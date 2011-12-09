@@ -154,6 +154,8 @@
                05  SPA-KENSAAUTO-FLG       PIC X(01).
       *自立支援負担変更区分
                05  SPA-FTNHEN-KBN          PIC X(01).
+      *訂正時の自動発生（処方せん料）
+               05  SPA-TEISEISYO-FLG       PIC X(01).
       *包括診療行為チェック
                05  SPA-HKTSANTEI-FLG       PIC 9(01).
       *包括診療行為チェック（入院料）
@@ -359,22 +361,23 @@
                05  SPA-PTTOKK-NAIYO            PIC X(12).
       *
       *入院用（Ｋ０２Ｎ）
+               05  SPA-K02N-DATA-REC.
       *        入院日
-               05  SPA-K02N-NYUINYMD           PIC X(08).
+                 06  SPA-K02N-NYUINYMD           PIC X(08).
       *        退院日
-               05  SPA-K02N-TAIINYMD           PIC X(08).
+                 06  SPA-K02N-TAIINYMD           PIC X(08).
       *        当月入院有無（算定履歴チェック用）
-               05  SPA-K02N-NYUINFLG          PIC  9(01).
+                 06  SPA-K02N-NYUINFLG          PIC  9(01).
       *   入院期間
-               05  SPA-K02-NYUIN-AREA.
+                 06  SPA-K02-NYUIN-AREA.
                    07  SPA-K02-NYUDAY         PIC 9(01)
                                               OCCURS   31.
       *        最終退院日
-               05  SPA-NAI-LASTTAIIN          PIC X(08).
+                 06  SPA-NAI-LASTTAIIN          PIC X(08).
       *        入院中区分（アフターケアの外来）
-               05  SPA-NAI-NYUIN              PIC 9(01).
+                 06  SPA-NAI-NYUIN              PIC 9(01).
       *        入院料包括チェック
-               05  SPA-NYUHKT-AREA.
+                 06  SPA-NYUHKT-AREA.
                    07  SPA-NYUHKTCHK           PIC 9(01).
                    07  SPA-NYUHKTCD            PIC X(03).
                    07  SPA-NYUHKTSRYCD         PIC X(09).
@@ -383,7 +386,16 @@
                            11  SPA-NYUHKTFLG       PIC 9(01).
                            11  SPA-DEKIDAFLG       PIC 9(01).
       *        他院退院日
-               05  SPA-TAI-TAIINYMD            PIC X(08).
+                 06  SPA-TAI-TAIINYMD            PIC X(08).
+      *        同日再入院日
+                 06  SPA-K02N-DOUDAY             PIC 9(02).
+      *        同日再入院区分（診療日）
+                 06  SPA-K02N-DOUKBN             PIC X(01).
+      *        中途終了選択の区分
+                 06  SPA-WKSRY-DOUKBN          PIC  X(01).
+      *        継続開始日入院日
+                 06  SPA-STR-NYUINYMD          PIC X(08).
+                 06  SPA-K02N-DOUTAIKBN        PIC X(01).
       *
       *複数診療科用
            03  SPA-FUKU-AREA.

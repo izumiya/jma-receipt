@@ -386,7 +386,7 @@
 	  <last_modification_time>Fri, 21 Jun 2002 02:27:59 GMT</last_modification_time>
 	</signal>
 	<columns>5</columns>
-	<column_widths>40,100,40,300,300</column_widths>
+	<column_widths>40,100,40,400,200</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -434,7 +434,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label444</name>
-	  <label>製造会社名</label>
+	  <label>「くすりのしおり」商品名</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -447,7 +447,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label447</name>
-	  <label>販売会社名</label>
+	  <label>会社名</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>

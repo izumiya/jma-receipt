@@ -347,11 +347,18 @@
       *
       *    病名移行確認画面より
            IF      SPA-MOTOPG(1:4)     =   "CID2"
+               MOVE    SPACE               TO  SPA-NAI-C04-BYOMEI-CHG
+                                                 (SPA-C04-IKOSAKI-INDEX)
+      *
                IF      SPA-CID2-FLG    =   "OK"
                    MOVE    SPA-C04-IKOSAKI-INDEX
                                                TO  IDZ
                    MOVE    SPA-C04-IKOSAKI-INDEX1
                                                TO  IDX2
+                   MOVE    SPA-CID2-FLG        TO  
+                                           SPA-NAI-C04-BYOMEI-CHG (IDZ)
+                   INITIALIZE              SPA-NAI-C04-BYOMEI-G (IDZ)
+      *
                    MOVE    SPA-C04-IKOSAKI-BYOMEICD
                                                TO
                                        SPA-NAI-C04-BYOMEICD-O (IDZ IDX2)
@@ -902,13 +909,24 @@
       *            自院病名コード廃止処理
                WHEN    "0108"
       *            自院病名コード未コード化病名処理
+                   MOVE    SPACE           TO
+                                           SPA-NAI-C04-BYOMEI-CHG
+                                               (SPA-C04-IKOSAKI-INDEX)
+      *
                    IF      SPA-CID6-FLG    =   "OK"
                        MOVE    SPA-C04-IKOSAKI-INDEX
                                                TO  IDZ
                        MOVE    SPA-C04-IKOSAKI-INDEX1
                                                TO  IDX2
+<<<<<<< ORCGC04.CBL
                        MOVE    SPA-CID6-FLG    TO
                                        SPA-NAI-C04-BYOMEI-CHG (IDZ)
+=======
+                       MOVE    SPA-CID6-FLG    TO
+                                       SPA-NAI-C04-BYOMEI-CHG (IDZ)
+                       INITIALIZE      SPA-NAI-C04-BYOMEI-G   (IDZ)
+      *
+>>>>>>> 1.57
                        MOVE    SPA-C04-IKOSAKI-BYOMEICD
                                                TO
                                        SPA-NAI-C04-BYOMEICD-O (IDZ IDX2)
@@ -1605,16 +1623,17 @@
       *****************************************************************
        500-BYOMEI-KENSAKU-SEC      SECTION.
       *
-           IF      SPA-C01-INDEX   =   ZERO           
+      *****IF      SPA-C01-INDEX   =   ZERO           
                PERFORM VARYING IDX     FROM    1   BY  1
                        UNTIL   IDX     >       6
                    PERFORM 3101-BYOMEITOP-HENSYU-SEC
                END-PERFORM
-           END-IF
+      *****END-IF
       *
            MOVE    SPACE               TO  ORCSBYOMEIAREA
            INITIALIZE                      ORCSBYOMEIAREA
            MOVE    "1"                 TO  LNK-BYO-SYORI
+<<<<<<< ORCGC04.CBL
            IF      SPA-C01-INDEX       =   ZERO
                MOVE    SPACE               TO  WRK-BYOMEI
                MOVE    ZERO                TO  IDYY
@@ -1638,7 +1657,28 @@
                        END-IF
                    ELSE
                        MOVE    IDY                 TO
+=======
+      *****IF      SPA-C01-INDEX       =   ZERO
+               MOVE    SPACE               TO  WRK-BYOMEI
+               MOVE    ZERO                TO  IDYY
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >       6
+                   IF      SPA-NAI-C04-BYOMEITOP (IDY)
+                                               =   "1"
+                       IF      IDY                 >   IDZ
+                           COMPUTE SPA-C04-CHANGE-INDEX-ED
+                                              =    IDY     -   1
+                           MOVE    6                   TO  IDY
+                       ELSE
+                           MOVE    SPA-NAI-C04-BYOMEI (IDY)
+                                                       TO  WRK-BYOMEI
+                           MOVE    IDY                 TO
+                                               SPA-C04-CHANGE-INDEX-ST
+                           IF      IDY                 =   6
+                               MOVE    IDY                 TO
+>>>>>>> 1.57
                                                SPA-C04-CHANGE-INDEX-ED
+<<<<<<< ORCGC04.CBL
                        STRING  WRK-BYOMEI          DELIMITED  BY  SPACE
                                SPA-NAI-C04-BYOMEI(IDY)
                                                    DELIMITED  BY  SPACE
@@ -1649,10 +1689,33 @@
                MOVE    WRK-BYOMEI          TO  LNK-BYO-BYOMEI
            ELSE
                MOVE    SPA-C01-INDEX       TO  SPA-C04-CHANGE-INDEX-ST
+=======
+                           END-IF
+                       END-IF
+                   ELSE
+                       MOVE    IDY                 TO
+>>>>>>> 1.57
                                                SPA-C04-CHANGE-INDEX-ED
+<<<<<<< ORCGC04.CBL
                MOVE    SPA-NAI-C04-BYOMEI (SPA-C01-INDEX)
                                            TO  LNK-BYO-BYOMEI
            END-IF
+=======
+                       STRING  WRK-BYOMEI          DELIMITED  BY  SPACE
+                               SPA-NAI-C04-BYOMEI(IDY)
+                                                   DELIMITED  BY  SPACE
+                                                   INTO       WRK-BYOMEI
+                       END-STRING
+                   END-IF    
+               END-PERFORM
+               MOVE    WRK-BYOMEI          TO  LNK-BYO-BYOMEI
+      *****ELSE
+      ******   MOVE    SPA-C01-INDEX       TO  SPA-C04-CHANGE-INDEX-ST
+      ******                                   SPA-C04-CHANGE-INDEX-ED
+      ******   MOVE    SPA-NAI-C04-BYOMEI (SPA-C01-INDEX)
+      ******                              TO  LNK-BYO-BYOMEI
+      *****END-IF
+>>>>>>> 1.57
            COMPUTE SPA-C04-CHANGE-INDEX-MAX
                    =   SPA-C04-CHANGE-INDEX-ED -
                        SPA-C04-CHANGE-INDEX-ST +   1

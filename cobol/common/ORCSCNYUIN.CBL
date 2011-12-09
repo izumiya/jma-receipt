@@ -42,6 +42,7 @@
       *  04.03.00    NACL-多々納  08/08/01  入院調剤料保険期間チェック対応
       *  04.05.00    NACL-多々納  09/10/XX  換算値・関連コメント対応
       *  04.07.00    NACL-多々納  11/08/XX  算定履歴付加テーブル削除対応
+      *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *****************************************************************
       *
       *
@@ -117,6 +118,10 @@
       *
            03  FLG-DEL             PIC 9(01).
            03  FLG-RENNUM          PIC 9(01).
+           03  FLG-DOUJITU         PIC 9(01).
+           03  FLG-OK2             PIC 9(01).
+      *    処理有
+           03  FLG-SYORI-ARI            PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -192,7 +197,7 @@
                05  WRK-JIHIMONEY           PIC  9(08).
       *    回数
            03  WRK-KAISU           PIC 9(08).
-           03  WRK-SRYSURYO       PIC 9(07)V9(05).
+           03  WRK-SRYSURYO        PIC 9(07)V9(05).
       *
            03  WRK-JYURRK-RENNUM           PIC 9(01).
            03  WRK-JYURRK-EDANUM           PIC 9(01).
@@ -458,6 +463,7 @@
       *
            MOVE    SPA-WORK            TO  SPA-K01KYOUTU
            MOVE    SPACE               TO  ORCSCNYUIN-ERRMSG
+      *
       *    更新日取得
            INITIALIZE                  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"       USING
@@ -537,6 +543,10 @@
            PERFORM     UNTIL      (FLG-PARA    =    1 )  OR
                                   (SPA-ERRCD   NOT =   SPACE )
                IF      PARA-FILEMEI        =   "WKSRYACT"
+      *!!!
+      *            対象有
+                   MOVE    1                   TO  FLG-SYORI-ARI
+      *!!!
                    MOVE    PARA-DATA-REC       TO  WRK-WKSRYACT-REC
                    MOVE    1                   TO  FLG-DEL
       *
@@ -590,6 +600,23 @@
                    PERFORM 4500115-TEISEI-RENNUM-SEC
                END-IF
            END-IF
+      *!!!
+      *    明細の登録なしはＤＢ異常終了とする
+           IF    ((ORCSCNYUIN-KBN      =   "1"  )  AND
+                  (FLG-SYORI-ARI       =   ZERO ))
+             OR   (SPA-ERRCD       NOT =   SPACE)
+                   MOVE    SPACE               TO  MCPDATA-REC
+                   MOVE    "DBSELECT"          TO  MCP-FUNC
+                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                   MOVE    "abort"             TO  MCP-PATHNAME
+                   CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                       MCPDATA-REC
+                                                       SPA-AREA
+                   IF      SPA-ERRCD           =   SPACE
+                       MOVE    "0051"              TO  SPA-ERRCD
+                   END-IF
+           END-IF
+      *!!!
       *
       *    包括まとめの時、以下対象外
            IF     (SPA-ERRCD           =   SPACE ) AND
@@ -817,6 +844,15 @@
                MOVE    SPA-SRYYMD(7:2)     TO  IDX-KAI2
                MOVE    1                   TO  TBL-DAY   (01 IDX-KAI2)
            END-IF
+      *!!!
+      *    同日再入院日判定
+           IF     (SPA-SRYYMD(1:6)     =   SPA-K02N-NYUINYMD (1:6))
+             AND  (SPA-K02N-DOUDAY     >   ZERO           )
+               MOVE    SPA-K02N-DOUDAY     TO  IDX-1
+           ELSE
+               MOVE    ZERO                TO  IDX-1
+           END-IF
+      *!!!
       *    算定日が重複した時、前の回数とする
            PERFORM VARYING     IDX-KAI1    FROM    1   BY  1
                    UNTIL       IDX-KAI1    >   10
@@ -830,6 +866,13 @@
                                                       (IDY IDX-KAI2)
                        END-PERFORM
                    END-IF
+      *!!!
+                   IF     (TBL-DAY (IDX-KAI1 IDX-KAI2) >   ZERO )
+                     AND  (IDX-1               =   IDX-KAI2  )
+                       MOVE    2               TO  TBL-DAY
+                                                  (IDX-KAI1 IDX-KAI2) 
+                   END-IF
+      *!!!
                END-PERFORM
            END-PERFORM
       *
@@ -1436,14 +1479,23 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                回数セット
                        ADD     TBL-KAISU(IDX-KAI1)
                                            TO  ACCT-DAY (1 IDX-KAI2)
+      *!!!!
+      *                同日再入院分
+                       EVALUATE   TBL-DAY (IDX-KAI1 IDX-KAI2)
+                       WHEN    2
+                           MOVE    3           TO  IDX-1
+                       WHEN    OTHER
+                           MOVE    2           TO  IDX-1
+                       END-EVALUATE
                        ADD     TBL-KAISU(IDX-KAI1)
-                                           TO  ACCT-DAY (2 IDX-KAI2)
+                                           TO  ACCT-DAY (IDX-1 IDX-KAI2)
+      *!!
       *                自動算定分は集計しない
                        IF      LNK-WKSRY-AUTOKBN(01 01)  =   "3"
                            MOVE    TBL-KAISU(IDX-KAI1)
                                            TO  ACCT-DAY (1 IDX-KAI2)
                            MOVE    TBL-KAISU(IDX-KAI1)
-                                           TO  ACCT-DAY (2 IDX-KAI2)
+                                           TO  ACCT-DAY (IDX-1 IDX-KAI2)
                        END-IF
                    END-IF
                END-PERFORM
@@ -1452,6 +1504,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  ACCT-ZAIKAISU
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL       IDX2    >   31
+               MOVE    ZERO                TO  ACCT-DAY (1 IDX2)
+               COMPUTE ACCT-DAY (1 IDX2)   =   ACCT-DAY (2 IDX2)
+                                           +   ACCT-DAY (3 IDX2)
+                                           +   ACCT-DAY (4 IDX2)
                ADD     ACCT-DAY (1 IDX2)   TO  ACCT-ZAIKAISU
            END-PERFORM
       *
@@ -1922,6 +1978,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                受診履歴作成
                        MOVE    SPA-SRYYMD          TO  WRK-SRYYMD
                        MOVE    IDX-KAI2            TO  WRK-SRYDD
+      *!!!!
+      *                同日再入院日判定
+                       IF     (SPA-SRYYMD(1:6)     =   SPA-K02N-NYUINYMD
+                                                                 (1:6))
+                       AND    (IDX-KAI2            =   SPA-K02N-DOUDAY)
+                           MOVE    2               TO  WRK-RENNUM
+                       ELSE
+                           MOVE    1               TO  WRK-RENNUM
+                       END-IF
+      *!!!!
                        PERFORM 2001-JYURRK-SAKUSEI-SEC
                    END-IF
                END-PERFORM
@@ -1951,7 +2017,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-SRYKA           TO  JYURRK-SRYKA
            MOVE    WRK-SRYYMD          TO  JYURRK-SRYYMD
-           MOVE    1                   TO  JYURRK-RENNUM
+      **** MOVE    1                   TO  JYURRK-RENNUM
+           MOVE    WRK-RENNUM          TO  JYURRK-RENNUM
       *    １日連番１とする
       *    MOVE    "JYURRK-KEY5"       TO  WRK-PATH
       *
@@ -2035,7 +2102,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-SRYKA           TO  JYURRK-SRYKA
            MOVE    WRK-SRYYMD          TO  JYURRK-SRYYMD
-           MOVE    1                   TO  JYURRK-RENNUM
+      ***  MOVE    1                   TO  JYURRK-RENNUM
+           MOVE    WRK-RENNUM          TO  JYURRK-RENNUM
       *    １日連番１とする
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
@@ -2200,7 +2268,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-SRYKA           TO  JYURRK-SRYKA
            MOVE    WRK-SRYYMD          TO  JYURRK-SRYYMD
-           MOVE    1                   TO  JYURRK-RENNUM
+      *****MOVE    1                   TO  JYURRK-RENNUM
+           MOVE    WRK-RENNUM          TO  JYURRK-RENNUM
            MOVE    WRK-JYURRK-DOUJI-RENNUM
                                        TO  JYURRK-DOUJI-RENNUM
            MOVE    WRK-JYURRK-EDANUM   TO  JYURRK-EDANUM
@@ -2865,12 +2934,15 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  WRK-DOUJI-RENNUM-KEY
            PERFORM
                    UNTIL       FLG-JYURRK  =   1
-               IF      JYURRK-RENNUM       =   WRK-RENNUM-KEY
-                   CONTINUE
-               ELSE
-                   ADD     1                   TO  WRK-JYURRK-RENNUM
-                   MOVE    JYURRK-RENNUM       TO  WRK-RENNUM-KEY
-               END-IF
+      *        IF      JYURRK-RENNUM       =   WRK-RENNUM-KEY
+      *            CONTINUE
+      *        ELSE
+      *            ADD     1                   TO  WRK-JYURRK-RENNUM
+      *            MOVE    JYURRK-RENNUM       TO  WRK-RENNUM-KEY
+      *        END-IF
+      *!!      同日再入院の為、同じ連番の同日連番を変更する
+             IF     (SPA-RENNUM          =   JYURRK-RENNUM )
+               MOVE    JYURRK-RENNUM       TO  WRK-JYURRK-RENNUM
                IF      JYURRK-DOUJI-RENNUM =   WRK-DOUJI-RENNUM-KEY
                    CONTINUE
                    IF      JYURRK-EDANUM       =   1
@@ -2933,9 +3005,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                        END-STRING
                    END-IF
       *            診療会計修正
-                   IF      FLG-RENNUM          =   1
-                       PERFORM 4500115-TEISEI-SRYACTUPD-SEC
-                   END-IF
+      ***          IF      FLG-RENNUM          =   1
+      *                PERFORM 4500115-TEISEI-SRYACTUPD-SEC
+      ****         END-IF
+                END-IF
                END-IF
       *
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
@@ -3263,6 +3336,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        200-TAIIN-SYORI-SEC             SECTION.
       *
+      *    同日再入院分
+           IF      ORCSCNYUIN-DOUJITSUKBN  =   "1"
+               MOVE    1                   TO  FLG-DOUJITU
+           ELSE
+               MOVE    ZERO                TO  FLG-DOUJITU
+           END-IF
+      *
            INITIALIZE                      TBL-NYU-SRYKA-AREA
            MOVE    ZERO                TO  IDX-K
       *    入院履歴判定
@@ -3313,7 +3393,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ORCSCNYUIN-YMD      TO  JYURRK-SRYYMD
       *    退院日以降すべて削除
            MOVE    ALL "9"             TO  JYURRK-UPSRYYMD
-           MOVE    "JYURRK-KEY14"      TO  WRK-PATH
+      **** MOVE    "JYURRK-KEY14"      TO  WRK-PATH
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
@@ -3329,6 +3409,18 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPACE                TO  WRK-LST-SRYYMD
            PERFORM
                    UNTIL       FLG-JYURRK      =   1
+      *
+               MOVE    ZERO                TO  FLG-OK2
+               IF     (ORCSCNYUIN-YMD          =   JYURRK-SRYYMD)
+                 AND  (FLG-DOUJITU             =   1            )
+                   IF      JYURRK-RENNUM           =   2
+                       MOVE    1                   TO  FLG-OK2
+                   END-IF
+               ELSE
+                   MOVE    1                   TO  FLG-OK2
+               END-IF
+      *        受診履歴削除
+               IF      FLG-OK2             =   1
       *
                MOVE    JYURRK-SRYYMD           TO  SPA-SRYYMD
       *        診療会計マスタの診療回数をクリアする
@@ -3358,6 +3450,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                IF      WRK-LST-SRYYMD      <   JYURRK-SRYYMD
                    MOVE    JYURRK-SRYYMD       TO  WRK-LST-SRYYMD
+               END-IF
+      *ver.4.7
                END-IF
       *
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE

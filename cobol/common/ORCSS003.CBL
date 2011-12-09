@@ -50,6 +50,7 @@
            03  FLG-PTNYUINRRK                  PIC 9(01).
            03  FLG-TENSU                       PIC 9(01).
            03  FLG-END                         PIC 9(01).
+           03  FLG-OK                          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -67,6 +68,7 @@
                05  WRK-SYOSAISIN-KBN           PIC X(01).
                05  WRK-JNISSUGEN-KBN           PIC X(01).
                05  WRK-JIKANGAI-KBN            PIC X(01).
+           03  WRK-DAY                         PIC S9(05).
       *
        01  CONST-AREA.
            03  CONST-ZAINUM-MAX            PIC 9(05)   VALUE 15.
@@ -173,9 +175,11 @@
       *****************************************************************
        200-MAIN-SEC                    SECTION.
       *
-           IF    ( SS003-SYORIKBN  =   ZERO )
+           IF    ( SS003-SYORIKBN      =   "0" OR "2" )
                INITIALIZE              TTNS-AREA
-           ELSE
+           END-IF
+      *
+           IF    ( SS003-SYORIKBN      =   "1" OR "2" )
                IF    ( SS003-NYUGAIKBN =   "1" )
                    PERFORM 2001-SYUNOU-CHK-SEC
                ELSE
@@ -450,6 +454,26 @@
       *****************************************************************
        20011-SRYACCT-CHK-SEC            SECTION.
       *
+           EVALUATE    SS003-SYORIKBN
+           WHEN    "1"
+               PERFORM 200111-SRYACCT-CHK-SEC
+               IF    ( FLG-OK     =    1 )
+                   PERFORM 2001-SRYACT-CHK-SEC
+               END-IF
+           WHEN    "2"
+               PERFORM 2001-SRYACT-CHK-SEC
+           END-EVALUATE
+      *
+           .
+       20011-SRYACCT-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¿ÇÎÅ²ñ·×¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       200111-SRYACCT-CHK-SEC            SECTION.
+      *
+           MOVE    ZERO            TO  FLG-OK
+      *
            IF   (( ACCT-ZAITEN     NOT =   ZERO )
              AND ( ACCT-DAY (IDX-KAISU WRK-SRYDAY)
                                    NOT =   ZERO )
@@ -464,13 +488,12 @@
                                        OR  "12"
                                        OR  "99" ))
       *
-               PERFORM 2001-SRYACT-CHK-SEC
+               MOVE    1           TO  FLG-OK
       *
            END-IF
       *
-      *
            .
-       20011-SRYACCT-CHK-EXT.
+       200111-SRYACCT-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ¿ÇÎÅ¹Ô°Ù¥Á¥§¥Ã¥¯½èÍý
@@ -506,10 +529,13 @@
                         OR   ( SRY-SRYCD (IDX-SRYCD)   =   SPACE)
                         OR   ( FLG-END             NOT =   ZERO )
       *
-                   PERFORM 2001-SYOSAISIN-CHK-SEC
+                   PERFORM 200111-SRYACCT-CHK-SEC
+                   IF    ( FLG-OK          =   1 )
+                       PERFORM 2001-SYOSAISIN-CHK-SEC
+                   END-IF
       *
                    PERFORM VARYING IDX0    FROM    1   BY  1
-                           UNTIL ( IDX0    >   20 )
+                           UNTIL ( IDX0    >   100 )
       *
                        IF    ( SRY-SRYCD (IDX-SRYCD)
                                            =   SS003-SRYCD (IDX0) )

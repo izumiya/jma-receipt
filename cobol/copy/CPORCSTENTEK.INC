@@ -23,6 +23,7 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 01.00.01     NACL-多々納  03/04/03  中心静脈処理追加
+      * 04.07.00     NACL-多々納  11/11/XX  同日再入院追加
       ************************************************************
        01  ORCSTENTEKAREA.
       *
@@ -77,6 +78,10 @@
                        09  ORCSTEN-KIZ-DAY-G.
                            11  ORCSTEN-KIZ-DAY         PIC 9(03)
                                                        OCCURS  31.
+      *                    同日算定回数
+                           11  ORCSTEN-KIZ-DAY2-G      OCCURS  31.
+                               13  ORCSTEN-KIZ-DAY2    PIC 9(03)
+                                                       OCCURS  2.
       *
       *点滴手技料算定
            03  ORCSTEN-DAY-AREA.
@@ -102,6 +107,15 @@
                    07  ORCSTEN-CHU-AREA.
                        09  ORCSTEN-CHU-DAY         PIC 9(01)
                                                OCCURS   31.
+      *同日再入院対応点数
+           03  ORCSTEN-DOUJITU-AREA.
+      *        薬剤日別テーブル
+               05  ORCSTEN-DOU-TBL2          OCCURS   31.
+      *            薬剤１日点数
+                   07  ORCSTEN-DOU-ZAITEN          PIC  9(08)
+                                                   OCCURS   2.
+      *
+      *
       *エラーコード（１：会計照会更新エラー
       *              ２：受診履歴更新エラー）
            03  ORCSTEN-ERRCD           PIC 9(01).

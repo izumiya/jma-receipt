@@ -163,7 +163,7 @@
       *
        01  CONST-AREA.
            03  CONST-H180401           PIC X(08)   VALUE "20060401".
-           03  CONST-SMEILIST-MAX      PIC 9(03)   VALUE   50.
+           03  CONST-SMEILIST-MAX      PIC 9(03)   VALUE   99.
            03  CONST-SKYLIST-MAX       PIC 9(03)   VALUE   50.
            03  CONST-JIHI-MAX          PIC 9(03)   VALUE   10.
            03  CONST-PROC-NO-G.
@@ -3643,6 +3643,7 @@
            PERFORM 900-SYUNOU-KEY-SEL-SEC
            IF    ( FLG-SYUNOU      NOT =   ZERO )
                MOVE    "1001"          TO  SPA-ERRCD
+               PERFORM 910-DBABORT-SEC
            ELSE
       *
                EVALUATE    SPA-GMN-O04-SYORIKBN
@@ -3764,7 +3765,9 @@
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            IF    ( FLG-SYUMEI      NOT =   ZERO )
+            OR   ( SMEI-DENPEDANUM    >=   CONST-SMEILIST-MAX )
                MOVE    "1003"          TO  SPA-ERRCD
+               PERFORM 910-DBABORT-SEC
            ELSE
       *
                COMPUTE WRK-DENPEDANUM  =   SMEI-DENPEDANUM +   1
@@ -3906,6 +3909,7 @@
       *
            IF    ( FLG-SYUMEI      NOT =   ZERO )
                MOVE    "1005"          TO  SPA-ERRCD
+               PERFORM 910-DBABORT-SEC
            ELSE
       *
                MOVE    SMEI-NYUHEN-YMD     TO  WRK-OLD-NYUHEN-YMD
@@ -4636,6 +4640,20 @@
       *
            .
        900-SYURRK-KEY-SEL-EXT.
+           EXIT.
+      *************************************************************
+      *    トランザクションキャンセル処理
+      *************************************************************
+       910-DBABORT-SEC               SECTION.
+      *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SYSKANRI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "abort"         TO  MCP-PATHNAME
+           PERFORM 911-DBSELECT-SEC
+      *
+           .
+       910-DBABORT-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

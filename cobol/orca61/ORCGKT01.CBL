@@ -85,7 +85,7 @@
       *
       *    £Ó£Ð£Á¥Ñ¥é¥á¥¿¥Ç¡¼¥¿
        FD  SPASCR-FILE.
-       01  SPA-DATA-REC                 PIC X(1200).
+       01  SPA-DATA-REC                 PIC X(1500).
       *
       *    ¥ï¡¼¥¯¿ÇÎÅ
        FD  WKSRY-FILE.

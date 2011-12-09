@@ -127,6 +127,10 @@
       *  04.06.03    NACL-門脇    10/12/13  請求額情報の追加
       *  04.06.04    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
+      *                                     一部負担金金額集計フラグ追加
+      *                                     保険欄−一部負担金記載
+      *                                     （高齢者）（70歳未満）フラグ追加
       ************************************************************
       *01  RECE02-REC.
            03  RECE02-KEY.
@@ -601,6 +605,9 @@
                    09  RECE02-EKF-JNISSUFLG    PIC  X(01).
                    09  RECE02-EKF-TOTALTENFLG  PIC  X(01).
                    09  RECE02-EKF-OCRFLG       PIC  X(01).
+                   09  RECE02-EKF-FTNKEIFLG    PIC  X(01).
+                   09  RECE02-EKF-HKNFTNFLG-K  PIC  X(01).
+                   09  RECE02-EKF-HKNFTNFLG-Y  PIC  X(01).
       *
       *実日数・請求点記載フラグ
            03  RECE02-JSKISAIFLG          PIC  X(01).

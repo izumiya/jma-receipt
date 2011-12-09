@@ -295,15 +295,30 @@
            MOVE    "5"                 TO  TBL-QRCSV-DATA (1)
       **** MOVE    ORCSQRCSV-DR-KANANAME
       ****                             TO  TBL-QRCSV-DATA (3)
-           MOVE    ORCSQRCSV-DR-NAME   TO  TBL-QRCSV-DATA (4)
+      *    拡張漢字変換
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    ORCSQRCSV-DR-NAME   TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT   TO  TBL-QRCSV-DATA (4)
            MOVE    4                   TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC
       *
       *    患者氏名レコード
            MOVE    SPACE               TO  TBL-QRCSV-AREA
            MOVE    "11"                TO  TBL-QRCSV-DATA (1)
-           MOVE    ORCSQRCSV-NAME(1:40)
+      **   MOVE    ORCSQRCSV-NAME(1:40)
+      **                               TO  TBL-QRCSV-DATA (3)
+      *    拡張漢字変換
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    ORCSQRCSV-NAME      TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT(1:40)
                                        TO  TBL-QRCSV-DATA (3)
+      *
            MOVE    ORCSQRCSV-KANANAME  TO  TBL-QRCSV-DATA (4)
            MOVE    4                   TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC

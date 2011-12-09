@@ -56,6 +56,8 @@
       *
       *  04.04.01    NACL-門脇    09/05/11  抽出対象条件修正
       *
+      *  04.05.01    NACL-藤原    11/11/22  同日再入院対応
+      *
       *  04.07.01    NACL-門脇    11/09/07  労災請求書作成対応
       *****************************************************************
       *
@@ -145,6 +147,7 @@
            03  IDZ                     PIC 9(03).
            03  TBL-MAX                 PIC 9(03).
            03  SYSKAN-IDX              PIC 9(03).
+           03  IDXX                    PIC 9(03).
       *
        01  KEY-AREA                            VALUE   LOW-VALUE.
            03  KEY-NEW.
@@ -305,6 +308,9 @@
            COPY    "CPORCSJOBKANRI.INC".
       *   保険算定用年齢・割合計算サブ
            COPY    "CPORCSAGECHK.INC".
+      *
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -708,6 +714,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
                PERFORM         UNTIL   FLG-SRYACCT     =   1 
                                OR      FLG-END         =   1 
                                OR      KEY-N-PTID  NOT =   KEY-O-PTID
+      *            同日再入院情報取得
+                   PERFORM 500-ORCSNYUINDAY-CALL-SEC
+      *
       *            保険組合せ読込み
                    INITIALIZE                  HKNCOMBI-REC
                    MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
@@ -903,6 +912,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
                END-PERFORM
       *
                IF      FLG-END                 =   ZERO 
+      *            同日再入院情報取得
+                   PERFORM 500-ORCSNYUINDAY-CALL-SEC
+      *            同日再入院のチェック
+                   PERFORM 500-ORCSNYUINDAY-CHECK-SEC
+      *
       *            入院会計より保険組合せ読込     
                    PERFORM VARYING IDX FROM    1   BY  1
                            UNTIL   IDX >       31
@@ -1267,6 +1281,21 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
              END-EVALUATE
            END-IF
       *
+      *    入院料情報取得フラグ
+           MOVE    1               TO  WRK-RECE82-DOUJITSU-FLG
+      *    同日再入院（入院分）の保険組合せ、食事開始時間区分
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL   IDX1    >       31
+               MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDX1)
+                                           TO
+                                   WRK-RECE82-DOUJITSU-HKNCOMBI (IDX1)
+               MOVE    LNK-NYUINDAY-DOUJITSU-SKJKBN   (IDX1)
+                                           TO
+                                   WRK-RECE82-DOUJITSU-SKJKBN   (IDX1)
+           END-PERFORM
+      *    入院区分
+           MOVE    LNK-NYUINDAY-TBL    TO  WRK-RECE82-NYUINDAY-TBL
+      *
            MOVE    WRK-RECE82-REC      TO  RECE82-REC
            WRITE   RECE82-REC
            ADD     1                   TO  CNT-OUT
@@ -1305,6 +1334,23 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
                     MOVE   WRK-DAY(2 IDX3)  TO  WRK-RECE82-DAY(IDX3)
                  END-IF
                END-PERFORM
+           END-IF
+      *
+           IF      WRK-RECE82-DOUJITSU-FLG =   ZERO
+      *        入院料情報取得フラグ
+               MOVE    1               TO  WRK-RECE82-DOUJITSU-FLG
+      *        同日再入院（入院分）の保険組合せ、食事開始時間区分
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL   IDX1    >       31
+                   MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDX1)
+                                               TO
+                                   WRK-RECE82-DOUJITSU-HKNCOMBI (IDX1)
+                   MOVE    LNK-NYUINDAY-DOUJITSU-SKJKBN   (IDX1)
+                                               TO
+                                   WRK-RECE82-DOUJITSU-SKJKBN   (IDX1)
+               END-PERFORM
+      *        入院区分
+               MOVE    LNK-NYUINDAY-TBL    TO  WRK-RECE82-NYUINDAY-TBL
            END-IF
       *
            IF      WRK-TEISEIKBN           =   "1"
@@ -1483,6 +1529,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
            CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                LNK-DAY7-AREA
            MOVE    LNK-DAY7-KOYOMI     TO  WRK-EDYMD 
+      *
+      *    同日再入院情報取得
+           PERFORM 500-ORCSNYUINDAY-CALL-SEC
       *
       *    診療会計読み込み
            MOVE    "1"                 TO  WRK-DBKBN 
@@ -1673,6 +1722,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
            PERFORM 500-CANCEL-HENSYU-SEC
       *
            IF      FLG-END             =   ZERO
+      *        同日再入院情報取得
+               PERFORM 500-ORCSNYUINDAY-CALL-SEC
+      *
       *        診療会計読み込み
                MOVE    "1"                 TO  WRK-DBKBN 
       *      
@@ -1847,6 +1899,9 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
            END-PERFORM
       *
            IF      FLG-END             =   ZERO
+      *        同日再入院のチェック
+               PERFORM 500-ORCSNYUINDAY-CHECK-SEC
+      *
       *        入院会計より保険組合せ読込     
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       31
@@ -1987,6 +2042,117 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            DISPLAY "*** ORCR0810 END ***"
            .
        300-TERM-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    同日再入院情報取得処理
+      *****************************************************************
+       500-ORCSNYUINDAY-CALL-SEC      SECTION.
+      *
+           INITIALIZE                      ORCSNYUINDAY-AREA
+           MOVE    SYS-1001-HOSPNUM    TO  LNK-NYUINDAY-HOSPNUM
+           EVALUATE    WRK-PARA-SYOKBN
+               WHEN    "1"
+                   MOVE    KEY-O-PTID      TO  LNK-NYUINDAY-PTID
+                   MOVE    SYS-2001-SRYYM  TO  LNK-NYUINDAY-SANTEIYM
+               WHEN    "2"
+                   MOVE    SYS-2002-PTID   TO  LNK-NYUINDAY-PTID
+                   MOVE    SYS-2002-SRYYM  TO  LNK-NYUINDAY-SANTEIYM
+           END-EVALUATE
+           CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
+                                               SPA-AREA
+           IF      LNK-NYUINDAY-RC >   0
+               DISPLAY "LNK-NYUINDAY-RC=" LNK-NYUINDAY-RC
+           END-IF
+           .
+       500-ORCSNYUINDAY-CALL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    同日再入院チェック処理
+      *****************************************************************
+       500-ORCSNYUINDAY-CHECK-SEC          SECTION.
+      *
+           PERFORM VARYING IDXX    FROM    1   BY  1
+                   UNTIL   IDXX    >       31
+             IF      LNK-NYUINDAY-DOUJITSU-KBN (IDXX)
+                                           =   "1"
+      *
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL   IDX1    >   10
+      *
+      *            保険組合せ追加
+                   IF      WRK-COMB-HKNCOMBINUM (IDX1) =   ZERO
+                       INITIALIZE                      HKNCOMBI-REC
+                       MOVE    SYS-1001-HOSPNUM    TO  COMB-HOSPNUM
+                       MOVE    KEY-O-PTID          TO  COMB-PTID
+                       MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
+                                                   TO  COMB-HKNCOMBINUM 
+                       MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+                       PERFORM  910-HKNCOMBI-INV-SEC
+      *                （対象外の組合せは１をセット）
+                       IF      FLG-HKNCOMBI    =   ZERO
+                           MOVE    HKNCOMBI-REC    TO
+                                           WRK-HKNCOMBI-REC  (IDX1)
+      *                    医保以外読み飛ばし
+                           IF      COMB-HKNNUM NOT =   WRK-CONS-HKNNUM
+                               MOVE    "1"         TO
+                                           WRK-HKNCOMBI-SYOKBN (IDX1)
+                           END-IF
+                       ELSE
+                           IF      COMB-DELKBN         =   "1"
+                               MOVE    HKNCOMBI-REC    TO
+                                               WRK-HKNCOMBI-REC  (IDX1)
+      *                        医保以外読み飛ばし
+                               IF      COMB-HKNNUM NOT =
+                                                       WRK-CONS-HKNNUM
+                                   MOVE    "1"         TO
+                                           WRK-HKNCOMBI-SYOKBN (IDX1)
+                               ELSE
+                                   MOVE    "2"             TO
+                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
+                               END-IF
+                           ELSE
+                               MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI
+                                                                (IDXX)
+                                                   TO
+                                           WRK-COMB-HKNCOMBINUM (IDX1)
+                               MOVE    "2"             TO
+                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
+                           END-IF
+                       END-IF
+                   END-IF
+      *
+      *            適用範囲かチェック（範囲外のとき２をセット）
+                   IF      LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
+                                           =
+                                       WRK-COMB-HKNCOMBINUM (IDX1)
+                       IF      WRK-HKNCOMBI-SYOKBN (IDX1)
+                                           NOT =   SPACE
+                           CONTINUE                    
+                       ELSE     
+                           MOVE    WRK-STYMD       TO  WRK-YMD
+                           MOVE    IDXX            TO  WRK-DD
+                           IF      WRK-COMB-TEKSTYMD (IDX1)
+                                                   <=  WRK-YMD
+                           AND     WRK-COMB-TEKEDYMD (IDX1)
+                                                   >=  WRK-YMD
+                               CONTINUE
+                           ELSE   
+                               MOVE    "2"         TO
+                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
+                               MOVE    IDXX        TO
+                                           WRK-HKNCOMBI-ERR-DAY (IDX1)
+                           END-IF
+                       END-IF
+                       MOVE    10              TO  IDX1
+                   END-IF            
+               END-PERFORM
+             END-IF
+           END-PERFORM
+      *
+           .
+       500-ORCSNYUINDAY-CHECK-EXT.
            EXIT.
       *
       *****************************************************************

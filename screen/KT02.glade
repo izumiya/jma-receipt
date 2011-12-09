@@ -1468,6 +1468,29 @@
       <xpad>0</xpad>
       <ypad>0</ypad>
     </widget>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>B02S</name>
+      <x>88</x>
+      <y>696</y>
+      <width>80</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <accelerator>
+	<modifiers>GDK_SHIFT_MASK</modifiers>
+	<key>GDK_F2</key>
+	<signal>clicked</signal>
+      </accelerator>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Mon, 25 Dec 2000 04:55:00 GMT</last_modification_time>
+      </signal>
+      <label>チェック</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
   </widget>
 </widget>
 

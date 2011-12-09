@@ -251,6 +251,7 @@
                05  WRK-PARA-SHELLID PIC  X(08).
            03  WRK-PARA-RECECOM     PIC  X(01).
            03  WRK-PARA-PRTKBN      PIC  X(01).
+           03  WRK-PARA-DLTKBN      PIC  X(01).
            03  WRK-PARA-HOSPNUM     PIC  9(02).
       *
            03  WRK-SYS-SRYYMD       PIC  X(08).
@@ -570,9 +571,13 @@
                                        INTO    WRK-PARA
                                                WRK-PARA-RECECOM
                                                WRK-PARA-PRTKBN
+                                               WRK-PARA-DLTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
+      *
+           DISPLAY "WRK-PARA-DLTKBN=" WRK-PARA-DLTKBN
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            MOVE    "RECE410"           TO  RECE41PARA-FILE-ID
@@ -3194,7 +3199,11 @@ grpsys                     MOVE    WRK-PARA-HOSPNUM    TO
                            MOVE    RECE10-REC          TO  MCPDATA-REC
                            MOVE    "DBDELETE"          TO  MCP-FUNC
                            MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                           MOVE    "del4"              TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
 grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC           NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE " "
@@ -3261,7 +3270,11 @@ grpsys                     MOVE    WRK-PARA-HOSPNUM
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
-                           MOVE    "del4"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
 grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -3323,7 +3336,11 @@ grpsys                     MOVE    WRK-PARA-HOSPNUM
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
-                           MOVE    "del4"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
 grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE

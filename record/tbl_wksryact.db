@@ -5,6 +5,7 @@ tbl_wksryact {
 	SRYKA				char(2);
 	SRYYMD				char(8);
 	HKNCOMBI			number(4,0);
+	DOUJITSUKBN			char(1);
 	ZAINUM			        number(8,0);
 	RENNUM                          number(2,0);
 	DRCD				char(5);
@@ -111,7 +112,7 @@ tbl_wksryact {
 	UPHMS				char(6);
 };
 primary	{
-	HOSPNUM,NYUGAIKBN,PTID,SRYKA,SRYYMD,HKNCOMBI,ZAINUM,RENNUM;
+	HOSPNUM,NYUGAIKBN,PTID,SRYKA,SRYYMD,HKNCOMBI,DOUJITSUKBN,ZAINUM,RENNUM;
 };
 
 path	key 	{
@@ -125,6 +126,7 @@ path	key 	{
 			AND   SRYKA       =   :SRYKA
 			AND   SRYYMD      =   :SRYYMD
 			AND   HKNCOMBI    =   :HKNCOMBI
+			AND   DOUJITSUKBN   =   :DOUJITSUKBN
 			AND   ZAINUM      =   :ZAINUM
 			AND   RENNUM      =   :RENNUM
 		;
@@ -142,6 +144,7 @@ path	key2 	{
 			AND   SRYKA       =   :SRYKA
 			AND   SRYYMD      =   :SRYYMD
 			AND   HKNCOMBI    =   :HKNCOMBI
+			AND   DOUJITSUKBN   =   :DOUJITSUKBN
 			ORDER   BY        ZAINUM,
                                           RENNUM
 		;
@@ -174,6 +177,7 @@ path	del11 	{
 			AND   SRYKA       =   :SRYKA
 			AND   SRYYMD      =   :SRYYMD
 			AND   HKNCOMBI    =   :HKNCOMBI
+			AND   DOUJITSUKBN   =   :DOUJITSUKBN
 		;
 	};
 };
@@ -207,6 +211,7 @@ path	key4 	{
 			ORDER   BY        SRYYMD,
                                           SRYKA,
                                           HKNCOMBI,
+                                          DOUJITSUKBN,
                                           ZAINUM,
                                           RENNUM
 		;
@@ -223,6 +228,7 @@ path	key5 	{
 		                          SRYYMD,
                                           SRYKA,
                                           HKNCOMBI,
+                                          DOUJITSUKBN,
                                           ZAINUM,
                                           RENNUM
 		;
@@ -250,6 +256,7 @@ path	key6 	{
 			ORDER   BY        SRYYMD,
                                           SRYKA,
                                           HKNCOMBI,
+                                          DOUJITSUKBN,
                                           ZAINUM,
                                           RENNUM
 		;
@@ -267,6 +274,7 @@ path	key7	{
                         AND   MOD_FLG     <>  '0'
 			ORDER   BY        SRYKA,
                                           HKNCOMBI,
+                                          DOUJITSUKBN,
                                           ZAINUM,
                                           RENNUM
 		;
@@ -285,6 +293,7 @@ path	key8	{
 		                          a.SRYYMD,
                                           a.SRYKA,
                                           a.HKNCOMBI,
+                                          a.DOUJITSUKBN,
                                           a.ZAINUM,
                                           a.RENNUM
 		;
@@ -305,6 +314,7 @@ path	key9	{
 		                          a.SRYYMD,
                                           a.SRYKA,
                                           a.HKNCOMBI,
+                                          a.DOUJITSUKBN,
                                           a.ZAINUM,
                                           a.RENNUM
 		;
@@ -324,6 +334,7 @@ path	key10 	{
 		                          SRYYMD,
                                           SRYKA,
                                           HKNCOMBI,
+                                          DOUJITSUKBN,
                                           ZAINUM,
                                           RENNUM
 		;
@@ -343,11 +354,13 @@ path	key11	{
 			ORDER   BY        b.PTNUM,
                                           a.SRYKA,
                                           a.HKNCOMBI,
+                                          a.DOUJITSUKBN,
                                           a.ZAINUM,
                                           a.RENNUM
 		;
 	};
 };
+<<<<<<< tbl_wksryact.db
 
 path	key12 	{
 	DBSELECT	{
@@ -396,3 +409,54 @@ path	del13 	{
 	};
 };
 
+=======
+
+path	key12 	{
+	DBSELECT	{
+		DECLARE tbl_wksryact_key12_csr CURSOR FOR
+		SELECT *
+		FROM tbl_wksryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYKA       =   :SRYKA
+			AND   SRYYMD      =   :SRYYMD
+			AND   KARTE_KEY   =   :KARTE_KEY
+			ORDER   BY        ZAINUM,
+                                          RENNUM
+		;
+	};
+};
+
+path	key13 	{
+	DBSELECT	{
+		DECLARE tbl_wksryact_key13_csr CURSOR FOR
+		SELECT *
+		FROM tbl_wksryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYKA       =   :SRYKA
+			AND   SRYYMD      =   :SRYYMD
+			ORDER   BY        HKNCOMBI,
+                                          DOUJITSUKBN,
+				          ZAINUM,
+                                          RENNUM
+		;
+	};
+};
+path	del13 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_wksryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYKA       =   :SRYKA
+			AND   SRYYMD      =   :SRYYMD
+			AND   KARTE_KEY   =   :KARTE_KEY
+		;
+	};
+};
+
+>>>>>>> 1.16

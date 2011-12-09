@@ -411,3 +411,11 @@ path	key24	{
         ; 
 	};
 };
+
+path	abort	{
+	DBSELECT	{
+		error
+ 		;
+	};
+};
+

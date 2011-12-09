@@ -33,7 +33,12 @@
       *                                     MONFUNC 対応
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
       *  04.07.00    NACL-多々納  11/08/08  明細２００件対応
+<<<<<<< ORCGK10.CBL
       *  04.07.00    NACL-多々納  11/10/XX  剤番＝１なし対応
+=======
+      *  04.07.00    NACL-多々納  11/10/XX  剤番＝１なし対応
+      *                                     同日再入院対応
+>>>>>>> 1.37
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -136,12 +141,22 @@
            03  WRK-K10-ROW             PIC S9(09).
            03  FLG-GMN-INIT            PIC  9(01).
       *
+<<<<<<< ORCGK10.CBL
            03  WRK-KEY-AREA.
                05  WRK-KEY-PTID        PIC 9(10).
                05  WRK-KEY-SRYYMD      PIC X(08).
                05  WRK-KEY-SRYKA       PIC X(02).
                05  WRK-KEY-HKNCOMBI    PIC X(04).
       *
+=======
+           03  WRK-KEY-AREA.
+               05  WRK-KEY-PTID        PIC 9(10).
+               05  WRK-KEY-SRYYMD      PIC X(08).
+               05  WRK-KEY-SRYKA       PIC X(02).
+               05  WRK-KEY-HKNCOMBI    PIC X(04).
+               05  WRK-KEY-DOUJITSUKBN    PIC X(01).
+      *
+>>>>>>> 1.37
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
            03  WRK-HENYMD.
@@ -418,6 +433,7 @@
            PERFORM
                UNTIL   (FLG-WKSRYACT   =   1 )  OR
                        (IDX            >   200 )
+<<<<<<< ORCGK10.CBL
                IF      (WKSRY-PTID         =   WRK-KEY-PTID  )  AND
                        (WKSRY-SRYKA        =   WRK-KEY-SRYKA )  AND
                        (WKSRY-SRYYMD       =   WRK-KEY-SRYYMD)  AND
@@ -429,6 +445,20 @@
                IF     ((WKSRY-ZAINUM       =   1   )  OR
                        (FLG-CHK            =   ZERO ))  AND
                       ( WKSRY-RENNUM       =   1   )
+=======
+               IF      (WKSRY-PTID         =   WRK-KEY-PTID  )  AND
+                       (WKSRY-SRYKA        =   WRK-KEY-SRYKA )  AND
+                       (WKSRY-SRYYMD       =   WRK-KEY-SRYYMD)  AND
+                       (WKSRY-HKNCOMBI     =   WRK-KEY-HKNCOMBI)  AND
+                       (WKSRY-DOUJITSUKBN  =   WRK-KEY-DOUJITSUKBN)
+                   MOVE    1                   TO  FLG-CHK
+               ELSE
+                   MOVE    ZERO                TO  FLG-CHK
+               END-IF
+               IF     ((WKSRY-ZAINUM       =   1   )  OR
+                       (FLG-CHK            =   ZERO ))  AND
+                      ( WKSRY-RENNUM       =   1   )
+>>>>>>> 1.37
                    ADD     1                   TO  IDX
                    IF      IDX                 >   200
                        MOVE    1                   TO  SPA-K10-NEXT
@@ -437,11 +467,20 @@
                    END-IF
                END-IF
       *
+<<<<<<< ORCGK10.CBL
                MOVE    WKSRY-PTID          TO  WRK-KEY-PTID
                MOVE    WKSRY-SRYKA         TO  WRK-KEY-SRYKA
                MOVE    WKSRY-SRYYMD        TO  WRK-KEY-SRYYMD
                MOVE    WKSRY-HKNCOMBI      TO  WRK-KEY-HKNCOMBI
       *
+=======
+               MOVE    WKSRY-PTID          TO  WRK-KEY-PTID
+               MOVE    WKSRY-SRYKA         TO  WRK-KEY-SRYKA
+               MOVE    WKSRY-SRYYMD        TO  WRK-KEY-SRYYMD
+               MOVE    WKSRY-HKNCOMBI      TO  WRK-KEY-HKNCOMBI
+               MOVE    WKSRY-DOUJITSUKBN   TO  WRK-KEY-DOUJITSUKBN
+      *
+>>>>>>> 1.37
                MOVE    "tbl_wksryact"      TO  MCP-TABLE
                MOVE    WRK-PATH            TO  MCP-PATHNAME
                PERFORM 940-WKSINKOUI-READ-SEC
@@ -517,6 +556,9 @@
            ELSE
                PERFORM 31012-DRCD-NAME-SEC
            END-IF
+      *ver.4.7
+           MOVE    WKSRY-DOUJITSUKBN   TO  SPA-K10-DOUKBN (IDX)
+      *
       *    保険組合せ
            IF      WKSRY-HKNCOMBI      =   "9999"
                MOVE    "包括分入力"    TO  SPA-K10-GMN-HKNCOMBI (IDX)
@@ -891,6 +933,9 @@
                                        TO  SPA-HKNCOMBINUM
            MOVE    SPA-K10-PTNUM  (IDX)
                                        TO  SPA-PTNUM
+      *ver.4.7
+           MOVE    SPA-K10-DOUKBN (IDX)
+                                       TO  SPA-WKSRY-DOUKBN
       *
            .
        4510-KAKUTEI-SYORI-EXT.
@@ -1028,6 +1073,9 @@
            MOVE    SPA-K10-SRYYMD(IDX) TO  WKSRY-SRYYMD
            MOVE    SPA-K10-HKNCOMBI(IDX)
                                        TO  WKSRY-HKNCOMBI
+      *ver.4.7
+           MOVE    SPA-K10-DOUKBN (IDX)
+                                       TO  WKSRY-DOUJITSUKBN
       *
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
            MOVE    "tbl_wksryact"      TO  MCP-TABLE
@@ -1171,6 +1219,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                TO  K10-SRYKA (IDX)
                MOVE    SPA-K10-GMN-SRYYMD (IDX)
                                                TO  K10-SRYYMD(IDX)
+      *TEST
+               IF      SPA-K10-DOUKBN (IDX)    =   "1"
+                   MOVE    "(2)"               TO  K10-SRYYMD(IDX)
+                                                           (10:3)
+               END-IF
+      *TEST
                MOVE    SPA-K10-GMN-HKNCOMBI (IDX)
                                                TO  K10-HKNCOMBI(IDX)
                MOVE    SPA-K10-SYORIKBN (IDX)

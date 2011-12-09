@@ -31,6 +31,8 @@
                05  ORCSCNYUHEN-KBN                 PIC  X(01).
       *        診療日（必須）
                05  ORCSCNYUHEN-SRYYMD              PIC  X(08).
+      *処理区分
+               05  ORCSCNYUHEN-KBN2                PIC  X(01).
       *出力
            03  ORCSCNYUHEN-OUT-AREA.
       *        １：入院あり、０：入院なし
@@ -53,4 +55,11 @@
                05  ORCSCNYUHEN-LAST-TAIINYMD       PIC X(08).
       *        他医院退院日
                05  ORCSCNYUHEN-TAI-TAIINYMD        PIC X(08).
+      *        同一再入院有無
+               05  ORCSCNYUHEN-DOUNYUKBN           PIC 9(01).
+               05  ORCSCNYUHEN-DOUNYUIN            PIC 9(02).
+      *        継続初回入院日
+               05  ORCSCNYUHEN-STR-NYUINYMD        PIC X(08).
+      *        同一再入院有無（退院日）
+               05  ORCSCNYUHEN-DOUTAIKBN           PIC 9(01).
       *

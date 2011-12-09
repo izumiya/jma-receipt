@@ -2747,6 +2747,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "2"                 TO  ORCSCNYUIN-KBN
                MOVE    LNK-SCNYUACCT-STSRYYMD
                                            TO  ORCSCNYUIN-YMD
+      *        同日再入院判定
+               IF      LNK-SCNYUACCT-DOUJITSUKBN   =   "1"
+                  MOVE    LNK-SCNYUACCT-SRYDELYMD  TO  ORCSCNYUIN-YMD
+                  MOVE    "1"              TO  ORCSCNYUIN-DOUJITSUKBN
+               END-IF
                CALL    "ORCSCNYUIN"        USING
                                            SPA-AREA
                                            ORCSCNYUINAREA

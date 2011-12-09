@@ -107,8 +107,9 @@
       *
            03  WRK-APPOINT-YMD         PIC X(08).
            03  WRK-APPOINT-TIME.
-               05  WRK-APPOINT-THH     PIC X(02).
-               05  WRK-APPOINT-TMM     PIC X(02).
+               05  WRK-APPOINT-HHMM.
+                   07  WRK-APPOINT-THH     PIC X(02).
+                   07  WRK-APPOINT-TMM     PIC X(02).
                05  WRK-APPOINT-TSS     PIC X(02).
            03  WRK-KEYYYKTIME.
                05  WRK-KEYYYKTIME-HH       PIC X(02).
@@ -684,7 +685,9 @@
            IF     (WRK-PTNUM           =   SPACE  )
               AND (WRK-NAME            =   SPACE  )
               AND (WRK-KANANAME        =   SPACE  )
-               MOVE    "01"                TO  WRK-ERRCD
+               IF     (WRK-ERRCD           =   SPACE  )
+                   MOVE    "01"                TO  WRK-ERRCD
+               END-IF
            END-IF
       *    Í½ÌóÆü
            IF      WRK-APPOINT-YMD     =   SPACE
@@ -1568,7 +1571,7 @@
            MOVE    WRK-KEYYYKTIME      TO  YYK-KEYYYKTIME
            MOVE    WRK-YYKID           TO  YYK-YYKID
       *
-           MOVE    WRK-APPOINT-TIME    TO  YYK-YYKTIME
+           MOVE    WRK-APPOINT-HHMM    TO  YYK-YYKTIME
            MOVE    SPA-PTID            TO  YYK-PTID
            IF      WRK-PTNUM           =   SPACE
                MOVE    WRK-YYKNAME         TO  YYK-NAME
@@ -1725,10 +1728,10 @@
            MOVE    ZERO                TO  WRK-YYKCNT
            INITIALIZE                      WRK-YYK-REC
            PERFORM UNTIL   (FLG-YYK        =   1   )
-               IF     (YYK-YYKID           =   ZERO )
+               IF     (YYK-YYKID       NOT =   ZERO )
       *            Íè±¡ºÑ¡¦Í½Ìó»þ´ÖÉÔ°ìÃ×¤ÏÂÐ¾Ý¤È¤·¤Ê¤¤
                    IF     (YYK-RAIINZUMI       =   "1"  )
-                   OR     (YYK-YYKTIME     NOT =   WRK-APPOINT-TIME )
+                   OR     (YYK-YYKTIME     NOT =   WRK-APPOINT-HHMM )
                        CONTINUE
                    ELSE
                        IF      WRK-PTNUM           =   SPACE

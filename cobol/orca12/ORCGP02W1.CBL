@@ -96,6 +96,7 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  11/07/01  ¸øÈñ°ìÍ÷É½¼¨ÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  11/08/XX  ÊÝ¸±³ÎÇ§Ç¯·îÆüÍúÎòÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  11/09/06  ½»½êÅùÈ¾³ÑÁ´³ÑÊÑ´¹¤Ø
+      * 04.07.00     NACL-Â¿¡¹Ç¼  11/11/07  ÃÏÊý¸øÈñÉéÃ´³ÛÊÑ¹¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -754,11 +755,12 @@
            COPY    "CPORCSNUM.INC".
       *   ´µ¼ÔÈÖ¹æÊÑ´¹¥µ¥Ö
            COPY    "CPORCSPTID.INC".
-      *----(01.00.12) LINE ADD START ----------------------------------
       *
       *   ²èÌÌÆüÉÕÊÑ´¹¥µ¥Ö
           COPY    "CPORCSGDAY.INC".
-      *----(01.00.12) LINE ADD END   ----------------------------------
+      *
+      *    ¸øÈñ·î¾å¸Â³Û¼èÆÀÍÑ¥Ñ¥é¥á¥¿
+          COPY    "CPORCSJGNGET.INC".
       *
       *    Á´³Ñ¥Á¥§¥Ã¥¯¥Ñ¥é¥á¥¿
            COPY    "CPORCSKANACHK.INC".
@@ -5010,7 +5012,7 @@
            END-IF
            MOVE    SPA-NAI-PTKOH-KOHID (IDX)   TO  SPA-PTKOH-KOHID (IDY)
       *    ÊÝ¸±¸øÈñ¼ïÊÌ¶èÊ¬
-           MOVE   SPA-NAI-PTKOH-SBTKBN (IDX)   TO  SPA-PTKOH-HKN-SBTKBN
+           MOVE    SPA-NAI-PTKOH-SBTKBN (IDX)  TO  SPA-PTKOH-HKN-SBTKBN
                                                                  (IDY)
       *    ´ü¸ÂÀÚ¤ì¶èÊ¬
            MOVE    SPA-NAI-TEKEDCHKKBN (IDX)
@@ -6805,6 +6807,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-PTKOH-MAX
+      *ver.4.7
+               MOVE    SPACE               TO  SPA-PTKOH-JYOGENKBN (IDX)
+      *        ÃÏÊý¸øÈñ¤Î¾å¸Â³ÛÀßÄêÂÐ¾ÝÈ½Äê
+               IF     (SPA-PTKOH-KOHNUM(IDX)(1:1)  >=  "1"
+                                               AND <=  "8"  )
+                   PERFORM 450411-KOHJYOGENHEN-SEC
+               END-IF
+      *
       *        ¹¹Àµ¡¢°éÀ®
                IF     (SPA-PTKOH-KOHNUM(IDX)   =   "015"
                                                OR  "016"
@@ -6813,18 +6823,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            ÆÃÄêÉéÍ­¡Ê£È£±£µ¡¥£±£°°Ê¹ß¡Ë
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "051" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20031001"))
-      *            Åìµþ¤ÎÆÃÄê¼À´µ¸øÈñ¡Ê£È£±£µ¡¥£±£°°Ê¹ß¡Ë
-                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "151" )  AND
-                      (SPA-PREFNUM             =   13    )  AND
-                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20031001"))
-      *            Åìµþ¤Î£´£µ£±¸øÈñ¡Ê£È£±£µ¡¥£±£°°Ê¹ß¡Ë
-                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "451" )  AND
-                      (SPA-PREFNUM             =   13    )  AND
-                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20031001"))
-      *            Ê¼¸Ë¸©¤Î£±£¸£¶¸øÈñ¡Ê£È£±£µ¡¥£±£°°Ê¹ß¡Ë
-                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "186" )  AND
-                      (SPA-PREFNUM             =   28    )  AND
-                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20031001"))
       *            ¾®»ùÆÃÄê¡Ê£°£µ£²¡Ë¡Ê£È£±£·¡¥£°£´°Ê¹ß¡Ë
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "052" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20050401"))
@@ -6832,51 +6830,62 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            Àº¿ÀÄÌ±¡¡Ê£°£²£±¡Ë¡Ê£È£±£¸¡¥£°£´°Ê¹ß¡Ë
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "021" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20060401"))
-      *
-      *            ¸ºÌÈ¡Ê£¹£¶£°¡¢£¹£¶£±¡Ë¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
-                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "960"
-                                               OR  "961"  )  AND
-                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20061001"))
-      *
+      *            Àº¿ÀÆþ±¡¡Ê£°£²£°¡Ë¡Ê£È£±£¹¡¥£´°Ê¹ß¡Ë
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "020" )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070401"))
       *           ÎÅÍÜ²ð¸î°åÎÅ¡Ê£°£²£´¡Ë¡¢¾ã³²»ù¡Ê£°£·£¹¡Ë¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "079"
                                                OR  "024"  )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20061001"))
-      *
+      *            ¸ºÌÈ¡Ê£¹£¶£°¡¢£¹£¶£±¡Ë¡Ê£È£±£¸¡¥£±£°°Ê¹ß¡Ë
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "960"
+                                               OR  "961"  )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20061001"))
       *           ¹â³Û°ÑÇ¤Ê§¤¤¡Ê£¹£¶£´¡Ë
                  OR   (SPA-PTKOH-KOHNUM(IDX)   =   "964"  )
-      *
-      *            Ê¡Åç¤ÎÃÏÊý¸øÈñ¡Ê£È£±£¹¡¥£²°Ê¹ß¡Ë
-                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "281" )  AND
-                      (SPA-PREFNUM             =   07    )  AND
-                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070201"))
-      *
       *            ·ë³ËÆþ½ê¡Ê£°£±£±¡Ë¡Ê£È£±£¹¡¥£´°Ê¹ß¡Ë
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "011" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070401"))
-      *
       *            ´Î±ê¼£ÎÅ¡Ê£°£³£¸¡Ë¡Ê£È£²£°¡¥£´°Ê¹ß¡Ë
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "038" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20080401"))
       *            »ÄÎ±Ë®¿Í¡Ê£°£²£µ¡Ë¡Ê£È£²£°¡¥£´°Ê¹ß¡Ë
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "025" )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20080401"))
-      *            ËÌ³¤Æ»¤ÎÃÏÊý¸øÈñ¡Ê£È£²£°¡¥£±£°°Ê¹ß¡Ë
-                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "183" )  AND
-                      (SPA-PREFNUM             =   01    )  AND
-                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20081001"))
+      *ver.4.7
+      *        ÃÏÊý¸øÈñ¤Ç¾å¸Â³ÛÀßÄêÂÐ¾Ý
+                 OR  ( SPA-PTKOH-JYOGENKBN (IDX)   NOT =   SPACE )
       *
-      *            Àº¿ÀÆþ±¡¡Ê£°£²£°¡Ë¡Ê£È£±£¹¡¥£´°Ê¹ß¡Ë
-                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "020" )  AND
-                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070401"))
+      *            Ê¡Åç¤ÎÃÏÊý¸øÈñ¡Ê£È£±£¹¡¥£²°Ê¹ß¡Ë
+      *          OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "281" )  AND
+      *               (SPA-PREFNUM             =   07    )  AND
+      *               (SPA-PTKOH-TEKSTYMD(IDX) >=  "20070201"))
+      *
+      *            ËÌ³¤Æ»¤ÎÃÏÊý¸øÈñ¡Ê£È£²£°¡¥£±£°°Ê¹ß¡Ë
+      *          OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "183" )  AND
+      *               (SPA-PREFNUM             =   01    )  AND
+      *               (SPA-PTKOH-TEKSTYMD(IDX) >=  "20081001"))
+      *
+      *            Åìµþ¤ÎÆÃÄê¼À´µ¸øÈñ¡Ê£È£±£µ¡¥£±£°°Ê¹ß¡Ë
+      *          OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "151" )  AND
+      *               (SPA-PREFNUM             =   13    )  AND
+      *               (SPA-PTKOH-TEKSTYMD(IDX) >=  "20031001"))
+      *            Åìµþ¤Î£´£µ£±¸øÈñ¡Ê£È£±£µ¡¥£±£°°Ê¹ß¡Ë
+      *          OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "451" )  AND
+      *               (SPA-PREFNUM             =   13    )  AND
+      *               (SPA-PTKOH-TEKSTYMD(IDX) >=  "20031001"))
+      *            Ê¼¸Ë¸©¤Î£±£¸£¶¸øÈñ¡Ê£È£±£µ¡¥£±£°°Ê¹ß¡Ë
+      *          OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "186" )  AND
+      *               (SPA-PREFNUM             =   28    )  AND
+      *               (SPA-PTKOH-TEKSTYMD(IDX) >=  "20031001"))
       *            °¦ÃÎ¸©¤ÎÃÏÊý¸øÈñ¡Ê£È£²£±¡¥£±£°°Ê¹ß¡Ë
-                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "191" )  AND
-                      (SPA-PREFNUM             =   23    )  AND
-                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20091001"))
+      *          OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "191" )  AND
+      *               (SPA-PREFNUM             =   23    )  AND
+      *               (SPA-PTKOH-TEKSTYMD(IDX) >=  "20091001"))
       *            °ñ¾ë¸©¤ÎÃÏÊý¸øÈñ¡Ê£È£²£±¡¥£´°Ê¹ß¡Ë
-                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "152" )  AND
-                      (SPA-PREFNUM             =   08    )  AND
-                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20090401"))
+      *          OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "152" )  AND
+      *               (SPA-PREFNUM             =   08    )  AND
+      *               (SPA-PTKOH-TEKSTYMD(IDX) >=  "20090401"))
       *
                    MOVE    ZERO                TO  IDY
                    PERFORM VARYING     IDX2    FROM    1   BY  1
@@ -6908,6 +6917,36 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
+      *    ÃÏÊý¸øÈñÉéÃ´³ÛÀßÄêÈ½Äê½èÍý
+      *****************************************************************
+       450411-KOHJYOGENHEN-SEC         SECTION.
+      *
+           INITIALIZE                          LNK-ORCSJGNGET-REC
+           MOVE    SPA-HOSPNUM             TO  LNK-ORCSJGNGET-HOSPNUM
+      *    ¸øÈñÊÝ¸±ÈÖ¹æ
+           MOVE    SPA-PTKOH-KOHNUM(IDX)   TO  LNK-ORCSJGNGET-KOHHKNNUM
+      *    ¸øÈñÅ¬ÍÑ³«»ÏÆü
+           MOVE    SPA-PTKOH-TEKSTYMD(IDX) TO  LNK-ORCSJGNGET-TEKSTYMD
+      *    ÅÔÆ»ÉÜ¸©ÈÖ¹æ
+           MOVE    SPA-PREFNUM             TO  LNK-ORCSJGNGET-PREFNUM
+      *    ÊÔ½¸¥Õ¥é¥°
+           MOVE    "1"                     TO  LNK-ORCSJGNGET-HENFLG
+           CALL    "ORCSJGNGET"        USING   LNK-ORCSJGNGET-REC
+                                               SPA-AREA
+           IF      LNK-ORCSJGNGET-RC   =   ZERO
+      *        ¾å¸Â¶â³ÛÂÐ¾Ý¶èÊ¬
+               IF      LNK-ORCSJGNGET-TAISYOKBN    =   ZERO
+                   MOVE    SPACE           TO  SPA-PTKOH-JYOGENKBN(IDX)
+               ELSE
+                   MOVE    LNK-ORCSJGNGET-TAISYOKBN
+                                           TO  SPA-PTKOH-JYOGENKBN (IDX)
+               END-IF
+           END-IF
+           .
+       450411-KOHJYOGENHEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¸øÈñÉéÃ´¤ØÊÔ½¸½èÍý
       *****************************************************************
        45041-PTKOHFTN-TBLHEN-SEC          SECTION.
@@ -6929,6 +6968,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-PTKOH-TEKSTYMDW (IDX)   TO  SPA-GMN24-TKOHSTYMD
                                                                    (IDY)
            MOVE    SPA-PTKOH-TEKEDYMDW (IDX)   TO  SPA-GMN24-TKOHEDYMD
+                                                                   (IDY)
+      *    ¾å¸Â¶â³ÛÂÐ¾Ý¶èÊ¬
+           MOVE    SPA-PTKOH-JYOGENKBN (IDX)   TO  SPA-NAI24-TJYOGENKBN
                                                                    (IDY)
            .
        45041-PTKOHFTN-TBLHEN-EXT.

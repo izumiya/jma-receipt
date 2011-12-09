@@ -4417,6 +4417,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        491-KOUSHIN-SEC                 SECTION.
       *
+           IF    ( SPA-W01-SEL-EDYUKYMD    <   SPA-W01-STYUKYMD )
+               MOVE    ZERO            TO  SPA-W01-SELNUM
+           END-IF
            PERFORM 40321-DEL-SEC
            IF    ( SPA-ERRCD           =   SPACE )
                PERFORM 4911-KOUSHIN-SEC

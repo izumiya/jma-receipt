@@ -35,8 +35,6 @@ utf8_shell_sources = \
 	daily/HCALL2.sh.in \
 	daily/HCALL_prv.sh.in \
 	daily/toukei2.sh.in \
-	daily/orc_medsiori_pull.sh.in \
-	daily/orc_medphoto_copy.sh.in \
 	monthly/recept1.sh.in \
 	monthly/recept2.sh.in \
 	monthly/recept3.sh.in \
@@ -97,12 +95,15 @@ utf8_shell_sources = \
 	daily/infectiondata2.sh.in \
 	daily/das-infection2.sh.in \
 	daily/infectionagree.sh.in \
+	allways/orcbs02.sh.in \
+	allways/master_get.sh.in \
+	allways/siori_pull.sh.in \
+	allways/medphoto_copy.sh.in \
 
 eucjp_shell_sources = \
 	allways/program_upgrade_check_log.sh.in \
 	allways/master_standard_upgrade.sh.in \
 	allways/master_license_upgrade.sh.in \
-	allways/master_get.sh.in \
 
 ruby_scripts = \
 	daily/print-data.rb \
@@ -111,7 +112,6 @@ ruby_scripts = \
 	daily/print_parent.rb \
 	daily/orcred2ps.rb \
 	daily/print_parent_prv.rb \
-	daily/OrcSioriPull.rb \
 	daily/apslib.rb \
 	daily/monlib.rb \
 	allways/cachedl.rb \

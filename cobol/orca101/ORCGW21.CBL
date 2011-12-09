@@ -3764,6 +3764,7 @@
                    MOVE    WRK-HENYMDG
                                        TO  SPA-GMN-W21-YUKOSTYMD
                    MOVE    WRK-SYMD    TO  SPA-NAI-W21-YUKOSTYMD
+                   MOVE    "0011"      TO  SPA-ERRCD
                    MOVE    11          TO  SPA-GMN-W21-CUR
                END-IF
       *
@@ -3864,7 +3865,7 @@
                                    TO  SPA-GMN-W21-YUKOEDYMD
                MOVE    WRK-SYMD    TO  SPA-NAI-W21-YUKOEDYMD
                MOVE    12          TO  SPA-GMN-W21-CUR
-               GO  TO  4100-YUKOEDYMD-CHK-EXT
+               MOVE    "0012"      TO  SPA-ERRCD
            END-IF
       *
            .
@@ -5196,6 +5197,9 @@
                        DELIMITED   BY  SIZE
                INTO    SPA-ERRMSG
                END-STRING
+           WHEN    "0101"
+               MOVE    "日付入力エラー"
+                                       TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "追加可能最大件数に達しました"
                                        TO  SPA-ERRMSG
@@ -5785,7 +5789,7 @@
                    MOVE    SGDAY-OTDAY TO  WRK-HENYMDG
                    MOVE    SGDAY-SDAY  TO  WRK-SYMD
                ELSE
-                   MOVE    "0001"      TO  SPA-ERRCD
+                   MOVE    "0101"      TO  SPA-ERRCD
                END-IF
            END-IF
       *

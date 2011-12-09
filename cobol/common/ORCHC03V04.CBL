@@ -475,7 +475,13 @@
            MOVE   SPACE                TO  MKPRT-DEF
            MOVE   HC01PARA             TO  MKPRT-DAT
            MOVE   SYS-1031-PRTNM(3)    TO  MKPRT-PRTNM
-           MOVE   "нн╪Щ╫Я╥Слю╨ы╫Я"     TO  MKPRT-INFO
+           IF    ( ORCHC03-PARAFLG     =   1 )
+             AND ( ORCHC03-PARA-GYOUMUID   =   "SU1" )
+               MOVE   "нн╪Щ╫Я╥Слю╨ы╫Я║й╫╓ю╣║к" 
+                                       TO  MKPRT-INFO
+           ELSE
+               MOVE   "нн╪Щ╫Я╥Слю╨ы╫Я" TO  MKPRT-INFO
+           END-IF
            CALL   "ORCSMKPRT1"         USING
                                        ORCSMKPRTAREA
                                        SPA-AREA

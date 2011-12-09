@@ -21,6 +21,12 @@
       *****************************************************************
        01  SYUPARA01-AREA.
            03  SYUPARA01-NYUGAIKBN         PIC X(01).
+           03  SYUPARA01-SEIKYU            PIC S9(10).
+           03  SYUPARA01-NYUKIN            PIC S9(10).
+           03  SYUPARA01-ZENMISYU          PIC S9(10).
+           03  SYUPARA01-ZENMISYU-2        PIC S9(10).
+           03  SYUPARA01-HENKIN            PIC S9(10).
+           03  SYUPARA01-KANYUKIN          PIC S9(10).
            03  SYUPARA01-NYU-MISYU         PIC S9(10).
            03  SYUPARA01-GAI-MISYU         PIC S9(10).
            03  SYUPARA01-GAI-MISYU-P       PIC S9(10).
@@ -43,3 +49,7 @@
            03  SYUPARA01-TUKISTYMD         PIC X(08).
       *    月別請求書期間終了日
            03  SYUPARA01-TUKIEDYMD         PIC X(08).
+      *    請求書件数
+           03  SYUPARA01-CNT               PIC 9(05).
+      *    請求書データ更新フラグ
+           03  SYUPARA01-UPDFLG            PIC 9(01).

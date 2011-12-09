@@ -1049,6 +1049,14 @@
                                        DELIMITED  BY  SPACE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *!!! 2011.11.15
+               WHEN    "9040"
+                   STRING  "入院の中心静脈注射の薬剤は"
+                           ".350等で入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *!!!
                WHEN    "9100"
                    STRING  "診療内容が４００行を超えます。"
                            "会計照会で訂正して下さい。"
@@ -1536,6 +1544,15 @@
                                        DELIMITED  BY  SPACE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *ver.4.7
+               WHEN    "K214"
+                   STRING  "警告！"
+                           "初回入院日からの回数が上限回数を"
+                           "超えています。"
+                                       DELIMITED  BY  SPACE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *
                WHEN    "0213"
                    STRING  "画像等手術支援加算の算定できない手術です。"
                                        DELIMITED  BY  SPACE
@@ -1839,6 +1856,14 @@
                    STRING  "警告！"
                            "入力値変換後の名称が表示できません。"
                            "コメントの入力値を変更して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *!!!
+               WHEN    "K901"
+                   STRING  "警告！！"
+                           "救急搬送診療料が入院期間中に"
+                           "算定されています。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
@@ -2526,6 +2551,43 @@
                WHEN    "1059"
                    STRING  "入院中です。自費保険以外の"
                            "複数保険入力はできません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *ver.4.7
+               WHEN    "0170"
+                   STRING  "診療日に同日再入院はありません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0171"
+                   STRING  "同日再入院日ではありません。"
+                           "内容をクリアして受診履歴を削除して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0172"
+                   STRING  "該当の中途終了データの内容に置換えました。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0122"
+                   STRING  "院内投薬のみの算定です。"
+                           "処方せん料は算定できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K232"
+                   STRING  "警告！"
+                           "内服薬剤が７種類以上となります。"
+                           "７種類以上の処方せん料が算定できます。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K233"
+                   STRING  "警告！"
+                           "内服薬剤が７種類未満です。"
+                           "処方せん料を確認して下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING

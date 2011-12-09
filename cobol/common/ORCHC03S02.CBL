@@ -136,6 +136,10 @@
            COPY    "CPSYUNOU.INC"      REPLACING
                                        //SYU-//    BY  //LNKSYU-//.
       *
+       01  TPARA-REC.
+           COPY    "CPPARA.INC"        REPLACING
+                                       //PARA-//   BY  //TPARA-//.
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -229,6 +233,7 @@
                                            SPA-AREA
       *
            PERFORM 900-PARA-KEY4-SEL-SEC
+           MOVE    PARA-REC            TO  TPARA-REC
            MOVE    PARA-DATA-REC       TO  SYUPARA01-AREA
       *
            .
@@ -764,6 +769,17 @@
            END-PERFORM
       *
            MOVE    PARA-EDANUM         TO  ORCHC03S02-CNT
+                                           SYUPARA01-CNT
+      *
+           MOVE    TPARA-REC           TO  PARA-REC
+           MOVE    SYUPARA01-AREA      TO  PARA-DATA-REC
+           MOVE    PARA-REC            TO  MCPDATA-REC
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBUPDATE-SEC
+           IF    ( MCP-RC          NOT =   ZERO )
+               MOVE    1               TO  ORCHC03S02-RC
+           END-IF
       *
            .
        2001-EDIT-PARA-EXT.
@@ -911,7 +927,20 @@
                                        TO  LNKSYU-DENPPRTYMD (IDX4)
            END-IF
       *
-           MOVE    LNKSYU-OCC (IDX4)   TO  SYUPARA03-SYU-DATA
+           MOVE    LNKSYU-OCC (IDX4)
+                                   TO  SYUPARA03-SYU-DATA
+      *
+           MOVE    SYUPARA01-HAKKOFLG
+                                   TO  SYUPARA03-HAKKOFLG
+      *
+           MOVE    SYUPARA03-SEIKYU
+                                   TO  SYUPARA03-ORG-SEIKYU
+           MOVE    SYUPARA03-SEIKYU-TAX-SAI
+                                   TO  SYUPARA03-ORG-SEIKYU-TAX-SAI
+           MOVE    SYUPARA03-MISYU
+                                   TO  SYUPARA03-ORG-MISYU
+           MOVE    SYUPARA03-NYUKIN
+                                   TO  SYUPARA03-ORG-NYUKIN
       *
            MOVE    SYUPARA03-AREA  TO  PARA-DATA-REC
            MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
@@ -1363,4 +1392,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
       *
        910-DBINSERT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢアップデート処理
+      *****************************************************************
+       910-DBUPDATE-SEC                SECTION.
+      *
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBUPDATE-EXT.
            EXIT.

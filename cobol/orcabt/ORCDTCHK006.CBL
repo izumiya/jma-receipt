@@ -119,7 +119,6 @@
       *    カウント領域
        01  CNT-AREA.
            03  CNT-ZAINUM                  PIC 9(08).
-           03  CNT-NACCT                   PIC 9(08).
       *
        01  IDX-AREA.
            03  IDX0                        PIC 9(05).
@@ -137,6 +136,7 @@
            03  WRK-DTCHKERR                PIC X(200).
            03  WRK-JOB-YOBI                PIC X(500).
            03  WRK-COMB-HKNCOMBINUM        PIC 9(04).
+           03  WRK-HKNCOMBINUM             PIC 9(04).
            03  WRK-HKNNUM                  PIC X(03).
            03  WRK-KOHNUM                  PIC X(03).
            03  WRK-LASTCOMB                PIC X(04).
@@ -216,6 +216,9 @@
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
+      *
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *    入院会計編集サブ
            COPY    "CPORCHCM34S01.INC".
@@ -386,30 +389,19 @@
       *****************************************************************
        20011-SRYACCT-EDIT-SEC          SECTION.
       *
-           MOVE    ZERO            TO  CNT-NACCT
-      *
-           PERFORM 900-NYUINACCT-KEY14-SEL-SEC
-      *
-           PERFORM UNTIL ( FLG-NYUINACCT   NOT =   ZERO )
-      *
-               IF    ( NACCT-ZAIKAISU  >   ZERO )
-      *
-                   COMPUTE CNT-NACCT   =   CNT-NACCT   +   1
-      *
-                   PERFORM 2001-TCOMBI-HEN-SEC
-      *
-                   PERFORM 2001-NACCT-EDIT-SEC
-               END-IF
-      *
-               PERFORM 900-NYUINACCT-KEY14-FET-SEC
-      *
-           END-PERFORM
+           PERFORM 900-NYUINACCT-KEY17-SEL-SEC
       *
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-           MOVE    "key14"             TO  MCP-PATHNAME
+           MOVE    "key17"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           IF    ( CNT-NACCT           =   ZERO )
+           IF    ( FLG-NYUINACCT   =   ZERO )
+      *
+               PERFORM 2001-TCOMBI-HEN-SEC
+      *
+               PERFORM 2001-NACCT-EDIT-SEC
+      *
+           ELSE
       *
                PERFORM 200111-HKNCOMBI-EDIT-SEC
                MOVE    WRK-HKNCOMBI    TO  WRK-COMB-HKNCOMBINUM
@@ -603,40 +595,77 @@
       *
                IF    ( NACCT-DAY (IDX1)    >   ZERO )
       *
-                   PERFORM VARYING IDX2    FROM    1   BY  1
-                           UNTIL ( IDX2    >   TCOMBI-MAX )
-                           OR    ( NACCT-DAY (IDX1)
-                                           =   TCOMBI-HKNCOMBI (IDX2) )
+                   MOVE    NACCT-DAY (IDX1)    TO  WRK-HKNCOMBINUM
+                   PERFORM 20011-TCOMBI-HEN-SEC
       *
-                       CONTINUE
+               END-IF
       *
-                   END-PERFORM
+           END-PERFORM
       *
-                   IF    (     IDX2                >   TCOMBI-MAX )
-                       IF    ( CONST-TCOMBI-MAX    >   TCOMBI-MAX )
-                           COMPUTE TCOMBI-MAX  =   TCOMBI-MAX  +   1
-                           MOVE    NACCT-DAY (IDX1)
-                                           TO  TCOMBI-HKNCOMBI
-                                                       (TCOMBI-MAX)
-                           COMPUTE TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
-                               =   TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
-                               +   1
-                           MOVE    1       TO  TCOMBI-HKNCOMBI-DAY
-                                                       (TCOMBI-MAX IDX1)
-                       END-IF
-                   ELSE
-                           COMPUTE TCOMBI-HKNCOMBI-CNT (IDX2)
-                               =   TCOMBI-HKNCOMBI-CNT (IDX2)
-                               +   1
-                           MOVE    1       TO  TCOMBI-HKNCOMBI-DAY
-                                                       (IDX2 IDX1)
-                   END-IF
+           INITIALIZE  ORCSNYUINDAY-AREA
+           MOVE    NACCT-HOSPNUM       TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    NACCT-PTID          TO  LNK-NYUINDAY-PTID
+           MOVE    NACCT-SRYYM         TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"          USING
+                                           ORCSNYUINDAY-AREA
+                                           SPA-AREA
+           IF    ( LNK-NYUINDAY-RC     NOT =   ZERO )
+               INITIALIZE              ORCSNYUINDAY-AREA
+           END-IF
+      *
+           PERFORM VARYING IDX1   FROM    1   BY  1
+                   UNTIL ( IDX1   >       31 )
+      *
+               IF    ( LNK-NYUINDAY-DOUJITSU-KBN(IDX1) = "1" )
+                   MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
+                                       TO  WRK-HKNCOMBINUM
+                   PERFORM 20011-TCOMBI-HEN-SEC
                END-IF
       *
            END-PERFORM
       *
            .
        2001-TCOMBI-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険組合せ情報編集処理
+      *****************************************************************
+       20011-TCOMBI-HEN-SEC            SECTION.
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2   >   TCOMBI-MAX )
+                   OR    ( WRK-HKNCOMBINUM
+                                   =   TCOMBI-HKNCOMBI (IDX2) )
+      *
+               CONTINUE
+      *
+           END-PERFORM
+      *
+           IF    (     IDX2               >   TCOMBI-MAX )
+               IF    ( CONST-TCOMBI-MAX    >   TCOMBI-MAX )
+                   COMPUTE TCOMBI-MAX  =   TCOMBI-MAX  +   1
+                   MOVE    WRK-HKNCOMBINUM
+                                           TO  TCOMBI-HKNCOMBI
+                                                       (TCOMBI-MAX)
+                   COMPUTE TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
+                       =   TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
+                       +   1
+                   MOVE    1       TO  TCOMBI-HKNCOMBI-DAY
+                                               (TCOMBI-MAX IDX1)
+               ELSE
+                   IF    ( TCOMBI-HKNCOMBI-DAY (IDX2 IDX1)
+                                           =    ZERO )
+                       COMPUTE TCOMBI-HKNCOMBI-CNT (IDX2)
+                           =   TCOMBI-HKNCOMBI-CNT (IDX2)
+                           +   1
+                       MOVE    1   TO  TCOMBI-HKNCOMBI-DAY
+                                                   (IDX2 IDX1)
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       20011-TCOMBI-HEN-EXT.
            EXIT.
       *****************************************************************
       *    入院会計情報編集処理
@@ -1125,9 +1154,9 @@
        900-NYUINACCT-KEY27-FET-EXT.
            EXIT.
       *****************************************************************
-      *    入院会計検索処理(KEY14)
+      *    入院会計検索処理(KEY17)
       *****************************************************************
-       900-NYUINACCT-KEY14-SEL-SEC     SECTION.
+       900-NYUINACCT-KEY17-SEL-SEC     SECTION.
       *
            MOVE    ZERO                TO  FLG-NYUINACCT
            INITIALIZE                  NYUINACCT-REC
@@ -1139,17 +1168,17 @@
            MOVE    "5"                 TO  NACCT-ZAISKBKBN
            MOVE    NYUINACCT-REC       TO  MCPDATA-REC
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-           MOVE    "key14"             TO  MCP-PATHNAME
-           PERFORM 911-DBSELECT-SEC
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
-               PERFORM 900-NYUINACCT-KEY14-FET-SEC
+               MOVE    MCPDATA-REC     TO  NYUINACCT-REC
            ELSE
                MOVE    1               TO  FLG-NYUINACCT
                INITIALIZE                  NYUINACCT-REC
            END-IF
       *
            .
-       900-NYUINACCT-KEY14-SEL-EXT.
+       900-NYUINACCT-KEY17-SEL-EXT.
            EXIT.
       *****************************************************************
       *    入院会計検索処理(KEY19)
@@ -1181,37 +1210,6 @@
       *
            .
        900-NYUINACCT-KEY19-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    入院会計FETCH処理(KEY14)
-      *****************************************************************
-       900-NYUINACCT-KEY14-FET-SEC     SECTION.
-      *
-           MOVE    ZERO            TO  FLG-NYUINACCT
-           MOVE    ZERO            TO  FLG-LOOP-END
-      *
-           PERFORM UNTIL ( FLG-NYUINACCT   NOT =   ZERO )
-                    OR   ( FLG-LOOP-END    NOT =   ZERO )
-      *
-               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-               MOVE    "key14"             TO  MCP-PATHNAME
-               PERFORM 910-DBFETCH-SEC
-               IF    ( MCP-RC          =   ZERO )
-                   MOVE    MCPDATA-REC     TO  NYUINACCT-REC
-      *
-                   IF    ( NACCT-ZAISKBKBN =   "5" )
-                       MOVE    1   TO  FLG-LOOP-END
-                   END-IF
-      *
-               ELSE
-                   MOVE    1               TO  FLG-NYUINACCT
-                   INITIALIZE                  NYUINACCT-REC
-               END-IF
-      *
-           END-PERFORM
-      *
-           .
-       900-NYUINACCT-KEY14-FET-EXT.
            EXIT.
       *****************************************************************
       *    保険組合せ取得処理

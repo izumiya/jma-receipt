@@ -85,6 +85,7 @@
            COPY    "SID1.INC".
            COPY    "SID2.INC".
            COPY    "SID3.INC".
+           COPY    "SID4.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -144,6 +145,10 @@
       *        ¿¡µ·ΩÒ°¶Ã¿∫ŸΩÒ
                WHEN    "CLICKED"                 ALSO    "B12"
                    MOVE    "OK"                  TO  SPA-SID1-FLG
+                   PERFORM 210-BACK
+      *        ¿¡µ·≥€ —ππ
+               WHEN    "CLICKED"                 ALSO    "B12S"
+                   MOVE    "SID4"                TO  SPA-SID1-FLG
                    PERFORM 210-BACK
            END-EVALUATE
       *

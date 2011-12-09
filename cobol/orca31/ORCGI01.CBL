@@ -13891,6 +13891,8 @@
       *****************************************************************
        4801-NYUKAIKEI-ERASE-SUB-SEC         SECTION.
       *
+           INITIALIZE            ORCSNYUACCT-AREA
+      *
       *---------------退院日の同日入院処理ここから----------------------
            MOVE   SPACE                TO  WRK-DOU-TENNYUYMD
       *    同日再入院用に入院日（転入日）を退避
@@ -13923,6 +13925,13 @@
            MOVE    SPACE               TO  WRK-DOUJITSU-FLG
                                            WRK-DOUJITSU-MOTOYMD
            IF     FLG-JIINRRK          =   1
+      *        同日再入院分の診療会計削除用引数追加対応
+               IF   SPA-GMN-I01-SYORIKBN-CD(2:1)  =   "6"
+                   MOVE   "1"          TO  LNK-SCNYUACCT-DOUJITSUKBN
+                   MOVE    SPA-NAI-I01-NYUINYMD
+                                       TO  LNK-SCNYUACCT-SRYDELYMD
+               END-IF
+      *
                MOVE    "1"             TO  WRK-DOUJITSU-FLG
                INITIALIZE                  STS-AREA-DAY
                INITIALIZE                  LNK-DAY6-AREA
@@ -13939,7 +13948,6 @@
       *---------------退院日の同日入院処理ここまで----------------------
       *
       *    入院会計作成サブの呼出し
-           INITIALIZE            ORCSNYUACCT-AREA
            MOVE     SPA-GMN-I01-SYORIKBN-CD(2:1)
                                        TO   LNK-SCNYUACCT-SYORI-KBN
            MOVE     "1"                TO  SPA-NYUGAIKBN
@@ -22282,6 +22290,10 @@
                    MOVE    "2020"  TO  SPA-ERRCD
                WHEN    22
                    MOVE    "2021"  TO  SPA-ERRCD
+               WHEN    23
+                   MOVE    "2022"  TO  SPA-ERRCD
+               WHEN    24
+                   MOVE    "2023"  TO  SPA-ERRCD
                WHEN    OTHER
                    MOVE    "2008"  TO  SPA-ERRCD
                END-EVALUATE
@@ -23944,6 +23956,26 @@
                STRING  "負担金計算に失敗しました。"
                                            DELIMITED   BY  SPACE
                        "他医受診（外泊）の入力に誤りがあります"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2022"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                       "同日再入院日に実日数算定コード"
+                                           DELIMITED   BY  SPACE
+                       "を入力してください"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2023"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                       "同日再入院日の再入院分に入院料加算"
+                                           DELIMITED   BY  SPACE
+                       "が算定されています"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING

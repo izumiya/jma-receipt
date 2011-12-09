@@ -211,6 +211,8 @@
       *                                     は公費単独のレセプトとする
       *  04.06.03    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
       *                                     併用から単独になったときのまとめ
+      *
+      *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -294,6 +296,7 @@
            03  FLG-CONTKBN                             PIC 9(01).
            03  FLG-SET                                 PIC 9(01).
            03  FLG-KOHRECEDSP                          PIC 9(01).
+           03  FLG-KOHSKY-HENSYU                       PIC 9(01).
            03  FLG-LASTHKNID                           PIC 9(01). 
       *
       *    カウント領域
@@ -1191,6 +1194,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
            INITIALIZE                  WRK-SEIKYUKBN-KOHI-AREA
                                        FLG-KOH
                                        FLG-KOHRECEDSP
+                                       FLG-KOHSKY-HENSYU
            MOVE    ZERO                TO  IDY
                                            IDZ    
       *
@@ -1282,6 +1286,7 @@ grpsys             MOVE    SPA-HOSPNUM             TO  HKN-HOSPNUM
                    IF     IDX1          =        1
       *                地方公費レセ記載判定
                        MOVE    ZERO        TO  FLG-KOHRECEDSP
+                                               FLG-KOHSKY-HENSYU
                        INITIALIZE          ORCSFTNJGNCHKAREA
 grpsys                 MOVE    SPA-HOSPNUM TO  LNK-FTNJGNCHK-HOSPNUM
                        MOVE    COMB-PTID   TO  LNK-FTNJGNCHK-PTID
@@ -1309,6 +1314,9 @@ grpsys                                             SPA-AREA
                        IF     LNK-FTNJGNCHK-RC   =   1
                            MOVE       1        TO    FLG-KOHRECEDSP
                        END-IF
+                       IF     LNK-FTNJGNCHK-KOHSKYFLG  =  "1"
+                           MOVE       1        TO    FLG-KOHSKY-HENSYU
+                       END-IF
                    END-IF
                ELSE
                    MOVE    1                      TO  IDX1
@@ -1323,6 +1331,7 @@ grpsys                                             SPA-AREA
                      ELSE 
       *                長期高額療養レセ記載判定（生保単独の不明分はしない）
                        MOVE    ZERO        TO  FLG-KOHRECEDSP
+                                               FLG-KOHSKY-HENSYU
                        INITIALIZE          ORCSFTNJGNCHKAREA
 grpsys                 MOVE    SPA-HOSPNUM TO  LNK-FTNJGNCHK-HOSPNUM
                        MOVE    COMB-PTID   TO  LNK-FTNJGNCHK-PTID
@@ -1363,48 +1372,8 @@ grpsys                                             SPA-AREA
                                           WRK-SEIKYU-KOHID    (IDX1 IDY)
                        MOVE    COMB-TEKSTYMD          TO
                                           WRK-SEIKYU-TEKSTYMD (IDX1 IDY)
-      *                福岡県の国保のとき（４１老人以外）
-                       IF    ( COMB-HKNNUM     =   "060"   OR  "067" )
-                       AND   ( SYS-1001-PREFNUM
-                                               =   "40"              )
-                       AND   ( HKN-HBTNUM  NOT =   "41"              )    
-                       AND   ( COMB-KOHHKNNUM(IDX)(1:1)
-                                               >=  "1" AND <=  "8"   )
-                           ADD     1                      TO  IDZ    
-                           MOVE    COMB-KOHHKNNUM (IDX)   TO 
-                                          WRK-SEIKYU-KOHHKNNUM(2 IDZ)
-                           MOVE    COMB-KOHID     (IDX)   TO
-                                          WRK-SEIKYU-KOHID    (2 IDZ)
-                           MOVE    1                      TO  FLG-KOH 
-                       END-IF
-      *                奈良県の国保、後期高齢者のとき
-      *               （法別７１（乳幼児）、８１（障害）、９１（母子））
-                       IF    ( COMB-HKNNUM     =   "060"   OR  "067"
-                                               OR  "039"             )
-                       AND   ( SYS-1001-PREFNUM
-                                               =   "29"              )
-                       AND   ( HKN-HBTNUM      =   "71"    OR  "81"
-                                               OR  "91"              )    
-                       AND   ( COMB-KOHHKNNUM(IDX)(1:1)
-                                               >=  "1" AND <=  "8"   )
-                           ADD     1                      TO  IDZ    
-                           MOVE    COMB-KOHHKNNUM (IDX)   TO 
-                                          WRK-SEIKYU-KOHHKNNUM(2 IDZ)
-                           MOVE    COMB-KOHID     (IDX)   TO
-                                          WRK-SEIKYU-KOHID    (2 IDZ)
-                           MOVE    1                      TO  FLG-KOH 
-                       END-IF
-      *                新潟県の国保、後期高齢者のとき
-      *               （法別８０、８２、８４、８６、００）
-                       IF    ( COMB-HKNNUM     =   "060"   OR  "067"
-                                               OR  "039"             )
-                       AND   ( SYS-1001-PREFNUM
-                                               =   "15"              )
-                       AND   ( HKN-HBTNUM      =   "80"    OR  "82"
-                                               OR  "84"    OR  "86"
-                                               OR  "00"              )    
-                       AND   ( COMB-KOHHKNNUM(IDX)(1:1)
-                                               >=  "1" AND <=  "8"   )
+      *                レセプト記載と併せて公費請求テーブルの作成も行う
+                       IF     FLG-KOHSKY-HENSYU   =   1
                            ADD     1                      TO  IDZ    
                            MOVE    COMB-KOHHKNNUM (IDX)   TO 
                                           WRK-SEIKYU-KOHHKNNUM(2 IDZ)

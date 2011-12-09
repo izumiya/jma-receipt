@@ -29,6 +29,8 @@ fi
 #        $17 様式区分
 #        $18 レセプト作成区分
 #            1:提出用レセ、2:点検用レセ
+#        $19 請求データ削除区分
+#            0:削除しない、2:削除する
 #-------------------------------------------#
 ##      エラーファイル削除
 	echo $#
@@ -147,7 +149,7 @@ fi
             exit
         else 
            if [ ${17} -eq  '0' ]; then
-              $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0480 -parameter $9${10}$1$2$3$8$5$6,${14},${15},${18},${16},${4}    >> $LOG_FILE 2>&1
+              $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0480 -parameter $9${10}$1$2$3$8$5$6,${14},${15},${18},${19},${16},${4}    >> $LOG_FILE 2>&1
         
               if  [ -e $4 ]; then
                   exit 
@@ -162,7 +164,7 @@ fi
                  $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0482 -parameter $9${10}$1$2$3$8$5$6,${14},${15},${18},${16},${4}    >> $LOG_FILE 2>&1
               fi
            else
-              $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0501 -parameter $9${10}$1$2$3$8$5$6,${14},${18},${16},${4}    >> $LOG_FILE 2>&1
+              $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0501 -parameter $9${10}$1$2$3$8$5$6,${14},${18},${19},${16},${4}    >> $LOG_FILE 2>&1
         
               if  [ -e $4 ]; then
                   exit 

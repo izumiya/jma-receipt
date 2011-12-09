@@ -138,6 +138,9 @@
       *                                     保険履歴を最大１００に変更
       *  04.05.31    NACL-藤原    11/09/05  「請求しない」設定の請求管理
       *                                     の保険の記号番号を更新する
+      *  04.05.32    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
+      *  04.05.33    NACL-門脇    11/12/01  宮城県地方公費対応（仙台市）
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -149,7 +152,13 @@
       *  04.06.04    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
       *                                     調査用にcrehms,updhms 追加
+<<<<<<< ORCR0730.CBL
       *  04.06.05    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
+=======
+      *  04.06.05    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
+      *
+      *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
+>>>>>>> 1.91
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -450,6 +459,7 @@
                05  WRK-PARA-JOBID   PIC  9(07).
                05  WRK-PARA-SHELLID PIC  X(08).
            03  WRK-PARA-PRTKBN      PIC  X(01).
+           03  WRK-PARA-DLTKBN      PIC  X(01).
            03  WRK-PARA-HOSPNUM     PIC  9(02).
            03  WRK-PARA-ERRFILENM   PIC X(200).
       *
@@ -1309,9 +1319,13 @@
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
                                                WRK-PARA-PRTKBN
+                                               WRK-PARA-DLTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
+      *
+           DISPLAY "WRK-PARA-DLTKBN=" WRK-PARA-DLTKBN
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            PERFORM 100-DBOPEN-SEC
@@ -1815,6 +1829,9 @@
                MOVE    ZERO             TO
                                     SYS-200501-INSPECT-CHARACTER-KBN
            END-IF
+           DISPLAY "SYS-200501-INSPECT-CHARACTER-KBN="
+                                    SYS-200501-INSPECT-CHARACTER-KBN
+                    " " WRK-PARA-PRTKBN
       *         
       *    レセプト編綴順情報
            MOVE    SPACE            TO  SYSKANRI-REC
@@ -5952,8 +5969,7 @@
                                       NOT =   RECE62-TOTALTEN (IDX1)) OR
                   (RECE62-FTNMONEY (IDX2)
                                       NOT =   RECE62-FTNMONEY (IDX1))  )
-             IF    SYS-1001-PREFNUM   =   45
-             AND   RECE62-KOHNUM(1)   =  "190"
+             IF    RECE62-EKF-FTNKEIFLG(IDX2)  =  "2"
                CONTINUE
              ELSE
                IF    RECE62-FTNMONEY (IDX2)   >   ZERO
@@ -6013,8 +6029,9 @@
            ELSE
                IF      RECE62-FUKUSHIFLG-SKJ(1)   =    "1"
                  IF   (SYS-1001-PREFNUM  =  04                    )
-                 AND  (RECE62-KOHNUM(1)  = "183" OR "383" OR "483"
-                                        OR "583" OR "683" OR "783")
+                 AND  (RECE62-KOHNUM(1)  = "183" OR "483" OR "583"
+                                        OR "783" OR "463" OR "563"
+                                        OR "263" OR "363"         )
                      MOVE    RECE62-SHOKUJINISSU (IDX2)
                                                  TO  WRK-KGK2 
                      MOVE    WRK-KGK2            TO
@@ -6046,8 +6063,7 @@
                                     NOT =   RECE62-FTNMONEY (IDX1)) OR
                 (RECE62-FTNMONEY (IDX3)
                                     NOT =   RECE62-FTNMONEY (IDX2))  )
-                 IF    SYS-1001-PREFNUM   =   45
-                 AND   RECE62-KOHNUM(2)   =  "190"
+                 IF    RECE62-EKF-FTNKEIFLG(IDX3)  =  "2"
                    CONTINUE
                  ELSE
                    IF  RECE62-FTNMONEY (IDX3)   >   ZERO
@@ -6127,8 +6143,9 @@
            ELSE
                IF      RECE62-FUKUSHIFLG-SKJ(2)   =    "1"
                  IF   (SYS-1001-PREFNUM  =  04                    )
-                 AND  (RECE62-KOHNUM(2)  = "183" OR "383" OR "483"
-                                        OR "583" OR "683" OR "783")
+                 AND  (RECE62-KOHNUM(2)  = "183" OR "483" OR "583"
+                                        OR "783" OR "463" OR "563"
+                                        OR "263" OR "363"         )
                      MOVE    RECE62-SHOKUJINISSU (IDX3)
                                                  TO  WRK-KGK2 
                      MOVE    WRK-KGK2            TO
@@ -6165,8 +6182,7 @@
                                    NOT =   RECE62-FTNMONEY (IDX2)) OR
                      ( RECE62-FTNMONEY (IDX4)
                                    NOT =   RECE62-FTNMONEY (IDX3))    )
-                   IF      SYS-1001-PREFNUM    =   45
-                   AND     RECE62-KOHNUM(3)    =  "190"
+                   IF    RECE62-EKF-FTNKEIFLG(IDX4)  =  "2"
                        CONTINUE
                    ELSE
                        IF      RECE62-FTNMONEY (IDX4)   >   ZERO
@@ -6250,8 +6266,9 @@
                    IF      RECE62-FUKUSHIFLG-SKJ (3)
                                                =   "1"
                        IF   (SYS-1001-PREFNUM      =   04              )
-                       AND  (RECE62-KOHNUM(3) = "183" OR "383" OR "483"
-                                             OR "583" OR "683" OR "783")
+                       AND  (RECE62-KOHNUM(3) = "183" OR "483" OR "583"
+                                             OR "783" OR "463" OR "563"
+                                             OR "263" OR "363"         )
                            MOVE    RECE62-SHOKUJINISSU (IDX4)
                                                    TO  WRK-KGK2 
                            MOVE    WRK-KGK2        TO
@@ -6292,8 +6309,7 @@
                                    NOT =   RECE62-FTNMONEY (IDX3)) OR
                      ( RECE62-FTNMONEY (IDX5)
                                    NOT =   RECE62-FTNMONEY (IDX4))    )
-                   IF      SYS-1001-PREFNUM    =   45
-                   AND     RECE62-KOHNUM(4)    =  "190"
+                   IF    RECE62-EKF-FTNKEIFLG(IDX5)  =  "2"
                        CONTINUE
                    ELSE
                        IF      RECE62-FTNMONEY (IDX5)   >   ZERO
@@ -6377,8 +6393,9 @@
                    IF      RECE62-FUKUSHIFLG-SKJ (4)
                                                =   "1"
                        IF   (SYS-1001-PREFNUM      =   04              )
-                       AND  (RECE62-KOHNUM(4) = "183" OR "383" OR "483"
-                                             OR "583" OR "683" OR "783")
+                       AND  (RECE62-KOHNUM(4) = "183" OR "483" OR "583"
+                                             OR "783" OR "463" OR "563"
+                                             OR "263" OR "363"         )
                            MOVE    RECE62-SHOKUJINISSU (IDX5)
                                                    TO  WRK-KGK2 
                            MOVE    WRK-KGK2        TO
@@ -10571,7 +10588,11 @@
                    MOVE    2                   TO  RECE10-XXTEISYUTUSAKI 
                    MOVE    RECE10-REC          TO  MCPDATA-REC
                    MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                   MOVE    "del4"              TO  MCP-PATHNAME
+                   IF      WRK-PARA-DLTKBN     =   "0"
+                       MOVE    "del4"          TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del7"          TO  MCP-PATHNAME
+                   END-IF
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    PERFORM   900-ORCDBMAIN-SEC
                    IF      MCP-RC           NOT =   ZERO
@@ -10593,7 +10614,11 @@
                    MOVE    6                   TO  RECE10-XXTEISYUTUSAKI 
                    MOVE    RECE10-REC          TO  MCPDATA-REC
                    MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                   MOVE    "del4"              TO  MCP-PATHNAME
+                   IF      WRK-PARA-DLTKBN     =   "0"
+                       MOVE    "del4"          TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del7"          TO  MCP-PATHNAME
+                   END-IF
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    PERFORM   900-ORCDBMAIN-SEC
                    IF      MCP-RC           NOT =   ZERO
@@ -10614,7 +10639,11 @@
                    MOVE    SYS-2002-NYUGAIKBN  TO  KOHSKY-NYUGAIKBN
                    MOVE    KOHSKY-REC          TO  MCPDATA-REC
                    MOVE    "tbl_kohsky"        TO  MCP-TABLE
-                   MOVE    "del2"              TO  MCP-PATHNAME
+                   IF      WRK-PARA-DLTKBN     =   "0"
+                       MOVE    "del2"          TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del4"          TO  MCP-PATHNAME
+                   END-IF
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    PERFORM   900-ORCDBMAIN-SEC
                    IF      MCP-RC           NOT =   ZERO
@@ -11608,7 +11637,7 @@
            END-STRING
            PERFORM 500-COBABORT-SEC
            .
-       900-DBINSERT-EXT.
+       900-DB-ERR-ABORT-EXT.
            EXIT.
       *
       *****************************************************************

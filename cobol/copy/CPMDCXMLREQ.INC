@@ -36,9 +36,17 @@
               03  MDCREQ-PERFORM-DATE PIC X(10).
       *       ¿ÇÎÅ»þ´Ö
               03  MDCREQ-PERFORM-TIME PIC X(8).
+<<<<<<< CPMDCXMLREQ.INC
       *       UID
               03  MDCREQ-MEDICAL-UID       PIC X(36).
       *
+=======
+      *       UID
+              03  MDCREQ-MEDICAL-UID       PIC X(36).
+      *       Æþ±¡Æü
+              03  MDCREQ-ADMISSION-DATE    PIC X(10).
+      *
+>>>>>>> 1.7
               03  MDCREQ-MEDICAL-INFO.
       *         ¿ÇÎÅ²Ê
                 04  MDCREQ-APPOINT-DEP-CODE PIC X(2).

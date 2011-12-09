@@ -18,6 +18,7 @@ bind	"RERR"		"OpenCOBOL"	"ORCGRERR";
 bind	"RID1"		"OpenCOBOL"	"ORCGRID1";
 bind	"RID2"		"OpenCOBOL"	"ORCGRID2";
 bind	"RID3"		"OpenCOBOL"	"ORCGRID3";
+bind	"RID4"		"OpenCOBOL"	"ORCGRID4";
 
 multiplex_group	orca42;
 
@@ -39,6 +40,7 @@ data	{
 		RID1;
 		RID2;
 		RID3;
+		RID4;
 	};
 };
 db	{

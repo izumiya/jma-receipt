@@ -15,6 +15,7 @@ tbl_yakujyo_temp	{
 	photo2_filename		varchar(256);
 	photo3_filename		varchar(256);
 	creymd   		char(8);
+	name			varchar(200);
 };
 
 primary	{
@@ -51,7 +52,8 @@ path	srycd	{
 				:photo2_filename,
 				:photo3_filename,
 				:creymd,
-				:HOSPNUM
+				:HOSPNUM,
+				:name
 			;
 	};
 	operation	DBCLOSECURSOR	{
@@ -74,7 +76,8 @@ path	srycd	{
 				:photo2_filename,
 				:photo3_filename,
 				:creymd,
-				:HOSPNUM
+				:HOSPNUM,
+				:name
 			);
 	};
 };

@@ -199,6 +199,10 @@
                05  WRK-SKYEDYM                 PIC  X(06).
                05  WRK-SKYEDDD                 PIC  9(02).
            03  WRK-SKJCOMMENTCD                PIC  X(09).
+           03  WRK-DOJITU-G.
+               05  WRK-DOJITU-OCC              OCCURS  31.
+                   07  WRK-DOJITUST            PIC  X(01).
+                   07  WRK-DOJITUED            PIC  X(01).
       *
       *    入院料
        01  WNYUINRYO-AREA.
@@ -475,7 +479,8 @@
                                    BY          //WKSYS-5000//.
       *
        01  WSKJNACCT-AREA.
-           02  WSKJNACCT-SYOKUDO-NG            PIC X(01).
+           02  WSKJNACCT-SYOKUDO-NG            PIC X(01)
+                                               OCCURS  31.
            02  WSKJNACCT-OCC                   OCCURS  3.
            COPY    "CPNYUINACCT.INC"   REPLACING   //NACCT-//
                                        BY          //WSKJNACCT-//.
@@ -677,11 +682,10 @@
                 END-IF
            END-PERFORM
       *
-           IF    ( FLG-NYUINARI            =   ZERO )
-               MOVE    4                   TO  HCM34S01-RC
-               PERFORM 990-EXIT-PROGRAM-SEC
-           END-IF
-      *
+           MOVE    HCM34S01-SANTEIYM       TO  WRK-SKYSTYMD
+                                               WRK-SKYEDYMD
+           MOVE    1                       TO  WRK-SKYSTDD
+           MOVE    31                      TO  WRK-SKYEDDD
       *    期間指定区分が設定されている場合、期間が設定されていること
            IF    ( HCM34S01-KIKANKBN       =   "1" )
                IF    ( HCM34S01-SKYSTYMD   IS  NOT NUMERIC )
@@ -705,14 +709,21 @@
                        MOVE    ZERO        TO  FLG-NYUINDAY (IDX1)
                    END-IF
       *
+               END-PERFORM
+      *
                MOVE    HCM34S01-SKYSTYMD   TO  WRK-SKYSTYMD
                MOVE    HCM34S01-SKYEDYMD   TO  WRK-SKYEDYMD
       *
                IF    ( HCM34S01-DOJITUFLG-ST   =   "1" )
-                   MOVE    ZERO            TO  FLG-NYUINDAY(WRK-SKYSTDD)
+                   MOVE    2               TO  FLG-NYUINDAY(WRK-SKYSTDD)
+                   MOVE    HCM34S01-TIMEKBN-ST
+                                       TO  WRK-DOJITUST(WRK-SKYSTDD)
                END-IF
       *
-               END-PERFORM
+               IF    ( HCM34S01-DOJITUFLG-ED   =   "1" )
+                   MOVE    HCM34S01-TIMEKBN-ED
+                                       TO  WRK-DOJITUED(WRK-SKYEDDD)
+               END-IF
       *
            END-IF
       *
@@ -825,6 +836,30 @@
             AND  ( SYS-4001-KOMUKBN    =   "2" )
                MOVE    1               TO  FLG-KENPO
            END-IF
+      *
+           PERFORM VARYING     IDXD    FROM    WRK-SKYSTDD BY  1
+                   UNTIL     ( IDXD    >       WRK-SKYEDDD )
+      *
+               IF    ( LNK-NYUINDAY-DOUJITSU-KBN(IDXD) = "1" )
+                   IF    ( LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDXD)
+                                               =  HCM34S01-HKNCOMBI )
+                     AND ( LNK-NYUINDAY-DOUJITSU-T-HKNCOMBI(IDXD)
+                                           NOT =  HCM34S01-HKNCOMBI )
+                       MOVE    2           TO  FLG-NYUINDAY(IDXD)
+                       MOVE    LNK-NYUINDAY-DOUJITSU-SKJKBN(IDXD)
+                                           TO  WRK-DOJITUST (IDXD)
+                   END-IF
+      *
+                   IF    ( LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDXD)
+                                           NOT =  HCM34S01-HKNCOMBI )
+                     AND ( LNK-NYUINDAY-DOUJITSU-T-HKNCOMBI(IDXD)
+                                               =  HCM34S01-HKNCOMBI )
+                       MOVE    LNK-NYUINDAY-DOUJITSU-T-SKJKBN(IDXD)
+                                           TO  WRK-DOJITUED (IDXD)
+                   END-IF
+               END-IF
+      *
+           END-PERFORM
       *
            .
        150-INIT-EXT.
@@ -1121,7 +1156,6 @@
       *
                IF    ( LNK-SROUNYUIN-NYUIN-FLG (IDXD)  =   "1" )
                 AND  ( FLG-NYUINDAY            (IDXD)  =    1  )
-                AND  ( LNK-NYUINDAY-KBN        (IDXD)  =   SPACE )
                    IF    ( LNK-SROUNYUIN-GAIHAKU(IDXD) =   ZERO )
                        PERFORM 20011-NYUINRYO-HEN-SEC
                    ELSE
@@ -2488,9 +2522,7 @@
       *
                    MOVE    ZERO                TO  FLG-SANTEI
                    IF    ( NACCT-DAY    (IDXD)     >   ZERO )
-                    AND (( FLG-NYUINDAY (IDXD)     =   1 )
-                      OR ((HCM34S01-DOJITUFLG-ST   =   "1" )
-                      AND( IDXD                    =   WRK-SKYSTDD )))
+                    AND  ( FLG-NYUINDAY (IDXD)     =   1 OR 2 )
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5)
                         IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
                          OR  ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
@@ -2503,49 +2535,46 @@
                                        TO  WSKJNACCT-DAY (IDX-SKJ IDXD)
       *
                        MOVE    ZERO    TO  FLG-CLEAR
-                       IF    ( HCM34S01-DOJITUFLG-ST   =   "1" )
-                           IF    ( WRK-SKYSTDD         =   IDXD )
-                               EVALUATE    HCM34S01-TIMEKBN-ST
-                               WHEN    "0"
-                                       MOVE    1   TO  FLG-CLEAR
-                               WHEN    "1"
-                                   CONTINUE
-                               WHEN    "2"
-                                   IF    ( IDX-SKJ <   2 )
-                                       MOVE    1   TO  FLG-CLEAR
-                                   END-IF
-                               WHEN    "3"
-                                   IF    ( IDX-SKJ <   3 )
-                                       MOVE    1   TO  FLG-CLEAR
-                                   END-IF
-                               END-EVALUATE
-                           END-IF
+                       IF    ( WRK-DOJITUST(IDXD)  NOT =  SPACE  )
+                           EVALUATE    WRK-DOJITUST(IDXD)
+                           WHEN    "0"
+                                   MOVE    1   TO  FLG-CLEAR
+                           WHEN    "1"
+                               CONTINUE
+                           WHEN    "2"
+                               IF    ( IDX-SKJ <   2 )
+                                   MOVE    1   TO  FLG-CLEAR
+                               END-IF
+                           WHEN    "3"
+                               IF    ( IDX-SKJ <   3 )
+                                   MOVE    1   TO  FLG-CLEAR
+                               END-IF
+                           END-EVALUATE
                        END-IF
       *
                        IF    ( FLG-CLEAR   =   1 )
                            MOVE    ZERO    TO  WSKJNACCT-DAY
                                                          (IDX-SKJ IDXD)
                            MOVE    "1"     TO  WSKJNACCT-SYOKUDO-NG
+                                                         (IDXD)
                        END-IF
       *
                        MOVE    ZERO    TO  FLG-CLEAR
-                       IF    ( HCM34S01-DOJITUFLG-ED   =   "1" )
-                           IF    ( WRK-SKYEDDD         =   IDXD )
-                               EVALUATE    HCM34S01-TIMEKBN-ED
-                               WHEN    "0"
-                                       MOVE    1   TO  FLG-CLEAR
-                               WHEN    "1"
-                                   IF    ( IDX-SKJ >   1 )
-                                       MOVE    1   TO  FLG-CLEAR
-                                   END-IF
-                               WHEN    "2"
-                                   IF    ( IDX-SKJ >   2 )
-                                       MOVE    1   TO  FLG-CLEAR
-                                   END-IF
-                               WHEN    "3"
-                                       CONTINUE
-                               END-EVALUATE
-                           END-IF
+                       IF    ( WRK-DOJITUED(IDXD)  NOT =  SPACE  )
+                           EVALUATE    WRK-DOJITUED(IDXD)
+                           WHEN    "0"
+                                   MOVE    1   TO  FLG-CLEAR
+                           WHEN    "1"
+                               IF    ( IDX-SKJ >   1 )
+                                   MOVE    1   TO  FLG-CLEAR
+                               END-IF
+                           WHEN    "2"
+                               IF    ( IDX-SKJ >   2 )
+                                   MOVE    1   TO  FLG-CLEAR
+                               END-IF
+                           WHEN    "3"
+                                   CONTINUE
+                           END-EVALUATE
                        END-IF
                        IF    ( FLG-CLEAR   =   1 )
                            MOVE    ZERO    TO  WSKJNACCT-DAY
@@ -2566,9 +2595,13 @@
        20021-SYOKUDOKSN-CHK-SEC        SECTION.
       *
            PERFORM 20011-SYOKUDOKSN-CHK-SEC
-           IF    ( WSKJNACCT-SYOKUDO-NG    =   "1" )
-               MOVE    ZERO    TO  FLG-SYOKUDODAY(WRK-SKYSTDD)
-           END-IF
+      *
+           PERFORM VARYING IDXD    FROM    1 BY  1
+                   UNTIL ( IDXD    >       31 )
+               IF    ( WSKJNACCT-SYOKUDO-NG (IDXD) =   "1" )
+                   MOVE    ZERO    TO  FLG-SYOKUDODAY(IDXD)
+               END-IF
+           END-PERFORM
       *
            .
        20021-SYOKUDOKSN-CHK-EXT.
@@ -3185,10 +3218,10 @@
                    IF    ( NACCT-DAY (IDXD)            >   ZERO )
                     AND  ( FLG-NYUINDAY  (IDXD)        =   1  )
                     AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
-                      OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
+                      OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)     =   "1" ))
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5 )
                     AND  ((FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
-                      OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
+                      OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)     =   "1" ))
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
                            PERFORM 2001111-KSN-KHNINF-SET-SEC

@@ -35,6 +35,7 @@
       *                                     器材商品名コード対応
       *  04.02.00    NACL-多々納  08/03/XX  Ｈ２０年４月改正対応
       *  04.05.00    NACL-多々納  09/10/XX  換算値・関連コメント対応
+      *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *****************************************************************
       *
       *
@@ -130,6 +131,8 @@
       *
            03  IDW                 PIC 9(04).
            03  IDW2                PIC 9(04).
+      *
+           03  IDX-D               PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -718,6 +721,15 @@
                MOVE    SPA-SRYYMD(7:2)     TO  IDX-KAI2
                MOVE    1                   TO  TBL-DAY   (01 IDX-KAI2)
            END-IF
+      *!!!
+      *    同日再入院日判定
+           IF     (SPA-SRYYMD(1:6)     =   SPA-K02N-NYUINYMD (1:6))
+             AND  (SPA-K02N-DOUDAY     >   ZERO           )
+               MOVE    SPA-K02N-DOUDAY     TO  IDX-1
+           ELSE
+               MOVE    ZERO                TO  IDX-1
+           END-IF
+      *!!!
       *    算定日が重複した時、前の回数とする
            PERFORM VARYING     IDX-KAI1    FROM    1   BY  1
                    UNTIL       IDX-KAI1    >   10
@@ -731,6 +743,13 @@
                                                       (IDY IDX-KAI2)
                        END-PERFORM
                    END-IF
+      *!!!
+                   IF     (TBL-DAY (IDX-KAI1 IDX-KAI2) >   ZERO )
+                     AND  (IDX-1               =   IDX-KAI2  )
+                       MOVE    2               TO  TBL-DAY
+                                                  (IDX-KAI1 IDX-KAI2) 
+                   END-IF
+      *!!!
                END-PERFORM
            END-PERFORM
       *
@@ -1318,14 +1337,26 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                回数セット
                        ADD     TBL-KAISU(IDX-KAI1)
                                            TO  ACCT-DAY (1 IDX-KAI2)
+      *                ADD     TBL-KAISU(IDX-KAI1)
+      *                                    TO  ACCT-DAY (2 IDX-KAI2)
+      *!!!!
+      *                同日再入院分
+                       EVALUATE   TBL-DAY (IDX-KAI1 IDX-KAI2)
+                       WHEN    2
+                           MOVE    3           TO  IDX-1
+                       WHEN    OTHER
+                           MOVE    2           TO  IDX-1
+                       END-EVALUATE
                        ADD     TBL-KAISU(IDX-KAI1)
-                                           TO  ACCT-DAY (2 IDX-KAI2)
+                                           TO  ACCT-DAY (IDX-1 IDX-KAI2)
+      *!!
       *                自動算定分は集計しない
                        IF      LNK-WKSRY-AUTOKBN(01 01)  =   "3"
                            MOVE    TBL-KAISU(IDX-KAI1)
                                            TO  ACCT-DAY (1 IDX-KAI2)
                            MOVE    TBL-KAISU(IDX-KAI1)
-                                           TO  ACCT-DAY (2 IDX-KAI2)
+      ***                                  TO  ACCT-DAY (2 IDX-KAI2)
+                                           TO  ACCT-DAY (IDX-1 IDX-KAI2)
                        END-IF
                    END-IF
                END-PERFORM
@@ -1334,6 +1365,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  ACCT-ZAIKAISU
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL       IDX2    >   31
+               MOVE    ZERO                TO  ACCT-DAY (1 IDX2)
+               COMPUTE ACCT-DAY (1 IDX2)   =   ACCT-DAY (2 IDX2)
+                                           +   ACCT-DAY (3 IDX2)
+                                           +   ACCT-DAY (4 IDX2)
                ADD     ACCT-DAY (1 IDX2)   TO  ACCT-ZAIKAISU
            END-PERFORM
       *
@@ -2252,14 +2287,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 4500113-TEISEI-SANTEI-SEC
       *
       *            剤回数　変更
-                   COMPUTE ACCT-ZAIKAISU       =   ACCT-ZAIKAISU
-                                               -   ACCT-DAY
-                                                       (IDX-1 IDX-2)
-                   COMPUTE ACCT-DAY (1 IDX-2)  =   ACCT-DAY (1 IDX-2)
-                                               -   ACCT-DAY
-                                                       (IDX-1 IDX-2)
                    MOVE    ZERO                TO  ACCT-DAY
                                                        (IDX-1 IDX-2)
+      *            剤回数編集
+                   PERFORM 450140-ZAIKAISU-HEN-SEC
       *            回数がゼロの時、削除
                    IF      ACCT-ZAIKAISU       =   ZERO
                        PERFORM 45001121-ZAINUM-DELETE-SEC
@@ -2300,6 +2331,27 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        4500112-TEISEI-SRYACCT-EXT.
            EXIT.
+      *****************************************************************
+      *   剤回数編集処理
+      *****************************************************************
+       450140-ZAIKAISU-HEN-SEC          SECTION.
+      *
+           COMPUTE ACCT-DAY (1 IDX-2)  =   ACCT-DAY (2 IDX-2)
+                                       +   ACCT-DAY (3 IDX-2)
+                                       +   ACCT-DAY (4 IDX-2)
+      *
+           MOVE    ZERO                TO  ACCT-ZAIKAISU
+           PERFORM VARYING     IDX-D   FROM    1   BY  1
+                   UNTIL       IDX-D   >   31
+              IF      ACCT-DAY (1 IDX-D)   >   ZERO
+      *            剤回数集計
+                   COMPUTE ACCT-ZAIKAISU       =   ACCT-ZAIKAISU
+                                               +   ACCT-DAY
+                                                       (1  IDX-D)
+               END-IF
+           END-PERFORM
+           .
+       450140-ZAIKAISU-HEN-EXT.
       *
       *****************************************************************
       *    剤削除処理

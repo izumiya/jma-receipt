@@ -158,7 +158,7 @@
        01  RECECSV.
            03  FILLER              PIC X(09)   VALUE   "/var/tmp/".
            03  RECECSV-HOSPNUM     PIC 9(02).
-           03  RECECSV-FILE-ID     PIC X(07).
+           03  RECECSV-FILE-ID     PIC X(08).
            03  FILLER              PIC X(04)   VALUE   ".csv".
       *
            COPY    "HCMSL55.INC".
@@ -499,7 +499,7 @@
            03  CSV-SKYYMHEN            PIC X(07).
            03  CSV-SYOKBNMEI           PIC X(10).
            03  CSV-NYUGAIMEI           PIC X(02).
-           03  CSV-TEISYUTUMEI         PIC X(10).
+           03  CSV-TEISYUTUMEI         PIC X(12).
            03  CSV-ZAIKBNMEI           PIC X(14).
            03  CSV-SYUBETUMEI          PIC X(30).
            03  CSV-KBNMEI              PIC X(30).
@@ -687,7 +687,7 @@
            MOVE    LNK-PRTKANRI-TERMID TO  TOKEIPARA-TERMID
            MOVE    SPA-HOSPNUM         TO  TOKEIPARA-HOSPNUM
       *
-           MOVE    "BG01401"           TO  RECECSV-FILE-ID
+           MOVE    "ORCBG014"          TO  RECECSV-FILE-ID
            MOVE    SPA-HOSPNUM         TO  RECECSV-HOSPNUM
       *
       *    パラメタ編集処理
@@ -2384,12 +2384,19 @@
                                "署分"              DELIMITED BY SIZE
                                            INTO    WRK-PRT2-HKNJANAME
                        END-STRING
-                       MOVE    WRK-PRT2-HKNJANAME  TO  CSV-HKNJANAME
+                       STRING  "短期傷病初回分（"  DELIMITED BY SIZE
+                               KANACHK-OUT-INPUT   DELIMITED BY SPACE
+                               "署分）"            DELIMITED BY SIZE
+                                       INTO    CSV-HKNJANAME
+                       END-STRING
                    END-IF
                END-IF
                MOVE    WRK-HKNJANUM(1:5)   TO  WRK-PRT2-HKNJANUM
                                                CSV-HKNJANUM
                MOVE    SPACE           TO  WRK-PRT2-FILLER
+           ELSE
+               MOVE    "短期傷病継続分"    TO   CSV-HKNJANAME
+               MOVE    SPACE               TO   CSV-HKNJANUM
            END-IF
       *
       *    医療機関名セット
@@ -2679,28 +2686,41 @@
       *****************************************************************
        3201-BODY-HEN-STR2-SEC      SECTION.
       *
-           IF      TOKEI-TEISYUTU  =   "7"
-      *        短期傷病監督署見出し
-               IF    ( TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM  )
-                   PERFORM 3201-LABOR-SIO-BODY-HEN-SEC
-               END-IF
-      *        短期傷病入外区分見出し
-               IF    ( TOKEI-HKNJANUM2 NOT =   WRK-HKNJANUM2 ) OR
-                     ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
-                   PERFORM 3201-ROUSAI-BODY-HEN-SEC
-               END-IF
-           ELSE
-      *        提出先入外区分見出し
-               IF        ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
-                   OR    ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
-                   PERFORM 3201-TEISYUTU-BODY-HEN-SEC
-               END-IF
-           END-IF
+           EVALUATE    TOKEI-TEISYUTU
+               WHEN    "7"
+      *            短期傷病監督署見出し
+                   IF    ( TOKEI-HKNJANUM  NOT =   WRK-HKNJANUM  )
+                       PERFORM 3201-LABOR-SIO-BODY-HEN-SEC
+                   END-IF
+      *            短期傷病入外区分見出し
+                   IF    ( TOKEI-HKNJANUM2 NOT =   WRK-HKNJANUM2 ) OR
+                         ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
+                       PERFORM 3201-ROUSAI-BODY-HEN-SEC
+                   END-IF
+               WHEN    "8"
+                   IF        ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
+                       OR    ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
+                       PERFORM 3201-AFTER-BODY-HEN-SEC
+                   END-IF
+               WHEN    OTHER
+      *            提出先入外区分見出し
+                   IF        ( TOKEI-TEISYUTU  NOT =   WRK-TEISYUTU )
+                       OR    ( TOKEI-NYUGAIKBN NOT =   WRK-NYUGAIKBN )
+                       MOVE    SPACE           TO  CSV-HKNJANAME
+                                                   CSV-HKNJANUM
+                                                   CSV-SYUBETUKBN
+                                                   CSV-KBN
+                       PERFORM 3201-TEISYUTU-BODY-HEN-SEC
+                   END-IF
+           END-EVALUATE
       *
       *    診療月見出し
            IF        ( TOKEI-SRYYMFLG  NOT =   WRK-SRYYMFLG )
                PERFORM 3201-SRYYM-BODY-HEN-SEC
            END-IF
+      *
+           MOVE    TOKEI-SRYYM     TO  CSV-SRYYM
+      *
       *
       *    保険区分見出し
            IF      TOKEI-HKNKBN    NOT =   WRK-HKNKBN
@@ -2823,6 +2843,46 @@
       *****************************************************************
       *    帳票編集<明細行>処理
       *****************************************************************
+       3201-AFTER-BODY-HEN-SEC  SECTION.
+      *
+           MOVE    SPACE           TO  CSV-HKNJANAME
+                                       CSV-HKNJANUM
+                                       CSV-SYUBETUKBN
+                                       CSV-KBN
+      *
+           MOVE    SPACE           TO  WRK-PRT-LINE
+      *
+           MOVE    "アフターケア分"    TO  WRK-PRT-LINE
+                                           CSV-HKNJANAME
+      *
+      *    見出し行セット
+           PERFORM 320-BODY-SET-SEC
+      *
+           MOVE    TOKEI-TEISYUTU  TO  WRK-TEISYUTU
+           MOVE    TOKEI-TEISYUTU  TO  CSV-TEISYUTU
+      *
+           MOVE    TOKEI-HKNJANUM  TO  WRK-HKNJANUM
+           MOVE    TOKEI-HKNJANUM2 TO  WRK-HKNJANUM2
+           MOVE    TOKEI-NYUGAIKBN TO  WRK-NYUGAIKBN
+           MOVE    TOKEI-ZAIKBN    TO  WRK-ZAIKBN
+           MOVE    0               TO  WRK-SRYYMFLG
+           MOVE    SPACE           TO  WRK-HKNKBN
+           MOVE    SPACE           TO  WRK-SYUBETUKBN
+           MOVE    SPACE           TO  WRK-KBN
+           EVALUATE    WRK-NYUGAIKBN
+               WHEN    "1"
+                   MOVE    "2"     TO  CSV-NYUGAIKBN
+               WHEN    "2"
+                   MOVE    "1"     TO  CSV-NYUGAIKBN
+           END-EVALUATE
+      *
+           .
+       3201-AFTER-BODY-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    帳票編集<明細行>処理
+      *****************************************************************
        3201-ROUSAI-BODY-HEN-SEC  SECTION.
       *
            MOVE    SPACE           TO  WRK-PRT-LINE
@@ -2925,8 +2985,11 @@
                    MOVE    "＜広域　外来＞"          TO  WRK-PRT-LINE
                WHEN    "6"     ALSO    "2"
                    MOVE    "＜広域　入院＞"          TO  WRK-PRT-LINE
+<<<<<<< ORCBG014.CBL
                WHEN    "8"     ALSO    ANY
                    MOVE    "アフターケア分"            TO  WRK-PRT-LINE
+=======
+>>>>>>> 1.57
                WHEN    "9"     ALSO    "1"
                    MOVE    "＜公害　外来＞"          TO  WRK-PRT-LINE
                WHEN    "9"     ALSO    "2"
@@ -2962,7 +3025,13 @@
       *****************************************************************
        3201-LABOR-SIO-BODY-HEN-SEC SECTION.
       *
+           MOVE    SPACE           TO  CSV-HKNJANAME
+                                       CSV-HKNJANUM
+                                       CSV-SYUBETUKBN
+                                       CSV-KBN
+      *
            MOVE    TOKEI-HKNJANUM  TO  WRK-HKNJANUM
+           MOVE    TOKEI-TEISYUTU  TO  CSV-TEISYUTU
       *
            MOVE    SPACE           TO  WRK-PRT-LINE
       *
@@ -2986,21 +3055,41 @@
                IF      KANACHK-RC      =   0
                    STRING  KANACHK-OUT-INPUT   DELIMITED BY SPACE
                            "署分"              DELIMITED BY SIZE
+<<<<<<< ORCBG014.CBL
+                                       INTO    WRK-PRT-LINE(24:40)
+=======
                                        INTO    WRK-PRT-LINE(24:40)
                    END-STRING
+                   STRING  "短期傷病初回分（"  DELIMITED BY SIZE
+                           KANACHK-OUT-INPUT   DELIMITED BY SPACE
+                           "署分）"            DELIMITED BY SIZE
+                                       INTO    CSV-HKNJANAME
+>>>>>>> 1.57
+                   END-STRING
+<<<<<<< ORCBG014.CBL
                    MOVE    WRK-PRT-LINE(24:40) TO  CSV-HKNJANAME
+=======
+>>>>>>> 1.57
                END-IF
            END-IF
            MOVE    WRK-HKNJANUM(1:5)   TO  WRK-PRT-LINE(17:5)
                                        CSV-HKNJANUM
            MOVE    "　"                TO  WRK-PRT-LINE(22:2)
            ELSE
+<<<<<<< ORCBG014.CBL
                MOVE    "短期傷病継続分"    TO  WRK-PRT-LINE
                                            CSV-HKNJANAME
+=======
+               MOVE    "短期傷病継続分"    TO  WRK-PRT-LINE
+                                               CSV-HKNJANAME
+>>>>>>> 1.57
            END-IF
       *
+<<<<<<< ORCBG014.CBL
       *     ADD     1                   TO  CNT-LINE
       *
+=======
+>>>>>>> 1.57
       *    見出し行セット
            PERFORM 320-BODY-SET-SEC
       *
@@ -3893,6 +3982,14 @@
       *
            WRITE   RECECSV-REC
       *
+           MOVE    SPACE           TO  CSV-SKYYMHEN
+                                       CSV-SYOKBNMEI
+                                       CSV-TEISYUTUMEI
+                                       CSV-NYUGAIMEI
+                                       CSV-ZAIKBNMEI
+                                       CSV-SRYYMHEN
+                                       CSV-SYUBETUMEI
+                                       CSV-KBNMEI
            MOVE    WRK-PARA-DENPPRTYM
                                    TO  WRK-SYMD
            MOVE    WRK-SYY         TO  WRK-HEN-YY-OT
@@ -3928,14 +4025,9 @@
                WHEN    "6"
                    MOVE    "広域連合"      TO  CSV-TEISYUTUMEI
                WHEN    "7"
-                   EVALUATE    TOKEI-HKNJANUM2
-                       WHEN    "1"
-                           MOVE    "短期"      TO  CSV-TEISYUTUMEI
-                       WHEN    "2"
-                           MOVE    "傷病"      TO  CSV-TEISYUTUMEI
-                   END-EVALUATE
+                   MOVE    "短期傷病"      TO  CSV-TEISYUTUMEI
                WHEN    "8"
-                   MOVE    "アフター"      TO  CSV-TEISYUTUMEI
+                   MOVE    "アフターケア"  TO  CSV-TEISYUTUMEI
                WHEN    "9"
                    MOVE    "公害"          TO  CSV-TEISYUTUMEI
            END-EVALUATE

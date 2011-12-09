@@ -35,6 +35,7 @@
       *  04.03.00    NACL-多々納  08/08/26  院外処方対応追加
       *  04.04.00    NACL-多々納  08/12/22  出来高算定コード対応
       *  04.05.00    NACL-多々納  09/10/XX  換算値数量追加対応
+      *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -252,6 +253,8 @@
            MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
            MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
            MOVE    SPA-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
+           MOVE    LNK-ORDERPRT-DOUJITSUKBN
+                                       TO  WKSRY-DOUJITSUKBN
       *
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
            MOVE    "tbl_wksryact"      TO  MCP-TABLE

@@ -61,6 +61,8 @@
                        09  SPA-GMN-HKNCOMBIMEI     PIC X(65).
       *            情ま’情陸
                    07  SPA-NAI-INNAI               PIC 9(01).
+      *            きゥ瘋ェ情
+                   07  SPA-NAI-DOUKBN              PIC X(01).
       *
                05  SPA-GMN-INITAREA.
                    07  SPA-GMN-DRCD-COMB-G.

@@ -72,7 +72,7 @@
       *
       *    ＳＰＡパラメタデータ
        FD  SPASCR-FILE.
-       01  SPA-DATA-REC            PIC X(1200).
+       01  SPA-DATA-REC            PIC X(1500).
       *
       *
        WORKING-STORAGE             SECTION.
@@ -682,7 +682,7 @@
            COPY    "CPORCSC00.INC".
       *
       *    算定履歴チェックパラメタ
-           COPY    "CPORCSC91.INC".
+      ***  COPY    "CPORCSC91.INC".
       *
       *    点数編集パラメタ
            COPY    "CPORCSC92.INC".
@@ -5488,7 +5488,9 @@
                    MOVE    SPA-COM-SURYO   (IDX1)
                                                TO  ORCSCZAICHK-SRYSURYO
                                                              (IDX-ATO)
-                   IF      SPA-COM-DATAKBN (IDX1)   =   "3"
+                   IF     (SPA-COM-DATAKBN (IDX1)   =   "3" )
+      *                画像診断のみ
+                    AND   (SPA-COM-SRYKBN  (IDX1)  =   "70" )
                        MOVE    SPA-COM-BUNGSU (IDX1)
                                                TO  ORCSCZAICHK-SRYKAISU
                                                              (IDX-ATO)
@@ -5915,7 +5917,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    数量
            MOVE    SPA-COM-SURYO  (IDX)    TO  SRY-SRYSURYO(IDS)
       *    回数
-           IF      SPA-COM-DATAKBN (IDX)   =   "3"
+           IF     (SPA-COM-DATAKBN (IDX)   =   "3"  )
+      *            画像診断のみ
+            AND   (SPA-COM-SRYKBN  (IDX)   =   "70" )
                MOVE    SPA-COM-BUNGSU (IDX)
                                            TO  SRY-SRYKAISU(IDS)
            END-IF

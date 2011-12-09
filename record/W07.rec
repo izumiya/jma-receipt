@@ -299,6 +299,13 @@ W07	{
 					count	int;
 					item	varchar(30)[5];
 				};
+				TEISEISYO_COMB	{
+					TEISEISYO	{
+						value	varchar(22);
+					};
+					count	int;
+					item	varchar(22)[5];
+				};
 			};
 			TAGNAME1    {
 			    state   int;

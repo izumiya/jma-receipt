@@ -31,4 +31,7 @@
       *
            02  SPA-COMMON              PIC X(20000).
            02  SPA-FREE                PIC X(600000).
+           02  SPA-FREE-R              REDEFINES   SPA-FREE.
+               03  SPA-FREE1           PIC X(400000).
+               03  SPA-FREE2           PIC X(200000).
       *

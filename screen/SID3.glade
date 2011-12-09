@@ -14,7 +14,7 @@
   <class>GtkWindow</class>
   <name>SID3</name>
   <width>550</width>
-  <height>120</height>
+  <height>144</height>
   <signal>
     <name>map_event</name>
     <handler>map_event</handler>
@@ -63,8 +63,8 @@
       <class>GtkButton</class>
       <name>B01</name>
       <x>8</x>
-      <y>88</y>
-      <width>112</width>
+      <y>108</y>
+      <width>108</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
@@ -101,9 +101,9 @@
     <widget>
       <class>GtkButton</class>
       <name>B10</name>
-      <x>152</x>
-      <y>88</y>
-      <width>116</width>
+      <x>164</x>
+      <y>108</y>
+      <width>108</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
@@ -124,9 +124,9 @@
     <widget>
       <class>GtkButton</class>
       <name>B12</name>
-      <x>400</x>
-      <y>88</y>
-      <width>144</width>
+      <x>388</x>
+      <y>108</y>
+      <width>152</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
@@ -148,8 +148,8 @@
       <class>GtkButton</class>
       <name>B11</name>
       <x>276</x>
-      <y>88</y>
-      <width>116</width>
+      <y>108</y>
+      <width>108</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
@@ -164,6 +164,29 @@
 	<last_modification_time>Wed, 14 Feb 2001 00:38:53 GMT</last_modification_time>
       </signal>
       <label>F11:明細書</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>B12S</name>
+      <x>388</x>
+      <y>84</y>
+      <width>152</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <accelerator>
+	<modifiers>GDK_SHIFT_MASK</modifiers>
+	<key>GDK_F12</key>
+	<signal>clicked</signal>
+      </accelerator>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Wed, 14 Feb 2001 00:38:53 GMT</last_modification_time>
+      </signal>
+      <label>Shift+F12:修正</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 

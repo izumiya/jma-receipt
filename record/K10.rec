@@ -12,7 +12,7 @@ K10	{
 					value0	varchar(3);
 					value1	varchar(20);
 					value2	varchar(50);
-					value3	varchar(10);
+					value3	varchar(12);
 					value4	varchar(10);
 					value5	varchar(50);
 					value6	varchar(50);

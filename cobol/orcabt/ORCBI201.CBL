@@ -68,7 +68,7 @@
            03  PRT-OFFSET-X            PIC X(05).
            03  PRT-OFFSET-Y            PIC X(05).
            03  PRT-SITEKBN             PIC X(01).
-           03  PRT-PRTDATA             PIC X(10000).
+           03  PRT-PRTDATA             PIC X(20000).
       *
       *    £Ã£Ó£Ö¥Õ¥¡¥¤¥ë
        FD  CSV-FILE.

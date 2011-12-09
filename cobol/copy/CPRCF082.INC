@@ -47,6 +47,7 @@
       *                                     載を行なう対応
       *  04.05.01   NACL-門脇     10/01/25  日別手技点にサイン追加
       *  04.05.02   NACL-門脇     10/02/16  予備項目追加
+      *  04.05.03    NACL-藤原    11/11/22  同日再入院対応
       *
       *  04.07.01    NACL-門脇    11/09/01  労災初回請求分フラグ追加
       *                                     労災基準監督署コード追加
@@ -364,10 +365,19 @@
       *公務災害点単価
                05  RECE82-KOMUTENTANKA    PIC  9(02).
       *
-      *入院料未算定区分
-           03  RECE82-NYUINDAY-TBL.
-               05  RECE82-NYUINDAY-KBN    PIC  X(01)
-                                               OCCURS  31.
+      *入院料情報取得フラグ
+           03  RECE82-DOUJITSU-FLG        PIC 9(01).
+      *入院料情報
+           03  RECE82-DOUJITSU-AREA.
+      *同日再入院（入院分）の保険組合せ
+               05  RECE82-DOUJITSU-HKNCOMBI
+                                          PIC 9(04)   OCCURS  31.
+      *同日再入院（入院分）の食事開始時間区分
+               05  RECE82-DOUJITSU-SKJKBN PIC X(01)   OCCURS  31.
+      *入院区分
+               05  RECE82-NYUINDAY-TBL.
+                   07  RECE82-NYUINDAY-KBN
+                                          PIC  X(01)  OCCURS  31.
       *
       *予備
            03  RECE82-YOBIETC-AREA.

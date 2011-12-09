@@ -545,6 +545,8 @@
                        09  SPA-PTKOH-HKN-SBTKBN        PIC X(01).
       *                期限切れ区分
                        09  SPA-PTKOH-TEKEDCHKKBN       PIC X(01).
+      *                上限金額対象区分
+                       09  SPA-PTKOH-JYOGENKBN         PIC X(01).
       *
                        09  SPA-PTKOH-SINKIKBN          PIC X(01).
                        09  SPA-PTKOH-KOHNUM-MEI        PIC X(10).
@@ -878,6 +880,7 @@
                            11  SPA-NAI24-TKOHSTYMD       PIC X(08).
                            11  SPA-NAI24-TKOHEDYMD       PIC X(08).
                            11  SPA-NAI24-TJKYSNUM        PIC X(20).
+                           11  SPA-NAI24-TJYOGENKBN      PIC X(01).
                        09  SPA-FTN1-MAX                      PIC 9(03).
       *            特定の受給者番号
                    07  SPA-GMN24-JKYSNUM                 PIC X(20).

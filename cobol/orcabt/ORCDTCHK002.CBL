@@ -9640,6 +9640,10 @@
                    MOVE    "990016"    TO  WRK-ERRCD
                WHEN    22
                    MOVE    "990017"    TO  WRK-ERRCD
+               WHEN    23
+                   MOVE    "990020"    TO  WRK-ERRCD
+               WHEN    24
+                   MOVE    "990021"    TO  WRK-ERRCD
                WHEN    OTHER
                    MOVE    "990018"    TO  WRK-ERRCD
                END-EVALUATE

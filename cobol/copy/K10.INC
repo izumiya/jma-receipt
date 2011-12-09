@@ -28,7 +28,7 @@
                     06  K10-NO      PIC X(3).
                     06  K10-PTNUM   PIC X(20).
                     06  K10-NAME    PIC X(50).
-                    06  K10-SRYYMD  PIC X(10).
+                    06  K10-SRYYMD  PIC X(12).
                     06  K10-SRYKA   PIC X(10).
                     06  K10-HKNCOMBI    PIC X(50).
                     06  K10-DRCD-NAME    PIC X(50).

@@ -55,3 +55,5 @@
            03  TEMP-PHOTO3-FILENAME     PIC X(256).
       *作成年月日
            03  TEMP-CREYMD              PIC  X(08).
+      *名称
+           03  TEMP-NAME                PIC X(200).

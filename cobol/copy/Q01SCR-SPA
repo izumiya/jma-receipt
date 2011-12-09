@@ -271,9 +271,18 @@
                                                        PIC X(08)
                                                        OCCURS  5.
       *                    検索条件AND/OR切り替え用ラジオボタン
-                           11  SPA-GMN-Q01-RDKOHNUM-AND
-                                                       PIC X(01).
-                           11  SPA-GMN-Q01-RDKOHNUM-OR PIC X(01).
+                           11  SPA-GMN-Q01-JKNHKNJANUM-G.
+                               13  SPA-GMN-Q01-JKNHKNJANUM    PIC X(01).
+                               13  SPA-GMN-Q01-JKNHKNJANUMFL  PIC X(01).
+                               13  SPA-GMN-Q01-JKNHKNJANUMMEI PIC X(08).
+                           11  SPA-GMN-Q01-JKNHKNNUM-G.
+                               13  SPA-GMN-Q01-JKNHKNNUM      PIC X(01).
+                               13  SPA-GMN-Q01-JKNHKNNUMFL    PIC X(01).
+                               13  SPA-GMN-Q01-JKNHKNNUMMEI   PIC X(08).
+                           11  SPA-GMN-Q01-JKNKOHNUM-G.
+                               13  SPA-GMN-Q01-JKNKOHNUM      PIC X(01).
+                               13  SPA-GMN-Q01-JKNKOHNUMFL    PIC X(01).
+                               13  SPA-GMN-Q01-JKNKOHNUMMEI   PIC X(08).
                            11  SPA-GMN-Q01-RDHKNKOH-AND
                                                        PIC X(01).
                            11  SPA-GMN-Q01-RDHKNKOH-OR PIC X(01).
@@ -424,12 +433,14 @@
                                                        PIC X(80).
       *
       *                    検索条件AND/OR切り替え用ラジオボタン
-                           11  SPA-GMN-Q01-RDBYOMEI-AND
-                                                       PIC X(01).
-                           11  SPA-GMN-Q01-RDBYOMEI-OR PIC X(01).
-                           11  SPA-GMN-Q01-RDSRYACT-AND
-                                                       PIC X(01).
-                           11  SPA-GMN-Q01-RDSRYACT-OR PIC X(01).
+                           11  SPA-GMN-Q01-JKNBYOMEI-G.
+                               13  SPA-GMN-Q01-JKNBYOMEI     PIC X(01).
+                               13  SPA-GMN-Q01-JKNBYOMEIFL   PIC X(01).
+                               13  SPA-GMN-Q01-JKNBYOMEIMEI  PIC X(08).
+                           11  SPA-GMN-Q01-JKNSRYACT-G.
+                               13  SPA-GMN-Q01-JKNSRYACT     PIC X(01).
+                               13  SPA-GMN-Q01-JKNSRYACTFL   PIC X(01).
+                               13  SPA-GMN-Q01-JKNSRYACTMEI  PIC X(08).
       *                並び順
                        09  SPA-GMN-Q01-NARABI-AREA.
                            11  SPA-GMN-Q01-KMKTBL.
@@ -731,6 +742,37 @@
                                13  SPA-GMN-Q01-SRYSYUKBNL     PIC X(02).
                                13  SPA-GMN-Q01-SRYSYUKBNFLL   PIC X(01).
                                13  SPA-GMN-Q01-SRYSYUKBNMEIL  PIC X(20).
+                       09  SPA-GMN-Q01-JKNHKNJANUMLST-G.
+                           11  SPA-GMN-Q01-JKNHKNJANUMLST-MAX PIC 9(05).
+                           11  SPA-GMN-Q01-JKNHKNJANUMLST     OCCURS 5.
+                               13  SPA-GMN-Q01-JKNHKNJANUML   PIC X(01).
+                               13  SPA-GMN-Q01-JKNHKNJANUMFLL PIC X(01).
+                               13  SPA-GMN-Q01-JKNHKNJANUMMEIL
+                                                              PIC X(08).
+                       09  SPA-GMN-Q01-JKNHKNNUMLST-G.
+                           11  SPA-GMN-Q01-JKNHKNNUMLST-MAX   PIC 9(05).
+                           11  SPA-GMN-Q01-JKNHKNNUMLST       OCCURS 5.
+                               13  SPA-GMN-Q01-JKNHKNNUML     PIC X(01).
+                               13  SPA-GMN-Q01-JKNHKNNUMFLL   PIC X(01).
+                               13  SPA-GMN-Q01-JKNHKNNUMMEIL  PIC X(08).
+                       09  SPA-GMN-Q01-JKNKOHNUMLST-G.
+                           11  SPA-GMN-Q01-JKNKOHNUMLST-MAX   PIC 9(05).
+                           11  SPA-GMN-Q01-JKNKOHNUMLST       OCCURS 5.
+                               13  SPA-GMN-Q01-JKNKOHNUML     PIC X(01).
+                               13  SPA-GMN-Q01-JKNKOHNUMFLL   PIC X(01).
+                               13  SPA-GMN-Q01-JKNKOHNUMMEIL  PIC X(08).
+                       09  SPA-GMN-Q01-JKNBYOMEILST-G.
+                           11  SPA-GMN-Q01-JKNBYOMEILST-MAX   PIC 9(05).
+                           11  SPA-GMN-Q01-JKNBYOMEILST       OCCURS 5.
+                               13  SPA-GMN-Q01-JKNBYOMEIL     PIC X(01).
+                               13  SPA-GMN-Q01-JKNBYOMEIFLL   PIC X(01).
+                               13  SPA-GMN-Q01-JKNBYOMEIMEIL  PIC X(08).
+                       09  SPA-GMN-Q01-JKNSRYACTLST-G.
+                           11  SPA-GMN-Q01-JKNSRYACTLST-MAX   PIC 9(05).
+                           11  SPA-GMN-Q01-JKNSRYACTLST       OCCURS 5.
+                               13  SPA-GMN-Q01-JKNSRYACTL     PIC X(01).
+                               13  SPA-GMN-Q01-JKNSRYACTFLL   PIC X(01).
+                               13  SPA-GMN-Q01-JKNSRYACTMEIL  PIC X(08).
       *            コンボボックス情報領域（内部）
                    07  SPA-NAI-Q01-COMMBO-AREA.
                        09  SPA-NAI-Q01-SELPATTERNLST-G.
@@ -1072,8 +1114,24 @@
                05  SPA-Q01-Q02-SENI-AREA.
                    07  SPA-Q01-SAKIPG                  PIC X(10).
                    07  SPA-Q01-GAITO-TBL.
-                       09  SPA-Q01-GTBL                PIC X(01)
-                                                       OCCURS  12.
+                       09  SPA-Q01-GITEM-G.
+                           11  SPA-Q01-GPTNUM          PIC X(01).
+                           11  SPA-Q01-GNAME           PIC X(01).
+                           11  SPA-Q01-GLASTYMD        PIC X(01).
+                           11  SPA-Q01-GBYOMEI         PIC X(01).
+                           11  SPA-Q01-GHKNINF         PIC X(01).
+                           11  SPA-Q01-GKOHINF         PIC X(01).
+                           11  SPA-Q01-GPTINF          PIC X(01).
+                           11  SPA-Q01-GJYURRK         PIC X(01).
+                           11  SPA-Q01-GSRYACT         PIC X(01).
+                           11  SPA-Q01-GTSY            PIC X(01).
+                           11  SPA-Q01-GRECECOM        PIC X(01).
+                           11  SPA-Q01-GSEIKYU         PIC X(01).
+                           11  SPA-Q01-GXBYOMEI        PIC X(01).
+                           11  SPA-Q01-GXSRYACT        PIC X(01).
+                       09  SPA-Q01-GITEM-R REDEFINES   SPA-Q01-GITEM-G.
+                           11  SPA-Q01-GTBL            PIC X(01)
+                                                       OCCURS  14.
                    07  SPA-Q01-AGE-CALC-KBN            PIC 9(01).
                    07  SPA-Q01-STSRYYMD                PIC X(08).
                    07  SPA-Q01-EDSRYYMD                PIC X(08).
@@ -1148,6 +1206,8 @@
                                                        OCCURS  5.
       *
                        09  SPA-Q01-HKNKOH-JKN          PIC X(01).
+                       09  SPA-Q01-HKNJANUM-JKN        PIC X(01).
+                       09  SPA-Q01-HKNNUM-JKN          PIC X(01).
                        09  SPA-Q01-KOHNUM-JKN          PIC X(01).
       *
                        09  SPA-Q01-KOHNUM-G.
@@ -1205,6 +1265,12 @@
                        09  SPA-Q01-SORTKBN-TBL.
                            11  SPA-Q01-SORTKBN         PIC 9(01)
                                                        OCCURS  3.
+      *            NOT検索条件エリア
+                   07  SPA-Q01-NOT-AREA.
+                       09  SPA-Q01-XSELECT             PIC X(01).
+                       09  SPA-Q01-XSRYCD-G.
+                           11  SPA-Q01-XSRYCD          PIC X(09)
+                                                       OCCURS  5.
       *
       *        Q01←→Q04遷移情報
                05  SPA-Q01-Q04-SENI-AREA.

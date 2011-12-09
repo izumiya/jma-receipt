@@ -152,13 +152,13 @@
       *病名記載順区分
                05  SYS-200501-BYOMEI-PRTJYUN
                                            PIC X(01).
+      *点検用レセプト記載設定区分
+               05  SYS-200501-INSPECT-CHARACTER-KBN
+                                           PIC X(01).
       *労災の様式選択機能（入院外）
                05  SYS-200501-ROUPRTKBN    PIC X(01).
       *労災の様式選択機能（入院）
                05  SYS-200501-ROUPRTKBN-N  PIC X(01).
-      *点検用レセプト記載設定区分
-               05  SYS-200501-INSPECT-CHARACTER-KBN
-                                           PIC X(01).
       *予備
            03  SYS-200501-YOBI             PIC X(387).
       *端末ＩＤ

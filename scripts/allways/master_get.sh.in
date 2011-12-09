@@ -10,16 +10,16 @@ fi
 . $JMARECEIPT_ENV
 
 #------------------------------------
-# $1 : °åÎÅµ¡´Ø¼±ÊÌÈÖ¹æ(HOSPNUM)
-# $2 : Ã¼Ëö£É£Ä
-# $3 : ¥¸¥ç¥Ö£É£Ä
-# $4 : ¥·¥§¥ë£É£Ä
-# $5 : ¥Þ¥¹¥¿¡¼£É£Ä
-# $6 : ¥³¡¼¥É£±
-# $7 : ¥³¡¼¥É£²
-# $8 : ¥³¡¼¥É£³
-# $9 : ¥³¡¼¥É£´
-# $10: ¥³¡¼¥É£µ
+# $1 : åŒ»ç™‚æ©Ÿé–¢è­˜åˆ¥ç•ªå·(HOSPNUM)
+# $2 : ç«¯æœ«ï¼©ï¼¤
+# $3 : ã‚¸ãƒ§ãƒ–ï¼©ï¼¤
+# $4 : ã‚·ã‚§ãƒ«ï¼©ï¼¤
+# $5 : ãƒžã‚¹ã‚¿ãƒ¼ï¼©ï¼¤
+# $6 : ã‚³ãƒ¼ãƒ‰ï¼‘
+# $7 : ã‚³ãƒ¼ãƒ‰ï¼’
+# $8 : ã‚³ãƒ¼ãƒ‰ï¼“
+# $9 : ã‚³ãƒ¼ãƒ‰ï¼”
+# $10: ã‚³ãƒ¼ãƒ‰ï¼•
 #------------------------------------
 
 HOSPNUM=${1}
@@ -73,6 +73,10 @@ case "${MASTERID}" in
     FILENAME=hknnum-"${CODE1}"-"${CODE2}".dat
     MSTURL="${MSTSRVPATH}"/hknnum
     ;;
+  SIORI)
+    FILENAME="${CODE1}"-siori.dat
+    MSTURL="${MSTSRVPATH}"/siori/data
+    ;;
   *)
     FILENAME=
     MSTURL=
@@ -101,13 +105,13 @@ ${DBSTUB} -dir ${LDDIRECTORY} -bd orcabt ORCBSQL1 \
           -parameter ${HOSPNUM},${WORKDIR}/${FILENAME}.sql 2>&1 >> ${LOG}
 if [ $? -ne 0 ] ; then 
   rm -f ${WORKDIR}/${FILENAME}.sql
-  ERRMSG="¥Þ¥¹¥¿¡¼ÅÐÏ¿½èÍý¤Ç¥¨¥é¡¼¤¬È¯À¸¤·¤Þ¤·¤¿"
+  ERRMSG="ãƒžã‚¹ã‚¿ãƒ¼ç™»éŒ²å‡¦ç†ã§ã‚¨ãƒ©ãƒ¼ãŒç™ºç”Ÿã—ã¾ã—ãŸ"
   jobend 99 9903 ${HOSPNUM} "${JOBID}" "${SHELLID}" "${ERRMSG}" ${LOG}
 fi
 
 rm -f ${WORKDIR}/${FILENAME}.sql
 
-MSG="¥Þ¥¹¥¿¡¼¼èÆÀ½èÍý¤¬½ªÎ»¤·¤Þ¤·¤¿"
+MSG="ãƒžã‚¹ã‚¿ãƒ¼å–å¾—å‡¦ç†ãŒçµ‚äº†ã—ã¾ã—ãŸ"
 jobend 0 0000 ${HOSPNUM} "${JOBID}" "${SHELLID}" "${MSG}" ${LOG}
 
 exit 0

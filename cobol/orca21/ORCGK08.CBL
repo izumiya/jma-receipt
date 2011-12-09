@@ -827,6 +827,9 @@
            MOVE    SPA-COMMON      TO  SPA-AREA.
            MOVE    SPA-FREE        TO  SPA-K08
            MOVE    SPA-WORK        TO  SPA-K01KYOUTU
+      *TEST
+           DISPLAY "K08 SPA-K02N-DOUDAY:" SPA-K02N-DOUDAY
+      *TEST
       *
       *    診療種別テーブルセット
            PERFORM 1001-SRYKBN-SET-SEC
@@ -5747,6 +5750,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "1"                 TO  LNK-ORDERPRT-DRCD(1:1)
                MOVE    SPA-K081GMN-DRCD    TO  LNK-ORDERPRT-DRCD(2:4)
            END-IF
+      *    同日再入院区分
+           MOVE    SPA-K02N-DOUKBN     TO  LNK-ORDERPRT-DOUJITSUKBN
            CALL    "ORCSORDERPRT"      USING
                                        ORCSORDERPRTAREA
                                        SPA-AREA
@@ -6651,6 +6656,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-ERRMSG
                    MOVE    "システム管理を確認して下さい。"
                                        TO  SPA-ERRMSG(31:)
+      *
+               WHEN    "9000"
+                   MOVE    "【算定履歴の更新ができませんでした】"
+                                       TO  SPA-ERRMSG
+               WHEN    "0051"
+                   STRING  "中間データに不整合が発生しました。"
+                           "再度、診療行為から入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
       *!
                WHEN    "9001"
                    MOVE    "プレビューができない保険組合せです。"

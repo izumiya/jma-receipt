@@ -117,7 +117,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Wed, 14 Feb 2001 00:38:53 GMT</last_modification_time>
       </signal>
-      <label>F11:請求確認画面</label>
+      <label>F11:金額入力</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 

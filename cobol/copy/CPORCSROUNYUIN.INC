@@ -28,6 +28,8 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 04.05.01     NACL-門脇    10/01/18  包括点数の治験減点分追加
+      *
+      * 04.07.01     NACL-門脇    11/11/22  同日再入院対応
       ************************************************************
        01  ORCSROUNYUIN-AREA.
       *
@@ -70,8 +72,16 @@
                    07  LNK-SROUNYUIN-ZAITEN-NACCT    PIC  9(08).
       *診療会計９０・９２の剤点数
                    07  LNK-SROUNYUIN-ZAITEN-ACCT     PIC  9(08).
+      *診療会計９０・９２の剤点数（２）
+                   07  LNK-SROUNYUIN-ZAITEN-ACCT2    PIC  9(08).
+      *診療会計９０・９２の剤点数（３）
+                   07  LNK-SROUNYUIN-ZAITEN-ACCT3    PIC  9(08).
       *診療会計９０・９２の剤点数（その他）
                    07  LNK-SROUNYUIN-ZAITEN-ACCTETC  PIC  9(08).
+      *診療会計９０・９２の剤点数（その他）（２）
+                   07  LNK-SROUNYUIN-ZAITEN-ACCTETC2 PIC  9(08).
+      *診療会計９０・９２の剤点数（その他）（３）
+                   07  LNK-SROUNYUIN-ZAITEN-ACCTETC3 PIC  9(08).
       *包括点数の治験減点分
                    07  LNK-SROUNYUIN-GENTEN          PIC  9(08).
       *

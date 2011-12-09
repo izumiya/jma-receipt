@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.00    NACL-多々納  09/10/26  他院退院日対応
+      *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *****************************************************************
       *
       *
@@ -70,6 +71,11 @@
       *
            03  WRK-TAIINYMD            PIC X(08).
            03  WRK-LASTTAIINYMD        PIC X(08).
+           03  WRK-YMD.
+               05  WRK-SYM             PIC 9(06).
+               05  WRK-SDD             PIC 9(02).
+      *
+           03  WRK-SHONUM                  PIC 9(03).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -236,6 +242,12 @@
            MOVE    WRK-LASTTAIINYMD    TO  ORCSCNYUHEN-LAST-TAIINYMD
       *    他医院退院日
            MOVE    WRK-TAI-TAIINYMD    TO  ORCSCNYUHEN-TAI-TAIINYMD
+      *
+      *    該当の入院履歴が継続の時
+           MOVE    SPACE               TO  ORCSCNYUHEN-STR-NYUINYMD
+           IF      WRK-SHONUM      NOT =   ZERO
+               PERFORM 1003-STR-NYUINYMD-HEN-SEC
+           END-IF
            .
        100-MAIN-SYORI-EXT.
            EXIT.
@@ -249,7 +261,20 @@
            IF     (PTNYUINRRK-NYUINYMD NOT =   WRK-OLD-NYUINYMD ) AND
                   (PTNYUINRRK-TAIINYMD NOT =   WRK-OLD-TAIINYMD )
                IF      PTNYUINRRK-TAIINYMD     =   WRK-OLD-NYUINYMD
-                   MOVE    ZERO                TO  FLG-OK
+                   IF      (ORCSCNYUHEN-KBN2   NOT =   "1"     )
+                       IF    ( FLG-OK          =   1             )
+                       AND   ( PTNYUINRRK-TAIINYMD =   WRK-SRYYMD)
+                           MOVE    1           TO  ORCSCNYUHEN-DOUNYUKBN
+                       END-IF
+                       MOVE    ZERO            TO  FLG-OK
+                   END-IF
+               END-IF
+      *!!!     同日再入院日あり対象
+               IF     (PTNYUINRRK-TAIINYMD     =   WRK-OLD-NYUINYMD )
+                 AND  (WRK-OLD-NYUINYMD        =   ORCSCNYUHEN-NYUINYMD)
+      *            同日再入院日
+                   MOVE    PTNYUINRRK-TAIINYMD    TO  WRK-YMD
+                   MOVE    WRK-SDD         TO  ORCSCNYUHEN-DOUNYUIN 
                END-IF
            END-IF
       *
@@ -263,6 +288,8 @@
                      AND  (FLG-OK                  =   ZERO      )
                        PERFORM 1002-PTNYUINRRK-HEN-SEC
                        MOVE    1               TO  FLG-OK
+      *                同日再入院日
+                       MOVE    ZERO            TO  ORCSCNYUHEN-DOUNYUIN
                    END-IF
                END-IF
            END-IF
@@ -343,7 +370,19 @@
       *        入院中
                MOVE    1                   TO  ORCSCNYUHEN-NYUIN-KBN
            END-IF
-	   .
+      *ver.4.7
+      *    継続
+           IF      PTNYUINRRK-SHOKAIKBN    =   "2"
+      *        継続
+               MOVE    PTNYUINRRK-SHONUM   TO  WRK-SHONUM
+           ELSE
+               MOVE    ZERO                TO  WRK-SHONUM
+           END-IF
+           IF      PTNYUINRRK-TAIINYMD =   WRK-OLD-NYUINYMD
+      *        退院日＝前回入院日あり
+               MOVE    1               TO  ORCSCNYUHEN-DOUTAIKBN
+           END-IF
+           .
        1002-PTNYUINRRK-HEN-EXT.
            EXIT.
       *
@@ -384,6 +423,39 @@
            END-PERFORM
            .
        1003-NYUINDAY-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院履歴が継続開始編集処理
+      *****************************************************************
+       1003-STR-NYUINYMD-HEN-SEC             SECTION.
+      *
+      *    継続の時、初回入院日検索
+           INITIALIZE                  PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+           MOVE    ORCSCNYUHEN-NYUINYMD    TO  PTNYUINRRK-NYUINYMD
+           MOVE    WRK-SHONUM          TO  PTNYUINRRK-SHONUM
+      *
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key13"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key13"             TO  MCP-PATHNAME
+               PERFORM 910-PTNYUINRRK-READ-SEC
+            ELSE
+               MOVE    1               TO  FLG-PTNYUINRRK
+               INITIALIZE                  PTNYUINRRK-REC
+           END-IF
+           IF      FLG-PTNYUINRRK      =   ZERO
+               MOVE    PTNYUINRRK-NYUINYMD
+                                           TO  ORCSCNYUHEN-STR-NYUINYMD
+           END-IF
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key13"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       1003-STR-NYUINYMD-HEN-EXT.
            EXIT.
       *****************************************************************
       *    西暦和暦編集処理

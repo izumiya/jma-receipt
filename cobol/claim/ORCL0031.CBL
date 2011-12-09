@@ -58,6 +58,7 @@
       *  04.05.00    NACL-多々納  09/06/25  薬剤情報提供料・調基判定追加
       *  04.05.00    NACL-多々納  09/11/30  入院回数一括入力対応
       *  04.05.00    NACL-多々納  10/01/15  治験対応
+      *  04.05.01    NACL-藤原    11/11/24  病名からの疑いフラグの設定
       *
       *  04.06.01    NACL-藤原    10/06/20  病名の入力順対応
       *  04.06.02    NACL-多々納  10/08/09  複数公費対応
@@ -66,7 +67,12 @@
       *  04.06.02    NACL-多々納  11/02/18  用法コメント対応
       *
       *  04.07.01    NACL-藤原    10/10/20  病名の削除処理対応
+<<<<<<< ORCL0031.CBL
       *  04.07.00    NACL-多々納  11/10/13  ＵＩＤ編集対応
+=======
+      *  04.07.00    NACL-多々納  11/10/13  ＵＩＤ編集対応
+      *  04.07.00    NACL-多々納  11/11/02  同日再入院対応
+>>>>>>> 1.92
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -229,6 +235,8 @@
            03  WRK-SRYKA           PIC X(02).
            03  WRK-SRYKA-KEY       PIC X(02).
            03  WRK-NYUGAIKBN       PIC X(01).
+      *    同日再入院区分
+           03  WRK-DOUJITSUKBN     PIC X(01).
       *
            03  WRK-DRCD            PIC X(05).
       *
@@ -974,6 +982,13 @@
       *
            DISPLAY "ドクタ   = ["  WRK-DRCD "]"
       *
+      *ver.4.7
+      *    同日再入院区分
+           IF      LF04-DOUJITSUKBN    =   "1"
+               MOVE    "1"             TO  WRK-DOUJITSUKBN
+           ELSE
+               MOVE    SPACE           TO  WRK-DOUJITSUKBN
+           END-IF
            .
        2000-SYOKI-SET-EXT.
            EXIT.
@@ -1968,6 +1983,10 @@
       *
       *    診療日付
            MOVE    WRK-SRYYMD          TO  TBL-WKSRY-SRYYMD (TBL-MAX)
+      *ver.4.7
+      *    同日再入院区分
+           MOVE    WRK-DOUJITSUKBN     TO  TBL-WKSRY-DOUJITSUKBN
+                                                            (TBL-MAX)
       *    保険組合せ
            MOVE    WRK-HKNCOMBI        TO  TBL-WKSRY-HKNCOMBI(TBL-MAX)
       *    剤番号
@@ -2602,6 +2621,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WRK-SRYKA           TO  WKSRY-SRYKA
            MOVE    WRK-SRYYMD          TO  WKSRY-SRYYMD
            MOVE    WRK-HKNCOMBI        TO  WKSRY-HKNCOMBI
+      *    同日再入院区分
+           MOVE    WRK-DOUJITSUKBN     TO  WKSRY-DOUJITSUKBN
       *
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
            MOVE    "tbl_wksryact"      TO  MCP-TABLE
@@ -2646,6 +2667,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WRK-SRYKA           TO  WKSRY-SRYKA
            MOVE    WRK-SRYYMD          TO  WKSRY-SRYYMD
            MOVE    WRK-HKNCOMBI        TO  WKSRY-HKNCOMBI
+      *    同日再入院区分
+           MOVE    WRK-DOUJITSUKBN     TO  WKSRY-DOUJITSUKBN
       *
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
            MOVE    "tbl_wksryact"      TO  MCP-TABLE
@@ -2747,6 +2770,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WRK-SRYKA           TO  WKSRY-SRYKA
            MOVE    WRK-SRYYMD          TO  WKSRY-SRYYMD
            MOVE    WRK-HKNCOMBI        TO  WKSRY-HKNCOMBI
+      *    同日再入院区分
+           MOVE    WRK-DOUJITSUKBN     TO  WKSRY-DOUJITSUKBN
       *
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
            MOVE    "tbl_wksryact"      TO  MCP-TABLE
@@ -3125,6 +3150,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            IF      FLG-BYOMEI-DELETE   =   1
+      *       「の疑い」を検索したとき
                IF      WRK-UTAGAIFLG-KETASU    >   ZERO
                    EVALUATE    WRK-UTAGAIFLG
                        WHEN    SPACE
@@ -3135,6 +3161,24 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                            MOVE    "3"         TO  WRK-UTAGAIFLG
                    END-EVALUATE
                END-IF    
+      *
+               IF      WRK-UTAGAIFLG       =   "3" OR  "2"
+                   CONTINUE
+               ELSE
+      *            「急性」を検索
+                   PERFORM VARYING IDY FROM    1  BY  2
+                           UNTIL   IDY >       77
+                       IF      WRK-BYOMEI1 (IDY:4)  =   "急性"
+                           EVALUATE    WRK-UTAGAIFLG
+                               WHEN    SPACE
+                                   MOVE    "2"         TO  WRK-UTAGAIFLG
+                               WHEN    "1"
+                                   MOVE    "3"         TO  WRK-UTAGAIFLG
+                           END-EVALUATE
+                           MOVE    80               TO  IDY
+                       END-IF     
+                   END-PERFORM
+               END-IF     
            END-IF    
       *
       *    患者病名マスタ検索（同一開始日・病名）
@@ -3491,6 +3535,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    TO  PTBYO-UTAGAIFLG
                        WHEN    "2"             ALSO    "1"
                        WHEN    "1"             ALSO    "2"
+                       WHEN    ANY             ALSO    "3"
                            MOVE    "3"         TO  PTBYO-UTAGAIFLG
                    END-EVALUATE
                END-IF      

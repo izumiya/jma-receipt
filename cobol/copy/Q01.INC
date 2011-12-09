@@ -156,8 +156,18 @@
                       08  Q01-CMB-KOHNUM-ITEM  PIC X(20)   OCCURS 150.
                   06  Q01-FTNJANUM-TBL.
                     07  Q01-FTNJANUM           PIC X(8)    OCCURS 5.
-                  06  Q01-RDKOHNUM-AND         PIC X.
-                  06  Q01-RDKOHNUM-OR          PIC X.
+                  06  Q01-CMB-JKNHKNJANUM.
+                    07  Q01-JKNHKNJANUM           PIC X(10).
+                    07  Q01-CMB-JKNHKNJANUM-COUNT PIC S9(9)   BINARY.
+                    07  Q01-CMB-JKNHKNJANUM-ITEM  PIC X(10)   OCCURS 5.
+                  06  Q01-CMB-JKNHKNNUM.
+                    07  Q01-JKNHKNNUM           PIC X(10).
+                    07  Q01-CMB-JKNHKNNUM-COUNT PIC S9(9)   BINARY.
+                    07  Q01-CMB-JKNHKNNUM-ITEM  PIC X(10)   OCCURS 5.
+                  06  Q01-CMB-JKNKOHNUM.
+                    07  Q01-JKNKOHNUM           PIC X(10).
+                    07  Q01-CMB-JKNKOHNUM-COUNT PIC S9(9)   BINARY.
+                    07  Q01-CMB-JKNKOHNUM-ITEM  PIC X(10)   OCCURS 5.
                   06  Q01-RDHKNKOH-AND         PIC X.
                   06  Q01-RDHKNKOH-OR          PIC X.
                 05  Q01-FIXED18.
@@ -265,10 +275,14 @@
                                                    PIC S9(9) BINARY.
                   06  Q01-RECECOM-TBL.
                     07  Q01-RECECOM            PIC X(50)   OCCURS 3.
-                  06  Q01-RDBYOMEI-AND         PIC X.
-                  06  Q01-RDBYOMEI-OR          PIC X.
-                  06  Q01-RDSRYACT-AND         PIC X.
-                  06  Q01-RDSRYACT-OR          PIC X.
+                  06  Q01-CMB-JKNBYOMEI.
+                    07  Q01-JKNBYOMEI           PIC X(10).
+                    07  Q01-CMB-JKNBYOMEI-COUNT PIC S9(9)   BINARY.
+                    07  Q01-CMB-JKNBYOMEI-ITEM  PIC X(10)   OCCURS 5.
+                  06  Q01-CMB-JKNSRYACT.
+                    07  Q01-JKNSRYACT           PIC X(10).
+                    07  Q01-CMB-JKNSRYACT-COUNT PIC S9(9)   BINARY.
+                    07  Q01-CMB-JKNSRYACT-ITEM  PIC X(10)   OCCURS 5.
                 05  Q01-FIXED19.
                   06  Q01-CMB-KMK-TBL.
                     07  Q01-CMB-KMK-OCC    OCCURS  3.

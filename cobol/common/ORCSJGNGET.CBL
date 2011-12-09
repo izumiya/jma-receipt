@@ -36,6 +36,8 @@
       *  04.02.01    NACL-ÌçÏÆ    08/03/21  ´Î±ê¼£ÎÅÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    09/07/28  ½êÆÀ¼Ô¾ðÊó¤Î¸øÈñÆþÎÏµ¡Ç½¸þ¾å
+      *
+      *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -62,6 +64,7 @@
            03  FLG-NYUINACCT               PIC 9(01).
            03  FLG-SRYACCT                 PIC 9(01).
            03  FLG-ARI                     PIC 9(01).
+           03  FLG-TAISYO                  PIC 9(01).
       *
       *    ¥ï¡¼¥¯ÎÎ°è
        01  WRK-AREA.
@@ -138,6 +141,7 @@
       *
       *    ¥·¥¹¥Æ¥à´ÉÍý
            COPY    "CPSK1001.INC".
+           COPY    "CPSK2010.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -174,9 +178,45 @@
                                        FLG-AREA
                                        WRK-AREA
       *
-           IF     LNK-ORCSJGNGET-SRYYM    >=   "200604"
+      *    Åö³ºÃÏÊý¸øÈñ¤ÎÂÐ¾Ý¥Á¥§¥Ã¥¯
+           MOVE       ZERO          TO   FLG-TAISYO
+           EVALUATE   LNK-ORCSJGNGET-HENFLG
+             WHEN     SPACE
+                IF    LNK-ORCSJGNGET-KOHHKNNUM(1:1) >=  "1" AND <=  "8"
+                   IF    LNK-ORCSJGNGET-SETKBN  NOT = ZERO
+                     MOVE   LNK-ORCSJGNGET-SETKBN
+                                      TO   LNK-ORCSJGNGET-TAISYOKBN
+                   ELSE
+                     MOVE       1     TO   LNK-ORCSJGNGET-TAISYOKBN
+                   END-IF
+                ELSE
+                   MOVE         9     TO   LNK-ORCSJGNGET-TAISYOKBN
+                END-IF
+                MOVE            1     TO   FLG-TAISYO
+             WHEN     "1"
+                IF    LNK-ORCSJGNGET-KOHHKNNUM(1:1) >=  "1" AND <=  "8"
+                   PERFORM  300-TAISYO-CHECK-SEC
+                   MOVE       ZERO    TO   FLG-TAISYO
+                ELSE
+                   MOVE        21     TO   LNK-ORCSJGNGET-RC
+                END-IF
+             WHEN     "2"
+                IF    LNK-ORCSJGNGET-KOHHKNNUM(1:1) >=  "1" AND <=  "8"
+                   PERFORM  300-TAISYO-CHECK-SEC
+                   IF    LNK-ORCSJGNGET-TAISYOKBN  =  1  OR  2
+                        MOVE    1     TO   FLG-TAISYO
+                   END-IF
+                ELSE
+                   MOVE        21     TO   LNK-ORCSJGNGET-RC
+                END-IF
+           END-EVALUATE
+      *
+           IF   (LNK-ORCSJGNGET-RC  =  ZERO)
+           AND  (FLG-TAISYO         =   1  )
+      *
+            IF     LNK-ORCSJGNGET-SRYYM    >=   "200604"
              PERFORM    100-KEISAN1-SEC
-           ELSE
+            ELSE
       *      ¹¹Àµ¡¦°éÀ®·×»»¶èÊ¬¤Î¼èÆÀ
              INITIALIZE                         SYS-1001-REC
              MOVE    "1001"               TO    SYS-1001-KANRICD
@@ -228,6 +268,8 @@
                             PERFORM    100-KEISAN1-SEC
                  END-EVALUATE
              END-IF
+            END-IF
+      *
            END-IF
       *
            .
@@ -297,18 +339,6 @@
                                 TO  LNK-ORCSJGNGET-NYUJGNGAK
                END-EVALUATE
            END-IF
-      *    Ê¡Åç¸©ÈÓ´ÛÂ¼
-           IF     LNK-ORCSJGNGET-SRYYM   >=   "200702"
-               EVALUATE   LNK-ORCSJGNGET-KOHHKNNUM
-                  WHEN     "281"
-                     MOVE   LNK-ORCSJGNGET-NYUJGNGAK
-                                TO  LNK-ORCSJGNGET-TAFTNRUIKEI
-                     MOVE   LNK-ORCSJGNGET-GAIJGNGAK
-                                TO  LNK-ORCSJGNGET-NYUJGNGAK
-      *
-                     PERFORM 1001-TAFTNRUIKEI-HENSYU-SEC
-               END-EVALUATE
-           END-IF
       *
            IF     LNK-ORCSJGNGET-SRYYM   >=   "200804"
                EVALUATE   LNK-ORCSJGNGET-KOHHKNNUM
@@ -320,6 +350,17 @@
       *
                      PERFORM 1001-TAFTNRUIKEI-HENSYU-SEC
                END-EVALUATE
+           END-IF
+      *
+      *    ÃÏÊý¸øÈñ¤ÎÆþ³°¾å¸Â³Û¡¦Â¾°ìÉôÉéÃ´Îß·×ÆþÎÏÊ¬
+           IF    (LNK-ORCSJGNGET-KOHHKNNUM(1:1) >=  "1" AND <=  "8")
+           AND   (LNK-ORCSJGNGET-TAISYOKBN       =   2             )
+                     MOVE   LNK-ORCSJGNGET-NYUJGNGAK
+                                TO  LNK-ORCSJGNGET-TAFTNRUIKEI
+                     MOVE   LNK-ORCSJGNGET-GAIJGNGAK
+                                TO  LNK-ORCSJGNGET-NYUJGNGAK
+      *
+                     PERFORM 1001-TAFTNRUIKEI-HENSYU-SEC
            END-IF
       *
            .
@@ -811,6 +852,101 @@
            EXIT.
       *
       *****************************************************************
+      *    Åö³ºÃÏÊý¸øÈñ¤ÎÂÐ¾Ý¥Á¥§¥Ã¥¯£²
+      *****************************************************************
+       300-TAISYO-CHECK-SEC         SECTION.
+      *
+           IF  LNK-ORCSJGNGET-TEKSTYMD  =  SPACE
+                   MOVE    22     TO   LNK-ORCSJGNGET-RC
+           END-IF
+           IF  LNK-ORCSJGNGET-PREFNUM   =  SPACE
+                   MOVE    23     TO   LNK-ORCSJGNGET-RC
+           END-IF
+      *
+           IF  LNK-ORCSJGNGET-RC  =  ZERO
+      *
+             EVALUATE   LNK-ORCSJGNGET-PREFNUM
+               WHEN       "01"
+                 IF  (LNK-ORCSJGNGET-KOHHKNNUM      = "183"   )
+                 AND (LNK-ORCSJGNGET-TEKSTYMD(1:6) >= "200810")
+                   MOVE     1     TO   LNK-ORCSJGNGET-TAISYOKBN
+                 END-IF
+               WHEN       "07"
+                 IF  (LNK-ORCSJGNGET-KOHHKNNUM      = "281"   )
+                 AND (LNK-ORCSJGNGET-TEKSTYMD(1:6) >= "200702")
+                   MOVE     2     TO   LNK-ORCSJGNGET-TAISYOKBN
+                 END-IF
+               WHEN       "08"
+                 IF  (LNK-ORCSJGNGET-KOHHKNNUM      = "152"   )
+                 AND (LNK-ORCSJGNGET-TEKSTYMD(1:6) >= "200904")
+                   MOVE     1     TO   LNK-ORCSJGNGET-TAISYOKBN
+                 END-IF
+               WHEN       "13"
+                 IF  (LNK-ORCSJGNGET-KOHHKNNUM      = "151"   )
+                 AND (LNK-ORCSJGNGET-TEKSTYMD(1:6) >= "200310")
+                   MOVE     1     TO   LNK-ORCSJGNGET-TAISYOKBN
+                 END-IF
+               WHEN       "23"
+                 IF  (LNK-ORCSJGNGET-KOHHKNNUM      = "191"   )
+                 AND (LNK-ORCSJGNGET-TEKSTYMD(1:6) >= "200910")
+                   MOVE     1     TO   LNK-ORCSJGNGET-TAISYOKBN
+                 END-IF
+               WHEN       "28"
+                 IF  (LNK-ORCSJGNGET-KOHHKNNUM      = "186"   )
+                 AND (LNK-ORCSJGNGET-TEKSTYMD(1:6) >= "200310")
+                   MOVE     1     TO   LNK-ORCSJGNGET-TAISYOKBN
+                 END-IF
+             END-EVALUATE
+      *
+             IF    LNK-ORCSJGNGET-TAISYOKBN   =   ZERO
+               INITIALIZE                   SYS-2010-REC
+               MOVE   "2010"            TO  SYS-2010-KANRICD
+               MOVE   LNK-ORCSJGNGET-KOHHKNNUM
+                                        TO  SYS-2010-KBNCD
+               MOVE   LNK-ORCSJGNGET-HOSPNUM
+                                        TO  SYS-2010-HOSPNUM
+               MOVE   LNK-ORCSJGNGET-TEKSTYMD(1:6)
+                                        TO  SYS-2010-STYUKYMD(1:6)
+               MOVE   "01"              TO  SYS-2010-STYUKYMD(7:2)
+               MOVE   LNK-ORCSJGNGET-TEKSTYMD(1:6)
+                                        TO  SYS-2010-EDYUKYMD(1:6)
+               MOVE   "01"              TO  SYS-2010-EDYUKYMD(7:2)
+               MOVE   SYS-2010-REC      TO  MCPDATA-REC
+               MOVE   "DBSELECT"        TO  MCP-FUNC
+               MOVE   "tbl_syskanri"    TO  MCP-TABLE
+               MOVE   "key10"           TO  MCP-PATHNAME
+               CALL   "ORCDBMAIN"       USING   MCPAREA
+                                                MCPDATA-REC
+                                                SPA-AREA
+               IF     MCP-RC   =   ZERO
+                  MOVE  "tbl_syskanri"  TO  MCP-TABLE
+                  MOVE  "key10"         TO  MCP-PATHNAME
+                  PERFORM   900-SYSKANRI-READ-SEC
+               ELSE
+                  INITIALIZE                SYS-2010-REC
+               END-IF
+               EVALUATE  SYS-2010-PTJGNKBN
+                 WHEN      SPACE
+                 WHEN      "0"
+                    MOVE   ZERO   TO   LNK-ORCSJGNGET-TAISYOKBN
+                 WHEN      "1"
+                    MOVE    1     TO   LNK-ORCSJGNGET-TAISYOKBN
+                 WHEN      "2"
+                    MOVE    2     TO   LNK-ORCSJGNGET-TAISYOKBN
+               END-EVALUATE
+               MOVE     "tbl_syskanri"  TO  MCP-TABLE
+               MOVE     "key10"         TO  MCP-PATHNAME
+               PERFORM   910-DB-CLOSE-SEC
+             END-IF
+      *
+           END-IF
+      *
+           .
+      *
+       300-TAISYO-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¥·¥¹¥Æ¥à´ÉÍýÆÉ¹þ
       *****************************************************************
        900-SYSKANRI-READ-SEC         SECTION.
@@ -821,9 +957,11 @@
                                                SPA-AREA
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC     TO  SYS-1001-REC
+                                           SYS-2010-REC
                MOVE    ZERO            TO  FLG-SYSKANRI
            ELSE
                INITIALIZE                  SYS-1001-REC
+                                           SYS-2010-REC
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
       *

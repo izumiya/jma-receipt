@@ -386,6 +386,7 @@
       *
       *  04.07.01    NACL-藤原    11/06/02  入退院履歴記載対応
       *                                     「2自費分は含まない」を追加
+      *  04.07.02    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3096,8 +3097,10 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
                    MOVE    8                      TO  WRK-NAGASA
                END-IF
            ELSE
-             IF    RECE02-PREFNUM     =   "45"
-             AND   RECE02-KOHNUM(IDY) =   "190"
+             IF  ((RECE02-PREFNUM     =   "45"      ) AND
+                  (RECE02-KOHNUM(IDY) =   "190"     ) AND
+                  (RECE02-SRYYM      <=  "200803"   ))
+             OR  ( RECE02-EKF-FTNKEIFLG(IDX)  =  "2" )
                CONTINUE
              ELSE
                IF      RECE02-FTNMONEY(IDX)   >   ZERO     

@@ -43,6 +43,7 @@
       *  03.05.01    NACL-Â¿¡¹Ç¼  07/07/20  Ç§Äê¾ðÊóÄÉ²ÃÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/07/XX  ´µ¼Ô¸øÈñÉéÃ´³Ûµ¡Ç½ÄÉ²Ã
       *                                     ¸øÈñÉéÃ´³ÛÌ¤ÆþÎÏ·Ù¹ðÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  11/11/07  ÃÏÊý¸øÈñÉéÃ´³ÛÊÑ¹¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -623,7 +624,7 @@
                IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "021"
                                            OR  "015"
-                                           OR  "281"
+      ******************************       OR  "281"
                                            OR  "016"     )  AND
                       (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
                                            >=   "20060401"  )
@@ -665,6 +666,16 @@
                    MOVE    "Æþ³°¾å¸Â³Û"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "Â¾°ìÉôÉéÃ´Îß·×"     TO  SPA-GMN24-FTNMSG2
                END-IF
+      *ver.4.7
+      *        ÃÏÊý¸øÈñ¤ÎÀßÄê
+               EVALUATE    SPA-NAI24-TJYOGENKBN (SPA-NAI24-FTNSELNUM)
+               WHEN    "1"
+                   MOVE    "³°Íè¾å¸Â³Û"         TO  SPA-GMN24-FTNMSG1
+                   MOVE    "Æþ±¡¾å¸Â³Û"         TO  SPA-GMN24-FTNMSG2
+               WHEN    "2"
+                   MOVE    "Æþ³°¾å¸Â³Û"         TO  SPA-GMN24-FTNMSG1
+                   MOVE    "Â¾°ìÉôÉéÃ´Îß·×"     TO  SPA-GMN24-FTNMSG2
+               END-EVALUATE
            END-IF
       *
            .
@@ -783,9 +794,12 @@
                                                OR  "016"
                                                OR  "021"
                                                OR  "038"    )
-                     OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
-                                               =   "281" ) AND
-                          (SPA-PREFNUM         =    07   ))
+      ***            OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
+      *                                        =   "281" ) AND
+      ***                 (SPA-PREFNUM         =    07   ))
+      *              ÃÏÊý¸øÈñ¤ÎÂÐ¾Ý
+                     OR   (SPA-NAI24-TJYOGENKBN (WRK-FTN1-IDX)
+                                               =   "2"    )
                        PERFORM 31021-PTKOHFTNETC-HEN-SEC
                    END-IF
                END-IF
@@ -1386,9 +1400,12 @@
                                            OR  "016"
                                            OR  "021"
                                            OR  "038"    )
-                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
-                                           =   "281" ) AND
-                      (SPA-PREFNUM         =    07   ))
+      ***        OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+      *                                    =   "281" ) AND
+      ***             (SPA-PREFNUM         =    07   ))
+      *          ÃÏÊý¸øÈñ¤ÎÂÐ¾Ý
+                 OR   (SPA-NAI24-TJYOGENKBN (SPA-NAI24-FTNSELNUM)
+                                           =   "2"    )
                    CONTINUE
                ELSE
                    MOVE    "2440"              TO  SPA-ERRCD
@@ -1545,9 +1562,12 @@
                                            OR  "016"
                                            OR  "021"
                                            OR  "038"    )
-                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
-                                           =   "281" ) AND
-                      (SPA-PREFNUM         =    07   ))
+      **         OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+      *                                    =   "281" ) AND
+      **              (SPA-PREFNUM         =    07   ))
+      *            ÃÏÊý¸øÈñ¤ÎÂÐ¾ÝÊ¬
+                 OR   (SPA-NAI24-TJYOGENKBN (SPA-NAI24-FTNSELNUM)
+                                           =   "2"    )
                    CONTINUE
                ELSE
                    MOVE    "2445"              TO  SPA-ERRCD
@@ -2545,9 +2565,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                OR  "016"
                                                OR  "021"
                                                OR  "038"    )
-                     OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
-                                               =   "281" ) AND
-                          (SPA-PREFNUM         =    07   ))
+      *ver.4.7
+      ****           OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
+      **                                       =   "281" ) AND
+      ***                 (SPA-PREFNUM         =    07   ))
+      *              ÃÏÊý¸øÈñ¤ÎÂÐ¾Ý
+                     OR   (SPA-NAI24-TJYOGENKBN (WRK-FTN1-IDX)
+                                               =   "2"    )
                        PERFORM 31021-PTKOHFTNETC-HEN-SEC
                    END-IF
                END-IF
@@ -2844,9 +2868,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            OR  "016"
                                            OR  "021"
                                            OR  "038"    )
-                 OR  ((SPA-NAI24-KOHNUM (IDX2)
-                                           =   "281" ) AND
-                      (SPA-PREFNUM         =    07   ))
+      ***        OR  ((SPA-NAI24-KOHNUM (IDX2)
+      *                                    =   "281" ) AND
+      **              (SPA-PREFNUM         =    07   ))
+      *          ÃÏÊý¸øÈñ¤ÎÂÐ¾Ý
+                 OR   (SPA-NAI24-TJYOGENKBN (IDX2)
+                                           =   "2"    )
       *            º£²óºï½üÊ¬
                    IF      SPA-NAI24-FTNDELKBN (IDX2)  =   "1" 
       *                ¹¹¿·ÂÐ¾ÝÊÔ½¸

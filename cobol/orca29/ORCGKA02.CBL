@@ -31,6 +31,7 @@
       *  04.05.00    NACL-多々納  09/09/XX  '0086'コメントコード対応
       *  04.05.00    NACL-多々納  10/01/XX  治験対応
       *  04.06.00    NACL-多々納  11/02/22  用法コメント対応
+      *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -838,6 +839,12 @@
       *                    担当医１（主治医）
                            MOVE    PTNYUINRRK-DRCD1    TO  WRK-DRCD
                        END-IF
+      *                同日再入院分
+                       IF     (SPA-NAI-DOUKBN      =   "1"  )
+                          AND (PTNYUINRRK-NYUINYMD
+                                               NOT =   SPA-NAI-SRYYMD )
+                           MOVE    ZERO            TO  FLG-OK
+                       END-IF
                    END-IF
                END-IF
       *
@@ -1041,6 +1048,7 @@
                                        OR  "148"
                                        OR  "149"
                    CONTINUE
+                   MOVE    1               TO  FLG-OK
                ELSE
                    MOVE    1               TO  FLG-SRYACT
                END-IF
@@ -1233,6 +1241,12 @@
            MOVE    SPA-NAI-RRKYMD (IDX)    TO  SPA-NAI-SRYYMD
       *    診療科
            MOVE    SPA-GMN-RRKSRYKA(IDX)   TO  SPA-GMN-SRYKAMEI
+      *    同日入院区分
+           IF      SPA-NAI-RENNUM (IDX)    =   2
+               MOVE    "1"                     TO  SPA-NAI-DOUKBN
+           ELSE
+               MOVE    SPACE                   TO  SPA-NAI-DOUKBN
+           END-IF
       *    選択登録がない時、内容を編集する
            IF      SPA-PARA-MAX        =   ZERO
                PERFORM 300121-INIT-HENSYU-SEC

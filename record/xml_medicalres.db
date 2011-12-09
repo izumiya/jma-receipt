@@ -9,7 +9,12 @@ xml_medicalres {
         Reskey					varchar(100);
         Perform_Date				varchar(10);
         Perform_Time				varchar(8);
+<<<<<<< xml_medicalres.db
 	Medical_Uid				varchar(36);
+=======
+	Medical_Uid				varchar(36);
+	Admission_Date				varchar(10);
+>>>>>>> 1.7
         Department_Code				varchar(2);
         Department_Name				varchar(80);
         Physician_Code				varchar(5);

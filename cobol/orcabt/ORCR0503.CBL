@@ -2156,7 +2156,6 @@
            MOVE    WRK-RECENUM         TO  WRK-RECEYMD-RECENUM
            MOVE    WRK-RECEYMD-REC     TO  RECEYMD-REC
            WRITE   RECEYMD-REC
-           WRITE   RECEYMD-REC
            IF      STS-RECEYMD         =   "00"
                CONTINUE
            ELSE

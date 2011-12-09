@@ -337,6 +337,10 @@
            03  WRK-TIME-KBN1           PIC X(01).
            03  WRK-TIME-KBN2           PIC X(01).
       *
+      *    Æþ±¡»»Äê¾å¸Â
+           03  WRK-NYUCNT              PIC 9(03).
+           03  WRK-NYU-CNT             PIC 9(03).
+      *
       *    ÊÝÂ¸ÍÑ£Ó£Ð£Á
        01  HZN-SCR-REC.
            COPY    "CPK02SPASCR.INC"  REPLACING
@@ -4517,21 +4521,25 @@
       *        ¥ê¥ó¥ÑÉâ¼ð»ØÆ³´ÉÍýÎÁ
                IF      WRK-COM-INPUTCD (IDX-Z) =   "113010410"
                    MOVE    1                   TO  FLG-NYUIN
+                   MOVE    1                   TO  WRK-NYUCNT
                    PERFORM 10016-NYUIN-KIKAN-SEC
                END-IF
-      *        Âà±¡»þ¶¦Æ±»ØÆ³ÎÁ£²
+      *        Âà±¡»þ¶¦Æ±»ØÆ³ÎÁ£²¡Ê·ÑÂ³½é²ó¤«¤é£²²ó¡Ë
                IF      WRK-COM-INPUTCD (IDX-Z) =   "113008910"
                    MOVE    2                   TO  FLG-NYUIN
+                   MOVE    2                   TO  WRK-NYUCNT
                    PERFORM 10016-NYUIN-KIKAN-SEC
                END-IF
       *        ²ð¸î»Ù±çÏ¢·È»ØÆ³ÎÁ¡ÊÆþ±¡Ãæ£²²ó¡Ë
                IF      WRK-COM-INPUTCD (IDX-Z) =   "113011710"
-                   MOVE    2                   TO  FLG-NYUIN
+                   MOVE    1                   TO  FLG-NYUIN
+                   MOVE    2                   TO  WRK-NYUCNT
                    PERFORM 10016-NYUIN-KIKAN-SEC
                END-IF
       *        °åÌôÉÊ°ÂÁ´À­¾ðÊóÅù´ÉÍýÂÎÀ©²Ã»»¡ÊÆþ±¡Ãæ£±²ó¡Ë
                IF      WRK-COM-INPUTCD (IDX-Z) =   "113012470"
                    MOVE    1                   TO  FLG-NYUIN
+                   MOVE    1                   TO  WRK-NYUCNT
                    PERFORM 10016-NYUIN-KIKAN-SEC
                END-IF
       *
@@ -4567,6 +4575,14 @@
                   END-IF
                END-IF
       *!!!!
+      *
+      *!!!!
+      *        µßµÞÈÂÁ÷¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯
+               IF     (WRK-COM-INPUTCD (IDX-Z) =   "114003010" )
+                  AND (SPA-ERRCD               =   SPACE  )
+                   PERFORM 10017-KUUKYUHANSO-SEC
+               END-IF
+      *!!!
       *
              END-IF
            END-PERFORM
@@ -5540,6 +5556,8 @@
            ELSE
                MOVE    "9"                 TO  LNK-SC91-KBN
            END-IF
+      *    ¾å¸Â²ó¿ô
+           MOVE    WRK-NYUCNT          TO  LNK-SC91-NYUCNT
            MOVE    WRK-COM-INPUTCD (IDX-Z)
                                        TO  LNK-SC91-SRYCD
            MOVE    LNK-ORCSC-TEISEI-AREA   TO  LNK-SC91-TEISEI-AREA
@@ -5550,15 +5568,42 @@
                                        SPA-AREA
                                        TNS-TENSU-REC
       *
+           IF      LNK-SC91-CNT        =   LNK-SC91-NYUZCNT
+               MOVE    ZERO                TO  WRK-NYU-CNT
+           ELSE
+               COMPUTE WRK-NYU-CNT     =   LNK-SC91-CNT
+                                       -   LNK-SC91-NYUZCNT
+           END-IF
            IF      LNK-SC91-ERRCD  NOT =   SPACE
-               MOVE    "0212"              TO  SPA-ERRCD
-               MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
+               IF      LNK-SC91-ERRCD(1:1) =   "K"
+                   MOVE    "K214"              TO  SPA-ERRCD
+               ELSE
+                   MOVE    "0212"              TO  SPA-ERRCD
+                   MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
+               END-IF
            END-IF
       *    ²ó¿ôÈ½Äê
-           IF  ((WRK-COM-NYU-KAI (IDX-Z) + LNK-SC91-CNT)
-                                           >   FLG-NYUIN )
+           IF    ((WRK-COM-NYU-KAI (IDX-Z) + WRK-NYU-CNT)
+                                           >   WRK-NYUCNT )
+      *        Æþ±¡Ãæ²ó¿ô
                MOVE    "0212"              TO  SPA-ERRCD
                MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
+           ELSE
+               IF    ((WRK-COM-NYU-KAI (IDX-Z) + LNK-SC91-CNT)
+                                               >   WRK-NYUCNT )
+                   MOVE    "K214"              TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *!!
+      *    ·Ù¹ð¤Ø
+           IF      SPA-ERRCD(1:1)      =   "K"
+               IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
+                 AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
+                   MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"             TO  WRK-COM-KZMFLG  (IDX-Z)
+               ELSE
+                   MOVE    SPACE           TO  SPA-ERRCD
+               END-IF
            END-IF
       *    IF   (WRK-COM-NYU-KAI (IDX-Z)   >   FLG-NYUIN )  OR
       *         (LNK-ORCSC-KAISU           >   FLG-NYUIN )
@@ -5568,6 +5613,35 @@
            .
        10016-NYUIN-KIKAN-EXT.
            EXIT.
+      *!!!
+      *****************************************************************
+      *    µßµÞÈÂÁ÷¿Ç»¡ÎÁ»»Äê¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       10017-KUUKYUHANSO-SEC                SECTION.
+      *
+      *    Æþ±¡´ü´ÖÃæÈ½Äê
+           IF       SPA-NYUGAIKBN      =   "2"
+              IF   (SPA-K02N-NYUINYMD   =   SPA-SRYYMD )
+                OR (SPA-K02N-TAIINYMD   =   SPA-SRYYMD )
+      *            ÆþÂà±¡Æü
+                   MOVE    "K901"              TO  SPA-ERRCD
+               END-IF
+           ELSE
+               MOVE    "K901"              TO  SPA-ERRCD
+           END-IF
+           IF      SPA-ERRCD       NOT =   SPACE
+               IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
+                 AND  (LNK-ORCSC-KEI-IDX       =   ZERO )
+                   MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"             TO  WRK-COM-KZMFLG  (IDX-Z)
+               ELSE
+                   MOVE    SPACE           TO  SPA-ERRCD
+               END-IF
+           END-IF
+           .
+       10017-KUUKYUHANSO-EXT.
+           EXIT.
+      *!!!
       *****************************************************************
       *    ÆÃÄêÌôºÞ¼£ÎÅ´ÉÍýÎÁ¤Î»»Äê¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************

@@ -169,14 +169,14 @@
                   05  O04-CLIST1-COUNT       PIC S9(9)   BINARY.
                   05  O04-CLIST1-ROW         PIC S9(9)   BINARY.
                   05  O04-CLIST1-ROWATTR     PIC S9(9)   BINARY.
-                  05  O04-ITEM        OCCURS  50 TIMES.
+                  05  O04-ITEM        OCCURS  99 TIMES.
                       06  O04-TRENNUM PIC X(4).
                       06  O04-TSKYMONY    PIC X(13).
                       06  O04-TNYUKINMONEY    PIC X(12).
                       06  O04-TSYORIYMD   PIC X(11).
                       06  O04-TJTI    PIC X(12).
                       06  O04-TNYKN-NAME    PIC X(10).
-                  05  O04-SELECT  PIC X       OCCURS  50 TIMES.
+                  05  O04-SELECT  PIC X       OCCURS  99 TIMES.
               03  O04-LBLSKY1ST   PIC X(4).
               03  O04-SKY1ST      PIC X(10).
               03  O04-LBLSKY2ND   PIC X(4).

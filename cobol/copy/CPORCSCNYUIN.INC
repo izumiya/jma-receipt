@@ -31,4 +31,6 @@
            03  ORCSCNYUIN-YMD                        PIC  X(08).
       *Âà±¡Æü
            03  ORCSCNYUIN-TAIINYMD                   PIC  X(08).
+      *Æ±ÆüºÆÆþ±¡¶èÊ¬
+           03  ORCSCNYUIN-DOUJITSUKBN                PIC  X(01).
       *

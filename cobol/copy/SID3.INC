@@ -17,6 +17,8 @@
       ********************************************************************
         02  SID3.
             03  SID3-FIXED1.
+              04  SID3-B12S-STATE   PIC S9(9) BINARY.
+              04  SID3-B12S-VISIBLE PIC X(01).
               04  SID3-ID1CODE.
                 05  SID3-VALUE  PIC X(10).
               04  SID3-ID1MSG.

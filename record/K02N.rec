@@ -401,7 +401,8 @@ K02N	{
 			value	varchar(10);
 		};
 		NYUINKIKAN	{
-			value	varchar(20);
+ 		        style   varchar(20);
+			value	varchar(22);
 		};
 		TEISEI	{
 			value	bool;

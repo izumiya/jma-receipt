@@ -33,6 +33,7 @@
       *                                      リスト行数５０→４０に変更
       *                                      タイマーイベントクリア追加
       *  04.06.00    NACL-森脇     11/02/07  情報削除追加
+      *  04.07.00    NACL-伊藤     11/12/01  参照スクリプト変更
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -58,8 +59,6 @@
       *
            COPY    "CPSHELLTBL.INC".
       *
-           COPY    "CPMKPASS.INC".
-      *
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
            03  FLG-TEMP            PIC 9(01).
@@ -84,10 +83,8 @@
            03  WRK-N21IDMSG        PIC X(70).
       *
        01  SHELL-AREA.
-           03  SHELL-NAME1         PIC X(34)  VALUE
-               "scripts/daily/orc_medsiori_pull.sh".
-           03  SHELL-NAME2         PIC X(34)  VALUE
-               "scripts/daily/orc_medphoto_copy.sh".
+           03  SHELL-NAME1         PIC X(13)  VALUE "siori_pull.sh".
+           03  SHELL-NAME2         PIC X(16)  VALUE "medphoto_copy.sh".
        01  WRK-FILE-AREA.
            03  WRK-FILE-FOLDER     PIC X(14)  VALUE "/tmp/medphoto/".
       *
@@ -340,25 +337,19 @@
       *
       *    処理
            MOVE    SPACE           TO  SHELLTBL
-           INITIALIZE                  ORCSMKPASSAREA
-      *
-           MOVE    SHELL-NAME1     TO  MKPASS-IN-01
+           MOVE    SHELL-NAME1     TO  SHELLTBL-NAME
            MOVE    SPA-N22-KENCD   TO  SHELLTBL-ARG1
            MOVE    SPA-TERMID      TO  SHELLTBL-ARG2
            MOVE    WRK-CONS-JOB-JOBID
                                    TO  SHELLTBL-ARG3
            MOVE    WRK-CONS-JOB-SHELLID
                                    TO  SHELLTBL-ARG4
-grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG8
+grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG5
       *
-           CALL    "ORCSMKPASS"        USING
-                                       ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
-grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
-           MOVE    "shell"         TO  MCP-PATHNAME
+           MOVE    "allways"       TO  MCP-PATHNAME
 grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
@@ -384,15 +375,31 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "処理中です"    TO  SPA-N22-MESSAGE
                MOVE    "blue"          TO  SPA-N22-MESSAGE-STYLE
       *----(04.02.01)--ADD-START---
-               MOVE    5               TO  SPA-N22-DURATION
+               MOVE    1               TO  SPA-N22-DURATION
       *----(04.02.01)--ADD-END-----
                GO  TO  400-JYOKYO-EXT
            ELSE
-               MOVE    SPACE           TO  SPA-N22-MESSAGE
-               MOVE    SPACE           TO  SPA-N22-MESSAGE-STYLE
-      *----(04.02.01)--ADD-START---
-               MOVE    ZERO            TO  SPA-N22-DURATION
-      *----(04.02.01)--ADD-END-----
+               MOVE    ZERO                TO  SPA-N22-DURATION
+               IF      JOB-ERRCD           =   "0000"
+                   MOVE    SPACE           TO  SPA-N22-MESSAGE
+                   MOVE    SPACE           TO  SPA-N22-MESSAGE-STYLE
+               ELSE
+                   MOVE    JOB-YOBI        TO  SPA-N22-MESSAGE
+                   IF      JOB-YOBI(9:16)  =   "No route to host"
+                       MOVE    "[ERROR] サーバが見つかりません"
+                                           TO  SPA-N22-MESSAGE
+                   END-IF
+                   IF      JOB-YOBI(9:3)   =   "404"
+                       MOVE    "[ERROR] ファイルが見つかりません"
+                                           TO  SPA-N22-MESSAGE
+                   END-IF
+                   IF      MCP-STATUS      =   "LINK"
+                       MOVE    "blue"      TO  SPA-N22-MESSAGE-STYLE
+                   ELSE
+                       MOVE    "red"       TO  SPA-N22-MESSAGE-STYLE
+                   END-IF
+                   GO  TO  400-JYOKYO-EXT
+               END-IF
            END-IF
       *
            MOVE    ZERO            TO  IDX
@@ -406,7 +413,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    IDX             TO  WRK-ZZZZ9
                MOVE    WRK-ZZZZ9       TO  SPA-N22-TNO(IDX)
                MOVE    TEMP-YJCD       TO  SPA-N22-TYJCD(IDX)
-               MOVE    TEMP-MAKE-COMPANY   TO  SPA-N22-TMAKER(IDX)
+      *ito         MOVE    TEMP-MAKE-COMPANY   TO  SPA-N22-TMAKER(IDX)
+               MOVE    TEMP-NAME       TO  SPA-N22-TMAKER(IDX)
                MOVE    TEMP-SALE-COMPANY   TO  SPA-N22-TSELLER(IDX)
                MOVE    TEMP-EFFECT     TO  SPA-N22-TEFFECT(IDX)
                MOVE    TEMP-COLOR      TO  SPA-N22-TCOLOR(IDX)
@@ -499,9 +507,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    プログラム更新処理
            MOVE    SPACE           TO  SHELLTBL
-           INITIALIZE                  ORCSMKPASSAREA
-      *
-           MOVE    SHELL-NAME2     TO  MKPASS-IN-01
+           MOVE    SHELL-NAME2     TO  SHELLTBL-NAME
            MOVE    SPA-N22-KENCD   TO  SHELLTBL-ARG1
            MOVE    WRK-GAZO        TO  SHELLTBL-ARG2
            MOVE    SPA-GMN-FOLDER  TO  SHELLTBL-ARG3
@@ -511,14 +517,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                    TO  SHELLTBL-ARG5
 grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG6
       *
-           CALL    "ORCSMKPASS"        USING
-                                       ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
-grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
-           MOVE    "shell"         TO  MCP-PATHNAME
+           MOVE    "allways"       TO  MCP-PATHNAME
 grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA

@@ -40,4 +40,6 @@
                05  ORCSNYUINSHO-SRYKA-MAX      PIC 9(02).
       *    主治医（処理区分＝２ でドクターがない時のみ必須）
            03  ORCSNYUINSHO-SYUDRCD    PIC X(05).
+      *    同日再入院区分（１：同日再入院）
+           03  ORCSNYUINSHO-DOUJITSUKBN    PIC X(01).
       *

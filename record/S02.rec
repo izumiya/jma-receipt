@@ -18,8 +18,11 @@ S02	{
 	           	state	int;
 			label	varchar(10);
 		};
-		B09S	{
+		B08	{
 	           	label	varchar(10);
+		};
+		B12	{
+	           	state	int;
 		};
 		LBLMSG	{
 			style   varchar(20);
@@ -43,6 +46,10 @@ S02	{
 		LBLMSG6	{
 			style   varchar(20);
 			value	varchar(28);
+		};
+		LBLMSG7	{
+			style   varchar(20);
+			value	varchar(20);
 		};
 		LBLSRYYMG	{
 			value	varchar(50);
@@ -136,6 +143,73 @@ S02	{
 			};
 			count	int;
 			item	varchar(22)[5];
+		};
+		CHOSEI1IN	{
+			value	varchar(10);
+			state	int;
+		};
+		CHOSEI2IN	{
+			value	varchar(10);
+			state	int;
+		};
+		SKYMONEYIN	{
+			style   varchar(20);
+			value	varchar(10);
+			state	int;
+		};
+		NYUKINGK2	{
+			value	varchar(10);
+			state	int;
+		};
+		NYUKINYMD	{
+			value	varchar(10);
+			state	int;
+		};
+		NYUKINHOUHOU_COMBO	{
+			NYUKINHOUHOU	{
+				value	varchar(33);
+				state	int;
+			};
+			count	int;
+			item	varchar(33)[50];
+			state	int;
+		};
+		SKYPRT_COMBO	{
+			SKYPRT	{
+				value	varchar(24);
+				state	int;
+			};
+			count	int;
+			item	varchar(24)[5];
+			state	int;
+		};
+		SRYPRT_COMBO	{
+			SRYPRT	{
+				value	varchar(24);
+				state	int;
+			};
+			count	int;
+			item	varchar(24)[5];
+			state	int;
+		};
+		EDANUM	{
+			value	number(2);
+		};
+		scrolledwindow2	{
+			MEILST	{
+				count	int;
+				row int;
+				rowattr int;
+				item	{
+					value0	varchar(4);
+					value1	varchar(12);
+					value2	varchar(12);
+					value3	varchar(11);
+					value4	varchar(12);
+					value5	varchar(10);
+				}	[99];
+				select	bool[99];
+			};
 		};
 	};
 };

@@ -283,6 +283,7 @@
                05  WRK-PARA-SHELLID PIC  X(08).
            03  WRK-PARA-RECECOM     PIC  X(01).
            03  WRK-PARA-PRTKBN      PIC  X(01).
+           03  WRK-PARA-DLTKBN      PIC  X(01).
            03  WRK-PARA-HOSPNUM     PIC  9(02).
       *
            03  WRK-SYS-SRYYMD       PIC  X(08).
@@ -618,9 +619,13 @@
                                        INTO    WRK-PARA
                                                WRK-PARA-RECECOM
                                                WRK-PARA-PRTKBN
+                                               WRK-PARA-DLTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
+      *
+           DISPLAY "WRK-PARA-DLTKBN=" WRK-PARA-DLTKBN
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
            MOVE    "RECE820"           TO  RECE82PARA-FILE-ID
@@ -3472,6 +3477,9 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                PERFORM            UNTIL       FLG-SYSKANRI    =   1
                    MOVE    MCPDATA-REC         TO  SYS-2002-REC
       *
+                   DISPLAY "DELETE PTNUM=" SYS-2002-PTNUM
+                           " SRYYM=" SYS-2002-SRYYM
+      *
       *            ¿ÇÎÅÇ¯·î¤ÎÀÁµá´ÉÍýºï½ü½èÍý
                    INITIALIZE                  RECE10-REC
                    MOVE    SYS-1001-HOSPNUM    TO  RECE10-HOSPNUM
@@ -3482,7 +3490,11 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                                                    RECE10-XXTEISYUTUSAKI 
                    MOVE    RECE10-REC          TO  MCPDATA-REC
                    MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                   MOVE    "del4"              TO  MCP-PATHNAME
+                   IF      WRK-PARA-DLTKBN     =   "0"
+                       MOVE    "del4"          TO  MCP-PATHNAME
+                   ELSE
+                       MOVE    "del7"          TO  MCP-PATHNAME
+                   END-IF
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    PERFORM   900-ORCDBMAIN-SEC
                    IF      MCP-RC           NOT =   ZERO
@@ -3516,6 +3528,16 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            MOVE    SPACE               TO  RECEYMD-REC
            MOVE    WRK-RECENUM         TO  RECEYMD-RECENUM
            WRITE   RECEYMD-REC
+           IF      STS-RECEYMD         =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE           TO  WRK-ERR-AREA
+               INITIALIZE                  WRK-ERR-AREA
+               MOVE    3               TO  WRK-ERR-FLG
+               MOVE    RECEYMD         TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECEYMD     TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
       *          
       *    ¥Õ¥¡¥¤¥ë£Ã£Ì£Ï£Ó£Å½èÍý
            CLOSE                       RECE82-FILE

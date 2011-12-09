@@ -135,3 +135,18 @@ path	key6 	{
 		;
 	};
 };
+
+path	key7 	{
+	DBSELECT	{
+		DECLARE tbl_para_key7_csr CURSOR FOR
+		SELECT *
+		FROM tbl_para
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   GYOUMUID   =   :GYOUMUID
+			AND   TERMID       =   :TERMID
+			AND   FILEMEI      =   :FILEMEI
+			AND   EDANUM       <=  :EDANUM
+			ORDER   BY        EDANUM DESC
+		;
+	};
+};

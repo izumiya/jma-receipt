@@ -14,6 +14,9 @@
 #                  '05-02-08 by hiki
 # version 1.4.3 fix correction of socket opening.
 #                  '2011-02-09
+# version 1.4.4 ソケットオープン失敗時の無限ループを修正.
+#               ログ出力を追加.
+#                  '2011-11-30
 
 $DEBUG = false
 
@@ -52,6 +55,13 @@ class FileSockRcv
     @eot = 0x04.chr
   end
 
+  def Log(text)
+    print text
+    open($logfl, "a") do |log|
+      log.puts("SockLog: #{text}")
+    end
+  end
+
   def start
     open(@fl_path_name, "wb") do |f|
       buf = ""
@@ -59,6 +69,7 @@ class FileSockRcv
         while @eot != (buf = @sckt.read(1))
           if buf == nil
             # ソケット接続が切れた
+            Log("Connect Error: read socket data is nil")
             raise ConnectError, 'read socket data is nil.'
           end
           print buf
@@ -66,9 +77,11 @@ class FileSockRcv
         end
       rescue ConnectError
         # 途中で接続が切れた場合への対応
+        Log("Connect Error")
         raise ConnectError, ''
       rescue
         # nmapコマンドへの対応
+        Log("CRead Error: socket read error")
         raise CReadError, 'socket read error.'
       end
     end
@@ -194,8 +207,8 @@ class ClaimRcv
     rescue ConnectError, CReadError
       Log("Connection Error\n")
       Log("Client disconnects\n")
-      @gsock.close
-      @gsock = nil
+      sock.close
+      sock = nil
       Log("temporary file delete.\n")
       File.delete(file_path_name)
     else
@@ -263,8 +276,8 @@ class ClaimRcv
     end
   end
 
-  def Log_Save
-    File.open(@claim_log, "a+") do |file|
+  def Log_Save(claim_log=@claim_log)
+    File.open(claim_log, "a+") do |file|
       STDOUT.reopen(file)
       STDERR.reopen(file)
     end
@@ -272,6 +285,9 @@ class ClaimRcv
 
   def Log(text)
     print text
+    open($logfl, "a") do |log|
+      log.puts("Log: #{text}")
+    end
   end
 
   def Reception
@@ -288,11 +304,13 @@ class ClaimRcv
           socket_thread(sock)
           Log("Close port [" + Time.now.strftime("%H:%M:%S") + "]\n")
           Log("Client disconnects\n")
-          sock.close
+          sock.close if sock != nil
         end
       end
+    rescue Errno::EADDRINUSE => error
+      Log("Error:#{error}\n")
     rescue => error
-      Log("#{error}\n")
+      Log("Error:#{error}\n")
       retry
     end
     @gsock.close if @gsock != nil

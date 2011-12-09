@@ -164,7 +164,7 @@
                    13  SPA-GMN-I01-SEIKYU-NM       PIC X(22).
       *          検索時患者表示
                  11  SPA-GMN-I01-DISPKBN.
-                   13  SPA-GMN-I01-DISPKBN-CD      PIC X(02).
+                   13  SPA-GMN-I01-DISPKBN-CD      PIC X(01).
                    13  SPA-GMN-I01-DISPKBNFL       PIC X(01).
                    13  SPA-GMN-I01-DISPKBN-NM      PIC X(08).
       *          ユーザープログラム
@@ -469,7 +469,7 @@
                  11  SPA-GMN-I01-CMB-DISPKBN.
                    13  SPA-GMN-I01-DISPKBN-CNT     PIC 9(5).
                    13  SPA-GMN-I01-DISPKBN-ITM     OCCURS  5.
-                     15  SPA-GMN-I01-DISPKBNL      PIC X(02).
+                     15  SPA-GMN-I01-DISPKBNL      PIC X(01).
                      15  SPA-GMN-I01-DISPKBNFLL    PIC X(01).
                      15  SPA-GMN-I01-DISPKBNMEIL   PIC X(08).
       *          ユーザープログラムコンボ

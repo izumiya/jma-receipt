@@ -36,6 +36,8 @@
       *  04.04.04    NACL-ÌçÏÆ    10/06/01  Â¾°åÎÅµ¡´Ø¼õ¿ÇÂÐ±þ
       *
       *  04.05.01    NACL-ÌçÏÆ    10/01/27  ¼£¸³ÂÐ±þ
+      *  04.05.02    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
+      *  04.05.03    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -165,10 +167,6 @@
            03  WRK-NYURYAKU-IDX                       PIC 9(03).
            03  WRK-NYURYAKU-MAX                       PIC 9(03).
       *
-           03  WRK-NYUINDAY-TANKI2-TBL.
-               05  WRK-NYUINDAY-TANKI2-KBN            PIC X(01)
-                                                      OCCURS  31.
-      *
        01  WRK-CONS-AREA.
       *    ¸ÇÄêÃ¼Ëö£É£Ä
            03  WRK-CONS-TERMID     PIC X(64)   VALUE
@@ -241,8 +239,6 @@
            COPY    "CPORCSPTID.INC".
       *    ¥¸¥ç¥Ö´ÉÍý£Ä£ÂÀ©¸æ¥µ¥Ö
            COPY    "CPORCSJOBKANRI.INC".
-      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
-           COPY    "CPORCSNYUINDAY.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -360,22 +356,6 @@
            MOVE       SPACE             TO     WRK-KOGAI-TABLE
            INITIALIZE                          WRK-KOGAI-TABLE
       *
-           MOVE       SPACE             TO     WRK-NYUINDAY-TANKI2-TBL
-           INITIALIZE                          WRK-NYUINDAY-TANKI2-TBL
-      *
-      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ
-           INITIALIZE                    ORCSNYUINDAY-AREA
-           MOVE    RECE200-HOSPNUM   TO  LNK-NYUINDAY-HOSPNUM
-           MOVE    RECE200-PTID      TO  LNK-NYUINDAY-PTID
-           MOVE    RECE200-SRYYM     TO  LNK-NYUINDAY-SANTEIYM
-           CALL    "ORCSNYUINDAY"    USING   ORCSNYUINDAY-AREA
-                                             SPA-AREA
-           IF      LNK-NYUINDAY-RC     =   ZERO
-               MOVE   LNK-NYUINDAY-TBL  TO  RECE200-NYUINDAY-TBL
-               MOVE   LNK-NYUINDAY-TANKI2-TBL
-                                        TO  WRK-NYUINDAY-TANKI2-TBL
-           END-IF
-      *
            PERFORM     200111-RECE200-HENSYU-SEC
            PERFORM     200112-RECE200-HENSYU2-SEC
            PERFORM     200113-RECE200-HENSYU3-SEC
@@ -431,6 +411,19 @@
                       IF   WRK-DAY1(IDY)   NOT =    ZERO
                           MOVE   "1"    TO   TBL-JNISSU-DAY(IDY)
                       END-IF
+                 END-IF
+      *
+           END-PERFORM
+      *
+      *+++Æ±ÆüºÆÆþ±¡
+      *
+           PERFORM  VARYING  IDY    FROM    1   BY  1
+                     UNTIL   IDY     >     31
+      *
+                 IF   RECE200-HKNCOMBI        =
+                                   RECE200-DOUJITSU-HKNCOMBI(IDY)
+                          MOVE   SPACE  TO   RECE200-NYUINRYOFLG
+                          MOVE   "1"    TO   TBL-JNISSU-DAY(IDY)
                  END-IF
       *
            END-PERFORM
@@ -713,15 +706,11 @@
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU2(1)
                                 END-EVALUATE
-                                IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
-      ***                         IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
-      ***                                                   NOT = SPACE
+                                IF  (WRK-DAY1(ACCT-IDX)         = ZERO)
+                                AND (RECE200-NYUINDAY-KBN(ACCT-IDX)
+                                                                = "1" )
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU3(1)
-      ***                         ELSE
-      ***                           ADD   ACCT-DAY(1 ACCT-IDX)
-      ***                                   TO  WRK-KOGAI-ZAIKAISU4(1)
-      ***                         END-IF
                                 END-IF
                               WHEN     "102900020"
                                 MOVE  TNS-TEN  TO  WRK-KOGAI-TEN(2)
@@ -733,15 +722,11 @@
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU2(2)
                                 END-EVALUATE
-                                IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
-      ***                         IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
-      ***                                                   NOT = SPACE
+                                IF  (WRK-DAY1(ACCT-IDX)         = ZERO)
+                                AND (RECE200-NYUINDAY-KBN(ACCT-IDX)
+                                                                = "1" )
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU3(2)
-      ***                         ELSE
-      ***                           ADD   ACCT-DAY(1 ACCT-IDX)
-      ***                                   TO  WRK-KOGAI-ZAIKAISU4(2)
-      ***                         END-IF
                                 END-IF
                               WHEN     "102900030"
                                 MOVE  TNS-TEN  TO  WRK-KOGAI-TEN(3)
@@ -753,15 +738,11 @@
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU2(3)
                                 END-EVALUATE
-                                IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
-      ***                         IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
-      ***                                                   NOT = SPACE
+                                IF  (WRK-DAY1(ACCT-IDX)         = ZERO)
+                                AND (RECE200-NYUINDAY-KBN(ACCT-IDX)
+                                                                = "1" )
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU3(3)
-      ***                         ELSE
-      ***                           ADD   ACCT-DAY(1 ACCT-IDX)
-      ***                                   TO  WRK-KOGAI-ZAIKAISU4(3)
-      ***                         END-IF
                                 END-IF
                               WHEN     "102900040"
                                 MOVE  TNS-TEN  TO  WRK-KOGAI-TEN(4)
@@ -773,15 +754,11 @@
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU2(4)
                                 END-EVALUATE
-                                IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
-      ***                         IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX)
-      ***                                                   NOT = SPACE
+                                IF  (WRK-DAY1(ACCT-IDX)         = ZERO)
+                                AND (RECE200-NYUINDAY-KBN(ACCT-IDX)
+                                                                = "1" )
                                     ADD   ACCT-DAY(1 ACCT-IDX)
                                             TO  WRK-KOGAI-ZAIKAISU3(4)
-      ***                         ELSE
-      ***                           ADD   ACCT-DAY(1 ACCT-IDX)
-      ***                                   TO  WRK-KOGAI-ZAIKAISU4(4)
-      ***                         END-IF
                                 END-IF
                             END-EVALUATE
       *
@@ -1111,14 +1088,10 @@
                              RECE200-NYUKHNKEI2  +  NACCT-ZAITEN
            END-EVALUATE
       *
-           IF  RECE200-NYUINDAY-KBN(IDY) = "1"
-      ***     IF  WRK-NYUINDAY-TANKI2-KBN(IDY) NOT = SPACE
+           IF  (WRK-DAY1(IDY)             = ZERO)
+           AND (RECE200-NYUINDAY-KBN(IDY) = "1" )
                     COMPUTE  RECE200-NYUTOKKEI2  =
                              RECE200-NYUTOKKEI2  +  NACCT-ZAITEN
-      ***     ELSE
-      ***           COMPUTE  RECE200-NYUKHNKEI2  =
-      ***                    RECE200-NYUKHNKEI2  +  NACCT-ZAITEN
-      ***     END-IF
            END-IF
       *
            .
@@ -1447,8 +1420,8 @@
                    END-EVALUATE
                  END-IF
       *
-                 IF  RECE200-NYUINDAY-KBN(ACCT-IDX) = "1"
-      ***           IF  WRK-NYUINDAY-TANKI2-KBN(ACCT-IDX) NOT = SPACE
+                 IF  (WRK-DAY1(ACCT-IDX)             = ZERO)
+                 AND (RECE200-NYUINDAY-KBN(ACCT-IDX) = "1" )
                       IF ACCT-ZAIKBN = 2
                        COMPUTE  RECE200-NYUTOKKEI2  =
                                 RECE200-NYUTOKKEI2  -
@@ -1458,17 +1431,6 @@
                                 RECE200-NYUTOKKEI2  +
                                (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
                       END-IF
-      ***           ELSE
-      ***             IF ACCT-ZAIKBN = 2
-      ***              COMPUTE  RECE200-NYUTOKKEI2  =
-      ***                       RECE200-NYUTOKKEI2  -
-      ***                      (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-      ***             ELSE
-      ***              COMPUTE  RECE200-NYUKHNKEI2  =
-      ***                       RECE200-NYUKHNKEI2  +
-      ***                      (ACCT-ZAITEN * ACCT-DAY(1 ACCT-IDX))
-      ***             END-IF
-      ***           END-IF
                  END-IF
       *
               END-IF

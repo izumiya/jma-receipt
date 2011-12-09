@@ -68,6 +68,7 @@ P02E.glade	orca12	(P02E)患者登録−患者複写画面
 P02F.glade	orca12	(P02F)患者登録−複写元患者一覧
 P02G.glade	orca12	(P02G)患者登録−グループ医療機関内登録済リスト
 P02G2.glade	orca12	(P02G2)患者登録−グループ医療機関内患者紐付けリスト
+P02H.glade	orca12	(P02H)患者登録−公費選択画面
 P014.glade	orca12	(P01)患者登録-患者番号発行
 P015.glade	orca12	(P015)患者登録-患者番号再発行
 P98.glade	orca12	(P98)住所検索
@@ -81,6 +82,7 @@ P02Q.glade	orca12	(P02Q)患者登録−ＱＲ受付一覧
 P02Q1.glade	orca12	(P02Q1)患者登録−ＱＲ患者確認
 P02Y.glade	orca12	(P02Y)患者登録−禁忌薬剤登録
 P02Y1.glade	orca12	(P02Y1)患者登録−薬剤一覧選択サブ
+P02T.glade	orca12	(P02T)確認履歴画面
 PERR.glade	orca12	(PERR)エラー情報
 PID1.glade	orca12	(PID1)確認画面
 
@@ -159,6 +161,7 @@ CID2.glade	orca22	(CID2)病名コード置換え確認画面
 CID3.glade	orca22	(CID3)確認画面
 CID4.glade	orca22	(CID4)確認画面
 CID5.glade	orca22	(CID5)確認画面
+CID6.glade	orca22	(CID6)病名コード置換確認画面
 
 S02.glade	orca23	(S02)収納登録−請求一覧
 S03.glade	orca23	(S03)収納登録−請求確認
@@ -376,6 +379,7 @@ W64.glade	orca101	(W64)システム管理情報−公費番号まとめ情報設定
 W65.glade	orca101	(W65)システム管理情報−公費付加情報設定
 W66.glade	orca101	(W66)システム管理情報−公害医療機関情報設定
 W67.glade	orca101	(W67)システム管理情報−出産費用内訳明細情報
+W68.glade	orca101	(W68)システム管理情報−保険者付加情報
 W96.glade	orca101	(W96)システム管理情報−CRON設定情報
 W98.glade	orca101	(W98)システム管理情報−排他情報設定
 W981.glade	orca101	(W981)システム管理情報−排他制御状態

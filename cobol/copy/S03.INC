@@ -177,11 +177,11 @@
                   05  S03-CLIST1-COUNT       PIC S9(9)   BINARY.
                   05  S03-CLIST1-ROW         PIC S9(9)   BINARY.
                   05  S03-CLIST1-ROWATTR     PIC S9(9)   BINARY.
-                  05  S03-ITEM        OCCURS  50 TIMES.
+                  05  S03-ITEM        OCCURS  99 TIMES.
                       06  S03-TRENNUM PIC X(4).
                       06  S03-TSKYMONY    PIC X(12).
                       06  S03-TNYUKINMONEY    PIC X(12).
                       06  S03-TSYORIYMD   PIC X(11).
                       06  S03-TJTI    PIC X(12).
                       06  S03-TNYKN-NAME    PIC X(10).
-                  05  S03-SELECT  PIC X       OCCURS  50 TIMES.
+                  05  S03-SELECT  PIC X       OCCURS  99 TIMES.

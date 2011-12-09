@@ -55,6 +55,7 @@
       *  04.05.00    NACL-多々納  10/03/XX  Ｈ２２．４改正対応
       *  04.06.00    NACL-多々納  10/07/01  残量廃棄自動算定対応
       *  04.06.00    NACL-多々納  10/07/16  免疫学的検査重複チェック対応
+      *  04.07.00    NACL-多々納  11/11/25  同日再入院対応
       *****************************************************************
       *
       *
@@ -253,6 +254,8 @@
            03  WRK-SURYO-R         REDEFINES   WRK-SURYO.
                05  WRK-SURYO-S1    PIC 9(07).
                05  WRK-SURYO-S2    PIC 9(05).
+      *
+           03  WRK-D-DAY           PIC 9(03).
       *
       *    検査　判断グループ
        01  WRK-KENSA-AREA.
@@ -4992,7 +4995,17 @@
                PERFORM VARYING    IDX2     FROM    1   BY  1
                        UNTIL     (IDX2     >   31  )  OR
                                  (FLG-KENSA-ARI    =   1   )
-                   IF      ACCT-DAY (1 IDX2)   NOT =   ZERO
+      *ver.4.7
+      *        同日再入院日
+               MOVE    ACCT-DAY (2 IDX2)   TO  WRK-D-DAY
+               IF     (SPA-K02N-DOUDAY     >   ZERO )
+                   IF     (WRK-YM          =   SPA-K02N-NYUINYMD(1:6))
+                     AND  (SPA-K02N-DOUDAY =   IDX2  )
+                       MOVE    ACCT-DAY (3 IDX2)   TO  WRK-D-DAY
+                   END-IF
+               END-IF
+      *****        IF      ACCT-DAY (1 IDX2)   NOT =   ZERO
+                   IF      WRK-D-DAY           NOT =   ZERO
                        MOVE    IDX2            TO  WRK-DD
       *                入院期間中
                        IF     (WRK-YMD         >=  SPA-K02N-NYUINYMD)

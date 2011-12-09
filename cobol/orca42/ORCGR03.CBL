@@ -105,7 +105,10 @@
       *  04.05.01    NACL-藤原    09/06/11  病棟別出力対応
       *  04.05.02    NACL-藤原    09/06/18  社保レセプト遍綴順対応
       *  04.05.03    NACL-小豆沢  10/02/18  スクリプト起動パスサーチ対応
-      *  04.05.04    NACL-藤原    11/08/02  労災新様式対応
+      *  04.05.04    NACL-藤原    11/11/07  入外区分表示切替ボタン押下時の修正
+      *  04.05.05    NACL-藤原    11/08/02  労災新様式対応
+      *  04.05.06    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -416,6 +419,7 @@
            COPY    "RID1.INC".
            COPY    "RID2.INC".
            COPY    "RID3.INC".
+           COPY    "RID4.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -1591,7 +1595,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    入力チェック処理
            PERFORM 410-INPUT-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  410-SYOKBN-CHK-EXT
+               GO  TO  430-HNYUGAIKBN-CHANGE-EXT
            END-IF
       *
            IF      SPA-GMN-IKKATU          =   "T" 
@@ -2466,6 +2470,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG16
                            END-IF
                    END-EVALUATE
                    MOVE    SPA-R01-PRTKBN  TO  SHELLTBL-ARG18
+                   MOVE    "0"             TO  SHELLTBL-ARG19
                    MOVE    SHELLTBL        TO  MCPDATA-REC
                    MOVE    "SHELL"         TO  MCP-FUNC
                    MOVE    "shell"         TO  MCP-TABLE

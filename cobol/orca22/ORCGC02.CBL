@@ -251,6 +251,9 @@
       *                                     渡された病名を表示
       *  04.05.07    NACL-藤原    09/11/11  病名の入力順対応を中止
       *  04.05.08    NACL-藤原    11/02/15  誕生日と診療開始日のチェック
+      *  04.05.09    NACL-藤原    11/11/14  公害による保険限定の病名の重
+      *                                     複登録を可能とする
+      *  04.05.10    NACL-藤原    08/05/07  上部の診療科未入力時の診療科表示
       *
       *  04.06.01    NACL-藤原    10/04/28  自院病名に不明な病名コードが
       *                                     登録された場合のチェックを追加
@@ -964,6 +967,9 @@
       *
       *    病名移行確認画面より
            IF      SPA-MOTOPG(1:4)     =   "CID2"
+               MOVE    SPACE               TO  SPA-NAI-C02-BYOMEI-CHG
+                                                 (SPA-C02-IKOSAKI-INDEX)
+      *
                IF      SPA-CIDCD2          =   "0103"  OR  "0101"
                                            OR  "0102"  OR  "0105"
       *            病名コードの移行
@@ -1413,6 +1419,8 @@ grpsys     MOVE    SPA-HOSPNUM      TO  SYS-HOSPNUM
            END-IF   
       *
            IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
            AND   ( SPA-GMN-C02-BSRYKA      =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
@@ -1802,6 +1810,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            SPA-NAI-C02-HKNCOMBI-JIHI
            END-IF
       *
+      *    公害の時
+           IF      ORCSHKN-NAI-HKNNUM (IDX)
+                                       =   "975"
+               MOVE    1                   TO
+                                           SPA-NAI-C02-HKNCOMBI-KOUGAI
+           END-IF
+      *
       *    労災の時、コメントの追加
            IF      ORCSHKN-NAI-HKNNUM (IDX)
                                        =   "971"  OR  "973"
@@ -2014,8 +2029,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            SPA-NAI-C02-HAISIYMD (IDZ)
                                            SPA-NAI-C02-HAISIYMD-O
                                                              (IDZ IDX3)
-                               MOVE    BYO-TANDOKUKBN
-                                                       TO
+                               MOVE    BYO-TANDOKUKBN  TO
                                            SPA-NAI-C02-TANDOKUKBN-O
                                                              (IDZ IDX3)
                                IF      SPA-NAI-C04-BYOMEICD-O (IDX IDX3)
@@ -2288,7 +2302,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        SPA-NAI-C02-SELNO
                                        SPA-PTBYOMEI-REC
       *
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
       *    検索処理
@@ -2770,6 +2786,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
       *            自院病名コード廃止処理
                WHEN    "0108"
       *            自院病名コード未コード化病名処理
+                   MOVE    SPACE               TO  
+                                               SPA-NAI-C02-BYOMEI-CHG
+                                                 (SPA-C02-IKOSAKI-INDEX)
+      *
                    IF      SPA-CID6-FLG    =   "OK"
                        MOVE    SPA-C02-IKOSAKI-INDEX
                                                TO  IDZ
@@ -3202,7 +3222,9 @@ grpsys                                         SPA-AREA
                    END-IF
                END-IF 
       *
-               IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+               IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+               AND   ( SPA-GMN-C02-SRYKAMEI
+                                           NOT =   SPACE )
                    MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
                END-IF
       *
@@ -3274,7 +3296,9 @@ grpsys                                         SPA-AREA
                                        SPA-PTBYOMEI-REC
       *                                
            MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
       *
@@ -3290,7 +3314,9 @@ grpsys                                         SPA-AREA
                                                SPA-NAI-C02-SELNO
                                                SPA-C02-IKOFLG
                    MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
-                   IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+                   IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+                   AND   ( SPA-GMN-C02-SRYKAMEI
+                                               NOT =   SPACE )
                        MOVE    SPA-GMN-C02-SRYKA-G
                                                TO  SPA-GMN-C02-BSRYKA-G
                    END-IF
@@ -3732,7 +3758,9 @@ grpsys                                         SPA-AREA
                                        SPA-NAI-C02-SELNO
                                        SPA-PTBYOMEI-REC
       *
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
       *    検索処理
@@ -7247,7 +7275,9 @@ grpsys                                       SPA-AREA
            MOVE    C02-BSRYKA          TO  SPA-GMN-C02-BSRYKA-G
       *
            IF      SPA-GMN-C02-BSRYKA  =   SPACE
-               IF      SPA-GMN-C02-SRYKA   NOT =   ZERO    AND SPACE
+               IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO    AND SPACE )
+               AND   ( SPA-GMN-C02-SRYKAMEI
+                                           NOT =   SPACE             )
                    MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
                ELSE
                    MOVE    "0030"              TO  SPA-ERRCD
@@ -7286,7 +7316,9 @@ grpsys                                       SPA-AREA
                                        SPA-GMN-C02-MAX
                                        SPA-PTBYOMEI-REC
            MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
       *
@@ -7341,7 +7373,9 @@ grpsys                                       SPA-AREA
                                        SPA-GMN-C02-MAX
                                        SPA-PTBYOMEI-REC
            MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
       *
@@ -8013,7 +8047,9 @@ grpsys                                       SPA-AREA
                END-IF                            
            END-IF                                    
       *
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
            MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
@@ -8160,7 +8196,9 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            INITIALIZE                  SPA-GMN-C02-KOUMOKU
                                        SPA-NAI-C02-KOUMOKU
                                        SPA-NAI-C02-SELNO
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
            MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
@@ -9148,11 +9186,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        45021-HKNCOMBI-DABURI-CHK-SEC   SECTION.
       *
-      *    労災または自賠責または自費の保険がない場合はチェックしない
-           IF    ( SPA-NAI-C02-HKNCOMBI-ROUSAI )
-                                       =   ZERO
-           AND   ( SPA-NAI-C02-HKNCOMBI-JIHI   )
-                                       =   ZERO
+      *    労災または自賠責または自費、公害の保険がない場合はチェックしない
+           IF    ( SPA-NAI-C02-HKNCOMBI-ROUSAI
+                                       =   ZERO )
+           AND   ( SPA-NAI-C02-HKNCOMBI-JIHI
+                                       =   ZERO )
+           AND   ( SPA-NAI-C02-HKNCOMBI-KOUGAI
+                                       =   ZERO )
                GO  TO   45021-HKNCOMBI-DABURI-CHK-EXT
            END-IF
       *
@@ -9181,19 +9221,22 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                MOVE    HKNCOMBI-REC        TO  WRK-CHK-HKNCOMBI-REC (2)
            END-IF
       *
-      *    片方のみ労災または自賠責の場合は登録可能とする
+      *    片方のみ労災または自賠責または公害の場合は登録可能とする
            EVALUATE    WRK-CHK-COMB-HKNNUM (1)
                                    ALSO    WRK-CHK-COMB-HKNNUM (2)
                WHEN    "971"       ALSO    "971"
                WHEN    "973"       ALSO    "973"
+               WHEN    "975"       ALSO    "975"
                    IF      WRK-CHK-COMB-HKNID (1)
                                        NOT =    WRK-CHK-COMB-HKNID (2)
                        MOVE    1                TO  FLG-HKNCOMBI-DABURI
                    END-IF
                WHEN    "971"       ALSO    ANY
                WHEN    "973"       ALSO    ANY
+               WHEN    "975"       ALSO    ANY
                WHEN    ANY         ALSO    "971"
                WHEN    ANY         ALSO    "973"
+               WHEN    ANY         ALSO    "975"
                    MOVE    1               TO  FLG-HKNCOMBI-DABURI
                WHEN    OTHER
                    MOVE    ZERO            TO  FLG-HKNCOMBI-DABURI
@@ -9300,7 +9343,9 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                        WRK-PTBYOMEI-REC (6)
                                        WRK-HAISIYMD-OCC
       *
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
       *    検索処理
@@ -10050,7 +10095,9 @@ grpsys                                          SPA-AREA
                                        SPA-GMN-C02-MAX
                                        SPA-PTBYOMEI-REC
            MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
       *
@@ -10105,7 +10152,9 @@ grpsys                                          SPA-AREA
                                        SPA-GMN-C02-MAX
                                        SPA-PTBYOMEI-REC
            MOVE    SPA-NAI-C02-SYSYMD  TO  SPA-NAI-C02-SRYYMD
-           IF      SPA-GMN-C02-SRYKA   NOT =   ZERO
+           IF    ( SPA-GMN-C02-SRYKA   NOT =   ZERO  )
+           AND   ( SPA-GMN-C02-SRYKAMEI
+                                       NOT =   SPACE )
                MOVE    SPA-GMN-C02-SRYKA-G TO  SPA-GMN-C02-BSRYKA-G
            END-IF
       *

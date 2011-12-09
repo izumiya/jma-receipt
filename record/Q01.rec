@@ -442,11 +442,26 @@ Q01	{
 				FTNJANUM5	{
 					value	varchar(8);
 				};
-				RDKOHNUM_AND	{
-					value	bool;
+				CMB_JKNHKNJANUM	{
+					JKNHKNJANUM	{
+						value	varchar(10);
+					};
+					count	int;
+					item	varchar(10)[5];
 				};
-				RDKOHNUM_OR	{
-					value	bool;
+				CMB_JKNHKNNUM	{
+					JKNHKNNUM	{
+						value	varchar(10);
+					};
+					count	int;
+					item	varchar(10)[5];
+				};
+				CMB_JKNKOHNUM	{
+					JKNKOHNUM	{
+						value	varchar(10);
+					};
+					count	int;
+					item	varchar(10)[5];
 				};
 				RDHKNKOH_AND	{
 					value	bool;
@@ -737,17 +752,19 @@ Q01	{
 				RECECOM3{
 					value	varchar(50);
 				};
-				RDBYOMEI_AND	{
-					value	bool;
+				CMB_JKNBYOMEI	{
+					JKNBYOMEI	{
+						value	varchar(10);
+					};
+					count	int;
+					item	varchar(10)[5];
 				};
-				RDBYOMEI_OR	{
-					value	bool;
-				};
-				RDSRYACT_AND	{
-					value	bool;
-				};
-				RDSRYACT_OR	{
-					value	bool;
+				CMB_JKNSRYACT	{
+					JKNSRYACT	{
+						value	varchar(10);
+					};
+					count	int;
+					item	varchar(10)[5];
 				};
 			};
 			fixed19	{

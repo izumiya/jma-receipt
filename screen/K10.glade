@@ -224,7 +224,7 @@
 	  <last_modification_time>Tue, 29 Jan 2002 06:38:08 GMT</last_modification_time>
 	</signal>
 	<columns>8</columns>
-	<column_widths>29,96,176,67,44,107,131,10</column_widths>
+	<column_widths>29,96,176,85,44,106,111,10</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>

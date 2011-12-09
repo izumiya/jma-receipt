@@ -299,6 +299,11 @@
            COPY    "CPPTNYUINRRK.INC"
                                      REPLACING
                                //PTNYUINRRK-// BY //WKPTNYUINRRK-//.
+      *
+       01  NRRK-REC.
+           COPY    "CPPTNYUINRRK.INC"
+                                     REPLACING
+                               //PTNYUINRRK-// BY //NRRK-//.
       *    ¼ýÇ¼¥ï¡¼¥¯
        01  WKSYUNOU-REC.
            COPY  "CPSYUNOU.INC"    REPLACING  //SYU-//
@@ -6155,6 +6160,9 @@
                MOVE    "1"                 TO  ORCSNYUINSHO-KBN
                MOVE    SPA-NAI-I04-NYUINYMD    TO  ORCSNYUINSHO-NYUINYMD
                MOVE    SPA-NAI-I04-TAIINYMD    TO  ORCSNYUINSHO-TAIINYMD
+               IF    ( WKPTNYUINRRK-DOUJITSUKBN    =   "1" )
+                   MOVE    "1"             TO  ORCSNYUINSHO-DOUJITSUKBN
+               END-IF
                CALL    "ORCSNYUINSHO"      USING
                                            WRK-SPA-AREA
                                            ORCSNYUINSHOAREA
@@ -6240,6 +6248,9 @@
            END-PERFORM
            MOVE    SPA-NAI-I04-NYUINYMD    TO  ORCSNYUINSHO-NYUINYMD
            MOVE    SPA-NAI-I04-TAIINYMD    TO  ORCSNYUINSHO-TAIINYMD
+           IF    ( WKPTNYUINRRK-DOUJITSUKBN    =   "1" )
+               MOVE    "1"                 TO  ORCSNYUINSHO-DOUJITSUKBN
+           END-IF
            CALL    "ORCSNYUINSHO"      USING
                                        WRK-SPA-AREA
                                        ORCSNYUINSHOAREA

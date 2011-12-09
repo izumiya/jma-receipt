@@ -120,11 +120,11 @@
       *************07  SPA-GMN-MCPCHK            PIC X(02).
       *
 ito   *        ステータス通知
-      *        05  SPA-GMN-POPUP-STATUS.
-      *            07  SPA-GMN-POPUP-SUMMARY         PIC X(256).
-      *            07  SPA-GMN-POPUP-BODY            PIC X(1024).
-      *            07  SPA-GMN-POPUP-ICON            PIC X(256).
-      *            07  SPA-GMN-POPUP-TIMEOUT         PIC S9(9).
+               05  SPA-GMN-POPUP-STATUS.
+                   07  SPA-GMN-POPUP-SUMMARY         PIC X(256).
+                   07  SPA-GMN-POPUP-BODY            PIC X(1024).
+                   07  SPA-GMN-POPUP-ICON            PIC X(256).
+                   07  SPA-GMN-POPUP-TIMEOUT         PIC S9(9).
 ito   *
                05  SPA-NAI-AREA.
       *            処理フラグ（０：通常、１：訂正）
@@ -289,6 +289,8 @@ ito   *
                    07  SPA-K02N-NYUINYMDW          PIC X(09).
                    07  SPA-K02N-H1                 PIC X(01).
                    07  SPA-K02N-TAIINYMDW          PIC X(09).
+      *        同日再入院あり
+               05  SPA-K02N-DOUNYUKBN          PIC 9(01).
       *        検査処理
                05  SPA-K02N-KENSAFLG           PIC X(01).
       *
@@ -622,6 +624,7 @@ ito   *
                        09  SPA-K10-GMN-DRCD-NAME
                                                PIC X(50).
                        09  SPA-K10-SYORIKBN    PIC X(02).
+                       09  SPA-K10-DOUKBN      PIC X(01).
                05  SPA-K10-GMN-SELNUM      PIC X(03).
                05  SPA-K10-SELNUM          PIC 9(03).
       *

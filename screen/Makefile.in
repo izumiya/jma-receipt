@@ -164,6 +164,7 @@ SCREEN_screen = \
 	RID1.glade \
 	RID2.glade \
 	RID3.glade \
+	RID4.glade \
 	S02.glade \
 	S03.glade \
 	S03N.glade \
@@ -428,6 +429,7 @@ SCREEN_screen = \
 	CID6.glade \
 	P02T.glade \
 	W68.glade \
+	SID4.glade \
 
 SCREEN_objs = $(SCREEN_sources:.glade.in=.glade)
 

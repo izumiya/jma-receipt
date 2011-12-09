@@ -87,6 +87,7 @@
            COPY    "RID1.INC".
            COPY    "RID2.INC".
            COPY    "RID3.INC".
+           COPY    "RID4.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA

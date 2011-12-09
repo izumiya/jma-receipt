@@ -27,6 +27,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.01    NACL-門脇    11/06/29  テスト患者を対象外とする修正
+      *  04.05.02    NACL-門脇    11/11/09  同日再入院食事対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -423,7 +424,7 @@
                  WHEN      "1"
                    PERFORM   VARYING   IDX3   FROM  1  BY  1
                               UNTIL    IDX3    >   31
-                     IF  (SYU-DAY(IDX3)        =  "1" OR "2")
+                     IF  (SYU-DAY(IDX3) =  "1" OR "2" OR "9")
                      AND (WRK-TAIHI-DAY(IDX3)  =  ZERO      )
                        COMPUTE  LNK-SKYGET-IRYO2-NISSU(IDX1 IDX2) =
                                 LNK-SKYGET-IRYO2-NISSU(IDX1 IDX2) +
@@ -517,7 +518,7 @@
                  WHEN      "1"
                    PERFORM   VARYING   IDX3   FROM  1  BY  1
                               UNTIL    IDX3    >   31
-                     IF  (SYU-DAY(IDX3)        =  "1" OR "2")
+                     IF  (SYU-DAY(IDX3) =  "1" OR "2" OR "9")
                      AND (WRK-TAIHI-DAY(IDX3)  =  ZERO      )
                        COMPUTE  LNK-SKYGET-IRYO2-NISSU(IDX1 IDX2) =
                                 LNK-SKYGET-IRYO2-NISSU(IDX1 IDX2) +

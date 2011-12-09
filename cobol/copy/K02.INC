@@ -18,6 +18,11 @@
         02  K02.
       ****  02  K02-FIXED2.
             03  K02-TITLE          PIC X(120).
+            03  K02-POPUP-STATUS.
+              04  K02-POPUP-SUMMARY   PIC X(256).
+              04  K02-POPUP-BODY      PIC X(1024).
+              04  K02-POPUP-ICON      PIC X(256).
+              04  K02-POPUP-TIMEOUT   PIC S9(9)  BINARY.
               03  K02-PTNUM.
                 04  K02-VALUE   PIC X(20).
               03  K02-KANANAME-G.

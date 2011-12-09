@@ -51,6 +51,8 @@
       *  04.05.03    NACL-藤原    10/03/03  平成２２年４月改正対応
       *  04.05.04    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
       *  04.05.05    NACL-藤原    11/08/02  点検レセ印字位置変更対応
+      *  04.05.06    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
@@ -259,6 +261,7 @@
                05  WRK-PARA-JOBID   PIC  9(07).
                05  WRK-PARA-SHELLID PIC  X(08).
            03  WRK-PARA-PRTKBN      PIC  X(01).
+           03  WRK-PARA-DLTKBN      PIC  X(01).
            03  WRK-PARA-HOSPNUM     PIC  9(02).
       *
            03  WRK-SYS-SRYYMD       PIC  X(08).
@@ -572,9 +575,13 @@
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
                                                WRK-PARA-PRTKBN
+                                               WRK-PARA-DLTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
+      *
+           DISPLAY "WRK-PARA-DLTKBN=" WRK-PARA-DLTKBN
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
       *    ファイルＯＰＥＮ処理
@@ -3130,7 +3137,11 @@ grpsys                     MOVE    WRK-PARA-HOSPNUM    TO
                            MOVE    RECE10-REC          TO  MCPDATA-REC
                            MOVE    "DBDELETE"          TO  MCP-FUNC
                            MOVE    "tbl_seikyu"        TO  MCP-TABLE
-                           MOVE    "del4"              TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
 grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC           NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE " "
@@ -3196,7 +3207,11 @@ grpsys                     MOVE    WRK-PARA-HOSPNUM
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
-                           MOVE    "del4"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
 grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -3257,7 +3272,11 @@ grpsys                     MOVE    WRK-PARA-HOSPNUM
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
-                           MOVE    "del4"          TO  MCP-PATHNAME
+                           IF      WRK-PARA-DLTKBN     =   "0"
+                               MOVE    "del4"          TO  MCP-PATHNAME
+                           ELSE
+                               MOVE    "del7"          TO  MCP-PATHNAME
+                           END-IF
 grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
@@ -3916,7 +3935,6 @@ grpsys     MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            .
        900-DBSELECT-EXT.
            EXIT.
-           .
       *
       *****************************************************************
       *    ＤＢＦＥＴＣＨ処理

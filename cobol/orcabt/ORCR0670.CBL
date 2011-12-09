@@ -59,6 +59,8 @@
       *                                     キーにkohid 追加
       *  04.06.03    NACL-藤原    11/04/12  拡張漢字対応（病名）
       *                                     エラー時処理終了
+      *  04.06.04    NACL-藤原    11/10/24  予約コード入力による病名編集
+      *                                     フラグの設定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -539,7 +541,7 @@
                        UNTIL   IDX >       21
                    IF      PTBYO-BYOMEICD (IDX) (1:4)  =   "ZZZC"
                                                        OR  "ZZZ("
-                       MOVE    "1"         TO  RECE63-BYOMEIHENFLG
+                       MOVE    "1"         TO  PTBYO-BYOMEIHENFLG
                        MOVE    21          TO  IDX
                    END-IF
                END-PERFORM

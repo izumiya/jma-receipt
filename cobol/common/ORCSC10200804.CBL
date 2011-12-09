@@ -324,6 +324,8 @@
       *    ËãÌôÈ½Äê
            03  WRK-DD                  PIC 9(02).
            03  IDX-N2                  PIC 9(02).
+      *    Æþ±¡»»Äê¾å¸Â
+           03  WRK-NYUCNT              PIC 9(03).
       *
       *    ÊÝÂ¸ÍÑ£Ó£Ð£Á
        01  HZN-SCR-REC.
@@ -4328,11 +4330,13 @@
       *        ¥ê¥ó¥ÑÉâ¼ð»ØÆ³´ÉÍýÎÁ
                IF      WRK-COM-INPUTCD (IDX-Z) =   "113010410"
                    MOVE    1                   TO  FLG-NYUIN
+                   MOVE    1                   TO  WRK-NYUCNT
                    PERFORM 10016-NYUIN-KIKAN-SEC
                END-IF
       *        Âà±¡»þ¶¦Æ±»ØÆ³ÎÁ£²
                IF      WRK-COM-INPUTCD (IDX-Z) =   "113008910"
                    MOVE    2                   TO  FLG-NYUIN
+                   MOVE    2                   TO  WRK-NYUCNT
                    PERFORM 10016-NYUIN-KIKAN-SEC
                END-IF
       *
@@ -5306,11 +5310,15 @@
       *
            INITIALIZE                      ORCSC91AREA
            MOVE    LNK-ORCSC-SYORIFLG  TO  LNK-SC91-SYORIFLG
-           IF      FLG-NYUIN           =   2
-               MOVE    "8"                 TO  LNK-SC91-KBN
-           ELSE
-               MOVE    "9"                 TO  LNK-SC91-KBN
-           END-IF
+      *    IF      FLG-NYUIN           =   2
+      *        MOVE    "8"                 TO  LNK-SC91-KBN
+      *    ELSE
+      *        MOVE    "9"                 TO  LNK-SC91-KBN
+      *    END-IF
+      *    ½é²óÆþ±¡ÆüÈ½Äê¤Ê¤·¤È¤¹¤ë
+           MOVE    "9"                 TO  LNK-SC91-KBN
+      *    ¾å¸Â²ó¿ô
+           MOVE    WRK-NYUCNT          TO  LNK-SC91-NYUCNT
            MOVE    WRK-COM-INPUTCD (IDX-Z)
                                        TO  LNK-SC91-SRYCD
            MOVE    LNK-ORCSC-TEISEI-AREA   TO  LNK-SC91-TEISEI-AREA
@@ -5326,8 +5334,8 @@
                MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
            END-IF
       *   £±²ó¤Î¤ß
-           IF   (WRK-COM-NYU-KAI (IDX-Z)   >   FLG-NYUIN )  OR
-                (LNK-ORCSC-KAISU           >   FLG-NYUIN )
+           IF   (WRK-COM-NYU-KAI (IDX-Z)   >   WRK-NYUCNT )  OR
+                (LNK-ORCSC-KAISU           >   WRK-NYUCNT )
                MOVE    "0212"              TO  SPA-ERRCD
                MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
            END-IF

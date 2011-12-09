@@ -338,6 +338,10 @@
       *                                     方法の修正
       *  04.06.09    NACL-藤原    11/09/29  基本項目でデータ区分２のデー
       *                                     タのみの診療区分の記録
+      *  04.06.10    NACL-藤原    11/12/05  判断料がある検査の日付情報記
+      *                                     録の修正
+      *
+      *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3352,8 +3356,10 @@
                    MOVE    8                      TO  WRK-NAGASA
                END-IF
            ELSE
-             IF    RECE62-PREFNUM     =   "45"
-             AND   RECE62-KOHNUM(IDY) =   "190"
+             IF  ((RECE62-PREFNUM     =   "45"      ) AND
+                  (RECE62-KOHNUM(IDY) =   "190"     ) AND
+                  (RECE62-SRYYM      <=  "200803"   ))
+             OR  ( RECE62-EKF-FTNKEIFLG(IDX)  =  "2" )
                CONTINUE
              ELSE
                IF      RECE62-FTNMONEY(IDX)   >   ZERO     
@@ -5292,7 +5298,7 @@
                    PERFORM 5004-MOJI-HENSYU-SEC  
                WHEN    OTHER     
       *            関連コメント退避処理
-                   IF      RECE641-SETCOMFLG   =   "1"
+                   IF      WRK-RECE641-SETCOMFLG   =   "1"
                        INITIALIZE               WRK-RECE655-REC
                        MOVE    TBL-KENSA-RECE65-KEY (IDZ3 IDZ4)
                                             TO  WRK-RECE655-KEY1
@@ -5407,8 +5413,8 @@
       *            日付情報
                    PERFORM VARYING IDV     FROM    1   BY  1
                            UNTIL   IDV     >       31
-                       IF      RECE641-KAISU (1 IDV)   >   ZERO
-                           MOVE    RECE641-KAISU (1 IDV)
+                       IF      WRK-RECE641-KAISU (1 IDV)   >   ZERO
+                           MOVE    WRK-RECE641-KAISU (1 IDV)
                                                    TO  WRK-NUM
                            MOVE    3               TO  WRK-NAGASA
                        END-IF

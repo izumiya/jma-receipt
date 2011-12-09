@@ -52,6 +52,8 @@
       *  04.03.03    NACL-藤原    08/08/11  コメント記載箇所選択機能対応
       *
       *  04.05.01    NACL-藤原    11/08/02  労災新様式対応
+      *  04.05.02    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -579,7 +581,7 @@
                         ","            DELIMITED   BY  SIZE
                         WRK-PARA-PRTKBN
                                        DELIMITED   BY  SIZE
-                        ","            DELIMITED   BY  SIZE
+                        ",0,"          DELIMITED   BY  SIZE
                         WRK-PARA-HOSPNUM
                                        DELIMITED   BY  SIZE
                         ","            DELIMITED   BY  SIZE
@@ -815,7 +817,7 @@
                             ","            DELIMITED   BY  SIZE
                             WRK-PARA-PRTKBN
                                            DELIMITED   BY  SIZE
-                            ","            DELIMITED   BY  SIZE
+                            ",0,"          DELIMITED   BY  SIZE
                             WRK-PARA-HOSPNUM
                                            DELIMITED   BY  SIZE
                             ","            DELIMITED   BY  SIZE
@@ -1028,7 +1030,7 @@
                         ","            DELIMITED   BY  SIZE
                         WRK-PARA-PRTKBN
                                        DELIMITED   BY  SIZE
-                        ","            DELIMITED   BY  SIZE
+                        ",0,"          DELIMITED   BY  SIZE
                         WRK-PARA-HOSPNUM
                                        DELIMITED   BY  SIZE
                         ","            DELIMITED   BY  SIZE
@@ -1038,11 +1040,42 @@
                DISPLAY "ORCR0480 start = [" WRK-ARG "]"
                CALL    "ORCR0480"          USING
                                            WRK-ARG
+               STRING   WRK-PARA3      DELIMITED   BY  SIZE
+                        ","            DELIMITED   BY  SIZE
+                        WRK-PARA-A35   DELIMITED   BY  SIZE
+                        ","            DELIMITED   BY  SIZE
+                        WRK-PARA-A13   DELIMITED   BY  SIZE
+                        ","            DELIMITED   BY  SIZE
+                        WRK-PARA-PRTKBN
+                                       DELIMITED   BY  SIZE
+                        ","            DELIMITED   BY  SIZE
+                        WRK-PARA-HOSPNUM
+                                       DELIMITED   BY  SIZE
+                        ","            DELIMITED   BY  SIZE
+                        RECEERR        DELIMITED   BY  SPACE
+                                       INTO    WRK-ARG
+               END-STRING
                CALL    "ORCR0481"          USING
                                            WRK-ARG
                CALL    "ORCR0482"          USING
                                            WRK-ARG
            ELSE
+               STRING   WRK-PARA3      DELIMITED   BY  SIZE
+                        ","            DELIMITED   BY  SIZE
+                        WRK-PARA-A35   DELIMITED   BY  SIZE
+                        ","            DELIMITED   BY  SIZE
+                        WRK-PARA-PRTKBN
+                                       DELIMITED   BY  SIZE
+                        ",0,"          DELIMITED   BY  SIZE
+                        WRK-PARA-HOSPNUM
+                                       DELIMITED   BY  SIZE
+                        ","            DELIMITED   BY  SIZE
+                        RECEERR        DELIMITED   BY  SPACE
+                                       INTO    WRK-ARG
+               END-STRING
+               DISPLAY "ORCR0501 start = [" WRK-ARG "]"
+               CALL    "ORCR0501"          USING
+                                           WRK-ARG
                STRING   WRK-PARA3      DELIMITED   BY  SIZE
                         ","            DELIMITED   BY  SIZE
                         WRK-PARA-A35   DELIMITED   BY  SIZE
@@ -1056,9 +1089,6 @@
                         RECEERR        DELIMITED   BY  SPACE
                                        INTO    WRK-ARG
                END-STRING
-               DISPLAY "ORCR0501 start = [" WRK-ARG "]"
-               CALL    "ORCR0501"          USING
-                                           WRK-ARG
                CALL    "ORCR0502"          USING
                                            WRK-ARG
                CALL    "ORCR0503"          USING
@@ -1300,7 +1330,7 @@
                             ","            DELIMITED   BY  SIZE
                             WRK-PARA-PRTKBN
                                            DELIMITED   BY  SIZE
-                            ","            DELIMITED   BY  SIZE
+                            ",0,"          DELIMITED   BY  SIZE
                             WRK-PARA-HOSPNUM
                                            DELIMITED   BY  SIZE
                             ","            DELIMITED   BY  SIZE
@@ -1337,7 +1367,7 @@
                             ","            DELIMITED   BY  SIZE
                             WRK-PARA-PRTKBN
                                            DELIMITED   BY  SIZE
-                            ","            DELIMITED   BY  SIZE
+                            ",0,"          DELIMITED   BY  SIZE
                             WRK-PARA-HOSPNUM
                                            DELIMITED   BY  SIZE
                             ","            DELIMITED   BY  SIZE
@@ -1567,7 +1597,7 @@
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-PRTKBN
                                    DELIMITED   BY  SIZE
-                    ","            DELIMITED   BY  SIZE
+                    ",0,"          DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
@@ -1700,7 +1730,7 @@
                             ","            DELIMITED   BY  SIZE
                             WRK-PARA-PRTKBN
                                            DELIMITED   BY  SIZE
-                            ","            DELIMITED   BY  SIZE
+                            ",0,"          DELIMITED   BY  SIZE
                             WRK-PARA-HOSPNUM
                                            DELIMITED   BY  SIZE
                             ","            DELIMITED   BY  SIZE
@@ -1724,7 +1754,7 @@
                             ","            DELIMITED   BY  SIZE
                             WRK-PARA-PRTKBN
                                            DELIMITED   BY  SIZE
-                            ","            DELIMITED   BY  SIZE
+                            ",0,"          DELIMITED   BY  SIZE
                             WRK-PARA-HOSPNUM
                                            DELIMITED   BY  SIZE
                             ","            DELIMITED   BY  SIZE
@@ -1926,7 +1956,7 @@
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-PRTKBN
                                    DELIMITED   BY  SIZE
-                    ","            DELIMITED   BY  SIZE
+                    ",0,"          DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
@@ -2051,7 +2081,7 @@
                             ","            DELIMITED   BY  SIZE
                             WRK-PARA-PRTKBN
                                            DELIMITED   BY  SIZE
-                            ","            DELIMITED   BY  SIZE
+                            ",0,"          DELIMITED   BY  SIZE
                             WRK-PARA-HOSPNUM
                                            DELIMITED   BY  SIZE
                             ","            DELIMITED   BY  SIZE
@@ -2075,7 +2105,7 @@
                             ","            DELIMITED   BY  SIZE
                             WRK-PARA-PRTKBN
                                            DELIMITED   BY  SIZE
-                            ","            DELIMITED   BY  SIZE
+                            ",0,"          DELIMITED   BY  SIZE
                             WRK-PARA-HOSPNUM
                                            DELIMITED   BY  SIZE
                             ","            DELIMITED   BY  SIZE
@@ -2231,7 +2261,7 @@
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-PRTKBN
                                    DELIMITED   BY  SIZE
-                    ","            DELIMITED   BY  SIZE
+                    ",0,"          DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
@@ -2400,7 +2430,7 @@
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-PRTKBN
                                    DELIMITED   BY  SIZE
-                    ","            DELIMITED   BY  SIZE
+                    ",0,"          DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE

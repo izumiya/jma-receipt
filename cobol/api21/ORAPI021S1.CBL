@@ -27,7 +27,12 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+<<<<<<< ORAPI021S1.CBL
       *  04.07.00    NACL-多々納  11/10/XX  削除・置換え対応
+=======
+      *  04.07.00    NACL-多々納  11/10/XX  削除・置換え対応
+      *  04.07.00    NACL-多々納  11/11/XX  同日再入院対応
+>>>>>>> 1.12
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -47,10 +52,20 @@
            03  FLG-END                 PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
+<<<<<<< ORAPI021S1.CBL
            03  FLG-WKSRYACT            PIC 9(01).
+=======
+           03  FLG-WKSRYACT            PIC 9(01).
+           03  FLG-PTNYUINRRK          PIC 9(01).
+>>>>>>> 1.12
       *
            03  FLG-SYORI               PIC 9(01).
+<<<<<<< ORAPI021S1.CBL
            03  FLG-CHKWK               PIC 9(01).
+=======
+           03  FLG-CHKWK               PIC 9(01).
+           03  FLG-DOUJITU             PIC 9(01).
+>>>>>>> 1.12
       *
       *    添字領域
        01  IDX-AREA.
@@ -89,8 +104,6 @@
                05  WRK-HEN-TMM         PIC X(02).
                05  WRK-HEN-T2          PIC X(01).
                05  WRK-HEN-TSS         PIC X(02).
-      *    受付ＩＤ
-           03  WRK-UKEID               PIC 9(05).
       *    保険組合せ
            03  WRK-HKNCOMBI            PIC 9(04).
            03  WRK-IN-HKNCOMBI         PIC 9(04).
@@ -126,6 +139,9 @@
       *
            03  WRK-START-DATE          PIC X(10).
            03  WRK-END-DATE            PIC X(10).
+      *    入院日
+           03  WRK-NYUIN-DATE          PIC X(10).
+           03  WRK-NYUIN-YMD           PIC X(08).
       *
       *    半角全角変換
        01  WRK-HENKAN-AREA.
@@ -216,9 +232,19 @@
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
       *
+<<<<<<< ORAPI021S1.CBL
       *    ワーク診療行為マスタ−
        01  WKSRYACT-REC.
            COPY    "CPWKSRYACT.INC".
+=======
+      *    ワーク診療行為マスタ−
+       01  WKSRYACT-REC.
+           COPY    "CPWKSRYACT.INC".
+      *
+      *    入院履歴
+       01  PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC".
+>>>>>>> 1.12
       *
       *　　（ＣＬＡＩＭ接続）
       *    COPY    "CPSK9000.INC".
@@ -646,6 +672,11 @@
            AND    (WRK-ERRCD           =   SPACE  )
                PERFORM 20011-DRCD-CHK-SEC
            END-IF
+      *    入院日付チェック
+           IF     (WRK-NYUIN-DATE  NOT =   SPACE  )
+           AND    (WRK-ERRCD           =   SPACE  )
+               PERFORM 20011-NYUINYMD-CHK-SEC
+           END-IF
       *
            .
        2001-INPUT-CHK-EXT.
@@ -686,6 +717,7 @@
                MOVE    "K1"                TO  WRK-KEICD
            END-IF
       *    診療日をシステム日付へ
+<<<<<<< ORAPI021S1.CBL
            MOVE    WRK-PERFORM-YMD     TO  SPA-SYSYMD
       *    UID
            MOVE    MDCREQ-MEDICAL-UID  TO  MDCRES-MEDICAL-UID
@@ -695,6 +727,29 @@
            ELSE
                MOVE    "2"                 TO  SPA-NYUGAIKBN
            END-IF
+=======
+           MOVE    WRK-PERFORM-YMD     TO  SPA-SYSYMD
+      *    UID
+           MOVE    MDCREQ-MEDICAL-UID  TO  MDCRES-MEDICAL-UID
+      *    入外区分
+           IF      MDCREQ-OUTPATIENT-CLASS =  "I"
+               MOVE    "1"                 TO  SPA-NYUGAIKBN
+           ELSE
+               MOVE    "2"                 TO  SPA-NYUGAIKBN
+           END-IF
+      *    入院日（同日再入院判定）
+           IF      MDCREQ-ADMISSION-DATE   =   SPACE
+               MOVE    SPACE               TO  WRK-NYUIN-DATE
+               MOVE    SPACE               TO  WRK-NYUIN-YMD
+           ELSE
+               MOVE    MDCREQ-ADMISSION-DATE   TO  WRK-HEN-DATE
+               MOVE    SPACE                   TO  WRK-HEN-TIME
+               PERFORM 802-DAYHEN02-SEC
+               MOVE    WRK-SYMD                TO  WRK-NYUIN-YMD
+               MOVE    MDCREQ-ADMISSION-DATE   TO  WRK-NYUIN-DATE
+               MOVE    MDCREQ-ADMISSION-DATE   TO  MDCRES-ADMISSION-DATE
+           END-IF
+>>>>>>> 1.12
       *
       *    必須入力チェック
       *    患者番号
@@ -832,6 +887,77 @@
            .
        20011-DRCD-CHK-EXT.
            EXIT.
+      *****************************************************************
+      *    入院日付チェック
+      *****************************************************************
+       20011-NYUINYMD-CHK-SEC    SECTION.
+      *
+      *    日付チェックサブ
+           MOVE    SPACE               TO  STS-AREA-DAY
+           INITIALIZE                      STS-AREA-DAY
+           MOVE    SPACE               TO  LNK-DAY2-AREA
+           MOVE    "21"                TO  LNK-DAY2-IRAI
+           MOVE    WRK-NYUIN-YMD       TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"           USING
+                                       STS-AREA-DAY
+                                       LNK-DAY2-AREA
+           IF      STS-DAY-RC1     NOT =   ZERO
+               MOVE    "23"                TO  WRK-ERRCD
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-DOUJITU
+           IF     (WRK-ERRCD           =   SPACE )
+              AND (SPA-NYUGAIKBN       =   "1"   )
+      *        入院履歴検索
+               PERFORM 200111-NYUINRRK-HEN-SEC
+               IF      FLG-PTNYUINRRK      =   1
+                   MOVE    "24"                TO  WRK-ERRCD
+               END-IF
+      *        同日再入院区分
+               IF     (PTNYUINRRK-NYUINYMD     =   WRK-PERFORM-YMD ) AND
+                      (PTNYUINRRK-DOUJITSUKBN  =   "1"             )
+                   MOVE    1                   TO  FLG-DOUJITU
+               END-IF
+           END-IF
+           .
+       20011-NYUINYMD-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院履歴検索処理
+      *****************************************************************
+       200111-NYUINRRK-HEN-SEC        SECTION.
+      *
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+           MOVE    WRK-NYUIN-YMD       TO  PTNYUINRRK-NYUINYMD
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key39"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key39"             TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+                   MOVE    ZERO            TO  FLG-PTNYUINRRK
+               ELSE
+                   INITIALIZE                  PTNYUINRRK-REC
+                   MOVE    1               TO  FLG-PTNYUINRRK
+               END-IF
+           ELSE
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    1                   TO  FLG-PTNYUINRRK
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key39"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       200111-NYUINRRK-HEN-EXT.
+           EXIT.
       *
       *****************************************************************
       *    中途終了データ登録処理
@@ -914,6 +1040,11 @@
            MOVE    WRK-PTNUM           TO  LF04-PTID1
            MOVE    WRK-SRYKA           TO  LF04-CRE001-DPERTID
            MOVE    WRK-DRCD            TO  LF04-DOCCD
+      *
+      *    同日再入院区分
+           IF      FLG-DOUJITU         =   1
+               MOVE    "1"                 TO  LF04-DOUJITSUKBN
+           END-IF
       *    保険情報
            MOVE    MDCREQ-MAIN-INSURANCE-CLASS
                                        TO  LF04-HKN-HKNSBTCODE (01)
@@ -1575,6 +1706,7 @@
            WHEN    "22"
                MOVE    "登録対象のデータがありません"
                                                TO  WRK-ERRMSG
+<<<<<<< ORAPI021S1.CBL
       *
            WHEN    "30"
                MOVE    "削除対象の中途終了データがありません"
@@ -1597,6 +1729,36 @@
            WHEN    "34"
                MOVE    "中途終了データ削除エラー"
                                                TO  WRK-ERRMSG
+=======
+           WHEN    "23"
+               MOVE    "入院日付が暦日エラーです。"
+                                               TO  WRK-ERRMSG
+           WHEN    "24"
+               MOVE    "入院日付が入院日ではありません。"
+                                               TO  WRK-ERRMSG
+      *
+           WHEN    "30"
+               MOVE    "削除対象の中途終了データがありません"
+                                               TO  WRK-ERRMSG
+           WHEN    "31"
+               STRING  "削除対象の中途終了データがありません。"
+                       "内容が更新されている可能性があります。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "32"
+               MOVE    "置換対象の中途終了データがありません。"
+                                               TO  WRK-ERRMSG
+           WHEN    "33"
+               STRING  "置換対象の中途終了データがありません。"
+                       "内容が更新されている可能性があります。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    WRK-ERRMSG
+               END-STRING
+           WHEN    "34"
+               MOVE    "中途終了データ削除エラー"
+                                               TO  WRK-ERRMSG
+>>>>>>> 1.12
       *警告
            WHEN    "K1"
                MOVE    "診療日を設定しました"

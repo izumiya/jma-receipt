@@ -129,14 +129,12 @@
            03  IDXZ                                PIC 9(04).
            03  IDX-LEN                             PIC 9(05).
            03  IDX-CMB                             PIC 9(05).
-           03  IDX-KOHNAME                         PIC 9(05).
       *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-ADRS                            PIC 9(04).
            03  CNT-PNT                             PIC 9(04).
            03  CNT-STR                             PIC 9(04).
-           03  CNT-KOHNAME                         PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -212,8 +210,6 @@
                05  WRK-RECECOM          PIC X(50)
                                         OCCURS     5.
            03  WRK-STSRYYMD             PIC X(08).
-           03  WRK-KOHNAME              PIC X(80).
-           03  WRK-FTNJANUM             PIC X(08).
            03  WRK-ORCSSTR-NUM1         PIC 9(03).
            03  WRK-TOKKICD.
                05  WRK-TOKKICD9         PIC 9(02).
@@ -223,6 +219,13 @@
                05  WRK-SRYSURYO9        PIC 99999V99999.
            03  WRK-WIDGET-STATUS        PIC S9(9)  BINARY.
            03  WRK-LEN-MAX              PIC 9(05).
+           03  WRK-GMN-SRYCD            PIC X(20).
+           03  WRK-NAI-SRYCD-G.
+               05  WRK-NAI-SRYCD        PIC X(09)
+                                        OCCURS     5.
+           03  WRK-NAI-XSRYCD-G.
+               05  WRK-NAI-XSRYCD       PIC X(09)
+                                        OCCURS     5.
       *
        01  SEL-AREA.
            03  SEL-SRYCD                PIC X(09).
@@ -635,8 +638,13 @@
            IF    ( SPA-Q01-Q96-SRYCD   NOT =   SPACE )
                MOVE    SPA-Q01-Q96-MOTOIDX
                                        TO  IDXZ
-               MOVE    SPA-Q01-Q96-SRYCD
+               IF    ( SPA-GMN-Q01-SRYCD (IDXZ)(1:1)   =   "-" )
+                   MOVE    SPA-Q01-Q96-SRYCD
+                                       TO  SPA-GMN-Q01-SRYCD (IDXZ)(2:)
+               ELSE
+                   MOVE    SPA-Q01-Q96-SRYCD
                                        TO  SPA-GMN-Q01-SRYCD (IDXZ)
+               END-IF
                MOVE    IDXZ            TO  IDXA
                PERFORM 4121-SRYCD-CHK-SEC
                IF    ( SPA-Q01-Q96-MOTOIDX =   5 )
@@ -843,6 +851,19 @@
       *    診療行為　項目区分（回数・数量・合計）
            PERFORM 3101-SRYVALITEM-CMB-SYOKI-SEC
       *
+      *    AND/OR/NOT条件コンボ初期処理
+           PERFORM 3101-JKN-CMB-SYOKI-SEC
+           MOVE    SPA-GMN-Q01-JKNHKNJANUMLST (1)
+                                       TO  SPA-GMN-Q01-JKNHKNJANUM-G
+           MOVE    SPA-GMN-Q01-JKNHKNNUMLST (1)
+                                       TO  SPA-GMN-Q01-JKNHKNNUM-G
+           MOVE    SPA-GMN-Q01-JKNKOHNUMLST (2)
+                                       TO  SPA-GMN-Q01-JKNKOHNUM-G
+           MOVE    SPA-GMN-Q01-JKNBYOMEILST (2)
+                                       TO  SPA-GMN-Q01-JKNBYOMEI-G
+           MOVE    SPA-GMN-Q01-JKNSRYACTLST (2)
+                                       TO  SPA-GMN-Q01-JKNSRYACT-G
+      *
       *    診療行為　比較区分（回数・数量・合計）
            PERFORM 3101-SRYVALCOMP-CMB-SYOKI-SEC
       *
@@ -883,12 +904,6 @@
       *    検索条件AND/OR切り替えラジオボタン初期化
            MOVE    "T"                 TO  SPA-GMN-Q01-RDHKNKOH-AND
            MOVE    "F"                 TO  SPA-GMN-Q01-RDHKNKOH-OR
-           MOVE    "F"                 TO  SPA-GMN-Q01-RDKOHNUM-AND
-           MOVE    "T"                 TO  SPA-GMN-Q01-RDKOHNUM-OR
-           MOVE    "F"                 TO  SPA-GMN-Q01-RDBYOMEI-AND
-           MOVE    "T"                 TO  SPA-GMN-Q01-RDBYOMEI-OR
-           MOVE    "F"                 TO  SPA-GMN-Q01-RDSRYACT-AND
-           MOVE    "T"                 TO  SPA-GMN-Q01-RDSRYACT-OR
       *
       *    カーソルキー制御項目
            MOVE   3                    TO  SPA-GMN-Q01-CUR
@@ -1871,6 +1886,48 @@
        3101-SRYVALITEM-CMB-SYOKI-EXT.
            EXIT.
       *****************************************************************
+      *    AND/OR/NOTコンボ初期処理
+      *****************************************************************
+       3101-JKN-CMB-SYOKI-SEC          SECTION.
+      *
+           MOVE    2               TO  SPA-GMN-Q01-JKNHKNJANUMLST-MAX
+           MOVE    "2"             TO  SPA-GMN-Q01-JKNHKNJANUML    (1)
+           MOVE    "OR"            TO  SPA-GMN-Q01-JKNHKNJANUMMEIL (1)
+           MOVE    "9"             TO  SPA-GMN-Q01-JKNHKNJANUML    (2)
+           MOVE    "NOT"           TO  SPA-GMN-Q01-JKNHKNJANUMMEIL (2)
+      *
+           MOVE    2               TO  SPA-GMN-Q01-JKNHKNNUMLST-MAX
+           MOVE    "2"             TO  SPA-GMN-Q01-JKNHKNNUML    (1)
+           MOVE    "OR"            TO  SPA-GMN-Q01-JKNHKNNUMMEIL (1)
+           MOVE    "9"             TO  SPA-GMN-Q01-JKNHKNNUML    (2)
+           MOVE    "NOT"           TO  SPA-GMN-Q01-JKNHKNNUMMEIL (2)
+      *
+           MOVE    3               TO  SPA-GMN-Q01-JKNKOHNUMLST-MAX
+           MOVE    "1"             TO  SPA-GMN-Q01-JKNKOHNUML    (1)
+           MOVE    "AND"           TO  SPA-GMN-Q01-JKNKOHNUMMEIL (1)
+           MOVE    "2"             TO  SPA-GMN-Q01-JKNKOHNUML    (2)
+           MOVE    "OR"            TO  SPA-GMN-Q01-JKNKOHNUMMEIL (2)
+           MOVE    "9"             TO  SPA-GMN-Q01-JKNKOHNUML    (3)
+           MOVE    "NOT"           TO  SPA-GMN-Q01-JKNKOHNUMMEIL (3)
+      *
+           MOVE    3               TO  SPA-GMN-Q01-JKNBYOMEILST-MAX
+           MOVE    "1"             TO  SPA-GMN-Q01-JKNBYOMEIL    (1)
+           MOVE    "AND"           TO  SPA-GMN-Q01-JKNBYOMEIMEIL (1)
+           MOVE    "2"             TO  SPA-GMN-Q01-JKNBYOMEIL    (2)
+           MOVE    "OR"            TO  SPA-GMN-Q01-JKNBYOMEIMEIL (2)
+           MOVE    "9"             TO  SPA-GMN-Q01-JKNBYOMEIL    (3)
+           MOVE    "NOT"           TO  SPA-GMN-Q01-JKNBYOMEIMEIL (3)
+      *
+           MOVE    2               TO  SPA-GMN-Q01-JKNSRYACTLST-MAX
+           MOVE    "1"             TO  SPA-GMN-Q01-JKNSRYACTL    (1)
+           MOVE    "AND"           TO  SPA-GMN-Q01-JKNSRYACTMEIL (1)
+           MOVE    "2"             TO  SPA-GMN-Q01-JKNSRYACTL    (2)
+           MOVE    "OR"            TO  SPA-GMN-Q01-JKNSRYACTMEIL (2)
+      *
+           .
+       3101-JKN-CMB-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
       *    診療行為　比較区分コンボ初期処理
       *****************************************************************
        3101-SRYVALCOMP-CMB-SYOKI-SEC    SECTION.
@@ -2107,30 +2164,12 @@
                MOVE    MCP-WIDGET   TO  WRK-WIDGET
       *
                PERFORM 440-TAB-CHANGE-SEC
-           WHEN    "CLICKED"       ALSO    "RDKOHNUM_AND"
-           WHEN    "CLICKED"       ALSO    "RDKOHNUM_OR"
-      *        画面をＳＰＡにセット
-               PERFORM 4101-GMN-SPA-SET-SEC
-               MOVE    Q01-RDKOHNUM-AND    TO  SPA-GMN-Q01-RDKOHNUM-AND
-               MOVE    Q01-RDKOHNUM-OR     TO  SPA-GMN-Q01-RDKOHNUM-OR
            WHEN    "CLICKED"       ALSO    "RDHKNKOH_AND"
            WHEN    "CLICKED"       ALSO    "RDHKNKOH_OR"
       *        画面をＳＰＡにセット
                PERFORM 4101-GMN-SPA-SET-SEC
                MOVE    Q01-RDHKNKOH-AND    TO  SPA-GMN-Q01-RDHKNKOH-AND
                MOVE    Q01-RDHKNKOH-OR     TO  SPA-GMN-Q01-RDHKNKOH-OR
-           WHEN    "CLICKED"       ALSO    "RDBYOMEI_AND"
-           WHEN    "CLICKED"       ALSO    "RDBYOMEI_OR"
-      *        画面をＳＰＡにセット
-               PERFORM 4101-GMN-SPA-SET-SEC
-               MOVE    Q01-RDBYOMEI-AND    TO  SPA-GMN-Q01-RDBYOMEI-AND
-               MOVE    Q01-RDBYOMEI-OR     TO  SPA-GMN-Q01-RDBYOMEI-OR
-           WHEN    "CLICKED"       ALSO    "RDSRYACT_AND"
-           WHEN    "CLICKED"       ALSO    "RDSRYACT_OR"
-      *        画面をＳＰＡにセット
-               PERFORM 4101-GMN-SPA-SET-SEC
-               MOVE    Q01-RDSRYACT-AND    TO  SPA-GMN-Q01-RDSRYACT-AND
-               MOVE    Q01-RDSRYACT-OR     TO  SPA-GMN-Q01-RDSRYACT-OR
            WHEN    "CLICKED"       ALSO    "BTBYOBUBUN"
                PERFORM 4101-BTBYOBUBUN-CHK-SEC
            WHEN    "CLICKED"       ALSO    "BTBYOKOHO"
@@ -2390,6 +2429,15 @@
       *
            END-PERFORM
       *
+      *    保険者番号AND/OR/NOT条件
+           MOVE    Q01-JKNHKNJANUM     TO  SPA-GMN-Q01-JKNHKNJANUM-G
+      *
+      *    保険の種類AND/OR/NOT条件
+           MOVE    Q01-JKNHKNNUM       TO  SPA-GMN-Q01-JKNHKNNUM-G
+      *
+      *    公費の種類AND/OR/NOT条件
+           MOVE    Q01-JKNKOHNUM       TO  SPA-GMN-Q01-JKNKOHNUM-G
+      *
       *    疑い病名区分
            MOVE    Q01-UTAGAIKBN       TO  SPA-GMN-Q01-UTAGAIKBN-G
       *
@@ -2444,6 +2492,12 @@
                MOVE    Q01-RECECOM(IDXB)
                                        TO  SPA-GMN-Q01-RECECOM(IDXB)
            END-PERFORM
+      *
+      *    病名AND/OR条件
+           MOVE    Q01-JKNBYOMEI       TO  SPA-GMN-Q01-JKNBYOMEI-G
+      *
+      *    診療行為AND/OR条件
+           MOVE    Q01-JKNSRYACT       TO  SPA-GMN-Q01-JKNSRYACT-G
       *
            PERFORM VARYING IDXB    FROM    1   BY  1
                    UNTIL   IDXB    >       3
@@ -2731,63 +2785,65 @@
        4101-HKN-INPUT-CHK-SEC          SECTION.
       *
       *    本人家族チェック
-           PERFORM 4114-HONKZKKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4101-HKN-INPUT-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4114-HONKZKKBN-CHK-SEC
+           END-IF
+      *
+      *    保険者番号AND/OR/NOTチェック
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4114-JKNHKNJANUM-CHK-SEC
            END-IF
       *
       *    保険者番号チェック
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
+                    OR   ( SPA-ERRCD   NOT =   SPACE )
                PERFORM 4114-HKNJANUM-CHK-SEC
-               IF    ( SPA-ERRCD   NOT =   SPACE )
-                   GO  TO  4101-HKN-INPUT-CHK-EXT
-               END-IF
            END-PERFORM
+      *
+      *    保険の種類AND/OR/NOTチェック
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4114-JKNHKNNUM-CHK-SEC
+           END-IF
       *
       *    保険の種類チェック
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
+                    OR   ( SPA-ERRCD   NOT =   SPACE )
                PERFORM 4114-HKNNUM-CHK-SEC
-               IF    ( SPA-ERRCD   NOT =   SPACE )
-                   GO  TO  4101-HKN-INPUT-CHK-EXT
-               END-IF
            END-PERFORM
       *
       *    記号チェック
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
+                    OR   ( SPA-ERRCD   NOT =   SPACE )
                PERFORM 4114-KIGO-CHK-SEC
-               IF    ( SPA-ERRCD   NOT =   SPACE )
-                   GO  TO  4101-HKN-INPUT-CHK-EXT
-               END-IF
            END-PERFORM
       *
       *    番号チェック
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
+                    OR   ( SPA-ERRCD   NOT =   SPACE )
                PERFORM 4115-NUM-CHK-SEC
-               IF    ( SPA-ERRCD   NOT =   SPACE )
-                   GO  TO  4101-HKN-INPUT-CHK-EXT
-               END-IF
            END-PERFORM
+      *
+      *    公費の種類AND/OR/NOTチェック
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4114-JKNKOHNUM-CHK-SEC
+           END-IF
       *
       *    公費の種類チェック
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
+                    OR   ( SPA-ERRCD   NOT =   SPACE )
                PERFORM 4116-KOHNUM-CHK-SEC  
-               IF    ( SPA-ERRCD   NOT =   SPACE )
-                   GO  TO  4101-HKN-INPUT-CHK-EXT
-               END-IF
            END-PERFORM
       *
       *    負担者番号チェック処理
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
+                    OR   ( SPA-ERRCD   NOT =   SPACE )
                PERFORM 4117-FTNJANUM-CHK-SEC
-               IF    ( SPA-ERRCD   NOT =   SPACE )
-                   GO  TO  4101-HKN-INPUT-CHK-EXT
-               END-IF
            END-PERFORM
       *
            .
@@ -2828,6 +2884,11 @@
                PERFORM 4119-SYUBYOKBN-CHK-SEC
            END-IF
       *
+           IF    ( SPA-ERRCD       =   SPACE )
+      *        病名AND/ORチェック
+               PERFORM 4114-JKNBYOMEI-CHK-SEC
+           END-IF
+      *
       *    病名コードチェック処理
            PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
@@ -2863,6 +2924,11 @@
       *    診療行為比較項目区分チェック処理
            IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 4121-SRYVALITEM-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+      *        診療行為AND/ORチェック
+               PERFORM 4114-JKNSRYACT-CHK-SEC
            END-IF
       *
       *    診療行為コードチェック処理
@@ -4523,6 +4589,101 @@
            EXIT.
       *
       *****************************************************************
+      *    保険者番号AND/OR/NOTチェック
+      *****************************************************************
+       4114-JKNHKNJANUM-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-Q01-JKNHKNJANUM
+                                   TO  WRK-CMB-CD
+           PERFORM 4200-JKNHKNJANUMLST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    "2"         TO  WRK-CMB-CD
+               PERFORM 4200-JKNHKNJANUMLST-CHK-SEC
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNHKNJANUM-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNHKNJANUM-G
+           END-IF
+      *
+           .
+       4114-JKNHKNJANUM-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険の種類AND/OR/NOTチェック
+      *****************************************************************
+       4114-JKNHKNNUM-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-Q01-JKNHKNNUM
+                                   TO  WRK-CMB-CD
+           PERFORM 4200-JKNHKNNUMLST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    "2"         TO  WRK-CMB-CD
+               PERFORM 4200-JKNHKNNUMLST-CHK-SEC
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNHKNNUM-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNHKNNUM-G
+           END-IF
+      *
+           .
+       4114-JKNHKNNUM-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    公費の種類AND/OR/NOTチェック
+      *****************************************************************
+       4114-JKNKOHNUM-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-Q01-JKNKOHNUM
+                                   TO  WRK-CMB-CD
+           PERFORM 4200-JKNKOHNUMLST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    "2"         TO  WRK-CMB-CD
+               PERFORM 4200-JKNKOHNUMLST-CHK-SEC
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNKOHNUM-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNKOHNUM-G
+           END-IF
+      *
+           .
+       4114-JKNKOHNUM-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    病名AND/ORチェック
+      *****************************************************************
+       4114-JKNBYOMEI-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-Q01-JKNBYOMEI
+                                   TO  WRK-CMB-CD
+           PERFORM 4200-JKNBYOMEILST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    "2"         TO  WRK-CMB-CD
+               PERFORM 4200-JKNBYOMEILST-CHK-SEC
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNBYOMEI-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNBYOMEI-G
+           END-IF
+      *
+           .
+       4114-JKNBYOMEI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為AND/ORチェック
+      *****************************************************************
+       4114-JKNSRYACT-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-Q01-JKNSRYACT
+                                   TO  WRK-CMB-CD
+           PERFORM 4200-JKNSRYACTLST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    "2"         TO  WRK-CMB-CD
+               PERFORM 4200-JKNSRYACTLST-CHK-SEC
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNSRYACT-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-JKNSRYACT-G
+           END-IF
+      *
+           .
+       4114-JKNSRYACT-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    患者照会検索条件チェック処理
       *****************************************************************
        4100-SELPATTERN-CHK-SEC         SECTION.
@@ -5517,6 +5678,17 @@
            MOVE    WRK-KANACHK-OUT-INPUT
                                    TO  SPA-GMN-Q01-SRYCD (IDX1)
       *
+           IF    ( SPA-GMN-Q01-SRYCD (IDX1)(1:1)   = "-" )
+               MOVE    SPA-GMN-Q01-SRYCD (IDX1)(2:)
+                                   TO  WRK-GMN-SRYCD
+               MOVE    SPACE       TO  SPA-GMN-Q01-SRYVAL (IDX1)
+               MOVE    ZERO        TO  SPA-NAI-Q01-SRYVAL (IDX1)
+               MOVE    SPACE       TO  SPA-GMN-Q01-SRYVALCOMP-G (IDX1)
+           ELSE
+               MOVE    SPA-GMN-Q01-SRYCD (IDX1)
+                                   TO  WRK-GMN-SRYCD
+           END-IF
+      *
            COMPUTE WRK-ERR-CUR         =   313
                                        +   IDX1
       *
@@ -5528,7 +5700,7 @@
            MOVE    SPACE               TO  SPA-GMN-Q01-SRYACT (IDX1)
       *
       *    診療行為検索画面へ遷移
-           IF  ( SPA-GMN-Q01-SRYCD (IDX1) (1:1)   =   "/" )
+           IF  ( WRK-GMN-SRYCD (1:1)   =   "/" )
                MOVE    IDX1            TO  IDXZ
                MOVE    ZERO            TO  FLG-KANJI
                INITIALIZE              WRK-INPUTCD
@@ -5538,7 +5710,7 @@
            END-IF
       *
       *    セットコードでの入力はエラーとする。
-           IF  ( SPA-GMN-Q01-SRYCD (IDX1) (1:1)   =   "P"  OR  "S" )
+           IF  ( WRK-GMN-SRYCD (1:1)   =   "P"  OR  "S" )
                MOVE    WRK-ERR-CUR     TO  SPA-GMN-Q01-CUR
                MOVE    "0007"          TO  SPA-ERRCD
                GO  TO  4121-SRYCD-CHK-EXT
@@ -5647,8 +5819,7 @@
            MOVE    ZERO                TO  FLG-KANJI
            MOVE    ZERO                TO  WRK-MOJI
       *
-           MOVE    SPA-GMN-Q01-SRYCD (IDX1)
-                                       TO  WRK-SRYCD
+           MOVE    WRK-GMN-SRYCD       TO  WRK-SRYCD
       *
            PERFORM VARYING IDX2    FROM    1   BY  1
                    UNTIL  (IDX2    >   20  )   OR
@@ -6190,6 +6361,111 @@
       *
            .
        4200-BYOCOMPLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険者番号AND/OR/NOTコンボボックスチェック処理
+      *****************************************************************
+       4200-JKNHKNJANUMLST-CHK-SEC       SECTION.
+      *
+           INITIALIZE                    WRK-CMB-ITM-G.
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-Q01-JKNHKNJANUMLST-MAX)
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( WRK-CMB-CD  =   SPA-GMN-Q01-JKNHKNJANUML
+                                                         (IDX-CMB))
+                   MOVE    SPA-GMN-Q01-JKNHKNJANUMLST  (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+           END-PERFORM
+      *
+           .
+       4200-JKNHKNJANUMLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険の種類AND/OR/NOTコンボボックスチェック処理
+      *****************************************************************
+       4200-JKNHKNNUMLST-CHK-SEC       SECTION.
+      *
+           INITIALIZE                    WRK-CMB-ITM-G.
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-Q01-JKNHKNNUMLST-MAX)
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( WRK-CMB-CD  =   SPA-GMN-Q01-JKNHKNNUML
+                                                         (IDX-CMB))
+                   MOVE    SPA-GMN-Q01-JKNHKNNUMLST  (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+           END-PERFORM
+      *
+           .
+       4200-JKNHKNNUMLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    公費の種類AND/OR/NOTコンボボックスチェック処理
+      *****************************************************************
+       4200-JKNKOHNUMLST-CHK-SEC       SECTION.
+      *
+           INITIALIZE                    WRK-CMB-ITM-G.
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-Q01-JKNKOHNUMLST-MAX)
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( WRK-CMB-CD  =   SPA-GMN-Q01-JKNKOHNUML
+                                                         (IDX-CMB))
+                   MOVE    SPA-GMN-Q01-JKNKOHNUMLST  (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+           END-PERFORM
+      *
+           .
+       4200-JKNKOHNUMLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    病名AND/ORTコンボボックスチェック処理
+      *****************************************************************
+       4200-JKNBYOMEILST-CHK-SEC       SECTION.
+      *
+           INITIALIZE                    WRK-CMB-ITM-G.
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-Q01-JKNBYOMEILST-MAX)
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( WRK-CMB-CD  =   SPA-GMN-Q01-JKNBYOMEIL
+                                                         (IDX-CMB))
+                   MOVE    SPA-GMN-Q01-JKNBYOMEILST  (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+           END-PERFORM
+      *
+           .
+       4200-JKNBYOMEILST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為AND/ORTコンボボックスチェック処理
+      *****************************************************************
+       4200-JKNSRYACTLST-CHK-SEC       SECTION.
+      *
+           INITIALIZE                    WRK-CMB-ITM-G.
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-Q01-JKNSRYACTLST-MAX)
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( WRK-CMB-CD  =   SPA-GMN-Q01-JKNSRYACTL
+                                                         (IDX-CMB))
+                   MOVE    SPA-GMN-Q01-JKNSRYACTLST  (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+           END-PERFORM
+      *
+           .
+       4200-JKNSRYACTLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    テスト患者チェックボタン編集処理
@@ -6901,10 +7177,14 @@
                                        SPA-NAI-Q01-HOKEN-AREA
       *
       *        検索条件AND/OR切り替えラジオボタン初期化
+               MOVE    SPA-GMN-Q01-JKNHKNJANUMLST (1)
+                                       TO  SPA-GMN-Q01-JKNHKNJANUM-G
+               MOVE    SPA-GMN-Q01-JKNHKNNUMLST (1)
+                                       TO  SPA-GMN-Q01-JKNHKNNUM-G
+               MOVE    SPA-GMN-Q01-JKNKOHNUMLST (2)
+                                       TO  SPA-GMN-Q01-JKNKOHNUM-G
                MOVE    "T"         TO  SPA-GMN-Q01-RDHKNKOH-AND
                MOVE    "F"         TO  SPA-GMN-Q01-RDHKNKOH-OR
-               MOVE    "F"         TO  SPA-GMN-Q01-RDKOHNUM-AND
-               MOVE    "T"         TO  SPA-GMN-Q01-RDKOHNUM-OR
       *
       *    病名　診療行為
            WHEN    2
@@ -6947,10 +7227,10 @@
                END-IF
       *
       *        検索条件AND/OR切り替えラジオボタン初期化
-               MOVE    "F"             TO  SPA-GMN-Q01-RDBYOMEI-AND
-               MOVE    "T"             TO  SPA-GMN-Q01-RDBYOMEI-OR
-               MOVE    "F"             TO  SPA-GMN-Q01-RDSRYACT-AND
-               MOVE    "T"             TO  SPA-GMN-Q01-RDSRYACT-OR
+               MOVE    SPA-GMN-Q01-JKNBYOMEILST (2)
+                                       TO  SPA-GMN-Q01-JKNBYOMEI-G
+               MOVE    SPA-GMN-Q01-JKNSRYACTLST (2)
+                                       TO  SPA-GMN-Q01-JKNSRYACT-G
       *
       *    並び順
            WHEN    3
@@ -7249,16 +7529,63 @@
            END-IF
       *
            IF    ( SPA-ERRCD   =   SPACE )
-               IF    ( SPA-GMN-Q01-SRYVALITEM  NOT =   SPACE )
-                   IF   ( SPA-NAI-Q01-STSRYYMD
+             IF   (  SPA-GMN-Q01-JKNHKNJANUM =   "9" )
+               OR (  SPA-GMN-Q01-JKNHKNNUM   =   "9" )
+               OR (  SPA-GMN-Q01-JKNKOHNUM   =   "9" )
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL ( IDX1    >   5 )
+                        OR   ( SPA-ERRCD   NOT =   SPACE )
+      *
+                   IF   (( SPA-GMN-Q01-JKNHKNJANUM        =   "9" )
+                      AND( SPA-GMN-Q01-HKNJANUM(IDX1) NOT =   SPACE ))
+                    OR  (( SPA-GMN-Q01-JKNHKNNUM          =   "9" )
+                      AND( SPA-GMN-Q01-HKNNUM  (IDX1) NOT =   SPACE ))
+                    OR  (( SPA-GMN-Q01-JKNKOHNUM          =   "9" )
+                      AND( SPA-GMN-Q01-KOHNUM  (IDX1) NOT =   SPACE ))
+                       IF   ( SPA-NAI-Q01-STSRYYMD
                                NOT =   SPACE )
-                     AND ( SPA-NAI-Q01-STSRYYMD(1:6)
+                         AND ( SPA-NAI-Q01-STSRYYMD(1:6)
                                    =   SPA-NAI-Q01-EDSRYYMD(1:6))
-                       CONTINUE
-                   ELSE
+                           CONTINUE
+                       ELSE
+                           MOVE    "1020"  TO  SPA-ERRCD
+                           MOVE    1       TO  SPA-GMN-Q01-CUR
+                       END-IF
+                   END-IF
+               END-PERFORM
+             END-IF
+           END-IF
+      *
+           MOVE    SPACE               TO  WRK-NAI-XSRYCD-G
+           PERFORM VARYING IDXB    FROM    WRK-STIDX   BY  1
+                   UNTIL ( IDXB    >   5 )
+      *
+               IF    ( SPA-GMN-Q01-SRYCD(IDXB)(1:1) = "-" )
+                   MOVE    SPA-NAI-Q01-SRYCD (IDXB)
+                                   TO   WRK-NAI-XSRYCD (IDXB)
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( SPA-ERRCD   =   SPACE )
+               IF   ( SPA-NAI-Q01-STSRYYMD
+                               NOT =   SPACE )
+                 AND ( SPA-NAI-Q01-STSRYYMD(1:6)
+                                   =   SPA-NAI-Q01-EDSRYYMD(1:6))
+                   CONTINUE
+               ELSE
+                   EVALUATE    TRUE
+                   WHEN  ( SPA-GMN-Q01-SRYVALITEM  NOT =   SPACE )
                        MOVE    "1018"      TO  SPA-ERRCD
                        MOVE    1           TO  SPA-GMN-Q01-CUR
-                   END-IF
+                   WHEN  ( SPA-GMN-Q01-JKNBYOMEI       =   "9" )
+                    AND  ( SPA-GMN-Q01-BYOMEINMTBL NOT =   SPACE )
+                       MOVE    "1020"      TO  SPA-ERRCD
+                       MOVE    1           TO  SPA-GMN-Q01-CUR
+                   WHEN  ( WRK-NAI-XSRYCD-G        NOT =   SPACE )
+                       MOVE    "1020"      TO  SPA-ERRCD
+                       MOVE    1           TO  SPA-GMN-Q01-CUR
+                   END-EVALUATE
                END-IF
            END-IF
       *
@@ -7679,18 +8006,17 @@
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-SAIGAIKBN
       *
-      *
       *    保険　公費
-           IF    ( SPA-GMN-Q01-RDKOHNUM-AND    =   "T" )
-               MOVE    "1"                 TO  SPA-Q01-KOHNUM-JKN
-           ELSE
-               MOVE    SPACE               TO  SPA-Q01-KOHNUM-JKN
-           END-IF
+           MOVE    SPA-GMN-Q01-JKNHKNJANUM TO  SPA-Q01-HKNJANUM-JKN
+      *
+           MOVE    SPA-GMN-Q01-JKNHKNNUM   TO  SPA-Q01-HKNNUM-JKN
+      *
+           MOVE    SPA-GMN-Q01-JKNKOHNUM   TO  SPA-Q01-KOHNUM-JKN
       *
            IF    ( SPA-GMN-Q01-RDHKNKOH-AND    =   "T" )
                MOVE    "1"                 TO  SPA-Q01-HKNKOH-JKN
            ELSE
-               MOVE    SPACE               TO  SPA-Q01-HKNKOH-JKN
+               MOVE    "2"                 TO  SPA-Q01-HKNKOH-JKN
            END-IF
       *
            MOVE    SPA-GMN-Q01-HONKZKKBN   TO  PTSRH-DBSTR
@@ -7768,11 +8094,8 @@
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-SYUBYOKBN
       *
-           IF    ( SPA-GMN-Q01-RDBYOMEI-AND    =   "T" )
-               MOVE    "1"                 TO  SPA-Q01-BYOMEI-JKN
-           ELSE
-               MOVE    SPACE               TO  SPA-Q01-BYOMEI-JKN
-           END-IF
+           MOVE    SPA-GMN-Q01-JKNBYOMEI
+                                     TO  SPA-Q01-BYOMEI-JKN
       *
            MOVE    SPA-GMN-Q01-SRYKBN      TO  PTSRH-DBSTR
            PERFORM 900-PTSRH-DBESCAPE-SEC
@@ -7787,11 +8110,8 @@
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-SRYVALITEM
       *
-           IF    ( SPA-GMN-Q01-RDSRYACT-AND    =   "T" )
-               MOVE    "1"                 TO  SPA-Q01-SRYACT-JKN
-           ELSE
-               MOVE    SPACE               TO  SPA-Q01-SRYACT-JKN
-           END-IF
+           MOVE    SPA-GMN-Q01-JKNSRYACT
+                                     TO  SPA-Q01-SRYACT-JKN
       *
            PERFORM VARYING IDXC    FROM    1   BY  1
                    UNTIL ( IDXC    >   5 )
@@ -7812,7 +8132,12 @@
                MOVE    SPA-NAI-Q01-SRYCD (IDXC)
                                            TO  PTSRH-DBSTR
                PERFORM 900-PTSRH-DBESCAPE-SEC
-               MOVE    PTSRH-DBSTR   TO  SPA-Q01-SRYCD (IDXC)
+               IF    ( SPA-GMN-Q01-SRYCD (IDXC)(1:1)   =   "-" )
+                   MOVE    PTSRH-DBSTR     TO  SPA-Q01-XSRYCD (IDXC)
+                   MOVE    "1"             TO  SPA-Q01-XSELECT
+               ELSE
+                   MOVE    PTSRH-DBSTR     TO  SPA-Q01-SRYCD (IDXC)
+               END-IF
       *
                IF    ( SPA-NAI-Q01-SRYCD (IDXC)      NOT =   SPACE )
                 AND  ( SPA-GMN-Q01-SRYVAL(IDXC)      NOT =   SPACE )
@@ -8078,6 +8403,14 @@
                        END-IF
                    END-IF
       *
+      *            診療行為コード
+                   IF    ( SPA-Q01-XSRYCD (IDX6)   NOT =   SPACE )
+                       IF    ( SPA-Q01-XSRYCD (IDX6)
+                                       =   SPA-Q01-XSRYCD (IDX7))
+                           MOVE    SPACE   TO  SPA-Q01-XSRYCD (IDX7)
+                       END-IF
+                   END-IF
+      *
                END-PERFORM
       *
            END-PERFORM
@@ -8161,34 +8494,39 @@
       *    該当（１）
            IF  ( SPA-Q01-STPTNUM           NOT =   SPACE )
             OR ( SPA-Q01-EDPTNUM           NOT =   SPACE )
-               MOVE    "1"                 TO  SPA-Q01-GTBL(1)
+               MOVE    "1"                 TO  SPA-Q01-GPTNUM
       *
            END-IF
       *
       *    該当（２）
            IF  ( SPA-Q01-NAME-G            NOT =   SPACE )
       *
-               MOVE    "1"                 TO  SPA-Q01-GTBL(2)
+               MOVE    "1"                 TO  SPA-Q01-GNAME
       *
            END-IF
       *
       *    該当（３）
            IF  ( SPA-Q01-STLASTYMD         NOT =   SPACE )
             OR ( SPA-Q01-EDLASTYMD         NOT =   SPACE )
-               MOVE    "1"                 TO  SPA-Q01-GTBL(3)
+               MOVE    "1"                 TO  SPA-Q01-GLASTYMD
            END-IF
       *
       *    該当（４）
-           IF  ( SPA-Q01-BYOMEI-G          NOT =   SPACE )
-            OR ( SPA-Q01-UTAGAIKBN         NOT =   SPACE )
+           IF  ( SPA-Q01-UTAGAIKBN         NOT =   SPACE )
             OR ( SPA-Q01-KYUSEIKBN         NOT =   SPACE )
             OR ( SPA-Q01-TENKIKBN          NOT =   SPACE )
             OR ( SPA-Q01-SYUBYOKBN         NOT =   SPACE )
       *
-               MOVE    "1"                 TO  SPA-Q01-GTBL(4)
+               MOVE    "1"                 TO  SPA-Q01-GBYOMEI
       *
            END-IF
-      *
+           IF  ( SPA-Q01-BYOMEI-G          NOT =   SPACE )
+               IF    ( SPA-Q01-BYOMEI-JKN  NOT =   "9" )
+                   MOVE    "1"     TO  SPA-Q01-GBYOMEI
+               ELSE
+                   MOVE    "1"     TO  SPA-Q01-GXBYOMEI
+               END-IF
+           END-IF
       *
       *    該当（５）
            IF  ( SPA-Q01-HONKZKKBN         NOT =   SPACE )
@@ -8197,7 +8535,7 @@
             OR ( SPA-Q01-KIGO-G            NOT =   SPACE )
             OR ( SPA-Q01-NUM-G             NOT =   SPACE )
       *
-              MOVE     "1"                 TO  SPA-Q01-GTBL(5)
+              MOVE     "1"                 TO  SPA-Q01-GHKNINF
       *
            END-IF
       *
@@ -8205,7 +8543,7 @@
            IF  ( SPA-Q01-KOHNUM-G          NOT =   SPACE )
             OR ( SPA-Q01-FTNJANUM-G        NOT =   SPACE )
       *
-              MOVE     "1"                 TO  SPA-Q01-GTBL(6)
+              MOVE     "1"                 TO  SPA-Q01-GKOHINF
       *
            END-IF
       *
@@ -8223,7 +8561,7 @@
             OR ( SPA-Q01-TEL-G             NOT =   SPACE )
             OR ( SPA-Q01-DEATH             NOT =   SPACE )
       *
-               MOVE    "1"                 TO  SPA-Q01-GTBL(7)
+               MOVE    "1"                 TO  SPA-Q01-GPTINF
       *
            END-IF
       *
@@ -8233,7 +8571,7 @@
             OR ( SPA-Q01-NYUGAIKBN         NOT =   SPACE )
             OR ( SPA-Q01-SRYKA             NOT =   SPACE )
       *
-               MOVE    "1"                 TO  SPA-Q01-GTBL(8)
+               MOVE    "1"                 TO  SPA-Q01-GJYURRK
       *
            END-IF
       *
@@ -8241,21 +8579,21 @@
            IF  ( SPA-Q01-SRYKBN            NOT =   SPACE )
             OR ( SPA-Q01-SRYCD-G           NOT =   SPACE )
       *
-              MOVE     "1"                 TO  SPA-Q01-GTBL(9)
+              MOVE     "1"                 TO  SPA-Q01-GSRYACT
       *
            END-IF
       *
       *    該当（１０）
            IF  ( SPA-Q01-TSY           NOT =   SPACE )
       *
-              MOVE     "1"                 TO  SPA-Q01-GTBL(10)
+              MOVE     "1"                 TO  SPA-Q01-GTSY
       *
            END-IF
       *
       *    該当（１１）
            IF   (  SPA-Q01-RECECOM-G       NOT =   SPACE )
       *
-              MOVE     "1"                 TO  SPA-Q01-GTBL(11)
+              MOVE     "1"                 TO  SPA-Q01-GRECECOM
       *
            END-IF
       *
@@ -8264,14 +8602,20 @@
             OR ( SPA-Q01-TOTALTEN         NOT =   ZERO  )
             OR ( SPA-Q01-SAIGAIKBN        NOT =   SPACE )
       *
-              MOVE     "1"                 TO  SPA-Q01-GTBL(12)
+              MOVE     "1"                 TO  SPA-Q01-GSEIKYU
+      *
+           END-IF
+      *
+      *    該当（１３）
+           IF  ( SPA-Q01-XSRYCD-G          NOT =   SPACE )
+      *
+              MOVE     "1"                 TO  SPA-Q01-GXSRYACT
       *
            END-IF
       *
       *    検索条件が未入力のとき
            IF  ( SPA-Q01-GAITO-TBL         =   SPACE )
                MOVE    "1007"              TO  SPA-ERRCD
-               GO  TO  4901-GAITOINF-SET-EXT
            END-IF
       *
            .
@@ -8313,7 +8657,7 @@
                    UNTIL ( IDXA    >   5 )
                     OR   ( SPA-ERRCD   NOT =   SPACE )
       *
-               IF    ( SPA-GMN-Q01-SRYCD  (IDXA)   NOT =   SPACE )
+               IF    ( SPA-NAI-Q01-SRYCD  (IDXA)   NOT =   SPACE )
                 AND  ( SPA-GMN-Q01-SRYVAL (IDXA)   NOT =   SPACE )
                    IF    ( SPA-GMN-Q01-SRYVALCOMP (IDXA)
                                                        =   SPACE )
@@ -8334,6 +8678,16 @@
            END-PERFORM
       *
            MOVE    313                 TO   WRK-ERR-CUR
+           MOVE    SPACE               TO   WRK-NAI-SRYCD-G
+           PERFORM VARYING IDXB    FROM    WRK-STIDX   BY  1
+                   UNTIL ( IDXB    >   5 )
+      *
+               IF    ( SPA-GMN-Q01-SRYCD(IDXB)(1:1) NOT = "-" )
+                   MOVE    SPA-NAI-Q01-SRYCD (IDXB)
+                                       TO   WRK-NAI-SRYCD (IDXB)
+               END-IF
+      *
+           END-PERFORM
            IF    ( SPA-ERRCD   =   SPACE )
                IF    ( SPA-GMN-Q01-SRYVALITEM  NOT =   SPACE )
                    PERFORM VARYING IDXA    FROM    1   BY  1
@@ -8343,10 +8697,10 @@
                        PERFORM VARYING IDXB    FROM    WRK-STIDX   BY  1
                                UNTIL ( IDXB    >   5 )
                                 OR   ( SPA-ERRCD   NOT =   SPACE )
-                           IF    ( SPA-GMN-Q01-SRYCD  (IDXA)
+                           IF    ( SPA-NAI-Q01-SRYCD  (IDXA)
                                        NOT =   SPACE )
-                            AND  ( SPA-GMN-Q01-SRYCD  (IDXA)
-                                           =   SPA-GMN-Q01-SRYCD (IDXB))
+                            AND  ( SPA-NAI-Q01-SRYCD  (IDXA)
+                                           =   SPA-NAI-Q01-SRYCD (IDXB))
                                COMPUTE SPA-GMN-Q01-CUR
                                    =   WRK-ERR-CUR
                                    +   IDXA
@@ -8355,11 +8709,7 @@
                        END-PERFORM
                    END-PERFORM
                    IF    ( SPA-ERRCD   =   SPACE )
-                       IF    ( SPA-GMN-Q01-SRYCD  (1)  =   SPACE )
-                        AND  ( SPA-GMN-Q01-SRYCD  (2)  =   SPACE )
-                        AND  ( SPA-GMN-Q01-SRYCD  (3)  =   SPACE )
-                        AND  ( SPA-GMN-Q01-SRYCD  (4)  =   SPACE )
-                        AND  ( SPA-GMN-Q01-SRYCD  (5)  =   SPACE )
+                       IF    ( WRK-NAI-SRYCD-G =   SPACE )
                                MOVE    314     TO  SPA-GMN-Q01-CUR
                                MOVE    "1017"  TO  SPA-ERRCD
                        END-IF
@@ -8766,10 +9116,6 @@
       *
            END-PERFORM
       *
-           MOVE    ZERO            TO  CNT-KOHNAME
-           MOVE    1               TO  IDX-KOHNAME
-           MOVE    SPACE           TO  WRK-KOHNAME
-                                       WRK-FTNJANUM
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   5 )
       *
@@ -8817,35 +9163,6 @@
                                TO  Q01-CMB-KOHNUM-ITEM (IDX1 IDX2)
       *
                END-PERFORM
-      *
-               IF    ( SPA-GMN-Q01-KOHNUMMEI (IDX1)    NOT =   SPACE )
-                   COMPUTE CNT-KOHNAME =   CNT-KOHNAME +   1
-                   IF    ( SPA-GMN-Q01-RDKOHNUM-AND    =   "T" )
-                       IF    ( WRK-KOHNAME             =   SPACE )
-                           MOVE    SPA-GMN-Q01-KOHNUMMEI (IDX1)
-                                           TO  WRK-KOHNAME
-                       END-IF
-                   ELSE
-                       IF    ( CNT-KOHNAME >   1 )
-                           STRING "と"     DELIMITED   BY  SIZE
-                           INTO   WRK-KOHNAME
-                           WITH   POINTER  IDX-KOHNAME
-                           END-STRING
-                       END-IF
-      *
-                           STRING SPA-GMN-Q01-KOHNUMMEI (IDX1)
-                                           DELIMITED   BY  SPACE
-                           INTO   WRK-KOHNAME
-                           WITH   POINTER  IDX-KOHNAME
-                           END-STRING
-      *
-                   END-IF
-               END-IF
-      *
-               IF    ( SPA-GMN-Q01-FTNJANUM(IDX1)  NOT =   SPACE )
-                   MOVE    SPA-GMN-Q01-FTNJANUM(IDX1)
-                                           TO  WRK-FTNJANUM
-               END-IF
       *
            END-PERFORM
       *
@@ -9154,14 +9471,61 @@
       *    検索条件AND/OR切り替えラジオボタン
            MOVE    SPA-GMN-Q01-RDHKNKOH-AND    TO  Q01-RDHKNKOH-AND
            MOVE    SPA-GMN-Q01-RDHKNKOH-OR     TO  Q01-RDHKNKOH-OR
-           MOVE    SPA-GMN-Q01-RDKOHNUM-AND    TO  Q01-RDKOHNUM-AND
-           MOVE    SPA-GMN-Q01-RDKOHNUM-OR     TO  Q01-RDKOHNUM-OR
       *
-           MOVE    SPA-GMN-Q01-RDBYOMEI-AND    TO  Q01-RDBYOMEI-AND
-           MOVE    SPA-GMN-Q01-RDBYOMEI-OR     TO  Q01-RDBYOMEI-OR
+           MOVE    SPA-GMN-Q01-JKNHKNJANUM-G   TO  Q01-JKNHKNJANUM
+           MOVE    SPA-GMN-Q01-JKNHKNJANUMLST-MAX
+                                           TO  Q01-CMB-JKNHKNJANUM-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SPA-GMN-Q01-JKNHKNJANUMLST-MAX )
       *
-           MOVE    SPA-GMN-Q01-RDSRYACT-AND    TO  Q01-RDSRYACT-AND
-           MOVE    SPA-GMN-Q01-RDSRYACT-OR     TO  Q01-RDSRYACT-OR
+               MOVE    SPA-GMN-Q01-JKNHKNJANUMLST (IDX1)
+                                   TO  Q01-CMB-JKNHKNJANUM-ITEM (IDX1)
+      *
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-Q01-JKNHKNNUM-G TO  Q01-JKNHKNNUM
+           MOVE    SPA-GMN-Q01-JKNHKNNUMLST-MAX
+                                           TO  Q01-CMB-JKNHKNNUM-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SPA-GMN-Q01-JKNHKNNUMLST-MAX )
+      *
+               MOVE    SPA-GMN-Q01-JKNHKNNUMLST (IDX1)
+                                   TO  Q01-CMB-JKNHKNNUM-ITEM (IDX1)
+      *
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-Q01-JKNKOHNUM-G TO  Q01-JKNKOHNUM
+           MOVE    SPA-GMN-Q01-JKNKOHNUMLST-MAX
+                                           TO  Q01-CMB-JKNKOHNUM-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SPA-GMN-Q01-JKNKOHNUMLST-MAX )
+      *
+               MOVE    SPA-GMN-Q01-JKNKOHNUMLST (IDX1)
+                                   TO  Q01-CMB-JKNKOHNUM-ITEM (IDX1)
+      *
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-Q01-JKNBYOMEI-G TO  Q01-JKNBYOMEI
+           MOVE    SPA-GMN-Q01-JKNBYOMEILST-MAX
+                                           TO  Q01-CMB-JKNBYOMEI-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SPA-GMN-Q01-JKNBYOMEILST-MAX )
+      *
+               MOVE    SPA-GMN-Q01-JKNBYOMEILST (IDX1)
+                                   TO  Q01-CMB-JKNBYOMEI-ITEM (IDX1)
+      *
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-Q01-JKNSRYACT-G TO  Q01-JKNSRYACT
+           MOVE    SPA-GMN-Q01-JKNSRYACTLST-MAX
+                                           TO  Q01-CMB-JKNSRYACT-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SPA-GMN-Q01-JKNSRYACTLST-MAX )
+      *
+               MOVE    SPA-GMN-Q01-JKNSRYACTLST (IDX1)
+                                   TO  Q01-CMB-JKNSRYACT-ITEM (IDX1)
+      *
+           END-PERFORM
       *
            MOVE    WIDGET-NORMAL           TO  Q01-B05S-STATE
                                                Q01-B06S-STATE
@@ -9182,6 +9546,13 @@
                                            Q01-SRYVALCOMP-STATE (IDX1)
                                            Q01-CMB-SRYVALCOMP-ITEM-STATE
                                                                 (IDX1)
+               IF    ( SPA-GMN-Q01-SRYCD (IDX1)(1:1)   =   "-" )
+                   MOVE    WIDGET-INSENSITIVE
+                                       TO  Q01-SRYVAL-STATE     (IDX1)
+                                           Q01-SRYVALCOMP-STATE (IDX1)
+                                           Q01-CMB-SRYVALCOMP-ITEM-STATE
+                                                                (IDX1)
+               END-IF
            END-PERFORM
       *
            IF  ( SPA-NAI-Q01-SELPATTERN-UID    =   SPACE )
@@ -9436,6 +9807,12 @@
                MOVE  "FTNJANUM4"   TO  MCP-WIDGET
            WHEN   231
                MOVE  "FTNJANUM5"   TO  MCP-WIDGET
+           WHEN   232
+               MOVE  "JKNHKNJANUM" TO  MCP-WIDGET
+           WHEN   233
+               MOVE  "JKNHKNNUM"   TO  MCP-WIDGET
+           WHEN   234
+               MOVE  "JKNKOHNUM"   TO  MCP-WIDGET
       *
       *    病名・診療行為タブ
            WHEN   301
@@ -9539,6 +9916,10 @@
            WHEN   345
                MOVE  "BYOCOMP5"
                                    TO  MCP-WIDGET
+           WHEN   346
+               MOVE  "JKNBYOMEI"   TO  MCP-WIDGET
+           WHEN   347
+               MOVE  "JKNSRYACT"   TO  MCP-WIDGET
       *
       *    並び順タブ
            WHEN   401
@@ -9710,6 +10091,8 @@
       *
       *    保険・公費タブ
            WHEN   "HONKZKKBN"
+               MOVE  232           TO  SPA-GMN-Q01-CUR
+           WHEN   "JKNHKNJANUM"
                MOVE  202           TO  SPA-GMN-Q01-CUR
            WHEN   "HKNJANUM1"
                MOVE  203           TO  SPA-GMN-Q01-CUR
@@ -9720,6 +10103,8 @@
            WHEN   "HKNJANUM4"
                MOVE  206           TO  SPA-GMN-Q01-CUR
            WHEN   "HKNJANUM5"
+               MOVE  233           TO  SPA-GMN-Q01-CUR
+           WHEN   "JKNHKNNUM"
                MOVE  207           TO  SPA-GMN-Q01-CUR
            WHEN   "HKNNUM1"
                MOVE  208           TO  SPA-GMN-Q01-CUR
@@ -9750,6 +10135,8 @@
            WHEN   "KIGO5"
                MOVE  221           TO  SPA-GMN-Q01-CUR
            WHEN   "NUM5"
+               MOVE  234           TO  SPA-GMN-Q01-CUR
+           WHEN   "JKNKOHNUM"
                MOVE  222           TO  SPA-GMN-Q01-CUR
            WHEN   "KOHNUM1"
                MOVE  223           TO  SPA-GMN-Q01-CUR
@@ -9788,6 +10175,8 @@
            WHEN   "EDTENKIYMD"
                MOVE  326           TO  SPA-GMN-Q01-CUR
            WHEN   "SYUBYOKBN"
+               MOVE  346           TO  SPA-GMN-Q01-CUR
+           WHEN   "JKNBYOMEI"
                MOVE  303           TO  SPA-GMN-Q01-CUR
            WHEN   "BYOMEICD1"
                MOVE  304           TO  SPA-GMN-Q01-CUR
@@ -9826,38 +10215,35 @@
            WHEN   "SRYSYUKBN"
                MOVE  340           TO  SPA-GMN-Q01-CUR
            WHEN   "SRYVALITEM"
+               MOVE  347           TO  SPA-GMN-Q01-CUR
+           WHEN   "JKNSRYACT"
                MOVE  314           TO  SPA-GMN-Q01-CUR
            WHEN   "SRYCD1"
-               IF    ( SPA-GMN-Q01-SRYVALITEM
-                                   =   SPACE )
+               IF    ( Q01-SRYVAL-STATE(1) =   WIDGET-INSENSITIVE )
                    MOVE  315       TO  SPA-GMN-Q01-CUR
                ELSE
                    MOVE  330       TO  SPA-GMN-Q01-CUR
                END-IF
            WHEN   "SRYCD2"
-               IF    ( SPA-GMN-Q01-SRYVALITEM
-                                   =   SPACE )
+               IF    ( Q01-SRYVAL-STATE(2) =   WIDGET-INSENSITIVE )
                    MOVE  316       TO  SPA-GMN-Q01-CUR
                ELSE
                    MOVE  331       TO  SPA-GMN-Q01-CUR
                END-IF
            WHEN   "SRYCD3"
-               IF    ( SPA-GMN-Q01-SRYVALITEM
-                                   =   SPACE )
+               IF    ( Q01-SRYVAL-STATE(3) =   WIDGET-INSENSITIVE )
                    MOVE  317       TO  SPA-GMN-Q01-CUR
                ELSE
                    MOVE  332       TO  SPA-GMN-Q01-CUR
                END-IF
            WHEN   "SRYCD4"
-               IF    ( SPA-GMN-Q01-SRYVALITEM
-                                   =   SPACE )
+               IF    ( Q01-SRYVAL-STATE(4) =   WIDGET-INSENSITIVE )
                    MOVE  318       TO  SPA-GMN-Q01-CUR
                ELSE
                    MOVE  333       TO  SPA-GMN-Q01-CUR
                END-IF
            WHEN   "SRYCD5"
-               IF    ( SPA-GMN-Q01-SRYVALITEM
-                                   =   SPACE )
+               IF    ( Q01-SRYVAL-STATE(5) =   WIDGET-INSENSITIVE )
                    MOVE  327       TO  SPA-GMN-Q01-CUR
                ELSE
                    MOVE  334       TO  SPA-GMN-Q01-CUR
@@ -10206,6 +10592,14 @@
                                            DELIMITED BY SIZE
                        "いずれかのみ設定してください"
                                            DELIMITED BY SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "1020"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "ＮＯＴ検索を行う場合、"
+                                           DELIMITED BY SIZE
+                       "診療月ボタンより診療月を指定してください"
+                                                       DELIMITED BY SIZE
                INTO    SPA-ERRMSG
                END-STRING
            WHEN    "4001"      THRU    "4999"
@@ -10584,15 +10978,11 @@
                END-IF
            WHEN    SHKITEMID-RDKOHNUM
                IF    ( SHODATA-ITEM    =   "1" )
-                   MOVE    "T"         TO  Q01-RDKOHNUM-AND
-                                           SPA-GMN-Q01-RDKOHNUM-AND
-                   MOVE    "F"         TO  Q01-RDKOHNUM-OR
-                                           SPA-GMN-Q01-RDKOHNUM-OR
+                   MOVE    SPA-GMN-Q01-JKNKOHNUMLST (1)
+                                       TO  Q01-JKNKOHNUM
                ELSE
-                   MOVE    "F"         TO  Q01-RDKOHNUM-AND
-                                           SPA-GMN-Q01-RDKOHNUM-AND
-                   MOVE    "T"         TO  Q01-RDKOHNUM-OR
-                                           SPA-GMN-Q01-RDKOHNUM-OR
+                   MOVE    SPA-GMN-Q01-JKNKOHNUMLST (2)
+                                       TO  Q01-JKNKOHNUM
                END-IF
            WHEN    SHKITEMID-KOHNUM01
                MOVE    SHODATA-ITEM    TO  Q01-KOHNUM (1)
@@ -10644,15 +11034,11 @@
                MOVE    1               TO  FLG-PAGENO-02
            WHEN    SHKITEMID-RDBYOMEI
                IF    ( SHODATA-ITEM    =   "1" )
-                   MOVE    "T"         TO  Q01-RDBYOMEI-AND
-                                           SPA-GMN-Q01-RDBYOMEI-AND
-                   MOVE    "F"         TO  Q01-RDBYOMEI-OR
-                                           SPA-GMN-Q01-RDBYOMEI-OR
+                   MOVE    SPA-GMN-Q01-JKNBYOMEILST (1)
+                                       TO  Q01-JKNBYOMEI
                ELSE
-                   MOVE    "F"         TO  Q01-RDBYOMEI-AND
-                                           SPA-GMN-Q01-RDBYOMEI-AND
-                   MOVE    "T"         TO  Q01-RDBYOMEI-OR
-                                           SPA-GMN-Q01-RDBYOMEI-OR
+                   MOVE    SPA-GMN-Q01-JKNBYOMEILST (2)
+                                       TO  Q01-JKNBYOMEI
                END-IF
            WHEN    SHKITEMID-BYOMEICD01
                MOVE    SHODATA-ITEM    TO  Q01-BYOMEICD (1)
@@ -10718,15 +11104,11 @@
                MOVE    1               TO  FLG-PAGENO-02
            WHEN    SHKITEMID-RDSRYACT
                IF    ( SHODATA-ITEM    =   "1" )
-                   MOVE    "T"         TO  Q01-RDSRYACT-AND
-                                           SPA-GMN-Q01-RDSRYACT-AND
-                   MOVE    "F"         TO  Q01-RDSRYACT-OR
-                                           SPA-GMN-Q01-RDSRYACT-OR
+                   MOVE    SPA-GMN-Q01-JKNSRYACTLST (1)
+                                       TO  Q01-JKNSRYACT
                ELSE
-                   MOVE    "F"         TO  Q01-RDSRYACT-AND
-                                           SPA-GMN-Q01-RDSRYACT-AND
-                   MOVE    "T"         TO  Q01-RDSRYACT-OR
-                                           SPA-GMN-Q01-RDSRYACT-OR
+                   MOVE    SPA-GMN-Q01-JKNSRYACTLST (2)
+                                       TO  Q01-JKNSRYACT
                END-IF
            WHEN    SHKITEMID-SRYCD01
                MOVE    SHODATA-ITEM    TO  Q01-SRYCD (1)
@@ -10901,6 +11283,16 @@
                MOVE    SHODATA-ITEM    TO  Q01-SRYVALCOMP (4)
            WHEN    SHKITEMID-SRYVALCOMP5
                MOVE    SHODATA-ITEM    TO  Q01-SRYVALCOMP (5)
+           WHEN    SHKITEMID-JKNHKNJANUM
+               MOVE    SHODATA-ITEM    TO  Q01-JKNHKNJANUM
+           WHEN    SHKITEMID-JKNHKNNUM
+               MOVE    SHODATA-ITEM    TO  Q01-JKNHKNNUM
+           WHEN    SHKITEMID-JKNKOHNUM
+               MOVE    SHODATA-ITEM    TO  Q01-JKNKOHNUM
+           WHEN    SHKITEMID-JKNBYOMEI
+               MOVE    SHODATA-ITEM    TO  Q01-JKNBYOMEI
+           WHEN    SHKITEMID-JKNSRYACT
+               MOVE    SHODATA-ITEM    TO  Q01-JKNSRYACT
            END-EVALUATE
       *
            .
@@ -11611,20 +12003,6 @@
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF
       *
-           IF    ( SPA-GMN-Q01-RDKOHNUM-AND   =   "T" )
-               MOVE    SHKITEMID-RDKOHNUM
-                                   TO  SHODATA-ITEMID
-               MOVE    "1"
-                                   TO  SHODATA-ITEM
-               PERFORM 70011-SHOUKAIDATA-INS-SEC
-           ELSE
-               MOVE    SHKITEMID-RDKOHNUM
-                                   TO  SHODATA-ITEMID
-               MOVE    "0"
-                                   TO  SHODATA-ITEM
-               PERFORM 70011-SHOUKAIDATA-INS-SEC
-           END-IF
-      *
            IF    ( SPA-GMN-Q01-KOHNUM (1)  NOT =   SPACE )
                MOVE    SHKITEMID-KOHNUM01
                                    TO  SHODATA-ITEMID
@@ -11749,20 +12127,6 @@
                MOVE    SHKITEMID-SYUBYOKBN
                                    TO  SHODATA-ITEMID
                MOVE    SPA-GMN-Q01-SYUBYOKBN
-                                   TO  SHODATA-ITEM
-               PERFORM 70011-SHOUKAIDATA-INS-SEC
-           END-IF
-      *
-           IF    ( SPA-GMN-Q01-RDBYOMEI-AND    =   "T" )
-               MOVE    SHKITEMID-RDBYOMEI
-                                   TO  SHODATA-ITEMID
-               MOVE    "1"
-                                   TO  SHODATA-ITEM
-               PERFORM 70011-SHOUKAIDATA-INS-SEC
-           ELSE
-               MOVE    SHKITEMID-RDBYOMEI
-                                   TO  SHODATA-ITEMID
-               MOVE    "0"
                                    TO  SHODATA-ITEM
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF
@@ -11900,20 +12264,6 @@
                MOVE    SHKITEMID-SRYSYUKBN
                                    TO  SHODATA-ITEMID
                MOVE    SPA-GMN-Q01-SRYSYUKBN
-                                   TO  SHODATA-ITEM
-               PERFORM 70011-SHOUKAIDATA-INS-SEC
-           END-IF
-      *
-           IF    ( SPA-GMN-Q01-RDSRYACT-AND    =   "T" )
-               MOVE    SHKITEMID-RDSRYACT
-                                   TO  SHODATA-ITEMID
-               MOVE    "1"
-                                   TO  SHODATA-ITEM
-               PERFORM 70011-SHOUKAIDATA-INS-SEC
-           ELSE
-               MOVE    SHKITEMID-RDSRYACT
-                                   TO  SHODATA-ITEMID
-               MOVE    "0"
                                    TO  SHODATA-ITEM
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF
@@ -12264,6 +12614,46 @@
                MOVE    SHKITEMID-SRYVALCOMP5
                                    TO  SHODATA-ITEMID
                MOVE    SPA-GMN-Q01-SRYVALCOMP (5)
+                                   TO  SHODATA-ITEM
+               PERFORM 70011-SHOUKAIDATA-INS-SEC
+           END-IF
+      *
+           IF    ( SPA-GMN-Q01-JKNHKNJANUM     NOT =   SPACE )
+               MOVE    SHKITEMID-JKNHKNJANUM
+                                   TO  SHODATA-ITEMID
+               MOVE    SPA-GMN-Q01-JKNHKNJANUM
+                                   TO  SHODATA-ITEM
+               PERFORM 70011-SHOUKAIDATA-INS-SEC
+           END-IF
+      *
+           IF    ( SPA-GMN-Q01-JKNHKNNUM     NOT =   SPACE )
+               MOVE    SHKITEMID-JKNHKNNUM
+                                   TO  SHODATA-ITEMID
+               MOVE    SPA-GMN-Q01-JKNHKNNUM
+                                   TO  SHODATA-ITEM
+               PERFORM 70011-SHOUKAIDATA-INS-SEC
+           END-IF
+      *
+           IF    ( SPA-GMN-Q01-JKNKOHNUM     NOT =   SPACE )
+               MOVE    SHKITEMID-JKNKOHNUM
+                                   TO  SHODATA-ITEMID
+               MOVE    SPA-GMN-Q01-JKNKOHNUM
+                                   TO  SHODATA-ITEM
+               PERFORM 70011-SHOUKAIDATA-INS-SEC
+           END-IF
+      *
+           IF    ( SPA-GMN-Q01-JKNBYOMEI     NOT =   SPACE )
+               MOVE    SHKITEMID-JKNBYOMEI
+                                   TO  SHODATA-ITEMID
+               MOVE    SPA-GMN-Q01-JKNBYOMEI
+                                   TO  SHODATA-ITEM
+               PERFORM 70011-SHOUKAIDATA-INS-SEC
+           END-IF
+      *
+           IF    ( SPA-GMN-Q01-JKNSRYACT     NOT =   SPACE )
+               MOVE    SHKITEMID-JKNSRYACT
+                                   TO  SHODATA-ITEMID
+               MOVE    SPA-GMN-Q01-JKNSRYACT
                                    TO  SHODATA-ITEM
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF

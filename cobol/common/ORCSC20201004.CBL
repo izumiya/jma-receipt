@@ -53,6 +53,7 @@
       *  04.05.00    NACL-多々納  10/03/XX  Ｈ２２年４月改正対応
       *  04.06.00    NACL-多々納  10/08/18  手帳記載加算確認追加
       *  04.06.00    NACL-多々納  10/11/02  難病外来疾患区分対応
+      *  04.07.00    NACL-多々納  11/11/XX  訂正処方せん料展開対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -732,6 +733,14 @@
                            MOVE    "1"             TO  WRK-COM-CUR
                                                             (IDX-Z + 1)
                        END-IF
+                   END-IF
+      *            薬剤の診療種別
+               WHEN    "6"
+                   IF      WRK-SRYSYUKBN       =   SPACE
+                       IF      WRK-COM-SRYSYUKBN (IDX-Z) NOT =   SPACE
+                           MOVE    WRK-COM-SRYSYUKBN (IDX-Z)
+                                                   TO  WRK-SRYSYUKBN
+                        END-IF
                    END-IF
            END-EVALUATE
       *
@@ -1524,7 +1533,7 @@
        3003-CHEK-SYORI-SEC              SECTION.
       *
            MOVE    ZERO                TO  FLG-SYOHOSENN
-      *    処方箋算定
+      *    処方箋料算定
            IF    ((FLG-NAIYAK2         =   1    )  OR
                   (FLG-TONPUK2         =   1    )  OR
                   (FLG-GAIYAK2         =   1    )) OR
@@ -1533,7 +1542,7 @@
            END-IF
       *
            MOVE    ZERO                TO  FLG-SYOHORYO
-      *    処方箋算定
+      *    処方料算定
            IF    ((FLG-NAIYAK2         =   1    )  OR
                   (FLG-TONPUK2         =   1    )  OR
                   (FLG-GAIYAK2         =   1    ))   OR
@@ -1704,6 +1713,56 @@
                    END-IF
                END-IF
            END-IF
+      *!!
+      *ver.4.7
+      *    処方せん料と投薬チェック
+           IF     (IDX-SYOHOU      NOT =   ZERO )  AND
+                  (FLG-NAIYAK2         =   ZERO )  AND
+                  (FLG-TONPUK2         =   ZERO )  AND
+                  (FLG-GAIYAK2         =   ZERO )  AND
+                  (SPA-ERRCD           =   SPACE )
+               IF     (FLG-NAIYAK          =   1    )  OR
+                      (FLG-TONPUK          =   1    )  OR
+                      (FLG-GAIYAK          =   1    )
+      *            処方せん料と院内投薬のみはエラー
+                   MOVE    "0122"          TO  SPA-ERRCD
+                   MOVE    "1"             TO  WRK-COM-CUR (IDX-SYOHOU)
+               END-IF
+           END-IF
+      *    処方せん料と投薬チェック
+           IF     (IDX-SYOHOU      NOT =   ZERO )  AND
+                  (SPA-ERRCD           =   SPACE)  AND
+                 ((FLG-NAIYAK2         =   1    )  OR
+                  (FLG-TONPUK2         =   1    )  OR
+                  (FLG-GAIYAK2         =   1    ))
+      *        処方せん料の内容チェック
+               IF      WRK-ZAICNT2         >=  7
+      *            ７種類以上
+                   IF      WRK-COM-INPUTCD (IDX-SYOHOU)
+                                           NOT =   "120002710"
+                       MOVE    "K232"          TO  SPA-ERRCD
+                   END-IF
+               ELSE
+      *            ７種類以内
+                   IF     (WRK-COM-INPUTCD (IDX-SYOHOU)
+                                               =   "120002710" )
+                       MOVE    "K233"          TO  SPA-ERRCD
+                   END-IF
+               END-IF
+               IF      SPA-ERRCD       NOT =   SPACE
+                   IF     (WRK-COM-KZMFLG (IDX-SYOHOU) =   SPACE) AND
+                          (LNK-ORCSC-KEI-IDX           =   ZERO )
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                          (IDX-SYOHOU)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                          (IDX-SYOHOU)
+                       MOVE    IDX-SYOHOU      TO  LNK-ORCSC-KEI-IDX
+                   ELSE
+                       MOVE    SPACE               TO  SPA-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *!!
       *
       *    調基が算定時の処方せん料とのチェック
            IF      IDX-CHOKI           >   ZERO
@@ -2445,6 +2504,7 @@
            IF     (FLG-NAIYAK2         =   1    )  OR
                   (FLG-TONPUK2         =   1    )  OR
                   (FLG-GAIYAK2         =   1    )
+           OR     (IDX-SYOHOU      NOT =   ZERO )
                GO      TO      3002-INNAI-SYORI-EXT
            END-IF
       *

@@ -29,6 +29,7 @@
       * 04.04.01     NACL-門脇    09/11/05  高齢者他保険入院対応
       *
       * 04.05.01     NACL-門脇    09/12/04  食事（特別食）の他保険対応
+      * 04.05.02     NACL-門脇    11/11/09  同日再入院食事対応
       ************************************************************
       *01  LNK-ORCS02-REC.
       *医療機関ＩＤ
@@ -93,6 +94,13 @@
       *入院料算定識別区分
            03  LNK-S02-NYUSANTEI-TBL.
               05  LNK-S02-NYUSANTEI-KBN    PIC  X(01)   OCCURS  31.
+      *
+      *同日再入院区分
+           03  LNK-S02-DOJITU.
+              05  LNK-S02-DOJITU-DAY       PIC  9(01)   OCCURS  31.
+              05  LNK-S02-DOJITU-DAY2      PIC  9(01)   OCCURS  31.
+              05  LNK-S02-DOJITU-SKJST     PIC  X(01)   OCCURS  31.
+              05  LNK-S02-DOJITU-SKJED     PIC  X(01)   OCCURS  31.
       *
       *高齢者他保険入院フラグ
            03  LNK-S02-KOREI-TANYUIN       PIC  X(01).

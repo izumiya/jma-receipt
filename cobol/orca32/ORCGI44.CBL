@@ -466,7 +466,7 @@
            COPY    "CPORCSC00.INC".
       *
       *    算定履歴チェックパラメタ
-           COPY    "CPORCSC91.INC".
+      **** COPY    "CPORCSC91.INC".
       *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".

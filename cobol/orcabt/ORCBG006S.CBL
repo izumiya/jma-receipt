@@ -106,6 +106,7 @@
            03  CNT-PAGE2               PIC 9(03).
            03  CNT-GPAGE               PIC 9(03).
            03  CNT-TOKEI               PIC 9(05).
+           03  CNT-KOUHATU             PIC 9(05).
            03  CNT-SRYKA               PIC 9(05).
            03  CNT-MAX                 PIC 9(02).
            03  CNT-KETA                PIC 9(02).
@@ -187,6 +188,8 @@
       *
            03  WRK-ZZ9                 PIC ZZ9.
            03  WRK-Z9                  PIC Z9.
+      *
+           03  WRK-WARIAI              PIC 9(07)V9(02).
       *
            03  WRK-YMD.
                05  WRK-SYSYMDWH        PIC X(22).
@@ -279,6 +282,13 @@
            03  FILLER              PIC X(01)   VALUE   ",".
            03  FILLER              PIC X(04)   VALUE   "点数".
       *
+      *    プログラムオプションパラメタ
+       01  PARA-AREA.
+           03  PARA-KOUHATU        PIC X(01).
+      *
+           03  PARA-NAME           PIC X(25).
+           03  PARA-NAIYO          PIC X(50).
+      *
            COPY    "CPSHELLTBL.INC".
       *
       *    COPY    "ORCA-DBPATH".
@@ -329,6 +339,9 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    プログラムオプション編集パラメタ
+           COPY    "CPORCSPRGOPTION.INC".
       *
       *    ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
@@ -514,10 +527,48 @@
                END-IF
            END-IF
       *
+           PERFORM 100-OPTION-SELECT-SEC
+      *
            .
        110-PARA-HENSYU-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    プログラムオプション取込み処理
+      *****************************************************************
+       100-OPTION-SELECT-SEC       SECTION.
+      *
+           INITIALIZE                  PARA-AREA
+      *
+      *    後発医薬品
+           MOVE    "KOUHATU"       TO  PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( PARA-NAIYO      =   "0" OR "1" )
+               MOVE    PARA-NAIYO  TO  PARA-KOUHATU
+           END-IF
+      *
+           .
+       100-OPTION-SELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラムオプションパラメタ取得処理
+      *****************************************************************
+       1001-OPTION-CALL-SEC        SECTION.
+      *
+           MOVE    SPACE           TO  PARA-NAIYO
+      *
+           INITIALIZE                  ORCSPRGOPTIONAREA
+           MOVE    "ORCBG006"      TO  ORCSPRGOPTION-PRGID
+           MOVE    PARA-NAME       TO  ORCSPRGOPTION-IN-DATA
+           CALL    "ORCSPRGOPTION"     USING   SPA-AREA
+                                               ORCSPRGOPTIONAREA
+      *
+           MOVE    ORCSPRGOPTION-OT-PARA (1:1)
+                                       TO  PARA-NAIYO
+      *
+           .
+       1001-OPTION-CALL-EXT.
+           EXIT.
       *****************************************************************
       *    主　　処理
       *****************************************************************
@@ -1084,7 +1135,15 @@
            MOVE    TNS-KANANAME    TO  TOKEI-KANANAME
            MOVE    WRK-SRYCD       TO  TOKEI-SRYCD
            MOVE    ACCT-SRYKA      TO  TOKEI-SRYKA
-           MOVE    TNS-NAME        TO  TOKEI-NAME
+           IF    ( PARA-KOUHATU    =   1 ) AND
+                 ( TNS-KOUHATUKBN  =   1 )
+               STRING  "【後】"        DELIMITED BY SIZE
+                      TNS-NAME         DELIMITED BY SIZE
+                                   INTO    TOKEI-NAME
+               END-STRING
+           ELSE
+               MOVE    TNS-NAME        TO  TOKEI-NAME
+           END-IF
            MOVE    TNS-TEN         TO  TOKEI-TEN
            MOVE    TNS-TANINAME    TO  TOKEI-TANI
            MOVE    ZERO            TO  TOKEI-SRYSURYO
@@ -1097,6 +1156,10 @@
            IF      FLG-TOKEI       =   1
                WRITE   TOKEI-REC
                COMPUTE CNT-TOKEI   =   CNT-TOKEI   +   1
+               IF    ( PARA-KOUHATU    =   1 ) AND
+                     ( TNS-KOUHATUKBN  =   1 )
+                   COMPUTE CNT-KOUHATU     =   CNT-KOUHATU   +   1
+               END-IF
            ELSE
                REWRITE TOKEI-REC
            END-IF
@@ -1124,7 +1187,15 @@
            MOVE    WRK-SRYCD       TO  TOKEI-SRYCD
            MOVE    SS009-BRMNUM-DAY(IDX-D)(1:2)
                                    TO  TOKEI-SRYKA
-           MOVE    TNS-NAME        TO  TOKEI-NAME
+           IF    ( PARA-KOUHATU    =   1 ) AND
+                 ( TNS-KOUHATUKBN  =   1 )
+               STRING  "【後】"        DELIMITED BY SIZE
+                      TNS-NAME         DELIMITED BY SIZE
+                                   INTO    TOKEI-NAME
+               END-STRING
+           ELSE
+               MOVE    TNS-NAME        TO  TOKEI-NAME
+           END-IF
            MOVE    TNS-TEN         TO  TOKEI-TEN
            MOVE    TNS-TANINAME    TO  TOKEI-TANI
            MOVE    ZERO            TO  TOKEI-SRYSURYO
@@ -1137,6 +1208,10 @@
            IF      FLG-TOKEI       =   1
                WRITE   TOKEI-REC
                COMPUTE CNT-TOKEI       =   CNT-TOKEI   +   1
+               IF    ( PARA-KOUHATU    =   1 ) AND
+                     ( TNS-KOUHATUKBN  =   1 )
+                   COMPUTE CNT-KOUHATU     =   CNT-KOUHATU   +   1
+               END-IF
            ELSE
                REWRITE TOKEI-REC
            END-IF
@@ -1171,7 +1246,6 @@
       *
            IF      FLG-TOKEI       =   1
                WRITE   TOKEI-REC
-               COMPUTE CNT-TOKEI   =   CNT-TOKEI   +   1
            ELSE
                REWRITE TOKEI-REC
            END-IF
@@ -1204,7 +1278,6 @@
       *
            IF      FLG-TOKEI       =   1
                WRITE   TOKEI-REC
-               COMPUTE CNT-TOKEI   =   CNT-TOKEI   +   1
            ELSE
                REWRITE TOKEI-REC
            END-IF
@@ -1300,6 +1373,25 @@
                MOVE    WRK-GSURYO      TO  WRK-KIN
                PERFORM 400-ZHEN-KIN-SET-SEC
                MOVE    WRK-HENKIN      TO  WRK-NAI-GAKU(IDY CNT-MAX)
+           END-IF
+      *
+           IF    ( PARA-KOUHATU    =   1 ) AND
+                 ( FLG-TOKEI       =   1 )
+      *        １枚２５明細とする
+               IF      IDY             =   25
+      *            印刷処理
+                   PERFORM 2602-PRINT-SEC
+                   MOVE    1               TO  IDY
+                   INITIALIZE                  WRK-NAI-AREA
+               END-IF
+               MOVE    "後発品目割合"  TO  WRK-NAI-NAME  (25)
+               MOVE    "％"            TO  WRK-NAI-TANI  (25)
+               MOVE    0               TO  WRK-WARIAI
+               COMPUTE WRK-WARIAI      =   CNT-KOUHATU
+                                       /   CNT-TOKEI   *   100
+               MOVE    WRK-WARIAI      TO  WRK-TEN
+               PERFORM 400-ZHEN-TEN-SET-SEC
+               MOVE    WRK-HENTEN      TO  WRK-NAI-TEN(25)
            END-IF
       *
              .

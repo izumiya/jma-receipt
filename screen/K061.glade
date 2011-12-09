@@ -638,8 +638,6 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label40</name>
-	  <width>70</width>
-	  <height>18</height>
 	  <label>½ªÎ»ÆüÉÕ</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>

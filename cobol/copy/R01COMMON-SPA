@@ -54,6 +54,8 @@
       *
       *  04.05.01    NACL-藤原    09/06/11  病棟別出力対応
       *  04.05.02    NACL-藤原    09/06/18  社保レセプト遍綴順対応
+      *  04.05.03    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -175,12 +177,15 @@
                09  SPA-R01-PRTNM-NMEI      PIC X(16).
      *
       *警告メッセージ
-           05  SPA-RIDCD                   PIC  X(04).
-           05  SPA-RIDCD2                  PIC  X(04).
-           05  SPA-RIDCD3                  PIC  X(04).
+           05  SPA-RIDCD-AREA.
+               07  SPA-RIDCD               PIC  X(04).
+               07  SPA-RIDCD2              PIC  X(04).
+               07  SPA-RIDCD3              PIC  X(04).
+               07  SPA-RIDCD4              PIC  X(04).
       *警告画面より
            05  SPA-RID1-AREA. 
                07  SPA-RID1-FLG            PIC  X(02).
+               07  SPA-RID4-FLG            PIC  X(03).
                07  SPA-R99-FLG             PIC  X(02).
                07  SPA-R99-CANCEL          PIC  X(03).
       *

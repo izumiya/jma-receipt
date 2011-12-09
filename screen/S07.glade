@@ -13,7 +13,7 @@
 <widget>
   <class>GtkWindow</class>
   <name>S07</name>
-  <width>552</width>
+  <width>528</width>
   <height>158</height>
   <signal>
     <name>map_event</name>
@@ -48,7 +48,7 @@
       <name>B01</name>
       <x>8</x>
       <y>120</y>
-      <width>112</width>
+      <width>96</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
@@ -69,9 +69,9 @@
     <widget>
       <class>GtkButton</class>
       <name>B10</name>
-      <x>152</x>
+      <x>180</x>
       <y>120</y>
-      <width>116</width>
+      <width>96</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
@@ -92,9 +92,9 @@
     <widget>
       <class>GtkButton</class>
       <name>B12</name>
-      <x>400</x>
+      <x>380</x>
       <y>120</y>
-      <width>144</width>
+      <width>140</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
@@ -115,9 +115,9 @@
     <widget>
       <class>GtkButton</class>
       <name>B11</name>
-      <x>276</x>
+      <x>280</x>
       <y>120</y>
-      <width>116</width>
+      <width>96</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
@@ -209,22 +209,6 @@
       </signal>
       <editable>True</editable>
       <format>ZZ</format>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label3</name>
-      <x>300</x>
-      <y>52</y>
-      <width>28</width>
-      <height>24</height>
-      <label>Æü</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
     </widget>
 
     <widget>
@@ -388,9 +372,48 @@
     </widget>
 
     <widget>
+      <class>GtkButton</class>
+      <name>B12S</name>
+      <x>380</x>
+      <y>96</y>
+      <width>140</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <accelerator>
+	<modifiers>GDK_SHIFT_MASK</modifiers>
+	<key>GDK_F12</key>
+	<signal>clicked</signal>
+      </accelerator>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Wed, 14 Feb 2001 00:38:53 GMT</last_modification_time>
+      </signal>
+      <label>Shift+F12:½¤Àµ</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label3</name>
+      <x>300</x>
+      <y>52</y>
+      <width>28</width>
+      <height>24</height>
+      <label>Æü</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
       <class>GtkLabel</class>
       <name>LBLSKYPRT</name>
-      <x>188</x>
+      <x>168</x>
       <y>20</y>
       <width>356</width>
       <height>24</height>

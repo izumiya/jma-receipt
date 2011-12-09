@@ -2239,6 +2239,29 @@
       *****************************************************************
        10011310-NYUINYMD-HEN-SEC        SECTION.
       *
+      *ver.4.7
+           IF     (FLG-SEISIN          =   1   )
+             AND  (SPA-STR-NYUINYMD    NOT =   SPACE )
+      *        継続入院日ありの時、家族は算定不可
+               IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE)
+               AND    (LNK-ORCSC-KEI-IDX       =   ZERO )
+                   MOVE    "K844"              TO  WRK-ERRCD
+                   MOVE    IDX-Z               TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"                 TO  WRK-COM-KZMFLG
+                                                           (IDX-Z)
+                   MOVE    "1"                 TO  WRK-COM-CUR
+                                                           (IDX-Z)
+               END-IF
+           END-IF
+      *    継続初回入院日
+           IF     (SPA-STR-NYUINYMD    NOT =   SPACE)
+           AND    (FLG-SEISIN              =   ZERO )
+               MOVE    SPA-STR-NYUINYMD    TO  WRK-NYUINYMD
+           END-IF
+      *
+           GO      TO      10011310-NYUINYMD-HEN-EXT
+      *!!
+      *!!
            INITIALIZE                  PTNYUINRRK-REC
            MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
            MOVE    SPA-PTID            TO  PTNYUINRRK-PTID

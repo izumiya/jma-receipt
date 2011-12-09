@@ -63,6 +63,170 @@
            03  IDX2                PIC 9(04).
            03  IDY                 PIC 9(04).
       *
+      *    コンスタント値
+       01  CONSTANT-AREA.
+      *
+      *
+      *  システム管理（医療機関情報）設定加算
+      *    総合入院体制加算
+           03  CONS-KSN1                   PIC X(09) VALUE "190098870".
+      *    地域医療支援病院入院診療加算
+           03  CONS-KSN2                   PIC X(09) VALUE "190099870".
+      *    診療録管理体制加算
+           03  CONS-KSN3                   PIC X(09) VALUE "190100370".
+      *    乳幼児加算（病院）
+           03  CONS-KSN4                   PIC X(09) VALUE "190100470".
+      *    乳幼児加算（病院）（特別入院基本料等）
+           03  CONS-KSN5                   PIC X(09) VALUE "190100570".
+      *    乳幼児加算（診療所）
+           03  CONS-KSN6                   PIC X(09) VALUE "190100670".
+      *    幼児加算（病院）
+           03  CONS-KSN7                   PIC X(09) VALUE "190100770".
+      *    幼児加算（病院）（特別入院基本料等）
+           03  CONS-KSN8                   PIC X(09) VALUE "190100870".
+      *    幼児加算（診療所）
+           03  CONS-KSN9                   PIC X(09) VALUE "190100970".
+      *    精神病棟入院時医学管理加算
+           03  CONS-KSN10                  PIC X(09) VALUE "190107170".
+      *    基幹型臨床研修病院入院診療加算
+           03  CONS-KSN11                  PIC X(09) VALUE "190117170".
+      *    協力型臨床研修病院入院診療加算
+           03  CONS-KSN12                  PIC X(09) VALUE "190119910".
+      *    離島加算
+           03  CONS-KSN13                  PIC X(09) VALUE "190117270".
+      *    医療安全対策加算１
+           03  CONS-KSN14                  PIC X(09) VALUE "190120510".
+      *    医療安全対策加算２
+           03  CONS-KSN15                  PIC X(09) VALUE "190136910".
+      *    感染防止対策加算
+           03  CONS-KSN16                  PIC X(09) VALUE "190137070".
+      *    栄養管理実施加算
+           03  CONS-KSN17                  PIC X(09) VALUE "190120410".
+      *    後発医薬品使用体制加算
+           03  CONS-KSN18                  PIC X(09) VALUE "190138010".
+      *    １級地地域加算
+           03  CONS-KSN19                  PIC X(09) VALUE "190077070".
+      *    ２級地地域加算
+           03  CONS-KSN20                  PIC X(09) VALUE "190077170".
+      *    ３級地地域加算
+           03  CONS-KSN21                  PIC X(09) VALUE "190120010".
+      *    ４級地地域加算
+           03  CONS-KSN22                  PIC X(09) VALUE "190077270".
+      *    ５級地地域加算
+           03  CONS-KSN23                  PIC X(09) VALUE "190120110".
+      *    ６級地地域加算
+           03  CONS-KSN24                  PIC X(09) VALUE "190077370".
+      *
+      *  病院のシステム管理（病棟管理）設定加算
+      *    看護補助加算１
+           03  CONS-KSN25                  PIC X(09) VALUE "190103770".
+      *    看護補助加算１（１３対１入院基本料）
+           03  CONS-KSN26                  PIC X(09) VALUE "190103870".
+      *    看護補助加算２
+           03  CONS-KSN27                  PIC X(09) VALUE "190103970".
+      *    看護補助加算３
+           03  CONS-KSN28                  PIC X(09) VALUE "190104070".
+      *    プレイルーム、保育士等加算
+           03  CONS-KSN29                  PIC X(09) VALUE "190111370".
+      *    難病患者等入院診療加算
+           03  CONS-KSN30                  PIC X(09) VALUE "190101770".
+      *    特殊疾患入院施設管理加算
+           03  CONS-KSN31                  PIC X(09) VALUE "190101970".
+      *    児童・思春期精神科入院医療管理加算
+           03  CONS-KSN32                  PIC X(09) VALUE "190110170".
+      *    精神科応急入院施設管理加算
+           03  CONS-KSN33                  PIC X(09) VALUE "190106970".
+      *    看護配置加算
+           03  CONS-KSN34                  PIC X(09) VALUE "190102070".
+      *    １５対１補助体制加算
+           03  CONS-KSN35                  PIC X(09) VALUE "190135710".
+      *    ２０対１補助体制加算
+           03  CONS-KSN36                  PIC X(09) VALUE "190135810".
+      *    ２５対１補助体制加算
+           03  CONS-KSN37                  PIC X(09) VALUE "190127110".
+      *    ５０対１補助体制加算
+           03  CONS-KSN38                  PIC X(09) VALUE "190127210".
+      *    ７５対１補助体制加算
+           03  CONS-KSN39                  PIC X(09) VALUE "190127310".
+      *    １００対１補助体制加算
+           03  CONS-KSN40                  PIC X(09) VALUE "190127410".
+      *    重症患者回復病棟加算
+           03  CONS-KSN41                  PIC X(09) VALUE "190129870".
+      *    急性期看護補助体制加算１
+           03  CONS-KSN42                  PIC X(09) VALUE "190135910".
+      *    急性期看護補助体制加算２
+           03  CONS-KSN43                  PIC X(09) VALUE "190136010".
+      *    精神科地域移行実施加算
+           03  CONS-KSN44                  PIC X(09) VALUE "190127810".
+      *    一般病棟看護必要度評価加算
+           03  CONS-KSN45                  PIC X(09) VALUE "190131570".
+      *    一般病棟看護必要度評価加算（専門病院）
+           03  CONS-KSN46                  PIC X(09) VALUE "190134970".
+      *    一般病棟看護必要度評価加算（特定機能病院）
+           03  CONS-KSN47                  PIC X(09) VALUE "190134870".
+      *    休日リハビリテーション提供体制加算
+           03  CONS-KSN48                  PIC X(09) VALUE "190140870".
+      *
+      *  病院のシステム管理（病室管理）設定加算
+      *    放射線治療病室管理加算
+           03  CONS-KSN49                  PIC X(09) VALUE "190106670".
+      *    療養環境加算
+           03  CONS-KSN50                  PIC X(09) VALUE "190105570".
+      *    療養病棟療養環境加算１
+           03  CONS-KSN51                  PIC X(09) VALUE "190120210".
+      *    療養病棟療養環境加算２
+           03  CONS-KSN52                  PIC X(09) VALUE "190106070".
+      *    療養病棟療養環境加算３
+           03  CONS-KSN53                  PIC X(09) VALUE "190106170".
+      *    療養病棟療養環境加算４
+           03  CONS-KSN54                  PIC X(09) VALUE "190106270".
+      *    重症者等療養環境特別加算（個室）
+           03  CONS-KSN55                  PIC X(09) VALUE "190105870".
+      *    重症者等療養環境特別加算（２人部屋）
+           03  CONS-KSN56                  PIC X(09) VALUE "190105970".
+      *    無菌治療室管理加算
+           03  CONS-KSN57                  PIC X(09) VALUE "190106570".
+      *
+      *  診療所のシステム管理（病棟管理）設定加算
+      *    難病患者等入院診療加算
+           03  CONS-KSN58                  PIC X(09) VALUE "190101770".
+      *    特殊疾患入院施設管理加算
+           03  CONS-KSN59                  PIC X(09) VALUE "190101970".
+      *    医師配置加算１
+           03  CONS-KSN60                  PIC X(09) VALUE "190135570".
+      *    医師配置加算２
+           03  CONS-KSN61                  PIC X(09) VALUE "190117070".
+      *    夜間緊急体制確保加算
+           03  CONS-KSN62                  PIC X(09) VALUE "190126470".
+      *    看護配置加算１
+           03  CONS-KSN63                  PIC X(09) VALUE "190109670".
+      *    看護配置加算２
+           03  CONS-KSN64                  PIC X(09) VALUE "190126570".
+      *    夜間看護配置加算１
+           03  CONS-KSN65                  PIC X(09) VALUE "190126770".
+      *    夜間看護配置加算２
+           03  CONS-KSN66                  PIC X(09) VALUE "190126670".
+      *
+      *  診療所のシステム管理（病室管理）設定加算
+      *    診療所療養病床療養環境加算１
+           03  CONS-KSN67                  PIC X(09) VALUE "190106370".
+      *    診療所療養病床療養環境加算２
+           03  CONS-KSN68                  PIC X(09) VALUE "190106470".
+      *    放射線治療病室管理加算
+           03  CONS-KSN69                  PIC X(09) VALUE "190106670".
+      *    無菌治療室管理加算
+           03  CONS-KSN70                  PIC X(09) VALUE "190106570".
+      *
+      *    入退院登録時に算定する加算
+      *    褥瘡患者管理加算
+           03  CONS-KSN71                  PIC X(09) VALUE "190116990".
+      *    有床診療所一般病床初期加算
+           03  CONS-KSN72                  PIC X(09) VALUE "190135470".
+      *    救急・在宅等支援療養病床初期加算（診療所）
+           03  CONS-KSN73                  PIC X(09) VALUE "190135670".
+      *    救急・在宅等支援療養病床初期加算（病院）
+           03  CONS-KSN74                  PIC X(09) VALUE "190134270".
+      *
       *    一時領域
        01  WRK-AREA.
            03  WRK-WIDGET              PIC X(64).
@@ -682,6 +846,7 @@
                ELSE
                    MOVE    1               TO  FLG-TENSU
                END-IF
+      *
                MOVE    "tbl_tensu"         TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
                PERFORM 990-DBCLOSE-SEC
@@ -706,6 +871,131 @@
                           MOVE    2        TO  SPA-W201-CUR
                       END-IF
                   END-IF
+               END-IF
+      *
+      *        システム管理（医療機関情報）で設定する加算
+      *        でないことのチェック
+               IF   SPA-ERRCD       =   SPACE
+                    IF   SPA-W201-KSNCD2  =   CONS-KSN1   OR
+                                              CONS-KSN2   OR
+                                              CONS-KSN3   OR
+                                              CONS-KSN4   OR
+                                              CONS-KSN5   OR
+                                              CONS-KSN6   OR
+                                              CONS-KSN7   OR
+                                              CONS-KSN8   OR
+                                              CONS-KSN9   OR
+                                              CONS-KSN10  OR
+                                              CONS-KSN11  OR
+                                              CONS-KSN12  OR
+                                              CONS-KSN13  OR
+                                              CONS-KSN14  OR
+                                              CONS-KSN15  OR
+                                              CONS-KSN16  OR
+                                              CONS-KSN17  OR
+                                              CONS-KSN18  OR
+                                              CONS-KSN19  OR
+                                              CONS-KSN20  OR
+                                              CONS-KSN21  OR
+                                              CONS-KSN22  OR
+                                              CONS-KSN23  OR
+                                              CONS-KSN24
+                        MOVE    "0007"   TO   SPA-ERRCD
+                        MOVE    2        TO   SPA-W201-CUR
+                    END-IF
+               END-IF
+      *
+      *        病院のシステム管理（病棟管理情報）で設定する加算
+      *        でないことのチェック
+               IF  (SPA-ERRCD       =   SPACE)   AND
+                   (SPA-HOSPSBT     =       1)
+                   IF   SPA-W201-KSNCD2  =    CONS-KSN25  OR
+                                              CONS-KSN26  OR
+                                              CONS-KSN27  OR
+                                              CONS-KSN28  OR
+                                              CONS-KSN29  OR
+                                              CONS-KSN30  OR
+                                              CONS-KSN31  OR
+                                              CONS-KSN32  OR
+                                              CONS-KSN33  OR
+                                              CONS-KSN34  OR
+                                              CONS-KSN35  OR
+                                              CONS-KSN36  OR
+                                              CONS-KSN37  OR
+                                              CONS-KSN38  OR
+                                              CONS-KSN39  OR
+                                              CONS-KSN40  OR
+                                              CONS-KSN41  OR
+                                              CONS-KSN42  OR
+                                              CONS-KSN43  OR
+                                              CONS-KSN44  OR
+                                              CONS-KSN45  OR
+                                              CONS-KSN46  OR
+                                              CONS-KSN47  OR
+                                              CONS-KSN48
+                        MOVE    "0008"   TO   SPA-ERRCD
+                        MOVE    2        TO   SPA-W201-CUR
+                   END-IF
+               END-IF
+      *
+      *        病院のシステム管理（病室管理情報）で設定する加算
+      *        でないことのチェック
+               IF  (SPA-ERRCD       =   SPACE)   AND
+                   (SPA-HOSPSBT     =       1)
+                   IF   SPA-W201-KSNCD2  =    CONS-KSN49  OR
+                                              CONS-KSN50  OR
+                                              CONS-KSN51  OR
+                                              CONS-KSN52  OR
+                                              CONS-KSN53  OR
+                                              CONS-KSN54  OR
+                                              CONS-KSN55  OR
+                                              CONS-KSN56  OR
+                                              CONS-KSN57
+                        MOVE    "0009"   TO   SPA-ERRCD
+                        MOVE    2        TO   SPA-W201-CUR
+                   END-IF
+               END-IF
+      *
+      *        診療所のシステム管理（病棟管理情報）で設定する加算
+      *        でないことのチェック
+               IF  (SPA-ERRCD       =   SPACE)   AND
+                   (SPA-HOSPSBT     =       2)
+                   IF   SPA-W201-KSNCD2  =    CONS-KSN58  OR
+                                              CONS-KSN59  OR
+                                              CONS-KSN60  OR
+                                              CONS-KSN61  OR
+                                              CONS-KSN62  OR
+                                              CONS-KSN63  OR
+                                              CONS-KSN64  OR
+                                              CONS-KSN65  OR
+                                              CONS-KSN66
+                        MOVE    "0008"   TO   SPA-ERRCD
+                        MOVE    2        TO   SPA-W201-CUR
+                   END-IF
+               END-IF
+      *
+      *        診療所のシステム管理（病室管理情報）で設定する加算
+      *        でないことのチェック
+               IF  (SPA-ERRCD       =   SPACE)   AND
+                   (SPA-HOSPSBT     =       2)
+                   IF   SPA-W201-KSNCD2  =    CONS-KSN67  OR
+                                              CONS-KSN68  OR
+                                              CONS-KSN69  OR
+                                              CONS-KSN70
+                        MOVE    "0009"   TO   SPA-ERRCD
+                        MOVE    2        TO   SPA-W201-CUR
+                   END-IF
+               END-IF
+      *
+      *        入退院登録画面で設定する加算でないことのチェック
+               IF  SPA-ERRCD       =   SPACE
+                   IF   SPA-W201-KSNCD2  =    CONS-KSN71  OR
+                                              CONS-KSN72  OR
+                                              CONS-KSN73  OR
+                                              CONS-KSN74
+                        MOVE    "0013"   TO   SPA-ERRCD
+                        MOVE    2        TO   SPA-W201-CUR
+                   END-IF
                END-IF
       *
            END-IF
@@ -850,6 +1140,13 @@
              IF  SPA-W201-TKSNCD2(10)    NOT =  SPACE
                  MOVE    "0011"          TO  SPA-ERRCD
                  MOVE    2               TO  SPA-W201-CUR
+             END-IF
+           END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE
+             IF  SPA-W201-SELNUM   NOT =   ZERO
+                 MOVE    "0014"          TO  SPA-ERRCD
+                 MOVE    1               TO  SPA-W201-CUR
              END-IF
            END-IF
       *
@@ -1013,6 +1310,15 @@
                WHEN    "0006"
                    MOVE   "診療所のみ算定可能な加算です。"
                                        TO  SPA-ERRMSG
+               WHEN    "0007"
+                MOVE "システム管理−医療機関情報で設定可能な加算です。"
+                                       TO  SPA-ERRMSG
+               WHEN    "0008"
+                MOVE "システム管理−病棟管理情報で設定可能な加算です。"
+                                       TO  SPA-ERRMSG
+               WHEN    "0009"
+                MOVE "システム管理−病室管理情報で設定可能な加算です。"
+                                       TO  SPA-ERRMSG
                WHEN    "0010"
                    MOVE    "入院料加算コードが未設定です。"
                                        TO  SPA-ERRMSG
@@ -1021,6 +1327,12 @@
                                        TO  SPA-ERRMSG
                WHEN    "0012"
                    MOVE    "入院料加算コードが重複しています。"
+                                       TO  SPA-ERRMSG
+               WHEN    "0013"
+                   MOVE    "入退院登録画面で設定可能な加算です。"
+                                       TO  SPA-ERRMSG
+               WHEN    "0014"
+                   MOVE    "選択された加算は追加できません。"
                                        TO  SPA-ERRMSG
                WHEN    "9000"
                    MOVE    "病棟情報が取得できません。"

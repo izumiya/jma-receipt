@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 04.05.00     NACL-多々納  10/01/XX  治験対応
       * 04. 05.00    NACL-太田    10/01/29  拡張漢字対応
+      * 04.07.00     NACL-多々納  11/10/31  同日再入院対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -906,7 +907,9 @@
                IF    ( LNK-WKSRYACT-MAX    =   ZERO    )   OR
                      ((WKSRY-PTID          =   LNK-WKSRY-PTID (1))
                  AND  (WKSRY-SRYKA         =   LNK-WKSRY-SRYKA (1))
-                 AND  (WKSRY-HKNCOMBI      =   LNK-WKSRY-HKNCOMBI (1)))
+                 AND  (WKSRY-HKNCOMBI      =   LNK-WKSRY-HKNCOMBI (1))
+                 AND  (WKSRY-DOUJITSUKBN   =   LNK-WKSRY-DOUJITSUKBN
+                                                                  (1)))
                    CONTINUE
                ELSE
                    MOVE    WKSRYACT-REC        TO  HZN-WKSRYACT-REC
@@ -1093,6 +1096,11 @@
            INITIALIZE                  ORCSCNYUHENAREA
            MOVE    "1"                 TO  ORCSCNYUHEN-KBN
            MOVE    SPA-SRYYMD          TO  ORCSCNYUHEN-SRYYMD
+      *ver.4.7
+      *    同日再入院
+           IF      LNK-WKSRY-DOUJITSUKBN(1)    =   "1"
+               MOVE   "1"                  TO  ORCSCNYUHEN-KBN2
+           END-IF
            CALL    "ORCSCNYUHEN"       USING
                                        SPA-AREA
                                        ORCSCNYUHENAREA
@@ -1107,6 +1115,17 @@
       *        入院期間
                MOVE    ORCSCNYUHEN-NYUIN-DAYG
                                               TO  SPA-K02-NYUIN-AREA
+      *ver.4.7
+      *        同日再入院有無
+               MOVE    ORCSCNYUHEN-DOUNYUIN   TO  SPA-K02N-DOUDAY
+      *        診療日付＝同日再入院日
+               IF     (SPA-SRYYMD             =   SPA-K02N-NYUINYMD)
+                 AND  (ORCSCNYUHEN-DOUNYUIN   =   SPA-SRYYMD(7:2)  )
+                   MOVE    "1"                TO  SPA-K02N-DOUKBN
+               ELSE
+                   MOVE    SPACE              TO  SPA-K02N-DOUKBN
+               END-IF
+               MOVE    ORCSCNYUHEN-DOUNYUKBN  TO  SPA-K02N-DOUNYUKBN
            END-IF
       *
            .
@@ -1912,6 +1931,10 @@
            MOVE    SPA-SRYKA           TO  WKSRY-SRYKA
            MOVE    SPA-SRYYMD          TO  WKSRY-SRYYMD
            MOVE    SPA-HKNCOMBINUM     TO  WKSRY-HKNCOMBI
+      *ver.4.7
+           IF      SPA-K02N-DOUKBN     =   "1"
+               MOVE    "1"                 TO  WKSRY-DOUJITSUKBN
+           END-IF
       *
            MOVE    WKSRYACT-REC        TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC

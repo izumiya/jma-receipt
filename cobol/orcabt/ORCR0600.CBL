@@ -69,6 +69,7 @@
       *  04.04.05    NACL-門脇    10/08/09  他医受診のチェック
       *
       *  04.05.01    NACL-門脇    10/01/18  治験対応
+      *  04.05.02    NACL-門脇    11/11/09  同日再入院食事対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -177,12 +178,18 @@
                    07  WRK-DAY                         PIC 9(04)
                                                        OCCURS   31.
       *
+           03  WRK-DAY-AREA2.
+               05  WRK-DAY-TBL2.
+                   07  WRK-DAY-DOJITU                  PIC 9(04)
+                                                       OCCURS   31.
+      *
            03  WRK-ROUSAIKBN                           PIC X(01).
            03  WRK-DENPNUM                             PIC 9(07).
            03  WRK-SEIKYUSTYMD                         PIC 9(08).
            03  WRK-SEIKYUEDYMD                         PIC 9(08).
            03  WRK-DATAKBN                             PIC X(01).
            03  WRK-SYOKBN                              PIC X(01).
+           03  WRK-HKNCOMBINUM                         PIC 9(04).
       *
            03  WRK-STR                                 PIC X(200).
            03  WRK-LEN                                 PIC 9(05).
@@ -270,6 +277,8 @@
            COPY    "CPORCSPTID.INC".
       *    分娩入院チェックサブ
            COPY    "CPORCSBUNBENCHK.INC".
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *    定期請求用収納作成サブ
        01  LNK-ORCS02-REC.
@@ -865,6 +874,7 @@
       *
                MOVE    KEY-NEW             TO  KEY-OLD
                INITIALIZE                      WRK-DAY-AREA
+               INITIALIZE                      WRK-DAY-AREA2
       *
                PERFORM         UNTIL   FLG-NYUINACCT   =   1 
                                OR      FLG-ERR         =   1 
@@ -888,12 +898,29 @@
                    PERFORM 900-NYUINACCT-READ-SEC
                END-PERFORM
       *
+               IF      FLG-ERR         =   ZERO
+                   INITIALIZE                   ORCSNYUINDAY-AREA
+                   MOVE    SYS-1001-HOSPNUM TO  LNK-NYUINDAY-HOSPNUM
+                   MOVE    KEY-O-PTID       TO  LNK-NYUINDAY-PTID
+                   MOVE    SYS-2001-SRYYM   TO  LNK-NYUINDAY-SANTEIYM
+                   CALL    "ORCSNYUINDAY"   USING   ORCSNYUINDAY-AREA
+                                                    SPA-AREA
+                   IF      LNK-NYUINDAY-RC  =   ZERO
+                      PERFORM    VARYING   IDX   FROM   1   BY   1
+                                  UNTIL    IDX    >    31
+                        MOVE  LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX)
+                                            TO  WRK-DAY-DOJITU(IDX)
+                      END-PERFORM
+                   END-IF
+               END-IF
+      *
                IF      FLG-ERR         =   ZERO 
       *            対象の入院会計があるとき仮収納作成
                    PERFORM VARYING IDX FROM    1   BY  1
                            UNTIL   IDX >       31
                        IF      WRK-DAY (1 IDX)     >   ZERO    AND
                                WRK-DAY (2 IDX)     >   ZERO
+                           MOVE    WRK-DAY (2 IDX) TO  WRK-HKNCOMBINUM
                            PERFORM 200121-NYUINACCT-CHK-SEC
                            IF      WRK-SYOKBN      =   SPACE
                                MOVE    2     TO   FLG-NG
@@ -905,6 +932,28 @@
                            END-IF
                        END-IF
                    END-PERFORM
+                   IF    ( WRK-DATAKBN     =   "1" )
+                   OR    ( FLG-ERR         =    1  )
+                     CONTINUE
+                   ELSE
+                     PERFORM VARYING IDX FROM    1   BY  1
+                             UNTIL   IDX >       31
+                       IF      WRK-DAY-DOJITU(IDX) >   ZERO
+                           MOVE    WRK-DAY-DOJITU(IDX)
+                                                   TO  WRK-HKNCOMBINUM
+                           PERFORM 200121-NYUINACCT-CHK-SEC
+                           IF      WRK-SYOKBN      =   SPACE
+                               MOVE    2     TO   FLG-NG
+                               DISPLAY "DOUJITU"
+                               PERFORM 200122-NYUINACCT-HENSYU-SEC
+                               IF    ( WRK-DATAKBN     =   "1" ) 
+                               OR    ( FLG-ERR         =    1  )
+                                   MOVE    31              TO  IDX
+                               END-IF
+                           END-IF
+                       END-IF
+                     END-PERFORM
+                   END-IF
                END-IF            
              END-IF
            END-IF    
@@ -922,7 +971,7 @@
            INITIALIZE                  HKNCOMBI-REC
            MOVE    SYS-1001-HOSPNUM TO  COMB-HOSPNUM
            MOVE    KEY-O-PTID      TO  COMB-PTID
-           MOVE    WRK-DAY (2 IDX) TO  COMB-HKNCOMBINUM 
+           MOVE    WRK-HKNCOMBINUM TO  COMB-HKNCOMBINUM
            MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
            PERFORM 910-HKNCOMBI-INV-SEC
       *
@@ -1233,6 +1282,12 @@
                                           TO  ERR-ERRMSG
                     WHEN       22
                       MOVE "他医受診（外泊）の入力誤り"
+                                          TO  ERR-ERRMSG
+                    WHEN       23
+                      MOVE "同日再入院日の実日数算定コード未入力"
+                                          TO  ERR-ERRMSG
+                    WHEN       24
+                      MOVE "同日再入院日の再入院分に入院料加算有"
                                           TO  ERR-ERRMSG
                     WHEN      OTHER
                       MOVE "仮収納データの取得に失敗"
@@ -1765,6 +1820,7 @@
       *
            MOVE    KEY-NEW             TO  KEY-OLD
            INITIALIZE                      WRK-DAY-AREA
+           INITIALIZE                      WRK-DAY-AREA2
       *
            PERFORM         UNTIL   FLG-NYUINACCT   =   1
                            OR      FLG-ERR         =   1 
@@ -1788,11 +1844,28 @@
            END-PERFORM
       *
            IF      FLG-ERR             =   ZERO
+               INITIALIZE                   ORCSNYUINDAY-AREA
+               MOVE    SYS-1001-HOSPNUM TO  LNK-NYUINDAY-HOSPNUM
+               MOVE    SYS-2002-PTID    TO  LNK-NYUINDAY-PTID
+               MOVE    SYS-2002-SRYYM   TO  LNK-NYUINDAY-SANTEIYM
+               CALL    "ORCSNYUINDAY"   USING   ORCSNYUINDAY-AREA
+                                                SPA-AREA
+               IF      LNK-NYUINDAY-RC  =   ZERO
+                  PERFORM    VARYING   IDX   FROM   1   BY   1
+                              UNTIL    IDX    >    31
+                    MOVE  LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX)
+                                        TO  WRK-DAY-DOJITU(IDX)
+                  END-PERFORM
+               END-IF
+           END-IF
+      *
+           IF      FLG-ERR             =   ZERO
       *        対象の入院会計があるとき仮収納作成
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       31
                    IF      WRK-DAY (1 IDX)     >   ZERO    AND
                            WRK-DAY (2 IDX)     >   ZERO
+                       MOVE    WRK-DAY (2 IDX) TO  WRK-HKNCOMBINUM
                        PERFORM 200121-NYUINACCT-CHK-SEC
                        IF      WRK-SYOKBN      =   SPACE
                            MOVE    3     TO   FLG-NG
@@ -1804,6 +1877,28 @@
                        END-IF
                    END-IF
                END-PERFORM
+               IF    ( WRK-DATAKBN     =   "1" )
+               OR    ( FLG-ERR         =    1  )
+                 CONTINUE
+               ELSE
+                 PERFORM VARYING IDX FROM    1   BY  1
+                         UNTIL   IDX >       31
+                   IF      WRK-DAY-DOJITU(IDX) >   ZERO
+                       MOVE    WRK-DAY-DOJITU(IDX)
+                                               TO  WRK-HKNCOMBINUM
+                       PERFORM 200121-NYUINACCT-CHK-SEC
+                       IF      WRK-SYOKBN      =   SPACE
+                           MOVE    3     TO   FLG-NG
+                           DISPLAY "DOUJITU2"
+                           PERFORM 200122-NYUINACCT-HENSYU-SEC
+                           IF    ( WRK-DATAKBN     =   "1" ) 
+                           OR    ( FLG-ERR         =    1  )
+                                   MOVE    31              TO  IDX
+                           END-IF
+                       END-IF
+                   END-IF
+                 END-PERFORM
+               END-IF
            END-IF    
            .
        200212-KOBETU-NYUINACCT-HENSYU-EXT.

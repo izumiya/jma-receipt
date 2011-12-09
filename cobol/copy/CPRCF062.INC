@@ -110,6 +110,7 @@
       *                                     文字設定対応
       *  04.05.04    NACL-藤原    11/03/25  災害対応
       *                                     連絡先情報追加
+      *  04.05.05    NACL-藤原    11/11/22  同日再入院対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -117,6 +118,11 @@
       *  04.06.02    NACL-門脇    10/12/13  請求額情報の追加
       *  04.06.03    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
+      *                                     一部負担金金額集計フラグ追加
+      *                                     保険欄−一部負担金記載
+      *                                     （高齢者）（70歳未満）フラグ追加
+      *                                     食事区分追加
       ************************************************************
       *01  RECE62-REC.
            03  RECE62-KEY.
@@ -439,6 +445,12 @@
       *標準負担額
                    07  RECE62-SHOKUJIFTN  PIC  9(09).
       *
+      *食事療養費情報２
+           03  RECE62-SHOKUJIINF2-AREA.
+               05  RECE62-SHOKUJIINF2     OCCURS  5.
+      *食事区分
+                   07  RECE62-SKJRYYKBN   PIC  X(01).
+      *
       *一部負担金・食事療養費標準負担額区分
            03  RECE62-SHOKUJIFTNKBN       PIC  X(01).
       *一部負担金・食事療養費標準負担額区分２（地方公費判定用）
@@ -691,6 +703,9 @@
                    07  RECE62-EKF-TOTALTENFLG  PIC  X(01).
                    07  RECE62-EKF-SKJFLG       PIC  X(01).
                    07  RECE62-EKF-OCRFLG       PIC  X(01).
+                   07  RECE62-EKF-FTNKEIFLG    PIC  X(01).
+                   07  RECE62-EKF-HKNFTNFLG-K  PIC  X(01).
+                   07  RECE62-EKF-HKNFTNFLG-Y  PIC  X(01).
       *
       *実日数・請求点記載フラグ
            03  RECE62-JSKISAIFLG          PIC  X(01).
@@ -760,10 +775,6 @@
       *
       *福岡県公費給付外点数
            03  RECE62-KYUFUGAITEN         PIC  9(06).
-      *入院料未算定区分
-           03  RECE62-NYUINDAY-TBL.
-               05  RECE62-NYUINDAY-KBN    PIC  X(01)
-                                               OCCURS  31.
       *
       *患者特記事項情報
            03  RECE62-PTTOKKI-AREA.
@@ -800,6 +811,18 @@
                05  RECE62-SKYSKJ-HOKENJA       PIC 9(09).
       *公費負担
                05  RECE62-SKYSKJ-KOHFTN        PIC 9(09).
+      *
+      *入院料情報
+           03  RECE62-DOUJITSU-AREA.
+      *同日再入院（入院分）の保険組合せ
+               05  RECE62-DOUJITSU-HKNCOMBI
+                                          PIC 9(04)   OCCURS  31.
+      *同日再入院（入院分）の食事開始時間区分
+               05  RECE62-DOUJITSU-SKJKBN PIC X(01)   OCCURS  31.
+      *入院区分
+               05  RECE62-NYUINDAY-TBL.
+                   07  RECE62-NYUINDAY-KBN
+                                          PIC  X(01)  OCCURS  31.
       *
       *予備
            03  RECE62-YOBIETC-AREA.

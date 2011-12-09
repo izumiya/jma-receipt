@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.00    NACL-多々納  11/12/06  upgrade非活性対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -359,6 +360,14 @@
                WHEN    "0104"
                    IF      SPA-M80ID1-FLG      =   "OK"
                        MOVE    "disable"        TO  WRK-COMMAND
+                       PERFORM 4010-SHELL-SYORI-SEC
+                   ELSE
+                       MOVE    1               TO  SPA-GMN-CUR
+                   END-IF
+      *        アップグレード
+               WHEN    "0105"
+                   IF      SPA-M80ID1-FLG      =   "OK"
+                       MOVE    "upgrade"       TO  WRK-COMMAND
                        PERFORM 4010-SHELL-SYORI-SEC
                    ELSE
                        MOVE    1               TO  SPA-GMN-CUR
@@ -894,6 +903,7 @@
       *****************************************************************
        410-UPGRADE-SEC       SECTION.
       *
+           MOVE    "0105"              TO  SPA-M80ID1CD
            .
        410-UPGRADE-EXT.
            EXIT.
@@ -1129,6 +1139,16 @@
            END-EVALUATE
       *
            MOVE   SPA-GMN-DURATION     TO  M80-DURATION
+      *ver.4.7
+           MOVE    SPACE               TO  M80-B10-LABEL
+           MOVE    WIDGET-INSENSITIVE  TO  M80-B10-STATE
+      *    明細があり未選択の時
+           IF     (SPA-TBL-MAX         >   ZERO )
+             AND  (SPA-GMN-SELNUM      =   ZERO )
+               MOVE    "upgrade"           TO  M80-B10-LABEL
+               MOVE    WIDGET-NORMAL       TO  M80-B10-STATE
+           END-IF
+      *
       *    非活性処理
            PERFORM 510-GSRAUTH-SEC
       *
@@ -1254,6 +1274,12 @@
                    END-STRING
                WHEN    "0104"
                    STRING  "選択したパッケージをアンリンクします。"
+                           "よろしいですか？"
+                                           DELIMITED  BY  SIZE
+                                       INTO   M80ID1-ID1MSG
+                   END-STRING
+               WHEN    "0105"
+                   STRING  "パッケージをアップグレードします。"
                            "よろしいですか？"
                                            DELIMITED  BY  SIZE
                                        INTO   M80ID1-ID1MSG

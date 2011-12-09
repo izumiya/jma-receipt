@@ -376,8 +376,8 @@ S03	{
 					value3	varchar(11);
 					value4	varchar(12);
 					value5	varchar(10);
-				}	[50];
-				select	bool[50];
+				}	[99];
+				select	bool[99];
 			};
 		};
 	};

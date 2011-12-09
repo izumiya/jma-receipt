@@ -376,14 +376,11 @@
       *
                MOVE    "%"                 TO  SEL-SRYSYUKBN
       *
-           MOVE    ZERO                    TO  IDX1
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   5 )
       *
                IF    ( SPA-Q01-SRYCD (IDX0)
                                NOT =   SPACE )
-                   MOVE    SPA-Q01-SRYCD (IDX0)
-                                   TO  SEL-SRYCD
       *
                    COMPUTE TSRYCD-IDX  =   TSRYCD-IDX  +   1
                    MOVE    SPA-Q01-SRYVALNUM (IDX0)
@@ -418,23 +415,32 @@
                    END-IF
                END-IF
       *
+               IF    ( SEL-SRYCD   =   SPACE )
+                   IF    ( SPA-Q01-SRYCD (IDX0)    NOT =   SPACE )
+                       MOVE    SPA-Q01-SRYCD (IDX0)    TO  SEL-SRYCD
+                   END-IF
+                   IF    ( SPA-Q01-XSRYCD (IDX0)   NOT =   SPACE )
+                       MOVE    SPA-Q01-XSRYCD(IDX0)    TO  SEL-SRYCD
+                   END-IF
+               END-IF
            END-PERFORM
       *
       *    診察年月日
-           IF   ( SPA-Q01-GTBL (8)  =   "1" )
+           IF   ( SPA-Q01-GJYURRK  =   "1" )
                MOVE    1           TO  SEL-RRKSRH
            END-IF
       *
       *    診療行為
-           IF   ( SPA-Q01-GTBL (9)  =   "1" )
-               IF    ( SPA-Q01-GTBL(8) =   SPACE )
-                   IF    ( SPA-Q01-SRYCD-G NOT =   SPACE )
+           IF   ( SPA-Q01-GSRYACT   =   "1" )
+            OR  ( SPA-Q01-GXSRYACT  =   "1" )
+               IF    ( SPA-Q01-GJYURRK  =   SPACE )
+                   IF    ( SPA-Q01-SRYCD-G  NOT =   SPACE )
                        MOVE    1    TO  SEL-SRYSRH
                    ELSE
                        MOVE    3    TO  SEL-SRYSRH
                    END-IF
                ELSE
-                   IF    ( SPA-Q01-SRYCD-G NOT =   SPACE )
+                   IF    ( SPA-Q01-SRYCD-G  NOT =   SPACE )
                        MOVE    2    TO  SEL-SRYSRH
                    ELSE
                        MOVE    4    TO  SEL-SRYSRH
@@ -443,11 +449,11 @@
            END-IF
       *
       *    診察年月日
-           IF   ( SPA-Q01-GTBL (8)  =   "1" )
+           IF   ( SPA-Q01-GJYURRK  =   "1" )
                MOVE    1           TO  SEL-RRKSRH
            END-IF
       *
-           IF    ( SPA-Q01-GTBL(12) =   "1" )
+           IF    ( SPA-Q01-GSEIKYU =   "1" )
                MOVE    1           TO  SEL-SKYSRH
            END-IF
       *
@@ -485,6 +491,8 @@
                PERFORM 910-DBSTART-SEC
            END-IF
       *
+           PERFORM 900-PTSRH-DEL3-SEC
+      *
            PERFORM 900-SRYSRH-DEL1-SEC
       *
            EVALUATE    SEL-SRYSRH
@@ -496,6 +504,9 @@
                PERFORM 900-SRYSRH-INS3-SEC
            WHEN    4
                PERFORM 900-SRYSRH-INS4-SEC
+               IF    ( SPA-Q01-XSRYCD-G  NOT =   SPACE )
+                   PERFORM 900-SRYSRH-INS2-SEC
+               END-IF
            END-EVALUATE
       *
            PERFORM 910-DBCOMMIT-SEC
@@ -512,7 +523,6 @@
                PERFORM 910-DBCOMMIT-SEC
                PERFORM 910-DBSTART-SEC
            END-IF
-      *
       *
            PERFORM 900-SKYSRH-DEL1-SEC
            PERFORM 910-DBCOMMIT-SEC
@@ -829,13 +839,6 @@
       *
            MOVE    1   TO  FLG-TARGET-SRYCD (TSRYCD-IDX)
       *
-           DISPLAY "BF FLG-TARGET = " FLG-TARGET
-      *
-           DISPLAY "TSRYCD-SRYCD (" TSRYCD-IDX ")="
-                    TSRYCD-SRYCD (TSRYCD-IDX)
-           DISPLAY "TMP01-ZAIKAISU(" TSRYCD-IDX ")="
-                    TMP01-ZAIKAISU (TSRYCD-IDX)
-      *
            IF    ( TSRYCD-SRYVAL (TSRYCD-IDX)  NOT =   SPACE )
                IF    ( SPA-Q01-SRYVALITEM  =   CONST-VALKAISU
                                             OR CONST-VALTOTAL )
@@ -846,11 +849,6 @@
                        MOVE    TMP01-SURYOTOTAL (TSRYCD-IDX)
                                            TO  WRK-SRYVAL
                    END-IF
-      *
-                   DISPLAY "TSRYCD-SRYVALCOMP (" TSRYCD-IDX "):"
-                            TSRYCD-SRYVALCOMP (TSRYCD-IDX)
-                   DISPLAY "TSRYCD-SRYVALNUM (" TSRYCD-IDX "):"
-                            TSRYCD-SRYVALNUM (TSRYCD-IDX)
       *
                    EVALUATE   TSRYCD-SRYVALCOMP (TSRYCD-IDX)
                    WHEN    CONST-GREATER-EQUAL
@@ -886,8 +884,6 @@
                    END-EVALUATE
                END-IF
            END-IF
-      *
-           DISPLAY "FLG-TARGET = " FLG-TARGET
       *
            .
        20011-SRYVAL-PTSRH-EDIT-EXT.
@@ -1240,9 +1236,9 @@
            MOVE    SEL-SRYKA       TO  RRKSRH-SRYKA
            MOVE    SEL-STSRYYMD    TO  RRKSRH-STSRYYMD
            MOVE    SEL-EDSRYYMD    TO  RRKSRH-EDSRYYMD
-           MOVE    SMCNDATE-YMD    TO  RRKSRH-CREYMD
+           MOVE    SEL-UPYMD    TO  RRKSRH-CREYMD
                                        RRKSRH-UPYMD
-           MOVE    SMCNDATE-HMS    TO  RRKSRH-UPHMS
+           MOVE    SEL-UPHMS    TO  RRKSRH-UPHMS
            MOVE    RRKSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_rrksrh"    TO  MCP-TABLE
            MOVE    "ins1"          TO  MCP-PATHNAME
@@ -1341,21 +1337,34 @@
                                    TO  SRYSRH-STSRYYM
            MOVE    SEL-EDSRYYMD(1:6)
                                    TO  SRYSRH-EDSRYYM
+           MOVE    ZERO            TO  IDX1
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   5 )
-      *
-               IF    ( TSRYCD-SRYCD (IDX0)
-                                   =   SPACE )
-                   MOVE    SEL-SRYCD
-                                   TO  SRYSRH-SRYCD (IDX0)
-               ELSE
-                   MOVE    TSRYCD-SRYCD (IDX0)
-                                   TO  SRYSRH-SRYCD (IDX0)
+               MOVE    SEL-SRYCD   TO  SRYSRH-SRYCD (IDX0)
+           END-PERFORM
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   5 )
+                    OR   ( IDX1    >=  5 )
+               IF    ( SPA-Q01-SRYCD (IDX0)
+                               NOT =   SPACE )
+                   COMPUTE IDX1 =  IDX1    +   1
+                   MOVE    SPA-Q01-SRYCD (IDX0)
+                                   TO  SRYSRH-SRYCD (IDX1)
                END-IF
            END-PERFORM
-           MOVE    SMCNDATE-YMD    TO  SRYSRH-CREYMD
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   5 )
+                    OR   ( IDX1    >=  5 )
+               IF    ( SPA-Q01-XSRYCD (IDX0)
+                               NOT =   SPACE )
+                   COMPUTE IDX1 =  IDX1    +   1
+                   MOVE    SPA-Q01-XSRYCD (IDX0)
+                                   TO  SRYSRH-SRYCD (IDX1)
+               END-IF
+           END-PERFORM
+           MOVE    SEL-UPYMD    TO  SRYSRH-CREYMD
                                        SRYSRH-UPYMD
-           MOVE    SMCNDATE-HMS    TO  SRYSRH-UPHMS
+           MOVE    SEL-UPHMS    TO  SRYSRH-UPHMS
       *
       *
            .
@@ -1365,8 +1374,6 @@
       *    患者照会追加処理
       *****************************************************************
        900-PTSRH-INS1-SEC              SECTION.
-      *
-           PERFORM 900-PTSRH-DEL3-SEC
       *
            INITIALIZE                  PTSRH-REC
            MOVE    WKBQ01-SQL      TO  PTSRH-SQL
@@ -1393,6 +1400,22 @@
       *
            .
        900-PTSRH-DEL3-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者照会削除処理
+      *****************************************************************
+       900-PTSRH-DEL4-SEC              SECTION.
+      *
+           INITIALIZE                  PTSRH-REC
+           MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
+           MOVE    SPA-TERMID      TO  PTSRH-TERMID
+           MOVE    PTSRH-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptsrh"     TO  MCP-TABLE
+           MOVE    "del4"          TO  MCP-PATHNAME
+           PERFORM 910-DBDELETE-SEC
+      *
+           .
+       900-PTSRH-DEL4-EXT.
            EXIT.
       *****************************************************************
       *    患者照会削除処理

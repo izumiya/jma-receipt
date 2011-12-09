@@ -1683,7 +1683,6 @@
                    WHEN    "133249"
                    WHEN    "133256"
                    WHEN    "133272"
-                   WHEN    "283077"
                        MOVE    "1"       TO  SPA-GMN-HBTNUM10KBN
                        MOVE    "0"       TO  SPA-GMN-HBTNUM10TAIKBN
                        MOVE    "1"       TO  SPA-GMN-HBTNUM21KBN

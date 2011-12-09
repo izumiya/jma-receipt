@@ -81,6 +81,11 @@
            03  LNK-SCNYUACCT-SENTEI-STYMD            PIC  X(08).
       *入院カレンダー設定区分
            03  LNK-SCNYUACCT-NYUCAL-KBN              PIC  9(01).
+      *同日再入院の入院取消時の診療会計削除区分
+      *（空白：同日再入院以外、１：同日再入院）
+           03  LNK-SCNYUACCT-DOUJITSUKBN             PIC  X(01).
+      *診療会計削除開始日
+           03  LNK-SCNYUACCT-SRYDELYMD               PIC  X(08).
       *復帰コード
            03  LNK-SCNYUACCT-RC                      PIC S9(9) BINARY.
       *

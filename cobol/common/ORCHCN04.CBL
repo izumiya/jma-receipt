@@ -41,6 +41,7 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/03/XX  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *  04.05.00    NACL-ÂÀÅÄ    10/03/11  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *  04.06.00    NACL-Â¿¡¹Ç¼  10/12/01  ¼«ÇåÀÕ¶â³ÛÆþÎÏÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  11/10/XX  Æ±ÆüºÆÆþ±¡ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -187,6 +188,13 @@
       *
            03  WRK-DENPNUM             PIC 9(07).
            03  WRK-GRP-DENPNUM         PIC 9(07).
+      *ver.4.7
+      *    Æ±ÆüºÆÆþ±¡¶èÊ¬
+           03  FLG-DOUJITU             PIC 9(01).
+           03  WRK-NYUINYMD.
+               05  WRK-NYUINYM         PIC X(06).
+               05  WRK-NYUINDD         PIC 9(02).
+           03  WRK-DOUDAY              PIC 9(02).
       *
            03  WRK-SUM-TENSU                   PIC 9(09)V99.
            03  WRK-SUM-KINGAKU                 PIC 9(09).
@@ -720,6 +728,8 @@
       *****************************************************************
        200-MAIN-SYORI-SEC                SECTION.
       *
+      *    Æþ±¡´ðËÜÎÁÊÔ½¸
+           PERFORM 2002-NYUIN-HEN-SEC
       *    ¿ÇÎÅ¹Ô°Ù°õºþ
            PERFORM 2003-SRYACCT-SYORI-SEC
       *    Æþ±¡ÎÁ°õºþ
@@ -1060,6 +1070,14 @@
            MOVE    SYU-SKYSTYMD(7:2)   TO  IDX-STR
            MOVE    SYU-SKYEDYMD(7:2)   TO  IDX-END
            MOVE    SYU-SKYSTYMD        TO  WRK-SRYYMD
+      *ver.4.7
+           MOVE    ZERO                TO  WRK-DOUDAY
+           IF      FLG-DOUJITU         =   1
+               IF      WRK-NYUINYM     =   SYU-SRYYMD(1:6)
+                   MOVE    WRK-NYUINDD     TO  WRK-DOUDAY
+               END-IF
+           END-IF
+      *
       *
            INITIALIZE                      TBL-JIHI-AREA
       *    ¿ÇÎÅ²ñ·×
@@ -1087,7 +1105,12 @@
                MOVE    ZERO                TO  WRK-KAISU
                PERFORM VARYING     IDX     FROM    IDX-STR   BY  1
                        UNTIL       IDX     >   IDX-END
-                   ADD     ACCT-DAY (1 IDX)    TO  WRK-KAISU
+                   IF      WRK-DOUDAY          =   IDX
+      *                Æ±ÆüºÆÆþ±¡Ê¬
+                       ADD     ACCT-DAY (3 IDX)    TO  WRK-KAISU
+                   ELSE
+                       ADD     ACCT-DAY (2 IDX)    TO  WRK-KAISU
+                   END-IF
                END-PERFORM
       *
                IF    ( WRK-KAISU           =   ZERO )
@@ -2029,9 +2052,26 @@
       *****************************************************************
       *   Æþ±¡´ðËÜÎÁÊÔ½¸½èÍý
       *****************************************************************
-       2004-NYUIN-SYORI-SEC                SECTION.
+       2002-NYUIN-HEN-SEC                SECTION.
       *
            PERFORM 900-PTNYUINRRK-KEY-SEL-SEC
+      *
+      *    Æ±ÆüºÆÆþ±¡¶èÊ¬
+           IF      PTNYUINRRK-DOUJITSUKBN  =   "1"
+               MOVE    1                   TO  FLG-DOUJITU
+               MOVE    PTNYUINRRK-NYUINYMD TO  WRK-NYUINYMD
+           ELSE
+               MOVE    ZERO                TO  FLG-DOUJITU
+               MOVE    SPACE               TO  WRK-NYUINYMD
+           END-IF
+           .
+       2002-NYUIN-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   Æþ±¡´ðËÜÎÁÊÔ½¸½èÍý
+      *****************************************************************
+       2004-NYUIN-SYORI-SEC                SECTION.
       *
            INITIALIZE                      SS006-AREA
            MOVE    SYU-SKYSTYMD        TO  SS006-SKYSTYMD

@@ -30,7 +30,11 @@ fi
 #
 #-------------------------------------------#
 
-        LOG_FILE="/var/log/jma-receipt/${7}ORCBQ01.log"
+        OLDLOG="/var/log/jma-receipt/${7}ORCBQ01.log"
+        LOG_FILE="/var/log/jma-receipt/${7}orcb013_1.log"
+
+[ -e "${OLDLOG}" ] &&  rm ${OLDLOG}
+[ -e "${LOG_FILE}" ] &&  rm ${LOG_FILE}
 
         echo "all params [" $@ "]"   >$LOG_FILE
         echo "arg2   = [" ${2}   "]" <>$LOG_FILE

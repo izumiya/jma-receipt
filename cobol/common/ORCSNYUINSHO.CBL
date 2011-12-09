@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.00    NACL-多々納  10/01/XX  治験対応
+      *  04.07.00    NACL-多々納  11/11/XX  同日再入院対応
       *****************************************************************
       *
       *
@@ -104,6 +105,8 @@
            03  WRK-DRCD                PIC X(05).
            03  WRK-INPUTCOMENT         PIC X(80).
            03  WRK-ZAIKAISU            PIC 9(05).
+      *    同日再入院日
+           03  WRK-DDAY                PIC 9(02).
       *    処方せんＰＧ名
            03  WRK-SYOHOU-PG           PIC X(20).
       *
@@ -301,12 +304,26 @@
                ELSE
                    MOVE    31                          TO  WRK-ENDD
                END-IF
+      *        同日再入院区分
+               MOVE    ZERO                TO  WRK-DDAY
+               IF      ORCSNYUINSHO-DOUJITSUKBN    =   "1"
+                   IF      ACCT-SRYYM          =   ORCSNYUINSHO-NYUINYMD
+                                                            (1:6)
+                       MOVE    ORCSNYUINSHO-NYUINYMD(7:2)  TO  WRK-DDAY
+                   END-IF
+               END-IF
+      *
                MOVE    ZERO                TO  WRK-ZAIKAISU
-      *        最初の日を保存
+      *        回数集計
                PERFORM VARYING     IDY2    FROM    WRK-STDD  BY  1
                        UNTIL       IDY2    >   WRK-ENDD
                    IF      ACCT-DAY (1 IDY2)   >   ZERO
-                       ADD     ACCT-DAY (1 IDY2)   TO  WRK-ZAIKAISU
+                       IF      IDY2            =   WRK-DDAY
+      *                    同日再入院日
+                           ADD     ACCT-DAY (3 IDY2)   TO  WRK-ZAIKAISU
+                       ELSE
+                           ADD     ACCT-DAY (2 IDY2)   TO  WRK-ZAIKAISU
+                       END-IF
                    END-IF
                END-PERFORM
       *        診療科指定時

@@ -23,12 +23,3 @@
 #PGUPGRADEPATH=file:///cdrom/pub/bugfix/ubuntu/i386/@DISTCODENAME@
 #MSTUPDATEPATH=file:///cdrom/pub/orca_data
 #DBLICENSEPATH=file:///cdrom/pub/orca_data
-
-#
-# 薬剤情報（しおり）
-#
-#MEDSIORISITE=
-#MEDSIORIMONVER=1.2.5
-#MEDPHOTOPATH=http://
-#MEDPHOTOPATH=ftp://
-#MEDPHOTOPATH=file:///cdrom/

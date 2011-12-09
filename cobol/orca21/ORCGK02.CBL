@@ -140,7 +140,7 @@
       *
       *    ＳＰＡ画面パラメタデータ
        FD  SPASCR-FILE.
-       01  SPA-DATA-REC            PIC X(1200).
+       01  SPA-DATA-REC            PIC X(1500).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -5015,15 +5015,19 @@
       *            メモ登録有無
                    PERFORM 41021-PTMEMOINF-SEC
       *ito ちょっと試し start
-      *            INITIALIZE SPA-GMN-POPUP-STATUS
+                   INITIALIZE SPA-GMN-POPUP-STATUS
       *            MOVE    "保険確認"          TO  SPA-GMN-POPUP-SUMMARY
       *             STRING  PTHKN-KAKUNINYMD        DELIMITED  BY  SIZE
       *            STRING  "H23. 3.11"             DELIMITED  BY  SIZE
       *                    " より確認していません" DELIMITED  BY  SIZE
       *                                      INTO  SPA-GMN-POPUP-BODY
       *            END-STRING
-      *            MOVE    SPACE               TO  SPA-GMN-POPUP-ICON
-      *            MOVE    5                   TO  SPA-GMN-POPUP-TIMEOUT
+                   IF      PTMEMOINF-MEMO  NOT =   SPACE
+                   MOVE    "メモがあります"    TO  SPA-GMN-POPUP-SUMMARY
+                   MOVE    PTMEMOINF-MEMO      TO  SPA-GMN-POPUP-BODY
+                   MOVE    SPACE               TO  SPA-GMN-POPUP-ICON
+                   MOVE    5                   TO  SPA-GMN-POPUP-TIMEOUT
+                   END-IF
       *ito ちょっと試し END
       *
            END-EVALUATE
@@ -12094,14 +12098,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-HOSPNAME        TO  K02-TITLE
       *
       *ito ちょっと試し start
-      *    MOVE    SPA-GMN-POPUP-SUMMARY   TO  K02-POPUP-SUMMARY
-      *    MOVE    SPA-GMN-POPUP-BODY      TO  K02-POPUP-BODY
-      *    MOVE    SPA-GMN-POPUP-ICON      TO  K02-POPUP-ICON
-      *    MOVE    SPA-GMN-POPUP-TIMEOUT   TO  K02-POPUP-TIMEOUT
+           MOVE    SPA-GMN-POPUP-SUMMARY   TO  K02-POPUP-SUMMARY
+           MOVE    SPA-GMN-POPUP-BODY      TO  K02-POPUP-BODY
+           MOVE    SPA-GMN-POPUP-ICON      TO  K02-POPUP-ICON
+           MOVE    SPA-GMN-POPUP-TIMEOUT   TO  K02-POPUP-TIMEOUT
       *    DISPLAY "SPA-GMN-POPUP-TIMEOUT = " SPA-GMN-POPUP-TIMEOUT
-      *    IF      SPA-GMN-POPUP-SUMMARY   NOT = SPACE
-      *        INITIALIZE SPA-GMN-POPUP-STATUS
-      *    END-IF
+           IF      SPA-GMN-POPUP-SUMMARY   NOT = SPACE
+               INITIALIZE SPA-GMN-POPUP-STATUS
+           END-IF
       *ito ちょっと試し END
       *
       *    非活性処理

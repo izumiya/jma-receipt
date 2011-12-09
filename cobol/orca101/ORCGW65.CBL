@@ -5660,23 +5660,23 @@
                END-EVALUATE
       *
                EVALUATE    TRUE
-               WHEN  ( SPA-PREFNUM     =   CONST-HOKKAIDO )
-                AND  ( SPA-GMN-KOHNUM  =   "183" )
-               WHEN  ( SPA-PREFNUM     =   CONST-IBARAKI )
-                AND  ( SPA-GMN-KOHNUM  =   "152" )
-               WHEN  ( SPA-PREFNUM     =   CONST-TOKYO )
-                AND  ( SPA-GMN-KOHNUM  =   "151" )
-               WHEN  ( SPA-PREFNUM     =   CONST-AICHI )
-                AND  ( SPA-GMN-KOHNUM  =   "191" )
-               WHEN  ( SPA-PREFNUM     =   CONST-HYOGO )
-                AND  ( SPA-GMN-KOHNUM  =   "186" )
-                   MOVE    "1"         TO  SPA-GMN-PTJGNKBN
-                   MOVE    "0"         TO  SPA-GMN-PTJGNTAIKBN
-               WHEN  ( SPA-PREFNUM     =   CONST-FUKUSHIMA )
-                AND  ( SPA-GMN-KOHNUM  =   "281" )
-                   MOVE    "2"         TO  SPA-GMN-PTJGNKBN
-                   MOVE    "0"         TO  SPA-GMN-PTJGNTAIKBN
-               END-EVALUATE
+      *        WHEN  ( SPA-PREFNUM     =   CONST-HOKKAIDO )
+      *         AND  ( SPA-GMN-KOHNUM  =   "183" )
+      *        WHEN  ( SPA-PREFNUM     =   CONST-IBARAKI )
+      *         AND  ( SPA-GMN-KOHNUM  =   "152" )
+      *        WHEN  ( SPA-PREFNUM     =   CONST-TOKYO )
+      *         AND  ( SPA-GMN-KOHNUM  =   "151" )
+      *        WHEN  ( SPA-PREFNUM     =   CONST-AICHI )
+      *         AND  ( SPA-GMN-KOHNUM  =   "191" )
+      *        WHEN  ( SPA-PREFNUM     =   CONST-HYOGO )
+      *         AND  ( SPA-GMN-KOHNUM  =   "186" )
+      *            MOVE    "1"         TO  SPA-GMN-PTJGNKBN
+      *            MOVE    "0"         TO  SPA-GMN-PTJGNTAIKBN
+      *        WHEN  ( SPA-PREFNUM     =   CONST-FUKUSHIMA )
+      *         AND  ( SPA-GMN-KOHNUM  =   "281" )
+      *            MOVE    "2"         TO  SPA-GMN-PTJGNKBN
+      *            MOVE    "0"         TO  SPA-GMN-PTJGNTAIKBN
+      *        END-EVALUATE
       *
                EVALUATE    TRUE
                WHEN  ( SPA-PREFNUM     =   CONST-FUKUSHIMA )
@@ -5689,7 +5689,9 @@
                                         OR "582" OR "743" OR "442"
                                         OR "781" OR "542" OR "681"
                                         OR "682" OR "381" OR "372"
-                                        OR "373" OR "281" )
+                                        OR "373" OR "281" OR "462"
+                                        OR "562" OR "662" OR "762"
+                                        )
                WHEN  ( SPA-PREFNUM     =   CONST-KUMAMOTO )
                 AND  ( SPA-GMN-KOHNUM  =   "341" OR "442" )
                    MOVE    "1"         TO  SPA-GMN-IRYOKEIKBNG
@@ -5709,7 +5711,8 @@
                                         OR "543" OR "582" OR "743"
                                         OR "442" OR "781" OR "542"
                                         OR "681" OR "682" OR "381"
-                                        OR "372" OR "373" OR "281" )
+                                        OR "372" OR "373" OR "281"
+                                        OR "462" OR "762" )
                WHEN  ( SPA-PREFNUM     =   CONST-KUMAMOTO )
                 AND  ( SPA-GMN-KOHNUM  =   "341" OR "442" )
                    MOVE    "1"         TO  SPA-GMN-IRYOKEIKBNN

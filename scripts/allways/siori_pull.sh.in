@@ -1,0 +1,62 @@
+#!/bin/bash
+
+if test -z "$JMARECEIPT_ENV" ; then
+    JMARECEIPT_ENV="@jma-receipt-env@"
+fi
+if ! test -f "$JMARECEIPT_ENV"; then
+    exit 0
+fi
+
+. $JMARECEIPT_ENV
+
+#-------------------------------------------#
+#    薬剤情報マスタ医薬品しおりダウンロード処理
+#
+#	引数より
+#        $1  SRYCD 医薬品コード（９桁）
+#        $2  TERMID
+#        $3  JOBID 
+#        $4  SHELLID
+#        $5  HOSPNUM
+#-------------------------------------------#
+
+SRYCD=${1}
+TERMID=${2}
+JOBID=${3}
+SHELLID=${4}
+HOSPNUM=${5}
+
+MEDPHOTOPATH="${MSTSRVPATH}/siori/image"
+MEDPHOTODIR="/tmp/medphoto"
+MEDPHOTOTEMP="$MEDPHOTODIR"/${HOSPNUM}
+
+# 画像ファイル格納ディレクトリの作成
+
+if ! [ -d $MEDPHOTODIR ]; then
+  mkdir $MEDPHOTODIR
+fi
+if ! [ -d $MEDPHOTOTEMP ]; then
+  mkdir $MEDPHOTOTEMP
+fi
+
+# センターサーバより雛型を取り込む
+
+master_get.sh ${HOSPNUM} ${TERMID} ${JOBID} ${SHELLID} SIORI ${SRYCD}
+if [ $? -ne 0 ] ; then
+  exit $?
+fi
+ 
+FLIST=`echo "select photo1_filename || ' ' || photo2_filename || ' ' || photo3_filename from tbl_yakujyo_temp where termid='${TERMID}' and srycd='${SRYCD}' and hospnum=${HOSPNUM};" | psql -Atq ${DBNAME}`
+
+#echo $FLIST
+
+for file in $FLIST
+do
+  wget -q -O ${MEDPHOTOTEMP}/${file} ${MEDPHOTOPATH}/${file}
+done
+
+MSG="参照処理が終了しました"
+${DBSTUB} -dir ${LDDIRECTORY} -bd orcabt ORCBJOB2 \
+          -parameter "JBE${JOBID}${SHELLID}0000,${HOSPNUM},,,${MSG}"
+
+exit 0

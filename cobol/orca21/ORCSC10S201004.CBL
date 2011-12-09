@@ -69,6 +69,7 @@
       * 04.05.00     NACL-多々納  10/03/XX  平成２２年４月改正対応
       * 04.07.00     NACL-多々納  11/08/XX  リハビリ開始日の終了日対応
       * 04.07.00     NACL=多々納  11/09/08  アトピー性皮膚炎と他病名対応
+      * 04.07.00     NACL=多々納  11/11/08  夜間早朝加算の小児科特例対応
       *****************************************************************
       *
       *
@@ -346,6 +347,8 @@
            03  WRK-ZOGEN-MEI               PIC X(12).
            03  WRK-ZOGEN                   PIC S9(03).
            03  WRK-ENDYMD                  PIC X(08).
+      *    外来時間外区分設定
+           03  WRK-HZN-JIKANKBN            PIC 9(01).
       *
       *    診察料テーブル
        01  TBL-SINSATU-AREA.
@@ -2501,6 +2504,17 @@
                MOVE    1                   TO  FLG-ERR
            END-IF
       *
+      *ver.4.7
+      *    夜間早朝加算の６歳未満対応
+           MOVE    SPA-GAI-JIKANKBN    TO  WRK-HZN-JIKANKBN
+           IF      SPA-GAI-JIKANKBN    =   8
+      *        ６歳未満は小児科特例夜間へ
+               IF     (SPA-NENREI-YY       <   6  )
+                  AND (SPA-JIKANTOKU-NYU   =   1  )
+                   MOVE    5               TO  SPA-GAI-JIKANKBN
+               END-IF
+           END-IF
+      *
            IF      FLG-ERR             =   ZERO
       *        労災の初診料算定
                IF     (SPA-HKNKBN          =   1   )
@@ -2528,6 +2542,9 @@
                    END-IF
                END-IF
            END-IF
+      *ver.4.7
+      *    外来時間外区分設定を戻す
+           MOVE    WRK-HZN-JIKANKBN    TO  SPA-GAI-JIKANKBN
       *
            .
        200-SYOSIN-SET-EXT.
@@ -3189,7 +3206,7 @@
       *            夜間・早朝加算はなし
                IF     (SPA-GAI-JIKANKBN    NOT =   8    ) 
                    MOVE    SPA-GMN-INPUTCD (SPA-GMN-IDX)
-                                           TO  WRK-INPUTCD
+                                               TO  WRK-INPUTCD
                    MOVE    SPACE               TO  SPA-GMN-INPUTCD
                                                          (SPA-GMN-IDX)
                    MOVE    SPA-GAI-JIKANKBN    TO  SPA-GMN-INPUTCD

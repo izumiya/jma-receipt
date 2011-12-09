@@ -34,6 +34,7 @@
       *  04.03.00    NACL-多々納  08/08/01  保険組合せ期間チェック追加
       *  04.04.00    NACL-多々納  08/12/17  入院料包括チェック対応
       *  04.05.00    NACL-多々納  09/12/03  前月保険組合せ終了対応
+      *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *****************************************************************
       *
       *
@@ -101,6 +102,8 @@
       *
            03  IDX-N               PIC 9(04).
            03  IDZ                 PIC 9(04).
+      *ver.4.7
+           03  IDX4                PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -150,6 +153,9 @@
                    07  WRK-STMM        PIC 9(02).
                05  WRK-STDD            PIC 9(02).
            03  WRK-HKNERR              PIC X(01).
+      *ver.4.7
+           03  WRK-DDAY                PIC 9(02).
+           03  WRK-RENNUM              PIC 9(01).
       *
       *    投薬日
        01  TBL-TOUYAKU-AREA.
@@ -460,9 +466,32 @@
       *        回数により保存
                PERFORM VARYING     IDY2    FROM    1   BY  1
                        UNTIL       IDY2    >   31
-      *            投薬の日が入院中であること
-                   IF      ACCT-DAY (1 IDY2)   >   ZERO
+      *            同日入院
+                   MOVE    ZERO                TO  WRK-RENNUM
+                   MOVE    ZERO                TO  WRK-DDAY
+                   MOVE    ZERO                TO  WRK-KAISU
+                   IF     (IDX                 =  2  )  AND
+                          (TBL-NYU-DAY (IDY2)  =  3  )
+                       IF      ACCT-DAY (3 IDY2)   >   ZERO
+                           MOVE    ACCT-DAY (3 IDY2)   TO  WRK-KAISU
+                           MOVE    IDY2                TO  WRK-DDAY
+                           IF      ACCT-DAY (2 IDY2)   =   ZERO
+                               MOVE    1               TO  WRK-RENNUM
+                           END-IF
+                       ELSE
+      **                   MOVE    ACCT-DAY (2 IDY2)   TO  WRK-KAISU
+      *                    同日退院分は、１回のみとする
+                           IF      ACCT-DAY (2 IDY2)   >   ZERO
+                               MOVE    1               TO  WRK-KAISU
+                           END-IF
+                       END-IF
+                   ELSE
                        MOVE    ACCT-DAY (1 IDY2)   TO  WRK-KAISU
+                   END-IF
+      *            投薬の日が入院中であること
+      *********    IF      ACCT-DAY (1 IDY2)   >   ZERO
+                   IF      WRK-KAISU           >   ZERO
+      ***************  MOVE    ACCT-DAY (1 IDY2)   TO  WRK-KAISU
                        PERFORM VARYING IDX2    FROM    1   BY   1
                                UNTIL   IDX2    >   WRK-KAISU
                            COMPUTE IDX3        =   IDY2
@@ -486,17 +515,19 @@
                                   (TBL-NYU-DAY (IDX3)  =   ZERO)
                                MOVE    WRK-KAISU       TO  IDX2
                            ELSE
-                               MOVE    1               TO  TBL-TOU-DAY
-                                                            (IDX1 IDX3)
-                               PERFORM 100111-TOU-SRYKAHEN-SEC
-                               IF      FLG-MADOKU      =   1
-                                   MOVE    1           TO  TBL-DOK-DAY
-                                                            (IDX1 IDX3)
-                                   PERFORM 100112-DOK-SRYKAHEN-SEC
-                               END-IF
+      *ver.4.7                 算定あり編集
+                               PERFORM 100110-TOUDAY-HEN-SEC
+      ***********************  PERFORM 100111-TOU-SRYKAHEN-SEC
+      *                        IF      FLG-MADOKU      =   1
+      *                            MOVE    1           TO  TBL-DOK-DAY
+      *                                                     (IDX1 IDX3)
+      *                            PERFORM 100112-DOK-SRYKAHEN-SEC
+      *******************      END-IF
       *                        退院日の時、以降はなしとする
                                IF     (IDX1                =  2  )  AND
-                                      (TBL-NYU-DAY (IDX3)  =  2  )
+                                     ((TBL-NYU-DAY (IDX3)  =  2  )  OR
+                                      (TBL-NYU-DAY (IDX3)  =  3  AND
+                                       IDX3                >  IDY2))
                                    MOVE    WRK-KAISU       TO  IDX2
                                END-IF
                            END-IF
@@ -519,6 +550,41 @@
       *
            .
        10011-SRYACCT-21HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    投薬有編集処理
+      *****************************************************************
+       100110-TOUDAY-HEN-SEC             SECTION.
+      *
+           IF     (WRK-DDAY            =   IDX3 )
+             AND  (WRK-RENNUM          =   1    )
+      *        同日再入院日で退院分がない時
+               IF      TBL-TOU-DAY (IDX1 IDX3) =   ZERO
+                   MOVE    2           TO  TBL-TOU-DAY (IDX1 IDX3)
+      *            診療科・保険編集処理（投薬）
+                   PERFORM 100111-TOU-SRYKAHEN-SEC
+               END-IF
+           ELSE
+               MOVE    1               TO  TBL-TOU-DAY (IDX1 IDX3)
+      *        診療科・保険編集処理（投薬）
+               PERFORM 100111-TOU-SRYKAHEN-SEC
+           END-IF
+      *    麻毒算定
+           IF      FLG-MADOKU          =   1
+               IF     (WRK-DDAY            =   IDX3 )
+                 AND  (WRK-RENNUM          =   1    )
+      *            同日再入院日で退院分がない時
+                   IF      TBL-DOK-DAY (IDX1 IDX3) =   ZERO
+                       MOVE    2           TO  TBL-DOK-DAY (IDX1 IDX3)
+                       PERFORM 100112-DOK-SRYKAHEN-SEC
+                   END-IF
+               ELSE
+                   MOVE    1               TO  TBL-DOK-DAY (IDX1 IDX3)
+                   PERFORM 100112-DOK-SRYKAHEN-SEC
+               END-IF
+           END-IF
+           .
+       100110-TOUDAY-HEN-EXT.
            EXIT.
       *****************************************************************
       *    診療科・保険編集処理（投薬）
@@ -571,7 +637,7 @@
                    END-IF
                END-IF
                IF     (TBL-TOU-SRYKA (IDX1 IDX3 IDX-T)
-                                               =   ACCT-SRYKA  )   AND 
+                                               =   ACCT-SRYKA  )   AND
                       (TBL-TOU-HKNCOMBI(IDX1 IDX3 IDX-T)
                                                =   ACCT-HKNCOMBI)
                    MOVE    10              TO  IDX-T
@@ -680,15 +746,25 @@
                    PERFORM VARYING     IDX3    FROM    1   BY  1
                            UNTIL       IDX3    >   31
                        IF      ACCT-DAY (1 IDX3)   >   ZERO
-                           MOVE    1               TO  TBL-TOU-DAY
-                                                            (2  IDX3)
-                           MOVE    2               TO  IDX1
-                           PERFORM 100111-TOU-SRYKAHEN-SEC
-                           IF      FLG-MADOKU      =   1
-                               MOVE    1               TO  TBL-DOK-DAY
-                                                            (2  IDX3)
-                               PERFORM 100112-DOK-SRYKAHEN-SEC
+      *ver.4.7
+                           MOVE    ZERO            TO  WRK-DDAY
+                           MOVE    ZERO            TO  WRK-RENNUM
+                           IF      ACCT-DAY (3 IDX3)   >   ZERO
+                               MOVE    IDX3            TO  WRK-DDAY
+                               IF      ACCT-DAY (2 IDX3)   =   ZERO
+                                   MOVE    1           TO  WRK-RENNUM
+                               END-IF
                            END-IF
+      *ver.4.7             MOVE    1               TO  TBL-TOU-DAY
+      *                                                     (2  IDX3)
+                           MOVE    2               TO  IDX1
+                           PERFORM 100110-TOUDAY-HEN-SEC
+      *                    PERFORM 100111-TOU-SRYKAHEN-SEC
+      *                    IF      FLG-MADOKU      =   1
+      *                        MOVE    1               TO  TBL-DOK-DAY
+      *                                                     (2  IDX3)
+      *                        PERFORM 100112-DOK-SRYKAHEN-SEC
+      *                    END-IF
                        END-IF
                    END-PERFORM
                  END-IF
@@ -900,10 +976,16 @@
                       (IDX-E               >   ZERO )
                    PERFORM VARYING     IDX     FROM    IDX-S  BY  1
                            UNTIL       IDX     >   IDX-E
-                       MOVE    1                   TO  TBL-NYU-DAY(IDX)
+      *****            MOVE    1                   TO  TBL-NYU-DAY(IDX)
       *                退院日設定
                        IF      IDX                 =   IDX-TAI
-                           MOVE    2               TO  TBL-NYU-DAY(IDX)
+                           IF      TBL-NYU-DAY(IDX)    =   1
+                               MOVE    3           TO  TBL-NYU-DAY(IDX)
+                           ELSE
+                               MOVE    2           TO  TBL-NYU-DAY(IDX)
+                           END-IF
+                       ELSE
+                           MOVE    1               TO  TBL-NYU-DAY(IDX)
                        END-IF
       *                入院の科と保険
                        MOVE    PTNYUINRRK-NYUINKA  TO  TBL-NYU-SRYKA
@@ -1168,6 +1250,12 @@
       *
            MOVE    ZERO                TO  FLG-ARI
            MOVE    ZERO                TO  WRK-IDX2
+      *ver.4.7
+           IF      TBL-TOU-DAY (2 IDX) =   2
+               MOVE    3                   TO  IDX4
+           ELSE
+               MOVE    2                   TO  IDX4
+           END-IF
       *
       *    包括分の判定
            IF      TBL-HKTCHKFLG (IDX)     =   1
@@ -1218,13 +1306,16 @@
                                                          (IDX2 4 IDX)
                END-IF
            END-PERFORM
-           IF      FLG-ARI             =   1
-               GO      TO      4002-TOU-ADD-SYORI-EXT
-           END-IF
+      *?   IF      FLG-ARI             =   1
+      *        GO      TO      4002-TOU-ADD-SYORI-EXT
+      *    END-IF
       *    当日調剤料指定がない時、対象の剤へ
            IF      WRK-IDX2            >   ZERO
                MOVE    1               TO  TBL-CHO-DAY (WRK-IDX2 1 IDX)
-               MOVE    1               TO  TBL-CHO-DAY (WRK-IDX2 2 IDX)
+               MOVE    ZERO            TO  TBL-CHO-DAY (WRK-IDX2 2 IDX)
+               MOVE    ZERO            TO  TBL-CHO-DAY (WRK-IDX2 3 IDX)
+               MOVE    1               TO  TBL-CHO-DAY
+                                                    (WRK-IDX2 IDX4 IDX)
                GO      TO      4002-TOU-ADD-SYORI-EXT
            END-IF
       *
@@ -1265,7 +1356,8 @@
                                            TO  TBL-CHO-HKNCOMBI (IDX2)
                    MOVE    WRK-JIHOKBN     TO  TBL-CHO-JIHOKBN  (IDX2)
                    MOVE    1               TO  TBL-CHO-DAY (IDX2 1 IDX)
-                   MOVE    1               TO  TBL-CHO-DAY (IDX2 2 IDX)
+                   MOVE    1               TO  TBL-CHO-DAY
+                                                         (IDX2 IDX4 IDX)
                    MOVE    10              TO  IDX2
                END-IF
            END-PERFORM
@@ -1304,6 +1396,12 @@
            ELSE
                MOVE    SPACE               TO  WRK-JIHOKBN
            END-IF
+      *ver.4.7
+           IF      TBL-DOK-DAY (2 IDX) =   2
+               MOVE    3                   TO  IDX4
+           ELSE
+               MOVE    2                   TO  IDX4
+           END-IF
       *
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL      (IDX2    >   10  )  OR
@@ -1326,6 +1424,11 @@
                    IF      TBL-MAD-DAY (IDX2 1 IDX)   >   ZERO
                        IF      FLG-ARI         =   ZERO
                            MOVE    1               TO  FLG-ARI
+      *ver.4.7
+                           IF      TBL-MAD-DAY (IDX2 IDX4 IDX) >   ZERO
+                               MOVE    ZERO            TO  FLG-ARI
+                           END-IF
+      *ver.4.7
                        ELSE
                            MOVE    ZERO            TO  TBL-MAD-DAY
                                                          (IDX2 1 IDX)
@@ -1354,7 +1457,11 @@
       *    当日調剤料指定がない時、対象の剤へ
            IF      WRK-IDX2            >   ZERO
                MOVE    1               TO  TBL-MAD-DAY (WRK-IDX2 1 IDX)
-               MOVE    1               TO  TBL-MAD-DAY (WRK-IDX2 2 IDX)
+      *ver.4.7
+               MOVE    ZERO            TO  TBL-MAD-DAY (WRK-IDX2 2 IDX)
+               MOVE    ZERO            TO  TBL-MAD-DAY (WRK-IDX2 3 IDX)
+               MOVE    1               TO  TBL-MAD-DAY
+                                                     (WRK-IDX2 IDX4 IDX)
                GO      TO      4004-MAD-ADD-SYORI-EXT
            END-IF
       *
@@ -1394,7 +1501,8 @@
                                            TO  TBL-MAD-HKNCOMBI (IDX2)
                    MOVE    WRK-JIHOKBN     TO  TBL-MAD-JIHOKBN  (IDX2)
                    MOVE    1               TO  TBL-MAD-DAY (IDX2 1 IDX)
-                   MOVE    1               TO  TBL-MAD-DAY (IDX2 2 IDX)
+                   MOVE    1               TO  TBL-MAD-DAY
+                                                         (IDX2 IDX4 IDX)
                    MOVE    10              TO  IDX2
                END-IF
            END-PERFORM

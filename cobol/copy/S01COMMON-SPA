@@ -36,6 +36,8 @@
            05  SPA-S01-DENPNUM           PIC 9(07).
       *伝票発行日
            05  SPA-S01-DENPPRTYMD        PIC X(08).
+      *グループ伝票番号
+           05  SPA-S01-GRP-DENPNUM       PIC 9(07).
       *患者ＩＤ
            05  SPA-S01-PTID              PIC 9(10).
       *患者番号
@@ -50,22 +52,23 @@
            05  SPA-S01-NYUKIN-HOHO       PIC X(02).
       *患者発行区分
            05  SPA-S01-SKYPRT            PIC X(01).
+           05  SPA-S01-TUKI-G.
       *月別請求書伝票番号
-           05  SPA-S01-TUKI-DENPNUM      PIC  9(07).
+               07  SPA-S01-TUKI-DENPNUM  PIC  9(07).
       *月別請求書診療年月
-           05  SPA-S01-TUKI-SRYYM        PIC  X(06).
+               07  SPA-S01-TUKI-SRYYM    PIC  X(06).
       *月別請求書期間区分
-           05  SPA-S01-TUKI-KIKANKBN     PIC  X(06).
+               07  SPA-S01-TUKI-KIKANKBN PIC  X(06).
       *請求期間開始日
-           05  SPA-S01-TUKI-STYMD        PIC  X(08).
+               07  SPA-S01-TUKI-STYMD    PIC  X(08).
       *請求期間終了日
-           05  SPA-S01-TUKI-EDYMD        PIC  X(08).
+               07  SPA-S01-TUKI-EDYMD    PIC  X(08).
       *月別請求書発行方法
-           05  SPA-S01-TUKI-GRPKBN       PIC  X(01).
+               07  SPA-S01-TUKI-GRPKBN   PIC  X(01).
       *月別請求書印刷区分
-           05  SPA-S01-TUKI-SKYPRT       PIC  X(01).
+               07  SPA-S01-TUKI-SKYPRT   PIC  X(01).
       *月別明細書印刷区分
-           05  SPA-S01-TUKI-SRYPRT       PIC  X(01).
+               07  SPA-S01-TUKI-SRYPRT   PIC  X(01).
       *排他フラグ
            05  SPA-S01-LOCK              PIC 9(01).
       *排他メッセージ
@@ -110,12 +113,21 @@
            05  SPA-S01-GAI-MISYU         PIC S9(08).
       *入院未収額
            05  SPA-S01-NYU-MISYU         PIC S9(08).
+      *PARA-GYOUMUID
+           05  SPA-S01-GYOUMUID          PIC  X(03).
+      *UID
+           05  SPA-S01-UID               PIC  X(36).
+      *PARAFILEMEI
+           05  SPA-S01-FILEMEI.
+               07  SPA-S01-FILEMEI-YMD   PIC X(08).
+               07  SPA-S01-FILEMEI-HMS   PIC X(06).
+               07  SPA-S01-FILEMEI-CD    PIC X(06).
       *警告メッセージ
            05  SPA-SIDCD                 PIC  X(04).
       *警告画面より
            05  SPA-SID1-AREA. 
-               07  SPA-SID1-FLG          PIC  X(02).
-               07  SPA-S99-FLG           PIC  X(02).
+               07  SPA-SID1-FLG          PIC  X(05).
+               07  SPA-S99-FLG           PIC  X(05).
            05  SPA-S01-SHIHARAI-PARA.
                07  SPA-S01-SHR-ORDER     PIC  X(02).
                07  SPA-S01-SHR-NYUGAIKBN PIC  X(01).

@@ -9,7 +9,12 @@ fi
 
 . $JMARECEIPT_ENV
 
-LOG=/var/log/jma-receipt/"$2"ORCBQ03.log
+OLDLOG=/var/log/jma-receipt/"$2"ORCBQ03.log
+LOG=/var/log/jma-receipt/"$2"orcb013_3.log
+
+[ -e "${OLDLOG}" ] &&  rm ${OLDLOG}
+[ -e "${LOG}" ] &&  rm ${LOG}
+
 
 #-------------------------------------------#
 #        検索結果データ作成

@@ -56,8 +56,9 @@
                 04  K02N-VALUE  PIC X(4).
               03  K02N-NYUINKA.
                 04  K02N-VALUE  PIC X(10).
-              03  K02N-NYUINKIKAN.
-                04  K02N-VALUE  PIC X(20).
+              03  K02N-NYUINKIKAN-G.
+                04  K02N-NYUINKIKAN-STYLE  PIC X(20).
+                04  K02N-NYUINKIKAN  PIC X(22).
               03  K02N-TEISEI.
                 04  K02N-TEISEI-VALUE  PIC X.
                 04  K02N-TEISEI-LABEL  PIC X(10).

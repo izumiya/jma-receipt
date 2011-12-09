@@ -30,6 +30,7 @@
       *  01.00.01    NACL-多々納  05/11/30  MONFUNC 対応
       *  03.05.00    NACL-多々納  07/05/XX  グループ診療対応
       *  04.05.00    NACL-多々納  09/06/29  一括入力対応
+      *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -50,6 +51,8 @@
       *
       *    画面スパ領域
            COPY    "J02SCR-SPA".
+      *    画面色等
+           COPY    "ENUM-VALUE".
       *
       *    フラグ領域
        01  STS-AREA.
@@ -202,7 +205,7 @@
            ELSE
       *
       *        初期画面編集
-      *D       PERFORM 300-SCREEN-SEC
+               PERFORM 300-SCREEN-SEC
       *
       *        画面編集
                PERFORM 500-GMNHEN-SEC
@@ -227,11 +230,9 @@
       *****************************************************************
        300-SCREEN-SEC              SECTION.
       *
-           INITIALIZE                  SPA-J021-AREA
       *
            PERFORM                     310-SPA-SET-SEC
       *
-           MOVE    1                   TO  SPA-GMN-CUR
       *
            .
        3OO-SCREEN-EXT.
@@ -242,6 +243,51 @@
       *****************************************************************
        310-SPA-SET-SEC                  SECTION.
       *
+           MOVE    SPA-J022-MAX        TO  IDY
+           INITIALIZE                  SPA-J022-AREA
+      *
+           MOVE    IDY                 TO  SPA-J022-MAX
+      *
+           MOVE    SPA-DAY-IDX         TO  SPA-J022-IDX
+           MOVE    1                   TO  SPA-NAI-DAYCHK
+                                                        (SPA-DAY-IDX)
+           MOVE    SPA-GNAI-DAY (2 SPA-DAY-IDX)
+                                       TO  SPA-NAI-DAY1 (SPA-DAY-IDX)
+           MOVE    SPA-GNAI-DAY (3 SPA-DAY-IDX)
+                                       TO  SPA-NAI-DAY2 (SPA-DAY-IDX)
+           MOVE    SPA-GNAI-DAY (4 SPA-DAY-IDX)
+                                       TO  SPA-NAI-DAY3 (SPA-DAY-IDX)
+      *
+           MOVE    SPA-GNAI-DAY (2 SPA-J022-IDX) 
+                                       TO  SPA-J022-DAY1
+           MOVE    SPA-GNAI-DAY (3 SPA-J022-IDX) 
+                                       TO  SPA-J022-DAY2
+           MOVE    SPA-GNAI-DAY (4 SPA-J022-IDX) 
+                                       TO  SPA-J022-DAY3
+           IF     (SPA-J022-DAY1   >   ZERO )  AND
+                  (SPA-J022-MAX    <   1    )
+               MOVE    1               TO  SPA-J022-MAX
+           END-IF
+           IF     (SPA-J022-DAY2   >   ZERO )  AND
+                  (SPA-J022-MAX    <   2    )
+               MOVE    2               TO  SPA-J022-MAX
+           END-IF
+           IF     (SPA-J022-DAY3   >   ZERO )  AND
+                  (SPA-J022-MAX    <   3    )
+               MOVE    3               TO  SPA-J022-MAX
+           END-IF
+      *
+      *    日付変換
+           MOVE    SPA-NAI-SRYYM       TO  WRK-SYMD(1:6)
+           MOVE    SPA-J022-IDX        TO  WRK-SDD
+           INITIALIZE                  LNK-DAY2-AREA
+           MOVE    "21"                TO  LNK-DAY2-IRAI
+           MOVE    WRK-SYMD            TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"           USING  STS-AREA-DAY
+                                              LNK-DAY2-AREA
+           IF      STS-DAY-RC1         =   ZERO
+               MOVE  LNK-DAY2-EDTYMD3      TO  SPA-HENNYMD
+           END-IF
       *
            .
        310-SPA-SET-EXT.
@@ -252,7 +298,8 @@
       *****************************************************************
        500-GMNHEN-SEC                  SECTION.
       *
-           MOVE    SPACE               TO  J021
+           MOVE    SPACE               TO  J022
+           INITIALIZE                      J022
       *
       *    画面編集
            MOVE    SPA-HENNYMD(11:)    TO  J022-SRYYMD
@@ -260,6 +307,19 @@
            MOVE    SPA-J022-DAY1       TO  J022-DAY1
            MOVE    SPA-J022-DAY2       TO  J022-DAY2
            MOVE    SPA-J022-DAY3       TO  J022-DAY3
+      *
+           MOVE    WIDGET-NORMAL       TO  J022-DAY1-STATE
+           MOVE    WIDGET-NORMAL       TO  J022-DAY2-STATE
+           MOVE    WIDGET-NORMAL       TO  J022-DAY3-STATE
+           IF      SPA-NYUGAIKBN       =   "1"
+               MOVE    WIDGET-INSENSITIVE  TO  J022-DAY3-STATE
+               MOVE    "（退院分）"        TO  J022-MSG1
+               MOVE    "（入院分）"        TO  J022-MSG2
+           ELSE
+               IF      SPA-J022-MAX        =   2
+                   MOVE    WIDGET-INSENSITIVE  TO  J022-DAY3-STATE
+               END-IF
+           END-IF
       *
            PERFORM 5001-MAPCUR-SEC
            .
@@ -277,6 +337,10 @@
                        MOVE    2                   TO  SPA-J022-CUR
                    WHEN    "DAY2"
                        MOVE    3                   TO  SPA-J022-CUR
+                       IF     (SPA-NYUGAIKBN       =   "1"  )
+                       OR     (SPA-J022-MAX        =   2    )
+                           MOVE    4                   TO  SPA-J022-CUR
+                       END-IF
                    WHEN    "DAY3"
                        MOVE    4                   TO  SPA-J022-CUR
                    WHEN    OTHER

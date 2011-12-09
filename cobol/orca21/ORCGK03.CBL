@@ -342,6 +342,10 @@
            03  WRK-RENNUM              PIC 9(02).
       *
            03  WRK-SKYPRTFLG           PIC X(01).
+      *    発行日保存
+           03  WRK-GMN-HAKYMD          PIC X(10).
+           03  WRK-NAI-HAKYMD          PIC X(08).
+           03  WRK-MAE-HAKYMD          PIC X(08).
       *
       *    剤テーブル領域
        01  WRK-TBL-ZAINUM-AREA.
@@ -1192,6 +1196,11 @@
            MOVE    SPA-GMN-HKNCOMBI    TO  SPA-GOK-HKNCOMBI
       *
       *    収納編集
+           INITIALIZE                  SPA-GMN-AREA
+      *    発行日
+           MOVE    SPA-SYSYMDWH        TO  SPA-GMN-HAKYMD
+           MOVE    SPA-SYSYMD          TO  SPA-NAI-HAKYMD
+           MOVE    SPA-SYSYMD          TO  SPA-MAE-HAKYMD
            PERFORM 3102-SYUNOU-HEN-SEC
       *
            COMPUTE WRK-SKYMONEY        =   SPA-GOK-SKYMONEY
@@ -1402,9 +1411,18 @@
       *****************************************************************
        3102-SYUNOU-HEN-SEC             SECTION.
       *
+      *    発行日保存
+           MOVE    SPA-GMN-HAKYMD      TO  WRK-GMN-HAKYMD
+           MOVE    SPA-NAI-HAKYMD      TO  WRK-NAI-HAKYMD
+           MOVE    SPA-MAE-HAKYMD      TO  WRK-MAE-HAKYMD
+      *
            INITIALIZE                  SPA-GMN-AREA
            MOVE    ZERO                TO  SPA-NAI-NYUKINFLG
            MOVE    ZERO                TO  SPA-NAI-HENFLG
+      *    発行日を戻す
+           MOVE    WRK-GMN-HAKYMD      TO  SPA-GMN-HAKYMD
+           MOVE    WRK-NAI-HAKYMD      TO  SPA-NAI-HAKYMD
+           MOVE    WRK-MAE-HAKYMD      TO  SPA-MAE-HAKYMD
       *
       *    科合計の入金額を編集する
            PERFORM 310515-KAGOK-NYUKIN-SEC
@@ -1450,9 +1468,9 @@
        31021-SYUNOU-GMN-HEN-SEC             SECTION.
       *
       *    発行日
-           MOVE    SPA-SYSYMDWH        TO  SPA-GMN-HAKYMD
-           MOVE    SPA-SYSYMD          TO  SPA-NAI-HAKYMD
-           MOVE    SPA-SYSYMD          TO  SPA-MAE-HAKYMD
+      *    MOVE    SPA-SYSYMDWH        TO  SPA-GMN-HAKYMD
+      *    MOVE    SPA-SYSYMD          TO  SPA-NAI-HAKYMD
+      *    MOVE    SPA-SYSYMD          TO  SPA-MAE-HAKYMD
       *    伝票番号
       *    MOVE    SYU-DENPNUM          TO  SPA-GMN-DENPNUM
            IF      SPA-SYORIFLG        =   1

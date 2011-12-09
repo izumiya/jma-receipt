@@ -48,7 +48,7 @@
       *
       *    ＳＰＡパラメタデータ
        FD  SPASCR-FILE.
-       01  SPA-DATA-REC            PIC X(1200).
+       01  SPA-DATA-REC            PIC X(1500).
       *
       *
        WORKING-STORAGE             SECTION.

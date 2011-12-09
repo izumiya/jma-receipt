@@ -2935,45 +2935,36 @@
                EVALUATE LNK-S02-RC
                WHEN    13
                    MOVE    "2002"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    14
                    MOVE    "2003"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    15
                    MOVE    "2004"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    16
                    MOVE    "2005"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    17
                    MOVE    "2006"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    18
                    MOVE    "2007"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    19
                    MOVE    "2008"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    20
                    MOVE    "2009"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    21
                    MOVE    "2010"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                WHEN    22
                    MOVE    "2011"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
+               WHEN    23
+                   MOVE    "2012"      TO  SPA-ERRCD
+               WHEN    24
+                   MOVE    "2013"      TO  SPA-ERRCD
                WHEN    OTHER
                    MOVE    "2001"      TO  SPA-ERRCD
-                   GO  TO  490-FTNKIN-CALC-EXT
                END-EVALUATE
            END-IF
-
       *
-      *    収納データ退避処理
-           PERFORM 490-SYUNOU-TAIHI-SEC
-           IF    ( SPA-ERRCD       NOT =   SPACE )
-               GO  TO  490-FTNKIN-CALC-EXT
+           IF    ( SPA-ERRCD           =   SPACE )
+      *        収納データ退避処理
+               PERFORM 490-SYUNOU-TAIHI-SEC
            END-IF
       *
            .
@@ -4000,6 +3991,25 @@
                STRING  "負担金計算に失敗しました。"
                                            DELIMITED   BY  SPACE
                        "他医受診（外泊）の入力に誤りがあります"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2012"
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                       "同日再入院日に実日数算定コード"
+                                           DELIMITED   BY  SPACE
+                       "を入力してください"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2013"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                       "同日再入院日の再入院分に入院料加算"
+                                           DELIMITED   BY  SPACE
+                       "が算定されています"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING

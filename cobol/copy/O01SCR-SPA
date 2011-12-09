@@ -214,7 +214,7 @@
                05  SPA-GMN-O04-SMEITBL-AREA.
                    07  SPA-GMN-O04-SMEILIST-MAX        PIC 9(02).
                    07  SPA-GMN-O04-SMEILIST-SEL        PIC 9(02).
-                   07  SPA-GMN-O04-SMEITBL-OCC         OCCURS  50.
+                   07  SPA-GMN-O04-SMEITBL-OCC         OCCURS  99.
                        09  SPA-GMN-O04-TDENPEDANUM     PIC 9(02).
                        09  SPA-GMN-O04-TSKYMONEY       PIC S9(10).
                        09  SPA-GMN-O04-TNYUKIN         PIC S9(10).
@@ -280,7 +280,7 @@
                                                        PIC X(02).
       *
                05  SPA-NAI-O04-SMEITBL-AREA.
-                   07  SPA-NAI-O04-SMEITBL-OCC         OCCURS  50.
+                   07  SPA-NAI-O04-SMEITBL-OCC         OCCURS  99.
                        09  SPA-NAI-O04-TMEISAIJOUTAIKBN
                                                        PIC X(01).
                        09  SPA-NAI-O04-TNYKN-HOHO      PIC X(02).

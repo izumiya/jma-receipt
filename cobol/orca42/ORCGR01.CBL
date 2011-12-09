@@ -140,11 +140,17 @@
       *                                     平成２２年４月分以降の訂正日
       *                                     の処理を元に戻す
       *  04.05.07    NACL-藤原    11/08/02  労災新様式対応
+      *  04.05.08    NACL-藤原    11/10/24  「請求しない」設定の請求管理
+      *                                     の削除処理の有無対応
+      *  04.05.09    NACL-藤原    11/11/22  同日再入院がある場合のチェック
+      *                                     追加
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
       *                                     不明分ありのとき赤字でエラー
       *                                     表示を行う
+      *
+      *  04.07.01    NACL-藤原    11/10/26  労災請求書作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -266,6 +272,7 @@
                    07  WRK-NAI-TSRYYM      PIC 9(06).
                    07  WRK-NAI-TTAISYO     PIC 9(01).
                    07  WRK-NAI-TDELETE     PIC 9(01).
+                   07  WRK-NAI-TCHK        PIC 9(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -480,6 +487,8 @@
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -506,6 +515,7 @@
            COPY    "RID1.INC".
            COPY    "RID2.INC".
            COPY    "RID3.INC".
+           COPY    "RID4.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -576,6 +586,10 @@
                    PERFORM 520-RIDSET-SEC
                    GO  TO  100-INIT-EXT
                END-IF
+               IF      SPA-RIDCD4      NOT =   SPACE
+                   PERFORM 540-RIDSET4-SEC
+                   GO  TO  100-INIT-EXT
+               END-IF
            END-IF
       *
            MOVE    SPACE               TO  LINKAREA
@@ -583,7 +597,7 @@
            MOVE    SPACE               TO  MCP-PUTTYPE
            MOVE    "R01    "           TO  MCP-WINDOW
       *
-           PERFORM 900-PUT-WINDOW.
+           PERFORM 900-PUT-WINDOW
       *
            MOVE    1                   TO  FLG-END
            .
@@ -628,6 +642,9 @@
                    GO      TO      300-SCREEN-EXT
                WHEN    "R96"
                    PERFORM 340-RID2-SET-SEC
+                   GO      TO      300-SCREEN-EXT
+               WHEN    "RID4"
+                   PERFORM 350-RID4-SET-SEC
                    GO      TO      300-SCREEN-EXT
            END-EVALUATE
       *
@@ -817,7 +834,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
            EXIT.
       *
       *****************************************************************
-      *    確認画面（ＣＩＤ１）ＯＫ処理
+      *    確認画面１戻り処理
       *****************************************************************
        330-RID1-SET-SEC            SECTION.
       *
@@ -840,7 +857,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
                        PERFORM 4501-JOBKANRI-CHK-SEC
                        IF      SPA-ERRCD      =   SPACE
                            PERFORM 450-KOUSHIN-SEC
-                       END-IF    
+                       END-IF
                    WHEN    "1003"
                        PERFORM 460-CLEAR-SEC
                    WHEN    "1005"
@@ -886,8 +903,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
                        END-IF 
                    WHEN    OTHER
                        PERFORM 480-ZENKAI-HYOUJI-SEC
-                       MOVE    SPACE           TO  SPA-RID1-FLG
-                                                   SPA-R99-FLG
+                       INITIALIZE                  SPA-RID1-AREA
                        IF      SPA-RIDCD   NOT =   SPACE
                            GO  TO  330-RID1-SET-EXT
                        END-IF 
@@ -910,9 +926,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
                WHEN    "1011"
                WHEN    "1012"
                WHEN    "1013"
-                   MOVE    SPACE           TO  SPA-RID1-FLG
-                                               SPA-R99-FLG
-                   MOVE    SPACE           TO  SPA-RIDCD      
+                   INITIALIZE                  SPA-RID1-AREA
+                                               SPA-RIDCD-AREA
                    PERFORM UNTIL   SPA-NAI-R01-2002-INDEX
                                            >=  SPA-NAI-R01-2002-MAX
                            OR      SPA-RIDCD   NOT =   SPACE
@@ -924,9 +939,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
                        PERFORM 4802-ZENKAI-HYOUJI-SYSKANRI-HENSYU-SEC   
                    END-IF
                WHEN    OTHER
-                   MOVE    SPACE           TO  SPA-RID1-FLG
-                                               SPA-R99-FLG
-                   MOVE    SPACE           TO  SPA-RIDCD      
+                   INITIALIZE                  SPA-RID1-AREA
+                                               SPA-RIDCD-AREA
            END-EVALUATE
       *
            MOVE    ZERO           TO  SPA-NAI-R01-PRTKBN-FLG  
@@ -936,7 +950,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
            EXIT.
       *
       *****************************************************************
-      *    確認画面（ＣＩＤ２）ＯＫ処理
+      *    確認画面（ＲＩＤ２）戻り処理
       *****************************************************************
        340-RID2-SET-SEC            SECTION.
       *
@@ -957,16 +971,39 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
                    END-IF    
            END-EVALUATE     
       *
-           MOVE    SPACE           TO  SPA-RID1-FLG
-                                       SPA-R99-FLG
-                                       SPA-R99-CANCEL
-           MOVE    SPACE           TO  SPA-RIDCD
-           MOVE    SPACE           TO  SPA-RIDCD2      
-           MOVE    SPACE           TO  SPA-RIDCD3
+           INITIALIZE                  SPA-RID1-AREA
+                                       SPA-RIDCD-AREA
            MOVE    ZERO            TO  SPA-R01-JOBCNT       
                                        SPA-R01-STOPFLG    
            .
        340-RID2-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    確認画面（ＲＩＤ４）戻り処理
+      *****************************************************************
+       350-RID4-SET-SEC            SECTION.
+      *
+           IF      SPA-RID4-FLG    =   "CHG"   OR  "OK"
+               EVALUATE    SPA-RIDCD4
+                   WHEN    "1002"
+                   WHEN    "1006"
+                   WHEN    "1007"
+      *                ジョブ管理チェック処理
+                       PERFORM 4501-JOBKANRI-CHK-SEC
+                       IF      SPA-ERRCD      =   SPACE
+                           PERFORM 450-KOUSHIN-SEC
+                       END-IF
+               END-EVALUATE
+           END-IF
+      *
+           INITIALIZE                  SPA-RID1-AREA
+                                       SPA-RIDCD-AREA
+      *
+           MOVE    ZERO           TO  SPA-NAI-R01-PRTKBN-FLG  
+      *
+           .
+       350-RID4-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1092,6 +1129,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  BTPARA-HOSPNUM
                                        TO  SPA-NAI-R01-SRYYM
            MOVE    SPA-GMN-R01-TNYUGAIKBN (SPA-GMN-R01-RENNUM)
                                        TO  SPA-GMN-R01-NYUGAIKBN
+           MOVE    SPA-NAI-R01-TCHK       (SPA-GMN-R01-RENNUM)
+                                       TO  SPA-NAI-R01-CHK
       *
            MOVE    4                   TO  SPA-GMN-R01-CUR 
       *
@@ -1348,6 +1387,19 @@ grpsys                 MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                                                        =   1
                            ADD     1       TO
                                        SPA-NAI-R01-BTPARA-TAISYO-MAX
+      *
+      *                    請求しない設定の存在チェック
+                           INITIALIZE                  RECE10-REC
+                           MOVE    SPA-HOSPNUM     TO  RECE10-HOSPNUM
+                           MOVE    QTORM-SRYYM      TO  RECE10-SRYYM
+                           MOVE    SPA-R01-NYUGAIKBN
+                                                    TO  RECE10-NYUGAIKBN
+                           MOVE    QTORS-PTID       TO  RECE10-PTID
+                           PERFORM 900-SEIKYU-SKYKBN-CHECK-SEC
+                           IF      FLG-SEIKYU-UMU      =   1
+                               MOVE    1                   TO
+                                               SPA-NAI-R01-SEIKYU-CHK
+                           END-IF
                        END-IF          
                END-EVALUATE
       *
@@ -1992,7 +2044,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
            MOVE    SPA-GMN-R01-MAX          TO  IDX
            PERFORM 4201-INTBL-SET-SEC
       *
-           MOVE    SPA-GMN-R01-MAX      TO  R01-ROW
+           MOVE    SPA-GMN-R01-MAX  TO  R01-ROW
       *
            MOVE    4                TO  SPA-GMN-R01-CUR  
       *
@@ -2085,9 +2137,24 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-4001-HOSPNUM
                        END-IF
                    END-IF
                END-IF
+      *        請求しない設定の存在チェック
+               IF      SPA-ERRCD           =   SPACE
+                   INITIALIZE                      RECE10-REC
+                   MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+                   MOVE    SPA-NAI-R01-SRYYM   TO  RECE10-SRYYM
+                   MOVE    SPA-GMN-R01-NYUGAIKBN
+                                               TO  RECE10-NYUGAIKBN
+                   MOVE    SPA-NAI-R01-PTID    TO  RECE10-PTID
+                   PERFORM 900-SEIKYU-SKYKBN-CHECK-SEC
+                   IF      FLG-SEIKYU-UMU      =   1
+                       MOVE    1                   TO  SPA-NAI-R01-CHK
+                   ELSE
+                       MOVE    ZERO                TO  SPA-NAI-R01-CHK
+                   END-IF
+               END-IF
            ELSE
-      *        請求管理テーブルの存在チェック（医保・公害）
-               IF      SPA-R01-RECEKBN     =   "0" OR  "6"
+      *        請求管理テーブルの存在チェック
+      *********IF      SPA-R01-RECEKBN     =   "0" OR  "6"
                    EVALUATE    SPA-ERRCD
                        WHEN    "0006"
                        WHEN    "0008"
@@ -2133,7 +2200,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-4001-HOSPNUM
                                END-IF
                            END-IF    
                    END-EVALUATE
-               END-IF
+      *********END-IF
            END-IF             
       *
            IF      SPA-ERRCD            =   SPACE
@@ -2323,6 +2390,70 @@ grpsys                 MOVE    NACCT-HOSPNUM       TO  COMB-HOSPNUM
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
            MOVE    "key14"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    会計が見つからないとき、同日再入院があれば保険組合せ読込みをチェック
+           IF    ( FLG-ERR             =   ZERO )
+           AND   ( FLG-CHK             =   ZERO )
+               INITIALIZE                      ORCSNYUINDAY-AREA
+               MOVE    SPA-HOSPNUM         TO  LNK-NYUINDAY-HOSPNUM
+               MOVE    WRK-ACCT-PTID       TO  LNK-NYUINDAY-PTID
+               MOVE    WRK-ACCT-SRYYM      TO  LNK-NYUINDAY-SANTEIYM
+               CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
+                                                   SPA-AREA
+               IF      LNK-NYUINDAY-RC >   0
+                   GO  TO  42032-NYUINACCT-CHK-EXT
+               END-IF
+      *
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL   IDXX    >       31
+                       OR      FLG-CHK =       1
+                       OR      FLG-ERR =       1     
+                   IF      LNK-NYUINDAY-DOUJITSU-KBN (IDXX)
+                                               =   "1"
+                       INITIALIZE                      HKNCOMBI-REC
+                       MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
+                       MOVE    WRK-ACCT-PTID       TO  COMB-PTID
+                       MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
+                                                   TO  COMB-HKNCOMBINUM 
+                       MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+                       PERFORM  910-HKNCOMBI-INV-SEC
+      *
+                       IF      FLG-HKNCOMBI        =   ZERO
+                         EVALUATE    SPA-R01-RECEKBN
+                           WHEN    "0"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-ROUSAI-HKNNUM
+                               OR      COMB-HKNNUM =
+                                               WRK-CONS-JIBAISEKI-HKNNUM
+                               OR      COMB-HKNNUM =
+                                               WRK-CONS-KOUGAI-HKNNUM
+                                   CONTINUE
+                               ELSE    
+                                   MOVE    1           TO  FLG-CHK
+                               END-IF
+                           WHEN    "3"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-ROUSAI-HKNNUM
+                                   MOVE    1           TO  FLG-CHK
+                               END-IF
+                           WHEN    "4"
+                           WHEN    "5"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-JIBAISEKI-HKNNUM
+                                   MOVE    1           TO  FLG-CHK
+                               END-IF
+                           WHEN    "6"
+                               IF      COMB-HKNNUM =
+                                               WRK-CONS-KOUGAI-HKNNUM
+                                   MOVE    1           TO  FLG-CHK
+                               END-IF
+                         END-EVALUATE 
+                       ELSE
+                         MOVE    1                 TO  FLG-ERR
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
            .
        42032-NYUINACCT-CHK-EXT.
            EXIT.
@@ -2474,6 +2605,7 @@ grpsys                 MOVE    NACCT-HOSPNUM       TO  COMB-HOSPNUM
                                        INTO    SPA-GMN-R01-TNAME (IDX)      
                END-STRING
            END-IF
+           MOVE    SPA-NAI-R01-CHK    TO  SPA-NAI-R01-TCHK (IDX)
       * 
            INITIALIZE                  SPA-GMN-R01-KOUMOKU
                                        SPA-NAI-R01-KOUMOKU
@@ -2771,14 +2903,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *****************************************************************
        210-BACK-SYORI-SEC              SECTION.
       *
-           MOVE    SPACE           TO  SPA-R99-FLG
-           MOVE    SPACE           TO  SPA-RIDCD
-           MOVE    SPACE           TO  SPA-RIDCD2      
-           MOVE    SPACE           TO  SPA-RIDCD3
+           INITIALIZE                  SPA-RID1-AREA
+                                       SPA-RIDCD-AREA
            MOVE    ZERO            TO  SPA-R01-JOBCNT       
                                        SPA-R01-STOPFLG    
-           MOVE    SPACE           TO  SPA-RID1-FLG
-                                       SPA-R99-CANCEL
       *
            MOVE    "R03"               TO  SPA-SAKIPG
            MOVE    "R01"               TO  SPA-MOTOPG
@@ -2876,6 +3004,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                        SPA-GMN-R01-BTPARA-AREA
            MOVE    ZERO            TO  SPA-NAI-R01-SELNO
            MOVE    1               TO  SPA-NAI-R01-BTPARA-HYOUJI-FLG
+           MOVE    ZERO            TO SPA-NAI-R01-SEIKYU-CHK
       *
            EVALUATE    SPA-GMN-R01-SYORI
                WHEN    "1"
@@ -2991,9 +3120,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-2001-HOSPNUM
       *
            MOVE    ZERO                TO  SPA-GMN-R01-MAX
                                            SPA-GMN-R01-DELETE-MAX
+                                           SPA-NAI-R01-SEIKYU-CHK
            INITIALIZE                      SPA-GMN-R01-TBL
                                            SPA-NAI-R01-TBL
                                            SPA-GMN-R01-KOUMOKU
+                                           SPA-NAI-R01-KOUMOKU
       *
            INITIALIZE                      SPA-NAI-R01-2002-TBL
            MOVE    ZERO                TO  IDX
@@ -3035,8 +3166,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            MOVE    IDX             TO  SPA-NAI-R01-2002-MAX
       *
-      *    請求データ存在チェック（医保・公害）
-           IF      SPA-R01-RECEKBN =   "0" OR  "6"
+      *    請求データ存在チェック
+      *****IF      SPA-R01-RECEKBN =   "0" OR  "6"
                MOVE    SPACE               TO  SPA-RIDCD
                PERFORM UNTIL   SPA-NAI-R01-2002-INDEX
                                                >=  SPA-NAI-R01-2002-MAX
@@ -3047,9 +3178,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF      SPA-RIDCD       NOT =   SPACE
                    GO  TO  480-ZENKAI-HYOUJI-EXT
                END-IF
-           ELSE
-               MOVE    SPACE               TO  SPA-RIDCD
-           END-IF
+      *****ELSE
+      *****    MOVE    SPACE               TO  SPA-RIDCD
+      *****END-IF
       *
       *    前回データ対象編集処理
            PERFORM 4802-ZENKAI-HYOUJI-SYSKANRI-HENSYU-SEC   
@@ -3114,8 +3245,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        END-IF
                    END-IF
                END-IF
+      *        請求しない設定の存在チェック
+               IF      SPA-ERRCD           =   SPACE
+                   INITIALIZE                      RECE10-REC
+                   MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+                   MOVE    WRK-ACCT-SRYYM      TO  RECE10-SRYYM
+                   MOVE    WRK-ACCT-NYUGAIKBN  TO  RECE10-NYUGAIKBN
+                   MOVE    WRK-ACCT-PTID       TO  RECE10-PTID
+                   PERFORM 900-SEIKYU-SKYKBN-CHECK-SEC
+                   IF      FLG-SEIKYU-UMU      =   1
+                       MOVE    1                   TO  SPA-NAI-R01-TCHK
+                                                (SPA-NAI-R01-2002-INDEX)
+                   ELSE
+                       MOVE    ZERO                TO  SPA-NAI-R01-TCHK
+                                                (SPA-NAI-R01-2002-INDEX)
+                   END-IF
+               END-IF
            ELSE
-      *        請求管理テーブルの存在チェック（医保分・公害）
+      *        請求管理テーブルの存在チェック
                INITIALIZE                  RECE10-REC
                MOVE    SPA-HOSPNUM     TO  RECE10-HOSPNUM
                MOVE    WRK-ACCT-SRYYM
@@ -3175,7 +3322,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            TO  SPA-GMN-R01-TPTNUM
                                                        (SPA-GMN-R01-MAX)
 grpsys             MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
-                   MOVE    SPA-NAI-R01-2002-TPTID (SPA-GMN-R01-MAX)
+                   MOVE    SPA-NAI-R01-TPTID (SPA-GMN-R01-MAX)
                                            TO  PTINF-PTID
                    PERFORM 900-PTINF-READ-SEC
                    IF      FLG-PTINF       =   ZERO
@@ -3271,13 +3418,21 @@ grpsys             MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
            MOVE    WRK-ACCT-NYUGAIKBN
                                    TO  RECE10-NYUGAIKBN
            MOVE    WRK-ACCT-PTID   TO  RECE10-PTID
-           IF      SPA-R01-RECEKBN =   "0"
-               MOVE    1               TO  RECE10-TEISYUTUSAKI
-               MOVE    2               TO  RECE10-XXTEISYUTUSAKI
-           ELSE
-               MOVE    5               TO  RECE10-TEISYUTUSAKI
-               MOVE    5               TO  RECE10-XXTEISYUTUSAKI 
-           END-IF
+           EVALUATE    SPA-R01-RECEKBN
+               WHEN    "0"
+                   MOVE    1               TO  RECE10-TEISYUTUSAKI
+                   MOVE    2               TO  RECE10-XXTEISYUTUSAKI
+               WHEN    "3"
+                   MOVE    3               TO  RECE10-TEISYUTUSAKI
+                   MOVE    3               TO  RECE10-XXTEISYUTUSAKI 
+               WHEN    "4"
+               WHEN    "5"
+                   MOVE    4               TO  RECE10-TEISYUTUSAKI
+                   MOVE    4               TO  RECE10-XXTEISYUTUSAKI 
+               WHEN    "6"
+                   MOVE    5               TO  RECE10-TEISYUTUSAKI
+                   MOVE    5               TO  RECE10-XXTEISYUTUSAKI 
+           END-EVALUATE
            MOVE    RECE10-REC      TO  MCPDATA-REC
            MOVE    "tbl_seikyu"    TO  MCP-TABLE
            MOVE    "del7"          TO  MCP-PATHNAME
@@ -3416,6 +3571,17 @@ grpsys             MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
       *
            EVALUATE    SPA-GMN-R01-SYORI
                WHEN    "1" 
+                   MOVE    "1002"             TO  SPA-RIDCD
+      *
+                   MOVE    ZERO               TO  SPA-NAI-R01-SEIKYU-CHK
+                   PERFORM VARYING IDX FROM    1   BY  1
+                           UNTIL   IDX >       SPA-GMN-R01-MAX
+                           OR      SPA-NAI-R01-SEIKYU-CHK
+                                           =       1
+                       IF      SPA-NAI-R01-TCHK (IDX)  =   1
+                           MOVE    1       TO  SPA-NAI-R01-SEIKYU-CHK
+                       END-IF
+                   END-PERFORM
                WHEN    "4" 
                    MOVE    "1002"             TO  SPA-RIDCD
                WHEN    "5" 
@@ -3427,6 +3593,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                    END-IF
                WHEN    "2"
                WHEN    "3"
+                   MOVE    ZERO               TO  SPA-NAI-R01-SEIKYU-CHK
                    MOVE    ZERO               TO  WRK-KENSU
                    MOVE    SPACE              TO  WRK-KENSU-X 
       *
@@ -3490,6 +3657,25 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    END-IF
                    PERFORM                 UNTIL   FLG-PTINF   =   1
                        ADD     1                   TO  WRK-KENSU
+      *
+      *                請求しない設定の存在チェック
+                       INITIALIZE                      RECE10-REC
+                       MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+                       IF      SPA-GMN-R01-SYORI       =   "2"
+                           MOVE    SPA-NAI-R01-TEISEIYM
+                                                       TO  RECE10-SRYYM
+                       ELSE
+                           MOVE    SPA-NAI-R01-STJYUSINYMD (1:6)
+                                                       TO  RECE10-SRYYM
+                       END-IF
+                       MOVE    SPA-R01-NYUGAIKBN   TO  RECE10-NYUGAIKBN
+                       MOVE    PTINF-PTID          TO  RECE10-PTID
+                       PERFORM 900-SEIKYU-SKYKBN-CHECK-SEC
+                       IF      FLG-SEIKYU-UMU      =   1
+                           MOVE    1               TO
+                                                SPA-NAI-R01-SEIKYU-CHK
+                       END-IF
+      *
                        MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
                        MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
                        PERFORM 900-PTINF-READ-N-SEC
@@ -3515,9 +3701,9 @@ grpsys             PERFORM 900-DBSELECT-SEC
                            MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
                                                    TO  WRK-KENSU-X
                            IF      SPA-GMN-R01-SYORI   =   "2"
-                               MOVE    "1007"              TO  SPA-RIDCD
+                               MOVE    "1007"          TO  SPA-RIDCD
                            ELSE
-                               MOVE    "1006"              TO  SPA-RIDCD
+                               MOVE    "1006"          TO  SPA-RIDCD
                            END-IF
                        END-IF 
                    END-IF
@@ -3564,6 +3750,17 @@ grpsys             PERFORM 900-DBSELECT-SEC
                        END-IF  
                END-EVALUATE
            END-IF
+      *
+      *    請求しない設定ありのとき
+           EVALUATE    SPA-RIDCD
+               WHEN    "1002"
+               WHEN    "1006"
+               WHEN    "1007"
+                   IF     SPA-NAI-R01-SEIKYU-CHK   =   1
+                       MOVE    SPA-RIDCD       TO  SPA-RIDCD4
+                       MOVE    SPACE           TO  SPA-RIDCD
+                   END-IF
+           END-EVALUATE
            .
        450-TOUROKU-EXT.
            EXIT.
@@ -4214,6 +4411,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG16
                    END-IF
            END-EVALUATE
            MOVE    SPA-R01-PRTKBN  TO  SHELLTBL-ARG18
+           IF      SPA-RID4-FLG    =   "CHG"
+               MOVE    "1"             TO  SHELLTBL-ARG19
+           ELSE
+               MOVE    "0"             TO  SHELLTBL-ARG19
+           END-IF
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
@@ -4601,6 +4803,11 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
            IF      SPA-RIDCD2      NOT =   SPACE
                PERFORM 530-RIDSET2-SEC
+               GO  TO  500-SET-SCREEN-EXT
+           END-IF
+      *
+           IF      SPA-RIDCD4      NOT =   SPACE
+               PERFORM 540-RIDSET4-SEC
                GO  TO  500-SET-SCREEN-EXT
            END-IF
       *
@@ -5027,7 +5234,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
-      *    エラーメッセージ表示理
+      *    確認画面１表示処理
       *****************************************************************
        520-RIDSET-SEC              SECTION.
       *
@@ -5052,7 +5259,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                            "人です。受診日指定で作表します"
                                                     DELIMITED  BY  SIZE
                            INTO   WRK-RIDMSG
-                   END-STRING                   
+                   END-STRING
                WHEN    "1007"
                    STRING  "訂正期間に該当する患者は"
                                                     DELIMITED  BY  SIZE
@@ -5060,7 +5267,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                            "人です。訂正日指定で作表します"
                                                     DELIMITED  BY  SIZE
                            INTO   WRK-RIDMSG
-                   END-STRING                   
+                   END-STRING
                WHEN    "1008"
                    STRING
                        "対象の診療会計がないので作成済の請求"
@@ -5168,7 +5375,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
-      *    エラーメッセージ表示理
+      *    確認画面２表示処理
       *****************************************************************
        530-RIDSET2-SEC              SECTION.
       *
@@ -5197,6 +5404,81 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
            .
        530-RIDSET2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    確認画面４表示処理
+      *****************************************************************
+       540-RIDSET4-SEC              SECTION.
+      *
+           MOVE    SPACE               TO  RID4
+           MOVE    SPA-RIDCD4          TO  RID4-ID1CODE
+      *
+           MOVE    SPACE               TO  WRK-RIDMSG
+           EVALUATE    SPA-RIDCD4
+               WHEN    "1002"
+                   MOVE    "個別作成で作表します"      TO  WRK-RIDMSG
+               WHEN    "1006"
+                   STRING  "受診日に該当する患者は" DELIMITED  BY  SIZE
+                           WRK-KENSU-X              DELIMITED  BY  SPACE
+                           "人です。受診日指定で作表します"
+                                                    DELIMITED  BY  SIZE
+                                                    INTO   WRK-RIDMSG
+                   END-STRING
+               WHEN    "1007"
+                   STRING  "訂正期間に該当する患者は"
+                                                    DELIMITED  BY  SIZE
+                           WRK-KENSU-X              DELIMITED  BY  SPACE
+                           "人です。訂正日指定で作表します"
+                                                    DELIMITED  BY  SIZE
+                                                    INTO   WRK-RIDMSG
+                   END-STRING                   
+           END-EVALUATE
+           MOVE    WRK-RIDMSG          TO  RID4-ID1MSG
+      *
+           EVALUATE    SPA-RIDCD4
+               WHEN    "1002"
+               WHEN    "1006"
+               WHEN    "1007"
+                   IF      SPA-R01-PRTKBN       =   "2"
+                       MOVE    "【点検用レセプト】"     TO  RID4-LABEL
+                   END-IF
+                   IF      SPA-NAI-R01-PRTKBN-FLG       =   1
+                       STRING  "【提出用レセプト】に変更します"
+                                               DELIMITED  BY  SIZE
+                           "（対象の診療年月が平成２０年３月以前です）"
+                                               DELIMITED  BY  SIZE
+                                               INTO    RID4-LABEL
+                       END-STRING
+                   END-IF
+      *
+                   STRING  "請求しない設定された請求管理データが"
+                                                    DELIMITED  BY  SIZE
+                           "あります。このデータを削除し新たに請求管理"
+                                                    DELIMITED  BY  SIZE
+                           "データを作成しますか"   DELIMITED  BY  SIZE
+                                                    INTO  RID4-LABEL1
+                   END-STRING 
+           END-EVALUATE
+      *
+           MOVE    "blue"              TO  RID4-LABEL-STYLE
+                                           RID4-LABEL1-STYLE
+      *
+           MOVE    "戻る"              TO  RID4-B01-LABEL
+      *
+           MOVE    "B12"               TO  MCP-WIDGET
+      *
+           MOVE    "R01"               TO  SPA-MOTOPG
+           MOVE    "RID4"              TO  SPA-SAKIPG
+      *
+           MOVE    "NEW"               TO  MCP-PUTTYPE
+           MOVE    "RID4"              TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+           .
+       540-RIDSET4-EXT.
            EXIT.
       *
       *****************************************************************
@@ -5478,7 +5760,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
            EXIT.
       *
       *****************************************************************
-      *    請求マスター読込（医保・公害の対象データの存在チェック）
+      *    請求マスター読込（対象請求管理データの存在チェック）
       *****************************************************************
        900-SEIKYU-READ-SEC         SECTION.
       *
@@ -5502,6 +5784,15 @@ grpsys     PERFORM 900-DBFETCH-SEC
                EVALUATE    SPA-R01-RECEKBN
                    WHEN    "0"
                        IF      RECE10-TEISYUTUSAKI =   1   OR  2   OR  6
+                           MOVE    1               TO  FLG-SEIKYU-UMU
+                       END-IF
+                   WHEN    "3"
+                       IF      RECE10-TEISYUTUSAKI =   3
+                           MOVE    1               TO  FLG-SEIKYU-UMU
+                       END-IF
+                   WHEN    "4"
+                   WHEN    "5"
+                       IF      RECE10-TEISYUTUSAKI =   4
                            MOVE    1               TO  FLG-SEIKYU-UMU
                        END-IF
                    WHEN    "6"
@@ -5540,6 +5831,65 @@ grpsys     PERFORM 900-DBFETCH-SEC
            .
        900-SEIKYU-NEXT-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    請求マスター読込（対象請求管理データの請求しない設定存在チェック）
+      *****************************************************************
+       900-SEIKYU-SKYKBN-CHECK-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SEIKYU-UMU
+      *
+           MOVE    RECE10-REC          TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    "key59"             TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_seikyu"        TO  MCP-TABLE
+               MOVE    "key59"             TO  MCP-PATHNAME
+               PERFORM 900-SEIKYU-NEXT-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SEIKYU
+           END-IF
+      *
+           PERFORM                 UNTIL   FLG-SEIKYU      =   1
+                                   OR      FLG-SEIKYU-UMU  =   1
+               IF      RECE10-SKYKBN       =   "0"
+                   EVALUATE    SPA-R01-RECEKBN
+                     WHEN    "0"
+                       IF      RECE10-TEISYUTUSAKI =   1   OR  2   OR  6
+                           MOVE    1               TO  FLG-SEIKYU-UMU
+                       END-IF
+                     WHEN    "3"
+                       IF      RECE10-TEISYUTUSAKI =   3
+                           MOVE    1               TO  FLG-SEIKYU-UMU
+                       END-IF
+                     WHEN    "4"
+                     WHEN    "5"
+                       IF      RECE10-TEISYUTUSAKI =   4
+                           MOVE    1               TO  FLG-SEIKYU-UMU
+                       END-IF
+                     WHEN    "6"
+                       IF      RECE10-TEISYUTUSAKI =   5
+                           MOVE    1               TO  FLG-SEIKYU-UMU
+                       END-IF
+                   END-EVALUATE
+               END-IF
+      * 
+               MOVE    "tbl_seikyu"        TO  MCP-TABLE
+               MOVE    "key59"             TO  MCP-PATHNAME
+               PERFORM 900-SEIKYU-NEXT-SEC
+           END-PERFORM
+      * 
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    "key59"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+      *
+           .
+       900-SEIKYU-SKYKBN-CHECK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ジョブ管理ＤＢ制御処理

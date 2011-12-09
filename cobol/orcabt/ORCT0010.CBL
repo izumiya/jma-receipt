@@ -229,6 +229,10 @@
                "救急搬送診療料算定日に入院料（加算）が算定されています".
            03  ERR-MSG19                   PIC X(100)    VALUE
                "他医受診（外泊）の入力に誤りがあります".
+           03  ERR-MSG20                   PIC X(100)    VALUE
+               "同日再入院日に実日数算定コードを入力してください".
+           03  ERR-MSG21                   PIC X(100)    VALUE
+               "同日再入院日の再入院分に入院料加算が算定されています".
            03  ERR-MSG88                   PIC X(100)    VALUE
                "キャンセルしました".
       *
@@ -942,6 +946,10 @@
                    MOVE    "0018"      TO  ERR-ERRCD
                WHEN    22
                    MOVE    "0019"      TO  ERR-ERRCD
+               WHEN    23
+                   MOVE    "0020"      TO  ERR-ERRCD
+               WHEN    24
+                   MOVE    "0021"      TO  ERR-ERRCD
                WHEN    OTHER
                    MOVE    "0006"      TO  ERR-ERRCD
                END-EVALUATE
@@ -1590,6 +1598,10 @@
                MOVE    ERR-MSG18       TO  ERR-ERRMSG
            WHEN    "0019"
                MOVE    ERR-MSG19       TO  ERR-ERRMSG
+           WHEN    "0020"
+               MOVE    ERR-MSG20       TO  ERR-ERRMSG
+           WHEN    "0021"
+               MOVE    ERR-MSG21       TO  ERR-ERRMSG
            WHEN    "8888"
                MOVE    ERR-MSG88       TO  ERR-ERRMSG
            END-EVALUATE

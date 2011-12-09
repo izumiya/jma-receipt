@@ -4,13 +4,25 @@ J022	{
 			value	varchar(14);
 		};
 		DAY1	{
+			state	int;
 			value	number(3);
 		};
 		DAY2	{
+			state	int;
 			value	number(3);
 		};
 		DAY3	{
+			state	int;
 			value	number(3);
+		};
+		MSG1	{
+			value	varchar(10);
+		};
+		MSG2	{
+			value	varchar(10);
+		};
+		MSG3	{
+			value	varchar(10);
 		};
 	};
 };

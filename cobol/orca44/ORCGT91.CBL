@@ -99,6 +99,7 @@
            03  IDX2                PIC 9(05).
            03  IDX2-1              PIC 9(05).
            03  IDX-1               PIC 9(05).
+           03  IDX-1U              PIC 9(05).
            03  IDX-3               PIC 9(05).
            03  IDY                 PIC 9(05).
            03  IDZ                 PIC 9(05).
@@ -121,6 +122,7 @@
            03  WRK-DATAVIEW-G      PIC X(63000).
            03  WRK-DATAVIEW        PIC X(63000). 
            03  WRK-CNT             PIC 9(05).
+           03  WRK-CNT-U           PIC 9(05).
       *
            03  WRK-Z1              PIC ZZZ,ZZ9.
            03  WRK-Z2              PIC ZZZ,ZZ9.
@@ -156,6 +158,8 @@
                                    PIC X(08)   VALUE   "COLLECT".
            03  WRK-CONS-JOB-JOBID-COLLECT
                                    PIC 9(07)   VALUE   1.
+      *
+           03  WRK-CONS-MAX-LEN    PIC 9(05)   VALUE   63000.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -389,6 +393,7 @@
       *
            MOVE   SPACE            TO  WRK-DATAVIEW
            MOVE   ZERO             TO  WRK-CNT
+           MOVE   ZERO             TO  WRK-CNT-U
            PERFORM UNTIL       FLG-COLLECT  =   1
                READ    COLLECT-FILE
                    AT  END
@@ -482,11 +487,15 @@
                IF     (COLLECT-REC(IDX2:2)     =   SPACE )
                    MOVE    1           TO  FLG-OVR
                ELSE
-                   ADD     1           TO  IDX-1
+                   IF     (COLLECT-REC(IDX2:1)     >=  X"A1" )
+                       ADD     2           TO  IDX-1
+                   ELSE
+                       ADD     1           TO  IDX-1
+                   END-IF
                END-IF
            END-PERFORM
       *
-           IF     (IDX-1   +   WRK-CNT )   >=  63000
+           IF     (IDX-1   +   WRK-CNT )   >=  WRK-CONS-MAX-LEN
                COMPUTE SPA-NAI-TOTALPAGE   =   SPA-NAI-TOTALPAGE  +  1
                MOVE   ZERO             TO  WRK-CNT
            ELSE
@@ -538,6 +547,7 @@
       *
            MOVE   ZERO             TO  FLG-OVR
            MOVE   ZERO             TO  IDX-1
+           MOVE   ZERO             TO  IDX-1U
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL      (IDX2    >   3000 )  OR
                               (FLG-OVR =   1    )
@@ -546,10 +556,15 @@
                    MOVE    1           TO  FLG-OVR
                ELSE
                    ADD     1           TO  IDX-1
+                   IF     (COLLECT-REC(IDX2:1)     >=  X"A1" )
+                       ADD     2           TO  IDX-1U
+                   ELSE
+                       ADD     1           TO  IDX-1U
+                   END-IF
                END-IF
            END-PERFORM
       *
-           IF     (IDX-1   +   WRK-CNT )   >=  63000
+           IF     (IDX-1U +  WRK-CNT-U )   >=  WRK-CONS-MAX-LEN
                MOVE    1               TO  FLG-COLLECT
                MOVE    1               TO  SPA-NAI-NEXT
                COMPUTE SPA-NAI-CNT     =   IDX    -   1
@@ -557,14 +572,17 @@
                IF      WRK-DATAVIEW    =   SPACE
                    MOVE    COLLECT-REC(1:IDX-1)   TO  WRK-DATAVIEW
                    MOVE    IDX-1           TO  WRK-CNT
+                   MOVE    IDX-1U          TO  WRK-CNT-U
                ELSE
                    COMPUTE IDX-3           =   WRK-CNT   +  1
                    MOVE    COLLECT-REC(1:IDX-1)   TO  WRK-DATAVIEW
                                                           (IDX-3:IDX-1)
                    COMPUTE WRK-CNT         =   WRK-CNT  +  IDX-1
+                   COMPUTE WRK-CNT-U       =   WRK-CNT-U  +  IDX-1U
                END-IF
                COMPUTE WRK-CNT         =   WRK-CNT  +  1
-               IF      WRK-CNT         <=  63000
+               COMPUTE WRK-CNT-U       =   WRK-CNT-U  +  1
+               IF      WRK-CNT-U       <=  WRK-CONS-MAX-LEN
                    MOVE    X"0A"           TO  WRK-DATAVIEW(WRK-CNT:1)
                END-IF
            END-IF

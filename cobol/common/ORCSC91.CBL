@@ -46,6 +46,8 @@
       *  04.05.00    NACL-多々納  10/03/XX  平成２２年４月改正対応
       *                                     他月数９９　対応
       *  04.06.00    NACL-多々納  10/12/XX  週回数対応
+      *  04.07.00    NACL-多々納  11/11/28  同日再入院対応
+      *                                     継続初回入院日対応
       *****************************************************************
       *
       *
@@ -66,6 +68,8 @@
            03  FLG-SANTEI          PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
            03  FLG-TENSUPLUS       PIC 9(01).
+           03  FLG-SRYACT          PIC 9(01).
+           03  FLG-SRYACCT         PIC 9(01).
            03  FLG-NYU-CHK         PIC 9(01).
            03  FLG-ERR             PIC 9(01).
       *
@@ -148,11 +152,13 @@
       *
            03  WRK-DAYMAXCNT           PIC 9(04).
       *    入院期間
-           03  CNT-NYU                 PIC 9(02).
+           03  CNT-NYU                 PIC 9(03).
            03  WRK-NYU                 PIC 9(03).
+           03  WRK-NYU2                PIC 9(03).
            03  WRK-YMD.
                05  WRK-YM              PIC X(06).
                05  WRK-DD              PIC 9(02).
+           03  WRK-NYUINYMD            PIC X(08).
       *
       *    週
            03  WRK-YOBI                PIC 9(01).
@@ -190,6 +196,10 @@
            03  WRK-CNT-ERRJ            PIC X(06).
            03  WRK-CNT-MAXJ            PIC X(06).
            03  IDXM                    PIC 9(04).
+      *
+           03  WRK-ACT-DAY             PIC 9(03).
+      *
+           03  WRK-CHKCNT              PIC 9(03).
       *
       *    同時に算定する診療行為コード一覧
        01  TBL-DOUJI-AREA.
@@ -333,6 +343,13 @@
       *    点数マスタ付加コード
         01 TENSUPLUS-REC.
            COPY    "CPTENSUPLUS.INC".
+      *
+      *    診療行為マスタ−
+       01  SRYACT-REC.
+           COPY    "CPSRYACT.INC".
+      *    診療会計マスタ−
+       01  SRYACCT-REC.
+           COPY    "CPSRYACCT.INC".
       *
       *    ＤＢ検索
       *01  MCPDATA-REC                 PIC X(5000).
@@ -656,6 +673,7 @@
            MOVE    WRK-SC91-WEEKCNT    TO  WRK-SC91-WEEKCHKCNT
       *
       *    上限回数チェック・エラー編集
+           MOVE    TNS-JGNCNTERR       TO  WRK-JGNCNTERR
            MOVE    ZERO                TO  FLG-DOUCHK
            PERFORM 1009-CNTCHK-SYORI-SEC
       *
@@ -692,7 +710,7 @@
                END-IF
       *        上限回数エラー処理＝９の時、回数エラーは警告とする
                IF       WRK-CNT        =   ZERO
-                   IF       TNS-JGNCNTERR      =   9
+                   IF       WRK-JGNCNTERR      =   9
                        MOVE    "K004"              TO  LNK-SC91-ERRCD
                    END-IF
       *            人工腎臓の時メッセージ変更
@@ -1081,14 +1099,28 @@
            IF     (LNK-SC91-CNT        >   ZERO )
             AND   (LNK-SC91-MAXCNT     >   ZERO )
                IF      LNK-SC91-SYORIFLG   =   1
+      *            訂正分は対象外
                    MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
                ELSE
-                   MOVE    32                  TO  IDX-Y2
+                   MOVE    ZERO                TO  IDX-Y2
                END-IF
-               PERFORM VARYING     IDD     FROM    1  BY  1
-                       UNTIL       IDD     >=  IDX-Y2
-                   IF      SANTEI-DAY (IDD)    >   ZERO
+               MOVE    ZERO                TO  WRK-CHKCNT
+               PERFORM VARYING     IDD     FROM    31  BY -1
+                       UNTIL      (IDD     <   1   )
+                   IF     (IDD             =   IDX-Y2 )
+                      AND (WRK-TEI-CNT     >   ZERO   )
+                       IF      SANTEI-DAY (IDD) >=  WRK-TEI-CNT
+                           COMPUTE WRK-CHKCNT  =   (SANTEI-DAY (IDD)
+                                               -   WRK-TEI-CNT )
+                       ELSE
+                           MOVE    ZERO            TO  WRK-CHKCNT
+                       END-IF
+                   ELSE
+                       MOVE    SANTEI-DAY (IDD)    TO  WRK-CHKCNT
+                   END-IF
+                   IF      WRK-CHKCNT      >   ZERO
                        MOVE    IDD                 TO  WRK-CHK-SRYDD
+                       MOVE    1                   TO  IDD
                    END-IF
                END-PERFORM
            END-IF
@@ -1891,7 +1923,8 @@
       *
       *    点数マスタの内容を入力分へ戻す
            MOVE    TNSWK-TENSU-REC     TO  TNS-TENSU-REC
-      *     
+      *
+      *!!!!!!!!!!!!!!!!!!!1     
            GO     TO  200-DOUJI-CHK-EXT.
       *    当月のＭＡＸ
            IF     (LNK-SC91-MAXCNT     >   ZERO  )  AND
@@ -2367,10 +2400,22 @@
       *****************************************************************
        2001-NYUIN-CHEK-SEC      SECTION.
       *
-           IF      LNK-SC91-KBN        =   "9"
-               MOVE    1               TO  CNT-NYU
+           IF      LNK-SC91-KBN        =   "8"
+      *        継続初回入院日から
+               IF      SPA-STR-NYUINYMD    =   SPACE
+                   MOVE    SPA-K02N-NYUINYMD   TO  WRK-NYUINYMD
+               ELSE
+                   MOVE    SPA-STR-NYUINYMD    TO  WRK-NYUINYMD
+               END-IF
            ELSE
-               MOVE    2               TO  CNT-NYU
+      *        入院日
+               MOVE    SPA-K02N-NYUINYMD   TO  WRK-NYUINYMD
+           END-IF
+      *    入院期間上限回数
+           IF      LNK-SC91-NYUCNT     =   ZERO
+               MOVE    1                   TO  CNT-NYU
+           ELSE
+               MOVE    LNK-SC91-NYUCNT     TO  CNT-NYU
            END-IF
       *
            MOVE    LNK-SC91-SRYCD      TO  WRK-SRYCD
@@ -2405,6 +2450,8 @@
            END-IF
            MOVE    ZERO                TO  FLG-SYOKAI-OK
            MOVE    ZERO                TO  WRK-NYU
+           MOVE    ZERO                TO  WRK-NYU2
+           INITIALIZE                      WRK-CHK-SRYYMD
            PERFORM UNTIL   (FLG-SANTEI     =   1   )  OR
                            (FLG-SYOKAI-OK  =   1   )
                MOVE    SANTEI-SRYYM        TO  WRK-YM
@@ -2414,26 +2461,48 @@
                                  (FLG-SYOKAI-OK    =   1   )
                    IF      SANTEI-DAY (ID2)    NOT =   ZERO
                        MOVE    ID2             TO  WRK-DD
+      *ver.4.7
+                       IF    ((WRK-NYUINYMD        =  WRK-YMD)  AND
+                              (SPA-K02N-DOUDAY NOT =  ZERO   ))
+                       OR    ((SPA-K02N-TAIINYMD   =  WRK-YMD)  AND
+                              (SPA-K02N-DOUTAIKBN  =  "1"    ))
+      *                    同日再入院日の算定
+                           PERFORM 20011-DOUNYUIN-SEC
+                           IF      SANTEI-DAY (ID2)    >=  WRK-ACT-DAY
+                               COMPUTE SANTEI-DAY (ID2)
+                                               =   SANTEI-DAY (ID2)
+                                               -   WRK-ACT-DAY
+                           ELSE
+                               MOVE    ZERO    TO  SANTEI-DAY (ID2)
+                           END-IF
+                       END-IF
+      *ver.4.7
       *                訂正の時当日分は算定なしとする
                        IF     (LNK-SC91-SYORIFLG   =   1  )  AND
                               (WRK-YMD             =   SPA-SRYYMD) AND
                               (WRK-TEI-CNT         >   ZERO )
-                           COMPUTE SANTEI-DAY (ID2)
+                           IF      SANTEI-DAY (ID2)    >=  WRK-TEI-CNT
+                               COMPUTE SANTEI-DAY (ID2)
                                                =   SANTEI-DAY (ID2)
                                                -   WRK-TEI-CNT
+                           ELSE
+                               MOVE    ZERO    TO  SANTEI-DAY (ID2)
+                           END-IF
                        END-IF
-                       IF     (SPA-K02N-NYUINYMD
+                       IF     (WRK-NYUINYMD
                                                <=  WRK-YMD )  AND
                               (SPA-K02N-TAIINYMD
                                                >=  WRK-YMD )
                            ADD     SANTEI-DAY (ID2)    TO  WRK-NYU
-                           IF      WRK-NYU              >=   CNT-NYU
-                               MOVE    1               TO  FLG-SYOKAI-OK
+                           IF     (WRK-YMD     <   SPA-K02N-NYUINYMD)
+      *                    入院日以前の算定
+                               ADD     SANTEI-DAY (ID2)    TO  WRK-NYU2
                            END-IF
+                           MOVE    WRK-YMD         TO  WRK-CHK-SRYYMD
                        END-IF
                    END-IF
                END-PERFORM
-               IF      SANTEI-SRYYM        <   SPA-K02N-NYUINYMD (1:6)
+               IF      SANTEI-SRYYM        <   WRK-NYUINYMD (1:6)
                    MOVE    1                   TO  FLG-SANTEI
                ELSE
                    MOVE    "tbl_santei"        TO  MCP-TABLE
@@ -2446,12 +2515,101 @@
            MOVE    "key8"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *TEST
+           DISPLAY "WRK-NYU:"  WRK-NYU ",FLG-SYOKAI-OK :" FLG-SYOKAI-OK 
+      *TEST 
            MOVE    WRK-NYU             TO  LNK-SC91-CNT
-           IF      FLG-SYOKAI-OK       =   1
+           MOVE    WRK-NYU2            TO  LNK-SC91-NYUZCNT
+           IF     (WRK-NYU             >=  CNT-NYU   )
                MOVE    "9031"              TO  LNK-SC91-ERRCD
+      *        入院日以前は警告
+               IF     (WRK-NYU2            >   ZERO )
+      *            入院日以前は警告
+                   MOVE    "KXXX"              TO  LNK-SC91-ERRCD
+               END-IF
            END-IF
            .
        2001-NYUIN-CHEK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    同日再入院日の算定チェック処理
+      *****************************************************************
+       20011-DOUNYUIN-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  WRK-ACT-DAY
+      *
+           MOVE    SPACE               TO  SRYACT-REC
+           INITIALIZE                      SRYACT-REC
+           MOVE    SPA-HOSPNUM         TO  SRY-HOSPNUM
+           MOVE    SPA-NYUGAIKBN       TO  SRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  SRY-PTID
+           MOVE    SPA-SRYYMD(1:6)     TO  SRY-SRYYM
+           MOVE    WRK-SRYCD           TO  SRY-SRYCD(1)
+           MOVE    WRK-SRYCD           TO  SRY-SRYCD(2)
+           MOVE    WRK-SRYCD           TO  SRY-SRYCD(3)
+           MOVE    WRK-SRYCD           TO  SRY-SRYCD(4)
+           MOVE    WRK-SRYCD           TO  SRY-SRYCD(5)
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key7"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key7"              TO  MCP-PATHNAME
+               PERFORM 930-SRYACT-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SRYACT
+           END-IF
+           PERFORM UNTIL     (FLG-SRYACT   =   1 )
+      *        診療会計マスタ読み込み
+               MOVE    SPACE               TO  SRYACCT-REC
+               INITIALIZE                      SRYACCT-REC
+               MOVE    SRY-HOSPNUM         TO  ACCT-HOSPNUM
+               MOVE    SRY-NYUGAIKBN       TO  ACCT-NYUGAIKBN
+               MOVE    SRY-PTID            TO  ACCT-PTID
+               MOVE    SRY-SRYKA           TO  ACCT-SRYKA
+               MOVE    SRY-SRYYM           TO  ACCT-SRYYM
+               MOVE    SRY-SRYKBN          TO  ACCT-SRYKBN
+               MOVE    SRY-ZAINUM          TO  ACCT-ZAINUM
+      *
+               MOVE    SRYACCT-REC         TO  MCPDATA-REC
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   PERFORM 940-SRYACCT-READ-SEC
+               ELSE
+                   MOVE    1                   TO  FLG-SRYACCT
+                   INITIALIZE                      SRYACCT-REC
+               END-IF
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+      *        退院日算定分
+               IF      WRK-NYUINYMD        =  WRK-YMD
+                   IF      ACCT-DAY (2 ID2)    >   ZERO
+                       ADD     ACCT-DAY (2 ID2)    TO  WRK-ACT-DAY
+                   END-IF
+               END-IF
+               IF      SPA-K02N-TAIINYMD   =  WRK-YMD
+                   IF      ACCT-DAY (3 ID2)    >   ZERO
+                       ADD     ACCT-DAY (3 ID2)    TO  WRK-ACT-DAY
+                   END-IF
+               END-IF
+      *
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key7"              TO  MCP-PATHNAME
+               PERFORM 930-SRYACT-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key7"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       20011-DOUNYUIN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2592,6 +2750,42 @@
       *
            .
        920-SANTEI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療行為マスター読込
+      *****************************************************************
+       930-SRYACT-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  SRYACT-REC
+               MOVE    ZERO                TO  FLG-SRYACT
+           ELSE
+               INITIALIZE                      SRYACT-REC
+               MOVE    1                   TO  FLG-SRYACT
+           END-IF
+      *
+           .
+       930-SRYACT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療会計マスタ読み込み
+      *****************************************************************
+       940-SRYACCT-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  SRYACCT-REC
+               MOVE    ZERO                TO  FLG-SRYACCT
+           ELSE
+               INITIALIZE                      SRYACCT-REC
+               MOVE    1                   TO  FLG-SRYACCT
+           END-IF
+      *
+           .
+       940-SRYACCT-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
