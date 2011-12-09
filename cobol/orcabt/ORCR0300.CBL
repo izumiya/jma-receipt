@@ -371,6 +371,7 @@
       *                                     対象文字コード追加
       *  04.05.24    NACL-藤原    11/08/25  公費単独対応
       *                                     保険履歴を最大１００に変更
+      *  04.05.25    NACL-藤原    11/12/06  更新日付をマシン日付から設定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1667,6 +1668,14 @@ grpsys     COPY    "COMMON-SPA".
                                    TO  JOB-SHELLMSG
            MOVE    "ORCR0300"      TO  JOB-PGID
 grpsys     PERFORM 900-CALL-ORCSJOB-SEC
+      *
+      *    処理開始時のシステム日付取得
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+grpsys     PERFORM 900-CALL-ORCSJOB-SEC
+           IF      SJOBKANRI-RETURN    =   ZERO
+               MOVE    JOB-STARTYMD        TO  WRK-PARA-SYSYMD
+           END-IF
       *
            PERFORM 110-SYSKANRI-HENSYU-SEC
       *

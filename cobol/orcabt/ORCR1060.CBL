@@ -54,6 +54,7 @@
       *  04.05.05    NACL-藤原    11/08/02  点検レセ印字位置変更対応
       *  04.05.06    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
+      *  04.05.07    NACL-藤原    11/12/06  更新日付をマシン日付から設定
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2595,7 +2596,7 @@ grpsys     MOVE    RECE100-HOSPNUM     TO  RECE10-HOSPNUM
            PERFORM 900-SEIKYU-INV-SEC
            IF      FLG-SEIKYU          =   ZERO
                MOVE    MCPDATA-REC         TO  RECE10-REC
-               MOVE    WRK-PARA-SYSYMD     TO  RECE10-UPDYMD
+               MOVE    WRK-PARA-CREYMD     TO  RECE10-UPDYMD
                IF      RECE10-SKYKBN       =   "2"
                    MOVE    "1"                 TO  RECE10-SKYKBN
                END-IF 
@@ -2610,7 +2611,7 @@ grpsys     MOVE    RECE100-HOSPNUM     TO  RECE10-HOSPNUM
                                                RECE10-HENREIYM
                                                RECE10-TEISEIKBN
                MOVE    ZERO                TO  RECE10-HKNJANUM-S
-               MOVE    WRK-PARA-SYSYMD     TO  RECE10-CREYMD
+               MOVE    WRK-PARA-CREYMD     TO  RECE10-CREYMD
                MOVE    ZERO                TO  RECE10-UPDYMD
            END-IF
       *

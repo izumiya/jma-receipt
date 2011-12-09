@@ -144,6 +144,7 @@
       *  04.05.32    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
       *  04.05.33    NACL-門脇    11/12/01  宮城県地方公費対応（仙台市）
+      *  04.05.34    NACL-藤原    11/12/06  更新日付をマシン日付から設定
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2501,14 +2502,14 @@
            PERFORM 900-KOHSKY-INV-SEC
            IF      FLG-KOHSKY          =   ZERO
                MOVE    MCPDATA-REC         TO  KOHSKY-REC
-               MOVE    WRK-PARA-SYSYMD     TO  KOHSKY-UPDYMD
+               MOVE    WRK-PARA-CREYMD     TO  KOHSKY-UPDYMD
                IF      KOHSKY-SKYKBN       =   "2"
                    MOVE    "1"                 TO  KOHSKY-SKYKBN
                END-IF 
                MOVE    "2"                 TO  KOHSKY-TEISEIKBN
            ELSE
                MOVE    "1"                 TO  KOHSKY-SKYKBN
-               MOVE    WRK-PARA-SYSYMD     TO  KOHSKY-CREYMD
+               MOVE    WRK-PARA-CREYMD     TO  KOHSKY-CREYMD
                MOVE    ZERO                TO  KOHSKY-UPDYMD
                MOVE    ZERO                TO  KOHSKY-SKYYM
                                                KOHSKY-HENREIYM
@@ -9578,7 +9579,7 @@
            PERFORM 900-SEIKYU-INV-SEC
            IF      FLG-SEIKYU          =   ZERO
                MOVE    MCPDATA-REC         TO  RECE10-REC
-               MOVE    WRK-PARA-SYSYMD     TO  RECE10-UPDYMD
+               MOVE    WRK-PARA-CREYMD     TO  RECE10-UPDYMD
                IF      RECE10-SKYKBN       =   "2"
                    MOVE    "1"                 TO  RECE10-SKYKBN
                END-IF 
@@ -9621,7 +9622,7 @@
                END-IF
                MOVE    RECE08-PREFKBN      TO  RECE10-PREFKBN
                MOVE    RECE08-PREFNUM      TO  RECE10-PREFNUM
-               MOVE    WRK-PARA-SYSYMD     TO  RECE10-CREYMD
+               MOVE    WRK-PARA-CREYMD     TO  RECE10-CREYMD
                MOVE    ZERO                TO  RECE10-UPDYMD
            END-IF
       *
