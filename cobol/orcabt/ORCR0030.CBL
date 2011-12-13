@@ -537,6 +537,7 @@
       *  04.05.35    NACL-ÌçÏÆ    11/12/05  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     (283077)Ê¿À®£²£³Ç¯£±£±·î¤Þ¤Ç
       *  04.05.36    NACL-ÌçÏÆ    11/12/07  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.37    NACL-ÌçÏÆ    11/12/13  ºÒ³²ÂÐ¾Ý¾ò·ï½¤Àµ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -1197,6 +1198,9 @@
            03  WK-GENGAKU2-YMD.
                05  WK-GENGAKU2-YM              PIC  9(06).
                05  WK-GENGAKU2-DD              PIC  9(02).
+           03  WK-GENGAKU3-YMD.
+               05  WK-GENGAKU3-YM              PIC  9(06).
+               05  WK-GENGAKU3-DD              PIC  9(02).
       *
            03  WRK-CHIHOU-KIN                  PIC  9(09).
            03  WRK-CHIHOU-KIN2                 PIC  9(09).
@@ -3530,6 +3534,14 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                                               TO   WK-GENGAKU2-DD
               END-IF
       *
+              MOVE      RECE02-SRYYM          TO   WK-GENGAKU3-YM
+              IF   RECE02-TEKSTYMD-X(1:6)  >=  RECE02-SRYYM
+                 MOVE   RECE02-TEKSTYMD-X(7:2)
+                                              TO   WK-GENGAKU3-DD
+              ELSE
+                 MOVE   01                    TO   WK-GENGAKU3-DD
+              END-IF
+      *
               PERFORM  21171-GENGAKU-HENSYU-SEC
       *
             END-IF
@@ -3593,6 +3605,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
               MOVE   RECE02-KOHTEKEDYMD(1)(7:2)
                                          TO   WK-GENGAKU2-DD
             END-IF
+      *
+            MOVE     "99999999"          TO   WK-GENGAKU3-YMD
       *
             PERFORM  21171-GENGAKU-HENSYU-SEC
       *
@@ -3698,6 +3712,10 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
                       (PTKOH-SAKJOKBN   =   SPACE          ))
                   OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU2-YMD) AND
                       (WK-GENGAKU2-YMD <=   PTKOH-TEKEDYMD ) AND
+                      (PTKOH-SAKJOKBN   =   SPACE          ))
+                  OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU3-YMD) AND
+                      (WK-GENGAKU3-YMD <=   PTKOH-TEKEDYMD ) AND
+                      (WK-GENGAKU3-YMD NOT = "99999999"    ) AND
                       (PTKOH-SAKJOKBN   =   SPACE          ))
                       EVALUATE   GEN-IDX
                         WHEN        1
@@ -15265,6 +15283,14 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                                             TO   WK-GENGAKU2-DD
                END-IF
       *
+               MOVE      RECE02-SRYYM       TO   WK-GENGAKU3-YM
+               IF   RECE02-TEKSTYMD-X(1:6)  >=  RECE02-SRYYM
+                  MOVE   RECE02-TEKSTYMD-X(7:2)
+                                            TO   WK-GENGAKU3-DD
+               ELSE
+                  MOVE   01                 TO   WK-GENGAKU3-DD
+               END-IF
+      *
                PERFORM  211L1-SAIGAI-TAISYO-HENSYU-SEC
              END-IF
            ELSE
@@ -15292,6 +15318,8 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                  MOVE   RECE02-KOHTEKEDYMD(1)(7:2)
                                             TO   WK-GENGAKU2-DD
                END-IF
+      *
+               MOVE     "99999999"          TO   WK-GENGAKU3-YMD
       *
                PERFORM  211L1-SAIGAI-TAISYO-HENSYU-SEC
            END-IF
@@ -15323,6 +15351,10 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                     (PTKOH-SAKJOKBN   =   SPACE          ))
                 OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU2-YMD) AND
                     (WK-GENGAKU2-YMD <=   PTKOH-TEKEDYMD ) AND
+                    (PTKOH-SAKJOKBN   =   SPACE          ))
+                OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU3-YMD) AND
+                    (WK-GENGAKU3-YMD <=   PTKOH-TEKEDYMD ) AND
+                    (WK-GENGAKU3-YMD NOT = "99999999"    ) AND
                     (PTKOH-SAKJOKBN   =   SPACE          ))
                   MOVE     1             TO  FLG-SAIGAI-TAISYO
                   MOVE     1             TO  FLG-PTKOHINF

@@ -141,6 +141,7 @@
       *  04.05.32    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
       *  04.05.33    NACL-門脇    11/12/01  宮城県地方公費対応（仙台市）
+      *  04.05.35    NACL-門脇    11/12/13  災害に関するコメント修正
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -515,8 +516,10 @@
                    07  WRK-1033-EDYUKYMD 
                                    PIC X(08).                                       
       *
-           03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
-           03  WRK-FUTAN1          PIC ZZZ,ZZ9. 
+      ***  03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
+           03  WRK-FUTAN           PIC ZZZZZZZZ9.
+      ***  03  WRK-FUTAN1          PIC ZZZ,ZZ9. 
+           03  WRK-FUTAN1          PIC ZZZZZ9.
            03  WRK-TITLE           PIC X(50).
            03  WRK-TEKIYOU         PIC X(50).
            03  WRK-ADRS.
@@ -7720,13 +7723,23 @@
                    CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
                    IF    ( KANACHK-RC      =   ZERO )
                    AND   ( KANACHK-MAX     >   ZERO )
-                       STRING  "【震災以前一部負担金】　　"
+                     IF   RECE62-SRYYM   =  "201103"
+                       STRING  "【震災以前一部負担金】　　　　"
                                                DELIMITED  BY  SIZE
                                KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                DELIMITED  BY  SIZE
                                "円"            DELIMITED  BY  SIZE
                                                INTO    WRK-TITLE
                        END-STRING
+                     ELSE
+                       STRING  "【非減免対象分扱い一部負担金】"
+                                               DELIMITED  BY  SIZE
+                               KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                               "円"            DELIMITED  BY  SIZE
+                                               INTO    WRK-TITLE
+                       END-STRING
+                     END-IF
                    END-IF
                    INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "　"
       * 
@@ -7758,13 +7771,23 @@
                    CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
                    IF    ( KANACHK-RC      =   ZERO )
                    AND   ( KANACHK-MAX     >   ZERO )
-                       STRING  "【震災以前食事生活療養標準負担額】"
+                     IF   RECE62-SRYYM   =  "201103"
+                       STRING  "【震災以前食事生活療養標準負担額】　"
                                                DELIMITED  BY  SIZE
                                KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                DELIMITED  BY  SIZE
                                "円"            DELIMITED  BY  SIZE
                                                INTO    WRK-TITLE
                        END-STRING
+                     ELSE
+                       STRING  "【非減免対象分扱い食事標準負担額】　"
+                                               DELIMITED  BY  SIZE
+                               KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                               "円"            DELIMITED  BY  SIZE
+                                               INTO    WRK-TITLE
+                       END-STRING
+                     END-IF
                    END-IF
                    INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "　"
       * 

@@ -325,6 +325,7 @@
       *                                     対象文字コード追加
       *  04.05.28    NACL-藤原    11/08/25  公費単独対応
       *                                     保険履歴を最大１００に変更
+      *  04.05.30    NACL-門脇    11/12/13  災害に関するコメント修正
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -741,8 +742,10 @@
       *
       *    災害用コメント
            03  WRK-DISASTER-COMMENT    PIC X(76).
-           03  WRK-FUTAN               PIC ZZZ,ZZZ,ZZ9. 
-           03  WRK-FUTAN1              PIC ZZZ,ZZ9. 
+      ***  03  WRK-FUTAN               PIC ZZZ,ZZZ,ZZ9. 
+           03  WRK-FUTAN               PIC ZZZZZZZZ9.
+      ***  03  WRK-FUTAN1              PIC ZZZ,ZZ9. 
+           03  WRK-FUTAN1              PIC ZZZZZ9.
            03  WRK-ADRS.
                05  WRK-ADRS-R          PIC X(76)  OCCURS  4.
       *
@@ -4093,13 +4096,23 @@
                CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
                IF    ( KANACHK-RC          =   ZERO )
                AND   ( KANACHK-MAX         >   ZERO )
-                   STRING  "【震災以前一部負担金】　　"
+                 IF   RECE62-SRYYM   =  "201103"
+                   STRING  "【震災以前一部負担金】　　　　"
                                                DELIMITED  BY  SIZE
                            KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                DELIMITED  BY  SIZE
                            "円"                DELIMITED  BY  SIZE
                                            INTO    WRK-DISASTER-COMMENT
                    END-STRING
+                 ELSE
+                   STRING  "【非減免対象分扱い一部負担金】"
+                                               DELIMITED  BY  SIZE
+                           KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                           "円"                DELIMITED  BY  SIZE
+                                           INTO    WRK-DISASTER-COMMENT
+                   END-STRING
+                 END-IF
                END-IF
                PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
       *
@@ -4112,13 +4125,23 @@
                CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
                IF    ( KANACHK-RC      =   ZERO )
                AND   ( KANACHK-MAX     >   ZERO )
-                   STRING  "【震災以前食事生活療養標準負担額】"
+                 IF   RECE62-SRYYM   =  "201103"
+                   STRING  "【震災以前食事生活療養標準負担額】　"
                                                DELIMITED  BY  SIZE
                            KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                DELIMITED  BY  SIZE
                            "円"                DELIMITED  BY  SIZE
                                            INTO    WRK-DISASTER-COMMENT
                    END-STRING
+                 ELSE
+                   STRING  "【非減免対象分扱い食事標準負担額】　"
+                                               DELIMITED  BY  SIZE
+                           KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                           "円"                DELIMITED  BY  SIZE
+                                           INTO    WRK-DISASTER-COMMENT
+                   END-STRING
+                 END-IF
                END-IF
                PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
            END-IF

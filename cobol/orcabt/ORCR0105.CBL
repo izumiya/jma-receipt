@@ -135,6 +135,7 @@
       *  04.05.28    NACL-藤原    11/08/02  点検レセ印字位置変更対応
       *  04.05.29    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
+      *  04.05.31    NACL-門脇    11/12/13  災害に関するコメント修正
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -679,7 +680,8 @@
            03  WRK-MCP-TABLE       PIC X(64).
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
-           03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
+      ***  03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
+           03  WRK-FUTAN           PIC ZZZZZZZZ9.
            03  WRK-TITLE           PIC X(50).
            03  WRK-TEKIYOU         PIC X(50).
            03  WRK-ADRS.
@@ -6838,13 +6840,23 @@
                    CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
                    IF    ( KANACHK-RC      =   ZERO )
                    AND   ( KANACHK-MAX     >   ZERO )
-                       STRING  "【震災以前一部負担金】"
+                     IF   RECE02-SRYYM   =  "201103"
+                       STRING  "【震災以前一部負担金】　　　　"
                                                DELIMITED  BY  SIZE
                                KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                DELIMITED  BY  SIZE
                                "円"            DELIMITED  BY  SIZE
                                                INTO    WRK-TITLE
                        END-STRING
+                     ELSE
+                       STRING  "【非減免対象分扱い一部負担金】"
+                                               DELIMITED  BY  SIZE
+                               KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                               "円"            DELIMITED  BY  SIZE
+                                               INTO    WRK-TITLE
+                       END-STRING
+                     END-IF
                    END-IF
                    INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "　"
       * 
