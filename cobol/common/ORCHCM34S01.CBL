@@ -3388,7 +3388,8 @@
       *****************************************************************
        2001111-LIFE-SKJFTN-SET-SEC     SECTION.
       *
-           IF    ( LNK-NYULIFE-SKJFTN-SRYCD (IDXD) =   SPACE )
+           IF    ( HCM34S01-HKNNUM(1:2)            =   "98" )
+             OR  ( LNK-NYULIFE-SKJFTN-SRYCD (IDXD) =   SPACE )
                CONTINUE
            ELSE
                IF    ( IDX5                <   5 )
