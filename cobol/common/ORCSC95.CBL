@@ -3446,8 +3446,9 @@
                    MOVE    PTBYO-SYUBYOFLG     TO  WRK-SYUBYOFLG (IDX)
                END-IF
                IF     (PTBYO-MANSEIKBN     =   09    ) 
-      *            特定疾患が主病以外であれば変更
+      *            特定疾患が主病以外か難病であれば変更
                    IF      (WRK-SYUBYOFLG (IDX)    =   SPACE )
+                      OR   (PTBYO-SYUBYOFLG        =  "1"    )
                        MOVE    PTBYO-MANSEIKBN     TO  SPA-TOKU-FLG(IDX)
                        MOVE    PTBYO-SYUBYOFLG     TO  WRK-SYUBYOFLG
                                                                    (IDX)
