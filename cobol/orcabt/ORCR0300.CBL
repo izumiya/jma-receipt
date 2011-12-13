@@ -372,6 +372,7 @@
       *  04.05.24    NACL-∆£∏∂    11/08/25  ∏¯»Ò√±∆»¬–±˛
       *                                      ›∏±Õ˙ŒÚ§Ú∫«¬Á£±£∞£∞§À —ππ
       *  04.05.25    NACL-∆£∏∂    11/12/06  ππø∑∆¸…’§Ú•ﬁ•∑•Û∆¸…’§´§È¿ﬂƒÍ
+      *  04.05.26    NACL-ÃÁœ∆    11/12/13  ∫“≥≤§À¥ÿ§π§Î•≥•·•Û•»Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -761,7 +762,8 @@ grpsys     COPY    "COMMON-SPA".
       *
       *    ∫“≥≤Õ—•≥•·•Û•»
            03  WRK-DISASTER-COMMENT    PIC X(76).
-           03  WRK-FUTAN               PIC ZZZ,ZZZ,ZZ9. 
+      ***  03  WRK-FUTAN               PIC ZZZ,ZZZ,ZZ9. 
+           03  WRK-FUTAN               PIC ZZZZZZZZ9.
            03  WRK-ADRS.
                05  WRK-ADRS-R      PIC X(76)  OCCURS  4.
       *
@@ -3734,13 +3736,23 @@ grpsys         MOVE    RECE041-HOSPNUM TO  COMB-HOSPNUM
                CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
                IF    ( KANACHK-RC      =   ZERO )
                AND   ( KANACHK-MAX     >   ZERO )
-                   STRING  "°⁄øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚°€"
+                 IF   RECE02-SRYYM   =  "201103"
+                   STRING  "°⁄øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚°€°°°°°°°°"
                                                DELIMITED  BY  SIZE
                            KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                DELIMITED  BY  SIZE
                            "±ﬂ"                DELIMITED  BY  SIZE
                                            INTO    WRK-DISASTER-COMMENT
                    END-STRING
+                 ELSE
+                   STRING  "°⁄»Û∏∫Ã»¬–æ› ¨∞∑§§∞Ï…Ù…È√¥∂‚°€"
+                                               DELIMITED  BY  SIZE
+                           KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                           "±ﬂ"                DELIMITED  BY  SIZE
+                                           INTO    WRK-DISASTER-COMMENT
+                   END-STRING
+                 END-IF
                END-IF
                PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
            END-IF

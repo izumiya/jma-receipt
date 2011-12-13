@@ -145,6 +145,7 @@
       *                                     §Œ∫ÔΩ¸ΩËÕ˝§ŒÕ≠Ãµ¬–±˛
       *  04.05.33    NACL-ÃÁœ∆    11/12/01  µ‹æÎ∏©√œ ˝∏¯»Ò¬–±˛° ¿Á¬Êª‘°À
       *  04.05.34    NACL-∆£∏∂    11/12/06  ππø∑∆¸…’§Ú•ﬁ•∑•Û∆¸…’§´§È¿ﬂƒÍ
+      *  04.05.35    NACL-ÃÁœ∆    11/12/13  ∫“≥≤§À¥ÿ§π§Î•≥•·•Û•»Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -508,8 +509,10 @@
                    07  WRK-1033-EDYUKYMD 
                                    PIC X(08).                                       
       *
-           03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
-           03  WRK-FUTAN1          PIC ZZZ,ZZ9. 
+      ***  03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
+           03  WRK-FUTAN           PIC ZZZZZZZZ9.
+      ***  03  WRK-FUTAN1          PIC ZZZ,ZZ9. 
+           03  WRK-FUTAN1          PIC ZZZZZ9.
            03  WRK-TITLE           PIC X(50).
            03  WRK-TEKIYOU         PIC X(50).
            03  WRK-ADRS.
@@ -7678,13 +7681,23 @@
                    CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
                    IF    ( KANACHK-RC      =   ZERO )
                    AND   ( KANACHK-MAX     >   ZERO )
-                       STRING  "°⁄øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚°€°°°°"
+                     IF   RECE62-SRYYM   =  "201103"
+                       STRING  "°⁄øÃ∫“∞ ¡∞∞Ï…Ù…È√¥∂‚°€°°°°°°°°"
                                                DELIMITED  BY  SIZE
                                KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                DELIMITED  BY  SIZE
                                "±ﬂ"            DELIMITED  BY  SIZE
                                                INTO    WRK-TITLE
                        END-STRING
+                     ELSE
+                       STRING  "°⁄»Û∏∫Ã»¬–æ› ¨∞∑§§∞Ï…Ù…È√¥∂‚°€"
+                                               DELIMITED  BY  SIZE
+                               KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                               "±ﬂ"            DELIMITED  BY  SIZE
+                                               INTO    WRK-TITLE
+                       END-STRING
+                     END-IF
                    END-IF
                    INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "°°"
       * 
@@ -7716,13 +7729,23 @@
                    CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
                    IF    ( KANACHK-RC      =   ZERO )
                    AND   ( KANACHK-MAX     >   ZERO )
-                       STRING  "°⁄øÃ∫“∞ ¡∞ø©ªˆ¿∏≥ËŒ≈Õ‹…∏Ω‡…È√¥≥€°€"
+                     IF   RECE62-SRYYM   =  "201103"
+                       STRING  "°⁄øÃ∫“∞ ¡∞ø©ªˆ¿∏≥ËŒ≈Õ‹…∏Ω‡…È√¥≥€°€°°"
                                                DELIMITED  BY  SIZE
                                KANACHK-OUT-INPUT(1:KANACHK-MAX)
                                                DELIMITED  BY  SIZE
                                "±ﬂ"            DELIMITED  BY  SIZE
                                                INTO    WRK-TITLE
                        END-STRING
+                     ELSE
+                       STRING  "°⁄»Û∏∫Ã»¬–æ› ¨∞∑§§ø©ªˆ…∏Ω‡…È√¥≥€°€°°"
+                                               DELIMITED  BY  SIZE
+                               KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                               DELIMITED  BY  SIZE
+                               "±ﬂ"            DELIMITED  BY  SIZE
+                                               INTO    WRK-TITLE
+                       END-STRING
+                     END-IF
                    END-IF
                    INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "°°"
       * 

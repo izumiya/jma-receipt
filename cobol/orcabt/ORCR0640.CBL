@@ -523,6 +523,7 @@
       *  04.05.41    NACL-ÌçÏÆ    11/12/01  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÀçÂæ»Ô¡Ë
       *  04.05.42    NACL-ÌçÏÆ    11/12/05  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     (283077)Ê¿À®£²£³Ç¯£±£±·î¤Þ¤Ç
+      *  04.05.43    NACL-ÌçÏÆ    11/12/13  ºÒ³²ÂÐ¾Ý¾ò·ï½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1390,6 +1391,9 @@
            03  WK-GENGAKU2-YMD.
                05  WK-GENGAKU2-YM              PIC  9(06).
                05  WK-GENGAKU2-DD              PIC  9(02).
+           03  WK-GENGAKU3-YMD.
+               05  WK-GENGAKU3-YM              PIC  9(06).
+               05  WK-GENGAKU3-DD              PIC  9(02).
       *
            03  WRK-TENTEKI2-SRYCD-X.
                05  WRK-TENTEKI2-SRYCD          PIC  X(09)
@@ -3168,6 +3172,14 @@
                                               TO   WK-GENGAKU2-DD
               END-IF
       *
+              MOVE      RECE62-SRYYM          TO   WK-GENGAKU3-YM
+              IF   RECE62-TEKSTYMD-X(1:6)  >=  RECE62-SRYYM
+                 MOVE   RECE62-TEKSTYMD-X(7:2)
+                                              TO   WK-GENGAKU3-DD
+              ELSE
+                 MOVE   01                    TO   WK-GENGAKU3-DD
+              END-IF
+      *
               PERFORM  21101-GENGAKU-HENSYU-SEC
       *
             END-IF
@@ -3231,6 +3243,8 @@
               MOVE   RECE62-KOHTEKEDYMD(1)(7:2)
                                          TO   WK-GENGAKU2-DD
             END-IF
+      *
+            MOVE     "99999999"          TO   WK-GENGAKU3-YMD
       *
             PERFORM  21101-GENGAKU-HENSYU-SEC
       *
@@ -3336,6 +3350,10 @@
                       (PTKOH-SAKJOKBN   =   SPACE          ))
                   OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU2-YMD) AND
                       (WK-GENGAKU2-YMD <=   PTKOH-TEKEDYMD ) AND
+                      (PTKOH-SAKJOKBN   =   SPACE          ))
+                  OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU3-YMD) AND
+                      (WK-GENGAKU3-YMD <=   PTKOH-TEKEDYMD ) AND
+                      (WK-GENGAKU3-YMD NOT = "99999999"    ) AND
                       (PTKOH-SAKJOKBN   =   SPACE          ))
                       EVALUATE   GEN-IDX
                         WHEN        1
@@ -20372,6 +20390,14 @@
                                             TO   WK-GENGAKU2-DD
                END-IF
       *
+               MOVE      RECE62-SRYYM       TO   WK-GENGAKU3-YM
+               IF   RECE62-TEKSTYMD-X(1:6)  >=  RECE62-SRYYM
+                  MOVE   RECE62-TEKSTYMD-X(7:2)
+                                            TO   WK-GENGAKU3-DD
+               ELSE
+                  MOVE   01                 TO   WK-GENGAKU3-DD
+               END-IF
+      *
                PERFORM  21151-SAIGAI-TAISYO-HENSYU-SEC
              END-IF
            ELSE
@@ -20399,6 +20425,8 @@
                  MOVE   RECE62-KOHTEKEDYMD(1)(7:2)
                                             TO   WK-GENGAKU2-DD
                END-IF
+      *
+               MOVE     "99999999"          TO   WK-GENGAKU3-YMD
       *
                PERFORM  21151-SAIGAI-TAISYO-HENSYU-SEC
            END-IF
@@ -20430,6 +20458,10 @@
                     (PTKOH-SAKJOKBN   =   SPACE          ))
                 OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU2-YMD) AND
                     (WK-GENGAKU2-YMD <=   PTKOH-TEKEDYMD ) AND
+                    (PTKOH-SAKJOKBN   =   SPACE          ))
+                OR ((PTKOH-TEKSTYMD  <=   WK-GENGAKU3-YMD) AND
+                    (WK-GENGAKU3-YMD <=   PTKOH-TEKEDYMD ) AND
+                    (WK-GENGAKU3-YMD NOT = "99999999"    ) AND
                     (PTKOH-SAKJOKBN   =   SPACE          ))
                   MOVE     1             TO  FLG-SAIGAI-TAISYO
                   IF   PTKOH-TEKSTYMD(1:6)  >=  RECE62-SRYYM
