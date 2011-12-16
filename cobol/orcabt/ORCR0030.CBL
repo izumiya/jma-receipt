@@ -538,6 +538,7 @@
       *                                     (283077)平成２３年１１月まで
       *  04.05.36    NACL-門脇    11/12/07  広島県地方公費対応
       *  04.05.37    NACL-門脇    11/12/13  災害対象条件修正
+      *  04.05.38    NACL-門脇    11/12/15  減免対応（東大阪市）
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -1191,6 +1192,7 @@
            03  WK-GENGAKU-RITU                 PIC  9(03).
            03  WK-GENGAKU-RITUX                PIC  9(03).
            03  WK-GENGAKU-KIN                  PIC  9(07).
+           03  WK-GENGAKU-KTKBN                PIC  9(01).
       *
            03  WK-GENGAKU-YMD.
                05  WK-GENGAKU-YM               PIC  9(06).
@@ -3503,6 +3505,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE     ZERO     TO     WK-GENGAKU-KOHID
            MOVE     ZERO     TO     WK-GENGAKU-RITU
            MOVE     ZERO     TO     WK-GENGAKU-KIN
+           MOVE     ZERO     TO     WK-GENGAKU-KTKBN
       *
            MOVE     ZERO     TO     FLG-SAIGAI-TAISYO
       *
@@ -3680,6 +3683,8 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
                   WHEN        4
                      MOVE    3                TO  RECE02-GENMENKBN
               END-EVALUATE
+      *
+              MOVE   WK-GENGAKU-KTKBN         TO  RECE02-YOBIETC(10)
            END-IF
       *
            .
@@ -3729,6 +3734,16 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
                         WHEN        4
                           MOVE   4           TO  WK-GENGAKUKBN
                       END-EVALUATE
+      *
+                      IF  RECE02-HKNJANUM  =  "270280" OR "67270280"
+                        IF     PTKOH-JKYSNUM(1:1)  = "1"
+                          MOVE   1           TO  WK-GENGAKU-KTKBN
+                        END-IF
+                        IF     PTKOH-JKYSNUM(1:1)  = "2"
+                          MOVE   2           TO  WK-GENGAKU-KTKBN
+                        END-IF
+                      END-IF
+      *
                       MOVE       1           TO  FLG-PTKOHINF
                   ELSE
                       MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
