@@ -519,7 +519,6 @@
       *    °õºþ½èÍý
            IF    ( IDX-LINE            >   CONST-MEISAI-ST )
                MOVE    ALL "-" TO  HCM44-MOJI (IDX-LINE)
-               PERFORM 2200-PAGE-FEED-CHK-SEC
                PERFORM 2100-HEAD-SEC
                IF    ( HXLST-PROCKBN   =   "1" )
                    PERFORM 400-PRINT-SYORI-SEC
