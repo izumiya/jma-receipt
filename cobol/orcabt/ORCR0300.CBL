@@ -373,6 +373,7 @@
       *                                     保険履歴を最大１００に変更
       *  04.05.25    NACL-藤原    11/12/06  更新日付をマシン日付から設定
       *  04.05.26    NACL-門脇    11/12/13  災害に関するコメント修正
+      *  04.05.27    NACL-藤原    11/12/16  東大阪市国保の減免対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2519,19 +2520,12 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
                END-EVALUATE
            END-IF    
            PERFORM 5004-MOJI-HENSYU-SEC     
-      *    証明書番号（国保OR退職者のみ）
-           IF    ( RECE02-TEISYUTUSAKI =   "2"     AND
-                   RECE02-RJNHKNNUM    =   SPACE                ) OR
-                 ( RECE02-HKNNUM       =   WRK-CONS-HKNNUM1  OR
-                                           WRK-CONS-HKNNUM2  OR
-                                           WRK-CONS-HKNNUM3  OR
-                                           WRK-CONS-HKNNUM4  OR
-                                           WRK-CONS-HKNNUM5  OR
-                                           WRK-CONS-HKNNUM6     )
-               MOVE    RECE02-CERTNUM      TO  WRK-DATA
-               MOVE    3                   TO  WRK-NAGASA
+      *    証明書番号（東大阪市国保減免のとき）
+           IF      RECE02-YOBIETC (10) >   0
+               MOVE    RECE02-YOBIETC (10) TO  WRK-NUM
+               MOVE    1                   TO  WRK-NAGASA
            END-IF    
-           PERFORM 5004-MOJI-HENSYU-SEC     
+           PERFORM 5005-NUM-HENSYU-SEC
       *    医療保険一部負担金額
            IF      RECE02-FTNMONEY(IDX1)
                                        >   ZERO
