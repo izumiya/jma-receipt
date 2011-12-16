@@ -141,7 +141,8 @@
       *  04.05.32    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
       *  04.05.33    NACL-門脇    11/12/01  宮城県地方公費対応（仙台市）
-      *  04.05.35    NACL-門脇    11/12/13  災害に関するコメント修正
+      *  04.05.34    NACL-門脇    11/12/13  災害に関するコメント修正
+      *  04.05.35    NACL-藤原    11/12/16  東大阪市国保の減免対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -8052,6 +8053,64 @@
                        END-IF
                    END-IF
                END-EVALUATE
+           END-IF
+      *
+      *    東大阪市減免コメント
+           IF      RECE62-YOBIETC (10) =   1   OR  2
+      *        摘要欄に記載されている場合１行あける
+               IF      WRK-LINETEK     >   ZERO
+                   IF      WRK-LINETEK     >=   WRK-TEKIYOU-LINE
+                       PERFORM 34120-PAGE-SEC
+                   ELSE
+                       ADD     1               TO  WRK-LINETEK
+                   END-IF
+               END-IF
+      *
+               IF      WRK-LINETEK         >=  WRK-TEKIYOU-LINE
+                   PERFORM 34120-PAGE-SEC
+               END-IF    
+               ADD     1                   TO  WRK-LINETEK
+      *
+               IF      CNT-PAGE        =   1
+                   EVALUATE    RECE62-YOBIETC (10)
+                       WHEN    1
+                           MOVE    "決定区分１"
+                                           TO  HC06-TEKIYO (WRK-LINETEK)
+                       WHEN    2
+                           MOVE    "決定区分２"
+                                           TO  HC06-TEKIYO (WRK-LINETEK)
+                   END-EVALUATE
+               ELSE                    
+                   EVALUATE    SYS-2005-NEXTPRTKBN
+                       WHEN    "0"   
+                           EVALUATE    RECE62-YOBIETC (10)
+                               WHEN    1
+                                   MOVE    "決定区分１"
+                                           TO  HC061-TEKIYO(WRK-LINETEK)
+                               WHEN    2
+                                   MOVE    "決定区分２"
+                                           TO  HC061-TEKIYO(WRK-LINETEK)
+                           END-EVALUATE
+                       WHEN    "1"   
+                           EVALUATE    RECE62-YOBIETC (10)
+                               WHEN    1
+                                   MOVE    "決定区分１"
+                                           TO  HC062-TEKIYO(WRK-LINETEK)
+                               WHEN    2
+                                   MOVE    "決定区分２"
+                                           TO  HC062-TEKIYO(WRK-LINETEK)
+                           END-EVALUATE
+                       WHEN    "2"   
+                           EVALUATE    RECE62-YOBIETC (10)
+                               WHEN    1
+                                   MOVE    "決定区分１"
+                                           TO  HC063-TEKIYO(WRK-LINETEK)
+                               WHEN    2
+                                   MOVE    "決定区分２"
+                                           TO  HC063-TEKIYO(WRK-LINETEK)
+                           END-EVALUATE
+                   END-EVALUATE
+               END-IF
            END-IF
       *
       *    適用欄上段コメント（レセプト特記事項編集情報）
