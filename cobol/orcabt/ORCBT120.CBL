@@ -403,9 +403,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  TOUKEI04PARA-HOSPNUM
                PERFORM   900-PTNYUINRRK-READ-SEC
                MOVE      PTNYUINRRK-PTID    TO  WRK-NEW-PTID
                PERFORM   UNTIL   FLG-PTNYUINRRK    =   1
-                   IF    WRK-OLD-PTID       NOT =   WRK-NEW-PTID
-                       MOVE   WRK-NEW-PTID  TO  WRK-OLD-PTID 
-                       PERFORM   2001-HENSYU-SEC
+                   IF     PTNYUINRRK-RRKEDANUM    =   1
+                          PERFORM   2001-HENSYU-SEC
                    END-IF
                    MOVE    "tbl_ptnyuinrrk"         TO  MCP-TABLE
                    MOVE    "key40"                  TO  MCP-PATHNAME
@@ -449,6 +448,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  TOUKEI04PARA-HOSPNUM
                   MOVE  WRK-PARA-SRYYMD
                                      TO  LNK-ORCBT120SUB-SANTEIYMD
                   MOVE    "00"       TO  LNK-ORCBT120SUB-SRYKA
+                  MOVE  PTNYUINRRK-RRKNUM
+                                     TO  LNK-ORCBT120SUB-RRKNUM
                   CALL    "ORCBT120SUB"  USING
                                          ORCBT120SUB-AREA
                                          SPA-AREA
