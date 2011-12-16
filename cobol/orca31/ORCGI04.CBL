@@ -3213,13 +3213,15 @@
                MOVE    IDXZ        TO  IDX7
                PERFORM 41001-CHOSEI-SEIKYU-CHK-SEC
       *
-               PERFORM VARYING IDX7    FROM    1   BY  1
-                       UNTIL ( IDX7    >   SPA-GMN-I04-HKNCOMBILST-CNT )
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >   SPA-GMN-I04-HKNCOMBILST-CNT )
                          OR  ( SPA-ERRCD   NOT =   SPACE )
+                   MOVE    SPA-NAI-I04-TSYUNOUIDX (IDX0)
+                                           TO  IDX7
                    PERFORM 41001-CHOSEI-SEIKYU-CHK-SEC
                    IF    ( SPA-ERRCD       NOT =   SPACE )
-                       MOVE    IDX7    TO  SPA-GMN-I04-HKNCOMBILST-SEL
-                       MOVE  SPA-GMN-I04-TSELNUM (IDX7)
+                       MOVE    IDX0    TO  SPA-GMN-I04-HKNCOMBILST-SEL
+                       MOVE  SPA-GMN-I04-TSELNUM (IDX0)
                                            TO  SPA-GMN-I04-SELNUM
       *
                        MOVE  SPA-NAI-I04-TSYUNOUIDX (SPA-GMN-I04-SELNUM)
