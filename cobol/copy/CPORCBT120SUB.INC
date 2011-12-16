@@ -39,6 +39,8 @@
            03  LNK-ORCBT120SUB-SANTEIYMD               PIC  X(08).
       *診療科（００：全科で固定セット）
            03  LNK-ORCBT120SUB-SRYKA                   PIC  X(02).
+      *入院履歴番号
+           03  LNK-ORCBT120SUB-RRKNUM                  PIC  9(03).
       *情報返却項目
            03  LNK-ORCBT120SUB-HENKYAKU-AREA.
       *医師コード

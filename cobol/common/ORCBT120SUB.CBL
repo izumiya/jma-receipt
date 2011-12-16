@@ -194,6 +194,9 @@
       *    レセプト種別返却サブ
            COPY    "CPORCSSYUBETUGET.INC".
       *
+      *    入院料未算定日取得サブ（同日再入院の保険取得に使用）
+           COPY    "CPORCSNYUINDAY.INC".
+      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -321,12 +324,14 @@
            INITIALIZE                           PTNYUINRRK-REC
            MOVE    LNK-ORCBT120SUB-HOSPNUM  TO  PTNYUINRRK-HOSPNUM
            MOVE    LNK-ORCBT120SUB-PTID     TO  PTNYUINRRK-PTID
+           MOVE    LNK-ORCBT120SUB-RRKNUM   TO  PTNYUINRRK-RRKNUM
+           MOVE    1                        TO  PTNYUINRRK-RRKEDANUM
            MOVE    "tbl_ptnyuinrrk"         TO  MCP-TABLE
-           MOVE    "key3"                   TO  MCP-PATHNAME
+           MOVE    "key"                    TO  MCP-PATHNAME
            PERFORM 910-PTNYUINRRK-SELECT-SEC
            IF      FLG-PTNYUINRRK            =   ZERO
                MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
-               MOVE    "key3"               TO  MCP-PATHNAME
+               MOVE    "key"                TO  MCP-PATHNAME
                PERFORM   910-PTNYUINRRK-READ-SEC
                PERFORM   UNTIL   (FLG-PTNYUINRRK    =   1)  OR
                                  (FLG-NYUIN-HIT1    =   1)
@@ -366,7 +371,7 @@
                        END-IF
                    END-IF
                    MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
-                   MOVE    "key3"               TO  MCP-PATHNAME
+                   MOVE    "key"                TO  MCP-PATHNAME
                    PERFORM 910-PTNYUINRRK-READ-SEC
                END-PERFORM
            ELSE
@@ -374,7 +379,7 @@
            END-IF
       *    患者入院履歴クローズ
            MOVE    "tbl_ptnyuinrrk"         TO  MCP-TABLE
-           MOVE    "key3"                   TO  MCP-PATHNAME
+           MOVE    "key"                    TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
       *
       *前日入院科／前日病棟番号／前日病室番号の取得
@@ -654,6 +659,21 @@
                MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                MOVE    "key17"                 TO  MCP-PATHNAME
                PERFORM   910-DB-CLOSE-SEC
+      *
+      *        同日再入院判定
+               IF    LNK-ORCBT120SUB-NYUIN-KBN    =    1
+                 INITIALIZE                        ORCSNYUINDAY-AREA
+                 MOVE  LNK-ORCBT120SUB-HOSPNUM TO  LNK-NYUINDAY-HOSPNUM
+                 MOVE  LNK-ORCBT120SUB-PTID    TO  LNK-NYUINDAY-PTID
+                 MOVE  LNK-ORCBT120SUB-SANTEIYMD(1:6)
+                                               TO  LNK-NYUINDAY-SANTEIYM
+                 CALL  "ORCSNYUINDAY"   USING      ORCSNYUINDAY-AREA
+                                                   SPA-AREA
+                 IF    LNK-NYUINDAY-DOUJITSU-KBN(WRK-SANTEIDD)  =  "1"
+                   MOVE  LNK-NYUINDAY-DOUJITSU-HKNCOMBI(WRK-SANTEIDD)
+                                     TO  LNK-ORCBT120SUB-HKNCOMBINUM(1)
+                 END-IF
+               END-IF
            END-IF
       *
       *
