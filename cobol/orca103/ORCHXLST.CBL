@@ -62,6 +62,7 @@
        01  B01L-REC.
            03  B01L-KEY.
                05  B01L-MSTSEQ         PIC 9(10).
+           03  B01L-NYUGAIKBN          PIC X(01).
            03  B01L-TEKIYO-G.
                05 B01L-NYUGAIKBNMEI    PIC X(02).
                05 B01L-SRYCD           PIC X(12).
@@ -152,6 +153,7 @@
                                        OCCURS  3.
            03  FLG-TEKCD               PIC 9(01).
            03  FLG-UTAGAIKBN           PIC 9(01).
+           03  FLG-NOCHECK             PIC 9(01).
            03  FLG-CHKERR-G.
                05  FLG-KEIKOKU         PIC 9(01).
                05  FLG-NASI            PIC 9(01).
@@ -212,6 +214,7 @@
                05  WRK-TEKCD-OCC       OCCURS  200.
                    07  WRK-DMKBN       PIC X(01).
                    07  WRK-TEKCD       PIC X(170).
+           03  WRK-MIDASI1             PIC X(56).
            03  WRK-MIDASI2             PIC X(100).
            03  WRK-YKSK-G.
                05  WRK-YKSK-MAX        PIC 9(05).
@@ -650,7 +653,7 @@
                "¡ã¡¡ÌôºÞ¤È¶Ø´÷°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "ÌôºÞ¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "¶Ø´÷¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            WHEN    "4" 
@@ -658,7 +661,7 @@
                "¡ã¡¡ÌôºÞ¤ÈÊ»ÍÑ¶Ø´÷°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "ÌôºÞ¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "Å¬ÍÑÌôºÞ¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            WHEN    "5"
@@ -666,7 +669,7 @@
                "¡ã¡¡Æ±°ì·î¤ËÊ»ÍÑ»»Äê¤Ç¤­¤Ê¤¤¿ÇÎÅ¹Ô°Ù°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "¿ÇÎÅ¹Ô°Ù¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "Å¬ÍÑ¿ÇÎÅ¹Ô°Ù¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            WHEN    "A"
@@ -674,7 +677,7 @@
                "¡ã¡¡Æ±°ìÆü¤ËÊ»ÍÑ»»Äê¤Ç¤­¤Ê¤¤¿ÇÎÅ¹Ô°Ù°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "¿ÇÎÅ¹Ô°Ù¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "Å¬ÍÑ¿ÇÎÅ¹Ô°Ù¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            WHEN    "B"
@@ -682,7 +685,7 @@
                "¡ã¡¡Æ±°ì²ñ·×¤ËÊ»ÍÑ»»Äê¤Ç¤­¤Ê¤¤¿ÇÎÅ¹Ô°Ù°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "¿ÇÎÅ¹Ô°Ù¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "Å¬ÍÑ¿ÇÎÅ¹Ô°Ù¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            END-EVALUATE
@@ -701,7 +704,7 @@
                "¡ã¡¡ÌôºÞ¤ÈÉÂÌ¾°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "ÌôºÞ¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "ÉÂÌ¾¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            WHEN    "2"
@@ -709,7 +712,7 @@
                "¡ã¡¡¿ÇÎÅ¹Ô°Ù¤ÈÉÂÌ¾°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "¿ÇÎÅ¹Ô°Ù¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "ÉÂÌ¾¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            WHEN    "6"
@@ -717,7 +720,7 @@
                "¡ã¡¡ÅêÍ¿¶Ø´÷ÌôºÞ¤ÈÉÂÌ¾¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "ÌôºÞ¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "ÉÂÌ¾¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            END-EVALUATE
@@ -780,7 +783,7 @@
                "¡ã¡¡¿ÇÎÅ¹Ô°Ù¤É¤¦¤·¤Î»»ÄêÏ³¤ì°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
            MOVE    "¿ÇÎÅ¹Ô°Ù¥³¡¼¥É¡ÊÌôºÞ¥³¡¼¥É¡Ë"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
            MOVE    "¿ÇÎÅ¹Ô°Ù¥³¡¼¥É¡ÊÌôºÞ¥³¡¼¥É¡Ë"
                                        TO  WRK-MIDASI2
       *
@@ -815,7 +818,7 @@
                "¡ã¡¡ÉÂÌ¾¤ÈÌôºÞ°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "ÉÂÌ¾¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "ÌôºÞ¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            WHEN    "9"
@@ -823,7 +826,7 @@
                "¡ã¡¡ÉÂÌ¾¤È¿ÇÎÅ¹Ô°Ù°ìÍ÷É½¡¡¡ä"
                                        TO  H01-MIDASI
                    MOVE    "ÉÂÌ¾¥³¡¼¥É"
-                                       TO  H02-MIDASI1
+                                       TO  WRK-MIDASI1
                    MOVE    "¿ÇÎÅ¹Ô°Ù¥³¡¼¥É"
                                        TO  WRK-MIDASI2
            END-EVALUATE
@@ -1126,6 +1129,7 @@
                MOVE    WRK-NAME-G      TO  WRK-SRYNAME
            END-IF
       *
+           MOVE    CHKSND-NYUGAIKBN    TO  B01L-NYUGAIKBN
            EVALUATE    CHKSND-NYUGAIKBN
            WHEN    "1"
                MOVE    "Æþ"        TO  B01L-NYUGAIKBNMEI
@@ -1438,6 +1442,10 @@
       *
            MOVE    B01L-TEKIYO-G   TO  B01-LEFT
       *
+           IF    ( B01L-NYUGAIKBN  =   "0" )
+               MOVE    1           TO  FLG-NOCHECK
+           END-IF
+      *
            .
        210-BODY-01-LEFT-EXT.
            EXIT.
@@ -1446,7 +1454,7 @@
       *****************************************************************
        210-BODY-01-RIGHT-SEC           SECTION.
       *
-           EVALUATE    CHKSND-COMPKBN
+           EVALUATE    B01R-COMPKBN
            WHEN    "2"
                MOVE    1      TO  FLG-KANZEN
            WHEN    "3"
@@ -1456,6 +1464,9 @@
            END-EVALUATE
       *
            MOVE    B01R-TEKIYO-G   TO  B01-RIGHT
+           IF    ( B01R-UTAGAIKBN  =   "1" )
+               MOVE    1      TO  FLG-UTAGAIKBN
+           END-IF
       *
            .
        210-BODY-01-RIGHT-EXT.
@@ -1946,6 +1957,51 @@
            MOVE    HEAD-01             TO  HCM44-MOJI(1)
       *
            MOVE    1                   TO  WRK-TGPNT
+           MOVE    SPACE               TO  H02-MIDASI1
+           STRING  WRK-MIDASI1  DELIMITED   BY  SPACE
+                   "¡¡"         DELIMITED   BY  SIZE
+           INTO    H02-MIDASI1
+           WITH    POINTER WRK-TGPNT
+           END-STRING
+      *
+           IF        ( HXLST-CHKKBN    =   "1" )
+               IF    ( FLG-NOCHECK     =   1 )
+                   STRING "¡ß¡§¥Á¥§¥Ã¥¯¤·¤Ê¤¤ÌôºÞ"
+                                       DELIMITED   BY  SIZE
+                   INTO   H02-MIDASI1
+                   WITH   POINTER WRK-TGPNT
+                   END-STRING
+               END-IF
+           END-IF
+      *
+           IF        ( HXLST-CHKKBN    =   "2" )
+               IF    ( FLG-NOCHECK     =   1 )
+                   STRING "¡ß¡§¥Á¥§¥Ã¥¯¤·¤Ê¤¤¿ÇÎÅ¹Ô°Ù"
+                                       DELIMITED   BY  SIZE
+                   INTO   H02-MIDASI1
+                   WITH   POINTER WRK-TGPNT
+                   END-STRING
+               END-IF
+           END-IF
+      *
+           IF        ( HXLST-CHKKBN    =   "8" OR "9" )
+      *
+               PERFORM VARYING IDX2    FROM    1   BY  1
+                       UNTIL ( IDX2    >   CONST-TOTUGO-MES-MAX )
+      *
+                   IF    ( FLG-TOTUGO (IDX2)   =   1 )
+                       STRING CONST-TOTUGO-MES (IDX2)
+                                           DELIMITED   BY  SPACE
+                              " "          DELIMITED   BY  SIZE
+                       INTO   H02-MIDASI1
+                       WITH   POINTER  WRK-TGPNT
+                       END-STRING
+                   END-IF
+      *
+               END-PERFORM
+           END-IF
+      *
+           MOVE    1                   TO  WRK-TGPNT
            MOVE    SPACE               TO  H02-MIDASI2
            STRING  WRK-MIDASI2         DELIMITED   BY  SPACE
                    "¡¡¡¡"              DELIMITED   BY  SIZE
@@ -1953,8 +2009,7 @@
            WITH    POINTER WRK-TGPNT
            END-STRING
       *
-           IF        ( HXLST-CHKKBN    =   "1" OR "2" OR "6" 
-                                        OR "8" OR "9" )
+           IF        ( HXLST-CHKKBN    =   "1" OR "2" OR "6" )
       *
                PERFORM VARYING IDX2    FROM    1   BY  1
                        UNTIL ( IDX2    >   CONST-TOTUGO-MES-MAX )
@@ -2047,6 +2102,7 @@
                MOVE    ZERO        TO  FLG-KEIKOKU
                MOVE    ZERO        TO  FLG-NASI
                MOVE    ZERO        TO  FLG-MSTDAT
+               MOVE    ZERO        TO  FLG-NOCHECK
       *
                MOVE    CONST-MEISAI-ST TO  IDX-LINE
       *
