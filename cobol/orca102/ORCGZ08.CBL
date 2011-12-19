@@ -1347,10 +1347,13 @@
       *    単位コードチェック必須
            IF     (SPA-GMN-TANICD      =   ZERO
                                        OR  SPACE  )
+               OR (SPA-ERRCD       NOT =   SPACE  )
                CONTINUE
            ELSE
-               IF     (SPA-NAI-TANICD  NOT =   ZERO  )
-                  AND (SPA-ERRCD           =   SPACE )
+               IF     (SPA-NAI-TANICD      =   ZERO
+                                           OR  SPACE  )
+                   CONTINUE
+               ELSE
                    MOVE    "0023"              TO  SPA-ERRCD
                    MOVE    11                  TO  SPA-GMN-CUR
                END-IF
