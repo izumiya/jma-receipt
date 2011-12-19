@@ -40,5 +40,18 @@ Z08	{
 		COPYCD	{
 			value	varchar(9);
 		};
+		TEN	{
+			value	number(10,2);
+		};
+		TANICD_COMB	{
+			TANICD	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[200];
+		};
+		MSGLBEL	{
+			value	varchar(100);
+		};
 	};
 };

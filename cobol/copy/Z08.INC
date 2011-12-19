@@ -27,3 +27,13 @@
                 04  Z08-IDOKIKAN-VALUE   PIC X(30).
               03  Z08-COPYCD.
                 04  Z08-VALUE   PIC X(9).
+              03  Z08-TEN.
+                04  Z08-VALUE   PIC S9(8)V9(2).
+              03  Z08-TANICD-COMB.
+                04  Z08-TANICD.
+                  05  Z08-VALUE   PIC X(30).
+                04  Z08-TANICD-COUNT   PIC S9(9)   BINARY.
+                04  Z08-TANICD-ITEM
+                        PIC X(30)   OCCURS  200 TIMES.
+              03  Z08-MSGLBEL.
+                04  Z08-VALUE   PIC X(100).
