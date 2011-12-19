@@ -196,6 +196,7 @@
       *                                     É½ÍÑÈÖ¹æÊÔ½¸
       *  04.05.08    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
       *  04.05.09    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
+      *  04.05.10    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -635,6 +636,10 @@
            03  WRK-SRYSURYO                            PIC 9(05)V9(05).
            03  WRK-SRYSURYO2                           PIC 9(05).
            03  WRK-SRYSURYO3                           PIC 9(05).
+           03  WRK-KZI058-TEN                          PIC 9(09)V99.
+           03  WRK-KZI058-TANICD                       PIC 9(03).
+           03  WRK-KZI058-TANIMOJISU                   PIC 9(01).
+           03  WRK-KZI058-TANINAME                     PIC X(24).
       *
            03  WRK-RECEERR                             PIC X(200).
       *
@@ -1849,6 +1854,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                           FLG-SRYKBN-HEN
                                           FLG-KENSA-COM
       *
+                       MOVE   ZERO   TO
+                                     WRK-KZI058-TEN
+                                     WRK-KZI058-TANICD
+                                     WRK-KZI058-TANIMOJISU
+                       MOVE   SPACE  TO
+                                     WRK-KZI058-TANINAME
+      *
                        MOVE   ZERO   TO   FLG-WRITE85
                        MOVE   ZERO   TO   FLG-TENTEKI
                        IF  (ACCT-SRYKBN     = "97"     )
@@ -1917,6 +1929,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                     FLG-SRYKBN-HEN
                                                     FLG-KENSA-COM
       *
+                                 MOVE   ZERO   TO
+                                               WRK-KZI058-TEN
+                                               WRK-KZI058-TANICD
+                                               WRK-KZI058-TANIMOJISU
+                                 MOVE   SPACE  TO
+                                               WRK-KZI058-TANINAME
+      *
                                  MOVE   ZERO   TO   FLG-WRITE85
                                  MOVE   ZERO   TO   FLG-TENTEKI
                                  PERFORM   2201-RECE84-TENSOU-SEC
@@ -1954,6 +1973,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                     FLG-TAHOKEN
                                                     FLG-SRYKBN-HEN
                                                     FLG-KENSA-COM
+      *
+                                 MOVE   ZERO   TO
+                                               WRK-KZI058-TEN
+                                               WRK-KZI058-TANICD
+                                               WRK-KZI058-TANIMOJISU
+                                 MOVE   SPACE  TO
+                                               WRK-KZI058-TANINAME
       *
                                  MOVE   ZERO   TO   FLG-WRITE85
                                  MOVE   ZERO   TO   FLG-TENTEKI
@@ -2697,8 +2723,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                   MOVE    SRY-SRYSURYO(IDX2)                            
                                           TO    WRK-SRYSURYO            
-                  MOVE    TNS-TANICD      TO    RECE85-TANICD(IDX4)
-                                                WRK-TANICD              
+                  IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO    RECE85-TANICD(IDX4)
+                                                WRK-TANICD
+                  END-IF
                   MOVE    TNS-TANIMOJISU  TO    RECE85-TANIMOJISU(IDX4)
                                                 WRK-TANIMOJISU          
                   MOVE    TNS-TANINAME    TO    RECE85-TANINAME(IDX4)
@@ -2832,6 +2860,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF  SRY-SRYCD(IDX2)(1:3)     =   "058"
                  MOVE  TNS-FORMALYUKOKETA TO  RECE85-YUKOKETA(IDX4)
                  MOVE  TNS-FORMALNAME     TO  RECE85-NAME(IDX4)
+      *
+                 MOVE     TNS-TEN         TO  WRK-KZI058-TEN
+                 IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO  WRK-KZI058-TANICD
+                    MOVE  TNS-TANIMOJISU  TO  WRK-KZI058-TANIMOJISU
+                    MOVE  TNS-TANINAME    TO  WRK-KZI058-TANINAME
+                 END-IF
+                 MOVE     ZERO            TO  RECE85-TEN(IDX4)
+                 MOVE     ZERO            TO  RECE85-TANICD(IDX4)
+                 MOVE     ZERO            TO  RECE85-TANIMOJISU(IDX4)
+                 MOVE     SPACE           TO  RECE85-TANINAME(IDX4)
                END-IF
                IF  (SRY-SRYCD(IDX2)(1:1)    =   "7")
                AND (SRY-MEISKYFLG(IDX2)     =   "1")
@@ -2846,6 +2885,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     END-IF
                  ELSE
                     MOVE  "1"             TO  RECE85-RECEHENFLG(IDX4)
+                    IF    WRK-KZI058-TEN  NOT = ZERO
+                       MOVE   WRK-KZI058-TEN
+                                          TO  RECE85-TEN(IDX4)
+                    END-IF
+                    IF   (RECE85-TANICD(IDX4)    = ZERO)
+                    AND  (WRK-KZI058-TANICD  NOT = ZERO)
+                       MOVE   WRK-KZI058-TANICD
+                                          TO  RECE85-TANICD(IDX4)
+                       MOVE   WRK-KZI058-TANIMOJISU
+                                          TO  RECE85-TANIMOJISU(IDX4)
+                       MOVE   WRK-KZI058-TANINAME
+                                          TO  RECE85-TANINAME(IDX4)
+                    END-IF
                  END-IF
                END-IF
       *
@@ -8232,6 +8284,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    ZERO                    TO   WRK-TANICD
            MOVE    ZERO                    TO   WRK-TANIMOJISU
            MOVE    SPACE                   TO   WRK-TANINAME
+           MOVE    ZERO                    TO   WRK-KZI058-TEN
+           MOVE    ZERO                    TO   WRK-KZI058-TANICD
+           MOVE    ZERO                    TO   WRK-KZI058-TANIMOJISU
+           MOVE    SPACE                   TO   WRK-KZI058-TANINAME
       *
            PERFORM
                   UNTIL     (IDX2      >   IDX5)    OR
@@ -8304,8 +8360,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           END-IF
                          END-PERFORM
                       END-IF
-                      MOVE  TNS-TANICD      TO  RECE85-TANICD(IDX4)
+                      IF   TNS-TANICD  NOT = SPACE AND "000"
+                       MOVE TNS-TANICD      TO  RECE85-TANICD(IDX4)
                                                 WRK-TANICD
+                      END-IF
                       MOVE  TNS-TANIMOJISU  TO  RECE85-TANIMOJISU(IDX4)
                                                 WRK-TANIMOJISU
                       MOVE  TNS-TANINAME    TO  RECE85-TANINAME(IDX4)
@@ -8349,11 +8407,35 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     MOVE  TNS-FORMALYUKOKETA TO  RECE85-YUKOKETA(IDX4)
                     MOVE  TNS-FORMALNAME     TO  RECE85-NAME(IDX4)
                     MOVE  1                  TO  FLG-FORMALNAME
+      *
+                    MOVE     TNS-TEN         TO  WRK-KZI058-TEN
+                    IF   TNS-TANICD  NOT = SPACE AND "000"
+                       MOVE  TNS-TANICD      TO  WRK-KZI058-TANICD
+                       MOVE  TNS-TANIMOJISU  TO  WRK-KZI058-TANIMOJISU
+                       MOVE  TNS-TANINAME    TO  WRK-KZI058-TANINAME
+                    END-IF
+                    MOVE     ZERO            TO  RECE85-TEN(IDX4)
+                    MOVE     ZERO            TO  RECE85-TANICD(IDX4)
+                    MOVE     ZERO            TO  RECE85-TANIMOJISU(IDX4)
+                    MOVE     SPACE           TO  RECE85-TANINAME(IDX4)
                   END-IF
                   IF  (WRK-ORCSTEN-SRYCD(IDX2)(1:1)  =   "7")
                   AND (FLG-FORMALNAME                =    1 )
                     MOVE  "1"             TO  RECE85-RECEHENFLG(IDX4)
                     MOVE  ZERO            TO  FLG-FORMALNAME
+                    IF    WRK-KZI058-TEN  NOT = ZERO
+                       MOVE   WRK-KZI058-TEN
+                                          TO  RECE85-TEN(IDX4)
+                    END-IF
+                    IF   (RECE85-TANICD(IDX4)    = ZERO)
+                    AND  (WRK-KZI058-TANICD  NOT = ZERO)
+                       MOVE   WRK-KZI058-TANICD
+                                          TO  RECE85-TANICD(IDX4)
+                       MOVE   WRK-KZI058-TANIMOJISU
+                                          TO  RECE85-TANIMOJISU(IDX4)
+                       MOVE   WRK-KZI058-TANINAME
+                                          TO  RECE85-TANINAME(IDX4)
+                    END-IF
                   END-IF
       *
                   IF   RECE85-YUKOKETA(IDX4)  =  ZERO

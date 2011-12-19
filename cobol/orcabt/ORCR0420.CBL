@@ -203,6 +203,7 @@
       *  04.05.06    NACL-ÌçÏÆ    10/01/21  ¼£¸³ÂÐ±þ
       *  04.05.07    NACL-ÌçÏÆ    11/06/21  ²èÁü¿ÇÃÇ¡¦ÅÅ»Ò²èÁü´ÉÍý²Ã»»¤Î
       *                                     É½ÍÑÈÖ¹æÊÔ½¸
+      *  04.05.08    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -537,6 +538,10 @@
            03  WRK-SRYSURYO                            PIC 9(05)V9(05).
            03  WRK-SRYSURYO2                           PIC 9(05).
            03  WRK-SRYSURYO3                           PIC 9(05).
+           03  WRK-KZI058-TEN                          PIC 9(09)V99.
+           03  WRK-KZI058-TANICD                       PIC 9(03).
+           03  WRK-KZI058-TANIMOJISU                   PIC 9(01).
+           03  WRK-KZI058-TANINAME                     PIC X(24).
            03  WRK-RENNUM                              PIC 9(02).
            03  WRK-RENNUM2                             PIC 9(02).
       *
@@ -1447,6 +1452,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    SPACE   TO      WRK-KYUGYOFLG
                                MOVE    ZERO    TO      FLG-COUNT-ARI
       *
+                               MOVE    ZERO    TO
+                                               WRK-KZI058-TEN
+                                               WRK-KZI058-TANICD
+                                               WRK-KZI058-TANIMOJISU
+                               MOVE    SPACE   TO
+                                               WRK-KZI058-TANINAME
+      *
                                MOVE    ZERO    TO      FLG-WRITE45
                                PERFORM   21011-RECE44-TENSOU-SEC
                                PERFORM   21012-RECE45-HENSYU-SEC
@@ -1503,6 +1515,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
                                       MOVE  ZERO  TO  FLG-COUNT-ARI
       *
+                                      MOVE  ZERO  TO
+                                                  WRK-KZI058-TEN
+                                                  WRK-KZI058-TANICD
+                                                  WRK-KZI058-TANIMOJISU
+                                      MOVE  SPACE TO
+                                                  WRK-KZI058-TANINAME
+      *
                                       MOVE  ZERO  TO  FLG-WRITE45
                                       PERFORM   21011-RECE44-TENSOU-SEC
                                       PERFORM   21012-RECE45-HENSYU-SEC
@@ -1545,6 +1564,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
                                       MOVE  ZERO  TO  FLG-COUNT-ARI
+      *
+                                      MOVE  ZERO  TO
+                                                  WRK-KZI058-TEN
+                                                  WRK-KZI058-TANICD
+                                                  WRK-KZI058-TANIMOJISU
+                                      MOVE  SPACE TO
+                                                  WRK-KZI058-TANINAME
       *
                                       MOVE  ZERO  TO  FLG-WRITE45
                                       PERFORM   21011-RECE44-TENSOU-SEC
@@ -2223,8 +2249,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                   MOVE    SRY-SRYSURYO(IDX2)                            
                                           TO    WRK-SRYSURYO            
-                  MOVE    TNS-TANICD      TO    RECE45-TANICD(IDX4)
-                                                WRK-TANICD              
+                  IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO    RECE45-TANICD(IDX4)
+                                                WRK-TANICD
+                  END-IF
                   MOVE    TNS-TANIMOJISU  TO    RECE45-TANIMOJISU(IDX4)
                                                 WRK-TANIMOJISU          
                   MOVE    TNS-TANINAME    TO    RECE45-TANINAME(IDX4)
@@ -2422,6 +2450,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF  SRY-SRYCD(IDX2)(1:3)     =   "058"
                  MOVE  TNS-FORMALYUKOKETA TO  RECE45-YUKOKETA(IDX4)
                  MOVE  TNS-FORMALNAME     TO  RECE45-NAME(IDX4)
+      *
+                 MOVE     TNS-TEN         TO  WRK-KZI058-TEN
+                 IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO  WRK-KZI058-TANICD
+                    MOVE  TNS-TANIMOJISU  TO  WRK-KZI058-TANIMOJISU
+                    MOVE  TNS-TANINAME    TO  WRK-KZI058-TANINAME
+                 END-IF
+                 MOVE     ZERO            TO  RECE45-TEN(IDX4)
+                 MOVE     ZERO            TO  RECE45-TANICD(IDX4)
+                 MOVE     ZERO            TO  RECE45-TANIMOJISU(IDX4)
+                 MOVE     SPACE           TO  RECE45-TANINAME(IDX4)
                END-IF
                IF  (SRY-SRYCD(IDX2)(1:1)    =   "7")
                AND (SRY-MEISKYFLG(IDX2)     =   "1")
@@ -2436,6 +2475,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     END-IF
                  ELSE
                     MOVE  "1"             TO  RECE45-RECEHENFLG(IDX4)
+                    IF    WRK-KZI058-TEN  NOT = ZERO
+                       MOVE   WRK-KZI058-TEN
+                                          TO  RECE45-TEN(IDX4)
+                    END-IF
+                    IF   (RECE45-TANICD(IDX4)    = ZERO)
+                    AND  (WRK-KZI058-TANICD  NOT = ZERO)
+                       MOVE   WRK-KZI058-TANICD
+                                          TO  RECE45-TANICD(IDX4)
+                       MOVE   WRK-KZI058-TANIMOJISU
+                                          TO  RECE45-TANIMOJISU(IDX4)
+                       MOVE   WRK-KZI058-TANINAME
+                                          TO  RECE45-TANINAME(IDX4)
+                    END-IF
                  END-IF
                END-IF
       *
@@ -7265,6 +7317,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    SPACE   TO    WRK-KYUGYOFLG
                                MOVE    ZERO    TO    FLG-COUNT-ARI
       *
+                               MOVE    ZERO    TO
+                                               WRK-KZI058-TEN
+                                               WRK-KZI058-TANICD
+                                               WRK-KZI058-TANIMOJISU
+                               MOVE    SPACE   TO
+                                               WRK-KZI058-TANINAME
+      *
                                MOVE    ZERO    TO    FLG-WRITE45
                                PERFORM   21011-RECE44-TENSOU-SEC
                                PERFORM   21012-RECE45-HENSYU-SEC
@@ -7323,6 +7382,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
                                       MOVE  ZERO  TO  FLG-COUNT-ARI
       *
+                                      MOVE  ZERO  TO
+                                                  WRK-KZI058-TEN
+                                                  WRK-KZI058-TANICD
+                                                  WRK-KZI058-TANIMOJISU
+                                      MOVE  SPACE TO
+                                                  WRK-KZI058-TANINAME
+      *
                                       MOVE  ZERO  TO  FLG-WRITE45
                                       PERFORM   21011-RECE44-TENSOU-SEC
                                       PERFORM   21012-RECE45-HENSYU-SEC
@@ -7367,6 +7433,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                                       MOVE  SPACE TO  WRK-KYUGYOFLG
                                       MOVE  ZERO  TO  FLG-COUNT-ARI
+      *
+                                      MOVE  ZERO  TO
+                                                  WRK-KZI058-TEN
+                                                  WRK-KZI058-TANICD
+                                                  WRK-KZI058-TANIMOJISU
+                                      MOVE  SPACE TO
+                                                  WRK-KZI058-TANINAME
       *
                                       MOVE  ZERO  TO  FLG-WRITE45
                                       PERFORM   21011-RECE44-TENSOU-SEC
