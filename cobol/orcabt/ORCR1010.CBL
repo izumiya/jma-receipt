@@ -81,6 +81,7 @@
       *  04.05.05    NACL-門脇    10/01/22  治験対応
       *  04.05.06    NACL-門脇    11/06/21  画像診断・電子画像管理加算の
       *                                     表用番号編集
+      *  04.05.07    NACL-門脇    11/12/16  器材の金額と単位の対応
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -323,6 +324,10 @@
            03  WRK-SRYSURYO                            PIC 9(05)V9(05).
            03  WRK-SRYSURYO2                           PIC 9(05).
            03  WRK-SRYSURYO3                           PIC 9(05).
+           03  WRK-KZI058-TEN                          PIC 9(09)V99.
+           03  WRK-KZI058-TANICD                       PIC 9(03).
+           03  WRK-KZI058-TANIMOJISU                   PIC 9(01).
+           03  WRK-KZI058-TANINAME                     PIC X(24).
            03  WRK-RENNUM                              PIC 9(02).
            03  WRK-RENNUM2                             PIC 9(02).
       *
@@ -1077,6 +1082,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE  ZERO  TO   WRK-FILMTEN
                                MOVE  ZERO  TO   FLG-NEBU
       *
+                               MOVE  ZERO  TO
+                                           WRK-KZI058-TEN
+                                           WRK-KZI058-TANICD
+                                           WRK-KZI058-TANIMOJISU
+                               MOVE  SPACE TO
+                                           WRK-KZI058-TANINAME
+      *
                                MOVE  ZERO  TO   FLG-WRITE05
                                PERFORM 21043-RECE120-TENSOU-SEC
                                PERFORM 21044-RECE130-HENSYU-SEC
@@ -1124,6 +1136,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  ZERO  TO   WRK-FILMTEN
                                       MOVE  ZERO  TO   FLG-NEBU
       *
+                                      MOVE  ZERO  TO
+                                                  WRK-KZI058-TEN
+                                                  WRK-KZI058-TANICD
+                                                  WRK-KZI058-TANIMOJISU
+                                      MOVE  SPACE TO
+                                                  WRK-KZI058-TANINAME
+      *
                                       MOVE  ZERO  TO   FLG-WRITE05
                                       PERFORM   21043-RECE120-TENSOU-SEC
                                       PERFORM   21044-RECE130-HENSYU-SEC
@@ -1157,6 +1176,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                                     MOVE  ZERO  TO   WRK-FILMTEN
                                     MOVE  ZERO  TO   FLG-NEBU
+      *
+                                    MOVE  ZERO  TO
+                                                WRK-KZI058-TEN
+                                                WRK-KZI058-TANICD
+                                                WRK-KZI058-TANIMOJISU
+                                    MOVE  SPACE TO
+                                                WRK-KZI058-TANINAME
       *
                                     MOVE  ZERO  TO   FLG-WRITE05
                                     PERFORM   21043-RECE120-TENSOU-SEC
@@ -1681,8 +1707,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                ELSE                                                     
                   MOVE    SRY-SRYSURYO(IDX2)                            
                                           TO    WRK-SRYSURYO            
-                  MOVE    TNS-TANICD      TO    RECE130-TANICD(IDX4)
-                                                WRK-TANICD              
+                  IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO    RECE130-TANICD(IDX4)
+                                                WRK-TANICD
+                  END-IF
                   MOVE    TNS-TANIMOJISU  TO    RECE130-TANIMOJISU(IDX4)
                                                 WRK-TANIMOJISU          
                   MOVE    TNS-TANINAME    TO    RECE130-TANINAME(IDX4)
@@ -1892,6 +1920,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                IF  SRY-SRYCD(IDX2)(1:3)     =   "058"
                  MOVE  TNS-FORMALYUKOKETA TO  RECE130-YUKOKETA(IDX4)
                  MOVE  TNS-FORMALNAME     TO  RECE130-NAME(IDX4)
+      *
+                 MOVE     TNS-TEN         TO  WRK-KZI058-TEN
+                 IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO  WRK-KZI058-TANICD
+                    MOVE  TNS-TANIMOJISU  TO  WRK-KZI058-TANIMOJISU
+                    MOVE  TNS-TANINAME    TO  WRK-KZI058-TANINAME
+                 END-IF
+                 MOVE     ZERO            TO  RECE130-TEN(IDX4)
+                 MOVE     ZERO            TO  RECE130-TANICD(IDX4)
+                 MOVE     ZERO            TO  RECE130-TANIMOJISU(IDX4)
+                 MOVE     SPACE           TO  RECE130-TANINAME(IDX4)
                END-IF
                IF  (SRY-SRYCD(IDX2)(1:1)    =   "7")
                AND (SRY-MEISKYFLG(IDX2)     =   "1")
@@ -1906,6 +1945,19 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                     END-IF
                  ELSE
                     MOVE  "1"        TO  RECE130-RECEHENFLG(IDX4)
+                    IF    WRK-KZI058-TEN  NOT = ZERO
+                       MOVE   WRK-KZI058-TEN
+                                     TO  RECE130-TEN(IDX4)
+                    END-IF
+                    IF   (RECE130-TANICD(IDX4)   = ZERO)
+                    AND  (WRK-KZI058-TANICD  NOT = ZERO)
+                       MOVE   WRK-KZI058-TANICD
+                                     TO  RECE130-TANICD(IDX4)
+                       MOVE   WRK-KZI058-TANIMOJISU
+                                     TO  RECE130-TANIMOJISU(IDX4)
+                       MOVE   WRK-KZI058-TANINAME
+                                     TO  RECE130-TANINAME(IDX4)
+                    END-IF
                  END-IF
                END-IF
       *

@@ -539,6 +539,7 @@
       *  04.05.36    NACL-ÌçÏÆ    11/12/07  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.37    NACL-ÌçÏÆ    11/12/13  ºÒ³²ÂÐ¾Ý¾ò·ï½¤Àµ
       *  04.05.38    NACL-ÌçÏÆ    11/12/15  ¸ºÌÈÂÐ±þ¡ÊÅìÂçºå»Ô¡Ë
+      *  04.05.39    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -1134,6 +1135,10 @@
            03  WRK-SRYSURYO                            PIC 9(05)V9(05).
            03  WRK-SRYSURYO2                           PIC 9(05).
            03  WRK-SRYSURYO3                           PIC 9(05).
+           03  WRK-KZI058-TEN                          PIC 9(09)V99.
+           03  WRK-KZI058-TANICD                       PIC 9(03).
+           03  WRK-KZI058-TANIMOJISU                   PIC 9(01).
+           03  WRK-KZI058-TANINAME                     PIC X(24).
            03  WRK-RENNUM                              PIC 9(02).
            03  WRK-RENNUM2                             PIC 9(02).
       *
@@ -5220,6 +5225,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE  ZERO  TO   WRK-FILMTEN
       *
                                MOVE  SPACE TO   WRK-FORMALNAME
+                               MOVE  ZERO  TO   WRK-KZI058-TEN
+                                                WRK-KZI058-TANICD
+                                                WRK-KZI058-TANIMOJISU
+                               MOVE  SPACE TO   WRK-KZI058-TANINAME
                                MOVE  ZERO  TO   FLG-WRITE05
                                MOVE  ZERO  TO   FLG-SETCOM
                                MOVE  ZERO  TO   WRK-SETCOM-JIDO
@@ -5268,6 +5277,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  ZERO  TO   WRK-FILMTEN
       *
                                       MOVE  SPACE TO   WRK-FORMALNAME
+                                      MOVE  ZERO  TO
+                                                  WRK-KZI058-TEN
+                                                  WRK-KZI058-TANICD
+                                                  WRK-KZI058-TANIMOJISU
+                                      MOVE  SPACE TO
+                                                  WRK-KZI058-TANINAME
                                       MOVE  ZERO  TO   FLG-WRITE05
                                       MOVE  ZERO  TO   FLG-SETCOM
                                       MOVE  ZERO  TO   WRK-SETCOM-JIDO
@@ -5305,6 +5320,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                     MOVE  ZERO  TO   WRK-FILMTEN
       *
                                     MOVE  SPACE TO   WRK-FORMALNAME
+                                    MOVE  ZERO  TO
+                                                WRK-KZI058-TEN
+                                                WRK-KZI058-TANICD
+                                                WRK-KZI058-TANIMOJISU
+                                    MOVE  SPACE TO
+                                                WRK-KZI058-TANINAME
                                     MOVE  ZERO  TO   FLG-WRITE05
                                     MOVE  ZERO  TO   FLG-SETCOM
                                     MOVE  ZERO  TO   WRK-SETCOM-JIDO
@@ -6205,8 +6226,10 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                ELSE                                                     
                   MOVE    SRY-SRYSURYO(IDX2)                            
                                           TO    WRK-SRYSURYO            
-                  MOVE    TNS-TANICD      TO    RECE05-TANICD(IDX4)
-                                                WRK-TANICD              
+                  IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO    RECE05-TANICD(IDX4)
+                                                WRK-TANICD
+                  END-IF
                   MOVE    TNS-TANIMOJISU  TO    RECE05-TANIMOJISU(IDX4)
                                                 WRK-TANIMOJISU          
                   MOVE    TNS-TANINAME    TO    RECE05-TANINAME(IDX4)
@@ -6473,6 +6496,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                  MOVE  TNS-FORMALNAME     TO  RECE05-NAME(IDX4)
                                               WRK-FORMALNAME
                  MOVE  "1"                TO  RECE05-RECEDENFLG(IDX4)
+      *
+                 MOVE     TNS-TEN         TO  WRK-KZI058-TEN
+                 IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO  WRK-KZI058-TANICD
+                    MOVE  TNS-TANIMOJISU  TO  WRK-KZI058-TANIMOJISU
+                    MOVE  TNS-TANINAME    TO  WRK-KZI058-TANINAME
+                 END-IF
+                 MOVE     ZERO            TO  RECE05-TEN(IDX4)
+                 MOVE     ZERO            TO  RECE05-TANICD(IDX4)
+                 MOVE     ZERO            TO  RECE05-TANIMOJISU(IDX4)
+                 MOVE     SPACE           TO  RECE05-TANINAME(IDX4)
                END-IF
                IF  (SRY-SRYCD(IDX2)(1:1)    =   "7")
                AND (SRY-MEISKYFLG(IDX2)     =   "1")
@@ -6488,6 +6522,19 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                  ELSE
                     MOVE  WRK-FORMALNAME  TO  RECE05-RECEDENNAME(IDX4)
                     MOVE  "1"             TO  RECE05-RECEHENFLG(IDX4)
+                    IF    WRK-KZI058-TEN  NOT = ZERO
+                       MOVE   WRK-KZI058-TEN
+                                          TO  RECE05-TEN(IDX4)
+                    END-IF
+                    IF   (RECE05-TANICD(IDX4)    = ZERO)
+                    AND  (WRK-KZI058-TANICD  NOT = ZERO)
+                       MOVE   WRK-KZI058-TANICD
+                                          TO  RECE05-TANICD(IDX4)
+                       MOVE   WRK-KZI058-TANIMOJISU
+                                          TO  RECE05-TANIMOJISU(IDX4)
+                       MOVE   WRK-KZI058-TANINAME
+                                          TO  RECE05-TANINAME(IDX4)
+                    END-IF
                  END-IF
                END-IF
       *

@@ -86,6 +86,7 @@
       *  04.05.07    NACL-ÌçÏÆ    11/06/21  ²èÁü¿ÇÃÇ¡¦ÅÅ»Ò²èÁü´ÉÍý²Ã»»¤Î
       *                                     É½ÍÑÈÖ¹æÊÔ½¸
       *  04.05.08    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
+      *  04.05.09    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/08/16  Æþ±¡¤ÎÅÀÅ©ÆþÎÏ²þÁ±ÂÐ±þ
       *****************************************************************
@@ -434,6 +435,11 @@
            03  WRK-SRYSURYO        PIC 9(05)V9(05).
            03  WRK-SRYSURYO2       PIC 9(05).
            03  WRK-SRYSURYO3       PIC 9(05).
+           03  WRK-KZI058-TEN      PIC 9(09)V99.
+           03  WRK-KZI058-TANICD   PIC 9(03).
+           03  WRK-KZI058-TANIMOJISU
+                                   PIC 9(01).
+           03  WRK-KZI058-TANINAME PIC X(24).
       *
            03  WRK-FILMTEN         PIC 9(07)V9(02).
            03  WRK-FILMTEN2        PIC 9(07)V9(02).
@@ -1398,6 +1404,13 @@
       *
                       MOVE   ZERO   TO   WRK-FILMTEN
       *
+                      MOVE   ZERO   TO
+                                    WRK-KZI058-TEN
+                                    WRK-KZI058-TANICD
+                                    WRK-KZI058-TANIMOJISU
+                      MOVE   SPACE  TO
+                                    WRK-KZI058-TANINAME
+      *
                       MOVE   ZERO   TO   FLG-WRITE230
                       MOVE   ZERO   TO   FLG-TENTEKI
                       IF  (ACCT-SRYKBN     = "97"     )
@@ -1457,6 +1470,13 @@
       *
                                  MOVE   ZERO   TO   WRK-FILMTEN
       *
+                                 MOVE   ZERO   TO
+                                               WRK-KZI058-TEN
+                                               WRK-KZI058-TANICD
+                                               WRK-KZI058-TANIMOJISU
+                                 MOVE   SPACE  TO
+                                               WRK-KZI058-TANINAME
+      *
                                  MOVE   ZERO   TO   FLG-WRITE230
                                  MOVE   ZERO   TO   FLG-TENTEKI
                                  PERFORM   21011-RECE220-TENSOU-SEC
@@ -1485,6 +1505,13 @@
                                                     FLG-KENSA-COM
       *
                                  MOVE   ZERO   TO   WRK-FILMTEN
+      *
+                                 MOVE   ZERO   TO
+                                               WRK-KZI058-TEN
+                                               WRK-KZI058-TANICD
+                                               WRK-KZI058-TANIMOJISU
+                                 MOVE   SPACE  TO
+                                               WRK-KZI058-TANINAME
       *
                                  MOVE   ZERO   TO   FLG-WRITE230
                                  MOVE   ZERO   TO   FLG-TENTEKI
@@ -1964,8 +1991,10 @@
                ELSE
                   MOVE    SRY-SRYSURYO(IDX2)
                                           TO  WRK-SRYSURYO
-                  MOVE    TNS-TANICD      TO  RECE230-TANICD(IDX4)
+                  IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO  RECE230-TANICD(IDX4)
                                               WRK-TANICD
+                  END-IF
                   MOVE    TNS-TANIMOJISU  TO  RECE230-TANIMOJISU(IDX4)
                                               WRK-TANIMOJISU
                   MOVE    TNS-TANINAME    TO  RECE230-TANINAME(IDX4)
@@ -2124,6 +2153,17 @@
                IF  SRY-SRYCD(IDX2)(1:3)     =   "058"
                  MOVE  TNS-FORMALYUKOKETA TO  RECE230-YUKOKETA(IDX4)
                  MOVE  TNS-FORMALNAME     TO  RECE230-NAME(IDX4)
+      *
+                 MOVE     TNS-TEN         TO  WRK-KZI058-TEN
+                 IF   TNS-TANICD  NOT = SPACE AND "000"
+                    MOVE  TNS-TANICD      TO  WRK-KZI058-TANICD
+                    MOVE  TNS-TANIMOJISU  TO  WRK-KZI058-TANIMOJISU
+                    MOVE  TNS-TANINAME    TO  WRK-KZI058-TANINAME
+                 END-IF
+                 MOVE     ZERO            TO  RECE230-TEN(IDX4)
+                 MOVE     ZERO            TO  RECE230-TANICD(IDX4)
+                 MOVE     ZERO            TO  RECE230-TANIMOJISU(IDX4)
+                 MOVE     SPACE           TO  RECE230-TANINAME(IDX4)
                END-IF
                IF  (SRY-SRYCD(IDX2)(1:1)    =   "7")
                AND (SRY-MEISKYFLG(IDX2)     =   "1")
@@ -2138,6 +2178,19 @@
                     END-IF
                  ELSE
                     MOVE  "1"         TO  RECE230-RECEHENFLG(IDX4)
+                    IF    WRK-KZI058-TEN  NOT = ZERO
+                       MOVE   WRK-KZI058-TEN
+                                      TO  RECE230-TEN(IDX4)
+                    END-IF
+                    IF   (RECE230-TANICD(IDX4)   = ZERO)
+                    AND  (WRK-KZI058-TANICD  NOT = ZERO)
+                       MOVE   WRK-KZI058-TANICD
+                                      TO  RECE230-TANICD(IDX4)
+                       MOVE   WRK-KZI058-TANIMOJISU
+                                      TO  RECE230-TANIMOJISU(IDX4)
+                       MOVE   WRK-KZI058-TANINAME
+                                      TO  RECE230-TANINAME(IDX4)
+                    END-IF
                  END-IF
                END-IF
       *
@@ -5494,6 +5547,10 @@
            MOVE    ZERO                    TO   WRK-TANICD
            MOVE    ZERO                    TO   WRK-TANIMOJISU
            MOVE    SPACE                   TO   WRK-TANINAME
+           MOVE    ZERO                    TO   WRK-KZI058-TEN
+           MOVE    ZERO                    TO   WRK-KZI058-TANICD
+           MOVE    ZERO                    TO   WRK-KZI058-TANIMOJISU
+           MOVE    SPACE                   TO   WRK-KZI058-TANINAME
       *
            PERFORM
                   UNTIL     (IDX2      >   IDX5)    OR
@@ -5550,8 +5607,10 @@
                       MOVE   "1"            TO  RECE230-RECEPTFLG(IDX4)
                     END-IF
                   ELSE
-                      MOVE  TNS-TANICD      TO  RECE230-TANICD(IDX4)
+                      IF   TNS-TANICD  NOT = SPACE AND "000"
+                       MOVE TNS-TANICD      TO  RECE230-TANICD(IDX4)
                                                 WRK-TANICD
+                      END-IF
                       MOVE  TNS-TANIMOJISU  TO  RECE230-TANIMOJISU(IDX4)
                                                 WRK-TANIMOJISU
                       MOVE  TNS-TANINAME    TO  RECE230-TANINAME(IDX4)
@@ -5610,11 +5669,35 @@
                     MOVE  TNS-FORMALYUKOKETA TO  RECE230-YUKOKETA(IDX4)
                     MOVE  TNS-FORMALNAME     TO  RECE230-NAME(IDX4)
                     MOVE  1                  TO  FLG-FORMALNAME
+      *
+                    MOVE     TNS-TEN         TO  WRK-KZI058-TEN
+                    IF   TNS-TANICD  NOT = SPACE AND "000"
+                       MOVE  TNS-TANICD      TO  WRK-KZI058-TANICD
+                       MOVE  TNS-TANIMOJISU  TO  WRK-KZI058-TANIMOJISU
+                       MOVE  TNS-TANINAME    TO  WRK-KZI058-TANINAME
+                    END-IF
+                    MOVE     ZERO         TO  RECE230-TEN(IDX4)
+                    MOVE     ZERO         TO  RECE230-TANICD(IDX4)
+                    MOVE     ZERO         TO  RECE230-TANIMOJISU(IDX4)
+                    MOVE     SPACE        TO  RECE230-TANINAME(IDX4)
                   END-IF
                   IF  (WRK-ORCSTEN-SRYCD(IDX2)(1:1)  =   "7")
                   AND (FLG-FORMALNAME                =    1 )
                     MOVE  "1"             TO  RECE230-RECEHENFLG(IDX4)
                     MOVE  ZERO            TO  FLG-FORMALNAME
+                    IF    WRK-KZI058-TEN  NOT = ZERO
+                       MOVE   WRK-KZI058-TEN
+                                          TO  RECE230-TEN(IDX4)
+                    END-IF
+                    IF   (RECE230-TANICD(IDX4)   = ZERO)
+                    AND  (WRK-KZI058-TANICD  NOT = ZERO)
+                       MOVE   WRK-KZI058-TANICD
+                                          TO  RECE230-TANICD(IDX4)
+                       MOVE   WRK-KZI058-TANIMOJISU
+                                          TO  RECE230-TANIMOJISU(IDX4)
+                       MOVE   WRK-KZI058-TANINAME
+                                          TO  RECE230-TANINAME(IDX4)
+                    END-IF
                   END-IF
       *
                   IF   RECE230-YUKOKETA(IDX4)  =  ZERO
