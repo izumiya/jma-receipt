@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.00    NACL-多々納  11/12/15  金額・単位対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -62,9 +63,22 @@
                05  SPA-GMN-NAME                PIC X(100).
                05  SPA-GMN-FORMALNAME          PIC X(200).
       *
+               05  SPA-GMN-TEN                 PIC 9(8)V9(2).
+      *
+               05  SPA-GMN-TANICD-G.
+                   07  SPA-GMN-TANICD              PIC X(3).
+                   07  SPA-GMN-F3                  PIC X(1).
+                   07  SPA-GMN-TANINAME            PIC X(26).
+               05  SPA-GMN-TANICDCOB-G.
+                   07  SPA-GMN-TANICDCOB           PIC X(30)
+                                                   OCCURS  200.
+               05  SPA-TANICD-MAX             PIC 9(04).
+      *
                05  SPA-GMN-IDOKANREN           PIC X(09).
                05  SPA-GMN-IDOKIKAN            PIC X(30).
                05  SPA-GMN-IDOKANRENNAME       PIC X(100).
+      *
+               05  SPA-GMN-MSGLABEL            PIC X(100).
       *
                05  SPA-GMN-COPYCD              PIC X(09).
       *
@@ -83,6 +97,8 @@
                05  SPA-NAI-IDOEDYMD            PIC X(08).
                05  SPA-MAE-IDOKANREN           PIC X(09).
                05  SPA-NAI-COPY                PIC X(01).
+               05  SPA-NAI-TENSIKIBETU         PIC X(01).
+               05  SPA-NAI-TANICD              PIC X(03).
       *
       *    フラグエリア
        01  FLG-AREA.
@@ -140,12 +156,21 @@
       *
            03  WRK-INPUTCD             PIC X(09).
            03  WRK-CD-MCNT             PIC 9(02).
-      *
-           03  WRK-TNS-YUKOSTYMD       PIC X(08).
-           03  WRK-TNS-YUKOEDYMD       PIC X(08).
-           03  WRK-TNS-NAME            PIC X(100).
+      *    関連算定コード
+           03  WRK-TNS-COPY-G.
+               05  WRK-TNS-YUKOSTYMD       PIC X(08).
+               05  WRK-TNS-YUKOEDYMD       PIC X(08).
+               05  WRK-TNS-NAME            PIC X(100).
+               05  WRK-TNS-TEN             PIC 9(09)V9(2).
+               05  WRK-TNS-TENSIKIBETU     PIC X(01).
+               05  WRK-TNS-TANICD          PIC X(03).
+               05  WRK-TNS-TANINAME        PIC X(30).
            03  WRK-HEN-STYMD           PIC X(09).
            03  WRK-HEN-EDYMD           PIC X(09).
+      *
+           03  WRK-H-TEN               PIC ZZZZZZZ9.99.
+           03  WRK-H-TANINAME          PIC X(30).
+           03  WRK-H-TENSIKIMEI        PIC X(30).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -450,6 +475,11 @@
            MOVE    TNS-FORMALNAME      TO  SPA-GMN-FORMALNAME
            MOVE    TNS-IDOKANREN       TO  SPA-GMN-IDOKANREN
            MOVE    TNS-IDOKANREN       TO  SPA-MAE-IDOKANREN
+      *    金額
+           MOVE    TNS-TEN             TO  SPA-GMN-TEN
+      *    単位コード
+           MOVE    TNS-TANICD          TO  SPA-GMN-TANICD
+           MOVE    TNS-TANINAME        TO  SPA-GMN-TANINAME
       *    関連算定コード編集
            IF      SPA-GMN-IDOKANREN   NOT =   SPACE
                PERFORM 30011-IDOKANREN-HEN-SEC
@@ -485,6 +515,7 @@
            MOVE    SPACE               TO  WRK-TNS-YUKOSTYMD
            MOVE    SPACE               TO  WRK-TNS-YUKOEDYMD
            MOVE    SPACE               TO  WRK-TNS-NAME
+           INITIALIZE                      WRK-TNS-COPY-G
            MOVE    ZERO                TO  SPA-NAI-IDOKAN
            PERFORM
                        UNTIL   (FLG-TENSU      =   1  )
@@ -497,6 +528,11 @@
                    MOVE    TNS-YUKOSTYMD       TO  WRK-TNS-YUKOSTYMD
                    MOVE    TNS-YUKOEDYMD       TO  WRK-TNS-YUKOEDYMD
                    MOVE    TNS-NAME            TO  WRK-TNS-NAME
+      *
+                   MOVE    TNS-TEN             TO  WRK-TNS-TEN
+                   MOVE    TNS-TANICD          TO  WRK-TNS-TANICD
+                   MOVE    TNS-TANINAME        TO  WRK-TNS-TANINAME
+                   MOVE    TNS-TENSIKIBETU     TO  WRK-TNS-TENSIKIBETU
       *
                    MOVE    1                   TO  SPA-NAI-IDOKAN
                    IF      (TNS-YUKOEDYMD      >=  SPA-NAI-YUKOEDYMD )
@@ -519,7 +555,9 @@
       *
            MOVE    WRK-TNS-NAME        TO  SPA-GMN-IDOKANRENNAME
            MOVE    WRK-TNS-YUKOSTYMD   TO  SPA-NAI-IDOSTYMD
-           MOVE    WRK-TNS-YUKOEDYMD    TO  SPA-NAI-IDOEDYMD
+           MOVE    WRK-TNS-YUKOEDYMD   TO  SPA-NAI-IDOEDYMD
+           MOVE    WRK-TNS-TENSIKIBETU TO  SPA-NAI-TENSIKIBETU
+           MOVE    WRK-TNS-TANICD      TO  SPA-NAI-TANICD
            IF      WRK-TNS-YUKOSTYMD   =   SPACE
                MOVE    SPACE               TO  SPA-GMN-IDOKIKAN
            ELSE
@@ -537,15 +575,89 @@
                                            INTO  SPA-GMN-IDOKIKAN
                END-STRING
            END-IF
+      *    金額・点数識別・単位編集
+           PERFORM 30011-MSGLABELHEN-SEC
            .
       *
        30011-IDOKANREN-HEN-EXT.
            EXIT.
       *
       *****************************************************************
+      *   金額・点数識別・単位編集処理
+      *****************************************************************
+       30011-MSGLABELHEN-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  SPA-GMN-MSGLABEL
+           MOVE    WRK-TNS-TEN         TO  WRK-H-TEN
+      *    単位コード
+           MOVE    SPACE               TO  WRK-H-TANINAME
+           IF      WRK-TNS-TANICD      =   SPACE
+                                       OR  ZERO
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDX     FROM    1   BY  1
+                       UNTIL   IDX     >       MTANI-MAX
+                   IF      MTANI-TANICD  (IDX) =   WRK-TNS-TANICD
+                       MOVE    MTANI-TANINAME(IDX)
+                                           TO  WRK-H-TANINAME
+                       MOVE    MTANI-MAX   TO  IDX
+                   END-IF
+               END-PERFORM
+           END-IF
+      *    金額種類
+           EVALUATE    WRK-TNS-TENSIKIBETU
+               WHEN    "1"
+                   MOVE    "金額"              TO  WRK-H-TENSIKIMEI
+               WHEN    "2"
+                   MOVE    "都道府県購入価格"  TO  WRK-H-TENSIKIMEI
+               WHEN    OTHER
+                   MOVE    SPACE               TO  WRK-H-TENSIKIMEI
+           END-EVALUATE
+      *
+           MOVE    SPACE               TO  SPA-GMN-MSGLABEL
+           STRING  "金額："
+                   WRK-H-TEN           DELIMITED  BY  SIZE
+                   "　金額種類："
+                   WRK-TNS-TENSIKIBETU
+                   "　"                DELIMITED  BY  SIZE
+                   WRK-H-TENSIKIMEI    DELIMITED  BY  SPACE
+                   "　単位："
+                   WRK-TNS-TANICD      DELIMITED  BY  SIZE
+                   "　"
+                   WRK-H-TANINAME      DELIMITED  BY  SIZE
+                                       INTO    SPA-GMN-MSGLABEL
+           END-STRING
+           .
+      *
+       30011-MSGLABELHEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *   各リストボックス編集処理
       *****************************************************************
        30012-COB-HEN-SEC            SECTION.
+      *
+      *    単位コード
+           MOVE    ZERO            TO  SPA-TANICD-MAX
+           MOVE    ZERO            TO  IDX-1
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       MTANI-MAX
+               ADD     1               TO  IDX-1
+               MOVE    MTANI-TANICD  (IDX)
+                                       TO  SPA-GMN-TANICDCOB(IDX-1)(1:3)
+               MOVE    MTANI-TANINAME(IDX)
+                                       TO  SPA-GMN-TANICDCOB(IDX-1)(5:)
+               MOVE    IDX-1           TO  SPA-TANICD-MAX
+           END-PERFORM
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-TANICD-MAX
+               IF      SPA-GMN-TANICD      =   SPA-GMN-TANICDCOB
+                                                         (IDX)(1:3)
+                   MOVE    SPA-GMN-TANICDCOB (IDX)
+                                           TO  SPA-GMN-TANICD-G
+                   MOVE    SPA-TANICD-MAX  TO  IDX
+               END-IF
+           END-PERFORM
       *
            .
        30012-COB-HEN-EXT.
@@ -717,6 +829,8 @@
            MOVE    Z08-KANANAME        TO  SPA-GMN-KANANAME
            MOVE    Z08-NAME            TO  SPA-GMN-NAME
            MOVE    Z08-FORMALNAME      TO  SPA-GMN-FORMALNAME
+           MOVE    Z08-TEN             TO  SPA-GMN-TEN
+           MOVE    Z08-TANICD          TO  SPA-GMN-TANICD-G
       *
            .
       *
@@ -749,7 +863,17 @@
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
       *    商品名称チェック
-           PERFORM 505-FORMALNAME-CHK-SEC
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 505-FORMALNAME-CHK-SEC
+           END-IF
+      *    金額チェック
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 505-TENSU-CHK-SEC
+           END-IF
+      *    単位コードチェック
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 505-TANICD-CHK-SEC
+           END-IF
            .
       *
        4102-KIHON-CHK-EXT.
@@ -860,7 +984,60 @@
       *
        505-FORMALNAME-CHK-EXT.
            EXIT.
-      *        
+      *****************************************************************
+      *  　金額チェック
+      *****************************************************************
+       505-TENSU-CHK-SEC              SECTION.
+      *
+           .
+       505-TENSU-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *  　単位コードチェック
+      *****************************************************************
+       505-TANICD-CHK-SEC              SECTION.
+      *
+           IF      SPA-GMN-TANICD      =   SPACE
+               MOVE    SPACE           TO  SPA-GMN-TANICD-G
+               GO      TO      505-TANICD-CHK-EXT
+           END-IF
+      *
+           INITIALIZE                      ORCSNUMAREA
+           MOVE    SPA-GMN-TANICD      TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           IF     (SNUM-RC         NOT =   ZERO  )   OR
+                  (SNUM-MINKBN     NOT =   SPACE )   OR
+                  (SNUM-SYOKBN     NOT =   SPACE )
+               MOVE    "0020"              TO  SPA-ERRCD
+               MOVE    11                  TO  SPA-GMN-CUR
+           ELSE
+               MOVE    SNUM-OUTEDT(13:3)       TO  SPA-GMN-TANICD
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-TANICD-MAX  )   OR
+                              (SPA-ERRCD   NOT =   SPACE   )   OR
+                              (FLG-OK  =   1   )
+               IF      SPA-GMN-TANICD     =   SPA-GMN-TANICDCOB
+                                                         (IDX)(1:3)
+                   MOVE    SPA-GMN-TANICDCOB (IDX)
+                                               TO  SPA-GMN-TANICD-G
+                   MOVE    1                   TO  FLG-OK
+                   MOVE    SPA-TANICD-MAX      TO  IDX
+               END-IF
+           END-PERFORM
+      *
+           IF     (FLG-OK              =   ZERO    )  AND
+                  (SPA-ERRCD           =   SPACE   )
+               MOVE    11                  TO  SPA-GMN-CUR
+               MOVE    "0020"              TO  SPA-ERRCD
+           END-IF
+           .
+      *
+       505-TANICD-CHK-EXT.
+           EXIT.
       *****************************************************************
       *  　関連コードチェック
       *****************************************************************
@@ -1158,6 +1335,25 @@
               AND (SPA-ERRCD           =   SPACE )
                MOVE    "0016"              TO  SPA-ERRCD
                MOVE    6                   TO  SPA-GMN-CUR
+           END-IF
+      *    金額チェック必須
+           IF     (SPA-GMN-TEN         >   ZERO  )
+              AND (SPA-ERRCD           =   SPACE )
+               IF      SPA-NAI-TENSIKIBETU NOT =   "2"
+                   MOVE    "0022"              TO  SPA-ERRCD
+                   MOVE    10                  TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *    単位コードチェック必須
+           IF     (SPA-GMN-TANICD      =   ZERO
+                                       OR  SPACE  )
+               CONTINUE
+           ELSE
+               IF     (SPA-NAI-TANICD  NOT =   ZERO  )
+                  AND (SPA-ERRCD           =   SPACE )
+                   MOVE    "0023"              TO  SPA-ERRCD
+                   MOVE    11                  TO  SPA-GMN-CUR
+               END-IF
            END-IF
            .
       *
@@ -1772,7 +1968,20 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM  891-STRCOUNT-SEC
            MOVE  CNT-STRING                TO  TNS-FORMALYUKOKETA
       *
-           MOVE  SPA-GMN-IDOKANREN         TO  TNS-IDOKANREN
+           MOVE    SPA-GMN-IDOKANREN       TO  TNS-IDOKANREN
+      *
+           MOVE    SPA-GMN-TEN             TO  TNS-TEN
+      *    金額種別（金額）
+           IF      SPA-GMN-TEN         NOT =   ZERO
+               MOVE    1                   TO  TNS-TENSIKIBETU
+           END-IF
+      *    単位コード
+           MOVE  SPA-GMN-TANICD            TO  TNS-TANICD
+           MOVE  SPA-GMN-TANINAME          TO  TNS-TANINAME
+           MOVE  SPA-GMN-TANINAME          TO  WRK-STRINGTBL
+           MOVE  12                        TO  CNT-STRING
+           PERFORM  891-STRCOUNT-SEC
+           MOVE  CNT-STRING                TO  TNS-TANIMOJISU
            .
        4121-KOUMOKUISO-EXT.
            EXIT.
@@ -1871,6 +2080,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-KANANAME        TO  Z08-KANANAME
            MOVE    SPA-GMN-NAME            TO  Z08-NAME
            MOVE    SPA-GMN-FORMALNAME      TO  Z08-FORMALNAME
+      *
+           MOVE    SPA-GMN-TEN             TO  Z08-TEN
+           MOVE    SPA-GMN-TANICD-G        TO  Z08-TANICD
+      *    データ規格
+           MOVE    ZERO                TO  IDX-1
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-TANICD-MAX
+               IF      SPA-GMN-TANICDCOB (IDX) NOT =   SPACE
+                   ADD     1               TO  IDX-1
+                   MOVE    SPA-GMN-TANICDCOB (IDX)
+                                           TO  Z08-TANICD-ITEM (IDX-1)
+               END-IF
+           END-PERFORM
+           MOVE    SPA-TANICD-MAX          TO  Z08-TANICD-COUNT
+      *
            MOVE    SPA-GMN-IDOKANREN       TO  Z08-IDOKANREN
            MOVE    SPA-GMN-IDOKIKAN        TO  Z08-IDOKIKAN-VALUE
            MOVE    "black"                 TO  Z08-IDOKIKAN-STYLE
@@ -1887,6 +2111,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-EVALUATE
            END-IF
            MOVE    SPA-GMN-IDOKANRENNAME   TO  Z08-IDOKANRENNAME
+           MOVE    SPA-GMN-MSGLABEL        TO  Z08-MSGLBEL
       *
            MOVE    SPA-GMN-COPYCD          TO  Z08-COPYCD
       *
@@ -1917,6 +2142,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "NAME"              TO  MCP-WIDGET
                WHEN    5
                    MOVE    "FORMALNAME"        TO  MCP-WIDGET
+               WHEN    10
+                   MOVE    "TEN"               TO  MCP-WIDGET
+               WHEN    11
+                   MOVE    "TANICD"            TO  MCP-WIDGET
                WHEN    6
                    MOVE    "IDOKANREN"         TO  MCP-WIDGET
                WHEN    7
@@ -1944,6 +2173,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "NAME"
                    MOVE    5                   TO  SPA-GMN-CUR
                WHEN    "FORMALNAME"
+      ****         MOVE    6                   TO  SPA-GMN-CUR
+                   MOVE    10                  TO  SPA-GMN-CUR
+               WHEN    "TEN"
+                   MOVE    11                  TO  SPA-GMN-CUR
+               WHEN    "TANICD"
                    MOVE    6                   TO  SPA-GMN-CUR
                WHEN    "IDOKANREN"
                    MOVE    40                  TO  SPA-GMN-CUR
@@ -2002,6 +2236,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0016"
                    MOVE    "算定器材コードを入力してください"
                                                  TO  SPA-ERRMSG
+               WHEN    "0020"
+                   MOVE    "単位コードがありません"
+                                                 TO  SPA-ERRMSG
+               WHEN    "0022"
+                   STRING  "金額は算定器材コードが都道府県購入価格の"
+                           "時のみ設定できます。"
+                                                 DELIMITED  BY  SIZE
+                                                 INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0023"
+                   STRING  "単位コードは算定器材コードの単位コードが"
+                           "未設定の時のみ設定できます。"
+                                                 DELIMITED  BY  SIZE
+                                                 INTO  SPA-ERRMSG
+                   END-STRING
       *        以下共通
                WHEN    "1010"
                    MOVE
