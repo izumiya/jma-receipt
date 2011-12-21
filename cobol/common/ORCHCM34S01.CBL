@@ -4176,8 +4176,12 @@
                END-PERFORM
                MOVE    1                   TO  WSYOKUJI-LIFE(IDXB)
       *
-               MOVE    IDXB                TO  IDX-KANKYO
-               PERFORM 200211-KANKYOFTN-HEN-SEC
+               IF    ( HCM34S01-HKNNUM(1:2)            =   "98" )
+                   CONTINUE
+               ELSE
+                   MOVE    IDXB                TO  IDX-KANKYO
+                   PERFORM 200211-KANKYOFTN-HEN-SEC
+               END-IF
       *
            END-IF
       *
