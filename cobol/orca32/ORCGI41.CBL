@@ -356,6 +356,9 @@
       *
            03  WRK-MATU                PIC 9(02).
            03  WRK-TAIINYMD            PIC X(08).
+           03  WRK-TAIINYMD-R          REDEFINES   WRK-TAIINYMD.
+               05  WRK-TAIINYMD-YM     PIC X(06).
+               05  WRK-TAIINYMD-DD     PIC X(02).
            03  WRK-SRYYM-N.
                05  WRK-SRYYY-N         PIC 9(04).
                05  WRK-SRYMM-N         PIC 9(02).
@@ -8560,7 +8563,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-NAI-SRYYM       TO  WRK-SRYYM-N
            MOVE    ZERO                TO  FLG-SYORI-END
            PERFORM
-                   UNTIL   (WRK-SRYYM-N     >=  WRK-TAIINYMD(1:6)) OR
+                   UNTIL   (WRK-SRYYM-N     >=  WRK-TAIINYMD-YM) OR
                            (FLG-SYORI-END   =   1        )
                COMPUTE WRK-SRYMM-N         =   WRK-SRYMM-N
                                            +   1
@@ -8583,7 +8586,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 490110-HKNCOMBI-CHK-SEC
                END-IF
       *        入院診療行為より対象の剤を更新する
-               PERFORM  490111-NYUINACCT-UPD3-SEC
+               IF      WRK-MATU            >   ZERO
+                   PERFORM  490111-NYUINACCT-UPD3-SEC
+               END-IF
            END-PERFORM
       *
            .
@@ -8605,6 +8610,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    =  WRK-SRYYM-N
                        MOVE    SPA-I41-TTEKEDYMD (IDH)(7:2)
                                                TO  WRK-MATU
+                   END-IF
+      *            期間外の算定
+                   IF      SPA-I41-TTEKEDYMD (IDH)(1:6)
+                                                   <  WRK-SRYYM-N
+                       MOVE    ZERO            TO  WRK-MATU
+                       MOVE    1               TO  FLG-SYORI-END
                    END-IF
                    MOVE    SPA-HKNCOMBI-MAX    TO  IDH
                END-IF
@@ -8676,8 +8687,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                IF      FLG-NYUINACCT        =   ZERO
       *            入院会計マスターを変更する
-                   IF      NACCT-SRYYM      =   WRK-TAIINYMD(1:6)
-                       MOVE    WRK-TAIINYMD(2:7)   TO  IDX-D2
+                   IF      NACCT-SRYYM      =   WRK-TAIINYMD-YM
+                       MOVE    WRK-TAIINYMD-DD  TO  IDX-D2
                        IF      WRK-MATU            <   IDX-D2
                            MOVE    WRK-MATU            TO  IDX-D2
                        END-IF
