@@ -44,6 +44,7 @@
       *  03.05.00    NACL-多々納  07/05/16  グループ診療対応
       *  04.01.00    NACL-多々納  07/11/06  公費追加処理削除
       *  04.02.00    NACL-多々納  08/04/28  Ｈ２０．４改正対応他
+      *  04.05.00    NACL-多々納  12/12/26  負担者番号全角対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1206,7 +1207,7 @@
       *
            MOVE    CSV-REC (WRK-MO-ST:WRK-MO-CNT)
                                    TO  WRK-DATA
-           MOVE    ZERO            TO  FLG-ZENKAKU
+           MOVE    1               TO  FLG-ZENKAKU
            PERFORM 2401-SPACE-HENSYU-SEC
            MOVE    WRK-DATA (1:WRK-LEN)
                                    TO  PTKOH-FTNJANUM
