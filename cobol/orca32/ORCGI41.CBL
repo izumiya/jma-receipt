@@ -1539,8 +1539,10 @@
       *
            PERFORM VARYING IDX10   FROM    1   BY  1
                    UNTIL ( IDX10   >   STUSAN-RRK-CNT )
-               COMPUTE WRK-TUSAN
-                   =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX10)
+               IF    WRK-TUSAN     NOT =    ZERO
+                  COMPUTE WRK-TUSAN
+                       =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX10)
+               END-IF
                IF    ( WRK-TUSAN   <   180 )
                    IF    ( STUSAN-RRK-JTIKBN (IDX10)   = "5" )
                        MOVE    "********"  TO  SPA-GMN-IJYOU180
