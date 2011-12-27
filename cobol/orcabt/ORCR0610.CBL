@@ -166,6 +166,9 @@
       *  04.05.13    NACL-藤原    11/12/06  東京都地方公費対応
       *                                     患者票（９３）をマル都（８２）
       *                                     より優先する
+      *  04.05.14    NACL-藤原    11/12/27  東京都地方公費対応
+      *                                     患者票（９３）をマル都（８２）
+      *                                     より優先するときの条件追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2986,7 +2989,7 @@
                        OR      WRK-RECE61-KOHHKNNUM-O (IDX)
                                    =       SPACE
                    IF      WRK-RECE61-KOHHKNNUM-O (IDX) (1:1)
-                                               =   "0"
+                                               =   "0" OR  "9"
                        MOVE    IDX                 TO  WRK-KOH-IDX
                        ADD     1                   TO  TBL-MAX
                        MOVE    WRK-RECE61-KOHI-TBL (IDX)  TO 
