@@ -207,6 +207,9 @@
       *  04.05.12    NACL-藤原    11/12/06  東京都地方公費対応
       *                                     患者票（９３）をマル都（８２）
       *                                     より優先する
+      *  04.05.13    NACL-藤原    11/12/27  東京都地方公費対応
+      *                                     患者票（９３）をマル都（８２）
+      *                                     より優先するときの条件追加
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
@@ -2443,7 +2446,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                        OR      WRK-RECE01-KOHHKNNUM-O (IDX)
                                    =       SPACE
                    IF      WRK-RECE01-KOHHKNNUM-O (IDX) (1:1)
-                                               =   "0"
+                                               =   "0" OR  "9"
                        MOVE    IDX                 TO  WRK-KOH-IDX
                        ADD     1                   TO  TBL-MAX
                        MOVE    WRK-RECE01-KOHI-TBL (IDX)  TO 
