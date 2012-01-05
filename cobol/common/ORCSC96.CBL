@@ -2526,7 +2526,7 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
-               WHEN    "K901"
+               WHEN    "K903"
                    MOVE    "警告！既に週の算定上限回数を超えています。"
                                        TO  SPA-ERRMSG
                WHEN    "0902"
