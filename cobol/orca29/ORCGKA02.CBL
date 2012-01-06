@@ -939,12 +939,12 @@
        300111-JYURRK-CHK-SEC       SECTION.
       *
            MOVE    ZERO                TO  FLG-OK
+           MOVE    ZERO                TO  FLG-CHK
            PERFORM VARYING     IDX-J   FROM    1   BY  1
                    UNTIL      (IDX-J   >   IDX     )   OR
                               (FLG-OK  =   1       )
                MOVE    WRK-JYURRK-REC (IDX-J)  TO  HZN-JYURRK-REC
       *
-               MOVE    ZERO                TO  FLG-CHK
                IF      SPA-NAI-INNAI       =   1
                    IF     (HZN-JYURRK-SRYKBN2  =   "01" )  OR
                           (HZN-JYURRK-SRYKBN3  =   "01" )  OR
@@ -972,8 +972,6 @@
                            PERFORM 300112-SRYACCT-CHK-SEC
                        END-IF
                    END-PERFORM
-      **           ≈ÍÃÙ§¢§Í
-      **           MOVE    1                   TO  FLG-OK
                END-IF
            END-PERFORM
       *
