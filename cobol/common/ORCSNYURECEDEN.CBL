@@ -6336,11 +6336,11 @@
                    COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
                            WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
                END-IF
-      **         IF   WRK-SKJ7-TOKU-SHOKU(IDX1)  NOT =  SPACE
-      **             MOVE    WRK-SKJ7-TOKU-SHOKU(IDX1)  TO WRK-SRYCD-X
-      **             COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
-      **                     WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
-      **         END-IF
+               IF   WRK-SKJ7-TOKU-SHOKU(IDX1)  NOT =  SPACE
+                   MOVE    WRK-SKJ7-TOKU-SHOKU(IDX1)  TO WRK-SRYCD-X
+                   COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
+                           WRK-SKJ7-SRYCDTOTAL(IDX1)  +  WRK-SRYCD-9
+               END-IF
                IF   WRK-SKJ7-SKJFTN(IDX1)      NOT =  SPACE
                    MOVE    WRK-SKJ7-SKJFTN(IDX1)  TO WRK-SRYCD-X
                    COMPUTE WRK-SKJ7-SRYCDTOTAL(IDX1)  =
