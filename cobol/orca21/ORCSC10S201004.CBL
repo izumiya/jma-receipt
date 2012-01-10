@@ -5478,7 +5478,11 @@
       *    初診料算定で、既に当日受診がある時は対象
            IF     (FLG-SYOSIN2         =   1    )
       *        初診料以外の時、自動発生あり
-               IF      SPA-SRYYMD      NOT =   SPA-LSTYMD
+               IF    ( SPA-SRYYMD      NOT =   SPA-LSTYMD )
+      *            当日に診察料算定なし
+                 OR  ((SPA-SRYYMD          =   SPA-LSTYMD ) AND
+                      (WRK-DAY-SINSATUCNT  =   ZERO        ))
+      *
                    MOVE    FLG-SYOSIN2         TO  SPA-SYOSIN
       *            中途終了分
                    IF     (SPA-WKSRY-KARTE-FLG =   1   )
