@@ -2189,7 +2189,7 @@
       *            糠栏基冉年
                    IF     (LNK-ORCSC-NENREI-YY     =   ZERO )  AND
                           (LNK-ORCSC-NENREI-MM     =   ZERO )  AND
-                          (LNK-ORCSC-NENREI-DD     <   28   )
+                          (LNK-ORCSC-NENREI-DD     <=  28   )
                        MOVE    ZERO                TO  FLG-NENREI-OK
                    ELSE
                        MOVE    1                   TO  FLG-NENREI-OK
@@ -2211,7 +2211,7 @@
       *            糠栏基冉年
                    IF     (LNK-ORCSC-NENREI-YY     =   ZERO )  AND
                           (LNK-ORCSC-NENREI-MM     =   ZERO )  AND
-                          (LNK-ORCSC-NENREI-DD     <   28   )
+                          (LNK-ORCSC-NENREI-DD     <=  28   )
                        MOVE    1                   TO  FLG-NENREI-OK
                    ELSE
                        MOVE    ZERO                TO  FLG-NENREI-OK

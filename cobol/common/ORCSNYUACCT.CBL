@@ -1649,7 +1649,7 @@
            ELSE
                IF      TNS-KGNAGE          =   "AA"
                    MOVE    PTINF-BIRTHDAY      TO  WRK-INYMD
-                   MOVE    27                  TO  WRK-ZOGEN
+                   MOVE    28                  TO  WRK-ZOGEN
                    PERFORM 800-HIZUKE-KEI-SEC
                    MOVE    WRK-OTYMD           TO  WRK-KGN-YMD
                ELSE
@@ -1666,7 +1666,7 @@
            ELSE
                IF      TNS-JGNAGE          =   "AA"
                    MOVE    PTINF-BIRTHDAY      TO  WRK-INYMD
-                   MOVE    27                  TO  WRK-ZOGEN
+                   MOVE    28                  TO  WRK-ZOGEN
                    PERFORM 800-HIZUKE-KEI-SEC
                    MOVE    WRK-OTYMD           TO  WRK-JGN-YMD
                ELSE

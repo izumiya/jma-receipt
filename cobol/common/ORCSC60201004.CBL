@@ -4454,7 +4454,7 @@
       *            新生児判定
                    IF     (LNK-ORCSC-NENREI-YY    =   ZERO )  AND
                           (LNK-ORCSC-NENREI-MM    =   ZERO )  AND
-                          (LNK-ORCSC-NENREI-DD    <   28   )
+                          (LNK-ORCSC-NENREI-DD    <=  28   )
                        CONTINUE
                    ELSE
                        MOVE    1                   TO  FLG-ERR
@@ -4495,49 +4495,49 @@
       *****************************************************************
       *    年齢チェック処理
       *****************************************************************
-       300511-NENREI-CHK-SEC             SECTION.
+      *300511-NENREI-CHK-SEC             SECTION.
       *
-           MOVE    ZERO                TO  WRK-KGNAGE
-           MOVE    ZERO                TO  WRK-JGNAGE
-           MOVE    TNS-AGEKSNKGN(IDX2) TO  WRK-KGNAGE(2:2)
-           MOVE    TNS-AGEKSNJGN(IDX2) TO  WRK-JGNAGE(2:2)
+      *    MOVE    ZERO                TO  WRK-KGNAGE
+      *    MOVE    ZERO                TO  WRK-JGNAGE
+      *    MOVE    TNS-AGEKSNKGN(IDX2) TO  WRK-KGNAGE(2:2)
+      *    MOVE    TNS-AGEKSNJGN(IDX2) TO  WRK-JGNAGE(2:2)
       *
       *    下限年齢チェック
-           IF      TNS-AGEKSNKGN(IDX2)     =   SPACE  OR  ZERO
-               CONTINUE
-           ELSE
-               IF      LNK-ORCSC-NENREI-YY     >=  WRK-KGNAGE
-                   CONTINUE
-               ELSE
-                   MOVE    1                   TO  FLG-ERR
-               END-IF
-           END-IF
+      *    IF      TNS-AGEKSNKGN(IDX2)     =   SPACE  OR  ZERO
+      *        CONTINUE
+      *    ELSE
+      *        IF      LNK-ORCSC-NENREI-YY     >=  WRK-KGNAGE
+      *            CONTINUE
+      *        ELSE
+      *            MOVE    1                   TO  FLG-ERR
+      *        END-IF
+      *    END-IF
       *
       *    上限年齢チェック
-           IF      TNS-AGEKSNJGN(IDX2) =   SPACE  OR  ZERO
-               CONTINUE
-           ELSE
-               IF      TNS-AGEKSNJGN(IDX2)     =   "AA"
+      *    IF      TNS-AGEKSNJGN(IDX2) =   SPACE  OR  ZERO
+      *        CONTINUE
+      *    ELSE
+      *        IF      TNS-AGEKSNJGN(IDX2)     =   "AA"
       *            新生児判定
-                   IF     (LNK-ORCSC-NENREI-YY    =   ZERO )  AND
-                          (LNK-ORCSC-NENREI-MM    =   ZERO )  AND
-                          (LNK-ORCSC-NENREI-DD    <   28   )
-                       CONTINUE
-                   ELSE
-                       MOVE    1                   TO  FLG-ERR
-                   END-IF
-               ELSE
-                   IF      LNK-ORCSC-NENREI-YY     <   WRK-JGNAGE
-                       CONTINUE
-                   ELSE
-                       MOVE    1                   TO  FLG-ERR
-                   END-IF
-               END-IF
-           END-IF
+      *            IF     (LNK-ORCSC-NENREI-YY    =   ZERO )  AND
+      *                   (LNK-ORCSC-NENREI-MM    =   ZERO )  AND
+      *                   (LNK-ORCSC-NENREI-DD    <   28   )
+      *                CONTINUE
+      *            ELSE
+      *                MOVE    1                   TO  FLG-ERR
+      *            END-IF
+      *        ELSE
+      *            IF      LNK-ORCSC-NENREI-YY     <   WRK-JGNAGE
+      *                CONTINUE
+      *            ELSE
+      *                MOVE    1                   TO  FLG-ERR
+      *            END-IF
+      *        END-IF
+      *    END-IF
       *
-           .
-       300511-NENREI-CHK-EXT.
-           EXIT.
+      *    .
+      *300511-NENREI-CHK-EXT.
+      *    EXIT.
       *****************************************************************
       *    外来検体検査加算自動発生処理
       *****************************************************************

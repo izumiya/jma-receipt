@@ -1690,7 +1690,7 @@
       *            糠栏基冉年
                    IF     (LNK-SC92-NENREI-YY   =   ZERO )  AND
                           (LNK-SC92-NENREI-MM   =   ZERO )  AND
-                          (LNK-SC92-NENREI-DD   <   28   )
+                          (LNK-SC92-NENREI-DD   <=  28   )
                        MOVE    "0032"              TO  LNK-SC92-ERRCD5
                    END-IF
                ELSE
@@ -1710,7 +1710,7 @@
       *            糠栏基冉年
                    IF     (LNK-SC92-NENREI-YY    =   ZERO )  AND
                           (LNK-SC92-NENREI-MM    =   ZERO )  AND
-                          (LNK-SC92-NENREI-DD    <   28   )
+                          (LNK-SC92-NENREI-DD    <=  28   )
                        CONTINUE
                    ELSE
                        MOVE    "0032"              TO  LNK-SC92-ERRCD5
