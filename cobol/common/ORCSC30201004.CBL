@@ -2886,7 +2886,7 @@
       *            糠栏基冉年
                    IF     (LNK-ORCSC-NENREI-YY   =   ZERO )  AND
                           (LNK-ORCSC-NENREI-MM   =   ZERO )  AND
-                          (LNK-ORCSC-NENREI-DD   <   28   )
+                          (LNK-ORCSC-NENREI-DD   <=  28   )
                        MOVE    1                 TO  FLG-CHK
                    END-IF
                ELSE
@@ -2906,7 +2906,7 @@
       *            糠栏基冉年
                    IF     (LNK-ORCSC-NENREI-YY    =   ZERO )  AND
                           (LNK-ORCSC-NENREI-MM    =   ZERO )  AND
-                          (LNK-ORCSC-NENREI-DD    <   28   )
+                          (LNK-ORCSC-NENREI-DD    <=  28   )
                        CONTINUE
                    ELSE
                        MOVE    1                 TO  FLG-CHK

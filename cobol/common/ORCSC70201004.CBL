@@ -2375,7 +2375,7 @@
       *    ¿·À¸»ùÈ½Äê
            IF     (LNK-ORCSC-NENREI-YY     =   ZERO )  AND
                   (LNK-ORCSC-NENREI-MM     =   ZERO )  AND
-                  (LNK-ORCSC-NENREI-DD     <   28   )
+                  (LNK-ORCSC-NENREI-DD     <=  28   )
                MOVE    WRK-SRYCD1          TO  WRK-SRYCD
            ELSE
       *        ÆýÍÄ»ù¡Ê£³ºÐÌ¤Ëþ¡Ë
