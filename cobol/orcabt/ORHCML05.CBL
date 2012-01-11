@@ -349,7 +349,7 @@
       *
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       4
-               IF      WRK-PARA-COMCHK (IDX)      >   ZERO
+               IF      WRK-COMCHK (IDX)      >   ZERO
       *            Ä¢É¼°õºþ³«»Ï½èÍý
                    PERFORM 900-DBSELECT-SEC
       *            Ä¢É¼ÊÔ½¸<CSV>½èÍý
@@ -378,7 +378,7 @@
       *
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       4
-               IF      WRK-PARA-COMCHK (IDX)      >   ZERO
+               IF      WRK-COMCHK (IDX)      >   ZERO
                    INITIALIZE                  CNT-AREA
       *            Ä¢É¼°õºþ³«»Ï½èÍý
                    PERFORM 900-DBSELECT-SEC
@@ -421,6 +421,7 @@
                WHEN    2
                    MOVE    "¡Ú»£±ÆÉô°Ì¥³¥á¥ó¥È¡Û"  TO  HCML06-DAI
                WHEN    3
+               WHEN    4
                    MOVE    "¡Ú¤½¤ÎÂ¾¥³¥á¥ó¥È¡Û"    TO  HCML06-DAI
            END-EVALUATE 
       *
