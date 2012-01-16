@@ -1338,6 +1338,7 @@
                                        ORCSC00AREA
            MOVE    ORCSCHKTCHK-NYUHKTCHK   TO  SPA-NYUHKTCHK
            MOVE    ORCSCHKTCHK-NYUHKTCD    TO  SPA-NYUHKTCD
+           MOVE    ORCSCHKTCHK-NYUSRYCD    TO  SPA-NYUHKTSRYCD
            MOVE    ORCSCHKTCHK-NYUHKT-G    TO  SPA-NYUHKT-G
       *    Æþ±¡ÎÁ»»Äê¤Ê¤·
            IF      ORCSCHKTCHK-NYUERR  =   1
@@ -1710,6 +1711,7 @@
            INITIALIZE                  ORCSCHKTCHKAREA
            MOVE    SPA-NYUHKTCHK       TO  ORCSCHKTCHK-NYUHKTCHK
            MOVE    SPA-NYUHKTCD        TO  ORCSCHKTCHK-NYUHKTCD
+           MOVE    SPA-NYUHKTSRYCD     TO  ORCSCHKTCHK-NYUSRYCD
            MOVE    SPA-NYUHKT-G        TO  ORCSCHKTCHK-NYUHKT-G
            MOVE    "6"                 TO  ORCSCHKTCHK-SYORI
            MOVE    "K02N"              TO  ORCSCHKTCHK-PG
@@ -1741,6 +1743,7 @@
            INITIALIZE                  ORCSCHKTCHKAREA
            MOVE    SPA-NYUHKTCHK       TO  ORCSCHKTCHK-NYUHKTCHK
            MOVE    SPA-NYUHKTCD        TO  ORCSCHKTCHK-NYUHKTCD
+           MOVE    SPA-NYUHKTSRYCD     TO  ORCSCHKTCHK-NYUSRYCD
            MOVE    SPA-NYUHKT-G        TO  ORCSCHKTCHK-NYUHKT-G
            MOVE    "3"                 TO  ORCSCHKTCHK-SYORI
            MOVE    "K02"               TO  ORCSCHKTCHK-PG
