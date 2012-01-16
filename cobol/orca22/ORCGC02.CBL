@@ -255,7 +255,9 @@
       *                                     の追加
       *  04.05.10    NACL-藤原    11/11/14  公害による保険限定の病名の重
       *                                     複登録を可能とする
-      *  04.05.11    NACL-藤原    08/05/07  上部の診療科未入力時の診療科表示
+      *  04.05.11    NACL-藤原    11/12/05  上部の診療科未入力時の診療科表示
+      *  04.05.12    NACL-藤原    12/01/13  患者番号未入力時の病名一覧の
+      *                                     表示を行わないようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1379,6 +1381,12 @@ grpsys                     MOVE    SPA-HOSPNUM TO  PTBYO-HOSPNUM
       *    患者病名マスター情報 編集処理
       *****************************************************************
        310-SPASET-PTBYO-HENSYU-SEC     SECTION.
+      *
+      *    患者番号未入力時
+           IF      SPA-NAI-C02-PTID   =   0
+      *****        MOVE    "0086"             TO  SPA-ERRCD
+                   GO  TO  310-SPASET-PTBYO-HENSYU-EXT
+           END-IF
       *                              
             INITIALIZE                 SPA-GMN-C02-TBL
                                        SPA-NAI-C02-TBL
@@ -8350,6 +8358,12 @@ grpsys                                          SPA-AREA
       *****************************************************************
        430-FREEMSG-SEC              SECTION.
       *
+      *    患者番号のチェック
+           IF      SPA-NAI-C02-PTID    =   ZERO
+               MOVE    "0086"          TO  SPA-ERRCD
+               GO      TO      430-FREEMSG-EXT
+           END-IF
+      *
       *    修正のチェック
            IF      SPA-GMN-C02-BANGO   NOT =   ZERO
                MOVE    "0073"          TO  SPA-ERRCD
@@ -8461,7 +8475,7 @@ grpsys                                          SPA-AREA
       *****************************************************************
        430-DELETE-LIST-SEC              SECTION.
       *
-      *    修正のチェック
+      *    患者番号のチェック
            IF      SPA-NAI-C02-PTID    =   ZERO
                MOVE    "0086"          TO  SPA-ERRCD
                GO  TO  430-DELETE-LIST-EXT
