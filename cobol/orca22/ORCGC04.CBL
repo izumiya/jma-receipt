@@ -351,7 +351,11 @@
                                                TO  IDZ
                    MOVE    SPA-C04-IKOSAKI-INDEX1
                                                TO  IDX2
-                   INITIALIZE              SPA-NAI-C04-BYOMEI-G (IDZ)
+                   INITIALIZE              SPA-NAI-C04-BYOMEI (IDZ)
+                                           SPA-NAI-C04-BYOMEICD-O
+                                                              (IDZ IDX2)
+                                           SPA-NAI-C04-BYOMEI-O
+                                                              (IDZ IDX2)
                    MOVE    SPA-CID2-FLG        TO  
                                            SPA-NAI-C04-BYOMEI-CHG (IDZ)
       *
