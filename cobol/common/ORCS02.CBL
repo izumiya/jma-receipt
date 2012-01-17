@@ -318,6 +318,7 @@
       *  04.05.21    NACL-ÌçÏÆ    11/12/02  ¿À¸Í»ÔÃÏÊý¸øÈñµþÅÔÉÜÂÐ±þ
       *  04.05.22    NACL-ÌçÏÆ    11/12/05  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     (283077)Ê¿À®£²£³Ç¯£±£±·î¤Þ¤Ç
+      *  04.05.24    NACL-ÌçÏÆ    12/01/16  ·²ÇÏ¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
       ****************************************************************
@@ -4183,12 +4184,48 @@
                 IF    FLG-GENBUTU70   =  ZERO
                   IF  (WK-1001-PREFNUM       =   10       )
                   AND (LNK-SYU-SRYYMD(1:6)  >=  "201104"  )
-                  AND (FLG-SANSHOU2          =  "2" OR "3")
-                    MOVE    3     TO    FLG-GENBUTU70
-                    MOVE    1     TO    FLG-OITA-GENBUTU70
+                    INITIALIZE                       PTKOHINF-REC
+                    MOVE    LNK-SYU-HOSPNUM      TO  PTKOH-HOSPNUM
+                    MOVE    LNK-SYU-PTID         TO  PTKOH-PTID
+                    MOVE    "965"                TO  PTKOH-KOHNUM
+                    MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+                    MOVE    "DBSELECT"           TO  MCP-FUNC
+                    MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                    MOVE    "key4"               TO  MCP-PATHNAME
+                    CALL    "ORCDBMAIN"          USING  MCPAREA
+                                                        MCPDATA-REC
+                                                        SPA-AREA
+                    IF      MCP-RC               =       ZERO
+                      MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                      MOVE    "key4"           TO  MCP-PATHNAME
+                      PERFORM  PTKOHINF-READ-SEC
+                      PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                        IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                        AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                        AND (PTKOH-SAKJOKBN   =  SPACE         )
+                          MOVE    1         TO  FLG-KOHYONKAIME
+                          MOVE    1         TO  FLG-PTKOHINF
+                        ELSE
+                          MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                          MOVE    "key4"           TO  MCP-PATHNAME
+                          PERFORM  PTKOHINF-READ-SEC
+                        END-IF
+                      END-PERFORM
+                    END-IF
+                    MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                    MOVE    "key4"               TO  MCP-PATHNAME
+                    PERFORM  DB-CLOSE-SEC
+      *
+                    IF   FLG-SANSHOU2   =  "2" OR "3"
+                      MOVE    3     TO    FLG-GENBUTU70
+                      MOVE    1     TO    FLG-OITA-GENBUTU70
+                    ELSE
+                      MOVE    2     TO    FLG-GENBUTU70
+                      MOVE    1     TO    FLG-OITA-GENBUTU70
+                    END-IF
                   ELSE
-                    MOVE    2     TO    FLG-GENBUTU70
-                    MOVE    1     TO    FLG-OITA-GENBUTU70
+                      MOVE    2     TO    FLG-GENBUTU70
+                      MOVE    1     TO    FLG-OITA-GENBUTU70
                   END-IF
                 END-IF
              END-IF
@@ -9328,7 +9365,7 @@
                  (FLG-GENBUTU70       =   1  ))
              OR ((FLG-IRYOHI70        =  ZERO) AND
                  (FLG-OITA-GENBUTU70  =   1  ) AND
-                 (FLG-GENBUTU70       =   3  ))
+                 (FLG-GENBUTU70   =  2 OR 3  ))
                   MOVE     1      TO   FLG-OITA-SYUKEI
              END-IF
            END-IF.
