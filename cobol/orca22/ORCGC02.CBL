@@ -4919,6 +4919,7 @@ grpsys                         MOVE    SPA-HOSPNUM
                GO  TO  4102-BYOMEICD-CHK-EXT
            END-IF
       *
+           MOVE    SPACE               TO  C02-BYOMEICD (IDZ) (11:2)
            MOVE    C02-BYOMEICD (IDZ)  TO  SPA-GMN-C02-BYOMEICD (IDZ)
                                            SPA-NAI-C02-BYOMEICD (IDZ)
       *
