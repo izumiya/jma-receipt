@@ -965,3 +965,34 @@ path	abort	{
 	};
 };
 
+path	key57		{ 	
+	DBSELECT	{
+		DECLARE tbl_ptnyuinrrk_key57_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptnyuinrrk
+			WHERE	    HOSPNUM      =   :HOSPNUM 
+			AND	    PTID        =   :PTID
+			AND		RRKEDANUM    =   1
+			AND	    SHONUM      =   :SHONUM
+			AND	JTIKBN		<>	'5'
+			AND	JTIKBN		<>	'6'
+			ORDER BY NYUINYMD,TAIINYMD,RRKNUM
+		;
+	};
+};
+
+path	key58		{ 	
+	DBSELECT	{
+		DECLARE tbl_ptnyuinrrk_key58_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptnyuinrrk
+			WHERE	HOSPNUM      =   :HOSPNUM 
+			AND		PTID        =   :PTID
+			AND		NYUINYMD	<=	:NYUINYMD
+			AND		TAIINYMD	>=	:TAIINYMD
+			AND		JTIKBN		<>	'5'
+			AND		JTIKBN		<>	'6'
+			ORDER BY NYUINYMD,TAIINYMD,RRKNUM,RRKEDANUM
+		;
+	};
+};
