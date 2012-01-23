@@ -525,6 +525,7 @@
       *  04.05.43    NACL-ÌçÏÆ    11/12/13  ºÒ³²ÂÐ¾Ý¾ò·ï½¤Àµ
       *  04.05.44    NACL-ÌçÏÆ    11/12/15  ¸ºÌÈÂÐ±þ¡ÊÅìÂçºå»Ô¡Ë
       *  04.05.45    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
+      *  04.05.46    NACL-ÌçÏÆ    12/01/23  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -19418,12 +19419,12 @@
       *
              IF   WRK-PREFNUM = "42"
                IF  ((RECE62-KOHNUM(1)       =  "186"         ) AND
-                    (RECE62-KOHNUM(2)       =  "187"         ) AND
+                    (RECE62-KOHNUM(2)       =  "187" OR "287") AND
                     (RECE62-KOHNUM(3)       =  SPACE         ) AND
                     (RECE62-KOHNUM(4)       =  SPACE         ))
                OR  ((RECE62-KOHNUM(1)       =  "972" OR "974") AND
                     (RECE62-KOHNUM(2)       =  "186"         ) AND
-                    (RECE62-KOHNUM(3)       =  "187"         ) AND
+                    (RECE62-KOHNUM(3)       =  "187" OR "287") AND
                     (RECE62-KOHNUM(4)       =  SPACE         ))
       *
                   MOVE        4           TO   FLG-ZENKOKUKOHI-NISYU
@@ -19434,8 +19435,8 @@
                      PERFORM   VARYING  IDX1  FROM  1  BY  1
                                 UNTIL  (IDX1                  >  10 )
                                  OR    (RECE62-HKNCOMBI(IDX1) = ZERO)
-                        IF   (RECE62-KOHNUMHC(IDX1 1) = "187")
-                        AND  (RECE62-KOHNUMHC(IDX1 2) = "186")
+                        IF   (RECE62-KOHNUMHC(IDX1 1) = "187" OR "287")
+                        AND  (RECE62-KOHNUMHC(IDX1 2) = "186"         )
                            MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU
                         END-IF
                      END-PERFORM

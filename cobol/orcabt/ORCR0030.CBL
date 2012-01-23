@@ -540,6 +540,7 @@
       *  04.05.37    NACL-ÌçÏÆ    11/12/13  ºÒ³²ÂÐ¾Ý¾ò·ï½¤Àµ
       *  04.05.38    NACL-ÌçÏÆ    11/12/15  ¸ºÌÈÂÐ±þ¡ÊÅìÂçºå»Ô¡Ë
       *  04.05.39    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
+      *  04.05.40    NACL-ÌçÏÆ    12/01/23  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -4489,12 +4490,12 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
       *
              IF   SYS-1001-PREFNUM = 42
                IF  ((RECE02-KOHNUM(1)       =  "186"         ) AND
-                    (RECE02-KOHNUM(2)       =  "187"         ) AND
+                    (RECE02-KOHNUM(2)       =  "187" OR "287") AND
                     (RECE02-KOHNUM(3)       =  SPACE         ) AND
                     (RECE02-KOHNUM(4)       =  SPACE         ))
                OR  ((RECE02-KOHNUM(1)       =  "972" OR "974") AND
                     (RECE02-KOHNUM(2)       =  "186"         ) AND
-                    (RECE02-KOHNUM(3)       =  "187"         ) AND
+                    (RECE02-KOHNUM(3)       =  "187" OR "287") AND
                     (RECE02-KOHNUM(4)       =  SPACE         ))
       *
                   MOVE        4           TO   FLG-ZENKOKUKOHI-NISYU
@@ -4505,8 +4506,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      PERFORM   VARYING  IDY2  FROM  1  BY  1
                                 UNTIL  (IDY2                  >  10 )
                                  OR    (RECE02-HKNCOMBI(IDY2) = ZERO)
-                        IF   (RECE02-KOHNUMHC(IDY2 1) = "187")
-                        AND  (RECE02-KOHNUMHC(IDY2 2) = "186")
+                        IF   (RECE02-KOHNUMHC(IDY2 1) = "187" OR "287")
+                        AND  (RECE02-KOHNUMHC(IDY2 2) = "186"         )
                            MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU
                         END-IF
                      END-PERFORM
