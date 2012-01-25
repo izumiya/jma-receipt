@@ -12334,7 +12334,12 @@
                            MOVE     MCPDATA-REC    TO  NYUINACCT-REC
                            MOVE     PTNYUINRRK-NYUINYMD(7:2)
                                               TO  IDX-SHOKUJIX
-                           MOVE     1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           IF   PTNYUINRRK-SKJKBN        =    "1"
+                               MOVE  1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "2"
+                               MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
@@ -12365,7 +12370,12 @@
                            MOVE     MCPDATA-REC    TO  NYUINACCT-REC
                            MOVE     PTNYUINRRK-NYUINYMD(7:2)
                                               TO  IDX-SHOKUJIX
-                           MOVE     1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           IF   PTNYUINRRK-SKJKBN        =    "1"
+                               MOVE  1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "2"
+                               MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
@@ -12396,7 +12406,12 @@
                            MOVE     MCPDATA-REC    TO  NYUINACCT-REC
                            MOVE     PTNYUINRRK-NYUINYMD(7:2)
                                               TO  IDX-SHOKUJIX
-                           MOVE     1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           IF   PTNYUINRRK-SKJKBN        =    "1"
+                               MOVE  1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "2"
+                               MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
@@ -12431,7 +12446,12 @@
                            MOVE     MCPDATA-REC    TO  NYUINACCT-REC
                            MOVE     PTNYUINRRK-NYUINYMD(7:2)
                                               TO  IDX-SHOKUJIX
-                           MOVE     1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           IF   PTNYUINRRK-SKJKBN        =    "1"
+                               MOVE  1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "2"
+                               MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
@@ -12462,7 +12482,12 @@
                            MOVE     MCPDATA-REC    TO  NYUINACCT-REC
                            MOVE     PTNYUINRRK-NYUINYMD(7:2)
                                               TO  IDX-SHOKUJIX
-                           MOVE     1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           IF   PTNYUINRRK-SKJKBN        =    "1"
+                               MOVE  1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "2"
+                               MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
@@ -12497,7 +12522,12 @@
                            MOVE     MCPDATA-REC    TO  NYUINACCT-REC
                            MOVE     PTNYUINRRK-NYUINYMD(7:2)
                                               TO  IDX-SHOKUJIX
-                           MOVE     1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           IF   PTNYUINRRK-SKJKBN        =    "1"
+                               MOVE  1   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
+                           IF   PTNYUINRRK-SKJKBN        =    "2"
+                               MOVE  2   TO  NACCT-DAY(IDX-SHOKUJI9)
+                           END-IF
       *                    剤回数再セット
                            MOVE  ZERO              TO  NACCT-ZAIKAISU
                            PERFORM  VARYING   IDX-SKJ FROM  1  BY  1
