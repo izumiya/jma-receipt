@@ -1444,33 +1444,61 @@
                GO  TO  3103-91DAYS-EDIT-EXT
            END-IF
       *
-           IF    ( STUSAN-RRK-FLG-OVER NOT =   ZERO )
-               MOVE    "********"  TO  SPA-GMN-IJYOU91
-               GO  TO  3103-91DAYS-EDIT-EXT
-           END-IF
-      *
            MOVE    STUSAN-NISSU03  TO  WRK-TUSAN
       *
-           INITIALIZE                  STS-AREA-DAY
-           INITIALIZE                  LNK-DAY6-AREA
-           MOVE    "61"            TO  LNK-DAY6-IRAI
-           MOVE    PTNYUINRRK-NYUINYMD   TO  LNK-DAY6-KIJUN
-           MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-           IF    WRK-TUSAN         =   ZERO
-                 COMPUTE LNK-DAY6-ZOGEN
-                              =   91   -          WRK-TUSAN
-           ELSE
-                 COMPUTE LNK-DAY6-ZOGEN
-                              =   92   -          WRK-TUSAN
-           END-IF
-           DISPLAY "LNK-DAY6-KIJUN = " LNK-DAY6-KIJUN
-           DISPLAY "LNK-DAY6-ZOGEN = " LNK-DAY6-ZOGEN
-           CALL    "ORCSDAY"   USING   STS-AREA-DAY
-                                       LNK-DAY6-AREA
-           MOVE    LNK-DAY6-KOYOMI TO  SPA-GMN-IJYOU91
-           MOVE    LNK-DAY6-KOYOMI TO  WRK-SYMD
-           PERFORM 41012-SEIWA-HEN-SEC
-           MOVE    WRK-HENYMDG     TO  SPA-GMN-IJYOU91
+           PERFORM VARYING IDX10   FROM    1   BY  1
+                   UNTIL ( IDX10   >   STUSAN-RRK-CNT )
+               IF    ( STUSAN-RRK-JTIKBN (IDX10)
+                                           NOT = "5" )
+                   IF (STUSAN-RRK-NYUINYMD (IDX10)  NOT =  SPACE)  AND
+                      (STUSAN-RRK-NISSU (IDX10)    =   ZERO)   AND
+                      (STUSAN-RRK-DJKBN (IDX10)    =   SPACE)
+                           ADD   1    TO   STUSAN-RRK-NISSU (IDX10)
+                   END-IF
+      *
+                   IF   (STUSAN-RRK-TAIINYMD(IDX10)  NOT = "99999999")
+                    IF (STUSAN-RRK-NISSU (IDX10)    =   ZERO  OR  1)
+                      CONTINUE
+                    ELSE
+                     INITIALIZE                  STS-AREA-DAY
+                     INITIALIZE                  LNK-DAY5-AREA
+                     MOVE    "51"            TO  LNK-DAY5-IRAI
+                     MOVE    STUSAN-RRK-NYUINYMD (IDX10)
+                                             TO  LNK-DAY5-START
+                     MOVE    STUSAN-RRK-TAIINYMD (IDX10)
+                                             TO  LNK-DAY5-END
+                     CALL    "ORCSDAY"   USING   STS-AREA-DAY
+                                                 LNK-DAY5-AREA
+                     MOVE    LNK-DAY5-NISSU2 TO  STUSAN-RRK-NISSU(IDX10)
+                    END-IF
+                   END-IF
+      *
+                   COMPUTE WRK-TUSAN
+                       =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX10)
+                   IF    ( WRK-TUSAN  <    91 )
+                       INITIALIZE                  STS-AREA-DAY
+                       INITIALIZE                  LNK-DAY6-AREA
+                       MOVE    "61"            TO  LNK-DAY6-IRAI
+                       MOVE    STUSAN-RRK-NYUINYMD (IDX10)
+                                               TO  LNK-DAY6-KIJUN
+                       MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+                       IF    ( STUSAN-RRK-DJKBN (IDX10) = SPACE OR "2" )
+                           COMPUTE LNK-DAY6-ZOGEN
+                               =   91   -          WRK-TUSAN
+                       ELSE
+                           COMPUTE LNK-DAY6-ZOGEN
+                               =   92   -          WRK-TUSAN
+                       END-IF
+                       CALL    "ORCSDAY"   USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                       MOVE    LNK-DAY6-KOYOMI TO  SPA-GMN-IJYOU91
+                       MOVE    LNK-DAY6-KOYOMI TO  WRK-SYMD
+                       PERFORM 41012-SEIWA-HEN-SEC
+                       MOVE    WRK-HENYMDG     TO  SPA-GMN-IJYOU91
+                       MOVE    STUSAN-RRK-CNT  TO  IDX10
+                   END-IF
+               END-IF
+           END-PERFORM
       *
            .
        3103-91DAYS-EDIT-EXT.
