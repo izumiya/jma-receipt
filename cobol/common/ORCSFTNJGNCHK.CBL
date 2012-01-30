@@ -79,6 +79,8 @@
       *  04.05.01    NACL-ÌçÏÆ    09/12/04  ¿©»ö¡ÊÆÃÊÌ¿©¡Ë¤ÎÂ¾ÊÝ¸±ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    11/03/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    11/11/17  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¾¾ÉúÄ®¡Ë
+      *  04.06.01    NACL-ÌçÏÆ    12/01/30  ±¡³°½èÊý¤Î¤ß¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥ÈÂÐ±þ
+      *                                     ¡ÊÀÁµáÅÀ¿ô£°ÅÀ¸øÈñÊ¬¡Ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -113,6 +115,7 @@
            03  FLG-TAISYO          PIC 9(01).
            03  FLG-KOREI           PIC 9(01).
            03  FLG-SAIGAI-TAISYO   PIC 9(01).
+           03  FLG-TENKEN          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -242,6 +245,7 @@
        000-PROC-SEC                 SECTION.
       *
            MOVE    ZERO                TO  LNK-FTNJGNCHK-RC
+                                           LNK-FTNJGNCHK-TENKEN-RC
                                            LNK-FTNJGNCHK-KOHFTN
                                            LNK-FTNJGNCHK-KOHFTNSKJ
       *
@@ -258,6 +262,14 @@
            IF    LNK-FTNJGNCHK-RC      =   ZERO
                PERFORM   200-MAIN-SEC
            END-IF
+      *
+           MOVE    LNK-FTNJGNCHK-RC   TO   LNK-FTNJGNCHK-TENKEN-RC
+           IF   (LNK-FTNJGNCHK-RC      =   1  )
+           AND  (FLG-TENKEN            =   1  )
+      ***  AND  (LNK-FTNJGNCHK-HKNID   =  ZERO)
+              MOVE     ZERO           TO   LNK-FTNJGNCHK-TENKEN-RC
+           END-IF
+      *
            .
        000-PROC-EXT.
       *
@@ -1293,14 +1305,6 @@
       *
            IF    LNK-FTNJGNCHK-RC  =   ZERO
            AND   FLG-ARI2          =    1
-             IF  WRK-SEIKYU         =  ZERO
-             AND FLG-SKJRYOYOHI-ARI =  ZERO
-                       MOVE   01        TO  LNK-FTNJGNCHK-RC
-             END-IF
-           END-IF
-      *
-           IF    LNK-FTNJGNCHK-RC  =   ZERO
-           AND   FLG-ARI2          =    1
              IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
              AND (FLG-SAIGAI-ARI2        =    1    )
              AND (WRK-SYUSKJ-FTN = WRK-SKYMONEY-SKJ)
@@ -1309,6 +1313,15 @@
              IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
              AND (FLG-SAIGAI-ARI         =    1    )
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
+             END-IF
+           END-IF
+      *
+           IF    LNK-FTNJGNCHK-RC  =   ZERO
+           AND   FLG-ARI2          =    1
+             IF  WRK-SEIKYU         =  ZERO
+             AND FLG-SKJRYOYOHI-ARI =  ZERO
+                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       MOVE    1        TO  FLG-TENKEN
              END-IF
            END-IF
       *
@@ -1627,14 +1640,6 @@
       *
            IF    LNK-FTNJGNCHK-RC  =   ZERO
            AND   FLG-ARI2          =    1
-             IF  WRK-SEIKYU         =  ZERO
-             AND FLG-SKJRYOYOHI-ARI =  ZERO
-                       MOVE   01        TO  LNK-FTNJGNCHK-RC
-             END-IF
-           END-IF
-      *
-           IF    LNK-FTNJGNCHK-RC  =   ZERO
-           AND   FLG-ARI2          =    1
              IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
              AND (FLG-SAIGAI-ARI2        =    1    )
              AND (WRK-SYUSKJ-FTN = WRK-SKYMONEY-SKJ)
@@ -1643,6 +1648,15 @@
              IF  (LNK-FTNJGNCHK-SRYYM   >= "201101")
              AND (FLG-SAIGAI-ARI         =    1    )
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
+             END-IF
+           END-IF
+      *
+           IF    LNK-FTNJGNCHK-RC  =   ZERO
+           AND   FLG-ARI2          =    1
+             IF  WRK-SEIKYU         =  ZERO
+             AND FLG-SKJRYOYOHI-ARI =  ZERO
+                       MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       MOVE    1        TO  FLG-TENKEN
              END-IF
            END-IF
       *
