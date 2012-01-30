@@ -2744,30 +2744,33 @@
            MOVE    WRK-BTU-NYUKSNKBN
                                    TO  NYUKSNCHK-NYUINKBN
            PERFORM   48012-TENSU-SEL-SEC
-           MOVE    WRK-KSN-NYUKSNKBN
-                                   TO  NYUKSNCHK-KSNKBN
-           MOVE    SYOKIKSN-IN-SANTEISTYMD    TO  NYUKSNCHK-YUKOSTYMD
-                                                  NYUKSNCHK-YUKOEDYMD
+           IF      TNS-NYUKHNKSNKBN    NOT =   ZERO
+               MOVE    WRK-KSN-NYUKSNKBN
+                                       TO  NYUKSNCHK-KSNKBN
+               MOVE    SYOKIKSN-IN-SANTEISTYMD TO  NYUKSNCHK-YUKOSTYMD
+                                                   NYUKSNCHK-YUKOEDYMD
       *
-           MOVE    "tbl_nyuksnchk" TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           MOVE    NYUKSNCHK-REC   TO  MCPDATA-REC
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  NYUKSNCHK-REC
-               IF    ( NYUKSNCHK-CHKKBN    =   "1" OR "2" )
-                   CONTINUE
+               MOVE    "tbl_nyuksnchk" TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               MOVE    NYUKSNCHK-REC   TO  MCPDATA-REC
+               PERFORM 910-DBSELECT-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   MOVE    MCPDATA-REC TO  NYUKSNCHK-REC
+                   IF    ( NYUKSNCHK-CHKKBN    =   "1" OR "2" )
+                       CONTINUE
+                   ELSE
+                       MOVE   1        TO     FLG-NYUKSN
+                   END-IF
                ELSE
                    MOVE   1        TO     FLG-NYUKSN
                END-IF
-           ELSE
-               MOVE   1        TO     FLG-NYUKSN
+      *
+      *
+               MOVE    "tbl_nyuksnchk"      TO  MCP-TABLE
+               MOVE    "key"                TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+      *
            END-IF
-      *
-      *
-           MOVE    "tbl_nyuksnchk"      TO  MCP-TABLE
-           MOVE    "key"                TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
       *
       *    老人特定入院基本料の加算チェック漏れ対応
            IF   (WRK-BTU-NYUKSNKBN   =  "099")  AND
