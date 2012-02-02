@@ -135,6 +135,13 @@ W12	{
 					count	int;
 					item	varchar(36)[5];
 				};
+				INSPECT_ZERO_COMBO	{
+					INSPECT_ZERO	{
+						value	varchar(24);
+					};
+					count	int;
+					item	varchar(24)[5];
+				};
 				PREFPRGID	{
 					value	varchar(15);
 				};

@@ -93,6 +93,7 @@
       *  04.06.02    NACL-藤原    10/10/12  キーにkohid 追加
       *                                     調査用にcrehms,updhms 追加
       *  04.06.03    NACL-藤原    10/12/20  保険者からの返戻対応
+      *  04.06.04    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -356,6 +357,14 @@
                END-IF
       *        画面編集
                PERFORM 500-GMNHEN-SEC
+               IF      SPA-ERRCD       NOT =   SPACE
+                   PERFORM 510-ERRSET-SEC
+                   GO  TO  100-INIT-EXT
+               END-IF
+               IF      SPA-HIDCD       NOT =   SPACE
+                   PERFORM 520-RIDSET-SEC
+                   GO  TO  100-INIT-EXT
+               END-IF
            END-IF
       *
            MOVE    SPACE               TO  LINKAREA
@@ -1438,6 +1447,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE    "0003"         TO  SPA-ERRCD
                WHEN    1
                    PERFORM 41021-SEIKYU-HENSYU-SEC
+      *            点検用レセ０点公費のとき入力不可
+                   IF      SPA-H01NAI-SKYKBN-RECEDEN   =   "1"
+                       MOVE    "0009"                  TO  SPA-ERRCD
+                       GO  TO  41021-SEIKYU-KENSAKU-EXT
+                   END-IF
       *            主科設定時の主科未設定のチェック（特別療養費を除く）
                    IF    ( RECE10-RECEKA          =   "00"   )
                    AND   ( RECE10-RECESYUBETU NOT =   "6666" )
@@ -1881,6 +1895,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        SPA-H01GMN-HENREI-SIJI-FLG-STATE
                END-IF
            END-IF
+      *    点検レセ０点公費あり
+           MOVE    RECE10-SKYKBN-RECEDEN
+                                       TO  SPA-H01NAI-SKYKBN-RECEDEN
       *
            MOVE    "1"                 TO  SPA-HENFLG
       *     
@@ -3527,6 +3544,14 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            MOVE    SPA-H01GMN-HONKZKKBN
                                       TO  H01-HONKZKKBN
       *
+           IF      SPA-H01NAI-SKYKBN-RECEDEN
+                                      =   "1"
+               MOVE    WIDGET-INSENSITIVE     TO  H01-B12-STATE
+               MOVE    "０点公費記載あり　請求できません"
+                                              TO  H01-MSG-VALUE
+               MOVE    "red"                  TO  H01-MSG-STYLE
+           END-IF  
+      *
            PERFORM 5001-MAPCUR-SEC
       *
            .
@@ -4048,6 +4073,10 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                                TO  SPA-ERRMSG
                WHEN    "0008"
                    MOVE    "請求年月＞＝返戻年月で入力して下さい" 
+                                               TO  SPA-ERRMSG
+               WHEN    "0009"
+                   MOVE
+                   "０点公費記載のレセプトです、更新処理はできません" 
                                                TO  SPA-ERRMSG
                WHEN    "0010"
                    MOVE    "修正項目がありません" 

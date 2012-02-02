@@ -39,6 +39,8 @@
       *  04.03.01    NACL-藤原    08/08/07  労災の枠印刷選択機能対応
       *  04.03.02    NACL-藤原    08/08/11  コメント記載箇所選択機能対応
       *  04.03.03    NACL-藤原    08/08/19  仮レセ作成（院外処方含む）対応
+      *
+      *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -315,6 +317,17 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
                                            =   SPACE
                MOVE    ZERO                TO
                                            SYS-200501-COMMENT-ROU-KSIKBN
+           END-IF
+           IF      SYS-200501-INSPECT-ZERO-KBN
+                                           =   SPACE
+               MOVE    "0"                 TO
+                                           SYS-200501-INSPECT-ZERO-KBN
+           END-IF
+           IF    ( LINK-PRTKBN             =   "2" )
+           AND   ( LINK-HKNKBN             =   "0" )
+           AND   ( SYS-200501-INSPECT-ZERO-KBN
+                                           =   "1" )
+               MOVE    "3"                 TO  LINK-PRTKBN
            END-IF
       *                
       *    出力先プリンタ名割り当て情報の取得

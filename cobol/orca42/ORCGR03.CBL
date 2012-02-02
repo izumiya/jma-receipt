@@ -113,6 +113,7 @@
       *                                     種別不明レセ対応
       *                                     不明分ありのとき赤字でエラー
       *                                     表示を行う
+      *  04.06.02    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -182,6 +183,8 @@
                        09  SPA-GMN-PRTKBN          PIC X(01).
                        09  SPA-GMN-F1              PIC X(01).
                        09  SPA-GMN-PRTKBNMEI       PIC X(30).
+      *             
+                   07  SPA-GMN-PRTKBN-LABEL        PIC X(20).
       *
                    07  SPA-DATAKBN.         
                        09  SPA-DATAKBN1-VALUE      PIC X(01).
@@ -204,6 +207,8 @@
                    07  SPA-NAI-NYUGAIKBN           PIC X(06).
       *
                    07  SPA-NAI-2005-AUTODSPKBN     PIC X(01).
+                   07  SPA-NAI-200501-INSPECT-ZERO-KBN
+                                                   PIC X(01).
       *
        01  SPA-RECE07-REC. 
            COPY    "CPRCF007.INC"  REPLACING  //RECE07//
@@ -685,6 +690,28 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
            MOVE    SYS-2005-AUTODSPKBN 
                                    TO  SPA-NAI-2005-AUTODSPKBN
       *
+      *    区分コード０１のデータ読み込み
+           INITIALIZE                  SYS-200501-REC
+           MOVE    "2005"          TO  SYS-200501-KANRICD
+           MOVE    "01"            TO  SYS-200501-KBNCD
+           MOVE    SPA-SYSYMD      TO  SYS-200501-STYUKYMD
+                                       SYS-200501-EDYUKYMD
+grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
+           MOVE    SYS-200501-REC  TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE   MCPDATA-REC  TO  SYS-200501-REC
+           ELSE
+               INITIALIZE              SYS-200501-REC
+               MOVE    SYS-2005-TERMID (1:4)
+                                   TO  SYS-200501-TBL (1:4)
+           END-IF
+           IF      SYS-200501-INSPECT-ZERO-KBN
+                                   =   SPACE
+               MOVE    "0"             TO  SYS-200501-INSPECT-ZERO-KBN
+           END-IF
+           MOVE    SYS-200501-INSPECT-ZERO-KBN
+                                   TO  SPA-NAI-200501-INSPECT-ZERO-KBN
       *
            IF      SPA-BEDSU           >   ZERO
                MOVE    3                   TO  SPA-GMN-CUR
@@ -795,6 +822,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
                    MOVE    SPA-GMN-PRTKBNLST (1)
                                                TO  SPA-GMN-PRTKBN-G
                WHEN    "2"    
+               WHEN    "3"    
                    MOVE    SPA-GMN-PRTKBNLST (2)
                                                TO  SPA-GMN-PRTKBN-G
            END-EVALUATE        
@@ -875,13 +903,25 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
            EVALUATE    SPA-GMN-SYOKBN
                WHEN    "T"
                    MOVE    "レセプト新規作成" TO  SPA-GMN-SYOKBN-LABEL
+                   IF      SPA-R01-PRTKBN     =   "3"
+                       MOVE    "０点公費記載設定"
+                                              TO  SPA-GMN-PRTKBN-LABEL
+                   ELSE
+      *****            MOVE    "０点公費を記載しない"
+      *****                                   TO  SPA-GMN-PRTKBN-LABEL
+                       MOVE    SPACE          TO  SPA-GMN-PRTKBN-LABEL
+                   END-IF
                WHEN    "F"
                    MOVE    "作成済レセプト再印刷"
                                               TO  SPA-GMN-SYOKBN-LABEL
                    MOVE    SPACE              TO  SPA-GMN-PRTKBN-G
+                   MOVE    SPACE              TO  SPA-GMN-PRTKBN-LABEL
            END-EVALUATE      
       *
            MOVE    SPA-R01-AUTODSPKBN  TO  SPA-NAI-2005-AUTODSPKBN
+           MOVE    SPA-R01-INSPECT-ZERO-KBN
+                                       TO
+                                       SPA-NAI-200501-INSPECT-ZERO-KBN
       *
            IF      SPA-GMN-IKKATU          =   "T" 
                MOVE    2               TO  SPA-GMN-CUR
@@ -1161,6 +1201,8 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
       *****************************************************************
        41023-PRTKBN-CHK-SEC                SECTION.
       *
+           MOVE    SPACE               TO  SPA-GMN-PRTKBN-LABEL
+      *
            IF      SPA-GMN-PRTKBN      =   SPACE
                IF      SPA-GMN-SYOKBN      =   "T"
                    MOVE    SPA-GMN-PRTKBNLST (1)
@@ -1192,6 +1234,19 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
       *
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE    4                   TO  SPA-GMN-CUR
+           ELSE
+               IF    ( SPA-GMN-PRTKBN      =   "2" )
+                   IF    ( SPA-NAI-200501-INSPECT-ZERO-KBN
+                                               =   "1" )
+                       MOVE    "０点公費記載設定"
+                                               TO  SPA-GMN-PRTKBN-LABEL
+      ******       ELSE
+      ******           MOVE    "０点公費を記載しない"
+      ******                                   TO  SPA-GMN-PRTKBN-LABEL
+                   END-IF
+               ELSE
+                   MOVE    SPACE           TO   SPA-GMN-PRTKBN-LABEL
+               END-IF
            END-IF 
            .
        41023-PRTKBN-CHK-EXT.
@@ -1777,6 +1832,10 @@ grpsys                 PERFORM 900-DBSELECT-SEC
                                MOVE    SPA-GMN-PRTKBNLST (2)
                                               TO  SPA-GMN-PRTKBN-G
                                MOVE    "2"    TO  SPA-R01-PRTKBN
+                           WHEN    "2"
+                               MOVE    SPA-GMN-PRTKBNLST (2)
+                                              TO  SPA-GMN-PRTKBN-G
+                               MOVE    "3"    TO  SPA-R01-PRTKBN
                        END-EVALUATE
                    END-IF    
            END-EVALUATE
@@ -2377,7 +2436,8 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
       *     
                    MOVE    SPA-NAI-SRYYM   TO  WRK-SHELL-SRYYM
                    MOVE    SPA-TERMID      TO  WRK-SHELL-TERMID
-                   MOVE    SPA-SYSYMD      TO  WRK-SHELL-SYSYMD
+      *************MOVE    SPA-SYSYMD      TO  WRK-SHELL-SYSYMD
+                   MOVE    SMCNDATE-YMD    TO  WRK-SHELL-SYSYMD
                    MOVE    WRK-SHELL-ARG1  TO  SHELLTBL-ARG1
                    MOVE    "1"             TO  SHELLTBL-ARG2
                    MOVE    SPA-R01-RECEKBN TO  SHELLTBL-ARG3
@@ -2554,11 +2614,21 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            MOVE    SPA-GMN-NYUGAIKBN   TO  SPA-R01-NYUGAIKBN
       *
            MOVE    SPA-GMN-PRTKBN      TO  SPA-R01-PRTKBN
+      *    医保分で点検用レセ（０点公費あり）のとき
+           IF    ( SPA-R01-RECEKBN     =   "0" OR  "1" OR
+                                           "2" OR  "7"    )
+           AND   ( SPA-R01-PRTKBN      =   "2"            )
+           AND   ( SPA-NAI-200501-INSPECT-ZERO-KBN
+                                       =   "1"            )
+               MOVE    "3"                 TO  SPA-R01-PRTKBN
+           END-IF
       *
            MOVE    SPACE               TO  SPA-R01-GMNKBN
       *
            MOVE    SPA-NAI-2005-AUTODSPKBN
                                        TO  SPA-R01-AUTODSPKBN
+           MOVE    SPA-NAI-200501-INSPECT-ZERO-KBN
+                                       TO  SPA-R01-INSPECT-ZERO-KBN
       *
            MOVE    SPA-R01KYOUTU       TO  SPA-WORK       
       *
@@ -2915,6 +2985,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                            TO  R03-PRTKBN-ITEM (IDX)
            END-PERFORM
            MOVE    SPA-GMN-PRTKBN-MAX   TO  R03-PRTKBN-COUNT
+      *
+           MOVE    SPA-GMN-PRTKBN-LABEL TO  R03-PRTKBN-LABEL
+           MOVE    "blue"               TO  R03-PRTKBN-LABEL-STYLE
+      * 
            EVALUATE    SPA-GMN-SYOKBN
                WHEN    "T"
                    MOVE    WIDGET-NORMAL       TO  R03-PRTKBN-STATE

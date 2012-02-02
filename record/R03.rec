@@ -31,6 +31,10 @@ R03	{
 			count	int;
 			item	varchar(32)[2];
 		};
+		PRTKBN_LABEL	{
+			style   varchar(20);
+			value	varchar(20);
+		};
 		KOBETU	{
 			value	bool;
 		};

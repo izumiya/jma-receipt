@@ -318,13 +318,13 @@
       <name>FILEKBN</name>
       <x>5</x>
       <y>5</y>
-      <width>300</width>
+      <width>480</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <editable>False</editable>
       <text_visible>True</text_visible>
       <text_max_length>52</text_max_length>
-      <text>Ê¿À®£±£°Ç¯£±£°·îÆþ±¡³°¡¦¼ÒÊÝ°ì³çºîÀ®Ê¬¤Ì¤Õ£²£³£´£µ£¶</text>
+      <text>¡ÚÅÀ¸¡ÍÑ¡Ê£°ÅÀ¸øÈñµ­ºÜÀßÄê¡Ë¡Û¼õ¿ÇÆü»ØÄê¡¡Ê¿À®£²£³Ç¯£±£²·î£±£²Æü¡Á£³£±Æü</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -332,10 +332,10 @@
     <widget>
       <class>GtkPandaEntry</class>
       <name>CREYMD</name>
-      <x>352</x>
-      <y>5</y>
-      <width>128</width>
-      <height>24</height>
+      <x>52</x>
+      <y>30</y>
+      <width>134</width>
+      <height>18</height>
       <can_focus>True</can_focus>
       <editable>False</editable>
       <text_visible>True</text_visible>
@@ -9334,7 +9334,7 @@
     <widget>
       <class>GtkLabel</class>
       <name>MSG</name>
-      <x>10</x>
+      <x>190</x>
       <y>30</y>
       <width>300</width>
       <height>18</height>
@@ -9616,8 +9616,8 @@
     <widget>
       <class>GtkLabel</class>
       <name>label550</name>
-      <x>305</x>
-      <y>8</y>
+      <x>3</x>
+      <y>30</y>
       <width>50</width>
       <height>18</height>
       <label>ºîÀ®Æü</label>

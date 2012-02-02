@@ -31,6 +31,8 @@
       *
       *  04.05.01    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
+      *
+      *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        01  SPA-R01FREE.
@@ -42,7 +44,7 @@
                05  SPA-GMN-R01-PAGE                PIC 9(02).
                05  SPA-GMN-R01-CUR                 PIC 9(02).
                05  SPA-GMN-R01-AREA.
-                   07  SPA-GMN-R01-SYOKBN          PIC X(38).
+                   07  SPA-GMN-R01-SYOKBN          PIC X(50).
                    07  SPA-GMN-R01-LABEL           PIC X(10).
                    07  SPA-GMN-R01-LABEL1          PIC X(12).
                    07  SPA-GMN-R01-LABEL2          PIC X(14).

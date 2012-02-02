@@ -148,6 +148,7 @@
       *                                     種別不明レセ対応
       *                                     不明分ありのとき赤字でエラー
       *                                     表示を行う
+      *  04.06.02    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -295,7 +296,7 @@
              05  WRK-SHELL-SYSYMD  PIC X(08).  
            03  WRK-RECEKBN         PIC X(18).
            03  WRK-NYUGAIKBN       PIC X(10).
-           03  WRK-PRTKBN          PIC X(10).
+           03  WRK-PRTKBN          PIC X(30).
            03  WRK-ERRCD           PIC X(04).
       *
            03  WRK-KBNCD-X.
@@ -676,11 +677,15 @@
            INITIALIZE              SPA-R01-AREA
       *
       *    点検用レセプト作成時
-           IF      SPA-R01-PRTKBN  =   "2"
-               MOVE    "【点検用】"    TO  WRK-PRTKBN
-           ELSE
-               MOVE    SPACE           TO  WRK-PRTKBN
-           END-IF
+           EVALUATE    SPA-R01-PRTKBN
+               WHEN    "2"
+                   MOVE    "【点検用】"    TO  WRK-PRTKBN
+               WHEN    "3"
+                   MOVE    "【点検用（０点公費記載設定）】"
+                                           TO  WRK-PRTKBN
+               WHEN    OTHER
+                   MOVE    SPACE           TO  WRK-PRTKBN
+           END-EVALUATE
       *
            EVALUATE    SPA-R01-RECEKBN
                WHEN    "0"
@@ -3708,8 +3713,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
            END-EVALUATE
       *
            MOVE    ZERO                TO  SPA-NAI-R01-PRTKBN-FLG
-           IF    ( SPA-ERRCD           =   SPACE )
-           AND   ( SPA-R01-PRTKBN      =   "2"   )
+           IF    ( SPA-ERRCD           =   SPACE       )
+           AND   ( SPA-R01-PRTKBN      =   "2" OR  "3" )
                EVALUATE    SPA-GMN-R01-SYORI
                    WHEN    "1"
                    WHEN    "4"
@@ -3924,8 +3929,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECE07-HOSPNUM
            MOVE    SPACE           TO  SPA-R99-CANCEL
       *
       *    点検用レセプトで平成２００８年３月以前のとき
-           IF    ( SPA-NAI-R01-PRTKBN-FLG  =   1   )
-           AND   ( SPA-R01-PRTKBN          =   "2" )
+           IF    ( SPA-NAI-R01-PRTKBN-FLG  =   1           )
+           AND   ( SPA-R01-PRTKBN          =   "2" OR  "3" )
                MOVE    "1"                     TO  SPA-R01-PRTKBN
            END-IF
            MOVE    ZERO           TO  SPA-NAI-R01-PRTKBN-FLG
@@ -4308,7 +4313,8 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
       *     
            MOVE    ZERO            TO  WRK-SHELL-SRYYM
            MOVE    SPA-TERMID      TO  WRK-SHELL-TERMID
-           MOVE    SPA-SYSYMD      TO  WRK-SHELL-SYSYMD
+      *****MOVE    SPA-SYSYMD      TO  WRK-SHELL-SYSYMD
+           MOVE    SMCNDATE-YMD    TO  WRK-SHELL-SYSYMD
            MOVE    WRK-SHELL-ARG1  TO  SHELLTBL-ARG1
            MOVE    "2"             TO  SHELLTBL-ARG2
            MOVE    SPA-R01-RECEKBN TO  SHELLTBL-ARG3
@@ -5315,7 +5321,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "1002"
                WHEN    "1006"
                WHEN    "1007"
-                   IF      SPA-R01-PRTKBN       =   "2"
+                   IF      SPA-R01-PRTKBN       =   "2" OR  "3"
                        MOVE    "【点検用レセプト】"     TO  RID1-LABEL
                    END-IF
                    IF      SPA-NAI-R01-PRTKBN-FLG       =   1
@@ -5422,7 +5428,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "1002"
                WHEN    "1006"
                WHEN    "1007"
-                   IF      SPA-R01-PRTKBN       =   "2"
+                   IF      SPA-R01-PRTKBN       =   "2" OR  "3"
                        MOVE    "【点検用レセプト】"     TO  RID4-LABEL
                    END-IF
                    IF      SPA-NAI-R01-PRTKBN-FLG       =   1

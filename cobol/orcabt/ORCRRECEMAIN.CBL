@@ -53,6 +53,8 @@
       *
       *  04.05.02    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
+      *
+      *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -465,6 +467,8 @@
            MOVE     SPACE       TO WRK-ARG
            STRING   WRK-PARA0      DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
+                    WRK-PARA-PRTKBN
+                    ","            DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
@@ -703,6 +707,18 @@
            CALL    "ORCR0600"          USING
                                        WRK-ARG
       *
+           MOVE     SPACE       TO WRK-ARG
+           STRING   WRK-PARA0      DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    WRK-PARA-PRTKBN
+                    ","            DELIMITED   BY  SIZE
+                    WRK-PARA-HOSPNUM
+                                   DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    RECEERR        DELIMITED   BY  SPACE
+                                   INTO    WRK-ARG
+           END-STRING
+           DISPLAY "ORCR0610 start = [" WRK-ARG "]"
            CALL    "ORCR0610"          USING
                                        WRK-ARG
       *

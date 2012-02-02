@@ -33,6 +33,7 @@
       *
       *  04.06.01    NACL-Æ£¸¶    10/10/12  ¸øÈñÃ±ÆÈ¤Î¥ì¥»Ê¬Î¥ÂÐ±þ
       *                                     kohid ÄÉ²Ã
+      *  04.06.02    NACL-Æ£¸¶    11/12/12  ÅÀ¸¡¥ì¥»£°ÅÀ¸øÈñ°õ»úÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -152,6 +153,7 @@
                WHEN    "04"
                    PERFORM 2003-KBN03-HENSYU-SEC
                WHEN    "06"
+               WHEN    "08"
                    PERFORM 2006-KBN06-HENSYU-SEC
                WHEN    "07"
                    PERFORM 2007-KBN07-HENSYU-SEC
@@ -879,11 +881,17 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYUKA-HOSPNUM
                                    TO  SYUKA-TEISYUTUSAKI
            MOVE    SYUKA-REC       TO  MCPDATA-REC
            MOVE    "tbl_syuka"     TO  MCP-TABLE
-           MOVE    "key7"          TO  MCP-PATHNAME
+           IF      LNK-SYUACC-I-KBN    =   "06"               
+               MOVE    "key7"          TO  WRK-MCP-PATHNAME
+           ELSE
+               MOVE    "key17"         TO  WRK-MCP-PATHNAME
+           END-IF
+           MOVE    WRK-MCP-PATHNAME
+                                   TO  MCP-PATHNAME
 grpsys     PERFORM 900-DBSELECT-SEC
            IF      MCP-RC          =   ZERO
                MOVE    "tbl_syuka"         TO  MCP-TABLE
-               MOVE    "key7"              TO  MCP-PATHNAME
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
                PERFORM 910-SYUKA-READ-N-SEC
            ELSE
                MOVE    1               TO  FLG-SYUKA
@@ -898,12 +906,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                PERFORM 20011-KBN01-SYUACC-HENSYU-SEC
       *        
                MOVE    "tbl_syuka"         TO  MCP-TABLE
-               MOVE    "key7"              TO  MCP-PATHNAME
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
                PERFORM 910-SYUKA-READ-N-SEC
            END-PERFORM   
       *     
            MOVE    "tbl_syuka"     TO  MCP-TABLE
-           MOVE    "key7"          TO  MCP-PATHNAME
+           MOVE    WRK-MCP-PATHNAME
+                                   TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
       *    

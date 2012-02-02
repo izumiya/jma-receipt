@@ -1018,13 +1018,13 @@
       <class>GtkLabel</class>
       <name>SYOKBN</name>
       <x>100</x>
-      <y>5</y>
-      <width>270</width>
+      <y>3</y>
+      <width>350</width>
       <height>24</height>
-      <label>£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹</label>
+      <label>£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
-      <xalign>0.5</xalign>
+      <xalign>0</xalign>
       <yalign>0.5</yalign>
       <xpad>0</xpad>
       <ypad>0</ypad>
@@ -1033,7 +1033,7 @@
     <widget>
       <class>GtkLabel</class>
       <name>HYODAI</name>
-      <x>400</x>
+      <x>460</x>
       <y>3</y>
       <width>220</width>
       <height>24</height>

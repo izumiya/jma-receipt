@@ -55,7 +55,7 @@
                     06  R01-TKOU     PIC X(4).
                   05  R01-SELECT  PIC X       OCCURS  500 TIMES.
               03  R01-SYOKBN-STYLE   PIC X(20).
-              03  R01-SYOKBN         PIC X(38).
+              03  R01-SYOKBN         PIC X(50).
               03  R01-LABEL.
                 04  R01-VALUE   PIC X(10).
               03  R01-LABEL1.

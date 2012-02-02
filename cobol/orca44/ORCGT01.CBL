@@ -146,6 +146,8 @@
       *                                     システム管理の設定に従い、災
       *                                     害該当レセプトのレセ電データ
       *                                     のチェックを追加
+      *
+      *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -249,6 +251,9 @@
       *
            03  WRK-GMN-CUR         PIC 9(02).
            03  WRK-MCP-WIDGET      PIC X(64).
+      *
+           03  WRK-MCP-TABLE       PIC X(64).
+           03  WRK-MCP-PATHNAME    PIC X(64).
       *
            03  WRK-PRTNM           PIC 9(04).
            03  WRK-PRTNM-R         REDEFINES   WRK-PRTNM.
@@ -1006,14 +1011,15 @@ grpsys                                         SPA-AREA
       ******** MOVE    "F"                 TO  SPA-DATAKBN3-VALUE  
       *****END-IF
       *
-           IF      SYS-2005-KKHRECEKBN =   "1" OR  "2" OR  "3"
+           IF      SPA-NAI-2005-KKHRECEKBN
+                                      =   "1" OR  "2" OR  "3"
                CONTINUE
            ELSE
                MOVE    WIDGET-INSENSITIVE TO  SPA-DATAKBN6-STATE
                MOVE    "F"                TO  SPA-DATAKBN6-VALUE  
            END-IF
       *
-           IF      SYS-200501-KOUIKIRECEKBN
+           IF      SPA-NAI-200501-KOUIKIRECEKBN
                                        =   "1" OR  "2" OR  "3"
                CONTINUE
            ELSE
@@ -1036,6 +1042,9 @@ grpsys                                         SPA-AREA
       *
       *    未実施の未請求解除データのチェック処理
            PERFORM 3101-SYUKA-CHECK-SEC
+      *
+      *    点検レセ０点公費記載の請求管理のチェック処理
+           PERFORM 3104-SEIKYU-CHECK-SEC
       *
            MOVE    1               TO  SPA-GMN-PAGE
            MOVE    1               TO  SPA-GMN-CUR
@@ -1368,6 +1377,114 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        3103-SYSKANRI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点検レセ０点公費記載の請求管理のチェック処理
+      *****************************************************************
+       3104-SEIKYU-CHECK-SEC            SECTION.
+      *
+           INITIALIZE                      SPA-NAI-RECEDEN-CHK
+      *
+      *****社保分チェック
+      *     MOVE    SPACE               TO  RECE10-REC
+      *    INITIALIZE                      RECE10-REC
+      *     MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+      *     MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
+      *     MOVE    "%"                 TO  RECE10-NYUGAIKBN
+      *     MOVE    1                   TO  RECE10-TEISYUTUSAKI
+      *     MOVE    "key78"             TO  WRK-MCP-PATHNAME
+      *     PERFORM 900-SEIKYU-READ-SEC
+      *
+      *     IF      FLG-RECE10          =   ZERO
+      *         MOVE    "1"                 TO  SPA-NAI-RECEDEN-CHK1
+      *     END-IF
+      *
+      *    国保分チェック
+      *     MOVE    SPACE               TO  RECE10-REC
+      *     INITIALIZE                      RECE10-REC
+      *     MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+      *     MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
+      *     MOVE    "%"                 TO  RECE10-NYUGAIKBN
+      *     MOVE    2                   TO  RECE10-TEISYUTUSAKI
+      *     MOVE    "key78"             TO  WRK-MCP-PATHNAME
+      *     PERFORM 900-SEIKYU-READ-SEC
+      *
+      *     IF      FLG-RECE10          =   ZERO
+      *         MOVE    "1"                 TO  SPA-NAI-RECEDEN-CHK2
+      *     END-IF
+      *
+      *    広域分チェック
+      *     MOVE    SPACE               TO  RECE10-REC
+      *     INITIALIZE                      RECE10-REC
+      *     MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+      *     MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
+      *     MOVE    "%"                 TO  RECE10-NYUGAIKBN
+      *     MOVE    6                   TO  RECE10-TEISYUTUSAKI
+      *     MOVE    "key78"             TO  WRK-MCP-PATHNAME
+      *     PERFORM 900-SEIKYU-READ-SEC
+      *
+      *     IF      FLG-RECE10          =   ZERO
+      *         MOVE    "1"                 TO  SPA-NAI-RECEDEN-CHK3
+      ******END-IF
+      *
+      *    ０点公費の有無チェック
+           MOVE    SPACE               TO  RECE10-REC
+           INITIALIZE                      RECE10-REC
+           MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+           MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
+           MOVE    "%"                 TO  RECE10-NYUGAIKBN
+           MOVE    "key79"             TO  WRK-MCP-PATHNAME
+           PERFORM 900-SEIKYU-READ-SEC
+      *
+           IF      FLG-RECE10          =   ZERO
+               MOVE    "111"               TO  SPA-NAI-RECEDEN-CHK
+           END-IF
+      *
+           IF      SPA-NAI-RECEDEN-CHK  =   SPACE
+               MOVE    "1"                 TO  SPA-GMN-PRTKBNL       (1)
+               MOVE    "提出用"            TO  SPA-GMN-PRTKBNMEIL    (1)
+               MOVE    "2"                 TO  SPA-GMN-PRTKBNL       (2)
+               MOVE    "点検用（院外処方含）"
+                                           TO  SPA-GMN-PRTKBNMEIL    (2)
+               MOVE    2                   TO  SPA-GMN-PRTKBN-MAX
+      *
+               MOVE    SPACE               TO  SPA-GMN-TITLE
+           ELSE
+               MOVE    "2"                 TO  SPA-GMN-PRTKBNL       (1)
+               MOVE    "点検用（院外処方含）"
+                                           TO  SPA-GMN-PRTKBNMEIL    (1)
+               MOVE    1                   TO  SPA-GMN-PRTKBN-MAX
+      *
+               STRING  "該当の診療年月に０点公費記載ありの点検用レセ"
+                                               DELIMITED  BY  SIZE
+                       "プトがあるため、医保分は点検用レセ電データの"
+                                               DELIMITED  BY  SIZE
+                       "作成のみ可能です"      DELIMITED  BY  SIZE
+                                               INTO  SPA-GMN-TITLE
+               END-STRING
+      *
+               MOVE    WIDGET-INSENSITIVE  TO  SPA-DATAKBN1-STATE
+                                               SPA-DATAKBN3-STATE
+                                               SPA-DATAKBN4-STATE
+                                               SPA-DATAKBN5-STATE
+                                               SPA-DATAKBN6-STATE
+                                               SPA-B09-STATE
+                                               SPA-B10-STATE
+                                               SPA-B21-STATE
+                                               SPA-B22-STATE
+               MOVE    "F"                 TO  SPA-DATAKBN1-VALUE
+                                               SPA-DATAKBN3-VALUE
+                                               SPA-DATAKBN4-VALUE
+                                               SPA-DATAKBN5-VALUE
+                                               SPA-DATAKBN6-VALUE
+           END-IF
+      *
+           MOVE    SPA-GMN-PRTKBNLST (1)
+                                       TO  SPA-GMN-PRTKBN-G
+      *
+           .
+       3104-SEIKYU-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2350,7 +2467,6 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "DATAKBN2"
                    MOVE    T01-DATAKBN2-VALUE  TO  SPA-DATAKBN2-VALUE
            END-EVALUATE
-      *
            .
        400-DATAKBN-EXT.
            EXIT.
@@ -2409,6 +2525,44 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            IF      SPA-NAI-SKYYM  NOT =   WRK-SKYYM-OLD
       *        診療年月によるシステム管理の取得処理
                PERFORM 3103-SYSKANRI-HENSYU-SEC
+      *
+               MOVE    WIDGET-NORMAL       TO  SPA-DATAKBN1-STATE
+                                               SPA-DATAKBN3-STATE       
+                                               SPA-DATAKBN4-STATE       
+                                               SPA-DATAKBN5-STATE       
+                                               SPA-B09-STATE
+                                               SPA-B10-STATE
+                                               SPA-B21-STATE
+                                               SPA-B22-STATE
+      *
+               MOVE    "T"                 TO  SPA-DATAKBN1-VALUE  
+               MOVE    "T"                 TO  SPA-DATAKBN3-VALUE  
+               MOVE    "T"                 TO  SPA-DATAKBN4-VALUE  
+               MOVE    "T"                 TO  SPA-DATAKBN5-VALUE  
+               MOVE    "F"                 TO  SPA-DATAKBN7-VALUE
+               IF      SPA-NAI-PRTKBN3 NOT =   SPACE
+                   MOVE    WIDGET-NORMAL       TO  SPA-DATAKBN6-STATE
+                   MOVE    "T"                 TO  SPA-DATAKBN6-VALUE
+               ELSE
+                   MOVE    WIDGET-INSENSITIVE  TO  SPA-DATAKBN6-STATE
+                   MOVE    "F"                 TO  SPA-DATAKBN6-VALUE  
+               END-IF
+      *
+               IF      SPA-NAI-2005-KKHRECEKBN
+                                          =   "1" OR  "2" OR  "3"
+                   CONTINUE
+               ELSE
+                   MOVE    WIDGET-INSENSITIVE TO  SPA-DATAKBN6-STATE
+                   MOVE    "F"                TO  SPA-DATAKBN6-VALUE  
+               END-IF
+      *
+               IF      SPA-NAI-200501-KOUIKIRECEKBN
+                                           =   "1" OR  "2" OR  "3"
+                   CONTINUE
+               ELSE
+                   MOVE    WIDGET-INSENSITIVE TO  SPA-DATAKBN2-STATE
+                   MOVE    "F"                TO  SPA-DATAKBN2-VALUE  
+               END-IF
            END-IF
       *
       *    診療年月によるレセ電作成区分の設定
@@ -2425,6 +2579,9 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            ELSE
       *        未実施の未請求解除データのチェック処理
                PERFORM 3101-SYUKA-CHECK-SEC
+      *
+      *        点検レセ０点公費記載の請求管理のチェック処理
+               PERFORM 3104-SEIKYU-CHECK-SEC
            END-IF
       *
            .
@@ -4126,7 +4283,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_seikyu"        TO  MCP-TABLE
                MOVE    "key69"             TO  MCP-PATHNAME
-               PERFORM 900-SEIKYU-READ-SEC
+               PERFORM 900-SEIKYU-READ-N-SEC
            ELSE
                MOVE    1                   TO  FLG-RECE10
            END-IF
@@ -4153,7 +4310,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
                MOVE    "tbl_seikyu"        TO  MCP-TABLE
                MOVE    "key69"             TO  MCP-PATHNAME
-               PERFORM 900-SEIKYU-READ-SEC
+               PERFORM 900-SEIKYU-READ-N-SEC
            END-PERFORM
            MOVE    "tbl_seikyu"        TO  MCP-TABLE
            MOVE    "key69"             TO  MCP-PATHNAME
@@ -4174,7 +4331,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_seikyu"        TO  MCP-TABLE
                MOVE    "key68"             TO  MCP-PATHNAME
-               PERFORM 900-SEIKYU-READ-SEC
+               PERFORM 900-SEIKYU-READ-N-SEC
            ELSE
                MOVE    1                   TO  FLG-RECE10
            END-IF
@@ -5237,6 +5394,9 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-DATA-STATE      TO  T01-DATA-STATE
            MOVE    SPA-NYUGAIKBN-STATE TO  T01-NYUGAIKBN-STATE
            MOVE    SPA-PRTKBN-STATE    TO  T01-PRTKBN-STATE
+           MOVE    SPA-B09-STATE       TO  T01-B09-STATE
+           MOVE    SPA-B10-STATE       TO  T01-B10-STATE
+           MOVE    SPA-B22-STATE       TO  T01-B22-STATE
       *
            MOVE    SPA-DATAKBN1-STATE  TO  T01-DATAKBN1-STATE
            MOVE    SPA-DATAKBN2-STATE  TO  T01-DATAKBN2-STATE
@@ -5344,6 +5504,31 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                                                T01-DATAKBN2-VALUE
            END-IF
       *****MOVE    WIDGET-INSENSITIVE  TO  T01-HKNJANUM1-STATE
+      *
+      *    ０点公費記載ありのとき
+           IF      SPA-NAI-RECEDEN-CHK  =   SPACE
+               CONTINUE
+           ELSE
+               MOVE    WIDGET-INSENSITIVE  TO  T01-DATAKBN1-STATE
+                                               T01-DATAKBN2-STATE
+                                               T01-DATAKBN3-STATE
+                                               T01-DATAKBN4-STATE
+                                               T01-DATAKBN5-STATE
+                                               T01-DATAKBN6-STATE
+      **************************************** T01-B06-STATE
+      **************************************** T01-B07-STATE
+      **************************************** T01-B08-STATE
+                                               T01-B09-STATE
+                                               T01-B10-STATE
+      **************************************** T01-B16-STATE
+                                               T01-B21-STATE
+                                               T01-B22-STATE
+               MOVE    "F"                 TO  T01-DATAKBN1-VALUE
+                                               T01-DATAKBN3-VALUE
+                                               T01-DATAKBN4-VALUE
+                                               T01-DATAKBN5-VALUE
+                                               T01-DATAKBN6-VALUE
+           END-IF
       *
            PERFORM 5001-MAPCUR-SEC
       *
@@ -6043,18 +6228,42 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *****************************************************************
       *    請求管理読込
       *****************************************************************
-       900-SEIKYU-READ-SEC           SECTION.
+       900-SEIKYU-READ-N-SEC           SECTION.
       *
            PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-RECE10
                MOVE    MCPDATA-REC         TO  RECE10-REC
                IF      RECE10-RECESYUBETU  =    "6666"
-                   GO  TO  900-SEIKYU-READ-SEC
+                   GO  TO  900-SEIKYU-READ-N-SEC
                END-IF
            ELSE
                MOVE    1                   TO  FLG-RECE10
            END-IF
+           .
+       900-SEIKYU-READ-N-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    請求管理読込
+      *****************************************************************
+       900-SEIKYU-READ-SEC             SECTION.
+      *
+           MOVE    RECE10-REC          TO  MCPDATA-REC
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_seikyu"        TO  MCP-TABLE
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+               PERFORM 900-SEIKYU-READ-N-SEC
+           ELSE
+               MOVE    1                   TO  FLG-RECE10
+           END-IF
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
            .
        900-SEIKYU-READ-EXT.
            EXIT.

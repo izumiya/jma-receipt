@@ -130,6 +130,8 @@
       *  04.05.02    NACL-藤原    09/06/18  社保レセプト遍綴順対応
       *  04.05.03    NACL-藤原    09/08/19  全件印刷時の自費レセプトの
       *                                     印刷指定対応
+      *
+      *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -251,7 +253,7 @@
                05  WRK-WMM         PIC 9(02).
                05  WRK-WDD         PIC 9(02).
            03  WRK-RECEERR         PIC X(200).
-           03  WRK-PRTKBN          PIC X(10).
+           03  WRK-PRTKBN          PIC X(30).
            03  WRK-RECEKBN         PIC X(10).
            03  WRK-NYUGAIKBN       PIC X(06).
            03  WRK-PREFKBN         PIC X(01).
@@ -614,7 +616,12 @@
            IF      SPA-R01-PRTKBN  =   "2"
                MOVE    "【点検用】"    TO  WRK-PRTKBN
            ELSE
-               MOVE    SPACE           TO  WRK-PRTKBN
+               IF      SPA-R01-PRTKBN  =   "3"
+                   MOVE    "【点検用（０点公費記載設定）】"
+                                           TO  WRK-PRTKBN
+               ELSE
+                   MOVE    SPACE           TO  WRK-PRTKBN
+               END-IF
            END-IF
       *
       *    ファイル作成区分
@@ -7895,7 +7902,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-RIDCD3           TO  RID3-ID1CODE
            MOVE    WRK-RIDMSG           TO  RID3-ID1MSG
            MOVE    "blue"               TO  RID3-LABEL-STYLE
-           IF      SPA-R01-PRTKBN       =   "2"
+           IF      SPA-R01-PRTKBN       =   "2" OR  "3"
                MOVE    "【点検用レセプト】"     TO  RID3-LABEL
            END-IF
            MOVE    "B12"                TO  MCP-WIDGET

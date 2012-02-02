@@ -41,6 +41,8 @@
       *  04.05.02    NACL-藤原    09/06/18  社保レセプト遍綴順対応
       *  04.05.03    NACL-藤原    09/08/19  全件印刷時の自費レセプトの
       *                                     印刷指定対応
+      *
+      *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        01  SPA-R02.
@@ -61,7 +63,7 @@
                05  SPA-GMN-CUR                     PIC 9(03).
                05  SPA-GMN-AREA.
                    07  SPA-GMN-SYOKBN              PIC X(01).
-                   07  SPA-GMN-FILEKBN             PIC X(52).
+                   07  SPA-GMN-FILEKBN             PIC X(72).
                    07  SPA-GMN-MSG                 PIC X(42).
                    07  SPA-GMN-CREYMD              PIC X(22).
                    07  SPA-GMN-PAGEH               PIC 9(04).

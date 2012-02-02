@@ -42,6 +42,7 @@
       *
       *  04.06.01    NACL-Æ£¸¶    10/10/12  ¸øÈñÃ±ÆÈ¤Î¥ì¥»Ê¬Î¥ÂÐ±þ
       *                                     kohid ÄÉ²Ã
+      *  04.06.02    NACL-Æ£¸¶    11/12/12  ÅÀ¸¡¥ì¥»£°ÅÀ¸øÈñ°õ»úÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -150,7 +151,7 @@
                                            =   "01"    OR  "02"    OR
                                                "03"    OR  "04"    OR
                                                "05"    OR  "06"    OR
-                                               "07"
+                                               "07"    OR  "08"
                            CONTINUE
                        ELSE
                            MOVE    1               TO  FLG-END
@@ -159,7 +160,7 @@
                        IF      LNK-SYUACC-I-KBN
                                            =   "01"    OR  "02"    OR
                                                "05"    OR  "06"    OR
-                                               "07"
+                                               "07"    OR  "08"
                            CONTINUE
                        ELSE
                            MOVE    1               TO  FLG-END
@@ -238,7 +239,8 @@
                END-EVALUATE
            ELSE
                IF      LNK-SYUACC-I-KBN    =   "01"    OR  "02"    OR  
-                                               "06"    OR  "07"
+                                               "06"    OR  "07"    OR
+                                               "08"
                    PERFORM 2004-ORCSSYUACC-SEC
                ELSE
                    IF      SPA-SYUKA-MODE  =   "2"

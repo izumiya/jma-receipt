@@ -133,6 +133,7 @@
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
       *  04.06.02    NACL-藤原    10/07/10  病名記載順設定対応
+      *  04.06.03    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -321,6 +322,12 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-INSPECT-CHARACTER-KBNMEI
                                               PIC X(34).
+                       09  SPA-GMN-INSPECT-ZERO-KBN-G.
+                           11  SPA-GMN-INSPECT-ZERO-KBN
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-INSPECT-ZERO-KBNMEI
+                                              PIC X(22).
                        09  SPA-GMN-SEIHO-DSPKBN-G.
                            11  SPA-GMN-SEIHO-DSPKBN
                                               PIC X(01).
@@ -888,6 +895,15 @@
                        09  SPA-GMN-INSPECT-CHARACTER-KBNMEIL
                                               PIC X(34).
                    07  SPA-GMN-INSPECT-CHARACTER-KBN-MAX
+                                              PIC 9(02).    
+      *                                        
+                   07  SPA-GMN-INSPECT-ZERO-KBNLST     OCCURS  5.
+                       09  SPA-GMN-INSPECT-ZERO-KBNL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-INSPECT-ZERO-KBNMEIL
+                                              PIC X(22).
+                   07  SPA-GMN-INSPECT-ZERO-KBN-MAX
                                               PIC 9(02).    
       *                                        
                    07  SPA-GMN-SEIHO-DSPKBNLST         OCCURS  5.
@@ -2098,6 +2114,19 @@
                                    SPA-GMN-INSPECT-CHARACTER-KBNMEIL(2)
            MOVE    2                   TO
                                    SPA-GMN-INSPECT-CHARACTER-KBN-MAX 
+      *     
+           MOVE    "0"                 TO
+                                   SPA-GMN-INSPECT-ZERO-KBNL   (1)
+           MOVE    "０点公費を記載しない"
+                                       TO
+                                   SPA-GMN-INSPECT-ZERO-KBNMEIL(1)
+           MOVE    "1"                 TO
+                                   SPA-GMN-INSPECT-ZERO-KBNL   (2)
+           MOVE    "０点公費を記載する"
+                                       TO
+                                   SPA-GMN-INSPECT-ZERO-KBNMEIL(2)
+           MOVE    2                   TO
+                                   SPA-GMN-INSPECT-ZERO-KBN-MAX 
       *     
            MOVE    "0"                 TO  SPA-GMN-SEIHO-DSPKBNL(1)
            MOVE    "患者番号順"        TO  SPA-GMN-SEIHO-DSPKBNMEIL
@@ -3323,6 +3352,20 @@
                END-IF
            END-PERFORM
       *
+           MOVE    SYS-200501-INSPECT-ZERO-KBN
+                                       TO  SPA-GMN-INSPECT-ZERO-KBN
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-GMN-INSPECT-ZERO-KBN-MAX
+               IF      SPA-GMN-INSPECT-ZERO-KBN 
+                               =   SPA-GMN-INSPECT-ZERO-KBNL (IDY)
+                   MOVE    SPA-GMN-INSPECT-ZERO-KBNLST (IDY)
+                                       TO
+                                       SPA-GMN-INSPECT-ZERO-KBN-G
+                   MOVE    SPA-GMN-INSPECT-ZERO-KBN-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
            MOVE    SYS-200501-SEIHO-DSPKBN
                                        TO  SPA-GMN-SEIHO-DSPKBN
            PERFORM VARYING IDY FROM    1   BY  1
@@ -3999,6 +4042,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                            TO
                                        SPA-GMN-INSPECT-CHARACTER-KBN-G
            END-IF                                              
+           IF     SPA-GMN-INSPECT-ZERO-KBN-G
+                                       =   SPACE
+               MOVE    SPA-GMN-INSPECT-ZERO-KBNLST (1)
+                                           TO SPA-GMN-INSPECT-ZERO-KBN-G
+           END-IF                                              
            IF     SPA-GMN-SEIHO-DSPKBN-G   =   SPACE
                MOVE    SPA-GMN-SEIHO-DSPKBNLST (1)
                                            TO
@@ -4109,6 +4157,8 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    W12-BYOMEI-PRTJYUN  TO  SPA-GMN-BYOMEI-PRTJYUN-G 
            MOVE    W12-INSPECT-CHARACTER-KBN  TO
                                        SPA-GMN-INSPECT-CHARACTER-KBN-G 
+           MOVE    W12-INSPECT-ZERO-KBN       TO
+                                       SPA-GMN-INSPECT-ZERO-KBN-G 
            MOVE    W12-SEIHO-DSPKBN    TO  SPA-GMN-SEIHO-DSPKBN-G 
            MOVE    W12-SYAPRTNM-NEXT   TO  SPA-GMN-SYAPRTNM-NEXT
            MOVE    W12-KKHPRTNM-NEXT   TO  SPA-GMN-KKHPRTNM-NEXT
@@ -4303,6 +4353,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4181-INSPECT-CHARACTER-KBN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4184-INSPECT-ZERO-KBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -5373,6 +5428,36 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF    
            .
        4181-INSPECT-CHARACTER-KBN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点検用レセプト０点公費記載区分チェック
+      *****************************************************************
+       4184-INSPECT-ZERO-KBN-CHK-SEC      SECTION.
+      *
+           IF      SPA-GMN-INSPECT-ZERO-KBN
+                                   =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >   SPA-GMN-INSPECT-ZERO-KBN-MAX
+                        OR     SPA-GMN-INSPECT-ZERO-KBN
+                                   =
+                                   SPA-GMN-INSPECT-ZERO-KBNL (IDY)
+                   CONTINUE
+               END-PERFORM
+      * 
+               IF      IDY <=      SPA-GMN-INSPECT-ZERO-KBN-MAX
+                   MOVE    SPA-GMN-INSPECT-ZERO-KBNLST (IDY)
+                                          TO
+                                      SPA-GMN-INSPECT-ZERO-KBN-G
+               ELSE
+                   MOVE    67             TO  SPA-GMN-CUR
+                   MOVE    "0070"         TO  SPA-ERRCD
+               END-IF
+           END-IF    
+           .
+       4184-INSPECT-ZERO-KBN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -7646,6 +7731,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-INSPECT-CHARACTER-KBN
                                            TO
                                        SYS-200501-INSPECT-CHARACTER-KBN
+           MOVE    SPA-GMN-INSPECT-ZERO-KBN
+                                           TO
+                                           SYS-200501-INSPECT-ZERO-KBN
       *##  MOVE    SPA-GMN-ROUPRTKBN       TO  SYS-200501-ROUPRTKBN
       *##  MOVE    SPA-GMN-ROUPRTKBN-N     TO  SYS-200501-ROUPRTKBN-N
            MOVE    SYS-200501-REC          TO  SYSKANRI-REC
@@ -7999,6 +8087,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-INSPECT-CHARACTER-KBN-G
                                             TO
                                             W12-INSPECT-CHARACTER-KBN
+           MOVE    SPA-GMN-INSPECT-ZERO-KBN-G
+                                            TO  W12-INSPECT-ZERO-KBN
            MOVE    SPA-GMN-SEIHO-DSPKBN-G   TO  W12-SEIHO-DSPKBN
            MOVE    SPA-GMN-RECECOMKBN-G     TO  W12-RECECOMKBN
            MOVE    SPA-GMN-SRYKAHENKBN-G    TO  W12-SRYKAHENKBN
@@ -8269,6 +8359,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-INSPECT-CHARACTER-KBN-MAX
                                        TO
                                    W12-INSPECT-CHARACTER-KBN-COUNT 
+      *     
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >   SPA-GMN-INSPECT-ZERO-KBN-MAX
+               MOVE    SPA-GMN-INSPECT-ZERO-KBNLST (IDY)
+                                       TO  W12-INSPECT-ZERO-KBNLST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-INSPECT-ZERO-KBN-MAX
+                                       TO  W12-INSPECT-ZERO-KBN-COUNT 
       *     
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-SEIHO-DSPKBN-MAX
@@ -8997,6 +9095,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0069"
                    MOVE    "労災様式選択（入院）入力エラー"
                                                          TO  SPA-ERRMSG
+               WHEN    "0070"
+                   MOVE    "点検用レセプト０点公費記載入力エラー"
+                                                         TO  SPA-ERRMSG
       *
                WHEN    "0096"
                    STRING  "一括作成出力順（国保）の指定が編綴順です。"
@@ -9188,6 +9289,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "BYOMEI_PRTJYUN"   TO   MCP-WIDGET
                 WHEN    66
                     MOVE  "INSPECT_CHAR"     TO   MCP-WIDGET
+                WHEN    67
+                    MOVE  "INSPECT_ZERO"     TO   MCP-WIDGET
                 WHEN    62
                     MOVE  "SEIHO_DSPKBN"     TO   MCP-WIDGET
       *
@@ -9388,7 +9491,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    43  THRU    44
                 WHEN    60
                 WHEN    62
-                WHEN    64  THRU    66
+                WHEN    64  THRU    67
                     MOVE    0                TO  W12-PAGENO
                 WHEN    9
                 WHEN    10
@@ -9473,6 +9576,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "BYOMEI_PRTJYUN"
                    MOVE    66          TO  SPA-GMN-CUR
                WHEN    "INSPECT_CHAR"
+                   MOVE    67          TO  SPA-GMN-CUR
+               WHEN    "INSPECT_ZERO"
                    MOVE    8           TO  SPA-GMN-CUR
                WHEN    "PREFPRGID"
                    IF      SPA-BEDSU       >   ZERO

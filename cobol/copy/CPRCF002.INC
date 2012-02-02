@@ -127,6 +127,8 @@
       *  04.06.03    NACL-門脇    10/12/13  請求額情報の追加
       *  04.06.04    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.05    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.06    NACL-藤原    12/01/06  予備を２０に変更
       ************************************************************
       *01  RECE02-REC.
            03  RECE02-KEY.
@@ -691,8 +693,11 @@
       *公費負担
                05  RECE02-SKYIRYO-KOHFTN       PIC 9(09).
       *
+      *点検レセ０点公費フラグ
+           03  RECE02-TENKEN-FLG               PIC X(01).
+      *
       *予備
            03  RECE02-YOBIETC-AREA.
-               05  RECE02-YOBIETCINF          OCCURS 10.
+               05  RECE02-YOBIETCINF          OCCURS 20.
                    07  RECE02-YOBIETC     PIC  9(09).
       *

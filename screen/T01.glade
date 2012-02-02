@@ -1071,11 +1071,11 @@
     <widget>
       <class>GtkLabel</class>
       <name>TITLE</name>
-      <x>448</x>
-      <y>30</y>
-      <width>290</width>
-      <height>24</height>
-      <label>£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°</label>
+      <x>50</x>
+      <y>8</y>
+      <width>780</width>
+      <height>18</height>
+      <label>£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ£¶£·£¸£¹£°£±£²£³£´£µ</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0</xalign>

@@ -64,6 +64,7 @@
       *                                     の作成のチェックを追加
       *
       *  04.06.01    NACL-藤原    10/12/20  保険者からの返戻対応
+      *  04.06.02    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        01  SPA-T01FREE.
@@ -127,7 +128,7 @@
                    07  SPA-GMN-HKNJAMEI            PIC X(50). 
                    07  SPA-GMN-HKNJANUM1           PIC X(08).
                    07  SPA-GMN-HKNJAMEI1           PIC X(50). 
-                   07  SPA-GMN-TITLE               PIC X(40). 
+                   07  SPA-GMN-TITLE               PIC X(108). 
       *
                05  SPA-NAIB-T01-AREA.
                    07  SPA-NAI-WIDGET              PIC X(08). 
@@ -141,16 +142,23 @@
                    07  SPA-NAI-PRTKBN5             PIC X(01).
                    07  SPA-NAI-HKNJANUM            PIC X(08). 
                    07  SPA-NAI-HKNJANUM1           PIC X(08). 
+                   07  SPA-NAI-RECEDEN-CHK.
+                       09  SPA-NAI-RECEDEN-CHK1    PIC X(01).
+                       09  SPA-NAI-RECEDEN-CHK2    PIC X(01).
+                       09  SPA-NAI-RECEDEN-CHK3    PIC X(01).
       *
                05  SPA-STATE.             
                    07  SPA-B06-STATE               PIC S9(09)  BINARY.
                    07  SPA-B07-STATE               PIC S9(09)  BINARY.
                    07  SPA-B08-STATE               PIC S9(09)  BINARY.
+                   07  SPA-B09-STATE               PIC S9(09)  BINARY.
+                   07  SPA-B10-STATE               PIC S9(09)  BINARY.
                    07  SPA-B15-STATE               PIC S9(09)  BINARY.
                    07  SPA-B16-STATE               PIC S9(09)  BINARY.
                    07  SPA-B19-STATE               PIC S9(09)  BINARY.
                    07  SPA-B20-STATE               PIC S9(09)  BINARY.
                    07  SPA-B21-STATE               PIC S9(09)  BINARY.
+                   07  SPA-B22-STATE               PIC S9(09)  BINARY.
                    07  SPA-DATA-STATE              PIC S9(09)  BINARY.
                    07  SPA-NYUGAIKBN-STATE         PIC S9(09)  BINARY.
                    07  SPA-PRTKBN-STATE            PIC S9(09)  BINARY.
@@ -161,6 +169,8 @@
                    07  SPA-DATAKBN5-STATE          PIC S9(09)  BINARY.
                    07  SPA-DATAKBN6-STATE          PIC S9(09)  BINARY.
                    07  SPA-DATAKBN7-STATE          PIC S9(09)  BINARY.
+      *
+                   07  SPA-SYOKBN1-STATE           PIC S9(09)  BINARY.
       *
                05  SPA-DATAKBN.         
                    07  SPA-DATAKBN3-VALUE          PIC X(01).

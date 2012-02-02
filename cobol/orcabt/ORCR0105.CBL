@@ -150,6 +150,7 @@
       *                                     キーにkohid 追加
       *                                     調査用にcrehms,updhms 追加
       *  04.06.06    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
+      *  04.06.07    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1087,6 +1088,10 @@
                05  FILLER          PIC X(46)   VALUE
                    "生保の負担者番号、受給者番号の入力がありません". 
       *
+           03  WRK-ERR-MSG-15.
+               05  FILLER          PIC X(20)  VALUE
+                   "【０点公費記載あり】".
+      *
        01  WRK-CONS-AREA.    
       *    固定端末ＩＤ
            03  WRK-CONS-TERMID         PIC X(32)   VALUE
@@ -1267,7 +1272,11 @@
                                                RECEERR
            END-UNSTRING
       *
-           DISPLAY "WRK-PARA-DLTKBN=" WRK-PARA-DLTKBN 
+           DISPLAY "WRK-PARA-HOSPNUM=" WRK-PARA-HOSPNUM
+           DISPLAY "WRK-PARA-SYOKBN =" WRK-PARA-SYOKBN
+           DISPLAY "WRK-PARA-SRYYM  =" WRK-PARA-SRYYM
+           DISPLAY "WRK-PARA-PRTKBN =" WRK-PARA-PRTKBN
+           DISPLAY "WRK-PARA-DLTKBN =" WRK-PARA-DLTKBN 
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
@@ -1761,7 +1770,6 @@
            END-IF
            DISPLAY "SYS-200501-INSPECT-CHARACTER-KBN="
                                     SYS-200501-INSPECT-CHARACTER-KBN
-                    " " WRK-PARA-PRTKBN
       *         
       *    レセプト編綴順情報
            MOVE    SPACE               TO  SYSKANRI-REC
@@ -2457,6 +2465,13 @@
            PERFORM 900-SEIKYU-INV-SEC
            IF      FLG-SEIKYU          =   ZERO
                MOVE    MCPDATA-REC         TO  RECE10-REC
+      *        点検用レセ０点公費のとき作成しない
+               IF      RECE10-SKYKBN-RECEDEN   =   "1"
+                   DISPLAY "RECE10-SKYKBN-RECEDEN="
+                                               RECE10-SKYKBN-RECEDEN
+                   GO  TO  20022-KOHSKY-WRITE-EXT
+               END-IF
+      *    
                MOVE    RECE10-RECESYUBETU  TO  KOHSKY-RECESYUBETU
                MOVE    RECE10-RECEKA       TO  KOHSKY-RECEKA
                IF   RECE10-FLG (5)  NOT =  ZERO
@@ -2464,13 +2479,6 @@
                END-IF
            ELSE
                 GO  TO  20022-KOHSKY-WRITE-EXT
-      *         STRING  "レセプト種別が設定不能 PTNUM="
-      *                                     DELIMITED  BY  SIZE
-      *                 RECE02X-PTNUM       DELIMITED  BY  SIZE 
-      *                                     INTO  WRK-RECEERR
-      *         END-STRING
-      *         PERFORM 500-ERR-HENSYU-SEC
-      *         MOVE    1                  TO  FLG-ERR
            END-IF
       *
            PERFORM 900-KOHSKY-INV-SEC
@@ -2976,7 +2984,7 @@
            END-IF
       *
       *    点検用レセプト作成時
-           IF      WRK-PARA-PRTKBN     =   "2"
+           IF      WRK-PARA-PRTKBN     =   "2" OR  "3"
                IF      SYS-200501-INSPECT-CHARACTER-KBN
                                            =   "0"
                    MOVE    "点検用レセプト"    TO  HC06-LABEL
@@ -2994,6 +3002,14 @@
                MOVE    HC06-HEAD4-G (5:)    TO  WRK-HC06-HEAD4-G
                MOVE    WRK-ERR-MSG-9        TO  HC06-HEAD4-G (5:)
                MOVE    WRK-HC06-HEAD4-G     TO  HC06-HEAD4-G (53:)
+           END-IF
+      *
+      *    点検用レセプト作成時０点公費を記載したとき
+           IF      RECE02-TENKEN-FLG   =   "1"
+               MOVE    SPACE                TO  WRK-HC06-HEAD4-G
+               MOVE    HC06-HEAD4-G (5:)    TO  WRK-HC06-HEAD4-G
+               MOVE    WRK-ERR-MSG-15       TO  HC06-HEAD4-G (5:)
+               MOVE    WRK-HC06-HEAD4-G     TO  HC06-HEAD4-G (25:)
            END-IF
       *
            IF      CNT-PAGE            =   1
@@ -8605,6 +8621,10 @@
                END-IF 
                IF      WRK-PARA-PRTKBN     =   "2"
                    MOVE    "1"                 TO  RECE07-PRTKBN
+               ELSE
+                   IF      WRK-PARA-PRTKBN     =   "3"
+                       MOVE    "2"                 TO  RECE07-PRTKBN
+                   END-IF
                END-IF
                MOVE    1                   TO  RECE07-PAGE
                MOVE    1                   TO  RECE07-KENSU
@@ -9050,12 +9070,20 @@
            MOVE    "00000000000000000000000000000000000000000000000000"
                                        TO  RECE10-RESERVE-AREA
       *
-           IF      RECE02-SRYYM    >=   "201004"
-             MOVE    RECE02-SKYIRYO-INF    TO  RECE10-SKYIRYO-INF
-             PERFORM  VARYING  IDX  FROM  1  BY  1
-                       UNTIL   IDX   >   10
-               MOVE  RECE02-HKNCOMBI(IDX)  TO  RECE10-HKNCOMBI(IDX)
-             END-PERFORM
+           IF      RECE02-SRYYM    >=  "201004"
+               MOVE    RECE02-SKYIRYO-INF  TO  RECE10-SKYIRYO-INF
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       10
+                   MOVE    RECE02-HKNCOMBI (IDX)
+                                           TO  RECE10-HKNCOMBI (IDX)
+               END-PERFORM
+           END-IF
+      *
+      *    点検レセ０点公費フラグ
+           IF      RECE02-TENKEN-FLG   =   "1"
+               MOVE    "1"                 TO  RECE10-SKYKBN-RECEDEN
+           ELSE
+               MOVE    SPACE               TO  RECE10-SKYKBN-RECEDEN
            END-IF
       *
            MOVE    RECE10-REC          TO  MCPDATA-REC

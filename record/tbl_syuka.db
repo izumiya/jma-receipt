@@ -425,3 +425,22 @@ path	upd4	{
 		;
 	};
 };
+
+path	key17		{ 	
+	DBSELECT	{
+		DECLARE tbl_syuka_key17_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syuka
+			WHERE   HOSPNUM         =    :HOSPNUM
+			AND     SRYYM          =    :SRYYM
+			AND     NYUGAIKBN      =    :NYUGAIKBN
+			AND     TEISYUTUSAKI   LIKE :TEISYUTUSAKI
+			AND     PTID           =    :PTID
+			AND     RECESYUBETU    =    :RECESYUBETU
+			AND     HOJOKBN        =    :HOJOKBN
+			AND     KOHID          =    :KOHID
+			AND     DLT_FLG        <>   '1'
+			ORDER BY SRYKA,TEN_KBN
+		;
+	};
+};

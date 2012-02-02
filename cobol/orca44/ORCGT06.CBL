@@ -47,6 +47,7 @@
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.02    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -101,7 +102,6 @@
            03  FLG-MONTHLYNUM          PIC 9(01).
            03  FLG-PTKOHINF            PIC 9(01).
            03  FLG-HENREI-B            PIC 9(01).
-           03  FLG-RECE10              PIC 9(01).
       *
            03  FLG-CHK                 PIC 9(01).
            03  FLG-ERR                 PIC 9(01).
@@ -700,6 +700,9 @@
       *
       *    管理情報編集処理
            PERFORM 3101-ONRECE-KANRI-HENSYU-SEC
+      *
+      *    点検レセ０点公費記載の請求管理のチェック処理
+           PERFORM 3104-SEIKYU-CHECK-SEC
       *                 
            MOVE    1               TO  SPA-GMN-T06-CUR
       *
@@ -885,6 +888,72 @@
       *
            .
        3102-ONRECE-BODY-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点検レセ０点公費記載の請求管理のチェック処理
+      *****************************************************************
+       3104-SEIKYU-CHECK-SEC            SECTION.
+      *
+           INITIALIZE                      SPA-NAI-T06-RECEDEN-CHK
+      *
+      *****社保分チェック
+      *     MOVE    SPACE               TO  RECE10-REC
+      *    INITIALIZE                       RECE10-REC
+      *     MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+      *     MOVE    SPA-NAI-T06-SRYYM-H TO  RECE10-SKYYM
+      *     MOVE    "%"                 TO  RECE10-NYUGAIKBN
+      *     MOVE    1                   TO  RECE10-TEISYUTUSAKI
+      *     MOVE    "key78"             TO  WRK-MCP-PATHNAME
+      *     PERFORM 900-SEIKYU-INV-SEC
+      *
+      *     IF      FLG-SEIKYU          =   ZERO
+      *         MOVE    "1"                 TO  SPA-NAI-T06-RECEDEN-CHK1
+      *     END-IF
+      *
+      *    国保分チェック
+      *     MOVE    SPACE               TO  RECE10-REC
+      *     INITIALIZE                      RECE10-REC
+      *     MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+      *     MOVE    SPA-NAI-T06-SRYYM-H TO  RECE10-SKYYM
+      *     MOVE    "%"                 TO  RECE10-NYUGAIKBN
+      *     MOVE    2                   TO  RECE10-TEISYUTUSAKI
+      *     MOVE    "key78"             TO  WRK-MCP-PATHNAME
+      *     PERFORM 900-SEIKYU-INV-SEC
+      *
+      *     IF      FLG-SEIKYU          =   ZERO
+      *         MOVE    "1"                 TO  SPA-NAI-T06-RECEDEN-CHK2
+      *     END-IF
+      *
+      *    広域分チェック
+      *     MOVE    SPACE               TO  RECE10-REC
+      *     INITIALIZE                      RECE10-REC
+      *     MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+      *     MOVE    SPA-NAI-T06-SRYYM-H TO  RECE10-SKYYM
+      *     MOVE    "%"                 TO  RECE10-NYUGAIKBN
+      *     MOVE    6                   TO  RECE10-TEISYUTUSAKI
+      *     MOVE    "key78"             TO  WRK-MCP-PATHNAME
+      *     PERFORM 900-SEIKYU-INV-SEC
+      *
+      *     IF      FLG-SEIKYU          =   ZERO
+      *         MOVE    "1"                 TO  SPA-NAI-T06-RECEDEN-CHK3
+      ******END-IF
+      *
+      *    ０点公費の有無チェック
+           MOVE    SPACE               TO  RECE10-REC
+           INITIALIZE                      RECE10-REC
+           MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+           MOVE    SPA-NAI-T06-SRYYM-H TO  RECE10-SKYYM
+           MOVE    "%"                 TO  RECE10-NYUGAIKBN
+           MOVE    "key79"             TO  WRK-MCP-PATHNAME
+           PERFORM 900-SEIKYU-INV-SEC
+      *
+           IF      FLG-SEIKYU          =   ZERO
+               MOVE    "111"               TO  SPA-NAI-T06-RECEDEN-CHK
+           END-IF
+      *
+           .
+       3104-SEIKYU-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1164,6 +1233,9 @@
                        END-EVALUATE
       *                管理情報編集処理
                        PERFORM 3101-ONRECE-KANRI-HENSYU-SEC
+      *
+      *                点検レセ０点公費記載の請求管理のチェック処理
+                       PERFORM 3104-SEIKYU-CHECK-SEC
                    WHEN    "2001"
       *                ジョブ管理チェック処理
                        PERFORM 4501-JOBKANRI-CHK-SEC
@@ -1540,6 +1612,9 @@
                    END-IF
       *            管理情報編集処理
                    PERFORM 3101-ONRECE-KANRI-HENSYU-SEC
+      *
+      *            点検レセ０点公費記載の請求管理のチェック処理
+                   PERFORM 3104-SEIKYU-CHECK-SEC
                END-IF
            ELSE
                MOVE    SPA-NAI-T06-SRYYM-OLD   TO  SPA-NAI-T06-SRYYM-H
@@ -5409,6 +5484,30 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        900-BTPARA-READ-N-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    請求管理読込
+      *****************************************************************
+       900-SEIKYU-INV-SEC             SECTION.
+      *
+           MOVE    RECE10-REC          TO  MCPDATA-REC
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_seikyu"        TO  MCP-TABLE
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+               PERFORM 900-SEIKYU-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SEIKYU
+           END-IF
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-SEIKYU-INV-EXT.
            EXIT.
       *
       *****************************************************************

@@ -34,6 +34,8 @@
       *                                     対応
       *                                     ファイル出力先のデフォルト値
       *                                     の設定も可能にする 
+      *
+      *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -248,13 +250,19 @@
                END-IF
            END-IF
       *
-           MOVE    "1"                 TO  SPA-GMN-T98-PRTKBNL     (1)
-           MOVE    "提出用"            TO  SPA-GMN-T98-PRTKBNMEIL  (1)
-           MOVE    "2"                 TO  SPA-GMN-T98-PRTKBNL     (2)
-           MOVE    "点検用（院外処方含）"
-                                       TO  SPA-GMN-T98-PRTKBNMEIL  (2)
-           MOVE    2                   TO  SPA-GMN-T98-PRTKBN-MAX
-      *
+           IF      SPA-NAI-T06-RECEDEN-CHK =   SPACE
+               MOVE    "1"                 TO  SPA-GMN-T98-PRTKBNL   (1)
+               MOVE    "提出用"            TO  SPA-GMN-T98-PRTKBNMEIL(1)
+               MOVE    "2"                 TO  SPA-GMN-T98-PRTKBNL   (2)
+               MOVE    "点検用（院外処方含）"
+                                           TO  SPA-GMN-T98-PRTKBNMEIL(2)
+               MOVE    2                   TO  SPA-GMN-T98-PRTKBN-MAX
+           ELSE
+               MOVE    "2"                 TO  SPA-GMN-T98-PRTKBNL   (1)
+               MOVE    "点検用（院外処方含）"
+                                           TO  SPA-GMN-T98-PRTKBNMEIL(1)
+               MOVE    1                   TO  SPA-GMN-T98-PRTKBN-MAX
+           END-IF
            MOVE    SPA-GMN-T98-PRTKBNLST (1)
                                        TO  SPA-GMN-T98-PRTKBN-G
       *

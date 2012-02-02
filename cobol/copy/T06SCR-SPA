@@ -39,6 +39,7 @@
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.02    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
        01  SPA-T06.
       *    個別指示画面
@@ -126,7 +127,15 @@
                        09  SPA-NAI-T06-KANRI-SELNUM
                                                    PIC 9(03).                   
                        09  SPA-NAI-T06-BODY-SELNUM PIC 9(04).
-                       09  SPA-NAI-T06-SYORIFLG    PIC 9(01).                   
+                       09  SPA-NAI-T06-SYORIFLG    PIC 9(01).
+      *
+                       09  SPA-NAI-T06-RECEDEN-CHK.
+                           11  SPA-NAI-T06-RECEDEN-CHK1
+                                                   PIC X(01).
+                           11  SPA-NAI-T06-RECEDEN-CHK2
+                                                   PIC X(01).
+                           11  SPA-NAI-T06-RECEDEN-CHK3
+                                                   PIC X(01).
       *
                        09  SPA-NAI-T06-RECE-KOUMOKU.
                            11  SPA-NAI-T06-SELNUM  PIC 9(04).                   

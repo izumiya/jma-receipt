@@ -115,6 +115,13 @@
                                       PIC S9(9)   BINARY.
                     06  W12-INSPECT-CHARACTER-KBNLST
                             PIC X(36)   OCCURS  5 TIMES.
+                  05  W12-INSPECT-ZERO-KBN-COMBO.
+                    06  W12-INSPECT-ZERO-KBN.
+                      07  W12-VALUE   PIC X(24).
+                    06  W12-INSPECT-ZERO-KBN-COUNT
+                                      PIC S9(9)   BINARY.
+                    06  W12-INSPECT-ZERO-KBNLST
+                            PIC X(24)   OCCURS  5 TIMES.
                   05  W12-PREFPRGID.
                     06  W12-VALUE   PIC X(15).
                   05  W12-PREFPRGID1-STATE   PIC S9(9)   BINARY.

@@ -2304,4 +2304,37 @@ path	upd1	{
 	};
 };
 
+path	key78	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key78_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_main
+                WHERE   HOSPNUM        =    :HOSPNUM
+                  AND   NYUGAIKBN      like :NYUGAIKBN
+                  AND   TEISYUTUSAKI   =    :TEISYUTUSAKI
+                  AND   SKYKBN_RECEDEN =    '1'
+                  AND (   ((  SRYYM       =   :SKYYM   )
+                       AND (  SKYKBN      <>  '0'      )
+                       AND (( SKYYM       =  '000000' ) OR ( SKYYM = :SKYYM )))
+                       OR ((  SKYYM       =   :SKYYM   )
+                       AND (  SKYKBN      <>  '0'      )))
+		;
+	};
+};
 
+path	key79	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key79_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_main
+                WHERE   HOSPNUM        =    :HOSPNUM
+                  AND   NYUGAIKBN      like :NYUGAIKBN
+                  AND   SKYKBN_RECEDEN =    '1'
+                  AND (   (( SRYYM       =   :SKYYM   )
+                       AND ( SKYKBN      <>  '0'      )
+                       AND (( SKYYM       =  '000000' ) OR ( SKYYM = :SKYYM )))
+                       OR (( SKYYM       =   :SKYYM   )
+                       AND ( SKYKBN      <>  '0'      )))
+		;
+	};
+};

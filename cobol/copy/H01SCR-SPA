@@ -48,6 +48,7 @@
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
       *  04.06.02    NACL-藤原    10/12/20  保険者からの返戻対応
+      *  04.06.03    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
        01  SPA-H01FREE.
          02  SPA-H01FREE-AREA.
@@ -155,6 +156,8 @@
                                                 PIC 9(06). 
                        09  SPA-H01NAI-HENREIYM-OLD
                                                 PIC 9(06).
+                       09  SPA-H01NAI-SKYKBN-RECEDEN
+                                                PIC X(01).
       *
                05  SPA-RECE10-AREA. 
                    07  SPA-RECE10-KEY. 
@@ -304,3 +307,5 @@
                                                      PIC  9(10).
                        09  SPA-H99NAI-RECE10-TEKSTYMD
                                                      PIC X(08).
+                   07  SPA-H99NAI-SKYKBN-RECEDEN     PIC X(01)
+                                              OCCURS  50.

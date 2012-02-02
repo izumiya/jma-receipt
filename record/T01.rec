@@ -12,6 +12,12 @@ T01	{
 		B08	{
 			state	int;
 		};
+		B09	{
+			state	int;
+		};
+		B10	{
+			state	int;
+		};
 		B15	{
 			state	int;
 		};
@@ -25,6 +31,9 @@ T01	{
 			state	int;
 		};
 		B21	{
+			state	int;
+		};
+		B22	{
 			state	int;
 		};
 		SRYYM	{
@@ -145,7 +154,7 @@ T01	{
 		};
 		TITLE	{
 			style	varchar(20);
-			value	varchar(40);
+			value	varchar(110);
 		};
 	};
 };

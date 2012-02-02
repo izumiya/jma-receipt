@@ -3,6 +3,9 @@ H01	{
 		B10     {
 			state   int;
 		};
+		B12     {
+			state   int;
+		};
 		PTNUM	{
 			value	varchar(20);
 		};
