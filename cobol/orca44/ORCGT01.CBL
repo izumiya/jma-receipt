@@ -2503,7 +2503,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-NAI-SKYYM    TO  WRK-SKYYM-OLD
       *
            MOVE    ZERO             TO  SPA-NAI-SKYYM
-           MOVE    SPACE            TO  SPA-GMN-TITLE  
+      *****MOVE    SPACE            TO  SPA-GMN-TITLE
       *
            IF      SPA-GMN-SKYYM    =   SPACE
                MOVE    "0001"          TO  SPA-ERRCD
@@ -2575,13 +2575,16 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            PERFORM 3102-FILE-INFO-CHECK-SEC
       *
            IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    SPACE           TO  SPA-GMN-TITLE
                MOVE    1               TO  SPA-GMN-CUR
            ELSE
-      *        未実施の未請求解除データのチェック処理
-               PERFORM 3101-SYUKA-CHECK-SEC
+               IF      SPA-NAI-SKYYM  NOT =   WRK-SKYYM-OLD
+      *            未実施の未請求解除データのチェック処理
+                   PERFORM 3101-SYUKA-CHECK-SEC
       *
-      *        点検レセ０点公費記載の請求管理のチェック処理
-               PERFORM 3104-SEIKYU-CHECK-SEC
+      *            点検レセ０点公費記載の請求管理のチェック処理
+                   PERFORM 3104-SEIKYU-CHECK-SEC
+               END-IF
            END-IF
       *
            .
