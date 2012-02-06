@@ -3881,6 +3881,16 @@
                 END-IF
            END-PERFORM
       *
+      *    東日本大震災について、入院時食事療養費及び入院時生活療養費
+      *    の自己負担免除は平成２４年２月までとする
+           IF  (LNK-NYURECEDEN-SANTEIYM  >=  "201203")
+                PERFORM     VARYING   IDX-SAIGAI   FROM   1   BY   1
+                       UNTIL    (IDX-SAIGAI   >    31)
+                    MOVE  SPACE  TO   WRK-SAIGAI-962(IDX-SAIGAI)
+                    MOVE  SPACE  TO   WRK-SAIGAI-963(IDX-SAIGAI)
+                END-PERFORM
+           END-IF
+      *
       *    食事情報の編集
            IF   LNK-NYURECEDEN-SANTEIYM  <=  "200603"
                PERFORM   2101-SHOKUJI-HENSHU1-SEC
