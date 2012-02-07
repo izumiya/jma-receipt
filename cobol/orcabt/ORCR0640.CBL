@@ -526,6 +526,8 @@
       *  04.05.44    NACL-門脇    11/12/15  減免対応（東大阪市）
       *  04.05.45    NACL-門脇    11/12/16  器材の金額と単位の対応
       *  04.05.46    NACL-門脇    12/01/23  長崎県地方公費対応
+      *  04.05.47    NACL-門脇    12/02/06  災害対応
+      *                                     （食事免除は平成２４年２月まで）
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -7184,7 +7186,7 @@
                            (RECE62-KOHNUMHC(IDX1 3)      =  SPACE) AND
                            (RECE62-KOHNUMHC(IDX1 4)      =  SPACE) AND
                            (RECE62-SRYYM            >= "201101"  ) AND
-      ***                  (RECE62-SRYYM            <= "201108"  ) AND
+                           (RECE62-SRYYM            <= "201202"  ) AND
                            (WK-GENGAKUKBN            =  3  OR  4 ) AND
                            (FLG-SAIGAI-TAISYO            =  1    ))
                         CONTINUE
@@ -15185,7 +15187,7 @@
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
                          (SYU-KOH4HKNNUM      =   SPACE         ) AND
                          (RECE62-SRYYM       >=  "201101"       ) AND
-      ***                (RECE62-SRYYM       <=  "201108"       ) AND
+                         (RECE62-SRYYM       <=  "201202"       ) AND
                          (WK-GENGAKUKBN       =   3  OR  4      ) AND
                          (FLG-SAIGAI-TAISYO   =   1             ))
                      ADD   SYU-SKJ-NISSU(IDX3)    TO
@@ -15473,7 +15475,7 @@
               IF   (WK-GENGAKUKBN      =   3 OR 4)
               AND  (FLG-SAIGAI-TAISYO  =   1     )
               AND  (RECE62-SRYYM      >= "201101")
-      ***     AND  (RECE62-SRYYM      <= "201108")
+              AND  (RECE62-SRYYM      <= "201202")
                 ADD    SYU-SYUSKJ-RYOYOHI
                                         TO   RECE62-SKYSKJ-HOKENJA
               ELSE
@@ -17704,7 +17706,7 @@
                  MOVE     999999999   TO   RECE62-KOUREI-SAIKEI2
               END-IF
               IF   (FLG-SAIGAI-TAISYO   =   1      )
-      ***     AND  (RECE62-SRYYM       <=  "201108")
+              AND  (RECE62-SRYYM       <=  "201202")
                  MOVE     ZERO        TO   RECE62-SHOKUJIFTN(1)
               END-IF
             END-IF 

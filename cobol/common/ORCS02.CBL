@@ -320,6 +320,8 @@
       *                                     (283077)Ê¿À®£²£³Ç¯£±£±·î¤Þ¤Ç
       *  04.05.23    NACL-ÌçÏÆ    12/01/10  µÜ¾ë¸©ÃÏÊý¸øÈñºÆÂÐ±þ¡ÊÀçÂæ»Ô¡Ë
       *  04.05.24    NACL-ÌçÏÆ    12/01/16  ·²ÇÏ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.25    NACL-ÌçÏÆ    12/02/06  ºÒ³²ÂÐ±þ
+      *                                     ¡Ê¿©»öÌÈ½ü¤ÏÊ¿À®£²£´Ç¯£²·î¤Þ¤Ç¡Ë
       *
       *  04.06.01    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
       ****************************************************************
@@ -3920,7 +3922,7 @@
             END-IF
             IF   (FLG-SAIGAI-TAISYO     =    1     )
             AND  (WK-GENGAKUKBN         =    3 OR 4)
-      ***   AND  (LNK-SYU-SRYYMD(1:6)  <=  "201108")
+            AND  (LNK-SYU-SRYYMD(1:6)  <=  "201202")
               EVALUATE   WK-GENGAKUKBN
                 WHEN        3
                       MOVE    7       TO    LNK-SYU-YKZKENNUM
@@ -7582,6 +7584,12 @@
            INITIALIZE                   WK-JIRITU-TBL.
            INITIALIZE                   WK-SYOGAI-TBL.
            INITIALIZE                   WK-SYOFUKUMU-TBL.
+      *
+           MOVE    9999999     TO       WK-SYOFUKUMU-GENDOGAK(1).
+           MOVE    9999999     TO       WK-SYOFUKUMU-GENDOGAK(2).
+           MOVE    9999999     TO       WK-SYOFUKUMU-GENDOGAK(3).
+           MOVE    9999999     TO       WK-SYOFUKUMU-GENDOGAK(4).
+      *
            MOVE       ZERO     TO       WK-TOTORI-JIRITU.
       *
            PERFORM    VARYING   KOH-IDX    FROM   1   BY   1
@@ -7742,6 +7750,8 @@
                                                              = "0" ) OR
                                       (WK-TOKATUKAI(KOH-IDX) =  1  )  )
                                  AND (WK-DOTANDOKU(KOH-IDX)   =  ZERO )
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX) >
+                                                      WK-KOH-GENDOGAKU)
                                    MOVE  WK-KOH-GENDOGAKU
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                    MOVE 3
@@ -7754,8 +7764,10 @@
                                    MOVE  WK-NYUJGNGAK
                                        TO   MAX-KIN-KOHI1-M-TOKU75
                                             WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                   IF  WK-NYUJGNGAK >
-                                              WK-KOH-GENDOGAKU-TOKU75
+                                   IF  (WK-NYUJGNGAK
+                                            >  WK-KOH-GENDOGAKU-TOKU75)
+                                   AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                            >  WK-KOH-GENDOGAKU-TOKU75)
                                      MOVE  WK-KOH-GENDOGAKU-TOKU75
                                        TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                      MOVE  3
@@ -7827,6 +7839,8 @@
                                                              = "0" ) OR
                                       (WK-TOKATUKAI(KOH-IDX) =  1  )  )
                                  AND (WK-DOTANDOKU(KOH-IDX)   =  ZERO )
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX) >
+                                                    WK-GEN70-GENDOGAKU)
                                    MOVE  WK-GEN70-GENDOGAKU
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                    MOVE 3
@@ -7839,8 +7853,10 @@
                                    MOVE  WK-NYUJGNGAK
                                        TO   MAX-KIN-KOHI1-M-TOKU75
                                             WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                   IF  WK-NYUJGNGAK >
-                                               WK-GEN70-GENDOGAKU-TOKU75
+                                   IF  (WK-NYUJGNGAK
+                                          >  WK-GEN70-GENDOGAKU-TOKU75)
+                                   AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                          >  WK-GEN70-GENDOGAKU-TOKU75)
                                      MOVE  WK-GEN70-GENDOGAKU-TOKU75
                                        TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                      MOVE  3
@@ -7856,11 +7872,12 @@
                                                = "051" OR "052") AND
                               (LNK-SYU-SRYYMD(1:6) < "200901"  )    ))
                         AND (  WK-TOKATUKAI(KOH-IDX)          = ZERO )
-                        AND (  WK-SYOFUKUMU-GENDOGAK(KOH-IDX) = ZERO )
                           IF  (COMB-KOH2HKNNUM  = "972") OR
                               (COMB-KOH3HKNNUM  = "972") OR
                               (COMB-KOH4HKNNUM  = "972")
-                             IF  MAX-KIN-KOHI1-M > WK-CYOKI-GENDO
+                             IF  (MAX-KIN-KOHI1-M > WK-CYOKI-GENDO)
+                             AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-CYOKI-GENDO)
                                MOVE  WK-CYOKI-GENDO
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                MOVE 3 TO WK-SYOFUKUMU-FLG(KOH-IDX)
@@ -7869,7 +7886,9 @@
                           IF  (COMB-KOH2HKNNUM  = "974") OR
                               (COMB-KOH3HKNNUM  = "974") OR
                               (COMB-KOH4HKNNUM  = "974")
-                             IF  MAX-KIN-KOHI1-M > WK-CYOKI-GENDO2
+                             IF  (MAX-KIN-KOHI1-M > WK-CYOKI-GENDO2)
+                             AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-CYOKI-GENDO2)
                                MOVE  WK-CYOKI-GENDO2
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                MOVE 3 TO WK-SYOFUKUMU-FLG(KOH-IDX)
@@ -8202,6 +8221,8 @@
                                  AND (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                                  = "0")
                                  AND (WK-DOTANDOKU(KOH-IDX)   =  ZERO )
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX) >
+                                                      WK-KOH-GENDOGAKU)
                                    MOVE  WK-KOH-GENDOGAKU
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                    MOVE 3
@@ -8213,8 +8234,10 @@
                                    MOVE  WK-NYUJGNGAK
                                        TO   MAX-KIN-KOHI2-M-TOKU75
                                             WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                   IF  WK-NYUJGNGAK >
-                                              WK-KOH-GENDOGAKU-TOKU75
+                                   IF  (WK-NYUJGNGAK
+                                            >  WK-KOH-GENDOGAKU-TOKU75)
+                                   AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                            >  WK-KOH-GENDOGAKU-TOKU75)
                                      MOVE  WK-KOH-GENDOGAKU-TOKU75
                                        TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                      MOVE  3
@@ -8283,6 +8306,8 @@
                                  AND (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                                  = "0")
                                  AND (WK-DOTANDOKU(KOH-IDX)   =  ZERO )
+                                 AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX) >
+                                                    WK-GEN70-GENDOGAKU)
                                    MOVE  WK-GEN70-GENDOGAKU
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                    MOVE 3
@@ -8294,8 +8319,10 @@
                                    MOVE  WK-NYUJGNGAK
                                        TO   MAX-KIN-KOHI2-M-TOKU75
                                             WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                   IF  WK-NYUJGNGAK >
-                                               WK-GEN70-GENDOGAKU-TOKU75
+                                   IF  (WK-NYUJGNGAK
+                                          >  WK-GEN70-GENDOGAKU-TOKU75)
+                                   AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                          >  WK-GEN70-GENDOGAKU-TOKU75)
                                      MOVE  WK-GEN70-GENDOGAKU-TOKU75
                                        TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                      MOVE  3
@@ -8310,11 +8337,12 @@
                              ((COMB-KOHHKNNUM(KOH-IDX)
                                                = "051" OR "052") AND
                               (LNK-SYU-SRYYMD(1:6) < "200901"  )    ))
-                        AND (  WK-SYOFUKUMU-GENDOGAK(KOH-IDX) = ZERO )
                           IF  (COMB-KOH1HKNNUM  = "972") OR
                               (COMB-KOH3HKNNUM  = "972") OR
                               (COMB-KOH4HKNNUM  = "972")
-                             IF  MAX-KIN-KOHI2-M > WK-CYOKI-GENDO
+                             IF  (MAX-KIN-KOHI2-M > WK-CYOKI-GENDO)
+                             AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-CYOKI-GENDO)
                                MOVE  WK-CYOKI-GENDO
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                MOVE 3 TO WK-SYOFUKUMU-FLG(KOH-IDX)
@@ -8323,7 +8351,9 @@
                           IF  (COMB-KOH1HKNNUM  = "974") OR
                               (COMB-KOH3HKNNUM  = "974") OR
                               (COMB-KOH4HKNNUM  = "974")
-                             IF  MAX-KIN-KOHI2-M > WK-CYOKI-GENDO2
+                             IF  (MAX-KIN-KOHI2-M > WK-CYOKI-GENDO2)
+                             AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-CYOKI-GENDO2)
                                MOVE  WK-CYOKI-GENDO2
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                MOVE 3 TO WK-SYOFUKUMU-FLG(KOH-IDX)
@@ -8482,6 +8512,8 @@
                               AND (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                               = "0")
                               AND (WK-DOTANDOKU(KOH-IDX)   =  ZERO )
+                              AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX) >
+                                                   WK-KOH-GENDOGAKU)
                                 MOVE  WK-KOH-GENDOGAKU
                                    TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                 MOVE 3
@@ -8493,8 +8525,10 @@
                                 MOVE  WK-NYUJGNGAK
                                     TO   MAX-KIN-KOHI3-M-TOKU75
                                          WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                IF  WK-NYUJGNGAK >
-                                           WK-KOH-GENDOGAKU-TOKU75
+                                IF  (WK-NYUJGNGAK
+                                         >  WK-KOH-GENDOGAKU-TOKU75)
+                                AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                         >  WK-KOH-GENDOGAKU-TOKU75)
                                   MOVE  WK-KOH-GENDOGAKU-TOKU75
                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                   MOVE  3
@@ -8534,6 +8568,8 @@
                               AND (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                               = "0")
                               AND (WK-DOTANDOKU(KOH-IDX)   =  ZERO )
+                              AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX) >
+                                                 WK-GEN70-GENDOGAKU)
                                 MOVE  WK-GEN70-GENDOGAKU
                                    TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                 MOVE 3
@@ -8545,8 +8581,10 @@
                                 MOVE  WK-NYUJGNGAK
                                     TO   MAX-KIN-KOHI3-M-TOKU75
                                          WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                IF  WK-NYUJGNGAK >
-                                            WK-GEN70-GENDOGAKU-TOKU75
+                                IF  (WK-NYUJGNGAK
+                                       >  WK-GEN70-GENDOGAKU-TOKU75)
+                                AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                       >  WK-GEN70-GENDOGAKU-TOKU75)
                                   MOVE  WK-GEN70-GENDOGAKU-TOKU75
                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                   MOVE  3
@@ -8557,11 +8595,12 @@
                         END-IF
                         IF  ( COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                               >= "1" AND <= "8"     )
-                        AND ( WK-SYOFUKUMU-GENDOGAK(KOH-IDX) = ZERO )
                           IF  (COMB-KOH1HKNNUM  = "972") OR
                               (COMB-KOH2HKNNUM  = "972") OR
                               (COMB-KOH4HKNNUM  = "972")
-                             IF  MAX-KIN-KOHI3-M > WK-CYOKI-GENDO
+                             IF  (MAX-KIN-KOHI3-M > WK-CYOKI-GENDO)
+                             AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-CYOKI-GENDO)
                                MOVE  WK-CYOKI-GENDO
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                MOVE 3 TO WK-SYOFUKUMU-FLG(KOH-IDX)
@@ -8570,7 +8609,9 @@
                           IF  (COMB-KOH1HKNNUM  = "974") OR
                               (COMB-KOH2HKNNUM  = "974") OR
                               (COMB-KOH4HKNNUM  = "974")
-                             IF  MAX-KIN-KOHI3-M > WK-CYOKI-GENDO2
+                             IF  (MAX-KIN-KOHI3-M > WK-CYOKI-GENDO2)
+                             AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-CYOKI-GENDO2)
                                MOVE  WK-CYOKI-GENDO2
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                MOVE 3 TO WK-SYOFUKUMU-FLG(KOH-IDX)
@@ -8617,6 +8658,8 @@
                               AND (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                               = "0")
                               AND (WK-DOTANDOKU(KOH-IDX)   =  ZERO )
+                              AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX) >
+                                                   WK-KOH-GENDOGAKU)
                                 MOVE  WK-KOH-GENDOGAKU
                                    TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                 MOVE 3
@@ -8628,8 +8671,10 @@
                                 MOVE  WK-NYUJGNGAK
                                     TO   MAX-KIN-KOHI4-M-TOKU75
                                          WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                IF  WK-NYUJGNGAK >
-                                           WK-KOH-GENDOGAKU-TOKU75
+                                IF  (WK-NYUJGNGAK
+                                         >  WK-KOH-GENDOGAKU-TOKU75)
+                                AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                         >  WK-KOH-GENDOGAKU-TOKU75)
                                   MOVE  WK-KOH-GENDOGAKU-TOKU75
                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                   MOVE  3
@@ -8669,6 +8714,8 @@
                               AND (COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                                               = "0")
                               AND (WK-DOTANDOKU(KOH-IDX)   =  ZERO )
+                              AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX) >
+                                                 WK-GEN70-GENDOGAKU)
                                 MOVE  WK-GEN70-GENDOGAKU
                                    TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                 MOVE 3
@@ -8680,8 +8727,10 @@
                                 MOVE  WK-NYUJGNGAK
                                     TO   MAX-KIN-KOHI4-M-TOKU75
                                          WK-TAIHI-NYUJGNGAK(KOH-IDX)
-                                IF  WK-NYUJGNGAK >
-                                            WK-GEN70-GENDOGAKU-TOKU75
+                                IF  (WK-NYUJGNGAK
+                                       >  WK-GEN70-GENDOGAKU-TOKU75)
+                                AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                       >  WK-GEN70-GENDOGAKU-TOKU75)
                                   MOVE  WK-GEN70-GENDOGAKU-TOKU75
                                     TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                   MOVE  3
@@ -8692,11 +8741,12 @@
                         END-IF
                         IF  ( COMB-KOHHKNNUM(KOH-IDX)(1:1)
                                               >= "1" AND <= "8"     )
-                        AND ( WK-SYOFUKUMU-GENDOGAK(KOH-IDX) = ZERO )
                           IF  (COMB-KOH1HKNNUM  = "972") OR
                               (COMB-KOH2HKNNUM  = "972") OR
                               (COMB-KOH3HKNNUM  = "972")
-                             IF  MAX-KIN-KOHI4-M > WK-CYOKI-GENDO
+                             IF  (MAX-KIN-KOHI4-M > WK-CYOKI-GENDO)
+                             AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-CYOKI-GENDO)
                                MOVE  WK-CYOKI-GENDO
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                MOVE 3 TO WK-SYOFUKUMU-FLG(KOH-IDX)
@@ -8705,7 +8755,9 @@
                           IF  (COMB-KOH1HKNNUM  = "974") OR
                               (COMB-KOH2HKNNUM  = "974") OR
                               (COMB-KOH3HKNNUM  = "974")
-                             IF  MAX-KIN-KOHI4-M > WK-CYOKI-GENDO2
+                             IF  (MAX-KIN-KOHI4-M > WK-CYOKI-GENDO2)
+                             AND (WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                                                  > WK-CYOKI-GENDO2)
                                MOVE  WK-CYOKI-GENDO2
                                       TO WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                                MOVE 3 TO WK-SYOFUKUMU-FLG(KOH-IDX)
@@ -8757,29 +8809,30 @@
                  EVALUATE   WK-GENGAKUKBN
                    WHEN          1
                      IF  WK-GENGAKU-RITU = 100
-                       MOVE   ZERO   TO   LNK-ORCSJGNGET-NYUJGNGAK
-                       MOVE    1     TO   FLG-JYOGEN-OKIKAE
+                       MOVE   ZERO   TO   WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                       MOVE    3     TO   WK-SYOFUKUMU-FLG(KOH-IDX)
                      ELSE
                        COMPUTE  WK-GENGAKU-RITUX =
                                 100 - WK-GENGAKU-RITU
-                       COMPUTE  LNK-ORCSJGNGET-NYUJGNGAK  =
-                                LNK-ORCSJGNGET-NYUJGNGAK  *
-                                WK-GENGAKU-RITUX          /
+                       COMPUTE  WK-SYOFUKUMU-GENDOGAK(KOH-IDX) =
+                                LNK-ORCSJGNGET-NYUJGNGAK       *
+                                WK-GENGAKU-RITUX               /
                                 100
+                       MOVE    3     TO   WK-SYOFUKUMU-FLG(KOH-IDX)
+                       COMPUTE  WK-SYOFUKUMU-GENDOGAK(KOH-IDX) =
+                                WK-SYOFUKUMU-GENDOGAK(KOH-IDX) +  5
+                       COMPUTE  WK-SYOFUKUMU-GENDOGAK(KOH-IDX) =
+                                WK-SYOFUKUMU-GENDOGAK(KOH-IDX) /  10
+                       COMPUTE  WK-SYOFUKUMU-GENDOGAK(KOH-IDX) =
+                                WK-SYOFUKUMU-GENDOGAK(KOH-IDX) *  10
                      END-IF
                    WHEN          2
                      CONTINUE
                    WHEN          3
                    WHEN          4
-                     MOVE     ZERO   TO   LNK-ORCSJGNGET-NYUJGNGAK
-                     MOVE      1     TO   FLG-JYOGEN-OKIKAE
+                     MOVE     ZERO   TO   WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
+                     MOVE      3     TO   WK-SYOFUKUMU-FLG(KOH-IDX)
                  END-EVALUATE
-                 COMPUTE  LNK-ORCSJGNGET-NYUJGNGAK =
-                          LNK-ORCSJGNGET-NYUJGNGAK +  5
-                 COMPUTE  LNK-ORCSJGNGET-NYUJGNGAK =
-                          LNK-ORCSJGNGET-NYUJGNGAK /  10
-                 COMPUTE  LNK-ORCSJGNGET-NYUJGNGAK =
-                          LNK-ORCSJGNGET-NYUJGNGAK *  10
              END-IF
       *
            END-IF
@@ -19982,7 +20035,7 @@
                                             TO   LNK-SYU-SYUSKJ-FTN-RECE
                             IF   (WK-GENGAKUKBN        =   3 OR 4)
                             AND  (FLG-SAIGAI-TAISYO    =   1     )
-      ***                   AND  (LNK-SYU-SRYYMD(1:6) <= "201108")
+                            AND  (LNK-SYU-SRYYMD(1:6) <= "201202")
                               MOVE  ZERO    TO   LNK-SYU-SYUSKJ-FTN
                             END-IF
                         END-IF
@@ -20188,7 +20241,7 @@
                                             TO   LNK-SYU-SYUSKJ-FTN-RECE
                             IF   (WK-GENGAKUKBN        =   3 OR 4)
                             AND  (FLG-SAIGAI-TAISYO    =   1     )
-      ***                   AND  (LNK-SYU-SRYYMD(1:6) <= "201108")
+                            AND  (LNK-SYU-SRYYMD(1:6) <= "201202")
                               MOVE  ZERO    TO   LNK-SYU-SYUSKJ-FTN
                             END-IF
                         END-IF
@@ -20614,6 +20667,7 @@
            AND (COMB-KOHHKNNUM(KOH-IDX)  =  "010"  )
            AND (WK-GENGAKUKBN            =   3 OR 4)
            AND (FLG-SAIGAI-TAISYO        =   1     )
+                   MOVE     SPACE    TO    COMB-KOH-NYUJGNKBN(KOH-IDX)
                    MOVE     ZERO     TO    WK-NYUKFTNRATE
            END-IF.
       *
@@ -21084,7 +21138,7 @@
       *
            IF   (WK-GENGAKUKBN        =   3 OR 4)
            AND  (FLG-SAIGAI-TAISYO    =   1     )
-      ***  AND  (LNK-SYU-SRYYMD(1:6) <= "201108")
+           AND  (LNK-SYU-SRYYMD(1:6) <= "201202")
                  MOVE   "3"   TO  WK-NYUSKJRYYKBN
            END-IF.
       *
@@ -21430,9 +21484,7 @@
                  END-IF
                END-IF
       *
-      *        IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)       =  "027"
-               IF  (LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0")
-               OR  (WK-TOKATUKAI(KOH-IDX)             =   1 )
+               IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "027"
       *             ¸º³Û
                     EVALUATE  WK-GENGAKUKBN
                       WHEN        1
@@ -22201,9 +22253,7 @@
                  END-IF
                END-IF
       *
-      *        IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)       =  "027"
-               IF  (LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0")
-               OR  (WK-TOKATUKAI(KOH-IDX)             =   1 )
+               IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "027"
       *             ¸º³Û
                     EVALUATE  WK-GENGAKUKBN
                       WHEN        1
@@ -22330,7 +22380,8 @@
              END-EVALUATE
            END-IF.
       *
-           IF    WK-SYOFUKUMU-FLG(KOH-IDX)  NOT =  ZERO
+           IF    WK-SYOFUKUMU-FLG(KOH-IDX)      NOT =  ZERO
+           AND   WK-SYOFUKUMU-GENDOGAK(KOH-IDX) NOT =  9999999
              IF  LNK-SYU-KOH-COMPFTN(KOH-IDX)  >
                                      WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
       **         IF   (WK-SYOFUKUMU-FLG(KOH-IDX)        =   1 OR 2 )
@@ -22418,7 +22469,8 @@
              END-EVALUATE
            END-IF.
       *
-           IF    WK-SYOFUKUMU-FLG(KOH-IDX)  NOT =  ZERO
+           IF    WK-SYOFUKUMU-FLG(KOH-IDX)      NOT =  ZERO
+           AND   WK-SYOFUKUMU-GENDOGAK(KOH-IDX) NOT =  9999999
              IF  WK-KOH-COMPFTN(KOH-IDX)       >
                                      WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                  MOVE  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
@@ -22576,7 +22628,8 @@
              END-EVALUATE
            END-IF.
       *
-           IF    WK-SYOFUKUMU-FLG(KOH-IDX)  NOT =  ZERO
+           IF    WK-SYOFUKUMU-FLG(KOH-IDX)      NOT =  ZERO
+           AND   WK-SYOFUKUMU-GENDOGAK(KOH-IDX) NOT =  9999999
              IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  >
                                      WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
                  MOVE  WK-SYOFUKUMU-GENDOGAK(KOH-IDX)
