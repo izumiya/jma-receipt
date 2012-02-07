@@ -5281,6 +5281,11 @@
            PERFORM UNTIL ( FLG-PTBYOMEI    NOT =   ZERO )
                     OR   ( FLG-CHK-END     NOT =   ZERO )
       *
+      *        患者病名エラーメッセージ付加情報編集
+               MOVE    PTBYO-BYOMEI    TO  WRK-PTBYOMEI
+               MOVE    PTBYO-SRYYMD    TO  WRK-PTBYOSRYYMD
+               PERFORM 2001121-PTBYOMES-PLUS-SEC
+      *
                PERFORM 200113-TAISYO-BYOMEI-CHK-SEC
                IF    ( FLG-TAISYO-BYOMEI   =   1   )
                    PERFORM 200113-PTBYOMEI-CHK-SEC
@@ -5459,11 +5464,6 @@
                            =   CNT-PTSYUBYO    +   1
                    END-IF
                END-IF
-      *
-      *        患者病名エラーメッセージ付加情報編集
-               MOVE    PTBYO-BYOMEI    TO  WRK-PTBYOMEI
-               MOVE    PTBYO-SRYYMD    TO  WRK-PTBYOSRYYMD
-               PERFORM 2001121-PTBYOMES-PLUS-SEC
       *
       *        患者病名チェック
                IF    ( FLG-CHKEND (5)  =   ZERO )
