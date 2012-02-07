@@ -41,7 +41,8 @@
       *  04.03.00    NACL-森脇     08/10/02  協会けんぽ対応
       *  04.04.00    NACL-森脇     09/03/10  オンライン返戻対応
       *  04.05.00    NACL-森脇     09/06/09  食事療養費、食事負担金追加
-      *  04.05.00    NACL-太田    10/01/29  拡張漢字対応
+      *  04.05.00    NACL-太田     10/01/29  拡張漢字対応
+      *  04.07.00    NACL-森脇     12/02/07  ０点公費記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -604,7 +605,16 @@
       *
            PERFORM 100-INIT-SEC
       *
-           PERFORM 200-MAIN-SEC
+           PERFORM 120-SEIKYU-SYOKICHK-SEC
+      *
+           IF      FLG-RECE10      =   ZERO
+               MOVE
+               "０点公費記載の対象レセプトがあるため処理できません。"
+                                           TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+           ELSE
+               PERFORM 200-MAIN-SEC
+           END-IF
       *
            PERFORM 300-END-SEC
       *
@@ -710,6 +720,56 @@
       *
            .
        110-PARA-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    請求管理マスター初期チェック
+      *****************************************************************
+       120-SEIKYU-SYOKICHK-SEC     SECTION.
+      *
+      *    請求管理ＤＢ検索
+           MOVE    SPACE               TO  RECE10-REC
+           INITIALIZE                      RECE10-REC
+           MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+           MOVE    WRK-PARA-DENPPRTYM  TO  RECE10-SKYYM
+           IF      WRK-PARA-NYUGAIKBN  =   "1"
+               OR  WRK-PARA-NYUGAIKBN  =   "2"
+               MOVE    WRK-PARA-NYUGAIKBN  TO  RECE10-NYUGAIKBN
+           ELSE
+               MOVE    "%"                 TO  RECE10-NYUGAIKBN
+           END-IF
+           MOVE    RECE10-REC          TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    "key79"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          =   ZERO
+               MOVE    "DBFETCH"           TO  MCP-FUNC
+               MOVE    "tbl_seikyu"        TO  MCP-TABLE
+               MOVE    "key79"             TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC          =   ZERO
+                   MOVE    ZERO                TO  FLG-RECE10
+               ELSE
+                   MOVE    1                   TO  FLG-RECE10
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-RECE10
+           END-IF
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           MOVE    "tbl_seikyu"        TO  MCP-TABLE
+           MOVE    "key79"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       120-SEIKYU-SYOKICHK-EXT.
            EXIT.
       *
       *****************************************************************
