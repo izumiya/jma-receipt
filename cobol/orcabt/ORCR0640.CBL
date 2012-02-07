@@ -527,6 +527,8 @@
       *  04.05.44    NACL-ÌçÏÆ    11/12/15  ¸ºÌÈÂÐ±þ¡ÊÅìÂçºå»Ô¡Ë
       *  04.05.45    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
       *  04.05.46    NACL-ÌçÏÆ    12/01/23  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.47    NACL-ÌçÏÆ    12/02/06  ºÒ³²ÂÐ±þ
+      *                                     ¡Ê¿©»öÌÈ½ü¤ÏÊ¿À®£²£´Ç¯£²·î¤Þ¤Ç¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7155,7 +7157,7 @@
                            (RECE62-KOHNUMHC(IDX1 3)      =  SPACE) AND
                            (RECE62-KOHNUMHC(IDX1 4)      =  SPACE) AND
                            (RECE62-SRYYM            >= "201101"  ) AND
-      ***                  (RECE62-SRYYM            <= "201108"  ) AND
+                           (RECE62-SRYYM            <= "201202"  ) AND
                            (WK-GENGAKUKBN            =  3  OR  4 ) AND
                            (FLG-SAIGAI-TAISYO            =  1    ))
                         CONTINUE
@@ -15268,7 +15270,7 @@
                          (SYU-KOH3HKNNUM      =   SPACE         ) AND
                          (SYU-KOH4HKNNUM      =   SPACE         ) AND
                          (RECE62-SRYYM       >=  "201101"       ) AND
-      ***                (RECE62-SRYYM       <=  "201108"       ) AND
+                         (RECE62-SRYYM       <=  "201202"       ) AND
                          (WK-GENGAKUKBN       =   3  OR  4      ) AND
                          (FLG-SAIGAI-TAISYO   =   1             ))
                      ADD   SYU-SKJ-NISSU(IDX3)    TO
@@ -15556,7 +15558,7 @@
               IF   (WK-GENGAKUKBN      =   3 OR 4)
               AND  (FLG-SAIGAI-TAISYO  =   1     )
               AND  (RECE62-SRYYM      >= "201101")
-      ***     AND  (RECE62-SRYYM      <= "201108")
+              AND  (RECE62-SRYYM      <= "201202")
                 ADD    SYU-SYUSKJ-RYOYOHI
                                         TO   RECE62-SKYSKJ-HOKENJA
               ELSE
@@ -17787,7 +17789,7 @@
                  MOVE     999999999   TO   RECE62-KOUREI-SAIKEI2
               END-IF
               IF   (FLG-SAIGAI-TAISYO   =   1      )
-      ***     AND  (RECE62-SRYYM       <=  "201108")
+              AND  (RECE62-SRYYM       <=  "201202")
                  MOVE     ZERO        TO   RECE62-SHOKUJIFTN(1)
               END-IF
             END-IF 
