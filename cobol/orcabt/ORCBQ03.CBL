@@ -162,6 +162,7 @@
            03  SEL-SKYSRH                          PIC 9(01).
            03  SEL-UPYMD                           PIC X(08).
            03  SEL-UPHMS                           PIC X(06).
+           03  SEL-TENKENRECE                      PIC X(01).
       *
        01  TSRYCD-G.
            03  TSRYCD-IDX                          PIC 9(05).
@@ -449,6 +450,12 @@
       *
            IF    ( SPA-Q01-GTBL(12) =   "1" )
                MOVE    1           TO  SEL-SKYSRH
+           END-IF
+      *
+           IF    ( SPA-Q01-TENKENRECE   =   SPACE )
+               MOVE    "%"                 TO  SEL-TENKENRECE
+           ELSE
+               MOVE    SPA-Q01-TENKENRECE  TO  SEL-TENKENRECE
            END-IF
       *
            .
@@ -1197,6 +1204,8 @@
                MOVE    SPACE       TO  SKYSRH-TOKKINM (1)
                MOVE    SPACE       TO  SKYSRH-TOKKINM (2)
            END-IF
+      *
+           MOVE    SEL-TENKENRECE  TO  SKYSRH-SKYKBN-RECEDEN
       *
            MOVE    SKYSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_skysrh"    TO  MCP-TABLE

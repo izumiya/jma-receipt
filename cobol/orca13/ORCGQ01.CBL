@@ -804,6 +804,9 @@
       *    災害該当コンボ初期処理
            PERFORM 3101-SAIGAIKBN-CMB-SYOKI-SEC
       *
+      *    点検用レセプトコンボ初期処理
+           PERFORM 3101-TENKENRECE-CMB-SYOKI-SEC
+      *
       *    本人家族コンボ初期処理
            PERFORM 3101-HONKZKKBN-CMB-SYOKI-SEC
       *
@@ -1363,6 +1366,19 @@
       *
            .
        3101-SAIGAIKBN-CMB-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
+      *    点検用レセプトコンボ初期処理
+      *****************************************************************
+       3101-TENKENRECE-CMB-SYOKI-SEC        SECTION.
+      *
+           MOVE    1               TO  SPA-GMN-Q01-TENKENRECELST-MAX
+      *
+           MOVE    "1"             TO  SPA-GMN-Q01-TENKENRECEL    (01)
+           MOVE    "０円公費記載分" TO SPA-GMN-Q01-TENKENRECEMEIL (01)
+      *
+           .
+       3101-TENKENRECE-CMB-SYOKI-EXT.
            EXIT.
       *****************************************************************
       *    本人家族コンボ初期処理
@@ -2326,6 +2342,9 @@
       *    災害該当
            MOVE    Q01-SAIGAIKBN       TO  SPA-GMN-Q01-SAIGAIKBN-G
       *
+      *    ０円公費記載分
+           MOVE    Q01-TENKENRECE      TO  SPA-GMN-Q01-TENKENRECE-G
+      *
            PERFORM VARYING IDXB    FROM    1   BY  1
                    UNTIL   IDXB    >       5
       *
@@ -2679,6 +2698,12 @@
       *
       *    災害該当情報チェック
            PERFORM 4117-SAIGAIKBN-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4101-KHN-INPUT-CHK-EXT
+           END-IF
+      *
+      *    ０円公費記載分チェック
+           PERFORM 4117-TENKENRECE-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  4101-KHN-INPUT-CHK-EXT
            END-IF
@@ -4292,6 +4317,37 @@
       *
            .
        4117-SAIGAIKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    点検用レセプトチェック処理
+      *****************************************************************
+       4117-TENKENRECE-CHK-SEC         SECTION.
+      *
+           IF    ( SPA-GMN-Q01-TENKENRECE-G   =   SPACE )
+               GO  TO  4117-TENKENRECE-CHK-EXT
+           END-IF
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   SPA-GMN-Q01-TENKENRECELST-MAX )
+                      OR ( SPA-GMN-Q01-TENKENRECE
+                                   =   SPA-GMN-Q01-TENKENRECEL (IDX2))
+      *
+               CONTINUE
+      *
+           END-PERFORM
+      *
+           IF    ( IDX2            <=  SPA-GMN-Q01-TENKENRECELST-MAX )
+               MOVE    SPA-GMN-Q01-TENKENRECELST (IDX2)
+                                       TO  SPA-GMN-Q01-TENKENRECE-G
+      *
+           ELSE
+               MOVE    "0145"          TO  SPA-ERRCD
+               MOVE    164             TO  SPA-GMN-Q01-CUR
+               GO TO   4117-TENKENRECE-CHK-EXT
+           END-IF
+      *
+           .
+       4117-TENKENRECE-CHK-EXT.
            EXIT.
       *****************************************************************
       *    本人家族チェック処理
@@ -7527,6 +7583,9 @@
            PERFORM 900-PTSRH-DBESCAPE-SEC
            MOVE    PTSRH-DBSTR       TO  SPA-Q01-SAIGAIKBN
       *
+           MOVE    SPA-GMN-Q01-TENKENRECE   TO  PTSRH-DBSTR
+           PERFORM 900-PTSRH-DBESCAPE-SEC
+           MOVE    PTSRH-DBSTR       TO  SPA-Q01-TENKENRECE
       *
       *    保険　公費
            IF    ( SPA-GMN-Q01-RDKOHNUM-AND    =   "T" )
@@ -8105,6 +8164,7 @@
            IF  ( SPA-Q01-TOKKI-G          NOT =   SPACE )
             OR ( SPA-Q01-TOTALTEN         NOT =   ZERO  )
             OR ( SPA-Q01-SAIGAIKBN        NOT =   SPACE )
+            OR ( SPA-Q01-TENKENRECE       NOT =   SPACE )
       *
               MOVE     "1"                 TO  SPA-Q01-GTBL(12)
       *
@@ -8593,6 +8653,18 @@
       *
                MOVE    SPA-GMN-Q01-SAIGAIKBNLST (IDX1)
                                    TO  Q01-CMB-SAIGAIKBN-ITEM (IDX1)
+      *
+           END-PERFORM
+      *
+      *    点検用レセプト
+           MOVE    SPA-GMN-Q01-TENKENRECE-G     TO  Q01-TENKENRECE
+           MOVE    SPA-GMN-Q01-TENKENRECELST-MAX
+                                           TO  Q01-CMB-TENKENRECE-COUNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >   SPA-GMN-Q01-TENKENRECELST-MAX )
+      *
+               MOVE    SPA-GMN-Q01-TENKENRECELST (IDX1)
+                                   TO  Q01-CMB-TENKENRECE-ITEM (IDX1)
       *
            END-PERFORM
       *
@@ -9204,6 +9276,8 @@
                MOVE  "TOTALTEN"    TO  MCP-WIDGET
            WHEN   163
                MOVE  "SAIGAIKBN"   TO  MCP-WIDGET
+           WHEN   164
+               MOVE  "TENKENRECE"  TO  MCP-WIDGET
       *
       *    保険・公費タブ
            WHEN   201
@@ -9523,6 +9597,8 @@
            WHEN   "TOTALTEN"
                MOVE  163           TO  SPA-GMN-Q01-CUR
            WHEN   "SAIGAIKBN"
+               MOVE  164           TO  SPA-GMN-Q01-CUR
+           WHEN   "TENKENRECE"
                MOVE  001           TO  SPA-GMN-Q01-CUR
       *
       *    保険・公費タブ
@@ -9931,6 +10007,9 @@
            WHEN    "0143"
                MOVE    "災害該当入力エラー"
                                        TO  SPA-ERRMSG
+           WHEN    "0145"
+               MOVE    "点検用レセプト入力エラー"
+                                       TO  SPA-ERRMSG
            WHEN    "1001"
                MOVE    "開始診療年月日＞終了診療年月日となっています"
                                        TO  SPA-ERRMSG
@@ -10304,6 +10383,9 @@
                MOVE    1               TO  FLG-PAGENO-00
            WHEN    SHKITEMID-SAIGAIKBN
                MOVE    SHODATA-ITEM    TO  Q01-SAIGAIKBN
+               MOVE    1               TO  FLG-PAGENO-00
+           WHEN    SHKITEMID-TENKENRECE
+               MOVE    SHODATA-ITEM    TO  Q01-TENKENRECE
                MOVE    1               TO  FLG-PAGENO-00
            WHEN    SHKITEMID-HONKZKKBN
                MOVE    SHODATA-ITEM    TO  Q01-HONKZKKBN
@@ -11205,6 +11287,14 @@
                MOVE    SHKITEMID-SAIGAIKBN
                                    TO  SHODATA-ITEMID
                MOVE    SPA-GMN-Q01-SAIGAIKBN
+                                   TO  SHODATA-ITEM
+               PERFORM 70011-SHOUKAIDATA-INS-SEC
+           END-IF
+      *
+           IF    ( SPA-GMN-Q01-TENKENRECE   NOT =   SPACE )
+               MOVE    SHKITEMID-TENKENRECE
+                                   TO  SHODATA-ITEMID
+               MOVE    SPA-GMN-Q01-TENKENRECE
                                    TO  SHODATA-ITEM
                PERFORM 70011-SHOUKAIDATA-INS-SEC
            END-IF

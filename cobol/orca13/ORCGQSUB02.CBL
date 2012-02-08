@@ -1471,6 +1471,21 @@
       *
            END-IF
       *
+      *2
+           IF    ( SPA-Q01-TENKENRECE   =   "1" )
+      *
+               MOVE    1           TO  CNT-JYOKEN
+               PERFORM 900-SQL-JYOKEN-EDIT2-SEC
+      *
+               STRING  "L.SKYKBN_RECEDEN='1'"  DELIMITED BY SIZE
+               INTO    WRK-SQL
+               WITH    POINTER WRK-SQL-PNT
+               END-STRING
+      *
+               PERFORM 900-SQL-JYOKEN-EDIT3-SEC
+      *
+           END-IF
+      *
            PERFORM 900-SQL-JYOKEN-EDIT4-SEC
       *
            .

@@ -48,6 +48,8 @@
                05  SKYSRH-TOKKINM      PIC X(12) OCCURS 5.
       *    記載外公費−薬剤一部負担金情報
            03  SKYSRH-ETC-YKZFTN1      PIC  9(05).
+      *    請求区分（レセ電対象）
+           03  SKYSRH-SKYKBN-RECEDEN   PIC X(1).
       *    開始診療年月
            03  SKYSRH-STSRYYM          PIC X(6).
       *    終了診療年月

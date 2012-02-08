@@ -131,6 +131,10 @@
                     07  Q01-CMB-SAIGAIKBN-COUNT    PIC S9(9) BINARY.
                     07  Q01-CMB-SAIGAIKBN-ITEM     PIC X(22) OCCURS 10.
                   06  Q01-TOTALTEN                 PIC S9(7).
+                  06  Q01-CMB-TENKENRECE.
+                    07  Q01-TENKENRECE              PIC X(22).
+                    07  Q01-CMB-TENKENRECE-COUNT    PIC S9(9) BINARY.
+                    07  Q01-CMB-TENKENRECE-ITEM     PIC X(22) OCCURS 5.
                 05  Q01-FIXED17.
                   06  Q01-CMB-HONKZKKBN.
                     07  Q01-HONKZKKBN          PIC X(10).

@@ -303,6 +303,13 @@ Q01	{
 				TOTALTEN	{
 					value	number(7);
 				};
+				CMB_TENKENRECE{
+					TENKENRECE{
+						value	varchar(22);
+					};
+					count	int;
+					item	varchar(22)[05];
+				};
 			};
 			fixed17	{
 				CMB_HONKZKKBN{

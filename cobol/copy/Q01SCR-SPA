@@ -224,6 +224,11 @@
                                13  SPA-GMN-Q01-SAIGAIKBNMEI  PIC X(20).
       *                    点数
                            11  SPA-GMN-Q01-TOTALTEN          PIC 9(07).
+      *                    点検用レセプト
+                           11  SPA-GMN-Q01-TENKENRECE-G.
+                               13  SPA-GMN-Q01-TENKENRECE    PIC X(01).
+                               13  SPA-GMN-Q01-TENKENRECEFL  PIC X(01).
+                               13  SPA-GMN-Q01-TENKENRECEMEI PIC X(20).
       *                保険　公費
                        09  SPA-GMN-Q01-HOKEN-AREA.
                            11  SPA-GMN-Q01-HONKZKKBN-G.
@@ -604,6 +609,13 @@
                                13  SPA-GMN-Q01-SAIGAIKBNL    PIC X(01).
                                13  SPA-GMN-Q01-SAIGAIKBNFLL  PIC X(01).
                                13  SPA-GMN-Q01-SAIGAIKBNMEIL PIC X(20).
+                       09  SPA-GMN-Q01-TENKENRECELST-G.
+                           11  SPA-GMN-Q01-TENKENRECELST-MAX
+                                                             PIC 9(05).
+                           11  SPA-GMN-Q01-TENKENRECELST      OCCURS  5.
+                               13  SPA-GMN-Q01-TENKENRECEL    PIC X(01).
+                               13  SPA-GMN-Q01-TENKENRECEFLL  PIC X(01).
+                               13  SPA-GMN-Q01-TENKENRECEMEIL PIC X(20).
                        09  SPA-GMN-Q01-HONKZKKBNLST-G.
                            11  SPA-GMN-Q01-HONKZKKBNLST-MAX
                                                             PIC 9(05).
@@ -1117,6 +1129,7 @@
                            11  SPA-Q01-TOKKINAME       PIC X(12).
                        09  SPA-Q01-SAIGAIKBN           PIC X(01).
                        09  SPA-Q01-TOTALTEN            PIC 9(07).
+                       09  SPA-Q01-TENKENRECE          PIC X(01).
       *            保険　公費
                    07  SPA-Q01-HOKEN-AREA.
                        09  SPA-Q01-HONKZKKBN           PIC X(01).
