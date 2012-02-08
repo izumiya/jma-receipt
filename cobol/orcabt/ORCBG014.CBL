@@ -732,12 +732,7 @@
            INITIALIZE                      RECE10-REC
            MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
            MOVE    WRK-PARA-DENPPRTYM  TO  RECE10-SKYYM
-           IF      WRK-PARA-NYUGAIKBN  =   "1"
-               OR  WRK-PARA-NYUGAIKBN  =   "2"
-               MOVE    WRK-PARA-NYUGAIKBN  TO  RECE10-NYUGAIKBN
-           ELSE
-               MOVE    "%"                 TO  RECE10-NYUGAIKBN
-           END-IF
+           MOVE    "%"                 TO  RECE10-NYUGAIKBN
            MOVE    RECE10-REC          TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
            MOVE    "tbl_seikyu"        TO  MCP-TABLE
