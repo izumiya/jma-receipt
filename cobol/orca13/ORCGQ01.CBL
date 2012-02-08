@@ -1375,7 +1375,7 @@
            MOVE    1               TO  SPA-GMN-Q01-TENKENRECELST-MAX
       *
            MOVE    "1"             TO  SPA-GMN-Q01-TENKENRECEL    (01)
-           MOVE    "£∞±ﬂ∏¯»Òµ≠∫‹ ¨" TO SPA-GMN-Q01-TENKENRECEMEIL (01)
+           MOVE    "£∞≈¿∏¯»Òµ≠∫‹ ¨" TO SPA-GMN-Q01-TENKENRECEMEIL (01)
       *
            .
        3101-TENKENRECE-CMB-SYOKI-EXT.
@@ -2342,7 +2342,7 @@
       *    ∫“≥≤≥∫≈ˆ
            MOVE    Q01-SAIGAIKBN       TO  SPA-GMN-Q01-SAIGAIKBN-G
       *
-      *    £∞±ﬂ∏¯»Òµ≠∫‹ ¨
+      *    £∞≈¿∏¯»Òµ≠∫‹ ¨
            MOVE    Q01-TENKENRECE      TO  SPA-GMN-Q01-TENKENRECE-G
       *
            PERFORM VARYING IDXB    FROM    1   BY  1
@@ -2702,7 +2702,7 @@
                GO  TO  4101-KHN-INPUT-CHK-EXT
            END-IF
       *
-      *    £∞±ﬂ∏¯»Òµ≠∫‹ ¨•¡•ß•√•Ø
+      *    £∞≈¿∏¯»Òµ≠∫‹ ¨•¡•ß•√•Ø
            PERFORM 4117-TENKENRECE-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  4101-KHN-INPUT-CHK-EXT
