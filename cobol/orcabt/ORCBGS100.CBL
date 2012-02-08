@@ -52,6 +52,9 @@
        01  STS-AREA.
            03  STS-BGS100ERR       PIC X(02).
       *
+       01  FLG-AREA.
+           03  FLG-ERR             PIC 9(01).
+      *
        01  WRK-AREA.
            03  WRK-ERRMSG          PIC X(200).
       *
@@ -107,7 +110,7 @@
       *
            PERFORM 100-INIT-SEC
       *
-           IF    ( BGS100P-RC      =   ZERO )
+           IF    ( FLG-ERR         =   ZERO )
                PERFORM 200-MAIN-SEC
            END-IF
       *
@@ -125,6 +128,7 @@
                                    SPA-AREA
                                    STS-AREA
                                    WRK-AREA
+                                   FLG-AREA
       *
            PERFORM 100-DBOPEN-SEC
       *
@@ -154,6 +158,7 @@
            MOVE    LNK-PRTKANRI-SKYYMD TO  SPA-SYSYMD
       *
            MOVE    SPA-HOSPNUM         TO  TMPFLPARA-HOSPNUM
+           MOVE    SPA-TERMID          TO  TMPFLPARA-TERMID
            MOVE    "BGS100F"           TO  TMPFLPARA-FILE-ID
       *
            MOVE    1                   TO  TMPFLPARA-SYOKBN2
@@ -326,6 +331,17 @@
                END-IF
            END-IF
       *
+           EVALUATE    BGS100P-RC
+           WHEN    2
+               MOVE    SPACE   TO  WRK-ERRMSG
+               STRING    "０点公費記載の対象レセプトがあるため"
+                                           DELIMITED BY SIZE
+                         "処理できません"  DELIMITED BY SIZE
+               INTO    WRK-ERRMSG
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+           END-EVALUATE
+      *
            .
        200-MAIN-EXT.
            EXIT.
@@ -350,13 +366,18 @@
            CALL    "orcfiledel"        USING
                                        ORCSFDELAREA
       *
+           MOVE    ZERO                TO  IF-RESULT
+           MOVE    BGS100P-ETCFNAME    TO  IF-FILENAME
+           CALL    "orcfiledel"        USING
+                                       ORCSFDELAREA
+      *
            IF    ( BGS100P-PAGE        =   ZERO )
                MOVE    "処理対象のデータがありませんでした"
                                    TO  WRK-ERRMSG
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
       *
-           IF    ( BGS100P-RC          =   ZERO )
+           IF    ( FLG-ERR             =   ZERO )
                MOVE    "STM"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
                PERFORM 800-ORCSJOB-SEC
@@ -395,7 +416,7 @@
                PERFORM 800-ORCSJOB-SEC
            END-IF
       *
-           MOVE    1                   TO  BGS100P-RC
+           MOVE    1                   TO  FLG-ERR
       *
            .
        500-ERR-HENSYU-EXT.

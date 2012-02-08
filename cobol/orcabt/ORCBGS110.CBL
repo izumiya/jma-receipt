@@ -326,11 +326,15 @@
            END-IF
       *
       *    ¤½¤ÎÂ¾ÀÁµá
-           PERFORM 2001-ETC-SEIKYU-EDIT-SEC
+           IF    ( BGS100P-RC      =   ZERO )
+               PERFORM 2001-ETC-SEIKYU-EDIT-SEC
+           END-IF
       *
       *    ¿ÇÎÅ²ÊÊÔ½¸
-           IF    ( BGS100P-RECEKA-MAX  >   ZERO )
-               PERFORM 2001-RECEKA-EDIT-SEC
+           IF    ( BGS100P-RC      =   ZERO )
+               IF    ( BGS100P-RECEKA-MAX  >   ZERO )
+                   PERFORM 2001-RECEKA-EDIT-SEC
+               END-IF
            END-IF
       *
            CLOSE           BGSSKY-FILE
@@ -351,6 +355,7 @@
            PERFORM 900-SEIKYU-SEL-SEC
       *
            PERFORM UNTIL ( FLG-SEIKYU  NOT =   ZERO )
+                    OR   ( BGS100P-RC  NOT =   ZERO )
       *
                PERFORM 900-PTINF-KEY-SEL-SEC
                IF    ( PTINF-TSTPTNUMKBN   NOT =   "1" )
@@ -819,9 +824,9 @@
            MOVE    RECE10-REC      TO  MCPDATA-REC
            MOVE    WRK-TABLE       TO  MCP-TABLE
            MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  RECE10-REC
+               PERFORM 900-SEIKYU-FET-SEC
            ELSE
                MOVE    1           TO  FLG-SEIKYU
                INITIALIZE              RECE10-REC
@@ -843,6 +848,11 @@
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC          =   ZERO )
                MOVE    MCPDATA-REC TO  RECE10-REC
+      *
+               IF    ( RECE10-SKYKBN-RECEDEN   =   "1" )
+                   MOVE    2       TO  BGS100P-RC
+               END-IF
+      *
            ELSE
                MOVE    1           TO  FLG-SEIKYU
                INITIALIZE              RECE10-REC
