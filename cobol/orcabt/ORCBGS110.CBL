@@ -219,7 +219,9 @@
       *
            PERFORM 100-INIT-SEC
       *
-           PERFORM 200-MAIN-SEC
+           IF    ( BGS100P-RC      =   ZERO )
+               PERFORM 200-MAIN-SEC
+           END-IF
       *
            PERFORM 300-END-SEC
       *
@@ -285,6 +287,12 @@
            CLOSE           BGSSKY-FILE
                            BGSKOH-FILE
                            BGSHKNJA-FILE
+      *
+           PERFORM 900-SEIKYU-KEY79-SEL-SEC
+           DISPLAY "FLG-SEIKYU=" FLG-SEIKYU
+           IF    ( FLG-SEIKYU      =   ZERO )
+               MOVE    2   TO  BGS100P-RC
+           END-IF
       *
            .
        100-INIT-EXT.
@@ -804,6 +812,36 @@
        800-ORCSJOB-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    ÀÁµá´ÉÍý¸¡º÷½èÍý
+      *****************************************************************
+       900-SEIKYU-KEY79-SEL-SEC              SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SEIKYU
+      *
+           INITIALIZE                  RECE10-REC
+           MOVE    SPA-HOSPNUM     TO  RECE10-HOSPNUM
+           MOVE    BGS100P-SRYYM   TO  RECE10-SKYYM
+           MOVE    "%"             TO  RECE10-NYUGAIKBN
+           MOVE    RECE10-REC      TO  MCPDATA-REC
+           MOVE    "tbl_seikyu"    TO  MCP-TABLE
+           MOVE    "key79"         TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  RECE10-REC
+           ELSE
+               MOVE    1           TO  FLG-SEIKYU
+               INITIALIZE              RECE10-REC
+           END-IF
+      *
+           MOVE    "tbl_seikyu"    TO  MCP-TABLE
+           MOVE    "key79"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-SEIKYU-KEY79-SEL-EXT.
+           EXIT.
       *****************************************************************
       *    ÀÁµá´ÉÍý¸¡º÷½èÍý
       *****************************************************************
