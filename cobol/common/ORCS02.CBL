@@ -322,6 +322,7 @@
       *  04.05.24    NACL-門脇    12/01/16  群馬県地方公費対応
       *  04.05.25    NACL-門脇    12/02/06  災害対応
       *                                     （食事免除は平成２４年２月まで）
+      *  04.05.26    NACL-門脇    12/02/08  宮城県地方公費対応（仙台市）修正
       *
       *  04.06.01    NACL-門脇    10/11/08  主保険＋マル長の請求対応
       ****************************************************************
@@ -28239,6 +28240,9 @@
              OR  (LNK-SYU-KOH4HKNNUM   = "972" OR "974" )
                 MOVE      ZERO     TO    LNK-SYU-JYO-HKNFTNMONEY
              END-IF
+             IF   WK-GENGAKUKBN    NOT  =   ZERO
+                MOVE      ZERO     TO    LNK-SYU-JYO-HKNFTNMONEY
+             END-IF
       *
            END-IF
       *
@@ -28288,6 +28292,12 @@
       *
       ******************************************************************
        230952-OITA-TOKUSYU-HENSYU2-SEC         SECTION.
+      *
+           IF   WK-GENGAKUKBN    NOT  =   ZERO
+             MOVE    ZERO    TO    LNK-SYU-JYO-HKNFTNMONEY
+             MOVE    ZERO    TO    LNK-SYU-JYO-COMPFTN
+             MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
+           END-IF
       *
            IF      WK-OITA-CYOFTN-KON   NOT  =  ZERO
              MOVE    WK-OITA-CYOFTN-KON  TO  LNK-SYU-JYO-COMPFTN

@@ -354,6 +354,7 @@
       *  04.05.25    NACL-門脇    11/12/05  特定保険者＋精神、結核対応
       *                                     (283077)平成２３年１１月まで
       *  04.05.26    NACL-門脇    12/01/16  群馬県地方公費対応
+      *  04.05.27    NACL-門脇    12/02/08  宮城県地方公費対応（仙台市）修正
       *
       *  04.06.01    NACL-門脇    10/09/02  出産育児一時金直接支払制度（外来）
       *  04.06.02    NACL-門脇    10/11/08  主保険＋マル長の請求対応
@@ -25145,6 +25146,9 @@
              OR  (LNK-SYU-KOH4HKNNUM   = "972" OR "974" )
                 MOVE      ZERO     TO    LNK-SYU-JYO-HKNFTNMONEY
              END-IF
+             IF   WK-GENGAKUKBN    NOT  =   ZERO
+                MOVE      ZERO     TO    LNK-SYU-JYO-HKNFTNMONEY
+             END-IF
       *
            END-IF
       *
@@ -25194,6 +25198,12 @@
       *
       ******************************************************************
        230742-OITA-TOKUSYU-HENSYU2-SEC         SECTION.
+      *
+           IF   WK-GENGAKUKBN    NOT  =   ZERO
+             MOVE    ZERO    TO    LNK-SYU-JYO-HKNFTNMONEY
+             MOVE    ZERO    TO    LNK-SYU-JYO-COMPFTN
+             MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
+           END-IF
       *
            IF      WK-OITA-CYOFTN-KON   NOT  =  ZERO
              MOVE    WK-OITA-CYOFTN-KON  TO  LNK-SYU-JYO-COMPFTN
