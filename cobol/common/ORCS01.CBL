@@ -354,6 +354,7 @@
       *  04.05.25    NACL-ÌçÏÆ    11/12/05  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     (283077)Ê¿À®£²£³Ç¯£±£±·î¤Þ¤Ç
       *  04.05.26    NACL-ÌçÏÆ    12/01/16  ·²ÇÏ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.27    NACL-ÌçÏÆ    12/02/08  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ¡ÊÀçÂæ»Ô¡Ë½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -25126,6 +25127,9 @@
              OR  (LNK-SYU-KOH4HKNNUM   = "972" OR "974" )
                 MOVE      ZERO     TO    LNK-SYU-JYO-HKNFTNMONEY
              END-IF
+             IF   WK-GENGAKUKBN    NOT  =   ZERO
+                MOVE      ZERO     TO    LNK-SYU-JYO-HKNFTNMONEY
+             END-IF
       *
            END-IF
       *
@@ -25175,6 +25179,12 @@
       *
       ******************************************************************
        230742-OITA-TOKUSYU-HENSYU2-SEC         SECTION.
+      *
+           IF   WK-GENGAKUKBN    NOT  =   ZERO
+             MOVE    ZERO    TO    LNK-SYU-JYO-HKNFTNMONEY
+             MOVE    ZERO    TO    LNK-SYU-JYO-COMPFTN
+             MOVE    ZERO    TO    WK-OITA-CYOFTN-KON
+           END-IF
       *
            IF      WK-OITA-CYOFTN-KON   NOT  =  ZERO
              MOVE    WK-OITA-CYOFTN-KON  TO  LNK-SYU-JYO-COMPFTN
