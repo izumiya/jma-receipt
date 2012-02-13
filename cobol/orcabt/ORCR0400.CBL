@@ -53,6 +53,7 @@
       *  03.05.02    NACL-藤原    07/06/01  realtime preview 処理追加
       *  03.05.03    NACL-門脇    07/07/17  個別時のシステム管理編集修正
       *  04.01.01    NACL-門脇    07/10/31  公務災害対応
+      *  04.05.01    NACL-門脇    12/02/13  アフターケア診療科情報編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -688,6 +689,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE40-HOSPNUM
                            MOVE    RECE40-REC  TO  WRK-RECE40-REC 
                            PERFORM 20011-RECE40-REWRITE-SEC
                        ELSE
+                           INITIALIZE              WRK-RECE40-SRYKAINF
                            MOVE    WRK-SRYYMD  TO  WRK-RECE40-TEKSTYMD  
                            PERFORM 20011-RECE40-WRITE-SEC
                        END-IF
