@@ -2213,14 +2213,14 @@
       *
            IF     (SPA-ERRCD           =   SPACE)  AND
                   (SPA-DATATEISYUTUKBN =   ZERO)
-               STRING  "日本医師会では日レセからのデータ自動送信"
-                       "を使った感染症マップ作成を始めました。ご"
-                       "協力をお願いします。"
+               STRING  "日レセから自動送信による感染症マップを"
+                       "日本医師会ホームページにて公開中です。"
+                       "ご協力ください。"
                                            DELIMITED  BY  SIZE
                                            INTO    SPA-GMN-LBLMSG2
                END-STRING
-               STRING  "感染症など件数のみの提供を許諾の上Ｆ４キ"
-                       "ーを押してください。"
+               STRING  "下方、Ｆ４キー（感染症設定ボタン）で参加"
+                       "登録をお願いします。"
                                            DELIMITED  BY  SIZE
                                            INTO    SPA-GMN-LBLMSG
                END-STRING
