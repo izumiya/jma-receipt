@@ -112,6 +112,9 @@
       *  04.06.07    NACL-藤原    11/07/04  廃止病名入力時の病名種別の表示
       *  04.06.08    NACL-藤原    11/11/22  種別変更時の登録前チェックの
       *                                     変更
+      *  04.06.09    NACL-藤原    12/02/10  入力コード欄よりコード入力後
+      *                                     自院病名コード変更時の削除処
+      *                                     理を行うようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1693,6 +1696,7 @@
            IF      SPA-GMN-C03-BANGO   =   ZERO
                IF    ( SPA-GMN-C03-BYOMEICD-G  NOT =   SPACE )
                OR    ( SPA-GMN-C03-BYOMEI      NOT =   SPACE )
+      *            コード変更時のチェック
                    INITIALIZE              USERBYOMEI-REC
       *************MOVE    SPA-HOSPID      TO  USBYO-HOSPID
                    MOVE    SPA-NAI-C03-CDSYU   TO  USBYO-CDSYU
@@ -1706,8 +1710,14 @@
                        GO  TO  41002-BYOMEIINPUT-CHK-EXT
                    END-IF
                ELSE
+      *            登録済かどうかのチェック
                    PERFORM 410111-USERBYOMEI-HENSYU-SEC
                    IF      FLG-USERBYOMEI  =   ZERO
+                       MOVE    SPA-GMN-C03-BYOMEIINPUTCD
+                                       TO  SPA-NAI-C03-BYOMEIINPUTCD-OLD
+                       MOVE    SPA-NAI-C03-CDSYU
+                                       TO  SPA-NAI-C03-CDSYU-OLD 
+      *
                        PERFORM VARYING     IDX     FROM    1   BY  1
                                UNTIL       IDX     >   SPA-GMN-C03-MAX
                            IF      SPA-GMN-C03-BYOMEIINPUTCD   =
@@ -3471,14 +3481,12 @@ grpsys                                         SPA-AREA
       *
            IF      SPA-GMN-C03-BYOMEIINPUTCD   NOT =   SPACE
                INITIALIZE                  USERBYOMEI-REC
-      *********MOVE    SPA-HOSPID          TO  USBYO-HOSPID
                MOVE    SPA-NAI-C03-CDSYU       TO  USBYO-CDSYU
                MOVE    SPA-GMN-C03-BYOMEIINPUTCD
                                            TO  USBYO-BYOMEIINPUTCD
                PERFORM 900-USBYO-INV-SEC
                IF      FLG-USERBYOMEI      =   1
                    INITIALIZE                  USERBYOMEI-REC
-      *************MOVE    SPA-HOSPID          TO  USBYO-HOSPID
                    MOVE    SPA-NAI-C03-CDSYU       TO  USBYO-CDSYU
                    MOVE    SPA-GMN-C03-BYOMEIINPUTCD
                                                TO  USBYO-BYOMEIINPUTCD
