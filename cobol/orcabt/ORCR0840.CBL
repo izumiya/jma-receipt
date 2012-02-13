@@ -197,6 +197,7 @@
       *  04.05.08    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
       *  04.05.09    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
       *  04.05.10    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
+      *  04.05.11    NACL-ÌçÏÆ    12/02/13  ²ó¿ôÍóÊÔ½¸½¤Àµ¡ÊÄ´ºÞ¡¢ËãÆÇ¡¢Ä´´ð¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4110,8 +4111,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                             (WK-ZAITEN   *   WK-ZAIKAISU)
       *    Ä´ºÞ¤Î¥ì¥»ÅÀ¿ôÍó¤ÎÊÔ½¸
                WHEN    "24"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(7)
@@ -4121,8 +4123,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                             (TNS-TEN   *   ACCT-ZAIKAISU)
       *    ËãÆÇ¤Î¥ì¥»ÅÀ¿ôÍó¤ÎÊÔ½¸
                WHEN    "26"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(8)
@@ -4454,8 +4457,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                            MOVE   1       TO    FLG-KHNTEN7-JI
                       END-IF
                    END-IF
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(7)
@@ -4476,8 +4480,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                       END-IF
                     END-IF
                    END-IF
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(8)
@@ -4496,8 +4501,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                            MOVE   1       TO    FLG-KHNTEN9-JI
                       END-IF
                    END-IF
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(9)
@@ -4973,8 +4979,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                       END-IF
                      END-IF
                    END-IF
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(7)
@@ -4998,8 +5005,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                       END-IF
                      END-IF
                    END-IF
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(8)
@@ -5023,8 +5031,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                       END-IF
                      END-IF
                    END-IF
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(9)
@@ -5509,8 +5518,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                             (WK-ZAITEN   *   WK-ZAIKAISU)
       *    Ä´ºÞ¤Î¥ì¥»ÅÀ¿ôÍó¤ÎÊÔ½¸
                WHEN    "24"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(22)
@@ -5520,8 +5530,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                             (TNS-TEN   *   ACCT-ZAIKAISU)
       *    ËãÆÇ¤Î¥ì¥»ÅÀ¿ôÍó¤ÎÊÔ½¸
                WHEN    "26"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE82-KAISU(23)

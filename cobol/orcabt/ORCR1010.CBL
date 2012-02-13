@@ -82,6 +82,7 @@
       *  04.05.06    NACL-門脇    11/06/21  画像診断・電子画像管理加算の
       *                                     表用番号編集
       *  04.05.07    NACL-門脇    11/12/16  器材の金額と単位の対応
+      *  04.05.08    NACL-門脇    12/02/13  回数欄編集修正（処方、麻毒）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3511,8 +3512,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       END-IF
                      END-IF
                    END-IF
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE100-KAISU(21)
@@ -3522,8 +3524,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                             (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE100-KAISU(22)
@@ -3537,8 +3540,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                             (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
       *    調基のレセ点数欄の編集
                WHEN    "27"
-      ***          IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-      ***          OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+      ***          IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+      ***          OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+      ***          OR  (SRY-SRYCD(IDX3)        = "099999903")
       ***             CONTINUE
       ***          ELSE
       ***             ADD    WK-ZAIKAISU     TO    RECE100-KAISU(23)

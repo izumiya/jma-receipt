@@ -542,6 +542,7 @@
       *  04.05.38    NACL-門脇    11/12/15  減免対応（東大阪市）
       *  04.05.39    NACL-門脇    11/12/16  器材の金額と単位の対応
       *  04.05.40    NACL-門脇    12/01/23  長崎県地方公費対応
+      *  04.05.41    NACL-門脇    12/02/13  回数欄編集修正（処方、麻毒）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8901,8 +8902,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       END-IF
                      END-IF
                    END-IF
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE02-KAISU(19)
@@ -8929,8 +8931,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                    END-IF
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE02-KAISU(20)
