@@ -87,6 +87,7 @@
       *                                     表用番号編集
       *  04.05.08    NACL-門脇    11/11/09  同日再入院食事対応
       *  04.05.09    NACL-門脇    11/12/16  器材の金額と単位の対応
+      *  04.05.10    NACL-門脇    12/02/13  回数欄編集修正（調剤、麻毒）
       *
       *  04.06.01    NACL-門脇    10/08/16  入院の点滴入力改善対応
       *****************************************************************
@@ -2992,8 +2993,9 @@
                             (WK-ZAITEN   *   WK-ZAIKAISU)
       *    調剤のレセ点数欄の編集
                WHEN    "24"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE200-KAISU(7)
@@ -3003,8 +3005,9 @@
                             (TNS-TEN     *   ACCT-ZAIKAISU)
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE200-KAISU(8)

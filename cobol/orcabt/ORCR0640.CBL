@@ -528,6 +528,7 @@
       *  04.05.46    NACL-門脇    12/01/23  長崎県地方公費対応
       *  04.05.47    NACL-門脇    12/02/06  災害対応
       *                                     （食事免除は平成２４年２月まで）
+      *  04.05.48    NACL-門脇    12/02/13  回数欄編集修正（調剤、麻毒）
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -5848,8 +5849,9 @@
                    END-IF
       *    調剤のレセ点数欄の編集
                WHEN    "24"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE62-KAISU(7)
@@ -5876,8 +5878,9 @@
                    END-IF
       *    麻毒のレセ点数欄の編集
                WHEN    "26"
-                   IF  (SRY-SRYCD(IDX3)(1:1)   =   "8"  )
-                   OR  (SRY-SRYCD(IDX3)(1:3)   =   "008")
+                   IF  (SRY-SRYCD(IDX3)(1:1)   = "S" OR "8" )
+                   OR  (SRY-SRYCD(IDX3)(1:3)   = "008"      )
+                   OR  (SRY-SRYCD(IDX3)        = "099999903")
                       CONTINUE
                    ELSE
                       ADD    WK-ZAIKAISU     TO    RECE62-KAISU(8)
