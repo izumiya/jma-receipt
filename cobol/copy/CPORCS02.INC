@@ -62,6 +62,8 @@
            03  LNK-S02-KOUREI-NYUIN-KBN    PIC  X(01).
       *自立支援再計算区分
            03  LNK-S02-JIRITU-SAI-KBN      PIC  X(01).
+      *特殊計算再計算区分
+           03  LNK-S02-TOKUSYU-SAI-KBN     PIC  X(01).
       *入院通算日数
            03  LNK-S02-NYUIN-TSUSAN-NISSU  PIC  9(04).
       *システム日付

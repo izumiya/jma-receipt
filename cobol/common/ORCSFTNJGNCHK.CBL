@@ -140,6 +140,7 @@
            03  WRK-CHIHOUNUMKBN   PIC X(01).
       *
            03  WRK-TEISYOTOKU     PIC X(01).
+           03  WRK-TEISYOTOKU2    PIC X(01).
            03  WRK-RECEJGNDSPKBN  PIC X(01).
       *
            03  WRK-HKNCOMBINUM-TBL.
@@ -298,6 +299,7 @@
            MOVE        ZERO      TO     FLG-CHECK
            MOVE        ZERO      TO     FLG-OK
            MOVE        SPACE     TO     WRK-TEISYOTOKU
+           MOVE        SPACE     TO     WRK-TEISYOTOKU2
            MOVE        SPACE     TO     WRK-RECEJGNDSPKBN
            MOVE        ZERO      TO     WRK-KOHFTN-RITU
       *
@@ -559,6 +561,7 @@
            IF    LNK-SYOTOKU-RC    =   ZERO
                  MOVE   LNK-SYOTOKU-CHIKBN(SYOTOKU-IDX)
                                         TO  WRK-TEISYOTOKU
+                                            WRK-TEISYOTOKU2
            END-IF
       *
            IF ((LNK-FTNJGNCHK-PREFNUM =  32            ) AND
@@ -1171,7 +1174,7 @@
                  (LNK-FTNJGNCHK-SRYYM   >= "200804"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
                  (LNK-FTNJGNCHK-KOHNUM   = "483"   ) AND
-                 (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
+                 (WRK-TEISYOTOKU2    NOT =  SPACE  ) AND
                  (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "200804"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
@@ -1180,7 +1183,7 @@
                  (LNK-FTNJGNCHK-SRYYM   >= "201001"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
                  (LNK-FTNJGNCHK-KOHNUM   = "783"   ) AND
-                 (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
+                 (WRK-TEISYOTOKU2    NOT =  SPACE  ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "201004"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
                  (LNK-FTNJGNCHK-KOHNUM   =
@@ -1196,7 +1199,7 @@
                  (LNK-FTNJGNCHK-SRYYM   >= "200904"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
                  (LNK-FTNJGNCHK-KOHNUM   = "683"   ) AND
-                 (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
+                 (WRK-TEISYOTOKU2    NOT =  SPACE  ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "200904"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
                  (LNK-FTNJGNCHK-KOHNUM   = "343" OR
@@ -1205,7 +1208,7 @@
                  (LNK-FTNJGNCHK-SRYYM   >= "200507"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
                  (LNK-FTNJGNCHK-KOHNUM   = "344"   ) AND
-                 (WRK-TEISYOTOKU     NOT =  SPACE  ) AND
+                 (WRK-TEISYOTOKU2    NOT =  SPACE  ) AND
                  (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "200507"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
