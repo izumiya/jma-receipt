@@ -258,6 +258,7 @@
       *  04.05.11    NACL-藤原    11/12/05  上部の診療科未入力時の診療科表示
       *  04.05.12    NACL-藤原    12/01/13  患者番号未入力時の病名一覧の
       *                                     表示を行わないようにする
+      *  04.05.13    NACL-太田    12/02/20  前画面戻り時SPA-PTIDを初期化する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6427,6 +6428,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
                INITIALIZE                  SPA-KYOTUKEY
                                            SPA-KYOTU-SET
            END-IF 
+           MOVE    SPACE               TO  SPA-PTNUM
+           MOVE    ZERO                TO  SPA-PTID
            MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
       *
       ***  MOVE    "CHANGE"            TO  MCP-PUTTYPE
