@@ -758,6 +758,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  BG0162-HOSPNUM
            PERFORM UNTIL ( FLG-NYUINACCT   NOT =   ZERO )
                IF    ( NACCT-ZAISKBKBN =   "5" )
                    INITIALIZE          SS009-AREA
+                   MOVE    "1"         TO      SS009-EXGAIHAKU
                    CALL    "ORCSS009"  USING   SS009-AREA
                                                NYUINACCT-REC
                                                SPA-AREA
@@ -855,6 +856,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  BG0162-HOSPNUM
            PERFORM UNTIL ( FLG-NYUINACCT   NOT =   ZERO )
                IF    ( NACCT-ZAIKAISU  >   ZERO )
                    INITIALIZE          SS009-AREA
+                   MOVE    "1"         TO      SS009-EXGAIHAKU
                    CALL    "ORCSS009"  USING   SS009-AREA
                                                NYUINACCT-REC
                                                SPA-AREA
