@@ -2227,15 +2227,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM
                    UNTIL   (FLG-SRYACCT        =   1    ) OR
                            (FLG-OK             =   1    )
-      *          投薬関係の有無
-                 IF      ACCT-SRYKBN(1:1)      =   "2"
-                     MOVE    1                 TO  FLG-TOUYAKU
-                 END-IF
+      ****       投薬関係の有無
+      *          IF      ACCT-SRYKBN(1:1)      =   "2"
+      *              MOVE    1                 TO  FLG-TOUYAKU
+      *          END-IF
       *
       *          入院調剤料と麻毒については後で一括変更するのでそのまま
-                 IF      ACCT-SRYKBN             =   "24"  OR "26"
-                       CONTINUE
-                 ELSE
+      *          IF      ACCT-SRYKBN             =   "24"  OR "26"
+      *                CONTINUE
+      ****       ELSE
       *
                    MOVE    JYURRK-SRYYMD(7:2)      TO  IDX-2
                    EVALUATE    JYURRK-RENNUM
@@ -2281,7 +2281,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                        END-IF
                    END-IF
       *
-                  END-IF
+      *****       END-IF
       *
                    MOVE    "tbl_sryacct_prv"   TO  MCP-TABLE
                    MOVE    "key5"              TO  MCP-PATHNAME
@@ -2407,6 +2407,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 915-SRYACT-NEXT-SEC
            ELSE
                MOVE    1                   TO  FLG-SRYACT
+           END-IF
+      *    投薬関係の有無
+           IF       FLG-SRYACT         =   ZERO
+               IF      (ACCT-SRYKBN        =   "21"
+                                           OR  "22"
+                                           OR  "23" )
+                   IF      (SRY-SRYSYUKBN(3:1)   NOT =   "4" )
+                       MOVE    1                 TO  FLG-TOUYAKU
+                   END-IF
+               END-IF
            END-IF
            PERFORM
                    UNTIL   FLG-SRYACT          =   1
