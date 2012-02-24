@@ -194,7 +194,9 @@
                05  WRK-NYUKHNKSN-SRYCD PIC X(09)  OCCURS 60.
            03  WRK-NYUKSNKBN               PIC X(03).
            03  WRK-BTU-NYUKSNKBN           PIC X(03).
+           03  WRK-BTU-CHUKSNCD            PIC X(04).
            03  WRK-KSN-NYUKSNKBN           PIC X(03).
+           03  WRK-KSN-CHUKSNCD            PIC X(04).
            03  WRK-SRYCD                   PIC X(09).
            03  WRK-STYUKYMD                PIC X(08).
            03  WRK-NYUINYM                 PIC X(06).
@@ -3268,6 +3270,17 @@
                    END-PERFORM
                  END-IF
                END-IF
+      *
+      *      入院料加算（ユーザー設定）
+             PERFORM   VARYING   IDX7   FROM   1  BY  1
+               UNTIL  (IDX7      >   10)
+                   IF   SYS-5001-KSNCD2(IDX7)  NOT =   SPACE
+                       ADD   1     TO    IDX8
+                       MOVE   SYS-5001-KSNCD2(IDX7) TO
+                                            WRK-NYUKHNKSN-SRYCD(IDX8)
+                   END-IF
+             END-PERFORM
+      *
            END-IF
       *
       *病室情報
@@ -3450,6 +3463,16 @@
                PERFORM 900-CLOSE-SEC
            END-IF
       *
+      *    注加算コードが同一であることの判定
+           IF   WRK-KSN-CHUKSNCD      NOT =    SPACE
+              IF   WRK-BTU-CHUKSNCD   =        WRK-KSN-CHUKSNCD
+                  CONTINUE
+              ELSE
+                  MOVE    1     TO    FLG-NYUKSN
+              END-IF
+           END-IF
+      *
+      *
            .
       *
        4801-NYUKSN-CHK-EXT.
@@ -3461,6 +3484,7 @@
        48011-TENSU-SEL-SEC              SECTION.
       *
            MOVE    SPACE           TO  WRK-NYUKSNKBN
+           MOVE    SPACE           TO  WRK-BTU-CHUKSNCD
            MOVE    SPACE           TO  WRK-TOKUBETSU-NYUIN
       *
            MOVE    ZERO            TO  FLG-TENSU
@@ -3500,6 +3524,7 @@
       *
            MOVE    TNS-NYUKHNKSNKBN
                                    TO  WRK-BTU-NYUKSNKBN
+           MOVE    TNS-CHUKSNCD    TO  WRK-BTU-CHUKSNCD
       *    特別入院料の判定
            EVALUATE   TNS-NYUKHNKBN
                WHEN   73
@@ -3527,6 +3552,7 @@
        48012-TENSU-SEL-SEC              SECTION.
       *
            MOVE    SPACE           TO  WRK-NYUKSNKBN
+           MOVE    SPACE           TO  WRK-KSN-CHUKSNCD
       *
            MOVE    ZERO            TO  FLG-TENSU
            INITIALIZE              TNS-TENSU-REC
@@ -3570,6 +3596,20 @@
       *
            MOVE    TNS-NYUKHNKSNKBN
                                    TO  WRK-KSN-NYUKSNKBN
+      *
+      *    入院料（Ａ１００番台）、特定入院料（Ａ３００番台）に含まれる
+      *    注加算のみが判定対象となる
+           IF      (TNS-CDKBN-KBN       =   "A")     AND
+                   (TNS-CDKBN-KBNNUM   >=   100)     AND
+                   (TNS-CDKBN-KBNNUM   <=   199)
+               MOVE    TNS-CHUKSNCD    TO  WRK-KSN-CHUKSNCD
+           END-IF
+      *
+           IF      (TNS-CDKBN-KBN       =   "A")     AND
+                   (TNS-CDKBN-KBNNUM   >=   300)     AND
+                   (TNS-CDKBN-KBNNUM   <=   399)
+               MOVE    TNS-CHUKSNCD    TO  WRK-KSN-CHUKSNCD
+           END-IF
            .
       *
        48012-TENSU-SEL-EXT.
