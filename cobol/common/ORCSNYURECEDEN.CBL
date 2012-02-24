@@ -1495,6 +1495,16 @@
                                      TO  WRK-CHUKSN-NYUKSN-DAY(6 IDX1)
                          END-IF
       *
+      *                  ÍÛ·Ï…æ≤¡º¬ª‹≤√ªª° Õ≠æ≤ø«Œ≈ΩÍ°À
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190122670
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(13)
+                           MOVE   NACCT-ZAITEN
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(13)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO WRK-CHUKSN-NYUKSN-DAY(13 IDX1)
+                         END-IF
+      *
                        END-IF
                    END-PERFORM
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
@@ -1538,6 +1548,16 @@
                        AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5)
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
       *
+      *                  øÕπ©∏∆µ€¥Ôª»Õ—≤√ªª° ∆√ºÏº¿¥µ°À
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190055470
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(7)
+                           MOVE   NACCT-ZAITEN
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(7)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(7 IDX1)
+                         END-IF
+      *
       *                  •◊•Ï•§•Î°º•‡°¢ ›∞ÈªŒ≈˘≤√ªª
                          IF   NACCT-SRYCDTOTAL(6:9)  =   190111370
                            MOVE   NACCT-SRYCDTOTAL(6:9)
@@ -1545,7 +1565,47 @@
                            MOVE   NACCT-ZAITEN  
                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(8)
                            MOVE   NACCT-DAY(IDX1)
-                                     TO WRK-CHUKSN-NYUKSN-DAY(8 IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(8 IDX1)
+                         END-IF
+      *
+      *                  øÕπ©∏∆µ€¥Ôª»Õ—≤√ªª° æÆª˘∆˛±°∞ÂŒ≈°À
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190120970
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(9)
+                           MOVE   NACCT-ZAITEN
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(9)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(9 IDX1)
+                         END-IF
+      *
+      *                  Ω≈≈Ÿ«ß√Œæ…≤√ªª° ∆√ƒÍµ°«Ω…¬±°¿∫ø¿…¬≈Ô°À
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190119210
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(10)
+                           MOVE   NACCT-ZAITEN
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(10)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(10 IDX1)
+                         END-IF
+      *
+      *                  »ÛƒÍ∑øπ≥¿∫ø¿…¬ÃÙ≤√ªª£≤
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190117570
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(11)
+                           MOVE   NACCT-ZAITEN
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(11)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(11 IDX1)
+                         END-IF
+      *
+      *                  ÍÛ·Ï…æ≤¡º¬ª‹≤√ªª° Œ≈Õ‹…¬≈Ô°À
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190121970
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(12)
+                           MOVE   NACCT-ZAITEN
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(12)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(12 IDX1)
                          END-IF
       *
       *                  Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª
@@ -1558,14 +1618,44 @@
                                      TO  WRK-CHUKSN-NYUKSN-DAY(14 IDX1)
                          END-IF
       *
-      *                  Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª° ¥Ω‡Ã§≈¨πÁ°À
-                         IF   NACCT-SRYCDTOTAL(6:9)  =   190142370
+      *                  Ωºº¬√ ≥¨£¡≤√ªª
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190139470
                            MOVE   NACCT-SRYCDTOTAL(6:9)
-                                     TO  WRK-CHUKSN-NYUKSN(33)
-                           MOVE   NACCT-ZAITEN  
-                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(33)
+                                     TO  WRK-CHUKSN-NYUKSN(16)
+                           MOVE   NACCT-ZAITEN
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(16)
                            MOVE   NACCT-DAY(IDX1)
-                                     TO  WRK-CHUKSN-NYUKSN-DAY(33 IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(16 IDX1)
+                         END-IF
+      *
+      *                  Ωºº¬√ ≥¨£¬≤√ªª
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190139570
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(17)
+                           MOVE   NACCT-ZAITEN
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(17)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(17 IDX1)
+                         END-IF
+      *
+      *                  π‚≈Ÿ∞ÂŒ≈¬Œ¿©≤√ªª
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190139670
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                    TO  WRK-CHUKSN-NYUKSN(18)
+                           MOVE   NACCT-ZAITEN
+                                    TO  WRK-CHUKSN-NYUKSN-ZAITEN(18)
+                           MOVE   NACCT-DAY(IDX1)
+                                    TO  WRK-CHUKSN-NYUKSN-DAY(18 IDX1)
+                         END-IF
+      *
+      *                  »ÛƒÍ∑øπ≥¿∫ø¿…¬ÃÙ≤√ªª£±° £≤ºÔŒ‡∞ ≤º°À
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190141270
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                      TO  WRK-CHUKSN-NYUKSN(22)
+                           MOVE   NACCT-ZAITEN
+                                      TO  WRK-CHUKSN-NYUKSN-ZAITEN(22)
+                           MOVE   NACCT-DAY(IDX1)
+                                      TO WRK-CHUKSN-NYUKSN-DAY(22 IDX1)
                          END-IF
       *
       *                  µŸ∆¸•Í•œ•”•Í•∆°º•∑•Á•ÛƒÛ∂°¬Œ¿©≤√ªª
@@ -1576,6 +1666,46 @@
                                       TO  WRK-CHUKSN-NYUKSN-ZAITEN(23)
                            MOVE   NACCT-DAY(IDX1)
                                       TO WRK-CHUKSN-NYUKSN-DAY(23 IDX1)
+                         END-IF
+      *
+      *                  •Í•œ•”•Í•∆°º•∑•Á•ÛΩºº¬≤√ªª
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190140970
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                    TO  WRK-CHUKSN-NYUKSN(24)
+                           MOVE   NACCT-ZAITEN
+                                    TO  WRK-CHUKSN-NYUKSN-ZAITEN(24)
+                           MOVE   NACCT-DAY(IDX1)
+                                    TO WRK-CHUKSN-NYUKSN-DAY(24 IDX1)
+                         END-IF
+      *
+      *                  ∫ﬂ¬Ω≈æ…ª˘° º‘°Àºı∆˛≤√ªª
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190136170
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                    TO  WRK-CHUKSN-NYUKSN(29)
+                           MOVE   NACCT-ZAITEN
+                                    TO  WRK-CHUKSN-NYUKSN-ZAITEN(29)
+                           MOVE   NACCT-DAY(IDX1)
+                                    TO WRK-CHUKSN-NYUKSN-DAY(29 IDX1)
+                         END-IF
+      *
+      *                 •Í•œ•”•Í•∆°º•∑•Á•ÛƒÛ∂°¬Œ¿©≤√ªª
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190141070
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                    TO  WRK-CHUKSN-NYUKSN(32)
+                           MOVE   NACCT-ZAITEN
+                                    TO  WRK-CHUKSN-NYUKSN-ZAITEN(32)
+                           MOVE   NACCT-DAY(IDX1)
+                                    TO WRK-CHUKSN-NYUKSN-DAY(32 IDX1)
+                         END-IF
+      *
+      *                  Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª° ¥Ω‡Ã§≈¨πÁ°À
+                         IF   NACCT-SRYCDTOTAL(6:9)  =   190142370
+                           MOVE   NACCT-SRYCDTOTAL(6:9)
+                                     TO  WRK-CHUKSN-NYUKSN(33)
+                           MOVE   NACCT-ZAITEN  
+                                     TO  WRK-CHUKSN-NYUKSN-ZAITEN(33)
+                           MOVE   NACCT-DAY(IDX1)
+                                     TO  WRK-CHUKSN-NYUKSN-DAY(33 IDX1)
                          END-IF
       *
                        END-IF
@@ -1630,14 +1760,27 @@
                              (NACCT-SRYCDTOTAL(6:9) =  190126570)  OR
                              (NACCT-SRYCDTOTAL(6:9) =  190109670)  OR
                              (NACCT-SRYCDTOTAL(6:9) =  190126670)  OR
-                             (NACCT-SRYCDTOTAL(6:9) =  190126770)))
+                             (NACCT-SRYCDTOTAL(6:9) =  190126770)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190122670)))
                                         OR
                             (((SPA-HOSPSBT                 =    1) AND
                              (LNK-NYURECEDEN-SANTEIYM >= "200804")) AND
-                            ((NACCT-SRYCDTOTAL(6:9) =  190111370)  OR
+                            ((NACCT-SRYCDTOTAL(6:9) =  190055470)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190111370)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190120970)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190119210)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190117570)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190121970)  OR
                              (NACCT-SRYCDTOTAL(6:9) =  190129870)  OR
-                             (NACCT-SRYCDTOTAL(6:9) =  190142370)  OR
-                             (NACCT-SRYCDTOTAL(6:9) =  190140870)))
+                             (NACCT-SRYCDTOTAL(6:9) =  190139470)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190139570)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190139670)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190141270)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190140870)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190140970)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190136170)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190141070)  OR
+                             (NACCT-SRYCDTOTAL(6:9) =  190142370)))
                              CONTINUE
                          ELSE
                            IF   FLG-KSN   =  ZERO
@@ -1665,7 +1808,7 @@
            PERFORM   900-CLOSE-SEC
       *
       *
-      *    ∆˛±°Œ¡≤√ªªºË∆¿° ø«Œ≈≤Ò∑◊°À
+      *    √Ì≤√ªª§«§¢§Î∆˛±°Œ¡≤√ªªºË∆¿° ø«Œ≈≤Ò∑◊°À
            INITIALIZE                          SRYACCT-REC
            MOVE    LNK-NYURECEDEN-HOSPNUM  TO  ACCT-HOSPNUM
            MOVE    "1"                     TO  ACCT-NYUGAIKBN
@@ -1843,7 +1986,7 @@
                                       TO  WRK-CHUKSN-NYUKSN-ZAITEN(10)
                                   MOVE   ACCT-DAY(1 IDX1)
                                       TO WRK-CHUKSN-NYUKSN-DAY(10 IDX1)
-      *                         »ÛƒÍ∑øπ≥¿∫ø¿…¬ÃÙº£Œ≈¥…Õ˝≤√ªª
+      *                         »ÛƒÍ∑øπ≥¿∫ø¿…¬ÃÙ≤√ªª£≤
                                 WHEN  "190117570"
                                   MOVE   "190117570"
                                       TO  WRK-CHUKSN-NYUKSN(11)
