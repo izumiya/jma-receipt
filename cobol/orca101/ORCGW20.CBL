@@ -95,6 +95,7 @@
            03  IDX-KSN                             PIC 9(05).
            03  IDX-GKSN                            PIC 9(05).
            03  IDX-SST                             PIC 9(05).
+           03  IDX-KSN2                            PIC 9(05).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -406,6 +407,7 @@
            COPY    "W18.INC".
            COPY    "W19.INC".
            COPY    "W20.INC".
+           COPY    "W201.INC".
            COPY    "W21.INC".
            COPY    "W22.INC".
            COPY    "W23.INC".
@@ -489,8 +491,6 @@
       *
       *    エラー画面より
            IF    ( SPA-MOTOPG          =   "WERR" )
-               MOVE    SPA-GMN-W20-MOTOPG
-                                       TO  SPA-MOTOPG
                PERFORM 5001-MAPCUR-SEC
            ELSE
       *        初期画面セット
@@ -531,10 +531,10 @@
       *
            EVALUATE    SPA-MOTOPG
            WHEN    "W21"
-               IF    ( SPA-MOTOPG2     =   "W20" )
-                   MOVE    "W01"       TO  SPA-MOTOPG
-                   MOVE    SPACE       TO  SPA-MOTOPG2
-                                           SPA-MOTOPG3
+               IF    ( SPA-W20-W21-MOTOPG  =   "W20" )
+      *
+                   INITIALIZE  SPA-W20-W21-AREA
+      *
       *            病棟リストを再編集する
                    MOVE    SPA-GMN-W20-BTULST-SEL
                                        TO  WRK-BTULST-SEL
@@ -551,9 +551,18 @@
                    PERFORM 310-BTU-SET-SEC
                    GO  TO  300-SCREEN-EXT
                END-IF
+           WHEN    "W201"
+      *            病棟リストを再編集する
+                   MOVE    SPA-GMN-W20-BTULST-SEL
+                                       TO  WRK-BTULST-SEL
+                   PERFORM 3101-EDIT-BTULST-SEC 
+                   MOVE    WRK-BTULST-SEL
+                                       TO  SPA-GMN-W20-BTULST-SEL
+      *
+                   PERFORM 4100-SYS-KANRI-SAI-SET-SEC
+      *
+                   GO  TO  300-SCREEN-EXT
            WHEN    "WID1"
-               MOVE    SPA-GMN-W20-MOTOPG
-                                       TO  SPA-MOTOPG
                PERFORM 330-WID1-SET-SEC
                GO  TO      300-SCREEN-EXT
            END-EVALUATE
@@ -1778,8 +1787,20 @@
                PERFORM 420-SAKUJO-SEC
       *    病室管理情報画面へ
            WHEN    "CLICKED"       ALSO    "B09"
-               IF  ( SPA-MOTOPG    =       "W01" )
+               IF  ( SPA-W20-W21-MOTOPG    =   SPACE )
                    PERFORM 420-BYOSITU-KANRI-SEC
+               END-IF
+      *    入院料加算設定画面へ
+           WHEN    "CLICKED"       ALSO    "B10"
+               IF (SPA-GMN-W20-BTUNUM    NOT =   ZERO)   AND
+                  (SPA-GMN-W20-SELNUM    NOT =   ZERO)
+                   IF   SPA-GMN-W20-SBT  NOT =   "10"
+                       PERFORM 420-W201-SYORI-SEC
+                   ELSE
+                       MOVE   "1109"   TO      SPA-ERRCD
+                   END-IF
+               ELSE
+                   MOVE   "1108"   TO      SPA-ERRCD
                END-IF
       *
            END-EVALUATE
@@ -2153,9 +2174,11 @@
       *****************************************************************
        210-BACK                    SECTION.
       *
-           MOVE    SPA-MOTOPG          TO  SPA-SAKIPG
-           MOVE    SPA-MOTOPG2         TO  SPA-MOTOPG3
-           MOVE    SPA-MOTOPG          TO  SPA-MOTOPG2
+           IF    ( SPA-W20-W21-MOTOPG  =   SPACE )
+               MOVE    "W01"               TO  SPA-SAKIPG
+           ELSE
+               MOVE    SPA-W20-W21-MOTOPG  TO  SPA-SAKIPG
+           END-IF
            MOVE    "W20"               TO  SPA-MOTOPG
       *
       ***  MOVE   "CHANGE"             TO  MCP-PUTTYPE
@@ -2525,7 +2548,7 @@
       *
            MOVE    "W21"               TO  SPA-SAKIPG
            MOVE    "W20"               TO  SPA-MOTOPG
-           MOVE    "W01"               TO  SPA-MOTOPG2
+                                           SPA-W20-W21-MOTOPG
       *
            MOVE   "CHANGE"             TO  MCP-PUTTYPE
            MOVE    SPA-SAKIPG          TO  MCP-WINDOW
@@ -2536,6 +2559,56 @@
       *
            .
        420-BYOSITU-KANRI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院料加算設定へ
+      *****************************************************************
+       420-W201-SYORI-SEC           SECTION.
+      *
+      *    画面をＳＰＡセット
+           PERFORM 4101-GMN-SPA-SET-SEC
+      *
+      *    初期画面セット
+           MOVE    SPACE               TO  LINKAREA
+           MOVE    SPACE               TO  SPA-MOTOPG
+           MOVE    SPA-W20FREE         TO  SPA-FREE
+           MOVE    SPA-W01KYOUTU       TO  SPA-WORK
+           MOVE    SPA-AREA            TO  SPA-COMMON
+      *
+           MOVE    "LINK"              TO  MCP-STATUS
+           MOVE    SPACE               TO  MCP-EVENT
+      *
+           CALL    "ORCGW201"          USING
+                                       MCPAREA
+                                       SPAAREA
+                                       LINKAREA
+                                       SCRAREA
+      *
+           MOVE    SPA-COMMON          TO  SPA-AREA
+           MOVE    SPA-FREE            TO  SPA-W20FREE
+           MOVE    SPA-WORK            TO  SPA-W01KYOUTU
+      *
+           MOVE    "W201"              TO  SPA-SAKIPG
+           MOVE    "W20"               TO  SPA-MOTOPG
+      *
+           MOVE    SPACE               TO  LINKAREA
+      *
+           IF      SPA-W201-TKSNCD2(1) =   SPACE
+               MOVE    "KSNCD2"        TO  MCP-WIDGET
+           ELSE
+               MOVE    "SELNUM"        TO  MCP-WIDGET
+           END-IF
+           MOVE    "NEW"               TO  MCP-PUTTYPE
+           MOVE    "W201"              TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+      *
+      *
+           .
+       420-W201-SYORI-EXT.
            EXIT.
       *****************************************************************
       *    病室管理情報更新処理
@@ -4582,6 +4655,14 @@
       *
            PERFORM 41001-INPUT-AREA-EDIT-SEC
       *
+      *    入院料加算設定画面の引き継ぎ領域編集
+           PERFORM    VARYING   IDX-KSN2   FROM   1   BY  1
+             UNTIL   (IDX-KSN2   >   10)    OR
+                     (SYS-5001-KSNCD2(IDX-KSN2)  =  SPACE)
+                 MOVE   SYS-5001-KSNCD2(IDX-KSN2)
+                                   TO  SPA-W201-TKSNCD2 (IDX-KSN2)
+           END-PERFORM
+      *
            .
        4100-INPUT-AREA-EDIT-EXT.
            EXIT.
@@ -5167,7 +5248,7 @@
            INITIALIZE  SPA-GMN-W20-INPUT-AREA
                        SPA-NAI-W20-INPUT-AREA
       *
-           IF    ( SPA-MOTOPG      =   "W01" )
+           IF    ( SPA-W20-W21-MOTOPG  =    SPACE )
                MOVE    "病室"      TO  SPA-GMN-W20-B09
            END-IF
       *
@@ -7041,6 +7122,9 @@
       *    病室ボタン
            MOVE    SPA-GMN-W20-B09         TO  W20-B09
       *
+      *    入院料加算ボタン
+           MOVE    "入院料加算"            TO  W20-B10
+      *
       *    基準日
            MOVE    SPA-GMN-W20-KJNYMD      TO  W20-KJNYMD
       *
@@ -7292,6 +7376,7 @@
                                        W20-B07-STATE
                                        W20-B08-STATE
                                        W20-B09-STATE
+                                       W20-B10-STATE
                                        W20-B12-STATE
                                        W20-NAME-STATE
                                        W20-TANNAME-STATE
@@ -7446,6 +7531,8 @@
                MOVE    "B08"               TO  MCP-WIDGET
            WHEN    209
                MOVE    "B09"               TO  MCP-WIDGET
+           WHEN    210
+               MOVE    "B10"               TO  MCP-WIDGET
            END-EVALUATE
       *
            .
@@ -7698,6 +7785,12 @@
            WHEN    "1107"
                MOVE    "診療所の病棟種別を選択してください"
                                        TO  SPA-ERRMSG
+           WHEN    "1108"
+               MOVE    "登録済みの病棟が選択されていません"
+                                       TO  SPA-ERRMSG
+           WHEN    "1109"
+               MOVE   "医療観察病棟では入院料加算の追加設定はできません"
+                                       TO  SPA-ERRMSG
            WHEN    "1201"
            WHEN    "1202"
            WHEN    "1203"
@@ -7706,8 +7799,6 @@
                MOVE    "更新処理に失敗しました"
                                        TO  SPA-ERRMSG
            END-EVALUATE
-      *
-           MOVE    SPA-MOTOPG          TO  SPA-GMN-W20-MOTOPG
       *
            MOVE    SPACE               TO  WERR
            MOVE    SPA-ERRCD           TO  WERR-ERRCODE
@@ -7746,9 +7837,6 @@
                INTO    WRK-WIDMSG
                END-STRING
            END-EVALUATE
-      *
-      *
-           MOVE    SPA-MOTOPG           TO  SPA-GMN-W20-MOTOPG
       *
            MOVE    SPACE                TO  WID1
            MOVE    SPA-WIDCD            TO  WID1-ID1CODE

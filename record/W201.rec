@@ -1,0 +1,26 @@
+W201	{
+	fixed32	{
+		scrolledwindow28	{
+			MEILIST	{
+				count	int;
+				row	int;
+				rowattr	int;
+				item	{
+					value0	varchar(3);
+					value1	varchar(20);
+					value2	varchar(40);
+				}	[10];
+				select	bool[10];
+			};
+		};
+		KSNCD2	{
+			value	varchar(20);
+		};
+		KSNNM2	{
+			value	varchar(40);
+		};
+		SELNUM	{
+			value	number(3);
+		};
+	};
+};

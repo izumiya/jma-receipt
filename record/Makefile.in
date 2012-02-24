@@ -429,6 +429,7 @@ RECORD_files = \
 	acceptmod.rec \
 	appoinlst.rec \
 	acceptlst.rec \
+	W201.rec \
 
 DEF_files = \
 
