@@ -134,8 +134,11 @@
                  07  SYS-5001-KSN              OCCURS  14.
                    09  SYS-5001-KSNCD          PIC X(09).
                    09  SYS-5001-KSNKBN         PIC X(01).
+      *入院料加算（ユーザ設定領域）
+               05  SYS-5001-KSN2.
+                 09  SYS-5001-KSNCD2           PIC X(09) OCCURS 10.
       *予備 ** 予備の後にも項目があるので注意すること **
-               05  SYS-5001-YOBI               PIC  X(245).
+               05  SYS-5001-YOBI               PIC  X(155).
                05  SYS-5001-KHNSRYCD           PIC X(09).
                05  SYS-5001-KHNKBNCD           PIC X(03).
       *選定入院特別料金（一般）

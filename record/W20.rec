@@ -19,6 +19,10 @@ W20	{
 			label	varchar(4);
 			state	int;
 		};
+		B10	{
+			label	varchar(10);
+			state	int;
+		};
 		B12	{
 			state	int;
 		};

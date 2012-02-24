@@ -22,6 +22,9 @@
       *****************************************************************
       *
        01  SPA-W20FREE.
+      *    検索画面共通
+         03  SPA-W25-KYOUTU                        PIC X(30000).
+      *
          03  SPA-W20-AREA.
            05  SPA-GMN-W20-PAGE                    PIC 9(02).
            05  SPA-GMN-W20-LINE                    PIC 9(02).
@@ -36,6 +39,8 @@
              07  SPA-GMN-W20-INPUT-AREA.
       *        病室ボタン
                09  SPA-GMN-W20-B09                 PIC X(04).
+      *        入院料加算ボタン
+               09  SPA-GMN-W20-B10                 PIC X(10).
       *        病棟番号
                09  SPA-GMN-W20-BTUNUM              PIC S9(2).
       *        病棟名称
@@ -1076,3 +1081,23 @@
          03  SPA-W20-W21-AREA.
       *      病棟番号
              05  SPA-W20-W21-BTUNUM                      PIC  X(02).
+      *      戻り画面
+             05  SPA-W20-W21-MOTOPG                      PIC  X(10).
+      *    入院料加算設定（Ｗ２０１）
+         03  SPA-W201-AREA.
+             05  SPA-W201-PAGE           PIC 9(02).
+             05  SPA-W201-CUR            PIC 9(02).
+      *
+             05  SPA-W201-LIST-G.
+                 07  SPA-W201-LIST       OCCURS  10.
+                     09  SPA-W201-TRENNUM         PIC 9(03).
+                     09  SPA-W201-TKSNCD2         PIC X(20).
+                     09  SPA-W201-TKSNNM2         PIC X(40).
+                 07  SPA-W201-LIST-MAX           PIC 9(03).
+      *
+             05  SPA-W201-GMN-G.
+                 07  SPA-W201-SELNUM             PIC 9(03).
+                 07  SPA-W201-KSNCD2             PIC X(20).
+                 07  SPA-W201-KSNNM2             PIC X(40).
+             05  SPA-W201-NAI-G.
+                 07  SPA-W201-MAE-SELNUM         PIC 9(03).
