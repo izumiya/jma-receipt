@@ -5450,6 +5450,17 @@
                    END-IF
                END-IF
       *
+      *        êóáì´µ¼Ô´ÉÍý²Ã»»¤ÏÊ¿À®£²£´Ç¯£³·î¤Þ¤Ç
+               IF    ( CONST-KSNCD (IDX-KSN)
+                                   =   CONST-KSNCD-190116990)
+                   IF  ( WRK-KJNYMD     >=  "20040401")  AND
+                       ( WRK-KJNYMD     <=  "20120331")
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO    TO  FLG-HIT
+                   END-IF
+               END-IF
+      *
                IF    ( SPA-GMN-I01-SYORIKBN-CD =   CONST-IDO )
                    IF    ( CONST-KSNCD (IDX-KSN)
                                    =   CONST-KSNCD-190135470
