@@ -33,7 +33,7 @@
       *                                     ¥ë¡¼¥Á¥ó¤ËÊÑ¹¹
       *  04.01.00    NACL-¾®Æ¦Âô  07/12/17  Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£²¤ÎÆþ±¡
       *                                     ÍâÆü¿©»ö»»ÄêÂÐ±þ
-      *Ê¿ÀÅ£²£°Ç¯£´·î²þÄêÂÐ±þ
+      *Ê¿À®£²£°Ç¯£´·î²þÄêÂÐ±þ
       *  04.02.00    NACL-¾®Æ¦Âô  08/03/05  ¸å´ü¹âÎð¼Ô¤ÎÈ½ÄêÊÑ¹¹
       *                                     À¸³èÎÅÍÜ¤ÎÆþ±¡ÎÁÈ½ÄêÄÉ²Ã
       *                                       Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£³
@@ -125,9 +125,15 @@
            03   CONS-H22-RYOYO2H           PIC X(09) VALUE "190133910".
            03   CONS-H22-RYOYO2I           PIC X(09) VALUE "190134110".
       *    ²óÉü´ü¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÉÂÅïÆþ±¡ÎÁ£±¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *      ¡ÊÊ¿À®£²£´Ç¯°Ê¹ß¤Ï²óÉü´ü¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÉÂÅïÆþ±¡ÎÁ£²¡ÊÀ¸³èÎÅÍÜ¡Ë¡Ë
            03   CONS-H22-KAIFUKU1          PIC X(09) VALUE "190141710".
       *    ²óÉü´ü¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÉÂÅïÆþ±¡ÎÁ£²¡ÊÀ¸³èÎÅÍÜ¡Ë
+      *      ¡ÊÊ¿À®£²£´Ç¯°Ê¹ß¤Ï²óÉü´ü¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÉÂÅïÆþ±¡ÎÁ£³¡ÊÀ¸³èÎÅÍÜ¡Ë¡Ë
            03   CONS-H22-KAIFUKU2          PIC X(09) VALUE "190141910".
+      *
+      *    Ê¿À®£²£´Ç¯ÅÙ²þÄêÄÉ²ÃÊ¬
+      *    ²óÉü´ü¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÉÂÅïÆþ±¡ÎÁ£±¡ÊÀ¸³èÎÅÍÜ¡Ë
+           03   CONS-H24-KAIFUKU1          PIC X(09) VALUE "190150210".
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -421,7 +427,8 @@
                                                CONS-H22-RYOYO2H OR
                                                CONS-H22-RYOYO2I OR
                                                CONS-H22-KAIFUKU1 OR
-                                               CONS-H22-KAIFUKU2
+                                               CONS-H22-KAIFUKU2 OR
+                                               CONS-H24-KAIFUKU1
                           PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
                             IF     NACCT-DAY(IDX1)  NOT =  ZERO
@@ -449,7 +456,8 @@
                                                      CONS-H22-RYOYO2E OR
                                                      CONS-H22-RYOYO2F OR
                                                     CONS-H22-KAIFUKU1 OR
-                                                    CONS-H22-KAIFUKU2
+                                                    CONS-H22-KAIFUKU2 OR
+                                                    CONS-H24-KAIFUKU1
                                    MOVE   "1"   TO   
                                              LNK-NYULIFE-FTNKBN2(IDX1)
                                END-IF
