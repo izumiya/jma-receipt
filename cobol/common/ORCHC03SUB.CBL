@@ -98,15 +98,6 @@
          02  TBL-SYUNOU-REC        OCCURS   15.
            COPY    "CPSYUNOU.INC"  REPLACING
                                      //SYU-// BY //TBL-SYU-//.
-       01  TBL-DOUJI-AREA.
-      *    ∆±ª˛∆˛Œœø«Œ≈≤ 
-           03  TBL-DOUJI-TBL       OCCURS   15.
-               05  TBL-DOUJI-SRYKA        PIC  X(02)
-                                          OCCURS  10.
-               05  TBL-DOUJI-HKNCOMBI     PIC  X(04)
-                                          OCCURS  10.
-               05  TBL-DOUJI-DENPNUM      PIC  9(07)
-                                          OCCURS  15.
       *    ¿¡µ·≥€≈˘
        01  TBL-SEIKYU-AREA.
            03  TBL-SEIKYU-TBL       OCCURS   15.
@@ -884,6 +875,9 @@
                        MOVE    WRK-SYU-HKNCOMBINUM TO  WRK-HKNCOMBI
                        PERFORM 30031-DOUJI-HKNCOMBI-SEC
                    END-IF
+      *             £øÙ≤ 
+                   MOVE    WRK-SYU-SRYKA   TO  WRK-SRYKA
+                   PERFORM 30041-DOUJI-SRYKA-SEC
                ELSE
                    PERFORM 30021-SYUNOU-ADD-SEC
       *             £øÙ ›∏±
@@ -895,27 +889,6 @@
                    MOVE    WRK-SYU-SRYKA   TO  WRK-SRYKA
                    PERFORM 30041-DOUJI-SRYKA-SEC
                END-IF
-      *        ∆±ª˛∆˛Œœø«Œ≈≤ 
-               PERFORM VARYING     IDH2    FROM    1   BY  1
-                       UNTIL      (IDH2    >   10  )  OR
-                                  (TBL-DOUJI-SRYKA(IDX IDH2)
-                                           =   SPACE )
-                   MOVE    TBL-DOUJI-SRYKA(IDX IDH2)
-                                           TO  WRK-SRYKA
-                   IF      WRK-SRYKA       NOT =   SPACE
-                       PERFORM 30041-DOUJI-SRYKA-SEC
-                   END-IF
-               END-PERFORM
-               PERFORM VARYING     IDH2    FROM    1   BY  1
-                       UNTIL      (IDH2    >   10  )  OR
-                                  (TBL-DOUJI-HKNCOMBI(IDX IDH2)
-                                           =   SPACE )
-                   MOVE    TBL-DOUJI-HKNCOMBI(IDX IDH2)
-                                           TO  WRK-HKNCOMBI
-                   IF      WRK-HKNCOMBI    NOT =   SPACE
-                       PERFORM 30031-DOUJI-HKNCOMBI-SEC
-                   END-IF
-               END-PERFORM
            END-PERFORM
       *    •—•È•·•ø§ÿ ‘Ω∏
            PERFORM 30023-LNK-TBL-HENSYU-SEC
