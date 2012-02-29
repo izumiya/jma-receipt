@@ -275,6 +275,7 @@
       *  04.06.12    NACL-藤原    11/12/19  自院病名検索時のチェックと
       *                                     自院病名検索から戻り時の表示の修正
       *  04.06.13    NACL-太田    12/02/20  前画面戻り時SPA-PTIDを初期化する
+      *  04.06.14    NACL-藤原    12/02/29  補足コメントの登録前チェック追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7804,6 +7805,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            END-IF
            MOVE    SPA-GMN-C02-HKNCOMBI-G TO  C02-HKNCOMBI
            PERFORM 4108-COMB-CHK-SEC
+           IF      SPA-ERRCD           NOT =   SPACE         
+               GO  TO  450-TOUROKU-EXT
+           END-IF
+           MOVE    SPA-GMN-C02-HOSOKU-COMMENT
+                                         TO  C02-HOSOKU-COMMENT
+           PERFORM 41025-HOSOKU-COMMENT-CHK-SEC
            IF      SPA-ERRCD           NOT =   SPACE         
                GO  TO  450-TOUROKU-EXT
            END-IF
