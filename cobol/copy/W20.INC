@@ -110,10 +110,10 @@
       *
               04  W20-LBLKSN-G.
                 05  W20-LBLKSN             PIC X(36)
-                                           OCCURS      14.
+                                           OCCURS      16.
       *
               04  W20-CMB-KSN-G.
-                05  W20-CMB-KSN-OCC        OCCURS      14.
+                05  W20-CMB-KSN-OCC        OCCURS      16.
       *
                   06  W20-KSN              PIC X(27).
                   06  W20-KSN-STATE        PIC S9(9)   BINARY.

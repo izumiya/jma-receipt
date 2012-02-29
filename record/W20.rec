@@ -146,6 +146,12 @@ W20	{
 		LBLKSN14	{
 			value	varchar(36);
 		};
+		LBLKSN15	{
+			value	varchar(36);
+		};
+		LBLKSN16	{
+			value	varchar(36);
+		};
 		CMB_KSN01	{
 			KSN01	{
 				value	varchar(27);
@@ -265,6 +271,24 @@ W20	{
 		};
 		CMB_KSN14	{
 			KSN14	{
+				value	varchar(27);
+				state	int;
+			};
+			count	int;
+			item	varchar(27)[10];
+			state	int;
+		};
+		CMB_KSN15	{
+			KSN15	{
+				value	varchar(27);
+				state	int;
+			};
+			count	int;
+			item	varchar(27)[10];
+			state	int;
+		};
+		CMB_KSN16	{
+			KSN16	{
 				value	varchar(27);
 				state	int;
 			};
