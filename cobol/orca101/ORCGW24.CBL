@@ -174,6 +174,7 @@
                        09  WRK-SSTKJNCD9           PIC 9(03).
            03  WRK-KSNMEI                          PIC X(100).
            03  WRK-PNT                             PIC 9(05).
+           03  WRK-KSNCD                           PIC X(09).
       *
        01  SSTKJN-AREA.
            03  SSTKJN-VAL.
@@ -186,6 +187,8 @@
       *    ¸ÇÄêÃÍÎÎ°è
        01  CONST-AREA.
       *
+           03  CONST-H240401           PIC X(08)   VALUE "20120401".
+           03  CONST-H240331           PIC X(08)   VALUE "20120331".
            03  CONST-H220401           PIC X(08)   VALUE "20100401".
            03  CONST-H220331           PIC X(08)   VALUE "20100331".
            03  CONST-H180401           PIC X(08)   VALUE "20060401".
@@ -238,6 +241,32 @@
       *    Æþ±¡²Ã»»¾ðÊó
            03  CONST-NYUKSN-AREA.
                05  CONST-NYUKSN-MAX    PIC 9(05)   VALUE   20.
+               05  CONST-NYUKSN-H2404-G.
+                   07  CONST-NYUKSN-H2404-VAL.
+                       09              PIC X(09)   VALUE   "190098870".
+                       09              PIC X(09)   VALUE   "190099870".
+                       09              PIC X(09)   VALUE   "190100370".
+                       09              PIC X(09)   VALUE   "190100470".
+                       09              PIC X(09)   VALUE   "190100770".
+                       09              PIC X(09)   VALUE   "190100670".
+                       09              PIC X(09)   VALUE   "190100970".
+                       09              PIC X(09)   VALUE   "190107170".
+                       09              PIC X(09)   VALUE   "190117170".
+                       09              PIC X(09)   VALUE   "190119910".
+                       09              PIC X(09)   VALUE   "190117270".
+                       09              PIC X(09)   VALUE   "190120510".
+                       09              PIC X(09)   VALUE   "190136910".
+                       09              PIC X(09)   VALUE   "190147210".
+                       09              PIC X(09)   VALUE   "190147310".
+                       09              PIC X(09)   VALUE   "190147470".
+                       09              PIC X(09)   VALUE   "190138010".
+                       09              PIC X(09)   VALUE   "190149010".
+                       09              PIC X(09)   VALUE   "190147510".
+                       09              PIC X(09)   VALUE   "         ".
+                   07  CONST-NYUKSN-H2404-R
+                               REDEFINES   CONST-NYUKSN-H2404-VAL.
+                       09  CONST-NYUKSN-H2404
+                                       PIC X(09)   OCCURS   20.
                05  CONST-NYUKSN-H2204-G.
                    07  CONST-NYUKSN-H2204-VAL.
                        09              PIC X(09)   VALUE   "190098870".
@@ -2488,27 +2517,23 @@
            MOVE    SPA-GMN-W24-NACCT-GAIHAKU
                                    TO  SYS-5000-NACCT-GAIHAKUKBN
       *
-           EVALUATE    TRUE
-           WHEN  ( SPA-W01-EDYUKYMD   >=   CONST-H220401 )
-               MOVE    16          TO  WRK-MAX
-           WHEN  ( SPA-W01-EDYUKYMD   >=   CONST-H180401 )
-               MOVE    13          TO  WRK-MAX
-           WHEN  ( SPA-W01-EDYUKYMD   >=   CONST-H160401 )
-               MOVE    15          TO  WRK-MAX
-           WHEN    OTHER
-               MOVE    13          TO  WRK-MAX
-           END-EVALUATE
-      *
       *    Æþ±¡ÎÁ²Ã»»¾ðÊó
            PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   WRK-MAX )
-               MOVE    SPA-NAI-W24-NYUKSN-SRYCD (IDX1)
+                   UNTIL ( IDX1    >   CONST-NYUKSN-MAX )
+      *
+               MOVE    SPACE       TO  SYS-5000-KSNCD (IDX1)
+                                       SYS-5000-KSNKBN (IDX1)
+      *
+               IF    ( SPA-NAI-W24-NYUKSN-SRYCD (IDX1)
+                                   NOT =   SPACE )
+                   MOVE    SPA-NAI-W24-NYUKSN-SRYCD (IDX1)
                                    TO  SYS-5000-KSNCD (IDX1)
-               IF    ( SPA-GMN-W24-CHK-NYUKSN (IDX1)
+                   IF    ( SPA-GMN-W24-CHK-NYUKSN (IDX1)
                                    =   "F" )
-                   MOVE    "1"     TO  SYS-5000-KSNKBN (IDX1)
-               ELSE
-                   MOVE    "2"     TO  SYS-5000-KSNKBN (IDX1)
+                       MOVE    "1" TO  SYS-5000-KSNKBN (IDX1)
+                   ELSE
+                       MOVE    "2" TO  SYS-5000-KSNKBN (IDX1)
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -4119,22 +4144,45 @@
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   CONST-NYUKSN-MAX )
       *
+               MOVE    "F"         TO  SPA-GMN-W24-CHK-NYUKSN (IDX0)
+      *
+           END-PERFORM
+      *
+           MOVE    ZERO                TO  WRK-MAX
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   CONST-NYUKSN-MAX )
+      *
+               MOVE    SPACE           TO  WRK-KSNCD
+      *
                EVALUATE    TRUE
+               WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H240401 )
+                   MOVE    CONST-NYUKSN-H2404 (IDX0)
+                                   TO  WRK-KSNCD
                WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H220401 )
                    MOVE    CONST-NYUKSN-H2204 (IDX0)
-                                   TO  SPA-NAI-W24-NYUKSN-SRYCD  (IDX0)
+                                   TO  WRK-KSNCD
                WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H180401 )
                    MOVE    CONST-NYUKSN-H1804 (IDX0)
-                                   TO  SPA-NAI-W24-NYUKSN-SRYCD  (IDX0)
+                                   TO  WRK-KSNCD
                WHEN  ( SPA-W01-EDYUKYMD    >=  CONST-H160401 )
                    MOVE    CONST-NYUKSN-H1604 (IDX0)
-                                   TO  SPA-NAI-W24-NYUKSN-SRYCD  (IDX0)
+                                   TO  WRK-KSNCD
                WHEN    OTHER
                    MOVE    CONST-NYUKSN-SRYCD (IDX0)
-                                   TO  SPA-NAI-W24-NYUKSN-SRYCD  (IDX0)
+                                   TO  WRK-KSNCD
                END-EVALUATE
       *
-               MOVE    "F"         TO  SPA-GMN-W24-CHK-NYUKSN (IDX0)
+               IF    ( WRK-KSNCD   NOT =   SPACE )
+                   MOVE    WRK-KSNCD   TO  WRK-SRYCD
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( TNS-HOSPSRYKBN  =   0 )
+                    OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
+                       COMPUTE WRK-MAX =   WRK-MAX +   1
+                       MOVE    WRK-KSNCD   TO  SPA-NAI-W24-NYUKSN-SRYCD
+                                                              (WRK-MAX)
+                   END-IF
+               END-IF
+      *
       *
            END-PERFORM
       *
@@ -5538,6 +5586,10 @@
       *
            MOVE    CONST-H220401   TO  WRK-KAISEISTYMD
            MOVE    CONST-H220331   TO  WRK-KAISEIEDYMD
+           PERFORM 8001-KAISEI-CHK-SEC
+      *
+           MOVE    CONST-H240401   TO  WRK-KAISEISTYMD
+           MOVE    CONST-H240331   TO  WRK-KAISEIEDYMD
            PERFORM 8001-KAISEI-CHK-SEC
       *
            .
