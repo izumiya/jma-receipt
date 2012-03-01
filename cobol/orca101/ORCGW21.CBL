@@ -4381,12 +4381,12 @@
                                    TO  WRK-KJN-YUKSTYMD
            PERFORM 3101-CMB-SYOKI-SEC
       *
+           INITIALIZE  SPA-NAI-W21-KSNINF-G
+      *
            PERFORM VARYING IDX-KSN    FROM 1  BY  1
                    UNTIL ( IDX-KSN    >    CONST-KSN-MAX )
       *
                MOVE    SPACE               TO  SPA-GMN-W21-KSN-LBL
-                                                           (IDX-KSN)
-                                               SPA-NAI-W21-KSNINF-CD
                                                            (IDX-KSN)
       *
            END-PERFORM
