@@ -2682,7 +2682,7 @@
                        MOVE    SYSKANRI-REC    TO  SYS-5002-REC
       *
       *                病室加算情報編集処理
-                       PERFORM 4201-BRM-KSN-EDIT-SEC
+                       PERFORM 4200-BRM-KSN-EDIT-SEC
       *
                        MOVE    SYS-5002-REC    TO  SYSKANRI-REC
                        PERFORM 800-MCNDATE-SEC
@@ -2934,7 +2934,7 @@
            PERFORM 4201-BRM-EDIT-SEC
       *
       *    病室加算情報編集処理
-           PERFORM 4201-BRM-KSN-EDIT-SEC
+           PERFORM 4200-BRM-KSN-EDIT-SEC
       *
            MOVE    SYS-5002-REC    TO  SYSKANRI-REC
            MOVE    SYS-5002-HOSPNUM TO SYSUP-HOSPNUM

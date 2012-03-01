@@ -115,11 +115,11 @@
               04  W20-CMB-KSN-G.
                 05  W20-CMB-KSN-OCC        OCCURS      16.
       *
-                  06  W20-KSN              PIC X(27).
+                  06  W20-KSN              PIC X(30).
                   06  W20-KSN-STATE        PIC S9(9)   BINARY.
       *
                   06  W20-KSN-CNT          PIC S9(9)   BINARY.
-                  06  W20-KSN-ITM          PIC X(27)   OCCURS  10.
+                  06  W20-KSN-ITM          PIC X(30)   OCCURS  10.
                   06  W20-KSN-ITM-STATE    PIC S9(9)   BINARY.
               04  W20-YUKOSTYMD            PIC X(10).
               04  W20-YUKOSTYMD-STATE      PIC S9(9)   BINARY.
