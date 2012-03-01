@@ -315,9 +315,9 @@
            03  WRK-NYUKHNKSN-SRYCD PIC X(09)  OCCURS 60.
            03  WRK-NYUKSNKBN       PIC X(03).
            03  WRK-BTU-NYUKSNKBN   PIC X(03).
-           03  WRK-BTU-CHUKSNCD    PIC X(04).
+           03  WRK-BTU-CDKBN-KBNNUM PIC 9(03).
            03  WRK-KSN-NYUKSNKBN   PIC X(03).
-           03  WRK-KSN-CHUKSNCD    PIC X(04).
+           03  WRK-KSN-CDKBN-KBNNUM PIC 9(03).
            03  WRK-SRYCD           PIC X(09).
            03  WRK-STYUKYMD        PIC X(08).
            03  WRK-NYUINYM         PIC X(06).
@@ -7977,8 +7977,8 @@
            END-IF
       *
       *    注加算コードが同一であることの判定
-           IF   WRK-KSN-CHUKSNCD      NOT =   SPACE
-              IF   WRK-BTU-CHUKSNCD   =       WRK-KSN-CHUKSNCD
+           IF   WRK-KSN-CDKBN-KBNNUM    NOT =    ZERO
+              IF   WRK-BTU-CDKBN-KBNNUM     =    WRK-KSN-CDKBN-KBNNUM
                   CONTINUE
               ELSE
                   MOVE    1     TO    FLG-NYUKSN
@@ -7996,7 +7996,7 @@
        48011-TENSU-SEL-SEC              SECTION.
       *
            MOVE    SPACE           TO  WRK-NYUKSNKBN
-           MOVE    SPACE           TO  WRK-BTU-CHUKSNCD
+           MOVE    ZERO            TO  WRK-BTU-CDKBN-KBNNUM
            MOVE    SPACE           TO  WRK-TOKUBETSU-NYUIN
       *
            MOVE    ZERO            TO  FLG-TENSU
@@ -8016,8 +8016,8 @@
            END-IF
       *
            MOVE    TNS-NYUKHNKSNKBN
-                                   TO  WRK-BTU-NYUKSNKBN
-           MOVE    TNS-CHUKSNCD    TO  WRK-BTU-CHUKSNCD
+                                    TO  WRK-BTU-NYUKSNKBN
+           MOVE    TNS-CDKBN-KBNNUM TO  WRK-BTU-CDKBN-KBNNUM
       *    特別入院料の判定
            EVALUATE   TNS-NYUKHNKBN
                WHEN   73
@@ -8045,7 +8045,7 @@
        48012-TENSU-SEL-SEC              SECTION.
       *
            MOVE    SPACE           TO  WRK-NYUKSNKBN
-           MOVE    SPACE           TO  WRK-KSN-CHUKSNCD
+           MOVE    ZERO            TO  WRK-KSN-CDKBN-KBNNUM
       *
            MOVE    ZERO            TO  FLG-TENSU
            INITIALIZE              TNS-TENSU-REC
@@ -8075,13 +8075,13 @@
                IF      (TNS-CDKBN-KBN       =   "A")     AND
                        (TNS-CDKBN-KBNNUM   >=   100)     AND
                        (TNS-CDKBN-KBNNUM   <=   199)
-                   MOVE    TNS-CHUKSNCD    TO  WRK-KSN-CHUKSNCD
+                    MOVE  TNS-CDKBN-KBNNUM TO  WRK-KSN-CDKBN-KBNNUM
                END-IF
       *
                IF      (TNS-CDKBN-KBN       =   "A")     AND
                        (TNS-CDKBN-KBNNUM   >=   300)     AND
                        (TNS-CDKBN-KBNNUM   <=   399)
-                   MOVE    TNS-CHUKSNCD    TO  WRK-KSN-CHUKSNCD
+                    MOVE  TNS-CDKBN-KBNNUM TO  WRK-KSN-CDKBN-KBNNUM
                END-IF
            END-IF
            .
