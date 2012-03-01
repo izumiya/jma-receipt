@@ -1052,6 +1052,25 @@
        3101-CMB-KNGHJO-SET-SEC         SECTION.
       *
            EVALUATE    TRUE
+           WHEN  ( WRK-KJN-YUKSTYMD    >=  CONST-H240401 )
+      *
+               MOVE    "00"                TO  SPA-GMN-W20-KNGHJOL(1)
+               MOVE    "»»Äê¤·¤Ê¤¤"        TO  SPA-GMN-W20-KNGHJOMEIL(1)
+      *
+               MOVE    "06"                TO  SPA-GMN-W20-KNGHJOL(2)
+               MOVE    "´Ç¸îÊä½õ²Ã»»£±"
+                                           TO  SPA-GMN-W20-KNGHJOMEIL(2)
+      *
+               MOVE    "08"                TO  SPA-GMN-W20-KNGHJOL(3)
+               MOVE    "´Ç¸îÊä½õ²Ã»»£²"
+                                           TO  SPA-GMN-W20-KNGHJOMEIL(3)
+      *
+               MOVE    "09"                TO  SPA-GMN-W20-KNGHJOL(4)
+               MOVE    "´Ç¸îÊä½õ²Ã»»£³"
+                                           TO  SPA-GMN-W20-KNGHJOMEIL(4)
+      *
+               MOVE    4                   TO  SPA-GMN-W20-KNGHJO-MAX
+      *
            WHEN  ( WRK-KJN-YUKSTYMD    >=  CONST-H180401 )
       *
                MOVE    "00"                TO  SPA-GMN-W20-KNGHJOL(1)
@@ -1460,11 +1479,11 @@
                MOVE    "»»Äê¤·¤Ê¤¤"    TO  SPA-GMN-W20-KYUKNGHJMEIL(1)
       *
                MOVE    "2"             TO  SPA-GMN-W20-KYUKNGHJL(2)
-               MOVE    "£²£µÂÐ£±¡Ê£µ³ä°Ê¾å¡Ë "
+               MOVE    "£²£µÂÐ£±¡Ê´Ç¸îÊä½õ£µ³ä°Ê¾å¡Ë"
                                        TO  SPA-GMN-W20-KYUKNGHJMEIL(2)
       *
                MOVE    "3"             TO  SPA-GMN-W20-KYUKNGHJL(3)
-               MOVE    "£²£µÂÐ£±¡Ê£µ³äÌ¤Ëþ¡Ë "
+               MOVE    "£²£µÂÐ£±¡Ê´Ç¸îÊä½õ£µ³äÌ¤Ëþ¡Ë"
                                        TO  SPA-GMN-W20-KYUKNGHJMEIL(3)
       *
                MOVE    "4"             TO  SPA-GMN-W20-KYUKNGHJL(4)
@@ -5570,7 +5589,7 @@
                                             TO SPA-GMN-W20-KJTRIHA-LBL
                MOVE    CONST-KJTRIHA        TO SPA-NAI-W20-KJTRIHA-CD
       *
-               MOVE    "´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»"
+               MOVE    "´Ç¸îÉ¬Í×ÅÙ²Ã»»"
                                             TO SPA-GMN-W20-KNGHITU-LBL
                MOVE    CONST-H2404-KNGHITU1 TO SPA-NAI-W20-KNGHITU-CD
       *
