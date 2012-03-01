@@ -120,6 +120,7 @@
            03  IDX4                                PIC 9(05).
            03  IDX5                                PIC 9(05).
            03  IDXC                                PIC 9(05).
+           03  IDXK                                PIC 9(05).
            03  IDXY                                PIC 9(05).
            03  IDXZ                                PIC 9(05).
            03  IDX-CMB                             PIC 9(05).
@@ -245,23 +246,23 @@
                    07  CONST-NYUKSN-H2404-VAL.
                        09              PIC X(09)   VALUE   "190098870".
                        09              PIC X(09)   VALUE   "190099870".
-                       09              PIC X(09)   VALUE   "190100370".
-                       09              PIC X(09)   VALUE   "190100470".
-                       09              PIC X(09)   VALUE   "190100770".
-                       09              PIC X(09)   VALUE   "190100670".
-                       09              PIC X(09)   VALUE   "190100970".
-                       09              PIC X(09)   VALUE   "190107170".
                        09              PIC X(09)   VALUE   "190117170".
                        09              PIC X(09)   VALUE   "190119910".
+                       09              PIC X(09)   VALUE   "190100370".
+                       09              PIC X(09)   VALUE   "190100470".
+                       09              PIC X(09)   VALUE   "190100670".
+                       09              PIC X(09)   VALUE   "190100770".
+                       09              PIC X(09)   VALUE   "190100970".
                        09              PIC X(09)   VALUE   "190117270".
+                       09              PIC X(09)   VALUE   "190107170".
                        09              PIC X(09)   VALUE   "190120510".
                        09              PIC X(09)   VALUE   "190136910".
                        09              PIC X(09)   VALUE   "190147210".
                        09              PIC X(09)   VALUE   "190147310".
                        09              PIC X(09)   VALUE   "190147470".
+                       09              PIC X(09)   VALUE   "190147510".
                        09              PIC X(09)   VALUE   "190138010".
                        09              PIC X(09)   VALUE   "190149010".
-                       09              PIC X(09)   VALUE   "190147510".
                        09              PIC X(09)   VALUE   "         ".
                    07  CONST-NYUKSN-H2404-R
                                REDEFINES   CONST-NYUKSN-H2404-VAL.
@@ -271,19 +272,19 @@
                    07  CONST-NYUKSN-H2204-VAL.
                        09              PIC X(09)   VALUE   "190098870".
                        09              PIC X(09)   VALUE   "190099870".
-                       09              PIC X(09)   VALUE   "190100370".
-                       09              PIC X(09)   VALUE   "190100470".
-                       09              PIC X(09)   VALUE   "190100770".
-                       09              PIC X(09)   VALUE   "190100670".
-                       09              PIC X(09)   VALUE   "190100970".
-                       09              PIC X(09)   VALUE   "190107170".
                        09              PIC X(09)   VALUE   "190117170".
                        09              PIC X(09)   VALUE   "190119910".
+                       09              PIC X(09)   VALUE   "190100370".
+                       09              PIC X(09)   VALUE   "190100470".
+                       09              PIC X(09)   VALUE   "190100670".
+                       09              PIC X(09)   VALUE   "190100770".
+                       09              PIC X(09)   VALUE   "190100970".
                        09              PIC X(09)   VALUE   "190117270".
+                       09              PIC X(09)   VALUE   "190107170".
+                       09              PIC X(09)   VALUE   "190120410".
                        09              PIC X(09)   VALUE   "190120510".
                        09              PIC X(09)   VALUE   "190136910".
                        09              PIC X(09)   VALUE   "190137070".
-                       09              PIC X(09)   VALUE   "190120410".
                        09              PIC X(09)   VALUE   "190138010".
                        09              PIC X(09)   VALUE   "         ".
                        09              PIC X(09)   VALUE   "         ".
@@ -297,17 +298,17 @@
                    07  CONST-NYUKSN-H1804-VAL.
                        09              PIC X(09)   VALUE   "190098870".
                        09              PIC X(09)   VALUE   "190099870".
+                       09              PIC X(09)   VALUE   "190107170".
+                       09              PIC X(09)   VALUE   "190119910".
                        09              PIC X(09)   VALUE   "190100370".
                        09              PIC X(09)   VALUE   "190100470".
-                       09              PIC X(09)   VALUE   "190100770".
                        09              PIC X(09)   VALUE   "190100670".
+                       09              PIC X(09)   VALUE   "190100770".
                        09              PIC X(09)   VALUE   "190100970".
-                       09              PIC X(09)   VALUE   "190107170".
-                       09              PIC X(09)   VALUE   "190117170".
-                       09              PIC X(09)   VALUE   "190119910".
                        09              PIC X(09)   VALUE   "190117270".
-                       09              PIC X(09)   VALUE   "190120510".
+                       09              PIC X(09)   VALUE   "190117170".
                        09              PIC X(09)   VALUE   "190120410".
+                       09              PIC X(09)   VALUE   "190120510".
                        09              PIC X(09)   VALUE   "         ".
                        09              PIC X(09)   VALUE   "         ".
                        09              PIC X(09)   VALUE   "         ".
@@ -328,17 +329,17 @@
                        09              PIC X(09)   VALUE   "190099570".
                        09              PIC X(09)   VALUE   "190099870".
                        09              PIC X(09)   VALUE   "190099970".
+                       09              PIC X(09)   VALUE   "190117170".
                        09              PIC X(09)   VALUE   "190100370".
                        09              PIC X(09)   VALUE   "190100470".
-                       09              PIC X(09)   VALUE   "190100770".
                        09              PIC X(09)   VALUE   "190100670".
+                       09              PIC X(09)   VALUE   "190100770".
                        09              PIC X(09)   VALUE   "190100970".
-                       09              PIC X(09)   VALUE   "190107170".
-                       09              PIC X(09)   VALUE   "190117170".
                        09              PIC X(09)   VALUE   "190117270".
-                       09              PIC X(09)   VALUE   "         ".
-                       09              PIC X(09)   VALUE   "         ".
-                       09              PIC X(09)   VALUE   "         ".
+                       09              PIC X(09)   VALUE   "190107170".
+                       09              PIC X(09)   VALUE   "190080570".
+                       09              PIC X(09)   VALUE   "190111690".
+                       09              PIC X(09)   VALUE   "190111790".
                        09              PIC X(09)   VALUE   "         ".
                        09              PIC X(09)   VALUE   "         ".
                    07  CONST-NYUKSN-H1604-R
@@ -356,13 +357,13 @@
                        09              PIC X(09)   VALUE   "190099970".
                        09              PIC X(09)   VALUE   "190100370".
                        09              PIC X(09)   VALUE   "190100470".
-                       09              PIC X(09)   VALUE   "190100770".
                        09              PIC X(09)   VALUE   "190100670".
+                       09              PIC X(09)   VALUE   "190100770".
                        09              PIC X(09)   VALUE   "190100970".
                        09              PIC X(09)   VALUE   "190107170".
-                       09              PIC X(09)   VALUE   "         ".
-                       09              PIC X(09)   VALUE   "         ".
-                       09              PIC X(09)   VALUE   "         ".
+                       09              PIC X(09)   VALUE   "190080570".
+                       09              PIC X(09)   VALUE   "190111690".
+                       09              PIC X(09)   VALUE   "190111790".
                        09              PIC X(09)   VALUE   "         ".
                        09              PIC X(09)   VALUE   "         ".
                        09              PIC X(09)   VALUE   "         ".
@@ -1625,6 +1626,10 @@
                MOVE    "F"     TO  SPA-GMN-W24-CHK-NYUKSN (IDX0)
       *
                EVALUATE    SPA-NAI-W24-NYUKSN-SRYCD (IDX0)
+               WHEN    CONST-GENCD (1)
+               WHEN    CONST-GENCD (2)
+               WHEN    CONST-GENCD (3)
+               WHEN    CONST-GENCD (4)
                WHEN    SPACE
                    CONTINUE
                WHEN    OTHER
@@ -1655,22 +1660,23 @@
       *****************************************************************
        3101-GENZAN-EDIT-SEC            SECTION.
       *
-           IF    ( SPA-W01-EDYUKYMD   >=   CONST-H160401 )
-               MOVE    16          TO  IDX0
-           ELSE
-               MOVE    14          TO  IDX0
-           END-IF
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   CONST-NYUKSN-MAX )
       *
-           MOVE    2               TO  IDX1
-      *
-           PERFORM UNTIL ( IDX1    >   4 )
-      *
-               IF    ( SYS-5000-GENKBN (IDX1)  =   "2" )
-                   MOVE    "T"     TO  SPA-GMN-W24-CHK-NYUKSN (IDX0)
+               MOVE    ZERO        TO  IDX1
+               EVALUATE    SPA-NAI-W24-NYUKSN-SRYCD (IDX0)
+               WHEN    CONST-GENCD (2)
+                   MOVE    2       TO  IDX1
+               WHEN    CONST-GENCD (3)
+                   MOVE    3       TO  IDX1
+               WHEN    CONST-GENCD (4)
+                   MOVE    4       TO  IDX1
+               END-EVALUATE
+               IF    ( IDX1    NOT =   ZERO )
+                   IF    ( SYS-5000-GENKBN (IDX1)  =   "2" )
+                       MOVE    "T"     TO  SPA-GMN-W24-CHK-NYUKSN (IDX0)
+                   END-IF
                END-IF
-      *
-               COMPUTE IDX0    =   IDX0    +   1
-               COMPUTE IDX1    =   IDX1    +   1
       *
            END-PERFORM
       *
@@ -2475,6 +2481,7 @@
                                    TO  SYS-5000-NACCT-GAIHAKUKBN
       *
       *    Æþ±¡ÎÁ²Ã»»¾ðÊó
+           MOVE    ZERO            TO  IDXK
            PERFORM VARYING IDX1    FROM    1   BY  1
                    UNTIL ( IDX1    >   CONST-NYUKSN-MAX )
       *
@@ -2482,14 +2489,21 @@
                                        SYS-5000-KSNKBN (IDX1)
       *
                IF    ( SPA-NAI-W24-NYUKSN-SRYCD (IDX1)
-                                   NOT =   SPACE )
+                                   =   SPACE
+                                    OR CONST-GENCD (1)
+                                    OR CONST-GENCD (2)
+                                    OR CONST-GENCD (3)
+                                    OR CONST-GENCD (4) )
+                   CONTINUE
+               ELSE
+                   COMPUTE IDXK = IDXK +   1
                    MOVE    SPA-NAI-W24-NYUKSN-SRYCD (IDX1)
-                                   TO  SYS-5000-KSNCD (IDX1)
+                                   TO  SYS-5000-KSNCD (IDXK)
                    IF    ( SPA-GMN-W24-CHK-NYUKSN (IDX1)
                                    =   "F" )
-                       MOVE    "1" TO  SYS-5000-KSNKBN (IDX1)
+                       MOVE    "1" TO  SYS-5000-KSNKBN (IDXK)
                    ELSE
-                       MOVE    "2" TO  SYS-5000-KSNKBN (IDX1)
+                       MOVE    "2" TO  SYS-5000-KSNKBN (IDXK)
                    END-IF
                END-IF
            END-PERFORM
@@ -2620,27 +2634,27 @@
       *****************************************************************
        48111-GENZAN-EDIT-SEC           SECTION.
       *
-           IF    ( SPA-W01-EDYUKYMD   >=   CONST-H160401 )
-               MOVE    16          TO  IDX0
-           ELSE
-               MOVE    14          TO  IDX0
-           END-IF
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   CONST-NYUKSN-MAX )
       *
-           MOVE    2               TO  IDX1
-      *
-           PERFORM UNTIL ( IDX1    >   CONST-GEN-MAX )
-      *
-               MOVE    CONST-GENCD (IDX1)
+               MOVE    ZERO        TO  IDX1
+               EVALUATE    SPA-NAI-W24-NYUKSN-SRYCD (IDX0)
+               WHEN    CONST-GENCD (2)
+                   MOVE    2       TO  IDX1
+               WHEN    CONST-GENCD (3)
+                   MOVE    3       TO  IDX1
+               WHEN    CONST-GENCD (4)
+                   MOVE    4       TO  IDX1
+               END-EVALUATE
+               IF    ( IDX1    NOT =   ZERO )
+                   MOVE    CONST-GENCD (IDX1)
                                    TO  SYS-5000-GENCD (IDX1)
-      *
-               IF    ( SPA-GMN-W24-CHK-NYUKSN (IDX0)   =   "T" )
-                   MOVE    "2"     TO  SYS-5000-GENKBN (IDX1)
-               ELSE
-                   MOVE    "1"     TO  SYS-5000-GENKBN (IDX1)
+                   IF    ( SPA-GMN-W24-CHK-NYUKSN (IDX0)   =   "T" )
+                       MOVE    "2" TO  SYS-5000-GENKBN (IDX1)
+                   ELSE
+                       MOVE    "1" TO  SYS-5000-GENKBN (IDX1)
+                   END-IF
                END-IF
-      *
-               COMPUTE IDX0    =   IDX0    +   1
-               COMPUTE IDX1    =   IDX1    +   1
       *
            END-PERFORM
       *
@@ -4165,8 +4179,6 @@
            IF    ( SPA-W01-EDYUKYMD   >=   CONST-H180401 )
                MOVE    SPA-GMN-W24-SKJKBNLST (2)
                                    TO  SPA-GMN-W24-SKJKBN-G
-           ELSE
-               PERFORM 4201-GENZANMEI-EDIT-SEC
            END-IF
       *
            MOVE    1               TO  SPA-GMN-W24-CUR
@@ -4195,33 +4207,6 @@
       *
            .
        4201-NYUKSNMEI-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    Æþ±¡¸º»»Ì¾¾ÎÊÔ½¸½èÍý
-      *****************************************************************
-       4201-GENZANMEI-EDIT-SEC         SECTION.
-      *
-           IF    ( SPA-W01-EDYUKYMD    >=  CONST-H160401 )
-               MOVE    16          TO  IDX0
-           ELSE
-               MOVE    14          TO  IDX0
-           END-IF
-      *
-           MOVE    2               TO  IDX1
-      *
-           PERFORM UNTIL ( IDX1    >   CONST-GEN-MAX )
-      *
-                MOVE    CONST-GENCD (IDX1)  TO  WRK-SRYCD
-                PERFORM 900-TENSU-KEY-SEL-SEC
-                MOVE    TNS-NAME   TO  SPA-GMN-W24-NYUKSNMEI  (IDX0)
-      *
-               COMPUTE IDX0    =   IDX0    +   1
-               COMPUTE IDX1    =   IDX1    +   1
-      *
-           END-PERFORM
-      *
-           .
-       4201-GENZANMEI-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    °åÎÅµ¡´Ø¾ðÊó¸¡º÷½èÍý

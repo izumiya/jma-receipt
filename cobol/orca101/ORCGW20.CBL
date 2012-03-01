@@ -5519,8 +5519,6 @@
       *
                MOVE    SPACE               TO  SPA-GMN-W20-KSN-LBL
                                                            (IDX-KSN)
-                                               SPA-NAI-W20-KSNINF-CD
-                                                           (IDX-KSN)
       *
            END-PERFORM
       *
