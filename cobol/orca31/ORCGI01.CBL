@@ -677,6 +677,9 @@
                    07                      PIC X(03)   VALUE   "229".
                    07                      PIC X(03)   VALUE   "230".
       *
+                   07                      PIC X(03)   VALUE   "231".
+                   07                      PIC X(03)   VALUE   "232".
+      *
                    07                      PIC X(03)   VALUE   "302".
                    07                      PIC X(03)   VALUE   "349".
       *
@@ -764,12 +767,12 @@
                    07                      PIC X(03)   VALUE   "387".
                    07                      PIC X(03)   VALUE   "388".
                05  CONST-TOK-LIFECD-R  REDEFINES   CONST-TOK-LIFECD-VAL.
-                   07  CONST-TOK-LIFECD-OCC    OCCURS  34.
+                   07  CONST-TOK-LIFECD-OCC    OCCURS  35.
                        09  CONST-TOK-LIFECD-IPN
                                            PIC X(03).
                        09  CONST-TOK-LIFECD-LIFE
                                            PIC X(03).
-               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   34.
+               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   35.
            03  CONST-GMN-KSN-MAX           PIC 9(05)   VALUE   3.
            03  CONST-KSNCD-G.
                05  CONST-KSNCD-MAX         PIC 9(05)   VALUE   4.
