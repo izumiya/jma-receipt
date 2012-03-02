@@ -2047,15 +2047,18 @@
                END-IF
       *    入院料加算設定画面へ
            WHEN    "CLICKED"       ALSO    "B10"
-               IF (SPA-GMN-W20-BTUNUM    NOT =   ZERO)   AND
-                  (SPA-GMN-W20-SELNUM    NOT =   ZERO)
-                   IF   SPA-GMN-W20-SBT  NOT =   "10"
-                       PERFORM 420-W201-SYORI-SEC
+               IF    ( SPA-NAI-W20-YUKOSTYMD
+                                   >=  CONST-H240401 )
+                   IF (SPA-GMN-W20-BTUNUM    NOT =   ZERO)   AND
+                      (SPA-GMN-W20-SELNUM    NOT =   ZERO)
+                       IF   SPA-GMN-W20-SBT  NOT =   "10"
+                           PERFORM 420-W201-SYORI-SEC
+                       ELSE
+                           MOVE   "1109"   TO      SPA-ERRCD
+                       END-IF
                    ELSE
-                       MOVE   "1109"   TO      SPA-ERRCD
+                       MOVE   "1108"   TO      SPA-ERRCD
                    END-IF
-               ELSE
-                   MOVE   "1108"   TO      SPA-ERRCD
                END-IF
       *
            END-EVALUATE
@@ -2757,8 +2760,18 @@
            PERFORM 4101-GMN-SPA-SET-SEC
       *
            IF    ( SPA-NAI-W20-YUKOSTYMD
+                                   >=  CONST-H240401 )
+               CONTINUE
+           ELSE
+               MOVE    "1111"          TO  SPA-ERRCD
+           END-IF
+      *
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+               IF    ( SPA-NAI-W20-YUKOSTYMD
                                    NOT =   SPA-NAI-W20-YUKOSTYMD-OLD )
-               MOVE    "1110"          TO  SPA-ERRCD
+                   MOVE    "1110"      TO  SPA-ERRCD
+               END-IF
            END-IF
       *
            IF    ( SPA-ERRCD           =   SPACE )
@@ -7458,7 +7471,9 @@
            MOVE    SPA-GMN-W20-B09         TO  W20-B09
       *
       *    入院料加算ボタン
-           MOVE    "入院料加算"            TO  W20-B10
+           IF    ( SPA-NAI-W20-YUKOSTYMD   >=  CONST-H240401 )
+               MOVE    "入院料加算"        TO  W20-B10
+           END-IF
       *
       *    基準日
            MOVE    SPA-GMN-W20-KJNYMD      TO  W20-KJNYMD
@@ -8144,6 +8159,14 @@
                STRING  "病棟の有効開始日が変更されています。"
                                            DELIMITED   BY  SIZE
                        "先に変更または追加処理を行ってください"
+                                           DELIMITED   BY  SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "1111"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "有効期間の開始日が平成２４年４月１日以降の"
+                                           DELIMITED   BY  SIZE
+                       "病棟のみ入院料加算の追加設定が可能です"
                                            DELIMITED   BY  SIZE
                INTO    SPA-ERRMSG
                END-STRING
