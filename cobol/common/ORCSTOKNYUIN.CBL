@@ -1158,6 +1158,12 @@
                WHEN    "94"
       *                児童・思春期精神科入院医療管理料
                        MOVE   "190151110"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "95"
+      *                特定一般病棟入院料（亜急性期入院医療管理）
+                       MOVE   "190152610"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "96"
+      *                特定一般病棟入院料（亜急性期入院医療管理・リハビリ算定患者）
+                       MOVE   "190152710"   TO  LNK-TOKNYUIN-SRYCD
              END-EVALUATE
            END-IF
       *
