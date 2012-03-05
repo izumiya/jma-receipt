@@ -543,6 +543,7 @@
       *  04.05.39    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
       *  04.05.40    NACL-ÌçÏÆ    12/01/23  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.41    NACL-ÌçÏÆ    12/02/13  ²ó¿ôÍóÊÔ½¸½¤Àµ¡Ê½èÊý¡¢ËãÆÇ¡Ë
+      *  04.05.42    NACL-ÌçÏÆ    12/03/05  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2317,7 +2318,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            PERFORM     2117-GENGAKU-HANTEI-SEC
       *
            IF    (RECE02-SRYYM   >=  "200804")
-           AND   (RECE02-SRYYM   <=  "201203")
+           AND   (RECE02-SRYYM   <=  "201303")
              IF  (RECE02-HKNNUM       =   SPACE                      )
              OR  (RECE02-HKNNUM(1:2)  =   "98" OR "90" OR "91"       )
              OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
@@ -3441,7 +3442,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    ( RECE02-SRYYM   <  "200704"              ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE02-SRYYM   <  "200804") OR
-                    (RECE02-SRYYM   >  "201203")             ))
+                    (RECE02-SRYYM   >  "201303")             ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE02-SRYYM   <  "200901"              ))
                  CONTINUE
@@ -9549,7 +9550,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                END-IF
              WHEN      "20"
                IF  (RECE02-SRYYM   >=  "200804")
-               AND (RECE02-SRYYM   <=  "201203")
+               AND (RECE02-SRYYM   <=  "201303")
                    CONTINUE
                ELSE
                    GO  TO  21045-TOKKI-HENSYU-EXT

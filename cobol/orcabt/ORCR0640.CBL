@@ -530,6 +530,7 @@
       *  04.05.47    NACL-門脇    12/02/06  災害対応
       *                                     （食事免除は平成２４年２月まで）
       *  04.05.48    NACL-門脇    12/02/13  回数欄編集修正（調剤、麻毒）
+      *  04.05.49    NACL-門脇    12/03/05  ７０歳代前半の特例措置延長対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3464,7 +3465,7 @@
                    ( RECE62-SRYYM   <  "200704"              ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE62-SRYYM   <  "200804") OR
-                    (RECE62-SRYYM   >  "201203")             ))
+                    (RECE62-SRYYM   >  "201303")             ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE62-SRYYM   <  "200901"              ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) =
@@ -6410,7 +6411,7 @@
                END-IF
              WHEN      "20"
                IF  (RECE62-SRYYM   >=  "200804")
-               AND (RECE62-SRYYM   <=  "201203")
+               AND (RECE62-SRYYM   <=  "201303")
                    CONTINUE
                ELSE
                    GO  TO  21013-TOKKI-HENSYU-EXT
@@ -11836,7 +11837,7 @@
            END-IF
       *
            IF    (RECE62-SRYYM   >=  "200804")
-           AND   (RECE62-SRYYM   <=  "201203")
+           AND   (RECE62-SRYYM   <=  "201303")
              IF  (RECE62-HKNNUM       =   SPACE                      )
              OR  (RECE62-HKNNUM(1:2)  =   "98"  OR "90"  OR "91"     )
              OR  (RECE62-HKNNUM  =   "068" OR "069" OR "040" OR "039")
