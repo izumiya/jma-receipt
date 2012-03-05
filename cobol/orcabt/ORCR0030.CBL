@@ -542,6 +542,7 @@
       *  04.05.39    NACL-門脇    11/12/16  器材の金額と単位の対応
       *  04.05.40    NACL-門脇    12/01/23  長崎県地方公費対応
       *  04.05.41    NACL-門脇    12/02/13  回数欄編集修正（処方、麻毒）
+      *  04.05.42    NACL-門脇    12/03/05  ７０歳代前半の特例措置延長対応
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -2352,7 +2353,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            PERFORM     2117-GENGAKU-HANTEI-SEC
       *
            IF    (RECE02-SRYYM   >=  "200804")
-           AND   (RECE02-SRYYM   <=  "201203")
+           AND   (RECE02-SRYYM   <=  "201303")
              IF  (RECE02-HKNNUM       =   SPACE                      )
              OR  (RECE02-HKNNUM(1:2)  =   "98" OR "90" OR "91"       )
              OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
@@ -3476,7 +3477,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    ( RECE02-SRYYM   <  "200704"              ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE02-SRYYM   <  "200804") OR
-                    (RECE02-SRYYM   >  "201203")             ))
+                    (RECE02-SRYYM   >  "201303")             ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE02-SRYYM   <  "200901"              ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "25"     ) AND
@@ -9604,7 +9605,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                END-IF
              WHEN      "20"
                IF  (RECE02-SRYYM   >=  "200804")
-               AND (RECE02-SRYYM   <=  "201203")
+               AND (RECE02-SRYYM   <=  "201303")
                    CONTINUE
                ELSE
                    GO  TO  21045-TOKKI-HENSYU-EXT
