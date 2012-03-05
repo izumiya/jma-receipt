@@ -2072,6 +2072,10 @@
                WHEN   "190075510"
                    MOVE    "190075510"  TO  WRK-TOKUTEI-SRYCD1
                    MOVE    "190075610"  TO  WRK-TOKUTEI-SRYCD2
+      *    ¾®»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ
+               WHEN   "190149910"
+                   MOVE    "190149910"  TO  WRK-TOKUTEI-SRYCD1
+                   MOVE    "190150010"  TO  WRK-TOKUTEI-SRYCD2
            END-EVALUATE
            .
       *
@@ -3136,6 +3140,7 @@
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
       *    ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²¡ÊÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ë
       *    ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë
+      *    ¾®»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ
            IF   LNK-PTNYUINRRK-TOKUTEI-KBN   =   "3"
                EVALUATE   LNK-PTNYUINRRK-TOKUTEI-NYUIN
                    WHEN   "03"
@@ -3204,6 +3209,9 @@
                    WHEN   "60"
                        MOVE   "190140010"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190140110"  TO  STUSAN-TOKUTEI-SRYCD(2)
+                   WHEN   "91"
+                       MOVE   "190149910"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                       MOVE   "190150010"  TO  STUSAN-TOKUTEI-SRYCD(2)
                END-EVALUATE
            END-IF
       *    Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
@@ -3687,11 +3695,13 @@
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£³¡ÊµßÌ¿µßµÞÆþ±¡ÎÁ¡Ë
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡ÊµßÌ¿µßµÞÆþ±¡ÎÁ¡Ë
       *    ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²¡ÊÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ë
+      *    ¾®»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN   = "03" OR "04" OR "05" OR
                                                  "06" OR "07" OR "08" OR
                                                  "09" OR "14" OR "16" OR
-                                                 "55" OR "57" OR "59"
+                                                 "55" OR "57" OR "59" OR
+                                                 "91"
                    IF   STUSAN-NISSU06   >=   14
                        MOVE    SPACE   TO   LNK-PTNYUINRRK-TOKUTEI-NYUIN
                    END-IF

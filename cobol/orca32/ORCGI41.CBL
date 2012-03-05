@@ -5758,12 +5758,13 @@
       *    颠炭颠缔掐薄瘟３∈颠炭颠缔掐薄瘟∷
       *    颠炭颠缔掐薄瘟４∈颠炭颠缔掐薄瘟∷
       *    泼年礁面迹闻技瓷妄瘟２∈泼年礁面迹闻技瓷妄瘟∷
+      *    井基泼年礁面迹闻技瓷妄瘟
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "03" OR "04" OR "05" OR
                                                "06" OR "07" OR "08" OR
                                                "09" OR "14" OR "16" OR
                                                "17" OR "19" OR "55" OR
-                                               "57" OR "59"
+                                               "57" OR "59" OR "91"
                    MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                END-IF
            END-IF
