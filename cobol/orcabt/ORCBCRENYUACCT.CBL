@@ -3375,6 +3375,12 @@
                                      MOVE   "190134970"  TO
                                             WRK-NYUKHNKSN-SRYCD(IDX8)
                                    END-IF
+      *                            一般病棟看護必要度評価加算（特定一般病棟入院料）
+                                   IF SYOKIKSN-IN-KHNSRYCD = "190151910"
+                                     ADD    1            TO  IDX8
+                                     MOVE   "190152570"  TO
+                                            WRK-NYUKHNKSN-SRYCD(IDX8)
+                                   END-IF
       *                      休日リハビリテーション提供体制加算（回復期リハビリテーション病棟入院料）
                              WHEN    "190140870"
                                 IF  SYOKIKSN-IN-KHNSRYCD = "190141610"
