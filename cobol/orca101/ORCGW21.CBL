@@ -237,6 +237,7 @@
                05   CONST-H2404-SNRRYO1     PIC X(09) VALUE "190106370".
                05   CONST-H2404-SNRRYO2     PIC X(09) VALUE "190106470".
                05   CONST-H2404-BTURYOKAI1  PIC X(09) VALUE "190146210".
+               05   CONST-H2404-BTURYOKAI2  PIC X(09) VALUE "190146310".
                05   CONST-H2404-SNRRYOKAI   PIC X(09) VALUE "190146410".
                05   CONST-H2404-MUKIN1      PIC X(09) VALUE "190106570".
                05   CONST-H2404-MUKIN2      PIC X(09) VALUE "190146510".
@@ -1392,8 +1393,18 @@
       *****************************************************************
        3101-CMB-BTURYOKAI-SET-SEC         SECTION.
       *
-           MOVE    SPA-GMN-W21-KSNCOMMONLST-G
-                                       TO  SPA-GMN-W21-BTURYOKAILST-G
+           MOVE    "1"             TO  SPA-GMN-W21-BTURYOKAIL(1)
+           MOVE    "ªªƒÍ§∑§ §§"    TO  SPA-GMN-W21-BTURYOKAIMEIL(1)
+      *
+           MOVE    "2"             TO  SPA-GMN-W21-BTURYOKAIL(2)
+           MOVE    "Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤˛¡±≤√ªª£±"
+                                   TO  SPA-GMN-W21-BTURYOKAIMEIL(2)
+      *
+           MOVE    "3"             TO  SPA-GMN-W21-BTURYOKAIL(3)
+           MOVE    "Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤˛¡±≤√ªª£≤"
+                                   TO  SPA-GMN-W21-BTURYOKAIMEIL(3)
+      *
+           MOVE    3               TO  SPA-GMN-W21-BTURYOKAI-MAX
       *
            .
        3101-CMB-BTURYOKAI-SET-EXT.
@@ -1980,6 +1991,8 @@
                        MOVE    "5"     TO  SPA-GMN-W21-BTURYO
                    WHEN    CONST-H2404-BTURYOKAI1
                        MOVE    "2"     TO  SPA-GMN-W21-BTURYOKAI
+                   WHEN    CONST-H2404-BTURYOKAI2
+                       MOVE    "3"     TO  SPA-GMN-W21-BTURYOKAI
                    WHEN    CONST-JYUTOK1
                        MOVE    "2"     TO  SPA-GMN-W21-JYUTOK
                    WHEN    CONST-JYUTOK2
@@ -3189,12 +3202,18 @@
            END-EVALUATE
       *
       *    Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤˛¡±≤√ªª
-           IF    ( SPA-GMN-W21-BTURYOKAI   =   "2" )
+           EVALUATE    SPA-GMN-W21-BTURYOKAI
+           WHEN    "2"
                MOVE    CONST-H2404-BTURYOKAI1  TO  WRK-KSNCD
                MOVE    SPA-NAI-W21-BTURYOKAI-IDX
                                                TO  WRK-KSNIDX
                PERFORM 42021-BRM-KSN-EDIT-SEC
-           END-IF
+           WHEN    "3"
+               MOVE    CONST-H2404-BTURYOKAI2  TO  WRK-KSNCD
+               MOVE    SPA-NAI-W21-BTURYOKAI-IDX
+                                               TO  WRK-KSNIDX
+               PERFORM 42021-BRM-KSN-EDIT-SEC
+           END-EVALUATE
       *
       *    Ω≈æ…º‘≈˘Œ≈Õ‹¥ƒ∂≠∆√ Ã≤√ªª
            EVALUATE    SPA-GMN-W21-JYUTOK
