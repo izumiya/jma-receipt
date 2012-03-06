@@ -140,7 +140,7 @@
                    07  SPA-GMN-TOKUKIZAISBT1MEI    PIC X(26).
                05  SPA-GMN-TOKUKIZAISBT1COB-G.
                    07  SPA-GMN-TOKUKIZAISBT1COB    PIC X(30)
-                                                   OCCURS   3.
+                                                   OCCURS   4.
                05  SPA-TOKUKIZAISBT1-MAX             PIC 9(04).
       *
                05  SPA-GMN-TOKUKIZAISBT2-G.
@@ -713,7 +713,9 @@
                                        TO  SPA-GMN-TOKUKIZAISBT1COB(2)
            MOVE    "3 高線量率イリジウム"
                                        TO  SPA-GMN-TOKUKIZAISBT1COB(3)
-           MOVE    3                   TO  SPA-TOKUKIZAISBT1-MAX
+           MOVE    "4 コバルト"
+                                       TO  SPA-GMN-TOKUKIZAISBT1COB(4)
+           MOVE    4                   TO  SPA-TOKUKIZAISBT1-MAX
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-TOKUKIZAISBT1-MAX
                IF      SPA-GMN-TOKUKIZAISBT1
