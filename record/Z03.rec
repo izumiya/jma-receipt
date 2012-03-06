@@ -138,7 +138,7 @@ Z03	{
 						value	varchar(30);
 					};
 					count	int;
-					item	varchar(30)[7];
+					item	varchar(30)[10];
 				};
 				SANTEIRRKKBNCOB	{
 					SANTEIRRKKBN	{
