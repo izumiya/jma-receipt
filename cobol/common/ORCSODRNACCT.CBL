@@ -566,6 +566,17 @@
       *
            IF      LNK-PTNYUINRRK-TOKUTEI-NYUIN    NOT =   SPACE
                PERFORM   4801-TOKTEI-NYUIN-SET-SEC
+      *        特定一般病棟入院料の場合は期間加算が存在するため、
+      *        初期加算サブを呼び出す（平成２４年改正で追加）
+               IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
+                                                "190152010"
+                   CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
+                                                   SPA-AREA
+                   IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
+                       MOVE    "4017"      TO  SPA-ERRCD
+                       GO  TO  4801-NYUKAIKEI-EDIT-EXT
+                   END-IF
+               END-IF
            ELSE
                IF  SYS-5001-BTU-KHNSRYCD      NOT =   SPACE
                    MOVE    SYS-5001-BTU-KHNSRYCD
@@ -3867,6 +3878,17 @@
       *
            IF      LNK-PTNYUINRRK-TOKUTEI-NYUIN    NOT =   SPACE
                PERFORM   4801-TOKTEI-NYUIN-SET-SEC
+      *        特定一般病棟入院料の場合は期間加算が存在するため、
+      *        初期加算サブを呼び出す（平成２４年改正で追加）
+               IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
+                                                "190152010"
+                   CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
+                                                   SPA-AREA
+                   IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
+                       MOVE    "4021"      TO  SPA-ERRCD
+                       GO  TO  4801-TENROOM-EDIT-EXT
+                   END-IF
+               END-IF
            ELSE
                PERFORM   4801-BTUSEL-SEC
                IF  SYS-5001-BTU-KHNSRYCD      NOT =   SPACE
