@@ -115,7 +115,7 @@
                     06  Z03-TIMEKSNKBN.
                       07  Z03-VALUE   PIC X(30).
                     06  Z03-TIMEKSNKBN-COUNT   PIC S9(9)   BINARY.
-                    06  Z03-TIMEKSNKBN-ITEM    PIC X(30)   OCCURS  7.
+                    06  Z03-TIMEKSNKBN-ITEM    PIC X(30)   OCCURS  10.
                   05  Z03-SANTEIRRKKBNCOB.
                     06  Z03-SANTEIRRKKBN.
                       07  Z03-VALUE   PIC X(30).

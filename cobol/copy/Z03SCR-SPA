@@ -210,7 +210,7 @@
                        09  SPA-GMN-TIMEKSNKBNMEI   PIC X(30).
                    07  SPA-GMN-TIMEKSNKBNCOB-G.
                        09  SPA-GMN-TIMEKSNKBNCOB   PIC X(32)
-                                                   OCCURS  7.
+                                                   OCCURS  10.
                    07  SPA-TIMEKSNKBN-MAX          PIC 9(04).
       *
                    07  SPA-GMN-GAIKANRIKBN-G.

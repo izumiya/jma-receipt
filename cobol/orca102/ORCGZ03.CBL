@@ -1436,7 +1436,9 @@
                                          TO  SPA-GMN-TIMEKSNKBNCOB (6)
                MOVE    "6 夜間・早朝加算"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (7)
-               MOVE    7                 TO  SPA-TIMEKSNKBN-MAX
+               MOVE    "7 夜間加算"
+                                         TO  SPA-GMN-TIMEKSNKBNCOB (8)
+               MOVE    8                 TO  SPA-TIMEKSNKBN-MAX
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-TIMEKSNKBN-MAX
@@ -2944,6 +2946,8 @@
            END-IF
       *
            IF      SPA-GMN-KGNAGE      =   "AA"
+                                       OR  "B3"
+                                       OR  "BF"
                CONTINUE
            ELSE
       *
@@ -2975,6 +2979,8 @@
            END-IF
       *
            IF      SPA-GMN-JGNAGE      =   "AA"
+                                       OR  "B3"
+                                       OR  "BF"
                CONTINUE
            ELSE
                MOVE    SPA-GMN-JGNAGE      TO  WRK-SNUM-INX
@@ -3030,6 +3036,8 @@
            END-IF
       *
            IF      WRK-AGEKSNKGN       =   "AA"
+                                       OR  "B3"
+                                       OR  "BF"
                CONTINUE
            ELSE
                INITIALIZE                      ORCSNUMAREA
@@ -3058,6 +3066,8 @@
            END-IF
       *
            IF      WRK-AGEKSNJGN       =   "AA"
+                                       OR  "B3"
+                                       OR  "BF"
                CONTINUE
            ELSE
                INITIALIZE                      ORCSNUMAREA
