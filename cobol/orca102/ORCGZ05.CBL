@@ -1266,6 +1266,8 @@
            END-IF
       *
            IF      SPA-GMN-KGNAGE      =   "AA"
+                                       OR  "B3"
+                                       OR  "BF"
                GO      TO      5002-KGNAGE-CHK-EXT
            END-IF
       *
@@ -1296,6 +1298,8 @@
            END-IF
       *
            IF      SPA-GMN-JGNAGE      =   "AA"
+                                       OR  "B3"
+                                       OR  "BF"
                CONTINUE
            ELSE
                INITIALIZE                      ORCSNUMAREA
