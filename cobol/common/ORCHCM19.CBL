@@ -647,6 +647,14 @@
        000-PROC-SEC                SECTION.
       *
       *
+      *    Ê¿À®£²£´Ç¯£´·î¤«¤éÊÌ£Ð£Ç¤È¤¹¤ë
+           IF      SPA-SRYYMD          >=  "20120401"
+               CALL    "ORCHCM19V02"        USING   SPA-AREA
+                                                   ORCHC19AREA
+               GO      TO      000-PROC-EXT
+           END-IF
+      *
+      *
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
            INITIALIZE                  STS-AREA

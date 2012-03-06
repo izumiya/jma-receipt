@@ -971,6 +971,9 @@
                    END-IF
                WHEN    "6"
                    MOVE    SPACE           TO  SPA-COM-SRYSYUKBN(IDX)
+      *H24.4改正
+      *点数を戻す
+                   MOVE    SPA-COM-TEN (IDX)   TO  SPA-COM-KISOTEN(IDX)
       *
       *            薬剤の時、内服・外用を決定する
                    EVALUATE    SPA-COM-YKZKBN(IDX)
@@ -1908,6 +1911,11 @@
                        WHEN    "099209905"
       *                剤型変更不可（薬剤毎）
                        WHEN    "099209906"
+      *H24.4 改正
+      *                一般名記載（薬剤毎）
+                       WHEN    "099209907"
+      *                一般名記載不可（薬剤毎）
+                       WHEN    "099209908"
                            IF     (SPA-COM-SRYKBN(IDX - 1) =   "21"
                                                            OR  "22"
                                                            OR  "23"
