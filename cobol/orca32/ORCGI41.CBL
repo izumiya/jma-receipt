@@ -1185,12 +1185,27 @@
       *
            MOVE    4                   TO  SPA-SAGAKU-MAX-41
       *
-           IF       SPA-NAI-SRYYM      >=  "201004"
+           IF      (SPA-NAI-SRYYM      >=  "201004")   AND
+                   (SPA-NAI-SRYYM      <=  "201203")
                MOVE    "05"                TO  SPA-GMN-SAGAKUNO-41 (5)
                MOVE    "他医療機関受診３０％減"
                                        TO  SPA-GMN-SAGAKU-41   (5)
       *
                MOVE    5                   TO  SPA-SAGAKU-MAX-41
+           END-IF
+      *
+           IF       SPA-NAI-SRYYM      >=  "201204"
+               MOVE    "05"                TO  SPA-GMN-SAGAKUNO-41 (5)
+               MOVE    "他医療機関受診３０％減"
+                                       TO  SPA-GMN-SAGAKU-41   (5)
+               MOVE    "06"                TO  SPA-GMN-SAGAKUNO-41 (6)
+               MOVE    "他医療機関受診５５％減"
+                                       TO  SPA-GMN-SAGAKU-41   (6)
+               MOVE    "07"                TO  SPA-GMN-SAGAKUNO-41 (7)
+               MOVE    "他医療機関受診１５％減"
+                                       TO  SPA-GMN-SAGAKU-41   (7)
+      *
+               MOVE    7                   TO  SPA-SAGAKU-MAX-41
            END-IF
       *
            .
@@ -3886,50 +3901,82 @@
                         MOVE    "0054"             TO  SPA-ERRCD
                         GO      TO      410121-DAY-NAI-CHK-EXT
                    END-IF
+      *
                    IF      SPA-CHK-SENTEI(IDX-D)   =   SPACE
-                     IF      SPA-NAI-SRYYM         >=    "201004"
-                       IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
-                                                       OR  1
-                                                       OR  2
-                                                       OR  3
-                                                       OR  4
-                                                       OR  5
-                           CONTINUE
-                       ELSE
-                           MOVE    "0035"         TO  SPA-ERRCD
-                       END-IF
+                     IF      SPA-NAI-SRYYM         >=    "201204"
+                           IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
+                                                           OR  1
+                                                           OR  2
+                                                           OR  3
+                                                           OR  4
+                                                           OR  5
+                                                           OR  6
+                                                           OR  7
+                               CONTINUE
+                           ELSE
+                               MOVE    "0035"         TO  SPA-ERRCD
+                           END-IF
                      ELSE
-                       IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
-                                                       OR  1
-                                                       OR  2
-                                                       OR  3
-                                                       OR  4
-                           CONTINUE
-                       ELSE
-                           MOVE    "0035"         TO  SPA-ERRCD
-                       END-IF
+                        IF     (SPA-NAI-SRYYM      >=    "201004") AND
+                               (SPA-NAI-SRYYM      <=    "201203")
+                           IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
+                                                           OR  1
+                                                           OR  2
+                                                           OR  3
+                                                           OR  4
+                                                           OR  5
+                               CONTINUE
+                           ELSE
+                               MOVE    "0035"         TO  SPA-ERRCD
+                           END-IF
+                        ELSE
+                           IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
+                                                           OR  1
+                                                           OR  2
+                                                           OR  3
+                                                           OR  4
+                               CONTINUE
+                           ELSE
+                               MOVE    "0035"         TO  SPA-ERRCD
+                           END-IF
+                        END-IF
                      END-IF
                    ELSE
       *                選定入院料算定日
-                     IF      SPA-NAI-SRYYM         >=    "201004"
-                       IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
-                                                       OR  3
-                                                       OR  4
-                                                       OR  5
-                           CONTINUE
-                       ELSE
-                           MOVE    "0036"         TO  SPA-ERRCD
-                       END-IF
+                     IF      SPA-NAI-SRYYM         >=    "201204"
+                           IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
+                                                           OR  3
+                                                           OR  4
+                                                           OR  5
+                                                           OR  6
+                                                           OR  7
+                               CONTINUE
+                           ELSE
+                               MOVE    "0036"         TO  SPA-ERRCD
+                           END-IF
                      ELSE
-                       IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
-                                                       OR  3
-                                                       OR  4
-                           CONTINUE
-                       ELSE
-                           MOVE    "0036"         TO  SPA-ERRCD
-                       END-IF
+                        IF     (SPA-NAI-SRYYM      >=    "201004") AND
+                               (SPA-NAI-SRYYM      <=    "201203")
+                           IF      SPA-GMN-DAY-41 (IDX-D)  =   ZERO
+                                                           OR  3
+                                                           OR  4
+                                                           OR  5
+                               CONTINUE
+                           ELSE
+                               MOVE    "0036"         TO  SPA-ERRCD
+                           END-IF
+                        ELSE
+                           IF          SPA-GMN-DAY-41 (IDX-D)  =   ZERO
+                                                           OR  3
+                                                           OR  4
+                               CONTINUE
+                           ELSE
+                               MOVE    "0036"         TO  SPA-ERRCD
+                           END-IF
+                        END-IF
                      END-IF
                    END-IF
+      *
       *        室料差額診療コード
                WHEN    "3"
       *            入院基本料算定なし
@@ -9337,28 +9384,44 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "入力可能な区分は０、１のいずれかです。"
                                        TO  WRK-ERRMSG
                WHEN    "0035"
-                 IF   SPA-NAI-SRYYM     >=    "201004"
-                   MOVE    "外泊での入力可能な区分は０、１、２、３、４"
+                 IF   SPA-NAI-SRYYM     >=    "201204"
+                     MOVE  "外泊での入力可能な区分は０、１、２、３、４"
                                        TO  WRK-ERRMSG(1:42)
-                   MOVE    "、５のいずれかです。"
-                                       TO  WRK-ERRMSG(43:20)
+                     MOVE  "、５、６、７のいずれかです。"
+                                       TO  WRK-ERRMSG(43:28)
                  ELSE
-                   MOVE    "外泊での入力可能な区分は０、１、２、３、４"
+                   IF  (SPA-NAI-SRYYM     >=    "201004")   AND
+                       (SPA-NAI-SRYYM     <=    "201203")
+                     MOVE  "外泊での入力可能な区分は０、１、２、３、４"
                                        TO  WRK-ERRMSG(1:42)
-                   MOVE    "のいずれかです。"
+                     MOVE  "、５のいずれかです。"
+                                       TO  WRK-ERRMSG(43:20)
+                   ELSE
+                     MOVE  "外泊での入力可能な区分は０、１、２、３、４"
+                                       TO  WRK-ERRMSG(1:42)
+                     MOVE  "のいずれかです。"
                                        TO  WRK-ERRMSG(43:16)
+                   END-IF
                  END-IF
                WHEN    "0036"
-                 IF   SPA-NAI-SRYYM     >=    "201004"
-                   MOVE    "選定入院料での入力可能な区分は０、３、４、"
+                 IF   SPA-NAI-SRYYM     >=    "201204"
+                     MOVE  "選定入院料での入力可能な区分は０、３、４、"
                                        TO  WRK-ERRMSG(1:42)
-                   MOVE    "５のいずれかです。"
-                                       TO  WRK-ERRMSG(43:18)
+                     MOVE    "５、６、７のいずれかです。"
+                                       TO  WRK-ERRMSG(43:26)
                  ELSE
-                   MOVE    "選定入院料での入力可能な区分は０、３、４の"
+                   IF  (SPA-NAI-SRYYM     >=    "201004")   AND
+                       (SPA-NAI-SRYYM     <=    "201203")
+                     MOVE  "選定入院料での入力可能な区分は０、３、４、"
                                        TO  WRK-ERRMSG(1:42)
-                   MOVE    "いずれかです。"
+                     MOVE  "５のいずれかです。"
+                                       TO  WRK-ERRMSG(43:18)
+                   ELSE
+                     MOVE  "選定入院料での入力可能な区分は０、３、４の"
+                                       TO  WRK-ERRMSG(1:42)
+                     MOVE  "いずれかです。"
                                        TO  WRK-ERRMSG(43:14)
+                   END-IF
                  END-IF
                WHEN    "0037"
                    MOVE    "入力された数字は室料差額番号として設定され"
