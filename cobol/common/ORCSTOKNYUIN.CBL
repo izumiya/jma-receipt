@@ -789,11 +789,8 @@
       *                фц╪Л╪ю╢╣ибеОфЧ╠║наё╡
                        MOVE   "190055310"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "05"
-      *                г╖цн╬иибеОфЧ╠║наё╠
+      *                г╖цн╬и╪ёнеибеОфЧ╠║наё╠
                        MOVE   "190739910"   TO  LNK-TOKNYUIN-SRYCD
-               WHEN    "06"
-      *                о╥©мю╜г╖цн╬и╪ю╢╣немэибеОфЧ╠║на
-                       MOVE   "190740110"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "07"
       *                ю╨©юнемэибеОфЧ╠║на
                        MOVE   "190055010"   TO  LNK-TOKNYUIN-SRYCD
@@ -804,36 +801,20 @@
       *                ╢коб╔╠╔╒ибеОфЧ╠║на
                        MOVE   "190028910"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "10"
-                   IF  LNK-TOKNYUIN-SANTEIYM <= "200603"
-      *                ю╨©ю╡й╣ъ╣чфЧ╠║на
-                       MOVE   "190111410"   TO  LNK-TOKNYUIN-SRYCD
-                   ELSE
       *                ю╨©ю╡й╣ъ╣чфЧ╠║наё╠
                        MOVE   "190121010"   TO  LNK-TOKNYUIN-SRYCD
-                   END-IF
                WHEN    "11"
-                   IF  LNK-TOKNYUIN-SANTEIYM <= "200603"
-      *                ю╨©ю╡й╣чю╜╢Э╪ёнеибеОфЧ╠║наё╠
-                       MOVE   "190066910"   TO  LNK-TOKNYUIN-SRYCD
-                   ELSE
       *                ю╨©ю╡й╣чю╜╢Э╪ёнеибеОфЧ╠║наё╠
                        MOVE   "190121110"   TO  LNK-TOKNYUIN-SRYCD
-                   END-IF
                WHEN    "12"
-                   IF  LNK-TOKNYUIN-SANTEIYM <= "200603"
-      *                ю╨©ю╡й╣чю╜╢Э╪ёнеибеОфЧ╠║наё╡
-                       MOVE   "190067010"   TO  LNK-TOKNYUIN-SRYCD
-                   ELSE
       *                ю╨©ю╡й╣чю╜╢Э╪ёнеибеОфЧ╠║наё╡
                        MOVE   "190121210"   TO  LNK-TOKNYUIN-SRYCD
-                   END-IF
                WHEN    "14"
       *                ╬╝╩ЫфЧ╠║╟Ене╢имЩнаё╣
                        MOVE   "190075810"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "15"
-      *                г╖цн╬иибеОфЧ╠║наё╡
+      *                г╖цн╬и╪ёнеибеОфЧ╠║наё╡
                        MOVE   "190813410"   TO  LNK-TOKNYUIN-SRYCD
-                       MOVE   "190124910"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "17"
       *                ╬╝╩ЫфЧ╠║╟Ене╢имЩнаё╠
                        MOVE   "190129310"   TO  LNK-TOKNYUIN-SRYCD
