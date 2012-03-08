@@ -790,7 +790,7 @@
                        MOVE   "190055310"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "05"
       *                認知症治療病棟入院料１
-                       MOVE   "190739910"   TO  LNK-TOKNYUIN-SRYCD
+                       MOVE   "190151610"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "07"
       *                精神療養病棟入院料
                        MOVE   "190055010"   TO  LNK-TOKNYUIN-SRYCD
@@ -814,7 +814,7 @@
                        MOVE   "190075810"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "15"
       *                認知症治療病棟入院料２
-                       MOVE   "190813410"   TO  LNK-TOKNYUIN-SRYCD
+                       MOVE   "190151710"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "17"
       *                小児入院医療管理料１
                        MOVE   "190129310"   TO  LNK-TOKNYUIN-SRYCD
@@ -891,7 +891,7 @@
       *                特定集中治療室管理料（重症者等比率基準適合）
                        MOVE   "190024610"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "10"
-      *                新生児特定集中治療室管理料
+      *                新生児特定集中治療室管理料１
                        MOVE   "190024710"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "11"
       *                総合周産期特定集中治療室管理料（母体・胎児）
@@ -909,7 +909,7 @@
       *                老人一般病棟入院医療管理料
                        MOVE   "190788810"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "16"
-      *                特定集中治療室管理料
+      *                特定集中治療室管理料１
                        MOVE   "190116310"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "17"
       *                ハイケアユニット入院医療管理料
@@ -927,13 +927,13 @@
       *                短期滞在手術基本料２
                        MOVE   "190076810"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "22"
-      *                後期高齢者特定入院基本料
+      *                特定入院基本料（一般病棟入院基本料）
                        MOVE   "190799410"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "23"
       *                診療所後期高齢者医療管理料（３０日を経過しない日の再入院）
                        MOVE   "190808910"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "24"
-      *                後期高齢者特定入院基本料（後期高齢者特別入院基本料算定患者）
+      *                特定入院基本料（特別入院基本料等算定患者）
                        MOVE   "190799510"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "25"
       *                療養病棟入院基本料１（入院基本料Ａ）
@@ -1008,7 +1008,7 @@
       *                有床診療所療養病床入院基本料（特別入院基本料）（生活療養）
                        MOVE   "190124810"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "49"
-      *                診療所後期高齢者医療管理料
+      *                診療所後期高齢者医療管理料（生活療養）
                        MOVE   "190125010"   TO  LNK-TOKNYUIN-SRYCD
                WHEN    "50"
       *                短期滞在手術基本料２（生活療養）
