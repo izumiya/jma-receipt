@@ -31,19 +31,16 @@
       * 01.00.05     NACL-門脇    09/06/16  一括再計算順、一括再計算方法追加
       * 01.00.06     NACL-門脇    10/01/26  診察料算定フラグ２追加
       * 01.00.07     NACL-門脇    11/02/03  時間外受診フラグ追加
+      * 01.00.08     NACL-門脇    12/03/09  現物給付計算フラグ追加
+      *                                     現物給付計算まとめ解除フラグ追加
+      *                                     現物給付メッセージフラグ追加
       ************************************************************
        01  LNK-ORCS01-REC.
       *
       *再計算処理区分
            03  LNK-S01-SAIKEISAN-KBN       PIC  X(01).
-      *再計算対象伝票番号
-      *    03  LNK-S01-SAIKEISAN-DENPYO    PIC  9(07).
       *高齢者（在宅総合・在宅末期）算定患者区分
            03  LNK-S01-KOUREI-ZAITAKU-KBN  PIC  X(01).
-      *自立支援再計算区分
-           03  LNK-S01-JIRITU-SAI-KBN      PIC  X(01).
-      *自立支援負担変更区分
-           03  LNK-S01-JIRITU-FTNHEN-KBN   PIC  X(01).
       *特殊計算再計算区分
            03  LNK-S01-TOKUSYU-SAI-KBN     PIC  X(01).
       *複数科まとめ集計フラグ（０：まとめ計算する　１：しない）
@@ -62,6 +59,12 @@
            03  LNK-S01-IKTKEISANKBN        PIC  X(01).
       *分娩自費区分
            03  LNK-S01-BUNBENJIHIKBN       PIC  X(01).
+      *一括再計算；現物給付計算フラグ
+           03  LNK-S01-IKTGENKEIFLG        PIC  X(01).
+      *一括再計算：現物給付計算まとめ解除フラグ
+           03  LNK-S01-IKTGENMKJFLG        PIC  X(01).
+      *現物給付メッセージフラグ
+           03  LNK-S01-GENBUTU-MSG-FLG     PIC  X(01).
       *
            03  LNK-S01-SINKOUI.
       *診療行為内容 

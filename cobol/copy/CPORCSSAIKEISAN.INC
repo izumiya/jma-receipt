@@ -23,6 +23,7 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 01.00.01     NACL-門脇    09/06/16  一括再計算順、一括再計算方法追加
+      * 01.00.02     NACL-門脇    12/03/09  現物給付計算フラグ追加
       ************************************************************
        01  LNK-ORCSSAIKEISAN-REC.
       *
@@ -42,6 +43,8 @@
            03  LNK-ORCSSKS-IKTKEISANKBN    PIC  X(01).
       *分娩自費区分
            03  LNK-ORCSSKS-BUNBENJIHIKBN   PIC  X(01).
+      *一括再計算；現物給付計算フラグ
+           03  LNK-ORCSSKS-IKTGENKEIFLG    PIC  X(01).
       *
       *返却値
       *
