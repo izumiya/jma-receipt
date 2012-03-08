@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  11/10/XX  削除・置換え対応
+      *  04.06.00    NACL=多々納  12/03/XX  平成２４年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -943,6 +944,16 @@
                                            TO  LF04-ALSNAME(IDY IDZ)
                    MOVE    MDCREQ-PRSCRPT-NUMBER(IDY IDZ)
                                            TO  LF04-SURYO(IDY IDZ)
+      *H24.4
+      *            数量コードに一般名記載区分編集
+                   EVALUATE    MDCREQ-GENERIC-FLG (IDY IDZ)
+                      WHEN     "yes"
+      *                   一般名記載
+                          MOVE    "90"         TO  LF04-SURYOCD(IDY IDZ)
+                      WHEN     "no"
+      *                   銘柄名記載
+                          MOVE    "91"         TO  LF04-SURYOCD(IDY IDZ)
+                   END-EVALUATE
       *
                    IF      MDCREQ-PRSCRPT-CODE (IDY IDZ)   NOT =   SPACE
                        ADD     1               TO  CNT-SRYCNT

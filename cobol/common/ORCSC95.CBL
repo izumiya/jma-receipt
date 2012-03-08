@@ -5336,6 +5336,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      WKSRY-SRYCD(IDXF)       =   "111011810"
                    MOVE    ZERO            TO  FLG-CHK
                END-IF
+      *H24.4
+      *        ∫∆ø«Œ¡£≤≤ Ã‹§œ¬–æ›
+               IF      WKSRY-SRYCD(IDXF)       =   "112015810"
+                                               OR  "112015950"
+                                               OR  "112016210"
+                   MOVE    ZERO            TO  FLG-CHK
+               END-IF
            END-PERFORM
            .
        3002-SRYKBN-CHK-EXT.

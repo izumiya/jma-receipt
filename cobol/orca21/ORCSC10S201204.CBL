@@ -5687,6 +5687,12 @@
                                        OR  "J"  )
                MOVE    ZERO                TO  FLG-HENKAN
            END-IF
+      *H24.4
+      *    再診同一日２科目の時
+           IF     (WRK-KBN3            =   "K"   )
+               MOVE    ZERO                TO  FLG-HENKAN
+           END-IF
+      *
       *    初診料算定で、既に当日受診がある時は対象
            IF     (FLG-SYOSIN2         =   1    )
       *        初診料以外の時、自動発生あり
@@ -6418,6 +6424,13 @@
                    IF      SPA-COM-INPUTCD (IDX)   =   "111011810"
       *TE 
                                                    OR  "101110040"
+                       MOVE    1               TO  FLG-DOUSYOSIN
+                   END-IF
+      *H24.4
+      *            再診料２科目
+                   IF      SPA-COM-INPUTCD (IDX)   =   "112015810"
+                                                   OR  "112015950"
+                                                   OR  "112016210"
                        MOVE    1               TO  FLG-DOUSYOSIN
                    END-IF
                END-IF
