@@ -66,6 +66,7 @@
       *  04.06.02    NACL-多々納  10/11/19  ４０剤、４０明細対応他
       *  04.06.02    NACL-多々納  11/02/18  用法コメント対応
       *  04.07.00    NACL-多々納  11/10/13  ＵＩＤ編集対応
+      *  04.07.00    NACL=多々納  12/03/XX  平成２４年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1820,6 +1821,11 @@
                    MOVE    1               TO  FLG-CHUSIN
                END-IF
            END-IF
+      *H24.4
+      *    一般名処方加算（処方せん料）は対象外
+           IF      WRK-SRYCD           =   "120003570"
+               MOVE    1               TO  FLG-CHK
+           END-IF
       *
            .
        20021-SRYCD-CHK-EXT.
@@ -2181,9 +2187,65 @@
                                                        (TBL-MAX IDX-S)
            END-IF
       *
+      *H24.4
+      *    一般名記載判定
+           IF      WRK-SRYYMD          >=  "20120401"
+               IF     (TBL-WKSRY-SRYCD (TBL-MAX IDX-S)(1:1)    =   "6")
+                  AND (LF04-SURYOCD (IDX1 IDX2)    =   "90"
+                                                   OR  "91"   )
+                  AND (TBL-WKSRY-SRYKBN (TBL-MAX)  =   "21"
+                                                   OR  "22"
+                                                   OR  "23"  )
+                   PERFORM 200329-GENERICHEN-SEC
+               END-IF
+           END-IF
+      *
            .
        20032-ZAITBLSET-EXT.
            EXIT.
+      *H24.4
+      *****************************************************************
+      *    一般名記載編集処理
+      *****************************************************************
+       200329-GENERICHEN-SEC         SECTION.
+      *
+            IF     IDX-S               =   5
+                MOVE    TBL-WKSRYACT-REC (TBL-MAX)
+                                       TO  TBL-WKSRYACT-REC
+                                                    (TBL-MAX + 1)
+                ADD     1              TO  TBL-MAX
+                ADD     1              TO  WRK-RENNUM
+      *         連番号
+                MOVE    WRK-RENNUM     TO  TBL-WKSRY-RENNUM(TBL-MAX)
+                MOVE    ZERO           TO  IDX-S
+                INITIALIZE             TBL-WKSRY-SINRYO-TBL-G(TBL-MAX)
+           END-IF
+      *
+           ADD     1                   TO  IDX-S
+           EVALUATE    LF04-SURYOCD (IDX1 IDX2)
+               WHEN    "90"
+      *            一般名記載
+                   MOVE    "099209908"         TO  TBL-WKSRY-SRYCD
+                                                     (TBL-MAX IDX-S)
+               WHEN    "91"
+      *            銘柄名記載
+                   MOVE    "099209907"         TO  TBL-WKSRY-SRYCD
+                                                     (TBL-MAX IDX-S)
+           END-EVALUATE
+           MOVE    TBL-WKSRY-SRYCD (TBL-MAX IDX-S)
+                                       TO  TBL-WKSRY-INPUTCD
+                                                      (TBL-MAX IDX-S)
+           MOVE    1                   TO  TBL-WKSRY-SRYSURYO
+                                                     (TBL-MAX IDX-S)
+      *    次行は削除
+           IF      LF04-IJICD(IDX1 IDX2 + 1)   =   "099209908"
+                                               OR  "099209907"
+               MOVE    SPACE           TO  LF04-IJICD(IDX1 IDX2 + 1)
+           END-IF
+           .
+       200329-GENERICHEN-EXT.
+           EXIT.
+      *H24.4
       *
       *****************************************************************
       *    コメント値編集処理

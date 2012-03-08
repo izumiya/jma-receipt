@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      * 04.07.00     NACL=多々納  12/03/XX  平成２４年４月改正対応
       *****************************************************************
       *
       *
@@ -802,6 +803,25 @@
                        MOVE    1               TO  SPA-MEISAKBN
                    ELSE
                        MOVE    0               TO  SPA-MEISAKBN
+                   END-IF
+               END-IF
+      *H24.4改正
+               IF      SYS-1006-KBNCD      =   "7"
+      *            時間外対応加算
+                   IF      SPA-SRYYMD      >=  "20120401"
+                       IF      SPA-CHIIKKBN    =   1
+                           MOVE    2               TO  SPA-CHIIKKBN
+                       END-IF
+                       EVALUATE    TRUE
+      *                    時間外対応加算１(3001)
+                           WHEN    SYS-1006-SSTKIJUN (001) =   1
+                               MOVE    1               TO  SPA-CHIIKKBN
+      *                    時間外対応加算３(3002)
+                           WHEN    SYS-1006-SSTKIJUN (002) =   1
+                               IF      SPA-CHIIKKBN    =   ZERO
+                                   MOVE    3           TO  SPA-CHIIKKBN
+                               END-IF
+                       END-EVALUATE
                    END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME

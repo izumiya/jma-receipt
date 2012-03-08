@@ -33,6 +33,7 @@
       * 01.00.02     NACL-多々納  02/10/18  入院追加
       * 01.00.03     NACL−多々納 02/11/11  ＤＵＭＭＹ診察料追加
       * 01.00.04     NACL−多々納 02/12/09  動脈注射エラー追加
+      * 04.07.00     NACL-多々納  12/03/XX  Ｈ２４年４月改正対応
       *****************************************************************
       *
       *
@@ -1860,6 +1861,14 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
       *
+      *!!!
+      *H24.4改正追加
+               WHEN    "2071"
+                   STRING  "一般名記載のコードは投薬の"
+                           "薬剤の下に入力して下さい。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
@@ -2544,6 +2553,63 @@
                WHEN    "1059"
                    STRING  "入院中です。自費保険以外の"
                            "複数保険入力はできません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *!!!
+      *H24.4改正追加
+               WHEN    "2100"
+                   STRING  "再診と同一２科目の診療科が同じです。"
+                           "算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2101"
+                   STRING  "当日に再診が算定されていません。"
+                           "再診料（同一２科目）は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2102"
+                   STRING  "初診料が算定されています。"
+                           "再診料（同一２科目）は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2103"
+                   STRING  "電話再診の算定がありません。"
+                           "電話再診（同一２科目）は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2106"
+                   STRING  "電話再診が算定されています。"
+                           "再診料（同一２科目）は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2104"
+                   STRING  "外来リハビリテーション診察料が算定中です。"
+                           "診察料は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2105"
+                   STRING  "外来放射線照射診察料が算定中です。"
+                           "診察料は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0234"
+                   STRING  "処方せん料が算定されません。"
+                           "一般名処方加算（処方せん料）は"
+                           "算定不可です"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K234"
+                   STRING  "警告！処方せん料を算定しません。"
+                           "一般名処方加算（処方せん料）のみの算定です"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
