@@ -54,14 +54,8 @@
            03  LNK-S02-DOJITUFLG-ED        PIC  X(01).
       *終了日入院食事区分（０：食なし、１：朝まで、２：昼まで、３：夕まで）
            03  LNK-S02-TIMEKBN-ED          PIC  X(01).
-      *再計算処理区分
-           03  LNK-S02-SAIKEISAN-KBN       PIC  X(01).
-      *再計算対象伝票番号
-           03  LNK-S02-SAIKEISAN-DENPYO    PIC  9(07).
       *高齢者算定患者区分
            03  LNK-S02-KOUREI-NYUIN-KBN    PIC  X(01).
-      *自立支援再計算区分
-           03  LNK-S02-JIRITU-SAI-KBN      PIC  X(01).
       *特殊計算再計算区分
            03  LNK-S02-TOKUSYU-SAI-KBN     PIC  X(01).
       *入院通算日数

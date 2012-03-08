@@ -364,7 +364,7 @@
       *
        01  WRK-COM-FTNHEN.
            03  FILLER              PIC X(50)   VALUE
-           "自立支援医療負担割合変更　同月請求分確認".
+           "★★　収納業務で一括再計算を行って下さい　★★".
       *
        01  WRK-SYSTIME.
            03  WRK-SYSTIME-X       PIC X(08).
@@ -1072,7 +1072,7 @@
       *    複数科編集
            PERFORM 3104-FUKU-HEN-SEC
       *
-      *    自立支援負担変更区分編集
+      *    現物給付メッセージフラグ編集
            EVALUATE    SPA-FTNHEN-KBN
                WHEN    "1"
                    MOVE    WRK-COM-FTNHEN      TO  SPA-GMN-FUKUMSG

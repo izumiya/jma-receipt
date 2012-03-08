@@ -106,6 +106,7 @@
       *  04.04.00    NACL-ÂÀÅÄ    08/12/08  ¼ýÇ¼¸¡º÷²èÌÌ¤òµÛ¼ý
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/16  °ì³çºÆ·×»»ÊýË¡ÁªÂòµ¡Ç½ÂÐ±þ
+      *  04.05.02    NACL-ÌçÏÆ    12/03/09  ²þÀµÂÐ±þ¡§³°Íè¸½ÊªµëÉÕÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -180,7 +181,6 @@
                            11  SPA-GMN-TNYUKIN     PIC S9(10).
                            11  SPA-GMN-TMISYU      PIC S9(10).
                            11  SPA-GMN-TJYOTAI     PIC X(16).
-                           11  SPA-GMN-FTNHENFLG   PIC 9(02).
                            11  SPA-GMN-SIKIBETUFLG PIC X(01).
                        09  SPA-GMN-TBL-SEL         PIC 9(05).
       *
@@ -283,6 +283,10 @@
            03  FLG-SEIKYU-PRT      PIC 9(01).
            03  FLG-MEISAI-PRT      PIC 9(01).
            03  FLG-PARA            PIC 9(01).
+           03  FLG-MISYORI2        PIC 9(01).
+           03  FLG-GENBUTU         PIC 9(01).
+           03  FLG-GENBUTU2        PIC 9(01).
+           03  FLG-GENBUTU3        PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -365,8 +369,6 @@
            03  WRK-DENPNUM-END-TABLE.
                05  WRK-DENPNUM-END PIC 9(07)   OCCURS  100.
       *
-           03  WRK-FTNHENFLG1      PIC 9(01).
-           03  WRK-FTNHENFLG2      PIC 9(01).
            03  WRK-FILEMEI  .
                05  WRK-FILEMEI-YMD PIC X(08).
                05  WRK-FILEMEI-HMS PIC X(06).
@@ -2078,18 +2080,10 @@
                MOVE    "³°"            TO  SPA-GMN-TNYUGAIKBN  (IDX-LST)
            END-EVALUATE
       *
-           IF    ( SYU-DENPJTIKBN  NOT =   "3" )
-               EVALUATE    SYU-NYNSHOKAISU
-               WHEN         1
-                   MOVE  SYU-NYNSHOKAISU
-                                       TO  SPA-GMN-FTNHENFLG  (IDX-LST)
-                   MOVE  SYU-NYUGAIKBN TO  SPA-GMN-SIKIBETUFLG(IDX-LST)
-               WHEN         2
-                   MOVE  SYU-NYNSHOKAISU
-                                       TO  SPA-GMN-FTNHENFLG  (IDX-LST)
-                   MOVE  SYU-NYUGAIKBN TO  SPA-GMN-SIKIBETUFLG(IDX-LST)
-                   MOVE    "¡û"    TO  SPA-GMN-TNYUGAIKBN (IDX-LST)(3:2)
-               END-EVALUATE
+           IF      SYU-DENPJTIKBN  NOT =   "3"
+                IF  SYU-SECMONEY        =  1
+                   MOVE   "1"     TO   SPA-GMN-SIKIBETUFLG(IDX-LST)
+                END-IF
            END-IF
       *
            INITIALIZE                      SYSKANRI-REC
@@ -2466,8 +2460,7 @@
            MOVE    WIDGET-INSENSITIVE  TO  S02-B03S-STATE
       *    »ÃÄê ED
       *
-           MOVE    ZERO                TO  WRK-FTNHENFLG1
-                                           WRK-FTNHENFLG2
+           MOVE    ZERO                TO  FLG-MISYORI2
       *
            PERFORM VARYING     IDX-LST     FROM    1   BY  1
                    UNTIL     ( IDX-LST     >       SPA-GMN-MAX )
@@ -2516,42 +2509,9 @@
                    MOVE    "F"         TO  S02-SYULIST-SELECT (IDX-LST)
                END-IF
       *
-               EVALUATE   SPA-GMN-SIKIBETUFLG(IDX-LST)
-                 WHEN         "1"
-                   EVALUATE   SPA-GMN-FTNHENFLG(IDX-LST)
-                     WHEN         1
-                       EVALUATE   WRK-FTNHENFLG1
-                         WHEN        ZERO
-                           MOVE   1   TO   WRK-FTNHENFLG1
-                         WHEN         2
-                           MOVE   3   TO   WRK-FTNHENFLG1
-                       END-EVALUATE
-                     WHEN         2
-                       EVALUATE   WRK-FTNHENFLG1
-                         WHEN        ZERO
-                           MOVE   2   TO   WRK-FTNHENFLG1
-                         WHEN         1
-                           MOVE   3   TO   WRK-FTNHENFLG1
-                       END-EVALUATE
-                   END-EVALUATE
-                 WHEN         "2"
-                   EVALUATE   SPA-GMN-FTNHENFLG(IDX-LST)
-                     WHEN         1
-                       EVALUATE   WRK-FTNHENFLG2
-                         WHEN        ZERO
-                           MOVE   1   TO   WRK-FTNHENFLG2
-                         WHEN         2
-                           MOVE   3   TO   WRK-FTNHENFLG2
-                       END-EVALUATE
-                     WHEN         2
-                       EVALUATE   WRK-FTNHENFLG2
-                         WHEN        ZERO
-                           MOVE   2   TO   WRK-FTNHENFLG2
-                         WHEN         1
-                           MOVE   3   TO   WRK-FTNHENFLG2
-                       END-EVALUATE
-                   END-EVALUATE
-               END-EVALUATE
+               IF    SPA-GMN-SIKIBETUFLG(IDX-LST)     = "1"
+                   MOVE     1          TO  FLG-MISYORI2
+               END-IF
       *
            END-PERFORM
       *
@@ -2560,19 +2520,9 @@
            MOVE    SPA-GMN-SELBAN              TO  WRK-SELBAN-W
            MOVE    WRK-SELBAN-W                TO  S02-SELNUM
       *
-           IF     (WRK-FTNHENFLG1  =  3) AND (WRK-FTNHENFLG2  NOT =  3)
-           MOVE    "red"       TO    S02-LBLMSG-STYLE
-       MOVE "¼«Î©»Ù±ç°åÎÅÉéÃ´³ä¹çÊÑ¹¹  Æ±·îÀÁµáÊ¬³ÎÇ§µÚ¤ÓºÆÀÁµá¡ÊÆþ¡Ë"
-                               TO    S02-LBLMSG
-           END-IF
-           IF     (WRK-FTNHENFLG1  NOT =  3) AND (WRK-FTNHENFLG2  =  3)
-           MOVE    "red"       TO    S02-LBLMSG-STYLE
-       MOVE "¼«Î©»Ù±ç°åÎÅÉéÃ´³ä¹çÊÑ¹¹  Æ±·îÀÁµáÊ¬³ÎÇ§µÚ¤ÓºÆÀÁµá¡Ê³°¡Ë"
-                               TO    S02-LBLMSG
-           END-IF
-           IF     (WRK-FTNHENFLG1      =  3) AND (WRK-FTNHENFLG2  =  3)
-           MOVE    "red"       TO    S02-LBLMSG-STYLE
-       MOVE "¼«Î©»Ù±ç°åÎÅÉéÃ´³ä¹çÊÑ¹¹  Æ±·îÀÁµáÊ¬³ÎÇ§µÚ¤ÓºÆÀÁµá¡ÊÆþ³°¡Ë"
+           IF      FLG-MISYORI2  =    1
+              MOVE    "red"    TO    S02-LBLMSG-STYLE
+       MOVE "¡ú¡ú¡¡¡Ú¸½ÊªµëÉÕÁë¸ý·×»»¡Û¡¡°ì³çºÆ·×»»¤ò¹Ô¤Ã¤Æ²¼¤µ¤¤¡¡¡ú¡ú"
                                TO    S02-LBLMSG
            END-IF
       *
@@ -4553,6 +4503,46 @@
       ***  END-IF
            MOVE    "2"                 TO  WRK-NYUGAIKBN
       *
+      *    ¸½ÊªµëÉÕ·×»»¡§°ì³çºÆ·×»»ÂÐ¾Ý¤Î¼ýÇ¼¥Ç¡¼¥¿¤¬¤¢¤ë¤«¥Á¥§¥Ã¥¯
+      *
+           MOVE    ZERO                TO  FLG-GENBUTU
+           MOVE    ZERO                TO  FLG-GENBUTU2
+           MOVE    ZERO                TO  FLG-GENBUTU3
+      *
+           MOVE    ZERO                TO  FLG-SYUNOU
+           INITIALIZE                      SYUNOU-REC
+           MOVE    SPA-HOSPNUM         TO  SYU-HOSPNUM
+           MOVE    WRK-NYUGAIKBN       TO  SYU-NYUGAIKBN
+           MOVE    SPA-GMN-PTID        TO  SYU-PTID
+           MOVE    WRK-SKYYM           TO  SYU-SRYYMD (1:6)
+           MOVE    "__"                TO  SYU-SRYYMD (7:)
+           MOVE    "tbl_syunou"        TO  WRK-TABLE
+           MOVE    "key35"             TO  WRK-PATHNAME
+           PERFORM 900-SYUNOU-SEL-IKT-SEC
+           PERFORM   UNTIL   FLG-SYUNOU  =  1
+               MOVE    MCPDATA-REC     TO  SYUNOU-REC
+               IF    SYU-DENPJTIKBN  NOT =  "3"
+                 IF   SYU-SAIKEISANKBN    =  "1"
+                    MOVE    1     TO  FLG-GENBUTU2
+                 END-IF
+                 IF  (SYU-SYUHKNNUM   NOT = SPACE)
+                 AND (SYU-KOH1HKNNUM  NOT = SPACE)
+                    MOVE    1     TO  FLG-GENBUTU3
+                 END-IF
+               END-IF
+               MOVE    "tbl_syunou"    TO  WRK-TABLE
+               MOVE    "key35"         TO  WRK-PATHNAME
+               PERFORM 900-SYUNOU-FET-SEC
+           END-PERFORM
+           MOVE    "tbl_syunou"   TO  MCP-TABLE
+           MOVE    "key35"        TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           IF   FLG-GENBUTU2  =   1
+           AND  FLG-GENBUTU3  =   1
+                    MOVE    1     TO  FLG-GENBUTU
+           END-IF
+      *
            MOVE    ZERO                TO  FLG-SYUNOU
            INITIALIZE                      SYUNOU-REC
            MOVE    SPA-HOSPNUM          TO  SYU-HOSPNUM
@@ -4560,11 +4550,24 @@
            MOVE    SPA-GMN-PTID        TO  SYU-PTID
            MOVE    WRK-SKYYM           TO  SYU-SRYYMD (1:6)
            MOVE    "__"                TO  SYU-SRYYMD (7:)
-           IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-              PERFORM 900-SYUNOU-KEY35-SEL-SEC
+           IF   FLG-GENBUTU = ZERO
+             IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                MOVE    "tbl_syunou"   TO  WRK-TABLE
+                MOVE    "key35"        TO  WRK-PATHNAME
+             ELSE
+                MOVE    "tbl_syunou"   TO  WRK-TABLE
+                MOVE    "key69"        TO  WRK-PATHNAME
+             END-IF
            ELSE
-              PERFORM 900-SYUNOU-KEY69-SEL-SEC
+             IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                MOVE    "tbl_syunou"   TO  WRK-TABLE
+                MOVE    "key82"        TO  WRK-PATHNAME
+             ELSE
+                MOVE    "tbl_syunou"   TO  WRK-TABLE
+                MOVE    "key83"        TO  WRK-PATHNAME
+             END-IF
            END-IF
+           PERFORM 900-SYUNOU-SEL-IKT-SEC
       *
            PERFORM   UNTIL ( FLG-SYUNOU  =   1 )
       *
@@ -4593,6 +4596,10 @@
                                           TO   LNK-ORCSSKS-IKTSORTKBN
                   MOVE     SYS-1039-IKTKEISANKBN
                                           TO   LNK-ORCSSKS-IKTKEISANKBN
+                  IF   FLG-GENBUTU  =  1
+                    MOVE     "1"          TO   LNK-ORCSSKS-IKTKEISANKBN
+                    MOVE     "1"          TO   LNK-ORCSSKS-IKTGENKEIFLG
+                  END-IF
       *
                   CALL    "ORCSSAIKEISAN"     USING
                                               SPA-AREA
@@ -4608,11 +4615,24 @@
       *
                END-IF
       *
-               IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-                  PERFORM 900-SYUNOU-KEY35-FET-SEC
+               IF   FLG-GENBUTU = ZERO
+                 IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                    MOVE    "tbl_syunou"   TO  WRK-TABLE
+                    MOVE    "key35"        TO  WRK-PATHNAME
+                 ELSE
+                    MOVE    "tbl_syunou"   TO  WRK-TABLE
+                    MOVE    "key69"        TO  WRK-PATHNAME
+                 END-IF
                ELSE
-                  PERFORM 900-SYUNOU-KEY69-FET-SEC
+                 IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+                    MOVE    "tbl_syunou"   TO  WRK-TABLE
+                    MOVE    "key82"        TO  WRK-PATHNAME
+                 ELSE
+                    MOVE    "tbl_syunou"   TO  WRK-TABLE
+                    MOVE    "key83"        TO  WRK-PATHNAME
+                 END-IF
                END-IF
+               PERFORM 900-SYUNOU-FET-SEC
       *
                IF    SPA-ERRCD   NOT =  SPACE
                    MOVE    1           TO  FLG-SYUNOU
@@ -4620,15 +4640,24 @@
       *
            END-PERFORM
       *
-           IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
-             MOVE    "tbl_syunou"   TO  MCP-TABLE
-             MOVE    "key35"        TO  MCP-PATHNAME
-             PERFORM 910-DBCLOSECURSOR-SEC
+           IF   FLG-GENBUTU = ZERO
+             IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+               MOVE    "tbl_syunou"   TO  MCP-TABLE
+               MOVE    "key35"        TO  MCP-PATHNAME
+             ELSE
+               MOVE    "tbl_syunou"   TO  MCP-TABLE
+               MOVE    "key69"        TO  MCP-PATHNAME
+             END-IF
            ELSE
-             MOVE    "tbl_syunou"   TO  MCP-TABLE
-             MOVE    "key69"        TO  MCP-PATHNAME
-             PERFORM 910-DBCLOSECURSOR-SEC
+             IF   SYS-1039-IKTSORTKBN  =  "0" OR SPACE
+               MOVE    "tbl_syunou"   TO  MCP-TABLE
+               MOVE    "key82"        TO  MCP-PATHNAME
+             ELSE
+               MOVE    "tbl_syunou"   TO  MCP-TABLE
+               MOVE    "key83"        TO  MCP-PATHNAME
+             END-IF
            END-IF
+           PERFORM 910-DBCLOSECURSOR-SEC
       *
            IF    SPA-ERRCD   NOT =  SPACE
                   MOVE    "0064"       TO  SPA-ERRCD
@@ -6225,6 +6254,27 @@
        800-SET-SS002-SMEI-EXT.
            EXIT.
       **************************************************************
+      *    ¼ýÇ¼¥Þ¥¹¥¿¡¼¸¡º÷½èÍý¡Ê°ì³çºÆ·×»»¡Ë
+      **************************************************************
+       900-SYUNOU-SEL-IKT-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYUNOU
+      *
+           MOVE    SYUNOU-REC          TO  MCPDATA-REC
+           MOVE    WRK-TABLE           TO  MCP-TABLE
+           MOVE    WRK-PATHNAME        TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYUNOU-REC
+           ELSE
+               INITIALIZE                  SYUNOU-REC
+               MOVE    1               TO  FLG-SYUNOU
+           END-IF
+      *
+           .
+       900-SYUNOU-SEL-IKT-EXT.
+           EXIT.
+      **************************************************************
       *    ¼ýÇ¼¥Þ¥¹¥¿¡¼ÆÉ¹þ¡Ê¼ç¥­¡¼¡Ë
       **************************************************************
        900-SYUNOU-KEY-SEL-SEC          SECTION.
@@ -6336,88 +6386,6 @@
       *
            .
        900-SYUNOU-FET-EXT.
-           EXIT.
-      **************************************************************
-      *    ¼ýÇ¼¥Þ¥¹¥¿¡¼¸¡º÷½èÍý
-      **************************************************************
-       900-SYUNOU-KEY35-SEL-SEC        SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SYUNOU
-      *
-           MOVE    SYUNOU-REC          TO  MCPDATA-REC
-           MOVE    "tbl_syunou"        TO  MCP-TABLE
-           MOVE    "key35"             TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYUNOU-REC
-           ELSE
-               INITIALIZE                  SYUNOU-REC
-               MOVE    1               TO  FLG-SYUNOU
-           END-IF
-      *
-           .
-       900-SYUNOU-KEY35-SEL-EXT.
-           EXIT.
-      **************************************************************
-      *    ¼ýÇ¼¥Þ¥¹¥¿¡¼FETCH½èÍý
-      **************************************************************
-       900-SYUNOU-KEY35-FET-SEC        SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SYUNOU
-      *
-           MOVE    "tbl_syunou"        TO  MCP-TABLE
-           MOVE    "key35"             TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYUNOU-REC
-           ELSE
-               INITIALIZE                  SYUNOU-REC
-               MOVE    1               TO  FLG-SYUNOU
-           END-IF
-      *
-           .
-       900-SYUNOU-KEY35-FET-EXT.
-           EXIT.
-      **************************************************************
-      *    ¼ýÇ¼¥Þ¥¹¥¿¡¼¸¡º÷½èÍý
-      **************************************************************
-       900-SYUNOU-KEY69-SEL-SEC        SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SYUNOU
-      *
-           MOVE    SYUNOU-REC          TO  MCPDATA-REC
-           MOVE    "tbl_syunou"        TO  MCP-TABLE
-           MOVE    "key69"             TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYUNOU-REC
-           ELSE
-               INITIALIZE                  SYUNOU-REC
-               MOVE    1               TO  FLG-SYUNOU
-           END-IF
-      *
-           .
-       900-SYUNOU-KEY69-SEL-EXT.
-           EXIT.
-      **************************************************************
-      *    ¼ýÇ¼¥Þ¥¹¥¿¡¼FETCH½èÍý
-      **************************************************************
-       900-SYUNOU-KEY69-FET-SEC        SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SYUNOU
-      *
-           MOVE    "tbl_syunou"        TO  MCP-TABLE
-           MOVE    "key69"             TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYUNOU-REC
-           ELSE
-               INITIALIZE                  SYUNOU-REC
-               MOVE    1               TO  FLG-SYUNOU
-           END-IF
-      *
-           .
-       900-SYUNOU-KEY69-FET-EXT.
            EXIT.
       **************************************************************
       *    ¼ýÇ¼¥Þ¥¹¥¿¡¼¸¡º÷½èÍý

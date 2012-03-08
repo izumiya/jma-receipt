@@ -3960,8 +3960,8 @@
                                        LNK-ORCS01-REC
                                        LNK-SYUNOU2-AREA
                                        SPA-AREA
-      *    自立支援負担変更区分
-           MOVE    LNK-S01-JIRITU-FTNHEN-KBN   TO  SPA-FTNHEN-KBN
+      *    現物給付メッセージフラグ
+           MOVE    LNK-S01-GENBUTU-MSG-FLG     TO  SPA-FTNHEN-KBN
       *
            IF      SPA-KAGRPFLG        =   "0"
       *        複数科まとめ集計の差額計算

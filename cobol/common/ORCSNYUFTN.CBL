@@ -168,6 +168,8 @@
            03  WRK-TENSU-KEISAN            PIC 9(08).
            03  WRK-JNISSU-ERR              PIC 9(01).
            03  WRK-DOJITU-TENTEK           PIC 9(07).
+           03  WRK-HKNJANUM                PIC X(08).
+           03  WRK-YUSENYMD                PIC X(08).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -298,6 +300,7 @@
               03 WRK-HANBETU-SENINFLG2     PIC X(01).                   
               03 WRK-HANBETU-TEKSTYMD      PIC X(08).
               03 WRK-HANBETU-TEKEDYMD      PIC X(08).
+              03 WRK-HANBETU-HKNJANUM      PIC X(08).
       *
        01  WRK-HANBETU2-TABLE.
            02  WRK-HANBETU2-TBL OCCURS   10.
@@ -311,7 +314,7 @@
               03 WRK-HANBETU3-HKNCOMBINUM  PIC 9(04).
               03 WRK-HANBETU3-DAY          PIC X(01)   OCCURS   31.
       *
-       01  WRK-HANBETU-DATA                PIC X(128).
+       01  WRK-HANBETU-DATA                PIC X(136).
       *
       *    入院点数算定用ワークエリア
        01  WRK-NYUIN-TENSU-AREA.
@@ -347,6 +350,7 @@
            03  FLG-NYUINRYO-KASAN-OK       PIC 9(01).
            03  FLG-NYUINRYO-KASAN2-OK      PIC 9(01).
            03  FLG-NYUINRYO-KASAN-CHK      PIC 9(01).
+           03  FLG-TAISYO                  PIC 9(01).
       *
        01  CNT-AREA.
            03  CNT-KENSU                   PIC 9(03).
@@ -1091,6 +1095,8 @@
       *
            PERFORM    NARABIKAE-SYORI-SEC.
       *
+           PERFORM    YUSENYMD-HENKOU-SYORI-SEC.
+      *
        NYUIN-HANBETU-EXT.
            EXIT.
       *
@@ -1696,6 +1702,10 @@
                 CALL "ORCDBMAIN"  USING MCPAREA
                                         MCPDATA-REC
                                         SPA-AREA
+                IF   (COMB-HKNNUM         =   "060")
+                AND  (PTHKN-HKNJANUM  NOT =   SPACE)
+                   MOVE  PTHKN-HKNJANUM  TO  WRK-HANBETU-HKNJANUM(IDX)
+                END-IF
               ELSE
                 INITIALIZE                           PTHKNINF-REC
               END-IF
@@ -1867,6 +1877,42 @@
            END-PERFORM.
       *
        NARABIKAE-SYORI-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    優先年月日変更処理                                          *
+      ******************************************************************
+       YUSENYMD-HENKOU-SYORI-SEC        SECTION.
+      *
+           MOVE       SPACE     TO    WRK-HKNJANUM
+           MOVE       SPACE     TO    WRK-YUSENYMD
+           MOVE       ZERO      TO    FLG-TAISYO
+      *
+           PERFORM    VARYING   IDX    FROM   1   BY   1
+                       UNTIL   (IDX                    >   10  )
+                        OR     (WRK-HANBETU-SKYYM(IDX) =  SPACE)
+             IF   WRK-HANBETU-HKNJANUM(IDX)  NOT =  SPACE
+               IF ( WRK-HKNJANUM      =  SPACE                    )
+               OR ((WRK-HKNJANUM  NOT =  SPACE                   ) AND
+                   (WRK-HKNJANUM  NOT = WRK-HANBETU-HKNJANUM(IDX)))
+                 MOVE   WRK-HANBETU-HKNJANUM(IDX)
+                                        TO   WRK-HKNJANUM
+                 MOVE   WRK-HANBETU-YUSENYMD(IDX)
+                                        TO   WRK-YUSENYMD
+               ELSE
+                 MOVE   WRK-YUSENYMD    TO   WRK-HANBETU-YUSENYMD(IDX)
+                 MOVE   1               TO   FLG-TAISYO
+               END-IF
+             END-IF
+           END-PERFORM
+      *
+           IF   FLG-TAISYO   =   1
+              PERFORM     NARABIKAE-SYORI-SEC
+           END-IF
+      *
+           .
+      *
+       YUSENYMD-HENKOU-SYORI-EXT.
            EXIT.
       *
       ******************************************************************

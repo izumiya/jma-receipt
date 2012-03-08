@@ -52,6 +52,7 @@
       *  04.05.02    NACL-門脇    10/01/19  治験対応
       *  04.05.03    NACL-門脇    10/01/26  東京都マル子追加対応
       *  04.05.04    NACL-門脇    11/02/28  長崎県地方公費対応
+      *  04.05.05    NACL-門脇    12/03/09  改正対応：外来現物給付対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -95,6 +96,9 @@
            03  FLG-OK                      PIC 9(01).
            03  FLG-TAISYO                  PIC 9(01).
            03  FLG-PTINF                   PIC 9(01).
+           03  FLG-GENBUTU                 PIC 9(01).
+           03  FLG-GENBUTU2                PIC 9(01).
+           03  FLG-GENBUTU3                PIC 9(01).
       *
       *    ワーク領域
        01  WRK-AREA.
@@ -219,6 +223,10 @@
       *    ワーク収納マスター（減点用）
        01  WRK-SYUNOUG-REC.
            COPY    "CPSYUNOU.INC" REPLACING  //SYU-// BY //WRK-SYUG-//.
+      *
+      *    ワーク収納マスター（退避用）
+       01  WRK-SYUNOU-TAIHI-REC.
+           COPY    "CPSYUNOU.INC" REPLACING  //SYU-// BY //WRK-SYUT-//.
       *
       *    収納明細マスター
        01  SYUMEI-REC.
@@ -368,10 +376,22 @@
                  MOVE     SYS-4001-KOTEIKBN   TO  WRK-4001-KOTEIKBN
                END-IF
       *
+               MOVE     SYUNOU-REC        TO      WRK-SYUNOU-TAIHI-REC
+      *
+               IF  (LNK-ORCSSKS-IKTGENKEIFLG = "1" )
+               AND (WRK-GRP-DENPNUM      NOT = ZERO)
+                 PERFORM  4407-GRP-DATA-CHECK-SEC
+               END-IF
+               IF   FLG-GENBUTU  =  1
+                 MOVE  ZERO               TO      WRK-GRP-DENPNUM
+               END-IF
+      *
                IF   WRK-GRP-DENPNUM   =   ZERO
                  ADD     1                TO      IDY
-                 MOVE    SYUNOU-REC       TO      LNK-SYUNOU-REC(IDY)
-                 MOVE    SYU-SKYMONEY     TO      WRK-MAE-SEIKYUGK(IDY)
+                 MOVE    WRK-SYUNOU-TAIHI-REC
+                                          TO      LNK-SYUNOU-REC(IDY)
+                 MOVE    WRK-SYUT-SKYMONEY
+                                          TO      WRK-MAE-SEIKYUGK(IDY)
                  MOVE    1                TO      FLG-NOGRP
                ELSE
                  INITIALIZE                       SYUNOU-REC
@@ -425,7 +445,7 @@
                               MOVE  SYU-SYUHKNNUM
                                              TO  WRK-TAIHI-SYUHKNNUM
                               ADD   1            TO  WRK-GRPCNT
-                           END-IF
+                          END-IF
                        END-IF
                        MOVE    "tbl_syunou"  TO  MCP-TABLE
                        MOVE    "key27"       TO  MCP-PATHNAME
@@ -758,6 +778,11 @@
                                  TO  LNK-S01-IKTSORTKBN
            MOVE    LNK-ORCSSKS-IKTKEISANKBN
                                  TO  LNK-S01-IKTKEISANKBN
+           MOVE    LNK-ORCSSKS-IKTGENKEIFLG
+                                 TO  LNK-S01-IKTGENKEIFLG
+           IF   FLG-GENBUTU  =  1
+             MOVE    "1"         TO  LNK-S01-IKTGENMKJFLG
+           END-IF
       *
            CALL    "ORCSGAIFTN"        USING
                                        MCPAREA
@@ -3115,6 +3140,56 @@
            .
       *
        4406-GOKEI-OKIKAE-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    複数科まとめ入力分のチェック
+      ******************************************************************
+       4407-GRP-DATA-CHECK-SEC           SECTION.
+      *
+           INITIALIZE                         SYUNOU-REC
+           MOVE    LNK-ORCSSKS-HOSPNUM    TO  SYU-HOSPNUM
+           MOVE    LNK-ORCSSKS-NYUGAIKBN  TO  SYU-NYUGAIKBN
+           MOVE    LNK-ORCSSKS-PTID       TO  SYU-PTID
+           MOVE    WRK-GRP-DENPNUM        TO  SYU-GRP-DENPNUM
+           MOVE    SYUNOU-REC             TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_syunou"           TO  MCP-TABLE
+           MOVE    "key27"                TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING  MCPAREA
+                                              MCPDATA-REC
+                                              SPA-AREA
+           IF      MCP-RC  =  ZERO
+              MOVE    "tbl_syunou"        TO  MCP-TABLE
+              MOVE    "key27"             TO  MCP-PATHNAME
+              PERFORM  900-SYUNOU-READ-SEC
+              PERFORM  UNTIL   FLG-SYUNOU   =    1
+                IF   SYU-DENPJTIKBN  NOT =  "3"
+                  IF   SYU-SAIKEISANKBN    =  "1"
+                     MOVE    1     TO  FLG-GENBUTU2
+                  END-IF
+                  IF  (SYU-SYUHKNNUM   NOT = SPACE)
+                  AND (SYU-KOH1HKNNUM  NOT = SPACE)
+                     MOVE    1     TO  FLG-GENBUTU3
+                  END-IF
+                END-IF
+                MOVE    "tbl_syunou"      TO  MCP-TABLE
+                MOVE    "key27"           TO  MCP-PATHNAME
+                PERFORM  900-SYUNOU-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE       "tbl_syunou"        TO  MCP-TABLE
+           MOVE       "key27"             TO  MCP-PATHNAME
+           PERFORM     DB-CLOSE-SEC
+      *
+           IF   FLG-GENBUTU2  =   1
+           AND  FLG-GENBUTU3  =   1
+              MOVE    1     TO   FLG-GENBUTU
+           END-IF
+      *
+           .
+      *
+       4407-GRP-DATA-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
