@@ -4372,7 +4372,7 @@
                    WHEN    "114019110"
                        MOVE    "114019210"         TO  WRK-SRYCD
                    WHEN    "114019310"
-                       MOVE    "114019040"         TO  WRK-SRYCD
+                       MOVE    "114019140"         TO  WRK-SRYCD
       *H24.4
                END-EVALUATE
            END-IF

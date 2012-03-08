@@ -28,6 +28,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       * 04.05.00     NACL-Â¿¡¹Ç¼  10/03/XX  £È£²£²Ç¯£´·î²þÀµÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  12/03/XX  £È£²£´Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -80,8 +81,16 @@
                                                SPA-KT01
       *
                WHEN   (SPA-SRYYMD          >=  "20100401" )  AND
-                      (SPA-SRYYMD          <   "99999999" )
+                      (SPA-SRYYMD          <   "20120401" )
                    CALL    "ORCSCKT10S201004"  USING
+                                               ORCSCKT10SAREA
+                                               SPA-AREA
+                                               SPA-SCR-REC
+                                               SPA-KT01
+      *
+               WHEN   (SPA-SRYYMD          >=  "20120401" )  AND
+                      (SPA-SRYYMD          <   "99999999" )
+                   CALL    "ORCSCKT10S201204"  USING
                                                ORCSCKT10SAREA
                                                SPA-AREA
                                                SPA-SCR-REC
