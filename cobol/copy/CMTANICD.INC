@@ -297,14 +297,17 @@
       *
            03  FILLER          PIC X(03)  VALUE   "140".
            03  FILLER          PIC X(24)  VALUE   "¿À·Ð".
+      *H24.4
+           03  FILLER          PIC X(03)  VALUE   "158".
+           03  FILLER          PIC X(24)  VALUE   "ÄÇÂÎ".
       *
       *
        01  MTANI-DATA-REC-R         REDEFINES   MTANI-DATA-REC.
       *****03  MTANI-TBL-OCC        OCCURS    59   INDEXED   MTANI-IDX.
       **** 03  MTANI-TBL-OCC        OCCURS    83   INDEXED   MTANI-IDX.
-           03  MTANI-TBL-OCC        OCCURS    90   INDEXED   MTANI-IDX.
+           03  MTANI-TBL-OCC        OCCURS    91   INDEXED   MTANI-IDX.
                05  MTANI-TANICD        PIC X(03).
                05  MTANI-TANINAME      PIC X(24).
       *
-       01  MTANI-MAX                   PIC 9(04)   VALUE   90.
+       01  MTANI-MAX                   PIC 9(04)   VALUE   91.
       *

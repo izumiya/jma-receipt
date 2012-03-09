@@ -29,7 +29,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.00    NACL-多々納  07/05/31  グループ診療対応
       *  04.01.00    NACL-多々納  08/01/21  公費編集パラメタ対応
-      * 04.02.00     NACL-多々納  08/03/XX  Ｈ２０年４月改正対応
+      *  04.02.00    NACL-多々納  08/03/XX  Ｈ２０年４月改正対応
+      *  04.05.00    NACL-多々納  12/03/XX  Ｈ２４年４月改正対応
       *****************************************************************
       *
       *
@@ -950,6 +951,17 @@
            ELSE
                MOVE    "1"                 TO  TBL-QRCSV-DATA (5)
            END-IF
+      *
+      *H24.4 から
+      *    一般名記載
+           IF     (SPA-SRYYMD          >=  "20120401" )  AND
+                  (ORCSQRCSV-SRYCD(IDX IDX2)(1:1)  =   "6" )
+             AND  (ORCSQRCSV-KISAIKBN (IDX IDX2)   =   1   )
+               MOVE    "7"                 TO  TBL-QRCSV-DATA (5)
+               MOVE    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
+                                           TO  TBL-QRCSV-DATA (6)
+           END-IF
+      *
            MOVE    ORCSQRCSV-TNS-NAME (IDX IDX2)
                                        TO  TBL-QRCSV-DATA (7)
            MOVE    ORCSQRCSV-SURYOU(IDX IDX2)  TO  WRK-SURYO
@@ -1025,6 +1037,24 @@
            MOVE    WRK-H-RP1           TO  TBL-QRCSV-DATA (2)
            MOVE    WRK-H-RP2           TO  TBL-QRCSV-DATA (3)
            MOVE    WRK-H-RP2-1         TO  TBL-QRCSV-DATA (4)
+      *H24.4
+           IF      SPA-SRYYMD          >=  "20120401"
+               EVALUATE    ORCSQRCSV-SRYCD(IDX IDX3)
+               WHEN    "099209901"
+      *            粉砕
+                   MOVE    "2"         TO  TBL-QRCSV-DATA (5)
+               WHEN    "099209903"
+      *            後発医薬品へ変更不可
+                   MOVE    "3"         TO  TBL-QRCSV-DATA (5)
+               WHEN    "099209906"
+      *            剤型変更不可
+                   MOVE    "4"         TO  TBL-QRCSV-DATA (5)
+               WHEN    "099209905"
+      *            含量規格変更不可
+                   MOVE    "5"         TO  TBL-QRCSV-DATA (5)
+               END-EVALUATE
+           END-IF
+      *
            MOVE    ORCSQRCSV-TNS-NAME (IDX IDX3)
                                        TO  TBL-QRCSV-DATA (6)
            MOVE    6                   TO  TBL-MAX

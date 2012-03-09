@@ -70,7 +70,7 @@ Z05	{
 				value	varchar(20);
 			};
 			count	int;
-			item	varchar(20)[90];
+			item	varchar(20)[99];
 		};
 		MEIUSESKBCOB	{
 			MEIUSESKB	{
@@ -98,7 +98,7 @@ Z05	{
 				value	varchar(30);
 			};
 			count	int;
-			item	varchar(30)[4];
+			item	varchar(30)[9];
 		};
 		TOKUKIZAISBT2COB	{
 			TOKUKIZAISBT2	{

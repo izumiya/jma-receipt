@@ -54,7 +54,7 @@ Z03	{
 						value	varchar(28);
 					};
 					count	int;
-					item	varchar(28)[90];
+					item	varchar(28)[99];
 				};
 				SRYKBNCOB	{
 					SRYKBN	{
@@ -138,7 +138,7 @@ Z03	{
 						value	varchar(30);
 					};
 					count	int;
-					item	varchar(30)[7];
+					item	varchar(30)[9];
 				};
 				SANTEIRRKKBNCOB	{
 					SANTEIRRKKBN	{
@@ -359,7 +359,7 @@ Z03	{
 					value	number(1);
 				};
 				KIJUNTEIGENCD	{
-					value	number(3);
+					value	number(4);
 				};
 				MICMESUKSN	{
 					value	number(1);
@@ -373,34 +373,34 @@ Z03	{
 			};
 			fixed12	{
 				SSTKIJUNCD1	{
-					value	number(3);
+					value	number(4);
 				};
 				SSTKIJUNCD5	{
-					value	number(3);
+					value	number(4);
 				};
 				SSTKIJUNCD4	{
-					value	number(3);
+					value	number(4);
 				};
 				SSTKIJUNCD3	{
-					value	number(3);
+					value	number(4);
 				};
 				SSTKIJUNCD2	{
-					value	number(3);
+					value	number(4);
 				};
 				SSTKIJUNCD10	{
-					value	number(3);
+					value	number(4);
 				};
 				SSTKIJUNCD9	{
-					value	number(3);
+					value	number(4);
 				};
 				SSTKIJUNCD8	{
-					value	number(3);
+					value	number(4);
 				};
 				SSTKIJUNCD7	{
-					value	number(3);
+					value	number(4);
 				};
 				SSTKIJUNCD6	{
-					value	number(3);
+					value	number(4);
 				};
 				NYUTENTTLSKB	{
 					value	number(3);

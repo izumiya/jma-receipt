@@ -45,6 +45,7 @@
       *                                     一般名等追加
       *  03.05.00    NACL-多々納  07/05/07  グループ診療対応
       *  04.05.00    NACL-太田    10/01/15  月上限回数、月総投与量設定追加
+      *  04.05.00    NACL-多々納  12/03/XX  平成２４年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -84,7 +85,7 @@
                    07  SPA-GMN-OLDTENSKBL      PIC X(01).
                    07  SPA-GMN-F1L             PIC X(01).
                    07  SPA-GMN-OLDTENSKBMEIL   PIC X(18).
-               05  SPA-GMN-TANICDLST           OCCURS  90.
+               05  SPA-GMN-TANICDLST           OCCURS  99.
                    07  SPA-GMN-TANICDL         PIC X(03).
                    07  SPA-GMN-F1L             PIC X(01).
                    07  SPA-GMN-TANICDMEIL      PIC X(24).

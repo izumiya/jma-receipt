@@ -54,6 +54,7 @@
       *  04.04.00    NACL=多々納  09/01/30  本院分院対応
       *  04.05.00    NACL=多々納  09/10/30  多剤投与・換算値入力他対応
       *  04.05.00    NACL=多々納  10/03/XX  平成２２年４月改正対応
+      *  04.06.00    NACL=多々納  12/03/XX  平成２４年４月改正対応
       *****************************************************************
       *
       *
@@ -1186,6 +1187,25 @@
                        MOVE    1               TO  SPA-MEISAKBN
                    ELSE
                        MOVE    0               TO  SPA-MEISAKBN
+                   END-IF
+               END-IF
+      *H24.4改正
+               IF      SYS-1006-KBNCD      =   "7"
+      *            時間外対応加算
+                   IF      SPA-SRYYMD      >=  "20120401"
+                       IF      SPA-CHIIKKBN    =   1
+                           MOVE    2               TO  SPA-CHIIKKBN
+                       END-IF
+                       EVALUATE    TRUE
+      *                    時間外対応加算１(3001)
+                           WHEN    SYS-1006-SSTKIJUN (001) =   1
+                               MOVE    1               TO  SPA-CHIIKKBN
+      *                    時間外対応加算３(3002)
+                           WHEN    SYS-1006-SSTKIJUN (002) =   1
+                               IF      SPA-CHIIKKBN    =   ZERO
+                                   MOVE    3           TO  SPA-CHIIKKBN
+                               END-IF
+                       END-EVALUATE
                    END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -6608,6 +6628,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *        同日初診は対象
                IF      WKSRY-SRYCD(IDXF)       =   "111011810"
+                   MOVE    ZERO            TO  FLG-CHK
+               END-IF
+      *H24.4
+      *        再診料２科目は対象
+               IF      WKSRY-SRYCD(IDXF)       =   "112015810"
+                                               OR  "112015950"
+                                               OR  "112016210"
                    MOVE    ZERO            TO  FLG-CHK
                END-IF
            END-PERFORM

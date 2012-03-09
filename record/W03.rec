@@ -294,37 +294,37 @@ W03	{
 			value	varchar(100);
 		};
 		KIJUN01	{
-			value	number(3);
+			value	number(4);
 		};
 		KIJUN02	{
-			value	number(3);
+			value	number(4);
 		};
 		KIJUN03	{
-			value	number(3);
+			value	number(4);
 		};
 		KIJUN04	{
-			value	number(3);
+			value	number(4);
 		};
 		KIJUN05	{
-			value	number(3);
+			value	number(4);
 		};
 		KIJUN06	{
-			value	number(3);
+			value	number(4);
 		};
 		KIJUN07	{
-			value	number(3);
+			value	number(4);
 		};
 		KIJUN08	{
-			value	number(3);
+			value	number(4);
 		};
 		KIJUN09	{
-			value	number(3);
+			value	number(4);
 		};
 		KIJUN10	{
-			value	number(3);
+			value	number(4);
 		};
 		TEIGENCD	{
-			value	number(3);
+			value	number(4);
 		};
 		YUKOKIKAN	{
 			value	varchar(30);

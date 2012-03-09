@@ -128,7 +128,7 @@ Z04	{
 				value	varchar(28);
 			};
 			count	int;
-			item	varchar(28)[90];
+			item	varchar(28)[99];
 		};
 		BUNRUIKBN_COMBO	{
 			BUNRUIKBN{
@@ -149,7 +149,7 @@ Z04	{
 				value	varchar(28);
 			};
 			count	int;
-			item	varchar(28)[90];
+			item	varchar(28)[99];
 		};
 		KANZANCHI	{
 			value	number(10,5);
@@ -318,7 +318,7 @@ Z04	{
 				value	varchar(28);
 			};
 			count	int;
-			item	varchar(28)[90];
+			item	varchar(28)[99];
 		};
 		IPNKANZANCHI	{
 			value	number(10,5);

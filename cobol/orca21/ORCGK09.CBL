@@ -38,6 +38,7 @@
       * 04.04.00     NACL=多々納  09/01/30  本院分院対応
       * 04.05.00     NACL-多々納  09/06/XX  数量小数５桁対応
       * 04.05.00     NACL-多々納  09/10/XX  換算値入力対応
+      * 04.07.00     NACL-多々納  12/03/07  処方せん料表示対応（H24.4対応）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -143,6 +144,8 @@
            03  FLG-HEN             PIC 9(01).
            03  FLG-HENSYU          PIC 9(01).
            03  FLG-KETA5           PIC 9(01).
+      *H24.4
+           03  FLG-OK3             PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -2103,14 +2106,20 @@
                    UNTIL      (IDX         >   5   )   OR
                               (SRY-SRYCD (IDX)     =   SPACE )
       *        登録時の自動算定分は対象外（点滴以外）
-      ******** IF     (SRY-AUTOKBN (IDX)   =   "4"  OR
-      *                                        "5"  OR
-      *******                                  "6" ) OR
+      *H24.4
+               MOVE    ZERO                TO  FLG-OK3
                IF    ((SRY-AUTOKBN (IDX)   =   "3" ) AND
                       (SRY-SRYSYUKBN   NOT =   "330" AND
                                                "340" ))
-                   CONTINUE
+      *            H24.4から処方せん料を対象とする
+                   IF     (SRY-SRYYM           >=  "201204"  ) AND
+                          (SRY-SRYSYUKBN       =   "820"     )
+                       MOVE    1               TO  FLG-OK3
+                   END-IF
                ELSE
+                   MOVE    1               TO  FLG-OK3
+               END-IF
+               IF      FLG-OK3             =   1
                    ADD     1                   TO  IDY
                    MOVE    SRY-SRYCD (IDX)     TO  WKSRY-SRYCD    (IDY)
                    MOVE    SRY-SRYSURYO (IDX)  TO  WKSRY-SRYSURYO (IDY)
@@ -2144,7 +2153,9 @@
                           (SRY-AUTOKBN (IDX)   =   "4"
                                                OR  "5"
                                                OR  "6"
-                                               OR  "7"  )
+                                               OR  "7"
+      *H24.4
+                                               OR  "3" )
                        MOVE    SPACE           TO  WKSRY-AUTOKBN (IDY)
                    END-IF
                    MOVE    SRY-INPUTNUM (IDX)  TO  WKSRY-INPUTNUM (IDY)
@@ -2403,6 +2414,8 @@
                                                OR  "5"
                                                OR  "6"
                                                OR  "7"
+      *H24.4
+                                               OR  "3"
                MOVE    SPACE           TO  WRK-SRYSYUMEI-H
                MOVE    "◎"            TO  WRK-SRYSYUMEI-H
                MOVE    SPA-GMN-TMEISYO (IDG)
@@ -3042,7 +3055,9 @@
                       (SRY-AUTOKBN (1)     =   "4"
                                            OR  "5"
                                            OR  "6"
-                                           OR  "7" )
+                                           OR  "7"
+      *H24.4
+                                           OR  "3" )
                    CONTINUE
                ELSE
       *        すべてを対象とする

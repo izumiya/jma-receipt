@@ -55,7 +55,7 @@
                     06  Z03-TANICD.
                       07  Z03-VALUE   PIC X(28).
                     06  Z03-TANICD-COUNT   PIC S9(9)   BINARY.
-                    06  Z03-TANICD-ITEM    PIC X(28)   OCCURS  90 TIMES.
+                    06  Z03-TANICD-ITEM    PIC X(28)   OCCURS  99 TIMES.
                   05  Z03-SRYKBNCOB.
                     06  Z03-SRYKBN.
                       07  Z03-VALUE   PIC X(20).
@@ -115,7 +115,7 @@
                     06  Z03-TIMEKSNKBN.
                       07  Z03-VALUE   PIC X(30).
                     06  Z03-TIMEKSNKBN-COUNT   PIC S9(9)   BINARY.
-                    06  Z03-TIMEKSNKBN-ITEM    PIC X(30)   OCCURS  7.
+                    06  Z03-TIMEKSNKBN-ITEM    PIC X(30)   OCCURS  9.
                   05  Z03-SANTEIRRKKBNCOB.
                     06  Z03-SANTEIRRKKBN.
                       07  Z03-VALUE   PIC X(30).
@@ -267,7 +267,7 @@
                   05  Z03-KIJUNTEIGENKBN.
                     06  Z03-VALUE   PIC S9(1).
                   05  Z03-KIJUNTEIGENCD.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-MICMESUKSN.
                     06  Z03-VALUE   PIC S9(1).
                   05  Z03-GAZOOPESUP.
@@ -276,25 +276,25 @@
                     06  Z03-VALUE   PIC S9(1).
                 04  Z03-FIXED12.
                   05  Z03-SSTKIJUNCD1.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-SSTKIJUNCD5.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-SSTKIJUNCD4.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-SSTKIJUNCD3.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-SSTKIJUNCD2.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-SSTKIJUNCD10.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-SSTKIJUNCD9.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-SSTKIJUNCD8.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-SSTKIJUNCD7.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-SSTKIJUNCD6.
-                    06  Z03-VALUE   PIC S9(3).
+                    06  Z03-VALUE   PIC S9(4).
                   05  Z03-NYUTENTTLSKB.
                     06  Z03-VALUE   PIC S9(3).
                   05  Z03-GAITENTTLKBN.

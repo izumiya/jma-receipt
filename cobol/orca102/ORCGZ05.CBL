@@ -37,6 +37,7 @@
       *                                     MONFUNC対応 他
       *  03.05.00    NACL-多々納  07/05/07  グループ診療対応
       *  04.05.00    NACL-多々納  10/04/XX  帳票名称追加対応
+      *  04.05.00    NACL-多々納  12/03/XX  平成２４年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -101,7 +102,7 @@
                    07  SPA-GMN-TANINAME            PIC X(26).
                05  SPA-GMN-TANICDCOB-G.
                    07  SPA-GMN-TANICDCOB           PIC X(30)
-                                                   OCCURS   90.
+                                                   OCCURS   99.
                05  SPA-TANICD-MAX             PIC 9(04).
       *
                05  SPA-GMN-TOKUKIZAIAGEKSNKBN-G.
@@ -140,7 +141,7 @@
                    07  SPA-GMN-TOKUKIZAISBT1MEI    PIC X(26).
                05  SPA-GMN-TOKUKIZAISBT1COB-G.
                    07  SPA-GMN-TOKUKIZAISBT1COB    PIC X(30)
-                                                   OCCURS   3.
+                                                   OCCURS   9.
                05  SPA-TOKUKIZAISBT1-MAX             PIC 9(04).
       *
                05  SPA-GMN-TOKUKIZAISBT2-G.
@@ -706,7 +707,9 @@
                                        TO  SPA-GMN-TOKUKIZAISBT1COB(2)
            MOVE    "3 高線量率イリジウム"
                                        TO  SPA-GMN-TOKUKIZAISBT1COB(3)
-           MOVE    3                   TO  SPA-TOKUKIZAISBT1-MAX
+           MOVE    "4 コバルト"
+                                       TO  SPA-GMN-TOKUKIZAISBT1COB(4)
+           MOVE    4                   TO  SPA-TOKUKIZAISBT1-MAX
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-TOKUKIZAISBT1-MAX
                IF      SPA-GMN-TOKUKIZAISBT1

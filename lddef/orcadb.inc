@@ -155,4 +155,5 @@ db	{
 	tbl_srysrh;
 	tbl_rrksrh;
 	tbl_infection_judgment;
+        tbl_generic_price;
 };

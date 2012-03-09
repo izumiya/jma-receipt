@@ -52,6 +52,8 @@
       *  04.04.00    NACL-Â¿¡¹Ç¼  09/01/05  Á°²ó¸¡ººÆü¶èÊ¬ÄÉ²Ã
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/03/XX  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/04/XX  Ä¢É¼Ì¾¾ÎÄÉ²ÃÂÐ±þ
+      *  04.05.00    NACL-Â¿¡¹Ç¼  12/03/XX  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *                                     »ÜÀß´ð½à£´·åÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -1431,7 +1433,9 @@
                                          TO  SPA-GMN-TIMEKSNKBNCOB (6)
                MOVE    "6 Ìë´Ö¡¦ÁáÄ«²Ã»»"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (7)
-               MOVE    7                 TO  SPA-TIMEKSNKBN-MAX
+               MOVE    "7 Ìë´Ö²Ã»»"
+                                         TO  SPA-GMN-TIMEKSNKBNCOB (8)
+               MOVE    8                 TO  SPA-TIMEKSNKBN-MAX
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-TIMEKSNKBN-MAX
@@ -2932,6 +2936,8 @@
            END-IF
       *
            IF      SPA-GMN-KGNAGE      =   "AA"
+                                       OR  "B3"
+                                       OR  "BF"
                CONTINUE
            ELSE
       *
@@ -2963,6 +2969,8 @@
            END-IF
       *
            IF      SPA-GMN-JGNAGE      =   "AA"
+                                       OR  "B3"
+                                       OR  "BF"
                CONTINUE
            ELSE
                MOVE    SPA-GMN-JGNAGE      TO  WRK-SNUM-INX
@@ -3018,6 +3026,8 @@
            END-IF
       *
            IF      WRK-AGEKSNKGN       =   "AA"
+                                       OR  "B3"
+                                       OR  "BF"
                CONTINUE
            ELSE
                INITIALIZE                      ORCSNUMAREA

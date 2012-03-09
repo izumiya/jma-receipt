@@ -101,6 +101,8 @@
                     06  MDCREQ-PRSCRPT-NAME          PIC X(50).
       *             数量
                     06  MDCREQ-PRSCRPT-NUMBER        PIC X(10).
+      *             処方せん一般名記載
+                    06  MDCREQ-GENERIC-FLG           PIC X(03).
       *         病名
                 04  MDCREQ-DIAGNOSIS-INFO           OCCURS  50 TIMES.
                   05  MDCREQ-DIAGNOSIS-NUMBER        PIC X(50).

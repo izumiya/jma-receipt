@@ -22,8 +22,8 @@
               03  W03-MEISYO.
                 04  W03-VALUE   PIC X(100).
               03  W03-KIJUNCD-G     OCCURS  10.
-                  04  W03-KIJUNCD   PIC S9(3).
+                  04  W03-KIJUNCD   PIC S9(4).
               03  W03-TEIGENCD.
-                04  W03-VALUE   PIC S9(3).
+                04  W03-VALUE   PIC S9(4).
               03  W03-YUKOKIKAN.
                   04  W03-VALUE   PIC X(30).

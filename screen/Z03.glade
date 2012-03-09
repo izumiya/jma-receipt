@@ -4095,7 +4095,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>999</format>
+	  <format>9999</format>
 	</widget>
 
 	<widget>
@@ -4521,7 +4521,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>
@@ -4561,7 +4561,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>
@@ -4585,7 +4585,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>
@@ -4609,7 +4609,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>
@@ -4633,7 +4633,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>
@@ -4769,7 +4769,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>
@@ -4793,7 +4793,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>
@@ -4817,7 +4817,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>
@@ -4841,7 +4841,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>
@@ -4865,7 +4865,7 @@
 	    <last_modification_time>Sat, 03 Feb 2001 04:58:26 GMT</last_modification_time>
 	  </signal>
 	  <editable>True</editable>
-	  <format>ZZ9</format>
+	  <format>ZZZ9</format>
 	</widget>
 
 	<widget>

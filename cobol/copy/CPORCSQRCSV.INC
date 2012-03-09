@@ -22,6 +22,8 @@
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.06.00    NACL-多々納  12/03/01  一般コード追加（H24.4）
+      *                                    （用法コメントはver.4.6用）
       ************************************************************
       *
        01  ORCSQRCSVAREA.
@@ -88,6 +90,10 @@
                        09  ORCSQRCSV-TANINAME         PIC X(12).
                        09  ORCSQRCSV-KISAIKBN         PIC X(01).
                        09  ORCSQRCSV-KANZANCHI        PIC 9(05)V9(5).
+      *                用法コメント区分（ver.4.5は未使用）
+                       09  ORCSQRCSV-YCOMMNTKBN       PIC X(01).
+      *                一般名コード
+                       09  ORCSQRCSV-YAKKAKJNCD       PIC X(13).
       *    ファイル名組み立て項目
            03  ORCSQRCSV-SYSTIME       PIC 9(08).
       *    エラーコード

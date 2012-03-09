@@ -109,7 +109,7 @@
                        09  SPA-GMN-TANINAME        PIC X(24).
                    07  SPA-GMN-TANICDCOB-G.
                        09  SPA-GMN-TANICDCOB       PIC X(28)
-                                                   OCCURS  90.
+                                                   OCCURS  99.
                    07  SPA-TANICD-MAX              PIC 9(04).
       *
                    07  SPA-GMN-HKNTEKKBN-G.
@@ -210,7 +210,7 @@
                        09  SPA-GMN-TIMEKSNKBNMEI   PIC X(30).
                    07  SPA-GMN-TIMEKSNKBNCOB-G.
                        09  SPA-GMN-TIMEKSNKBNCOB   PIC X(32)
-                                                   OCCURS  7.
+                                                   OCCURS  9.
                    07  SPA-TIMEKSNKBN-MAX          PIC 9(04).
       *
                    07  SPA-GMN-GAIKANRIKBN-G.
@@ -302,7 +302,7 @@
       *            施設基準不適合区分
                    07  SPA-GMN-KIJUNTEIGENKBN  PIC  9(01).
       *            基準不適合逓減対象施設基準コード
-                   07  SPA-GMN-KIJUNTEIGENCD   PIC  9(03).
+                   07  SPA-GMN-KIJUNTEIGENCD   PIC  9(04).
                    07  SPA-GMN-KNSJISKBN       PIC 9(1).
                    07  SPA-GMN-KNSJISGRPKBN    PIC 9(2).
                    07  SPA-GMN-KENTAICOMMENT   PIC 9(1).
@@ -316,7 +316,7 @@
                    07  SPA-GMN-CHIIKIKSN       PIC 9(1).
                05  SPA-GMN-BANGO.
                    07  SPA-GMN-SSTKIJUNCDTBL   OCCURS 10.
-                       09  SPA-GMN-SSTKIJUNCD  PIC 9(3).
+                       09  SPA-GMN-SSTKIJUNCD  PIC 9(4).
                    07  SPA-GMN-GAITENTTLKBN    PIC 9(3).
                    07  SPA-GMN-NYUTENTTLSKB    PIC 9(3).
                    07  SPA-GMN-KOUHYOJYUNNUM   PIC 9(9).

@@ -65,7 +65,7 @@
                 04  Z05-TANICD.
                   05  Z05-VALUE   PIC X(20).
                 04  Z05-TANICD-COUNT   PIC S9(9)   BINARY.
-                04  Z05-TANICD-ITEM    PIC X(20)   OCCURS  90 TIMES.
+                04  Z05-TANICD-ITEM    PIC X(20)   OCCURS  99 TIMES.
               03  Z05-MEIUSESKBCOB.
                 04  Z05-MEIUSESKB.
                   05  Z05-VALUE   PIC X(20).
@@ -85,7 +85,7 @@
                 04  Z05-TOKUKIZAISBT1.
                   05  Z05-VALUE   PIC X(30).
                 04  Z05-TOKUKIZAISBT1-COUNT   PIC S9(9)   BINARY.
-                04  Z05-TOKUKIZAISBT1-ITEM    PIC X(30)   OCCURS  4.
+                04  Z05-TOKUKIZAISBT1-ITEM    PIC X(30)   OCCURS  9.
               03  Z05-TOKUKIZAISBT2COB.
                 04  Z05-TOKUKIZAISBT2.
                   05  Z05-VALUE   PIC X(30).
