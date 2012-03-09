@@ -4022,6 +4022,18 @@
                                TNS-NAME         DELIMITED   BY  SIZE
                                INTO             WRK-MEISYO
                    END-STRING
+      *??
+               WHEN    0
+      *            後発品のない先発品で一般名記載区分あり
+                   IF      WRK-MSG1        NOT =   SPACE
+                       MOVE    SPACE               TO  WRK-MEISYO
+                       STRING  "【"             DELIMITED   BY  SIZE
+                               WRK-MSG1         DELIMITED   BY  SPACE
+                               "】"             DELIMITED   BY  SIZE
+                               TNS-NAME         DELIMITED   BY  SIZE
+                               INTO             WRK-MEISYO
+                       END-STRING
+                   END-IF
            END-EVALUATE
       *!!!!
       *ver.4.5（削除かも〜）

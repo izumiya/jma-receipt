@@ -3018,6 +3018,13 @@
                        MOVE    1               TO  TNSP-IPN-KISAIKBN
                    END-IF
                END-IF
+      *
+      *        院内は一般名記載なしとする
+               IF     (FLG-SYOHO-IN        =   2  )  AND
+                      (TNSP-IPN-KISAIKBN   =   1  )
+                   MOVE    ZERO                TO  TNSP-IPN-KISAIKBN
+               END-IF
+      *
       *        一般名・処方名称記載
                IF      TNSP-IPN-KISAIKBN   =   ZERO 
                    MOVE    1                   TO  WRK-KANZANCHI
