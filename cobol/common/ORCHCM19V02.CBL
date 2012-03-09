@@ -2909,7 +2909,7 @@
                        MOVE    WRK-SRY-SRYCD (IDXF)    TO  WRK-SRYCD
                        PERFORM 31039-KOUHATU-NAME-SEC
                    WHEN    "099209907"
-      *                办忍叹淡很稍材
+      *                堂柿叹淡很
                        MOVE    1                   TO  WRK-IPNMEI
                    WHEN    "099209908"
       *                办忍叹淡很
@@ -2987,7 +2987,7 @@
                        MOVE    ZERO            TO  TNSP-IPN-KISAIKBN
                    END-IF
                ELSE
-      *           办忍叹淡很あり
+      *           办忍叹淡很
                    IF      WRK-IPNMEI          =   2
                        MOVE    1               TO  TNSP-IPN-KISAIKBN
                    END-IF

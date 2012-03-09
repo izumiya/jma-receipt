@@ -2935,7 +2935,7 @@
                        MOVE    WRK-SRY-SRYCD (IDXF)    TO  WRK-SRYCD
                        PERFORM 31039-KOUHATU-NAME-SEC
                    WHEN    "099209907"
-      *                一般名記載不可
+      *                銘柄名記載
                        MOVE    1                   TO  WRK-IPNMEI
                    WHEN    "099209908"
       *                一般名記載

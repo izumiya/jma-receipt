@@ -1911,11 +1911,6 @@
                        WHEN    "099209905"
       *                ∫ﬁ∑ø —ππ…‘≤ƒ° ÃÙ∫ﬁÀË°À
                        WHEN    "099209906"
-      *H24.4 ≤˛¿µ
-      *                ∞Ï»ÃÃæµ≠∫‹° ÃÙ∫ﬁÀË°À
-                       WHEN    "099209907"
-      *                ∞Ï»ÃÃæµ≠∫‹…‘≤ƒ° ÃÙ∫ﬁÀË°À
-                       WHEN    "099209908"
                            IF     (SPA-COM-SRYKBN(IDX - 1) =   "21"
                                                            OR  "22"
                                                            OR  "23"
@@ -1925,6 +1920,21 @@
                                                                   (IDX)
                            ELSE
                                MOVE    "0268"        TO  SPA-ERRCD
+                           END-IF
+      *H24.4 ≤˛¿µ
+      *                Ã√ ¡Ãæµ≠∫‹° ÃÙ∫ﬁÀË°À
+                       WHEN    "099209907"
+      *                ∞Ï»ÃÃæµ≠∫‹° ÃÙ∫ﬁÀË°À
+                       WHEN    "099209908"
+                           IF     (SPA-COM-SRYKBN(IDX - 1) =   "21"
+                                                           OR  "22"
+                                                           OR  "23"
+                                                           OR  "14" )
+                               MOVE    SPA-COM-SRYKBN(IDX - 1)
+                                                     TO  SPA-COM-SRYKBN
+                                                                  (IDX)
+                           ELSE
+                               MOVE    "2071"        TO  SPA-ERRCD
                            END-IF
       *                 Ò≥ÁΩ–ÕËπ‚ªªƒÍ° ∫ﬁ°À
                        WHEN    "099999903"

@@ -556,7 +556,10 @@
                                 OR    (FLG-CHK3        =   1     )
                        IF      (WRK-COM-INPUTCD(IDZ6)
                                                    =   "099209905"
-                                                   OR  "099209906" )
+                                                   OR  "099209906"
+      *H24.4
+                                                   =   "099209907"
+                                                   OR  "099209908" )
                            CONTINUE
                        ELSE
                            IF      (WRK-COM-INPUTCD(IDZ6)(1:1)
@@ -573,9 +576,9 @@
                                                              (IDX-Z)
                    END-IF
       *H24.4
-      *        一般名記載不可
+      *        銘柄名記載
                WHEN    "099209907"
-      *        一般名記載可
+      *        一般名記載
                WHEN    "099209908"
       *            前行に薬剤があること
                    IF      (IDX-Z          >   1   ) AND
@@ -1048,7 +1051,7 @@
                        IF      (WRK-COM-INPUTCD (IDX-Z + 1)
                                                    =   "099209907"
                                                    OR  "099209903"  )
-      *                    一般名記載なし、後発品変更不可
+      *                    銘柄名記載、後発品変更不可
                            MOVE    ZERO                TO  FLG-CHK-P
                        END-IF
                    END-IF
