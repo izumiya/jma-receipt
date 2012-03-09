@@ -347,10 +347,6 @@
        01  SRYACCT-REC.
            COPY    "CPSRYACCT.INC".
       *
-      *    一般名テーブル
-       01  GENERICNAME-REC.
-           COPY    "CPGENERICNAME.INC".
-      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -1336,8 +1332,8 @@
       *    抗悪性腫瘍剤処方管理加算
            MOVE    ZERO                TO  FLG-AKUSKSN1
            MOVE    ZERO                TO  FLG-AKUSKSN2
+      *H24.4
            MOVE    ZERO                TO  FLG-IPPANKSN
-      *
            MOVE    ZERO                TO  FLG-GENERIC-OK
       *
            INITIALIZE                  WRK-HKNCOMBI-AREA
@@ -1883,7 +1879,7 @@
                                                       (WRK-CNT-HKN)
                END-IF
            END-IF
-      *
+      *H24.4
            IF      WRK-COM-INPUTCD(IDX)(1:1)   =   "6"
       *
                MOVE    WRK-COM-KISOTEN(IDX)    TO  WRK-KEI-KISOTEN
@@ -1971,6 +1967,7 @@
                    END-IF
                END-IF
       *        点数
+      *H24.4
       *******  COMPUTE WRK-SYOKEIS2        =   WRK-COM-KISOTEN(IDX)
                COMPUTE WRK-SYOKEIS2        =   WRK-KEI-KISOTEN
                                            *   WRK-COM-SURYO  (IDX)
@@ -2022,7 +2019,7 @@
                MOVE    ZERO            TO  WRK-ZAITEN
                MOVE    ZERO            TO  WRK-ZAITEN-G
            END-IF
-      *
+      *H24.4
       **** 後発医薬品チェック
       *    IF     (WRK-COM-INPUTCD(IDX)(1:1) =   "6"  )  AND
       *           (WRK-CHK-SRYSYUKBN   =   "212"  OR

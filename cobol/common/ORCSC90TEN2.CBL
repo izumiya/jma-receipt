@@ -32,6 +32,7 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/06/XX  ¿ôÎÌ¾®¿ô£µ·åÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/01/XX  ÌôÉ¾ÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/03/XX  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  12/03/XX  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -87,6 +88,8 @@
       *    ´ïºà
            03  WRK-KIZKEI          PIC 9(08)V9(5).
            03  WRK-KIZKEI-3        PIC 9(08)V9(5).
+      *    ¥³¥Ð¥ë¥È
+           03  WRK-KIZKEI-4        PIC 9(08)V9(5).
       *    ¥Õ¥£¥ë¥à
            03  WRK-FIRKEI          PIC 9(08)V9(5).
            03  WRK-NYU-FIRKEI      PIC 9(08)V9(5).
@@ -381,6 +384,12 @@
                    COMPUTE WRK-SYOKEIS2        =   LNK-COM-KISOTEN (IDX)
                                                *   LNK-COM-SURYO   (IDX)
                    ADD     WRK-SYOKEIS2        TO  WRK-KIZKEI-3
+               WHEN    4
+      *            ¥³¥Ð¥ë¥È
+      *            (¹ØÆþ²Á³Ê¡ö¿ôÎÌ)
+                   COMPUTE WRK-SYOKEIS2        =   LNK-COM-KISOTEN (IDX)
+                                               *   LNK-COM-SURYO   (IDX)
+                   ADD     WRK-SYOKEIS2        TO  WRK-KIZKEI-4
            END-EVALUATE
       *
            .
@@ -440,6 +449,15 @@
       *        ¶â³Û·×¡à£µ£°¡¡»Í¼Î¸ÞÆþ¡¡¡ÊH22.4 ¤«¤é¡Ë
                COMPUTE WRK-SYOKEIS2        =  (WRK-KIZKEI-3
                                            /   50  )
+                                           +   0.5
+               ADD     WRK-SYOKEIS2        TO  WRK-SC90-KIZTEN
+           END-IF
+      *H24.4 ²þÀµ
+      *    ¥³¥Ð¥ë¥È
+           IF      WRK-KIZKEI-4        >   ZERO
+      *        ¶â³Û·×¡à1000¡¡»Í¼Î¸ÞÆþ
+               COMPUTE WRK-SYOKEIS2        =  (WRK-KIZKEI-4
+                                           /   1000 )
                                            +   0.5
                ADD     WRK-SYOKEIS2        TO  WRK-SC90-KIZTEN
            END-IF

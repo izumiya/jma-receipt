@@ -412,7 +412,7 @@
       *    »»ÄêÍúÎò
        01  SANTEI-REC.
            COPY    "CPSANTEI.INC".
-      *
+      *H24.4
       *    ºÇÄãÌô²Á¥Þ¥¹¥¿
        01  GENERICPRICE-REC.
            COPY    "CPGENERICPRICE.INC".
@@ -1650,7 +1650,7 @@
            PERFORM UNTIL   (FLG-SYSKANRI   =   1    )
                    OR      (IDX            >=  3500 )
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
-      *H2.4
+      *H24.4
                EVALUATE    SYS-1006-KBNCD
                    WHEN    "1"
                        MOVE    0               TO  IDX
@@ -1659,7 +1659,7 @@
                    WHEN    "7"
                        MOVE    3000            TO  IDX
                    END-EVALUATE
-      *H2.4
+      *H24.4
                PERFORM VARYING IDY         FROM    1   BY  1
                        UNTIL   IDY         >       500
                    ADD     1               TO  IDX

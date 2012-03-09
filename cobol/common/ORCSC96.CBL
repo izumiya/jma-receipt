@@ -1864,7 +1864,7 @@
       *!!!
       *H24.4改正追加
                WHEN    "2071"
-                   STRING  "一般名記載のコードは投薬の"
+                   STRING  "一般名記載・銘柄名記載のコードは投薬の"
                            "薬剤の下に入力して下さい。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
