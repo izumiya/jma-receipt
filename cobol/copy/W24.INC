@@ -42,6 +42,17 @@
                                                OCCURS  5.
                     07  W24-SYOKUJI-ITM-STATE  PIC S9(9)
                                                BINARY.
+                  06  W24-LBLEIYOUKSN          PIC X(20).
+                  06  W24-CMB-EIYOUKSN.
+                    07  W24-EIYOUKSN               PIC X(28).
+                    07  W24-EIYOUKSN-STATE         PIC S9(9)
+                                                   BINARY.
+                    07  W24-EIYOUKSN-CNT           PIC S9(9)
+                                                   BINARY.
+                    07  W24-EIYOUKSN-ITM           PIC X(28)
+                                                   OCCURS  5.
+                    07  W24-EIYOUKSN-ITM-STATE     PIC S9(9)
+                                                   BINARY.
               04  W24-CMB-BRMSGK-TAX.
                 05  W24-BRMSGK-TAX             PIC X(10).
                 05  W24-BRMSGK-TAX-CNT         PIC S9(9)
