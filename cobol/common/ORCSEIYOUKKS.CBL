@@ -41,11 +41,21 @@
       *
        WORKING-STORAGE             SECTION.
       *
+      *    フラグ領域
+       01  FLG-AREA.
+           03  FLG-SYSKANRI        PIC 9(01).
       *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
       *
+      *    システム管理
+           COPY    "CPSK5000.INC".
+      *
+      *    ＤＢ検索
+           COPY    "MCPDATA.INC".
+      *
+           COPY    "MCPAREA".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -72,6 +82,64 @@
       *    主　　処理
       *****************************************************************
        000-PROC-SEC                    SECTION.
+      *
+           IF  LNK-EIYOUKKS-SANTEIYM    >=   "201204"
+      *        システム管理検索（栄養管理経過措置の区分取得）
+               MOVE    SPACE               TO  SYS-5000-REC
+               INITIALIZE                      SYS-5000-REC
+               MOVE    "5000"              TO  SYS-5000-KANRICD
+               MOVE    "*"                 TO  SYS-5000-KBNCD
+               MOVE    LNK-EIYOUKKS-SANTEIYM
+                                           TO  SYS-5000-STYUKYMD(1:6)
+               MOVE    "01"                TO  SYS-5000-STYUKYMD(7:2)
+               MOVE    SYS-5000-STYUKYMD   TO  SYS-5000-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-5000-HOSPNUM
+               MOVE    SYS-5000-REC        TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                   MOVE    "key10"             TO  MCP-PATHNAME
+                   PERFORM 920-DBFETCH-SEC
+                   IF      MCP-RC              =   ZERO
+                       MOVE    ZERO                TO  FLG-SYSKANRI
+                       MOVE    MCPDATA-REC         TO  SYS-5000-REC
+                   ELSE
+                       MOVE    1                   TO  FLG-SYSKANRI
+                   END-IF
+               ELSE
+                   MOVE    SPACE               TO  SYS-5000-REC
+                   INITIALIZE                  SYS-5000-REC
+                   MOVE    1               TO  FLG-SYSKANRI
+               END-IF
+      *
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+      *
+               IF    SYS-5000-EIYOUKSNKBN  =   "1"
+                   IF    LNK-EIYOUKKS-SRYCD    NOT  =  SPACE
+                       PERFORM    200-CDCHG-SEC
+                   END-IF
+      *
+               END-IF
+           END-IF
+      *
+           IF    LNK-EIYOUKKS-CHGSRYCD   =     SPACE
+               MOVE    1                 TO     LNK-EIYOUKKS-RC
+           END-IF
+      *
+           .
+      *
+       000-PROC-EXT.
+           EXIT   PROGRAM
+           .
+      *
+      *****************************************************************
+      *    コード置き換え（栄管経過措置）
+      *****************************************************************
+       200-CDCHG-SEC                    SECTION.
       *
            EVALUATE    LNK-EIYOUKKS-SRYCD
       *        療養病床・有床診療所入院基本料１（１４日以内）
@@ -747,11 +815,49 @@
                        CONTINUE
            END-EVALUATE
       *
-           IF    LNK-EIYOUKKS-CHGSRYCD   =     SPACE
-               MOVE    1                 TO     LNK-EIYOUKKS-RC
-           END-IF
            .
       *
-       000-PROC-EXT.
-           EXIT   PROGRAM
+       200-CDCHG-EXT.
            .
+      *
+      *****************************************************************
+      *    テーブル検索処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ読み込み処理
+      *****************************************************************
+       920-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       920-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢクロース処理
+      *****************************************************************
+       990-DBCLOSE-SEC         SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       990-DBCLOSE-EXT.
+           EXIT.
+      *
