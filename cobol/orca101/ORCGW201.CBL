@@ -68,176 +68,6 @@
            03  IDXK                PIC 9(04).
            03  IDY                 PIC 9(04).
       *
-      *    •≥•Û•π•ø•Û•»√Õ
-       01  CONSTANT-AREA.
-      *
-           03 CONS-KSN-VAL.
-      *      •∑•π•∆•‡¥…Õ˝° ∞ÂŒ≈µ°¥ÿæ Û°À¿ﬂƒÍ≤√ªª
-      *        ¡ÌπÁ∆˛±°¬Œ¿©≤√ªª
-               05  CONS-KSN1           PIC X(11) VALUE "0 190098870".
-      *        √œ∞Ë∞ÂŒ≈ªŸ±Á…¬±°∆˛±°ø«Œ≈≤√ªª
-               05  CONS-KSN2           PIC X(11) VALUE "0 190099870".
-      *        ø«Œ≈œø¥…Õ˝¬Œ¿©≤√ªª
-               05  CONS-KSN3           PIC X(11) VALUE "0 190100370".
-      *        ∆˝Õƒª˘≤√ªª° …¬±°°À
-               05  CONS-KSN4           PIC X(11) VALUE "0 190100470".
-      *        ∆˝Õƒª˘≤√ªª° …¬±°°À° ∆√ Ã∆˛±°¥À‹Œ¡≈˘°À
-               05  CONS-KSN5           PIC X(11) VALUE "0 190100570".
-      *        ∆˝Õƒª˘≤√ªª° ø«Œ≈ΩÍ°À
-               05  CONS-KSN6           PIC X(11) VALUE "0 190100670".
-      *        Õƒª˘≤√ªª° …¬±°°À
-               05  CONS-KSN7           PIC X(11) VALUE "0 190100770".
-      *        Õƒª˘≤√ªª° …¬±°°À° ∆√ Ã∆˛±°¥À‹Œ¡≈˘°À
-               05  CONS-KSN8           PIC X(11) VALUE "0 190100870".
-      *        Õƒª˘≤√ªª° ø«Œ≈ΩÍ°À
-               05  CONS-KSN9           PIC X(11) VALUE "0 190100970".
-      *        ¿∫ø¿…¬≈Ô∆˛±°ª˛∞Â≥ÿ¥…Õ˝≤√ªª
-               05  CONS-KSN10          PIC X(11) VALUE "0 190107170".
-      *        ¥¥¥∑øŒ◊æ≤∏¶Ω§…¬±°∆˛±°ø«Œ≈≤√ªª
-               05  CONS-KSN11          PIC X(11) VALUE "0 190117170".
-      *        ∂®Œœ∑øŒ◊æ≤∏¶Ω§…¬±°∆˛±°ø«Œ≈≤√ªª
-               05  CONS-KSN12          PIC X(11) VALUE "0 190119910".
-      *        Œ•≈Á≤√ªª
-               05  CONS-KSN13          PIC X(11) VALUE "0 190117270".
-      *        ∞ÂŒ≈∞¬¡¥¬–∫ˆ≤√ªª£±
-               05  CONS-KSN14          PIC X(11) VALUE "0 190120510".
-      *        ∞ÂŒ≈∞¬¡¥¬–∫ˆ≤√ªª£≤
-               05  CONS-KSN15          PIC X(11) VALUE "0 190136910".
-      *        ¥∂¿˜À…ªﬂ¬–∫ˆ≤√ªª
-               05  CONS-KSN16          PIC X(11) VALUE "0 190137070".
-      *        ±…Õ‹¥…Õ˝º¬ª‹≤√ªª
-               05  CONS-KSN17          PIC X(11) VALUE "0 190120410".
-      *        ∏Â»Ø∞ÂÃÙ… ª»Õ—¬Œ¿©≤√ªª
-               05  CONS-KSN18          PIC X(11) VALUE "0 190138010".
-      *        £±µÈ√œ√œ∞Ë≤√ªª
-               05  CONS-KSN19          PIC X(11) VALUE "0 190077070".
-      *        £≤µÈ√œ√œ∞Ë≤√ªª
-               05  CONS-KSN20          PIC X(11) VALUE "0 190077170".
-      *        £≥µÈ√œ√œ∞Ë≤√ªª
-               05  CONS-KSN21          PIC X(11) VALUE "0 190120010".
-      *        £¥µÈ√œ√œ∞Ë≤√ªª
-               05  CONS-KSN22          PIC X(11) VALUE "0 190077270".
-      *        £µµÈ√œ√œ∞Ë≤√ªª
-               05  CONS-KSN23          PIC X(11) VALUE "0 190120110".
-      *        £∂µÈ√œ√œ∞Ë≤√ªª
-               05  CONS-KSN24          PIC X(11) VALUE "0 190077370".
-      *
-      *      …¬±°§Œ•∑•π•∆•‡¥…Õ˝° …¬≈Ô¥…Õ˝°À¿ﬂƒÍ≤√ªª
-      *        ¥«∏Ó ‰Ωı≤√ªª£±
-               05  CONS-KSN25          PIC X(11) VALUE "1 190103770".
-      *        ¥«∏Ó ‰Ωı≤√ªª£±° £±£≥¬–£±∆˛±°¥À‹Œ¡°À
-               05  CONS-KSN26          PIC X(11) VALUE "1 190103870".
-      *        ¥«∏Ó ‰Ωı≤√ªª£≤
-               05  CONS-KSN27          PIC X(11) VALUE "1 190103970".
-      *        ¥«∏Ó ‰Ωı≤√ªª£≥
-               05  CONS-KSN28          PIC X(11) VALUE "1 190104070".
-      *        •◊•Ï•§•Î°º•‡°¢ ›∞ÈªŒ≈˘≤√ªª
-               05  CONS-KSN29          PIC X(11) VALUE "1 190111370".
-      *        ∆Ò…¬¥µº‘≈˘∆˛±°ø«Œ≈≤√ªª
-               05  CONS-KSN30          PIC X(11) VALUE "1 190101770".
-      *        ∆√ºÏº¿¥µ∆˛±°ª‹¿ﬂ¥…Õ˝≤√ªª
-               05  CONS-KSN31          PIC X(11) VALUE "1 190101970".
-      *        ª˘∆∏°¶ª◊Ω’¥¸¿∫ø¿≤ ∆˛±°∞ÂŒ≈¥…Õ˝≤√ªª
-               05  CONS-KSN32          PIC X(11) VALUE "1 190110170".
-      *        ¿∫ø¿≤ ±˛µﬁ∆˛±°ª‹¿ﬂ¥…Õ˝≤√ªª
-               05  CONS-KSN33          PIC X(11) VALUE "1 190106970".
-      *        ¥«∏Ó«€√÷≤√ªª
-               05  CONS-KSN34          PIC X(11) VALUE "1 190102070".
-      *        £±£µ¬–£± ‰Ωı¬Œ¿©≤√ªª
-               05  CONS-KSN35          PIC X(11) VALUE "1 190135710".
-      *        £≤£∞¬–£± ‰Ωı¬Œ¿©≤√ªª
-               05  CONS-KSN36          PIC X(11) VALUE "1 190135810".
-      *        £≤£µ¬–£± ‰Ωı¬Œ¿©≤√ªª
-               05  CONS-KSN37          PIC X(11) VALUE "1 190127110".
-      *        £µ£∞¬–£± ‰Ωı¬Œ¿©≤√ªª
-               05  CONS-KSN38          PIC X(11) VALUE "1 190127210".
-      *        £∑£µ¬–£± ‰Ωı¬Œ¿©≤√ªª
-               05  CONS-KSN39          PIC X(11) VALUE "1 190127310".
-      *        £±£∞£∞¬–£± ‰Ωı¬Œ¿©≤√ªª
-               05  CONS-KSN40          PIC X(11) VALUE "1 190127410".
-      *        Ω≈æ…¥µº‘≤Û…¸…¬≈Ô≤√ªª
-               05  CONS-KSN41          PIC X(11) VALUE "1 190129870".
-      *        µﬁ¿≠¥¸¥«∏Ó ‰Ωı¬Œ¿©≤√ªª£±
-               05  CONS-KSN42          PIC X(11) VALUE "1 190135910".
-      *        µﬁ¿≠¥¸¥«∏Ó ‰Ωı¬Œ¿©≤√ªª£≤
-               05  CONS-KSN43          PIC X(11) VALUE "1 190136010".
-      *        ¿∫ø¿≤ √œ∞Ë∞‹π‘º¬ª‹≤√ªª
-               05  CONS-KSN44          PIC X(11) VALUE "1 190127810".
-      *        ∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª
-               05  CONS-KSN45          PIC X(11) VALUE "1 190131570".
-      *        ∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª° ¿ÏÃÁ…¬±°°À
-               05  CONS-KSN46          PIC X(11) VALUE "1 190134970".
-      *        ∞Ï»Ã…¬≈Ô¥«∏Ó…¨Õ◊≈Ÿ…æ≤¡≤√ªª° ∆√ƒÍµ°«Ω…¬±°°À
-               05  CONS-KSN47          PIC X(11) VALUE "1 190134870".
-      *        µŸ∆¸•Í•œ•”•Í•∆°º•∑•Á•ÛƒÛ∂°¬Œ¿©≤√ªª
-               05  CONS-KSN48          PIC X(11) VALUE "1 190140870".
-      *
-      *      …¬±°§Œ•∑•π•∆•‡¥…Õ˝° …¬ºº¥…Õ˝°À¿ﬂƒÍ≤√ªª
-      *         ¸ºÕ¿˛º£Œ≈…¬ºº¥…Õ˝≤√ªª
-               05  CONS-KSN49          PIC X(11) VALUE "2 190106670".
-      *        Œ≈Õ‹¥ƒ∂≠≤√ªª
-               05  CONS-KSN50          PIC X(11) VALUE "2 190105570".
-      *        Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£±
-               05  CONS-KSN51          PIC X(11) VALUE "2 190120210".
-      *        Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£≤
-               05  CONS-KSN52          PIC X(11) VALUE "2 190106070".
-      *        Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£≥
-               05  CONS-KSN53          PIC X(11) VALUE "2 190106170".
-      *        Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£¥
-               05  CONS-KSN54          PIC X(11) VALUE "2 190106270".
-      *        Ω≈æ…º‘≈˘Œ≈Õ‹¥ƒ∂≠∆√ Ã≤√ªª° ∏ƒºº°À
-               05  CONS-KSN55          PIC X(11) VALUE "2 190105870".
-      *        Ω≈æ…º‘≈˘Œ≈Õ‹¥ƒ∂≠∆√ Ã≤√ªª° £≤øÕ…Ù≤∞°À
-               05  CONS-KSN56          PIC X(11) VALUE "2 190105970".
-      *        Ãµ∂›º£Œ≈ºº¥…Õ˝≤√ªª
-               05  CONS-KSN57          PIC X(11) VALUE "2 190106570".
-      *
-      *      ø«Œ≈ΩÍ§Œ•∑•π•∆•‡¥…Õ˝° …¬≈Ô¥…Õ˝°À¿ﬂƒÍ≤√ªª
-      *        ∆Ò…¬¥µº‘≈˘∆˛±°ø«Œ≈≤√ªª
-               05  CONS-KSN58          PIC X(11) VALUE "1 190101770".
-      *        ∆√ºÏº¿¥µ∆˛±°ª‹¿ﬂ¥…Õ˝≤√ªª
-               05  CONS-KSN59          PIC X(11) VALUE "1 190101970".
-      *        ∞Âª’«€√÷≤√ªª£±
-               05  CONS-KSN60          PIC X(11) VALUE "1 190135570".
-      *        ∞Âª’«€√÷≤√ªª£≤
-               05  CONS-KSN61          PIC X(11) VALUE "1 190117070".
-      *        ÃÎ¥÷∂€µﬁ¬Œ¿©≥Œ ›≤√ªª
-               05  CONS-KSN62          PIC X(11) VALUE "1 190126470".
-      *        ¥«∏Ó«€√÷≤√ªª£±
-               05  CONS-KSN63          PIC X(11) VALUE "1 190109670".
-      *        ¥«∏Ó«€√÷≤√ªª£≤
-               05  CONS-KSN64          PIC X(11) VALUE "1 190126570".
-      *        ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£±
-               05  CONS-KSN65          PIC X(11) VALUE "1 190126770".
-      *        ÃÎ¥÷¥«∏Ó«€√÷≤√ªª£≤
-               05  CONS-KSN66          PIC X(11) VALUE "1 190126670".
-      *
-      *      ø«Œ≈ΩÍ§Œ•∑•π•∆•‡¥…Õ˝° …¬ºº¥…Õ˝°À¿ﬂƒÍ≤√ªª
-      *        ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤Œ≈Õ‹¥ƒ∂≠≤√ªª£±
-               05  CONS-KSN67          PIC X(11) VALUE "2 190106370".
-      *        ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤Œ≈Õ‹¥ƒ∂≠≤√ªª£≤
-               05  CONS-KSN68          PIC X(11) VALUE "2 190106470".
-      *         ¸ºÕ¿˛º£Œ≈…¬ºº¥…Õ˝≤√ªª
-               05  CONS-KSN69          PIC X(11) VALUE "2 190106670".
-      *        Ãµ∂›º£Œ≈ºº¥…Õ˝≤√ªª
-               05  CONS-KSN70          PIC X(11) VALUE "2 190106570".
-      *
-      *      ∆˛¬‡±°≈–œøª˛§ÀªªƒÍ§π§Î≤√ªª
-      *        ÍÛ·Ï¥µº‘¥…Õ˝≤√ªª
-               05  CONS-KSN71          PIC X(11) VALUE "3 190116990".
-      *        Õ≠æ≤ø«Œ≈ΩÍ∞Ï»Ã…¬æ≤ΩÈ¥¸≤√ªª
-               05  CONS-KSN72          PIC X(11) VALUE "3 190135470".
-      *        µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª° ø«Œ≈ΩÍ°À
-               05  CONS-KSN73          PIC X(11) VALUE "3 190135670".
-      *        µﬂµﬁ°¶∫ﬂ¬≈˘ªŸ±ÁŒ≈Õ‹…¬æ≤ΩÈ¥¸≤√ªª° …¬±°°À
-               05  CONS-KSN74          PIC X(11) VALUE "3 190134270".
-           03  CONS-KSN-R  REDEFINES CONS-KSN-VAL.
-               05  CONS-KSN-OCC            OCCURS    74.
-                   07  CONS-KSN-KBN        PIC X(01).
-                   07  CONS-KSN-FIL        PIC X(01).
-                   07  CONS-KSN-CD         PIC X(09).
-           03  CONS-KSN-MAX                PIC 9(05)   VALUE 74.
-        
       *
       *    ∞Ïª˛ŒŒ∞Ë
        01  WRK-AREA.
@@ -974,28 +804,6 @@
               END-IF
            END-IF
       *
-      *        •∑•π•∆•‡¥…Õ˝° ∞ÂŒ≈µ°¥ÿæ Û°À§«¿ﬂƒÍ§π§Î≤√ªª
-      *        §«§ §§§≥§»§Œ•¡•ß•√•Ø
-           IF  SPA-ERRCD       =   SPACE
-               PERFORM VARYING IDXK    FROM    1   BY  1
-                       UNTIL ( IDXK    >   CONS-KSN-MAX )
-                        OR   ( SPA-ERRCD   NOT =   SPACE )
-                   IF    ( SPA-W201-KSNCD2     =   CONS-KSN-CD (IDXK))
-                       MOVE    2           TO  SPA-W201-CUR
-                       EVALUATE    CONS-KSN-KBN (IDXK)
-                       WHEN    "0"
-                           MOVE    "0007"  TO  SPA-ERRCD
-                       WHEN    "1"
-                           MOVE    "0008"  TO  SPA-ERRCD
-                       WHEN    "2"
-                           MOVE    "0009"  TO  SPA-ERRCD
-                       WHEN    "3"
-                           MOVE    "0013"  TO  SPA-ERRCD
-                       END-EVALUATE
-                   END-IF
-               END-PERFORM
-           END-IF
-      *
            .
        22022-KSNCD2-CHK-EXT.
            EXIT.
@@ -1008,6 +816,15 @@
       *    ∂¶ƒÃ£”£–£¡ ‘Ω∏
            INITIALIZE                  SPA-W25-AREA
            MOVE    "2"                 TO  SPA-W25-TYPE
+      *
+           MOVE    SPA-SYSYMD              TO  SPA-W25-SYSYMD
+           IF    ( SPA-SYSYMD              <   SPA-NAI-W20-YUKOSTYMD )
+               MOVE    SPA-NAI-W20-YUKOSTYMD   TO  SPA-W25-SYSYMD
+           END-IF
+           IF    ( SPA-SYSYMD              >   SPA-NAI-W20-YUKOEDYMD )
+               MOVE    SPA-NAI-W20-YUKOEDYMD  TO  SPA-W25-SYSYMD
+           END-IF
+      *
       *
            INITIALIZE                  SPA-W25GMN-AREA
            IF      WRK-INPUTCD         NOT =   SPACE

@@ -169,21 +169,23 @@
            03  WRK-SSTKJNCD-G.
                05  WRK-SSTKJNCD-OCC                OCCURS 10.
                    07  WRK-SSTKJNCDSEP             PIC X(01).
-                   07  WRK-SSTKJNCD                PIC X(03).
+                   07  WRK-SSTKJNCD                PIC X(04).
                    07  WRK-SSTKJNCD-R              REDEFINES
                        WRK-SSTKJNCD.
-                       09  WRK-SSTKJNCD9           PIC 9(03).
+                       09  WRK-SSTKJNCD9           PIC 9(04).
            03  WRK-KSNMEI                          PIC X(100).
            03  WRK-PNT                             PIC 9(05).
            03  WRK-KSNCD                           PIC X(09).
+           03  WRK-KBN1-G.
+               05  WRK-KBN1                        PIC 9(01).
       *
        01  SSTKJN-AREA.
            03  SSTKJN-VAL.
-               05  SSTKJN-VAL1                     PIC X(500).
-               05  SSTKJN-VAL2                     PIC X(500).
+               05  SSTKJN-VAL-OCC                  PIC X(500)
+                                                   OCCURS  7.
            03  SSTKJN-R    REDEFINES       SSTKJN-VAL.
-               05  SSTKJN-CD                       PIC 9(01)
-                                                   OCCURS  1000.
+               05  SSTKJN-CD                       PIC X(01)
+                                                   OCCURS  3500.
       *
       *    固定値領域
        01  CONST-AREA.
@@ -2038,14 +2040,14 @@
                END-IF
            END-PERFORM
       *
-      *    入院加算情報チェック処理-施設基準チェック処理
-           PERFORM 4101-SSTKIJUN-CHK-SEC
+      *    地域加算チェック処理
+           PERFORM 4101-CHIIKIKSN-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
       *
-      *    地域加算チェック処理
-           PERFORM 4101-CHIIKIKSN-CHK-SEC
+      *    入院加算情報チェック処理-施設基準チェック処理
+           PERFORM 4101-SSTKIJUN-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
@@ -2228,6 +2230,14 @@
       *    共通ＳＰＡ編集
            INITIALIZE                  SPA-W25-AREA
            MOVE    "2"                 TO  SPA-W25-TYPE
+      *
+           MOVE    SPA-SYSYMD              TO  SPA-W25-SYSYMD
+           IF    ( SPA-SYSYMD              <   SPA-W01-STYUKYMD )
+               MOVE    SPA-W01-STYUKYMD    TO  SPA-W25-SYSYMD
+           END-IF
+           IF    ( SPA-SYSYMD              >   SPA-W01-EDYUKYMD )
+               MOVE    SPA-W01-EDYUKYMD    TO  SPA-W25-SYSYMD
+           END-IF
       *
            INITIALIZE                  SPA-W25GMN-AREA
            IF      WRK-INPUTCD         NOT =   SPACE
@@ -2942,12 +2952,12 @@
       *
                MOVE    SYSKANRI-REC    TO  SYS-1006-REC
       *
-               EVALUATE    SYS-1006-KBNCD
-               WHEN    "1"
-                   MOVE    SYS-1006-TBL    TO  SSTKJN-VAL1
-               WHEN    "2"
-                   MOVE    SYS-1006-TBL    TO  SSTKJN-VAL2
-               END-EVALUATE
+               IF    ( SYS-1006-KBNCD  >=  "1" )
+                AND  ( SYS-1006-KBNCD  <=  "7" )
+                   MOVE    SYS-1006-KBNCD  TO  WRK-KBN1-G
+                   MOVE    SYS-1006-TBL    TO  SSTKJN-VAL-OCC
+                                                     (WRK-KBN1)
+               END-IF
       *
                PERFORM 900-SYSKANRI-KEY2-FET-SEC
       *

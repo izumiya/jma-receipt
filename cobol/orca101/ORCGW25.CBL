@@ -511,6 +511,9 @@
            MOVE    SPA-W25-INPUTCD     TO  SPA-W25-GMN-INPUT
            MOVE    ZERO                TO  SPA-W25-NEXT
            MOVE    1                   TO  SPA-W25-PAGE
+           IF    ( SPA-W25-SYSYMD      =   SPACE )
+               MOVE    SPA-SYSYMD      TO  SPA-W25-SYSYMD
+           END-IF
       *
       *    リストボックス
            MOVE    "1:内服薬"          TO  SPA-W25-JIINLST (1)
@@ -1426,8 +1429,8 @@
            INITIALIZE                      INPUTSET-REC
            MOVE    SPA-HOSPNUM         TO  ISET-HOSPNUM
            MOVE    ICD-SRYCD           TO  ISET-SETCD
-           MOVE    SPA-SYSYMD          TO  ISET-YUKOSTYMD
-           MOVE    SPA-SYSYMD          TO  ISET-YUKOEDYMD
+           MOVE    SPA-W25-SYSYMD      TO  ISET-YUKOSTYMD
+           MOVE    SPA-W25-SYSYMD      TO  ISET-YUKOEDYMD
       *
            MOVE    INPUTSET-REC        TO  MCPDATA-REC
            MOVE    "tbl_inputset"      TO  MCP-TABLE
@@ -1448,8 +1451,8 @@
            MOVE    ZERO                TO  FLG-KIKAN
            PERFORM
                UNTIL    FLG-INPUTSET    =   1
-               IF      (ISET-YUKOSTYMD     <=  SPA-SYSYMD ) AND
-                       (ISET-YUKOEDYMD     >=  SPA-SYSYMD )
+               IF      (ISET-YUKOSTYMD     <=  SPA-W25-SYSYMD ) AND
+                       (ISET-YUKOEDYMD     >=  SPA-W25-SYSYMD )
                    MOVE    1               TO  FLG-KIKAN
                    MOVE    1               TO  FLG-INPUTSET
                ELSE
@@ -4168,8 +4171,8 @@
       *****************************************************************
        910-TENSU-SELECT-SEC         SECTION.
       *
-           MOVE    SPA-SYSYMD          TO  TNS-YUKOSTYMD
-           MOVE    SPA-SYSYMD          TO  TNS-YUKOEDYMD
+           MOVE    SPA-W25-SYSYMD      TO  TNS-YUKOSTYMD
+           MOVE    SPA-W25-SYSYMD      TO  TNS-YUKOEDYMD
            MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
            MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
       *
@@ -4207,8 +4210,8 @@
       *****************************************************************
        9110-TENSU-KEYREAD-SEC         SECTION.
       *
-           MOVE    SPA-SYSYMD          TO  TNS-YUKOSTYMD
-           MOVE    SPA-SYSYMD          TO  TNS-YUKOEDYMD
+           MOVE    SPA-W25-SYSYMD      TO  TNS-YUKOSTYMD
+           MOVE    SPA-W25-SYSYMD      TO  TNS-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
            MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
