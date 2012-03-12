@@ -28,6 +28,8 @@
       ************************************************************
        01  ORCSEIYOUKKS-AREA.
       *
+      *算定年月
+           03  LNK-EIYOUKKS-SANTEIYM               PIC  X(06).
       *入院料コード
            03  LNK-EIYOUKKS-SRYCD                  PIC  X(09).
       *返却項目
