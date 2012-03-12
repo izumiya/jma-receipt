@@ -59,9 +59,12 @@
       *入院会計テーブル表示情報
                05  SYS-5000-GENSAN-INF     OCCURS  10.
                    07  SYS-5000-DSPCD      PIC  X(09).
+      *栄養管理経過措置区分
+               05  SYS-5000-EIYOUKSNKBN    PIC  X(01).
       *予備（１）
       ******   05                          PIC  X(60).
-               05                          PIC  X(56).
+      ******   05                          PIC  X(56).
+               05                          PIC  X(55).
       *入院時の食事
                05  SYS-5000-SKJKBN         PIC  X(01).
       *入院時の選定入院

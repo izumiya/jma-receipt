@@ -42,6 +42,18 @@ W24	{
 					item	varchar(28)[05];
 					state	int;
 				};
+				LBLEIYOUKSN	{
+					value	varchar(20);
+				};
+				CMB_EIYOUKSN	{
+					EIYOUKSN	{
+						value	varchar(28);
+						state	int;
+					};
+					count	int;
+					item	varchar(28)[05];
+					state	int;
+				};
 			};
 		};
 		CMB_BRMSGK_TAX	{
