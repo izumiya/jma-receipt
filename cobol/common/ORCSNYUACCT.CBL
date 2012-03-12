@@ -101,6 +101,7 @@
            03  IDX-SIN             PIC 9(04).
            03  IDX-ATO             PIC 9(04).
            03  IDX-SYU             PIC 9(04).
+           03  IDX-EIYOU           PIC 9(04).
       *
            03  IDX1                PIC 9(02).
            03  IDX2                PIC 9(02).
@@ -319,6 +320,9 @@
       *    通算日数取得サブ
            COPY "CPORCSTUSAN.INC".
       *
+      *    栄養管理経過措置入院料コード取得サブ
+           COPY "CPORCSEIYOUKKS.INC".
+      *
       *****************************************************************
       *    連絡　領域
       *****************************************************************
@@ -349,6 +353,80 @@
            INITIALIZE                  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
+      *
+      *    平成２４年改正　栄養管理体制経過措置の入院料置き換え
+      *   （医療観察入院時はこの処理をスキップ）
+           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)(1:3) = "188"
+              CONTINUE
+           ELSE
+      *
+      *        システム管理検索（栄養管理経過措置の区分取得）
+               MOVE    SPACE               TO  SYS-5000-REC
+               INITIALIZE                      SYS-5000-REC
+               MOVE    "5000"              TO  SYS-5000-KANRICD
+               MOVE    "*"                 TO  SYS-5000-KBNCD
+               MOVE    LNK-SCNYUACCT-STSRYYMD(1:6)
+                                           TO  SYS-5000-STYUKYMD(1:6)
+               MOVE    "01"                TO  SYS-5000-STYUKYMD(7:2)
+               MOVE    SYS-5000-STYUKYMD   TO  SYS-5000-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-5000-HOSPNUM
+               MOVE    SYS-5000-REC        TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                   MOVE    "key10"             TO  MCP-PATHNAME
+                   PERFORM 920-DBFETCH-SEC
+                   IF      MCP-RC              =   ZERO
+                       MOVE    ZERO                TO  FLG-SYSKANRI
+                       MOVE    MCPDATA-REC         TO  SYS-5000-REC
+                   ELSE
+                       MOVE    1                   TO  FLG-SYSKANRI
+                   END-IF
+               ELSE
+                   MOVE    SPACE               TO  SYS-5000-REC
+                   INITIALIZE                  SYS-5000-REC
+                   MOVE    1               TO  FLG-SYSKANRI
+               END-IF
+      *
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+      *
+               IF    SYS-5000-EIYOUKSNKBN  =   "1"
+                   IF    LNK-SCNYUACCT-NYUKHN-SRYCD (1)   NOT  =  SPACE
+                     INITIALIZE    ORCSEIYOUKKS-AREA
+                     MOVE   LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+                                           TO    LNK-EIYOUKKS-SRYCD
+                     CALL   "ORCSEIYOUKKS"    USING   ORCSEIYOUKKS-AREA
+                                                      SPA-AREA
+                     IF   LNK-EIYOUKKS-RC     =       ZERO
+                            MOVE LNK-EIYOUKKS-CHGSRYCD   TO
+                                         LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+                     END-IF
+                   END-IF
+      *
+                   IF    LNK-SCNYUACCT-KAGEN-SRYCD(1)  NOT =  SPACE
+                       PERFORM    VARYING   IDX-EIYOU  FROM  1   BY   1
+                         UNTIL   (IDX-EIYOU     >   10)    OR
+                                 (LNK-SCNYUACCT-KAGEN-SRYCD (IDX-EIYOU)
+                                                = SPACE)
+                            INITIALIZE    ORCSEIYOUKKS-AREA
+                            MOVE  LNK-SCNYUACCT-KAGEN-SRYCD (IDX-EIYOU)
+                                           TO    LNK-EIYOUKKS-SRYCD
+                            CALL "ORCSEIYOUKKS" USING ORCSEIYOUKKS-AREA
+                                                      SPA-AREA
+                            IF   LNK-EIYOUKKS-RC     =       ZERO
+                                MOVE LNK-EIYOUKKS-CHGSRYCD   TO
+                                         LNK-SCNYUACCT-KAGEN-SRYCD
+                                                            (IDX-EIYOU)
+                            END-IF
+                       END-PERFORM
+                   END-IF
+               END-IF
+      *
+           END-IF
       *
       *    患者マスター検索
            INITIALIZE                      PTINF-REC
