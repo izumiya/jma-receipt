@@ -2130,9 +2130,12 @@
            END-EVALUATE
       *
            IF      SYU-DENPJTIKBN  NOT =   "3"
-                IF  SYU-SECMONEY        =  1
-                   MOVE   "1"     TO   SPA-GMN-SIKIBETUFLG(IDX-LST)
-                END-IF
+                EVALUATE  SYU-SECMONEY
+                  WHEN      1
+                     MOVE      "1"     TO  SPA-GMN-SIKIBETUFLG(IDX-LST)
+                  WHEN      2
+                     MOVE      "2"     TO  SPA-GMN-SIKIBETUFLG(IDX-LST)
+                END-EVALUATE
                 IF  SYU-ACCT-UPDKBN NOT = SPACE
                    MOVE   "¡ù"    TO   SPA-GMN-TNYUGAIKBN(IDX-LST)(3:2)
                 END-IF
@@ -2579,9 +2582,12 @@
                IF    SPA-GMN-TNYUGAIKBN(IDX-LST)(3:2) = "¡ù"
                    MOVE     1          TO  FLG-MISYORI
                END-IF
-               IF    SPA-GMN-SIKIBETUFLG(IDX-LST)     = "1"
+               EVALUATE  SPA-GMN-SIKIBETUFLG(IDX-LST)
+                 WHEN        "1"
                    MOVE     1          TO  FLG-MISYORI2
-               END-IF
+                 WHEN        "2"
+                   MOVE     2          TO  FLG-MISYORI2
+               END-EVALUATE
       *
            END-PERFORM
       *
@@ -2590,16 +2596,23 @@
            MOVE    SPA-GMN-SELBAN              TO  WRK-SELBAN-W
            MOVE    WRK-SELBAN-W                TO  S02-SELNUM
       *
-           IF      FLG-MISYORI2  =    1
-              MOVE    "red"    TO    S02-LBLMSG-STYLE
-       MOVE "¡ú¡ú¡¡¡Ú¸½ÊªµëÉÕÁë¸ý·×»»¡Û¡¡°ì³çºÆ·×»»¤ò¹Ô¤Ã¤Æ²¼¤µ¤¤¡¡¡ú¡ú"
-                               TO    S02-LBLMSG
+           IF      FLG-MISYORI2   NOT =  ZERO
+             EVALUATE  FLG-MISYORI2
+               WHEN       1
+                 MOVE    "red"    TO    S02-LBLMSG-STYLE
+       MOVE "¡ú¡ú¡¡¡Ú£·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¡Û°ì³çºÆ·×»»¤ò¹Ô¤Ã¤Æ²¼¤µ¤¤¡¡¡ú¡ú"
+                                  TO    S02-LBLMSG
+               WHEN       2
+                 MOVE    "blue"   TO    S02-LBLMSG-STYLE
+       MOVE "¡ú¡ú¡¡¡Ú¹âÎð¼Ô¸½ÊªµëÉÕ¡Û°ì³çºÆ·×»»¤ò¹Ô¤Ã¤Æ²¼¤µ¤¤¡¡¡ú¡ú"
+                                  TO    S02-LBLMSG
+             END-EVALUATE
            ELSE
-            IF     FLG-MISYORI   =    1
-              MOVE    "blue"   TO    S02-LBLMSG-STYLE
-              MOVE    "¡ù¡¡²ñ·×¾È²ñ¡Ú¼ýÇ¼¹¹¿·¡ÛÌ¤½èÍýÊ¬"
-                               TO    S02-LBLMSG
-            END-IF
+             IF    FLG-MISYORI    =      1
+                 MOVE    "blue"   TO    S02-LBLMSG-STYLE
+                 MOVE    "¡ù¡¡²ñ·×¾È²ñ¡Ú¼ýÇ¼¹¹¿·¡ÛÌ¤½èÍýÊ¬"
+                                  TO    S02-LBLMSG
+             END-IF
            END-IF
       *
            MOVE    WIDGET-NORMAL       TO  S02-B06-STATE

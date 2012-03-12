@@ -439,7 +439,6 @@
            03  WK-GENBUTU-SYUMAXKIN    PIC 9(10).
            03  WK-GENBUTU-FTNKIN       PIC 9(10).
            03  WK-GENBUTU-SKYMONEY     PIC 9(10).
-           03  WK-GENBUTU-SKYMONEY-T   PIC 9(10).
            03  WK-SEIHO-GENDO          PIC 9(07).
            03  WK-SEIHO-GENDO70        PIC 9(07).
            03  WK-CYOKI-GENDO          PIC 9(07).
@@ -819,6 +818,7 @@
       *
            03  WK-SYUNOU-GENBUTU-JGNFLG                 PIC  9(01).
            03  WK-SYUNOU-GENBUTU-KOREI-SKYMONEY         PIC  9(07).
+           03  WK-SYUNOU-GENBUTU-KOREI-SYUHKNFLG        PIC  9(01).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â²ó¿ô¤È¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -1443,12 +1443,6 @@
            INITIALIZE                  KEISAN-AREA.
            MOVE    SPACE           TO  WRK-AREA.
            INITIALIZE                  WRK-AREA.
-      *++
-           IF   LNK-S01-SAIKEISAN-KBN  =  "1"
-             COMPUTE  WK-GENBUTU-SKYMONEY-T  =  LNK-SYU-HKNTEKMONEY
-                                             +  LNK-SYU-KOH-FTN
-           END-IF.
-      *++
            MOVE    ZERO            TO  LNK-SYU-RJN-FTN
                                        LNK-SYU-KOH-FTN
                                        LNK-SYU-KOH-FTN-ENTANI
@@ -6091,6 +6085,7 @@
            MOVE   ZERO   TO   WK-SYUNOU-GENBUTU70-MSG.
            MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-JGNFLG.
            MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-KOREI-SKYMONEY.
+           MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-KOREI-SYUHKNFLG.
            IF    LNK-SYU-SRYYMD(1:6)   >=  "201204"
              IF  (FLG-GENBUTU70           NOT =   ZERO)
              AND (FLG-OITA-GENBUTU70          =   ZERO)
@@ -6327,10 +6322,12 @@
                           END-IF
                         END-IF
                     ELSE
-                     IF   ( COMB-KOH1HKNNUM  =   "972" )
-                     OR   ( COMB-KOH2HKNNUM  =   "972" )
-                     OR   ( COMB-KOH3HKNNUM  =   "972" )
-                     OR   ( COMB-KOH4HKNNUM  =   "972" )
+                     IF  ((COMB-KOH1HKNNUM  =   "972"        ) OR
+                          (COMB-KOH2HKNNUM  =   "972"        ) OR
+                          (COMB-KOH3HKNNUM  =   "972"        ) OR
+                          (COMB-KOH4HKNNUM  =   "972"        ))
+                     AND ( WK-SYUNOU-GENBUTU-KOREI-SYUHKNFLG
+                                                       = ZERO )
                         IF    FLG-TOKU75  =  1 OR 2
                           IF   MAX-KIN-SYU-M   >  5000
                             MOVE   5000    TO   MAX-KIN-SYU-M
@@ -6347,10 +6344,12 @@
                       OR  (COMB-KOH4HKNNUM(1:1) = "0")
                           CONTINUE
                       ELSE
-                        IF  (COMB-KOH1HKNNUM = "974")
-                        OR  (COMB-KOH2HKNNUM = "974")
-                        OR  (COMB-KOH3HKNNUM = "974")
-                        OR  (COMB-KOH4HKNNUM = "974")
+                        IF  ((COMB-KOH1HKNNUM  =   "974"        ) OR
+                             (COMB-KOH2HKNNUM  =   "974"        ) OR
+                             (COMB-KOH3HKNNUM  =   "974"        ) OR
+                             (COMB-KOH4HKNNUM  =   "974"        ))
+                        AND ( WK-SYUNOU-GENBUTU-KOREI-SYUHKNFLG
+                                                          = ZERO )
                           IF    FLG-TOKU75  =  1 OR 2
                             IF   MAX-KIN-SYU-M   >  10000
                               MOVE   10000   TO   MAX-KIN-SYU-M
@@ -9705,6 +9704,7 @@
                    IF   SYU-SKJ-FTNGAKU(1) =  1
                      MOVE   1  TO  WK-SYUNOU-GENBUTU-JGNFLG
                    END-IF
+                   MOVE     1  TO  WK-SYUNOU-GENBUTU-KOREI-SYUHKNFLG
                  ELSE
                    ADD   SYU-KOH-FTN
                                TO  WK-SYUNOU-GENBUTU-KOREI-SKYMONEY
@@ -15301,9 +15301,9 @@
                     IF  (LNK-SYU-SRYYMD(1:6) >=  "201204")
                     AND (COMB-HKNNUM      NOT =   SPACE  )
                     AND (COMB-KOH1HKNNUM  NOT =   SPACE  )
-                      MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
-                      MOVE    ZERO TO  WK-ENTANI
-                      MOVE    1    TO  FLG-TAISYO
+      **>             MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
+      **>             MOVE    ZERO TO  WK-ENTANI
+      **>             MOVE    1    TO  FLG-TAISYO
                       MOVE    3    TO  WK-SYUNOU-GENBUTU70-MSG
                     END-IF
                END-IF
@@ -15344,9 +15344,9 @@
                        IF  (LNK-SYU-SRYYMD(1:6) >=  "201204")
                        AND (COMB-HKNNUM      NOT =   SPACE  )
                        AND (COMB-KOH1HKNNUM  NOT =   SPACE  )
-                         MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
-                         MOVE    ZERO TO  WK-ENTANI
-                         MOVE    1    TO  FLG-TAISYO
+      **>                MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
+      **>                MOVE    ZERO TO  WK-ENTANI
+      **>                MOVE    1    TO  FLG-TAISYO
                          MOVE    3    TO  WK-SYUNOU-GENBUTU70-MSG
                        END-IF
                  END-IF
@@ -25593,30 +25593,13 @@
       *
                EVALUATE  WK-SYUNOU-GENBUTU70-MSG
                  WHEN       1
-                 WHEN       3
-                   IF ((LNK-S01-SAIKEISAN-KBN     = SPACE) AND
-                       (WK-GENBUTU-SKYMONEY   NOT = ZERO ))
-                   OR ((LNK-S01-SAIKEISAN-KBN     = "1"  ) AND
-                       (WK-GENBUTU-SKYMONEY-T NOT =
-                                      WK-GENBUTU-SKYMONEY))
                      IF    WK-SYUNOU-GENBUTU-JGNFLG  =  1
                        MOVE       "1"   TO   LNK-S01-GENBUTU-MSG-FLG
                        MOVE        1    TO   LNK-SYU-SECMONEY
                      ELSE
-                       IF  WK-SYUNOU-GENBUTU70-MSG   =  1
-                         PERFORM  230761-GENBUTU-MSG-HENSYU-CHECK-SEC
-                         PERFORM  230763-GENBUTU-MSG-HENSYU-CHECK3-SEC
-                       ELSE
-                         ADD  WK-GENBUTU-SKYMONEY  TO
-                                  WK-SYUNOU-GENBUTU-KOREI-SKYMONEY
-                         IF   WK-GENBUTU-SYUMAXKIN  <
-                                  WK-SYUNOU-GENBUTU-KOREI-SKYMONEY
-                           MOVE   "1"   TO   LNK-S01-GENBUTU-MSG-FLG
-                           MOVE    1    TO   LNK-SYU-SECMONEY
-                         END-IF
-                       END-IF
+                       PERFORM    230761-GENBUTU-MSG-HENSYU-CHECK-SEC
+                       PERFORM    230763-GENBUTU-MSG-HENSYU-CHECK3-SEC
                      END-IF
-                   END-IF
                  WHEN       2
                      IF    WK-SYUNOU-GENBUTU-JGNFLG  =  1
                        MOVE       "1"   TO   LNK-S01-GENBUTU-MSG-FLG
@@ -25627,6 +25610,22 @@
                        PERFORM    230762-GENBUTU-MSG-HENSYU-CHECK2-SEC
                        IF  FLG-GENBUTU-OK  =  1
                          PERFORM  230763-GENBUTU-MSG-HENSYU-CHECK3-SEC
+                       END-IF
+                     END-IF
+                 WHEN       3
+                     IF    WK-SYUNOU-GENBUTU-JGNFLG  =  1
+      **>              MOVE       "1"   TO   LNK-S01-GENBUTU-MSG-FLG
+      **>              MOVE        1    TO   LNK-SYU-SECMONEY
+                       MOVE        2    TO   LNK-SYU-SECMONEY
+                     ELSE
+                       ADD  WK-GENBUTU-SKYMONEY  TO
+                                WK-SYUNOU-GENBUTU-KOREI-SKYMONEY
+      **>              IF   WK-GENBUTU-SYUMAXKIN  <
+                       IF   WK-GENBUTU-SYUMAXKIN  <=
+                                WK-SYUNOU-GENBUTU-KOREI-SKYMONEY
+      **>                MOVE     "1"   TO   LNK-S01-GENBUTU-MSG-FLG
+      **>                MOVE      1    TO   LNK-SYU-SECMONEY
+                         MOVE      2    TO   LNK-SYU-SECMONEY
                        END-IF
                      END-IF
                END-EVALUATE
