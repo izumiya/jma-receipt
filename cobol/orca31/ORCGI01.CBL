@@ -561,6 +561,7 @@
            03  WRK-NYUREKILST-ROW          PIC S9(9)   BINARY.
       *
        01  CONST-AREA.
+           03  CONST-H240401               PIC X(08)   VALUE "20120401".
            03  CONST-H220401               PIC X(08)   VALUE "20100401".
            03  CONST-H211001               PIC X(08)   VALUE "20091001".
            03  CONST-H181001               PIC X(08)   VALUE "20061001".
@@ -5963,11 +5964,28 @@
       *****************************************************************
        4101-CMB-TOKNYUIN-DAT-SET-SEC   SECTION.
       *
+           MOVE    ZERO                TO  FLG-PASS
            IF    ( WRK-TOKNYUIN-NM     =   SPACE )
-               GO  TO  4101-CMB-TOKNYUIN-DAT-SET-EXT
+               MOVE    1               TO  FLG-PASS
            END-IF
       *
+           IF    ( WRK-TOKNYUIN-KBN    =   "4" )
+               CONTINUE
+           ELSE
+               MOVE    WRK-TOKNYUIN-SRYCD-X
+                                       TO  WRK-SRYCD
+               PERFORM 900-TENSU-KEY-SEL-SEC
+               IF    ( TNS-HOSPSRYKBN  =   0 )
+                OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
+                   CONTINUE
+               ELSE
+                   MOVE    1           TO  FLG-PASS
+               END-IF
+           END-IF
+      *
+      *
            IF    ( SPA-GMN-I01-TOKNYUIN-CNT   >=   CONST-TOKNYUIN-MAX )
+            OR   ( FLG-PASS                    =   1 )
                CONTINUE
            ELSE
                COMPUTE SPA-GMN-I01-TOKNYUIN-CNT

@@ -68,6 +68,7 @@
       *
                05  SPA-W25-SRYCD           PIC X(09).
                05  SPA-W25-NAME            PIC X(60).
+               05  SPA-W25-SYSYMD          PIC X(08).
       *
                05  SPA-W25-RC              PIC 9(04).
       *
