@@ -231,6 +231,7 @@
            03  FLG-NSRYSRH                 PIC 9(01).
            03  FLG-NRRKSRH                 PIC 9(01).
            03  FLG-SST                     PIC 9(01).
+           03  FLG-RYOYOKHN                PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -5141,147 +5142,12 @@
       *
                IF    ( WRK-KJNYMD         >=   CONST-H180701 )
                 AND  ( SYS-5001-BTU-SBT    =   "04" OR "09" )
-      *
-                   MOVE    1               TO  SPA-NAI-I01-SELNYUKHN
-      *
-                   INITIALIZE                  SYSKANRI-REC
-                   MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
-                   MOVE    "5111"          TO  SYS-KANRICD
-                   MOVE    WRK-KJNYMD      TO  SYS-STYUKYMD
-                                               SYS-EDYUKYMD
-                   PERFORM 900-SYSKANRI-KEY23-SEL-SEC
-                   MOVE    SYSKANRI-REC    TO  SYS-5111-REC
-                   PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
-      *
-                       MOVE    ZERO        TO  FLG-TARGET
-      *
-                       IF    ( SYS-5001-BTU-SBT            =   "04" )
-                        AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "05" )
-                           IF    ( FLG-LIFE-RJN    =   ZERO OR 2)
-                               IF    ( SYS-5111-SEIKATU-RYOKBN
-                                                       =   SPACE )
-                                   MOVE    1   TO  FLG-TARGET
-                               END-IF
-                           END-IF
-                           IF    ( FLG-LIFE-RJN    =   1    OR 2)
-                               IF    ( SYS-5111-SEIKATU-RYOKBN
-                                                   NOT =   SPACE )
-                                       MOVE    1   TO  FLG-TARGET
-                               END-IF
-                           END-IF
-                       END-IF
-      *
-                       IF    ( SYS-5001-BTU-SBT            =   "09" )
-                        AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "06" )
-                           IF    ( FLG-LIFE-RJN        =   ZERO OR 2)
-                               IF    ( SYS-5111-SEIKATU-RYOKBN
-                                                           =   SPACE )
-                                   MOVE    1   TO  FLG-TARGET
-                               END-IF
-                           END-IF
-                           IF    ( FLG-LIFE-RJN        =   1    OR 2)
-                               IF    ( SYS-5111-SEIKATU-RYOKBN
-                                                       NOT =   SPACE )
-                                   MOVE    1   TO  FLG-TARGET
-                               END-IF
-                           END-IF
-                       END-IF
-      *
-                       IF    ( WRK-KJNYMD  >=  CONST-H220401 )
-                           IF    ( SYS-5111-SRYCD
-                                               =   "099999953"
-                                                OR "099999954" )
-                                   MOVE  ZERO  TO  FLG-TARGET
-                           END-IF
-                           IF    ( SYS-5001-KHNSRYCD
-                                               =   SPACE
-                                          OR       "099999953"
-                                          OR       "190121310"
-                                          OR       "190121410"
-                                          OR       "190121510"
-                                          OR       "190121610"
-                                          OR       "190121710"
-                                          OR       "190131610"
-                                          OR       "190132010"
-                                          OR       "190132210" )
-                               IF    ( SYS-5111-SRYCD
-                                               =   "190132410"
-                                          OR       "190132610"
-                                          OR       "190132810"
-                                          OR       "190133010"
-                                          OR       "190133210"
-                                          OR       "190133410"
-                                          OR       "190133610"
-                                          OR       "190133810"
-                                          OR       "190134010"
-                                          OR       "190132510"
-                                          OR       "190132710"
-                                          OR       "190132910"
-                                          OR       "190133110"
-                                          OR       "190133310"
-                                          OR       "190133510"
-                                          OR       "190133710"
-                                          OR       "190133910"
-                                          OR       "190134110" )
-                                   MOVE  ZERO  TO  FLG-TARGET
-                               END-IF
-                           END-IF
-                           IF    ( SYS-5001-KHNSRYCD
-                                               =   "099999954"
-                                          OR       "190132410"
-                                          OR       "190132610"
-                                          OR       "190132810"
-                                          OR       "190133010"
-                                          OR       "190133210"
-                                          OR       "190133410"
-                                          OR       "190133610"
-                                          OR       "190133810"
-                                          OR       "190134010" )
-                               IF    ( SYS-5111-SRYCD
-                                               =   "190121310"
-                                          OR       "190121410"
-                                          OR       "190121510"
-                                          OR       "190121610"
-                                          OR       "190121710"
-                                          OR       "190131610"
-                                          OR       "190131810"
-                                          OR       "190132010"
-                                          OR       "190132210"
-                                          OR       "190123710"
-                                          OR       "190123810"
-                                          OR       "190123910"
-                                          OR       "190124010"
-                                          OR       "190124110"
-                                          OR       "190131710"
-                                          OR       "190131910"
-                                          OR       "190132110"
-                                          OR       "190132310" )
-                                   MOVE  ZERO  TO  FLG-TARGET
-                               END-IF
-                           END-IF
-                       END-IF
-      *
-                       IF    ( FLG-TARGET  =   1 )
-      *
-                           MOVE    SYS-5111-BRM-TOKUTEINYUIN-NM
-                                                   TO  WRK-TOKNYUIN-NM
-                           MOVE    "3"             TO  WRK-TOKNYUIN-KBN
-                           MOVE    SYS-5111-KBNCD
-                                                   TO  WRK-TOKNYUIN-CD
-                           MOVE    SYS-5111-BRM-NYUINRYOKBN
-                                           TO  WRK-TOKNYUIN-NYUINRYOKBN
-                           MOVE    SYS-5111-SRYCD
-                                               TO  WRK-TOKNYUIN-SRYCD-X
-                           PERFORM 4101-CMB-TOKNYUIN-DAT-SET-SEC
-                       END-IF
-      *
-                       PERFORM 900-SYSKANRI-KEY23-FET-SEC
-                       MOVE    SYSKANRI-REC    TO  SYS-5111-REC
-      *
-                   END-PERFORM
-                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
-                   MOVE    "key23"             TO  MCP-PATHNAME
-                   PERFORM 910-DBCLOSECURSOR-SEC
+                   IF    ( SYS-5001-BTU-SBT    =   "04" )
+                       MOVE    1           TO  FLG-RYOYOKHN
+                   ELSE
+                       MOVE    2           TO  FLG-RYOYOKHN
+                   END-IF
+                   PERFORM 410111-RYOYOKHN-EDIT-SEC
                END-IF
       *
                IF    ( SYS-5001-BTU-TOKTEI-NYUIN   NOT =   SPACE )
@@ -5370,16 +5236,25 @@
            PERFORM 4801-RJN-TAISYO-CHK-SEC
            IF    ( FLG-RJN         =   1 )
             OR   ( WRK-KJNYMD     >=  CONST-H220401 )
-               MOVE    "5111"      TO  WRK-KANRICD
-               MOVE    "22"        TO  WRK-KBNCD
-               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-               PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+               IF    ( WRK-KJNYMD     >=  CONST-H220401 )
+                 EVALUATE  TRUE
+                 WHEN  ( WRK-KJNYMD   >=  CONST-H240401 )
+                   AND ( SYS-5001-BTU-TOKTEI-NYUIN
+                                       =  "33" OR "34" )
+                     MOVE    3         TO  FLG-RYOYOKHN
+                     PERFORM 410111-RYOYOKHN-EDIT-SEC
+                 WHEN  ( SPA-NAI-I01-BTUSBT  =   "01" OR "05" OR "06" )
+                   MOVE    "5111"      TO  WRK-KANRICD
+                   MOVE    "22"        TO  WRK-KBNCD
+                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
       *
-               MOVE    "5111"      TO  WRK-KANRICD
-               MOVE    "24"        TO  WRK-KBNCD
-               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-               PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
-      *
+                   MOVE    "5111"      TO  WRK-KANRICD
+                   MOVE    "24"        TO  WRK-KBNCD
+                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                 END-EVALUATE
+             END-IF
            END-IF
       *
       *    Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ¤ò¥³¥ó¥Ü¤ËÀßÄê
@@ -5395,6 +5270,158 @@
       *
            .
        41011-CMB-TOKNYUIN-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁÊÔ½¸½èÍý
+      *****************************************************************
+       410111-RYOYOKHN-EDIT-SEC      SECTION.
+      *
+           MOVE    1               TO  SPA-NAI-I01-SELNYUKHN
+      *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "5111"          TO  SYS-KANRICD
+           MOVE    WRK-KJNYMD      TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY23-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-5111-REC
+           PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
+      *
+               MOVE    ZERO        TO  FLG-TARGET
+      *
+               IF    ( FLG-RYOYOKHN                =   1 OR 3)
+                AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "05" )
+                   IF    ( FLG-LIFE-RJN    =   ZERO OR 2)
+                       IF    ( SYS-5111-SEIKATU-RYOKBN
+                                               =   SPACE )
+                           MOVE    1   TO  FLG-TARGET
+                       END-IF
+                   END-IF
+                   IF    ( FLG-LIFE-RJN    =   1    OR 2)
+                       IF    ( SYS-5111-SEIKATU-RYOKBN
+                                           NOT =   SPACE )
+                               MOVE    1   TO  FLG-TARGET
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-RYOYOKHN                =   2 )
+                AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "06" )
+                   IF    ( FLG-LIFE-RJN        =   ZERO OR 2)
+                       IF    ( SYS-5111-SEIKATU-RYOKBN
+                                                   =   SPACE )
+                           MOVE    1   TO  FLG-TARGET
+                       END-IF
+                   END-IF
+                   IF    ( FLG-LIFE-RJN        =   1    OR 2)
+                       IF    ( SYS-5111-SEIKATU-RYOKBN
+                                               NOT =   SPACE )
+                           MOVE    1   TO  FLG-TARGET
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( WRK-KJNYMD  >=  CONST-H220401 )
+                   IF    ( SYS-5111-SRYCD
+                                       =   "099999953"
+                                        OR "099999954" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                   END-IF
+                   IF   (( FLG-RYOYOKHN    =   1 )
+                    AND  ( SYS-5001-KHNSRYCD
+                                       =   SPACE
+                                  OR       "099999953"
+                                  OR       "190121310"
+                                  OR       "190121410"
+                                  OR       "190121510"
+                                  OR       "190121610"
+                                  OR       "190121710"
+                                  OR       "190131610"
+                                  OR       "190132010"
+                                  OR       "190132210" ))
+                    OR   ( FLG-RYOYOKHN    =   3 )
+                       IF    ( SYS-5111-SRYCD
+                                       =   "190132410"
+                                  OR       "190132610"
+                                  OR       "190132810"
+                                  OR       "190133010"
+                                  OR       "190133210"
+                                  OR       "190133410"
+                                  OR       "190133610"
+                                  OR       "190133810"
+                                  OR       "190134010"
+                                  OR       "190132510"
+                                  OR       "190132710"
+                                  OR       "190132910"
+                                  OR       "190133110"
+                                  OR       "190133310"
+                                  OR       "190133510"
+                                  OR       "190133710"
+                                  OR       "190133910"
+                                  OR       "190134110" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                   END-IF
+                   IF   (( FLG-RYOYOKHN    =   1 )
+                    AND  ( SYS-5001-KHNSRYCD
+                                       =   "099999954"
+                                  OR       "190132410"
+                                  OR       "190132610"
+                                  OR       "190132810"
+                                  OR       "190133010"
+                                  OR       "190133210"
+                                  OR       "190133410"
+                                  OR       "190133610"
+                                  OR       "190133810"
+                                  OR       "190134010" ))
+                       IF    ( SYS-5111-SRYCD
+                                       =   "190121310"
+                                  OR       "190121410"
+                                  OR       "190121510"
+                                  OR       "190121610"
+                                  OR       "190121710"
+                                  OR       "190131610"
+                                  OR       "190131810"
+                                  OR       "190132010"
+                                  OR       "190132210"
+                                  OR       "190123710"
+                                  OR       "190123810"
+                                  OR       "190123910"
+                                  OR       "190124010"
+                                  OR       "190124110"
+                                  OR       "190131710"
+                                  OR       "190131910"
+                                  OR       "190132110"
+                                  OR       "190132310" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-TARGET  =   1 )
+      *
+                   MOVE    SYS-5111-BRM-TOKUTEINYUIN-NM
+                                           TO  WRK-TOKNYUIN-NM
+                   MOVE    "3"             TO  WRK-TOKNYUIN-KBN
+                   MOVE    SYS-5111-KBNCD
+                                           TO  WRK-TOKNYUIN-CD
+                   MOVE    SYS-5111-BRM-NYUINRYOKBN
+                                   TO  WRK-TOKNYUIN-NYUINRYOKBN
+                   MOVE    SYS-5111-SRYCD
+                                       TO  WRK-TOKNYUIN-SRYCD-X
+                   PERFORM 4101-CMB-TOKNYUIN-DAT-SET-SEC
+               END-IF
+      *
+               PERFORM 900-SYSKANRI-KEY23-FET-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-5111-REC
+      *
+           END-PERFORM
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       410111-RYOYOKHN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    Æþ±¡ÎÁ²Ã»»¥³¥ó¥Ü½é´üÀßÄê½èÍý

@@ -5942,23 +5942,36 @@
                IF    ( SPA-GMN-W20-TOKNYUIN-G      =   SPACE )
       *
       *            病棟種別が設定されていること
-                   IF    ( SPA-GMN-W20-SBT     NOT =   SPACE )
-                       CONTINUE
-                   ELSE
-                       MOVE    "1009"  TO  SPA-ERRCD
-                       MOVE    6       TO  SPA-GMN-W20-CUR
-                       GO  TO  4900-KANRENCHK-EXT
+                   IF    ( SPA-ERRCD       =   SPACE )
+                       IF    ( SPA-GMN-W20-SBT     NOT =   SPACE )
+                           CONTINUE
+                       ELSE
+                           MOVE    "1009"  TO  SPA-ERRCD
+                           MOVE    6       TO  SPA-GMN-W20-CUR
+                       END-IF
                    END-IF
       *
       *            入院基本料が算定されていること
-                   IF    ( SPA-GMN-W20-KHNRYO      =   SPACE )
-                       IF    ( SPA-GMN-W20-SBT       =   "04" OR "09"  )
-                        AND  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H180701 )
-                            CONTINUE
-                       ELSE
-                           MOVE    "1014"  TO  SPA-ERRCD
-                           GO  TO  4900-KANRENCHK-EXT
+                   IF    ( SPA-ERRCD       =   SPACE )
+                       IF    ( SPA-GMN-W20-KHNRYO   =   SPACE )
+                           IF    ( SPA-GMN-W20-SBT  =   "04" OR "09"  )
+                            AND  ( SPA-NAI-W20-YUKOSTYMD
+                                                   >=  CONST-H180701 )
+                               CONTINUE
+                           ELSE
+                               MOVE    "1014"  TO  SPA-ERRCD
+                           END-IF
                        END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+      *        特定一般病棟入院料選択時、病棟種別は一般病棟であること
+               IF    ( SPA-NAI-W20-TOKNYUIN    =   "33" OR "34")
+                   IF    ( SPA-GMN-W20-SBT NOT =   "01" )
+                       MOVE    "1112"  TO  SPA-ERRCD
+                       MOVE    6       TO  SPA-GMN-W20-CUR
                    END-IF
                END-IF
            END-IF
@@ -8213,6 +8226,14 @@
                STRING  "有効期間の開始日が平成２４年４月１日以降の"
                                            DELIMITED   BY  SIZE
                        "病棟のみ入院料加算の追加設定が可能です"
+                                           DELIMITED   BY  SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "1112"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "特定一般病棟入院料算定時は"
+                                           DELIMITED   BY  SIZE
+                       "病棟種別を一般病棟にしてください"
                                            DELIMITED   BY  SIZE
                INTO    SPA-ERRMSG
                END-STRING
