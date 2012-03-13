@@ -901,6 +901,15 @@
                WHEN    "34"
       *                фцдЙ╟ЛхлибеОфЧ╠║наё╡
                        MOVE   "190152010"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "35"
+      *                немэиб╬╡║╕м╜╬╡©гне╫ЙфЧ╠║╢Пкэнаё╠
+                       MOVE   "099999950"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "36"
+      *                немэиб╬╡║╕м╜╬╡©гне╫ЙфЧ╠║╢Пкэнаё╡
+                       MOVE   "099999951"   TO  LNK-TOKNYUIN-SRYCD
+               WHEN    "37"
+      *                немэиб╬╡║╕м╜╬╡©гне╫ЙфЧ╠║╢ПкэнаёЁ
+                       MOVE   "099999952"   TO  LNK-TOKNYUIN-SRYCD
              END-EVALUATE
            END-IF
       *
