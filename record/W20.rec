@@ -89,6 +89,18 @@ W20	{
 			item	varchar(13)[10];
 			state	int;
 		};
+		LBLRYOYOKBN	{
+			value	varchar(40);
+		};
+		CMB_RYOYOKBN	{
+			RYOYOKBN	{
+				value	varchar(52);
+				state	int;
+			};
+			count	int;
+			item	varchar(52)[10];
+			state	int;
+		};
 		SELNUM	{
 			value	number(2);
 		};

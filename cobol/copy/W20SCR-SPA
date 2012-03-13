@@ -67,6 +67,11 @@
                  11  SPA-GMN-W20-RECEDSPKBN        PIC X(02).
                  11  SPA-GMN-W20-RECEDSPKBNFL      PIC X(01).
                  11  SPA-GMN-W20-RECEDSPKBNMEI     PIC X(10).
+      *        Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡ªªƒÍ∂Ë ¨
+               09  SPA-GMN-W20-RYOYOKBN-G.
+                 11  SPA-GMN-W20-RYOYOKBN          PIC X(01).
+                 11  SPA-GMN-W20-RYOYOKBNFL        PIC X(01).
+                 11  SPA-GMN-W20-RYOYOKBNMEI       PIC X(50).
       *        æÆµ¨≥ …¬≈Ô…¬æ≤øÙ≤√ªª
                09  SPA-GMN-W20-SYOUBTUBRM-G.
                  11  SPA-GMN-W20-SYOUBTUBRM        PIC X(02).
@@ -298,6 +303,13 @@
                    13  SPA-GMN-W20-SBTL            PIC X(02).
                    13  SPA-GMN-W20-SBTFL1          PIC X(01).
                    13  SPA-GMN-W20-SBTMEIL         PIC X(20).
+      *        Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡ªªƒÍ∂Ë ¨
+               09  SPA-GMN-W20-RYOYOKBNLST-G.
+                 11  SPA-GMN-W20-RYOYOKBN-MAX      PIC 9(03).
+                 11  SPA-GMN-W20-RYOYOKBNLST       OCCURS  10.
+                   13  SPA-GMN-W20-RYOYOKBNL       PIC X(01).
+                   13  SPA-GMN-W20-RYOYOKBNFL1     PIC X(01).
+                   13  SPA-GMN-W20-RYOYOKBNMEIL    PIC X(50).
       *        •Ï•ª•◊•»…Ωº®∂Ë ¨•≥•Û•‹
                09  SPA-GMN-W20-RECEDSPKBNLST-G.
                  11  SPA-GMN-W20-RECEDSPKBN-MAX    PIC 9(03).

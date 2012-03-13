@@ -323,6 +323,8 @@
                05  WRK-ZZZ9                PIC ZZZ9.
                05  WRK-ZZZZ9               PIC ZZZZ9.
                05  WRK-ZZZZZ9              PIC ZZZZZ9.
+           03  WRK-KBN1-G.
+               05  WRK-KBN1                PIC 9(01).
            03  WRK-SAGAKU.
                05  WRK-SAGAKU-NUM          PIC ZZZZZ9.
                05  WRK-SAGAKU-EN           PIC X(02).
@@ -841,11 +843,11 @@
       *
        01  SSTKJN-AREA.
            03  SSTKJN-VAL.
-               05  SSTKJN-VAL1                     PIC X(500).
-               05  SSTKJN-VAL2                     PIC X(500).
+               05  SSTKJN-VAL-OCC                  PIC X(500)
+                                                   OCCURS  7.
            03  SSTKJN-R    REDEFINES       SSTKJN-VAL.
-               05  SSTKJN-CD                       PIC 9(01)
-                                                   OCCURS  1000.
+               05  SSTKJN-CD                       PIC X(01)
+                                                   OCCURS  3500.
       *
            COPY    "CPLNKS08.INC".
       *
@@ -5236,24 +5238,45 @@
            PERFORM 4801-RJN-TAISYO-CHK-SEC
            IF    ( FLG-RJN         =   1 )
             OR   ( WRK-KJNYMD     >=  CONST-H220401 )
-               IF    ( WRK-KJNYMD     >=  CONST-H220401 )
-                 EVALUATE  TRUE
-                 WHEN  ( WRK-KJNYMD   >=  CONST-H240401 )
-                   AND ( SYS-5001-BTU-TOKTEI-NYUIN
-                                       =  "33" OR "34" )
-                     MOVE    3         TO  FLG-RYOYOKHN
-                     PERFORM 410111-RYOYOKHN-EDIT-SEC
-                 WHEN  ( SPA-NAI-I01-BTUSBT  =   "01" OR "05" OR "06" )
-                   MOVE    "5111"      TO  WRK-KANRICD
-                   MOVE    "22"        TO  WRK-KBNCD
-                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+             IF    ( WRK-KJNYMD     >=  CONST-H220401 )
+               EVALUATE  TRUE
+               WHEN  ( WRK-KJNYMD   >=  CONST-H240401 )
+                AND  ( SPA-NAI-I01-BTUSBT  =   "08" )
+                AND  ( SYS-5001-CRYOYOKBN  =   "1" )
+                   MOVE    4         TO  FLG-RYOYOKHN
+                   PERFORM 410111-RYOYOKHN-EDIT-SEC
+               WHEN  ( WRK-KJNYMD   >=  CONST-H240401 )
+                AND  ( SPA-NAI-I01-BTUSBT  =   "09" )
+                   MOVE    "5110"      TO  WRK-KANRICD
+                   MOVE    "2"         TO  WRK-TOKNYUIN-KBN
                    PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   EVALUATE    SYS-5001-CRYOYOKBN
+                   WHEN    "1"
+                       MOVE    "35"  TO  WRK-KBNCD
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   WHEN    "2"
+                       MOVE    "36"  TO  WRK-KBNCD
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   WHEN    "3"
+                       MOVE    "37"  TO  WRK-KBNCD
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   END-EVALUATE
+               WHEN  ( WRK-KJNYMD   >=  CONST-H240401 )
+                 AND ( SYS-5001-BTU-TOKTEI-NYUIN
+                                     =  "33" OR "34" )
+                   MOVE    3         TO  FLG-RYOYOKHN
+                   PERFORM 410111-RYOYOKHN-EDIT-SEC
+               WHEN  ( SPA-NAI-I01-BTUSBT  =   "01" OR "05" OR "06" )
+                 MOVE    "5111"      TO  WRK-KANRICD
+                 MOVE    "22"        TO  WRK-KBNCD
+                 MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                 PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
       *
-                   MOVE    "5111"      TO  WRK-KANRICD
-                   MOVE    "24"        TO  WRK-KBNCD
-                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
-                 END-EVALUATE
+                 MOVE    "5111"      TO  WRK-KANRICD
+                 MOVE    "24"        TO  WRK-KBNCD
+                 MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                 PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+               END-EVALUATE
              END-IF
            END-IF
       *
@@ -5305,7 +5328,7 @@
                    END-IF
                END-IF
       *
-               IF    ( FLG-RYOYOKHN                =   2 )
+               IF    ( FLG-RYOYOKHN                =   2 OR 4)
                 AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "06" )
                    IF    ( FLG-LIFE-RJN        =   ZERO OR 2)
                        IF    ( SYS-5111-SEIKATU-RYOKBN
@@ -5735,12 +5758,12 @@
       *
                MOVE    SYSKANRI-REC    TO  SYS-1006-REC
       *
-               EVALUATE    SYS-1006-KBNCD
-               WHEN    "1"
-                   MOVE    SYS-1006-TBL    TO  SSTKJN-VAL1
-               WHEN    "2"
-                   MOVE    SYS-1006-TBL    TO  SSTKJN-VAL2
-               END-EVALUATE
+               IF    ( SYS-1006-KBNCD  >=  "1" )
+                AND  ( SYS-1006-KBNCD  <=  "7" )
+                   MOVE    SYS-1006-KBNCD  TO  WRK-KBN1-G
+                   MOVE    SYS-1006-TBL    TO  SSTKJN-VAL-OCC
+                                                     (WRK-KBN1)
+               END-IF
       *
                PERFORM 900-SYSKANRI-KEY2-FET-SEC
       *
@@ -6080,7 +6103,8 @@
                END-IF
       *
                IF    ( SPA-GMN-I01-TOKNYUIN-ITM2 (IDX10)
-                                   = "224" OR "225" )
+                                   = "224" OR "225"
+                                  OR "235" OR "236" OR "237" )
                            MOVE    ZERO    TO  FLG-TARGET
                END-IF
       *
