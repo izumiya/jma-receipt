@@ -171,6 +171,8 @@
       *    後発品・先発品あり
       *    03  FLG-KOUHATU-ARI         PIC 9(01).
       *---(04.02.00) LINE ADD END   ------------------------------------
+      *H24.4
+           03  FLG-FUKACHK             PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -2885,6 +2887,7 @@
        310391-FUKACHK-SEC             SECTION.
       *
            INITIALIZE                      WRK-FUKA-MEI-AREA
+           MOVE    ZERO                TO  FLG-FUKACHK
       *
            COMPUTE IDXF2               =   IDXA    +   1
            PERFORM VARYING     IDXF    FROM    IDXF2   BY  1
@@ -2898,6 +2901,7 @@
                        PERFORM 31039-KOUHATU-NAME-SEC
                        MOVE    1               TO  FLG-KOUHATUFUKA-IN
                        MOVE    "×"            TO  WRK-HEN-FUKA
+                       MOVE    1               TO  FLG-FUKACHK
                    WHEN    "099209905"
       *                含量規格変更不可
                        MOVE    2                       TO  IDXF3
@@ -2911,13 +2915,24 @@
                    WHEN    "099209907"
       *                銘柄名記載
                        MOVE    1                   TO  WRK-IPNMEI
+                       MOVE    1                   TO  FLG-FUKACHK
                    WHEN    "099209908"
       *                一般名記載
                        MOVE    2                   TO  WRK-IPNMEI
+                       MOVE    1                   TO  FLG-FUKACHK
                    WHEN    OTHER
                        MOVE    WRK-SRY-MAX         TO  IDXF
                END-EVALUATE
            END-PERFORM
+      *
+           IF     (FLG-FUKACHK         =   ZERO    )
+              AND (SYS-1030-KOUHATUKA  =   "0"     )
+      *        後発医薬品へ変更不可
+               MOVE    1                   TO  IDXF3
+               MOVE    "099209903"         TO  WRK-SRYCD
+               PERFORM 31039-KOUHATU-NAME-SEC
+               MOVE    2                   TO  FLG-FUKACHK
+           END-IF
            .
        310391-FUKACHK-EXT.
            EXIT.
@@ -2997,6 +3012,21 @@
                IF     (FLG-SYOHO-IN        =   2  )  AND
                       (TNSP-IPN-KISAIKBN   =   1  )
                    MOVE    ZERO                TO  TNSP-IPN-KISAIKBN
+               END-IF
+      *
+      *        システム管理の後発品変更不可の判定
+               IF      FLG-FUKACHK         =   2
+      *            先発品のみは、変更不可記載なし
+                   IF     (TNS-KOUHATUKBN      =   ZERO )
+                     OR   (TNSP-IPN-KISAIKBN   =   1    )
+                       MOVE    SPACE           TO  WRK-KOU-SRYCD (1)
+                       MOVE    SPACE           TO  WRK-KOU-TNSNAME(1)
+                       MOVE    SPACE           TO  WRK-HEN-FUKA
+                   ELSE
+      *                変更不可とする
+                       MOVE    1               TO  FLG-KOUHATUFUKA-IN
+                       MOVE    "×"            TO  WRK-HEN-FUKA
+                   END-IF
                END-IF
       *
       *        一般名・処方名称記載
@@ -4557,6 +4587,14 @@
            ELSE
                INITIALIZE                      TENSUPLUS-REC
            END-IF
+      *H24.4
+      *    システム管理の変更可によってすべて一般名記載とする
+           IF     (TNSP-IPN-KISAIKBN   NOT =   2       )
+              AND (SYS-1030-KOUHATUKA      =   "1"     )
+              AND (TNS-KOUHATUKBN          =   1  OR  2  )
+               MOVE    1               TO  TNSP-IPN-KISAIKBN
+           END-IF
+      *
       *    一般名記載あり
            IF     (TNSP-IPN-KISAIKBN   =   1  )
              OR   (WRK-IPNMEI          =   2  )

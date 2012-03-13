@@ -3845,9 +3845,9 @@
            IF      SPA-SRYYMD          >=  "20120401"
                IF     (TNS-SRYCD(1:1)      =   "6"  )
                  AND ((TNS-KOUHATUKBN      =   1  OR  2 )  OR
-                      (TNSP-IPN-KISAIKBN   =   "1"  ))
+                      (TNSP-IPN-KISAIKBN   =   1    ))
       *            後発品・後発のある先発品の最低薬価
-                   IF      TNSP-IPN-KISAIKBN   =   "1"
+                   IF      TNSP-IPN-KISAIKBN   =   1
                        MOVE    9               TO  SPA-COM-KOKUJISKBKBN2
                                                                (IDX-T)
                    END-IF
@@ -3996,7 +3996,7 @@
       *H24.4
            MOVE    SPACE               TO  WRK-MSG1
            IF      SPA-SRYYMD          >=  "20120401"
-               IF     (TNSP-IPN-KISAIKBN   =   "1"  )
+               IF     (TNSP-IPN-KISAIKBN   =   1    )
       *            一般名記載あり
                    MOVE    "般"                TO  WRK-MSG1
                END-IF
@@ -5265,6 +5265,18 @@
                                        OR  "6"  ) AND
                   (FLG-TENSU           =   ZERO)
                PERFORM 9101-TENSUPLUS-SYORI-SEC
+      *H24.4
+      *        システム管理の変更可によって一般名記載とする
+               IF     (SPA-SRYYMD          >=  "20120401"  )
+                 AND  (SPA-KOUHATUKA       =   "1"         )
+                   IF     (TNSP-IPN-KISAIKBN   =   2    )   OR
+                          (TNS-KOUHATUKBN      =   ZERO )
+      *                処方名記載、先発品は変更なし
+                       CONTINUE
+                   ELSE
+                       MOVE    1               TO  TNSP-IPN-KISAIKBN
+                   END-IF
+               END-IF
            ELSE
                MOVE    SPACE               TO  TENSUPLUS-REC
                INITIALIZE                      TENSUPLUS-REC

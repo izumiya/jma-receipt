@@ -464,10 +464,13 @@
       *    Ｈ２０．４改正に合わせて変更
            MOVE    "0"                 TO  SPA-GMN-KOUHATUKALST(1)
            MOVE    "変更不可"          TO  SPA-GMN-KOUHATUKALST(1)(3:)
+      *H24.4
            MOVE    "1"                 TO  SPA-GMN-KOUHATUKALST(2)
-           MOVE    "変更可"            TO  SPA-GMN-KOUHATUKALST(2)(3:)
+           MOVE    "変更可（一般）"    TO  SPA-GMN-KOUHATUKALST(2)(3:)
            MOVE    "2"                 TO  SPA-GMN-KOUHATUKALST(3)
-           MOVE    "変更可（後発）"    TO  SPA-GMN-KOUHATUKALST(3)(3:)
+     ***** MOVE    "変更可（後発）"    TO  SPA-GMN-KOUHATUKALST(3)(3:)
+           MOVE    "変更可（点数マスタ）"
+                                       TO  SPA-GMN-KOUHATUKALST(3)(3:)
            MOVE    3                   TO  SPA-GMN-KOUHATUKA-MAX
       *
            MOVE    SPACE               TO  SYSKANRI-REC
