@@ -122,6 +122,7 @@
       *
       *    添字領域
        01  IDX-AREA.
+           03  IDX                         PIC 9(05).
            03  IDX0                        PIC 9(05).
            03  IDX1                        PIC 9(05).
            03  IDX2                        PIC 9(05).
@@ -1394,8 +1395,13 @@
                PERFORM 4801-TOKTEI-NYUIN-SET-SEC
       *        特定一般病棟入院料の場合は期間加算が存在するため、
       *        初期加算サブを呼び出す（平成２４年改正で追加）
+      *        療養病床で有床診療所入院基本料を相互算定する場合も
+      *        初期加算サブを呼び出す（平成２４年改正で追加）
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
-                                                "190152010"
+                                                "190152010"   OR
+                                                "099999950"   OR
+                                                "099999951"   OR
+                                                "099999952"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -3206,6 +3212,46 @@
                   MOVE   1         TO  LNK-SCNYUACCT-NYUCAL-KBN
            ELSE
                   MOVE   ZERO      TO  LNK-SCNYUACCT-NYUCAL-KBN
+           END-IF
+      *
+      *    有床診療所入院基本料の相互算定コード置き換え
+           IF     LNK-SCNYUACCT-STSRYYMD   >=   "20120401"
+               IF  (SYS-5001-BTU-SBT       =    "09")  AND
+                   (SYS-5001-CRYOYOKBN     =    "1" )
+                  PERFORM    VARYING   IDX  FROM   1  BY  1
+                    UNTIL (LNK-SCNYUACCT-KAGEN-SRYCD(IDX)  =  SPACE) OR
+                          (IDX           >   10)
+                      EVALUATE   LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190097010"
+                             MOVE "190153410" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190119510"
+                             MOVE "190153610" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190119610"
+                             MOVE "190153810" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190097210"
+                             MOVE "190154010" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190119710"
+                             MOVE "190154210" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190119810"
+                             MOVE "190154410" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190135110"
+                             MOVE "190154610" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190135210"
+                             MOVE "190154810" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190135310"
+                             MOVE "190155010" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                      END-EVALUATE
+                  END-PERFORM
+               END-IF
            END-IF
       *
       *     DISPLAY   "********ORCSNYUACCT MAE **********"
