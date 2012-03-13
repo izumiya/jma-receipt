@@ -3022,6 +3022,7 @@
                        MOVE    SPACE           TO  WRK-KOU-SRYCD (1)
                        MOVE    SPACE           TO  WRK-KOU-TNSNAME(1)
                        MOVE    SPACE           TO  WRK-HEN-FUKA
+                       MOVE    ZERO            TO  FLG-FUKACHK
                    ELSE
       *                変更不可とする
                        MOVE    1               TO  FLG-KOUHATUFUKA-IN
