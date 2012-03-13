@@ -1869,6 +1869,37 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "8070"
+                   STRING  "初期加算（リハビリテーション料）を"
+                           "算定できる期間ではありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "8071"
+                   STRING  "初診料算定日より２年以上経過しています。"
+                           "算定できません。"
+                                       DELIMITED  BY  SPACE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K870"
+                   STRING  "警告！"
+                           "初期加算（リハビリテーション料）を"
+                           "算定できる期間ではありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K871"
+                   STRING  "警告！脳血管疾患等リハビリテーション"
+                           "発症日から１８０日以内です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K872"
+                   STRING  "警告！運動器リハビリテーション"
+                           "発症日から１５０日以内です。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
