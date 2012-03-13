@@ -23620,7 +23620,11 @@
       *    ∆√ƒÍ∆˛±°§«§ŒªªƒÍ∫—∆¸øÙ§ÚºË∆¿Õ—
       *    ∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡
       *    µﬂÃøµﬂµﬁ∆˛±°Œ¡£±
+      *    µﬂÃøµﬂµﬁ∆˛±°Œ¡£±° π‚≈Ÿ°À
+      *    µﬂÃøµﬂµﬁ∆˛±°Œ¡£±° £¡°À
       *    µﬂÃøµﬂµﬁ∆˛±°Œ¡£≤
+      *    µﬂÃøµﬂµﬁ∆˛±°Œ¡£≤° π‚≈Ÿ°À
+      *    µﬂÃøµﬂµﬁ∆˛±°Œ¡£≤° £¡°À
       *    ∞ÏŒ‡¥∂¿˜æ…¥µº‘∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
       *    π≠»œ∞œ«ÆΩ˝∆√ƒÍΩ∏√Êº£Œ≈ºº¥…Õ˝Œ¡
       *    •œ•§•±•¢•Ê•À•√•»∆˛±°∞ÂŒ≈¥…Õ˝Œ¡
@@ -23641,82 +23645,138 @@
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                EVALUATE   PTNYUINRRK-TOKUTEI-NYUIN
                    WHEN   "03"
-                   WHEN   "04"
-                   WHEN   "05"
                        MOVE   "190024510"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190128610"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190074510"  TO  STUSAN-TOKUTEI-SRYCD(3)
-                       MOVE   "190110210"  TO  STUSAN-TOKUTEI-SRYCD(4)
-                       MOVE   "190129110"  TO  STUSAN-TOKUTEI-SRYCD(5)
-                       MOVE   "190110610"  TO  STUSAN-TOKUTEI-SRYCD(6)
-                       MOVE   "190110310"  TO  STUSAN-TOKUTEI-SRYCD(7)
-                       MOVE   "190128910"  TO  STUSAN-TOKUTEI-SRYCD(8)
-                       MOVE   "190110710"  TO  STUSAN-TOKUTEI-SRYCD(9)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190714410"  TO  STUSAN-TOKUTEI-SRYCD(4)
+                       MOVE   "190714510"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190714610"  TO  STUSAN-TOKUTEI-SRYCD(6)
+                   WHEN   "04"
+                       MOVE   "190110210"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                       MOVE   "190129110"  TO  STUSAN-TOKUTEI-SRYCD(2)
+                       MOVE   "190110610"  TO  STUSAN-TOKUTEI-SRYCD(3)
+                   WHEN   "05"
+                       MOVE   "190110310"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                       MOVE   "190128910"  TO  STUSAN-TOKUTEI-SRYCD(2)
+                       MOVE   "190110710"  TO  STUSAN-TOKUTEI-SRYCD(3)
                    WHEN   "06"
-                   WHEN   "07"
-                   WHEN   "08"
                        MOVE   "190024310"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190128710"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190024410"  TO  STUSAN-TOKUTEI-SRYCD(3)
-                       MOVE   "190110410"  TO  STUSAN-TOKUTEI-SRYCD(4)
-                       MOVE   "190129210"  TO  STUSAN-TOKUTEI-SRYCD(5)
-                       MOVE   "190110810"  TO  STUSAN-TOKUTEI-SRYCD(6)
-                       MOVE   "190110510"  TO  STUSAN-TOKUTEI-SRYCD(7)
-                       MOVE   "190129010"  TO  STUSAN-TOKUTEI-SRYCD(8)
-                       MOVE   "190110910"  TO  STUSAN-TOKUTEI-SRYCD(9)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190714710"  TO  STUSAN-TOKUTEI-SRYCD(4)
+                       MOVE   "190714810"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190714910"  TO  STUSAN-TOKUTEI-SRYCD(6)
+                   WHEN   "07"
+                       MOVE   "190110410"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                       MOVE   "190129210"  TO  STUSAN-TOKUTEI-SRYCD(2)
+                       MOVE   "190110810"  TO  STUSAN-TOKUTEI-SRYCD(3)
+                   WHEN   "08"
+                       MOVE   "190110510"  TO  STUSAN-TOKUTEI-SRYCD(1)
+                       MOVE   "190129010"  TO  STUSAN-TOKUTEI-SRYCD(2)
+                       MOVE   "190110910"  TO  STUSAN-TOKUTEI-SRYCD(3)
                    WHEN   "09"
                    WHEN   "16"
                        MOVE   "190024610"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190074610"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190116310"  TO  STUSAN-TOKUTEI-SRYCD(3)
                        MOVE   "190116410"  TO  STUSAN-TOKUTEI-SRYCD(4)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190717210"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190717310"  TO  STUSAN-TOKUTEI-SRYCD(6)
                    WHEN   "14"
                        MOVE   "190075510"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190075610"  TO  STUSAN-TOKUTEI-SRYCD(2)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190718710"  TO  STUSAN-TOKUTEI-SRYCD(3)
+                       MOVE   "190718810"  TO  STUSAN-TOKUTEI-SRYCD(4)
                    WHEN   "13"
                        MOVE   "190024810"  TO  STUSAN-TOKUTEI-SRYCD(1)
                    WHEN   "17"
                        MOVE   "190117310"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190717810"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "18"
                        MOVE   "190117410"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190720110"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "19"
                        MOVE   "190120810"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190717910"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "54"
                        MOVE   "190129910"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190720210"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "55"
                        MOVE   "190138110"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190138210"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190138310"  TO  STUSAN-TOKUTEI-SRYCD(3)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190715010"  TO  STUSAN-TOKUTEI-SRYCD(4)
+                       MOVE   "190715110"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190715210"  TO  STUSAN-TOKUTEI-SRYCD(6)
                    WHEN   "56"
                        MOVE   "190138410"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190138510"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190138610"  TO  STUSAN-TOKUTEI-SRYCD(3)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190715310"  TO  STUSAN-TOKUTEI-SRYCD(4)
+                       MOVE   "190715410"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190715510"  TO  STUSAN-TOKUTEI-SRYCD(6)
                    WHEN   "57"
                        MOVE   "190138710"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190138810"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190138910"  TO  STUSAN-TOKUTEI-SRYCD(3)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190715610"  TO  STUSAN-TOKUTEI-SRYCD(4)
+                       MOVE   "190715710"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190715810"  TO  STUSAN-TOKUTEI-SRYCD(6)
                    WHEN   "58"
                        MOVE   "190139010"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190139110"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190139210"  TO  STUSAN-TOKUTEI-SRYCD(3)
                        MOVE   "190139310"  TO  STUSAN-TOKUTEI-SRYCD(4)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190715910"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190716010"  TO  STUSAN-TOKUTEI-SRYCD(6)
+                       MOVE   "190716110"  TO  STUSAN-TOKUTEI-SRYCD(7)
+                       MOVE   "190716210"  TO  STUSAN-TOKUTEI-SRYCD(8)
                    WHEN   "59"
                        MOVE   "190139810"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190139910"  TO  STUSAN-TOKUTEI-SRYCD(2)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190717410"  TO  STUSAN-TOKUTEI-SRYCD(3)
+                       MOVE   "190717510"  TO  STUSAN-TOKUTEI-SRYCD(4)
                    WHEN   "60"
                        MOVE   "190140010"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190140110"  TO  STUSAN-TOKUTEI-SRYCD(2)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190717610"  TO  STUSAN-TOKUTEI-SRYCD(3)
+                       MOVE   "190717710"  TO  STUSAN-TOKUTEI-SRYCD(4)
                    WHEN   "91"
                        MOVE   "190149910"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190150010"  TO  STUSAN-TOKUTEI-SRYCD(2)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190718010"  TO  STUSAN-TOKUTEI-SRYCD(3)
+                       MOVE   "190718110"  TO  STUSAN-TOKUTEI-SRYCD(4)
                    WHEN   "92"
                        MOVE   "190150310"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190720310"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "93"
                        MOVE   "190150410"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190720410"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "95"
                        MOVE   "190152610"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190723110"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "96"
                        MOVE   "190152710"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190723210"  TO  STUSAN-TOKUTEI-SRYCD(2)
                END-EVALUATE
            END-IF
       *    ¿∫ø¿≤ µﬁ¿≠¥¸º£Œ≈…¬≈Ô∆˛±°Œ¡£±
@@ -23730,24 +23790,44 @@
                EVALUATE   PTNYUINRRK-TOKUTEI-NYUIN
                    WHEN   "11"
                        MOVE   "190121110"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190721410"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "12"
                        MOVE   "190121210"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190721610"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "24"
                        MOVE   "190121110"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190721410"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "25"
                        MOVE   "190121210"  TO  STUSAN-TOKUTEI-SRYCD(1)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190721610"  TO  STUSAN-TOKUTEI-SRYCD(2)
                    WHEN   "05"
                        MOVE   "190151610"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190739910"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190740010"  TO  STUSAN-TOKUTEI-SRYCD(3)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190722310"  TO  STUSAN-TOKUTEI-SRYCD(4)
+                       MOVE   "190722410"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190722510"  TO  STUSAN-TOKUTEI-SRYCD(6)
                    WHEN   "15"
                        MOVE   "190151710"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190813410"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190813510"  TO  STUSAN-TOKUTEI-SRYCD(3)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190722610"  TO  STUSAN-TOKUTEI-SRYCD(4)
+                       MOVE   "190722710"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190722810"  TO  STUSAN-TOKUTEI-SRYCD(6)
                    WHEN   "09"
                        MOVE   "190028910"  TO  STUSAN-TOKUTEI-SRYCD(1)
                        MOVE   "190150510"  TO  STUSAN-TOKUTEI-SRYCD(2)
                        MOVE   "190150610"  TO  STUSAN-TOKUTEI-SRYCD(3)
+      *                ° ±…¥…∑–≤·¡º√÷°À
+                       MOVE   "190720710"  TO  STUSAN-TOKUTEI-SRYCD(4)
+                       MOVE   "190720810"  TO  STUSAN-TOKUTEI-SRYCD(5)
+                       MOVE   "190720910"  TO  STUSAN-TOKUTEI-SRYCD(6)
                END-EVALUATE
            END-IF
            CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
