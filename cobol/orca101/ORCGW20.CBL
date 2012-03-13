@@ -1603,7 +1603,8 @@
                MOVE    SYSKANRI-REC    TO  SYS-5110-REC
       *
                IF    ( SYS-5110-SEIKATU-RYOKBN NOT =   SPACE )
-                OR   ( SYS-5110-KBNCD  =   "24" OR "25" )
+                OR   ( SYS-5110-KBNCD  =   "24" OR "25"
+                                        OR "35" OR "36" OR "37" )
                    CONTINUE
                ELSE
       *
@@ -2174,6 +2175,9 @@
       *    ¥ì¥»¥×¥ÈÉ½¼¨¶èÊ¬
            MOVE    W20-RECEDSPKBN  TO  SPA-GMN-W20-RECEDSPKBN-G
       *
+      *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬
+           MOVE    W20-RYOYOKBN    TO  SPA-GMN-W20-RYOYOKBN-G
+      *
       *    Í­¸ú´ü´Ö³«»ÏÆü
            MOVE    W20-YUKOSTYMD   TO  SPA-GMN-W20-YUKOSTYMD
       *
@@ -2260,6 +2264,11 @@
            IF    ( SPA-ERRCD       =   SPACE )
       *        ¥ì¥»¥×¥ÈÉ½¼¨¶èÊ¬¥Á¥§¥Ã¥¯½èÍý
                PERFORM 4101-RECEDSPKBN-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+      *        ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬¥Á¥§¥Ã¥¯½èÍý
+               PERFORM 4101-RYOYOKBN-CHK-SEC
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
@@ -3085,6 +3094,15 @@
            MOVE    SPA-GMN-W20-RECEDSPKBN
                                        TO  SYS-5001-RECEDSPKBN
       *
+      *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬
+           IF  ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H240401 )
+            AND( SPA-GMN-W20-SBT        =   "08" OR "09" )
+               MOVE    SPA-GMN-W20-RYOYOKBN
+                                       TO  SYS-5001-CRYOYOKBN
+           ELSE
+               MOVE    "0"             TO  SYS-5001-CRYOYOKBN
+           END-IF
+      *
            PERFORM 42011-KHNRYO-EDIT-SEC
       *
       *    ÉÂÅï½ªÎ»¶èÊ¬
@@ -3841,11 +3859,13 @@
                INITIALIZE  SPA-NAI-W20-KHNSRYCDLST-G
                            SPA-GMN-W20-KHNRYOLST-G
                            SPA-NAI-W20-KHNTENLST-G
+                           SPA-GMN-W20-RYOYOKBNLST-G
       *
                INITIALIZE  SPA-GMN-W20-KHNRYO-G
                            SPA-NAI-W20-KHNSRYCD
                            SPA-NAI-W20-KHNTEN
                            SPA-GMN-W20-RECEDSPKBN-G
+                           SPA-GMN-W20-RYOYOKBN-G
                            SPA-NAI-W20-SBT-MOT
                GO  TO  4100-SBT-CHK-EXT
            END-IF
@@ -3871,11 +3891,13 @@
            INITIALIZE      SPA-NAI-W20-KHNSRYCDLST-G
                            SPA-GMN-W20-KHNRYOLST-G
                            SPA-NAI-W20-KHNTENLST-G
+                           SPA-GMN-W20-RYOYOKBNLST-G
       *
            INITIALIZE      SPA-GMN-W20-KHNRYO-G
                            SPA-NAI-W20-KHNSRYCD
                            SPA-NAI-W20-KHNTEN
                            SPA-GMN-W20-RECEDSPKBN-G
+                           SPA-GMN-W20-RYOYOKBN-G
       *
       *    Æþ±¡´ðËÜÎÁ¥³¥ó¥ÜÊÔ½¸½èÍý
            PERFORM 4100-KHNRYO-CMB-EDT-SEC
@@ -3884,6 +3906,13 @@
                IF    ( SPA-GMN-W20-SBT NOT =   "04" )
                    MOVE  SPA-GMN-W20-YKNKNGLST (01)
                                        TO  SPA-GMN-W20-YKNKNG-G
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H240401 )
+               IF    ( SPA-GMN-W20-SBT     =   "08" OR "09" )
+                   MOVE  SPA-GMN-W20-RYOYOKBNLST (1)
+                                       TO  SPA-GMN-W20-RYOYOKBN-G
                END-IF
            END-IF
       *
@@ -4048,6 +4077,37 @@
                END-IF
            END-IF
       *
+           IF    ( SPA-NAI-W20-YUKOSTYMD  >=   CONST-H240401 )
+               INITIALIZE  SPA-GMN-W20-RYOYOKBNLST-G
+               EVALUATE    SPA-GMN-W20-SBT
+               WHEN    "08"
+                   MOVE    "0"    TO  SPA-GMN-W20-RYOYOKBNL  (1)
+                   MOVE    "Áê¸ß»»Äê¤·¤Ê¤¤"
+                                  TO  SPA-GMN-W20-RYOYOKBNMEIL (1)
+      *
+                   MOVE    "1"    TO  SPA-GMN-W20-RYOYOKBNL  (2)
+                   MOVE    "Áê¸ß»»Äê¤¹¤ë"
+                                  TO  SPA-GMN-W20-RYOYOKBNMEIL (2)
+                   MOVE    2      TO  SPA-GMN-W20-RYOYOKBN-MAX
+               WHEN    "09"
+                   MOVE    "0"    TO  SPA-GMN-W20-RYOYOKBNL (1)
+                   MOVE    "Áê¸ß»»Äê¤·¤Ê¤¤"
+                                  TO  SPA-GMN-W20-RYOYOKBNMEIL (1)
+      *
+                   MOVE    "1"    TO  SPA-GMN-W20-RYOYOKBNL (2)
+                   MOVE    "Áê¸ß»»Äê¤¹¤ë¡Ê¿Ç£±¡Ë"
+                                  TO  SPA-GMN-W20-RYOYOKBNMEIL (2)
+      *
+                   MOVE    "2"    TO  SPA-GMN-W20-RYOYOKBNL (3)
+                   MOVE    "Áê¸ß»»Äê¤¹¤ë¡Ê¿Ç£²¡Ë"
+                                  TO  SPA-GMN-W20-RYOYOKBNMEIL (3)
+      *
+                   MOVE    "3"    TO  SPA-GMN-W20-RYOYOKBNL (4)
+                   MOVE    "Áê¸ß»»Äê¤¹¤ë¡Ê¿Ç£³¡Ë" 
+                                  TO  SPA-GMN-W20-RYOYOKBNMEIL (4)
+                   MOVE    4      TO  SPA-GMN-W20-RYOYOKBN-MAX
+               END-EVALUATE
+           END-IF
       *
            .
       *
@@ -4269,6 +4329,20 @@
        4101-RECEDSPKBN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       4101-RYOYOKBN-CHK-SEC     SECTION.
+      *
+           MOVE    SPA-GMN-W20-RYOYOKBN
+                                   TO  WRK-CMB-CD
+           PERFORM 4200-RYOYOKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM     TO  SPA-GMN-W20-RYOYOKBN-G
+      *
+           .
+      *
+       4101-RYOYOKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    Í­¸ú´ü´Ö³«»ÏÆü
       *****************************************************************
        4101-YUKOSTYMD-CHK-SEC          SECTION.
@@ -4371,15 +4445,14 @@
                                            TO  SPA-GMN-W20-YKNKNG-G
            END-IF
       *
-           PERFORM 4100-BTUNUM-LSTSEL-SEC
-           IF    ( IDX-BTULST      >   ZERO )
+           INITIALIZE                     SYSKANRI-REC
+           PERFORM 900-SYSKANRI-KEY16-SEL-SEC
+           IF    ( FLG-SYSKANRI       =   ZERO )
                EVALUATE    TRUE
                WHEN  ( WRK-EDYMD          >=   CONST-H220401 )
                  AND ( WRK-STYMD          <    CONST-H220401 )
                WHEN  ( WRK-EDYMD          >=   CONST-H240401 )
                  AND ( WRK-STYMD          <    CONST-H240401 )
-                   INITIALIZE                     SYSKANRI-REC
-                   PERFORM 900-SYSKANRI-KEY16-SEL-SEC
                    PERFORM 41001-INPUT-AREA-EDIT-SEC
                END-EVALUATE
            END-IF
@@ -4822,6 +4895,11 @@
       *
            MOVE    SYS-5001-BTU-KHNSRYCD
                                    TO  SPA-NAI-W20-KHNSRYCD
+      *
+      *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬
+           MOVE    SYS-5001-CRYOYOKBN  TO  WRK-CMB-CD
+           PERFORM 4200-RYOYOKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-W20-RYOYOKBN-G
       *
       *    Æþ±¡´ðËÜÅÀ¿ô¤ò¥µ¥Ö¥×¥í¤è¤ê¼èÆÀ¤¹¤ë
            INITIALIZE W20SUB01-LNK
@@ -7411,6 +7489,33 @@
        4201-RECEDSPKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       4200-RYOYOKBNLST-CHK-SEC      SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W20-RYOYOKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-W20-RYOYOKBNL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W20-RYOYOKBNLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM         =   SPACE )
+                   MOVE    SPA-GMN-W20-RYOYOKBNLST (1)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-RYOYOKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    ½ªÎ»¶èÊ¬¶èÊ¬¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
        4200-EDKBNLST-CHK-SEC           SECTION.
@@ -7581,6 +7686,22 @@
                UNTIL     ( IDX1    >   W20-RECEDSPKBN-CNT )
                 MOVE   SPA-GMN-W20-RECEDSPKBNLST (IDX1)
                                    TO  W20-RECEDSPKBN-ITM (IDX1)
+           END-PERFORM
+      *
+      *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ»»Äê¶èÊ¬
+           IF    ( SPA-NAI-W20-YUKOSTYMD   >=  CONST-H240401 )
+            AND  ( SPA-GMN-W20-SBT          =  "08" OR "09" )
+               MOVE    "°ìÈÌ¡¦ÎÅÍÜÁê¸ß»»Äê" TO W20-LBLRYOYOKBN
+           END-IF
+      *
+           MOVE    SPA-GMN-W20-RYOYOKBN-G
+                                       TO  W20-RYOYOKBN
+           MOVE    SPA-GMN-W20-RYOYOKBN-MAX
+                                       TO  W20-RYOYOKBN-CNT
+           PERFORM VARYING IDX1    FROM    1   BY  1
+               UNTIL     ( IDX1    >   W20-RYOYOKBN-CNT )
+                MOVE   SPA-GMN-W20-RYOYOKBNLST (IDX1)
+                                       TO  W20-RYOYOKBN-ITM (IDX1)
            END-PERFORM
       *
       *    Í­¸ú´ü´Ö³«»ÏÆü
@@ -7805,6 +7926,8 @@
                                        W20-KHNRYO-STATE
                                        W20-KHNRYO-ITM-STATE
                                        W20-KHNTEN-STATE
+                                       W20-RYOYOKBN-STATE
+                                       W20-RYOYOKBN-ITM-STATE
       *
            IF   ( SPA-NAI-W20-HOSPSBT  =    1 )
                CONTINUE
@@ -7856,6 +7979,12 @@
                                        TO  W20-KSN-STATE    (IDX-GKSN)
                                            W20-KSN-ITM-STATE(IDX-GKSN)
                END-IF
+           END-IF
+      *
+           IF    ( W20-LBLRYOYOKBN     =   SPACE )
+               MOVE    WIDGET-INSENSITIVE
+                                       TO  W20-RYOYOKBN-STATE
+                                           W20-RYOYOKBN-ITM-STATE
            END-IF
       *
            .
@@ -7931,6 +8060,8 @@
                MOVE    "YUKOEDYMD"         TO  MCP-WIDGET
            WHEN    053
                MOVE    "EDKBN"             TO  MCP-WIDGET
+           WHEN    054
+               MOVE    "RYOYOKBN"          TO  MCP-WIDGET
            WHEN    100
                MOVE    "SELNUM"            TO  MCP-WIDGET
            WHEN    101
@@ -7967,6 +8098,13 @@
                IF    ( W20-KHNRYO-STATE
                                        =   WIDGET-INSENSITIVE )
                    MOVE    8           TO  SPA-GMN-W20-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-W20-CUR     =   54 )
+               IF    ( W20-RYOYOKBN-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    9           TO  SPA-GMN-W20-CUR
                END-IF
            END-IF
       *
@@ -8020,6 +8158,8 @@
            WHEN    "KHNRYO"
                MOVE    008             TO  SPA-GMN-W20-CUR
            WHEN    "RECEDSPKBN"
+               MOVE    054             TO  SPA-GMN-W20-CUR
+           WHEN    "RYOYOKBN"
                MOVE    009             TO  SPA-GMN-W20-CUR
            WHEN    "KNGHJO"
                MOVE    010             TO  SPA-GMN-W20-CUR

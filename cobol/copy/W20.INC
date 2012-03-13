@@ -95,6 +95,15 @@
                 05  W20-RECEDSPKBN-ITM-STATE
                                            PIC S9(9)   BINARY.
       *
+              04  W20-LBLRYOYOKBN          PIC X(40).
+      *
+              04  W20-CMB-RYOYOKBN.
+                05  W20-RYOYOKBN           PIC X(52).
+                05  W20-RYOYOKBN-STATE     PIC S9(9)   BINARY.
+                05  W20-RYOYOKBN-CNT       PIC S9(9)   BINARY.
+                05  W20-RYOYOKBN-ITM       PIC X(52)   OCCURS  10.
+                05  W20-RYOYOKBN-ITM-STATE PIC S9(9)   BINARY.
+      *
               04  W20-SELNUM               PIC S9(2).
       *
               04  W20-LBLKNGHJO            PIC X(36).
