@@ -36,6 +36,8 @@
            03  LNK-TOKNYUIN-NYUIN                     PIC  X(02).
       *算定年月
            03  LNK-TOKNYUIN-SANTEIYM                  PIC  X(06).
+      *病棟番号
+           03  LNK-TOKNYUIN-BTUNUM                    PIC  X(02).
       *返却項目
            03  LNK-TOKNYUIN-HENKYAKU-AREA.
       *特定入院料コード
