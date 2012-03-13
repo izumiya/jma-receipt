@@ -329,6 +329,7 @@
       *  04.05.30    NACL-ÌçÏÆ    12/03/05  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.05.31    NACL-ÌçÏÆ    12/03/05  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     Ê¿À®£²£´Ç¯£³·î¤Þ¤Ç
+      *  04.05.32    NACL-ÌçÏÆ    12/03/13  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¶¡¤£·¤ÎÂÐ±þ¡Ë
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -18047,8 +18048,8 @@
       *
              IF       ( NACCT-DAY(IDY)   NOT =  ZERO        )
              AND      ( LNK-SYU-DAY(IDY)     =  "1" OR "9"  )
-             AND      ( WK-GAIHAKU(IDY)      =  ZERO  OR  4
-                                                      OR  5 )
+             AND      ( WK-GAIHAKU(IDY)      =
+                                 ZERO OR 4 OR 5 OR 6 OR 7   )
       *
               IF  WK-SHOKUDOKASAN(IDY)  =  ZERO
       *
@@ -18976,8 +18977,8 @@
               IF       ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
               AND      ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
-              AND      ( WK-GAIHAKU(IDY)        =  ZERO  OR  4
-                                                         OR  5 )
+              AND      ( WK-GAIHAKU(IDY)        =
+                                    ZERO OR 4 OR 5 OR 6 OR 7   )
       *
                IF    LNK-SYU-SYUHKNNUM   =   "971" OR "973"
                  EVALUATE  LNK-SYU-SYUHKNNUM
@@ -19136,8 +19137,8 @@
               MOVE     ZERO     TO      WK-SHOKUJI-JIHI
               IF       ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
-              AND      ( WK-GAIHAKU(IDY)        =  ZERO  OR  4
-                                                         OR  5 )
+              AND      ( WK-GAIHAKU(IDY)        =
+                                    ZERO OR 4 OR 5 OR 6 OR 7   )
               AND      ( WK-SHOKUJI-KANFLG(IDY) =  ZERO        )
       *
                 IF    LNK-SYU-SYUHKNNUM   =   "971" OR "973"
@@ -19243,8 +19244,8 @@
               IF       ( WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO )
               AND      ((LNK-SYU-DAY(IDY)       =  "1" OR "9" ) OR
                         (LNK-S02-NYUINDAY-KBN(IDY)     =  "1" ))
-              AND      ( WK-GAIHAKU(IDY)        =  ZERO  OR  4
-                                                         OR  5 )
+              AND      ( WK-GAIHAKU(IDY)        =
+                                    ZERO OR 4 OR 5 OR 6 OR 7   )
       *
                EVALUATE   WK-SHOKUJIRYOYO(IDY)
       *
@@ -19445,8 +19446,8 @@
                MOVE     ZERO     TO      WK-SHOKUJI-JIHI
                IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
                AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
-               AND  (WK-GAIHAKU(IDY)     =   ZERO  OR  4
-                                                   OR  5  )
+               AND  (WK-GAIHAKU(IDY)     =
+                              ZERO OR 4 OR 5 OR 6 OR 7    )
                AND  (WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO)
                  IF  WK-SHOKUJI-NYUINJI(IDY) < WK-ROSAITOKU97(IDY)
                    MOVE  WK-SHOKUJI-NYUINJI(IDY)
@@ -19535,8 +19536,8 @@
                MOVE     ZERO     TO      WK-SHOKUJI-JIHI
                IF   (LNK-S02-NYUSANTEI-KBN(IDY)    =  "1" )
                AND  (WK-SHOKUJIRYOYO(IDY)          =   1  )
-               AND  (WK-GAIHAKU(IDY)     =   ZERO  OR  4
-                                                   OR  5  )
+               AND  (WK-GAIHAKU(IDY)     =
+                              ZERO OR 4 OR 5 OR 6 OR 7    )
                AND  (WK-SHOKUJI-NYUINJI(IDY)   NOT =  ZERO)
                  IF  WK-SHOKUJI-NYUINJI(IDY) < WK-ROSAITOKU97(IDY)
                    MOVE  WK-SHOKUJI-NYUINJI(IDY)
