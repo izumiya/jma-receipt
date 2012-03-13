@@ -41,11 +41,21 @@
       *
        WORKING-STORAGE             SECTION.
       *
+      *    ¥Õ¥é¥°ÎÎ°è
+       01  FLG-AREA.
+           03  FLG-SYSKANRI        PIC 9(01).
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
       *
+      *    ¥·¥¹¥Æ¥à´ÉÍý
+           COPY    "CPSK5001.INC".
+      *
+      *    £Ä£Â¸¡º÷
+           COPY    "MCPDATA.INC".
+      *
+           COPY    "MCPAREA".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -770,6 +780,40 @@
       *****************************************************************
        202-EDIT-SEC                    SECTION.
       *
+      *    ¥·¥¹¥Æ¥à´ÉÍý¸¡º÷¡ÊÁê¸ß»»Äê¶èÊ¬¼èÆÀ¡Ë
+           MOVE    SPACE               TO  SYS-5001-REC
+           INITIALIZE                      SYS-5001-REC
+           MOVE    "5001"              TO  SYS-5001-KANRICD
+           MOVE    LNK-TOKNYUIN-BTUNUM TO  SYS-5001-KBNCD
+           MOVE    LNK-TOKNYUIN-SANTEIYM
+                                       TO  SYS-5001-STYUKYMD(1:6)
+           MOVE    "01"                TO  SYS-5001-STYUKYMD(7:2)
+           MOVE    SYS-5001-STYUKYMD   TO  SYS-5001-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-5001-HOSPNUM
+           MOVE    SYS-5001-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-SYSKANRI
+                   MOVE    MCPDATA-REC         TO  SYS-5001-REC
+               ELSE
+                   MOVE    1                   TO  FLG-SYSKANRI
+               END-IF
+           ELSE
+               MOVE    SPACE               TO  SYS-5001-REC
+               INITIALIZE                  SYS-5001-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
            INITIALIZE                  LNK-TOKNYUIN-HENKYAKU-AREA
            MOVE    ZERO                TO  LNK-TOKNYUIN-RC
       *
@@ -956,18 +1000,38 @@
                WHEN    "31"
       *                Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Á
                        MOVE   "190122010"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190155210"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "32"
       *                Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Â
                        MOVE   "190122110"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190155610"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "33"
       *                Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ã
                        MOVE   "190122210"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190156010"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "34"
       *                Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ä
                        MOVE   "190122310"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190156410"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "35"
       *                Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Å
                        MOVE   "190122410"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190156810"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "36"
       *                Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
                        MOVE   "190122510"   TO  LNK-TOKNYUIN-SRYCD
@@ -1155,3 +1219,45 @@
            .
        202-EDIT-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    ¥Æ¡¼¥Ö¥ë¸¡º÷½èÍý
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£ÂÆÉ¤ß¹þ¤ß½èÍý
+      *****************************************************************
+       920-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       920-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £Ä£Â¥¯¥í¡¼¥¹½èÍý
+      *****************************************************************
+       990-DBCLOSE-SEC         SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       990-DBCLOSE-EXT.
+           EXIT.
+      *
