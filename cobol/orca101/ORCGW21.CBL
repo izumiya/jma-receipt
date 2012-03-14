@@ -250,6 +250,7 @@
                05   CONST-H2404-BTURYOKAI2  PIC X(09) VALUE "190146310".
                05   CONST-H2404-SNRRYOKAI   PIC X(09) VALUE "190146410".
                05   CONST-H2404-MUKIN1      PIC X(09) VALUE "190106570".
+               05   CONST-H2404-MUKIN1K     PIC X(09) VALUE "190713410".
                05   CONST-H2404-MUKIN2      PIC X(09) VALUE "190146510".
            03  CONST-SINSEIJI          PIC X(09) VALUE "190109770".
            03  CONST-SNR-RYOYO-VAL.
@@ -1448,9 +1449,12 @@
                MOVE    "Ãµ∂›º£Œ≈ºº¥…Õ˝≤√ªª£±"
                                        TO  SPA-GMN-W21-MUKINMEIL(2)
                MOVE    "3"             TO  SPA-GMN-W21-MUKINL(3)
-               MOVE    "Ãµ∂›º£Œ≈ºº¥…Õ˝≤√ªª£≤"
+               MOVE    "Ãµ∂›º£Œ≈ºº¥…Õ˝≤√ªª£±° ∑–≤·¡º√÷°À"
                                        TO  SPA-GMN-W21-MUKINMEIL(3)
-               MOVE    3               TO  SPA-GMN-W21-MUKIN-MAX
+               MOVE    "4"             TO  SPA-GMN-W21-MUKINL(4)
+               MOVE    "Ãµ∂›º£Œ≈ºº¥…Õ˝≤√ªª£≤"
+                                       TO  SPA-GMN-W21-MUKINMEIL(4)
+               MOVE    4               TO  SPA-GMN-W21-MUKIN-MAX
            WHEN    OTHER
                MOVE    SPA-GMN-W21-KSNCOMMONLST-G
                                        TO  SPA-GMN-W21-MUKINLST-G
@@ -2009,8 +2013,10 @@
                        MOVE    "3"     TO  SPA-GMN-W21-JYUTOK
                    WHEN    CONST-H2404-MUKIN1
                        MOVE    "2"     TO  SPA-GMN-W21-MUKIN
-                   WHEN    CONST-H2404-MUKIN2
+                   WHEN    CONST-H2404-MUKIN1K
                        MOVE    "3"     TO  SPA-GMN-W21-MUKIN
+                   WHEN    CONST-H2404-MUKIN2
+                       MOVE    "4"     TO  SPA-GMN-W21-MUKIN
                    END-EVALUATE
                END-IF
            END-PERFORM
@@ -3236,6 +3242,10 @@
                MOVE    SPA-NAI-W21-MUKIN-IDX   TO  WRK-KSNIDX
                PERFORM 42021-BRM-KSN-EDIT-SEC
            WHEN    "3"
+               MOVE    CONST-H2404-MUKIN1K     TO  WRK-KSNCD
+               MOVE    SPA-NAI-W21-MUKIN-IDX   TO  WRK-KSNIDX
+               PERFORM 42021-BRM-KSN-EDIT-SEC
+           WHEN    "4"
                MOVE    CONST-H2404-MUKIN2      TO  WRK-KSNCD
                MOVE    SPA-NAI-W21-MUKIN-IDX   TO  WRK-KSNIDX
                PERFORM 42021-BRM-KSN-EDIT-SEC

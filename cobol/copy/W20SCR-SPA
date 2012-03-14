@@ -805,68 +805,68 @@
                  11  SPA-GMN-W21-SINSEIJI-G.
                    13  SPA-GMN-W21-SINSEIJI        PIC X(01).
                    13  SPA-GMN-W21-SINSEIJIFL1     PIC X(01).
-                   13  SPA-GMN-W21-SINSEIJIMEI     PIC X(28).
+                   13  SPA-GMN-W21-SINSEIJIMEI     PIC X(38).
       *          Œ≈Õ‹¥ƒ∂≠≤√ªª
                  11  SPA-GMN-W21-RYO-LBL           PIC X(36).
                  11  SPA-GMN-W21-RYO-G.
                    13  SPA-GMN-W21-RYO             PIC X(01).
                    13  SPA-GMN-W21-RYOFL1          PIC X(01).
-                   13  SPA-GMN-W21-RYOMEI          PIC X(28).
+                   13  SPA-GMN-W21-RYOMEI          PIC X(38).
       *          Ω≈æ…º‘≈˘Œ≈Õ‹¥ƒ∂≠∆√ Ã≤√ªª
                  11  SPA-GMN-W21-JYUTOK-LBL        PIC X(36).
                  11  SPA-GMN-W21-JYUTOK-G.
                    13  SPA-GMN-W21-JYUTOK          PIC X(01).
                    13  SPA-GMN-W21-JYUTOKFL1       PIC X(01).
-                   13  SPA-GMN-W21-JYUTOKMEI       PIC X(28).
+                   13  SPA-GMN-W21-JYUTOKMEI       PIC X(38).
       *          Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª
                  11  SPA-GMN-W21-BTURYO-LBL        PIC X(36).
                  11  SPA-GMN-W21-BTURYO-G.
                    13  SPA-GMN-W21-BTURYO          PIC X(01).
                    13  SPA-GMN-W21-BTURYOFL1       PIC X(01).
-                   13  SPA-GMN-W21-BTURYOMEI       PIC X(28).
+                   13  SPA-GMN-W21-BTURYOMEI       PIC X(38).
       *          Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤˛¡±≤√ªª
                  11  SPA-GMN-W21-BTURYOKAI-LBL     PIC X(36).
                  11  SPA-GMN-W21-BTURYOKAI-G.
                    13  SPA-GMN-W21-BTURYOKAI       PIC X(01).
                    13  SPA-GMN-W21-BTURYOKAIFL1    PIC X(01).
-                   13  SPA-GMN-W21-BTURYOKAIMEI    PIC X(28).
+                   13  SPA-GMN-W21-BTURYOKAIMEI    PIC X(38).
       *          ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤Œ≈Õ‹¥ƒ∂≠≤√ªª
                  11  SPA-GMN-W21-SNRRYO-LBL        PIC X(36).
                  11  SPA-GMN-W21-SNRRYO-G.
                    13  SPA-GMN-W21-SNRRYO          PIC X(01).
                    13  SPA-GMN-W21-SNRRYOFL1       PIC X(01).
-                   13  SPA-GMN-W21-SNRRYOMEI       PIC X(28).
+                   13  SPA-GMN-W21-SNRRYOMEI       PIC X(38).
       *          ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤Œ≈Õ‹¥ƒ∂≠≤˛¡±≤√ªª
                  11  SPA-GMN-W21-SNRRYOKAI-LBL     PIC X(36).
                  11  SPA-GMN-W21-SNRRYOKAI-G.
                    13  SPA-GMN-W21-SNRRYOKAI       PIC X(01).
                    13  SPA-GMN-W21-SNRRYOKAIFL1    PIC X(01).
-                   13  SPA-GMN-W21-SNRRYOKAIMEI    PIC X(28).
+                   13  SPA-GMN-W21-SNRRYOKAIMEI    PIC X(38).
       *          Ãµ∂›º£Œ≈ºº¥…Õ˝≤√ªª
                  11  SPA-GMN-W21-MUKIN-LBL        PIC X(36).
                  11  SPA-GMN-W21-MUKIN-G.
                    13  SPA-GMN-W21-MUKIN          PIC X(01).
                    13  SPA-GMN-W21-MUKINFL1       PIC X(01).
-                   13  SPA-GMN-W21-MUKINMEI       PIC X(28).
+                   13  SPA-GMN-W21-MUKINMEI       PIC X(38).
       *           ¸ºÕ¿˛º£Œ≈…¬ºº¥…Õ˝≤√ªª
                  11  SPA-GMN-W21-HOSYASEN-LBL      PIC X(36).
                  11  SPA-GMN-W21-HOSYASEN-G.
                    13  SPA-GMN-W21-HOSYASEN        PIC X(01).
                    13  SPA-GMN-W21-HOSYASENFL1     PIC X(01).
-                   13  SPA-GMN-W21-HOSYASENMEI     PIC X(28).
+                   13  SPA-GMN-W21-HOSYASENMEI     PIC X(38).
       *          ∂¶ƒÃ° •¿•ﬂ°º°À
                  11  SPA-GMN-W21-KSNCOMMON-LBL       PIC X(36).
                  11  SPA-GMN-W21-KSNCOMMON-G.
                    13  SPA-GMN-W21-KSNCOMMON         PIC X(01).
                    13  SPA-GMN-W21-KSNCOMMONFL1      PIC X(01).
-                   13  SPA-GMN-W21-KSNCOMMONMEI      PIC X(28).
+                   13  SPA-GMN-W21-KSNCOMMONMEI      PIC X(38).
                09  SPA-GMN-W21-KSN-R   REDEFINES   SPA-GMN-W21-KSN-G.
                  11  SPA-GMN-W21-KSNCD-OCC           OCCURS 10.
                    13  SPA-GMN-W21-KSN-LBL         PIC X(36).
                    13  SPA-GMN-W21-KSNCD-G.
                        15  SPA-GMN-W21-KSNCD           PIC X(01).
                        15  SPA-GMN-W21-KSNCDFL         PIC X(01).
-                       15  SPA-GMN-W21-KSNCDMEI        PIC X(28).
+                       15  SPA-GMN-W21-KSNCDMEI        PIC X(38).
       *        Õ≠∏˙≥´ªœ∆¸
                09  SPA-GMN-W21-YUKOSTYMD           PIC X(10).
       *        Õ≠∏˙Ω™Œª∆¸
@@ -943,70 +943,70 @@
                    13  SPA-GMN-W21-SINSEIJILST     OCCURS  10.
                      15  SPA-GMN-W21-SINSEIJIL     PIC X(01).
                      15  SPA-GMN-W21-SINSEIJILFL1  PIC X(01).
-                     15  SPA-GMN-W21-SINSEIJIMEIL  PIC X(28).
+                     15  SPA-GMN-W21-SINSEIJIMEIL  PIC X(38).
       *          Œ≈Õ‹¥ƒ∂≠≤√ªª
                  11  SPA-GMN-W21-RYOLST-G.
                    13  SPA-GMN-W21-RYO-MAX         PIC 9(03).
                    13  SPA-GMN-W21-RYOLST          OCCURS  10.
                      15  SPA-GMN-W21-RYOL          PIC X(01).
                      15  SPA-GMN-W21-RYOLFL1       PIC X(01).
-                     15  SPA-GMN-W21-RYOMEIL       PIC X(28).
+                     15  SPA-GMN-W21-RYOMEIL       PIC X(38).
       *          Ω≈æ…º‘≈˘Œ≈Õ‹¥ƒ∂≠∆√ Ã≤√ªª
                  11  SPA-GMN-W21-JYUTOKLST-G.
                    13  SPA-GMN-W21-JYUTOK-MAX         PIC 9(03).
                    13  SPA-GMN-W21-JYUTOKLST          OCCURS  10.
                      15  SPA-GMN-W21-JYUTOKL          PIC X(01).
                      15  SPA-GMN-W21-JYUTOKLFL1       PIC X(01).
-                     15  SPA-GMN-W21-JYUTOKMEIL       PIC X(28).
+                     15  SPA-GMN-W21-JYUTOKMEIL       PIC X(38).
       *          Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª
                  11  SPA-GMN-W21-BTURYOLST-G.
                    13  SPA-GMN-W21-BTURYO-MAX         PIC 9(03).
                    13  SPA-GMN-W21-BTURYOLST          OCCURS  10.
                      15  SPA-GMN-W21-BTURYOL          PIC X(01).
                      15  SPA-GMN-W21-BTURYOLFL1       PIC X(01).
-                     15  SPA-GMN-W21-BTURYOMEIL       PIC X(28).
+                     15  SPA-GMN-W21-BTURYOMEIL       PIC X(38).
       *          Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤˛¡±≤√ªª
                  11  SPA-GMN-W21-BTURYOKAILST-G.
                    13  SPA-GMN-W21-BTURYOKAI-MAX      PIC 9(03).
                    13  SPA-GMN-W21-BTURYOKAILST       OCCURS  10.
                      15  SPA-GMN-W21-BTURYOKAIL       PIC X(01).
                      15  SPA-GMN-W21-BTURYOKAILFL1    PIC X(01).
-                     15  SPA-GMN-W21-BTURYOKAIMEIL    PIC X(28).
+                     15  SPA-GMN-W21-BTURYOKAIMEIL    PIC X(38).
       *          ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤Œ≈Õ‹¥ƒ∂≠≤√ªª
                  11  SPA-GMN-W21-SNRRYOLST-G.
                    13  SPA-GMN-W21-SNRRYO-MAX      PIC 9(03).
                    13  SPA-GMN-W21-SNRRYOLST       OCCURS  10.
                      15  SPA-GMN-W21-SNRRYOL       PIC X(01).
                      15  SPA-GMN-W21-SNRRYOLFL1    PIC X(01).
-                     15  SPA-GMN-W21-SNRRYOMEIL    PIC X(28).
+                     15  SPA-GMN-W21-SNRRYOMEIL    PIC X(38).
       *          ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤Œ≈Õ‹¥ƒ∂≠≤˛¡±≤√ªª
                  11  SPA-GMN-W21-SNRRYOKAILST-G.
                    13  SPA-GMN-W21-SNRRYOKAI-MAX   PIC 9(03).
                    13  SPA-GMN-W21-SNRRYOKAILST    OCCURS  10.
                      15  SPA-GMN-W21-SNRRYOKAIL    PIC X(01).
                      15  SPA-GMN-W21-SNRRYOKAILFL1 PIC X(01).
-                     15  SPA-GMN-W21-SNRRYOKAIMEIL PIC X(28).
+                     15  SPA-GMN-W21-SNRRYOKAIMEIL PIC X(38).
       *          Ãµ∂›º£Œ≈ºº¥…Õ˝≤√ªª
                  11  SPA-GMN-W21-MUKINLST-G.
                    13  SPA-GMN-W21-MUKIN-MAX         PIC 9(03).
                    13  SPA-GMN-W21-MUKINLST          OCCURS  10.
                      15  SPA-GMN-W21-MUKINL          PIC X(01).
                      15  SPA-GMN-W21-MUKINLFL1       PIC X(01).
-                     15  SPA-GMN-W21-MUKINMEIL       PIC X(28).
+                     15  SPA-GMN-W21-MUKINMEIL       PIC X(38).
       *           ¸ºÕ¿˛º£Œ≈…¬ºº¥…Õ˝≤√ªª
                  11  SPA-GMN-W21-HOSYASENLST-G.
                    13  SPA-GMN-W21-HOSYASEN-MAX    PIC 9(03).
                    13  SPA-GMN-W21-HOSYASENLST     OCCURS  10.
                      15  SPA-GMN-W21-HOSYASENL     PIC X(01).
                      15  SPA-GMN-W21-HOSYASENLFL1  PIC X(01).
-                     15  SPA-GMN-W21-HOSYASENMEIL  PIC X(28).
+                     15  SPA-GMN-W21-HOSYASENMEIL  PIC X(38).
       *          ∂¶ƒÃ° •¿•ﬂ°º°À
                  11  SPA-GMN-W21-KSNCOMMONLST-G.
                    13  SPA-GMN-W21-KSNCOMMON-MAX        PIC 9(03).
                    13  SPA-GMN-W21-KSNCOMMONLST         OCCURS  10.
                      15  SPA-GMN-W21-KSNCOMMONL         PIC X(01).
                      15  SPA-GMN-W21-KSNCOMMONFL1L      PIC X(01).
-                     15  SPA-GMN-W21-KSNCOMMONMEIL      PIC X(28).
+                     15  SPA-GMN-W21-KSNCOMMONMEIL      PIC X(38).
                09  SPA-GMN-W21-KSNLST-R    REDEFINES
                  SPA-GMN-W21-KSNLST-G.
                  11  SPA-GMN-W21-KSNLST-OCC        OCCURS  10.
@@ -1014,7 +1014,7 @@
                    13  SPA-GMN-W21-KSNLST          OCCURS  10.
                        15  SPA-GMN-W21-KSNCDL      PIC X(01).
                        15  SPA-GMN-W21-KSNCDFL     PIC X(01).
-                       15  SPA-GMN-W21-KSNCDMEIL   PIC X(28).
+                       15  SPA-GMN-W21-KSNCDMEIL   PIC X(38).
       *      …¬ººæ Û•Í•π•»
              07  SPA-GMN-W21-BRMLST.
       *        …¬ººæ Û•Í•π•»π‡Ã‹øÙ
