@@ -434,7 +434,7 @@
       *        診療コード
                05  TBL-SRYCD           PIC X(09).
       *
-       01  TBL-SIN-MAX                 PIC 9(04)   VALUE   12.
+       01  TBL-SIN-MAX                 PIC 9(04)   VALUE   15.
       *
       *    外来管理加算等加算テーブル
        01  TBL-GAIRAI-AREA.
@@ -3895,7 +3895,6 @@
       *****************************************************************
        10012-DUMMYSYORI-SEC          SECTION.
       *
-      *TEST
       *H24.4
       *    在宅判定
            IF      WRK-COM-SRYKBN (IDX-Z)  =   "14"
@@ -3924,7 +3923,9 @@
                                 OR    (FLG-CHK3        =   1     )
                        IF      (WRK-COM-INPUTCD(IDZ6)
                                                    =   "099209905"
-                                                   OR  "099209906" )
+                                                   OR  "099209906"
+                                                   OR  "099209907"
+                                                   OR  "099209908" )
                            CONTINUE
                        ELSE
                            IF      (WRK-COM-INPUTCD(IDZ6)(1:1)
@@ -3940,9 +3941,9 @@
                        MOVE    "1"             TO  WRK-COM-CUR
                                                              (IDX-Z)
                    END-IF
-      *        一般名記載不可
+      *        銘柄名記載
                WHEN    "099209907"
-      *        一般名記載可
+      *        一般名記載
                WHEN    "099209908"
       *            前行に薬剤があること
                    IF      (IDX-Z          >   1   ) AND
@@ -4355,6 +4356,7 @@
                OR   (WRK-COM-GENTEN (IDX-Z)   =   "1")
                    CONTINUE
                ELSE
+      *H24.4
       *            診察料のチェック処理
                    IF      (WRK-COM-INPUTCD (IDX-Z)(1:1)
                                                =   "1"  )
@@ -4439,7 +4441,13 @@
                                            NOT =   "95" AND "96") AND
                        (WRK-COM-GAIKANRIKBN(IDX-Z)
                                                =   1   )
-                   MOVE    1               TO  FLG-GAIKAN
+      *            同一日２科目以外
+                   IF     (IDX-Z           =   IDX-SINSATU2-S )
+                      OR  (IDX-Z           =   IDX-SINSATU2-T )
+                       CONTINUE
+                   ELSE
+                       MOVE    1               TO  FLG-GAIKAN
+                    END-IF
                 END-IF
       *
       *        他保険算定済み
@@ -4666,6 +4674,7 @@
            IF     (IDX-ZAI1            >   ZERO) AND
                   (IDX-ZAI2            >   ZERO) AND
                   (IDX-SYU2            >   ZERO)
+      *H24.4
       *        同日初診は再診と同時
                IF     ((FLG-DOUJITU        =   1    )  AND
                        (IDX-ZAI1           =   1    ))
@@ -4680,7 +4689,8 @@
                    GO      TO      200-ALL-SYORI-EXT
                END-IF
            END-IF
-      *    同日初診
+      *    同日初診・再診
+      *H24.4
            IF    ((IDX-ZAI1            <=  2   )  OR
                   (IDX-ZAI2            >   ZERO)) AND
                  ((FLG-DOUJITU         =   1   )  OR
@@ -4876,6 +4886,7 @@
            .
        200-ALL-SYORI-EXT.
            EXIT.
+      *H24.4
       *****************************************************************
       *    診察料の判定・チェック処理
       *****************************************************************
@@ -4985,6 +4996,7 @@
            .
        20001-SINSATURYOCHK-EXT.
            EXIT.
+      *
       *****************************************************************
       *    同日初診チェック処理
       *****************************************************************
