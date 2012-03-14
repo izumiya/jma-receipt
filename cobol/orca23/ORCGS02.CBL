@@ -974,12 +974,8 @@
       *****************************************************************
        3101-S10SPASET-SEC              SECTION.
       *
-           IF    ( SPA-S10-PTNUM       =   SPA-GMN-PTNUM )
-               CONTINUE
-           ELSE
-               MOVE    SPA-S10-PTNUM   TO  S02-PTNUM
-               PERFORM 4102-PTNUM-CHK-SEC
-           END-IF
+           MOVE    SPA-S10-PTNUM   TO  S02-PTNUM
+           PERFORM 4102-PTNUM-CHK-SEC
       *
            MOVE    SPACE               TO  SPA-ERRCD
            MOVE    3                   TO  SPA-GMN-CUR
