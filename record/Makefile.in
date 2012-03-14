@@ -430,6 +430,7 @@ RECORD_files = \
 	appoinlst.rec \
 	acceptlst.rec \
 	W201.rec \
+	S10.rec \
 
 DEF_files = \
 
