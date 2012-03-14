@@ -329,6 +329,7 @@
            03  SINRYO-COUNT                PIC  9(04). 
            03  WRK-SENTEI-ZAITEN           PIC  9(08).
            03  WRK-SENTEI-KHNTEN           PIC  9(08).
+           03  WRK-CHK-SRYCD               PIC  X(09).
       *
        01  FLG-AREA.
            03  FLG-HANBETU                 PIC 9(01).
@@ -3249,9 +3250,24 @@ grpsys                                    SPA-AREA
                  IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
                  END-IF
+      *          «ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡
                  IF    WRK-NYUKHNKSNKBN = 221 OR 232
-                   CONTINUE
+      *            ° £∂£±∆¸∞ æÂ°À
+                   IF   WRK-CHK-SRYCD = "190740010" OR "190813510"
+                     IF    TBL-GAIHAKU(SYU-IDX)  =    7
+                        MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                     END-IF
+                   END-IF
+      *            ° £∂£∞∆¸∞ ∆‚°À
+                   IF   WRK-CHK-SRYCD = "190151610" OR "190739910" OR
+                                        "190151710" OR "190813410"
+                     IF    TBL-GAIHAKU(SYU-IDX)  =    6
+                        MOVE    1    TO    WRK-TAIJYUSIN-ERR
+                     END-IF
+                   END-IF
                  ELSE
+      *            ¿∫ø¿≤ µﬂµﬁ∆˛±°Œ¡°¢¿∫ø¿≤ µﬁ¿≠¥¸º£Œ≈…¬≈Ô∆˛±°Œ¡
+      *            ¿∫ø¿≤ µﬂµﬁ°¶πÁ ªæ…∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
                    IF  WRK-NYUKHNKSNKBN = 229 OR 238 OR 215 OR 216 OR
                                           217 OR 239
                      IF    TBL-GAIHAKU(SYU-IDX)  =    7
@@ -3597,6 +3613,7 @@ grpsys                              SPA-AREA
            MOVE    ZERO               TO   WRK-KSNTEN
            MOVE    ZERO               TO   WRK-HYOKETU-TEN
            MOVE    ZERO               TO   SENTEI-IDX
+           MOVE    SPACE              TO   WRK-CHK-SRYCD
       *
            MOVE    SYU-HOSPNUM        TO   NSRY-HOSPNUM
            MOVE    "1"                TO   NSRY-NYUGAIKBN
@@ -3639,6 +3656,8 @@ grpsys                            SPA-AREA
                               MOVE   TNS-TEN   TO   WRK-KHNTEN
                               MOVE   TNS-NYUKHNKSNKBN
                                                TO   WRK-NYUKHNKSNKBN
+                              MOVE   NSRY-SRYCD(NYUINACT-IDX)
+                                               TO   WRK-CHK-SRYCD
       ***                     MOVE   1         TO   FLG-NYUKHN
                               MOVE   NYUINACT-IDX  TO  SENTEI-IDX
                          ELSE
