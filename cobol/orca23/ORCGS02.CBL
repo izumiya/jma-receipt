@@ -602,6 +602,7 @@
            COPY    "S04.INC".
            COPY    "S06.INC".
            COPY    "S07.INC".
+           COPY    "S10.INC".
            COPY    "S99.INC".
            COPY    "SERR.INC".
            COPY    "SID1.INC".
@@ -766,6 +767,11 @@
                END-IF
                MOVE    SPACE           TO  SPA-S99-FLG
                MOVE    SPACE           TO  SPA-SIDCD
+           WHEN    "S10"
+               PERFORM 320-S03SPASET-SEC
+               IF    ( SPA-S10-PTNUM   NOT =   SPACE )
+                   PERFORM 3101-S10SPASET-SEC
+               END-IF
            WHEN    "SID1"
                PERFORM 330-SID1-SET-SEC
            WHEN    "SID2"
@@ -962,6 +968,24 @@
       *
            .
        3101-P97SPASET-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者一覧画面より戻り時の処理
+      *****************************************************************
+       3101-S10SPASET-SEC              SECTION.
+      *
+           IF    ( SPA-S10-PTNUM       =   SPA-GMN-PTNUM )
+               CONTINUE
+           ELSE
+               MOVE    SPA-S10-PTNUM   TO  S02-PTNUM
+               PERFORM 4102-PTNUM-CHK-SEC
+           END-IF
+      *
+           MOVE    SPACE               TO  SPA-ERRCD
+           MOVE    3                   TO  SPA-GMN-CUR
+      *
+           .
+       3101-S10SPASET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2784,6 +2808,9 @@
       *    確定
            WHEN    "CLICKED"       ALSO    "B12"
                    PERFORM 490-KAKUTEI-SEC
+      *    一括再計算該当
+           WHEN    "CLICKED"       ALSO    "B12C"
+                   PERFORM 412-S10-SENI-SEC
       *    ＪＤ入金
       ***  WHEN    "CLICKED"       ALSO    "B13"
       ***          PERFORM 490-JD-NYUKIN-SEC
@@ -3770,6 +3797,58 @@
       *
            .
        490-GAI-TUKISKYPRT-EXT.
+           EXIT.
+      **************************************************************
+      *    外来月まとめ請求書兼領収書発行処理
+      **************************************************************
+       412-S10-SENI-SEC            SECTION.
+      *
+           MOVE    SPACE       TO  SPA-TUKI-SRYYM
+      *
+           IF    ( SPA-NAI-SRYYM (1:6) IS  NUMERIC )
+               MOVE    SPA-NAI-SRYYM
+                               TO  SPA-TUKI-SRYYM
+           END-IF
+           IF    ( SPA-TUKI-SRYYM  =   SPACE )
+               MOVE    SPA-SYSYMD(1:6)
+                               TO  SPA-TUKI-SRYYM
+           END-IF
+      *
+           INITIALIZE              SPA-S01KYOUTU
+      *
+           PERFORM 4901-SPAKYOTUKEY-SET-SEC
+           MOVE    SPA-TUKI-SRYYM
+                               TO  SPA-S01-TUKI-SRYYM
+      *
+           MOVE    SPA-S01KYOUTU   TO  SPA-WORK
+           MOVE    SPA-AREA        TO  SPA-COMMON
+           MOVE    SPA-S02         TO  SPA-FREE
+      *
+           MOVE    "LINK"          TO  MCP-STATUS
+           MOVE    SPACE           TO  MCP-EVENT
+      *
+           CALL    "ORCGS10"       USING
+                                   MCPAREA
+                                   SPAAREA
+                                   LINKAREA
+                                   SCRAREA
+      *
+           MOVE    SPA-COMMON      TO  SPA-AREA
+           MOVE    SPA-WORK        TO  SPA-S01KYOUTU
+           MOVE    SPA-FREE        TO  SPA-S02
+      *
+           MOVE    "S02"           TO  SPA-MOTOPG
+           MOVE    "S10"           TO  SPA-SAKIPG
+      *
+           MOVE    "NEW"           TO  MCP-PUTTYPE
+           MOVE    "S10"           TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1               TO  FLG-END
+      *
+           .
+       412-S10-SENI-EXT.
            EXIT.
       **************************************************************
       *    請求年月チェック処理

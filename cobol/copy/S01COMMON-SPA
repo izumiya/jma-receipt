@@ -138,4 +138,6 @@
       *
            05  SPA-S02-TBL-GROUP           PIC  X(14).
            05  SPA-S02-JOB-JOBID           PIC  9(07).
+           05  SPA-S10-AREA.
+               07  SPA-S10-PTNUM           PIC  X(20).
       *

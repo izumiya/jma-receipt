@@ -10,6 +10,7 @@ bind	"S03N"		"OpenCOBOL"	"ORCGS03N";
 bind    "S04"           "OpenCOBOL"     "ORCGS04";
 bind    "S06"           "OpenCOBOL"     "ORCGS06";
 bind    "S07"           "OpenCOBOL"     "ORCGS07";
+bind    "S10"           "OpenCOBOL"     "ORCGS10";
 bind    "S99"           "OpenCOBOL"     "ORCGS99";
 bind	"SERR"		"OpenCOBOL"	"ORCGSERR";
 bind	"SID1"		"OpenCOBOL"	"ORCGSID1";
@@ -29,6 +30,7 @@ data	{
                 S04;
                 S06;
                 S07;
+                S10;
                 S99;
                 SERR;
                 SID1;

@@ -125,6 +125,7 @@
            COPY    "S04.INC".
            COPY    "S06.INC".
            COPY    "S07.INC".
+           COPY    "S10.INC".
            COPY    "S99.INC".
            COPY    "SERR.INC".
            COPY    "SID1.INC".
