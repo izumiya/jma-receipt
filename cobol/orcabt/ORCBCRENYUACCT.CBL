@@ -3112,61 +3112,55 @@
                MOVE     "0"        TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
            ELSE
                MOVE     "1"        TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
-      *        œ∑øÕ∆√ƒÍ∆˛±°¥À‹Œ¡µ⁄§” ø¿Æ£±£∏«Ø£∑∑Ó∞ πﬂ§ŒŒ≈Õ‹…¬≈Ô°¢
-      *        Œ≈Õ‹…¬æ≤§ŒæÏπÁ§œ∆√ƒÍ∆˛±°Œ¡∞∑§§§´§È≥∞§π
-               IF    LNK-SCNYUACCT-NYUKHN-SRYCD(1)  =  "190799410" OR
-                                                       "190799510" OR
-                                                       "190121310" OR
-                                                       "190121410" OR
-                                                       "190121510" OR
-                                                       "190121610" OR
-                                                       "190121710" OR
-                                                       "190121810" OR
-                                                       "190122010" OR
-                                                       "190122110" OR
-                                                       "190122210" OR
-                                                       "190122310" OR
-                                                       "190122410" OR
-                                                       "190121510" OR
-                                                       "190123710" OR
-                                                       "190123810" OR
-                                                       "190123910" OR
-                                                       "190124010" OR
-                                                       "190124110" OR
-                                                       "190124210" OR
-                                                       "190124310" OR
-                                                       "190124410" OR
-                                                       "190124510" OR
-                                                       "190124610" OR
-                                                       "190124710" OR
-                                                       "190124810" OR
-                                                       "190131610" OR
-                                                       "190131710" OR
-                                                       "190131810" OR
-                                                       "190131910" OR
-                                                       "190132010" OR
-                                                       "190132110" OR
-                                                       "190132210" OR
-                                                       "190132310" OR
-                                                       "190132410" OR
-                                                       "190132510" OR
-                                                       "190132610" OR
-                                                       "190132710" OR
-                                                       "190132810" OR
-                                                       "190132910" OR
-                                                       "190133010" OR
-                                                       "190133110" OR
-                                                       "190133210" OR
-                                                       "190133310" OR
-                                                       "190133410" OR
-                                                       "190133510" OR
-                                                       "190133610" OR
-                                                       "190133710" OR
-                                                       "190133810" OR
-                                                       "190133910" OR
-                                                       "190134010" OR
-                                                       "190134110"
-                   MOVE  "0"     TO  LNK-SCNYUACCT-TOKUTEINYUIN-KBN
+      *        ∆√ƒÍ∆˛±°¥À‹Œ¡°¢Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡°¢Œ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡≈˘§œ
+      *        ∆√ƒÍ∆˛±°Œ¡∞∑§§§´§È≥∞§π
+               IF    LNK-SCNYUACCT-NYUKHN-SRYCD(1)  NOT =   SPACE
+                   INITIALIZE                   TNS-TENSU-REC
+                   MOVE   SPA-HOSPNUM       TO  TNS-HOSPNUM
+                   MOVE   LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                                            TO  TNS-SRYCD
+                   MOVE    LNK-SCNYUACCT-STSRYYMD
+                                            TO  TNS-YUKOSTYMD
+                                                TNS-YUKOEDYMD
+                   MOVE    TNS-TENSU-REC    TO  MCPDATA-REC
+                   MOVE    "tbl_tensu"      TO  MCP-TABLE
+                   MOVE    "key"            TO  MCP-PATHNAME
+                   PERFORM 910-DBSELECT-SEC
+                   IF    ( MCP-RC           =   ZERO )
+                       MOVE    MCPDATA-REC  TO  TNS-TENSU-REC
+                       IF      TNS-NYUTENTTLKBN   =   903
+                           MOVE   "0"       TO
+                                        LNK-SCNYUACCT-TOKUTEINYUIN-KBN
+                       END-IF
+                   END-IF
+      *
+                   MOVE    "tbl_tensu"      TO  MCP-TABLE
+                   MOVE    "key"            TO  MCP-PATHNAME
+                   PERFORM 900-CLOSE-SEC
+               END-IF
+               IF    LNK-SCNYUACCT-KAGEN-SRYCD(1)  NOT =   SPACE
+                   INITIALIZE                   TNS-TENSU-REC
+                   MOVE   SPA-HOSPNUM       TO  TNS-HOSPNUM
+                   MOVE   LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                                            TO  TNS-SRYCD
+                   MOVE    LNK-SCNYUACCT-STSRYYMD
+                                            TO  TNS-YUKOSTYMD
+                                                TNS-YUKOEDYMD
+                   MOVE    TNS-TENSU-REC    TO  MCPDATA-REC
+                   MOVE    "tbl_tensu"      TO  MCP-TABLE
+                   MOVE    "key"            TO  MCP-PATHNAME
+                   PERFORM 910-DBSELECT-SEC
+                   IF    ( MCP-RC           =   ZERO )
+                       MOVE    MCPDATA-REC  TO  TNS-TENSU-REC
+                       IF      TNS-NYUTENTTLKBN   =   903
+                           MOVE   "0"       TO
+                                        LNK-SCNYUACCT-TOKUTEINYUIN-KBN
+                       END-IF
+                   END-IF
+      *
+                   MOVE    "tbl_tensu"      TO  MCP-TABLE
+                   MOVE    "key"            TO  MCP-PATHNAME
+                   PERFORM 900-CLOSE-SEC
                END-IF
            END-IF
       *    ≥∞«Ò
@@ -4722,6 +4716,22 @@
            END-IF
            .
        900-DBSELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £ƒ£¬∏°∫˜ΩËÕ˝° FHETCH§‚π‘§¶)
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           IF    ( MCP-RC          =   ZERO )
+               PERFORM 900-DBFETCH-SEC
+           END-IF
+      *
+           .
+      *
+       910-DBSELECT-EXT.
            EXIT.
       *
       *****************************************************************
