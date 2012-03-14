@@ -1,0 +1,30 @@
+S10	{
+	fixed6	{
+		LBLSRYYM	{
+			value	varchar(20);
+		};
+		LBLMSG01	{
+			value	varchar(40);
+		};
+		SELNUM	{
+			value	number(3);
+		};
+		scrolledwindow1	{
+			PTLIST	{
+				count	int;
+				row int;
+				rowattr int;
+				item	{
+					value0	varchar(5);
+					value1	varchar(20);
+					value2	varchar(50);
+					value3	varchar(02);
+					value4	varchar(10);
+					value5	varchar(10);
+					value6	varchar(20);
+				}	[100];
+				select	bool[100];
+			};
+		};
+	};
+};

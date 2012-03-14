@@ -1697,3 +1697,19 @@ path	key83 	{
 		;
 	};
 };
+
+path	key84 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key84_csr CURSOR FOR
+		SELECT DISTINCT ON (PTID) * 
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			AND   SECMONEY    <>  0
+			ORDER   BY    PTID
+		;
+	};
+};
+

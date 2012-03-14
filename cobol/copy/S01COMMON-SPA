@@ -147,3 +147,5 @@
       *      £Ó£°£¹Á«°Ü¾ðÊó
            05  SPA-S09-AREA.
                07  SPA-S09-BTN             PIC X(03).
+           05  SPA-S10-AREA.
+               07  SPA-S10-PTNUM           PIC  X(20).

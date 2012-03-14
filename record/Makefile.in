@@ -442,6 +442,7 @@ RECORD_files = \
 	medicalget.rec \
 	diseaseget.rec \
 	W201.rec \
+	S10.rec \
 	
 
 DEF_files = \
