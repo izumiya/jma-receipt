@@ -30,6 +30,7 @@
       * 01.00.04     NACL-°ËÆ£    08/03/07  ²èÁü¼ê½Ñ»Ù±ç²Ã»»
       *                                     °åÎÅ´Ñ»¡Ë¡ÂÐ¾Ý¶èÊ¬
       *                                     Ëã¿ì¼±ÊÌ¶èÊ¬ ÄÉ²Ã
+      * 04.06.00     NACL-Â¿¡¹Ç¼  10/10/29  »ÜÀß´ð½à¡¡£´·åÂÐ±þ
       ************************************************************
        01  TNS-TENSU-REC.
       *(1)
@@ -86,7 +87,7 @@
       *    ´ð½àÉÔÅ¬¹çÄþ¸º¶èÊ¬
            03  TNS-KIJUNTEIGENKBN      PIC  9(01).
       *    ´ð½àÉÔÅ¬¹çÄþ¸ºÂÐ¾Ý»ÜÀß´ð½à¥³¡¼¥É
-           03  TNS-KIJUNTEIGENCD       PIC  9(03).
+           03  TNS-KIJUNTEIGENCD       PIC  9(04).
            03  TNS-LASERKBN            PIC  9(01).
            03  TNS-CHPMESUKSN          PIC  9(01).
            03  TNS-MICMESUKSN          PIC  9(01).
@@ -110,7 +111,7 @@
            03  TNS-BUIKBN              PIC  9(01).
            03  TNS-SANTEIRRKKBN        PIC  9(01).
            03  TNS-SSTKIJUNCDTBL       OCCURS 10.
-               05  TNS-SSTKIJUNCD      PIC  9(03).
+               05  TNS-SSTKIJUNCD      PIC  9(04).
            03  TNS-AGEKSNTBL           OCCURS 4.
                05  TNS-AGEKSNKGN       PIC  X(02).
                05  TNS-AGEKSNJGN       PIC  X(02).

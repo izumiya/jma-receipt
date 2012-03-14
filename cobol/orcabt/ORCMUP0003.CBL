@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCMUP0002.
+       PROGRAM-ID.                 ORCMUP0003.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
@@ -152,7 +152,7 @@ grpsys     COPY    "COMMON-SPA".
        01  MES-AREA.
            03  MES-TITLE1.
                05  FILLER              PIC X(26) VALUE
-                                       "【PGID:ORCMUP0002.CBL】".
+                                       "【PGID:ORCMUP0003.CBL】".
                05  MES-TITLE1-YY       PIC X(04) VALUE SPACE.
                05  FILLER              PIC X(01) VALUE ".".
                05  MES-TITLE1-MM       PIC X(02) VALUE SPACE.
@@ -305,7 +305,7 @@ grpsys     COPY    "COMMON-SPA".
            OPEN    INPUT           IN-FILE
            IF  STS-IN          NOT =   ZERO
                MOVE    1           TO  FLG-IN
-               DISPLAY "*(ORCMUP0002)* IN-FILE OPN STS["
+               DISPLAY "*(ORCMUP0003)* IN-FILE OPN STS["
                                        STS-IN "]"
            END-IF
       *
@@ -396,6 +396,7 @@ grpsys     COPY    "COMMON-SPA".
        2010-INSERT-SYORI-SEC               SECTION.
       *
            INITIALIZE                  TNS-TENSU-REC
+           INITIALIZE                  WRK-TNS-TENSU-REC
 grpsys     MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
            MOVE    TNSWK-SRYCD         TO  TNS-SRYCD
            MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
@@ -446,7 +447,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
       *    追加更新
                MOVE    ZERO                TO  FLG-SYORI
-               INITIALIZE                      WRK-TNS-TENSU-REC
+      ****         INITIALIZE                      WRK-TNS-TENSU-REC
                PERFORM UNTIL   (FLG-TENSU      =   1  )  OR
                                (FLG-SYORI      =   1  )
                    IF     (TNS-YUKOSTYMD   <=  TNSWK-YUKOEDYMD2 ) AND
@@ -536,8 +537,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
       *    特定器材で金額の変更されている時、点数識別＝２の時
            IF     (FLG-SYORI           =   1    )
             AND   (TNS-SRYCD(1:1)      =   "7"  )
-            AND  ((TNS-TENSIKIBETU     =   2    ) OR
-                  (TNS-OLDTEN      NOT =   WRK-TNS-TEN ))
+      ***** AND  ((TNS-TENSIKIBETU     =   2    ) OR
+      *****       (TNS-OLDTEN      NOT =   WRK-TNS-TEN ))
+            AND   (TNS-TENSIKIBETU     =   2    )
                MOVE    WRK-TNS-TEN         TO  TNS-TEN
            END-IF
       *
@@ -906,14 +908,14 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            OPEN    OUTPUT              ERR-FILE
            IF  STS-ERR             NOT =   ZERO
-               DISPLAY "*(ORCMUP0002)* OUTFILE OPN STS[" STS-ERR "]"
+               DISPLAY "*(ORCMUP0003)* OUTFILE OPN STS[" STS-ERR "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
       *
       *    エラーレコード出力ファイル　オープン
            OPEN    OUTPUT              PLF-FILE
            IF  STS-PLF             NOT =   ZERO
-               DISPLAY "*(ORCMUP0002)* PLFFILE OPN STS[" STS-PLF "]"
+               DISPLAY "*(ORCMUP0003)* PLFFILE OPN STS[" STS-PLF "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
            ACCEPT  SYS-DATE            FROM    DATE
@@ -958,13 +960,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            END-IF
       *
-           DISPLAY "*(ORCMUP0002)* INPUT  /I   CNT[" CNT-IN  "]"
-           DISPLAY "*(ORCMUP0002)*  INSERT     CNT[" CNT-INS "]"
-           DISPLAY "*(ORCMUP0002)*  UPDATE     CNT[" CNT-UPD "]"
-           DISPLAY "*(ORCMUP0002)*  DELETE     CNT[" CNT-DEL "]"
-           DISPLAY "*(ORCMUP0002)* ERR    /O   CNT[" CNT-ERR "]"
-           DISPLAY "*(ORCMUP0002)* PLF    /O   CNT[" CNT-PLF "]"
-           DISPLAY "*(ORCMUP0002)* RC             [" LNK-RC "]"
+           DISPLAY "*(ORCMUP0003)* INPUT  /I   CNT[" CNT-IN  "]"
+           DISPLAY "*(ORCMUP0003)*  INSERT     CNT[" CNT-INS "]"
+           DISPLAY "*(ORCMUP0003)*  UPDATE     CNT[" CNT-UPD "]"
+           DISPLAY "*(ORCMUP0003)*  DELETE     CNT[" CNT-DEL "]"
+           DISPLAY "*(ORCMUP0003)* ERR    /O   CNT[" CNT-ERR "]"
+           DISPLAY "*(ORCMUP0003)* PLF    /O   CNT[" CNT-PLF "]"
+           DISPLAY "*(ORCMUP0003)* RC             [" LNK-RC "]"
       **** ACCEPT  WRK-IN
       *
            .

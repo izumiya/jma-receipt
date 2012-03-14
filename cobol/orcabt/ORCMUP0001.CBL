@@ -34,6 +34,8 @@
       *                                     対応
       * 01.00.03     NACL-小豆沢   6/04/03  MONFUNC対応
       * 04.03.00     NACL-太田    08/05/28  エラー処理強化対応
+      * 04.06.00     NACL-伊藤    10/12/02  点数マスタレイアウト変更
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -147,6 +149,10 @@ grpsys     COPY    "COMMON-SPA".
       *
            03  WRK-IN                  PIC X(01). 
       *
+           03  WRK-X-3                 PIC X(03). 
+           03  WRK-9-3-R               REDEFINES  WRK-X-3. 
+               05  WRK-9-3                 PIC 9(03). 
+      *
       *    出力ファイル領域
        01  MES-AREA.
            03  MES-TITLE1.
@@ -192,6 +198,16 @@ grpsys     COPY    "COMMON-SPA".
            03  TNSWK-V03-AREA-01       PIC X(1080).
            03  TNSWK-V03-AREA-02       PIC X(239).
       *---(01.00.03) LINE ADD START -------------------------------------
+      *---(04.06.00) LINE ADD START -------------------------------------
+      *    旧マスタデータ退避領域
+       01  TNSWK-TENSU-REC-V04.
+           03  TNSWK-V04-AREA-01       PIC X(963).
+           03  TNSWK-V04-AREA-02       PIC X(03).
+           03  TNSWK-V04-AREA-03       PIC X(24).
+           03  TNSWK-V04-AREA-04-TBL   OCCURS 10.
+               05  TNSWK-V04-AREA-04       PIC X(03).
+           03  TNSWK-V04-AREA-05       PIC X(304).
+      *---(04.06.00) LINE ADD START -------------------------------------
       *
        01  WRK-HOMEDIR.
            03  FILLER                  PIC X(28)  VALUE
@@ -991,6 +1007,9 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            WHEN    LNK-DBRVERSION (3:6)    <   "040200"
                PERFORM 900-TNSWK-V03-SET
       *
+           WHEN    LNK-DBRVERSION (3:6)    <   "040500"
+               PERFORM 900-TNSWK-V04-SET
+      *
            WHEN    OTHER
                MOVE    IN-REC      TO  TNSWK-TENSU-REC
            END-EVALUATE
@@ -1058,6 +1077,30 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *---(01.00.03) LINE ADD END   -------------------------------------
+      *---(04.06.00) LINE ADD START -------------------------------------
+      *****************************************************************
+      *    変更後レイアウト移送処理
+      *****************************************************************
+       900-TNSWK-V04-SET          SECTION.
+      *
+           MOVE    IN-REC              TO  TNSWK-TENSU-REC-V04
+      *
+           MOVE    TNSWK-V04-AREA-01   TO  TNSWK-TENSU-REC (1    : 963)
+           MOVE    TNSWK-V04-AREA-02   TO  WRK-X-3
+           MOVE    WRK-9-3             TO  TNSWK-KIJUNTEIGENCD
+           MOVE    TNSWK-V04-AREA-03   TO  TNSWK-TENSU-REC (968  : 24)
+           PERFORM VARYING IDX FROM 1 BY 1
+                   UNTIL IDX > 10
+               MOVE    TNSWK-V04-AREA-04(IDX)  TO  WRK-X-3
+               MOVE    WRK-9-3             TO  TNSWK-SSTKIJUNCD (IDX)
+           END-PERFORM
+           MOVE    TNSWK-V04-AREA-05   TO  TNSWK-TENSU-REC (1032 : 304)
+      *
+          .
+       900-TNSWK-V04-EXT.
+           EXIT.
+      *
+      *---(04.06.00) LINE ADD END   -------------------------------------
       *****************************************************************
       *    点数マスター読込
       *****************************************************************

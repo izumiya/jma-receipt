@@ -30,6 +30,7 @@
       * 01.00.04     NACL-°ËÆ£    08/03/07  ²èÁü¼ê½Ñ»Ù±ç²Ã»»
       *                                     °åÎÅ´Ñ»¡Ë¡ÂÐ¾Ý¶èÊ¬
       *                                     Ëã¿ì¼±ÊÌ¶èÊ¬ ÄÉ²Ã
+      * 04.06.00     NACL-Â¿¡¹Ç¼  10/10/29  »ÜÀß´ð½à¡¡£´·åÂÐ±þ
       ************************************************************
        01  TNSWK-TENSU-REC.
       *(1)
@@ -87,7 +88,7 @@
       *    ´ð½àÉÔÅ¬¹çÄþ¸º¶èÊ¬
            03  TNSWK-KIJUNTEIGENKBN      PIC  9(01).
       *    ´ð½àÉÔÅ¬¹çÄþ¸ºÂÐ¾Ý»ÜÀß´ð½à¥³¡¼¥É
-           03  TNSWK-KIJUNTEIGENCD       PIC  9(03).
+           03  TNSWK-KIJUNTEIGENCD       PIC  9(04).
            03  TNSWK-LASERKBN            PIC  9(01).
            03  TNSWK-CHPMESUKSN          PIC  9(01).
            03  TNSWK-MICMESUKSN          PIC  9(01).
@@ -111,7 +112,7 @@
            03  TNSWK-BUIKBN              PIC  9(01).
            03  TNSWK-SANTEIRRKKBN        PIC  9(01).
            03  TNSWK-SSTKIJUNCDTBL       OCCURS 10.
-               05  TNSWK-SSTKIJUNCD      PIC  9(03).
+               05  TNSWK-SSTKIJUNCD      PIC  9(04).
            03  TNSWK-AGEKSNTBL           OCCURS 4.
                05  TNSWK-AGEKSNKGN       PIC  X(02).
                05  TNSWK-AGEKSNJGN       PIC  X(02).
