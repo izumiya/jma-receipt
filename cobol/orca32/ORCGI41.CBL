@@ -7855,6 +7855,42 @@
                END-IF
            END-IF
       *
+      *    特定入院基本料のコード細分化置き換え
+           IF     LNK-SCNYUACCT-STSRYYMD   >=   "20120401"
+               IF  LNK-SCNYUACCT-NYUKHN-SRYCD(1)  =  "190799410"
+                   EVALUATE   SYS-5001-BTU-SBT
+      *                専門病院
+                       WHEN    "06"
+                             MOVE "190161010" TO
+                                        LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+      *                障害者施設等
+                       WHEN    "05"
+                             MOVE "190161210" TO
+                                        LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                   END-EVALUATE
+      *
+      *            特定機能病院は病棟設定された入院コードから判定
+                   IF   SYS-5001-BTU-KHNSRYCD =  "190118610" OR
+                                                 "190705610" OR
+                                                 "190085910"
+                     MOVE "190160810" TO  LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                   END-IF
+               END-IF
+      *        特別入院基本料
+               IF  LNK-SCNYUACCT-NYUKHN-SRYCD(1)  =  "190799510"
+                   EVALUATE   SYS-5001-BTU-SBT
+      *                専門病院
+                       WHEN    "06"
+                             MOVE "190161110" TO
+                                        LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+      *                障害者施設等
+                       WHEN    "05"
+                             MOVE "190161310" TO
+                                        LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                   END-EVALUATE
+               END-IF
+           END-IF
+      *
            DISPLAY "LNK-SCNYUACCT-STSRYYMD = "
                     LNK-SCNYUACCT-STSRYYMD
            CALL    "ORCSNYUACCT"       USING   SPA-AREA
