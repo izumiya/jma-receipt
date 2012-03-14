@@ -124,8 +124,16 @@
                                                SPA-K02
       *
                WHEN   (SPA-SRYYMD          >=  "20100401" )  AND
-                      (SPA-SRYYMD          <   "99999999" )
+                      (SPA-SRYYMD          <   "20120401" )
                    CALL    "ORCSC10S201004"    USING
+                                               ORCSC10SAREA
+                                               SPA-AREA
+                                               SPA-SCR-REC
+                                               SPA-K02
+      *
+               WHEN   (SPA-SRYYMD          >=  "20120401" )  AND
+                      (SPA-SRYYMD          <   "99999999" )
+                   CALL    "ORCSC10S201204"    USING
                                                ORCSC10SAREA
                                                SPA-AREA
                                                SPA-SCR-REC

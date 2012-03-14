@@ -80,8 +80,16 @@
                                                SPA-KT01
       *
                WHEN   (SPA-SRYYMD          >=  "20100401" )  AND
-                      (SPA-SRYYMD          <   "99999999" )
+                      (SPA-SRYYMD          <   "20120401" )
                    CALL    "ORCSCKT10S201004"  USING
+                                               ORCSCKT10SAREA
+                                               SPA-AREA
+                                               SPA-SCR-REC
+                                               SPA-KT01
+      *
+               WHEN   (SPA-SRYYMD          >=  "20120401" )  AND
+                      (SPA-SRYYMD          <   "99999999" )
+                   CALL    "ORCSCKT10S201204"  USING
                                                ORCSCKT10SAREA
                                                SPA-AREA
                                                SPA-SCR-REC
