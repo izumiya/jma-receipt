@@ -336,6 +336,7 @@ SRCS = ORCHC01.CBL \
        ORCSC10201204.CBL \
        ORCSC20201204.CBL \
        ORCSEIYOUKKS.CBL \
+       ORCSC70201204.CBL \
        ORCSC80201204.CBL \
 
 top_builddir = ../..
