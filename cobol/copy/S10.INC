@@ -27,6 +27,7 @@
                   06  S10-TNUM          PIC X(5).
                   06  S10-TPTNUM        PIC X(20).
                   06  S10-TNAME         PIC X(50).
+                  06  S10-TSEX          PIC X(02).
                   06  S10-TBIRHDAY      PIC X(10).
                   06  S10-TAGE          PIC X(10).
                   06  S10-TKBNMEI       PIC X(20).

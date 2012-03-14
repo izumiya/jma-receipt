@@ -57,6 +57,7 @@
                05  SPA-GMN-PTLIST-SEL          PIC 9(05).
                05  SPA-GMN-PTLIST-OCC          OCCURS  101.
                    07  SPA-GMN-PTLIST-SRT-KEY.
+                       09  SPA-GMN-TSECMONEY   PIC 9(07).
                        09  SPA-GMN-TKANANAME   PIC X(50).
                        09  SPA-GMN-TPTNUM      PIC X(20).
                    07  SPA-GMN-TPTID           PIC 9(10).
@@ -305,6 +306,7 @@
                    MOVE    WRK-AGE-G   TO  SPA-GMN-TAGE     (IDXL)
                END-IF
       *
+               MOVE    SYU-SECMONEY        TO  SPA-GMN-TSECMONEY(IDXL)
                IF    ( SYU-SECMONEY    =   1 )
                    MOVE    "£·£°ºÐÌ¤Ëþ"    TO  SPA-GMN-TKBNMEI (IDXL)
                ELSE
@@ -555,6 +557,8 @@
                                        TO  S10-TPTNUM (IDXL)
                MOVE    SPA-GMN-TNAME  (IDXL)
                                        TO  S10-TNAME (IDXL)
+               MOVE    SPA-GMN-TSEX(IDXL)
+                                       TO  S10-TSEX(IDXL)
                MOVE    SPA-GMN-TBIRHDAY(IDXL)
                                        TO  S10-TBIRHDAY(IDXL)
                MOVE    SPA-GMN-TAGE(IDXL)
