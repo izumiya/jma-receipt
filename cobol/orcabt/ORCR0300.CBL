@@ -371,6 +371,9 @@
       *                                     保険履歴を最大１００に変更
       *  04.05.24    NACL-門脇    11/12/13  災害に関するコメント修正
       *  04.05.25    NACL-藤原    11/12/16  東大阪市国保の減免対応
+      *  04.05.26    NACL-藤原    12/03/14  平成２４年４月改正対応
+      *                                     平成２４年４月分以降の処理を
+      *                                     行わない
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -1827,6 +1830,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE055PARA-HOSPNUM
                MOVE    RECE055PARA         TO  WRK-ERR-FILE-NM
                MOVE    STS-RECE055         TO  WRK-ERR-FILE-STS
                PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
+      *    平成２４年４月改正対応
+           IF      WRK-PARA-SRYYM      >=  "201204"
+               MOVE    1                   TO  FLG-END
            END-IF
       * 
            IF      FLG-END             =   ZERO
@@ -8267,6 +8275,11 @@ grpsys     PERFORM 900-DBFETCH-SEC
                              END-IF
                            END-IF
                        END-IF    
+      *
+      *                平成２４年４月改正対応
+                       IF      RECE02-SRYYM        >=  "201204"
+                           MOVE    2                   TO  FLG-READ
+                       END-IF
       *
                        IF      FLG-READ            =   1
                            ADD     1           TO  CNT-IN

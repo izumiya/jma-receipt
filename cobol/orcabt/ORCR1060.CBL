@@ -54,6 +54,9 @@
       *                                     の保険の記号番号を更新する
       *  04.05.06    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
+      *  04.05.07    NACL-藤原    12/03/14  平成２４年４月改正対応
+      *                                     平成２４年４月分以降の処理を
+      *                                     行わない
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/10/12  公費単独のレセ分離対応
@@ -541,6 +544,10 @@ grpsys             07  KEY-O-HOSPNUM   PIC  9(02).
            03  WRK-ERR-MSG-7.
                05  FILLER          PIC X(48)   VALUE
                    "【リアルタイムプレビューより作成のため提出不可】". 
+      *
+           03  WRK-ERR-MSG-99.
+               05  FILLER          PIC X(28)  VALUE
+                   "《平成２４年４月改正未対応》".
       *
        01  WRK-CONS-AREA.    
       *    改行コード
@@ -1264,6 +1271,24 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                MOVE    HCM58-HEAD1-G (5:)   TO  WRK-HCM58-HEAD1-G
                MOVE    WRK-ERR-MSG-7        TO  HCM58-HEAD1-G (5:)
                MOVE    WRK-HCM58-HEAD1-G    TO  HCM58-HEAD1-G (53:)
+           END-IF
+      *
+      *    平成２４年４月改正対応
+           IF      RECE100-SRYYM       >=  "201204"
+               MOVE    SPACE               TO  WRK-HCM58-HEAD1-G
+               MOVE    HCM58-HEAD1-G (5:)  TO  WRK-HCM58-HEAD1-G
+               MOVE    WRK-ERR-MSG-99      TO  HCM58-HEAD1-G (5:)
+               MOVE    WRK-HCM58-HEAD1-G   TO  HCM58-HEAD1-G (33:)
+               IF      WRK-PARA-PRTKBN     =   "2"
+                   IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                               =   "0"
+                       MOVE    "点検改正未対応"    TO  HCM58-LABEL
+                   ELSE
+                       MOVE    "改正未対応"        TO  HCM58-LABEL
+                   END-IF
+               ELSE
+                   MOVE    "改正未対応"        TO  HCM58-LABEL
+               END-IF
            END-IF
       *
            .
@@ -2601,6 +2626,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    請求管理ＤＢ更新
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
+      *
+      *    平成２４年４月改正対応
+           IF      RECE100-SRYYM       >=  "201204"
+               GO  TO  3904-RECE10-HENSYU-EXT
+           END-IF
       * 
       *    テスト患者、レセプト種別不明のとき更新しない
            IF    ( RECE100-TSTPTNUMKBN =   "1"  )
