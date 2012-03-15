@@ -807,8 +807,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                  IF   RECE82-HKNCOMBI         =
                                    RECE82-DOUJITSU-HKNCOMBI(IDY)
-                      MOVE    SPACE   TO    RECE82-NYUINRYOFLG
-                      MOVE     1      TO    FLG-SHOSAISIN
+                      MOVE    SPACE           TO    RECE82-NYUINRYOFLG
+                      MOVE    ZERO            TO    FLG-SHOSAISIN
+                      IF   WRK-DAY1(IDY)   NOT =    ZERO
+                               MOVE    1      TO    FLG-SHOSAISIN
+                      END-IF
                       PERFORM   2202-RECE82-TENSOU11-SEC
                  END-IF
       *

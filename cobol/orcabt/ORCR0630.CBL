@@ -1061,7 +1061,10 @@
                                    RECE62-DOUJITSU-HKNCOMBI(IDY)
                       MOVE    SPACE   TO    RECE62-NYUINRYOFLG
       *
-                      MOVE     1      TO    FLG-SHOSAISIN
+                      MOVE    ZERO            TO    FLG-SHOSAISIN
+                      IF   WRK-DAY1(IDY)   NOT =    ZERO
+                               MOVE    1      TO    FLG-SHOSAISIN
+                      END-IF
       *
                       PERFORM   500-KUMIAWASE-HANBETU-SEC
       *

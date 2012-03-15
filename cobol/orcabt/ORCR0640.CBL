@@ -533,6 +533,8 @@
       *  04.05.49    NACL-ÌçÏÆ    12/03/05  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.05.50    NACL-ÌçÏÆ    12/03/05  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     Ê¿À®£²£´Ç¯£³·î¤Þ¤Ç
+      *  04.05.51    NACL-ÌçÏÆ    12/03/15  ËÌ³¤Æ»ÃÏÊý¸øÈñ¡Ê£±£¸£³¡Ë¤Î
+      *                                     °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -14996,6 +14998,10 @@
                          (WRK-PREFNUM            =   13       ) AND
                          (RECE62-KOHNUM(KH-IDX - 1) =
                            "180" OR "380" OR "181" OR "381"   ))
+                  OR    ((RECE62-KOUREI          =  "1" OR "2") AND
+                         (RECE62-SRYYM          >=  "200810"  ) AND
+                         (WRK-PREFNUM            =   01       ) AND
+                         (RECE62-KOHNUM(KH-IDX - 1) = "183"   ))
                   OR    ((WRK-PREFNUM            =   36       ) AND
                          (RECE62-KOHNUM(KH-IDX - 1) =  "245"  ) AND
                          (RECE62-TEISYUTUSAKI    =   2 OR 6   ))
@@ -17025,6 +17031,9 @@
       ***          OR  ((WRK-PREFNUM             =   33           ) AND
       ***               (RECE62-KOHNUM(KOHFTN-IDX)(1:1)
       ***                                       >= "1" AND <=  "8"))
+                   OR  ((WRK-PREFNUM             =   01           ) AND
+                        (RECE62-KOHNUM(KOHFTN-IDX) = "183"        ) AND
+                        (RECE62-SRYYM             >= "200810"     ))
                    OR  ( TBL-TOKATUKAIFLG(KOHFTN-IDX)   =  1       )
                       MOVE  WRK-TAIHI-FTNMONEY    (KOHFTN-IDX + 1)
                                 TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
