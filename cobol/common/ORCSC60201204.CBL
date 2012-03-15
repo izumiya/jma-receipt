@@ -3097,7 +3097,7 @@
                           (WRK-COM-INPUTCD (IDX-ACT)  =   SPACE )) OR
                           (FLG-OK                     =   1     )
                IF      WRK-COM-INPUTCD (IDX-Z) =   CONS-BYORIK1
-                                               OR  CONS-BYORIK1
+                                               OR  CONS-BYORIK2
       *        ¡»ø•ø«√«
                    IF      WRK-COM-INPUTCD (IDX-ACT)   =   "160155110"
                                                        OR  "160178910"
@@ -3128,7 +3128,7 @@
                    MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
                    MOVE    "1"             TO  WRK-COM-KZMFLG (IDX-Z)
                    IF      WRK-COM-INPUTCD (IDX-Z) =   CONS-BYORIK1
-                                                   OR  CONS-BYORIK1
+                                                   OR  CONS-BYORIK2
                        MOVE    "K272"              TO  SPA-ERRCD
                    ELSE
                        MOVE    "K273"              TO  SPA-ERRCD
