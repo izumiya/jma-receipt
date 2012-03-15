@@ -782,7 +782,7 @@
                05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   35.
            03  CONST-GMN-KSN-MAX           PIC 9(05)   VALUE   3.
            03  CONST-KSNCD-G.
-               05  CONST-KSNCD-MAX         PIC 9(05)   VALUE   4.
+               05  CONST-KSNCD-MAX         PIC 9(05)   VALUE   7.
                05  CONST-KSNCD-VAL.
                    07  CONST-KSNCD-190116990
                                    PIC X(09)   VALUE   "190116990".
@@ -792,8 +792,14 @@
                                    PIC X(09)   VALUE   "190134270".
                    07  CONST-KSNCD-190135670
                                    PIC X(09)   VALUE   "190135670".
+                   07  CONST-KSNCD-190142970
+                                   PIC X(09)   VALUE   "190142970".
+                   07  CONST-KSNCD-190143370
+                                   PIC X(09)   VALUE   "190143370".
+                   07  CONST-KSNCD-190152470
+                                   PIC X(09)   VALUE   "190152470".
                05  CONST-KSNCD-R REDEFINES CONST-KSNCD-VAL.
-                   07  CONST-KSNCD-OCC     OCCURS  4.
+                   07  CONST-KSNCD-OCC     OCCURS  7.
                        09  CONST-KSNCD     PIC X(09).
            03  CONST-KANSATU               PIC X(02)    VALUE "10".
       *
@@ -5422,6 +5428,13 @@
                            MOVE  ZERO  TO  FLG-TARGET
                        END-IF
                    END-IF
+                   IF   (  FLG-RYOYOKHN    =   4 )
+                       IF    ( SYS-5111-SRYCD
+                                  =        "190122510"
+                                  OR       "190124810" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                   END-IF
                END-IF
       *
                IF    ( FLG-TARGET  =   1 )
@@ -5498,7 +5511,8 @@
       *
                MOVE    1               TO  FLG-HIT
       *
-               IF    ( CONST-KSNCD (IDX-KSN)
+               EVALUATE    TRUE
+               WHEN  ( CONST-KSNCD (IDX-KSN)
                                    =   CONST-KSNCD-190135470
                                     OR CONST-KSNCD-190134270
                                     OR CONST-KSNCD-190135670 )
@@ -5507,10 +5521,17 @@
                    ELSE
                        MOVE    ZERO    TO  FLG-HIT
                    END-IF
-               END-IF
-      *
+               WHEN  ( CONST-KSNCD (IDX-KSN)
+                                   =   CONST-KSNCD-190142970
+                                    OR CONST-KSNCD-190143370
+                                    OR CONST-KSNCD-190152470 )
+                   IF    ( WRK-KJNYMD     >=  CONST-H240401 )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO    TO  FLG-HIT
+                   END-IF
       *        êóáì´µ¼Ô´ÉÍý²Ã»»¤ÏÊ¿À®£²£´Ç¯£³·î¤Þ¤Ç
-               IF    ( CONST-KSNCD (IDX-KSN)
+               WHEN  ( CONST-KSNCD (IDX-KSN)
                                    =   CONST-KSNCD-190116990)
                    IF  ( WRK-KJNYMD     >=  "20040401")  AND
                        ( WRK-KJNYMD     <=  "20120331")
@@ -5518,13 +5539,16 @@
                    ELSE
                        MOVE    ZERO    TO  FLG-HIT
                    END-IF
-               END-IF
+               END-EVALUATE
       *
                IF    ( SPA-GMN-I01-SYORIKBN-CD =   CONST-IDO )
                    IF    ( CONST-KSNCD (IDX-KSN)
                                    =   CONST-KSNCD-190135470
                                     OR CONST-KSNCD-190134270
-                                    OR CONST-KSNCD-190135670 )
+                                    OR CONST-KSNCD-190135670
+                                    OR CONST-KSNCD-190142970
+                                    OR CONST-KSNCD-190143370
+                                    OR CONST-KSNCD-190152470 )
                      AND ( SPA-NAI-I01-IDOYMD
                                            >=  SPA-NAI-I01-NYUINYMD )
                        CONTINUE
@@ -5592,10 +5616,9 @@
                            CONTINUE
                        ELSE
                            EVALUATE    TNS-NYUKHNKSNKBN
-                           WHEN    152
-                           WHEN    173    THRU    190
+                           WHEN    1      THRU    2
                                IF    ( CONST-KSNCD (IDX-KSN)
-                                           =   CONST-KSNCD-190134270 )
+                                           =   CONST-KSNCD-190142970 )
                                    IF    ( SPA-GMN-I01-SYORIKBN-CD
                                                    =   CONST-NYUIN )
                                    OR    ( SPA-NAI-I01-IDOYMD
@@ -5605,6 +5628,33 @@
                                      PERFORM 410111-IPPAN-NYUIN-CHK-SEC
                                      IF    ( FLG-IPPAN       =   1 )
                                        CONTINUE
+                                     ELSE
+                                       MOVE    ZERO        TO  FLG-HIT
+                                     END-IF
+                                   END-IF
+                               ELSE
+                                   MOVE    ZERO            TO  FLG-HIT
+                               END-IF
+                           WHEN    152
+                           WHEN    173    THRU    190
+                               IF    ( CONST-KSNCD (IDX-KSN)
+                                           =   CONST-KSNCD-190134270
+                                            OR CONST-KSNCD-190143370 )
+                                   IF    ( SPA-GMN-I01-SYORIKBN-CD
+                                                   =   CONST-NYUIN )
+                                   OR    ( SPA-NAI-I01-IDOYMD
+                                             =  SPA-NAI-I01-NYUINYMD )
+                                       IF    ( WRK-KJNYMD
+                                                   >=    CONST-H240401 )
+                                           PERFORM 410111-RYOYO-CHK-SEC
+                                       END-IF
+                                   ELSE
+                                     PERFORM 410111-IPPAN-NYUIN-CHK-SEC
+                                     IF    ( FLG-IPPAN       =   1 )
+                                       IF    ( WRK-KJNYMD
+                                                   >=    CONST-H240401 )
+                                           PERFORM 410111-RYOYO-CHK-SEC
+                                       END-IF
                                      ELSE
                                        MOVE    ZERO        TO  FLG-HIT
                                      END-IF
@@ -5628,12 +5678,20 @@
                                ELSE
                                    MOVE    ZERO            TO  FLG-HIT
                                END-IF
+                           WHEN    253
+                           WHEN    254
+                               IF    ( CONST-KSNCD (IDX-KSN)
+                                           =   CONST-KSNCD-190152470 )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    ZERO            TO  FLG-HIT
+                               END-IF
                            WHEN    OTHER
                                    MOVE    ZERO            TO  FLG-HIT
                            END-EVALUATE
                        END-IF
                    ELSE
-                                   MOVE    ZERO            TO  FLG-HIT
+                           MOVE    ZERO            TO  FLG-HIT
                    END-IF
                END-IF
       *
@@ -5732,6 +5790,31 @@
       *
            .
        410111-IPPAN-NYUIN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÎÅÍÜÉÂÅï¡¡µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»»»Äê²ÄÈÝ¥Á¥§¥Ã¥¯
+      *****************************************************************
+       410111-RYOYO-CHK-SEC        SECTION.
+      *
+           EVALUATE    TNS-NYUKHNKSNKBN
+           WHEN    173 THRU 181
+               IF    ( CONST-KSNCD (IDX-KSN)
+                                       =   CONST-KSNCD-190143370 )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO        TO  FLG-HIT
+               END-IF
+           WHEN    182 THRU 190
+               IF    ( CONST-KSNCD (IDX-KSN)
+                                       =   CONST-KSNCD-190134270 )
+                   CONTINUE
+               ELSE
+                   MOVE    ZERO        TO  FLG-HIT
+               END-IF
+          END-EVALUATE
+      *
+           .
+       410111-RYOYO-CHK-EXT.
            EXIT.
       *****************************************************************
       *    »ÜÀß´ð½à¸¡º÷½èÍý
@@ -14096,34 +14179,6 @@
                                   IF    FLG-IPPAN2    =   2
                                      MOVE   "3"    TO
                                       LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX9)
-                                  END-IF
-      *                           ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¤Î¤È¤­²Ã»»¥³¡¼¥ÉÃÖ¤­´¹¤¨
-                                  IF     WRK-YUKYMD  >=  "20120401"
-                                    IF   PTNYUINRRK-TOKUTEI-KBN  =  "3"
-                                      IF PTNYUINRRK-TOKUTEI-NYUIN
-                                                             = "25" OR
-                                                               "26" OR
-                                                               "27" OR
-                                                               "28" OR
-                                                               "29" OR
-                                                               "37" OR
-                                                               "38" OR
-                                                               "39" OR
-                                                               "40" OR
-                                                               "41" OR
-                                                               "63" OR
-                                                               "64" OR
-                                                               "65" OR
-                                                               "66" OR
-                                                               "67" OR
-                                                               "68" OR
-                                                               "69" OR
-                                                               "70"
-                                        MOVE  "190143370"  TO
-                                          LNK-SCNYUACCT-NYUKHNKSN-SRYCD
-                                                                 (IDX9)
-                                      END-IF
-                                    END-IF
                                   END-IF
                              END-IF
       *                      µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡Ê¿ÇÎÅ½ê¡Ë¤Î¥Õ¥é¥°¥»¥Ã¥È
