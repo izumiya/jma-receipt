@@ -534,6 +534,7 @@
       *                                     Ê¿À®£²£´Ç¯£³·î¤Þ¤Ç
       *  04.05.51    NACL-ÌçÏÆ    12/03/15  ËÌ³¤Æ»ÃÏÊý¸øÈñ¡Ê£±£¸£³¡Ë¤Î
       *                                     °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  04.05.52    NACL-ÌçÏÆ    12/03/15  ÀéÍÕ¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -15460,6 +15461,11 @@
                                           OR "143" OR "243") AND
                     (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
                     (RECE62-SRYYM        >=  "201104"      ))
+                OR ((WRK-PREFNUM          =  "12"          ) AND
+                    (SYU-KOH1HKNNUM       =  "263" OR "363"
+                                          OR "463"         ) AND
+                    (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
+                    (RECE62-SRYYM        >=  "201203"      ))
                    MOVE     1     TO    FLG-SKY-TOKKOH
                 END-IF
               END-IF
