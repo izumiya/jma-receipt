@@ -334,6 +334,7 @@
       *    逓減検査包括テーブル
       *****************************************************************
       *
+      *
        01  TBL-KENSA-HOU-AREA.
       *      心カテ（右心）
            03  FILLER          PIC X(12)  VALUE    "01 160064610".
@@ -471,6 +472,12 @@
            03  FILLER          PIC X(12)  VALUE    "13 160072750".
       *    超音波（ＵＣＧ）（経食道的超音波法）
            03  FILLER          PIC X(12)  VALUE    "13 160160410".
+      *H24.4
+      *    超音波（ＵＣＧ）（胎児心エコー法）
+           03  FILLER          PIC X(12)  VALUE    "13 160186610".
+      *H24.4
+      *    超音波（心臓超音波検査）（負荷心エコー法）
+           03  FILLER          PIC X(12)  VALUE    "13 160198810".
       * 14
       *    超音波（ドップラー法）（胎児心音観察）
            03  FILLER          PIC X(12)  VALUE    "14 160072910".
@@ -483,11 +490,11 @@
       *
        01  TBL-KENSA-HOU-AREA-R    REDEFINES   TBL-KENSA-HOU-AREA.
       **** 03  TBL-KENSA-HOU-OCC       OCCURS  56  INDEXED  KEN-IDX.
-           03  TBL-KENSA-HOU-OCC       OCCURS  65  INDEXED  KEN-IDX.
+           03  TBL-KENSA-HOU-OCC       OCCURS  67  INDEXED  KEN-IDX.
                05  TBL-KEN-HOU         PIC X(02).
                05  TBL-FILLER          PIC X(01).
                05  TBL-KEN-SRYCD       PIC X(09).
-       01  KEN-IDX-MAX                 PIC 9(04)   VALUE   65.
+       01  KEN-IDX-MAX                 PIC 9(04)   VALUE   67.
       *
       *****************************************************************
       *    重複算定不可テーブル
