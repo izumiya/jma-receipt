@@ -5250,7 +5250,6 @@
                 AND  ( SPA-NAI-I01-BTUSBT  =   "09" )
                    MOVE    "5110"      TO  WRK-KANRICD
                    MOVE    "2"         TO  WRK-TOKNYUIN-KBN
-                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
                    EVALUATE    SYS-5001-CRYOYOKBN
                    WHEN    "1"
                        MOVE    "35"  TO  WRK-KBNCD
