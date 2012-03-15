@@ -5693,9 +5693,9 @@
                                             TO SPA-GMN-W20-KNGHITU-LBL
                MOVE    CONST-H2404-KNGHITU1 TO SPA-NAI-W20-KNGHITU-CD
       *
-               MOVE    "…¬≈ÔÃÙ∫ﬁ∂»Ã≥º¬ª‹≤√ªª"
-                                            TO SPA-GMN-W20-BTUYKZ-LBL
-               MOVE    CONST-H2404-BTUYKZ   TO SPA-NAI-W20-BTUYKZ-CD
+      *        MOVE    "…¬≈ÔÃÙ∫ﬁ∂»Ã≥º¬ª‹≤√ªª"
+      *                                     TO SPA-GMN-W20-BTUYKZ-LBL
+      *        MOVE    CONST-H2404-BTUYKZ   TO SPA-NAI-W20-BTUYKZ-CD
       *
                MOVE    "∞Âª’«€√÷≤√ªª£±"      TO  SPA-GMN-W20-DRTEK-LBL
                MOVE    CONST-H2204-DRTEKCD1  TO  SPA-NAI-W20-DRTEK-CD
