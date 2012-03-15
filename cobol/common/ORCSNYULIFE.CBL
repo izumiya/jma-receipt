@@ -69,12 +69,15 @@
            03  FLG-TSYRRK                  PIC 9(01).
            03  FLG-TNKRRK                  PIC 9(01).
            03  FLG-RJN                     PIC 9(01).
+           03  FLG-SEI                     PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
            03  IDX1                        PIC 9(04).
            03  TSY90-IDX                   PIC 9(02).
            03  IDX-RJN                     PIC 9(02).
+           03  IDX-SEI                     PIC 9(04).
+           03  IDX-SEI2                    PIC 9(04).
       *
       *    コンスタント値
       *    生活療養に関する入院診療コード
@@ -125,15 +128,189 @@
            03   CONS-H22-RYOYO2H           PIC X(09) VALUE "190133910".
            03   CONS-H22-RYOYO2I           PIC X(09) VALUE "190134110".
       *    回復期リハビリテーション病棟入院料１（生活療養）
-      *      （平成２４年以降は回復期リハビリテーション病棟入院料２（生活療養））
            03   CONS-H22-KAIFUKU1          PIC X(09) VALUE "190141710".
       *    回復期リハビリテーション病棟入院料２（生活療養）
-      *      （平成２４年以降は回復期リハビリテーション病棟入院料３（生活療養））
            03   CONS-H22-KAIFUKU2          PIC X(09) VALUE "190141910".
       *
-      *    平成２４年度改定追加分
+      *    平成２４年度改定生活療養判定用
+      *  （医療度の高い生活療養を上位にまとめているので、データの並びに注意すること）
+      *  （特別入院基本料は特別な判定があることからデータの最後とする）
+       01  TBL-H24-SEIKATSU-AREA.
+      *  医療度の高い生活療養
       *    回復期リハビリテーション病棟入院料１（生活療養）
-           03   CONS-H24-KAIFUKU1          PIC X(09) VALUE "190150210".
+           03   FILLER                     PIC X(09) VALUE "190150210".
+      *    回復期リハビリテーション病棟入院料１（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190719610".
+      *    回復期リハビリテーション病棟入院料２（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190141710".
+      *    回復期リハビリテーション病棟入院料２（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190719810".
+      *    回復期リハビリテーション病棟入院料３（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190141910".
+      *    回復期リハビリテーション病棟入院料３（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190720010".
+      *    短期滞在手術基本料２（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190125310".
+      *    短期滞在手術基本料３（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190130510".
+      *    有床診療所療養病床入院基本料Ａ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190124310".
+      *10  有床診療所療養病床入院基本料Ａ（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190711510".
+      *    有床診療所療養病床入院基本料Ｂ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190124410".
+      *    有床診療所療養病床入院基本料Ｂ（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190711710".
+      *    有床診療所療養病床入院基本料Ｃ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190124510".
+      *    有床診療所療養病床入院基本料Ｃ（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190711910".
+      *    療養病床以外・有床診療所療養病床入院Ａ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190155410".
+      *    療養病床以外・有床診療所療養病床入院Ａ（生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190155510".
+      *    療養病床以外・有床診療所療養病床入院Ｂ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190155810".
+      *    療養病床以外・有床診療所療養病床入院Ｂ（生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190155910".
+      *    療養病床以外・有床診療所療養病床入院Ｃ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190156210".
+      *20  療養病床以外・有床診療所療養病床入院Ｃ（生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190156310".
+      *    療養病棟入院基本料１（入院基本料Ａ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190123710".
+      *    療養病棟入院基本料１（入院基本料Ａ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190701010".
+      *    療養病棟入院基本料１（入院基本料Ｂ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190123810".
+      *    療養病棟入院基本料１（入院基本料Ｂ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190701210".
+      *    療養病棟入院基本料１（入院基本料Ｃ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190123910".
+      *    療養病棟入院基本料１（入院基本料Ｃ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190701410".
+      *    療養病棟入院基本料１（入院基本料Ｄ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190124010".
+      *    療養病棟入院基本料１（入院基本料Ｄ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190701610".
+      *    療養病棟入院基本料１（入院基本料Ｅ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190124110".
+      *30  療養病棟入院基本料１（入院基本料Ｅ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190701810".
+      *    療養病棟入院基本料１（入院基本料Ｆ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190131710".
+      *    療養病棟入院基本料１（入院基本料Ｆ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190702010".
+      *    療養病棟入院基本料２（入院基本料Ａ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190132510".
+      *    療養病棟入院基本料２（入院基本料Ａ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190702810".
+      *    療養病棟入院基本料２（入院基本料Ｂ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190132710".
+      *    療養病棟入院基本料２（入院基本料Ｂ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190703010".
+      *    療養病棟入院基本料２（入院基本料Ｃ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190132910".
+      *    療養病棟入院基本料２（入院基本料Ｃ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190703210".
+      *    療養病棟入院基本料２（入院基本料Ｄ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190133110".
+      *40  療養病棟入院基本料２（入院基本料Ｄ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190703410".
+      *    療養病棟入院基本料２（入院基本料Ｅ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190133310".
+      *    療養病棟入院基本料２（入院基本料Ｅ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190703610".
+      *   療養病棟入院基本料２（入院基本料Ｆ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190133510".
+      *    療養病棟入院基本料２（入院基本料Ｆ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190703810".
+      *    特定一般病棟・療養病棟入院基本料１（Ａ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190157410".
+      *    特定一般病棟・療養病棟入院基本料１（Ａ・生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190157510".
+      *    特定一般病棟・療養病棟入院基本料１（Ｂ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190157810".
+      *    特定一般病棟・療養病棟入院基本料１（Ｂ・生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190157910".
+      *    特定一般病棟・療養病棟入院基本料１（Ｃ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190158210".
+      *50  特定一般病棟・療養病棟入院基本料１（Ｃ・生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190158310".
+      *    特定一般病棟・療養病棟入院基本料１（Ｄ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190158610".
+      *    特定一般病棟・療養病棟入院基本料１（Ｄ・生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190158710".
+      *   特定一般病棟・療養病棟入院基本料１（Ｅ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190159010".
+      *    特定一般病棟・療養病棟入院基本料１（Ｅ・生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190159110".
+      *    特定一般病棟・療養病棟入院基本料１（Ｆ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190159410".
+      *56  特定一般病棟・療養病棟入院基本料１（Ｆ・生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190159510".
+      *
+      *  医療度の高くない生活療養
+      *57  有床診療所療養病床入院基本料Ｄ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190124610".
+      *    有床診療所療養病床入院基本料Ｄ（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190712110".
+      *    有床診療所療養病床入院基本料Ｅ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190124710".
+      *60  有床診療所療養病床入院基本料Ｅ（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190712310".
+      *    療養病床以外・有床診療所療養病床入院Ｄ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190156610".
+      *    療養病床以外・有床診療所療養病床入院Ｄ（生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190156710".
+      *    療養病床以外・有床診療所療養病床入院Ｅ（生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190157110".
+      *    療養病床以外・有床診療所療養病床入院Ｅ（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190157010".
+      *    療養病棟入院基本料１（入院基本料Ｇ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190131910".
+      *    療養病棟入院基本料１（入院基本料Ｇ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190702210".
+      *    療養病棟入院基本料１（入院基本料Ｈ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190132110".
+      *    療養病棟入院基本料１（入院基本料Ｈ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190702410".
+      *    療養病棟入院基本料１（入院基本料Ｉ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190132310".
+      *70  療養病棟入院基本料１（入院基本料Ｉ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190702610".
+      *    療養病棟入院基本料２（入院基本料Ｇ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190133710".
+      *    療養病棟入院基本料２（入院基本料Ｇ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190704010".
+      *    療養病棟入院基本料２（入院基本料Ｈ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190133910".
+      *    療養病棟入院基本料２（入院基本料Ｈ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190704210".
+      *    療養病棟入院基本料２（入院基本料Ｉ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190134110".
+      *    療養病棟入院基本料２（入院基本料Ｉ）（生活療養）（栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190704410".
+      *    特定一般病棟・療養病棟入院基本料１（Ｇ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190159810".
+      *    特定一般病棟・療養病棟入院基本料１（Ｇ・生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190159910".
+      *    特定一般病棟・療養病棟入院基本料１（Ｈ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190160210".
+      *80  特定一般病棟・療養病棟入院基本料１（Ｈ・生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190160310".
+      *    特定一般病棟・療養病棟入院基本料１（Ｉ）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190160610".
+      *82  特定一般病棟・療養病棟入院基本料１（Ｉ・生活療養・栄管経過措置）
+           03   FILLER                     PIC X(09) VALUE "190160710".
+      *
+      *83  有床診療所療養病床入院基本料（特別入院基本料）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190124810".
+      *84  療養病棟入院基本料（特別入院基本料）（生活療養）
+           03   FILLER                     PIC X(09) VALUE "190124210".
+      *
+       01  TBL-H24-SEIKATSU-R     REDEFINES  TBL-H24-SEIKATSU-AREA.
+           03   TBL-H24-SEISRYCD           PIC X(09)  OCCURS  84.
       *
       *    一時領域
        01  WRK-AREA.
@@ -331,8 +508,9 @@
                    IF    NACCT-SRYCDTOTAL     =    99999916
                        CONTINUE
                    ELSE
+      *
+      *            （平成２２年３月以前）
                      IF   LNK-NYULIFE-SANTEIYM <=  "201003"
-      *                （平成２２年３月以前）
       *                生活療養に該当する入院料を判定し、
       *                返却値の対象区分を設定する
                        PERFORM    210-NYUINACT-GET-SEC
@@ -392,8 +570,11 @@
                             END-IF
                           END-PERFORM
                        END-IF
-                     ELSE
-      *                （平成２２年４月以降）
+                     END-IF
+      *
+      *            （平成２２年４月から平成２４年３月まで）
+                     IF  (LNK-NYULIFE-SANTEIYM >=  "201004")    AND
+                         (LNK-NYULIFE-SANTEIYM <=  "201203")
       *                生活療養に該当する入院料を判定し、
       *                返却値の対象区分を設定する
                        PERFORM    210-NYUINACT-GET-SEC
@@ -427,8 +608,7 @@
                                                CONS-H22-RYOYO2H OR
                                                CONS-H22-RYOYO2I OR
                                                CONS-H22-KAIFUKU1 OR
-                                               CONS-H22-KAIFUKU2 OR
-                                               CONS-H24-KAIFUKU1
+                                               CONS-H22-KAIFUKU2
                           PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
                             IF     NACCT-DAY(IDX1)  NOT =  ZERO
@@ -456,8 +636,7 @@
                                                      CONS-H22-RYOYO2E OR
                                                      CONS-H22-RYOYO2F OR
                                                     CONS-H22-KAIFUKU1 OR
-                                                    CONS-H22-KAIFUKU2 OR
-                                                    CONS-H24-KAIFUKU1
+                                                    CONS-H22-KAIFUKU2
                                    MOVE   "1"   TO   
                                              LNK-NYULIFE-FTNKBN2(IDX1)
                                END-IF
@@ -476,7 +655,52 @@
                           END-PERFORM
                        END-IF
                      END-IF
+      *
+      *            （平成２４年４月から）
+                     IF  LNK-NYULIFE-SANTEIYM >=  "201204"
+      *                生活療養に該当する入院料を判定し、
+      *                返却値の対象区分を設定する
+                       PERFORM    210-NYUINACT-GET-SEC
+                       MOVE       ZERO        TO   FLG-SEI
+                                                   IDX-SEI2
+                       PERFORM    VARYING   IDX-SEI  FROM 1  BY  1
+                         UNTIL   (IDX-SEI   >   84)    OR
+                                 (FLG-SEI   =    1)
+                             IF  NSRY-SRYCD(1) = TBL-H24-SEISRYCD
+                                                        (IDX-SEI)
+                                 MOVE   1        TO   FLG-SEI
+                                 MOVE   IDX-SEI  TO   IDX-SEI2
+                             END-IF
+                       END-PERFORM
+                       IF   FLG-SEI    =    1
+                          PERFORM    VARYING   IDX1   FROM   1   BY   1
+                                  UNTIL     IDX1   >   31
+                            IF     NACCT-DAY(IDX1)  NOT =  ZERO
+                               MOVE   "1"     TO   LNK-NYULIFE-KBN(IDX1)
+                               MOVE    1      TO   FLG-OK
+      *                        病状の程度、治療の内容をしん酌して標準
+      *                        負担額を軽減する患者の判定（入院料判断）
+                               IF  (IDX-SEI2   >=   1 )   AND
+                                   (IDX-SEI2   <=   56)
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE-FTNKBN2(IDX1)
+                               END-IF
+      *                        病状の程度、治療の内容をしん酌して標準
+      *                        負担額を軽減する患者の判定（特別入院基本料算定時の
+      *                                                    ＡＤＬ入力判断）
+                               IF (IDX-SEI2   =   83  OR  84)    AND
+                                  (SS008-MEDKBNDAY(IDX1)  =  "2" OR
+                                                             "3" )
+                                   MOVE   "1"   TO   
+                                             LNK-NYULIFE-FTNKBN2(IDX1)
+                               END-IF
+                            END-IF
+                          END-PERFORM
+                       END-IF
+                     END-IF
+      *
                    END-IF
+      *
                    MOVE    "tbl_nyuinacct"      TO  MCP-TABLE
                    MOVE    "key17"              TO  MCP-PATHNAME
                    PERFORM 910-NYUINACCT-READ-SEC
