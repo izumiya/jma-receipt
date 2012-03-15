@@ -331,6 +331,9 @@
       *  04.05.29    NACL-藤原    11/12/06  更新日付をマシン日付から設定
       *  04.05.30    NACL-門脇    11/12/13  災害に関するコメント修正
       *  04.05.31    NACL-藤原    11/12/16  東大阪市国保の減免対応
+      *  04.05.32    NACL-藤原    12/03/14  平成２４年４月改正対応
+      *                                     平成２４年４月分以降の処理を
+      *                                     行わない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1650,6 +1653,11 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            OPEN    INPUT               RECE68-FILE
       *
            OPEN    INPUT               RECE655-FILE
+      *
+      *    平成２４年４月改正対応
+           IF      WRK-PARA-SRYYM      >=  "201204"
+               MOVE    1                   TO  FLG-END
+           END-IF
       * 
            IF      FLG-END             =   ZERO
       *
@@ -8788,6 +8796,11 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *************************END-IF
                            END-IF
                        END-IF    
+      *
+      *                平成２４年４月改正対応
+                       IF      RECE62-SRYYM        >=  "201204"
+                           MOVE    2                   TO  FLG-READ
+                       END-IF
       *
                        IF      FLG-READ            =   1
                            ADD     1               TO  CNT-IN

@@ -147,6 +147,9 @@
       *  04.05.34    NACL-Æ£¸¶    11/12/06  ¹¹¿·ÆüÉÕ¤ò¥Þ¥·¥óÆüÉÕ¤«¤éÀßÄê
       *  04.05.35    NACL-ÌçÏÆ    11/12/13  ºÒ³²¤Ë´Ø¤¹¤ë¥³¥á¥ó¥È½¤Àµ
       *  04.05.36    NACL-Æ£¸¶    11/12/16  ÅìÂçºå»Ô¹ñÊÝ¤Î¸ºÌÈÂÐ±þ
+      *  04.05.37    NACL-Æ£¸¶    12/03/14  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *                                     Ê¿À®£²£´Ç¯£´·îÊ¬°Ê¹ß¤Î½èÍý¤ò
+      *                                     ¹Ô¤ï¤Ê¤¤
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1105,6 +1108,10 @@
            03  WRK-ERR-MSG-11.
                05  FILLER          PIC X(28)   VALUE
                    "À¯ÉÜ´É¾¸¤¬»ÈÍÑ¤µ¤ì¤Æ¤¤¤Þ¤¹". 
+      *
+           03  WRK-ERR-MSG-99.
+               05  FILLER          PIC X(28)  VALUE
+                   "¡ÔÊ¿À®£²£´Ç¯£´·î²þÀµÌ¤ÂÐ±þ¡Õ".
       *
        01  WRK-CONS-AREA.
       *    ¸ÇÄêÃ¼Ëö£É£Ä
@@ -2455,6 +2462,11 @@
       *****************************************************************
        20022-KOHSKY-WRITE-SEC          SECTION.
       *
+      *    Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+           IF      RECE62X-SRYYM       >=  "201204"
+               GO  TO  20022-KOHSKY-WRITE-EXT
+           END-IF
+      *
            MOVE    SPACE               TO  KOHSKY-REC
            INITIALIZE                      KOHSKY-REC
            MOVE    RECE62X-HOSPNUM     TO  KOHSKY-HOSPNUM
@@ -3092,6 +3104,24 @@
                                                    TO  HC06-HEAD5
                        END-EVALUATE
                END-EVALUATE
+           END-IF
+      *
+      *    Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+           IF      RECE62-SRYYM        >=  "201204"
+               MOVE    SPACE               TO  WRK-HC06-HEAD4-G
+               MOVE    HC06-HEAD4-G (5:)   TO  WRK-HC06-HEAD4-G
+               MOVE    WRK-ERR-MSG-99      TO  HC06-HEAD4-G (5:)
+               MOVE    WRK-HC06-HEAD4-G    TO  HC06-HEAD4-G (33:)
+               IF      WRK-PARA-PRTKBN     =   "2"
+                   IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                           =   "0"
+                       MOVE    "ÅÀ¸¡²þÀµÌ¤ÂÐ±þ"    TO  HC06-LABEL
+                   ELSE
+                       MOVE    "²þÀµÌ¤ÂÐ±þ"        TO  HC06-LABEL
+                   END-IF
+               ELSE
+                   MOVE    "²þÀµÌ¤ÂÐ±þ"        TO  HC06-LABEL
+               END-IF
            END-IF
       *
            .
@@ -9587,6 +9617,11 @@
       *    ÀÁµá´ÉÍý£Ä£Â¹¹¿·
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
+      *
+      *    Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+           IF      RECE62-SRYYM        >=  "201204"
+               GO  TO  3904-RECE10-HENSYU-EXT
+           END-IF
       * 
       *    ¥Æ¥¹¥È´µ¼Ô¤Î¤È¤­¹¹¿·¤·¤Ê¤¤
            IF      RECE62-TSTPTNUMKBN  =   "1"
@@ -10773,6 +10808,11 @@
       *****************************************************************
        3001-MISEIKYU-FLG-KOUSIN-SEC    SECTION.
       *
+      *    Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+           IF      WRK-PARA-SRYYM      >=  "201204"
+               GO  TO  3001-MISEIKYU-FLG-KOUSIN-EXT
+           END-IF
+      *
            OPEN    INPUT               RECE62-FILE
       *
            MOVE    ZERO                TO  FLG-RECE62
@@ -10994,6 +11034,11 @@
                    END-IF
       *
                    MOVE    ZERO                TO  FLG-RECE62
+      *
+      *            Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+                   IF      RECE62-SRYYM        >=  "201204"
+                       GO  TO  990-RECE62-READ-EXT
+                   END-IF
            END-READ
       *
            .

@@ -56,6 +56,9 @@
       *  04.05.07    NACL-藤原    11/10/24  「請求しない」設定の請求管理
       *                                     の削除処理の有無対応
       *  04.05.08    NACL-藤原    11/12/06  更新日付をマシン日付から設定
+      *  04.05.09    NACL-藤原    12/03/14  平成２４年４月改正対応
+      *                                     平成２４年４月分以降の処理を
+      *                                     行わない
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -565,6 +568,10 @@
            03  WRK-ERR-MSG-7.
                05  FILLER          PIC X(48)   VALUE
                    "【リアルタイムプレビューより作成のため提出不可】". 
+      *
+           03  WRK-ERR-MSG-99.
+               05  FILLER          PIC X(28)  VALUE
+                   "《平成２４年４月改正未対応》".
       *
        01  WRK-CONS-AREA.    
       *    改行コード
@@ -1299,6 +1306,24 @@
                MOVE    HCN58-HEAD1-G (5:)   TO  WRK-HCN58-HEAD1-G
                MOVE    WRK-ERR-MSG-7        TO  HCN58-HEAD1-G (5:)
                MOVE    WRK-HCN58-HEAD1-G    TO  HCN58-HEAD1-G (53:)
+           END-IF
+      *
+      *    平成２４年４月改正対応
+           IF      RECE200-SRYYM       >=  "201204"
+               MOVE    SPACE               TO  WRK-HCN58-HEAD1-G
+               MOVE    HCN58-HEAD1-G (5:)  TO  WRK-HCN58-HEAD1-G
+               MOVE    WRK-ERR-MSG-99      TO  HCN58-HEAD1-G (5:)
+               MOVE    WRK-HCN58-HEAD1-G   TO  HCN58-HEAD1-G (33:)
+               IF      WRK-PARA-PRTKBN     =   "2"
+                   IF      SYS-200501-INSPECT-CHARACTER-KBN
+                                               =   "0"
+                       MOVE    "点検改正未対応"    TO  HCN58-LABEL
+                   ELSE
+                       MOVE    "改正未対応"        TO  HCN58-LABEL
+                   END-IF
+               ELSE
+                   MOVE    "改正未対応"        TO  HCN58-LABEL
+               END-IF
            END-IF
       *
            .
@@ -2909,6 +2934,11 @@
       *    請求管理ＤＢ更新
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
+      *
+      *    平成２４年４月改正対応
+           IF      RECE200-SRYYM       >=  "201204"
+               GO  TO  3904-RECE10-HENSYU-EXT
+           END-IF
       * 
       *    テスト患者、レセプト種別不明のとき更新しない
            IF    ( RECE200-TSTPTNUMKBN =   "1"  )
