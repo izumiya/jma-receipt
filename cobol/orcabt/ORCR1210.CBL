@@ -422,8 +422,10 @@
       *
                  IF   RECE200-HKNCOMBI        =
                                    RECE200-DOUJITSU-HKNCOMBI(IDY)
-                          MOVE   SPACE  TO   RECE200-NYUINRYOFLG
+                      MOVE    SPACE     TO   RECE200-NYUINRYOFLG
+                      IF   WRK-DAY1(IDY)   NOT =    ZERO
                           MOVE   "1"    TO   TBL-JNISSU-DAY(IDY)
+                      END-IF
                  END-IF
       *
            END-PERFORM

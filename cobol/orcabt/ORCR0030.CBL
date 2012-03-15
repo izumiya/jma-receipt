@@ -545,6 +545,8 @@
       *  04.05.42    NACL-ÌçÏÆ    12/03/05  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.05.43    NACL-ÌçÏÆ    12/03/05  ÆÃÄêÊÝ¸±¼Ô¡ÜÀº¿À¡¢·ë³ËÂÐ±þ
       *                                     Ê¿À®£²£´Ç¯£³·î¤Þ¤Ç
+      *  04.05.44    NACL-ÌçÏÆ    12/03/15  ËÌ³¤Æ»ÃÏÊý¸øÈñ¡Ê£±£¸£³¡Ë¤Î
+      *                                     °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -11523,6 +11525,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        (SYS-1001-PREFNUM     =   13       ) AND
                        (RECE02-KOHNUM(KH-IDX - 1) =
                          "180" OR "380" OR "181" OR "381" ))
+                OR    ((RECE02-ZAITAKU       =  "1" OR "2") AND
+                       (RECE02-SRYYM        >=  "200810"  ) AND
+                       (SYS-1001-PREFNUM     =   01       ) AND
+                       (RECE02-KOHNUM(KH-IDX - 1) = "183" ))
                   ADD   SYU-KOH-HKNFTNMONEY(IDX3)  TO
                                            RECE02-FTNMONEY(KH-IDX)
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
@@ -12382,6 +12388,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
       ***          OR  ((SYS-1001-PREFNUM        =   33           ) AND
       ***               (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
       ***                                       >= "1" AND <=  "8"))
+                   OR  ((SYS-1001-PREFNUM        =   01           ) AND
+                        (RECE02-KOHNUM(KOHFTN-IDX) = "183"        ) AND
+                        (RECE02-SRYYM             >= "200810"     ))
                    OR  ( TBL-TOKATUKAIFLG(KOHFTN-IDX)   =  1       )
                       MOVE  WRK-TAIHI-FTNMONEY    (KOHFTN-IDX + 1)
                                 TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)

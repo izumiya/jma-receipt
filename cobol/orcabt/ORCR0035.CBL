@@ -326,27 +326,40 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            IF (RECE02-HENTOTALTEN(2)       =      ZERO)    AND
               (RECE02-HENTOTALTEN(3)       =      ZERO)    AND
               (RECE02-HENTOTALTEN(4)       =      ZERO)    AND
-              (RECE02-HENTOTALTEN(5)       =      ZERO)
+              (RECE02-HENTOTALTEN(5)       =      ZERO)    AND
+              (RECE02-TENKEN-FLG           =     SPACE)
                CONTINUE
            ELSE
-             IF    RECE02-HENTOTALTEN(1)   NOT =  ZERO
-               IF (RECE02-HENTOTALTEN(2)   NOT =  ZERO)              AND
-                  (RECE02-HENTOTALTEN(1)   NOT =  RECE02-HENTOTALTEN(2))
+             IF     RECE02-HENTOTALTEN(1) NOT = ZERO
+               IF ((RECE02-HENTOTALTEN(2) NOT = ZERO)    AND
+                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(2)))
+               OR ((RECE02-TENKEN-FLG         = "1" )    AND
+                   (RECE02-HENTOTALTEN(2)     = ZERO)    AND
+                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(2)))
                    MOVE      1          TO     BUN-IDX
                    PERFORM   20011-RECE04-HENSYU-SEC
                END-IF
-               IF (RECE02-HENTOTALTEN(3)   NOT =  ZERO)              AND
-                  (RECE02-HENTOTALTEN(1)   NOT =  RECE02-HENTOTALTEN(3))
+               IF ((RECE02-HENTOTALTEN(3) NOT = ZERO)    AND
+                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(3)))
+               OR ((RECE02-TENKEN-FLG         = "1" )    AND
+                   (RECE02-HENTOTALTEN(3)     = ZERO)    AND
+                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(3)))
                    MOVE      2          TO     BUN-IDX
                    PERFORM   20011-RECE04-HENSYU-SEC
                END-IF
-               IF (RECE02-HENTOTALTEN(4)   NOT =  ZERO)              AND
-                  (RECE02-HENTOTALTEN(1)   NOT =  RECE02-HENTOTALTEN(4))
+               IF ((RECE02-HENTOTALTEN(4) NOT = ZERO)    AND
+                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(4)))
+               OR ((RECE02-TENKEN-FLG         = "1" )    AND
+                   (RECE02-HENTOTALTEN(4)     = ZERO)    AND
+                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(4)))
                    MOVE      3          TO     BUN-IDX
                    PERFORM   20011-RECE04-HENSYU-SEC
                END-IF
-               IF (RECE02-HENTOTALTEN(5)   NOT =  ZERO)              AND
-                  (RECE02-HENTOTALTEN(1)   NOT =  RECE02-HENTOTALTEN(5))
+               IF ((RECE02-HENTOTALTEN(5) NOT = ZERO)    AND
+                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(5)))
+               OR ((RECE02-TENKEN-FLG         = "1" )    AND
+                   (RECE02-HENTOTALTEN(5)     = ZERO)    AND
+                   (RECE02-HENTOTALTEN(1) NOT = RECE02-HENTOTALTEN(5)))
                    MOVE      4          TO     BUN-IDX
                    PERFORM   20011-RECE04-HENSYU-SEC
                END-IF
