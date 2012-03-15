@@ -1105,18 +1105,38 @@
                WHEN    "43"
       *                м╜╬╡©гне╫Йнемэиб╬╡фЧ╠║╢Пкэнаёа║йю╦ЁХнемэ║к
                        MOVE   "190124310"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190155410"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "44"
       *                м╜╬╡©гне╫Йнемэиб╬╡фЧ╠║╢Пкэнаёб║йю╦ЁХнемэ║к
                        MOVE   "190124410"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190155810"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "45"
       *                м╜╬╡©гне╫Йнемэиб╬╡фЧ╠║╢Пкэнаёц║йю╦ЁХнемэ║к
                        MOVE   "190124510"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190156210"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "46"
       *                м╜╬╡©гне╫Йнемэиб╬╡фЧ╠║╢Пкэнаёд║йю╦ЁХнемэ║к
                        MOVE   "190124610"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190156610"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "47"
       *                м╜╬╡©гне╫Йнемэиб╬╡фЧ╠║╢Пкэнаёе║йю╦ЁХнемэ║к
                        MOVE   "190124710"   TO  LNK-TOKNYUIN-SRYCD
+                       IF   (SYS-5001-BTU-SBT     =   "08")   AND
+                            (SYS-5001-CRYOYOKBN   =   "1")
+                           MOVE   "190157010"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "48"
       *                м╜╬╡©гне╫Йнемэиб╬╡фЧ╠║╢Пкэна║йфцйлфЧ╠║╢Пкэна║к║йю╦ЁХнемэ║к
                        MOVE   "190124810"   TO  LNK-TOKNYUIN-SRYCD
