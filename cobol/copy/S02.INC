@@ -31,6 +31,9 @@
                 04  S02-B07-LABEL      PIC X(10).
               03  S02-B09S.
                 04  S02-B09S-LABEL     PIC X(10).
+              03  S02-B12C.
+                04  S02-B12C-STATE     PIC S9(9)   BINARY.
+                04  S02-B12C-LABEL     PIC X(20).
               03  S02-LBLMSG-G.
                 04  S02-LBLMSG-STYLE   PIC X(20).
                 04  S02-LBLMSG         PIC X(60).

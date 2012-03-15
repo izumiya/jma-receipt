@@ -2796,6 +2796,12 @@
                MOVE    WIDGET-INSENSITIVE      TO  S02-B04S-STATE
            END-IF
       *
+           MOVE    WIDGET-INSENSITIVE          TO  S02-B12C-STATE
+           MOVE    "°ì³çºÆ·×»»³ºÅö"            TO  S02-B12C-LABEL
+           IF    ( SPA-GMN-MODE    =   CONST-MODE-NORMON )
+               MOVE    WIDGET-NORMAL           TO  S02-B12C-STATE
+           END-IF
+      *
            PERFORM 5001-MAPCUR-SEC
       *
            .

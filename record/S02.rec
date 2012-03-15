@@ -21,6 +21,10 @@ S02	{
 		B09S	{
 	           	label	varchar(10);
 		};
+		B12C	{
+           	state	int;
+			value	varchar(20);
+		};
 		LBLMSG	{
 			style   varchar(20);
 			value	varchar(60);
