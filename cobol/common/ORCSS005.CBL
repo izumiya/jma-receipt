@@ -55,7 +55,8 @@
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX0                            PIC 9(05).
-           03  IDX-RYO                         PIC 9(05).
+           03  IDXK                            PIC 9(05).
+           03  IDXR                            PIC 9(05).
            03  IDX-SRY                         PIC 9(05).
            03  IDX-DAY                         PIC 9(05).
       *
@@ -343,25 +344,24 @@
       *****************************************************************
        1001111-RYOYOCD-CHK-SEC          SECTION.
       *
-           PERFORM VARYING IDX-RYO FROM    1   BY  1
-                   UNTIL ( IDX-RYO >   CONST-RYOYOCD-MAX )
+           PERFORM VARYING IDXK    FROM    1   BY  1
+                   UNTIL ( IDXK    >   CONST-RYOYOCD-KHN-MAX )
                     OR   ( WRK-RYOYO-DAY-G NOT =   ZERO )
+               PERFORM VARYING IDXR    FROM    1   BY  1
+                   UNTIL ( IDXR    >   CONST-RYOYOCD-CD-MAX  )
+                    OR   ( WRK-RYOYO-DAY-G NOT =   ZERO )
+                   IF    ( NSRY-SRYCD (IDX-SRY)
+                                   =   CONST-RYOYOCD  (IDXK IDXR))
+                       PERFORM VARYING IDX-DAY FROM    1   BY  1
+                               UNTIL ( IDX-DAY >   31 )
       *
-               IF    ( NSRY-SRYCD (IDX-SRY)    =   CONST-RYOYOCD
-                                                              (IDX-RYO))
+                           IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
+                               MOVE    1   TO  WRK-RYOYO-DAY (IDX-DAY)
+                           END-IF
       *
-                   PERFORM VARYING IDX-DAY FROM    1   BY  1
-                           UNTIL ( IDX-DAY >   31 )
-      *
-                       IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
-                           MOVE    CONST-RYOYOCDMSGID  (IDX-RYO)
-                                           TO  WRK-RYOYO-DAY (IDX-DAY)
-                       END-IF
-      *
-                   END-PERFORM
-      *
-               END-IF
-      *
+                       END-PERFORM
+                   END-IF
+               END-PERFORM
            END-PERFORM
       *
            IF    ( WRK-RYOYO-DAY-G         =   ZERO )

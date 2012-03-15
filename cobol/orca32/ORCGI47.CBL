@@ -65,8 +65,7 @@
                    07  SPA-I47-RYOYO-DAY-OCC       OCCURS  31.
                        09  SPA-I47-RYOYO-DAY       PIC S9(02).
                        09  SPA-I47-RYOYO-CD        PIC X(09).
-                       09  SPA-I47-RYOYO-LIFE      PIC 9(01).
-                       09  SPA-I47-RYOYO-KHN       PIC 9(01).
+                       09  SPA-I47-RYOYO-KHN       PIC 9(02).
                05  SPA-GMN-CUR                     PIC 9(03).
                05  SPA-GMN-AREA.
                    07  SPA-GMN-SELNUM              PIC X(50).
@@ -142,6 +141,8 @@
            03  IDX-RYO                     PIC 9(05).
            03  IDX-MED                     PIC 9(05).
            03  IDX-ADL                     PIC 9(05).
+           03  IDXK                        PIC 9(05).
+           03  IDXR                        PIC 9(05).
       *
        01  WRK-AREA.
            03  WRK-IIDCD                   PIC X(04).
@@ -203,11 +204,8 @@
            03  WRK-RYOYO-CD-G.
                05  WRK-RYOYO-CD            PIC X(09)
                                            OCCURS  31.
-           03  WRK-RYOYO-LIFE-G.
-               05  WRK-RYOYO-LIFE          PIC 9(01)
-                                           OCCURS  31.
            03  WRK-RYOYO-KHN-G.
-               05  WRK-RYOYO-KHN           PIC 9(01)
+               05  WRK-RYOYO-KHN           PIC 9(02)
                                            OCCURS  31.
            03  WRK-ZAINUM-G.
                05  WRK-ZAINUM              PIC 9(08).
@@ -1275,7 +1273,6 @@
       *
                INITIALIZE      WRK-RYOYO-DAY-G
                                WRK-RYOYO-CD-G
-                               WRK-RYOYO-LIFE-G
                                WRK-RYOYO-KHN-G
       *
                PERFORM 31011-EDIT-RYOYO-DAY-SEC
@@ -1291,8 +1288,6 @@
                    IF    ( WRK-RYOYO-CD  (IDX-DAY) NOT =   SPACE )
                        MOVE    WRK-RYOYO-CD  (IDX-DAY)
                                        TO  SPA-I47-RYOYO-CD  (IDX-DAY)
-                       MOVE    WRK-RYOYO-LIFE(IDX-DAY)
-                                       TO  SPA-I47-RYOYO-LIFE(IDX-DAY)
                        MOVE    WRK-RYOYO-KHN (IDX-DAY)
                                        TO  SPA-I47-RYOYO-KHN (IDX-DAY)
                        MOVE    1       TO  SPA-I47-RYOYO-FLG
@@ -1345,30 +1340,34 @@
       *****************************************************************
        310111-RYOYOCD-CHK-SEC          SECTION.
       *
-           PERFORM VARYING IDX-RYO FROM    1   BY  1
-                   UNTIL ( IDX-RYO >   CONST-RYOYOCD-MAX )
+           PERFORM VARYING IDXK    FROM    1   BY  1
+                   UNTIL ( IDXK    >   CONST-RYOYOCD-KHN-MAX )
                     OR   ( WRK-RYOYO-DAY-G NOT =   ZERO )
       *
-               IF    ( NSRY-SRYCD (IDX-SRY)    =   CONST-RYOYOCD
-                                                              (IDX-RYO))
+               PERFORM VARYING IDXR    FROM    1   BY  1
+                   UNTIL ( IDXR    >   CONST-RYOYOCD-CD-MAX  )
+                    OR   ( WRK-RYOYO-DAY-G NOT =   ZERO )
       *
-                   PERFORM VARYING IDX-DAY FROM    1   BY  1
-                           UNTIL ( IDX-DAY >   31 )
+                   IF    ( NSRY-SRYCD (IDX-SRY)    =   CONST-RYOYOCD
+                                                           (IDXK IDXR))
       *
-                       IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
-                           MOVE    CONST-RYOYOCDMSGID  (IDX-RYO)
+                       PERFORM VARYING IDX-DAY FROM    1   BY  1
+                               UNTIL ( IDX-DAY >   31 )
+      *
+                           IF    ( NACCT-DAY (IDX-DAY) >   ZERO )
+                               MOVE    IDXR
                                            TO  WRK-RYOYO-DAY (IDX-DAY)
-                           MOVE    CONST-RYOYOCD       (IDX-RYO)
+                               MOVE    CONST-RYOYOCD  (IDXK IDXR)
                                            TO  WRK-RYOYO-CD  (IDX-DAY)
-                           MOVE    CONST-RYOYOLIFE     (IDX-RYO)
-                                           TO  WRK-RYOYO-LIFE(IDX-DAY)
-                           MOVE    CONST-RYOYOKHN      (IDX-RYO)
+                               MOVE    IDXK
                                            TO  WRK-RYOYO-KHN(IDX-DAY)
-                       END-IF
+                           END-IF
       *
-                   END-PERFORM
+                       END-PERFORM
       *
-               END-IF
+                   END-IF
+      *
+               END-PERFORM
       *
            END-PERFORM
       *
@@ -1790,8 +1789,6 @@
                IF    ( SPA-I47-RYOYO-DAY (IDX-DAY) >   ZERO )
                    MOVE    SPA-I47-RYOYO-DAY (IDX-DAY)
                                    TO  SS011-DAY (IDX-DAY)
-                   MOVE    SPA-I47-RYOYO-LIFE(IDX-DAY)
-                                   TO  SS011-LIFE(IDX-DAY)
                    MOVE    SPA-I47-RYOYO-KHN (IDX-DAY)
                                    TO  SS011-KHN (IDX-DAY)
                    EVALUATE    TRUE
@@ -3258,8 +3255,6 @@
                    IF    ( SPA-I47-RYOYO-DAY (IDX-DAY) >  ZERO )
                        MOVE    SPA-I47-RYOYO-DAY (IDX-DAY)
                                    TO  SS011-DAY (IDX-DAY)
-                       MOVE    SPA-I47-RYOYO-LIFE(IDX-DAY)
-                                   TO  SS011-LIFE(IDX-DAY)
                        MOVE    SPA-I47-RYOYO-KHN (IDX-DAY)
                                    TO  SS011-KHN (IDX-DAY)
                        EVALUATE    TRUE
@@ -3405,6 +3400,9 @@
                    MOVE    IDX-DAY     TO   WRK-Z9
                    MOVE    WRK-Z9      TO   I47-NYULIST-NDAY (IDX-DAY)
       *
+             IF    ( SPA-I47-RYOYO-KHN (IDX-DAY) = 5 OR 6 OR 9 OR 10 )
+               MOVE    "ÆÃ"            TO  I47-TNL-DAY(1 IDX-DAY)
+             ELSE
                EVALUATE    SPA-I47-RYOYO-DAY (IDX-DAY)
                WHEN    1
                    MOVE    "£Á"        TO  I47-TNL-DAY(1 IDX-DAY)
@@ -3424,11 +3422,10 @@
                    MOVE    "£È"        TO  I47-TNL-DAY(1 IDX-DAY)
                WHEN    9
                    MOVE    "£É"        TO  I47-TNL-DAY(1 IDX-DAY)
-               WHEN    10
-                   MOVE    "ÆÃ"        TO  I47-TNL-DAY(1 IDX-DAY)
                WHEN    -1
                    MOVE    "¡¦"        TO  I47-TNL-DAY(1 IDX-DAY)
                END-EVALUATE
+             END-IF
            END-PERFORM
       *
            .
