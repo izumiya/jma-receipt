@@ -1890,13 +1890,13 @@
                    END-STRING
                WHEN    "K871"
                    STRING  "警告！脳血管疾患等リハビリテーション"
-                           "発症日から１８０日以内です。"
+                           "発症日の１８０日超から算定して下さい。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "K872"
                    STRING  "警告！運動器リハビリテーション"
-                           "発症日から１５０日以内です。"
+                           "発症日の１５０日超から算定して下さい。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
