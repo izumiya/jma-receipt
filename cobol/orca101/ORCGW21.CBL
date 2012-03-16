@@ -4581,7 +4581,7 @@
            PERFORM 4100-SYS-1006-SEL-SEC
       *
            IF    ( SPA-ERRCD               =   SPACE )
-               IF    ( SPA-NAI-W20-YUKOSTYMD >=  CONST-H240401 )
+               IF    ( SPA-NAI-W21-YUKOSTYMD >=  CONST-H240401 )
                    PERFORM 49012-SSTKIJUN-CHK-SEC
                ELSE
                    PERFORM 49011-SSTKIJUN-CHK-SEC
