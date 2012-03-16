@@ -735,6 +735,10 @@
                MOVE    1                   TO  FLG-EXSYOKUJI
            END-IF
       *
+           IF    ( HCM34S01-EXGAIHAKU      =   SPACE )
+               MOVE       "1"              TO  HCM34S01-EXGAIHAKU
+           END-IF
+      *
            .
        100-PRM-CHK-EXT.
            EXIT.
