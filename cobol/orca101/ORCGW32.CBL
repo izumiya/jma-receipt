@@ -483,7 +483,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    "特定施設入居時等医学総合管理料" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "206"
-                   MOVE    "在宅末期医療総合診療料" 
+      *H24.4       MOVE    "在宅末期医療総合診療料" 
+                   MOVE    "在宅がん医療総合診療料" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "504"
                    MOVE    "回復期リハビリテーション病棟入院料" 
