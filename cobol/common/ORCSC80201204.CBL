@@ -303,6 +303,7 @@
       *    発症日＋１４日
            03  WRK-KYUSEI-14               PIC X(08).
            03  WRK-KYUSEI-14-MSG           PIC X(80).
+           03  WRK-KYUSEI-MSG02            PIC X(80).
       *
       *    リハビリ回数集計
        01  WRK-RIGAKU-NCNT-AREA.
@@ -1807,6 +1808,17 @@
                        LNK-DAY2-EDTYMD3    DELIMITED  BY  SIZE
                       INTO                 WRK-KYUSEI-MSG
                END-STRING
+      *        発生日
+               INITIALIZE                      STS-AREA-DAY
+               INITIALIZE                      LNK-DAY2-AREA
+               MOVE    "21"                TO  LNK-DAY2-IRAI
+               MOVE    WRK-KYUSEI-YMD      TO  LNK-DAY2-YMD
+               CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY2-AREA
+               STRING  "算定開始日："      DELIMITED  BY  SIZE
+                       LNK-DAY2-EDTYMD3    DELIMITED  BY  SIZE
+                      INTO                 WRK-KYUSEI-MSG02
+               END-STRING
            END-IF
       *
            .
@@ -3054,8 +3066,8 @@
                                MOVE    "K872"          TO  SPA-ERRCD
                            END-IF
                    END-EVALUATE
-                   MOVE    WRK-KYUSEI-MSG  TO  LNK-ORCSC-ERRMSG
-                   MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
+                   MOVE    WRK-KYUSEI-MSG02    TO  LNK-ORCSC-ERRMSG
+                   MOVE    "1"                 TO  WRK-COM-CUR  (IDX-Z)
                END-IF
            END-IF
       *
