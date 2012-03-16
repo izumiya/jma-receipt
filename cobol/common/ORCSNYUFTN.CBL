@@ -3253,14 +3253,17 @@ grpsys                                    SPA-AREA
       *          Ç§ÃÎ¾É¼£ÎÅÉÂÅïÆþ±¡ÎÁ
                  IF    WRK-NYUKHNKSNKBN = 221 OR 232
       *            ¡Ê£¶£±Æü°Ê¾å¡Ë
-                   IF   WRK-CHK-SRYCD = "190740010" OR "190813510"
+                   IF   WRK-CHK-SRYCD = "190740010" OR "190813510" OR
+                                        "190722510" OR "190722810"
                      IF    TBL-GAIHAKU(SYU-IDX)  =    7
                         MOVE    1    TO    WRK-TAIJYUSIN-ERR
                      END-IF
                    END-IF
       *            ¡Ê£¶£°Æü°ÊÆâ¡Ë
                    IF   WRK-CHK-SRYCD = "190151610" OR "190739910" OR
-                                        "190151710" OR "190813410"
+                                        "190151710" OR "190813410" OR
+                                        "190722310" OR "190722410" OR
+                                        "190722610" OR "190722710"
                      IF    TBL-GAIHAKU(SYU-IDX)  =    6
                         MOVE    1    TO    WRK-TAIJYUSIN-ERR
                      END-IF
