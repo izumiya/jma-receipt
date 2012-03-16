@@ -5,9 +5,10 @@ tbl_generic_price {
 	PRICE   			number(11,2);
 	CREYMD   			char(8);
 	UPYMD    			char(8);
+#-----> 主キー更新用項目
+	UPYUKOEDYMD 			char(8),virtual;
 };
-primary	{
-	YAKKAKJNCD,YUKOSTYMD,YUKOEDYMD;
+primary	{YAKKAKJNCD,YUKOSTYMD,YUKOEDYMD;
 };
 
 path	key 	{
@@ -28,5 +29,32 @@ path	all	{
 		SELECT *
 		FROM tbl_generic_price
  		;
+	};
+};
+path	key2	{
+	DBSELECT	{
+		DECLARE tbl_generic_price_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_generic_price
+		WHERE 	YAKKAKJNCD	= :YAKKAKJNCD
+			ORDER	BY	YUKOSTYMD
+		;
+	};
+};
+
+path	upd1	{
+	DBUPDATE		{
+		UPDATE	tbl_generic_price
+				SET
+				YAKKAKJNCD     = :YAKKAKJNCD,
+				YUKOSTYMD      = :YUKOSTYMD,
+				YUKOEDYMD      = :YUKOEDYMD,
+				PRICE          = :PRICE,
+				CREYMD      = :CREYMD,
+				UPYMD      = :UPYMD
+			WHERE 	YAKKAKJNCD      =  :YAKKAKJNCD
+			AND	YUKOSTYMD	=	:YUKOSTYMD
+			AND	YUKOEDYMD	=	:UPYUKOEDYMD
+		;
 	};
 };
