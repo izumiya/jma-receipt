@@ -5631,7 +5631,7 @@
                            CONTINUE
                        ELSE
                            EVALUATE    TNS-NYUKHNKSNKBN
-                           WHEN    1      THRU    2
+                           WHEN    2      THRU    3
                                IF    ( CONST-KSNCD (IDX-KSN)
                                            =   CONST-KSNCD-190142970 )
                                    IF    ( SPA-GMN-I01-SYORIKBN-CD
