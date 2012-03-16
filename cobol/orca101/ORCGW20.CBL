@@ -5165,8 +5165,8 @@
                        MOVE    "2"         TO  SPA-GMN-W20-KNGHITU
                    WHEN    CONST-H2404-KNGHITU2
                        MOVE    "3"         TO  SPA-GMN-W20-KNGHITU
-                   WHEN    CONST-H2404-BTUYKZ
-                       MOVE    "2"         TO  SPA-GMN-W20-BTUYKZ
+      *             WHEN    CONST-H2404-BTUYKZ
+      *                MOVE    "2"         TO  SPA-GMN-W20-BTUYKZ
       *
                    WHEN    CONST-H2204-DRTEKCD1
                        MOVE    "2"         TO  SPA-GMN-W20-DRTEK
