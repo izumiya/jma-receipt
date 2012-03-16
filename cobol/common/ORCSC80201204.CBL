@@ -1906,11 +1906,19 @@
                        LNK-DAY2-EDTYMD3    DELIMITED  BY  SIZE
                       INTO                 WRK-KYUSEI-MSG
                END-STRING
-      *        発生日
+      *        要介護開始日
+               INITIALIZE                      STS-AREA-DAY
+               INITIALIZE                      LNK-DAY6-AREA
+               MOVE    "61"                TO  LNK-DAY6-IRAI
+               MOVE    WRK-KYUSEI-YMD      TO  LNK-DAY6-KIJUN
+               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+               MOVE    1                   TO  LNK-DAY6-ZOGEN
+               CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
                INITIALIZE                      STS-AREA-DAY
                INITIALIZE                      LNK-DAY2-AREA
                MOVE    "21"                TO  LNK-DAY2-IRAI
-               MOVE    WRK-KYUSEI-YMD      TO  LNK-DAY2-YMD
+               MOVE    LNK-DAY6-KEISAN     TO  LNK-DAY2-YMD
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY2-AREA
                STRING  "算定開始日："      DELIMITED  BY  SIZE
