@@ -1139,6 +1139,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                      SPACE      OR
                                     "190142190" OR  "190142090" OR
                                     "190142290" OR  "190141590" OR
+                                    "190108790" OR  "190108890" OR
+                                    "190109090" OR
                                     "190153190" OR  "190153090" OR
                                     "190153390" OR  "190153290" )
                AND     (WRK-SHOKIKSN(IDX1)   NOT =         SPACE)
