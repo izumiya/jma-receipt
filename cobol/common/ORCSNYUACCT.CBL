@@ -1365,6 +1365,7 @@
                    END-IF
                END-IF
       *
+      *        救急・在宅等支援療養病床初期加算（病院）
                IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190134270"
                   MOVE  "3"  TO  LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
                END-IF
@@ -1395,6 +1396,7 @@
                    END-IF
                END-IF
       *
+      *        救急・在宅等支援療養病床初期加算（診療所）
                IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190135670"
                   MOVE  "4"  TO  LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
                END-IF
@@ -1411,6 +1413,37 @@
       *                救急・在宅等支援療養病床初期加算（診療所）の算定済
       *                日数取得
                        PERFORM   210-KYUKYU-KSN2-SEC
+                       IF      WRK-KYUKYU-NISSU  NOT =   ZERO
+                         IF  WRK-KYUKYU-NISSU    <   14
+                           COMPUTE  WRK-ZOGEN  =  14 - WRK-KYUKYU-NISSU
+                           MOVE     ZERO         TO  FLG-SYORI
+                         ELSE
+                           MOVE    ZERO          TO  WRK-ZOGEN
+                         END-IF
+                       ELSE
+                         MOVE     14    TO   WRK-ZOGEN
+                         MOVE     ZERO  TO   FLG-SYORI
+                       END-IF
+                   END-IF
+               END-IF
+      *
+      *        救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）
+               IF    LNK-SCNYUACCT-NYUKHNKSN-SRYCD (IDX-K) = "190143370"
+                  MOVE  "3"  TO  LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
+               END-IF
+      *
+               IF      LNK-SCNYUACCT-NYUKHNKSN-KBN (IDX-K)
+                                           =   "3"
+      *            入院処理時のみ行う
+                   IF      LNK-SCNYUACCT-SYORI-KBN     =   "1"
+                       MOVE    14                  TO  WRK-ZOGEN
+      *暫定対処
+                       MOVE    ZERO                TO  FLG-SYORI
+      *
+                   ELSE
+      *                救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）
+      *                の算定済日数取得
+                       PERFORM   210-KYUKYU-KSN3-SEC
                        IF      WRK-KYUKYU-NISSU  NOT =   ZERO
                          IF  WRK-KYUKYU-NISSU    <   14
                            COMPUTE  WRK-ZOGEN  =  14 - WRK-KYUKYU-NISSU
@@ -1584,6 +1617,67 @@
       **                 WRK-KYUKYU-NISSU
            .
        210-KYUKYU-KSN2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）の
+      *    算定済日数取得
+      *****************************************************************
+       210-KYUKYU-KSN3-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-KYUKYU-NISSU
+      *    入院履歴と入院会計を検索し、算定済み日数を求める
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+           MOVE    WRK-STYMD           TO  PTNYUINRRK-TENNYUYMD
+                                           PTNYUINRRK-TENSTUYMD
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 910-PTNYUINRRK-SELECT-SEC
+           IF      FLG-PTNYUINRRK      =   ZERO
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key42"             TO  MCP-PATHNAME
+               PERFORM 910-PTNYUINRRK-FETCH-SEC
+               IF      FLG-PTNYUINRRK  =   ZERO
+                   INITIALIZE                      KSN-NYUINACCT-REC
+                   MOVE    SPA-HOSPNUM         TO  KSN-NACCT-HOSPNUM
+                   MOVE    SPA-PTID            TO  KSN-NACCT-PTID
+                   MOVE    PTNYUINRRK-NYUINYMD(1:6)
+                                               TO  KSN-NACCT-SRYYM
+                   MOVE    KSN-NYUINACCT-REC   TO  MCPDATA-REC
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key48"             TO  MCP-PATHNAME
+                   PERFORM 910-NYUINACCT-SELECT-SEC
+                   IF      FLG-NYUINACCT       =   ZERO
+                       MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                       MOVE    "key48"         TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACCT-FETCH-SEC
+                       PERFORM    UNTIL
+                                  FLG-NYUINACCT    =    1
+                           ADD   KSN-NACCT-ZAIKAISU
+                                               TO  WRK-KYUKYU-NISSU
+                           MOVE    "tbl_nyuinacct" TO  MCP-TABLE
+                           MOVE    "key48"         TO  MCP-PATHNAME
+                           PERFORM 910-NYUINACCT-FETCH-SEC
+                       END-PERFORM
+                   END-IF
+      *
+                   MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+                   MOVE    "key48"             TO  MCP-PATHNAME
+                   PERFORM 990-DBCLOSE-SEC
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key42"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      **     DISPLAY "==  ORCSNYUACCT WRK-KYUKYU-NISSU = "
+      **                 WRK-KYUKYU-NISSU
+           .
+       210-KYUKYU-KSN3-EXT.
            EXIT.
       *
       *****************************************************************
