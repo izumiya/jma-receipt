@@ -96,8 +96,9 @@
                05  WRK-WDD         PIC 9(02).
            03  WRK-SYMD.
                05  WRK-SYY         PIC 9(04).
-               05  WRK-SMM         PIC 9(02).
-               05  WRK-SDD         PIC 9(02).
+               05  WRK-SMMDD.
+                   07  WRK-SMM         PIC 9(02).
+                   07  WRK-SDD         PIC 9(02).
       *
       *    検証番号チェック
            03  WRK-MOJ-AREA.
@@ -3313,6 +3314,14 @@
                                         LNK-DAY6-AREA
            IF  STS-DAY-RC1          =   ZERO
                MOVE    LNK-DAY6-KEISAN  TO  WRK-SYMD
+      *H24.3
+      *        開始日が２月２９日で年加算は翌日とする
+               IF     (WRK-DAY-YMD(5:4)    =   "0229" )
+                 AND  (WRK-DAY-PTN         =   "3"    )
+                 AND  (WRK-DAY-ZOGEN       >   ZERO   )
+                 AND  (WRK-SMMDD           =   "0228" )
+                   MOVE    "0301"          TO  WRK-SMMDD
+               END-IF
            ELSE
                MOVE    SPACE            TO  WRK-SYMD
                MOVE    "0069"           TO  SPA-ERRCD
