@@ -17216,6 +17216,21 @@
       *    扱いに含める
            PERFORM   210-KYUKYU-KSN2-SEC
       *
+      *    退院日に救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-KYUKYU-KSN3-SEC
+      *
+      *    退院日に救急・在宅等支援療養病床初期加算（一般病棟入院基本料）が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-KYUKYU-KSN4-SEC
+      *
+      *    退院日に救急・在宅等支援療養病床初期加算（特定一般病棟入院料）が算定
+      *    されているかチェックして、算定されていれば入院料加算の
+      *    扱いに含める
+           PERFORM   210-KYUKYU-KSN5-SEC
+      *
       *    退院日に有床診療所一般病床初期加算が算定
       *    されているかチェックして、算定されていれば入院料加算の
       *    扱いに含める
@@ -17505,6 +17520,132 @@
       *
            .
        210-KYUKYU-KSN2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（療養病棟入院基本料１）の
+      *    算定有無チェック
+      *****************************************************************
+       210-KYUKYU-KSN3-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           MOVE  PTNYUINRRK-TENNYUYMD  TO  LNK-DAY6-KIJUN
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key48"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key48"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+                         ADD    1      TO   IDX9
+                         MOVE   "190143370"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key48"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-KYUKYU-KSN3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（一般病棟入院基本料）の
+      *    算定有無チェック
+      *****************************************************************
+       210-KYUKYU-KSN4-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           MOVE  PTNYUINRRK-TENNYUYMD  TO  LNK-DAY6-KIJUN
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key49"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key49"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+                         ADD    1      TO   IDX9
+                         MOVE   "190142970"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key49"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-KYUKYU-KSN4-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    救急・在宅等支援療養病床初期加算（特定一般病棟入院料）の
+      *    算定有無チェック
+      *****************************************************************
+       210-KYUKYU-KSN5-SEC            SECTION.
+      *
+           MOVE     ZERO               TO  WRK-TENNYUYMD9
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
+           MOVE    SPA-PTID            TO  NACCT-PTID
+      *    転入日付のマイナス１日
+           INITIALIZE   LNK-DAY6-AREA
+           MOVE  "61"         TO  LNK-DAY6-IRAI
+           MOVE  PTNYUINRRK-TENNYUYMD  TO  LNK-DAY6-KIJUN
+           MOVE  "1"                   TO  LNK-DAY6-ZOGENPTN
+           MOVE  -1                    TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"    USING        STS-AREA-DAY
+                                           LNK-DAY6-AREA
+           MOVE   LNK-DAY6-KEISAN      TO  WRK-TENNYUYMD
+           MOVE   WRK-TENNYUYMD(1:6)   TO  NACCT-SRYYM
+           MOVE    "key50"             TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT       =   ZERO
+               MOVE    "key50"         TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+               IF   FLG-NYUINACCT      =    0
+                    IF   NACCT-DAY(WRK-TENNYUYMD-DD9)  =  1
+                         ADD    1      TO   IDX9
+                         MOVE   "190152470"
+                              TO   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
+                    END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key50"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       210-KYUKYU-KSN5-EXT.
            EXIT.
       *
       *****************************************************************
