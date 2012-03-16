@@ -36,3 +36,6 @@
            03  GENERICPRICE-CREYMD           PIC  X(08).
       *更新年月日
            03  GENERICPRICE-UPYMD            PIC  X(08).
+      *更新用
+           03  GENERICPRICE-UP-AREA.
+               05  GENERICPRICE-UPYUKOEDYMD  PIC  X(08).
