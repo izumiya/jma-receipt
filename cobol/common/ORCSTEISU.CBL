@@ -44,19 +44,20 @@
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-SYSKANRI                PIC 9(01).
+           03  FLG-TENSU                   PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
       *
       *    コンスタント値
        01  CONSTANT-AREA.
-      *    定数超過入院ん基本料減額（１００分の１０）
+      *    定数超過入院基本料減額（１００分の１０）
            03  CONS-TEISU1                 PIC X(09) VALUE "190107690".
-      *    定数超過入院ん基本料減額（１００分の２０）
+      *    定数超過入院基本料減額（１００分の２０）
            03  CONS-TEISU2                 PIC X(09) VALUE "190107790".
-      *    定数超過入院ん基本料減額（１００分の１０）（特定入院料）
+      *    定数超過入院基本料減額（１００分の１０）（特定入院料）
            03  CONS-TEISU3                 PIC X(09) VALUE "190122990".
-      *    定数超過入院ん基本料減額（１００分の２０）（特定入院料）
+      *    定数超過入院基本料減額（１００分の２０）（特定入院料）
            03  CONS-TEISU4                 PIC X(09) VALUE "190123090".
       *
       *    一時領域
@@ -78,6 +79,8 @@
       *
            COPY    "CPSK5000.INC".
       *
+      *    点数マスタ−
+           COPY    "CPTENSU.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -117,8 +120,12 @@
            END-IF
       *
       *    主処理
-           IF      LNK-TEISU-RC      =    ZERO
-               PERFORM 200-MAIN-SEC
+           IF    LNK-TEISU-RC      =    ZERO
+               IF  LNK-TEISU-SANTEIYM    >=   "201204"
+                   PERFORM    210-TEISU2-SEC
+               ELSE
+                   PERFORM    200-TEISU1-SEC
+               END-IF
            END-IF
       *
            .
@@ -143,9 +150,9 @@
            EXIT.
       *
       *****************************************************************
-      *    主取得
+      *    定数超過の診療コード判定取得（平成２４年３月まで）
       *****************************************************************
-       200-MAIN-SEC            SECTION.
+       200-TEISU1-SEC            SECTION.
       *
       *定数超過情報の取得（システム管理テーブルより）
            MOVE    SPACE               TO  WRK-TEISUKBN
@@ -454,7 +461,318 @@
            END-IF
       *
            .
-       200-MAIN-EXT.
+       200-TEISU1-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    定数超過の診療コード判定取得（平成２４年４月以降）
+      *****************************************************************
+       210-TEISU2-SEC            SECTION.
+      *
+      *定数超過情報の取得（システム管理テーブルより）
+           MOVE    SPACE               TO  WRK-TEISUKBN
+           MOVE    ZERO                TO  FLG-SYSKANRI
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    "5000"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    LNK-TEISU-SANTEIYM
+                                       TO  SYS-STYUKYMD(1:6)
+           MOVE    "01"                TO  SYS-STYUKYMD(7:2)
+           MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key10"         TO  MCP-PATHNAME
+               PERFORM  910-SYSKANRI-READ-SEC
+               IF  FLG-SYSKANRI     =      ZERO
+                   IF   SYS-5000-TEISUKBN  =  SPACE OR  "0"
+                       CONTINUE
+                   ELSE
+                       MOVE  SYS-5000-TEISUKBN  TO  WRK-TEISUKBN
+                       EVALUATE  LNK-TEISU-TOKUTEINYUIN-KBN
+                           WHEN  "0"
+                               INITIALIZE                TNS-TENSU-REC
+                               MOVE    LNK-TEISU-SANTEIYM
+                                                     TO  TNS-YUKOSTYMD
+                                                                 (1:6)
+                               MOVE    "01"    TO  TNS-YUKOSTYMD (7:2)
+                               MOVE    TNS-YUKOSTYMD TO  TNS-YUKOEDYMD
+                               MOVE    SPA-HOSPNUM   TO  TNS-HOSPNUM
+                               MOVE    LNK-TEISU-SANTEISRYCD
+                                                     TO  TNS-SRYCD
+                               MOVE    TNS-TENSU-REC TO  MCPDATA-REC
+                               MOVE    "tbl_tensu"   TO  MCP-TABLE
+                               MOVE    "key"         TO  MCP-PATHNAME
+                               PERFORM 910-DBSELECT-SEC
+                               IF      MCP-RC              =   ZERO
+                                   MOVE  "tbl_tensu" TO  MCP-TABLE
+                                   MOVE  "key"       TO  MCP-PATHNAME
+                                   PERFORM 910-DBFETCH-SEC
+                                   IF      MCP-RC     =  ZERO
+                                       MOVE  MCPDATA-REC
+                                                     TO  TNS-TENSU-REC
+                                       MOVE  ZERO    TO  FLG-TENSU
+                                   ELSE
+                                       INITIALIZE        TNS-TENSU-REC
+                                       MOVE    1     TO  FLG-TENSU
+                                   END-IF
+                               ELSE
+                                   INITIALIZE            TNS-TENSU-REC
+                                   MOVE    1         TO  FLG-TENSU
+                               END-IF
+      *
+                               MOVE    "tbl_tensu"   TO  MCP-TABLE
+                               MOVE    "key"         TO  MCP-PATHNAME
+                               PERFORM  910-DB-CLOSE-SEC
+      *
+      *                        入院基本料加算区分からの判定に変更
+                               EVALUATE   TNS-NYUKHNKSNKBN
+      *                            療養病棟入院基本料（特別入院基本料）
+                                   WHEN   152
+      *                            有床診療所療養病床入院基本料Ａ
+                                   WHEN   153
+      *                            有床診療所療養病床入院基本料Ｂ
+                                   WHEN   154
+      *                            有床診療所療養病床入院基本料Ｃ
+                                   WHEN   155
+      *                            有床診療所療養病床入院基本料Ｄ
+                                   WHEN   156
+      *                            有床診療所療養病床入院基本料Ｅ
+                                   WHEN   157
+      *                            有床診療所療養病床入院基本料（特別入院基本料）
+                                   WHEN   158
+      *                            療養病棟入院基本料１（入院基本料Ａ）
+                                   WHEN   173
+      *                            療養病棟入院基本料１（入院基本料Ｂ）
+                                   WHEN   174
+      *                            療養病棟入院基本料１（入院基本料Ｃ）
+                                   WHEN   175
+      *                            療養病棟入院基本料１（入院基本料Ｄ）
+                                   WHEN   176
+      *                            療養病棟入院基本料１（入院基本料Ｅ）
+                                   WHEN   177
+      *                            療養病棟入院基本料１（入院基本料Ｆ）
+                                   WHEN   178
+      *                            療養病棟入院基本料１（入院基本料Ｇ）
+                                   WHEN   179
+      *                            療養病棟入院基本料１（入院基本料Ｈ）
+                                   WHEN   180
+      *                            療養病棟入院基本料１（入院基本料Ｉ）
+                                   WHEN   181
+      *                            療養病棟入院基本料２（入院基本料Ａ）
+                                   WHEN   182
+      *                            療養病棟入院基本料２（入院基本料Ｂ）
+                                   WHEN   183
+      *                            療養病棟入院基本料２（入院基本料Ｃ）
+                                   WHEN   184
+      *                            療養病棟入院基本料２（入院基本料Ｄ）
+                                   WHEN   185
+      *                            療養病棟入院基本料２（入院基本料Ｅ）
+                                   WHEN   186
+      *                            療養病棟入院基本料２（入院基本料Ｆ）
+                                   WHEN   187
+      *                            療養病棟入院基本料２（入院基本料Ｇ）
+                                   WHEN   188
+      *                            療養病棟入院基本料２（入院基本料Ｈ）
+                                   WHEN   189
+      *                            療養病棟入院基本料２（入院基本料Ｉ）
+                                   WHEN   190
+      *                            特定入院基本料
+                                   WHEN   99
+      *                            特定入院基本料（特別入院基本料等算定患者）
+                                   WHEN   100
+                                      MOVE   CONS-TEISU1  TO
+                                                LNK-TEISU-SRYCD(1)
+                                   WHEN   OTHER
+                                      MOVE   CONS-TEISU2  TO
+                                                LNK-TEISU-SRYCD(1)
+                               END-EVALUATE
+                           WHEN  "1"
+                               MOVE  CONS-TEISU4   TO  
+                                                LNK-TEISU-SRYCD(1)
+                       END-EVALUATE
+                       MOVE    LNK-TEISU-SANTEIYM   TO
+                                                LNK-TEISU-STARTYM(1)
+                       MOVE    SYS-5000-EDYUKYMD(1:6)   TO
+                                                LNK-TEISU-ENDYM(1)
+                   END-IF
+               ELSE
+                   MOVE  2     TO    LNK-TEISU-RC
+               END-IF
+           END-IF
+      *    システム管理クローズ
+           MOVE    "tbl_syskanri"          TO  MCP-TABLE
+           MOVE    "key10"                 TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+      *定数超過情報の取得（システム管理テーブルより翌月分を取得）
+           MOVE    LNK-TEISU-SANTEIYM  
+                                       TO  WRK-SANTEIYM
+           IF      LNK-TEISU-SANTEIYM(5:2)  = "12"
+               ADD    1                TO  WRK-SANTEI-YY
+               MOVE   1                TO  WRK-SANTEI-MM
+           ELSE
+               ADD    1                TO  WRK-SANTEI-MM
+           END-IF
+           MOVE    ZERO                TO  FLG-SYSKANRI
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    "5000"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    WRK-SANTEIYM        TO  SYS-STYUKYMD(1:6)
+           MOVE    "01"                TO  SYS-STYUKYMD(7:2)
+           MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key10"         TO  MCP-PATHNAME
+               PERFORM  910-SYSKANRI-READ-SEC
+               IF  FLG-SYSKANRI     =      ZERO
+                   IF   SYS-5000-TEISUKBN  =  SPACE OR "0"
+                       CONTINUE
+                   ELSE
+                       IF   WRK-TEISUKBN   =  SYS-5000-TEISUKBN
+                           CONTINUE
+                       ELSE
+                           EVALUATE  LNK-TEISU-TOKUTEINYUIN-KBN
+                               WHEN  "0"
+                               INITIALIZE                TNS-TENSU-REC
+                               MOVE    LNK-TEISU-SANTEIYM
+                                                     TO  TNS-YUKOSTYMD
+                                                                 (1:6)
+                               MOVE    "01"    TO  TNS-YUKOSTYMD (7:2)
+                               MOVE    TNS-YUKOSTYMD TO  TNS-YUKOEDYMD
+                               MOVE    SPA-HOSPNUM   TO  TNS-HOSPNUM
+                               MOVE    LNK-TEISU-SANTEISRYCD
+                                                     TO  TNS-SRYCD
+                               MOVE    TNS-TENSU-REC TO  MCPDATA-REC
+                               MOVE    "tbl_tensu"   TO  MCP-TABLE
+                               MOVE    "key"         TO  MCP-PATHNAME
+                               PERFORM 910-DBSELECT-SEC
+                               IF      MCP-RC              =   ZERO
+                                   MOVE  "tbl_tensu" TO  MCP-TABLE
+                                   MOVE  "key"       TO  MCP-PATHNAME
+                                   PERFORM 910-DBFETCH-SEC
+                                   IF      MCP-RC     =  ZERO
+                                       MOVE  MCPDATA-REC
+                                                     TO  TNS-TENSU-REC
+                                       MOVE  ZERO    TO  FLG-TENSU
+                                   ELSE
+                                       INITIALIZE        TNS-TENSU-REC
+                                       MOVE    1     TO  FLG-TENSU
+                                   END-IF
+                               ELSE
+                                   INITIALIZE            TNS-TENSU-REC
+                                   MOVE    1         TO  FLG-TENSU
+                               END-IF
+      *
+                               MOVE    "tbl_tensu"   TO  MCP-TABLE
+                               MOVE    "key"         TO  MCP-PATHNAME
+                               PERFORM  910-DB-CLOSE-SEC
+      *
+      *                        入院基本料加算区分からの判定に変更
+                               EVALUATE   TNS-NYUKHNKSNKBN
+      *                            療養病棟入院基本料（特別入院基本料）
+                                   WHEN   152
+      *                            有床診療所療養病床入院基本料Ａ
+                                   WHEN   153
+      *                            有床診療所療養病床入院基本料Ｂ
+                                   WHEN   154
+      *                            有床診療所療養病床入院基本料Ｃ
+                                   WHEN   155
+      *                            有床診療所療養病床入院基本料Ｄ
+                                   WHEN   156
+      *                            有床診療所療養病床入院基本料Ｅ
+                                   WHEN   157
+      *                            有床診療所療養病床入院基本料（特別入院基本料）
+                                   WHEN   158
+      *                            療養病棟入院基本料１（入院基本料Ａ）
+                                   WHEN   173
+      *                            療養病棟入院基本料１（入院基本料Ｂ）
+                                   WHEN   174
+      *                            療養病棟入院基本料１（入院基本料Ｃ）
+                                   WHEN   175
+      *                            療養病棟入院基本料１（入院基本料Ｄ）
+                                   WHEN   176
+      *                            療養病棟入院基本料１（入院基本料Ｅ）
+                                   WHEN   177
+      *                            療養病棟入院基本料１（入院基本料Ｆ）
+                                   WHEN   178
+      *                            療養病棟入院基本料１（入院基本料Ｇ）
+                                   WHEN   179
+      *                            療養病棟入院基本料１（入院基本料Ｈ）
+                                   WHEN   180
+      *                            療養病棟入院基本料１（入院基本料Ｉ）
+                                   WHEN   181
+      *                            療養病棟入院基本料２（入院基本料Ａ）
+                                   WHEN   182
+      *                            療養病棟入院基本料２（入院基本料Ｂ）
+                                   WHEN   183
+      *                            療養病棟入院基本料２（入院基本料Ｃ）
+                                   WHEN   184
+      *                            療養病棟入院基本料２（入院基本料Ｄ）
+                                   WHEN   185
+      *                            療養病棟入院基本料２（入院基本料Ｅ）
+                                   WHEN   186
+      *                            療養病棟入院基本料２（入院基本料Ｆ）
+                                   WHEN   187
+      *                            療養病棟入院基本料２（入院基本料Ｇ）
+                                   WHEN   188
+      *                            療養病棟入院基本料２（入院基本料Ｈ）
+                                   WHEN   189
+      *                            療養病棟入院基本料２（入院基本料Ｉ）
+                                   WHEN   190
+      *                            特定入院基本料
+                                   WHEN   99
+      *                            特定入院基本料（特別入院基本料等算定患者）
+                                   WHEN   100
+                                      MOVE   CONS-TEISU1  TO
+                                                LNK-TEISU-SRYCD(1)
+                                   WHEN   OTHER
+                                      MOVE   CONS-TEISU2  TO
+                                                LNK-TEISU-SRYCD(1)
+                                   END-EVALUATE
+                               WHEN  "1"
+                                   MOVE  CONS-TEISU4   TO  
+                                                    LNK-TEISU-SRYCD(2)
+                           END-EVALUATE
+                           MOVE    WRK-SANTEIYM   TO
+                                                LNK-TEISU-STARTYM(2)
+                           MOVE    SYS-5000-EDYUKYMD(1:6)   TO
+                                                LNK-TEISU-ENDYM(2)
+                       END-IF
+                   END-IF
+               ELSE
+                   MOVE  2     TO    LNK-TEISU-RC
+               END-IF
+           END-IF
+      *    システム管理クローズ
+           MOVE    "tbl_syskanri"          TO  MCP-TABLE
+           MOVE    "key10"                 TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           IF    (LNK-TEISU-SRYCD(1)    =   SPACE)   AND
+                 (LNK-TEISU-SRYCD(2)    =   SPACE)
+                 MOVE   3        TO  LNK-TEISU-RC
+           END-IF
+      *
+           .
+       210-TEISU2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -477,6 +795,34 @@
       *
            .
        910-SYSKANRI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブル検索処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブル読み込み処理
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-DBFETCH-EXT.
            EXIT.
       *
       *****************************************************************
