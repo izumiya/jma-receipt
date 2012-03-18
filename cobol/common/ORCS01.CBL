@@ -25651,7 +25651,7 @@
                      END-IF
                  WHEN       3
                      IF    WK-SYUNOU-GENBUTU-JGNFLG  =  1
-      **>              MOVE       "1"   TO   LNK-S01-GENBUTU-MSG-FLG
+                       MOVE       "1"   TO   LNK-S01-GENBUTU-MSG-FLG
       **>              MOVE        1    TO   LNK-SYU-SECMONEY
                        MOVE        2    TO   LNK-SYU-SECMONEY
                      ELSE
@@ -25660,7 +25660,7 @@
       **>              IF   WK-GENBUTU-SYUMAXKIN  <
                        IF   WK-GENBUTU-SYUMAXKIN  <=
                                 WK-SYUNOU-GENBUTU-KOREI-SKYMONEY
-      **>                MOVE     "1"   TO   LNK-S01-GENBUTU-MSG-FLG
+                         MOVE     "1"   TO   LNK-S01-GENBUTU-MSG-FLG
       **>                MOVE      1    TO   LNK-SYU-SECMONEY
                          MOVE      2    TO   LNK-SYU-SECMONEY
                        END-IF
