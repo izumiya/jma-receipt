@@ -39,6 +39,7 @@
       *  03.05.00    NACL-多々納  07/05/25  グループ診療対応
       *  04.03.00    NACL-太田    08/05/27  エラー処理強化
       *  04.06.00    NACL-伊藤    11/03/10  新マスター追加
+      *  04.06.00    NACL-伊藤    12/03/19  新マスター追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -171,7 +172,6 @@
            COPY    "MDAS.INC".
            COPY    "MLOG.INC".
            COPY    "MINF.INC".
-           COPY    "MPRT.INC".
       *
       *
        PROCEDURE                   DIVISION    USING
@@ -620,7 +620,10 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
        3102-LIST3-HENSYU-SEC         SECTION.
       *
            MOVE    MSTKANRI-KANRICD(7:2)   TO  IDX2
-           ADD     1                       TO  IDX2
+      *2012.04改定パッチ対応
+           IF      IDX2                NOT =   24
+               ADD     1                       TO  IDX2
+           END-IF
       *
            IF      MSTKANRI-HOSPNUM     =   1
                ADD     1                    TO  SPA-GMN-MAX3
@@ -697,6 +700,9 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                                           TO  SPA-GMN-MASTNAME(IDX2)
                WHEN    "ORCADB22"
                    MOVE    "電子点数表マスタ"
+                                          TO  SPA-GMN-MASTNAME(IDX2)
+               WHEN    "ORCADB24"
+                   MOVE    "最低薬価マスタ"
                                           TO  SPA-GMN-MASTNAME(IDX2)
                WHEN    OTHER
                    MOVE    MSTKANRI-KANRICD

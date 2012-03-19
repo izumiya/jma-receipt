@@ -835,6 +835,8 @@ grpsys                                 SPA-AREA
                MOVE    "同義語マスタ"          TO  WRK-MSTNAME
            WHEN    "22"
                MOVE    "電子点数表マスタ"      TO  WRK-MSTNAME
+           WHEN    "24"
+               MOVE    "最低薬価マスタ"        TO  WRK-MSTNAME
            WHEN    OTHER
                MOVE    PARA-MASTER-KBN         TO  WRK-MSTNAME
            END-EVALUATE
