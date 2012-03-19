@@ -3229,7 +3229,7 @@
       *    Í­¾²¿ÇÎÅ½êÆþ±¡´ðËÜÎÁ¤ÎÁê¸ß»»Äê¥³¡¼¥ÉÃÖ¤­´¹¤¨
            IF     LNK-SCNYUACCT-STSRYYMD   >=   "20120401"
                IF  (SYS-5001-BTU-SBT       =    "09")  AND
-                   (SYS-5001-CRYOYOKBN     =    "1" )
+                   (SYS-5001-CRYOYOKBN     =    "1" OR "2" OR "3")
                   PERFORM    VARYING   IDX  FROM   1  BY  1
                     UNTIL (LNK-SCNYUACCT-KAGEN-SRYCD(IDX)  =  SPACE) OR
                           (IDX           >   10)
