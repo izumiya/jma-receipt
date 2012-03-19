@@ -364,7 +364,7 @@
       *        診療コード
                05  TBL-SRYCD           PIC X(09).
       *
-       01  TBL-SIN-MAX                 PIC 9(04)   VALUE   12.
+       01  TBL-SIN-MAX                 PIC 9(04)   VALUE   15.
       *
       *    外来管理加算テーブル
        01  TBL-GAIRAI-AREA.

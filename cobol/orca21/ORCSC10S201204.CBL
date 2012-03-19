@@ -4603,13 +4603,13 @@
       *!!
       *H24.4 改正
       *        後期高齢者診療料区分流用
-      *        外来リハビリテーション診察料
-               WHEN    "113013910"
-               WHEN    "113014010"
-                   MOVE    2                   TO  SPA-KOURESRY-ARI
-      *        外来放射線照射診察料
-               WHEN    "113014110"
-                   MOVE    3                   TO  SPA-KOURESRY-ARI
+      *            外来リハビリテーション診察料
+                   WHEN    "113013910"
+                   WHEN    "113014010"
+                       MOVE    2                   TO  SPA-KOURESRY-ARI
+      *            外来放射線照射診察料
+                   WHEN    "113014110"
+                       MOVE    3                   TO  SPA-KOURESRY-ARI
       *!!
                END-EVALUATE
       *        在宅療養指導料の判定
