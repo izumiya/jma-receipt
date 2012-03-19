@@ -481,6 +481,8 @@
            03  PARA-ALLERGY            PIC X(01).
            03  PARA-KANSENSYO          PIC X(01).
            03  PARA-COMMENT            PIC X(01).
+      *H24.3
+           03  PARA-GE201203           PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -726,6 +728,11 @@
            MOVE    "COMMENT"           TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-COMMENT
+      *H24.3
+      *    一般名記載なし区分
+           MOVE    "GE201203"          TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-GE201203
       *
            .
        100-OPTION-SELECT-EXT.
@@ -3012,6 +3019,14 @@
            PERFORM 910-TENSU-READ-SEC
       *    内容
            IF      WRK-SRYCD  (1:1)   =   "6"
+      *H24.3
+      *        一般名記載なし区分
+               IF      PARA-GE201203       =   "1"
+                   IF      TNSP-IPN-KISAIKBN   =   1
+                       MOVE    ZERO            TO  TNSP-IPN-KISAIKBN
+                   END-IF
+               END-IF
+      *
       *        一般名・処方名称記載
                IF      TNSP-IPN-KISAIKBN   =   ZERO
                    MOVE    1               TO  WRK-KANZANCHI
