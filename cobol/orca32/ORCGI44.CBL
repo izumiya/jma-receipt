@@ -262,7 +262,7 @@
                05  WRK-MEISYO      PIC X(60).
       *    施設規準テーブル
        01  WRK-TBL-SSTKIJUN-AREA.
-           03  WRK-TBL-SSTKIJUN-OCC       OCCURS  1000.
+           03  WRK-TBL-SSTKIJUN-OCC       OCCURS  3500.
                05  WRK-TBL-SSTKIJUN       PIC 9(01).
       *
       *    行位置編集
@@ -1105,8 +1105,16 @@
            END-IF
            MOVE    ZERO                TO  IDX
            PERFORM UNTIL   (FLG-SYSKANRI   =   1    )
-                   OR      (IDX            >=  1000 )
+                   OR      (IDX            >=  3500 )
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
+               EVALUATE     SYS-1006-KBNCD
+                   WHEN     "1"
+                        MOVE    0          TO  IDX
+                   WHEN     "2"
+                        MOVE    500        TO  IDX
+                   WHEN     "7"
+                        MOVE    3000       TO  IDX
+               END-EVALUATE
                PERFORM VARYING IDY         FROM    1   BY  1
                        UNTIL   IDY         >       500
                    ADD     1               TO  IDX
