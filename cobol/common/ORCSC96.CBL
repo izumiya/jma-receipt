@@ -1912,6 +1912,13 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "K244"
+                   STRING  "警告！！"
+                           "外来緩和ケア管理料を算定しています。"
+                           "麻薬の算定がありません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
