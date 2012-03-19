@@ -9698,7 +9698,9 @@
                  ELSE
                    ADD   SYU-KOH-FTN
                                TO  WK-SYUNOU-GENBUTU-KOREI-SKYMONEY
-                   IF    SYU-KOH2HKNNUM = SPACE
+                   IF   (SYU-KOH2HKNNUM  =  SPACE)
+                   AND  (SYU-KOH3HKNNUM  =  SPACE)
+                   AND  (SYU-KOH4HKNNUM  =  SPACE)
                      ADD   SYU-KOH-FTN
                                TO  WK-SYUNOU-GENBUTU-KOREI-SKYMONEY2
                    ELSE
@@ -25648,7 +25650,9 @@
                      ELSE
                        ADD    WK-GENBUTU-SKYMONEY  TO
                                   WK-SYUNOU-GENBUTU-KOREI-SKYMONEY
-                       IF     LNK-SYU-KOH2HKNNUM = SPACE
+                       IF   (LNK-SYU-KOH2HKNNUM  =  SPACE)
+                       AND  (LNK-SYU-KOH3HKNNUM  =  SPACE)
+                       AND  (LNK-SYU-KOH4HKNNUM  =  SPACE)
                          ADD  WK-GENBUTU-SKYMONEY  TO
                                   WK-SYUNOU-GENBUTU-KOREI-SKYMONEY2
                        ELSE
