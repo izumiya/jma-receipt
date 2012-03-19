@@ -90,5 +90,7 @@
       *更新時間
            03  NYUKHN-UPHMS            PIC  X(06).
       *更新用
-           03  NYUKHN-UP-AREA.
+           03  NYUKHN-UP-KEY.
+               05  NYUKHN-UPKHNSRYCD   PIC  X(09).
+               05  NYUKHN-UPYUKOSTYMD  PIC  X(08).
                05  NYUKHN-UPYUKOEDYMD  PIC  X(08).

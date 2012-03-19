@@ -23,7 +23,9 @@ tbl_nyuinkhn	{
 	UPYMD		char(8);
 	UPHMS		char(6);
 #-----> 主キー更新用項目
-	UPYUKOEDYMD char(8),virtual;
+	UPKHN_SRYCD	char(9),virtual;
+	UPYUKOSTYMD	char(8),virtual;
+	UPYUKOEDYMD	char(8),virtual;
 };
 
 primary	{
@@ -109,8 +111,8 @@ path	upd1	{
 				CREYMD      = :CREYMD,
 				UPYMD      = :UPYMD,
 				UPHMS      = :UPHMS
-			WHERE 	KHN_SRYCD      =  :KHN_SRYCD
-			AND	YUKOSTYMD	=	:YUKOSTYMD
+			WHERE 	KHN_SRYCD      =  :UPKHN_SRYCD
+			AND	YUKOSTYMD	=	:UPYUKOSTYMD
 			AND	YUKOEDYMD	=	:UPYUKOEDYMD
 		;
 	};
