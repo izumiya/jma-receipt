@@ -6182,6 +6182,10 @@
                               (WRK-COM-INPUTCD(IDY)    =   SPACE ))
       *        がん拉嶂乃此下回瞥瓷妄瘟
                IF      WRK-COM-INPUTCD (IDY)   =   "113010210"
+      *H24.4       ∈此下ケアに犯る甫饯∷
+                                               OR  "113012810"
+      *H24.4       嘲丸此下ケア瓷妄瘟
+                                               OR  "113013010"
                    MOVE    IDY             TO  IDX-Z
                    MOVE    1               TO  FLG-KANWA
                END-IF
@@ -6226,6 +6230,10 @@
                   AND (LNK-ORCSC-KEI-IDX   =   ZERO  )
                    MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
                    MOVE    "K243"          TO  SPA-ERRCD
+      *H24.4       嘲丸此下ケア瓷妄瘟
+                   IF      WRK-COM-INPUTCD (IDX-Z) =   "113013010"
+                       MOVE    "K244"          TO  SPA-ERRCD
+                   END-IF
                    MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
                    MOVE    "2"             TO  WRK-COM-KZMFLG
                                                            (IDX-Z)
