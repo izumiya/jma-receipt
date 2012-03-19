@@ -37,5 +37,7 @@
       *更新年月日
            03  GENERICPRICE-UPYMD            PIC  X(08).
       *更新用
-           03  GENERICPRICE-UP-AREA.
+           03  GENERICPRICE-UP-KEY.
+               05  GENERICPRICE-UPYAKKAKJNCD PIC  X(09).
+               05  GENERICPRICE-UPYUKOSTYMD  PIC  X(08).
                05  GENERICPRICE-UPYUKOEDYMD  PIC  X(08).
