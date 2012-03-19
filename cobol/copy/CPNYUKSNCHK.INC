@@ -46,8 +46,8 @@
            03  NYUKSNCHK-UPHMS         PIC  X(06).
       *主キー更新用項目
            03  NYUKSNCHKUP-KEY.
-               05  NYUKSNCHKUP-NYUINKBN      PIC  X(01).
-               05  NYUKSNCHKUP-KSNKBN        PIC  X(09).
+               05  NYUKSNCHKUP-NYUINKBN      PIC  X(03).
+               05  NYUKSNCHKUP-KSNKBN        PIC  X(03).
                05  NYUKSNCHKUP-YUKOSTYMD     PIC  X(08).
                05  NYUKSNCHKUP-YUKOEDYMD     PIC  X(08).
       *
