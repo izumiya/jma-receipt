@@ -6,6 +6,8 @@ tbl_generic_price {
 	CREYMD   			char(8);
 	UPYMD    			char(8);
 #-----> 主キー更新用項目
+	UPYAKKAKJNCD			char(9),virtual;
+	UPYUKOSTYMD			char(8),virtual;
 	UPYUKOEDYMD 			char(8),virtual;
 };
 primary	{YAKKAKJNCD,YUKOSTYMD,YUKOEDYMD;
@@ -52,8 +54,8 @@ path	upd1	{
 				PRICE          = :PRICE,
 				CREYMD      = :CREYMD,
 				UPYMD      = :UPYMD
-			WHERE 	YAKKAKJNCD      =  :YAKKAKJNCD
-			AND	YUKOSTYMD	=	:YUKOSTYMD
+			WHERE 	YAKKAKJNCD      =  :UPYAKKAKJNCD
+			AND	YUKOSTYMD	=	:UPYUKOSTYMD
 			AND	YUKOEDYMD	=	:UPYUKOEDYMD
 		;
 	};

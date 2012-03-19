@@ -402,8 +402,7 @@
                IF     (GENERIC-YUKOSTYMD   <=  GENERICWK-YUKOEDYMD2)
                  AND  (GENERIC-YUKOEDYMD   >=  GENERICWK-YUKOEDYMD2)
       *            £Ä£Â¹¹¿·
-                   MOVE    GENERIC-YUKOEDYMD
-                                           TO  GENERIC-UPYUKOEDYMD
+                   MOVE    GENERIC-KEY     TO  GENERIC-KEY
                    MOVE    GENERICWK-YUKOEDYMD2
                                            TO  GENERIC-YUKOEDYMD
                    PERFORM 20101-GENERIC-UPD-SEC
@@ -461,9 +460,9 @@
                IF     (GENERIC-YUKOSTYMD   <=  GENERICWK-YUKOSTYMD)
                  AND  (GENERIC-YUKOEDYMD   >=  GENERICWK-YUKOEDYMD)
       *            £Ä£Â¹¹¿·
-                   MOVE    GENERIC-YUKOEDYMD
-                                           TO  GENERIC-UPYUKOEDYMD
-                   MOVE    GENERICWK-PRICE   TO  GENERIC-PRICE
+                   MOVE    GENERIC-KEY     TO  GENERIC-UP-KEY
+                   MOVE    GENERICWK-KEY   TO  GENERIC-KEY
+                   MOVE    GENERICWK-PRICE TO  GENERIC-PRICE
                    PERFORM 20101-GENERIC-UPD-SEC
                    MOVE    1               TO  FLG-SYORI
                ELSE
