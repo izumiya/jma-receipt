@@ -4619,21 +4619,23 @@
                INITIALIZE                      TENSUPLUS-REC
            END-IF
       *H24.4
-      *    システム管理の変更可によってすべて一般名記載とする
-           IF     (TNSP-IPN-KISAIKBN   NOT =   2       )
-              AND (SYS-1030-KOUHATUKA      =   "1"     )
-              AND (TNS-KOUHATUKBN          =   1  OR  2  )
-               MOVE    1               TO  TNSP-IPN-KISAIKBN
-           END-IF
+           IF     (TNS-SRYCD(1:1)      =   "6" )
+      *        システム管理の変更可によってすべて一般名記載とする
+               IF     (TNSP-IPN-KISAIKBN   NOT =   2       )
+                  AND (SYS-1030-KOUHATUKA      =   "1"     )
+                  AND (TNS-KOUHATUKBN          =   1  OR  2  )
+                   MOVE    1               TO  TNSP-IPN-KISAIKBN
+               END-IF
       *
-      *    一般名記載あり
-           IF     (TNSP-IPN-KISAIKBN   =   1  )
-             OR   (WRK-IPNMEI          =   2  )
-               PERFORM 9102-GENERICNAME-READ-SEC
-      *        一般名マスタなし
-               IF      FLG-GENERICNAME     =   1
-                   MOVE    ZERO            TO  TNSP-IPN-KISAIKBN
-                   MOVE    ZERO            TO  WRK-IPNMEI
+      *        一般名記載あり
+               IF     (TNSP-IPN-KISAIKBN   =   1  )
+                 OR   (WRK-IPNMEI          =   2  )
+                   PERFORM 9102-GENERICNAME-READ-SEC
+      *            一般名マスタなし
+                   IF      FLG-GENERICNAME     =   1
+                       MOVE    ZERO            TO  TNSP-IPN-KISAIKBN
+                       MOVE    ZERO            TO  WRK-IPNMEI
+                   END-IF
                END-IF
            END-IF
       *---(03.04.00) LINE ADD END   ------------------------------------
