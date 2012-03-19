@@ -378,9 +378,11 @@ path	key11 	{
 path	key12	{
 	DBSELECT	{
 		DECLARE tbl_sryact_key12_csr CURSOR FOR
-		SELECT *
-		FROM tbl_sryact
+		SELECT * FROM (
+			SELECT *
+			FROM tbl_sryact
 			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   '1'
 			AND   PTID        =   :PTID
 			AND   SRYYM       =   :SRYYM
 			AND ((SRYCD1      =   :SRYCD1)
@@ -388,6 +390,19 @@ path	key12	{
 			 OR  (SRYCD3      =   :SRYCD3)
 			 OR  (SRYCD4      =   :SRYCD4)
 			 OR  (SRYCD5      =   :SRYCD5))
+			UNION ALL
+			SELECT *
+			FROM tbl_sryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   '2'
+			AND   PTID        =   :PTID
+			AND   SRYYM       =   :SRYYM
+			AND ((SRYCD1      =   :SRYCD1)
+			 OR  (SRYCD2      =   :SRYCD2)
+			 OR  (SRYCD3      =   :SRYCD3)
+			 OR  (SRYCD4      =   :SRYCD4)
+			 OR  (SRYCD5      =   :SRYCD5))
+		) AS sryact
 			ORDER   BY        SRYKA,
                                           SRYYM,
                                           ZAINUM,
