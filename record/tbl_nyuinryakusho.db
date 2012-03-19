@@ -10,7 +10,9 @@ tbl_nyuinryakusho	{
 	UPYMD		char(8);
 	UPHMS		char(6);
 #-----> 主キー更新用項目
-	UPYUKOEDYMD 		char(8),virtual;
+	UPSRYCD		char(9);
+	UPYUKOSTYMD	char(8);
+	UPYUKOEDYMD 	char(8),virtual;
 };
 
 primary	{SRYCD,YUKOSTYMD,YUKOEDYMD;
@@ -62,8 +64,8 @@ path	upd1	{
 				CREYMD      = :CREYMD,
 				UPYMD      = :UPYMD,
 				UPHMS      = :UPHMS
-			WHERE 	SRYCD      =  :SRYCD
-			AND	YUKOSTYMD	=	:YUKOSTYMD
+			WHERE 	SRYCD      =  :UPSRYCD
+			AND	YUKOSTYMD	=	:UPYUKOSTYMD
 			AND	YUKOEDYMD	=	:UPYUKOEDYMD
 		;
 	};
