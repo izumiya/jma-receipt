@@ -23,7 +23,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       ************************************************************
       *01  NYURYAKUSHO-REC.
-           03  NYUKHN-KEY.
+           03  NYURYAKUSHO-KEY.
       *基本点数診療コード
                05  NYURYAKUSHO-SRYCD   PIC  X(09).
       *有効開始年月日
@@ -44,4 +44,9 @@
            03  NYURYAKUSHO-UPYMD        PIC  X(08).
       *更新時間
            03  NYURYAKUSHO-UPHMS        PIC  X(06).
+      *更新用
+           03  NYURYAKUSHO-UP-KEY.
+               05  NYURYAKUSHO-UPSRYCD      PIC  X(09).
+               05  NYURYAKUSHO-UPYUKOSTYMD  PIC  X(08).
+               05  NYURYAKUSHO-UPYUKOEDYMD  PIC  X(08).
       *

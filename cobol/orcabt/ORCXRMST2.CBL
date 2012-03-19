@@ -831,6 +831,8 @@ grpsys                                 SPA-AREA
            WHEN    "20"
                MOVE    "入院レセプト記載略称マスタ"
                                                TO  WRK-MSTNAME
+           WHEN    "24"
+               MOVE    "最低薬価マスタ"        TO  WRK-MSTNAME
            WHEN    OTHER
                MOVE    PARA-MASTER-KBN         TO  WRK-MSTNAME
            END-EVALUATE

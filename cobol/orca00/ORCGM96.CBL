@@ -38,6 +38,7 @@
       *  03.04.01    NACL-森脇    07/01/24  タイマーイベント追加
       *  03.05.00    NACL-多々納  07/05/25  グループ診療対応
       *  04.03.00    NACL-太田    08/05/27  エラー処理強化
+      *  04.05.00    NACL-伊藤    12/03/19  新マスター追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -618,7 +619,12 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
        3102-LIST3-HENSYU-SEC         SECTION.
       *
            MOVE    MSTKANRI-KANRICD(7:2)   TO  IDX2
-           ADD     1                       TO  IDX2
+      *2012.04改定パッチ対応
+           IF      IDX2                    =   24
+               MOVE    22                      TO  IDX2
+           ELSE
+               ADD     1                       TO  IDX2
+           END-IF
       *
            IF      MSTKANRI-HOSPNUM     =   1
                ADD     1                    TO  SPA-GMN-MAX3
@@ -689,6 +695,9 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                                           TO  SPA-GMN-MASTNAME(IDX2)
                WHEN    "ORCADB20"
                    MOVE    "入院レセプト記載略称マスタ"
+                                          TO  SPA-GMN-MASTNAME(IDX2)
+               WHEN    "ORCADB24"
+                   MOVE    "最低薬価マスタ"
                                           TO  SPA-GMN-MASTNAME(IDX2)
                WHEN    OTHER
                    MOVE    MSTKANRI-KANRICD

@@ -22,6 +22,10 @@ tbl_nyuinkhn	{
 	CREYMD		char(8);
 	UPYMD		char(8);
 	UPHMS		char(6);
+#-----> 主キー更新用項目
+	UPKHN_SRYCD	char(9),virtual;
+	UPYUKOSTYMD	char(8),virtual;
+	UPYUKOEDYMD	char(8),virtual;
 };
 
 primary	{
@@ -66,5 +70,50 @@ path	all	{
 		SELECT *
 		FROM tbl_nyuinkhn
       		;
+	};
+};
+
+path	key3	{
+	DBSELECT	{
+		DECLARE tbl_nyuinkhn_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nyuinkhn
+		WHERE 	KHN_SRYCD	= :KHN_SRYCD
+			ORDER	BY	YUKOSTYMD
+		;
+	};
+};
+
+path	upd1	{
+	DBUPDATE		{
+		UPDATE	tbl_nyuinkhn
+				SET
+				KHN_SRYCD      = :KHN_SRYCD,
+				YUKOSTYMD      = :YUKOSTYMD,
+				YUKOEDYMD      = :YUKOEDYMD,
+				IPROUKBN      = :IPROUKBN,
+				SSTKIJUNKBN      = :SSTKIJUNKBN,
+				BTUSBTKBN      = :BTUSBTKBN,
+				HEIKINZAIKBN      = :HEIKINZAIKBN,
+				KANGOHAICHIKBN      = :KANGOHAICHIKBN,
+				KANGOHIRITUKBN      = :KANGOHIRITUKBN,
+				KANGOHOJOHAICHIKBN      = :KANGOHOJOHAICHIKBN,
+				KHN_TEN      = :KHN_TEN,
+				KAGEN_SRYCD1      = :KAGEN_SRYCD1,
+				KAGEN_SRYCD2      = :KAGEN_SRYCD2,
+				KAGEN_SRYCD3      = :KAGEN_SRYCD3,
+				KAGEN_SRYCD4      = :KAGEN_SRYCD4,
+				KAGEN_SRYCD5      = :KAGEN_SRYCD5,
+				KAGEN_SRYCD6      = :KAGEN_SRYCD6,
+				KAGEN_SRYCD7      = :KAGEN_SRYCD7,
+				TERMID      = :TERMID,
+				OPID      = :OPID,
+				CREYMD      = :CREYMD,
+				UPYMD      = :UPYMD,
+				UPHMS      = :UPHMS
+			WHERE 	KHN_SRYCD      =  :UPKHN_SRYCD
+			AND	YUKOSTYMD	=	:UPYUKOSTYMD
+			AND	YUKOEDYMD	=	:UPYUKOEDYMD
+		;
 	};
 };

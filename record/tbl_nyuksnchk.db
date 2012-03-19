@@ -41,3 +41,37 @@ path	all		{
 		;
 	};
 };
+
+path	key2	{
+	DBSELECT	{
+		DECLARE tbl_nyuksnchk_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nyuksnchk
+			WHERE NYUINKBN        = :NYUINKBN
+			AND   KSNKBN          = :KSNKBN
+			ORDER	BY	YUKOSTYMD
+		;
+	};
+};
+
+path	upd1	{
+	DBUPDATE		{
+		UPDATE	tbl_nyuksnchk
+				SET
+				NYUINKBN      = :NYUINKBN,
+				KSNKBN      = :KSNKBN,
+				YUKOSTYMD      = :YUKOSTYMD,
+				YUKOEDYMD      = :YUKOEDYMD,
+				CHKKBN      = :CHKKBN,
+				TERMID      = :TERMID,
+				OPID      = :OPID,
+				CREYMD      = :CREYMD,
+				UPYMD      = :UPYMD,
+				UPHMS      = :UPHMS
+			WHERE 	NYUINKBN      =  :UPNYUINKBN
+			AND	KSNKBN	=	:UPKSNKBN
+			AND	YUKOSTYMD	=	:UPYUKOSTYMD
+			AND	YUKOEDYMD	=	:UPYUKOEDYMD
+		;
+	};
+};
