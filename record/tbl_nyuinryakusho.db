@@ -10,8 +10,8 @@ tbl_nyuinryakusho	{
 	UPYMD		char(8);
 	UPHMS		char(6);
 #-----> 主キー更新用項目
-	UPSRYCD		char(9);
-	UPYUKOSTYMD	char(8);
+	UPSRYCD		char(9),virtual;
+	UPYUKOSTYMD	char(8),virtual;
 	UPYUKOEDYMD 	char(8),virtual;
 };
 
