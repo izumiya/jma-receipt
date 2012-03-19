@@ -163,7 +163,7 @@
       *
                05  WRK-NYUKSNKBN-MAX               PIC 9(03).
                05  WRK-NYUKSNKBN-OCC               OCCURS   10.
-                   07  WRK-NYUKHNKBN               PIC 9(03).
+                   07  WRK-NYUKHNKBN               PIC 9(02).
                    07  WRK-NYUKSNKBN               PIC 9(03).
                    07  WRK-NYUCHUKSNCD             PIC X(04).
                    07  WRK-NYUSRYCD                PIC X(09).
@@ -6524,7 +6524,8 @@
       *
                    PERFORM VARYING IDX6    FROM    1   BY  1
                            UNTIL ( IDX6    >   WRK-NYUKSNKBN-MAX )
-                            OR   ( FLG-HIT =   1 )
+                            OR   ( FLG-HIT     =   1 )
+                            OR   ( FLG-KSNERR  =   1 )
       *
                        IF    ( WRK-NYUKSNKBN (IDX6)    >   ZERO )
                         AND  ( WRK-KSNKSNKBN           >   ZERO )
@@ -6542,26 +6543,11 @@
                            END-IF
                        END-IF
       *
-                       IF    ( WRK-NYUCHUKSNCD (IDX6)
-                                               NOT = SPACE AND ZERO )
-                        AND  ( WRK-KSNCHUKSNCD NOT = SPACE AND ZERO )
-                           COMPUTE CNT-NYUKSNKBNCHK
-                               =   CNT-NYUKSNKBNCHK
-                               +   1
-                           IF    ( WRK-NYUCHUKSNCD (IDX6)
-                                               =   WRK-KSNCHUKSNCD )
-                               MOVE    1       TO  FLG-HIT
-                           END-IF
-                       END-IF
-      *
                        IF    ( WRK-NYUKHNKBN   (IDX6)  >   ZERO )
                         AND  ( WRK-KSNKHNKBN           >   ZERO )
-                           COMPUTE CNT-NYUKSNKBNCHK
-                               =   CNT-NYUKSNKBNCHK
-                               +   1
                            IF    ( WRK-NYUKHNKBN   (IDX6)
                                            NOT =   WRK-KSNKHNKBN )
-                               MOVE    ZERO    TO  FLG-HIT
+                               MOVE    1   TO      FLG-KSNERR
                            END-IF
                        END-IF
                    END-PERFORM
