@@ -5094,6 +5094,14 @@
                                            TO  WRK-SYONIKA-KBN
                     MOVE    1              TO  FLG-SYONIKA-CHK
            END-SEARCH
+      *
+      *H24.4 追加のコード
+           IF      SPA-COM-INPUTCD (IDX)   =   "113013710"
+                                           OR  "113013810"
+      *        院内トリアージ実施料・夜間休日救急搬送医学管理料
+               MOVE    1                   TO  FLG-SYONIKA-CHK
+               MOVE    "9"                 TO  WRK-SYONIKA-KBN
+           END-IF
            .
        50192-SYONIKASRYCD-CHK-EXT.
            EXIT.
