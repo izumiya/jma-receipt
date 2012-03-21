@@ -2639,13 +2639,13 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "2104"
-                   STRING  "外来リハビリテーション診察料が算定中です。"
+                   STRING  "外来リハビリテーション診療料が算定中です。"
                            "診察料は算定できません。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "2105"
-                   STRING  "外来放射線照射診察料が算定中です。"
+                   STRING  "外来放射線照射診療料が算定中です。"
                            "診察料は算定できません。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
