@@ -322,6 +322,8 @@
            03  FLG-RYOTARGET               PIC 9(01).
            03  FLG-ROUJIN                  PIC 9(01).
            03  FLG-LIFE-RJN                PIC 9(01).
+           03  FLG-RYOYOKHN                PIC 9(01).
+           03  FLG-PASS                    PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -406,6 +408,10 @@
            03  WRK-NUMSRYCD                PIC 9(09).
            03  WRK-TOKNYUIN-SRYCDTTL       PIC 9(14).
            03  WRK-ERRMSG                  PIC X(80).
+           03  WRK-TOK-G.
+               05  WRK-TOK-SRYCD           PIC X(09).
+               05  WRK-TOK-NAME            PIC X(60).
+               05  WRK-TOK-NYUINRYOKBN     PIC X(02).
       *
        01  WRK-ROW-AREA.
            03  WRK-ALLIDOLST-ROW           PIC S9(9).
@@ -419,6 +425,7 @@
                05  ITEM-TOKNYUIN-NYUIN     PIC X(02).
       *
        01  CONST-AREA.
+           03  CONST-H240401               PIC X(08)   VALUE "20120401".
            03  CONST-H220401               PIC X(08)   VALUE "20100401".
            03  CONST-H200401               PIC X(08)   VALUE "20080401".
            03  CONST-H181001               PIC X(08)   VALUE "20061001".
@@ -451,6 +458,9 @@
       *
                    07                      PIC X(03)   VALUE   "229".
                    07                      PIC X(03)   VALUE   "230".
+      *
+                   07                      PIC X(03)   VALUE   "231".
+                   07                      PIC X(03)   VALUE   "232".
       *
                    07                      PIC X(03)   VALUE   "302".
                    07                      PIC X(03)   VALUE   "349".
@@ -499,13 +509,52 @@
       *
                    07                      PIC X(03)   VALUE   "352".
                    07                      PIC X(03)   VALUE   "353".
+      *
+                   07                      PIC X(03)   VALUE   "363".
+                   07                      PIC X(03)   VALUE   "364".
+      *
+                   07                      PIC X(03)   VALUE   "365".
+                   07                      PIC X(03)   VALUE   "366".
+      *
+                   07                      PIC X(03)   VALUE   "367".
+                   07                      PIC X(03)   VALUE   "368".
+      *
+                   07                      PIC X(03)   VALUE   "369".
+                   07                      PIC X(03)   VALUE   "370".
+      *
+                   07                      PIC X(03)   VALUE   "371".
+                   07                      PIC X(03)   VALUE   "372".
+      *
+                   07                      PIC X(03)   VALUE   "373".
+                   07                      PIC X(03)   VALUE   "374".
+      *
+                   07                      PIC X(03)   VALUE   "375".
+                   07                      PIC X(03)   VALUE   "376".
+      *
+                   07                      PIC X(03)   VALUE   "377".
+                   07                      PIC X(03)   VALUE   "378".
+      *
+                   07                      PIC X(03)   VALUE   "379".
+                   07                      PIC X(03)   VALUE   "380".
+      *
+                   07                      PIC X(03)   VALUE   "381".
+                   07                      PIC X(03)   VALUE   "382".
+      *
+                   07                      PIC X(03)   VALUE   "383".
+                   07                      PIC X(03)   VALUE   "384".
+      *
+                   07                      PIC X(03)   VALUE   "385".
+                   07                      PIC X(03)   VALUE   "386".
+      *
+                   07                      PIC X(03)   VALUE   "387".
+                   07                      PIC X(03)   VALUE   "388".
                05  CONST-TOK-LIFECD-R  REDEFINES   CONST-TOK-LIFECD-VAL.
-                   07  CONST-TOK-LIFECD-OCC    OCCURS  21.
+                   07  CONST-TOK-LIFECD-OCC    OCCURS  35.
                        09  CONST-TOK-LIFECD-IPN
                                            PIC X(03).
                        09  CONST-TOK-LIFECD-LIFE
                                            PIC X(03).
-               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   21.
+               05  CONST-TOK-LIFECD-MAX    PIC 9(05)   VALUE   35.
       *
       *    ¥¹¥ÑÎÎ°è ¥ï¡¼¥¯
            COPY    "COMMON-SPA"      REPLACING
@@ -1256,138 +1305,12 @@
            IF    ( SPA-NAI-KJNYMD         >=   CONST-H180701 )
             AND  ( SPA-NAI-BTU-SBT     =   "04" OR "09" )
       *
-               MOVE    1               TO  SPA-NAI-SELNYUKHN
-      *
-               INITIALIZE                  SYSKANRI-REC
-               MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
-               MOVE    "5111"          TO  SYS-KANRICD
-               MOVE    SPA-NAI-KJNYMD  TO  SYS-STYUKYMD
-                                           SYS-EDYUKYMD
-               PERFORM 900-SYSKANRI-KEY23-SEL-SEC
-               MOVE    SYSKANRI-REC    TO  SYS-5111-REC
-               PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
-      *
-                   MOVE    ZERO        TO  FLG-TARGET
-                   IF    ( SPA-NAI-BTU-SBT             =   "04" )
-                    AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "05" )
-                       IF    ( FLG-LIFE-RJN            =   ZERO OR 2)
-                           IF    ( SYS-5111-SEIKATU-RYOKBN
-                                                       =   SPACE )
-                               MOVE    1   TO  FLG-TARGET
-                           END-IF
-                       END-IF
-                       IF    ( FLG-LIFE-RJN            =   1    OR 2)
-                           IF    ( SYS-5111-SEIKATU-RYOKBN
-                                                   NOT =   SPACE )
-                               MOVE    1   TO  FLG-TARGET
-                           END-IF
-                       END-IF
-                   END-IF
-      *
-                   IF    ( SPA-NAI-BTU-SBT             =   "09" )
-                    AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "06" )
-                       IF    ( FLG-LIFE-RJN            =   ZERO OR 2)
-                           IF    ( SYS-5111-SEIKATU-RYOKBN
-                                                       =   SPACE )
-                               MOVE    1   TO  FLG-TARGET
-                           END-IF
-                       END-IF
-                       IF    ( FLG-LIFE-RJN            =   1    OR 2)
-                           IF    ( SYS-5111-SEIKATU-RYOKBN
-                                                   NOT =   SPACE )
-                               MOVE    1   TO  FLG-TARGET
-                           END-IF
-                       END-IF
-                   END-IF
-      *
-                   IF    ( SPA-NAI-KJNYMD >=  CONST-H220401 )
-                       IF    ( SYS-5111-SRYCD
-                                           =   "099999953"
-                                            OR "099999954" )
-                               MOVE  ZERO  TO  FLG-TARGET
-                       END-IF
-                       IF    ( SYS-5001-KHNSRYCD
-                                           =   SPACE
-                                      OR       "099999953"
-                                      OR       "190121310"
-                                      OR       "190121410"
-                                      OR       "190121510"
-                                      OR       "190121610"
-                                      OR       "190121710"
-                                      OR       "190131610"
-                                      OR       "190132010"
-                                      OR       "190132210" )
-                           IF    ( SYS-5111-SRYCD
-                                           =   "190132410"
-                                      OR       "190132610"
-                                      OR       "190132810"
-                                      OR       "190133010"
-                                      OR       "190133210"
-                                      OR       "190133410"
-                                      OR       "190133610"
-                                      OR       "190133810"
-                                      OR       "190134010"
-                                      OR       "190132510"
-                                      OR       "190132710"
-                                      OR       "190132910"
-                                      OR       "190133110"
-                                      OR       "190133310"
-                                      OR       "190133510"
-                                      OR       "190133710"
-                                      OR       "190133910"
-                                      OR       "190134110" )
-                               MOVE  ZERO  TO  FLG-TARGET
-                           END-IF
-                       END-IF
-                       IF    ( SYS-5001-KHNSRYCD
-                                           =   "099999954"
-                                      OR       "190132410"
-                                      OR       "190132610"
-                                      OR       "190132810"
-                                      OR       "190133010"
-                                      OR       "190133210"
-                                      OR       "190133410"
-                                      OR       "190133610"
-                                      OR       "190133810"
-                                      OR       "190134010" )
-                           IF    ( SYS-5111-SRYCD
-                                           =   "190121310"
-                                      OR       "190121410"
-                                      OR       "190121510"
-                                      OR       "190121610"
-                                      OR       "190121710"
-                                      OR       "190131610"
-                                      OR       "190131810"
-                                      OR       "190132010"
-                                      OR       "190132210"
-                                      OR       "190123710"
-                                      OR       "190123810"
-                                      OR       "190123910"
-                                      OR       "190124010"
-                                      OR       "190124110"
-                                      OR       "190131710"
-                                      OR       "190131910"
-                                      OR       "190132110"
-                                      OR       "190132310" )
-                               MOVE  ZERO  TO  FLG-TARGET
-                           END-IF
-                       END-IF
-                   END-IF
-      *
-                   IF    ( FLG-TARGET  =   1 )
-      *
-                       MOVE    "3"             TO  WRK-TOKNYUIN-KBN
-                       MOVE    SYS-5111-KBNCD  TO  WRK-TOKKBNCD
-                       PERFORM 31011-TOKNYUINLST-SET-SEC
-                   END-IF
-      *
-                   PERFORM 900-SYSKANRI-KEY23-FET-SEC
-                   MOVE    SYSKANRI-REC    TO  SYS-5111-REC
-      *
-               END-PERFORM
-               MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key23"             TO  MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
+               IF    ( SPA-NAI-BTU-SBT =   "04" )
+                   MOVE    1           TO  FLG-RYOYOKHN
+               ELSE
+                   MOVE    2           TO  FLG-RYOYOKHN
+               END-IF
+               PERFORM 410111-RYOYOKHN-EDIT-SEC
            END-IF
       *
            IF    ( SPA-NAI-BTU-BTUTOK  NOT =   SPACE )
@@ -1417,6 +1340,19 @@
                    PERFORM 31011-TOKNYUINLST-SET-SEC
                END-EVALUATE
       *
+               IF   (  SPA-NAI-BTU-BTUTOK  =   "11" )
+                AND (  SPA-NAI-ORDERID NOT =   NORDERID-NYUINID )
+                   MOVE    "24"        TO  WRK-TOKKBNCD
+                   MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                   PERFORM 31011-TOKNYUINLST-SET-SEC
+               END-IF
+      *
+               IF   (  SPA-NAI-BTU-BTUTOK  =   "12" )
+                AND (  SPA-NAI-ORDERID NOT =   NORDERID-NYUINID )
+                       MOVE    "25"    TO  WRK-TOKKBNCD
+                       MOVE    "2"     TO  WRK-TOKNYUIN-KBN
+                   PERFORM 31011-TOKNYUINLST-SET-SEC
+               END-IF
            END-IF
       *
            IF    ( SPA-NAI-BTU-BRMTOK  NOT =   SPACE )
@@ -1439,18 +1375,61 @@
                END-EVALUATE
            END-IF
       *
+      *
+           IF    ( SPA-NAI-KJNYMD     >=  CONST-H240401 )
+               EVALUATE  TRUE
+               WHEN  ( SPA-NAI-BTU-SBT  =   "08" )
+                AND  ( SYS-5001-CRYOYOKBN  =   "1" )
+                   MOVE    4         TO  FLG-RYOYOKHN
+                   PERFORM 410111-RYOYOKHN-EDIT-SEC
+               WHEN  ( SPA-NAI-BTU-SBT  =   "09" )
+                   MOVE    "2"         TO  WRK-TOKNYUIN-KBN
+                   EVALUATE    SYS-5001-CRYOYOKBN
+                   WHEN    "1"
+                       MOVE    "35"  TO  WRK-TOKKBNCD
+                       PERFORM 31011-TOKNYUINLST-SET-SEC
+                   WHEN    "2"
+                       MOVE    "36"  TO  WRK-TOKKBNCD
+                       PERFORM 31011-TOKNYUINLST-SET-SEC
+                   WHEN    "3"
+                       MOVE    "37"  TO  WRK-TOKKBNCD
+                       PERFORM 31011-TOKNYUINLST-SET-SEC
+                   END-EVALUATE
+               WHEN  ( SYS-5001-BTU-TOKTEI-NYUIN
+                                     =  "33" OR "34" )
+                   MOVE    3         TO  FLG-RYOYOKHN
+                   PERFORM 410111-RYOYOKHN-EDIT-SEC
+               END-EVALUATE
+           END-IF
+      *
       *    Ï·¿Í¤Î¾ì¹ç¡¢Ï·¿Í°ìÈÌÉÂÅïÆÃÄêÆþ±¡´ðËÜÎÁ¤ò¥³¥ó¥Ü¤ËÀßÄê
       *    Ê¿À®£²£²Ç¯£´·î¤«¤éÇ¯ÎðÍ×·ïÇÑ»ß
            PERFORM 31011-ROUJIN-CHK-SEC
-           IF    ( FLG-RJN         =   1 )
-            OR   ( SPA-NAI-KJNYMD >=  CONST-H220401 )
-               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-               MOVE    "22"        TO  WRK-TOKKBNCD
-               PERFORM 31011-TOKNYUINLST-SET-SEC
+           IF  ( SPA-NAI-KJNYMD   >=  CONST-H220401 )
+               IF    ( SPA-NAI-BTU-SBT  =   "01" OR "05" OR "06")
+                   IF    ( SYS-5001-BTU-TOKTEI-NYUIN
+                                           =   "33" OR "34" )
+                       CONTINUE
+                   ELSE
+                       MOVE    "22"        TO  WRK-TOKKBNCD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 31011-TOKNYUINLST-SET-SEC
       *
-               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-               MOVE    "24"        TO  WRK-TOKKBNCD
-               PERFORM 31011-TOKNYUINLST-SET-SEC
+                       MOVE    "24"        TO  WRK-TOKKBNCD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 31011-TOKNYUINLST-SET-SEC
+                   END-IF
+               END-IF
+           ELSE
+               IF  ( FLG-RJN   =   1 )
+                   MOVE    "22"        TO  WRK-TOKKBNCD
+                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                   PERFORM 31011-TOKNYUINLST-SET-SEC
+      *
+                   MOVE    "24"        TO  WRK-TOKKBNCD
+                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                   PERFORM 31011-TOKNYUINLST-SET-SEC
+               END-IF
            END-IF
       *
       *    Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ¤ò¥³¥ó¥Ü¤ËÀßÄê
@@ -1466,6 +1445,176 @@
       *
            . 
        3101-TOKNYUINLST-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁÊÔ½¸½èÍý
+      *****************************************************************
+       410111-RYOYOKHN-EDIT-SEC         SECTION.
+      *
+           MOVE    1               TO  SPA-NAI-SELNYUKHN
+      *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "5111"          TO  SYS-KANRICD
+           MOVE    SPA-NAI-KJNYMD  TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY23-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-5111-REC
+           PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
+      *
+               MOVE    ZERO        TO  FLG-TARGET
+      *
+               IF    ( FLG-RYOYOKHN                =   1 OR 3)
+                AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "05" )
+                   IF    ( FLG-LIFE-RJN            =   ZERO OR 2)
+                       IF    ( SYS-5111-SEIKATU-RYOKBN
+                                                   =   SPACE )
+                           MOVE    1   TO  FLG-TARGET
+                       END-IF
+                   END-IF
+                   IF    ( FLG-LIFE-RJN            =   1    OR 2)
+                       IF    ( SYS-5111-SEIKATU-RYOKBN
+                                               NOT =   SPACE )
+                           MOVE    1   TO  FLG-TARGET
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-RYOYOKHN                =   2 OR 4 )
+                AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "06" )
+                   IF    ( FLG-LIFE-RJN            =   ZERO OR 2)
+                       IF    ( SYS-5111-SEIKATU-RYOKBN
+                                                   =   SPACE )
+                           MOVE    1   TO  FLG-TARGET
+                       END-IF
+                   END-IF
+                   IF    ( FLG-LIFE-RJN            =   1    OR 2)
+                       IF    ( SYS-5111-SEIKATU-RYOKBN
+                                               NOT =   SPACE )
+                           MOVE    1   TO  FLG-TARGET
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( SPA-NAI-KJNYMD >=  CONST-H220401 )
+                   IF    ( SYS-5111-SRYCD
+                                       =   "099999953"
+                                        OR "099999954" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                   END-IF
+                   IF   (( FLG-RYOYOKHN    =   1 )
+                    AND  ( SYS-5001-KHNSRYCD
+                                       =   SPACE
+                                  OR       "099999953"
+                                  OR       "190121310"
+                                  OR       "190121410"
+                                  OR       "190121510"
+                                  OR       "190121610"
+                                  OR       "190121710"
+                                  OR       "190131610"
+                                  OR       "190131810"
+                                  OR       "190132010"
+                                  OR       "190132210"
+                                  OR       "190121810" ))
+                    OR   ( FLG-RYOYOKHN    =   3 )
+                       IF    ( SYS-5111-SRYCD
+                                       =   "190121310"
+                                  OR       "190121410"
+                                  OR       "190121510"
+                                  OR       "190121610"
+                                  OR       "190121710"
+                                  OR       "190131610"
+                                  OR       "190131810"
+                                  OR       "190132010"
+                                  OR       "190132210"
+                                  OR       "190123710"
+                                  OR       "190123810"
+                                  OR       "190123910"
+                                  OR       "190124010"
+                                  OR       "190124110"
+                                  OR       "190131710"
+                                  OR       "190131910"
+                                  OR       "190132110"
+                                  OR       "190132310"
+                                  OR       "190121810"
+                                  OR       "190124210" )
+                           CONTINUE
+                       ELSE
+                           MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                   END-IF
+                   IF   (( FLG-RYOYOKHN    =   1 )
+                    AND  ( SYS-5001-KHNSRYCD
+                                       =   "099999954"
+                                  OR       "190132410"
+                                  OR       "190132610"
+                                  OR       "190132810"
+                                  OR       "190133010"
+                                  OR       "190133210"
+                                  OR       "190133410"
+                                  OR       "190133610"
+                                  OR       "190133810"
+                                  OR       "190134010"
+                                  OR       "190121810" ))
+                       IF    ( SYS-5111-SRYCD
+                                       =   "190132410"
+                                  OR       "190132610"
+                                  OR       "190132810"
+                                  OR       "190133010"
+                                  OR       "190133210"
+                                  OR       "190133410"
+                                  OR       "190133610"
+                                  OR       "190133810"
+                                  OR       "190134010"
+                                  OR       "190132510"
+                                  OR       "190132710"
+                                  OR       "190132910"
+                                  OR       "190133110"
+                                  OR       "190133310"
+                                  OR       "190133510"
+                                  OR       "190133710"
+                                  OR       "190133910"
+                                  OR       "190134110"
+                                  OR       "190121810"
+                                  OR       "190124210" )
+                           CONTINUE
+                       ELSE
+                           MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                   END-IF
+                   IF   (  FLG-RYOYOKHN    =   3 )
+                       IF    ( SYS-5111-SRYCD
+                                  =        "190121810"
+                                  OR       "190124210" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                   END-IF
+                   IF   (  FLG-RYOYOKHN    =   4 )
+                       IF    ( SYS-5111-SRYCD
+                                  =        "190122510"
+                                  OR       "190124810" )
+                           MOVE  ZERO  TO  FLG-TARGET
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-TARGET  =   1 )
+      *
+                   MOVE    "3"             TO  WRK-TOKNYUIN-KBN
+                   MOVE    SYS-5111-KBNCD  TO  WRK-TOKKBNCD
+                   PERFORM 310111-TOKNYUINLST-SET-SEC
+               END-IF
+      *
+               PERFORM 900-SYSKANRI-KEY23-FET-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-5111-REC
+      *
+           END-PERFORM
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key23"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           . 
+       410111-RYOYOKHN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    ÆÃÄêÆþ±¡ÎÁÀßÄê½èÍý
@@ -1508,75 +1657,84 @@
       *****************************************************************
        310111-TOKNYUINLST-SET-SEC      SECTION.
       *
-           IF    ( CNT-MAX         >=  CONST-TOKNYUIN-MAX )
-               CONTINUE
-           ELSE
+           MOVE    ZERO                TO  FLG-PASS
+           INITIALIZE                      WRK-TOK-G
       *
+           IF    ( WRK-TOKNYUIN-KBN    =   "2" )
                INITIALIZE                  SYSKANRI-REC
                MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
-      *
-               IF    ( WRK-TOKNYUIN-KBN    =   "2" )
-                   MOVE    "5110"          TO  SYS-KANRICD
-               ELSE
-                   MOVE    "5111"          TO  SYS-KANRICD
-               END-IF
-      *
+               MOVE    "5110"          TO  SYS-KANRICD
                MOVE    WRK-TOKKBNCD    TO  SYS-KBNCD
                MOVE    SPA-NAI-KJNYMD  TO  SYS-STYUKYMD
-                                       SYS-EDYUKYMD
+                                           SYS-EDYUKYMD
                PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-               IF    ( FLG-SYSKANRI    =   ZERO )
-                   COMPUTE CNT-MAX =   CNT-MAX +   1
+               MOVE    SYSKANRI-REC    TO  SYS-5110-REC
+               MOVE    SYS-5110-SRYCD  TO  WRK-TOK-SRYCD
+               MOVE    SYS-5110-BTU-TOKUTEINYUIN-NM
+                                       TO  WRK-TOK-NAME
+           ELSE
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+               MOVE    "5111"          TO  SYS-KANRICD
+               MOVE    WRK-TOKKBNCD    TO  SYS-KBNCD
+               MOVE    SPA-NAI-KJNYMD  TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-5111-REC
+               MOVE    SYS-5111-SRYCD  TO  WRK-TOK-SRYCD
+               MOVE    SYS-5111-BRM-TOKUTEINYUIN-NM
+                                       TO  WRK-TOK-NAME
+               MOVE    SYS-5111-BRM-NYUINRYOKBN
+                                       TO  WRK-TOK-NYUINRYOKBN
+           END-IF
       *
-                   MOVE    CNT-MAX     TO  WRK-99
+           MOVE    WRK-TOK-SRYCD   TO  WRK-TNS-SRYCD
+           MOVE    SPA-NAI-KJNYMD  TO  WRK-TNS-KJNYMD
+           PERFORM 900-TENSU-KEY-SEL-SEC
+           IF    ( FLG-TENSU       =   ZERO )
+               IF    ( TNS-HOSPSRYKBN  =   0 )
+                OR   ( TNS-HOSPSRYKBN  =   SPA-HOSPSBT )
+                   CONTINUE
+               ELSE
+                   MOVE    1       TO  FLG-PASS
+               END-IF
+           ELSE
+                   MOVE    1       TO  FLG-PASS
+           END-IF
       *
-                   MOVE    WRK-99      TO  SPA-GMN-TOKNYUINL   (CNT-MAX)
-                   MOVE    WRK-TOKNYUIN-KBN
-                                       TO  SPA-GMN-TOKNYUINL2-KBN
-                                                               (CNT-MAX)
-                   MOVE    WRK-TOKKBNCD
-                                       TO  SPA-GMN-TOKNYUINL2-NYUIN
-                                                               (CNT-MAX)
+           IF    ( CNT-MAX         >=  CONST-TOKNYUIN-MAX )
+            OR   ( FLG-PASS         =   1 )
+               CONTINUE
+           ELSE
+               COMPUTE CNT-MAX =   CNT-MAX +   1
       *
-                   IF    ( WRK-TOKNYUIN-KBN    =   "2" )
-                       MOVE    SYSKANRI-REC    TO  SYS-5110-REC
-                       MOVE    SYS-5110-BTU-TOKUTEINYUIN-NM
-                                   TO  SPA-GMN-TOKNYUINMEIL    (CNT-MAX)
-                       MOVE    SPACE
+               MOVE    CNT-MAX     TO  WRK-99
+      *
+               MOVE    WRK-99      TO  SPA-GMN-TOKNYUINL   (CNT-MAX)
+               MOVE    WRK-TOKNYUIN-KBN
+                                   TO  SPA-GMN-TOKNYUINL2-KBN
+                                                           (CNT-MAX)
+               MOVE    WRK-TOKKBNCD
+                                   TO  SPA-GMN-TOKNYUINL2-NYUIN
+                                                           (CNT-MAX)
+      *
+               MOVE    WRK-TOK-NAME
+                                   TO  SPA-GMN-TOKNYUINMEIL(CNT-MAX)
+               MOVE    WRK-TOK-NYUINRYOKBN
                                    TO  SPA-GMN-TOKNYUINL3-NYUINRYOKBN
-                                                               (CNT-MAX)
+                                                           (CNT-MAX)
       *
-                       IF    ( SYS-5110-SRYCD  IS  NUMERIC )
-                           MOVE    SYS-5110-SRYCD  TO  WRK-NUMSRYCD
-                           COMPUTE SPA-GMN-TOKNYUIN-SRYCDTTL
-                               =   SPA-GMN-TOKNYUIN-SRYCDTTL
-                               +   WRK-NUMSRYCD
-                       END-IF
-                   ELSE
-                       MOVE    SYSKANRI-REC    TO  SYS-5111-REC
-                       MOVE    SYS-5111-BRM-TOKUTEINYUIN-NM
+               IF  ( WRK-TOKNYUIN-KBN  =   "3" )
+                AND( WRK-TOKKBNCD      =   "23" OR "49" OR "51")
+                   MOVE    TNS-NAME
                                    TO  SPA-GMN-TOKNYUINMEIL   (CNT-MAX)
-                       MOVE    SYS-5111-BRM-NYUINRYOKBN
-                                   TO  SPA-GMN-TOKNYUINL3-NYUINRYOKBN
-                                                              (CNT-MAX)
+               END-IF
       *
-                       IF    ( SYS-5111-KBNCD  =   "23" OR "49" OR "51")
-                           MOVE    SYS-5111-SRYCD
-                                                   TO  WRK-TNS-SRYCD
-                           MOVE    SPA-NAI-KJNYMD  TO  WRK-TNS-KJNYMD
-                           PERFORM 900-TENSU-KEY-SEL-SEC
-                           MOVE    TNS-NAME
-                                   TO  SPA-GMN-TOKNYUINMEIL   (CNT-MAX)
-                       END-IF
-      *
-                       IF    ( SYS-5111-SRYCD  IS  NUMERIC )
-                           MOVE    SYS-5111-SRYCD  TO  WRK-NUMSRYCD
-                           COMPUTE SPA-GMN-TOKNYUIN-SRYCDTTL
-                               =   SPA-GMN-TOKNYUIN-SRYCDTTL
-                               +   WRK-NUMSRYCD
-                       END-IF
-                   END-IF
-      *
+               IF    ( WRK-TOK-SRYCD   IS  NUMERIC )
+                   MOVE    WRK-TOK-SRYCD   TO  WRK-NUMSRYCD
+                   COMPUTE SPA-GMN-TOKNYUIN-SRYCDTTL
+                       =   SPA-GMN-TOKNYUIN-SRYCDTTL
+                       +   WRK-NUMSRYCD
                END-IF
            END-IF
       *
