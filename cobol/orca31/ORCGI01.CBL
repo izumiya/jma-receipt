@@ -5242,21 +5242,13 @@
                END-IF
            END-IF
       *
-      *    老人の場合、老人一般病棟特定入院基本料をコンボに設定
-      *    平成２２年４月から年齢要件廃止
-           MOVE    WRK-KJNYMD  TO  WRK-AGECHK-SRYYMD
-           PERFORM 4801-RJN-TAISYO-CHK-SEC
-           IF    ( FLG-RJN         =   1 )
-            OR   ( WRK-KJNYMD     >=  CONST-H220401 )
-             IF    ( WRK-KJNYMD     >=  CONST-H220401 )
+           IF    ( WRK-KJNYMD     >=  CONST-H240401 )
                EVALUATE  TRUE
-               WHEN  ( WRK-KJNYMD   >=  CONST-H240401 )
-                AND  ( SPA-NAI-I01-BTUSBT  =   "08" )
+               WHEN  ( SPA-NAI-I01-BTUSBT  =   "08" )
                 AND  ( SYS-5001-CRYOYOKBN  =   "1" )
                    MOVE    4         TO  FLG-RYOYOKHN
                    PERFORM 410111-RYOYOKHN-EDIT-SEC
-               WHEN  ( WRK-KJNYMD   >=  CONST-H240401 )
-                AND  ( SPA-NAI-I01-BTUSBT  =   "09" )
+               WHEN  ( SPA-NAI-I01-BTUSBT  =   "09" )
                    MOVE    "5110"      TO  WRK-KANRICD
                    MOVE    "2"         TO  WRK-TOKNYUIN-KBN
                    EVALUATE    SYS-5001-CRYOYOKBN
@@ -5270,23 +5262,47 @@
                        MOVE    "37"  TO  WRK-KBNCD
                        PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
                    END-EVALUATE
-               WHEN  ( WRK-KJNYMD   >=  CONST-H240401 )
-                 AND ( SYS-5001-BTU-TOKTEI-NYUIN
+               WHEN  ( SYS-5001-BTU-TOKTEI-NYUIN
                                      =  "33" OR "34" )
                    MOVE    3         TO  FLG-RYOYOKHN
                    PERFORM 410111-RYOYOKHN-EDIT-SEC
-               WHEN  ( SPA-NAI-I01-BTUSBT  =   "01" OR "05" OR "06" )
-                 MOVE    "5111"      TO  WRK-KANRICD
-                 MOVE    "22"        TO  WRK-KBNCD
-                 MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-                 PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
-      *
-                 MOVE    "5111"      TO  WRK-KANRICD
-                 MOVE    "24"        TO  WRK-KBNCD
-                 MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-                 PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
                END-EVALUATE
-             END-IF
+           END-IF
+      *
+      *    老人の場合、老人一般病棟特定入院基本料をコンボに設定
+      *    平成２２年４月から年齢要件廃止
+           MOVE    WRK-KJNYMD  TO  WRK-AGECHK-SRYYMD
+           PERFORM 4801-RJN-TAISYO-CHK-SEC
+      *
+           IF  ( WRK-KJNYMD   >=  CONST-H220401 )
+               IF    ( SPA-NAI-I01-BTUSBT  =   "01" OR "05" OR "06")
+                   IF    ( SYS-5001-BTU-TOKTEI-NYUIN
+                                           =   "33" OR "34" )
+                       CONTINUE
+                   ELSE
+                       MOVE    "5111"      TO  WRK-KANRICD
+                       MOVE    "22"        TO  WRK-KBNCD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+      *
+                       MOVE    "5111"      TO  WRK-KANRICD
+                       MOVE    "24"        TO  WRK-KBNCD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   END-IF
+               END-IF
+           ELSE
+               IF  ( FLG-RJN   =   1 )
+                   MOVE    "5111"      TO  WRK-KANRICD
+                   MOVE    "22"        TO  WRK-KBNCD
+                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+      *
+                   MOVE    "5111"      TO  WRK-KANRICD
+                   MOVE    "24"        TO  WRK-KBNCD
+                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+               END-IF
            END-IF
       *
       *    短期滞在手術基本料をコンボに設定
