@@ -5258,6 +5258,22 @@
                                  OR CONS-201004-KSN19
                                  OR CONS-201204-KSN1
                                  OR CONS-201204-KSN2
+      *
+                                 OR CONS-201204-KSN3
+                                 OR CONS-201204-KSN4
+                                 OR CONS-201204-KSN5
+                                 OR CONS-201204-KSN6
+                                 OR CONS-201204-KSN7
+                                 OR CONS-201204-KSN8
+                                 OR CONS-201204-KSN9
+                                 OR CONS-201204-KSN10
+                                 OR CONS-201204-KSN11
+                                 OR CONS-201204-KSN12
+                                 OR CONS-201204-KSN13
+                                 OR CONS-201204-KSN14
+                                 OR CONS-201204-KSN15
+                                 OR CONS-201204-KSN16
+                                 OR CONS-201204-KSN17
                    CONTINUE
                  ELSE
                    ADD     1        TO  IDX1
