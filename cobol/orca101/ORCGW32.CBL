@@ -568,7 +568,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    "坴嶺問儅ぅ橾斯樊陸侳啣喀棟咥恔" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "202"
-                   MOVE    "凝價粗陸侳褲說恔" 
+                   MOVE    "凝價粗陸侳褲恓恔" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "203"
                    MOVE    "戲唾蓮晰匟棟咥恔" 
