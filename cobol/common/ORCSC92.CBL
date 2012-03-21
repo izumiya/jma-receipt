@@ -4900,6 +4900,7 @@
       *        システム管理の変更可によって一般名記載とする
                IF     (SPA-SRYYMD          >=  "20120401"  )
                  AND  (SPA-KOUHATUKA       =   "1"         )
+                 AND  (TNS-SRYCD(1:1)      =   "6"         )
                    IF     (TNSP-IPN-KISAIKBN   =   2    )   OR
                           (TNS-KOUHATUKBN      =   ZERO )
       *                処方名記載、先発品は変更なし
