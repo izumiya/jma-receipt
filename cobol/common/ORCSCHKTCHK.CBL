@@ -907,6 +907,11 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
            INITIALIZE                  TBL-HKTSANTEI-AREA
            MOVE    ZERO                TO  IDX-H
+      *    電子点数表対象分から対象外
+           IF      WRK-SRYYMD          >=  "20100401"
+               MOVE    1               TO  FLG-HKTSANTEI
+           END-IF
+      *
            PERFORM UNTIL  (FLG-HKTSANTEI   =   1  )
                       OR  (IDX-H           >=  600 )
                ADD     1                   TO  IDX-H
