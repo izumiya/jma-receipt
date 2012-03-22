@@ -106,7 +106,6 @@
            03  CNT-STR                             PIC 9(05).
            03  CNT-SST                             PIC 9(05).
            03  CNT-KSN                             PIC 9(05).
-           03  CNT-NYUKSNKBNCHK                    PIC 9(05).
       *
       *    一時領域
        01  WRK-AREA.
@@ -155,18 +154,6 @@
            03  WRK-KSNCD-SEN                       PIC X(09).
            03  WRK-KSNCD-TOK                       PIC X(09).
            03  WRK-KSNIDX                          PIC 9(03).
-           03  WRK-NYUKSNKBN-G.
-               05  WRK-KSNCHUKSNCD                 PIC X(04).
-               05  WRK-KSNKHNKBN                   PIC 9(02).
-               05  WRK-KSNKSNKBN                   PIC 9(03).
-               05  WRK-KSNSRYCD                    PIC X(09).
-      *
-               05  WRK-NYUKSNKBN-MAX               PIC 9(03).
-               05  WRK-NYUKSNKBN-OCC               OCCURS   10.
-                   07  WRK-NYUKHNKBN               PIC 9(02).
-                   07  WRK-NYUKSNKBN               PIC 9(03).
-                   07  WRK-NYUCHUKSNCD             PIC X(04).
-                   07  WRK-NYUSRYCD                PIC X(09).
            03  WRK-KSNKBN                          PIC 9(03).
            03  WRK-NYUINKBN                        PIC 9(03).
            03  WRK-SSTKJNCD-G.
@@ -431,6 +418,9 @@
       *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
+      *
+      *    入院料加算チェックサブ
+      *    COPY   "CPORCSNYUKSNCHK.INC".
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
@@ -6410,8 +6400,6 @@
        41011-SSTKIJUN-CHK-SEC          SECTION.
       *
            INITIALIZE                  WRK-SSTKJNCD-G
-                                       WRK-NYUKSNKBN-G
-                                       CNT-NYUKSNKBNCHK
       *
            MOVE    ZERO            TO  FLG-SSTKIJUNERR
                                        FLG-KSNERR
@@ -6448,48 +6436,21 @@
                END-IF
            END-IF
       *
-           IF    ( SPA-NAI-W20-KHNSRYCD    NOT =   SPACE )
-               EVALUATE    SPA-NAI-W20-KHNSRYCD
-               WHEN    "099999950"
-                   MOVE    "190097010"         TO  WRK-TNS-SRYCD
-               WHEN    "099999951"
-                   MOVE    "190097210"         TO  WRK-TNS-SRYCD
-               WHEN    "099999952"
-                   MOVE    "190135110"         TO  WRK-TNS-SRYCD
-               WHEN    OTHER
-                   MOVE    SPA-NAI-W20-KHNSRYCD
-                                               TO  WRK-TNS-SRYCD
-               END-EVALUATE
-               MOVE    SPA-NAI-W20-YUKOSTYMD   TO  WRK-TNS-KJNYMD
-               PERFORM 900-TENSU-KEY-SEL-SEC
-               MOVE    TNS-SRYCD               TO  WRK-NYUSRYCD  (1)
-               MOVE    TNS-NYUKHNKSNKBN        TO  WRK-NYUKSNKBN (1)
-               MOVE    TNS-NYUKHNKBN           TO  WRK-NYUKHNKBN (1)
-               MOVE    TNS-CHUKSNCD            TO  WRK-NYUCHUKSNCD (1)
-      *
-           END-IF
-      *
-           IF    ( SPA-GMN-W20-TOKNYUIN    NOT =   SPACE )
-               MOVE    SPA-GMN-W20-TOKNYUIN    TO  WRK-CMB-CD
-               PERFORM 4200-TOKNYUINLST-CHK-SEC
-               MOVE    WRK-CMB-ITM3            TO  WRK-TNS-SRYCD
-               MOVE    SPA-NAI-W20-YUKOSTYMD   TO  WRK-TNS-KJNYMD
-               PERFORM 900-TENSU-KEY-SEL-SEC
-               MOVE    TNS-SRYCD               TO  WRK-NYUSRYCD  (2)
-               MOVE    TNS-NYUKHNKSNKBN        TO  WRK-NYUKSNKBN (2)
-               MOVE    TNS-NYUKHNKBN           TO  WRK-NYUKHNKBN (2)
-               MOVE    TNS-CHUKSNCD            TO  WRK-NYUCHUKSNCD (2)
-           END-IF
-      *
-           MOVE    2                           TO  WRK-NYUKSNKBN-MAX
-      *
-           MOVE    WRK-KSNCD                   TO  WRK-TNS-SRYCD
-           MOVE    SPA-NAI-W20-YUKOSTYMD       TO  WRK-TNS-KJNYMD
-           PERFORM 900-TENSU-KEY-SEL-SEC
-           MOVE    TNS-SRYCD                   TO  WRK-KSNSRYCD
-           MOVE    TNS-NYUKHNKSNKBN            TO  WRK-KSNKSNKBN
-           MOVE    TNS-NYUKHNKBN               TO  WRK-KSNKHNKBN
-           MOVE    TNS-CHUKSNCD                TO  WRK-KSNCHUKSNCD
+      *    INITIALIZE  SNYUKSNCHK-LNK
+      *    MOVE    SPA-GMN-W20-SBT             TO  SNYUKSNCHK-BTUSBT
+      *    MOVE    SPA-NAI-W20-KHNSRYCD        TO  SNYUKSNCHK-KHN-SRYCD
+      *    IF    ( SPA-GMN-W20-TOKNYUIN    NOT =   SPACE )
+      *        MOVE    SPA-NAI-W20-TOKNYUIN    TO  SNYUKSNCHK-BTU-TOKKBN
+      *    END-IF
+      *    MOVE    SPA-GMN-W20-RYOYOKBN        TO  SNYUKSNCHK-RYOYOKBN
+      *    MOVE    WRK-KSNCD                   TO  SNYUKSNCHK-KSN-SRYCD
+      *    MOVE    SPA-NAI-W20-YUKOSTYMD       TO  SNYUKSNCHK-SRYYMD
+      *    CALL    "ORCSNYUKSNCHK"         USING
+      *                                    SNYUKSNCHK-LNK
+      *                                    SPA-AREA
+      *    IF    ( SNYUKSNCHK-ERR      NOT =   ZERO )
+      *            MOVE    1   TO      FLG-KSNERR
+      *    END-IF
       *
            MOVE    ZERO            TO  FLG-HIT
                                        CNT-SST
@@ -6514,49 +6475,6 @@
                IF    ( FLG-HIT =   ZERO )
                    MOVE        1   TO  FLG-SSTKIJUNERR
                END-IF
-           END-IF
-      *
-           IF    ( SPA-GMN-W20-SBT     =   "04"  OR  "09" )
-               CONTINUE
-           ELSE
-      *
-                   MOVE    ZERO        TO  FLG-HIT
-      *
-                   PERFORM VARYING IDX6    FROM    1   BY  1
-                           UNTIL ( IDX6    >   WRK-NYUKSNKBN-MAX )
-                            OR   ( FLG-HIT     =   1 )
-                            OR   ( FLG-KSNERR  =   1 )
-      *
-                       IF    ( WRK-NYUKSNKBN (IDX6)    >   ZERO )
-                        AND  ( WRK-KSNKSNKBN           >   ZERO )
-                           COMPUTE CNT-NYUKSNKBNCHK
-                               =   CNT-NYUKSNKBNCHK
-                               +   1
-                           MOVE    WRK-NYUKSNKBN (IDX6)
-                                                       TO  WRK-NYUINKBN
-                           MOVE    WRK-KSNKSNKBN       TO  WRK-KSNKBN
-                           MOVE    SPA-NAI-W20-YUKOSTYMD
-                                                       TO  WRK-YUKOSTYMD
-                           PERFORM 900-NYUKSNCHK-KEY-SEL-SEC
-                           IF    ( NYUKSNCHK-CHKKBN    =   "1" OR "2" )
-                               MOVE    1       TO  FLG-HIT
-                           END-IF
-                       END-IF
-      *
-                       IF    ( WRK-NYUKHNKBN   (IDX6)  >   ZERO )
-                        AND  ( WRK-KSNKHNKBN           >   ZERO )
-                           IF    ( WRK-NYUKHNKBN   (IDX6)
-                                           NOT =   WRK-KSNKHNKBN )
-                               MOVE    1   TO      FLG-KSNERR
-                           END-IF
-                       END-IF
-                   END-PERFORM
-      *
-                   IF    ( CNT-NYUKSNKBNCHK    >   ZERO )
-                       IF   (  FLG-HIT     =       ZERO )
-                            MOVE    1      TO      FLG-KSNERR
-                       END-IF
-                   END-IF
            END-IF
       *
            .

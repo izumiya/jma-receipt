@@ -60,14 +60,21 @@
            03  FLG-SELNUM          PIC 9(01).
            03  FLG-KENSAKU         PIC 9(01).
            03  FLG-KANJI           PIC 9(01).
+           03  FLG-HIT             PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
            03  IDX2                PIC 9(04).
+           03  IDX5                PIC 9(04).
            03  IDXK                PIC 9(04).
            03  IDY                 PIC 9(04).
+           03  IDX-SST             PIC 9(05).
       *
+      *    カウント領域
+       01  CNT-AREA.
+           03  CNT-SST             PIC 9(05).
+           03  CNT-STR             PIC 9(05).
       *
       *    一時領域
        01  WRK-AREA.
@@ -79,6 +86,24 @@
            03  WRK-ZZ9                 PIC ZZ9.
            03  WRK-CD-MCNT             PIC 9(02).
            03  WRK-INPUTCD             PIC X(09).
+           03  WRK-SSTKJNCD-G.
+               05  WRK-SSTKJNCD-OCC                OCCURS 10.
+                   07  WRK-SSTKJNCDSEP             PIC X(01).
+                   07  WRK-SSTKJNCD                PIC X(04).
+                   07  WRK-SSTKJNCD-R              REDEFINES
+                       WRK-SSTKJNCD.
+                       09  WRK-SSTKJNCD9           PIC 9(04).
+           03  WRK-KBN1-G.
+               05  WRK-KBN1                        PIC 9(01).
+           03  WRK-PNT                 PIC 9(05).
+      *
+       01  SSTKJN-AREA.
+           03  SSTKJN-VAL.
+               05  SSTKJN-VAL-OCC                  PIC X(500)
+                                                   OCCURS  7.
+           03  SSTKJN-R    REDEFINES       SSTKJN-VAL.
+               05  SSTKJN-CD                       PIC X(01)
+                                                   OCCURS  3500.
       *
       *    コラムリスト位置
            03  WRK-W201-ROW            PIC S9(09).
@@ -91,6 +116,8 @@
       *
       *    システム管理マスタ
            COPY  "CPSYSKANRI.INC".
+      *    施設基準
+           COPY  "CPSK1006.INC".
       *    病棟管理
            COPY  "CPSK5001.INC".
       *    点数マスタ
@@ -99,6 +126,9 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    入院料加算チェックサブ
+      *    COPY   "CPORCSNYUKSNCHK.INC".
       *
       *   日付変換サブ
            COPY    "CPORCSDAY.INC".
@@ -192,6 +222,7 @@
       *
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
+           INITIALIZE                  CNT-AREA
            INITIALIZE                  WRK-AREA
       *
            MOVE    SPA-COMMON      TO  SPA-AREA
@@ -783,32 +814,144 @@
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           IF      FLG-TENSU           NOT =   ZERO
+           IF      FLG-TENSU           =   ZERO
+               PERFORM 220221-KSNCD2-CHK-SEC
+               IF    ( SPA-ERRCD       =   SPACE )
+                   PERFORM 220221-SSTKJN-CHK-SEC
+               END-IF
+           ELSE
                MOVE    "0002"          TO  SPA-ERRCD
                MOVE    2               TO  SPA-W201-CUR
-           END-IF
-      *
-           IF      FLG-TENSU           =   ZERO
-              IF   TNS-HOSPSRYKBN      =   ZERO
-                  CONTINUE
-              ELSE
-                  IF  (TNS-HOSPSRYKBN  =  1)   AND
-                      (SPA-HOSPSBT     =  2)
-                      MOVE    "0005"   TO  SPA-ERRCD
-                      MOVE    2        TO  SPA-W201-CUR
-                  END-IF
-                  IF  (TNS-HOSPSRYKBN  =  2)   AND
-                      (SPA-HOSPSBT     =  1)
-                      MOVE    "0006"   TO  SPA-ERRCD
-                      MOVE    2        TO  SPA-W201-CUR
-                  END-IF
-              END-IF
            END-IF
       *
            .
        22022-KSNCD2-CHK-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    入院料加算コードチェック処理
+      *****************************************************************
+       220221-KSNCD2-CHK-SEC           SECTION.
+      *
+          IF     ( TNS-HOSPSRYKBN      =   ZERO )
+              CONTINUE
+          ELSE
+              IF     ( TNS-HOSPSRYKBN  =  1 )
+               AND   ( SPA-HOSPSBT     =  2 )
+                  MOVE    "0005"       TO  SPA-ERRCD
+              END-IF
+              IF     ( TNS-HOSPSRYKBN  =  2)
+                AND  ( SPA-HOSPSBT     =  1)
+                  MOVE    "0006"       TO  SPA-ERRCD
+              END-IF
+          END-IF
+      *
+           MOVE    ZERO        TO  CNT-STR
+           INSPECT TNS-NAME    TALLYING   CNT-STR
+                   FOR     ALL "加算"
+      *
+          IF    ( SPA-ERRCD        =   SPACE )
+              IF    ( TNS-NYUTENTTLKBN =   903 OR 920 )
+               AND (( TNS-DATAKBN  =   2 )
+                 OR ( CNT-STR      >   0 ))
+                  CONTINUE
+              ELSE
+                  MOVE    "0007"       TO  SPA-ERRCD
+              END-IF
+          END-IF
+      *
+          IF    ( SPA-ERRCD        =   SPACE )
+              IF    ( TNS-MICMESUKSN   =   3 OR 4 OR 5 )
+                  MOVE    "0008"       TO  SPA-ERRCD
+              END-IF
+          END-IF
+      *
+      *    INITIALIZE  SNYUKSNCHK-LNK
+      *    MOVE    SPA-GMN-W20-SBT             TO  SNYUKSNCHK-BTUSBT
+      *    MOVE    SPA-NAI-W20-KHNSRYCD        TO  SNYUKSNCHK-KHN-SRYCD
+      *    IF    ( SPA-GMN-W20-TOKNYUIN    NOT =   SPACE )
+      *        MOVE    SPA-NAI-W20-TOKNYUIN    TO  SNYUKSNCHK-BTU-TOKKBN
+      *    END-IF
+      *    MOVE    SPA-GMN-W20-RYOYOKBN        TO  SNYUKSNCHK-RYOYOKBN
+      *    MOVE    SPA-W201-KSNCD2             TO  SNYUKSNCHK-KSN-SRYCD
+      *    MOVE    SPA-NAI-W20-YUKOSTYMD       TO  SNYUKSNCHK-SRYYMD
+      *    CALL    "ORCSNYUKSNCHK"         USING
+      *                                    SNYUKSNCHK-LNK
+      *                                    SPA-AREA
+      *    IF    ( SNYUKSNCHK-ERR      NOT =   ZERO )
+      *           MOVE    "0009"       TO  SPA-ERRCD
+      *    END-IF
+      *
+           IF    ( SPA-ERRCD        NOT =   SPACE )
+                MOVE    2               TO  SPA-W201-CUR
+           END-IF
+      *
+           .
+       220221-KSNCD2-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    施設基準チェック処理
+      *****************************************************************
+       220221-SSTKJN-CHK-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  SSTKJN-AREA
+      *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    "1006"          TO  SYS-KANRICD
+           MOVE    SPA-NAI-W20-YUKOSTYMD
+                                   TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY2-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-1006-REC
+      *
+           PERFORM UNTIL ( FLG-SYSKANRI    =   1 )
+      *
+      *
+               IF    ( SYS-1006-KBNCD  >=  "1" )
+                AND  ( SYS-1006-KBNCD  <=  "7" )
+                   MOVE    SYS-1006-KBNCD  TO  WRK-KBN1-G
+                   MOVE    SYS-1006-TBL    TO  SSTKJN-VAL-OCC
+                                                     (WRK-KBN1)
+               END-IF
+      *
+               PERFORM 900-SYSKANRI-KEY2-FET-SEC
+               MOVE    SYSKANRI-REC    TO  SYS-1006-REC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    ZERO            TO  FLG-HIT
+                                       CNT-SST
+           PERFORM VARYING IDX5    FROM    1   BY  1
+                   UNTIL ( IDX5    >   10 )
+                    OR   ( FLG-HIT     =   1 )
+      *
+               IF    ( TNS-SSTKIJUNCD (IDX5)   >   ZERO )
+                   COMPUTE CNT-SST =   CNT-SST +   1
+                   MOVE    TNS-SSTKIJUNCD (IDX5)
+                                   TO  WRK-SSTKJNCD9(CNT-SST)
+                   MOVE    TNS-SSTKIJUNCD (IDX5)
+                                   TO  IDX-SST
+                   IF    ( SSTKJN-CD (IDX-SST) =   "1" )
+                       MOVE    1   TO  FLG-HIT
+                   END-IF
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( CNT-SST     >   ZERO )
+               IF    ( FLG-HIT =   ZERO )
+                   MOVE    "0015"      TO  SPA-ERRCD
+                   MOVE    2           TO  SPA-W201-CUR
+               END-IF
+           END-IF
+      *
+           .
+       220221-SSTKJN-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    検索処理
       *****************************************************************
@@ -1225,14 +1368,18 @@
                    MOVE   "診療所のみ算定可能な加算です。"
                                        TO  SPA-ERRMSG
                WHEN    "0007"
-                MOVE "システム管理−医療機関情報で設定可能な加算です。"
+                   MOVE   "入院料加算のみ登録が可能です。"
                                        TO  SPA-ERRMSG
                WHEN    "0008"
-                MOVE "システム管理−病棟管理情報で設定可能な加算です。"
+                   MOVE   "減算コードは登録できません。"
                                        TO  SPA-ERRMSG
                WHEN    "0009"
-                MOVE "システム管理−病室管理情報で設定可能な加算です。"
-                                       TO  SPA-ERRMSG
+                   MOVE    SPACE       TO  SPA-ERRMSG
+                   STRING  "入院料に対して"
+                       "算定できない加算です。"
+                                       DELIMITED   BY  SIZE
+                   INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "0010"
                    MOVE    "入院料加算コードが未設定です。"
                                        TO  SPA-ERRMSG
@@ -1248,6 +1395,23 @@
                WHEN    "0014"
                    MOVE    "選択された加算は追加できません。"
                                        TO  SPA-ERRMSG
+               WHEN    "0015"
+                   MOVE    SPACE       TO  SPA-ERRMSG
+                   MOVE    1           TO  WRK-PNT
+                   STRING  "必要な施設基準が設定されていません／"
+                           DELIMITED   BY  SIZE
+                   INTO    SPA-ERRMSG
+                   WITH    POINTER         WRK-PNT
+                   END-STRING
+                   PERFORM VARYING IDX-SST FROM    1   BY  1
+                           UNTIL ( IDX-SST >   CNT-SST )
+      *
+                       STRING  WRK-SSTKJNCD-OCC  (IDX-SST)
+                               DELIMITED   BY  SIZE
+                       INTO    SPA-ERRMSG
+                       WITH    POINTER         WRK-PNT
+                       END-STRING
+                   END-PERFORM
                WHEN    "9000"
                    MOVE    "病棟情報が取得できません。"
                                        TO  SPA-ERRMSG
@@ -1356,7 +1520,13 @@
                MOVE    "tbl_syskanri"  TO  MCP-TABLE
                MOVE    "key10"         TO  MCP-PATHNAME
                PERFORM  920-DBFETCH-SEC
-               MOVE    MCPDATA-REC TO  SYSKANRI-REC
+               IF    ( MCP-RC      =   ZERO )
+                   MOVE    MCPDATA-REC
+                                   TO  SYSKANRI-REC
+               ELSE
+                   MOVE    1       TO  FLG-SYSKANRI
+                   INITIALIZE          SYSKANRI-REC
+               END-IF
            ELSE
                MOVE    1           TO  FLG-SYSKANRI
                INITIALIZE              SYSKANRI-REC
@@ -1368,6 +1538,57 @@
       *
            .
        900-SYSKANRI-KEY10-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理検索処理(KEY2)
+      *****************************************************************
+       900-SYSKANRI-KEY2-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYSKANRI
+      *
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM  920-DBFETCH-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   MOVE    MCPDATA-REC
+                                   TO  SYSKANRI-REC
+               ELSE
+                   MOVE    1       TO  FLG-SYSKANRI
+                   INITIALIZE          SYSKANRI-REC
+               END-IF
+           ELSE
+               MOVE    1           TO  FLG-SYSKANRI
+               INITIALIZE              SYSKANRI-REC
+           END-IF
+      *
+           .
+       900-SYSKANRI-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理FETCH処理(KEY2)
+      *****************************************************************
+       900-SYSKANRI-KEY2-FET-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYSKANRI
+      *
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM  920-DBFETCH-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  SYSKANRI-REC
+           ELSE
+               MOVE    1           TO  FLG-SYSKANRI
+               INITIALIZE              SYSKANRI-REC
+           END-IF
+      *
+           .
+       900-SYSKANRI-KEY2-FET-EXT.
            EXIT.
       *****************************************************************
       *    点数マスター読込処理
