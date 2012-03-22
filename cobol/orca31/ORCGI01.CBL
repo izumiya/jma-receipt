@@ -16382,8 +16382,27 @@
                                                    LNK-DAY6-AREA
                  MOVE    LNK-DAY6-KEISAN
                                   TO       IPN-SANTEISTYMD
+      *          異動日のプラス１月を計算
+                 MOVE    SPA-NAI-I01-IDOYMD
+                                  TO      WRK-IPN-HANTEI-YMD1
+                 IF      WRK-IPN-HANTEI-M1   =   12
+                     ADD    1     TO      WRK-IPN-HANTEI-Y1
+                     MOVE   1     TO      WRK-IPN-HANTEI-M1
+                 ELSE
+                     ADD    1     TO      WRK-IPN-HANTEI-M1
+                 END-IF
+      *          月末日を算定
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY7-AREA
+                 MOVE    "71"              TO  LNK-DAY7-IRAI
+                 MOVE   WRK-IPN-HANTEI-YM1 TO  LNK-DAY7-YM
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI   TO      WRK-IPN-HANTEI-YMD1
       *          一般入院会計作成用のフラグ設定
-                 MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 IF    IPN-SANTEISTYMD   <=   WRK-IPN-HANTEI-YMD1
+                   MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 END-IF
              END-IF
            END-IF
       *
@@ -16530,8 +16549,27 @@
                                                    LNK-DAY6-AREA
                  MOVE    LNK-DAY6-KEISAN
                                   TO       IPN-SANTEISTYMD
+      *          異動日のプラス１月を計算
+                 MOVE    SPA-NAI-I01-IDOYMD
+                                  TO      WRK-IPN-HANTEI-YMD1
+                 IF      WRK-IPN-HANTEI-M1   =   12
+                     ADD    1     TO      WRK-IPN-HANTEI-Y1
+                     MOVE   1     TO      WRK-IPN-HANTEI-M1
+                 ELSE
+                     ADD    1     TO      WRK-IPN-HANTEI-M1
+                 END-IF
+      *          月末日を算定
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY7-AREA
+                 MOVE    "71"              TO  LNK-DAY7-IRAI
+                 MOVE   WRK-IPN-HANTEI-YM1 TO  LNK-DAY7-YM
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI   TO      WRK-IPN-HANTEI-YMD1
       *          一般入院会計作成用のフラグ設定
-                 MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 IF    IPN-SANTEISTYMD   <=   WRK-IPN-HANTEI-YMD1
+                   MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 END-IF
              END-IF
            END-IF
       *
@@ -16608,8 +16646,27 @@
                                                    LNK-DAY6-AREA
                  MOVE    LNK-DAY6-KEISAN
                                   TO       IPN-SANTEISTYMD
+      *          異動日のプラス１月を計算
+                 MOVE    SPA-NAI-I01-IDOYMD
+                                  TO      WRK-IPN-HANTEI-YMD1
+                 IF      WRK-IPN-HANTEI-M1   =   12
+                     ADD    1     TO      WRK-IPN-HANTEI-Y1
+                     MOVE   1     TO      WRK-IPN-HANTEI-M1
+                 ELSE
+                     ADD    1     TO      WRK-IPN-HANTEI-M1
+                 END-IF
+      *          月末日を算定
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY7-AREA
+                 MOVE    "71"              TO  LNK-DAY7-IRAI
+                 MOVE   WRK-IPN-HANTEI-YM1 TO  LNK-DAY7-YM
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI   TO      WRK-IPN-HANTEI-YMD1
       *          一般入院会計作成用のフラグ設定
-                 MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 IF    IPN-SANTEISTYMD   <=   WRK-IPN-HANTEI-YMD1
+                   MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 END-IF
              END-IF
            END-IF
       *
@@ -19691,25 +19748,6 @@
                                   LNK-SCNYUACCT-KAGEN-EDYUKYMD(TN-IDX)
                  END-IF
       *          一般入院料の算定開始日を算定
-      *              異動日のプラス１月を計算
-                     INITIALIZE                STS-AREA-DAY
-                     INITIALIZE                LNK-DAY6-AREA
-                     MOVE    "61"              TO  LNK-DAY6-IRAI
-                     MOVE   SPA-NAI-I01-IDOYMD
-                                               TO  LNK-DAY6-KIJUN
-                     MOVE    "2"               TO  LNK-DAY6-ZOGENPTN
-                     MOVE   1                  TO  LNK-DAY6-ZOGEN
-                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-      *              月末日を計算
-                     INITIALIZE                STS-AREA-DAY
-                     INITIALIZE                LNK-DAY7-AREA
-                     MOVE    "71"              TO  LNK-DAY7-IRAI
-                     MOVE   LNK-DAY6-KEISAN(1:6)
-                                               TO  LNK-DAY7-YM
-                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY7-AREA
-      *
                  INITIALIZE                STS-AREA-DAY
                  INITIALIZE                LNK-DAY6-AREA
                  MOVE    "61"              TO  LNK-DAY6-IRAI
@@ -19721,8 +19759,25 @@
                                                    LNK-DAY6-AREA
                  MOVE    LNK-DAY6-KEISAN
                                   TO       IPN-SANTEISTYMD
+      *          異動日のプラス１月を計算
+                 MOVE    SPA-NAI-I01-IDOYMD
+                                  TO      WRK-IPN-HANTEI-YMD1
+                 IF      WRK-IPN-HANTEI-M1   =   12
+                     ADD    1     TO      WRK-IPN-HANTEI-Y1
+                     MOVE   1     TO      WRK-IPN-HANTEI-M1
+                 ELSE
+                     ADD    1     TO      WRK-IPN-HANTEI-M1
+                 END-IF
+      *          月末日を算定
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY7-AREA
+                 MOVE    "71"              TO  LNK-DAY7-IRAI
+                 MOVE   WRK-IPN-HANTEI-YM1 TO  LNK-DAY7-YM
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI   TO      WRK-IPN-HANTEI-YMD1
       *          一般入院会計作成用のフラグ設定
-                 IF    IPN-SANTEISTYMD   <=   LNK-DAY7-KOYOMI
+                 IF    IPN-SANTEISTYMD   <=   WRK-IPN-HANTEI-YMD1
                    MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
                  END-IF
              END-IF
@@ -19862,25 +19917,6 @@
                                   LNK-SCNYUACCT-KAGEN-EDYUKYMD(TN-IDX)
                  END-IF
       *          一般入院料の算定開始日を算定
-      *              異動日のプラス１月を計算
-                     INITIALIZE                STS-AREA-DAY
-                     INITIALIZE                LNK-DAY6-AREA
-                     MOVE    "61"              TO  LNK-DAY6-IRAI
-                     MOVE   SPA-NAI-I01-IDOYMD
-                                               TO  LNK-DAY6-KIJUN
-                     MOVE    "2"               TO  LNK-DAY6-ZOGENPTN
-                     MOVE   1                  TO  LNK-DAY6-ZOGEN
-                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-      *              月末日を計算
-                     INITIALIZE                STS-AREA-DAY
-                     INITIALIZE                LNK-DAY7-AREA
-                     MOVE    "71"              TO  LNK-DAY7-IRAI
-                     MOVE   LNK-DAY6-KEISAN(1:6)
-                                               TO  LNK-DAY7-YM
-                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY7-AREA
-      *
                  INITIALIZE                STS-AREA-DAY
                  INITIALIZE                LNK-DAY6-AREA
                  MOVE    "61"              TO  LNK-DAY6-IRAI
@@ -19892,8 +19928,25 @@
                                                    LNK-DAY6-AREA
                  MOVE    LNK-DAY6-KEISAN
                                   TO       IPN-SANTEISTYMD
+      *          異動日のプラス１月を計算
+                 MOVE    SPA-NAI-I01-IDOYMD
+                                  TO      WRK-IPN-HANTEI-YMD1
+                 IF      WRK-IPN-HANTEI-M1   =   12
+                     ADD    1     TO      WRK-IPN-HANTEI-Y1
+                     MOVE   1     TO      WRK-IPN-HANTEI-M1
+                 ELSE
+                     ADD    1     TO      WRK-IPN-HANTEI-M1
+                 END-IF
+      *          月末日を算定
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY7-AREA
+                 MOVE    "71"              TO  LNK-DAY7-IRAI
+                 MOVE   WRK-IPN-HANTEI-YM1 TO  LNK-DAY7-YM
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI   TO      WRK-IPN-HANTEI-YMD1
       *          一般入院会計作成用のフラグ設定
-                 IF    IPN-SANTEISTYMD   <=   LNK-DAY7-KOYOMI
+                 IF    IPN-SANTEISTYMD   <=   WRK-IPN-HANTEI-YMD1
                    MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
                  END-IF
              END-IF
@@ -19962,25 +20015,6 @@
                  END-IF
       *
       *          一般入院料の算定開始日を算定
-      *              異動日のプラス１月を計算
-                     INITIALIZE                STS-AREA-DAY
-                     INITIALIZE                LNK-DAY6-AREA
-                     MOVE    "61"              TO  LNK-DAY6-IRAI
-                     MOVE   SPA-NAI-I01-IDOYMD
-                                               TO  LNK-DAY6-KIJUN
-                     MOVE    "2"               TO  LNK-DAY6-ZOGENPTN
-                     MOVE   1                  TO  LNK-DAY6-ZOGEN
-                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-      *              月末日を計算
-                     INITIALIZE                STS-AREA-DAY
-                     INITIALIZE                LNK-DAY7-AREA
-                     MOVE    "71"              TO  LNK-DAY7-IRAI
-                     MOVE   LNK-DAY6-KEISAN(1:6)
-                                               TO  LNK-DAY7-YM
-                     CALL  "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY7-AREA
-      *
                  INITIALIZE                STS-AREA-DAY
                  INITIALIZE                LNK-DAY6-AREA
                  MOVE    "61"              TO  LNK-DAY6-IRAI
@@ -19992,8 +20026,25 @@
                                                    LNK-DAY6-AREA
                  MOVE    LNK-DAY6-KEISAN
                                   TO       IPN-SANTEISTYMD
+      *          異動日のプラス１月を計算
+                 MOVE    SPA-NAI-I01-IDOYMD
+                                  TO      WRK-IPN-HANTEI-YMD1
+                 IF      WRK-IPN-HANTEI-M1   =   12
+                     ADD    1     TO      WRK-IPN-HANTEI-Y1
+                     MOVE   1     TO      WRK-IPN-HANTEI-M1
+                 ELSE
+                     ADD    1     TO      WRK-IPN-HANTEI-M1
+                 END-IF
+      *          月末日を算定
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY7-AREA
+                 MOVE    "71"              TO  LNK-DAY7-IRAI
+                 MOVE   WRK-IPN-HANTEI-YM1 TO  LNK-DAY7-YM
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI   TO      WRK-IPN-HANTEI-YMD1
       *          一般入院会計作成用のフラグ設定
-                 IF    IPN-SANTEISTYMD   <=   LNK-DAY7-KOYOMI
+                 IF    IPN-SANTEISTYMD   <=   WRK-IPN-HANTEI-YMD1
                    MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
                  END-IF
              END-IF
@@ -23134,8 +23185,27 @@
                                                    LNK-DAY6-AREA
                  MOVE    LNK-DAY6-KEISAN
                                   TO       IPN-SANTEISTYMD
+      *          異動日のプラス１月を計算
+                 MOVE    SPA-NAI-I01-IDOYMD
+                                  TO      WRK-IPN-HANTEI-YMD1
+                 IF      WRK-IPN-HANTEI-M1   =   12
+                     ADD    1     TO      WRK-IPN-HANTEI-Y1
+                     MOVE   1     TO      WRK-IPN-HANTEI-M1
+                 ELSE
+                     ADD    1     TO      WRK-IPN-HANTEI-M1
+                 END-IF
+      *          月末日を算定
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY7-AREA
+                 MOVE    "71"              TO  LNK-DAY7-IRAI
+                 MOVE   WRK-IPN-HANTEI-YM1 TO  LNK-DAY7-YM
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI   TO      WRK-IPN-HANTEI-YMD1
       *          一般入院会計作成用のフラグ設定
-                 MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 IF    IPN-SANTEISTYMD   <=   WRK-IPN-HANTEI-YMD1
+                   MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 END-IF
              END-IF
            END-IF
       *
@@ -23282,8 +23352,27 @@
                                                    LNK-DAY6-AREA
                  MOVE    LNK-DAY6-KEISAN
                                   TO       IPN-SANTEISTYMD
+      *          異動日のプラス１月を計算
+                 MOVE    SPA-NAI-I01-IDOYMD
+                                  TO      WRK-IPN-HANTEI-YMD1
+                 IF      WRK-IPN-HANTEI-M1   =   12
+                     ADD    1     TO      WRK-IPN-HANTEI-Y1
+                     MOVE   1     TO      WRK-IPN-HANTEI-M1
+                 ELSE
+                     ADD    1     TO      WRK-IPN-HANTEI-M1
+                 END-IF
+      *          月末日を算定
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY7-AREA
+                 MOVE    "71"              TO  LNK-DAY7-IRAI
+                 MOVE   WRK-IPN-HANTEI-YM1 TO  LNK-DAY7-YM
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI   TO      WRK-IPN-HANTEI-YMD1
       *          一般入院会計作成用のフラグ設定
-                 MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 IF    IPN-SANTEISTYMD   <=   WRK-IPN-HANTEI-YMD1
+                   MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 END-IF
              END-IF
            END-IF
       *
@@ -23360,8 +23449,27 @@
                                                    LNK-DAY6-AREA
                  MOVE    LNK-DAY6-KEISAN
                                   TO       IPN-SANTEISTYMD
+      *          異動日のプラス１月を計算
+                 MOVE    SPA-NAI-I01-IDOYMD
+                                  TO      WRK-IPN-HANTEI-YMD1
+                 IF      WRK-IPN-HANTEI-M1   =   12
+                     ADD    1     TO      WRK-IPN-HANTEI-Y1
+                     MOVE   1     TO      WRK-IPN-HANTEI-M1
+                 ELSE
+                     ADD    1     TO      WRK-IPN-HANTEI-M1
+                 END-IF
+      *          月末日を算定
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY7-AREA
+                 MOVE    "71"              TO  LNK-DAY7-IRAI
+                 MOVE   WRK-IPN-HANTEI-YM1 TO  LNK-DAY7-YM
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI   TO      WRK-IPN-HANTEI-YMD1
       *          一般入院会計作成用のフラグ設定
-                 MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 IF    IPN-SANTEISTYMD   <=   WRK-IPN-HANTEI-YMD1
+                   MOVE    "1"      TO      IPN-NYUKAIKEI-SAKUSEI-FLG
+                 END-IF
              END-IF
            END-IF
       *
