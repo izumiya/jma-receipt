@@ -1414,7 +1414,7 @@
                                          TO  SPA-GMN-TIMEKSNKBNCOB (1)
                MOVE    "1 »þ´Ö³°»»Äê²ÄÇ½"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (2)
-               MOVE    "2 ½é¿ÇÎÁ¤ÎµÙÆü¤Ë·¸¤ë"
+               MOVE    "3 ½é¿ÇÎÁ¤ÎµÙÆü¤Ë·¸¤ë"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (3)
                MOVE    3                 TO  SPA-TIMEKSNKBN-MAX
            END-IF
