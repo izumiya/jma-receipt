@@ -334,6 +334,7 @@
       *  04.05.32    NACL-Æ£¸¶    12/03/14  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
       *                                     Ê¿À®£²£´Ç¯£´·îÊ¬°Ê¹ß¤Î½èÍý¤ò
       *                                     ¹Ô¤ï¤Ê¤¤
+      *  04.05.33    NACL-ÌçÏÆ    12/03/23  ºÒ³²ÂÐ±þ¡Ê¸øÈñÍóÀÁµáÅÀ£°ÅÀÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3239,6 +3240,15 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                          ( RECE62-FTNMONEY (IDX)      =   ZERO ) AND
                          ( RECE62-ZEROKISAIFLG (IDX)  =   "1"  ))
                    OR   (( RECE62-FUKUSHIFLG(IDX)     =   "1"  ) AND
+                         ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
+                         ( RECE62-FTNMONEY (IDX)      >   ZERO ))
+                   OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
+                         ( RECE62-GENMENKBN         =   2 OR 3 ) AND
+                         ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
+                         ( RECE62-FTNMONEY (IDX)      =   ZERO ) AND
+                         ( RECE62-ZEROKISAIFLG (IDX)  =   "1"  ))
+                   OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
+                         ( RECE62-GENMENKBN         =   2 OR 3 ) AND
                          ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
                          ( RECE62-FTNMONEY (IDX)      >   ZERO ))
                        MOVE    RECE62-FTNMONEY(IDX)   TO  WRK-NUM
