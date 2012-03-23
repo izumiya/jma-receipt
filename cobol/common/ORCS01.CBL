@@ -363,6 +363,7 @@
       *                                     Ê¿À®£²£´Ç¯£³·î¤Þ¤Ç
       *  04.05.33    NACL-ÌçÏÆ    12/03/09  ²þÀµÂÐ±þ¡§³°Íè¸½ÊªµëÉÕÂÐ±þ
       *  04.05.34    NACL-ÌçÏÆ    12/03/15  ÀéÍÕ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.35    NACL-ÌçÏÆ    12/03/23  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3533,6 +3534,12 @@
                         MOVE     "1"      TO     WK-GAIJGNKBN
              END-IF
              MOVE HKN-HON-GAIKFTNRATE TO WK-SYOUKAN-FTNRATE
+           END-IF.
+      *
+           IF     (WK-1001-PREFNUM         =  43           ) AND
+                  (HKN-HKNNUM              = "343"         ) AND
+                  (LNK-SYU-SRYYMD(1:6)    >= "201204"      )
+                        MOVE     "1"      TO     WK-GAIJGNKBN
            END-IF.
       *
        1051-JYOGENKBN-CHECK-EXT.
@@ -17266,6 +17273,78 @@
                END-IF
            END-IF.
       *
+      *    ·§ËÜ¸©ÃÏÊý¸øÈñ¸øÈñ¾å¸ÂÊÔ½¸
+           IF  ( WK-1001-PREFNUM       =  43      )
+           AND ( LNK-SYU-SRYYMD(1:6)  >= "201204" )
+           AND ((COMB-KOH1HKNNUM = "343"         ) OR
+                (COMB-KOH2HKNNUM = "343"         ) OR
+                (COMB-KOH3HKNNUM = "343"         ) OR
+                (COMB-KOH4HKNNUM = "343"         ))
+      *
+             IF  COMB-KOH1HKNNUM  =  "343"
+               MOVE   99999990    TO  MAX-KIN-KOHI1-M
+             END-IF
+             IF  COMB-KOH2HKNNUM  =  "343"
+               MOVE   99999990    TO  MAX-KIN-KOHI2-M
+             END-IF
+             IF  COMB-KOH3HKNNUM  =  "343"
+               MOVE   99999990    TO  MAX-KIN-KOHI3-M
+             END-IF
+             IF  COMB-KOH4HKNNUM  =  "343"
+               MOVE   99999990    TO  MAX-KIN-KOHI4-M
+             END-IF
+      *
+             IF    (LNK-S01-KOUREI-ZAITAKU-KBN  = "1")
+             OR    (FLG-KOUREI-KBN              = "1")
+               CONTINUE
+             ELSE
+               IF  (COMB-KOH1HKNNUM  = "972" OR "974")
+               OR  (COMB-KOH2HKNNUM  = "972" OR "974")
+               OR  (COMB-KOH3HKNNUM  = "972" OR "974")
+               OR  (COMB-KOH4HKNNUM  = "972" OR "974")
+                     IF  COMB-KOH1HKNNUM  =  "343"
+                       MOVE   MAX-KIN-SYU-M   TO  MAX-KIN-KOHI1-M
+                     END-IF
+                     IF  COMB-KOH2HKNNUM  =  "343"
+                       MOVE   MAX-KIN-SYU-M   TO  MAX-KIN-KOHI2-M
+                     END-IF
+                     IF  COMB-KOH3HKNNUM  =  "343"
+                       MOVE   MAX-KIN-SYU-M   TO  MAX-KIN-KOHI3-M
+                     END-IF
+                     IF  COMB-KOH4HKNNUM  =  "343"
+                       MOVE   MAX-KIN-SYU-M   TO  MAX-KIN-KOHI4-M
+                     END-IF
+               ELSE
+                 IF  FLG-GENBUTU70   NOT =   ZERO
+                   IF ((COMB-KOH1HKNNUM(1:1) = "0"            ) AND
+                       (COMB-KOH1HKNNUM  NOT = "012" AND "025"))
+                   OR ((COMB-KOH2HKNNUM(1:1) = "0"            ) AND
+                       (COMB-KOH2HKNNUM  NOT = "012" AND "025"))
+                   OR ((COMB-KOH3HKNNUM(1:1) = "0"            ) AND
+                       (COMB-KOH3HKNNUM  NOT = "012" AND "025"))
+                   OR ((COMB-KOH4HKNNUM(1:1) = "0"            ) AND
+                       (COMB-KOH4HKNNUM  NOT = "012" AND "025"))
+                     CONTINUE
+                   ELSE
+                     IF  COMB-KOH1HKNNUM  =  "343"
+                       MOVE   MAX-KIN-SYU-M   TO  MAX-KIN-KOHI1-M
+                     END-IF
+                     IF  COMB-KOH2HKNNUM  =  "343"
+                       MOVE   MAX-KIN-SYU-M   TO  MAX-KIN-KOHI2-M
+                     END-IF
+                     IF  COMB-KOH3HKNNUM  =  "343"
+                       MOVE   MAX-KIN-SYU-M   TO  MAX-KIN-KOHI3-M
+                     END-IF
+                     IF  COMB-KOH4HKNNUM  =  "343"
+                       MOVE   MAX-KIN-SYU-M   TO  MAX-KIN-KOHI4-M
+                     END-IF
+                   END-IF
+                 END-IF
+               END-IF
+             END-IF
+      *
+           END-IF.
+      *
            IF  FLG-SANTEI1               =     "1"
                MOVE     ZERO             TO    ZAN-KOHI1-M
                                                ZAN-KOHI1-M2             
@@ -20424,6 +20503,15 @@
                MOVE    SPACE     TO   COMB-KOH-GAIJGNKBN(KOH-IDX)
              END-IF
            END-IF.
+           IF     (WK-1001-PREFNUM         =  43           ) AND
+                  (COMB-KOHHKNNUM(KOH-IDX) = "343"         ) AND
+                  (LNK-SYU-SRYYMD(1:6)    >= "201204"      )
+             IF  (LNK-S01-KOUREI-ZAITAKU-KBN  = "1")
+             OR  (FLG-KOUREI-KBN              = "1")
+               MOVE      100     TO   WK-GAIKFTNRATE
+               MOVE    SPACE     TO   COMB-KOH-GAIJGNKBN(KOH-IDX)
+             END-IF
+           END-IF.
       *
            MOVE      ZERO      TO        FLG-MIYAGI.
            IF     (WK-1001-PREFNUM         =  04           ) AND
@@ -20640,6 +20728,14 @@
                          ELSE
                            MOVE   2    TO  FLG-RUIKEIYO2
                          END-IF
+                         PERFORM   23043-ZAN-HENSYU-SEC
+                       END-IF
+                       IF  (WK-1001-PREFNUM       =  43           )
+                       AND (LNK-SYU-KOH-HKNNUM(2) = "343"         )
+                       AND (LNK-SYU-SRYYMD(1:6)  >= "201204"      )
+                         MOVE   1    TO  WK-RUI-TAISYO
+                         PERFORM   23042-FTNGAK-HENSYU-SEC
+                         MOVE   1    TO  FLG-RUIKEIYO2
                          PERFORM   23043-ZAN-HENSYU-SEC
                        END-IF
                      ELSE
@@ -21324,6 +21420,12 @@
                   MOVE   1    TO  WK-KUMAMOTO-FLG(KOH-IDX)
                   MOVE  "1"   TO  WK-TAIHI-RECEFTNDSPKBN(KOH-IDX)
                   PERFORM   23061-KUMAMOTO-KOHI2-SEC
+                  GO    TO  2305-KOH-KEISAN-EXT
+               END-IF
+               IF  (WK-1001-PREFNUM             =  43           ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "343"         ) AND
+                   (LNK-SYU-SRYYMD(1:6)        >= "201204"      )
+                  PERFORM   23061-KUMAMOTO-KOHI3-SEC
                   GO    TO  2305-KOH-KEISAN-EXT
                END-IF
       *
@@ -23429,6 +23531,62 @@
            .
       *
        23061-KUMAMOTO-KOHI2-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        ·§ËÜ¸©ÃÏÊý¸øÈñ¡Ê£±¡¿£³¡Ë·×»»
+      ******************************************************************
+       23061-KUMAMOTO-KOHI3-SEC           SECTION.
+      *
+      *    ÉéÃ´¶â³Û¤Î·×»»
+      *
+           IF     LNK-SYU-SYUHKNNUM     NOT =   SPACE
+             COMPUTE    LNK-SYU-KOH-COMPFTN(KOH-IDX) =
+                        WK-ZENGAKU   *  WK-FUTANWARI
+             COMPUTE    LNK-SYU-KOH-COMPFTN(KOH-IDX) =
+                        LNK-SYU-KOH-COMPFTN(KOH-IDX) +   5
+             COMPUTE    LNK-SYU-KOH-COMPFTN(KOH-IDX) =
+                        LNK-SYU-KOH-COMPFTN(KOH-IDX) /  10
+             COMPUTE    LNK-SYU-KOH-COMPFTN(KOH-IDX) =
+                        LNK-SYU-KOH-COMPFTN(KOH-IDX) *  10
+      *
+             MOVE       LNK-SYU-KOH-COMPFTN(KOH-IDX)  TO  WK-FTN
+             COMPUTE    LNK-SYU-KOH-COMPFTN(KOH-IDX) =
+                        (WK-FTN  /  3) +  5
+             COMPUTE    LNK-SYU-KOH-COMPFTN(KOH-IDX) =
+                        LNK-SYU-KOH-COMPFTN(KOH-IDX) /  10
+             COMPUTE    LNK-SYU-KOH-COMPFTN(KOH-IDX) =
+                        LNK-SYU-KOH-COMPFTN(KOH-IDX) *  10
+             COMPUTE    LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)  =
+                        (WK-FTN  /  3 )
+      *
+             IF  LNK-SYU-KOH-COMPFTN(KOH-IDX) >  ZAN-KOHI-T(KOH-IDX)
+                 MOVE   ZAN-KOHI-T(KOH-IDX)
+                              TO  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                 MOVE   1     TO  WK-KUMAMOTO-FLG(KOH-IDX)
+             END-IF
+             IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                              >  ZAN-KOHI-T3(KOH-IDX)
+                 MOVE   ZAN-KOHI-T3(KOH-IDX)
+                              TO  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+             END-IF
+           ELSE
+             MOVE    ZERO   TO   LNK-SYU-KOH-COMPFTN(KOH-IDX)
+             MOVE    ZERO   TO   LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+           END-IF
+      *
+           MOVE  WK-GAIYKZFTNKBN TO  LNK-SYU-KOH-YKZFTNKBN(KOH-IDX)
+      *
+           PERFORM   23053-KOHHI-HIKAKU3-SEC
+           PERFORM   23051-KOHHI-HIKAKU-SEC
+           MOVE  ZERO  TO  LNK-SYU-KOH-COMPYKZFTN(KOH-IDX)
+           COMPUTE   LNK-SYU-KOH-COMPTOTAL(KOH-IDX)   =
+                     LNK-SYU-KOH-COMPFTN(KOH-IDX)     +
+                     LNK-SYU-KOH-COMPYKZFTN(KOH-IDX)
+      *
+           .
+      *
+       23061-KUMAMOTO-KOHI3-EXT.
            EXIT.
       *
       ******************************************************************
