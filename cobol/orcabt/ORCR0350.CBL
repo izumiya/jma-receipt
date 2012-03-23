@@ -330,6 +330,7 @@
       *  04.05.31    NACL-藤原    12/03/14  平成２４年４月改正対応
       *                                     平成２４年４月分以降の処理を
       *                                     行わない
+      *  04.05.32    NACL-門脇    12/03/23  災害対応（公費欄請求点０点対応）
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -3381,6 +3382,15 @@
                          ( RECE62-FTNMONEY (IDX)      =   ZERO ) AND
                          ( RECE62-ZEROKISAIFLG (IDX)  =   "1"  ))
                    OR   (( RECE62-FUKUSHIFLG(IDX)     =   "1"  ) AND
+                         ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
+                         ( RECE62-FTNMONEY (IDX)      >   ZERO ))
+                   OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
+                         ( RECE62-GENMENKBN         =   2 OR 3 ) AND
+                         ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
+                         ( RECE62-FTNMONEY (IDX)      =   ZERO ) AND
+                         ( RECE62-ZEROKISAIFLG (IDX)  =   "1"  ))
+                   OR   (( RECE62-HKNNUM        NOT =   SPACE  ) AND
+                         ( RECE62-GENMENKBN         =   2 OR 3 ) AND
                          ( RECE62-TOTALTEN (IDX)      =   ZERO ) AND
                          ( RECE62-FTNMONEY (IDX)      >   ZERO ))
                        MOVE    RECE62-FTNMONEY(IDX)   TO  WRK-NUM

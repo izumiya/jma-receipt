@@ -535,6 +535,7 @@
       *  04.05.51    NACL-ÌçÏÆ    12/03/15  ËÌ³¤Æ»ÃÏÊý¸øÈñ¡Ê£±£¸£³¡Ë¤Î
       *                                     °ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.05.52    NACL-ÌçÏÆ    12/03/15  ÀéÍÕ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.53    NACL-ÌçÏÆ    12/03/23  ºÒ³²ÂÐ±þ¡Ê¸øÈñÍóÀÁµáÅÀ£°ÅÀÂÐ±þ¡Ë
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -813,6 +814,7 @@
            03  NYUINACT-IDX                            PIC 9(03).
            03  KOHFTN-IDX                              PIC 9(03).
            03  KOHFTN-IDX2                             PIC 9(03).
+           03  KOHFTN-IDX3                             PIC 9(03).
            03  SYSKAN-IDX                              PIC 9(03).
            03  SYSKAN-IDX2                             PIC 9(03).
            03  KOHIDX                                  PIC 9(03).
@@ -16258,6 +16260,32 @@
                 MOVE  SPACE  TO  RECE62-FUKUSHIFLG-SKJSEI(KOHFTN-IDX)
               END-PERFORM
            END-IF
+      *
+           PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                       UNTIL    KOHFTN-IDX     >    4
+      *
+             IF   ( RECE62-HKNNUM              NOT =   SPACE  )
+             AND  ( RECE62-KOHNUM(KOHFTN-IDX)  NOT =   SPACE  )
+             AND  ( RECE62-GENMENKBN               =   2 OR 3 )
+      *
+              COMPUTE  KOHFTN-IDX3 = KOHFTN-IDX + 1
+      *
+              MOVE   ZERO TO RECE62-TOTALTEN(KOHFTN-IDX3)
+              PERFORM  VARYING  KOHFTN-IDX2  FROM  1  BY  1
+                        UNTIL   KOHFTN-IDX2   >   30
+                MOVE ZERO TO RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX3)
+              END-PERFORM
+              PERFORM  VARYING  KOHFTN-IDX2  FROM  1  BY  1
+                        UNTIL   KOHFTN-IDX2   >   10
+                MOVE ZERO TO RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX3)
+                             RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX3)
+              END-PERFORM
+              MOVE   ZERO TO RECE62-NYUKHNKEI2(KOHFTN-IDX3)
+                             RECE62-NYUTOKKEI2(KOHFTN-IDX3)
+      *
+             END-IF
+      *
+           END-PERFORM
       *
            .
        21045-KOH-FUTAN-SET-EXT.
