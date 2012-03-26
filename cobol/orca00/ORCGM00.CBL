@@ -1394,10 +1394,45 @@
        420-GYOMU-START-EXT.
            EXIT.
       *
+      *H24.4
       *****************************************************************
       *    施設基準の更新確認
       *****************************************************************
        420-SYS1006-CHK-SEC                  SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHIIKKBN-ARI
+      *
+           MOVE    SPACE               TO  SYS-1006-REC
+           INITIALIZE                      SYS-1006-REC
+           MOVE    "1006"              TO  SYS-1006-KANRICD
+           MOVE    "2"                 TO  SYS-1006-KBNCD
+           MOVE    "20120331"          TO  SYS-1006-STYUKYMD
+           MOVE    "20120331"          TO  SYS-1006-EDYUKYMD
+      *    システム管理検索（施設基準）
+           MOVE    SPA-HOSPNUM         TO  SYS-1006-HOSPNUM
+           MOVE    SYS-1006-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               MOVE    SPACE               TO  SYS-1006-REC
+               INITIALIZE                  SYS-1006-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-1006-REC
+      *        地域医療貢献加算(754 - 500)
+               IF      SYS-1006-SSTKIJUN (254) =   1
+                   MOVE    1               TO  FLG-CHIIKKBN-ARI
+               END-IF
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
       *
            MOVE    SPACE               TO  SYS-1006-REC
            INITIALIZE                      SYS-1006-REC
@@ -1418,7 +1453,6 @@
                INITIALIZE                  SYS-1006-REC
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
-           MOVE    ZERO                TO  FLG-CHIIKKBN-ARI
            PERFORM UNTIL   FLG-SYSKANRI    =   1
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
                IF      SYS-1006-KBNCD      =   "2"
@@ -1447,6 +1481,7 @@
            .
        420-SYS1006-CHK-EXT.
            EXIT.
+      *H24.4
       *
       *****************************************************************
       *    システム日付変更画面へ1
