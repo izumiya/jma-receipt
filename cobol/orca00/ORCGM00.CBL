@@ -68,6 +68,7 @@
       *  04.04.00    NACL-多々納  09/01/26  ＳＰＡ設定共通対応
       *  04.06.01    NACL-伊藤    11/01/28  リアルタイム送信
       *  04.06.02    NACL-伊藤    11/05/19  感染症参加送信
+      *  04.06.00    NACL-多々納  12/03/26  平成２４年４月改正対応
       *****************************************************************
       *
       *
@@ -156,6 +157,11 @@
            03  WRK-MOTOPG          PIC X(08).
            03  WRK-MIDMSG          PIC X(80).
       *
+      *H24.4
+       01  WRK-HZN-AREA.
+           03  WRK-SPA-ERRCD           PIC X(04).
+           03  FLG-CHIIKKBN-ARI        PIC 9(01).
+      *
        01  SHELL-AREA.
            05  SHELL-NAME          PIC X(17) VALUE
                                    "infectiondata1.sh".
@@ -203,6 +209,9 @@
       *    広告情報
            COPY  "CPSK1003.INC".
       *----(03.04.01)--ADD-END-----------------------------------------
+      *
+           COPY    "CPSK1006.INC".
+      *
       *    システム基本
        01  SYSBASE-REC.
            COPY    "CPSYSBASE.INC".
@@ -294,6 +303,8 @@
            MOVE    SPA-WORK        TO  SPA-M00KYOUTU
            MOVE    SPA-SYS-1010-REC    TO  SYS-1010-REC
            MOVE    SPA-FREE        TO  SPA-M00
+      *H24.4
+           MOVE    SPA-ERRCD       TO  WRK-SPA-ERRCD
       *
            MOVE    SPACE           TO  SPA-ERRCD
            MOVE    ZERO            TO  FLG-END
@@ -333,6 +344,21 @@
       *
       *    エラー画面より
            IF      SPA-MOTOPG          =   "MERR"
+      *H24.4
+      *        確認メッセージ表示後、業務へ
+               IF      WRK-SPA-ERRCD           =   "9999"
+                   MOVE    "M01"               TO  SPA-SAKIPG
+                   MOVE    SPACE               TO  SPA-MOTOPG2
+                   MOVE    "M00"               TO  SPA-MOTOPG
+                   MOVE     "CHANGE"           TO  MCP-PUTTYPE
+                   MOVE     SPA-SAKIPG         TO  MCP-WINDOW
+      *
+                   PERFORM 900-PUT-WINDOW
+      *
+                   MOVE    1                   TO  FLG-END
+                   GO      TO    100-INIT-EXT
+               END-IF
+      *!!!
                MOVE    SPACE               TO  SPA-MOTOPG
                PERFORM 5001-MAPCUR-SEC
            ELSE
@@ -1332,6 +1358,19 @@
            END-EVALUATE.
       *
       *
+      *H24.4
+      *    H24.4.2まで施設基準の更新確認メッセージ表示
+           IF      SPA-SAKIPG          =   "M01"
+                ACCEPT  SYS-YMD         FROM    DATE
+                COMPUTE WRK-SYSYY   =   SYS-YY      +   2000
+                MOVE    SYS-MM          TO  WRK-SYSMM
+                MOVE    SYS-DD          TO  WRK-SYSDD
+                IF      WRK-SYSYMD      <=  "20120402"
+                    PERFORM 420-SYS1006-CHK-SEC
+                END-IF
+            END-IF
+      *H24.4
+      *
            IF      SPA-ERRCD           =   SPACE
                IF      SPA-SAKIPG      NOT =  SPACE
                    EVALUATE    SPA-SAKIPG
@@ -1357,6 +1396,63 @@
       *
        420-GYOMU-START-EXT.
            EXIT.
+      *
+      *H24.4
+      *****************************************************************
+      *    施設基準の更新確認
+      *****************************************************************
+       420-SYS1006-CHK-SEC                  SECTION.
+      *
+           MOVE    SPACE               TO  SYS-1006-REC
+           INITIALIZE                      SYS-1006-REC
+           MOVE    "1006"              TO  SYS-1006-KANRICD
+           MOVE    "20120401"          TO  SYS-1006-STYUKYMD
+           MOVE    "20120401"          TO  SYS-1006-EDYUKYMD
+      *    システム管理検索（施設基準）
+           MOVE    SPA-HOSPNUM         TO  SYS-1006-HOSPNUM
+           MOVE    SYS-1006-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               MOVE    SPACE               TO  SYS-1006-REC
+               INITIALIZE                  SYS-1006-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           MOVE    ZERO                TO  FLG-CHIIKKBN-ARI
+           PERFORM UNTIL   FLG-SYSKANRI    =   1
+               MOVE    MCPDATA-REC         TO  SYS-1006-REC
+               IF      SYS-1006-KBNCD      =   "2"
+      *            地域医療貢献加算(754 - 500)
+                   IF      SYS-1006-SSTKIJUN (254) =   1
+                       MOVE    1               TO  FLG-CHIIKKBN-ARI
+                   END-IF
+               END-IF
+               IF      SYS-1006-KBNCD      =   "7"
+      *            時間外対応加算(3001)(3155)(3002)
+                   IF     (SYS-1006-SSTKIJUN (001) =   1  )
+                      OR  (SYS-1006-SSTKIJUN (155) =   1  )
+                      OR  (SYS-1006-SSTKIJUN (002) =   1  )
+                       MOVE    ZERO            TO  FLG-CHIIKKBN-ARI
+                   END-IF
+               END-IF
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-CHIIKKBN-ARI    =   1
+               MOVE    "9999"          TO  SPA-ERRCD
+           END-IF
+           .
+       420-SYS1006-CHK-EXT.
+           EXIT.
+      *H24.4
+      *
       *
       *****************************************************************
       *    システム日付変更画面へ1
@@ -1874,6 +1970,14 @@
                WHEN    "K001"
                    STRING  "警告！！"
                            "この端末は使用できません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+      *H24.4
+               WHEN    "9999"
+                   STRING  "施設基準コードの"
+                           "地域医療貢献加算が時間外対応加算２へ"
+                           "変更されていません。"
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
