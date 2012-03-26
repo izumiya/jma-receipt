@@ -241,6 +241,7 @@
       *
        01  CONST-AREA.
       *
+           03  CONST-H240401           PIC X(08)   VALUE   "20120401".
            03  CONST-H220401           PIC X(08)   VALUE   "20100401".
            03  CONST-H200401           PIC X(08)   VALUE   "20080401".
            03  CONST-NSRYACT-MAX       PIC 9(05)     VALUE 5.
@@ -967,6 +968,245 @@
                        09  CONST-MEDH22-SRYCD  PIC X(09).
                05  CONST-MEDH22-MAX        PIC 9(03)   VALUE   39.
       *
+           03  CONST-MEDH24-G.
+               05  CONST-MEDH24-VAL.
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2004.
+                   07                  PIC X(09)   VALUE "820000060".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 14.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2020.
+                   07                  PIC X(09)   VALUE "820000076".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 30.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2021.
+                   07                  PIC X(09)   VALUE "820000077".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2022.
+                   07                  PIC X(09)   VALUE "820000078".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2023.
+                   07                  PIC X(09)   VALUE "820000079".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 3.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2024.
+                   07                  PIC X(09)   VALUE "820000080".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2027.
+                   07                  PIC X(09)   VALUE "820000083".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 7.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2031.
+                   07                  PIC X(09)   VALUE "820000087".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 3.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2034.
+                   07                  PIC X(09)   VALUE "820000090".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2001.
+                   07                  PIC X(09)   VALUE "820000057".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2010.
+                   07                  PIC X(09)   VALUE "820000066".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2002.
+                   07                  PIC X(09)   VALUE "820000058".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2003.
+                   07                  PIC X(09)   VALUE "820000059".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2005.
+                   07                  PIC X(09)   VALUE "820000061".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2006.
+                   07                  PIC X(09)   VALUE "820000062".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2007.
+                   07                  PIC X(09)   VALUE "820000063".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2008.
+                   07                  PIC X(09)   VALUE "820000064".
+      *
+                   07                  PIC 9(01)   VALUE 3.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2009.
+                   07                  PIC X(09)   VALUE "820000065".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2011.
+                   07                  PIC X(09)   VALUE "820000067".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2012.
+                   07                  PIC X(09)   VALUE "820000068".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2013.
+                   07                  PIC X(09)   VALUE "820000069".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2014.
+                   07                  PIC X(09)   VALUE "820000070".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2015.
+                   07                  PIC X(09)   VALUE "820000071".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2016.
+                   07                  PIC X(09)   VALUE "820000072".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2017.
+                   07                  PIC X(09)   VALUE "820000073".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2030.
+                   07                  PIC X(09)   VALUE "820000086".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2036.
+                   07                  PIC X(09)   VALUE "820000092".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 1.
+                   07                  PIC 9(04)   VALUE 2037.
+                   07                  PIC X(09)   VALUE "820000093".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2018.
+                   07                  PIC X(09)   VALUE "820000074".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2019.
+                   07                  PIC X(09)   VALUE "820000075".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2025.
+                   07                  PIC X(09)   VALUE "820000081".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2026.
+                   07                  PIC X(09)   VALUE "820000082".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2028.
+                   07                  PIC X(09)   VALUE "820000084".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2029.
+                   07                  PIC X(09)   VALUE "820000085".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2032.
+                   07                  PIC X(09)   VALUE "820000088".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2033.
+                   07                  PIC X(09)   VALUE "820000089".
+      *
+                   07                  PIC 9(01)   VALUE 2.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2035.
+                   07                  PIC X(09)   VALUE "820000091".
+      *
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(03)   VALUE 0.
+                   07                  PIC 9(01)   VALUE 0.
+                   07                  PIC 9(04)   VALUE 2092.
+                   07                  PIC X(09)   VALUE "820000159".
+      *
+               05  CONST-MEDH24-R REDEFINES CONST-MEDH24-VAL.
+                   07  CONST-MEDH24-OCC     OCCURS  38.
+                       09  CONST-MEDH24-MEDH24 PIC 9(01).
+                       09  CONST-MEDH24-LIMIT  PIC 9(03).
+                       09  CONST-MEDH24-ALLKBN PIC 9(01).
+                       09  CONST-MEDH24-ZAINUM PIC 9(04).
+                       09  CONST-MEDH24-SRYCD  PIC X(09).
+               05  CONST-MEDH24-MAX        PIC 9(03)   VALUE   38.
+      *
            COPY    "CPRYOYOCD.INC".
       *
       *    スパ領域 ワーク
@@ -1535,8 +1775,12 @@
                        UNTIL ( IDX2 >   MEDH20-MAX )
                         OR   ( SPA-GMN-TNAME   (IDX-LST)
                                        NOT =   SPACE )
-                   IF    ( MEDH20-CDL (IDX2)
-                                       =   SPA-NAI-TSRYCD  (IDX-LST))
+                   IF    ( MEDH20-STYMD  (IDX2)
+                                      <=   SPA-I40-SRYYMD )
+                     AND ( MEDH20-EDYMD  (IDX2)
+                                      >=   SPA-I40-SRYYMD )
+                     AND ( MEDH20-ZAINUM (IDX2)
+                                       =   SPA-NAI-TZAINUM  (IDX-LST))
                        MOVE    MEDH20-MEIL (IDX2)
                                        TO  SPA-GMN-TNAME   (IDX-LST)
                    END-IF
@@ -1569,6 +1813,21 @@
            INITIALIZE                  MEDINF-AREA
       *
            EVALUATE    TRUE
+           WHEN      ( SPA-I40-SRYYMD  >=  CONST-H240401 )
+               MOVE    CONST-MEDH24-MAX    TO  MEDINF-MAX
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >   MEDINF-MAX )
+                   MOVE  CONST-MEDH24-MEDH24(IDX0)
+                                           TO  MEDINF-MEDKBN (IDX0)
+                   MOVE  CONST-MEDH24-LIMIT (IDX0)
+                                           TO  MEDINF-LIMIT  (IDX0)
+                   MOVE  CONST-MEDH24-ALLKBN(IDX0)
+                                           TO  MEDINF-ALLKBN (IDX0)
+                   MOVE  CONST-MEDH24-ZAINUM(IDX0)
+                                           TO  MEDINF-ZAINUM (IDX0)
+                   MOVE  CONST-MEDH24-SRYCD (IDX0)
+                                           TO  MEDINF-SRYCD  (IDX0)
+               END-PERFORM
            WHEN      ( SPA-I40-SRYYMD  >=  CONST-H220401 )
                MOVE    CONST-MEDH22-MAX    TO  MEDINF-MAX
                PERFORM VARYING IDX0    FROM    1   BY  1
@@ -2656,8 +2915,12 @@
                            UNTIL ( IDX2 >   MEDH20-MAX )
                             OR   ( SPA-GMN-MEISYO
                                            NOT =   SPACE )
-                       IF    ( MEDH20-CDL (IDX2)
-                                       =   SPA-NAI-TSRYCD  (IDX-SEL))
+                       IF    ( MEDH20-STYMD  (IDX2)
+                                      <=   SPA-I40-SRYYMD )
+                         AND ( MEDH20-EDYMD  (IDX2)
+                                      >=   SPA-I40-SRYYMD )
+                         AND ( MEDH20-ZAINUM (IDX2)
+                                       =   SPA-NAI-TZAINUM  (IDX-SEL))
                            MOVE    MEDH20-MEIL (IDX2)
                                        TO  SPA-GMN-MEISYO
                        END-IF
@@ -3069,8 +3332,12 @@
                    WHEN  ( SPA-NAI-TZAISKBKBN (IDX0)  =   "2" )
                     AND  ( SPA-NAI-TSRYCD     (IDX0)  =   "820000158" )
                     AND  ( FLG-MEDCOM                 =   0   )
+                   WHEN  ( SPA-NAI-TZAISKBKBN (IDX0)  =   "2" )
+                    AND  ( SPA-I40-SRYYMD        >=   CONST-H240401 )
+                    AND  ( SPA-NAI-TSRYCD     (IDX0)  =   "820000159" )
+                    AND  ( FLG-MEDCOM                 =   0   )
                        MOVE    1       TO  FLG-MEDCOM
-                       MOVE    ALL "−"
+                       MOVE    "――"
                                        TO  I47-TNAME(IDX-LST)
                        COMPUTE IDX-LST =   IDX-LST +   1
                        PERFORM 5001-GMNHEN-SEC
