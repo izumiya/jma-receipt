@@ -4318,92 +4318,15 @@
            PERFORM     4801-BRMSEL-SEC
       *
            IF   FLG-SYSKANRI       =    ZERO
-             IF     WRK-PARA-SRYYM      <=     "201203"
-      *          ø∑¿∏ª˘∆˛±°∞ÂŒ≈¥…Õ˝≤√ªª
-                 IF   SYS-5002-SINSEIJI-KBN   =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-SINSEIJI-CD  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤Œ≈Õ‹¥ƒ∂≠≤√ªª° £±°À
-                 IF   SYS-5002-SNR-RYOYO-KBN(1)   =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-SNR-RYOYO-CD(1)  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤Œ≈Õ‹¥ƒ∂≠≤√ªª° £≤°À
-                 IF   SYS-5002-SNR-RYOYO-KBN(2)   =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-SNR-RYOYO-CD(2)  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *           ¸ºÕ¿˛º£Œ≈…¬ºº¥…Õ˝≤√ªª
-                 IF   SYS-5002-HOSYASEN-KBN       =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-HOSYASEN-CD  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          Œ≈Õ‹¥ƒ∂≠≤√ªª
-                 IF   SYS-5002-RYOYO-KBN   =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-RYOYO-CD  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£±°  ø¿Æ£±£∏«Øø∑¿ﬂ°À
-                 IF   SYS-5002-BTU-RYOYO-H18-KBN   =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-BTU-RYOYO-H18-CD  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£±
-                 IF   SYS-5002-BTU-RYOYO-KBN(1)   =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-BTU-RYOYO-CD(1)  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£≤
-                 IF   SYS-5002-BTU-RYOYO-KBN(2)   =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-BTU-RYOYO-CD(2)  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          Œ≈Õ‹…¬≈ÔŒ≈Õ‹¥ƒ∂≠≤√ªª£≥
-                 IF   SYS-5002-BTU-RYOYO-KBN(3)   =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-BTU-RYOYO-CD(3)  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          Ω≈æ…º‘≈˘Œ≈Õ‹¥ƒ∂≠∆√ Ã≤√ªª° ∏ƒºº°À
-                 IF   SYS-5002-JYUTOK1-KBN  =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-JYUTOK1-CD  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          Ω≈æ…º‘≈˘Œ≈Õ‹¥ƒ∂≠∆√ Ã≤√ªª° £≤øÕ…Ù≤∞°À
-                 IF   SYS-5002-JYUTOK2-KBN  =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-JYUTOK2-CD  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-      *          Ãµ∂›º£Œ≈ºº¥…Õ˝≤√ªª
-                 IF   SYS-5002-MUKIN-KBN   =   "2"
-                     ADD    1                TO  IDX8
-                     MOVE   SYS-5002-MUKIN-CD  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                 END-IF
-             END-IF
       *
-             IF     WRK-PARA-SRYYM      >=     "201204"
                PERFORM   VARYING   IDX7   FROM   1  BY  1
-                 UNTIL  (SYS-5002-KSNCD(IDX7)    =   SPACE)  OR
-                        (IDX7                    >   12)
+                 UNTIL    (IDX7                    >   12)
                      IF   SYS-5002-KSNKBN(IDX7)   =   "2"
                           ADD    1                TO  IDX8
                           MOVE   SYS-5002-KSNCD(IDX7)  TO
                                              WRK-NYUKHNKSN-SRYCD(IDX8)
                      END-IF
                END-PERFORM
-             END-IF
       *
            END-IF
       *
@@ -4504,7 +4427,7 @@
                PERFORM 900-CLOSE-SEC
            END-IF
       *
-      *    √Ì≤√ªª•≥°º•…§¨∆±∞Ï§«§¢§Î§≥§»§Œ»ΩƒÍ
+      *    …ΩÕ—»÷πÊ§¨∆±∞Ï§«§¢§Î§≥§»§Œ»ΩƒÍ
            IF   WRK-KSN-CDKBN-KBNNUM    NOT =    ZERO
               IF  (WRK-BTU-CDKBN-KBNNUM  = WRK-KSN-CDKBN-KBNNUM)  AND
                   (WRK-BTU-CDKBN-KBNNUM-EDA = WRK-KSN-CDKBN-KBNNUM-EDA)
@@ -4567,6 +4490,14 @@
                                     TO  WRK-BTU-NYUKSNKBN
            MOVE    TNS-CDKBN-KBNNUM TO  WRK-BTU-CDKBN-KBNNUM
            MOVE    TNS-CDKBN-KBNNUM-EDA TO WRK-BTU-CDKBN-KBNNUM-EDA
+      *    Œ≈Õ‹…¬æ≤∞ ≥∞°¶Õ≠æ≤ø«Œ≈ΩÍŒ≈Õ‹…¬æ≤∆˛±°¥À‹Œ¡§Œ§»§≠°¢
+      *    …ΩÕ—»÷πÊ§Œ√÷§≠¥π§®
+           IF     (TNS-CDKBN-KBNNUM  = 108)   AND
+                  (TNS-CDKBN-KOUBAN  =  10)   AND
+                  (TNS-YUKOSTYMD    >=  "20120401")
+               MOVE   109           TO WRK-BTU-CDKBN-KBNNUM
+               MOVE   ZERO          TO WRK-BTU-CDKBN-KBNNUM-EDA
+           END-IF
       *    ∆√ Ã∆˛±°Œ¡§Œ»ΩƒÍ
            EVALUATE   TNS-NYUKHNKBN
                WHEN   73
