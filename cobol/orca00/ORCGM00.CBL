@@ -1403,6 +1403,39 @@
       *****************************************************************
        420-SYS1006-CHK-SEC                  SECTION.
       *
+           MOVE    ZERO                TO  FLG-CHIIKKBN-ARI
+      *
+           MOVE    SPACE               TO  SYS-1006-REC
+           INITIALIZE                      SYS-1006-REC
+           MOVE    "1006"              TO  SYS-1006-KANRICD
+           MOVE    "2"                 TO  SYS-1006-KBNCD
+           MOVE    "20120331"          TO  SYS-1006-STYUKYMD
+           MOVE    "20120331"          TO  SYS-1006-EDYUKYMD
+      *    ¥·¥¹¥Æ¥à´ÉÍý¸¡º÷¡Ê»ÜÀß´ð½à¡Ë
+           MOVE    SPA-HOSPNUM         TO  SYS-1006-HOSPNUM
+           MOVE    SYS-1006-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               MOVE    SPACE               TO  SYS-1006-REC
+               INITIALIZE                  SYS-1006-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE    MCPDATA-REC         TO  SYS-1006-REC
+      *        ÃÏ°è°åÎÅ¹×¸¥²Ã»»(754 - 500)
+               IF      SYS-1006-SSTKIJUN (254) =   1
+                   MOVE    1               TO  FLG-CHIIKKBN-ARI
+               END-IF
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
            MOVE    SPACE               TO  SYS-1006-REC
            INITIALIZE                      SYS-1006-REC
            MOVE    "1006"              TO  SYS-1006-KANRICD
@@ -1422,7 +1455,6 @@
                INITIALIZE                  SYS-1006-REC
                MOVE    1               TO  FLG-SYSKANRI
            END-IF
-           MOVE    ZERO                TO  FLG-CHIIKKBN-ARI
            PERFORM UNTIL   FLG-SYSKANRI    =   1
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
                IF      SYS-1006-KBNCD      =   "2"
