@@ -633,8 +633,12 @@
                        UNTIL ( IDX-MED >   MEDH20-MAX )
                         OR   ( SPA-GMN-CHK-LBLMEDKBN (IDX-CHK)
                                        NOT =   SPACE )
-                   IF    ( MEDH20-CDL (IDX-MED)
-                                       =   SPA-NAI-MEDKBN-SRYCD
+                   IF    ( MEDH20-STYMD (IDX-MED)
+                                      <=   SPA-W01-STYUKYMD )
+                     AND ( MEDH20-EDYMD (IDX-MED)
+                                      >=   SPA-W01-STYUKYMD )
+                     AND ( MEDH20-ZAINUM (IDX-MED)
+                                       =   SPA-NAI-MEDKBN-ZAINUM
                                                               (IDX-CHK))
                        MOVE    MEDH20-MEIL (IDX-MED)
                                        TO  SPA-GMN-CHK-LBLMEDKBN

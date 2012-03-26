@@ -429,9 +429,10 @@
            PERFORM VARYING IDX-MED FROM    1   BY  1
                    UNTIL ( IDX-MED >   MEDH20-MAX )
       *
-               IF    ( RYOCOM-SRYCD
-                                   =   MEDH20-CDL    (IDX-MED)
-                                    OR MEDH20-SRYCDL (IDX-MED))
+               IF   ( RYOCOM-SRYYM >=  MEDH20-STYM   (IDX-MED))
+                AND ( RYOCOM-SRYYM <=  MEDH20-EDYM   (IDX-MED))
+                AND ( RYOCOM-ZAINUM
+                                   =   MEDH20-ZAINUM (IDX-MED))
                    MOVE    MEDH20-MEDKBN (IDX-MED)
                                    TO  WRK-MEDKBN
                    MOVE    MEDH20-MAX  TO  IDX-MED

@@ -171,7 +171,10 @@
            PERFORM VARYING IDX-MED FROM    1   BY  1
                    UNTIL ( IDX-MED     >   MEDH20-MAX )
                     OR   ( WRK-MEDKBN  NOT =   SPACE )
-               IF    ( RYOCOM-ZAINUM   =   MEDH20-ZAINUM (IDX-MED))
+               IF   ( RYOCOM-SRYYM >=  MEDH20-STYM   (IDX-MED))
+                AND ( RYOCOM-SRYYM <=  MEDH20-EDYM   (IDX-MED))
+                AND ( RYOCOM-ZAINUM
+                                   =   MEDH20-ZAINUM (IDX-MED))
                    MOVE    MEDH20-MEDKBN (IDX-MED)
                                    TO  WRK-MEDKBN
                END-IF

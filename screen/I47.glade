@@ -1374,22 +1374,6 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label170</name>
-      <x>856</x>
-      <y>620</y>
-      <width>24</width>
-      <height>20</height>
-      <label>30</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
       <name>label158</name>
       <x>120</x>
       <y>620</y>
@@ -1436,7 +1420,7 @@
       <class>GtkPandaEntry</class>
       <name>SELNUM</name>
       <x>88</x>
-      <y>592</y>
+      <y>596</y>
       <width>152</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -1464,7 +1448,7 @@
       <class>GtkPandaEntry</class>
       <name>MEISYO</name>
       <x>248</x>
-      <y>592</y>
+      <y>596</y>
       <width>632</width>
       <height>24</height>
       <editable>False</editable>
@@ -1473,22 +1457,6 @@
       <text></text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label173</name>
-      <x>20</x>
-      <y>592</y>
-      <width>64</width>
-      <height>24</height>
-      <label>選択番号</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
     </widget>
 
     <widget>
@@ -1571,15 +1539,6 @@
 
     <widget>
       <class>GtkHSeparator</class>
-      <name>hseparator1</name>
-      <x>8</x>
-      <y>64</y>
-      <width>1004</width>
-      <height>5</height>
-    </widget>
-
-    <widget>
-      <class>GtkHSeparator</class>
       <name>hseparator4</name>
       <x>8</x>
       <y>704</y>
@@ -1588,21 +1547,85 @@
     </widget>
 
     <widget>
+      <class>GtkLabel</class>
+      <name>label172</name>
+      <x>20</x>
+      <y>680</y>
+      <width>64</width>
+      <height>24</height>
+      <label>一括修正</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLINFO</name>
+      <x>556</x>
+      <y>8</y>
+      <width>450</width>
+      <height>24</height>
+      <label>あいうえお</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
       <class>GtkHSeparator</class>
       <name>hseparator3</name>
       <x>8</x>
-      <y>585</y>
+      <y>588</y>
       <width>1008</width>
       <height>8</height>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label170</name>
+      <x>856</x>
+      <y>620</y>
+      <width>24</width>
+      <height>20</height>
+      <label>30</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label173</name>
+      <x>20</x>
+      <y>600</y>
+      <width>64</width>
+      <height>24</height>
+      <label>選択番号</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
     </widget>
 
     <widget>
       <class>GtkScrolledWindow</class>
       <name>scrolledwindow2</name>
       <x>8</x>
-      <y>72</y>
-      <width>1005</width>
-      <height>84</height>
+      <y>68</y>
+      <width>1012</width>
+      <height>108</height>
       <hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
       <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
       <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
@@ -1632,7 +1655,7 @@
 	  <last_modification_time>Mon, 17 Sep 2001 01:39:53 GMT</last_modification_time>
 	</signal>
 	<columns>36</columns>
-	<column_widths>20,10,238,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14</column_widths>
+	<column_widths>20,10,236,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -2111,9 +2134,9 @@
       <class>GtkScrolledWindow</class>
       <name>scrolledwindow1</name>
       <x>8</x>
-      <y>160</y>
-      <width>1005</width>
-      <height>420</height>
+      <y>180</y>
+      <width>1012</width>
+      <height>408</height>
       <hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
       <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
       <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
@@ -2143,7 +2166,7 @@
 	  <last_modification_time>Mon, 17 Sep 2001 01:39:53 GMT</last_modification_time>
 	</signal>
 	<columns>36</columns>
-	<column_widths>20,10,238,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14</column_widths>
+	<column_widths>20,10,236,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14,14</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -2217,7 +2240,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label178</name>
-	  <label>1</label>
+	  <label> 1</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2230,7 +2253,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label179</name>
-	  <label>2</label>
+	  <label> 2</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2243,7 +2266,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label180</name>
-	  <label>3</label>
+	  <label> 3</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2256,7 +2279,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label181</name>
-	  <label>4</label>
+	  <label> 4</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2269,7 +2292,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label182</name>
-	  <label>5</label>
+	  <label> 5</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2282,7 +2305,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label183</name>
-	  <label>6</label>
+	  <label> 6</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2295,7 +2318,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label184</name>
-	  <label>7</label>
+	  <label> 7</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2308,7 +2331,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label185</name>
-	  <label>8</label>
+	  <label> 8</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2321,7 +2344,7 @@
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
 	  <name>label186</name>
-	  <label>9</label>
+	  <label> 9</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -2619,35 +2642,12 @@
     </widget>
 
     <widget>
-      <class>GtkLabel</class>
-      <name>label172</name>
-      <x>20</x>
-      <y>680</y>
-      <width>64</width>
-      <height>24</height>
-      <label>一括修正</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>LBLINFO</name>
-      <x>556</x>
-      <y>8</y>
-      <width>450</width>
-      <height>24</height>
-      <label>あいうえお</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
+      <class>GtkHSeparator</class>
+      <name>hseparator1</name>
+      <x>8</x>
+      <y>62</y>
+      <width>1004</width>
+      <height>5</height>
     </widget>
   </widget>
 </widget>
