@@ -797,7 +797,7 @@
                        MOVE    1               TO  SPA-CHIIKKBN
       *H24.4改正
                        IF      SPA-SRYYMD      >=  "20120401"
-                           MOVE    2               TO  SPA-CHIIKKBN
+                           MOVE    0               TO  SPA-CHIIKKBN
                        END-IF
                    ELSE
                        MOVE    0               TO  SPA-CHIIKKBN
@@ -817,6 +817,9 @@
       *                    時間外対応加算１(3001)
                            WHEN    SYS-1006-SSTKIJUN (001) =   1
                                MOVE    1               TO  SPA-CHIIKKBN
+      *                    時間外対応加算２(3155)
+                           WHEN    SYS-1006-SSTKIJUN (155) =   1
+                               MOVE    2               TO  SPA-CHIIKKBN
       *                    時間外対応加算３(3002)
                            WHEN    SYS-1006-SSTKIJUN (002) =   1
                                IF      SPA-CHIIKKBN    =   ZERO
