@@ -9104,6 +9104,9 @@
            IF  TNS-SRYCD      =    "190121810"
                    MOVE    "1"     TO  WRK-TOKUBETSU-NYUIN
            END-IF
+           IF  TNS-SRYCD      =    "190799510"
+                   MOVE    "1"     TO  WRK-TOKUBETSU-NYUIN
+           END-IF
            .
       *
        48011-TENSU-SEL-EXT.
