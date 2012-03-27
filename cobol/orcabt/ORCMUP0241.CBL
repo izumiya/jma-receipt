@@ -402,7 +402,7 @@
                IF     (GENERIC-YUKOSTYMD   <=  GENERICWK-YUKOEDYMD2)
                  AND  (GENERIC-YUKOEDYMD   >=  GENERICWK-YUKOEDYMD2)
       *            £Ä£Â¹¹¿·
-                   MOVE    GENERIC-KEY     TO  GENERIC-KEY
+                   MOVE    GENERIC-KEY     TO  GENERIC-UP-KEY
                    MOVE    GENERICWK-YUKOEDYMD2
                                            TO  GENERIC-YUKOEDYMD
                    PERFORM 20101-GENERIC-UPD-SEC
