@@ -149,7 +149,7 @@ Z04	{
 				value	varchar(28);
 			};
 			count	int;
-			item	varchar(28)[90];
+			item	varchar(28)[200];
 		};
 		KANZANCHI	{
 			value	number(10,5);
@@ -318,7 +318,7 @@ Z04	{
 				value	varchar(28);
 			};
 			count	int;
-			item	varchar(28)[90];
+			item	varchar(28)[200];
 		};
 		IPNKANZANCHI	{
 			value	number(10,5);

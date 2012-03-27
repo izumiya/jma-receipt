@@ -121,7 +121,7 @@
                 04  Z04-KANZANTANICD.
                   05  Z04-VALUE   PIC X(28).
                 04  Z04-KANZANTANICD-COUNT   PIC S9(9)   BINARY.
-                04  Z04-KANZANTANICDLST   PIC X(28)   OCCURS  90 TIMES.
+                04  Z04-KANZANTANICDLST   PIC X(28)   OCCURS  200 TIMES.
               03  Z04-KANZANCHI.
                 04  Z04-VALUE   PIC 9(5)V9(5).
               03  Z04-CHNGCD.
@@ -168,7 +168,7 @@
                   05  Z04-VALUE   PIC X(28).
                 04  Z04-IPNTANICD-COUNT   PIC S9(9)   BINARY.
                 04  Z04-IPNTANICD-ITEM
-                        PIC X(28)   OCCURS  90 TIMES.
+                        PIC X(28)   OCCURS 200 TIMES.
               03  Z04-IPNKANZANCHI.
                 04  Z04-VALUE   PIC S9(5)V9(5).
               03  Z04-GENERICHEN.
