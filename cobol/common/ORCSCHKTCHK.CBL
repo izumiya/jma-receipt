@@ -32,6 +32,7 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/09/XX  ³°Íè¤Þ¤È¤áÂÐ±þ
       *                                     ËýÀ­°Ý»ýÆ©ÀÏ°å³Ø´ÉÍýÎÁÅùÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/02/XX  ¥¢¥Õ¥¿¡¼¥±¥¢ÂÐ¾Ý³°ÂÐ±þ
+      *  04.06.00    NACL-Â¿¡¹Ç¼  12/03/28  £È£²£´Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -163,7 +164,7 @@
                                              OCCURS   50.
                05  TBL-N-SRYCD-G.
                    07  TBL-N-SRYCD           PIC X(09)
-                                           OCCURS   50.
+                                           OCCURS   99.
            03  TBL-N-MAX                 PIC 9(04).
       *
        01  TBL-HKTSANTEI-AREA.
@@ -430,7 +431,7 @@
            END-IF
            MOVE    ZERO                TO  IDY
            PERFORM UNTIL  (FLG-HKTSRYCD    =   1  )
-                      OR  (IDY             >=  50 )
+                      OR  (IDY             >=  99 )
                IF      SYS-1014-KBNCD (1:3)    >=  "500"
                    ADD     1                   TO  IDY
                    MOVE    HKTSRYCD-SRYCD      TO  TBL-N-SRYCD
@@ -1669,12 +1670,12 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    UNTIL      (IDX-N       >   TBL-N-MAX )
                            OR (FLG-CHK     =   1         )
                PERFORM VARYING     IDY     FROM    1   BY  1
-                       UNTIL      (IDY     >   50   )  OR
+                       UNTIL      (IDY     >   99   )  OR
                                   (TBL-N-SRYCD (IDX-N IDY) =   SPACE)
                    IF      NSRY-SRYCD(IDZ) =   TBL-N-SRYCD (IDX-N IDY)
                        MOVE    1                   TO  FLG-CHK
                        MOVE    IDX-N               TO  WRK-IDX-N
-                       MOVE    50                  TO  IDY
+                       MOVE    99                  TO  IDY
                    END-IF
                END-PERFORM
            END-PERFORM
