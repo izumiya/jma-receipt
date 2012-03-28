@@ -3054,12 +3054,13 @@
       ****     ELSE
       *        ”＊”の時、自動発生分は対象外
                IF     (FLG-DOALL           =   1  )  AND
-                      (SRY-AUTOKBN (1)     =   "4"
+                     ((SRY-AUTOKBN (1)     =   "4"
                                            OR  "5"
                                            OR  "6"
-                                           OR  "7"
+                                           OR  "7"  )  OR
       *H24.4
-                                           OR  "3" )
+                     ((SRY-SRYSYUKBN       =   "820" )  AND
+                      (SRY-AUTOKBN (1)     =   "3"   )))
                    CONTINUE
                ELSE
       *        すべてを対象とする
