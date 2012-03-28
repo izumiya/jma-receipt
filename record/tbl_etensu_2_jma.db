@@ -36,8 +36,8 @@ path	key2 	{
 		SELECT *
 		FROM tbl_etensu_2_jma
 		WHERE 	H_GROUP      = :H_GROUP
-		AND	YUKOSTYMD  >=  :YUKOSTYMD
-		AND	YUKOEDYMD  <=  :YUKOEDYMD
+		AND	YUKOSTYMD  <=  :YUKOSTYMD
+		AND	YUKOEDYMD  >=  :YUKOEDYMD
 			ORDER   BY  SRYCD,
 				    YUKOSTYMD
 		;
@@ -50,14 +50,14 @@ path	key3 	{
 		SELECT a.*
 		FROM tbl_etensu_2_jma a,tbl_tensu b
 		WHERE 	a.H_GROUP      = :H_GROUP
-		AND	a.YUKOSTYMD  >=  :YUKOSTYMD
-		AND	a.YUKOEDYMD  <=  :YUKOEDYMD
+		AND	a.YUKOSTYMD  <=  :YUKOSTYMD
+		AND	a.YUKOEDYMD  >=  :YUKOEDYMD
 		AND     a.SRYCD       =  b.SRYCD 
 		AND     b.HOSPNUM     =  :HOSPNUM 
 		AND   ( b.SRYKBN    >=  :SRYKBN    AND
 			b.SRYKBN    <=  :SRYKBN2 )
-		AND	a.YUKOSTYMD  >=  b.YUKOSTYMD
-		AND	a.YUKOEDYMD  <=  b.YUKOEDYMD
+		AND	b.YUKOSTYMD  <= :YUKOSTYMD
+		AND	b.YUKOEDYMD  >= :YUKOEDYMD
 			ORDER   BY  b.CDKBN_KBN,
                                     b.CDKBN_KBNNUM,
                                     a.SRYCD,
@@ -72,16 +72,16 @@ path	key4	{
 		SELECT a.*
 		FROM tbl_etensu_2_jma a,tbl_tensu b
 		WHERE 	a.H_GROUP      = :H_GROUP
-		AND	a.YUKOSTYMD  >=  :YUKOSTYMD
-		AND	a.YUKOEDYMD  <=  :YUKOEDYMD
+		AND	a.YUKOSTYMD  <=  :YUKOSTYMD
+		AND	a.YUKOEDYMD  >=  :YUKOEDYMD
 		AND     a.SRYCD       =  b.SRYCD 
 		AND     b.HOSPNUM     =  :HOSPNUM 
 		AND  (( b.SRYKBN    >=  :SRYKBN    AND
 			b.SRYKBN    <=  :SRYKBN2 )
 		OR    ( b.SRYSYUKBN  >= :SRYSYUKBN  AND
 		        b.SRYSYUKBN  <= :SRYSYUKBN2))
-		AND	a.YUKOSTYMD  >=  b.YUKOSTYMD
-		AND	a.YUKOEDYMD  <=  b.YUKOEDYMD
+		AND	b.YUKOSTYMD  <= :YUKOSTYMD
+		AND	b.YUKOEDYMD  >= :YUKOEDYMD
 			ORDER   BY  b.CDKBN_KBN,
                                     b.CDKBN_KBNNUM,
                                     a.SRYCD,
@@ -96,14 +96,14 @@ path	key5	{
 		SELECT a.*
 		FROM tbl_etensu_2_jma a,tbl_tensu b
 		WHERE 	a.H_GROUP      = :H_GROUP
-		AND	a.YUKOSTYMD  >=  :YUKOSTYMD
-		AND	a.YUKOEDYMD  <=  :YUKOEDYMD
+		AND	a.YUKOSTYMD  <=  :YUKOSTYMD
+		AND	a.YUKOEDYMD  >=  :YUKOEDYMD
 		AND     a.SRYCD       =  b.SRYCD 
 		AND     b.HOSPNUM     =  :HOSPNUM 
 		AND   ( b.SRYSYUKBN   = :SRYSYUKBN  OR
 		        b.SRYSYUKBN   = :SRYSYUKBN2)
-		AND	a.YUKOSTYMD  >=  b.YUKOSTYMD
-		AND	a.YUKOEDYMD  <=  b.YUKOEDYMD
+		AND	b.YUKOSTYMD  <= :YUKOSTYMD
+		AND	b.YUKOEDYMD  >= :YUKOEDYMD
 			ORDER   BY  b.CDKBN_KBN,
                                     b.CDKBN_KBNNUM,
                                     a.SRYCD,
