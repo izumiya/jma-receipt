@@ -34,6 +34,7 @@
       *  04.05.00    NACL-多々納  10/02/XX  アフターケア対象外対応
       *  04.06.00    NACL-多々納  10/10/XX  包括算定（剤）対応
       *  04.06.00    NACL-多々納  11/01/XX  電子点数表マスタ対応
+      *  04.06.00    NACL-多々納  12/03/28  Ｈ２４年４月改正対応
       *****************************************************************
       *
       *
@@ -56,7 +57,7 @@
            03  FLG-HKTSRYCD            PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-SANTEI              PIC 9(01).
-           03  FLG-NYUINACT           PIC 9(01).
+           03  FLG-NYUINACT            PIC 9(01).
            03  FLG-NYUINACCT           PIC 9(01).
       *
            03  FLG-CHK                 PIC 9(01).
@@ -174,7 +175,7 @@
                                              OCCURS   50.
                05  TBL-N-SRYCD-G.
                    07  TBL-N-SRYCD           PIC X(09)
-                                           OCCURS   50.
+                                           OCCURS   99.
            03  TBL-N-MAX                 PIC 9(04).
       *
        01  TBL-HKTSANTEI-AREA.
@@ -446,7 +447,7 @@
            END-IF
            MOVE    ZERO                TO  IDY
            PERFORM UNTIL  (FLG-HKTSRYCD    =   1  )
-                      OR  (IDY             >=  50 )
+                      OR  (IDY             >=  99 )
                IF      SYS-1014-KBNCD (1:3)    >=  "500"
                    ADD     1                   TO  IDY
                    MOVE    HKTSRYCD-SRYCD      TO  TBL-N-SRYCD
@@ -1926,14 +1927,14 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    UNTIL      (IDX-N       >   TBL-N-MAX )
                            OR (FLG-CHK     =   1         )
                PERFORM VARYING     IDY     FROM    1   BY  1
-                       UNTIL      (IDY     >   50   )  OR
+                       UNTIL      (IDY     >   99   )  OR
                                   (TBL-N-SRYCD (IDX-N IDY) =   SPACE)
                    IF      NSRY-SRYCD(IDZ) =   TBL-N-SRYCD (IDX-N IDY)
                        MOVE    TBL-N-SRYCD (IDX-N IDY)
                                                    TO  WRK-NT-SRYCD
                        MOVE    1                   TO  FLG-CHK
                        MOVE    IDX-N               TO  WRK-IDX-N
-                       MOVE    50                  TO  IDY
+                       MOVE    99                  TO  IDY
                    END-IF
                END-PERFORM
            END-PERFORM
