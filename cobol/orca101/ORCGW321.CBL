@@ -545,8 +545,10 @@
            MOVE    SPACE               TO  ETENSU2-REC
            INITIALIZE                  ETENSU2-REC
            MOVE    SPA-W321-H-GROUP    TO  ETENSU2-H-GROUP
+      ***  MOVE    SPA-W321-YUKOSTYMD  TO  ETENSU2-YUKOSTYMD
+      *H24.4 開始日時点で有効
            MOVE    SPA-W321-YUKOSTYMD  TO  ETENSU2-YUKOSTYMD
-           MOVE    SPA-W321-YUKOEDYMD  TO  ETENSU2-YUKOEDYMD
+           MOVE    SPA-W321-YUKOSTYMD  TO  ETENSU2-YUKOEDYMD
       *    検索用
            MOVE    SPA-HOSPNUM         TO  ETENSU2-TK-HOSPNUM
            MOVE    "key2"              TO  WRK-MCP-PATHNAME
@@ -653,8 +655,11 @@
       *
            MOVE    SPACE               TO  TNS-TENSU-REC
            MOVE    WRK-SRYCD           TO  TNS-SRYCD
-           MOVE    ETENSU2-YUKOSTYMD   TO  TNS-YUKOSTYMD
-           MOVE    ETENSU2-YUKOEDYMD   TO  TNS-YUKOEDYMD
+      *H24.4 開始日時点で有効
+      *    MOVE    ETENSU2-YUKOSTYMD   TO  TNS-YUKOSTYMD
+      *    MOVE    ETENSU2-YUKOEDYMD   TO  TNS-YUKOEDYMD
+           MOVE    SPA-W321-YUKOSTYMD  TO  TNS-YUKOSTYMD
+           MOVE    SPA-W321-YUKOSTYMD  TO  TNS-YUKOEDYMD
            PERFORM 910-TENSU-READ-SEC
            IF      FLG-TENSU           =   1
       *       マスタなし
@@ -670,10 +675,10 @@
            MOVE    ETENSU2-YUKOSTYMD   TO  SPA-W321-TSTYMD(IDX)
            MOVE    ETENSU2-YUKOEDYMD   TO  SPA-W321-TEDYMD(IDX)
       *
-           MOVE    ETENSU2-YUKOSTYMD   TO  WRK-SYMD
+           MOVE    ETENSU1-YUKOSTYMD   TO  WRK-SYMD
            PERFORM 5002-HIZUKE-HEN-SEC
            MOVE    WRK-HENYMDG         TO  WRK-H-STYMD
-           MOVE    ETENSU2-YUKOEDYMD   TO  WRK-SYMD
+           MOVE    ETENSU1-YUKOEDYMD   TO  WRK-SYMD
            PERFORM 5002-HIZUKE-HEN-SEC
            MOVE    WRK-HENYMDG         TO  WRK-H-EDYMD
            STRING      WRK-H-STYMD
