@@ -4676,59 +4676,108 @@
       *
       *    入院料の時、加算他の削除（短期滞在、選定入院、療養病床は削除しない）
            MOVE    SPA-NAI-TBANGO (SPA-NAI-BANGO)  TO  IDG
+      *
+      *    療養病床の判定用に点数マスタ読み込み
+           INITIALIZE                           TNS-TENSU-REC
+           MOVE    SPA-HOSPNUM             TO   TNS-HOSPNUM
+           MOVE    SPA-GMN-TSRYCD (IDG)    TO   TNS-SRYCD
+           MOVE    SPA-NAI-SRYYM           TO   TNS-YUKOSTYMD(1:6)
+           MOVE    "01"                    TO   TNS-YUKOSTYMD(7:2)
+           MOVE    TNS-YUKOSTYMD           TO   TNS-YUKOEDYMD
+           MOVE    TNS-TENSU-REC           TO   MCPDATA-REC
+           MOVE    "tbl_tensu"             TO   MCP-TABLE
+           MOVE    "key"                   TO   MCP-PATHNAME
+           PERFORM    910-DBSELECT-SEC
+           IF      MCP-RC                  =    ZERO
+               MOVE    "tbl_tensu"             TO   MCP-TABLE
+               MOVE    "key"                   TO   MCP-PATHNAME
+               PERFORM    920-DBFETCH-SEC
+               IF      MCP-RC              =    ZERO
+                   MOVE   MCPDATA-REC      TO   TNS-TENSU-REC
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_tensu"             TO   MCP-TABLE
+           MOVE    "key"                   TO   MCP-PATHNAME
+           PERFORM    990-DBCLOSE-SEC
+      *
            IF     (SPA-GMN-TSRYCD (IDG)    =   "190076810"
                                            OR  "190125310"
                                            OR  "190130410"
                                            OR  "190130510"
                                            OR  "099999916")
+      *    療養病床の判定
            OR     ((SPA-5000-RYOYODSPKBN    =    "1")
                                            AND
-                   (SPA-GMN-TSRYCD (IDG)    =  "190122010"
-                                           OR  "190122110"
-                                           OR  "190122210"
-                                           OR  "190122310"
-                                           OR  "190122410"
-                                           OR  "190124310"
-                                           OR  "190124410"
-                                           OR  "190124510"
-                                           OR  "190124610"
-                                           OR  "190124710"
-                                           OR  "190121310"
-                                           OR  "190121410"
-                                           OR  "190121510"
-                                           OR  "190121610"
-                                           OR  "190121710"
-                                           OR  "190131610"
-                                           OR  "190131810"
-                                           OR  "190132010"
-                                           OR  "190132210"
-                                           OR  "190123710"
-                                           OR  "190123810"
-                                           OR  "190123910"
-                                           OR  "190124010"
-                                           OR  "190124110"
-                                           OR  "190131710"
-                                           OR  "190131910"
-                                           OR  "190132110"
-                                           OR  "190132310"
-                                           OR  "190132410"
-                                           OR  "190132610"
-                                           OR  "190132810"
-                                           OR  "190133010"
-                                           OR  "190133210"
-                                           OR  "190133410"
-                                           OR  "190133610"
-                                           OR  "190133810"
-                                           OR  "190134010"
-                                           OR  "190132510"
-                                           OR  "190132710"
-                                           OR  "190132910"
-                                           OR  "190133110"
-                                           OR  "190133310"
-                                           OR  "190133510"
-                                           OR  "190133710"
-                                           OR  "190133910"
-                                           OR  "190134110"))
+                   (TNS-NYUKHNKSNKBN       =      173   OR
+                                                  174   OR
+                                                  175   OR
+                                                  176   OR
+                                                  177   OR
+                                                  178   OR
+                                                  179   OR
+                                                  180   OR
+                                                  181   OR
+                                                  182   OR
+                                                  183   OR
+                                                  184   OR
+                                                  185   OR
+                                                  186   OR
+                                                  187   OR
+                                                  188   OR
+                                                  189   OR
+                                                  190   OR
+                                                  153   OR
+                                                  154   OR
+                                                  155   OR
+                                                  156   OR
+                                                  157))
+      *             (SPA-GMN-TSRYCD (IDG)    =  "190122010"
+      *                                     OR  "190122110"
+      *                                     OR  "190122210"
+      *                                     OR  "190122310"
+      *                                     OR  "190122410"
+      *                                     OR  "190124310"
+      *                                     OR  "190124410"
+      *                                     OR  "190124510"
+      *                                     OR  "190124610"
+      *                                     OR  "190124710"
+      *                                     OR  "190121310"
+      *                                     OR  "190121410"
+      *                                     OR  "190121510"
+      *                                     OR  "190121610"
+      *                                     OR  "190121710"
+      *                                     OR  "190131610"
+      *                                     OR  "190131810"
+      *                                     OR  "190132010"
+      *                                     OR  "190132210"
+      *                                     OR  "190123710"
+      *                                     OR  "190123810"
+      *                                     OR  "190123910"
+      *                                     OR  "190124010"
+      *                                     OR  "190124110"
+      *                                     OR  "190131710"
+      *                                     OR  "190131910"
+      *                                     OR  "190132110"
+      *                                     OR  "190132310"
+      *                                     OR  "190132410"
+      *                                     OR  "190132610"
+      *                                     OR  "190132810"
+      *                                     OR  "190133010"
+      *                                     OR  "190133210"
+      *                                     OR  "190133410"
+      *                                     OR  "190133610"
+      *                                     OR  "190133810"
+      *                                     OR  "190134010"
+      *                                     OR  "190132510"
+      *                                     OR  "190132710"
+      *                                     OR  "190132910"
+      *                                     OR  "190133110"
+      *                                     OR  "190133310"
+      *                                     OR  "190133510"
+      *                                     OR  "190133710"
+      *                                     OR  "190133910"
+      *                                     OR  "190134110"))
                CONTINUE
            ELSE
       *        短期滞在手術基本料以外とする
