@@ -3929,9 +3929,9 @@
                                                                 (IDX)
       *
       *H24.4          •Ì°º•”•∏•Á•Û∏°∫∫»Ω√«Œ¡
-                       WHEN    16
-                           MOVE    "160199510"     TO  WRK-KEN-SRYCD
-                                                                (IDX)
+      *                WHEN    16
+      *                    MOVE    "160199510"     TO  WRK-KEN-SRYCD
+      ****                                                      (IDX)
                    END-EVALUATE
                 END-IF
            END-PERFORM
