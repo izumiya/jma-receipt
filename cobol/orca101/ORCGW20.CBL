@@ -4220,6 +4220,7 @@
                                ALL "¡ÊÁªÄêÎÅÍÜ¡Ë" ,
                                ALL "±É´É·Ð²áÁ¼ÃÖ" ,
                                ALL "ÎÅÍÜÉÂ¾²°Ê³°"
+                               ALL "ÆÃÄêÆþ±¡´ðËÜÎÁ"
       * 
                IF    ( CNT-STR     >   ZERO )
                    MOVE    ZERO    TO  FLG-SETKHNRYO
@@ -4271,7 +4272,14 @@
                END-IF
       *
                IF    ( TNS-SRYCD   =   "190799410"
-                                    OR "190799510"  )
+                                    OR "190799510"
+                                    OR "190161210"
+                                    OR "190161310"
+                                    OR "190161010"
+                                    OR "190161110"
+                                    OR "190160810"
+                                    OR "190160910"
+                                                   )
                        MOVE    ZERO    TO  FLG-SETKHNRYO
                END-IF
       *
