@@ -6459,6 +6459,10 @@
       *            MOVE    1   TO      FLG-KSNERR
       *    END-IF
       *
+           MOVE    WRK-KSNCD                   TO  WRK-TNS-SRYCD
+           MOVE    SPA-NAI-W20-YUKOSTYMD       TO  WRK-TNS-KJNYMD
+           PERFORM 900-TENSU-KEY-SEL-SEC
+      *
            MOVE    ZERO            TO  FLG-HIT
                                        CNT-SST
            PERFORM VARYING IDX5    FROM    1   BY  1
