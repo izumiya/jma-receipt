@@ -455,11 +455,13 @@
            03  FILLER              PIC X(13)   VALUE   "0 FD101110040".
       *    ºÆ¿ÇÎÁ
            03  FILLER              PIC X(13)   VALUE   "0 S 101120040".
+      *    ºÆ¿ÇÎÁ¡ÊÆ±Æü£²²ÊÌÜ¡Ë
+           03  FILLER              PIC X(13)   VALUE   "0 SD101120100".
       *    ³°Íè´ÉÍý²Ã»»
            03  FILLER              PIC X(13)   VALUE   "0 G 101120070".
       *
        01  TBL-RSI-SINSATU-AREAR   REDEFINES   TBL-RSI-SINSATU-AREA.
-           03  TBL-RSI-SINSATU-OCC     OCCURS  4    INDEXED  TBL-RSI.
+           03  TBL-RSI-SINSATU-OCC     OCCURS  5    INDEXED  TBL-RSI.
       *        ²ó¿ô
                05  TBLR-KAISU           PIC 9(01).
                05  FILLER               PIC X(01).

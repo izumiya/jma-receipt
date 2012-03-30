@@ -458,17 +458,21 @@
       *TE  Æ±Æü½é¿Ç
            03  FILLER              PIC X(13)   VALUE   "0 FD101110040".
       *    ºÆ¿ÇÎÁ
-           03  FILLER              PIC X(13)   VALUE   "0 S 101120040".
+           03  FILLER              PIC X(13)   VALUE   "0 R 101120040".
+      *H24.4
+      *    ºÆ¿ÇÎÁ¡ÊÆ±Æü£²²ÊÌÜ¡Ë
+           03  FILLER              PIC X(13)   VALUE   "0 RD101120100".
       *
       *    ³°Íè´ÉÍý²Ã»»
            03  FILLER              PIC X(13)   VALUE   "0 G 101120070".
       *
        01  TBL-RSI-SINSATU-AREAR   REDEFINES   TBL-RSI-SINSATU-AREA.
-           03  TBL-RSI-SINSATU-OCC     OCCURS  4    INDEXED  TBL-RSI.
+           03  TBL-RSI-SINSATU-OCC     OCCURS  5    INDEXED  TBL-RSI.
       *        ²ó¿ô
                05  TBLR-KAISU           PIC 9(01).
                05  FILLER               PIC X(01).
-      *        F:½é¿Ç¡¢S:ºÆ¿Ç¡¢G:³°Íè´ÉÍý²Ã»»
+      *H24.4   F:½é¿Ç¡¢S:ºÆ¿Ç¡¢G:³°Íè´ÉÍý²Ã»»
+      *        F:½é¿Ç¡¢R:ºÆ¿Ç¡¢G:³°Íè´ÉÍý²Ã»»
                05  TBLR-KBN             PIC X(01).
       *        D:Æ±Æü½é¿Ç
                05  TBLR-KBN2            PIC X(01).
@@ -4939,7 +4943,8 @@
                IF      SPA-HKNKBN      =   1
                  AND  (SPA-RSI-JUNKYO  NOT =   "1" )
                    PERFORM 20012-RSISINSATU-CHK-SEC
-                   IF      WRK-KBN             =   "F"  OR  "S"
+      *H24.4       IF      WRK-KBN             =   "F"  OR  "S"
+                   IF      WRK-KBN             =   "F"  OR  "R"
       *                ¿Ç»¡ÎÁ¤¢¤ê
                        MOVE    1               TO  FLG-TBL
       *                ¿Ç»¡ÎÁ¤Î°ÌÃÖÀßÄê
@@ -4949,7 +4954,10 @@
                            ADD     1               TO  IDX-ZAI1
                            MOVE   IDX-Z            TO  IDX-SYU2
                        END-IF
-                       IF     (WRK-KBN             =   "S"  )
+      *H24.4
+      ********         IF     (WRK-KBN             =   "S"  )
+                       IF     (WRK-KBN             =   "R"  )  AND
+                              (WRK-KBN2        NOT =   "D"  )
       *                    ºÆ¿ÇÎÁ
                            ADD     1               TO  IDX-ZAI2
                            MOVE   IDX-Z            TO  IDX-SYU2
@@ -5409,7 +5417,8 @@
                    MOVE    TBLR-KAISU(TBL-RSI) TO  WRK-KAISU
            END-SEARCH
       *
-           IF      WRK-KBN             =   "F"  OR  "S"
+      *D   IF      WRK-KBN             =   "F"  OR  "S"
+           IF      WRK-KBN             =   "F"  OR  "R"
       *        ¿Ç»¡ÎÁ¤¢¤ê
                MOVE    1               TO  LNK-ORCSC-SINSATU-ARI
       *        ½é¿ÇÎÁ¤ÎÈ½Äê
@@ -5433,6 +5442,16 @@
                        MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
                    ELSE
                        MOVE    ZERO            TO  LNK-ORCSC-SYOSIN2
+                   END-IF
+               END-IF
+      *H24.4
+      *        ºÆ¿Ç£²²ÊÌÜ
+               IF     (WRK-KBN             =   "R" )  AND
+                      (WRK-KBN2            =   "D" )
+                   MOVE    1               TO  FLG-DOUJITU-S
+                   MOVE    IDX-Z           TO  IDX-SINSATU2-S
+                   IF      IDX-SINSATU     >   ZERO
+                       GO      TO      20012-RSISINSATU-CHK-EXT
                    END-IF
                END-IF
       *
