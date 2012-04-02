@@ -1046,24 +1046,44 @@
                WHEN    "113014010"
       *        外来放射線照射診察料
                WHEN    "113014110"
-                   MOVE    1               TO  FLG-TBL
+      *            期間内のチェック
+                   IF     SPA-KOURESRY-ARI2    =   2
+                       MOVE    "2104"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+                   END-IF
+                   IF     SPA-KOURESRY-ARI2    =   3
+                       MOVE    "2105"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+                   END-IF
            END-EVALUATE
       *
-           IF      FLG-TBL             =   1
+      *
+           IF     (FLG-TBL             =   1   )
+              AND (SPA-KOURESRY-ARI2   =   2
+                                       OR  3   )
       *        外来リハビリ診察料算定中
-               IF     SPA-KOURESRY-ARI2    =   2
-                   MOVE    "2104"          TO  WRK-ERRCD
-                   MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
-               END-IF
-               IF     SPA-KOURESRY-ARI2    =   3
-                   MOVE    "2105"          TO  WRK-ERRCD
-                   MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+      *        警告へ
+               IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE )
+                  AND (LNK-ORCSC-KEI-IDX       =   ZERO  )
+                   MOVE    IDX-Z               TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
+                   MOVE    "1"                 TO  WRK-COM-KZMFLG
+                                                          (IDX-Z)
+                   IF     SPA-KOURESRY-ARI2    =   2
+                       MOVE    "K104"          TO  WRK-ERRCD
+                   END-IF
+                   IF     SPA-KOURESRY-ARI2    =   3
+                       MOVE    "K105"          TO  WRK-ERRCD
+                   END-IF
                END-IF
            END-IF
-           IF      SPA-KOURESRY-ARI    =   2  OR  3
+      *
+           IF     (WRK-ERRCD           =   SPACE  )
+           AND    (SPA-KOURESRY-ARI    =   2  OR  3  )
       *        再診料を削除する
-               IF      WRK-COM-SRYKBN (IDX-Z)  =   "12"
-                                               OR  "11"
+               IF     (WRK-COM-SRYKBN (IDX-Z)  =   "12"
+                                               OR  "11" )
+                 AND  (WRK-KBN2            NOT =   "D"  )
                    INITIALIZE              WRK-GMN-TBLREC(IDX-Z)
                    INITIALIZE              WRK-COM-TBLREC(IDX-Z)
                    MOVE    1               TO  FLG-DEL
@@ -4799,6 +4819,15 @@
                                                        (IDX-SINSATU2)
                    END-IF
                END-IF
+      *H24.4
+      *        外来リハビリ算定時はチェックなし
+               IF    (( SPA-KOURESRY-ARI    =   2  OR  3 )  OR
+                      ( SPA-KOURESRY-ARI2   =   2  OR  3 ) )
+                 AND  ( SPA-ERRCD       NOT =   SPACE   )
+                   MOVE    SPACE           TO  SPA-ERRCD
+                   MOVE    SPACE           TO  WRK-COM-CUR
+                                                       (IDX-CHK)
+               END-IF
            END-IF
       *    複数科コメントがある時、自動発生分は削除
            IF     (FLG-TAKA-2          =   1 ) AND
@@ -4894,6 +4923,15 @@
                        MOVE    "1"             TO  WRK-COM-CUR
                                                        (IDX-CHK)
                    END-IF
+               END-IF
+      *H24.4
+      *        外来リハビリ算定時はチェックなし
+               IF    (( SPA-KOURESRY-ARI    =   2  OR  3 )  OR
+                      ( SPA-KOURESRY-ARI2   =   2  OR  3 ) )
+                 AND  ( SPA-ERRCD       NOT =   SPACE   )
+                   MOVE    SPACE           TO  SPA-ERRCD
+                   MOVE    SPACE           TO  WRK-COM-CUR
+                                                       (IDX-CHK)
                END-IF
            END-IF
       *    複数科コメントがある時、自動発生分は削除
