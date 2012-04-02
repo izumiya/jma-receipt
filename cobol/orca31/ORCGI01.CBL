@@ -6104,7 +6104,7 @@
            MOVE    "5112"          TO  SYS-KANRICD
            MOVE    WRK-KJNYMD      TO  SYS-STYUKYMD
                                        SYS-EDYUKYMD
-           PERFORM 900-SYSKANRI-KEY23-SEL-SEC
+           PERFORM 900-SYSKANRI-KEY15-SEL-SEC
            MOVE    SYSKANRI-REC    TO  SYS-5112-REC
       *
            PERFORM UNTIL ( FLG-SYSKANRI    NOT =   ZERO )
@@ -6117,13 +6117,13 @@
                MOVE    SYS-5112-KBNCD(1:2) TO  WRK-TOKNYUIN-SRYCD-X(8:2)
                PERFORM 4101-CMB-TOKNYUIN-DAT-SET-SEC
       *
-               PERFORM 900-SYSKANRI-KEY23-FET-SEC
+               PERFORM 900-SYSKANRI-KEY15-FET-SEC
                MOVE    SYSKANRI-REC    TO  SYS-5112-REC
       *
            END-PERFORM
       *
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key23"             TO  MCP-PATHNAME
+           MOVE    "key15"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -28282,6 +28282,48 @@
       *
            .
        900-SYSKANRI-KEY23-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理マスタ検索処理
+      *****************************************************************
+       900-SYSKANRI-KEY15-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYSKANRI
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key15"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI
+               INITIALIZE                  SYSKANRI-REC
+           END-IF
+      *
+           .
+       900-SYSKANRI-KEY15-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理マスタ検索処理
+      *****************************************************************
+       900-SYSKANRI-KEY15-FET-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYSKANRI
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key15"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI
+               INITIALIZE                  SYSKANRI-REC
+           END-IF
+      *
+           .
+       900-SYSKANRI-KEY15-FET-EXT.
            EXIT.
       *
       *****************************************************************
