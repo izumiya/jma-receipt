@@ -1919,6 +1919,10 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "1421"
+                   MOVE
+                   "在宅がん医療総合診察料を算定時、算定できません"
+                                       TO  SPA-ERRMSG
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
@@ -2640,12 +2644,26 @@
                    END-STRING
                WHEN    "2104"
                    STRING  "外来リハビリテーション診療料が算定中です。"
-                           "診察料は算定できません。"
+                           "算定できません。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "2105"
                    STRING  "外来放射線照射診療料が算定中です。"
+                           "算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K104"
+                   STRING  "警告！"
+                           "外来リハビリテーション診療料が算定中です。"
+                           "診察料は算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K105"
+                   STRING  "警告！"
+                           "外来放射線照射診療料が算定中です。"
                            "診察料は算定できません。"
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG

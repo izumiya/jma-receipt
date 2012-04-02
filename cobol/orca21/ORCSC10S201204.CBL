@@ -5394,7 +5394,7 @@
       *                    処方のみはＯＫ
                            IF      SPA-COM-SRYSYUKBN(IDX)(3:1)
                                                    NOT =   "3" 
-                               MOVE    "1401"          TO  SPA-ERRCD
+                               MOVE    "1421"          TO  SPA-ERRCD
                                MOVE    "1"             TO  SPA-COM-CUR
                                                              (IDX)
                            END-IF
@@ -5404,7 +5404,7 @@
                            CONTINUE
                        WHEN    OTHER
       *                    算定エラー
-                           MOVE    "1401"          TO  SPA-ERRCD
+                           MOVE    "1421"          TO  SPA-ERRCD
                            MOVE    "1"             TO  SPA-COM-CUR (IDX)
                    END-EVALUATE
                END-IF
