@@ -121,6 +121,7 @@
                        MOVE   "188000110"   TO  LNK-IRYOKNS-SRYCD(IDX)
       *        回復期入院対象者入院医学管理料
                WHEN    "04"
+               WHEN    "11"
                        ADD     1            TO  IDX
                        MOVE   "188000510"   TO  LNK-IRYOKNS-SRYCD(IDX)
       *        社会復帰期入院対象者入院医学管理料
@@ -130,6 +131,7 @@
                WHEN    "08"
                WHEN    "09"
                WHEN    "10"
+               WHEN    "12"
                        ADD     1            TO  IDX
                        MOVE   "188000610"   TO  LNK-IRYOKNS-SRYCD(IDX)
              END-EVALUATE
@@ -182,6 +184,22 @@
       *                未適合（入院決定日から１年超）
                        ADD     1            TO  IDX
                        MOVE   "188000470"   TO  LNK-IRYOKNS-SRYCD(IDX)
+             END-EVALUATE
+      *
+      *
+      *      観察回復期減算のセット（算定開始日から２７１日以上）
+             EVALUATE    LNK-IRYOKNS-NYUIN
+               WHEN    "11"
+                       ADD     1            TO  IDX
+                       MOVE   "188006570"   TO  LNK-IRYOKNS-SRYCD(IDX)
+             END-EVALUATE
+      *
+      *
+      *      社会復帰期移行加算のセット
+             EVALUATE    LNK-IRYOKNS-NYUIN
+               WHEN    "12"
+                       ADD     1            TO  IDX
+                       MOVE   "188006670"   TO  LNK-IRYOKNS-SRYCD(IDX)
              END-EVALUATE
       *
       *
