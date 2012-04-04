@@ -440,6 +440,7 @@
            03  WRK-SKYEDYMD                PIC X(08).
       *    医療機関設定の入院料加算チェック用
            03  WRK-NYUKHNKSN-SRYCD         PIC X(09)  OCCURS 20.
+           03  WRK-KHN-NYUKSNKBN           PIC X(03).
            03  WRK-NYUKSNKBN               PIC X(03).
            03  WRK-BTU-NYUKSNKBN           PIC X(03).
            03  WRK-BTU-CDKBN-KBNNUM        PIC 9(03).
@@ -5519,6 +5520,7 @@
       *
            MOVE    SPACE               TO  WRK-KSNNAME
                                            WRK-NYUKSNKBN
+                                           WRK-KHN-NYUKSNKBN
                                            WRK-KSN-NYUKSNKBN
            MOVE    ZERO                TO  CNT-KSN
       *
@@ -5628,7 +5630,8 @@
                    END-EVALUATE
       *
                    PERFORM 900-TENSU-KEY-SEL-SEC
-                   MOVE    TNS-NYUKHNKSNKBN        TO  WRK-NYUKSNKBN
+                   MOVE    TNS-NYUKHNKSNKBN        TO  WRK-KHN-NYUKSNKBN
+                                                       WRK-NYUKSNKBN
                    IF    ( TNS-NYUKHNKSNKBN        >   ZERO )
                        PERFORM 900-NYUKSNCHK-KEY-SEL-SEC
                        IF    ( NYUKSNCHK-CHKKBN    =   "1" OR "2" )
@@ -5815,7 +5818,7 @@
       *****************************************************************
        410111-RYOYO-CHK-SEC        SECTION.
       *
-           EVALUATE    TNS-NYUKHNKSNKBN
+           EVALUATE    WRK-KHN-NYUKSNKBN
            WHEN    173 THRU 181
                IF    ( CONST-KSNCD (IDX-KSN)
                                        =   CONST-KSNCD-190143370 )
