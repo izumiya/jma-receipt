@@ -558,6 +558,7 @@
              AND ( TNS-DAYCNT              =   1 ))
             OR  (  SRY-SRYCD (IDX-SRYCD)   =   "099110001" )
             OR  (  SRY-SRYCD (IDX-SRYCD)   =   "111011810" )
+            OR  (  SRY-SRYCD (IDX-SRYCD)   =   "101110040" )
                MOVE    "1"                 TO  WRK-SYOSAISIN-KBN
            END-IF
       *
@@ -582,8 +583,20 @@
                                            OR  "112703450"
                                            OR  "112704450"
                                            OR  "112704850"
-                                           OR  "112705850" )
-               MOVE    "2"                 TO  WRK-SYOSAISIN-KBN
+                                           OR  "112705850"
+                                           OR  "101120100"
+                                           OR  "113013910"
+                                           OR  "113014010"
+                                           OR  "113014110"
+                                           OR  "112015810"
+                                           OR  "112015950"
+                                           OR  "112016210"
+                                                           )
+               IF    ( WRK-SYOSAISIN-KBN   =   "1" )
+                   CONTINUE
+               ELSE
+                   MOVE    "2"             TO  WRK-SYOSAISIN-KBN
+               END-IF
            END-IF
       *
            IF    ( SRY-SRYCD (IDX-SRYCD)   =  "099409903" )

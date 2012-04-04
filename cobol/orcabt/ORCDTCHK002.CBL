@@ -3012,7 +3012,9 @@
       *
            IF   (( TNS-JITUDAY     =   2 )
             AND  ( TNS-DAYCNT      =   1 ))
-            OR  (  TNS-SRYCD       =   "111011810" )
+            OR  (  TNS-SRYCD       =   "111011810"
+                                   OR  "101110040"
+                                                    )
       *
                PERFORM VARYING IDX2    FROM    1   BY  1
                        UNTIL ( IDX2    >   31 )
@@ -3024,7 +3026,9 @@
                        MOVE    1   TO  TSRYKA-SYOSIN-DAY
                                                  (IDX-TSRYKA IDX2)
       *
-                       IF    ( TNS-SRYCD       =   "111011810" )
+                       IF    ( TNS-SRYCD       =   "111011810"
+                                               OR  "101110040"
+                                                               )
                            CONTINUE
                        ELSE
                            MOVE    ORCBSD01-SRYYM
@@ -3423,7 +3427,17 @@
                                        OR  "112012210"
                                        OR  "112705850"
                                        OR  "112705950"
-                                       OR  "112706050" )
+                                       OR  "112706050"
+                                       OR  "111011810"
+                                       OR  "101110040"
+                                       OR  "101120100"
+                                       OR  "113013910"
+                                       OR  "113014010"
+                                       OR  "113014110"
+                                       OR  "112015810"
+                                       OR  "112015950"
+                                       OR  "112016210"
+                                                       )
       *
                    MOVE    1           TO  FLG-SHOSAISIN
       *
