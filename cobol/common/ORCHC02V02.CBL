@@ -392,11 +392,11 @@
                    07  WRK-FIL42           PIC X(06).
       *    薬剤名編集
        01  WRK-MEISAI-AREA.
-           03  WRK-M-NAME              PIC X(100).
+           03  WRK-M-NAME              PIC X(152).
            03  WRK-M-NAME-RR           REDEFINES    WRK-M-NAME.
       *        １行名称の最大
                05  WRK-M-NAME-R1           PIC X(76).
-               05  WRK-M-NAME-R2           PIC X(24).
+               05  WRK-M-NAME-R2           PIC X(76).
            03  WRK-M-KETA              PIC 9(03).
            03  WRK-FUKA-MEI-AREA.
       *        変更不可コード編集
