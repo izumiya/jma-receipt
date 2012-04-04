@@ -32,6 +32,7 @@
       *  04.02.00    NACL-多々納  08/03/XX  Ｈ２０年４月改正対応
       *  04.06.00    NACL-多々納  11/02/21  用法コメント対応
       *  04.06.00    NACL-多々納  12/03/XX  Ｈ２４年４月改正対応
+      *  04.06.00    NACL-多々納  12/04/04  薬品名称を４０文字までとする
       *****************************************************************
       *
       *
@@ -143,6 +144,10 @@
                    07  WRK-QR-JKYSNUM      PIC X(07).
                05  WRK-QR-FTNJA-N      PIC X(40).
                05  WRK-QR-JKYSNUM-N    PIC X(40).
+      *    薬品名称
+           03  WRK-NAME.
+               05  WRK-NAME-1          PIC X(80).
+               05  WRK-NAME-2          PIC X(20).
       *
       *    ＱＲテーブル
        01  TBL-QRCSV-AREA.
@@ -970,8 +975,14 @@
                                            TO  TBL-QRCSV-DATA (6)
            END-IF
       *
+      *H24.4 訂正
+      **** MOVE    ORCSQRCSV-TNS-NAME (IDX IDX2)
+      ****                             TO  TBL-QRCSV-DATA (7)
+      *    薬品の名称は４０文字とする
            MOVE    ORCSQRCSV-TNS-NAME (IDX IDX2)
-                                       TO  TBL-QRCSV-DATA (7)
+                                       TO  WRK-NAME
+           MOVE    WRK-NAME-1          TO  TBL-QRCSV-DATA (7)
+      *
            MOVE    ORCSQRCSV-SURYOU(IDX IDX2)  TO  WRK-SURYO
            PERFORM 20031-SURYO-HEN-SEC
            MOVE    WRK-SURYO-H         TO  TBL-QRCSV-DATA (8)
