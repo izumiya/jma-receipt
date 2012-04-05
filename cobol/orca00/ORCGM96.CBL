@@ -962,7 +962,24 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
            IF    ( FLG-ERR                 =   1 )
                MOVE    "0203"              TO  SPA-ERRCD
            ELSE
-               MOVE    "0202"              TO  SPA-MIDCD
+      *        プログラム更新ＪＯＢ管理存在チェック
+               PERFORM 820-JOBKANRI-READ2-SEC
+      *
+               MOVE    ZERO                 TO  FLG-ERR
+               IF    ( FLG-SJOBKANRI         =   ZERO )
+                   IF        ( JOB-ENDTIME   NOT =   SPACE )
+                       AND   ( JOB-ENDYMD    NOT =   SPACE )
+                       CONTINUE
+                   ELSE
+                       MOVE    1             TO  FLG-ERR
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-ERR                 =   1 )
+                   MOVE    "0501"              TO  SPA-ERRCD
+               ELSE
+                   MOVE    "0202"              TO  SPA-MIDCD
+               END-IF
            END-IF.
       *
        212-UPDATE-EXT.
@@ -1302,6 +1319,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    "0005"
                     MOVE    "ＪＯＢ管理情報は、ありません"
                                                 TO  SPA-ERRMSG
+                WHEN    "0501"
+                    MOVE    "プログラム更新が実行中です。"
+                                                TO  SPA-ERRMSG
                 WHEN    OTHER
                     MOVE    SPACE               TO  SPA-ERRMSG
             END-EVALUATE.
@@ -1447,6 +1467,33 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        820-JOBKANRI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ジョブ管理読込
+      *****************************************************************
+       820-JOBKANRI-READ2-SEC      SECTION.
+      *
+      *    プログラム更新チェック
+           MOVE    ZERO            TO  FLG-SJOBKANRI
+           INITIALIZE                  ORCSJOBKANRIAREA
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    1               TO  JOB-JOBID
+           MOVE    "PRGMNT"        TO  JOB-SHELLID
+      *
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           CALL    "ORCSJOB"           USING
+                                       ORCSJOBKANRIAREA
+                                       JOBKANRI-REC
+                                       SPA-AREA
+           IF      SJOBKANRI-RETURN    NOT =   ZERO
+               MOVE    1               TO  FLG-SJOBKANRI
+               INITIALIZE                  JOBKANRI-REC
+           END-IF
+      *
+           .
+       820-JOBKANRI-READ2-EXT.
            EXIT.
       *
       *****************************************************************
