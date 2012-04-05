@@ -108,6 +108,7 @@
       *    処理区分領域
        01  SKBN-AREA.
            03  SKBN-RUN            PIC X(03).
+           03  MST-RUN             PIC X(03).
       *
       *    一時領域
        01  WRK-AREA.
@@ -755,8 +756,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "0203"          TO  SPA-ERRCD
                PERFORM 510-ERRSET-SEC
            ELSE
-               MOVE    "0202"          TO  SPA-MIDCD
-               PERFORM 520-MIDSET-SEC
+               PERFORM 820-JOBKANRI-READ3-SEC
+      *
+               IF      MST-RUN         =   "RUN"
+                   MOVE    "0501"          TO  SPA-ERRCD
+                   PERFORM 510-ERRSET-SEC
+               ELSE
+                   MOVE    "0202"          TO  SPA-MIDCD
+                   PERFORM 520-MIDSET-SEC
+               END-IF
            END-IF
            .
       *
@@ -985,6 +993,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0203"
                    MOVE    "処理中です。"
                                             TO  SPA-ERRMSG
+               WHEN    "0501"
+                   MOVE    "マスタ更新が実行中です。"
+                                            TO  SPA-ERRMSG
                WHEN    OTHER
                    MOVE    SPACE            TO  SPA-ERRMSG
            END-EVALUATE
@@ -1106,6 +1117,60 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
       *
        820-JOBKANRI-READ2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ジョブ管理読込
+      *****************************************************************
+       820-JOBKANRI-READ3-SEC      SECTION.
+      *
+           MOVE    SPACE           TO  MST-RUN
+      *
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    1               TO  JOB-JOBID
+           MOVE    "MSTMNT"        TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           CALL    "ORCSJOB"           USING
+                                       ORCSJOBKANRIAREA
+                                       JOBKANRI-REC
+                                       SPA-AREA
+      *
+           IF      SJOBKANRI-RETURN    =   ZERO
+               IF     (JOB-ENDTIME     NOT =   SPACE)  AND
+                      (JOB-ENDYMD      NOT =   SPACE)
+                   CONTINUE
+               ELSE
+                   MOVE    "RUN"       TO  MST-RUN
+               END-IF
+           END-IF
+      *
+           IF      MST-RUN         =   "RUN"
+               GO  TO  820-JOBKANRI-READ3-EXT
+           END-IF
+      *
+           MOVE    "CHK"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    1               TO  JOB-JOBID
+           MOVE    "MSTMLI"        TO  JOB-SHELLID
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           CALL    "ORCSJOB"           USING
+                                       ORCSJOBKANRIAREA
+                                       JOBKANRI-REC
+                                       SPA-AREA
+      *
+           IF      SJOBKANRI-RETURN    =   ZERO
+               IF     (JOB-ENDTIME     NOT =   SPACE)  AND
+                      (JOB-ENDYMD      NOT =   SPACE)
+                   CONTINUE
+               ELSE
+                   MOVE    "RUN"       TO  MST-RUN
+               END-IF
+           END-IF
+      *
+           .
+      *
+       820-JOBKANRI-READ3-EXT.
            EXIT.
       *
       *****************************************************************
