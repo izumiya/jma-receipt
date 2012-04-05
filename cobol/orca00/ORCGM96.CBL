@@ -297,7 +297,23 @@
                WHEN    "0202"
       *            マスタ更新処理
                    IF      SPA-MID1-FLG        =   "OK"
-                       PERFORM 30012-KOUSIN-SYORI-SEC
+      *                プログラム更新ＪＯＢ管理存在チェック
+                       PERFORM 820-JOBKANRI-READ2-SEC
+                       MOVE    ZERO                 TO  FLG-ERR
+                       IF    ( FLG-SJOBKANRI         =   ZERO )
+                           IF        ( JOB-ENDTIME   NOT =   SPACE )
+                               AND   ( JOB-ENDYMD    NOT =   SPACE )
+                               CONTINUE
+                           ELSE
+                               MOVE    1             TO  FLG-ERR
+                           END-IF
+                       END-IF
+                       IF    ( FLG-ERR                 =   1 )
+                           MOVE    "0501"              TO  SPA-ERRCD
+                           PERFORM 510-ERRSET-SEC
+                       ELSE
+                           PERFORM 30012-KOUSIN-SYORI-SEC
+                       END-IF
                    END-IF
                WHEN    "0301"
       *            終了処理
