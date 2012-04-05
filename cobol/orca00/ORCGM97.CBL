@@ -421,8 +421,13 @@
                    END-IF
                WHEN    "0202"
                    IF      SPA-MID1-FLG    =   "OK"
-      *            更新処理
-                       PERFORM 420-KOUSHIN-SEC
+                       PERFORM 820-JOBKANRI-READ3-SEC
+                       IF      MST-RUN         =   "RUN"
+                           MOVE    "0501"          TO  SPA-ERRCD
+                       ELSE
+      *                    更新処理
+                          PERFORM 420-KOUSHIN-SEC
+                       END-IF
                    END-IF
                WHEN    "0204"
                WHEN    "0206"
