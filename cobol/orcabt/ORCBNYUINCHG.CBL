@@ -88,6 +88,7 @@
            03  FLG-DBRC                    PIC 9(01).
            03  FLG-TAISYO                  PIC 9(01).
            03  FLG-NG                      PIC 9(01).
+           03  FLG-WWK-PTNYUINRRK          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -206,6 +207,7 @@
            03  WRK-STYUKYMD                PIC X(08).
            03  WRK-NYUINYM                 PIC X(06).
            03  WRK-TOKUBETSU-NYUIN         PIC X(01).
+           03  WRK-TOKUTEI-TENNYUYMD  PIC X(08).
       *    特定入院料の会計作成後に一般の入院料で会計を作成するための
       *    領域
            03  WK-TOKUTEI-DAY              PIC 9(04).
@@ -280,6 +282,10 @@
        01  WK-PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC"     REPLACING
                                 //PTNYUINRRK-// BY //WK-PTNYUINRRK-//.
+      *    入院履歴退避用ワーク
+       01  WWK-PTNYUINRRK-REC.
+           COPY    "CPPTNYUINRRK.INC"     REPLACING
+                                //PTNYUINRRK-// BY //WWK-PTNYUINRRK-//.
       *    特定入院期間算定用ワーク
        01  WRK-SCNYUACCT-AREA.
            03  WRK-SCNYUACCT-KAGENCD-TBL         OCCURS  7.
@@ -2124,14 +2130,56 @@
                                                                     (1)
                MOVE   SPACE            TO  WRK-SCNYUACCT-AREA
                INITIALIZE                  WRK-SCNYUACCT-AREA
+      *
+      *        緩和ケアの算定開始日を検索
+               MOVE   SPACE            TO  WRK-TOKUTEI-TENNYUYMD
+               INITIALIZE                  WWK-PTNYUINRRK-REC
+               MOVE   SPA-HOSPNUM      TO  WWK-PTNYUINRRK-HOSPNUM
+               MOVE   PTNYUINRRK-PTID  TO  WWK-PTNYUINRRK-PTID
+               MOVE   PTNYUINRRK-RRKNUM TO WWK-PTNYUINRRK-RRKNUM
+               PERFORM    980-PTNYUINRRK-SELECT-SEC
+               IF     FLG-WWK-PTNYUINRRK   =   ZERO
+                   MOVE  "tbl_ptnyuinrrk"  TO  MCP-TABLE
+                   MOVE  "key4"            TO  MCP-PATHNAME
+                   PERFORM 980-PTNYUINRRK-READ-SEC
+                   IF   ( PTNYUINRRK-TOKUTEI-KBN  =
+                                   WWK-PTNYUINRRK-TOKUTEI-KBN ) AND
+                        ( PTNYUINRRK-TOKUTEI-NYUIN  =
+                                   WWK-PTNYUINRRK-TOKUTEI-NYUIN )
+                       MOVE   WWK-PTNYUINRRK-TENNYUYMD
+                                           TO   WRK-TOKUTEI-TENNYUYMD
+                   END-IF
+                   PERFORM   UNTIL  ( FLG-WWK-PTNYUINRRK   =   1 )  OR
+                                    ( PTNYUINRRK-TOKUTEI-KBN NOT =
+                                       WWK-PTNYUINRRK-TOKUTEI-KBN ) OR
+                                    ( PTNYUINRRK-TOKUTEI-NYUIN NOT =
+                                       WWK-PTNYUINRRK-TOKUTEI-NYUIN )
+                       MOVE  "tbl_ptnyuinrrk"  TO  MCP-TABLE
+                       MOVE  "key4"            TO  MCP-PATHNAME
+                       PERFORM 980-PTNYUINRRK-READ-SEC
+                       IF   ( PTNYUINRRK-TOKUTEI-KBN  =
+                                       WWK-PTNYUINRRK-TOKUTEI-KBN ) AND
+                            ( PTNYUINRRK-TOKUTEI-NYUIN  =
+                                       WWK-PTNYUINRRK-TOKUTEI-NYUIN )
+                           MOVE   WWK-PTNYUINRRK-TENNYUYMD
+                                            TO   WRK-TOKUTEI-TENNYUYMD
+                       END-IF
+                   END-PERFORM
+               END-IF
+               MOVE  "tbl_ptnyuinrrk"  TO  MCP-TABLE
+               MOVE  "key4"            TO  MCP-PATHNAME
+               PERFORM 900-CLOSE-SEC
+      *
                MOVE   "190028910"      TO  WRK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
+      **         MOVE   PTNYUINRRK-TENNYUYMD
+               MOVE   WRK-TOKUTEI-TENNYUYMD
                                        TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
                                                                     (1)
                INITIALIZE                  STS-AREA-DAY
                INITIALIZE                  LNK-DAY6-AREA
                MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
+      **         MOVE   PTNYUINRRK-TENNYUYMD
+               MOVE   WRK-TOKUTEI-TENNYUYMD
                                        TO  LNK-DAY6-KIJUN
                MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
                MOVE    29              TO  LNK-DAY6-ZOGEN
@@ -2155,7 +2203,8 @@
                INITIALIZE                  STS-AREA-DAY
                INITIALIZE                  LNK-DAY6-AREA
                MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
+      **         MOVE   PTNYUINRRK-TENNYUYMD
+               MOVE   WRK-TOKUTEI-TENNYUYMD
                                        TO  LNK-DAY6-KIJUN
                MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
                MOVE    59              TO  LNK-DAY6-ZOGEN
@@ -5113,6 +5162,44 @@
            .
       *
        910-DBUPDATE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者入院履歴マスター検索
+      *****************************************************************
+       980-PTNYUINRRK-SELECT-SEC     SECTION.
+      *
+           MOVE    WWK-PTNYUINRRK-REC   TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    ZERO             TO  FLG-WWK-PTNYUINRRK
+           ELSE
+               MOVE    1                TO  FLG-WWK-PTNYUINRRK
+               INITIALIZE                   WWK-PTNYUINRRK-REC
+           END-IF
+      *
+           .
+      *
+       980-PTNYUINRRK-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者入院履歴マスター読込
+      *****************************************************************
+       980-PTNYUINRRK-READ-SEC     SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  WWK-PTNYUINRRK-REC
+               MOVE    ZERO            TO  FLG-WWK-PTNYUINRRK
+           ELSE
+               INITIALIZE                  WWK-PTNYUINRRK-REC
+               MOVE    1               TO  FLG-WWK-PTNYUINRRK
+           END-IF.
+      *
+       980-PTNYUINRRK-READ-EXT.
            EXIT.
       *
       *****************************************************************

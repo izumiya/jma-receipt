@@ -15055,6 +15055,13 @@
       *             MOVE   SPA-NAI-I01-TAIINYMD
       *                                 TO   PTNYUINRRK-TENNYUYMD
                END-IF
+      *        ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ»»Äê»þ¤ËÂà±¡Æü¤ò£Ó£Ð£Á¡Ý°ÛÆ°Æü¤ÈÅ¾ÆþÆü¤Ë¥»¥Ã¥È
+               IF   (PTNYUINRRK-TOKUTEI-KBN   =   "2")  AND
+                    (PTNYUINRRK-TOKUTEI-NYUIN  = "09")
+                    MOVE   SPA-NAI-I01-TAIINYMD
+                                       TO   PTNYUINRRK-TENNYUYMD
+                                            SPA-NAI-I01-IDOYMD
+               END-IF
            END-IF
       *
       *    Âà±¡¼è¾ÃÁ°¤Î²ñ·×¸µ¥Ç¡¼¥¿ºîÀ®
@@ -15822,24 +15829,30 @@
       *    ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡ÊÊ¿À®£²£´Ç¯£´·î¤«¤é¤Î´ü´ÖÂÐ±þ¡Ë
            IF    SPA-NAI-I01-NYUINYMD   >=  "20120401"
              IF  SYOKIKSN-IN-KHNSRYCD   =   "190028910"
+                 DISPLAY "=============TAIIN-CANCEL============="
+                 DISPLAY "STUSAN-NISSU07 = " STUSAN-NISSU07
+                 DISPLAY "SPA-NAI-I01-NYUINYMD = "
+                          SPA-NAI-I01-NYUINYMD
+                 DISPLAY "SPA-NAI-I01-TAIINYMD = "
+                          SPA-NAI-I01-TAIINYMD
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
-                 IF     STUSAN-NISSU03      <=  30
+                 IF     STUSAN-NISSU07      <=  30
                      ADD    1           TO  TN-IDX
                      MOVE   "190028910" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
       *              ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ¤Î£³£°Æü°ÊÆâ¤Î½ªÆü
       *              ¤òºÆ·×»»
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  30  - STUSAN-NISSU03
-                     MOVE   SPA-NAI-I01-NYUINYMD
+                     COMPUTE  WK-TOKUTEI-DAY  =  29  - STUSAN-NISSU07
+                     MOVE   SPA-NAI-I01-TAIINYMD
                                        TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
                                                                (TN-IDX)
                      INITIALIZE                STS-AREA-DAY
                      INITIALIZE                LNK-DAY6-AREA
                      MOVE    "61"              TO  LNK-DAY6-IRAI
-                     MOVE   SPA-NAI-I01-NYUINYMD
+                     MOVE   SPA-NAI-I01-TAIINYMD
                                                TO  LNK-DAY6-KIJUN
                      MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
                      MOVE    WK-TOKUTEI-DAY    TO  LNK-DAY6-ZOGEN
@@ -15850,13 +15863,13 @@
                                                                (TN-IDX)
                  END-IF
       *
-                 IF     STUSAN-NISSU03      <=  60
+                 IF     STUSAN-NISSU07      <=  60
                      ADD    1           TO  TN-IDX
                      MOVE   "190150510" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
       *              ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ¤Î£¶£°Æü°ÊÆâ¤Î³«»ÏÆü¥»¥Ã¥È
                      IF     TN-IDX        =      1
-                         MOVE   SPA-NAI-I01-NYUINYMD
+                         MOVE   SPA-NAI-I01-TAIINYMD
                                        TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
                                                                (TN-IDX)
                      END-IF
@@ -15874,11 +15887,11 @@
       *              ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ¤Î£¶£°Æü°ÊÆâ¤Î½ªÆü
       *              ¤òºÆ·×»»
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  60  - STUSAN-NISSU03
+                     COMPUTE  WK-TOKUTEI-DAY  =  59  - STUSAN-NISSU07
                      INITIALIZE                STS-AREA-DAY
                      INITIALIZE                LNK-DAY6-AREA
                      MOVE    "61"              TO  LNK-DAY6-IRAI
-                     MOVE   SPA-NAI-I01-NYUINYMD
+                     MOVE   SPA-NAI-I01-TAIINYMD
                                                TO  LNK-DAY6-KIJUN
                      MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
                      MOVE    WK-TOKUTEI-DAY    TO  LNK-DAY6-ZOGEN
@@ -15918,7 +15931,7 @@
                                    TO LNK-SCNYUACCT-KAGEN-STYUKYMD
                                                            (TN-IDX)
                      ELSE
-                         MOVE    SPA-NAI-I01-NYUINYMD
+                         MOVE    SPA-NAI-I01-TAIINYMD
                                        TO LNK-SCNYUACCT-KAGEN-STYUKYMD
                                                                (TN-IDX)
                      END-IF
@@ -19202,14 +19215,14 @@
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
-                 IF     STUSAN-NISSU03      <=  30
+                 IF     STUSAN-NISSU07      <=  30
                      ADD    1           TO  TN-IDX
                      MOVE   "190028910" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
       *              ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ¤Î£³£°Æü°ÊÆâ¤Î½ªÆü
       *              ¤òºÆ·×»»
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  30  - STUSAN-NISSU03
+                     COMPUTE  WK-TOKUTEI-DAY  =  29  - STUSAN-NISSU07
                      MOVE   SPA-NAI-I01-IDOYMD
                                        TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
                                                                (TN-IDX)
@@ -19227,7 +19240,7 @@
                                                                (TN-IDX)
                  END-IF
       *
-                 IF     STUSAN-NISSU03      <=  60
+                 IF     STUSAN-NISSU07      <=  60
                      ADD    1           TO  TN-IDX
                      MOVE   "190150510" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
@@ -19251,7 +19264,7 @@
       *              ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ¤Î£¶£°Æü°ÊÆâ¤Î½ªÆü
       *              ¤òºÆ·×»»
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  60  - STUSAN-NISSU03
+                     COMPUTE  WK-TOKUTEI-DAY  =  59  - STUSAN-NISSU07
                      INITIALIZE                STS-AREA-DAY
                      INITIALIZE                LNK-DAY6-AREA
                      MOVE    "61"              TO  LNK-DAY6-IRAI
@@ -22628,14 +22641,14 @@
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
-                 IF     STUSAN-NISSU03      <=  30
+                 IF     STUSAN-NISSU07      <=  30
                      ADD    1           TO  TN-IDX
                      MOVE   "190028910" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
       *              ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ¤Î£³£°Æü°ÊÆâ¤Î½ªÆü
       *              ¤òºÆ·×»»
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  30  - STUSAN-NISSU03
+                     COMPUTE  WK-TOKUTEI-DAY  =  29  - STUSAN-NISSU07
                      MOVE   SPA-NAI-I01-MAEIDOYMD
                                        TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
                                                                (TN-IDX)
@@ -22653,7 +22666,7 @@
                                                                (TN-IDX)
                  END-IF
       *
-                 IF     STUSAN-NISSU03      <=  60
+                 IF     STUSAN-NISSU07      <=  60
                      ADD    1           TO  TN-IDX
                      MOVE   "190150510" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
@@ -22677,7 +22690,7 @@
       *              ´ËÏÂ¥±¥¢ÉÂÅïÆþ±¡ÎÁ¤Î£¶£°Æü°ÊÆâ¤Î½ªÆü
       *              ¤òºÆ·×»»
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  60  - STUSAN-NISSU03
+                     COMPUTE  WK-TOKUTEI-DAY  =  59  - STUSAN-NISSU07
                      INITIALIZE                STS-AREA-DAY
                      INITIALIZE                LNK-DAY6-AREA
                      MOVE    "61"              TO  LNK-DAY6-IRAI
