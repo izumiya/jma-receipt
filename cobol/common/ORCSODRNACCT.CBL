@@ -3439,7 +3439,7 @@
                MOVE   ZERO     TO     FLG-NYUKSN
            END-IF
       *
-      *    表用番号が同一であることの判定
+      *    注加算の表用番号が同一であることの判定
            IF   WRK-KSN-CDKBN-KBNNUM    NOT =    ZERO
               IF  (WRK-BTU-CDKBN-KBNNUM  = WRK-KSN-CDKBN-KBNNUM)  AND
                   (WRK-BTU-CDKBN-KBNNUM-EDA = WRK-KSN-CDKBN-KBNNUM-EDA)
@@ -5359,14 +5359,14 @@
                  MOVE   SPACE       TO   SYOKIKSN-IN-KHNSRYCD
                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
                  MOVE   ZERO            TO  TN-IDX
-                 IF     STUSAN-NISSU03      <=  30
+                 IF     STUSAN-NISSU07      <=  30
                      ADD    1           TO  TN-IDX
                      MOVE   "190028910" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
       *              緩和ケア病棟入院料の３０日以内の終日
       *              を再計算
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  30  - STUSAN-NISSU03
+                     COMPUTE  WK-TOKUTEI-DAY  =  29  - STUSAN-NISSU07
                      MOVE   LNK-PTNYUINRRK-TENNYUYMD
                                        TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
                                                                (TN-IDX)
@@ -5384,7 +5384,7 @@
                                                                (TN-IDX)
                  END-IF
       *
-                 IF     STUSAN-NISSU03      <=  60
+                 IF     STUSAN-NISSU07      <=  60
                      ADD    1           TO  TN-IDX
                      MOVE   "190150510" TO   LNK-SCNYUACCT-KAGEN-SRYCD
                                                                (TN-IDX)
@@ -5408,7 +5408,7 @@
       *              緩和ケア病棟入院料の６０日以内の終日
       *              を再計算
                      MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                     COMPUTE  WK-TOKUTEI-DAY  =  60  - STUSAN-NISSU03
+                     COMPUTE  WK-TOKUTEI-DAY  =  59  - STUSAN-NISSU07
                      INITIALIZE                STS-AREA-DAY
                      INITIALIZE                LNK-DAY6-AREA
                      MOVE    "61"              TO  LNK-DAY6-IRAI
