@@ -10147,6 +10147,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                   (FLG-END             =   1     )
                GO      TO      480-DOSYORI-EXT
            END-IF
+      *    行挿入行をなくす
+           IF      FLG-INS             =   1
+               PERFORM 420-SYOKYO-SEC
+           END-IF
       *
       **** MOVE    ZERO                TO  SPA-NAI-DOSELNUM
            MOVE    SPACE               TO  SPA-GMN-DOSELNUM
