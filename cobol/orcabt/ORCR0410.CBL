@@ -81,6 +81,9 @@
       *                                     ¡ÊµÙ¶È¾ÚÌÀÀÁµá»þ¡Ë
       *  04.05.02    NACL-ÌçÏÆ    10/01/21  ¼£¸³ÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    11/10/07  ÎÅÍÜ´ü´Ö¡Ê½ªÎ»Æü¡Ë¤ÎÊÔ½¸½¤Àµ
+      *  04.05.04    NACL-ÌçÏÆ    12/04/02  Ê¿À®£²£´Ç¯£´·î²þÀµ
+      *                                     ¼ÂÆü¿ô¥«¥¦¥ó¥ÈÂÐ±þ
+      *                                     Ï«ºÒºÆ¿Ç¡ÊÆ±°ìÆü£²²ÊÌÜ¡ËÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
@@ -324,6 +327,7 @@
            03  CONS-ROUSAI16   PIC X(09)   VALUE   "101130090".
            03  CONS-ROUSAI17   PIC X(09)   VALUE   "101130100".
            03  CONS-ROUSAI18   PIC X(09)   VALUE   "101110040".
+           03  CONS-ROUSAI19   PIC X(09)   VALUE   "101120100".
       *
            03  CONS-GAIRAI1    PIC X(09)   VALUE   "101120070".
            03  CONS-GAIRAI2    PIC X(09)   VALUE   "101120080".
@@ -1236,15 +1240,71 @@ grpsys     PERFORM 900-DBSELECT-SEC
       ****                            (SRY-SRYCD(IDY) =   SPACE)  OR
       ****                            (FLG-SHOSAISIN  =       1)
                        PERFORM   800-TENSU-TBL-SEC
+      *
                        IF  (( TNS-JITUDAY    =     2          ) AND       
                             ( TNS-DAYCNT     =     1   OR   2 ))
-                       OR  (  SRY-SRYCD(IDY) =  "099409901"   
-                                             OR "099999902"    
-                                             OR "099110001"
-                                             OR "099120001"
-                                             OR "112011710"
-                                             OR "112705850"
-                                             OR  CONS-ROUSAI18 )
+                       OR  (  SRY-SRYCD(IDY) =   "112700850"
+                                              OR "112003350"
+                                              OR "099409901"
+                                              OR "099999902"
+                                              OR "099110001"
+                                              OR "099120001"
+      *                              Æ±ÆüºÆ¿Ç
+                                              OR "112010150"
+                                              OR "112010250"
+                                              OR "112010350"
+                                              OR "112010450"
+                                              OR "112010550"
+                                              OR "112704450"
+                                              OR "112704550"
+                                              OR "112704650"
+                                              OR "112704750"
+                                              OR "112010650"
+                                              OR "112010750"
+                                              OR "112010850"
+                                              OR "112010950"
+                                              OR "112012850"
+                                              OR "112704850"
+                                              OR "112704950"
+                                              OR "112705050"
+                                              OR "112706850"
+                                              OR "112008850"
+                                              OR "112008950"
+                                              OR "112009050"
+                                              OR "112009150"
+                                              OR "112012550"
+                                              OR "112703450"
+                                              OR "112703550"
+                                              OR "112703650"
+                                              OR "112706550"
+                                              OR "112008350"
+                                              OR "112008450"
+                                              OR "112008550"
+                                              OR "112008650"
+                                              OR "112008750"
+                                              OR "112703050"
+                                              OR "112703150"
+                                              OR "112703250"
+                                              OR "112703350"
+      *
+                                              OR "112011710"
+                                              OR "112011810"
+                                              OR "112011910"
+                                              OR "112012010"
+                                              OR "112012210"
+                                              OR "112705850"
+                                              OR "112705950"
+                                              OR "112706050"
+      *
+                                              OR "111011810"
+                                              OR "113013910"
+                                              OR "113014010"
+                                              OR "113014110"
+                                              OR "112015810"
+                                              OR "112015950"
+                                              OR "112016210"
+                                              OR  CONS-ROUSAI18
+                                              OR  CONS-ROUSAI19)
       *
                           MOVE       1      TO    FLG-SHOSAISIN
       *
@@ -1465,7 +1525,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               CONS-ROUSAI15 OR
                                               CONS-ROUSAI16 OR
                                               CONS-ROUSAI17 OR
-                                              CONS-ROUSAI18   )
+                                              CONS-ROUSAI18 OR
+                                              CONS-ROUSAI19   )
                        OR ((ACCT-SRYKBN         =  "80"      )   AND
                            (SRY-SRYCD(IDY)(1:5) =  "09593"   ))
                        OR ((SRY-SRYCD(IDY) =  CONS-ROUSAI8   )   AND
@@ -1714,7 +1775,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               CONS-ROUSAI15 OR
                                               CONS-ROUSAI16 OR
                                               CONS-ROUSAI17 OR
-                                              CONS-ROUSAI18    )
+                                              CONS-ROUSAI18 OR
+                                              CONS-ROUSAI19    )
                        OR ((SRY-SRYCD(IDY) =  CONS-ROUSAI8    ) AND
                            (RECE41-SRYYM   <  "200804"        ))
       *

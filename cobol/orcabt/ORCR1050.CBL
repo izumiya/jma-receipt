@@ -58,6 +58,9 @@
       *  04.05.05    NACL-門脇    10/01/26  東京都マル子追加対応
       *  04.05.06    NACL-門脇    11/02/28  長崎県地方公費対応
       *  04.05.07    NACL-門脇    11/11/30  画像診断フイルム分画数対応
+      *  04.05.08    NACL-門脇    12/04/02  平成２４年４月改正
+      *                                     「再診」の対応
+      *                                     「その他」の対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -556,7 +559,7 @@
       *
       *    電子化加算等情報
        01  TBL-DENSHI-INF.
-         02    TBL-DENSHI-OCC              OCCURS  10.
+         02    TBL-DENSHI-OCC              OCCURS  12.
            03  TBL-DENSHI-FLG              PIC  9(01).
            03  TBL-DENSHI-TEN              PIC  9(07).
            03  TBL-DENSHI-ZAIKAISU         PIC  9(04).
@@ -707,6 +710,10 @@
            03  FILLER          PIC X(09)   VALUE   "112015670".
       *    明細書発行体制等加算
            03  FILLER          PIC X(09)   VALUE   "112015770".
+      *    時間外対応加算１
+           03  FILLER          PIC X(09)   VALUE   "112016070".
+      *    時間外対応加算３
+           03  FILLER          PIC X(09)   VALUE   "112016170".
       *
       *    診察料未算定扱い
            03  FILLER          PIC X(09)   VALUE   "099409905".
@@ -714,9 +721,9 @@
            03  FILLER          PIC X(09)   VALUE   "099409907".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   66.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   68.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   66.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   68.         
       *
       *    固定値
        01  CONST-AREA.
@@ -1110,7 +1117,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *        電子化加算編集
                MOVE    ZERO      TO    FLG-TEIGEN
                PERFORM  VARYING  IDX6   FROM   1   BY  1
-                         UNTIL   IDX6    >    10
+                         UNTIL   IDX6    >    12
                  IF      TBL-DENSHI-FLG(IDX6)  =   1
                    PERFORM 2010-DENSHI-HENSYU-SEC
                  END-IF
@@ -1653,7 +1660,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                           "112014370"  OR  "112015070"   ))
            OR (( RECE100-SRYYM   >=  "201004"            ) AND
                ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                      =   "112015670"  OR  "112015770"   ))
+                      =   "112015670"  OR  "112015770"  OR
+                          "112016070"  OR  "112016170"   ))
       *
              EVALUATE   TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                WHEN       "112001410"
@@ -1668,10 +1676,14 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                   MOVE     7     TO     IDX6
                WHEN       "112015570"
                   MOVE     8     TO     IDX6
-               WHEN       "112015670"
+               WHEN       "112016070"
                   MOVE     9     TO     IDX6
-               WHEN       "112015770"
+               WHEN       "112015670"
                   MOVE    10     TO     IDX6
+               WHEN       "112016170"
+                  MOVE    11     TO     IDX6
+               WHEN       "112015770"
+                  MOVE    12     TO     IDX6
              END-EVALUATE
       *
              MOVE     1              TO  TBL-DENSHI-FLG(IDX6)
@@ -2688,6 +2700,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                  WHEN      8
                  WHEN      9
                  WHEN     10
+                 WHEN     11
+                 WHEN     12
       *
                    MOVE    SPACE             TO  WRK-ZAI
                    MOVE    TBL-DENSHI-TEN(IDX6)  TO  WRK-ZAITENX
@@ -2701,15 +2715,31 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                      WHEN      1
                        MOVE  "電子化加算"    TO  WRK-ZAI-NAME(1:10)
                      WHEN      3
+                      IF   RECE100-SRYYM  >=  "201204"
+                       MOVE  "再診（時間外特例）加算"
+                                             TO  WRK-ZAI-NAME(1:22)
+                      ELSE
                        MOVE  "時間外特例（再診）"
                                              TO  WRK-ZAI-NAME(1:18)
+                      END-IF
                      WHEN      8
                        MOVE  "再診（夜間・早朝等）加算"
                                              TO  WRK-ZAI-NAME(1:24)
                      WHEN      9
-                       MOVE  "地域医療貢献加算"
+                       MOVE  "時間外対応加算１"
                                              TO  WRK-ZAI-NAME(1:16)
                      WHEN     10
+                      IF   RECE100-SRYYM  >=  "201204"
+                       MOVE  "時間外対応加算２"
+                                             TO  WRK-ZAI-NAME(1:16)
+                      ELSE
+                       MOVE  "地域医療貢献加算"
+                                             TO  WRK-ZAI-NAME(1:16)
+                      END-IF
+                     WHEN     11
+                       MOVE  "時間外対応加算３"
+                                             TO  WRK-ZAI-NAME(1:16)
+                     WHEN     12
                        MOVE  "明細書発行体制等加算"
                                              TO  WRK-ZAI-NAME(1:20)
                    END-EVALUATE
@@ -2791,6 +2821,10 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                COMPUTE RECE140-ZAINUM   = 99994081
              WHEN    10
                COMPUTE RECE140-ZAINUM   = 99994091
+             WHEN    11
+               COMPUTE RECE140-ZAINUM   = 99994101
+             WHEN    12
+               COMPUTE RECE140-ZAINUM   = 99994111
            END-EVALUATE
       *
            MOVE    1                 TO  RECE140-ZAIMEISAISU
@@ -2808,6 +2842,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
              WHEN     8
              WHEN     9
              WHEN    10
+             WHEN    11
+             WHEN    12
                 MOVE    "12"         TO  RECE140-SRYKBN
            END-EVALUATE
       *
@@ -3434,7 +3470,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                  IF  WRK-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
-                                       "120003270" OR "120003470"
+                                       "120003270" OR "120003470" OR
+                                       "120003570"
                        MOVE   ZERO   TO   RECE140-SYOHOUFLG
                  ELSE
                        MOVE    1     TO   RECE140-SYOHOUFLG

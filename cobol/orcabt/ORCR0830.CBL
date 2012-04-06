@@ -68,6 +68,8 @@
       *  04.05.02    NACL-ÌçÏÆ    11/08/16  Ï«ºÒÉÂ°áÂßÍ¿ÎÁÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
       *  04.05.04    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
+      *  04.05.05    NACL-ÌçÏÆ    12/04/02  Ê¿À®£²£´Ç¯£´·î²þÀµ
+      *                                     ³°Çñ¶èÊ¬£¶¡¥£·¤ÎÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
@@ -980,6 +982,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       **                                                "099999902" OR
       **                                                "099110001" OR
       **                                                "099120001" OR
+      **                                                "111011810" OR
       **                                                 CONS-ROUSAI21 )
       **                     MOVE    1       TO   FLG-SHOSAISIN
       **                 END-IF
@@ -1348,8 +1351,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     IF  WRK-DAY1(IDY) NOT =  ZERO 
                     AND WRK-DAY5(IDY)  =  RECE82-HKNCOMBI
                          IF   (WRK-DAY4(IDY)   NOT =    ZERO)  
-                         AND  (WRK-DAY2(IDY)  =    ZERO  OR  4
-                                                         OR  5)
+                         AND  (WRK-DAY2(IDY)   =
+                                    ZERO OR 4 OR 5 OR 6 OR 7)
                          AND  (WRK-SHOKUJIRYOYO(IDY)  NOT = ZERO)
                               PERFORM   2501-NYUINKHN-GET4-SEC
                          END-IF
@@ -1560,8 +1563,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
               AND  ( WRK-DAY5(IDY)      =  RECE82-HKNCOMBI )
                   IF  (WRK-DAY7(IDY)          NOT =  ZERO)
                   AND (WRK-DAY7-ZAITEN(IDY)   NOT =  ZERO)
-                  AND (WRK-DAY2(IDY)              =  ZERO  OR  4
-                                                           OR  5)
+                  AND (WRK-DAY2(IDY)          =
+                                 ZERO OR 4 OR 5 OR 6 OR 7)
                      IF    RECE82-HKNKBN   =   "4"
                       EVALUATE  RECE82-JIBAIKBN
                        WHEN  "1"

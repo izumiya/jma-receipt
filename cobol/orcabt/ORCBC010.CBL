@@ -59,6 +59,9 @@
       *                                     から振り出す
       *  04.05.04    NACL-太田    10/06/04  外泊の剤に入院料を編集する
       *                                     選定入院中の外泊剤を読み飛ばす
+      *  04.05.05    NACL-門脇    12/04/02  平成２４年４月改正
+      *                                     実日数カウント対応
+      *                                     外泊区分６．７の対応
       *
       *  04.06.01    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
       *                                     は公費単独のレセプトとする
@@ -1524,10 +1527,9 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
       *
            PERFORM VARYING    IDX6   FROM  1  BY  1
                    UNTIL      IDX6     >   31
-               IF (WRK-DAY (3 IDX6)    >   ZERO)        AND
-                  (WRK-DAY (2 IDX6)    NOT =   ZERO)    AND
-                  (WRK-DAY (4 IDX6)    =   ZERO  OR  4
-                                                 OR  5)
+               IF  (WRK-DAY (3 IDX6)    >   ZERO                    )
+               AND (WRK-DAY (2 IDX6)    NOT =   ZERO                )
+               AND (WRK-DAY (4 IDX6)    =   ZERO OR 4 OR 5 OR 6 OR 7)
                  IF  (WRK-DAY(2 IDX6)  =   WRK-COMB-HKNCOMBINUM (IDX2))
       *ito 20080425 IF  (COLDAT01-HKNNUM      NOT =   SPACE)   OR
       *ito              (COLDAT01-RJNHKNNUM   NOT =   SPACE)
@@ -3834,15 +3836,7 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
            IF      SRY-SRYCD(IDX2)(1:1)     =   "0" OR  "1" OR
                                                 "6" OR  "7" OR
                                                 "8"
-            IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
-            OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
-            OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
-                    (TNS-TEN               =  ZERO )       )
-            OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-            OR     ( SRY-SRYCD(IDX2)       =  "099209903"  )
-               CONTINUE
-            ELSE
-      **診療実日数のカウントを行える剤であるかの判定
+      *        診療実日数のカウントを行える剤であるかの判定
                IF  ((ACCT-ZAITEN    NOT =    ZERO)    AND
                     (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                     (ACCT-SRYKBN        =  "11"  OR  "12"  OR
@@ -3907,14 +3901,21 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                                               OR "112705950"
                                               OR "112706050"
       *
-                                              OR "111011810"      )
+                                              OR "111011810"
+                                              OR "113013910"
+                                              OR "113014010"
+                                              OR "113014110"
+                                              OR "112015810"
+                                              OR "112015950"
+                                              OR "112016210"
+                                              OR "101110040"
+                                              OR "101120100"      )
                              MOVE    1      TO    FLG-SHOSAISIN
                        END-IF
                        IF    SRY-SRYCD(IDX2)  =  "099409903"
                              MOVE    1      TO    FLG-SHOSAISIN-GEN
                        END-IF
                END-IF
-            END-IF
            END-IF
       *
            PERFORM    VARYING   IDX3    FROM   1   BY   1
