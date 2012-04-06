@@ -823,6 +823,8 @@
            03  WK-SYUNOU-GENBUTU-KOREI-SKYMONEY2        PIC  9(07).
            03  WK-SYUNOU-GENBUTU-KOREI-SYUHKNFLG        PIC  9(01).
       *
+           03  WK-SYUNOU-GENBUTU-SECMONEY-MAE           PIC  9(07).
+      *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â²ó¿ô¤È¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
            03  MAX-KAI-KOHI1-D         PIC 9(05).
@@ -6100,6 +6102,7 @@
            MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-KOREI-SKYMONEY.
            MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-KOREI-SKYMONEY2.
            MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-KOREI-SYUHKNFLG.
+           MOVE   ZERO   TO   WK-SYUNOU-GENBUTU-SECMONEY-MAE.
            IF    LNK-SYU-SRYYMD(1:6)   >=  "201204"
              IF  (FLG-GENBUTU70           NOT =   ZERO)
              AND (FLG-OITA-GENBUTU70          =   ZERO)
@@ -9333,6 +9336,38 @@
                   COMPUTE  MAX-KIN-SYU-M =
                            MAX-KIN-SYU-M *  10
                END-IF
+             END-IF
+      *
+           END-IF
+      *
+           IF   (LNK-S01-KOUREI-ZAITAKU-KBN   =  "1" )
+           OR   (FLG-GENBUTU70            NOT =  ZERO)
+      *
+             IF    WK-GENBUTU-SYUMAXKIN   NOT =  ZERO
+               EVALUATE   WK-GENGAKUKBN
+                 WHEN          1
+                    IF  WK-GENGAKU-RITU = 100
+                      MOVE   ZERO   TO   WK-GENBUTU-SYUMAXKIN
+                    ELSE
+                      COMPUTE  WK-GENGAKU-RITUX =
+                               100 - WK-GENGAKU-RITU
+                      COMPUTE  WK-GENBUTU-SYUMAXKIN  =
+                               WK-GENBUTU-SYUMAXKIN  *
+                               WK-GENGAKU-RITUX      /
+                               100
+                    END-IF
+                 WHEN          2
+                    CONTINUE
+                 WHEN          3
+                 WHEN          4
+                    MOVE   ZERO   TO   WK-GENBUTU-SYUMAXKIN
+               END-EVALUATE
+               COMPUTE  WK-GENBUTU-SYUMAXKIN =
+                        WK-GENBUTU-SYUMAXKIN +  5
+               COMPUTE  WK-GENBUTU-SYUMAXKIN =
+                        WK-GENBUTU-SYUMAXKIN /  10
+               COMPUTE  WK-GENBUTU-SYUMAXKIN =
+                        WK-GENBUTU-SYUMAXKIN *  10
              END-IF
       *
            END-IF
@@ -25809,8 +25844,35 @@
                      END-IF
                  WHEN       2
                      IF    WK-SYUNOU-GENBUTU-JGNFLG  =  1
-                       MOVE       "1"   TO   LNK-S01-GENBUTU-MSG-FLG
-                       MOVE        1    TO   LNK-SYU-SECMONEY
+                       IF   LNK-SYU-SRYYMD(1:6)   >= "201205"
+                         PERFORM    230761-GENBUTU-MSG-HENSYU-CHECK-SEC
+                         MOVE       ZERO  TO   FLG-GENBUTU-OK
+                         PERFORM    230762-GENBUTU-MSG-HENSYU-CHECK2-SEC
+                         IF  LNK-S01-SAIKEISAN-KBN  = "1"
+                           IF  FLG-GENBUTU-OK  =  1
+                                 MOVE  "1"  TO  LNK-S01-GENBUTU-MSG-FLG
+                                 MOVE   1   TO  LNK-SYU-SECMONEY
+                           ELSE
+                             EVALUATE  WK-SYUNOU-GENBUTU-SECMONEY-MAE
+                              WHEN     0
+                                CONTINUE
+                              WHEN     1
+                              WHEN     3
+                              WHEN     9
+                                 MOVE  "1"  TO  LNK-S01-GENBUTU-MSG-FLG
+                                 MOVE   3   TO  LNK-SYU-SECMONEY
+                             END-EVALUATE
+                           END-IF
+                         ELSE
+                           IF  FLG-GENBUTU-OK  =  1
+                                 MOVE  "1"  TO  LNK-S01-GENBUTU-MSG-FLG
+                                 MOVE   1   TO  LNK-SYU-SECMONEY
+                           END-IF
+                         END-IF
+                       ELSE
+                                 MOVE  "1"  TO  LNK-S01-GENBUTU-MSG-FLG
+                                 MOVE   1   TO  LNK-SYU-SECMONEY
+                       END-IF
                      ELSE
                        PERFORM    230761-GENBUTU-MSG-HENSYU-CHECK-SEC
                        MOVE       ZERO  TO   FLG-GENBUTU-OK
@@ -25845,6 +25907,18 @@
                      END-IF
                END-EVALUATE
       *
+             END-IF
+           END-IF
+      *
+           IF  (LNK-S01-IKTGENKEIFLG         = "1"     )
+           AND (LNK-SYU-SRYYMD(1:6)         >= "201205")
+             IF ((FLG-GENBUTU70           NOT =   ZERO ) AND
+                 (FLG-OITA-GENBUTU70          =   ZERO ))
+             OR ((LNK-S01-KOUREI-ZAITAKU-KBN  =   "1"  ) AND
+                 (COMB-HKNNUM             NOT =   SPACE))
+               IF   WK-SYUNOU-GENBUTU-SECMONEY-MAE  =  1 OR 2 OR 9
+                  MOVE     9    TO   LNK-SYU-SECMONEY
+               END-IF
              END-IF
            END-IF
       *
@@ -27151,6 +27225,12 @@
                       (LNK-S01-IKTGENMKJFLG     =  SPACE          ) AND
                       (LNK-SYU-GRP-DENPNUM  NOT =  ZERO           ) AND
                       (LNK-SYU-GRP-DENPNUM      =  SYU-GRP-DENPNUM))
+                       IF  (LNK-S01-SAIKEISAN-KBN  =   "1"       )
+                       AND (LNK-SYU-DENPNUM    NOT =  ZERO       )
+                       AND (LNK-SYU-DENPNUM        =  SYU-DENPNUM)
+                         MOVE  SYU-SECMONEY      TO
+                                   WK-SYUNOU-GENBUTU-SECMONEY-MAE
+                       END-IF
                        GO    TO    SYUNOU-READ2-100
                ELSE
                        MOVE    ZERO    TO  FLG-SYUNOU

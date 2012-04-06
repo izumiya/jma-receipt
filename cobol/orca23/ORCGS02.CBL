@@ -2153,6 +2153,7 @@
       **********OR  (SYU-SRYYMD(1:6)  =   SPA-SYSYMD(1:6))
                   EVALUATE  SYU-SECMONEY
                     WHEN      1
+                    WHEN      3
                        MOVE      "1"   TO  SPA-GMN-SIKIBETUFLG(IDX-LST)
                     WHEN      2
                        MOVE      "2"   TO  SPA-GMN-SIKIBETUFLG(IDX-LST)

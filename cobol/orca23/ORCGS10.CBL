@@ -309,7 +309,10 @@
                END-IF
       *
                MOVE    SYU-SECMONEY        TO  SPA-GMN-TSECMONEY(IDXL)
-               IF    ( SYU-SECMONEY    =   1 )
+               IF      SYU-SECMONEY    =   3
+                   MOVE     1              TO  SPA-GMN-TSECMONEY(IDXL)
+               END-IF
+               IF    ( SYU-SECMONEY    =   1 OR 3 )
                    MOVE    "£·£°ºÐÌ¤Ëþ"    TO  SPA-GMN-TKBNMEI (IDXL)
                ELSE
                    MOVE    "¹âÎð¼Ô"        TO  SPA-GMN-TKBNMEI (IDXL)
@@ -731,7 +734,7 @@
                    MOVE    MCPDATA-REC     TO  SYUNOU-REC
       *
                    MOVE    1               TO  FLG-LOOP-END
-                   IF    ( SYU-SECMONEY    =   1 OR 2 )
+                   IF    ( SYU-SECMONEY    =   1 OR 2 OR 3 )
                        CONTINUE
                    ELSE
                        MOVE    ZERO        TO  FLG-LOOP-END
