@@ -97,6 +97,15 @@
       *  04.05.02    NACL-門脇    09/11/25  リハビリコメント対応
       *  04.05.03    NACL-門脇    11/08/08  外泊（他医受診）の日付コメント
       *                                     の差し込みを止める
+      *  04.05.04    NACL-門脇    12/04/02  平成２４年４月改正
+      *                                     コメント差込
+      *                                     外泊日コメントを記載しない
+      *                                     190153090
+      *                                     190153190
+      *                                     190153290
+      *                                     190153390
+      *                                     療養病棟コメント名称編集
+      *                                     820000160
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4393,7 +4402,9 @@ grpsys       PERFORM 900-DBSELECT-SEC
            AND  (WRK-RECE85-SRYCD(1)  =  "190108890" OR "190142190"
                                       OR "190108790" OR "190142090"
                                       OR "190108990" OR "190109090"
-                                      OR "190142290" OR "190141590")
+                                      OR "190142290" OR "190141590"
+                                      OR "190153190" OR "190153390"
+                                      OR "190153290" OR "190153090")
               MOVE    1     TO    FLG-NG
            END-IF
       *
@@ -4531,7 +4542,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2001-EISAPO-HANTEI-SEC          SECTION.
       *
-           IF      RECE84-FLG-EISAPO-COMMENT    =    "1"
+           IF      RECE84-FLG-EISAPO-COMMENT    =    "1" OR "2"
                MOVE       99      TO     FLG-COMMENT
                PERFORM   2001-NYU-COMMENT-SEC
            END-IF
@@ -4561,7 +4572,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2001-JYUSYO-HANTEI-SEC          SECTION.
       *
-           IF      RECE84-FLG-JYUSYO-COMMENT    =    "1"
+           IF      RECE84-FLG-JYUSYO-COMMENT    =    "1" OR "2"
                MOVE       99      TO     FLG-COMMENT
                PERFORM   2001-NYU-COMMENT-SEC
            END-IF
@@ -5895,6 +5906,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                 MOVE "「３７」"
                        TO  WRK-RECE85XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000158"
+             WHEN      "820000160"
                 MOVE "「９１」"
                        TO  WRK-RECE85XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000159"

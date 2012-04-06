@@ -198,6 +198,13 @@
       *  04.05.09    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
       *  04.05.10    NACL-ÌçÏÆ    11/12/16  ´ïºà¤Î¶â³Û¤ÈÃ±°Ì¤ÎÂÐ±þ
       *  04.05.11    NACL-ÌçÏÆ    12/02/13  ²ó¿ôÍóÊÔ½¸½¤Àµ¡ÊÄ´ºÞ¡¢ËãÆÇ¡¢Ä´´ð¡Ë
+      *  04.05.12    NACL-ÌçÏÆ    12/04/02  Ê¿À®£²£´Ç¯£´·î²þÀµ
+      *                                     ³°Çñ¶èÊ¬£¶¡¥£·¤ÎÂÐ±þ
+      *                                     ¡ÖºßÂð¡×¤ÎÂÐ±þ
+      *                                     ¡Ö½èÃÖ¡×¤ÎÂÐ±þ
+      *                                     ¡Ö²èÁü¿ÇÃÇ¡×¤ÎÂÐ±þ
+      *                                     ¡Ö¤½¤ÎÂ¾¡×¤ÎÂÐ±þ
+      *                                     ¡ÖÆþ±¡¡×¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -583,8 +590,8 @@
       *    »ÜÀß´ð½à¾ðÊóÂàÈòÍÑÎÎ°è
        01  TBL-SYS1006-T.
            03  TBL-SYS1006-OCC                         OCCURS  100.
-               05  TBL-SYS10061                        PIC X(610).
                05  TBL-SYS10062                        PIC X(610).
+               05  TBL-SYS10067                        PIC X(610).
       *
       *    ¼êµ»ÅÀ¡¦ÌôºÞÅùÅÀ¿ôÍÑÎÎ°è
        01  TBL-TENSUG-JI.
@@ -676,6 +683,12 @@
       *
            03  WRK-SISETU613                           PIC 9(01).
            03  WRK-SISETU695                           PIC 9(01).
+           03  WRK-SISETU3055                          PIC 9(01).
+           03  WRK-SISETU3056                          PIC 9(01).
+           03  WRK-SISETU3057                          PIC 9(01).
+           03  WRK-SISETU3058                          PIC 9(01).
+           03  WRK-SISETU3168                          PIC 9(01).
+           03  WRK-SISETU3169                          PIC 9(01).
       *
       *    ¿ô»úÈ¾³ÑÁ´³ÑÊÑ´¹ÍÑ     
            03  WRK-CHAR-IDX                    PIC 9(02).
@@ -853,6 +866,10 @@
            03  CONS-CTMRI-COMMENT17  PIC X(09)  VALUE  "170023510".
       *    £Ã£Ô»£±Æ¡Ê£±£¶ÎóÌ¤Ëþ¥Þ¥ë¥Á¥¹¥é¥¤¥¹·¿µ¡´ï¡Ë
            03  CONS-CTMRI-COMMENT18  PIC X(09)  VALUE  "170028610".
+      *    £Ã£Ô»£±Æ¡Ê£¶£´Îó°Ê¾å¥Þ¥ë¥Á¥¹¥é¥¤¥¹·¿µ¡´ï¡Ë
+           03  CONS-CTMRI-COMMENT19  PIC X(09)  VALUE  "170033410".
+      *    £Í£Ò£É»£±Æ¡Ê£³¥Æ¥¹¥é°Ê¾å¤Îµ¡´ï¡Ë
+           03  CONS-CTMRI-COMMENT20  PIC X(09)  VALUE  "170033510".
       *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
            03  CONS-HOUSEI-COMMENT   PIC X(09)  VALUE  "180018310".
       *    Àº¿À²ÊÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ»»ÄêÆü
@@ -930,6 +947,18 @@
            03  CONS-NOUKE12-COMMENT  PIC X(09)  VALUE  "180032510".
       *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÇÑÍÑ¾É¸õ·²¡Ë
            03  CONS-NOUKE13-COMMENT  PIC X(09)  VALUE  "180032610".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡¦ÇÑÍÑ¾É¸õ·²°Ê³°¡Ë
+           03  CONS-NOUKE14-COMMENT  PIC X(09)  VALUE  "180033910".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡¦ÇÑÍÑ¾É¸õ·²¡Ë
+           03  CONS-NOUKE15-COMMENT  PIC X(09)  VALUE  "180034010".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡¦ÇÑÍÑ¾É¸õ·²°Ê³°¡Ë
+           03  CONS-NOUKE16-COMMENT  PIC X(09)  VALUE  "180034110".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡¦ÇÑÍÑ¾É¸õ·²¡Ë
+           03  CONS-NOUKE17-COMMENT  PIC X(09)  VALUE  "180034210".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦ÇÑÍÑ¾É¸õ·²°Ê³°¡Ë
+           03  CONS-NOUKE18-COMMENT  PIC X(09)  VALUE  "180034310".
+      *    Ç¾·ì´É¼À´µÅù¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡¦ÇÑÍÑ¾É¸õ·²¡Ë
+           03  CONS-NOUKE19-COMMENT  PIC X(09)  VALUE  "180034410".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë
@@ -950,6 +979,12 @@
            03  CONS-UNDOKI9-COMMENT  PIC X(09)  VALUE  "180032710".
       *!   ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë
            03  CONS-UNDOKI10-COMMENT PIC X(09)  VALUE  "101800125".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£±¡Ë¡ÊÍ×²ð¸î¡Ë
+           03  CONS-UNDOKI11-COMMENT  PIC X(09)  VALUE  "180034510".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£²¡Ë¡ÊÍ×²ð¸î¡Ë
+           03  CONS-UNDOKI12-COMMENT  PIC X(09)  VALUE  "180034610".
+      *    ±¿Æ°´ï¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£³¡Ë¡ÊÍ×²ð¸î¡Ë
+           03  CONS-UNDOKI13-COMMENT PIC X(09)  VALUE  "180034710".
       *    ÆñÉÂ´µ¼Ô¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    ¾ã³²»ù¡Ê¼Ô¡Ë¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÎÁ¡Ê£¶ºÐÌ¤Ëþ¡Ë
@@ -998,6 +1033,8 @@
            03  CONS-JINZOU7-COMMENT  PIC X(09)  VALUE  "140008210".
       *    ·ìµåÀ®Ê¬½üµîÎÅË¡
            03  CONS-JINZOU8-COMMENT  PIC X(09)  VALUE  "140039210".
+      *    ¿Í¹©¿ÕÂ¡¡ÊËýÀ­°Ý»ýÆ©ÀÏßÉ²á¡Ë¡ÊÊ£»¨¡Ë
+           03  CONS-JINZOU9-COMMENT  PIC X(09)  VALUE  "140052810".
       *    ¶É½ê±¢°µÊÄº¿½èÃÖ¡Ê¤½¤ÎÂ¾¡Ë
            03  CONS-KYOKUIN1-COMMENT PIC X(09)  VALUE  "140052410".
       *    ¶É½ê±¢°µÊÄº¿½èÃÖ¡ÊÈïÊ¤ºàÅ½ÉÕ¡Ë¡Ê£±£°£°£ã£í£²Ì¤Ëþ¡Ë
@@ -1008,10 +1045,14 @@
            03  CONS-KYOKUIN4-COMMENT PIC X(09)  VALUE  "140052010".
       *    ±ÉÍÜ¥µ¥Ý¡¼¥È¥Á¡¼¥à²Ã»»
            03  CONS-EISAPO-COMMENT   PIC X(09)  VALUE  "190136810".
+      *    ±ÉÍÜ¥µ¥Ý¡¼¥È¥Á¡¼¥à²Ã»»¡Ê»ØÄêÃÏ°è¡Ë
+           03  CONS-EISAPO-COMMENT2  PIC X(09)  VALUE  "190147110".
       *    ¸ÆµÛ¥±¥¢¥Á¡¼¥à²Ã»»
            03  CONS-KOKKEA-COMMENT   PIC X(09)  VALUE  "190137910".
       *    ½Å¾É¼Ô²Ã»»¡ÊÀº¿ÀÎÅÍÜÉÂÅïÆþ±¡ÎÁ¡Ë
            03  CONS-JYUSYO-COMMENT   PIC X(09)  VALUE  "190141370".
+      *    ½Å¾É¼Ô²Ã»»£±
+           03  CONS-JYUSYO-COMMENT2  PIC X(09)  VALUE  "190151470".
       *
       *    ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -1020,6 +1061,12 @@
            03  CONS-ZAISIEN1         PIC X(09)  VALUE  "114011570".
            03  CONS-ZAISIEN2         PIC X(09)  VALUE  "114011670".
            03  CONS-ZAISIEN3         PIC X(09)  VALUE  "114011770".
+           03  CONS-ZAISIEN4         PIC X(09)  VALUE  "114017570".
+           03  CONS-ZAISIEN5         PIC X(09)  VALUE  "114017870".
+           03  CONS-ZAISIEN6         PIC X(09)  VALUE  "114017470".
+           03  CONS-ZAISIEN7         PIC X(09)  VALUE  "114017770".
+           03  CONS-ZAISIEN8         PIC X(09)  VALUE  "114017670".
+           03  CONS-ZAISIEN9         PIC X(09)  VALUE  "114017970".
       *
       *    ºÞ¤Î¿ÇÎÅÆâÍÆ¥Á¥§¥Ã¥¯¥Æ¡¼¥Ö¥ë
        01  TBL-ZAICHECK-AREA.
@@ -1251,8 +1298,17 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
       *       »ÜÀß´ð½à¾ðÊó
               MOVE     ZERO     TO     WRK-SISETU613
               MOVE     ZERO     TO     WRK-SISETU695
+              MOVE     ZERO     TO     WRK-SISETU3055
+              MOVE     ZERO     TO     WRK-SISETU3056
+              MOVE     ZERO     TO     WRK-SISETU3057
+              MOVE     ZERO     TO     WRK-SISETU3058
+              MOVE     ZERO     TO     WRK-SISETU3168
+              MOVE     ZERO     TO     WRK-SISETU3169
               PERFORM  VARYING  IDXA   FROM   1   BY  1
-                        UNTIL   IDXA     >    2
+                        UNTIL   IDXA     >    7
+               IF   IDXA  =  1 OR 3 OR 4 OR 5 OR 6
+                 CONTINUE
+               ELSE
                 INITIALIZE                      SYSKANRI-REC
                 MOVE    "1006"              TO  SYS-KANRICD
                 MOVE    IDXA                TO  SYS-KBNCD
@@ -1265,15 +1321,27 @@ grpsys          MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                 IF      FLG-SYSKANRI     =   ZERO
                    MOVE   MCPDATA-REC       TO  SYS-1006-REC
                    EVALUATE  IDXA
-                     WHEN     1
-                       CONTINUE
                      WHEN     2
                        MOVE  SYS-1006-SSTKIJUN(113)
                                             TO  WRK-SISETU613
                        MOVE  SYS-1006-SSTKIJUN(195)
                                             TO  WRK-SISETU695
+                     WHEN     7
+                       MOVE  SYS-1006-SSTKIJUN(55)
+                                            TO  WRK-SISETU3055
+                       MOVE  SYS-1006-SSTKIJUN(56)
+                                            TO  WRK-SISETU3056
+                       MOVE  SYS-1006-SSTKIJUN(57)
+                                            TO  WRK-SISETU3057
+                       MOVE  SYS-1006-SSTKIJUN(58)
+                                            TO  WRK-SISETU3058
+                       MOVE  SYS-1006-SSTKIJUN(168)
+                                            TO  WRK-SISETU3168
+                       MOVE  SYS-1006-SSTKIJUN(169)
+                                            TO  WRK-SISETU3169
                    END-EVALUATE
                 END-IF
+               END-IF
               END-PERFORM
            ELSE
               MOVE     ZERO               TO  SYSKAN-IDX
@@ -1317,7 +1385,10 @@ grpsys        PERFORM 900-DBSELECT-SEC
               INITIALIZE                      TBL-SYS1006-T
       *
               PERFORM  VARYING  IDXA   FROM   1   BY  1
-                        UNTIL   IDXA     >    2
+                        UNTIL   IDXA     >    7
+               IF   IDXA  =  1 OR 3 OR 4 OR 5 OR 6
+                 CONTINUE
+               ELSE
                  MOVE     ZERO            TO  SYSKAN-IDX2
                  INITIALIZE                   SYSKANRI-REC
                  MOVE    "1006"           TO  SYS-KANRICD
@@ -1336,14 +1407,14 @@ grpsys           PERFORM 900-DBSELECT-SEC
       *
                        MOVE   MCPDATA-REC     TO  SYS-1006-REC
                        EVALUATE  IDXA
-                         WHEN     1
-                           ADD     1      TO  SYSKAN-IDX2
-                           MOVE    SYS-1006-REC
-                                          TO  TBL-SYS10061(SYSKAN-IDX2)
                          WHEN     2
                            ADD     1      TO  SYSKAN-IDX2
                            MOVE    SYS-1006-REC
                                           TO  TBL-SYS10062(SYSKAN-IDX2)
+                         WHEN     7
+                           ADD     1      TO  SYSKAN-IDX2
+                           MOVE    SYS-1006-REC
+                                          TO  TBL-SYS10067(SYSKAN-IDX2)
                        END-EVALUATE
                        MOVE    "tbl_syskanri" TO  MCP-TABLE
                        MOVE    "key8"         TO  MCP-PATHNAME
@@ -1353,6 +1424,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  MOVE    "tbl_syskanri"       TO  MCP-TABLE
                  MOVE    "key8"               TO  MCP-PATHNAME
                  PERFORM  900-CLOSE-SEC
+               END-IF
               END-PERFORM
            END-IF
       *
@@ -1632,6 +1704,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  IF   TNS-SRYCD  =  "190134270"
                                  OR "190135470"
                                  OR "190135670"
+      *
+                                 OR "190142970"
+                                 OR "190143370"
+      *
+                                 OR "190142870"
+                                 OR "190143070"
+                                 OR "190143170"
+                                 OR "190143270"
+                                 OR "190143470"
+                                 OR "190143970"
+                                 OR "190144070"
+                                 OR "190144570"
+                                 OR "190144670"
+                                 OR "190144770"
+                                 OR "190144870"
+                                 OR "190144970"
+                                 OR "190145070"
+                                 OR "190145170"
+                                 OR "190145270"
                    CONTINUE
                  ELSE
                    ADD    1          TO  IDX14
@@ -2277,7 +2368,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
             OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
             OR     ( SRY-SRYCD(IDX2)       =  "099209903"
                                            OR "099209905"
-                                           OR "099209906"  )
+                                           OR "099209906"
+                                           OR "099209907"
+                                           OR "099209908"  )
             OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                            OR "0086"       )
             OR     ( SRY-SRYCD(IDX2)       =  "099999903"
@@ -2348,7 +2441,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
               OR     ( SRY-SRYCD(IDX2)       =  "099209903"
                                              OR "099209905"
-                                             OR "099209906"  )
+                                             OR "099209906"
+                                             OR "099209907"
+                                             OR "099209908"  )
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                              OR "0086"       )
               OR     ( SRY-SRYCD(IDX2)       =  "099999903"
@@ -3182,6 +3277,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                  IF (SRY-SRYCD(IDX2) =  "114001110")
                  OR (SRY-SRYCD(IDX2) =  "114012910")
+                 OR (SRY-SRYCD(IDX2) =  "114018010")
                     MOVE        9         TO    FLG-OSINKBN
                  END-IF
       *
@@ -3200,6 +3296,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "114001970"
                    WHEN    "114011670"
                    WHEN    "114011970"
+                   WHEN    "114017570"
+                   WHEN    "114017870"
                    IF  FLG-OSINKBN        NOT = 9
                        MOVE     2         TO    FLG-OSINKBN
                    END-IF
@@ -3212,6 +3310,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    WHEN    "114011770"
                    WHEN    "114011870"
                    WHEN    "114012070"
+                   WHEN    "114017470"
+                   WHEN    "114017770"
+                   WHEN    "114017670"
+                   WHEN    "114017970"
                    IF  FLG-OSINKBN        NOT = 9
                        MOVE     3         TO    FLG-OSINKBN
                    END-IF
@@ -3292,6 +3394,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                         OR  CONS-JINZOU6-COMMENT
                                         OR  CONS-JINZOU7-COMMENT
                                         OR  CONS-JINZOU8-COMMENT
+                                        OR  CONS-JINZOU9-COMMENT
                         MOVE   "1"    TO    RECE84-FLG-JINZOU-COMMENT
                 END-IF
       *         ¶É½ê±¢°µÊÄº¿½èÃÖ
@@ -3365,6 +3468,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-NOUKE11-COMMENT  OR
                                             CONS-NOUKE12-COMMENT  OR
                                             CONS-NOUKE13-COMMENT  OR
+                                            CONS-NOUKE14-COMMENT  OR
+                                            CONS-NOUKE15-COMMENT  OR
+                                            CONS-NOUKE16-COMMENT  OR
+                                            CONS-NOUKE17-COMMENT  OR
+                                            CONS-NOUKE18-COMMENT  OR
+                                            CONS-NOUKE19-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
@@ -3373,6 +3482,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-UNDOKI8-COMMENT  OR
                                             CONS-UNDOKI9-COMMENT  OR
                                             CONS-UNDOKI10-COMMENT OR
+                                            CONS-UNDOKI11-COMMENT OR
+                                            CONS-UNDOKI12-COMMENT OR
+                                            CONS-UNDOKI13-COMMENT OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT  OR
@@ -3435,6 +3547,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-NOUKE11-COMMENT
                                       OR    CONS-NOUKE12-COMMENT
                                       OR    CONS-NOUKE13-COMMENT
+                                      OR    CONS-NOUKE14-COMMENT
+                                      OR    CONS-NOUKE15-COMMENT
+                                      OR    CONS-NOUKE16-COMMENT
+                                      OR    CONS-NOUKE17-COMMENT
+                                      OR    CONS-NOUKE18-COMMENT
+                                      OR    CONS-NOUKE19-COMMENT
                         MOVE   "1"    TO    RECE82-COMCNTFLG
                         MOVE   "1"    TO    RECE84-NOUKE-COMMENT
                 END-IF
@@ -3448,6 +3566,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-UNDOKI8-COMMENT
                                       OR    CONS-UNDOKI9-COMMENT
                                       OR    CONS-UNDOKI10-COMMENT
+                                      OR    CONS-UNDOKI11-COMMENT
+                                      OR    CONS-UNDOKI12-COMMENT
+                                      OR    CONS-UNDOKI13-COMMENT
                         MOVE   "1"    TO    RECE82-COMCNTFLG
                         MOVE   "1"    TO    RECE84-UNDOKI-COMMENT
                 END-IF
@@ -3550,23 +3671,65 @@ grpsys     PERFORM 900-DBSELECT-SEC
       ***          MOVE    1    TO    FLG-OSIN-COM
       ***     END-IF
       *
-              IF     WRK-SISETU613      =      1
-                IF     RECE82-SRYYM    >=     "200604"
-                  IF   SRY-SRYCD(IDX2)  =     CONS-ZAISIEN1    OR
-                                              CONS-ZAISIEN2    OR
-                                              CONS-ZAISIEN3
-                       MOVE   "1"   TO    RECE82-COMCNTFLG
-                       MOVE   "1"   TO    RECE84-FLG-ZAISIEN-COMMENT
+              IF   RECE82-SRYYM    >=     "201204"
+                IF  (WRK-SISETU3168  =  1)
+                  IF  SRY-SRYCD(IDX2) =  CONS-ZAISIEN1  OR
+                                         CONS-ZAISIEN2  OR
+                                         CONS-ZAISIEN3
+                    MOVE   "1"   TO    RECE82-COMCNTFLG
+                    MOVE   "1"   TO    RECE84-FLG-ZAISIEN-COMMENT
+                  END-IF
+                END-IF
+                IF  (WRK-SISETU3055  =  1)
+                OR  (WRK-SISETU3056  =  1)
+                  IF  SRY-SRYCD(IDX2) =  CONS-ZAISIEN4  OR
+                                         CONS-ZAISIEN5  OR
+                                         CONS-ZAISIEN6  OR
+                                         CONS-ZAISIEN7  OR
+                                         CONS-ZAISIEN8  OR
+                                         CONS-ZAISIEN9
+                    MOVE   "1"   TO    RECE82-COMCNTFLG
+                    MOVE   "1"   TO    RECE84-FLG-ZAISIEN-COMMENT
+                  END-IF
+                END-IF
+                IF  RECE84-FLG-ZAISIEN-COMMENT = SPACE
+                  IF  (WRK-SISETU3169  =  1)
+                    IF  SRY-SRYCD(IDX2) =  CONS-ZAISIEN1  OR
+                                           CONS-ZAISIEN2  OR
+                                           CONS-ZAISIEN3
+                      MOVE   "1"   TO    RECE82-COMCNTFLG
+                      MOVE   "2"   TO    RECE84-FLG-ZAISIEN-COMMENT
+                    END-IF
+                  END-IF
+                  IF  (WRK-SISETU3057  =  1)
+                  OR  (WRK-SISETU3058  =  1)
+                    IF  SRY-SRYCD(IDX2) =  CONS-ZAISIEN4  OR
+                                           CONS-ZAISIEN6  OR
+                                           CONS-ZAISIEN8
+                      MOVE   "1"   TO    RECE82-COMCNTFLG
+                      MOVE   "2"   TO    RECE84-FLG-ZAISIEN-COMMENT
+                    END-IF
                   END-IF
                 END-IF
               ELSE
-                IF   WRK-SISETU695      =      1
-                  IF   RECE82-SRYYM    >=     "200804"
-                    IF SRY-SRYCD(IDX2)  =     CONS-ZAISIEN1    OR
-                                              CONS-ZAISIEN2    OR
-                                              CONS-ZAISIEN3
-                       MOVE   "1"   TO    RECE82-COMCNTFLG
-                       MOVE   "2"   TO    RECE84-FLG-ZAISIEN-COMMENT
+                IF   WRK-SISETU613   =  1
+                  IF   RECE82-SRYYM   >=  "200604"
+                      IF SRY-SRYCD(IDX2) =  CONS-ZAISIEN1       OR
+                                            CONS-ZAISIEN2       OR
+                                            CONS-ZAISIEN3
+                        MOVE   "1"   TO    RECE82-COMCNTFLG
+                        MOVE   "1"   TO    RECE84-FLG-ZAISIEN-COMMENT
+                      END-IF
+                  END-IF
+                ELSE
+                  IF   WRK-SISETU695   =  1
+                    IF   RECE82-SRYYM   >=  "200804"
+                      IF SRY-SRYCD(IDX2) =  CONS-ZAISIEN1       OR
+                                            CONS-ZAISIEN2       OR
+                                            CONS-ZAISIEN3
+                        MOVE   "1"   TO    RECE82-COMCNTFLG
+                        MOVE   "2"   TO    RECE84-FLG-ZAISIEN-COMMENT
+                      END-IF
                     END-IF
                   END-IF
                 END-IF
@@ -3619,7 +3782,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-CTMRI-COMMENT4  OR
                                             CONS-CTMRI-COMMENT6  OR
                                             CONS-CTMRI-COMMENT7  OR
-                                            CONS-CTMRI-COMMENT18)
+                                            CONS-CTMRI-COMMENT18 OR
+                                            CONS-CTMRI-COMMENT19 OR
+                                            CONS-CTMRI-COMMENT20)
               AND (RECE82-SRYYM       >=    "201004"            )
                    MOVE   "1"   TO    RECE84-FLG-CTMRI-COMMENT
               END-IF
@@ -3652,6 +3817,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 IF   SRY-SRYCD(IDX2)  =     CONS-EISAPO-COMMENT
                         MOVE   "1"    TO    RECE84-FLG-EISAPO-COMMENT
                 END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-EISAPO-COMMENT2
+                        MOVE   "2"    TO    RECE84-FLG-EISAPO-COMMENT
+                END-IF
       *         ¸ÆµÛ¥±¥¢¥Á¡¼¥à²Ã»»
                 IF   SRY-SRYCD(IDX2)  =     CONS-KOKKEA-COMMENT
                         MOVE   "1"    TO    RECE84-FLG-KOKKEA-COMMENT
@@ -3659,6 +3827,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *         ½Å¾É¼Ô²Ã»»¡ÊÀº¿ÀÎÅÍÜÉÂÅïÆþ±¡ÎÁ¡Ë
                 IF   SRY-SRYCD(IDX2)  =     CONS-JYUSYO-COMMENT
                         MOVE   "1"    TO    RECE84-FLG-JYUSYO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-JYUSYO-COMMENT2
+                        MOVE   "2"    TO    RECE84-FLG-JYUSYO-COMMENT
                 END-IF
               END-IF
            END-IF
@@ -5458,7 +5629,13 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         (SRY-SRYCD(IDX3)   NOT =    "114011570")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011770")   AND
                         (SRY-SRYCD(IDX3)   NOT =    "114011870")   AND
-                        (SRY-SRYCD(IDX3)   NOT =    "114012070")))
+                        (SRY-SRYCD(IDX3)   NOT =    "114012070")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114017470")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114017570")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114017670")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114017770")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114017870")   AND
+                        (SRY-SRYCD(IDX3)   NOT =    "114017970")))
                    OR (  FLG-OSINKBN           =     9           )
       ***          OR (  SRY-SRYCD(IDX3) =    "114001110"        )
       ***          OR (  SRY-SRYCD(IDX3) =    "114012910"        )
@@ -5930,8 +6107,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             AND ( NACCT-ZAITEN    NOT  =  ZERO   )
                             AND ( NACCT-ZAISKBKBN NOT  =  "4"    )
                             AND ( NACCT-DAY(IDY)  NOT  =  ZERO   )
-                               IF  WRK-DAY2(IDY) =  ZERO  OR  4
-                                                          OR  5
+                               IF  WRK-DAY2(IDY) =
+                                       ZERO OR 4 OR 5 OR 6 OR 7
                                     MOVE   NACCT-DAY(IDY)  
                                            TO   WRK-DAY21(IDY) 
                                     ADD    1   TO   CNT-DAY21
@@ -5946,8 +6123,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             AND ( NACCT-DAY(IDY)  NOT  =  ZERO   )
                             AND ( WRK-SHOKUJIRYOYO(IDY)
                                                   NOT  =  ZERO   )
-                               IF  WRK-DAY2(IDY) =  ZERO  OR  4
-                                                          OR  5
+                               IF  WRK-DAY2(IDY) =
+                                       ZERO OR 4 OR 5 OR 6 OR 7
                                 IF   RECE82-SRYYM  >= "200604"
                                  IF  NACCT-SRYCDTOTAL = 099999918
                                                     OR  099999919
@@ -5978,8 +6155,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               AND ( NACCT-SRYCDTOTAL = 099999918
                                                    OR  099999919
                                                    OR  099999920   )
-                              AND ( WRK-DAY2(IDY) =  ZERO  OR  4
-                                                           OR  5   )
+                              AND ( WRK-DAY2(IDY) =
+                                        ZERO OR 4 OR 5 OR 6 OR 7   )
                                 PERFORM   2307-NYUINACCT-SYU-KAN-SEC
                               END-IF
                             END-IF
@@ -5992,7 +6169,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             AND (NACCT-DAY(IDY)  NOT  =  ZERO   )
                             AND (WRK-SHOKUJIRYOYO(IDY)
                                                  NOT  =  ZERO   )
-                            AND (WRK-DAY2(IDY) = ZERO OR 4 OR 5 )
+                            AND (WRK-DAY2(IDY) =
+                                       ZERO OR 4 OR 5 OR 6 OR 7 )
                             AND (RECE82-SRYYM >= "200604"       )
                              IF  NACCT-SRYCDTOTAL = 099999918
                                                  OR 099999919
@@ -10258,6 +10436,33 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
                ELSE
                    MOVE  SYS-1006-SSTKIJUN(113)  TO  WRK-SISETU613
                    MOVE  SYS-1006-SSTKIJUN(195)  TO  WRK-SISETU695
+               END-IF
+      *
+               MOVE    ZERO         TO  FLG-SET
+               PERFORM  VARYING  SYSKAN-IDX2  FROM  1   BY  1
+                         UNTIL ( SYSKAN-IDX2               >  100  )
+                          OR   ( TBL-SYS10067(SYSKAN-IDX2) = SPACE )
+                          OR   ( FLG-SET                   =   1   )
+                   MOVE    TBL-SYS10067(SYSKAN-IDX2)  TO  SYS-1006-REC
+                   IF   ( SYS-1006-STYUKYMD  <=  WRK-SYS-SRYYMD    )
+                   AND  ( WRK-SYS-SRYYMD     <=  SYS-1006-EDYUKYMD )
+                       MOVE     1                  TO  FLG-SET
+                   END-IF
+               END-PERFORM
+               IF      FLG-SET    =   ZERO
+                   MOVE  ZERO                    TO  WRK-SISETU3055
+                   MOVE  ZERO                    TO  WRK-SISETU3056
+                   MOVE  ZERO                    TO  WRK-SISETU3057
+                   MOVE  ZERO                    TO  WRK-SISETU3058
+                   MOVE  ZERO                    TO  WRK-SISETU3168
+                   MOVE  ZERO                    TO  WRK-SISETU3169
+               ELSE
+                   MOVE  SYS-1006-SSTKIJUN(55)   TO  WRK-SISETU3055
+                   MOVE  SYS-1006-SSTKIJUN(56)   TO  WRK-SISETU3056
+                   MOVE  SYS-1006-SSTKIJUN(57)   TO  WRK-SISETU3057
+                   MOVE  SYS-1006-SSTKIJUN(58)   TO  WRK-SISETU3058
+                   MOVE  SYS-1006-SSTKIJUN(168)  TO  WRK-SISETU3168
+                   MOVE  SYS-1006-SSTKIJUN(169)  TO  WRK-SISETU3169
                END-IF
       *
                MOVE      RECE82-SRYYM   TO  WRK-SRYYM-5000

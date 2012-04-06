@@ -38,6 +38,8 @@
       *  04.05.01    NACL-ÌçÏÆ    10/01/27  ¼£¸³ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    11/11/04  µßµÞÈÂÁ÷¿ÇÎÅÎÁ»»ÄêÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
+      *  04.05.04    NACL-ÌçÏÆ    12/04/02  Ê¿À®£²£´Ç¯£´·î²þÀµ
+      *                                     ³°Çñ¶èÊ¬£¶¡¥£·¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -837,8 +839,8 @@
                          IF   WRK-DAY5(IDY)   =  RECE200-HKNCOMBI
                               IF   (NACCT-ZAITEN      NOT =    ZERO)
                               AND  (NACCT-DAY(IDY)    NOT =    ZERO)
-                              AND  (WRK-DAY2(IDY)  =    ZERO  OR  4
-                                                              OR  5)
+                              AND  (WRK-DAY2(IDY)     =
+                                           ZERO OR 4 OR 5 OR 6 OR 7)
                                    PERFORM 2001125-RECE200-TENSOU22-SEC
                               END-IF
                          END-IF
@@ -918,20 +920,23 @@
                       COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.3)
                                                             +  0.5
                     WHEN   4
-                      COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.3)
-                                                            +  0.5
-                      COMPUTE  WRK-NYUKHNRYO =  WRK-NYUKHNRYO
-                                             +  WRK-KSNTEN
-                      IF  WRK-HYOKETU-TEN  NOT =  ZERO
-                         COMPUTE WRK-NYUKHNRYO  =
-                                (WRK-NYUKHNRYO  -
-                                 (WRK-NYUKHNRYO *
-                                  (WRK-HYOKETU-TEN / 100)))
-                                                + 0.5
-                      END-IF
                     WHEN   5
-                      COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.7)
-                                                            +  0.5
+                    WHEN   6
+                    WHEN   7
+                      EVALUATE  WRK-DAY2(IDY)
+                        WHEN       4
+                          COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.3 )
+                                                                +  0.5
+                        WHEN       5
+                          COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.7 )
+                                                                +  0.5
+                        WHEN       6
+                          COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.45)
+                                                                +  0.5
+                        WHEN       7
+                          COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.85)
+                                                                +  0.5
+                      END-EVALUATE
                       COMPUTE  WRK-NYUKHNRYO =  WRK-NYUKHNRYO
                                              +  WRK-KSNTEN
                       IF  WRK-HYOKETU-TEN  NOT =  ZERO
@@ -980,21 +985,23 @@
                                                             +  0.5
                       MOVE   1   TO   FLG-GAIHAKU
                     WHEN   4
-                      COMPUTE  WRK-NYUTOKRYO = (WRK-KHNTEN  *  0.3)
-                                                            +  0.5
-                      COMPUTE  WRK-NYUTOKRYO =  WRK-NYUTOKRYO
-                                             +  WRK-KSNTEN
-                      IF  WRK-HYOKETU-TEN  NOT =  ZERO
-                         COMPUTE WRK-NYUTOKRYO  =
-                                (WRK-NYUTOKRYO  -
-                                 (WRK-NYUTOKRYO *
-                                  (WRK-HYOKETU-TEN / 100)))
-                                                + 0.5
-                      END-IF
-                      MOVE   1   TO   FLG-GAIHAKU
                     WHEN   5
-                      COMPUTE  WRK-NYUTOKRYO = (WRK-KHNTEN  *  0.7)
-                                                            +  0.5
+                    WHEN   6
+                    WHEN   7
+                      EVALUATE  WRK-DAY2(IDY)
+                        WHEN       4
+                          COMPUTE  WRK-NYUTOKRYO = (WRK-KHNTEN  *  0.3 )
+                                                                +  0.5
+                        WHEN       5
+                          COMPUTE  WRK-NYUTOKRYO = (WRK-KHNTEN  *  0.7 )
+                                                                +  0.5
+                        WHEN       6
+                          COMPUTE  WRK-NYUTOKRYO = (WRK-KHNTEN  *  0.45)
+                                                                +  0.5
+                        WHEN       7
+                          COMPUTE  WRK-NYUTOKRYO = (WRK-KHNTEN  *  0.85)
+                                                                +  0.5
+                      END-EVALUATE
                       COMPUTE  WRK-NYUTOKRYO =  WRK-NYUTOKRYO
                                              +  WRK-KSNTEN
                       IF  WRK-HYOKETU-TEN  NOT =  ZERO
@@ -1008,8 +1015,8 @@
                   END-EVALUATE
                   IF  (WRK-DAY6(IDY)          NOT =  ZERO)
                   AND (WRK-DAY6-ZAITEN(IDY)   NOT =  ZERO)
-                  AND (WRK-DAY2(IDY)              =  ZERO  OR  4
-                                                           OR  5)
+                  AND (WRK-DAY2(IDY)          =
+                                 ZERO OR 4 OR 5 OR 6 OR 7)
                       COMPUTE  WRK-NYUTOKRYO = WRK-NYUTOKRYO
                                              + WRK-DAY6-ZAITEN(IDY)
                   END-IF
@@ -1157,7 +1164,9 @@
                          IF   TNS-DATAKBN    =    1
                               MOVE   TNS-TEN   TO   WRK-KHNTEN
       *                       ´Ç¸îÈæÎ¨´ð½àÌ¤Ã£»þ¤ÎÆþ±¡´ðËÜÅÀ¿ô¤Î¼èÆÀ
-                              PERFORM  20011231-GAIHAKU-NYUINKHN-SET-SEC
+                              IF    RECE200-SRYYM  <=  "201203"
+                               PERFORM 20011231-GAIHAKU-NYUINKHN-SET-SEC
+                              END-IF
                               IF   WRK-GAIHAKU-KHNTEN  NOT =  ZERO
                                  MOVE   WRK-GAIHAKU-KHNTEN
                                                TO   WRK-KHNTEN
@@ -1516,10 +1525,10 @@
                        IF   (WRK-DAY1(IDY)    NOT  =  ZERO  )
                        OR   (RECE200-NYUINDAY-KBN(IDY) = "1")
                          IF   WRK-DAY5(IDY)  =  RECE200-HKNCOMBI
-                              IF   (NACCT-ZAITEN    NOT =    ZERO)
-                              AND  (NACCT-DAY(IDY)  NOT =    ZERO)
-                              AND  (WRK-DAY2(IDY)  =    ZERO  OR  4
-                                                              OR  5)
+                              IF   (NACCT-ZAITEN    NOT =    ZERO   )
+                              AND  (NACCT-DAY(IDY)  NOT =    ZERO   )
+                              AND  (WRK-DAY2(IDY)   =
+                                            ZERO OR 4 OR 5 OR 6 OR 7)
                               AND  (WRK-DAY1-NYUTENTTLKBN(IDY) = 903)
                                    PERFORM   2001131-NYUINKHN-GET3-SEC
                                    MOVE    31    TO    IDY

@@ -126,6 +126,8 @@
       *  04.05.06    NACL-ÃÁœ∆    10/12/03  ∆‚…˛ÃÙ∫ﬁƒ˛∏∫ ‘Ω∏Ω§¿µ
       *  04.05.07    NACL-ÃÁœ∆    11/10/11  ∆‚…˛ÃÙ∫ﬁƒ˛∏∫ ‘Ω∏Ω§¿µ
       *  04.05.08    NACL-ÃÁœ∆    11/11/30  ≤Ë¡¸ø«√«•’•§•Î•‡ ¨≤ËøÙ¬–±˛
+      *  04.05.09    NACL-ÃÁœ∆    12/04/02   ø¿Æ£≤£¥«Ø£¥∑Ó≤˛¿µ
+      *                                     •≥•·•Û•»∫ππ˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -714,6 +716,8 @@
            03  CONS-SINPESU         PIC X(09) VALUE "113001510".
       *    «ß√ŒŒ≈À°°¶«ß√Œπ‘∆∞Œ≈À°
            03  CONS-NINRYO          PIC X(09) VALUE "180033210".
+      *    «ß√ŒŒ≈À°°¶«ß√Œπ‘∆∞Œ≈À°° ¿∫ø¿≤ µﬂµﬁ¬Œ¿©§Œ¿∫ø¿ ›∑ÚªÿƒÍ∞Â°À
+           03  CONS-NINRYO2         PIC X(09) VALUE "180035910".
       *
       *     £øÙø«Œ≈≤ ºıø«§Œ¬‡»Ú•∆°º•÷•Î
        01  TBL-JUSHIN-INF.
@@ -5409,13 +5413,17 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *****************************************************************
        2001-NINRYO-HANTEI-SEC          SECTION.
       *
-           IF     RECE04-FLG-NINRYO-COMMENT   =    "1"
+           IF     RECE04-FLG-NINRYO-COMMENT   =    "1" OR "2"
                MOVE    SPACE                TO  WRK-NINRYO-FSANTEIYMD
                INITIALIZE                       SANTEI-REC
                MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                MOVE    RECE04-PTID          TO  SANTEI-PTID
                MOVE    RECE04-SRYYM         TO  SANTEI-SRYYM
-               MOVE    CONS-NINRYO          TO  SANTEI-SRYCD
+               IF  RECE04-FLG-NINRYO-COMMENT  =    "1"
+                 MOVE  CONS-NINRYO          TO  SANTEI-SRYCD
+               ELSE
+                 MOVE  CONS-NINRYO2         TO  SANTEI-SRYCD
+               END-IF
                MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
                MOVE    ZERO                 TO  SANTEI-SRYKA
                MOVE    ZERO                 TO  SANTEI-HKNCOMBINUM
@@ -7121,7 +7129,7 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *13
                           "114000110" OR "114001610" OR
       *14
-                          "114001110" OR "114012910" OR
+                          "114001110" OR "114012910" OR "114018010" OR
       *16
                           "180027410" OR "180027510" OR "180028010" OR
                           "180028110" OR "180027610" OR "180027710" OR
@@ -7129,12 +7137,15 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                           "180028210" OR "180028310" OR "180028410" OR
                           "180032410" OR "180032510" OR "180032610" OR
                           "180032710" OR "180033110" OR
+                          "180033910" OR "180034010" OR "180034110" OR
+                          "180034210" OR "180034310" OR "180034410" OR
+                          "180034510" OR "180034610" OR "180034710" OR
       *17
                           "113001510" OR
       *18
                           "113003410" OR
       *19
-                          "180033210" OR
+                          "180033210" OR "180035910" OR
       *20
                           "700010000" OR "700030000" OR "700050000" OR
                           "700080000" OR "700110000" OR "700140000" OR

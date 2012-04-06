@@ -123,6 +123,15 @@
       *  04.05.04    NACL-門脇    11/08/08  外泊（他医受診）の日付コメント
       *                                     の差し込みを止める
       *  04.05.05    NACL-門脇    11/11/30  画像診断フイルム分画数対応
+      *  04.05.06    NACL-門脇    12/04/02  平成２４年４月改正
+      *                                     コメント差込
+      *                                     外泊日コメントを記載しない
+      *                                     190153090
+      *                                     190153190
+      *                                     190153290
+      *                                     190153390
+      *                                     療養病棟コメント名称編集
+      *                                     820000160
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5219,7 +5228,9 @@
                                       OR "999999982" OR "999999992"
                                       OR "999999983" OR "999999993"
                                       OR "190116890" OR "999999984"
-                                      OR "999999994"               )
+                                      OR "999999994"
+                                      OR "190153190" OR "190153390"
+                                      OR "190153290" OR "190153090")
               MOVE    1     TO    FLG-NG
            END-IF
       *
@@ -5271,10 +5282,10 @@
       *
            IF     RECE64-ZAISKBKBN             =    "6"
            AND    RECE64-MEISAISU              =     1
-             IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
-             OR  (RECE64-FLG-EISAPO-COMMENT    =    "1")
-             OR  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
-             OR  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+             IF  (RECE64-FLG-KAKURI-COMMENT    =    "1"       )
+             OR  (RECE64-FLG-EISAPO-COMMENT    =    "1" OR "2")
+             OR  (RECE64-FLG-KOKKEA-COMMENT    =    "1"       )
+             OR  (RECE64-FLG-JYUSYO-COMMENT    =    "1" OR "2")
                PERFORM    20012-NYUKASAN-HENSYU-SEC
              END-IF
            END-IF
@@ -5357,15 +5368,31 @@
              MOVE  "栄養サポートチーム加算算定日"
                               TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
            END-IF
+           IF  (RECE64-FLG-EISAPO-COMMENT    =    "2")
+             MOVE   20        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "栄養サポートチーム加算（指定地域）算定日"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
            IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
              MOVE   12        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
              MOVE  "呼吸ケアチーム加算算定日"
                               TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
            END-IF
+           IF  (RECE64-FLG-JYUSYO-COMMENT    =    "2")
+             MOVE   9         TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "重症者加算１算定日"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
            IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+            IF  RECE62-SRYYM   >=  "201204"
+             MOVE   9         TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "重症者加算２算定日"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+            ELSE
              MOVE   19        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
              MOVE  "重症者加算（精神療養病棟入院料）算定日"
                               TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+            END-IF
            END-IF
            MOVE  "1"          TO  WRK-RECE65XX-RECEPTFLG(MAX-MEISAISU 1)
       *    算定日コメントの挿入
@@ -5418,11 +5445,17 @@
                    IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994005  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+                   IF  (RECE64-FLG-EISAPO-COMMENT    =    "2")
                      COMPUTE RECE659-ZAINUM =  99994010  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                   IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994015  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "2")
+                     COMPUTE RECE659-ZAINUM =  99994020  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994025  +  IDX19
                    END-IF
                    MOVE    "900"            TO   RECE659-SRYSYUKBN
                  WHEN      "92"
@@ -5432,11 +5465,17 @@
                    IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994055  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+                   IF  (RECE64-FLG-EISAPO-COMMENT    =    "2")
                      COMPUTE RECE659-ZAINUM =  99994060  +  IDX19
                    END-IF
-                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                   IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
                      COMPUTE RECE659-ZAINUM =  99994065  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "2")
+                     COMPUTE RECE659-ZAINUM =  99994070  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994075  +  IDX19
                    END-IF
                    MOVE    "920"            TO   RECE659-SRYSYUKBN
                END-EVALUATE
@@ -5486,11 +5525,17 @@
                IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994005  +  IDX19
                END-IF
-               IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+               IF  (RECE64-FLG-EISAPO-COMMENT    =    "2")
                  COMPUTE RECE649-ZAINUM =  99994010  +  IDX19
                END-IF
-               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+               IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994015  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "2")
+                 COMPUTE RECE649-ZAINUM =  99994020  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994025  +  IDX19
                END-IF
              WHEN      "92"
                IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
@@ -5499,11 +5544,17 @@
                IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994055  +  IDX19
                END-IF
-               IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
+               IF  (RECE64-FLG-EISAPO-COMMENT    =    "2")
                  COMPUTE RECE649-ZAINUM =  99994060  +  IDX19
                END-IF
-               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+               IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
                  COMPUTE RECE649-ZAINUM =  99994065  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "2")
+                 COMPUTE RECE649-ZAINUM =  99994070  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994075  +  IDX19
                END-IF
            END-EVALUATE
            MOVE    ZERO                TO  RECE649-ZAIREN
@@ -5544,7 +5595,7 @@
       *****************************************************************
        2001-EISAPO-HANTEI-SEC          SECTION.
       *
-           IF      RECE64-FLG-EISAPO-COMMENT    =    "1"
+           IF      RECE64-FLG-EISAPO-COMMENT    =    "1" OR "2"
                MOVE       99      TO     FLG-COMMENT
                PERFORM   2001-NYU-COMMENT-SEC
            END-IF
@@ -5574,7 +5625,7 @@
       *****************************************************************
        2001-JYUSYO-HANTEI-SEC          SECTION.
       *
-           IF      RECE64-FLG-JYUSYO-COMMENT    =    "1"
+           IF      RECE64-FLG-JYUSYO-COMMENT    =    "1" OR "2"
                MOVE       99      TO     FLG-COMMENT
                PERFORM   2001-NYU-COMMENT-SEC
            END-IF
@@ -7064,6 +7115,7 @@
                 MOVE "「３７」"
                        TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000158"
+             WHEN      "820000160"
                 MOVE "「９１」"
                        TO  WRK-RECE65XX2-NAME(MAX-MEISAISU 1)
              WHEN      "820000159"
@@ -7599,6 +7651,9 @@
                           "180028210" OR "180028310" OR "180028410" OR
                           "180032410" OR "180032510" OR "180032610" OR
                           "180032710" OR "180033110" OR
+                          "180033910" OR "180034010" OR "180034110" OR
+                          "180034210" OR "180034310" OR "180034410" OR
+                          "180034510" OR "180034610" OR "180034710" OR
       *18
                           "113003410" OR
       *20

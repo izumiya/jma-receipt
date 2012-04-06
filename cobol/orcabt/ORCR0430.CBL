@@ -111,6 +111,8 @@
       *  04.05.04    NACL-門脇    10/11/10  内服薬剤逓減編集修正
       *  04.05.05    NACL-門脇    10/12/03  内服薬剤逓減編集修正
       *  04.05.06    NACL-門脇    11/10/11  内服薬剤逓減編集修正
+      *  04.05.07    NACL-門脇    12/04/02  平成２４年４月改正
+      *                                     コメント差込
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -613,6 +615,8 @@
            03  CONS-SINPESU         PIC X(09) VALUE "113001510".
       *    認知療法・認知行動療法
            03  CONS-NINRYO          PIC X(09) VALUE "180033210".
+      *    認知療法・認知行動療法（精神科救急体制の精神保健指定医）
+           03  CONS-NINRYO2         PIC X(09) VALUE "180035910".
       *
       *    複数診療科受診の退避テーブル
        01  TBL-JUSHIN-INF.
@@ -4875,13 +4879,17 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2001-NINRYO-HANTEI-SEC          SECTION.
       *
-           IF     RECE44-FLG-NINRYO-COMMENT   =    "1"
+           IF     RECE44-FLG-NINRYO-COMMENT   =    "1" OR "2"
                MOVE    SPACE                TO  WRK-NINRYO-FSANTEIYMD
                INITIALIZE                       SANTEI-REC
                MOVE    RECE44-HOSPNUM       TO  SANTEI-HOSPNUM
                MOVE    RECE44-PTID          TO  SANTEI-PTID
                MOVE    RECE44-SRYYM         TO  SANTEI-SRYYM
-               MOVE    CONS-NINRYO          TO  SANTEI-SRYCD
+               IF  RECE44-FLG-NINRYO-COMMENT  =    "1"
+                 MOVE  CONS-NINRYO          TO  SANTEI-SRYCD
+               ELSE
+                 MOVE  CONS-NINRYO2         TO  SANTEI-SRYCD
+               END-IF
                MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
                MOVE    ZERO                 TO  SANTEI-SRYKA
                MOVE    ZERO                 TO  SANTEI-HKNCOMBINUM
