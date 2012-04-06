@@ -10070,11 +10070,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                GO      TO      480-DOSYORI-EXT
            END-IF
       *
-      *    行挿入行をなくす
-           IF      FLG-INS             =   1
-               PERFORM 420-SYOKYO-SEC
-           END-IF
-      *
       **** MOVE    ZERO                TO  SPA-NAI-DOSELNUM
            MOVE    SPACE               TO  SPA-GMN-DOSELNUM
            MOVE    1                   TO  SPA-NAI-DOSELNUM
@@ -10092,6 +10087,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ＤＯ処理へ
       *****************************************************************
        4801-K09-SYORI-SEC            SECTION.
+      *
+      *    行挿入行をなくす
+           PERFORM 420-SYOKYO-SEC
       *
       *    初期画面セット
            MOVE    SPACE               TO  LINKAREA
