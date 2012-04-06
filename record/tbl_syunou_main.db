@@ -1639,6 +1639,7 @@ path	key84 	{
 			AND   SRYYMD      LIKE :SRYYMD
 			AND   CREATEKBN   <>  '3'
 			AND   SECMONEY    <>  0
+			AND   SECMONEY    <>  9
 			ORDER   BY    PTID
 		;
 	};
