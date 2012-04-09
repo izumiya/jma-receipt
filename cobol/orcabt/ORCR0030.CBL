@@ -1459,12 +1459,6 @@
            03  CONS-ZAISIEN1       PIC X(09) VALUE "114011570".
            03  CONS-ZAISIEN2       PIC X(09) VALUE "114011670".
            03  CONS-ZAISIEN3       PIC X(09) VALUE "114011770".
-           03  CONS-ZAISIEN4       PIC X(09) VALUE "114017570".
-           03  CONS-ZAISIEN5       PIC X(09) VALUE "114017870".
-           03  CONS-ZAISIEN6       PIC X(09) VALUE "114017470".
-           03  CONS-ZAISIEN7       PIC X(09) VALUE "114017770".
-           03  CONS-ZAISIEN8       PIC X(09) VALUE "114017670".
-           03  CONS-ZAISIEN9       PIC X(09) VALUE "114017970".
       *
       *    ºÆ¿Ç¡ÊÆýÍÄ»ù¡Ë²Ã»»
            03  CONS-NYUYOJI        PIC X(09) VALUE "112000970".
@@ -1764,6 +1758,12 @@
            03  CONS-KYOKUIN3-COMMENT PIC X(09)  VALUE  "140051910".
       *    ¶É½ê±¢°µÊÄº¿½èÃÖ¡ÊÈïÊ¤ºàÅ½ÉÕ¡Ë¡Ê£²£°£°£ã£í£²°Ê¾å¡Ë
            03  CONS-KYOKUIN4-COMMENT PIC X(09)  VALUE  "140052010".
+      *    ¶É½ê±¢°µÊÄº¿½èÃÖ½é²ó²Ã»»¡Ê£±£°£°£ã£í£²Ì¤Ëþ¡Ë
+           03  CONS-KYOKUIN5-COMMENT PIC X(09)  VALUE  "140052170".
+      *    ¶É½ê±¢°µÊÄº¿½èÃÖ½é²ó²Ã»»¡Ê£±£°£°£ã£í£²°Ê¾å£²£°£°£ã£í£²Ì¤Ëþ¡Ë
+           03  CONS-KYOKUIN6-COMMENT PIC X(09)  VALUE  "140052270".
+      *    ¶É½ê±¢°µÊÄº¿½èÃÖ½é²ó²Ã»»¡Ê£²£°£°£ã£í£²°Ê¾å¡Ë
+           03  CONS-KYOKUIN7-COMMENT PIC X(09)  VALUE  "140052370".
       *    Ç§ÃÎÎÅË¡¡¦Ç§ÃÎ¹ÔÆ°ÎÅË¡
            03  CONS-NINRYO-COMMENT   PIC X(09)  VALUE  "180033210".
       *    Ç§ÃÎÎÅË¡¡¦Ç§ÃÎ¹ÔÆ°ÎÅË¡¡ÊÀº¿À²ÊµßµÞÂÎÀ©¤ÎÀº¿ÀÊÝ·ò»ØÄê°å¡Ë
@@ -6970,11 +6970,19 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE   "1"    TO    RECE04-FLG-JINZOU-COMMENT
                 END-IF
       *         ¶É½ê±¢°µÊÄº¿½èÃÖ
-                IF   SRY-SRYCD(IDX2)  =     CONS-KYOKUIN1-COMMENT
-                                        OR  CONS-KYOKUIN2-COMMENT
-                                        OR  CONS-KYOKUIN3-COMMENT
-                                        OR  CONS-KYOKUIN4-COMMENT
+                IF   RECE02-SRYYM      >=    "201204"
+                  IF   SRY-SRYCD(IDX2)  =     CONS-KYOKUIN5-COMMENT
+                                          OR  CONS-KYOKUIN6-COMMENT
+                                          OR  CONS-KYOKUIN7-COMMENT
                         MOVE   "1"    TO    RECE04-FLG-KYOKUIN-COMMENT
+                  END-IF
+                ELSE
+                  IF   SRY-SRYCD(IDX2)  =     CONS-KYOKUIN1-COMMENT
+                                          OR  CONS-KYOKUIN2-COMMENT
+                                          OR  CONS-KYOKUIN3-COMMENT
+                                          OR  CONS-KYOKUIN4-COMMENT
+                        MOVE   "1"    TO    RECE04-FLG-KYOKUIN-COMMENT
+                  END-IF
                 END-IF
               END-IF
            END-IF
@@ -7276,44 +7284,22 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
               END-IF
       *
               IF   RECE02-SRYYM    >=     "201204"
-                IF  (WRK-SISETU3168  =  1)
-                  IF  SRY-SRYCD(IDX2) =  CONS-ZAISIEN1  OR
-                                         CONS-ZAISIEN2  OR
-                                         CONS-ZAISIEN3
-                    MOVE   "1"   TO    RECE02-COMCNTFLG
-                    MOVE   "1"   TO    RECE04-FLG-ZAISIEN-COMMENT
-                  END-IF
-                END-IF
-                IF  (WRK-SISETU3055  =  1)
-                OR  (WRK-SISETU3056  =  1)
-                  IF  SRY-SRYCD(IDX2) =  CONS-ZAISIEN4  OR
-                                         CONS-ZAISIEN5  OR
-                                         CONS-ZAISIEN6  OR
-                                         CONS-ZAISIEN7  OR
-                                         CONS-ZAISIEN8  OR
-                                         CONS-ZAISIEN9
-                    MOVE   "1"   TO    RECE02-COMCNTFLG
-                    MOVE   "1"   TO    RECE04-FLG-ZAISIEN-COMMENT
-                  END-IF
-                END-IF
-                IF  RECE04-FLG-ZAISIEN-COMMENT = SPACE
-                  IF  (WRK-SISETU3169  =  1)
-                    IF  SRY-SRYCD(IDX2) =  CONS-ZAISIEN1  OR
-                                           CONS-ZAISIEN2  OR
-                                           CONS-ZAISIEN3
-                      MOVE   "1"   TO    RECE02-COMCNTFLG
-                      MOVE   "2"   TO    RECE04-FLG-ZAISIEN-COMMENT
-                    END-IF
-                  END-IF
-                  IF  (WRK-SISETU3057  =  1)
-                  OR  (WRK-SISETU3058  =  1)
-                    IF  SRY-SRYCD(IDX2) =  CONS-ZAISIEN4  OR
-                                           CONS-ZAISIEN6  OR
-                                           CONS-ZAISIEN8
-                      MOVE   "1"   TO    RECE02-COMCNTFLG
-                      MOVE   "2"   TO    RECE04-FLG-ZAISIEN-COMMENT
-                    END-IF
-                  END-IF
+                IF   SRY-SRYCD(IDX2) =  CONS-OSIN-COMMENT
+                                    OR  CONS-OSIN2-COMMENT
+                   IF    (WRK-SISETU3168  =  1)
+                   OR    (WRK-SISETU3055  =  1)
+                   OR    (WRK-SISETU3056  =  1)
+                       MOVE   "1"   TO    RECE02-COMCNTFLG
+                       MOVE   "1"   TO    RECE04-FLG-ZAISIEN-COMMENT
+                   END-IF
+                   IF  RECE04-FLG-ZAISIEN-COMMENT = SPACE
+                     IF  (WRK-SISETU3169  =  1)
+                     OR  (WRK-SISETU3057  =  1)
+                     OR  (WRK-SISETU3058  =  1)
+                       MOVE   "1"   TO    RECE02-COMCNTFLG
+                       MOVE   "2"   TO    RECE04-FLG-ZAISIEN-COMMENT
+                     END-IF
+                   END-IF
                 END-IF
               ELSE
                 IF   WRK-SISETU613   =  1
