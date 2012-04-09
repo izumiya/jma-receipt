@@ -156,51 +156,33 @@ fi
         if  [ -e $4 ]; then
             exit 
         else 
-            if  [ $2 -eq '1' ]; then
-##
-##              レセ一括作成 
-                if  [ $8 -lt '200610' ]; then
-                    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0950 -parameter $9${10}$1$2$3$8$5$6,${16},${4}   >> $LOG_FILE 2>&1
-                    if  [ -e $4 ]; then
-                       exit 
-                    else 
-                       $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0951 -parameter $9${10}$1$3$8$5$6,${16},${4}   >> $LOG_FILE 2>&1
-                    fi
-                else    
+            if  [ $8 -lt '200610' ]; then
+                $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0950 -parameter $9${10}$1$2$3$8$5$6,${16},${4}   >> $LOG_FILE 2>&1
+                if  [ -e $4 ]; then
+                    exit 
+                else 
+                    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0951 -parameter $9${10}$1$3$8$5$6,${16},${4}   >> $LOG_FILE 2>&1
+                fi
+            else    
+                if [ ${17} -eq  '0' ]; then
                     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0960 -parameter $9${10}$1$2$3$8$5$6,${14},${15},${18},${16},${4}   >> $LOG_FILE 2>&1
                     if  [ -e $4 ]; then
                        exit 
                     else 
                        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0961 -parameter $9${10}$1$3$8$5$6,${14},${15},${18},${16},${4}   >> $LOG_FILE 2>&1
                     fi
+                else
+                    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0963 -parameter $9${10}$1$2$3$8$5$6,${14},${18},${16},${4}   >> $LOG_FILE 2>&1
                     if  [ -e $4 ]; then
                        exit 
                     else 
-                       $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0962 -parameter $9${10}$1$3$8$5$6,${18},${16},${4}   >> $LOG_FILE 2>&1
+                       $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0964 -parameter $9${10}$1$3$8$5$6,${14},${18},${16},${4}   >> $LOG_FILE 2>&1
                     fi
                 fi
-            else
-##
-##              レセ個別作成 
-                if  [ $8 -lt '200610' ]; then
-                    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0950 -parameter $9${10}$1$2$3$8$5$6,${16},${4}   >> $LOG_FILE 2>&1
-                    if  [ -e $4 ]; then
-                       exit 
-                    else 
-                       $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0951 -parameter $9${10}$1$3$8$5$6,${16},${4}   >> $LOG_FILE 2>&1
-                    fi
-                else    
-                    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0960 -parameter $9${10}$1$2$3$8$5$6,${14},${15},${18},${16},${4}   >> $LOG_FILE 2>&1
-                    if  [ -e $4 ]; then
-                       exit 
-                    else 
-                       $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0961 -parameter $9${10}$1$3$8$5$6,${14},${15},${18},${16},${4}   >> $LOG_FILE 2>&1
-                    fi
-                    if  [ -e $4 ]; then
-                       exit 
-                    else 
-                       $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0962 -parameter $9${10}$1$3$8$5$6,${18},${16},${4}   >> $LOG_FILE 2>&1
-                    fi
+                if  [ -e $4 ]; then
+                   exit 
+                else 
+                   $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0962 -parameter $9${10}$1$3$8$5$6,${18},${16},${4}   >> $LOG_FILE 2>&1
                 fi
             fi
         fi
@@ -210,7 +192,7 @@ fi
             exit 
         else
             $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE$5$6,${16}  >> $LOG_FILE 2>&1
-        
+
             rm  -f /tmp/${16}00RECE8*
             rm  -f /tmp/${16}00RECEYMD*
 	fi

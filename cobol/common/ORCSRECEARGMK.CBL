@@ -40,6 +40,8 @@
       *  04.03.02    NACL-藤原    08/08/11  コメント記載箇所選択機能対応
       *  04.03.03    NACL-藤原    08/08/19  仮レセ作成（院外処方含む）対応
       *
+      *  04.05.01    NACL-藤原    11/08/02  労災新様式対応
+      *
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
       *
@@ -182,7 +184,7 @@
       *01  LINK-ERRCD                  PIC X(04).
            COPY    "COMMON-SPA".
       *
-      **************************************************************************
+      *****************************************************************
        PROCEDURE           DIVISION
                USING
                LINK-SHORI-KBN
@@ -208,7 +210,7 @@
            .
       * 
       *****************************************************************
-      *    初期　処理
+      *    初期処理
       *****************************************************************
        100-INIT-SEC                SECTION.
       *???
@@ -317,6 +319,12 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
                                            =   SPACE
                MOVE    ZERO                TO
                                            SYS-200501-COMMENT-ROU-KSIKBN
+           END-IF
+           IF      SYS-200501-ROUPRTKBN    =   SPACE
+               MOVE    ZERO                TO  SYS-200501-ROUPRTKBN
+           END-IF
+           IF      SYS-200501-ROUPRTKBN-N  =   SPACE
+               MOVE    ZERO                TO  SYS-200501-ROUPRTKBN-N
            END-IF
            IF      SYS-200501-INSPECT-ZERO-KBN
                                            =   SPACE
@@ -602,6 +610,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
                                                    TO  SHELLTBL-ARG13
            END-EVALUATE
            EVALUATE   LINK-NYUGAIKBN   ALSO    LINK-HKNKBN
+               WHEN   "1"              ALSO    "1"
+                   MOVE    SYS-200501-ROUPRTKBN-N
+                                                   TO  SHELLTBL-ARG14
+               WHEN   "2"              ALSO    "1"
+                   MOVE    SYS-200501-ROUPRTKBN    TO  SHELLTBL-ARG14
                WHEN   "1"              ALSO    "2"
                    MOVE    SYS-200501-JIBAIPRTKBN-N
                                                    TO  SHELLTBL-ARG14

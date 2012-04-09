@@ -1407,6 +1407,7 @@
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
 	</widget>
+
 	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>BYOMEI_PRTJYUN_COMBO</name>
@@ -3317,7 +3318,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <name>label635</name>
-	  <x>1120</x>
+	  <x>120</x>
 	  <y>126</y>
 	  <width>70</width>
 	  <height>24</height>
@@ -3334,7 +3335,7 @@
 	  <class>GtkLabel</class>
 	  <name>label636</name>
 	  <x>120</x>
-	  <y>1160</y>
+	  <y>160</y>
 	  <width>70</width>
 	  <height>24</height>
 	  <label>¡ÊÆþ±¡¡Ë</label>
@@ -3350,7 +3351,7 @@
 	  <class>GtkLabel</class>
 	  <name>label525</name>
 	  <x>30</x>
-	  <y>112</y>
+	  <y>208</y>
 	  <width>140</width>
 	  <height>24</height>
 	  <label>Ï«ºÒ¥³¥á¥ó¥Èµ­ºÜ</label>
@@ -3365,7 +3366,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <name>label634</name>
-	  <x>1030</x>
+	  <x>30</x>
 	  <y>106</y>
 	  <width>140</width>
 	  <height>24</height>
@@ -3422,7 +3423,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>COMMENT_ROU_COMBO</name>
 	  <x>190</x>
-	  <y>112</y>
+	  <y>208</y>
 	  <width>208</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -3460,48 +3461,8 @@
 
 	<widget>
 	  <class>GtkPandaCombo</class>
-	  <name>ROUPRTKBN_COMBO</name>
-	  <x>1190</x>
-	  <y>112</y>
-	  <width>208</width>
-	  <height>24</height>
-	  <value_in_list>False</value_in_list>
-	  <ok_if_empty>True</ok_if_empty>
-	  <case_sensitive>False</case_sensitive>
-	  <use_arrows>True</use_arrows>
-	  <use_arrows_always>False</use_arrows_always>
-	  <items></items>
-
-	  <widget>
-	    <class>GtkPandaEntry</class>
-	    <child_name>GtkPandaCombo:entry</child_name>
-	    <name>ROUPRTKBN</name>
-	    <can_focus>False</can_focus>
-	    <signal>
-	      <name>activate</name>
-	      <handler>send_event</handler>
-	      <data>ACTIVATE</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>changed</name>
-	      <handler>entry_changed</handler>
-	      <data>CHANGED</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
-	    </signal>
-	    <editable>True</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>24</text_max_length>
-	    <text>1 Ê¿À®£±£¹Ç¯£´·î²þÀµÍÍ¼°</text>
-	    <input_mode>XIM</input_mode>
-	    <xim_enabled>False</xim_enabled>
-	  </widget>
-	</widget>
-
-	<widget>
-	  <class>GtkPandaCombo</class>
 	  <name>ROUPRTKBN_N_COMBO</name>
-	  <x>1190</x>
+	  <x>190</x>
 	  <y>160</y>
 	  <width>208</width>
 	  <height>24</height>
@@ -3516,7 +3477,7 @@
 	    <class>GtkPandaEntry</class>
 	    <child_name>GtkPandaCombo:entry</child_name>
 	    <name>ROUPRTKBN_N</name>
-	    <can_focus>False</can_focus>
+	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>activate</name>
 	      <handler>send_event</handler>
@@ -3552,6 +3513,15 @@
 	  <yalign>0.5</yalign>
 	  <xpad>0</xpad>
 	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkHSeparator</class>
+	  <name>hseparator2</name>
+	  <x>530</x>
+	  <y>30</y>
+	  <width>460</width>
+	  <height>10</height>
 	</widget>
 
 	<widget>
@@ -3596,6 +3566,46 @@
 
 	<widget>
 	  <class>GtkPandaCombo</class>
+	  <name>ROUPRTKBN_COMBO</name>
+	  <x>190</x>
+	  <y>112</y>
+	  <width>208</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>ROUPRTKBN</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>24</text_max_length>
+	    <text>1 Ê¿À®£±£¹Ç¯£´·î²þÀµÍÍ¼°</text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
 	  <name>FRAME_ROU_N_COMBO</name>
 	  <x>190</x>
 	  <y>64</y>
@@ -3632,15 +3642,6 @@
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
-	</widget>
-
-	<widget>
-	  <class>GtkHSeparator</class>
-	  <name>hseparator2</name>
-	  <x>530</x>
-	  <y>30</y>
-	  <width>460</width>
-	  <height>10</height>
 	</widget>
       </widget>
 
