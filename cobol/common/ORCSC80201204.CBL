@@ -3051,8 +3051,6 @@
       *        ¾å¸ÂÆü¿ô±Û¤¨¤Ç ·î£±£³Ã±°Ì°Ê¾å
                IF     (WRK-COM-KZMFLG (IDX-Z)   =   SPACE)  AND
                       (LNK-ORCSC-KEI-IDX        =   ZERO )
-                   MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
-                   MOVE    "1"             TO  WRK-COM-KZMFLG (IDX-Z)
                    EVALUATE    WRK-RIHA-KBN
                        WHEN    "2"
       *                    Ç¾·ì´É¼À´µ
@@ -3074,8 +3072,13 @@
                                MOVE    "K872"          TO  SPA-ERRCD
                            END-IF
                    END-EVALUATE
-                   MOVE    WRK-KYUSEI-MSG02    TO  LNK-ORCSC-ERRMSG
-                   MOVE    "1"                 TO  WRK-COM-CUR  (IDX-Z)
+                   IF      SPA-ERRCD       NOT =   SPACE
+                       MOVE    IDX-Z           TO  LNK-ORCSC-KEI-IDX
+                       MOVE    "1"             TO  WRK-COM-KZMFLG(IDX-Z)
+                       MOVE    WRK-KYUSEI-MSG02
+                                               TO  LNK-ORCSC-ERRMSG
+                       MOVE    "1"             TO  WRK-COM-CUR  (IDX-Z)
+                   END-IF
                END-IF
            END-IF
       *
