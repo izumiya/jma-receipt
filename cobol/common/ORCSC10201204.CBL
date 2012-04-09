@@ -814,6 +814,9 @@
                                                    OR  "13"
                                                    OR  "14" )
                   IF      (WRK-COM-KAISU(IDX-MAX)    >   1  )
+      *H24.4         在宅加算料は回数チェックなし
+                     AND  (WRK-COM-SRYSYUKBN(IDX-MAX)
+                                               NOT =   "143")
                        PERFORM 10012-KAISU-CHK-SEC
                    END-IF
                END-IF
