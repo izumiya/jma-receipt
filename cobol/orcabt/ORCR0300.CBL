@@ -374,6 +374,8 @@
       *  04.05.26    NACL-藤原    12/03/14  平成２４年４月改正対応
       *                                     平成２４年４月分以降の処理を
       *                                     行わない
+      *  04.05.27    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
+      *                                     の変更
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -1543,6 +1545,7 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-CONS-SRYYM-200604   PIC 9(06)   VALUE   200604. 
            03  WRK-CONS-SRYYM-200704   PIC 9(06)   VALUE   200704.
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.
+           03  WRK-CONS-SRYYM-201204   PIC 9(06)   VALUE   201204.
       *    レセプトコメント
            03  WRK-CONS-RECECOM-MAX
                                    PIC 9(02)   VALUE   48.
@@ -5304,13 +5307,13 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                        END-IF    
                        PERFORM 5005-NUM-HENSYU-SEC  
       *                回数
-                       IF    ( IDX             =   WRK-SRYCD1-MAX     )
-                       AND   ( RECE041-ZAIKAISU
-                                               >   ZERO               )
+      *****            IF    ( IDX             =   WRK-SRYCD1-MAX     )
+      *****            AND   ( RECE041-ZAIKAISU
+      *****                                    >   ZERO               )
                            MOVE    RECE041-ZAIKAISU    TO  WRK-KAISU
                            MOVE    WRK-KAISU           TO  WRK-NUM
                            MOVE    3                   TO  WRK-NAGASA
-                       END-IF
+      *****            END-IF
                        PERFORM 5005-NUM-HENSYU-SEC
       *                コメントコード１
                        IF      TBL-RECE055-MAX >   ZERO
@@ -5395,8 +5398,9 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                PERFORM 200722-YKZ-HENSYU-SEC
            END-PERFORM            
       *    日計表データの編集
-           IF    ( WRK-TBLMAX6         >   ZERO                        )
-           AND   ( RECE041-SRYKBN (1:1)
+           IF      RECE02-SRYYM        <   WRK-CONS-SRYYM-201204
+             IF    ( WRK-TBLMAX6         >   ZERO                      )
+             AND   ( RECE041-SRYKBN (1:1)
                                        =   "2" OR  "3"  OR  "4" OR  "5")
                IF    ( RECE02-TEISYUTUSAKI   =   "1"                )
                AND   ( RECE02-RJNGAIFTN  >=  SYS-2005-NI-JYOKEN (1) )
@@ -5410,6 +5414,7 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                AND   ( RECE02-RJNGAIFTN  >=  SYS-200501-NI-JYOKEN (1) )
                        PERFORM 200725-NIKKEI-HENSYU-SEC
                END-IF
+             END-IF
            END-IF
       *
       *    特定器材データの編集
@@ -5597,13 +5602,13 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            END-IF        
            PERFORM 5005-NUM-HENSYU-SEC  
       *    回数
-           IF      IDX                 =   WRK-TBLMAX6
-               IF      RECE041-ZAIKAISU    >   ZERO
+      *****IF      IDX                 =   WRK-TBLMAX6
+      *****    IF      RECE041-ZAIKAISU    >   ZERO
                    MOVE    RECE041-ZAIKAISU    TO  WRK-KAISU
                    MOVE    WRK-KAISU           TO  WRK-NUM
                    MOVE    3                   TO  WRK-NAGASA
-               END-IF
-           END-IF        
+      *****    END-IF
+      *****END-IF        
            PERFORM 5005-NUM-HENSYU-SEC
       *    コメントコード１
            IF      TBL-RECE055-MAX >   ZERO
@@ -5765,21 +5770,21 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            END-IF        
            PERFORM 5005-NUM-HENSYU-SEC  
       *    回数
-           IF    ( IDXX                =   1               )
-           AND   ( IDX                 =   WRK-SRYCD71-MAX )
-           AND   ( RECE041-SRYKBN      =   "70"            )
-               IF      RECE041-ZAIKAISU    >   ZERO
+      *****IF    ( IDXX                =   1               )
+      *****AND   ( IDX                 =   WRK-SRYCD71-MAX )
+      *****AND   ( RECE041-SRYKBN      =   "70"            )
+      *****    IF      RECE041-ZAIKAISU    >   ZERO
+      *****        MOVE    RECE041-ZAIKAISU    TO  WRK-NUM
+      *****        MOVE    3                   TO  WRK-NAGASA
+      *****    END-IF
+      *****END-IF        
+      *****IF    ( IDXX                =   2               )
+      *****AND   ( IDX                 =   WRK-SRYCD72-MAX )
+      *****    IF      RECE041-ZAIKAISU    >   ZERO
                    MOVE    RECE041-ZAIKAISU    TO  WRK-NUM
                    MOVE    3                   TO  WRK-NAGASA
-               END-IF
-           END-IF        
-           IF    ( IDXX                =   2               )
-           AND   ( IDX                 =   WRK-SRYCD72-MAX )
-               IF      RECE041-ZAIKAISU    >   ZERO
-                   MOVE    RECE041-ZAIKAISU    TO  WRK-NUM
-                   MOVE    3                   TO  WRK-NAGASA
-               END-IF
-           END-IF        
+      *****    END-IF
+      *****END-IF        
            PERFORM 5005-NUM-HENSYU-SEC
       *    単位コード
            IF      TBL-ZAIW-TANICD (2 IDX)     >   ZERO
@@ -5947,13 +5952,13 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            END-IF
            PERFORM 5005-NUM-HENSYU-SEC  
       *    回数
-           IF      ORCSRECESORT-TBLMAX (IDXX)
-                                       =   IDX
-               IF      RECE041-ZAIKAISU    >   ZERO
+      *****IF      ORCSRECESORT-TBLMAX (IDXX)
+      *****                            =   IDX
+      *****    IF      RECE041-ZAIKAISU    >   ZERO
                    MOVE    RECE041-ZAIKAISU    TO  WRK-NUM
                    MOVE    3                   TO  WRK-NAGASA
-               END-IF
-           END-IF        
+      *****    END-IF
+      *****END-IF        
            PERFORM 5005-NUM-HENSYU-SEC
       *    単位コード
            IF      ORCSRECESORT-TANICD (IDXX IDX)
@@ -6203,13 +6208,13 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                    END-IF    
                    PERFORM 5005-NUM-HENSYU-SEC  
       *            回数
-                   IF    ( IDZ4            =   IDZ5 )
-                   AND   ( RECE041-ZAIKAISU
-                                           >   ZERO )
+      *****        IF    ( IDZ4            =   IDZ5 )
+      *****        AND   ( RECE041-ZAIKAISU
+      *****                                >   ZERO )
                        MOVE    RECE041-ZAIKAISU    TO  WRK-KAISU
                        MOVE    WRK-KAISU           TO  WRK-NUM
                        MOVE    3                   TO  WRK-NAGASA
-                   END-IF
+      *****        END-IF
                    PERFORM 5005-NUM-HENSYU-SEC
       *            コメントコード１
                    IF      TBL-RECE055-MAX >   ZERO
