@@ -5015,13 +5015,27 @@
       *    初診・再診の重複チェック
            IF     (FLG-TBL             =   1   )  AND
                   (SPA-ERRCD           =   SPACE )
-      *        最初の診察料が複数科・保険の時
-               IF     (IDX-SINSATU     NOT =   IDX-Z  )
-               AND    (IDX-SYU2            =   IDX-Z  )
-                   MOVE    "0017"          TO  SPA-ERRCD
-                   MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+      *        同日再診、同日電話再診、同日２科目以外
+               IF     (WRK-KBN             =   "D"
+                                           OR  "S"
+                                           OR  "K"
+                                           OR  "J")
+                 OR   (LNK-ORCSC-PG        =   "KT01"  )
+                 OR   (FLG-DOUJITU         =   1  )
+                 OR   (FLG-DOUJITU-S       =   1  )
+                 OR   (FLG-DOUJITU-T       =   1  )
+                   CONTINUE
+               ELSE
+                   IF      LNK-ORCSC-CHK-IDX   >   ZERO
+                       MOVE    "0017"          TO  SPA-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                              (IDX-Z)
+                   ELSE
+                       MOVE    IDX-Z       TO  LNK-ORCSC-CHK-IDX
+                   END-IF
                END-IF
            END-IF
+      *
            .
        20001-SINSATURYOCHK-EXT.
            EXIT.
