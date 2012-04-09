@@ -296,6 +296,9 @@
        01  RYOUYOCOM-REC.
            COPY    "CPRYOCOM.INC".
       *
+      *    ÅÀ¿ô¥Þ¥¹¥¿¡Ý
+           COPY    "CPTENSU.INC".
+      *
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -545,8 +548,9 @@
                    END-IF
                  END-PERFORM
                END-IF
-      *        Ê¿À®£²£²Ç¯£´·î¤«¤é¤ÎÆþ±¡¥Á¥§¥Ã¥¯
-               IF    LNK-RYOCOM-SANTEIYM   >=  "201004"
+      *        Ê¿À®£²£²Ç¯£´·î¤«¤éÊ¿À®£²£´Ç¯£³·î¤Þ¤Ç¤ÎÆþ±¡¥Á¥§¥Ã¥¯
+               IF   ( LNK-RYOCOM-SANTEIYM   >=  "201004" )    AND
+                    ( LNK-RYOCOM-SANTEIYM   <=  "201203" )
                  PERFORM   VARYING  IDX   FROM   1   BY  1
                    UNTIL  (IDX      >     50)
                    IF   NSRY-SRYCD(1)   =    CONS-RYOYO-SRYCD-H22(IDX)
@@ -560,6 +564,93 @@
                        END-PERFORM
                    END-IF
                  END-PERFORM
+               END-IF
+      *        Ê¿À®£²£´Ç¯£´·î¤«¤é¤ÎÆþ±¡¥Á¥§¥Ã¥¯
+               IF     LNK-RYOCOM-SANTEIYM   >=  "201204"
+                   INITIALIZE                       TNS-TENSU-REC
+                   MOVE   LNK-RYOCOM-SANTEIYM  TO  TNS-YUKOSTYMD (1:6)
+                   MOVE   "01"                 TO  TNS-YUKOSTYMD (7:2)
+                   MOVE   TNS-YUKOSTYMD        TO  TNS-YUKOEDYMD
+                   MOVE   LNK-RYOCOM-HOSPNUM   TO  TNS-HOSPNUM
+                   MOVE   NSRY-SRYCD(1)        TO  TNS-SRYCD
+                   MOVE   TNS-TENSU-REC        TO  MCPDATA-REC
+                   MOVE    "tbl_tensu"         TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   PERFORM 910-DBSELECT-SEC
+                   IF      MCP-RC              =   ZERO
+                       MOVE  "tbl_tensu"       TO  MCP-TABLE
+                       MOVE  "key"             TO  MCP-PATHNAME
+                       PERFORM 910-DBFETCH-SEC
+                       IF      MCP-RC          =   ZERO
+                           MOVE  MCPDATA-REC   TO  TNS-TENSU-REC
+      *                    Æþ±¡´ðËÜÎÁ²Ã»»¶èÊ¬¤«¤é¤ÎÈ½Äê
+                           EVALUATE   TNS-NYUKHNKSNKBN
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
+                             WHEN   152
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Á
+                             WHEN   153
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Â
+                             WHEN   154
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ã
+                             WHEN   155
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Ä
+                             WHEN   156
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ£Å
+                             WHEN   157
+      *                      Í­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡ÊÆÃÊÌÆþ±¡´ðËÜÎÁ¡Ë
+                             WHEN   158
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë
+                             WHEN   173
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë
+                             WHEN   174
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë
+                             WHEN   175
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë
+                             WHEN   176
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë
+                             WHEN   177
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Æ¡Ë
+                             WHEN   178
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£Ç¡Ë
+                             WHEN   179
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£È¡Ë
+                             WHEN   180
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡ÊÆþ±¡´ðËÜÎÁ£É¡Ë
+                             WHEN   181
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Á¡Ë
+                             WHEN   182
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Â¡Ë
+                             WHEN   183
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ã¡Ë
+                             WHEN   184
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ä¡Ë
+                             WHEN   185
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Å¡Ë
+                             WHEN   186
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Æ¡Ë
+                             WHEN   187
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£Ç¡Ë
+                             WHEN   188
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£È¡Ë
+                             WHEN   189
+      *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£É¡Ë
+                             WHEN   190
+                               PERFORM  VARYING   IDX1 FROM 1 BY 1
+                                 UNTIL  ( IDX1     >   31 )
+                                 IF  (NACCT-DAY(IDX1)    =   1)   AND
+                                     (WRK-GAIHAKU(IDX1)  =   SPACE)
+                                      MOVE "1"  TO  LNK-RYOCOM-NYUINKBN
+                                                                (IDX1)
+                                      MOVE  1     TO  FLG-RYOYO-NYUIN
+                                 END-IF
+                               END-PERFORM
+                           END-EVALUATE
+                       END-IF
+                   END-IF
+      *
+                   MOVE    "tbl_tensu"   TO  MCP-TABLE
+                   MOVE    "key"         TO  MCP-PATHNAME
+                   PERFORM  910-DB-CLOSE-SEC
                END-IF
            END-IF
       *
@@ -898,6 +989,12 @@
       *    °åÎÅ¶èÊ¬½¸·×
            IF     (RYOCOM-ZAINUM       >=  2000)     AND
                   (RYOCOM-ZAINUM       <=  2999)
+             IF    (RYOCOM-SRYYM       >=  "201204")   AND
+                   (RYOCOM-SRYCD       =   "820000158")
+      *        ¡Ö£¹£±¡¡êóáì¤ËÂÐ¤¹¤ë¼£ÎÅ¤ò¼Â»Ü¤·¤Æ¤¤¤ë¾õÂÖ¡×¤Ï
+      *          ²þÀµ¤Ë¤è¤êÊ¿À®£²£´Ç¯£´·î°Ê¹ß¤Ï½èÍýÂÐ¾Ý³°¤È¤¹¤ë
+                 CONTINUE
+             ELSE
                IF   RYOCOM-MONTH       NOT =     ZERO
                    PERFORM   VARYING  IDX   FROM  1  BY  1
                      UNTIL   IDX      >   31
@@ -932,6 +1029,7 @@
                        END-IF
                    END-PERFORM
                END-IF
+             END-IF
            END-IF
       *
            .
@@ -1022,7 +1120,14 @@
              WHEN   "820000158"
                 MOVE  "820000158"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
              WHEN   "820000159"
-                MOVE  "820000159"  TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+      *         Ê¿À®£²£´Ç¯£´·î°Ê¹ß¤Ï "820000159" ==> "820000160"
+                IF  RYOCOM-SRYYM   <=   "201203"
+                    MOVE  "820000159"
+                                   TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+                ELSE
+                    MOVE  "820000160"
+                                   TO  LNK-RYOCOM-IRYO-SRYCD(IDX IDX2)
+                END-IF
            END-EVALUATE
       *
            .
@@ -1257,6 +1362,34 @@
       *
            .
        910-RYOUYOCOM-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥Æ¡¼¥Ö¥ë¸¡º÷½èÍý
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥Æ¡¼¥Ö¥ëÆÉ¤ß¹þ¤ß½èÍý
+      *****************************************************************
+       910-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-DBFETCH-EXT.
            EXIT.
       *
       *****************************************************************
