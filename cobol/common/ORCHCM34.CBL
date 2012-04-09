@@ -139,8 +139,6 @@
            03  FLG-PTKOHINF                        PIC 9(01).
            03  FLG-PTBYOMEI                        PIC 9(01).
            03  FLG-ZENSP                           PIC 9(01).
-           03  FLG-KYUSEI                          PIC 9(01).
-           03  FLG-UTAGAI                          PIC 9(01).
            03  FLG-SRYACCT                         PIC 9(01).
            03  FLG-SRYACT                          PIC 9(01).
            03  FLG-NYUINACCT                       PIC 9(01).
@@ -328,7 +326,7 @@
            03  WRK-PTKOH-JKYSNUM-N                 PIC X(40).
            03  WRK-PTBYO-TENKIKBN                  PIC X(01).
            03  WRK-PTBYO-TENKIKBNMEI               PIC X(04).
-           03  WRK-PTBYO-BYOMEI                    PIC X(200).
+           03  WRK-PTBYO-BYOMEI                    PIC X(240).
            03  WRK-PTBYO-BYOMEIMOJI                PIC 9(05).
            03  WRK-PTBYO-UTAGAIFLG                 PIC X(01).
            03  WRK-BASEYMD.
@@ -908,6 +906,9 @@
       *
       *    °õºþ£Ä£ÂÀ©¸æ¥µ¥Ö
            COPY    "CPORCSPRT.INC".
+      *
+      *    ÉÂÌ¾ÊÔ½¸
+           COPY    "CPORCSMKBYOMEI.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPAREA".
@@ -2603,63 +2604,16 @@
       *****************************************************************
        20011-PTBYOMEI-BYOMEI-HEN-SEC       SECTION.
       *
-           MOVE       ZERO                 TO  FLG-UTAGAI
-                                               FLG-KYUSEI
+           MOVE   WRK-PTBYO-UTAGAIFLG  TO  SMKBYO-UTAGAIFLG
+           MOVE    WRK-PTBYO-BYOMEI    TO  SMKBYO-BYOMEI
       *
-           IF    ( WRK-PTBYO-UTAGAIFLG     =   "1" OR  "3" )
-               COMPUTE CNT-BYOMEIMOJI  =   WRK-PTBYO-BYOMEIMOJI    *   2
-               IF    ( CNT-BYOMEIMOJI  <=  8 )
-                   MOVE    WRK-PTBYO-BYOMEI    TO  WRK-STR
-               ELSE
-                   MOVE    WRK-PTBYO-BYOMEI (CNT-BYOMEIMOJI - 7:)
-                                           TO  WRK-STR
-               END-IF
+           CALL   "ORCSMKBYOMEI"   USING
+                                   ORCSMKBYOMEIAREA
+           MOVE    SMKBYO-BYOMEI       TO  WRK-PTBYO-BYOMEI
       *
-               MOVE    ZERO                TO  CNT-STR
-               PERFORM VARYING IDX0    FROM    1   BY  2
-                       UNTIL ( IDX0    >   199 )
-                        OR   ( WRK-STR (IDX0:) =   SPACE )
-      *
-                   IF    ( WRK-STR (IDX0:2)    =   "µ¿" )
-                       COMPUTE CNT-STR =   CNT-STR     +   1
-                   END-IF
-      *
-               END-PERFORM
-               IF    ( CNT-STR         =   ZERO )
-                   MOVE    1           TO  FLG-UTAGAI
-               END-IF
-           END-IF
-      *
-           IF    ( WRK-PTBYO-UTAGAIFLG     =   "2" OR  "3" )
-               MOVE    ZERO                TO  CNT-STR
-               INSPECT WRK-PTBYO-BYOMEI    TALLYING
-                       CNT-STR FOR ALL "µÞÀ­"
-               IF    ( CNT-STR        <=   ZERO )
-                   MOVE    1               TO  FLG-KYUSEI
-               END-IF
-           END-IF
-      *
-           IF    ( FLG-KYUSEI              =   1 )
-               MOVE    SPACE               TO  WRK-STR
-               STRING  "µÞÀ­"              DELIMITED   BY  SIZE
-                       WRK-PTBYO-BYOMEI    DELIMITED   BY  SPACE
-               INTO    WRK-STR
-               END-STRING
-               MOVE    WRK-STR             TO  WRK-PTBYO-BYOMEI
-           END-IF
-      *
-           IF    ( FLG-UTAGAI              =   1 )
-               MOVE    SPACE               TO  WRK-STR
-               STRING  WRK-PTBYO-BYOMEI    DELIMITED   BY  SPACE
-                       "¤Îµ¿¤¤"            DELIMITED   BY  SIZE
-               INTO    WRK-STR
-               END-STRING
-               MOVE    WRK-STR             TO  WRK-PTBYO-BYOMEI
-           END-IF
-      *
-           MOVE    WRK-PTBYO-BYOMEI        TO  WRK-MAE-INPUT
+           MOVE    WRK-PTBYO-BYOMEI    TO  WRK-MAE-INPUT
            PERFORM 800-ZENKAKU-HEN-SEC
-           MOVE    WRK-OUT-INPUT           TO  WRK-PTBYO-BYOMEI
+           MOVE    WRK-OUT-INPUT       TO  WRK-PTBYO-BYOMEI
       *
            .
        20011-PTBYOMEI-BYOMEI-HEN-EXT.
