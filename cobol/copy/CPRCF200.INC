@@ -117,7 +117,7 @@
       *入院基本料種別情報
            03  RECE200-NYUSYUINF           OCCURS  20.
       *入院基本料種別
-               05  RECE200-NYUSYUBETU      PIC X(12).
+               05  RECE200-NYUSYUBETU      PIC X(20).
       *
       *入院基本料情報
            03  RECE200-NYUKHNINF           OCCURS  10.
@@ -138,7 +138,7 @@
       *特定入院料・その他（点）
                05  RECE200-NYUTOKRYO       PIC 9(09).
       *特定入院料・その他（略称）
-               05  RECE200-NYUTOKRYO-RYAKU PIC X(14).
+               05  RECE200-NYUTOKRYO-RYAKU PIC X(20).
       *入院日数
                05  RECE200-NYUTOKNISSU     PIC 9(02).
       *合計金額

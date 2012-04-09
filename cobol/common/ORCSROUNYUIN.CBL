@@ -83,6 +83,7 @@
       *  04.05.01    NACL-門脇    10/01/18  治験対応
       *  04.05.02    NACL-門脇    11/08/16  労災病衣貸与料対応
       *  04.05.03    NACL-門脇    12/03/13  改正対応（外泊区分６，７の対応）
+      *  04.05.04    NACL-門脇    12/04/09  改正対応（入院略称の文字数拡張）
       *****************************************************************
       *
       *
@@ -251,7 +252,7 @@
            03  WRK-GAIHAKU-SRYCD           PIC X(09).
            03  WRK-MEISAISU                PIC 9(03).
            03  WRK-RYAKU-SRYCD             PIC X(09).
-           03  WRK-RYAKUSHO                PIC X(14).
+           03  WRK-RYAKUSHO                PIC X(20).
            03  WRK-SRYKBN                  PIC X(02).
            03  WRK-KSNKBN                  PIC 9(03).
            03  WRK-ZAISKBKBN               PIC X(01).

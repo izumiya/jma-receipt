@@ -112,6 +112,7 @@
       *  04.05.05    NACL-藤原    11/03/25  災害対応
       *                                     連絡先情報追加
       *  04.05.06    NACL-藤原    11/11/22  同日再入院対応
+      *  04.05.07    NACL-門脇    12/04/09  入院略称の文字数拡張
       ************************************************************
       *01  RECE62-REC.
            03  RECE62-KEY.
@@ -379,7 +380,7 @@
       *入院基本料種別情報
            03  RECE62-NYUSYUINF           OCCURS  20.
       *入院基本料種別
-               05  RECE62-NYUSYUBETU      PIC  X(12).
+               05  RECE62-NYUSYUBETU      PIC  X(20).
       *
       *入院基本料情報
            03  RECE62-NYUKHNINF           OCCURS  10.
@@ -404,7 +405,7 @@
       *特定入院料・その他（点）
                05  RECE62-NYUTOKRYO       PIC  9(09).
       *特定入院料・その他（略称）
-               05  RECE62-NYUTOKRYO-RYAKU PIC  X(14).
+               05  RECE62-NYUTOKRYO-RYAKU PIC  X(20).
       *入院日数
                05  RECE62-NYUTOKNISSU     PIC  9(02).
       *合計金額情報
