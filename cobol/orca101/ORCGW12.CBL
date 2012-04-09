@@ -7476,8 +7476,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-INSPECT-CHARACTER-KBN
                                            TO
                                        SYS-200501-INSPECT-CHARACTER-KBN
-      *##  MOVE    SPA-GMN-ROUPRTKBN       TO  SYS-200501-ROUPRTKBN
-      *##  MOVE    SPA-GMN-ROUPRTKBN-N     TO  SYS-200501-ROUPRTKBN-N
+           MOVE    SPA-GMN-ROUPRTKBN       TO  SYS-200501-ROUPRTKBN
+           MOVE    SPA-GMN-ROUPRTKBN-N     TO  SYS-200501-ROUPRTKBN-N
            MOVE    SPACE                   TO  SYS-200501-CHKKBN
            MOVE    SPACE                   TO  SYS-200501-BYOMEI-PRTJYUN
            MOVE    SYS-200501-REC          TO  SYSKANRI-REC
@@ -9346,8 +9346,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "FRAME_ROU"
                    MOVE    213         TO  SPA-GMN-CUR
                WHEN    "FRAME_ROU_N"
-                   MOVE    214         TO  SPA-GMN-CUR
-      *##          MOVE    215         TO  SPA-GMN-CUR
+                   MOVE    215         TO  SPA-GMN-CUR
                WHEN    "ROUPRTKBN"
                    MOVE    216         TO  SPA-GMN-CUR
                WHEN    "ROUPRTKBN_N"

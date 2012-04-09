@@ -282,7 +282,6 @@
                05  WRK-PARA-SHELLID PIC  X(08).
            03  WRK-PARA-RECECOM     PIC  X(01).
            03  WRK-PARA-PRTKBN      PIC  X(01).
-           03  WRK-PARA-DLTKBN      PIC  X(01).
            03  WRK-PARA-HOSPNUM     PIC  9(02).
       *
            03  WRK-SYS-SRYYMD       PIC  X(08).
@@ -612,12 +611,9 @@
                                        INTO    WRK-PARA
                                                WRK-PARA-RECECOM
                                                WRK-PARA-PRTKBN
-                                               WRK-PARA-DLTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
-      *
-           DISPLAY "WRK-PARA-DLTKBN=" WRK-PARA-DLTKBN
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
