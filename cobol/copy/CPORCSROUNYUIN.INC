@@ -28,6 +28,7 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 04.05.01     NACL-門脇    10/01/18  包括点数の治験減点分追加
+      * 04.05.02     NACL-門脇    12/04/09  入院略称の文字数拡張
       ************************************************************
        01  ORCSROUNYUIN-AREA.
       *
@@ -65,7 +66,7 @@
                        09  LNK-SROUNYUIN-SRYCD       PIC  X(09).
                        09  LNK-SROUNYUIN-SRYCD-SK    PIC  X(01).
       *略称（特定入院料）
-                   07  LNK-SROUNYUIN-RYAKUSYO        PIC  X(14).
+                   07  LNK-SROUNYUIN-RYAKUSYO        PIC  X(20).
       *入院会計剤識別区分６の剤点数
                    07  LNK-SROUNYUIN-ZAITEN-NACCT    PIC  9(08).
       *診療会計９０・９２の剤点数
@@ -76,7 +77,7 @@
                    07  LNK-SROUNYUIN-GENTEN          PIC  9(08).
       *
       *略称（一般入院料・加算）
-               05  LNK-SROUNYUIN-RYAKUSYO2           PIC  X(14)
+               05  LNK-SROUNYUIN-RYAKUSYO2           PIC  X(20)
                                                      OCCURS 20.
       *
       *注加算扱いの入院料加算

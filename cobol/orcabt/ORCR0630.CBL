@@ -101,6 +101,7 @@
       *  04.05.06    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
       *  04.05.07    NACL-ÌçÏÆ    12/04/02  Ê¿À®£²£´Ç¯£´·î²þÀµ
       *                                     ³°Çñ¶èÊ¬£¶¡¥£·¤ÎÂÐ±þ
+      *                                     Æþ±¡Î¬¾Î¤ÎÊ¸»ú¿ô³ÈÄ¥ÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/13  ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤ÎËÜÂÎ¼è¹þ¤ß
       *****************************************************************
@@ -343,7 +344,7 @@
                05  WRK-TOKUKANRIKASAN                  PIC 9(01)
                                                        OCCURS 31.
            03  WRK-SRYCD                               PIC X(09).
-           03  WRK-RYAKUSHO                            PIC X(14).
+           03  WRK-RYAKUSHO                            PIC X(20).
            03  WRK-SRYYMD                              PIC X(08).       
            03  WRK-SRYYMD-TAIHI                        PIC X(08).   
            03  WRK-SENTEI-KEISU                        PIC 9V99.    
@@ -2138,7 +2139,7 @@
                       ADD        1           TO  RECE62-NYUTOKNISSU(ID1)
                       MOVE       1           TO  FLG-NISSUSET
       ***             ÅÀ¿ô¤¬¥¼¥í¤Î¾ì¹ç¤Î°Ù¤Î½èÃÖ
-                      MOVE   "£¹£¹£¹£¹£¹£¹£¹"
+                      MOVE   "£¹£¹£¹£¹£¹£¹£¹£¹£¹£¹"
                                              TO  RECE62-NYUTOKRYO-RYAKU
                                                                    (ID1)
       *
@@ -3854,7 +3855,7 @@
                     MOVE    ZERO    TO   RECE62-NYUTOKRYO(IDX)
                  END-IF
                  IF   RECE62-NYUTOKRYO-RYAKU(IDX)  
-                                             =  "£¹£¹£¹£¹£¹£¹£¹"
+                                             =  "£¹£¹£¹£¹£¹£¹£¹£¹£¹£¹"
                     MOVE    SPACE   TO   RECE62-NYUTOKRYO-RYAKU(IDX)
                  END-IF
            END-PERFORM

@@ -70,6 +70,7 @@
       *  04.05.04    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    12/04/02  Ê¿À®£²£´Ç¯£´·î²þÀµ
       *                                     ³°Çñ¶èÊ¬£¶¡¥£·¤ÎÂÐ±þ
+      *                                     Æþ±¡Î¬¾Î¤ÎÊ¸»ú¿ô³ÈÄ¥ÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
@@ -1254,7 +1255,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     IF  FLG-ARI  =  ZERO  
                       ADD        1           TO  RECE82-NYUTOKNISSU(ID1)
       ***             ÅÀ¿ô¤¬¥¼¥í¤Î¾ì¹ç¤Î°Ù¤Î½èÃÖ
-                      MOVE   "£¹£¹£¹£¹£¹"    TO  RECE82-NYUTOKRYO-RYAKU
+                      MOVE   "£¹£¹£¹£¹£¹£¹£¹£¹£¹£¹"
+                                             TO  RECE82-NYUTOKRYO-RYAKU
                                                                    (ID1)
       *
                       MOVE   WRK-NYUTOKRYO   TO  RECE82-NYUTOKRYO(ID1)
@@ -2513,7 +2515,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     MOVE    ZERO    TO   RECE82-NYUTOKRYO(IDX)
                  END-IF
                  IF   RECE82-NYUTOKRYO-RYAKU(IDX)  
-                                             =  "£¹£¹£¹£¹£¹"
+                                             =  "£¹£¹£¹£¹£¹£¹£¹£¹£¹£¹"
                     MOVE    SPACE   TO   RECE82-NYUTOKRYO-RYAKU(IDX)
                  END-IF
            END-PERFORM
