@@ -335,6 +335,9 @@
       *                                     平成２４年４月分以降の処理を
       *                                     行わない
       *  04.05.33    NACL-門脇    12/03/23  災害対応（公費欄請求点０点対応）
+      *  04.05.34    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
+      *                                     の変更
+      *                                     日付情報の記録を行う
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1452,6 +1455,7 @@
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.      
            03  WRK-CONS-SRYYM-200704   PIC 9(06)   VALUE   200704.
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.
+           03  WRK-CONS-SRYYM-201204   PIC 9(06)   VALUE   201204.
       *
       *    改行コード
        01  WRK-CONS-RETURN          PIC X(01)   VALUE   X"0A".
@@ -5323,14 +5327,14 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                    END-IF    
                    PERFORM 5005-NUM-HENSYU-SEC  
       *            回数
-                   IF    ( IDZ4            =   IDZ5 )
-                   AND   ( WRK-RECE641-ZAIKAISU
-                                           >   ZERO )
+      *****        IF    ( IDZ4            =   IDZ5 )
+      *****        AND   ( WRK-RECE641-ZAIKAISU
+      *****                                >   ZERO )
                        MOVE    WRK-RECE641-ZAIKAISU
                                                    TO  WRK-KAISU
                        MOVE    WRK-KAISU           TO  WRK-NUM
                        MOVE    3                   TO  WRK-NAGASA
-                   END-IF
+      *****        END-IF
                    PERFORM 5005-NUM-HENSYU-SEC
       *            コメントコード１
                    IF      TBL-RECE655-MAX >   ZERO
@@ -5377,11 +5381,11 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *            日付情報
                    PERFORM VARYING IDV     FROM    1   BY  1
                            UNTIL   IDV     >       31
-      *************    IF      RECE641-KAISU (1 IDV)   >   ZERO
-      *************        MOVE    RECE641-KAISU (1 IDV)
-      *************                                TO  WRK-NUM
-      *************        MOVE    3               TO  WRK-NAGASA
-      *************    END-IF
+                       IF      RECE641-KAISU (1 IDV)   >   ZERO
+                           MOVE    RECE641-KAISU (1 IDV)
+                                                   TO  WRK-NUM
+                           MOVE    3               TO  WRK-NAGASA
+                       END-IF
                        IF      IDV                 =   31
                            MOVE    1                   TO  WRK-END 
                        END-IF     
@@ -5791,8 +5795,9 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    日計表データ用の回数の編集
            INITIALIZE                WRK-NI-RECE641-REC
       *
-           IF    ( WRK-TBLMAX6         >   ZERO                        )
-           AND   ( RECE641-SRYKBN (1:1)
+           IF      RECE62-SRYYM        <   WRK-CONS-SRYYM-201204
+             IF    ( WRK-TBLMAX6         >   ZERO                      )
+             AND   ( RECE641-SRYKBN (1:1)
                                        =   "2" OR  "3"  OR  "4" OR  "5")
                IF    ( RECE62-TEISYUTUSAKI   =   "1"                )
                AND   ( RECE62-RJNGAIFTN  >=  SYS-2005-NI-JYOKEN (3) )
@@ -5973,41 +5978,41 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                        END-IF    
                        PERFORM 5005-NUM-HENSYU-SEC  
       *                回数
-                       IF    ( RECE641-SRYKBN      =   "13"  OR  "14" )
-                       AND   ( RECE641-ZAIKAISU    >   ZERO           )
-                       AND   ( IDX                 <   WRK-SRYCD1-MAX )
-                           IF      FLG-KOKUJISKBKBN1   =   ZERO
-                               MOVE    RECE641-ZAIKAISU
-                                                       TO  WRK-KAISU
-                               MOVE    WRK-KAISU       TO  WRK-NUM
-                               MOVE    3               TO  WRK-NAGASA
-                           ELSE
-                               IF    ( TBL-KOUI-KOKUJISKBKBN1 (IDX)
-                                                       =   "1"      )
-                               AND   ( TBL-KOUI-DATAKBN (IDX)
-                                                       =   "2"      )
-                                   MOVE    RECE641-ZAIKAISU
-                                                       TO  WRK-KAISU
-                                   MOVE    WRK-KAISU   TO  WRK-NUM
-                                   MOVE    3           TO  WRK-NAGASA
-                               ELSE
-                                   IF      IDX     =   FLG-KOKUJISKBKBN1
-                                       MOVE    RECE641-ZAIKAISU
-                                                       TO  WRK-KAISU
-                                       MOVE    WRK-KAISU
-                                                       TO  WRK-NUM
-                                       MOVE    3       TO  WRK-NAGASA
-                                   END-IF
-                               END-IF
-                           END-IF        
-                       END-IF
-                       IF    ( IDX             =   WRK-SRYCD1-MAX     )
-                       AND   ( RECE641-ZAIKAISU
-                                               >   ZERO               )
+      *****            IF    ( RECE641-SRYKBN      =   "13"  OR  "14" )
+      *****            AND   ( RECE641-ZAIKAISU    >   ZERO           )
+      *****            AND   ( IDX                 <   WRK-SRYCD1-MAX )
+      *****                IF      FLG-KOKUJISKBKBN1   =   ZERO
+      *****                    MOVE    RECE641-ZAIKAISU
+      *****                                            TO  WRK-KAISU
+      *****                    MOVE    WRK-KAISU       TO  WRK-NUM
+      *****                    MOVE    3               TO  WRK-NAGASA
+      *****                ELSE
+      *****                    IF    ( TBL-KOUI-KOKUJISKBKBN1 (IDX)
+      *****                                            =   "1"      )
+      *****                    AND   ( TBL-KOUI-DATAKBN (IDX)
+      *****                                            =   "2"      )
+      *****                        MOVE    RECE641-ZAIKAISU
+      *****                                            TO  WRK-KAISU
+      *****                        MOVE    WRK-KAISU   TO  WRK-NUM
+      *****                        MOVE    3           TO  WRK-NAGASA
+      *****                    ELSE
+      *****                        IF      IDX     =   FLG-KOKUJISKBKBN1
+      *****                            MOVE    RECE641-ZAIKAISU
+      *****                                            TO  WRK-KAISU
+      *****                            MOVE    WRK-KAISU
+      *****                                            TO  WRK-NUM
+      *****                            MOVE    3       TO  WRK-NAGASA
+      *****                        END-IF
+      *****                    END-IF
+      *****                END-IF        
+      *****            END-IF
+      *****            IF    ( IDX             =   WRK-SRYCD1-MAX     )
+      *****            AND   ( RECE641-ZAIKAISU
+      *****                                    >   ZERO               )
                            MOVE    RECE641-ZAIKAISU    TO  WRK-KAISU
                            MOVE    WRK-KAISU           TO  WRK-NUM
                            MOVE    3                   TO  WRK-NAGASA
-                       END-IF
+      *****            END-IF
                        PERFORM 5005-NUM-HENSYU-SEC
       *                コメントコード１
                        IF      TBL-RECE655-MAX >   ZERO
@@ -6054,11 +6059,11 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *                日付情報
                        PERFORM VARYING IDV     FROM    1   BY  1
                                UNTIL   IDV     >       31
-      *****************    IF      RECE641-KAISU (1 IDV)   >   ZERO
-      *****************        MOVE    RECE641-KAISU (1 IDV)
-      *****************                                TO  WRK-NUM
-      *****************        MOVE    3               TO  WRK-NAGASA
-      *****************    END-IF
+                           IF      RECE641-KAISU (1 IDV)   >   ZERO
+                               MOVE    RECE641-KAISU (1 IDV)
+                                                       TO  WRK-NUM
+                               MOVE    3               TO  WRK-NAGASA
+                           END-IF
                            IF      IDV                 =   31
                                MOVE    1                   TO  WRK-END 
                            END-IF     
@@ -6086,8 +6091,9 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                PERFORM 200722-YKZ-HENSYU-SEC
            END-PERFORM            
       *    日計表データの編集
-           IF    ( WRK-TBLMAX6         >   ZERO                        )
-           AND   ( RECE641-SRYKBN (1:1)
+           IF      RECE62-SRYYM        <   WRK-CONS-SRYYM-201204
+             IF    ( WRK-TBLMAX6         >   ZERO                      )
+             AND   ( RECE641-SRYKBN (1:1)
                                        =   "2" OR  "3"  OR  "4" OR  "5")
                IF    ( RECE62-TEISYUTUSAKI   =   "1"                )
                AND   ( RECE62-RJNGAIFTN  >=  SYS-2005-NI-JYOKEN (3) )
@@ -6101,6 +6107,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                AND   ( RECE62-RJNGAIFTN  >=  SYS-200501-NI-JYOKEN (2) )
                        PERFORM 200725-NIKKEI-HENSYU-SEC
                END-IF
+             END-IF
            END-IF
       *
       *    特定器材データの編集                 
@@ -6310,13 +6317,13 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-IF        
            PERFORM 5005-NUM-HENSYU-SEC  
       *    回数
-           IF      IDX                 =   WRK-TBLMAX6
-               IF      RECE641-ZAIKAISU    >   ZERO
+      *****IF      IDX                 =   WRK-TBLMAX6
+      *****    IF      RECE641-ZAIKAISU    >   ZERO
                    MOVE    RECE641-ZAIKAISU    TO  WRK-KAISU
                    MOVE    WRK-KAISU           TO  WRK-NUM
                    MOVE    3                   TO  WRK-NAGASA
-               END-IF
-           END-IF        
+      *****    END-IF
+      *****END-IF        
            PERFORM 5005-NUM-HENSYU-SEC
       *    コメントコード１
            IF      TBL-RECE655-MAX >   ZERO
@@ -6363,11 +6370,11 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    日付情報
            PERFORM VARYING IDV     FROM    1   BY  1
                    UNTIL   IDV     >       31
-      *********IF      RECE641-KAISU (1 IDV)   >   ZERO
-      *********    MOVE    RECE641-KAISU (1 IDV)
-      *********                            TO  WRK-NUM
-      *********    MOVE    3               TO  WRK-NAGASA
-      *********END-IF
+               IF      RECE641-KAISU (1 IDV)   >   ZERO
+                   MOVE    RECE641-KAISU (1 IDV)
+                                           TO  WRK-NUM
+                   MOVE    3               TO  WRK-NAGASA
+               END-IF
                IF      IDV                 =   31
                    MOVE    1                   TO  WRK-END 
                END-IF     
@@ -6478,21 +6485,21 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-IF        
            PERFORM 5005-NUM-HENSYU-SEC  
       *    回数
-           IF    ( IDXX                =   1               )
-           AND   ( IDX                 =   WRK-SRYCD71-MAX )
-           AND   ( RECE641-SRYKBN      =   "70"            )
-               IF      RECE641-ZAIKAISU    >   ZERO
+      *****IF    ( IDXX                =   1               )
+      *****AND   ( IDX                 =   WRK-SRYCD71-MAX )
+      *****AND   ( RECE641-SRYKBN      =   "70"            )
+      *****    IF      RECE641-ZAIKAISU    >   ZERO
+      *****        MOVE    RECE641-ZAIKAISU    TO  WRK-NUM
+      *****        MOVE    3                   TO  WRK-NAGASA
+      *****    END-IF
+      *****END-IF        
+      *****IF    ( IDXX                =   2               )
+      *****AND   ( IDX                 =   WRK-SRYCD72-MAX )
+      *****    IF      RECE641-ZAIKAISU    >   ZERO
                    MOVE    RECE641-ZAIKAISU    TO  WRK-NUM
                    MOVE    3                   TO  WRK-NAGASA
-               END-IF
-           END-IF        
-           IF    ( IDXX                =   2               )
-           AND   ( IDX                 =   WRK-SRYCD72-MAX )
-               IF      RECE641-ZAIKAISU    >   ZERO
-                   MOVE    RECE641-ZAIKAISU    TO  WRK-NUM
-                   MOVE    3                   TO  WRK-NAGASA
-               END-IF
-           END-IF        
+      *****    END-IF
+      *****END-IF        
            PERFORM 5005-NUM-HENSYU-SEC
       *    単位コード
            IF      TBL-ZAIW-TANICD (2 IDX)     >   ZERO
@@ -6579,11 +6586,11 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    日付情報
            PERFORM VARYING IDV     FROM    1   BY  1
                    UNTIL   IDV     >       31
-      *********IF      RECE641-KAISU (1 IDV)  >   ZERO
-      *********    MOVE    RECE641-KAISU (1 IDV)
-      *********                            TO  WRK-NUM
-      *********    MOVE    3               TO  WRK-NAGASA
-      *********END-IF
+               IF      RECE641-KAISU (1 IDV)  >   ZERO
+                   MOVE    RECE641-KAISU (1 IDV)
+                                           TO  WRK-NUM
+                   MOVE    3               TO  WRK-NAGASA
+               END-IF
                IF      IDV                 =   31
                    MOVE    1                   TO  WRK-END 
                END-IF     
@@ -6660,13 +6667,13 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
            PERFORM 5005-NUM-HENSYU-SEC  
       *    回数
-           IF      ORCSRECESORT-TBLMAX (IDXX)
-                                       =   IDX
-               IF      RECE641-ZAIKAISU    >   ZERO
+      *****IF      ORCSRECESORT-TBLMAX (IDXX)
+      *****                            =   IDX
+      *****    IF      RECE641-ZAIKAISU    >   ZERO
                    MOVE    RECE641-ZAIKAISU    TO  WRK-NUM
                    MOVE    3                   TO  WRK-NAGASA
-               END-IF
-           END-IF        
+      *****    END-IF
+      *****END-IF        
            PERFORM 5005-NUM-HENSYU-SEC
       *    単位コード
            IF      ORCSRECESORT-TANICD (IDXX IDX)
@@ -6760,11 +6767,11 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    日付情報
            PERFORM VARYING IDV     FROM    1   BY  1
                    UNTIL   IDV     >       31
-      *********IF      RECE641-KAISU (1 IDV)   >   ZERO
-      *********    MOVE    RECE641-KAISU (1 IDV)
-      *********                            TO  WRK-NUM
-      *********    MOVE    3               TO  WRK-NAGASA
-      *********END-IF
+               IF      RECE641-KAISU (1 IDV)   >   ZERO
+                   MOVE    RECE641-KAISU (1 IDV)
+                                           TO  WRK-NUM
+                   MOVE    3               TO  WRK-NAGASA
+               END-IF
                IF      IDV                 =   31
                    MOVE    1                   TO  WRK-END 
                END-IF     
@@ -7008,16 +7015,16 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                    END-IF
                                    PERFORM 5005-NUM-HENSYU-SEC  
       *                            回数
-                                   IF      LNK-NYURECEDEN-KAISU
-                                                   (IDZ1 IDZ2 IDXZ)
-                                                       >   ZERO 
+      *****                        IF      LNK-NYURECEDEN-KAISU
+      *****                                        (IDZ1 IDZ2 IDXZ)
+      *****                                            >   ZERO 
                                        MOVE    LNK-NYURECEDEN-KAISU
                                                        (IDZ1 IDZ2 IDXZ)
                                                        TO  WRK-KAISU
                                        MOVE    WRK-KAISU
                                                        TO  WRK-NUM
                                        MOVE    3       TO  WRK-NAGASA
-                                   END-IF
+      *****                        END-IF
                                    PERFORM 5005-NUM-HENSYU-SEC
       *                            コメントコード１
                                    PERFORM 5005-NUM-HENSYU-SEC
@@ -7034,13 +7041,14 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *                            日付情報
                                    PERFORM VARYING IDV FROM    1   BY  1
                                            UNTIL   IDV >       31
-      *********                        IF      LNK-NYURECEDEN-?? (1 IDV)
-      *********                                        >   ZERO
-      *********                            MOVE    LNK-NYURECEDEN-??
-      *********                                                  (1 IDV)
-      *********                                        TO  WRK-NUM
-      *********                            MOVE    3   TO  WRK-NAGASA
-      *********                        END-IF
+                                       IF      LNK-NYURECEDEN-DAY
+                                                       (IDZ1 IDZ2 IDV)
+                                                       >   ZERO
+                                           MOVE    LNK-NYURECEDEN-DAY
+                                                       (IDZ1 IDZ2 IDV)
+                                                       TO  WRK-NUM
+                                           MOVE    3   TO  WRK-NAGASA
+                                       END-IF
                                        IF      IDV     =   31
                                            MOVE    1       TO  WRK-END 
                                        END-IF     
