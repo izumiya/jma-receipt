@@ -32,6 +32,7 @@
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    10/01/19  剤区分追加
+      *  04.05.03    NACL-門脇    12/04/10  改正対応項目追加
       ************************************************************
       *01  RECE120-REC.
            03  RECE120-KEY.
@@ -181,6 +182,19 @@
            03  RECE120-FLG-MASUI-COMMENT   PIC X(01).
       *認知療法・認知行動療法
            03  RECE120-FLG-NINRYO-COMMENT  PIC X(01).
+      *
+      *認知症専門診断管理料２
+           03  RECE120-FLG-NINSEN-COMMENT  PIC  X(01).
+      *退院時共同指導料１（１以外）
+           03  RECE120-FLG-TAKYO-COMMENT   PIC  X(01).
+      *退院時共同指導料特別管理指導加算
+           03  RECE120-FLG-TAKYOKSN-COMMENT
+                                           PIC  X(01).
+      *外来リハビリテーション診療料・外来放射線照射診療料
+           03  RECE120-FLG-GAIRIHA-COMMENT PIC  X(01).
+      *介護職員等喀痰吸引等指示料
+           03  RECE120-FLG-KAISYOKU-COMMENT
+                                           PIC  X(01).
       *
       *日数回数テーブル
            03  RECE120-DAY-AREA.

@@ -62,6 +62,7 @@
       *                                     対応（ファイル編集）
       *  04.05.04    NACL-門脇    10/01/12  剤区分追加
       *  04.05.05    NACL-門脇    11/11/30  画像診断フイルム追加
+      *  04.05.06    NACL-門脇    12/04/10  改正対応項目追加
       ************************************************************
       *01  RECE04-REC.
            03  RECE04-KEY.
@@ -229,6 +230,19 @@
       *
       *画像診断フイルム
            03  RECE04-FLG-FILM-COMMENT    PIC  X(01).
+      *
+      *認知症専門診断管理料２
+           03  RECE04-FLG-NINSEN-COMMENT  PIC  X(01).
+      *退院時共同指導料１（１以外）
+           03  RECE04-FLG-TAKYO-COMMENT   PIC  X(01).
+      *退院時共同指導料特別管理指導加算
+           03  RECE04-FLG-TAKYOKSN-COMMENT
+                                          PIC  X(01).
+      *外来リハビリテーション診療料・外来放射線照射診療料
+           03  RECE04-FLG-GAIRIHA-COMMENT PIC  X(01).
+      *介護職員等喀痰吸引等指示料
+           03  RECE04-FLG-KAISYOKU-COMMENT
+                                          PIC  X(01).
       *
       *日数回数テーブル
            03  RECE04-DAY-AREA.

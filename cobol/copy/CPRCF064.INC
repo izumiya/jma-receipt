@@ -50,6 +50,7 @@
       *                                     対応（ファイル編集）
       *  04.05.04    NACL-門脇    10/01/12  剤区分追加
       *  04.05.05    NACL-門脇    11/11/30  画像診断フイルム追加
+      *  04.05.06    NACL-門脇    12/04/10  改正対応項目追加
       ************************************************************
       *01  RECE64-REC.
            03  RECE64-KEY.
@@ -215,6 +216,16 @@
       *
       *画像診断フイルム
            03  RECE64-FLG-FILM-COMMENT    PIC  X(01).
+      *
+      *介護職員等喀痰吸引等指示料
+           03  RECE64-FLG-KAISYOKU-COMMENT
+                                          PIC  X(01).
+      *精神科ショート・ケア・精神科デイ・ケア
+           03  RECE64-FLG-SEIKEA-COMMENT  PIC  X(01).
+      *精神科リエゾンチーム加算
+           03  RECE64-FLG-SEIRIE-COMMENT  PIC  X(01).
+      *病棟薬剤業務実施加算
+           03  RECE64-FLG-BYOYAK-COMMENT  PIC  X(01).
       *
       *日数回数テーブル
            03  RECE64-DAY-AREA.
