@@ -235,6 +235,8 @@
       *                                     修正（平成２３年９月まで）
       *  04.05.11    NACL-藤原    11/11/18  他保険での同日再入院時の保険
       *                                     履歴対応
+      *  04.05.12    NACL-門脇    12/04/10  平成２４年４月改正
+      *                                     現物給付化対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -721,6 +723,61 @@
             03  TBL-ZAITAKU3   PIC X(09)   OCCURS  11.
       *
        01  TBL-ZAITAKU3-MAX    PIC 9(02)   VALUE   11.
+      *
+      *    在総診テーブル（２０１２年４月診療分〜）
+       01  TBL-ZAITAKU4-AREA.
+      *    在がん医総（在支診等）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114007610".
+      *    在がん医総（在支診等）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114007710".
+      *    在医総管（在支診等）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114012210".
+      *    在医総管（在支診等）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114012310".
+      *    在医総管（在支診以外）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114012410".
+      *    在医総管（在支診以外）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114007510".
+      *    在医総・在医総管（ＤＵＭＭＹ）
+           03  FILLER          PIC X(09)   VALUE   "099140003".
+      *    特医総管（在支診等）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114013010".
+      *    特医総管（在支診等）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114013110".
+      *    特医総管（在支診等以外）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114013210".
+      *    特医総管（在支診等以外）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114013310".
+      *
+      *    在がん医総（機能強化した在支診等）（病床あり）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114019510".
+      *    在がん医総（機能強化した在支診等）（病床あり）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114019610".
+      *    在がん医総（機能強化した在支診等）（病床なし）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114019710".
+      *    在がん医総（機能強化した在支診等）（病床なし）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114019810".
+      *    在医総管（機能強化した在支診等）（病床あり）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114018710".
+      *    在医総管（機能強化した在支診等）（病床あり）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114018810".
+      *    在医総管（機能強化した在支診等）（病床なし）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114018910".
+      *    在医総管（機能強化した在支診等）（病床なし）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114019010".
+      *    特医総管（機能強化した在支診等）（病床あり）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114019110".
+      *    特医総管（機能強化した在支診等）（病床あり）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114019210".
+      *    特医総管（機能強化した在支診等）（病床なし）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114019310".
+      *    特医総管（機能強化した在支診等）（病床なし）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114019410".
+      *
+       01  TBL-ZAITAKU4-R      REDEFINES   TBL-ZAITAKU4-AREA.
+            03  TBL-ZAITAKU4   PIC X(09)   OCCURS  23.
+      *
+       01  TBL-ZAITAKU4-MAX    PIC 9(02)   VALUE   23.
       *
       *
            COPY    "MCPAREA".
@@ -3394,6 +3451,14 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
       *
            IF   RECE01-SRYYM    >=  "200210"
       *
+            IF     RECE01-SRYYM    >=  "201204"
+                 PERFORM   VARYING   IDX3   FROM    1   BY   1
+                            UNTIL  ( IDX3   >   TBL-ZAITAKU4-MAX )
+                              OR   ( WRK-ZAITAKU    =    "1"     )
+                    MOVE     TBL-ZAITAKU4(IDX3)  TO  WRK-ZAITAKU-SRYCD
+                    PERFORM  ZAITAKU-HENSYU-SEC
+                 END-PERFORM
+            ELSE
              IF    RECE01-SRYYM    >=  "200804"
                  PERFORM   VARYING   IDX3   FROM    1   BY   1
                             UNTIL  ( IDX3   >   TBL-ZAITAKU3-MAX )
@@ -3418,15 +3483,26 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
                  END-PERFORM
                END-IF
              END-IF
+            END-IF
       *
-             IF    WRK-ZAITAKU   =   "1"
+            IF   ((WRK-ZAITAKU     =   "1"     ) AND
+                  (RECE01-SRYYM   <=   "201203"))
+            OR   ( RECE01-SRYYM   >=   "201204" )
                EVALUATE   FLG-GENBUTU70
                  WHEN        1
                     MOVE   "1"   TO  RECE02-ZAITAKU
                  WHEN        2
                     MOVE   "2"   TO  RECE02-ZAITAKU
                END-EVALUATE
-             END-IF
+            END-IF
+      *
+            IF    (WRK-ZAITAKU     =   "1"     )
+            AND   (RECE01-SRYYM   >=   "201204")
+               EVALUATE   FLG-GENBUTU70
+                 WHEN        1
+                    MOVE   "1"   TO  RECE02-ZAITAKU-SANTEI-FLG
+               END-EVALUATE
+            END-IF
       *
            END-IF
       *

@@ -229,6 +229,7 @@
       *  04.05.13    NACL-門脇    12/04/02  平成２４年４月改正
       *                                     「再診」の対応
       *                                     「その他」の対応
+      *                                     現物給付化対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3683,7 +3684,9 @@ grpsys         OR     ( RECE04-HOSPNUM   NOT =   RECE05-HOSPNUM      )
            END-IF
       *
            IF      WRK-2006-ZAITAKU   =   "1"
-               IF      RECE02-ZAITAKU     =   "1"
+               IF   (( RECE02-ZAITAKU     =   "1"       ) AND
+                     ( RECE02-SRYYM      <=   "201203"  ))
+               OR   (  RECE02-ZAITAKU-SANTEI-FLG  = "1"  )
                    CONTINUE
                ELSE
                    GO  TO  200811-SYS2006-CHECK-EXT

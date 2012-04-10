@@ -142,6 +142,8 @@
       *  04.05.33    NACL-藤原    12/03/14  平成２４年４月改正対応
       *                                     平成２４年４月分以降の処理を
       *                                     行わない
+      *  04.05.34    NACL-門脇    12/04/10  平成２４年４月改正
+      *                                     現物給付化対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2536,7 +2538,9 @@
                                        TO  KOHSKY-FTNMONEY(1)
            END-IF
            MOVE    RECE02X-SHOSHINTIME TO  KOHSKY-SHOSHINTIME
-           IF      RECE02X-ZAITAKU  =  "1"
+           IF    ((RECE02X-ZAITAKU  =  "1"          ) AND
+                  (RECE02X-SRYYM   <=  "201203"     ))
+           OR    ( RECE02X-ZAITAKU-SANTEI-FLG  = "1" )
              MOVE    RECE02X-ZAITAKU   TO  KOHSKY-ZAITAKU
            END-IF
            IF      RECE02X-ZAITAKU  =  "2" OR "3"
@@ -8078,9 +8082,11 @@
                    MOVE    "A"         TO  RECE08-RECESYUBETU-SRT (3:1)
                END-IF
       *
-               IF    ( SYS-2008-ZAITAKU 
-                                    NOT =   SPACE )
-               AND   ( RECE02-ZAITAKU   =   "1"   )
+               IF    ((SYS-2008-ZAITAKU NOT = SPACE    ) AND
+                      (RECE02-ZAITAKU   =  "1"         ) AND
+                      (RECE02-SRYYM    <=  "201203"    ))
+               OR    ((SYS-2008-ZAITAKU NOT = SPACE    ) AND
+                      (RECE02-ZAITAKU-SANTEI-FLG  = "1"))
                    MOVE    "1"              TO  RECE08-ZAITAKU
                END-IF
       *
@@ -8112,9 +8118,11 @@
                    MOVE    "1"              TO  RECE08-KOUGAKU
                END-IF
       *
-               IF    ( RECE02-ZAITAKU   =   "1"   )
-               AND   ( RECE-PUTH-ZAITAKU (IDXX)
-                                    NOT =   SPACE )
+               IF    ((RECE-PUTH-ZAITAKU(IDXX) NOT = SPACE) AND
+                      (RECE02-ZAITAKU        =    "1"     ) AND
+                      (RECE02-SRYYM         <=    "201203"))
+               OR    ((RECE-PUTH-ZAITAKU(IDXX) NOT = SPACE) AND
+                      (RECE02-ZAITAKU-SANTEI-FLG  = "1"   ))
                    MOVE    "1"              TO  RECE08-ZAITAKU
                END-IF
       *
@@ -8179,8 +8187,11 @@
                    END-PERFORM
       *
       *            在総診
-                   IF    ( FLG-HENSYU          =   ZERO )
-                   AND   ( RECE02-ZAITAKU      =   "1"  )
+                   IF    ((FLG-HENSYU          =   ZERO    ) AND
+                          (RECE02-ZAITAKU      =   "1"     ) AND
+                          (RECE02-SRYYM       <=   "201203"))
+                   OR    ((FLG-HENSYU          =   ZERO    ) AND
+                          (RECE02-ZAITAKU-SANTEI-FLG  = "1"))
                        PERFORM VARYING IDY FROM    1   BY  1
                                UNTIL   IDY >   WRK-CONS-KOHLIST-MAX
                                OR      TBL-KOH-RECE-PUTB-HKNNUM
@@ -8483,7 +8494,9 @@
            END-IF
       *
       *    在総診等
-           IF      RECE02-ZAITAKU   =   "1"   
+           IF    ((RECE02-ZAITAKU   =   "1"        ) AND
+                  (RECE02-SRYYM    <=  "201203"    ))
+           OR    ( RECE02-ZAITAKU-SANTEI-FLG  = "1" )
                MOVE    "1"              TO  RECE08-ZAITAKU
            END-IF
      *
@@ -8872,7 +8885,10 @@
                MOVE   RECE02-RJNNYUKOHFTN (3)  TO  RECE10-FLG (5)
            END-IF
       *
-           IF      RECE02-ZAITAKU  =  "1"
+           IF    ((RECE02-ZAITAKU  =  "1"          ) AND
+                  (RECE02-SRYYM   <=  "201203"     ))
+           OR    ((RECE02-ZAITAKU-SANTEI-FLG  = "1") AND
+                  (RECE02-TEISYUTUSAKI   NOT  = "1"))
              MOVE    RECE02-ZAITAKU    TO  RECE10-ZAITAKU
            END-IF
       *
