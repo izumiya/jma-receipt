@@ -95,6 +95,7 @@
       *                                     「画像診断」の対応
       *                                     「その他」の対応
       *                                     「入院」の対応
+      *                                     コメント差込
       *
       *  04.06.01    NACL-門脇    10/08/16  入院の点滴入力改善対応
       *****************************************************************
@@ -799,6 +800,29 @@
            03  CONS-JYUSYO-COMMENT   PIC X(09)  VALUE  "190141370".
       *    重症者加算１
            03  CONS-JYUSYO-COMMENT2  PIC X(09)  VALUE  "190151470".
+      *
+      *    介護職員等喀痰吸引等指示料
+           03  CONS-KAISYOKU-COMMENT PIC X(09)  VALUE  "114020910".
+      *    精神科ショート・ケア（大規模）（入院中の患者）
+           03  CONS-SEIKEA1-COMMENT  PIC X(09)  VALUE  "180039030".
+      *    精神科ショート・ケア（小規模）（入院中の患者）
+           03  CONS-SEIKEA2-COMMENT  PIC X(09)  VALUE  "180036030".
+      *    精神科ショート・ケア（小規模）（早期・入院中の患者）
+           03  CONS-SEIKEA3-COMMENT  PIC X(09)  VALUE  "180039130".
+      *    精神科ショート・ケア（大規模）（早期・入院中の患者）
+           03  CONS-SEIKEA4-COMMENT  PIC X(09)  VALUE  "180039230".
+      *    精神科デイ・ケア（大規模）（入院中の患者）
+           03  CONS-SEIKEA5-COMMENT  PIC X(09)  VALUE  "180039330".
+      *    精神科デイ・ケア（小規模）（入院中の患者）
+           03  CONS-SEIKEA6-COMMENT  PIC X(09)  VALUE  "180036130".
+      *    精神科デイ・ケア（小規模）（早期・入院中の患者）
+           03  CONS-SEIKEA7-COMMENT  PIC X(09)  VALUE  "180039430".
+      *    精神科デイ・ケア（大規模）（早期・入院中の患者）
+           03  CONS-SEIKEA8-COMMENT  PIC X(09)  VALUE  "180039530".
+      *    精神科リエゾンチーム加算
+           03  CONS-SEIRIE-COMMENT   PIC X(09)  VALUE  "190147010".
+      *    病棟薬剤業務実施加算
+           03  CONS-BYOYAK-COMMENT   PIC X(09)  VALUE  "190149110".
       *
       *    外来迅速検体検査加算
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -2720,6 +2744,12 @@
                   END-IF
                 END-IF
               END-IF
+      *
+              IF   RECE200-SRYYM    >=     "201204"
+                IF   SRY-SRYCD(IDX2) =  CONS-KAISYOKU-COMMENT
+                   MOVE   "1"   TO    RECE220-FLG-KAISYOKU-COMMENT
+                END-IF
+              END-IF
            END-IF
       *
            IF      RECE220-SRYKBN      =     "50"
@@ -2785,6 +2815,19 @@
                    MOVE  SPACE  TO    RECE220-FLG-HOUSEI-COMMENT
                    MOVE    1    TO    FLG-HOUSEI-COM
               END-IF
+      *
+              IF   RECE200-SRYYM     >=    "201204"
+                IF   SRY-SRYCD(IDX2)  =     CONS-SEIKEA1-COMMENT
+                                      OR    CONS-SEIKEA2-COMMENT
+                                      OR    CONS-SEIKEA3-COMMENT
+                                      OR    CONS-SEIKEA4-COMMENT
+                                      OR    CONS-SEIKEA5-COMMENT
+                                      OR    CONS-SEIKEA6-COMMENT
+                                      OR    CONS-SEIKEA7-COMMENT
+                                      OR    CONS-SEIKEA8-COMMENT
+                   MOVE   "1"   TO    RECE220-FLG-SEIKEA-COMMENT
+                END-IF
+              END-IF
            END-IF
       *
            IF      RECE220-SRYKBN      =     "90"  OR  "92"
@@ -2810,6 +2853,17 @@
                 END-IF
                 IF   SRY-SRYCD(IDX2)  =     CONS-JYUSYO-COMMENT2
                         MOVE   "2"    TO    RECE220-FLG-JYUSYO-COMMENT
+                END-IF
+              END-IF
+      *
+              IF   RECE200-SRYYM     >=    "201204"
+      *         精神科リエゾンチーム加算
+                IF   SRY-SRYCD(IDX2)  =     CONS-SEIRIE-COMMENT
+                        MOVE   "1"    TO    RECE220-FLG-SEIRIE-COMMENT
+                END-IF
+      *         病棟薬剤業務実施加算
+                IF   SRY-SRYCD(IDX2)  =     CONS-BYOYAK-COMMENT
+                        MOVE   "1"    TO    RECE220-FLG-BYOYAK-COMMENT
                 END-IF
               END-IF
            END-IF

@@ -555,6 +555,7 @@
       *                                     ¡Ö½èÃÖ¡×¤ÎÂÐ±þ
       *                                     ¡Ö²èÁü¿ÇÃÇ¡×¤ÎÂÐ±þ
       *                                     ¡Ö¤½¤ÎÂ¾¡×¤ÎÂÐ±þ
+      *                                     ¥³¥á¥ó¥Èº¹¹þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -1773,6 +1774,21 @@
            03  CONS-NINRYO-COMMENT   PIC X(09)  VALUE  "180033210".
       *    Ç§ÃÎÎÅË¡¡¦Ç§ÃÎ¹ÔÆ°ÎÅË¡¡ÊÀº¿À²ÊµßµÞÂÎÀ©¤ÎÀº¿ÀÊÝ·ò»ØÄê°å¡Ë
            03  CONS-NINRYO2-COMMENT  PIC X(09)  VALUE  "180035910".
+      *
+      *    Ç§ÃÎ¾ÉÀìÌç¿ÇÃÇ´ÉÍýÎÁ£²
+           03  CONS-NINSEN-COMMENT   PIC X(09)  VALUE  "113014610".
+      *    Âà±¡»þ¶¦Æ±»ØÆ³ÎÁ£±¡Ê£±°Ê³°¡Ë
+           03  CONS-TAKYO-COMMENT    PIC X(09)  VALUE  "113008710".
+      *    Âà±¡»þ¶¦Æ±»ØÆ³ÎÁÆÃÊÌ´ÉÍý»ØÆ³²Ã»»
+           03  CONS-TAKYOKSN-COMMENT PIC X(09)  VALUE  "113014370".
+      *    ³°Íè¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó¿ÇÎÅÎÁ£±
+           03  CONS-GAIRIHA1-COMMENT PIC X(09)  VALUE  "113013910".
+      *    ³°Íè¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó¿ÇÎÅÎÁ£²
+           03  CONS-GAIRIHA2-COMMENT PIC X(09)  VALUE  "113014010".
+      *    ³°ÍèÊü¼ÍÀþ¾È¼Í¿ÇÎÅÎÁ
+           03  CONS-GAIHOU-COMMENT   PIC X(09)  VALUE  "113014110".
+      *    ²ð¸î¿¦°÷ÅùÓ½áâµÛ°úÅù»Ø¼¨ÎÁ
+           03  CONS-KAISYOKU-COMMENT PIC X(09)  VALUE  "114020910".
       *
       *    ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -7272,6 +7288,24 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE   "1"    TO    RECE04-FLG-SYUEIYO-COMMENT
                 END-IF
               END-IF
+      *
+              IF   RECE02-SRYYM      >=    "201204"
+                IF   SRY-SRYCD(IDX2)  =     CONS-NINSEN-COMMENT
+                        MOVE   "1"    TO    RECE04-FLG-NINSEN-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-TAKYO-COMMENT
+                        MOVE   "1"    TO    RECE02-COMCNTFLG
+                        MOVE   "1"    TO    RECE04-FLG-TAKYO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-TAKYOKSN-COMMENT
+                        MOVE   "1"    TO    RECE04-FLG-TAKYOKSN-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-GAIRIHA1-COMMENT
+                                      OR    CONS-GAIRIHA2-COMMENT
+                                      OR    CONS-GAIHOU-COMMENT
+                        MOVE   "1"    TO    RECE04-FLG-GAIRIHA-COMMENT
+                END-IF
+              END-IF
            END-IF
       *
            IF      RECE04-SRYKBN      =     "14"
@@ -7381,6 +7415,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       END-IF
                     END-IF
                   END-IF
+                END-IF
+              END-IF
+      *
+              IF   RECE02-SRYYM    >=     "201204"
+                IF   SRY-SRYCD(IDX2) =  CONS-KAISYOKU-COMMENT
+                   MOVE   "1"   TO    RECE04-FLG-KAISYOKU-COMMENT
                 END-IF
               END-IF
            END-IF

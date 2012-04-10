@@ -30,6 +30,7 @@
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.02    NACL-門脇    10/01/19  剤区分追加
+      *  04.05.03    NACL-門脇    12/04/10  改正対応項目追加
       ************************************************************
       *01  RECE220-REC.
            03  RECE220-KEY.
@@ -177,6 +178,16 @@
            03  RECE220-FLG-KOKKEA-COMMENT  PIC X(01).
       *重症者加算（精神療養病棟入院料）
            03  RECE220-FLG-JYUSYO-COMMENT  PIC X(01).
+      *
+      *介護職員等喀痰吸引等指示料
+           03  RECE220-FLG-KAISYOKU-COMMENT
+                                           PIC  X(01).
+      *精神科ショート・ケア・精神科デイ・ケア
+           03  RECE220-FLG-SEIKEA-COMMENT  PIC  X(01).
+      *精神科リエゾンチーム加算
+           03  RECE220-FLG-SEIRIE-COMMENT  PIC  X(01).
+      *病棟薬剤業務実施加算
+           03  RECE220-FLG-BYOYAK-COMMENT  PIC  X(01).
       *
       *日数回数テーブル
            03  RECE220-DAY-AREA.

@@ -316,6 +316,8 @@
            03  FLG-KAISIEN         PIC 9(01).
            03  FLG-PTNYUINRRK      PIC 9(01).
            03  FLG-NG              PIC 9(01).
+           03  FLG-KAISYOKU-COMMENT
+                                   PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -466,6 +468,8 @@
            03  WRK-KAISIEN-RRKNUM-X          PIC 9(03).
            03  WRK-KAISIEN-RRKNUM-Y          PIC 9(03).
       *
+           03  WRK-KAISYOKU-YMD              PIC X(08).
+      *
        01  WRK-RECE84-REC. 
            COPY    "CPRCF084.INC"  REPLACING   //RECE84//
                                    BY          //WRK-RECE84//.
@@ -606,6 +610,9 @@
       *
       *    介護支援連携指導料
            03  CONS-KAISIEN         PIC X(09) VALUE "113011710".
+      *
+      *    介護職員等喀痰吸引等指示料
+           03  CONS-KAISYOKU        PIC X(09) VALUE "114020910".
       *
       *    薬剤管理指導料テーブル（２００８年４月診療分〜）
        01  TBL-YAKUKAN-AREA.
@@ -1176,6 +1183,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM    2001-OSIN-HANTEI-SEC
                       END-IF
+      *            （介護職員等喀痰吸引等指示料の算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-KAISYOKU-HANTEI-SEC
+                      END-IF
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM    2099-RECE84-WRITE-SEC
                       END-IF
@@ -1237,6 +1248,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-RIHASEN-HANTEI-SEC
                       END-IF
+      *            （精神科ショート・ケア・精神科デイ・ケアの算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-SEIKEA-HANTEI-SEC
+                      END-IF
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2099-RECE84-WRITE-SEC
                       END-IF
@@ -1266,6 +1281,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
       *                  （重症者加算（精神療養病棟入院料）の算定日のセット）
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2001-JYUSYO-HANTEI-SEC
+                          END-IF
+      *                  （精神科リエゾンチーム加算の算定日のセット）
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-SEIRIE-HANTEI-SEC
+                          END-IF
+      *                  （病棟薬剤業務実施加算の算定日のセット）
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-BYOYAK-HANTEI-SEC
                           END-IF
                           IF   FLG-COMMENT  =  ZERO
                              PERFORM   2099-RECE84-WRITE-SEC
@@ -1354,6 +1377,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-RIHASEN-HANTEI-SEC
                       END-IF
+      *            （精神科ショート・ケア・精神科デイ・ケアの算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-SEIKEA-HANTEI-SEC
+                      END-IF
       *
       *            （訪問看護指示料算定日のセット）
                       IF   FLG-COMMENT  =  ZERO
@@ -1367,6 +1394,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
       *            （往診・特別往診算定日のセット）
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-OSIN-HANTEI-SEC
+                      END-IF
+      *            （介護職員等喀痰吸引等指示料の算定日のセット）
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-KAISYOKU-HANTEI-SEC
                       END-IF
       *            （人工腎臓等の算定日のセット）
                       IF   FLG-COMMENT  =  ZERO
@@ -1429,6 +1460,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
       *                  （重症者加算（精神療養病棟入院料）の算定日のセット）
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2001-JYUSYO-HANTEI-SEC
+                          END-IF
+      *                  （精神科リエゾンチーム加算の算定日のセット）
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-SEIRIE-HANTEI-SEC
+                          END-IF
+      *                  （病棟薬剤業務実施加算の算定日のセット）
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-BYOYAK-HANTEI-SEC
                           END-IF
                           IF   FLG-COMMENT  =  ZERO
                              PERFORM   2099-RECE84-WRITE-SEC
@@ -3400,6 +3439,136 @@ grpsys       PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    介護職員等喀痰吸引等指示料があるか判定
+      *****************************************************************
+       2001-KAISYOKU-HANTEI-SEC          SECTION.
+      *
+           IF     RECE84-FLG-KAISYOKU-COMMENT   =    "1"
+             MOVE    ZERO                TO  FLG-KAISYOKU-COMMENT
+             MOVE    SPACE               TO  WRK-KAISYOKU-YMD
+             INITIALIZE                      SANTEI-REC
+             MOVE    RECE82-HOSPNUM      TO  SANTEI-HOSPNUM
+             MOVE    RECE82-PTID         TO  SANTEI-PTID
+             MOVE    CONS-KAISYOKU       TO  SANTEI-SRYCD
+             MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+             MOVE    ZERO                TO  SANTEI-SRYKA
+             MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+             MOVE    SANTEI-REC          TO  MCPDATA-REC
+             MOVE    "tbl_santei"        TO  MCP-TABLE
+             MOVE    "key3"              TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC              =   ZERO
+                 MOVE    "tbl_santei"    TO  MCP-TABLE
+                 MOVE    "key3"          TO  MCP-PATHNAME
+                 PERFORM  900-SANTEI-READ-SEC
+                 PERFORM   UNTIL  ( FLG-SANTEI           =   1 )
+                             OR   ( FLG-KAISYOKU-COMMENT =   1 )
+      *
+                   IF   SANTEI-SRYYM  <  RECE84-SRYYM
+                     MOVE  SANTEI-SRYYM     TO  WRK-KAISYOKU-YMD(1:6)
+                     MOVE  SANTEI-MSANTEID  TO  WRK-KAISYOKU-YMD(7:2)
+                     MOVE    1              TO  FLG-KAISYOKU-COMMENT
+                   END-IF
+      *
+                   MOVE    "tbl_santei"  TO  MCP-TABLE
+                   MOVE    "key3"        TO  MCP-PATHNAME
+                   PERFORM  900-SANTEI-READ-SEC
+                 END-PERFORM
+             END-IF
+             MOVE    "tbl_santei"        TO  MCP-TABLE
+             MOVE    "key3"              TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+      *
+             MOVE       99         TO     FLG-COMMENT
+      *
+             IF   WRK-KAISYOKU-YMD   NOT =  SPACE
+                MOVE      ZERO     TO     IDZ
+                INITIALIZE                WRK-FREE-AREA2
+      *
+                ADD        1       TO     IDZ
+      *
+                MOVE       17      TO     WK-FREE-YUKOKETA2(IDZ)
+                MOVE   "前回交付年月日　　　年　　月　　日"
+                                   TO     WK-FREE-NAME2(IDZ)
+      *
+                INITIALIZE                         STS-AREA-DAY
+                INITIALIZE                         LNK-DAY2-AREA
+                MOVE    "21"                   TO  LNK-DAY2-IRAI
+                MOVE    WRK-KAISYOKU-YMD       TO  LNK-DAY2-YMD
+                CALL    "ORCSDAY"    USING     STS-AREA-DAY
+                                               LNK-DAY2-AREA
+                IF      STS-DAY-RC1            =   ZERO
+                   MOVE    LNK-DAY2-EDTYMD1-Y   TO  WRK-TAIHI-XX
+                   INITIALIZE                       ORCSKANACHKAREA
+                   MOVE    "2"                  TO  KANACHK-SYORI
+                   MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                   IF      KANACHK-RC      =   ZERO
+                      MOVE    KANACHK-OUT-INPUT(1:4)
+                                        TO  WK-FREE-NAME2(IDZ)(17:4)
+                   END-IF
+      *
+                   MOVE    LNK-DAY2-EDTYMD1-M   TO  WRK-TAIHI-XX
+                   INITIALIZE                       ORCSKANACHKAREA
+                   MOVE    "2"                  TO  KANACHK-SYORI
+                   MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                   IF      KANACHK-RC      =   ZERO
+                      MOVE    KANACHK-OUT-INPUT(1:4)
+                                        TO  WK-FREE-NAME2(IDZ)(23:4)
+                   END-IF
+      *
+                   MOVE    LNK-DAY2-EDTYMD1-D   TO  WRK-TAIHI-XX
+                   INITIALIZE                       ORCSKANACHKAREA
+                   MOVE    "2"                  TO  KANACHK-SYORI
+                   MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                   IF      KANACHK-RC      =   ZERO
+                      MOVE    KANACHK-OUT-INPUT(1:4)
+                                        TO  WK-FREE-NAME2(IDZ)(29:4)
+                   END-IF
+                END-IF
+             ELSE
+                MOVE      ZERO     TO     IDZ
+                INITIALIZE                WRK-FREE-AREA2
+      *
+                ADD        1       TO     IDZ
+      *
+                MOVE       6       TO     WK-FREE-YUKOKETA2(IDZ)
+                MOVE   "（初回交付）"  TO     WK-FREE-NAME2(IDZ)
+             END-IF
+      *
+             PERFORM  200111-RECE85-TAIHI-SEC
+      *
+      *      ＲＥＣＥ０５ファイルの内容をテーブルに退避
+             MOVE    ZERO                 TO  IDX-RECE85
+             MOVE    SPACE                TO  WRK-RECE85XX-REC
+             INITIALIZE                       WRK-RECE85XX-REC
+      *
+             MOVE    RECE84-MEISAISU      TO  MAX-MEISAISU
+      *
+             PERFORM   VARYING   IDX   FROM    1   BY  1
+                        UNTIL  ( IDX                >   50    )
+                         OR    ( WK-FREE-NAME2(IDX) =   SPACE )
+               COMPUTE  MAX-MEISAISU  =   MAX-MEISAISU  +  1
+               MOVE  "810000001"
+                            TO  WRK-RECE85XX-SRYCD(MAX-MEISAISU 1)
+               MOVE   ZERO  TO  WRK-RECE85XX-SRYSURYO(MAX-MEISAISU 1)
+               MOVE   WK-FREE-YUKOKETA2(IDX)
+                            TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+               MOVE   WK-FREE-NAME2(IDX)
+                            TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+               MOVE  "1"    TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
+             END-PERFORM
+      *
+             PERFORM    200111-SRYACTINF-HENSYU-SEC
+           END-IF
+      *
+           .
+       2001-KAISYOKU-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    人工腎臓等のコメントがあるか判定
       *****************************************************************
        2001-JINZOUETC-HANTEI-SEC          SECTION.
@@ -4387,6 +4556,20 @@ grpsys       PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    精神科ショート・ケア・精神科デイ・ケアがあるか判定
+      *****************************************************************
+       2001-SEIKEA-HANTEI-SEC          SECTION.
+      *
+           IF     RECE84-FLG-SEIKEA-COMMENT   =    "1"
+               MOVE       3       TO     FLG-COMMENT
+               PERFORM    20011-SHUJUTSU-ETC2-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-SEIKEA-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    外泊日のコメント編集
       *    精神科隔離病室管理加算（入院料加算）のコメント編集
       *****************************************************************
@@ -4579,6 +4762,36 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        2001-JYUSYO-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    精神科リエゾンチーム加算があるか判定
+      *    （診療行為入力）
+      *****************************************************************
+       2001-SEIRIE-HANTEI-SEC          SECTION.
+      *
+           IF      RECE84-FLG-SEIRIE-COMMENT    =    "1"
+               MOVE       99      TO     FLG-COMMENT
+               PERFORM   2001-NYU-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-SEIRIE-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    病棟薬剤業務実施加算があるか判定
+      *    （診療行為入力）
+      *****************************************************************
+       2001-BYOYAK-HANTEI-SEC          SECTION.
+      *
+           IF      RECE84-FLG-BYOYAK-COMMENT    =    "1"
+               MOVE       99      TO     FLG-COMMENT
+               PERFORM   2001-NYU-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-BYOYAK-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************
