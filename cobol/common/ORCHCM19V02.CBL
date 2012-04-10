@@ -75,6 +75,8 @@
       * 04.06.00     NACL-¬ø°π«º  10/08/26  π‚Œ»Û≥∫≈ˆ¬–±˛ƒ…≤√
       * 04.06.00     NACL-¬ø°π«º  11/02/21  Õ—À°•≥°º•…•≥•·•Û•»¬–±˛
       * 04.06.00     NACL-¬ø°π«º  12/03/01  £»£≤£¥«Ø£¥∑Ó≤˛¿µ¬–±˛
+      * 04.06.00     NACL-¬ø°π«º  12/04/10  ∞Ï»ÃÃæ£±£∞£∞ ∏ª˙¬–±˛
+      *                                     ¥ﬁŒÃµ¨≥  —ππ…‘≤ƒ≈˘§Œ¬–±˛
       *****************************************************************
       *
       *
@@ -173,6 +175,7 @@
       *---(04.02.00) LINE ADD END   ------------------------------------
       *H24.4
            03  FLG-FUKACHK             PIC 9(01).
+           03  FLG-FUKACHK2            PIC 9(01).
       *
       *    ≈∫ª˙ŒŒ∞Ë
        01  IDX-AREA.
@@ -215,6 +218,8 @@
            03  IDXF                    PIC 9(04).
            03  IDXF2                   PIC 9(04).
            03  IDXF3                   PIC 9(04).
+      *H24.4
+           03  IDX-M                   PIC 9(04).
       *
       *    •∑•π•∆•‡ŒŒ∞Ë
        01  SYS-AREA.
@@ -289,9 +294,10 @@
            03  WRK-ZZ              PIC ZZ.
            03  WRK-ZZZ             PIC ZZZ.
       *    ÃææŒ
-           03  WRK-QR-NAME         PIC X(200).
-           03  WRK-TNS-NAME        PIC X(200).
-           03  WRK-NAME            PIC X(200).
+           03  WRK-QR-NAME         PIC X(210).
+           03  WRK-TNS-NAME        PIC X(210).
+           03  WRK-TNS-NAME-G      PIC X(210).
+           03  WRK-NAME            PIC X(210).
       *    Õ—À°•≥•·•Û•»ÃææŒ
            03  WRK-YOH-NAME        PIC X(200).
       *    ∫ﬁ∆‚Õ∆
@@ -392,12 +398,18 @@
                    07  WRK-FIL42           PIC X(06).
       *    ÃÙ∫ﬁÃæ ‘Ω∏
        01  WRK-MEISAI-AREA.
-           03  WRK-M-NAME              PIC X(152).
+           03  WRK-M-NAME              PIC X(228).
            03  WRK-M-NAME-RR           REDEFINES    WRK-M-NAME.
       *        £±π‘ÃææŒ§Œ∫«¬Á
                05  WRK-M-NAME-R1           PIC X(76).
                05  WRK-M-NAME-R2           PIC X(76).
+               05  WRK-M-NAME-R3           PIC X(76).
+           03  WRK-M-NAME-RR2          REDEFINES    WRK-M-NAME.
+               05  WRK-M-NAME-R            PIC X(76)
+                                           OCCURS   3.
+      *
            03  WRK-M-KETA              PIC 9(03).
+           03  WRK-M-KETACHK           PIC 9(03).
            03  WRK-FUKA-MEI-AREA.
       *         —ππ…‘≤ƒ•≥°º•… ‘Ω∏
                05  WRK-FUKA-TBL            OCCURS   3.
@@ -2888,6 +2900,7 @@
       *
            INITIALIZE                      WRK-FUKA-MEI-AREA
            MOVE    ZERO                TO  FLG-FUKACHK
+           MOVE    ZERO                TO  FLG-FUKACHK2
       *
            COMPUTE IDXF2               =   IDXA    +   1
            PERFORM VARYING     IDXF    FROM    IDXF2   BY  1
@@ -2907,11 +2920,17 @@
                        MOVE    2                       TO  IDXF3
                        MOVE    WRK-SRY-SRYCD (IDXF)    TO  WRK-SRYCD
                        PERFORM 31039-KOUHATU-NAME-SEC
+      *                ∞Âª’ΩÃæ§¢§Í
+                       MOVE    1               TO  FLG-KOUHATUFUKA-IN
+                       MOVE    1               TO  FLG-FUKACHK2
                    WHEN    "099209906"
       *                ∫ﬁ∑ø —ππ…‘≤ƒ
                        MOVE    3                       TO  IDXF3
                        MOVE    WRK-SRY-SRYCD (IDXF)    TO  WRK-SRYCD
                        PERFORM 31039-KOUHATU-NAME-SEC
+      *                ∞Âª’ΩÃæ§¢§Í
+                       MOVE    1               TO  FLG-KOUHATUFUKA-IN
+                       MOVE    1               TO  FLG-FUKACHK2
                    WHEN    "099209907"
       *                Ã√ ¡Ãæµ≠∫‹
                        MOVE    1                   TO  WRK-IPNMEI
@@ -2926,6 +2945,7 @@
            END-PERFORM
       *
            IF     (FLG-FUKACHK         =   ZERO    )
+              AND (FLG-FUKACHK2        =   ZERO    )
               AND (SYS-1030-KOUHATUKA  =   "0"     )
       *        ∏Â»Ø∞ÂÃÙ… §ÿ —ππ…‘≤ƒ
                MOVE    1                   TO  IDXF3
@@ -3031,15 +3051,16 @@
                END-IF
       *
       *        ∞Ï»ÃÃæ°¶ΩË ˝ÃææŒµ≠∫‹
+               MOVE    TNS-NAME            TO  WRK-TNS-NAME-G
                IF      TNSP-IPN-KISAIKBN   =   ZERO 
                    MOVE    1                   TO  WRK-KANZANCHI
-                   MOVE    TNS-NAME            TO  WRK-QR-NAME
+                   MOVE    WRK-TNS-NAME-G      TO  WRK-QR-NAME
                ELSE
                    PERFORM 310321-GENERIC-HEN-SEC
-                   MOVE    TNS-NAME            TO  WRK-QR-NAME
+                   MOVE    WRK-TNS-NAME-G      TO  WRK-QR-NAME
                END-IF
       *        £«£≈…’§≠…Ωº®§Œª˛°¢…Ωº®
-               MOVE    TNS-NAME        TO  WRK-TNS-NAME
+               MOVE    WRK-TNS-NAME-G      TO  WRK-TNS-NAME
                IF      SYS-1030-SYOHOGEPRTFLG  =   1
                    IF     (TNS-SYUSAISKB       =   8   )  AND
                           (TNS-SYOMEIKANREN    NOT =   SPACE AND
@@ -3053,7 +3074,7 @@
                IF      SYS-1030-SYOHODSPNAME   NOT =   SPACE
       *            ∏Â»Ø∞ÂÃÙ… ∂Ë ¨
                    IF      TNS-KOUHATUKBN          =   1
-                       MOVE    TNS-NAME        TO  WRK-TNS-NAME
+                       MOVE    WRK-TNS-NAME-G      TO  WRK-TNS-NAME
                        COMPUTE KETA            =  (TNS-YUKOKETA  * 2)
                                                +   1
                        MOVE    SYS-1030-SYOHODSPNAME
@@ -3302,10 +3323,10 @@
            EVALUATE    TNSP-IPN-KISAIKBN
       *        ∞Ï»ÃÃæµ≠∫‹
                WHEN    1
-                   MOVE    SPACE               TO  TNS-NAME
+                   MOVE    SPACE               TO  WRK-TNS-NAME-G
                    STRING  "°⁄»Ã°€"                DELIMITED  BY  SIZE
                            GENERIC-GENERICNAME     DELIMITED  BY  SPACE
-                                               INTO    TNS-NAME
+                                               INTO    WRK-TNS-NAME-G
                    END-STRING
                    COMPUTE TNS-YUKOKETA        =   GENERIC-YUKOKETA
                                                +   3
@@ -3326,7 +3347,7 @@
                    END-IF
       *        ΩË ˝ÃææŒµ≠∫‹
                WHEN    2
-                   MOVE    TNSP-SHONAME        TO  TNS-NAME
+                   MOVE    TNSP-SHONAME        TO  WRK-TNS-NAME-G
                    MOVE    TNSP-SHOYUKOKETA    TO  TNS-YUKOKETA
                    IF      TNSP-IPN-KANZANTANINAME NOT =   SPACE
                        MOVE    TNSP-IPN-KANZANTANICD
@@ -3354,11 +3375,13 @@
            CALL    "ORCSKANACHK"       USING
                                        ORCSKANACHKAREA
            MOVE    KANACHK-MAX         TO  WRK-M-KETA
-      *    ÃÙ∫ﬁ°¶¥Ô∫‡ ‘Ω∏
+      *
            IF     (WRK-SRYCD(1:1)      =   "6"  OR  "7" )  OR
                   (WRK-SRYCD(1:3)      =   "059"  )
+      *        ÃÙ∫ﬁ°¶¥Ô∫‡ ‘Ω∏
                PERFORM 310311-MEISYOU-HEN2-SEC
            ELSE
+      *        ÃÙ∫ﬁ°¶¥Ô∫‡∞ ≥∞§œ£µ£∞ ∏ª˙§ﬁ§«
                MOVE    WRK-M-NAME      TO  WRK-MEISYOU3(IDX-S)
                IF      WRK-M-KETA      >   NAME-MAX
                    ADD     1               TO  IDX-S
@@ -3396,33 +3419,42 @@
       *    ∏Â»Ø…  —ππ…‘≤ƒ∂Ë ¨
            MOVE    WRK-HEN-FUKA        TO  WRK-HENKOU-Z (IDX-S)
       *
-      *
-           MOVE    SPACE               TO  WRK-TNS-NAME
-           IF      (WRK-M-KETA +   WRK-HEN-KETA)  <=  NAME-MAX
-               STRING   WRK-M-NAME     DELIMITED  BY  SPACE
-                        WRK-HEN-NAME   DELIMITED  BY  SPACE
-                                       INTO  WRK-TNS-NAME
-               END-STRING
-               MOVE    WRK-TNS-NAME    TO  WRK-MEISYOU3 (IDX-S)
-           ELSE
-               MOVE    WRK-M-NAME      TO  WRK-MEISYOU3 (IDX-S)
-               IF      WRK-M-KETA      <=  NAME-MAX
+      *    ÃææŒ§Ú£≥π‘§ﬁ§«
+           MOVE    WRK-M-KETA          TO  WRK-M-KETACHK
+           PERFORM VARYING    IDX-M    FROM    1   BY  1
+                   UNTIL      IDX-M    >   3
+               IF      IDX-M           >   1
                    ADD     1               TO  IDX-S
                    MOVE    ALL "°°"        TO  WRK-NO (IDX-S)
                    MOVE    ALL "°°"        TO  WRK-K2 (IDX-S)
-                   MOVE    WRK-HEN-NAME    TO  WRK-MEISYOU3 (IDX-S)
-               ELSE
-                   MOVE    WRK-M-NAME-R2   TO  WRK-NAME
-                   STRING  WRK-NAME        DELIMITED  BY  SPACE
-                           WRK-HEN-NAME    DELIMITED  BY  SPACE
+               END-IF
+               MOVE    SPACE               TO  WRK-TNS-NAME
+               IF      (WRK-M-KETACHK  +   WRK-HEN-KETA)  <=  NAME-MAX
+                   STRING   WRK-M-NAME-R(IDX-M)
+                                           DELIMITED  BY  SPACE
+                            WRK-HEN-NAME   DELIMITED  BY  SPACE
                                            INTO  WRK-TNS-NAME
                    END-STRING
-                   ADD     1               TO  IDX-S
-                   MOVE    ALL "°°"        TO  WRK-NO (IDX-S)
-                   MOVE    ALL "°°"        TO  WRK-K2 (IDX-S)
                    MOVE    WRK-TNS-NAME    TO  WRK-MEISYOU3 (IDX-S)
+                   MOVE    3               TO  IDX-M
+               ELSE
+                   MOVE    WRK-M-NAME-R(IDX-M)
+                                           TO  WRK-MEISYOU3 (IDX-S)
+                   IF      WRK-M-KETACHK   >=  NAME-MAX
+                       COMPUTE WRK-M-KETACHK   =   WRK-M-KETACHK
+                                               -   NAME-MAX
+                   ELSE
+                       MOVE    ZERO            TO  WRK-M-KETACHK
+                   END-IF
+                   IF     (IDX-M               =   3  )
+                     AND  (WRK-HEN-KETA        >   ZERO)
+                       ADD     1               TO  IDX-S
+                       MOVE    ALL "°°"        TO  WRK-NO (IDX-S)
+                       MOVE    ALL "°°"        TO  WRK-K2 (IDX-S)
+                       MOVE    WRK-HEN-NAME    TO  WRK-MEISYOU3 (IDX-S)
+                   END-IF
                END-IF
-           END-IF
+           END-PERFORM
       *
            .
        310311-MEISYOU-HEN2-EXT.
