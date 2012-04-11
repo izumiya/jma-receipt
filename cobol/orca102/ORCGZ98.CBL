@@ -1600,6 +1600,18 @@
                 END-STRING
                 PERFORM 310211-KENSA-NAME-SEC
            END-IF
+      *!!
+      *    °åÎÅ´Ñ»¡¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
+           IF      (TNS-SRYCD(1:1)     =   "1"  )  AND
+                   (TNS-IRYOKANSATUKBN =   4    )
+      *        °åÎÅ´Ñ»¡¶èÊ¬
+               MOVE    SPACE               TO  SPA-Z98-GMN-NAME (IDX)
+               STRING  "¡Ú°å´Ñ¡Û"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-Z98-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *!!
       *
       *    ÆþÎÏ£Ã£Ä
            IF      ICD-DSPSEQ          =   1
@@ -2156,6 +2168,18 @@
                 END-STRING
                 PERFORM 310211-KENSA-NAME-SEC
            END-IF
+      *!!
+      *    °åÎÅ´Ñ»¡¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
+           IF      (TNS-SRYCD(1:1)     =   "1"  )  AND
+                   (TNS-IRYOKANSATUKBN =   4    )
+      *        °åÎÅ´Ñ»¡¶èÊ¬
+               MOVE    SPACE               TO  SPA-Z98-GMN-NAME (IDX)
+               STRING  "¡Ú°å´Ñ¡Û"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-Z98-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *!!
       *    ÆþÎÏ£Ã£Ä
            PERFORM 3200-SETCD-HEN-SEC
       *

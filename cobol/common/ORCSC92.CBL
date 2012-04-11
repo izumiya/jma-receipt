@@ -5259,6 +5259,19 @@
                    MOVE    TNS-FORMALNAME  TO  TNS-NAME
                END-IF
            END-IF
+      *!!
+      *    °åÎÅ´Ñ»¡¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
+           IF      (TNS-SRYCD(1:1)     =   "1"  )  AND
+                   (TNS-IRYOKANSATUKBN =   4    )
+      *        °åÎÅ´Ñ»¡¶èÊ¬
+               MOVE    SPACE               TO  WRK-MEISYO
+               STRING  "¡Ú°å´Ñ¡Û"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO             WRK-MEISYO
+               END-STRING
+               MOVE    WRK-MEISYO          TO  TNS-NAME
+           END-IF
+      *!!
       *!
       *    Éí²Ã¾ðÊó¤Î¾å¸Â²ó¿ôÀßÄê
            IF     (TNS-SRYCD(1:1)      =   "1"
@@ -5407,6 +5420,19 @@
                    MOVE    TNS-FORMALNAME  TO  TNS-NAME
                END-IF
            END-IF
+      *!!
+      *    °åÎÅ´Ñ»¡¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
+           IF      (TNS-SRYCD(1:1)     =   "1"  )  AND
+                   (TNS-IRYOKANSATUKBN =   4    )
+      *        °åÎÅ´Ñ»¡¶èÊ¬
+               MOVE    SPACE               TO  WRK-MEISYO
+               STRING  "¡Ú°å´Ñ¡Û"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO             WRK-MEISYO
+               END-STRING
+               MOVE    WRK-MEISYO          TO  TNS-NAME
+           END-IF
+      *!!
       *
            .
        911-TENSU-READ22-EXT.
