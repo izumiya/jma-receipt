@@ -399,15 +399,16 @@
                END-IF
       *!!
       *!!!
+      *!!!  H24.4 ∫ÔΩ¸
       *    ∞ÂŒ≈¥—ª°À°¿ÏÕ—§Œ•≥°º•…»ΩƒÍ
-               IF      SPA-ERRCD           =   SPACE
-                   IF     (SPA-COM-INPUTCD (IDX)(1:3)  =   "188"  )
-                   AND    (SPA-COM-KZMFLG  (IDX)   =   SPACE      )
-                       MOVE    "K269"          TO  SPA-ERRCD
-                       MOVE    "1"             TO  SPA-COM-KZMFLG(IDX)
-                       MOVE    "1"             TO  SPA-COM-CUR(IDX)
-                   END-IF
-               END-IF
+      *        IF      SPA-ERRCD           =   SPACE
+      *            IF     (SPA-COM-INPUTCD (IDX)(1:3)  =   "188"  )
+      *            AND    (SPA-COM-KZMFLG  (IDX)   =   SPACE      )
+      *                MOVE    "K269"          TO  SPA-ERRCD
+      *                MOVE    "1"             TO  SPA-COM-KZMFLG(IDX)
+      *                MOVE    "1"             TO  SPA-COM-CUR(IDX)
+      *            END-IF
+      *        END-IF
       *!!!
            END-PERFORM
       *    ∫ﬁ∆‚§Ú§π§Ÿ§∆∆±§∏∂Ë ¨
