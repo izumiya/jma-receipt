@@ -555,11 +555,11 @@
       *
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key1"              TO  MCP-PATHNAME
+           MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_santei"        TO  MCP-TABLE
-               MOVE    "key1"              TO  MCP-PATHNAME
+               MOVE    "key"               TO  MCP-PATHNAME
                PERFORM 920-SANTEI-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-SANTEI
@@ -586,7 +586,7 @@
                END-PERFORM
            END-IF
            MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key1"              TO  MCP-PATHNAME
+           MOVE    "key"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
       *    各急性発生日

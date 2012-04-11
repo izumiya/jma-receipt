@@ -4610,7 +4610,7 @@
                END-IF
       *        介護支援連携指導料（入院中２回）
                IF      WRK-COM-INPUTCD (IDX-Z) =   "113011710"
-                   MOVE    1                   TO  FLG-NYUIN
+                   MOVE    2                   TO  FLG-NYUIN
                    PERFORM 10016-NYUIN-KIKAN-SEC
                END-IF
       *        医薬品安全性情報等管理体制加算（入院中１回）
