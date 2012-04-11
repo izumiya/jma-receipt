@@ -42,6 +42,8 @@
       *  04.01.01    NACL-ÃÁœ∆    07/10/31  ∏¯Ã≥∫“≥≤¬–±˛
       *  04.01.02    NACL-ÃÁœ∆    07/11/26  ∆√ƒÍ¥Ô∫‡æ¶… Ãæµ≠∫‹¬–±˛
       *  04.03.01    NACL-ÃÁœ∆    08/09/25  º´«Â¿’£∞£π£µ£π£≥§ŒΩ∏∑◊¿Ë¬–±˛
+      *  04.05.01    NACL-ÃÁœ∆    12/04/11   ø¿Æ£≤£¥«Ø£¥∑Ó≤˛¿µ
+      *                                     •≥•·•Û•»∫ππ˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -490,6 +492,25 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE451PARA-HOSPNUM
                        PERFORM    2002-RECE45-TENSOU-SEC
                      END-IF
                    END-IF
+                 WHEN      "12"
+                   IF  ((RECE41-HKNKBN   =  "4") AND
+                        (RECE41-JIBAIKBN =  "2"))
+                   OR  ((RECE41-HKNKBN   =  "5") AND
+                        (RECE41-KOMUKBN  =  "2"))
+                       MOVE       RECE44-REC    TO   RECE441-REC
+                       WRITE      RECE441-REC
+                       ADD     1          TO      CNT-RECE44
+                       PERFORM    2002-RECE45-TENSOU-SEC
+                   ELSE
+                     IF    RECE44-FLG-SAIDOU-COMMENT   =    "1"
+                       PERFORM    2001-SAIDOU-COMMENT-SEC
+                     ELSE
+                       MOVE       RECE44-REC    TO   RECE441-REC
+                       WRITE      RECE441-REC
+                       ADD     1          TO      CNT-RECE44
+                       PERFORM    2002-RECE45-TENSOU-SEC
+                     END-IF
+                   END-IF
                  WHEN      "80"
                    IF (( RECE41-KYUKYU-PRTKBN    =      1         ) AND
                        ( RECE44-SRYCDTOTAL(6:9)  =   CONS-KYUKYU1
@@ -764,6 +785,166 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        2001-SYODOU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À§Œ•≥•·•Û•» ‘Ω∏
+      *****************************************************************
+       2001-SAIDOU-COMMENT-SEC          SECTION.
+      *
+           MOVE       ZERO       TO   IDZ
+           INITIALIZE            WRK-FREE-AREA2
+      *
+           PERFORM   VARYING   IDX    FROM   1   BY   1
+                      UNTIL   (IDX                       >   10  )
+                       OR     (RECE44-SAIDOU-SRYKA(IDX)  =  SPACE)
+      *
+             ADD      1                  TO  IDZ
+             MOVE    " £∫∆ªªƒÍø«Œ≈≤ °ß"  TO  WK-FREE-NAME2(IDZ)(1:16)
+      *      ø«Œ≈≤ §ŒºË∆¿
+             INITIALIZE                      SYS-1005-REC
+             MOVE    "1005"              TO  SYS-1005-KANRICD
+             MOVE    RECE44-SAIDOU-SRYKA(IDX)
+                                         TO  SYS-1005-KBNCD
+             MOVE    RECE41-SRYYM        TO  SYS-1005-STYUKYMD(1:6)
+             MOVE    "01"                TO  SYS-1005-STYUKYMD(7:2)
+             MOVE    SYS-1005-STYUKYMD   TO  SYS-1005-EDYUKYMD
+grpsys       MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
+             MOVE    SYS-1005-REC        TO  MCPDATA-REC
+             MOVE    "tbl_syskanri"      TO  MCP-TABLE
+             MOVE    "key10"             TO  MCP-PATHNAME
+grpsys       PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"    TO  MCP-TABLE
+               MOVE    "key10"           TO  MCP-PATHNAME
+               PERFORM  900-SYSKANRI-READ-SEC
+               IF      FLG-SYSKANRI      =   ZERO
+                  MOVE  SYS-1005-SRYKANAME(1:40)
+                                         TO  WK-FREE-NAME2(IDZ)(17:40)
+               END-IF
+             END-IF
+             MOVE    "tbl_syskanri"      TO  MCP-TABLE
+             MOVE    "key10"             TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+      *
+             PERFORM   VARYING   IDW   FROM   200   BY  -1
+                        UNTIL    IDW   <   1
+                IF   WK-FREE-NAME2(IDZ)(IDW:1)  NOT =  SPACE
+                     COMPUTE WK-FREE-YUKOKETA2(IDZ) =  IDW  /   2
+                     MOVE    1   TO    IDW
+                END-IF
+             END-PERFORM
+      *
+           END-PERFORM
+      *
+           INITIALIZE                      RECE45-REC
+           MOVE    RECE44-HOSPNUM      TO  RECE45-HOSPNUM
+           MOVE    RECE44-SRYYM        TO  RECE45-SRYYM
+           MOVE    RECE44-NYUGAIKBN    TO  RECE45-NYUGAIKBN
+           MOVE    RECE44-PTID         TO  RECE45-PTID
+           MOVE    RECE44-RECEKA       TO  RECE45-RECEKA
+           MOVE    RECE44-HKNID        TO  RECE45-HKNID
+           MOVE    RECE44-TEKSTYMD     TO  RECE45-TEKSTYMD
+           MOVE    RECE44-ZAINUM       TO  RECE45-ZAINUM
+           START   RECE45-FILE
+                 KEY IS    >=   RECE45-KEY
+                 INVALID
+                     MOVE    1         TO  FLG-RECE45
+                 NOT INVALID
+                     PERFORM 990-RECE45-NEXT-SEC
+                     MOVE  RECE45-REC  TO  WRK-RECE45-REC
+           END-START
+      *
+      *    £“£≈£√£≈£∞£µ•’•°•§•Î§Œ∆‚Õ∆§Ú•∆°º•÷•Î§À¬‡»Ú
+           MOVE    ZERO                TO  IDX-RECE45
+           MOVE    SPACE               TO  WRK-RECE45XX-REC
+           INITIALIZE                      WRK-RECE45XX-REC
+      *
+           MOVE    RECE44-MEISAISU     TO  MAX-MEISAISU
+      *
+           PERFORM   VARYING   IDX   FROM    1   BY  1
+                         UNTIL   ( IDX                >   50    )
+                         OR      ( WK-FREE-NAME2(IDX) =   SPACE )
+                COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
+                MOVE   "810000001"
+                             TO  WRK-RECE45XX-SRYCD(MAX-MEISAISU 1)
+                MOVE   ZERO  TO  WRK-RECE45XX-SRYSURYO(MAX-MEISAISU 1)
+                MOVE   WK-FREE-YUKOKETA2(IDX)
+                             TO  WRK-RECE45XX-YUKOKETA(MAX-MEISAISU 1)
+                MOVE   WK-FREE-NAME2(IDX)
+                             TO  WRK-RECE45XX-NAME(MAX-MEISAISU 1)
+                MOVE    "2"  TO  WRK-RECE45XX-SIKFLG(MAX-MEISAISU 1)
+           END-PERFORM
+      *
+           PERFORM
+             UNTIL  ( FLG-RECE45           =   1                   )
+             OR     ( RECE44-HOSPNUM   NOT =   RECE45-HOSPNUM      )
+             OR     ( RECE44-SRYYM     NOT =   RECE45-SRYYM        )
+             OR     ( RECE44-NYUGAIKBN NOT =   RECE45-NYUGAIKBN    )
+             OR     ( RECE44-PTID      NOT =   RECE45-PTID         )
+             OR     ( RECE44-RECEKA    NOT =   RECE45-RECEKA       )
+             OR     ( RECE44-HKNID     NOT =   RECE45-HKNID        )
+             OR     ( RECE44-TEKSTYMD  NOT =   RECE45-TEKSTYMD     )
+             OR     ( RECE44-ZAINUM    NOT =   RECE45-ZAINUM       )
+      *
+             PERFORM   VARYING   IDX   FROM    1   BY  1
+                       UNTIL   ( IDX               >   5     )
+                       OR      ( RECE45-SRYCD(IDX) =   SPACE )
+                  ADD    1             TO      IDX-RECE45
+                  MOVE   RECE45-SRYACT-TBL(IDX)
+                             TO   WRK-RECE45XX-SRYACT-TBL(IDX-RECE45 1)
+             END-PERFORM 
+      *
+             PERFORM 990-RECE45-NEXT-SEC
+      *
+           END-PERFORM
+      *
+      *    •≥•·•Û•»§Ú¥ﬁ§Û§¿∆‚Õ∆§«√Ê¥÷•’•°•§•Î§Œ∫∆∫Ó¿Æ
+           MOVE       ZERO             TO      FLG-WRKRECE45
+           MOVE       ZERO             TO      IDX
+           MOVE       ZERO             TO      IDX-RECE45
+           MOVE       ZERO             TO      WRK-RENNUM
+           MOVE       ZERO             TO      WRK-CNT-MEISAI
+           PERFORM    UNTIL     FLG-WRKRECE45  =    1
+      *
+                  INITIALIZE                        RECE451-REC
+                  MOVE    WRK-RECE45-KEY       TO   RECE451-KEY
+                  ADD     1                    TO   WRK-RENNUM
+                  MOVE    WRK-RENNUM           TO   RECE451-RENNUM
+                  MOVE    WRK-RECE45-PTNUM     TO   RECE451-PTNUM
+                  MOVE    WRK-RECE45-SRYKA     TO   RECE451-SRYKA
+                  MOVE    WRK-RECE45-SRYKBN    TO   RECE451-SRYKBN
+                  MOVE    WRK-RECE45-SRYSYUKBN TO   RECE451-SRYSYUKBN
+                  MOVE    WRK-RECE45-JIHIMONEY TO   RECE451-JIHIMONEY
+                  PERFORM  VARYING   IDX   FROM   1   BY   1
+                           UNTIL   (IDX       >    5)   OR
+                                   (FLG-WRKRECE45   =   1)
+                     ADD         1             TO    IDX-RECE45
+                     IF  WRK-RECE45XX-SRYCD(IDX-RECE45 1) = SPACE
+                         MOVE    1             TO    FLG-WRKRECE45
+                     ELSE
+                         MOVE  WRK-RECE45XX-SRYACT-TBL(IDX-RECE45 1)
+                                          TO   RECE451-SRYACT-TBL(IDX)
+      *
+                         IF    WRK-RECE45XX-SIKFLG(IDX-RECE45 1)  =  "2"
+                              ADD    1    TO   WRK-CNT-MEISAI
+                         END-IF
+      *
+                     END-IF
+                  END-PERFORM
+                  IF   RECE451-SRYCD(1)  NOT =  SPACE
+                     WRITE   RECE451-REC
+                     ADD     1            TO   CNT-RECE45
+                  END-IF
+           END-PERFORM
+      *
+           MOVE    RECE44-REC        TO      RECE441-REC
+           MOVE    WRK-CNT-MEISAI    TO      RECE441-MEISAISU
+           WRITE   RECE441-REC
+           ADD     1                 TO      CNT-RECE44
+      *
+           .
+       2001-SAIDOU-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************

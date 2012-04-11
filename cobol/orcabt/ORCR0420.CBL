@@ -794,11 +794,9 @@
       *    ∫ﬂ¬∑Ï±’∆©¿œ…—≤Ûªÿ∆≥¥…Õ˝Œ¡
            03  CONS-HINKAI-COMMENT   PIC X(09)  VALUE  "114009410".
       *    ΩÈø«° ∆±∆¸ £øÙø«Œ≈≤ °À
-           03  CONS-SYODOU-COMMENT   PIC X(09)  VALUE  "101110040".
+           03  CONS-SYODOU-COMMENT   PIC X(09)  VALUE  "111011810".
       *     £ΩÈªªƒÍø«Œ≈≤ °ß
            03  CONS-SYODOU2-COMMENT  PIC X(09)  VALUE  "830000024".
-      *    ΩÈø«° ∆±∆¸ £øÙø«Œ≈≤ °À
-           03  CONS-SYODOU3-COMMENT  PIC X(09)  VALUE  "111011810".
       *    •À•≥•¡•Û∞Õ¬∏æ…¥…Õ˝Œ¡° ΩÈ≤Û°À
            03  CONS-NIKOCHIN-COMMENT PIC X(09)  VALUE  "113008310".
       *    •À•≥•¡•Û∞Õ¬∏æ…¥…Õ˝Œ¡° £≤≤ÛÃ‹§´§È£¥≤ÛÃ‹§ﬁ§«°À
@@ -2954,13 +2952,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF      RECE44-SRYKBN      =     "11"
       *       ΩÈø«Œ¡ªªƒÍ≤ °ß
-              IF   SRY-SRYCD(IDX2)    =     "830000020"
+              IF ( SRY-SRYCD(IDX2)    =     "830000020"         )
+              OR ((SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT) AND
+                  (RECE41-SRYYM      >=     "201204"           ))
+              OR ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI18      ) AND
+                  (RECE41-SRYYM      >=     "201204"           ))
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-SYOSANTEIKA-COMMENT
               END-IF
       *       ΩÈø«° ∆±∆¸ £øÙø«Œ≈≤ °À
               IF  (SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
-                                      OR    CONS-SYODOU3-COMMENT)
+                                      OR    CONS-ROUSAI18       )
               AND (FLG-SYODOU-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE44-FLG-SYODOU-COMMENT
                    MOVE   SRY-SRYKA   TO    RECE44-SYODOU-SRYKA(1)
@@ -2975,6 +2977,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      RECE44-SRYKBN      =     "12"
       *       ∫∆ø«Œ¡ªªƒÍ≤ °ß
               IF   SRY-SRYCD(IDX2)    =     "830000021"
+                                      OR    CONS-DOUJITU-SAI
+                                      OR    CONS-DOUJITU-DEN
+                                      OR    CONS-DOUJITU-GAI
+                                      OR    CONS-ROUSAI19
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-SAISANTEIKA-COMMENT
               END-IF
@@ -3079,6 +3085,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
               AND (RECE41-SRYYM       >=    "201004"        )
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-DOUDENSAI-COMMENT
+              END-IF
+      *
+      *       ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À
+              IF   SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
+                                      OR    CONS-DOUJITU-DEN
+                                      OR    CONS-DOUJITU-GAI
+                                      OR    CONS-ROUSAI19
+                 MOVE   "1"        TO   RECE44-FLG-SAIDOU-COMMENT
+                 MOVE   SRY-SRYKA  TO   RECE44-SAIDOU-SRYKA(1)
               END-IF
            END-IF
       *

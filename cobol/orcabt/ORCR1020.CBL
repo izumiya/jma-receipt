@@ -32,6 +32,7 @@
       *                                     ¡Ê¿ÇÎÅ¶èÊ¬£¶£´¡§ÉÂÍý¿ÇÃÇÂÐ±þ¡Ë
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
+      *  04.05.02    NACL-ÌçÏÆ    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -405,6 +406,24 @@ grpsys     COPY    "COMMON-SPA".
                                END-IF
                            END-PERFORM
                        END-IF
+                       IF      RECE120-SAIDOU-SRYKA (1)
+                                               NOT =   SPACE
+                           PERFORM VARYING IDX FROM    1   BY  1
+                                   UNTIL   IDX >       10
+                               IF      RECE120-SAIDOU-SRYKA (1)    =
+                                           RECE121-SAIDOU-SRYKA (IDX)
+                                   MOVE    10          TO  IDX
+                               ELSE
+                                   IF      RECE121-SAIDOU-SRYKA(IDX)
+                                                           =   SPACE
+                                       MOVE   RECE120-SAIDOU-SRYKA (1)
+                                                           TO
+                                              RECE121-SAIDOU-SRYKA (IDX)
+                                       MOVE    10          TO  IDX
+                                   END-IF
+                               END-IF
+                           END-PERFORM
+                       END-IF
       *
                        IF      FLG-MATOME      =   ZERO
                            WRITE   RECE121-REC
@@ -443,6 +462,24 @@ grpsys     COPY    "COMMON-SPA".
                                        MOVE   RECE120-SYODOU-SRYKA (1)
                                                            TO
                                               RECE121-SYODOU-SRYKA (IDX)
+                                       MOVE    10          TO  IDX
+                                   END-IF
+                               END-IF
+                           END-PERFORM
+                       END-IF
+                       IF      RECE120-SAIDOU-SRYKA (1)
+                                               NOT =   SPACE
+                           PERFORM VARYING IDX FROM    1   BY  1
+                                   UNTIL   IDX >       10
+                               IF      RECE120-SAIDOU-SRYKA (1)    =
+                                           RECE121-SAIDOU-SRYKA (IDX)
+                                   MOVE    10          TO  IDX
+                               ELSE
+                                   IF      RECE121-SAIDOU-SRYKA(IDX)
+                                                           =   SPACE
+                                       MOVE   RECE120-SAIDOU-SRYKA (1)
+                                                           TO
+                                              RECE121-SAIDOU-SRYKA (IDX)
                                        MOVE    10          TO  IDX
                                    END-IF
                                END-IF
@@ -546,6 +583,8 @@ grpsys     COPY    "COMMON-SPA".
       *
            MOVE    RECE121-SYODOU-SRYKA-AREA
                                         TO  RECE120-SYODOU-SRYKA-AREA
+           MOVE    RECE121-SAIDOU-SRYKA-AREA
+                                        TO  RECE120-SAIDOU-SRYKA-AREA
       *
            WRITE   RECE120-REC
            ADD     1                   TO  CNT-RECE120W

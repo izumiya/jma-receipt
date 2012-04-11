@@ -49,6 +49,7 @@
       *                                     ¡Ê¿ÇÎÅ¶èÊ¬£¶£´¡§ÉÂÍý¿ÇÃÇÂÐ±þ¡Ë
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
+      *  04.05.02    NACL-ÌçÏÆ    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -530,6 +531,23 @@ grpsys             MOVE    RECE04-HOSPNUM      TO  RECE042-HOSPNUM
                                         TO   RECE042-SYODOU-SRYKA(IDX)
                        END-IF
                      END-IF
+                     IF  RECE04-SAIDOU-SRYKA(1)  NOT =  SPACE
+                       MOVE     ZERO     TO    FLG-ARI
+                       PERFORM  VARYING  IDX   FROM    1   BY  1
+                                 UNTIL IDX                       > 10
+                                  OR   RECE042-SAIDOU-SRYKA(IDX) = SPACE
+                                  OR   FLG-ARI                   = 1
+                          IF  RECE04-SAIDOU-SRYKA(1)
+                                     =  RECE042-SAIDOU-SRYKA(IDX)
+                              MOVE  1   TO   FLG-ARI
+                          END-IF
+                       END-PERFORM
+                       IF  FLG-ARI  =  ZERO
+                       AND IDX     <=  10
+                              MOVE   RECE04-SAIDOU-SRYKA(1)
+                                        TO   RECE042-SAIDOU-SRYKA(IDX)
+                       END-IF
+                     END-IF
       *
                      IF      FLG-MATOME    =   ZERO
                          WRITE   RECE042-REC
@@ -570,6 +588,23 @@ grpsys             MOVE    RECE04-HOSPNUM      TO  RECE042-HOSPNUM
                        AND IDX     <=  10
                               MOVE   RECE04-SYODOU-SRYKA(1)
                                         TO   RECE042-SYODOU-SRYKA(IDX)
+                       END-IF
+                     END-IF
+                     IF  RECE04-SAIDOU-SRYKA(1)  NOT =  SPACE
+                       MOVE     ZERO     TO    FLG-ARI
+                       PERFORM  VARYING  IDX   FROM    1   BY  1
+                                 UNTIL IDX                       > 10
+                                  OR   RECE042-SAIDOU-SRYKA(IDX) = SPACE
+                                  OR   FLG-ARI                   = 1
+                          IF  RECE04-SAIDOU-SRYKA(1)
+                                     =  RECE042-SAIDOU-SRYKA(IDX)
+                              MOVE  1   TO   FLG-ARI
+                          END-IF
+                       END-PERFORM
+                       IF  FLG-ARI  =  ZERO
+                       AND IDX     <=  10
+                              MOVE   RECE04-SAIDOU-SRYKA(1)
+                                        TO   RECE042-SAIDOU-SRYKA(IDX)
                        END-IF
                      END-IF
       *
@@ -729,6 +764,8 @@ grpsys            (RECE02-HOSPNUM       NOT =  RECE05-HOSPNUM)   OR
       *
            MOVE    RECE042-SYODOU-SRYKA-AREA
                                         TO  RECE04W-SYODOU-SRYKA-AREA
+           MOVE    RECE042-SAIDOU-SRYKA-AREA
+                                        TO  RECE04W-SAIDOU-SRYKA-AREA
       *
            WRITE   RECE04W-REC
            ADD     1                   TO  CNT-RECE04W

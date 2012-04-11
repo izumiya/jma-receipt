@@ -48,6 +48,7 @@
       *                                     ¡Ê¿ÇÎÅ¶èÊ¬£¶£´¡§ÉÂÍý¿ÇÃÇÂÐ±þ¡Ë
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/10  Å¦Í×Íó²¼Éô¤Ø¤Î¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
+      *  04.05.02    NACL-ÌçÏÆ    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -501,6 +502,23 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                         TO   RECE442-SYODOU-SRYKA(IDX)
                        END-IF
                      END-IF
+                     IF  RECE44-SAIDOU-SRYKA(1)  NOT =  SPACE
+                       MOVE     ZERO     TO    FLG-ARI
+                       PERFORM  VARYING  IDX   FROM    1   BY  1
+                                 UNTIL IDX                       > 10
+                                  OR   RECE442-SAIDOU-SRYKA(IDX) = SPACE
+                                  OR   FLG-ARI                   = 1
+                          IF  RECE44-SAIDOU-SRYKA(1)
+                                     =  RECE442-SAIDOU-SRYKA(IDX)
+                              MOVE  1   TO   FLG-ARI
+                          END-IF
+                       END-PERFORM
+                       IF  FLG-ARI  =  ZERO
+                       AND IDX     <=  10
+                              MOVE   RECE44-SAIDOU-SRYKA(1)
+                                        TO   RECE442-SAIDOU-SRYKA(IDX)
+                       END-IF
+                     END-IF
       *
                      IF      FLG-MATOME    =   ZERO
                          WRITE   RECE442-REC
@@ -541,6 +559,23 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                        AND IDX     <=  10
                               MOVE   RECE44-SYODOU-SRYKA(1)
                                         TO   RECE442-SYODOU-SRYKA(IDX)
+                       END-IF
+                     END-IF
+                     IF  RECE44-SAIDOU-SRYKA(1)  NOT =  SPACE
+                       MOVE     ZERO     TO    FLG-ARI
+                       PERFORM  VARYING  IDX   FROM    1   BY  1
+                                 UNTIL IDX                       > 10
+                                  OR   RECE442-SAIDOU-SRYKA(IDX) = SPACE
+                                  OR   FLG-ARI                   = 1
+                          IF  RECE44-SAIDOU-SRYKA(1)
+                                     =  RECE442-SAIDOU-SRYKA(IDX)
+                              MOVE  1   TO   FLG-ARI
+                          END-IF
+                       END-PERFORM
+                       IF  FLG-ARI  =  ZERO
+                       AND IDX     <=  10
+                              MOVE   RECE44-SAIDOU-SRYKA(1)
+                                        TO   RECE442-SAIDOU-SRYKA(IDX)
                        END-IF
                      END-IF
       *
@@ -678,6 +713,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            MOVE    RECE442-SYODOU-SRYKA-AREA
                                         TO  RECE44W-SYODOU-SRYKA-AREA
+           MOVE    RECE442-SAIDOU-SRYKA-AREA
+                                        TO  RECE44W-SAIDOU-SRYKA-AREA
       *
            WRITE   RECE44W-REC
            ADD     1                   TO  CNT-RECE44W
