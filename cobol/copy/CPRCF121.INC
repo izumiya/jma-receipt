@@ -23,6 +23,7 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
+      *  04.05.02    NACL-門脇    12/04/10  改正対応項目追加
       ************************************************************
       *01  RECE121-REC.
            03  RECE121-KEY.
@@ -76,3 +77,6 @@
       *初診（同日複数診療科）算定科
            03  RECE121-SYODOU-SRYKA-AREA.
                05  RECE121-SYODOU-SRYKA    PIC X(02)     OCCURS  10.
+      *再診（同一日２科目）算定科
+           03  RECE121-SAIDOU-SRYKA-AREA.
+               05  RECE121-SAIDOU-SRYKA    PIC X(02)     OCCURS  10.

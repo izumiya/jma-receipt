@@ -174,6 +174,10 @@
            03  RECE44-FLG-SYODOU-COMMENT  PIC  X(01).
            03  RECE44-SYODOU-SRYKA-AREA.
                05  RECE44-SYODOU-SRYKA    PIC  X(02)     OCCURS  10.
+      *再診（同一日２科目）
+           03  RECE44-FLG-SAIDOU-COMMENT  PIC  X(01).
+           03  RECE44-SAIDOU-SRYKA-AREA.
+               05  RECE44-SAIDOU-SRYKA    PIC  X(02)     OCCURS  10.
       *ニコチン依存症管理料
            03  RECE44-FLG-NIKOCHIN-COMMENT PIC X(01).
       *重度喘息患者治療管理加算

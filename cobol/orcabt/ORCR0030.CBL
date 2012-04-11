@@ -6854,7 +6854,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *
            IF      RECE04-SRYKBN      =     "11"
       *       ΩÈø«Œ¡ªªƒÍ≤ °ß
-              IF   SRY-SRYCD(IDX2)    =     "830000020"
+              IF ( SRY-SRYCD(IDX2)    =     "830000020"         )
+              OR ((SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT) AND
+                  (RECE02-SRYYM      >=     "201204"           ))
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-SYOSANTEIKA-COMMENT
               END-IF
@@ -6874,6 +6876,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            IF      RECE04-SRYKBN      =     "12"
       *       ∫∆ø«Œ¡ªªƒÍ≤ °ß
               IF   SRY-SRYCD(IDX2)    =     "830000021"
+                                      OR    CONS-DOUJITU-SAI
+                                      OR    CONS-DOUJITU-DEN
+                                      OR    CONS-DOUJITU-GAI
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-SAISANTEIKA-COMMENT
               END-IF
@@ -6998,6 +7003,14 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             "112703350"     
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-SAIJINKO-COMMENT
+              END-IF
+      *
+      *       ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À
+              IF   SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
+                                      OR    CONS-DOUJITU-DEN
+                                      OR    CONS-DOUJITU-GAI
+                 MOVE   "1"        TO   RECE04-FLG-SAIDOU-COMMENT
+                 MOVE   SRY-SRYKA  TO   RECE04-SAIDOU-SRYKA(1)
               END-IF
            END-IF
       *

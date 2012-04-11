@@ -1286,6 +1286,20 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       ELSE
                           PERFORM      2099-RECE44-TENSOU-SEC
                       END-IF
+                   WHEN      "12"
+                      IF   RECE41-HKNKBN     =   "5"
+                      AND  RECE41-KOMUKBN    =   "2"
+                          MOVE   ZERO   TO  FLG-COMMENT
+      *                ° ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°ÀªªƒÍ≤ §Œ•ª•√•»°À
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-SAIDOU-HANTEI-SEC
+                          END-IF
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2099-RECE44-TENSOU-SEC
+                          END-IF
+                      ELSE
+                          PERFORM      2099-RECE44-TENSOU-SEC
+                      END-IF
                    WHEN      "13"
                       MOVE   ZERO   TO  FLG-COMMENT
       *            ° À˝¿≠·÷ƒÀº¿¥µ¥…Õ˝Œ¡ªªƒÍ∆¸§Œ•ª•√•»°À
@@ -1445,6 +1459,20 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *                ° ΩÈø«° ∆±∆¸ £øÙø«Œ≈≤ °ÀªªƒÍ≤ §Œ•ª•√•»°À
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2001-SYODOU-HANTEI-SEC
+                          END-IF
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2099-RECE44-TENSOU-SEC
+                          END-IF
+                      END-EVALUATE
+                   WHEN      "12"
+                      EVALUATE   RECE41-JIBAIKBN
+                        WHEN       "1"
+                          PERFORM      2099-RECE44-TENSOU-SEC
+                        WHEN       "2"
+                          MOVE   ZERO   TO  FLG-COMMENT
+      *                ° ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°ÀªªƒÍ≤ §Œ•ª•√•»°À
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-SAIDOU-HANTEI-SEC
                           END-IF
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2099-RECE44-TENSOU-SEC
@@ -3438,6 +3466,100 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        20011-SYODOU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À§¨§¢§Î§´»ΩƒÍ
+      *****************************************************************
+       2001-SAIDOU-HANTEI-SEC          SECTION.
+      *
+           IF      RECE44-FLG-SAIDOU-COMMENT   =    "1"
+                MOVE       99       TO     FLG-COMMENT
+                PERFORM    20011-SAIDOU-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-SAIDOU-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À§Œ•≥•·•Û•» ‘Ω∏
+      *****************************************************************
+       20011-SAIDOU-COMMENT-SEC          SECTION.
+      *
+           MOVE       ZERO       TO   IDZ
+           INITIALIZE            WRK-FREE-AREA2
+      *
+           PERFORM   VARYING   IDX    FROM   1   BY   1
+                      UNTIL   (IDX                       >   10  )
+                       OR     (RECE44-SAIDOU-SRYKA(IDX)  =  SPACE)
+      *
+             ADD      1                  TO  IDZ
+             MOVE    " £∫∆ªªƒÍø«Œ≈≤ °ß"  TO  WK-FREE-NAME2(IDZ)(1:16)
+      *      ø«Œ≈≤ §ŒºË∆¿
+             INITIALIZE                      SYS-1005-REC
+             MOVE    "1005"              TO  SYS-1005-KANRICD
+             MOVE    RECE44-SAIDOU-SRYKA(IDX)
+                                         TO  SYS-1005-KBNCD
+             MOVE    RECE41-SRYYM        TO  SYS-1005-STYUKYMD(1:6)
+             MOVE    "01"                TO  SYS-1005-STYUKYMD(7:2)
+             MOVE    SYS-1005-STYUKYMD   TO  SYS-1005-EDYUKYMD
+grpsys       MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
+             MOVE    SYS-1005-REC        TO  MCPDATA-REC
+             MOVE    "tbl_syskanri"      TO  MCP-TABLE
+             MOVE    "key10"             TO  MCP-PATHNAME
+grpsys       PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"    TO  MCP-TABLE
+               MOVE    "key10"           TO  MCP-PATHNAME
+               PERFORM  900-SYSKANRI-READ-SEC
+               IF      FLG-SYSKANRI      =   ZERO
+                  MOVE  SYS-1005-SRYKANAME(1:40)
+                                         TO  WK-FREE-NAME2(IDZ)(17:40)
+               END-IF
+             END-IF
+      *
+             MOVE    "tbl_syskanri"      TO  MCP-TABLE
+             MOVE    "key10"             TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+      *
+             PERFORM   VARYING   IDW   FROM   200   BY  -1
+                        UNTIL    IDW   <   1
+                IF   WK-FREE-NAME2(IDZ)(IDW:1)  NOT =  SPACE
+                     COMPUTE WK-FREE-YUKOKETA2(IDZ) =  IDW  /   2
+                     MOVE    1   TO    IDW
+                END-IF
+             END-PERFORM
+      *
+           END-PERFORM
+      *
+           PERFORM  200111-RECE45-TAIHI-SEC
+      *
+      *    £“£≈£√£≈£∞£µ•’•°•§•Î§Œ∆‚Õ∆§Ú•∆°º•÷•Î§À¬‡»Ú
+           MOVE    ZERO                TO  IDX-RECE45
+           MOVE    SPACE               TO  WRK-RECE45XX-REC
+           INITIALIZE                      WRK-RECE45XX-REC
+      *
+           MOVE    RECE44-MEISAISU     TO  MAX-MEISAISU
+      *
+           PERFORM   VARYING   IDX   FROM    1   BY  1
+                         UNTIL   ( IDX                >   50    )
+                         OR      ( WK-FREE-NAME2(IDX) =   SPACE )
+                COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
+                MOVE   "810000001"
+                             TO  WRK-RECE45XX-SRYCD(MAX-MEISAISU 1)
+                MOVE   ZERO  TO  WRK-RECE45XX-SRYSURYO(MAX-MEISAISU 1)
+                MOVE   WK-FREE-YUKOKETA2(IDX)
+                             TO  WRK-RECE45XX-YUKOKETA(MAX-MEISAISU 1)
+                MOVE   WK-FREE-NAME2(IDX)
+                             TO  WRK-RECE45XX-NAME(MAX-MEISAISU 1)
+                MOVE    "1"  TO  WRK-RECE45XX-SIKFLG(MAX-MEISAISU 1)
+           END-PERFORM
+      *
+           PERFORM    200111-SRYACTINF-HENSYU-SEC
+      *
+           .
+       20011-SAIDOU-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************
