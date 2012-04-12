@@ -4744,6 +4744,8 @@
       *        最初の診察料が複数科・保険の時
                IF     (IDX-SINSATU         =   IDX-Z  )
                AND    (FLG-FUKUSU          =   1     )
+      *H24.4       ダミーがあればチェックなし
+               AND    (FLG-DUMMY-ARI       =   ZERO  )
                    IF     (WRK-KBN             =   "F" )  AND
                           (WRK-KBN2        NOT =   "D" )
                        MOVE    "1044"          TO  SPA-ERRCD
@@ -6209,9 +6211,11 @@
                        MOVE    ZERO            TO  FLG-ARI
                    WHEN    WRK-COM-INPUTCD(IDX)
                                                =   TBL-SRYCD (TBL-IDX)
-                       IF     (TBL-KBN (TBL-IDX)   =   "F"  )
-                       AND    (TBL-KBN2(TBL-IDX)   =   "D"  )
-      *                   同日初診は削除なし
+      *DD H24.4        IF     (TBL-KBN (TBL-IDX)   =   "F"  )
+      **               AND    (TBL-KBN2(TBL-IDX)   =   "D"  )
+      **                  同日初診は削除なし
+                       IF     (TBL-KBN2(TBL-IDX)   =   "D"  )
+      *                    同一日２科目は削除なし
                            MOVE    ZERO            TO  FLG-ARI
                        ELSE
                            MOVE    1               TO  FLG-ARI

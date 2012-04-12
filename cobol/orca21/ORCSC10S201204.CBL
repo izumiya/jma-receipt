@@ -2597,8 +2597,13 @@
       *
       *H24.4
       *    外来リハビリ診察料等算定時、再診ダミー？？
-           IF     (SPA-KOURESRY-ARI2   =   2   OR  3  )
-               MOVE    "099120001"         TO  WRK-SRYCD
+           IF     (WRK-SRYCD(1:2)      =   "83" )
+      *        コメント以外
+               CONTINUE
+           ELSE
+               IF     (SPA-KOURESRY-ARI2   =   2   OR  3  )
+                   MOVE    "099120001"         TO  WRK-SRYCD
+               END-IF
            END-IF
       *H24.4
       *
@@ -2733,8 +2738,9 @@
                GO      TO      3301-SYOSIN-SYORI-EXT
            END-IF
       *H24.4
-      *    外来リハビリ診察料等算定
+      *    外来リハビリ診察料等算定でダミーの時
            IF     (SPA-KOURESRY-ARI2   =   2   OR  3 )
+            AND   (WRK-SRYCD (1:3)     =   "099"     )
                GO      TO      3301-SYOSIN-SYORI-EXT
            END-IF
       *H24.4
@@ -2920,7 +2926,8 @@
            END-IF
       *    診療区分の設定
            IF      SPA-COM-SRYKBN(SPA-GMN-IDX) =   SPACE
-               MOVE    SPA-COM-SRYSYUKBN(SPA-GMN-IDX)
+      ******   MOVE    SPA-COM-SRYSYUKBN(SPA-GMN-IDX)
+               MOVE    SPA-COM-TNSSRYKBN(SPA-GMN-IDX)
                                            TO  SPA-COM-SRYKBN
                                                          (SPA-GMN-IDX)
            END-IF
@@ -4018,6 +4025,12 @@
                MOVE    ZERO                TO  FLG-SAISIN-CHK
       *        診察コードをテーブルより決定
                PERFORM 2001-SRYCD-TBL-SEC
+      *H24.4
+      *       外来リハビリ診察料等算定時、再診ダミー？？
+               IF     (SPA-KOURESRY-ARI2   =   2   OR  3  )
+                   MOVE    "099120001"         TO  WRK-SRYCD
+               END-IF
+      *H24.4
       *        初診料自動追加
                PERFORM 3301-SYOSIN-SYORI-SEC
            END-IF
