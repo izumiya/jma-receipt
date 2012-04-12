@@ -130,6 +130,9 @@
       *  04.05.02    NACL-藤原    09/06/18  社保レセプト遍綴順対応
       *  04.05.03    NACL-藤原    09/08/19  全件印刷時の自費レセプトの
       *                                     印刷指定対応
+      *  04.05.04    NACL-藤原    12/04/10  平成２４年４月改正対応
+      *                                     平成２４年４月以降の社保分に
+      *                                     ついて在総診の設定は行わない
       *
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
@@ -370,6 +373,8 @@
       *
            03  WRK-CONS-SRYYM-200804
                                    PIC X(06)   VALUE   "200804".
+           03  WRK-CONS-SRYYM-201204
+                                   PIC X(06)   VALUE   "201204".
       *
       *    プレビュー用情報
            COPY    "CPXC01LNK.INC".
@@ -2791,7 +2796,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    "T"             TO  SPA-GMN-TCHK-VALUE  (IDW IDX)
            PERFORM 31011-PAGE-HENSYU-07-KENSU-SEC
       *
-           IF      SPA-R01-NYUGAIKBN   =   "2"
+           IF    ( SPA-R01-NYUGAIKBN   =   "2"                   )
+           AND   ( SPA-R01-SRYYM       <   WRK-CONS-SRYYM-201204 )
                ADD     1               TO  IDX 
                MOVE    "02"            TO  SPA-NAI-PRTJYUNI    (IDW IDX)
                MOVE    "1"             TO  SPA-NAI-TEISYUTUSAKI(IDW IDX)

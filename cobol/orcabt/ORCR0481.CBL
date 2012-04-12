@@ -90,6 +90,8 @@
       *  04.05.05    NACL-藤原    11/08/02  点検レセ印字位置変更対応
       *  04.05.06    NACL-藤原    12/03/14  平成２４年４月改正対応
       *                                     「改正未対応」の記載を行う
+      *  04.05.07    NACL-藤原    12/04/11  平成２４年４月改正対応
+      *                                     「改正未対応」の記載をやめる
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
@@ -1351,20 +1353,6 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            ELSE
                MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
                                            TO  HC21-LOPTION
-           END-IF
-      *
-      *    平成２４年４月改正対応
-           IF      RECE41-SRYYM        >=  "201204"
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   IF      SYS-200501-INSPECT-CHARACTER-KBN
-                                               =   "0"
-                       MOVE    "点検改正未対応"    TO  HC21-LABEL
-                   ELSE
-                       MOVE    "改正未対応"        TO  HC21-LABEL
-                   END-IF
-               ELSE
-                   MOVE    "改正未対応"        TO  HC21-LABEL
-               END-IF
            END-IF
       *
            .

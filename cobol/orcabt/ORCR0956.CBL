@@ -64,6 +64,10 @@
       *  04.05.06    NACL-藤原    11/08/02  点検レセ印字位置変更対応
       *  04.05.07    NACL-藤原    12/03/14  平成２４年４月改正対応
       *                                     「改正未対応」の記載を行う
+      *  04.05.08    NACL-藤原    12/04/11  平成２４年４月改正対応
+      *                                     「改正未対応」の記載を行わな
+      *                                     いようにする
+      *                                     入院略称の変更
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
@@ -151,7 +155,7 @@
                                    BY         //RECEERR//.
       *
       *    自賠責
-           COPY    "HCN25V02.INC"  REPLACING  //HCN25V02//
+           COPY    "HCN25V03.INC"  REPLACING  //HCN25V03//
                                    BY         //HC23//.
       *
       *    自賠責（続紙）
@@ -1281,20 +1285,6 @@ grpsys        PERFORM 900-DBSELECT-SEC
                MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
                                            TO  HC23-LOPTION
            END-IF
-      *
-      *    平成２４年４月改正対応
-           IF      RECE82-SRYYM        >=  "201204"
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   IF      SYS-200501-INSPECT-CHARACTER-KBN
-                                               =   "0"
-                       MOVE    "点検改正未対応"    TO  HC23-LABEL
-                   ELSE
-                       MOVE    "改正未対応"        TO  HC23-LABEL
-                   END-IF
-               ELSE
-                   MOVE    "改正未対応"        TO  HC23-LABEL
-               END-IF
-           END-IF      
       *    
            .
        20021-HEAD-HEN-EXT.
@@ -1487,8 +1477,13 @@ grpsys        PERFORM 900-DBSELECT-SEC
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       9
                    OR      RECE82-NYUSYUBETU (IDX) =   SPACE
-               MOVE    RECE82-NYUSYUBETU (IDX)
+               IF      RECE82-NYUSYUBETU (IDX) (11:)   =   SPACE
+                   MOVE    RECE82-NYUSYUBETU (IDX)
                                      TO  HC23-NYUINSYUBETU (IDX)
+               ELSE
+                   MOVE    RECE82-NYUSYUBETU (IDX)
+                                     TO  HC23-NYUINSYUBETU2(IDX)
+               END-IF
            END-PERFORM
       *
       *    小計
@@ -2531,7 +2526,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       * 
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
-               MOVE    "HCN25V02.red"      TO
+               MOVE    "HCN25V03.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HC23                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -2665,7 +2660,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCN25V02.red"                  
+                       WHEN    "HCN25V03.red"                  
                            MOVE    RECE08-PRTDATA  TO HC23
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC23-PAGE

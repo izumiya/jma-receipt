@@ -26,6 +26,7 @@
 
 # クライアント印刷用(複数ps をまとめる)
 # (2011/11/14 ) 労災枠有り対応
+# (2012/04/11 ) 改正対応
 $:.unshift(File.dirname(__FILE__))
 require "monpeps"
 
@@ -600,6 +601,19 @@ end
                         red_file = std_form + ls_w1
                 when    'HCM29V04.red'
                         ls_w1 = 'HCM49V02.red'
+                        red_file = std_form + ls_w1
+#   -----------> 改正対応(2012/04/11)
+                when    'HCN50V03.red'
+                        ls_w1 = 'HCN50V03P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN51V03.red'
+                        ls_w1 = 'HCN51V03P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN23V07.red'
+                        ls_w1 = 'HCN48V03.red'
+                        red_file = std_form + ls_w1
+                when    'HCN53V03.red'
+                        ls_w1 = 'HCN54V03.red'
                         red_file = std_form + ls_w1
 		end
 	end

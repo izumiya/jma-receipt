@@ -1842,8 +1842,14 @@
                                              TO  WRK-KHNTENZ
                        MOVE    WRK-KHNTENZ   TO  HCN67-NYUKHNTEN (IDY)
                    ELSE
-                       MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
+                       IF      RECE82-NYUTOKRYO-RYAKU (IDX) (11:)
+                                             =   SPACE 
+                           MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
                                              TO  HCN67-NYUKHNTENN(IDY)
+                       ELSE
+                           MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
+                                             TO  HCN67-NYUKHNTENN2(IDY)
+                       END-IF
                    END-IF    
       *            <日数>
                    MOVE    RECE82-NYUTOKNISSU(IDX)
@@ -1917,8 +1923,13 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       11
                    OR      RECE82-NYUSYUBETU (IDX) =   SPACE
-               MOVE    RECE82-NYUSYUBETU (IDX)
+               IF      RECE82-NYUSYUBETU (IDX) (11:)   =   SPACE
+                   MOVE    RECE82-NYUSYUBETU (IDX)
                                      TO  HCN67-NYUSYUBETSU (IDX)
+               ELSE
+                   MOVE    RECE82-NYUSYUBETU (IDX)
+                                     TO  HCN67-NYUSYUBETSU2(IDX)
+               END-IF
            END-PERFORM
       *
       *    小計イ

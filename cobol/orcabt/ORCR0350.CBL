@@ -333,6 +333,8 @@
       *  04.05.32    NACL-門脇    12/03/23  災害対応（公費欄請求点０点対応）
       *  04.05.33    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
       *                                     の変更
+      *  04.05.34    NACL-藤原    12/04/11  平成２４年４月分以降の処理を
+      *                                     行うようにする
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -1798,11 +1800,6 @@
                MOVE    RECE655PARA         TO  WRK-ERR-FILE-NM
                MOVE    STS-RECE655         TO  WRK-ERR-FILE-STS
                PERFORM 500-FILE-ERR-ABORT-SEC
-           END-IF
-      *
-      *    平成２４年４月改正対応
-           IF      WRK-PARA-SRYYM      >=  "201204"
-               MOVE    1                   TO  FLG-END
            END-IF
       * 
            IF      FLG-END             =   ZERO
@@ -9004,11 +9001,6 @@
       *************************END-IF
                            END-IF
                        END-IF    
-      *
-      *                平成２４年４月改正対応
-                       IF      RECE62-SRYYM        >=  "201204"
-                           MOVE    2                   TO  FLG-READ
-                       END-IF
       *
                        IF      FLG-READ            =   1
                            ADD     1               TO  CNT-IN

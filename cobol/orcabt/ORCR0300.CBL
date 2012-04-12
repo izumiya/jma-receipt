@@ -376,6 +376,8 @@
       *                                     行わない
       *  04.05.27    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
       *                                     の変更
+      *  04.05.34    NACL-藤原    12/04/11  平成２４年４月分以降の処理を
+      *                                     行うようにする
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -1833,11 +1835,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE055PARA-HOSPNUM
                MOVE    RECE055PARA         TO  WRK-ERR-FILE-NM
                MOVE    STS-RECE055         TO  WRK-ERR-FILE-STS
                PERFORM 500-FILE-ERR-ABORT-SEC
-           END-IF
-      *
-      *    平成２４年４月改正対応
-           IF      WRK-PARA-SRYYM      >=  "201204"
-               MOVE    1                   TO  FLG-END
            END-IF
       * 
            IF      FLG-END             =   ZERO
@@ -8280,11 +8277,6 @@ grpsys     PERFORM 900-DBFETCH-SEC
                              END-IF
                            END-IF
                        END-IF    
-      *
-      *                平成２４年４月改正対応
-                       IF      RECE02-SRYYM        >=  "201204"
-                           MOVE    2                   TO  FLG-READ
-                       END-IF
       *
                        IF      FLG-READ            =   1
                            ADD     1           TO  CNT-IN

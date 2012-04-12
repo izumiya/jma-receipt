@@ -147,6 +147,10 @@
       *                                     平成２４年４月分以降の処理を
       *                                     行わない
       *  04.05.37    NACL-門脇    12/03/23  災害対応（公費欄請求点０点対応）
+      *  04.05.38    NACL-藤原    12/04/11  平成２４年４月改正対応
+      *                                     平成２４年４月分以降の処理を
+      *                                     行うようにする
+      *                                     入院略称の変更
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -289,7 +293,8 @@
       *****COPY    "HCN09V01.INC"  REPLACING  //HCN09V01//
       *****COPY    "HCN09V02.INC"  REPLACING  //HCN09V02//
       *****COPY    "HCN09V03.INC"  REPLACING  //HCN09V03//
-           COPY    "HCN09V04.INC"  REPLACING  //HCN09V04//
+      *****COPY    "HCN09V04.INC"  REPLACING  //HCN09V04//
+           COPY    "HCN09V05.INC"  REPLACING  //HCN09V05//
                                    BY         //HC06//.
       *****COPY    "HCM12V01.INC"  REPLACING  //HCM12V01//
            COPY    "HCM12V02.INC"  REPLACING  //HCM12V02//
@@ -2500,11 +2505,6 @@
       *    公費請求書編集処理
       *****************************************************************
        20022-KOHSKY-WRITE-SEC          SECTION.
-      *
-      *    平成２４年４月改正対応
-           IF      RECE62X-SRYYM       >=  "201204"
-               GO  TO  20022-KOHSKY-WRITE-EXT
-           END-IF
       *  
            MOVE    SPACE               TO  KOHSKY-REC
            INITIALIZE                      KOHSKY-REC
@@ -3161,24 +3161,6 @@
                                                    TO  HC06-HEAD5
                        END-EVALUATE
                END-EVALUATE
-           END-IF
-      *
-      *    平成２４年４月改正対応
-           IF      RECE62-SRYYM        >=  "201204"
-               MOVE    SPACE               TO  WRK-HC06-HEAD4-G
-               MOVE    HC06-HEAD4-G (5:)   TO  WRK-HC06-HEAD4-G
-               MOVE    WRK-ERR-MSG-99      TO  HC06-HEAD4-G (5:)
-               MOVE    WRK-HC06-HEAD4-G    TO  HC06-HEAD4-G (33:)
-               IF      WRK-PARA-PRTKBN     =   "2" OR  "3"
-                   IF      SYS-200501-INSPECT-CHARACTER-KBN
-                                           =   "0"
-                       MOVE    "点検改正未対応"    TO  HC06-LABEL
-                   ELSE
-                       MOVE    "改正未対応"        TO  HC06-LABEL
-                   END-IF
-               ELSE
-                   MOVE    "改正未対応"        TO  HC06-LABEL
-               END-IF
            END-IF
            .
        310-HCN06-HEAD-HEN-EXT.
@@ -5657,8 +5639,14 @@
                                              TO  WRK-KHNTENZ
                        MOVE    WRK-KHNTEN    TO  HC06-NYUKHNTEN (IDY)
                    ELSE
-                       MOVE    RECE62-NYUTOKRYO-RYAKU (IDX)
-                                             TO  HC06-NYUKHNTENN(IDY)
+                       IF      RECE62-NYUTOKRYO-RYAKU (IDX) (11:)
+                                             =   SPACE
+                           MOVE    RECE62-NYUTOKRYO-RYAKU (IDX)
+                                             TO  HC06-NYUKHNTENN (IDY)
+                       ELSE 
+                           MOVE    RECE62-NYUTOKRYO-RYAKU (IDX)
+                                             TO  HC06-NYUKHNTENN2(IDY)
+                       END-IF 
                    END-IF    
       *            <日数>
                    MOVE    RECE62-NYUTOKNISSU(IDX)
@@ -5833,8 +5821,14 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       11
                    OR      RECE62-NYUSYUBETU (IDX) =   SPACE
-               MOVE    RECE62-NYUSYUBETU (IDX)
-                                     TO  HC06-NYUSYUBETU (IDX)
+               IF      RECE62-NYUSYUBETU (IDX) (13:)
+                                       =   SPACE
+                   MOVE    RECE62-NYUSYUBETU (IDX)
+                                         TO  HC06-NYUSYUBETU (IDX)
+               ELSE 
+                   MOVE    RECE62-NYUSYUBETU (IDX)
+                                         TO  HC06-NYUSYUBETU2(IDX)
+               END-IF 
            END-PERFORM
       *
       *    ９７食事            
@@ -8708,7 +8702,8 @@
       *********MOVE    "HCN09V01.red"      TO
       *********MOVE    "HCN09V02.red"      TO
       *********MOVE    "HCN09V03.red"      TO
-               MOVE    "HCN09V04.red"      TO
+      *********MOVE    "HCN09V04.red"      TO
+               MOVE    "HCN09V05.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HC06                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -8981,7 +8976,8 @@
       *****************WHEN    "HCN09V01.red"
       *****************WHEN    "HCN09V02.red"
       *****************WHEN    "HCN09V03.red"
-                       WHEN    "HCN09V04.red"
+      *****************WHEN    "HCN09V04.red"
+                       WHEN    "HCN09V05.red"
                            MOVE    RECE08-PRTDATA  TO HC06
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC06-PAGE
@@ -9740,11 +9736,6 @@
       *    請求管理ＤＢ更新
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
-      *
-      *    平成２４年４月改正対応
-           IF      RECE62-SRYYM        >=  "201204"
-               GO  TO  3904-RECE10-HENSYU-EXT
-           END-IF
       * 
       *    テスト患者のとき更新しない
            IF      RECE62-TSTPTNUMKBN  =   "1"
@@ -10949,11 +10940,6 @@
       *****************************************************************
        3001-MISEIKYU-FLG-KOUSIN-SEC    SECTION.
       *
-      *    平成２４年４月改正対応
-           IF      WRK-PARA-SRYYM      >=  "201204"
-               GO  TO  3001-MISEIKYU-FLG-KOUSIN-EXT
-           END-IF
-      *
            OPEN    INPUT               RECE62-FILE
       *
            MOVE    ZERO                TO  FLG-RECE62
@@ -11175,11 +11161,6 @@
                    END-IF
       *
                    MOVE    ZERO                TO  FLG-RECE62
-      *
-      *            平成２４年４月改正対応
-                   IF      RECE62-SRYYM        >=  "201204"
-                       GO  TO  990-RECE62-READ-EXT
-                   END-IF
            END-READ
       *
            .
