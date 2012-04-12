@@ -4614,12 +4614,11 @@
                                                       (IDX-NYUKSN IDX1)
                         END-IF
                    END-PERFORM
-               END-IF
-      *
-               IF ((TNS-CDKBN-KBNNUM   >=   100)   AND
-                   (TNS-CDKBN-KBNNUM   <=   199))  OR
-                  ((TNS-CDKBN-KBNNUM   >=   300)   AND
-                   (TNS-CDKBN-KBNNUM   <=   399))
+               ELSE
+                 IF ((TNS-CDKBN-KBNNUM   >=   100)   AND
+                     (TNS-CDKBN-KBNNUM   <=   199))  OR
+                    ((TNS-CDKBN-KBNNUM   >=   300)   AND
+                     (TNS-CDKBN-KBNNUM   <=   399))
                       ADD    1         TO  IDX-CHUKSN1
                       MOVE   NSRY-SRYCD(1) TO  WRK-CHUKSN-SRYCD-1
                                                       (IDX-CHUKSN1)
@@ -4642,10 +4641,10 @@
                                                      (IDX-CHUKSN1 IDX1)
                           END-IF
                       END-PERFORM
-               END-IF
+                 END-IF
       *
-               IF ((TNS-CDKBN-KBNNUM   >=   200)   AND
-                   (TNS-CDKBN-KBNNUM   <=   299))
+                 IF ((TNS-CDKBN-KBNNUM   >=   200)   AND
+                     (TNS-CDKBN-KBNNUM   <=   299))
                     ADD    1         TO  IDX-CHUKSN2
                     MOVE   NSRY-SRYCD(1)   TO  WRK-CHUKSN-SRYCD-2
                                                      (IDX-CHUKSN2)
@@ -4666,6 +4665,7 @@
                                                      (IDX-CHUKSN2 IDX1)
                         END-IF
                     END-PERFORM
+                 END-IF
                END-IF
       *
               END-IF
@@ -4753,12 +4753,12 @@
                                                       (IDX-NYUKSN IDX1)
                          END-IF
                        END-PERFORM
-                    END-IF
+                    ELSE
       *
-                    IF ((TNS-CDKBN-KBNNUM   >=   100)   AND
-                        (TNS-CDKBN-KBNNUM   <=   199))  OR
-                       ((TNS-CDKBN-KBNNUM   >=   300)   AND
-                        (TNS-CDKBN-KBNNUM   <=   399))
+                      IF ((TNS-CDKBN-KBNNUM   >=   100)   AND
+                          (TNS-CDKBN-KBNNUM   <=   199))  OR
+                         ((TNS-CDKBN-KBNNUM   >=   300)   AND
+                          (TNS-CDKBN-KBNNUM   <=   399))
                          ADD    1         TO  IDX-CHUKSN1
                          MOVE   SRY-SRYCD(1)
                                            TO  WRK-CHUKSN-SRYCD-1
@@ -4784,10 +4784,10 @@
                                                      (IDX-CHUKSN1 IDX1)
                             END-IF
                          END-PERFORM
-                    END-IF
+                      END-IF
       *
-                    IF ((TNS-CDKBN-KBNNUM   >=   200)   AND
-                        (TNS-CDKBN-KBNNUM   <=   299))
+                      IF ((TNS-CDKBN-KBNNUM   >=   200)   AND
+                          (TNS-CDKBN-KBNNUM   <=   299))
                          ADD    1         TO  IDX-CHUKSN2
                          MOVE   SRY-SRYCD(1)
                                            TO  WRK-CHUKSN-SRYCD-2
@@ -4813,6 +4813,8 @@
                                                      (IDX-CHUKSN2 IDX1)
                             END-IF
                          END-PERFORM
+                      END-IF
+      *
                     END-IF
       *
                    END-IF
@@ -5049,8 +5051,8 @@
                   IF    WRK-NYUKSN-DAY-1(IDX-NYUKSN IDX1)  =  ZERO
                       CONTINUE
                   ELSE
-                      ADD   1               TO  WRK-MEISAISU
-                      MOVE  WRK-NYUKSN-SRYCD-1(KSN-IDX)
+                      ADD   1    TO  WRK-MEISAISU
+                      MOVE  WRK-NYUKSN-SRYCD-1(IDX-NYUKSN)
                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                   END-IF
                END-PERFORM
