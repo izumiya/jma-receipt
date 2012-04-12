@@ -164,8 +164,10 @@
            03  IDX-NYUKSN                  PIC 9(02).
            03  IDX-CHUKSN1                 PIC 9(02).
            03  IDX-CHUKSN1S                PIC 9(02).
+           03  IDX-CHUKSN1SS               PIC 9(02).
            03  IDX-CHUKSN2                 PIC 9(02).
            03  IDX-CHUKSN2S                PIC 9(02).
+           03  IDX-CHUKSN2SS               PIC 9(02).
       *
       *    コンスタント値
        01  CONSTANT-AREA.
@@ -404,6 +406,15 @@
                07  WRK-NYUKSN-SRYCD-1          PIC X(09).
                07  WRK-NYUKSN-ZAITEN-1         PIC 9(08).
                07  WRK-NYUKSN-DAY-1            PIC 9(03)  OCCURS 31.
+      *
+      *    並び替え時の退避用
+           03  WRK-CHUKSN-TAIHI.
+             05  WRK-CHUKSN-SRYCD-T          PIC X(09).
+             05  WRK-CHUKSN-CHUCD-T.
+               07  WRK-CHUKSN-CHUKSNCD-T     PIC X(04).
+               07  WRK-CHUKSN-CHUKSNTUBAN-T  PIC X(01).
+             05  WRK-CHUKSN-ZAITEN-T         PIC 9(08).
+             05  WRK-CHUKSN-DAY-T            PIC 9(03)  OCCURS 31.
       *-------------------------------------------------------------
       *
       *    未実施減算退避用フラグテーブル
@@ -4571,6 +4582,7 @@
              MOVE     "key17"              TO  MCP-PATHNAME
              PERFORM   910-NYUINACCT-READ-SEC
              PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
+              IF       NACCT-ZAIKAISU   NOT =    ZERO
       *        該当入院行為テーブルの読み込み
                PERFORM    210-NYUINACT-GET-SEC
       *        点数マスタより注加算の判定
@@ -4595,11 +4607,10 @@
                      UNTIL     IDX1   >   31
                         IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                               (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                            AND   (WRK-GAIHAKU-KBN(IDX1) = ZERO OR 4 OR
-                                                           5 OR 6 OR 7)
-                            AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
-                               MOVE   NACCT-DAY(IDX1)
-                                                 TO WRK-NYUKSN-DAY-1
+                        AND   (WRK-GAIHAKU-KBN(IDX1) = ZERO OR 4 OR 5
+                                                            OR 6 OR 7)
+                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
+                          MOVE   NACCT-DAY(IDX1)  TO WRK-NYUKSN-DAY-1
                                                       (IDX-NYUKSN IDX1)
                         END-IF
                    END-PERFORM
@@ -4621,15 +4632,15 @@
                                                       (IDX-CHUKSN1)
                       PERFORM    VARYING   IDX1   FROM   1   BY   1
                         UNTIL     IDX1   >   31
-                            IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
-                                  (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                            AND   (WRK-GAIHAKU-KBN(IDX1) = ZERO OR 4 OR
-                                                           5 OR 6 OR 7)
-                            AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
-                               MOVE   NACCT-DAY(IDX1)
+                          IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
+                                (LNK-NYUINDAY-KBN(IDX1) = "1"))
+                          AND   (WRK-GAIHAKU-KBN(IDX1) = ZERO OR 4 OR 5
+                                                              OR 6 OR 7)
+                          AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
+                             MOVE   NACCT-DAY(IDX1)
                                                  TO WRK-CHUKSN-DAY-1
                                                      (IDX-CHUKSN1 IDX1)
-                            END-IF
+                          END-IF
                       END-PERFORM
                END-IF
       *
@@ -4648,8 +4659,8 @@
                       UNTIL     IDX1   >   31
                         IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                               (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                        AND   (WRK-GAIHAKU-KBN(IDX1) = ZERO OR 4 OR
-                                                       5 OR 6 OR 7)
+                        AND   (WRK-GAIHAKU-KBN(IDX1) = ZERO OR 4 OR 5
+                                                            OR 6 OR 7)
                         AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
                            MOVE   NACCT-DAY(IDX1)  TO WRK-CHUKSN-DAY-2
                                                      (IDX-CHUKSN2 IDX1)
@@ -4657,12 +4668,16 @@
                     END-PERFORM
                END-IF
       *
-               MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
-               MOVE    "key17"                 TO  MCP-PATHNAME
-               PERFORM 910-NYUINACCT-READ-SEC
+              END-IF
+      *
+              MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
+              MOVE    "key17"                 TO  MCP-PATHNAME
+              PERFORM 910-NYUINACCT-READ-SEC
       *
              END-PERFORM
+      *
            END-IF
+      *
       *    入院会計クローズ
            MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
            MOVE    "key17"                 TO  MCP-PATHNAME
@@ -4729,14 +4744,13 @@
                                                         (IDX-NYUKSN)
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                          UNTIL     IDX1   >   31
-                         IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
-                               (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                         AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 
-                                                     OR 5 OR 6 OR 7)
-                         AND   (ACCT-DAY(1 IDX1)    NOT =  ZERO)
-                           MOVE   ACCT-DAY(1 IDX1)
-                                                TO WRK-NYUKSN-DAY-1
-                                                   (IDX-NYUKSN IDX1)
+                         IF  ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
+                              (LNK-NYUINDAY-KBN(IDX1) = "1"))
+                         AND  (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
+                                                              OR 6 OR 7)
+                         AND  (ACCT-DAY(1 IDX1)    NOT =  ZERO)
+                           MOVE   ACCT-DAY(1 IDX1)  TO WRK-NYUKSN-DAY-1
+                                                      (IDX-NYUKSN IDX1)
                          END-IF
                        END-PERFORM
                     END-IF
@@ -4815,6 +4829,46 @@
       *
       *
       *    取得した入院料加算を注加算コード、注加算通番順に並び替え
+           PERFORM      VARYING    IDX-CHUKSN1   FROM   1  BY  1
+             UNTIL     (IDX-CHUKSN1   >   50)   OR
+                       (WRK-CHUKSN-SRYCD-1(IDX-CHUKSN1)  =   SPACE)
+               COMPUTE   IDX-CHUKSN1SS   =   IDX-CHUKSN1  +  1
+               PERFORM   VARYING IDX-CHUKSN1S FROM IDX-CHUKSN1SS  BY  1
+                 UNTIL   (IDX-CHUKSN1S   >   50)   OR
+                         (WRK-CHUKSN-SRYCD-1(IDX-CHUKSN1S) =  SPACE)
+                   IF  WRK-CHUKSN-CHUCD-1(IDX-CHUKSN1)
+                                   <=  WRK-CHUKSN-CHUCD-1(IDX-CHUKSN1S)
+                       CONTINUE
+                   ELSE
+                       MOVE   WRK-CHUKSN-TBL-1(IDX-CHUKSN1)
+                                      TO   WRK-CHUKSN-TAIHI
+                       MOVE   WRK-CHUKSN-TBL-1(IDX-CHUKSN1S)
+                                      TO  WRK-CHUKSN-TBL-1(IDX-CHUKSN1)
+                       MOVE   WRK-CHUKSN-TAIHI
+                                      TO  WRK-CHUKSN-TBL-1(IDX-CHUKSN1S)
+                   END-IF
+               END-PERFORM
+           END-PERFORM
+           PERFORM      VARYING    IDX-CHUKSN2   FROM   1  BY  1
+             UNTIL     (IDX-CHUKSN2   >   50)   OR
+                       (WRK-CHUKSN-SRYCD-2(IDX-CHUKSN2)  =   SPACE)
+               COMPUTE   IDX-CHUKSN2SS   =   IDX-CHUKSN2  +  1
+               PERFORM   VARYING IDX-CHUKSN2S FROM IDX-CHUKSN2SS  BY  1
+                 UNTIL   (IDX-CHUKSN2S   >   50)   OR
+                         (WRK-CHUKSN-SRYCD-2(IDX-CHUKSN2S) =  SPACE)
+                   IF  WRK-CHUKSN-CHUCD-2(IDX-CHUKSN2)
+                                   <=  WRK-CHUKSN-CHUCD-2(IDX-CHUKSN2S)
+                       CONTINUE
+                   ELSE
+                       MOVE   WRK-CHUKSN-TBL-2(IDX-CHUKSN2)
+                                      TO   WRK-CHUKSN-TAIHI
+                       MOVE   WRK-CHUKSN-TBL-2(IDX-CHUKSN2S)
+                                      TO  WRK-CHUKSN-TBL-2(IDX-CHUKSN2)
+                       MOVE   WRK-CHUKSN-TAIHI
+                                      TO  WRK-CHUKSN-TBL-2(IDX-CHUKSN2S)
+                   END-IF
+               END-PERFORM
+           END-PERFORM
       *
       *    取得した入院情報から日単位の入院会計情報を再構築
            PERFORM      VARYING    IDX1   FROM   1  BY  1
