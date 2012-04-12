@@ -311,20 +311,22 @@ path	key10 	{
 			WHERE   HOSPNUM    =   :HOSPNUM
 			AND   PTID        =   :PTID
 			AND   HKNCOMBINUM <>  '9999'
-			AND   SRYYMD      =
-                           (SELECT MAX(SRYYMD)
+            AND   (HOSPNUM,PTID,SRYYMD)  in
+                  (SELECT HOSPNUM,PTID,MAX(SRYYMD)
                                    FROM tbl_jyurrk 
                                	WHERE   HOSPNUM    =   :HOSPNUM
 		        	AND   PTID        =   :PTID
 		        	AND   HKNCOMBINUM <>  '9999'
-                                AND   SRYYMD      <=  :SRYYMD )
+                                AND   SRYYMD      <=  :SRYYMD 
+                   GROUP BY HOSPNUM,PTID )
 			ORDER   BY        DENPNUM,
 		                          RENNUM,
 			                  DOUJI_RENNUM,
 			                  EDANUM
 		;
 	};
-};path	key11 	{
+};
+path	key11 	{
 	DBSELECT	{
 		DECLARE tbl_jyurrk_key11_csr CURSOR FOR
 		SELECT *
@@ -334,14 +336,15 @@ path	key10 	{
 			AND   NYUGAIKBN   =   :NYUGAIKBN
 			AND   SRYKA       =   :SRYKA
 			AND   HKNCOMBINUM <>  '9999'
-			AND   SRYYMD      =
-                           (SELECT MAX(SRYYMD)
+            AND   (HOSPNUM,PTID,SRYYMD)  in
+                  (SELECT HOSPNUM,PTID,MAX(SRYYMD)
                                    FROM tbl_jyurrk 
                                	WHERE   HOSPNUM    =   :HOSPNUM
 		        	AND   PTID        =   :PTID
               			AND   SRYKA       =   :SRYKA
 		        	AND   HKNCOMBINUM <>  '9999'
-                                AND   SRYYMD      <=  :SRYYMD )
+                                AND   SRYYMD      <=  :SRYYMD 
+                   GROUP BY HOSPNUM,PTID )
 			ORDER   BY        RENNUM,
 			                  DOUJI_RENNUM,
 			                  EDANUM
@@ -751,14 +754,15 @@ path	key32 	{
 			AND   a.NYUGAIKBN   =   :NYUGAIKBN
 			AND   a.SRYKA       =   :SRYKA
 			AND   a.HKNCOMBINUM <>  '9999'
-			AND   a.SRYYMD      =
-                           (SELECT MAX(SRYYMD)
+            AND   (a.HOSPNUM,a.PTID,a.SRYYMD)  in
+                  (SELECT HOSPNUM,PTID,MAX(SRYYMD)
                                    FROM tbl_jyurrk 
                                	WHERE   HOSPNUM    =   a.HOSPNUM
 		        	AND   PTID        =   a.PTID
          			AND   NYUGAIKBN   =   a.NYUGAIKBN
               			AND   SRYKA       =   a.SRYKA
-                                AND   SRYYMD      >=  :SRYYMD )
+                                AND   SRYYMD      >=  :SRYYMD 
+                   GROUP BY HOSPNUM,PTID )
 	        	AND   a.HOSPNUM     =  b.HOSPNUM
 	        	AND   a.PTID       =  b.PTID
 	        	AND   a.HOSPNUM     =  c.HOSPNUM
@@ -813,14 +817,15 @@ path	key35 	{
 			AND   PTID        =   :PTID
 			AND   NYUGAIKBN   =   :NYUGAIKBN
 			AND   HKNCOMBINUM <>  '9999'
-			AND   SRYYMD      =
-                           (SELECT MAX(SRYYMD)
+            AND   (HOSPNUM,PTID,SRYYMD)  in
+                  (SELECT HOSPNUM,PTID,MAX(SRYYMD)
                                    FROM tbl_jyurrk 
                                	WHERE   HOSPNUM    =   :HOSPNUM
 		        	AND   PTID        =   :PTID
            			AND   NYUGAIKBN   =   :NYUGAIKBN
 		        	AND   HKNCOMBINUM <>  '9999'
-                                AND   SRYYMD      <=  :SRYYMD )
+                                AND   SRYYMD      <=  :SRYYMD 
+                   GROUP BY HOSPNUM,PTID )
 			ORDER   BY        DENPNUM,
 		                          RENNUM,
 			                  DOUJI_RENNUM,
@@ -953,13 +958,14 @@ path	key44 	{
 			WHERE   a.HOSPNUM    =   :HOSPNUM
 			AND   a.NYUGAIKBN   =   :NYUGAIKBN
 			AND   a.HKNCOMBINUM <>  '9999'
-			AND   a.SRYYMD      =
-                           (SELECT MAX(SRYYMD)
+            AND   (a.HOSPNUM,a.PTID,a.SRYYMD)  in
+                  (SELECT HOSPNUM,PTID,MAX(SRYYMD)
                                    FROM tbl_jyurrk 
                                	WHERE   HOSPNUM    =   a.HOSPNUM
 		        	AND   PTID        =   a.PTID
          			AND   NYUGAIKBN   =   a.NYUGAIKBN
-                                AND   SRYYMD      >=  :SRYYMD )
+                                AND   SRYYMD      >=  :SRYYMD 
+                   GROUP BY HOSPNUM,PTID )
 	        	AND   a.HOSPNUM     =  b.HOSPNUM
 	        	AND   a.PTID       =  b.PTID
 	        	AND   a.HOSPNUM     =  c.HOSPNUM
@@ -983,13 +989,14 @@ path	key45 	{
 			AND   a.NYUGAIKBN   =   :NYUGAIKBN
 			AND   a.SRYKA    LIKE   :SRYKA
 			AND   a.HKNCOMBINUM <>  '9999'
-			AND   a.SRYYMD      =
-                           (SELECT MAX(SRYYMD)
+            AND   (a.HOSPNUM,a.PTID,a.SRYYMD)  in
+                  (SELECT HOSPNUM,PTID,MAX(SRYYMD)
                                    FROM tbl_jyurrk 
                                	WHERE   HOSPNUM    =   a.HOSPNUM
 		        	AND   PTID        =   a.PTID
          			AND   NYUGAIKBN   =   a.NYUGAIKBN
-                                AND   SRYYMD      >=  :SRYYMD )
+                                AND   SRYYMD      >=  :SRYYMD 
+                   GROUP BY HOSPNUM,PTID )
 			ORDER BY a.RENNUM,
 			         a.DOUJI_RENNUM,
 			         a.EDANUM
