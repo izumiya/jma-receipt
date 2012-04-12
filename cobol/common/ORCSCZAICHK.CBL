@@ -31,6 +31,7 @@
       *  03.04.00    NACL-多々納  07/02/XX  包括診療対応
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
       *  04.05.00    NACL-多々納  09/10/XX  多剤投与・換算値等対応
+      *  04.07.00    NACL-多々納  12/04/12  後発品変更不可等対応
       *****************************************************************
       *
       *
@@ -58,6 +59,8 @@
            03  FLG-OK              PIC 9(01).
            03  FLG-ERR             PIC 9(01).
            03  FLG-ARI             PIC 9(01).
+      *H24.4
+           03  FLG-HENCHK          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -89,6 +92,11 @@
                    07  TBL-MAE-KANSURYO    PIC  9(05)V9(05).
                    07  TBL-MAE-INPUTKBN    PIC  X(01).
                    07  TBL-MAE-JIHIMONEY   PIC  9(07).
+      *H24.4
+      *            投薬予約コード
+                   07  TBL-MAE-TOUYKK-G.
+                       09  TBL-MAE-TOUYYK       PIC  X(01)
+                                                OCCURS   5.
                05  TBL-MAE-CHKFLG          PIC  X(01)
                                            OCCURS   50.
            03  TBL-ATO-AREA.
@@ -102,6 +110,11 @@
                    07  TBL-ATO-KANSURYO    PIC  9(05)V9(05).
                    07  TBL-ATO-INPUTKBN    PIC  X(01).
                    07  TBL-ATO-JIHIMONEY   PIC  9(07).
+      *H24.4
+      *            投薬予約コード
+                   07  TBL-ATO-TOUYKK-G.
+                       09  TBL-ATO-TOUYYK       PIC  X(01)
+                                                OCCURS   5.
                05  TBL-ATO-CHKFLG          PIC  X(01)
                                            OCCURS   50.
       *
@@ -322,6 +335,16 @@
                            UNTIL  (IDX2        >   5   )  OR
                                   (SRY-SRYCD(IDX2)     =   SPACE ) OR
                                   (IDX-SIN     >=  50 )
+      *H24.4
+                       MOVE    ZERO                TO  FLG-HENCHK
+                       IF      IDX-SIN         >   ZERO
+                           IF     (TBL-MAE-SRYCD(IDX-SIN)(1:1) =  "6")
+                             AND  (SRY-SRYCD (IDX2)(1:7)   =  "0992099")
+                               PERFORM 10022-SRYACCT-HEN-SEC
+                           END-IF
+                       END-IF
+                       IF      FLG-HENCHK          =   ZERO
+      *H24.4
                        ADD     1                   TO  IDX-SIN
                        MOVE    SRY-SRYCD   (IDX2)  TO  TBL-MAE-SRYCD
                                                              (IDX-SIN)
@@ -363,6 +386,9 @@
                                                             (IDX-SIN)
                            END-IF
                        END-IF
+      *H24.4
+                       END-IF
+      *H24.4
                    END-PERFORM
       *
                END-IF
@@ -380,6 +406,16 @@
            PERFORM VARYING     IDX1    FROM    1   BY  1
                    UNTIL      (IDX1        >   50   )  OR
                               (ORCSCZAICHK-SRYCD (IDX1)  =   SPACE )
+      *H24.4
+               MOVE    ZERO                TO  FLG-HENCHK
+               IF      IDX-ATO         >   ZERO
+                   IF     (TBL-ATO-SRYCD(IDX-ATO)(1:1) =  "6")
+                      AND (ORCSCZAICHK-SRYCD(IDX1)(1:7)  =  "0992099")
+                       PERFORM 10023-ZAICHK-HEN-SEC
+                   END-IF
+               END-IF
+               IF      FLG-HENCHK          =   ZERO
+      *H24.4
                ADD     1                   TO  IDX-ATO
                MOVE    ORCSCZAICHK-SRYCD (IDX1)
                                            TO  TBL-ATO-SRYCD  (IDX-ATO)
@@ -401,6 +437,9 @@
                MOVE    ORCSCZAICHK-JIHIMONEY (IDX1)
                                            TO  TBL-ATO-JIHIMONEY
                                                               (IDX-ATO)
+      *H24.4
+               END-IF
+      *H24.4
            END-PERFORM
       *
       *    診療行為数が違う
@@ -433,6 +472,71 @@
            .
       *
        1002-SRYACCT-CHK-EXT.
+           EXIT.
+      *
+      *H24.4
+      *****************************************************************
+      *    診療行為データ　予約コード編集
+      *****************************************************************
+       10022-SRYACCT-HEN-SEC         SECTION.
+      *
+           EVALUATE    SRY-SRYCD (IDX2)
+      *        後発変更不可
+               WHEN    "099209903"
+                   MOVE    "1"         TO  TBL-MAE-TOUYYK (IDX-SIN 1)
+                   MOVE    1           TO  FLG-HENCHK
+      *        含量変更不可
+               WHEN    "099209905"
+                   MOVE    "1"         TO  TBL-MAE-TOUYYK (IDX-SIN 2)
+                   MOVE    1           TO  FLG-HENCHK
+      *        剤形変更不可
+               WHEN    "099209906"
+                   MOVE    "1"         TO  TBL-MAE-TOUYYK (IDX-SIN 3)
+                   MOVE    1           TO  FLG-HENCHK
+      *        銘柄名記載
+               WHEN    "099209907"
+                   MOVE    "1"         TO  TBL-MAE-TOUYYK (IDX-SIN 4)
+                   MOVE    1           TO  FLG-HENCHK
+      *        一般名記載
+               WHEN    "099209908"
+                   MOVE    "1"         TO  TBL-MAE-TOUYYK (IDX-SIN 5)
+                   MOVE    1           TO  FLG-HENCHK
+           END-EVALUATE
+           .
+      *
+       10022-SRYACCT-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    予約コード編集処理
+      *****************************************************************
+       10023-ZAICHK-HEN-SEC         SECTION.
+      *
+           EVALUATE    ORCSCZAICHK-SRYCD (IDX1)
+      *        後発変更不可
+               WHEN    "099209903"
+                   MOVE    "1"         TO  TBL-ATO-TOUYYK (IDX-ATO 1)
+                   MOVE    1           TO  FLG-HENCHK
+      *        含量変更不可
+               WHEN    "099209905"
+                   MOVE    "1"         TO  TBL-ATO-TOUYYK (IDX-ATO 2)
+                   MOVE    1           TO  FLG-HENCHK
+      *        剤形変更不可
+               WHEN    "099209906"
+                   MOVE    "1"         TO  TBL-ATO-TOUYYK (IDX-ATO 3)
+                   MOVE    1           TO  FLG-HENCHK
+      *        銘柄名記載
+               WHEN    "099209907"
+                   MOVE    "1"         TO  TBL-ATO-TOUYYK (IDX-ATO 4)
+                   MOVE    1           TO  FLG-HENCHK
+      *        一般名記載
+               WHEN    "099209908"
+                   MOVE    "1"         TO  TBL-ATO-TOUYYK (IDX-ATO 5)
+                   MOVE    1           TO  FLG-HENCHK
+           END-EVALUATE
+           .
+      *
+       10023-ZAICHK-HEN-EXT.
            EXIT.
       *
       *****************************************************************
