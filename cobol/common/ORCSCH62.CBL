@@ -892,6 +892,7 @@
                IF     (WRK-SRYSYUKBN       =   "210"
                                            OR  "220"
                                            OR  "230" 
+                                           OR  "290" 
                                            OR  SPACE )
                    IF     (ORCSCH62-KBN        =   "1"  )
       *                管鰾醒未伕匹情ま質杅執綬
