@@ -95,4 +95,8 @@
             02  HCN67-LABEL PIC X(14).
             02  HCN67-SYOCD PIC X(5).
             02  HCN67-HOSPNAME2 PIC X(94).
+            02  HCN67-NYUSYUBETSU2
+                    PIC X(14)   OCCURS  11 TIMES.
+            02  HCN67-NYUKHNTENN2
+                    PIC X(14)   OCCURS  9 TIMES.
             02  HCN67-LOPTION   PIC X(100).
