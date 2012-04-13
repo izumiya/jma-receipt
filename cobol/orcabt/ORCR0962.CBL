@@ -44,6 +44,10 @@
       *  04.05.04    NACL-Æ£¸¶    11/08/02  ÅÀ¸¡¥ì¥»°õ»ú°ÌÃÖÊÑ¹¹ÂÐ±þ
       *  04.05.05    NACL-Æ£¸¶    12/03/14  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
       *                                     ¡Ö²þÀµÌ¤ÂÐ±þ¡×¤Îµ­ºÜ¤ò¹Ô¤¦
+      *  04.05.06    NACL-Æ£¸¶    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *                                     ¡Ö²þÀµÌ¤ÂÐ±þ¡×¤Îµ­ºÜ¤ò¹Ô¤ï¤Ê
+      *                                     ¤¤¤è¤¦¤Ë¤¹¤ë
+      *                                     Æþ±¡Î¬¾Î¤ÎÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -141,7 +145,7 @@
                                    BY         //RECEERR//.
       *
       *    ¸øÌ³ºÒ³²
-           COPY    "HCM56V02.INC"  REPLACING  //HCM56V02//
+           COPY    "HCM56V03.INC"  REPLACING  //HCM56V03//
                                    BY         //HCM56//.
       *
       *    ¸øÌ³ºÒ³²¡ÊÂ³»æ¡Ë 
@@ -1327,20 +1331,6 @@ grpsys        PERFORM 900-DBSELECT-SEC
                                            TO  HCM56-LOPTION
            END-IF
       *
-      *    Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
-           IF      RECE82-SRYYM        >=  "201204"
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   IF      SYS-200501-INSPECT-CHARACTER-KBN
-                                               =   "0"
-                       MOVE    "ÅÀ¸¡²þÀµÌ¤ÂÐ±þ"    TO  HCM56-LABEL
-                   ELSE
-                       MOVE    "²þÀµÌ¤ÂÐ±þ"        TO  HCM56-LABEL
-                   END-IF
-               ELSE
-                   MOVE    "²þÀµÌ¤ÂÐ±þ"        TO  HCM56-LABEL
-               END-IF
-           END-IF
-      *
            .
        20021-HEAD-HEN-EXT.
            EXIT.
@@ -1715,8 +1705,14 @@ grpsys        PERFORM 900-DBSELECT-SEC
                                              TO  WRK-KHNTENZ
                        MOVE    WRK-KHNTENZ   TO  HCM56-NYUKHNTEN (IDY)
                    ELSE
-                       MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
-                                             TO  HCM56-NYUKHNTENN(IDY)
+                       IF      RECE82-NYUTOKRYO-RYAKU (IDX) (11:)
+                                             =   SPACE
+                           MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
+                                             TO  HCM56-NYUKHNTEN  (IDY)
+                       ELSE
+                           MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
+                                             TO  HCM56-NYUKHNTENN2(IDY)
+                       END-IF
                    END-IF    
       *            <Æü¿ô>
                    MOVE    RECE82-NYUTOKNISSU(IDX)
@@ -1787,8 +1783,14 @@ grpsys        PERFORM 900-DBSELECT-SEC
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       10
                    OR      RECE82-NYUSYUBETU (IDX) =   SPACE
-               MOVE    RECE82-NYUSYUBETU (IDX)
-                                       TO  HCM56-NYUSYUBETSU (IDX)
+               IF      RECE82-NYUSYUBETU (IDX) (11:)
+                                         =   SPACE
+                   MOVE    RECE82-NYUSYUBETU (IDX)
+                                     TO  HCM56-NYUSYUBETSU (IDX)
+               ELSE
+                   MOVE    RECE82-NYUSYUBETU (IDX)
+                                     TO  HCM56-NYUSYUBETSU2(IDX)
+               END-IF
            END-PERFORM
       *
       *    £¹£·¿©»ö
@@ -2605,7 +2607,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       * 
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
-               MOVE    "HCM56V02.red"      TO
+               MOVE    "HCM56V03.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HCM56                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -2739,7 +2741,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCM56V02.red"                  
+                       WHEN    "HCM56V03.red"                  
                            MOVE    RECE08-PRTDATA  TO HCM56
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCM56-PAGE

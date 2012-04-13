@@ -47,6 +47,8 @@
       *  04.05.04    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
       *  04.05.05    NACL-藤原    12/03/14  平成２４年４月改正対応
       *                                     「改正未対応」の記載を行う
+      *  04.05.07    NACL-藤原    12/04/10  平成２４年４月改正対応
+      *                                     「改正未対応」の記載をやめる
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1277,20 +1279,6 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                MOVE    "MonpeLayerIn -L SEN MonpeLayerOut"
                                            TO  HC23-LOPTION
            END-IF
-      *
-      *    平成２４年４月改正対応
-           IF      RECE41-SRYYM        >=  "201204"
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   IF      SYS-200501-INSPECT-CHARACTER-KBN
-                                               =   "0"
-                       MOVE    "点検改正未対応"    TO  HC23-LABEL
-                   ELSE
-                       MOVE    "改正未対応"        TO  HC23-LABEL
-                   END-IF
-               ELSE
-                   MOVE    "改正未対応"        TO  HC23-LABEL
-               END-IF
-           END-IF      
       *
            .
        310-HC101-HEAD-HEN-EXT.

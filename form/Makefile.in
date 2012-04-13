@@ -500,6 +500,19 @@ FORM_files = \
 	      HCM71.red \
 	      HCN66.red \
 	      HCN67.red \
+	      HCM56V03.red \
+	      HCN09V05.red \
+	      HCN23V07.red \
+	      HCN25V03.red \
+	      HCN48V03.red \
+	      HCN50V03.red \
+	      HCN50V03P.red \
+	      HCN51V03.red \
+	      HCN51V03P.red \
+	      HCN53V03.red \
+	      HCN54V03.red \
+	      HCN55V03.red \
+	      HCN58V03.red \
 
 all:   
 

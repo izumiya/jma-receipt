@@ -54,6 +54,10 @@
       *  04.05.04    NACL-藤原    11/08/02  点検レセ印字位置変更対応
       *  04.05.05    NACL-藤原    12/03/14  平成２４年４月改正対応
       *                                     「改正未対応」の記載を行う
+      *  04.05.06    NACL-藤原    12/04/11  平成２４年４月改正対応
+      *                                     「改正未対応」の記載を行わな
+      *                                     いようにする
+      *                                     入院略称の変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -166,7 +170,7 @@
                                    BY         //RECEERR//.
       *
       *    短期（３４７０２）     
-           COPY    "HCN50V02.INC"  REPLACING  //HCN50V02//
+           COPY    "HCN50V03.INC"  REPLACING  //HCN50V03//
                                    BY         //HCN50//.
       *
       *    長期・短期（続紙）     
@@ -1293,20 +1297,6 @@ grpsys        PERFORM 900-DBSELECT-SEC
                                            TO  HCN50-LOPTION
            END-IF
       *
-      *    平成２４年４月改正対応
-           IF      RECE82-SRYYM        >=  "201204"
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   IF      SYS-200501-INSPECT-CHARACTER-KBN
-                                               =   "0"
-                       MOVE    "点検改正未対応"    TO  HCN50-LABEL
-                   ELSE
-                       MOVE    "改正未対応"        TO  HCN50-LABEL
-                   END-IF
-               ELSE
-                   MOVE    "改正未対応"        TO  HCN50-LABEL
-               END-IF
-           END-IF
-      *
            .
        20021-HEAD-HEN-EXT.
            EXIT.
@@ -1757,8 +1747,14 @@ grpsys        PERFORM 900-DBSELECT-SEC
                                              TO  WRK-KHNTENZ
                        MOVE    WRK-KHNTENZ   TO  HCN50-NYUKHNTEN (IDY)
                    ELSE
-                       MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
-                                             TO  HCN50-NYUKHNTENN(IDY)
+                       IF      RECE82-NYUTOKRYO-RYAKU (IDX) (11:)
+                                             =   SPACE
+                           MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
+                                             TO  HCN50-NYUKHNTENN (IDY)
+                       ELSE
+                           MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
+                                             TO  HCN50-NYUKHNTENN2(IDY)
+                       END-IF
                    END-IF    
       *            <日数>
                    MOVE    RECE82-NYUTOKNISSU(IDX)
@@ -1832,8 +1828,14 @@ grpsys        PERFORM 900-DBSELECT-SEC
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       11
                    OR      RECE82-NYUSYUBETU (IDX) =   SPACE
-               MOVE    RECE82-NYUSYUBETU (IDX)
+               IF      RECE82-NYUSYUBETU (IDX) (11:)
+                                         =   SPACE
+                   MOVE    RECE82-NYUSYUBETU (IDX)
                                      TO  HCN50-NYUSYUBETSU (IDX)
+               ELSE
+                   MOVE    RECE82-NYUSYUBETU (IDX)
+                                     TO  HCN50-NYUSYUBETSU2(IDX)
+               END-IF
            END-PERFORM
       *
       *    小計イ
@@ -2638,10 +2640,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      CNT-PAGE            =   1
                EVALUATE  WRK-PARA-FRAME
                    WHEN      "0"
-                       MOVE    "HCN50V02.red"      TO
+                       MOVE    "HCN50V03.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                    WHEN      "1"
-                       MOVE    "HCN50V02P.red"     TO
+                       MOVE    "HCN50V03P.red"     TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                END-EVALUATE
                MOVE    HCN50                TO
@@ -2783,8 +2785,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCN50V02.red"                  
-                       WHEN    "HCN50V02P.red"                  
+                       WHEN    "HCN50V03.red"                  
+                       WHEN    "HCN50V03P.red"                  
                            MOVE    RECE08-PRTDATA  TO HCN50
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCN50-PAGE

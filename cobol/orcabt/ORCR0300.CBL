@@ -380,6 +380,8 @@
       *  04.05.29    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
       *                                     の変更
       *                                     日付情報の記録を行う
+      *  04.05.30    NACL-藤原    12/04/11  平成２４年４月分以降の処理を
+      *                                     行うようにする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1736,11 +1738,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE055PARA-HOSPNUM
            OPEN    INPUT               RECE12-FILE
       *
            OPEN    INPUT               RECE055-FILE
-      *
-      *    平成２４年４月改正対応
-           IF      WRK-PARA-SRYYM      >=  "201204"
-               MOVE    1                   TO  FLG-END
-           END-IF
       * 
            IF      FLG-END             =   ZERO
       *
@@ -8231,11 +8228,6 @@ grpsys     PERFORM 900-DBFETCH-SEC
                              END-IF
                            END-IF
                        END-IF    
-      *
-      *                平成２４年４月改正対応
-                       IF      RECE02-SRYYM        >=  "201204"
-                           MOVE    2                   TO  FLG-READ
-                       END-IF
       *
                        IF      FLG-READ            =   1
                            ADD     1           TO  CNT-IN

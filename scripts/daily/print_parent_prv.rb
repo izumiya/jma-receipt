@@ -21,6 +21,7 @@
 # (2008/07/30 ) 労災、自賠枠なし対応
 # (2008/11/12 ) レイアウトオプション対応
 # (2011/11/14 ) 労災枠有り対応
+# (2012/04/11 ) 改正対応
 #
 
 # ※複数のプロセスの実行はできない
@@ -588,6 +589,19 @@ end
                 when    'HCM29V04.red'
                         ls_w1 = 'HCM49V02.red'
                         red_file = std_form + ls_w1
+#   -----------> 改正対応(2012/04/11)
+                when    'HCN50V03.red'
+                        ls_w1 = 'HCN50V03P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN51V03.red'
+                        ls_w1 = 'HCN51V03P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN23V07.red'
+                        ls_w1 = 'HCN48V03.red'
+                        red_file = std_form + ls_w1
+                when    'HCN53V03.red'
+                        ls_w1 = 'HCN54V03.red'
+                        red_file = std_form + ls_w1
 		end
 	end
 #   労災の枠なし帳票をスイッチする ed
@@ -614,16 +628,16 @@ end
 			puts	'出力区分未設定'
 		when	'1'     # 印刷のみの指示
 		puts	'take1 Start [' + psfile_name + ']'
-			w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' ' +  LAYEROPTION
+			w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name
 		when	'2'     # 印刷＆PSファイル出力の指示
 		puts	'take2 Start [' + psfile_name + ']'
 			# 出力ファイル名が指定されていなかったら、通常の印刷処理を行う
 			if psfile_name == ''
 				puts	'出力ファイル名未設定'
-				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' ' +  LAYEROPTION
+				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name
 			else
 #				w_exec = RED_EXECPS + ' ' + red_file + ' ' + temp_file + ' -p ' + lp_name + ' -o ' + psfile_name
-				w_exec = RED_EXECPS + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' -o ' + psfile_name + ' ' +  LAYEROPTION
+				w_exec = RED_EXECPS + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' -o ' + psfile_name + ' ' +  LAYEROPTION 
 			end
 		when	'3'     # PSファイル出力の指示
 		puts	'take3 Start [' + psfile_name + ']'
@@ -638,7 +652,7 @@ end
 			if psfile_name == ''
 				puts	'出力ファイル名未設定'
 			else
-				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -o ' + psfile_name + ' ' + LAYEROPTION
+				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -o ' + psfile_name
 			end
 		else
 			puts	'出力区分内容設定エラー'

@@ -144,6 +144,10 @@
       *                                     行わない
       *  04.05.34    NACL-門脇    12/04/10  平成２４年４月改正
       *                                     現物給付化対応
+      *                                     平成２４年４月分以降の処理を
+      *                                     行うようにする
+      *                                     平成２４年４月以降の社保分に
+      *                                     ついて在総診の設定を行わない
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2392,11 +2396,6 @@
       *****************************************************************
        20022-KOHSKY-WRITE-SEC          SECTION.
       *
-      *    平成２４年４月改正対応
-           IF      RECE02X-SRYYM       >=  "201204"
-               GO  TO  20022-KOHSKY-WRITE-EXT
-           END-IF
-      *
            MOVE    SPACE               TO  KOHSKY-REC
            INITIALIZE                      KOHSKY-REC
            MOVE    RECE02X-HOSPNUM     TO  KOHSKY-HOSPNUM
@@ -3007,24 +3006,6 @@
                                                    TO  HC06-HEAD5
                        END-EVALUATE
                END-EVALUATE
-           END-IF
-      *
-      *    平成２４年４月改正対応
-           IF      RECE02-SRYYM        >=  "201204"
-               MOVE    SPACE               TO  WRK-HC06-HEAD4-G
-               MOVE    HC06-HEAD4-G (5:)   TO  WRK-HC06-HEAD4-G
-               MOVE    WRK-ERR-MSG-99      TO  HC06-HEAD4-G (5:)
-               MOVE    WRK-HC06-HEAD4-G    TO  HC06-HEAD4-G (33:)
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   IF      SYS-200501-INSPECT-CHARACTER-KBN
-                                               =   "0"
-                       MOVE    "点検改正未対応"    TO  HC06-LABEL
-                   ELSE
-                       MOVE    "改正未対応"        TO  HC06-LABEL
-                   END-IF
-               ELSE
-                   MOVE    "改正未対応"        TO  HC06-LABEL
-               END-IF
            END-IF
       *
            .
@@ -8496,7 +8477,7 @@
       *    在総診等
            IF    ((RECE02-ZAITAKU   =   "1"        ) AND
                   (RECE02-SRYYM    <=  "201203"    ))
-           OR    ( RECE02-ZAITAKU-SANTEI-FLG  = "1" )
+      *****OR    ( RECE02-ZAITAKU-SANTEI-FLG  = "1" )
                MOVE    "1"              TO  RECE08-ZAITAKU
            END-IF
      *
@@ -8703,11 +8684,6 @@
       *    請求管理ＤＢ更新
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
-      *
-      *    平成２４年４月改正対応
-           IF      RECE02-SRYYM        >=  "201204"
-               GO  TO  3904-RECE10-HENSYU-EXT
-           END-IF
       * 
       *    テスト患者のとき更新しない
            IF      RECE02-TSTPTNUMKBN   =   "1"
@@ -10143,11 +10119,6 @@
       *****************************************************************
        3001-MISEIKYU-FLG-KOUSIN-SEC    SECTION.
       *
-      *    平成２４年４月改正対応
-           IF      WRK-PARA-SRYYM      >=  "201204"
-               GO  TO  3001-MISEIKYU-FLG-KOUSIN-EXT
-           END-IF
-      *
            OPEN    INPUT               RECE02-FILE
       *
            MOVE    ZERO                TO  FLG-RECE02
@@ -10354,11 +10325,6 @@
                    END-IF
       *
                    MOVE    ZERO                TO  FLG-RECE02
-      *
-      *            平成２４年４月改正対応
-                   IF      RECE02-SRYYM        >=  "201204"
-                       GO  TO  900-RECE02-READ-EXT
-                   END-IF
            END-READ
       *
            .

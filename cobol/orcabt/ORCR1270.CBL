@@ -59,6 +59,9 @@
       *  04.05.09    NACL-藤原    12/03/14  平成２４年４月改正対応
       *                                     平成２４年４月分以降の処理を
       *                                     行わない
+      *  04.05.33    NACL-藤原    12/04/10  平成２４年４月改正対応
+      *                                     平成２４年４月分以降の処理を
+      *                                     行うようにする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -139,7 +142,8 @@
                                    BY         //RECEERR//.
       *
       *****COPY    "HCN58V01.INC"  REPLACING  //HCN58V01//
-           COPY    "HCN58V02.INC"  REPLACING  //HCN58V02//
+      *****COPY    "HCN58V02.INC"  REPLACING  //HCN58V02//
+           COPY    "HCN58V03.INC"  REPLACING  //HCN58V03//
                                    BY         //HCN58//.
       *****COPY    "HCN59V01.INC"  REPLACING  //HCN59V01//
            COPY    "HCM59V02.INC"  REPLACING  //HCM59V02//
@@ -1308,24 +1312,6 @@
                MOVE    WRK-HCN58-HEAD1-G    TO  HCN58-HEAD1-G (53:)
            END-IF
       *
-      *    平成２４年４月改正対応
-           IF      RECE200-SRYYM       >=  "201204"
-               MOVE    SPACE               TO  WRK-HCN58-HEAD1-G
-               MOVE    HCN58-HEAD1-G (5:)  TO  WRK-HCN58-HEAD1-G
-               MOVE    WRK-ERR-MSG-99      TO  HCN58-HEAD1-G (5:)
-               MOVE    WRK-HCN58-HEAD1-G   TO  HCN58-HEAD1-G (33:)
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   IF      SYS-200501-INSPECT-CHARACTER-KBN
-                                               =   "0"
-                       MOVE    "点検改正未対応"    TO  HCN58-LABEL
-                   ELSE
-                       MOVE    "改正未対応"        TO  HCN58-LABEL
-                   END-IF
-               ELSE
-                   MOVE    "改正未対応"        TO  HCN58-LABEL
-               END-IF
-           END-IF
-      *
            .
        310-HCN06-HEAD-HEN-EXT.
            EXIT.
@@ -1840,8 +1826,13 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       5
                    OR      RECE200-NYUSYUBETU (IDX) =   SPACE
-               MOVE    RECE200-NYUSYUBETU (IDX)
+               IF      RECE200-NYUSYUBETU (IDX) (11:)   =   SPACE
+                   MOVE    RECE200-NYUSYUBETU (IDX)
                                        TO  HCN58-NYUSYUBETU (IDX)
+               ELSE
+                   MOVE    RECE200-NYUSYUBETU (IDX)
+                                       TO  HCN58-NYUSYUBETU2(IDX)
+               END-IF
            END-PERFORM
       *
       *    入院基本料
@@ -2641,7 +2632,8 @@
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
       *********MOVE    "HCN58V01.red"      TO
-               MOVE    "HCN58V02.red"      TO
+      *********MOVE    "HCN58V02.red"      TO
+               MOVE    "HCN58V03.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HCN58               TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -2781,7 +2773,8 @@
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
       *****************WHEN    "HCN58V01.red"
-                       WHEN    "HCN58V02.red"
+      *****************WHEN    "HCN58V02.red"
+                       WHEN    "HCN58V03.red"
                            MOVE    RECE08-PRTDATA  TO HCN58
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCN58-PAGE
@@ -2934,11 +2927,6 @@
       *    請求管理ＤＢ更新
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
-      *
-      *    平成２４年４月改正対応
-           IF      RECE200-SRYYM       >=  "201204"
-               GO  TO  3904-RECE10-HENSYU-EXT
-           END-IF
       * 
       *    テスト患者、レセプト種別不明のとき更新しない
            IF    ( RECE200-TSTPTNUMKBN =   "1"  )

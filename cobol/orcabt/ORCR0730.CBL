@@ -151,6 +151,10 @@
       *                                     Ê¿À®£²£´Ç¯£´·îÊ¬°Ê¹ß¤Î½èÍý¤ò
       *                                     ¹Ô¤ï¤Ê¤¤
       *  04.05.38    NACL-ÌçÏÆ    12/03/23  ºÒ³²ÂÐ±þ¡Ê¸øÈñÍóÀÁµáÅÀ£°ÅÀÂÐ±þ¡Ë
+      *  04.05.39    NACL-Æ£¸¶    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *                                     Ê¿À®£²£´Ç¯£´·îÊ¬°Ê¹ß¤Î½èÍý¤ò
+      *                                     ¹Ô¤¦¤è¤¦¤Ë¤¹¤ë
+      *                                     Æþ±¡Î¬¾Î¤ÎÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -280,7 +284,8 @@
       *****COPY    "HCN09V01.INC"  REPLACING  //HCN09V01//
       *****COPY    "HCN09V02.INC"  REPLACING  //HCN09V02//
       *****COPY    "HCN09V03.INC"  REPLACING  //HCN09V03//
-           COPY    "HCN09V04.INC"  REPLACING  //HCN09V04//
+      *****COPY    "HCN09V04.INC"  REPLACING  //HCN09V04//
+           COPY    "HCN09V05.INC"  REPLACING  //HCN09V05//
                                    BY         //HC06//.
       *****COPY    "HCM12V01.INC"  REPLACING  //HCM12V01//
            COPY    "HCM12V02.INC"  REPLACING  //HCM12V02//
@@ -2463,11 +2468,6 @@
       *****************************************************************
        20022-KOHSKY-WRITE-SEC          SECTION.
       *
-      *    Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
-           IF      RECE62X-SRYYM       >=  "201204"
-               GO  TO  20022-KOHSKY-WRITE-EXT
-           END-IF
-      *
            MOVE    SPACE               TO  KOHSKY-REC
            INITIALIZE                      KOHSKY-REC
            MOVE    RECE62X-HOSPNUM     TO  KOHSKY-HOSPNUM
@@ -3105,24 +3105,6 @@
                                                    TO  HC06-HEAD5
                        END-EVALUATE
                END-EVALUATE
-           END-IF
-      *
-      *    Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
-           IF      RECE62-SRYYM        >=  "201204"
-               MOVE    SPACE               TO  WRK-HC06-HEAD4-G
-               MOVE    HC06-HEAD4-G (5:)   TO  WRK-HC06-HEAD4-G
-               MOVE    WRK-ERR-MSG-99      TO  HC06-HEAD4-G (5:)
-               MOVE    WRK-HC06-HEAD4-G    TO  HC06-HEAD4-G (33:)
-               IF      WRK-PARA-PRTKBN     =   "2"
-                   IF      SYS-200501-INSPECT-CHARACTER-KBN
-                                           =   "0"
-                       MOVE    "ÅÀ¸¡²þÀµÌ¤ÂÐ±þ"    TO  HC06-LABEL
-                   ELSE
-                       MOVE    "²þÀµÌ¤ÂÐ±þ"        TO  HC06-LABEL
-                   END-IF
-               ELSE
-                   MOVE    "²þÀµÌ¤ÂÐ±þ"        TO  HC06-LABEL
-               END-IF
            END-IF
       *
            .
@@ -5572,8 +5554,14 @@
                                              TO  WRK-KHNTENZ
                        MOVE    WRK-KHNTEN    TO  HC06-NYUKHNTEN (IDY)
                    ELSE
-                       MOVE    RECE62-NYUTOKRYO-RYAKU (IDX)
-                                             TO  HC06-NYUKHNTENN(IDY)
+                       IF      RECE62-NYUTOKRYO-RYAKU (IDX) (11:)
+                                             =   SPACE
+                           MOVE    RECE62-NYUTOKRYO-RYAKU (IDX)
+                                             TO  HC06-NYUKHNTENN (IDY)
+                       ELSE
+                           MOVE    RECE62-NYUTOKRYO-RYAKU (IDX)
+                                             TO  HC06-NYUKHNTENN2(IDY)
+                       END-IF
                    END-IF    
       *            <Æü¿ô>
                    MOVE    RECE62-NYUTOKNISSU(IDX)
@@ -5748,8 +5736,14 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       11
                    OR      RECE62-NYUSYUBETU (IDX) =   SPACE
-               MOVE    RECE62-NYUSYUBETU (IDX)
-                                     TO  HC06-NYUSYUBETU (IDX)
+               IF      RECE62-NYUSYUBETU (IDX) (13:)
+                                       =   SPACE
+                   MOVE    RECE62-NYUSYUBETU (IDX)
+                                         TO  HC06-NYUSYUBETU (IDX)
+               ELSE
+                   MOVE    RECE62-NYUSYUBETU (IDX)
+                                         TO  HC06-NYUSYUBETU2(IDX)
+               END-IF
            END-PERFORM
       *
       *    £¹£·¿©»ö            
@@ -8650,7 +8644,8 @@
       *********MOVE    "HCN09V01.red"      TO
       *********MOVE    "HCN09V02.red"      TO
       *********MOVE    "HCN09V03.red"      TO
-               MOVE    "HCN09V04.red"      TO
+      *********MOVE    "HCN09V04.red"      TO
+               MOVE    "HCN09V05.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HC06                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -8921,7 +8916,8 @@
       *****************WHEN    "HCN09V01.red"
       *****************WHEN    "HCN09V02.red"
       *****************WHEN    "HCN09V03.red"
-                       WHEN    "HCN09V04.red"
+      *****************WHEN    "HCN09V04.red"
+                       WHEN    "HCN09V05.red"
                            MOVE    RECE08-PRTDATA  TO HC06
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC06-PAGE
@@ -9675,11 +9671,6 @@
       *    ÀÁµá´ÉÍý£Ä£Â¹¹¿·
       *****************************************************************
        3904-RECE10-HENSYU-SEC        SECTION.
-      *
-      *    Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
-           IF      RECE62-SRYYM        >=  "201204"
-               GO  TO  3904-RECE10-HENSYU-EXT
-           END-IF
       * 
       *    ¥Æ¥¹¥È´µ¼Ô¤Î¤È¤­¹¹¿·¤·¤Ê¤¤
            IF      RECE62-TSTPTNUMKBN  =   "1"
@@ -10866,11 +10857,6 @@
       *****************************************************************
        3001-MISEIKYU-FLG-KOUSIN-SEC    SECTION.
       *
-      *    Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
-           IF      WRK-PARA-SRYYM      >=  "201204"
-               GO  TO  3001-MISEIKYU-FLG-KOUSIN-EXT
-           END-IF
-      *
            OPEN    INPUT               RECE62-FILE
       *
            MOVE    ZERO                TO  FLG-RECE62
@@ -11092,11 +11078,6 @@
                    END-IF
       *
                    MOVE    ZERO                TO  FLG-RECE62
-      *
-      *            Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
-                   IF      RECE62-SRYYM        >=  "201204"
-                       GO  TO  990-RECE62-READ-EXT
-                   END-IF
            END-READ
       *
            .
