@@ -214,6 +214,8 @@
       *  04.05.16    NACL-Æ£¸¶    11/12/27  ÅìµþÅÔÃÏÊý¸øÈñÂÐ±þ
       *                                     ´µ¼ÔÉ¼¡Ê£¹£³¡Ë¤ò¥Þ¥ëÅÔ¡Ê£¸£²¡Ë
       *                                     ¤è¤êÍ¥Àè¤¹¤ë¤È¤­¤Î¾ò·ïÄÉ²Ã
+      *  04.05.17    NACL-Æ£¸¶    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *                                     ¡Ö£¶£²£Â·¿´Î±ê¡×¤ÎÄÉ²Ã 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -482,6 +484,7 @@
                05  FILLER              PIC X(03)   VALUE   SPACE.
                05  FILLER              PIC X(03)   VALUE   SPACE.
                05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(03)   VALUE   SPACE.
       *
                05  FILLER              PIC X(03)   VALUE   "027".  
                05  FILLER              PIC X(03)   VALUE   "013".  
@@ -511,6 +514,7 @@
                05  FILLER              PIC X(03)   VALUE   "972".
                05  FILLER              PIC X(03)   VALUE   "974".
                05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(03)   VALUE   SPACE.
       *
       *********05  FILLER              PIC X(03)   VALUE   "027".  
                05  FILLER              PIC X(03)   VALUE   "013".  
@@ -537,6 +541,7 @@
                05  FILLER              PIC X(03)   VALUE   "052".  
                05  FILLER              PIC X(03)   VALUE   "053".  
                05  FILLER              PIC X(03)   VALUE   "066".  
+               05  FILLER              PIC X(03)   VALUE   "062".  
                05  FILLER              PIC X(03)   VALUE   "025".  
                05  FILLER              PIC X(03)   VALUE   "012".
                05  FILLER              PIC X(03)   VALUE   "972".
@@ -545,9 +550,9 @@
            03  WRK-SRT-TABLE-R         REDEFINES   WRK-SRT-TABLE.
                05  WRK-SRT-OCC         OCCURS  3.
                    07  WRK-SRT-KOHHKNNUM
-                                       PIC X(03)   OCCURS  28.
+                                       PIC X(03)   OCCURS  29.
       *
-           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   28.
+           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   29.
       *
       *    °åÎÅµ¡´Ø¡Ê´ðËÜ¾ðÊó¡ËÂàÈòÍÑÎÎ°è
        01  TBL-SYS1001-T.

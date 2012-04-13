@@ -95,6 +95,8 @@
       *  04.05.04    NACL-Æ£¸¶    11/08/25  ¸øÈñÃ±ÆÈÂÐ±þ
       *                                     ¸øÈñ¤òºÇÂç£µ£°¤ËÊÑ¹¹
       *  04.05.05    NACL-Æ£¸¶    11/11/22  Æ±ÆüºÆÆþ±¡ÂÐ±þ
+      *  04.05.06    NACL-Æ£¸¶    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *                                     ¡Ö£¶£²£Â·¿´Î±ê¡×¤ÎÄÉ²Ã 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -269,6 +271,7 @@
                05  FILLER              PIC X(03)   VALUE   "972".
                05  FILLER              PIC X(03)   VALUE   "974".
                05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(03)   VALUE   SPACE.
       *
                05  FILLER              PIC X(03)   VALUE   "013".  
                05  FILLER              PIC X(03)   VALUE   "014".  
@@ -294,6 +297,7 @@
                05  FILLER              PIC X(03)   VALUE   "052".  
                05  FILLER              PIC X(03)   VALUE   "053".  
                05  FILLER              PIC X(03)   VALUE   "066".  
+               05  FILLER              PIC X(03)   VALUE   "062".  
                05  FILLER              PIC X(03)   VALUE   "025".  
                05  FILLER              PIC X(03)   VALUE   "012".
                05  FILLER              PIC X(03)   VALUE   "972".
@@ -302,9 +306,9 @@
            03  WRK-SRT-TABLE-R         REDEFINES   WRK-SRT-TABLE.
                05  WRK-SRT-OCC         OCCURS  2.
                    07  WRK-SRT-KOHHKNNUM
-                                       PIC X(03)   OCCURS  28.
+                                       PIC X(03)   OCCURS  29.
       *
-           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   28.
+           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   29.
       *     
       *    ¥ï¡¼¥¯ÊÝ¸±ÁÈ¹ç¤»¡ÊÆþ±¡²ñ·×ÍÑ¡Ë 
        01  WRK-HKNCOMBI-TABLE.
