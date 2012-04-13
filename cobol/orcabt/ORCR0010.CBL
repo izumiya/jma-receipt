@@ -210,6 +210,8 @@
       *  04.05.13    NACL-藤原    11/12/27  東京都地方公費対応
       *                                     患者票（９３）をマル都（８２）
       *                                     より優先するときの条件追加
+      *  04.05.14    NACL-藤原    12/04/11  平成２４年４月改正対応
+      *                                     「６２Ｂ型肝炎」の追加
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
@@ -476,6 +478,7 @@
                05  FILLER              PIC X(03)   VALUE   SPACE.
                05  FILLER              PIC X(03)   VALUE   SPACE.
                05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(03)   VALUE   SPACE.
       *
                05  FILLER              PIC X(03)   VALUE   "027".  
                05  FILLER              PIC X(03)   VALUE   "013".  
@@ -505,6 +508,7 @@
                05  FILLER              PIC X(03)   VALUE   "972".
                05  FILLER              PIC X(03)   VALUE   "974".
                05  FILLER              PIC X(03)   VALUE   SPACE.
+               05  FILLER              PIC X(03)   VALUE   SPACE.
       *
       *********05  FILLER              PIC X(03)   VALUE   "027".  
                05  FILLER              PIC X(03)   VALUE   "013".  
@@ -531,6 +535,7 @@
                05  FILLER              PIC X(03)   VALUE   "052".  
                05  FILLER              PIC X(03)   VALUE   "053".  
                05  FILLER              PIC X(03)   VALUE   "066".  
+               05  FILLER              PIC X(03)   VALUE   "062".  
                05  FILLER              PIC X(03)   VALUE   "025".  
                05  FILLER              PIC X(03)   VALUE   "012".
                05  FILLER              PIC X(03)   VALUE   "972".
@@ -539,9 +544,9 @@
            03  WRK-SRT-TABLE-R         REDEFINES   WRK-SRT-TABLE.
                05  WRK-SRT-OCC         OCCURS  3.
                    07  WRK-SRT-KOHHKNNUM
-                                       PIC X(03)   OCCURS  28.
+                                       PIC X(03)   OCCURS  29.
       *
-           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   28.
+           03  WRK-SRT-KOHHKNNUM-MAX   PIC 9(02)   VALUE   29.
       *
       *    医療機関（基本情報）退避用領域
        01  TBL-SYS1001-T.
