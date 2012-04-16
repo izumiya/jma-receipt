@@ -4900,6 +4900,7 @@
                        PERFORM VARYING     IDX-D   FROM    1   BY  1
                                UNTIL       IDX-D   >   31
                            IF  SPA-GMN-DAY-41(IDX-D)  = ZERO OR 4 OR 5
+                                                             OR 6 OR 7
                                CONTINUE
                            ELSE
                                MOVE    ZERO         TO  SPA-NAI-DAY-41
