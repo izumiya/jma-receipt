@@ -93,6 +93,7 @@
            03  IDX4                                PIC 9(05).
            03  IDX5                                PIC 9(05).
            03  IDX6                                PIC 9(05).
+           03  IDX7                                PIC 9(05).
            03  IDXA                                PIC 9(05).
            03  IDXB                                PIC 9(05).
            03  IDXL                                PIC 9(05).
@@ -2683,17 +2684,17 @@
       *****************************************************************
        42021-HENKOU-SEC                SECTION.
       *
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   SPA-GMN-W21-BRMLST-MAX )
+           PERFORM VARYING IDX7    FROM    1   BY  1
+                   UNTIL ( IDX7    >   SPA-GMN-W21-BRMLST-MAX )
                     OR   ( SPA-ERRCD   NOT =   SPACE )
       *
-               IF  ( SPA-NAI-W21-SELNUM-FLG (IDX0) =   1 )
+               IF  ( SPA-NAI-W21-SELNUM-FLG (IDX7) =   1 )
       *
                    INITIALIZE                  SYSKANRI-REC
                    MOVE    "5002"          TO  SYS-KANRICD
-                   MOVE    SPA-NAI-W21-TBRMNUM (IDX0)
+                   MOVE    SPA-NAI-W21-TBRMNUM (IDX7)
                                            TO  SYS-KBNCD
-                   MOVE    SPA-NAI-W21-TYUKOSTYMD (IDX0)
+                   MOVE    SPA-NAI-W21-TYUKOSTYMD (IDX7)
                                            TO  SYS-STYUKYMD
                                                SYS-EDYUKYMD
                    PERFORM 900-SYSKANRI-KEY10-SEL-SEC
