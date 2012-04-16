@@ -5808,6 +5808,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                AND   ( RECE62-RJNGAIFTN  >=  SYS-200501-NI-JYOKEN (2) )
                        PERFORM 200721-NI-KAISU-HENSYU-SEC
                END-IF
+             END-IF
            END-IF
       *
       *    •≥•·•Û•»•«°º•ø§Œ ‘Ω∏° ø«Œ≈∂Ë ¨£∑£∞°À
