@@ -2279,11 +2279,15 @@
       *    入院基本料
            MOVE    W21-KHNRYO      TO  SPA-GMN-W21-KHNRYO-G
       *
-      *    有効期間開始日
-           MOVE    W21-YUKOSTYMD   TO  SPA-GMN-W21-YUKOSTYMD
+           IF    ( SPA-NAI-W21-INPUT-MODE  =   2 )
+               CONTINUE
+           ELSE
+      *        有効期間開始日
+               MOVE    W21-YUKOSTYMD   TO  SPA-GMN-W21-YUKOSTYMD
       *
-      *    有効期間終了日
-           MOVE    W21-YUKOEDYMD   TO  SPA-GMN-W21-YUKOEDYMD
+      *        有効期間終了日
+               MOVE    W21-YUKOEDYMD   TO  SPA-GMN-W21-YUKOEDYMD
+           END-IF
       *
       *    入院料加算
            PERFORM VARYING IDX-KSN FROM    1   BY  1
@@ -4128,9 +4132,6 @@
                                                SPA-GMN-W21-KHNTEN
                                                SPA-GMN-W21-KHNRYO-G
            END-IF
-      *
-           DISPLAY "W21-YUKOSTYMD[" SPA-NAI-W21-YUKOSTYMD "]"
-           DISPLAY "YUKOSTYMD-MOT [" SPA-NAI-W21-YUKOSTYMD-MOT "]"
       *
            PERFORM 4200-BRM-SEL-SEC
            IF    ( FLG-INPUT-AREA  =    ZERO )
