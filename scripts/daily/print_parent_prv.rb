@@ -652,7 +652,7 @@ end
 			if psfile_name == ''
 				puts	'出力ファイル名未設定'
 			else
-				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -o ' + psfile_name
+				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -o ' + psfile_name + ' ' + LAYEROPTION
 			end
 		else
 			puts	'出力区分内容設定エラー'
