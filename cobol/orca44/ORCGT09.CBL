@@ -1134,48 +1134,47 @@
        510-ERRSET-SEC              SECTION.
            MOVE    SPACE               TO  SPA-ERRMSG
       *
+           MOVE    SPACE                TO  TERR
+           MOVE    SPA-ERRCD            TO  TERR-ERRCODE
+      *
            EVALUATE    SPA-ERRCD
                WHEN    "0001"
-                   MOVE    "選択番号入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "選択番号入力エラー"        TO  TERR-ERRMSG
                WHEN    "0002"
-                   MOVE    "選択番号が重複しています"  TO  SPA-ERRMSG
+                   MOVE    "選択番号が重複しています"  TO  TERR-ERRMSG
                WHEN    "0003"
                    MOVE    "複数の患者は、同時に選択できません。"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0004"
                    MOVE    "これ以上データの追加はできません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0005"
                    MOVE    "データが選択してありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0010"
                    MOVE    "対象のレセ電データがありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0011"
                    MOVE    "返戻データが設定されていません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0018"
-                   MOVE    "主科未設定データです"      TO  SPA-ERRMSG
+                   MOVE    "主科未設定データです"      TO  TERR-ERRMSG
                WHEN    "0020"
                    STRING  "改正パッチ提供以降に平成２４年３月以前の"
                                                    DELIMITED  BY  SIZE
-                           "月遅れ分の再作成が行われていません"
+                     "月遅れ分についてレセプト再処理が行われていません"
                                                    DELIMITED  BY  SIZE
-                                                   INTO    SPA-ERRMSG
-                       END-STRING
+                                                   INTO    TERR-ERRMSG
+                   END-STRING
                WHEN    "0099"
                    MOVE    "選択したデータを全て追加できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
       *
                WHEN    "9999"
                    MOVE    "他端末で使用中です。"
-                                               TO  SPA-ERRMSG
-                   MOVE    SLOCK-MSG           TO  SPA-ERRMSG(21:)
+                                               TO  TERR-ERRMSG
+                   MOVE    SLOCK-MSG           TO  TERR-ERRMSG(21:)
            END-EVALUATE
-      *
-           MOVE    SPACE                TO  TERR
-           MOVE    SPA-ERRCD            TO  TERR-ERRCODE
-           MOVE    SPA-ERRMSG           TO  TERR-ERRMSG
            MOVE    "B01"                TO  MCP-WIDGET
       *
            MOVE    "T09"                TO  SPA-MOTOPG

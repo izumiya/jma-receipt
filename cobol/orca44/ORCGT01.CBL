@@ -5436,87 +5436,86 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
        510-ERRSET-SEC              SECTION.
            MOVE    SPACE               TO  SPA-ERRMSG
       *
+           MOVE    SPACE                TO  TERR
+           MOVE    SPA-ERRCD            TO  TERR-ERRCODE
+      *
            EVALUATE    SPA-ERRCD
                WHEN    "0001"
                    MOVE    "診療年月が未入力です" 
-                                               TO  SPA-ERRMSG
+                                               TO  TERR-ERRMSG
                WHEN    "0002"
                    MOVE    "請求年月日が未入力です" 
-                                               TO  SPA-ERRMSG
+                                               TO  TERR-ERRMSG
                WHEN    "0003"
                    MOVE    "診療年月入力エラー" 
-                                               TO  SPA-ERRMSG
+                                               TO  TERR-ERRMSG
                WHEN    "0004"
                    MOVE    "請求年月日入力エラー" 
-                                               TO  SPA-ERRMSG
+                                               TO  TERR-ERRMSG
                WHEN    "0005"
                    MOVE    "保険者番号入力エラー" 
-                                               TO  SPA-ERRMSG
+                                               TO  TERR-ERRMSG
                WHEN    "0006"
                    MOVE    "処理対象の帳票が選択してありません" 
-                                               TO  SPA-ERRMSG
+                                               TO  TERR-ERRMSG
                WHEN    "0007"
                    MOVE
                       "総括表・社保の処理対象データが選択してありません"
-                                               TO  SPA-ERRMSG
+                                               TO  TERR-ERRMSG
                WHEN    "0008"
                    MOVE
                       "総括表・国保の処理対象データが選択してありません"
-                                               TO  SPA-ERRMSG
+                                               TO  TERR-ERRMSG
                WHEN    "0009"
                    MOVE
                   "総括表・広域の処理対象データが選択してありません"
-                                               TO  SPA-ERRMSG
+                                               TO  TERR-ERRMSG
                WHEN    "0011"
                    STRING  "主科未設定データがあります"
                                                DELIMITED  BY  SIZE
                            "（主科未設定リストで確認可能です）"
                                                DELIMITED  BY  SIZE
-                                               INTO  SPA-ERRMSG
+                                               INTO  TERR-ERRMSG
                    END-STRING
                WHEN    "0012"
-                   MOVE    "再印刷できない帳票です"    TO  SPA-ERRMSG
+                   MOVE    "再印刷できない帳票です"    TO  TERR-ERRMSG
                WHEN    "0020"
                    STRING  "改正パッチ提供以降に平成２４年３月以前の"
                                                    DELIMITED  BY  SIZE
-                           "月遅れ分の再作成が行われていません"
+                     "月遅れ分についてレセプト再処理が行われていません"
                                                    DELIMITED  BY  SIZE
-                                                   INTO    SPA-ERRMSG
+                                                   INTO    TERR-ERRMSG
                    END-STRING
       *
                WHEN    "0200"
                    MOVE
                        "平成２０年４月改正未対応のため処理できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
       *
                WHEN    "1001"
                    MOVE    "パラメタＤＢの削除処理でエラーとなりました" 
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1002"
                    MOVE    "パラメタＤＢの更新処理でエラーとなりました" 
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1003"
                    MOVE    "パラメタＤＢが存在しません" 
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1004"
                    MOVE    "ジョブ管理ＤＢが削除できませんでした"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1005"
                    MOVE
                    "システム管理ＤＢ（３００３）が削除できませんでした"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1006"
                    MOVE    "システム管理の更新処理でエラーとなりました"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "7777"
-                   MOVE    WRK-RECEERR                 TO  SPA-ERRMSG
+                   MOVE    WRK-RECEERR                 TO  TERR-ERRMSG
                WHEN    "9999"
-                   MOVE    WRK-RECEERR                 TO  SPA-ERRMSG
+                   MOVE    WRK-RECEERR                 TO  TERR-ERRMSG
            END-EVALUATE
-      *
-           MOVE    SPACE                TO  TERR
-           MOVE    SPA-ERRCD            TO  TERR-ERRCODE
-           MOVE    SPA-ERRMSG           TO  TERR-ERRMSG
            MOVE    "B01"                TO  MCP-WIDGET
       *
            MOVE    "T01"                TO  SPA-MOTOPG

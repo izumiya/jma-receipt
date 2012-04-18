@@ -4875,120 +4875,119 @@
        510-ERRSET-SEC              SECTION.
            MOVE    SPACE               TO  SPA-ERRMSG
       *
+           MOVE    SPACE                TO  TERR
+           MOVE    SPA-ERRCD            TO  TERR-ERRCODE
+      *
            EVALUATE    SPA-ERRCD
                WHEN    "0001"
-                   MOVE    "入外区分入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "入外区分入力エラー"        TO  TERR-ERRMSG
                WHEN    "0002"
                    MOVE    "これ以上データの追加はできません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0003"
-                   MOVE    "該当の患者が存在しません"  TO  SPA-ERRMSG
+                   MOVE    "該当の患者が存在しません"  TO  TERR-ERRMSG
                WHEN    "0004"
                    MOVE    "対象のデータを選択してありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0005"
                    MOVE    "同じ診療年月で既に入力済です"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0006"
-                   MOVE    "診療年月入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "診療年月入力エラー"        TO  TERR-ERRMSG
                WHEN    "0007"
                    MOVE    "対象の請求データがありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0008"
-                   MOVE    "個別指示一覧に選択済です"  TO  SPA-ERRMSG
+                   MOVE    "個別指示一覧に選択済です"  TO  TERR-ERRMSG
                WHEN    "0009"
-                   MOVE    "診療年月入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "診療年月入力エラー"        TO  TERR-ERRMSG
                WHEN    "0010"
                    MOVE    "対象のレセ電データがありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0011"
                    MOVE    "返戻データが設定されていません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0012"
                    MOVE
                    "請求する診療年月より未来の診療年月が入力されました"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0013"
-                   MOVE    "請求年月日入力エラー"      TO  SPA-ERRMSG
+                   MOVE    "請求年月日入力エラー"      TO  TERR-ERRMSG
                WHEN    "0014"
                    MOVE
                    "対象の請求データは返戻年月の設定が行なわれています"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0015"
                    STRING  "対象の請求データは返戻年月、"
                                                    DELIMITED  BY  SIZE
                            "月遅れ等の設定が行なわれています"
                                                    DELIMITED  BY  SIZE
-                                                   INTO  SPA-ERRMSG
+                                                   INTO  TERR-ERRMSG
                    END-STRING
                WHEN    "0016"
                    MOVE
                    "対象の請求データは月遅れ等の設定が行なわれています"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0017"
                    MOVE
                    "対象の請求データに返戻の設定が行なわれていません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0018"
-                   MOVE    "主科未設定データです"      TO  SPA-ERRMSG
+                   MOVE    "主科未設定データです"      TO  TERR-ERRMSG
                WHEN    "0019"
                    MOVE
                    "対象の請求データは災害の未確定分です"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0020"
                    STRING  "改正パッチ提供以降に平成２４年３月以前の"
                                                    DELIMITED  BY  SIZE
-                           "月遅れ分の再作成が行われていません"
+                     "月遅れ分についてレセプト再処理が行われていません"
                                                    DELIMITED  BY  SIZE
-                                                   INTO    SPA-ERRMSG
-                       END-STRING
+                                                   INTO    TERR-ERRMSG
+                   END-STRING
                WHEN    "0022"
-                   MOVE    "患者情報を入力中です"      TO  SPA-ERRMSG
+                   MOVE    "患者情報を入力中です"      TO  TERR-ERRMSG
                WHEN    "0023"
-                   MOVE    "選択番号入力エラー"        TO  SPA-ERRMSG
+                   MOVE    "選択番号入力エラー"        TO  TERR-ERRMSG
                WHEN    "0024"
-                   MOVE    "対象診療年月入力エラー"    TO  SPA-ERRMSG
+                   MOVE    "対象診療年月入力エラー"    TO  TERR-ERRMSG
                WHEN    "0025"
                    MOVE    "作成済のデータはありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0026"
                    MOVE    "作成対象となるデータがありません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "0041"
                    MOVE    "データが入力してあるので遷移できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1001"
                    MOVE    "レセプト指示コード（個別）が削除できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1002"
                    MOVE    "レセプト指示コード（個別）が更新できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1003"
                    MOVE    "レセプト指示コード（管理）が更新できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1004"
                    MOVE    "パラメタＤＢが更新できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1005"
                    MOVE    "パラメタＤＢが存在しません" 
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1009"
                    MOVE    "オンライン管理ＤＢが更新できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "1010"
                    MOVE    "オンライン明細ＤＢが更新できません"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "2001"
                    MOVE    "入力された診療月のデータは閲覧のみ可能です"
-                                                       TO  SPA-ERRMSG
+                                                       TO  TERR-ERRMSG
                WHEN    "7777"
                WHEN    "9999"
-                   MOVE    WRK-RECEERR                 TO  SPA-ERRMSG
+                   MOVE    WRK-RECEERR                 TO  TERR-ERRMSG
            END-EVALUATE
-      *
-           MOVE    SPACE                TO  TERR
-           MOVE    SPA-ERRCD            TO  TERR-ERRCODE
-           MOVE    SPA-ERRMSG           TO  TERR-ERRMSG
            MOVE    "B01"                TO  MCP-WIDGET
       *
            MOVE    "T06"                TO  SPA-MOTOPG
