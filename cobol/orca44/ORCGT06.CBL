@@ -44,6 +44,8 @@
       *                                     システム管理の設定に従い、災
       *                                     害該当レセプトのレセ電データ
       *                                     の作成のチェックを追加
+      *  04.05.05    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
+      *                                     の変更に伴う月後れ分のチェック
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
@@ -2802,6 +2804,13 @@
            PERFORM 900-RECEDEN-READ-SEC
            IF      FLG-RECEDEN         =   1
                MOVE    "1"                 TO  SPA-NAI-T09-TRECEDEN(IDX)
+           ELSE
+      *        平成２４年３月以前の月後れ分が改正パッチ前の作成か
+               IF    ( SPA-NAI-T06-SRYYM-H >   201203     )
+               AND   ( RECEDEN-SRYYM       <=  201203     )
+               AND   ( RECEDEN-CREYMD      <   "20120420" )
+                   MOVE    "9"             TO  SPA-NAI-T09-TRECEDEN(IDX)
+               END-IF
            END-IF
       *
       *    請求済かどうか
@@ -2983,6 +2992,13 @@
            IF      SPA-NAI-T09-TRECEDEN (1)
                                        =   "1"
                MOVE    "0010"              TO  SPA-ERRCD
+               GO  TO  42031-SEIKYU-CHK-EXT
+           END-IF
+      *
+      *    平成２４年３月以前の月後れ分が改正パッチ後に再作成されているか
+           IF      SPA-NAI-T09-TRECEDEN (1)
+                                       =   "9"
+               MOVE    "0020"              TO  SPA-ERRCD
                GO  TO  42031-SEIKYU-CHK-EXT
            END-IF
       *
@@ -3537,6 +3553,15 @@
                        PERFORM 900-RECEDEN-READ-SEC
                        IF      FLG-RECEDEN         =   1
                            MOVE    "2"     TO  SPA-GMN-T06-R-TERR  (IDX)
+                       ELSE
+      *                    平成２４年３月以前の月後れ分が改正パッチ前の作成か
+                           IF    ( SPA-NAI-T06-SRYYM-H
+                                                       >   201203     )
+                           AND   ( RECEDEN-SRYYM       <=  201203     )
+                           AND   ( RECEDEN-CREYMD      <   "20120420" )
+                               MOVE    "6"                 TO
+                                               SPA-GMN-T06-R-TERR  (IDX)
+                           END-IF
                        END-IF
                    ELSE
                        MOVE    "3"     TO  SPA-GMN-T06-R-TERR  (IDX)
@@ -4792,6 +4817,8 @@
                        MOVE    "◎"        TO  T06-RECE-TERR      (IDX)
                    WHEN    "5"
                        MOVE    "□"        TO  T06-RECE-TERR      (IDX)
+                   WHEN    "6"
+                       MOVE    "＊"        TO  T06-RECE-TERR      (IDX)
                END-EVALUATE
                MOVE    SPA-GMN-T06-R-TPTNUM     (IDX)
                                            TO  T06-RECE-TPTNUM    (IDX)
@@ -4992,6 +5019,13 @@
                    MOVE
                    "対象の請求データは災害の未確定分です"
                                                        TO  SPA-ERRMSG
+               WHEN    "0020"
+                   STRING  "改正パッチ提供以降に平成２４年３月以前の"
+                                                   DELIMITED  BY  SIZE
+                           "月遅れ分の再作成が行われていません"
+                                                   DELIMITED  BY  SIZE
+                                                   INTO    SPA-ERRMSG
+                       END-STRING
                WHEN    "0022"
                    MOVE    "患者情報を入力中です"      TO  SPA-ERRMSG
                WHEN    "0023"

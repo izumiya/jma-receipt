@@ -146,6 +146,8 @@
       *                                     システム管理の設定に従い、災
       *                                     害該当レセプトのレセ電データ
       *                                     のチェックを追加
+      *  04.05.11    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
+      *                                     の変更に伴う月後れ分のチェック
       *
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *****************************************************************
@@ -204,7 +206,9 @@
            03  FLG-3004-PARAKBN    PIC 9(01).
            03  FLG-TOUROKU         PIC 9(01).
            03  FLG-RECEDEN-CHK     PIC 9(01).
-           03  FLG-SYUKA-CHK      PIC 9(01).
+           03  FLG-RECEDEN-201203-CHK
+                                   PIC 9(01).
+           03  FLG-SYUKA-CHK       PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -4131,6 +4135,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    
       *    月遅れ分のレセ電データの存在チェック
            MOVE    ZERO                TO  FLG-RECEDEN-CHK
+                                           FLG-RECEDEN-201203-CHK
       *   
            MOVE    SPACE               TO  RECE10-REC
            INITIALIZE                      RECE10-REC
@@ -4293,8 +4298,9 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            PERFORM                 UNTIL   FLG-RECE10      =   1
                                    OR      FLG-RECEDEN-CHK =   1
+      *
       *        未確定分をレセ電データに記録するか
-               IF    (  SPA-NAI-200501-RECEDEN-DISASTER
+               IF    ( SPA-NAI-200501-RECEDEN-DISASTER
                                            =   "0"              )
                AND   ( RECE10-ETC-YKZFTN (1)
                                            =   6   OR  7  OR  8 )
@@ -4308,6 +4314,14 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    PERFORM 900-RECEDEN-READ-SEC
                    IF      FLG-RECEDEN         =   1
                        MOVE    1                   TO  FLG-RECEDEN-CHK
+                   ELSE
+      *                平成２４年３月以前の月後れ分が改正パッチ前の作成か
+                       IF    ( SPA-NAI-SKYYM   >   201203     )
+                       AND   ( RECEDEN-SRYYM   <=  201203     )
+                       AND   ( RECEDEN-CREYMD  <   "20120420" )
+                           MOVE    1               TO
+                                               FLG-RECEDEN-201203-CHK
+                       END-IF
                    END-IF
                END-IF
       *
@@ -4318,6 +4332,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    "tbl_seikyu"        TO  MCP-TABLE
            MOVE    "key69"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    平成２４年３月以前の月後れ分が改正パッチ後に再作成されているか
+           IF      FLG-RECEDEN-201203-CHK
+                                       =   1
+               MOVE    "0020"              TO  SPA-ERRCD
+           END-IF
            .
        4601-RECEDEN-CHK-EXT.
            EXIT.
@@ -5645,6 +5665,13 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                    END-STRING
                WHEN    "0012"
                    MOVE    "再印刷できない帳票です"    TO  SPA-ERRMSG
+               WHEN    "0020"
+                   STRING  "改正パッチ提供以降に平成２４年３月以前の"
+                                                   DELIMITED  BY  SIZE
+                           "月遅れ分の再作成が行われていません"
+                                                   DELIMITED  BY  SIZE
+                                                   INTO    SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "0200"
                    MOVE
@@ -5891,7 +5918,7 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "1023"
                WHEN    "1024"
                WHEN    "1025"
-               IF      FLG-RECEDEN-CHK      =   1
+               IF      FLG-RECEDEN-CHK     =   1
                    STRING  "月遅れ分のレセ電データがありません。"
                                                DELIMITED  BY  SIZE
                            "このままレセプト電算データを作成しますか"

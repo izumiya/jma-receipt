@@ -18,4 +18,4 @@
          02  TERR.
             03  TERR-FIXED1.
               04  TERR-ERRCODE    PIC X(10).
-              04  TERR-ERRMSG     PIC X(60).
+              04  TERR-ERRMSG     PIC X(80).
