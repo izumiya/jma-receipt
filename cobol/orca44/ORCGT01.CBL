@@ -4156,8 +4156,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    ELSE
       *                平成２４年３月以前の月後れ分が改正パッチ前の作成か
                        IF    ( SPA-NAI-SKYYM   >   201203     )
-                       AND   ( RECEDEN-SRYYM   <=  201203     )
-                       AND   ( RECEDEN-CREYMD  <   "20120420" )
+                       AND   ( RECE10-SRYYM    <=  201203     )
+                       AND   ( RECE10-CREYMD   <   "20120420" )
                            MOVE    1               TO
                                                FLG-RECEDEN-201203-CHK
                        END-IF

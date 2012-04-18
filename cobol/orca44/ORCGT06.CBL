@@ -2727,8 +2727,8 @@
            ELSE
       *        平成２４年３月以前の月後れ分が改正パッチ前の作成か
                IF    ( SPA-NAI-T06-SRYYM-H >   201203     )
-               AND   ( RECEDEN-SRYYM       <=  201203     )
-               AND   ( RECEDEN-CREYMD      <   "20120420" )
+               AND   ( RECE10-SRYYM        <=  201203     )
+               AND   ( RECE10-CREYMD       <   "20120420" )
                    MOVE    "9"             TO  SPA-NAI-T09-TRECEDEN(IDX)
                END-IF
            END-IF
@@ -3475,8 +3475,8 @@
       *                    平成２４年３月以前の月後れ分が改正パッチ前の作成か
                            IF    ( SPA-NAI-T06-SRYYM-H
                                                        >   201203     )
-                           AND   ( RECEDEN-SRYYM       <=  201203     )
-                           AND   ( RECEDEN-CREYMD      <   "20120420" )
+                           AND   ( RECE10-SRYYM        <=  201203     )
+                           AND   ( RECE10-CREYMD       <   "20120420" )
                                MOVE    "6"                 TO
                                                SPA-GMN-T06-R-TERR  (IDX)
                            END-IF
