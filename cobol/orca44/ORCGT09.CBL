@@ -30,6 +30,9 @@
       *  04.04.01    NACL-藤原    09/12/10  返戻対応
       *  04.04.02    NACL-藤原    09/03/31  主科設定時の主科未設定データ
       *                                     の有無チェック
+      *
+      *  04.05.01    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
+      *                                     の変更に伴う月後れ分のチェック
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -637,6 +640,14 @@
                GO  TO  410211-SELNUM-HENSYU-EXT
            END-IF
       *
+      *    平成２４年３月以前の月後れ分が改正パッチ後に再作成されているか
+           IF      SPA-NAI-T09-TRECEDEN (WRK-SELNO)
+                                       =   "9"
+               MOVE    "0020"              TO  SPA-ERRCD
+               MOVE    ZERO                TO  SPA-GMN-T09-SELNUM (IDX)
+               GO  TO  410211-SELNUM-HENSYU-EXT
+           END-IF
+      *
       *    返戻指示設定時に返戻データに設定されているか
            IF      SPA-NAI-T09-THENREI (WRK-SELNO)
                                        =   "1"
@@ -1145,6 +1156,13 @@
                                                        TO  SPA-ERRMSG
                WHEN    "0018"
                    MOVE    "主科未設定データです"      TO  SPA-ERRMSG
+               WHEN    "0020"
+                   STRING  "改正パッチ提供以降に平成２４年３月以前の"
+                                                   DELIMITED  BY  SIZE
+                           "月遅れ分の再作成が行われていません"
+                                                   DELIMITED  BY  SIZE
+                                                   INTO    SPA-ERRMSG
+                       END-STRING
                WHEN    "0099"
                    MOVE    "選択したデータを全て追加できません"
                                                        TO  SPA-ERRMSG
