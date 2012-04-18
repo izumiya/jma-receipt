@@ -4,7 +4,7 @@ TERR	{
 			value	varchar(10);
 		};
 		ERRMSG	{
-			value	varchar(80);
+			value	varchar(90);
 		};
 	};
 };
