@@ -1574,3 +1574,37 @@ path	key31   	{
 		;
 	};
 };
+
+
+path	key01g 	{
+	DBSELECT	{
+		DECLARE tbl_tensu_key01g_csr CURSOR FOR
+		SELECT *
+		FROM tbl_tensu
+			WHERE HOSPNUM    =   :HOSPNUM
+			AND   YAKKAKJNCD    LIKE :YAKKAKJNCD
+			AND   YUKOSTYMD  <=  :YUKOSTYMD
+			AND   YUKOEDYMD  >=  :YUKOEDYMD
+                        AND   SRYCD LIKE '6%'
+			ORDER   BY       KANANAME
+		;
+	};
+};
+
+path	key01gj 	{
+	DBSELECT	{
+		DECLARE tbl_tensu_key01gj_csr CURSOR FOR
+		SELECT distinct a.*
+		FROM tbl_tensu a, tbl_inputcd b
+			WHERE a.HOSPNUM  =   :HOSPNUM
+			AND   (YAKKAKJNCD    LIKE :YAKKAKJNCD)
+			AND   YUKOSTYMD  <=  :YUKOSTYMD
+			AND   YUKOEDYMD  >=  :YUKOEDYMD
+			AND   a.SRYCD    = b.SRYCD 
+			AND   a.HOSPNUM  = b.HOSPNUM 
+                        AND   a.SRYCD LIKE '6%'
+			ORDER   BY       KANANAME
+		;
+	};
+};
+

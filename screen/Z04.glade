@@ -388,7 +388,7 @@
       </signal>
       <editable>True</editable>
       <text_visible>True</text_visible>
-      <text_max_length>100</text_max_length>
+      <text_max_length>200</text_max_length>
       <text></text>
       <input_mode>XIM</input_mode>
       <xim_enabled>True</xim_enabled>
@@ -2500,22 +2500,6 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label32</name>
-      <x>784</x>
-      <y>136</y>
-      <width>112</width>
-      <height>24</height>
-      <label>収載方式等識別</label>
-      <justify>GTK_JUSTIFY_RIGHT</justify>
-      <wrap>True</wrap>
-      <xalign>0.5</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
       <name>label71</name>
       <x>8</x>
       <y>196</y>
@@ -3562,22 +3546,6 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>GENERICNAME</name>
-      <x>112</x>
-      <y>192</y>
-      <width>590</width>
-      <height>24</height>
-      <label></label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
       <name>label49</name>
       <x>704</x>
       <y>288</y>
@@ -3618,22 +3586,6 @@
       <width>96</width>
       <height>24</height>
       <label>長期投与日数</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>GENERICHEN</name>
-      <x>700</x>
-      <y>192</y>
-      <width>320</width>
-      <height>24</height>
-      <label></label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0</xalign>
@@ -3796,6 +3748,54 @@
       <width>80</width>
       <height>24</height>
       <label>月上限回数</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label32</name>
+      <x>784</x>
+      <y>136</y>
+      <width>112</width>
+      <height>24</height>
+      <label>収載方式等識別</label>
+      <justify>GTK_JUSTIFY_RIGHT</justify>
+      <wrap>True</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>GENERICNAME</name>
+      <x>112</x>
+      <y>192</y>
+      <width>690</width>
+      <height>24</height>
+      <label></label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>GENERICHEN</name>
+      <x>784</x>
+      <y>192</y>
+      <width>240</width>
+      <height>24</height>
+      <label></label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0</xalign>

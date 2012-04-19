@@ -28,7 +28,7 @@
               03  Z04-KANANAME.
                 04  Z04-VALUE   PIC X(100).
               03  Z04-SHONAME.
-                04  Z04-VALUE   PIC X(100).
+                04  Z04-VALUE   PIC X(200).
               03  Z04-NAME.
                 04  Z04-VALUE   PIC X(100).
               03  Z04-TEN.
@@ -101,12 +101,12 @@
                 04  Z04-KOUHATUKBN.
                   05  Z04-VALUE   PIC X(34).
                 04  Z04-KOUHATUKBN-COUNT   PIC S9(9)   BINARY.
-                04  Z04-KOUHATUKBN-ITEM   PIC X(34)   OCCURS  3 TIMES.
+                04  Z04-KOUHATUKBN-ITEM   PIC X(34)   OCCURS  9 TIMES.
               03  Z04-TANICD-COMBO.
                 04  Z04-TANICD.
                   05  Z04-VALUE   PIC X(28).
                 04  Z04-TANICD-COUNT   PIC S9(9)   BINARY.
-                04  Z04-TANICDLST   PIC X(28)   OCCURS  99 TIMES.
+                04  Z04-TANICDLST   PIC X(28)   OCCURS 200 TIMES.
               03  Z04-BUNRUIKBN-COMBO.
                 04  Z04-BUNRUIKBN.
                   05  Z04-VALUE   PIC X(43).
@@ -121,7 +121,7 @@
                 04  Z04-KANZANTANICD.
                   05  Z04-VALUE   PIC X(28).
                 04  Z04-KANZANTANICD-COUNT   PIC S9(9)   BINARY.
-                04  Z04-KANZANTANICDLST   PIC X(28)   OCCURS  99 TIMES.
+                04  Z04-KANZANTANICDLST   PIC X(28)   OCCURS  200 TIMES.
               03  Z04-KANZANCHI.
                 04  Z04-VALUE   PIC 9(5)V9(5).
               03  Z04-CHNGCD.
@@ -168,13 +168,13 @@
                   05  Z04-VALUE   PIC X(28).
                 04  Z04-IPNTANICD-COUNT   PIC S9(9)   BINARY.
                 04  Z04-IPNTANICD-ITEM
-                        PIC X(28)   OCCURS  99 TIMES.
+                        PIC X(28)   OCCURS 200 TIMES.
               03  Z04-IPNKANZANCHI.
                 04  Z04-VALUE   PIC S9(5)V9(5).
               03  Z04-GENERICHEN.
                 04  Z04-VALUE   PIC X(80).
               03  Z04-GENERICNAME.
-                04  Z04-VALUE   PIC X(100).
+                04  Z04-VALUE   PIC X(200).
               03  Z04-TUKIJGNKAISU  PIC S9(3).
               03  Z04-TUKIJGNTOUYORYO  PIC S9(5)V9(3).
 

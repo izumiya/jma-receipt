@@ -16,7 +16,7 @@ Z04	{
 			value	varchar(100);
 		};
 		SHONAME	{
-			value	varchar(100);
+			value	varchar(200);
 		};
 		NAME	{
 			value	varchar(100);
@@ -121,14 +121,14 @@ Z04	{
 				value	varchar(34);
 			};
 			count	int;
-			item	varchar(34)[3];
+			item	varchar(34)[9];
 		};
 		TANICD_COMBO	{
 			TANICD	{
 				value	varchar(28);
 			};
 			count	int;
-			item	varchar(28)[99];
+			item	varchar(28)[200];
 		};
 		BUNRUIKBN_COMBO	{
 			BUNRUIKBN{
@@ -149,7 +149,7 @@ Z04	{
 				value	varchar(28);
 			};
 			count	int;
-			item	varchar(28)[99];
+			item	varchar(28)[200];
 		};
 		KANZANCHI	{
 			value	number(10,5);
@@ -318,7 +318,7 @@ Z04	{
 				value	varchar(28);
 			};
 			count	int;
-			item	varchar(28)[99];
+			item	varchar(28)[200];
 		};
 		IPNKANZANCHI	{
 			value	number(10,5);
@@ -327,7 +327,7 @@ Z04	{
 			value	varchar(80);
 		};
 		GENERICNAME	{
-			value	varchar(100);
+			value	varchar(200);
 		};
 		TUKIJGNKAISU	{
 			value	number(3);

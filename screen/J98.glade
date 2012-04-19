@@ -965,6 +965,29 @@
 	<xim_enabled>False</xim_enabled>
       </widget>
     </widget>
+
+    <widget>
+      <class>GtkButton</class>
+      <name>B02S</name>
+      <x>276</x>
+      <y>524</y>
+      <width>110</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <accelerator>
+	<modifiers>GDK_SHIFT_MASK</modifiers>
+	<key>GDK_F2</key>
+	<signal>clicked</signal>
+      </accelerator>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Wed, 10 Jan 2001 07:56:38 GMT</last_modification_time>
+      </signal>
+      <label>Shift+F2 ∞Ï»ÃÃæ</label>
+      <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
   </widget>
 </widget>
 
