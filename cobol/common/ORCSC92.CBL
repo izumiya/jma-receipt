@@ -4010,7 +4010,7 @@
            MOVE    TNS-NAME            TO  WRK-MEISYO
            EVALUATE    TNS-KOUHATUKBN
                WHEN    1
-      *            後発品
+      *            後発品（先発品のある後発品）
                    MOVE    SPACE                TO  WRK-MEISYO
                    STRING      "【"             DELIMITED   BY  SIZE
                                WRK-MSG1         DELIMITED   BY  SPACE
@@ -4039,6 +4039,16 @@
                                INTO             WRK-MEISYO
                        END-STRING
                    END-IF
+      *
+               WHEN    7
+      *            先発品のない後発品
+                   MOVE    SPACE                TO  WRK-MEISYO
+                   STRING      "【"             DELIMITED   BY  SIZE
+                               WRK-MSG1         DELIMITED   BY  SPACE
+                               "無】"           DELIMITED   BY  SIZE
+                               TNS-NAME         DELIMITED   BY  SIZE
+                               INTO             WRK-MEISYO
+                   END-STRING
            END-EVALUATE
       *!!!!
       *ver.4.5（削除かも〜）

@@ -662,11 +662,15 @@
            MOVE    "0"                 TO  SPA-GMN-KOUHATUKBNL    (1)
            MOVE    "後発医薬品でない"  TO  SPA-GMN-KOUHATUKBNMEIL (1)
            MOVE    "1"                 TO  SPA-GMN-KOUHATUKBNL    (2)
-           MOVE    "後発医薬品である"  TO  SPA-GMN-KOUHATUKBNMEIL (2)
+           MOVE    "先発医薬品がある後発医薬品である"
+                                       TO  SPA-GMN-KOUHATUKBNMEIL (2)
            MOVE    "2"                 TO  SPA-GMN-KOUHATUKBNL    (3)
            MOVE    "後発医薬品がある先発医薬品である"
                                        TO  SPA-GMN-KOUHATUKBNMEIL (3)
-           MOVE    3                   TO  SPA-GMN-KOUHATUKBN-MAX
+           MOVE    "7"                 TO  SPA-GMN-KOUHATUKBNL    (4)
+           MOVE    "先発医薬品のない後発医薬品である"
+                                       TO  SPA-GMN-KOUHATUKBNMEIL (4)
+           MOVE    4                   TO  SPA-GMN-KOUHATUKBN-MAX
       *
            MOVE    "0"                 TO  SPA-GMN-ALLSURYOKBNL   (1)
            MOVE    "記載しない"        TO  SPA-GMN-ALLSURYOKBNMEIL(1)

@@ -3134,6 +3134,7 @@
                IF      SYS-1030-SYOHODSPNAME   NOT =   SPACE
       *            後発医薬品区分
                    IF      TNS-KOUHATUKBN          =   1
+                                                   OR  7
       *H24.4         一般名記載以外
                      AND  (TNSP-IPN-KISAIKBN       =   ZERO
                                                    OR  2     )
@@ -4712,7 +4713,8 @@
       *        システム管理の変更可によって一般名記載とする
                IF     (TNSP-IPN-KISAIKBN       =   ZERO    )
                   AND (SYS-1030-KOUHATUKA      =   "1"     )
-                  AND (TNS-KOUHATUKBN          =   1  OR  2  )
+                  AND (TNS-KOUHATUKBN          =   1  OR  2
+                                               OR  7       )
                    MOVE    1               TO  TNSP-IPN-KISAIKBN
                END-IF
       *

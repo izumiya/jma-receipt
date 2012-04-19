@@ -2185,7 +2185,8 @@
       *    後発医薬品再編集
            IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6") AND
                   (TNS-KOUHATUKBN      =   1
-                                       OR  2  )
+                                       OR  2
+                                       OR  7  )
                 PERFORM 3100123-KOUHATU-HEN-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
@@ -2393,7 +2394,8 @@
       *    後発医薬品再編集
            IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6") AND
                   (TNS-KOUHATUKBN      =   1
-                                       OR  2  )
+                                       OR  2
+                                       OR  7  )
                 PERFORM 3100123-KOUHATU-HEN-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
@@ -2586,22 +2588,39 @@
       *****************************************************************
        3100123-KOUHATU-HEN-SEC        SECTION.
       *
-           MOVE    SPACE               TO  WRK-MEISYO
+      *H24.4
+      *    後発品区分名称
+           PERFORM 3100123-KOUHATU-MSG-SEC
       *
+           MOVE    SPACE               TO  WRK-MEISYO
       *    後発医薬品再編集
-           IF      TNS-KOUHATUKBN      =   1
-                STRING  "【後】"      DELIMITED   BY  SIZE
-                        TNS-NAME      DELIMITED   BY  SIZE
-                                      INTO        WRK-MEISYO
-                END-STRING
-           ELSE
-                STRING  "【先】"      DELIMITED   BY  SIZE
-                        TNS-NAME      DELIMITED   BY  SIZE
-                                      INTO        WRK-MEISYO
-                END-STRING
-           END-IF
+            STRING  "【"
+                    WRK-KOUMEI         DELIMITED   BY  SIZE
+                    "】"               DELIMITED   BY  SIZE
+                    TNS-NAME           DELIMITED   BY  SIZE
+                                  INTO        WRK-MEISYO
+           END-STRING
            .
        3100123-KOUHATU-HEN-EXT.
+           EXIT.
+      *
+      *H24.4
+      *****************************************************************
+      *     後発品区分名称編集処理
+      *****************************************************************
+       3100123-KOUHATU-MSG-SEC        SECTION.
+      *
+           MOVE    SPACE               TO  WRK-KOUMEI
+           EVALUATE    TNS-KOUHATUKBN
+               WHEN    1
+                   MOVE    "後"            TO  WRK-KOUMEI
+               WHEN    2
+                   MOVE    "先"            TO  WRK-KOUMEI
+               WHEN    7
+                   MOVE    "無"            TO  WRK-KOUMEI
+           END-EVALUATE
+           .
+       3100123-KOUHATU-MSG-EXT.
            EXIT.
       *****************************************************************
       *     用量割合再編集処理
@@ -2670,18 +2689,13 @@
       *    システム管理の変更可によってすべて一般名記載とする
            IF     (TNSP-IPN-KISAIKBN       =   0       )
              AND  (SPA-KOUHATUKA           =   "1"     )
-             AND  (TNS-KOUHATUKBN          =   1  OR  2  )
+             AND  (TNS-KOUHATUKBN          =   1  OR  2
+                                           OR  7       )
                MOVE    1               TO  TNSP-IPN-KISAIKBN
            END-IF
       *
-           EVALUATE    TNS-KOUHATUKBN
-               WHEN    1
-                   MOVE    "後"            TO  WRK-KOUMEI
-               WHEN    2
-                   MOVE    "先"            TO  WRK-KOUMEI
-               WHEN    OTHER
-                   MOVE    SPACE           TO  WRK-KOUMEI
-           END-EVALUATE
+      *    後発品区分名称
+           PERFORM 3100123-KOUHATU-MSG-SEC
       *
       *    一般名記載あり
            IF     (TNSP-IPN-KISAIKBN   =   1  )
@@ -6094,7 +6108,7 @@
        9101-TENSUPLUS-READ-EXT.
            EXIT.
       *****************************************************************
-      *    点数マスタ付加情報検索処理
+      *    一般名マスタ検索処理
       *****************************************************************
        9102-GENERICNAME-READ-SEC          SECTION.
       *

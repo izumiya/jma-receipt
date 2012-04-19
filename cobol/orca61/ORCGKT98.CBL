@@ -2182,6 +2182,16 @@
                 END-STRING
            END-IF
       *H24.4
+      *    ¸åÈ¯°åÌôÉÊºÆÊÔ½¸
+           IF     (TNS-SRYCD(1:1)      =   "6") AND
+                  (TNS-KOUHATUKBN      =   7  )
+                MOVE    SPACE              TO  SPA-KT98-GMN-NAME (IDX)
+                STRING  "¡ÚÀèÈ¯Ìµ¡Û"  DELIMITED   BY  SIZE
+                        TNS-NAME      DELIMITED   BY  SIZE
+                               INTO        SPA-KT98-GMN-NAME(IDX)
+                END-STRING
+           END-IF
+      *H24.4
       *    Ìô²Á´ð½à¥³¡¼¥É
            IF      TNS-SRYCD (1:1)     =   "6"
                MOVE    TNS-YAKKAKJNCD      TO  SPA-KT98-GMN-INPUTCD(IDX)
@@ -2556,6 +2566,11 @@
                END-IF
       *
                MOVE    "F"             TO  KT98-SELECT  (IDX)
+      *H24.4
+               IF      SPA-KT98-GMN-NO-X(IDX)   =   "G"
+                   CONTINUE
+               ELSE
+      *
                PERFORM VARYING     IDS     FROM    1   BY  1
                        UNTIL       IDS     >   10
                    IF      SPA-KT98-NAI-SELNUM(IDS) NOT =   ZERO
@@ -2565,6 +2580,9 @@
                        END-IF
                    END-IF
                END-PERFORM
+      *H24.4
+               END-IF
+      *H24.4
            END-PERFORM
       *
            MOVE    SPA-KT98-GMN-MAX     TO  KT98-COUNT
