@@ -378,6 +378,8 @@
       *                                     の変更
       *  04.05.34    NACL-藤原    12/04/11  平成２４年４月分以降の処理を
       *                                     行うようにする
+      *  04.05.35    NACL-門脇    12/04/19  一部負担金・食事療養費標準負担
+      *                                     額区分の記録変更
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -2306,10 +2308,8 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
       *    病棟区分
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    一部負担金・食事療養費標準負担額区分
-           IF    ( RECE02-TEISYOTOKU   =   SPACE )
-           OR    ( RECE02-ZAITAKU      =   SPACE )
-               CONTINUE
-           ELSE
+           IF    ( RECE02-TEISYOTOKU   NOT =   SPACE )
+           AND   ( RECE02-ZAITAKU          =   "1"   )
                EVALUATE    RECE02-TEISYOTOKU
                    WHEN    "1"
                        MOVE    "3"             TO  WRK-DATA
