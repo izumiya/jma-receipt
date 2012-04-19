@@ -7,7 +7,10 @@ tbl_etensu_3_3 {
 	TOKUREI				number(1,0);
 	CHGYMD   			char(8);
 #-----> 主キー更新用項目
-	UPYUKOEDYMD char(8),virtual;
+	UPSRYCD1			char(9),virtual;
+	UPSRYCD2			char(9),virtual;
+	UPYUKOSTYMD			char(8),virtual;
+	UPYUKOEDYMD			char(8),virtual;
 };
 primary	{
 	SRYCD1,SRYCD2,YUKOSTYMD,YUKOEDYMD;
@@ -61,9 +64,9 @@ path	upd1	{
 				HAIHAN      = :HAIHAN,
 				TOKUREI      = :TOKUREI,
 				CHGYMD      = :CHGYMD
-			WHERE 	SRYCD1   =   :SRYCD1
-			AND     SRYCD2   =   :SRYCD2
-			AND	YUKOSTYMD	=	:YUKOSTYMD
+			WHERE 	SRYCD1   =   :UPSRYCD1
+			AND     SRYCD2   =   :UPSRYCD2
+			AND	YUKOSTYMD	=	:UPYUKOSTYMD
 			AND	YUKOEDYMD	=	:UPYUKOEDYMD
 		;
 	};

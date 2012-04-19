@@ -11,7 +11,10 @@ tbl_etensu_2 {
 	SRYKBN2				char(2),virtual;
 	SRYSYUKBN2			char(3),virtual;
 #-----> 主キー更新用項目
-	UPYUKOEDYMD char(8),virtual;
+	UPH_GROUP 			varchar(7),virtual;
+	UPSRYCD				char(9),virtual;
+	UPYUKOSTYMD			char(8),virtual;
+	UPYUKOEDYMD			char(8),virtual;
 };
 primary	{
 	H_GROUP,SRYCD,YUKOSTYMD,YUKOEDYMD;
@@ -145,9 +148,9 @@ path	upd1	{
 				YUKOSTYMD      = :YUKOSTYMD,
 				YUKOEDYMD      = :YUKOEDYMD,
 				CHGYMD      = :CHGYMD
-			WHERE 	H_GROUP      = :H_GROUP
-			AND	SRYCD      =  :SRYCD
-			AND	YUKOSTYMD	=	:YUKOSTYMD
+			WHERE 	H_GROUP      = :UPH_GROUP
+			AND	SRYCD      =  :UPSRYCD
+			AND	YUKOSTYMD	=	:UPYUKOSTYMD
 			AND	YUKOEDYMD	=	:UPYUKOEDYMD
 		;
 	};

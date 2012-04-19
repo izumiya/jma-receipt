@@ -23,23 +23,27 @@
       * Maj/Min/Rev  修正者       日付      内容
       ************************************************************
       *01  ETENSU2-REC.
-      *    グループ番号
-           03  ETENSU2-H-GROUP             PIC X(07).
-      *    診療行為コード
-           03  ETENSU2-SRYCD               PIC  X(09).
-      *    有効開始日
-           03  ETENSU2-YUKOSTYMD           PIC  X(08).
-      *    有効終了日
-           03  ETENSU2-YUKOEDYMD           PIC  X(08).
+           03  ETENSU2-KEY.
+      *        グループ番号
+               05  ETENSU2-H-GROUP             PIC  X(07).
+      *        診療行為コード
+               05  ETENSU2-SRYCD               PIC  X(09).
+      *        有効開始日
+               05  ETENSU2-YUKOSTYMD           PIC  X(08).
+      *        有効終了日
+               05  ETENSU2-YUKOEDYMD           PIC  X(08).
       *    更新日付
-           03  ETENSU2-CHGYMD              PIC  X(08).
+           03  ETENSU2-CHGYMD                  PIC  X(08).
       *点数マスタ用
            03  ETENSU2-TK-KEY.
-               05  ETENSU2-TK-HOSPNUM           PIC  9(02).
-               05  ETENSU2-TK-SRYKBN            PIC  X(02).
-               05  ETENSU2-TK-SRYSYUKBN         PIC  X(03).
-               05  ETENSU2-TK-SRYKBN-2          PIC  X(02).
-               05  ETENSU2-TK-SRYSYUKBN-2       PIC  X(03).
+               05  ETENSU2-TK-HOSPNUM          PIC  9(02).
+               05  ETENSU2-TK-SRYKBN           PIC  X(02).
+               05  ETENSU2-TK-SRYSYUKBN        PIC  X(03).
+               05  ETENSU2-TK-SRYKBN-2         PIC  X(02).
+               05  ETENSU2-TK-SRYSYUKBN-2      PIC  X(03).
       *更新用
-           03  ETENSU2-UP-AREA.
-               05  ETENSU2-UPYUKOEDYMD  PIC  X(08).
+           03  ETENSU2-UP-KEY.
+               05  ETENSU2-UPH-GROUP           PIC  X(07).
+               05  ETENSU2-UPSRYCD             PIC  X(09).
+               05  ETENSU2-UPYUKOSTYMD         PIC  X(08).
+               05  ETENSU2-UPYUKOEDYMD         PIC  X(08).

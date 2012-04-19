@@ -54,5 +54,7 @@
       *    作成年月日
            03  ETENSU1-CHGYMD                  PIC  X(08).
       *更新用
-           03  ETENSU1-UP-AREA.
-               05  ETENSU1-UPYUKOEDYMD  PIC  X(08).
+           03  ETENSU1-UP-KEY.
+               05  ETENSU1-UPSRYCD             PIC  X(09).
+               05  ETENSU1-UPYUKOSTYMD         PIC  X(08).
+               05  ETENSU1-UPYUKOEDYMD         PIC  X(08).

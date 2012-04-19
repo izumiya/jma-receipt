@@ -7,7 +7,11 @@ tbl_etensu_2_sample {
 	SAMPLECD			char(9);
 	CHGYMD   			char(8);
 #-----> 主キー更新用項目
-	UPYUKOEDYMD char(8),virtual;
+	UPH_GROUP 			varchar(7),virtual;
+	UPSRYCD				char(9),virtual;
+	UPYUKOSTYMD			char(8),virtual;
+	UPYUKOEDYMD			char(8),virtual;
+	UPRENNUM			number(2),virtual;
 };
 primary	{
 	H_GROUP,SRYCD,YUKOSTYMD,YUKOEDYMD,RENNUM;
@@ -92,11 +96,11 @@ path	upd1	{
 				RENNUM      = :RENNUM,
 				SAMPLECD      = :SAMPLECD,
 				CHGYMD      = :CHGYMD
-			WHERE 	H_GROUP      = :H_GROUP
-			AND	SRYCD      =  :SRYCD
-			AND	YUKOSTYMD	=	:YUKOSTYMD
+			WHERE 	H_GROUP      = :UPH_GROUP
+			AND	SRYCD      =  :UPSRYCD
+			AND	YUKOSTYMD	=	:UPYUKOSTYMD
 			AND	YUKOEDYMD	=	:UPYUKOEDYMD
-			AND	RENNUM	=	:RENNUM
+			AND	RENNUM	=	:UPRENNUM
 		;
 	};
 };

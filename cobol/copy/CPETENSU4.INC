@@ -33,9 +33,12 @@
       *        有効終了日
                05  ETENSU4-YUKOEDYMD           PIC  X(08).
       *    加算識別
-           03  ETENSU4-KASAN                   PIC  9(01).
+           03  ETENSU4-KASAN                   PIC  9(02).
       *    作成年月日
            03  ETENSU4-CHGYMD                  PIC  X(08).
       *更新用
-           03  ETENSU4-UP-AREA.
-               05  ETENSU4-UPYUKOEDYMD  PIC  X(08).
+           03  ETENSU4-UP-KEY.
+               05  ETENSU4-UPN-GROUP           PIC  9(03).
+               05  ETENSU4-UPSRYCD             PIC  X(09).
+               05  ETENSU4-UPYUKOSTYMD         PIC  X(08).
+               05  ETENSU4-UPYUKOEDYMD         PIC  X(08).
