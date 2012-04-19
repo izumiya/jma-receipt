@@ -34,6 +34,7 @@
       * 01.00.05     ひさなが     03/05/12  入院関連テーブルの追加
       * 01.00.06     ひさなが     03/06/05  患者ＩＤ置換メッセージの追加
       * 03.05.01     NACL-森脇    07/06/11  グループ診療対応
+      * 04.05.01     NACL-森脇    12/04/19  パッチ対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -237,6 +238,10 @@ grpsys     03  EIE01PARA-FILE      PIC X(23).
       *    フィアルデイレクトリ位置指定サブ
            COPY  "CPMKPASS.INC".
       *
+      *    ファイルリネームサブ
+           COPY    "CPORCSSTRING.INC".
+      *    ファイル存在チェック
+           COPY    "CPORCSFILECHK.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -1263,6 +1268,9 @@ grpsys     MOVE    SPA-TERMID        TO  EIE00PARA-TERMID.
                CALL    "ORCSMKPASS"          USING   ORCSMKPASSAREA
                MOVE    MKPASS-OT-01          TO  EIE02PARA
       *
+      *        パッチ対応
+               PERFORM T-000-PATCHCHEK-SEC
+      *
                MOVE    1                     TO  IDX4
                MOVE    1                     TO  IDY1
                MOVE    ZERO                  TO  IDY2
@@ -1556,6 +1564,10 @@ grpsys     MOVE    SPA-TERMID        TO  EIE01PARA-TERMID.
            MOVE    EIE02PARA-NAME        TO  MKPASS-IN-01.
            CALL    "ORCSMKPASS"          USING   ORCSMKPASSAREA.
            MOVE    MKPASS-OT-01          TO  EIE02PARA.
+      *
+      *    パッチ対応
+           PERFORM T-000-PATCHCHEK-SEC
+      *
            MOVE    ALL SPACE             TO  SPA-GMN-FILE-ID.
            STRING  "/tmp/"               DELIMITED  BY    SIZE
                    WK-TBL-MSG (IDX2)     DELIMITED  BY    SPACE
@@ -1724,3 +1736,25 @@ grpsys     MOVE    SPA-TERMID        TO  EIE01PARA-TERMID.
        T-000-SETECHEK-01-EXT.
            EXIT.
       *
+      **************************************************
+      *    パッチ対応
+      **************************************************
+       T-000-PATCHCHEK-SEC         SECTION.
+      *
+           INITIALIZE                      ORCSSTRINGAREA
+           MOVE    "sub"               TO  ORCSSTR-COMMAND
+           MOVE    EIE02PARA           TO  ORCSSTR-STRING1
+           MOVE    "record"            TO  ORCSSTR-STRING2
+           MOVE    "patch-lib/record"  TO  ORCSSTR-STRING3
+           CALL    "orcsstring"        USING   ORCSSTRINGAREA
+           IF      ORCSSTR-STRING1     NOT =   SPACE
+               INITIALIZE                  ORCSFILECHKAREA
+               MOVE    ORCSSTR-STRING1     TO  FILECHK-NAME
+               CALL    "ORCSFILECHK"       USING   ORCSFILECHKAREA
+               IF      FILECHK-RC          =   0
+                   MOVE    ORCSSTR-STRING1     TO  EIE02PARA
+               END-IF
+           END-IF.
+      *
+       T-000-PATCHCHEK-EXT.
+           EXIT.
