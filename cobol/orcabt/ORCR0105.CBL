@@ -2540,7 +2540,7 @@
            IF    ((RECE02X-ZAITAKU  =  "1"          ) AND
                   (RECE02X-SRYYM   <=  "201203"     ))
            OR    ( RECE02X-ZAITAKU-SANTEI-FLG  = "1" )
-             MOVE    RECE02X-ZAITAKU   TO  KOHSKY-ZAITAKU
+             MOVE       "1"     TO   KOHSKY-ZAITAKU
            END-IF
            IF      RECE02X-ZAITAKU  =  "2" OR "3"
              EVALUATE  RECE02X-DISCOUNTTENTNK
@@ -8865,7 +8865,7 @@
                   (RECE02-SRYYM   <=  "201203"     ))
            OR    ((RECE02-ZAITAKU-SANTEI-FLG  = "1") AND
                   (RECE02-TEISYUTUSAKI   NOT  = "1"))
-             MOVE    RECE02-ZAITAKU    TO  RECE10-ZAITAKU
+               MOVE    "1"    TO   RECE10-ZAITAKU
            END-IF
       *
            PERFORM VARYING IDX FROM    1   BY  1
