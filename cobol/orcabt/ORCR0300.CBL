@@ -382,6 +382,8 @@
       *                                     日付情報の記録を行う
       *  04.05.30    NACL-藤原    12/04/11  平成２４年４月分以降の処理を
       *                                     行うようにする
+      *  04.05.31    NACL-門脇    12/04/19  一部負担金・食事療養費標準負担
+      *                                     額区分の記録変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2213,10 +2215,8 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
       *    病棟区分
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    一部負担金・食事療養費標準負担額区分
-           IF    ( RECE02-TEISYOTOKU   =   SPACE )
-           OR    ( RECE02-ZAITAKU      =   SPACE )
-               CONTINUE
-           ELSE
+           IF    ( RECE02-TEISYOTOKU   NOT =   SPACE )
+           AND   ( RECE02-ZAITAKU          =   "1"   )
                EVALUATE    RECE02-TEISYOTOKU
                    WHEN    "1"
                        MOVE    "3"             TO  WRK-DATA
