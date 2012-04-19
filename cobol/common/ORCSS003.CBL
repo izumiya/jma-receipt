@@ -606,7 +606,7 @@
            IF   (( TNS-DATAKBN             =  "2" )
              AND ( TNS-SRYKBN              =  "11" OR "12" OR "13" )
              AND ( TNS-TIMEKSNKBN          =  1 OR 2 OR 3
-                                           OR 4 OR 5 OR 6 ))
+                                           OR 4 OR 5 OR 6 OR 7))
             OR  (  SRY-SRYCD (IDX-SRYCD)   =  "113005570"
                                            OR "113007770"
                                            OR "113009870"
