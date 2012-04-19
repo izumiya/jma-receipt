@@ -34,6 +34,8 @@
       *                                     備考欄の記載等追加
       *  04.05.02    NACL-藤原    11/04/18  災害対応
       *                                     確定分の記載を中止
+      *  04.05.03    NACL-藤原    12/04/17  平成２４年４月改正対応
+      *                                     平成２４年４月分以降はまとめる
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -545,7 +547,9 @@
            IF      WRK-NYUGAIKBN       =   "2"
                EVALUATE    IDX1
                    WHEN    1
-                       MOVE    "その他のレセ"      TO  HCM3A-TITLE  
+                       IF      WRK-PRTFLG          <   5
+                           MOVE    "その他のレセ"      TO  HCM3A-TITLE
+                       END-IF
                    WHEN    2
                        IF      WRK-PRTFLG          =   1
                            MOVE    "在総診または在医総を算定したレセ"
@@ -602,7 +606,9 @@
            IF      WRK-NYUGAIKBN       =   "2"
                EVALUATE    IDX1
                    WHEN    1
-                       MOVE    "その他のレセ"      TO  HCM3B-TITLE  
+                       IF      WRK-PRTFLG          <   5
+                           MOVE    "その他のレセ"      TO  HCM3B-TITLE
+                       END-IF
                    WHEN    2
                        IF      WRK-PRTFLG          =   1
                            MOVE    "在総診または在医総を算定したレセ"

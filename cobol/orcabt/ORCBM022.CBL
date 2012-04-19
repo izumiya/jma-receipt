@@ -88,6 +88,8 @@
       *                                     È÷¹ÍÍó¤Îµ­ºÜÅùÄÉ²Ã
       *  04.05.03    NACL-Æ£¸¶    11/04/18  ºÒ³²ÂÐ±þ
       *                                     Ì¤³ÎÄêÊ¬¤Î¤ßÊÌ½¸·×¤È¤¹¤ë
+      *  04.05.04    NACL-Æ£¸¶    12/04/17  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *                                     Ê¿À®£²£´Ç¯£´·îÊ¬°Ê¹ß¤Ï¤Þ¤È¤á¤ë
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -301,6 +303,8 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-CONS-SRYYM-200610   PIC X(06)   VALUE   "200610".
       *    £²£°£°£¸Ç¯£´·î²þÀµ
            03  WRK-CONS-SRYYM-200804   PIC X(06)   VALUE   "200804".
+      *    £²£°£±£²Ç¯£´·î²þÀµ
+           03  WRK-CONS-SRYYM-201204   PIC X(06)   VALUE   "201204".
       *     
       *
       *****************************************************************
@@ -562,10 +566,15 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
       *
            MOVE    "2"                 TO  WRK-NYUGAIKBN
       *
-      *    1:-200603 2:200604-200609 3:200610-200803 4:200804-   
+      *    1:-200603 2:200604-200609 3:200610-200803 4:200804-201203
+      *    5:201204-   
            PERFORM VARYING WRK-PRTFLG  FROM    1   BY  1
-                   UNTIL   WRK-PRTFLG  >       4
+                   UNTIL   WRK-PRTFLG  >       5
       *
+            IF    ( WRK-PRTFLG          =   5                     )
+            AND   ( LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-201204 )
+                 CONTINUE
+            ELSE
              IF    ( WRK-PRTFLG          =   4                     )
              AND   ( LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-200804 )
                  CONTINUE
@@ -658,6 +667,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                    END-IF
                END-IF    
              END-IF    
+            END-IF    
            END-PERFORM    
       *
       *    Æþ±¡Ê¬
@@ -760,7 +770,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
-           IF      FLG-ERR             =   ZERO
+           IF    ( FLG-ERR             =   ZERO )
+           AND   ( WRK-PRTFLG          <   5    )
       *        ºßÁí¿Ç¤Þ¤¿¤Ïºß°åÁí¤ò»»Äê¤·¤¿¥ì¥»
                EVALUATE    WRK-SYOKBN  ALSO    WRK-PARA-MARUCHO
                    WHEN    "1"         ALSO    "0"
@@ -1779,7 +1790,18 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE10-HOSPNUM
                    MOVE    WRK-CONS-SRYYM-200804
                                                TO  RECE10-XXSRYYM
                WHEN    "4"
-                   MOVE    WRK-CONS-SRYYM-200804
+                   IF      WRK-NYUGAIKBN       =   "1"
+                       MOVE    WRK-CONS-SRYYM-200804
+                                                   TO  RECE10-SRYYM
+                       MOVE    999999              TO  RECE10-XXSRYYM
+                   ELSE
+                       MOVE    WRK-CONS-SRYYM-200804
+                                                   TO  RECE10-SRYYM
+                       MOVE    WRK-CONS-SRYYM-201204
+                                                   TO  RECE10-XXSRYYM
+                   END-IF
+               WHEN    "5"
+                   MOVE    WRK-CONS-SRYYM-201204
                                                TO  RECE10-SRYYM
                    MOVE    999999              TO  RECE10-XXSRYYM
            END-EVALUATE

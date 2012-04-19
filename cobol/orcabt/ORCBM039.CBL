@@ -28,6 +28,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.05.01    NACL-藤原    12/04/17  平成２４年４月改正対応
+      *                                     平成２４年４月分以降はまとめる
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -427,7 +429,9 @@
       *
            EVALUATE    WRK-INDEX
                WHEN    1
-                   MOVE    "その他のレセ"  TO  HCM3E-TITLE  
+                   IF      WRK-PRTFLG          <   5
+                       MOVE    "その他のレセ"  TO  HCM3E-TITLE
+                   END-IF
                WHEN    2
                    MOVE    "在医総管または在医総を算定したレセ"
                                            TO  HCM3E-TITLE
@@ -458,7 +462,9 @@
       *
            EVALUATE    WRK-INDEX
                WHEN    1
-                   MOVE    "その他のレセ"      TO  HCM3F-TITLE  
+                   IF      WRK-PRTFLG          <   5
+                       MOVE    "その他のレセ"      TO  HCM3F-TITLE
+                   END-IF 
                WHEN    2
                    MOVE    "在医総管または在医総を算定したレセ"
                                                TO  HCM3F-TITLE
