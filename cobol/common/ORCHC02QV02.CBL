@@ -3133,8 +3133,8 @@
       *        後発医薬品の時、表示（優先）
                IF      SYS-1030-SYOHODSPNAME   NOT =   SPACE
       *            後発医薬品区分
-                   IF      TNS-KOUHATUKBN          =   1
-                                                   OR  7
+                   IF     (TNS-KOUHATUKBN          =   1
+                                                   OR  7    )
       *H24.4         一般名記載以外
                      AND  (TNSP-IPN-KISAIKBN       =   ZERO
                                                    OR  2     )
