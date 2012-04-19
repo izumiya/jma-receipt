@@ -128,7 +128,7 @@
                05  SPA-GMN-ALLSURYOKBN-MAX     PIC 9(05).
       *
       *        後発医薬品
-               05  SPA-GMN-KOUHATUKBNLST       OCCURS  3.
+               05  SPA-GMN-KOUHATUKBNLST       OCCURS  9.
                    07  SPA-GMN-KOUHATUKBNL     PIC X(01).
                    07  SPA-GMN-F1L             PIC X(01).
                    07  SPA-GMN-KOUHATUKBNMEIL  PIC X(32).
@@ -136,13 +136,14 @@
                    07  SPA-GMN-KOUHATUKBN      PIC X(01).
                    07  SPA-GMN-F1              PIC X(01).
                    07  SPA-GMN-KOUHATUKBNMEI   PIC X(32).
+               05  SPA-GMN-KOUHATUKBN-MAX      PIC 9(02).
       *
                05  SPA-GMN-YUKOSTYMD           PIC X(10).
                05  SPA-GMN-YUKOEDYMD           PIC X(10).
                05  SPA-GMN-KANANAME            PIC X(100).
                05  SPA-GMN-NAME                PIC X(100).
                05  SPA-GMN-FORMALNAME          PIC X(200).
-               05  SPA-GMN-SHONAME             PIC X(100).
+               05  SPA-GMN-SHONAME             PIC X(200).
                05  SPA-GMN-TEN                 PIC 9(8)V9(2).
                05  SPA-GMN-TENSIKIBETU-G.
                    07  SPA-GMN-TENSIKIBETU     PIC X(01).
@@ -258,7 +259,7 @@
                        09  SPA-GMN-TOUYORYO2       PIC 9(05)V9(03).
                    07  SPA-GMN-TOUYOERR        PIC 9(01).
       *        一般名
-               05  SPA-GMN-GENERICNAME         PIC X(100).
+               05  SPA-GMN-GENERICNAME         PIC X(200).
                05  SPA-GMN-GENERICHEN          PIC X(80).
       *        月上限
                05  SPA-GMN-TUKIJGN-G.
@@ -665,6 +666,7 @@
            MOVE    "2"                 TO  SPA-GMN-KOUHATUKBNL    (3)
            MOVE    "後発医薬品がある先発医薬品である"
                                        TO  SPA-GMN-KOUHATUKBNMEIL (3)
+           MOVE    3                   TO  SPA-GMN-KOUHATUKBN-MAX
       *
            MOVE    "0"                 TO  SPA-GMN-ALLSURYOKBNL   (1)
            MOVE    "記載しない"        TO  SPA-GMN-ALLSURYOKBNMEIL(1)
@@ -687,7 +689,9 @@
                                        TO  SPA-GMN-IPN-KISAIKBN-LST(2)
            MOVE    "2 処方名称を記載する"
                                        TO  SPA-GMN-IPN-KISAIKBN-LST(3)
-           MOVE    3                   TO  SPA-GMN-IPN-KISAI-MAX
+           MOVE    "3 処方名称（一般名）を記載"
+                                       TO  SPA-GMN-IPN-KISAIKBN-LST(4)
+           MOVE    4                   TO  SPA-GMN-IPN-KISAI-MAX
       *
            MOVE    ZERO                TO  SPA-GMN-TANICD-MAX
            PERFORM VARYING IDXX    FROM    1   BY  1
@@ -952,12 +956,12 @@
       *    後発医薬品
            MOVE    TNS-KOUHATUKBN      TO  SPA-GMN-KOUHATUKBN
            PERFORM VARYING IDXX    FROM    1   BY  1
-                   UNTIL   IDXX    >       3
+                   UNTIL   IDXX    >       SPA-GMN-KOUHATUKBN-MAX
                IF      SPA-GMN-KOUHATUKBN 
                                        =   SPA-GMN-KOUHATUKBNL(IDXX)
                    MOVE    SPA-GMN-KOUHATUKBNLST (IDXX)
                                            TO  SPA-GMN-KOUHATUKBN-G
-                   MOVE    3               TO  IDXX
+                   MOVE    SPA-GMN-KOUHATUKBN-MAX  TO  IDXX
                END-IF
            END-PERFORM
       *
@@ -2297,7 +2301,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            INITIALIZE                  TENSUPLUS-REC
            MOVE    SPA-GMN-SHONAME     TO  TNSP-SHONAME
                                            WRK-STRINGTBL
-           MOVE    100                 TO  CNT-STRING
+           MOVE    200                 TO  CNT-STRING
            PERFORM 891-STRCOUNT-SEC
            MOVE    CNT-STRING          TO  TNSP-SHOYUKOKETA
            MOVE    SPA-GMN-INPCHKKBN   TO  TNSP-INPCHKKBN
@@ -2777,7 +2781,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WRK-OUT-INPUT       TO  SPA-GMN-FORMALNAME
            IF      FLG-ERR             =   1
                MOVE    "0005"              TO  SPA-ERRCD
-               MOVE    5                   TO  SPA-GMN-CUR
+               MOVE    6                   TO  SPA-GMN-CUR
            END-IF
            .
       *
@@ -2788,13 +2792,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        503-SHONAME-CHK-SEC                  SECTION.
       *
-           MOVE    SPA-GMN-SHONAME    TO  WRK-MAE-INPUT
-           MOVE    100                 TO  WRK-LEN
+           MOVE    SPA-GMN-SHONAME     TO  WRK-MAE-INPUT
+           MOVE    200                 TO  WRK-LEN
            PERFORM 400-ZENCHK-SEC
            MOVE    WRK-OUT-INPUT       TO  SPA-GMN-SHONAME
            IF      FLG-ERR             =   1
                MOVE    "0006"              TO  SPA-ERRCD
-               MOVE    6                   TO  SPA-GMN-CUR
+               MOVE    5                   TO  SPA-GMN-CUR
            END-IF
            .
       *
@@ -3027,7 +3031,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING     IDXX    FROM    1   BY  1
-                   UNTIL      (IDXX    >   3   )   OR
+                   UNTIL      (IDXX    >   SPA-GMN-KOUHATUKBN-MAX) OR
                               (FLG-OK  =   1   )
                IF      SPA-GMN-KOUHATUKBN  =   SPA-GMN-KOUHATUKBNL(IDXX)
                    MOVE    SPA-GMN-KOUHATUKBNLST (IDXX)
@@ -3300,6 +3304,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
            IF      SPA-GMN-IPN-KISAIKBN    =   "2"
+               IF      SPA-GMN-SHONAME         =   SPACE
+                   MOVE    "0033"              TO  SPA-ERRCD
+                   MOVE    38                  TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+           IF      SPA-GMN-IPN-KISAIKBN    =   "3"
                IF      SPA-GMN-SHONAME         =   SPACE
                    MOVE    "0033"              TO  SPA-ERRCD
                    MOVE    38                  TO  SPA-GMN-CUR
@@ -3751,11 +3761,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    4                   TO  Z04-ZAIGATAKBN-COUNT
       *    後発医薬品
            PERFORM VARYING IDXX    FROM    1   BY  1
-                   UNTIL   IDXX    >       3
+                   UNTIL   IDXX    >       SPA-GMN-KOUHATUKBN-MAX
                MOVE    SPA-GMN-KOUHATUKBNLST(IDXX)
                                        TO  Z04-KOUHATUKBN-ITEM  (IDXX)
            END-PERFORM
-           MOVE    3                   TO  Z04-KOUHATUKBN-COUNT
+           MOVE    SPA-GMN-KOUHATUKBN-MAX  TO  Z04-KOUHATUKBN-COUNT
       *
            MOVE  SPA-GMN-INPCHKKBN     TO  Z04-INPCHKKBN
       *

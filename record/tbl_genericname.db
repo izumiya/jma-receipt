@@ -33,3 +33,15 @@ path	all	{
  		;
 	};
 };
+
+path	key2 	{
+	DBSELECT	{
+		DECLARE tbl_genericname_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_genericname
+		WHERE   GENERICNAME    LIKE :GENERICNAME
+			ORDER	BY	GENERICNAME
+		;
+	};
+};
+

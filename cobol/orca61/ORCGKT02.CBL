@@ -29,6 +29,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 04.05.00     NACL-多々納  09/06/XX  数量小数５桁対応
       * 04.06.00     NACL-多々納  10/12/07  チェック追加対応
+      * 04.06.00     NACL-多々納  12/04/19  Ｈ２４年４月改正対応
+      *                                     （一般名記載編集）
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -313,6 +315,9 @@
       *    ユーザプログラム起動
            03  FLG-USERPG              PIC 9(01).
            03  FLG-PRVSYORI            PIC 9(01).
+      *H24.4
+           03  FLG-GENERICNAME         PIC 9(01).
+           03  FLG-TENSUPLUS           PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -536,6 +541,12 @@
            03  WRK-TJIHI           PIC X(40).
            03  WRK-Z7              PIC Z(07).
       *
+      *H24.4
+           03  WRK-KOUMEI              PIC X(02).
+           03  WRK-IPNMEI              PIC 9(01).
+           03  IDG-Z                   PIC 9(04).
+           03  IDG-X                   PIC 9(04).
+      *
       *    集計収納請求内容
        01  WRK-SUM-AREA.
            03  SUM-SYU-SKY-NAIYOU.
@@ -693,6 +704,14 @@
            03  WRK-WKSRYACTPLUS-REC.
            COPY    "CPWKSRYACTPLUS.INC"  REPLACING
                                      //WKSRYP-// BY //WRK-WKSRYP-//.
+      *
+      *H24.4
+      *    点数マスタ付加コード
+        01 TENSUPLUS-REC.
+           COPY    "CPTENSUPLUS.INC".
+      *    一般名テーブル
+       01  GENERICNAME-REC.
+           COPY    "CPGENERICNAME.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -2158,6 +2177,8 @@
            IF      LNK-WKSRY-SRYCD (IDX IDZ)   =   "099209903"
                                                OR  "099209905"
                                                OR  "099209906"
+                                               OR  "099209907"
+                                               OR  "099209908"
                 PERFORM 3100122-KOUHATU-MEISYO-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
@@ -2168,6 +2189,26 @@
                 PERFORM 3100123-KOUHATU-HEN-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
+      *
+      *H24.4  院外処方せんの一般名表示
+           IF    (SPA-SRYYMD           >=  "20120401" )
+             AND (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6")
+             AND (LNK-WKSRY-SRYKBN (IDX)       =   "21"
+                                               OR  "22"
+                                               OR  "23" 
+                                               OR  "14"  )
+               IF      (LNK-WKSRY-ZAITENKEI (IDX-KOUI)
+                                               NOT =   ZERO  )
+                 OR    (LNK-WKSRY-SRYSYUKBN (IDX)  =   "213"
+                                                   OR  "223"
+                                                   OR  "233" )
+                   CONTINUE
+               ELSE
+      *            院外処方せん
+                   PERFORM 310020-GENERICNAME-CHK-SEC
+               END-IF
+           END-IF
+      *!
       *!
       *    器材商品名の器材コード
            IF     (LNK-WKSRY-SRYCD(IDX IDZ)(1:1)   =   "7"  )  AND
@@ -2596,6 +2637,96 @@
            .
        3005-INPUT-MEISYO4-EXT.
            EXIT.
+      *H24.4
+      *****************************************************************
+      *    院外処方せん一般名編集処理
+      *****************************************************************
+       310020-GENERICNAME-CHK-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  WRK-IPNMEI
+           MOVE    IDZ                 TO  IDG-Z
+           MOVE    IDX                 TO  IDG-X
+           ADD     1                   TO  IDG-Z
+           IF      IDG-Z               >   5
+               IF      IDG-X           <   IDX-KOUI
+                   ADD     1               TO  IDG-X
+                   MOVE    1               TO  IDG-Z
+               ELSE
+                   MOVE    IDZ             TO  IDG-Z
+               END-IF
+           END-IF
+           IF      LNK-WKSRY-SRYCD (IDG-X IDG-Z) =   "099209903"
+                                                 OR  "099209907"
+      *        次の行に　後発品変更不可、銘柄名記載があれば変更なし
+               GO      TO      310020-GENERICNAME-CHK-EXT
+           END-IF
+           IF      LNK-WKSRY-SRYCD (IDG-X IDG-Z) =   "099209908"
+      *        次の行に一般名記載
+               MOVE    1               TO  WRK-IPNMEI
+           END-IF
+      *
+           PERFORM 9101-TENSUPLUS-READ-SEC
+      *
+      *    システム管理の変更可によってすべて一般名記載とする
+           IF     (TNSP-IPN-KISAIKBN       =   0       )
+             AND  (SPA-KOUHATUKA           =   "1"     )
+             AND  (TNS-KOUHATUKBN          =   1  OR  2  )
+               MOVE    1               TO  TNSP-IPN-KISAIKBN
+           END-IF
+      *
+           EVALUATE    TNS-KOUHATUKBN
+               WHEN    1
+                   MOVE    "後"            TO  WRK-KOUMEI
+               WHEN    2
+                   MOVE    "先"            TO  WRK-KOUMEI
+               WHEN    OTHER
+                   MOVE    SPACE           TO  WRK-KOUMEI
+           END-EVALUATE
+      *
+      *    一般名記載あり
+           IF     (TNSP-IPN-KISAIKBN   =   1  )
+             OR   (WRK-IPNMEI          =   1  )
+               PERFORM 9102-GENERICNAME-READ-SEC
+      *        一般名
+               IF      FLG-GENERICNAME     =   ZERO
+                   MOVE    SPACE               TO  WRK-MEISYO
+                   STRING  "【般"                  DELIMITED  BY  SIZE
+                           WRK-KOUMEI              DELIMITED  BY  SPACE
+                           "】"                    DELIMITED  BY  SIZE
+                           GENERIC-GENERICNAME     DELIMITED  BY  SPACE
+                                               INTO    WRK-MEISYO
+                   END-STRING
+                   MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
+               END-IF
+           END-IF
+      *    処方名記載
+           IF     (TNSP-IPN-KISAIKBN   =   2   )
+             AND  (WRK-IPNMEI          =   ZERO)
+               MOVE    SPACE               TO  WRK-MEISYO
+               STRING  "【処"                  DELIMITED  BY  SIZE
+                       WRK-KOUMEI              DELIMITED  BY  SPACE
+                       "】"                    DELIMITED  BY  SIZE
+                       TNSP-SHONAME            DELIMITED  BY  SPACE
+                                               INTO    WRK-MEISYO
+               END-STRING
+               MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
+           END-IF
+      *    処方名記載
+           IF     (TNSP-IPN-KISAIKBN   =   3   )
+               MOVE    SPACE               TO  WRK-MEISYO
+               STRING  "【般"                  DELIMITED  BY  SIZE
+                       WRK-KOUMEI              DELIMITED  BY  SPACE
+                       "】"                    DELIMITED  BY  SIZE
+                       TNSP-SHONAME            DELIMITED  BY  SPACE
+                                               INTO    WRK-MEISYO
+               END-STRING
+               MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
+           END-IF
+           .
+       310020-GENERICNAME-CHK-EXT.
+           EXIT.
+      *
+      *H24.4
       *
       *****************************************************************
       *    数量表示用編集処理
@@ -5924,6 +6055,81 @@
            .
        970-WKSRYACT-READ-EXT.
            EXIT.
+      *H24.4
+      *****************************************************************
+      *    点数マスタ付加情報検索処理
+      *****************************************************************
+       9101-TENSUPLUS-READ-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  TENSUPLUS-REC
+           INITIALIZE                      TENSUPLUS-REC
+           MOVE    TNS-SRYCD           TO  TNSP-SRYCD
+           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
+           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
+      *
+           MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
+           MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TENSUPLUS-REC
+                   MOVE    ZERO                TO  FLG-TENSUPLUS
+               ELSE
+                   INITIALIZE                  TENSUPLUS-REC
+                   MOVE    1                   TO  FLG-TENSUPLUS
+               END-IF
+           ELSE
+               INITIALIZE                      TENSUPLUS-REC
+               MOVE    1                   TO  FLG-TENSUPLUS
+           END-IF
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       9101-TENSUPLUS-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ付加情報検索処理
+      *****************************************************************
+       9102-GENERICNAME-READ-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  GENERICNAME-REC
+           INITIALIZE                      GENERICNAME-REC
+           MOVE    TNS-YAKKAKJNCD(1:9) TO  GENERIC-YAKKAKJNCD
+      **** MOVE    SPA-HOSPNUM         TO  GENERIC-HOSPNUM
+      *
+           MOVE    GENERICNAME-REC     TO  MCPDATA-REC
+           MOVE    "tbl_genericname"   TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_genericname"   TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  GENERICNAME-REC
+                   MOVE    ZERO                TO  FLG-GENERICNAME
+               ELSE
+                   INITIALIZE                  GENERICNAME-REC
+                   MOVE    1                   TO  FLG-GENERICNAME
+               END-IF
+           ELSE
+               INITIALIZE                      GENERICNAME-REC
+               MOVE    1                   TO  FLG-GENERICNAME
+           END-IF
+           MOVE    "tbl_genericname"   TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       9102-GENERICNAME-READ-EXT.
+           EXIT.
+      *H24.4
+      *
       *
       *****************************************************************
       *    テーブル検索処理

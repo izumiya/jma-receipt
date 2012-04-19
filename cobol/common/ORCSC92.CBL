@@ -249,7 +249,7 @@
       *
       *    商品名称の金額
            03  WRK-SYOHIN-TEN          PIC 9(09)V99.
-      *TEST
+      *
       *H24.4
            03  WRK-NEN-03.
                05  WRK-NEN03-YM.
@@ -261,7 +261,6 @@
                    07  WRK-NEN15-YY        PIC 9(04).
                    07  WRK-NEN15-MM        PIC 9(02).
                05  WRK-NEN15-DD            PIC 9(02).
-      *TEST
       *H24.4
       *
       *    コメントの入力値用
@@ -1658,7 +1657,7 @@
                        MOVE    500             TO  IDX
                    WHEN    "7"
                        MOVE    3000            TO  IDX
-                   END-EVALUATE
+               END-EVALUATE
       *H24.4
                PERFORM VARYING IDY         FROM    1   BY  1
                        UNTIL   IDY         >       500
@@ -3838,16 +3837,18 @@
              AND  (LNK-SC92-PG     NOT =   "K05")
                PERFORM 3008-PTKINKI-CHK-SEC
            END-IF
-      *TEST
+      *
       *TEST
       *H24.4
       *    処方箋一般名記載区分（告示識別区分を使用）
            IF      SPA-SRYYMD          >=  "20120401"
                IF     (TNS-SRYCD(1:1)      =   "6"  )
                  AND ((TNS-KOUHATUKBN      =   1  OR  2 )  OR
+                      (TNSP-IPN-KISAIKBN   =   3    )  OR
                       (TNSP-IPN-KISAIKBN   =   1    ))
       *            後発品・後発のある先発品の最低薬価
                    IF      TNSP-IPN-KISAIKBN   =   1
+                                               OR  3
                        MOVE    9               TO  SPA-COM-KOKUJISKBKBN2
                                                                (IDX-T)
                    END-IF
@@ -3998,6 +3999,10 @@
            IF      SPA-SRYYMD          >=  "20120401"
                IF     (TNSP-IPN-KISAIKBN   =   1    )
       *            一般名記載あり
+                   MOVE    "般"                TO  WRK-MSG1
+               END-IF
+               IF     (TNSP-IPN-KISAIKBN   =   3    )
+      *            処方名称（一般名）記載
                    MOVE    "般"                TO  WRK-MSG1
                END-IF
            END-IF
@@ -5283,8 +5288,9 @@
                IF     (SPA-SRYYMD          >=  "20120401"  )
                  AND  (SPA-KOUHATUKA       =   "1"         )
                  AND  (TNS-SRYCD(1:1)      =   "6"         )
-                   IF     (TNSP-IPN-KISAIKBN   =   2    )   OR
-                          (TNS-KOUHATUKBN      =   ZERO )
+                   IF     (TNSP-IPN-KISAIKBN   =   2    )
+                   OR     (TNS-KOUHATUKBN      =   ZERO )
+                   OR     (TNSP-IPN-KISAIKBN   =   3    )
       *                処方名記載、先発品は変更なし
                        CONTINUE
                    ELSE

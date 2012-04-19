@@ -220,6 +220,7 @@
            03  IDXF3                   PIC 9(04).
       *H24.4
            03  IDX-M                   PIC 9(04).
+           03  IDX-SH                  PIC 9(04).
       *
       *    システム領域
        01  SYS-AREA.
@@ -2063,6 +2064,11 @@
                    MOVE    1                   TO  WRK-PAGE-MAX
                    MOVE    SPA-HKNCOMBINUM     TO  WRK-HKNCOMBINUM
                    INITIALIZE                  ORCSQRCSVAREA
+      *H24.4
+      *            頭書の時、システム管理よって保険名を記載
+                   IF     (SYS-1030-KOUHATUKA  =   "0" )
+                       MOVE    1               TO  FLG-KOUHATUFUKA-IN
+                   END-IF
                    PERFORM 400-PRINT-SYORI-SEC
                WHEN    "4"
                WHEN    "5"
@@ -2810,6 +2816,9 @@
                MOVE    "23"                TO  WRK-SRYKBN
            END-IF
       *---(03.04.00) LINE ADD END   ------------------------------------
+      *H24.4
+           MOVE    IDX-S               TO  IDX-SH
+      *
            EVALUATE    WRK-SRYKBN
            WHEN    "21"
            WHEN    "22"
@@ -2827,7 +2836,9 @@
            END-EVALUATE
       *    回数行で２０行以上の時
            IF      IDX-S               >=  LINE-MAX
-               COMPUTE IDX-S           =   LINE-MAX   -   1
+      *H24.4
+      ****     COMPUTE IDX-S           =   LINE-MAX   -   1
+               MOVE    IDX-SH              TO  IDX-S
       *        帳票編集処理
                PERFORM 20022-PRINT-HEN-SEC
                MOVE    SPACE               TO  WRK-NAIYOU-AREA
@@ -2872,6 +2883,8 @@
       *
       *    帳票用編集処理
            PERFORM 20022-PRINT-HEN-SEC
+      *H24.4
+           ADD     1                   TO  IDX
       *
            .
        20029-SRYACT-HENSYU-EXT.
@@ -2914,12 +2927,24 @@
            PERFORM VARYING IDXA2       FROM    1   BY  1
                    UNTIL   IDXA2       >   IDX-S
                ADD     1                   TO  IDX
+      *H24.4
+      *        １剤が１頁以上
+               IF      IDX                 =   LINE-MAX
+                   MOVE    "次ページへ続く"    TO  WRK-NAIYOU
+                                                (WRK-PAGE-MAX IDX)
+                                                                (50:)
+      *            改ページ
+                   ADD     1                   TO  WRK-PAGE-MAX
+                   MOVE    1                   TO  IDX
+               END-IF
+      *H24.4
                MOVE    WRK-HENKOU-Z(IDXA2) TO  WRK-HENKOU
                                                     (WRK-PAGE-MAX IDX)
                MOVE    WRK-NAIYOU-Z(IDXA2) TO  WRK-NAIYOU
                                                     (WRK-PAGE-MAX IDX)
            END-PERFORM
-           ADD     1                   TO  IDX
+      *H24.4
+      **   ADD     1                   TO  IDX
       *
            .
        20022-PRINT-HEN-EXT.
@@ -3047,6 +3072,7 @@
       *    内容
            IF      WRK-SRYCD  (1:1)   =   "6"
                IF      TNSP-IPN-KISAIKBN   =   1
+                                           OR  3
       *            一般名記載なし
                    IF     (WRK-IPNMEI          =   1 )
                      OR   (WRK-HEN-FUKA    NOT =   SPACE)
@@ -3061,15 +3087,18 @@
       *
       *        院内は一般名記載なしとする
                IF     (FLG-SYOHO-IN        =   2  )  AND
-                      (TNSP-IPN-KISAIKBN   =   1  )
+                      (TNSP-IPN-KISAIKBN   =   1
+                                           OR  3  )
                    MOVE    ZERO                TO  TNSP-IPN-KISAIKBN
                END-IF
       *
       *        システム管理の後発品変更不可の判定
                IF      FLG-FUKACHK         =   2
-      *            先発品のみは、変更不可記載なし
-                   IF     (TNS-KOUHATUKBN      =   ZERO )
-                     OR   (TNSP-IPN-KISAIKBN   =   1    )
+      *****        先発品のみは、変更不可記載なし
+      *****        IF     (TNS-KOUHATUKBN      =   ZERO )
+      *            先発品も変更不可とする
+                   IF     (TNSP-IPN-KISAIKBN   =   1    )
+                     OR   (TNSP-IPN-KISAIKBN   =   3    )
                        MOVE    SPACE           TO  WRK-KOU-SRYCD (1)
                        MOVE    SPACE           TO  WRK-KOU-TNSNAME(1)
                        MOVE    SPACE           TO  WRK-HEN-FUKA
@@ -3105,6 +3134,9 @@
                IF      SYS-1030-SYOHODSPNAME   NOT =   SPACE
       *            後発医薬品区分
                    IF      TNS-KOUHATUKBN          =   1
+      *H24.4         一般名記載以外
+                     AND  (TNSP-IPN-KISAIKBN       =   ZERO
+                                                   OR  2     )
                        MOVE    WRK-TNS-NAME-G      TO  WRK-TNS-NAME
                        COMPUTE KETA            =  (TNS-YUKOKETA  * 2)
                                                +   1
@@ -3200,7 +3232,8 @@
            ADD     1               TO  IDX-S
       *    １剤で２０行以上の時
            IF      IDX-S               >=  LINE-MAX
-               COMPUTE IDX-S           =   LINE-MAX   -   1
+      *H24.4   COMPUTE IDX-S           =   LINE-MAX   -   1
+               COMPUTE IDX-S           =   IDX-S      -   1
       *        帳票編集処理
                PERFORM 20022-PRINT-HEN-SEC
                MOVE    SPACE               TO  WRK-NAIYOU-AREA
@@ -3322,6 +3355,12 @@
       *    一般名記載
            MOVE    TNSP-IPN-KISAIKBN   TO  ORCSQRCSV-KISAIKBN
                                                   (IDX-QR1 IDX-QR2)
+      *H24.4
+           IF      TNSP-IPN-KISAIKBN   =   3
+               MOVE    "1"             TO  ORCSQRCSV-KISAIKBN
+                                                  (IDX-QR1 IDX-QR2)
+           END-IF
+      *H24.4
       *    一般名コード
            STRING  TNS-YAKKAKJNCD(1:9)
                    "ZZZ"               DELIMITED  BY  SIZE
@@ -3380,6 +3419,23 @@
                WHEN    2
                    MOVE    TNSP-SHONAME        TO  WRK-TNS-NAME-G
                    MOVE    TNSP-SHOYUKOKETA    TO  TNS-YUKOKETA
+                   IF      TNSP-IPN-KANZANTANINAME NOT =   SPACE
+                       MOVE    TNSP-IPN-KANZANTANICD
+                                                   TO  TNS-TANICD
+                       MOVE    TNSP-IPN-KANZANTANINAME
+                                                   TO  TNS-TANINAME
+                       MOVE    TNSP-IPN-KANZANCHI  TO  WRK-KANZANCHI
+                   END-IF
+      *H24.4
+      *        処方名称を一般名称とする
+               WHEN    3
+                   MOVE    SPACE               TO  WRK-TNS-NAME-G
+                   STRING  "【般】"                DELIMITED  BY  SIZE
+                           TNSP-SHONAME            DELIMITED  BY  SPACE
+                                               INTO    WRK-TNS-NAME-G
+                   END-STRING
+                   COMPUTE TNS-YUKOKETA        =   TNSP-SHOYUKOKETA
+                                               +   3
                    IF      TNSP-IPN-KANZANTANINAME NOT =   SPACE
                        MOVE    TNSP-IPN-KANZANTANICD
                                                    TO  TNS-TANICD
@@ -4653,8 +4709,8 @@
            END-IF
       *H24.4
            IF     (TNS-SRYCD(1:1)      =   "6" )
-      *        システム管理の変更可によってすべて一般名記載とする
-               IF     (TNSP-IPN-KISAIKBN   NOT =   2       )
+      *        システム管理の変更可によって一般名記載とする
+               IF     (TNSP-IPN-KISAIKBN       =   ZERO    )
                   AND (SYS-1030-KOUHATUKA      =   "1"     )
                   AND (TNS-KOUHATUKBN          =   1  OR  2  )
                    MOVE    1               TO  TNSP-IPN-KISAIKBN
@@ -4663,11 +4719,16 @@
       *        一般名記載あり
                IF     (TNSP-IPN-KISAIKBN   =   1  )
                  OR   (WRK-IPNMEI          =   2  )
-                   PERFORM 9102-GENERICNAME-READ-SEC
-      *            一般名マスタなし
-                   IF      FLG-GENERICNAME     =   1
-                       MOVE    ZERO            TO  TNSP-IPN-KISAIKBN
-                       MOVE    ZERO            TO  WRK-IPNMEI
+                   IF      TNSP-IPN-KISAIKBN   =   3
+      *                処方名称を一般名称
+                       CONTINUE
+                   ELSE
+                       PERFORM 9102-GENERICNAME-READ-SEC
+      *                一般名マスタなし
+                       IF      FLG-GENERICNAME     =   1
+                           MOVE    ZERO            TO  TNSP-IPN-KISAIKBN
+                           MOVE    ZERO            TO  WRK-IPNMEI
+                       END-IF
                    END-IF
                END-IF
            END-IF
