@@ -5850,6 +5850,7 @@
                ELSE
                    MOVE    ZERO        TO  FLG-HIT
                END-IF
+           WHEN    152
            WHEN    182 THRU 190
                IF    ( CONST-KSNCD (IDX-KSN)
                                        =   CONST-KSNCD-190134270 )
