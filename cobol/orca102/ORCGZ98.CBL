@@ -46,6 +46,7 @@
       *  03.04.00    NACL-多々納  06/11/14  検査正式名称表示追加
       *  04.01.00    NACL-多々納  08/01/30  次頁表示の追加
       *  04.05.00    NACL-多々納  09/07/24  診療行為一覧と同期
+      *  04.06.00    NACL-多々納  12/04/20  一般名記載区分他対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -92,6 +93,8 @@
       *
            03  FLG-KIKAN           PIC 9(01).
            03  FLG-KENSAKU01       PIC 9(01).
+      *H24.4
+           03  FLG-TENSUPLUS           PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -189,6 +192,10 @@
            03  WRK-NAME2-G.
                05  WRK-NAME21           PIC X(30).
                05  WRK-NAME22           PIC X(40).
+      *H24.4
+      *    一般記載区分名称
+           03  WRK-NAME                    PIC X(100).
+           03  WRK-MSG-2                   PIC X(10).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMD.
@@ -341,6 +348,11 @@
       *    入力セットコード
        01  INPUTSET-REC.
            COPY    "CPINPUTSET.INC".
+      *
+      *H24.4
+      *    点数マスタ付加コード
+        01 TENSUPLUS-REC.
+           COPY    "CPTENSUPLUS.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1506,6 +1518,38 @@
                                INTO        SPA-Z98-GMN-NAME(IDX)
                 END-STRING
            END-IF
+      *H24.4
+      *    後発医薬品再編集
+           IF     (TNS-SRYCD(1:1)      =   "6") AND
+                  (TNS-KOUHATUKBN      =   7  )
+                MOVE    SPACE              TO  SPA-Z98-GMN-NAME (IDX)
+                STRING  "【先発無】"  DELIMITED   BY  SIZE
+                        TNS-NAME      DELIMITED   BY  SIZE
+                               INTO        SPA-Z98-GMN-NAME(IDX)
+                END-STRING
+           END-IF
+      *    薬価基準コード
+           IF      TNS-SRYCD (1:1)     =   "6"
+      *        一般名記載区分
+               PERFORM 9101-TENSUPLUS-READ-SEC
+      *
+               MOVE    SPACE                TO  WRK-MSG-2
+               EVALUATE    TNSP-IPN-KISAIKBN
+                   WHEN    1
+                       MOVE    "〔般〕"        TO  WRK-MSG-2
+                   WHEN    2
+                       MOVE    "〔２〕"        TO  WRK-MSG-2
+                   WHEN    3
+                       MOVE    "〔処〕"        TO  WRK-MSG-2
+               END-EVALUATE
+               MOVE    SPA-Z98-GMN-NAME(IDX)   TO  WRK-NAME
+               MOVE    SPACE                   TO  SPA-Z98-GMN-NAME(IDX)
+               STRING  WRK-MSG-2               DELIMITED   BY  SPACE
+                       WRK-NAME                DELIMITED   BY  SPACE
+                               INTO        SPA-Z98-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *H24.4
       *!!
       *    検査正式名称
            IF     (TNS-SRYCD(1:1)      =   "1") AND
@@ -2074,6 +2118,38 @@
                                INTO        SPA-Z98-GMN-NAME(IDX)
                 END-STRING
            END-IF
+      *H24.4
+      *    後発医薬品再編集
+           IF     (TNS-SRYCD(1:1)      =   "6") AND
+                  (TNS-KOUHATUKBN      =   7  )
+                MOVE    SPACE              TO  SPA-Z98-GMN-NAME (IDX)
+                STRING  "【先発無】"  DELIMITED   BY  SIZE
+                        TNS-NAME      DELIMITED   BY  SIZE
+                               INTO        SPA-Z98-GMN-NAME(IDX)
+                END-STRING
+           END-IF
+      *    薬価基準コード
+           IF      TNS-SRYCD (1:1)     =   "6"
+      *        一般名記載区分
+               PERFORM 9101-TENSUPLUS-READ-SEC
+      *
+               MOVE    SPACE                TO  WRK-MSG-2
+               EVALUATE    TNSP-IPN-KISAIKBN
+                   WHEN    1
+                       MOVE    "〔般〕"        TO  WRK-MSG-2
+                   WHEN    2
+                       MOVE    "〔２〕"        TO  WRK-MSG-2
+                   WHEN    3
+                       MOVE    "〔処〕"        TO  WRK-MSG-2
+               END-EVALUATE
+               MOVE    SPA-Z98-GMN-NAME(IDX)   TO  WRK-NAME
+               MOVE    SPACE                   TO  SPA-Z98-GMN-NAME(IDX)
+               STRING  WRK-MSG-2               DELIMITED   BY  SPACE
+                       WRK-NAME                DELIMITED   BY  SPACE
+                               INTO        SPA-Z98-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *H24.4
       *!!
       *    検査正式名称
            IF     (TNS-SRYCD(1:1)      =   "1") AND
@@ -4292,6 +4368,44 @@
       *
            .
        975-INPSET-READ-EXT.
+           EXIT.
+      *H24.4
+      *****************************************************************
+      *    点数マスタ付加情報検索処理
+      *****************************************************************
+       9101-TENSUPLUS-READ-SEC          SECTION.
+      *
+           MOVE    SPACE               TO  TENSUPLUS-REC
+           INITIALIZE                      TENSUPLUS-REC
+           MOVE    TNS-SRYCD           TO  TNSP-SRYCD
+           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
+           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOEDYMD
+      *
+           MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
+           MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TENSUPLUS-REC
+                   MOVE    ZERO                TO  FLG-TENSUPLUS
+               ELSE
+                   INITIALIZE                  TENSUPLUS-REC
+                   MOVE    1                   TO  FLG-TENSUPLUS
+               END-IF
+           ELSE
+               INITIALIZE                      TENSUPLUS-REC
+               MOVE    1                   TO  FLG-TENSUPLUS
+           END-IF
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       9101-TENSUPLUS-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
