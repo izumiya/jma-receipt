@@ -2607,6 +2607,7 @@
                END-PERFORM
       *H24.4
                END-IF
+      *H24.4
            END-PERFORM
       *
            MOVE    SPA-J98-GMN-MAX     TO  J98-COUNT
@@ -3075,11 +3076,34 @@
                    MOVE    SPA-J98-NAI-SELNUM(IDX-1)
                                            TO  WRK-NOZ
                    MOVE    WRK-NOZ         TO  SPA-J98-GMN-SELNUM(IDX-1)
+      *H24.4
+                   IF     (SPA-J98-GMN-SYORI   =   "G"  )  AND
+                          (SPA-J98-GMN-SYORI2  =   "1"  )
+                       MOVE    SNUM-OUTNUM         TO  WRK-SELNO
+                       PERFORM 4101101-SELNUM-NAIHEN-SEC
+                   END-IF
                END-IF
            END-IF
       *
            .
        410110-GMN-SPA-EXT.
+           EXIT.
+      *
+      *H24.4
+      *****************************************************************
+      *    番号選択　処理
+      *****************************************************************
+       4101101-SELNUM-NAIHEN-SEC                SECTION.
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-J98-GMN-MAX
+               IF      SPA-J98-NAI-NO (IDX)    =   WRK-SELNO
+                   MOVE    IDX             TO  SPA-J98-NAI-SELNUM(IDX-1)
+                   MOVE    SPA-J98-GMN-MAX     TO  IDX
+               END-IF
+           END-PERFORM
+           .
+       4101101-SELNUM-NAIHEN-EXT.
            EXIT.
       *****************************************************************
       *    番号選択　処理
@@ -3143,10 +3167,20 @@
            MOVE    ZERO                TO  WRK-SELNO
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-J98-GMN-MAX
+      *24.4
+      *        一般名からの検索時
+               IF      SPA-J98-GMN-NO-X(IDX)   =   "G"
+                   MOVE    SPA-J98-NAI-SELNUM (IDX-1)
+                                               TO  WRK-SELNO
+                   MOVE    SPA-J98-GMN-MAX     TO  IDX
+               ELSE
+      *
                IF      SPA-J98-NAI-NO (IDX)    =   SPA-J98-NAI-SELNUM
                                                             (IDX-1)
                    MOVE    IDX                 TO  WRK-SELNO
                    MOVE    SPA-J98-GMN-MAX     TO  IDX
+               END-IF
+      *24.4
                END-IF
            END-PERFORM
       *H24.4
