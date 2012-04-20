@@ -3088,11 +3088,34 @@
                    MOVE    SPA-K98-NAI-SELNUM(IDX-1)
                                            TO  WRK-NOZ
                    MOVE    WRK-NOZ         TO  SPA-K98-GMN-SELNUM(IDX-1)
+      *H24.4
+                   IF     (SPA-K98-GMN-SYORI   =   "G"  )  AND
+                          (SPA-K98-GMN-SYORI2  =   "1"  )
+                       MOVE    SNUM-OUTNUM         TO  WRK-SELNO
+                       PERFORM 4101101-SELNUM-NAIHEN-SEC
+                   END-IF
                END-IF
            END-IF
       *
            .
        410110-GMN-SPA-EXT.
+           EXIT.
+      *
+      *H24.4
+      *****************************************************************
+      *    番号選択　処理
+      *****************************************************************
+       4101101-SELNUM-NAIHEN-SEC                SECTION.
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-K98-GMN-MAX
+               IF      SPA-K98-NAI-NO (IDX)    =   WRK-SELNO
+                   MOVE    IDX             TO  SPA-K98-NAI-SELNUM(IDX-1)
+                   MOVE    SPA-K98-GMN-MAX     TO  IDX
+               END-IF
+           END-PERFORM
+           .
+       4101101-SELNUM-NAIHEN-EXT.
            EXIT.
       *****************************************************************
       *    番号選択　処理
@@ -3156,10 +3179,20 @@
            MOVE    ZERO                TO  WRK-SELNO
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-K98-GMN-MAX
-               IF      SPA-K98-NAI-NO (IDX)    =   SPA-K98-NAI-SELNUM
-                                                            (IDX-1)
-                   MOVE    IDX                 TO  WRK-SELNO
+      *24.4
+      *        一般名からの検索時
+               IF      SPA-K98-GMN-NO-X(IDX)   =   "G"
+                   MOVE    SPA-K98-NAI-SELNUM (IDX-1)
+                                               TO  WRK-SELNO
                    MOVE    SPA-K98-GMN-MAX     TO  IDX
+               ELSE
+      *
+                   IF      SPA-K98-NAI-NO (IDX)
+                                               =   SPA-K98-NAI-SELNUM
+                                                            (IDX-1)
+                       MOVE    IDX                 TO  WRK-SELNO
+                       MOVE    SPA-K98-GMN-MAX     TO  IDX
+                   END-IF
                END-IF
            END-PERFORM
       *H24.4
@@ -3551,7 +3584,6 @@
                MOVE    "0002"          TO  SPA-ERRCD
                GO      TO              41011-SELNO-EXT
            END-IF
-      *
            MOVE    WRK-SELNO           TO  IDX
       *
       *****PERFORM 410111-SEL-SYUKBN-CHK-SEC
