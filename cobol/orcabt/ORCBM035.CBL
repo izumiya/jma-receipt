@@ -38,6 +38,8 @@
       *  04.05.01    NACL-藤原    09/05/25  広域連合の保険者番号指定対応
       *  04.05.02    NACL-藤原    09/07/08  公費再掲欄への地方公費記載
       *                                     設定対応
+      *  04.05.03    NACL-藤原    12/04/17  平成２４年４月改正対応
+      *                                     平成２４年４月分以降はまとめる
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -155,6 +157,8 @@
            03  WRK-INDEX           PIC 9(02).
            03  WRK-SYOKBN          PIC X(01).
       *
+           03  WRK-PRTFLG          PIC 9(01).
+      *
       *    数字項目編集
            03  WRK-KOHNUM9         PIC ZZ9.
            03  WRK-NISSUZ          PIC ZZZZZZ.
@@ -257,6 +261,8 @@
       *    固定項目
        01  WRK-CONS-AREA.
            03  WRK-CONS-SRYYM-200804   PIC X(06)   VALUE   "200804".
+      *    ２０１２年４月改正
+           03  WRK-CONS-SRYYM-201204   PIC X(06)   VALUE   "201204".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -640,54 +646,76 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2010-HOSPNUM
       *****************************************************************
        2001-SYOKBN-SYUKEI-SEC         SECTION.
       *
-      *    入院外（その他のレセ）・入院集計
+      *    1:200804-201203  2:201204-   
+           PERFORM VARYING WRK-PRTFLG  FROM    1   BY  1
+                   UNTIL   WRK-PRTFLG  >       2
+      *
+           IF    ( WRK-PRTFLG          =   2                     )
+           AND   ( LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-201204 )
+               CONTINUE
+           ELSE
+      *        入院外（その他のレセ）・入院集計
       *    
-           MOVE    LOW-VALUE           TO  KEY-AREA
-           MOVE    1                   TO  WRK-INDEX
-      *     
-           EVALUATE    WRK-SYOKBN      ALSO    WRK-PARA-SYOKBN1
-               WHEN    "1"             ALSO    "1"
-                   MOVE    "key62"         TO  WRK-MCP-PATHNAME
-               WHEN    "2"             ALSO    "1"
-                   MOVE    "key61"         TO  WRK-MCP-PATHNAME
-               WHEN    "1"             ALSO    "2"
-                   MOVE    "key66"         TO  WRK-MCP-PATHNAME
-               WHEN    "2"             ALSO    "2"
-                   MOVE    "key65"         TO  WRK-MCP-PATHNAME
-           END-EVALUATE  
-           MOVE    "tbl_seikyu"        TO  WRK-MCP-TABLE
-           PERFORM 900-SEIKYU-SELECT-SEC
-      *
-           PERFORM 200-HENSYU-SEC  UNTIL   FLG-RECE10   =   1 
-                                   OR      FLG-ERR      =   1
-      *
-           MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
-           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
-      *
-      *    入院外集計（在総診または在医総を算定したレセ）
-      *    特別療養費の場合は在総診はなし
-           IF    ( FLG-ERR             =   ZERO )
-           AND   ( WRK-PARA-SYOKBN1    =   "1"  )
                MOVE    LOW-VALUE           TO  KEY-AREA
-               MOVE    2                   TO  WRK-INDEX
-      *         
-               EVALUATE    WRK-SYOKBN
-                   WHEN    "1"
-                       MOVE    "key64"     TO  WRK-MCP-PATHNAME
-                   WHEN    "2"
-                       MOVE    "key63"     TO  WRK-MCP-PATHNAME
-               END-EVALUATE  
+               MOVE    1                   TO  WRK-INDEX
+      *     
+               IF      WRK-PRTFLG          =   1
+                   EVALUATE    WRK-SYOKBN      ALSO    WRK-PARA-SYOKBN1
+                       WHEN    "1"             ALSO    "1"
+                           MOVE    "key62"         TO  WRK-MCP-PATHNAME
+                       WHEN    "2"             ALSO    "1"
+                           MOVE    "key61"         TO  WRK-MCP-PATHNAME
+                       WHEN    "1"             ALSO    "2"
+                           MOVE    "key66"         TO  WRK-MCP-PATHNAME
+                       WHEN    "2"             ALSO    "2"
+                           MOVE    "key65"         TO  WRK-MCP-PATHNAME
+                   END-EVALUATE
+               ELSE
+                   EVALUATE    WRK-SYOKBN      ALSO    WRK-PARA-SYOKBN1
+                       WHEN    "1"             ALSO    "1"
+                       WHEN    "1"             ALSO    "2"
+                           MOVE    "key66"         TO  WRK-MCP-PATHNAME
+                       WHEN    "2"             ALSO    "1"
+                       WHEN    "2"             ALSO    "2"
+                           MOVE    "key65"         TO  WRK-MCP-PATHNAME
+                   END-EVALUATE
+               END-IF
                MOVE    "tbl_seikyu"        TO  WRK-MCP-TABLE
                PERFORM 900-SEIKYU-SELECT-SEC
       *
-               PERFORM 200-HENSYU-SEC  UNTIL   FLG-RECE10   =  1
-                                       OR      FLG-ERR      =  1
+               PERFORM 200-HENSYU-SEC  UNTIL   FLG-RECE10   =   1 
+                                       OR      FLG-ERR      =   1
       *
                MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
                MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
-           END-IF
+      *
+      *        入院外集計（在総診または在医総を算定したレセ）
+      *        特別療養費の場合は在総診はなし
+      *        平成２４年４月以降はなし
+               IF    ( FLG-ERR             =   ZERO )
+               AND   ( WRK-PARA-SYOKBN1    =   "1"  )
+               AND   ( WRK-PRTFLG          <   2    )
+                   MOVE    LOW-VALUE           TO  KEY-AREA
+                   MOVE    2                   TO  WRK-INDEX
+      *         
+                   EVALUATE    WRK-SYOKBN
+                       WHEN    "1"
+                           MOVE    "key64"     TO  WRK-MCP-PATHNAME
+                       WHEN    "2"
+                           MOVE    "key63"     TO  WRK-MCP-PATHNAME
+                   END-EVALUATE  
+                   MOVE    "tbl_seikyu"        TO  WRK-MCP-TABLE
+                   PERFORM 900-SEIKYU-SELECT-SEC
+      *
+                   PERFORM 200-HENSYU-SEC  UNTIL   FLG-RECE10   =  1
+                                           OR      FLG-ERR      =  1
+      *
+                   MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
+                   MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+                   PERFORM 900-CLOSE-SEC
+               END-IF
+           END-PERFORM
       *     
            MOVE    1                   TO  FLG-END
            .
@@ -1139,7 +1167,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2010-HOSPNUM
       *
            EVALUATE    WRK-INDEX
                WHEN    1
-                   MOVE    "その他のレセ"      TO  HCM3G-TITLE  
+                   IF      WRK-PRTFLG          <   2
+                       MOVE    "その他のレセ"      TO  HCM3G-TITLE
+                   END-IF
                WHEN    2
                    MOVE    "在医総管または在医総を算定したレセ"
                                                TO  HCM3G-TITLE
@@ -1569,9 +1599,17 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2010-HOSPNUM
            INITIALIZE                      RECE10-REC
            MOVE    WRK-PARA-HOSPNUM    TO  RECE10-HOSPNUM
            MOVE    LNK-PRTKANRI-SRYYM  TO  RECE10-SKYYM
-           MOVE    WRK-CONS-SRYYM-200804
-                                       TO  RECE10-SRYYM
-           MOVE    999999              TO  RECE10-XXSRYYM
+           EVALUATE    WRK-PRTFLG
+               WHEN    1
+                   MOVE    WRK-CONS-SRYYM-200804
+                                               TO  RECE10-SRYYM
+                   MOVE    WRK-CONS-SRYYM-201204
+                                               TO  RECE10-XXSRYYM
+               WHEN    2
+                   MOVE    WRK-CONS-SRYYM-201204
+                                               TO  RECE10-SRYYM
+                   MOVE    999999              TO  RECE10-XXSRYYM
+           END-EVALUATE
            IF      WRK-PARA-HKNJANUM   NOT =   ZERO
                MOVE    WRK-PARA-HKNJANUM   TO  RECE10-XXSTHKNJANUM
                                                RECE10-XXEDHKNJANUM
