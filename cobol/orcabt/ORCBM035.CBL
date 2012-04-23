@@ -650,10 +650,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2010-HOSPNUM
            PERFORM VARYING WRK-PRTFLG  FROM    1   BY  1
                    UNTIL   WRK-PRTFLG  >       2
       *
-           IF    ( WRK-PRTFLG          =   2                     )
-           AND   ( LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-201204 )
+             IF    ( WRK-PRTFLG          =   2                     )
+             AND   ( LNK-PRTKANRI-SRYYM  <   WRK-CONS-SRYYM-201204 )
                CONTINUE
-           ELSE
+             ELSE
       *        入院外（その他のレセ）・入院集計
       *    
                MOVE    LOW-VALUE           TO  KEY-AREA
@@ -715,6 +715,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2010-HOSPNUM
                    MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
                    PERFORM 900-CLOSE-SEC
                END-IF
+             END-IF
            END-PERFORM
       *     
            MOVE    1                   TO  FLG-END
