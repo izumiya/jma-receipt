@@ -971,7 +971,7 @@
       <name>B02S</name>
       <x>272</x>
       <y>524</y>
-      <width>110</width>
+      <width>114</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
