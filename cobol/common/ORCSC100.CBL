@@ -522,6 +522,8 @@
                GO      TO      5101-TBLSAIHEN-EXT
            END-IF
       *!!
+      *H24.4
+           MOVE    SPACE               TO  SPA-ERRCD
       *    剤ごとの処理
       *    診療種別件数クリア
            INITIALIZE                  SPA-SRYKBN-AREA
