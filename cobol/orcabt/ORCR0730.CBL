@@ -155,6 +155,8 @@
       *                                     Ê¿À®£²£´Ç¯£´·îÊ¬°Ê¹ß¤Î½èÍý¤ò
       *                                     ¹Ô¤¦¤è¤¦¤Ë¤¹¤ë
       *                                     Æþ±¡Î¬¾Î¤ÎÊÑ¹¹
+      *  04.05.40    NACL-ÌçÏÆ    12/04/24  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ¤Ë´Ø
+      *                                     ¤¹¤ë¥Õ¥é¥°ÊÔ½¸
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -10087,6 +10089,11 @@
       *
            MOVE    "00000000000000000000000000000000000000000000000000"
                                        TO  RECE10-RESERVE-AREA
+      *
+           IF     (RECE62-SRYYM    >=  "201204")
+           AND    (RECE62-KOUREI   NOT =  SPACE)
+             MOVE   RECE62-KOUREI      TO  RECE10-RESERVE-AREA(1:1)
+           END-IF
       *
            IF      RECE62-SRYYM    >=   "201004"
              MOVE    RECE62-SKYIRYO-INF    TO  RECE10-SKYIRYO-INF

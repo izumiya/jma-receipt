@@ -977,6 +977,8 @@
            03  FTN-KOH-YY6                             PIC 9(09).
            03  FTN-KOH-YY7                             PIC 9(09).
            03  FLG-KOH                                 PIC 9(01).
+           03  FLG-GENBUTU-HANTEI                      PIC 9(01).
+           03  FLG-GENBUTU-HANTEI2                     PIC 9(01).
            03  WRK-FTNKEI                              PIC 9(09).
            03  WRK-FTNKEI-Z                            PIC 9(09).
            03  WRK-FTNKEI2                             PIC 9(09).
@@ -1152,6 +1154,7 @@
            03  WRK-CHK-IDOU                            PIC 9(01).
            03  WRK-CHK-TAISYO                          PIC 9(01).
            03  WRK-CHK-TAISYO2                         PIC 9(01).
+           03  WRK-CHK-TAISYO3                         PIC 9(01).
            03  WRK-CHK-TOKU75-MAE                      PIC 9(01).
            03  WRK-CHK-CNT                             PIC 9(07).
            03  WRK-CHK-HKNID                           PIC 9(10).
@@ -4163,6 +4166,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                            WRK-CHK-TAISYO2
                                            WRK-CHK-TOKU75-MAE
                                            FLG-TOKU75-XXX
+                                           WRK-CHK-TAISYO3
       *
            INITIALIZE                      RECE09-REC
 grpsys     MOVE    RECE02-HOSPNUM      TO  RECE09-HOSPNUM
@@ -4344,12 +4348,22 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                              (RECE09-HKNJANUM  NOT =
                                                  WRK-CHK-HKNJANUM )
                              MOVE    1            TO  WRK-CHK-TAISYO
+                             MOVE    1            TO  WRK-CHK-TAISYO3
                          END-IF
                      END-EVALUATE
                END-EVALUATE
       *
                PERFORM RECE09-NEXT-SEC
            END-PERFORM
+      *
+           IF   WRK-CHK-TAISYO3      =  1
+           AND  WRK-CHK-CNT          =  2
+             IF ((RECE02-HKNJANUM  NOT = SPACE            ) AND
+                 (RECE02-HKNJANUM  NOT = WRK-CHK-HKNJANUM ))
+             OR ( RECE02-HONKZKKBN NOT = WRK-CHK-HONKZKKBN )
+               MOVE    1     TO    FLG-GENBUTU-HANTEI2
+             END-IF
+           END-IF
       *
            IF   (RECE02-HKNNUM    NOT = "039")
            AND  (FLG-TOKU75       =  2 OR 3  )
@@ -10641,6 +10655,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF   SYU-SYUHKNNUM  NOT = SPACE
               ADD   SYU-KOH-FTN   TO   WRK-KOH-FTN
+              IF  (SYU-SKJ-FTNGAKU(1)  =     1   )
+              AND (RECE02-SRYYM       >= "201204")
+                 MOVE    1   TO   FLG-GENBUTU-HANTEI
+              END-IF
            END-IF
       *
            .
@@ -10962,6 +10980,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF   SYU-SYUHKNNUM  NOT = SPACE
               ADD   SYU-KOH-FTN   TO   WRK-KOH-FTN
+              IF  (SYU-SKJ-FTNGAKU(1)  =     1   )
+              AND (RECE02-SRYYM       >= "201204")
+                 MOVE    1   TO   FLG-GENBUTU-HANTEI
+              END-IF
            END-IF
       *
            .
@@ -13101,6 +13123,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     MOVE    "2"      TO   RECE02-ZAITAKU
                END-IF
       *
+               IF  (FLG-GENBUTU-HANTEI    =   1  )
+               AND (FLG-GENBUTU-HANTEI2   =   1  )
+               AND (RECE02-ZAITAKU        =  "3" )
+                    MOVE    "2"      TO   RECE02-ZAITAKU
+               END-IF
+      *
                IF      RECE02-ZAITAKU  =  "3"
                  MOVE     ZERO    TO    RECE02-FTNMONEY(1)
                  PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
@@ -13665,6 +13693,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
                  END-IF
       *
+               END-IF
+      *
+               IF  (FLG-GENBUTU-HANTEI    =   1  )
+               AND (FLG-GENBUTU-HANTEI2   =   1  )
+               AND (RECE02-ZAITAKU        =  "4" )
+                    MOVE    "1"      TO   RECE02-ZAITAKU
                END-IF
       *
                IF      RECE02-ZAITAKU  =  "4"
