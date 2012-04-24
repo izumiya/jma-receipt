@@ -1129,7 +1129,7 @@
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                    MOVE    "key17"                 TO  MCP-PATHNAME
                    PERFORM   900-CLOSE-SEC
-                   GO   TO    200-MAIN-EXT
+                   GO   TO    200-MAIN-1-EXT
                END-IF
            ELSE
                MOVE     4      TO      LNK-NYURECEDEN-RC
@@ -1137,7 +1137,7 @@
                MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                MOVE    "key17"                 TO  MCP-PATHNAME
                PERFORM   900-CLOSE-SEC
-               GO   TO    200-MAIN-EXT
+               GO   TO    200-MAIN-1-EXT
            END-IF
       *    入院会計クローズ
            MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
@@ -4385,7 +4385,7 @@
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                    MOVE    "key17"                 TO  MCP-PATHNAME
                    PERFORM   900-CLOSE-SEC
-                   GO   TO    200-MAIN-EXT
+                   GO   TO    200-MAIN-2-EXT
                END-IF
            ELSE
                MOVE     4      TO      LNK-NYURECEDEN-RC
@@ -4393,7 +4393,7 @@
                MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
                MOVE    "key17"                 TO  MCP-PATHNAME
                PERFORM   900-CLOSE-SEC
-               GO   TO    200-MAIN-EXT
+               GO   TO    200-MAIN-2-EXT
            END-IF
       *    入院会計クローズ
            MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
