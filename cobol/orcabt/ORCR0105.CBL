@@ -146,6 +146,8 @@
       *                                     行うようにする
       *                                     平成２４年４月以降の社保分に
       *                                     ついて在総診の設定を行わない
+      *  04.05.34    NACL-門脇    12/04/24  保険欄−一部負担金欄記載に関
+      *                                     するフラグ編集
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -9096,6 +9098,11 @@
       *
            MOVE    "00000000000000000000000000000000000000000000000000"
                                        TO  RECE10-RESERVE-AREA
+      *
+           IF     (RECE02-SRYYM    >=  "201204")
+           AND    (RECE02-ZAITAKU  NOT =  SPACE)
+               MOVE   RECE02-ZAITAKU   TO  RECE10-RESERVE-AREA(1:1)
+           END-IF
       *
            IF      RECE02-SRYYM    >=  "201004"
                MOVE    RECE02-SKYIRYO-INF  TO  RECE10-SKYIRYO-INF
