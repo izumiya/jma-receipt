@@ -637,7 +637,7 @@ end
 				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' ' + LAYEROPTION
 			else
 #				w_exec = RED_EXECPS + ' ' + red_file + ' ' + temp_file + ' -p ' + lp_name + ' -o ' + psfile_name
-				w_exec = RED_EXEC + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' -o ' + psfile_name + ' '  + LAYEROPTION
+				w_exec = RED_EXECPS + ' ' + red_file + ' ' + temp_file + ' -x ' + offset_x + ' -y ' + offset_y + ' -p ' + lp_name + ' -o ' + psfile_name + ' '  + LAYEROPTION
 			end
 		when	'3'     # PSファイル出力の指示
 		puts	'take3 Start [' + psfile_name + ']'
