@@ -544,6 +544,9 @@
       *                                     「その他」の対応
       *                                     「入院」の対応
       *                                     コメント差込
+      *  04.05.55    NACL-門脇    12/04/25  福岡市地方公費対応
+      *                                     社保分保険欄一部負担金記載
+      *                                     一律一般の金額で記載
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -14022,6 +14025,11 @@
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE62-SRYYM      >= "201010"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((WRK-PREFNUM        = "40"                     ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+                (SYU-KOH-HKNNUM(1)  = "251" OR "450" OR "260"
+                                            OR "360" OR "460"  ) AND
+                (RECE62-SRYYM      >= "201204"                 ))
               CONTINUE
            ELSE
               MOVE    ZERO    TO    FLG-KGKIPNTAI
@@ -14179,6 +14187,11 @@
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE62-SRYYM      >= "201010"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((WRK-PREFNUM        = "40"                     ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)  = "251" OR "450" OR "260"
+                                            OR "360" OR "460"  ) AND
+                (RECE62-SRYYM      >= "201204"                 ))
            OR  ((WRK-PREFNUM        = "33"                     ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
            OR  ((WRK-PREFNUM        = "01"                     ) AND
