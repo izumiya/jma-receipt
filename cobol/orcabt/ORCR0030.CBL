@@ -558,6 +558,9 @@
       *                                     「その他」の対応
       *                                     コメント差込
       *                                     現物給付化対応
+      *  04.05.47    NACL-門脇    12/04/25  福岡市地方公費対応
+      *                                     社保分保険欄一部負担金記載
+      *                                     一律一般の金額で記載
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11192,6 +11195,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE02-SRYYM      >= "201010"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((SYS-1001-PREFNUM   =  40                      ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+                (SYU-KOH-HKNNUM(1)  = "251" OR "450" OR "260"
+                                            OR "360" OR "460"  ) AND
+                (RECE02-SRYYM      >= "201204"                 ))
               CONTINUE
            ELSE
               MOVE    ZERO    TO    FLG-KGKIPNTAI
@@ -11293,6 +11301,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (RECE02-SRYYM      >= "201010"                 ) AND
                 (IDZ                =  1                       ))
+           OR  ((SYS-1001-PREFNUM   =  40                      ) AND
+                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)  = "251" OR "450" OR "260"
+                                            OR "360" OR "460"  ) AND
+                (RECE02-SRYYM      >= "201204"                 ))
            OR  ((SYS-1001-PREFNUM   =  33                      ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
            OR  ((SYS-1001-PREFNUM   =  01                      ) AND
