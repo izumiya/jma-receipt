@@ -1718,10 +1718,15 @@
            MOVE    WRK-TNS-JGNAGE      TO  WRK-JGNAGE(2:2)
       *
       *H24.4
-           MOVE    SPA-BIRTHDAY        TO  WRK-NEN-03
-           MOVE    SPA-BIRTHDAY        TO  WRK-NEN-15
-           COMPUTE WRK-NEN03-YY        =   WRK-NEN03-YY  +  3
-           COMPUTE WRK-NEN15-YY        =   WRK-NEN15-YY  +  15
+           IF      SPA-PTID            =   ZERO
+               MOVE    ZERO                TO  WRK-NEN-03
+               MOVE    ZERO                TO  WRK-NEN-15
+           ELSE
+               MOVE    SPA-BIRTHDAY        TO  WRK-NEN-03
+               MOVE    SPA-BIRTHDAY        TO  WRK-NEN-15
+               COMPUTE WRK-NEN03-YY        =   WRK-NEN03-YY  +  3
+               COMPUTE WRK-NEN15-YY        =   WRK-NEN15-YY  +  15
+           END-IF
       *
       *    下限年齢チェック
            IF      WRK-TNS-KGNAGE          =   SPACE  OR  ZERO

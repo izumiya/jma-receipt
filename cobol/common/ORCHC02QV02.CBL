@@ -3158,6 +3158,9 @@
                    MOVE    2                   TO  FLG-SOURYOHEN
                END-IF
            ELSE
+      *H24.4
+      *        換算値クリア
+               MOVE    ZERO                TO  WRK-KANZANCHI
       *        用法
                IF      WRK-SRYCD  (1:3)    =   "001"
                    PERFORM 310300-YOUHO-NAME-SEC
