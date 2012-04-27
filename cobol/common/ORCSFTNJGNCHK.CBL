@@ -79,6 +79,7 @@
       *  04.05.01    NACL-ÌçÏÆ    09/12/04  ¿©»ö¡ÊÆÃÊÌ¿©¡Ë¤ÎÂ¾ÊÝ¸±ÂÐ±þ
       *  04.05.02    NACL-ÌçÏÆ    11/03/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    11/11/17  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¾¾ÉúÄ®¡Ë
+      *  04.05.04    NACL-ÌçÏÆ    12/04/27  ÂçºåÉÜÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
       *  04.06.01    NACL-ÌçÏÆ    12/01/30  ±¡³°½èÊý¤Î¤ß¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥ÈÂÐ±þ
       *                                     ¡ÊÀÁµáÅÀ¿ô£°ÅÀ¸øÈñÊ¬¡Ë
       *****************************************************************
@@ -116,6 +117,8 @@
            03  FLG-KOREI           PIC 9(01).
            03  FLG-SAIGAI-TAISYO   PIC 9(01).
            03  FLG-TENKEN          PIC 9(01).
+           03  FLG-ZENKI-TOKUREI   PIC 9(01).
+           03  FLG-KOREI-HIGAITO   PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -315,6 +318,11 @@
            MOVE        SPACE     TO     WRK-TEISYOTOKU2
            MOVE        SPACE     TO     WRK-RECEJGNDSPKBN
            MOVE        ZERO      TO     WRK-KOHFTN-RITU
+           MOVE        ZERO      TO     FLG-ZENKI-TOKUREI
+           MOVE        ZERO      TO     FLG-KOREI-HIGAITO
+      *
+      *    Á°´ü¹âÎð¼Ô¡Ê£·£°ºÐ¡Á£·£´ºÐ¡ËÆÃÎãÂÐ¾Ý¼Ô¥Á¥§¥Ã¥¯
+           PERFORM    2006-ZENKI-TOKUREI-HANTEI-SEC
       *
       *    ÊÝ¸±ÈÖ¹æ¥Þ¥¹¥¿¤«¤é¥ì¥»¥×¥ÈÉ½¼¨¶èÊ¬¤ÈÉéÃ´¾å¸Â³Û¤Î¼èÆÀ
            PERFORM    210-HKNNUM-GET-SEC
@@ -1014,6 +1022,17 @@
                   MOVE    1    TO    FLG-ARI
                   EVALUATE   LNK-FTNJGNCHK-KOHNUM
                     WHEN   SYU-KOH-HKNNUM(1)
+                       IF  (LNK-FTNJGNCHK-KOHNUM    = "972" OR "974")
+                       AND (FLG-ZENKI-TOKUREI       =   1           )
+                         COMPUTE  SYU-KOH-COMPFTN(1) =
+                                  SYU-TOTAL-HKNTEN * 10 * 0.2
+                         COMPUTE  SYU-KOH-COMPFTN(1)  =
+                                  SYU-KOH-COMPFTN(1)  + 5
+                         COMPUTE  SYU-KOH-COMPFTN(1)  =
+                                  SYU-KOH-COMPFTN(1)  / 10
+                         COMPUTE  SYU-KOH-COMPFTN(1)  =
+                                  SYU-KOH-COMPFTN(1)  * 10
+                       END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(1)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
                        ADD  SYU-KOH-COMPFTN(1)     TO  WRK-KOHFTN
@@ -1034,6 +1053,17 @@
                           PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(2)
+                       IF  (LNK-FTNJGNCHK-KOHNUM    = "972" OR "974")
+                       AND (FLG-ZENKI-TOKUREI       =   1           )
+                         COMPUTE  SYU-KOH-COMPFTN(2) =
+                                  SYU-TOTAL-HKNTEN * 10 * 0.2
+                         COMPUTE  SYU-KOH-COMPFTN(2)  =
+                                  SYU-KOH-COMPFTN(2)  + 5
+                         COMPUTE  SYU-KOH-COMPFTN(2)  =
+                                  SYU-KOH-COMPFTN(2)  / 10
+                         COMPUTE  SYU-KOH-COMPFTN(2)  =
+                                  SYU-KOH-COMPFTN(2)  * 10
+                       END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(2)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
                        ADD  SYU-KOH-COMPFTN(2)     TO  WRK-KOHFTN
@@ -1060,6 +1090,17 @@
                           PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(3)
+                       IF  (LNK-FTNJGNCHK-KOHNUM    = "972" OR "974")
+                       AND (FLG-ZENKI-TOKUREI       =   1           )
+                         COMPUTE  SYU-KOH-COMPFTN(3) =
+                                  SYU-TOTAL-HKNTEN * 10 * 0.2
+                         COMPUTE  SYU-KOH-COMPFTN(3)  =
+                                  SYU-KOH-COMPFTN(3)  + 5
+                         COMPUTE  SYU-KOH-COMPFTN(3)  =
+                                  SYU-KOH-COMPFTN(3)  / 10
+                         COMPUTE  SYU-KOH-COMPFTN(3)  =
+                                  SYU-KOH-COMPFTN(3)  * 10
+                       END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(3)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
                        ADD  SYU-KOH-COMPFTN(3)     TO  WRK-KOHFTN
@@ -1080,6 +1121,17 @@
                           PERFORM  210111-CYOKI-HENSYU-SEC
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(4)
+                       IF  (LNK-FTNJGNCHK-KOHNUM    = "972" OR "974")
+                       AND (FLG-ZENKI-TOKUREI       =   1           )
+                         COMPUTE  SYU-KOH-COMPFTN(4) =
+                                  SYU-TOTAL-HKNTEN * 10 * 0.2
+                         COMPUTE  SYU-KOH-COMPFTN(4)  =
+                                  SYU-KOH-COMPFTN(4)  + 5
+                         COMPUTE  SYU-KOH-COMPFTN(4)  =
+                                  SYU-KOH-COMPFTN(4)  / 10
+                         COMPUTE  SYU-KOH-COMPFTN(4)  =
+                                  SYU-KOH-COMPFTN(4)  * 10
+                       END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(4)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
                        ADD  SYU-KOH-COMPFTN(4)     TO  WRK-KOHFTN
@@ -1671,6 +1723,113 @@
       *
            .
        21012-SYUKEI-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Á°´ü¹âÎð¼Ô¡Ê£·£°ºÐ¡Á£·£´ºÐ¡ËÆÃÎãÂÐ¾Ý¼Ô¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2006-ZENKI-TOKUREI-HANTEI-SEC            SECTION.
+      *
+           IF   (LNK-FTNJGNCHK-SRYYM      >=   "200804")
+           AND  (LNK-FTNJGNCHK-SRYYM      <=   "201303")
+           AND  (LNK-FTNJGNCHK-PREFNUM     =    27     )
+           AND  (LNK-FTNJGNCHK-NYUGAIKBN   =   "2"     )
+      *
+             INITIALIZE                            HKNCOMBI-REC
+             MOVE    LNK-FTNJGNCHK-HOSPNUM     TO  COMB-HOSPNUM
+             MOVE    LNK-FTNJGNCHK-PTID        TO  COMB-PTID
+             MOVE    LNK-FTNJGNCHK-HKNCOMBINUM TO  COMB-HKNCOMBINUM
+             MOVE     "tbl_hkncombi"           TO  MCP-TABLE
+             MOVE     "key"                    TO  MCP-PATHNAME
+             PERFORM   910-HKNCOMBI-SELECT-SEC
+             IF      FLG-HKNCOMBI   =   ZERO
+               MOVE   "tbl_hkncombi"           TO  MCP-TABLE
+               MOVE   "key"                    TO  MCP-PATHNAME
+               PERFORM 910-HKNCOMBI-READ-SEC
+             ELSE
+               INITIALIZE                          HKNCOMBI-REC
+             END-IF
+             MOVE     "tbl_hkncombi"           TO  MCP-TABLE
+             MOVE     "key"                    TO  MCP-PATHNAME
+             PERFORM   910-DB-CLOSE-SEC
+      *
+             INITIALIZE                            ORCSAGECHKAREA
+             MOVE  LNK-FTNJGNCHK-HOSPNUM       TO  AGECHK-HOSPNUM
+             MOVE  LNK-FTNJGNCHK-PTID          TO  AGECHK-PTID
+             MOVE  LNK-FTNJGNCHK-SRYYM         TO  AGECHK-SRYYMD(1:6)
+             MOVE  "01"                        TO  AGECHK-SRYYMD(7:2)
+             MOVE  PTINF-BIRTHDAY              TO  AGECHK-BIRTHDAY
+             CALL  "ORCSAGECHK"                USING  ORCSAGECHKAREA
+                                                      SPA-AREA
+             IF    AGECHK-RC  =   ZERO
+                CONTINUE
+             END-IF
+      *
+             IF    AGECHK-NENREI   >=  70
+               IF  (COMB-HKNNUM                =   SPACE   )
+               OR  (COMB-SYU-HKNKOHSBTKBN  = "8" OR "9"    )
+               OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
+                                          OR "040" OR "039"
+                                          OR "067" OR "069")
+                CONTINUE
+               ELSE
+                IF ( COMB-HKNNUM      = "060" OR  "068" )
+                OR ((COMB-HKNNUM  NOT = "060" AND "068") AND
+                    (COMB-HOJOKBN     = SPACE          ))
+                  INITIALIZE                         PTKOHINF-REC
+                  MOVE    LNK-FTNJGNCHK-HOSPNUM  TO  PTKOH-HOSPNUM
+                  MOVE    LNK-FTNJGNCHK-PTID     TO  PTKOH-PTID
+                  MOVE    "976"                  TO  PTKOH-KOHNUM
+                  MOVE    PTKOHINF-REC           TO  MCPDATA-REC
+                  MOVE    "DBSELECT"             TO  MCP-FUNC
+                  MOVE    "tbl_ptkohinf"         TO  MCP-TABLE
+                  MOVE    "key4"                 TO  MCP-PATHNAME
+                  CALL    "ORCDBMAIN"            USING  MCPAREA
+                                                        MCPDATA-REC
+                                                        SPA-AREA
+                  IF      MCP-RC   =    ZERO
+                    MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                    MOVE    "key4"               TO  MCP-PATHNAME
+                    PERFORM  910-PTKOHINF-READ-SEC
+                    PERFORM  UNTIL   FLG-PTKOHINF  =  1
+                      IF  (PTKOH-TEKSTYMD      <=  LNK-FTNJGNCHK-SRYYM)
+                      AND (LNK-FTNJGNCHK-SRYYM <=  PTKOH-TEKEDYMD     )
+                      AND (PTKOH-SAKJOKBN       =  SPACE              )
+                         MOVE    1               TO  FLG-KOREI-HIGAITO
+                         MOVE    1               TO  FLG-PTKOHINF
+                      ELSE
+                         MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                         MOVE    "key4"          TO  MCP-PATHNAME
+                         PERFORM  910-PTKOHINF-READ-SEC
+                      END-IF
+                    END-PERFORM
+                  END-IF
+                  MOVE     "tbl_ptkohinf"        TO   MCP-TABLE
+                  MOVE     "key4"                TO   MCP-PATHNAME
+                  PERFORM   910-DB-CLOSE-SEC
+                END-IF
+               END-IF
+             END-IF
+      *
+             IF  (COMB-HKNNUM                =   SPACE   )
+             OR  (COMB-SYU-HKNKOHSBTKBN  = "8" OR "9"    )
+             OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
+                               OR "068" OR "069" OR "040"
+                                                 OR "039")
+             OR  (AGECHK-NENREI         <     70         )
+      ***    OR  (AGECHK-NENREI         >     74         )
+             OR  (FLG-KOREI-HIGAITO     =      1         )
+               CONTINUE
+             ELSE
+               IF  COMB-HOJOKBN  =  "1"  OR  "9"
+                  MOVE    1     TO    FLG-ZENKI-TOKUREI
+               END-IF
+             END-IF
+      *
+           END-IF
+      *
+           .
+       2006-ZENKI-TOKUREI-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************
