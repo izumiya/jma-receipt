@@ -364,6 +364,7 @@
       *  04.05.33    NACL-門脇    12/03/09  改正対応：外来現物給付対応
       *  04.05.34    NACL-門脇    12/03/15  千葉県地方公費対応
       *  04.05.35    NACL-門脇    12/03/23  熊本県地方公費対応
+      *  04.05.36    NACL-門脇    12/04/27  大阪府地方公費＋長期対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -23421,10 +23422,17 @@
        23057-TOKUSYU-SANTEI4-SEC           SECTION.
       *
            IF    FLG-ZENKI-TOKUREI  =  1
-             COMPUTE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
-                                   =  WK-ZENGAKU  *  0.2
-             COMPUTE  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
-                                   =  WK-ZENGAKU  *  0.2
+             IF   WK-1001-PREFNUM   =  27
+               COMPUTE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                     =  WK-ZENGAKU  *  0.1
+               COMPUTE  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                     =  WK-ZENGAKU  *  0.1
+             ELSE
+               COMPUTE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
+                                     =  WK-ZENGAKU  *  0.2
+               COMPUTE  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
+                                     =  WK-ZENGAKU  *  0.2
+             END-IF
            ELSE
              IF  COMB-HKNNUM        =  SPACE
                COMPUTE  LNK-SYU-KOH-COMPFTN(KOH-IDX)
