@@ -1765,7 +1765,13 @@
                IF     (WRK-COM-INPUTCD(IDX-Z)  =   TBL-CHISRYCD1
                                                OR  TBL-CHISRYCD2
                                                OR  TBL-CHISRYCD3 )
-                   MOVE    1                   TO  FLG-ARI
+                   IF     (IDX-SYU         NOT =   ZERO )
+      *            ∫∆ø«ª˛Œ≈Õ‹ªÿ∆≥¥…Õ˝Œ¡§Œ≤√ªª§œ•®•È°º
+                     AND  (WRK-COM-INPUTCD(IDX-SYU) =   "101120030" )
+                       MOVE    ZERO                 TO  FLG-ARI
+                   ELSE
+                       MOVE    1                   TO  FLG-ARI
+                   END-IF
                END-IF
       *        £±π‘Ã‹§ÚºÍµª§»§π§Î
                IF     (FLG-ARI             =   1    )  AND
