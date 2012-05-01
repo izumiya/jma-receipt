@@ -182,6 +182,14 @@
            COPY    "CPK02SPASCR.INC"  REPLACING
                                        //SPA-// BY //HZN-//.
       *
+      *H24.5
+      *    ª˛¥÷≥∞¬–±˛≤√ªª£≤° √œ∞Ë∞ÂŒ≈π◊∏•≤√ªª£≤°À
+           03  TBL-CHISRYCD2       PIC X(09)   VALUE   "112015670".
+      *    ª˛¥÷≥∞¬–±˛≤√ªª£±
+           03  TBL-CHISRYCD1       PIC X(09)   VALUE   "112016070".
+      *    ª˛¥÷≥∞¬–±˛≤√ªª£≥
+           03  TBL-CHISRYCD3       PIC X(09)   VALUE   "112016170".
+      *
       *****************************************************************
       *    œ¢ÕÌ°°ŒŒ∞Ë
       *****************************************************************
@@ -2436,6 +2444,23 @@
                        END-IF
                    END-IF
       *********END-IF
+      *H24.5
+               IF     (SPA-HKNKBN          =   1   )
+                 AND  (SPA-RSI-HKNKBN      =   "4" )
+      *        º´«Â¿’§Œ√œ∞Ë∞ÂŒ≈π◊∏•≤√ªª
+                   IF     (SPA-COM-INPUTCD(IDX)    =   TBL-CHISRYCD1
+                                                   OR  TBL-CHISRYCD2
+                                                   OR  TBL-CHISRYCD3 )
+                       IF     (IDX             >   1 )  AND
+                              (SPA-GMN-INPUTCD(IDX - 1)(1:4)
+                                               =   ".120")
+                           MOVE    1           TO  FLG-ARI
+      *                    ºÍµªŒ¡§»§π§Î
+                           MOVE    1               TO  FLG-SYUGI
+                       END-IF
+                   END-IF
+               END-IF
+      *!!
       *        ∆˛±°≈¿≈©§«ø«Œ≈ºÔ Ã§¨∆˛Œœ§µ§Ï§∆§§§Î§≥§»
                IF      SPA-NYUGAIKBN           =   "1"
                    IF      (SPA-COM-TNSSRYSYUKBN (IDX) =   "300" OR

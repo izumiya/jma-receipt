@@ -1195,9 +1195,30 @@
                IF     (WRK-COM-SRYKBN (IDX-Z)  =   "12"
                                                OR  "11" )
                  AND  (WRK-KBN2            NOT =   "D"  )
+      *****        INITIALIZE              WRK-GMN-TBLREC(IDX-Z)
+      *****        INITIALIZE              WRK-COM-TBLREC(IDX-Z)
+                   MOVE    1               TO  FLG-DEL
+               END-IF
+      *
+      *H24.5
+      *        œ´∫“
+               IF     (SPA-HKNKBN          =   1   )
+      *            º´«Â¿’§Œ√œ∞Ë∞ÂŒ≈π◊∏•≤√ªª
+                   IF      (SPA-RSI-HKNKBN     =   "4"   )
+                   AND     (WRK-COM-INPUTCD(IDX-Z) =   TBL-CHISRYCD1
+                                                   OR  TBL-CHISRYCD2
+                                                   OR  TBL-CHISRYCD3 )
+                       MOVE    ZERO               TO  FLG-DEL
+                   END-IF
+      *            ∫∆ø«ª˛Œ≈Õ‹ªÿ∆≥¥…Õ˝Œ¡
+                   IF      (WRK-COM-INPUTCD(IDX-Z) =   "101120030" )
+                       MOVE    ZERO               TO  FLG-DEL
+                   END-IF
+               END-IF
+      *        ∫ÔΩ¸
+               IF      FLG-DEL             =   1
                    INITIALIZE              WRK-GMN-TBLREC(IDX-Z)
                    INITIALIZE              WRK-COM-TBLREC(IDX-Z)
-                   MOVE    1               TO  FLG-DEL
                END-IF
            END-IF
            .
@@ -1737,6 +1758,22 @@
                    MOVE    IDX-Z           TO  IDX-SYU
                END-IF
            END-IF
+      *H24.5
+           IF     (SPA-HKNKBN          =   1   )
+             AND  (SPA-RSI-HKNKBN      =   "4" )
+      *        º´«Â¿’§Œ√œ∞Ë∞ÂŒ≈π◊∏•≤√ªª
+               IF     (WRK-COM-INPUTCD(IDX-Z)  =   TBL-CHISRYCD1
+                                               OR  TBL-CHISRYCD2
+                                               OR  TBL-CHISRYCD3 )
+                   MOVE    1                   TO  FLG-ARI
+               END-IF
+      *        £±π‘Ã‹§ÚºÍµª§»§π§Î
+               IF     (FLG-ARI             =   1    )  AND
+                      (IDX-SYU             =   ZERO )
+                   MOVE    IDX-Z           TO  IDX-SYU
+               END-IF
+           END-IF
+      *
       *
            IF      FLG-ARI             =   ZERO
                MOVE    "0013"          TO  WRK-ERRCD
