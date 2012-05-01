@@ -1667,8 +1667,79 @@
       *****************************************************************
        100191-GAIRAIRIHA-ZEN-SEC            SECTION.
       *
+      *    前月分検索
+           MOVE    SPA-SRYYMD          TO  WRK-YMD
+           COMPUTE WRK-MM              =   WRK-MM   -  1
+           IF      WRK-MM              =   ZERO
+               MOVE    12                  TO  WRK-MM
+               COMPUTE WRK-YY              =   WRK-YY  -   1
+           END-IF
+      *    外来リハビリテーション診察料
+           MOVE    "113013910"         TO  WRK-SRYCD
+           PERFORM 1001912-SANTEI-KEN-SEC
+           IF      WRK-LAST-DAY    NOT =   SPACE
+               MOVE    WRK-LAST-DAY        TO  WRK-LAST-DAY1
+           END-IF
+      *
+           MOVE    "113014010"         TO  WRK-SRYCD
+           PERFORM 1001912-SANTEI-KEN-SEC
+           IF      WRK-LAST-DAY    NOT =   SPACE
+               MOVE    WRK-LAST-DAY        TO  WRK-LAST-DAY2
+           END-IF
+      *    外来放射線照射診察料
+           MOVE    "113014110"         TO  WRK-SRYCD
+           PERFORM 1001912-SANTEI-KEN-SEC
+           IF      WRK-LAST-DAY    NOT =   SPACE
+               MOVE    WRK-LAST-DAY        TO  WRK-LAST-DAY3
+           END-IF
+      *
            .
        100191-GAIRAIRIHA-ZEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    外来リハビリ前月分処理
+      *****************************************************************
+       1001912-SANTEI-KEN-SEC            SECTION.
+      *
+      *    算定履歴検索
+           MOVE    SPACE               TO  SANTEI-REC
+           INITIALIZE                  SANTEI-REC
+           MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
+           MOVE    SPA-PTID            TO  SANTEI-PTID
+           MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
+           MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+           MOVE    ZERO                TO  SANTEI-SRYKA
+           MOVE    WRK-YYMM            TO  SANTEI-SRYYM
+           MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+      *
+           MOVE    SANTEI-REC          TO  MCPDATA-REC
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 920-SANTEI-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SANTEI
+               INITIALIZE                  SANTEI-REC
+           END-IF
+           MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    直近の算定日
+           MOVE    SPACE               TO  WRK-LAST-DAY
+           PERFORM VARYING     IDX-Y3  FROM  31  BY  -1
+                   UNTIL      (IDX-Y3  <     1   )
+                          OR  (FLG-SANTEI    =   1   )
+               IF      SANTEI-DAY (IDX-Y3) >   ZERO
+                   MOVE    IDX-Y3          TO  WRK-RDD
+                   MOVE    WRK-RDD         TO  WRK-LAST-DD
+                   MOVE    SANTEI-SRYYM    TO  WRK-LAST-YM
+               END-IF
+           END-PERFORM
+           .
+       1001912-SANTEI-KEN-EXT.
            EXIT.
       *H24.4 改正
       *!!
