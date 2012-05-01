@@ -1100,7 +1100,7 @@
                    AND     (WRK-COM-INPUTCD(IDX-Z) =   TBL-CHISRYCD1
                                                    OR  TBL-CHISRYCD2
                                                    OR  TBL-CHISRYCD3 )
-                       MOVE    ZERO               TO  FLG-DEL
+                       MOVE    ZERO                TO  FLG-DEL
                    END-IF
       *            再診時療養指導管理料
                    IF      (WRK-COM-INPUTCD(IDX-Z) =   "101120030" )
@@ -1562,6 +1562,7 @@
       *
       *    加算データの時、前に手技料があること
            MOVE    ZERO                TO  FLG-ARI
+           MOVE    ZERO                TO  FLG-ARIOK
            PERFORM VARYING     IDX1    FROM    1   BY  1
                    UNTIL       IDX1    >=  IDX-Z
                IF     (WRK-COM-INPUTCD(IDX1)(1:1)  =   "1" )  AND
@@ -1612,7 +1613,13 @@
                IF     (WRK-COM-INPUTCD(IDX-Z)  =   TBL-CHISRYCD1
                                                OR  TBL-CHISRYCD2
                                                OR  TBL-CHISRYCD3 )
-                   MOVE    1                   TO  FLG-ARI
+                   IF     (IDX-SYU         NOT =   ZERO )
+      *            再診時療養指導管理料の加算はエラー
+                     AND  (WRK-COM-INPUTCD(IDX-SYU) =   "101120030" )
+                       MOVE    ZERO                 TO  FLG-ARI
+                   ELSE
+                       MOVE    1                   TO  FLG-ARI
+                   END-IF
                END-IF
       *        １行目を手技とする
                IF     (FLG-ARI             =   1    )  AND

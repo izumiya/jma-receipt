@@ -224,6 +224,15 @@
       *画面最大行
       *01  WRK-GYO-MAX                 PIC 9(04)   VALUE   400.
       *
+      *H24.5
+       01  CONS-AREA.
+      *    時間外対応加算１
+           03  TBL-CHISRYCD1       PIC X(09)   VALUE   "112016070".
+      *    時間外対応加算２
+           03  TBL-CHISRYCD2       PIC X(09)   VALUE   "112015670".
+      *    時間外対応加算３
+           03  TBL-CHISRYCD3       PIC X(09)   VALUE   "112016170".
+      *
       *    小児科外来診察料テーブル
            COPY   "CMSYONIKATBL.INC".
       *
@@ -1489,6 +1498,20 @@
                                            =   "199000210"
                                            OR  "199000410" )
                MOVE    1                   TO  FLG-SYUBETU
+           END-IF
+      *H24.5
+      *    自賠責
+           IF     (SPA-HKNKBN          =   1   )
+             AND  (SPA-RSI-HKNKBN      =   "4" )
+      *        再診料で時間外対応加算の時
+               IF     (LNK-WKSRY-SRYSYUKBN(IDX)(1:2)
+                                           =   "12"  ) AND
+                      (LNK-WKSRY-SRYCD (IDX IDY)
+                                           =   TBL-CHISRYCD1
+                                           OR  TBL-CHISRYCD2
+                                           OR  TBL-CHISRYCD3 )
+                   MOVE    1                   TO  FLG-SYUBETU
+               END-IF
            END-IF
       *
       *    自動発生の展開分
