@@ -548,6 +548,7 @@
       *  04.05.55    NACL-ÌçÏÆ    12/04/25  Ê¡²¬»ÔÃÏÊý¸øÈñÂÐ±þ
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
+      *  04.05.56    NACL-ÌçÏÆ    12/05/01  ¸º¡Ê³ä¡Ë·×»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1418,6 +1419,7 @@
            03  WRK-BIRTHDAY                    PIC X(08).
       *
            03  WK-GENGAKUKBN                   PIC  9(01).
+           03  WK-GENGAKUKBN-KEISAN            PIC  9(01).
            03  WK-GENGAKU-KOHID                PIC  9(10).
            03  WK-GENGAKU-RITU                 PIC  9(03).
            03  WK-GENGAKU-RITUX                PIC  9(03).
@@ -3258,6 +3260,7 @@
        2110-GENGAKU-HANTEI-SEC      SECTION.
       *
            MOVE     ZERO     TO     WK-GENGAKUKBN
+           MOVE     ZERO     TO     WK-GENGAKUKBN-KEISAN
            MOVE     ZERO     TO     WK-GENGAKU-KOHID
            MOVE     ZERO     TO     WK-GENGAKU-RITU
            MOVE     ZERO     TO     WK-GENGAKU-KIN
@@ -3499,6 +3502,11 @@
                         IF     PTKOH-JKYSNUM(1:1)  = "2"
                           MOVE   2           TO  WK-GENGAKU-KTKBN
                         END-IF
+                      END-IF
+      *
+                      IF  (WK-GENGAKUKBN       =  1 )
+                      AND (PTKOH-FTNJANUM(1:1) = "1")
+                          MOVE   1           TO  WK-GENGAKUKBN-KEISAN
                       END-IF
       *
                       MOVE       1           TO  FLG-PTKOHINF
@@ -14522,6 +14530,7 @@
        2104426-ICHIBUFTN-GEN-SEC               SECTION.
       *
            IF   WK-GENGAKUKBN    NOT =   ZERO
+           AND  WK-GENGAKUKBN-KEISAN =   ZERO
       *
               COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
                                   * 10
@@ -15936,8 +15945,7 @@
                                        *  RECE62-KYURATE
                                        /  100
       *
-      **      IF    WK-GENGAKUKBN   =  3  OR  4
-              IF    WK-GENGAKUKBN   NOT =  ZERO
+              IF    WK-GENGAKUKBN   =  3  OR  4
                 ADD    WRK-SKY-KEISAN   TO   RECE62-SKYIRYO-HOKENJA
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-HOKENJA
               ELSE
@@ -17215,9 +17223,10 @@
                   PERFORM   210461-KOHIHEIYO-KEISAN-SEC
                END-IF
                IF      FLG-JYOGENKBN   =   1
-                  MOVE     WRK-JYOGENKBN-TEN  TO  WRK-JYOGENKBN-TEN9
-                  PERFORM  210468-SYUHKN-JYOHEN-KEISAN-SEC
+                MOVE     WRK-JYOGENKBN-TEN  TO  WRK-JYOGENKBN-TEN9
+                PERFORM  210468-SYUHKN-JYOHEN-KEISAN-SEC
       *
+                IF  WK-GENGAKUKBN-KEISAN  =   ZERO
                   EVALUATE   WK-GENGAKUKBN
                     WHEN        1
                      IF  WK-GENGAKU-RITU = 100
@@ -17275,6 +17284,7 @@
                     COMPUTE  WRK-HOKENICHIBUGAK =
                              WRK-HOKENICHIBUGAK * 10
                   END-IF
+                END-IF
                END-IF
       *
                MOVE    9999999    TO   WRK-CHK-KINGAKU
@@ -18888,6 +18898,7 @@
                                                WRK-JYOGEN-KOH2
       ****
            IF    WK-GENGAKUKBN    NOT =  ZERO
+           AND   WK-GENGAKUKBN-KEISAN =  ZERO
             IF  ((RECE62-KOHNUM(KOHFTN-IDX)      = "051") AND
                  (TBL-DOTANDOKU-FLG(KOHFTN-IDX)  =   1  ))
             OR  ((WRK-PREFNUM                    = "13" ) AND
@@ -19202,6 +19213,7 @@
            END-EVALUATE
       *
            IF   WK-GENGAKUKBN    NOT =   ZERO
+           AND  WK-GENGAKUKBN-KEISAN =   ZERO
              EVALUATE   WK-GENGAKUKBN
                WHEN        1
                  IF  WK-GENGAKU-RITU = 100
@@ -21171,8 +21183,8 @@
                      MOVE     1            TO  FLG-KGK
                    END-IF
       *
-                   IF  (WK-GENGAKUKBN         =   ZERO)
-                   AND (WRK-SKY-ZENGAKU-KOH   =   ZERO)
+                   IF  (WK-GENGAKUKBN     NOT =  3 AND 4 )
+                   AND (WRK-SKY-ZENGAKU-KOH   =   ZERO   )
                      COMPUTE  WRK-SKY-KEISAN  = WRK-SKY-ZENGAKU
                                               - WRK-SKY-HOKENJA
                      IF   WRK-SKY-KEISAN   >  WRK-SKY-FTNMONEY
