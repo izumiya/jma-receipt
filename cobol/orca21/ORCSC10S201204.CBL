@@ -1736,6 +1736,7 @@
                    MOVE    IDX-Y3          TO  WRK-RDD
                    MOVE    WRK-RDD         TO  WRK-LAST-DD
                    MOVE    SANTEI-SRYYM    TO  WRK-LAST-YM
+                   MOVE    1               TO  IDX-Y3
                END-IF
            END-PERFORM
            .
