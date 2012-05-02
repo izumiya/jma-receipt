@@ -5874,6 +5874,8 @@
       *    診察料を算定中かの判定
            IF     (SPA-SYORIFLG        =   1    )
                OR (LNK-SC10S-SYORI     =   "S"  )
+      *H24.5
+               OR (LNK-SC10S-SYORI     =   "J"  )
       *        時間外なし
                IF      SPA-SYORIFLG        =   1
                    MOVE    1                   TO  FLG-JIKANKBN
