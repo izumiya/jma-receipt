@@ -5493,6 +5493,15 @@
                GO      TO      410121-HKNCOMBI-SAI-EXT
            END-IF
       *
+      *!!!!
+      *H24.5
+           IF     (SPA-MAE-HKNCOMBINUM =   "0000" )
+             AND  (SPA-SRYYMD          >=  "20120401" )
+      *    前保険組合せがゼロの時、老人区分の変更なし
+               MOVE    SPA-NAI-ROUJIN      TO  SPA-MAE-ROUJIN
+           END-IF
+      *!!
+      *
       *    保険区分が変更された時、再編集を行う
            IF     (SPA-HKNKBN          =   SPA-MAE-HKNKBN  )  AND
                   (SPA-HKNKBN          =   ZERO            )  AND
