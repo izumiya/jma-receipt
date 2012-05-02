@@ -560,6 +560,7 @@
       *  04.05.47    NACL-門脇    12/04/25  福岡市地方公費対応
       *                                     社保分保険欄一部負担金記載
       *                                     一律一般の金額で記載
+      *  04.05.48    NACL-門脇    12/05/01  減（割）計算対応
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -1270,6 +1271,7 @@
            03  WRK-BIRTHDAY                    PIC X(08).
       *
            03  WK-GENGAKUKBN                   PIC  9(01).
+           03  WK-GENGAKUKBN-KEISAN            PIC  9(01).
            03  WK-GENGAKU-KOHID                PIC  9(10).
            03  WK-GENGAKU-RITU                 PIC  9(03).
            03  WK-GENGAKU-RITUX                PIC  9(03).
@@ -3694,6 +3696,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
        2117-GENGAKU-HANTEI-SEC      SECTION.
       *
            MOVE     ZERO     TO     WK-GENGAKUKBN
+           MOVE     ZERO     TO     WK-GENGAKUKBN-KEISAN
            MOVE     ZERO     TO     WK-GENGAKU-KOHID
            MOVE     ZERO     TO     WK-GENGAKU-RITU
            MOVE     ZERO     TO     WK-GENGAKU-KIN
@@ -3934,6 +3937,11 @@ grpsys        MOVE  RECE02-HOSPNUM    TO  LNK-ORCSJGNGET-HOSPNUM
                         IF     PTKOH-JKYSNUM(1:1)  = "2"
                           MOVE   2           TO  WK-GENGAKU-KTKBN
                         END-IF
+                      END-IF
+      *
+                      IF  (WK-GENGAKUKBN       =  1 )
+                      AND (PTKOH-FTNJANUM(1:1) = "1")
+                          MOVE   1           TO  WK-GENGAKUKBN-KEISAN
                       END-IF
       *
                       MOVE       1           TO  FLG-PTKOHINF
@@ -11615,6 +11623,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
        2105215-ICHIBUFTN-GEN-SEC               SECTION.
       *
            IF   WK-GENGAKUKBN    NOT =   ZERO
+           AND  WK-GENGAKUKBN-KEISAN =   ZERO
       *
               COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
                                   * 10
@@ -12508,8 +12517,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        *  RECE02-KYURATE
                                        /  100
       *
-      **      IF    WK-GENGAKUKBN   =  3  OR  4
-              IF    WK-GENGAKUKBN   NOT =  ZERO
+              IF    WK-GENGAKUKBN   =  3  OR  4
                 ADD    WRK-SKY-KEISAN   TO   RECE02-SKYIRYO-HOKENJA
                 ADD    WRK-SKY-KEISAN   TO   WRK-SKY-HOKENJA
               ELSE
@@ -12894,9 +12902,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   PERFORM   21091-KOHIHEIYO-KEISAN-SEC
                END-IF
                IF      FLG-JYOGENKBN   =   1
-                  MOVE     WRK-JYOGENKBN-TEN  TO  WRK-JYOGENKBN-TEN9
-                  PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
+                MOVE     WRK-JYOGENKBN-TEN  TO  WRK-JYOGENKBN-TEN9
+                PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
       *
+                IF  WK-GENGAKUKBN-KEISAN  =   ZERO
                   EVALUATE   WK-GENGAKUKBN
                     WHEN        1
                      IF  WK-GENGAKU-RITU = 100
@@ -12954,6 +12963,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     COMPUTE  WRK-HOKENICHIBUGAK =
                              WRK-HOKENICHIBUGAK * 10
                   END-IF
+                END-IF
                END-IF
       *
                MOVE    9999999    TO   WRK-CHK-KINGAKU
@@ -13285,7 +13295,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            AND    (RECE02-ZAITAKU  =  "1"     )
       *
                IF      FLG-JYOGENKBN   =   1
-                  PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
+                PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
+                IF  WK-GENGAKUKBN-KEISAN  =   ZERO
                   EVALUATE   WK-GENGAKUKBN
                     WHEN        1
                      IF  WK-GENGAKU-RITU = 100
@@ -13372,6 +13383,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     COMPUTE  WRK-KOH-GAI-GEN70-Z =
                              WRK-KOH-GAI-GEN70-Z * 10
                   END-IF
+                END-IF
                END-IF
       *
                MOVE    9999999    TO   WRK-CHK-KINGAKU
@@ -15098,6 +15110,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                           TO   WRK-JYOGEN-KOH
       ****
            IF    WK-GENGAKUKBN    NOT =  ZERO
+           AND   WK-GENGAKUKBN-KEISAN =  ZERO
             IF  ((RECE02-KOHNUM(KOHFTN-IDX)      = "051") AND
                  (TBL-DOTANDOKU-FLG(KOHFTN-IDX)  =   1  ))
             OR  ((SYS-1001-PREFNUM               =  13  ) AND
@@ -15359,6 +15372,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-EVALUATE
       *
            IF   WK-GENGAKUKBN    NOT =   ZERO
+           AND  WK-GENGAKUKBN-KEISAN =   ZERO
              EVALUATE   WK-GENGAKUKBN
                WHEN        1
                  IF  WK-GENGAKU-RITU = 100
@@ -17065,8 +17079,8 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                      MOVE     1            TO  FLG-KGK
                    END-IF
       *
-                   IF  (WK-GENGAKUKBN         =   ZERO)
-                   AND (WRK-SKY-ZENGAKU-KOH   =   ZERO)
+                   IF  (WK-GENGAKUKBN     NOT =  3 AND 4 )
+                   AND (WRK-SKY-ZENGAKU-KOH   =   ZERO   )
                      COMPUTE  WRK-SKY-KEISAN  = WRK-SKY-ZENGAKU
                                               - WRK-SKY-HOKENJA
                      IF   WRK-SKY-KEISAN   >  WRK-SKY-FTNMONEY
