@@ -366,6 +366,10 @@
       *  04.05.35    NACL-門脇    12/03/23  熊本県地方公費対応
       *  04.05.36    NACL-門脇    12/04/27  大阪府地方公費＋長期対応
       *  04.05.37    NACL-門脇    12/05/01  減（割）計算対応
+      *  04.05.38    NACL-門脇    12/05/02  現物給付（高齢者）＋長期
+      *                                     ・低所得者の計算修正
+      *                                     ・一括再計算メッセージ表示の対
+      *                                       象外とする
       *
       *  04.06.01    NACL-門脇    10/09/02  出産育児一時金直接支払制度（外来）
       *  04.06.02    NACL-門脇    10/11/08  主保険＋マル長の請求対応
@@ -4538,7 +4542,13 @@
            ELSE
               MOVE   35400       TO     WK-SEIHO-GENDO70
            END-IF
-           MOVE      10000       TO     WK-CYOKI-GENDO
+      *
+           IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
+           AND  (FLG-SANSHOU3              NOT =  SPACE)
+             MOVE     8000       TO     WK-CYOKI-GENDO
+           ELSE
+             MOVE    10000       TO     WK-CYOKI-GENDO
+           END-IF
            MOVE      20000       TO     WK-CYOKI-GENDO2
       *
            COMPUTE  WK-KOH-GENDOGAKU-TOKU75   = 
@@ -15422,7 +15432,14 @@
       **>             MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
       **>             MOVE    ZERO TO  WK-ENTANI
       **>             MOVE    1    TO  FLG-TAISYO
-                      MOVE    3    TO  WK-SYUNOU-GENBUTU70-MSG
+                      IF  (COMB-KOH1HKNNUM  = "972" OR "974")
+                      AND (COMB-KOH2HKNNUM  = SPACE         )
+                      AND (COMB-KOH3HKNNUM  = SPACE         )
+                      AND (COMB-KOH4HKNNUM  = SPACE         )
+                        CONTINUE
+                      ELSE
+                        MOVE  3    TO  WK-SYUNOU-GENBUTU70-MSG
+                      END-IF
                     END-IF
                END-IF
                ADD   WK-SYU-SYUCOMPFTN      TO  FTN-SYU-M
@@ -15465,7 +15482,14 @@
       **>                MOVE    ZERO TO  WK-SYU-SYUCOMPFTN
       **>                MOVE    ZERO TO  WK-ENTANI
       **>                MOVE    1    TO  FLG-TAISYO
-                         MOVE    3    TO  WK-SYUNOU-GENBUTU70-MSG
+                         IF  (COMB-KOH1HKNNUM  = "972" OR "974")
+                         AND (COMB-KOH2HKNNUM  = SPACE         )
+                         AND (COMB-KOH3HKNNUM  = SPACE         )
+                         AND (COMB-KOH4HKNNUM  = SPACE         )
+                           CONTINUE
+                         ELSE
+                           MOVE  3    TO  WK-SYUNOU-GENBUTU70-MSG
+                         END-IF
                        END-IF
                  END-IF
                  ADD   WK-SYU-SYUCOMPFTN       TO  FTN-SYU-M
