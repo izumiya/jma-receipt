@@ -213,6 +213,9 @@
       *                                     「その他」の対応
       *                                     労災再診（同一日２科目）対応
       *                                     コメント差込
+      *  04.05.11    NACL-門脇    12/05/01  平成２４年４月改正
+      *                                     自賠責
+      *                                     再診の点数集計と回数編集対応
       *
       *  04.06.01    NACL-門脇    10/07/01  自賠責文書料レセプト摘要欄記載
       *                                     （１通時）対応
@@ -1072,6 +1075,15 @@
            03  CONS-DOUJITU-DEN      PIC X(09)  VALUE  "112015950".
       *    外来診療料（同一日２科目）
            03  CONS-DOUJITU-GAI      PIC X(09)  VALUE  "112016210".
+      *
+      *    時間外対応加算１
+           03  CONS-JIKANTAI1        PIC X(09)  VALUE  "112016070".
+      *    時間外対応加算２
+           03  CONS-JIKANTAI2        PIC X(09)  VALUE  "112015670".
+      *    時間外対応加算３
+           03  CONS-JIKANTAI3        PIC X(09)  VALUE  "112016170".
+      *    明細書発行体制等加算
+           03  CONS-MESAIKSN         PIC X(09)  VALUE  "112015770".
       *
       *    剤の診療内容チェックテーブル
        01  TBL-ZAICHECK-AREA.
@@ -5263,7 +5275,11 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                              CONS-ROUSAI6  OR
                                              CONS-ROUSAI7  OR
                                              CONS-ROUSAI19
-                         ADD   WK-ZAIKAISU      TO   RECE41-KAISU2(2)
+                         IF  SRY-SRYCD(IDX3) = CONS-ROUSAI19
+                           CONTINUE
+                         ELSE
+                           ADD    WK-ZAIKAISU   TO   RECE41-KAISU2(2)
+                         END-IF
                          COMPUTE    RECE41-KINGAKU2(2)  =
                                     RECE41-KINGAKU2(2)  +
                                    (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
@@ -5865,6 +5881,18 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                     WRK-KINGAKU-JI   +
                                (WRK-TNS-TEN(IDX3)    * ACCT-ZAIKAISU)
                      ELSE
+                      IF  (SRY-SRYCD(IDX3) =  CONS-JIKANTAI1  OR
+                                              CONS-JIKANTAI2  OR
+                                              CONS-JIKANTAI3  OR
+                                              CONS-MESAIKSN     )
+                      AND (RECE41-SRYYM   >=  "201204"          )
+                         COMPUTE    RECE41-TENSU(8)   =
+                                    RECE41-TENSU(8)   +
+                                   (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                         COMPUTE    TBL-SYUTEN-JI(8)  =
+                                    TBL-SYUTEN-JI(8)  +
+                                   (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                      ELSE
       **                 IF ( SRY-SRYCD(IDX3)     =   CONS-KEIZOKU1  OR
       **                                              CONS-KEIZOKU2 )
       **                 OR ( WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"  )
@@ -5891,6 +5919,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                          COMPUTE    TBL-SYUTEN-JI(2)  =
                                     TBL-SYUTEN-JI(2)  +
                                    (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                      END-IF
                      END-IF
       *      （外来管理加算）
                     WHEN  122
@@ -5992,6 +6021,29 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                    EVALUATE  WRK-TNS-GAITENTTLKBN(IDX3)
       *      （基本手技）
                     WHEN  120
+                      IF    SRY-SRYCD(IDX3) =  CONS-DOUJITU-SAI OR
+                                               CONS-DOUJITU-DEN OR
+                                               CONS-DOUJITU-GAI
+                        ADD   WK-ZAIKAISU  TO  CNT-SAISIN-DOUJITU
+                        COMPUTE    RECE41-TENSU(2)   =
+                                   RECE41-TENSU(2)   +
+                                  (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                        COMPUTE    TBL-SYUTEN-JI(2)  =
+                                   TBL-SYUTEN-JI(2)  +
+                                  (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                      ELSE
+                       IF  (SRY-SRYCD(IDX3) =  CONS-JIKANTAI1   OR
+                                               CONS-JIKANTAI2   OR
+                                               CONS-JIKANTAI3   OR
+                                               CONS-MESAIKSN      )
+                       AND (RECE41-SRYYM   >=  "201204"           )
+                        COMPUTE    RECE41-TENSU(8)   =
+                                   RECE41-TENSU(8)   +
+                                  (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                        COMPUTE    TBL-SYUTEN-JI(8)  =
+                                   TBL-SYUTEN-JI(8)  +
+                                  (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                       ELSE
                         IF   RECE41-SRYYM  >= "200604"
                           IF  SRY-SRYCD(IDX3)  =  "112000970" OR
                                                   "112006270"
@@ -6005,13 +6057,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                             CONTINUE
                         ELSE
                             ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
-                            IF    SRY-SRYCD(IDX3)   =  CONS-DOUJITU-SAI
-                                                   OR  CONS-DOUJITU-DEN
-                                                   OR  CONS-DOUJITU-GAI
-                              ADD WK-ZAIKAISU  TO   CNT-SAISIN-DOUJITU
-                            ELSE
-                              ADD WK-ZAIKAISU  TO   CNT-SAISIN-ETC
-                            END-IF
+                            ADD   WK-ZAIKAISU  TO   CNT-SAISIN-ETC
                         END-IF
                         IF  WRK-PARA-JIBAIPRTKBN = "1"
                           IF    RECE41-KHNTEN(2)   =   ZERO
@@ -6029,6 +6075,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                         COMPUTE    TBL-SYUTEN-JI(2)  =
                                    TBL-SYUTEN-JI(2)  +
                                   (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                       END-IF
+                      END-IF
       *      （外来管理加算）
                     WHEN  122
                         IF  WRK-PARA-JIBAIPRTKBN = "1"
