@@ -549,6 +549,7 @@
       *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
       *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *  04.05.56    NACL-ÌçÏÆ    12/05/01  ¸º¡Ê³ä¡Ë·×»»ÂÐ±þ
+      *  04.05.57    NACL-ÌçÏÆ    12/05/06  ¼ÂÆü¿ô¡¦ÀÁµáÅÀµ­ºÜ¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12268,6 +12269,22 @@
               IF   (RECE62-HKNCOMBI(2)   NOT =   ZERO)
               AND  (WRK-KOHCNT               >    1  )
                      MOVE     "1"       TO      RECE62-JSKISAIFLG
+              END-IF
+      *
+              IF   (RECE62-JSKISAIFLG   =   "1" )
+              AND  (RECE62-HKNCOMBI(3)  =   ZERO)
+                 IF  (RECE62-HKNNUMHC(1)   NOT =  SPACE               )
+                 AND (RECE62-HKNNUMHC(2)   NOT =  SPACE               )
+                 AND (RECE62-KOHNUMHC(1 1)     =  RECE62-KOHNUMHC(2 1))
+                 AND (RECE62-KOHIDHC (1 1)     =  RECE62-KOHIDHC (2 1))
+                 AND (RECE62-KOHNUMHC(1 2)     =  RECE62-KOHNUMHC(2 2))
+                 AND (RECE62-KOHIDHC (1 2)     =  RECE62-KOHIDHC (2 2))
+                 AND (RECE62-KOHNUMHC(1 3)     =  RECE62-KOHNUMHC(2 3))
+                 AND (RECE62-KOHIDHC (1 3)     =  RECE62-KOHIDHC (2 3))
+                 AND (RECE62-KOHNUMHC(1 4)     =  RECE62-KOHNUMHC(2 4))
+                 AND (RECE62-KOHIDHC (1 4)     =  RECE62-KOHIDHC (2 4))
+                     MOVE     SPACE     TO      RECE62-JSKISAIFLG
+                 END-IF
               END-IF
            END-IF
       *
