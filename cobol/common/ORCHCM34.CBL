@@ -6090,14 +6090,14 @@
                GO  TO  210-WRK-SRYACT-TBL-HEN-EXT
            END-IF
       *
-           IF    ( WRK-SRYACT-PNT  <=  1 )
-               COMPUTE WRK-SRYACT-MAX  =   WRK-SRYACT-MAX  -   1
-           END-IF
-      *
            MOVE    WRK-SRYACT-STR  TO  WRK-STR
            PERFORM 800-STRLEN-CHK-SEC
            IF    ( WRK-STRLEN  <=  ZERO )
                GO  TO  210-WRK-SRYACT-TBL-HEN-EXT
+           END-IF
+      *
+           IF    ( WRK-SRYACT-PNT  <=  1 )
+               COMPUTE WRK-SRYACT-MAX  =   WRK-SRYACT-MAX  -   1
            END-IF
       *
            PERFORM VARYING IDX6    FROM    1   BY  CONST-SRYACT-LEN
