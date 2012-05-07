@@ -561,6 +561,7 @@
       *                                     社保分保険欄一部負担金記載
       *                                     一律一般の金額で記載
       *  04.05.48    NACL-門脇    12/05/01  減（割）計算対応
+      *  04.05.49    NACL-門脇    12/05/06  実日数・請求点記載フラグ編集修正
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -2575,6 +2576,22 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
               IF   (RECE02-HKNCOMBI(2)   NOT =   ZERO)
               AND  (WRK-KOHCNT               >    1  )
                   MOVE     "1"    TO    RECE02-JSKISAIFLG
+              END-IF
+      *
+              IF   (RECE02-JSKISAIFLG   =   "1" )
+              AND  (RECE02-HKNCOMBI(3)  =   ZERO)
+                 IF  (RECE02-HKNNUMHC(1)   NOT =  SPACE               )
+                 AND (RECE02-HKNNUMHC(2)   NOT =  SPACE               )
+                 AND (RECE02-KOHNUMHC(1 1)     =  RECE02-KOHNUMHC(2 1))
+                 AND (RECE02-KOHIDHC (1 1)     =  RECE02-KOHIDHC (2 1))
+                 AND (RECE02-KOHNUMHC(1 2)     =  RECE02-KOHNUMHC(2 2))
+                 AND (RECE02-KOHIDHC (1 2)     =  RECE02-KOHIDHC (2 2))
+                 AND (RECE02-KOHNUMHC(1 3)     =  RECE02-KOHNUMHC(2 3))
+                 AND (RECE02-KOHIDHC (1 3)     =  RECE02-KOHIDHC (2 3))
+                 AND (RECE02-KOHNUMHC(1 4)     =  RECE02-KOHNUMHC(2 4))
+                 AND (RECE02-KOHIDHC (1 4)     =  RECE02-KOHIDHC (2 4))
+                     MOVE  SPACE  TO    RECE02-JSKISAIFLG
+                 END-IF
               END-IF
            END-IF
       *

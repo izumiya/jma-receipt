@@ -548,6 +548,7 @@
       *                                     社保分保険欄一部負担金記載
       *                                     一律一般の金額で記載
       *  04.05.56    NACL-門脇    12/05/01  減（割）計算対応
+      *  04.05.57    NACL-門脇    12/05/06  実日数・請求点記載フラグ編集修正
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -12185,6 +12186,22 @@
               IF   (RECE62-HKNCOMBI(2)   NOT =   ZERO)
               AND  (WRK-KOHCNT               >    1  )
                      MOVE     "1"       TO      RECE62-JSKISAIFLG
+              END-IF
+      *
+              IF   (RECE62-JSKISAIFLG   =   "1" )
+              AND  (RECE62-HKNCOMBI(3)  =   ZERO)
+                 IF  (RECE62-HKNNUMHC(1)   NOT =  SPACE               )
+                 AND (RECE62-HKNNUMHC(2)   NOT =  SPACE               )
+                 AND (RECE62-KOHNUMHC(1 1)     =  RECE62-KOHNUMHC(2 1))
+                 AND (RECE62-KOHIDHC (1 1)     =  RECE62-KOHIDHC (2 1))
+                 AND (RECE62-KOHNUMHC(1 2)     =  RECE62-KOHNUMHC(2 2))
+                 AND (RECE62-KOHIDHC (1 2)     =  RECE62-KOHIDHC (2 2))
+                 AND (RECE62-KOHNUMHC(1 3)     =  RECE62-KOHNUMHC(2 3))
+                 AND (RECE62-KOHIDHC (1 3)     =  RECE62-KOHIDHC (2 3))
+                 AND (RECE62-KOHNUMHC(1 4)     =  RECE62-KOHNUMHC(2 4))
+                 AND (RECE62-KOHIDHC (1 4)     =  RECE62-KOHIDHC (2 4))
+                     MOVE     SPACE     TO      RECE62-JSKISAIFLG
+                 END-IF
               END-IF
            END-IF
       *
