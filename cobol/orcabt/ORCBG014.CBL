@@ -314,6 +314,10 @@
                05  WRK-SYY             PIC 9(04).
                05  WRK-SMM             PIC 9(02).
                05  WRK-SDD             PIC 9(02).
+           03  WRK-SYMD2.
+               05  WRK-SYY2            PIC 9(02).
+               05  WRK-SMM2            PIC 9(02).
+               05  WRK-SDD2            PIC 9(02).
            03  WRK-HENYMDG             PIC X(22).
            03  WRK-DENPYMD             PIC X(16).
            03  WRK-PRTYMD              PIC X(09).
@@ -3704,8 +3708,13 @@
        5002-HIZUKE-CHK-SEC         SECTION.
       *
       *    日付画面チェックサブ
+           ACCEPT  WRK-SYMD2       FROM    DATE
+           MOVE    ZERO            TO  WRK-SYMD
+           MOVE    WRK-SYMD2       TO  WRK-SYMD(3:)
+           ADD     2000            TO  WRK-SYY
+      *
            INITIALIZE                  ORCSGDAYAREA
-           MOVE    WRK-SYSYMD      TO  SGDAY-INDAY
+           MOVE    WRK-SYMD        TO  SGDAY-INDAY
            CALL    "ORCSGDAY"          USING
                                        ORCSGDAYAREA
            MOVE    SGDAY-OTDAY     TO  WRK-PRTYMD
