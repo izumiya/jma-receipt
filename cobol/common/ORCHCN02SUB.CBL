@@ -153,6 +153,15 @@
            IF      LNK-ORCHCN02SUB-RC      =    ZERO
                PERFORM 200-MAIN-SEC
            END-IF
+      *     DISPLAY "SYUBETUCD(1) = " LNK-ORCHCN02SUB-SYUBETUCD(1)
+      *     DISPLAY "NISSU(1)     = " LNK-ORCHCN02SUB-NISSU(1)
+      *     DISPLAY "MEI(1)       = " LNK-ORCHCN02SUB-SYUBETUMEI(1)
+      *     DISPLAY "SYUBETUCD(2) = " LNK-ORCHCN02SUB-SYUBETUCD(2)
+      *     DISPLAY "NISSU(2)     = " LNK-ORCHCN02SUB-NISSU(2)
+      *     DISPLAY "MEI(2)       = " LNK-ORCHCN02SUB-SYUBETUMEI(2)
+      *     DISPLAY "SYUBETUCD(3) = " LNK-ORCHCN02SUB-SYUBETUCD(3)
+      *     DISPLAY "NISSU(3)     = " LNK-ORCHCN02SUB-NISSU(3)
+      *     DISPLAY "MEI(3)       = " LNK-ORCHCN02SUB-SYUBETUMEI(3)
       *
            .
        000-PROC-EXT.
@@ -432,7 +441,7 @@
       *
                IF   (NSRY-SRYCD(1)  =
                           LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX))  AND
-                    (TNS-NAME   = 
+                    (TNS-NAME(1:50)   = 
                           LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX))
                     MOVE   1      TO    FLG-MATCH
                     IF   NACCT-SRYYM  =  LNK-ORCHCN02SUB-NYUINYMD(1:6)
