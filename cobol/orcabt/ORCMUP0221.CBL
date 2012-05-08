@@ -599,8 +599,7 @@
                WHEN    10
                    IF     (ETENSU1-YUKOSTYMD   <=  ETENSUWK-YUKOEDYMD2)
                      AND  (ETENSU1-YUKOEDYMD   >=  ETENSUWK-YUKOEDYMD2)
-                       MOVE    ETENSU1-YUKOEDYMD
-                                               TO  ETENSU1-UPYUKOEDYMD
+                       MOVE    ETENSU1-KEY     TO  ETENSU1-UP-KEY
                        MOVE    ETENSUWK-YUKOEDYMD2
                                                TO  ETENSU1-YUKOEDYMD
                        MOVE    1               TO  FLG-SYORI
@@ -609,8 +608,7 @@
                WHEN    21
                    IF     (ETENSU2-YUKOSTYMD   <=  ETENSUWK-YUKOEDYMD2)
                      AND  (ETENSU2-YUKOEDYMD   >=  ETENSUWK-YUKOEDYMD2)
-                       MOVE    ETENSU2-YUKOEDYMD
-                                               TO  ETENSU2-UPYUKOEDYMD
+                       MOVE    ETENSU2-KEY     TO  ETENSU2-UP-KEY
                        MOVE    ETENSUWK-YUKOEDYMD2
                                                TO  ETENSU2-YUKOEDYMD
                        MOVE    1               TO  FLG-SYORI
@@ -618,8 +616,7 @@
                WHEN    22
                    IF     (ETNSSMP-YUKOSTYMD   <=  ETENSUWK-YUKOEDYMD2)
                      AND  (ETNSSMP-YUKOEDYMD   >=  ETENSUWK-YUKOEDYMD2)
-                       MOVE    ETNSSMP-YUKOEDYMD
-                                               TO  ETNSSMP-UPYUKOEDYMD
+                       MOVE    ETNSSMP-KEY     TO  ETNSSMP-UP-KEY
                        MOVE    ETENSUWK-YUKOEDYMD2
                                                TO  ETNSSMP-YUKOEDYMD
                        MOVE    1               TO  FLG-SYORI
@@ -630,8 +627,7 @@
                WHEN    34
                    IF     (ETENSU3-YUKOSTYMD   <=  ETENSUWK-YUKOEDYMD2)
                      AND  (ETENSU3-YUKOEDYMD   >=  ETENSUWK-YUKOEDYMD2)
-                       MOVE    ETENSU3-YUKOEDYMD
-                                               TO  ETENSU3-UPYUKOEDYMD
+                       MOVE    ETENSU3-KEY     TO  ETENSU3-UP-KEY
                        MOVE    ETENSUWK-YUKOEDYMD2
                                                TO  ETENSU3-YUKOEDYMD
                        MOVE    1               TO  FLG-SYORI
@@ -639,8 +635,7 @@
                WHEN    40
                    IF     (ETENSU4-YUKOSTYMD   <=  ETENSUWK-YUKOEDYMD2)
                      AND  (ETENSU4-YUKOEDYMD   >=  ETENSUWK-YUKOEDYMD2)
-                       MOVE    ETENSU4-YUKOEDYMD
-                                               TO  ETENSU4-UPYUKOEDYMD
+                       MOVE    ETENSU4-KEY     TO  ETENSU4-UP-KEY
                        MOVE    ETENSUWK-YUKOEDYMD2
                                                TO  ETENSU4-YUKOEDYMD
                        MOVE    1               TO  FLG-SYORI
@@ -648,8 +643,7 @@
                WHEN    50
                    IF     (ETENSU5-YUKOSTYMD   <=  ETENSUWK-YUKOEDYMD2)
                      AND  (ETENSU5-YUKOEDYMD   >=  ETENSUWK-YUKOEDYMD2)
-                       MOVE    ETENSU5-YUKOEDYMD
-                                               TO  ETENSU5-UPYUKOEDYMD
+                       MOVE    ETENSU5-KEY     TO  ETENSU5-UP-KEY
                        MOVE    ETENSUWK-YUKOEDYMD2
                                                TO  ETENSU5-YUKOEDYMD
                        MOVE    1               TO  FLG-SYORI
@@ -671,8 +665,8 @@
                      AND  (ETENSU1-YUKOEDYMD   >=  ETENSU1WK-YUKOEDYMD)
                        MOVE    ETENSU1WK-REC(26:)
                                                TO  ETENSU1-REC(26:)
-                       MOVE    ETENSU1-YUKOEDYMD
-                                               TO  ETENSU1-UPYUKOEDYMD
+                       MOVE    ETENSU1-KEY     TO  ETENSU1-UP-KEY
+                       MOVE    ETENSU1WK-KEY   TO  ETENSU1-KEY
                        MOVE    1               TO  FLG-SYORI
                    END-IF
                WHEN    20
@@ -681,8 +675,8 @@
                      AND  (ETENSU2-YUKOEDYMD   >=  ETENSU2WK-YUKOEDYMD)
                        MOVE    ETENSU2WK-REC(41:)
                                                TO  ETENSU2-REC(41:)
-                       MOVE    ETENSU2-YUKOEDYMD
-                                               TO  ETENSU2-UPYUKOEDYMD
+                       MOVE    ETENSU2-KEY     TO  ETENSU2-UP-KEY
+                       MOVE    ETENSU2WK-KEY   TO  ETENSU2-KEY
                        MOVE    1               TO  FLG-SYORI
                    END-IF
                WHEN    22
@@ -690,8 +684,8 @@
                      AND  (ETNSSMP-YUKOEDYMD   >=  ETNSSMPWK-YUKOEDYMD)
                        MOVE    ETNSSMPWK-REC(35:)
                                                TO  ETNSSMP-REC(35:)
-                       MOVE    ETNSSMP-YUKOEDYMD
-                                               TO  ETNSSMP-UPYUKOEDYMD
+                       MOVE    ETNSSMP-KEY     TO  ETNSSMP-UP-KEY
+                       MOVE    ETNSSMPWK-KEY   TO  ETNSSMP-KEY
                        MOVE    1               TO  FLG-SYORI
                    END-IF
                WHEN    31
@@ -702,8 +696,8 @@
                      AND  (ETENSU3-YUKOEDYMD   >=  ETENSU3WK-YUKOEDYMD)
                        MOVE    ETENSU3WK-REC(35:)
                                                TO  ETENSU3-REC(35:)
-                       MOVE    ETENSU3-YUKOEDYMD
-                                               TO  ETENSU3-UPYUKOEDYMD
+                       MOVE    ETENSU3-KEY     TO  ETENSU3-UP-KEY
+                       MOVE    ETENSU3WK-KEY   TO  ETENSU3-KEY
                        MOVE    1               TO  FLG-SYORI
                    END-IF
                WHEN    40
@@ -711,8 +705,8 @@
                      AND  (ETENSU4-YUKOEDYMD   >=  ETENSU4WK-YUKOEDYMD)
                        MOVE    ETENSU4WK-REC(29:)
                                                TO  ETENSU4-REC(29:)
-                       MOVE    ETENSU4-YUKOEDYMD
-                                               TO  ETENSU4-UPYUKOEDYMD
+                       MOVE    ETENSU4-KEY     TO  ETENSU4-UP-KEY
+                       MOVE    ETENSU4WK-KEY   TO  ETENSU4-KEY
                        MOVE    1               TO  FLG-SYORI
                    END-IF
                WHEN    50
@@ -720,8 +714,8 @@
                      AND  (ETENSU5-YUKOEDYMD   >=  ETENSU5WK-YUKOEDYMD)
                        MOVE    ETENSU5WK-REC(29:)
                                                TO  ETENSU5-REC(29:)
-                       MOVE    ETENSU5-YUKOEDYMD
-                                               TO  ETENSU5-UPYUKOEDYMD
+                       MOVE    ETENSU5-KEY     TO  ETENSU5-UP-KEY
+                       MOVE    ETENSU5WK-KEY   TO  ETENSU5-KEY
                        MOVE    1               TO  FLG-SYORI
                    END-IF
            END-EVALUATE
