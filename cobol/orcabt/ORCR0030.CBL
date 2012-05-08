@@ -11427,8 +11427,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
       **>       (RECE02-SRYYM      <= "200803"                 ))
            IF  ((SYS-1001-PREFNUM   =  42                      ) AND
                 (SYU-KOH-HKNNUM(1)  = "186"                    ))
-           OR  ((SYS-1001-PREFNUM   =  33                      ) AND
-                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
            OR  ((SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (IDZ                =  1                       ))
