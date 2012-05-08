@@ -563,6 +563,9 @@
       *                                     一律一般の金額で記載
       *  04.05.48    NACL-門脇    12/05/01  減（割）計算対応
       *  04.05.49    NACL-門脇    12/05/06  実日数・請求点記載フラグ編集修正
+      *  04.05.50    NACL-門脇    12/05/06  月途中の医療機関コード変更時の
+      *                                     一部負担金記載対応
+      *                                     （現物給付の主保険単独）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -767,6 +770,7 @@
            03  FLG-SAIGAI-ETC1-ARI                     PIC 9(01).
            03  FLG-JIRITU-CYUKANSOU1                   PIC 9(01).
            03  FLG-JIRITU-CYUKANSOU2                   PIC 9(01).
+           03  FLG-SYSCHK                              PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -1400,6 +1404,9 @@
       *
            03  WRK-ZENKI-FTNMONEY              PIC 9(09).
       *
+           03  WRK-SYSCHK-SRYYM                PIC X(06).
+           03  WRK-SYSCHK-HOSPCD               PIC 9(07).
+      *
       *---------------------------------------------------------------
       *  回数減算用退避領域
       *
@@ -2019,6 +2026,9 @@
       *
            COPY    "CPSK2010.INC".
       *
+           COPY    "CPSK1001.INC"  REPLACING  //SYS-1001-//
+                                   BY         //WRK-1001-//.
+      *
       *    患者コメント
        01  PTCOM-REC.
            COPY    "CPPTCOM.INC".
@@ -2125,6 +2135,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
       *
            IF   WRK-PARA-SRYYM    NOT =  ZERO
+              MOVE    ZERO             TO  FLG-SYSCHK
       *       医療機関情報
               INITIALIZE                   SYSKANRI-REC
               MOVE    "1001"           TO  SYS-KANRICD
@@ -2137,6 +2148,12 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
               PERFORM 960-KANRIMST-READ-SEC
               IF      FLG-SYSKANRI     =   ZERO
                   MOVE    MCPDATA-REC  TO  SYS-1001-REC
+      *           システム管理１００１のチェック
+                  MOVE    SYS-1001-HOSPCD
+                                       TO  WRK-SYSCHK-HOSPCD
+                  MOVE    WRK-PARA-SRYYM
+                                       TO  WRK-SYSCHK-SRYYM
+                  PERFORM 901-SYSKANRI-CHECK-SEC
               ELSE    
                   MOVE    "医療機関情報が取得できませんでした。"
                                        TO  WRK-RECEERR
@@ -13140,6 +13157,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  END-IF
                 END-IF
                END-IF
+      *
                IF    SYS-1001-PREFNUM  =  19
                 IF ( RECE02-KOHHBTNUM(1) =  "41"        )
                 OR ((RECE02-KOHNUM(1)  = "051" OR "091") AND
@@ -13165,6 +13183,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                IF  (FLG-GENBUTU-HANTEI    =   1  )
                AND (FLG-GENBUTU-HANTEI2   =   1  )
+               AND (RECE02-ZAITAKU        =  "3" )
+                    MOVE    "2"      TO   RECE02-ZAITAKU
+               END-IF
+      *
+               IF  (FLG-GENBUTU-HANTEI    =   1  )
+               AND (FLG-SYSCHK            =   1  )
                AND (RECE02-ZAITAKU        =  "3" )
                     MOVE    "2"      TO   RECE02-ZAITAKU
                END-IF
@@ -13739,6 +13763,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                IF  (FLG-GENBUTU-HANTEI    =   1  )
                AND (FLG-GENBUTU-HANTEI2   =   1  )
+               AND (RECE02-ZAITAKU        =  "4" )
+                    MOVE    "1"      TO   RECE02-ZAITAKU
+               END-IF
+      *
+               IF  (FLG-GENBUTU-HANTEI    =   1  )
+               AND (FLG-SYSCHK            =   1  )
                AND (RECE02-ZAITAKU        =  "4" )
                     MOVE    "1"      TO   RECE02-ZAITAKU
                END-IF
@@ -18185,6 +18215,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
       *    医療機関情報（基本情報）
            MOVE    ZERO                TO  FLG-SET
+           MOVE    ZERO                TO  FLG-SYSCHK
       *
            PERFORM VARYING SYSKAN-IDX  FROM    1   BY  1
                    UNTIL ( SYSKAN-IDX              >  100  )
@@ -18194,6 +18225,10 @@ grpsys         PERFORM 900-DBFETCH-SEC
                IF    ( SYS-1001-STYUKYMD       <= WRK-SYS-SRYYMD    )
                AND   ( WRK-SYS-SRYYMD          <= SYS-1001-EDYUKYMD )
                    MOVE     1                  TO  FLG-SET
+      *            システム管理１００１のチェック
+                   MOVE    SYS-1001-HOSPCD     TO  WRK-SYSCHK-HOSPCD
+                   MOVE    RECE02-SRYYM        TO  WRK-SYSCHK-SRYYM
+                   PERFORM 901-SYSKANRI-CHECK-SEC
                END-IF
            END-PERFORM
            IF      FLG-SET             =   ZERO
@@ -18258,6 +18293,52 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
            .
        900-SYSKANRI-HENSYU-EXT.
+           EXIT.
+      *
+      ****************************************************************
+      *    システム管理１００１チェック
+      ****************************************************************
+       901-SYSKANRI-CHECK-SEC         SECTION.
+      *
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "1001"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    WRK-SYSCHK-SRYYM    TO  SYS-STYUKYMD(1:6)
+           MOVE    "__"                TO  SYS-STYUKYMD(7:2)
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+             MOVE  "tbl_syskanri"      TO  MCP-TABLE
+             MOVE  "key11"             TO  MCP-PATHNAME
+             PERFORM 900-DBFETCH-SEC
+             IF    MCP-RC          =   ZERO
+               MOVE    MCPDATA-REC     TO  WRK-1001-REC
+               IF  WRK-1001-STYUKYMD(7:2)   =   "01"
+                 MOVE  "tbl_syskanri"  TO  MCP-TABLE
+                 MOVE  "key11"         TO  MCP-PATHNAME
+                 PERFORM 900-DBFETCH-SEC
+                 IF  MCP-RC        =   ZERO
+                   MOVE   MCPDATA-REC  TO  WRK-1001-REC
+                   IF  WRK-SYSCHK-HOSPCD = WRK-1001-HOSPCD
+                     MOVE    1         TO  FLG-SYSCHK
+                   END-IF
+                 END-IF
+               ELSE
+                 IF    WRK-SYSCHK-HOSPCD = WRK-1001-HOSPCD
+                     MOVE    1         TO  FLG-SYSCHK
+                 END-IF
+               END-IF
+             END-IF
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       901-SYSKANRI-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
