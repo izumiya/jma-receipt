@@ -566,6 +566,9 @@
       *  04.05.50    NACL-ÌçÏÆ    12/05/06  ·îÅÓÃæ¤Î°åÎÅµ¡´Ø¥³¡¼¥ÉÊÑ¹¹»þ¤Î
       *                                     °ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *                                     ¡Ê¸½ÊªµëÉÕ¤Î¼çÊÝ¸±Ã±ÆÈ¡Ë
+      *  04.05.51    NACL-ÌçÏÆ    12/05/07  ÃÏÊý¸øÈñÂÐ±þ¡ÊÅÔÆ»ÉÜ¸©Ìä¤ï¤º¡Ë
+      *                                     ¼ÒÊÝÊ¬ÊÝ¸±Íó°ìÉôÉéÃ´¶âµ­ºÜ
+      *                                     °ìÎ§°ìÈÌ¤Î¶â³Û¤Çµ­ºÜ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -11216,32 +11219,37 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2105212-ICHIBUFTN-KOH-HEN1-SEC               SECTION.
       *
+      **>  IF  ((SYS-1001-PREFNUM   =  42                      ) AND
+      **>       (SYU-KOH-HKNNUM(1)  = "186"                    ))
+      **>  OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27 OR 15    ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+      **>       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+      **>       (IDZ                =  1                       ))
+      **>  OR  ((SYS-1001-PREFNUM   =  34                      ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+      **>       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+      **>       (RECE02-SRYYM      >= "201004"                 ) AND
+      **>       (IDZ                =  1                       ))
+      **>  OR  ((SYS-1001-PREFNUM   =  05                      ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+      **>       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+      **>       (RECE02-SRYYM      >= "201008"                 ) AND
+      **>       (IDZ                =  1                       ))
+      **>  OR  ((SYS-1001-PREFNUM   =  42                      ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+      **>       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+      **>       (RECE02-SRYYM      >= "201010"                 ) AND
+      **>       (IDZ                =  1                       ))
+      **>  OR  ((SYS-1001-PREFNUM   =  40                      ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+      **>       (SYU-KOH-HKNNUM(1)  = "251" OR "450" OR "260"
+      **>                                   OR "360" OR "460"  ) AND
+      **>       (RECE02-SRYYM      >= "201204"                 ))
            IF  ((SYS-1001-PREFNUM   =  42                      ) AND
                 (SYU-KOH-HKNNUM(1)  = "186"                    ))
-           OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27 OR 15    ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
+           OR  ((SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
                 (IDZ                =  1                       ))
-           OR  ((SYS-1001-PREFNUM   =  34                      ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
-                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
-                (RECE02-SRYYM      >= "201004"                 ) AND
-                (IDZ                =  1                       ))
-           OR  ((SYS-1001-PREFNUM   =  05                      ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
-                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
-                (RECE02-SRYYM      >= "201008"                 ) AND
-                (IDZ                =  1                       ))
-           OR  ((SYS-1001-PREFNUM   =  42                      ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
-                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
-                (RECE02-SRYYM      >= "201010"                 ) AND
-                (IDZ                =  1                       ))
-           OR  ((SYS-1001-PREFNUM   =  40                      ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067" AND "039") AND
-                (SYU-KOH-HKNNUM(1)  = "251" OR "450" OR "260"
-                                            OR "360" OR "460"  ) AND
-                (RECE02-SRYYM      >= "201204"                 ))
               CONTINUE
            ELSE
               MOVE    ZERO    TO    FLG-KGKIPNTAI
@@ -11322,39 +11330,46 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2105213-ICHIBUFTN-KOH-HEN2-SEC               SECTION.
       *
+      **>  IF  ((SYS-1001-PREFNUM   =  42                      ) AND
+      **>       (SYU-KOH-HKNNUM(1)  = "186"                    ))
+      **>  OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27 OR 15    ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+      **>       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+      **>       (IDZ                =  1                       ))
+      **>  OR  ((SYS-1001-PREFNUM   =  34                      ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+      **>       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+      **>       (RECE02-SRYYM      >= "201004"                 ) AND
+      **>       (IDZ                =  1                       ))
+      **>  OR  ((SYS-1001-PREFNUM   =  05                      ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+      **>       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+      **>       (RECE02-SRYYM      >= "201008"                 ) AND
+      **>       (IDZ                =  1                       ))
+      **>  OR  ((SYS-1001-PREFNUM   =  42                      ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+      **>       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+      **>       (RECE02-SRYYM      >= "201010"                 ) AND
+      **>       (IDZ                =  1                       ))
+      **>  OR  ((SYS-1001-PREFNUM   =  40                      ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+      **>       (SYU-KOH-HKNNUM(1)  = "251" OR "450" OR "260"
+      **>                                   OR "360" OR "460"  ) AND
+      **>       (RECE02-SRYYM      >= "201204"                 ))
+      **>  OR  ((SYS-1001-PREFNUM   =  33                      ) AND
+      **>       (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
+      **>  OR  ((SYS-1001-PREFNUM   =  01                      ) AND
+      **>       (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+      **>       (SYU-KOH-HKNNUM(1)  = "141" OR "241"           ) AND
+      **>       (IDZ                =  1                       ) AND
+      **>       (RECE02-SRYYM      <= "200803"                 ))
            IF  ((SYS-1001-PREFNUM   =  42                      ) AND
                 (SYU-KOH-HKNNUM(1)  = "186"                    ))
-           OR  ((SYS-1001-PREFNUM   =  13 OR 08 OR 27 OR 15    ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
-                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
-                (IDZ                =  1                       ))
-           OR  ((SYS-1001-PREFNUM   =  34                      ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
-                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
-                (RECE02-SRYYM      >= "201004"                 ) AND
-                (IDZ                =  1                       ))
-           OR  ((SYS-1001-PREFNUM   =  05                      ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
-                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
-                (RECE02-SRYYM      >= "201008"                 ) AND
-                (IDZ                =  1                       ))
-           OR  ((SYS-1001-PREFNUM   =  42                      ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
-                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
-                (RECE02-SRYYM      >= "201010"                 ) AND
-                (IDZ                =  1                       ))
-           OR  ((SYS-1001-PREFNUM   =  40                      ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
-                (SYU-KOH-HKNNUM(1)  = "251" OR "450" OR "260"
-                                            OR "360" OR "460"  ) AND
-                (RECE02-SRYYM      >= "201204"                 ))
            OR  ((SYS-1001-PREFNUM   =  33                      ) AND
                 (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ))
-           OR  ((SYS-1001-PREFNUM   =  01                      ) AND
-                (SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
-                (SYU-KOH-HKNNUM(1)  = "141" OR "241"           ) AND
-                (IDZ                =  1                       ) AND
-                (RECE02-SRYYM      <= "200803"                 ))
+           OR  ((SYU-SYUHKNNUM  NOT = "060" AND "067"          ) AND
+                (SYU-KOH-HKNNUM(1)(1:1)  >=  "1" AND <=  "8"   ) AND
+                (IDZ                =  1                       ))
               CONTINUE
            ELSE
               MOVE    ZERO    TO    FLG-KGKIPNTAI
