@@ -1237,7 +1237,7 @@
                MOVE    WRK-TNS-TENSU-REC   TO  TNS-TENSU-REC
                INITIALIZE                  GENERICNAME-REC 
                MOVE    SPACE               TO  GENERICNAME-REC
-               MOVE    TNS-YAKKAKJNCD(1:9)
+               MOVE    TNS-YAKKAKJNCD
                                            TO  GENERIC-YAKKAKJNCD
       *
 grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM

@@ -203,7 +203,7 @@
       *H24.4
       *    °ìÈÌÌ¾¸¡º÷
            03  WRK-GEN-AREA.
-               05  WRK-GEN-YAKKAKJNCD      PIC X(09).
+               05  WRK-GEN-YAKKAKJNCD      PIC X(12).
                05  WRK-GEN-NAME            PIC X(80).
                05  WRK-GEN-TANI            PIC X(24).
                05  WRK-GEN-KISOTEN         PIC 9(07)V99.
@@ -586,7 +586,7 @@
            IF     (SPA-K98-GMN-SYORI       =   "G"  )
              AND  (SPA-K98-GMN-SYORI2      =   "1"  )
                INITIALIZE                      WRK-GEN-AREA
-               MOVE    SPA-K98-GMN-SRYCD  (1)
+               MOVE    SPA-K98-GMN-INPUTCD (1)
                                            TO  WRK-GEN-YAKKAKJNCD
                MOVE    SPA-K98-GMN-NAME(1) TO  WRK-GEN-NAME
                MOVE    SPA-K98-GMN-TANI(1) TO  WRK-GEN-TANI
@@ -4147,7 +4147,7 @@
            MOVE    "1"                 TO  SPA-K98-GMN-SYORI2
       *
            INITIALIZE                      WRK-GEN-AREA
-           MOVE    SPA-K98-GMN-SRYCD(WRK-SELNO)
+           MOVE    SPA-K98-GMN-INPUTCD(WRK-SELNO)
                                        TO  WRK-GEN-YAKKAKJNCD
            MOVE    SPA-K98-GMN-NAME (WRK-SELNO)    TO  WRK-GEN-NAME
            MOVE    SPA-K98-GMN-TANI (WRK-SELNO)    TO  WRK-GEN-TANI
@@ -4267,7 +4267,7 @@
            MOVE    SPACE               TO  GENERICNAME-REC
            INITIALIZE                      GENERICNAME-REC
       *    MOVE    TNS-YAKKAKJNCD(1:9) TO  GENERIC-YAKKAKJNCD
-           MOVE    SPA-K98-GMN-INPUTCD (WRK-SELNO)(1:9)
+           MOVE    SPA-K98-GMN-INPUTCD (WRK-SELNO)
                                        TO  GENERIC-YAKKAKJNCD
       *
            MOVE    GENERICNAME-REC     TO  MCPDATA-REC

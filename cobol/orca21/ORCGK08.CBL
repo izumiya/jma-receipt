@@ -165,14 +165,17 @@
                    07  SPA-GMN-TBLREC-G    OCCURS  800.
                        09  SPA-GMN-TBANGO      PIC 9(03).
                        09  SPA-GMN-TDELFLG     PIC 9(01).
-                       09  SPA-GMN-TMEISYO     PIC X(200).
+      **               09  SPA-GMN-TMEISYO     PIC X(200).
+                       09  SPA-GMN-TMEISYO     PIC X(150).
                        09  SPA-GMN-TMEISYO-1   REDEFINES
                                                    SPA-GMN-TMEISYO.
-                           11  SPA-GMN-TMEISYO1    PIC X(200).
+      ********             11  SPA-GMN-TMEISYO1    PIC X(200).
+                           11  SPA-GMN-TMEISYO1    PIC X(150).
                        09  SPA-GMN-TMEISYO-3   REDEFINES
                                                    SPA-GMN-TMEISYO.
                            11  SPA-GMN-TYOBI3      PIC X(02).
-                           11  SPA-GMN-TMEISYO3    PIC X(198).
+      **********           11  SPA-GMN-TMEISYO3    PIC X(198).
+                           11  SPA-GMN-TMEISYO3    PIC X(148).
                        09  SPA-GMN-TMEISYO-2   REDEFINES
                                                SPA-GMN-TMEISYO.
                            11  SPA-GMN-TBANGO2     PIC X(02).
@@ -208,6 +211,9 @@
       *                内部位置
                        09  SPA-GMN-NAIIDX      PIC 9(03).
                        09  SPA-GMN-NAIBANGO    PIC 9(03).
+      *H24.4           一般名称
+                       09  SPA-GMN-GE-MEISYO   PIC X(100).
+                       09  SPA-GMN-ME-MEISYO   PIC X(100).
       *
                05  SPA-GMN-GOKEI             PIC S9(11).
                05  SPA-GMN-LASTYMD           PIC X(09).
@@ -255,6 +261,9 @@
                05  SPA-NAI-GYOUMU-ARI             PIC 9(01).
       *        レセプトプレビュー区分
                05  SPA-NAI-RESPRVFLG              PIC X(01).
+      *H24.4
+      *        一般名表示区分
+               05  SPA-NAI-GENEINIT               PIC 9(01).
       *
       *    フラグ領域
        01  STS-AREA.
@@ -404,7 +413,7 @@
       *    診療行為名称
            03  WRK-SRYSYUMEI       PIC X(40).
       *
-           03  WRK-MEISYO          PIC X(60).
+           03  WRK-MEISYO          PIC X(80).
       *    数量表示用
            03  WRK-SURYO           PIC 9(05)V9(05).
            03  WRK-SURYO-R         REDEFINES   WRK-SURYO.
@@ -989,6 +998,12 @@
       *
            INITIALIZE                  SPA-K08
            INITIALIZE                  SPA-K08-AREA
+      *H24.4
+      *    レセプトプレビュー区分初期処理
+           PERFORM 3100-RESPRV-SET-SEC
+      *    一般名記載初期処理
+           PERFORM 30001-GENERIC-SET-SEC
+      *
            PERFORM                     310-SPA-SET-SEC
       *
       *    削除区分設置
@@ -1004,6 +1019,24 @@
            .
        3000-INIT-SCREEN-EXT.
            EXIT.
+      *
+      *H24.4
+      *****************************************************************
+      *    一般名記載初期処理
+      *****************************************************************
+       30001-GENERIC-SET-SEC          SECTION.
+      *
+      *    一般名表示
+           MOVE    ZERO                TO  SPA-NAI-GENEINIT
+           IF      SYS-1038-GENERICFLG     =   "1"
+      *        銘柄名表示
+               MOVE    1                   TO  SPA-NAI-GENEINIT
+           END-IF
+      *
+           .
+       30001-GENERIC-SET-EXT.
+           EXIT.
+      *H24.4
       *
       *****************************************************************
       *    確認画面（ＫＩＤ１）ＯＫ処理
@@ -1163,6 +1196,11 @@
            ELSE
                MOVE    IDG                 TO  SPA-K08-MAX
            END-IF
+      *
+      *H24.4
+      *    院外処方名称設定
+           PERFORM 4051-MEISYO-HEN-SEC
+      *
       *    各点数
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL       IDX2    >   LNK-SYUNOU-MAX
@@ -1204,8 +1242,8 @@
            ELSE
                MOVE    ZERO                TO  SPA-USERPG-MAX
            END-IF
-      *    レセプトプレビュー区分初期処理
-           PERFORM 3100-RESPRV-SET-SEC
+      ***  レセプトプレビュー区分初期処理
+      ***  PERFORM 3100-RESPRV-SET-SEC
       *
             .
        310-SPA-SET-EXT.
@@ -2446,6 +2484,8 @@
            END-IF
       *
       *H24.4  院外処方せんの一般名表示
+           MOVE    SPACE               TO  SPA-GMN-GE-MEISYO(IDG)
+           MOVE    SPACE               TO  SPA-GMN-ME-MEISYO(IDG)
            IF    (SPA-SRYYMD           >=  "20120401" )
              AND (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)  =   "6")
              AND (LNK-WKSRY-SRYKBN (IDX)       =   "21"
@@ -2459,6 +2499,9 @@
                                                    OR  "233" )
                    CONTINUE
                ELSE
+      *            銘柄名
+                   MOVE    SPA-GMN-TMEISYO2(IDG)
+                                       TO  SPA-GMN-ME-MEISYO(IDG)
       *            院外処方せん
                    PERFORM 310020-GENERICNAME-CHK-SEC
                END-IF
@@ -2942,7 +2985,7 @@
                            GENERIC-GENERICNAME     DELIMITED  BY  SPACE
                                                INTO    WRK-MEISYO
                    END-STRING
-                   MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
+                   MOVE    WRK-MEISYO    TO  SPA-GMN-GE-MEISYO(IDG)
                END-IF
            END-IF
       *    処方名記載
@@ -2955,7 +2998,7 @@
                       TNSP-SHONAME             DELIMITED  BY  SPACE
                                                INTO    WRK-MEISYO
                END-STRING
-               MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
+               MOVE    WRK-MEISYO    TO  SPA-GMN-GE-MEISYO(IDG)
            END-IF
       *    処方名記載
            IF     (TNSP-IPN-KISAIKBN   =   3   )
@@ -2966,7 +3009,7 @@
                        TNSP-SHONAME            DELIMITED  BY  SPACE
                                                INTO    WRK-MEISYO
                END-STRING
-               MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
+               MOVE    WRK-MEISYO    TO  SPA-GMN-GE-MEISYO(IDG)
            END-IF
            .
        310020-GENERICNAME-CHK-EXT.
@@ -3317,6 +3360,10 @@
       *    プレビュー
                WHEN    "CLICKED"       ALSO    "B01S"
                    PERFORM 4010-PREVIEW-SYORI-SEC
+      *H24.4
+      *        一般名称切替え
+               WHEN    "CLICKED"       ALSO    "B04"
+                    PERFORM 405-GENERIC-CHG-SEC
            END-EVALUATE
       *
            .
@@ -6032,6 +6079,60 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        459001-PRTNUM-HEN-EXT.
            EXIT.
+      *
+      *H24.4
+      *****************************************************************
+      *    一般名称切替え処理
+      *****************************************************************
+       405-GENERIC-CHG-SEC              SECTION.
+      *
+           IF      SPA-NAI-GENEINIT    =   1
+               MOVE    ZERO            TO  SPA-NAI-GENEINIT
+           ELSE
+               MOVE    1               TO  SPA-NAI-GENEINIT
+           END-IF
+      *    院外処方名称設定
+           PERFORM 4051-MEISYO-HEN-SEC
+           .
+       405-GENERIC-CHG-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    院外処方名称設定処理
+      *****************************************************************
+       4051-MEISYO-HEN-SEC          SECTION.
+      *
+           PERFORM   VARYING   IDX     FROM    1   BY  1
+                     UNTIL     IDX         >   SPA-K08-MAX
+               IF      SPA-GMN-TMEISYO (IDX)(1:1)  =   "-"
+                                                   OR  "#"
+                                                   OR  "="
+                   CONTINUE
+               ELSE
+                   IF      SPA-NAI-GENEINIT    =   1
+      *                銘柄名記載
+                       IF      SPA-GMN-ME-MEISYO (IDX)    NOT =   SPACE
+                           MOVE    SPA-GMN-ME-MEISYO (IDX)
+                                               TO  SPA-GMN-TMEISYO2(IDX)
+                           INSPECT SPA-GMN-TMEISYO2(IDX)   REPLACING
+                                               ALL "  "  BY  "　"
+                       END-IF
+                    ELSE
+      *                一般名記載
+                       IF      SPA-GMN-GE-MEISYO (IDX)    NOT =   SPACE
+                           MOVE    SPA-GMN-GE-MEISYO (IDX)
+                                               TO  SPA-GMN-TMEISYO2(IDX)
+                           INSPECT SPA-GMN-TMEISYO2(IDX)   REPLACING
+                                               ALL "  "  BY  "　"
+                       END-IF
+                    END-IF
+                END-IF
+           END-PERFORM
+           .
+       4051-MEISYO-HEN-EXT.
+           EXIT.
+      *H24.4
+      *
       *****************************************************************
       *    プレビュー処理
       *****************************************************************
@@ -7242,7 +7343,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE               TO  GENERICNAME-REC
            INITIALIZE                      GENERICNAME-REC
-           MOVE    TNS-YAKKAKJNCD(1:9) TO  GENERIC-YAKKAKJNCD
+           MOVE    TNS-YAKKAKJNCD      TO  GENERIC-YAKKAKJNCD
       **** MOVE    SPA-HOSPNUM         TO  GENERIC-HOSPNUM
       *
            MOVE    GENERICNAME-REC     TO  MCPDATA-REC

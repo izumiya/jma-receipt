@@ -1,5 +1,5 @@
 tbl_genericname {
-	YAKKAKJNCD			char(9);
+	YAKKAKJNCD			char(12);
 	YUKOKETA			number(2,0);
 	GENERICNAME			char(200);
 	TANICD				char(3);
@@ -20,7 +20,14 @@ path	key 	{
 		DECLARE tbl_genericname_key_csr CURSOR FOR
 		SELECT *
 		FROM tbl_genericname
-		WHERE   YAKKAKJNCD    =   :YAKKAKJNCD
+		WHERE	YAKKAKJNCD    =  (
+			SELECT
+			    CASE
+				WHEN EXISTS ( SELECT * from tbl_genericname WHERE yakkakjncd = :YAKKAKJNCD )
+				    THEN :YAKKAKJNCD
+				ELSE SUBSTR(:YAKKAKJNCD,1,9)
+			    END
+			)
 		;
 	};
 };

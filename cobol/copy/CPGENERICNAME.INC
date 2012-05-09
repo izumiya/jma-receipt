@@ -25,7 +25,7 @@
       *01  GENERICNAME-REC.
            03  GENERIC-KEY.
       *    薬価基準コード
-               05  GENERIC-YAKKAKJNCD      PIC  X(09).
+               05  GENERIC-YAKKAKJNCD      PIC  X(12).
       *    一般名有効桁
            03  GENERIC-YUKOKETA        PIC  9(02).
       *    一般名

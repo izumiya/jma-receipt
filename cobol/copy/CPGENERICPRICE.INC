@@ -25,7 +25,7 @@
       *01  GENERICPRICE-REC.
            03  GENERICPRICE-KEY.
       *薬価基準コード
-               05  GENERICPRICE-YAKKAKJNCD   PIC  X(09).
+               05  GENERICPRICE-YAKKAKJNCD   PIC  X(12).
       *有効期間開始
                05  GENERICPRICE-YUKOSTYMD    PIC  X(08).
       *有効期間終了
@@ -38,6 +38,6 @@
            03  GENERICPRICE-UPYMD            PIC  X(08).
       *更新用
            03  GENERICPRICE-UP-KEY.
-               05  GENERICPRICE-UPYAKKAKJNCD PIC  X(09).
+               05  GENERICPRICE-UPYAKKAKJNCD PIC  X(12).
                05  GENERICPRICE-UPYUKOSTYMD  PIC  X(08).
                05  GENERICPRICE-UPYUKOEDYMD  PIC  X(08).

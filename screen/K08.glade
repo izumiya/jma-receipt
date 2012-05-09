@@ -760,7 +760,7 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>button3</name>
+      <name>B04</name>
       <x>248</x>
       <y>718</y>
       <width>80</width>
@@ -777,7 +777,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Mon, 25 Dec 2000 04:55:00 GMT</last_modification_time>
       </signal>
-      <label></label>
+      <label>л╬╬нюзбь</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
