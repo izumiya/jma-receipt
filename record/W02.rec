@@ -173,7 +173,7 @@ W02	{
 						value	varchar(22);
 					};
 					count	int;
-					item	varchar(22)[2];
+					item	varchar(22)[5];
 				};
 				TAXHASU_COMBO	{
 					TAXHASU	{

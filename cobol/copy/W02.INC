@@ -100,7 +100,7 @@
                     06  W02-GENTAIKBN-COUNT
                                              PIC S9(9)   BINARY.
                     06  W02-GENTAIKBNLST     PIC X(22)
-                                                      OCCURS  2.
+                                                      OCCURS  5.
                   05  W02-TAXHASU-COMBO.
                     06  W02-TAXHASU          PIC X(32).
                     06  W02-TAXHASU-COUNT
