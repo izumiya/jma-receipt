@@ -1875,8 +1875,9 @@
                                                DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
-               WHEN    "8071"
-                   STRING  "初診料算定日より２年以上経過しています。"
+               WHEN    "K873"
+                   STRING  "警告！"
+                           "初診料算定日より１年以上経過しています。"
                            "算定できません。"
                                        DELIMITED  BY  SPACE
                                        INTO    SPA-ERRMSG
