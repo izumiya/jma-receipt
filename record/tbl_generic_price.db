@@ -1,12 +1,12 @@
 tbl_generic_price {
-	YAKKAKJNCD			char(9);
+	YAKKAKJNCD			char(12);
 	YUKOSTYMD			char(8);
 	YUKOEDYMD			char(8);
 	PRICE   			number(11,2);
 	CREYMD   			char(8);
 	UPYMD    			char(8);
 #-----> 主キー更新用項目
-	UPYAKKAKJNCD			char(9),virtual;
+	UPYAKKAKJNCD			char(12),virtual;
 	UPYUKOSTYMD			char(8),virtual;
 	UPYUKOEDYMD 			char(8),virtual;
 };
@@ -18,7 +18,14 @@ path	key 	{
 		DECLARE tbl_generic_price_key_csr CURSOR FOR
 		SELECT *
 		FROM tbl_generic_price
-		WHERE   YAKKAKJNCD    =   :YAKKAKJNCD
+		WHERE	YAKKAKJNCD    =  (
+			SELECT
+			    CASE
+				WHEN EXISTS ( SELECT * from tbl_generic_price WHERE yakkakjncd = :YAKKAKJNCD )
+				    THEN :YAKKAKJNCD
+				ELSE SUBSTR(:YAKKAKJNCD,1,9)
+			    END
+			)
 			AND   YUKOSTYMD  <=  :YUKOSTYMD
 			AND   YUKOEDYMD  >=  :YUKOEDYMD
 		;

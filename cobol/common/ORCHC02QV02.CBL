@@ -4793,7 +4793,7 @@
       *
            MOVE    SPACE               TO  GENERICNAME-REC
            INITIALIZE                      GENERICNAME-REC
-           MOVE    TNS-YAKKAKJNCD(1:9) TO  GENERIC-YAKKAKJNCD
+           MOVE    TNS-YAKKAKJNCD      TO  GENERIC-YAKKAKJNCD
       **** MOVE    SPA-HOSPNUM         TO  GENERIC-HOSPNUM
       *
            MOVE    GENERICNAME-REC     TO  MCPDATA-REC

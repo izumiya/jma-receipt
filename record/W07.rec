@@ -515,6 +515,13 @@ W07	{
 					count	int;
 					item	varchar(40)[5];
 				};
+				GENERIC_FLG_COMB	{
+					GENERIC_FLG	{
+						value	varchar(40);
+					};
+					count	int;
+					item	varchar(40)[5];
+				};
 			};
 			TAGNAME3    {
 			  	state   int;
