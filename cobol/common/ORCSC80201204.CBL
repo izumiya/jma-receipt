@@ -238,6 +238,11 @@
                 05   WRK-SYO2-YY    PIC 9(04).
                 05   WRK-SYO2-MM    PIC 9(02).
                 05   WRK-SYO2-DD    PIC 9(02).
+      *H24.4
+           03   WRK-SYOYMD3.
+                05   WRK-SYO3-YY    PIC 9(04).
+                05   WRK-SYO3-MM    PIC 9(02).
+                05   WRK-SYO3-DD    PIC 9(02).
       *    ¿ÇÎÅÆü
            03   WRK-SRYYMD         PIC X(08).
            03   WRK-EDSRYYMD       PIC X(08).
@@ -1891,6 +1896,7 @@
                MOVE    SPA-SRYYMD          TO  WRK-SYOYMD
            END-IF
            MOVE    WRK-SYOYMD          TO  WRK-SYOYMD2
+           MOVE    WRK-SYOYMD          TO  WRK-SYOYMD3
       *    ½é¿ÇÎÁ»»ÄêÆü¡Ü£¶·î¸å
            INITIALIZE                      STS-AREA-DAY
            INITIALIZE                      LNK-DAY6-AREA
@@ -1907,10 +1913,10 @@
       **** END-IF
       *    £È£²£°¡¥£´¤«¤é£±Ç¯Ì¤Ëþ¤È¤¹¤ë
            COMPUTE WRK-SYO2-YY         =   WRK-SYO2-YY   +   1
+           COMPUTE WRK-SYO3-YY         =   WRK-SYO3-YY   +   2
            IF      SPA-SRYYMD          >=  WRK-SYOYMD2
       *H24.4
-               COMPUTE WRK-SYO2-YY         =   WRK-SYO2-YY   +   1
-               IF      SPA-SRYYMD          <   WRK-SYOYMD2
+               IF      SPA-SRYYMD          <   WRK-SYOYMD3
       *            £²Ç¯Ì¤Ëþ¤Ç¤¢¤ì¤Ð¡¢»ÜÀß´ð½à¤ÎÈ½Äê
                    PERFORM 10011321-GAIRI-SEISINCHK-SEC
                    IF      FLG-NENREI          =   ZERO
@@ -1938,6 +1944,13 @@
                                                OR  "180031210"
                                                OR  "180031310"
                        IF      SPA-SRYYMD      >=  WRK-SYOYMD2
+      *H24.4
+      *                 £±Ç¯°Ê¾å¤Ç£²Ç¯Ì¤Ëþ¤Ç»»ÄêÉÔ²Ä
+                         IF     (SPA-SRYYMD      <   WRK-SYOYMD3 ) AND
+                                (FLG-NENREI2     =   1           )
+                           CONTINUE
+                         ELSE
+      *H24.4
                            IF     (WRK-COM-KZMFLG (IDX-Z)   =   SPACE)
                            AND    (LNK-ORCSC-KEI-IDX        =   ZERO )
                                MOVE    IDX-Z       TO  LNK-ORCSC-KEI-IDX
@@ -1945,12 +1958,11 @@
                                                            (IDX-Z)
                                MOVE    "0215"      TO  WRK-ERRCD
       *H24.4
-                               IF      FLG-NENREI2     =   1
-                                   MOVE    "8071"      TO  WRK-ERRCD
-                               END-IF
+                               MOVE    "K873"      TO  WRK-ERRCD
                                MOVE    "1"         TO  WRK-COM-CUR
                                                            (IDX-Z)
                            END-IF
+                         END-IF
                        END-IF
                    ELSE
                        MOVE    "0083"      TO  WRK-ERRCD
