@@ -129,6 +129,7 @@
       *                                     ルトを「1 記録する」とする
       *  04.05.08    NACL-藤原    11/08/02  労災新様式対応
       *                                     点検レセ印字位置変更対応
+      *  04.05.09    NACL-藤原    12/05/10  労災様式の表示変更
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -2489,16 +2490,17 @@
            MOVE    2               TO  SPA-GMN-FRAME-ROUPRTKBN-N-MAX 
       *
            MOVE    "0"             TO  SPA-GMN-ROUPRTKBNL    (1)
-           MOVE    "旧様式"        TO  SPA-GMN-ROUPRTKBNMEIL (1)
+           MOVE    "ＯＣＲ専用様式"
+                                   TO  SPA-GMN-ROUPRTKBNMEIL (1)
            MOVE    "1"             TO  SPA-GMN-ROUPRTKBNL    (2)
-           MOVE    "改正様式"      TO  SPA-GMN-ROUPRTKBNMEIL (2)
+           MOVE    "確認様式"      TO  SPA-GMN-ROUPRTKBNMEIL (2)
            MOVE    2               TO  SPA-GMN-ROUPRTKBN-MAX 
       *
            MOVE    "0"             TO  SPA-GMN-ROUPRTKBN-NL      (1)
-           MOVE    "旧様式"
+           MOVE    "ＯＣＲ専用様式"
                                    TO  SPA-GMN-ROUPRTKBN-NMEIL   (1)
            MOVE    "1"             TO  SPA-GMN-ROUPRTKBN-NL      (2)
-           MOVE    "改正様式"      TO  SPA-GMN-ROUPRTKBN-NMEIL   (2)
+           MOVE    "確認様式"      TO  SPA-GMN-ROUPRTKBN-NMEIL   (2)
            MOVE    2               TO  SPA-GMN-ROUPRTKBN-N-MAX 
       *
            MOVE    "0"             TO  SPA-GMN-COMMENT-ROUL    (1)
