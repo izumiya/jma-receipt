@@ -1628,10 +1628,8 @@
       ******** MOVE    ORCHC04SUB-NAME (IDX)   TO  WRK-H-NAME
                MOVE    WRK-H-NAME1             TO  TBL-H-NAME
                                                      (WRK-PAGE IDX-H)
-               IF      FLG-LINE            =   1
-                   ADD     1                   TO  IDX-H
-               END-IF
                IF      WRK-H-NAME2         NOT =   SPACE
+                   ADD     1                   TO  IDX-H
                    MOVE    WRK-H-NAME2         TO  TBL-H-NAME
                                                      (WRK-PAGE IDX-H)
                    MOVE    "¡¡"                TO  TBL-H-ZKBN
