@@ -16,21 +16,20 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCMUP0121.
+       PROGRAM-ID.                 ORCMUP0242.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
-      *  コンポーネント名  : 一般名マスタ更新処理
+      *  コンポーネント名  : 最低薬価更新処理
       *                    : 
       *  管理者            : 
       *  作成日付    作業者        記述
-      *  07.03.18    NACL-伊藤     新規作成
+      *  12.03.16    NACL-森脇     新規作成
+      *  12.05.10    NACL-伊藤     レイアウト変更のためORCMUP0241.CBL
+      *                            を複写して作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      * 04.03.00     NACL-太田    08/05/28  エラー処理強化対応
-      * 04.05.00     NACL-伊藤    12/05/10  レイアウト変更のため更新データ
-      *                                     を変換
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -38,7 +37,7 @@
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
-      *    入力：一般名マスタ更新データ
+      *    入力：最低薬価更新データ
            SELECT  IN-FILE         ASSIGN
                                    ASS-IN
                                    ORGANIZATION    IS  LINE SEQUENTIAL
@@ -57,24 +56,25 @@
        DATA                        DIVISION.
        FILE                        SECTION.
       *
-      *    入力：一般名マスタ更新データ
+      *    入力：最低薬価更新データ
        FD  IN-FILE.
        01  IN-REC                      PIC X(1000).
       *
       *    出力：エラーファイル
        FD  ERR-FILE.
-       01  ERR-GENERICNAMEWK-REC.
+       01  ERR-GENERICWK-REC.
            03  ERR-GENERICWK-SYORIKBN      PIC X(01).
-           COPY    "CPGENERICNAME.INC"     REPLACING
-                         //GENERIC-// BY //ERR-GENERICWK-//.
+           03  ERR-GENERICWK-YUKOEDYMD2    PIC X(08).
+           COPY    "CPGENERICPRICE.INC"    REPLACING  //GENERICPRICE-//
+                                           BY  //ERR-GENERICWK-//.
       *
       *    出力：プルーフファイル
        FD  PLF-FILE.
        01  PLF-REC                     PIC X(1000).
       *
        WORKING-STORAGE             SECTION.
-grpsys*
-grpsys     COPY    "COMMON-SPA".
+     *
+           COPY    "COMMON-SPA".
       *
       *    ファイル指定領域
        01  ASS-AREA.
@@ -91,7 +91,17 @@ grpsys     COPY    "COMMON-SPA".
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-IN                  PIC 9(01).
-           03  FLG-GENERICNAME         PIC 9(01).
+           03  FLG-GENERIC             PIC 9(01).
+           03  FLG-PLF                 PIC 9(01).
+           03  FLG-SYORI               PIC 9(01).
+      *
+      *    インデックス領域
+       01  IDX-AREA.
+           03  IDX-PNT1                PIC 9(05).
+           03  IDX-PNT2                PIC 9(05).
+           03  IDX-PNT3                PIC 9(05).
+           03  IDX                     PIC 9(03).
+           03  IDY                     PIC 9(03).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -101,6 +111,8 @@ grpsys     COPY    "COMMON-SPA".
            03  CNT-DEL                 PIC 9(06).
            03  CNT-ERR                 PIC 9(06).
            03  CNT-PLF                 PIC 9(06).
+           03  CNT-MAE                 PIC 9(03).
+           03  CNT-ATO                 PIC 9(03).
       *
        01  SYS-DATE.
            03  SYS-YY                  PIC 9(02).
@@ -126,7 +138,7 @@ grpsys     COPY    "COMMON-SPA".
        01  MES-AREA.
            03  MES-TITLE1.
                05  FILLER              PIC X(26) VALUE
-                                       "【PGID:ORCMUP0121.CBL】".
+                                       "【PGID:ORCMUP0242.CBL】".
                05  MES-TITLE1-YY       PIC X(04) VALUE SPACE.
                05  FILLER              PIC X(01) VALUE ".".
                05  MES-TITLE1-MM       PIC X(02) VALUE SPACE.
@@ -140,7 +152,9 @@ grpsys     COPY    "COMMON-SPA".
            03  FILLER                  PIC X(01)   VALUE   SPACE.
            03  WRK-SYORIKBN            PIC X(01).
            03  FILLER                  PIC X(01)   VALUE   ",".
-           03  WRK-YAKKAKJNCD          PIC X(09).
+           03  WRK-YAKKAKJNCD          PIC  X(09).
+           03  FILLER                  PIC X(01)   VALUE   ",".
+           03  WRK-PRICE               PIC  9(09)V99.
       *
        01  WRK-HOMEDIR.
            03  FILLER                  PIC X(28)  VALUE
@@ -151,14 +165,15 @@ grpsys     COPY    "COMMON-SPA".
       *    ファイル定義
       *****************************************************************
       *
-       01  GENERICNAMEWK-REC.
+       01  GENERICWK-REC.
            03  GENERICWK-SYORIKBN          PIC X(01).
-           COPY    "CPGENERICNAME.INC"     REPLACING
-                         //GENERIC-// BY //GENERICWK-//.
-      *
-      *    一般名マスタ
-       01  GENERICNAME-REC.
-           COPY    "CPGENERICNAME.INC".
+           03  GENERICWK-YUKOEDYMD2        PIC X(08).
+           COPY    "CPGENERICPRICE.INC"    REPLACING   //GENERICPRICE-//
+                                           BY   //GENERICWK-//.
+      *    最低薬価
+       01  GENERIC-REC.
+           COPY    "CPGENERICPRICE.INC"    REPLACING   //GENERICPRICE-//
+                                           BY   //GENERIC-//.
       *
       *    ジョブ管理情報
        01  JOBKANRI-REC.
@@ -175,7 +190,7 @@ grpsys     COPY    "COMMON-SPA".
       *
            COPY    "CPMUPLINK.INC".
       *
-       PROCEDURE                       DIVISION
+       PROCEDURE                   DIVISION
            USING
            LNK-AREA.
       *
@@ -187,10 +202,11 @@ grpsys     COPY    "COMMON-SPA".
            PERFORM 100-INIT-SEC
       *
            PERFORM 200-MAIN-SEC
-                   UNTIL ( FLG-IN      =   1 )
-                    OR   ( LNK-RC  NOT =   ZERO )
+                   UNTIL  (FLG-IN          =   1)
+                     OR   (LNK-RC      NOT =   ZERO)
       *
            PERFORM 300-END-SEC
+      *
            .
            EXIT    PROGRAM
            .
@@ -200,24 +216,22 @@ grpsys     COPY    "COMMON-SPA".
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
-           MOVE    ZERO                TO  FLG-AREA
-           MOVE    ZERO                TO  CNT-AREA
-           INITIALIZE                      WRK-AREA
-                                           SPA-AREA
+           MOVE    ZERO            TO  FLG-AREA
+           MOVE    ZERO            TO  CNT-AREA
+           INITIALIZE                  WRK-AREA
+                                       SPA-AREA
+                                       IDX-AREA
       *
-           MOVE    LNK-HOSPNUM         TO  SPA-HOSPNUM
+           MOVE    LNK-HOSPNUM     TO  SPA-HOSPNUM
       *
-           ACCEPT  SYS-DATE            FROM    DATE
-           COMPUTE WRK-SYY             =   SYS-YY    +   2000
-           MOVE    SYS-MM              TO  WRK-SMM
-           MOVE    SYS-DD              TO  WRK-SDD
-           ACCEPT  SYS-TIME            FROM    TIME
+           ACCEPT  SYS-DATE        FROM    DATE
+           COMPUTE WRK-SYY         =   SYS-YY    +   2000
+           MOVE    SYS-MM          TO  WRK-SMM
+           MOVE    SYS-DD          TO  WRK-SDD
+           ACCEPT  SYS-TIME        FROM    TIME
       *
       *    DB OPEN
       *    PERFORM 100-DBOPEN-SEC
-      *    IF      MCP-RC      NOT =   ZERO
-      *        DISPLAY "DBOPEN ERR"
-      *    END-IF.
       *
            PERFORM 101-ASSIN-GET-SEC
       *
@@ -225,17 +239,17 @@ grpsys     COPY    "COMMON-SPA".
            OPEN    INPUT               IN-FILE
            IF  STS-IN              NOT =   ZERO
                MOVE    1               TO  FLG-IN
-               DISPLAY "*(ORCMUP0121)* IN-FILE OPN STS["
-                                       STS-IN "]"
+               DISPLAY "*(ORCMUP0242)* IN-FILE OPN STS[" STS-IN "]"
            END-IF
       *
       *    出力ファイル　初期処理
            PERFORM 2700-OUTLST-INIT-SEC
       *
-      *    一般名マスタ更新データ読込み処理
-           IF      FLG-IN              =   ZERO
+      *    最低薬価データ読込み処理
+           IF      FLG-IN          =   ZERO
                PERFORM 900-IN-KENSAKU-SEC
            END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -245,10 +259,10 @@ grpsys     COPY    "COMMON-SPA".
       *****************************************************************
        101-ASSIN-GET-SEC           SECTION.
       *
-           MOVE    SPA-HOSPNUM         TO  WRK-HOMEDIR-HOSPNUM
+           MOVE    SPA-HOSPNUM     TO  WRK-HOMEDIR-HOSPNUM
       *
       *    入力ファイル
-           MOVE    SPACE               TO  ASS-IN
+           MOVE    SPACE           TO  ASS-IN
            STRING  WRK-HOMEDIR         DELIMITED  BY  SPACE
                    LNK-DBFILE          DELIMITED  BY  SPACE
                    "/"                 DELIMITED  BY  SIZE
@@ -257,7 +271,7 @@ grpsys     COPY    "COMMON-SPA".
            END-STRING
       *
       *    エラーファイル
-           MOVE    SPACE               TO  ASS-ERR
+           MOVE    SPACE           TO  ASS-ERR
            STRING  WRK-HOMEDIR         DELIMITED  BY  SPACE
                    "orca-mstlog/"      DELIMITED  BY  SIZE
                    LNK-UPFILE          DELIMITED  BY  SPACE
@@ -266,13 +280,14 @@ grpsys     COPY    "COMMON-SPA".
            END-STRING
       *
       *    プルーフファイル
-           MOVE    SPACE               TO  ASS-PLF
+           MOVE    SPACE           TO  ASS-PLF
            STRING  WRK-HOMEDIR         DELIMITED  BY  SPACE
                    "orca-mstlog/"      DELIMITED  BY  SIZE
                    LNK-UPFILE          DELIMITED  BY  SPACE
                    ".PRF"              DELIMITED  BY  SIZE
                                        INTO    ASS-PLF
            END-STRING
+      *
            .
        101-ASSIN-GET-EXT.
            EXIT.
@@ -282,7 +297,7 @@ grpsys     COPY    "COMMON-SPA".
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-           MOVE    ZERO                TO  WRK-ERRCD
+           MOVE    ZERO            TO  WRK-ERRCD
       *
            EVALUATE    GENERICWK-SYORIKBN
       *        追加
@@ -296,8 +311,9 @@ grpsys     COPY    "COMMON-SPA".
                    PERFORM 2030-DELETE-SYORI-SEC
            END-EVALUATE
       *
-      *    一般名マスタ更新データ読込み処理
+      *    最低薬価データ読込み処理
            PERFORM 900-IN-KENSAKU-SEC
+      *
            .
        200-MAIN-EXT.
            EXIT.
@@ -307,79 +323,168 @@ grpsys     COPY    "COMMON-SPA".
       *****************************************************************
        2010-INSERT-SYORI-SEC       SECTION.
       *
-           INITIALIZE                  GENERICNAME-REC
-           MOVE    GENERICWK-KEY       TO  GENERIC-KEY
-           MOVE    GENERICNAME-REC     TO  MCPDATA-REC
-           MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-grpsys     PERFORM 900-ORCDBMAIN-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_genericname"   TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM  910-GENERICNAME-READ-SEC
+      *    単純追加
+           IF      GENERICWK-YUKOEDYMD2
+                                   =   SPACE
+               PERFORM 2011-INSERT-SYORI-SEC
            ELSE
-               MOVE    1                   TO  FLG-GENERICNAME
+               PERFORM 2012-INSERT-SYORI-SEC
            END-IF
       *
-      *    一般名マスタクローズ
-           MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 900-TBL-CLOSE-SEC
-      *
-      *    追加エラー（同一キー存在）
-           IF      FLG-GENERICNAME     =   ZERO
-               MOVE    1               TO  WRK-ERRCD
-               PERFORM 2040-ERR-SYORI-SEC
-               GO      TO      2010-INSERT-SYORI-EXT
-           END-IF
-      *
-      *    ＤＢ追加
-           PERFORM 20101-GENERICNAME-INS-SEC
-           IF      WRK-ERRCD       =   ZERO
-               ADD     1               TO  CNT-INS
-           END-IF
            .
        2010-INSERT-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
-      *    ＤＢ更新  処理
+      *    単純追加  処理
       *****************************************************************
-       2020-UPDATE-SYORI-SEC           SECTION.
+       2011-INSERT-SYORI-SEC       SECTION.
       *
-           INITIALIZE                  GENERICNAME-REC
-           MOVE    GENERICWK-KEY       TO  GENERIC-KEY
-           MOVE    GENERICNAME-REC     TO  MCPDATA-REC
-           MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-grpsys     PERFORM 900-ORCDBMAIN-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_genericname"   TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM  910-GENERICNAME-READ-SEC
+           INITIALIZE                  GENERIC-REC
+           MOVE    GENERICWK-KEY   TO  GENERIC-KEY
+           MOVE    GENERIC-REC     TO  MCPDATA-REC
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_generic_price"
+                                       TO  MCP-TABLE
+               MOVE    "key3"          TO  MCP-PATHNAME
+               PERFORM 910-GENERIC-READ-SEC
            ELSE
-               MOVE    1                   TO  FLG-GENERICNAME
+               MOVE    1               TO  FLG-GENERIC
            END-IF
       *
-      *    一般名マスタクローズ
-           MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
       *
-      *    更新エラー（同一キーなし）
-           IF      FLG-GENERICNAME  NOT =  ZERO
-               MOVE    3               TO  WRK-ERRCD
+      *    追加エラー（同一キー存在）
+           IF      FLG-GENERIC     =   ZERO
+               MOVE    1               TO  WRK-ERRCD
                PERFORM 2040-ERR-SYORI-SEC
-               GO      TO      2020-UPDATE-SYORI-EXT
+           ELSE
+      *        ＤＢ追加
+               PERFORM 20101-GENERIC-INS-SEC
            END-IF
       *
-      *    ＤＢ更新
-           PERFORM 20101-GENERICNAME-UPD-SEC
-           IF      WRK-ERRCD           =   ZERO
-               ADD     1               TO  CNT-UPD
+           .
+       2011-INSERT-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    改正追加  処理
+      *****************************************************************
+       2012-INSERT-SYORI-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYORI
+      *
+           INITIALIZE                  GENERIC-REC
+           MOVE    GENERICWK-KEY   TO  GENERIC-KEY
+           MOVE    GENERIC-REC     TO  MCPDATA-REC
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_generic_price"
+                                       TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 910-GENERIC-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-GENERIC
            END-IF
+      *
+           PERFORM UNTIL  (FLG-GENERIC     =   1  )
+                     OR   (FLG-SYORI       =   1  )
+               IF     (GENERIC-YUKOSTYMD   <=  GENERICWK-YUKOEDYMD2)
+                 AND  (GENERIC-YUKOEDYMD   >=  GENERICWK-YUKOEDYMD2)
+      *            ＤＢ更新
+                   MOVE    GENERIC-KEY     TO  GENERIC-UP-KEY
+                   MOVE    GENERICWK-YUKOEDYMD2
+                                           TO  GENERIC-YUKOEDYMD
+                   PERFORM 20101-GENERIC-UPD-SEC
+      *            ＤＢ追加
+                   PERFORM 20101-GENERIC-INS-SEC
+                   MOVE    1               TO  FLG-SYORI
+               ELSE
+                   MOVE    "tbl_generic_price"
+                                           TO  MCP-TABLE
+                   MOVE    "key2"          TO  MCP-PATHNAME
+                   PERFORM 910-GENERIC-READ-SEC
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 900-TBL-CLOSE-SEC
+      *
+           IF      FLG-SYORI       =   ZERO
+      *        ＤＢ追加
+               PERFORM 20101-GENERIC-INS-SEC
+           END-IF
+      *
+           .
+       2012-INSERT-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢ更新  処理
+      *****************************************************************
+       2020-UPDATE-SYORI-SEC       SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYORI
+      *
+           INITIALIZE                  GENERIC-REC
+           MOVE    GENERICWK-KEY   TO  GENERIC-KEY
+           MOVE    GENERIC-REC     TO  MCPDATA-REC
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_generic_price"
+                                       TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 910-GENERIC-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-GENERIC
+           END-IF
+      *
+           PERFORM UNTIL  (FLG-GENERIC     =   1  )
+                     OR   (FLG-SYORI       =   1  )
+               IF     (GENERIC-YUKOSTYMD   <=  GENERICWK-YUKOSTYMD)
+                 AND  (GENERIC-YUKOEDYMD   >=  GENERICWK-YUKOEDYMD)
+      *            ＤＢ更新
+                   MOVE    GENERIC-KEY     TO  GENERIC-UP-KEY
+                   MOVE    GENERICWK-KEY   TO  GENERIC-KEY
+                   MOVE    GENERICWK-PRICE TO  GENERIC-PRICE
+                   PERFORM 20101-GENERIC-UPD-SEC
+                   MOVE    1               TO  FLG-SYORI
+               ELSE
+                   MOVE    "tbl_generic_price"
+                                           TO  MCP-TABLE
+                   MOVE    "key2"          TO  MCP-PATHNAME
+                   PERFORM 910-GENERIC-READ-SEC
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 900-TBL-CLOSE-SEC
+      *
+           IF      FLG-SYORI       =   ZERO
+               MOVE    5               TO  WRK-ERRCD
+               PERFORM 2040-ERR-SYORI-SEC
+           END-IF
+      *
            .
        2020-UPDATE-SYORI-EXT.
            EXIT.
@@ -389,38 +494,50 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        2030-DELETE-SYORI-SEC       SECTION.
       *
-           INITIALIZE                  GENERICNAME-REC
-           MOVE    GENERICWK-KEY       TO  GENERIC-KEY
-           MOVE    GENERICNAME-REC     TO  MCPDATA-REC
-           MOVE    "DBSELECT"          TO  MCP-FUNC
-           MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-grpsys     PERFORM 900-ORCDBMAIN-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_genericname"   TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM  910-GENERICNAME-READ-SEC
+           MOVE    ZERO            TO  FLG-SYORI
+      *
+           INITIALIZE                  GENERIC-REC
+           MOVE    GENERICWK-KEY   TO  GENERIC-KEY
+           MOVE    GENERIC-REC     TO  MCPDATA-REC
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    "tbl_generic_price"
+                                       TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 910-GENERIC-READ-SEC
            ELSE
-               MOVE    1                   TO  FLG-GENERICNAME
+               MOVE    1               TO  FLG-GENERIC
            END-IF
       *
-      *    一般名マスタクローズ
-           MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM UNTIL  (FLG-GENERIC     =   1  )
+                     OR   (FLG-SYORI       =   1  )
+               IF     (GENERIC-YUKOSTYMD   <=  GENERICWK-YUKOSTYMD)
+                 AND  (GENERIC-YUKOEDYMD   >=  GENERICWK-YUKOEDYMD)
+      *            ＤＢ削除
+                   PERFORM 20101-GENERIC-DEL-SEC
+                   MOVE    1               TO  FLG-SYORI
+               ELSE
+                   MOVE    "tbl_generic_price"
+                                           TO  MCP-TABLE
+                   MOVE    "key2"          TO  MCP-PATHNAME
+                   PERFORM 910-GENERIC-READ-SEC
+               END-IF
+           END-PERFORM
+      *
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
       *
-      *    削除エラー（同一キーなし）
-           IF      FLG-GENERICNAME  NOT =  ZERO
-               MOVE    4               TO  WRK-ERRCD
+           IF      FLG-SYORI       =   ZERO
+               MOVE    6               TO  WRK-ERRCD
                PERFORM 2040-ERR-SYORI-SEC
-               GO      TO      2030-DELETE-SYORI-EXT
            END-IF
       *
-      *    ＤＢ削除
-           PERFORM 20101-GENERICNAME-DEL-SEC
-           IF      WRK-ERRCD           =   ZERO
-               ADD     1               TO  CNT-DEL
-           END-IF
            .
        2030-DELETE-SYORI-EXT.
            EXIT.
@@ -428,74 +545,79 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
       *    ＤＢ追加  処理
       *****************************************************************
-       20101-GENERICNAME-INS-SEC  SECTION.
+       20101-GENERIC-INS-SEC       SECTION.
       *
-           INITIALIZE                  GENERICNAME-REC
-           MOVE    GENERICNAMEWK-REC(2:)
-                                       TO  GENERICNAME-REC
-           MOVE    WRK-SYMD            TO  GENERIC-CREYMD
-           MOVE    SYS-TIME(1:6)       TO  GENERIC-UPHMS
-           MOVE    LNK-MNTYMD          TO  GENERIC-CREYMD
-                                           GENERIC-UPYMD
-           MOVE    LNK-MNTHMS          TO  GENERIC-UPHMS
-           MOVE    GENERICNAME-REC     TO  MCPDATA-REC
-           MOVE    "DBINSERT"          TO  MCP-FUNC
-           MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-grpsys     PERFORM 900-ORCDBMAIN-SEC
-           IF      MCP-RC          NOT =   ZERO
+           INITIALIZE                  GENERIC-REC
+           MOVE    GENERICWK-REC(10:)
+                                   TO  GENERIC-REC
+           MOVE    LNK-MNTYMD      TO  GENERIC-CREYMD
+                                       GENERIC-UPYMD
+           MOVE    GENERIC-REC     TO  MCPDATA-REC
+           MOVE    "DBINSERT"      TO  MCP-FUNC
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC      NOT =   ZERO
                MOVE    1               TO  LNK-RC
                MOVE    2               TO  WRK-ERRCD
                PERFORM 2040-ERR-SYORI-SEC
            END-IF
+           IF      WRK-ERRCD       =   ZERO
+               ADD     1               TO  CNT-INS
+           END-IF
+      *
            .
-       20101-GENERICNAME-INS-EXT.
+       20101-GENERIC-INS-EXT.
            EXIT.
       *
       *****************************************************************
       *    ＤＢ更新  処理
       *****************************************************************
-       20101-GENERICNAME-UPD-SEC  SECTION.
+       20101-GENERIC-UPD-SEC       SECTION.
       *
-           INITIALIZE                  GENERICNAME-REC
-           MOVE    GENERICNAMEWK-REC(2:)
-                                       TO  GENERICNAME-REC
-           MOVE    LNK-MNTYMD          TO  GENERIC-UPYMD
-           MOVE    LNK-MNTHMS          TO  GENERIC-UPHMS
-           MOVE    GENERICNAME-REC     TO  MCPDATA-REC
-           MOVE    "DBUPDATE"          TO  MCP-FUNC
-           MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-grpsys     PERFORM 900-ORCDBMAIN-SEC
-           IF      MCP-RC          NOT =   ZERO
+           MOVE    LNK-MNTYMD      TO  GENERIC-UPYMD
+           MOVE    GENERIC-REC     TO  MCPDATA-REC
+           MOVE    "DBUPDATE"      TO  MCP-FUNC
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "upd1"          TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC      NOT =   ZERO
                MOVE    2               TO  LNK-RC
                MOVE    3               TO  WRK-ERRCD
                PERFORM 2040-ERR-SYORI-SEC
            END-IF
+           IF      WRK-ERRCD       =   ZERO
+               ADD     1               TO  CNT-UPD
+           END-IF
+      *
            .
-       20101-GENERICNAME-UPD-EXT.
+       20101-GENERIC-UPD-EXT.
            EXIT.
       *
       *****************************************************************
       *    ＤＢ削除  処理
       *****************************************************************
-       20101-GENERICNAME-DEL-SEC  SECTION.
+       20101-GENERIC-DEL-SEC       SECTION.
       *
-           INITIALIZE                  GENERICNAME-REC
-           MOVE    GENERICNAMEWK-REC(2:)
-                                       TO  GENERICNAME-REC
-           MOVE    GENERICNAME-REC     TO  MCPDATA-REC
-           MOVE    "DBDELETE"          TO  MCP-FUNC
-           MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-grpsys     PERFORM 900-ORCDBMAIN-SEC
-           IF      MCP-RC          NOT =   ZERO
+           MOVE    GENERIC-REC     TO  MCPDATA-REC
+           MOVE    "DBDELETE"      TO  MCP-FUNC
+           MOVE    "tbl_generic_price"
+                                   TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC      NOT =   ZERO
                MOVE    3               TO  LNK-RC
                MOVE    4               TO  WRK-ERRCD
                PERFORM 2040-ERR-SYORI-SEC
            END-IF
+           IF      WRK-ERRCD       =   ZERO
+               ADD     1               TO  CNT-DEL
+           END-IF
+      *
            .
-       20101-GENERICNAME-DEL-EXT.
+       20101-GENERIC-DEL-EXT.
            EXIT.
       *
       *****************************************************************
@@ -504,12 +626,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
        2040-ERR-SYORI-SEC          SECTION.
       *
       *    エラー出力
-           MOVE    GENERICNAMEWK-REC   TO  ERR-GENERICNAMEWK-REC
-           WRITE   ERR-GENERICNAMEWK-REC
-           ADD     1                   TO  CNT-ERR
+           MOVE    GENERICWK-REC   TO  ERR-GENERICWK-REC
+           WRITE   ERR-GENERICWK-REC
+           ADD     1               TO  CNT-ERR
       *
       *    エラーメッセージ出力
            PERFORM 20401-PLF-OUT-SEC
+      *
            .
        2040-ERR-SYORI-EXT.
            EXIT.
@@ -519,23 +642,32 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        20401-PLF-OUT-SEC           SECTION.
       *
-           MOVE    GENERICWK-SYORIKBN  TO  WRK-SYORIKBN
-           MOVE    GENERICWK-YAKKAKJNCD    TO  WRK-YAKKAKJNCD
+           MOVE    GENERICWK-SYORIKBN
+                                   TO  WRK-SYORIKBN
+           MOVE    GENERICWK-YAKKAKJNCD
+                                   TO  WRK-YAKKAKJNCD
+           MOVE    GENERICWK-PRICE TO  WRK-PRICE
+      *
            EVALUATE    WRK-ERRCD
                WHEN    1
-                   MOVE  "一般名コード存在"
-                                       TO  WRK-MSG-01
+                   MOVE  "最低薬価マスタ登録済み"
+                                           TO  WRK-MSG-01
                WHEN    2
-                   MOVE  "追加エラー"  TO  WRK-MSG-01
+                   MOVE  "追加エラー"      TO  WRK-MSG-01
                WHEN    3
-                   MOVE  "更新エラー"  TO  WRK-MSG-01
+                   MOVE  "更新エラー"      TO  WRK-MSG-01
                WHEN    4
-                   MOVE  "削除エラー"  TO  WRK-MSG-01
+                   MOVE  "削除エラー"      TO  WRK-MSG-01
+               WHEN    5
+                   MOVE  "更新対象なし"    TO  WRK-MSG-01
+               WHEN    6
+                   MOVE  "削除対象なし"    TO  WRK-MSG-01
            END-EVALUATE
       *
-           MOVE    WRK-MSG-AREA        TO  PLF-REC
-           WRITE                           PLF-REC
-           ADD     1                   TO  CNT-PLF
+           MOVE    WRK-MSG-AREA    TO  PLF-REC
+           WRITE                       PLF-REC
+           ADD     1               TO  CNT-PLF
+      *
            .
        20401-PLF-OUT-EXT.
            EXIT.
@@ -546,23 +678,25 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
        2700-OUTLST-INIT-SEC        SECTION.
       *
            OPEN    OUTPUT              ERR-FILE
-           IF  STS-ERR             NOT =   ZERO
-               DISPLAY "*(ORCMUP0121)* OUTFILE OPN STS[" STS-ERR "]"
-               GO      TO              2700-OUTLST-INIT-EXT
+           IF      STS-ERR     NOT =   ZERO
+               DISPLAY "*(ORCMUP0242)* OUTFILE OPN STS[" STS-ERR "]"
+               GO  TO  2700-OUTLST-INIT-EXT
            END-IF
       *
       *    エラーレコード出力ファイル　オープン
-           OPEN    OUTPUT              PLF-FILE
-           IF  STS-PLF             NOT =   ZERO
-               DISPLAY "*(ORCMUP0121)* PLFFILE OPN STS[" STS-PLF "]"
-               GO      TO              2700-OUTLST-INIT-EXT
+           OPEN    OUTPUT             PLF-FILE
+           IF      STS-PLF    NOT =   ZERO
+               DISPLAY "*(ORCMUP0242)* PLFFILE OPN STS[" STS-PLF "]"
+               GO  TO  2700-OUTLST-INIT-EXT
            END-IF
-           MOVE    WRK-SYY             TO  MES-TITLE1-YY
-           MOVE    SYS-MM              TO  MES-TITLE1-MM
-           MOVE    SYS-DD              TO  MES-TITLE1-DD
-           MOVE    SPA-HOSPNUM         TO  MES-TITLE1-HOSPNUM
-           MOVE    MES-TITLE1          TO  PLF-REC
+      *
+           MOVE    WRK-SYY         TO  MES-TITLE1-YY
+           MOVE    SYS-MM          TO  MES-TITLE1-MM
+           MOVE    SYS-DD          TO  MES-TITLE1-DD
+           MOVE    SPA-HOSPNUM     TO  MES-TITLE1-HOSPNUM
+           MOVE    MES-TITLE1      TO  PLF-REC
            WRITE   PLF-REC
+      *
            .
        2700-OUTLST-INIT-EXT.
            EXIT.
@@ -570,7 +704,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
       *    終了処理
       *****************************************************************
-       300-END-SEC                     SECTION.
+       300-END-SEC                 SECTION.
       *
       *    DB DISCONNECT
       *    PERFORM 900-DBDISCONNECT-SEC
@@ -580,9 +714,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            CLOSE                       ERR-FILE
            CLOSE                       PLF-FILE
       *
-           IF    ( LNK-RC              =   ZERO )
-               IF    ( CNT-IN      NOT =   LNK-COUNT )
-      *
+           IF      LNK-RC          =   ZERO
+               IF      CNT-IN      NOT =   LNK-COUNT
                    MOVE    99              TO  LNK-RC
       *
                    INITIALIZE                  JOBKANRI-REC
@@ -593,76 +726,76 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    MOVE    "DBSELECT"      TO  MCP-FUNC
                    PERFORM 900-ORCDBMAIN-SEC
                END-IF
-      *
            END-IF
       *
-           DISPLAY "*(ORCMUP0121)* INPUT  /I   CNT[" CNT-IN  "]"
-           DISPLAY "*(ORCMUP0121)*  INSERT     CNT[" CNT-INS "]"
-           DISPLAY "*(ORCMUP0121)*  UPDATE     CNT[" CNT-UPD "]"
-           DISPLAY "*(ORCMUP0121)*  DELETE     CNT[" CNT-DEL "]"
-           DISPLAY "*(ORCMUP0121)* ERR    /O   CNT[" CNT-ERR "]"
-           DISPLAY "*(ORCMUP0121)* PLF    /O   CNT[" CNT-PLF "]"
-           DISPLAY "*(ORCMUP0121)* RC             [" LNK-RC "]"
-      **** ACCEPT  WRK-IN
+           DISPLAY "*(ORCMUP0242)* INPUT  /I   CNT[" CNT-IN  "]"
+           DISPLAY "*(ORCMUP0242)*  INSERT     CNT[" CNT-INS "]"
+           DISPLAY "*(ORCMUP0242)*  UPDATE     CNT[" CNT-UPD "]"
+           DISPLAY "*(ORCMUP0242)*  DELETE     CNT[" CNT-DEL "]"
+           DISPLAY "*(ORCMUP0242)* ERR    /O   CNT[" CNT-ERR "]"
+           DISPLAY "*(ORCMUP0242)* PLF    /O   CNT[" CNT-PLF "]"
+           DISPLAY "*(ORCMUP0242)* RC             [" LNK-RC "]"
+      *
            .
        300-END-EXT.
            EXIT.
       *
       *****************************************************************
-      *     一般名マスタ変更データ読込み処理
+      *     最低薬価読込み処理
       *****************************************************************
        900-IN-KENSAKU-SEC          SECTION.
       *
           READ    IN-FILE
               AT  END
-                  MOVE    1               TO  FLG-IN
+                  MOVE    1                TO  FLG-IN
               NOT AT  END
-                  MOVE    ZERO            TO  FLG-IN
-                  ADD     1               TO  CNT-IN
+                  MOVE    ZERO             TO  FLG-IN
+                  ADD     1                TO  CNT-IN
           END-READ
       *
           IF      FLG-IN           =   ZERO
-              MOVE    SPACE            TO  GENERICNAMEWK-REC
-      *       2012.5.10 YAKKAKJNCD 9 -> 12
-              MOVE    IN-REC(1:10)     TO  GENERICNAMEWK-REC
-              MOVE    IN-REC(11:)      TO  GENERICNAMEWK-REC(14:)
+              MOVE    SPACE            TO  GENERICWK-REC
+              MOVE    IN-REC           TO  GENERICWK-REC
           END-IF
+      *
           .
        900-IN-KENSAKU-EXT.
           EXIT.
       *
       *****************************************************************
-      *    一般名マスター読込
+      *    最低薬価読込
       *****************************************************************
-       910-GENERICNAME-READ-SEC   SECTION.
+       910-GENERIC-READ-SEC        SECTION.
       *
-           MOVE    "DBFETCH"           TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC         TO  GENERICNAME-REC
-               MOVE    ZERO                TO  FLG-GENERICNAME
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    MCPDATA-REC     TO  GENERIC-REC
+               MOVE    ZERO            TO  FLG-GENERIC
            ELSE
-               INITIALIZE                  GENERICNAME-REC
-               MOVE    1                   TO  FLG-GENERICNAME
+               INITIALIZE                  GENERIC-REC
+               MOVE    1               TO  FLG-GENERIC
            END-IF
+      *
            .
-       910-GENERICNAME-READ-EXT.
+       910-GENERIC-READ-EXT.
            EXIT.
       *
       *****************************************************************
       *    ＤＢ　オープン処理
       *****************************************************************
-       100-DBOPEN-SEC                SECTION.
+       100-DBOPEN-SEC              SECTION.
       *
            MOVE    LOW-VALUE       TO  MCP-TABLE
                                        MCP-PATHNAME
            MOVE    "DBOPEN"        TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    LOW-VALUE       TO  MCP-TABLE
                                        MCP-PATHNAME
            MOVE    "DBSTART"       TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
+      *
            .
        100-DBOPEN-EXT.
            EXIT.
@@ -670,17 +803,18 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
       *    ＤＢ　クローズ処理
       *****************************************************************
-       900-DBDISCONNECT-SEC            SECTION.
+       900-DBDISCONNECT-SEC        SECTION.
       *
            MOVE    LOW-VALUE       TO  MCP-TABLE
                                        MCP-PATHNAME
            MOVE    "DBCOMMIT"      TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    LOW-VALUE       TO  MCP-TABLE
                                        MCP-PATHNAME
            MOVE    "DBDISCONNECT"  TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
+      *
            .
        900-DBDISCONNECT-EXT.
            EXIT.
@@ -688,10 +822,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
       *    テーブルクローズ処理
       *****************************************************************
-       900-TBL-CLOSE-SEC               SECTION.
+       900-TBL-CLOSE-SEC           SECTION.
       *
            MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
+      *
            .
        900-TBL-CLOSE-EXT.
            EXIT.
@@ -699,12 +834,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
       *    テーブルアクセス処理
       *****************************************************************
-       900-ORCDBMAIN-SEC               SECTION.
+       900-ORCDBMAIN-SEC           SECTION.
       *
-grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
+           CALL    "ORCDBMAIN"     USING
+                                   MCPAREA
+                                   MCPDATA-REC
+                                   SPA-AREA
+      *
            .
-      *
        900-ORCDBMAIN-EXT.
            EXIT.

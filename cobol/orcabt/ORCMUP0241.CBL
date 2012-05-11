@@ -28,6 +28,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      * 04.05.00     NACL-伊藤    12/05/10  レイアウト変更のため更新データ
+      *                                     を変換
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -56,7 +58,7 @@
       *
       *    入力：最低薬価更新データ
        FD  IN-FILE.
-       01  IN-REC                      PIC X(50200).
+       01  IN-REC                      PIC X(1000).
       *
       *    出力：エラーファイル
        FD  ERR-FILE.
@@ -229,7 +231,7 @@
            ACCEPT  SYS-TIME        FROM    TIME
       *
       *    DB OPEN
-      *     PERFORM 100-DBOPEN-SEC
+      *    PERFORM 100-DBOPEN-SEC
       *
            PERFORM 101-ASSIN-GET-SEC
       *
@@ -753,7 +755,9 @@
       *
           IF      FLG-IN           =   ZERO
               MOVE    SPACE            TO  GENERICWK-REC
-              MOVE    IN-REC           TO  GENERICWK-REC
+      *       2012.5.10 YAKKAKJNCD 9 -> 12
+              MOVE    IN-REC(1:18)     TO  GENERICWK-REC
+              MOVE    IN-REC(19:)      TO  GENERICWK-REC(22:)
           END-IF
       *
           .

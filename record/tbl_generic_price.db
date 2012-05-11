@@ -67,3 +67,15 @@ path	upd1	{
 		;
 	};
 };
+
+path	key3 	{
+	DBSELECT	{
+		DECLARE tbl_generic_price_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_generic_price
+		WHERE	YAKKAKJNCD    =  :YAKKAKJNCD
+			AND   YUKOSTYMD  <=  :YUKOSTYMD
+			AND   YUKOEDYMD  >=  :YUKOEDYMD
+		;
+	};
+};

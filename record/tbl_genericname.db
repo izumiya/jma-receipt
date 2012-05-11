@@ -52,3 +52,13 @@ path	key2 	{
 	};
 };
 
+path	key3 	{
+	DBSELECT	{
+		DECLARE tbl_genericname_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_genericname
+		WHERE	YAKKAKJNCD    =  :YAKKAKJNCD
+		;
+	};
+};
+
