@@ -13485,10 +13485,11 @@
              END-IF
            ELSE
              MOVE      1      TO    FLG-HOKENICHIBU
-             IF   ( SYU-KOH-HKNNUM(1)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(3)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(4)   =   "012" OR "025" )
+             IF  ((SYU-KOH-HKNNUM(1) = "012" OR "025") OR
+                  (SYU-KOH-HKNNUM(2) = "012" OR "025") OR
+                  (SYU-KOH-HKNNUM(3) = "012" OR "025") OR
+                  (SYU-KOH-HKNNUM(4) = "012" OR "025"))
+             AND ( FLG-ZENKOKUKOHI-NISYU    NOT =   5 )
                IF   SYU-SYUHKNNUM  NOT = SPACE
                  IF  FLG-TOKU75 = 1 OR 2
                    MOVE    7500      TO   WRK-KINGAKU
@@ -13496,6 +13497,7 @@
                    MOVE    15000     TO   WRK-KINGAKU
                  END-IF
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
+                 PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                END-IF
              ELSE
                IF   ( SYU-KOH-HKNNUM(1) =   "972" )
@@ -13612,7 +13614,7 @@
                            MOVE    1    TO   FLG-HOKENICHIBU2
                       END-IF
       *
-                      IF  FLG-ZENKOKUKOHI-NISYU  =  1
+                      IF  FLG-ZENKOKUKOHI-NISYU  =  1 OR 5
                         IF  RECE62-KOHNUM(1) = SYU-KOH-HKNNUM(1)
                         AND RECE62-KOHNUM(1) = RECE62-KOHNUMHC(IDX1 1)
                         AND RECE62-KOHID(1)  = RECE62-KOHIDHC(IDX1 1)
@@ -13741,10 +13743,11 @@
                  ADD    SYU-TOTAL-HKNTEN    TO  WRK-JYOGENKBN-TEN
                  ADD    SYU-KOH-FTN         TO  WRK-KOH-FTN-GEN70
              END-IF
-             IF   ( SYU-KOH-HKNNUM(1)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(3)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(4)   =   "012" OR "025" )
+             IF  ((SYU-KOH-HKNNUM(1) = "012" OR "025") OR
+                  (SYU-KOH-HKNNUM(2) = "012" OR "025") OR
+                  (SYU-KOH-HKNNUM(3) = "012" OR "025") OR
+                  (SYU-KOH-HKNNUM(4) = "012" OR "025"))
+             AND ( FLG-ZENKOKUKOHI-NISYU    NOT =   5 )
                IF   SYU-SYUHKNNUM  NOT = SPACE
                  MOVE    1         TO   FLG-JYOGENKBN2
                  IF  FLG-KOHYONKAIME = 1
@@ -13761,6 +13764,7 @@
                   END-IF
                  END-IF
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
+                 PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                END-IF
              ELSE
                IF   ( SYU-KOH-HKNNUM(1) =   "972" )
@@ -13795,6 +13799,15 @@
                  END-IF
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                  PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
+                 IF  FLG-ZENKOKUKOHI-NISYU  =  5
+                    IF  RECE62-KOHNUM(1) = SYU-KOH-HKNNUM(1)
+                    AND RECE62-KOHNUM(1) = RECE62-KOHNUMHC(IDX1 1)
+                    AND RECE62-KOHID(1)  = RECE62-KOHIDHC(IDX1 1)
+                      MOVE 5          TO   FLG-JYOGENKBN2
+                      MOVE WRK-KINGAKU
+                                      TO   WRK-KINGAKU-GENBUTU2
+                    END-IF
+                 END-IF
                ELSE
                 IF  ( SYU-KOH-HKNNUM(1) =   "974")
                 OR  ( SYU-KOH-HKNNUM(2) =   "974")
@@ -13890,7 +13903,7 @@
                            MOVE    1    TO   FLG-HOKENICHIBU2
                      END-IF
       *
-                     IF  FLG-ZENKOKUKOHI-NISYU  =  1
+                     IF  FLG-ZENKOKUKOHI-NISYU  =  1 OR 5
                         IF  RECE62-KOHNUM(1) = SYU-KOH-HKNNUM(1)
                         AND RECE62-KOHNUM(1) = RECE62-KOHNUMHC(IDX1 1)
                         AND RECE62-KOHID(1)  = RECE62-KOHIDHC(IDX1 1)
@@ -14261,16 +14274,27 @@
        2104423-ICHIBUFTN-KOH-HEN2-SEC               SECTION.
       *
            IF    RECE62-SRYYM   >=  "200610"
-                   IF  FLG-TOKU75 = 1 OR 2
-                     MOVE    22200   TO   WRK-KINGAKU
-                   ELSE
-                     MOVE    44400   TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
+             IF  FLG-TOKU75 = 1 OR 2
+               MOVE     22200   TO   WRK-KINGAKU
+             ELSE
+               MOVE     44400   TO   WRK-KINGAKU
+             END-IF
            ELSE
-                   MOVE      40200   TO   WRK-KINGAKU
-                   PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
+               MOVE     40200   TO   WRK-KINGAKU
            END-IF
+           IF  (SYU-KOH-HKNNUM(1) = "012" OR "025")
+           OR  (SYU-KOH-HKNNUM(2) = "012" OR "025")
+           OR  (SYU-KOH-HKNNUM(3) = "012" OR "025")
+           OR  (SYU-KOH-HKNNUM(4) = "012" OR "025")
+             IF  SYU-SYUHKNNUM  NOT = SPACE
+               IF  FLG-TOKU75 = 1 OR 2
+                 MOVE    7500   TO   WRK-KINGAKU
+               ELSE
+                 MOVE   15000   TO   WRK-KINGAKU
+               END-IF
+             END-IF
+           END-IF
+           PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
       *
            .
        2104423-ICHIBUFTN-KOH-HEN2-EXT.
@@ -14518,6 +14542,26 @@
                   END-IF
                  END-IF
       ***>     END-IF
+               IF  (SYU-KOH-HKNNUM(1) = "012" OR "025")
+               OR  (SYU-KOH-HKNNUM(2) = "012" OR "025")
+               OR  (SYU-KOH-HKNNUM(3) = "012" OR "025")
+               OR  (SYU-KOH-HKNNUM(4) = "012" OR "025")
+                 IF   SYU-SYUHKNNUM  NOT = SPACE
+                   IF  FLG-KOHYONKAIME = 1
+                     IF  FLG-TOKU75 = 3
+                       MOVE  12300      TO   WRK-KINGAKU
+                     ELSE
+                       MOVE  24600      TO   WRK-KINGAKU
+                     END-IF
+                   ELSE
+                     IF  FLG-TOKU75 = 3
+                       MOVE  17700      TO   WRK-KINGAKU
+                     ELSE
+                       MOVE  35400      TO   WRK-KINGAKU
+                     END-IF
+                   END-IF
+                 END-IF
+               END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU2
                PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
              WHEN         2
@@ -14546,6 +14590,26 @@
                   END-IF
                  END-IF
       ***>     END-IF
+               IF  (SYU-KOH-HKNNUM(1) = "012" OR "025")
+               OR  (SYU-KOH-HKNNUM(2) = "012" OR "025")
+               OR  (SYU-KOH-HKNNUM(3) = "012" OR "025")
+               OR  (SYU-KOH-HKNNUM(4) = "012" OR "025")
+                 IF   SYU-SYUHKNNUM  NOT = SPACE
+                   IF  FLG-KOHYONKAIME = 1
+                     IF  FLG-TOKU75 = 3
+                       MOVE  12300      TO   WRK-KINGAKU
+                     ELSE
+                       MOVE  24600      TO   WRK-KINGAKU
+                     END-IF
+                   ELSE
+                     IF  FLG-TOKU75 = 3
+                       MOVE  17700      TO   WRK-KINGAKU
+                     ELSE
+                       MOVE  35400      TO   WRK-KINGAKU
+                     END-IF
+                   END-IF
+                 END-IF
+               END-IF
                MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU4
                PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
            END-EVALUATE
@@ -20052,6 +20116,34 @@
                IF    RECE62-HKNCOMBI(2)   =   ZERO
                      MOVE     ZERO     TO     FLG-ZENKOKUKOHI-NISYU
                END-IF
+             END-IF
+      *
+      *      主＋生保、主＋全
+             IF (((RECE62-KOHNUM(1)(1:1)  =  "0"             ) OR
+                  (TBL-TOKATUKAIFLG(1)    =   1              ))  AND
+                 ( RECE62-KOHNUM(2)       =  "012" OR  "025"  ))
+             OR (( RECE62-KOHNUM(1)       =  "012" OR  "025"  )  AND
+                 ((RECE62-KOHNUM(2)(1:1)  =  "0"             ) OR
+                  (TBL-TOKATUKAIFLG(2)    =   1              )))
+      *
+               MOVE        1           TO     FLG-ZENKOKUKOHI-NISYU
+               IF    RECE62-HKNCOMBI(2)   =   ZERO
+                  MOVE     ZERO        TO     FLG-ZENKOKUKOHI-NISYU
+               ELSE
+                  PERFORM   VARYING  IDX1  FROM  1  BY  1
+                             UNTIL  (IDX1                  >  10 )
+                              OR    (RECE62-HKNCOMBI(IDX1) = ZERO)
+                     IF (RECE62-KOHNUMHC(IDX1 1) = "012" OR "025")
+                     OR (RECE62-KOHNUMHC(IDX1 2) = "012" OR "025")
+                     OR (RECE62-KOHNUMHC(IDX1 3) = "012" OR "025")
+                     OR (RECE62-KOHNUMHC(IDX1 4) = "012" OR "025")
+                       CONTINUE
+                     ELSE
+                       MOVE     5      TO     FLG-ZENKOKUKOHI-NISYU
+                     END-IF
+                  END-PERFORM
+               END-IF
+      *
              END-IF
       *
       ***    IF ((WRK-PREFNUM =  "27") AND (RECE62-KOUREI       = "1"))
