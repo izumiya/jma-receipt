@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCMUP0121.
+       PROGRAM-ID.                 ORCMUP0122.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
@@ -25,12 +25,11 @@
       *  管理者            : 
       *  作成日付    作業者        記述
       *  07.03.18    NACL-伊藤     新規作成
+      *  12.05.10    NACL-伊藤     レイアウト変更のためORCMUP0121.CBL
+      *                            を複写して作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      * 04.03.00     NACL-太田    08/05/28  エラー処理強化対応
-      * 04.05.00     NACL-伊藤    12/05/10  レイアウト変更のため更新データ
-      *                                     を変換
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -126,7 +125,7 @@ grpsys     COPY    "COMMON-SPA".
        01  MES-AREA.
            03  MES-TITLE1.
                05  FILLER              PIC X(26) VALUE
-                                       "【PGID:ORCMUP0121.CBL】".
+                                       "【PGID:ORCMUP0122.CBL】".
                05  MES-TITLE1-YY       PIC X(04) VALUE SPACE.
                05  FILLER              PIC X(01) VALUE ".".
                05  MES-TITLE1-MM       PIC X(02) VALUE SPACE.
@@ -225,7 +224,7 @@ grpsys     COPY    "COMMON-SPA".
            OPEN    INPUT               IN-FILE
            IF  STS-IN              NOT =   ZERO
                MOVE    1               TO  FLG-IN
-               DISPLAY "*(ORCMUP0121)* IN-FILE OPN STS["
+               DISPLAY "*(ORCMUP0122)* IN-FILE OPN STS["
                                        STS-IN "]"
            END-IF
       *
@@ -312,11 +311,11 @@ grpsys     COPY    "COMMON-SPA".
            MOVE    GENERICNAME-REC     TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
            MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
 grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_genericname"   TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "key3"              TO  MCP-PATHNAME
                PERFORM  910-GENERICNAME-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-GENERICNAME
@@ -324,7 +323,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
       *    一般名マスタクローズ
            MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
       *
       *    追加エラー（同一キー存在）
@@ -353,11 +352,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    GENERICNAME-REC     TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
            MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
 grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_genericname"   TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "key3"              TO  MCP-PATHNAME
                PERFORM  910-GENERICNAME-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-GENERICNAME
@@ -365,7 +364,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
       *    一般名マスタクローズ
            MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
       *
       *    更新エラー（同一キーなし）
@@ -394,11 +393,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    GENERICNAME-REC     TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
            MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
 grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_genericname"   TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
+               MOVE    "key3"              TO  MCP-PATHNAME
                PERFORM  910-GENERICNAME-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-GENERICNAME
@@ -406,7 +405,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
       *    一般名マスタクローズ
            MOVE    "tbl_genericname"   TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "key3"              TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
       *
       *    削除エラー（同一キーなし）
@@ -547,14 +546,14 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            OPEN    OUTPUT              ERR-FILE
            IF  STS-ERR             NOT =   ZERO
-               DISPLAY "*(ORCMUP0121)* OUTFILE OPN STS[" STS-ERR "]"
+               DISPLAY "*(ORCMUP0122)* OUTFILE OPN STS[" STS-ERR "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
       *
       *    エラーレコード出力ファイル　オープン
            OPEN    OUTPUT              PLF-FILE
            IF  STS-PLF             NOT =   ZERO
-               DISPLAY "*(ORCMUP0121)* PLFFILE OPN STS[" STS-PLF "]"
+               DISPLAY "*(ORCMUP0122)* PLFFILE OPN STS[" STS-PLF "]"
                GO      TO              2700-OUTLST-INIT-EXT
            END-IF
            MOVE    WRK-SYY             TO  MES-TITLE1-YY
@@ -596,13 +595,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            END-IF
       *
-           DISPLAY "*(ORCMUP0121)* INPUT  /I   CNT[" CNT-IN  "]"
-           DISPLAY "*(ORCMUP0121)*  INSERT     CNT[" CNT-INS "]"
-           DISPLAY "*(ORCMUP0121)*  UPDATE     CNT[" CNT-UPD "]"
-           DISPLAY "*(ORCMUP0121)*  DELETE     CNT[" CNT-DEL "]"
-           DISPLAY "*(ORCMUP0121)* ERR    /O   CNT[" CNT-ERR "]"
-           DISPLAY "*(ORCMUP0121)* PLF    /O   CNT[" CNT-PLF "]"
-           DISPLAY "*(ORCMUP0121)* RC             [" LNK-RC "]"
+           DISPLAY "*(ORCMUP0122)* INPUT  /I   CNT[" CNT-IN  "]"
+           DISPLAY "*(ORCMUP0122)*  INSERT     CNT[" CNT-INS "]"
+           DISPLAY "*(ORCMUP0122)*  UPDATE     CNT[" CNT-UPD "]"
+           DISPLAY "*(ORCMUP0122)*  DELETE     CNT[" CNT-DEL "]"
+           DISPLAY "*(ORCMUP0122)* ERR    /O   CNT[" CNT-ERR "]"
+           DISPLAY "*(ORCMUP0122)* PLF    /O   CNT[" CNT-PLF "]"
+           DISPLAY "*(ORCMUP0122)* RC             [" LNK-RC "]"
       **** ACCEPT  WRK-IN
            .
        300-END-EXT.
@@ -623,9 +622,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
           IF      FLG-IN           =   ZERO
               MOVE    SPACE            TO  GENERICNAMEWK-REC
-      *       2012.5.10 YAKKAKJNCD 9 -> 12
-              MOVE    IN-REC(1:10)     TO  GENERICNAMEWK-REC
-              MOVE    IN-REC(11:)      TO  GENERICNAMEWK-REC(14:)
+              MOVE    IN-REC           TO  GENERICNAMEWK-REC
           END-IF
           .
        900-IN-KENSAKU-EXT.
