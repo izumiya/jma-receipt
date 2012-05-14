@@ -701,6 +701,7 @@
            03  FLG-SYOBYO-COM                          PIC 9(01).
            03  FLG-RYOYO-COM                           PIC 9(01).
            03  FLG-SYODOU-COM                          PIC 9(01).
+           03  FLG-SAIDOU-COM                          PIC 9(01).
            03  FLG-NIKOCHIN-COM                        PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
            03  FLG-KENSA-COM                           PIC 9(01).
@@ -1893,6 +1894,10 @@
            03  CONS-DOUJITU-DEN    PIC X(09) VALUE "112015950".
       *    ≥∞ÕËø«Œ≈Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°À
            03  CONS-DOUJITU-GAI    PIC X(09) VALUE "112016210".
+      *
+      *     £∫∆ªªƒÍø«Œ≈≤ °ß
+           03  CONS-DOUJITU-COMMENT
+                                   PIC X(09) VALUE "830000051".
       *
       *    ∫ﬁ§Œø«Œ≈∆‚Õ∆•¡•ß•√•Ø•∆°º•÷•Î
        01  TBL-ZAICHECK-AREA.
@@ -5465,6 +5470,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 FLG-SYOBYO-COM
                                                 FLG-RYOYO-COM
                                                 FLG-SYODOU-COM
+                                                FLG-SAIDOU-COM
                                                 FLG-NIKOCHIN-COM
                                                 FLG-ZENSOKU-COM
                                                 FLG-OSIN-COM
@@ -5517,6 +5523,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-SYOBYO-COM
                                                        FLG-RYOYO-COM
                                                        FLG-SYODOU-COM
+                                                       FLG-SAIDOU-COM
                                                        FLG-NIKOCHIN-COM
                                                        FLG-ZENSOKU-COM
                                                        FLG-OSIN-COM
@@ -5560,6 +5567,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                      FLG-SYOBYO-COM
                                                      FLG-RYOYO-COM
                                                      FLG-SYODOU-COM
+                                                     FLG-SAIDOU-COM
                                                      FLG-NIKOCHIN-COM
                                                      FLG-ZENSOKU-COM
                                                      FLG-OSIN-COM
@@ -7122,11 +7130,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
               END-IF
       *
       *       ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À
-              IF   SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
+              IF  (SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
                                       OR    CONS-DOUJITU-DEN
-                                      OR    CONS-DOUJITU-GAI
+                                      OR    CONS-DOUJITU-GAI)
+              AND (FLG-SAIDOU-COM     =     ZERO            )
                  MOVE   "1"        TO   RECE04-FLG-SAIDOU-COMMENT
                  MOVE   SRY-SRYKA  TO   RECE04-SAIDOU-SRYKA(1)
+              END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-DOUJITU-COMMENT
+                 MOVE   SPACE      TO   RECE04-FLG-SAIDOU-COMMENT
+                 MOVE   SPACE      TO   RECE04-SAIDOU-SRYKA(1)
+                 MOVE    1         TO   FLG-SAIDOU-COM
               END-IF
            END-IF
       *
@@ -7938,6 +7952,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                      OR CONS-ZAIHOU4-COMMENT
                  MOVE   14            TO  WRK-SETCOM-JIDO
            END-IF
+      *    ∫∆ø«° ∆±∞Ï∆¸£≤≤ Ã‹°À
+           IF    RECE05-SRYCD(IDX4)   = CONS-DOUJITU-SAI
+                                     OR CONS-DOUJITU-DEN
+                                     OR CONS-DOUJITU-GAI
+                 MOVE   25            TO  WRK-SETCOM-JIDO
+           END-IF
       *
            IF  ((WRK-SETCOM-JIDO    =  1                        ) AND
                 (RECE05-SRYCD(IDX4) = "830000014" OR "840000038"))
@@ -7964,6 +7984,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                 (RECE05-SRYCD(IDX4) = CONS-OSIN3-COMMENT        ))
            OR  ((WRK-SETCOM-JIDO    =  14                       ) AND
                 (RECE05-SRYCD(IDX4) = CONS-ZAIHOU2-COMMENT      ))
+           OR  ((WRK-SETCOM-JIDO    =  25                       ) AND
+                (RECE05-SRYCD(IDX4) = CONS-DOUJITU-COMMENT      ))
       *
                  MOVE  "1"              TO  RECE04-SETCOMFLG
                  MOVE  "2"              TO  RECE05-MEISKYFLG(IDX4)

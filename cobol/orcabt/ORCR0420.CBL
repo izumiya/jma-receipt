@@ -373,6 +373,7 @@
            03  FLG-SYOBYO-COM                          PIC 9(01).
            03  FLG-RYOYO-COM                           PIC 9(01).
            03  FLG-SYODOU-COM                          PIC 9(01).
+           03  FLG-SAIDOU-COM                          PIC 9(01).
            03  FLG-NIKOCHIN-COM                        PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
            03  FLG-KENSA-COM                           PIC 9(01).
@@ -1068,6 +1069,9 @@
       *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë
            03  CONS-DOUJITU-GAI      PIC X(09)  VALUE  "112016210".
       *
+      *    Ê£ºÆ»»Äê¿ÇÎÅ²Ê¡§
+           03  CONS-DOUJITU-COMMENT  PIC X(09)  VALUE  "830000051".
+      *
       *    »þ´Ö³°ÂÐ±þ²Ã»»£±
            03  CONS-JIKANTAI1        PIC X(09)  VALUE  "112016070".
       *    »þ´Ö³°ÂÐ±þ²Ã»»£²
@@ -1563,6 +1567,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-SYOBYO-COM
                                                        FLG-RYOYO-COM
                                                        FLG-SYODOU-COM
+                                                       FLG-SAIDOU-COM
                                                        FLG-NIKOCHIN-COM
                                                        FLG-ZENSOKU-COM
                                                        FLG-OSIN-COM
@@ -1626,6 +1631,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-SYOBYO-COM
                                                       FLG-RYOYO-COM
                                                       FLG-SYODOU-COM
+                                                      FLG-SAIDOU-COM
                                                       FLG-NIKOCHIN-COM
                                                       FLG-ZENSOKU-COM
                                                       FLG-OSIN-COM
@@ -1676,6 +1682,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-SYOBYO-COM
                                                       FLG-RYOYO-COM
                                                       FLG-SYODOU-COM
+                                                      FLG-SAIDOU-COM
                                                       FLG-NIKOCHIN-COM
                                                       FLG-ZENSOKU-COM
                                                       FLG-OSIN-COM
@@ -3100,12 +3107,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
       *
       *       ºÆ¿Ç¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë
-              IF   SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
+              IF  (SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
                                       OR    CONS-DOUJITU-DEN
                                       OR    CONS-DOUJITU-GAI
-                                      OR    CONS-ROUSAI19
+                                      OR    CONS-ROUSAI19   )
+              AND (FLG-SAIDOU-COM     =     ZERO            )
                  MOVE   "1"        TO   RECE44-FLG-SAIDOU-COMMENT
                  MOVE   SRY-SRYKA  TO   RECE44-SAIDOU-SRYKA(1)
+              END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-DOUJITU-COMMENT
+                 MOVE   SPACE      TO   RECE44-FLG-SAIDOU-COMMENT
+                 MOVE   SPACE      TO   RECE44-SAIDOU-SRYKA(1)
+                 MOVE    1         TO   FLG-SAIDOU-COM
               END-IF
            END-IF
       *
@@ -7678,6 +7691,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                      FLG-SYOBYO-COM
                                                      FLG-RYOYO-COM
                                                      FLG-SYODOU-COM
+                                                     FLG-SAIDOU-COM
                                                      FLG-NIKOCHIN-COM
                                                      FLG-ZENSOKU-COM
                                                      FLG-OSIN-COM
@@ -7743,6 +7757,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-SYOBYO-COM
                                                       FLG-RYOYO-COM
                                                       FLG-SYODOU-COM
+                                                      FLG-SAIDOU-COM
                                                       FLG-NIKOCHIN-COM
                                                       FLG-ZENSOKU-COM
                                                       FLG-OSIN-COM
@@ -7795,6 +7810,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                       FLG-SYOBYO-COM
                                                       FLG-RYOYO-COM
                                                       FLG-SYODOU-COM
+                                                      FLG-SAIDOU-COM
                                                       FLG-NIKOCHIN-COM
                                                       FLG-ZENSOKU-COM
                                                       FLG-OSIN-COM

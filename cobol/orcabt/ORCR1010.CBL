@@ -188,6 +188,7 @@
            03  FLG-SYOBYO-COM                          PIC 9(01).
            03  FLG-RYOYO-COM                           PIC 9(01).
            03  FLG-SYODOU-COM                          PIC 9(01).
+           03  FLG-SAIDOU-COM                          PIC 9(01).
            03  FLG-NIKOCHIN-COM                        PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
            03  FLG-KENSA-COM                           PIC 9(01).
@@ -810,6 +811,9 @@
       *    外来診療料（同一日２科目）
            03  CONS-DOUJITU-GAI      PIC X(09)  VALUE  "112016210".
       *
+      *    複再算定診療科：
+           03  CONS-DOUJITU-COMMENT  PIC X(09)  VALUE  "830000051".
+      *
       *    剤の診療内容チェックテーブル
        01  TBL-ZAICHECK-AREA.
       *    （サ）
@@ -1187,6 +1191,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 FLG-SYOBYO-COM
                                                 FLG-RYOYO-COM
                                                 FLG-SYODOU-COM
+                                                FLG-SAIDOU-COM
                                                 FLG-NIKOCHIN-COM
                                                 FLG-ZENSOKU-COM
                                                 FLG-OSIN-COM
@@ -1241,6 +1246,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-SYOBYO-COM
                                                        FLG-RYOYO-COM
                                                        FLG-SYODOU-COM
+                                                       FLG-SAIDOU-COM
                                                        FLG-NIKOCHIN-COM
                                                        FLG-ZENSOKU-COM
                                                        FLG-OSIN-COM
@@ -1282,6 +1288,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                      FLG-SYOBYO-COM
                                                      FLG-RYOYO-COM
                                                      FLG-SYODOU-COM
+                                                     FLG-SAIDOU-COM
                                                      FLG-NIKOCHIN-COM
                                                      FLG-ZENSOKU-COM
                                                      FLG-OSIN-COM
@@ -2386,11 +2393,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
               END-IF
       *
       *       再診（同一日２科目）
-              IF   SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
+              IF  (SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
                                       OR    CONS-DOUJITU-DEN
-                                      OR    CONS-DOUJITU-GAI
+                                      OR    CONS-DOUJITU-GAI)
+              AND (FLG-SAIDOU-COM     =     ZERO            )
                  MOVE   "1"        TO   RECE120-FLG-SAIDOU-COMMENT
                  MOVE   SRY-SRYKA  TO   RECE120-SAIDOU-SRYKA(1)
+              END-IF
+              IF   SRY-SRYCD(IDX2)    =     CONS-DOUJITU-COMMENT
+                 MOVE   SPACE      TO   RECE120-FLG-SAIDOU-COMMENT
+                 MOVE   SPACE      TO   RECE120-SAIDOU-SRYKA(1)
+                 MOVE    1         TO   FLG-SAIDOU-COM
               END-IF
            END-IF
       *
