@@ -1499,20 +1499,6 @@
                                            OR  "199000410" )
                MOVE    1                   TO  FLG-SYUBETU
            END-IF
-      *H24.5
-      *    自賠責
-           IF     (SPA-HKNKBN          =   1   )
-             AND  (SPA-RSI-HKNKBN      =   "4" )
-      *        再診料で時間外対応加算の時
-               IF     (LNK-WKSRY-SRYSYUKBN(IDX)(1:2)
-                                           =   "12"  ) AND
-                      (LNK-WKSRY-SRYCD (IDX IDY)
-                                           =   TBL-CHISRYCD1
-                                           OR  TBL-CHISRYCD2
-                                           OR  TBL-CHISRYCD3 )
-                   MOVE    1                   TO  FLG-SYUBETU
-               END-IF
-           END-IF
       *
       *    自動発生の展開分
            IF      FLG-SYUBETU         =   1
