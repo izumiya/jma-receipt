@@ -2445,23 +2445,6 @@
                        END-IF
                    END-IF
       *********END-IF
-      *H24.5
-               IF     (SPA-HKNKBN          =   1   )
-                 AND  (SPA-RSI-HKNKBN      =   "4" )
-      *        º´«Â¿’§Œ√œ∞Ë∞ÂŒ≈π◊∏•≤√ªª
-                   IF     (SPA-COM-INPUTCD(IDX)    =   TBL-CHISRYCD1
-                                                   OR  TBL-CHISRYCD2
-                                                   OR  TBL-CHISRYCD3 )
-                       IF     (IDX             >   1 )  AND
-                              (SPA-GMN-INPUTCD(IDX - 1)(1:4)
-                                               =   ".120")
-                           MOVE    1           TO  FLG-ARI
-      *                    ºÍµªŒ¡§»§π§Î
-                           MOVE    1               TO  FLG-SYUGI
-                       END-IF
-                   END-IF
-               END-IF
-      *!!
       *        ∆˛±°≈¿≈©§«ø«Œ≈ºÔ Ã§¨∆˛Œœ§µ§Ï§∆§§§Î§≥§»
                IF      SPA-NYUGAIKBN           =   "1"
                    IF      (SPA-COM-TNSSRYSYUKBN (IDX) =   "300" OR

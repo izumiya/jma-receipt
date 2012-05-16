@@ -1203,13 +1203,6 @@
       *H24.5
       *        œ´∫“
                IF     (SPA-HKNKBN          =   1   )
-      *            º´«Â¿’§Œ√œ∞Ë∞ÂŒ≈π◊∏•≤√ªª
-                   IF      (SPA-RSI-HKNKBN     =   "4"   )
-                   AND     (WRK-COM-INPUTCD(IDX-Z) =   TBL-CHISRYCD1
-                                                   OR  TBL-CHISRYCD2
-                                                   OR  TBL-CHISRYCD3 )
-                       MOVE    ZERO               TO  FLG-DEL
-                   END-IF
       *            ∫∆ø«ª˛Œ≈Õ‹ªÿ∆≥¥…Õ˝Œ¡
                    IF      (WRK-COM-INPUTCD(IDX-Z) =   "101120030" )
                        MOVE    ZERO               TO  FLG-DEL
@@ -1751,27 +1744,6 @@
                IF     (WRK-COM-TNSSRYSYUKBN (IDX-Z)  =   "140" ) AND
                       (WRK-COM-OSINKBN (IDX-Z)       =   ZERO  )
                    MOVE    1                    TO  FLG-ARI
-               END-IF
-      *        £±π‘Ã‹§ÚºÍµª§»§π§Î
-               IF     (FLG-ARI             =   1    )  AND
-                      (IDX-SYU             =   ZERO )
-                   MOVE    IDX-Z           TO  IDX-SYU
-               END-IF
-           END-IF
-      *H24.5
-           IF     (SPA-HKNKBN          =   1   )
-             AND  (SPA-RSI-HKNKBN      =   "4" )
-      *        º´«Â¿’§Œ√œ∞Ë∞ÂŒ≈π◊∏•≤√ªª
-               IF     (WRK-COM-INPUTCD(IDX-Z)  =   TBL-CHISRYCD1
-                                               OR  TBL-CHISRYCD2
-                                               OR  TBL-CHISRYCD3 )
-                   IF     (IDX-SYU         NOT =   ZERO )
-      *            ∫∆ø«ª˛Œ≈Õ‹ªÿ∆≥¥…Õ˝Œ¡§Œ≤√ªª§œ•®•È°º
-                     AND  (WRK-COM-INPUTCD(IDX-SYU) =   "101120030" )
-                       MOVE    ZERO                 TO  FLG-ARI
-                   ELSE
-                       MOVE    1                   TO  FLG-ARI
-                   END-IF
                END-IF
       *        £±π‘Ã‹§ÚºÍµª§»§π§Î
                IF     (FLG-ARI             =   1    )  AND
