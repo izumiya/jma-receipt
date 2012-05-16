@@ -552,6 +552,7 @@
       *  04.05.58    NACL-門脇    12/05/07  地方公費対応（都道府県問わず）
       *                                     社保分保険欄一部負担金記載
       *                                     一律一般の金額で記載
+      *  04.05.59    NACL-門脇    12/05/15  医療観察コメント自動記載対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -1705,6 +1706,8 @@
            03  CONS-HOUSEI-COMMENT   PIC X(09)  VALUE  "180018310".
       *    精神科退院前訪問指導料算定日
            03  CONS-HOUSEI-COMMENT2  PIC X(09)  VALUE  "840000079".
+      *    医療観察退院前訪問指導料
+           03  CONS-HOUSEI-COMMENT3  PIC X(09)  VALUE  "188003110".
       *    精神科隔離病室管理加算
            03  CONS-KAKURI-COMMENT   PIC X(09)  VALUE  "190107070".
       *    在宅血液透析頻回指導管理料
@@ -5216,8 +5219,9 @@
            END-IF
       *
            IF      RECE64-SRYKBN      =     "80"
-              IF   SRY-SRYCD(IDX2)    =     CONS-HOUSEI-COMMENT
-              AND  FLG-HOUSEI-COM     =     ZERO
+              IF  (SRY-SRYCD(IDX2)    =     CONS-HOUSEI-COMMENT
+                                      OR    CONS-HOUSEI-COMMENT3)
+              AND (FLG-HOUSEI-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE64-FLG-HOUSEI-COMMENT
               END-IF
               IF   SRY-SRYCD(IDX2)    =     CONS-HOUSEI-COMMENT2
@@ -5557,6 +5561,7 @@
            END-IF
       *    精神科退院前訪問指導料
            IF    RECE65-SRYCD(IDX4)   = CONS-HOUSEI-COMMENT
+                                    OR  CONS-HOUSEI-COMMENT3
                  MOVE   105           TO  WRK-SETCOM-JIDO
            END-IF
       *
