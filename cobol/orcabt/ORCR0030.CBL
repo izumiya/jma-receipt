@@ -569,6 +569,7 @@
       *  04.05.51    NACL-門脇    12/05/07  地方公費対応（都道府県問わず）
       *                                     社保分保険欄一部負担金記載
       *                                     一律一般の金額で記載
+      *  04.05.52    NACL-門脇    12/05/15  医療観察コメント自動記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1841,6 +1842,10 @@
            03  CONS-NINRYO-COMMENT   PIC X(09)  VALUE  "180033210".
       *    認知療法・認知行動療法（精神科救急体制の精神保健指定医）
            03  CONS-NINRYO2-COMMENT  PIC X(09)  VALUE  "180035910".
+      *    医療観察認知療法・認知行動療法（イ以外の場合）
+           03  CONS-NINRYO3-COMMENT  PIC X(09)  VALUE  "188006210".
+      *    医療観察認知療法・認知行動療法（精神科救急体制の精神保健指定医）
+           03  CONS-NINRYO4-COMMENT  PIC X(09)  VALUE  "188007010".
       *
       *    認知症専門診断管理料２
            03  CONS-NINSEN-COMMENT   PIC X(09)  VALUE  "113014610".
@@ -7356,6 +7361,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                 END-IF
                 IF   SRY-SRYCD(IDX2)  =     CONS-NINRYO2-COMMENT
                         MOVE   "2"    TO    RECE04-FLG-NINRYO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-NINRYO3-COMMENT
+                        MOVE   "3"    TO    RECE04-FLG-NINRYO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)  =     CONS-NINRYO4-COMMENT
+                        MOVE   "4"    TO    RECE04-FLG-NINRYO-COMMENT
                 END-IF
               END-IF
            END-IF

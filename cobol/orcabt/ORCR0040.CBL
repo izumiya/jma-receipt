@@ -128,6 +128,7 @@
       *  04.05.08    NACL-門脇    11/11/30  画像診断フイルム分画数対応
       *  04.05.09    NACL-門脇    12/04/02  平成２４年４月改正
       *                                     コメント差込
+      *  04.05.10    NACL-門脇    12/05/15  医療観察コメント自動記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -719,6 +720,10 @@
            03  CONS-NINRYO          PIC X(09) VALUE "180033210".
       *    認知療法・認知行動療法（精神科救急体制の精神保健指定医）
            03  CONS-NINRYO2         PIC X(09) VALUE "180035910".
+      *    医療観察認知療法・認知行動療法（イ以外の場合）
+           03  CONS-NINRYO3         PIC X(09) VALUE  "188006210".
+      *    医療観察認知療法・認知行動療法（精神科救急体制の精神保健指定医）
+           03  CONS-NINRYO4         PIC X(09) VALUE  "188007010".
       *
       *    認知症専門診断管理料２
            03  CONS-NINSEN          PIC X(09) VALUE "113014610".
@@ -5877,17 +5882,22 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *****************************************************************
        2001-NINRYO-HANTEI-SEC          SECTION.
       *
-           IF     RECE04-FLG-NINRYO-COMMENT   =    "1" OR "2"
+           IF     RECE04-FLG-NINRYO-COMMENT   NOT =  SPACE
                MOVE    SPACE                TO  WRK-NINRYO-FSANTEIYMD
                INITIALIZE                       SANTEI-REC
                MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                MOVE    RECE04-PTID          TO  SANTEI-PTID
                MOVE    RECE04-SRYYM         TO  SANTEI-SRYYM
-               IF  RECE04-FLG-NINRYO-COMMENT  =    "1"
-                 MOVE  CONS-NINRYO          TO  SANTEI-SRYCD
-               ELSE
-                 MOVE  CONS-NINRYO2         TO  SANTEI-SRYCD
-               END-IF
+               EVALUATE  RECE04-FLG-NINRYO-COMMENT
+                 WHEN      "1"
+                   MOVE  CONS-NINRYO        TO  SANTEI-SRYCD
+                 WHEN      "2"
+                   MOVE  CONS-NINRYO2       TO  SANTEI-SRYCD
+                 WHEN      "3"
+                   MOVE  CONS-NINRYO3       TO  SANTEI-SRYCD
+                 WHEN      "4"
+                   MOVE  CONS-NINRYO4       TO  SANTEI-SRYCD
+               END-EVALUATE
                MOVE    ZERO                 TO  SANTEI-NYUGAIKBN
                MOVE    ZERO                 TO  SANTEI-SRYKA
                MOVE    ZERO                 TO  SANTEI-HKNCOMBINUM
@@ -7609,7 +7619,8 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *18
                           "113003410" OR
       *19
-                          "180033210" OR "180035910" OR
+                          "180033210" OR "180035910" OR "188006210" OR
+                          "188007010" OR
       *20
                           "700010000" OR "700030000" OR "700050000" OR
                           "700080000" OR "700110000" OR "700140000" OR

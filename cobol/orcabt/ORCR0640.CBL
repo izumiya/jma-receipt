@@ -553,6 +553,7 @@
       *  04.05.58    NACL-ÃÁœ∆    12/05/07  √œ ˝∏¯»Ò¬–±˛° ≈‘∆ª…‹∏©Ã‰§Ô§∫°À
       *                                     º“ › ¨ ›∏±ÕÛ∞Ï…Ù…È√¥∂‚µ≠∫‹
       *                                     ∞ÏŒß∞Ï»Ã§Œ∂‚≥€§«µ≠∫‹
+      *  04.05.59    NACL-ÃÁœ∆    12/05/15  ∞ÂŒ≈¥—ª°•≥•·•Û•»º´∆∞µ≠∫‹¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1684,6 +1685,8 @@
            03  CONS-HOUSEI-COMMENT   PIC X(09)  VALUE  "180018310".
       *    ¿∫ø¿≤ ¬‡±°¡∞À¨Ã‰ªÿ∆≥Œ¡ªªƒÍ∆¸
            03  CONS-HOUSEI-COMMENT2  PIC X(09)  VALUE  "840000079".
+      *    ∞ÂŒ≈¥—ª°¬‡±°¡∞À¨Ã‰ªÿ∆≥Œ¡
+           03  CONS-HOUSEI-COMMENT3  PIC X(09)  VALUE  "188003110".
       *    ¿∫ø¿≤ ≥÷Œ•…¬ºº¥…Õ˝≤√ªª
            03  CONS-KAKURI-COMMENT   PIC X(09)  VALUE  "190107070".
       *    ∫ﬂ¬∑Ï±’∆©¿œ…—≤Ûªÿ∆≥¥…Õ˝Œ¡
@@ -5187,8 +5190,9 @@
            END-IF
       *
            IF      RECE64-SRYKBN      =     "80"
-              IF   SRY-SRYCD(IDX2)    =     CONS-HOUSEI-COMMENT
-              AND  FLG-HOUSEI-COM     =     ZERO
+              IF  (SRY-SRYCD(IDX2)    =     CONS-HOUSEI-COMMENT
+                                      OR    CONS-HOUSEI-COMMENT3)
+              AND (FLG-HOUSEI-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE64-FLG-HOUSEI-COMMENT
               END-IF
               IF   SRY-SRYCD(IDX2)    =     CONS-HOUSEI-COMMENT2
@@ -5528,6 +5532,7 @@
            END-IF
       *    ¿∫ø¿≤ ¬‡±°¡∞À¨Ã‰ªÿ∆≥Œ¡
            IF    RECE65-SRYCD(IDX4)   = CONS-HOUSEI-COMMENT
+                                    OR  CONS-HOUSEI-COMMENT3
                  MOVE   105           TO  WRK-SETCOM-JIDO
            END-IF
       *
