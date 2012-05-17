@@ -213,6 +213,8 @@
            03  FLG-DEKIDAKA        PIC 9(01).
       *
            03  FLG-RSIGAIRAI        PIC 9(01).
+      *H24.5
+           03  FLG-JYURRK-OK       PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -10068,13 +10070,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
            MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
            MOVE    SPA-RRK-SRYKA (IDX) TO  JYURRK-SRYKA
-           IF      SPA-NYUGAIKBN       =   "2"
+      ***  IF      SPA-NYUGAIKBN       =   "2"
       *        外来の時、伝票番号
-               MOVE    SPA-RRK-DENPNUM(IDX)
-                                           TO  JYURRK-DENPNUM
+      *        MOVE    SPA-RRK-DENPNUM(IDX)
+      *                                    TO  JYURRK-DENPNUM
       *
-               MOVE    "key6"              TO  WRK-ORC-DBPATH
-           ELSE
+      *        MOVE    "key6"              TO  WRK-ORC-DBPATH
+      ***  ELSE
+      *H24.5   伝票番号重複対応（伝票番号検索廃止）
       *        入院の時、診療年月日、保険組合せ
                MOVE    SPA-RRK-RRKYMD-MAE(IDX)
                                            TO  JYURRK-SRYYMD
@@ -10083,7 +10086,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-RRK-HKNCOMBI(IDX)
                                            TO  JYURRK-HKNCOMBINUM
                MOVE    "key19"             TO  WRK-ORC-DBPATH
-           END-IF
+      **** END-IF
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
@@ -10103,6 +10106,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            INITIALIZE                  TBL-JYURRK-AREA
            INITIALIZE                  TBL-MAE-ZAINUM-AREA
            PERFORM UNTIL   FLG-JYURRK      =   1
+      *        外来の時、伝票番号の一致のチェック
+           IF      (JYURRK-NYUGAIKBN     =  "2"  )  AND
+                   (SPA-RRK-DENPNUM(IDX) NOT =  ZERO )  AND
+                   (SPA-RRK-DENPNUM(IDX) NOT =  JYURRK-DENPNUM )
+               CONTINUE
+           ELSE
+      *
                ADD     1                   TO  IDX-T
                MOVE    JYURRK-REC          TO  TBL-JYURRK-REC(IDX-T)
                PERFORM VARYING     IDX2    FROM    1   BY  1
@@ -10114,6 +10124,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                TO  TBL-MAE-ZAINUM (IDX3)
                    END-IF
                END-PERFORM
+      *
+           END-IF
       *
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
                MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
@@ -10191,6 +10203,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-PERFORM
       *
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      49011-JYURRK-PARAUPD-EXT
+           END-IF
+      *
       *    受診履歴の追加判定
            IF     (SPA-RRK-ADD (IDX)   =   "1" )  OR
                   (IDX-T               =   ZERO )
@@ -10205,7 +10221,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            INITIALIZE                  JYURRK-ZAINUM-G
            INITIALIZE                  JYURRK-SRYKBN-G
            PERFORM VARYING     IDR     FROM    IDX2   BY  1
-                   UNTIL       IDR     >   135
+                   UNTIL      (IDR     >   135           )
+                         OR   (SPA-ERRCD   NOT =   SPACE )
                IF      SPA-RRK-ZAINUM (IDX IDR) NOT=   ZERO
       *            受診履歴の追加
                    ADD     1               TO  IDR3
@@ -10220,11 +10237,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 4901122-JYURRK-SRYKBN-SEC
                END-IF
            END-PERFORM
-           IF      IDR3                >   ZERO
+           IF     (IDR3                >   ZERO )
+             AND  (SPA-ERRCD           =   SPACE )
                PERFORM 490111-JYURRK-INS-SEC
            END-IF
       *    収納マスタの更新
-           IF      SPA-NYUGAIKBN       =   "2"
+           IF     (SPA-NYUGAIKBN       =   "2"   )
+             AND  (SPA-ERRCD           =   SPACE )
                PERFORM 490113-SYUNOU-UPD-SEC
            END-IF
            .
@@ -10366,12 +10385,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-PERFORM
       *    パラメタ出力処理
-           IF      IDX2                >   ZERO
+           IF     (IDX2                >   ZERO  )
+            AND   (SPA-ERRCD           =   SPACE )
                PERFORM 490111-JYURRK-INS-SEC
            END-IF
       *    外来の時、収納作成
            IF     (SPA-NYUGAIKBN       =   "2" ) AND
                   (SPA-RRK-HKNCOMBI(IDX)   NOT =   "9999" )
+            AND   (SPA-ERRCD           =   SPACE )
                PERFORM 49011212-SYUNOU-INS-SEC
            END-IF
       *
@@ -10482,6 +10503,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      FLG-SYSKANRI        =   ZERO
                ADD     1                   TO  SYS-0041-DENPNUMMAX
+      *!!!
+               IF      SYS-0041-DENPNUMMAX     =   0
+                   MOVE    1               TO  SYS-0041-DENPNUMMAX
+               END-IF
                MOVE    SYS-0041-DENPNUMMAX
                                            TO  JYURRK-DENPNUM
       *
@@ -11227,6 +11252,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                INITIALIZE                  JYURRK-REC
                MOVE    1               TO  FLG-JYURRK
            END-IF
+      *H24.5
+      *    伝票番号重複対応（診療年月日・保険組合せ一致判定）
+           MOVE    ZERO                TO  FLG-JYURRK-OK
+           PERFORM UNTIL   (FLG-JYURRK-OK  =   1   )
+                       OR  (FLG-JYURRK     =   1   )
+               IF     (SYU-SRYYMD          =   JYURRK-SRYYMD     )
+                 AND  (SYU-HKNCOMBINUM     =   JYURRK-HKNCOMBINUM)
+                   MOVE    1                   TO  FLG-JYURRK-OK
+               ELSE
+                   MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+                   MOVE    "key6"              TO  MCP-PATHNAME
+                   PERFORM 970-JYURRK-READ-SEC
+               END-IF
+           END-PERFORM
+      *
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
            MOVE    "key6"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
