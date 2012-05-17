@@ -547,6 +547,14 @@
                     MOVE       "tbl_jyurrk"     TO  MCP-TABLE
                     MOVE       "key6"           TO  MCP-PATHNAME
                     PERFORM     900-JYURRK-READ-SEC
+      *H24.5
+      *             保険組合せ判定追加
+                    PERFORM UNTIL   (FLG-JYURRK     =   1   )
+                            OR      (JYURRK-HKNCOMBINUM 
+                                         =   LNK-SYU-HKNCOMBINUM(IDY))
+                         PERFORM     900-JYURRK-READ-SEC
+                    END-PERFORM
+      *H24.5
                     IF   FLG-JYURRK   =    ZERO
                         COMPUTE   SAI-IDX  =  JYURRK-RENNUM  +  1
                         IF    SAI-IDX   >   4

@@ -2067,6 +2067,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-TEI-DENPNUM (1) =   ZERO
                MOVE    SPA-DENPNUM         TO  WRK-DENPNUM
                MOVE    SPA-DOUJI-RENNUM    TO  WRK-DOUJI-RENNUM
+               MOVE    SPA-HKNCOMBINUM     TO  WRK-HKNCOMBI
                PERFORM 10011-TEISEI-SYORI1-SEC
            ELSE
                PERFORM VARYING     IDXF    FROM    1   BY  1
@@ -2075,8 +2076,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-TEI-DENPNUM (IDXF)  TO  WRK-DENPNUM
                    MOVE    SPA-TEI-DOUJI-RENNUM (IDXF)
                                                    TO  WRK-DOUJI-RENNUM
+                   MOVE    SPA-TEI-HKNCOMBI (IDXF)
+                                               TO  WRK-HKNCOMBI
                    PERFORM 10011-TEISEI-SYORI1-SEC
-                   PERFORM 10012-TEISEI-SYUTTL-DEL-SEC
+                   IF      WRK-HKNCOMBI    NOT =   "9999"
+                       PERFORM 10012-TEISEI-SYUTTL-DEL-SEC
+                   END-IF
                END-PERFORM
            END-IF
       *
@@ -2159,6 +2164,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM
                    UNTIL       FLG-JYURRK      =   1
       *?       IF      WRK-DOUJI-RENNUM    =   JYURRK-DOUJI-RENNUM
+      *H24.5   ÅÁÉ¼ÈÖ¹æ½ÅÊ£ÂÐ±þ
+               IF     (JYURRK-SRYYMD       =   SPA-SRYYMD )
+                AND   (JYURRK-HKNCOMBINUM  =   WRK-HKNCOMBI )
       *
                    MOVE    JYURRK-RENNUM       TO  WRK-JYURRK-RENNUM
                    MOVE    JYURRK-RENNUM       TO  WRK-DEL-RENNUM
@@ -2184,7 +2192,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                 ",KEY:" JYURRK-KEY
                        MOVE    "0005"              TO  SPA-ERRCD
                   END-IF
-      *!       END-IF
+               END-IF
       *
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
                MOVE    "key6"              TO  MCP-PATHNAME
@@ -4091,8 +4099,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     END-IF
                END-PERFORM
                IF      FLG-OK              =   ZERO
+      *H24.5
+                  IF      SPA-TEI-HKNCOMBI (IDXF)    NOT =   "9999"
+      *
                     MOVE    SPA-TEI-DENPNUM (IDXF) TO  WRK-DENPNUM
                     PERFORM 450041-TEI-SYUNOU-DEL-SEC
+                  END-IF
                END-IF
            END-PERFORM
            .
@@ -4103,6 +4115,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ¼ýÇ¼ºï½ü½èÍý
       *****************************************************************
        450041-TEI-SYUNOU-DEL-SEC              SECTION.
+      *
       *    ¼ýÇ¼¥Æ¡¼¥Ö¥ëÆÉ¤ß¹þ¤ß
            MOVE    SPACE               TO  SYUNOU-REC
            INITIALIZE                  SYUNOU-REC
@@ -4836,6 +4849,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM
                        UNTIL       FLG-JYURRK      =   1
       *
+               IF      JYURRK-SRYYMD       =   SPA-SRYYMD
+      *
       *            ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¤Î¿ÇÎÅ²ó¿ô¤ò¥¯¥ê¥¢¤¹¤ë
                    PERFORM 4500112-TEISEI-SRYACCT-SEC
       *            ²ñ·×Ï¢ÈÖ
@@ -4848,6 +4863,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *            ¼õ¿ÇÍúÎò¡¦¼ýÇ¼ºï½ü
                    PERFORM 4500114-TEISEI-JYURRKDEL-SEC
+      *
+               END-IF
       *
                    MOVE    "tbl_jyurrk"        TO  MCP-TABLE
                    MOVE    "key6"              TO  MCP-PATHNAME
@@ -4929,7 +4946,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 990-DBCLOSE-SEC
                    IF      FLG-JYURRK          =   ZERO
       *                ¼ýÇ¼ºï½ü
-                       PERFORM 45001141-SYUNOU-DELETE-SEC
+                       IF      JYURRK-HKNCOMBINUM  NOT =   "9999"
+                           PERFORM 45001141-SYUNOU-DELETE-SEC
+                       END-IF
       *
       *                ¼õ¿ÇÍúÎòºï½ü
                        MOVE    JYURRK-REC          TO  MCPDATA-REC
