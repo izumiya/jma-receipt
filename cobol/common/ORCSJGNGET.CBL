@@ -36,6 +36,7 @@
       *  04.02.01    NACL-門脇    08/03/21  肝炎治療対応
       *
       *  04.05.01    NACL-門脇    09/07/28  所得者情報の公費入力機能向上
+      *  04.05.02    NACL-門脇    12/05/16  愛知・三重県地方公費対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -313,6 +314,19 @@
            IF     LNK-ORCSJGNGET-SRYYM   >=   "200804"
                EVALUATE   LNK-ORCSJGNGET-KOHHKNNUM
                   WHEN     "038"
+                     MOVE   LNK-ORCSJGNGET-NYUJGNGAK
+                                TO  LNK-ORCSJGNGET-TAFTNRUIKEI
+                     MOVE   LNK-ORCSJGNGET-GAIJGNGAK
+                                TO  LNK-ORCSJGNGET-NYUJGNGAK
+      *
+                     PERFORM 1001-TAFTNRUIKEI-HENSYU-SEC
+               END-EVALUATE
+           END-IF
+      *    愛知・三重県
+           IF    (LNK-ORCSJGNGET-SRYYM   >=   "201104"    )
+           AND   (LNK-ORCSJGNGET-PREFNUM  =   "23" OR "24")
+               EVALUATE   LNK-ORCSJGNGET-KOHHKNNUM
+                  WHEN     "152"
                      MOVE   LNK-ORCSJGNGET-NYUJGNGAK
                                 TO  LNK-ORCSJGNGET-TAFTNRUIKEI
                      MOVE   LNK-ORCSJGNGET-GAIJGNGAK

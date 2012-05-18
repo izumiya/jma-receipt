@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.00    NACL-太田    07/05/28  グループ診療対応
       *  04.05.01    NACL-門脇    10/01/07  治験対応
+      *  04.05.02    NACL-門脇    12/05/16  愛知・三重県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT                     DIVISION.
@@ -57,6 +58,7 @@
                05  FLG-KOH052          PIC 9(01).
                05  FLG-KOH091          PIC 9(01).
                05  FLG-KOH151          PIC 9(01).
+               05  FLG-KOH152          PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
@@ -300,7 +302,8 @@
             AND  (     FLG-KOH051  =   1
                     OR FLG-KOH052  =   1
                     OR FLG-KOH091  =   1
-                    OR FLG-KOH151  =   1           )
+                    OR FLG-KOH151  =   1
+                    OR FLG-KOH152  =   1           )
       *
                PERFORM 800-HOKEN-CHK-SEC
                PERFORM VARYING IDX-KOH FROM    1   BY  1
@@ -311,17 +314,25 @@
                        EVALUATE    TRUE
                        WHEN  ( TKOH-KOHNUM  (IDX-KOH)
                                            =   "051" OR "052"
-                                            OR "091"OR "151" )
+                                            OR "091" OR "151"
+                                            OR "152"          )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (5:3)
                                            =   "601" OR "602" )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
-                                           =   "51" OR "52" )
+                                           =   "51" OR "52"   )
                        WHEN  ( TKOH-KOHNUM  (IDX-KOH)
-                                           =   "052" )
+                                           =   "052"          )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (5:2)
-                                           =   "60" )
+                                           =   "60"           )
                         AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
-                                           =   "52" )
+                                           =   "52"           )
+                       WHEN  ( TKOH-KOHNUM  (IDX-KOH)
+                                           =   "152"          )
+                        AND  ( SYS-1001-PREFNUM   =  23 OR 24 )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (5:2)
+                                           =   "60"           )
+                        AND  ( TKOH-FTNJANUM(IDX-KOH) (1:2)
+                                           =   "52"           )
                            IF    ( KEY-HKNNUM  =   "060" OR "039" )
                             OR   ( AGECHK-NENREI   >=    70 )
                                MOVE    1       TO  SSRHKOH-RC
@@ -384,6 +395,11 @@
                IF    ( SYS-1001-PREFNUM            =   13 )
                 AND  ( COMB-KOHHKNNUM (IDX-KOH)    =   "151" )
                    MOVE    1       TO  FLG-KOH151
+               END-IF
+               IF    ( SYS-1001-PREFNUM            =   23 OR 24 )
+                AND  ( COMB-KOHHKNNUM (IDX-KOH)    =   "152"    )
+                AND  ( SSRHKOH-SRYYM              >=   "201104" )
+                   MOVE    1       TO  FLG-KOH152
                END-IF
       *
            END-PERFORM

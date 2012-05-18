@@ -663,6 +663,15 @@
                    MOVE    "入外上限額"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "他一部負担累計"     TO  SPA-GMN24-FTNMSG2
                END-IF
+      *
+               IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "152"        )  AND
+                      (SPA-PREFNUM         =    23 OR 24    )  AND
+                      (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+                                           >=   "20110401"  )
+                   MOVE    "入外上限額"         TO  SPA-GMN24-FTNMSG1
+                   MOVE    "他一部負担累計"     TO  SPA-GMN24-FTNMSG2
+               END-IF
            END-IF
       *
            .
@@ -784,6 +793,9 @@
                      OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
                                                =   "281" ) AND
                           (SPA-PREFNUM         =    07   ))
+                     OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
+                                               =   "152" ) AND
+                          (SPA-PREFNUM         = 23 OR 24))
                        PERFORM 31021-PTKOHFTNETC-HEN-SEC
                    END-IF
                END-IF
@@ -1387,6 +1399,9 @@
                  OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "281" ) AND
                       (SPA-PREFNUM         =    07   ))
+                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "152" ) AND
+                      (SPA-PREFNUM         = 23 OR 24))
                    CONTINUE
                ELSE
                    MOVE    "2440"              TO  SPA-ERRCD
@@ -1546,6 +1561,9 @@
                  OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "281" ) AND
                       (SPA-PREFNUM         =    07   ))
+                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "152" ) AND
+                      (SPA-PREFNUM         = 23 OR 24))
                    CONTINUE
                ELSE
                    MOVE    "2445"              TO  SPA-ERRCD
@@ -2546,6 +2564,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                      OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
                                                =   "281" ) AND
                           (SPA-PREFNUM         =    07   ))
+                     OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
+                                               =   "152" ) AND
+                          (SPA-PREFNUM         = 23 OR 24))
                        PERFORM 31021-PTKOHFTNETC-HEN-SEC
                    END-IF
                END-IF
@@ -2845,6 +2866,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                  OR  ((SPA-NAI24-KOHNUM (IDX2)
                                            =   "281" ) AND
                       (SPA-PREFNUM         =    07   ))
+                 OR  ((SPA-NAI24-KOHNUM (IDX2)
+                                           =   "152" ) AND
+                      (SPA-PREFNUM         = 23 OR 24))
       *            今回削除分
                    IF      SPA-NAI24-FTNDELKBN (IDX2)  =   "1" 
       *                更新対象編集

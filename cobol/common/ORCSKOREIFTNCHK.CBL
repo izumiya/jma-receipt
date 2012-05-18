@@ -52,6 +52,7 @@
       *
       *  04.05.01    NACL-ÌçÏÆ    11/10/05  ²¬»³¸©À¾°ÀÁÒÂ¼Âà¿¦¼Ô¹ñÊÝ£²³äÂÐ±þ
       *                                     ½¤Àµ¡ÊÊ¿À®£²£³Ç¯£¹·î¤Þ¤Ç¡Ë
+      *  04.05.02    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    11/01/14  ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤ÎËÜÂÎ¼è¹þ¤ß
       *****************************************************************
@@ -301,6 +302,10 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                      OR ((LNK-KOREIFTNCHK-PREFNUM  = "23"    ) AND
                          (COMB-KOH1HKNNUM          = "191"   ) AND
                          (LNK-KOREIFTNCHK-SRYYM   >= "200910"))
+                     OR ((LNK-KOREIFTNCHK-PREFNUM  =
+                                             "23" OR "24"    ) AND
+                         (COMB-KOH1HKNNUM          = "152"   ) AND
+                         (LNK-KOREIFTNCHK-SRYYM   >= "201104"))
                         MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
                      END-IF
                    END-IF
@@ -742,6 +747,10 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                      OR ((LNK-KOREIFTNCHK-PREFNUM  = "23"  ) AND
                          (SYU-KOH-HKNNUM(1)        = "191" ) AND
                          (LNK-KOREIFTNCHK-SRYYM >= "200910"))
+                     OR ((LNK-KOREIFTNCHK-PREFNUM  =
+                                             "23" OR "24"  ) AND
+                         (SYU-KOH-HKNNUM(1)        = "152" ) AND
+                         (LNK-KOREIFTNCHK-SRYYM >= "201104"))
       ***              PERFORM   22012-NYUIN-KOREI-HEN2-SEC
                        CONTINUE
                      ELSE
@@ -1115,6 +1124,10 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                    OR  ((LNK-KOREIFTNCHK-PREFNUM  = "23"  ) AND
                         (SYU-KOH-HKNNUM(1)        = "191" ) AND
                         (LNK-KOREIFTNCHK-SRYYM >= "200910"))
+                   OR  ((LNK-KOREIFTNCHK-PREFNUM  =
+                                            "23" OR "24"  ) AND
+                        (SYU-KOH-HKNNUM(1)        = "152" ) AND
+                        (LNK-KOREIFTNCHK-SRYYM >= "201104"))
       ***            IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
       ***               MOVE   6000      TO   WRK-KINGAKU
       ***            ELSE
