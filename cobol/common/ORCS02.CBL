@@ -333,6 +333,7 @@
       *  04.05.33    NACL-ÌçÏÆ    12/03/15  ÀéÍÕ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.34    NACL-ÌçÏÆ    12/03/23  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.35    NACL-ÌçÏÆ    12/05/01  ¸º¡Ê³ä¡Ë·×»»ÂÐ±þ
+      *  04.05.36    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
       ****************************************************************
@@ -4030,6 +4031,9 @@
            OR ((WK-1001-PREFNUM      =  23     ) AND
                (COMB-KOH1HKNNUM      = "191"   ) AND
                (LNK-SYU-SRYYMD(1:6) >= "200910"))
+           OR ((WK-1001-PREFNUM   =  23 OR 24  ) AND
+               (COMB-KOH1HKNNUM      = "152"   ) AND
+               (LNK-SYU-SRYYMD(1:6) >= "201104"))
                MOVE    1     TO    WK-TOKATUKAI(1)
            END-IF
       *
@@ -4576,6 +4580,7 @@
                 END-EVALUATE
                 MOVE  WK-GENGAKU-KOHID    TO  LNK-ORCSJGNGET-KOHID
                 MOVE  LNK-SYU-SRYYMD(1:6) TO  LNK-ORCSJGNGET-SRYYM
+                MOVE  WK-1001-PREFNUM     TO  LNK-ORCSJGNGET-PREFNUM
       *
                 CALL    "ORCSJGNGET"      USING
                                           LNK-ORCSJGNGET-REC
@@ -4925,6 +4930,11 @@
                OR (( COMB-KOH1HKNNUM = "052"                    ) AND
                    ( WK-KOH-FTNJANUM(5:2) = "60"                ) AND
                    ( WK-KOH-FTNJANUM(1:2) = "52"                ))
+               OR (( WK-TOKATUKAI(1) =  1                       ) AND
+                   ( WK-1001-PREFNUM =  23 OR 24                ) AND
+                   ( COMB-KOH1HKNNUM = "152"                    ) AND
+                   ( WK-KOH-FTNJANUM(5:2) = "60"                ) AND
+                   ( WK-KOH-FTNJANUM(1:2) = "52"                ))
                  IF     LNK-S02-KOUREI-NYUIN-KBN  =  "1"
                  OR     FLG-KOREI-TANYUIN         =   1
                    IF    COMB-HOJOKBN    =   "3" OR "7"
@@ -5202,6 +5212,9 @@
                  OR ((WK-1001-PREFNUM         =  11           ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) = "462" OR "762") AND
                      (LNK-SYU-SRYYMD(1:6)    >= "201112"      ))
+                 OR ((WK-1001-PREFNUM         =  23 OR 24     ) AND
+                     (COMB-KOHHKNNUM(IDX-CYO) = "152"         ) AND
+                     (LNK-SYU-SRYYMD(1:6)    >= "201104"      ))
                     MOVE     ZERO     TO   WK-CYO-OKIKAE(IDX-CYO)
                  ELSE
                     MOVE     1        TO   WK-CYO-OKIKAE(IDX-CYO)
@@ -7694,6 +7707,10 @@
                  (COMB-KOHHKNNUM(KOH-IDX)      = "152"   )  AND
                  (LNK-SYU-SRYYMD(1:6)         >= "200904"))
       *
+             OR ((WK-1001-PREFNUM           =  23 OR 24  )  AND
+                 (COMB-KOHHKNNUM(KOH-IDX)      = "152"   )  AND
+                 (LNK-SYU-SRYYMD(1:6)         >= "201104"))
+      *
       ***    OR ( COMB-KOHHKNNUM(KOH-IDX)(1:1) = "1" OR "2" OR "3" OR 
       ***                                        "4" OR "5" OR "6" OR
       ***                                        "7" OR "8"          )
@@ -7711,6 +7728,7 @@
                 MOVE  COMB-KOHID(KOH-IDX) TO  LNK-ORCSJGNGET-KOHID
                 MOVE  LNK-SYU-SRYYMD(1:6) TO  LNK-ORCSJGNGET-SRYYM
                 MOVE  LNK-SYU-SKYEDYMD    TO  LNK-ORCSJGNGET-SKYEDYMD
+                MOVE  WK-1001-PREFNUM     TO  LNK-ORCSJGNGET-PREFNUM
       *
                 CALL    "ORCSJGNGET"       USING
                                            LNK-ORCSJGNGET-REC
@@ -7986,6 +8004,12 @@
                         AND (LNK-SYU-SRYYMD(1:6) >= "200804"  )
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-KANEN-TAFTNRUIKEI(KOH-IDX)
+                        END-IF
+                        IF  (WK-1001-PREFNUM      =  23 OR 24 )
+                        AND (COMB-KOH1HKNNUM      = "152"     )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "201104"  )
+                              MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
+                                   TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
                         END-IF
                         IF   LNK-S02-KOUREI-NYUIN-KBN  =    "1"
                         OR   FLG-KOREI-TANYUIN         =     1
@@ -8447,6 +8471,12 @@
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
                         END-IF
+                        IF  (WK-1001-PREFNUM      =  23 OR 24 )
+                        AND (COMB-KOH2HKNNUM      = "152"     )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "201104"  )
+                              MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
+                                   TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
+                        END-IF
                         IF   LNK-S02-KOUREI-NYUIN-KBN  =    "1"
                          IF  (COMB-KOH2HKNNUM = "015" OR "016" OR "021")
                          AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
@@ -8679,6 +8709,12 @@
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
                         END-IF
+                        IF  (WK-1001-PREFNUM      =  23 OR 24 )
+                        AND (COMB-KOH3HKNNUM      = "152"     )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "201104"  )
+                              MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
+                                   TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
+                        END-IF
                       WHEN  4
                         MOVE   WK-NYUJGNGAK    TO   MAX-KIN-KOHI4-M
                         MOVE   WK-NYUJGNGAK    TO
@@ -8822,6 +8858,12 @@
                         IF  (WK-1001-PREFNUM      =  07       )
                         AND (COMB-KOH4HKNNUM      = "281"     )
                         AND (LNK-SYU-SRYYMD(1:6) >= "200702"  )
+                              MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
+                                   TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
+                        END-IF
+                        IF  (WK-1001-PREFNUM      =  23 OR 24 )
+                        AND (COMB-KOH4HKNNUM      = "152"     )
+                        AND (LNK-SYU-SRYYMD(1:6) >= "201104"  )
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
                         END-IF
@@ -9370,6 +9412,7 @@
            MOVE  WK-KOHININBARAI-KOHID
                                      TO  LNK-ORCSJGNGET-KOHID
            MOVE  LNK-SYU-SRYYMD(1:6) TO  LNK-ORCSJGNGET-SRYYM
+           MOVE  WK-1001-PREFNUM     TO  LNK-ORCSJGNGET-PREFNUM
       *
            CALL    "ORCSJGNGET"      USING
                                      LNK-ORCSJGNGET-REC
@@ -9824,6 +9867,33 @@
                         MOVE  WK-KANEN-TAFTNRUIKEI(1)  TO FTN-KOHI1-M
                                                           FTN-KOHI1-M2
                                                           FTN-KOHI1-M3
+                    END-IF
+               END-IF
+               IF  (WK-1001-PREFNUM       =    23 OR 24)
+               AND (LNK-SYU-SRYYMD(1:6)  >=   "201104" )
+                    IF   LNK-SYU-KOH1HKNNUM  = "152"
+      ***               MOVE     1    TO     FLG-NYUGAI2
+                        MOVE  WK-CHIHOU-TAFTNRUIKEI(1) TO FTN-KOHI1-M
+                                                          FTN-KOHI1-M2
+                                                          FTN-KOHI1-M3
+                    END-IF
+                    IF   LNK-SYU-KOH2HKNNUM  = "152"
+      ***               MOVE     2    TO     FLG-NYUGAI2
+                        MOVE  WK-CHIHOU-TAFTNRUIKEI(2) TO FTN-KOHI2-M
+                                                          FTN-KOHI2-M2
+                                                          FTN-KOHI2-M3
+                    END-IF
+                    IF   LNK-SYU-KOH3HKNNUM  = "152"
+      ***               MOVE     3    TO     FLG-NYUGAI2
+                        MOVE  WK-CHIHOU-TAFTNRUIKEI(3) TO FTN-KOHI3-M
+                                                          FTN-KOHI3-M2
+                                                          FTN-KOHI3-M3
+                    END-IF
+                    IF   LNK-SYU-KOH4HKNNUM  = "152"
+      ***               MOVE     4    TO     FLG-NYUGAI2
+                        MOVE  WK-CHIHOU-TAFTNRUIKEI(4) TO FTN-KOHI4-M
+                                                          FTN-KOHI4-M2
+                                                          FTN-KOHI4-M3
                     END-IF
                END-IF
       *
@@ -15641,9 +15711,12 @@
            PERFORM   VARYING   KOHFUKA-IDX2   FROM   1   BY   1
                       UNTIL    KOHFUKA-IDX2    >     4
       *
-             IF    (WK-1001-PREFNUM                  =   07     )
-             AND   (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2) =  "281"   )
-             AND   (LNK-SYU-SRYYMD(1:6)             >=  "200702")
+             IF   ((WK-1001-PREFNUM                  =   07     ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2) =  "281"   ) AND
+                   (LNK-SYU-SRYYMD(1:6)             >=  "200702"))
+             OR   ((WK-1001-PREFNUM               =   23 OR 24  ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2) =  "152"   ) AND
+                   (LNK-SYU-SRYYMD(1:6)             >=  "201104"))
                   MOVE    KOHFUKA-IDX2     TO  FLG-NYUGAI2
              ELSE
                IF  (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)(1:1)
@@ -20865,6 +20938,11 @@
            AND (COMB-KOHHKNNUM(KOH-IDX)   =  "191"         )
                 MOVE    "2"              TO   WK-NYUSKJRYYKBN
            END-IF.
+           IF  (LNK-SYU-SRYYMD(1:6)      >=  "201104"      )
+           AND (WK-1001-PREFNUM           =   23 OR 24     )
+           AND (COMB-KOHHKNNUM(KOH-IDX)   =  "152"         )
+                MOVE    "2"              TO   WK-NYUSKJRYYKBN
+           END-IF.
       *
            IF   COMB-KOHHKNNUM(KOH-IDX)  =  "027"
                 MOVE    HKN-HON-NYUKFTNRATE  TO   WK-KOH-FTNRATE
@@ -22287,7 +22365,10 @@
                      (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "151"))
                  OR ((WK-1001-PREFNUM             =  23  ) AND
                      (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "191") AND
-                     (LNK-SYU-SRYYMD(1:6)     >= "200910")))
+                     (LNK-SYU-SRYYMD(1:6)     >= "200910"))
+                 OR ((WK-1001-PREFNUM       =  23 OR 24  ) AND
+                     (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "152") AND
+                     (LNK-SYU-SRYYMD(1:6)     >= "201104")))
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY
                                    =  WK-ZENGAKU  *  0.2
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY  =
