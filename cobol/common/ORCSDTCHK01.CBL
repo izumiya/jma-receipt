@@ -214,7 +214,7 @@
                                        TBYOMEI-AREA
                                        TGRP-AREA
       *
-           IF    ( SDTCHK01-CHKKBN     =   "1" )
+           IF    ( SDTCHK01-CHKKBN     =   "1" OR "2" )
             AND  ( SDTCHK01-GRPCHKKBN  =   "1" )
                PERFORM 1001-GRP-INIT-SEC
            END-IF
@@ -917,8 +917,6 @@
                    MOVE    MCPDATA-REC     TO  QDTCHK-REC
       *
                    MOVE    1               TO  FLG-LOOP-END
-      *
-                   CALL    "ORCSDTCHK07"   USING   QDTCHK-REC
       *
                    IF   ( QDTCHK-UTAGAIFLG     =   "1"  OR "3" )
                        IF    ( SDTCHK01-CHKKBN             =   "1" )
