@@ -3243,6 +3243,11 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                   (RECE02-HKNNUMHC(IDX11)     NOT = SPACE          ) AND
                   (RECE02-KOHNUMHC(IDX11 1)       = "191"          ) AND
                   (RECE02-KOHNUMHC(IDX11 2)(1:1) >= "1" AND <= "8" ))
+              OR ((SYS-1001-PREFNUM               = "23" OR "24"   ) AND
+                  (RECE02-SRYYM                  >= "201104"       ) AND
+                  (RECE02-HKNNUMHC(IDX11)     NOT = SPACE          ) AND
+                  (RECE02-KOHNUMHC(IDX11 1)       = "152"          ) AND
+                  (RECE02-KOHNUMHC(IDX11 2)(1:1) >= "1" AND <= "8" ))
       *
                 IF ((RECE02-KOHNUMHC(IDX11 2) =  RECE02-KOHNUM(2)) AND
                     (RECE02-KOHIDHC(IDX11 2)  =  RECE02-KOHID(2) ))
@@ -5174,8 +5179,6 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ( RECE02-KOHFTNJANUM(1)(5:2) = "60"           ) AND
                    ( RECE02-KOHFTNJANUM(1)(1:2) = "52"           ))
                OR (( TBL-TOKATUKAIFLG(1) =  1                    ) AND
-                   ( SYS-1001-PREFNUM    =  23 OR 24             ) AND
-                   ( RECE02-KOHNUM(1) =  "152"                   ) AND
                    ( RECE02-KOHFTNJANUM(1)(5:2) = "60"           ) AND
                    ( RECE02-KOHFTNJANUM(1)(1:2) = "52"           ))
                OR (((RECE02-KOHNUM(2) =  "051" OR "052" OR "091") OR
@@ -5186,8 +5189,6 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ( RECE02-KOHFTNJANUM(2)(5:2) = "60"           ) AND
                    ( RECE02-KOHFTNJANUM(2)(1:2) = "52"           ))
                OR (( TBL-TOKATUKAIFLG(2) =  1                    ) AND
-                   ( SYS-1001-PREFNUM    =  23 OR 24             ) AND
-                   ( RECE02-KOHNUM(2) =  "152"                   ) AND
                    ( RECE02-KOHFTNJANUM(2)(5:2) = "60"           ) AND
                    ( RECE02-KOHFTNJANUM(2)(1:2) = "52"           ))
                OR (((RECE02-KOHNUM(3) =  "051" OR "052" OR "091") OR
@@ -5198,8 +5199,6 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ( RECE02-KOHFTNJANUM(3)(5:2) = "60"           ) AND
                    ( RECE02-KOHFTNJANUM(3)(1:2) = "52"           ))
                OR (( TBL-TOKATUKAIFLG(3) =  1                    ) AND
-                   ( SYS-1001-PREFNUM    =  23 OR 24             ) AND
-                   ( RECE02-KOHNUM(3) =  "152"                   ) AND
                    ( RECE02-KOHFTNJANUM(3)(5:2) = "60"           ) AND
                    ( RECE02-KOHFTNJANUM(3)(1:2) = "52"           ))
                OR (((RECE02-KOHNUM(4) =  "051" OR "052" OR "091") OR
@@ -5210,8 +5209,6 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                    ( RECE02-KOHFTNJANUM(4)(5:2) = "60"           ) AND
                    ( RECE02-KOHFTNJANUM(4)(1:2) = "52"           ))
                OR (( TBL-TOKATUKAIFLG(4) =  1                    ) AND
-                   ( SYS-1001-PREFNUM    =  23 OR 24             ) AND
-                   ( RECE02-KOHNUM(4) =  "152"                   ) AND
                    ( RECE02-KOHFTNJANUM(4)(5:2) = "60"           ) AND
                    ( RECE02-KOHFTNJANUM(4)(1:2) = "52"           ))
       *
@@ -5223,8 +5220,6 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      ( RECE02-KOHFTNJANUM(1)(5:2) = "60"           ) AND
                      ( RECE02-KOHFTNJANUM(1)(1:2) = "52"           ))
                  OR (( TBL-TOKATUKAIFLG(1) =  1                    ) AND
-                     ( SYS-1001-PREFNUM    =  23 OR 24             ) AND
-                     ( RECE02-KOHNUM(1) =  "152"                   ) AND
                      ( RECE02-KOHFTNJANUM(1)(5:2) = "60"           ) AND
                      ( RECE02-KOHFTNJANUM(1)(1:2) = "52"           ))
                     MOVE     1     TO    TBL-TOKUSITUFLG(1)
@@ -5237,8 +5232,6 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      ( RECE02-KOHFTNJANUM(2)(5:2) = "60"           ) AND
                      ( RECE02-KOHFTNJANUM(2)(1:2) = "52"           ))
                  OR (( TBL-TOKATUKAIFLG(2) =  1                    ) AND
-                     ( SYS-1001-PREFNUM    =  23 OR 24             ) AND
-                     ( RECE02-KOHNUM(2) =  "152"                   ) AND
                      ( RECE02-KOHFTNJANUM(2)(5:2) = "60"           ) AND
                      ( RECE02-KOHFTNJANUM(2)(1:2) = "52"           ))
                     MOVE     1     TO    TBL-TOKUSITUFLG(2)
@@ -5251,8 +5244,6 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      ( RECE02-KOHFTNJANUM(3)(5:2) = "60"           ) AND
                      ( RECE02-KOHFTNJANUM(3)(1:2) = "52"           ))
                  OR (( TBL-TOKATUKAIFLG(3) =  1                    ) AND
-                     ( SYS-1001-PREFNUM    =  23 OR 24             ) AND
-                     ( RECE02-KOHNUM(3) =  "152"                   ) AND
                      ( RECE02-KOHFTNJANUM(3)(5:2) = "60"           ) AND
                      ( RECE02-KOHFTNJANUM(3)(1:2) = "52"           ))
                     MOVE     1     TO    TBL-TOKUSITUFLG(3)
@@ -5265,8 +5256,6 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      ( RECE02-KOHFTNJANUM(4)(5:2) = "60"           ) AND
                      ( RECE02-KOHFTNJANUM(4)(1:2) = "52"           ))
                  OR (( TBL-TOKATUKAIFLG(4) =  1                    ) AND
-                     ( SYS-1001-PREFNUM    =  23 OR 24             ) AND
-                     ( RECE02-KOHNUM(4) =  "152"                   ) AND
                      ( RECE02-KOHFTNJANUM(4)(5:2) = "60"           ) AND
                      ( RECE02-KOHFTNJANUM(4)(1:2) = "52"           ))
                     MOVE     1     TO    TBL-TOKUSITUFLG(4)

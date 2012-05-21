@@ -5138,8 +5138,6 @@
                    ( WK-KOH-FTNJANUM(5:2) = "60"                ) AND
                    ( WK-KOH-FTNJANUM(1:2) = "52"                ))
                OR (( WK-TOKATUKAI(1) =  1                       ) AND
-                   ( WK-1001-PREFNUM =  23 OR 24                ) AND
-                   ( COMB-KOH1HKNNUM = "152"                    ) AND
                    ( WK-KOH-FTNJANUM(5:2) = "60"                ) AND
                    ( WK-KOH-FTNJANUM(1:2) = "52"                ))
                  IF     FLG-KOUREI-KBN   =   "1"
