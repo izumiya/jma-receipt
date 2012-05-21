@@ -3934,6 +3934,11 @@
                   (RECE62-HKNNUMHC(IDX11)     NOT = SPACE          ) AND
                   (RECE62-KOHNUMHC(IDX11 1)       = "191"          ) AND
                   (RECE62-KOHNUMHC(IDX11 2)(1:1) >= "1" AND <= "8" ))
+              OR ((WRK-PREFNUM                    = "23" OR "24"   ) AND
+                  (RECE62-SRYYM                  >= "201104"       ) AND
+                  (RECE62-HKNNUMHC(IDX11)     NOT = SPACE          ) AND
+                  (RECE62-KOHNUMHC(IDX11 1)       = "152"          ) AND
+                  (RECE62-KOHNUMHC(IDX11 2)(1:1) >= "1" AND <= "8" ))
       *
                 IF ((RECE62-KOHNUMHC(IDX11 2) =  RECE62-KOHNUM(2)) AND
                     (RECE62-KOHIDHC(IDX11 2)  =  RECE62-KOHID(2) ))
