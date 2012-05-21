@@ -1208,6 +1208,10 @@
            03  TBL-TOKATUKAI-OCC                       OCCURS   4.
                05  TBL-TOKATUKAIFLG                    PIC  9(01).
       *
+       01  TBL-TOKATUKAI2.
+           03  TBL-TOKATUKAI2-OCC.
+               05  TBL-TOKATUKAIFLG2                   PIC  9(01).
+      *
        01  TBL-HKNFTNDATA.
            03  TBL-HKNFTNDATA-OCC                      OCCURS   4.
                05  TBL-HKNFTNDATA-JGN                  PIC  9(07).
@@ -12267,15 +12271,7 @@
                 IF  (RECE62-KOHNUM(IDY2)  =
                      "015" OR "016" OR "024" OR "079" OR "038" OR
                      "051" OR "052" OR "011" OR "020")
-                OR  ((WRK-PREFNUM         =  "13" ) AND
-                     (RECE62-KOHNUM(IDY2) =  "151")  )
-                OR  ((WRK-PREFNUM         =  "23" ) AND
-                     (RECE62-KOHNUM(IDY2) =  "191") AND
-                     (RECE62-SRYYM    >=  "200910")  )
-                OR  ((WRK-PREFNUM         =  "23"
-                                          OR "24" ) AND
-                     (RECE62-KOHNUM(IDY2) =  "152") AND
-                     (RECE62-SRYYM    >=  "201104")  )
+                OR  (TBL-TOKATUKAIFLG(IDY2)  =  1    )
                      PERFORM  2104F-JGNCHK-HENSYU-SEC
                 END-IF
              END-PERFORM
@@ -13444,16 +13440,7 @@
                  OR  ( SYU-KOH-HKNNUM(2)(1:1)  = "0")
                  OR  ( SYU-KOH-HKNNUM(3)(1:1)  = "0")
                  OR  ( SYU-KOH-HKNNUM(4)(1:1)  = "0")
-                 OR  ((WRK-PREFNUM       = "13"    ) AND
-                      (SYU-KOH-HKNNUM(1) = "151"   ) AND
-                      (RECE62-SRYYM     >= "200905"))
-                 OR  ((WRK-PREFNUM       = "23"    ) AND
-                      (SYU-KOH-HKNNUM(1) = "191"   ) AND
-                      (RECE62-SRYYM     >= "200910"))
-                 OR  ((WRK-PREFNUM       = "23"
-                                        OR "24"    ) AND
-                      (SYU-KOH-HKNNUM(1) = "152"   ) AND
-                      (RECE62-SRYYM     >= "201104"))
+                 OR  ( TBL-TOKATUKAIFLG2       =  1 )
                  OR  ((WRK-PREFNUM       = "42"    ) AND
                       (SYU-KOH-HKNNUM(1) = "186"   ) AND
                       (FLG-ZENKOKUKOHI-NISYU  =  4 ))
@@ -13480,16 +13467,7 @@
                     OR  ( SYU-KOH-HKNNUM(2)(1:1)  = "0")
                     OR  ( SYU-KOH-HKNNUM(3)(1:1)  = "0")
                     OR  ( SYU-KOH-HKNNUM(4)(1:1)  = "0")
-                    OR  ((WRK-PREFNUM       = "13"    ) AND
-                         (SYU-KOH-HKNNUM(1) = "151"   ) AND
-                         (RECE62-SRYYM     >= "200905"))
-                    OR  ((WRK-PREFNUM       = "23"    ) AND
-                         (SYU-KOH-HKNNUM(1) = "191"   ) AND
-                         (RECE62-SRYYM     >= "200910"))
-                    OR  ((WRK-PREFNUM       = "23"
-                                           OR "24"    ) AND
-                         (SYU-KOH-HKNNUM(1) = "152"   ) AND
-                         (RECE62-SRYYM     >= "201104"))
+                    OR  ( TBL-TOKATUKAIFLG2       =  1 )
                     OR  ((WRK-PREFNUM       = "42"    ) AND
                          (SYU-KOH-HKNNUM(1) = "186"   ) AND
                          (FLG-ZENKOKUKOHI-NISYU  =  4 ))
@@ -13533,27 +13511,10 @@
                    OR  ( SYU-KOH-HKNNUM(2)(1:1)    = "0"   )
                    OR  ( SYU-KOH-HKNNUM(3)(1:1)    = "0"   )
                    OR  ( SYU-KOH-HKNNUM(4)(1:1)    = "0"   )
-                   OR  ((WRK-PREFNUM       = "13"         ) AND
-                        (SYU-KOH-HKNNUM(1) = "151"        ) AND
-                        (RECE62-SRYYM     >= "200905"     ))
-                   OR  ((WRK-PREFNUM       = "23"         ) AND
-                        (SYU-KOH-HKNNUM(1) = "191"        ) AND
-                        (RECE62-SRYYM     >= "200910"     ))
-                   OR  ((WRK-PREFNUM       = "23" OR "24" ) AND
-                        (SYU-KOH-HKNNUM(1) = "152"        ) AND
-                        (RECE62-SRYYM     >= "201104"     ))
+                   OR  ( TBL-TOKATUKAIFLG2         =  1    )
       *
                       IF  (SYU-KOH-HKNNUM(1)(1:1) >= "1" AND <= "8")
-                        IF  ((WRK-PREFNUM       = "13"    ) AND
-                             (SYU-KOH-HKNNUM(1) = "151"   ) AND
-                             (RECE62-SRYYM     >= "200905"))
-                        OR  ((WRK-PREFNUM       = "23"    ) AND
-                             (SYU-KOH-HKNNUM(1) = "191"   ) AND
-                             (RECE62-SRYYM     >= "200910"))
-                        OR  ((WRK-PREFNUM       = "23"
-                                               OR "24"    ) AND
-                             (SYU-KOH-HKNNUM(1) = "152"   ) AND
-                             (RECE62-SRYYM     >= "201104"))
+                        IF  TBL-TOKATUKAIFLG2  =  1
                            CONTINUE
                         ELSE
                            MOVE    1    TO   FLG-HOKENICHIBU2
@@ -13726,16 +13687,7 @@
                  OR  ( SYU-KOH-HKNNUM(2)(1:1)  = "0")
                  OR  ( SYU-KOH-HKNNUM(3)(1:1)  = "0")
                  OR  ( SYU-KOH-HKNNUM(4)(1:1)  = "0")
-                 OR  ((WRK-PREFNUM       = "13"    ) AND
-                      (SYU-KOH-HKNNUM(1) = "151"   ) AND
-                      (RECE62-SRYYM     >= "200905"))
-                 OR  ((WRK-PREFNUM       = "23"    ) AND
-                      (SYU-KOH-HKNNUM(1) = "191"   ) AND
-                      (RECE62-SRYYM     >= "200910"))
-                 OR  ((WRK-PREFNUM       = "23"
-                                        OR "24"    ) AND
-                      (SYU-KOH-HKNNUM(1) = "152"   ) AND
-                      (RECE62-SRYYM     >= "201104"))
+                 OR  ( TBL-TOKATUKAIFLG2       =  1 )
                  OR  ((WRK-PREFNUM       = "42"    ) AND
                       (SYU-KOH-HKNNUM(1) = "186"   ) AND
                       (FLG-ZENKOKUKOHI-NISYU  =  4 ))
@@ -13772,16 +13724,7 @@
                     OR  ( SYU-KOH-HKNNUM(2)(1:1)  = "0")
                     OR  ( SYU-KOH-HKNNUM(3)(1:1)  = "0")
                     OR  ( SYU-KOH-HKNNUM(4)(1:1)  = "0")
-                    OR  ((WRK-PREFNUM       = "13"    ) AND
-                         (SYU-KOH-HKNNUM(1) = "151"   ) AND
-                         (RECE62-SRYYM     >= "200905"))
-                    OR  ((WRK-PREFNUM       = "23"    ) AND
-                         (SYU-KOH-HKNNUM(1) = "191"   ) AND
-                         (RECE62-SRYYM     >= "200910"))
-                    OR  ((WRK-PREFNUM       = "23"
-                                           OR "24"    ) AND
-                         (SYU-KOH-HKNNUM(1) = "152"   ) AND
-                         (RECE62-SRYYM     >= "201104"))
+                    OR  ( TBL-TOKATUKAIFLG2       =  1 )
                     OR  ((WRK-PREFNUM       = "42"    ) AND
                          (SYU-KOH-HKNNUM(1) = "186"   ) AND
                          (FLG-ZENKOKUKOHI-NISYU  =  4 ))
@@ -13837,28 +13780,10 @@
                    OR  ( SYU-KOH-HKNNUM(2)(1:1)    = "0" )
                    OR  ( SYU-KOH-HKNNUM(3)(1:1)    = "0" )
                    OR  ( SYU-KOH-HKNNUM(4)(1:1)    = "0" )
-                   OR  ((WRK-PREFNUM       = "13"       ) AND
-                        (SYU-KOH-HKNNUM(1) = "151"      ) AND
-                        (RECE62-SRYYM     >= "200905"   ))
-                   OR  ((WRK-PREFNUM       = "23"       ) AND
-                        (SYU-KOH-HKNNUM(1) = "191"      ) AND
-                        (RECE62-SRYYM     >= "200910"   ))
-                   OR  ((WRK-PREFNUM       = "23"
-                                          OR "24"       ) AND
-                        (SYU-KOH-HKNNUM(1) = "152"      ) AND
-                        (RECE62-SRYYM     >= "201104"   ))
+                   OR  ( TBL-TOKATUKAIFLG2         =  1  )
       *
                      IF  (SYU-KOH-HKNNUM(1)(1:1) >= "1" AND <= "8")
-                       IF  ((WRK-PREFNUM       = "13"    ) AND
-                            (SYU-KOH-HKNNUM(1) = "151"   ) AND
-                            (RECE62-SRYYM     >= "200905"))
-                       OR  ((WRK-PREFNUM       = "23"    ) AND
-                            (SYU-KOH-HKNNUM(1) = "191"   ) AND
-                            (RECE62-SRYYM     >= "200910"))
-                       OR  ((WRK-PREFNUM       = "23"
-                                              OR "24"    ) AND
-                            (SYU-KOH-HKNNUM(1) = "152"   ) AND
-                            (RECE62-SRYYM     >= "201104"))
+                       IF  TBL-TOKATUKAIFLG2  =  1
                            CONTINUE
                        ELSE
                            MOVE    1    TO   FLG-HOKENICHIBU2
@@ -22563,6 +22488,20 @@
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC     TO  SYUNOU-REC
                MOVE    ZERO            TO  FLG-SYUNOU
+      *
+               INITIALIZE              TBL-TOKATUKAI2
+               IF  ((WRK-PREFNUM              = "13"        ) AND
+                    (SYU-KOH-HKNNUM(1)        = "151"       ) AND
+                    (RECE62-SRYYM            >= "200905"    ))
+               OR  ((WRK-PREFNUM              = "23"        ) AND
+                    (SYU-KOH-HKNNUM(1)        = "191"       ) AND
+                    (RECE62-SRYYM            >= "200910"    ))
+               OR  ((WRK-PREFNUM              = "23" OR "24") AND
+                    (SYU-KOH-HKNNUM(1)        = "152"       ) AND
+                    (RECE62-SRYYM            >= "201104"    ))
+                 MOVE     1     TO     TBL-TOKATUKAIFLG2
+               END-IF
+      *
            ELSE
                INITIALIZE                  SYUNOU-REC
                MOVE    1               TO  FLG-SYUNOU
