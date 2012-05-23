@@ -206,6 +206,7 @@
       *                                     「その他」の対応
       *                                     「入院」の対応
       *                                     コメント差込
+      *  04.05.13    NACL-門脇    12/05/23  再就労療養指導管理料の集計先変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2637,6 +2638,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                    RECE85-SRYKBN
                   ELSE
                     IF      TNS-SRYKBN         =     "80"
+                    OR      RECE84-SRYKBN      =     "80"
                       IF  TNS-NYUTENTTLKBN   =     130
                           MOVE   "13"        TO    RECE84-SRYKBN
                                                    RECE85-SRYKBN
@@ -2767,6 +2769,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE      1          TO  FLG-SRYKBN-HEN
                    ELSE                                                 
                      IF     TNS-SRYKBN         =   "80"
+                     OR     RECE84-SRYKBN      =   "80"
                        IF   TNS-NYUTENTTLKBN   =   130
                             MOVE   "13"   TO  RECE84-SRYKBN
                                               RECE85-SRYKBN
