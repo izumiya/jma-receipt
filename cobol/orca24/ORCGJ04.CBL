@@ -5092,15 +5092,16 @@
       *        GO      TO      4100-TOROKU-EXT
       *****END-IF
       *
+      *H24.5 すべてのチェック後へ
       *    禁忌更新前のチェック
-           PERFORM 41001-YAKKNK-CHK-SEC
+      *    PERFORM 41001-YAKKNK-CHK-SEC
       *
       *     禁忌エラーの時、エラー表示へ
-           IF      WRK-KNKCHK-AREA     NOT =   SPACE
-               MOVE    "J03"               TO  SPA-J041-SAKI
-               PERFORM 410019-POP-J041-SEC
-               GO      TO      4100-TOROKU-EXT
-           END-IF
+      *    IF      WRK-KNKCHK-AREA     NOT =   SPACE
+      *        MOVE    "J03"               TO  SPA-J041-SAKI
+      *        PERFORM 410019-POP-J041-SEC
+      *        GO      TO      4100-TOROKU-EXT
+      *****END-IF
       *
       *    剤のチェック
            PERFORM 45011-NAIYOU-CHK-SEC
@@ -5136,6 +5137,16 @@
                    GO      TO      4100-TOROKU-EXT
                END-IF
            END-IF
+      *
+      *    禁忌更新前のチェック
+           PERFORM 41001-YAKKNK-CHK-SEC
+      *     禁忌エラーの時、エラー表示へ
+           IF      WRK-KNKCHK-AREA     NOT =   SPACE
+               MOVE    "J03"               TO  SPA-J041-SAKI
+               PERFORM 410019-POP-J041-SEC
+               GO      TO      4100-TOROKU-EXT
+           END-IF
+      *
       *
            IF      SPA-J04-SYORI       =   ZERO
                MOVE    "0101"              TO  SPA-JIDCD
