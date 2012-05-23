@@ -216,6 +216,7 @@
       *  04.05.11    NACL-門脇    12/05/01  平成２４年４月改正
       *                                     自賠責
       *                                     再診の点数集計と回数編集対応
+      *  04.05.12    NACL-門脇    12/05/23  再就労療養指導管理料の集計先変更
       *
       *  04.06.01    NACL-門脇    10/07/01  自賠責文書料レセプト摘要欄記載
       *                                     （１通時）対応
@@ -2208,6 +2209,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     END-IF
                   ELSE
                     IF      TNS-SRYKBN         =     "80"
+                    OR      RECE44-SRYKBN      =     "80"
                       IF  TNS-GAITENTTLKBN   =     130
                           MOVE   "13"        TO    RECE44-SRYKBN
                                                    RECE45-SRYKBN
@@ -2340,6 +2342,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE    1          TO    FLG-SRYKBN-HEN
                    ELSE                                                 
                      IF      TNS-SRYKBN         =   "80"
+                     OR      RECE44-SRYKBN      =   "80"
                          IF  TNS-GAITENTTLKBN   =   130
                              MOVE   "13"    TO  RECE44-SRYKBN
                                                 RECE45-SRYKBN

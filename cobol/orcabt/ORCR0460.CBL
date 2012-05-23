@@ -3600,13 +3600,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                        END-IF
                      END-IF
                  END-IF
-                 IF   RECE41-SRYYM   >=   "200804"
-                   EVALUATE  TBL-ZAIW-SRYCD1
-                     WHEN     "101130010"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999981   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                   END-EVALUATE
-                 END-IF
+      ***        IF   RECE41-SRYYM   >=   "200804"
+      ***          EVALUATE  TBL-ZAIW-SRYCD1
+      ***            WHEN     "101130010"
+      ***              MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
+      ***              MOVE      999999981   TO  TBL-ZAIW-KOUHYOJYUNNUM
+      ***          END-EVALUATE
+      ***        END-IF
                  EVALUATE    TBL-ZAIW-SRYCD1
                      WHEN     "101800175"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
@@ -3620,9 +3620,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                      WHEN     "101800340"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
                        MOVE      999999985   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                     WHEN     "101800360"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999986   TO  TBL-ZAIW-KOUHYOJYUNNUM
                  END-EVALUATE
                END-IF
                MOVE    TBL-ZAIW-CDKBN-SYO  TO  RECE46-CDKBN-SYO
