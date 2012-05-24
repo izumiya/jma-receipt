@@ -153,6 +153,8 @@
       *                                     入院略称の変更
       *  04.05.39    NACL-門脇    12/04/24  保険欄−一部負担金欄記載に関
       *                                     するフラグ編集
+      *  04.05.40    NACL-門脇    12/05/23  一部負担金・食事療養費標準負担
+      *                                     額区分編集修正
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -5871,8 +5873,8 @@
       *                                                                 
       *        <減、免、猶、低所得１、低所得２、３月超>            
       *                                                                
-           IF      RECE62-KOUREI       NOT = SPACE
-           AND     RECE62-TEISYOTOKU   NOT = SPACE
+           IF     (RECE62-KOUREI           = "1"  )
+           AND    (RECE62-TEISYOTOKU   NOT = SPACE)
                EVALUATE    RECE62-TEISYOTOKU
                    WHEN    "1"
                    WHEN    "4"

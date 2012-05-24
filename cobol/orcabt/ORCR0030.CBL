@@ -570,6 +570,7 @@
       *                                     一律一般の金額で記載
       *  04.05.52    NACL-門脇    12/05/15  医療観察コメント自動記載対応
       *  04.05.53    NACL-門脇    12/05/16  愛知・三重県地方公費対応
+      *  04.05.54    NACL-門脇    12/05/23  保険欄−一部負担金未記載対応
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -6162,6 +6163,10 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                                              -  1
              END-IF
       *
+             IF       SRY-SRYCD(IDX2)  =  "099999909"
+                  MOVE    1     TO    RECE02-YOBIETC(3)
+             END-IF
+      *
              IF     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
@@ -6177,7 +6182,8 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                                             OR "099999904"
                                             OR "099999905"
                                             OR "099999906"
-                                            OR "099999907"  )
+                                            OR "099999907"
+                                            OR "099999909"  )
              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                     "60" OR "64" OR "70" OR
                                     "80"                   ) AND
@@ -6255,7 +6261,8 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                                              OR "099999904"
                                              OR "099999905"
                                              OR "099999906"
-                                             OR "099999907"  )
+                                             OR "099999907"
+                                             OR "099999909"  )
               OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                      "60" OR "64" OR "70" OR
                                      "80"                   ) AND
@@ -13586,6 +13593,23 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                END-IF
       *
+               IF  (WRK-KEISAN-YYY    NOT =  ZERO)
+               AND (RECE02-ZAITAKU        =  "3" )
+                    MOVE    "2"      TO   RECE02-ZAITAKU
+               END-IF
+      *
+               IF  (FLG-GENBUTU-HANTEI    =   1  )
+               AND (FLG-GENBUTU-HANTEI2   =   1  )
+               AND (RECE02-ZAITAKU        =  "3" )
+                    MOVE    "2"      TO   RECE02-ZAITAKU
+               END-IF
+      *
+               IF  (FLG-GENBUTU-HANTEI    =   1  )
+               AND (FLG-SYSCHK            =   1  )
+               AND (RECE02-ZAITAKU        =  "3" )
+                    MOVE    "2"      TO   RECE02-ZAITAKU
+               END-IF
+      *
                IF    SYS-1001-PREFNUM  =  19
                 IF ( RECE02-KOHHBTNUM(1) =  "41"        )
                 OR ((RECE02-KOHNUM(1)  = "051" OR "091") AND
@@ -13604,21 +13628,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                 END-IF
                END-IF
-               IF  (WRK-KEISAN-YYY    NOT =  ZERO)
-               AND (RECE02-ZAITAKU        =  "3" )
-                    MOVE    "2"      TO   RECE02-ZAITAKU
-               END-IF
       *
-               IF  (FLG-GENBUTU-HANTEI    =   1  )
-               AND (FLG-GENBUTU-HANTEI2   =   1  )
-               AND (RECE02-ZAITAKU        =  "3" )
-                    MOVE    "2"      TO   RECE02-ZAITAKU
-               END-IF
-      *
-               IF  (FLG-GENBUTU-HANTEI    =   1  )
-               AND (FLG-SYSCHK            =   1  )
-               AND (RECE02-ZAITAKU        =  "3" )
-                    MOVE    "2"      TO   RECE02-ZAITAKU
+               IF   RECE02-YOBIETC(3)     =   1
+                    MOVE    "3"      TO   RECE02-ZAITAKU
                END-IF
       *
                IF      RECE02-ZAITAKU  =  "3"
@@ -13652,6 +13664,50 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    高齢者の現物給付チェック
+           IF     (RECE02-SRYYM   <=  "201203")
+           AND    (RECE02-ZAITAKU  =  "1"     )
+      *
+               IF   RECE02-YOBIETC(3)     =   1
+                    MOVE    "4"      TO   RECE02-ZAITAKU
+               END-IF
+      *
+               IF      RECE02-ZAITAKU  =  "4"
+                 MOVE     ZERO    TO    RECE02-FTNMONEY(1)
+                 PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
+                           UNTIL   KOHFTN-IDX   >    4
+                   IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  NOT =  1
+                     IF ( RECE02-KOHNUM(KOHFTN-IDX) =
+                               "015" OR "016" OR "051" OR "021" OR
+                               "024" OR "079" OR "052" OR "012" OR
+                               "025" OR "038"                       )
+                     OR ((SYS-1001-PREFNUM        =   33           ) AND
+                         (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
+                                                 >= "1" AND <=  "8") AND
+                         (RECE02-SRYYM           >= "200610"       ))
+                     OR ((SYS-1001-PREFNUM        =   27           ) AND
+                         (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
+                                                 >= "1" AND <=  "8") AND
+                         (RECE02-KOHNUM(KOHFTN-IDX)
+                                              NOT = "100" AND "200") AND
+                         (RECE02-SRYYM           >= "200804"       ))
+                     OR ((SYS-1001-PREFNUM        =   01           ) AND
+                         (RECE02-KOHNUM(KOHFTN-IDX) = "183"        ) AND
+                         (RECE02-SRYYM           >= "200810"       ))
+                     OR ( TBL-TOKATUKAIFLG(KOHFTN-IDX)   =  1       )
+                       MOVE  WRK-TAIHI-FTNMONEY    (KOHFTN-IDX + 1)
+                                 TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                       MOVE  WRK-TAIHI-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+                                 TO  RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+                     END-IF
+                     IF    RECE02-KOHNUM(KOHFTN-IDX) = "010"
+                       MOVE  ZERO    TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                     END-IF
+                   END-IF
+                 END-PERFORM
+               END-IF
+      *
+           END-IF
+      *
            IF     (RECE02-SRYYM   >=  "201204")
            AND    (RECE02-ZAITAKU  =  "1"     )
       *
@@ -14202,6 +14258,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                AND (FLG-SYSCHK            =   1  )
                AND (RECE02-ZAITAKU        =  "4" )
                     MOVE    "1"      TO   RECE02-ZAITAKU
+               END-IF
+      *
+               IF   RECE02-YOBIETC(3)     =   1
+                    MOVE    "4"      TO   RECE02-ZAITAKU
                END-IF
       *
                IF      RECE02-ZAITAKU  =  "4"
