@@ -6252,15 +6252,20 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
                END-PERFORM
       *        伝票番号保存
-               PERFORM VARYING     IDX     FROM    1   BY  1
-                       UNTIL       IDX     >   10
-                   IF      TBL-DENPNUM (IDX)   =   ZERO
-                       MOVE    JYURRK-DENPNUM  TO  TBL-DENPNUM (IDX)
-                   END-IF
-                   IF      JYURRK-DENPNUM  =   TBL-DENPNUM (IDX)
-                       MOVE    10              TO  IDX
-                   END-IF
-               END-PERFORM
+               IF     (JYURRK-HKNCOMBINUM  =   "9999" )   OR
+                      (JYURRK-NYUGAIKBN    =   "1"    )
+                   CONTINUE
+               ELSE
+                   PERFORM VARYING     IDX     FROM    1   BY  1
+                           UNTIL       IDX     >   10
+                       IF      TBL-DENPNUM (IDX)   =   ZERO
+                           MOVE    JYURRK-DENPNUM  TO  TBL-DENPNUM (IDX)
+                       END-IF
+                       IF      JYURRK-DENPNUM  =   TBL-DENPNUM (IDX)
+                           MOVE    10              TO  IDX
+                       END-IF
+                   END-PERFORM
+               END-IF
                PERFORM VARYING     IDX     FROM    1   BY  1
                        UNTIL       IDX     >   10
                    IF      TBL-SRYKA (IDX)     =   SPACE
@@ -6871,15 +6876,20 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
                END-PERFORM
       *        伝票番号保存
-               PERFORM VARYING     IDX     FROM    1   BY  1
-                       UNTIL       IDX     >   10
-                   IF      TBL-DENPNUM (IDX)   =   ZERO
-                       MOVE    JYURRK-DENPNUM  TO  TBL-DENPNUM (IDX)
-                   END-IF
-                   IF      JYURRK-DENPNUM  =   TBL-DENPNUM (IDX)
-                       MOVE    10              TO  IDX
-                   END-IF
-               END-PERFORM
+               IF     (JYURRK-HKNCOMBINUM  =   "9999" )   OR
+                      (JYURRK-NYUGAIKBN    =   "1"    )
+                   CONTINUE
+               ELSE
+                   PERFORM VARYING     IDX     FROM    1   BY  1
+                           UNTIL       IDX     >   10
+                       IF      TBL-DENPNUM (IDX)   =   ZERO
+                           MOVE    JYURRK-DENPNUM  TO  TBL-DENPNUM (IDX)
+                       END-IF
+                       IF      JYURRK-DENPNUM  =   TBL-DENPNUM (IDX)
+                           MOVE    10              TO  IDX
+                       END-IF
+                   END-PERFORM
+               END-IF
                PERFORM VARYING     IDX     FROM    1   BY  1
                        UNTIL       IDX     >   10
                    IF      TBL-SRYKA (IDX)     =   SPACE
@@ -8050,6 +8060,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-RRK-RRKYMD (SPA-NAI-RRKSELNUM)(7:2)
                                            TO  IDX-D
                IF      SPA-GMN-DAY (IDX-D) =   ZERO
+                   MOVE    "0004"              TO  SPA-ERRCD
+                   MOVE    3                   TO  SPA-GMN-CUR
+                   GO      TO      420-ZAIHENKOU-EXT
+               END-IF
+      *        診療科・保険組合せが一致
+               MOVE    SPA-NAI-BANGO       TO  IDX
+               IF     (SPA-RRK-SRYKA  (SPA-NAI-RRKSELNUM)
+                                       NOT =   SPA-NAI-SRYKA(IDX) )
+                 OR   (SPA-RRK-HKNCOMBI(SPA-NAI-RRKSELNUM)
+                                       NOT =   SPA-NAI-HKNCOMBI(IDX))
                    MOVE    "0004"              TO  SPA-ERRCD
                    MOVE    3                   TO  SPA-GMN-CUR
                    GO      TO      420-ZAIHENKOU-EXT
@@ -12898,10 +12918,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "診療回数は数字で入力して下さい"
                                        TO  WRK-ERRMSG
                WHEN    "0004"
-                   MOVE    "対象の診療科で受診履歴がない日です。"
-                                       TO  WRK-ERRMSG
-                   MOVE    "入力できません"
-                                       TO  WRK-ERRMSG(37:)
+      ******       MOVE    "対象の診療科で受診履歴がない日です。"
+      *                                TO  WRK-ERRMSG
+      *            MOVE    "入力できません"
+      ******                           TO  WRK-ERRMSG(37:)
+                   STRING  "対象の剤は選択した受診履歴に算定が"
+                           "ありません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  WRK-ERRMSG
+                   END-STRING
                WHEN    "0005"
                    MOVE    "受診履歴番号がありません。"
                                        TO  WRK-ERRMSG

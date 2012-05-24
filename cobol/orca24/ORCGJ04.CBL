@@ -6795,7 +6795,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    UNTIL       FLG-JYURRK      =   1
                IF      JYURRK-SRYYMD(1:6)  =   SPA-J02-SRYYMD(1:6)
       *            収納の会計変更区分変更
-                   IF      SPA-NYUGAIKBN       =   "2"
+                   IF     (SPA-NYUGAIKBN       =   "2"  )
+                   AND    (JYURRK-HKNCOMBINUM  NOT =   "9999")
                        PERFORM 450431-SYUNOU-UPD-SEC
                    END-IF
                END-IF
@@ -7167,7 +7168,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                IF      FLG-UPD             =   1
       *            収納の会計変更区分変更
-                   IF      SPA-NYUGAIKBN       =   "2"
+                   IF     (SPA-NYUGAIKBN       =   "2"  )
+                   AND    (JYURRK-HKNCOMBINUM  NOT =   "9999")
                        PERFORM 450431-SYUNOU-UPD-SEC
                    END-IF
       *
@@ -7240,6 +7242,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
 grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    MCPDATA-REC
                                                    SPA-AREA
+               IF      MCP-RC          NOT =   ZERO
+                   MOVE    "1099"          TO  SPA-ERRCD
+                   DISPLAY "J04 SYUNOU UPD ERR:"  MCP-RC
+                           ",KEY:" SYU-KEY
+               END-IF
            END-IF
       *
            .
