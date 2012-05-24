@@ -2067,7 +2067,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-TEI-DENPNUM (1) =   ZERO
                MOVE    SPA-DENPNUM         TO  WRK-DENPNUM
                MOVE    SPA-DOUJI-RENNUM    TO  WRK-DOUJI-RENNUM
-               MOVE    SPA-HKNCOMBINUM     TO  WRK-HKNCOMBI
+               MOVE    SPA-OLD-HKNCOMBI    TO  WRK-HKNCOMBI
                PERFORM 10011-TEISEI-SYORI1-SEC
            ELSE
                PERFORM VARYING     IDXF    FROM    1   BY  1
