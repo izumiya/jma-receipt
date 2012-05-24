@@ -342,6 +342,8 @@
       *                                     行うようにする
       *  04.05.36    NACL-藤原    11/12/05  判断料がある検査の日付情報記
       *                                     録の修正
+      *  04.05.37    NACL-門脇    12/05/23  一部負担金・食事療養費標準負担
+      *                                     額区分編集修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2437,8 +2439,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    8                   TO  WRK-NAGASA
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    一部負担金・食事療養費標準負担額区分
-           IF      RECE62-KOUREI       NOT = SPACE
-           AND     RECE62-TEISYOTOKU   NOT = SPACE
+           IF     (RECE62-KOUREI           = "1"  )
+           AND    (RECE62-TEISYOTOKU   NOT = SPACE)
              EVALUATE    RECE62-TEISYOTOKU
                WHEN    "1"
                    MOVE    "3"             TO  WRK-DATA

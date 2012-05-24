@@ -237,6 +237,7 @@
       *                                     ÍúÎòÂÐ±þ
       *  04.05.12    NACL-ÌçÏÆ    12/04/10  Ê¿À®£²£´Ç¯£´·î²þÀµ
       *                                     ¸½ÊªµëÉÕ²½ÂÐ±þ
+      *  04.05.13    NACL-ÌçÏÆ    12/05/23  ºß°åÁí»»Äê¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -431,6 +432,7 @@
            03  IDX3                                    PIC 9(03).
            03  IDX4                                    PIC 9(03).
            03  IDX5                                    PIC 9(03).
+           03  IDX6                                    PIC 9(03).
            03  IDY1                                    PIC 9(03).
            03  IDY2                                    PIC 9(03).
            03  IDZ                                     PIC 9(02).
@@ -3596,7 +3598,18 @@ grpsys             PERFORM 900-DBSELECT-SEC
               OR (COMB-SYU-HKNKOHSBTKBN  =  "8" OR "9" )
                  CONTINUE
               ELSE
+               IF  RECE01-SRYYM   >=  "201204"
+                 PERFORM  VARYING  IDX6   FROM   1   BY   1
+                           UNTIL  (IDX6                   >   10 )
+                             OR   (RECE02-HKNCOMBI(IDX6)  =  ZERO)
+                    IF  RECE02-HKNCOMBI(IDX6) =  ACCT-HKNCOMBI
+                      MOVE    "1"     TO  WRK-ZAITAKU
+                      MOVE    10      TO  IDX6
+                    END-IF
+                 END-PERFORM
+               ELSE
                  MOVE    "1"     TO  WRK-ZAITAKU
+               END-IF
               END-IF
            END-IF
       *
