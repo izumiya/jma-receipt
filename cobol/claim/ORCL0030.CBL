@@ -34,6 +34,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 03.05.00     NACL-多々納  07/05/10  グループ診療対応
+      * 04.07.00     NACL-多々納  11/10/05  OPENエラー対応追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -42,13 +43,14 @@
        FILE-CONTROL.
       *
            SELECT  LF04-FILE       ASSIGN  FILE-NAME
+                                   ORGANIZATION    IS  LINE SEQUENTIAL
                                    FILE    STATUS  IS  STS-LF04.
       *
        DATA                        DIVISION.
        FILE                        SECTION.
       *
        FD  LF04-FILE.
-       01  IN-LF04-REC             PIC X(30000).
+       01  IN-LF04-REC             PIC X(500000).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -61,8 +63,8 @@
       *    03                      PIC X(06)  VALUE  ".txt".
       *
        01  WRK-DATA-REC.
-           03  WRK-DATA            PIC X(30000)
-                                   OCCURS  50.
+           03  WRK-DATA            PIC X(500000)
+                                   OCCURS  5.
       *                            OCCURS  6.
       *
        01  LF04-REC.        
@@ -78,10 +80,11 @@
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
+           03  FLG-SYORIEND        PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
-           03  IDX                 PIC 9(04).
+           03  IDX                 PIC 9(08).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
       *
@@ -101,6 +104,7 @@
                05  WRK-SYSYY         PIC 9(04).
                05  WRK-SYSMM         PIC 9(02).
                05  WRK-SYSDD         PIC 9(02).
+           03  SYS-TIME                            PIC 9(08).
       *
        01  WRK-LF04-REC. 
            COPY    "CPRLF004.INC"    REPLACING  //LF04//
@@ -153,7 +157,9 @@
       *
            PERFORM 100-INIT-SEC
       *
-           PERFORM 200-MAIN-SEC
+           IF      FLG-SYORIEND        =   ZERO
+               PERFORM 200-MAIN-SEC
+           END-IF
       *            UNTIL       FLG-END     =   1
       *
            PERFORM 300-END-SEC
@@ -194,19 +200,29 @@
       *     
            MOVE    WRK-PARA-PTID       TO  FILE-PTID
            OPEN    INPUT    LF04-FILE
+      *    OPEN エラー
+           IF      STS-LF04        NOT =   ZERO
+               DISPLAY "**ORCL0030 LF04-FILE OPEN ERR:"
+                                           STS-LF04
+               MOVE    1                   TO  FLG-SYORIEND
+               GO      TO      100-INIT-EXT
+           END-IF
+      *
            MOVE    ZERO                TO  IDX
       *     
       ************
+           ACCEPT  SYS-TIME            FROM    TIME
+           DISPLAY "Read Start time = " SYS-TIME
            PERFORM UNTIL    FLG-END    =   1
                READ                    LF04-FILE
                    AT  END
                        MOVE    1           TO  FLG-END
                    NOT AT  END
                       ADD     1           TO  IDX
-                      IF      IDX         >   100
+                      IF      IDX         >   5
                            CONTINUE
                        ELSE
-           DISPLAY "L0030 IDX = " "[" IDX "]"
+      *     DISPLAY "L0030 IDX = " "[" IDX "]"
                            MOVE    IN-LF04-REC   TO  WRK-DATA
                                                        (IDX)
                        END-IF
@@ -220,9 +236,16 @@
       *            MOVE    10             TO  IDX
       *        END-IF
            END-PERFORM
+           ACCEPT  SYS-TIME            FROM    TIME
+           DISPLAY "Read End   time = " SYS-TIME
+           DISPLAY "L0030 LAST IDX = " "[" IDX "]"
            MOVE    WRK-DATA-REC           TO  WRK-LF041-REC
            DISPLAY "L0030 WRK-LF04-CRE001-DPERTID = " 
                   "[" WRK-LF041-CRE001-DPERTID "]" 
+           DISPLAY "L0030 WRK-LF041-IJICD(20 17) = " 
+                    WRK-LF041-IJICD(20 17)
+           DISPLAY "L0030 WRK-LF041-IJICD(20 18) = " 
+                    WRK-LF041-IJICD(20 18)
            IF      WRK-LF04-IJICD(18 1)   =  LOW-VALUE
                 DISPLAY "L0030 LOW-VALUE(18 1) = " 
            END-IF
