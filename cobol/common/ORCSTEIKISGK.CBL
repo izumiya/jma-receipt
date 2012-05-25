@@ -591,7 +591,7 @@
            MOVE    SYUDAY-REC     TO   MCPDATA-REC
            MOVE    "tbl_syuday"   TO   MCP-TABLE
            MOVE    "del6"         TO   MCP-PATHNAME
-           PERFORM 910-DBUPDATE-SEC
+           PERFORM 910-DBDELETE-SEC
            IF    ( MCP-RC         NOT  =   ZERO )
                MOVE    1          TO  FLG-SYUDAY
            END-IF
