@@ -17403,6 +17403,7 @@
                     AND  RECE62-KOHNUM(4)  =  SPACE
                     AND  FLG-HOKENICHIBU   =  ZERO
                     AND  WRK-KOH-GAI-GEN70 =  WRK-HOKENICHIBUGAK
+                    AND  WRK-CHK-KEIKASOCHI1  NOT =  ZERO
                       MOVE  "3"      TO   RECE62-KOUREI
                     END-IF
                  ELSE
