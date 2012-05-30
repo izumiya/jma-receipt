@@ -371,6 +371,7 @@
       *                                     ・一括再計算メッセージ表示の対
       *                                       象外とする
       *  04.05.39    NACL-門脇    12/05/16  愛知・三重県地方公費対応
+      *  04.05.40    NACL-門脇    12/05/30  災害対応（日雇特例被保険者）
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4140,9 +4141,9 @@
                    MOVE     ZERO    TO    WK-GENGAKUKBN
               END-IF
             END-IF
-            IF   COMB-HKNNUM  =  "004"
-                   MOVE     ZERO    TO    WK-GENGAKUKBN
-            END-IF
+      ***   IF   COMB-HKNNUM  =  "004"
+      ***          MOVE     ZERO    TO    WK-GENGAKUKBN
+      ***   END-IF
             MOVE   WK-GENGAKUKBN    TO    LNK-SYU-YKZKENNUM
       *
            END-IF

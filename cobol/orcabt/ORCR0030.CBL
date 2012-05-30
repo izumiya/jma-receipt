@@ -572,6 +572,7 @@
       *  04.05.52    NACL-ÌçÏÆ    12/05/15  °åÎÅ´Ñ»¡¥³¥á¥ó¥È¼«Æ°µ­ºÜÂÐ±þ
       *  04.05.53    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.54    NACL-ÌçÏÆ    12/05/23  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÌ¤µ­ºÜÂÐ±þ
+      *  04.05.55    NACL-ÌçÏÆ    12/05/30  ºÒ³²ÂÐ±þ¡ÊÆü¸ÛÆÃÎãÈïÊÝ¸±¼Ô¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3810,11 +3811,11 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
              END-IF
             END-IF
       *
-            IF   RECE02-HKNNUM   =   "004"
-             IF   RECE02-SRYYM  >=   "201101"
-                MOVE     ZERO    TO    WK-GENGAKUKBN
-             END-IF
-            END-IF
+      ***   IF   RECE02-HKNNUM   =   "004"
+      ***    IF   RECE02-SRYYM  >=   "201101"
+      ***       MOVE     ZERO    TO    WK-GENGAKUKBN
+      ***    END-IF
+      ***   END-IF
       *
            END-IF
       *

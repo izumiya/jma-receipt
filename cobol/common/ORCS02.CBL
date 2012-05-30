@@ -334,6 +334,7 @@
       *  04.05.34    NACL-門脇    12/03/23  熊本県地方公費対応
       *  04.05.35    NACL-門脇    12/05/01  減（割）計算対応
       *  04.05.36    NACL-門脇    12/05/16  愛知・三重県地方公費対応
+      *  04.05.37    NACL-門脇    12/05/30  災害対応（日雇特例被保険者）
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3944,9 +3945,9 @@
                    MOVE     ZERO    TO    WK-GENGAKUKBN
               END-IF
             END-IF
-            IF   COMB-HKNNUM  =  "004"
-                   MOVE     ZERO    TO    WK-GENGAKUKBN
-            END-IF
+      ***   IF   COMB-HKNNUM  =  "004"
+      ***          MOVE     ZERO    TO    WK-GENGAKUKBN
+      ***   END-IF
             IF   (FLG-SAIGAI-TAISYO     =    1     )
             AND  (WK-GENGAKUKBN         =    3 OR 4)
             AND  (LNK-SYU-SRYYMD(1:6)  <=  "201202")
