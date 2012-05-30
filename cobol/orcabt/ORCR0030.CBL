@@ -13323,6 +13323,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     AND  RECE02-KOHNUM(4)  =  SPACE
                     AND  FLG-HOKENICHIBU   =  ZERO
                     AND  WRK-KOH-GAI-GEN70 =  WRK-HOKENICHIBUGAK
+                    AND  WRK-CHK-KEIKASOCHI1  NOT =  ZERO
                       MOVE  "3"      TO   RECE02-ZAITAKU
                     END-IF
                  ELSE
@@ -13980,6 +13981,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      AND  RECE02-KOHNUM(4)  =  SPACE
                      AND  FLG-HOKENICHIBU   =  ZERO
                      AND  WRK-KOH-GAI-GEN70 =  WRK-HOKENICHIBUGAK
+                     AND  WRK-CHK-KEIKASOCHI1  NOT =  ZERO
                         MOVE    "4"      TO   RECE02-ZAITAKU
                      END-IF
                    ELSE
