@@ -571,6 +571,7 @@
       *  04.05.52    NACL-門脇    12/05/15  医療観察コメント自動記載対応
       *  04.05.53    NACL-門脇    12/05/16  愛知・三重県地方公費対応
       *  04.05.54    NACL-門脇    12/05/23  保険欄−一部負担金未記載対応
+      *  04.05.55    NACL-門脇    12/05/30  災害対応（日雇特例被保険者）
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -3847,11 +3848,11 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
              END-IF
             END-IF
       *
-            IF   RECE02-HKNNUM   =   "004"
-             IF   RECE02-SRYYM  >=   "201101"
-                MOVE     ZERO    TO    WK-GENGAKUKBN
-             END-IF
-            END-IF
+      ***   IF   RECE02-HKNNUM   =   "004"
+      ***    IF   RECE02-SRYYM  >=   "201101"
+      ***       MOVE     ZERO    TO    WK-GENGAKUKBN
+      ***    END-IF
+      ***   END-IF
       *
            END-IF
       *
