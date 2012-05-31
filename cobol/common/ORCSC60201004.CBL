@@ -864,9 +864,9 @@
                    END-IF
       *
       *----(01.00.03) LINE ADD START ----------------------------------
-      *            年齢加算算定チェック
-                   MOVE    SPACE               TO  WRK-NYU-SRYCD
-                   PERFORM 1007-NENREI-SYORI-SEC
+      *H24.5 下へ  年齢加算算定チェック
+      *            MOVE    SPACE               TO  WRK-NYU-SRYCD
+      *            PERFORM 1007-NENREI-SYORI-SEC
       *----(01.00.03) LINE ADD END   ----------------------------------
       *            施設基準不適合チェック
                    IF      WRK-COM-KIJUNTEIGENKBN(IDX-Z)
@@ -890,6 +890,11 @@
                            PERFORM 100115-ZENKNSCOMMNT-SET-SEC
                        END-IF
                    END-IF
+      *H24.5
+      *            年齢加算算定チェック
+                   MOVE    SPACE               TO  WRK-NYU-SRYCD
+                   PERFORM 1007-NENREI-SYORI-SEC
+      *
       *            初回コンタクトレンズ検査チェック
       *Ｈ２０．４から削除
       *********    IF     (SPA-ERRCD           =   SPACE ) AND
