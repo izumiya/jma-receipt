@@ -138,6 +138,7 @@
            03  FLG-TOKU-SET                PIC 9(01).
            03  FLG-TOKU-SHOKU              PIC 9(01).
            03  FLG-PTKOHINF                PIC 9(01).
+           03  FLG-PTHKNINF                PIC 9(01).
       *    ≈∫ª˙ŒŒ∞Ë
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -680,6 +681,10 @@
        01  PTKOHINF-REC.
            COPY    "CPPTKOHINF.INC".
       *
+      *    ¥µº‘ ›∏±æ Û•ﬁ•π•ø°›
+       01  PTHKNINF-REC.
+           COPY    "CPPTHKNINF.INC".
+      *
       *     ›∏±¡»§ﬂπÁ§Ô§ª
        01  HKNCOMBI-REC.
            COPY    "CPHKNCOMBI.INC".
@@ -931,10 +936,15 @@
       *                                 ∫“≥≤∏∫Ã»¬–æ›≥∞§»§π§Î∞Ÿ§À∆√ ÃŒ≈Õ‹
       *                                 ° µÏ∆√ Ã∆¸∏€°À§Úµ≠œø
                                         IF   COMB-HKNNUM = "004"
-      *                                      MOVE  "1"  TO  
-      *                                            WRK-SAIGAI-004(IDX)
-                                             MOVE  SPACE  TO
+                                           PERFORM  210-TOKUBETSU-SEC
+                                           IF  PTHKN-HKNJANUM(1:4) =
+                                                                "0404"
+                                               MOVE  SPACE  TO  
                                                    WRK-SAIGAI-004(IDX)
+                                           ELSE
+                                               MOVE  "1"    TO
+                                                   WRK-SAIGAI-004(IDX)
+                                           END-IF
                                         END-IF
       *                                 ∫“≥≤∏∫Ã»¬–æ›≥∞§»§π§Î∞Ÿ§ÀºÁ ›∏±
       *                                 Ãµ§∑§Úµ≠œø
@@ -4189,10 +4199,15 @@
       *                                 ∫“≥≤∏∫Ã»¬–æ›≥∞§»§π§Î∞Ÿ§À∆√ ÃŒ≈Õ‹
       *                                 ° µÏ∆√ Ã∆¸∏€°À§Úµ≠œø
                                         IF   COMB-HKNNUM = "004"
-      *                                      MOVE  "1"  TO  
-      *                                            WRK-SAIGAI-004(IDX)
-                                             MOVE  SPACE  TO
+                                           PERFORM  210-TOKUBETSU-SEC
+                                           IF  PTHKN-HKNJANUM(1:4) =
+                                                                "0404"
+                                               MOVE  SPACE  TO  
                                                    WRK-SAIGAI-004(IDX)
+                                           ELSE
+                                               MOVE  "1"    TO
+                                                   WRK-SAIGAI-004(IDX)
+                                           END-IF
                                         END-IF
       *                                 ∫“≥≤∏∫Ã»¬–æ›≥∞§»§π§Î∞Ÿ§ÀºÁ ›∏±
       *                                 Ãµ§∑§Úµ≠œø
@@ -6386,6 +6401,35 @@
       *
            .
        210-RJN-TAISYO-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ∆√ Ã∆¸∏€° ∆√ ÃŒ≈Õ‹°À§Œ»ΩƒÍÕ—§À¥µº‘ ›∏±æ Û§Œ∆…§ﬂπ˛§ﬂ
+      *****************************************************************
+       210-TOKUBETSU-SEC         SECTION.
+      *
+           INITIALIZE                      PTHKNINF-REC
+           MOVE    LNK-NYURECEDEN-HOSPNUM
+                                    TO     PTHKN-HOSPNUM
+           MOVE    LNK-NYURECEDEN-PTID
+                                    TO     PTHKN-PTID
+           MOVE    COMB-HKNID       TO     PTHKN-HKNID
+           MOVE    "tbl_pthkninf"   TO  MCP-TABLE
+           MOVE    "key"            TO  MCP-PATHNAME
+           PERFORM 910-PTHKNINF-SELECT-SEC
+           IF    FLG-PTHKNINF       =       ZERO
+               MOVE    "tbl_pthkninf"   TO  MCP-TABLE
+               MOVE    "key"            TO  MCP-PATHNAME
+               PERFORM 910-PTHKNINF-READ-SEC
+           END-IF
+      *
+      *    ¥µº‘ ›∏±æ Û•Ø•Ì°º•∫
+           MOVE    "tbl_pthkninf"   TO  MCP-TABLE
+           MOVE    "key"            TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+           .
+       210-TOKUBETSU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -10160,6 +10204,41 @@
       *
            .
        910-HKNCOMBI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥µº‘ ›∏±æ Û∏°∫˜
+      *****************************************************************
+       910-PTHKNINF-SELECT-SEC        SECTION.
+      *
+           MOVE    PTHKNINF-REC        TO  MCPDATA-REC
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO               TO  FLG-PTHKNINF
+           ELSE
+               MOVE    1                  TO  FLG-PTHKNINF
+           END-IF
+      *
+           .
+       910-PTHKNINF-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥µº‘ ›∏±æ Û∆…π˛
+      *****************************************************************
+       910-PTHKNINF-READ-SEC        SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC        TO  PTHKNINF-REC
+               MOVE    ZERO               TO  FLG-PTHKNINF
+           ELSE
+               INITIALIZE                     PTHKNINF-REC
+               MOVE    1                  TO  FLG-PTHKNINF
+           END-IF
+      *
+           .
+       910-PTHKNINF-READ-EXT.
            EXIT.
       *
       *****************************************************************
