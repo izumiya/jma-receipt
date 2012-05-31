@@ -3811,11 +3811,14 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
              END-IF
             END-IF
       *
-      ***   IF   RECE02-HKNNUM   =   "004"
-      ***    IF   RECE02-SRYYM  >=   "201101"
-      ***       MOVE     ZERO    TO    WK-GENGAKUKBN
-      ***    END-IF
-      ***   END-IF
+            IF   RECE02-HKNNUM   =   "004"
+            AND  RECE02-SRYYM   >=   "201101"
+              IF  RECE02-HKNJANUM(1:4) = "0404"
+                CONTINUE
+              ELSE
+                MOVE     ZERO    TO    WK-GENGAKUKBN
+              END-IF
+            END-IF
       *
            END-IF
       *

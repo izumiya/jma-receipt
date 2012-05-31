@@ -3346,11 +3346,14 @@
              END-IF
             END-IF
       *
-      ***   IF   RECE62-HKNNUM   =   "004"
-      ***    IF   RECE62-SRYYM  >=   "201101"
-      ***       MOVE     ZERO    TO    WK-GENGAKUKBN
-      ***    END-IF
-      ***   END-IF
+            IF   RECE62-HKNNUM   =   "004"
+            AND  RECE62-SRYYM   >=   "201101"
+              IF  RECE62-HKNJANUM(1:4) = "0404"
+                CONTINUE
+              ELSE
+                MOVE     ZERO    TO    WK-GENGAKUKBN
+              END-IF
+            END-IF
       *
            END-IF
       *
