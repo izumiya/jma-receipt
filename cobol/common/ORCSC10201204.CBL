@@ -6102,10 +6102,17 @@
                           (LNK-ORCSC-GAIRAI-NASI   =   1  )
                        CONTINUE
                    ELSE
+      ***              MOVE    IDX-SYU         TO  IDX-Z
+      *                PERFORM
+      *                    UNTIL  WRK-COM-DATAKBN (IDX-Z + 1) NOT =  "2"
+      *                        ADD     1               TO  IDX-Z
+      ***              END-PERFORM
+      *                再診料の剤の下
                        MOVE    IDX-SYU         TO  IDX-Z
                        PERFORM
-                           UNTIL  WRK-COM-DATAKBN (IDX-Z + 1) NOT =  "2"
-                               ADD     1               TO  IDX-Z
+                           UNTIL  (WRK-COM-SRYKBN (IDX-Z) NOT =  "12")
+                            OR    (WRK-COM-ZAIEND (IDX-Z)     =  "1" )
+                           ADD     1               TO  IDX-Z
                        END-PERFORM
       *                外来管理加算コード追加処理
                        PERFORM 2001-GAIKASAN-SEC

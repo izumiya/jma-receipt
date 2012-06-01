@@ -1015,13 +1015,14 @@
                                                =   LNK-SC97-INCD
                            MOVE    ZERO            TO  LNK-SC97-NYURYOKU
       *!!!!
-      *H24.5 入力ＣＤが違う時変更とする
-      *                    IF     (SPA-COM-ICD-INPUTCD (GMN-IDX)
-      *                                            NOT =   SPACE )
-      *                    AND    (SPA-COM-ICD-INPUTCD (GMN-IDX)
-      *                                            NOT =   WRK-CD )
-      *                        MOVE    1           TO  LNK-SC97-NYURYOKU
-      *                    END-IF
+      *H24.5 入力ＣＤが違う時編集とする
+                           IF     (SPA-COM-ICD-INPUTCD (GMN-IDX)
+                                                   NOT =   SPACE )
+                           AND    (SPA-COM-ICD-INPUTCD (GMN-IDX)
+                                                   NOT =   WRK-CD )
+                               MOVE    SPACE       TO  SPA-COM-GMNFLG
+                                                           (GMN-IDX)
+                           END-IF
       *!!!!
                        END-IF
                    ELSE
