@@ -558,6 +558,7 @@
       *  04.05.62    NACL-門脇    12/05/30  災害対応（日雇特例被保険者）
       *  04.05.63    NACL-門脇    12/06/04  災害対応（請求点０点のレセ電負担
       *                                     区分）
+      *  04.05.64    NACL-門脇    12/06/04  生保の２４併用時の対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -16790,10 +16791,10 @@
                END-IF
            END-EVALUATE
       *
-           IF  ( RECE62-HKNNUM          =  SPACE    )
-           AND ( RECE62-KOHNUM(1)       =  "079"    )
-           AND ( RECE62-KOHNUM(2)       =  "012"    )
-           AND ( RECE62-SRYYM          >=  "200804" )
+           IF  ( RECE62-HKNNUM          =  SPACE         )
+           AND ( RECE62-KOHNUM(1)       =  "079" OR "024")
+           AND ( RECE62-KOHNUM(2)       =  "012"         )
+           AND ( RECE62-SRYYM          >=  "200804"      )
                MOVE     ZERO    TO    RECE62-TOTALTEN(3)
                PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
                            UNTIL    KOHFTN-IDX     >   30
@@ -16806,6 +16807,16 @@
                END-PERFORM
                MOVE     ZERO    TO    RECE62-NYUKHNKEI2(3)
                                       RECE62-NYUTOKKEI2(3)
+      *
+               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                           UNTIL   (KOHFTN-IDX                  >  10 )
+                            OR     (RECE62-HKNCOMBI(KOHFTN-IDX) = ZERO)
+                 IF  (RECE62-HKNNUMHC(KOHFTN-IDX)    =  SPACE        )
+                 AND (RECE62-KOHNUMHC(KOHFTN-IDX 1)  = "079" OR "024")
+                 AND (RECE62-KOHNUMHC(KOHFTN-IDX 2)  = "012"         )
+                    MOVE   1    TO    RECE62-FTNKBNFLG(KOHFTN-IDX 2)
+                 END-IF
+               END-PERFORM
            END-IF
       *
            IF   ( RECE62-SHOKUJIRYOYOHI(1) = ZERO )
