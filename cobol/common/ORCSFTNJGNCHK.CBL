@@ -80,6 +80,7 @@
       *  04.05.02    NACL-ÌçÏÆ    11/03/08  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.03    NACL-ÌçÏÆ    11/11/17  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¾¾ÉúÄ®¡Ë
       *  04.05.04    NACL-ÌçÏÆ    12/04/27  ÂçºåÉÜÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
+      *  04.05.05    NACL-ÌçÏÆ    12/06/04  À¸ÊÝ¤Î£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1166,9 +1167,9 @@
                   IF  (LNK-FTNJGNCHK-NYUGAIKBN  = "1"     )
                   AND (LNK-FTNJGNCHK-KOHNUM     = "012"   )
                   AND (LNK-FTNJGNCHK-SRYYM     >= "200804")
-                    IF  (SYU-SYUHKNNUM     =   SPACE)
-                    AND (SYU-KOH-HKNNUM(1) =  "079" )
-                    AND (SYU-KOH-HKNNUM(2) =  "012" )
+                    IF  (SYU-SYUHKNNUM     =   SPACE        )
+                    AND (SYU-KOH-HKNNUM(1) =  "079" OR "024")
+                    AND (SYU-KOH-HKNNUM(2) =  "012"         )
                         ADD  SYU-SKJ-FTN-RECE(1) TO  WRK-SKJ-FTN
                     END-IF
                   END-IF
