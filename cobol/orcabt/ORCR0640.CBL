@@ -557,6 +557,8 @@
       *  04.05.60    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.61    NACL-ÌçÏÆ    12/05/23  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÌ¤µ­ºÜÂÐ±þ
       *  04.05.62    NACL-ÌçÏÆ    12/05/30  ºÒ³²ÂÐ±þ¡ÊÆü¸ÛÆÃÎãÈïÊÝ¸±¼Ô¡Ë
+      *  04.05.63    NACL-ÌçÏÆ    12/06/04  ºÒ³²ÂÐ±þ¡ÊÀÁµáÅÀ£°ÅÀ¤Î¥ì¥»ÅÅÉéÃ´
+      *                                     ¶èÊ¬¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -16902,31 +16904,42 @@
               END-PERFORM
            END-IF
       *
-           PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                       UNTIL    KOHFTN-IDX     >    4
+           IF  (RECE62-HKNNUM      NOT =   SPACE )
+           AND (RECE62-GENMENKBN       =   2 OR 3)
       *
-             IF   ( RECE62-HKNNUM              NOT =   SPACE  )
-             AND  ( RECE62-KOHNUM(KOHFTN-IDX)  NOT =   SPACE  )
-             AND  ( RECE62-GENMENKBN               =   2 OR 3 )
+             PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
+                       UNTIL   KOHFTN-IDX    >   4
+               IF  RECE62-KOHNUM(KOHFTN-IDX)  NOT =   SPACE
+                 COMPUTE  KOHFTN-IDX3 = KOHFTN-IDX + 1
       *
-              COMPUTE  KOHFTN-IDX3 = KOHFTN-IDX + 1
+                 MOVE   ZERO  TO  RECE62-TOTALTEN(KOHFTN-IDX3)
+                 PERFORM  VARYING  KOHFTN-IDX2  FROM  1  BY  1
+                           UNTIL   KOHFTN-IDX2   >   30
+                   MOVE ZERO  TO  RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX3)
+                 END-PERFORM
+                 PERFORM  VARYING  KOHFTN-IDX2  FROM  1  BY  1
+                           UNTIL   KOHFTN-IDX2   >   10
+                   MOVE ZERO  TO
+                              RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX3)
+                              RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX3)
+                 END-PERFORM
+                 MOVE   ZERO  TO  RECE62-NYUKHNKEI2(KOHFTN-IDX3)
+                                  RECE62-NYUTOKKEI2(KOHFTN-IDX3)
+               END-IF
+             END-PERFORM
       *
-              MOVE   ZERO TO RECE62-TOTALTEN(KOHFTN-IDX3)
-              PERFORM  VARYING  KOHFTN-IDX2  FROM  1  BY  1
-                        UNTIL   KOHFTN-IDX2   >   30
-                MOVE ZERO TO RECE62-TENSU(KOHFTN-IDX2 KOHFTN-IDX3)
-              END-PERFORM
-              PERFORM  VARYING  KOHFTN-IDX2  FROM  1  BY  1
-                        UNTIL   KOHFTN-IDX2   >   10
-                MOVE ZERO TO RECE62-NYUKHNKEI(KOHFTN-IDX2 KOHFTN-IDX3)
-                             RECE62-NYUTOKKEI(KOHFTN-IDX2 KOHFTN-IDX3)
-              END-PERFORM
-              MOVE   ZERO TO RECE62-NYUKHNKEI2(KOHFTN-IDX3)
-                             RECE62-NYUTOKKEI2(KOHFTN-IDX3)
+             PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
+                       UNTIL  (KOHFTN-IDX                  >  10 )
+                         OR   (RECE62-HKNCOMBI(KOHFTN-IDX) = ZERO)
+               PERFORM  VARYING  KOHFTN-IDX2   FROM   1   BY   1
+                         UNTIL   KOHFTN-IDX2     >    4
+                 IF RECE62-KOHNUMHC(KOHFTN-IDX KOHFTN-IDX2) NOT = SPACE
+                   MOVE  1  TO RECE62-FTNKBNFLG(KOHFTN-IDX KOHFTN-IDX2)
+                 END-IF
+               END-PERFORM
+             END-PERFORM
       *
-             END-IF
-      *
-           END-PERFORM
+           END-IF
       *
            .
        21045-KOH-FUTAN-SET-EXT.
