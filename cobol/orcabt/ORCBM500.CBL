@@ -77,6 +77,7 @@
       *                                     システム管理の設定に従い、災
       *                                     害該当レセプトのレセ電データ
       *                                     の作成を行う
+      *  04.05.03    NACL-藤原    12/06/05  レセ電データ無し時のエラー処理
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -606,6 +607,18 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
                        " ETC-YKZFTN1="  RECE10-ETC-YKZFTN (1)
       *???
                PERFORM 900-RECEDEN-SELECT-SEC
+               IF      FLG-RECEDEN     =   1
+                   STRING
+                       "該当患者のレセ電データが存在しません"
+                                               DELIMITED  BY  SIZE
+                        "　患者番号＝"         DELIMITED  BY  SIZE
+                        RECE10-PTNUM           DELIMITED  BY  SIZE
+                                               INTO  WRK-RECEERR
+                   END-STRING
+                   PERFORM 500-ERR-HENSYU-SEC
+                   PERFORM 500-COBABORT-SEC
+               END-IF
+      *
                PERFORM     UNTIL   FLG-RECEDEN =   1
                    PERFORM 2002-HENSYU-SEC
                END-PERFORM
