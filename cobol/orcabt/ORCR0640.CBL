@@ -560,6 +560,7 @@
       *  04.05.63    NACL-門脇    12/06/04  災害対応（請求点０点のレセ電負担
       *                                     区分）
       *  04.05.64    NACL-門脇    12/06/04  生保の２４併用時の対応
+      *  04.05.65    NACL-門脇    12/06/05  長期＋全国公費２種の再掲対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -17986,20 +17987,20 @@
                                                 - FTN-KOH-XX5
                       ADD WRK-CYOKI-KEISAN3 TO RECE62-FTNMONEY(2)
                                                RECE62-FTNMONEY-KOJ(2)
+                    END-IF
       *
-                      COMPUTE WRK-CYOKI-KEISAN  = RECE62-FTNMONEY(1)
-                                                - WRK-KOH-GAI2
-                      COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XX5
-                                                + FTN-KOH-XX6
-                      IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
-                        COMPUTE WRK-CYOKI-KEISAN3 = WRK-CYOKI-KEISAN
-                                                  - FTN-KOH-XX5
-                        IF  WRK-CYOKI-KEISAN3  <  FTN-KOH-XX6
-                          MOVE  WRK-CYOKI-KEISAN3
-                                        TO   RECE62-KOUREI-SAIKEI2
-                          IF    WRK-CYOKI-KEISAN3  = ZERO
-                             MOVE   1   TO   RECE62-YOBIETC(7)
-                          END-IF
+                    COMPUTE WRK-CYOKI-KEISAN  = RECE62-FTNMONEY(1)
+                                              - WRK-KOH-GAI2
+                    COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XX5
+                                              + FTN-KOH-XX6
+                    IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
+                      COMPUTE WRK-CYOKI-KEISAN3 = WRK-CYOKI-KEISAN
+                                                - FTN-KOH-XX5
+                      IF  WRK-CYOKI-KEISAN3  <  FTN-KOH-XX6
+                        MOVE  WRK-CYOKI-KEISAN3
+                                      TO   RECE62-KOUREI-SAIKEI2
+                        IF    WRK-CYOKI-KEISAN3  = ZERO
+                           MOVE   1   TO   RECE62-YOBIETC(7)
                         END-IF
                       END-IF
                     END-IF

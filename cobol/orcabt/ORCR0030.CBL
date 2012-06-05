@@ -574,6 +574,7 @@
       *  04.05.54    NACL-門脇    12/05/23  保険欄−一部負担金未記載対応
       *  04.05.55    NACL-門脇    12/05/30  災害対応（日雇特例被保険者）
       *  04.05.56    NACL-門脇    12/06/05  高齢者の現物給付判定修正
+      *  04.05.57    NACL-門脇    12/06/05  長期＋全国公費２種の再掲対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -14410,20 +14411,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 - FTN-KOH-XX5
                       ADD WRK-CYOKI-KEISAN3 TO RECE02-FTNMONEY(2)
                                                RECE02-FTNMONEY-KOJ(2)
+                    END-IF
       *
-                      COMPUTE WRK-CYOKI-KEISAN  = RECE02-FTNMONEY(1)
-                                                - WRK-KOH-GAI2
-                      COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XX5
-                                                + FTN-KOH-XX6
-                      IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
-                        COMPUTE WRK-CYOKI-KEISAN3 = WRK-CYOKI-KEISAN
-                                                  - FTN-KOH-XX5
-                        IF  WRK-CYOKI-KEISAN3  <  FTN-KOH-XX6
-                          MOVE  WRK-CYOKI-KEISAN3
-                                        TO   RECE02-ZAITAKU-SAIKEI2
-                          IF    WRK-CYOKI-KEISAN3  = ZERO
-                             MOVE   1   TO   RECE02-YOBIETC(7)
-                          END-IF
+                    COMPUTE WRK-CYOKI-KEISAN  = RECE02-FTNMONEY(1)
+                                              - WRK-KOH-GAI2
+                    COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XX5
+                                              + FTN-KOH-XX6
+                    IF    WRK-CYOKI-KEISAN   <  WRK-CYOKI-KEISAN2
+                      COMPUTE WRK-CYOKI-KEISAN3 = WRK-CYOKI-KEISAN
+                                                - FTN-KOH-XX5
+                      IF  WRK-CYOKI-KEISAN3  <  FTN-KOH-XX6
+                        MOVE  WRK-CYOKI-KEISAN3
+                                      TO   RECE02-ZAITAKU-SAIKEI2
+                        IF    WRK-CYOKI-KEISAN3  = ZERO
+                           MOVE   1   TO   RECE02-YOBIETC(7)
                         END-IF
                       END-IF
                     END-IF
