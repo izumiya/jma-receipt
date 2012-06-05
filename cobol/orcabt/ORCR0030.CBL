@@ -572,6 +572,7 @@
       *  04.05.53    NACL-門脇    12/05/16  愛知・三重県地方公費対応
       *  04.05.54    NACL-門脇    12/05/23  保険欄−一部負担金未記載対応
       *  04.05.55    NACL-門脇    12/05/30  災害対応（日雇特例被保険者）
+      *  04.05.56    NACL-門脇    12/06/05  高齢者の現物給付判定修正
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -967,6 +968,8 @@
            03  WRK-KOH-GAI2                            PIC 9(09).
            03  WRK-KOH-GAI-GEN70                       PIC 9(09).
            03  WRK-KOH-GAI-GEN70-Z                     PIC 9(09).
+           03  WRK-KOH-GAI-GEN70-TEN                   PIC 9(09).
+           03  WRK-KOH-GAI-GEN70-KIN                   PIC 9(09).
            03  FTN-KOH-XXX                             PIC 9(09).       
            03  FTN-KOH-XXX-Z                           PIC 9(09).       
            03  FTN-KOH-XX2                             PIC 9(09).
@@ -10837,6 +10840,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE     1                TO   FLG-JYOGENKBN
                ADD      SYU-SYUCOMPFTN   TO   WRK-KOH-GAI-GEN70
                ADD      WRK-FTNKEI-Z     TO   WRK-KOH-GAI-GEN70-Z
+               ADD      SYU-TOTAL-HKNTEN TO   WRK-KOH-GAI-GEN70-TEN
                ADD      SYU-TOTAL-HKNTEN TO   WRK-JYOGENKBN-TEN4
                ADD      WRK-FTNKEI       TO   WRK-HOKENICHIBUGAK
              END-IF
@@ -13920,7 +13924,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  IF  (WRK-CHK-KINGAKU    NOT = 9999999)
                  AND (WRK-CHK-KINGAKU2       = 9999999)
                    MOVE   WRK-CHK-KINGAKU   TO   WRK-CHK-KEIKASOCHI1
-                   IF  (WRK-KOH-GAI-GEN70-Z  >   WRK-CHK-KEIKASOCHI1)
+                   COMPUTE  WRK-KOH-GAI-GEN70-KIN =
+                            WRK-KOH-GAI-GEN70-TEN *
+                            10                    *
+                            20                    /
+                            100
+      **>          IF  (WRK-KOH-GAI-GEN70-Z  >   WRK-CHK-KEIKASOCHI1)
+                   IF  (WRK-KOH-GAI-GEN70-KIN >  WRK-CHK-KEIKASOCHI1)
                    OR  (WRK-CHK-KEIKASOCHI1  =   ZERO               )
                         CONTINUE
                    ELSE
@@ -14085,16 +14095,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  IF  (WRK-CHK-KINGAKU    NOT = 9999999)
                  AND (WRK-CHK-KINGAKU2       = 9999999)
                    MOVE   WRK-CHK-KINGAKU   TO   WRK-CHK-KEIKASOCHI1
-                   IF   WRK-KOH-GAI-GEN70    >=  WRK-CHK-KEIKASOCHI1
-                     IF   RECE02-KOHNUM(1)  =  SPACE
-                     AND  RECE02-KOHNUM(2)  =  SPACE
-                     AND  RECE02-KOHNUM(3)  =  SPACE
-                     AND  RECE02-KOHNUM(4)  =  SPACE
-                     AND  FLG-HOKENICHIBU   =  ZERO
-                     AND  WRK-KOH-GAI-GEN70 =  WRK-HOKENICHIBUGAK
-                     AND  WRK-CHK-KEIKASOCHI1  NOT =  ZERO
-                        MOVE    "4"      TO   RECE02-ZAITAKU
-                     END-IF
+                   COMPUTE  WRK-KOH-GAI-GEN70-KIN =
+                            WRK-KOH-GAI-GEN70-TEN *
+                            10                    *
+                            RECE02-KYURATE        /
+                            100
+      **>          IF   WRK-KOH-GAI-GEN70    >=  WRK-CHK-KEIKASOCHI1
+                   IF  (WRK-KOH-GAI-GEN70-KIN >  WRK-CHK-KEIKASOCHI1)
+                   OR  (WRK-CHK-KEIKASOCHI1   =  ZERO               )
+                        CONTINUE
                    ELSE
                         MOVE    "4"      TO   RECE02-ZAITAKU
                    END-IF
