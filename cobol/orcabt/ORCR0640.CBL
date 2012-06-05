@@ -561,6 +561,7 @@
       *                                     区分）
       *  04.05.64    NACL-門脇    12/06/04  生保の２４併用時の対応
       *  04.05.65    NACL-門脇    12/06/05  長期＋全国公費２種の再掲対応
+      *  04.05.66    NACL-門脇    12/06/05  山梨県４１老人対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -17686,7 +17687,8 @@
                     MOVE    "2"      TO   RECE62-KOUREI
                END-IF
       *
-               IF    WRK-PREFNUM       =  19
+               IF   (WRK-PREFNUM       =  19     )
+               AND  (RECE62-SRYYM     <= "201203")
                 IF ( RECE62-KOHHBTNUM(1) =  "41"        )
                 OR ((RECE62-KOHNUM(1)  = "051" OR "091") AND
                     (RECE62-KOHHBTNUM(2) =  "41"       ) AND
