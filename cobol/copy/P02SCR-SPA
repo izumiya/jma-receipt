@@ -374,7 +374,7 @@
                    07  SPA-KOH-AREA.
                        09  SPA-GMN-HOKNUM-LIST.
       ******************** 11  SPA-GMN-KOHNUMLST       OCCURS 50.
-                           11  SPA-GMN-KOHNUMLST       OCCURS 100.
+                           11  SPA-GMN-KOHNUMLST       OCCURS 200.
                                13  SPA-GMN-KOHNUML     PIC X(03).
       ************************ 13  SPA-GMM-HL1         PIC X(01).
                                13  SPA-GMN-KOHKBNL     PIC X(01).
@@ -382,7 +382,7 @@
                        09  SPA-GMN-KOHMAX              PIC 9(04).
                        09  SPA-NAI-KOHNUM-LIST.
       *****************    11  SPA-NAI-KOHNUMLST       OCCURS 50.
-                           11  SPA-NAI-KOHNUMLST       OCCURS 100.
+                           11  SPA-NAI-KOHNUMLST       OCCURS 200.
                                13  SPA-NAI-KOHSBTKBN     PIC X(01).
       *                        検証番号チェック区分
                                13  SPA-NAI-KENSNUMCHKKBN    PIC X(01).
