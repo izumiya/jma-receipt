@@ -574,6 +574,7 @@
       *  04.05.55    NACL-門脇    12/05/30  災害対応（日雇特例被保険者）
       *  04.05.56    NACL-門脇    12/06/05  高齢者の現物給付判定修正
       *  04.05.57    NACL-門脇    12/06/05  長期＋全国公費２種の再掲対応
+      *  04.05.58    NACL-門脇    12/06/05  山梨県４１老人対応
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -13620,7 +13621,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     MOVE    "2"      TO   RECE02-ZAITAKU
                END-IF
       *
-               IF    SYS-1001-PREFNUM  =  19
+               IF   (SYS-1001-PREFNUM  =  19     )
+               AND  (RECE02-SRYYM     <= "201203")
                 IF ( RECE02-KOHHBTNUM(1) =  "41"        )
                 OR ((RECE02-KOHNUM(1)  = "051" OR "091") AND
                     (RECE02-KOHHBTNUM(2) =  "41"       ) AND
