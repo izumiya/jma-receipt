@@ -372,6 +372,7 @@
       *                                       ¾Ý³°¤È¤¹¤ë
       *  04.05.39    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.40    NACL-ÌçÏÆ    12/05/30  ºÒ³²ÂÐ±þ¡ÊÆü¸ÛÆÃÎãÈïÊÝ¸±¼Ô¡Ë
+      *  04.05.41    NACL-ÌçÏÆ    12/06/05  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/09/02  ½Ð»º°é»ù°ì»þ¶âÄ¾ÀÜ»ÙÊ§À©ÅÙ¡Ê³°Íè¡Ë
       *  04.06.02    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
@@ -11565,6 +11566,7 @@
                    AND (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM        )
                    AND (FLG-KEISAN-TAI2     =  1                     )
                    AND (LNK-SYU-SRYYMD(1:6) >=  "200804"             )
+                   AND (LNK-SYU-SRYYMD(1:6) <=  "201203"             )
                      IF  (LNK-S01-SAIKEISAN-KBN   =   "1" )
                      AND (LNK-SYU-DENPNUM     NOT =  ZERO )
                      AND (LNK-SYU-DENPNUM   <  SYU-DENPNUM)
