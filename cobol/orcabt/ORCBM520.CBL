@@ -35,6 +35,7 @@
       *  04.05.01    NACL-藤原    10/03/23  平成２２年４月改正対応
       *                                     請求に係わる記録条件仕様の
       *                                     変更に伴う修正
+      *  04.05.02    NACL-藤原    12/06/05  レセ電データ無し時のエラー処理
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -487,6 +488,18 @@
                        " U-HENREI-FLG="  ONRECE-B-U-HENREI-FLG
       *???
                PERFORM 900-RECEDEN-SELECT-SEC
+               IF      FLG-RECEDEN     =   1
+                   STRING
+                       "該当患者のレセ電データが存在しません"
+                                               DELIMITED  BY  SIZE
+                        "　患者番号＝"         DELIMITED  BY  SIZE
+                        ONRECE-B-PTNUM         DELIMITED  BY  SIZE
+                                               INTO  WRK-RECEERR
+                   END-STRING
+                   PERFORM 500-ERR-HENSYU-SEC
+                   PERFORM 500-COBABORT-SEC
+               END-IF
+      *
                PERFORM     UNTIL   FLG-RECEDEN =   1
                    PERFORM 2002-HENSYU-SEC
                END-PERFORM
