@@ -78,6 +78,8 @@
       *                                     害該当レセプトのレセ電データ
       *                                     の作成を行う
       *  04.05.03    NACL-藤原    12/06/05  レセ電データ無し時のエラー処理
+      *                                     月後れ分については画面より確認
+      *                                     済なのでチェックしない 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -608,15 +610,19 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-1002-HOSPNUM
       *???
                PERFORM 900-RECEDEN-SELECT-SEC
                IF      FLG-RECEDEN     =   1
-                   STRING
-                       "該当患者のレセ電データが存在しません"
-                                               DELIMITED  BY  SIZE
-                        "　患者番号＝"         DELIMITED  BY  SIZE
-                        RECE10-PTNUM           DELIMITED  BY  SIZE
-                                               INTO  WRK-RECEERR
-                   END-STRING
-                   PERFORM 500-ERR-HENSYU-SEC
-                   PERFORM 500-COBABORT-SEC
+                   IF      RECE10-SRYYM    =    LNK-PRTKANRI-SRYYM
+                       STRING
+                           "該当患者のレセ電データが存在しません"
+                                                   DELIMITED  BY  SIZE
+                            "　患者番号＝"         DELIMITED  BY  SIZE
+                            RECE10-PTNUM           DELIMITED  BY  SIZE
+                                                   INTO  WRK-RECEERR
+                       END-STRING
+                       PERFORM 500-ERR-HENSYU-SEC
+                       PERFORM 500-COBABORT-SEC
+                   ELSE
+                       DISPLAY "!!!!!! RECEDEN NOT FOUND !!!!!"
+                   END-IF
                END-IF
       *
                PERFORM     UNTIL   FLG-RECEDEN =   1
@@ -1833,6 +1839,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    ZERO                TO  FLG-END
                MOVE    MCPDATA-REC         TO  RECE10-REC
+      *
+      *        特別療養費は対象外
+               IF      RECE10-RECESYUBETU  =   "6666"
+                   GO  TO  900-SEIKYU-READ-SEC
+               END-IF
       *
       *        未確定分をレセ電データに記録するか
                IF    (  SYS-200501-RECEDEN-DISASTER
