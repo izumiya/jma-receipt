@@ -121,6 +121,9 @@
               03  H01-TEISEIKBNNM.
                 04  H01-TEISEIKBNNM-STYLE   PIC X(20).
                 04  H01-TEISEIKBNNM-VALUE   PIC X(14).
+              03  H01-RECEDEN-CHK-MSG.
+                04  H01-RECEDEN-CHK-MSG-STYLE   PIC X(20).
+                04  H01-RECEDEN-CHK-MSG-VALUE   PIC X(30).
               03  H01-HNYUGAIKBN.
                 04  H01-HNYUGAIKBN-STYLE   PIC X(20).
                 04  H01-HNYUGAIKBN-VALUE   PIC X(6).

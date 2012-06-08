@@ -44,6 +44,7 @@
       *
       *  04.05.01    NACL-藤原    11/08/25  公費単独対応
       *                                     公費を最大５０に変更
+      *  04.05.02    NACL-藤原    12/06/05  レセ電データ無し時のエラー表示
       *****************************************************************
        01  SPA-H01FREE.
          02  SPA-H01FREE-AREA.
@@ -142,6 +143,8 @@
                                                 PIC 9(01).
                        09  SPA-H01NAI-HENREI-MSG
                                                 PIC 9(01).
+                       09  SPA-H01NAI-RECEDEN-MSG
+                                                PIC 9(01).
                    07  SPA-H01NAI-KOUMOKU.
                        09  SPA-H01NAI-SKYYM     PIC 9(06). 
                        09  SPA-H01NAI-SKYYM-KOHSKY
@@ -179,6 +182,12 @@
                05  SPA-NAI-2009-SYUKA-SYAHO    PIC X(01).
                05  SPA-NAI-2009-SYUKA-KOKUHO   PIC X(01).
                05  SPA-NAI-2009-SYUKA-KOUIKI   PIC X(01).
+               05  SPA-NAI-2005-KKHRECEKBN     PIC X(01).
+               05  SPA-NAI-2005-SYARECEKBN     PIC X(01).
+               05  SPA-NAI-200501-KOUIKIRECEKBN
+                                               PIC X(01).
+               05  SPA-NAI-200501-RECEDEN-DISASTER
+                                               PIC X(01).
       *
       *Ｈ０２画面
            03  SPA-H02-AREA.

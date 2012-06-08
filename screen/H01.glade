@@ -947,6 +947,22 @@
 
     <widget>
       <class>GtkLabel</class>
+      <name>RECEDEN_CHK_MSG</name>
+      <x>8</x>
+      <y>72</y>
+      <width>215</width>
+      <height>18</height>
+      <label>レセ電データがありません</label>
+      <justify>GTK_JUSTIFY_LEFT</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
       <name>label1001</name>
       <x>350</x>
       <y>72</y>
