@@ -575,6 +575,7 @@
       *  04.05.56    NACL-ÌçÏÆ    12/06/05  ¹âÎð¼Ô¤Î¸½ÊªµëÉÕÈ½Äê½¤Àµ
       *  04.05.57    NACL-ÌçÏÆ    12/06/05  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
       *  04.05.58    NACL-ÌçÏÆ    12/06/05  »³Íü¸©£´£±Ï·¿ÍÂÐ±þ
+      *  04.05.59    NACL-ÌçÏÆ    12/06/07  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -10472,7 +10473,14 @@ grpsys           PERFORM 900-DBSELECT-SEC
       *
            IF  (SYU-KOH-HKNNUM(1)(1:1)   =  "0")
            OR  (TBL-TOKATUKAIFLG2        =   1 )
+             IF  (SYS-1001-PREFNUM     =  23     )
+             AND (SYU-KOH-HKNNUM(1)    = "191"   )
+             AND (RECE02-TEISYUTUSAKI  =  2 OR 6 )
+             AND (RECE02-SRYYM        >= "201204")
+                CONTINUE
+             ELSE
                 MOVE     1        TO   FLG-CYOKI-CHECK2
+             END-IF
            ELSE
              IF  ((SYS-1001-PREFNUM   =  42                      ) AND
                   (SYU-KOH-HKNNUM(1)  = "186"                    ))
@@ -12157,6 +12165,81 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
               END-EVALUATE
            ELSE
+            IF  ((RECE02-KOHNUM(1)   = SYU-KOH-HKNNUM(1)      ) AND
+                 (RECE02-KOHNUM(1)   = RECE02-KOHNUMHC(IDX1 1)) AND
+                 (RECE02-KOHID(1)    = RECE02-KOHIDHC(IDX1 1) ) AND
+                 (SYS-1001-PREFNUM   =  23                    ) AND
+                 (RECE02-KOHNUM(1)   = "191"                  ) AND
+                 (RECE02-TEISYUTUSAKI  =  2 OR 6              ) AND
+                 (RECE02-SRYYM      >=  "201204"              ))
+            OR  ((RECE02-KOHNUM(2)   = SYU-KOH-HKNNUM(1)      ) AND
+                 (RECE02-KOHNUM(2)   = RECE02-KOHNUMHC(IDX1 1)) AND
+                 (RECE02-KOHID(2)    = RECE02-KOHIDHC(IDX1 1) ) AND
+                 (SYS-1001-PREFNUM   =  23                    ) AND
+                 (RECE02-KOHNUM(2)   = "191"                  ) AND
+                 (RECE02-TEISYUTUSAKI  =  2 OR 6              ) AND
+                 (RECE02-SRYYM      >=  "201204"              ))
+            OR  ((RECE02-KOHNUM(3)   = SYU-KOH-HKNNUM(1)      ) AND
+                 (RECE02-KOHNUM(3)   = RECE02-KOHNUMHC(IDX1 1)) AND
+                 (RECE02-KOHID(3)    = RECE02-KOHIDHC(IDX1 1) ) AND
+                 (SYS-1001-PREFNUM   =  23                    ) AND
+                 (RECE02-KOHNUM(3)   = "191"                  ) AND
+                 (RECE02-TEISYUTUSAKI  =  2 OR 6              ) AND
+                 (RECE02-SRYYM      >=  "201204"              ))
+            OR  ((RECE02-KOHNUM(4)   = SYU-KOH-HKNNUM(1)      ) AND
+                 (RECE02-KOHNUM(4)   = RECE02-KOHNUMHC(IDX1 1)) AND
+                 (RECE02-KOHID(4)    = RECE02-KOHIDHC(IDX1 1) ) AND
+                 (SYS-1001-PREFNUM   =  23                    ) AND
+                 (RECE02-KOHNUM(4)   = "191"                  ) AND
+                 (RECE02-TEISYUTUSAKI  =  2 OR 6              ) AND
+                 (RECE02-SRYYM      >=  "201204"              ))
+              MOVE           5         TO   FLG-JYOGENKBN2
+              IF   RECE02-TEISYOTOKU  NOT =  SPACE
+                   IF  FLG-TOKU75 = 1 OR 2
+                     MOVE    4000      TO   WRK-KINGAKU
+                   ELSE
+                     MOVE    8000      TO   WRK-KINGAKU
+                   END-IF
+                   EVALUATE   FLG-KEISAN2
+                     WHEN        ZERO
+                     WHEN         1
+                       MOVE   WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU2
+                     WHEN         2
+                       MOVE   WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU4
+                   END-EVALUATE
+                   PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+              ELSE
+                IF   RECE02-KYURATE  =  30
+                   IF  FLG-TOKU75 = 1 OR 2
+                     MOVE    22200     TO   WRK-KINGAKU
+                   ELSE
+                     MOVE    44400     TO   WRK-KINGAKU
+                   END-IF
+                   EVALUATE   FLG-KEISAN2
+                     WHEN        ZERO
+                     WHEN         1
+                       MOVE   WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU2
+                     WHEN         2
+                       MOVE   WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU4
+                   END-EVALUATE
+                   PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+                ELSE
+                   IF  FLG-TOKU75 = 1 OR 2
+                     MOVE    6000      TO   WRK-KINGAKU
+                   ELSE
+                     MOVE    12000     TO   WRK-KINGAKU
+                   END-IF
+                   EVALUATE   FLG-KEISAN2
+                     WHEN        ZERO
+                     WHEN         1
+                       MOVE   WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU2
+                     WHEN         2
+                       MOVE   WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU4
+                   END-EVALUATE
+                   PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+                END-IF
+              END-IF
+            ELSE
               MOVE      5         TO   FLG-JYOGENKBN2
               IF  FLG-TOKU75 = 1 OR 2
                 MOVE    6000      TO   WRK-KINGAKU
@@ -12183,6 +12266,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE   WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU4
               END-EVALUATE
               PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+            END-IF
            END-IF
       *
            .
@@ -12231,8 +12315,40 @@ grpsys     PERFORM 900-DBSELECT-SEC
               MOVE      5      TO   FLG-JYOGENKBN2
               PERFORM   2105218-ICHIBUFTN-KOH-HEN4-SEC
            ELSE
+            IF  ((RECE02-KOHNUM(1)   = SYU-KOH-HKNNUM(1)      ) AND
+                 (RECE02-KOHNUM(1)   = RECE02-KOHNUMHC(IDX1 1)) AND
+                 (RECE02-KOHID(1)    = RECE02-KOHIDHC(IDX1 1) ) AND
+                 (SYS-1001-PREFNUM   =  23                    ) AND
+                 (RECE02-KOHNUM(1)   = "191"                  ) AND
+                 (RECE02-TEISYUTUSAKI  =  2 OR 6              ) AND
+                 (RECE02-SRYYM      >=  "201204"              ))
+            OR  ((RECE02-KOHNUM(2)   = SYU-KOH-HKNNUM(1)      ) AND
+                 (RECE02-KOHNUM(2)   = RECE02-KOHNUMHC(IDX1 1)) AND
+                 (RECE02-KOHID(2)    = RECE02-KOHIDHC(IDX1 1) ) AND
+                 (SYS-1001-PREFNUM   =  23                    ) AND
+                 (RECE02-KOHNUM(2)   = "191"                  ) AND
+                 (RECE02-TEISYUTUSAKI  =  2 OR 6              ) AND
+                 (RECE02-SRYYM      >=  "201204"              ))
+            OR  ((RECE02-KOHNUM(3)   = SYU-KOH-HKNNUM(1)      ) AND
+                 (RECE02-KOHNUM(3)   = RECE02-KOHNUMHC(IDX1 1)) AND
+                 (RECE02-KOHID(3)    = RECE02-KOHIDHC(IDX1 1) ) AND
+                 (SYS-1001-PREFNUM   =  23                    ) AND
+                 (RECE02-KOHNUM(3)   = "191"                  ) AND
+                 (RECE02-TEISYUTUSAKI  =  2 OR 6              ) AND
+                 (RECE02-SRYYM      >=  "201204"              ))
+            OR  ((RECE02-KOHNUM(4)   = SYU-KOH-HKNNUM(1)      ) AND
+                 (RECE02-KOHNUM(4)   = RECE02-KOHNUMHC(IDX1 1)) AND
+                 (RECE02-KOHID(4)    = RECE02-KOHIDHC(IDX1 1) ) AND
+                 (SYS-1001-PREFNUM   =  23                    ) AND
+                 (RECE02-KOHNUM(4)   = "191"                  ) AND
+                 (RECE02-TEISYUTUSAKI  =  2 OR 6              ) AND
+                 (RECE02-SRYYM      >=  "201204"              ))
+              MOVE      5      TO   FLG-JYOGENKBN2
+              PERFORM   2105218-ICHIBUFTN-KOH-HEN4X-SEC
+            ELSE
               MOVE      5      TO   FLG-JYOGENKBN2
               PERFORM   2105214-ICHIBUFTN-KOH-HEN3-SEC
+            END-IF
            END-IF
       *
            .
@@ -12379,6 +12495,149 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        2105218-ICHIBUFTN-KOH-HEN4-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÊÝ¸±Íó¤Î°ìÉôÉéÃ´¶â³ÛÊÔ½¸£´¡ÊÆÃÎã¡Ë
+      *****************************************************************
+       2105218-ICHIBUFTN-KOH-HEN4X-SEC               SECTION.
+      *
+           EVALUATE   FLG-GENBUTU70
+            WHEN       1
+      *
+             EVALUATE   FLG-KEISAN2
+              WHEN        ZERO
+              WHEN         1
+                 COMPUTE   WRK-CHIHOU-KIN2  =  WRK-CHIHOU-KIN2
+                                            + (SYU-TOTAL-HKNTEN * 10)
+                 IF  FLG-TOKU75 = 3
+                  IF   WRK-CHIHOU-KIN2  >  250000
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN2 -  250000 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  =  75000  +  WRK-KINGAKU2
+                  ELSE
+                     MOVE     75000  TO   WRK-KINGAKU
+                  END-IF
+                 ELSE
+                  IF   WRK-CHIHOU-KIN2  >  500000
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN2 -  500000 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  =  150000 +  WRK-KINGAKU2
+                  ELSE
+                     MOVE     150000 TO   WRK-KINGAKU
+                  END-IF
+                 END-IF
+                 MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU2
+                 PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+              WHEN         2
+                 COMPUTE   WRK-CHIHOU-KIN4  =  WRK-CHIHOU-KIN4
+                                            + (SYU-TOTAL-HKNTEN * 10)
+                 IF  FLG-TOKU75 = 3
+                  IF   WRK-CHIHOU-KIN4  >  250000
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN4 -  250000 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  =  75000  +  WRK-KINGAKU2
+                  ELSE
+                     MOVE     75000  TO   WRK-KINGAKU
+                  END-IF
+                 ELSE
+                  IF   WRK-CHIHOU-KIN4  >  500000
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN4 -  500000 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  =  150000 +  WRK-KINGAKU2
+                  ELSE
+                     MOVE     150000 TO   WRK-KINGAKU
+                  END-IF
+                 END-IF
+                 MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU4
+                 PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+             END-EVALUATE
+      *
+            WHEN       0
+            WHEN       2
+      *
+             EVALUATE   FLG-KEISAN2
+              WHEN        ZERO
+              WHEN         1
+                 COMPUTE   WRK-CHIHOU-KIN2  =  WRK-CHIHOU-KIN2
+                                            + (SYU-TOTAL-HKNTEN * 10)
+                 IF  FLG-TOKU75 = 3
+                  IF   WRK-CHIHOU-KIN2  >  133500
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN2 -  133500 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  =  40050  +  WRK-KINGAKU2
+                  ELSE
+                     MOVE     40050  TO   WRK-KINGAKU
+                  END-IF
+                 ELSE
+                  IF   WRK-CHIHOU-KIN2  >  267000
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN2 -  267000 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  =  80100  +  WRK-KINGAKU2
+                  ELSE
+                     MOVE     80100  TO   WRK-KINGAKU
+                  END-IF
+                 END-IF
+                 MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU2
+                 PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+              WHEN         2
+                 COMPUTE   WRK-CHIHOU-KIN4  =  WRK-CHIHOU-KIN4
+                                            + (SYU-TOTAL-HKNTEN * 10)
+                 IF  FLG-TOKU75 = 3
+                  IF   WRK-CHIHOU-KIN4  >  133500
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN4 -  133500 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  =  40050  +  WRK-KINGAKU2
+                  ELSE
+                     MOVE     40050  TO   WRK-KINGAKU
+                  END-IF
+                 ELSE
+                  IF   WRK-CHIHOU-KIN4  >  267000
+                     COMPUTE  WRK-KINGAKU2 =
+                           (( WRK-CHIHOU-KIN4 -  267000 ) * 0.01 )
+                                                          + 0.5
+                     COMPUTE  WRK-KINGAKU  =  80100  +  WRK-KINGAKU2
+                  ELSE
+                     MOVE     80100  TO   WRK-KINGAKU
+                  END-IF
+                 END-IF
+                 MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU4
+                 PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+             END-EVALUATE
+      *
+            WHEN       3
+      *
+             EVALUATE   FLG-KEISAN2
+              WHEN        ZERO
+              WHEN         1
+                 IF  FLG-TOKU75 = 3
+                  MOVE   17700   TO   WRK-KINGAKU
+                 ELSE
+                  MOVE   35400   TO   WRK-KINGAKU
+                 END-IF
+                 MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU2
+                 PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+              WHEN         2
+                 IF  FLG-TOKU75 = 3
+                  MOVE   17700   TO   WRK-KINGAKU
+                 ELSE
+                  MOVE   35400   TO   WRK-KINGAKU
+                 END-IF
+                 MOVE      WRK-KINGAKU TO   WRK-KINGAKU-GENBUTU4
+                 PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
+             END-EVALUATE
+      *
+           END-EVALUATE
+      *
+           .
+       2105218-ICHIBUFTN-KOH-HEN4X-EXT.
            EXIT.
       *
       *****************************************************************
