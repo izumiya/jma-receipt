@@ -1958,6 +1958,10 @@
            PERFORM
                    UNTIL     (FLG-CHKMST       =   1    ) 
                          OR  (FLG-CHKERR       =   1 )
+      *H24.6
+      *    診療コードのみ対象
+             IF      CHK-CD(1:1)       =   "1"
+      *
                EVALUATE    CHK-CHKKBN
                    WHEN    "5"
       *            同月内チェック
@@ -2000,6 +2004,9 @@
                            PERFORM 20052-CHK-INPUT-SEC
                        END-IF
                END-EVALUATE
+      *
+             END-IF
+      *
                MOVE    "tbl_chk"           TO  MCP-TABLE
                MOVE    "key14"             TO  MCP-PATHNAME
                PERFORM 950-CHK-READ-SEC
