@@ -9547,7 +9547,8 @@
                    MOVE    "key"               TO  MCP-PATHNAME
                    PERFORM   900-CLOSE-SEC
       *
-                   IF    FLG-TOKU-SHOKU        =   1
+                   IF   (FLG-TOKU-SHOKU        =   1)   AND
+                        (ACCT-SRYKBN           =   "97")
                        PERFORM    VARYING   IDX1   FROM   1   BY  1
                          UNTIL   (IDX1         >   31)     OR
                                  (LNK-NYURECEDEN-HKNCOMBI(3 IDX1)
