@@ -88,6 +88,7 @@
       *  04.05.03    NACL-藤原    11/03/25  災害対応
       *  04.05.04    NACL-藤原    11/04/22  災害対応
       *                                     災害区分の追加
+      *  04.05.05    NACL-藤原    12/06/05  レセ電データ無し時のエラー表示
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *  04.06.02    NACL-藤原    10/10/12  キーにkohid 追加
@@ -147,6 +148,7 @@
            03  FLG-HENREI-B        PIC 9(01).
            03  FLG-MONTHLYNUM      PIC 9(01).
            03  FLG-PTKOHINF        PIC 9(01).
+           03  FLG-RECEDEN         PIC 9(01).
       *
            03  FLG-TOUROKU         PIC 9(01).
            03  FLG-HENREI-B-CHK    pic 9(01).
@@ -232,6 +234,7 @@
            COPY    "CPSK1005.INC".
       *
            COPY    "CPSK2005.INC".
+           COPY    "CPSK200501.INC".
       *
            COPY    "CPSK2009.INC".
       *
@@ -254,6 +257,9 @@
       *    患者公費情報
        01  PTKOHINF-REC.
            COPY    "CPPTKOHINF.INC".
+      *
+      *    レセプト電算
+           COPY    "CPRECEDEN.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -515,6 +521,58 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
            MOVE    "未請求"            TO  SPA-H01GMN-SKYKBNMEIL (2)
            MOVE    "2"                 TO  SPA-H01GMN-SKYKBNL    (3)
            MOVE    "請求済"            TO  SPA-H01GMN-SKYKBNMEIL (3)
+      *         
+      *    レセプト編集情報
+           MOVE    SPACE               TO  SYS-2005-REC
+           INITIALIZE                      SYS-2005-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-2005-HOSPNUM
+           MOVE    "2005"              TO  SYS-2005-KANRICD
+           MOVE    "*"                 TO  SYS-2005-KBNCD
+           MOVE    ZERO                TO  SYS-2005-STYUKYMD 
+           MOVE    SYS-2005-STYUKYMD   TO  SYS-2005-EDYUKYMD
+           MOVE    SYS-2005-REC        TO  MCPDATA-REC
+           PERFORM 910-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-2005-REC
+           ELSE    
+               INITIALIZE                  SYS-2005-REC
+           END-IF
+           IF      SYS-2005-KKHRECEKBN =   SPACE
+               MOVE    ZERO            TO  SYS-2005-KKHRECEKBN
+           END-IF
+           IF      SYS-2005-SYARECEKBN =   SPACE
+               MOVE    ZERO            TO  SYS-2005-SYARECEKBN
+           END-IF
+           MOVE    SYS-2005-SYARECEKBN TO  SPA-NAI-2005-SYARECEKBN
+           MOVE    SYS-2005-KKHRECEKBN TO  SPA-NAI-2005-KKHRECEKBN
+      *
+           MOVE    SPACE               TO  SYS-200501-REC
+           INITIALIZE                      SYS-200501-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-200501-HOSPNUM
+           MOVE    "2005"              TO  SYS-200501-KANRICD
+           MOVE    "01"                TO  SYS-200501-KBNCD
+           MOVE    ZERO                TO  SYS-200501-STYUKYMD 
+           MOVE    SYS-200501-STYUKYMD TO  SYS-200501-EDYUKYMD
+           MOVE    SYS-200501-REC      TO  MCPDATA-REC
+           PERFORM 910-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-200501-REC
+           ELSE    
+               INITIALIZE                  SYS-200501-REC
+           END-IF
+           IF      SYS-200501-KOUIKIRECEKBN
+                                       =   SPACE
+               MOVE    ZERO                TO  SYS-200501-KOUIKIRECEKBN
+           END-IF
+           IF     SYS-200501-RECEDEN-DISASTER
+                                       =   SPACE
+               MOVE    "1"             TO  SYS-200501-RECEDEN-DISASTER
+           END-IF
+           MOVE    SYS-200501-KOUIKIRECEKBN
+                                       TO  SPA-NAI-200501-KOUIKIRECEKBN
+           MOVE    SYS-200501-RECEDEN-DISASTER
+                                       TO
+                                       SPA-NAI-200501-RECEDEN-DISASTER
       *
       *    レセプト編集区分情報（主科情報）
            MOVE    SPACE               TO  SYS-2009-REC
@@ -1898,6 +1956,64 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    点検レセ０点公費あり
            MOVE    RECE10-SKYKBN-RECEDEN
                                        TO  SPA-H01NAI-SKYKBN-RECEDEN
+      *
+      *    レセ電データ存在チェック
+           MOVE    ZERO                TO  SPA-H01NAI-RECEDEN-MSG
+      *    特別療養費、公害のとき
+           IF    ( RECE10-RECESYUBETU  =   "6666" )
+           OR    ( RECE10-TEISYUTUSAKI =   "5"    )
+               CONTINUE
+           ELSE
+      *        未確定分をレセ電データに記録しないとき
+               IF    (  SPA-NAI-200501-RECEDEN-DISASTER
+                                           =   "0"              )
+               AND   ( RECE10-ETC-YKZFTN (1)
+                                           =   6   OR  7  OR  8 )
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE               TO  RECEDEN-REC
+                   INITIALIZE                      RECEDEN-REC
+                   MOVE    RECE10-KEY          TO  RECEDEN-KEY
+                   MOVE    "1"                 TO  RECEDEN-RECKBN
+                   MOVE    RECEDEN-REC         TO  MCPDATA-REC
+                   PERFORM 900-RECEDEN-INV-SEC
+                   IF      FLG-RECEDEN         =   1
+                     EVALUATE    RECE10-TEISYUTUSAKI
+                                               ALSO    RECE10-NYUGAIKBN
+                       WHEN    "1"             ALSO    "1"
+                           IF      SPA-NAI-2005-SYARECEKBN
+                                                   =   "2" OR  "3"
+                               MOVE    1   TO  SPA-H01NAI-RECEDEN-MSG
+                           END-IF
+                       WHEN    "1"             ALSO    "2"
+                           IF      SPA-NAI-2005-SYARECEKBN
+                                                   =   "1" OR  "3"
+                               MOVE    1   TO  SPA-H01NAI-RECEDEN-MSG
+                           END-IF
+                       WHEN    "2"             ALSO    "1"
+                           IF      SPA-NAI-2005-KKHRECEKBN
+                                                   =   "2" OR  "3"
+                               MOVE    1   TO  SPA-H01NAI-RECEDEN-MSG
+                           END-IF
+                       WHEN    "2"             ALSO    "2"
+                           IF      SPA-NAI-2005-KKHRECEKBN
+                                                   =   "1" OR  "3"
+                               MOVE    1   TO  SPA-H01NAI-RECEDEN-MSG
+                           END-IF
+                       WHEN    "6"             ALSO    "1"
+                           IF      SPA-NAI-200501-KOUIKIRECEKBN
+                                                   =   "2" OR  "3"
+                               MOVE    1   TO  SPA-H01NAI-RECEDEN-MSG
+                           END-IF
+                       WHEN    "6"             ALSO    "2"
+                           IF      SPA-NAI-200501-KOUIKIRECEKBN
+                                                   =   "1" OR  "3"
+                               MOVE    1   TO  SPA-H01NAI-RECEDEN-MSG
+                           END-IF
+                     END-EVALUATE
+                   END-IF 
+               END-IF
+           END-IF
       *
            MOVE    "1"                 TO  SPA-HENFLG
       *     
@@ -3383,6 +3499,10 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            ELSE
                MOVE    WIDGET-INSENSITIVE     TO  H01-B10-STATE
            END-IF   
+           IF      SPA-H01NAI-RECEDEN-MSG  =   1
+               MOVE    "レセ電データがありません"
+                                           TO  H01-RECEDEN-CHK-MSG-VALUE
+           END-IF
       *
            PERFORM VARYING IDX FROM    1       BY  1
                    UNTIL   IDX     >   38
@@ -3487,6 +3607,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                            H01-HCREYMD-STYLE
            MOVE    "darkgreen"         TO  H01-MSG-STYLE
            MOVE    "red"               TO  H01-HENREI-MSG-STYLE
+                                           H01-RECEDEN-CHK-MSG-STYLE
       *
       *    入力の設定
            IF      SPA-SYS-1001-HOSPSBT1   =   "0"
@@ -4528,6 +4649,35 @@ grpsys     PERFORM 900-DBFETCH-SEC
            END-IF
            .
        900-HENREI-BODY-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセ電ＤＢ読込
+      *****************************************************************
+       900-RECEDEN-INV-SEC             SECTION.
+      *
+           MOVE    "tbl_receden"       TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_receden"       TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-RECEDEN
+               ELSE
+                   MOVE    1                   TO  FLG-RECEDEN
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-RECEDEN
+           END-IF
+      *
+           MOVE    "tbl_receden"       TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-RECEDEN-INV-EXT.
            EXIT.
       *
       *****************************************************************

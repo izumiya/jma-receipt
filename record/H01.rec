@@ -1901,6 +1901,10 @@ H01	{
                     style   varchar(20);
 			value	varchar(14);
 		};
+		RECEDEN_CHK_MSG	{
+                    style   varchar(20);
+			value	varchar(30);
+		};
 		HNYUGAIKBN	{
                     style   varchar(20);
 			value	varchar(6);
