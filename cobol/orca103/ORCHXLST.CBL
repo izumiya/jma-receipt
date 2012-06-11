@@ -1310,7 +1310,7 @@
                    MOVE    "#"        TO  B01R-UTAGAIKBNMEI
            END-EVALUATE
       *
-           IF    ( CHKSND-CHKKBN   =   "1" )
+           IF    ( CHKSND-CHKKBN   =   "1" OR "2" )
                MOVE    CHKSND-GRPID   TO  B01R-GRPID
            END-IF
       *

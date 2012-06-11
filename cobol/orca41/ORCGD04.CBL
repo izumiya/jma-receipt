@@ -831,7 +831,7 @@
                    COMPUTE IDX-LST =   IDX-LST +   1
                    MOVE    IDX-LST         TO  SPA-GMN-CHKLST-MAX
       *
-                   IF    ( CHKSND-CHKKBN   =   "1" )
+                   IF    ( CHKSND-CHKKBN   =   "1" OR "2" )
                        MOVE    CHKSND-GRPID    TO  SPA-GMN-TGRPID
                                                                (IDX-LST)
                    END-IF

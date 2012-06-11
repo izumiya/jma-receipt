@@ -3530,7 +3530,7 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    UNTIL ( IDXD    >   SPA-GMN-BYOLST-MAX )
                     OR   ( WRK-GRPCHKKBN   NOT =   SPACE )
                     OR   ( SPA-ERRCD       NOT =   SPACE )
-               IF    ( SPA-X01-CHKKBN      =   "1" )
+               IF    ( SPA-X01-CHKKBN      =   "1" OR "2" )
                 AND  ( SPA-GMN-TGRPID (IDXD)
                                        NOT =   SPACE )
                    MOVE    "1"         TO  WRK-GRPCHKKBN
@@ -3564,7 +3564,7 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                            TO  CHKSND-UTAGAIKBN
                END-IF
                MOVE    WRK-GRPCHKKBN       TO  CHKSND-GRPCHKKBN
-               IF    ( SPA-X01-CHKKBN      =   "1" )
+               IF    ( SPA-X01-CHKKBN      =   "1" OR "2" )
                    MOVE    SPA-GMN-TGRPID (IDXD)
                                            TO  CHKSND-GRPID
                ELSE
@@ -4026,7 +4026,7 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                        X04-UTAGAIKBN-ITEM-STATE
            END-IF
       *
-           IF    ( SPA-X01-CHKKBN  =   "1" )
+           IF    ( SPA-X01-CHKKBN  =   "1" OR "2" )
                CONTINUE
            ELSE
                INITIALIZE              X04-LBLGRPID
