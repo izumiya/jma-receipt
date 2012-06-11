@@ -24,6 +24,7 @@ tbl_ptsrh {
 	UPDATAKBN			char(1),virtual;
 	SQL				dbcode(15000),virtual;
 	dbescapestring			varchar(500),virtual;
+	KENSU			    number(8,0),virtual;
 };
 
 path	all 	{
@@ -145,7 +146,9 @@ path	key 	{
 path	cnt 	{
 	DBSELECT	{
 		DECLARE tbl_ptsrh_cnt_csr CURSOR FOR
-                SELECT COUNT(PTID) AS PTID,COUNT(DISTINCT PTID) AS TOTALTEN
+                SELECT COUNT(PTID) AS PTID,
+                       COUNT(DISTINCT PTID) AS TOTALTEN,
+               TO_CHAR(COUNT(DISTINCT to_char(PTID,'0000000000'||SRYCD)),'00000000') AS KENSU
 		FROM tbl_ptsrh
 		WHERE	HOSPNUM    =    :HOSPNUM
 		AND     TERMID     =    :TERMID

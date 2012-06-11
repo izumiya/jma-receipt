@@ -77,6 +77,7 @@
            03  FLG-JOBEND                          PIC 9(01).
            03  FLG-HKNKOHSEL                       PIC 9(01).
            03  FLG-GMN-INIT                        PIC 9(01).
+           03  FLG-EDIT                            PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -93,15 +94,17 @@
            03  IDX-LEN                             PIC 9(05).
            03  IDX-GMN                             PIC 9(05).
            03  IDX-JOBID                           PIC 9(05).
+           03  IDX-PTNUM                           PIC 9(05).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
            03  CNT-TTL-PTINF                       PIC 9(05).
            03  CNT-JYOKEN                          PIC 9(05).
+           03  CNT-SKIP                            PIC 9(05).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
-           03  WRK-SYMD                            PIC 9(08).
+           03  WRK-SYMD                            PIC X(08).
            03  WRK-HENYMDG1                        PIC X(09).
            03  WRK-HENYMDG3                        PIC X(22).
            03  WRK-STR                             PIC X(20000).
@@ -178,14 +181,18 @@
                05  WRK-NISSU-MES                       PIC X(200).
                05  WRK-NISSU-PTR                       PIC 9(03).
                05  WRK-NISSU-LASTYMD                   PIC X(08).
-          03  WRK-SRYSURYOZ                        PIC ZZZZ9.99999.
-          03  WRK-ZAIKAISUZ                        PIC ZZZZ9.
-          03  WRK-SURYOTOTALZ                      PIC ZZZZZZ9.99999.
+           03  WRK-SRYSURYOZ                        PIC ZZZZ9.99999.
+           03  WRK-ZAIKAISUZ                        PIC ZZZZ9.
+           03  WRK-SURYOTOTALZ                      PIC ZZZZZZ9.99999.
       *
            03  WRK-FILENM-AREA.
                07  WRK-FILENM      PIC X(100).
                07  WRK-FILENM-FOLDER 
                                    PIC X(100).
+           03  WRK-RENNUM                          PIC 9(05).
+           03  WRK-KEY-PTID                        PIC 9(10).
+           03  WRK-KEY-SRYCD                       PIC X(09).
+           03  WRK-SELNUM                          PIC 9(05).
       *
        01  WRK-ROW-AREA.
            03  WRK-KEKKALST-ROW                    PIC S9(9)   BINARY.
@@ -207,7 +214,7 @@
            03  CONST-SHELNAME3     PIC X(100)
                VALUE   "ORCBQ03.sh".
            03  CONST-LINE                          PIC 9(05)
-               VALUE   45.
+               VALUE   30.
            03  CONST-JOBID                         PIC 9(07)
                VALUE   1.
            03  CONST-JOBID2                        PIC 9(07)
@@ -874,6 +881,10 @@
       *
            MOVE   1                TO  FLG-GMN-INIT
       *
+           MOVE   ZERO             TO  WRK-RENNUM
+                                       WRK-KEY-PTID
+           MOVE   LOW-VALUE        TO  WRK-KEY-SRYCD
+      *
            MOVE    SPACE           TO  SPA-GMN-Q02-KEKKATBL
                                        SPA-GMN-Q02-PTINF-AREA
       *
@@ -883,10 +894,10 @@
       *    £Ó£Ñ£ÌÊ¸ÊÔ½¸½èÍý
            INITIALIZE              QSUB02-LNK
            MOVE    1               TO  QSUB02-LIMITCONTROL
-           COMPUTE QSUB02-OFFSET
-               =   SPA-GMN-Q02-SKIP-KNS
+           COMPUTE QSUB02-OFFSET   =   0
            COMPUTE QSUB02-LIMIT
-               =   CONST-LINE-MAX  +   1
+               =   SPA-GMN-Q02-SKIP-KNS
+               +   CONST-LINE-MAX  +   1
            CALL    "ORCGQSUB02"    USING
                                    SPA-AREA
                                    SPA-Q01FREE
@@ -897,91 +908,56 @@
       *    ´µ¼Ô¥Þ¥¹¥¿¸¡º÷½èÍý
            PERFORM 900-PTSRH-ODR-SEL-SEC
       *
+           MOVE    ZERO                TO  CNT-SKIP
+           PERFORM UNTIL ( CNT-SKIP   >=   SPA-GMN-Q02-SKIP-KNS )
+                    OR   ( FLG-PTSRH   =   1   )
+      *
+               COMPUTE CNT-SKIP    =   CNT-SKIP    +   1
+      *
+               IF    ( PTSRH-PTID  NOT =   WRK-KEY-PTID  )
+                OR   ( PTSRH-SRYCD NOT =   WRK-KEY-SRYCD )
+      *
+                   COMPUTE WRK-RENNUM  =   WRK-RENNUM  +   1
+                   MOVE    PTSRH-PTID  TO  WRK-KEY-PTID
+                   MOVE    PTSRH-SRYCD TO  WRK-KEY-SRYCD
+      *
+               END-IF
+      *
+               PERFORM 900-PTSRH-ODR-FET-SEC
+      *
+           END-PERFORM
+      *
            PERFORM VARYING IDX-GMN FROM    1   BY  1
                UNTIL   (   IDX-GMN     >   CONST-LINE-MAX )
                 OR     (   FLG-PTSRH   =   1   )
       *
                PERFORM 900-PTINF-KEY-SEL-SEC
       *
-      *        ÈÖ¹æ
-               COMPUTE WRK-NUM     =   SPA-GMN-Q02-SKIP-KNS
-                                   +   IDX-GMN
-               MOVE    WRK-NUM     TO  WRK-ZZZZ9
-               MOVE    WRK-ZZZZ9   TO  SPA-GMN-Q02-TNO
-                                                           (IDX-GMN)
-      *
-      *        ´µ¼ÔÈÖ¹æ
-               MOVE    PTSRH-PTNUM
-                                   TO  SPA-GMN-Q02-TPTNUM
-                                                           (IDX-GMN)
-      *
-      *        »áÌ¾
-               MOVE    PTINF-NAME
-                                   TO  SPA-GMN-Q02-TNAME
-                                                           (IDX-GMN)
-      *        À­ÊÌ
-               EVALUATE    PTINF-SEX
-               WHEN    "1"
-                   MOVE    "ÃË"    TO  SPA-GMN-Q02-TSEX
-                                                           (IDX-GMN)
-               WHEN    "2"
-                   MOVE    "½÷"    TO  SPA-GMN-Q02-TSEX
-                                                           (IDX-GMN)
-               END-EVALUATE
-      *
-      *        Ç¯Îð
-               IF  (   SPA-Q01-AGE-CALC-KBN    =   ZERO )
-                   MOVE    SPA-SYSYMD      TO  WRK-KJYNYMD
-               ELSE
-                   MOVE    SPA-Q01-KJYNYMD TO  WRK-KJYNYMD
+               MOVE    ZERO        TO  FLG-EDIT
+               IF    ( IDX-GMN     =   1 )
+                   MOVE    1       TO  FLG-EDIT
                END-IF
       *
-               IF  (   PTINF-BIRTHDAY    <   WRK-KJYNYMD )
-                   MOVE    PTINF-BIRTHDAY
-                                           TO  WRK-CALC-YMD1
-                   MOVE    WRK-KJYNYMD     TO  WRK-CALC-YMD2
-                   PERFORM 3101-AGE-CALC-SEC
-               ELSE
-                   MOVE    WRK-KJYNYMD     TO  WRK-CALC-YMD1
-                   MOVE    PTINF-BIRTHDAY
-                                           TO  WRK-CALC-YMD2
-                   PERFORM 3101-AGE-CALC-SEC
-                   COMPUTE WRK-AGE-YY   =   WRK-AGE-YY
-                                           *   -1
-                   COMPUTE WRK-AGE-MM   =   WRK-AGE-MM
-                                           *   -1
+               IF    ( PTSRH-PTID  NOT =   WRK-KEY-PTID  )
+                OR   ( PTSRH-SRYCD NOT =   WRK-KEY-SRYCD )
+                   MOVE    1       TO  FLG-EDIT
+                   COMPUTE WRK-RENNUM  =   WRK-RENNUM  +   1
+                   MOVE    PTSRH-PTID  TO  WRK-KEY-PTID
+                   MOVE    PTSRH-SRYCD TO  WRK-KEY-SRYCD
                END-IF
       *
-               IF    ( WRK-AGE-YY          =   ZERO )
-                   MOVE    WRK-AGE-MM      TO  WRK-AGE-Z
-                   MOVE    "¥ö·î"          TO  WRK-AGE-MEI
-               ELSE
-                   MOVE    WRK-AGE-YY      TO  WRK-AGE-Z
-                   MOVE    "ºÐ"            TO  WRK-AGE-MEI
+               MOVE    WRK-RENNUM  TO  SPA-GMN-Q02-TRENNUM (IDX-GMN)
+      *
+               IF    (  FLG-EDIT   =   1 )
+                   PERFORM 31011-Q02-GMN-EDIT-SEC
                END-IF
       *
-               MOVE    WRK-AGE-G           TO  SPA-GMN-Q02-TAGE
-                                                               (IDX-GMN)
-      *        ¿ÇÎÅ¥³¡¼¥É
-               MOVE    PTSRH-SRYCD    TO  SPA-GMN-Q02-TSRYCD
-                                                               (IDX-GMN)
-      *        ¿ÇÎÅ¹Ô°ÙÌ¾¾Î
-               MOVE    PTSRH-SRYNAME  TO  SPA-GMN-Q02-TSRYNAME
-                                                               (IDX-GMN)
-      *        ¿ôÎÌ
-               MOVE    PTSRH-SRYSURYO TO  SPA-GMN-Q02-TSRYSURYO
-                                                               (IDX-GMN)
-      *        ¿ôÎÌÊÔ½¸¥Õ¥é¥°
-               MOVE    PTSRH-SURYO-EDIT
-                            TO  SPA-GMN-Q02-TSURYO-EDIT
-                                                               (IDX-GMN)
-      *        ²ó¿ô
-               MOVE    PTSRH-ZAIKAISU TO  SPA-GMN-Q02-TZAIKAISU
-                                                               (IDX-GMN)
-      *        ¹ç·×
-               MOVE    PTSRH-SURYOTOTAL
-                                      TO SPA-GMN-Q02-TSURYOTOTAL
-                                                               (IDX-GMN)
+      *        ¿ÇÎÅÇ¯·î
+               MOVE    PTSRH-SRYYM    TO   WRK-SYMD
+               MOVE    "01"           TO   WRK-SYMD(7:2)
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-HENYMDG1(1:6)
+                                      TO   SPA-GMN-Q02-TSRYYM  (IDX-GMN)
       *        È÷¹Í
                INITIALIZE  WRK-NISSU-AREA
                PERFORM VARYING IDXD    FROM    1   BY  1
@@ -991,12 +967,10 @@
                    END-IF
                END-PERFORM
                PERFORM 3101-NISSU-HEN-SEC
-               MOVE    WRK-NISSU-MES   TO  SPA-GMN-Q02-TMEMO
-                                                               (IDX-GMN)
+               MOVE    WRK-NISSU-MES   TO  SPA-GMN-Q02-TMEMO  (IDX-GMN)
       *
       *        ´µ¼Ô£É£Ä
-               MOVE    PTINF-PTID
-                                   TO  SPA-GMN-Q02-PTINF-PTID (IDX-GMN)
+               MOVE    PTINF-PTID  TO  SPA-GMN-Q02-PTINF-PTID (IDX-GMN)
       *
                MOVE    IDX-GMN     TO  SPA-GMN-Q02-KEKKA-MAX
       *
@@ -1024,6 +998,79 @@
       *
            .
        3101-Q02-GMN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ²èÌÌÊÔ½¸½èÍý
+      *****************************************************************
+       31011-Q02-GMN-EDIT-SEC          SECTION.
+      *
+      *    ÈÖ¹æ
+           MOVE    WRK-RENNUM  TO  WRK-ZZZZ9
+           MOVE    WRK-ZZZZ9   TO  SPA-GMN-Q02-TNO         (IDX-GMN)
+      *
+      *    ´µ¼ÔÈÖ¹æ
+           MOVE    PTSRH-PTNUM     TO  SPA-GMN-Q02-TPTNUM  (IDX-GMN)
+      *
+      *    »áÌ¾
+           MOVE    PTINF-NAME      TO  SPA-GMN-Q02-TNAME   (IDX-GMN)
+      *    À­ÊÌ
+           EVALUATE    PTINF-SEX
+           WHEN    "1"
+               MOVE    "ÃË"    TO  SPA-GMN-Q02-TSEX        (IDX-GMN)
+           WHEN    "2"
+               MOVE    "½÷"    TO  SPA-GMN-Q02-TSEX        (IDX-GMN)
+           END-EVALUATE
+      *
+      *    Ç¯Îð
+           IF  (   SPA-Q01-AGE-CALC-KBN    =   ZERO )
+               MOVE    SPA-SYSYMD      TO  WRK-KJYNYMD
+           ELSE
+               MOVE    SPA-Q01-KJYNYMD TO  WRK-KJYNYMD
+           END-IF
+      *
+           IF  (   PTINF-BIRTHDAY    <   WRK-KJYNYMD )
+               MOVE    PTINF-BIRTHDAY
+                                       TO  WRK-CALC-YMD1
+               MOVE    WRK-KJYNYMD     TO  WRK-CALC-YMD2
+               PERFORM 3101-AGE-CALC-SEC
+           ELSE
+               MOVE    WRK-KJYNYMD     TO  WRK-CALC-YMD1
+               MOVE    PTINF-BIRTHDAY
+                                       TO  WRK-CALC-YMD2
+               PERFORM 3101-AGE-CALC-SEC
+               COMPUTE WRK-AGE-YY   =   WRK-AGE-YY
+                                       *   -1
+               COMPUTE WRK-AGE-MM   =   WRK-AGE-MM
+                                       *   -1
+           END-IF
+      *
+           IF    ( WRK-AGE-YY          =   ZERO )
+               MOVE    WRK-AGE-MM      TO  WRK-AGE-Z
+               MOVE    "¥ö·î"          TO  WRK-AGE-MEI
+           ELSE
+               MOVE    WRK-AGE-YY      TO  WRK-AGE-Z
+               MOVE    "ºÐ"            TO  WRK-AGE-MEI
+           END-IF
+      *
+           MOVE    WRK-AGE-G           TO  SPA-GMN-Q02-TAGE    (IDX-GMN)
+      *    ¿ÇÎÅ¥³¡¼¥É
+           MOVE    PTSRH-SRYCD    TO  SPA-GMN-Q02-TSRYCD       (IDX-GMN)
+      *    ¿ÇÎÅ¹Ô°ÙÌ¾¾Î
+           MOVE    PTSRH-SRYNAME  TO  SPA-GMN-Q02-TSRYNAME     (IDX-GMN)
+      *    ¿ôÎÌ
+           MOVE    PTSRH-SRYSURYO TO  SPA-GMN-Q02-TSRYSURYO    (IDX-GMN)
+      *    ¿ôÎÌÊÔ½¸¥Õ¥é¥°
+           MOVE    PTSRH-SURYO-EDIT
+                                  TO  SPA-GMN-Q02-TSURYO-EDIT  (IDX-GMN)
+      *    ²ó¿ô
+           MOVE    PTSRH-ZAIKAISU      TO  SPA-GMN-Q02-TZAIKAISU
+                                                               (IDX-GMN)
+      *    ¹ç·×
+           MOVE    PTSRH-SURYOTOTAL    TO SPA-GMN-Q02-TSURYOTOTAL
+                                                               (IDX-GMN)
+      *
+           .
+       31011-Q02-GMN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    Ç¯Îð·×»»½èÍý
@@ -1273,10 +1320,12 @@
            MOVE    "cnt"               TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           MOVE    PTSRH-PTID          TO  WRK-TOTAL
+           MOVE    PTSRH-KENSU         TO  WRK-TOTAL
                                            SPA-GMN-Q02-TOTAL-NUM
       *
            MOVE    PTSRH-TOTALTEN      TO  SPA-GMN-Q02-NINZU
+      *
+           MOVE    PTSRH-PTID          TO  SPA-GMN-Q02-KENSU
       *
       *    º¸µÍ¤ÇÊÔ½¸¤ò¹Ô¤¦
            PERFORM VARYING IDX1    FROM    1   BY  1
@@ -1509,20 +1558,19 @@
                GO  TO  4102-SELUM-CHK-EXT
            END-IF
       *
+           MOVE    ZERO                TO  WRK-SELNUM    
+           PERFORM VARYING     IDX1    FROM    1   BY  1
+                   UNTIL     ( IDX1        >   CONST-LINE-MAX )
+                    OR       ( WRK-SELNUM  >   ZERO )
+               IF    ( SPA-GMN-Q02-TRENNUM (IDX1)
+                                           =   SPA-GMN-Q02-SELNUM )
+                   MOVE    SPA-GMN-Q02-TRENNUM (IDX1) 
+                                           TO  WRK-SELNUM 
+                                               SPA-GMN-Q02-KEKKA-SEL
+               END-IF
+           END-PERFORM
       *    ÁªÂòÈÖ¹æÈÏ°Ï¥Á¥§¥Ã¥¯
-           COMPUTE WRK-KEKKALST-NO-ST  =   SPA-GMN-Q02-SKIP-KNS
-                                       +   1
-      *
-           COMPUTE WRK-KEKKALST-NO-ED  =   SPA-GMN-Q02-SKIP-KNS
-                                       +   SPA-GMN-Q02-KEKKA-MAX
-      *
-           IF      ( SPA-GMN-Q02-SELNUM   >=   WRK-KEKKALST-NO-ST )
-            AND    ( SPA-GMN-Q02-SELNUM   <=   WRK-KEKKALST-NO-ED )
-      *
-               COMPUTE SPA-GMN-Q02-KEKKA-SEL
-                   =   SPA-GMN-Q02-SELNUM  -  SPA-GMN-Q02-SKIP-KNS
-      *
-           ELSE
+           IF      ( WRK-SELNUM        =   ZERO )
                MOVE    4               TO  SPA-GMN-Q02-CUR
                MOVE    "0002"          TO  SPA-ERRCD
                GO  TO  4102-SELUM-CHK-EXT
@@ -1542,11 +1590,9 @@
            PERFORM VARYING     IDX1    FROM    1   BY  1
                    UNTIL     ( IDX1    >       CONST-LINE-MAX )
                IF      (  Q02B-KEKKALST-SELECT (IDX1)  =   "T"  )
-                   COMPUTE SPA-GMN-Q02-SELNUM
-                                   =   IDX1
-                                   +   SPA-GMN-Q02-SKIP-KNS
-                   MOVE    IDX1            TO  SPA-GMN-Q02-KEKKA-SEL
-                   MOVE    CONST-LINE-MAX  TO  IDX1
+                   MOVE    SPA-GMN-Q02-TRENNUM (IDX1) 
+                                           TO  SPA-GMN-Q02-SELNUM
+                                               SPA-GMN-Q02-KEKKA-SEL
                END-IF
            END-PERFORM
       *
@@ -1729,11 +1775,20 @@
                GO  TO  480-GYOUMU-SENI-EXT
            END-IF
       *
-           COMPUTE IDX1    =   SPA-GMN-Q02-SELNUM
-                           -   SPA-GMN-Q02-SKIP-KNS
+           MOVE    ZERO                TO  IDX-PTNUM   
+           PERFORM VARYING     IDX1    FROM    1   BY  1
+                   UNTIL     ( IDX1        >   CONST-LINE-MAX )
+                    OR       ( IDX-PTNUM   >   ZERO )
+               IF    ( SPA-GMN-Q02-TRENNUM (IDX1)
+                                           =   SPA-GMN-Q02-SELNUM )
+                   MOVE    IDX1            TO  IDX-PTNUM
+               END-IF
+           END-PERFORM
       *
-           IF  SPA-GMN-Q02-TPTNUM (IDX1)  =  SPACE
-               MOVE    "1002"          TO  SPA-ERRCD
+      *    ÁªÂòÈÖ¹æÈÏ°Ï¥Á¥§¥Ã¥¯
+           IF      ( IDX-PTNUM         =   ZERO )
+               MOVE    4               TO  SPA-GMN-Q02-CUR
+               MOVE    "0002"          TO  SPA-ERRCD
                GO  TO  480-GYOUMU-SENI-EXT
            END-IF
       *
@@ -1747,9 +1802,9 @@
       *
            INITIALIZE                  SPA-KYOTUKEY
       *
-           MOVE    SPA-GMN-Q02-PTINF-PTID (IDX1)
+           MOVE    SPA-GMN-Q02-PTINF-PTID (IDX-PTNUM)
                                        TO  SPA-PTID
-           MOVE  SPA-GMN-Q02-TPTNUM (IDX1)
+           MOVE  SPA-GMN-Q02-TPTNUM (IDX-PTNUM)
                                        TO  SPA-PTNUM
       *
       *    ¼õÉÕ¤È´µ¼Ô¸¡º÷°Ê³°¤Î¸µ¤ò¥»¥Ã¥È
@@ -2052,11 +2107,11 @@
            MOVE    1               TO  SPA-Q02-Q100-STNUM
       *
            IF  ( WRK-PROC-FLG      =   ZERO )
-               MOVE    SPA-GMN-Q02-TOTAL-NUM
+               MOVE    SPA-GMN-Q02-KENSU
                                    TO  SPA-Q02-Q100-EDNUM
            ELSE
                COMPUTE SPA-Q02-Q100-EDNUM
-                   = ( SPA-GMN-Q02-TOTAL-NUM   +   CONST-LINE  -   1 )
+                   = ( SPA-GMN-Q02-KENSU   +   CONST-LINE  -   1 )
                    /   CONST-LINE
            END-IF
       *
@@ -2107,16 +2162,18 @@
            END-IF
       *
       *    £²¡¥ÈÏ°Ï¥Á¥§¥Ã¥¯
-           COMPUTE WRK-KEKKALST-NO-ST  =   SPA-GMN-Q02-SKIP-KNS
-                                       +   1
-      *
-           COMPUTE WRK-KEKKALST-NO-ED  =   SPA-GMN-Q02-SKIP-KNS
-                                       +   SPA-GMN-Q02-KEKKA-MAX
-      *
-           IF      ( SPA-GMN-Q02-SELNUM   >=   WRK-KEKKALST-NO-ST )
-            AND    ( SPA-GMN-Q02-SELNUM   <=   WRK-KEKKALST-NO-ED )
-                   CONTINUE
-           ELSE
+           MOVE    ZERO                TO  WRK-SELNUM    
+           PERFORM VARYING     IDX1    FROM    1   BY  1
+                   UNTIL     ( IDX1        >   CONST-LINE-MAX )
+                    OR       ( WRK-SELNUM  >   ZERO )
+               IF    ( SPA-GMN-Q02-TRENNUM (IDX1)
+                                           =   SPA-GMN-Q02-SELNUM )
+                   MOVE    SPA-GMN-Q02-TRENNUM (IDX1) 
+                                           TO  WRK-SELNUM 
+               END-IF
+           END-PERFORM
+           IF      ( WRK-SELNUM        =   ZERO )
+               MOVE    4               TO  SPA-GMN-Q02-CUR
                MOVE    "0002"          TO  SPA-ERRCD
                GO  TO  4801-GAMEN-SENIJI-CHK-EXT
            END-IF
@@ -2263,64 +2320,76 @@
                MOVE    SPA-GMN-Q02-TSRYNAME (IDX1)
                                    TO  Q02B-KEKKALST-SRYNAME (IDX1)
       *
-      *        ¿ôÎÌ
-               IF    ( SPA-GMN-Q02-TSURYO-EDIT (IDX1)
+               IF    (  SPA-GMN-Q02-TNO (IDX1) NOT =   SPACE )
+      *
+      *            ¿ôÎÌ
+                   IF    ( SPA-GMN-Q02-TSURYO-EDIT (IDX1)
                                    =   1 )
-                   IF    ( SPA-GMN-Q02-TSRYSURYO (IDX1)
+                       IF    ( SPA-GMN-Q02-TSRYSURYO (IDX1)
                                    =   ZERO )
                            MOVE    "   ***"
                                    TO  Q02B-KEKKALST-SRYSURYO(IDX1)
-                   ELSE
-                       MOVE    SPA-GMN-Q02-TSRYSURYO (IDX1)
-                                       TO  WRK-SRYSURYOZ
-                       MOVE    WRK-SRYSURYOZ
+                       ELSE
+                           MOVE    SPA-GMN-Q02-TSRYSURYO (IDX1)
+                                   TO  WRK-SRYSURYOZ
+                           MOVE    WRK-SRYSURYOZ
                                    TO  Q02B-KEKKALST-SRYSURYO(IDX1)
-                       PERFORM VARYING IDXA    FROM    11  BY  -1
-                         UNTIL ( IDXA    <   1 )
-                          OR   ( Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
+                           PERFORM VARYING IDXA    FROM    11  BY  -1
+                                   UNTIL ( IDXA    <   1 )
+                             OR   ( Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
                                       NOT =   "0" )
-                           MOVE    SPACE
-                              TO   Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:)
-                       END-PERFORM
-                       IF    ( IDXA      >   0 )
-                           IF    ( Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
+                               MOVE    SPACE
+                                TO   Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:)
+                           END-PERFORM
+                           IF    ( IDXA      >   0 )
+                             IF  ( Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
                                               =   "." )
                                MOVE    SPACE
                                  TO Q02B-KEKKALST-SRYSURYO(IDX1)(IDXA:1)
+                             END-IF
                            END-IF
+                       END-IF
+                   END-IF
+      *
+      *            ²ó¿ô
+                   MOVE    SPA-GMN-Q02-TZAIKAISU (IDX1)
+                                   TO  WRK-ZAIKAISUZ
+                   MOVE    WRK-ZAIKAISUZ
+                                   TO  Q02B-KEKKALST-ZAIKAISU(IDX1)
+      *
+      *            ¹ç·×
+                   MOVE    SPA-GMN-Q02-TSURYOTOTAL (IDX1)
+                                   TO  WRK-SURYOTOTALZ
+                   MOVE    WRK-SURYOTOTALZ
+                                   TO  Q02B-KEKKALST-SURYOTOTAL(IDX1)
+      *
+                   PERFORM VARYING IDXA    FROM    13  BY  -1
+                           UNTIL ( IDXA    <   1 )
+                            OR  ( Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
+                                           NOT =   "0" )
+                       MOVE    SPACE
+                           TO  Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
+                   END-PERFORM
+                   IF    ( IDXA      >   0 )
+                       IF    ( Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
+                                      =   "." )
+                           MOVE    SPACE
+                               TO Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
                        END-IF
                    END-IF
                END-IF
       *
-      *        ²ó¿ô
-               MOVE    SPA-GMN-Q02-TZAIKAISU (IDX1)
-                                   TO  WRK-ZAIKAISUZ
-               MOVE    WRK-ZAIKAISUZ
-                                   TO  Q02B-KEKKALST-ZAIKAISU(IDX1)
+      *        ¿ÇÎÅÇ¯·î
+               MOVE    SPA-GMN-Q02-TSRYYM (IDX1)
+                                   TO  Q02B-KEKKALST-SRYYM (IDX1)
       *
-      *        ¹ç·×
-               MOVE    SPA-GMN-Q02-TSURYOTOTAL (IDX1)
-                                   TO  WRK-SURYOTOTALZ
-               MOVE    WRK-SURYOTOTALZ
-                                   TO  Q02B-KEKKALST-SURYOTOTAL(IDX1)
-               PERFORM VARYING IDXA    FROM    13  BY  -1
-                       UNTIL ( IDXA    <   1 )
-                        OR   ( Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
-                                           NOT =   "0" )
-                   MOVE    SPACE
-                           TO  Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
-               END-PERFORM
-               IF    ( IDXA      >   0 )
-                   IF    ( Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
-                                      =   "." )
-                       MOVE    SPACE
-                          TO Q02B-KEKKALST-SURYOTOTAL(IDX1)(IDXA:1)
-                   END-IF
-               END-IF
                MOVE    SPA-GMN-Q02-TMEMO (IDX1)
                            TO  Q02B-KEKKALST-MEMO (IDX1)
       *
-               IF      ( SPA-GMN-Q02-KEKKA-SEL =   IDX1 )
+               IF    ( SPA-GMN-Q02-TNO (IDX1)
+                                   NOT =   SPACE )
+                AND  ( SPA-GMN-Q02-TRENNUM (IDX1)
+                                       =   SPA-GMN-Q02-KEKKA-SEL )
                    MOVE    "T"     TO  Q02B-KEKKALST-SELECT (IDX1)
                ELSE
                    MOVE    "F"     TO  Q02B-KEKKALST-SELECT (IDX1)
@@ -2866,6 +2935,20 @@
            .
       *
        910-DBINSERT-EXT.
+           EXIT.
+      *****************************************************************
+      *    £Ä£Â¹¹¿·½èÍý
+      *****************************************************************
+       910-DBUPDATE-SEC                 SECTION.
+      *
+           MOVE    "DBUPDATE"       TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       910-DBUPDATE-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Âºï½ü½èÍý

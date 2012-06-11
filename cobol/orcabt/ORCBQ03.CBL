@@ -78,9 +78,16 @@
                    07  TMP01-SRYSURYO2         PIC 9(05)V9(05).
                    07  TMP01-ZAIKAISU          PIC 9(07).
                    07  TMP01-SURYOTOTAL        PIC 9(07)V9(05).
-                   07  TMP01-DAY-G.
-                       09  TMP01-DAY   PIC 9(05)
-                                       OCCURS  31.
+                   07  TMP01-MON-G.
+                       09  TMP01-MON-OCC               OCCURS 12.
+                           11  TMP01-MON-SRYYM         PIC X(06).
+                           11  TMP01-MON-SRYSURYO1     PIC 9(05)V9(05).
+                           11  TMP01-MON-SRYSURYO2     PIC 9(05)V9(05).
+                           11  TMP01-MON-ZAIKAISU      PIC 9(07).
+                           11  TMP01-MON-SURYOTOTAL    PIC 9(07)V9(05).
+                           11  TMP01-MON-DAY-G.
+                               13  TMP01-MON-DAY       PIC 9(05)
+                                                       OCCURS  31.
       *
        FD  TMP02-FILE.
        01  TMP02-REC.
@@ -129,8 +136,11 @@
        01  IDX-AREA.
            03  IDX0                    PIC 9(05).
            03  IDX1                    PIC 9(05).
-           03  IDXD                    PIC 9(02).
+           03  IDX2                    PIC 9(05).
+           03  IDXM                    PIC 9(05).
            03  IDX-SRY                 PIC 9(05).
+      *
+           03  IDXD                    PIC 9(02).
       *
       *    フラグ領域
        01  FLG-AREA.
@@ -163,6 +173,8 @@
            03  SEL-UPYMD                           PIC X(08).
            03  SEL-UPHMS                           PIC X(06).
            03  SEL-TENKENRECE                      PIC X(01).
+           03  SEL-SRYYM                           PIC X(06)
+                                                   OCCURS 12.
       *
        01  TSRYCD-G.
            03  TSRYCD-IDX                          PIC 9(05).
@@ -176,6 +188,10 @@
                05  TSRYCD-SURYO-EDIT               PIC 9(01).
       *
        01  WRK-AREA.
+           03  WRK-YMD                             PIC X(10). 
+           03  WRK-ZOGENPTN                        PIC X(01).
+           03  WRK-ZOGEN                           PIC S9(05).
+           03  WRK-KEISANYMD                       PIC X(08).
            03  WRK-DELYMD                          PIC X(08).
            03  WRK-ACCT-G.
                05  WRK-ZAIKAISU                    PIC 9(05).
@@ -347,6 +363,15 @@
                MOVE    "00000000"          TO  SEL-STSRYYMD
            ELSE
                MOVE    SPA-Q01-STSRYYMD    TO  SEL-STSRYYMD
+               PERFORM VARYING     IDX0    FROM    1   BY  1
+                       UNTIL (     IDX0    >   12 )
+                   MOVE    SEL-STSRYYMD TO WRK-YMD
+                   COMPUTE WRK-ZOGEN   =   IDX0    -   1
+                   MOVE    "2"         TO  WRK-ZOGENPTN
+                   PERFORM 800-CALENDAR-SEC
+                   MOVE    WRK-KEISANYMD(1:6)
+                                           TO  SEL-SRYYM (IDX0)
+               END-PERFORM
            END-IF
       *
            IF    ( SPA-Q01-EDSRYYMD    =   SPACE )
@@ -599,7 +624,9 @@
       *****************************************************************
        20011-SRYVAL-EDIT-SEC           SECTION.
       *
-           MOVE    ZERO                TO   FLG-TARGET
+           MOVE    ZERO                TO  FLG-TARGET
+      *
+           MOVE    ZERO                TO  IDXM
       *
            PERFORM VARYING TSRYCD-IDX  FROM    1   BY  1
                    UNTIL ( TSRYCD-IDX  >   5 )
@@ -646,6 +673,20 @@
                    END-IF
                END-IF
            END-PERFORM
+      *
+           PERFORM VARYING IDX2    FROM    1   BY  1
+                   UNTIL ( IDX2    >   12 )
+                    OR   ( IDXM    >   ZERO  )
+      *
+               IF    ( SRYSRH-SRYYMD (1:6) =   SEL-SRYYM (IDX2))
+                   MOVE    IDX2    TO  IDXM
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( IDXM        =   ZERO )
+               MOVE    ZERO    TO  FLG-TARGET
+           END-IF
       *
            IF    ( FLG-TARGET  =   1 )
                INITIALIZE              WRK-ACCT-G
@@ -711,29 +752,55 @@
                                        =   SRYSRH-SRYCD (IDX-SRY))
                        MOVE    TSRYCD-SRYCD (IDX0)
                                        TO  TMP01-SRYCD (IDX0)
-                       IF    ( TMP01-SRYSURYO1 (IDX0)  =   ZERO )
-                           MOVE    SRYSRH-SRYSURYO(IDX-SRY)
-                                       TO  TMP01-SRYSURYO1(IDX0)
-                                           TMP01-SRYSURYO2(IDX0)
-                       ELSE
-                           IF    ( TMP01-SRYSURYO2(IDX0)
-                                       =   SRYSRH-SRYSURYO (IDX-SRY))
-                               CONTINUE
-                           ELSE
-                               MOVE    SRYSRH-SRYSURYO(IDX-SRY)
-                                       TO  TMP01-SRYSURYO1(IDX0)
-                           END-IF
-                       END-IF
                        COMPUTE TMP01-ZAIKAISU(IDX0)
                            =   TMP01-ZAIKAISU(IDX0)
                            +   WRK-ZAIKAISU
                        COMPUTE TMP01-SURYOTOTAL(IDX0)
                            =   TMP01-SURYOTOTAL(IDX0)
                            +   WRK-SURYOTOTAL
+      *
+                       IF    ( TMP01-SRYSURYO1 (IDX0)
+                                           =   ZERO )
+                           MOVE    SRYSRH-SRYSURYO(IDX-SRY)
+                                   TO  TMP01-SRYSURYO1(IDX0)
+                                       TMP01-SRYSURYO2(IDX0)
+                       ELSE
+                           IF    ( TMP01-SRYSURYO2(IDX0)
+                                       =   SRYSRH-SRYSURYO (IDX-SRY))
+                               CONTINUE
+                           ELSE
+                               MOVE    SRYSRH-SRYSURYO(IDX-SRY)
+                                   TO  TMP01-SRYSURYO1(IDX0)
+                           END-IF
+                       END-IF
+      *
+                       MOVE    SEL-SRYYM (IDXM)
+                                       TO  TMP01-MON-SRYYM (IDX0 IDXM)
+                       COMPUTE TMP01-MON-ZAIKAISU(IDX0 IDXM)
+                           =   TMP01-MON-ZAIKAISU(IDX0 IDXM)
+                           +   WRK-ZAIKAISU
+                       COMPUTE TMP01-MON-SURYOTOTAL(IDX0 IDXM)
+                           =   TMP01-MON-SURYOTOTAL(IDX0 IDXM)
+                           +   WRK-SURYOTOTAL
+      *
+                       IF    ( TMP01-MON-SRYSURYO1 (IDX0 IDXM)
+                                           =   ZERO )
+                           MOVE    SRYSRH-SRYSURYO(IDX-SRY)
+                                   TO  TMP01-MON-SRYSURYO1(IDX0 IDXM)
+                                       TMP01-MON-SRYSURYO2(IDX0 IDXM)
+                       ELSE
+                           IF    ( TMP01-MON-SRYSURYO2(IDX0 IDXM)
+                                       =   SRYSRH-SRYSURYO (IDX-SRY))
+                               CONTINUE
+                           ELSE
+                               MOVE    SRYSRH-SRYSURYO(IDX-SRY)
+                                   TO  TMP01-MON-SRYSURYO1(IDX0 IDXM)
+                           END-IF
+                       END-IF
                        PERFORM VARYING IDXD    FROM    1   BY  1
                                UNTIL ( IDXD    >   31 )
-                           COMPUTE TMP01-DAY (IDX0 IDXD)
-                               =   TMP01-DAY (IDX0 IDXD)
+                           COMPUTE TMP01-MON-DAY (IDX0 IDXM IDXD)
+                               =   TMP01-MON-DAY (IDX0 IDXM IDXD)
                                +   WRK-DAY (IDXD)
                        END-PERFORM
                    END-IF
@@ -756,7 +823,7 @@
        200111-SRYVAL-SUM-SEC           SECTION.
       *
            PERFORM 900-SRYACCT-KEY57-SEL-SEC
-           MOVE    SEL-STSRYYMD    TO  WRK-SRYYMD
+           MOVE    ACCT-SRYYM      TO  WRK-SRYYMD
            PERFORM VARYING IDXD    FROM    1   BY  1
                    UNTIL ( IDXD    >   31 )
                MOVE    IDXD        TO  WRK-SRYDD
@@ -904,8 +971,27 @@
       *****************************************************************
        20011-SRYVAL-PTSRH-INS-SEC  SECTION.
       *
+           PERFORM VARYING IDXM    FROM    1   BY   1
+                   UNTIL ( IDXM    >   12 )
+      *
+               IF    ( TMP01-MON-SRYYM (TSRYCD-IDX IDXM)
+                                   =   SPACE )
+                   CONTINUE
+               ELSE
+                   PERFORM 200111-SRYVAL-PTSRH-INS-SEC
+               END-IF
+           END-PERFORM
+      *
+           .
+       20011-SRYVAL-PTSRH-INS-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療行為数値検索より患者照会編集処理
+      *****************************************************************
+       200111-SRYVAL-PTSRH-INS-SEC  SECTION.
+      *
            INITIALIZE                  PTSRH-REC
-                                       PTSRH-MEMO-R
+                                           PTSRH-MEMO-R
            MOVE    SPA-HOSPNUM     TO  PTSRH-HOSPNUM
            MOVE    SPA-TERMID      TO  PTSRH-TERMID
            MOVE    TMP01-PTID      TO  PTSRH-PTID
@@ -915,15 +1001,7 @@
            MOVE    TMP01-BIRTHDAY  TO  PTSRH-BIRTHDAY
            MOVE    TMP01-SRYCD    (TSRYCD-IDX)
                                    TO  PTSRH-SRYCD
-           IF    ( TMP01-SRYSURYO1 (TSRYCD-IDX)
-                                   =   TMP01-SRYSURYO2 (TSRYCD-IDX))
-               MOVE    TMP01-SRYSURYO1(TSRYCD-IDX)
-                                   TO  PTSRH-SRYSURYO
-           END-IF
-           MOVE    TMP01-ZAIKAISU (TSRYCD-IDX)
-                                   TO  PTSRH-ZAIKAISU
-           MOVE    TMP01-SURYOTOTAL(TSRYCD-IDX)
-                                   TO  PTSRH-SURYOTOTAL
+      *
            MOVE    TSRYCD-NAME (TSRYCD-IDX)
                                    TO  PTSRH-SRYNAME
            MOVE    TSRYCD-SURYO-EDIT (TSRYCD-IDX)
@@ -931,10 +1009,33 @@
            MOVE    TSRYCD-KANANAME (TSRYCD-IDX)
                                    TO  PTSRH-SRYKANANAME
            MOVE    TSRYCD-IDX      TO  PTSRH-SRYSEQ
+      *
+           MOVE    TMP01-MON-SRYYM (TSRYCD-IDX IDXM)
+                                   TO  PTSRH-SRYYM
+      *
+           IF    ( TMP01-SRYSURYO1 (TSRYCD-IDX)
+                       =   TMP01-SRYSURYO2 (TSRYCD-IDX))
+               MOVE    TMP01-SRYSURYO1 (TSRYCD-IDX)
+                                   TO  PTSRH-SRYSURYO
+           END-IF
+           MOVE    TMP01-ZAIKAISU (TSRYCD-IDX)
+                                   TO  PTSRH-ZAIKAISU
+           MOVE    TMP01-SURYOTOTAL(TSRYCD-IDX)
+                                   TO  PTSRH-SURYOTOTAL
+      *
+           IF    ( TMP01-MON-SRYSURYO1 (TSRYCD-IDX IDXM)
+                       =   TMP01-MON-SRYSURYO2 (TSRYCD-IDX IDXM))
+               MOVE    TMP01-MON-SRYSURYO1 (TSRYCD-IDX IDXM)
+                                   TO  PTSRH-SRYYM-SRYSURYO
+           END-IF
+           MOVE    TMP01-MON-ZAIKAISU (TSRYCD-IDX IDXM)
+                                   TO  PTSRH-SRYYM-ZAIKAISU
+           MOVE    TMP01-MON-SURYOTOTAL(TSRYCD-IDX IDXM)
+                                   TO  PTSRH-SRYYM-SURYOTOTAL
            PERFORM VARYING IDXD    FROM    1   BY  1
                    UNTIL ( IDXD    >   31 )
       *
-               MOVE    TMP01-DAY (TSRYCD-IDX IDXD)
+               MOVE    TMP01-MON-DAY (TSRYCD-IDX IDXM IDXD)
                                    TO  PTSRH-DAY (IDXD)
       *
            END-PERFORM
@@ -950,7 +1051,7 @@
            PERFORM 910-DBINSERT-SEC
       *
            .
-       20011-SRYVAL-PTSRH-INS-EXT.
+       200111-SRYVAL-PTSRH-INS-EXT.
            EXIT.
       *****************************************************************
       *    収納データ取得　処理
@@ -1027,6 +1128,24 @@
            .
       *
        800-MCNDATE-EXT.
+           EXIT.
+      *****************************************************************
+      *    カレンダー処理
+      *****************************************************************
+       800-CALENDAR-SEC                SECTION.
+      *
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY6-AREA
+           MOVE    "61"                TO  LNK-DAY6-IRAI
+           MOVE    WRK-YMD             TO  LNK-DAY6-KIJUN
+           MOVE    WRK-ZOGENPTN        TO  LNK-DAY6-ZOGENPTN
+           MOVE    WRK-ZOGEN           TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"             USING   STS-AREA-DAY
+                                               LNK-DAY6-AREA
+           MOVE    LNK-DAY6-KEISAN     TO  WRK-KEISANYMD
+      *
+           .
+       800-CALENDAR-EXT.
            EXIT.
       *****************************************************************
       *    収納検索処理

@@ -210,6 +210,7 @@
                05  WRK-RECECOM          PIC X(50)
                                         OCCURS     5.
            03  WRK-STSRYYMD             PIC X(08).
+           03  WRK-EDSRYYMD             PIC X(08).
            03  WRK-KOHNAME              PIC X(80).
            03  WRK-FTNJANUM             PIC X(08).
            03  WRK-ORCSSTR-NUM1         PIC 9(03).
@@ -7154,10 +7155,22 @@
       *
            IF    ( SPA-ERRCD   =   SPACE )
                IF    ( SPA-GMN-Q01-SRYVALITEM  NOT =   SPACE )
-                   IF   ( SPA-NAI-Q01-STSRYYMD
-                               NOT =   SPACE )
-                     AND ( SPA-NAI-Q01-STSRYYMD(1:6)
-                                   =   SPA-NAI-Q01-EDSRYYMD(1:6))
+      *
+                   MOVE    SPA-NAI-Q01-STSRYYMD    TO  WRK-KEISANYMD
+                   IF    ( WRK-KEISANYMD           =   SPACE )
+                       MOVE    "00000000"          TO  WRK-KEISANYMD
+                   ELSE
+                       MOVE    WRK-KEISANYMD       TO  WRK-YMD
+                       MOVE    11                  TO  WRK-ZOGEN
+                       MOVE    "2"                 TO  WRK-ZOGENPTN
+                       PERFORM 800-CALENDAR-SEC
+                   END-IF
+      *
+                   MOVE    SPA-NAI-Q01-EDSRYYMD    TO  WRK-EDSRYYMD
+                   IF    ( WRK-EDSRYYMD            =   SPACE )
+                       MOVE    "99999999"          TO  WRK-EDSRYYMD
+                   END-IF
+                   IF   (  WRK-KEISANYMD (1:6) >=  WRK-EDSRYYMD (1:6))
                        CONTINUE
                    ELSE
                        MOVE    "1018"      TO  SPA-ERRCD
@@ -10079,8 +10092,10 @@
                MOVE    SPACE           TO  SPA-ERRMSG
                STRING  "診療行為の数値指定を行う場合、"
                                            DELIMITED BY SIZE
-                       "診療月ボタンより診療月を指定してください"
-                                                       DELIMITED BY SIZE
+                       "診療年月日の期間指定をしてください"
+                                           DELIMITED BY SIZE
+                       "（最大１２ケ月）"
+                                           DELIMITED BY SIZE
                INTO    SPA-ERRMSG
                END-STRING
            WHEN    "1019"

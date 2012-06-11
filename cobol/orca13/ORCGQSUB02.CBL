@@ -101,6 +101,7 @@
            03  WRK-PAYKBN                          PIC X(02).
            03  WRK-YMD                             PIC X(08).
            03  WRK-RECECOMMENT                     PIC X(50).
+           03  WRK-SORT-ITEM                       PIC X(50).
            03  WRK-ITEM-G.
                05  WRK-ITEM                        PIC X(50)
                                                    OCCURS  4.
@@ -144,14 +145,14 @@
                05  CONST-TKMK-ITEM PIC X(12)   OCCURS  6.
       *
            03  CONST-SKMK-ITEM-AREA.
-               05  FILLER      PIC X(12)   VALUE "PTNUM".
-               05  FILLER      PIC X(12)   VALUE "KANANAME".
-               05  FILLER      PIC X(12)   VALUE "SEX".
-               05  FILLER      PIC X(12)   VALUE "BIRTHDAY".
-               05  FILLER      PIC X(12)   VALUE "SRYCD".
-               05  FILLER      PIC X(12)   VALUE "SRYKANANAME".
+               05  FILLER      PIC X(30)   VALUE "PTNUM".
+               05  FILLER      PIC X(30)   VALUE "KANANAME".
+               05  FILLER      PIC X(30)   VALUE "SEX".
+               05  FILLER      PIC X(30)   VALUE "BIRTHDAY".
+               05  FILLER      PIC X(30)   VALUE "SRYCD".
+               05  FILLER      PIC X(30)   VALUE "SRYKANANAME".
            03  CONST-SKMK-ITEM-R   REDEFINES   CONST-SKMK-ITEM-AREA.
-               05  CONST-SKMK-ITEM PIC X(12)   OCCURS  6.
+               05  CONST-SKMK-ITEM PIC X(30)   OCCURS  6.
       *
            03  CONST-ORDER-AREA.
                05  FILLER          PIC X(5)    VALUE "ASC".
@@ -3811,17 +3812,42 @@
                        " "                         DELIMITED   BY  SIZE
                        CONST-ORDER (IDX-SRT1)
                                                    DELIMITED   BY  SPACE
-                       ","                         DELIMITED   BY  SIZE
+               INTO    WRK-SQL-ORDER
+               WITH    POINTER WRK-SQL-ORDER-PNT
+               END-STRING
+      *
+               MOVE    CONST-SKMK-ITEM (IDX-SITM1)
+                                           TO      WRK-SORT-ITEM
+               PERFORM 10011-ORDER-EDIT-SEC
+      *
+               STRING  ","                         DELIMITED   BY  SIZE
                        CONST-SKMK-ITEM (IDX-SITM2) DELIMITED   BY  SPACE
                        " "                         DELIMITED   BY  SIZE
                        CONST-ORDER (IDX-SRT2)
                                                    DELIMITED   BY  SPACE
-                       ","                         DELIMITED   BY  SIZE
+               INTO    WRK-SQL-ORDER
+               WITH    POINTER WRK-SQL-ORDER-PNT
+               END-STRING
+      *
+               MOVE    CONST-SKMK-ITEM (IDX-SITM2)
+                                           TO      WRK-SORT-ITEM
+               PERFORM 10011-ORDER-EDIT-SEC
+      *
+               STRING  ","                         DELIMITED   BY  SIZE
                        CONST-SKMK-ITEM (IDX-SITM3) DELIMITED   BY  SPACE
                        " "                         DELIMITED   BY  SIZE
                        CONST-ORDER (IDX-SRT3)
                                                    DELIMITED   BY  SPACE
-                       ",SRYCD ASC"                DELIMITED   BY  SIZE
+               INTO    WRK-SQL-ORDER
+               WITH    POINTER WRK-SQL-ORDER-PNT
+               END-STRING
+      *
+               MOVE    CONST-SKMK-ITEM (IDX-SITM2)
+                                           TO      WRK-SORT-ITEM
+               PERFORM 10011-ORDER-EDIT-SEC
+      *
+               STRING  ",SRYCD  ASC,SUBSTR(MEMO,1,6)  ASC"
+                                                   DELIMITED   BY  SIZE
                INTO    WRK-SQL-ORDER
                WITH    POINTER WRK-SQL-ORDER-PNT
                END-STRING
@@ -3870,6 +3896,22 @@
            .
       *
        1001-ORDER-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÊÂ¤ÙÂØ¤¨½çÊÔ½¸½èÍý(¿ÇÎÅ¹Ô°Ù¸¡º÷)
+      *****************************************************************
+       10011-ORDER-EDIT-SEC                 SECTION.
+      *
+           IF    ( WRK-SORT-ITEM            =  "SRYCD" OR "srycd" )
+               STRING    ", SUBSTR(MEMO,1,6)  ASC" DELIMITED   BY  SIZE
+               INTO    WRK-SQL-ORDER
+               WITH    POINTER WRK-SQL-ORDER-PNT
+               END-STRING
+           END-IF
+      *
+           .
+      *
+       10011-ORDER-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    £Ó£Ñ£Ì¾ò·ïÊÔ½¸½èÍý£±

@@ -573,8 +573,8 @@
 	  <data>SELECT</data>
 	  <last_modification_time>Wed, 31 Jan 2001 12:09:23 GMT</last_modification_time>
 	</signal>
-	<columns>10</columns>
-	<column_widths>40,100,160,30,60,260,80,48,90,200</column_widths>
+	<columns>11</columns>
+	<column_widths>40,100,160,30,60,260,80,48,90,60,200</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -688,6 +688,19 @@
 	  <child_name>CList:title</child_name>
 	  <name>label501</name>
 	  <label>¹ç·×</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>label1519</name>
+	  <label>¿ÇÎÅÇ¯·î</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>

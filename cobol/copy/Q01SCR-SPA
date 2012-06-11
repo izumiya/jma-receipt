@@ -769,6 +769,9 @@
       *                        連番
                                13  SPA-GMN-Q02-TNO
                                                        PIC X(5).
+      *                        連番
+                               13  SPA-GMN-Q02-TRENNUM
+                                                       PIC 9(5).
       *                        患者番号
                                13  SPA-GMN-Q02-TPTNUM
                                                        PIC X(20).
@@ -836,6 +839,9 @@
       *                        合計
                                13  SPA-GMN-Q02-TSURYOTOTAL
                                                        PIC 9(07)V9(05).
+      *                        診療年月
+                               13  SPA-GMN-Q02-TSRYYM
+                                                       PIC X(10).
       *                        備考
                                13  SPA-GMN-Q02-TMEMO
                                                        PIC X(200).
@@ -850,6 +856,8 @@
                        09  SPA-GMN-Q02-TOTAL-GET-FLG   PIC 9(1).
       *                実人数
                        09  SPA-GMN-Q02-NINZU           PIC 9(09).
+      *                件数
+                       09  SPA-GMN-Q02-KENSU           PIC 9(09).
       *
       *                選択番号
                        09  SPA-GMN-Q02-SELNUM          PIC 9(05).

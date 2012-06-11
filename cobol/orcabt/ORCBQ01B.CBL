@@ -116,11 +116,13 @@
            03  FLG-HKNNUM              PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTSRH               PIC 9(01).
+           03  FLG-EDIT                PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-PAGE                PIC 9(09).
            03  CNT-LINE                PIC 9(05).
+           03  CNT-RENNUM              PIC 9(05).
            03  CNT-KNS                 PIC 9(05).
            03  CNT-CSV                 PIC 9(09).
       *
@@ -153,7 +155,7 @@
            03  WRK-ZZZZ9C              PIC ZZ,ZZ9.
            03  WRK-ZZZZZZZ9            PIC ZZZZZZZ9.
            03  WRK-ZZZZZZZ9C           PIC ZZ,ZZZ,ZZ9.
-           03  WRK-SYMD                PIC 9(08).
+           03  WRK-SYMD                PIC X(08).
            03  WRK-HENYMDG1            PIC X(09).
            03  WRK-HENYMDG3            PIC X(22).
            03  WRK-HKNNUM              PIC X(03).
@@ -186,10 +188,10 @@
                05  WRK-SRYDD           PIC 9(02).
            03  WRK-DAY-G.
                05  WRK-DAY                             PIC 9(02).
-           03  WRK-NISSU-AREA.
-               05  WRK-NISSU-DAY-G.
+           03  WRK-NISSU-DAY-G.
                    07  WRK-NISSU-DAY                   PIC 9(01)
                                                        OCCURS  31.
+           03  WRK-NISSU-AREA.
                05  WRK-NISSU-KUGIRI-FLG                PIC 9(01).
                05  WRK-NISSU-RENZOKU-CNT               PIC 9(03).
                05  WRK-NISSU-ST-G.
@@ -211,7 +213,11 @@
                05  WRK-NISSU-MES                       PIC X(200).
                05  WRK-NISSU-PTR                       PIC 9(03).
                05  WRK-NISSU-LASTYMD                   PIC X(08).
-      * 
+      *
+       01  KEY-AREA.
+           03  KEY-PTID                PIC 9(10).
+           03  KEY-SRYCD               PIC X(09).
+      *
        01  CSV-EDIT-AREA.
            03  CSV-NO                  PIC Z(9)9.
            03  FILLER                  PIC X(01)   VALUE ",".
@@ -240,6 +246,8 @@
            03  CSV-ZAIKAISU            PIC X(05).
            03  FILLER                  PIC X(01)   VALUE ",".
            03  CSV-SURYOTOTAL          PIC X(13).
+           03  FILLER                  PIC X(01)   VALUE ",".
+           03  CSV-SRYYM               PIC X(07).
            03  CSV-SRYYMD-OCC          OCCURS  31.
                05  FILLER              PIC X(01)   VALUE ",".
                05  CSV-SRYYMD          PIC X(10).
@@ -279,6 +287,8 @@
            03  CONST-CSV-ZAIKAISU      PIC X(20)   VALUE "回数".
            03  FILLER                  PIC X(01)   VALUE ",".
            03  CONST-CSV-SURYOTOTAL    PIC X(20)   VALUE "合計".
+           03  FILLER                  PIC X(01)   VALUE ",".
+           03  CONST-CSV-SRYYM         PIC X(20)   VALUE "診療年月".
            03  FILLER                  PIC X(01)   VALUE ",".
            03  CONST-CSV-SRYYMD01      PIC X(20)   VALUE "算定日１".
            03  FILLER                  PIC X(01)   VALUE ",".
@@ -436,6 +446,7 @@
                                        IDX-AREA
                                        WRK-AREA
                                        CNT-AREA
+                                       KEY-AREA
       *
            MOVE    SPACE               TO  SPA-AREA
            INITIALIZE                      SPA-AREA
@@ -535,6 +546,10 @@
       *
            MOVE    ZERO            TO  CNT-LINE
                                        CNT-KNS
+                                       CNT-RENNUM
+      *
+           MOVE    ZERO            TO  KEY-PTID
+           MOVE    LOW-VALUE       TO  KEY-SRYCD
       *
       *    患者対象データ検索処理
            PERFORM 910-PTSRH-ODR-SEL-SEC
@@ -737,6 +752,7 @@
                                        CSV-SRYSURYO
                                        CSV-ZAIKAISU
                                        CSV-SURYOTOTAL
+                                       CSV-SRYYM
       *
            COMPUTE CNT-CSV =   CNT-CSV +   1
            IF    ( CNT-CSV =   1 )
@@ -750,7 +766,14 @@
                MOVE    SPACE       TO  CSV-SRYYMD (IDXD)
            END-PERFORM
       *
-           MOVE    CNT-KNS         TO  CSV-NO
+           IF    ( PTSRH-PTID  NOT =   KEY-PTID  )
+            OR   ( PTSRH-SRYCD NOT =   KEY-SRYCD )
+               COMPUTE CNT-RENNUM  =   CNT-RENNUM  +   1
+               MOVE    PTSRH-PTID  TO  KEY-PTID
+               MOVE    PTSRH-SRYCD TO  KEY-SRYCD
+           END-IF
+      *
+           MOVE    CNT-RENNUM      TO  CSV-NO
            MOVE    PTSRH-PTNUM
                                    TO  CSV-PTNUM
            MOVE    PTINF-NAME
@@ -794,8 +817,13 @@
            PERFORM 8001-SURYOTOTAL-EDIT-SEC
            MOVE    WRK-SURYOTOTALX TO  CSV-SURYOTOTAL
       *
+           MOVE    PTSRH-SRYYM(1:4)
+                                   TO  CSV-SRYYM (1:4)
+           MOVE    "/"             TO  CSV-SRYYM (5:1)
+           MOVE    PTSRH-SRYYM(5:2) TO  CSV-SRYYM (6:2)
+      *
            MOVE    ZERO            TO  IDXA
-           MOVE    BQ01-SRYYM      TO  WRK-SRYYM
+           MOVE    PTSRH-SRYYM     TO  WRK-SRYYM
            PERFORM VARYING IDXD    FROM    1   BY  1
                    UNTIL ( IDXD    >   31 )
       *
@@ -883,7 +911,65 @@
       *
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
       *
-           MOVE    CNT-KNS         TO  WRK-ZZZZ9
+           MOVE    ZERO        TO  FLG-EDIT
+           IF    ( CNT-LINE    =   1 )
+               MOVE    1       TO  FLG-EDIT
+           END-IF
+      *
+           IF    ( PTSRH-PTID  NOT =   KEY-PTID  )
+            OR   ( PTSRH-SRYCD NOT =   KEY-SRYCD )
+               MOVE    1       TO  FLG-EDIT
+               COMPUTE CNT-RENNUM  =   CNT-RENNUM  +   1
+               MOVE    PTSRH-PTID  TO  KEY-PTID
+               MOVE    PTSRH-SRYCD TO  KEY-SRYCD
+           END-IF
+      *
+           IF    ( FLG-EDIT        =   1 )
+               PERFORM 8001-PRT-EDIT-SEC
+           END-IF
+      *
+           MOVE    PTSRH-SRYYM     TO  WRK-SYMD
+           MOVE    "01"            TO  WRK-SYMD(7:2)
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-HENYMDG1    TO  HC28-SRYYM (CNT-LINE)
+      *
+      *    備考
+           INITIALIZE                  WRK-NISSU-DAY-G
+           PERFORM VARYING IDXD    FROM    1   BY  1
+                   UNTIL ( IDXD    >   31 )
+               IF    ( PTSRH-DAY(IDXD)     >   ZERO )
+                   MOVE    1       TO  WRK-NISSU-DAY (IDXD)
+               END-IF
+           END-PERFORM
+           PERFORM 8001-NISSU-HEN-SEC
+           IF    ( WRK-NISSU-MES (47:) NOT =   SPACE )
+               MOVE    WRK-NISSU-MES
+                                   TO  HC28-SRYYMD2(CNT-LINE)
+           ELSE
+               MOVE    WRK-NISSU-MES
+                                   TO  HC28-SRYYMD (CNT-LINE)
+           END-IF
+      *
+           IF  ( CNT-LINE         >=   CONST-LINE )
+      *
+      *        帳票出力処理
+               PERFORM 800-PRT-WRITE-SEC
+      *
+               INITIALIZE              HC28
+               MOVE    ZERO        TO  CNT-LINE
+      *
+      *
+           END-IF
+      *
+           .
+       800-PRT-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    帳票編集処理
+      *****************************************************************
+       8001-PRT-EDIT-SEC               SECTION.
+      *
+           MOVE    CNT-RENNUM      TO  WRK-ZZZZ9
            MOVE    WRK-ZZZZ9       TO  HC28-CD     (CNT-LINE)
            IF    ( PTSRH-PTNUM (11:)   NOT =   SPACE )
               MOVE    PTSRH-PTNUM(1:10)
@@ -916,7 +1002,7 @@
       *
            MOVE    PTSRH-SRYCD     TO  HC28-SRYCD (CNT-LINE)
       *
-           IF    ( PTSRH-SRYNAME (41:) NOT =   SPACE )
+           IF    ( PTSRH-SRYNAME (33:) NOT =   SPACE )
               MOVE    PTSRH-SRYNAME
                                    TO  HC28-SRYNAME2(CNT-LINE)
            ELSE
@@ -936,41 +1022,15 @@
            PERFORM 8001-SURYOTOTAL-EDIT-SEC
            MOVE    WRK-SURYOTOTALX TO  HC28-SURYOTOTAL (CNT-LINE)
       *
-      *    備考
-           INITIALIZE  WRK-NISSU-AREA
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-               IF    ( PTSRH-DAY(IDXD)     >   ZERO )
-                   MOVE    1       TO  WRK-NISSU-DAY (IDXD)
-               END-IF
-           END-PERFORM
-           PERFORM 8001-NISSU-HEN-SEC
-           IF    ( WRK-NISSU-MES (47:) NOT =   SPACE )
-               MOVE    WRK-NISSU-MES
-                                   TO  HC28-SRYYMD2(CNT-LINE)
-           ELSE
-               MOVE    WRK-NISSU-MES
-                                   TO  HC28-SRYYMD (CNT-LINE)
-           END-IF
-      *
-           IF  ( CNT-LINE         >=   CONST-LINE )
-      *
-      *        帳票出力処理
-               PERFORM 800-PRT-WRITE-SEC
-      *
-               INITIALIZE              HC28
-               MOVE    ZERO        TO  CNT-LINE
-      *
-      *
-           END-IF
-      *
            .
-       800-PRT-EDIT-EXT.
+       8001-PRT-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    日数編集処理
       *****************************************************************
        8001-NISSU-HEN-SEC            SECTION.
+      *
+           INITIALIZE  WRK-NISSU-AREA
       *
            MOVE    1                   TO  WRK-NISSU-PTR
            MOVE    1                   TO  WRK-NISSU-ST
@@ -1308,6 +1368,15 @@
       *
       *        患者マスタ読込処理
                PERFORM 910-PTSRH-ODR-FET-SEC
+      *
+               IF    ( PTSRH-PTID  NOT =   KEY-PTID  )
+                OR   ( PTSRH-SRYCD NOT =   KEY-SRYCD )
+      *
+                   COMPUTE CNT-RENNUM  =   CNT-RENNUM  +   1
+                   MOVE    PTSRH-PTID  TO  KEY-PTID
+                   MOVE    PTSRH-SRYCD TO  KEY-SRYCD
+      *
+               END-IF
       *
            END-PERFORM
       *

@@ -61,14 +61,19 @@
            03  PTSRH-MEMO-G.
                05  PTSRH-MEMO         PIC X(200).
                05  PTSRH-MEMO-R       REDEFINES    PTSRH-MEMO.
-                   07  PTSRH-SRYSURYO     PIC 9(05)V9(05).
-                   07  PTSRH-ZAIKAISU     PIC 9(05).
-                   07  PTSRH-SURYOTOTAL   PIC 9(07)V9(05).
+                   07  PTSRH-SRYYM              PIC X(06).
+                   07  PTSRH-SRYSURYO           PIC 9(05)V9(05).
+                   07  PTSRH-ZAIKAISU           PIC 9(05).
+                   07  PTSRH-SURYOTOTAL         PIC 9(07)V9(05).
+                   07  PTSRH-SRYYM-SRYSURYO     PIC 9(05)V9(05).
+                   07  PTSRH-SRYYM-ZAIKAISU     PIC 9(05).
+                   07  PTSRH-SRYYM-SURYOTOTAL   PIC 9(07)V9(05).
                    07  PTSRH-SURYO-EDIT
                                       PIC 9(01).
                    07  PTSRH-DAY      PIC 9(03)
                                       OCCURS  31.
-                   07  PTSRH-R1-FIL   PIC X(79).
+                   07  PTSRH-RENNUM   PIC 9(05).
+                   07  PTSRH-R1-FIL   PIC X(41).
       *データ区分
            03  PTSRH-DATAKBN      PIC X(1).
       *作成日
@@ -84,4 +89,7 @@
            03  PTSRH-SQL          PIC X(15000).
       *DBESCAPEENCODING
            03  PTSRH-DBSTR        PIC X(500).
+      *件数
+           03  PTSRH-KENSU        PIC 9(08).
+
 

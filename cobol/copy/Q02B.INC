@@ -45,6 +45,7 @@
                     07  Q02B-KEKKALST-SRYSURYO  PIC X(11).
                     07  Q02B-KEKKALST-ZAIKAISU  PIC X(05).
                     07  Q02B-KEKKALST-SURYOTOTAL PIC X(13).
+                    07  Q02B-KEKKALST-SRYYM     PIC X(10).
                     07  Q02B-KEKKALST-MEMO      PIC X(200).
                   06  Q02B-KEKKALST-SELECT      PIC X
                                            OCCURS  200 TIMES.
