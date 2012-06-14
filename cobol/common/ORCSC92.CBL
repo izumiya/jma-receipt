@@ -4963,7 +4963,8 @@
       *****************************************************************
        400-GYOINSN-SEC                 SECTION.
       *
-           IF      SPA-GMN-INPUTCD (200)   NOT =   SPACE
+      *****IF      SPA-GMN-INPUTCD (200)   NOT =   SPACE
+           IF      SPA-GMN-INPUTCD (SPA-MAX-LINE)   NOT =   SPACE
                MOVE    "0007"          TO  SPA-ERRCD
                GO      TO      400-GYOINSN-EXT
            END-IF
