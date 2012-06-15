@@ -430,7 +430,7 @@
       <class>GtkPandaEntry</class>
       <name>SRYYM</name>
       <x>280</x>
-      <y>30</y>
+      <y>38</y>
       <width>150</width>
       <height>24</height>
       <sensitive>False</sensitive>
@@ -543,7 +543,7 @@
       <class>GtkLabel</class>
       <name>label507</name>
       <x>200</x>
-      <y>30</y>
+      <y>40</y>
       <width>60</width>
       <height>18</height>
       <label>∞Ï≥Á∫Ó¿Æ</label>
@@ -1072,8 +1072,24 @@
       <class>GtkLabel</class>
       <name>TITLE</name>
       <x>50</x>
-      <y>8</y>
+      <y>2</y>
       <width>780</width>
+      <height>18</height>
+      <label>£±£≤£≥£¥£µ£∂£∑£∏£π£∞£±£≤£≥£¥£µ£∂£∑£∏£π£∞£±£≤£≥£¥£µ£∂£∑£∏£π£∞£±£≤£≥£¥£µ£∂£∑£∏£π£∞£±£≤£≥£¥£µ</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>TITLE1</name>
+      <x>50</x>
+      <y>19</y>
+      <width>690</width>
       <height>18</height>
       <label>£±£≤£≥£¥£µ£∂£∑£∏£π£∞£±£≤£≥£¥£µ£∂£∑£∏£π£∞£±£≤£≥£¥£µ£∂£∑£∏£π£∞£±£≤£≥£¥£µ£∂£∑£∏£π£∞£±£≤£≥£¥£µ</label>
       <justify>GTK_JUSTIFY_CENTER</justify>

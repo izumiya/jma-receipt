@@ -150,6 +150,8 @@
       *                                     の変更に伴う月後れ分のチェック
       *
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.02    NACL-藤原    12/06/15  点検レセ０点公費と未請求解除
+      *                                     のメッセージ表示を別にする 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1072,9 +1074,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYUKA-HOSPNUM
            PERFORM 900-SYUKA-READ-SEC
            IF      FLG-SYUKA       =   ZERO
                MOVE    "未実施の未請求解除データがあります"
-                                       TO  SPA-GMN-TITLE    
+                                       TO  SPA-GMN-TITLE1    
            ELSE
-               MOVE    SPACE           TO  SPA-GMN-TITLE
+               MOVE    SPACE           TO  SPA-GMN-TITLE1
            END-IF
       *
            .
@@ -2580,6 +2582,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
            IF      SPA-ERRCD       NOT =   SPACE
                MOVE    SPACE           TO  SPA-GMN-TITLE
+                                           SPA-GMN-TITLE1
                MOVE    1               TO  SPA-GMN-CUR
            ELSE
                IF      SPA-NAI-SKYYM  NOT =   WRK-SKYYM-OLD
@@ -5404,7 +5407,9 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-GMN-HKNJANUM1   TO  T01-HKNJANUM1
            MOVE    SPA-GMN-HKNJAMEI1   TO  T01-HKNJAMEI1
            MOVE    SPA-GMN-TITLE       TO  T01-TITLE-VALUE
+           MOVE    SPA-GMN-TITLE1      TO  T01-TITLE1-VALUE
            MOVE   "red"                TO  T01-TITLE-STYLE
+                                           T01-TITLE1-STYLE
       *
            MOVE    SPA-B06-STATE       TO  T01-B06-STATE
            MOVE    SPA-B07-STATE       TO  T01-B07-STATE

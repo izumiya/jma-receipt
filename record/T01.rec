@@ -156,5 +156,9 @@ T01	{
 			style	varchar(20);
 			value	varchar(110);
 		};
+		TITLE1	{
+			style	varchar(20);
+			value	varchar(90);
+		};
 	};
 };

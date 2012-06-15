@@ -84,3 +84,5 @@
               03  T01-PRTKBN5-VALUE   PIC X(4).
               03  T01-TITLE-STYLE     PIC X(20).
               03  T01-TITLE-VALUE     PIC X(110).
+              03  T01-TITLE1-STYLE    PIC X(20).
+              03  T01-TITLE1-VALUE    PIC X(90).
