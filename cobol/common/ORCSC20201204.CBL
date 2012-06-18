@@ -1776,6 +1776,45 @@
                END-IF
            END-IF
       *
+      *H24.6
+      *    処方せん料の入力があり一般名処方加算なし
+           IF     (IDX-SYOHOU      NOT =   ZERO )
+             AND  (FLG-IPPANKSN        =   ZERO )
+             AND  (SPA-ERRCD           =   SPACE)
+             AND  (FLG-GENERIC-OK      =   1    )
+      *        処方せん料の入力があり、一般名加算対象
+               IF     (WRK-COM-KZMFLG2 (IDX-SYOHOU) =   SPACE) AND
+                      (LNK-ORCSC-KEI-IDX       =   ZERO )
+                   MOVE    "K236"          TO  SPA-ERRCD
+                   MOVE    "1"             TO  WRK-COM-CUR
+                                                        (IDX-SYOHOU)
+                   MOVE    "1"             TO  WRK-COM-KZMFLG2
+                                                        (IDX-SYOHOU)
+                   MOVE    IDX-SYOHOU      TO  LNK-ORCSC-KEI-IDX
+                END-IF
+           END-IF
+      *    手入力した一般名加算のチェック
+           IF     (FLG-IPPANKSN        =   1   )
+             AND  (SPA-ERRCD           =   SPACE)
+             AND ((FLG-NAIYAK2         =   1    )  OR
+                  (FLG-TONPUK2         =   1    )  OR
+                  (FLG-GAIYAK2         =   1    ))
+      *        一般名加算と院外投薬あり
+               IF      FLG-GENERIC-OK      =   ZERO
+      *            一般名加算投薬なし
+                   IF     (WRK-COM-KZMFLG (IDX-IP) =   SPACE) AND
+                          (LNK-ORCSC-KEI-IDX       =   ZERO )
+                       MOVE    "K235"          TO  SPA-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                              (IDX-IP)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                              (IDX-IP)
+                       MOVE    IDX-IP          TO  LNK-ORCSC-KEI-IDX
+                   END-IF
+               END-IF
+           END-IF
+      *!!!!
+      *
            IF      LNK-ORCSC-PG        =   "K02"
                                        OR  "KT02"
                MOVE    WRK-HENSYU-MEISYO   TO  SPA-SYOHO-MEI
