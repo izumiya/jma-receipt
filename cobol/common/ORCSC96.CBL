@@ -2682,6 +2682,21 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+      *H24.6
+               WHEN    "K235"
+                   STRING  "警告！"
+                           "一般名処方加算（処方せん料）の対象薬剤が"
+                           "ありません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K236"
+                   STRING  "警告！"
+                           "一般名処方加算（処方せん料）の算定が可能"
+                           "です。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    OTHER
                    MOVE    SPA-ERRCD
                                        TO  SPA-ERRMSG
