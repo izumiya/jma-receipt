@@ -562,6 +562,7 @@
       *  04.05.65    NACL-ÌçÏÆ    12/06/05  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
       *  04.05.66    NACL-ÌçÏÆ    12/06/05  »³Íü¸©£´£±Ï·¿ÍÂÐ±þ
       *  04.05.67    NACL-ÌçÏÆ    12/06/07  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.68    NACL-ÌçÏÆ    12/06/15  °¦ÃÎ¡¦°¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -773,6 +774,7 @@
            03  FLG-JIRITU-CYUKANSOU1                   PIC 9(01).
            03  FLG-JIRITU-CYUKANSOU2                   PIC 9(01).
            03  FLG-DOJITU                              PIC 9(01).
+           03  FLG-NISYU-KOREI                         PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1577,6 +1579,7 @@
            03  WRK-CYOKI-KEISAN                PIC 9(09).
            03  WRK-CYOKI-KEISAN2               PIC 9(09).
            03  WRK-CYOKI-KEISAN3               PIC 9(09).
+           03  WRK-CYOKI-KEISAN4               PIC 9(09).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).
@@ -18339,11 +18342,6 @@
                   IF   (FLG-KEISAN-TOK1        =   1     )
                   AND  (FLG-KEISAN-TOK2        =   1     )
                   AND  (FLG-ZENKOKUKOHI-NISYU  =   2 OR 4)
-                      IF  WRK-PREFNUM  =  "27"
-                        CONTINUE
-                      ELSE
-                        MOVE   ZERO      TO  FLG-ZENKOKUKOHI-NISYU
-                      END-IF
                       MOVE  FTN-KOH-XX7  TO  RECE62-KOUREI-SAIKEI2
                       COMPUTE WRK-CYOKI-KEISAN  = RECE62-FTNMONEY(1)
                                                 - WRK-KOH-GAI2
@@ -18353,10 +18351,24 @@
                         COMPUTE WRK-CYOKI-KEISAN3 = WRK-CYOKI-KEISAN
                                                   - FTN-KOH-XXX
                         IF  WRK-CYOKI-KEISAN3  <  FTN-KOH-XX7
-                          MOVE  WRK-CYOKI-KEISAN3
-                                        TO   RECE62-KOUREI-SAIKEI2
-                          IF    WRK-CYOKI-KEISAN3  = ZERO
-                             MOVE   1   TO   RECE62-YOBIETC(7)
+      *                   °¦É²¸©
+                          IF   WRK-PREFNUM  =  "38"
+                            COMPUTE WRK-CYOKI-KEISAN4
+                                                  = FTN-KOH-XX7
+                                                  - WRK-CYOKI-KEISAN3
+                            ADD   WRK-CYOKI-KEISAN4
+                                          TO   RECE62-FTNMONEY(1)
+                            IF     FLG-KOH  =   2
+                              ADD WRK-CYOKI-KEISAN4
+                                          TO   RECE62-FTNMONEY(2)
+                                               RECE62-FTNMONEY-KOJ(2)
+                            END-IF
+                          ELSE
+                            MOVE  WRK-CYOKI-KEISAN3
+                                          TO   RECE62-KOUREI-SAIKEI2
+                            IF    WRK-CYOKI-KEISAN3  = ZERO
+                               MOVE   1   TO   RECE62-YOBIETC(7)
+                            END-IF
                           END-IF
                         END-IF
                       END-IF
@@ -18582,6 +18594,46 @@
              END-IF
             END-IF
       *
+            IF  (RECE62-SRYYM        >=  "200804")
+            AND (RECE62-KOUREI        =  "1"     )
+              IF  ((RECE62-TEISYUTUSAKI  =   6                  ) AND
+                   (WRK-PREFNUM          = "10" OR "45" OR "23"
+                                        OR "27" OR "28" OR "38" ))
+              OR  ((RECE62-TEISYUTUSAKI  =   2                  ) AND
+                   (WRK-PREFNUM          = "38"                 ))
+                 COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
+                                           + RECE62-HENTOTALTEN(3)
+                 IF  (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
+                       (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
+                      ( TBL-TOKATUKAIFLG(1)   =  1              ) )
+                 AND (RECE62-KOHNUM(2)(1:1)  >= "1" AND <= "8"    )
+                 AND (TBL-TOKATUKAIFLG(2)     = ZERO              )
+                 AND (RECE62-KOHNUM(3)        = SPACE             )
+                 AND (RECE62-KOHNUM(4)        = SPACE             )
+                 AND (RECE62-HKNCOMBI(2)  NOT = ZERO              )
+                 AND (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(2))
+                 AND ((RECE62-TOTALTEN(1)   =  WRK-CHK-KOKIGAK4 ) OR
+                      (RECE62-TOTALTEN(1)   =
+                                           RECE62-HENTOTALTEN(3)) )
+                   IF   FLG-ZENKOKUKOHI-NISYU  =  ZERO
+                     MOVE     1       TO   FLG-CHIIKI
+                     IF   RECE62-KYURATE   NOT =    30
+                        PERFORM  210466-HOKEN-ICHIBUFTN-CHK-SEC
+                     ELSE
+                        PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
+                     END-IF
+                   ELSE
+                     MOVE     3       TO   FLG-CHIIKI
+                     IF   RECE62-KYURATE   NOT =    30
+                        PERFORM  210466-HOKEN-ICHIBUFTN-CHK-SEC
+                     ELSE
+                        PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
+                     END-IF
+                   END-IF
+                 END-IF
+              END-IF
+            END-IF
+      *
             EVALUATE   WRK-PREFNUM
       *      ·²ÇÏ¸©ÃÏÊý¸øÈñ
              WHEN    "10"
@@ -18612,28 +18664,6 @@
                      END-IF
                    END-IF
                    MOVE  999999999  TO   RECE62-KOUREI-SAIKEI
-                 END-IF
-                 COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
-                                           + RECE62-HENTOTALTEN(3)
-                 IF  (RECE62-KOHNUM(1)(1:1)  = "0"               )
-                 AND (RECE62-KOHNUM(1)   NOT =  "012" AND "025"  )
-                 AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
-                 AND (RECE62-KOHNUM(3)       = SPACE             )
-                 AND (RECE62-KOHNUM(4)       = SPACE             )
-                 AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
-                 AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
-                 AND ((RECE62-TOTALTEN(1)  = WRK-CHK-KOKIGAK4  ) OR
-                      (RECE62-TOTALTEN(1)  =
-                                          RECE62-HENTOTALTEN(3)) )
-                 AND (RECE62-TEISYUTUSAKI  =    6                )
-                 AND (RECE62-KOUREI        =   "1"               )
-                      IF   RECE62-KYURATE   NOT =    30
-                          MOVE     1       TO   FLG-CHIIKI
-                          PERFORM  210466-HOKEN-ICHIBUFTN-CHK-SEC
-                      ELSE
-                          MOVE     1       TO   FLG-CHIIKI
-                          PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
-                      END-IF
                  END-IF
                END-IF
       *      °¦É²¸©ÃÏÊý¸øÈñ
@@ -18709,54 +18739,6 @@
                    END-IF
                  END-IF
                END-IF
-      *      °¦ÃÎ¸©ÃÏÊý¸øÈñ
-      *      Ê¼¸Ë¸©ÃÏÊý¸øÈñ
-             WHEN    "23"
-             WHEN    "28"
-               IF   FLG-ZENKOKUKOHI-NISYU  =  2
-                 COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
-                                           + RECE62-HENTOTALTEN(3)
-                 IF  (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
-                 AND ((RECE62-TOTALTEN(1)  = WRK-CHK-KOKIGAK4  ) OR
-                      (RECE62-TOTALTEN(1)  =
-                                          RECE62-HENTOTALTEN(3)) )
-                      IF   RECE62-KYURATE   NOT =    30
-                          MOVE     2       TO   FLG-CHIIKI
-                          PERFORM  210466-HOKEN-ICHIBUFTN-CHK-SEC
-                      ELSE
-                          MOVE     2       TO   FLG-CHIIKI
-                          PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
-                      END-IF
-                 END-IF
-               END-IF
-      *      µÜºê¸©ÃÏÊý¸øÈñ
-             WHEN    "45"
-               IF  (RECE62-SRYYM        >=  "200804"  )
-               AND (RECE62-TEISYUTUSAKI  =   2  OR  6 )
-               AND (RECE62-KOUREI        =  "1" OR "2")
-                 COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
-                                           + RECE62-HENTOTALTEN(3)
-                 IF  (RECE62-KOHNUM(1)(1:1)  = "0"               )
-                 AND (RECE62-KOHNUM(1)   NOT =  "012" AND "025"  )
-                 AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
-                 AND (RECE62-KOHNUM(3)       = SPACE             )
-                 AND (RECE62-KOHNUM(4)       = SPACE             )
-                 AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
-                 AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
-                 AND ((RECE62-TOTALTEN(1)  = WRK-CHK-KOKIGAK4  ) OR
-                      (RECE62-TOTALTEN(1)  =
-                                          RECE62-HENTOTALTEN(3)) )
-                 AND (RECE62-TEISYUTUSAKI  =    6                )
-                 AND (RECE62-KOUREI        =   "1"               )
-                      IF   RECE62-KYURATE   NOT =    30
-                          MOVE     1       TO   FLG-CHIIKI
-                          PERFORM  210466-HOKEN-ICHIBUFTN-CHK-SEC
-                      ELSE
-                          MOVE     1       TO   FLG-CHIIKI
-                          PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
-                      END-IF
-                 END-IF
-               END-IF
       *      ÅìµþÅÔÃÏÊý¸øÈñ
              WHEN    "13"
                IF  (RECE62-SRYYM        >=  "200804" )
@@ -18787,34 +18769,30 @@
                    END-IF
                  END-IF
                END-IF
+      *      °¦ÃÎ¸©ÃÏÊý¸øÈñ
       *      ÂçºåÉÜÃÏÊý¸øÈñ
+             WHEN    "23"
              WHEN    "27"
-               IF  (FLG-ZENKOKUKOHI-NISYU  =  2)
-               AND (RECE62-TEISYUTUSAKI    =  6)
-                 COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
-                                           + RECE62-HENTOTALTEN(3)
-                 IF  (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
-                 AND ((RECE62-TOTALTEN(1)  = WRK-CHK-KOKIGAK4  ) OR
-                      (RECE62-TOTALTEN(1)  =
-                                          RECE62-HENTOTALTEN(3)) )
-                      IF   RECE62-KYURATE   NOT =    30
-                          MOVE     3       TO   FLG-CHIIKI
-                          PERFORM  210466-HOKEN-ICHIBUFTN-CHK-SEC
-                      ELSE
-                          MOVE     3       TO   FLG-CHIIKI
-                          PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
-                      END-IF
-                 END-IF
-               END-IF
-               IF  (FLG-ZENKOKUKOHI-NISYU  =  2 OR 3)
-               AND (RECE62-TEISYUTUSAKI    =  2 OR 6)
-                 IF  ((RECE62-KOHNUM(1)(1:1)  =  "0"              ) AND
-                      (RECE62-KOHNUM(2)(1:1) >=  "1" AND <= "8"   ) AND
-                      (RECE62-TOTALTEN(1) =  RECE62-HENTOTALTEN(3)))
-                 OR  ((RECE62-KOHNUM(1)(1:1)  =  "0"              ) AND
-                      (RECE62-KOHNUM(2)       =  "972" OR "974"   ) AND
-                      (RECE62-KOHNUM(3)(1:1) >=  "1" AND <= "8"   ) AND
-                      (RECE62-TOTALTEN(1) =  RECE62-HENTOTALTEN(4)))
+               IF  (FLG-ZENKOKUKOHI-NISYU  =   2 OR 3)
+               AND (RECE62-TEISYUTUSAKI    =   2 OR 6)
+               AND (RECE62-KOUREI          =  "1"    )
+                 IF ((((RECE62-KOHNUM(1)(1:1)  =  "0"            ) AND
+                       (RECE62-KOHNUM(1)   NOT =  "012" AND "025")) OR
+                      ( TBL-TOKATUKAIFLG(1)    =   1              )) AND
+                     (  RECE62-KOHNUM(2)(1:1) >=  "1" AND <= "8"   ) AND
+                     (  TBL-TOKATUKAIFLG(2)    =  ZERO             ) AND
+                     (  RECE62-TOTALTEN(1) =  RECE62-HENTOTALTEN(3)))
+                 OR ((  RECE62-KOHNUM(1)(1:1)  =  "0"              ) AND
+                     (  RECE62-KOHNUM(1)   NOT =  "012" AND "025"  ) AND
+                     (  RECE62-KOHNUM(2)       =  "972" OR "974"   ) AND
+                     (  RECE62-KOHNUM(3)(1:1) >=  "1" AND <= "8"   ) AND
+                     (  TBL-TOKATUKAIFLG(3)    =  ZERO             ) AND
+                     (  RECE62-TOTALTEN(1) =  RECE62-HENTOTALTEN(4)))
+                 OR ((  RECE62-KOHNUM(1)       =  "972" OR "974"   ) AND
+                     (  TBL-TOKATUKAIFLG(2)    =   1               ) AND
+                     (  RECE62-KOHNUM(3)(1:1) >=  "1" AND <= "8"   ) AND
+                     (  TBL-TOKATUKAIFLG(3)    =  ZERO             ) AND
+                     (  RECE62-TOTALTEN(1) =  RECE62-HENTOTALTEN(4)))
                    IF   FLG-KOH  =   2
                      COMPUTE  WRK-CHK-KOKIGAK8  =  RECE62-FTNMONEY(2)
                                                 -  WRK-KOH-GAI
@@ -20500,39 +20478,27 @@
                      (TBL-TOKATUKAIFLG(3)    =  ZERO           )) OR
                     ( RECE62-KOHNUM(3)       =  SPACE           ) OR
                     ( RECE62-KOHNUM(3)       =  "972" OR "974"  ))
-      ***         IF  (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(2))
-      ***         AND (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(3))
                      MOVE      1       TO     FLG-ZENKOKUKOHI-NISYU
-      ***         END-IF
                END-IF
       *
                IF  (RECE62-KOHNUM(1)(1:1)  =  "0"                )
                AND (RECE62-KOHNUM(1)   NOT =  "012" AND "025"    )
                AND (RECE62-KOHNUM(2)       =  "972" OR "974"     )
                AND (TBL-TOKATUKAIFLG(3)    =   1                 )
-      ***         IF  (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(2))
-      ***         AND (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(4))
                      MOVE      8       TO     FLG-ZENKOKUKOHI-NISYU
-      ***         END-IF
                END-IF
                IF  (RECE62-KOHNUM(1)(1:1)  =  "0"                )
                AND (RECE62-KOHNUM(1)   NOT =  "012" AND "025"    )
                AND (RECE62-KOHNUM(2)       =  "972" OR "974"     )
                AND (RECE62-KOHNUM(3)(1:1)  =  "0"                )
                AND (RECE62-KOHNUM(3)   NOT =  "012" AND "025"    )
-      ***         IF  (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(2))
-      ***         AND (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(4))
                      MOVE      8       TO     FLG-ZENKOKUKOHI-NISYU
-      ***         END-IF
                END-IF
       *
                IF  (RECE62-KOHNUM(1)       =  "972" OR "974"     )
                AND (TBL-TOKATUKAIFLG(2)    =   1                 )
                AND (TBL-TOKATUKAIFLG(3)    =   1                 )
-      ***         IF  (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(3))
-      ***         AND (RECE62-TOTALTEN(1)  NOT = RECE62-TOTALTEN(4))
                      MOVE      9       TO     FLG-ZENKOKUKOHI-NISYU
-      ***         END-IF
                END-IF
       *
                IF    RECE62-HKNCOMBI(2)   =   ZERO
@@ -20568,47 +20534,69 @@
       *
              END-IF
       *
-      ***    IF ((WRK-PREFNUM =  "27") AND (RECE62-KOUREI       = "1"))
-      ***    OR ((WRK-PREFNUM =  "28") AND (RECE62-KOUREI       = "1")
-      ***                              AND (RECE62-TEISYUTUSAKI =  6 ))
-             IF  ((RECE62-AGE       >=  70  ) OR
-                  (RECE62-HKNNUM     = "039"))
-             AND ( RECE62-YOBIETC(8) =  ZERO )
-              IF ( WRK-PREFNUM = "27"                               )
-              OR ((WRK-PREFNUM = "28") AND (RECE62-TEISYUTUSAKI = 6))
-              OR ((WRK-PREFNUM = "23") AND (RECE62-TEISYUTUSAKI = 6))
-               IF ((((RECE62-KOHNUM(1)(1:1)  =  "0"            ) AND
-                     (RECE62-KOHNUM(1)   NOT =  "012" AND "025")) OR
-                    ( TBL-TOKATUKAIFLG(1)    =   1              ))  AND
-                   (  RECE62-KOHNUM(2)(1:1) >=  "1" AND <= "8"   )  AND
-                   (  TBL-TOKATUKAIFLG(2)    =  ZERO             ))
-               OR ((  RECE62-KOHNUM(1)(1:1)  =  "0"              )  AND
-                   (  RECE62-KOHNUM(1)   NOT =  "012" AND "025"  )  AND
-                   (  RECE62-KOHNUM(2)       =  "972" OR "974"   )  AND
-                   (  RECE62-KOHNUM(3)(1:1) >=  "1" AND <= "8"   )  AND
-                   (  TBL-TOKATUKAIFLG(3)    =  ZERO             ))
-               OR ((  RECE62-KOHNUM(1)       =  "972" OR "974"   )  AND
-                   (  TBL-TOKATUKAIFLG(2)    =   1               )  AND
-                   (  RECE62-KOHNUM(3)(1:1) >=  "1" AND <= "8"   )  AND
-                   (  TBL-TOKATUKAIFLG(3)    =  ZERO             ))
+             MOVE         ZERO       TO     FLG-NISYU-KOREI
+             IF  ((RECE62-AGE >=  70) OR (RECE62-HKNNUM = "039"))
+             AND ( RECE62-YOBIETC(8)  =   ZERO                  )
+                  MOVE     1         TO     FLG-NISYU-KOREI
+             END-IF
       *
-                  MOVE      2       TO     FLG-ZENKOKUKOHI-NISYU
+             IF ((((RECE62-KOHNUM(1)(1:1)  =  "0"            ) AND
+                   (RECE62-KOHNUM(1)   NOT =  "012" AND "025")) OR
+                  ( TBL-TOKATUKAIFLG(1)    =   1              ))  AND
+                 (  RECE62-KOHNUM(2)(1:1) >=  "1" AND <= "8"   )  AND
+                 (  TBL-TOKATUKAIFLG(2)    =  ZERO             ))
+             OR ((  RECE62-KOHNUM(1)(1:1)  =  "0"              )  AND
+                 (  RECE62-KOHNUM(1)   NOT =  "012" AND "025"  )  AND
+                 (  RECE62-KOHNUM(2)       =  "972" OR "974"   )  AND
+                 (  RECE62-KOHNUM(3)(1:1) >=  "1" AND <= "8"   )  AND
+                 (  TBL-TOKATUKAIFLG(3)    =  ZERO             ))
+             OR ((  RECE62-KOHNUM(1)       =  "972" OR "974"   )  AND
+                 (  TBL-TOKATUKAIFLG(2)    =   1               )  AND
+                 (  RECE62-KOHNUM(3)(1:1) >=  "1" AND <= "8"   )  AND
+                 (  TBL-TOKATUKAIFLG(3)    =  ZERO             ))
       *
-                  IF  WRK-PREFNUM =  "27"
-                     IF    RECE62-HKNCOMBI(2)   =   ZERO
-                       IF  RECE62-TEISYUTUSAKI  =   2 OR 6
-                          MOVE    3       TO   FLG-ZENKOKUKOHI-NISYU
-                       ELSE
-                          MOVE    ZERO    TO   FLG-ZENKOKUKOHI-NISYU
-                       END-IF
-                     END-IF
-                  ELSE
-                     IF    RECE62-HKNCOMBI(2)   =   ZERO
-                          MOVE    ZERO    TO   FLG-ZENKOKUKOHI-NISYU
-                     END-IF
-                  END-IF
+               IF ((WRK-PREFNUM         = "27"           ) AND
+                   (FLG-NISYU-KOREI     =  1             ))
+               OR ((WRK-PREFNUM         = "28"           ) AND
+                   (RECE62-TEISYUTUSAKI =  6             ) AND
+                   (FLG-NISYU-KOREI     =  1             ))
+               OR ((WRK-PREFNUM         = "23"           ) AND
+                   (RECE62-TEISYUTUSAKI =  6             ) AND
+                   (FLG-NISYU-KOREI     =  1             ))
+               OR ((WRK-PREFNUM         = "38"           ) AND
+                   (RECE62-TEISYUTUSAKI =  2 OR 6        ) AND
+                   (FLG-NISYU-KOREI     =  1             ))
+      *
+                  MOVE        2           TO   FLG-ZENKOKUKOHI-NISYU
+                  EVALUATE  WRK-PREFNUM
+                    WHEN        "27"
+                      IF    RECE62-HKNCOMBI(2)   =   ZERO
+                         IF   RECE62-TEISYUTUSAKI  =   2 OR 6
+                           MOVE    3      TO   FLG-ZENKOKUKOHI-NISYU
+                         ELSE
+                           MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU
+                         END-IF
+                      END-IF
+                    WHEN        "23"
+                    WHEN        "28"
+                      IF    RECE62-HKNCOMBI(2)   =   ZERO
+                           MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU
+                      END-IF
+                    WHEN        "38"
+                      IF    RECE62-HKNCOMBI(2)   =   ZERO
+                         IF (RECE62-KOHNUMHC(1 1) = "972" OR "974")
+                         OR (RECE62-KOHNUMHC(1 2) = "972" OR "974")
+                         OR (RECE62-KOHNUMHC(1 3) = "972" OR "974")
+                         OR (RECE62-KOHNUMHC(1 4) = "972" OR "974")
+                           MOVE    3      TO   FLG-ZENKOKUKOHI-NISYU
+                         ELSE
+                           MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU
+                         END-IF
+                      END-IF
+                  END-EVALUATE
+      *
                END-IF
-              END-IF
+      *
              END-IF
       *
              IF   WRK-PREFNUM = "42"
