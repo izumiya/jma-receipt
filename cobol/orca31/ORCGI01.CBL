@@ -13845,7 +13845,6 @@
            PERFORM  910-DBCLOSECURSOR-SEC
       *
       *    食堂加算の再セット
-      *    食堂加算の再セット
            IF    (WRK-SHOKUJI-ASA      =   ZERO)   AND
                  (WRK-SHOKUJI-HIRU     =   ZERO)   AND
                  (WRK-SHOKUJI-YORU     =   ZERO)
@@ -17927,6 +17926,91 @@
                                   TO LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
                  MOVE    "99999999"
                                   TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+      *
+               DISPLAY "STUSAN-NISSU03 = " STUSAN-NISSU03
+               DISPLAY "STUSAN-TAINREL-NISSU = " STUSAN-TAINREL-NISSU
+               IF     STUSAN-NISSU03      NOT =    ZERO
+                 MOVE      ZERO           TO  WRK-STUSAN-NISSU03
+                 COMPUTE   WRK-STUSAN-NISSU03  =   STUSAN-NISSU03  -  1
+      *          開始日１
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 COMPUTE   LNK-DAY6-ZOGEN  =   WRK-STUSAN-NISSU03  * -1
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+      *          終了日１
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 COMPUTE   LNK-DAY6-ZOGEN  =   WRK-STUSAN-NISSU03  * -1
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+      *          開始日２
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 COMPUTE   LNK-DAY6-ZOGEN  =   WRK-STUSAN-NISSU03  * -1
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+      *
+                 IF   LNK-SCNYUACCT-KAGEN-STYUKYMD(1)  <
+                                                SPA-NAI-I01-NYUINYMD
+                      MOVE   SPA-NAI-I01-NYUINYMD  TO
+                                      LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                 END-IF
+                 IF   LNK-SCNYUACCT-KAGEN-STYUKYMD(2)  <
+                                                SPA-NAI-I01-NYUINYMD
+                      MOVE   SPA-NAI-I01-NYUINYMD  TO
+                                      LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+                 END-IF
+      *
+                 IF      LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)  <
+                                                SPA-NAI-I01-NYUINYMD
+                      MOVE  SPACE   TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                                        LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                                        LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                 END-IF
+                 MOVE     ZERO     TO  TN-IDX
+                 IF      (LNK-SCNYUACCT-KAGEN-SRYCD(1)  =   SPACE)  AND
+                         (LNK-SCNYUACCT-KAGEN-SRYCD(2)  NOT =   SPACE)
+                      MOVE  LNK-SCNYUACCT-KAGEN-SRYCD(2)   TO
+                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                      MOVE  LNK-SCNYUACCT-KAGEN-STYUKYMD(2)  TO
+                                        LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                      MOVE  LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)  TO
+                                        LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                      MOVE  SPACE   TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
+                                        LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+                                        LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+                 END-IF
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-STYUKYMD(1) = "
+                          LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-EDYUKYMD(1) = "
+                          LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-STYUKYMD(2) = "
+                          LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-EDYUKYMD(2) = "
+                          LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-STYUKYMD(3) = "
+                          LNK-SCNYUACCT-KAGEN-STYUKYMD(3)
+               END-IF
+      *
            END-IF
       *
       *    精神科急性期治療病棟入院料２
@@ -17962,6 +18046,91 @@
                                   TO LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
                  MOVE    "99999999"
                                   TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+      *
+               DISPLAY "STUSAN-NISSU03 = " STUSAN-NISSU03
+               DISPLAY "STUSAN-TAINREL-NISSU = " STUSAN-TAINREL-NISSU
+               IF     STUSAN-NISSU03      NOT =    ZERO
+                 MOVE      ZERO           TO  WRK-STUSAN-NISSU03
+                 COMPUTE   WRK-STUSAN-NISSU03  =   STUSAN-NISSU03  -  1
+      *          開始日１
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 COMPUTE   LNK-DAY6-ZOGEN  =   WRK-STUSAN-NISSU03  * -1
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+      *          終了日１
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 COMPUTE   LNK-DAY6-ZOGEN  =   WRK-STUSAN-NISSU03  * -1
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+      *          開始日２
+                 INITIALIZE                STS-AREA-DAY
+                 INITIALIZE                LNK-DAY6-AREA
+                 MOVE    "61"              TO  LNK-DAY6-IRAI
+                 MOVE    LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+                                           TO  LNK-DAY6-KIJUN
+                 MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
+                 COMPUTE   LNK-DAY6-ZOGEN  =   WRK-STUSAN-NISSU03  * -1
+                 CALL  "ORCSDAY"           USING   STS-AREA-DAY
+                                                   LNK-DAY6-AREA
+                 MOVE    LNK-DAY6-KEISAN
+                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+      *
+                 IF   LNK-SCNYUACCT-KAGEN-STYUKYMD(1)  <
+                                                SPA-NAI-I01-NYUINYMD
+                      MOVE   SPA-NAI-I01-NYUINYMD  TO
+                                      LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                 END-IF
+                 IF   LNK-SCNYUACCT-KAGEN-STYUKYMD(2)  <
+                                                SPA-NAI-I01-NYUINYMD
+                      MOVE   SPA-NAI-I01-NYUINYMD  TO
+                                      LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+                 END-IF
+      *
+                 IF      LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)  <
+                                                SPA-NAI-I01-NYUINYMD
+                      MOVE  SPACE   TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                                        LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                                        LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                 END-IF
+                 MOVE     ZERO     TO  TN-IDX
+                 IF      (LNK-SCNYUACCT-KAGEN-SRYCD(1)  =   SPACE)  AND
+                         (LNK-SCNYUACCT-KAGEN-SRYCD(2)  NOT =   SPACE)
+                      MOVE  LNK-SCNYUACCT-KAGEN-SRYCD(2)   TO
+                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                      MOVE  LNK-SCNYUACCT-KAGEN-STYUKYMD(2)  TO
+                                        LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                      MOVE  LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)  TO
+                                        LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                      MOVE  SPACE   TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
+                                        LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+                                        LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+                 END-IF
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-STYUKYMD(1) = "
+                          LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-EDYUKYMD(1) = "
+                          LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-STYUKYMD(2) = "
+                          LNK-SCNYUACCT-KAGEN-STYUKYMD(2)
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-EDYUKYMD(2) = "
+                          LNK-SCNYUACCT-KAGEN-EDYUKYMD(2)
+                 DISPLAY "LNK-SCNYUACCT-KAGEN-STYUKYMD(3) = "
+                          LNK-SCNYUACCT-KAGEN-STYUKYMD(3)
+               END-IF
+      *
            END-IF
       *
       *-------特定入院対応ここまで-----------------------------------
@@ -28069,10 +28238,10 @@
                MOVE    "月途中の入金（請求）を取消してください"
                                        TO  SPA-ERRMSG (41 : )
            WHEN    "1029"
-               MOVE    "異動月の会計テーブルが作成されていません"
+               MOVE    "異動月の入院会計が作成されていません"
                                        TO  SPA-ERRMSG
            WHEN    "1030"
-               MOVE    "退院月の会計テーブルが作成されていません"
+               MOVE    "退院月の入院会計が作成されていません"
                                        TO  SPA-ERRMSG
            WHEN    "1031"
                MOVE    "前歴の自院歴が「入院中」です。前歴の継続"
@@ -28120,7 +28289,7 @@
                MOVE    "り新規に作成してください"
                                        TO  SPA-ERRMSG (41 : )
            WHEN    "1042"
-               MOVE    "異動月前月の会計テーブルが作成されていません"
+               MOVE    "異動月前月の入院会計が作成されていません"
                                        TO  SPA-ERRMSG
            WHEN    "1043"
                MOVE    "異動日を７月１日にし、転科転棟転室処理を"
