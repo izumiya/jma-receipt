@@ -373,6 +373,8 @@
       *  04.05.39    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.40    NACL-ÌçÏÆ    12/05/30  ºÒ³²ÂÐ±þ¡ÊÆü¸ÛÆÃÎãÈïÊÝ¸±¼Ô¡Ë
       *  04.05.41    NACL-ÌçÏÆ    12/06/05  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.42    NACL-ÌçÏÆ    12/06/19  ÂçºåÉÜÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
+      *                                     ¹­Åç¸©ÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/09/02  ½Ð»º°é»ù°ì»þ¶âÄ¾ÀÜ»ÙÊ§À©ÅÙ¡Ê³°Íè¡Ë
       *  04.06.02    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
@@ -466,6 +468,12 @@
            03  WK-CYOKI-ZAN-XXX        PIC 9(08).
            03  WK-HIKAKU-KINGAKU       PIC 9(07).
            03  WK-KEISAN-FTNRATE       PIC 9(03).
+      *
+           03  WK-CYOKI-HIKAKU1        PIC 9(08).
+           03  WK-CYOKI-HIKAKU2        PIC 9(08).
+           03  WK-CYOKI-HIKAKU3        PIC 9(08).
+           03  WK-CYOKI-HIKAKU9        PIC 9(08).
+      *
       *    Ä´À°¶âºÆ·×»»
            03  WRK-SYU-CHOSEI          PIC S9(07).
            03  WRK-SYU-CHOSEI2         PIC S9(07).
@@ -19339,38 +19347,109 @@
       ******************************************************************
        23081-ZANOKIKAE-HENSYU1-SEC           SECTION.
       *
+           IF   FLG-TOKU75 = 1 OR 2
+             MOVE     1000    TO   WK-CYOKI-HIKAKU9
+           ELSE
+             MOVE     2000    TO   WK-CYOKI-HIKAKU9
+           END-IF
+      *
            IF   COMB-KOH2HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI1  >  ZAN-KOHI2
-                 MOVE   ZAN-KOHI2   TO  ZAN-KOHI1
-              END-IF
-              IF   ZAN-KOHI12 >  ZAN-KOHI22
-                 MOVE   ZAN-KOHI22  TO  ZAN-KOHI12
-              END-IF
-              IF   ZAN-KOHI13 >  ZAN-KOHI23
-                 MOVE   ZAN-KOHI23  TO  ZAN-KOHI13
+      *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
+              IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
+              AND  (FLG-SANSHOU3              NOT =  SPACE)
+                 IF   ZAN-KOHI2   >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI2
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU1
+                 END-IF
+                 IF   ZAN-KOHI22  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU2 = ZAN-KOHI22
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU2
+                 END-IF
+                 IF   ZAN-KOHI23  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU3 = ZAN-KOHI23
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU3
+                 END-IF
+              ELSE
+                 MOVE   ZAN-KOHI2   TO   WK-CYOKI-HIKAKU1
+                 MOVE   ZAN-KOHI22  TO   WK-CYOKI-HIKAKU2
+                 MOVE   ZAN-KOHI23  TO   WK-CYOKI-HIKAKU3
               END-IF
            END-IF
            IF   COMB-KOH3HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI1  >  ZAN-KOHI3
-                 MOVE   ZAN-KOHI3   TO  ZAN-KOHI1
-              END-IF
-              IF   ZAN-KOHI12 >  ZAN-KOHI32
-                 MOVE   ZAN-KOHI32  TO  ZAN-KOHI12
-              END-IF
-              IF   ZAN-KOHI13 >  ZAN-KOHI33
-                 MOVE   ZAN-KOHI33  TO  ZAN-KOHI13
+      *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
+              IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
+              AND  (FLG-SANSHOU3              NOT =  SPACE)
+                 IF   ZAN-KOHI3   >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI3
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU1
+                 END-IF
+                 IF   ZAN-KOHI32  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU2 = ZAN-KOHI32
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU2
+                 END-IF
+                 IF   ZAN-KOHI33  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU3 = ZAN-KOHI33
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU3
+                 END-IF
+              ELSE
+                 MOVE   ZAN-KOHI3   TO   WK-CYOKI-HIKAKU1
+                 MOVE   ZAN-KOHI32  TO   WK-CYOKI-HIKAKU2
+                 MOVE   ZAN-KOHI33  TO   WK-CYOKI-HIKAKU3
               END-IF
            END-IF
            IF   COMB-KOH4HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI1  >  ZAN-KOHI4
-                 MOVE   ZAN-KOHI4   TO  ZAN-KOHI1
+      *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
+              IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
+              AND  (FLG-SANSHOU3              NOT =  SPACE)
+                 IF   ZAN-KOHI4   >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI4
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU1
+                 END-IF
+                 IF   ZAN-KOHI42  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU2 = ZAN-KOHI42
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU2
+                 END-IF
+                 IF   ZAN-KOHI43  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU3 = ZAN-KOHI43
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU3
+                 END-IF
+              ELSE
+                 MOVE   ZAN-KOHI4   TO   WK-CYOKI-HIKAKU1
+                 MOVE   ZAN-KOHI42  TO   WK-CYOKI-HIKAKU2
+                 MOVE   ZAN-KOHI43  TO   WK-CYOKI-HIKAKU3
               END-IF
-              IF   ZAN-KOHI12 >  ZAN-KOHI42
-                 MOVE   ZAN-KOHI42  TO  ZAN-KOHI12
-              END-IF
-              IF   ZAN-KOHI13 >  ZAN-KOHI43
-                 MOVE   ZAN-KOHI43  TO  ZAN-KOHI13
-              END-IF
+           END-IF
+      *
+           IF  (COMB-KOH2HKNNUM  =  "972" OR "974")
+           OR  (COMB-KOH3HKNNUM  =  "972" OR "974")
+           OR  (COMB-KOH4HKNNUM  =  "972" OR "974")
+             IF   ZAN-KOHI1  >  WK-CYOKI-HIKAKU1
+                 MOVE   WK-CYOKI-HIKAKU1   TO  ZAN-KOHI1
+             END-IF
+             IF   ZAN-KOHI12 >  WK-CYOKI-HIKAKU2
+                 MOVE   WK-CYOKI-HIKAKU2   TO  ZAN-KOHI12
+             END-IF
+             IF   ZAN-KOHI13 >  WK-CYOKI-HIKAKU3
+                 MOVE   WK-CYOKI-HIKAKU3   TO  ZAN-KOHI13
+             END-IF
            END-IF
       *
            .
@@ -19383,27 +19462,80 @@
       ******************************************************************
        23082-ZANOKIKAE-HENSYU2-SEC           SECTION.
       *
+           IF   FLG-TOKU75 = 1 OR 2
+             MOVE     1000    TO   WK-CYOKI-HIKAKU9
+           ELSE
+             MOVE     2000    TO   WK-CYOKI-HIKAKU9
+           END-IF
+      *
            IF   COMB-KOH3HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI2  >  ZAN-KOHI3
-                 MOVE   ZAN-KOHI3   TO  ZAN-KOHI2
-              END-IF
-              IF   ZAN-KOHI22 >  ZAN-KOHI32
-                 MOVE   ZAN-KOHI32  TO  ZAN-KOHI22
-              END-IF
-              IF   ZAN-KOHI23 >  ZAN-KOHI33
-                 MOVE   ZAN-KOHI33  TO  ZAN-KOHI23
+      *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
+              IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
+              AND  (FLG-SANSHOU3              NOT =  SPACE)
+                 IF   ZAN-KOHI3   >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI3
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU1
+                 END-IF
+                 IF   ZAN-KOHI32  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU2 = ZAN-KOHI32
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU2
+                 END-IF
+                 IF   ZAN-KOHI33  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU3 = ZAN-KOHI33
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU3
+                 END-IF
+              ELSE
+                 MOVE   ZAN-KOHI3   TO   WK-CYOKI-HIKAKU1
+                 MOVE   ZAN-KOHI32  TO   WK-CYOKI-HIKAKU2
+                 MOVE   ZAN-KOHI33  TO   WK-CYOKI-HIKAKU3
               END-IF
            END-IF
            IF   COMB-KOH4HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI2  >  ZAN-KOHI4
-                 MOVE   ZAN-KOHI4   TO  ZAN-KOHI2
+      *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
+              IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
+              AND  (FLG-SANSHOU3              NOT =  SPACE)
+                 IF   ZAN-KOHI4   >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI4
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU1
+                 END-IF
+                 IF   ZAN-KOHI42  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU2 = ZAN-KOHI42
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU2
+                 END-IF
+                 IF   ZAN-KOHI43  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU3 = ZAN-KOHI43
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU3
+                 END-IF
+              ELSE
+                 MOVE   ZAN-KOHI4   TO   WK-CYOKI-HIKAKU1
+                 MOVE   ZAN-KOHI42  TO   WK-CYOKI-HIKAKU2
+                 MOVE   ZAN-KOHI43  TO   WK-CYOKI-HIKAKU3
               END-IF
-              IF   ZAN-KOHI22 >  ZAN-KOHI42
-                 MOVE   ZAN-KOHI42  TO  ZAN-KOHI22
-              END-IF
-              IF   ZAN-KOHI23 >  ZAN-KOHI43
-                 MOVE   ZAN-KOHI43  TO  ZAN-KOHI23
-              END-IF
+           END-IF
+      *
+           IF  (COMB-KOH3HKNNUM  =  "972" OR "974")
+           OR  (COMB-KOH4HKNNUM  =  "972" OR "974")
+             IF   ZAN-KOHI2  >  WK-CYOKI-HIKAKU1
+                 MOVE   WK-CYOKI-HIKAKU1   TO  ZAN-KOHI2
+             END-IF
+             IF   ZAN-KOHI22 >  WK-CYOKI-HIKAKU2
+                 MOVE   WK-CYOKI-HIKAKU2   TO  ZAN-KOHI22
+             END-IF
+             IF   ZAN-KOHI23 >  WK-CYOKI-HIKAKU3
+                 MOVE   WK-CYOKI-HIKAKU3   TO  ZAN-KOHI23
+             END-IF
            END-IF
       *
            .
@@ -19416,16 +19548,51 @@
       ******************************************************************
        23083-ZANOKIKAE-HENSYU3-SEC           SECTION.
       *
+           IF   FLG-TOKU75 = 1 OR 2
+             MOVE     1000    TO   WK-CYOKI-HIKAKU9
+           ELSE
+             MOVE     2000    TO   WK-CYOKI-HIKAKU9
+           END-IF
+      *
            IF   COMB-KOH4HKNNUM  =  "972" OR "974"
-              IF   ZAN-KOHI3  >  ZAN-KOHI4
-                 MOVE   ZAN-KOHI4   TO  ZAN-KOHI3
+      *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
+              IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
+              AND  (FLG-SANSHOU3              NOT =  SPACE)
+                 IF   ZAN-KOHI4   >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI4
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU1
+                 END-IF
+                 IF   ZAN-KOHI42  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU2 = ZAN-KOHI42
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU2
+                 END-IF
+                 IF   ZAN-KOHI43  >  WK-CYOKI-HIKAKU9
+                   COMPUTE  WK-CYOKI-HIKAKU3 = ZAN-KOHI43
+                                             - WK-CYOKI-HIKAKU9
+                 ELSE
+                   MOVE     ZERO    TO   WK-CYOKI-HIKAKU3
+                 END-IF
+              ELSE
+                 MOVE   ZAN-KOHI4   TO   WK-CYOKI-HIKAKU1
+                 MOVE   ZAN-KOHI42  TO   WK-CYOKI-HIKAKU2
+                 MOVE   ZAN-KOHI43  TO   WK-CYOKI-HIKAKU3
               END-IF
-              IF   ZAN-KOHI32 >  ZAN-KOHI42
-                 MOVE   ZAN-KOHI42  TO  ZAN-KOHI32
-              END-IF
-              IF   ZAN-KOHI33 >  ZAN-KOHI43
-                 MOVE   ZAN-KOHI43  TO  ZAN-KOHI33
-              END-IF
+           END-IF
+      *
+           IF  (COMB-KOH4HKNNUM  =  "972" OR "974")
+             IF   ZAN-KOHI3  >  WK-CYOKI-HIKAKU1
+                 MOVE   WK-CYOKI-HIKAKU1   TO  ZAN-KOHI3
+             END-IF
+             IF   ZAN-KOHI32 >  WK-CYOKI-HIKAKU2
+                 MOVE   WK-CYOKI-HIKAKU2   TO  ZAN-KOHI32
+             END-IF
+             IF   ZAN-KOHI33 >  WK-CYOKI-HIKAKU3
+                 MOVE   WK-CYOKI-HIKAKU3   TO  ZAN-KOHI33
+             END-IF
            END-IF
       *
            .
