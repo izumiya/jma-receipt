@@ -373,8 +373,7 @@
       *  04.05.39    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.40    NACL-ÌçÏÆ    12/05/30  ºÒ³²ÂÐ±þ¡ÊÆü¸ÛÆÃÎãÈïÊÝ¸±¼Ô¡Ë
       *  04.05.41    NACL-ÌçÏÆ    12/06/05  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
-      *  04.05.42    NACL-ÌçÏÆ    12/06/19  ÂçºåÉÜÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
-      *                                     ¹­Åç¸©ÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
+      *  04.05.42    NACL-ÌçÏÆ    12/06/19  ¹­Åç¸©ÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/09/02  ½Ð»º°é»ù°ì»þ¶âÄ¾ÀÜ»ÙÊ§À©ÅÙ¡Ê³°Íè¡Ë
       *  04.06.02    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
@@ -19357,6 +19356,8 @@
       *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
               IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
               AND  (FLG-SANSHOU3              NOT =  SPACE)
+              AND  (COMB-KOH2HKNNUM               =  "972")
+              AND  (WK-1001-PREFNUM               =   34  )
                  IF   ZAN-KOHI2   >  WK-CYOKI-HIKAKU9
                    COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI2
                                              - WK-CYOKI-HIKAKU9
@@ -19385,6 +19386,8 @@
       *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
               IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
               AND  (FLG-SANSHOU3              NOT =  SPACE)
+              AND  (COMB-KOH3HKNNUM               =  "972")
+              AND  (WK-1001-PREFNUM               =   34  )
                  IF   ZAN-KOHI3   >  WK-CYOKI-HIKAKU9
                    COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI3
                                              - WK-CYOKI-HIKAKU9
@@ -19413,6 +19416,8 @@
       *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
               IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
               AND  (FLG-SANSHOU3              NOT =  SPACE)
+              AND  (COMB-KOH4HKNNUM               =  "972")
+              AND  (WK-1001-PREFNUM               =   34  )
                  IF   ZAN-KOHI4   >  WK-CYOKI-HIKAKU9
                    COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI4
                                              - WK-CYOKI-HIKAKU9
@@ -19472,6 +19477,8 @@
       *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
               IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
               AND  (FLG-SANSHOU3              NOT =  SPACE)
+              AND  (COMB-KOH3HKNNUM               =  "972")
+              AND  (WK-1001-PREFNUM               =   34  )
                  IF   ZAN-KOHI3   >  WK-CYOKI-HIKAKU9
                    COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI3
                                              - WK-CYOKI-HIKAKU9
@@ -19500,6 +19507,8 @@
       *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
               IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
               AND  (FLG-SANSHOU3              NOT =  SPACE)
+              AND  (COMB-KOH4HKNNUM               =  "972")
+              AND  (WK-1001-PREFNUM               =   34  )
                  IF   ZAN-KOHI4   >  WK-CYOKI-HIKAKU9
                    COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI4
                                              - WK-CYOKI-HIKAKU9
@@ -19558,6 +19567,8 @@
       *       Äã½ê¤Î¾ì¹ç¤Ï»Ä¤«¤é£²£°£°£°±ßËô¤Ï£±£°£°£°±ß¤ò°ú¤¯
               IF   (LNK-S01-KOUREI-ZAITAKU-KBN    =   "1" )
               AND  (FLG-SANSHOU3              NOT =  SPACE)
+              AND  (COMB-KOH4HKNNUM               =  "972")
+              AND  (WK-1001-PREFNUM               =   34  )
                  IF   ZAN-KOHI4   >  WK-CYOKI-HIKAKU9
                    COMPUTE  WK-CYOKI-HIKAKU1 = ZAN-KOHI4
                                              - WK-CYOKI-HIKAKU9
