@@ -28,9 +28,9 @@
       *   変換文字列数(バイト)
            03 SJISTOEUC-INLEN           PIC S9(9) BINARY.
       *   入力文字列
-           03 SJISTOEUC-INDATA          PIC X(1500).
+           03 SJISTOEUC-INDATA          PIC X(10000).
       *   出力文字列
-           03 SJISTOEUC-OUTDATA         PIC X(3000).
+           03 SJISTOEUC-OUTDATA         PIC X(20000).
       *   出力バイト数
            03 SJISTOEUC-OUTLEN          PIC S9(9) BINARY.
       *   変換文字列数(バイト)

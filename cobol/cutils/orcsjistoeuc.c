@@ -16,10 +16,10 @@ inlen = *((int *)(args + count));
 count += sizeof(int *);
 
 indata = (args + count);
-count += 1500;
+count += 10000;
 
 outdata = (args + count);
-count += 3000;
+count += 20000;
 
 outlen = *((int *)(args + count));
 count += sizeof(int *);
@@ -48,7 +48,7 @@ int sjis_to_euc(int inlen, char *indata, char *outdata,
  unsigned char str1,str2;
  unsigned char *str;
  unsigned char tr_str[4];
- unsigned char str_data[3000];
+ unsigned char str_data[20000];
  char strdata[3];
  unsigned char *pnt_str1,*pnt_str2;  
  
@@ -65,7 +65,7 @@ ret_flag = 1;
 break;
 }else{
 str1 = 0x20;
-count += 2;
+count += 1;
 }
 i++;
  }
@@ -93,7 +93,7 @@ ret_flag = 1;
  count += 2;
  }else{
  str1 = 0x20;
- count += 2;
+ count += 1;
  }
  if(ret_flag == 0){
  str = convert_kanji_strict(&str1, "EUCJP", "SJIS");
