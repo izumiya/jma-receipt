@@ -11,16 +11,15 @@ extern int orcsjistoeuc(char *args){
         int *maxlen;
         char *indata;char *outdata;int *ret;
 int count = 0;
-unsigned char ret_data[2009];
 
 inlen = *((int *)(args + count));
 count += sizeof(int *);
 
 indata = (args + count);
-count += 1000;
+count += 1500;
 
 outdata = (args + count);
-count += 2000;
+count += 3000;
 
 outlen = *((int *)(args + count));
 count += sizeof(int *);
@@ -33,17 +32,7 @@ ret = ((int *)(args + count));
         sjis_to_euc(inlen, indata, outdata, outlen, maxlen, ret);
 
 
-count = 0;
-
-memcpy(((char *)(ret_data + count)), outdata, 2000);
-count += 2000;
-
-*((int *)(ret_data + count)) = *maxlen;
-count += sizeof(int);
-
-*((int *)(ret_data + count)) = *ret;
-
-return *ret_data;
+return 0;
 }
 
 //SJISコードで書かれた文字列をEUCコードに変換するメソッド
@@ -59,7 +48,7 @@ int sjis_to_euc(int inlen, char *indata, char *outdata,
  unsigned char str1,str2;
  unsigned char *str;
  unsigned char tr_str[4];
- unsigned char str_data[2000];
+ unsigned char str_data[3000];
  char strdata[3];
  unsigned char *pnt_str1,*pnt_str2;  
  
@@ -115,7 +104,6 @@ ret_flag = 1;
  memcpy((char *)(str_data + count2), str, str_len);
  free(str);
  }
- printf("%c\n",str_data[3]);
  strcpy(outdata, str_data);
  }else{
  *ret = 0;

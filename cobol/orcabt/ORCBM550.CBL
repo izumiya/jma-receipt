@@ -482,8 +482,8 @@
       *        文字コード変換
                MOVE    PARA-DATA           TO  SJISTOEUC-INDATA
                INITIALIZE                      SJISTOEUC-OUTDATA
-               MOVE    1000                TO  SJISTOEUC-INLEN
-               MOVE    2000                TO  SJISTOEUC-OUTLEN
+               MOVE    1500                TO  SJISTOEUC-INLEN
+               MOVE    3000                TO  SJISTOEUC-OUTLEN
                CALL    "orcsjistoeuc"      USING
                                            ORCSJISTOEUC
                MOVE    SJISTOEUC-OUTDATA   TO  WRK-PARA-REC

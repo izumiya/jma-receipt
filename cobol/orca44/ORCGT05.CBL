@@ -1967,8 +1967,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
        7002-FILE-CONVERT-SEC       SECTION.
       *
            INITIALIZE                  SJISTOEUC-OUTDATA
-           MOVE    1000                TO  SJISTOEUC-INLEN
-           MOVE    2000                TO  SJISTOEUC-OUTLEN
+           MOVE    1500                TO  SJISTOEUC-INLEN
+           MOVE    3000                TO  SJISTOEUC-OUTLEN
            CALL    "orcsjistoeuc"      USING
                                        ORCSJISTOEUC
       *
