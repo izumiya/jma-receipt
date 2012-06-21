@@ -1817,6 +1817,56 @@
            END-IF
       *
       *H24.6
+      *処方せん料・一般名加算を訂正時に展開した為のチェック追加
+      *ver.4.7
+      *    処方せん料と投薬チェック
+           IF     (IDX-SYOHOU      NOT =   ZERO )  AND
+                  (FLG-NAIYAK2         =   ZERO )  AND
+                  (FLG-TONPUK2         =   ZERO )  AND
+                  (FLG-GAIYAK2         =   ZERO )  AND
+                  (SPA-ERRCD           =   SPACE )
+               IF     (FLG-NAIYAK          =   1    )  OR
+                      (FLG-TONPUK          =   1    )  OR
+                      (FLG-GAIYAK          =   1    )
+      *            処方せん料と院内投薬のみはエラー
+                   MOVE    "0122"          TO  SPA-ERRCD
+                   MOVE    "1"             TO  WRK-COM-CUR (IDX-SYOHOU)
+               END-IF
+           END-IF
+      *    処方せん料と投薬チェック
+           IF     (IDX-SYOHOU      NOT =   ZERO )  AND
+                  (SPA-ERRCD           =   SPACE)  AND
+                 ((FLG-NAIYAK2         =   1    )  OR
+                  (FLG-TONPUK2         =   1    )  OR
+                  (FLG-GAIYAK2         =   1    ))
+      *        処方せん料の内容チェック
+               IF      WRK-ZAICNT2         >=  7
+      *            ７種類以上
+                   IF      WRK-COM-INPUTCD (IDX-SYOHOU)
+                                           NOT =   "120002710"
+                       MOVE    "K232"          TO  SPA-ERRCD
+                   END-IF
+               ELSE
+      *            ７種類以内
+                   IF     (WRK-COM-INPUTCD (IDX-SYOHOU)
+                                               =   "120002710" )
+                       MOVE    "K233"          TO  SPA-ERRCD
+                   END-IF
+               END-IF
+               IF      SPA-ERRCD       NOT =   SPACE
+                   IF     (WRK-COM-KZMFLG (IDX-SYOHOU) =   SPACE) AND
+                          (LNK-ORCSC-KEI-IDX           =   ZERO )
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                          (IDX-SYOHOU)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                          (IDX-SYOHOU)
+                       MOVE    IDX-SYOHOU      TO  LNK-ORCSC-KEI-IDX
+                   ELSE
+                       MOVE    SPACE               TO  SPA-ERRCD
+                   END-IF
+               END-IF
+           END-IF
+      *
       *    処方せん料の入力があり一般名処方加算なし
            IF     (IDX-SYOHOU      NOT =   ZERO )
              AND  (FLG-IPPANKSN        =   ZERO )
