@@ -41,7 +41,7 @@ tbl_henrei_body	{
 #---->    分ける必要がないか?(管理情報で対応?)
 	HENREI_INFO1		varchar(20);
 #---->  返戻レセ電データ(データ部)
-	HENREI_INFO2		varchar(2200);
+	HENREI_INFO2		varchar(3000);
 	ERRCD			char(3);
 #-----> 請求管理情報(紐付け用)  後9個設けよう
 #-----> ptnum,sryym 不正時(これだけでよいか いるか)

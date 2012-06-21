@@ -36,6 +36,7 @@
       *  04.06.01    NACL-藤原    10/12/20  保険者からの返戻対応
       *  04.06.02    NACL-藤原    11/02/10  登録済エラー時の情報追加
       *  04.06.03    NACL-藤原    11/02/14  OpenCOBOL 1.0.0 対応
+      *  04.06.04    NACL-藤原    12/06/19  取り込み時のレコード長変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1967,7 +1968,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
        7002-FILE-CONVERT-SEC       SECTION.
       *
            INITIALIZE                  SJISTOEUC-OUTDATA
-           MOVE    1500                TO  SJISTOEUC-INLEN
+           MOVE    3000                TO  SJISTOEUC-INLEN
            MOVE    3000                TO  SJISTOEUC-OUTLEN
            CALL    "orcsjistoeuc"      USING
                                        ORCSJISTOEUC

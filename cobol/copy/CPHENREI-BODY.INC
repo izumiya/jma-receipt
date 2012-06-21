@@ -60,7 +60,7 @@
            03  HENREI-B-HENREI-INFO1
                                    PIC X(20).
            03  HENREI-B-HENREI-INFO2
-                                   PIC X(2200).
+                                   PIC X(3000).
            03  HENREI-B-ERRCD      PIC X(03).
       *
            03  HENREI-B-SEIKYU-AREA.

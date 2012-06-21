@@ -33,6 +33,7 @@
       *
       *  04.06.01    NACL-藤原    10/12/20  保険者からの返戻対応
       *  04.06.02    NACL-藤原    11/02/14  OpenCOBOL 1.0.0 対応
+      *  04.06.03    NACL-藤原    12/06/19  取り込み時のレコード長変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -53,7 +54,7 @@
       *    取り込みデータファイル
        FD  PARA-FILE.
        01  PARA-REC.
-           03  PARA-DATA           PIC X(500).
+           03  PARA-DATA           PIC X(3000).
       *
       *    エラーファイル
        FD  CSVERR-FILE.
@@ -482,7 +483,7 @@
       *        文字コード変換
                MOVE    PARA-DATA           TO  SJISTOEUC-INDATA
                INITIALIZE                      SJISTOEUC-OUTDATA
-               MOVE    1500                TO  SJISTOEUC-INLEN
+               MOVE    3000                TO  SJISTOEUC-INLEN
                MOVE    3000                TO  SJISTOEUC-OUTLEN
                CALL    "orcsjistoeuc"      USING
                                            ORCSJISTOEUC
@@ -568,10 +569,16 @@
       *        文字コード変換
                MOVE  PARA-DATA             TO  SJISTOEUC-INDATA
                INITIALIZE                      SJISTOEUC-OUTDATA
-               MOVE    1000                TO  SJISTOEUC-INLEN
-               MOVE    2000                TO  SJISTOEUC-OUTLEN
+               MOVE    3000                TO  SJISTOEUC-INLEN
+               MOVE    3000                TO  SJISTOEUC-OUTLEN
                CALL    "orcsjistoeuc"      USING
                                            ORCSJISTOEUC
+               IF      SJISTOEUC-RETURN    =   0
+                   CONTINUE
+               ELSE
+                   DISPLAY "SJISTOEUC-RETURN =" SJISTOEUC-RETURN
+                   DISPLAY "SJISTOEUC-INDATA=" SJISTOEUC-INDATA (1:5)
+               END-IF
                MOVE    SJISTOEUC-OUTDATA   TO  WRK-PARA-REC
       *
                UNSTRING  WRK-PARA-REC      DELIMITED  BY  X"0D"  OR
@@ -2760,6 +2767,20 @@
                AT  END
                    MOVE    1            TO  FLG-PARA
                NOT AT  END
+                   IF      STS-PARA        NOT =   ZERO
+                       CALL "coblog" USING   "file read err "
+                                                   WRK-FILE-TMP
+                       STRING  "ファイル読み込みエラー FILE="
+                                                   DELIMITED  BY  SIZE
+                           WRK-FILE-TMP            DELIMITED  BY  SPACE
+                           " STS="                 DELIMITED  BY  SIZE
+                           STS-PARA                DELIMITED  BY  SIZE
+                                                   INTO    WRK-CSVERR
+                       END-STRING
+                       PERFORM 500-ERR-HENSYU-SEC
+                       PERFORM 500-COBABORT-SEC
+                   END-IF
+      *
                    ADD     1            TO  READ-CNT
                    MOVE    ZERO         TO  FLG-PARA
       *
