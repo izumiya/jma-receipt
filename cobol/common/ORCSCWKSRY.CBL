@@ -600,6 +600,16 @@
                            MOVE    1               TO  FLG-AUTO-OK
                        END-IF
                    END-IF
+      *H24.6
+      *            処方せん料を訂正時展開する
+                   IF     (ORCSCWKSRY-SYORIFLG         =   ZERO ) AND
+                          (LNK-WKSRY-AUTOKBN(IDX IDY)  =  "3"   ) AND
+                          (LNK-WKSRY-SRYSYUKBN(IDX)    =  "820" )
+                       MOVE    ZERO               TO  FLG-HEN-CHK
+                       MOVE    SPACE              TO  LNK-WKSRY-AUTOKBN
+                                                            (IDX IDY)
+                   END-IF
+      *!!!!
       *            自動発生の有無判定
                    IF      ORCSCWKSRY-SYORIFLG     =   ZERO
                        IF     (LNK-WKSRY-AUTOKBN(IDX IDY)  =  "4"
