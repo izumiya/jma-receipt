@@ -608,7 +608,8 @@
                    END-IF
       *H24.6
       *            処方せん料を訂正時展開する
-                   IF     (ORCSCWKSRY-SYORIFLG         =   ZERO ) AND
+                   IF     (SPA-SRYYMD              >=  "20120401")  AND
+                          (ORCSCWKSRY-SYORIFLG         =   ZERO ) AND
                           (LNK-WKSRY-AUTOKBN(IDX IDY)  =  "3"   ) AND
                           (LNK-WKSRY-SRYSYUKBN(IDX)    =  "820" )
                        MOVE    ZERO               TO  FLG-HEN-CHK
