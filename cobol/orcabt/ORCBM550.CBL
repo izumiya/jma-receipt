@@ -30,6 +30,8 @@
       *  04.04.01    NACL-藤原    09/12/10  返戻対応
       *  04.04.02    NACL-藤原    10/12/10  返戻ファイルの保存用ファイル名
       *                                     の変更
+      *
+      *  04.05.01    NACL-藤原    12/06/19  取り込み時のレコード長変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -50,7 +52,7 @@
       *    取り込みデータファイル
        FD  PARA-FILE.
        01  PARA-REC.
-           03  PARA-DATA           PIC X(500).
+           03  PARA-DATA           PIC X(3000).
       *
       *    エラーファイル
        FD  CSVERR-FILE.
@@ -2713,6 +2715,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                AT  END
                    MOVE    1            TO  FLG-PARA
                NOT AT  END
+                   IF      STS-PARA        NOT =   ZERO
+                       CALL "coblog" USING   "file read err "
+                                                   WRK-FILE-TMP
+                       STRING  "ファイル読み込みエラー FILE="
+                                                   DELIMITED  BY  SIZE
+                           WRK-FILE-TMP            DELIMITED  BY  SPACE
+                           " STS="                 DELIMITED  BY  SIZE
+                           STS-PARA                DELIMITED  BY  SIZE
+                                                   INTO    WRK-CSVERR
+                       END-STRING
+                       PERFORM 500-ERR-HENSYU-SEC
+                       PERFORM 500-COBABORT-SEC
+                   END-IF
+      *
                    ADD     1            TO  READ-CNT
                    MOVE    ZERO         TO  FLG-PARA
       *
