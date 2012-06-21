@@ -2886,8 +2886,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_henrei_kanri"
                                        TO  MCP-TABLE
-               MOVE    WRK-MCP-PATHNAME
-                                       TO  MCP-PATHNAME
+               MOVE    "key"           TO  MCP-PATHNAME
                PERFORM 900-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
                    MOVE   ZERO                 TO  FLG-HENREI-K
@@ -2903,8 +2902,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
       * 
            MOVE    "tbl_henrei_kanri"
                                    TO  MCP-TABLE
-           MOVE    WRK-MCP-PATHNAME
-                                   TO  MCP-PATHNAME
+           MOVE    "key"           TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
            .
        900-HENREI-KANRI-READ-EXT.
