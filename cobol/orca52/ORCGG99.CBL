@@ -226,6 +226,17 @@
                WHEN    "CLICKED"       ALSO    "pandatimer1"
                WHEN    "CLICKED"       ALSO    "B11"
                    PERFORM 490-KAKUNIN-SEC
+               IF      SPA-SFILESV-MAX     >   SPA-SFILESV-IDX
+                   ADD     1                   TO  SPA-SFILESV-IDX 
+                   PERFORM 3001-FILEENTRY-SEC
+                 IF      SPA-SFILESV-MAX   =   SPA-SFILESV-IDX
+                   ADD     1                   TO  SPA-SFILESV-IDX 
+                 END-IF
+               ELSE
+                 IF      SPA-SFILESV-MAX   NOT =   ZERO
+                   MOVE    ZERO                TO  G99-DURATION
+                 END-IF
+               END-IF
       *    プレビュー画面へ
                WHEN    "CLICKED"       ALSO    "B12"
                    PERFORM 4501-NEXT-GMN-SEC
@@ -379,7 +390,7 @@
                            PERFORM 4902-FILE-INFO-CHK-SEC
                        ELSE
       *                    ファイルエントリ処理(クライアント保存)
-                           MOVE    1               TO  SPA-SFILESV-IDX 
+                           ADD     1               TO  SPA-SFILESV-IDX 
                            PERFORM 3001-FILEENTRY-SEC
                            IF      FLG-END         =   1
                                GO  TO  490-KAKUNIN-EXT
@@ -529,7 +540,7 @@
                                        TO  WRK-KENSU-Z
            MOVE    WRK-KENSU-Z         TO  GFIL-KENSU
       *
-           MOVE    ZERO                TO  G99-DURATION
+           MOVE    1                   TO  G99-DURATION
       *
       *    MOVE    "NEW"               TO  MCP-PUTTYPE
       *    MOVE    "GFIL"              TO  MCP-WINDOW
