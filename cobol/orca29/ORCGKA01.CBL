@@ -841,6 +841,7 @@
                                        TO  SPA-GMN-THKNCOMBINUM (IDX)
                MOVE    ORCSHKN-GMN-HKNCOMBIMEI (IDX)
                                        TO  SPA-GMN-THKNCOMBIMEI (IDX)
+               MOVE    IDX             TO  SPA-HKNCOMBI-MAX
            END-PERFORM
       *
       *    ºıø«Õ˙ŒÚ ‘Ω∏

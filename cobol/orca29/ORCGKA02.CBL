@@ -766,6 +766,7 @@
                                        TO  SPA-GMN-THKNCOMBINUM (IDX)
                MOVE    ORCSHKN-GMN-HKNCOMBIMEI (IDX)
                                        TO  SPA-GMN-THKNCOMBIMEI (IDX)
+               MOVE    IDX             TO  SPA-HKNCOMBI-MAX
            END-PERFORM
       *
       *    ÉÂÅï¡¦ÉÂ¼¼ÊÔ½¸
@@ -1277,6 +1278,7 @@
                                        TO  SPA-GMN-THKNCOMBINUM (IDX-T)
                MOVE    ORCSHKN-GMN-HKNCOMBIMEI (IDX-T)
                                        TO  SPA-GMN-THKNCOMBIMEI (IDX-T)
+               MOVE    IDX-T           TO  SPA-HKNCOMBI-MAX
            END-PERFORM
       *    ÆþÂà±¡ÆüÊÔ½¸
            PERFORM 30011-NYUINRRK-HEN-SEC
