@@ -369,6 +369,11 @@
            03  WRK-SYS-TIME            PIC 9(08).
       *
            03  WRK-BIKOU-FTN           PIC X(01).
+      *H24.6
+      *ＱＲのみページ対応
+           03  WRK-QRPAGE              PIC 9(03).
+           03  WRK-QRYOBI              PIC 9(03).
+           03  WRK-IDXMAX              PIC 9(03).
       *
       *    剤毎の内容
        01  WRK-NAIYOU-AREA.
@@ -892,6 +897,30 @@
                END-IF
            END-IF
            MOVE    ZERO                TO  WRK-FILE-CNT
+      *
+      *H24.6
+      *    ＱＲ件数と印刷枚数の判定
+           IF      ORCSQRCSV-RET-COUNT     >   ZERO
+               DIVIDE  3   INTO    ORCSQRCSV-RET-COUNT
+                           GIVING  WRK-QRPAGE
+                           REMAINDER  WRK-QRYOBI
+               IF      WRK-QRYOBI          >   ZERO
+                   COMPUTE WRK-QRPAGE      =   WRK-QRPAGE  +  1
+               END-IF
+      *        ＱＲのみのページ作成
+               IF      WRK-QRPAGE          >   WRK-PAGE-MAX
+                   MOVE    WRK-IDXMAX          TO  IDX
+                   MOVE    SPACE               TO  WRK-NAIYOU
+                                                   (WRK-PAGE-MAX IDX)
+                   MOVE    "次ページへ続く"    TO  WRK-NAIYOU
+                                                   (WRK-PAGE-MAX IDX)
+                                                                (50:)
+                   COMPUTE WRK-PAGE-MAX    =   WRK-PAGE-MAX   +   1
+                   MOVE    "　　　　　　以下余白"
+                                       TO  WRK-NAIYOU (WRK-PAGE-MAX 2)
+               END-IF
+           END-IF
+      *H24.6
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   WRK-PAGE-MAX
@@ -2316,11 +2345,15 @@
                       (IDX             =   LINE-MAX  )
                    MOVE    "　　　　　　以下余白"
                                        TO  WRK-NAIYOU (WRK-PAGE-MAX IDX)
+      *H24.6
+                   MOVE    IDX         TO  WRK-IDXMAX
                END-IF
                ADD     1               TO  IDX
                IF      IDX             <=  LINE-MAX
                    MOVE    "　　　　　　以下余白"
                                        TO  WRK-NAIYOU (WRK-PAGE-MAX IDX)
+      *H24.6
+                   MOVE    IDX         TO  WRK-IDXMAX
                END-IF
                MOVE    1               TO  FLG-PRINT
            END-IF
