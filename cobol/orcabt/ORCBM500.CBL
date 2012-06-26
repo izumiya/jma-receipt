@@ -1273,7 +1273,7 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            END-PERFORM
       *
            MOVE    ZERO            TO  IDZZ
-           PERFORM VARYING IDZZ    FROM    2200    BY  -1
+           PERFORM VARYING IDZZ    FROM    3000    BY  -1
                    UNTIL   IDZZ   <        1
                IF      HENREI-B-HENREI-INFO2 (IDZZ:1)
                                        NOT =   SPACE
