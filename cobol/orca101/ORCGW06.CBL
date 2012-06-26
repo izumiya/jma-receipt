@@ -3800,6 +3800,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "選択番号がありません。"
                                                TO  SPA-ERRMSG
                WHEN    "0007"
+                   STRING  "既にオペレータＩＤが登録されています。"
+                           "オペレータＩＤを変更して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "0008"
                    MOVE    "オペレータＩＤを入力して下さい"
                                                TO  SPA-ERRMSG
