@@ -4770,6 +4770,8 @@
                          AND  (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
                                                               OR 6 OR 7)
                          AND  (ACCT-DAY(1 IDX1)    NOT =  ZERO)
+                         AND   (ACCT-HKNCOMBI  =
+                                                WRK-HKNCOMBI-DAY(IDX1))
                            MOVE   ACCT-DAY(1 IDX1)  TO WRK-NYUKSN-DAY-1
                                                       (IDX-NYUKSN IDX1)
                          END-IF
@@ -4800,6 +4802,8 @@
                             AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 
                                                         OR 5 OR 6 OR 7)
                             AND   (ACCT-DAY(1 IDX1)    NOT =  ZERO)
+                            AND   (ACCT-HKNCOMBI  =
+                                                WRK-HKNCOMBI-DAY(IDX1))
                               MOVE   ACCT-DAY(1 IDX1)
                                                   TO  WRK-CHUKSN-DAY-1
                                                      (IDX-CHUKSN1 IDX1)
@@ -4829,6 +4833,8 @@
                             AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 
                                                         OR 5 OR 6 OR 7)
                             AND   (ACCT-DAY(1 IDX1)    NOT =  ZERO)
+                            AND   (ACCT-HKNCOMBI  =
+                                                WRK-HKNCOMBI-DAY(IDX1))
                               MOVE   ACCT-DAY(1 IDX1)
                                                   TO  WRK-CHUKSN-DAY-2
                                                      (IDX-CHUKSN2 IDX1)
