@@ -40,6 +40,7 @@
       *                                     生保単独になったときのまとめ
       *
       *  04.05.01    NACL-藤原    10/02/12  拡張漢字対応
+      *  04.05.02    NACL-藤原    12/06/22  処理結果画面への件数表示
       *
       *  04.06.01    NACL-藤原    10/06/21  日本語化（見出し）対応
       *****************************************************************
@@ -1763,7 +1764,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            CLOSE   TOUKEI01-FILE
                    TOUKEI02-FILE
+                   TOUKEI03-FILE
                    TOUKEI04-FILE
+                   TOUKEI05-FILE
       *
            IF      CNT-TOUKEI01           =   ZERO  
                MOVE    "処理対象のデータがありませんでした"
@@ -1777,6 +1780,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
+           COMPUTE JOB-UPDCNT  =   CNT-TOUKEI04    +
+                                   CNT-TOUKEI05
 grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *
            PERFORM 900-DBDISCONNECT-SEC
