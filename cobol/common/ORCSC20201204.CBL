@@ -289,6 +289,8 @@
       *H24.4
            03  WRK-YAKKAKJNCD           PIC X(12).
            03  WRK-KEI-KISOTEN          PIC 9(07)V9(2).
+      *H24.6
+           03  WRK-ERRCD2               PIC X(04).
       *
       *    継続の時、自動発生のチェック
        01  WRK-CONTCHK-TBL.
@@ -1562,6 +1564,76 @@
       *****************************************************************
        3003-CHEK-SYORI-SEC              SECTION.
       *
+           MOVE    SPACE               TO  WRK-ERRCD2
+      *    処方箋を交付する診察料を算定している場合
+           IF      (LNK-ORCSC-ROUMANSEI-ARI    =   1  )  OR
+                   (LNK-ORCSC-ROUMANSEI-ARI2   >   ZERO) OR
+                   (LNK-ORCSC-NETAKIRI-ARI     =   1  )  OR
+                   (LNK-ORCSC-NETAKIRI-ARI2    >   ZERO) OR
+                   (LNK-ORCSC-SYONIKA-ARI  NOT =   ZERO) OR
+                   (LNK-ORCSC-SEIKATU-ARI2     >   ZERO) OR
+                   (LNK-ORCSC-SEIKATU-ARI      >   ZERO)
+      *             在宅末期医療総合診察料あり
+               OR  (SPA-ZAIMATU-ARI            >   ZERO )
+      *             在宅時医療総合管理料あり
+               OR  (SPA-ZAIKANRI-ARI           >   ZERO)
+               OR  (SPA-ZAIKANRI-ARI2          >   ZERO)
+      *        特定施設入居時等医学管理料
+               OR  (SPA-IGAKUKAN-ARI       NOT =   ZERO)
+               OR  (SPA-IGAKUKAN-ARI2      NOT =   ZERO)
+      *        処方せん料が算定不可の時
+               MOVE    ZERO                TO  FLG-SYOHO-CHK
+      *        処方せん料の入力あり
+               IF     (IDX-SYOHOU      NOT =   ZERO )
+                  OR  (IDX-IP          NOT =   ZERO )
+                   MOVE    "K237"              TO  WRK-ERRCD2
+      *            生活習慣病指導管理料チェック
+                   IF     (SPA-SEIKATU-ARI     NOT =   ZERO )  OR
+                          (SPA-SEIKATU-ARI2    NOT =   ZERO )
+                       IF      SPA-HKTSANTEI-203   NOT =   ZERO
+                           MOVE    SPACE               TO  WRK-ERRCD2
+                       END-IF
+                   END-IF
+      *            小児科外来診察料チェック
+                   IF      (LNK-ORCSC-SYONIKA-ARI  NOT =   ZERO)
+                       IF      SPA-HKTSANTEI-202   NOT =   ZERO
+                           MOVE    SPACE               TO  WRK-ERRCD2
+                       END-IF
+                   END-IF
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-SYOHO-CHK
+           END-IF
+           IF      WRK-ERRCD2       NOT =   SPACE
+               IF      IDX-SYOHOU      NOT =   ZERO
+                   IF     (WRK-COM-KZMFLG (IDX-SYOHOU) =   SPACE) AND
+                          (LNK-ORCSC-KEI-IDX       =   ZERO )
+                       MOVE    WRK-ERRCD2      TO  SPA-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                        (IDX-SYOHOU)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                        (IDX-SYOHOU)
+                       MOVE    IDX-IP          TO  LNK-ORCSC-KEI-IDX
+                   END-IF
+               END-IF
+               IF     (IDX-IP          NOT =   ZERO )
+               AND    (SPA-ERRCD           =   SPACE)
+                   IF     (WRK-COM-KZMFLG (IDX-IP) =   SPACE) AND
+                          (LNK-ORCSC-KEI-IDX       =   ZERO )
+                       MOVE    WRK-ERRCD2      TO  SPA-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                              (IDX-IP)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG
+                                                              (IDX-IP)
+                       MOVE    IDX-IP          TO  LNK-ORCSC-KEI-IDX
+                   END-IF
+               END-IF
+               IF      SPA-ERRCD       NOT =   SPACE
+                   GO      TO      3003-CHEK-SYORI-EXT
+               END-IF
+           END-IF
+      *!!!
+      *!!!!
            MOVE    ZERO                TO  FLG-SYOHOSENN
       *    処方箋算定
            IF    ((FLG-NAIYAK2         =   1    )  OR
@@ -1569,6 +1641,11 @@
                   (FLG-GAIYAK2         =   1    )) OR
                   (IDX-SYOHOU      NOT =   ZERO )
                MOVE    1               TO  FLG-SYOHOSENN
+      *        処方せん料自動発生なしの時
+               IF     (FLG-SYOHO-CHK       =   ZERO )
+                 AND  (IDX-SYOHOU          =   ZERO )
+                   MOVE    ZERO                TO  FLG-SYOHOSENN
+               END-IF
            END-IF
       *
            MOVE    ZERO                TO  FLG-SYOHORYO
