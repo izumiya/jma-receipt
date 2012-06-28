@@ -577,6 +577,7 @@
       *  04.05.58    NACL-ÌçÏÆ    12/06/05  »³Íü¸©£´£±Ï·¿ÍÂÐ±þ
       *  04.05.59    NACL-ÌçÏÆ    12/06/07  °¦ÃÎ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.60    NACL-ÌçÏÆ    12/06/15  °¦ÃÎ¡¦°¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.61    NACL-ÌçÏÆ    12/06/28  ºÒ³²¤Î¸½ÊªµëÉÕÈ½Äê½¤Àµ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -1351,8 +1352,6 @@
                 07  WRK-TAIHI-GENKIN-EN        PIC  9(07).
       *
            03  WRK-FORMALNAME                  PIC  X(300).
-      *
-           03  WRK-HOKENICHIBUGAK              PIC  9(07).
       *
            03  WRK-KOHCNT                      PIC  9(01).
       *
@@ -2564,7 +2563,6 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      FLG-HOKENICHIBU4
            MOVE      ZERO       TO      FLG-HOKENICHIBU5
            MOVE      ZERO       TO      FLG-HOKENICHIBU6
-           MOVE      ZERO       TO      WRK-HOKENICHIBUGAK
            MOVE      ZERO       TO      FLG-ZENKOKUKOHI-NISYU
            MOVE      ZERO       TO      FLG-ZENKOKUKOHI-NISYU2
            MOVE      ZERO       TO      FLG-KEISAN-TOK1
@@ -10867,7 +10865,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                ADD      WRK-FTNKEI-Z     TO   WRK-KOH-GAI-GEN70-Z
                ADD      SYU-TOTAL-HKNTEN TO   WRK-KOH-GAI-GEN70-TEN
                ADD      SYU-TOTAL-HKNTEN TO   WRK-JYOGENKBN-TEN4
-               ADD      WRK-FTNKEI       TO   WRK-HOKENICHIBUGAK
              END-IF
            ELSE
              MOVE      1      TO    FLG-HOKENICHIBU
@@ -11146,7 +11143,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  ADD    SYU-TOTAL-HKNTEN TO   WRK-JYOGENKBN-TEN
                                               WRK-JYOGENKBN-TEN3
                                               WRK-JYOGENKBN-TEN4
-                 ADD    WRK-FTNKEI       TO   WRK-HOKENICHIBUGAK
              END-IF
              ADD        SYU-TOTAL-HKNTEN TO   WRK-JYOGENKBN-TEN6
            ELSE
@@ -11589,12 +11585,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  ELSE
                      MOVE    12000     TO   WRK-KINGAKU
                  END-IF
-                 PERFORM     2105215-ICHIBUFTN-GEN-SEC
                  IF    FLG-KEISAN2 = 2
                    MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU5
                  ELSE
                    MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU
                  END-IF
+                 PERFORM     2105215-ICHIBUFTN-GEN-SEC
                  PERFORM     2105211-ICHIBUFTN-KOH-SET-SEC
            ELSE
             IF   RECE02-TEISYOTOKU  NOT =  SPACE
@@ -11603,12 +11599,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  ELSE
                    MOVE      8000      TO   WRK-KINGAKU
                  END-IF
-                 PERFORM     2105215-ICHIBUFTN-GEN-SEC
                  IF    FLG-KEISAN2 = 2
                    MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU5
                  ELSE
                    MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU
                  END-IF
+                 PERFORM     2105215-ICHIBUFTN-GEN-SEC
                  PERFORM     2105211-ICHIBUFTN-KOH-SET-SEC
             ELSE
              IF   ( RECE02-KYURATE         =  20 OR 30 )
@@ -11619,12 +11615,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      MOVE    44400     TO   WRK-KINGAKU
                    END-IF
-                   PERFORM   2105215-ICHIBUFTN-GEN-SEC
                    IF    FLG-KEISAN2 = 2
                      MOVE    WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU5
                    ELSE
                      MOVE    WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU
                    END-IF
+                   PERFORM   2105215-ICHIBUFTN-GEN-SEC
                    PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
                  ELSE
                    MOVE      40200     TO   WRK-KINGAKU
@@ -11637,12 +11633,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  ELSE
                      MOVE    12000     TO   WRK-KINGAKU
                  END-IF
-                 PERFORM     2105215-ICHIBUFTN-GEN-SEC
                  IF    FLG-KEISAN2 = 2
                    MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU5
                  ELSE
                    MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU
                  END-IF
+                 PERFORM     2105215-ICHIBUFTN-GEN-SEC
                  PERFORM     2105211-ICHIBUFTN-KOH-SET-SEC
              END-IF
             END-IF
@@ -11766,12 +11762,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
               END-IF
             END-IF
-            PERFORM   2105215-ICHIBUFTN-GEN-SEC
             IF    FLG-KEISAN2 = 2
               MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU5
             ELSE
               MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU
             END-IF
+            PERFORM   2105215-ICHIBUFTN-GEN-SEC
             PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
            ELSE
             EVALUATE     FLG-GENBUTU70
@@ -11807,12 +11803,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                  END-IF
                END-IF
-               PERFORM   2105215-ICHIBUFTN-GEN-SEC
                IF    FLG-KEISAN2 = 2
                  MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU5
                ELSE
                  MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU
                END-IF
+               PERFORM   2105215-ICHIBUFTN-GEN-SEC
                PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
              WHEN           2
                IF  FLG-KOHYONKAIME = 1
@@ -11846,12 +11842,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   END-IF
                  END-IF
                END-IF
-               PERFORM   2105215-ICHIBUFTN-GEN-SEC
                IF    FLG-KEISAN2 = 2
                  MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU5
                ELSE
                  MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU
                END-IF
+               PERFORM   2105215-ICHIBUFTN-GEN-SEC
                PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
              WHEN           3
                IF  FLG-KOHYONKAIME = 1
@@ -11867,12 +11863,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE   35400   TO   WRK-KINGAKU
                  END-IF
                END-IF
-               PERFORM   2105215-ICHIBUFTN-GEN-SEC
                IF    FLG-KEISAN2 = 2
                  MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU5
                ELSE
                  MOVE      WRK-KINGAKU   TO   WRK-KINGAKU-GENBUTU
                END-IF
+               PERFORM   2105215-ICHIBUFTN-GEN-SEC
                PERFORM   2105211-ICHIBUFTN-KOH-SET-SEC
             END-EVALUATE
            END-IF
@@ -11996,7 +11992,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
        2105215-ICHIBUFTN-GEN-SEC               SECTION.
       *
            IF   WK-GENGAKUKBN    NOT =   ZERO
-           AND  WK-GENGAKUKBN-KEISAN =   ZERO
       *
               COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
                                   * 10
@@ -12028,35 +12023,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
               END-IF
       *
-              COMPUTE  WRK-FTNKEI-Z = SYU-TOTAL-HKNTEN
-                                    * 10
-                                    * 20
-                                    / 100
-              EVALUATE   WK-GENGAKUKBN
-                WHEN        1
-                  IF  WK-GENGAKU-RITU = 100
-                      MOVE   ZERO     TO   WRK-FTNKEI-Z
-                  ELSE
-                      COMPUTE  WK-GENGAKU-RITUX =
-                               100 - WK-GENGAKU-RITU
-                      IF    WRK-FTNKEI-Z  NOT = ZERO
-                        COMPUTE  WRK-FTNKEI-Z       =
-                                 WRK-FTNKEI-Z       *
-                                 WK-GENGAKU-RITUX   /
-                                 100
-                      END-IF
-                  END-IF
-                WHEN        2
-                  CONTINUE
-                WHEN        3
-                WHEN        4
-                      MOVE   ZERO     TO   WRK-FTNKEI-Z
-              END-EVALUATE
-              IF   FLG-WRKFILE-CLEAR   =   ZERO
-                COMPUTE  WRK-FTNKEI-Z = WRK-FTNKEI-Z +  5
-                COMPUTE  WRK-FTNKEI-Z = WRK-FTNKEI-Z / 10
-                COMPUTE  WRK-FTNKEI-Z = WRK-FTNKEI-Z * 10
-              END-IF
+           END-IF
+      *
+           IF   WK-GENGAKUKBN    NOT =   ZERO
+           AND  WK-GENGAKUKBN-KEISAN =   ZERO
       *
               EVALUATE   WK-GENGAKUKBN
                 WHEN        1
@@ -13571,65 +13541,37 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 MOVE     WRK-JYOGENKBN-TEN  TO  WRK-JYOGENKBN-TEN9
                 PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
       *
-                IF  WK-GENGAKUKBN-KEISAN  =   ZERO
-                  EVALUATE   WK-GENGAKUKBN
-                    WHEN        1
-                     IF  WK-GENGAKU-RITU = 100
-                         MOVE   ZERO     TO   WRK-KINGAKU-GENBUTU3
-                     ELSE
-                         COMPUTE  WK-GENGAKU-RITUX =
-                                  100 - WK-GENGAKU-RITU
-                         IF    WRK-KINGAKU-GENBUTU3  NOT = ZERO
-                           COMPUTE  WRK-KINGAKU-GENBUTU3  =
-                                   (WRK-KINGAKU-GENBUTU3  *
-                                    WK-GENGAKU-RITUX      /
-                                    100) + 0.5
-                         END-IF
-                     END-IF
-                    WHEN        2
-                     CONTINUE
-                    WHEN        3
-                    WHEN        4
-                         MOVE   ZERO     TO   WRK-KINGAKU-GENBUTU3
-                  END-EVALUATE
-                  IF  FLG-KOUGAKU2 = ZERO
-                    COMPUTE  WRK-KINGAKU-GENBUTU3 =
-                             WRK-KINGAKU-GENBUTU3 +  5
-                    COMPUTE  WRK-KINGAKU-GENBUTU3 =
-                             WRK-KINGAKU-GENBUTU3 / 10
-                    COMPUTE  WRK-KINGAKU-GENBUTU3 =
-                             WRK-KINGAKU-GENBUTU3 * 10
-                  END-IF
-      *
-                  EVALUATE   WK-GENGAKUKBN
-                    WHEN        1
-                     IF  WK-GENGAKU-RITU = 100
-                         MOVE   ZERO     TO   WRK-HOKENICHIBUGAK
-                     ELSE
-                         COMPUTE  WK-GENGAKU-RITUX =
-                                  100 - WK-GENGAKU-RITU
-                         IF    WRK-HOKENICHIBUGAK  NOT = ZERO
-                           COMPUTE  WRK-HOKENICHIBUGAK    =
-                                   (WRK-HOKENICHIBUGAK    *
-                                    WK-GENGAKU-RITUX      /
-                                    100) + 0.5
-                         END-IF
-                     END-IF
-                    WHEN        2
-                     CONTINUE
-                    WHEN        3
-                    WHEN        4
-                         MOVE   ZERO     TO   WRK-HOKENICHIBUGAK
-                  END-EVALUATE
-                  IF   FLG-WRKFILE-CLEAR   =   ZERO
-                    COMPUTE  WRK-HOKENICHIBUGAK =
-                             WRK-HOKENICHIBUGAK +  5
-                    COMPUTE  WRK-HOKENICHIBUGAK =
-                             WRK-HOKENICHIBUGAK / 10
-                    COMPUTE  WRK-HOKENICHIBUGAK =
-                             WRK-HOKENICHIBUGAK * 10
-                  END-IF
-                END-IF
+      **>       IF   WK-GENGAKUKBN    NOT =   ZERO
+      **>       AND  WK-GENGAKUKBN-KEISAN =   ZERO
+      **>         EVALUATE   WK-GENGAKUKBN
+      **>           WHEN        1
+      **>            IF  WK-GENGAKU-RITU = 100
+      **>                MOVE   ZERO     TO   WRK-KINGAKU-GENBUTU3
+      **>            ELSE
+      **>                COMPUTE  WK-GENGAKU-RITUX =
+      **>                         100 - WK-GENGAKU-RITU
+      **>                IF    WRK-KINGAKU-GENBUTU3  NOT = ZERO
+      **>                  COMPUTE  WRK-KINGAKU-GENBUTU3  =
+      **>                          (WRK-KINGAKU-GENBUTU3  *
+      **>                           WK-GENGAKU-RITUX      /
+      **>                           100) + 0.5
+      **>                END-IF
+      **>            END-IF
+      **>           WHEN        2
+      **>            CONTINUE
+      **>           WHEN        3
+      **>           WHEN        4
+      **>                MOVE   ZERO     TO   WRK-KINGAKU-GENBUTU3
+      **>         END-EVALUATE
+      **>         IF  FLG-KOUGAKU2 = ZERO
+      **>           COMPUTE  WRK-KINGAKU-GENBUTU3 =
+      **>                    WRK-KINGAKU-GENBUTU3 +  5
+      **>           COMPUTE  WRK-KINGAKU-GENBUTU3 =
+      **>                    WRK-KINGAKU-GENBUTU3 / 10
+      **>           COMPUTE  WRK-KINGAKU-GENBUTU3 =
+      **>                    WRK-KINGAKU-GENBUTU3 * 10
+      **>         END-IF
+      **>       END-IF
                END-IF
       *
                MOVE    9999999    TO   WRK-CHK-KINGAKU
@@ -13701,35 +13643,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE    9999999              TO  WRK-CHK-KINGAKU3
                END-IF
       *
-      *        ¸ºÌÈ»þ
-               EVALUATE   WK-GENGAKUKBN
-                 WHEN        3
-                 WHEN        4
-                   IF  WRK-CHK-KINGAKU   NOT = 9999999
-                      MOVE   ZERO     TO   WRK-CHK-KINGAKU
-                   END-IF
-                   IF  WRK-CHK-KINGAKU2  NOT = 9999999
-                      MOVE   ZERO     TO   WRK-CHK-KINGAKU2
-                   END-IF
-                   IF  WRK-CHK-KINGAKU3  NOT = 9999999
-                      MOVE   ZERO     TO   WRK-CHK-KINGAKU3
-                   END-IF
-                   MOVE      ZERO     TO   WRK-KINGAKU-GENBUTU
-                   MOVE      ZERO     TO   WRK-KINGAKU-GENBUTU2
-                   MOVE      ZERO     TO   WRK-KINGAKU-GENBUTU4
-                   MOVE      ZERO     TO   WRK-KINGAKU-GENBUTU5
-               END-EVALUATE
-      *
                IF  (WRK-CHK-KINGAKU    NOT = 9999999)
                AND (WRK-CHK-KINGAKU2       = 9999999)
                  MOVE   WRK-CHK-KINGAKU   TO   WRK-CHK-KEIKASOCHI1
                  IF  ( FLG-JYOGENKBN             =  1       )
-                 AND ( WK-GENGAKUKBN         NOT =  3 AND 4 )
                  AND ( FLG-GENBUTU-TAISYOOK      =  ZERO    )
                      MOVE   9999999  TO   WRK-CHK-KEIKASOCHI1
                  END-IF
                  IF  (WRK-KOH-GAI-GEN70-KIN >  WRK-CHK-KEIKASOCHI1)
-                 OR  (WRK-CHK-KEIKASOCHI1   =  ZERO               )
                     CONTINUE
                  ELSE
                     MOVE    "3"      TO   RECE02-ZAITAKU
@@ -13740,16 +13661,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 IF   FLG-KEISAN-TOK1  =  1
                 AND  FLG-KEISAN-TOK2  =  1
                  IF  (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2)
-                 OR  (WRK-CHK-KINGAKU2       =  ZERO            )
                     CONTINUE
                  ELSE
                     MOVE    "3"      TO   RECE02-ZAITAKU
                  END-IF
                 ELSE
                  IF  (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2)
-                 OR  (WRK-CHK-KINGAKU2       =  ZERO            )
                  OR  (WRK-KOH-GAI-GEN70-KIN3 >  WRK-CHK-KINGAKU3)
-                 OR  (WRK-CHK-KINGAKU3       =  ZERO            )
                     CONTINUE
                  ELSE
                     MOVE    "3"      TO   RECE02-ZAITAKU
@@ -13760,12 +13678,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                AND (WRK-CHK-KINGAKU2   NOT = 9999999)
                 IF   FLG-JYOGENKBN  =  1
                   MOVE  WRK-CHK-KINGAKU  TO  WRK-CHK-KEIKASOCHI1
-                  IF  ( WK-GENGAKUKBN         NOT =  3 AND 4 )
-                  AND ( FLG-GENBUTU-TAISYOOK      =  ZERO    )
+                  IF  ( FLG-GENBUTU-TAISYOOK      =  ZERO    )
                     MOVE   9999999       TO  WRK-CHK-KEIKASOCHI1
                   END-IF
                   IF  (WRK-KOH-GAI-GEN70-KIN >  WRK-CHK-KEIKASOCHI1)
-                  OR  (WRK-CHK-KEIKASOCHI1   =  ZERO               )
                     MOVE   ZERO          TO  WRK-CHK-KEIKASOCHI1
                   END-IF
                   COMPUTE  WRK-CHK-KEIKASOCHIXX  =  WRK-KOH-GAI-GEN70
@@ -13874,7 +13790,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 AND  FLG-KEISAN-TOK2  =  1
                  IF  (WRK-CHK-KEIKASOCHIXX  >=  WRK-CHK-KEIKASOCHI1)
                  OR  (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2   )
-                 OR  (WRK-CHK-KINGAKU2       =  ZERO               )
                     CONTINUE
                  ELSE
                     MOVE    "3"      TO   RECE02-ZAITAKU
@@ -13882,11 +13797,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 ELSE
                  IF  (WRK-CHK-KEIKASOCHIXX  >=  WRK-CHK-KEIKASOCHI1)
                  OR  (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2   )
-                 OR  (WRK-CHK-KINGAKU2       =  ZERO               )
                  OR  (WRK-KOH-GAI-GEN70-KIN3 >  WRK-CHK-KINGAKU3   )
-                 OR  (WRK-CHK-KINGAKU3       =  ZERO               )
                  OR  (WRK-KOH-GAI-GEN70-KIN2 >  WRK-CHK-KINGAKU    )
-                 OR  (WRK-CHK-KINGAKU        =  ZERO               )
                  OR  (WRK-KOH-GAI-GEN70-KIN4 >  WRK-CHK-KINGAKU    )
                     CONTINUE
                  ELSE
@@ -13932,6 +13844,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
                END-IF
       *
+               IF   WK-GENGAKUKBN    =   3 OR 4
+                    MOVE    "3"      TO   RECE02-ZAITAKU
+               END-IF
+      *
                IF   RECE02-YOBIETC(3)     =   1
                     MOVE    "3"      TO   RECE02-ZAITAKU
                END-IF
@@ -13969,6 +13885,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    ¹âÎð¼Ô¤Î¸½ÊªµëÉÕ¥Á¥§¥Ã¥¯
            IF     (RECE02-SRYYM   <=  "201203")
            AND    (RECE02-ZAITAKU  =  "1"     )
+      *
+               IF   WK-GENGAKUKBN    =   3 OR 4
+                    MOVE    "4"      TO   RECE02-ZAITAKU
+               END-IF
       *
                IF   RECE02-YOBIETC(3)     =   1
                     MOVE    "4"      TO   RECE02-ZAITAKU
@@ -14016,65 +13936,39 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                IF      FLG-JYOGENKBN   =   1
                 PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
-                IF  WK-GENGAKUKBN-KEISAN  =   ZERO
-                  EVALUATE   WK-GENGAKUKBN
-                    WHEN        1
-                     IF  WK-GENGAKU-RITU = 100
-                         MOVE   ZERO     TO   WRK-KINGAKU-GENBUTU3
-                     ELSE
-                         COMPUTE  WK-GENGAKU-RITUX =
-                                  100 - WK-GENGAKU-RITU
-                         IF    WRK-KINGAKU-GENBUTU3  NOT = ZERO
-                           COMPUTE  WRK-KINGAKU-GENBUTU3  =
-                                   (WRK-KINGAKU-GENBUTU3  *
-                                    WK-GENGAKU-RITUX      /
-                                    100) + 0.5
-                         END-IF
-                     END-IF
-                    WHEN        2
-                     CONTINUE
-                    WHEN        3
-                    WHEN        4
-                         MOVE   ZERO     TO   WRK-KINGAKU-GENBUTU3
-                  END-EVALUATE
-                  IF  FLG-KOUGAKU2 = ZERO
-                    COMPUTE  WRK-KINGAKU-GENBUTU3 =
-                             WRK-KINGAKU-GENBUTU3 +  5
-                    COMPUTE  WRK-KINGAKU-GENBUTU3 =
-                             WRK-KINGAKU-GENBUTU3 / 10
-                    COMPUTE  WRK-KINGAKU-GENBUTU3 =
-                             WRK-KINGAKU-GENBUTU3 * 10
-                  END-IF
+      **>       IF   WK-GENGAKUKBN    NOT =   ZERO
+      **>       AND  WK-GENGAKUKBN-KEISAN =   ZERO
+      **>         EVALUATE   WK-GENGAKUKBN
+      **>           WHEN        1
+      **>            IF  WK-GENGAKU-RITU = 100
+      **>                MOVE   ZERO     TO   WRK-KINGAKU-GENBUTU3
+      **>            ELSE
+      **>                COMPUTE  WK-GENGAKU-RITUX =
+      **>                         100 - WK-GENGAKU-RITU
+      **>                IF    WRK-KINGAKU-GENBUTU3  NOT = ZERO
+      **>                  COMPUTE  WRK-KINGAKU-GENBUTU3  =
+      **>                          (WRK-KINGAKU-GENBUTU3  *
+      **>                           WK-GENGAKU-RITUX      /
+      **>                           100) + 0.5
+      **>                END-IF
+      **>            END-IF
+      **>           WHEN        2
+      **>            CONTINUE
+      **>           WHEN        3
+      **>           WHEN        4
+      **>                MOVE   ZERO     TO   WRK-KINGAKU-GENBUTU3
+      **>         END-EVALUATE
+      **>         IF  FLG-KOUGAKU2 = ZERO
+      **>           COMPUTE  WRK-KINGAKU-GENBUTU3 =
+      **>                    WRK-KINGAKU-GENBUTU3 +  5
+      **>           COMPUTE  WRK-KINGAKU-GENBUTU3 =
+      **>                    WRK-KINGAKU-GENBUTU3 / 10
+      **>           COMPUTE  WRK-KINGAKU-GENBUTU3 =
+      **>                    WRK-KINGAKU-GENBUTU3 * 10
+      **>         END-IF
+      **>       END-IF
       *
-                  EVALUATE   WK-GENGAKUKBN
-                    WHEN        1
-                     IF  WK-GENGAKU-RITU = 100
-                         MOVE   ZERO     TO   WRK-HOKENICHIBUGAK
-                     ELSE
-                         COMPUTE  WK-GENGAKU-RITUX =
-                                  100 - WK-GENGAKU-RITU
-                         IF    WRK-HOKENICHIBUGAK  NOT = ZERO
-                           COMPUTE  WRK-HOKENICHIBUGAK    =
-                                   (WRK-HOKENICHIBUGAK    *
-                                    WK-GENGAKU-RITUX      /
-                                    100) + 0.5
-                         END-IF
-                     END-IF
-                    WHEN        2
-                     CONTINUE
-                    WHEN        3
-                    WHEN        4
-                         MOVE   ZERO     TO   WRK-HOKENICHIBUGAK
-                  END-EVALUATE
-                  IF   FLG-WRKFILE-CLEAR   =   ZERO
-                    COMPUTE  WRK-HOKENICHIBUGAK =
-                             WRK-HOKENICHIBUGAK +  5
-                    COMPUTE  WRK-HOKENICHIBUGAK =
-                             WRK-HOKENICHIBUGAK / 10
-                    COMPUTE  WRK-HOKENICHIBUGAK =
-                             WRK-HOKENICHIBUGAK * 10
-                  END-IF
-      *
+                IF   WK-GENGAKUKBN    NOT =   ZERO
                   EVALUATE   WK-GENGAKUKBN
                     WHEN        1
                      IF  WK-GENGAKU-RITU = 100
@@ -14167,25 +14061,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE    9999999              TO  WRK-CHK-KINGAKU3
                END-IF
       *
-      *        ¸ºÌÈ»þ
-               EVALUATE   WK-GENGAKUKBN
-                 WHEN        3
-                 WHEN        4
-                   IF  WRK-CHK-KINGAKU   NOT = 9999999
-                      MOVE   ZERO     TO   WRK-CHK-KINGAKU
-                   END-IF
-                   IF  WRK-CHK-KINGAKU2  NOT = 9999999
-                      MOVE   ZERO     TO   WRK-CHK-KINGAKU2
-                   END-IF
-                   IF  WRK-CHK-KINGAKU3  NOT = 9999999
-                      MOVE   ZERO     TO   WRK-CHK-KINGAKU3
-                   END-IF
-                   MOVE      ZERO     TO   WRK-KINGAKU-GENBUTU
-                   MOVE      ZERO     TO   WRK-KINGAKU-GENBUTU2
-                   MOVE      ZERO     TO   WRK-KINGAKU-GENBUTU4
-                   MOVE      ZERO     TO   WRK-KINGAKU-GENBUTU5
-               END-EVALUATE
-      *
                IF   FLG-ZENKI-TOKUREI   =   1
                  MOVE   WRK-KOH-FTN-GEN70
                                     TO    WRK-KOH-FTN-GEN70-Z
@@ -14226,7 +14101,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                AND (WRK-CHK-KINGAKU2       = 9999999)
                    MOVE   WRK-CHK-KINGAKU   TO   WRK-CHK-KEIKASOCHI1
                    IF  (WRK-KOH-GAI-GEN70-KIN >  WRK-CHK-KEIKASOCHI1)
-                   OR  (WRK-CHK-KEIKASOCHI1   =  ZERO               )
                         CONTINUE
                    ELSE
                         MOVE    "4"      TO   RECE02-ZAITAKU
@@ -14238,16 +14112,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF   FLG-KEISAN-TOK1  =  1
                    AND  FLG-KEISAN-TOK2  =  1
                      IF  (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2)
-                     OR  (WRK-CHK-KINGAKU2       =  ZERO            )
                         CONTINUE
                      ELSE
                         MOVE    "4"      TO   RECE02-ZAITAKU
                      END-IF
                    ELSE
                      IF  (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2)
-                     OR  (WRK-CHK-KINGAKU2       =  ZERO            )
                      OR  (WRK-KOH-GAI-GEN70-KIN3 >  WRK-CHK-KINGAKU3)
-                     OR  (WRK-CHK-KINGAKU3       =  ZERO            )
                         CONTINUE
                      ELSE
                         MOVE    "4"      TO   RECE02-ZAITAKU
@@ -14260,7 +14131,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF   FLG-JYOGENKBN  =  1
                      MOVE  WRK-CHK-KINGAKU  TO  WRK-CHK-KEIKASOCHI1
                      IF  (WRK-KOH-GAI-GEN70-KIN >  WRK-CHK-KEIKASOCHI1)
-                     OR  (WRK-CHK-KEIKASOCHI1   =  ZERO               )
                        MOVE   ZERO          TO  WRK-CHK-KEIKASOCHI1
                      END-IF
                      MOVE WRK-CHK-KEIKASOCHIXX9 TO WRK-CHK-KEIKASOCHIXX
@@ -14361,7 +14231,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    AND  FLG-KEISAN-TOK2  =  1
                      IF (WRK-CHK-KEIKASOCHIXX  >=  WRK-CHK-KEIKASOCHI1)
                      OR (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2   )
-                     OR (WRK-CHK-KINGAKU2       =  ZERO               )
                         CONTINUE
                      ELSE
                         MOVE    "4"      TO   RECE02-ZAITAKU
@@ -14369,11 +14238,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      IF (WRK-CHK-KEIKASOCHIXX  >=  WRK-CHK-KEIKASOCHI1)
                      OR (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2   )
-                     OR (WRK-CHK-KINGAKU2       =  ZERO               )
                      OR (WRK-KOH-GAI-GEN70-KIN3 >  WRK-CHK-KINGAKU3   )
-                     OR (WRK-CHK-KINGAKU3       =  ZERO               )
                      OR (WRK-KOH-GAI-GEN70-KIN2 >  WRK-CHK-KINGAKU    )
-                     OR (WRK-CHK-KINGAKU        =  ZERO               )
                      OR (WRK-KOH-GAI-GEN70-KIN4 >  WRK-CHK-KINGAKU    )
                         CONTINUE
                      ELSE
@@ -14392,6 +14258,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                AND (FLG-SYSCHK            =   1  )
                AND (RECE02-ZAITAKU        =  "4" )
                     MOVE    "1"      TO   RECE02-ZAITAKU
+               END-IF
+      *
+               IF   WK-GENGAKUKBN    =   3 OR 4
+                    MOVE    "4"      TO   RECE02-ZAITAKU
                END-IF
       *
                IF   RECE02-YOBIETC(3)     =   1
