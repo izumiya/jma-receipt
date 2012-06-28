@@ -150,6 +150,7 @@
       *                                     ついて在総診の設定を行わない
       *  04.05.35    NACL-門脇    12/04/24  保険欄−一部負担金欄記載に関
       *                                     するフラグ編集
+      *  04.05.36    NACL-門脇    12/06/28  生保まとめ分点欄摘要欄記載対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -344,6 +345,7 @@
            03  FLG-LINE            PIC 9(01).
            03  FLG-RECECOM-SJKBN   PIC 9(01).
            03  FLG-STS             PIC 9(04).
+           03  FLG-MEISYO-HENSYU   PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -4762,19 +4764,19 @@
                        (RECE02-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
                        (RECE02-HENTOTALTEN(IDX1) NOT =
                                      RECE02-HENTOTALTEN(IDX2)))
-                  IF    RECE02-SEIHOFLG    =  "1"
-                   MOVE    RECE02-TENSU(IDX IDX2)  TO   WRK-TENSUZ
-                   MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
+      ***         IF    RECE02-SEIHOFLG    =  "1"
+      ***          MOVE    RECE02-TENSU(IDX IDX2)  TO   WRK-TENSUZ
+      ***          MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
       *
-                   COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX2)
-                                           -     RECE02-TENSU(IDX IDX1)
-                   MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ
-                   MOVE    WRK-KOUTEN            TO  HC06-KOUTEN  (IDX)
-                  ELSE
+      ***          COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX2)
+      ***                                  -     RECE02-TENSU(IDX IDX1)
+      ***          MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ
+      ***          MOVE    WRK-KOUTEN            TO  HC06-KOUTEN  (IDX)
+      ***         ELSE
                    MOVE    RECE02-TENSU(IDX IDX2)
                                                  TO  WRK-KOUTENZ
                    MOVE    WRK-KOUTEN            TO  HC06-KOUTEN  (IDX)
-                  END-IF
+      ***         END-IF
                  END-IF
                END-IF
            END-PERFORM
@@ -6129,6 +6131,7 @@
                  END-IF
               END-PERFORM
               IF     IDX-KUGIRI2    NOT =    ZERO
+                MOVE     ZERO     TO   FLG-MEISYO-HENSYU
                 PERFORM  VARYING  IDX-KUGIRI1  FROM   1   BY   1
                           UNTIL   IDX-KUGIRI1   >     4
                  IF  RECE02-KOHNUMHC(IDX-KUGIRI2 IDX-KUGIRI1)
@@ -6144,11 +6147,45 @@
                          MOVE     RECE02-KOHNUM(IDX-KUGIRI3)
                                          TO  WRK-HENSYU-KOHNUM
                          PERFORM  341101-HKNNUM-KENSAKU-SEC
+                         IF   RECE02-SEIHOFLG  =  "1"
+                           IF  (RECE02-HKNNUMHC(IDX-KUGIRI2)
+                                                 NOT =  SPACE)
+                           AND (RECE02-KOHNUMHC(IDX-KUGIRI2 1)
+                                                 NOT =  SPACE)
+                           AND (RECE02-KOHNUMHC(IDX-KUGIRI2 2)
+                                                     =  SPACE)
+                           AND (RECE02-KOHNUMHC(IDX-KUGIRI2 3)
+                                                     =  SPACE)
+                           AND (RECE02-KOHNUMHC(IDX-KUGIRI2 4)
+                                                     =  SPACE)
+                             MOVE   1      TO   FLG-MEISYO-HENSYU
+                           END-IF
+                           IF  (RECE02-HKNNUMHC(IDX-KUGIRI2)
+                                                     =  SPACE)
+                           AND (RECE02-KOHNUMHC(IDX-KUGIRI2 1)
+                                                 NOT =  SPACE)
+                           AND (RECE02-KOHNUMHC(IDX-KUGIRI2 2)
+                                                     =  SPACE)
+                           AND (RECE02-KOHNUMHC(IDX-KUGIRI2 3)
+                                                     =  SPACE)
+                           AND (RECE02-KOHNUMHC(IDX-KUGIRI2 4)
+                                                     =  SPACE)
+                             MOVE   2      TO   FLG-MEISYO-HENSYU
+                           END-IF
+                         END-IF
                          ADD        1      TO   IDX-KUGIRI4
                          EVALUATE   IDX-KUGIRI4
                            WHEN         1
                               MOVE  HKN-TANSEIDONAME
                                          TO WRK-HENSYU-KOHNAME1
+                              EVALUATE  FLG-MEISYO-HENSYU
+                                WHEN       1
+                                  MOVE  "（併用分）"
+                                         TO WRK-HENSYU-KOHNAME2
+      ***                       WHEN       2
+      ***                         MOVE  "（単独分）"
+      ***                                TO WRK-HENSYU-KOHNAME2
+                              END-EVALUATE
                            WHEN         2
                               MOVE  "＋" TO WRK-HENSYU-KOHNAME2-PLUS
                               MOVE  HKN-TANSEIDONAME
