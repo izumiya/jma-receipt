@@ -380,6 +380,9 @@
       *                                     行うようにする
       *  04.05.35    NACL-門脇    12/04/19  一部負担金・食事療養費標準負担
       *                                     額区分の記録変更
+      *  04.05.31    NACL-藤原    12/06/25  加減算対象となる複数の基本項目を
+      *                                     まとめて記録するときに途中にコメ
+      *                                     ントがあった場合の記録順の修正 
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
@@ -4875,10 +4878,6 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                MOVE    SPACE               TO  WRK-CHUKSNCD
                MOVE    ZERO                TO  FLG-KOUI
                PERFORM UNTIL   IDX >   WRK-TBLMAX1
-      ****           IF      TBL-KOUI-SRYCD (IDX) = "150268970"
-      ****                MOVE    1      TO  TBL-KOUI-KOKUJISKBKBN1 (IDX)
-      ****                                   TBL-KOUI-KOKUJISKBKBN2 (IDX) 
-      ****           END-IF
                  IF    ( TBL-KOUI-SRYCD (IDX)  =   SPACE       )
                  OR    ( TBL-KOUI-SRYCD (IDX) (1:1)
                                                =   "0" OR  "8" )
@@ -4943,11 +4942,10 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                    END-EVALUATE
       *    
                    COMPUTE IDX     =   IDX     +   1
-                   IF      IDX     <=  WRK-TBLMAX1
-      ****               IF      TBL-KOUI-SRYCD (IDX) = "150268970"
-      ****                 MOVE    1      TO  TBL-KOUI-KOKUJISKBKBN1 (IDX)
-      ****                                    TBL-KOUI-KOKUJISKBKBN2 (IDX) 
-      ****               END-IF
+                 END-IF
+      *    
+                 IF    ( IDX       <=  WRK-TBLMAX1 )
+                 AND   ( IDYY      >   ZERO        )
                      IF    ( TBL-KOUI-SRYCD (IDX) (1:1)
                                    =   "1"                 )
                      AND   ( TBL-KOUI-KOKUJISKBKBN1 (IDX)
@@ -4959,7 +4957,6 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                              MOVE    9                 TO  FLG-KOUI
                          END-IF 
                      END-IF
-                   END-IF
                  END-IF
                END-PERFORM
       *
