@@ -2717,6 +2717,13 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "K237"
+                   STRING  "警告！"
+                           "処方せん料が包括されます。"
+                           "算定できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
       *!!!
                WHEN    OTHER
                    MOVE    SPA-ERRCD
