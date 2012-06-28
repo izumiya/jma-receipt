@@ -2024,6 +2024,14 @@
            MOVE    "key37"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC.
       *
+      *    月末日を取得
+           INITIALIZE                        STS-AREA-DAY
+           INITIALIZE                        LNK-DAY7-AREA
+           MOVE    "71"                TO    LNK-DAY7-IRAI
+           MOVE    SPA-NAI-SRYYM       TO    LNK-DAY7-YM
+           CALL    "ORCSDAY"     USING       STS-AREA-DAY
+                                             LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI     TO    WRK-MATSUYMD
       *
       *    入院会計マスターを編集（入院料以外）
            INITIALIZE                      NYUINACCT-REC
@@ -2057,36 +2065,18 @@
                    WHEN    "4"
                        IF      NACCT-ZAITEN    =    ZERO
                            MOVE    ZERO           TO  SPA-TAIHI-SHOKUJI
-                           PERFORM VARYING IDX-HKN     FROM   1   BY  1
-                               UNTIL   IDX-HKN     >   31
-                               IF      NACCT-DAY (IDX-HKN)  NOT =  ZERO
-                                   MOVE   NACCT-DAY(IDX-HKN)
+                           IF    NACCT-SRYCDTOTAL   =   099999913  OR
+                                                        099999920
+                               MOVE   NACCT-DAY(WRK-MATSUDD)
                                                   TO  SPA-TAIHI-SHOKUJI
-                               END-IF
-                           END-PERFORM
+                           END-IF
                        ELSE
+      *                    食堂加算
                            IF    NACCT-SRYCDTOTAL   =   197000570
-      *                      月末日を取得
-                             INITIALIZE                 STS-AREA-DAY
-                             INITIALIZE                 LNK-DAY7-AREA
-                             MOVE     "71"        TO    LNK-DAY7-IRAI
-                             MOVE     NACCT-SRYYM TO    LNK-DAY7-YM
-                             CALL  "ORCSDAY"    USING   STS-AREA-DAY
-                                                        LNK-DAY7-AREA
-                             MOVE    LNK-DAY7-KOYOMI
-                                                  TO   WRK-MATSUYMD
-      *
                              MOVE      1          TO   SPA-SHOKUDOU-OFF
                              IF   NACCT-DAY(WRK-MATSUDD)  NOT = ZERO
                                  MOVE   ZERO  TO  SPA-SHOKUDOU-OFF
                              END-IF
-      *                       PERFORM  VARYING IDX-SHOKUDOU  FROM 1 BY 1
-      *                              UNTIL  (IDX-SHOKUDOU  >  31)  OR
-      *                                     (SPA-SHOKUDOU-OFF  =  ZERO)
-      *                         IF   NACCT-DAY(IDX-SHOKUDOU)  NOT = ZERO
-      *                             MOVE   ZERO  TO  SPA-SHOKUDOU-OFF
-      *                         END-IF
-      *                       END-PERFORM
                            END-IF
                        END-IF
       *            最終日の保険組合せを退避（次月会計の作成用）
@@ -9982,28 +9972,32 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *    回数テーブル（１日から３１日）
            MOVE    SPA-NAI-DAY-AREA-41 (IDX) TO  NACCT-DAY-AREA.
       *
+      *    月末日を取得
+           INITIALIZE                        STS-AREA-DAY
+           INITIALIZE                        LNK-DAY7-AREA
+           MOVE    "71"                TO    LNK-DAY7-IRAI
+           MOVE    NACCT-SRYYM         TO    LNK-DAY7-YM
+           CALL    "ORCSDAY"     USING       STS-AREA-DAY
+                                             LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI     TO    WRK-MATSUYMD
+      *
            EVALUATE    NACCT-ZAISKBKBN
       *        最終日の食事を退避（次月会計の作成用）
                WHEN    "4"
                    IF    NACCT-ZAITEN   =   ZERO
-                       MOVE    ZERO            TO  SPA-TAIHI-SHOKUJI
-                       PERFORM VARYING IDX-HKN     FROM   1   BY  1
-                               UNTIL   IDX-HKN     >   31
-                           IF      NACCT-DAY (IDX-HKN)  NOT =   ZERO
-                               MOVE   NACCT-DAY(IDX-HKN)
-                                               TO  SPA-TAIHI-SHOKUJI
-                           END-IF
-                       END-PERFORM
+                       MOVE    ZERO           TO  SPA-TAIHI-SHOKUJI
+                       IF    NACCT-SRYCDTOTAL   =   099999913  OR
+                                                    099999920
+                           MOVE   NACCT-DAY(WRK-MATSUDD)
+                                              TO  SPA-TAIHI-SHOKUJI
+                       END-IF
                    ELSE
+      *                食堂加算
                        IF    NACCT-SRYCDTOTAL   =   197000570
-                           MOVE      1          TO   SPA-SHOKUDOU-OFF
-                           PERFORM  VARYING IDX-SHOKUDOU  FROM  1  BY 1
-                                    UNTIL  (IDX-SHOKUDOU  >  31)  OR
-                                           (SPA-SHOKUDOU-OFF  =  ZERO)
-                               IF   NACCT-DAY(IDX-SHOKUDOU)  NOT = ZERO
-                                   MOVE   ZERO  TO  SPA-SHOKUDOU-OFF
-                               END-IF
-                           END-PERFORM
+                             MOVE      1          TO   SPA-SHOKUDOU-OFF
+                             IF   NACCT-DAY(WRK-MATSUDD)  NOT = ZERO
+                                 MOVE   ZERO  TO  SPA-SHOKUDOU-OFF
+                             END-IF
                        END-IF
                    END-IF
       *        最終日の保険組合せを退避（次月会計の作成用）

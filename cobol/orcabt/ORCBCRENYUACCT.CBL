@@ -748,15 +748,11 @@
       *            여색
                    IF    ( NACCT-ZAISKBKBN     =    "4"    )   AND
                          ( NACCT-ZAITEN        =    ZERO   )
-                       MOVE    ZERO      TO   IDX-SHOKUJI
-                       PERFORM VARYING IDX-SHOKUJI FROM IDX-DAY BY -1
-                          UNTIL (IDX-SHOKUJI  < 1)
-                                IF  NACCT-DAY(IDX-SHOKUJI) NOT = ZERO
-                                    MOVE  NACCT-DAY(IDX-SHOKUJI)
+                       IF    NACCT-SRYCDTOTAL   =   099999913  OR
+                                                    099999920
+                           MOVE  NACCT-DAY(IDX-DAY)
                                             TO  WRK-TAIHI-SHOKUJI
-                                    MOVE  1   TO  IDX-SHOKUJI
-                                END-IF
-                       END-PERFORM
+                       END-IF
                    END-IF
       *            여틀꼴뻣
                    IF    ( NACCT-ZAISKBKBN     =    "4"    )   AND
