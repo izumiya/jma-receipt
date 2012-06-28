@@ -519,6 +519,8 @@
                    07  WRK-TENROOM-SKJ19   PIC 9(03)  OCCURS  31.
                    07  WRK-TENROOM-SKJ20   PIC 9(03)  OCCURS  31.
                    07  WRK-TENROOM-GAIHAKU PIC 9(03)  OCCURS  31.
+           03  WRK-TENROOM-MAE-SKJ1        PIC 9(03).
+           03  WRK-TENROOM-MAE-SKJ2        PIC 9(03).
            03  WRK-NAI-NYUINYMD.
                05  WRK-NAI-NYUINYM         PIC X(06).
                05  WRK-NAI-NYUINDD         PIC 9(02).
@@ -541,6 +543,12 @@
            03  WRK-SHOKUJI-ASA             PIC 9(01).
            03  WRK-SHOKUJI-HIRU            PIC 9(01).
            03  WRK-SHOKUJI-YORU            PIC 9(01).
+      *
+      *    前月末日算定用
+           03  WRK-CHK-SRYYM               PIC X(06).
+           03  WRK-CHK-SRYYMR      REDEFINES  WRK-CHK-SRYYM.
+               05  WRK-CHK-SRYYR           PIC 9(04).
+               05  WRK-CHK-SRYMR           PIC 9(02).
       *
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
@@ -18912,12 +18920,51 @@
            END-IF
       *
       *    入院会計作成前に会計データの食事区分を退避
+      *
            IF  SPA-NAI-I01-IDOYMD(1:6)  >= "200604"
+      *
+      *      前月末日の食事会計取得
+      *     （異動日の入院会計が存在しない場合、前月末の食事情報取得の為）
+             MOVE    SPA-NAI-I01-IDOYMD(1:6)
+                                           TO  WRK-CHK-SRYYM
+             IF      WRK-CHK-SRYMR         =   1
+                 COMPUTE   WRK-CHK-SRYYR   =   WRK-CHK-SRYYR - 1
+                 MOVE      12              TO  WRK-CHK-SRYMR
+             ELSE
+                 COMPUTE   WRK-CHK-SRYMR   =   WRK-CHK-SRYMR - 1
+             END-IF
+      *      前月の月末日を取得
+             INITIALIZE                        STS-AREA-DAY
+             INITIALIZE                        LNK-DAY7-AREA
+             MOVE      "71"                TO  LNK-DAY7-IRAI
+             MOVE    WRK-CHK-SRYYM         TO  LNK-DAY7-YM
+             CALL    "ORCSDAY"       USING     STS-AREA-DAY
+                                               LNK-DAY7-AREA
+             MOVE    LNK-DAY7-KOYOMI       TO  IDX-MATSUBI
+      *      異動日前月末日の食事会計（夕食）を読み込み
+             INITIALIZE                        NYUINACCT-REC
+             MOVE    PTNYUINRRK-HOSPNUM    TO  NACCT-HOSPNUM
+             MOVE    PTNYUINRRK-PTID       TO  NACCT-PTID
+             MOVE    WRK-CHK-SRYYM         TO  NACCT-SRYYM
+             MOVE    "key32"               TO  MCP-PATHNAME
+             PERFORM  910-NYUINACCT-SELECT-SEC
+             MOVE    "key32"               TO  MCP-PATHNAME
+             PERFORM  910-NYUINACCT-READ-SEC
+             IF      FLG-NYUINACCT         =   ZERO
+                 MOVE     MCPDATA-REC      TO  NYUINACCT-REC
+                 MOVE     NACCT-DAY(IDX-MATSUBI)
+                                           TO WRK-TENROOM-MAE-SKJ1
+             END-IF
+      *      入院会計マスタクローズ
+             MOVE    "tbl_nyuinacct"       TO  MCP-TABLE
+             MOVE    "key32"               TO  MCP-PATHNAME
+             PERFORM 910-DBCLOSECURSOR-SEC
+      *
       *      （異動月分）
              PERFORM   VARYING   IDX-SKJ-TAIHI  FROM  1 BY  1
                UNTIL   IDX-SKJ-TAIHI  >    3
                INITIALIZE                      NYUINACCT-REC
-               MOVE    PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
+               MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
                MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
                MOVE    SPA-NAI-I01-IDOYMD(1:6)
                                            TO  NACCT-SRYYM
@@ -18961,10 +19008,24 @@
                                          TO WRK-TENROOM-SKJ19(1 IDX-SKJ)
                         END-PERFORM
                      WHEN  3
+      *                 月末日を算定
+                        INITIALIZE                  STS-AREA-DAY
+                        INITIALIZE                  LNK-DAY7-AREA
+                        MOVE      "71"          TO  LNK-DAY7-IRAI
+                        MOVE    SPA-NAI-I01-IDOYMD(1:6)
+                                                TO  LNK-DAY7-YM
+                        CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                                        LNK-DAY7-AREA
+                        MOVE    LNK-DAY7-KOYOMI TO  IDX-MATSUBI
+      *
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
                            UNTIL     IDX-SKJ   >   31
                                MOVE   NACCT-DAY(IDX-SKJ)
                                          TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
+                               IF    IDX-SKJ   =    IDX-MATSUBI
+                                   MOVE    NACCT-DAY(IDX-SKJ)
+                                               TO  WRK-TENROOM-MAE-SKJ2
+                               END-IF
                         END-PERFORM
                  END-EVALUATE
                ELSE
@@ -18986,47 +19047,20 @@
                      WHEN  1
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
                            UNTIL     IDX-SKJ   >   IDX-MATSUBI
-                               EVALUATE   PTNYUINRRK-SKJKBN
-                                   WHEN   "0"
-                                     MOVE   0
-                                         TO WRK-TENROOM-SKJ18(1 IDX-SKJ)
-                                   WHEN   "1"
-                                     MOVE   1
-                                         TO WRK-TENROOM-SKJ18(1 IDX-SKJ)
-                                   WHEN   "2"
-                                     MOVE   2
-                                         TO WRK-TENROOM-SKJ18(1 IDX-SKJ)
-                               END-EVALUATE
+                              MOVE   WRK-TENROOM-MAE-SKJ1
+                                        TO WRK-TENROOM-SKJ18(1 IDX-SKJ)
                         END-PERFORM
                      WHEN  2
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
                            UNTIL     IDX-SKJ   >   IDX-MATSUBI
-                               EVALUATE   PTNYUINRRK-SKJKBN
-                                   WHEN   "0"
-                                     MOVE   0
-                                         TO WRK-TENROOM-SKJ19(1 IDX-SKJ)
-                                   WHEN   "1"
-                                     MOVE   1
-                                         TO WRK-TENROOM-SKJ19(1 IDX-SKJ)
-                                   WHEN   "2"
-                                     MOVE   2
-                                         TO WRK-TENROOM-SKJ19(1 IDX-SKJ)
-                               END-EVALUATE
+                              MOVE   WRK-TENROOM-MAE-SKJ1
+                                        TO WRK-TENROOM-SKJ19(1 IDX-SKJ)
                         END-PERFORM
                      WHEN  3
                         PERFORM VARYING IDX-SKJ FROM IDX-SHOKUJI9 BY  1
                            UNTIL     IDX-SKJ   >   IDX-MATSUBI
-                               EVALUATE   PTNYUINRRK-SKJKBN
-                                   WHEN   "0"
-                                     MOVE   0
-                                         TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
-                                   WHEN   "1"
-                                     MOVE   1
-                                         TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
-                                   WHEN   "2"
-                                     MOVE   2
-                                         TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
-                               END-EVALUATE
+                              MOVE   WRK-TENROOM-MAE-SKJ1
+                                        TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
                         END-PERFORM
                  END-EVALUATE
                  MOVE    SPACE           TO  WRK-TENROOM-SKJ-SRYYM(1)
@@ -19103,7 +19137,38 @@
                        END-PERFORM
                  END-EVALUATE
                ELSE
-                   MOVE    SPACE           TO  WRK-TENROOM-SKJ-SRYYM(2)
+                 MOVE    WRK-TENROOM-SKJ-SRYYMX
+                                        TO  WRK-TENROOM-SKJ-SRYYM(2)
+      *          月末日を算定
+                 INITIALIZE                  STS-AREA-DAY
+                 INITIALIZE                  LNK-DAY7-AREA
+                 MOVE      "71"          TO  LNK-DAY7-IRAI
+                 MOVE    WRK-TENROOM-SKJ-SRYYMX
+                                         TO  LNK-DAY7-YM
+                 CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                                 LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI TO  IDX-MATSUBI
+      *
+                 EVALUATE  IDX-SKJ-TAIHI
+                     WHEN  1
+                        PERFORM VARYING IDX-SKJ FROM 1 BY  1
+                           UNTIL     IDX-SKJ   >   IDX-MATSUBI
+                              MOVE   WRK-TENROOM-MAE-SKJ2
+                                        TO WRK-TENROOM-SKJ18(2 IDX-SKJ)
+                        END-PERFORM
+                     WHEN  2
+                        PERFORM VARYING IDX-SKJ FROM 1  BY  1
+                           UNTIL     IDX-SKJ   >   IDX-MATSUBI
+                              MOVE   WRK-TENROOM-MAE-SKJ2
+                                        TO WRK-TENROOM-SKJ19(2 IDX-SKJ)
+                        END-PERFORM
+                     WHEN  3
+                        PERFORM VARYING IDX-SKJ FROM 1  BY  1
+                           UNTIL     IDX-SKJ   >   IDX-MATSUBI
+                              MOVE   WRK-TENROOM-MAE-SKJ2
+                                        TO WRK-TENROOM-SKJ20(2 IDX-SKJ)
+                        END-PERFORM
+                 END-EVALUATE
                END-IF
       *        入院会計マスタクローズ
                MOVE    "tbl_nyuinacct"    TO  MCP-TABLE
@@ -19118,6 +19183,7 @@
                PERFORM 910-DBCLOSECURSOR-SEC
              END-PERFORM
            ELSE
+      *       ここから２００６年３月以前の食事退避処理
       *      （異動月分）
              INITIALIZE                      NYUINACCT-REC
              MOVE    PTNYUINRRK-HOSPNUM   TO  NACCT-HOSPNUM
