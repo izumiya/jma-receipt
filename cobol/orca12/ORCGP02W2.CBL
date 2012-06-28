@@ -102,6 +102,9 @@
       *                                     保険組合せ作成
       *  04.05.04    NACL-門脇    11/07/20  019原爆と地方公費の
       *                                     保険組合せ作成
+      *  04.05.05    NACL-門脇    12/06/28  一般療養、特別療養（旧日雇保険）
+      *                                     の場合の生保単独の保険組み合わせ
+      *                                     作成変更
       *
       *  04.06.01    NACL-小豆沢  11/07/04  更正と特定疾患負担無（水俣）の
       *                                     保険組合せ作成
@@ -180,7 +183,9 @@
       *----(01.00.01) LINE ADD END   ---------------------------------
            03  FLG-SYOCYO          PIC 9(01).
            03  FLG-HANTEI          PIC 9(01).
-           03  FLG-KOH-CHK          PIC 9(01).
+           03  FLG-KOH-CHK         PIC 9(01).
+           03  FLG-ARI             PIC 9(01).
+           03  FLG-HIYATOI         PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -212,7 +217,12 @@
            03  IDX1                PIC 9(04).
            03  IDX2                PIC 9(04).
            03  IDX3                PIC 9(04).
+           03  IDX4                PIC 9(04).
+           03  IDX5                PIC 9(04).
            03  IDX6                PIC 9(04).
+           03  IDX7                PIC 9(04).
+           03  IDX8                PIC 9(04).
+           03  IDX9                PIC 9(04).
            03  IDY2                PIC 9(04).
       *
        01  WRK-KCOMB-AREA.
@@ -231,6 +241,14 @@
            02  WRK-LCOMB-REC       OCCURS   100.
            COPY  "CPHKNCOMBI.INC" REPLACING //COMB-//
                                          BY //WRK-LCOMB-//.
+       01  WRK-LCOMB2-AREA.
+           02  WRK-LCOMB2-REC      OCCURS   100.
+           COPY  "CPHKNCOMBI.INC" REPLACING //COMB-//
+                                         BY //WRK-LCOMB2-//.
+       01  WRK-LCOMB3-AREA.
+           02  WRK-LCOMB3-REC      OCCURS   100.
+           COPY  "CPHKNCOMBI.INC" REPLACING //COMB-//
+                                         BY //WRK-LCOMB3-//.
       *
        01  WRK-TCOMB-AREA.
       *    　組合せ退避用（省庁用）
@@ -283,6 +301,7 @@
            03  WRK-KCOMB-MAX       PIC 9(04).
            03  WRK-RCOMB-MAX       PIC 9(04).
            03  WRK-LCOMB-MAX       PIC 9(04).
+           03  WRK-LCOMB2-MAX      PIC 9(04).
            03  WRK-LCOMB-MAX-O     PIC 9(04).
       *    1:通常 / 2:生保つけない / 3:元にたいして生保つけない
            03  WRK-FTN-FLG         PIC X(01).
@@ -377,6 +396,15 @@
       *
            03  WRK-SYOCYO-TEKSTYMD         PIC 9(08).
            03  WRK-SYOCYO-TEKEDYMD         PIC 9(08).
+      *
+           03  WRK-SEIHO-YMD               PIC X(08).
+      *
+           03  TBL-SEIHO-YMD-T.
+               05  TBL-SEIHO-YMD-OCC       OCCURS   100.
+                   07  TBL-SEIHO-YMD       PIC X(08).
+           03  TBL-SEIHO-YMD2-T.
+               05  TBL-SEIHO-YMD2-OCC      OCCURS   100.
+                   07  TBL-SEIHO-YMD2      PIC X(08).
       *
        01  WRK-HIYATOI-AREA.
            03  WRK-HIYATOI-FLG             PIC 9(01).
@@ -3108,13 +3136,20 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                  MOVE    ZERO              TO  WRK-COMB-RJNIDX
                  PERFORM 570131-HKNIDX-SORT-SEC
       *
+                 MOVE    ZERO              TO  FLG-HIYATOI
                  IF  WRK-SRT-HKN-CNT       >   ZERO
       *            [保険テーブル]より主保険を検索
                    PERFORM     VARYING   IDZ   FROM  1   BY  1
                                UNTIL     IDZ   >     WRK-SRT-HKN-CNT
                        MOVE    WRK-SRT-HKN-IDX (IDZ)
                                          TO  WRK-COMB-SYUHOIDX
-                       PERFORM 570132-SEIHO-HKN-HEN-SEC
+                       IF  (WRK-HKN-HKNNUM(WRK-COMB-SYUHOIDX)
+                                                =  "003" OR "004")
+                          MOVE    1        TO  FLG-HIYATOI
+                          PERFORM 570132X-SEIHO-HKN-HEN-SEC
+                       ELSE
+                          PERFORM 570132-SEIHO-HKN-HEN-SEC
+                       END-IF
                    END-PERFORM
       *            主保険が終了しその後、生保のみが存在する場合
                    IF  WRK-KCOMB-TEKSTYMD (IDX2)
@@ -3146,6 +3181,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 57012-FUTAN-SET-SEC
                  END-IF
       *
+                 IF    FLG-HIYATOI  =   1
+                    PERFORM  570133-SEIHO-OKIKAE-HENSYU-SEC
+                 END-IF
+      *
                  PERFORM     57010-NC01PARA-OUT-SEC
       *
              END-IF
@@ -3168,18 +3207,12 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
              IF ((WRK-KOH-SBT   (IDX)  =   "6")   AND
                  (WRK-KOH-SAKJOKBN   (IDX)  =   SPACE)) OR
                 ((WRK-KOH-HKNNUM   (IDX)  =   "019"
-                                          OR  "012"
-      *          残留邦人
-                                          OR  "025"
                                           OR  "011")   AND
                  (WRK-KOH-SAKJOKBN (IDX)  =   SPACE)   AND
                  (WRK-HIYATOI-FLG         =   1 )     )
       *
                MOVE    ZERO            TO  FLG-KOH-CHK
                IF      WRK-KOH-HKNNUM   (IDX)  =   "019"
-                                               OR "012"
-      *          残留邦人
-                                               OR  "025"
                                                OR  "011"
                    MOVE    1           TO  FLG-KOH-CHK
       *            日雇いの範囲外は作成しない
@@ -3234,8 +3267,7 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                PERFORM     57010-NC01PARA-OUT-SEC
       *
-             END-IF
-      *
+               END-IF
              END-IF
            END-PERFORM
           .
@@ -4958,6 +4990,254 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            .
        570132-SEIHO-HKN-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    生保−主保険　組合せ作成処理
+      *****************************************************************
+       570132X-SEIHO-HKN-HEN-SEC       SECTION.
+      *
+           MOVE    WRK-COMB-SYUHOIDX  TO  IDX6
+      *    [保険 開始日]≦[生保 開始日]
+           IF  WRK-HKN-TEKSTYMD(WRK-COMB-SYUHOIDX)
+                                    <=  WRK-KCOMB-TEKSTYMD (IDX2)
+      *        [保険 終了日]＜[生保 終了日]
+               IF  WRK-HKN-TEKEDYMD(WRK-COMB-SYUHOIDX)
+                                    <   WRK-KCOMB-TEKEDYMD (IDX2)
+      *@@
+                   ADD     1               TO  WRK-RCOMB-MAX
+                   MOVE    WRK-RCOMB-MAX   TO  IDX1
+                   MOVE    WRK-KCOMB-REC(IDX2)
+                                           TO  WRK-RCOMB-REC(IDX1)
+                   MOVE    WRK-HKN-TEKEDYMD(WRK-COMB-SYUHOIDX)
+                                           TO  WRK-RCOMB-TEKEDYMD(IDX1)
+      *@@
+      *            ○生保の開始日変更
+      *            主保険　終了日の翌日取得
+                   INITIALIZE                  STS-AREA-DAY
+                   INITIALIZE                  LNK-DAY6-AREA
+                   MOVE    "61"                TO  LNK-DAY6-IRAI
+                   MOVE    WRK-HKN-TEKEDYMD   (WRK-COMB-SYUHOIDX)
+                                               TO  LNK-DAY6-KIJUN
+                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+                   MOVE     1                  TO  LNK-DAY6-ZOGEN
+                   PERFORM 4221-YMD-GET-SEC
+                   MOVE    WRK-SYMD TO  WRK-KCOMB-TEKSTYMD (IDX2)
+               END-IF
+           ELSE
+      *        [生保 開始日]＜[保険 開始日]
+      *        保険　開始日の前日取得
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY6-AREA
+               MOVE    "61"                TO  LNK-DAY6-IRAI
+               MOVE    WRK-HKN-TEKSTYMD   (WRK-COMB-SYUHOIDX)
+                                           TO  LNK-DAY6-KIJUN
+               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+               MOVE    -1                  TO  LNK-DAY6-ZOGEN
+               PERFORM 4221-YMD-GET-SEC
+               MOVE    WRK-SYMD            TO  WRK-SYMD6
+      *
+      *        ●[生保] 開始 <---> [主保険] 開始日の前日
+               ADD     1                 TO  WRK-RCOMB-MAX
+               MOVE    WRK-RCOMB-MAX     TO  IDX1
+               MOVE    WRK-KCOMB-REC (IDX2)
+                                         TO  WRK-RCOMB-REC    (IDX1)
+               MOVE    WRK-SYMD6    TO  WRK-RCOMB-TEKEDYMD    (IDX1)
+      *        ○生保の開始日変更
+               MOVE    WRK-HKN-TEKSTYMD (WRK-COMB-SYUHOIDX)
+                                    TO  WRK-KCOMB-TEKSTYMD    (IDX2)
+      *
+      *        [主保険 終了日]＜[生保 終了日]
+               IF  WRK-HKN-TEKEDYMD (WRK-COMB-SYUHOIDX)
+                                    <   WRK-KCOMB-TEKEDYMD (IDX2)
+      *@@
+                   ADD     1               TO  WRK-RCOMB-MAX
+                   MOVE    WRK-RCOMB-MAX   TO  IDX1
+                   MOVE    WRK-KCOMB-REC(IDX2)
+                                           TO  WRK-RCOMB-REC(IDX1)
+                   MOVE    WRK-HKN-TEKEDYMD(WRK-COMB-SYUHOIDX)
+                                           TO  WRK-RCOMB-TEKEDYMD(IDX1)
+      *@@
+      *            主保険　終了日の翌日取得
+                   INITIALIZE                  STS-AREA-DAY
+                   INITIALIZE                  LNK-DAY6-AREA
+                   MOVE    "61"                TO  LNK-DAY6-IRAI
+                   MOVE    WRK-HKN-TEKEDYMD   (WRK-COMB-SYUHOIDX)
+                                               TO  LNK-DAY6-KIJUN
+                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+                   MOVE     1                  TO  LNK-DAY6-ZOGEN
+                   PERFORM 4221-YMD-GET-SEC
+      *            ○生保の開始日変更
+                   MOVE    WRK-SYMD  TO  WRK-KCOMB-TEKSTYMD (IDX2)
+               END-IF
+           END-IF
+           .
+       570132X-SEIHO-HKN-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    生保置き換え編集処理
+      *****************************************************************
+       570133-SEIHO-OKIKAE-HENSYU-SEC       SECTION.
+      *
+           INITIALIZE                  WRK-LCOMB2-AREA
+           INITIALIZE                  WRK-LCOMB3-AREA
+           INITIALIZE                  WRK-TCOMB-AREA
+           MOVE     ZERO       TO      WRK-LCOMB2-MAX
+           INITIALIZE                  TBL-SEIHO-YMD-T
+           INITIALIZE                  TBL-SEIHO-YMD2-T
+           MOVE     SPACE      TO      WRK-SEIHO-YMD
+           MOVE     ZERO       TO      IDX4
+           MOVE     ZERO       TO      IDX5
+           MOVE     ZERO       TO      IDX7
+           MOVE     ZERO       TO      IDX8
+           MOVE     ZERO       TO      IDX9
+           MOVE     ZERO       TO      FLG-ARI
+      *
+           IF    WRK-LCOMB-MAX   >    1
+      *
+             MOVE    WRK-LCOMB-MAX        TO  WRK-LCOMB2-MAX
+             MOVE    WRK-LCOMB-AREA       TO  WRK-LCOMB2-AREA
+      *
+             MOVE    WRK-LCOMB2-REC(1)    TO  WRK-TCOMB-REC
+             PERFORM    VARYING   IDX4   FROM   2   BY   1
+                         UNTIL  ( IDX4    >    100           )
+                          OR    ( IDX4    >   WRK-LCOMB2-MAX )
+               COMPUTE   IDX5  =  IDX4  -  1
+               MOVE  WRK-LCOMB2-REC(IDX4) TO  WRK-LCOMB2-REC(IDX5)
+             END-PERFORM
+             MOVE    WRK-TCOMB-REC        TO
+                                    WRK-LCOMB2-REC(WRK-LCOMB2-MAX)
+      *
+             PERFORM    VARYING   IDX4   FROM   1   BY   1
+                         UNTIL  ( IDX4    >    100           )
+                          OR    ( IDX4    >   WRK-LCOMB2-MAX )
+               IF  (IDX4   =   WRK-LCOMB2-MAX)
+               OR  (IDX4   =   100           )
+                  MOVE      9999   TO   IDX5
+               ELSE
+                  COMPUTE   IDX5    =   IDX4  +  1
+               END-IF
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY6-AREA
+               MOVE    "61"                TO  LNK-DAY6-IRAI
+               MOVE    WRK-LCOMB2-TEKEDYMD(IDX4)
+                                           TO  LNK-DAY6-KIJUN
+               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
+               MOVE     1                  TO  LNK-DAY6-ZOGEN
+               PERFORM 4221-YMD-GET-SEC
+               IF    (IDX5              NOT  =  9999      )
+               AND   (WRK-LCOMB2-HKNID(IDX4) =
+                                WRK-LCOMB2-HKNID(IDX5)    )
+               AND   (WRK-LCOMB2-KOHI-AREA(IDX4) =
+                                WRK-LCOMB2-KOHI-AREA(IDX5))
+               AND   (WRK-SYMD = WRK-LCOMB2-TEKSTYMD(IDX5))
+                 INITIALIZE               STS-AREA-DAY
+                 INITIALIZE               LNK-DAY7-AREA
+                 MOVE    "71"        TO   LNK-DAY7-IRAI
+                 MOVE    WRK-LCOMB2-TEKEDYMD(IDX4)(1:6)
+                                     TO   LNK-DAY7-YM
+                 CALL    "ORCSDAY"   USING   STS-AREA-DAY
+                                             LNK-DAY7-AREA
+                 MOVE    LNK-DAY7-KOYOMI
+                                     TO   WRK-SEIHO-YMD
+                 MOVE    ZERO        TO   FLG-ARI
+                 PERFORM  VARYING  IDX7   FROM    1   BY  1
+                           UNTIL   IDX7                >   100
+                            OR     TBL-SEIHO-YMD(IDX7) =  SPACE
+                            OR     FLG-ARI             =   1
+                   IF  TBL-SEIHO-YMD(IDX7) = WRK-SEIHO-YMD
+                     MOVE     1      TO   FLG-ARI
+                   END-IF
+                 END-PERFORM
+                 IF  FLG-ARI  =  ZERO
+                   MOVE  WRK-SEIHO-YMD
+                                     TO   TBL-SEIHO-YMD(IDX7)
+                 END-IF
+      *
+                 MOVE    WRK-LCOMB2-TEKSTYMD(IDX4)
+                                     TO   WRK-LCOMB2-TEKSTYMD(IDX5)
+                 MOVE    "9"         TO   WRK-LCOMB2-HYOJIKBN(IDX5)
+      *
+                 MOVE    "99999999"  TO   WRK-LCOMB2-TEKSTYMD(IDX4)
+                 MOVE    "99999999"  TO   WRK-LCOMB2-TEKEDYMD(IDX4)
+               END-IF
+             END-PERFORM
+      *
+             PERFORM    VARYING   IDX4   FROM   1   BY   1
+                         UNTIL  ( IDX4    >    100           )
+                          OR    ( IDX4    >   WRK-LCOMB2-MAX )
+               IF   WRK-LCOMB2-TEKSTYMD(IDX4) = "99999999"
+               AND  WRK-LCOMB2-TEKEDYMD(IDX4) = "99999999"
+                 CONTINUE
+               ELSE
+                IF  WRK-LCOMB2-HYOJIKBN(IDX4) = SPACE
+                   ADD   1         TO   IDX9
+                   MOVE  WRK-LCOMB2-REC(IDX4)
+                                   TO   WRK-LCOMB3-REC(IDX9)
+                ELSE
+                 MOVE     ZERO     TO    IDX8
+                 INITIALIZE              TBL-SEIHO-YMD2-T
+                 PERFORM  VARYING  IDX7   FROM    1   BY  1
+                           UNTIL   IDX7                >   100
+                            OR     TBL-SEIHO-YMD(IDX7) =  SPACE
+                   IF  (WRK-LCOMB2-TEKSTYMD(IDX4)
+                                      <= TBL-SEIHO-YMD(IDX7))
+                   AND (WRK-LCOMB2-TEKEDYMD(IDX4)
+                                      >  TBL-SEIHO-YMD(IDX7))
+                     ADD     1     TO    IDX8
+                     MOVE    TBL-SEIHO-YMD(IDX7)
+                                   TO    TBL-SEIHO-YMD2(IDX8)
+                   END-IF
+                 END-PERFORM
+                 IF    TBL-SEIHO-YMD2(1) =  SPACE
+                   ADD   1         TO   IDX9
+                   MOVE  SPACE     TO   WRK-LCOMB2-HYOJIKBN(IDX4)
+                   MOVE  WRK-LCOMB2-REC(IDX4)
+                                   TO   WRK-LCOMB3-REC(IDX9)
+                 ELSE
+                   MOVE  WRK-LCOMB2-TEKSTYMD(IDX4)
+                                   TO   WRK-SEIHO-YMD
+                   PERFORM  VARYING  IDX8   FROM    1   BY  1
+                             UNTIL   IDX8                 >   100
+                              OR     TBL-SEIHO-YMD2(IDX8) =  SPACE
+                     ADD   1       TO   IDX9
+                     MOVE  SPACE   TO   WRK-LCOMB2-HYOJIKBN(IDX4)
+                     MOVE  WRK-LCOMB2-REC(IDX4)
+                                   TO   WRK-LCOMB3-REC(IDX9)
+                     MOVE  WRK-SEIHO-YMD
+                                   TO   WRK-LCOMB3-TEKSTYMD(IDX9)
+                     MOVE  TBL-SEIHO-YMD2(IDX8)
+                                   TO   WRK-LCOMB3-TEKEDYMD(IDX9)
+                     INITIALIZE         STS-AREA-DAY
+                     INITIALIZE         LNK-DAY6-AREA
+                     MOVE    "61"  TO   LNK-DAY6-IRAI
+                     MOVE    TBL-SEIHO-YMD2(IDX8)
+                                   TO   LNK-DAY6-KIJUN
+                     MOVE    "1"   TO   LNK-DAY6-ZOGENPTN
+                     MOVE     1    TO   LNK-DAY6-ZOGEN
+                     PERFORM 4221-YMD-GET-SEC
+                     MOVE    WRK-SYMD
+                                   TO   WRK-SEIHO-YMD
+                   END-PERFORM
+                   ADD   1         TO   IDX9
+                   MOVE  SPACE     TO   WRK-LCOMB2-HYOJIKBN(IDX4)
+                   MOVE  WRK-LCOMB2-REC(IDX4)
+                                   TO   WRK-LCOMB3-REC(IDX9)
+                   MOVE  WRK-SEIHO-YMD
+                                   TO   WRK-LCOMB3-TEKSTYMD(IDX9)
+                 END-IF
+                END-IF
+               END-IF
+             END-PERFORM
+      *
+             MOVE    IDX9               TO   WRK-LCOMB-MAX
+             MOVE    WRK-LCOMB3-AREA    TO   WRK-LCOMB-AREA
+      *
+           END-IF
+      *
+           .
+       570133-SEIHO-OKIKAE-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

@@ -564,6 +564,7 @@
       *  04.05.67    NACL-門脇    12/06/07  愛知県地方公費対応
       *  04.05.68    NACL-門脇    12/06/15  愛知・愛媛県地方公費対応
       *  04.05.69    NACL-門脇    12/06/28  災害の現物給付判定修正
+      *  04.05.70    NACL-門脇    12/06/28  生保まとめ分点欄摘要欄記載対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -5665,6 +5666,32 @@
                                                    RECE62-KOHID(1)
                            IF      RECE62-RECESKYKBN (1)       =   SPACE
                                MOVE      2       TO     BUN-IDX2
+                               IF   RECE62-SEIHOFLG  =  "1"
+                                 IF  (RECE62-HKNNUMHC(HC-IDX)
+                                                       NOT =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 1)
+                                                       NOT =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 2)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 3)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 4)
+                                                           =  SPACE)
+                                   MOVE   ZERO   TO     BUN-IDX2
+                                 END-IF
+                                 IF  (RECE62-HKNNUMHC(HC-IDX)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 1)
+                                                       NOT =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 2)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 3)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 4)
+                                                           =  SPACE)
+                                   MOVE    1     TO     BUN-IDX
+                                 END-IF
+                               END-IF
                            END-IF
                       END-IF
                     END-IF
@@ -9013,6 +9040,32 @@
                                                    RECE62-KOHID(1)
                            IF      RECE62-RECESKYKBN (1)       =   SPACE
                                MOVE      2       TO     BUN-IDX2
+                               IF   RECE62-SEIHOFLG  =  "1"
+                                 IF  (RECE62-HKNNUMHC(HC-IDX)
+                                                       NOT =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 1)
+                                                       NOT =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 2)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 3)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 4)
+                                                           =  SPACE)
+                                   MOVE   ZERO   TO     BUN-IDX2
+                                 END-IF
+                                 IF  (RECE62-HKNNUMHC(HC-IDX)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 1)
+                                                       NOT =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 2)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 3)
+                                                           =  SPACE)
+                                 AND (RECE62-KOHNUMHC(HC-IDX 4)
+                                                           =  SPACE)
+                                   MOVE    1     TO     BUN-IDX
+                                 END-IF
+                               END-IF
                            END-IF
                       END-IF
                     END-IF
@@ -11351,6 +11404,32 @@
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE62-KOHID(1)
                            MOVE      2       TO     BUN-IDX2
+                           IF   RECE62-SEIHOFLG  =  "1"
+                             IF  (RECE62-HKNNUMHC(HC-IDX)
+                                                   NOT =  SPACE)
+                             AND (RECE62-KOHNUMHC(HC-IDX 1)
+                                                   NOT =  SPACE)
+                             AND (RECE62-KOHNUMHC(HC-IDX 2)
+                                                       =  SPACE)
+                             AND (RECE62-KOHNUMHC(HC-IDX 3)
+                                                       =  SPACE)
+                             AND (RECE62-KOHNUMHC(HC-IDX 4)
+                                                       =  SPACE)
+                               MOVE   ZERO   TO     BUN-IDX2
+                             END-IF
+                             IF  (RECE62-HKNNUMHC(HC-IDX)
+                                                       =  SPACE)
+                             AND (RECE62-KOHNUMHC(HC-IDX 1)
+                                                   NOT =  SPACE)
+                             AND (RECE62-KOHNUMHC(HC-IDX 2)
+                                                       =  SPACE)
+                             AND (RECE62-KOHNUMHC(HC-IDX 3)
+                                                       =  SPACE)
+                             AND (RECE62-KOHNUMHC(HC-IDX 4)
+                                                       =  SPACE)
+                               MOVE    1     TO     BUN-IDX
+                             END-IF
+                           END-IF
                       END-IF
                     END-IF
                    END-PERFORM

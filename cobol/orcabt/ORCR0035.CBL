@@ -51,6 +51,7 @@
       *                                     更生等単独になったときの対応
       *
       *  04.05.01    NACL-門脇    11/06/20  公費分離区分編集修正
+      *  04.05.02    NACL-門脇    12/06/28  生保まとめ分点欄摘要欄記載対応
       *
       *  04.06.01    NACL-門脇    10/10/14  編集条件判定修正
       *****************************************************************
@@ -510,19 +511,20 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                 MOVE    BUN-IDX     TO        KH-IDX
            END-IF
       *
-           IF   (RECE02-SEIHOFLG                     =  "1" )
-           AND  (KH-IDX                          NOT =  ZERO)
-           AND  (RECE02-HENTOTALTEN(1)           NOT =  ZERO)
-           AND  (RECE02-HENTOTALTEN(KH-IDX + 1)  NOT =  ZERO)
-           AND  (RECE02-HENTOTALTEN(1) <
-                              RECE02-HENTOTALTEN(KH-IDX + 1))
-              IF   RECE02-HKNNUMHC(HC-IDX)  NOT = SPACE
-                MOVE    ZERO        TO        KH-IDX
-              END-IF
-           END-IF
+      ***  IF   (RECE02-SEIHOFLG                     =  "1" )
+      ***  AND  (KH-IDX                          NOT =  ZERO)
+      ***  AND  (RECE02-HENTOTALTEN(1)           NOT =  ZERO)
+      ***  AND  (RECE02-HENTOTALTEN(KH-IDX + 1)  NOT =  ZERO)
+      ***  AND  (RECE02-HENTOTALTEN(1) <
+      ***                     RECE02-HENTOTALTEN(KH-IDX + 1))
+      ***     IF   RECE02-HKNNUMHC(HC-IDX)  NOT = SPACE
+      ***       MOVE    ZERO        TO        KH-IDX
+      ***     END-IF
+      ***  END-IF
       *
            IF    KH-IDX      NOT =   ZERO
-                IF    RECE04-KOHBUNRI  NOT =  ZERO
+                IF  ( RECE04-KOHBUNRI  NOT =  ZERO )
+                OR  ( RECE02-SEIHOFLG      =  "1"  )
                    MOVE    1        TO     FLG-KOHBUNRI-OKIKAE
                 END-IF
                 MOVE    KH-IDX      TO     RECE04-KOHBUNRI

@@ -156,6 +156,7 @@
       *  04.05.40    NACL-門脇    12/05/23  一部負担金・食事療養費標準負担
       *                                     額区分編集修正
       *  04.05.41    NACL-門脇    12/06/04  生保の２４併用時の対応
+      *  04.05.42    NACL-門脇    12/06/28  生保まとめ分点欄摘要欄記載対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -363,6 +364,7 @@
            03  FLG-RECE-PUT-UM     PIC 9(01).
            03  FLG-HENSYU          PIC 9(01).
            03  FLG-STS             PIC 9(04).
+           03  FLG-MEISYO-HENSYU   PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -5450,19 +5452,19 @@
                        (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
                        (RECE62-HENTOTALTEN(IDX1) NOT =
                                      RECE62-HENTOTALTEN(IDX2)))
-                  IF    RECE62-SEIHOFLG    =  "1"
-                   MOVE    RECE62-TENSU(IDX IDX2)  TO   WRK-TENSUZ
-                   MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
+      ***         IF    RECE62-SEIHOFLG    =  "1"
+      ***          MOVE    RECE62-TENSU(IDX IDX2)  TO   WRK-TENSUZ
+      ***          MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
       *
-                   COMPUTE WRK-SUM-TENSU   =     RECE62-TENSU(IDX IDX2)
-                                           -     RECE62-TENSU(IDX IDX1)
-                   MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ
-                   MOVE    WRK-KOUTEN            TO  HC06-KOHTEN  (IDX)
-                  ELSE
+      ***          COMPUTE WRK-SUM-TENSU   =     RECE62-TENSU(IDX IDX2)
+      ***                                  -     RECE62-TENSU(IDX IDX1)
+      ***          MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ
+      ***          MOVE    WRK-KOUTEN            TO  HC06-KOHTEN  (IDX)
+      ***         ELSE
                    MOVE    RECE62-TENSU(IDX IDX2)
                                                  TO  WRK-KOUTENZ
                    MOVE    WRK-KOUTEN            TO  HC06-KOHTEN  (IDX)
-                  END-IF
+      ***         END-IF
                  END-IF
                END-IF
            END-PERFORM
@@ -5495,20 +5497,20 @@
                        (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
                        (RECE62-HENTOTALTEN(IDX1) NOT =
                                      RECE62-HENTOTALTEN(IDX2)))
-                  IF    RECE62-SEIHOFLG    =  "1"
-                   MOVE    RECE62-NYUKHNKEI(IDX IDX2)
-                                             TO  WRK-TENSUZ
-                   MOVE    WRK-TENSU         TO  HC06-NYUTENSU(IDX)
+      ***         IF    RECE62-SEIHOFLG    =  "1"
+      ***          MOVE    RECE62-NYUKHNKEI(IDX IDX2)
+      ***                                    TO  WRK-TENSUZ
+      ***          MOVE    WRK-TENSU         TO  HC06-NYUTENSU(IDX)
       *
-                   COMPUTE WRK-SUM-TENSU  =  RECE62-NYUKHNKEI(IDX IDX2)
-                                          -  RECE62-NYUKHNKEI(IDX IDX1)
-                   MOVE    WRK-SUM-TENSU     TO  WRK-KOUTENZ
-                   MOVE    WRK-KOUTEN        TO  HC06-NYUKOHTEN (IDX)
-                  ELSE
+      ***          COMPUTE WRK-SUM-TENSU  =  RECE62-NYUKHNKEI(IDX IDX2)
+      ***                                 -  RECE62-NYUKHNKEI(IDX IDX1)
+      ***          MOVE    WRK-SUM-TENSU     TO  WRK-KOUTENZ
+      ***          MOVE    WRK-KOUTEN        TO  HC06-NYUKOHTEN (IDX)
+      ***         ELSE
                    MOVE    RECE62-NYUKHNKEI(IDX IDX2)
                                              TO  WRK-KOUTENZ
                    MOVE    WRK-KOUTEN        TO  HC06-NYUKOHTEN (IDX)
-                  END-IF
+      ***         END-IF
                  END-IF
                END-IF
            END-PERFORM
@@ -5536,16 +5538,16 @@
                            (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
                            (RECE62-HENTOTALTEN(IDX1) NOT =
                                          RECE62-HENTOTALTEN(IDX2)))
-                      IF    RECE62-SEIHOFLG    =  "1"
-                       COMPUTE WRK-SUM-TENSU
-                                       = RECE62-NYUKHNKEI(IDX IDX2)
-                                       - RECE62-NYUKHNKEI(IDX IDX1)
-                       ADD     WRK-SUM-TENSU     TO  SUM-NYUKHNKEI (2)
-                                                     SUM-NYUKHNKEI (1)
-                      ELSE
+      ***             IF    RECE62-SEIHOFLG    =  "1"
+      ***              COMPUTE WRK-SUM-TENSU
+      ***                              = RECE62-NYUKHNKEI(IDX IDX2)
+      ***                              - RECE62-NYUKHNKEI(IDX IDX1)
+      ***              ADD     WRK-SUM-TENSU     TO  SUM-NYUKHNKEI (2)
+      ***                                            SUM-NYUKHNKEI (1)
+      ***             ELSE
                        ADD    RECE62-NYUKHNKEI(IDX IDX2)
                                                  TO  SUM-NYUKHNKEI (2)
-                      END-IF
+      ***             END-IF
                      END-IF
                    END-IF
                END-PERFORM    
@@ -5598,20 +5600,20 @@
                    (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
                    (RECE62-HENTOTALTEN(IDX1) NOT =
                                  RECE62-HENTOTALTEN(IDX2)))
-              IF    RECE62-SEIHOFLG    =  "1"
-               MOVE    RECE62-NYUKHNKEI2(IDX2)
-                                               TO  WRK-TENSUZ
-               MOVE    WRK-TENSU               TO  HC06-NYUTENSU(5)
+      ***     IF    RECE62-SEIHOFLG    =  "1"
+      ***      MOVE    RECE62-NYUKHNKEI2(IDX2)
+      ***                                      TO  WRK-TENSUZ
+      ***      MOVE    WRK-TENSU               TO  HC06-NYUTENSU(5)
       *
-               COMPUTE WRK-SUM-TENSU   = RECE62-NYUKHNKEI2(IDX2)
-                                       - RECE62-NYUKHNKEI2(IDX1)
-               MOVE    WRK-SUM-TENSU           TO  WRK-KOUTENZ
-               MOVE    WRK-KOUTEN              TO  HC06-NYUKOHTEN  (5)
-              ELSE
+      ***      COMPUTE WRK-SUM-TENSU   = RECE62-NYUKHNKEI2(IDX2)
+      ***                              - RECE62-NYUKHNKEI2(IDX1)
+      ***      MOVE    WRK-SUM-TENSU           TO  WRK-KOUTENZ
+      ***      MOVE    WRK-KOUTEN              TO  HC06-NYUKOHTEN  (5)
+      ***     ELSE
                MOVE    RECE62-NYUKHNKEI2 (IDX2)
                                                TO  WRK-KOUTENZ
                MOVE    WRK-KOUTEN              TO  HC06-NYUKOHTEN  (5)
-              END-IF
+      ***     END-IF
               IF      RECE62-NYUKHNKEI2 (IDX2)
                                                <   ZERO
                    PERFORM VARYING IDZ FROM    6   BY  -1
@@ -5670,21 +5672,21 @@
                            (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
                            (RECE62-HENTOTALTEN(IDX1) NOT =
                                          RECE62-HENTOTALTEN(IDX2)))
-                      IF    RECE62-SEIHOFLG    =  "1"
-                       MOVE    RECE62-NYUTOKKEI(IDX IDX2)
-                                             TO   WRK-TENSUZ
-                       MOVE    WRK-TENSU     TO   HC06-NYUTENSU(IDY)
+      ***             IF    RECE62-SEIHOFLG    =  "1"
+      ***              MOVE    RECE62-NYUTOKKEI(IDX IDX2)
+      ***                                    TO   WRK-TENSUZ
+      ***              MOVE    WRK-TENSU     TO   HC06-NYUTENSU(IDY)
       *
-                       COMPUTE WRK-SUM-TENSU
-                                       = RECE62-NYUTOKKEI(IDX IDX2)
-                                       - RECE62-NYUTOKKEI(IDX IDX1)
-                       MOVE    WRK-SUM-TENSU TO  WRK-KOUTENZ
-                       MOVE    WRK-KOUTEN    TO  HC06-NYUKOHTEN (IDY)
-                      ELSE
+      ***              COMPUTE WRK-SUM-TENSU
+      ***                              = RECE62-NYUTOKKEI(IDX IDX2)
+      ***                              - RECE62-NYUTOKKEI(IDX IDX1)
+      ***              MOVE    WRK-SUM-TENSU TO  WRK-KOUTENZ
+      ***              MOVE    WRK-KOUTEN    TO  HC06-NYUKOHTEN (IDY)
+      ***             ELSE
                        MOVE    RECE62-NYUTOKKEI(IDX IDX2)
                                              TO  WRK-KOUTENZ
                        MOVE    WRK-KOUTEN    TO  HC06-NYUKOHTEN (IDY)
-                      END-IF
+      ***             END-IF
                      END-IF
                    END-IF
                END-IF    
@@ -5713,16 +5715,16 @@
                            (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
                            (RECE62-HENTOTALTEN(IDX1) NOT =
                                          RECE62-HENTOTALTEN(IDX2)))
-                      IF    RECE62-SEIHOFLG    =  "1"
-                       COMPUTE WRK-SUM-TENSU
-                                        = RECE62-NYUTOKKEI(IDX IDX2)
-                                        - RECE62-NYUTOKKEI(IDX IDX1)
-                       ADD    WRK-SUM-TENSU      TO  SUM-NYUKHNKEI (2)
-                                                     SUM-NYUKHNKEI (1)
-                      ELSE
+      ***             IF    RECE62-SEIHOFLG    =  "1"
+      ***              COMPUTE WRK-SUM-TENSU
+      ***                               = RECE62-NYUTOKKEI(IDX IDX2)
+      ***                               - RECE62-NYUTOKKEI(IDX IDX1)
+      ***              ADD    WRK-SUM-TENSU      TO  SUM-NYUKHNKEI (2)
+      ***                                            SUM-NYUKHNKEI (1)
+      ***             ELSE
                        ADD    RECE62-NYUTOKKEI(IDX IDX2)
                                                  TO  SUM-NYUKHNKEI (2)
-                      END-IF
+      ***             END-IF
                      END-IF
                    END-IF
                END-PERFORM    
@@ -5777,19 +5779,19 @@
                    (RECE62-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
                    (RECE62-HENTOTALTEN(IDX1) NOT =
                                  RECE62-HENTOTALTEN(IDX2)))
-              IF    RECE62-SEIHOFLG    =  "1"
-               MOVE    RECE62-NYUTOKKEI2(IDX2) TO  WRK-TENSUZ
-               MOVE    WRK-TENSU               TO  HC06-NYUTENSU(10)
+      ***     IF    RECE62-SEIHOFLG    =  "1"
+      ***      MOVE    RECE62-NYUTOKKEI2(IDX2) TO  WRK-TENSUZ
+      ***      MOVE    WRK-TENSU               TO  HC06-NYUTENSU(10)
       *
-               COMPUTE WRK-SUM-TENSU   = RECE62-NYUTOKKEI2(IDX2)
-                                       - RECE62-NYUTOKKEI2(IDX1)
-               MOVE    WRK-SUM-TENSU           TO  WRK-KOUTENZ
-               MOVE    WRK-KOUTEN              TO  HC06-NYUKOHTEN  (10)
-              ELSE
+      ***      COMPUTE WRK-SUM-TENSU   = RECE62-NYUTOKKEI2(IDX2)
+      ***                              - RECE62-NYUTOKKEI2(IDX1)
+      ***      MOVE    WRK-SUM-TENSU           TO  WRK-KOUTENZ
+      ***      MOVE    WRK-KOUTEN              TO  HC06-NYUKOHTEN  (10)
+      ***     ELSE
                MOVE    RECE62-NYUTOKKEI2 (IDX2)
                                                TO  WRK-KOUTENZ
                MOVE    WRK-KOUTEN              TO  HC06-NYUKOHTEN  (10)
-              END-IF
+      ***     END-IF
               IF      RECE62-NYUTOKKEI2 (IDX2)
                                                <   ZERO
                    PERFORM VARYING IDZ FROM    6   BY  -1
@@ -7164,6 +7166,7 @@
                  END-IF
               END-PERFORM
               IF     IDX-KUGIRI2    NOT =    ZERO
+                MOVE     ZERO     TO   FLG-MEISYO-HENSYU
                 PERFORM  VARYING  IDX-KUGIRI1  FROM   1   BY   1
                           UNTIL   IDX-KUGIRI1   >     4
                  IF  RECE62-KOHNUMHC(IDX-KUGIRI2 IDX-KUGIRI1)
@@ -7179,11 +7182,45 @@
                          MOVE     RECE62-KOHNUM(IDX-KUGIRI3)
                                          TO  WRK-HENSYU-KOHNUM
                          PERFORM  341101-HKNNUM-KENSAKU-SEC
+                         IF   RECE62-SEIHOFLG  =  "1"
+                           IF  (RECE62-HKNNUMHC(IDX-KUGIRI2)
+                                                 NOT =  SPACE)
+                           AND (RECE62-KOHNUMHC(IDX-KUGIRI2 1)
+                                                 NOT =  SPACE)
+                           AND (RECE62-KOHNUMHC(IDX-KUGIRI2 2)
+                                                     =  SPACE)
+                           AND (RECE62-KOHNUMHC(IDX-KUGIRI2 3)
+                                                     =  SPACE)
+                           AND (RECE62-KOHNUMHC(IDX-KUGIRI2 4)
+                                                     =  SPACE)
+                             MOVE   1      TO   FLG-MEISYO-HENSYU
+                           END-IF
+                           IF  (RECE62-HKNNUMHC(IDX-KUGIRI2)
+                                                     =  SPACE)
+                           AND (RECE62-KOHNUMHC(IDX-KUGIRI2 1)
+                                                 NOT =  SPACE)
+                           AND (RECE62-KOHNUMHC(IDX-KUGIRI2 2)
+                                                     =  SPACE)
+                           AND (RECE62-KOHNUMHC(IDX-KUGIRI2 3)
+                                                     =  SPACE)
+                           AND (RECE62-KOHNUMHC(IDX-KUGIRI2 4)
+                                                     =  SPACE)
+                             MOVE   2      TO   FLG-MEISYO-HENSYU
+                           END-IF
+                         END-IF
                          ADD        1      TO   IDX-KUGIRI4
                          EVALUATE   IDX-KUGIRI4
                            WHEN         1
                               MOVE  HKN-TANSEIDONAME
                                          TO WRK-HENSYU-KOHNAME1
+                              EVALUATE  FLG-MEISYO-HENSYU
+                                WHEN       1
+                                  MOVE  "（併用分）"
+                                         TO WRK-HENSYU-KOHNAME2
+      ***                       WHEN       2
+      ***                         MOVE  "（単独分）"
+      ***                                TO WRK-HENSYU-KOHNAME2
+                              END-EVALUATE
                            WHEN         2
                               MOVE  "＋" TO WRK-HENSYU-KOHNAME2-PLUS
                               MOVE  HKN-TANSEIDONAME
