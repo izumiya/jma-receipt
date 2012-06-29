@@ -3145,7 +3145,12 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                                          TO  WRK-COMB-SYUHOIDX
                        IF  (WRK-HKN-HKNNUM(WRK-COMB-SYUHOIDX)
                                                 =  "003" OR "004")
-                          MOVE    1        TO  FLG-HIYATOI
+                          IF  (WRK-HKN-TEKEDYMD(WRK-COMB-SYUHOIDX)
+                                        NOT = "99999999")
+                          AND (WRK-HKN-TEKEDYMD(WRK-COMB-SYUHOIDX)
+                                           >= "20120601")
+                            MOVE    1    TO  FLG-HIYATOI
+                          END-IF
                           PERFORM 570132X-SEIHO-HKN-HEN-SEC
                        ELSE
                           PERFORM 570132-SEIHO-HKN-HEN-SEC
@@ -5132,6 +5137,10 @@ grpsys            CALL    "ORCDBMAIN"         USING   MCPAREA
                AND   (WRK-LCOMB2-KOHI-AREA(IDX4) =
                                 WRK-LCOMB2-KOHI-AREA(IDX5))
                AND   (WRK-SYMD = WRK-LCOMB2-TEKSTYMD(IDX5))
+               AND   (WRK-LCOMB2-TEKEDYMD(IDX4)
+                                          NOT = "99999999")
+               AND   (WRK-LCOMB2-TEKEDYMD(IDX4)
+                                             >= "20120601")
                  INITIALIZE               STS-AREA-DAY
                  INITIALIZE               LNK-DAY7-AREA
                  MOVE    "71"        TO   LNK-DAY7-IRAI
