@@ -226,15 +226,18 @@
                WHEN    "CLICKED"       ALSO    "pandatimer1"
                WHEN    "CLICKED"       ALSO    "B11"
                    PERFORM 490-KAKUNIN-SEC
-               IF      SPA-SFILESV-MAX     >   SPA-SFILESV-IDX
+               IF      SPA-SFILESV-MAX   NOT =  1 
+                 AND   SPA-SFILESV-MAX   NOT =  ZERO
+                 IF      SPA-SFILESV-MAX     >   SPA-SFILESV-IDX
                    ADD     1                   TO  SPA-SFILESV-IDX 
                    PERFORM 3001-FILEENTRY-SEC
-                 IF      SPA-SFILESV-MAX   =   SPA-SFILESV-IDX
+                   IF      SPA-SFILESV-MAX   =   SPA-SFILESV-IDX
                    ADD     1                   TO  SPA-SFILESV-IDX 
-                 END-IF
-               ELSE
-                 IF      SPA-SFILESV-MAX   NOT =   ZERO
+                   END-IF
+                 ELSE
+                   IF      SPA-SFILESV-MAX   NOT =   ZERO
                    MOVE    ZERO                TO  G99-DURATION
+                   END-IF
                  END-IF
                END-IF
       *    プレビュー画面へ
@@ -402,6 +405,8 @@
       *
            MOVE    "CURRENT"           TO  MCP-PUTTYPE
            MOVE    "G99    "           TO  MCP-WINDOW
+           MOVE    "CURRENT"           TO  MCP-PUTTYPE
+           MOVE    "G99    "           TO  MCP-WINDOW
       *
            PERFORM 900-PUT-WINDOW
            .
@@ -509,6 +514,9 @@
       *****************************************************************
        3001-FILEENTRY-SEC          SECTION.
       *
+          IF  SPA-SFILESV-MAX          <  SPA-SFILESV-IDX
+              GO                       TO  3001-FILEENTRY-EXT
+          END-IF
            INITIALIZE                      ORCA-BLOB
            MOVE    "BLOBIMPORT"        TO  MCP-FUNC
            MOVE    "key"               TO  MCP-PATHNAME
