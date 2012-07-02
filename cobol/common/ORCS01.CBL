@@ -374,6 +374,7 @@
       *  04.05.40    NACL-ÌçÏÆ    12/05/30  ºÒ³²ÂÐ±þ¡ÊÆü¸ÛÆÃÎãÈïÊÝ¸±¼Ô¡Ë
       *  04.05.41    NACL-ÌçÏÆ    12/06/05  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.42    NACL-ÌçÏÆ    12/06/19  ¹­Åç¸©ÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
+      *  04.05.43    NACL-ÌçÏÆ    12/06/29  ÂçÊ¬¸©ÃÏÊý¸øÈñÊ¡²¬¸©ÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/09/02  ½Ð»º°é»ù°ì»þ¶âÄ¾ÀÜ»ÙÊ§À©ÅÙ¡Ê³°Íè¡Ë
       *  04.06.02    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
@@ -4290,6 +4291,9 @@
                 (LNK-SYU-SRYYMD(1:6)  >= "201203"       ) AND
                 (LNK-SYU-KOH1HKNNUM    =  "263" OR "363"
                                        OR "463"         ))
+           OR  ((WK-1001-PREFNUM       =   40           ) AND
+                (LNK-SYU-SRYYMD(1:6)  >=  "201010"      ) AND
+                (LNK-SYU-KOH1HKNNUM    =  "383"         ))
              IF  (LNK-SYU-KOH2HKNNUM  = "972" OR "974")
              OR  (LNK-SYU-KOH3HKNNUM  = "972" OR "974")
              OR  (LNK-SYU-KOH4HKNNUM  = "972" OR "974")
@@ -10884,6 +10888,9 @@
                 ( LNK-SYU-SRYYMD(1:6)    >= "201203" ) AND
                 ( SYU-KOH1HKNNUM   = "263" OR "363"
                                   OR "463"           ))
+           OR  (( WK-1001-PREFNUM         =  40      ) AND
+                ( LNK-SYU-SRYYMD(1:6)    >= "201010" ) AND
+                ( SYU-KOH1HKNNUM   = "383"           ))
              COMPUTE   SYU-KOH-FTN         =  SYU-KOH-FTN
                                            -  SYU-JYO-COMPFTN
              COMPUTE   SYU-KOH-FTN-ENTANI  =  SYU-KOH-FTN-ENTANI
@@ -11652,6 +11659,9 @@
                        (LNK-SYU-KOH1HKNNUM  = "263" OR "363"
                                            OR "463"         ) AND
                        (LNK-SYU-SRYYMD(1:6)     >= "201203" ))
+                   OR ((WK-1001-PREFNUM          =  40      ) AND
+                       (LNK-SYU-KOH1HKNNUM  = "383"         ) AND
+                       (LNK-SYU-SRYYMD(1:6)     >= "201010" ))
                       IF    LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
                                                OR  SYU-KOH2HKNNUM
                                                OR  SYU-KOH3HKNNUM
@@ -12654,6 +12664,9 @@
                        (LNK-SYU-KOH2HKNNUM  = "263" OR "363"
                                            OR "463"         ) AND
                        (LNK-SYU-SRYYMD(1:6)     >= "201203" ))
+                   OR ((WK-1001-PREFNUM          =  40      ) AND
+                       (LNK-SYU-KOH2HKNNUM  = "383"         ) AND
+                       (LNK-SYU-SRYYMD(1:6)     >= "201010" ))
                       IF    LNK-SYU-KOH2HKNNUM  =  SYU-KOH1HKNNUM
                                                OR  SYU-KOH2HKNNUM
                                                OR  SYU-KOH3HKNNUM
@@ -13507,6 +13520,9 @@
                        (LNK-SYU-KOH3HKNNUM  = "263" OR "363"
                                            OR "463"         ) AND
                        (LNK-SYU-SRYYMD(1:6)     >= "201203" ))
+                   OR ((WK-1001-PREFNUM          =  40      ) AND
+                       (LNK-SYU-KOH3HKNNUM  = "383"         ) AND
+                       (LNK-SYU-SRYYMD(1:6)     >= "201010" ))
                       IF    LNK-SYU-KOH3HKNNUM  =  SYU-KOH1HKNNUM
                                                OR  SYU-KOH2HKNNUM
                                                OR  SYU-KOH3HKNNUM
@@ -14296,6 +14312,9 @@
                        (LNK-SYU-KOH4HKNNUM  = "263" OR "363"
                                            OR "463"         ) AND
                        (LNK-SYU-SRYYMD(1:6)     >= "201203" ))
+                   OR ((WK-1001-PREFNUM          =  40      ) AND
+                       (LNK-SYU-KOH4HKNNUM  = "383"         ) AND
+                       (LNK-SYU-SRYYMD(1:6)     >= "201010" ))
                       IF    LNK-SYU-KOH4HKNNUM  =  SYU-KOH1HKNNUM
                                                OR  SYU-KOH2HKNNUM
                                                OR  SYU-KOH3HKNNUM
@@ -25885,6 +25904,9 @@
                 (LNK-SYU-SRYYMD(1:6)       >= "201203")  AND
                 (LNK-SYU-KOH1HKNNUM   = "263" OR "363"
                                               OR "463"))
+           OR  ((WK-1001-PREFNUM            =  40     )  AND
+                (LNK-SYU-SRYYMD(1:6)       >= "201010")  AND
+                (LNK-SYU-KOH1HKNNUM   = "383"         ))
               IF   FLG-GENBUTU70   NOT =  ZERO
                 IF   FLG-IRYOHI70      =  3 OR 4
       *            ¸ÂÅÙ³ÛÇ§Äê¾ÚÌµ¤·
@@ -26057,6 +26079,11 @@
                 ((LNK-SYU-KOH2HKNNUM   = "263" OR "363" OR "463" ) OR
                  (LNK-SYU-KOH3HKNNUM   = "263" OR "363" OR "463" ) OR
                  (LNK-SYU-KOH4HKNNUM   = "263" OR "363" OR "463" )))
+           OR  (( WK-1001-PREFNUM             =  40      ) AND
+                ( LNK-SYU-SRYYMD(1:6)        >= "201104" ) AND
+                ((LNK-SYU-KOH2HKNNUM   = "383"          ) OR
+                 (LNK-SYU-KOH3HKNNUM   = "383"          ) OR
+                 (LNK-SYU-KOH4HKNNUM   = "383"          )))
       *
              IF   LNK-SYU-KOH2HKNNUM  =
                     "183" OR "283" OR
