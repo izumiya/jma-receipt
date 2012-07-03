@@ -396,6 +396,7 @@
            03  WRK-PARA-NYUGAIKBN      PIC X(01).
            03  WRK-PARA-SYORIKBN       PIC X(01).
            03  WRK-PARA-KIKANFLG       PIC X(01).
+           03  WRK-PARA-INGAIKBN2      PIC 9(01).
       *
       ******************************************************************
       *
@@ -795,33 +796,44 @@
       *
            IF    ( ACCT-ZAIKBN     NOT = 1 )   AND
                  ( ACCT-ZAIKBN     NOT = 2 )
-           IF    ( ACCT-ZAITEN         =   ZERO )  AND
-                (( ACCT-SRYKBN         =   "21" )  OR
-                 ( ACCT-SRYKBN         =   "22" )  OR
-                 ( ACCT-SRYKBN         =   "23" )  OR
-                 ( ACCT-SRYKBN         =   "14" ))
-               IF    ( SRY-SRYSYUKBN       =   "213")  OR
-                     ( SRY-SRYSYUKBN       =   "223")  OR
-                     ( SRY-SRYSYUKBN       =   "233")
-                   MOVE    "1"         TO  WRK-INGAIKBN
+               IF    ( ACCT-ZAITEN         =   ZERO )  AND
+                    (( ACCT-SRYKBN         =   "21" )  OR
+                     ( ACCT-SRYKBN         =   "22" )  OR
+                     ( ACCT-SRYKBN         =   "23" )  OR
+                     ( ACCT-SRYKBN         =   "14" ))
+                   IF    ( SRY-SRYSYUKBN       =   "213")  OR
+                         ( SRY-SRYSYUKBN       =   "223")  OR
+                         ( SRY-SRYSYUKBN       =   "233")
+                       MOVE    "1"         TO  WRK-INGAIKBN
+                   ELSE
+                       MOVE    "2"         TO  WRK-INGAIKBN
+                   END-IF
                ELSE
-                   MOVE    "2"         TO  WRK-INGAIKBN
+                   IF      WRK-PARA-INGAIKBN2  NOT =   "1"
+                       MOVE    "1"         TO  WRK-INGAIKBN
+                   ELSE
+                       IF   (( ACCT-SRYKBN     =   "21" )  OR
+                             ( ACCT-SRYKBN     =   "22" )  OR
+                             ( ACCT-SRYKBN     =   "23" )  OR
+                             ( ACCT-SRYKBN     =   "14" ))
+                           MOVE    "1"         TO  WRK-INGAIKBN
+                       ELSE
+                           MOVE    "0"         TO  WRK-INGAIKBN
+                       END-IF
+                   END-IF
                END-IF
-           ELSE
-               MOVE    "1"         TO  WRK-INGAIKBN
-           END-IF
       *
-      *    情ま
-           IF    ( WRK-INGAIKBN            =   "1" )   AND
-                 ( WRK-PARA-INGAIKBN   NOT =   1   )
-               PERFORM 240-MAIN-HEN-SEC
-           END-IF
-      *    情陸
-           IF    ( WRK-INGAIKBN            =   "2" )   AND
-                 ( WRK-PARA-INGAIKBN   NOT =   0   )   AND
-                 ( WRK-PARA-INGAIKBN   NOT =   SPACE )
-               PERFORM 240-MAIN-HEN-SEC
-           END-IF
+      *        情ま
+               IF    ( WRK-INGAIKBN            =   "1" )   AND
+                     ( WRK-PARA-INGAIKBN   NOT =   1   )
+                   PERFORM 240-MAIN-HEN-SEC
+               END-IF
+      *        情陸
+               IF    ( WRK-INGAIKBN            =   "2" )   AND
+                     ( WRK-PARA-INGAIKBN   NOT =   0   )   AND
+                     ( WRK-PARA-INGAIKBN   NOT =   SPACE )
+                   PERFORM 240-MAIN-HEN-SEC
+               END-IF
            END-IF
       *
            .

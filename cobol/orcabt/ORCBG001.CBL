@@ -51,6 +51,7 @@
            03  WRK-PARA-NYUGAIKBN      PIC X(01).
            03  WRK-PARA-SYORIKBN       PIC X(01).
            03  WRK-PARA-KIKANFLG       PIC X(01).
+           03  WRK-PARA-INGAIKBN2      PIC 9(01).
       *
        01  WRK-HEN-PARA.
            03  WRK-PARA-STRYM          PIC X(06).
@@ -108,6 +109,7 @@
                                        WRK-PARA-INGAIKBN
                                        WRK-PARA-NYUGAIKBN
                                        WRK-PARA-SYORIKBN
+                                       WRK-PARA-INGAIKBN2
            END-UNSTRING
       *
            .
