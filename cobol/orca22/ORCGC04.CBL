@@ -67,6 +67,8 @@
       *                                     の設定
       *  04.06.05    NACL-藤原    11/12/19  自院病名検索時のチェックと
       *                                     自院病名検索から戻り時の表示の修正
+      *  04.06.06    NACL-藤原    12/07/02  検索対象が１件のときＥＮＴＥ
+      *                                     Ｒのみで確定可能にする
       ****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1018,6 +1020,15 @@
            MOVE    2                   TO  SPA-GMN-C04-CUR
       *
            MOVE    C04-SELNUM2         TO  SPA-GMN-C04-SELNUM
+      *
+      *    検索時対象が１件のときは選択番号なしで確定
+           IF      SPA-GMN-C04-SELNUM  =   ZERO
+               IF    ( SPA-C01-INDEX       >   ZERO )
+               AND   ( SPA-GMN-C04-MAX     =   1    )
+               AND   ( SPA-GMN-C04-PAGE    =   1    )
+                   MOVE    1           TO  SPA-GMN-C04-SELNUM
+               END-IF
+           END-IF
       *
            IF      SPA-GMN-C04-SELNUM  >   ZERO
                COMPUTE WRK-BANGO       =   SPA-GMN-C04-SELNUM
