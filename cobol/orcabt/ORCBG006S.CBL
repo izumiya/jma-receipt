@@ -98,6 +98,7 @@
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-OK                  PIC 9(01).
            03  FLG-NYUINACCT           PIC 9(01).
+           03  FLG-SRYKBN              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -190,6 +191,7 @@
            03  WRK-Z9                  PIC Z9.
       *
            03  WRK-WARIAI              PIC 9(07)V9(02).
+           03  WRK-SRYKBN              PIC X(02).
       *
            03  WRK-YMD.
                05  WRK-SYSYMDWH        PIC X(22).
@@ -389,7 +391,7 @@
            03  WRK-PARA-NYUGAIKBN      PIC X(01).
            03  WRK-PARA-SYORIKBN       PIC X(01).
            03  WRK-PARA-KIKANFLG       PIC X(01).
-           03  WRK-PARA-INGAIKBN2      PIC 9(01).
+           03  WRK-PARA-SRYKBN         PIC X(02).
       *
       ******************************************************************
       *
@@ -756,8 +758,12 @@
            END-IF
       *
            PERFORM UNTIL   FLG-SRYACT  =   1
-      *        診療会計集計処理
-               PERFORM 230-MAIN-ACCT-SEC
+      *        診療区分チェック
+               PERFORM 230-MAIN-CHECK-SEC
+               IF      FLG-SRYKBN      =   1
+      *            診療会計集計処理
+                   PERFORM 230-MAIN-ACCT-SEC
+               END-IF
                MOVE    "tbl_sryact"    TO  MCP-TABLE
                MOVE    "key17"         TO  MCP-PATHNAME
                PERFORM 900-SRY-DBFETCH-SEC
@@ -769,6 +775,50 @@
       *
             .
        220-MAIN-SRY-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療区分チェック処理
+      *****************************************************************
+       230-MAIN-CHECK-SEC           SECTION.
+      *
+           MOVE    0               TO  FLG-SRYKBN
+           MOVE   SPACE            TO  WRK-SRYKBN
+      *
+           EVALUATE    WRK-PARA-SRYKBN
+               WHEN    ""
+               WHEN    "0"
+               WHEN    "00"
+               WHEN    SPACE
+                   MOVE    1               TO  FLG-SRYKBN
+               WHEN    "14"
+               WHEN    "20"
+               WHEN    "30"
+               WHEN    "40"
+               WHEN    "50"
+               WHEN    "54"
+               WHEN    "60"
+               WHEN    "70"
+               WHEN    "80"
+               WHEN    "90"
+                   MOVE    SRY-SRYKBN  TO  WRK-SRYKBN
+      *
+                   EVALUATE    TRUE
+                       WHEN    ( WRK-SRYKBN  =   "90" OR "92" OR "97" )
+                           MOVE    "90"    TO  WRK-SRYKBN
+                       WHEN    ( WRK-SRYKBN (1:1)     =  "2" )
+                           MOVE    "20"    TO  WRK-SRYKBN
+                       WHEN    ( WRK-SRYKBN (1:1)     =  "3" )
+                           MOVE    "30"    TO  WRK-SRYKBN
+                       WHEN    ( WRK-SRYKBN =  "64" )
+                           MOVE    "60"    TO  WRK-SRYKBN
+                   END-EVALUATE
+                   IF      WRK-PARA-SRYKBN     =   WRK-SRYKBN
+                       MOVE    1               TO  FLG-SRYKBN
+                   END-IF
+           END-EVALUATE
+            .
+       230-MAIN-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -816,18 +866,7 @@
                        MOVE    "2"         TO  WRK-INGAIKBN
                    END-IF
                ELSE
-                   IF      WRK-PARA-INGAIKBN2  NOT =   "1"
-                       MOVE    "1"         TO  WRK-INGAIKBN
-                   ELSE
-                       IF   (( ACCT-SRYKBN     =   "21" )  OR
-                             ( ACCT-SRYKBN     =   "22" )  OR
-                             ( ACCT-SRYKBN     =   "23" )  OR
-                             ( ACCT-SRYKBN     =   "14" ))
-                           MOVE    "1"         TO  WRK-INGAIKBN
-                       ELSE
-                           MOVE    "0"         TO  WRK-INGAIKBN
-                       END-IF
-                   END-IF
+                   MOVE    "1"         TO  WRK-INGAIKBN
                END-IF
       *
       *        院内
