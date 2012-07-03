@@ -580,6 +580,7 @@
       *  04.05.61    NACL-ÌçÏÆ    12/06/28  ºÒ³²¤Î¸½ÊªµëÉÕÈ½Äê½¤Àµ
       *  04.05.62    NACL-ÌçÏÆ    12/06/28  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅ¦Í×Íóµ­ºÜÂÐ±þ
       *  04.05.63    NACL-ÌçÏÆ    12/06/29  ÂçÊ¬¸©ÃÏÊý¸øÈñÊ¡²¬¸©ÂÐ±þ
+      *  04.05.64    NACL-ÌçÏÆ    12/07/03  Á°´ü¹âÎð£±³ä¡Ü£°£±£°¡Ü¥Þ¥ëÄ¹ÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -1362,6 +1363,7 @@
            03  WRK-TOKU75-BIRTHDAY             PIC  X(08).
       *
            03  WRK-KINGAKU-TOK1                PIC  9(07).
+           03  WRK-KINGAKU-TOK1X               PIC  9(07).
       *
            03  WRK-KINGAKU-TOK3                PIC  9(07).
            03  WRK-KINGAKU-TOK4                PIC  9(07).
@@ -2570,6 +2572,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      FLG-KEISAN-TOK1
                                         FLG-KEISAN-TOK2
                                         WRK-KINGAKU-TOK1
+                                        WRK-KINGAKU-TOK1X
            MOVE      ZERO       TO      FLG-KOUGAKU
            MOVE      ZERO       TO      FLG-BUNBEN-SET
            MOVE      ZERO       TO      FLG-WRKFILE-CLEAR
@@ -10866,11 +10869,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                  * 10
                                  * 20
                                  / 100
-           IF   FLG-WRKFILE-CLEAR   =   ZERO
-             COMPUTE  WRK-FTNKEI-Z = WRK-FTNKEI-Z +  5
-             COMPUTE  WRK-FTNKEI-Z = WRK-FTNKEI-Z / 10
-             COMPUTE  WRK-FTNKEI-Z = WRK-FTNKEI-Z * 10
-           END-IF
+      ***  IF   FLG-WRKFILE-CLEAR   =   ZERO
+      ***    COMPUTE  WRK-FTNKEI-Z = WRK-FTNKEI-Z +  5
+      ***    COMPUTE  WRK-FTNKEI-Z = WRK-FTNKEI-Z / 10
+      ***    COMPUTE  WRK-FTNKEI-Z = WRK-FTNKEI-Z * 10
+      ***  END-IF
       *
            IF   ( SYU-KOH-FTN         =   ZERO   )
            AND  ( SYU-KOH-HKNNUM(1)   =   SPACE OR "027"  )
@@ -11477,6 +11480,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       ADD  WRK-KINGAKU-TOK3 TO  WRK-KINGAKU-TOK1
                  ELSE
                       ADD  WRK-FTNKEI       TO  WRK-KINGAKU-TOK1
+                 END-IF
+      *
+                 IF  WRK-KINGAKU-TOK1X >  WRK-KINGAKU
+                      MOVE   WRK-KINGAKU    TO  WRK-KINGAKU-TOK1X
+                 END-IF
+                 COMPUTE  WRK-KINGAKU-TOK3
+                             =   WRK-KINGAKU -  WRK-KINGAKU-TOK1X
+                 IF  WRK-FTNKEI-Z >   WRK-KINGAKU-TOK3
+                      ADD  WRK-KINGAKU-TOK3 TO  WRK-KINGAKU-TOK1X
+                 ELSE
+                      ADD  WRK-FTNKEI-Z     TO  WRK-KINGAKU-TOK1X
                  END-IF
       *@
                  ADD      SYU-TOTAL-HKNTEN  TO  WRK-KOH-GAI-GEN70-TEN1
@@ -13525,6 +13539,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
               ELSE
                  MOVE  WRK-KINGAKU-TOK3  TO  FTN-KOH-XXX
                  MOVE  WRK-KINGAKU-TOK1  TO  WRK-KINGAKU-TOK4
+                 IF    FLG-ZENKI-TOKUREI  =   1
+                    COMPUTE  WRK-KINGAKU-TOK1X =
+                             WRK-KINGAKU-TOK1X +  5
+                    COMPUTE  WRK-KINGAKU-TOK1X =
+                             WRK-KINGAKU-TOK1X / 10
+                    COMPUTE  WRK-KINGAKU-TOK1X =
+                             WRK-KINGAKU-TOK1X * 10
+                    MOVE  WRK-KINGAKU-TOK1X
+                                         TO  WRK-KINGAKU-TOK4
+                 END-IF
               END-IF
               IF  WRK-KINGAKU-TOK9  >  WRK-KINGAKU-TOK4
                  COMPUTE    WRK-KINGAKU-TOK5 = WRK-KINGAKU-TOK9
@@ -14021,14 +14045,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     WHEN        4
                          MOVE   ZERO     TO   WRK-KOH-GAI-GEN70-Z
                   END-EVALUATE
-                  IF   FLG-WRKFILE-CLEAR   =   ZERO
-                    COMPUTE  WRK-KOH-GAI-GEN70-Z =
-                             WRK-KOH-GAI-GEN70-Z +  5
-                    COMPUTE  WRK-KOH-GAI-GEN70-Z =
-                             WRK-KOH-GAI-GEN70-Z / 10
-                    COMPUTE  WRK-KOH-GAI-GEN70-Z =
-                             WRK-KOH-GAI-GEN70-Z * 10
-                  END-IF
+      ***         IF   FLG-WRKFILE-CLEAR   =   ZERO
+      ***           COMPUTE  WRK-KOH-GAI-GEN70-Z =
+      ***                    WRK-KOH-GAI-GEN70-Z +  5
+      ***           COMPUTE  WRK-KOH-GAI-GEN70-Z =
+      ***                    WRK-KOH-GAI-GEN70-Z / 10
+      ***           COMPUTE  WRK-KOH-GAI-GEN70-Z =
+      ***                    WRK-KOH-GAI-GEN70-Z * 10
+      ***         END-IF
                 END-IF
                END-IF
       *
@@ -14094,6 +14118,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
       *
                IF   FLG-ZENKI-TOKUREI   =   1
+                 COMPUTE  WRK-KOH-GAI-GEN70-Z =
+                          WRK-KOH-GAI-GEN70-Z +  5
+                 COMPUTE  WRK-KOH-GAI-GEN70-Z =
+                          WRK-KOH-GAI-GEN70-Z / 10
+                 COMPUTE  WRK-KOH-GAI-GEN70-Z =
+                          WRK-KOH-GAI-GEN70-Z * 10
                  MOVE   WRK-KOH-FTN-GEN70
                                     TO    WRK-KOH-FTN-GEN70-Z
                  IF   RECE02-KOHNUM(1)    NOT =  SPACE
