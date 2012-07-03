@@ -33,7 +33,6 @@
       *                                     メッセージの追加
       *  03.05.00    NACL-太田    07.05.28  グループ診療対応
       *  03.05.01    NACL-藤原    07/08/01  クライアント保存対応
-      *  04.06.00    NACL-竹田    10/11/25  クライアント保存拡張対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -226,20 +225,6 @@
                WHEN    "CLICKED"       ALSO    "pandatimer1"
                WHEN    "CLICKED"       ALSO    "B11"
                    PERFORM 490-KAKUNIN-SEC
-               IF      SPA-SFILESV-MAX   NOT =  1 
-                 AND   SPA-SFILESV-MAX   NOT =  ZERO
-                 IF      SPA-SFILESV-MAX     >   SPA-SFILESV-IDX
-                   ADD     1                   TO  SPA-SFILESV-IDX 
-                   PERFORM 3001-FILEENTRY-SEC
-                   IF      SPA-SFILESV-MAX   =   SPA-SFILESV-IDX
-                   ADD     1                   TO  SPA-SFILESV-IDX 
-                   END-IF
-                 ELSE
-                   IF      SPA-SFILESV-MAX   NOT =   ZERO
-                   MOVE    ZERO                TO  G99-DURATION
-                   END-IF
-                 END-IF
-               END-IF
       *    プレビュー画面へ
                WHEN    "CLICKED"       ALSO    "B12"
                    PERFORM 4501-NEXT-GMN-SEC
@@ -393,7 +378,7 @@
                            PERFORM 4902-FILE-INFO-CHK-SEC
                        ELSE
       *                    ファイルエントリ処理(クライアント保存)
-                           ADD     1               TO  SPA-SFILESV-IDX 
+                           MOVE    1               TO  SPA-SFILESV-IDX 
                            PERFORM 3001-FILEENTRY-SEC
                            IF      FLG-END         =   1
                                GO  TO  490-KAKUNIN-EXT
@@ -403,8 +388,6 @@
                END-IF    
            END-IF
       *
-           MOVE    "CURRENT"           TO  MCP-PUTTYPE
-           MOVE    "G99    "           TO  MCP-WINDOW
            MOVE    "CURRENT"           TO  MCP-PUTTYPE
            MOVE    "G99    "           TO  MCP-WINDOW
       *
@@ -514,9 +497,6 @@
       *****************************************************************
        3001-FILEENTRY-SEC          SECTION.
       *
-          IF  SPA-SFILESV-MAX          <  SPA-SFILESV-IDX
-              GO                       TO  3001-FILEENTRY-EXT
-          END-IF
            INITIALIZE                      ORCA-BLOB
            MOVE    "BLOBIMPORT"        TO  MCP-FUNC
            MOVE    "key"               TO  MCP-PATHNAME
@@ -533,25 +513,23 @@
                                        SPA-AREA
       *
            INITIALIZE                      GFIL 
-           MOVE    ORCA-BLOB-OBJECT    TO  G99-OBJECTDATA
+           MOVE    ORCA-BLOB-OBJECT    TO  GFIL-OBJECTDATA
            STRING  SPA-SFILESV-TO-FOLDER (SPA-SFILESV-IDX)
                                        DELIMITED  BY  SPACE
                    SPA-SFILESV-TO-DATA   (SPA-SFILESV-IDX)
                                        DELIMITED  BY  SPACE
                                        INTO  GFIL-ENTRY1
            END-STRING
-           MOVE    SPA-SFILESV-TO-DATA   (SPA-SFILESV-IDX)
-                                       TO  G99-FILENAME
            MOVE    SPA-SFILESV-TITLE   (SPA-SFILESV-IDX)
                                        TO  GFIL-TITLE
            MOVE    SPA-SFILESV-CNT-ALL (SPA-SFILESV-IDX)
                                        TO  WRK-KENSU-Z
            MOVE    WRK-KENSU-Z         TO  GFIL-KENSU
       *
-           MOVE    1                   TO  G99-DURATION
+           MOVE    ZERO                TO  G99-DURATION
       *
-      *    MOVE    "NEW"               TO  MCP-PUTTYPE
-      *    MOVE    "GFIL"              TO  MCP-WINDOW
+           MOVE    "NEW"               TO  MCP-PUTTYPE
+           MOVE    "GFIL"              TO  MCP-WINDOW
       *
            PERFORM 900-PUT-WINDOW
            MOVE    1                   TO  FLG-END
