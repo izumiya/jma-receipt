@@ -32,6 +32,7 @@
       *
       *  04.05.01    NACL-藤原    10/02/12  拡張漢字対応
       *  04.05.02    NACL-藤原    12/06/22  処理結果画面への件数表示
+      *  04.05.03    NACL-藤原    12/07/02  住所欄に番地方書を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -135,7 +136,7 @@ grpsys COPY    "COMMON-SPA".
            03  WRK-REC                 PIC X(3000).
            03  WRK-REC-LENGTH          PIC 9(04).
            03  WRK-HENSYU-AREA.
-               05  WRK-DATA            PIC X(200).
+               05  WRK-DATA            PIC X(400).
                05  WRK-NUM             PIC ZZZZZZZZZ9.999. 
                05  WRK-NAGASA          PIC 9(03).
                05  WRK-ST              PIC 9(02). 
@@ -541,7 +542,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  TOUKEI05PARA-HOSPNUM
       *    住所
            IF      WRK-PARA-KOJINKBN   =   "1"
                MOVE    TOUKEI04-HOME-ADRS      TO  WRK-DATA
-               MOVE    200                     TO  WRK-NAGASA
+               MOVE    400                     TO  WRK-NAGASA
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC
       *    電話番号

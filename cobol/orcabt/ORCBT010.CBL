@@ -107,6 +107,7 @@
       *                                     併用から単独になったときのまとめ
       *  04.05.05    NACL-藤原    11/08/25  公費単独対応
       *                                     公費を最大５０に変更
+      *  04.05.06    NACL-藤原    12/07/02  住所欄に番地方書を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1815,7 +1816,10 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
            MOVE    PTINF-SEX       TO  TOUKEI01-SEX
            MOVE    PTINF-BIRTHDAY  TO  TOUKEI01-BIRTHDAY
            MOVE    PTINF-HOME-POST TO  TOUKEI01-HOME-POST
-           MOVE    PTINF-HOME-ADRS TO  TOUKEI01-HOME-ADRS
+           STRING  PTINF-HOME-ADRS     DELIMITED   BY  SPACE
+                   PTINF-HOME-BANTI    DELIMITED   BY  SPACE
+                                       INTO        TOUKEI01-HOME-ADRS
+           END-STRING
            MOVE    PTINF-HOME-TEL1 TO  TOUKEI01-HOME-TEL1
            INITIALIZE                  ADRS-REC
            MOVE    PTINF-HOME-POST TO  ADRS-POST

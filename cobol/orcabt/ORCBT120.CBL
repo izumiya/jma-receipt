@@ -28,6 +28,8 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.01    NACL-藤原    07/04/19  グループ診療対応
+      *
+      *  04.05.01    NACL-藤原    12/07/02  住所欄に番地方書を追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -513,7 +515,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  TOUKEI04PARA-HOSPNUM
            MOVE    PTINF-SEX           TO  TOUKEI04-SEX
            MOVE    PTINF-BIRTHDAY      TO  TOUKEI04-BIRTHDAY
            MOVE    PTINF-HOME-POST     TO  TOUKEI04-HOME-POST
-           MOVE    PTINF-HOME-ADRS     TO  TOUKEI04-HOME-ADRS
+           STRING  PTINF-HOME-ADRS     DELIMITED   BY  SPACE
+                   PTINF-HOME-BANTI    DELIMITED   BY  SPACE
+                                       INTO        TOUKEI04-HOME-ADRS
+           END-STRING
            MOVE    PTINF-HOME-TEL1     TO  TOUKEI04-HOME-TEL
            INITIALIZE                  ADRS-REC
            MOVE    PTINF-HOME-POST TO  ADRS-POST
