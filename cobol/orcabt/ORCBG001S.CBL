@@ -794,12 +794,9 @@
                WHEN    "60"
                WHEN    "70"
                WHEN    "80"
-               WHEN    "90"
                    MOVE    SRY-SRYKBN  TO  WRK-SRYKBN
       *
                    EVALUATE    TRUE
-                       WHEN    ( WRK-SRYKBN  =   "90" OR "92" OR "97" )
-                           MOVE    "90"    TO  WRK-SRYKBN
                        WHEN    ( WRK-SRYKBN (1:1)     =  "2" )
                            MOVE    "20"    TO  WRK-SRYKBN
                        WHEN    ( WRK-SRYKBN (1:1)     =  "3" )
