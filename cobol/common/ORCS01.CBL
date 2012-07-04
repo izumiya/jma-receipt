@@ -375,6 +375,7 @@
       *  04.05.41    NACL-ÌçÏÆ    12/06/05  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.42    NACL-ÌçÏÆ    12/06/19  ¹­Åç¸©ÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
       *  04.05.43    NACL-ÌçÏÆ    12/06/29  ÂçÊ¬¸©ÃÏÊý¸øÈñÊ¡²¬¸©ÂÐ±þ
+      *  04.05.44    NACL-ÌçÏÆ    12/07/04  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -11562,7 +11563,7 @@
                    AND (LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM        )
                    AND (FLG-KEISAN-TAI2     =  1                     )
                    AND (LNK-SYU-SRYYMD(1:6) >=  "200804"             )
-                   AND (LNK-SYU-SRYYMD(1:6) <=  "201203"             )
+      **>          AND (LNK-SYU-SRYYMD(1:6) <=  "201203"             )
                      IF  (LNK-S01-SAIKEISAN-KBN   =   "1" )
                      AND (LNK-SYU-DENPNUM     NOT =  ZERO )
                      AND (LNK-SYU-DENPNUM   <  SYU-DENPNUM)
