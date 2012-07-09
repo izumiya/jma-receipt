@@ -98,6 +98,7 @@
       *  04.06.00    NACL-多々納  10/08/12  診療科変更対応
       *  04.06.00    NACL-多々納  10/09/06  自費保険入院中入力対応
       *  04.06.00    NACL-多々納  11/02/16  用法コメント対応
+      *  04.06.01    NACL-森脇    12/07/09  ユーザーＩＤ表示
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -12007,7 +12008,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *    医院名称
-           MOVE    SPA-HOSPNAME        TO  K02-TITLE
+      *     MOVE    SPA-HOSPNAME        TO  K02-TITLE
+           MOVE    SPACE               TO  K02-TITLE
+           STRING  SPA-HOSPNAME        DELIMITED BY SPACE
+                   "  ["               DELIMITED BY SIZE
+                   SPA-OPID            DELIMITED BY SPACE
+                   "]"                 DELIMITED BY SIZE
+                                       INTO  K02-TITLE
+           END-STRING
       *
       *    非活性処理
            PERFORM 510-GSRAUTH-SEC

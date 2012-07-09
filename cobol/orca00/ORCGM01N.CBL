@@ -53,6 +53,7 @@
       *  03.05.00    NACL-Â¿¡¹Ç¼  07/05/25  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  04.04.00    NACL-¿¹ÏÆ    08/11/20  °õºþºï½ü¥Ü¥¿¥óÄÉ²Ã
       *  04.04.00    NACL-¿¹ÏÆ    09/01/27  ÇÓÂ¾£Ó£Ð£Á¶¦ÄÌÂÐ±þ
+      *  04.06.01    NACL-¿¹ÏÆ    12/07/09  ¥æ¡¼¥¶¡¼£É£ÄÉ½¼¨
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -212,7 +213,6 @@
            COPY    "MDAS.INC".
            COPY    "MLOG.INC".
            COPY    "MINF.INC".
-           COPY    "MPRT.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -662,13 +662,6 @@
       *    °õºþºï½ü
                WHEN    "CLICKED"       ALSO    "B07"
                    MOVE    "0001"      TO  SPA-MIDCD
-      *    ¥¯¥é¥¤¥¢¥ó¥È°õºþ»Ø¼¨(For Test)
-               WHEN    "CLICKED"       ALSO    "B09"
-                 IF  SPA-CLIENT-PRT-FLG =  1
-                   MOVE    ZERO   TO  SPA-CLIENT-PRT-FLG
-                 ELSE
-                   MOVE    1      TO  SPA-CLIENT-PRT-FLG
-                 END-IF
       *    ³Æ¶ÈÌ³°ÜÆ°¤Ø
                WHEN    "CLICKED"       ALSO    ANY
                    PERFORM 400-GYOMU-SEL-SEC
@@ -1257,7 +1250,14 @@
       *
            INITIALIZE                  M01N
       *
-           MOVE    SPA-HOSPNAME        TO  M01N-TITLE
+      *     MOVE    SPA-HOSPNAME        TO  M01N-TITLE
+           MOVE    SPACE           TO  M01N-TITLE
+           STRING  SPA-HOSPNAME        DELIMITED BY SPACE
+                   "  ["               DELIMITED BY SIZE
+                   SPA-OPID            DELIMITED BY SPACE
+                   "]"                 DELIMITED BY SIZE
+                                 INTO  M01N-TITLE
+           END-STRING
            MOVE    SPA-GMN-GSEL        TO  M01N-SELNUM
       *
       *----(01.00.04) LINE DEL START ----------------------------------

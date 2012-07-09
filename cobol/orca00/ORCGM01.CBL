@@ -52,6 +52,7 @@
       *  04.04.00    NACL-¿¹ÏÆ    08/11/20  °õºþºï½ü¥Ü¥¿¥óÄÉ²Ã
       *  04.04.00    NACL-¿¹ÏÆ    09/01/27  ÇÓÂ¾£Ó£Ð£Á¶¦ÄÌÂÐ±þ
       *  04.04.00    NACL-¿¹ÏÆ    09/01/30  Â¾±¡ÀÚÂØÂÐ±þ
+      *  04.06.01    NACL-¿¹ÏÆ    12/07/09  ¥æ¡¼¥¶¡¼£É£ÄÉ½¼¨
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -211,7 +212,6 @@
            COPY    "MDAS.INC".
            COPY    "MLOG.INC".
            COPY    "MINF.INC".
-           COPY    "MPRT.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -1245,7 +1245,14 @@
       *
            INITIALIZE                  M01
       *
-           MOVE    SPA-HOSPNAME        TO  M01-TITLE
+      *     MOVE    SPA-HOSPNAME        TO  M01-TITLE
+           MOVE    SPACE           TO  M01-TITLE
+           STRING  SPA-HOSPNAME        DELIMITED BY SPACE
+                   "  ["               DELIMITED BY SIZE
+                   SPA-OPID            DELIMITED BY SPACE
+                   "]"                 DELIMITED BY SIZE
+                                 INTO  M01-TITLE
+           END-STRING
            MOVE    SPA-GMN-GSEL        TO  M01-SELNUM
       *
       *----(01.00.04) LINE DEL START ----------------------------------

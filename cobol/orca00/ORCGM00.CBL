@@ -69,6 +69,7 @@
       *  04.06.01    NACL-°ËÆ£    11/01/28  ¥ê¥¢¥ë¥¿¥¤¥àÁ÷¿®
       *  04.06.02    NACL-°ËÆ£    11/05/19  ´¶À÷¾É»²²ÃÁ÷¿®
       *  04.06.00    NACL-Â¿¡¹Ç¼  12/03/26  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *  04.06.03    NACL-¿¹ÏÆ    12/07/09  ¥æ¡¼¥¶¡¼£É£ÄÉ½¼¨
       *****************************************************************
       *
       *
@@ -1708,7 +1709,14 @@
            INITIALIZE                  M00
       *
       **** MOVE    SYS-1001-HOSPNAME   TO  M00-TITLE
-           MOVE    ORCSCOMMON-HOSPNAME TO  M00-TITLE
+      *     MOVE    ORCSCOMMON-HOSPNAME TO  M00-TITLE
+           MOVE    SPACE               TO  M00-TITLE
+           STRING  ORCSCOMMON-HOSPNAME     DELIMITED BY SPACE
+                   "  ["                   DELIMITED BY SIZE
+                   SPA-OPID                DELIMITED BY SPACE
+                   "]"                     DELIMITED BY SIZE
+                                     INTO  M00-TITLE
+           END-STRING
            MOVE    SPA-GMN-GSEL        TO  M00-SELNUM
            MOVE    SPA-GMN-LBLMSG      TO  M00-LBLMSG
            MOVE    SPA-GMN-LBLMSG2     TO  M00-LBLMSG2

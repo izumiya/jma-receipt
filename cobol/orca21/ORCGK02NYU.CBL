@@ -65,6 +65,7 @@
       * 04.05.00     NACL-多々納  09/09/16  "0086XXXXX"コメント対応
       * 04.05.00     NACL-多々納  10/01/XX  治験対応
       * 04.06.00     NACL-多々納  10/08/12  診療科変更対応
+      * 04.06.01     NACL-森脇    12/07/09  ユーザーＩＤ表示
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -9805,7 +9806,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPACE               TO  K02N-GRPMEI-VALUE
            END-IF
       *    医院名称
-           MOVE    SPA-HOSPNAME        TO  K02N-TITLE
+      *     MOVE    SPA-HOSPNAME        TO  K02N-TITLE
+           MOVE    SPACE               TO  K02N-TITLE
+           STRING  SPA-HOSPNAME        DELIMITED BY SPACE
+                   "  ["               DELIMITED BY SIZE
+                   SPA-OPID            DELIMITED BY SPACE
+                   "]"                 DELIMITED BY SIZE
+                                       INTO  K02N-TITLE
+           END-STRING
       *
       *    非活性処理
            PERFORM 510-GSRAUTH-SEC
