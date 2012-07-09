@@ -30,6 +30,7 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/06/XX  ¥¨¥é¡¼¥á¥Ã¥»¡¼¥¸½¤Àµ
       *                                     ÆþÎÏ£Ã£ÄÉ½¼¨ÄÉ²Ã
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/04/18  °ìÈÌÌ¾¾Î¸¡º÷ÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  12/07/09  Ï«ºÒÅùÌ¾¾ÎÊÔ½¸ÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2243,6 +2244,32 @@
                END-STRING
            END-IF
       *!!
+      *
+      *H24.7
+      *    Ï«ºÒ¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
+           IF      (TNS-SRYCD(1:3)     =   "101")
+      *    Ï«ºÒ¡Ê´ïºà¡Ë
+           OR     ((TNS-SRYCD(1:1)     =   "7"    )  AND
+                   (TNS-SRYCD(2:5)     =   "88888"))
+      *    Ï«ºÒ¡Ê¥³¥á¥ó¥È¡Ë
+           OR     ((TNS-SRYCD(1:1)     =   "8"  )  AND
+                   (TNS-SRYCD(4:1)     =   "8"  ))
+               MOVE    SPACE               TO  SPA-KT98-GMN-NAME (IDX)
+               STRING  "¡ÚÏ«¡Û"            DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-KT98-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *
+      *    ¸ø³²¤Î¥³¡¼¥É
+           IF      (TNS-SRYCD (1:3)    =   "102")
+               MOVE    SPACE               TO  SPA-KT98-GMN-NAME (IDX)
+               STRING  "¡Ú¸ø³²¡Û"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-KT98-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *
       *
            .
        310211-TENSU-KYOHEN-EXT.

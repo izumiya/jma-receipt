@@ -31,6 +31,7 @@
       *  03.05.00    NACL-Â¿¡¹Ç¼  07/05/02  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  04.01.00    NACL-Â¿¡¹Ç¼  08/01/30  ¼¡ÊÇÉ½¼¨¤ÎÄÉ²Ã
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/07/24  ¿ÇÎÅ¹Ô°Ù°ìÍ÷¤ÈÆ±´ü
+      *  04.07.00    NACL-Â¿¡¹Ç¼  12/07/09  Ï«ºÒÅùÌ¾¾ÎÊÔ½¸ÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1532,21 +1533,25 @@
                 END-STRING
            END-IF
       *!!
-      *    ¸¡ººÀµ¼°Ì¾¾Î
-           IF     (TNS-SRYCD(1:1)      =   "1") AND
-                  (TNS-SRYKBN          =   "60"
-                                       OR  "64"  )  AND
-                  (TNS-FORMALNAME  NOT =   SPACE )  AND
-                  (TNS-FORMALNAME  NOT =   TNS-NAME )
-                MOVE    SPACE              TO  SPA-W25-GMN-NAME (IDX)
-                STRING  TNS-NAME           DELIMITED   BY  SPACE
-                        "¡¡¡Ú"             DELIMITED   BY  SIZE
-                        TNS-FORMALNAME     DELIMITED   BY  SPACE
-                        "¡Û"               DELIMITED   BY  SIZE
-                               INTO        SPA-W25-GMN-NAME(IDX)
-                END-STRING
-                PERFORM 310211-KENSA-NAME-SEC
-           END-IF
+      **   ¸¡ººÀµ¼°Ì¾¾Î
+      *    IF     (TNS-SRYCD(1:1)      =   "1") AND
+      *           (TNS-SRYKBN          =   "60"
+      *                                OR  "64"  )  AND
+      *           (TNS-FORMALNAME  NOT =   SPACE )  AND
+      *           (TNS-FORMALNAME  NOT =   TNS-NAME )
+      *         MOVE    SPACE              TO  SPA-W25-GMN-NAME (IDX)
+      *         STRING  TNS-NAME           DELIMITED   BY  SPACE
+      *                 "¡¡¡Ú"             DELIMITED   BY  SIZE
+      *                 TNS-FORMALNAME     DELIMITED   BY  SPACE
+      *                 "¡Û"               DELIMITED   BY  SIZE
+      *                        INTO        SPA-W25-GMN-NAME(IDX)
+      *         END-STRING
+      *         PERFORM 310211-KENSA-NAME-SEC
+      ***  END-IF
+      *
+      *H24.6
+      *    ¶¦ÄÌÊÔ½¸½èÍý
+           PERFORM 310211-TENSU-KYOHEN-SEC
       *
       *    ÆþÎÏ£Ã£Ä
            IF      ICD-DSPSEQ          =   1
@@ -2076,21 +2081,26 @@
                 END-STRING
            END-IF
       *!!
-      *    ¸¡ººÀµ¼°Ì¾¾Î
-           IF     (TNS-SRYCD(1:1)      =   "1") AND
-                  (TNS-SRYKBN          =   "60"
-                                       OR  "64" )  AND
-                  (TNS-FORMALNAME  NOT =   SPACE )  AND
-                  (TNS-FORMALNAME  NOT =   TNS-NAME )
-                MOVE    SPACE              TO  SPA-W25-GMN-NAME (IDX)
-                STRING  TNS-NAME           DELIMITED   BY  SPACE
-                        "¡¡¡Ú"             DELIMITED   BY  SIZE
-                        TNS-FORMALNAME     DELIMITED   BY  SPACE
-                        "¡Û"               DELIMITED   BY  SIZE
-                               INTO        SPA-W25-GMN-NAME(IDX)
-                END-STRING
-                PERFORM 310211-KENSA-NAME-SEC
-           END-IF
+      ***  ¸¡ººÀµ¼°Ì¾¾Î
+      *    IF     (TNS-SRYCD(1:1)      =   "1") AND
+      *           (TNS-SRYKBN          =   "60"
+      *                                OR  "64" )  AND
+      *           (TNS-FORMALNAME  NOT =   SPACE )  AND
+      *           (TNS-FORMALNAME  NOT =   TNS-NAME )
+      *         MOVE    SPACE              TO  SPA-W25-GMN-NAME (IDX)
+      *         STRING  TNS-NAME           DELIMITED   BY  SPACE
+      *                 "¡¡¡Ú"             DELIMITED   BY  SIZE
+      *                 TNS-FORMALNAME     DELIMITED   BY  SPACE
+      *                 "¡Û"               DELIMITED   BY  SIZE
+      *                        INTO        SPA-W25-GMN-NAME(IDX)
+      *         END-STRING
+      *         PERFORM 310211-KENSA-NAME-SEC
+      **   END-IF
+      *
+      *H24.6
+      *    ¶¦ÄÌÊÔ½¸½èÍý
+           PERFORM 310211-TENSU-KYOHEN-SEC
+      *
       *    ÆþÎÏ£Ã£Ä
            PERFORM 3200-SETCD-HEN-SEC
       *
@@ -2164,6 +2174,67 @@
       *
            .
        31021-TENSU-HEN-EXT.
+           EXIT.
+      *
+      *H24.6
+      *****************************************************************
+      *    ÅÀ¿ô¥Þ¥¹¥¿¶¦ÄÌÊÔ½¸½èÍý
+      *****************************************************************
+       310211-TENSU-KYOHEN-SEC             SECTION.
+      *
+      *    ¸¡ººÀµ¼°Ì¾¾Î
+           IF     (TNS-SRYCD(1:1)      =   "1") AND
+                  (TNS-SRYKBN          =   "60"
+                                       OR  "64"  )  AND
+                  (TNS-FORMALNAME  NOT =   SPACE )  AND
+                  (TNS-FORMALNAME  NOT =   TNS-NAME )
+                MOVE    SPACE              TO  SPA-W25-GMN-NAME (IDX)
+                STRING  TNS-NAME           DELIMITED   BY  SPACE
+                        "¡¡¡Ú"             DELIMITED   BY  SIZE
+                        TNS-FORMALNAME     DELIMITED   BY  SPACE
+                        "¡Û"               DELIMITED   BY  SIZE
+                               INTO        SPA-W25-GMN-NAME(IDX)
+                END-STRING
+                PERFORM 310211-KENSA-NAME-SEC
+           END-IF
+      *
+      *    °åÎÅ´Ñ»¡¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
+           IF      (TNS-SRYCD(1:1)     =   "1"  )  AND
+                   (TNS-IRYOKANSATUKBN =   4    )
+      *        °åÎÅ´Ñ»¡¶èÊ¬
+               MOVE    SPACE               TO  SPA-W25-GMN-NAME (IDX)
+               STRING  "¡Ú°å´Ñ¡Û"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-W25-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *
+      *    Ï«ºÒ¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
+           IF      (TNS-SRYCD(1:3)     =   "101")
+      *    Ï«ºÒ¡Ê´ïºà¡Ë
+           OR     ((TNS-SRYCD(1:1)     =   "7"    )  AND
+                   (TNS-SRYCD(2:5)     =   "88888"))
+      *    Ï«ºÒ¡Ê¥³¥á¥ó¥È¡Ë
+           OR     ((TNS-SRYCD(1:1)     =   "8"  )  AND
+                   (TNS-SRYCD(4:1)     =   "8"  ))
+               MOVE    SPACE               TO  SPA-W25-GMN-NAME (IDX)
+               STRING  "¡ÚÏ«¡Û"            DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-W25-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *
+      *    ¸ø³²¤Î¥³¡¼¥É
+           IF      (TNS-SRYCD (1:3)    =   "102")
+               MOVE    SPACE               TO  SPA-W25-GMN-NAME (IDX)
+               STRING  "¡Ú¸ø³²¡Û"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-W25-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *
+           .
+       310211-TENSU-KYOHEN-EXT.
            EXIT.
       *
       *****************************************************************

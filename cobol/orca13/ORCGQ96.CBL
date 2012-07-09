@@ -31,6 +31,7 @@
       *  03.04.00    NACL-多々納  06/11/14  検査正式名称表示追加
       *  03.05.00    NACL-太田    07.05.23  グループ診療対応
       *  04.01.00    NACL-太田    08/01/30  次頁表示の追加
+      *  04.06.00    NACL-多々納  12/07/09  労災等名称編集追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -976,6 +977,9 @@
                 END-STRING
                 PERFORM 310211-KENSA-NAME-SEC
            END-IF
+      *H24.7
+      *    共通編集処理
+           PERFORM 310211-TENSU-KYOHEN-SEC
       *
            .
        31012-INPUTCD-HEN-EXT.
@@ -1457,6 +1461,9 @@
                 END-STRING
                 PERFORM 310211-KENSA-NAME-SEC
            END-IF
+      *H24.7
+      *    共通編集処理
+           PERFORM 310211-TENSU-KYOHEN-SEC
       *
       *    検査の時、包括の編集
            IF      SPA-Q96-GMN-SYORI   =   "9"
@@ -1529,6 +1536,52 @@
            .
        31021-TENSU-HEN-EXT.
            EXIT.
+      *
+      *H24.7
+      *****************************************************************
+      *    点数マスタ共通編集処理
+      *****************************************************************
+       310211-TENSU-KYOHEN-SEC             SECTION.
+      *
+      *    医療観察コード名称編集
+           IF      (TNS-SRYCD(1:1)     =   "1"  )  AND
+                   (TNS-IRYOKANSATUKBN =   4    )
+      *        医療観察区分
+               MOVE    SPACE               TO  SPA-Q96-GMN-NAME (IDX)
+               STRING  "【医観】"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-Q96-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *
+      *    労災コード名称編集
+           IF      (TNS-SRYCD(1:3)     =   "101")
+      *    労災（器材）
+           OR     ((TNS-SRYCD(1:1)     =   "7"    )  AND
+                   (TNS-SRYCD(2:5)     =   "88888"))
+      *    労災（コメント）
+           OR     ((TNS-SRYCD(1:1)     =   "8"  )  AND
+                   (TNS-SRYCD(4:1)     =   "8"  ))
+               MOVE    SPACE               TO  SPA-Q96-GMN-NAME (IDX)
+               STRING  "【労】"            DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-Q96-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *
+      *    公害のコード
+           IF      (TNS-SRYCD (1:3)    =   "102")
+               MOVE    SPACE               TO  SPA-Q96-GMN-NAME (IDX)
+               STRING  "【公害】"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-Q96-GMN-NAME(IDX)
+               END-STRING
+           END-IF
+      *
+           .
+       310211-TENSU-KYOHEN-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    検査名称再編集処理
       *****************************************************************
