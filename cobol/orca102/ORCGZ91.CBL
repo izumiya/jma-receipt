@@ -385,6 +385,7 @@
            MOVE    "F"             TO  SPA-GMN-SRY(2)
       *
            MOVE    "F"             TO  SPA-GMN-IYKCHKALL
+           MOVE    "F"             TO  SPA-GMN-IPNCHKALL
            MOVE    "F"             TO  SPA-GMN-IYKCHK(1)
            MOVE    "F"             TO  SPA-GMN-IYKCHK(2)
            MOVE    "F"             TO  SPA-GMN-IYKCHK(3)
@@ -406,6 +407,8 @@
            MOVE    "T"             TO  SPA-GMN-CYU(1)
            MOVE    "F"             TO  SPA-GMN-CYU(2)
            MOVE    "F"             TO  SPA-GMN-CYU(3)
+      *
+           MOVE    "F"             TO  SPA-GMN-IPN
       *
            MOVE    "T"             TO  SPA-GMN-SYU(1)
            MOVE    "F"             TO  SPA-GMN-SYU(2)
@@ -687,13 +690,40 @@
                                    UNTIL   IDX         >   7
                                MOVE    "F"     TO  SPA-GMN-IYKCHK(IDX)
                            END-PERFORM
+                           MOVE    "F"     TO  SPA-GMN-IYKCHKALL
                        WHEN    "F"
                            PERFORM VARYING IDX FROM    1   BY  1
                                    UNTIL   IDX         >   7
                                MOVE    "T"     TO  SPA-GMN-IYKCHK(IDX)
                            END-PERFORM
+                           MOVE    "T"     TO  SPA-GMN-IYKCHKALL
+                           MOVE    "F"     TO  SPA-GMN-IPNCHKALL
+                           MOVE    "F"     TO  SPA-GMN-IPN
                    END-EVALUATE
                    MOVE    6           TO  SPA-Z91-GMN-CUR
+      *        一般名チェック
+               WHEN    "CLICKED"       ALSO    "IPNCHKALL"
+                   EVALUATE    SPA-GMN-IPNCHKALL
+                       WHEN    "T"
+                           PERFORM VARYING IDX FROM    1   BY  1
+                                   UNTIL   IDX         >   7
+                               MOVE    "F"     TO  SPA-GMN-IYKCHK(IDX)
+                           END-PERFORM
+                           MOVE    "F"     TO  SPA-GMN-IPNCHKALL
+                           MOVE    "F"     TO  SPA-GMN-IPN
+                       WHEN    "F"
+                           PERFORM VARYING IDX FROM    1   BY  1
+                                   UNTIL   IDX         >   7
+                               IF      IDX     <=   2
+                               MOVE    "T"     TO  SPA-GMN-IYKCHK(IDX)
+                               ELSE
+                               MOVE    "F"     TO  SPA-GMN-IYKCHK(IDX)
+                               END-IF
+                           END-PERFORM
+                           MOVE    "T"     TO  SPA-GMN-IPNCHKALL
+                           MOVE    "F"     TO  SPA-GMN-IYKCHKALL
+                   END-EVALUATE
+                   MOVE    32          TO  SPA-Z91-GMN-CUR
                WHEN    "CLICKED"       ALSO    "IYKCHK1"
                    EVALUATE    SPA-GMN-IYKCHK(1)
                        WHEN    "T"
@@ -845,6 +875,14 @@
                            MOVE    "F"         TO  SPA-GMN-SYU(4)
                        END-IF
                    END-IF
+               WHEN    "CLICKED"       ALSO    "IPN"
+                   EVALUATE    SPA-GMN-IPN
+                       WHEN    "T"
+                           MOVE    "F"     TO  SPA-GMN-IPN
+                       WHEN    "F"
+                           MOVE    "T"     TO  SPA-GMN-IPN
+                   END-EVALUATE
+                   MOVE    33          TO  SPA-Z91-GMN-CUR
                WHEN    "CLICKED"       ALSO    "SYU1"
                WHEN    "CLICKED"       ALSO    "SYU2"
                WHEN    "CLICKED"       ALSO    "SYU3"
@@ -855,16 +893,23 @@
                    MOVE  Z91-SYU4              TO  SPA-GMN-SYU(4)
            END-EVALUATE
       *
-           IF          SPA-GMN-IYKCHK(1)   =   "F"
-               AND     SPA-GMN-IYKCHK(2)   =   "F"
-               AND     SPA-GMN-IYKCHK(3)   =   "F"
-               AND     SPA-GMN-IYKCHK(4)   =   "F"
-               AND     SPA-GMN-IYKCHK(5)   =   "F"
-               AND     SPA-GMN-IYKCHK(6)   =   "F"
-               AND     SPA-GMN-IYKCHK(7)   =   "F"
-               MOVE    "F"             TO  SPA-GMN-IYKCHKALL
-           ELSE
-               MOVE    "T"             TO  SPA-GMN-IYKCHKALL
+           IF      SPA-GMN-IYKCHKALL   =   "T"
+               IF          SPA-GMN-IYKCHK(1)   =   "F"
+                   AND     SPA-GMN-IYKCHK(2)   =   "F"
+                   AND     SPA-GMN-IYKCHK(3)   =   "F"
+                   AND     SPA-GMN-IYKCHK(4)   =   "F"
+                   AND     SPA-GMN-IYKCHK(5)   =   "F"
+                   AND     SPA-GMN-IYKCHK(6)   =   "F"
+                   AND     SPA-GMN-IYKCHK(7)   =   "F"
+                   MOVE    "F"             TO  SPA-GMN-IYKCHKALL
+               END-IF
+           END-IF
+           IF      SPA-GMN-IPNCHKALL   =   "T"
+               IF          SPA-GMN-IYKCHK(1)   =   "F"
+                   AND     SPA-GMN-IYKCHK(2)   =   "F"
+                   MOVE    "F"             TO  SPA-GMN-IPNCHKALL
+                   MOVE    "F"             TO  SPA-GMN-IPN
+               END-IF
            END-IF
       *
            IF          SPA-GMN-COMCHK(1)   =   "F"
@@ -1214,6 +1259,7 @@
        490-PRINT-MAE-SEC                   SECTION.
       *
            IF     (SPA-GMN-IYKCHKALL   =   "F")    AND
+                  (SPA-GMN-IPNCHKALL   =   "F")    AND
                   (SPA-GMN-SRYCHK      =   "F")    AND
                   (SPA-GMN-TOKCHK      =   "F")    AND
                   (SPA-GMN-JIHCHK      =   "F")    AND
@@ -1264,6 +1310,7 @@
        490-CSV-MAE-SEC                   SECTION.
       *
            IF     (SPA-GMN-IYKCHKALL   =   "F")    AND
+                  (SPA-GMN-IPNCHKALL   =   "F")    AND
                   (SPA-GMN-SRYCHK      =   "F")    AND
                   (SPA-GMN-TOKCHK      =   "F")    AND
                   (SPA-GMN-JIHCHK      =   "F")    AND
@@ -1547,6 +1594,13 @@
                    MOVE  3                     TO  SHELL-CYUKBN
            END-EVALUATE
       *
+      *    一般チェックセット
+           IF      SPA-GMN-IPN         =   "T"
+               MOVE  1                     TO  SHELL-IPN
+           ELSE
+               MOVE  ZERO                  TO  SHELL-IPN
+           END-IF
+      *
       *    出力区分セット
            EVALUATE    TRUE
                WHEN    SPA-GMN-SYU (1) =   "T"
@@ -1586,9 +1640,7 @@
                        PERFORM 4901-PRINT-SYORI-SEC
                END-IF
       *
-               IF      SHELL-IYKCHK-G      =   ALL "0"
-                   CONTINUE
-               ELSE         
+               IF      SPA-GMN-IYKCHKALL  =   "T"
                    IF      SHELL-IYKCHK(7)   >   ZERO
                        MOVE    SPA-CSV-DIRNAME(8)    TO  WRK-CSVDIR
                        MOVE    SPA-CSV-FILENAME(8)   TO  WRK-CSVFILE
@@ -1604,6 +1656,15 @@
                        MOVE    SPA-CSV-DIRNAME(2)    TO  WRK-CSVDIR
                        MOVE    SPA-CSV-FILENAME(2)   TO  WRK-CSVFILE
                        MOVE    "ORHCML01"        TO  WRK-PGID
+                       PERFORM 4901-PRINT-SYORI-SEC
+                   END-IF
+               END-IF
+               IF      SPA-GMN-IPNCHKALL  =   "T"
+                   IF     (SHELL-IYKCHK(1)   >   ZERO)
+                       OR (SHELL-IYKCHK(2)   >   ZERO)
+                       MOVE    SPA-CSV-DIRNAME(2)    TO  WRK-CSVDIR
+                       MOVE    SPA-CSV-FILENAME(2)   TO  WRK-CSVFILE
+                       MOVE    "ORHCML13"        TO  WRK-PGID
                        PERFORM 4901-PRINT-SYORI-SEC
                    END-IF
                END-IF
@@ -1655,9 +1716,7 @@
                    PERFORM 4901-PRINT-SYORI-SEC
                END-IF
       *
-               IF      SHELL-IYKCHK-G      =   ALL "0"
-                   CONTINUE
-               ELSE         
+               IF      SPA-GMN-IYKCHKALL  =   "T"
                    IF      SHELL-IYKCHK(7)   >   ZERO
                        MOVE    SPA-CSV-DIRNAME(8)    TO  WRK-CSVDIR
                        MOVE    SPA-CSV-FILENAME(8)   TO  WRK-CSVFILE
@@ -1673,6 +1732,15 @@
                        MOVE    SPA-CSV-DIRNAME(2)    TO  WRK-CSVDIR
                        MOVE    SPA-CSV-FILENAME(2)   TO  WRK-CSVFILE
                        MOVE    "ORHCML06"        TO  WRK-PGID
+                       PERFORM 4901-PRINT-SYORI-SEC
+                   END-IF
+               END-IF
+               IF      SPA-GMN-IPNCHKALL  =   "T"
+                   IF     (SHELL-IYKCHK(1)   >   ZERO)
+                       OR (SHELL-IYKCHK(2)   >   ZERO)
+                       MOVE    SPA-CSV-DIRNAME(2)    TO  WRK-CSVDIR
+                       MOVE    SPA-CSV-FILENAME(2)   TO  WRK-CSVFILE
+                       MOVE    "ORHCML13"        TO  WRK-PGID
                        PERFORM 4901-PRINT-SYORI-SEC
                    END-IF
                END-IF
@@ -2151,18 +2219,20 @@
            MOVE  SPA-GMN-CYU(1)     TO  Z91-CYU1
            MOVE  SPA-GMN-CYU(2)     TO  Z91-CYU2
            MOVE  SPA-GMN-CYU(3)     TO  Z91-CYU3
-           MOVE  SPA-GMN-IYKCHK(1)     TO  Z91-IYKCHK(1)
-           MOVE  SPA-GMN-IYKCHK(2)     TO  Z91-IYKCHK(2)
-           MOVE  SPA-GMN-IYKCHK(3)     TO  Z91-IYKCHK(3)
-           MOVE  SPA-GMN-IYKCHK(4)     TO  Z91-IYKCHK(4)
-           MOVE  SPA-GMN-IYKCHK(5)     TO  Z91-IYKCHK(5)
-           MOVE  SPA-GMN-IYKCHK(6)     TO  Z91-IYKCHK(6)
-           MOVE  SPA-GMN-IYKCHK(7)     TO  Z91-IYKCHK(7)
+           MOVE  SPA-GMN-IPN        TO  Z91-IPN
+           MOVE  SPA-GMN-IYKCHK(1)     TO  Z91-IYKCHK1
+           MOVE  SPA-GMN-IYKCHK(2)     TO  Z91-IYKCHK2
+           MOVE  SPA-GMN-IYKCHK(3)     TO  Z91-IYKCHK3
+           MOVE  SPA-GMN-IYKCHK(4)     TO  Z91-IYKCHK4
+           MOVE  SPA-GMN-IYKCHK(5)     TO  Z91-IYKCHK5
+           MOVE  SPA-GMN-IYKCHK(6)     TO  Z91-IYKCHK6
+           MOVE  SPA-GMN-IYKCHK(7)     TO  Z91-IYKCHK7
            MOVE  SPA-GMN-COMCHK(1)     TO  Z91-COMCHK(1)
            MOVE  SPA-GMN-COMCHK(2)     TO  Z91-COMCHK(2)
            MOVE  SPA-GMN-COMCHK(3)     TO  Z91-COMCHK(3)
            MOVE  SPA-GMN-IYKCHKALL     TO  Z91-IYKCHKALL
            MOVE  SPA-GMN-COMCHKALL     TO  Z91-COMCHKALL
+           MOVE  SPA-GMN-IPNCHKALL     TO  Z91-IPNCHKALL
       *
            PERFORM  VARYING IDX FROM 1 BY 1
                     UNTIL   IDX > SPA-SRYSTR-MAX
@@ -2200,7 +2270,30 @@
                MOVE    WIDGET-INSENSITIVE  TO  Z91-SYU4-STATE
            ELSE
                MOVE    WIDGET-NORMAL       TO  Z91-SYU4-STATE 
-           END-IF    
+           END-IF
+      *
+           MOVE    WIDGET-INSENSITIVE  TO  Z91-IYKCHK1-STATE
+                                           Z91-IYKCHK2-STATE
+                                           Z91-IYKCHK3-STATE
+                                           Z91-IYKCHK4-STATE
+                                           Z91-IYKCHK5-STATE
+                                           Z91-IYKCHK6-STATE
+                                           Z91-IYKCHK7-STATE
+                                           Z91-IPN-STATE
+           IF      SPA-GMN-IPNCHKALL  =  "T"
+               MOVE    WIDGET-NORMAL       TO  Z91-IYKCHK1-STATE
+                                               Z91-IYKCHK2-STATE
+                                               Z91-IPN-STATE
+           END-IF
+           IF      SPA-GMN-IYKCHKALL  =  "T"
+               MOVE    WIDGET-NORMAL       TO  Z91-IYKCHK1-STATE
+                                               Z91-IYKCHK2-STATE
+                                               Z91-IYKCHK3-STATE
+                                               Z91-IYKCHK4-STATE
+                                               Z91-IYKCHK5-STATE
+                                               Z91-IYKCHK6-STATE
+                                               Z91-IYKCHK7-STATE
+           END-IF
       *             
       *    カーソル位置
            PERFORM 5001-MAPCUR-SEC
@@ -2276,6 +2369,10 @@
                    MOVE    "SYU4"              TO  MCP-WIDGET
                WHEN    31
                    MOVE    "KZICHK"            TO  MCP-WIDGET
+               WHEN    32
+                   MOVE    "IPNCHKALL"         TO  MCP-WIDGET
+               WHEN    33
+                   MOVE    "IPN"               TO  MCP-WIDGET
                WHEN    99
                    MOVE    "B12"               TO  MCP-WIDGET
            END-EVALUATE

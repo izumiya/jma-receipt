@@ -28,26 +28,36 @@ Z91	{
 		IYKCHKALL	{
 			value	bool;
 		};
+		IPNCHKALL	{
+			value	bool;
+		};
 		IYKCHK1	{
 			value	bool;
+			state   int;
 		};
 		IYKCHK2	{
 			value	bool;
+			state   int;
 		};
 		IYKCHK3	{
 			value	bool;
+			state   int;
 		};
 		IYKCHK4	{
 			value	bool;
+			state   int;
 		};
 		IYKCHK5	{
 			value	bool;
+			state   int;
 		};
 		IYKCHK6	{
 			value	bool;
+			state   int;
 		};
 		IYKCHK7	{
 			value	bool;
+			state   int;
 		};
 		TOKCHK	{
 			value	bool;
@@ -91,6 +101,10 @@ Z91	{
 		};
 		CYU3	{
 			value	bool;
+		};
+		IPN	{
+			value	bool;
+			state   int;
 		};
 		SYU1	{
 			value	bool;

@@ -148,6 +148,7 @@
                    07  SPA-GMN-SRY         PIC X     OCCURS  2.
                    07  SPA-GMN-IYKCHK-G.
                        09  SPA-GMN-IYKCHKALL         PIC X.
+                       09  SPA-GMN-IPNCHKALL         PIC X.
                        09  SPA-GMN-IYKCHK  PIC X     OCCURS  7.
                    07  SPA-GMN-TOKCHK      PIC X.
                    07  SPA-GMN-HOKACHK     PIC X.
@@ -158,6 +159,7 @@
                        09  SPA-GMN-COMCHK  PIC X     OCCURS  3.
                    07  SPA-GMN-MSTYMD      PIC X(9).
                    07  SPA-GMN-CYU         PIC X     OCCURS  3.
+                   07  SPA-GMN-IPN         PIC X.
                    07  SPA-GMN-SYU         PIC X     OCCURS  4.
                    07  SPA-GMN-KEI         PIC X     OCCURS  2.
       *

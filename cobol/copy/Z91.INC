@@ -30,7 +30,22 @@
                         06  Z91-SRYEND-COUNT   PIC S9(9)   BINARY.
                         06  Z91-SRYEND-ITEM    PIC X(17)   OCCURS  14.
                     05  Z91-IYKCHKALL          PIC X.
-                    05  Z91-IYKCHK             PIC X       OCCURS  7.
+                    05  Z91-IPNCHKALL          PIC X.
+                    05  Z91-IYK-G.
+                        06  Z91-IYKCHK1        PIC X.
+                        06  Z91-IYKCHK1-STATE  PIC S9(9)   BINARY.
+                        06  Z91-IYKCHK2        PIC X.
+                        06  Z91-IYKCHK2-STATE  PIC S9(9)   BINARY.
+                        06  Z91-IYKCHK3        PIC X.
+                        06  Z91-IYKCHK3-STATE  PIC S9(9)   BINARY.
+                        06  Z91-IYKCHK4        PIC X.
+                        06  Z91-IYKCHK4-STATE  PIC S9(9)   BINARY.
+                        06  Z91-IYKCHK5        PIC X.
+                        06  Z91-IYKCHK5-STATE  PIC S9(9)   BINARY.
+                        06  Z91-IYKCHK6        PIC X.
+                        06  Z91-IYKCHK6-STATE  PIC S9(9)   BINARY.
+                        06  Z91-IYKCHK7        PIC X.
+                        06  Z91-IYKCHK7-STATE  PIC S9(9)   BINARY.
                     05  Z91-TOKCHK             PIC X.
                     05  Z91-HOKACHK            PIC X.
                     05  Z91-KZICHK             PIC X.
@@ -44,6 +59,8 @@
                         06  Z91-CYU1-STATE     PIC S9(9)   BINARY.
                         06  Z91-CYU2           PIC X.
                         06  Z91-CYU3           PIC X.
+                    05  Z91-IPN                PIC X.
+                    05  Z91-IPN-STATE          PIC S9(9)   BINARY.
                     05  Z91-SYU-G.
                         06  Z91-SYU1           PIC X.
                         06  Z91-SYU2           PIC X.
