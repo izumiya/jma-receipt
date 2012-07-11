@@ -2553,9 +2553,16 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
-               WHEN    "0122"
-                   STRING  "院内投薬のみの算定です。"
-                           "処方せん料は算定できません。"
+      **       WHEN    "0122"
+      *            STRING  "院内投薬のみの算定です。"
+      *                    "処方せん料は算定できません。"
+      *                                DELIMITED  BY  SIZE
+      *                                INTO  SPA-ERRMSG
+      ****         END-STRING
+               WHEN    "K122"
+                   STRING  "警告！"
+                           "院内投薬のみの算定です。"
+                           "処方せん料を削除して下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING

@@ -112,6 +112,8 @@
            03  FLG-JYURRK-END       PIC 9(01).
       *    長期あり
            03  FLG-CHOUKI           PIC 9(01).
+      *H24.7
+           03  FLG-CHOUKI2          PIC 9(01).
       *
            03  FLG-CHOKIKA1         PIC 9(01).
            03  FLG-CHOKIKA2         PIC 9(01).
@@ -1287,6 +1289,7 @@
            MOVE    ZERO                TO  FLG-MADOKU-ARI
            MOVE    ZERO                TO  FLG-SINSATU
            MOVE    ZERO                TO  FLG-CHOUKI 
+           MOVE    ZERO                TO  FLG-CHOUKI2
       *
            MOVE    ZERO                TO  FLG-TOKUSYO1
            MOVE    ZERO                TO  FLG-TOKUSYO2
@@ -1728,7 +1731,8 @@
                    END-IF
                ELSE
       *            長期投薬があること
-                  IF      FLG-CHOUKI          =   ZERO
+      *H24.7       IF      FLG-CHOUKI          =   ZERO
+                   IF      FLG-CHOUKI2         =   ZERO
                       IF     (WRK-COM-KZMFLG (IDX-T1)  =   SPACE) AND
                              (LNK-ORCSC-KEI-IDX        =   ZERO )
                            MOVE    "K021"          TO  SPA-ERRCD
@@ -1864,9 +1868,16 @@
                IF     (FLG-NAIYAK          =   1    )  OR
                       (FLG-TONPUK          =   1    )  OR
                       (FLG-GAIYAK          =   1    )
-      *            処方せん料と院内投薬のみはエラー
-                   MOVE    "0122"          TO  SPA-ERRCD
-                   MOVE    "1"             TO  WRK-COM-CUR (IDX-SYOHOU)
+      *            処方せん料と院内投薬のみは警告エラー
+                   IF     (WRK-COM-KZMFLG5(IDX-SYOHOU) =   SPACE) AND
+                          (LNK-ORCSC-KEI-IDX           =   ZERO )
+                       MOVE    "K122"          TO  SPA-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR
+                                                          (IDX-SYOHOU)
+                       MOVE    "1"             TO  WRK-COM-KZMFLG5
+                                                          (IDX-SYOHOU)
+                       MOVE    IDX-SYOHOU      TO  LNK-ORCSC-KEI-IDX
+                   END-IF
                END-IF
            END-IF
       *    処方せん料と投薬チェック
@@ -2188,7 +2199,14 @@
                                               OR  "23"
                                               OR  "29" )  AND
                    (WRK-COM-KAISU (IDX)       >=  28   )
-               MOVE    1                   TO  FLG-CHOUKI
+      *H24.7   MOVE    1                   TO  FLG-CHOUKI
+               IF      WRK-CHK-SRYSYUKBN(3:1)  =   "1"
+      *            院内
+                   MOVE    1                   TO  FLG-CHOUKI
+               ELSE
+      *            院外
+                   MOVE    1                   TO  FLG-CHOUKI2
+               END-IF
                IF      WRK-CHOU-HKNCOMBI   =   SPACE
                    MOVE    WRK-COM-HKNCOMBI (IDX)
                                                TO  WRK-CHOU-HKNCOMBI
@@ -2200,7 +2218,14 @@
            IF      (WRK-COM-INPUTCD(IDX)(1:1) =   "6"  )  AND
                    (WRK-CHK-SRYSYUKBN (1:2)   =   "23" )  AND
                    (WRK-COM-KAISU2(IDX)       >=  28   )
-               MOVE    1                   TO  FLG-CHOUKI
+      ******** MOVE    1                   TO  FLG-CHOUKI
+               IF      WRK-CHK-SRYSYUKBN(3:1)  =   "1"
+      *            院内
+                   MOVE    1                   TO  FLG-CHOUKI
+               ELSE
+      *            院外
+                   MOVE    1                   TO  FLG-CHOUKI2
+               END-IF
                IF      WRK-CHOU-HKNCOMBI   =   SPACE
                    MOVE    WRK-COM-HKNCOMBI (IDX)
                                                TO  WRK-CHOU-HKNCOMBI
@@ -2551,7 +2576,8 @@
                GO      TO      30011-INGAITOKUTEIKSN-CHK-EXT
            END-IF
       *
-           IF     (FLG-CHOUKI          =   1   )  AND
+      **** IF     (FLG-CHOUKI          =   1   )  AND
+           IF     (FLG-CHOUKI2         =   1   )  AND
                   (SPA-CHOKITOFLG      =   ZERO)
       *        長期投薬加算チェック
                MOVE    "120003270"         TO  WRK-SRYCD
