@@ -2849,6 +2849,8 @@
       *        内服７種類以上逓減確認
                WHEN    "2001"
                WHEN    "2002"
+               WHEN    "2004"
+               WHEN    "2005"
                    MOVE    SPACE               TO  SPA-KIDCD
                    IF      SPA-KID1-FLG        =   "OK"
                       MOVE    1                TO  SPA-NAIFUKU-OK
@@ -12556,6 +12558,21 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        DELIMITED   BY  SIZE
                                        INTO    WRK-KIDMSG
                    END-STRING
+      *ver.4.7
+               WHEN    "2004"
+                   STRING  "用法まとめでは内服薬剤は７種類未満です。"
+                           "７種類以上の処方せん料にしますか？"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+               WHEN    "2005"
+                   STRING  "用法まとめでは内服薬剤が７種類以上に"
+                           "なります。"
+                           "７種類以上の処方せん料にしますか？"
+                                       DELIMITED   BY  SIZE
+                                       INTO    WRK-KIDMSG
+                   END-STRING
+      *ver.4.7
                WHEN    "0140"
                    STRING  "初回算定日を算定履歴に作成します。"
                                            DELIMITED  BY  SIZE
@@ -12637,10 +12654,20 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0121"
                WHEN    "0128"
                WHEN    "0129"
+      *ver.4.7
+               WHEN    "2004"
+               WHEN    "2005"
                    MOVE    "ＮＯ"            TO  KID1-B01
            END-EVALUATE
       *
            MOVE    "B12"               TO  MCP-WIDGET
+      *
+      *ver.4.7
+           EVALUATE    SPA-KIDCD
+      *    処方せん料７種類以上の判定
+               WHEN    "2004"
+                   MOVE    "B01"               TO  MCP-WIDGET
+           END-EVALUATE
       *
            MOVE    "K02"               TO  SPA-MOTOPG
            MOVE    "KID1"              TO  SPA-SAKIPG

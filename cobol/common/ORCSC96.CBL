@@ -2697,13 +2697,20 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
-               WHEN    "0122"
-                   STRING  "院内投薬のみの算定です。"
-                           "処方せん料は算定できません。"
+      *****    WHEN    "0122"
+      *            STRING  "院内投薬のみの算定です。"
+      *                    "処方せん料は算定できません。"
+      *                                DELIMITED  BY  SIZE
+      *                                INTO  SPA-ERRMSG
+      *****        END-STRING
+                WHEN    "K122"
+                   STRING  "警告！"
+                           "院内投薬のみの算定です。"
+                           "処方せん料を削除して下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
-               WHEN    "K232"
+              WHEN    "K232"
                    STRING  "警告！"
                            "内服薬剤が７種類以上となります。"
                            "処方せん料を確認して下さい。"
@@ -2721,6 +2728,23 @@
                    STRING  "警告！"
                            "処方せん料が包括されます。"
                            "算定できません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *ver.4.7
+               WHEN    "K239"
+                   STRING  "警告！"
+                           "用法まとめでは"
+                           "内服薬剤が７種類以上となります。"
+                           "処方せん料を確認して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K238"
+                   STRING  "警告！"
+                           "用法まとめでは"
+                           "内服薬剤が７種類未満です。"
+                           "処方せん料を確認して下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
