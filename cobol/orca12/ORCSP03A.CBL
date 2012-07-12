@@ -47,6 +47,7 @@
       * 04.02.00     NACL-多々納  08/03/XX  平成２０年４月改正対応
       * 04.03.00     NACL-多々納  08/06/XX  家族年齢・被保険者名設定対応
       * 04.06.00     NACL-多々納  10/06/30  本人家族区分、補助区分変更対応
+      * 04.07.00     NACL-多々納  12/07/12  全後期高齢者の開始日対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1673,18 +1674,19 @@
       *        システム日付を設定
                MOVE    SPA-SYSYMD          TO  SPA-NAI-HTEKSTYMD
                MOVE    SPA-SYSYMDWH        TO  SPA-GMN-HTEKSTYMD
+      *ver.4.7 　すべてシステム日付
       *        後期高齢者
-               IF      SPA-GMN-HKNNUM      =   "039"
-                                           OR  "040"
-                   PERFORM 10011-TEKSTYMD-SET39-SEC
-                   IF      (FLG-KOH-CHK        =   1   )
-                       OR  (SPA-SYSYMD         <   "20080401" )
-                       OR  (SPA-BYMD-75-2      <=  "20080401" )
+      *        IF      SPA-GMN-HKNNUM      =   "039"
+      *                                    OR  "040"
+      *            PERFORM 10011-TEKSTYMD-SET39-SEC
+      *            IF      (FLG-KOH-CHK        =   1   )
+      *                OR  (SPA-SYSYMD         <   "20080401" )
+      *                OR  (SPA-BYMD-75-2      <=  "20080401" )
       *                ７５歳到達日がＨ２０．４以前の時
-                       MOVE    "20080401"      TO  SPA-NAI-HTEKSTYMD
-                       MOVE    "20080401"      TO  SPA-GMN-HTEKSTYMD
-                   END-IF
-               END-IF
+      *                MOVE    "20080401"      TO  SPA-NAI-HTEKSTYMD
+      *                MOVE    "20080401"      TO  SPA-GMN-HTEKSTYMD
+      *            END-IF
+      ******   END-IF
            END-IF
       *
       *!   IF      SPA-GMN-HTEKSTYMD   =   SPACE
