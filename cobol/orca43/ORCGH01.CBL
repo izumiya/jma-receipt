@@ -89,6 +89,8 @@
       *  04.05.04    NACL-藤原    11/04/22  災害対応
       *                                     災害区分の追加
       *  04.05.05    NACL-藤原    12/06/05  レセ電データ無し時のエラー表示
+      *  04.05.06    NACL-藤原    12/07/18  公費単独の負担者番号、受給者
+      *                                     番号の表示に自立支援を追加
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *  04.06.02    NACL-藤原    10/10/12  キーにkohid 追加
@@ -1551,7 +1553,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF    ( RECE10-HKNNUM       =   SPACE               )
                IF    ( RECE10-KOHNUM (1)   =   "012"  OR "025"
                                                       OR "020"
-                                                      OR "053" )
+                                                      OR "053"
+                                                      OR "021"
+                                                      OR "015"
+                                                      OR "016" )
                AND   ( RECE10-KOHNUM (2)   =   SPACE           )
                    INITIALIZE                  PTKOHINF-REC
                    MOVE    SPA-HOSPNUM     TO  PTKOH-HOSPNUM
@@ -1638,7 +1643,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF    ( RECE10-HKNNUM       =   SPACE               )
                        IF    ( RECE10-KOHNUM (1)   =   "012"  OR "025"
                                                               OR "020"
-                                                              OR "053" )
+                                                              OR "053"
+                                                              OR "021"
+                                                              OR "015"
+                                                              OR "016" )
                        AND   ( RECE10-KOHNUM (2)   =   SPACE           )
                            STRING  SPA-RECE10-FTNJANUM
                                                    DELIMITED   BY  SPACE
