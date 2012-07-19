@@ -2567,6 +2567,14 @@
                        MOVE    1               TO  FLG-JIKASAN
                    END-IF
                END-IF
+      *H24.7   ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤Î»þ´Ö³°²Ã»»¤ÎÈ½Äê
+      *       ¡Ê¿Ç¶è¡á£±£³¤Î»þ´Ö³°²Ã»»¤Ï¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤Î²Ã»»¤·¤«¤Ê¤¤¡Ë
+               IF     (WRK-COM-SRYKBN  (IDX-Z)     =   "13"     )
+                   IF     (WRK-COM-DATAKBN   (IDX-Z)   =   "2"  ) AND
+                          (WRK-COM-TIMEKSNKBN(IDX-Z)   NOT =   ZERO)
+                       MOVE    1               TO  FLG-JIKASAN
+                   END-IF
+               END-IF
       ***      Äþ¸º²Ã»»»»Äê¥Á¥§¥Ã¥¯
       *!       IF     (WRK-COM-TEIGENKBN (IDX-Z)   =   1    )  AND
       *!              (WRK-COM-DATAKBN   (IDX-Z)   =  "1"   )  AND
