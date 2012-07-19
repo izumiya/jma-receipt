@@ -568,6 +568,7 @@
       *  04.05.70    NACL-ÌçÏÆ    12/06/28  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅ¦Í×Íóµ­ºÜÂÐ±þ
       *  04.05.71    NACL-ÌçÏÆ    12/06/29  ÂçÊ¬¸©ÃÏÊý¸øÈñÊ¡²¬¸©ÂÐ±þ
       *  04.05.72    NACL-ÌçÏÆ    12/07/03  Á°´ü¹âÎð£±³ä¡Ü£°£±£°¡Ü¥Þ¥ëÄ¹ÂÐ±þ
+      *  04.05.73    NACL-ÌçÏÆ    12/07/19  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -13474,12 +13475,14 @@
                        WHEN     "2"
                           MOVE    "6"     TO   RECE62-NYUINRYOFLG
                           IF  (RECE62-SRYYM      >= "200904")
+                          AND (RECE62-SRYYM      <= "201203")
                           AND (RECE62-KOUREI      = "1"     )
                             MOVE  "1"     TO   RECE62-NYUINRYOFLG
                           END-IF
                        WHEN     "3"
                           PERFORM  2104411-NYUINRYOFLG-HENSYU-SEC
                           IF  (RECE62-SRYYM      >= "200904"         )
+                          AND (RECE62-SRYYM      <= "201203"         )
                           AND (RECE62-KOUREI      = "1"              )
                           AND (RECE62-NYUINRYOFLG = "2" OR "3" OR "7")
                             MOVE  "1"     TO   RECE62-NYUINRYOFLG

@@ -336,6 +336,7 @@
       *  04.05.36    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.37    NACL-ÌçÏÆ    12/05/30  ºÒ³²ÂÐ±þ¡ÊÆü¸ÛÆÃÎãÈïÊÝ¸±¼Ô¡Ë
       *  04.05.38    NACL-ÌçÏÆ    12/06/29  ÂçÊ¬¸©ÃÏÊý¸øÈñÊ¡²¬¸©ÂÐ±þ
+      *  04.05.39    NACL-ÌçÏÆ    12/07/19  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -3743,6 +3744,7 @@
            IF  (LNK-S02-KOUREI-NYUIN-KBN   =  "1"     )
            AND (LNK-S02-KOREI-TANYUIN      =  "1"     )
            AND (LNK-SYU-SRYYMD(1:6)       >=  "200904")
+           AND (LNK-SYU-SRYYMD(1:6)       <=  "201203")
                MOVE    1    TO    LNK-SYU-SKJ-FTNGAKU(3)
                IF  (COMB-KOH1HKNNUM  = "972" OR "974")
                OR  (COMB-KOH2HKNNUM  = "972" OR "974")
