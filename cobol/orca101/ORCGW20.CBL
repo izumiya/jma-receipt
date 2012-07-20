@@ -3755,7 +3755,24 @@
       *****************************************************************
       *    病棟情報編集処理(H20.04〜)
       *****************************************************************
-       420121-BTU-KSN-EDIT-SEC          SECTION.
+       420121-BTU-KSN-EDIT-SEC         SECTION.
+      *
+           MOVE    WRK-KSNCD           TO  WRK-TNS-SRYCD
+           MOVE    SPA-NAI-W20-YUKOSTYMD
+                                       TO  WRK-TNS-KJNYMD
+           PERFORM 900-TENSU-KEY-SEL-SEC
+           IF    ( TNS-HOSPSRYKBN  =   ZERO )
+            OR   ( TNS-HOSPSRYKBN  =   SPA-NAI-W20-HOSPSBT )
+               PERFORM 4201211-BTU-KSN-EDIT-SEC
+           END-IF
+      *
+           .
+       420121-BTU-KSN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    病棟情報編集処理(H20.04〜)
+      *****************************************************************
+       4201211-BTU-KSN-EDIT-SEC         SECTION.
       *
            IF    ( WRK-KSNCD            =  CONST-HOIKUCD )
                CONTINUE
@@ -3786,7 +3803,7 @@
            END-IF
       *
            .
-       420121-BTU-KSN-EDIT-EXT.
+       4201211-BTU-KSN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    病棟番号
