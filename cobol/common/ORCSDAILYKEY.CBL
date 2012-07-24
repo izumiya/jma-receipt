@@ -44,6 +44,7 @@
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-SYSKANRI            PIC 9(01).
+           03  FLG-HOURS               PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -51,9 +52,14 @@
       *
       *    一時領域
        01  WRK-AREA.
+           03  WRK-SYMD                    PIC X(10).
+           03  WRK-ZOGENPTN                PIC X(01).
+           03  WRK-ZOGEN                   PIC S9(05).
            03  WRK-DAILYKEY.
                05  WRK-DAILYKEY-YMD    PIC X(08).
-               05  WRK-DAILYKEY-HM     PIC X(04).
+               05  WRK-DAILYKEY-HM.
+                   07  WRK-DAILYKEY-HH PIC 9(02).
+                   07  WRK-DAILYKEY-MM PIC 9(02).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -62,9 +68,17 @@
            COPY    "CPSYSKANRI.INC".
            COPY    "CPSK1039.INC".
       *
+      *    締め時刻管理
+       01  HOURS-REC.
+           COPY    "CPHOURS.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
       *
            COPY    "MCPDATA.INC".
            COPY    "MCPAREA".
@@ -120,6 +134,28 @@ grpsys*
            IF    ( SDAILYKEY-CREYMD    =   SDAILYKEY-BASEYMD )
                MOVE    SDAILYKEY-CREYMD    TO  WRK-DAILYKEY-YMD
                MOVE    SDAILYKEY-CREHMS    TO  WRK-DAILYKEY-HM
+               PERFORM 900-HOURS-KEY-SEL-SEC
+               IF    ( FLG-HOURS           =   ZERO )
+
+                   COMPUTE WRK-DAILYKEY-MM
+                       =   WRK-DAILYKEY-MM     +   1
+      *
+                   IF    ( WRK-DAILYKEY-MM     >=  60 )
+                       COMPUTE WRK-DAILYKEY-HH
+                           =   WRK-DAILYKEY-HH +   1
+                       MOVE    ZERO        TO  WRK-DAILYKEY-MM
+                   END-IF
+      *
+                   IF    ( WRK-DAILYKEY-HH     >=  24 )
+                       MOVE    "1"          TO  WRK-ZOGENPTN
+                       MOVE    1            TO  WRK-ZOGEN
+                       MOVE    WRK-DAILYKEY-YMD
+                                            TO  WRK-SYMD
+                       PERFORM 800-CALENDAR-SEC
+                       MOVE    WRK-SYMD     TO  WRK-DAILYKEY-YMD
+                       MOVE    ZERO         TO  WRK-DAILYKEY-HH
+                   END-IF
+               END-IF
            ELSE
                MOVE    SDAILYKEY-BASEYMD   TO  WRK-DAILYKEY-YMD
       *
@@ -157,6 +193,24 @@ grpsys*
        300-END-EXT.
            EXIT.
       *****************************************************************
+      *    カレンダー処理
+      *****************************************************************
+       800-CALENDAR-SEC               SECTION.
+      *
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY6-AREA
+           MOVE    "61"                TO  LNK-DAY6-IRAI
+           MOVE    WRK-SYMD            TO  LNK-DAY6-KIJUN
+           MOVE    WRK-ZOGENPTN        TO  LNK-DAY6-ZOGENPTN
+           MOVE    WRK-ZOGEN           TO  LNK-DAY6-ZOGEN
+           CALL  "ORCSDAY"             USING   STS-AREA-DAY
+                                               LNK-DAY6-AREA
+           MOVE    LNK-DAY6-KEISAN     TO  WRK-SYMD
+      *
+           .
+       800-CALENDAR-EXT.
+           EXIT.
+      *****************************************************************
       *    管理マスター読込（KEY10）
       *****************************************************************
        900-SYSKANRI-KEY10-SEL-SEC      SECTION.
@@ -181,6 +235,35 @@ grpsys*
       *
            .
        900-SYSKANRI-KEY10-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    締め時刻管理検索処理
+      *****************************************************************
+       900-HOURS-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-HOURS
+      *
+           INITIALIZE                      HOURS-REC
+           MOVE    SPA-HOSPNUM         TO  HOURS-HOSPNUM
+           MOVE    WRK-DAILYKEY-YMD    TO  HOURS-SRYYMD
+           MOVE    WRK-DAILYKEY-HM     TO  HOURS-TIME
+           MOVE    HOURS-REC           TO  MCPDATA-REC
+           MOVE    "tbl_hours"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  HOURS-REC
+           ELSE
+               MOVE    1               TO  FLG-HOURS
+               MOVE    MCPDATA-REC     TO  HOURS-REC
+           END-IF
+      *
+           MOVE    "tbl_hours"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-HOURS-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理
