@@ -339,6 +339,7 @@
       *  04.05.39    NACL-ÌçÏÆ    12/07/19  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
+      *  04.06.02    NACL-ÌçÏÆ    12/07/30  ¹â³Û°ÑÇ¤Ê§¤¤À©ÅÙ¾å¸Â³Û£°±ßÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -9429,13 +9430,13 @@
                                      SPA-AREA
       *
            IF    LNK-ORCSJGNGET-RC   =   ZERO
-              IF      LNK-ORCSJGNGET-NYUJGNGAK  =  ZERO
-                 MOVE    ZERO        TO  FLG-KOHININBARAI
-              ELSE
+      ***     IF      LNK-ORCSJGNGET-NYUJGNGAK  =  ZERO
+      ***        MOVE    ZERO        TO  FLG-KOHININBARAI
+      ***     ELSE
                  MOVE    LNK-ORCSJGNGET-NYUJGNGAK
                                      TO  MAX-KIN-SYU-M
                  MOVE    1           TO  FLG-KOUGAKUCYO-ININ
-              END-IF
+      ***     END-IF
            ELSE
                  MOVE    ZERO        TO  FLG-KOHININBARAI
            END-IF
