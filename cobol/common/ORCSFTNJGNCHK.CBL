@@ -82,6 +82,7 @@
       *  04.05.04    NACL-ÌçÏÆ    12/04/27  ÂçºåÉÜÃÏÊý¸øÈñ¡ÜÄ¹´üÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    12/06/04  À¸ÊÝ¤Î£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ
       *  04.05.06    NACL-ÌçÏÆ    12/06/11  Ä¹´ü¤ÎÈ½Äê½¤Àµ
+      *  04.05.07    NACL-ÌçÏÆ    12/07/31  Ä¹´ü¤ÎÈ½Äê½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -183,6 +184,8 @@
       *
            03  WRK-SYUSKJ-FTN               PIC 9(07).
            03  WRK-SKYMONEY-SKJ             PIC 9(07).
+      *
+           03  WRK-KYURATE                  PIC 9(03).
       *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
@@ -310,6 +313,7 @@
            MOVE        ZERO      TO     WRK-KOHFTN-RITU
            MOVE        ZERO      TO     FLG-ZENKI-TOKUREI
            MOVE        ZERO      TO     FLG-KOREI-HIGAITO
+           MOVE        999       TO     WRK-KYURATE
       *
       *    Á°´ü¹âÎð¼Ô¡Ê£·£°ºÐ¡Á£·£´ºÐ¡ËÆÃÎãÂÐ¾Ý¼Ô¥Á¥§¥Ã¥¯
            PERFORM    2006-ZENKI-TOKUREI-HANTEI-SEC
@@ -1014,9 +1018,10 @@
                   EVALUATE   LNK-FTNJGNCHK-KOHNUM
                     WHEN   SYU-KOH-HKNNUM(1)
                        IF  (LNK-FTNJGNCHK-KOHNUM    = "972" OR "974")
-                       AND (FLG-ZENKI-TOKUREI       =   1           )
+                       AND (WRK-KYURATE        NOT  =  999          )
                          COMPUTE  SYU-KOH-COMPFTN(1) =
-                                  SYU-TOTAL-HKNTEN * 10 * 0.2
+                                  SYU-TOTAL-HKNTEN * 10 * WRK-KYURATE
+                                                        / 100
                          MOVE     SYU-KOH-COMPFTN(1)  TO
                                            SYU-KOH-COMPFTN-ENTANI(1)
                          COMPUTE  SYU-KOH-COMPFTN(1)  =
@@ -1049,9 +1054,10 @@
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(2)
                        IF  (LNK-FTNJGNCHK-KOHNUM    = "972" OR "974")
-                       AND (FLG-ZENKI-TOKUREI       =   1           )
+                       AND (WRK-KYURATE        NOT  =  999          )
                          COMPUTE  SYU-KOH-COMPFTN(2) =
-                                  SYU-TOTAL-HKNTEN * 10 * 0.2
+                                  SYU-TOTAL-HKNTEN * 10 * WRK-KYURATE
+                                                        / 100
                          MOVE     SYU-KOH-COMPFTN(2)  TO
                                            SYU-KOH-COMPFTN-ENTANI(2)
                          COMPUTE  SYU-KOH-COMPFTN(2)  =
@@ -1090,9 +1096,10 @@
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(3)
                        IF  (LNK-FTNJGNCHK-KOHNUM    = "972" OR "974")
-                       AND (FLG-ZENKI-TOKUREI       =   1           )
+                       AND (WRK-KYURATE        NOT  =  999          )
                          COMPUTE  SYU-KOH-COMPFTN(3) =
-                                  SYU-TOTAL-HKNTEN * 10 * 0.2
+                                  SYU-TOTAL-HKNTEN * 10 * WRK-KYURATE
+                                                        / 100
                          MOVE     SYU-KOH-COMPFTN(3)  TO
                                            SYU-KOH-COMPFTN-ENTANI(3)
                          COMPUTE  SYU-KOH-COMPFTN(3)  =
@@ -1125,9 +1132,10 @@
                        END-IF
                     WHEN   SYU-KOH-HKNNUM(4)
                        IF  (LNK-FTNJGNCHK-KOHNUM    = "972" OR "974")
-                       AND (FLG-ZENKI-TOKUREI       =   1           )
+                       AND (WRK-KYURATE        NOT  =  999          )
                          COMPUTE  SYU-KOH-COMPFTN(4) =
-                                  SYU-TOTAL-HKNTEN * 10 * 0.2
+                                  SYU-TOTAL-HKNTEN * 10 * WRK-KYURATE
+                                                        / 100
                          MOVE     SYU-KOH-COMPFTN(4)  TO
                                            SYU-KOH-COMPFTN-ENTANI(4)
                          COMPUTE  SYU-KOH-COMPFTN(4)  =
@@ -1310,6 +1318,26 @@
                    IF   FLG-GENMEN   =   1
                      CONTINUE
                    ELSE
+                    IF   LNK-FTNJGNCHK-SRYYM    >=   "201204"
+                     IF   FLG-TOKU75  =  1
+                       IF   WRK-HKNMST-JGNGAK   >=   WRK-KOHFTN-EN
+                         EVALUATE  LNK-FTNJGNCHK-KOHNUM
+                           WHEN      "972"
+                              IF  WRK-KOHFTN-TOKU75  <= 5000
+                                 MOVE   01   TO  LNK-FTNJGNCHK-RC
+                              END-IF
+                           WHEN      "974"
+                              IF  WRK-KOHFTN-TOKU75  <= 10000
+                                 MOVE   01   TO  LNK-FTNJGNCHK-RC
+                              END-IF
+                         END-EVALUATE
+                       END-IF
+                     ELSE
+                       IF   WRK-HKNMST-JGNGAK   >=  WRK-KOHFTN-EN
+                         MOVE   01        TO  LNK-FTNJGNCHK-RC
+                       END-IF
+                     END-IF
+                    ELSE
                      IF   FLG-TOKU75  =  1
       **>              IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
                        IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN-EN
@@ -1330,6 +1358,7 @@
                          MOVE   01        TO  LNK-FTNJGNCHK-RC
                        END-IF
                      END-IF
+                    END-IF
                    END-IF
                  WHEN       OTHER
                    IF   LNK-FTNJGNCHK-RC      = ZERO
@@ -1737,40 +1766,42 @@
       *****************************************************************
        2006-ZENKI-TOKUREI-HANTEI-SEC            SECTION.
       *
+           INITIALIZE                            HKNCOMBI-REC
+           MOVE    LNK-FTNJGNCHK-HOSPNUM     TO  COMB-HOSPNUM
+           MOVE    LNK-FTNJGNCHK-PTID        TO  COMB-PTID
+           MOVE    LNK-FTNJGNCHK-HKNCOMBINUM TO  COMB-HKNCOMBINUM
+           MOVE     "tbl_hkncombi"           TO  MCP-TABLE
+           MOVE     "key"                    TO  MCP-PATHNAME
+           PERFORM   910-HKNCOMBI-SELECT-SEC
+           IF      FLG-HKNCOMBI   =   ZERO
+             MOVE   "tbl_hkncombi"           TO  MCP-TABLE
+             MOVE   "key"                    TO  MCP-PATHNAME
+             PERFORM 910-HKNCOMBI-READ-SEC
+           ELSE
+             INITIALIZE                          HKNCOMBI-REC
+           END-IF
+           MOVE     "tbl_hkncombi"           TO  MCP-TABLE
+           MOVE     "key"                    TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           INITIALIZE                            ORCSAGECHKAREA
+           MOVE  LNK-FTNJGNCHK-HOSPNUM       TO  AGECHK-HOSPNUM
+           MOVE  LNK-FTNJGNCHK-PTID          TO  AGECHK-PTID
+           MOVE  LNK-FTNJGNCHK-SRYYM         TO  AGECHK-SRYYMD(1:6)
+           MOVE  "01"                        TO  AGECHK-SRYYMD(7:2)
+           MOVE  PTINF-BIRTHDAY              TO  AGECHK-BIRTHDAY
+           CALL  "ORCSAGECHK"                USING  ORCSAGECHKAREA
+                                                    SPA-AREA
+           IF    AGECHK-RC  =   ZERO
+              CONTINUE
+           END-IF
+      *
+      *****
+      *
            IF   (LNK-FTNJGNCHK-SRYYM      >=   "200804")
            AND  (LNK-FTNJGNCHK-SRYYM      <=   "201303")
-           AND  (LNK-FTNJGNCHK-PREFNUM     =    27     )
-           AND  (LNK-FTNJGNCHK-NYUGAIKBN   =   "2"     )
-      *
-             INITIALIZE                            HKNCOMBI-REC
-             MOVE    LNK-FTNJGNCHK-HOSPNUM     TO  COMB-HOSPNUM
-             MOVE    LNK-FTNJGNCHK-PTID        TO  COMB-PTID
-             MOVE    LNK-FTNJGNCHK-HKNCOMBINUM TO  COMB-HKNCOMBINUM
-             MOVE     "tbl_hkncombi"           TO  MCP-TABLE
-             MOVE     "key"                    TO  MCP-PATHNAME
-             PERFORM   910-HKNCOMBI-SELECT-SEC
-             IF      FLG-HKNCOMBI   =   ZERO
-               MOVE   "tbl_hkncombi"           TO  MCP-TABLE
-               MOVE   "key"                    TO  MCP-PATHNAME
-               PERFORM 910-HKNCOMBI-READ-SEC
-             ELSE
-               INITIALIZE                          HKNCOMBI-REC
-             END-IF
-             MOVE     "tbl_hkncombi"           TO  MCP-TABLE
-             MOVE     "key"                    TO  MCP-PATHNAME
-             PERFORM   910-DB-CLOSE-SEC
-      *
-             INITIALIZE                            ORCSAGECHKAREA
-             MOVE  LNK-FTNJGNCHK-HOSPNUM       TO  AGECHK-HOSPNUM
-             MOVE  LNK-FTNJGNCHK-PTID          TO  AGECHK-PTID
-             MOVE  LNK-FTNJGNCHK-SRYYM         TO  AGECHK-SRYYMD(1:6)
-             MOVE  "01"                        TO  AGECHK-SRYYMD(7:2)
-             MOVE  PTINF-BIRTHDAY              TO  AGECHK-BIRTHDAY
-             CALL  "ORCSAGECHK"                USING  ORCSAGECHKAREA
-                                                      SPA-AREA
-             IF    AGECHK-RC  =   ZERO
-                CONTINUE
-             END-IF
+      ***  AND  (LNK-FTNJGNCHK-PREFNUM     =    27     )
+      ***  AND  (LNK-FTNJGNCHK-NYUGAIKBN   =   "2"     )
       *
              IF    AGECHK-NENREI   >=  70
                IF  (COMB-HKNNUM                =   SPACE   )
@@ -1833,6 +1864,66 @@
                END-IF
              END-IF
       *
+           END-IF
+      *
+      *****
+      *
+           IF    FLG-ZENKI-TOKUREI       =   1
+                 MOVE    20      TO     WRK-KYURATE
+           ELSE
+             IF  LNK-FTNJGNCHK-SRYYM    >=  "201204"
+               IF  COMB-HKNNUM   =   SPACE
+                 MOVE   100      TO     WRK-KYURATE
+               ELSE
+                 MOVE    30      TO     WRK-KYURATE
+                 EVALUATE   LNK-FTNJGNCHK-NYUGAIKBN
+                   WHEN       "1"
+                      EVALUATE   COMB-HOJOKBN
+                        WHEN   "0"
+                        WHEN   "4"
+                          MOVE   ZERO   TO   WRK-KYURATE
+                        WHEN   "1"
+                        WHEN   "5"
+                        WHEN   "9"
+                          MOVE   10     TO   WRK-KYURATE
+                        WHEN   "2"
+                        WHEN   "6"
+                        WHEN   "8"
+                          MOVE   20     TO   WRK-KYURATE
+                        WHEN   "3"
+                        WHEN   "7"
+                          MOVE   30     TO   WRK-KYURATE
+                      END-EVALUATE
+                      IF   AGECHK-SYUGAKUKBN   =   1
+                        IF    WRK-KYURATE  >   20
+                          MOVE   20     TO   WRK-KYURATE
+                        END-IF
+                      END-IF
+                   WHEN       "2"
+                      EVALUATE   COMB-HOJOKBN
+                        WHEN   "0"
+                          MOVE   ZERO   TO   WRK-KYURATE
+                        WHEN   "1"
+                        WHEN   "4"
+                        WHEN   "9"
+                          MOVE   10     TO   WRK-KYURATE
+                        WHEN   "2"
+                        WHEN   "5"
+                        WHEN   "8"
+                          MOVE   20     TO   WRK-KYURATE
+                        WHEN   "3"
+                        WHEN   "6"
+                        WHEN   "7"
+                          MOVE   30     TO   WRK-KYURATE
+                      END-EVALUATE
+                      IF   AGECHK-SYUGAKUKBN   =   1
+                        IF    WRK-KYURATE  >   20
+                          MOVE   20     TO   WRK-KYURATE
+                        END-IF
+                      END-IF
+                 END-EVALUATE
+               END-IF
+             END-IF
            END-IF
       *
            .
