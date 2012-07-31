@@ -361,7 +361,7 @@
 	  <class>GtkPandaEntry</class>
 	  <name>PREFPRGID</name>
 	  <x>700</x>
-	  <y>176</y>
+	  <y>216</y>
 	  <width>130</width>
 	  <height>24</height>
 	  <can_focus>True</can_focus>
@@ -389,7 +389,7 @@
 	  <class>GtkPandaEntry</class>
 	  <name>PREFPRGID1</name>
 	  <x>700</x>
-	  <y>216</y>
+	  <y>256</y>
 	  <width>130</width>
 	  <height>24</height>
 	  <can_focus>True</can_focus>
@@ -416,8 +416,8 @@
 	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>KOUIKIKBN_COMBO</name>
-	  <x>190</x>
-	  <y>536</y>
+	  <x>700</x>
+	  <y>16</y>
 	  <width>270</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -457,7 +457,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>JIHITEKKSIKBN_COMBO</name>
 	  <x>190</x>
-	  <y>496</y>
+	  <y>536</y>
 	  <width>100</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -497,7 +497,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>RJNGNBKKBN_COMBO</name>
 	  <x>190</x>
-	  <y>456</y>
+	  <y>496</y>
 	  <width>208</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -537,7 +537,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>BTUNUM_KSIKBN_COMBO</name>
 	  <x>190</x>
-	  <y>416</y>
+	  <y>456</y>
 	  <width>208</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -577,7 +577,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>SRYKAHENKBN_COMBO</name>
 	  <x>190</x>
-	  <y>376</y>
+	  <y>416</y>
 	  <width>208</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -617,7 +617,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>NYUTAIINREKI_COMBO</name>
 	  <x>190</x>
-	  <y>336</y>
+	  <y>376</y>
 	  <width>208</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -657,7 +657,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>RENNUMHENKBN_COMBO</name>
 	  <x>190</x>
-	  <y>296</y>
+	  <y>336</y>
 	  <width>208</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -697,7 +697,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>KOUIKIOCRKBN_COMBO</name>
 	  <x>190</x>
-	  <y>256</y>
+	  <y>296</y>
 	  <width>208</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -737,7 +737,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>KKHOCRKBN_COMBO</name>
 	  <x>190</x>
-	  <y>216</y>
+	  <y>256</y>
 	  <width>208</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -777,7 +777,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>SYAOCRKBN_COMBO</name>
 	  <x>190</x>
-	  <y>176</y>
+	  <y>216</y>
 	  <width>208</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -847,6 +847,46 @@
 	    <editable>True</editable>
 	    <text_visible>True</text_visible>
 	    <text_max_length>20</text_max_length>
+	    <text></text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>TENKIBYOMEI_KBN_COMBO</name>
+	  <x>190</x>
+	  <y>176</y>
+	  <width>316</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>TENKIBYOMEI_KBN</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>52</text_max_length>
 	    <text></text>
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
@@ -951,9 +991,25 @@
 
 	<widget>
 	  <class>GtkLabel</class>
+	  <name>label2214</name>
+	  <x>30</x>
+	  <y>176</y>
+	  <width>150</width>
+	  <height>24</height>
+	  <label>転帰済傷病名記載区分</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
 	  <name>label219</name>
 	  <x>30</x>
-	  <y>216</y>
+	  <y>256</y>
 	  <width>144</width>
 	  <height>24</height>
 	  <label>国保ＯＣＲ出力区分</label>
@@ -969,7 +1025,7 @@
 	  <class>GtkLabel</class>
 	  <name>label512</name>
 	  <x>30</x>
-	  <y>256</y>
+	  <y>296</y>
 	  <width>160</width>
 	  <height>24</height>
 	  <label>広域連合ＯＣＲ出力区分</label>
@@ -985,7 +1041,7 @@
 	  <class>GtkLabel</class>
 	  <name>labe2212</name>
 	  <x>30</x>
-	  <y>296</y>
+	  <y>336</y>
 	  <width>122</width>
 	  <height>24</height>
 	  <label>通し番号編集区分</label>
@@ -1001,7 +1057,7 @@
 	  <class>GtkLabel</class>
 	  <name>label320</name>
 	  <x>30</x>
-	  <y>350</y>
+	  <y>390</y>
 	  <width>144</width>
 	  <height>20</height>
 	  <label>（入院外）</label>
@@ -1017,7 +1073,7 @@
 	  <class>GtkLabel</class>
 	  <name>label319</name>
 	  <x>30</x>
-	  <y>330</y>
+	  <y>370</y>
 	  <width>144</width>
 	  <height>24</height>
 	  <label>入退院履歴記載区分</label>
@@ -1033,7 +1089,7 @@
 	  <class>GtkLabel</class>
 	  <name>labe2215</name>
 	  <x>30</x>
-	  <y>376</y>
+	  <y>416</y>
 	  <width>150</width>
 	  <height>24</height>
 	  <label>診療科編集区分（入院）</label>
@@ -1049,7 +1105,7 @@
 	  <class>GtkLabel</class>
 	  <name>label510</name>
 	  <x>30</x>
-	  <y>410</y>
+	  <y>450</y>
 	  <width>150</width>
 	  <height>24</height>
 	  <label>病棟番号編集区分</label>
@@ -1065,7 +1121,7 @@
 	  <class>GtkLabel</class>
 	  <name>label511</name>
 	  <x>30</x>
-	  <y>432</y>
+	  <y>472</y>
 	  <width>144</width>
 	  <height>20</height>
 	  <label>（入院）　</label>
@@ -1081,7 +1137,7 @@
 	  <class>GtkLabel</class>
 	  <name>label327</name>
 	  <x>30</x>
-	  <y>456</y>
+	  <y>496</y>
 	  <width>150</width>
 	  <height>24</height>
 	  <label>老人＋原爆  レセ記載</label>
@@ -1097,7 +1153,7 @@
 	  <class>GtkLabel</class>
 	  <name>label328</name>
 	  <x>30</x>
-	  <y>496</y>
+	  <y>536</y>
 	  <width>150</width>
 	  <height>24</height>
 	  <label>自費レセ摘要欄記載</label>
@@ -1112,8 +1168,8 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <name>label519</name>
-	  <x>30</x>
-	  <y>536</y>
+	  <x>510</x>
+	  <y>16</y>
 	  <width>150</width>
 	  <height>24</height>
 	  <label>広域連合作成区分</label>
@@ -1200,9 +1256,9 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label629</name>
+	  <name>label730</name>
 	  <x>510</x>
-	  <y>56</y>
+	  <y>96</y>
 	  <width>132</width>
 	  <height>24</height>
 	  <label>病名記載順</label>
@@ -1218,7 +1274,7 @@
 	  <class>GtkLabel</class>
 	  <name>label230</name>
 	  <x>30</x>
-	  <y>176</y>
+	  <y>216</y>
 	  <width>148</width>
 	  <height>24</height>
 	  <label>社保ＯＣＲ出力区分</label>
@@ -1275,7 +1331,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>CHKKBN_COMBO</name>
 	  <x>700</x>
-	  <y>16</y>
+	  <y>56</y>
 	  <width>200</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1314,9 +1370,9 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label628</name>
+	  <name>label728</name>
 	  <x>510</x>
-	  <y>16</y>
+	  <y>56</y>
 	  <width>173</width>
 	  <height>24</height>
 	  <label>受付エラーチェック区分</label>
@@ -1332,7 +1388,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>INSPECT_CHAR_COMBO</name>
 	  <x>700</x>
-	  <y>96</y>
+	  <y>136</y>
 	  <width>280</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1372,7 +1428,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>INSPECT_ZERO_COMBO</name>
 	  <x>700</x>
-	  <y>136</y>
+	  <y>176</y>
 	  <width>200</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1412,7 +1468,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>BYOMEI_PRTJYUN_COMBO</name>
 	  <x>700</x>
-	  <y>56</y>
+	  <y>96</y>
 	  <width>279</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1453,7 +1509,7 @@
 	  <class>GtkLabel</class>
 	  <name>label624</name>
 	  <x>576</x>
-	  <y>313</y>
+	  <y>353</y>
 	  <width>74</width>
 	  <height>18</height>
 	  <label>画面表示順</label>
@@ -1469,7 +1525,7 @@
 	  <class>GtkLabel</class>
 	  <name>label623</name>
 	  <x>510</x>
-	  <y>294</y>
+	  <y>334</y>
 	  <width>150</width>
 	  <height>19</height>
 	  <label>生保等まとめ入力</label>
@@ -1485,7 +1541,7 @@
 	  <class>GtkLabel</class>
 	  <name>label222</name>
 	  <x>510</x>
-	  <y>256</y>
+	  <y>296</y>
 	  <width>132</width>
 	  <height>24</height>
 	  <label>自動遷移区分</label>
@@ -1501,7 +1557,7 @@
 	  <class>GtkLabel</class>
 	  <name>label301</name>
 	  <x>650</x>
-	  <y>216</y>
+	  <y>256</y>
 	  <width>33</width>
 	  <height>24</height>
 	  <label>入院</label>
@@ -1517,7 +1573,7 @@
 	  <class>GtkLabel</class>
 	  <name>label300</name>
 	  <x>650</x>
-	  <y>176</y>
+	  <y>216</y>
 	  <width>41</width>
 	  <height>24</height>
 	  <label>入院外</label>
@@ -1533,7 +1589,7 @@
 	  <class>GtkLabel</class>
 	  <name>label225</name>
 	  <x>550</x>
-	  <y>212</y>
+	  <y>252</y>
 	  <width>90</width>
 	  <height>17</height>
 	  <label>プログラム名</label>
@@ -1549,7 +1605,7 @@
 	  <class>GtkLabel</class>
 	  <name>label223</name>
 	  <x>510</x>
-	  <y>196</y>
+	  <y>236</y>
 	  <width>144</width>
 	  <height>18</height>
 	  <label>県別レセプト編集</label>
@@ -1565,7 +1621,7 @@
 	  <class>GtkLabel</class>
 	  <name>label729</name>
 	  <x>510</x>
-	  <y>96</y>
+	  <y>136</y>
 	  <width>170</width>
 	  <height>24</height>
 	  <label>点検用レセプト記載</label>
@@ -1581,7 +1637,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>SEIHO_DSPKBN_COMBO</name>
 	  <x>700</x>
-	  <y>296</y>
+	  <y>336</y>
 	  <width>270</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1622,7 +1678,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>AUTODSPKBN_COMBO</name>
 	  <x>700</x>
-	  <y>256</y>
+	  <y>296</y>
 	  <width>200</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>

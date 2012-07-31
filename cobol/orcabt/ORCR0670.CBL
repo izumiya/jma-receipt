@@ -61,6 +61,7 @@
       *                                     エラー時処理終了
       *  04.06.04    NACL-藤原    11/10/24  予約コード入力による病名編集
       *                                     フラグの設定
+      *  04.06.05    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -327,6 +328,21 @@
                                     =   SPACE
                MOVE    ZERO             TO  SYS-200501-BYOMEI-PRTJYUN
            END-IF
+           IF      SYS-200501-TENKIBYOMEI-KBN
+                                    =   SPACE
+               MOVE    ZERO             TO  SYS-200501-TENKIBYOMEI-KBN
+           END-IF
+      *
+           DISPLAY "SYS-2005-BYOMEIHENKBN1    ="
+                                    SYS-2005-BYOMEIHENKBN1
+           DISPLAY "SYS-2005-SYUBYOHENFLG     ="
+                                    SYS-2005-SYUBYOHENFLG
+           DISPLAY "SYS-200501-CHKKBN         ="
+                                    SYS-200501-CHKKBN
+           DISPLAY "SYS-200501-BYOMEI-PRTJYUN ="
+                                    SYS-200501-BYOMEI-PRTJYUN
+           DISPLAY "SYS-200501-TENKIBYOMEI-KBN="
+                                    SYS-200501-TENKIBYOMEI-KBN
       *
       *        レセプト明細０２読み込み
            PERFORM 900-RECE62-READ-SEC
@@ -454,25 +470,6 @@
                END-IF
            END-IF        
       *
-      *    診療開始日
-           IF      PTBYO-SRYYMD(1:6)    =   RECE62-SRYYM
-               CONTINUE
-           ELSE
-               IF      PTBYO-SRYYMD(1:6)    <   RECE62-SRYYM 
-                   IF      PTBYO-TENKIKBN       =   SPACE
-                       CONTINUE
-                   ELSE
-                       IF      PTBYO-TENKIYMD(1:6)  >=  RECE62-SRYYM
-                           CONTINUE
-                       ELSE
-                           GO  TO  2001-PTBYO-CHK-EXT
-                       END-IF
-                   END-IF       
-               ELSE
-                   GO  TO  2001-PTBYO-CHK-EXT
-               END-IF
-           END-IF
-      *
       *    入外区分
            IF      PTBYO-NYUGAIKBN      =   SPACE
                CONTINUE
@@ -508,23 +505,68 @@
               GO  TO  2001-PTBYO-CHK-EXT
            END-IF
       *
-           IF      PTBYO-REZEMM           >   ZERO
-               INITIALIZE                      STS-AREA-DAY
-               INITIALIZE                      LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    PTBYO-SRYYMD        TO  LNK-DAY6-KIJUN 
-               MOVE    "2"                 TO  LNK-DAY6-ZOGENPTN
-               COMPUTE LNK-DAY6-ZOGEN  =   PTBYO-REZEMM    -   1    
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN(1:6)
-                                           TO  WRK-YM
-               IF      WRK-YM              >=  RECE62-SRYYM
+      *    診療開始日
+           IF      PTBYO-SRYYMD(1:6)    =   RECE62-SRYYM
+               CONTINUE
+           ELSE
+               IF      PTBYO-SRYYMD(1:6)    >   RECE62-SRYYM 
+                   GO  TO  2001-PTBYO-CHK-EXT
+               ELSE
+      *            転帰日
+                   IF      PTBYO-TENKIKBN       =   SPACE
+                       CONTINUE
+                   ELSE
+                       IF    ( SYS-200501-TENKIBYOMEI-KBN
+                                                   =   "0"  )
+                       OR    ( PTBYO-REZEMM        =   ZERO )
+                           IF      PTBYO-TENKIYMD(1:6) >=  RECE62-SRYYM
+                               CONTINUE
+                           ELSE
+                               GO  TO  2001-PTBYO-CHK-EXT
+                           END-IF
+                       END-IF       
+                   END-IF       
+               END-IF
+      *
+      *        レセプト表示期間
+               MOVE    ZERO                   TO  WRK-YM
+               IF      PTBYO-REZEMM           >   ZERO
+                   INITIALIZE                      STS-AREA-DAY
+                   INITIALIZE                      LNK-DAY6-AREA
+                   MOVE    "61"                TO  LNK-DAY6-IRAI
+                   MOVE    PTBYO-SRYYMD        TO  LNK-DAY6-KIJUN 
+                   MOVE    "2"                 TO  LNK-DAY6-ZOGENPTN
+                   COMPUTE LNK-DAY6-ZOGEN  =   PTBYO-REZEMM    -   1    
+                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                       LNK-DAY6-AREA
+                   MOVE    LNK-DAY6-KEISAN(1:6)
+                                               TO  WRK-YM
+                   IF    ( SYS-200501-TENKIBYOMEI-KBN
+                                               =   "0"   )
+                   OR    ( PTBYO-TENKIKBN      =   SPACE )
+                       IF      WRK-YM              >=  RECE62-SRYYM
+                           CONTINUE
+                       ELSE
+                           GO  TO  2001-PTBYO-CHK-EXT
+                       END-IF
+                   END-IF
+               END-IF                    
+      *
+      *        レセプト表示期間と転帰日の優先設定による判定
+               IF    ( PTBYO-TENKIKBN      =   SPACE )
+               OR    ( PTBYO-REZEMM        =   ZERO  )
                    CONTINUE
                ELSE
-                   GO  TO  2001-PTBYO-CHK-EXT
+                   IF      SYS-200501-TENKIBYOMEI-KBN
+                                               =   "1"
+                       IF      WRK-YM              >=  RECE62-SRYYM
+                           CONTINUE
+                       ELSE
+                           GO  TO  2001-PTBYO-CHK-EXT
+                       END-IF
+                   END-IF    
                END-IF
-           END-IF                    
+           END-IF
       *                               
            PERFORM 20011-RECE63-WRITE-SEC
            .

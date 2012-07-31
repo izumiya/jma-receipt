@@ -30,6 +30,12 @@
                     06  W12-TENKIHENKBN-COUNT   PIC S9(9)   BINARY.
                     06  W12-TENKIHENKBNLST
                             PIC X(20)   OCCURS  2 TIMES.
+                  05  W12-TENKIBYOMEI-KBN-COMBO.
+                    06  W12-TENKIBYOMEI-KBN.
+                      07  W12-VALUE   PIC X(52).
+                    06  W12-TENKIBYOMEI-KBN-COUNT   PIC S9(9)   BINARY.
+                    06  W12-TENKIBYOMEI-KBNLST
+                            PIC X(52)   OCCURS  3 TIMES.
                   05  W12-SYAOCRKBN-COMBO.
                     06  W12-SYAOCRKBN.
                       07  W12-VALUE   PIC X(24).
@@ -84,18 +90,18 @@
                     06  W12-JIHITEKKSIKBN-COUNT   PIC S9(9)   BINARY.
                     06  W12-JIHITEKKSIKBNLST
                             PIC X(10)   OCCURS  2 TIMES.
-                  05  W12-KOUIKIKBN-COMBO.
-                    06  W12-KOUIKIKBN.
-                      07  W12-VALUE   PIC X(34).
-                    06  W12-KOUIKIKBN-COUNT   PIC S9(9)   BINARY.
-                    06  W12-KOUIKIKBNLST
-                            PIC X(34)   OCCURS  4 TIMES.
                   05  W12-COMMENT-NYUINRYO-COMBO.
                     06  W12-COMMENT-NYUINRYO.
                       07  W12-VALUE   PIC X(34).
                     06  W12-COMMENT-NYUINRYO-COUNT   PIC S9(9)   BINARY.
                     06  W12-COMMENT-NYUINRYOLST
                             PIC X(34)   OCCURS  5 TIMES.
+                  05  W12-KOUIKIKBN-COMBO.
+                    06  W12-KOUIKIKBN.
+                      07  W12-VALUE   PIC X(34).
+                    06  W12-KOUIKIKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W12-KOUIKIKBNLST
+                            PIC X(34)   OCCURS  4 TIMES.
                   05  W12-CHKKBN-COMBO.
                     06  W12-CHKKBN.
                       07  W12-VALUE   PIC X(20).

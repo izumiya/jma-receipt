@@ -163,6 +163,7 @@
       *                                     調査用にcrehms,updhms 追加
       *  04.06.06    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
       *  04.06.07    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.08    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -296,7 +297,8 @@
       *****COPY    "HCM11V01.INC"  REPLACING  //HCM11V01//
       *****COPY    "HCM11V02.INC"  REPLACING  //HCM11V02//
       *****COPY    "HCM11V03.INC"  REPLACING  //HCM11V03//
-           COPY    "HCM11V04.INC"  REPLACING  //HCM11V04//
+      *****COPY    "HCM11V04.INC"  REPLACING  //HCM11V04//
+           COPY    "HCM11V05.INC"  REPLACING  //HCM11V05//
                                    BY         //HC06//.
       *****COPY    "HCM12V01.INC"  REPLACING  //HCM12V01//
            COPY    "HCM12V02.INC"  REPLACING  //HCM12V02//
@@ -580,12 +582,12 @@
                        09  WRK-BYOMEI2-YMD     PIC X(20).
                        09  WRK-BYOMEI2-TENKI   PIC X(04).
                05  WRK-BYOMEI2R-NAMEW  REDEFINES   WRK-BYOMEI2-NAME.
-                   07  FILLER                  PIC X(14).
+                   07  FILLER                  PIC X(08).
                    07  WRK-BYOMEI2R-ELSE.
                        09  WRK-BYOMEI2R-YMD    PIC X(20).
                        09  WRK-BYOMEI2R-TENKI  PIC X(04).
                        09  WRK-BYOMEI2R-TENKIYMD
-                                               PIC X(06).
+                                               PIC X(12).
       *
       *    傷病名が３行になるときの編集
            03  WRK-BYOMEI3                     PIC X(48).
@@ -4564,7 +4566,7 @@
                ELSE
                    MOVE    WRK-BO-TENKIYMD TO  WRK-SYMD
                    PERFORM 31012-SEIWA-HEN-SEC
-                   MOVE    LNK-DAY2-EDTYMD3 (17:)
+                   MOVE    LNK-DAY2-EDTYMD3 (11:)
                                            TO  HC06-TENKIYMD
                                                     (WRK-LINEBYO)
                END-IF                                     
@@ -4736,7 +4738,7 @@
                ELSE
                    MOVE    WRK-BO-TENKIYMD     TO  WRK-SYMD
                    PERFORM 31012-SEIWA-HEN-SEC
-                   MOVE    LNK-DAY2-EDTYMD3 (17:)
+                   MOVE    LNK-DAY2-EDTYMD3 (11:)
                                                TO  WRK-BYOMEI2R-TENKIYMD
                END-IF                                
            END-IF                                     
@@ -7690,7 +7692,7 @@
       *********MOVE    "HCM11V01.red"      TO
       *********MOVE    "HCM11V02.red"      TO
       *********MOVE    "HCM11V03.red"      TO
-               MOVE    "HCM11V04.red"      TO
+               MOVE    "HCM11V05.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HC06                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -7700,7 +7702,7 @@
       *****************MOVE    "HCM11V01.red"      TO
       *********        MOVE    "HCM11V02.red"      TO
       *********        MOVE    "HCM11V03.red"      TO
-                       MOVE    "HCM11V04.red"      TO
+                       MOVE    "HCM11V05.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                        MOVE    HC06                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -7974,7 +7976,7 @@
       *****************WHEN    "HCM11V01.red"
       *****************WHEN    "HCM11V02.red"
       *****************WHEN    "HCM11V03.red"
-                       WHEN    "HCM11V04.red"
+                       WHEN    "HCM11V05.red"
                            MOVE    RECE08-PRTDATA  TO HC06
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC06-PAGE

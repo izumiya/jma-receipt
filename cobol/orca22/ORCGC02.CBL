@@ -278,6 +278,7 @@
       *  04.06.14    NACL-藤原    12/02/29  補足コメントの登録前チェック追加
       *  04.06.15    NACL-藤原    12/03/22  補足コメントの登録前チェック
       *                                     を複数病名登録時には行わない
+      *  04.06.16    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -617,6 +618,7 @@
            COPY    "CPSK1010.INC".
       *
            COPY    "CPSK2005.INC".
+           COPY    "CPSK200501.INC".
       *    病名機能情報
            COPY    "CPSK1042.INC".
       *
@@ -1267,6 +1269,27 @@ grpsys     MOVE    SPA-HOSPNUM      TO  SYS-HOSPNUM
            MOVE    SYS-2005-SYUBYOHENFLG
                                        TO  SPA-C02-2005-SYUBYOHENFLG
       *
+           MOVE    SPACE           TO  SYSKANRI-REC
+           INITIALIZE                  SYSKANRI-REC
+grpsys     MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "2005"          TO  SYS-KANRICD
+           MOVE    "01"            TO  SYS-KBNCD
+           MOVE    SPA-NAI-C02-SYSYMD
+                                   TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-200501-REC
+           ELSE    
+               MOVE    SPACE           TO  SYS-200501-REC
+           END-IF
+           IF      SYS-200501-TENKIBYOMEI-KBN
+                                   =   SPACE
+               MOVE    ZERO            TO  SYS-200501-TENKIBYOMEI-KBN
+           END-IF
+           MOVE    SYS-200501-TENKIBYOMEI-KBN
+                                       TO
+                                       SPA-C02-200501-TENKIBYOMEI-KBN
       *    
            MOVE    SPACE           TO  SYSKANRI-REC
            INITIALIZE                  SYSKANRI-REC
@@ -1586,44 +1609,74 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    ZERO                TO  FLG-CHK
       *        レセプト対象の病名かチェック（全体以外のとき）
                IF      SPA-GMN-C02-SYOKBN   NOT =   "2"
+      *          レセプト表示フラグ
+                 IF      PTBYO-REZEFLG       =   "1"
+                   MOVE    1                   TO  FLG-CHK
+                 ELSE
+      *
                    IF      PTBYO-SRYYMD(1:6)    =   WRK-SYSYMD (1:6)
                        CONTINUE
                    ELSE
                        IF      PTBYO-TENKIKBN       =   SPACE
                            CONTINUE
                        ELSE 
-                           IF      PTBYO-TENKIYMD(1:6)
+                           IF    ( SPA-C02-200501-TENKIBYOMEI-KBN
+                                                       =   "0"  )
+                           OR    ( PTBYO-REZEMM        =   ZERO )
+                               IF      PTBYO-TENKIYMD(1:6)
                                                    >=  WRK-SYSYMD (1:6)
-                               CONTINUE
-                           ELSE
-                               MOVE    1               TO  FLG-CHK
+                                   CONTINUE
+                               ELSE
+                                   MOVE    1               TO  FLG-CHK
+                               END-IF
                            END-IF
                        END-IF
-                   END-IF
       *
-      *            レセプト表示フラグ
-                   IF      PTBYO-REZEFLG       =   "1"
-                       MOVE    1                   TO  FLG-CHK
-                   END-IF
-      *
-      *            レセプト表示月数
-                   IF      PTBYO-REZEMM        >   ZERO
-                       INITIALIZE                      STS-AREA-DAY
-                       INITIALIZE                      LNK-DAY6-AREA
-                       MOVE    "61"                TO  LNK-DAY6-IRAI
-                       MOVE    PTBYO-SRYYMD        TO  LNK-DAY6-KIJUN 
-                       MOVE    "2"                 TO  LNK-DAY6-ZOGENPTN
-                       COMPUTE LNK-DAY6-ZOGEN  =   PTBYO-REZEMM    -   1    
-                       CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                       MOVE    LNK-DAY6-KEISAN(1:6)
-                                                   TO  WRK-YM
-                       IF      WRK-YM              >=  WRK-SYSYMD (1:6)
+                       IF      FLG-CHK             =   1
                            CONTINUE
                        ELSE
-                           MOVE    1                   TO  FLG-CHK
+      *                  レセプト表示月数
+                         MOVE    ZERO                TO  WRK-YM
+                         IF      PTBYO-REZEMM        >   ZERO
+                           INITIALIZE                      STS-AREA-DAY
+                           INITIALIZE                      LNK-DAY6-AREA
+                           MOVE    "61"            TO  LNK-DAY6-IRAI
+                           MOVE    PTBYO-SRYYMD    TO  LNK-DAY6-KIJUN 
+                           MOVE    "2"             TO  LNK-DAY6-ZOGENPTN
+                           COMPUTE LNK-DAY6-ZOGEN
+                                               =   PTBYO-REZEMM    -   1    
+                           CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                                           LNK-DAY6-AREA
+                           MOVE    LNK-DAY6-KEISAN(1:6)
+                                                   TO  WRK-YM
+                           IF    ( SPA-C02-200501-TENKIBYOMEI-KBN
+                                                   =   "0"   )
+                           OR    ( PTBYO-TENKIKBN  =   SPACE )
+                               IF      WRK-YM      >=  WRK-SYSYMD (1:6)
+                                   CONTINUE
+                               ELSE
+                                   MOVE    1               TO  FLG-CHK
+                               END-IF
+                           END-IF
+                         END-IF                    
+      *
+      *                  レセプト表示期間の優先設定による判定
+                         IF    ( PTBYO-TENKIKBN      =   SPACE )
+                         OR    ( PTBYO-REZEMM        =   ZERO  )
+                           CONTINUE
+                         ELSE
+                           IF      SPA-C02-200501-TENKIBYOMEI-KBN
+                                                   =   "1"
+                               IF      WRK-YM      >=  WRK-SYSYMD (1:6)
+                                   CONTINUE
+                               ELSE
+                                   MOVE    1           TO  FLG-CHK
+                               END-IF
+                           END-IF    
+                         END-IF
                        END-IF
                    END-IF
+                 END-IF
                END-IF
       *
                IF      FLG-CHK         =   ZERO
@@ -10781,7 +10834,8 @@ grpsys                                          SPA-AREA
            MOVE    ZERO                    TO  C02-BYO-ROW
            IF      WRK-C02-BYO-ROW         >   ZERO
                MOVE    WRK-C02-BYO-ROW         TO  C02-BYO-ROW
-           END-IF
+               COMPUTE C02-BYO-ROW = WRK-C02-BYO-ROW - 1 
+            END-IF
            IF    ( SPA-NAI-C02-SELNO       >   ZERO )
            OR    ( SPA-NAI-C02-UPDOWN      =   1    )
                MOVE    2                       TO  C02-BYO-ROWATTR
