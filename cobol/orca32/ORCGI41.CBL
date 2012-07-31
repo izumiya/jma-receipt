@@ -3057,7 +3057,7 @@
                       DISPLAY   "SEISHINNKA STUSAN-NISSU07 = "
                                  STUSAN-NISSU07
       *               通算日数取得の比較
-                      IF   STUSAN-NISSU07         <=  LNK-DAY5-NISSU2
+                      IF   STUSAN-NISSU07        <=  LNK-DAY5-NISSU2
                           MOVE    SPACE          TO  SPA-GMN-KEIKOKU
                       ELSE
             MOVE "精神科急性期治療病棟入院料の算定が３月を越えています"
@@ -3068,6 +3068,16 @@
                MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
                MOVE    "key41"             TO  MCP-PATHNAME
                PERFORM 990-DBCLOSE-SEC
+           END-IF
+      *
+      *    生活療養でない入院料算定時の警告チェック
+           IF      SPA-GMN-KEIKOKU     =   SPACE
+               IF    SS007-RC2          =   0
+                   MOVE    SPACE       TO  SPA-GMN-KEIKOKU
+               ELSE
+            MOVE "生活療養の入院料が算定されていない期間があります。"
+                                       TO  SPA-GMN-KEIKOKU
+               END-IF
            END-IF
            .
       *
