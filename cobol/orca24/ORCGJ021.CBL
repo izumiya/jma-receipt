@@ -94,6 +94,7 @@
            03  IDX-R               PIC 9(04).
            03  IDX2                PIC 9(02).
            03  IDX3                PIC 9(02).
+           03  IDX4                PIC 9(02).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -2680,6 +2681,24 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    COMB-KOH2HKNNUM     TO  SYU-KOH2HKNNUM
            MOVE    COMB-KOH3HKNNUM     TO  SYU-KOH3HKNNUM
            MOVE    COMB-KOH4HKNNUM     TO  SYU-KOH4HKNNUM
+      *
+           MOVE    ZERO                TO  SYU-SYUHKNFTNMONEY
+                                           SYU-SYUCOMPFTN
+                                           SYU-SYUCOMPFTN-ENTANI
+                                           SYU-SYUCOMPYKZFTN
+                                           SYU-SYUCOMPTOTAL
+           MOVE    SPACE               TO  SYU-SYUYKZFTNKBN
+      *
+           PERFORM   VARYING   IDX4   FROM   1    BY   1
+                      UNTIL    IDX4    >     4
+             MOVE  ZERO     TO   SYU-KOH-HKNFTNMONEY(IDX4)
+                                 SYU-KOH-COMPFTN(IDX4)
+                                 SYU-KOH-COMPFTN-ENTANI(IDX4)
+                                 SYU-KOH-COMPYKZFTN(IDX4)
+                                 SYU-KOH-COMPTOTAL(IDX4)
+             MOVE  SPACE    TO   SYU-KOH-YKZFTNKBN(IDX4)
+           END-PERFORM
+      *
       *    ¼ýÇ¼ÍúÎò½èÍý
            PERFORM 3003131-SRYURRK-HEN-SEC
       *
