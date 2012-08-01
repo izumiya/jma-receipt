@@ -242,6 +242,8 @@
       *  04.06.03    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
       *                                     併用から単独になったときのまとめ
       *  04.06.04    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.05    NACL-藤原    12/08/01  保険履歴ファイルのエラー処理
+      *                                     中止 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1188,7 +1190,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                            MOVE    3               TO  WRK-ERR-FLG
                            MOVE    RECE09PARA      TO  WRK-ERR-FILE-NM
                            MOVE    STS-RECE09      TO  WRK-ERR-FILE-STS
-                           PERFORM 500-FILE-ERR-ABORT-SEC
+      ****                 PERFORM 500-FILE-ERR-ABORT-SEC
                        END-IF
       *
                        ADD     1                       TO  CNT-RECE09
