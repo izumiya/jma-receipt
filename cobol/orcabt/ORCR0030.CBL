@@ -582,6 +582,7 @@
       *  04.05.63    NACL-門脇    12/06/29  大分県地方公費福岡県対応
       *  04.05.64    NACL-門脇    12/07/03  前期高齢１割＋０１０＋マル長対応
       *  04.05.65    NACL-門脇    12/08/01  広島県地方公費対応
+      *  04.05.66    NACL-門脇    12/08/01  長期＋全国公費２種の再掲対応
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -14585,7 +14586,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                RECE02-FTNMONEY-KOJ(2)
                     END-IF
       *
-                    IF     FLG-KOH  =   2
+      ***           IF     FLG-KOH  =   2
                       COMPUTE WRK-CYOKI-KEISAN  = RECE02-FTNMONEY(1)
                                                 - WRK-KOH-GAI2
                       COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XX5
@@ -14601,7 +14602,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           END-IF
                         END-IF
                       END-IF
-                    END-IF
+      ***           END-IF
                   END-IF
       *
                   IF   (FLG-KEISAN-TOK1        =   1     )

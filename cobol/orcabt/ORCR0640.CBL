@@ -569,6 +569,7 @@
       *  04.05.72    NACL-門脇    12/07/03  前期高齢１割＋０１０＋マル長対応
       *  04.05.73    NACL-門脇    12/07/19  高齢者他保険入院対応
       *  04.05.74    NACL-門脇    12/08/01  広島県地方公費対応
+      *  04.05.75    NACL-門脇    12/08/01  長期＋全国公費２種の再掲対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -18411,7 +18412,7 @@
                                                RECE62-FTNMONEY-KOJ(2)
                     END-IF
       *
-                    IF     FLG-KOH  =   2
+      ***           IF     FLG-KOH  =   2
                       COMPUTE WRK-CYOKI-KEISAN  = RECE62-FTNMONEY(1)
                                                 - WRK-KOH-GAI2
                       COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XX5
@@ -18427,7 +18428,7 @@
                           END-IF
                         END-IF
                       END-IF
-                    END-IF
+      ***           END-IF
                   END-IF
       *
                   IF   (FLG-KEISAN-TOK1        =   1     )
