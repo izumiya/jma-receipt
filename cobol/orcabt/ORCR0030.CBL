@@ -583,6 +583,7 @@
       *  04.05.63    NACL-ÌçÏÆ    12/06/29  ÂçÊ¬¸©ÃÏÊý¸øÈñÊ¡²¬¸©ÂÐ±þ
       *  04.05.64    NACL-ÌçÏÆ    12/07/03  Á°´ü¹âÎð£±³ä¡Ü£°£±£°¡Ü¥Þ¥ëÄ¹ÂÐ±þ
       *  04.05.65    NACL-ÌçÏÆ    12/08/01  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.66    NACL-ÌçÏÆ    12/08/01  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -14477,7 +14478,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                RECE02-FTNMONEY-KOJ(2)
                     END-IF
       *
-                    IF     FLG-KOH  =   2
+      ***           IF     FLG-KOH  =   2
                       COMPUTE WRK-CYOKI-KEISAN  = RECE02-FTNMONEY(1)
                                                 - WRK-KOH-GAI2
                       COMPUTE WRK-CYOKI-KEISAN2 = FTN-KOH-XX5
@@ -14493,7 +14494,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           END-IF
                         END-IF
                       END-IF
-                    END-IF
+      ***           END-IF
                   END-IF
       *
                   IF   (FLG-KEISAN-TOK1        =   1     )
