@@ -22,6 +22,7 @@
       *****************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      * 04.07.00     NACL-多々納  12/08/03  改正対応追加
       *****************************************************************
       *
        01  TBL-KENSA-TAI-AREA.
@@ -33,6 +34,10 @@
            03  FILLER          PIC X(09)  VALUE    "160010010".
            03  FILLER          PIC X(09)  VALUE    "160012010".
            03  FILLER          PIC X(09)  VALUE    "160014510".
+      *H24.8
+           03  FILLER          PIC X(09)  VALUE    "160191810".
+           03  FILLER          PIC X(09)  VALUE    "160191910".
+      *H24.8
            03  FILLER          PIC X(09)  VALUE    "160114010".
            03  FILLER          PIC X(09)  VALUE    "160017010".
            03  FILLER          PIC X(09)  VALUE    "160017410".
@@ -76,7 +81,8 @@
            03  FILLER          PIC X(09)  VALUE    "160057710".
       *
        01  TBL-KENSA-TAI-AREA-R    REDEFINES  TBL-KENSA-TAI-AREA.
-           03  TBL-KENSA-TAI-OCC        OCCURS  49  INDEXED  TAI-IDX.
+      *    03  TBL-KENSA-TAI-OCC        OCCURS  49  INDEXED  TAI-IDX.
+           03  TBL-KENSA-TAI-OCC        OCCURS  51  INDEXED  TAI-IDX.
                05  TBL-TAI-SRYCD        PIC X(09).
-       01  KEN-TAI-MAX                  PIC 9(04)   VALUE   49.
+       01  KEN-TAI-MAX                  PIC 9(04)   VALUE   51.
       *
