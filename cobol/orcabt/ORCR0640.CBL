@@ -570,6 +570,9 @@
       *  04.05.73    NACL-ÌçÏÆ    12/07/19  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
       *  04.05.74    NACL-ÌçÏÆ    12/08/01  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.75    NACL-ÌçÏÆ    12/08/01  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
+      *  04.05.76    NACL-ÌçÏÆ    12/08/06  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¤Ç¡¢¹â³Û·×»»
+      *                                     ÂÐ¾Ý³°¤ÎÁ´¹ñ¸øÈñ¤Î°ìÉôÉéÃ´¶âµ­
+      *                                     ºÜ½¤Àµ¡Ê£°£±£°¡Ë
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -15961,16 +15964,16 @@
                                    WRK-SKJ-FTN(KH-IDX)
                   END-IF
                 ELSE
-                 IF  (RECE62-KOUREI              =  "2"  )
-                 AND (RECE62-KOHNUM(KH-IDX - 1)  =  "010")
-                 AND (SYU-KOHTAIYKZKBN       NOT =  "9"  )
-                   COMPUTE  WRK-KEISAN-ZZZ =
-                            SYU-KOH-COMPFTN-ENTANI(IDX3) + 0.5
-                   ADD   WRK-KEISAN-ZZZ             TO
-                                   RECE62-FTNMONEY(KH-IDX)
-                                   RECE62-FTNMONEY-KOJ(KH-IDX)
-                   MOVE   1   TO   WRK-KOGAKU-TAISYOGAI(KH-IDX - 1)
-                 ELSE
+      **>        IF  (RECE62-KOUREI              =  "2"  )
+      **>        AND (RECE62-KOHNUM(KH-IDX - 1)  =  "010")
+      **>        AND (SYU-KOHTAIYKZKBN       NOT =  "9"  )
+      **>          COMPUTE  WRK-KEISAN-ZZZ =
+      **>                   SYU-KOH-COMPFTN-ENTANI(IDX3) + 0.5
+      **>          ADD   WRK-KEISAN-ZZZ             TO
+      **>                          RECE62-FTNMONEY(KH-IDX)
+      **>                          RECE62-FTNMONEY-KOJ(KH-IDX)
+      **>          MOVE   1   TO   WRK-KOGAKU-TAISYOGAI(KH-IDX - 1)
+      **>        ELSE
       ***         IF     (RECE62-KOUREI          =  "1" OR "2")
                   IF    ((RECE62-KOUREI          =  "1"       ) AND
                          (RECE62-SRYYM          >=  "200610"  ) AND
@@ -16016,7 +16019,7 @@
                                       WRK-SKJ-FTN(KH-IDX)
                    END-IF
                   END-IF
-                 END-IF
+      **>        END-IF
                 END-IF
       *
                 IF   ( RECE62-KOHNUM(KH-IDX - 1) =  "012" OR "025" )
