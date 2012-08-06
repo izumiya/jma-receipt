@@ -584,6 +584,9 @@
       *  04.05.64    NACL-ÌçÏÆ    12/07/03  Á°´ü¹âÎð£±³ä¡Ü£°£±£°¡Ü¥Þ¥ëÄ¹ÂÐ±þ
       *  04.05.65    NACL-ÌçÏÆ    12/08/01  ¹­Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.66    NACL-ÌçÏÆ    12/08/01  Ä¹´ü¡ÜÁ´¹ñ¸øÈñ£²¼ï¤ÎºÆ·ÇÂÐ±þ
+      *  04.05.67    NACL-ÌçÏÆ    12/08/06  £·£°ºÐÌ¤Ëþ¸½ÊªµëÉÕ¤Ç¡¢¹â³Û·×»»
+      *                                     ÂÐ¾Ý³°¤ÎÁ´¹ñ¸øÈñ¤Î°ìÉôÉéÃ´¶âµ­
+      *                                     ºÜ½¤Àµ¡Ê£°£±£°¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -12908,17 +12911,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                         WRK-TAIHI-FTNMONEY-KOJ(KH-IDX)
                 END-IF
               ELSE
-               IF  (RECE02-ZAITAKU             =  "2"          )
-               AND (RECE02-KOHNUM(KH-IDX - 1)  =  "010"        )
-               AND (WRK-SYUNOU-GENBUTU70-HANTEIFLG(IDX1) = ZERO)
-               AND (RECE02-SRYYM              >= "201204"      )
-                 COMPUTE  WRK-KEISAN-ZZZ =
-                          SYU-KOH-COMPFTN-ENTANI(IDX3) + 0.5
-                 ADD   WRK-KEISAN-ZZZ             TO
-                                 RECE02-FTNMONEY(KH-IDX)
-                                 RECE02-FTNMONEY-KOJ(KH-IDX)
-                 MOVE   1   TO   WRK-KOGAKU-TAISYOGAI(KH-IDX - 1)
-               ELSE
+      **>      IF  (RECE02-ZAITAKU             =  "2"          )
+      **>      AND (RECE02-KOHNUM(KH-IDX - 1)  =  "010"        )
+      **>      AND (WRK-SYUNOU-GENBUTU70-HANTEIFLG(IDX1) = ZERO)
+      **>      AND (RECE02-SRYYM              >= "201204"      )
+      **>        COMPUTE  WRK-KEISAN-ZZZ =
+      **>                 SYU-KOH-COMPFTN-ENTANI(IDX3) + 0.5
+      **>        ADD   WRK-KEISAN-ZZZ             TO
+      **>                        RECE02-FTNMONEY(KH-IDX)
+      **>                        RECE02-FTNMONEY-KOJ(KH-IDX)
+      **>        MOVE   1   TO   WRK-KOGAKU-TAISYOGAI(KH-IDX - 1)
+      **>      ELSE
       ***       IF     (RECE02-ZAITAKU       =  "1" OR "2")
                 IF    ((RECE02-ZAITAKU       =  "1"       ) AND
                        (RECE02-SRYYM        >=  "200610"  ) AND
@@ -12957,7 +12960,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            RECE02-FTNMONEY-KOJ(KH-IDX)
                   END-IF
                 END-IF
-               END-IF
+      **>      END-IF
               END-IF
       *
               IF    ( RECE02-KOHNUM(KH-IDX - 1) =  "012" OR "025")
