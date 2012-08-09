@@ -18195,7 +18195,8 @@
                     MOVE    "3"      TO   RECE62-KOUREI
                 END-IF
                END-IF
-               IF    WRK-PREFNUM       =  34
+               IF   (WRK-PREFNUM       =  34     )
+               AND  (RECE62-SRYYM     <= "201208")
                 IF   RECE62-TEISYUTUSAKI   =   2
                   IF  (RECE62-KOHHBTNUM(1) =  "90" OR "91" OR "92")
                   OR  (RECE62-KOHHBTNUM(2) =  "90" OR "91" OR "92")
