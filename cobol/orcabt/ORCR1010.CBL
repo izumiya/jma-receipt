@@ -92,6 +92,7 @@
       *                                     「その他」の対応
       *                                     コメント差込
       *  04.05.10    NACL-門脇    12/05/23  保険欄−一部負担金未記載対応
+      *  04.05.11    NACL-門脇    12/08/10  ８０その他欄の点数集計修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3664,7 +3665,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        ADD    WK-ZAIKAISU    TO   RECE100-KAISU(13)
                        COMPUTE   RECE100-TENSU(13 1)  =
                                  RECE100-TENSU(13 1)  +
-                                (WK-SYUTEN     *   ACCT-ZAIKAISU)
+                                (WK-SYUTEN     *   WK-ZAIKAISU)
       *                ネブライザー加算
                        IF    SRY-SRYCD(IDX3)  =  "102400010"
                          COMPUTE    RECE100-TENSU(15 2)  =
@@ -3943,23 +3944,23 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                WHEN    "80"
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN2
                       COMPUTE  WRK-TOKUTEI-SKAN2 =  WRK-TOKUTEI-SKAN2 +
-                                                    WK-ZAIKAISU 
+                                                    ACCT-ZAIKAISU
                    END-IF
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN1
                     COMPUTE WRK-NYUYOUJI-SHOKAN = WRK-NYUYOUJI-SHOKAN +
-                                                  WK-ZAIKAISU 
+                                                  ACCT-ZAIKAISU
                    END-IF
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN3          
                       COMPUTE  WRK-CYOKI-SKAN2  =   WRK-CYOKI-SKAN2   + 
-                                                    WK-ZAIKAISU         
+                                                    ACCT-ZAIKAISU
                    END-IF                                               
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN4
                       COMPUTE  WRK-AKUSEI-SKAN2 =   WRK-AKUSEI-SKAN2  +
-                                                    WK-ZAIKAISU
+                                                    ACCT-ZAIKAISU
                    END-IF
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOKSN5
                       COMPUTE  WRK-IPPAN-SKAN2  =   WRK-IPPAN-SKAN2   +
-                                                    WK-ZAIKAISU
+                                                    ACCT-ZAIKAISU
                    END-IF
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOSEN1 OR
                                                 CONS-SHOHOSEN2 OR
@@ -3970,8 +3971,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                                 CONS-SHOHOKSN3 OR
                                                 CONS-SHOHOKSN4 OR
                                                 CONS-SHOHOKSN5
-                           ADD    WK-ZAIKAISU  TO  RECE100-KAISU(36)
+                           ADD  ACCT-ZAIKAISU  TO  RECE100-KAISU(36)
                    END-IF
+                   COMPUTE   RECE100-TENSU(37 1)  =
+                             RECE100-TENSU(37 1)  +
+                            (WK-SYUTEN   *   WK-ZAIKAISU)
                    IF SRY-SRYCD(IDX3)      =    CONS-SHOHOSEN1 OR
                                                 CONS-SHOHOSEN2 OR
                                                 CONS-SHOHOSEN3 OR
@@ -3984,15 +3988,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        COMPUTE   RECE100-TENSU(36 1)  =
                                  RECE100-TENSU(36 1)  +
                                 (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
+                       COMPUTE   RECE100-TENSU(37 1)  =
+                                 RECE100-TENSU(37 1)  -
+                                (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
                    ELSE
                      IF    WRK-TNS-GAITENTTLKBN(IDX3)   =    130
                        COMPUTE   RECE100-TENSU(9 1)   =
                                  RECE100-TENSU(9 1)   +
                                 (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
-                     ELSE
                        COMPUTE   RECE100-TENSU(37 1)  =
-                                 RECE100-TENSU(37 1)  +
-                                (WK-SYUTEN   *   ACCT-ZAIKAISU)
+                                 RECE100-TENSU(37 1)  -
+                                (WRK-TNS-TEN(IDX3)  *  ACCT-ZAIKAISU)
                      END-IF
                    END-IF
                    COMPUTE   RECE100-TENSU(38 2)  =

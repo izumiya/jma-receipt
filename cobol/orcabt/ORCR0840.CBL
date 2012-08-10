@@ -208,6 +208,7 @@
       *                                     ¥³¥á¥ó¥Èº¹¹þ
       *  04.05.13    NACL-ÌçÏÆ    12/05/23  ºÆ½¢Ï«ÎÅÍÜ»ØÆ³´ÉÍýÎÁ¤Î½¸·×ÀèÊÑ¹¹
       *  04.05.14    NACL-ÌçÏÆ    12/05/23  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÌ¤µ­ºÜÂÐ±þ
+      *  04.05.15    NACL-ÌçÏÆ    12/08/10  £¸£°¤½¤ÎÂ¾Íó¤ÎÅÀ¿ô½¸·×½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4501,14 +4502,16 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                   (TNS-TEN     *   ACCT-ZAIKAISU)
                          END-IF
                      ELSE                
+                       COMPUTE     RECE82-TENSU(21) =
+                                   RECE82-TENSU(21) +
+                                  (WK-SYUTEN   *   WK-ZAIKAISU)
                        IF    TNS-NYUTENTTLKBN   =    130
                          COMPUTE   RECE82-TENSU(2)  =
                                    RECE82-TENSU(2)  +
                                   (TNS-TEN     *   ACCT-ZAIKAISU)
-                       ELSE  
-                         COMPUTE   RECE82-TENSU(21)  =
-                                   RECE82-TENSU(21)  +
-                                  (WK-SYUTEN   *   WK-ZAIKAISU)
+                         COMPUTE   RECE82-TENSU(21) =
+                                   RECE82-TENSU(21) -
+                                  (TNS-TEN     *   ACCT-ZAIKAISU)
                        END-IF
                        COMPUTE       RECE82-TENSU(22)  =
                                      RECE82-TENSU(22)  +
@@ -4905,24 +4908,33 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                   RECE82-KINGAKU3(3)  +                 
                                  (WRK-RYOYOTEATE  *   ACCT-ZAIKAISU)    
                      ELSE
+                      EVALUATE  WRK-PARA-JIBAIPRTKBN
+                       WHEN      "0"
+      **>                IF    WK-SYUTEN       NOT =   ZERO
+      **>                   ADD  WK-ZAIKAISU  TO  RECE82-KAISU(14)
+      **>                END-IF
+                         COMPUTE   RECE82-TENSU(14)  =
+                                   RECE82-TENSU(14)  +
+                                  (WK-SYUTEN   *   WK-ZAIKAISU)
+                       WHEN      "1"
+                         COMPUTE   RECE82-TENSU(22)  =
+                                   RECE82-TENSU(22)  +
+                                  (WK-SYUTEN   *   WK-ZAIKAISU)
+                      END-EVALUATE
                       IF    TNS-NYUTENTTLKBN   =    130
-                            COMPUTE   RECE82-TENSU(2)  =
-                                      RECE82-TENSU(2)  +
-                                     (TNS-TEN   *   ACCT-ZAIKAISU)
-                      ELSE
-                        EVALUATE  WRK-PARA-JIBAIPRTKBN
+                         COMPUTE   RECE82-TENSU(2)  =
+                                   RECE82-TENSU(2)  +
+                                  (TNS-TEN   *   ACCT-ZAIKAISU)
+                         EVALUATE  WRK-PARA-JIBAIPRTKBN
                           WHEN      "0"
-                            IF    WK-SYUTEN       NOT =   ZERO
-                               ADD  WK-ZAIKAISU  TO  RECE82-KAISU(14)
-                            END-IF
-                            COMPUTE   RECE82-TENSU(14)  =
-                                      RECE82-TENSU(14)  +
-                                     (WK-SYUTEN   *   ACCT-ZAIKAISU)
+                           COMPUTE RECE82-TENSU(14) =
+                                   RECE82-TENSU(14) -
+                                  (TNS-TEN   *   ACCT-ZAIKAISU)
                           WHEN      "1"
-                            COMPUTE   RECE82-TENSU(22)  =
-                                      RECE82-TENSU(22)  +
-                                     (WK-SYUTEN   *   ACCT-ZAIKAISU)
-                        END-EVALUATE
+                           COMPUTE RECE82-TENSU(22) =
+                                   RECE82-TENSU(22) -
+                                  (TNS-TEN   *   ACCT-ZAIKAISU)
+                         END-EVALUATE
                       END-IF
                       EVALUATE  WRK-PARA-JIBAIPRTKBN
                         WHEN      "0"
@@ -5485,33 +5497,48 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                   RECE82-SONOTAKIN-JYU  +               
                                  (WRK-RYOYOTEATE  *   ACCT-ZAIKAISU)    
                      ELSE
+                      EVALUATE  WRK-PARA-JIBAIPRTKBN
+                       WHEN      "0"
+      **>                IF    WK-SYUTEN       NOT =   ZERO
+      **>                   ADD  WK-ZAIKAISU  TO  RECE82-KAISU(15)
+      **>                END-IF
+                         COMPUTE   RECE82-TENSU(15)   =
+                                   RECE82-TENSU(15)   +
+                                  (WK-SYUTEN   *   WK-ZAIKAISU)
+                         COMPUTE   TBL-SYUTEN-JI(15)  =
+                                   TBL-SYUTEN-JI(15)  +
+                                  (WK-SYUTEN   *   WK-ZAIKAISU)
+                       WHEN      "1"
+                         COMPUTE   RECE82-TENSU(27)   =
+                                   RECE82-TENSU(27)   +
+                                  (WK-SYUTEN   *   WK-ZAIKAISU)
+                         COMPUTE   TBL-SYUTEN-JI(27)  =
+                                   TBL-SYUTEN-JI(27)  +
+                                  (WK-SYUTEN   *   WK-ZAIKAISU)
+                      END-EVALUATE
                       IF    TNS-NYUTENTTLKBN   =    130
-                            COMPUTE   RECE82-TENSU(2)   =
-                                      RECE82-TENSU(2)   +
-                                     (TNS-TEN   *   ACCT-ZAIKAISU)
-                            COMPUTE   TBL-SYUTEN-JI(2)  =
-                                      TBL-SYUTEN-JI(2)  +
-                                     (TNS-TEN   *   ACCT-ZAIKAISU)
-                      ELSE
-                        EVALUATE  WRK-PARA-JIBAIPRTKBN
+                         COMPUTE   RECE82-TENSU(2)   =
+                                   RECE82-TENSU(2)   +
+                                  (TNS-TEN   *   ACCT-ZAIKAISU)
+                         COMPUTE   TBL-SYUTEN-JI(2)  =
+                                   TBL-SYUTEN-JI(2)  +
+                                  (TNS-TEN   *   ACCT-ZAIKAISU)
+                         EVALUATE  WRK-PARA-JIBAIPRTKBN
                           WHEN      "0"
-                            IF    WK-SYUTEN       NOT =   ZERO
-                               ADD  WK-ZAIKAISU  TO  RECE82-KAISU(15)
-                            END-IF
-                            COMPUTE   RECE82-TENSU(15)   =
-                                      RECE82-TENSU(15)   +
-                                     (WK-SYUTEN   *   ACCT-ZAIKAISU)
-                            COMPUTE   TBL-SYUTEN-JI(15)  =
-                                      TBL-SYUTEN-JI(15)  +
-                                     (WK-SYUTEN   *   ACCT-ZAIKAISU)
+                            COMPUTE   RECE82-TENSU(15)  =
+                                      RECE82-TENSU(15)  -
+                                  (TNS-TEN   *   ACCT-ZAIKAISU)
+                            COMPUTE   TBL-SYUTEN-JI(15) =
+                                      TBL-SYUTEN-JI(15) -
+                                  (TNS-TEN   *   ACCT-ZAIKAISU)
                           WHEN      "1"
-                            COMPUTE   RECE82-TENSU(27)   =
-                                      RECE82-TENSU(27)   +
-                                     (WK-SYUTEN   *   ACCT-ZAIKAISU)
-                            COMPUTE   TBL-SYUTEN-JI(27)  =
-                                      TBL-SYUTEN-JI(27)  +
-                                     (WK-SYUTEN   *   ACCT-ZAIKAISU)
-                        END-EVALUATE
+                            COMPUTE   RECE82-TENSU(27)  =
+                                      RECE82-TENSU(27)  -
+                                  (TNS-TEN   *   ACCT-ZAIKAISU)
+                            COMPUTE   TBL-SYUTEN-JI(27) =
+                                      TBL-SYUTEN-JI(27) -
+                                  (TNS-TEN   *   ACCT-ZAIKAISU)
+                         END-EVALUATE
                       END-IF
                       EVALUATE  WRK-PARA-JIBAIPRTKBN
                         WHEN      "0"
@@ -5685,7 +5712,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                        ADD    WK-ZAIKAISU    TO   RECE82-KAISU(13)
                        COMPUTE   RECE82-TENSU(13)   =
                                  RECE82-TENSU(13)   +
-                                (WK-SYUTEN         * ACCT-ZAIKAISU)
+                                (WK-SYUTEN         * WK-ZAIKAISU)
                    END-IF
       *            ¤½¤ÎÂ¾
                    IF    FLG-ZAITAKU    =   ZERO
@@ -5867,14 +5894,16 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                   (TNS-TEN     *   ACCT-ZAIKAISU)
                          END-IF
                      ELSE                
+                       COMPUTE     RECE82-TENSU(37) =
+                                   RECE82-TENSU(37) +
+                                  (WK-SYUTEN   *   WK-ZAIKAISU)
                        IF    TNS-NYUTENTTLKBN   =    130
                          COMPUTE   RECE82-TENSU(9)  =
                                    RECE82-TENSU(9)  +
                                   (TNS-TEN     *   ACCT-ZAIKAISU)
-                       ELSE  
-                         COMPUTE   RECE82-TENSU(37)  =
-                                   RECE82-TENSU(37)  +
-                                  (WK-SYUTEN   *   WK-ZAIKAISU)
+                         COMPUTE   RECE82-TENSU(37) =
+                                   RECE82-TENSU(37) -
+                                  (TNS-TEN     *   ACCT-ZAIKAISU)
                        END-IF
                        COMPUTE       RECE82-TENSU(38)  =
                                      RECE82-TENSU(38)  +
