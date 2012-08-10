@@ -337,6 +337,8 @@
       *  04.05.37    NACL-門脇    12/05/30  災害対応（日雇特例被保険者）
       *  04.05.38    NACL-門脇    12/06/29  大分県地方公費福岡県対応
       *  04.05.39    NACL-門脇    12/07/19  高齢者他保険入院対応
+      *  04.05.40    NACL-門脇    12/08/10  災害対応（前期高齢者１割＋０５１
+      *                                     の食事負担計算）
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -22393,6 +22395,9 @@
                            WK-ZENKI-TOKUREI-MONEY  / 10
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY  =
                            WK-ZENKI-TOKUREI-MONEY  * 10
+                  IF   WK-GENGAKUKBN   =   3 OR 4
+                    MOVE      ZERO   TO   WK-ZENKI-TOKUREI-MONEY
+                  END-IF
                   IF   WK-ZENKI-TOKUREI-MONEY  <  ZAN-KOHI-T(KOH-IDX)
                     COMPUTE   ZAN-KOHI-T(KOH-IDX)  =
                               ZAN-KOHI-T(KOH-IDX)  -
