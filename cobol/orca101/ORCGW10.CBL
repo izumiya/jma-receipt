@@ -454,6 +454,9 @@
                    ELSE
                        MOVE    "F"     TO  SPA-GMN-W10-CHK-SAVEPARA
                    END-IF
+                   IF    ( SYS-TOUKEI-KANRICD  =   "0043" )
+                       MOVE    "T"     TO  SPA-GMN-W10-CHK-SAVEPARA
+                   END-IF
       *
                    MOVE    TKIMEMO-MEMO    TO  SPA-GMN-W10-MEMO
       *
@@ -490,6 +493,9 @@
                        MOVE    "T"     TO  SPA-GMN-W10-CHK-SAVEPARA1
                    ELSE
                        MOVE    "F"     TO  SPA-GMN-W10-CHK-SAVEPARA1
+                   END-IF
+                   IF    ( SYS-TOUKEI-KANRICD  =   "0044" )
+                       MOVE    "T"     TO  SPA-GMN-W10-CHK-SAVEPARA1
                    END-IF
       *
                    MOVE    TKIMEMO-MEMO    TO  SPA-GMN-W10-MEMO1
@@ -662,7 +668,7 @@
            INITIALIZE   SPA-GMN-W10-AREA
                         SPA-NAI-W10-AREA
       *
-           MOVE        "F"             TO  SPA-GMN-W10-CHK-SAVEPARA
+           MOVE        "T"             TO  SPA-GMN-W10-CHK-SAVEPARA
                                            SPA-GMN-W10-CHK-SAVEPARA1
       *
            PERFORM VARYING IDX FROM    1   BY  1
@@ -715,24 +721,28 @@
                MOVE    SPA-HOSPNUM         TO  TKIMEMO-HOSPNUM
                MOVE    TOUKEIMEMO-REC      TO  MCPDATA-REC
                PERFORM 900-TOUKEIMEMO-KEY-SEL-SEC
+               IF    ( FLG-TOUKEIMEMO  =   ZERO )
+                   CONTINUE
+               ELSE
+                   MOVE    "1"             TO  TKIMEMO-SAVEPARA
+               END-IF
+      *
                MOVE    TOUKEIMEMO-REC      TO  WTMEMO-REC
-               IF    ( TKIMEMO-MEMO(1:10)   NOT =   "¡ô£È£Ï£Ì£Ä" )
-                AND  ( TKIMEMO-MEMO(1:10)   NOT =   "¡ô£è£ï£ì£ä" )
-                   INITIALIZE                  TOUKEIMEMO-REC
-                   MOVE    WRK-PGID        TO  TKIMEMO-PGID
-                   MOVE    "0000"          TO  TKIMEMO-KANRICD
-                   MOVE    "000"           TO  TKIMEMO-KBNCD
-                   MOVE    "00000000"      TO  TKIMEMO-STYUKYMD
-                   MOVE    "99999999"      TO  TKIMEMO-EDYUKYMD
-                   MOVE    SPA-HOSPNUM     TO  TKIMEMO-HOSPNUM
-                   MOVE    TOUKEIMEMO-REC  TO  MCPDATA-REC
-                   PERFORM 900-TOUKEIMEMO-KEY-SEL-SEC
-                   IF    ( FLG-TOUKEIMEMO  =   ZERO )
-                       MOVE    WTMEMO-SAVEPARA
-                                           TO  TKIMEMO-SAVEPARA
-                   ELSE
-                       MOVE    WTMEMO-REC  TO  TOUKEIMEMO-REC
-                   END-IF
+      *
+               INITIALIZE                      TOUKEIMEMO-REC
+               MOVE    WRK-PGID            TO  TKIMEMO-PGID
+               MOVE    "0000"              TO  TKIMEMO-KANRICD
+               MOVE    "000"               TO  TKIMEMO-KBNCD
+               MOVE    "00000000"          TO  TKIMEMO-STYUKYMD
+               MOVE    "99999999"          TO  TKIMEMO-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  TKIMEMO-HOSPNUM
+               MOVE    TOUKEIMEMO-REC      TO  MCPDATA-REC
+               PERFORM 900-TOUKEIMEMO-KEY-SEL-SEC
+               IF    ( FLG-TOUKEIMEMO  =   ZERO )
+                   MOVE    WTMEMO-SAVEPARA
+                                       TO  TKIMEMO-SAVEPARA
+               ELSE
+                   MOVE    WTMEMO-REC  TO  TOUKEIMEMO-REC
                END-IF
            ELSE
                    INITIALIZE                  TOUKEIMEMO-REC
@@ -1716,7 +1726,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        491-TOUKEIMEMO-UPD-SEC      SECTION.
       *
+           INITIALIZE                          WTMEMO-REC
+      *
            IF    ( SPA-W10-MODE            =   ZERO )
+      *
+               INITIALIZE                          TOUKEIMEMO-REC
+               MOVE    SPA-GMN-W10-PRGNAME     TO  TKIMEMO-PGID
+               MOVE    SPA-W10-KANRICD         TO  TKIMEMO-KANRICD
+               MOVE    SPA-W10-KBNCD           TO  TKIMEMO-KBNCD
+               MOVE    SPA-W10-SEL-STYUKYMD    TO  TKIMEMO-STYUKYMD
+               MOVE    SPA-W10-SEL-EDYUKYMD    TO  TKIMEMO-EDYUKYMD
+               MOVE    SPA-HOSPNUM             TO  TKIMEMO-HOSPNUM
+               MOVE    TOUKEIMEMO-REC          TO  MCPDATA-REC
+               PERFORM 900-TOUKEIMEMO-KEY-SEL-SEC
+               MOVE    TOUKEIMEMO-REC          TO  WTMEMO-REC
+      *
                PERFORM 4032-TOUKEIMEMO-DEL-SEC
            ELSE
                MOVE    SPA-W10-PRGNAME TO  WRK-PRGNAME
@@ -1743,6 +1767,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  TKIMEMO-PGID
                MOVE    SPA-GMN-W10-MEMO
                                        TO  TKIMEMO-MEMO
+               MOVE    WTMEMO-USERMEMO
+                                       TO  TKIMEMO-USERMEMO
+      *
                IF    ( SPA-GMN-W10-CHK-SAVEPARA    =   "T" )
                    MOVE    "1"         TO  TKIMEMO-SAVEPARA
                ELSE
@@ -1758,6 +1785,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  TKIMEMO-PGID
                MOVE    SPA-GMN-W10-MEMO1
                                        TO  TKIMEMO-MEMO
+               MOVE    WTMEMO-USERMEMO
+                                       TO  TKIMEMO-USERMEMO
                IF    ( SPA-GMN-W10-CHK-SAVEPARA1   =   "T" )
                    MOVE    "1"         TO  TKIMEMO-SAVEPARA
                ELSE

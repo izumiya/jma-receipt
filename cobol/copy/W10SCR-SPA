@@ -113,6 +113,7 @@
                    07  SPA-GMN-W19-TYOHYOLST-MAX   PIC 9(05).
                    07  SPA-GMN-W19-TYOHYOLST-SEL   PIC 9(05).
                    07  SPA-GMN-W19-TYOHYOLST-OCC   OCCURS  200.
+                       09  SPA-GMN-W19-TNUM        PIC 9(03).
                        09  SPA-GMN-W19-THCNAME     PIC X(80).
                        09  SPA-GMN-W19-TPRGNAME    PIC X(20).
                        09  SPA-GMN-W19-TSTATUS     PIC 9(01).

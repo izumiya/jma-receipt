@@ -14,7 +14,7 @@
   <class>GtkWindow</class>
   <name>G03</name>
   <width>1024</width>
-  <height>420</height>
+  <height>620</height>
   <signal>
     <name>map_event</name>
     <handler>map_event</handler>
@@ -47,7 +47,7 @@
       <class>GtkButton</class>
       <name>B01</name>
       <x>8</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -70,7 +70,7 @@
       <class>GtkButton</class>
       <name>B02</name>
       <x>88</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -93,7 +93,7 @@
       <class>GtkButton</class>
       <name>B03</name>
       <x>168</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -108,7 +108,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Tue, 26 Dec 2000 00:43:04 GMT</last_modification_time>
       </signal>
-      <label></label>
+      <label>入力欄</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
@@ -116,7 +116,7 @@
       <class>GtkButton</class>
       <name>B04</name>
       <x>248</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -131,7 +131,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Tue, 26 Dec 2000 00:43:36 GMT</last_modification_time>
       </signal>
-      <label></label>
+      <label>メモ欄</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
@@ -139,7 +139,7 @@
       <class>GtkButton</class>
       <name>B05</name>
       <x>352</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -162,7 +162,7 @@
       <class>GtkButton</class>
       <name>B06</name>
       <x>432</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -185,7 +185,7 @@
       <class>GtkButton</class>
       <name>B07</name>
       <x>512</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -208,7 +208,7 @@
       <class>GtkButton</class>
       <name>B08</name>
       <x>592</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -231,7 +231,7 @@
       <class>GtkButton</class>
       <name>B09</name>
       <x>696</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -254,7 +254,7 @@
       <class>GtkButton</class>
       <name>B10</name>
       <x>776</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -277,7 +277,7 @@
       <class>GtkButton</class>
       <name>B11</name>
       <x>856</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -300,7 +300,7 @@
       <class>GtkButton</class>
       <name>B12</name>
       <x>936</x>
-      <y>390</y>
+      <y>590</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -541,55 +541,6 @@
       <text>20011010</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
-    </widget>
-
-    <widget>
-      <class>GtkScrolledWindow</class>
-      <name>scrolledwindow1</name>
-      <x>152</x>
-      <y>96</y>
-      <width>720</width>
-      <height>285</height>
-      <hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
-      <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
-      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
-      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
-
-      <widget>
-	<class>GtkPandaText</class>
-	<name>MEMO</name>
-	<signal>
-	  <name>changed</name>
-	  <handler>entry_changed</handler>
-	  <data>CHANGED</data>
-	  <last_modification_time>Tue, 05 Oct 2004 00:46:39 GMT</last_modification_time>
-	</signal>
-	<signal>
-	  <name>activate</name>
-	  <handler>send_event</handler>
-	  <data>ACTIVATE</data>
-	  <last_modification_time>Tue, 05 Oct 2004 00:47:07 GMT</last_modification_time>
-	</signal>
-	<editable>False</editable>
-	<text></text>
-	<xim_enabled>False</xim_enabled>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>PRGNAME</name>
-      <x>15</x>
-      <y>95</y>
-      <width>130</width>
-      <height>25</height>
-      <label>あいうえお</label>
-      <justify>GTK_JUSTIFY_RIGHT</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
     </widget>
 
     <widget>
@@ -1089,6 +1040,105 @@
       <text>20011010</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>PRGNAME</name>
+      <x>20</x>
+      <y>88</y>
+      <width>130</width>
+      <height>25</height>
+      <label>あいうえお</label>
+      <justify>GTK_JUSTIFY_RIGHT</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label5</name>
+      <x>152</x>
+      <y>384</y>
+      <width>64</width>
+      <height>25</height>
+      <label>メモ欄</label>
+      <justify>GTK_JUSTIFY_RIGHT</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkScrolledWindow</class>
+      <name>scrolledwindow1</name>
+      <x>152</x>
+      <y>88</y>
+      <width>720</width>
+      <height>285</height>
+      <hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
+      <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
+      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+
+      <widget>
+	<class>GtkPandaText</class>
+	<name>MEMO</name>
+	<signal>
+	  <name>changed</name>
+	  <handler>entry_changed</handler>
+	  <data>CHANGED</data>
+	  <last_modification_time>Tue, 05 Oct 2004 00:46:39 GMT</last_modification_time>
+	</signal>
+	<signal>
+	  <name>activate</name>
+	  <handler>send_event</handler>
+	  <data>ACTIVATE</data>
+	  <last_modification_time>Tue, 05 Oct 2004 00:47:07 GMT</last_modification_time>
+	</signal>
+	<editable>False</editable>
+	<text></text>
+	<xim_enabled>False</xim_enabled>
+      </widget>
+    </widget>
+
+    <widget>
+      <class>GtkScrolledWindow</class>
+      <name>scrolledwindow2</name>
+      <x>152</x>
+      <y>408</y>
+      <width>720</width>
+      <height>168</height>
+      <hscrollbar_policy>GTK_POLICY_AUTOMATIC</hscrollbar_policy>
+      <vscrollbar_policy>GTK_POLICY_ALWAYS</vscrollbar_policy>
+      <hupdate_policy>GTK_UPDATE_CONTINUOUS</hupdate_policy>
+      <vupdate_policy>GTK_UPDATE_CONTINUOUS</vupdate_policy>
+
+      <widget>
+	<class>GtkPandaText</class>
+	<name>USERMEMO</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>changed</name>
+	  <handler>entry_changed</handler>
+	  <data>CHANGED</data>
+	  <last_modification_time>Tue, 05 Oct 2004 00:46:39 GMT</last_modification_time>
+	</signal>
+	<signal>
+	  <name>activate</name>
+	  <handler>send_event</handler>
+	  <data>ACTIVATE</data>
+	  <last_modification_time>Tue, 05 Oct 2004 00:47:07 GMT</last_modification_time>
+	</signal>
+	<editable>True</editable>
+	<text></text>
+	<xim_enabled>True</xim_enabled>
+      </widget>
     </widget>
   </widget>
 </widget>

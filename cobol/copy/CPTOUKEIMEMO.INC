@@ -69,3 +69,6 @@
            03  TKIMEMO-PARA09              PIC  X(20).
       *パラメタ１０
            03  TKIMEMO-PARA10              PIC  X(20).
+      *ユーザーメモ
+           03  TKIMEMO-USERMEMO            PIC  X(5000).
+

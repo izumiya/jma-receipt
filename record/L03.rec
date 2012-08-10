@@ -114,5 +114,10 @@ L03	{
 				value	varchar(6000);
 			};
 		};
+		scrolledwindow2	{
+			USERMEMO	{
+				value	varchar(5000);
+			};
+		};
 	};
 };

@@ -74,6 +74,7 @@
                        09  SPA-GMN-G03-PARA        PIC X(20)
                                                    OCCURS  10.
                    07  SPA-GMN-G03-MEMO            PIC X(6000).
+                   07  SPA-GMN-G03-USERMEMO        PIC X(5000).
       *
                05  SPA-NAI-G03-AREA.
                    07  SPA-NAI-G03-PARAARI         PIC 9(01).
@@ -179,6 +180,45 @@
                        09  SPA-NAI-G05-TRENNUM    PIC 9(04).
                        09  SPA-NAI-G05-TUPYMD     PIC X(08).
                        09  SPA-NAI-G05-TUPHMS     PIC X(06).
+           03  SPA-G07.
+             04  SPA-G07-AREA.
+               05  SPA-GMN-G07-CUR                 PIC 9(03).
+      *
+               05  SPA-GMN-G07-AREA.
+                   07  SPA-GMN-G07-SELNUM          PIC 9(03).
+                   07  SPA-GMN-G07-TYOHYOKBN-G.
+                       09  SPA-GMN-G07-TYOHYOKBN   PIC X(01).
+                       09  SPA-GMN-G07-TYOHYOKBNFL PIC X(01).
+                       09  SPA-GMN-G07-TYOHYOKBNMEI
+                                                   PIC X(20).
+                   07  SPA-GMN-G07-TYOHYOKBNLST-G.
+                       09  SPA-GMN-G07-TYOHYOKBN-MAX
+                                                   PIC 9(03).
+                       09  SPA-GMN-G07-TYOHYOKBNLST
+                                                   OCCURS  2.
+                           11  SPA-GMN-G07-TYOHYOKBNL
+                                                   PIC X(01).
+                           11  SPA-GMN-G07-TYOHYOKBNFLL
+                                                   PIC X(01).
+                           11  SPA-GMN-G07-TYOHYOKBNMEIL
+                                                   PIC X(20).
+      *
+               05  SPA-GMN-G07-TYOHYOLST-AREA.
+                   07  SPA-GMN-G07-TYOHYOLST-MAX   PIC 9(05).
+                   07  SPA-GMN-G07-TYOHYOLST-SEL   PIC 9(05).
+                   07  SPA-GMN-G07-TYOHYOLST-OCC   OCCURS  200.
+                       09  SPA-GMN-G07-TNUM        PIC 9(03).
+                       09  SPA-GMN-G07-THCNAME     PIC X(80).
+                       09  SPA-GMN-G07-TPRGNAME    PIC X(20).
+                       09  SPA-GMN-G07-TSTATUS     PIC 9(01).
+               05  SPA-NAI-G07-AREA.
+                   07  SPA-NAI-G07-RET             PIC 9(01).
+                   07  SPA-NAI-G07-KANRICD         PIC X(04).
+                   07  SPA-NAI-G07-KBNCD           PIC X(08).
+               05  SPA-NAI-G07-TYOHYOLST-AREA.
+                   07  SPA-NAI-G07-TYOHOLST-OCC    OCCURS  200.
+                       09  SPA-NAI-G07-TKANRICD    PIC X(04).
+                       09  SPA-NAI-G07-TKBNCD      PIC X(08).
       *
            03  SPA-G99-AREA.
                05  SPA-SFILESV-AREA.
@@ -193,3 +233,5 @@
                        09  SPA-SFILESV-DATA-TYPE   PIC X(01).
                    07  SPA-SFILESV-IDX             PIC 9(03).
                    07  SPA-SFILESV-MAX             PIC 9(03).
+           03  SPA-G01-OTHERS                      PIC X(50000).
+      *

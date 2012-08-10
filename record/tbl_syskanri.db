@@ -392,3 +392,60 @@ path	key23	{
 		;
 	};
 };
+
+path	key24	{
+	DBSELECT	{
+		DECLARE tbl_syskanri_key24_csr CURSOR FOR
+		SELECT STYUKYMD,KBNCD
+		FROM ( SELECT DISTINCT(STYUKYMD),'1' AS KBNCD
+               FROM   tbl_syskanri
+               WHERE  HOSPNUM =  :HOSPNUM
+               AND    KANRICD =  :KANRICD
+               UNION
+		       SELECT DISTINCT(EDYUKYMD),'2' AS KBNCD
+               FROM   tbl_syskanri
+               WHERE  HOSPNUM =  :HOSPNUM
+               AND    KANRICD =  :KANRICD
+             ) as kikan
+        ORDER  BY STYUKYMD,KBNCD
+        ; 
+	};
+};
+
+path	abort	{
+	DBSELECT	{
+		error
+ 		;
+	};
+};
+
+path	del2	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_syskanri
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   KANRICD      =   :KANRICD
+			AND   KBNCD       >=   :KBNCD
+			AND   KBNCD       <=   :UPKBNCD
+			AND   STYUKYMD    <=   :STYUKYMD
+			AND   EDYUKYMD    >=   :EDYUKYMD
+		;
+	};
+};
+
+path	key25	{
+	DBSELECT	{
+		DECLARE tbl_syskanri_key25_csr CURSOR FOR
+		SELECT *
+		FROM      tbl_syskanri
+		WHERE 	  HOSPNUM	   = :HOSPNUM
+			AND   KANRICD      =   :KANRICD
+			AND   KBNCD       >=   :KBNCD
+			AND   KBNCD       <=   :UPKBNCD
+			AND   STYUKYMD    <=   :STYUKYMD
+			AND   EDYUKYMD    >=   :EDYUKYMD
+        ORDER  BY KBNCD,STYUKYMD
+		;
+	};
+};
+

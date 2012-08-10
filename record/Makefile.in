@@ -443,6 +443,10 @@ RECORD_files = \
 	diseaseget.rec \
 	W201.rec \
 	S10.rec \
+	L07.rec \
+	G07.rec \
+	L100.rec \
+	G100.rec \
 	
 
 DEF_files = \

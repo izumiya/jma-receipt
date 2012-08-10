@@ -22,6 +22,7 @@ tbl_toukeimemo {
 	SAVEPARA		char(1);
 	PARA9                   varchar(20);
 	PARA10                  varchar(20);
+	USERMEMO                varchar(6000);
 };
 
 primary	{
@@ -76,6 +77,47 @@ path	all		{
 		SELECT *
 		FROM tbl_toukeimemo
 		WHERE 	HOSPNUM	= :HOSPNUM
+		;
+	};
+};
+
+path	del2		{ 	
+	DBDELETE	{
+		DELETE	FROM tbl_toukeimemo
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   KANRICD   =  :KANRICD
+			AND     KBNCD     =  :KBNCD
+			AND     STYUKYMD  <=  :STYUKYMD
+			AND     EDYUKYMD  >=  :EDYUKYMD
+		;
+	};
+};
+
+path	del3		{ 	
+	DBDELETE	{
+		DELETE	FROM tbl_toukeimemo
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   KANRICD   =  :KANRICD
+			AND     KBNCD     >=  :KBNCD
+			AND     KBNCD     <=  :UPYMD
+			AND     STYUKYMD  <=  :STYUKYMD
+			AND     EDYUKYMD  >=  :EDYUKYMD
+		;
+	};
+};
+
+path	key3		{ 	
+	DBSELECT	{
+		DECLARE tbl_toukeimemo_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_toukeimemo
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   KANRICD   =  :KANRICD
+			AND     KBNCD     >=  :KBNCD
+			AND     KBNCD     <=  :UPYMD
+			AND     STYUKYMD  <=  :STYUKYMD
+			AND     EDYUKYMD  >=  :EDYUKYMD
+            ORDER BY KBNCD,STYUKYMD
 		;
 	};
 };

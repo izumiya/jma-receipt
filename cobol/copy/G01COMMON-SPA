@@ -29,6 +29,7 @@
            03  SPA-G01-CUR                 PIC  9(05).
            03  SPA-G01-TBL-GROUP           PIC  X(14).
            03  SPA-G01-JOB-JOBID           PIC  9(07).
+           03  SPA-G01-MOTOPG              PIC  X(08).
       *
            03  SPA-G99-FILESV-CHK-FLG      PIC 9(01).
            03  SPA-G99-MOTOPG              PIC X(08).

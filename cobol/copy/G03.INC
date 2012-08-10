@@ -43,3 +43,5 @@
               03  G03-PRGNAME         PIC X(20).
               03  G03-SCROLLEDWINDOW1.
                 06  G03-MEMO          PIC X(6000).
+              03  G03-SCROLLEDWINDOW2.
+                06  G03-USERMEMO      PIC X(5000).

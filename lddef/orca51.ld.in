@@ -8,7 +8,9 @@ bind	"L01"		"OpenCOBOL"	"ORCGL01";
 bind	"L02"		"OpenCOBOL"	"ORCGL02";
 bind	"L03"		"OpenCOBOL"	"ORCGL03";
 bind	"L04"		"OpenCOBOL"	"ORCGL04";
+bind	"L07"		"OpenCOBOL"	"ORCGL07";
 bind	"L99"		"OpenCOBOL"	"ORCGL99";
+bind	"L100"		"OpenCOBOL"	"ORCGL100";
 bind	"LERR"		"OpenCOBOL"	"ORCGLERR";
 bind	"LID1"		"OpenCOBOL"	"ORCGLID1";
 bind	"LID2"		"OpenCOBOL"	"ORCGLID2";
@@ -17,7 +19,9 @@ bind	"G01"		"OpenCOBOL"	"ORCGG01";
 bind	"G02"		"OpenCOBOL"	"ORCGG02";
 bind	"G03"		"OpenCOBOL"	"ORCGG03";
 bind	"G05"		"OpenCOBOL"	"ORCGG05";
+bind	"G07"		"OpenCOBOL"	"ORCGG07";
 bind	"G99"		"OpenCOBOL"	"ORCGG99";
+bind	"G100"		"OpenCOBOL"	"ORCGG100";
 bind	"GERR"		"OpenCOBOL"	"ORCGGERR";
 bind	"GID1"		"OpenCOBOL"	"ORCGGID1";
 bind	"GID2"		"OpenCOBOL"	"ORCGGID2";
@@ -33,7 +37,9 @@ data	{
 		L02;
 		L03;
 		L04;
+		L07;
 		L99;
+		L100;
 		LERR;
 		LID1;
 		LID2;
@@ -42,7 +48,9 @@ data	{
 		G02;
 		G03;
 		G05;
+		G07;
 		G99;
+		G100;
 		GERR;
 		GID1;
 		GID2;
@@ -59,6 +67,7 @@ db	{
 	tbl_hours;
 	tbl_file_info; 
         tbl_btpara; 
+        tbl_sysuser; 
 };
 
 /* #include "orcadb.inc" */

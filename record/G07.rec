@@ -1,0 +1,31 @@
+G07	{
+	fixed32	{
+		LBLTOUKEI	{
+			value	varchar(20);
+		};
+		SELNUM	{
+			value	number(3);
+		};
+		CMB_TYOHYOKBN	{
+			TYOHYOKBN	{
+				value	varchar(22);
+			};
+			count	int;
+			item	varchar(22)[2];
+		};
+		scrolledwindow26	{
+			LIST	{
+				count	int;
+				row	int;
+				rowattr int;
+				item	{
+					value0	varchar(3);
+					value1	varchar(80);
+					value2	varchar(20);
+					value3	varchar(4);
+				}	[200];
+				select	bool[200];
+			};
+		};
+	};
+};
