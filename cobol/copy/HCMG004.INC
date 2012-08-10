@@ -15,3 +15,5 @@
               03  HCMG004-TUSAN   PIC X(9).
               03  HCMG004-DAY-91  PIC X(9).
               03  HCMG004-DAY-180 PIC X(9).
+            02  HCMG004-TAIINYMD
+                    PIC X(9)    OCCURS  30 TIMES.

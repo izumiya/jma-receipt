@@ -701,6 +701,14 @@ grpsys                                         SPA-AREA
       *
            END-PERFORM
       *
+      *    退院日
+           IF    ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
+               MOVE    PTNYUINRRK-TAIINYMD     TO  WRK-SYMD
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-EDTYMD1             TO  HCMG004-TAIINYMD
+                                                       (CNT-LINE)
+           END-IF
+      *
       *    通算日数チェックサブ呼出
            INITIALIZE                  ORCSTUSANCHKAREA
 grpsys*DD  MOVE    WRK-PARA-HOSPID     TO  STUSANCHK-HOSPID
@@ -734,26 +742,29 @@ grpsys                                         SPA-AREA
            MOVE    WRK-HCMG004-TUSAN   TO  HCMG004-TUSAN   (CNT-LINE)
       *
       *    ９１日以上
-           IF    ( STUSANCHK-DAY-91-STS    =   ZERO OR "1" )
+           IF    ( STUSANCHK-DAY-91       <=   PTNYUINRRK-TAIINYMD )
+             IF  ( STUSANCHK-DAY-91-STS    =   ZERO OR "1" )
                MOVE    STUSANCHK-DAY-91    TO  WRK-SYMD
                PERFORM 800-SEIWA-HEN-SEC
                MOVE    WRK-EDTYMD1         TO  HCMG004-DAY-91
                                                            (CNT-LINE)
-               
-           ELSE
+             ELSE
                MOVE    "*********"         TO  HCMG004-DAY-91
                                                            (CNT-LINE)
+             END-IF
            END-IF
       *
       *    １８０日以上
-           IF    ( STUSANCHK-DAY-180-STS   =   ZERO OR "2" )
+           IF    ( STUSANCHK-DAY-180      <=   PTNYUINRRK-TAIINYMD )
+             IF    ( STUSANCHK-DAY-180-STS =   ZERO OR "2" )
                MOVE    STUSANCHK-DAY-180   TO  WRK-SYMD
                PERFORM 800-SEIWA-HEN-SEC
                MOVE    WRK-EDTYMD1         TO  HCMG004-DAY-180
                                                            (CNT-LINE)
-           ELSE
+             ELSE
                MOVE    "*********"         TO  HCMG004-DAY-180
                                                            (CNT-LINE)
+             END-IF
            END-IF
       *
            COMPUTE CNT-BG004   =   CNT-BG004   +   1
