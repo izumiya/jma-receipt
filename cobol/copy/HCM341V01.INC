@@ -45,3 +45,5 @@
             02  HCM341V01-KIKAN PIC X(20).
             02  HCM341V01-SRYAREA2      OCCURS  28 TIMES.
               03  HCM341V01-TOTAL PIC X(11).
+            02  HCM341V01-BYOMEI2
+                    PIC X(56)   OCCURS  10 TIMES.

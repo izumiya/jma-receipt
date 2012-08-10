@@ -133,11 +133,13 @@
            03  WRK-PARA-NYUGAIKBN                  PIC X(01).
            03  WRK-PARA-BTUNUM                     PIC X(02).
            03  WRK-PARA-SRTKBN                     PIC X(01).
-           03  WRK-PARA-SRYKAKBN                   PIC X(01).
+           03  WRK-PARA-EDITKBN                    PIC X(01).
            03  WRK-PARA-SRYKA                      PIC X(02).
            03  WRK-PARA-HOKEN                      PIC X(01).
            03  WRK-PARA-STDAY                      PIC X(05).
            03  WRK-PARA-EDDAY                      PIC X(05).
+           03  WRK-PARA-SRYKAKBN                   PIC X(01).
+           03  WRK-PARA-HIDEBYOKBN                 PIC X(01).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -368,6 +370,7 @@
            INITIALIZE                  TTNS-AREA
            INITIALIZE                  ERR-EDIT-AREA
 grpsys     INITIALIZE                  SPA-AREA
+           INITIALIZE                  WRK-PARA
       *
            PERFORM 100-DBOPEN-SEC
       *
@@ -392,7 +395,7 @@ grpsys     INITIALIZE                  SPA-AREA
                                        WRK-PARA-NYUGAIKBN
                                        WRK-PARA-BTUNUM
                                        WRK-PARA-SRTKBN
-                                       WRK-PARA-SRYKAKBN
+                                       WRK-PARA-EDITKBN
                                        WRK-PARA-SRYKA
                                        WRK-PARA-HOKEN
                                        WRK-PARA-STDAY
@@ -412,6 +415,16 @@ grpsys     END-UNSTRING
            END-IF
       *
            MOVE    WRK-PARA-NYUGAIKBN  TO  WRK-NYUGAI
+      *
+           EVALUATE    WRK-PARA-EDITKBN
+           WHEN    "1"
+               MOVE    "1"             TO  WRK-PARA-SRYKAKBN
+           WHEN    "2"
+               MOVE    "1"             TO  WRK-PARA-HIDEBYOKBN
+           WHEN    "3"
+               MOVE    "1"             TO  WRK-PARA-SRYKAKBN
+               MOVE    "1"             TO  WRK-PARA-HIDEBYOKBN
+           END-EVALUATE
       *
            IF    ( WRK-PARA-SRYKA      NOT =   SPACE )
             AND  ( WRK-PARA-SRYKAKBN       =   SPACE )
@@ -1187,6 +1200,7 @@ grpsys     END-UNSTRING
            MOVE    WRK-PARA-SRYYM      TO  ORCHCM34-SRYYM
            MOVE    WRK-PARA-NYUGAIKBN  TO  ORCHCM34-NYUGAIKBN
            MOVE    WRK-PARA-SRYKAKBN   TO  ORCHCM34-SRYKAKBN
+           MOVE    WRK-PARA-HIDEBYOKBN TO  ORCHCM34-HIDEBYOKBN
            MOVE    BG00701-HOKENBUNRUI TO  ORCHCM34-HOKEN
            MOVE    BG00701-SRYKA       TO  ORCHCM34-SRYKA
            MOVE    BG00701-SRYKADAY-G  TO  ORCHCM34-SRYKADAY-G

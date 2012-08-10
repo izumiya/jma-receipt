@@ -248,6 +248,7 @@
            03  IDX33                               PIC 9(05).
            03  IDX34                               PIC 9(05).
            03  IDX35                               PIC 9(05).
+           03  IDX36                               PIC 9(05).
            03  IDXA                                PIC 9(05).
            03  IDXB                                PIC 9(05).
            03  IDXC                                PIC 9(05).
@@ -436,6 +437,11 @@
                05  WRK-TOTALZ                      PIC -------9.
                05  WRK-TOTAL-TANI                  PIC X(02).
                05  WRK-TOTAL-KAKKO                 PIC X(01).
+           03  WRK-BYOMEI-G.
+               05  WRK-BYOMEI-MAX                  PIC 9(05).
+               05  WRK-BYOMEI.
+                   07  WRK-BYOMEI-LINE             PIC X(56)
+                                                   OCCURS 3.
       *
        01  COMMENT-CHK-AREA.
            03  COMMENT-IDX                         PIC 9(03).
@@ -975,6 +981,7 @@
            INITIALIZE                  SRH-AREA
            INITIALIZE                  ORCHCM34-OT
            INITIALIZE                  TBLCOMBI-AREA
+           INITIALIZE                  WKPTBYOMEI-REC
       *
       *    医療機関情報取得処理
            PERFORM 1001-SYS1001-GET-SEC
@@ -1742,7 +1749,9 @@
       *    公費編集処理
            PERFORM 2001-PTKOH-HEN-SEC
       *    傷病名編集処理
-           PERFORM 2001-PTBYOMEI-HEN-SEC
+           IF    ( ORCHCM34-HIDEBYOKBN =   SPACE )
+               PERFORM 2001-PTBYOMEI-HEN-SEC
+           END-IF
       *    診療行為編集処理
            PERFORM 2001-SRYACT-HEN-SEC
       *
@@ -2485,8 +2494,6 @@
       *****************************************************************
        2001-PTBYOMEI-HEN-SEC           SECTION.
       *
-           INITIALIZE  WKPTBYOMEI-REC
-      *
       *    患者病名マスタ検索
            MOVE    ZERO                TO  FLG-PTBYOMEI
            INITIALIZE                  PTBYOMEI-REC
@@ -2524,6 +2531,7 @@
            PERFORM UNTIL ( FLG-PTBYOMEI    NOT =   ZERO )
       *
                MOVE    1           TO  FLG-TARGET
+               INITIALIZE              WRK-BYOMEI-G
       *
                IF    ( ORCHCM34-HOKEN  =   SPACE )
                 OR   ( PTBYO-HKNCOMBI  =   SPACE )
@@ -2552,8 +2560,26 @@
       *
                IF    ( FLG-TARGET      =   1 )
       *
-                   IF    ( CNT-BYOMEI-LINE
-                                       <    CONST-BYOMEI-LINE-MAX )
+                   MOVE    PTBYO-BYOMEI    TO  WRK-PTBYO-BYOMEI
+                   MOVE    PTBYO-BYOMEIMOJI
+                                           TO  WRK-PTBYO-BYOMEIMOJI
+                   MOVE    PTBYO-UTAGAIFLG TO  WRK-PTBYO-UTAGAIFLG
+                   MOVE    PTBYO-HOSOKU-COMMENT
+                                           TO  WRK-PTBYO-HOSOKU-COMMENT
+                   PERFORM 20011-PTBYOMEI-BYOMEI-HEN-SEC
+                   MOVE    WRK-PTBYO-BYOMEI
+                                           TO  WRK-BYOMEI
+      *
+                   PERFORM VARYING IDX36   FROM    1   BY  1
+                           UNTIL ( IDX36   >   3 )
+                            OR   ( WRK-BYOMEI-LINE (IDX36) =   SPACE )
+      *
+                       COMPUTE WRK-BYOMEI-MAX  =   WRK-BYOMEI-MAX  +   1
+      *
+                   END-PERFORM
+      *
+                   IF    ( CONST-BYOMEI-LINE-MAX
+                              >=   CNT-BYOMEI-LINE + WRK-BYOMEI-MAX )
                        PERFORM 20011-PTBYOMEI-HEN-SEC
                    ELSE
                        IF    ( WKPTBYOMEI-MAX  <   300 )
@@ -2588,16 +2614,11 @@
       *****************************************************************
        20011-PTBYOMEI-HEN-SEC          SECTION.
       *
-           COMPUTE CNT-BYOMEI-LINE =   CNT-BYOMEI-LINE     +   1
-      *
            MOVE    CNT-BYOMEI-LINE         TO  IDXA
       *
-           MOVE    PTBYO-BYOMEI            TO  WRK-PTBYO-BYOMEI
-           MOVE    PTBYO-BYOMEIMOJI        TO  WRK-PTBYO-BYOMEIMOJI
-           MOVE    PTBYO-UTAGAIFLG         TO  WRK-PTBYO-UTAGAIFLG
-           MOVE    PTBYO-HOSOKU-COMMENT    TO  WRK-PTBYO-HOSOKU-COMMENT
-           PERFORM 20011-PTBYOMEI-BYOMEI-HEN-SEC
-           MOVE    WRK-PTBYO-BYOMEI        TO  HCM341-BYOMEI (IDXA)
+           COMPUTE IDXA    =   IDXA    +   1
+      *
+           MOVE    WRK-BYOMEI-LINE (1)     TO  HCM341-BYOMEI2 (IDXA)
       *
            MOVE    PTBYO-SRYKA             TO  SRH-SRYKA
            PERFORM 200111-SRYKA-HEN-SEC
@@ -2614,6 +2635,17 @@
            MOVE    PTBYO-TENKIKBN          TO  WRK-PTBYO-TENKIKBN
            PERFORM 200111-PTBYO-TENKIKBN-HEN-SEC
            MOVE    WRK-PTBYO-TENKIKBNMEI   TO  HCM341-TENKI  (IDXA)
+      *
+           PERFORM VARYING IDX36    FROM   2   BY  1
+                   UNTIL ( IDX36    >   WRK-BYOMEI-MAX )
+      *
+               COMPUTE IDXA    =   IDXA    +   1
+               MOVE    WRK-BYOMEI-LINE (IDX36)
+                                           TO  HCM341-BYOMEI2 (IDXA)
+      *
+           END-PERFORM
+      *
+           MOVE    IDXA                    TO  CNT-BYOMEI-LINE
       *
            .
       *
