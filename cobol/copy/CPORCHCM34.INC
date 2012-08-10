@@ -31,6 +31,8 @@
                05  ORCHCM34-SRYYM          PIC X(06).
       *        ∆˛≥∞∂Ë ¨
                05  ORCHCM34-NYUGAIKBN      PIC X(01).
+      *        …¬Ãæ…Ωº®»Û…Ωº®∂Ë ¨
+               05  ORCHCM34-HIDEBYOKBN     PIC X(01).
       *        ø«Œ≈≤ ∂Ë ¨
                05  ORCHCM34-SRYKAKBN       PIC X(01).
       *        ø«Œ≈≤ 

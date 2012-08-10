@@ -958,6 +958,7 @@
            INITIALIZE                  SRH-AREA
            INITIALIZE                  ORCHCM34-OT
            INITIALIZE                  TBLCOMBI-AREA
+           INITIALIZE                  WKPTBYOMEI-REC
       *
       *    医療機関情報取得処理
            PERFORM 1001-SYS1001-GET-SEC
@@ -1724,7 +1725,9 @@
       *    公費編集処理
            PERFORM 2001-PTKOH-HEN-SEC
       *    傷病名編集処理
-           PERFORM 2001-PTBYOMEI-HEN-SEC
+           IF    ( ORCHCM34-HIDEBYOKBN =   SPACE )
+               PERFORM 2001-PTBYOMEI-HEN-SEC
+           END-IF
       *    診療行為編集処理
            PERFORM 2001-SRYACT-HEN-SEC
       *
@@ -2465,8 +2468,6 @@
       *    傷病名編集処理
       *****************************************************************
        2001-PTBYOMEI-HEN-SEC           SECTION.
-      *
-           INITIALIZE  WKPTBYOMEI-REC
       *
       *    患者病名マスタ検索
            MOVE    ZERO                TO  FLG-PTBYOMEI
