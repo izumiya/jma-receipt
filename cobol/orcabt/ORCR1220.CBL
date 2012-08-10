@@ -97,6 +97,7 @@
       *                                     「入院」の対応
       *                                     コメント差込
       *  04.05.12    NACL-門脇    12/05/23  保険欄−一部負担金未記載対応
+      *  04.05.13    NACL-門脇    12/08/10  ８０その他欄の点数集計修正
       *
       *  04.06.01    NACL-門脇    10/08/16  入院の点滴入力改善対応
       *****************************************************************
@@ -3280,14 +3281,16 @@
                             (WK-YKZTEN   *   WK-ZAIKAISU)
       *    その他のレセ点数欄の編集
                WHEN    "80"
+                   COMPUTE     RECE200-TENSU(20 1) =
+                               RECE200-TENSU(20 1) +
+                              (WK-SYUTEN   *   WK-ZAIKAISU)
                    IF    TNS-NYUTENTTLKBN   =    130
                      COMPUTE   RECE200-TENSU(2 1)  =
                                RECE200-TENSU(2 1)  +
                               (TNS-TEN     *   ACCT-ZAIKAISU)
-                   ELSE
-                     COMPUTE   RECE200-TENSU(20 1)  =
-                               RECE200-TENSU(20 1)  +
-                              (WK-SYUTEN   *   ACCT-ZAIKAISU)
+                     COMPUTE   RECE200-TENSU(20 1) =
+                               RECE200-TENSU(20 1) -
+                              (TNS-TEN     *   ACCT-ZAIKAISU)
                    END-IF
                    COMPUTE     RECE200-TENSU(21 2)  =
                                RECE200-TENSU(21 2)  +

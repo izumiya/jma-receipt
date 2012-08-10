@@ -573,6 +573,7 @@
       *  04.05.76    NACL-門脇    12/08/06  ７０歳未満現物給付で、高額計算
       *                                     対象外の全国公費の一部負担金記
       *                                     載修正（０１０）
+      *  04.05.77    NACL-門脇    12/08/10  ８０その他欄の点数集計修正
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -6489,47 +6490,55 @@
       *    その他のレセ点数欄の編集
                WHEN    "80"
                    IF    BUN-IDX        =   1
+                         COMPUTE     RECE62-TENSU(21 BUN-IDX) =
+                                     RECE62-TENSU(21 BUN-IDX) +
+                                    (WK-SYUTEN *   WK-ZAIKAISU)
                          IF    TNS-NYUTENTTLKBN   =    130
                            COMPUTE   RECE62-TENSU(2 BUN-IDX)  =
                                      RECE62-TENSU(2 BUN-IDX)  +
                                     (TNS-TEN   *   ACCT-ZAIKAISU)
-                         ELSE  
-                           COMPUTE   RECE62-TENSU(21 BUN-IDX)  =
-                                     RECE62-TENSU(21 BUN-IDX)  +
-                                    (WK-SYUTEN   *   ACCT-ZAIKAISU)
+                           COMPUTE   RECE62-TENSU(21 BUN-IDX) =
+                                     RECE62-TENSU(21 BUN-IDX) -
+                                    (TNS-TEN   *   ACCT-ZAIKAISU)
                          END-IF
                    END-IF
                    IF    BUN-IDX2       =   2
+                         COMPUTE     RECE62-TENSU(21 BUN-IDX2) =
+                                     RECE62-TENSU(21 BUN-IDX2) +
+                                    (WK-SYUTEN *   WK-ZAIKAISU)
                          IF    TNS-NYUTENTTLKBN   =    130
                            COMPUTE   RECE62-TENSU(2 BUN-IDX2)  =
                                      RECE62-TENSU(2 BUN-IDX2)  +
                                     (TNS-TEN   *   ACCT-ZAIKAISU)
-                         ELSE  
-                           COMPUTE   RECE62-TENSU(21 BUN-IDX2)  =
-                                     RECE62-TENSU(21 BUN-IDX2)  +
-                                    (WK-SYUTEN   *   ACCT-ZAIKAISU)
+                           COMPUTE   RECE62-TENSU(21 BUN-IDX2) =
+                                     RECE62-TENSU(21 BUN-IDX2) -
+                                    (TNS-TEN   *   ACCT-ZAIKAISU)
                          END-IF
                    END-IF
                    IF    BUN-IDX3       =   3
+                         COMPUTE     RECE62-TENSU(21 BUN-IDX3) =
+                                     RECE62-TENSU(21 BUN-IDX3) +
+                                    (WK-SYUTEN *   WK-ZAIKAISU)
                          IF    TNS-NYUTENTTLKBN   =    130
                            COMPUTE   RECE62-TENSU(2 BUN-IDX3)  =
                                      RECE62-TENSU(2 BUN-IDX3)  +
                                     (TNS-TEN   *   ACCT-ZAIKAISU)
-                         ELSE  
-                           COMPUTE   RECE62-TENSU(21 BUN-IDX3)  =
-                                     RECE62-TENSU(21 BUN-IDX3)  +
-                                    (WK-SYUTEN   *   ACCT-ZAIKAISU)
+                           COMPUTE   RECE62-TENSU(21 BUN-IDX3) =
+                                     RECE62-TENSU(21 BUN-IDX3) -
+                                    (TNS-TEN   *   ACCT-ZAIKAISU)
                          END-IF
                    END-IF
                    IF    BUN-IDX4       =   4
+                         COMPUTE     RECE62-TENSU(21 BUN-IDX4) =
+                                     RECE62-TENSU(21 BUN-IDX4) +
+                                    (WK-SYUTEN *   WK-ZAIKAISU)
                          IF    TNS-NYUTENTTLKBN   =    130
                            COMPUTE   RECE62-TENSU(2 BUN-IDX4)  =
                                      RECE62-TENSU(2 BUN-IDX4)  +
                                     (TNS-TEN   *   ACCT-ZAIKAISU)
-                         ELSE
-                           COMPUTE   RECE62-TENSU(21 BUN-IDX4)  =
-                                     RECE62-TENSU(21 BUN-IDX4)  +
-                                    (WK-SYUTEN   *   ACCT-ZAIKAISU)
+                           COMPUTE   RECE62-TENSU(21 BUN-IDX4) =
+                                     RECE62-TENSU(21 BUN-IDX4) -
+                                    (TNS-TEN   *   ACCT-ZAIKAISU)
                          END-IF
                    END-IF
                    IF    BUN-IDX        =   1
