@@ -58,12 +58,14 @@
            03  FLG-ERR                         PIC 9(01).
            03  FLG-HIT                         PIC 9(01).
            03  FLG-UPDATE-SYSKANRI             PIC 9(01).
+           03  FLG-FIXED                       PIC 9(01).
       *
        01  IDX-AREA.
            03  IDX0                            PIC 9(05).
            03  IDX1                            PIC 9(05).
            03  IDX2                            PIC 9(05).
            03  IDXA                            PIC 9(05).
+           03  IDXK                            PIC 9(04).
            03  IDX-STR                         PIC 9(05).
       *
        01  WRK-AREA.
@@ -90,6 +92,18 @@
            03  WRK-ATO-INPUT                   PIC X(100).
            03  WRK-STR                         PIC X(100).
            03  WRK-ERRMSG                      PIC X(200).
+           03  WRK-ZERO                        PIC X(10).
+           03  WRK-NUM99-G.
+               05  WRK-NUM99                   PIC 99.
+           03  WRK-NUMZ9                       PIC Z9.
+           03  WRK-NUMMSG                      PIC X(04).
+           03  WRK-MAX                         PIC 9(03).
+           03  WRK-FMTNUM-G.
+               05  WRK-FMTNUM-X10              PIC X(10).
+               05  WRK-FMTNUM-R1   REDEFINES   WRK-FMTNUM-X10.
+                   07  WRK-FMTNUM-Z10          PIC Z(9)9.
+               05  WRK-FMTNUM-R2   REDEFINES   WRK-FMTNUM-X10.
+                   07  WRK-FMTNUM-910          PIC 9(10).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -104,6 +118,20 @@
        01  WRK-CONS-AREA.
       *    パラメータ最大個数
            03  WRK-CONS-PARA-MAX               PIC 9(05) VALUE 10.
+           03  WRK-CONS-NUMMSG-G.
+               05  WRK-CONS-NUMMSG-VAL.
+                   07  WRK-CONS-NUMMSG-01      PIC X(04) VALUE "１".
+                   07  WRK-CONS-NUMMSG-02      PIC X(04) VALUE "２".
+                   07  WRK-CONS-NUMMSG-03      PIC X(04) VALUE "３".
+                   07  WRK-CONS-NUMMSG-04      PIC X(04) VALUE "４".
+                   07  WRK-CONS-NUMMSG-05      PIC X(04) VALUE "５".
+                   07  WRK-CONS-NUMMSG-06      PIC X(04) VALUE "６".
+                   07  WRK-CONS-NUMMSG-07      PIC X(04) VALUE "７".
+                   07  WRK-CONS-NUMMSG-08      PIC X(04) VALUE "８".
+                   07  WRK-CONS-NUMMSG-09      PIC X(04) VALUE "９".
+                   07  WRK-CONS-NUMMSG-10      PIC X(04) VALUE "１０".
+               05  WRK-CONS-NUMMSG-R  REDEFINES   WRK-CONS-NUMMSG-VAL.
+                   07  WRK-CONS-NUMMSG         PIC X(04) OCCURS 10.
       *
        01  WTMEMO-AREA.
            COPY    "CPTOUKEIMEMO.INC"  REPLACING   //TKIMEMO-//
@@ -575,12 +603,23 @@
                MOVE    "0"             TO  SPA-NAI-G03-HENPARA(IDXA)
                MOVE    "0"
                                        TO  SPA-GMN-G03-PARA   (IDXA)
-           WHEN    "PTNUM"
+           WHEN    "N1"
+           WHEN    "N2"
+           WHEN    "N3"
+           WHEN    "N4"
+           WHEN    "N5"
+           WHEN    "N6"
+           WHEN    "N7"
+           WHEN    "N8"
+           WHEN    "N9"
+           WHEN    "N10"
+           WHEN    "PSN1"
+               MOVE    "0"             TO  SPA-NAI-G03-HENPARA(IDXA)
+               MOVE    "0"
+                                       TO  SPA-GMN-G03-PARA   (IDXA)
+           WHEN    OTHER
                MOVE    SPACE           TO  SPA-NAI-G03-HENPARA(IDXA)
                MOVE    SPACE           TO  SPA-GMN-G03-PARA   (IDXA)
-      *    WHEN    OTHER
-      *        MOVE    "0002"  TO  SPA-ERRCD
-      *        GO  TO  41011-PARA-KIHON-SET-EXT
            END-EVALUATE
       *
            .
@@ -633,6 +672,68 @@
                ELSE
                    MOVE    "0002"      TO  SPA-ERRCD
                END-IF
+           WHEN    "N1"
+           WHEN    "N2"
+           WHEN    "N3"
+           WHEN    "N4"
+           WHEN    "N5"
+           WHEN    "N6"
+           WHEN    "N7"
+           WHEN    "N8"
+           WHEN    "N9"
+           WHEN    "N10"
+               MOVE    ZERO            TO  FLG-FIXED
+               PERFORM 410121-PARA-NUM-CHK-SEC
+           WHEN    "N01"
+           WHEN    "N02"
+           WHEN    "N03"
+           WHEN    "N04"
+           WHEN    "N05"
+           WHEN    "N06"
+           WHEN    "N07"
+           WHEN    "N08"
+           WHEN    "N09"
+           WHEN    "N010"
+               MOVE    1               TO  FLG-FIXED
+               PERFORM 410121-PARA-NUM-CHK-SEC
+           WHEN    "A"
+           WHEN    "A1"
+           WHEN    "A2"
+           WHEN    "A3"
+           WHEN    "A4"
+           WHEN    "A5"
+           WHEN    "A6"
+           WHEN    "A7"
+           WHEN    "A8"
+           WHEN    "A9"
+           WHEN    "A10"
+               MOVE    SPA-GMN-G03-PARA (IDXA)
+                                       TO  WRK-MAE-INPUT
+               PERFORM 800-HANKAKU-CHK-SEC
+               MOVE    WRK-ATO-INPUT   TO  SPA-GMN-G03-PARA (IDXA)
+               IF    ( FLG-ERR     NOT =   ZERO )
+                   MOVE    "0002"  TO  SPA-ERRCD
+               END-IF
+               IF    ( SPA-ERRCD   =   SPACE )
+                AND  ( SPA-NAI-G03-PARA (IDXA)
+                               NOT =   "A" )
+                   INITIALIZE                  ORCSNUMAREA
+                   MOVE    SPA-NAI-G03-PARA (IDXA)(2:)
+                                           TO  SNUM-INX
+                   CALL    "ORCSNUM"           USING
+                                               ORCSNUMAREA
+                   MOVE    SNUM-OUTNUM     TO  WRK-MAX
+                   IF    ( SPA-GMN-G03-PARA (IDXA)(WRK-MAX + 1 :)
+                                        NOT =   SPACE )
+                       MOVE    "0103"      TO  SPA-ERRCD
+                       MOVE   WRK-CONS-NUMMSG (WRK-MAX)
+                                           TO  WRK-NUMMSG
+                   END-IF
+               END-IF
+               IF    ( SPA-ERRCD   =   SPACE )
+                   MOVE    SPA-GMN-G03-PARA (IDXA)
+                                       TO  SPA-NAI-G03-HENPARA (IDXA)
+               END-IF
            WHEN    "PTNUM"
                IF    ( SPA-GMN-G03-PARA (IDXA)    =   "*" or "＊" )
                    MOVE    "*"         TO  SPA-NAI-G03-HENPARA (IDXA)
@@ -666,6 +767,63 @@
       *
            .
        41012-PARA-NAIYO-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    パラメータ数値項目入力内容チェック処理
+      *****************************************************************
+       410121-PARA-NUM-CHK-SEC         SECTION.
+      *
+           INITIALIZE                  ORCSNUMAREA
+           MOVE   SPA-NAI-G03-PARA (IDXA)(2:)
+                                   TO  SNUM-INX
+           CALL   "ORCSNUM"            USING
+                                       ORCSNUMAREA
+           MOVE   SNUM-OUTNUM      TO  WRK-MAX
+      *
+           INITIALIZE                  ORCSNUMAREA
+           MOVE   SPA-GMN-G03-PARA (IDXA)
+                                   TO  SNUM-INX
+           CALL    "ORCSNUM"           USING
+                                       ORCSNUMAREA
+           EVALUATE    TRUE
+           WHEN  ( SNUM-RC         NOT =   ZERO  )
+            OR   ( SNUM-SYOKBN         =   "1"   )
+            OR   ( SNUM-MINKBN         =   "1"   )
+               MOVE    "0002"      TO  SPA-ERRCD
+               MOVE   WRK-CONS-NUMMSG (WRK-MAX)
+                                   TO  WRK-NUMMSG
+           WHEN  ( SNUM-SEISUU         >   WRK-MAX )
+           WHEN  ( SPA-GMN-G03-PARA (IDXA)(WRK-MAX + 1 :)
+                               NOT =   SPACE )
+               MOVE    "0103"      TO  SPA-ERRCD
+               MOVE   WRK-CONS-NUMMSG (WRK-MAX)
+                                   TO  WRK-NUMMSG
+           END-EVALUATE
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( FLG-FIXED       =   ZERO )
+                   MOVE    SPA-GMN-G03-PARA (IDXA)
+                                   TO  WRK-FMTNUM-X10
+                   PERFORM VARYING IDXK    FROM    1   BY  1
+                           UNTIL ( IDXK    >   10 )
+                       IF    ( WRK-FMTNUM-X10(IDXK :1)
+                                       NOT =   SPACE )
+                           MOVE    WRK-FMTNUM-X10 (IDXK :)
+                               TO   SPA-NAI-G03-HENPARA (IDXA)
+                                    SPA-GMN-G03-PARA    (IDXA)
+                           MOVE    10      TO  IDXK
+                       END-IF
+                   END-PERFORM
+               ELSE
+                   MOVE    SNUM-OUTNUM TO   WRK-FMTNUM-910
+                   MOVE    WRK-FMTNUM-X10(11 - WRK-MAX : WRK-MAX)
+                               TO   SPA-NAI-G03-HENPARA (IDXA)
+                                     SPA-GMN-G03-PARA    (IDXA)
+               END-IF
+           END-IF
+      *
+           .
+       410121-PARA-NUM-CHK-EXT.
            EXIT.
       *****************************************************************
       *    共通関連チェック
@@ -1152,6 +1310,24 @@
            WHEN    "0007"
                MOVE    "パラメタ説明の更新に失敗しました"
                                                    TO  SPA-ERRMSG
+           WHEN    "0101"
+               MOVE    "半角文字を規定文字数以内で入力してください"
+                                                   TO  SPA-ERRMSG
+           WHEN    "0102"
+               STRING  "数字（０以上）を規定桁数以内で入力してください"
+                                               DELIMITED BY  SPACE
+                       "【"                    DELIMITED BY  SIZE
+                       WRK-ERRMSG              DELIMITED BY  SPACE
+                       "】"                    DELIMITED BY  SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "0103"
+               STRING  "入力エラー"            DELIMITED BY  SIZE
+                       "【"                    DELIMITED BY  SIZE
+                       WRK-ERRMSG              DELIMITED BY  SPACE
+                       "】"                    DELIMITED BY  SIZE
+               INTO    SPA-ERRMSG
+               END-STRING
            END-EVALUATE
       *
            MOVE    SPACE               TO  GERR
@@ -1260,6 +1436,27 @@
       *
            .
        800-KANA-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    半角チェック処理
+      *****************************************************************
+       800-HANKAKU-CHK-SEC             SECTION.
+      *
+           MOVE    ZERO            TO  FLG-ERR
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
+           IF     (KANACHK-RC      NOT =   ZERO  )  OR
+                  (KANACHK-SYUBETU NOT =   1     )
+               MOVE    1                   TO  FLG-ERR
+           END-IF
+      *
+           .
+       800-HANKAKU-CHK-EXT.
            EXIT.
       *****************************************************************
       *    マシン日付取得サブ
