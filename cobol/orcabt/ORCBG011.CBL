@@ -132,6 +132,7 @@
        01  KEY-AREA.
            03  KEY-HOSPNUM                 PIC 9(02).
            03  KEY-PTNUM                   PIC X(20).
+           03  KEY-NYUGAIKBN               PIC X(1).
            03  KEY-PTID                    PIC 9(10).
       *
       *    一時領域
@@ -140,8 +141,8 @@
                05  WRK-SYY             PIC 9(04).
                05  WRK-SMM             PIC 9(02).
                05  WRK-SDD             PIC 9(02).
-           03  WRK-DBPATH                          PIC X(100).
-           03  WRK-DBTABLE                         PIC X(100).
+           03  WRK-PATHNAME            PIC X(64).
+           03  WRK-TABLE               PIC X(64).
            03  WRK-HENYMD              PIC X(09).
            03  WRK-HENYMDG             PIC X(22).
            03  WRK-RECEERR                         PIC X(200).
@@ -408,16 +409,20 @@
              OR  ( WRK-PARA-NYUGAIKBN  =   "2" )
                CONTINUE
            ELSE
-               MOVE    "2"             TO  WRK-PARA-NYUGAIKBN
+               MOVE    "0"             TO  WRK-PARA-NYUGAIKBN
            END-IF
       *
-           IF    ( WRK-PARA-NYUGAIKBN  =   "1" )
+           EVALUATE    WRK-PARA-NYUGAIKBN
+           WHEN    "1"
                MOVE    "未収金一覧表−入院（伝票別）"
                                        TO  WRK-TITLE
-           ELSE
+           WHEN    "2"
                MOVE    "未収金一覧表−外来（伝票別）"
                                        TO  WRK-TITLE
-           END-IF
+           WHEN    OTHER
+               MOVE    "未収金一覧表（伝票別）"
+                                       TO  WRK-TITLE
+           END-EVALUATE
       *
       *    ステップ管理開始処理
            MOVE    "STS"               TO  SJOBKANRI-MODE
@@ -667,10 +672,16 @@
       *    期間処理区分チェック
            EVALUATE    WRK-PARA-SYORIKBN
            WHEN    "1"
-               MOVE    "締月翌月以降の訂正・入金を含む"
+               MOVE    "期間内の診療分（期間外の訂正・入金を含む）"
                                        TO  WRK-MES
            WHEN    "2"
-               MOVE    "締月翌月以降の訂正・入金は含まず"
+               MOVE    "期間内の診療分（期間外の訂正・入金を含まない）"
+                                       TO  WRK-MES
+           WHEN    "3"
+               MOVE    "期間内の請求分（期間外の訂正・入金を含む）"
+                                       TO  WRK-MES
+           WHEN    "4"
+               MOVE    "期間内の請求分（期間外の訂正・入金を含まない）"
                                        TO  WRK-MES
            WHEN    OTHER
                MOVE    SPACE           TO  WRK-RECEERR
@@ -701,8 +712,8 @@
                                        SYS-1009-EDYUKYMD
            MOVE    SPA-HOSPNUM     TO  SYS-1009-HOSPNUM
            MOVE    SYS-1009-REC        TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"  TO  WRK-DBTABLE
-           MOVE    "key10"         TO  WRK-DBPATH
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
            PERFORM 900-TBL-SELECT-SEC
            IF    ( FLG-DBRC            =   ZERO )
                MOVE    MCPDATA-REC         TO  SYS-1009-REC
@@ -730,8 +741,8 @@
                                        TO  SPA-1009-KKCKSIATOKETA
            END-IF
       *
-           MOVE    "tbl_syskanri"  TO  WRK-DBTABLE
-           MOVE    "key10"         TO  WRK-DBPATH
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key10"         TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
       *
            .
@@ -750,8 +761,8 @@
            MOVE    "1005"              TO  SYS-1005-KANRICD
            MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
            MOVE    SYS-1005-REC        TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"  TO  WRK-DBTABLE
-           MOVE    "key5"          TO  WRK-DBPATH
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key5"          TO  MCP-PATHNAME
            PERFORM 900-TBL-SELECT-SEC
            IF    ( FLG-DBRC        NOT =   ZERO )
                MOVE    1               TO  FLG-SYSKANRI
@@ -774,8 +785,8 @@
                                                              (IDX1)
                MOVE    SYS-1005-SRYKANAME  TO  WRK-SRYKAMEIL (IDX1)
       *
-               MOVE    "tbl_syskanri"  TO  WRK-DBTABLE
-               MOVE    "key5"          TO  WRK-DBPATH
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key5"          TO  MCP-PATHNAME
                PERFORM 900-TBL-READ-SEC
                IF    ( FLG-DBRC        NOT =   ZERO )
                    MOVE    1               TO  FLG-SYSKANRI
@@ -785,8 +796,8 @@
       *
            END-PERFORM
       *
-           MOVE    "tbl_syskanri"  TO  WRK-DBTABLE
-           MOVE    "key5"          TO  WRK-DBPATH
+           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+           MOVE    "key5"          TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
       *
            .
@@ -801,19 +812,17 @@
       *
       *    タイトル
            IF    ( WRK-PARA-NYUGAIKBN  =   "1" )
-               MOVE    "　未収金一覧表−入院（伝票別）　"
-                                       TO  WKHCM39-TITLE
                MOVE    "請求期間"      TO  WKHCM39-DAI
                                            CSV-SRYYMD
            ELSE
-               MOVE    "　未収金一覧表−外来（伝票別）　"
-                                       TO  WKHCM39-TITLE
                MOVE    "診療日"        TO  WKHCM39-DAI
                                            CSV-SRYYMD
            END-IF
       *
       *    作成日
-           MOVE     WRK-SAKUSEIBI      TO  WKHCM39-SAKUSEIBI
+           MOVE    LNK-PRTKANRI-SKYYMD TO  WRK-SYMD
+           PERFORM 31012-SEIWA-HEN-SEC
+           MOVE    WRK-HENYMDG         TO  WKHCM39-SAKUSEIBI
       *
       *    期間
            MOVE    WRK-KIKAN           TO  WKHCM39-KIKAN
@@ -862,6 +871,16 @@
       *
            OPEN    OUTPUT                  BG01101-FILE
       *
+           EVALUATE    WRK-PARA-SYORIKBN
+           WHEN  "3"
+           WHEN  "4"
+               MOVE    "view_bd003"    TO  WRK-TABLE
+               MOVE    "key6"          TO  WRK-PATHNAME
+           WHEN  OTHER
+               MOVE    "view_bd003"    TO  WRK-TABLE
+               MOVE    "key2"          TO  WRK-PATHNAME
+           END-EVALUATE
+      *
            PERFORM 20011-BD003-SEL-SEC
       *
            PERFORM UNTIL ( FLG-BD003   NOT =   ZERO )
@@ -874,8 +893,8 @@
                    PERFORM 2101-TOKEI-SET-SEIKYU-SEC
                END-IF
       *
-               MOVE    "view_bd003"    TO  WRK-DBTABLE
-               MOVE    "key2"          TO  WRK-DBPATH
+               MOVE    WRK-TABLE       TO  MCP-TABLE
+               MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
                PERFORM 900-TBL-READ-SEC
                IF    ( FLG-DBRC    NOT =   ZERO )
                    MOVE    1               TO  FLG-BD003
@@ -885,8 +904,8 @@
       *
            END-PERFORM
       *
-           MOVE    "view_bd003"    TO  WRK-DBTABLE
-           MOVE    "key2"          TO  WRK-DBPATH
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
       *
            CLOSE   BG01101-FILE
@@ -903,11 +922,16 @@
       *
            INITIALIZE                      BD003-REC
            MOVE    SPA-HOSPNUM         TO  BD003-HOSPNUM
-           MOVE    WRK-PARA-NYUGAIKBN  TO  BD003-NYUGAIKBN
+           IF    ( WRK-PARA-NYUGAIKBN  =   "0" )
+               MOVE    "%"             TO  BD003-NYUGAIKBN
+           ELSE
+               MOVE    WRK-PARA-NYUGAIKBN
+                                       TO  BD003-NYUGAIKBN
+           END-IF
            MOVE    WRK-YUKOSTRYMD      TO  BD003-STSRYYMD
            MOVE    WRK-YUKOENDYMD      TO  BD003-EDSRYYMD
       *
-           IF    ( WRK-PARA-SYORIKBN     =   "1" )
+           IF    ( WRK-PARA-SYORIKBN     =   "1" OR "3" )
                MOVE    "99999999"          TO  BD003-NYUHEN-YMD
            ELSE
                MOVE    BD003-EDSRYYMD      TO  BD003-NYUHEN-YMD
@@ -915,8 +939,8 @@
       *
            MOVE    BD003-REC               TO  MCPDATA-REC
       *
-           MOVE    "view_bd003"    TO  WRK-DBTABLE
-           MOVE    "key2"          TO  WRK-DBPATH
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            PERFORM 900-TBL-SELECT-SEC
            IF    ( FLG-DBRC        NOT =   ZERO )
                MOVE    1                   TO  FLG-BD003
@@ -990,21 +1014,7 @@
       *****************************************************************
        2001-MISYU-HEN-SEC              SECTION.
       *
-           INITIALIZE                  HCM39
-      *
-           MOVE    LOW-VALUE       TO  KEY-HOSPNUM
-                                       KEY-PTNUM
-           MOVE    ZERO            TO  KEY-PTID
-      *
            MOVE    ZERO            TO  CNT-PAGE
-                                       CNT-LINE
-                                       CNT-PTSYU
-                                       CNT-KNS
-      *
-           MOVE    ZERO            TO  WRK-SKYMONEY-TTL
-                                       WRK-MISYU-TTL
-      *
-           MOVE    ZERO            TO  FLG-SKIP
       *
            MOVE    ZERO            TO  FLG-BG01101
            OPEN    INPUT               BG01101-FILE
@@ -1015,30 +1025,69 @@
            PERFORM UNTIL ( FLG-BG01101 NOT =   ZERO )
                     OR   ( FLG-END     NOT =   ZERO )
       *
-               IF    ( BG01101-HOSPNUM     =   KEY-HOSPNUM )
-                AND  ( BG01101-PTNUM       =   KEY-PTNUM  )
-                   CONTINUE
-               ELSE
-                   MOVE    BG01101-HOSPNUM TO  KEY-HOSPNUM
-                   MOVE    BG01101-PTNUM   TO  KEY-PTNUM
-                   MOVE    BG01101-PTID    TO  KEY-PTID
-                   MOVE    ZERO            TO  CNT-PTSYU
-                   PERFORM 20011-PTINF-HEN-SEC
-               END-IF
+               MOVE    BG01101-NYUGAIKBN
+                                       TO  KEY-NYUGAIKBN
       *
-               IF    ( FLG-SKIP            =   ZERO )
+               MOVE    LOW-VALUE       TO  KEY-HOSPNUM
+                                           KEY-PTNUM
+               MOVE    ZERO            TO  KEY-PTID
       *
-                   PERFORM 20011-MISYU-HEN-SEC
-               END-IF
+               MOVE    ZERO            TO  CNT-PTSYU
+                                           CNT-KNS
       *
-      *        処理対象患者ファイル読み込み処理
-               PERFORM 20011-BG01101-REAC-SEC
+               MOVE    ZERO            TO  WRK-SKYMONEY-TTL
+                                           WRK-MISYU-TTL
+      *
+               MOVE    ZERO            TO  FLG-SKIP
+      *
+               PERFORM UNTIL ( FLG-BG01101 NOT =   ZERO )
+                        OR   ( FLG-END     NOT =   ZERO )
+                        OR   ( BG01101-NYUGAIKBN
+                                           NOT =   KEY-NYUGAIKBN )
+      *
+                   INITIALIZE                  HCM39
+                                               CNT-LINE
+      *
+                   IF    ( BG01101-NYUGAIKBN   =   "1" )
+                       MOVE    "　未収金一覧表−入院（伝票別）　"
+                                       TO  WKHCM39-TITLE
+                   ELSE
+                       MOVE    "　未収金一覧表−外来（伝票別）　"
+                                       TO  WKHCM39-TITLE
+                   END-IF
+      *
+                   PERFORM UNTIL ( FLG-BG01101 NOT =   ZERO )
+                            OR   ( FLG-END     NOT =   ZERO )
+                            OR   ( BG01101-NYUGAIKBN
+                                               NOT =   KEY-NYUGAIKBN )
+                            OR   ( CNT-LINE       >=   30 )
+      *
+                       IF    ( BG01101-HOSPNUM     =   KEY-HOSPNUM )
+                        AND  ( BG01101-PTNUM       =   KEY-PTNUM  )
+                           CONTINUE
+                       ELSE
+                           MOVE    BG01101-HOSPNUM TO  KEY-HOSPNUM
+                           MOVE    BG01101-PTNUM   TO  KEY-PTNUM
+                           MOVE    BG01101-PTID    TO  KEY-PTID
+                           MOVE    ZERO            TO  CNT-PTSYU
+                           PERFORM 20011-PTINF-HEN-SEC
+                       END-IF
+      *
+                       IF    ( FLG-SKIP            =   ZERO )
+      *
+                           PERFORM 20011-MISYU-HEN-SEC
+                       END-IF
+      *
+      *                処理対象患者ファイル読み込み処理
+                       PERFORM 20011-BG01101-REAC-SEC
+      *
+                   END-PERFORM
+      *
+                   PERFORM 20011-PRINT-SEC
+      *
+               END-PERFORM
       *
            END-PERFORM
-      *
-           IF    ( CNT-LINE               >    ZERO )
-               PERFORM 20011-PRINT-SEC
-           END-IF
       *
            .
        2001-MISYU-HEN-EXT.
@@ -1068,8 +1117,8 @@
            MOVE    KEY-HOSPNUM         TO  PTINF-HOSPNUM
            MOVE    KEY-PTID            TO  PTINF-PTID
            MOVE    PTINF-REC           TO  MCPDATA-REC
-           MOVE    "tbl_ptinf"     TO  WRK-DBTABLE
-           MOVE    "key"           TO  WRK-DBPATH
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
            PERFORM 900-TBL-SELECT-SEC
            IF    ( FLG-DBRC        NOT =   ZERO )
                MOVE    SPACE           TO  PTINF-REC
@@ -1077,8 +1126,8 @@
                MOVE    MCPDATA-REC     TO  PTINF-REC
            END-IF
       *
-           MOVE    "tbl_ptinf"     TO  WRK-DBTABLE
-           MOVE    "key"           TO  WRK-DBPATH
+           MOVE    "tbl_ptinf"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
       *
            IF    ( PTINF-TSTPTNUMKBN   =   1 )
@@ -1111,13 +1160,6 @@
       *    未収金一覧編集処理
       *****************************************************************
        20011-MISYU-HEN-SEC                 SECTION.
-      *
-           IF    ( CNT-LINE               >=   30 )
-               PERFORM 20011-PRINT-SEC
-               IF    ( FLG-END         NOT =   ZERO )
-                   GO  TO  20011-MISYU-HEN-EXT
-               END-IF
-           END-IF
       *
            COMPUTE CNT-LINE    =   CNT-LINE    +   1
            COMPUTE CNT-PTSYU   =   CNT-PTSYU   +   1
@@ -1314,8 +1356,8 @@
            MOVE    BG01101-PTID        TO  SYU-PTID
            MOVE    BG01101-DENPNUM     TO  SYU-DENPNUM
            MOVE    SYUNOU-REC          TO  MCPDATA-REC
-           MOVE    "tbl_syunou"    TO  WRK-DBTABLE
-           MOVE    "key"           TO  WRK-DBPATH
+           MOVE    "tbl_syunou"    TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
            PERFORM 900-TBL-SELECT-SEC
            IF    ( FLG-DBRC        NOT =   ZERO )
                INITIALIZE                  SYUNOU-REC
@@ -1323,8 +1365,8 @@
                MOVE    MCPDATA-REC     TO  SYUNOU-REC
            END-IF
       *
-           MOVE    "tbl_syunou"    TO  WRK-DBTABLE
-           MOVE    "key"           TO  WRK-DBPATH
+           MOVE    "tbl_syunou"    TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
            PERFORM 900-TBL-CLOSE-SEC
            .
       *
@@ -1366,6 +1408,8 @@
            MOVE    WKHCM39-DAI         TO  HCM39-DAI
       *
            IF    ( FLG-BG01101     NOT =   ZERO )
+            OR   ( BG01101-NYUGAIKBN
+                                   NOT =   KEY-NYUGAIKBN )
                MOVE    "合計"          TO  HCM39-GTTL
                MOVE    WRK-MISYU-TTL   TO  WRK-MISYUF
                MOVE    WRK-MISYUF      TO  HCM39-MISYUG
@@ -1751,16 +1795,16 @@
        900-TBL-SELECT-SEC          SECTION.
       *
            MOVE    ZERO            TO  FLG-DBRC
-           MOVE    WRK-DBTABLE     TO  MCP-TABLE
-           MOVE    WRK-DBPATH      TO  MCP-PATHNAME
+           MOVE    MCP-TABLE     TO  MCP-TABLE
+           MOVE    MCP-PATHNAME      TO  MCP-PATHNAME
            MOVE    "DBSELECT"      TO  MCP-FUNC
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
                                        SPA-AREA
            IF        ( MCP-RC          =   ZERO )
-               MOVE    WRK-DBTABLE     TO  MCP-TABLE
-               MOVE    WRK-DBPATH      TO  MCP-PATHNAME
+               MOVE    MCP-TABLE     TO  MCP-TABLE
+               MOVE    MCP-PATHNAME      TO  MCP-PATHNAME
                MOVE    "DBFETCH"       TO  MCP-FUNC
                CALL    "ORCDBMAIN"         USING
                                            MCPAREA
@@ -1785,8 +1829,6 @@
        900-TBL-READ-SEC            SECTION.
       *
            MOVE    ZERO            TO  FLG-DBRC
-           MOVE    WRK-DBTABLE     TO  MCP-TABLE
-           MOVE    WRK-DBPATH      TO  MCP-PATHNAME
            MOVE    "DBFETCH"       TO  MCP-FUNC
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
@@ -1807,8 +1849,6 @@
       *****************************************************************
        900-TBL-CLOSE-SEC           SECTION.
       *
-           MOVE    WRK-DBTABLE     TO  MCP-TABLE
-           MOVE    WRK-DBPATH      TO  MCP-PATHNAME
            MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA

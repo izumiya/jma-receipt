@@ -156,6 +156,8 @@
            03  WRK-SRYKA               PIC X(02).
            03  WRK-LASTYMD             PIC X(10).
            03  WRK-NYUHENYMD           PIC X(10).
+           03  WRK-TABLE               PIC X(64).
+           03  WRK-PATHNAME            PIC X(64).
       *
        01  WRK-HEN-YMD-OT.
            03  WRK-HEN-YY-OT       PIC X(04).
@@ -644,10 +646,16 @@
       *    期間処理区分チェック
            EVALUATE    PARA-SYORIKBN
            WHEN    "1"
-               MOVE    "締月翌月以降の訂正・入金を含む"
+               MOVE    "期間内の診療分（期間外の訂正・入金を含む）"
                                        TO  WRK-MES
            WHEN    "2"
-               MOVE    "締月翌月以降の訂正・入金は含まず"
+               MOVE    "期間内の診療分（期間外の訂正・入金を含まない）"
+                                       TO  WRK-MES
+           WHEN    "3"
+               MOVE    "期間内の請求分（期間外の訂正・入金を含む）"
+                                       TO  WRK-MES
+           WHEN    "4"
+               MOVE    "期間内の請求分（期間外の訂正・入金を含まない）"
                                        TO  WRK-MES
            WHEN    OTHER
                MOVE    SPACE           TO  WRK-RECEERR
@@ -726,6 +734,13 @@
            MOVE    ZERO            TO  WRK-GSURYO
       *
       *    未収金一覧用収納明細情報読み込み
+           IF    ( PARA-SYORIKBN   =   "3" OR "4" )
+               MOVE    "view_bd003"    TO  WRK-TABLE
+               MOVE    "key5"          TO  WRK-PATHNAME
+           ELSE
+               MOVE    "view_bd003"    TO  WRK-TABLE
+               MOVE    "key"           TO  WRK-PATHNAME
+           END-IF
            PERFORM 900-BD003-SELECT-SEC
       *
       *    未収金一覧用収納明細情報セット
@@ -1053,6 +1068,9 @@
       *****************************************************************
        31012-SEIWA-HEN-SEC         SECTION.
       *
+           MOVE    SPACE           TO  WRK-HENYMD
+                                       WRK-HENYMDG
+      *
            INITIALIZE                  STS-AREA-DAY
            INITIALIZE                  LNK-DAY2-AREA
            MOVE    "21"            TO  LNK-DAY2-IRAI
@@ -1060,11 +1078,15 @@
            CALL    "ORCSDAY"           USING
                                        STS-AREA-DAY
                                        LNK-DAY2-AREA
-           MOVE    LNK-DAY2-EDTYMD1
-                                  TO  WRK-HENYMD
-           MOVE    LNK-DAY2-EDTYMD3
-                                  TO  WRK-HENYMDG
+           IF    ( STS-DAY-RC1     =    ZERO  )
+               MOVE    LNK-DAY2-EDTYMD1
+                                  TO   WRK-HENYMD
+               MOVE    LNK-DAY2-EDTYMD3
+                                  TO   WRK-HENYMDG
+           END-IF
+      *
            INSPECT WRK-HENYMDG    REPLACING  ALL "  "  BY  "　"
+      *
            .
        31012-SEIWA-HEN-EXT.
            EXIT.
@@ -1513,7 +1535,7 @@
            MOVE    WRK-YUKOSTRYMD  TO  BD003-STSRYYMD
            MOVE    WRK-YUKOENDYMD  TO  BD003-EDSRYYMD
       *
-           IF      PARA-SYORIKBN   =   "1"
+           IF      PARA-SYORIKBN   =   "1" OR "3"
                MOVE    "99999999"      TO  BD003-NYUHEN-YMD
            ELSE
                MOVE    WRK-YUKOENDYMD  TO  BD003-NYUHEN-YMD
@@ -1521,8 +1543,8 @@
       *
            MOVE    BD003-REC       TO  MCPDATA-REC
            MOVE    "DBSELECT"      TO  MCP-FUNC
-           MOVE    "view_bd003"    TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
@@ -1543,8 +1565,8 @@
        900-BD003-FETCH-SEC         SECTION.
       *
            MOVE    "DBFETCH"       TO  MCP-FUNC
-           MOVE    "view_bd003"    TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
@@ -1565,8 +1587,8 @@
        900-BD003-CLOSE-SEC         SECTION.
       *
            MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
-           MOVE    "view_bd003"    TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
@@ -1582,10 +1604,18 @@
       *
            MOVE    ZERO            TO  FLG-BD003
       *
+           IF    ( PARA-SYORIKBN   =   "1" OR "2" )
+              MOVE    "view_bd003" TO  WRK-TABLE
+              MOVE    "key3"       TO  WRK-PATHNAME
+           ELSE
+              MOVE    "view_bd003" TO  WRK-TABLE
+              MOVE    "key7"       TO  WRK-PATHNAME
+           END-IF
+      *
            INITIALIZE                  BD003-REC
            MOVE    SPA-HOSPNUM     TO  BD003-HOSPNUM
            MOVE    TOKEI-PTID      TO  BD003-PTID
-           IF      PARA-SYORIKBN   =   "1"
+           IF      PARA-SYORIKBN   =   "1" OR "3"
                MOVE    "99999999"  TO  BD003-NYUHEN-YMD
            ELSE
                MOVE    WRK-YUKOENDYMD
@@ -1595,16 +1625,16 @@
            MOVE    WRK-YUKOENDYMD  TO  BD003-EDSRYYMD 
            MOVE    BD003-REC       TO  MCPDATA-REC
            MOVE    "DBSELECT"      TO  MCP-FUNC
-           MOVE    "view_bd003"    TO  MCP-TABLE
-           MOVE    "key3"          TO  MCP-PATHNAME
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
                                        SPA-AREA
            IF      MCP-RC          =   ZERO
                MOVE    "DBFETCH"       TO  MCP-FUNC
-               MOVE    "view_bd003"    TO  MCP-TABLE
-               MOVE    "key3"          TO  MCP-PATHNAME
+               MOVE    WRK-TABLE       TO  MCP-TABLE
+               MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
                CALL    "ORCDBMAIN"         USING
                                            MCPAREA
                                            MCPDATA-REC
@@ -1621,8 +1651,8 @@
            END-IF
       *
            MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
-           MOVE    "view_bd003"    TO  MCP-TABLE
-           MOVE    "key3"          TO  MCP-PATHNAME
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                        MCPAREA
                                        MCPDATA-REC
