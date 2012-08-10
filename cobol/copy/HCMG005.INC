@@ -16,3 +16,5 @@
               03  HCMG005-DAY-91  PIC X(9).
               03  HCMG005-AST-180 PIC X(2).
               03  HCMG005-DAY-180 PIC X(9).
+            02  HCMG005-TAIINYMD
+                    PIC X(9)    OCCURS  30 TIMES.

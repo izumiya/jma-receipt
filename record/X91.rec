@@ -1,5 +1,8 @@
 X91	{
 	fixed2	{
+		KJNYMD	{
+			value	varchar(10);
+		};
 		CHKYKZBYO	{
 			value	bool;
 		};
@@ -55,10 +58,10 @@ X91	{
 		};
 		CMB_MOREKIKAN	{
 			MOREKIKAN	{
-				value	varchar(20);
+				value	varchar(40);
 			};
 			count	int;
-			item	varchar(20)[5];
+			item	varchar(40)[5];
 		};
 		CHKMOREYKZBYO	{
 			value	bool;

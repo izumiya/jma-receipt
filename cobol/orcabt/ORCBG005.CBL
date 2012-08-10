@@ -692,6 +692,14 @@ grpsys                                         SPA-AREA
       *
            END-PERFORM
       *
+      *    Âà±¡Æü
+           IF    ( PTNYUINRRK-TAIINYMD NOT =   "99999999" )
+               MOVE    PTNYUINRRK-TAIINYMD     TO  WRK-SYMD
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-EDTYMD1             TO  HCMG005-TAIINYMD
+                                                       (CNT-LINE)
+           END-IF
+      *
       *    ÄÌ»»Æü¿ô¥Á¥§¥Ã¥¯¥µ¥Ö¸Æ½Ð
            INITIALIZE                      ORCSTUSANCHKAREA
 grpsys*DD  MOVE    WRK-PARA-HOSPID     TO  STUSANCHK-HOSPID
@@ -721,7 +729,8 @@ grpsys                                     SPA-AREA
            END-IF
       *
       *    £¹£±Æü°Ê¾å
-           IF        ( STUSANCHK-DAY-91-STS    =   ZERO OR "1" )
+           IF    ( STUSANCHK-DAY-91       <=   PTNYUINRRK-TAIINYMD )
+             IF  ( STUSANCHK-DAY-91-STS    =   ZERO OR "1" )
                MOVE    STUSANCHK-DAY-91    TO  WRK-SYMD
                PERFORM 800-SEIWA-HEN-SEC
                MOVE    WRK-EDTYMD1         TO  HCMG005-DAY-91(CNT-LINE)
@@ -733,12 +742,14 @@ grpsys                                     SPA-AREA
                WHEN    OTHER
                    MOVE    "¡ü"            TO  HCMG005-AST-91(CNT-LINE)
                END-EVALUATE
-           ELSE
+             ELSE
                MOVE    "*********"         TO  HCMG005-DAY-91(CNT-LINE)
+             END-IF
            END-IF
       *
       *    £±£¸£°Æü°Ê¾å
-           IF        ( STUSANCHK-DAY-180-STS   =   ZERO OR "2"  )
+           IF    ( STUSANCHK-DAY-180      <=   PTNYUINRRK-TAIINYMD )
+             IF  ( STUSANCHK-DAY-180-STS   =   ZERO OR "2"  )
                MOVE    STUSANCHK-DAY-180   TO  WRK-SYMD
                PERFORM 800-SEIWA-HEN-SEC
                MOVE    WRK-EDTYMD1         TO  HCMG005-DAY-180(CNT-LINE)
@@ -750,10 +761,11 @@ grpsys                                     SPA-AREA
                WHEN    OTHER
                    MOVE    "¡ü"            TO  HCMG005-AST-180(CNT-LINE)
                END-EVALUATE
-           ELSE
+             ELSE
                MOVE    "*********"         TO  HCMG005-DAY-180(CNT-LINE)
+             END-IF
            END-IF
-      *
+  *
            COMPUTE CNT-BG005       =   CNT-BG005   +   1
       *
            PERFORM 900-BG00501SEQ-READ-SEC
