@@ -20,6 +20,7 @@ fi
 #        ${17} 対象範囲
 #        ${18} 出力順
 #        ${19} エラーファイル名 
+#        ${20} 基準日
 #-------------------------------------------#
 #
 ERR_FILE=${19}
@@ -33,7 +34,7 @@ echo $LOGFILE
             rm  $ERR_FILE
         fi
 
-        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBX02 -parameter "$1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16},${17},${18},${19}," > $LOGFILE 2>&1
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBX02 -parameter "$1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16},${17},${18},${19},${20}" > $LOGFILE 2>&1
         if  [ -e $ERR_FILE ]; then
             exit
         fi

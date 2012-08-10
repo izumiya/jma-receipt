@@ -113,6 +113,7 @@
                05  WRK-PARA-MOREBUI                PIC X(01).
            03  WRK-PARA-SRTKBN                     PIC X(01).
            03  RECEERR                             PIC X(200).
+           03  WRK-PARA-KJNYMD                     PIC X(08).
       *
       *    一時領域
        01  WRK-AREA.
@@ -126,6 +127,11 @@
                05  WRK-KIKAN                       PIC Z9.
                05  WRK-KIKANMES                    PIC X(10).
            03  WRK-KANA-STR                        PIC X(500).
+           03  WRK-STSRYYM                         PIC X(6).
+           03  WRK-EDSRYYM                         PIC X(6).
+           03  WRK-YMD                             PIC X(08).
+           03  WRK-ZOGENPTN                        PIC X(01).
+           03  WRK-ZOGEN                           PIC S9(05).
       *
        01  SORTKEY-AREA.
            03  SORTKEY-KEY                         PIC X(200).
@@ -146,20 +152,16 @@
       *
        01  FRM-AREA.
            03  FRM-HEAD1.
-               05  FRM-HEAD1-FL1       PIC X(25)   VALUE   SPACE.
                05  FRM-HEAD1-MIDASI    PIC X(80).
                05  FRM-HEAD1-FL2       PIC X(08)   VALUE   "作成日：".
-               05  FRM-HEAD1-YY        PIC 9(04).
-               05  FRM-HEAD1-FL3       PIC X(01)   VALUE   ".".
-               05  FRM-HEAD1-MM        PIC Z9.
-               05  FRM-HEAD1-FL4       PIC X(01)   VALUE   ".".
-               05  FRM-HEAD1-DD        PIC Z9.
+               05  FRM-HEAD1-SAKYMD    PIC X(09).
                05  FRM-HEAD1-FL5       PIC X(04)   VALUE   "  P-".
                05  FRM-HEAD1-PCNT      PIC ZZ9.
            03  FRM-HEAD2.
                05  FRM-HEAD2-FL1       PIC X(14)
-                                       VALUE   "診療年月指定：".
+                                       VALUE   "期間指定：".
                05  FRM-HEAD2-KIKAN     PIC X(10).
+               05  FRM-HEAD2-FROM-TO   PIC X(19).
                05  FRM-HEAD2-FL2       PIC X(04)   VALUE   SPACE.
                05  FRM-HEAD2-RANGE     PIC X(20).
            03  FRM-BODY.
@@ -178,6 +180,9 @@
       *
       *    スパ領域
            COPY    "COMMON-SPA".
+      *
+           COPY    "COMMON-SPA"            REPLACING   //SPA-//
+                                           BY          //WSPA-//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -283,6 +288,7 @@
                                        WRK-PARA-MORERANGE-G
                                        WRK-PARA-SRTKBN
                                        RECEERR
+                                       WRK-PARA-KJNYMD
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
            MOVE    LNK-PRTKANRI-SKYYMD TO  SPA-SYSYMD
@@ -316,9 +322,11 @@
            INITIALIZE                  SS004-AREA
            MOVE    WRK-PARA-CHKMORE    TO  SS004-SRYCDKBN
            MOVE    WRK-PARA-MOREKIKAN  TO  SS004-KIKAN
+           MOVE    SPA-AREA            TO  WSPA-AREA
+           MOVE    WRK-PARA-KJNYMD     TO  WSPA-SYSYMD
            CALL    "ORCSS004"          USING
                                        SS004-AREA
-                                       SPA-AREA
+                                       WSPA-AREA
       *
            .
        100-INIT-EXT.
@@ -453,9 +461,9 @@
                                        TO  FRM-HEAD1-MIDASI
            END-EVALUATE
       *
-           MOVE    SPA-SYSYMD (1:4)    TO FRM-HEAD1-YY
-           MOVE    SPA-SYSYMD (5:2)    TO FRM-HEAD1-MM
-           MOVE    SPA-SYSYMD (7:2)    TO FRM-HEAD1-DD
+           MOVE    SPA-SYSYMD          TO WRK-SYMD
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-EDTYMD1         TO FRM-HEAD1-SAKYMD
       *
            MOVE    CNT-PAGE            TO FRM-HEAD1-PCNT
       *
@@ -463,11 +471,33 @@
                MOVE    "なし"          TO FRM-HEAD2-KIKAN
            ELSE
                MOVE    WRK-PARA-MOREKIKAN
-                                       TO WRK-KIKAN
-               MOVE    "ヶ月分"        TO WRK-KIKANMES
-               MOVE    WRK-KIKAN-G     TO WRK-KANA-STR
+                                       TO  WRK-KIKAN
+               MOVE    "ヶ月分"        TO  WRK-KIKANMES
+               MOVE    WRK-KIKAN-G     TO  WRK-KANA-STR
                PERFORM 800-ZENKAKU-SEC
-               MOVE    WRK-KANA-STR    TO FRM-HEAD2-KIKAN
+               MOVE    WRK-KANA-STR    TO  FRM-HEAD2-KIKAN
+      *
+               MOVE    WRK-PARA-KJNYMD TO  WRK-YMD
+               MOVE    "2"             TO  WRK-ZOGENPTN
+               COMPUTE WRK-ZOGEN
+                   = ( WRK-PARA-MOREKIKAN  -   1 )  *   -1
+               PERFORM 800-CALENDAR-SEC
+               MOVE    WRK-YMD         TO  WRK-SYMD
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-EDTYMD1     TO  WRK-STSRYYM
+      *
+               MOVE    WRK-PARA-KJNYMD TO  WRK-SYMD
+               PERFORM 800-SEIWA-HEN-SEC
+               MOVE    WRK-EDTYMD1     TO  WRK-EDSRYYM
+      *
+               STRING  "（"            DELIMITED BY SIZE
+                       WRK-STSRYYM     DELIMITED BY SIZE
+                       " - "           DELIMITED BY SIZE
+                       WRK-EDSRYYM     DELIMITED BY SIZE
+                       "）"            DELIMITED BY SIZE
+               INTO    FRM-HEAD2-FROM-TO
+               END-STRING
+      *
            END-IF
       *
            MOVE    SPACE               TO  FRM-HEAD2-RANGE
@@ -709,6 +739,25 @@
        800-ZENKAKU-EXT.
            EXIT.
       *****************************************************************
+      *    カレンダー処理
+      *****************************************************************
+       800-CALENDAR-SEC                SECTION.
+      *
+           INITIALIZE                  STS-AREA-DAY
+           INITIALIZE                  LNK-DAY6-AREA
+           MOVE    "61"                TO  LNK-DAY6-IRAI
+           MOVE    WRK-YMD             TO  LNK-DAY6-KIJUN
+           MOVE    WRK-ZOGENPTN        TO  LNK-DAY6-ZOGENPTN
+           MOVE    WRK-ZOGEN           TO  LNK-DAY6-ZOGEN
+           CALL    "ORCSDAY"           USING
+                                       STS-AREA-DAY
+                                       LNK-DAY6-AREA
+           MOVE    LNK-DAY6-KEISAN     TO  WRK-YMD
+      *
+           .
+       800-CALENDAR-EXT.
+           EXIT.
+      *****************************************************************
       *    一時ファイル読込処理
       *****************************************************************
        900-TENSU-READ-SEC          SECTION.
@@ -773,7 +822,7 @@
            MOVE    WRK-PARA-HOSPNUM TO CHKSND-HOSPNUM
            MOVE    WRK-PARA-CHKMORE TO CHKSND-CHKKBN
            MOVE    TNS-SRYCD       TO  CHKSND-SRYCD
-           MOVE    SPA-SYSYMD      TO  CHKSND-YUKOSTYMD
+           MOVE    WRK-PARA-KJNYMD TO  CHKSND-YUKOSTYMD
                                        CHKSND-YUKOEDYMD
            MOVE    "1"             TO  CHKSND-CDKBN
            MOVE    1               TO  CHKSND-RENNUM

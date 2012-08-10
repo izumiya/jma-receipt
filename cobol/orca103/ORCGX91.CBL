@@ -83,6 +83,7 @@
                    07  SPA-GMN-CHK-R   REDEFINES   SPA-GMN-CHK-VAL.
                        09  SPA-GMN-CHKKBN      PIC X(01)   OCCURS  10.
       *----(03.04.01)--UPD-END-----
+                   07  SPA-GMN-KJNYMD          PIC X(09).
                    07  SPA-GMN-CHKSRYRANGE     PIC X(01).
                    07  SPA-GMN-STSRYCD         PIC X(09).
                    07  SPA-GMN-STSRYNAME       PIC X(100).
@@ -91,13 +92,14 @@
                        09  SPA-GMN-SORT            PIC X(01).
                        09  SPA-GMN-SORTFL          PIC X(01).
                        09  SPA-GMN-SORTMEI         PIC X(28).
-                   07  SPA-GMN-CHKMOREYKZBYO       PIC X(01).
-                   07  SPA-GMN-CHKMOREKENSA        PIC X(01).
-                   07  SPA-GMN-CHKMOREBUI          PIC X(01).
+                   07  SPA-GMN-CHKMORE-G.
+                       09  SPA-GMN-CHKMOREYKZBYO   PIC X(01).
+                       09  SPA-GMN-CHKMOREKENSA    PIC X(01).
+                       09  SPA-GMN-CHKMOREBUI      PIC X(01).
                    07  SPA-GMN-MOREKIKAN-G.
                        09  SPA-GMN-MOREKIKAN       PIC X(01).
                        09  SPA-GMN-MOREKIKANFL     PIC X(01).
-                       09  SPA-GMN-MOREKIKANMEI    PIC X(18).
+                       09  SPA-GMN-MOREKIKANMEI    PIC X(38).
                    07  SPA-GMN-MORESORT-G.
                        09  SPA-GMN-MORESORT        PIC X(01).
                        09  SPA-GMN-MORESORTFL      PIC X(01).
@@ -114,7 +116,7 @@
                        09  SPA-GMN-MOREKIKANLST        OCCURS  5.
                            11  SPA-GMN-MOREKIKANL      PIC X(01).
                            11  SPA-GMN-MOREKIKANFLL    PIC X(01).
-                           11  SPA-GMN-MOREKIKANMEIL   PIC X(18).
+                           11  SPA-GMN-MOREKIKANMEIL   PIC X(38).
                    07  SPA-GMN-MORESORTLST-G.
                        09  SPA-GMN-MORESORT-MAX        PIC 9(05).
                        09  SPA-GMN-MORESORTLST         OCCURS  5.
@@ -122,8 +124,8 @@
                            11  SPA-GMN-MORESORTFLL     PIC X(01).
                            11  SPA-GMN-MORESORTMEIL    PIC X(28).
                05  SPA-NAI-AREA.
-                   07  SPA-NAI-SRYCD-EXSIT-FLG
-                                               PIC 9(01).
+                   07  SPA-NAI-KJNYMD                  PIC X(08).
+                   07  SPA-NAI-SRYCD-EXSIT-FLG         PIC 9(01).
       *
       *    フラグエリア
        01  FLG-AREA.
@@ -131,6 +133,7 @@
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-KANJI               PIC 9(01).
            03  FLG-KENSAKU             PIC 9(01).
+           03  FLG-TENSU               PIC 9(01).
       *
       *----(02.00.06)--ADD-START---
       *    フラグ領域
@@ -162,6 +165,8 @@
            03  SYS-TIME                PIC X(06).
       *
        01  WRK-AREA.
+           03  WRK-SYMD                PIC X(10).
+           03  WRK-EDTYMD1             PIC X(10).
            03  WRK-MCP-WIDGET          PIC X(64).
            03  WRK-CMB-CD                  PIC X(10).
            03  WRK-CMB-ITM-G.
@@ -174,11 +179,6 @@
       *
            03  WRK-STPAGE              PIC 9(05).
            03  WRK-EDPAGE              PIC 9(05).
-      *
-           03  WRK-SYMD.
-               05  WRK-SYY             PIC 9(04).
-               05  WRK-SMM             PIC 9(02).
-               05  WRK-SDD             PIC 9(02).
            03  WRK-HENTIME.
                05  WRK-HH              PIC X(02).
                05  FILLER              PIC X(01)   VALUE   ".".
@@ -479,22 +479,16 @@
       *
            PERFORM 3101-CMB-SYOKI-SEC
       *
-           MOVE    "F"             TO  SPA-GMN-CHKYKZBYO
-           MOVE    "F"             TO  SPA-GMN-CHKSRYBYO
-           MOVE    "F"             TO  SPA-GMN-CHKYKZHEI
-           MOVE    "F"             TO  SPA-GMN-CHKSRYHEI
-           MOVE    "F"             TO  SPA-GMN-CHKYKZKNKBYO
-           MOVE    "F"             TO  SPA-GMN-CHKSRYSNT
-      *----(03.04.01)--ADD-START---
-           MOVE    "F"             TO  SPA-GMN-CHKBYOYKZ
-           MOVE    "F"             TO  SPA-GMN-CHKBYOSRY
-      *----(03.04.01)--ADD-END-----
+           MOVE    SPA-SYSYMD      TO  SPA-NAI-KJNYMD
+           MOVE    SPA-NAI-KJNYMD  TO  WRK-SYMD
+           PERFORM 800-HIZUKE-CHK-SEC
+           MOVE    WRK-EDTYMD1     TO  SPA-GMN-KJNYMD
+      *
+           MOVE    ALL "F"         TO  SPA-GMN-CHK-VAL
+                                       SPA-GMN-CHKMORE-G
       *
            MOVE    "F"             TO  SPA-GMN-CHKSRYRANGE
       *
-           MOVE    "F"             TO  SPA-GMN-CHKMOREYKZBYO
-           MOVE    "F"             TO  SPA-GMN-CHKMOREKENSA
-           MOVE    "F"             TO  SPA-GMN-CHKMOREBUI
       *
            MOVE    SPA-GMN-SORTLST (1)
                                    TO  SPA-GMN-SORT-G
@@ -554,10 +548,12 @@
            MOVE    "なし"              TO  SPA-GMN-MOREKIKANMEIL   (1)
       *
            MOVE    "2"                 TO  SPA-GMN-MOREKIKANL      (2)
-           MOVE    "２ヶ月分"          TO  SPA-GMN-MOREKIKANMEIL   (2)
+           MOVE    "２ヶ月分"
+                                       TO  SPA-GMN-MOREKIKANMEIL   (2)
       *
            MOVE    "3"                 TO  SPA-GMN-MOREKIKANL      (3)
-           MOVE    "６ヶ月分"          TO  SPA-GMN-MOREKIKANMEIL   (3)
+           MOVE    "６ヶ月分"
+                                       TO  SPA-GMN-MOREKIKANMEIL   (3)
       *
            MOVE    3                   TO  SPA-GMN-MOREKIKAN-MAX
       *
@@ -837,17 +833,21 @@
       *
            MOVE    MCP-WIDGET          TO  WRK-MCP-WIDGET
       *
-      *    EVALUATE    MCP-EVENT   ALSO    MCP-WIDGET
-      *    WHEN    "ACTIVATE"      ALSO    "??????"
-      *            PERFORM 4100-??????-CHK-SEC
-      *    WHEN    OTHER
+           EVALUATE    MCP-EVENT   ALSO    MCP-WIDGET
+      *    基準日
+           WHEN    "ACTIVATE"      ALSO    "KJNYMD"
+               PERFORM 4100-KJNYMD-CHK-SEC
+               IF    ( SPA-ERRCD       =   SPACE )
+                   PERFORM 410-INPUT-CHK-SEC
+               END-IF
+           WHEN    OTHER
       *
                MOVE    ZERO            TO  SPA-GMN-CUR
       *
       *        入力チェック処理
                PERFORM 410-INPUT-CHK-SEC
       *
-      *    END-EVALUATE
+           END-EVALUATE
            .
        200-ENTRY-EXT.
            EXIT.
@@ -924,6 +924,30 @@
            EXIT.
       *
       *****************************************************************
+      *    基準日
+      *****************************************************************
+       4100-KJNYMD-CHK-SEC             SECTION.
+      *
+           IF    ( X91-KJNYMD  =   SPACE )
+               MOVE    SPA-SYSYMD  TO  X91-KJNYMD
+           END-IF
+      *
+           MOVE    ZERO            TO  SPA-GMN-CUR
+           MOVE    X91-KJNYMD      TO  WRK-SYMD
+           PERFORM 800-HIZUKE-CHK-SEC
+           IF  ( WRK-EDTYMD1       =   SPACE )
+               MOVE    "0003"      TO  SPA-ERRCD
+               MOVE    101         TO  SPA-GMN-CUR
+           ELSE
+               MOVE    WRK-EDTYMD1 TO  SPA-GMN-KJNYMD
+               MOVE    WRK-SYMD    TO  SPA-NAI-KJNYMD
+           END-IF
+      *
+           .
+      *
+       4100-KJNYMD-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    開始診療行為コードチェック
       *****************************************************************
        4101-STSRYCD-CHK-SEC            SECTION.
@@ -982,6 +1006,8 @@
                GO  TO  4101-STSRYCD-CHK-EXT
            END-IF
       *
+           MOVE    ZERO                TO  FLG-TENSU
+      *
            INITIALIZE                      TNS-TENSU-REC
            MOVE    SPA-GMN-STSRYCD     TO  TNS-SRYCD
            MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
@@ -994,7 +1020,27 @@
       *
            ELSE
                INITIALIZE                  TNS-TENSU-REC
+               MOVE    1               TO  FLG-TENSU
            END-IF
+      *
+           PERFORM UNTIL ( FLG-TENSU   NOT =  ZERO )
+                    OR  (( SPA-NAI-KJNYMD  >=  TNS-YUKOSTYMD )
+                     AND ( SPA-NAI-KJNYMD  <=  TNS-YUKOEDYMD ))
+      *
+               MOVE    ZERO                TO  FLG-TENSU
+      *
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key24"             TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
+      *
+               ELSE
+                   INITIALIZE                  TNS-TENSU-REC
+                    MOVE    1              TO  FLG-TENSU
+               END-IF
+      *
+           END-PERFORM
       *
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key24"             TO  MCP-PATHNAME
@@ -1044,7 +1090,7 @@
                        MOVE    WRK-CONS-CHKKBN (IDX0)
                                                TO  CHKSND-CHKKBN
                        MOVE    SPA-GMN-STSRYCD TO  CHKSND-SRYCD
-                       MOVE    SPA-SYSYMD      TO  CHKSND-YUKOSTYMD
+                       MOVE    SPA-NAI-KJNYMD  TO  CHKSND-YUKOSTYMD
                                                    CHKSND-YUKOEDYMD
                        MOVE    SPA-HOSPNUM     TO  CHKSND-HOSPNUM
                        MOVE    CHKSND-REC      TO  MCPDATA-REC
@@ -1062,7 +1108,7 @@
                        MOVE    WRK-CONS-CHKKBN (IDX0)
                                                TO  CHKTRD-CHKKBN
                        MOVE    SPA-GMN-STSRYCD TO  CHKTRD-SRYCD
-                       MOVE    SPA-SYSYMD      TO  CHKTRD-YUKOSTYMD
+                       MOVE    SPA-NAI-KJNYMD  TO  CHKTRD-YUKOSTYMD
                                                    CHKTRD-YUKOEDYMD
                        MOVE    SPA-HOSPNUM     TO  CHKTRD-HOSPNUM
                        MOVE    CHKTRD-REC      TO  MCPDATA-REC
@@ -1080,7 +1126,7 @@
                        MOVE    WRK-CONS-CHKKBN (IDX0)
                                                TO  CHK-CHKKBN
                        MOVE    SPA-GMN-STSRYCD TO  CHK-SRYCD
-                       MOVE    SPA-SYSYMD      TO  CHK-YUKOSTYMD
+                       MOVE    SPA-NAI-KJNYMD  TO  CHK-YUKOSTYMD
                                                    CHK-YUKOEDYMD
                        MOVE    SPA-HOSPNUM     TO  CHK-HOSPNUM
                        MOVE    CHK-REC         TO  MCPDATA-REC
@@ -1189,21 +1235,8 @@
       *****************************************************************
        4101-KANREN-CHK-SEC             SECTION.
       *
-           IF    ( SPA-GMN-CHKYKZBYO   =   "F")
-            AND  ( SPA-GMN-CHKSRYBYO   =   "F")
-            AND  ( SPA-GMN-CHKYKZHEI   =   "F")
-            AND  ( SPA-GMN-CHKSRYHEI   =   "F")
-            AND  ( SPA-GMN-CHKYKZKNKBYO    =   "F")
-            AND  ( SPA-GMN-CHKSRYSNT   =   "F")
-      *----(03.04.01)--ADD-START---
-            AND  ( SPA-GMN-CHKBYOYKZ   =   "F")
-            AND  ( SPA-GMN-CHKBYOSRY   =   "F")
-      *----(03.04.01)--ADD-END-----
-            AND  ( SPA-GMN-CHKSRYHEIA  =   "F")
-            AND  ( SPA-GMN-CHKSRYHEIB  =   "F")
-            AND  ( SPA-GMN-CHKMOREYKZBYO   =   "F")
-            AND  ( SPA-GMN-CHKMOREKENSA    =   "F")
-            AND  ( SPA-GMN-CHKMOREBUI      =   "F")
+           IF    ( SPA-GMN-CHK-VAL     = ALL "F" )
+            AND  ( SPA-GMN-CHKMORE-G   = ALL "F" )
                MOVE    "0100"          TO  SPA-ERRCD
                MOVE    1               TO  SPA-GMN-CUR
                GO  TO  4101-KANREN-CHK-EXT
@@ -1493,7 +1526,7 @@
       *****************************************************************
        41011-X98-SET-SEC               SECTION.
       *
-           MOVE    SPA-SYSYMD      TO  SPA-X01-KJNYMD
+           MOVE    SPA-NAI-KJNYMD  TO  SPA-X01-KJNYMD
            MOVE    SPACE           TO  SPA-X01-CHKKBN
       *
            MOVE    SPA-X01KYOUTU   TO  SPA-WORK
@@ -1797,10 +1830,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE           TO  SHELLTBL 
            INITIALIZE              ORCSMKPASSAREA
-           MOVE    "scripts/allways/chkmst.sh"
-                                   TO  MKPASS-IN-01
-           CALL    "ORCSMKPASS"    USING   ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
+           MOVE    "chkmst.sh"     TO  SHELLTBL-NAME
            MOVE    LNK-PRTKANRI-RENNUM
                                    TO  SHELLTBL-ARG1
            MOVE    LNK-PRTKANRI-TBL-KEY
@@ -1834,12 +1864,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-STSRYCD TO  SHELLTBL-ARG17
            MOVE    SPA-GMN-EDSRYCD TO  SHELLTBL-ARG18
            MOVE    CHKMERR         TO  SHELLTBL-ARG19
+           MOVE    SPA-NAI-KJNYMD  TO  SHELLTBL-ARG20
       *
 grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
-           MOVE    "shell"         TO  MCP-PATHNAME
+           MOVE    "allways"       TO  MCP-PATHNAME
 grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
@@ -1879,10 +1910,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE           TO  SHELLTBL 
            INITIALIZE              ORCSMKPASSAREA
-           MOVE    "scripts/allways/chkmst2.sh"
-                                   TO  MKPASS-IN-01
-           CALL    "ORCSMKPASS"    USING   ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01    TO  SHELLTBL-NAME
+           MOVE    "chkmst2.sh"    TO  SHELLTBL-NAME
            MOVE    LNK-PRTKANRI-RENNUM
                                    TO  SHELLTBL-ARG1
            MOVE    LNK-PRTKANRI-TBL-KEY
@@ -1916,12 +1944,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WRK-MORERANGE-G TO  SHELLTBL-ARG17
            MOVE    WRK-SRTKBN      TO  SHELLTBL-ARG18
            MOVE    CHKMERR         TO  SHELLTBL-ARG19
+           MOVE    SPA-SYSYMD      TO  SHELLTBL-ARG20
       *
 grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
-           MOVE    "shell"         TO  MCP-PATHNAME
+           MOVE    "allways"       TO  MCP-PATHNAME
 grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
@@ -2245,6 +2274,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            INITIALIZE                      X91
       *
+           MOVE    SPA-GMN-KJNYMD      TO  X91-KJNYMD
            MOVE    SPA-GMN-CHKYKZBYO   TO  X91-CHKYKZBYO
            MOVE    SPA-GMN-CHKSRYBYO   TO  X91-CHKSRYBYO
            MOVE    SPA-GMN-CHKYKZHEI   TO  X91-CHKYKZHEI
@@ -2371,6 +2401,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "CHKSRYHEIA"    TO  MCP-WIDGET
            WHEN    21
                MOVE    "CHKSRYHEIB"    TO  MCP-WIDGET
+           WHEN    101
+               MOVE    "KJNYMD"        TO  MCP-WIDGET
            WHEN    212
                MOVE    "B12"           TO  MCP-WIDGET
            END-EVALUATE
@@ -2423,6 +2455,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    18              TO  SPA-GMN-CUR
            WHEN    "CHKMOREBUI"
                MOVE    19              TO  SPA-GMN-CUR
+           WHEN    "KJNYMD"
+               MOVE    1               TO  SPA-GMN-CUR
            WHEN    "MORESORT"
                MOVE    212             TO  SPA-GMN-CUR
            END-EVALUATE
@@ -2459,6 +2493,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-ERRMSG
            WHEN    "0002"
                MOVE    "終了診療行為コード入力エラー"
+                                       TO  SPA-ERRMSG
+           WHEN    "0003"
+               MOVE    "基準日に正しい日付を入力してください"
                                        TO  SPA-ERRMSG
            WHEN    "0100"
                MOVE    "印刷するチェック項目を選択してください"
@@ -2569,6 +2606,25 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        540-XID2SET-EXT.
+           EXIT.
+      **************************************************************
+      *    日付チェック処理
+      **************************************************************
+       800-HIZUKE-CHK-SEC              SECTION.
+      *
+           MOVE    SPACE               TO  WRK-EDTYMD1
+      *
+           INITIALIZE                      ORCSGDAYAREA
+           MOVE    WRK-SYMD            TO  SGDAY-INDAY
+           CALL    "ORCSGDAY"          USING
+                                           ORCSGDAYAREA
+           IF  ( SGDAY-RC              =   ZERO )
+               MOVE    SGDAY-OTDAY     TO  WRK-EDTYMD1
+               MOVE    SGDAY-SDAY      TO  WRK-SYMD
+           END-IF
+      *
+           .
+       800-HIZUKE-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ジョブ管理制御サブ呼び出し

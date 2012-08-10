@@ -1611,6 +1611,7 @@
            MOVE    SPA-GMN-CHKKBN      TO  HXLST-CHKKBN
            MOVE    SPA-GMN-SRYCD       TO  HXLST-SRYCD
            MOVE    "1"                 TO  HXLST-PROCKBN
+           MOVE    SPA-X01-KJNYMD      TO  HXLST-KJNYMD
            CALL    "ORCHXLST"      USING   SPA-AREA
                                            ORCHXLSTAREA
       *

@@ -84,6 +84,7 @@
            03  WRK-PARA-STSRYCD                    PIC X(09).
            03  WRK-PARA-EDSRYCD                    PIC X(09).
            03  WRK-PARA-CHKMERR                    PIC X(50).
+           03  WRK-PARA-KJNYMD                     PIC X(08).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -200,6 +201,7 @@
                                        WRK-PARA-STSRYCD
                                        WRK-PARA-EDSRYCD
                                        WRK-PARA-CHKMERR
+                                       WRK-PARA-KJNYMD
            END-UNSTRING
       *
       *    £Ó£Ð£Á¥¨¥ê¥¢¥»¥Ã¥È½èÍý
@@ -316,6 +318,7 @@
            MOVE    WRK-PARA-STSRYCD    TO  HXLST-SRYCD
            MOVE    WRK-PARA-EDSRYCD    TO  HXLST-SRYCD-END
            MOVE    WRK-PARA-SRTKBN     TO  HXLST-SRTKBN
+           MOVE    WRK-PARA-KJNYMD     TO  HXLST-KJNYMD
            MOVE    "2"                 TO  HXLST-PROCKBN
            MOVE    ORCSPRTAREA         TO  HXLST-PRTAREA
       *

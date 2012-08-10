@@ -17,6 +17,7 @@
       ********************************************************************
         02  X91.
       *     02  FIXED2.
+              03  X91-KJNYMD    PIC X(10).
               03  X91-CHKYKZBYO.
                 04  X91-VALUE   PIC X.
               03  X91-CHKSRYBYO.
@@ -62,10 +63,10 @@
                 04  X91-VALUE   PIC X.
               03  X91-CMB-MOREKIKAN.
                 04  X91-MOREKIKAN.
-                  05  X91-VALUE   PIC X(20).
+                  05  X91-VALUE   PIC X(40).
                 04  X91-MOREKIKAN-COUNT   PIC S9(9)   BINARY.
                 04  X91-MOREKIKAN-ITEM
-                        PIC X(20)   OCCURS  5 TIMES.
+                        PIC X(40)   OCCURS  5 TIMES.
               03  X91-CHKMOREYKZBYO.
                 04  X91-VALUE   PIC X.
               03  X91-CHKMOREKENSA.

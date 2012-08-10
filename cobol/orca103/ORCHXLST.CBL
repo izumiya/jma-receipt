@@ -183,6 +183,9 @@
       *
       *    一時領域
        01  WRK-AREA.
+           03  WRK-SYMD                PIC X(08).
+           03  WRK-EDTYMD1             PIC X(09).
+           03  WRK-EDTYMD3             PIC X(22).
            03  WRK-MCP-TABLE           PIC X(64).
            03  WRK-MCP-PATHNAME        PIC X(64).
            03  WRK-TNS-SRYCD           PIC X(09).
@@ -230,14 +233,13 @@
       *
       *    印刷内容
        01  HEAD-01.
-           03  FILLER                  PIC X(25)   VALUE   SPACE.
-           03  H01-MIDASI              PIC X(80).
+           03  H01-MIDASI              PIC X(60).
+           03  FILLER                  PIC X(08)   VALUE   "基準日：".
+           03  H01-KJNYMD              PIC X(09).
+           03  FILLER                  PIC X(46)   VALUE   SPACE.
            03  FILLER                  PIC X(08)   VALUE   "作成日：".
-           03  H01-YY                  PIC 9(04).
-           03  FILLER                  PIC X(01)   VALUE   ".".
-           03  H01-MM                  PIC Z9.
-           03  FILLER                  PIC X(01)   VALUE   ".".
-           03  H01-DD                  PIC Z9.
+           03  H01-SAKYMD              PIC X(09).
+           03  FILLER                  PIC X(01)   VALUE   SPACE.
            03  FILLER                  PIC X(04)   VALUE   "  P-".
            03  H01-PCNT                PIC ZZ9.
        01  HEAD-02.
@@ -333,6 +335,8 @@
        01  WKINPUTSET-REC.
            COPY    "CPINPUTSET.INC"    REPLACING   //ISET-//
                                        BY          //WKISET-//.
+      *
+           COPY    "CPTTNS.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -440,6 +444,7 @@
            INITIALIZE                  HXLST-RCD
            INITIALIZE                  HCM44
            INITIALIZE                  KEY-AREA
+           INITIALIZE                  TTNS-AREA
       *
            PERFORM 800-MCNDATE-SEC
       *
@@ -562,9 +567,17 @@
                MOVE    "1"         TO  SYS-1101-YBUTAGAIKBN
            END-IF
       *
-           MOVE    SPA-SYSYMD(1:4)     TO  H01-YY
-           MOVE    SPA-SYSYMD(5:2)     TO  H01-MM
-           MOVE    SPA-SYSYMD(7:2)     TO  H01-DD
+           IF    ( HXLST-KJNYMD    =   SPACE )
+               MOVE    SPA-SYSYMD  TO  HXLST-KJNYMD
+           END-IF
+      *
+           MOVE    SPA-SYSYMD      TO  WRK-SYMD
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-EDTYMD1     TO  H01-SAKYMD
+      *
+           MOVE    HXLST-KJNYMD    TO  WRK-SYMD
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-EDTYMD1     TO  H01-KJNYMD
       *
            EVALUATE    HXLST-CHKKBN
            WHEN    "1"
@@ -621,7 +634,7 @@
                END-IF
            END-IF
       *
-           MOVE    SPA-SYSYMD          TO  CHK-YUKOSTYMD
+           MOVE    HXLST-KJNYMD        TO  CHK-YUKOSTYMD
                                            CHK-YUKOEDYMD
       *
            INITIALIZE                  WRK-MCP-TABLE
@@ -753,7 +766,7 @@
                END-IF
            END-IF
       *
-           MOVE    SPA-SYSYMD          TO  CHKTRD-YUKOSTYMD
+           MOVE    HXLST-KJNYMD        TO  CHKTRD-YUKOSTYMD
                                            CHKTRD-YUKOEDYMD
       *
            INITIALIZE                  WRK-MCP-TABLE
@@ -801,7 +814,7 @@
       *
            MOVE    HXLST-CHKKBN        TO  CHK005-CHKKBN
       *
-           MOVE    SPA-SYSYMD          TO  CHK005-YUKOSTYMD
+           MOVE    HXLST-KJNYMD        TO  CHK005-YUKOSTYMD
                                            CHK005-YUKOEDYMD
       *
            MOVE    "tbl_chk005"        TO  WRK-MCP-TABLE
@@ -926,7 +939,7 @@
            MOVE    WRK-STSRYCD         TO  CHKSND-SRYCD
            MOVE    WRK-EDSRYCD         TO  CHKSND-UPSRYCD
       *
-           MOVE    SPA-SYSYMD          TO  CHKSND-YUKOSTYMD
+           MOVE    HXLST-KJNYMD        TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
       *
            INITIALIZE                  WRK-MCP-TABLE
@@ -1109,6 +1122,7 @@
            MOVE    CHKSND-SRYCD    TO  WRK-TNS-SRYCD
            IF    ( CHKSND-SRYCD(1:1)   =   "S" OR "P" )
                PERFORM 2001-INPUTCD-HEN-SEC
+      *
                MOVE    SPACE           TO  WRK-SRYNAME
                IF    ( WRK-NAME1       =   SPACE )
                    STRING  "【"            DELIMITED   BY  SIZE
@@ -1181,7 +1195,7 @@
                            INITIALIZE                  WKINPUTSET-REC
                            MOVE    SPA-HOSPNUM     TO  WKISET-HOSPNUM
                            MOVE    ISET-INPUTCD    TO  WKISET-SETCD
-                           MOVE    SPA-SYSYMD      TO  WKISET-YUKOSTYMD
+                           MOVE    HXLST-KJNYMD    TO  WKISET-YUKOSTYMD
                                                        WKISET-YUKOEDYMD
                            MOVE    1               TO  WKISET-SETSEQ
                            MOVE    WKINPUTSET-REC  TO  MCPDATA-REC
@@ -1893,8 +1907,8 @@
                    MOVE    TNS-NAME    TO  WRK-NAME
                END-IF
       *
-               IF     (TNS-YUKOSTYMD  <=  SPA-SYSYMD )  AND
-                      (TNS-YUKOEDYMD  >=  SPA-SYSYMD )
+               IF     (TNS-YUKOSTYMD  <=  HXLST-KJNYMD )  AND
+                      (TNS-YUKOEDYMD  >=  HXLST-KJNYMD )
                    MOVE    1           TO  FLG-OK
                END-IF
       *
@@ -2237,6 +2251,22 @@
        800-STRLEN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    西暦日本語変換処理
+      *****************************************************************
+       800-SEIWA-HEN-SEC        SECTION.
+      *
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY2-AREA
+           MOVE    "21"                TO  LNK-DAY2-IRAI
+           MOVE    WRK-SYMD            TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                               LNK-DAY2-AREA
+           MOVE    LNK-DAY2-EDTYMD1    TO  WRK-EDTYMD1
+           MOVE    LNK-DAY2-EDTYMD3    TO  WRK-EDTYMD3
+           .
+       800-SEIWA-HEN-EXT.
+           EXIT.
+      *****************************************************************
       *    チェックマスタ検索処理
       *****************************************************************
        900-CHKMST-SEL-SEC              SECTION.
@@ -2244,9 +2274,9 @@
            MOVE    ZERO                TO  FLG-CHKMST
            MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  CHK-REC
+               PERFORM 900-CHKMST-FET-SEC
            ELSE
                INITIALIZE                  CHK-REC
                MOVE    1               TO  FLG-CHKMST
@@ -2260,15 +2290,41 @@
       *****************************************************************
        900-CHKMST-FET-SEC              SECTION.
       *
-           MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
-           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  CHK-REC
-           ELSE
-               INITIALIZE                  CHK-REC
-               MOVE    1               TO  FLG-CHKMST
-           END-IF
+           MOVE    ZERO                TO  FLG-CHKMST
+           MOVE    ZERO                TO  FLG-LOOPEND
+      *
+           PERFORM UNTIL ( FLG-CHKMST  NOT =   ZERO )
+                    OR   ( FLG-LOOPEND NOT =   ZERO )
+      *
+               MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC     TO  CHK-REC
+      *
+                   MOVE    1               TO  FLG-LOOPEND
+      *
+                   MOVE    HXLST-KJNYMD    TO  TTNS-CHK-YMD
+                   MOVE    CHK-SRYCD       TO  TTNS-CHK-SRYCD
+      *            点数マスタ検索
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       NOT =   ZERO )
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+      *
+                   MOVE    HXLST-KJNYMD    TO  TTNS-CHK-YMD
+                   MOVE    CHK-CD          TO  TTNS-CHK-SRYCD
+      *            点数マスタ検索
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       NOT =   ZERO )
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+               ELSE
+                   INITIALIZE                  CHK-REC
+                   MOVE    1               TO  FLG-CHKMST
+               END-IF
+      *
+           END-PERFORM
       *
            .
        900-CHKMST-FET-EXT.
@@ -2313,6 +2369,21 @@
       *
                    MOVE    1               TO  FLG-LOOPEND
       *
+                   IF    ( CHKSND-SRYCD(1:1)   =   "P" OR "S" )
+                       PERFORM 900-INPUTSET-KEY-SEL-SEC
+                       IF    ( FLG-INPUTSET    NOT =   ZERO )
+                           MOVE    ZERO        TO  FLG-LOOPEND
+                       END-IF
+                   ELSE
+                       MOVE    HXLST-KJNYMD    TO  TTNS-CHK-YMD
+                       MOVE    CHKSND-SRYCD    TO  TTNS-CHK-SRYCD
+      *                点数マスタ検索
+                       PERFORM 900-TENSU-KEY-SEL-SEC
+                       IF    ( FLG-TENSU       NOT =   ZERO )
+                           MOVE    ZERO        TO  FLG-LOOPEND
+                       END-IF
+                   END-IF
+      *
                ELSE
                    INITIALIZE                  CHKSND-REC
                    MOVE    1               TO  FLG-CHKSND
@@ -2334,7 +2405,7 @@
            MOVE    SPA-HOSPNUM         TO  CHKSND-HOSPNUM
            MOVE    HXLST-CHKKBN        TO  CHKSND-CHKKBN
            MOVE    WRK-TNS-SRYCD       TO  CHKSND-SRYCD
-           MOVE    SPA-SYSYMD          TO  CHKSND-YUKOSTYMD
+           MOVE    HXLST-KJNYMD        TO  CHKSND-YUKOSTYMD
                                            CHKSND-YUKOEDYMD
            MOVE    "1"                 TO  CHKSND-CDKBN
            MOVE    CHKSND-REC          TO  MCPDATA-REC
@@ -2380,9 +2451,9 @@
            MOVE    ZERO                TO  FLG-CHKTRD
            MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  CHKTRD-REC
+               PERFORM 900-CHKTRD-FET-SEC
            ELSE
                INITIALIZE                  CHKTRD-REC
                MOVE    1               TO  FLG-CHKTRD
@@ -2396,15 +2467,42 @@
       *****************************************************************
        900-CHKTRD-FET-SEC              SECTION.
       *
-           MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
-           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  CHKTRD-REC
-           ELSE
-               INITIALIZE                  CHKTRD-REC
-               MOVE    1               TO  FLG-CHKTRD
-           END-IF
+           MOVE    ZERO                TO  FLG-CHKTRD
+           MOVE    ZERO                TO  FLG-LOOPEND
+      *
+           PERFORM UNTIL ( FLG-CHKTRD  NOT =   ZERO )
+                    OR   ( FLG-LOOPEND NOT =   ZERO )
+      *
+               MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC     TO  CHKTRD-REC
+      *
+                   MOVE    1               TO  FLG-LOOPEND
+      *
+                   MOVE    HXLST-KJNYMD    TO  TTNS-CHK-YMD
+                   MOVE    CHKTRD-SRYCD    TO  TTNS-CHK-SRYCD
+      *            点数マスタ検索
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       NOT =   ZERO )
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+      *
+                   MOVE    HXLST-KJNYMD    TO  TTNS-CHK-YMD
+                   MOVE    CHKTRD-CD       TO  TTNS-CHK-SRYCD
+      *            点数マスタ検索
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       NOT =   ZERO )
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+      *
+               ELSE
+                   INITIALIZE                  CHKTRD-REC
+                   MOVE    1               TO  FLG-CHKTRD
+               END-IF
+      *
+           END-PERFORM
       *
            .
        900-CHKTRD-FET-EXT.
@@ -2417,9 +2515,9 @@
            MOVE    ZERO                TO  FLG-CHK005
            MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
+           PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  CHK005-REC
+               PERFORM 900-CHK005-FET-SEC
            ELSE
                INITIALIZE                  CHK005-REC
                MOVE    1               TO  FLG-CHK005
@@ -2433,15 +2531,33 @@
       *****************************************************************
        900-CHK005-FET-SEC              SECTION.
       *
-           MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
-           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC              =   ZERO )
-               MOVE    MCPDATA-REC     TO  CHK005-REC
-           ELSE
-               INITIALIZE                  CHK005-REC
-               MOVE    1               TO  FLG-CHK005
-           END-IF
+           MOVE    ZERO                TO  FLG-CHK005
+           MOVE    ZERO                TO  FLG-LOOPEND
+      *
+           PERFORM UNTIL ( FLG-CHK005  NOT =   ZERO )
+                    OR   ( FLG-LOOPEND NOT =   ZERO )
+      *
+               MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
+               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+               PERFORM 910-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC     TO  CHK005-REC
+      *
+                   MOVE    1               TO  FLG-LOOPEND
+      *
+                   MOVE    HXLST-KJNYMD    TO  TTNS-CHK-YMD
+                   MOVE    CHK005-SRYCD    TO  TTNS-CHK-SRYCD
+      *            点数マスタ検索
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   IF    ( FLG-TENSU       NOT =   ZERO )
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+               ELSE
+                   INITIALIZE                  CHK005-REC
+                   MOVE    1               TO  FLG-CHK005
+               END-IF
+      *
+           END-PERFORM
       *
            .
        900-CHK005-FET-EXT.
@@ -2474,6 +2590,8 @@
       *    点数マスタFETCH処理(KEY4)
       *****************************************************************
        900-TENSU-KEY4-FET-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TENSU
       *
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key4"              TO  MCP-PATHNAME
@@ -2578,6 +2696,37 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *****************************************************************
       *    入力セット検索処理
       *****************************************************************
+       900-INPUTSET-KEY-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO            TO  FLG-INPUTSET
+      *
+           INITIALIZE                  INPUTSET-REC
+           MOVE    SPA-HOSPNUM     TO  ISET-HOSPNUM
+           MOVE    CHKSND-SRYCD    TO  ISET-SETCD
+           MOVE    HXLST-KJNYMD    TO  ISET-YUKOSTYMD
+                                       ISET-YUKOEDYMD
+           MOVE    1               TO  ISET-SETSEQ
+           MOVE    INPUTSET-REC    TO  MCPDATA-REC
+           MOVE    "tbl_inputset"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC TO  INPUTSET-REC
+           ELSE
+               INITIALIZE              INPUTSET-REC
+               MOVE    1           TO  FLG-INPUTSET
+           END-IF
+      *
+           MOVE    "tbl_inputset"  TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-INPUTSET-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    入力セット検索処理
+      *****************************************************************
        900-INPUTSET-KEY7-SEL-SEC       SECTION.
       *
            MOVE    ZERO            TO  FLG-INPUTSET
@@ -2585,7 +2734,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            INITIALIZE                  INPUTSET-REC
            MOVE    SPA-HOSPNUM     TO  ISET-HOSPNUM
            MOVE    WRK-TNS-SRYCD   TO  ISET-SETCD
-           MOVE    SPA-SYSYMD      TO  ISET-YUKOSTYMD
+           MOVE    HXLST-KJNYMD    TO  ISET-YUKOSTYMD
                                        ISET-YUKOEDYMD
            MOVE    INPUTSET-REC    TO  MCPDATA-REC
            MOVE    "tbl_inputset"  TO  MCP-TABLE
@@ -2650,6 +2799,93 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            .
        900-SRYCDCHG-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ検索処理(KEY1)
+      *****************************************************************
+       900-TENSU-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TENSU
+      *
+      *    点数マスタ退避ワークチェック
+           PERFORM 9001-TTNS-CHK-SEC
+      *
+      *    退避ワークに存在しない場合はＤＢを検索
+           IF    ( TTNS-FLG            =   ZERO )
+      *
+               INITIALIZE                      TNS-TENSU-REC
+               MOVE    TTNS-CHK-SRYCD      TO  TNS-SRYCD
+               MOVE    TTNS-CHK-YMD        TO  TNS-YUKOSTYMD
+                                               TNS-YUKOEDYMD
+               MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+               MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
+      *
+      *            点数マスタ退避ワークに編集する
+                   PERFORM 9001-TTNS-HEN-SEC
+               ELSE
+                   MOVE    1               TO  FLG-TENSU
+                   INITIALIZE                  TNS-TENSU-REC
+               END-IF
+      *
+               MOVE    "tbl_tensu"         TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+           END-IF
+      *
+           .
+      *
+       900-TENSU-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ退避ワークチェック処理
+      *****************************************************************
+       9001-TTNS-CHK-SEC               SECTION.
+      *
+           MOVE    ZERO                TO  TTNS-FLG
+           INITIALIZE                      TNS-TENSU-REC
+      *
+           PERFORM VARYING TTNS-IDX    FROM    1   BY  1
+                   UNTIL ( TTNS-IDX    >   TTNS-MAX )
+                    OR   ( TTNS-FLG    =   1 )
+               IF    ( TTNS-KEY-SRYCD (TTNS-IDX)
+                                       =   TTNS-CHK-SRYCD )
+                 AND ( TTNS-KEY-YUKOSTYMD (TTNS-IDX)
+                                      <=   TTNS-CHK-YMD )
+                 AND ( TTNS-KEY-YUKOEDYMD (TTNS-IDX)
+                                      >=   TTNS-CHK-YMD )
+                   MOVE    1           TO  TTNS-FLG
+                   MOVE    TTNS-DAT (TTNS-IDX)
+                                       TO  TNS-TENSU-REC
+               END-IF
+           END-PERFORM
+      *
+           .
+       9001-TTNS-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ退避ワーク編集処理
+      *****************************************************************
+       9001-TTNS-HEN-SEC               SECTION.
+      *
+           IF    ( TTNS-CONST-MAX  >   TTNS-MAX )
+               COMPUTE TTNS-MAX    =   TTNS-MAX    +   1
+               MOVE    TNS-SRYCD       TO  TTNS-KEY-SRYCD
+                                                   (TTNS-MAX)
+               MOVE    TNS-YUKOSTYMD   TO  TTNS-KEY-YUKOSTYMD
+                                                   (TTNS-MAX)
+               MOVE    TNS-YUKOEDYMD   TO  TTNS-KEY-YUKOEDYMD
+                                                   (TTNS-MAX)
+               MOVE    TNS-TENSU-REC   TO  TTNS-DAT
+                                                   (TTNS-MAX)
+           END-IF
+      *
+           .
+       9001-TTNS-HEN-EXT.
            EXIT.
       *****************************************************************
       *    明細情報（チェック２診療行為）読込処理

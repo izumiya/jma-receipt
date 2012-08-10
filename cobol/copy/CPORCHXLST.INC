@@ -35,6 +35,8 @@
            03  HXLST-PROCKBN            PIC X(01).
       *    ソート区分
            03  HXLST-SRTKBN             PIC X(01).
+      *    基準日
+           03  HXLST-KJNYMD             PIC X(08).
       *    一括パラメタ
            03  HXLST-PRTAREA            PIC X(25000).
       *    出力件数
