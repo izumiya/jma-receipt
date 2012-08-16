@@ -41,6 +41,7 @@
       *  04.03.00    NACL-多々納  08/09/19  自賠責集計等取扱追加
       *  04.05.00    NACL-多々納  09/09/19  '0086'コメント追加
       *  04.06.00    NACL-多々納  11/02/23  コメント変更チェック追加
+      *  04.06.00    NACL-多々納  12/08/16  期間変更警告追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -138,6 +139,7 @@
       *
                05  SPA-NAI-KEIFLG1             PIC 9(01).
                05  SPA-NAI-KEIFLG2             PIC 9(01).
+               05  SPA-NAI-KEIFLG3             PIC 9(01).
       *
       *    フラグエリア
        01  FLG-AREA.
@@ -1170,6 +1172,33 @@
                    MOVE    1                   TO  SPA-GMN-CUR
                    GO      TO      4109-TOUROKU-CHK-EXT
                END-IF
+      *
+      *H24.8
+               IF      SPA-Z01-SRYCD(1:1)  =   "8"
+                   IF      SPA-NAI-KEIFLG3     =   ZERO
+                       MOVE    "K005"          TO  SPA-ERRCD
+                       MOVE    1               TO  SPA-NAI-KEIFLG3
+                       MOVE    1               TO  SPA-GMN-CUR
+                       GO      TO      4109-TOUROKU-CHK-EXT
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *H24.8
+      *    コメント期間変更チェック
+           IF      SPA-Z01-SELNUM      >=  1
+               IF     ( SPA-Z01-SRYCD(1:1)  =   "8"   )
+               AND    ((SPA-Z01-TYUKOSTYMD(SPA-Z01-SELNUM)
+                                       NOT =   SPA-NAI-YUKOSTYMD)
+               OR      (SPA-Z01-TYUKOEDYMD(SPA-Z01-SELNUM)
+                                       NOT =   SPA-NAI-YUKOEDYMD))
+                   IF      SPA-NAI-KEIFLG3     =   ZERO
+                       MOVE    "K004"          TO  SPA-ERRCD
+                       MOVE    1               TO  SPA-NAI-KEIFLG3
+                       MOVE    1               TO  SPA-GMN-CUR
+                       GO      TO      4109-TOUROKU-CHK-EXT
+                   END-IF
+               END-IF
            END-IF
       *
            IF     (SPA-GMN-NAME        =   SPACE  )
@@ -2102,6 +2131,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    STRING   "警告！厚生労働省から提供されたデータです。"
                                                    DELIMITED BY  SIZE
                             "削除しないで下さい。"
+                                                   DELIMITED BY  SIZE
+                                                 INTO    SPA-ERRMSG
+                   END-STRING
+      *H24.8
+               WHEN    "K004"
+                   STRING    "警告！"
+                             "厚生労働省から提供される範囲のコードです"
+                             "。有効年月日の変更はしないで下さい。"
+                                                   DELIMITED BY  SIZE
+                                                 INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K005"
+                   STRING    "警告！"
+                             "厚生労働省から提供される範囲のコードです"
+                             "。改正処理はしないで下さい。"
                                                    DELIMITED BY  SIZE
                                                  INTO    SPA-ERRMSG
                    END-STRING

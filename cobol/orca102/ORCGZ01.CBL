@@ -45,6 +45,7 @@
       *                                     MONFUNC対応
       *  03.05.00    NACL-多々納  07/05/07  グループ診療対応
       *  04.01.00    NACL-多々納  07/11/XX  器材商品名対応
+      *  04.06.00    NACL-多々納  12/08/16  期間変更警告追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -104,6 +105,8 @@
       *
                    07  SPA-Z01NAI-KEIFLG          PIC 9(01).
                    07  SPA-Z01NAI-SRYCD-HZN       PIC X(09).
+      *H24.8
+                   07  SPA-Z01NAI-KEIFLG2         PIC 9(01).
       *
       ******* 05  SPA-NAI-SELNO                   PIC 9(03). 
       *
@@ -464,6 +467,7 @@
       *
            IF      Z01-SRYCD       NOT =    SPA-Z01GMN-SRYCD
                MOVE    ZERO                TO  SPA-Z01NAI-KEIFLG
+               MOVE    ZERO                TO  SPA-Z01NAI-KEIFLG2
            END-IF
       *    全角入力の時、４文字まで
            INITIALIZE                  ORCSKANACHKAREA
@@ -834,6 +838,13 @@
       *****************************************************************
        4101-GMN-SPA-SET-SEC          SECTION.
       *
+      *H24.8
+      *    警告区分クリア
+           IF     (Z01-YUKOSTYMD   NOT =   SPA-Z01GMN-YUKOSTYMD)
+             OR   (Z01-YUKOSTYMD   NOT =   SPA-Z01GMN-YUKOSTYMD)
+               MOVE    ZERO            TO  SPA-Z01NAI-KEIFLG2
+           END-IF
+      *
            MOVE    Z01-YUKOSTYMD       TO  SPA-Z01GMN-YUKOSTYMD
            MOVE    Z01-YUKOEDYMD       TO  SPA-Z01GMN-YUKOEDYMD
       *
@@ -1168,6 +1179,19 @@
                        MOVE    "0012"              TO  SPA-ERRCD
                        GO      TO      4103-KANREI-EXT
                    END-IF
+      *H24.8
+      *            ユーザ登録分であること
+                   IF     (SPA-Z01GMN-SRYCD (1:1)  =   "1"
+                                                   OR  "6"
+                                                   OR  "7"
+                                                   OR  "8" )
+                       IF       SPA-Z01NAI-KEIFLG2  =   ZERO
+                           MOVE    1           TO  SPA-Z01NAI-KEIFLG2
+                           MOVE    "K003"          TO  SPA-ERRCD
+                           MOVE    1               TO  SPA-GMN-CUR
+                           GO      TO      4103-KANREI-EXT
+                       END-IF
+                   END-IF
       *
       *        通常修正
                WHEN    2
@@ -1214,6 +1238,27 @@
                    GO      TO      41031-YUKOHANI-CHK-EXT
                END-IF
            END-IF
+      *H24.8
+      *    ユーザ登録分以外の期間変更
+           IF     (SPA-Z01GMN-SRYCD (1:1)  =   "1"
+                                           OR  "6"
+                                           OR  "7"
+                                           OR  "8" )
+           AND   (SPA-Z01NAI-KEIFLG2   =   ZERO   )
+           AND   (SPA-Z01NAI-SELNUM    >   1      )
+               IF     (SPA-Z01NAI-YUKOSTYMD    =
+                               SPA-Z01NAI-TYUKOSTYMD(SPA-Z01NAI-SELNUM))
+               AND    (SPA-Z01NAI-YUKOEDYMD    =
+                               SPA-Z01NAI-TYUKOEDYMD(SPA-Z01NAI-SELNUM))
+                   CONTINUE
+               ELSE
+                   MOVE    1               TO  SPA-Z01NAI-KEIFLG2
+                   MOVE    "K004"          TO  SPA-ERRCD
+                   MOVE    2               TO  SPA-GMN-CUR
+                   GO      TO      4103-KANREI-EXT
+               END-IF
+           END-IF
+      *
       *
            .
        41031-YUKOHANI-CHK-EXT.
@@ -1444,7 +1489,7 @@
                  MOVE  "F"                   TO  SPA-Z01GMN-BS1VALUE
                  MOVE  1                     TO  SPA-Z01-SYORIKBN
              WHEN   1
-                 MOVE  "改　正"             TO  SPA-Z01GMN-BS1LABEL
+                 MOVE  "改　正"              TO  SPA-Z01GMN-BS1LABEL
                  MOVE  "T"                   TO  SPA-Z01GMN-BS1VALUE
                  MOVE  3                     TO  SPA-Z01-SYORIKBN
            END-EVALUATE
@@ -1613,6 +1658,21 @@
                              "ではありません。"
                                                    DELIMITED BY  SIZE
                              "新規登録はしないで下さい。"
+                                                   DELIMITED BY  SIZE
+                                                 INTO    SPA-ERRMSG
+                   END-STRING
+      *H24.8
+               WHEN    "K003"
+                   STRING    "警告！"
+                             "厚生労働省から提供される範囲のコードです"
+                             "。改正処理はしないで下さい。"
+                                                   DELIMITED BY  SIZE
+                                                 INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K004"
+                   STRING    "警告！"
+                             "厚生労働省から提供される範囲のコードです"
+                             "。有効年月日の変更はしないで下さい。"
                                                    DELIMITED BY  SIZE
                                                  INTO    SPA-ERRMSG
                    END-STRING

@@ -868,6 +868,7 @@
            END-IF
       *
            IF      LNK-ERR-CODE        =   ZERO
+                                       OR  02
       *        ≈–œø§¢§Í
                MOVE    CNT-OUT01           TO  LNK-OUT-CNT1
                MOVE    CNT-OUT02           TO  LNK-OUT-CNT2
@@ -1867,7 +1868,8 @@
            MOVE    ZERO                TO  WRK-GAIYO-KAISU
       *
            PERFORM VARYING     IDX2     FROM    1   BY  1
-                   UNTIL       IDX2     >   20
+     **************UNTIL       IDX2     >   20
+                   UNTIL       IDX2     >   40
                IF      LF04-IJICD(IDX1 IDX2)   NOT =   SPACE
                    IF      TBL-MAX         =   ZERO
       *                •Ô°º•Øø«Œ≈π‘∞ŸΩÈ¥¸ ‘Ω∏
@@ -1894,7 +1896,8 @@
       *
       *    ø«ª°•≥°º•…§Œ§ﬂ§Œ∫ﬁ
            PERFORM VARYING     IDX2     FROM    1   BY  1
-                   UNTIL       IDX2     >   20
+      **********   UNTIL       IDX2     >   20
+                   UNTIL       IDX2     >   40
                IF      LF04-IJICD(IDX1 IDX2)(1:1)   =   "1"
                    IF      TBL-MAX         =   ZERO
       *                •Ô°º•Øø«Œ≈π‘∞ŸΩÈ¥¸ ‘Ω∏
@@ -1926,7 +1929,8 @@
        2005-NYUIN-BUNKATU-SEC                SECTION.
       *
            PERFORM VARYING     IDX2     FROM    1   BY  1
-                   UNTIL       IDX2     >   20
+      **********   UNTIL       IDX2     >   20
+                   UNTIL       IDX2     >   40
       *
                INITIALIZE                  TBL-WKSRYACT-AREA
                MOVE    ZERO                TO  TBL-MAX
@@ -2390,7 +2394,8 @@
        2005-TBLSET-NEXT-SEC                SECTION.
       *
            PERFORM VARYING     IDX2     FROM    1   BY  1
-                   UNTIL       IDX2     >   20
+      ***********  UNTIL       IDX2     >   20
+                   UNTIL       IDX2     >   40
                IF      LF04-IJICD(IDX1 IDX2)   NOT =   SPACE
       *            •Ô°º•Øø«Œ≈π‘∞Ÿ∆‚…Ù ‘Ω∏
                    PERFORM 20032-ZAITBLSET-SEC

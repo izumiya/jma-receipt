@@ -45,6 +45,7 @@
       *                                     一般名等追加
       *  03.05.00    NACL-多々納  07/05/07  グループ診療対応
       *  04.05.00    NACL-太田    10/01/15  月上限回数、月総投与量設定追加
+      *  04.06.00    NACL-多々納  12/08/16  期間変更警告追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -277,6 +278,8 @@
       *
                05  SPA-NAI-KEIFLG1             PIC 9(01).
                05  SPA-NAI-KEIFLG2             PIC 9(01).
+      *H24.8
+               05  SPA-NAI-KEIFLG3             PIC 9(01).
       *
                05  SPA-NAI-CHNGCD              PIC X(09).
                05  SPA-MAE-CHNGCD              PIC X(09).
@@ -1928,6 +1931,30 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "1013"              TO  SPA-ERRCD
                    MOVE    1                   TO  SPA-GMN-CUR
                    GO      TO      4109-TOUROKU-CHK-EXT
+               END-IF
+      *
+      *H24.8
+               IF      SPA-NAI-KEIFLG3     =   ZERO
+                   MOVE    "K005"          TO  SPA-ERRCD
+                   MOVE    1               TO  SPA-NAI-KEIFLG3
+                   MOVE    1               TO  SPA-GMN-CUR
+                   GO      TO      4109-TOUROKU-CHK-EXT
+               END-IF
+           END-IF
+      *
+      *H24.8
+      *    期間変更チェック
+           IF      SPA-Z01-SELNUM      >=  1
+               IF      (SPA-Z01-TYUKOSTYMD(SPA-Z01-SELNUM)
+                                       NOT =   SPA-NAI-YUKOSTYMD)
+               OR      (SPA-Z01-TYUKOEDYMD(SPA-Z01-SELNUM)
+                                       NOT =   SPA-NAI-YUKOEDYMD)
+                   IF      SPA-NAI-KEIFLG3     =   ZERO
+                       MOVE    "K004"          TO  SPA-ERRCD
+                       MOVE    1               TO  SPA-NAI-KEIFLG3
+                       MOVE    1               TO  SPA-GMN-CUR
+                       GO      TO      4109-TOUROKU-CHK-EXT
+                   END-IF
                END-IF
            END-IF
       *
@@ -4384,6 +4411,21 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    STRING   "警告！厚生労働省から提供されたデータです。"
                                                    DELIMITED BY  SIZE
                             "削除しないで下さい。"
+                                                   DELIMITED BY  SIZE
+                                                 INTO    SPA-ERRMSG
+                   END-STRING
+      *H24.8
+               WHEN    "K004"
+                   STRING    "警告！"
+                             "厚生労働省から提供される範囲のコードです"
+                             "。有効年月日の変更はしないで下さい。"
+                                                   DELIMITED BY  SIZE
+                                                 INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K005"
+                   STRING    "警告！"
+                             "厚生労働省から提供される範囲のコードです"
+                             "。改正処理はしないで下さい。"
                                                    DELIMITED BY  SIZE
                                                  INTO    SPA-ERRMSG
                    END-STRING
