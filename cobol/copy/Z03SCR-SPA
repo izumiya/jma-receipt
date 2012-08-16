@@ -345,4 +345,5 @@
       *
                05  SPA-NAI-KEIFLG3             PIC 9(01).
       *
+               05  SPA-NAI-KEIFLGK             PIC 9(01).
       *

@@ -3574,6 +3574,22 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                END-EVALUATE
            END-IF
       *
+      *H24.8
+      *    期間変更チェック
+           IF      SPA-Z01-SELNUM      >=  1
+               IF      (SPA-Z01-TYUKOSTYMD(SPA-Z01-SELNUM)
+                                       NOT =   SPA-NAI-YUKOSTYMD)
+               OR      (SPA-Z01-TYUKOEDYMD(SPA-Z01-SELNUM)
+                                       NOT =   SPA-NAI-YUKOEDYMD)
+                   IF     (SPA-NAI-KEIFLGK     =   ZERO  )
+                     AND  (SPA-ERRCD           =   SPACE )
+                       MOVE    "K004"          TO  SPA-ERRCD
+                       MOVE    1               TO  SPA-NAI-KEIFLGK
+                       MOVE    1               TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           END-IF
+      *
            IF      SPA-ERRCD           =   SPACE
                IF      SPA-GMN-NAME        =   SPACE
                    MOVE    "1014"              TO  SPA-ERRCD
@@ -3602,11 +3618,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF    (SPA-GMN-JGNCNT   NOT =   ZERO )  AND
                          (SPA-GMN-PLUS-JGNCNT  =   ZERO )
                      AND (SPA-GMN-PLUS-JGNCNTETC    =   ZERO )
+                     AND (SPA-ERRCD            =   SPACE )
                        MOVE    "0018"              TO  SPA-ERRCD
                        MOVE    "PLUS_JGNCNT"       TO  WRK-MCP-WIDGET
                    END-IF
                    IF    (SPA-GMN-JGNCNT1D     NOT =   ZERO )  AND
                          (SPA-GMN-PLUS-JGNCNT1D    =   ZERO )
+                     AND (SPA-ERRCD            =   SPACE )
                        MOVE    "0018"              TO  SPA-ERRCD
                        MOVE    "PLUS_JGNCNT1D"     TO  WRK-MCP-WIDGET
                    END-IF
@@ -3668,6 +3686,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      SPA-ERRCD           =   SPACE
                    MOVE    "1013"              TO  SPA-ERRCD
                    MOVE    1                   TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *H24.8
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-NAI-KEIFLGK     =   ZERO
+                   MOVE    "K005"          TO  SPA-ERRCD
+                   MOVE    1               TO  SPA-NAI-KEIFLGK
+                   MOVE    1               TO  SPA-GMN-CUR
                END-IF
            END-IF
            .
@@ -4738,6 +4764,21 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "K003"
                    STRING   "警告！厚生労働省から提供されたデータです。"
                             "削除しないで下さい。"
+                                                   DELIMITED BY  SIZE
+                                                 INTO    SPA-ERRMSG
+                   END-STRING
+      *H24.8
+               WHEN    "K004"
+                   STRING    "警告！"
+                             "厚生労働省から提供される範囲のコードです"
+                             "。有効年月日の変更はしないで下さい。"
+                                                   DELIMITED BY  SIZE
+                                                 INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K005"
+                   STRING    "警告！"
+                             "厚生労働省から提供される範囲のコードです"
+                             "。改正処理はしないで下さい。"
                                                    DELIMITED BY  SIZE
                                                  INTO    SPA-ERRMSG
                    END-STRING
