@@ -98,7 +98,7 @@
       *             診療コード
                     06  MDCREQ-PRSCRPT-CODE          PIC X(9).
       *             診療名称（コメント）
-                    06  MDCREQ-PRSCRPT-NAME          PIC X(50).
+                    06  MDCREQ-PRSCRPT-NAME          PIC X(80).
       *             数量
                     06  MDCREQ-PRSCRPT-NUMBER        PIC X(10).
       *             処方せん一般名記載

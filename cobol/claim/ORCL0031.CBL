@@ -1801,7 +1801,8 @@
            MOVE    ZERO                TO  WRK-GAIYO-KAISU
       *
            PERFORM VARYING     IDX2     FROM    1   BY  1
-                   UNTIL       IDX2     >   20
+      ***********  UNTIL       IDX2     >   20
+                   UNTIL       IDX2     >   40
                IF      LF04-IJICD(IDX1 IDX2)   NOT =   SPACE
                    IF      TBL-MAX         =   ZERO
       *                ワーク診療行為初期編集
@@ -1828,7 +1829,8 @@
       *
       *    診察コードのみの剤
            PERFORM VARYING     IDX2     FROM    1   BY  1
-                   UNTIL       IDX2     >   20
+      **********   UNTIL       IDX2     >   20
+                   UNTIL       IDX2     >   40
                IF      LF04-IJICD(IDX1 IDX2)(1:1)   =   "1"
                    IF      TBL-MAX         =   ZERO
       *                ワーク診療行為初期編集
@@ -1860,7 +1862,8 @@
        2005-NYUIN-BUNKATU-SEC                SECTION.
       *
            PERFORM VARYING     IDX2     FROM    1   BY  1
-                   UNTIL       IDX2     >   20
+      ***********  UNTIL       IDX2     >   20
+                   UNTIL       IDX2     >   40
       *
                INITIALIZE                  TBL-WKSRYACT-AREA
                MOVE    ZERO                TO  TBL-MAX
@@ -2306,7 +2309,8 @@
        2005-TBLSET-NEXT-SEC                SECTION.
       *
            PERFORM VARYING     IDX2     FROM    1   BY  1
-                   UNTIL       IDX2     >   20
+      ***********  UNTIL       IDX2     >   20
+                   UNTIL       IDX2     >   40
                IF      LF04-IJICD(IDX1 IDX2)   NOT =   SPACE
       *            ワーク診療行為内部編集
                    PERFORM 20032-ZAITBLSET-SEC
