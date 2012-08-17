@@ -18835,7 +18835,8 @@
             AND (RECE62-KOUREI        =  "1"     )
               IF  ((RECE62-TEISYUTUSAKI  =   6                  ) AND
                    (WRK-PREFNUM          = "10" OR "45" OR "23"
-                                        OR "27" OR "28" OR "38" ))
+                                        OR "27" OR "28" OR "38"
+                                        OR "34"                 ))
               OR  ((RECE62-TEISYUTUSAKI  =   2                  ) AND
                    (WRK-PREFNUM          = "38"                 ))
                  COMPUTE  WRK-CHK-KOKIGAK4 = RECE62-TOTALTEN(2)
