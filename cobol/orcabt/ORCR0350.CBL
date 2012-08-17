@@ -347,6 +347,7 @@
       *  04.05.38    NACL-藤原    12/06/25  加減算対象となる複数の基本項目を
       *                                     まとめて記録するときに途中にコメ
       *                                     ントがあった場合の記録順の修正 
+      *  04.05.39    NACL-門脇    12/08/16  レセ電負担区分編集（食事）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -551,6 +552,7 @@
            03  FLG-KOUI                PIC 9(01).
            03  FLG-TOYAKUFLG           PIC 9(01).
            03  FLG-TAISYO              PIC 9(01).
+           03  FLG-SKJ-HANTEI          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -572,6 +574,7 @@
            03  IDXX                    PIC 9(03).
            03  IDXY                    PIC 9(03).
            03  IDXZ                    PIC 9(03).
+           03  IDXZ2                   PIC 9(03).
            03  IDW1                    PIC 9(03).
            03  IDW2                    PIC 9(04).
            03  IDX0                    PIC 9(03).
@@ -7145,8 +7148,18 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            IF      RECE62-SRYYM    >=  WRK-CONS-SRYYM-200804
                IF    ( IDZ1                =   3     )
                    MOVE    "97"        TO  WRK-RECE641-SRYKBN
-                   MOVE    RECE62-FUKUSHIFLG-SKJIPAINF-AREA
-                                       TO  WRK-FUKUSHIFLG-SKJINF-AREA
+      ***          MOVE    RECE62-FUKUSHIFLG-SKJIPAINF-AREA
+      ***                              TO  WRK-FUKUSHIFLG-SKJINF-AREA
+                   PERFORM VARYING IDZ7  FROM  1  BY  1
+                            UNTIL  IDZ7   >    4
+                     EVALUATE  RECE62-FUKUSHIFLG-SKJIPA(IDZ7)
+                       WHEN      "3"
+                         PERFORM  2007721-SKJ-FTNKBN-HENSYU2-SEC
+                       WHEN     OTHER
+                         MOVE  RECE62-FUKUSHIFLG-SKJIPA(IDZ7)
+                                       TO  WRK-FUKUSHIFLG-SKJ(IDZ7)
+                     END-EVALUATE
+                   END-PERFORM
                ELSE
                    IF    ( IDZ1            >   3     )
       ***              MOVE    RECE62-FUKUSHIFLG-SKJSEIINF-AREA
@@ -7154,17 +7167,20 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                        MOVE    "97"    TO  WRK-RECE641-SRYKBN
                        PERFORM VARYING IDZ7  FROM  1  BY  1
                                 UNTIL  IDZ7   >    4
-                         IF  RECE62-FUKUSHIFLG-SKJSEI(IDZ7) = "2"
+                        EVALUATE  RECE62-FUKUSHIFLG-SKJSEI(IDZ7)
+                         WHEN      "2"
                            EVALUATE  IDZ1
                              WHEN     4
                                MOVE SPACE  TO  WRK-FUKUSHIFLG-SKJ(IDZ7)
                              WHEN     5
                                MOVE  "1"   TO  WRK-FUKUSHIFLG-SKJ(IDZ7)
                            END-EVALUATE
-                         ELSE
+                         WHEN      "3"
+                           PERFORM  2007721-SKJ-FTNKBN-HENSYU2-SEC
+                         WHEN     OTHER
                            MOVE  RECE62-FUKUSHIFLG-SKJSEI(IDZ7)
                                            TO  WRK-FUKUSHIFLG-SKJ(IDZ7)
-                         END-IF
+                        END-EVALUATE
                        END-PERFORM
                    END-IF
                END-IF
@@ -7526,6 +7542,41 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
            .
        200772-SKJ-FTNKBN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    負担区分編集処理（食事）
+      *****************************************************************
+       2007721-SKJ-FTNKBN-HENSYU2-SEC    SECTION.
+      *
+           MOVE    ZERO    TO   FLG-SKJ-HANTEI
+           PERFORM VARYING IDXZ FROM  1  BY 1
+                    UNTIL  IDXZ  >   10
+                     OR    RECE62-HKNCOMBI(IDXZ) = ZERO
+             IF  LNK-NYURECEDEN-HKNCOMBI(IDZ1 IDZ2)
+                              =   RECE62-HKNCOMBI(IDXZ)
+               PERFORM  VARYING  IDXZ2  FROM  1  BY  1
+                         UNTIL   IDXZ2   >    4
+                 IF  (RECE62-KOHNUM(IDZ7) = RECE62-KOHNUMHC(IDXZ IDXZ2))
+                 AND (RECE62-KOHID (IDZ7) = RECE62-KOHIDHC (IDXZ IDXZ2))
+                   IF  RECE62-FTNKBNFLG-SKJ(IDXZ IDXZ2) =  1
+                     MOVE    1    TO   FLG-SKJ-HANTEI
+                   END-IF
+                   MOVE      4    TO   IDXZ2
+                 END-IF
+               END-PERFORM
+               MOVE         10    TO   IDXZ
+             END-IF
+           END-PERFORM
+      *
+           IF  FLG-SKJ-HANTEI  =  ZERO
+             MOVE SPACE  TO  WRK-FUKUSHIFLG-SKJ(IDZ7)
+           ELSE
+             MOVE  "1"   TO  WRK-FUKUSHIFLG-SKJ(IDZ7)
+           END-IF
+      *
+           .
+       2007721-SKJ-FTNKBN-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************

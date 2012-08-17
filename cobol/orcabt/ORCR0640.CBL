@@ -575,6 +575,7 @@
       *                                     ÂÐ¾Ý³°¤ÎÁ´¹ñ¸øÈñ¤Î°ìÉôÉéÃ´¶âµ­
       *                                     ºÜ½¤Àµ¡Ê£°£±£°¡Ë
       *  04.05.77    NACL-ÌçÏÆ    12/08/10  £¸£°¤½¤ÎÂ¾Íó¤ÎÅÀ¿ô½¸·×½¤Àµ
+      *  04.05.78    NACL-ÌçÏÆ    12/08/16  ¥ì¥»ÅÅÉéÃ´¶èÊ¬ÊÔ½¸¡Ê¿©»ö¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -799,6 +800,8 @@
            03  FLG-JIRITU-CYUKANSOU2                   PIC 9(01).
            03  FLG-DOJITU                              PIC 9(01).
            03  FLG-NISYU-KOREI                         PIC 9(01).
+           03  FLG-SKJ-HANTEI1                         PIC 9(01).
+           03  FLG-SKJ-HANTEI2                         PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -867,6 +870,7 @@
            03  KOHFTN-IDX                              PIC 9(03).
            03  KOHFTN-IDX2                             PIC 9(03).
            03  KOHFTN-IDX3                             PIC 9(03).
+           03  KOHFTN-IDX4                             PIC 9(03).
            03  SYSKAN-IDX                              PIC 9(03).
            03  SYSKAN-IDX2                             PIC 9(03).
            03  KOHIDX                                  PIC 9(03).
@@ -17414,6 +17418,12 @@
                AND (RECE62-TEISYUTUSAKI  =   6          )
                    PERFORM  210453-SEIKYUGAK-SKJ-HENSYU-SEC
                END-IF
+      *      ¿·³ã¸©ÃÏÊý¸øÈñ
+             WHEN    "15"
+               IF  (RECE62-SRYYM        >=  "200804"    )
+               AND (RECE62-TEISYUTUSAKI  =   2 OR 6     )
+                   PERFORM  210453-SEIKYUGAK-SKJ-HENSYU-SEC
+               END-IF
            END-EVALUATE
       *
            IF  ( RECE62-HKNNUM          =  SPACE         )
@@ -17564,6 +17574,14 @@
               COMPUTE  RECE62-SHOKUJIFTN(3) =
                        RECE62-SHOKUJIFTN(1) -
                        RECE62-SHOKUJIFTN(2)
+              IF   RECE62-FUKUSHIFLG-SKJ(2)    = SPACE
+              AND  RECE62-FUKUSHIFLG-SKJIPA(2) = SPACE
+              AND  RECE62-FUKUSHIFLG-SKJSEI(2) = SPACE
+                MOVE     "3"     TO   RECE62-FUKUSHIFLG-SKJIPA(2)
+                MOVE     "3"     TO   RECE62-FUKUSHIFLG-SKJSEI(2)
+                MOVE      2      TO   KOHFTN-IDX4
+                PERFORM  2104531-SEIKYUGAK-SKJ-HENSYU2-SEC
+              END-IF
            END-IF
       *
            IF  ( RECE62-HKNNUM       NOT = SPACE    )
@@ -17619,6 +17637,14 @@
               COMPUTE  RECE62-SHOKUJIFTN(4) =
                        RECE62-SHOKUJIFTN(1) -
                        RECE62-SHOKUJIFTN(2)
+              IF   RECE62-FUKUSHIFLG-SKJ(3)    = SPACE
+              AND  RECE62-FUKUSHIFLG-SKJIPA(3) = SPACE
+              AND  RECE62-FUKUSHIFLG-SKJSEI(3) = SPACE
+                MOVE     "3"     TO   RECE62-FUKUSHIFLG-SKJIPA(3)
+                MOVE     "3"     TO   RECE62-FUKUSHIFLG-SKJSEI(3)
+                MOVE      3      TO   KOHFTN-IDX4
+                PERFORM  2104531-SEIKYUGAK-SKJ-HENSYU2-SEC
+              END-IF
            END-IF
       *
            IF  ( RECE62-HKNNUM       NOT = SPACE    )
@@ -17649,6 +17675,44 @@
       *
            .
        210453-SEIKYUGAK-SKJ-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿©»öÀÁµá³ÛÅù¤ÎÃÖ¤­´¹¤¨
+      *****************************************************************
+       2104531-SEIKYUGAK-SKJ-HENSYU2-SEC               SECTION.
+      *
+           PERFORM VARYING KOHFTN-IDX FROM  1  BY 1
+                    UNTIL  KOHFTN-IDX  >   10
+                     OR    RECE62-HKNCOMBI(KOHFTN-IDX) = ZERO
+             MOVE    ZERO    TO   FLG-SKJ-HANTEI1
+             MOVE    ZERO    TO   FLG-SKJ-HANTEI2
+             MOVE    ZERO    TO   KOHFTN-IDX3
+             PERFORM  VARYING  KOHFTN-IDX2  FROM  1  BY  1
+                       UNTIL   KOHFTN-IDX2   >    4
+               IF  (RECE62-KOHNUM(1) =
+                           RECE62-KOHNUMHC(KOHFTN-IDX KOHFTN-IDX2))
+               AND (RECE62-KOHID (1) =
+                           RECE62-KOHIDHC (KOHFTN-IDX KOHFTN-IDX2))
+                 MOVE    1             TO   FLG-SKJ-HANTEI1
+               END-IF
+               IF  (RECE62-KOHNUM(KOHFTN-IDX4) =
+                           RECE62-KOHNUMHC(KOHFTN-IDX KOHFTN-IDX2))
+               AND (RECE62-KOHID (KOHFTN-IDX4) =
+                           RECE62-KOHIDHC (KOHFTN-IDX KOHFTN-IDX2))
+                 MOVE    1             TO   FLG-SKJ-HANTEI2
+                 MOVE    KOHFTN-IDX2   TO   KOHFTN-IDX3
+               END-IF
+             END-PERFORM
+             IF   FLG-SKJ-HANTEI1  =  1
+             AND  FLG-SKJ-HANTEI2  =  1
+                 MOVE    1    TO
+                           RECE62-FTNKBNFLG-SKJ(KOHFTN-IDX KOHFTN-IDX3)
+             END-IF
+           END-PERFORM
+      *
+           .
+       2104531-SEIKYUGAK-SKJ-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************
