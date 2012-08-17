@@ -14827,7 +14827,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
             AND (RECE02-ZAITAKU       =  "1"     )
               IF  ((RECE02-TEISYUTUSAKI  =   6                  ) AND
                    (SYS-1001-PREFNUM     =  10 OR 45 OR 23 OR 27
-                                         OR 28 OR 38            ))
+                                         OR 28 OR 38 OR 34      ))
               OR  ((RECE02-TEISYUTUSAKI  =   2                  ) AND
                    (SYS-1001-PREFNUM     =  38                  ))
                  COMPUTE  WRK-CHK-KOKIGAK4 = RECE02-TOTALTEN(2)
