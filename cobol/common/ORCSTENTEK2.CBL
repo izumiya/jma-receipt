@@ -1552,7 +1552,41 @@
                                PERFORM   300-ZAINUM-SET-SEC
                              END-IF
                              IF      FLG-SEIMITSU-SET    =    ZERO
-                                 MOVE   5     TO    LNK-ORCSTEN2-RC
+      *                        手技料が算定されていない場合でも、
+      *                        精密持続点滴注射については取り込みを行う
+                               MOVE  1     TO   FLG-SEIMITSU-SET
+                               MOVE  1     TO   FLG-TENTEK-SET
+                               ADD   1     TO 
+                                    LNK-ORCSTEN2-TENTEK-MEISAISU(IDX1)
+                               EVALUATE   TRUE
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 1)
+                                              =    SPACE
+                                   MOVE   1   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 2)
+                                              =    SPACE
+                                   MOVE   2   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 3)
+                                              =    SPACE
+                                   MOVE   3   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 4)
+                                              =    SPACE
+                                   MOVE   4   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 5)
+                                              =    SPACE
+                                   MOVE   5   TO     WRK-MEISAISU
+                               END-EVALUATE
+                               ADD   ACCT-ZAITEN     TO 
+                                    LNK-ORCSTEN2-TENTEK-ZAITEN(IDX1)
+                               ADD   ACCT-SRYCDTOTAL     TO 
+                                    LNK-ORCSTEN2-TENTEK-SRYCDTOTAL(IDX1)
+                               MOVE   "130000210"    TO
+                                    LNK-ORCSTEN2-TENTEK-SRYCD
+                                                  (IDX1 WRK-MEISAISU)
+                               IF   WRK-COMMENT-MEISAISU   NOT =  ZERO
+                                    PERFORM    300-COMMENT-SET-SEC
+                                    PERFORM    310-COMMENT-SET-SEC
+                               END-IF
+                               PERFORM   300-ZAINUM-SET-SEC
                              END-IF
                            END-IF
                        END-PERFORM
