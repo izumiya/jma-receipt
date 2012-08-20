@@ -33,6 +33,7 @@
       *  04.06.00    NACL-多々納  11/02/21  用法コメント対応
       *  04.06.00    NACL-多々納  12/03/XX  Ｈ２４年４月改正対応
       *  04.06.00    NACL-多々納  12/04/04  薬品名称を４０文字までとする
+      *  04.06.00    NACL-多々納  12/08/17  薬価基準コード変換対応
       *****************************************************************
       *
       *
@@ -148,6 +149,8 @@
            03  WRK-NAME.
                05  WRK-NAME-1          PIC X(80).
                05  WRK-NAME-2          PIC X(20).
+      *H24.8
+           03  WRK-YAKKAKJNCD          PIC X(12).
       *
       *    ＱＲテーブル
        01  TBL-QRCSV-AREA.
@@ -156,6 +159,9 @@
       *
       *    ＱＲ作成用
            COPY    "CPORCSQRENCODE.INC".
+      *
+      *    一般名例外コードテーブル
+           COPY    "CMGENERICTBL.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -971,8 +977,12 @@
                   (ORCSQRCSV-SRYCD(IDX IDX2)(1:1)  =   "6" )
              AND  (ORCSQRCSV-KISAIKBN (IDX IDX2)   =   1   )
                MOVE    "7"                 TO  TBL-QRCSV-DATA (5)
-               MOVE    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
-                                           TO  TBL-QRCSV-DATA (6)
+      *H24.8
+      **       MOVE    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
+      **                                   TO  TBL-QRCSV-DATA (6)
+      *        一般名例外コード変換
+               PERFORM 20039-GENERICCD-HEN-SEC
+               MOVE    WRK-YAKKAKJNCD      TO  TBL-QRCSV-DATA (6)
            END-IF
       *
       *H24.4 訂正
@@ -1023,6 +1033,32 @@
            END-IF
            .
        2003-RP201-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    一般名例外コード変換処理
+      *****************************************************************
+       20039-GENERICCD-HEN-SEC         SECTION.
+      *
+           SET     TBL-GEN             TO  1
+           SEARCH      TBL-GENERIC-OCC     VARYING   TBL-GEN
+                   AT  END
+                       MOVE    SPACE               TO  WRK-YAKKAKJNCD
+                   WHEN    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
+                                               =   TBL-YAKKAKJNCD
+                                                           (TBL-GEN)
+                       MOVE    TBL-GENERIC-CODE (TBL-GEN)
+                                                TO  WRK-YAKKAKJNCD
+           END-SEARCH
+      *
+           IF      WRK-YAKKAKJNCD      =   SPACE
+               STRING  ORCSQRCSV-YAKKAKJNCD(IDX IDX2)(1:9)
+                       "ZZZ"               DELIMITED  BY  SIZE
+                                           INTO    WRK-YAKKAKJNCD
+               END-STRING
+           END-IF
+           .
+       20039-GENERICCD-HEN-EXT.
            EXIT.
       *
       *****************************************************************

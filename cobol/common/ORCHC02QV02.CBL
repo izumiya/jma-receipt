@@ -3399,11 +3399,15 @@
            END-IF
       *H24.4
       *    一般名コード
-           STRING  TNS-YAKKAKJNCD(1:9)
-                   "ZZZ"               DELIMITED  BY  SIZE
-                                       INTO    ORCSQRCSV-YAKKAKJNCD
+      *    STRING  TNS-YAKKAKJNCD(1:9)
+      *            "ZZZ"               DELIMITED  BY  SIZE
+      *                                INTO    ORCSQRCSV-YAKKAKJNCD
+      *                                           (IDX-QR1 IDX-QR2)
+      *    END-STRING
+      *H24.8
+      *    薬価基準コード
+           MOVE    TNS-YAKKAKJNCD      TO  ORCSQRCSV-YAKKAKJNCD
                                                   (IDX-QR1 IDX-QR2)
-           END-STRING
       *    単位換算値
            IF      TNSP-IPN-KISAIKBN   =   ZERO
                CONTINUE
