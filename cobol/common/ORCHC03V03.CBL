@@ -1709,6 +1709,8 @@
                ELSE
                    PERFORM 2021-GRP-SRYKAMEI-HEN-SEC
                END-IF
+               INITIALIZE                      HKNCOMBI-REC
+                                               PTRSIINF-REC
       *        保険組合せ
                IF      SYU-HKNCOMBINUM     =   ZERO  OR  SPACE
                    MOVE    "複数保険使用"      TO  WRK-HKNCOMBIMEI
