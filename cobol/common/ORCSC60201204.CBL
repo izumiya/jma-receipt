@@ -553,33 +553,42 @@
            03  FILLER          PIC X(14)  VALUE    "06 2 160018910".
       *
       *¤É¤ì¤«£²¤Ä
-      *    ¥ê¥Þ¥È¥¤¥É°ø»Ò
+      *(D014)
+      *    ¥ê¥Þ¥È¥¤¥É°ø»Ò¡Ê£Ò£Æ¡ËÈ¾ÄêÎÌ(D014-2)
            03  FILLER          PIC X(14)  VALUE    "07 21160053110".
-      *    ¹³¥¬¥é¥¯¥È¡¼¥¹·çÂ»£É£ç£Ç¹³ÂÎ
-           03  FILLER          PIC X(14)  VALUE    "07 2 160168750".
-      *    ¥Þ¥È¥ê¥Ã¥¯¥¹¥á¥¿¥×¥í¥Æ¥¤¥Ê¡¼¥¼£³¡Ê£Í£Í£Ð¡¼£³¡Ë
+      *    ¥ê¥Þ¥È¥¤¥É°ø»Ò¡Ê£Ò£Æ¡ËÄêÎÌ(D014-2)
+           03  FILLER          PIC X(14)  VALUE    "07 21160195610".
+      *    ¹³¥¬¥é¥¯¥È¡¼¥¹·çÂ»£É£ç£Ç¹³ÂÎ(D014-8)
+           03  FILLER          PIC X(14)  VALUE    "07 21160168750".
+      *    ¹³¥¬¥é¥¯¥È¡¼¥¹·çÂ»£É£ç£ÇÄêÎÌ(D014-8)
+           03  FILLER          PIC X(14)  VALUE    "07 21160195910".
+      *    ¥Þ¥È¥ê¥Ã¥¯¥¹¥á¥¿¥×¥í¥Æ¥¤¥Ê¡¼¥¼£³¡Ê£Í£Í£Ð¡¼£³¡Ë(D014-8)
            03  FILLER          PIC X(14)  VALUE    "07 2 160173150".
-      *    £Ã£±£ñ·ë¹çÌÈ±ÖÊ£¹çÂÎ
+      *    £Ã£±£ñ·ë¹çÌÈ±ÖÊ£¹çÂÎ(D014-11)
            03  FILLER          PIC X(14)  VALUE    "07 2 160119210".
-      *    ¥â¥Î¥¯¥í¡¼¥Ê¥ë£Ò£Æ·ë¹çÌÈ±ÖÊ£¹çÂÎ
+      *    ¥â¥Î¥¯¥í¡¼¥Ê¥ë£Ò£Æ·ë¹çÌÈ±ÖÊ£¹çÂÎ(D014-14)
            03  FILLER          PIC X(14)  VALUE    "07 2 160143750".
-      *    £É£ç£Ç·¿¥ê¥¦¥Þ¥Á°ø»Ò
+      *    £É£ç£Ç·¿¥ê¥¦¥Þ¥Á°ø»Ò(D014-16)
            03  FILLER          PIC X(14)  VALUE    "07 2 160151650".
-      *    £Ã£³£ä·ë¹çÌÈ±ÖÊ£¹çÂÎ
+      *    £Ã£³£ä·ë¹çÌÈ±ÖÊ£¹çÂÎ(D014-16)
            03  FILLER          PIC X(14)  VALUE    "07 2 160119310".
       *£±¤Ä¡Ê£°£·¡Ë¤Î¸¡ºº¤Ï»»ÄêÉÔ²Ä
-      *    ¹³¥·¥È¥ë¥ê¥ó²½¥Ú¥¯¥Á¥É¹³ÂÎ
+      *    ¹³¥·¥È¥ë¥ê¥ó²½¥Ú¥¯¥Á¥É¹³ÂÎ(D014-16)
            03  FILLER          PIC X(14)  VALUE    "08 1 160181150".
+      *    ¹³¥·¥È¥ë¥ê¥ó²½¥Ú¥¯¥Á¥ÉÄêÎÌ(D014-16)
+           03  FILLER          PIC X(14)  VALUE    "08 1 160197410".
+      *
       *
        01  TBL-KENSA-JYU-AREA-R    REDEFINES   TBL-KENSA-JYU-AREA.
-           03  TBL-KENSA-JYU-OCC       OCCURS  19  INDEXED  JYU-IDX.
+      *****03  TBL-KENSA-JYU-OCC       OCCURS  19  INDEXED  JYU-IDX.
+           03  TBL-KENSA-JYU-OCC       OCCURS  22  INDEXED  JYU-IDX.
                05  TBL-JYU-KBN         PIC X(02).
                05  TBL-FILLER1         PIC X(01).
                05  TBL-JYU-KEN         PIC X(01).
                05  TBL-FILLER2         PIC X(01).
                05  TBL-JYU-SRYCD       PIC X(09).
       *01  KEN-JYU-MAX                 PIC 9(04)   VALUE   11.
-       01  KEN-JYU-MAX                 PIC 9(04)   VALUE   19.
+       01  KEN-JYU-MAX                 PIC 9(04)   VALUE   22.
       *
       *    ½ÅÊ£»»ÄêÉÔ²Ä¥Æ¡¼¥Ö¥ë¡Ê£²¡Ë
       *01  TBL-KENSA-JYU2-AREA.
@@ -607,6 +616,8 @@
            03  WRK-JYU-KBN             PIC X(02).
            03  WRK-JYU-KEN             PIC 9(01).
            03  WRK-JYU-FLG             PIC X(01).
+      *
+           03  WRK-JYU-FLG2            PIC X(01).
       *
       *    ¸¡ÂÎ¸¡ºº¿×Â®¼Â»Ü²Ã»»ÂÐ¾Ý
            COPY    "CMGAIKENSATBL.INC".
@@ -3205,9 +3216,14 @@
                    UNTIL      (IDX         >   KEN-JYU-MAX)  OR
                               (SPA-ERRCD   NOT =   SPACE  )
                MOVE    SPACE               TO  WRK-SRYCD
+               MOVE    SPACE               TO  WRK-JYU-FLG2
                IF      WRK-JYU-KBN         =   "08"
+      *            Æ±¤¸¸¡ºº
+                   PERFORM 200112-JYUFUKU-KBN-CHK-SEC
       *            ¹³¥·¥È¥ë¥ê¥ó²½¥Ú¥¯¥Á¥É¹³ÂÎ
-                   PERFORM 200113-JYUFUKU-KBN08-CHK-SEC
+                   IF      WRK-SRYCD       =   SPACE
+                       PERFORM 200113-JYUFUKU-KBN08-CHK-SEC
+                   END-IF
                ELSE
       *            ¤½¤ÎÂ¾¤Î¸¡ºº
                    PERFORM 200112-JYUFUKU-KBN-CHK-SEC
@@ -3235,6 +3251,13 @@
                                ADD     1               TO  WRK-JYU-CNT
                                MOVE    IDX2            TO  WRK-JYU-IDX
                                PERFORM 200111-ERRMSG-HEN-SEC
+                           END-IF
+      *H24.8
+      *                    ¤É¤ì¤«£±¤Ä¤Î½ÅÊ£ÂÐ¾Ý¤¢¤ê
+                           IF      (WRK-JYU-KBN        =   "07" )
+                             AND   (WRK-JYU-FLG        =   "1" )
+                             AND   (WRK-JYU-FLG2       =   "1" )
+                               MOVE    1               TO  WRK-JYU-KEN
                            END-IF
                        END-IF
       *                Êñ³ç¡¦Æþ±¡¤Î»þ¤ÏºÞÆâ
@@ -3275,6 +3298,8 @@
                                        NOT =   WRK-COM-INPUTCD
                                                          (IDX-Z))
                MOVE    TBL-JYU-SRYCD (JYU-IDX) TO  WRK-SRYCD
+      *H24.8
+               MOVE    TBL-FILLER2   (JYU-IDX) TO  WRK-JYU-FLG2
            END-IF
            .
        200112-JYUFUKU-KBN-CHK-EXT.
