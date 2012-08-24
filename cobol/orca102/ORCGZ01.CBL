@@ -1244,7 +1244,7 @@
                                            OR  "7"
                                            OR  "8" )
            AND   (SPA-Z01NAI-KEIFLG2   =   ZERO   )
-           AND   (SPA-Z01NAI-SELNUM    >   1      )
+           AND   (SPA-Z01NAI-SELNUM    >=  1      )
                IF     (SPA-Z01NAI-YUKOSTYMD    =
                                SPA-Z01NAI-TYUKOSTYMD(SPA-Z01NAI-SELNUM))
                AND    (SPA-Z01NAI-YUKOEDYMD    =
