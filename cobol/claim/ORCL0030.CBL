@@ -277,7 +277,7 @@
        1001-LF04MAKE-SEC           SECTION.
       *
            MOVE    WRK-LF041-REC       TO  WRK-LF04-REC
-           INITIALIZE  LF04-SRYTBL-G
+           INITIALIZE  WRK-LF04-SRYTBL-G
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   20
               MOVE     WRK-LF041-SRYCD(IDX) 
