@@ -5258,6 +5258,8 @@
                        MOVE    "3"         TO  WRK-TOKNYUIN-KBN
                        PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
                    WHEN    ( SYS-5002-BRM-TOKTEI-NYUIN = "18" OR "54" )
+                       AND ( WRK-KJNYMD   >=  CONST-H240401 )
+      *
                        MOVE    "5111"      TO  WRK-KANRICD
                        MOVE    "18"        TO  WRK-KBNCD
                        MOVE    "3"         TO  WRK-TOKNYUIN-KBN
@@ -5268,6 +5270,8 @@
                        MOVE    "3"         TO  WRK-TOKNYUIN-KBN
                        PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
                    WHEN    ( SYS-5002-BRM-TOKTEI-NYUIN = "92" OR "93" )
+                       AND ( WRK-KJNYMD   >=  CONST-H240401 )
+      *
                        MOVE    "5111"      TO  WRK-KANRICD
                        MOVE    "92"        TO  WRK-KBNCD
                        MOVE    "3"         TO  WRK-TOKNYUIN-KBN
