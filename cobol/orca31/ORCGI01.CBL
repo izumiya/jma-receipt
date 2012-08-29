@@ -5119,6 +5119,8 @@
                        SPA-NAI-I01-BTUSBT
                        SPA-NAI-I01-BTUKHNKBNCD
                        SPA-NAI-I01-BRMKHNKBNCD
+                       SPA-NAI-I01-BTUTOKCD
+                       SPA-NAI-I01-BRMTOKCD
                        SPA-NAI-I01-SELNYUKHN
       *
            MOVE    WRK-KJNYMD  TO  WRK-AGECHK-SRYYMD
@@ -5134,6 +5136,13 @@
       *
                MOVE    SYS-5001-BTU-SBT    TO  SPA-NAI-I01-BTUSBT
                MOVE    SYS-5001-KHNKBNCD   TO  SPA-NAI-I01-BTUKHNKBNCD
+               MOVE    "3"                 TO  WRK-CMB-CD(1:1)
+               MOVE    SYS-5001-BTU-TOKTEI-NYUIN
+                                           TO  WRK-CMB-CD(2:2)
+               IF    ( WRK-KJNYMD      >=  CONST-H181001 )
+                   PERFORM 41011-TOKNYUIN-SYOKI-SEC
+                   MOVE    WRK-CMB-CD      TO  SPA-NAI-I01-BTUTOKCD
+               END-IF
       *
       *        ÉÂÅï¤ÎÆþ±¡´ðËÜÎÁ¤òÂàÈò¤¹¤ë
                IF    ( SYS-5001-BTU-KHNSRYCD
@@ -5225,6 +5234,14 @@
                MOVE    SYSKANRI-REC TO  SYS-5002-REC
       *
                MOVE    SYS-5002-KHNKBNCD   TO  SPA-NAI-I01-BRMKHNKBNCD
+               MOVE    "3"                 TO  WRK-CMB-CD(1:1)
+               MOVE    SYS-5002-BRM-TOKTEI-NYUIN
+                                           TO  WRK-CMB-CD(2:2)
+               IF    ( WRK-KJNYMD      >=  CONST-H181001 )
+                   PERFORM 41011-TOKNYUIN-SYOKI-SEC
+                   MOVE    WRK-CMB-CD      TO  SPA-NAI-I01-BRMTOKCD
+               END-IF
+
       *
                IF    ( SYS-5002-BRM-TOKTEI-NYUIN
                                NOT =   SPACE )
@@ -5240,7 +5257,26 @@
                        MOVE    "23"        TO  WRK-KBNCD
                        MOVE    "3"         TO  WRK-TOKNYUIN-KBN
                        PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   WHEN    ( SYS-5002-BRM-TOKTEI-NYUIN = "18" OR "54" )
+                       MOVE    "5111"      TO  WRK-KANRICD
+                       MOVE    "18"        TO  WRK-KBNCD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
       *
+                       MOVE    "5111"      TO  WRK-KANRICD
+                       MOVE    "54"        TO  WRK-KBNCD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                   WHEN    ( SYS-5002-BRM-TOKTEI-NYUIN = "92" OR "93" )
+                       MOVE    "5111"      TO  WRK-KANRICD
+                       MOVE    "92"        TO  WRK-KBNCD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+      *
+                       MOVE    "5111"      TO  WRK-KANRICD
+                       MOVE    "93"        TO  WRK-KBNCD
+                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
                    WHEN    OTHER
                        MOVE    "5111"      TO  WRK-KANRICD
                        MOVE    SYS-5002-BRM-TOKTEI-NYUIN
@@ -6220,36 +6256,18 @@
                    UNTIL ( IDX10   <   1 )
                     OR   ( SPA-GMN-I01-TOKNYUIN NOT =   SPACE )
       *
-               MOVE    ZERO            TO  FLG-TARGET
-      *
-               IF    ( SPA-GMN-I01-TOKNYUIN-ITM2 (IDX10) (1 : 1)
-                                   =   "1" OR  "2" OR  "3" )
-                   IF    ( SPA-GMN-I01-TOKNYUIN-ITM2 (IDX10) (1:1)
-                                   =  "3" )
-                       IF    ( SPA-GMN-I01-TOKNYUIN-ITM3 (IDX10)
-                                   =   "01" )
-                           MOVE    1   TO  FLG-TARGET
-                       END-IF
-                   ELSE
-                           MOVE    1   TO  FLG-TARGET
-                   END-IF
-               END-IF
-      *
                IF    ( SPA-GMN-I01-TOKNYUIN-ITM2 (IDX10)
-                                   = "224" OR "225"
-                                  OR "235" OR "236" OR "237" )
-                           MOVE    ZERO    TO  FLG-TARGET
-               END-IF
+                                   =   SPA-NAI-I01-BTUTOKCD
+                                    OR SPA-NAI-I01-BRMTOKCD )
       *
-               IF    ( FLG-TARGET      =   1 )
-                   MOVE    SPA-GMN-I01-TOKNYUIN-ITM (IDX10)
+                   MOVE    SPA-GMN-I01-TOKNYUIN-ITM  (IDX10)
                                        TO  SPA-GMN-I01-TOKNYUIN
                    MOVE    SPA-GMN-I01-TOKNYUIN-ITM2 (IDX10)
                                        TO  SPA-NAI-I01-TOKNYUIN-ORG
                    MOVE    SPA-GMN-I01-TOKNYUIN-ITM4 (IDX10)
                                        TO  SPA-NAI-I01-TOKNYUINCD
-               END-IF
       *
+               END-IF
            END-PERFORM
       *
            IF    ( SPA-GMN-I01-TOKNYUIN            =   SPACE )
@@ -6302,10 +6320,10 @@
       *****************************************************************
        41011-TOKNYUIN-SYOKI-SEC        SECTION.
       *
-           MOVE    WRK-KJNYMD  TO  WRK-AGECHK-SRYYMD
-           PERFORM 4801-RJN-TAISYO-CHK-SEC
-           IF    ( FLG-LIFE-RJN                =   1 )
-               IF    ( SPA-NAI-I01-RSI-HKNKBN  =   SPACE )
+           IF    ( SPA-NAI-I01-BTUSBT  =   "04" OR "09" )
+               MOVE    WRK-KJNYMD  TO  WRK-AGECHK-SRYYMD
+               PERFORM 4801-RJN-TAISYO-CHK-SEC
+               IF    ( FLG-LIFE-RJN                =   1  OR 2)
                    PERFORM VARYING IDX10   FROM    1   BY  1
                            UNTIL ( IDX10 > CONST-TOK-LIFECD-MAX)
                        IF    ( WRK-CMB-CD

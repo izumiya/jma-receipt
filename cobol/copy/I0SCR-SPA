@@ -275,6 +275,8 @@
                  11  SPA-NAI-I01-BTUSBT            PIC X(02).
                  11  SPA-NAI-I01-BTUKHNKBNCD       PIC X(03).
                  11  SPA-NAI-I01-BRMKHNKBNCD       PIC X(03).
+                 11  SPA-NAI-I01-BTUTOKCD          PIC X(03).
+                 11  SPA-NAI-I01-BRMTOKCD          PIC X(03).
                  11  SPA-NAI-I01-SELNYUKHN         PIC 9(01).
       *          退院処理時、請求データ取消フラグ
                  11  SPA-NAI-I01-TORIKESI-FLG      PIC 9(01).
