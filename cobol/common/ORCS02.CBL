@@ -339,6 +339,8 @@
       *  04.05.39    NACL-ÌçÏÆ    12/07/19  ¹âÎð¼ÔÂ¾ÊÝ¸±Æþ±¡ÂÐ±þ
       *  04.05.40    NACL-ÌçÏÆ    12/08/10  ºÒ³²ÂÐ±þ¡ÊÁ°´ü¹âÎð¼Ô£±³ä¡Ü£°£µ£±
       *                                     ¤Î¿©»öÉéÃ´·×»»¡Ë
+      *  04.05.41    NACL-ÌçÏÆ    12/08/29  Á°´ü¹âÎð¼Ô£±³ä¡Ü£°£µ£±
+      *                                     ¤Î¿©»öÉéÃ´·×»»½¤Àµ¡ÊÄ¹´üÊ»ÍÑ»þ¡Ë
       *
       *  04.06.01    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
       *  04.06.02    NACL-ÌçÏÆ    12/07/30  ¹â³Û°ÑÇ¤Ê§¤¤À©ÅÙ¾å¸Â³Û£°±ßÂÐ±þ
@@ -22405,6 +22407,10 @@
                            WK-ZENKI-TOKUREI-MONEY  / 10
                   COMPUTE  WK-ZENKI-TOKUREI-MONEY  =
                            WK-ZENKI-TOKUREI-MONEY  * 10
+                  IF   WK-ZENKI-TOKUREI-MONEY > WK-KOH-GENDOGAKU
+                    MOVE   WK-KOH-GENDOGAKU
+                                     TO   WK-ZENKI-TOKUREI-MONEY
+                  END-IF
                   IF   WK-GENGAKUKBN   =   3 OR 4
                     MOVE      ZERO   TO   WK-ZENKI-TOKUREI-MONEY
                   END-IF
