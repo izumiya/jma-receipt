@@ -253,16 +253,16 @@
        01  NYUINACT-REC.
            COPY    "CPNYUINACT.INC".
       *
-      *    入院診療会計マスタ−
+      *    入院会計マスタ−
        01  NYUINACCT-REC.
            COPY    "CPNYUINACCT.INC".
       *
-      *    入院診療会計マスタ−
+      *    入院会計マスタ−
        01  HZN-NYUINACCT-REC.
            COPY    "CPNYUINACCT.INC"   REPLACING
                                      //NACCT-// BY //HZN-NACCT-//.
       *
-      *    入院診療会計マスタ−（加算日数取得用）
+      *    入院会計マスタ−（加算日数取得用）
        01  KSN-NYUINACCT-REC.
            COPY    "CPNYUINACCT.INC"   REPLACING
                                      //NACCT-// BY //KSN-NACCT-//.
@@ -872,6 +872,51 @@
                    MOVE   "190159910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
                    MOVE   "190160310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
                    MOVE   "190160710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+                END-EVALUATE
+             END-IF
+      *
+             IF      LNK-SCNYUACCT-STSRYYMD   >=   "20121001"
+                EVALUATE     LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+      *         一般病棟・療養病棟入院基本料１
+                 WHEN      "190162210"
+                 WHEN      "190162410"
+                 WHEN      "190162610"
+                 WHEN      "190162810"
+                 WHEN      "190163010"
+                 WHEN      "190163210"
+                 WHEN      "190163410"
+                 WHEN      "190163610"
+                 WHEN      "190163810"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190162210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190162410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190162610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190162810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190163010"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190163210"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190163410"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190163610"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190163810"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
+      *         一般病棟・療養病棟入院基本料１（栄管経過措置）
+                 WHEN      "190162310"
+                 WHEN      "190162510"
+                 WHEN      "190162710"
+                 WHEN      "190162910"
+                 WHEN      "190163110"
+                 WHEN      "190163310"
+                 WHEN      "190163510"
+                 WHEN      "190163710"
+                 WHEN      "190163910"
+                   MOVE    1           TO  FLG-RYOYO-NYUIN
+                   MOVE   "190162310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (1)
+                   MOVE   "190162510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (2)
+                   MOVE   "190162710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (3)
+                   MOVE   "190162910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (4)
+                   MOVE   "190163110"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (5)
+                   MOVE   "190163310"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (6)
+                   MOVE   "190163510"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (7)
+                   MOVE   "190163710"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (8)
+                   MOVE   "190163910"  TO  LNK-SCNYUACCT-KAGEN-SRYCD (9)
                 END-EVALUATE
              END-IF
       *
@@ -2332,6 +2377,7 @@
            ELSE
                IF      TNS-KGNAGE          =   "AA"
                    MOVE    PTINF-BIRTHDAY      TO  WRK-INYMD
+      *            （２８日まで新生児）
                    MOVE    28                  TO  WRK-ZOGEN
                    PERFORM 800-HIZUKE-KEI-SEC
                    MOVE    WRK-OTYMD           TO  WRK-KGN-YMD
@@ -2608,7 +2654,7 @@
       *
            MOVE    ZERO                TO  WRK-ZAINUM
            MOVE    ZERO                TO  FLG-OK
-      *    診療会計マスターを特定する
+      *    入院会計マスターを特定する
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
@@ -2661,7 +2707,7 @@
                       (NACCT-MEISAISU      =   WRK-MEISAISU   ) AND
                       (NACCT-SURYOUTOTAL   =   WRK-SURYOUTOTAL)
                    MOVE    NACCT-ZAINUM        TO  WRK-H-ZAINUM
-      *            診療行為内容の比較処理
+      *            入院診療行為内容の比較処理
                    PERFORM 40021-NYUINACCT-CHK-SEC
       *
       *            同一診療会計マスターあり
@@ -2690,7 +2736,7 @@
       *TEST
       *     DISPLAY "WRK-ZAINUM:" WRK-ZAINUM
       *TEST
-      *    診療会計マスター更新用読み込み
+      *    入院会計マスター更新用読み込み
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
@@ -2716,9 +2762,9 @@
            PERFORM 990-DBCLOSE-SEC
       *
            IF      FLG-NYUINACCT        =   1
-      *        診療会計マスター新規編集処理
+      *        入院会計マスター新規編集処理
                PERFORM 40023-NYUINACCT-SRY-SEC
-      *        診療会計マスター編集処理
+      *        入院会計マスター編集処理
                PERFORM 40024-NYUINACCT-HEN-SEC
       *
                MOVE    SMCNDATE-YMD        TO  NACCT-CREYMD
@@ -2741,7 +2787,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *        新規のときのみ、診療行為マスターを追加する
                MOVE    1                   TO  FLG-SINKI
            ELSE
-      *        診療会計マスター編集処理
+      *        入院会計マスター編集処理
                PERFORM 40024-NYUINACCT-HEN-SEC
       *
                MOVE    SMCNDATE-YMD        TO  NACCT-UPYMD
@@ -2767,14 +2813,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
-      *   診療行為内容の比較処理
+      *   入院診療行為内容の比較処理
       *****************************************************************
        40021-NYUINACCT-CHK-SEC          SECTION.
       *
            MOVE    ZERO                TO  IDX-SIN
            MOVE    ZERO                TO  FLG-OK
            INITIALIZE                      TBL-MAE-AREA 
-      *    診療会計マスターから診療行為マスターを検索する
+      *    入院会計マスターから入院診療行為マスターを検索する
            INITIALIZE                      NYUINACT-REC
            MOVE    NACCT-HOSPNUM       TO  NSRY-HOSPNUM
            MOVE    NACCT-NYUGAIKBN     TO  NSRY-NYUGAIKBN
@@ -2885,7 +2931,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
-      *   診療会計マスター新規編集処理
+      *   入院会計マスター新規編集処理
       *****************************************************************
        40023-NYUINACCT-SRY-SEC          SECTION.
       *
@@ -2923,7 +2969,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
-      *   診療会計マスター編集処理
+      *   入院会計マスター編集処理
       *****************************************************************
        40024-NYUINACCT-HEN-SEC          SECTION.
       *
@@ -2966,7 +3012,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        40024-NYUINACCT-HEN-EXT.
            EXIT.
       *****************************************************************
-      *    診療行為マスター処理
+      *    入院診療行為マスター処理
       *****************************************************************
        4003-NYUSRYACT-SYORI-SEC          SECTION.
       *
@@ -3072,7 +3118,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  FLG-END
            PERFORM
                UNTIL       FLG-END     =   1
-      *        診療会計退院処理
+      *        入院会計退院処理
                PERFORM 2001-NYUINACCT-SYORI-SEC
       *
       *        診療会計があった時、次月を設定
@@ -3154,12 +3200,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        200-TAIIN-SYORI-EXT.
            EXIT.
       *****************************************************************
-      *    診療会計退院処理
+      *    入院会計退院処理
       *****************************************************************
        2001-NYUINACCT-SYORI-SEC         SECTION.
       *
            MOVE    ZERO                TO  FLG-OK
-      *    診療会計マスターを特定する
+      *    入院会計マスターを特定する
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
@@ -3179,7 +3225,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    1                   TO  FLG-NYUINACCT
            END-IF
-      *    診療会計がない時、終了とする
+      *    入院会計がない時、終了とする
            IF      FLG-NYUINACCT       =   1
                MOVE    1               TO  FLG-END
            END-IF
@@ -3207,15 +3253,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                        OR  "6"  )
                            PERFORM 20019-NYUINACCT-CHK-SEC
                        ELSE
-      *                    診療会計更新
+      *                    入院会計更新
                            PERFORM 20013-NYUINACCT-UPDATE-SEC
                        END-IF
                    ELSE
-      *                診療会計削除
+      *                入院会計削除
                        PERFORM 20012-NYUINACCT-DELETE-SEC
                    END-IF
                ELSE
-      *            診療会計更新
+      *            入院会計更新
                    PERFORM 20013-NYUINACCT-UPDATE-SEC
                END-IF
       *
@@ -3231,13 +3277,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
-      *   診療会計マスター編集処理
+      *   入院会計マスター編集処理
       *****************************************************************
        20019-NYUINACCT-CHK-SEC          SECTION.
       *
            MOVE    ZERO                TO  FLG-DEL
            IF      NACCT-ZAISKBKBN     =   "1"
-      *    診療会計マスターから診療行為マスターを検索する
+      *    入院会計マスターから入院診療行為マスターを検索する
                INITIALIZE                      NYUINACT-REC
                MOVE    NACCT-HOSPNUM       TO  NSRY-HOSPNUM
                MOVE    NACCT-NYUGAIKBN     TO  NSRY-NYUGAIKBN
@@ -3272,10 +3318,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            IF      FLG-DEL             =   1
-      *        診療会計更新
+      *        入院会計更新
                PERFORM 20013-NYUINACCT-UPDATE-SEC
            ELSE
-      *        診療会計削除
+      *        入院会計削除
                PERFORM 20012-NYUINACCT-DELETE-SEC
            END-IF
            .
@@ -3283,7 +3329,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
-      *   診療会計マスター編集処理
+      *   入院会計マスター編集処理
       *****************************************************************
        20011-NYUINACCT-DELDAY-SEC          SECTION.
       *
@@ -3307,7 +3353,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
-      *   診療会計更新処理
+      *   入院会計更新処理
       *****************************************************************
        20013-NYUINACCT-UPDATE-SEC          SECTION.
       *
@@ -3331,11 +3377,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
-      *   診療会計マスター削除処理
+      *   入院会計マスター削除処理
       *****************************************************************
        20012-NYUINACCT-DELETE-SEC          SECTION.
       *
-      *    診療会計マスターから診療行為マスターを検索する
+      *    入院会計マスターから入院診療行為マスターを検索する
            INITIALIZE                      NYUINACT-REC
            MOVE    NACCT-HOSPNUM       TO  NSRY-HOSPNUM
            MOVE    NACCT-NYUGAIKBN     TO  NSRY-NYUGAIKBN
@@ -3372,7 +3418,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
-      *    診療会計削除
+      *    入院会計削除
            MOVE    NYUINACCT-REC       TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
@@ -3408,7 +3454,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                UNTIL       FLG-END     =   1
                MOVE    ZERO                TO  WRK-CNT
                MOVE    ZERO                TO  FLG-DELETE-OK
-      *        診療会計処理
+      *        入院会計退院処理
                PERFORM 5001-NYUINACCT-DEL-SEC
       *
       *        診療会計があった時、次月を設定
@@ -3499,12 +3545,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        500-NYUINDEL-SYORI-EXT.
            EXIT.
       *****************************************************************
-      *    診療会計退院処理
+      *    入院会計退院処理
       *****************************************************************
        5001-NYUINACCT-DEL-SEC         SECTION.
       *
            MOVE    ZERO                TO  FLG-OK
-      *    診療会計マスターを特定する
+      *    入院会計マスターを特定する
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
@@ -3524,7 +3570,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    1                   TO  FLG-NYUINACCT
            END-IF
-      *    診療会計がない時、終了とする
+      *    入院会計がない時、終了とする
            IF      FLG-NYUINACCT       =   1
                MOVE    1               TO  FLG-END
            END-IF
@@ -3557,14 +3603,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
                END-IF
                IF      FLG-DELETE          =   1
-      *                診療会計削除
+      *                入院会計削除
                        PERFORM 20012-NYUINACCT-DELETE-SEC
       *                最初の剤が削除の時、外泊も削除とする
                        IF      WRK-CNT         =   1
                            MOVE    1               TO  FLG-DELETE-OK
                        END-IF
                    ELSE
-      *                診療会計更新
+      *                入院会計更新
                        MOVE    SMCNDATE-YMD        TO  NACCT-UPYMD
                        MOVE    SMCNDATE-HMS        TO  NACCT-UPHMS
       *
@@ -3597,7 +3643,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    外泊削除
            MOVE    ZERO                TO  WRK-CNT
-      *    診療会計マスターを特定する
+      *    入院会計マスターを特定する
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
@@ -3641,7 +3687,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      (FLG-DELETE          =   ZERO )
            AND     (WRK-CNT             >   ZERO )
-      *        診療会計削除
+      *        入院会計削除
                PERFORM 50019-NYUINACCT-ALLDELETE-SEC
            END-IF
       *
@@ -3649,11 +3695,11 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
        5001-NYUINACCT-DEL-EXT.
            EXIT.
       *****************************************************************
-      *    診療会計当月分削除処理
+      *    入院会計当月分削除処理
       *****************************************************************
        50019-NYUINACCT-ALLDELETE-SEC            SECTION.
       *
-      *    診療会計マスターを特定する
+      *    入院会計マスターを特定する
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
@@ -3674,7 +3720,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            PERFORM
                UNTIL  (FLG-NYUINACCT       =   1 )
-      *        診療会計削除
+      *        入院会計削除
                PERFORM 20012-NYUINACCT-DELETE-SEC
       *
                MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
@@ -4078,7 +4124,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
        910-TENSU-READ-EXT.
            EXIT.
       *****************************************************************
-      *    診療行為マスター読込
+      *    入院診療行為マスター読込
       *****************************************************************
        920-NYUINACT-READ-SEC         SECTION.
       *
@@ -4095,7 +4141,7 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
        920-NYUINACT-READ-EXT.
            EXIT.
       *****************************************************************
-      *    診療会計マスター読込
+      *    入院会計マスター読込
       *****************************************************************
        930-NYUINACCT-READ-SEC         SECTION.
       *
