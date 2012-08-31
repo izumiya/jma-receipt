@@ -995,12 +995,22 @@
                             (SYS-5001-BTU-TOKTEI-NYUIN = "33" OR "34")
                            MOVE   "190157210"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "01")   AND
+                            (SYS-5001-BTU-TOKTEI-NYUIN NOT =
+                                                         "33" OR "34")
+                           MOVE   "190162210"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "26"
       *                Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡£±° ∆˛±°¥À‹Œ¡£¬°À
                        MOVE   "190121410"   TO  LNK-TOKNYUIN-SRYCD
                        IF   (SYS-5001-BTU-SBT     =   "01")   AND
                             (SYS-5001-BTU-TOKTEI-NYUIN = "33" OR "34")
                            MOVE   "190157610"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "01")   AND
+                            (SYS-5001-BTU-TOKTEI-NYUIN NOT =
+                                                         "33" OR "34")
+                           MOVE   "190162410"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
                WHEN    "27"
       *                Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡£±° ∆˛±°¥À‹Œ¡£√°À
@@ -1009,6 +1019,11 @@
                             (SYS-5001-BTU-TOKTEI-NYUIN = "33" OR "34")
                            MOVE   "190158010"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "01")   AND
+                            (SYS-5001-BTU-TOKTEI-NYUIN NOT =
+                                                         "33" OR "34")
+                           MOVE   "190162610"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "28"
       *                Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡£±° ∆˛±°¥À‹Œ¡£ƒ°À
                        MOVE   "190121610"   TO  LNK-TOKNYUIN-SRYCD
@@ -1016,12 +1031,22 @@
                             (SYS-5001-BTU-TOKTEI-NYUIN = "33" OR "34")
                            MOVE   "190158410"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "01")   AND
+                            (SYS-5001-BTU-TOKTEI-NYUIN NOT =
+                                                         "33" OR "34")
+                           MOVE   "190162810"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "29"
       *                Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡£±° ∆˛±°¥À‹Œ¡£≈°À
                        MOVE   "190121710"   TO  LNK-TOKNYUIN-SRYCD
                        IF   (SYS-5001-BTU-SBT     =   "01")   AND
                             (SYS-5001-BTU-TOKTEI-NYUIN = "33" OR "34")
                            MOVE   "190158810"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "01")   AND
+                            (SYS-5001-BTU-TOKTEI-NYUIN NOT =
+                                                         "33" OR "34")
+                           MOVE   "190163010"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
                WHEN    "30"
       *                Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡° ∆√ Ã∆˛±°¥À‹Œ¡°À
@@ -1189,6 +1214,11 @@
                             (SYS-5001-BTU-TOKTEI-NYUIN = "33" OR "34")
                            MOVE   "190159210"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "01")   AND
+                            (SYS-5001-BTU-TOKTEI-NYUIN NOT =
+                                                         "33" OR "34")
+                           MOVE   "190163210"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "64"
       *                Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡£±° ∆˛±°¥À‹Œ¡£∆°À° ¿∏≥ËŒ≈Õ‹°À
                        MOVE   "190131710"   TO  LNK-TOKNYUIN-SRYCD
@@ -1202,6 +1232,11 @@
                        IF   (SYS-5001-BTU-SBT     =   "01")   AND
                             (SYS-5001-BTU-TOKTEI-NYUIN = "33" OR "34")
                            MOVE   "190159610"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "01")   AND
+                            (SYS-5001-BTU-TOKTEI-NYUIN NOT =
+                                                         "33" OR "34")
+                           MOVE   "190163410"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
                WHEN    "66"
       *                Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡£±° ∆˛±°¥À‹Œ¡£«°À° ¿∏≥ËŒ≈Õ‹°À
@@ -1217,6 +1252,11 @@
                             (SYS-5001-BTU-TOKTEI-NYUIN = "33" OR "34")
                            MOVE   "190160010"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "01")   AND
+                            (SYS-5001-BTU-TOKTEI-NYUIN NOT =
+                                                         "33" OR "34")
+                           MOVE   "190163610"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
                WHEN    "68"
       *                Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡£±° ∆˛±°¥À‹Œ¡£»°À° ¿∏≥ËŒ≈Õ‹°À
                        MOVE   "190132110"   TO  LNK-TOKNYUIN-SRYCD
@@ -1230,6 +1270,11 @@
                        IF   (SYS-5001-BTU-SBT     =   "01")   AND
                             (SYS-5001-BTU-TOKTEI-NYUIN = "33" OR "34")
                            MOVE   "190160410"   TO  LNK-TOKNYUIN-SRYCD
+                       END-IF
+                       IF   (SYS-5001-BTU-SBT     =   "01")   AND
+                            (SYS-5001-BTU-TOKTEI-NYUIN NOT =
+                                                         "33" OR "34")
+                           MOVE   "190163810"   TO  LNK-TOKNYUIN-SRYCD
                        END-IF
                WHEN    "70"
       *                Œ≈Õ‹…¬≈Ô∆˛±°¥À‹Œ¡£±° ∆˛±°¥À‹Œ¡£…°À° ¿∏≥ËŒ≈Õ‹°À
