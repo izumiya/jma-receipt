@@ -253,6 +253,33 @@
       *        特定一般病棟・療養病棟入院基本料１（Ｉ・生活療養）
                WHEN    "190160610"
                   MOVE "190160710" TO  LNK-EIYOUKKS-CHGSRYCD
+      *        一般病棟・療養病棟入院基本料１（Ａ）
+               WHEN    "190162210"
+                  MOVE "190162310" TO  LNK-EIYOUKKS-CHGSRYCD
+      *        一般病棟・療養病棟入院基本料１（Ｂ）
+               WHEN    "190162410"
+                  MOVE "190162510" TO  LNK-EIYOUKKS-CHGSRYCD
+      *        一般病棟・療養病棟入院基本料１（Ｃ）
+               WHEN    "190162610"
+                  MOVE "190162710" TO  LNK-EIYOUKKS-CHGSRYCD
+      *        一般病棟・療養病棟入院基本料１（Ｄ）
+               WHEN    "190162810"
+                  MOVE "190162910" TO  LNK-EIYOUKKS-CHGSRYCD
+      *        一般病棟・療養病棟入院基本料１（Ｅ）
+               WHEN    "190163010"
+                  MOVE "190163110" TO  LNK-EIYOUKKS-CHGSRYCD
+      *        一般病棟・療養病棟入院基本料１（Ｆ）
+               WHEN    "190163210"
+                  MOVE "190163310" TO  LNK-EIYOUKKS-CHGSRYCD
+      *        一般病棟・療養病棟入院基本料１（Ｇ）
+               WHEN    "190163410"
+                  MOVE "190163510" TO  LNK-EIYOUKKS-CHGSRYCD
+      *        一般病棟・療養病棟入院基本料１（Ｈ）
+               WHEN    "190163610"
+                  MOVE "190163710" TO  LNK-EIYOUKKS-CHGSRYCD
+      *        一般病棟・療養病棟入院基本料１（Ｉ）
+               WHEN    "190163810"
+                  MOVE "190163910" TO  LNK-EIYOUKKS-CHGSRYCD
       *        一般病棟７対１入院基本料
                WHEN    "190117710"
                   MOVE "190700210" TO  LNK-EIYOUKKS-CHGSRYCD
