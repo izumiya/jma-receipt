@@ -150,6 +150,7 @@
       *                                     不明分ありのとき赤字でエラー
       *                                     表示を行う
       *  04.06.02    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.03    NACL-藤原    12/08/08  コラムリストのスクロール対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4879,7 +4880,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    SPA-GMN-R01-MAX         TO  R01-COUNT
            MOVE    ZERO                TO  R01-ROW
            IF      WRK-R01-ROW         >   ZERO
-               MOVE    WRK-R01-ROW         TO  R01-ROW
+      *********MOVE    WRK-R01-ROW         TO  R01-ROW
+               COMPUTE R01-ROW =   WRK-R01-ROW -   1
            END-IF
       *
            MOVE    SPA-GMN-R01-SYORI-G     TO  R01-SYORI
