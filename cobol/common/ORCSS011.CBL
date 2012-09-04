@@ -82,7 +82,7 @@
            03  WRK-ZAITENV99           PIC S9(09)V99.
       *
        01  TNACCT-AREA.
-           03    TNACCT-KHN-OCC            OCCURS  24.
+           03    TNACCT-KHN-OCC            OCCURS  26.
                05  TNACCT-KHN-CNT          PIC  9(07).
                05  TNACCT-RYOYO-OCC        OCCURS  9.
                    07  TNACCT-SRYCDTOTAL   PIC  9(14).
