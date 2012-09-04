@@ -232,6 +232,7 @@
            03  FLG-NRRKSRH                 PIC 9(01).
            03  FLG-SST                     PIC 9(01).
            03  FLG-RYOYOKHN                PIC 9(01).
+           03  FLG-EDIT                    PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -575,6 +576,7 @@
            03  WRK-NYUREKILST-ROW          PIC S9(9)   BINARY.
       *
        01  CONST-AREA.
+           03  CONST-H241001               PIC X(08)   VALUE "20121001".
            03  CONST-H240401               PIC X(08)   VALUE "20120401".
            03  CONST-H220401               PIC X(08)   VALUE "20100401".
            03  CONST-H211001               PIC X(08)   VALUE "20091001".
@@ -5292,7 +5294,15 @@
                END-IF
            END-IF
       *
-           IF    ( WRK-KJNYMD     >=  CONST-H240401 )
+           EVALUATE    TRUE
+           WHEN  ( WRK-KJNYMD     >=  CONST-H241001 )
+               EVALUATE  TRUE
+               WHEN  ( SPA-NAI-I01-BTUSBT  =   "01" )
+                AND  ( SYS-5001-CRYOYOKBN  =   "1" )
+                   MOVE    5         TO  FLG-RYOYOKHN
+                   PERFORM 410111-RYOYOKHN-EDIT-SEC
+               END-EVALUATE
+           WHEN  ( WRK-KJNYMD     >=  CONST-H240401 )
                EVALUATE  TRUE
                WHEN  ( SPA-NAI-I01-BTUSBT  =   "08" )
                 AND  ( SYS-5001-CRYOYOKBN  =   "1" )
@@ -5317,42 +5327,49 @@
                    MOVE    3         TO  FLG-RYOYOKHN
                    PERFORM 410111-RYOYOKHN-EDIT-SEC
                END-EVALUATE
-           END-IF
+           END-EVALUATE
       *
       *    Ï·¿Í¤Î¾ì¹ç¡¢Ï·¿Í°ìÈÌÉÂÅïÆÃÄêÆþ±¡´ðËÜÎÁ¤ò¥³¥ó¥Ü¤ËÀßÄê
       *    Ê¿À®£²£²Ç¯£´·î¤«¤éÇ¯ÎðÍ×·ïÇÑ»ß
            MOVE    WRK-KJNYMD  TO  WRK-AGECHK-SRYYMD
            PERFORM 4801-RJN-TAISYO-CHK-SEC
       *
+           MOVE    ZERO        TO  FLG-EDIT
            IF  ( WRK-KJNYMD   >=  CONST-H220401 )
-               IF    ( SPA-NAI-I01-BTUSBT  =   "01" OR "05" OR "06")
-                   IF    ( SYS-5001-BTU-TOKTEI-NYUIN
-                                           =   "33" OR "34" )
-                       CONTINUE
-                   ELSE
-                       MOVE    "5111"      TO  WRK-KANRICD
-                       MOVE    "22"        TO  WRK-KBNCD
-                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
       *
-                       MOVE    "5111"      TO  WRK-KANRICD
-                       MOVE    "24"        TO  WRK-KBNCD
-                       MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-                       PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+               MOVE    1       TO  FLG-EDIT
+      *
+               IF    ( WRK-KJNYMD   >=  CONST-H240401 )
+                   IF    ( SPA-NAI-I01-BTUSBT  =   "01" OR "05" OR "06")
+                       IF    ( SYS-5001-BTU-TOKTEI-NYUIN
+                                           =   "33" OR "34" )
+                           MOVE    ZERO    TO  FLG-EDIT
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF  ( WRK-KJNYMD   >=  CONST-H241001 )
+                   IF    ( SPA-NAI-I01-BTUSBT  =   "01" )
+                     AND ( SYS-5001-CRYOYOKBN  =   "1" )
+                           MOVE    ZERO    TO  FLG-EDIT
                    END-IF
                END-IF
            ELSE
                IF  ( FLG-RJN   =   1 )
-                   MOVE    "5111"      TO  WRK-KANRICD
-                   MOVE    "22"        TO  WRK-KBNCD
-                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
-      *
-                   MOVE    "5111"      TO  WRK-KANRICD
-                   MOVE    "24"        TO  WRK-KBNCD
-                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+                           MOVE    1       TO  FLG-EDIT
                END-IF
+           END-IF
+      *
+           IF    ( FLG-EDIT            =   1 )
+               MOVE    "5111"      TO  WRK-KANRICD
+               MOVE    "22"        TO  WRK-KBNCD
+               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+               PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+      *
+               MOVE    "5111"      TO  WRK-KANRICD
+               MOVE    "24"        TO  WRK-KBNCD
+               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+               PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
            END-IF
       *
       *    Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ¤ò¥³¥ó¥Ü¤ËÀßÄê
@@ -5403,6 +5420,14 @@
                    END-IF
                END-IF
       *
+               IF    ( FLG-RYOYOKHN                =   5 )
+                AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "05" )
+                   IF    ( SYS-5111-SEIKATU-RYOKBN
+                                               =   SPACE )
+                       MOVE    1   TO  FLG-TARGET
+                   END-IF
+               END-IF
+      *
                IF    ( FLG-RYOYOKHN                =   2 OR 4)
                 AND  ( SYS-5111-BRM-NYUINRYOKBN    =   "06" )
                    IF    ( FLG-LIFE-RJN        =   ZERO OR 2)
@@ -5439,7 +5464,7 @@
                                   OR       "190132010"
                                   OR       "190132210"
                                   OR       "190121810" ))
-                    OR   ( FLG-RYOYOKHN    =   3 )
+                    OR   ( FLG-RYOYOKHN    =   3 OR 5 )
                        IF    ( SYS-5111-SRYCD
                                        =   "190121310"
                                   OR       "190121410"
@@ -5505,7 +5530,7 @@
                            MOVE  ZERO  TO  FLG-TARGET
                        END-IF
                    END-IF
-                   IF   (  FLG-RYOYOKHN    =   3 )
+                   IF   (  FLG-RYOYOKHN    =   3 OR 5 )
                        IF    ( SYS-5111-SRYCD
                                   =        "190121810"
                                   OR       "190124210" )
@@ -5745,6 +5770,11 @@
                                        MOVE    ZERO        TO  FLG-HIT
                                      END-IF
                                    END-IF
+                               ELSE
+                                   MOVE    ZERO            TO  FLG-HIT
+                               END-IF
+                               IF    ( SPA-NAI-I01-BTUSBT  =   "04" )
+                                   CONTINUE
                                ELSE
                                    MOVE    ZERO            TO  FLG-HIT
                                END-IF

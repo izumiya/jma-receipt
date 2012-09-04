@@ -610,10 +610,13 @@
                09  SPA-NAI-W20-YUKOEDYMD-OLD       PIC X(08).
       *        病棟種別
                09  SPA-NAI-W20-SBT-MOT             PIC X(02).
-      *        入院基本料点数コード
-               09  SPA-NAI-W20-KHNSRYCD            PIC X(09).
-      *        入院基本点数
-               09  SPA-NAI-W20-KHNTEN              PIC 99999.
+               09  SPA-NAI-W20-KHNRYO-G.
+      *            入院基本料点数コード
+                   11  SPA-NAI-W20-KHNSRYCD        PIC X(09).
+      *            入院基本点数
+                   11  SPA-NAI-W20-KHNTEN          PIC 9(05).
+      *            入院基本料区分
+                   11  SPA-NAI-W20-NYUKHNKBN       PIC 9(02).
       *        小規格病棟病床数加算コード
                09  SPA-NAI-W20-SYOUBTUBRMCD        PIC X(09).
       *        特定入院料区分コード
@@ -622,12 +625,11 @@
                09  SPA-NAI-W20-RECEDSPKBNLST-G.
                  11  SPA-NAI-W20-RECEDSPKBNLST     PIC X(02)
                                                    OCCURS  10.
-               09  SPA-NAI-W20-KHNSRYCDLST-G.
-                 11  SPA-NAI-W20-KHNSRYCDLST       PIC X(09)
-                                                   OCCURS 50.
-               09  SPA-NAI-W20-KHNTENLST-G.
-                 11  SPA-NAI-W20-KHNTENLST         PIC 99999
-                                                   OCCURS  50.
+               09  SPA-NAI-W20-KHNRYOLST-G.
+                 11  SPA-NAI-W20-KHNRYOLST         OCCURS 50.
+                     13  SPA-NAI-W20-KHNSRYCDLST   PIC X(09).
+                     13  SPA-NAI-W20-KHNTENLST     PIC 9(05).
+                     13  SPA-NAI-W20-NYUKHNKBNLST  PIC 9(02).
       *
                09  SPA-NAI-W20-KSNINF-G.
       *          看護必要度加算１（一般病棟入院基本料のものを設定）
@@ -1158,7 +1160,7 @@
                                                            PIC  X(02).
                09  SPA-NAI-W21-KHNRYOLST-G.
                  11  SPA-NAI-W21-KHNRYOLST       OCCURS  20.
-                   13  SPA-NAI-W21-KHNRYOL     PIC  X(09).
+                   13  SPA-NAI-W21-KHNRYOL       PIC  X(09).
          03  SPA-W20-W21-AREA.
       *      病棟番号
              05  SPA-W20-W21-BTUNUM                      PIC  X(02).
