@@ -4331,7 +4331,7 @@
            INITIALIZE                  SPA-GMN-W20-RYOYOKBNLST-G
       *
            MOVE    "0"            TO   SPA-GMN-W20-RYOYOKBNL  (1)
-           MOVE    "特定入院基本料を算定"
+           MOVE    "一般病棟入院基本料を算定"
                                   TO   SPA-GMN-W20-RYOYOKBNMEIL (1)
       *
            MOVE    "1"    TO  SPA-GMN-W20-RYOYOKBNL  (2)
