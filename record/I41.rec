@@ -161,96 +161,127 @@ I41	{
 				rowattr int;
 				LBLDAY01	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY02	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY03	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY04	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY05	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY06	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY07	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY08	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY09	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY10	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY11	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY12	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY13	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY14	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY15	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY16	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY17	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY18	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY19	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY20	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY21	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY22	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY23	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY24	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY25	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY26	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY27	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY28	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY29	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY30	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				LBLDAY31	{
 					style	varchar(20);
+					value	varchar(02);
 				};
 				item	{
 					value0	varchar(3);
