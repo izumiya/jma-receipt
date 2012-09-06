@@ -3169,6 +3169,8 @@
       *    ÍËÆü
            PERFORM   VARYING   IDX     FROM    1   BY  1
                      UNTIL     IDX     >   31
+               MOVE    IDX             TO  WRK-ZZ
+               MOVE    WRK-ZZ-X        TO  I41-TLBLDAY (IDX)
                MOVE    "black"         TO  I41-TLBLDAY-STYLE (IDX)
                EVALUATE    SPA-NAI-YOBI (IDX)
                WHEN    CONST-SATURDAY

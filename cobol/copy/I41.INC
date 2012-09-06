@@ -66,6 +66,7 @@
               05  I41-DATELIST-ROWATTR PIC S9(9)   BINARY.
               05  I41-DATELIST-LBLDAY-OCC  OCCURS  31.
                 06  I41-TLBLDAY-STYLE  PIC X(20).
+                06  I41-TLBLDAY        PIC X(2).
               05  I41-DATELIST-ITEM    OCCURS  400 TIMES.
                 06  I41-TNO            PIC X(3).
                 06  I41-TMEISYO        PIC X(60).
