@@ -4618,9 +4618,16 @@
                        MOVE    1               TO  IDY
                    ELSE
                        ADD     1               TO  SPA-PTKOH-MAX
+      *!!              上限チェック
+                       IF      (SPA-PTKOH-MAX      >   TBL-MAX-KOH )
+                           MOVE    "0106"          TO  SPA-ERRCD
+                           MOVE    TBL-MAX-KOH     TO  SPA-PTKOH-MAX
+                       END-IF
                        MOVE    SPA-PTKOH-MAX   TO  IDY
                    END-IF
-                   PERFORM 3102-KOH-SPATBL-HEN-SEC
+                   IF      SPA-ERRCD       =   SPACE
+                       PERFORM 3102-KOH-SPATBL-HEN-SEC
+                  END-IF
               END-IF
            END-PERFORM
       *    空白行削除

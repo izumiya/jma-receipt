@@ -4944,7 +4944,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "老人公費の場合、全角での入力はできません。"
                                                TO  SPA-ERRMSG
                WHEN    "0097"
-                   MOVE    "公費負担額対象が４０件を超えました。"
+                   MOVE    "公費負担額対象が６０件を超えました。"
                                                TO  SPA-ERRMSG
       *Ｈ１８．１０から
                WHEN    "0098"
@@ -5345,7 +5345,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "公費負担は１００％までです。"
                                                TO  SPA-ERRMSG
                WHEN    "2499"
-                   MOVE    "公費負担額対象公費が５０件以上です。"
+                   MOVE    "公費負担額対象公費が６０件以上です。"
                                                TO  SPA-ERRMSG
       *        公費負担額複写
                WHEN    "2440"

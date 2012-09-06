@@ -3971,7 +3971,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ¸øÈñÉéÃ´
            MOVE    ZERO                TO  IDY
            PERFORM VARYING     IDX     FROM    1   BY  1
-                    UNTIL      IDX     >   SPA-FTN1-MAX
+                    UNTIL     (IDX     >   SPA-FTN1-MAX )
+                         OR   (IDY     >=  40           )
                MOVE    ZERO                TO  SPA-GMN24-TGMNNUM (IDX)
                IF      SPA-NAI24-FTNDELKBN (IDX)   =   SPACE
                    ADD     1                   TO  IDY
