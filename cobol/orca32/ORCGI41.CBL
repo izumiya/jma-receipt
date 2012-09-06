@@ -216,6 +216,7 @@
            03  IDU                 PIC 9(04).
            03  SC-IDX              PIC 9(02).
            03  SC-IDX2             PIC 9(02).
+           03  IDXD                PIC 9(02).
       *
       *    点数マスタ予約コード領域（選定入院料）
        01  WRK-YOYAKU.
@@ -479,6 +480,10 @@
                05  WRK-SCNYUACCT-KAGEN-SRYCD     PIC  X(09).
                05  WRK-SCNYUACCT-KAGEN-STYUKYMD  PIC  X(08).
                05  WRK-SCNYUACCT-KAGEN-EDYUKYMD  PIC  X(08).
+      *
+       01  CONST-AREA.
+           03  CONST-SATURDAY                PIC  X(01)    VALUE "6".
+           03  CONST-SUNDAY                  PIC  X(01)    VALUE "7".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -876,6 +881,9 @@
            MOVE    SPA-I40-SRYYMD (1:6)    TO  SPA-NAI-SRYYM
            MOVE    "1"                 TO  SPA-NYUGAIKBN
       *
+      *    曜日編集処理
+           PERFORM 3006-YOBI-HEN-SEC
+      *
       *    室料差額テーブルセット
            PERFORM 3113-SAGAKU-HEN-SEC
       *
@@ -1060,6 +1068,33 @@
        3005-NYUINKA-HEN-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    曜日編集処理
+      *****************************************************************
+       3006-YOBI-HEN-SEC               SECTION.
+      *
+      *    曜日編集
+           PERFORM VARYING IDXD    FROM    1   BY  1
+                   UNTIL ( IDXD    >   31 )
+      *
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY3-AREA
+               MOVE    "31"            TO  LNK-DAY3-IRAI
+               MOVE    SPA-NAI-SRYYM   TO  WRK-SRYYMD
+               MOVE    IDXD            TO  WRK-SRYDD
+               MOVE    WRK-SRYYMD      TO  LNK-DAY3-YMD
+               CALL    "ORCSDAY"       USING   STS-AREA-DAY
+                                               LNK-DAY3-AREA
+               IF    ( STS-DAY-RC1         =   ZERO )
+                   MOVE    LNK-DAY3-YOBI
+                                       TO  SPA-NAI-YOBI (IDXD)
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       3006-YOBI-HEN-EXT.
+           EXIT.
       *****************************************************************
       *    室料差額初期編集
       *****************************************************************
@@ -1282,6 +1317,8 @@
            PERFORM 3500-KIHON-HEN-SEC
       *    室料差額テーブルセット
            PERFORM 3113-SAGAKU-HEN-SEC
+      *
+           PERFORM 3006-YOBI-HEN-SEC
       *
       *    診療会計マスターより編集をする
       *    診療年月の末日算定
@@ -3128,6 +3165,19 @@
                                           TO  I41-SAGAKU-ITEM (IDX)
            END-PERFORM.
            MOVE    SPA-SAGAKU-MAX-41   TO  I41-SAGAKULIST-COUNT.
+      *
+      *    曜日
+           PERFORM   VARYING   IDX     FROM    1   BY  1
+                     UNTIL     IDX     >   31
+               MOVE    "black"         TO  I41-TLBLDAY-STYLE (IDX)
+               EVALUATE    SPA-NAI-YOBI (IDX)
+               WHEN    CONST-SATURDAY
+                   MOVE    "blue"      TO  I41-TLBLDAY-STYLE (IDX)
+               WHEN    CONST-SUNDAY
+                   MOVE    "red"       TO  I41-TLBLDAY-STYLE (IDX)
+               END-EVALUATE
+           END-PERFORM
+      *
       *    明細
            PERFORM   VARYING   IDX     FROM    1   BY  1
                      UNTIL     IDX     >   SPA-GMN-MAX-41
@@ -3299,12 +3349,14 @@
       *        患者番号入力
                WHEN    "ACTIVATE"      ALSO    "PTNUM"
                    PERFORM 41010-PTNUM-SYORI-SEC
+                   PERFORM 3006-YOBI-HEN-SEC
       *        入院科入力
                WHEN    "ACTIVATE"      ALSO    "NYUINKA"
                    PERFORM 41013-NYUINKA-SYORI-SEC
       *        診療年月
                WHEN    "ACTIVATE"      ALSO    "SRYYM"
                    PERFORM 41018-SRYYMD-SYORI-SEC
+                   PERFORM 3006-YOBI-HEN-SEC
       *        番号選択
                WHEN    "ACTIVATE"      ALSO    "NUM"
                    PERFORM 41011-BANGO-CHK-SEC
@@ -3323,6 +3375,9 @@
                        PERFORM 41012-DAY-CHK-SEC
                    END-IF
            END-EVALUATE.
+      *
+      *
+           .
       *
        200-ENTRY-EXT.
            EXIT.

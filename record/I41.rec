@@ -158,6 +158,99 @@ I41	{
 				count	int;
 				row int;
 				rowattr int;
+				LBLDAY01	{
+					style	varchar(20);
+				};
+				LBLDAY02	{
+					style	varchar(20);
+				};
+				LBLDAY03	{
+					style	varchar(20);
+				};
+				LBLDAY04	{
+					style	varchar(20);
+				};
+				LBLDAY05	{
+					style	varchar(20);
+				};
+				LBLDAY06	{
+					style	varchar(20);
+				};
+				LBLDAY07	{
+					style	varchar(20);
+				};
+				LBLDAY08	{
+					style	varchar(20);
+				};
+				LBLDAY09	{
+					style	varchar(20);
+				};
+				LBLDAY10	{
+					style	varchar(20);
+				};
+				LBLDAY11	{
+					style	varchar(20);
+				};
+				LBLDAY12	{
+					style	varchar(20);
+				};
+				LBLDAY13	{
+					style	varchar(20);
+				};
+				LBLDAY14	{
+					style	varchar(20);
+				};
+				LBLDAY15	{
+					style	varchar(20);
+				};
+				LBLDAY16	{
+					style	varchar(20);
+				};
+				LBLDAY17	{
+					style	varchar(20);
+				};
+				LBLDAY18	{
+					style	varchar(20);
+				};
+				LBLDAY19	{
+					style	varchar(20);
+				};
+				LBLDAY20	{
+					style	varchar(20);
+				};
+				LBLDAY21	{
+					style	varchar(20);
+				};
+				LBLDAY22	{
+					style	varchar(20);
+				};
+				LBLDAY23	{
+					style	varchar(20);
+				};
+				LBLDAY24	{
+					style	varchar(20);
+				};
+				LBLDAY25	{
+					style	varchar(20);
+				};
+				LBLDAY26	{
+					style	varchar(20);
+				};
+				LBLDAY27	{
+					style	varchar(20);
+				};
+				LBLDAY28	{
+					style	varchar(20);
+				};
+				LBLDAY29	{
+					style	varchar(20);
+				};
+				LBLDAY30	{
+					style	varchar(20);
+				};
+				LBLDAY31	{
+					style	varchar(20);
+				};
 				item	{
 					value0	varchar(3);
 					value1	varchar(60);

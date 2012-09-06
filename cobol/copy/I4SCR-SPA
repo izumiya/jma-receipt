@@ -77,6 +77,10 @@
       *    診療年月末日
                    07  SPA-NAI-SRYMATU                   PIC 9(02).
                    07  SPA-DAY-IDX-41                    PIC 9(02).
+      *    曜日
+                   07  SPA-NAI-YOBI-G.
+                       09  SPA-NAI-YOBI                  PIC X(01)
+                                                         OCCURS 31.
       *    更新フラグ
                05  SPA-UPDFLG-41                         PIC X(01).
                05  SPA-MAE-BANGO-41                      PIC 9(03).
