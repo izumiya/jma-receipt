@@ -14,7 +14,7 @@ MVER.glade	orca00	(MVER)情報
 MUID.glade	orca00	(MUID)収集データアップロードユーザ設定
 MDAS.glade	orca00	(MDAS)参加同意
 MLOG.glade	orca00	(MLOG)ログインユーザ一覧
-MINF.glade	orca00	(MINF)感染症サーベイランス閲覧画面
+MINF.glade	orca00	(MINF)ＯＲＣＡサーベイランス閲覧画面
 
 XA01.glade	orca01	(XA01)再印刷選択画面
 XA02.glade	orca01	(XA02)再印刷選択画面（オンライン）
