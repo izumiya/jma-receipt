@@ -848,7 +848,7 @@
 	  <y>600</y>
 	  <width>164</width>
 	  <height>24</height>
-	  <label>データ収集感染症区分</label>
+	  <label>ORCAサーベイランス区分</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>True</wrap>
 	  <xalign>0.5</xalign>

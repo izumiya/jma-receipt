@@ -118,7 +118,7 @@
 	<data>CLICKED</data>
 	<last_modification_time>Mon, 25 Dec 2000 08:24:50 GMT</last_modification_time>
       </signal>
-      <label>感染症</label>
+      <label>サーベイ</label>
       <relief>GTK_RELIEF_NORMAL</relief>
     </widget>
 
