@@ -681,12 +681,14 @@ grpsys     COPY    "COMMON-SPA".
                MOVE    KANACHK-OUT-INPUT   TO  LNK-BYO-BYOMEI
            ELSE
                MOVE    1                   TO  LNK-BYO-KANACHK-ERR
+               MOVE    9                   TO  FLG-KENSAKU-KBN
                GO  TO  200-BYOMEI-SYORI-EXT
            END-IF
       *
       *    文字数チェック
            IF      KANACHK-MAX         >   80
                MOVE    2                   TO  LNK-BYO-KANACHK-ERR
+               MOVE    9                   TO  FLG-KENSAKU-KBN
                GO  TO  200-BYOMEI-SYORI-EXT
            END-IF
       *    病名文字数
