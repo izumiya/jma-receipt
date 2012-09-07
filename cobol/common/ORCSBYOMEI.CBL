@@ -773,6 +773,10 @@ grpsys     COPY    "COMMON-SPA".
                    IF      FLG-BYOMEI          =   ZERO
                        PERFORM 2002-BYOMEICD-HENSYU-SEC
                        IF      FLG-TBLERR          =   1
+                           MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
+                           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+                           PERFORM 900-CLOSE-SEC
+      *
                            GO  TO  200-BYOMEI-SYORI-EXT
                        END-IF 
                    END-IF      
@@ -853,12 +857,23 @@ grpsys     COPY    "COMMON-SPA".
                            IF      FLG-BUBUN           >   ZERO
                                PERFORM 2007-BUBUN-HENSYU-SEC
                                IF      FLG-TBLERR          =   1
+                                   MOVE    WRK-MCP-TABLE
+                                                       TO  MCP-TABLE
+                                   MOVE    WRK-MCP-PATHNAME
+                                                       TO  MCP-PATHNAME
+                                   PERFORM 900-CLOSE-SEC
+      *
                                    GO  TO  200-BYOMEI-SYORI-EXT
                                END-IF 
                            END-IF
       *
                            PERFORM 2002-BYOMEICD-HENSYU-SEC
                            IF      FLG-TBLERR  =   1
+                               MOVE    WRK-MCP-TABLE   TO  MCP-TABLE
+                               MOVE    WRK-MCP-PATHNAME
+                                                       TO  MCP-PATHNAME
+                               PERFORM 900-CLOSE-SEC
+      *
                                GO  TO  200-BYOMEI-SYORI-EXT
                            END-IF
                        END-IF      
@@ -948,10 +963,19 @@ grpsys     COPY    "COMMON-SPA".
                    PERFORM 2001-BYOMEICD-KENSAKU-SEC
                    IF      FLG-BYOMEI          =   ZERO
                        PERFORM 2002-BYOMEICD-HENSYU-SEC
+      *
+                       MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
+                       MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+                       PERFORM 900-CLOSE-SEC
+      *
                        IF      FLG-TBLERR          =   1
                            GO  TO  200-BYOMEICD-SYORI-EXT
                        END-IF 
                    ELSE
+                       MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
+                       MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+                       PERFORM 900-CLOSE-SEC
+      *
                        SET     TBL-BYOMEICD-IDX    TO  1
                        SEARCH  TBL-BYOMEICD-OCC
                                        VARYING TBL-BYOMEICD-IDX
@@ -981,10 +1005,6 @@ grpsys     COPY    "COMMON-SPA".
                            GO  TO  200-BYOMEICD-SYORI-EXT
                        END-IF
                    END-IF
-      *
-                   MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
-                   MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-                   PERFORM 900-CLOSE-SEC
                END-IF
            END-PERFORM    
            .
