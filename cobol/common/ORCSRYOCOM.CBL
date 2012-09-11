@@ -635,6 +635,8 @@
                              WHEN   189
       *                      ÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£²¡ÊÆþ±¡´ðËÜÎÁ£É¡Ë
                              WHEN   190
+      *                      ¡Ê°ìÈÌÉÂÅïÆþ±¡´µ¼Ô¡ËÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±
+                             WHEN   196
                                PERFORM  VARYING   IDX1 FROM 1 BY 1
                                  UNTIL  ( IDX1     >   31 )
                                  IF  (NACCT-DAY(IDX1)    =   1)   AND
