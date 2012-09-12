@@ -743,6 +743,8 @@
                                    WHEN   99
       *                            特定入院基本料（特別入院基本料等算定患者）
                                    WHEN   100
+      *                            一般病棟・療養病棟入院基本料１
+                                   WHEN   196
                                       MOVE   CONS-TEISU1  TO
                                                 LNK-TEISU-SRYCD(1)
                                    WHEN   OTHER
