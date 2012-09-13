@@ -136,9 +136,9 @@
            03  WRK-INYMD                   PIC X(08).
            03  WRK-OTYMD                   PIC X(08).
            03  WRK-OTYMD2                  PIC X(08).
-           03  WRK-NISUU                   PIC 9(03).
-           03  WRK-NISUU-KEI               PIC 9(03).
-           03  WRK-ZOGEN                   PIC S9(03).
+           03  WRK-NISUU                   PIC 9(04).
+           03  WRK-NISUU-KEI               PIC 9(04).
+           03  WRK-ZOGEN                   PIC S9(04).
            03  WRK-KAGEN-SRYCD             PIC X(09).
       *    会計情報ワーク
            03  WRK-ACT-STYMD-HZN           PIC X(08).
