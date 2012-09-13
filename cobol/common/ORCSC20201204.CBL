@@ -117,6 +117,7 @@
            03  FLG-CHOUKI           PIC 9(01).
       *H24.7
            03  FLG-CHOUKI2          PIC 9(01).
+           03  FLG-CHOUKI3          PIC 9(01).
       *
            03  FLG-CHOKIKA1         PIC 9(01).
            03  FLG-CHOKIKA2         PIC 9(01).
@@ -1376,6 +1377,7 @@
            MOVE    ZERO                TO  FLG-SINSATU
            MOVE    ZERO                TO  FLG-CHOUKI 
            MOVE    ZERO                TO  FLG-CHOUKI2
+           MOVE    ZERO                TO  FLG-CHOUKI3
       *
            MOVE    ZERO                TO  FLG-TOKUSYO1
            MOVE    ZERO                TO  FLG-TOKUSYO2
@@ -1850,8 +1852,7 @@
                    END-IF
                ELSE
       *            長期投薬があること
-      *H24.7       IF      FLG-CHOUKI          =   ZERO
-                   IF      FLG-CHOUKI2         =   ZERO
+                   IF      FLG-CHOUKI          =   ZERO
                       IF     (WRK-COM-KZMFLG (IDX-T1)  =   SPACE) AND
                              (LNK-ORCSC-KEI-IDX        =   ZERO )
                            MOVE    "K021"          TO  SPA-ERRCD
@@ -2512,10 +2513,10 @@
                                               OR  "23"
                                               OR  "29" )  AND
                    (WRK-COM-KAISU (IDX)       >=  28   )
-      *H24.7   MOVE    1                   TO  FLG-CHOUKI
+               MOVE    1                   TO  FLG-CHOUKI
                IF      WRK-CHK-SRYSYUKBN(3:1)  =   "1"
       *            院内
-                   MOVE    1                   TO  FLG-CHOUKI
+                   MOVE    1                   TO  FLG-CHOUKI3
                ELSE
       *            院外
                    MOVE    1                   TO  FLG-CHOUKI2
@@ -2531,10 +2532,10 @@
            IF      (WRK-COM-INPUTCD(IDX)(1:1) =   "6"  )  AND
                    (WRK-CHK-SRYSYUKBN (1:2)   =   "23" )  AND
                    (WRK-COM-KAISU2(IDX)       >=  28   )
-      ******** MOVE    1                   TO  FLG-CHOUKI
+               MOVE    1                   TO  FLG-CHOUKI
                IF      WRK-CHK-SRYSYUKBN(3:1)  =   "1"
       *            院内
-                   MOVE    1                   TO  FLG-CHOUKI
+                   MOVE    1                   TO  FLG-CHOUKI3
                ELSE
       *            院外
                    MOVE    1                   TO  FLG-CHOUKI2
@@ -2954,8 +2955,7 @@
                GO      TO      30011-INGAITOKUTEIKSN-CHK-EXT
            END-IF
       *
-      *****IF     (FLG-CHOUKI          =   1   )  AND
-           IF     (FLG-CHOUKI2         =   1   )  AND
+           IF     (FLG-CHOUKI          =   1   )  AND
                   (SPA-CHOKITOFLG      =   ZERO)
       *        長期投薬加算チェック
                MOVE    "120003270"         TO  WRK-SRYCD
