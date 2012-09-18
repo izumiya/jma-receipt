@@ -83,6 +83,7 @@
       *  04.05.05    NACL-門脇    12/06/04  生保の２４併用時の対応
       *  04.05.06    NACL-門脇    12/06/11  長期の判定修正
       *  04.05.07    NACL-門脇    12/07/31  長期の判定修正
+      *  04.05.08    NACL-門脇    12/09/18  熊本県地方公費対応
       *  04.06.01    NACL-門脇    12/01/30  院外処方のみの点検用レセプト対応
       *                                     （請求点数０点公費分）
       *****************************************************************
@@ -1328,6 +1329,10 @@
                  (LNK-FTNJGNCHK-KOHNUM   =
                    "341" OR "442"                  ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "200912"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  43     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "480"   ) AND
+                 (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "201210"))
                IF   WRK-KOHFTN   NOT = ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                END-IF
