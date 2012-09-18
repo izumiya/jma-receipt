@@ -1317,6 +1317,17 @@
                    "562" OR "662"                  ) AND
                  (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "201112"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  07     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "245"   ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "200412"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  07     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   =
+                   "246" OR "445" OR "545" OR "645") AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "200604"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  43     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   =
+                   "341" OR "442"                  ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "200912"))
                IF   WRK-KOHFTN   NOT = ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                END-IF

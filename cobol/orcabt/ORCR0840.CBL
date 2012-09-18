@@ -209,6 +209,7 @@
       *  04.05.13    NACL-ÌçÏÆ    12/05/23  ºÆ½¢Ï«ÎÅÍÜ»ØÆ³´ÉÍýÎÁ¤Î½¸·×ÀèÊÑ¹¹
       *  04.05.14    NACL-ÌçÏÆ    12/05/23  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÌ¤µ­ºÜÂÐ±þ
       *  04.05.15    NACL-ÌçÏÆ    12/08/10  £¸£°¤½¤ÎÂ¾Íó¤ÎÅÀ¿ô½¸·×½¤Àµ
+      *  04.05.16    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/01  ¼«ÇåÀÕÊ¸½ñÎÁ¥ì¥»¥×¥ÈÅ¦Í×Íóµ­ºÜ
       *                                     ¡Ê£±ÄÌ»þ¡ËÂÐ±þ
@@ -6309,6 +6310,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             AND ( NACCT-DAY(IDY)  NOT  =  ZERO   )
                                IF  WRK-DAY2(IDY) =
                                        ZERO OR 4 OR 5 OR 6 OR 7
+                                                      OR 8 OR 9
                                     MOVE   NACCT-DAY(IDY)  
                                            TO   WRK-DAY21(IDY) 
                                     ADD    1   TO   CNT-DAY21
@@ -6325,6 +6327,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                   NOT  =  ZERO   )
                                IF  WRK-DAY2(IDY) =
                                        ZERO OR 4 OR 5 OR 6 OR 7
+                                                      OR 8 OR 9
                                 IF   RECE82-SRYYM  >= "200604"
                                  IF  NACCT-SRYCDTOTAL = 099999918
                                                     OR  099999919
@@ -6356,7 +6359,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                    OR  099999919
                                                    OR  099999920   )
                               AND ( WRK-DAY2(IDY) =
-                                        ZERO OR 4 OR 5 OR 6 OR 7   )
+                                        ZERO OR 4 OR 5 OR 6 OR 7
+                                                       OR 8 OR 9   )
                                 PERFORM   2307-NYUINACCT-SYU-KAN-SEC
                               END-IF
                             END-IF
@@ -6370,7 +6374,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             AND (WRK-SHOKUJIRYOYO(IDY)
                                                  NOT  =  ZERO   )
                             AND (WRK-DAY2(IDY) =
-                                       ZERO OR 4 OR 5 OR 6 OR 7 )
+                                       ZERO OR 4 OR 5 OR 6 OR 7
+                                                      OR 8 OR 9 )
                             AND (RECE82-SRYYM >= "200604"       )
                              IF  NACCT-SRYCDTOTAL = 099999918
                                                  OR 099999919

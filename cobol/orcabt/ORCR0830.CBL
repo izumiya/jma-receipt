@@ -71,6 +71,7 @@
       *  04.05.05    NACL-門脇    12/04/02  平成２４年４月改正
       *                                     外泊区分６．７の対応
       *                                     入院略称の文字数拡張対応
+      *  04.05.06    NACL-門脇    12/09/18  改正対応（外泊区分８，９の対応）
       *
       *  04.06.01    NACL-門脇    10/12/06  労災・自賠責の金額フリー入力
       *                                     コード対応
@@ -1354,7 +1355,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     AND WRK-DAY5(IDY)  =  RECE82-HKNCOMBI
                          IF   (WRK-DAY4(IDY)   NOT =    ZERO)  
                          AND  (WRK-DAY2(IDY)   =
-                                    ZERO OR 4 OR 5 OR 6 OR 7)
+                                    ZERO OR 4 OR 5 OR 6 OR 7
+                                                   OR 8 OR 9)
                          AND  (WRK-SHOKUJIRYOYO(IDY)  NOT = ZERO)
                               PERFORM   2501-NYUINKHN-GET4-SEC
                          END-IF
@@ -1566,7 +1568,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   IF  (WRK-DAY7(IDY)          NOT =  ZERO)
                   AND (WRK-DAY7-ZAITEN(IDY)   NOT =  ZERO)
                   AND (WRK-DAY2(IDY)          =
-                                 ZERO OR 4 OR 5 OR 6 OR 7)
+                                 ZERO OR 4 OR 5 OR 6 OR 7
+                                                OR 8 OR 9)
                      IF    RECE82-HKNKBN   =   "4"
                       EVALUATE  RECE82-JIBAIKBN
                        WHEN  "1"

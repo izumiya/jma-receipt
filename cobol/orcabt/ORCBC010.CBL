@@ -62,6 +62,7 @@
       *  04.05.05    NACL-門脇    12/04/02  平成２４年４月改正
       *                                     実日数カウント対応
       *                                     外泊区分６．７の対応
+      *  04.05.06    NACL-門脇    12/09/18  改正対応（外泊区分８，９の対応）
       *
       *  04.06.01    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
       *                                     は公費単独のレセプトとする
@@ -1529,7 +1530,8 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                    UNTIL      IDX6     >   31
                IF  (WRK-DAY (3 IDX6)    >   ZERO                    )
                AND (WRK-DAY (2 IDX6)    NOT =   ZERO                )
-               AND (WRK-DAY (4 IDX6)    =   ZERO OR 4 OR 5 OR 6 OR 7)
+               AND (WRK-DAY (4 IDX6)    =   ZERO OR 4 OR 5 OR 6 OR 7
+                                                           OR 8 OR 9)
                  IF  (WRK-DAY(2 IDX6)  =   WRK-COMB-HKNCOMBINUM (IDX2))
       *ito 20080425 IF  (COLDAT01-HKNNUM      NOT =   SPACE)   OR
       *ito              (COLDAT01-RJNHKNNUM   NOT =   SPACE)
