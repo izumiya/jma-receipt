@@ -1254,6 +1254,17 @@
                MOVE    7                   TO  SPA-SAGAKU-MAX-41
            END-IF
       *
+           IF       SPA-NAI-SRYYM      >=  "201210"
+               MOVE    "08"                TO  SPA-GMN-SAGAKUNO-41 (8)
+               MOVE    "ÆÃÄê»þ´ÖÂà±¡¸º»»"
+                                       TO  SPA-GMN-SAGAKU-41   (8)
+               MOVE    "09"                TO  SPA-GMN-SAGAKUNO-41 (9)
+               MOVE    "ÆÃÄêÍËÆüÆþÂà±¡¸º»»"
+                                       TO  SPA-GMN-SAGAKU-41   (9)
+      *
+               MOVE    9                   TO  SPA-SAGAKU-MAX-41
+           END-IF
+      *
            .
        3113-GAIHAKU-HEN-EXT.
            EXIT.
@@ -3970,6 +3981,8 @@
                                                            OR  5
                                                            OR  6
                                                            OR  7
+                                                           OR  8
+                                                           OR  9
                                CONTINUE
                            ELSE
                                MOVE    "0035"         TO  SPA-ERRCD
@@ -4816,6 +4829,7 @@
                                UNTIL       IDX-D   >   31
                            IF  SPA-GMN-DAY-41(IDX-D)  = ZERO OR 4 OR 5
                                                              OR 6 OR 7
+                                                             OR 8 OR 9
                                CONTINUE
                            ELSE
                                MOVE    ZERO         TO  SPA-NAI-DAY-41
