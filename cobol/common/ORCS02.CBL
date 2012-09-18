@@ -21335,15 +21335,6 @@
             END-IF
            END-IF.
            IF  (WK-1001-PREFNUM         =  43           ) AND
-               (COMB-KOHHKNNUM(KOH-IDX) = "341" OR "442") AND
-               (LNK-SYU-SRYYMD(1:6)    >= "200912"      )
-             IF   LNK-S02-KOUREI-NYUIN-KBN   =  "1"
-             OR   FLG-KOREI-TANYUIN          =   1
-               MOVE      100     TO   WK-NYUKFTNRATE
-               MOVE    SPACE     TO   COMB-KOH-NYUJGNKBN(KOH-IDX)
-             END-IF
-           END-IF.
-           IF  (WK-1001-PREFNUM         =  43           ) AND
                (COMB-KOHHKNNUM(KOH-IDX) = "343"         ) AND
                (LNK-SYU-SRYYMD(1:6)    >= "201204"      )
              IF   LNK-S02-KOUREI-NYUIN-KBN   =  "1"
