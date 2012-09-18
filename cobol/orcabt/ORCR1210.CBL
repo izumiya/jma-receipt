@@ -41,6 +41,7 @@
       *  04.05.04    NACL-ÌçÏÆ    12/04/02  Ê¿À®£²£´Ç¯£´·î²þÀµ
       *                                     ³°Çñ¶èÊ¬£¶¡¥£·¤ÎÂÐ±þ
       *                                     Æþ±¡Î¬¾Î¤ÎÊ¸»ú¿ô³ÈÄ¥ÂÐ±þ
+      *  04.05.05    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -841,7 +842,8 @@
                               IF   (NACCT-ZAITEN      NOT =    ZERO)
                               AND  (NACCT-DAY(IDY)    NOT =    ZERO)
                               AND  (WRK-DAY2(IDY)     =
-                                           ZERO OR 4 OR 5 OR 6 OR 7)
+                                           ZERO OR 4 OR 5 OR 6 OR 7
+                                                          OR 8 OR 9)
                                    PERFORM 2001125-RECE200-TENSOU22-SEC
                               END-IF
                          END-IF
@@ -947,6 +949,25 @@
                                   (WRK-HYOKETU-TEN / 100)))
                                                 + 0.5
                       END-IF
+                    WHEN   8
+                    WHEN   9
+                      EVALUATE  WRK-DAY2(IDY)
+                        WHEN       8
+                          COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.92)
+                                                                +  0.5
+                        WHEN       9
+                          COMPUTE  WRK-NYUKHNRYO = (WRK-KHNTEN  *  0.92)
+                                                                +  0.5
+                      END-EVALUATE
+                      COMPUTE  WRK-NYUKHNRYO =  WRK-NYUKHNRYO
+                                             +  WRK-KSNTEN
+                      IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                         COMPUTE WRK-NYUKHNRYO  =
+                                (WRK-NYUKHNRYO  -
+                                 (WRK-NYUKHNRYO *
+                                  (WRK-HYOKETU-TEN / 100)))
+                                                + 0.5
+                      END-IF
                   END-EVALUATE
                   IF   WRK-NYUKHNRYO  NOT = ZERO
                     MOVE     ZERO     TO    FLG-ARI
@@ -1013,11 +1034,32 @@
                                                 + 0.5
                       END-IF
                       MOVE   1   TO   FLG-GAIHAKU
+                    WHEN   8
+                    WHEN   9
+                      EVALUATE  WRK-DAY2(IDY)
+                        WHEN       8
+                          COMPUTE  WRK-NYUTOKRYO = (WRK-KHNTEN  *  0.92)
+                                                                +  0.5
+                        WHEN       9
+                          COMPUTE  WRK-NYUTOKRYO = (WRK-KHNTEN  *  0.92)
+                                                                +  0.5
+                      END-EVALUATE
+                      COMPUTE  WRK-NYUTOKRYO =  WRK-NYUTOKRYO
+                                             +  WRK-KSNTEN
+                      IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                         COMPUTE WRK-NYUTOKRYO  =
+                                (WRK-NYUTOKRYO  -
+                                 (WRK-NYUTOKRYO *
+                                  (WRK-HYOKETU-TEN / 100)))
+                                                + 0.5
+                      END-IF
+                      MOVE   1   TO   FLG-GAIHAKU
                   END-EVALUATE
                   IF  (WRK-DAY6(IDY)          NOT =  ZERO)
                   AND (WRK-DAY6-ZAITEN(IDY)   NOT =  ZERO)
                   AND (WRK-DAY2(IDY)          =
-                                 ZERO OR 4 OR 5 OR 6 OR 7)
+                                 ZERO OR 4 OR 5 OR 6 OR 7
+                                                OR 8 OR 9)
                       COMPUTE  WRK-NYUTOKRYO = WRK-NYUTOKRYO
                                              + WRK-DAY6-ZAITEN(IDY)
                   END-IF
@@ -1501,6 +1543,15 @@
            MOVE    "key7"               TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
+           PERFORM  VARYING  IDY    FROM    1   BY  1
+                     UNTIL   IDY     >     31
+                IF   (WRK-DAY1(IDY)   NOT  =  ZERO  )
+                AND  (WRK-DAY2(IDY)        =  8 OR 9)
+                  IF  WRK-DAY5(IDY) =  RECE200-HKNCOMBI
+                     PERFORM   2001133-GENSAN-GET3-SEC
+                  END-IF
+                END-IF
+           END-PERFORM
       *
            INITIALIZE                            NYUINACCT-REC
            MOVE    RECE200-HOSPNUM       TO      NACCT-HOSPNUM
@@ -1529,7 +1580,8 @@
                               IF   (NACCT-ZAITEN    NOT =    ZERO   )
                               AND  (NACCT-DAY(IDY)  NOT =    ZERO   )
                               AND  (WRK-DAY2(IDY)   =
-                                            ZERO OR 4 OR 5 OR 6 OR 7)
+                                            ZERO OR 4 OR 5 OR 6 OR 7
+                                                           OR 8 OR 9)
                               AND  (WRK-DAY1-NYUTENTTLKBN(IDY) = 903)
                                    PERFORM   2001131-NYUINKHN-GET3-SEC
                                    MOVE    31    TO    IDY
@@ -1702,6 +1754,44 @@
       *
            .
        2001132-ACCTKHN-GET3-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    Æþ±¡Î¬¾Î¤Î¼èÆÀ¡ÊÆÃÄê»þ´ÖÂà±¡¸º»»¡¦ÆÃÄêÍËÆüÆþÂà±¡¸º»»¡Ë
+      **************************************************************
+       2001133-GENSAN-GET3-SEC           SECTION.
+      *
+           EVALUATE    WRK-DAY2(IDY)
+              WHEN          8
+                 MOVE     ZERO     TO    FLG-ARI
+                 PERFORM  VARYING  ID1    FROM    1   BY  1
+                           UNTIL  (ID1                     >  20  )
+                            OR    (RECE200-NYUSYUBETU(ID1) = SPACE)
+                            OR    (FLG-ARI                 =   1  )
+                   IF  RECE200-NYUSYUBETU(ID1)(1:6)  =  "¸áÁ°¸º"
+                     MOVE     1      TO   FLG-ARI
+                   END-IF
+                 END-PERFORM
+                 IF    FLG-ARI  =  ZERO
+                     MOVE  "¸áÁ°¸º"  TO   RECE200-NYUSYUBETU(ID1)(1:6)
+                 END-IF
+              WHEN          9
+                 MOVE     ZERO     TO    FLG-ARI
+                 PERFORM  VARYING  ID1    FROM    1   BY  1
+                           UNTIL  (ID1                     >  20  )
+                            OR    (RECE200-NYUSYUBETU(ID1) = SPACE)
+                            OR    (FLG-ARI                 =   1  )
+                   IF  RECE200-NYUSYUBETU(ID1)(1:6)  =  "ÅÚÆü¸º"
+                     MOVE     1      TO   FLG-ARI
+                   END-IF
+                 END-PERFORM
+                 IF    FLG-ARI  =  ZERO
+                     MOVE  "ÅÚÆü¸º"  TO   RECE200-NYUSYUBETU(ID1)(1:6)
+                 END-IF
+           END-EVALUATE
+      *
+           .
+       2001133-GENSAN-GET3-EXT.
            EXIT.
       *
       *****************************************************************

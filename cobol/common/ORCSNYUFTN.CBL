@@ -132,6 +132,7 @@
       *  04.05.08    NACL-ÌçÏÆ    11/11/09  Æ±ÆüºÆÆþ±¡¿©»öÂÐ±þ
       *  04.05.09    NACL-ÌçÏÆ    11/11/17  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ¡Ê¾¾ÉúÄ®¡Ë
       *  04.05.10    NACL-ÌçÏÆ    12/03/13  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¶¡¤£·¤ÎÂÐ±þ¡Ë
+      *  04.05.11    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -163,6 +164,8 @@
            03  WRK-GENTEN-ERR              PIC 9(01).
            03  WRK-KYUKYUHANSO-ERR         PIC 9(01).
            03  WRK-TAIJYUSIN-ERR           PIC 9(01).
+           03  WRK-GENSAN-ERR              PIC 9(01).
+           03  WRK-GENSAN-ERR2             PIC 9(01).
            03  WRK-HANTEI-YMD              PIC X(08).
            03  WRK-HKNCOMBINUM             PIC 9(04).
            03  WRK-HIKAKU-ZAITEN           PIC 9(08).
@@ -327,6 +330,7 @@
            03  WRK-SENTEI-ZAITEN           PIC  9(08).
            03  WRK-SENTEI-KHNTEN           PIC  9(08).
            03  WRK-CHK-SRYCD               PIC  X(09).
+           03  WRK-CHUKSNCD                PIC  X(04).
       *
        01  FLG-AREA.
            03  FLG-HANBETU                 PIC 9(01).
@@ -869,6 +873,16 @@
            IF    LNK-S02-RC   =   ZERO
              IF   WRK-TAIJYUSIN-ERR    =  1
                 MOVE     22     TO    LNK-S02-RC
+             END-IF
+           END-IF.
+           IF    LNK-S02-RC   =   ZERO
+             IF   WRK-GENSAN-ERR       =  1
+                MOVE     26     TO    LNK-S02-RC
+             END-IF
+           END-IF.
+           IF    LNK-S02-RC   =   ZERO
+             IF   WRK-GENSAN-ERR2      =  1
+                MOVE     27     TO    LNK-S02-RC
              END-IF
            END-IF.
       *
@@ -2922,6 +2936,34 @@ grpsys                            SPA-AREA
                                    COMPUTE  SDAY-HKNTEN(SYU-IDX) =
                                             SDAY-HKNTEN(SYU-IDX) +
                                             WRK-TENSU-KEISAN
+      *                          ¸º³Û¡Ê£¹£²¡ó¡Ë
+                                 WHEN   8
+                                 WHEN   9
+                                   PERFORM   CHUKSNCD-CHECK-SEC
+                                   EVALUATE  TBL-GAIHAKU(SYU-IDX)
+                                    WHEN       8
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-KHNTEN * 0.92) + 0.5
+                                    WHEN       9
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-KHNTEN * 0.92) + 0.5
+                                   END-EVALUATE
+                                   COMPUTE   WRK-TENSU-KEISAN  =
+                                             WRK-TENSU-KEISAN  +
+                                             WRK-KSNTEN
+                                   IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                                     COMPUTE WRK-TENSU-KEISAN  =
+                                            (WRK-TENSU-KEISAN  -
+                                             (WRK-TENSU-KEISAN *
+                                              (WRK-HYOKETU-TEN / 100)))
+                                                               + 0.5
+                                   END-IF
+                                   COMPUTE  SYU-HKNTEN(15)  =
+                                            SYU-HKNTEN(15)  +
+                                            WRK-TENSU-KEISAN
+                                   COMPUTE  SDAY-HKNTEN(SYU-IDX) =
+                                            SDAY-HKNTEN(SYU-IDX) +
+                                            WRK-TENSU-KEISAN
                                END-EVALUATE
                            ELSE
       *                        ÁªÄê´ü´Ö¤ÎÅÀ¿ô»»Äê
@@ -3024,6 +3066,36 @@ grpsys                            SPA-AREA
                                    COMPUTE  SDAY-HKNTEN(SYU-IDX) =
                                             SDAY-HKNTEN(SYU-IDX) +
                                             WRK-TENSU-KEISAN
+      *                          ¸º³Û
+                                 WHEN   8
+                                 WHEN   9
+                                   PERFORM   CHUKSNCD-CHECK-SEC
+                                   EVALUATE  TBL-GAIHAKU(SYU-IDX)
+                                    WHEN       8
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.92)
+                                                                + 0.5
+                                    WHEN       9
+                                      COMPUTE WRK-TENSU-KEISAN  =
+                                             (WRK-SENTEI-KHNTEN * 0.92)
+                                                                + 0.5
+                                   END-EVALUATE
+                                   COMPUTE   WRK-TENSU-KEISAN  =
+                                             WRK-TENSU-KEISAN  +
+                                             WRK-KSNTEN
+                                   IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                                     COMPUTE WRK-TENSU-KEISAN  =
+                                            (WRK-TENSU-KEISAN  -
+                                             (WRK-TENSU-KEISAN *
+                                              (WRK-HYOKETU-TEN / 100)))
+                                                               + 0.5
+                                   END-IF
+                                   COMPUTE  SYU-HKNTEN(15)  =
+                                            SYU-HKNTEN(15)  +
+                                            WRK-TENSU-KEISAN
+                                   COMPUTE  SDAY-HKNTEN(SYU-IDX) =
+                                            SDAY-HKNTEN(SYU-IDX) +
+                                            WRK-TENSU-KEISAN
                                END-EVALUATE
       *                        ÁªÄê´ü´Ö¤Î´µ¼Ô¼«¸ÊÉéÃ´³Û»»Äê
                                PERFORM    SENTEI-PTFTN-SEC
@@ -3040,7 +3112,8 @@ grpsys                            SPA-AREA
                             (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1"))
                        AND ( NACCT-DAY(SYU-IDX)          NOT =  ZERO )
                        AND ( TBL-GAIHAKU(SYU-IDX)     =
-                                   ZERO  OR  4  OR  5  OR  6  OR  7  )
+                                   ZERO  OR  4  OR  5  OR  6  OR  7
+                                                       OR  8  OR  9  )
                        AND ( WRK-DOJITU-FLG(IDX SYU-IDX) = 0 OR 1    )
                            ADD   NACCT-ZAITEN   TO
                                              SYU-HKNTEN(15)
@@ -3057,7 +3130,8 @@ grpsys                            SPA-AREA
                             (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1"))
                        AND ( NACCT-DAY(SYU-IDX)          NOT =  ZERO )
                        AND ( TBL-GAIHAKU(SYU-IDX)     =
-                                   ZERO  OR  4  OR  5  OR  6  OR  7  )
+                                   ZERO  OR  4  OR  5  OR  6  OR  7
+                                                       OR  8  OR  9  )
                        AND ( WRK-DOJITU-FLG(IDX SYU-IDX) = 0 OR 1    )
                            ADD   NACCT-ZAITEN    TO
                                              SYU-HKNTEN(16)
@@ -3359,6 +3433,39 @@ grpsys                                    SPA-AREA
            EXIT.
       *
       **************************************************************
+      *    ¸º»»¥Á¥§¥Ã¥¯
+      **************************************************************
+       CHUKSNCD-CHECK-SEC           SECTION.
+      *
+           EVALUATE   TBL-GAIHAKU(SYU-IDX)
+             WHEN        8
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9018"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                   CONTINUE
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR
+               END-EVALUATE
+             WHEN        9
+               EVALUATE   WRK-CHUKSNCD
+                 WHEN   "9017"
+                 WHEN   "9018"
+                 WHEN   "9026"
+                 WHEN   "9030"
+                   CONTINUE
+                 WHEN    OTHER
+                   MOVE    1    TO    WRK-GENSAN-ERR2
+               END-EVALUATE
+           END-EVALUATE
+      *
+           .
+      *
+       CHUKSNCD-CHECK-EXT.
+           EXIT.
+      *
+      **************************************************************
       *    Æþ±¡ÎÁ´Ø·¸¤Î¼èÆÀ¡ÊÏ«ºÒ¡¦¼«ÇåÀÕÍÑ¡Ë
       **************************************************************
        NYUINACCT-GET2-SEC           SECTION.
@@ -3374,7 +3481,8 @@ grpsys                                    SPA-AREA
                             (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1"))
                        AND ( NACCT-DAY(SYU-IDX)          NOT =  ZERO )
                        AND ( TBL-GAIHAKU(SYU-IDX)     =
-                                   ZERO  OR  4  OR  5  OR  6  OR  7  )
+                                   ZERO  OR  4  OR  5  OR  6  OR  7
+                                                       OR  8  OR  9  )
                        AND ( WRK-DOJITU-FLG(IDX SYU-IDX) = 0 OR 1    )
                            ADD   NACCT-ZAITEN    TO   SYU-HKNTEN(16)
                            IF    SYU-SYUHKNNUM   =    "973"
@@ -3596,6 +3704,12 @@ grpsys                              SPA-AREA
               IF   LNK-SROUNYUIN-RC   =   9
                    MOVE    1    TO   WRK-TAIJYUSIN-ERR
               END-IF
+              IF   LNK-SROUNYUIN-RC   =  10
+                   MOVE    1    TO   WRK-GENSAN-ERR
+              END-IF
+              IF   LNK-SROUNYUIN-RC   =  11
+                   MOVE    1    TO   WRK-GENSAN-ERR2
+              END-IF
       *
            END-IF
       *
@@ -3614,6 +3728,7 @@ grpsys                              SPA-AREA
            MOVE    ZERO               TO   WRK-HYOKETU-TEN
            MOVE    ZERO               TO   SENTEI-IDX
            MOVE    SPACE              TO   WRK-CHK-SRYCD
+           MOVE    SPACE              TO   WRK-CHUKSNCD
       *
            MOVE    SYU-HOSPNUM        TO   NSRY-HOSPNUM
            MOVE    "1"                TO   NSRY-NYUGAIKBN
@@ -3656,6 +3771,8 @@ grpsys                            SPA-AREA
                               MOVE   TNS-TEN   TO   WRK-KHNTEN
                               MOVE   TNS-NYUKHNKSNKBN
                                                TO   WRK-NYUKHNKSNKBN
+                              MOVE   TNS-CHUKSNCD
+                                               TO   WRK-CHUKSNCD
                               MOVE   NSRY-SRYCD(NYUINACT-IDX)
                                                TO   WRK-CHK-SRYCD
       ***                     MOVE   1         TO   FLG-NYUKHN
@@ -4072,6 +4189,8 @@ grpsys                            SPA-AREA
                                  WHEN   5
                                  WHEN   6
                                  WHEN   7
+                                 WHEN   8
+                                 WHEN   9
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                      COMPUTE  WRK-SENTEI-GAIHAKU1 =
@@ -4222,6 +4341,8 @@ grpsys                            SPA-AREA
                                  WHEN   5
                                  WHEN   6
                                  WHEN   7
+                                 WHEN   8
+                                 WHEN   9
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                      MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                      COMPUTE  WRK-SENTEI-GAIHAKU1 =
@@ -4287,6 +4408,8 @@ grpsys                            SPA-AREA
                                  WHEN   5
                                  WHEN   6
                                  WHEN   7
+                                 WHEN   8
+                                 WHEN   9
                                      COMPUTE  NYUIN-TGMONEY =
                                               NYUIN-TGMONEY +
                                               SYS-5000-SENTEI-KINGAKU
@@ -4300,6 +4423,8 @@ grpsys                            SPA-AREA
                                  WHEN   5
                                  WHEN   6
                                  WHEN   7
+                                 WHEN   8
+                                 WHEN   9
                                      COMPUTE  NYUIN-TGMONEY-TAX =
                                               NYUIN-TGMONEY-TAX +
                                               SYS-5000-SENTEI-KINGAKU
@@ -4408,6 +4533,8 @@ grpsys                            SPA-AREA
                              WHEN   5
                              WHEN   6
                              WHEN   7
+                             WHEN   8
+                             WHEN   9
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                  COMPUTE  WRK-SENTEI-GAIHAKU1 =
@@ -4558,6 +4685,8 @@ grpsys                            SPA-AREA
                              WHEN   5
                              WHEN   6
                              WHEN   7
+                             WHEN   8
+                             WHEN   9
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU1
                                  MOVE  ZERO TO WRK-SENTEI-GAIHAKU2
                                  COMPUTE  WRK-SENTEI-GAIHAKU1 =
@@ -4598,6 +4727,8 @@ grpsys                            SPA-AREA
                              WHEN   5
                              WHEN   6
                              WHEN   7
+                             WHEN   8
+                             WHEN   9
                                  COMPUTE  NYUIN-TGMONEY =
                                           NYUIN-TGMONEY +
                                        SBTUSENTEI-DAY-KINGAKU(SYU-IDX)
@@ -4611,6 +4742,8 @@ grpsys                            SPA-AREA
                              WHEN   5
                              WHEN   6
                              WHEN   7
+                             WHEN   8
+                             WHEN   9
                                  COMPUTE  NYUIN-TGMONEY-TAX =
                                           NYUIN-TGMONEY-TAX +
                                        SBTUSENTEI-DAY-KINGAKU(SYU-IDX)
@@ -4911,7 +5044,8 @@ grpsys                                        SPA-AREA
                  AND ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
                  AND ( SYU-HKNCOMBINUM       =   ACCT-HKNCOMBI )
                  AND ( TBL-GAIHAKU(SYU-IDX)  =
-                             ZERO  OR  4  OR  5  OR  6  OR  7  )
+                             ZERO  OR  4  OR  5  OR  6  OR  7
+                                                 OR  8  OR  9  )
                  AND ( WRK-DOJITU-FLG(IDX SYU-IDX) = 0 OR 1    )
                      EVALUATE  WRK-DOJITU-FLG(IDX SYU-IDX)
                        WHEN      0
@@ -4935,7 +5069,8 @@ grpsys                                        SPA-AREA
                    IF  ( ACCT-DAY(1 SYU-IDX)         NOT =  ZERO )
                    AND ( SYU-HKNCOMBINUM       =   ACCT-HKNCOMBI )
                    AND ( TBL-GAIHAKU(SYU-IDX)  =
-                               ZERO  OR  4  OR  5  OR  6  OR  7  )
+                               ZERO  OR  4  OR  5  OR  6  OR  7
+                                                   OR  8  OR  9  )
                    AND ( WRK-DOJITU-FLG(IDX SYU-IDX) = 0 OR 1    )
                      MOVE   SYU-SKYSTYMD(7:2)  TO  WRK-CHECK-STDAY
                      MOVE   SYU-SKYEDYMD(7:2)  TO  WRK-CHECK-EDDAY
@@ -4984,6 +5119,7 @@ grpsys                                        SPA-AREA
                    OR  (WRK-NYUINDAY-KBN(IDX SYU-IDX)   =   "1")
                      IF  TBL-GAIHAKU(SYU-IDX)  =
                               ZERO  OR  4  OR  5  OR  6  OR  7
+                                                  OR  8  OR  9
                        CONTINUE
                      ELSE
                        IF  ACCT-ZAITEN  NOT = ZERO

@@ -105,6 +105,7 @@
       *  04.05.08    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.09    NACL-ÌçÏÆ    12/06/04  À¸ÊÝ¤Î£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ
       *  04.05.10    NACL-ÌçÏÆ    12/06/28  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅ¦Í×Íóµ­ºÜÂÐ±þ
+      *  04.05.11    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/13  ÊÝ¸±ÊÌÀÁµá¥Á¥§¥Ã¥¯É½¤ÎËÜÂÎ¼è¹þ¤ß
       *****************************************************************
@@ -1513,7 +1514,8 @@
                               IF   (NACCT-ZAITEN    NOT =    ZERO)  
                               AND  (NACCT-DAY(IDY)  NOT =    ZERO)  
                               AND  (WRK-DAY2(IDY)   =
-                                         ZERO OR 4 OR 5 OR 6 OR 7)
+                                         ZERO OR 4 OR 5 OR 6 OR 7
+                                                        OR 8 OR 9)
                                    PERFORM 500-KUMIAWASE-HANBETU-SEC
                                    PERFORM 2001125-RECE62-TENSOU22-SEC
                               END-IF
@@ -1831,6 +1833,28 @@
                                     (WRK-HYOKETU-TEN / 100)))
                                                   + 0.5
                          END-IF
+                       WHEN   8
+                       WHEN   9
+                         EVALUATE  WRK-DAY2(IDY)
+                           WHEN       8
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                           WHEN       9
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                         END-EVALUATE
+                         COMPUTE  WRK-NYUKHNRYO =
+                                  WRK-NYUKHNRYO +
+                                  WRK-KSNTEN
+                         IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                           COMPUTE WRK-NYUKHNRYO  =
+                                  (WRK-NYUKHNRYO  -
+                                   (WRK-NYUKHNRYO *
+                                    (WRK-HYOKETU-TEN / 100)))
+                                                  + 0.5
+                         END-IF
                     END-EVALUATE
                   ELSE
                     EVALUATE   WRK-DAY2(IDY)
@@ -1872,6 +1896,28 @@
                                COMPUTE  WRK-NYUKHNRYO =
                                        (WRK-KHNTEN    *  0.85)
                                                       +  0.5
+                         END-EVALUATE
+                         COMPUTE  WRK-NYUKHNRYO =
+                                  WRK-NYUKHNRYO +
+                                  WRK-KSNTEN
+                         IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                           COMPUTE WRK-NYUKHNRYO  =
+                                  (WRK-NYUKHNRYO  -
+                                   (WRK-NYUKHNRYO *
+                                    (WRK-HYOKETU-TEN / 100)))
+                                                  + 0.5
+                         END-IF
+                       WHEN   8
+                       WHEN   9
+                         EVALUATE  WRK-DAY2(IDY)
+                           WHEN       8
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                           WHEN       9
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUKHNRYO =
                                   WRK-NYUKHNRYO +
@@ -2036,6 +2082,29 @@
                                                   + 0.5
                          END-IF
                          MOVE   1   TO   FLG-GAIHAKU
+                       WHEN   8
+                       WHEN   9
+                         EVALUATE  WRK-DAY2(IDY)
+                           WHEN       8
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                           WHEN       9
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                         END-EVALUATE
+                         COMPUTE  WRK-NYUTOKRYO =
+                                  WRK-NYUTOKRYO +
+                                  WRK-KSNTEN
+                         IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                           COMPUTE WRK-NYUTOKRYO  =
+                                  (WRK-NYUTOKRYO  -
+                                   (WRK-NYUTOKRYO *
+                                    (WRK-HYOKETU-TEN / 100)))
+                                                  + 0.5
+                         END-IF
+                         MOVE   1   TO   FLG-GAIHAKU
                     END-EVALUATE
                   ELSE
                     EVALUATE   WRK-DAY2(IDY)
@@ -2091,6 +2160,29 @@
                                                   + 0.5
                          END-IF
                          MOVE   1   TO   FLG-GAIHAKU
+                       WHEN   8
+                       WHEN   9
+                         EVALUATE  WRK-DAY2(IDY)
+                           WHEN       8
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                           WHEN       9
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                         END-EVALUATE
+                         COMPUTE  WRK-NYUTOKRYO =
+                                  WRK-NYUTOKRYO +
+                                  WRK-KSNTEN
+                         IF  WRK-HYOKETU-TEN  NOT =  ZERO
+                           COMPUTE WRK-NYUTOKRYO  =
+                                  (WRK-NYUTOKRYO  -
+                                   (WRK-NYUTOKRYO *
+                                    (WRK-HYOKETU-TEN / 100)))
+                                                  + 0.5
+                         END-IF
+                         MOVE   1   TO   FLG-GAIHAKU
                     END-EVALUATE
                   END-IF
                   EVALUATE   WRK-DAY2(IDY)
@@ -2121,7 +2213,8 @@
                   IF  (WRK-DAY6(IDY)          NOT =  ZERO)
                   AND (WRK-DAY6-ZAITEN(IDY)   NOT =  ZERO)
                   AND (WRK-DAY2(IDY)          =
-                                 ZERO OR 4 OR 5 OR 6 OR 7)
+                                 ZERO OR 4 OR 5 OR 6 OR 7
+                                                OR 8 OR 9)
                       COMPUTE  WRK-NYUTOKRYO = WRK-NYUTOKRYO
                                              + WRK-DAY6-ZAITEN(IDY)
                   END-IF
@@ -3119,6 +3212,22 @@
            MOVE    "key7"               TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *
+           PERFORM  VARYING  IDY    FROM    1   BY  1
+                     UNTIL   IDY     >     31
+              PERFORM  VARYING  IDX1    FROM    1   BY  1
+                        UNTIL  (IDX1                  >  10 )
+                         OR    (RECE62-HKNCOMBI(IDX1) = ZERO)
+                IF   (WRK-DAY1(IDY)   NOT  =  ZERO  )
+                AND  (WRK-DAY2(IDY)        =  8 OR 9)
+                  IF  WRK-DAY5(IDY) =  RECE62-HKNCOMBI(IDX1)
+                     PERFORM   2001133-GENSAN-GET3-SEC
+                     MOVE  10    TO    IDX1
+                  END-IF
+                ELSE
+                  MOVE     10    TO    IDX1
+                END-IF
+              END-PERFORM
+           END-PERFORM
       *
            INITIALIZE                            NYUINACCT-REC
            MOVE    RECE62-HOSPNUM        TO      NACCT-HOSPNUM
@@ -3152,7 +3261,8 @@
                               IF   (NACCT-ZAITEN    NOT =    ZERO)  
                               AND  (NACCT-DAY(IDY)  NOT =    ZERO)  
                               AND  (WRK-DAY2(IDY)   =
-                                         ZERO OR 4 OR 5 OR 6 OR 7)
+                                         ZERO OR 4 OR 5 OR 6 OR 7
+                                                        OR 8 OR 9)
                                    PERFORM   2001131-NYUINKHN-GET3-SEC
                                    MOVE    31    TO    IDY
                               END-IF
@@ -3377,6 +3487,44 @@
        2001132-ACCTKHN-GET3-EXT.
            EXIT.
       *
+      **************************************************************
+      *    Æþ±¡Î¬¾Î¤Î¼èÆÀ¡ÊÆÃÄê»þ´ÖÂà±¡¸º»»¡¦ÆÃÄêÍËÆüÆþÂà±¡¸º»»¡Ë
+      **************************************************************
+       2001133-GENSAN-GET3-SEC           SECTION.
+      *
+           EVALUATE    WRK-DAY2(IDY)
+              WHEN          8
+                 MOVE     ZERO     TO    FLG-ARI
+                 PERFORM  VARYING  ID1    FROM    1   BY  1
+                           UNTIL  (ID1                    >  20  )
+                            OR    (RECE62-NYUSYUBETU(ID1) = SPACE)
+                            OR    (FLG-ARI                =   1  )
+                   IF  RECE62-NYUSYUBETU(ID1)(1:6)  =  "¸áÁ°¸º"
+                     MOVE     1      TO   FLG-ARI
+                   END-IF
+                 END-PERFORM
+                 IF    FLG-ARI  =  ZERO
+                     MOVE  "¸áÁ°¸º"  TO   RECE62-NYUSYUBETU(ID1)(1:6)
+                 END-IF
+              WHEN          9
+                 MOVE     ZERO     TO    FLG-ARI
+                 PERFORM  VARYING  ID1    FROM    1   BY  1
+                           UNTIL  (ID1                    >  20  )
+                            OR    (RECE62-NYUSYUBETU(ID1) = SPACE)
+                            OR    (FLG-ARI                =   1  )
+                   IF  RECE62-NYUSYUBETU(ID1)(1:6)  =  "ÅÚÆü¸º"
+                     MOVE     1      TO   FLG-ARI
+                   END-IF
+                 END-PERFORM
+                 IF    FLG-ARI  =  ZERO
+                     MOVE  "ÅÚÆü¸º"  TO   RECE62-NYUSYUBETU(ID1)(1:6)
+                 END-IF
+           END-EVALUATE
+      *
+           .
+       2001133-GENSAN-GET3-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    ¥ì¥»¥×¥ÈÃæ´Ö¥Õ¥¡¥¤¥ë¤ÎÊÔ½¸¡Ê£Æ£°£°£²¡Ë
       *****************************************************************
@@ -3395,7 +3543,8 @@
                     IF   WRK-DAY5(IDY)  =  RECE62-HKNCOMBI (IDX1)
                          IF   (WRK-DAY4(IDY)   NOT =    ZERO    )
                          AND  (WRK-DAY2(IDY)   =
-                                        ZERO OR 4 OR 5 OR 6 OR 7)
+                                        ZERO OR 4 OR 5 OR 6 OR 7
+                                                       OR 8 OR 9)
                          AND  (WRK-SHOKUJIRYOYO(IDY)  NOT = ZERO)
                               PERFORM   201141-NYUINKHN-GET4-SEC
                          END-IF
@@ -3556,7 +3705,8 @@
                       IF  (WRK-DAY7(IDY)          NOT =  ZERO)
                       AND (WRK-DAY7-ZAITEN(IDY)   NOT =  ZERO)
                       AND (WRK-DAY2(IDY)          =
-                                     ZERO OR 4 OR 5 OR 6 OR 7)
+                                     ZERO OR 4 OR 5 OR 6 OR 7
+                                                    OR 8 OR 9)
                            PERFORM 500-KUMIAWASE-HANBETU-SEC
                            PERFORM 2001153-RECE62-TENSOU9-RYOYO-SEC
                       END-IF

@@ -71,6 +71,7 @@
       *  04.05.05    NACL-ÌçÏÆ    12/04/02  Ê¿À®£²£´Ç¯£´·î²þÀµ
       *                                     ³°Çñ¶èÊ¬£¶¡¥£·¤ÎÂÐ±þ
       *                                     Æþ±¡Î¬¾Î¤ÎÊ¸»ú¿ô³ÈÄ¥ÂÐ±þ
+      *  04.05.06    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1351,7 +1352,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     AND WRK-DAY5(IDY)  =  RECE82-HKNCOMBI
                          IF   (WRK-DAY4(IDY)   NOT =    ZERO)  
                          AND  (WRK-DAY2(IDY)   =
-                                    ZERO OR 4 OR 5 OR 6 OR 7)
+                                    ZERO OR 4 OR 5 OR 6 OR 7
+                                                   OR 8 OR 9)
                          AND  (WRK-SHOKUJIRYOYO(IDY)  NOT = ZERO)
                               PERFORM   2501-NYUINKHN-GET4-SEC
                          END-IF
@@ -1552,7 +1554,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   IF  (WRK-DAY7(IDY)          NOT =  ZERO)
                   AND (WRK-DAY7-ZAITEN(IDY)   NOT =  ZERO)
                   AND (WRK-DAY2(IDY)          =
-                                 ZERO OR 4 OR 5 OR 6 OR 7)
+                                 ZERO OR 4 OR 5 OR 6 OR 7
+                                                OR 8 OR 9)
                      IF    RECE82-HKNKBN   =   "4"
                       EVALUATE  RECE82-JIBAIKBN
                        WHEN  "1"
