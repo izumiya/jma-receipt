@@ -84,6 +84,7 @@
       *  04.05.06    NACL-ÌçÏÆ    12/06/11  Ä¹´ü¤ÎÈ½Äê½¤Àµ
       *  04.05.07    NACL-ÌçÏÆ    12/07/31  Ä¹´ü¤ÎÈ½Äê½¤Àµ
       *  04.05.08    NACL-ÌçÏÆ    12/09/18  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.09    NACL-ÌçÏÆ    12/09/19  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.01    NACL-ÌçÏÆ    12/01/30  ±¡³°½èÊý¤Î¤ß¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥ÈÂÐ±þ
       *                                     ¡ÊÀÁµáÅÀ¿ô£°ÅÀ¸øÈñÊ¬¡Ë
       *****************************************************************
@@ -1332,6 +1333,9 @@
              OR ((LNK-FTNJGNCHK-PREFNUM  =  43     ) AND
                  (LNK-FTNJGNCHK-KOHNUM   = "480"   ) AND
                  (LNK-FTNJGNCHK-NYUGAIKBN = "2"    ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "201210"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  07     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "480"   ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "201210"))
                IF   WRK-KOHFTN   NOT = ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
