@@ -231,6 +231,10 @@
                "他医受診（外泊）の入力に誤りがあります".
            03  ERR-MSG20                   PIC X(100)    VALUE
                "同日再入院日に実日数算定コードを入力してください".
+           03  ERR-MSG26                   PIC X(100)    VALUE
+               "特定時間退院減算（外泊）の入力に誤りがあります".
+           03  ERR-MSG27                   PIC X(100)    VALUE
+               "特定曜日入退院減算（外泊）の入力に誤りがあります".
            03  ERR-MSG88                   PIC X(100)    VALUE
                "キャンセルしました".
       *
@@ -946,6 +950,10 @@
                    MOVE    "0019"      TO  ERR-ERRCD
                WHEN    23
                    MOVE    "0020"      TO  ERR-ERRCD
+               WHEN    26
+                   MOVE    "0026"      TO  ERR-ERRCD
+               WHEN    27
+                   MOVE    "0027"      TO  ERR-ERRCD
                WHEN    OTHER
                    MOVE    "0006"      TO  ERR-ERRCD
                END-EVALUATE
@@ -1596,6 +1604,10 @@
                MOVE    ERR-MSG19       TO  ERR-ERRMSG
            WHEN    "0020"
                MOVE    ERR-MSG20       TO  ERR-ERRMSG
+           WHEN    "0026"
+               MOVE    ERR-MSG26       TO  ERR-ERRMSG
+           WHEN    "0027"
+               MOVE    ERR-MSG27       TO  ERR-ERRMSG
            WHEN    "8888"
                MOVE    ERR-MSG88       TO  ERR-ERRMSG
            END-EVALUATE

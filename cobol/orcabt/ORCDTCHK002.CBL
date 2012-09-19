@@ -8940,7 +8940,8 @@
       *
                IF    ( TNACCT-GAIHAKU-DAY (IDX0)
                                            =   ZERO OR 4 OR 5 
-                                                    OR 6 OR 7 )
+                                                    OR 6 OR 7
+                                                    OR 8 OR 9 )
                    CONTINUE
                ELSE
                    IF    ( TNYUIN-CHOZAI-DAY (IDX0)    =   1 )
@@ -9643,7 +9644,8 @@
                                ELSE
                                    IF    ( TNACCT-GAIHAKU-DAY (IDX22)
                                                    =   ZERO OR 4 OR 5
-                                                            OR 6 OR 7 )
+                                                            OR 6 OR 7
+                                                            OR 8 OR 9 )
                                        CONTINUE
                                    ELSE
                                        COMPUTE TNYUKSN-ERR-CNT (IDX23 3)
