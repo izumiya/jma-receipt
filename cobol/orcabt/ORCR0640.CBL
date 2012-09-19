@@ -577,6 +577,7 @@
       *  04.05.77    NACL-ÌçÏÆ    12/08/10  £¸£°¤½¤ÎÂ¾Íó¤ÎÅÀ¿ô½¸·×½¤Àµ
       *  04.05.78    NACL-ÌçÏÆ    12/08/16  ¥ì¥»ÅÅÉéÃ´¶èÊ¬ÊÔ½¸¡Ê¿©»ö¡Ë
       *  04.05.79    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
+      *  04.05.80    NACL-ÌçÏÆ    12/09/19  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍó¶â³ÛÃÖ´¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -803,6 +804,7 @@
            03  FLG-NISYU-KOREI                         PIC 9(01).
            03  FLG-SKJ-HANTEI1                         PIC 9(01).
            03  FLG-SKJ-HANTEI2                         PIC 9(01).
+           03  FLG-KIN-OKIKAE                          PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -846,6 +848,8 @@
            03  IDW4                                    PIC 9(03).
            03  IDW5                                    PIC 9(03).
            03  IDW6                                    PIC 9(03).
+           03  IDW7                                    PIC 9(03).
+           03  IDW8                                    PIC 9(03).
            03  ID1                                     PIC 9(03).
            03  ID2                                     PIC 9(03).
            03  ID3                                     PIC 9(03).
@@ -1597,6 +1601,16 @@
            03  WRK-CYOKI-KEISAN7               PIC 9(09).
       *
            03  WRK-CYOKI-JGNGAK                PIC 9(09).
+      *
+           03  WRK-INPUTCOMENT                 PIC X(80).
+           03  WRK-INPUTCOMENT2                PIC X(14).
+           03  WRK-INPUTCOMENT-KIN-T.
+               05  WRK-INPUTCOMENT-KIN         PIC 9(07).
+           03  WRK-INPUTCOMENT-KIN2-T.
+               05  WRK-INPUTCOMENT-KIN2        PIC X(07).
+      *
+           03  WRK-TAIHI-ZAINUM                PIC 9(08).
+           03  WRK-TAIHI-OKIKAE                PIC 9(01).
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -2823,6 +2837,13 @@
       *
            INITIALIZE          WRK-RECE62G-REC
       *
+           MOVE      ZERO      TO   WRK-TAIHI-ZAINUM
+           MOVE      ZERO      TO   WRK-TAIHI-OKIKAE
+      *
+           MOVE    123456789   TO   RECE62-YOBIETC(12)
+           MOVE    123456789   TO   RECE62-YOBIETC(13)
+           MOVE    123456789   TO   RECE62-YOBIETC(14)
+      *
            PERFORM        2110-GENGAKU-HANTEI-SEC
       *
            PERFORM        2111-TENTEKIMATOME-HENSYU-SEC
@@ -3264,6 +3285,9 @@
       *
       *    ÀÁµá³Û¾ðÊóÊÔ½¸
            PERFORM     2116-SKY-HENSYU-SEC
+      *
+      *    ºÆ·Ç¡¦°ìÉôÉéÃ´¶âÃÖ¤­´¹¤¨ÊÔ½¸
+           PERFORM     211A-ICHIBUFUTAN-OKIKAE2-SEC
       *
            PERFORM     RECE62-REWRITE-SEC
            .
@@ -3739,6 +3763,7 @@
                                MOVE   ZERO   TO   FLG-SETCOM
                                MOVE   ZERO   TO   WRK-SETCOM-JIDO
                                MOVE   ZERO   TO   WRK-SETCOM-JIDO2
+                               MOVE   ZERO   TO   FLG-KIN-OKIKAE
                                IF  (ACCT-SRYKBN     = "97"     )
                                AND (ACCT-SRYCDTOTAL = 197000470
                                                    OR 197001570
@@ -3805,6 +3830,7 @@
                                       MOVE   ZERO   TO   FLG-SETCOM
                                       MOVE   ZERO   TO  WRK-SETCOM-JIDO
                                       MOVE   ZERO   TO  WRK-SETCOM-JIDO2
+                                      MOVE   ZERO   TO   FLG-KIN-OKIKAE
                                       PERFORM   21011-RECE64-TENSOU-SEC
                                       PERFORM   21012-RECE65-HENSYU-SEC
                                       IF    FLG-WRITE65  =   1
@@ -3844,6 +3870,7 @@
                                       MOVE   ZERO   TO   FLG-SETCOM
                                       MOVE   ZERO   TO  WRK-SETCOM-JIDO
                                       MOVE   ZERO   TO  WRK-SETCOM-JIDO2
+                                      MOVE   ZERO   TO   FLG-KIN-OKIKAE
                                       PERFORM   21011-RECE64-TENSOU-SEC
                                       PERFORM   21012-RECE65-HENSYU-SEC
                                       IF    FLG-WRITE65  =   1
@@ -4108,6 +4135,11 @@
       *
             IF       SRY-SRYCD(IDX2)   =  "099999909"
                   MOVE    1     TO    RECE62-YOBIETC(3)
+                  MOVE    2     TO    FLG-KIN-OKIKAE
+            END-IF
+            IF       SRY-SRYCD(IDX2)   =  "099999910"
+                  MOVE    1     TO    RECE62-YOBIETC(11)
+                  MOVE    1     TO    FLG-KIN-OKIKAE
             END-IF
       *
             IF     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
@@ -4125,8 +4157,7 @@
                                            OR "099999904"
                                            OR "099999905"
                                            OR "099999906"
-                                           OR "099999907"
-                                           OR "099999909"  )
+                                           OR "099999907"  )
             OR     ((SRY-SRYSYUKBN  = "330" OR "331" OR
                                       "332" OR "350" OR
                                       "352"               ) AND
@@ -4142,6 +4173,7 @@
                     (ACCT-ZAIKAISU     NOT =  ZERO        ) AND
                     (ACCT-YKZTEN           =  ZERO        ) AND
                     (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
+            OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
                   COMPUTE   RECE64-MEISAISU    =  RECE64-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -4227,8 +4259,7 @@
                                              OR "099999904"
                                              OR "099999905"
                                              OR "099999906"
-                                             OR "099999907"
-                                             OR "099999909"  )
+                                             OR "099999907"  )
               OR     ((SRY-SRYSYUKBN  = "330" OR "331" OR
                                         "332" OR "350" OR
                                         "352"               ) AND
@@ -4244,8 +4275,21 @@
                       (ACCT-ZAIKAISU     NOT =  ZERO        ) AND
                       (ACCT-YKZTEN           =  ZERO        ) AND
                       (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
+              OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
       *
-               CONTINUE
+               IF   FLG-KIN-OKIKAE   NOT =  ZERO
+                 IF  WRK-TAIHI-ZAINUM  =  ZERO
+                   MOVE   ACCT-ZAINUM     TO   WRK-TAIHI-ZAINUM
+                 END-IF
+                 IF  ACCT-ZAINUM  =  WRK-TAIHI-ZAINUM
+                   MOVE   FLG-KIN-OKIKAE  TO   WRK-TAIHI-OKIKAE
+                   IF  SRY-SRYCD(IDX2) = "099999910" OR "099999909"
+                     CONTINUE
+                   ELSE
+                     PERFORM   2101215-ICHIBUCOM-HENSYU-SEC
+                   END-IF
+                 END-IF
+               END-IF
       *
               ELSE
       *
@@ -5629,6 +5673,98 @@
       *
            .
        2101214-SETCOM-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¡Ú¥ì¥»¥×¥È¡ÛÊÝ¸±Íó¡¼°ìÉôÉéÃ´¶âµ­ºÜ¤¢¤ê¥³¥á¥ó¥ÈÊÔ½¸
+      *****************************************************************
+       2101215-ICHIBUCOM-HENSYU-SEC     SECTION.
+      *
+           MOVE    SPACE                  TO  WRK-INPUTCOMENT
+           MOVE    SPACE                  TO  WRK-INPUTCOMENT2
+           MOVE    ZERO                   TO  WRK-INPUTCOMENT-KIN
+           MOVE    SPACE                  TO  WRK-INPUTCOMENT-KIN2
+      *
+           IF    ((SRY-SRYCD    (IDX2)(1:1)     =   "8"  )  OR
+                  (SRY-SRYCD    (IDX2)(1:3)     =   "008"))
+           AND   ( SRY-INPUTNUM (IDX2)      NOT =   ZERO  )
+      *
+             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
+             MOVE    SRY-PTID             TO  PTCOM-PTID
+             MOVE    SRY-ZAINUM           TO  PTCOM-ZAINUM
+             MOVE    SRY-SRYCD    (IDX2)  TO  PTCOM-SRYCD
+             MOVE    SRY-INPUTNUM (IDX2)  TO  PTCOM-RENNUM
+             PERFORM 950-PTCOM-READ-SEC
+             MOVE    PTCOM-INPUTCOMENT    TO  WRK-INPUTCOMENT
+      *
+             IF  WRK-INPUTCOMENT(1:12)  =  "¡ÊºÆ·Ç¾å¡Ë¡§"
+             OR  WRK-INPUTCOMENT(1:12)  =  "¡ÊºÆ·Ç²¼¡Ë¡§"
+             OR  WRK-INPUTCOMENT(1:12)  =  "ÊÝ¸±ÉéÃ´¶â¡§"
+               MOVE  WRK-INPUTCOMENT(13:14)
+                                          TO  WRK-INPUTCOMENT2
+               IF  WRK-INPUTCOMENT2 = "¡¡¡¡¡¡¡¡¡¡¡¡¡¡" OR SPACE
+                 CONTINUE
+               ELSE
+                 PERFORM VARYING IDW7 FROM  1  BY  2
+                          UNTIL  IDW7   >  14
+                   COMPUTE  IDW8 = (IDW7 + 1) / 2
+                   EVALUATE  WRK-INPUTCOMENT2(IDW7:2)
+                     WHEN     "£°"
+                        MOVE   "0"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£±"
+                        MOVE   "1"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£²"
+                        MOVE   "2"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£³"
+                        MOVE   "3"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£´"
+                        MOVE   "4"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£µ"
+                        MOVE   "5"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£¶"
+                        MOVE   "6"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£·"
+                        MOVE   "7"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£¸"
+                        MOVE   "8"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     "£¹"
+                        MOVE   "9"  TO  WRK-INPUTCOMENT-KIN2-T(IDW8:1)
+                     WHEN     OTHER
+                        MOVE    14  TO  IDW7
+                   END-EVALUATE
+                 END-PERFORM
+                 IF  WRK-INPUTCOMENT-KIN2-T NOT = SPACE
+                   MOVE    8    TO   IDW8
+                   PERFORM VARYING IDW7 FROM  7  BY -1
+                            UNTIL  IDW7   <   1
+                     IF  WRK-INPUTCOMENT-KIN2-T(IDW7:1) = SPACE
+                        CONTINUE
+                     ELSE
+                        COMPUTE  IDW8 = IDW8 - 1
+                        MOVE  WRK-INPUTCOMENT-KIN2-T(IDW7:1)
+                                TO   WRK-INPUTCOMENT-KIN-T(IDW8:1)
+                     END-IF
+                   END-PERFORM
+                   IF  WRK-INPUTCOMENT(1:12)  =  "¡ÊºÆ·Ç¾å¡Ë¡§"
+                     MOVE  ZERO                 TO  RECE62-YOBIETC(12)
+                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(12)
+                   END-IF
+                   IF  WRK-INPUTCOMENT(1:12)  =  "¡ÊºÆ·Ç²¼¡Ë¡§"
+                     MOVE  ZERO                 TO  RECE62-YOBIETC(13)
+                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(13)
+                   END-IF
+                   IF  WRK-INPUTCOMENT(1:12)  =  "ÊÝ¸±ÉéÃ´¶â¡§"
+                     MOVE  ZERO                 TO  RECE62-YOBIETC(14)
+                     MOVE  WRK-INPUTCOMENT-KIN  TO  RECE62-YOBIETC(14)
+                   END-IF
+                 END-IF
+               END-IF
+             END-IF
+      *
+           END-IF
+      *
+           .
+       2101215-ICHIBUCOM-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -18488,9 +18624,22 @@
                     MOVE    "3"      TO   RECE62-KOUREI
                END-IF
       *
-               IF   RECE62-YOBIETC(3)     =   1
-                    MOVE    "3"      TO   RECE62-KOUREI
-               END-IF
+               EVALUATE  WRK-TAIHI-OKIKAE
+                 WHEN        1
+                     IF  RECE62-KOUREI   = "2"
+                       CONTINUE
+                     ELSE
+                       MOVE   "2"      TO   RECE62-KOUREI
+                       MOVE    2       TO   RECE62-YOBIETC(11)
+                     END-IF
+                 WHEN        2
+                     IF  RECE62-KOUREI   = "3"
+                       CONTINUE
+                     ELSE
+                       MOVE   "3"      TO   RECE62-KOUREI
+                       MOVE    2       TO   RECE62-YOBIETC(3)
+                     END-IF
+               END-EVALUATE
       *
                IF      RECE62-KOUREI  =  "3"
                  MOVE     ZERO    TO    RECE62-FTNMONEY(1)
@@ -18528,9 +18677,22 @@
                     MOVE    "4"      TO   RECE62-KOUREI
                END-IF
       *
-               IF   RECE62-YOBIETC(3)     =   1
-                    MOVE    "4"      TO   RECE62-KOUREI
-               END-IF
+               EVALUATE  WRK-TAIHI-OKIKAE
+                 WHEN        1
+                     IF  RECE62-KOUREI   = "1"
+                       CONTINUE
+                     ELSE
+                       MOVE   "1"      TO   RECE62-KOUREI
+                       MOVE    2       TO   RECE62-YOBIETC(11)
+                     END-IF
+                 WHEN        2
+                     IF  RECE62-KOUREI   = "4"
+                       CONTINUE
+                     ELSE
+                       MOVE   "4"      TO   RECE62-KOUREI
+                       MOVE    2       TO   RECE62-YOBIETC(3)
+                     END-IF
+               END-EVALUATE
       *
                IF      RECE62-KOUREI  =  "4"
                  MOVE     ZERO    TO    RECE62-FTNMONEY(1)
@@ -22362,6 +22524,116 @@
       *
            .
        2116-SKY-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ºÆ·Ç¡¦°ìÉôÉéÃ´¶âÃÖ¤­´¹¤¨ÊÔ½¸
+      *****************************************************************
+       211A-ICHIBUFUTAN-OKIKAE2-SEC      SECTION.
+      *
+           IF  (IDZ                 =   1        )
+           AND (RECE62-KOUREI       =  "1" OR "2")
+           AND (WRK-TAIHI-OKIKAE    =   1        )
+      *      ºÆ·Ç¾åÃÖ¤­´¹¤¨
+             IF  ( RECE62-KOHNUM(1)        =  SPACE     )
+             OR  ((RECE62-YOBIETC(12)      =  009999999) AND
+                  (RECE62-KOUREI-SAIKEI    =  999999999))
+                 MOVE   123456789           TO   RECE62-YOBIETC(12)
+             END-IF
+             IF    RECE62-YOBIETC(12)  =  123456789
+                 CONTINUE
+             ELSE
+               IF  RECE62-YOBIETC(12)  =  009999999
+                 MOVE   999999999           TO   RECE62-KOUREI-SAIKEI
+               ELSE
+                 MOVE      1                TO   RECE62-YOBIETC(6)
+                 MOVE   RECE62-YOBIETC(12)  TO   RECE62-KOUREI-SAIKEI
+               END-IF
+             END-IF
+      *      ºÆ·Ç²¼ÃÖ¤­´¹¤¨
+             IF  ( RECE62-KOHNUM(2)        =  SPACE     )
+             OR  ((RECE62-YOBIETC(13)      =  009999999) AND
+                  (RECE62-KOUREI-SAIKEI2   =  999999999))
+                 MOVE   123456789           TO   RECE62-YOBIETC(13)
+             END-IF
+             IF   (RECE62-KOUREI-SAIKEI        =  999999999)
+             AND  (RECE62-KOUREI-SAIKEI2   NOT =  999999999)
+                 MOVE   999999999           TO   RECE62-KOUREI-SAIKEI2
+                 MOVE   123456789           TO   RECE62-YOBIETC(13)
+             END-IF
+             IF    RECE62-YOBIETC(13)  =  123456789
+                 CONTINUE
+             ELSE
+               IF  RECE62-YOBIETC(13)  =  009999999
+                 MOVE   999999999           TO   RECE62-KOUREI-SAIKEI2
+               ELSE
+                 MOVE      1                TO   RECE62-YOBIETC(7)
+                 MOVE   RECE62-YOBIETC(13)  TO   RECE62-KOUREI-SAIKEI2
+               END-IF
+             END-IF
+      *      ÊÝ¸±°ìÉôÉéÃ´¶âÃÖ¤­´¹¤¨
+             IF    RECE62-YOBIETC(14)  =  009999999
+                 MOVE   123456789           TO   RECE62-YOBIETC(14)
+             END-IF
+             IF    RECE62-YOBIETC(14)  =  123456789
+                 CONTINUE
+             ELSE
+                 MOVE   RECE62-YOBIETC(14)  TO   RECE62-FTNMONEY(1)
+             END-IF
+      *
+             IF    RECE62-YOBIETC(12)  =  123456789
+             AND   RECE62-YOBIETC(13)  =  123456789
+             AND   RECE62-YOBIETC(14)  =  123456789
+               IF  RECE62-YOBIETC(11)  =  1
+                MOVE    ZERO                TO   RECE62-YOBIETC(11)
+               END-IF
+               IF  RECE62-YOBIETC(11)  =  2
+                MOVE    3                   TO   RECE62-YOBIETC(11)
+               END-IF
+             END-IF
+             MOVE       ZERO                TO   RECE62-YOBIETC(3)
+           END-IF
+      *
+           IF  (IDZ                     =   1         )
+           AND (RECE62-KOUREI       NOT =  "1" AND "2")
+           AND (WRK-TAIHI-OKIKAE        =   2         )
+      *      ºÆ·Ç¾åÃÖ¤­´¹¤¨
+             MOVE   123456789           TO   RECE62-YOBIETC(12)
+      *      ºÆ·Ç²¼ÃÖ¤­´¹¤¨
+             MOVE   123456789           TO   RECE62-YOBIETC(13)
+      *      ÊÝ¸±°ìÉôÉéÃ´¶âÃÖ¤­´¹¤¨
+             MOVE   123456789           TO   RECE62-YOBIETC(14)
+      *
+             IF    RECE62-YOBIETC(12)  =  123456789
+             AND   RECE62-YOBIETC(13)  =  123456789
+             AND   RECE62-YOBIETC(14)  =  123456789
+               IF  RECE62-YOBIETC(3)   =  1
+                MOVE    ZERO                TO   RECE62-YOBIETC(3)
+               END-IF
+               IF  RECE62-YOBIETC(3)   =  2
+                MOVE    3                   TO   RECE62-YOBIETC(3)
+               END-IF
+             END-IF
+             MOVE       ZERO                TO   RECE62-YOBIETC(11)
+           END-IF
+      *
+           IF ((IDZ                     =   1         ) AND
+               (RECE62-KOUREI           =  "1" OR  "2") AND
+               (WRK-TAIHI-OKIKAE        =   1         ))
+           OR ((IDZ                     =   1         ) AND
+               (RECE62-KOUREI       NOT =  "1" AND "2") AND
+               (WRK-TAIHI-OKIKAE        =   2         ))
+             CONTINUE
+           ELSE
+             MOVE       ZERO                TO   RECE62-YOBIETC(3)
+             MOVE       ZERO                TO   RECE62-YOBIETC(11)
+             MOVE       123456789           TO   RECE62-YOBIETC(12)
+             MOVE       123456789           TO   RECE62-YOBIETC(13)
+             MOVE       123456789           TO   RECE62-YOBIETC(14)
+           END-IF
+      *
+           .
+       211A-ICHIBUFUTAN-OKIKAE2-EXT.
            EXIT.
       *
       *****************************************************************

@@ -161,6 +161,7 @@
       *                                     ³Û¶èÊ¬ÊÔ½¸½¤Àµ
       *  04.05.42    NACL-ÌçÏÆ    12/06/04  À¸ÊÝ¤Î£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ
       *  04.05.43    NACL-ÌçÏÆ    12/06/28  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅ¦Í×Íóµ­ºÜÂÐ±þ
+      *  04.05.44    NACL-ÌçÏÆ    12/09/19  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍó¶â³ÛÃÖ´¹ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -10131,6 +10132,43 @@
            IF     (RECE62-SRYYM    >=  "201204")
            AND    (RECE62-KOUREI   NOT =  SPACE)
              MOVE   RECE62-KOUREI      TO  RECE10-RESERVE-AREA(1:1)
+           END-IF
+      *
+           IF     (RECE62-YOBIETC(11)  =  1  OR  2  OR  3)
+           OR     (RECE62-YOBIETC(3)   =  1  OR  2  OR  3)
+             EVALUATE  RECE62-YOBIETC(11)
+               WHEN       1
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(2:1)
+               WHEN       2
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(2:1)
+               WHEN       3
+                 MOVE   "3"        TO  RECE10-RESERVE-AREA(2:1)
+             END-EVALUATE
+             EVALUATE  RECE62-YOBIETC(3)
+               WHEN       1
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(3:1)
+               WHEN       2
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(3:1)
+               WHEN       3
+                 MOVE   "3"        TO  RECE10-RESERVE-AREA(3:1)
+             END-EVALUATE
+             IF    RECE62-YOBIETC(12)  NOT =  123456789
+               IF  RECE62-YOBIETC(12)      =  009999999
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(4:1)
+               ELSE
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(4:1)
+               END-IF
+             END-IF
+             IF    RECE62-YOBIETC(13)  NOT =  123456789
+               IF  RECE62-YOBIETC(13)      =  009999999
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(5:1)
+               ELSE
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(5:1)
+               END-IF
+             END-IF
+             IF    RECE62-YOBIETC(14)  NOT =  123456789
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(6:1)
+             END-IF
            END-IF
       *
            IF      RECE62-SRYYM    >=   "201004"
