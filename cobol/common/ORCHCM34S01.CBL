@@ -148,6 +148,7 @@
            03  WRK-GAIHAKU-KHNTEN              PIC 9(08).
            03  WRK-GAIHAKU-KSNTEN              PIC 9(08).
            03  WRK-NYUKHNKSNKBN                PIC 9(03).
+           03  WRK-CHUKSNCD                    PIC X(04).
            03  WRK-NACCT-ZAISKBKBN             PIC X(01).
            03  WRK-KHNTEN                      PIC S9(08).
            03  WRK-KSNTEN                      PIC S9(08).
@@ -155,7 +156,7 @@
            03  WRK-KSNSRYCD-G.
                05  WRK-KSNSRYCD-MAX            PIC 9(03).
                05  WRK-KSNSRYCD                PIC X(09)
-                                               OCCURS   3.
+                                               OCCURS   5.
            03  WRK-HYOKETU-TEN                 PIC S9(08).
            03  WRK-HYOKETU-SRYCD               PIC X(09).
            03  WRK-SENTEI-TEN                  PIC S9(08).
@@ -1381,6 +1382,8 @@
       *
       *    入院基本料のコードを探す
            MOVE    ZERO                TO  WRK-KHNTEN
+           MOVE    ZERO                TO  WRK-NYUKHNKSNKBN
+           MOVE    SPACE               TO  WRK-CHUKSNCD
            MOVE    SPACE               TO  WRK-KHNSRYCD
            MOVE    ZERO                TO  WRK-HYOKETU-TEN
            MOVE    SPACE               TO  WRK-HYOKETU-SRYCD
@@ -1405,6 +1408,7 @@
                    WHEN    1
                        MOVE    TNS-TEN             TO  WRK-KHNTEN
                        MOVE    TNS-NYUKHNKSNKBN    TO  WRK-NYUKHNKSNKBN
+                       MOVE    TNS-CHUKSNCD        TO  WRK-CHUKSNCD
                        MOVE    IDX2                TO  IDX-KHN
                    WHEN    2
                        EVALUATE    TNS-TENSIKIBETU
@@ -1419,7 +1423,7 @@
                                    =   WRK-GAIHAKU-KSNTEN
                                    -   TNS-TEN
                            END-IF
-                           IF    ( WRK-KSNSRYCD-MAX    >=  3 )
+                           IF    ( WRK-KSNSRYCD-MAX    >=  5 )
                                CONTINUE
                            ELSE
                                COMPUTE WRK-KSNSRYCD-MAX
@@ -1682,6 +1686,9 @@
                    ELSE
                        PERFORM 2001111-SENTEI-TAKIKAN-SEC
                    END-IF
+               WHEN    8
+               WHEN    9
+                       PERFORM 2001111-GAIHAKU-GENSAN-SEC
                END-EVALUATE
            ELSE
                EVALUATE    FLG-GAIHAKUDAY (IDXD)
@@ -1704,6 +1711,9 @@
                    ELSE
                        PERFORM 2001111-SENTEI-TAKIKAN-SEC
                    END-IF
+               WHEN    8
+               WHEN    9
+                       PERFORM 2001111-GAIHAKU-GENSAN-SEC
                END-EVALUATE
            END-IF
       *
@@ -1741,7 +1751,8 @@
       *
            END-IF
       *
-           IF    ( FLG-GAIHAKUDAY (IDXD)   =   4 OR 5 OR 6 OR 7)
+           IF    ( FLG-GAIHAKUDAY (IDXD)   =   4 OR 5 OR 6 OR 7
+                                            OR 8 OR 9 )
       *
                PERFORM VARYING IDX8    FROM    1   BY  1
                        UNTIL ( IDX8    >   WRK-KSNSRYCD-MAX )
@@ -1945,6 +1956,39 @@
        2001111-SENTEI-TAKIKAN-EXT.
            EXIT.
       *****************************************************************
+      *    特定曜日・特定時間減算診療コード取得
+      *****************************************************************
+       2001111-GAIHAKU-GENSAN-SEC      SECTION.
+      *
+           EVALUATE   FLG-GAIHAKUDAY (IDXD)
+           WHEN     8
+               EVALUATE   WRK-CHUKSNCD
+               WHEN   "9017"
+                   MOVE   "190161470"  TO  WRK-GAIHAKU-SRYCD
+               WHEN   "9018"
+                   MOVE   "190161570"  TO  WRK-GAIHAKU-SRYCD
+               WHEN   "9026"
+                   MOVE   "190161870"  TO  WRK-GAIHAKU-SRYCD
+               WHEN   "9030"
+                   MOVE   "190162070"  TO  WRK-GAIHAKU-SRYCD
+               END-EVALUATE
+           WHEN     9
+               EVALUATE   WRK-CHUKSNCD
+               WHEN   "9017"
+                   MOVE   "190161670"  TO  WRK-GAIHAKU-SRYCD
+               WHEN   "9018"
+                   MOVE   "190161770"  TO  WRK-GAIHAKU-SRYCD
+               WHEN   "9026"
+                   MOVE   "190161970"  TO  WRK-GAIHAKU-SRYCD
+               WHEN   "9030"
+                  MOVE    "190162170"  TO  WRK-GAIHAKU-SRYCD
+               END-EVALUATE
+           END-EVALUATE
+      *
+           .
+       2001111-GAIHAKU-GENSAN-EXT.
+           EXIT.
+      *****************************************************************
       *    外泊点数取得処理
       *****************************************************************
        200111-GAIHAKU-TENSU-GET-SEC    SECTION.
@@ -1962,17 +2006,17 @@
                    IF    ( NACCT-SRYYM     >=  CONST-H2204 )
                        COMPUTE WRK-ZAI-TEN
                            = ( WRK-ZAI-KHNTEN  *   0.3 )   +  0.5
-                       COMPUTE WRK-ZAI-TEN
-                           =   WRK-ZAI-TEN
-                           +   WRK-GAIHAKU-KSNTEN
-                       COMPUTE WRK-ZAI-TEN
-                           =   WRK-ZAI-TEN
-                           - ( WRK-ZAI-TEN * ( WRK-HYOKETU-TEN / 100 ))
-                           +   0.5
                    END-IF
                WHEN    5
                    COMPUTE WRK-ZAI-TEN
                        = ( WRK-ZAI-KHNTEN  *   0.7 )   +  0.5
+               WHEN    8
+               WHEN    9
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.92 )   +  0.5
+               END-EVALUATE
+      *
+               IF    ( FLG-GAIHAKUDAY(IDXD)    =   4 OR 5 OR 8 OR 9 )
                    COMPUTE WRK-ZAI-TEN
                        =   WRK-ZAI-TEN
                        +   WRK-GAIHAKU-KSNTEN
@@ -1980,7 +2024,7 @@
                        =   WRK-ZAI-TEN
                        - ( WRK-ZAI-TEN * ( WRK-HYOKETU-TEN / 100 ))
                        +   0.5
-               END-EVALUATE
+               END-IF
            ELSE
                EVALUATE  FLG-GAIHAKUDAY(IDXD)
                WHEN   1
@@ -2006,9 +2050,14 @@
                WHEN   7
                    COMPUTE WRK-ZAI-TEN
                        = ( WRK-ZAI-KHNTEN  *   0.85 )   +  0.5
+               WHEN    8
+               WHEN    9
+                   COMPUTE WRK-ZAI-TEN
+                       = ( WRK-ZAI-KHNTEN  *   0.92 )   +  0.5
                END-EVALUATE
       *
-               IF    ( FLG-GAIHAKUDAY(IDXD)    =   4 OR 5 OR 6 OR 7 )
+               IF    ( FLG-GAIHAKUDAY(IDXD)    =   4 OR 5 OR 6 OR 7
+                                                OR 8 OR 9 )
                    COMPUTE WRK-ZAI-TEN
                        =   WRK-ZAI-TEN
                        +   WRK-GAIHAKU-KSNTEN
@@ -2418,6 +2467,8 @@
                WHEN    3
                WHEN    4
                WHEN    5
+               WHEN    8
+               WHEN    9
                    IF    ( NACCT-SRYYM     >=  CONST-H1604 )
                     AND  ( NACCT-SRYYM     <   CONST-H2204 )
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   4 )
@@ -2458,6 +2509,8 @@
                WHEN    3
                WHEN    4
                WHEN    5
+               WHEN    8
+               WHEN    9
                    IF    ( IDX-TAX             =   1 )
                        COMPUTE WRK-SENTEI-PTFTN (IDX-TAX)
                            =   WRK-SENTEI-PTFTN (IDX-TAX)
@@ -2928,7 +2981,8 @@
                IF    ( NACCT-DAY    (IDXD)     >   ZERO )
                 AND  ( FLG-NYUINDAY (IDXD)     =   1 )
                 AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5
-                                                        OR 6 OR 7)
+                                                        OR 6 OR 7
+                                                        OR 8 OR 9 )
                     IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
                      OR  ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
                         MOVE   1       TO  FLG-SANTEI
@@ -3652,7 +3706,8 @@
                    IF    ( NACCT-DAY    (IDXD)     >   ZERO )
                     AND  ( FLG-NYUINDAY (IDXD)     =   1 OR 2 )
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5
-                                                            OR 6 OR 7)
+                                                            OR 6 OR 7
+                                                            OR 8 OR 9 )
                         IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
                          OR  ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
                             MOVE   1       TO  FLG-SANTEI
@@ -4172,7 +4227,8 @@
                MOVE    ZERO                TO  FLG-SANTEI
                IF    ( FLG-NYUINDAY (IDXD)     =   1 )
                 AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5
-                                                        OR 6 OR 7)
+                                                        OR 6 OR 7
+                                                        OR 8 OR 9 )
                 AND  ( LNK-NYULIFE-KBN(IDXD)   NOT =   SPACE )
                     IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
                      OR  ( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
@@ -4479,7 +4535,8 @@
                     AND  ( FLG-NYUINDAY  (IDXD)        =   1  )
                     AND  ( FLG-NYUINRYODAY (IDXD)      =   1 )
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5
-                                                            OR 6 OR 7)
+                                                            OR 6 OR 7
+                                                            OR 8 OR 9 )
                     AND  ( FLG-TOKTEIDAY (IDXD)        =   ZERO )
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
@@ -4504,7 +4561,8 @@
                     AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
                       OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)  =   "1" ))
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5
-                                                            OR 6 OR 7)
+                                                            OR 6 OR 7
+                                                            OR 8 OR 9 )
                     AND  ((FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
                       OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)
                                                        =   "1" ))
@@ -4565,7 +4623,8 @@
                 AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
                   OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
                 AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR 4 OR 5
-                                                        OR 6 OR 7)
+                                                        OR 6 OR 7
+                                                        OR 8 OR 9 )
                    MOVE    1       TO  WRYYTAN-DAY (IDXD)
                    COMPUTE WRYYTAN-ZAIKAISU
                        =   WRYYTAN-ZAIKAISU    +   1

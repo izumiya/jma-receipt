@@ -26916,6 +26916,10 @@
                    MOVE    "2021"  TO  SPA-ERRCD
                WHEN    23
                    MOVE    "2022"  TO  SPA-ERRCD
+               WHEN    26
+                   MOVE    "2026"  TO  SPA-ERRCD
+               WHEN    27
+                   MOVE    "2027"  TO  SPA-ERRCD
                WHEN    OTHER
                    MOVE    "2008"  TO  SPA-ERRCD
                END-EVALUATE
@@ -28566,6 +28570,22 @@
                        "同日再入院日に実日数算定コード"
                                            DELIMITED   BY  SPACE
                        "を入力してください"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2026"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                       "特定時間退院減算（外泊）の入力に誤りがあります"
+                                           DELIMITED   BY  SPACE
+               INTO    SPA-ERRMSG
+               END-STRING
+           WHEN    "2027"
+               MOVE    SPACE           TO  SPA-ERRMSG
+               STRING  "負担金計算に失敗しました。"
+                                           DELIMITED   BY  SPACE
+                     "特定曜日入退院減算（外泊）の入力に誤りがあります"
                                            DELIMITED   BY  SPACE
                INTO    SPA-ERRMSG
                END-STRING
