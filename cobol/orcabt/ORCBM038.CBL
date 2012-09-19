@@ -152,6 +152,8 @@
        01  WRK-CONS-AREA.
       *    £²£°£°£¸Ç¯£±£°·î²þÀµ
            03  WRK-CONS-SRYYM-200810   PIC X(06)   VALUE   "200810".
+      *    £²£°£±£²Ç¯£´·î²þÀµ
+           03  WRK-CONS-SRYYM-201204   PIC X(06)   VALUE   "201204".
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -591,9 +593,10 @@
                    END-STRING
            END-EVALUATE
       *
-           IF    ( WRK-PRTFLG          =   5       )
+           IF    ( WRK-PRTFLG          =   5                     )
            OR    ( WRK-PRTFLG          =   4   AND 
-                   WRK-NYUGAIKBN       =   "1"     )
+                   WRK-NYUGAIKBN       =   "1" AND
+                   LNK-PRTKANRI-SRYYM  >=  WRK-CONS-SRYYM-201204 )
                STRING
                    "MonpeLayerIn "             DELIMITED   BY  SIZE
                    "-L L1 -L L2 -L L3 -L L4 -L L5 -L L6 -L L7 -L L8 "
