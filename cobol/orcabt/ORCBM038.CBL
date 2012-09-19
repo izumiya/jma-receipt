@@ -36,6 +36,7 @@
       *                                     確定分の記載を中止
       *  04.05.03    NACL-藤原    12/04/17  平成２４年４月改正対応
       *                                     平成２４年４月分以降はまとめる
+      *  04.05.05    NACL-藤原    12/09/10  一部負担金の記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -60,7 +61,7 @@
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *
-           COPY    "HCM3AV01.INC"  REPLACING  //HCM3AV01//
+           COPY    "HCM3AV02.INC"  REPLACING  //HCM3AV02//
                                    BY         //HCM3A//.
       *****COPY    "HCM3B.INC".
            COPY    "HCM3BV01.INC"  REPLACING  //HCM3BV01//
@@ -590,6 +591,24 @@
                    END-STRING
            END-EVALUATE
       *
+           IF    ( WRK-PRTFLG          =   5       )
+           OR    ( WRK-PRTFLG          =   4   AND 
+                   WRK-NYUGAIKBN       =   "1"     )
+               STRING
+                   "MonpeLayerIn "             DELIMITED   BY  SIZE
+                   "-L L1 -L L2 -L L3 -L L4 -L L5 -L L6 -L L7 -L L8 "
+                                               DELIMITED   BY  SIZE
+                   "-L L9 -L L10 -L L11 -L L12 -L L13 -L L14 -L L15 "
+                                               DELIMITED   BY  SIZE
+                   "-L L16 -L L17 -L L18 -L L19 -L L20 -L L21 -L L22 "
+                                               DELIMITED   BY  SIZE
+                   "-L L23 -L L24 -L L25 -L L26 -L L27 -L L28 -L L29 "
+                                               DELIMITED   BY  SIZE
+                   "MonpeLayerOut"             DELIMITED   BY  SIZE
+                                               INTO    HCM3A-LOPTION
+               END-STRING
+           END-IF
+      *
            .
        310-HEAD-HEN-01-EXT.
            EXIT.
@@ -760,10 +779,18 @@
                MOVE    WRK-NISSUZ              TO  HCM3A-NISSU3 (IDY) 
                MOVE    SUM-TOTALTEN (IDX3 IDX1 IDX IDY)  TO  WRK-TENSUZ
                MOVE    WRK-TENSUZ              TO  HCM3A-TENSU3 (IDY)
-               IF      IDY             =   3
+               IF    ( WRK-PRTFLG          =   5       )
+               OR    ( WRK-PRTFLG          =   4   AND 
+                       WRK-NYUGAIKBN       =   "1"     )
                    MOVE    SUM-FTNMONEY (IDX3 IDX1 IDX IDY)
                                                TO  WRK-FTNMONEYZ
-                   MOVE    WRK-FTNMONEYZ       TO  HCM3A-ITBFTN3
+                   MOVE    WRK-FTNMONEYZ       TO  HCM3A-ITBFTN3 (IDY)
+               ELSE
+                   IF      IDY             =   3
+                       MOVE    SUM-FTNMONEY (IDX3 IDX1 IDX IDY)
+                                               TO  WRK-FTNMONEYZ
+                       MOVE    WRK-FTNMONEYZ   TO  HCM3A-ITBFTN3 (IDY)
+                   END-IF
                END-IF
                MOVE    SUM-SHOKUJIKENSU (IDX3 IDX1 IDX IDY) 
                                                TO  WRK-SHOKENSUZ
@@ -784,6 +811,13 @@
            MOVE    WRK-NISSUZ              TO  HCM3A-NISSU3 (12) 
            MOVE    SUM-TOTALTEN (IDX3 IDX1 IDX 12)   TO  WRK-TENSUZ
            MOVE    WRK-TENSUZ              TO  HCM3A-TENSU3 (12)
+           IF    ( WRK-PRTFLG          =   5       )
+           OR    ( WRK-PRTFLG          =   4   AND 
+                   WRK-NYUGAIKBN       =   "1"     )
+               MOVE    SUM-FTNMONEY (IDX3 IDX1 IDX 12)
+                                               TO  WRK-FTNMONEYZ
+               MOVE    WRK-FTNMONEYZ           TO  HCM3A-ITBFTN3(12)
+           END-IF
            MOVE    SUM-SHOKUJIKENSU (IDX3 IDX1 IDX 12) 
                                            TO  WRK-SHOKENSUZ
            MOVE    WRK-SHOKENSUZ           TO  HCM3A-SYOKENSU3 (12)
@@ -806,6 +840,13 @@
                MOVE    WRK-NISSUZ              TO  HCM3A-NISSU4 (IDY) 
                MOVE    SUM-TOTALTEN (IDX3 IDX1 IDX IDY)  TO  WRK-TENSUZ
                MOVE    WRK-TENSUZ              TO  HCM3A-TENSU4 (IDY)
+               IF    ( WRK-PRTFLG          =   5       )
+               OR    ( WRK-PRTFLG          =   4   AND 
+                       WRK-NYUGAIKBN       =   "1"     )
+                   MOVE    SUM-FTNMONEY (IDX3 IDX1 IDX IDY)
+                                               TO  WRK-FTNMONEYZ
+                   MOVE    WRK-FTNMONEYZ       TO  HCM3A-ITBFTN4 (IDY)
+               END-IF
                MOVE    SUM-SHOKUJIKENSU (IDX3 IDX1 IDX IDY) 
                                                TO  WRK-SHOKENSUZ
                MOVE    WRK-SHOKENSUZ           TO  HCM3A-SYOKENSU4 (IDY)
@@ -825,6 +866,13 @@
            MOVE    WRK-NISSUZ              TO  HCM3A-NISSU4 (9) 
            MOVE    SUM-TOTALTEN (IDX3 IDX1 IDX 12)   TO  WRK-TENSUZ
            MOVE    WRK-TENSUZ              TO  HCM3A-TENSU4 (9)
+           IF    ( WRK-PRTFLG          =   5       )
+           OR    ( WRK-PRTFLG          =   4   AND 
+                   WRK-NYUGAIKBN       =   "1"     )
+               MOVE    SUM-FTNMONEY (IDX3 IDX1 IDX 12)
+                                               TO  WRK-FTNMONEYZ
+               MOVE    WRK-FTNMONEYZ           TO  HCM3A-ITBFTN4 (9)
+           END-IF
            MOVE    SUM-SHOKUJIKENSU (IDX3 IDX1 IDX 12) 
                                            TO  WRK-SHOKENSUZ
            MOVE    WRK-SHOKENSUZ           TO  HCM3A-SYOKENSU4 (9)
@@ -847,6 +895,13 @@
                MOVE    WRK-NISSUZ              TO  HCM3A-NISSU5 (IDY) 
                MOVE    SUM-TOTALTEN (IDX3 IDX1 IDX IDY)  TO  WRK-TENSUZ
                MOVE    WRK-TENSUZ              TO  HCM3A-TENSU5 (IDY)
+               IF    ( WRK-PRTFLG          =   5       )
+               OR    ( WRK-PRTFLG          =   4   AND 
+                       WRK-NYUGAIKBN       =   "1"     )
+                   MOVE    SUM-FTNMONEY (IDX3 IDX1 IDX IDY)
+                                               TO  WRK-FTNMONEYZ
+                   MOVE    WRK-FTNMONEYZ       TO  HCM3A-ITBFTN5 (IDY)
+               END-IF
                MOVE    SUM-SHOKUJIKENSU (IDX3 IDX1 IDX IDY) 
                                                TO  WRK-SHOKENSUZ
                MOVE    WRK-SHOKENSUZ           TO  HCM3A-SYOKENSU5 (IDY)
@@ -866,6 +921,13 @@
            MOVE    WRK-NISSUZ              TO  HCM3A-NISSU5 (9) 
            MOVE    SUM-TOTALTEN (IDX3 IDX1 IDX 12)   TO  WRK-TENSUZ
            MOVE    WRK-TENSUZ              TO  HCM3A-TENSU5 (9)
+           IF    ( WRK-PRTFLG          =   5       )
+           OR    ( WRK-PRTFLG          =   4   AND 
+                   WRK-NYUGAIKBN       =   "1"     )
+               MOVE    SUM-FTNMONEY (IDX3 IDX1 IDX 12)
+                                               TO  WRK-FTNMONEYZ
+               MOVE    WRK-FTNMONEYZ           TO  HCM3A-ITBFTN5 (9)
+           END-IF
            MOVE    SUM-SHOKUJIKENSU (IDX3 IDX1 IDX 12) 
                                            TO  WRK-SHOKENSUZ
            MOVE    WRK-SHOKENSUZ           TO  HCM3A-SYOKENSU5 (9)
@@ -1131,7 +1193,7 @@
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
            IF      FLG-PRTKBN          =   ZERO                            
-               MOVE    "HCM3AV01.red"      TO  SPRT-PRTID
+               MOVE    "HCM3AV02.red"      TO  SPRT-PRTID
                MOVE    HCM3A               TO  SPRT-PRTDATA
            ELSE                          
       *********MOVE    "HCM3B.red"         TO  SPRT-PRTID
