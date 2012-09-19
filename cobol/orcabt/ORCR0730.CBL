@@ -157,6 +157,7 @@
       *                                     額区分編集修正
       *  04.05.41    NACL-門脇    12/06/04  生保の２４併用時の対応
       *  04.05.42    NACL-門脇    12/06/28  生保まとめ分点欄摘要欄記載対応
+      *  04.05.43    NACL-門脇    12/09/19  保険欄−一部負担金欄金額置換対応
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -10205,6 +10206,43 @@
            IF     (RECE62-SRYYM    >=  "201204")
            AND    (RECE62-KOUREI   NOT =  SPACE)
                MOVE   RECE62-KOUREI    TO  RECE10-RESERVE-AREA(1:1)
+           END-IF
+      *
+           IF     (RECE62-YOBIETC(11)  =  1  OR  2  OR  3)
+           OR     (RECE62-YOBIETC(3)   =  1  OR  2  OR  3)
+             EVALUATE  RECE62-YOBIETC(11)
+               WHEN       1
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(2:1)
+               WHEN       2
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(2:1)
+               WHEN       3
+                 MOVE   "3"        TO  RECE10-RESERVE-AREA(2:1)
+             END-EVALUATE
+             EVALUATE  RECE62-YOBIETC(3)
+               WHEN       1
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(3:1)
+               WHEN       2
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(3:1)
+               WHEN       3
+                 MOVE   "3"        TO  RECE10-RESERVE-AREA(3:1)
+             END-EVALUATE
+             IF    RECE62-YOBIETC(12)  NOT =  123456789
+               IF  RECE62-YOBIETC(12)      =  009999999
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(4:1)
+               ELSE
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(4:1)
+               END-IF
+             END-IF
+             IF    RECE62-YOBIETC(13)  NOT =  123456789
+               IF  RECE62-YOBIETC(13)      =  009999999
+                 MOVE   "2"        TO  RECE10-RESERVE-AREA(5:1)
+               ELSE
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(5:1)
+               END-IF
+             END-IF
+             IF    RECE62-YOBIETC(14)  NOT =  123456789
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(6:1)
+             END-IF
            END-IF
       *
            IF      RECE62-SRYYM        >=  "201004"
