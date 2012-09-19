@@ -8125,7 +8125,8 @@
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
                          (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7)
+                                                         OR 6 OR 7
+                                                         OR 8 OR 9)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX1)
@@ -8173,7 +8174,8 @@
       ***                  ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
       ***                   (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))          AND
                          (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7)
+                                                         OR 6 OR 7
+                                                         OR 8 OR 9)
                        MOVE   LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX1)
@@ -8222,7 +8224,8 @@
                                                                "2"   OR
                                                                "3")  AND
                        (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                       OR 6 OR 7)
+                                                       OR 6 OR 7
+                                                       OR 8 OR 9)
       *                食堂加算クリアフラグのセット
                         MOVE  "1"    TO  WRK-TAHOKEN-SHOKUDOU-FLG(IDX1)
                    END-IF
@@ -8267,7 +8270,8 @@
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
                          (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7)
+                                                         OR 6 OR 7
+                                                         OR 8 OR 9)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX2)
@@ -8316,7 +8320,8 @@
       ***                  ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
       ***                   (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
                          (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7)
+                                                         OR 6 OR 7
+                                                         OR 8 OR 9)
                        MOVE   LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX2)
@@ -8364,7 +8369,8 @@
                        (LNK-NYUINDAY-DOUJITSU-T-SKJKBN(IDX1) = "2"   OR
                                                                "3")  AND
                        (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                       OR 6 OR 7)
+                                                       OR 6 OR 7
+                                                       OR 8 OR 9)
       *                食堂加算クリアフラグのセット
                         MOVE  "1"    TO  WRK-TAHOKEN-SHOKUDOU-FLG(IDX1)
                    END-IF
@@ -8410,7 +8416,8 @@
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
                          (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7)
+                                                         OR 6 OR 7
+                                                         OR 8 OR 9)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX3)
@@ -8460,7 +8467,8 @@
       ***                  ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
       ***                   (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
                          (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7)
+                                                         OR 6 OR 7
+                                                         OR 8 OR 9)
                        MOVE   LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX3)
@@ -8507,7 +8515,8 @@
                        (NACCT-DAY(IDX1)    NOT =  ZERO)              AND
                        (LNK-NYUINDAY-DOUJITSU-T-SKJKBN(IDX1) = "3")  AND
                        (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                       OR 6 OR 7)
+                                                       OR 6 OR 7
+                                                       OR 8 OR 9)
       *                食堂加算クリアフラグのセット
                         MOVE  "1"    TO  WRK-TAHOKEN-SHOKUDOU-FLG(IDX1)
                    END-IF
@@ -9813,7 +9822,8 @@
                     ((WRK-NYUINKHN(IDX1)     NOT =  SPACE)          OR
                      (LNK-NYUINDAY-KBN(IDX1)     =  "1"  ))         AND
                      (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                     OR 6 OR 7)
+                                                     OR 6 OR 7
+                                                     OR 8 OR 9)
                    MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                      TO  WRK-KANKYO-HKNCOMBI-DAY(IDX1)
                    MOVE   1          TO  WRK-KANKYO-DAY(IDX1 IDX1)
