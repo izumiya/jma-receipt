@@ -90,6 +90,7 @@
       *                                     未確定分のみ別集計とする
       *  04.05.04    NACL-藤原    12/04/17  平成２４年４月改正対応
       *                                     平成２４年４月分以降はまとめる
+      *  04.05.05    NACL-藤原    12/09/10  一部負担金の記載対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1438,13 +1439,22 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                  TO  SUM-TOTALTEN  (IDY4 IDY3 IDY1 IDY2)
                                      SUM-BIKOU-TOTALTEN
                                                    (IDY4 IDY3)
-           IF    (  IDY1              <   3        )
-           OR    ( (IDY1              =   3 ) AND
-                   (IDY2              =   3 )      )                          
+           IF    ( WRK-PRTFLG          =   5                     )
+           OR    ( WRK-PRTFLG          =   4   AND
+                   WRK-NYUGAIKBN       =   "1" AND
+                   RECE10-SRYYM        >=  WRK-CONS-SRYYM-201204 )
                ADD     RECE10-FTNMONEY       (IDX1)
+                             TO  SUM-FTNMONEY      (IDY4 IDY3 IDY1 IDY2)
+                                 SUM-BIKOU-FTNMONEY(IDY4 IDY3)
+           ELSE
+               IF    (  IDY1               <   3        )
+               OR    ( (IDY1               =   3 ) AND
+                       (IDY2               =   3 )      )                          
+                   ADD     RECE10-FTNMONEY       (IDX1)
                                  TO  SUM-FTNMONEY  (IDY4 IDY3 IDY1 IDY2)
                                      SUM-BIKOU-FTNMONEY
                                                    (IDY4 IDY3)
+               END-IF
            END-IF                          
            ADD     RECE10-SHOKUJINISSU   (IDX1)
                                  TO  SUM-SHOKUJINISSU
@@ -1474,10 +1484,18 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                    TO  SUM-NISSU     (IDY4 IDY3 IDY1 12)    
                ADD     RECE10-TOTALTEN       (IDX1)
                                    TO  SUM-TOTALTEN  (IDY4 IDY3 IDY1 12)
-               IF      IDY1              <   3                          
+               IF    ( WRK-PRTFLG          =   5                     )
+               OR    ( WRK-PRTFLG          =   4   AND 
+                       WRK-NYUGAIKBN       =   "1" AND
+                       RECE10-SRYYM        >=  WRK-CONS-SRYYM-201204 )
                    ADD     RECE10-FTNMONEY       (IDX1)
                                    TO  SUM-FTNMONEY  (IDY4 IDY3 IDY1 12)
-               END-IF                      
+               ELSE
+                   IF      IDY1              <   3                          
+                       ADD     RECE10-FTNMONEY       (IDX1)
+                                   TO  SUM-FTNMONEY  (IDY4 IDY3 IDY1 12)
+                   END-IF
+               END-IF
                ADD     RECE10-SHOKUJINISSU   (IDX1)
                                    TO  SUM-SHOKUJINISSU
                                                      (IDY4 IDY3 IDY1 12)
