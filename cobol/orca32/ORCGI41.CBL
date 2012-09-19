@@ -3231,6 +3231,22 @@
       *    ©гне╡С©Т
            PERFORM   VARYING   IDX     FROM    1   BY  1
                      UNTIL     IDX     >   31
+      *
+               MOVE    IDX             TO  WRK-ZZ
+               IF    ( IDX             <   10 )
+                   MOVE    WRK-ZZ-X (2:1)  TO  I41-LDAY (IDX)
+               ELSE
+                   MOVE    WRK-ZZ-X        TO  I41-LDAY (IDX)
+               END-IF
+      *
+               MOVE    "black"             TO  I41-LDAY-STYLE (IDX)
+               EVALUATE    SPA-NAI-YOBI (IDX)
+               WHEN    CONST-SATURDAY
+                   MOVE    "blue"          TO  I41-LDAY-STYLE (IDX)
+               WHEN    CONST-SUNDAY
+                   MOVE    "red"           TO  I41-LDAY-STYLE (IDX)
+               END-EVALUATE
+      *
                IF      SPA-GMN-DAY-41 (IDX)    >=  100
                    MOVE    SPA-GMN-DAY-41 (IDX)    TO  WRK-ZZZZ
                    MOVE    WRK-ZZZZ-X              TO  I41-DAY (IDX)
