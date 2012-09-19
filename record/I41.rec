@@ -54,6 +54,130 @@ I41	{
 		KOMENTO	{
 			value	varchar(50);
 		};
+		LDAY01	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY02	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY03	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY04	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY05	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY06	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY07	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY08	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY09	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY10	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY11	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY12	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY13	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY14	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY15	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY16	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY17	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY18	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY19	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY20	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY21	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY22	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY23	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY24	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY25	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY26	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY27	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY28	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY29	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY30	{
+			style	varchar(20);
+			value	varchar(02);
+		};
+		LDAY31	{
+			style	varchar(20);
+			value	varchar(02);
+		};
 		DAY01	{
 			value	varchar(3);
 		};
