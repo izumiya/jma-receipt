@@ -5294,15 +5294,7 @@
                END-IF
            END-IF
       *
-           EVALUATE    TRUE
-           WHEN  ( WRK-KJNYMD     >=  CONST-H241001 )
-               EVALUATE  TRUE
-               WHEN  ( SPA-NAI-I01-BTUSBT  =   "01" )
-                AND  ( SYS-5001-CRYOYOKBN  =   "1" )
-                   MOVE    5         TO  FLG-RYOYOKHN
-                   PERFORM 410111-RYOYOKHN-EDIT-SEC
-               END-EVALUATE
-           WHEN  ( WRK-KJNYMD     >=  CONST-H240401 )
+           IF    ( WRK-KJNYMD     >=  CONST-H240401 )
                EVALUATE  TRUE
                WHEN  ( SPA-NAI-I01-BTUSBT  =   "08" )
                 AND  ( SYS-5001-CRYOYOKBN  =   "1" )
@@ -5326,8 +5318,14 @@
                                      =  "33" OR "34" )
                    MOVE    3         TO  FLG-RYOYOKHN
                    PERFORM 410111-RYOYOKHN-EDIT-SEC
+               WHEN  ( SPA-NAI-I01-BTUSBT  =   "01" )
+                AND  ( SYS-5001-CRYOYOKBN  =   "1" )
+                   IF    ( WRK-KJNYMD     >=  CONST-H241001 )
+                       MOVE    5         TO  FLG-RYOYOKHN
+                       PERFORM 410111-RYOYOKHN-EDIT-SEC
+                   END-IF
                END-EVALUATE
-           END-EVALUATE
+           END-IF
       *
       *    老人の場合、老人一般病棟特定入院基本料をコンボに設定
       *    平成２２年４月から年齢要件廃止
