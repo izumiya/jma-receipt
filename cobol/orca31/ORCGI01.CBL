@@ -5123,7 +5123,7 @@
       *
                MOVE    SYS-5001-BTU-SBT    TO  SPA-NAI-I01-BTUSBT
                MOVE    SYS-5001-KHNKBNCD   TO  SPA-NAI-I01-BTUKHNKBNCD
-               MOVE    "3"                 TO  WRK-CMB-CD(1:1)
+               MOVE    "2"                 TO  WRK-CMB-CD(1:1)
                MOVE    SYS-5001-BTU-TOKTEI-NYUIN
                                            TO  WRK-CMB-CD(2:2)
                IF    ( WRK-KJNYMD      >=  CONST-H181001 )
