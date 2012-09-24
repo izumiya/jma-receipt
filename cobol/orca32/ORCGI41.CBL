@@ -3922,6 +3922,7 @@
                                            OR  "0046"
                                            OR  "0053"
                                            OR  "0054"
+                                           OR  "0055"
                    MOVE    SPA-NAI-DAY-41(SPA-NAI-BANGO IDX-D)
                                            TO  SPA-GMN-DAY-41 (IDX-D)
                    MOVE    SPA-ERRCD       TO  WRK-ERRCD
@@ -4096,6 +4097,15 @@
                            END-IF
                         END-IF
                      END-IF
+                   END-IF
+      *
+      *            特定曜日入退院減算の土日曜日チェック
+                   IF    SPA-GMN-DAY-41 (IDX-D)   =    9
+                       IF   SPA-NAI-YOBI(IDX-D)   =  "6"  OR  "7"
+                           CONTINUE
+                       ELSE
+                           MOVE  "0055"           TO  SPA-ERRCD
+                       END-IF
                    END-IF
       *
       *        室料差額診療コード
@@ -10452,6 +10462,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0054"
                    MOVE    "医療観察での入院算定時は外泊入力不可です。"
                                        TO  WRK-ERRMSG
+               WHEN    "0055"
+                   MOVE    "特定曜日入退院減算は土曜、日曜のみ入力可能"
+                                       TO  WRK-ERRMSG(1:42)
+                   MOVE    "です。"
+                                       TO  WRK-ERRMSG(43:6)
                WHEN    "1005"
                    MOVE    "受診履歴番号が存在しません。"
                                        TO  WRK-ERRMSG
