@@ -1073,6 +1073,8 @@
       *****************************************************************
        3006-YOBI-HEN-SEC               SECTION.
       *
+           INITIALIZE                  SPA-NAI-YOBI-G
+      *
       *    ÍËÆüÊÔ½¸
            PERFORM VARYING IDXD    FROM    1   BY  1
                    UNTIL ( IDXD    >   31 )
