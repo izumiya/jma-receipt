@@ -517,3 +517,18 @@ path key18  {
 	};
 };
 
+path	key19 	{
+	DBSELECT	{
+		DECLARE tbl_sryact_key19_csr CURSOR FOR
+		SELECT *
+		FROM tbl_sryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     NYUGAIKBN  LIKE     :NYUGAIKBN
+			AND     SRYYM     >=   :SRYYM
+			AND     SRYYM     <=   :CREYMD
+			AND     SRYKBN    LIKE :SRYKBN
+			ORDER   BY PTID,SRYYM,ZAINUM,RENNUM
+		;
+	};
+};
+
