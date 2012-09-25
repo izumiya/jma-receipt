@@ -4155,12 +4155,14 @@
                    END-IF
       *
       *            ∆√ƒÍÕÀ∆¸∆˛¬‡±°∏∫ªª§Œ≈⁄∆¸ÕÀ∆¸•¡•ß•√•Ø
-                   IF    SPA-GMN-DAY-41 (IDX-D)   =    9
+                   IF     SPA-NAI-SRYYM      >=    "201210"
+                     IF  SPA-GMN-DAY-41 (IDX-D)   =    9
                        IF   SPA-NAI-YOBI(IDX-D)   =  "6"  OR  "7"
                            CONTINUE
                        ELSE
                            MOVE  "0055"           TO  SPA-ERRCD
                        END-IF
+                     END-IF
                    END-IF
       *
       *        ººŒ¡∫π≥€ø«Œ≈•≥°º•…
