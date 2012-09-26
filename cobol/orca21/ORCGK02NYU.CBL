@@ -2841,6 +2841,17 @@
                MOVE    ORCSCWKSRY-ERRCD    TO  WRK-ERRCD1
            END-IF
       *
+      *H24.9
+      *    中途終了でアフターケアの場合エラーとする
+           IF      ORCSCWKSRY-SYORIFLG     =   1
+               IF     (SPA-HKNNUM          =   "971" ) AND
+                      (SPA-RSI-HKNKBN      =   "3"   )
+                   MOVE    "9041"              TO  SPA-ERRCD
+                   MOVE    "9041"              TO  WRK-ERRCD1
+                   MOVE    9                   TO  SPA-HKN-ERR
+                   MOVE    SPACE               TO  SPA-ERRMSG2
+               END-IF
+           END-IF
            .
        3103-SAIHEN-HEN-EXT.
            EXIT.
@@ -4027,13 +4038,17 @@
                                        SPA-K02
       *
       *    再表示編集処理
+           MOVE    SPACE               TO  WRK-KIDCD
            IF      LNK-SC95-WKSRYACT   =   1
-               MOVE    "0122"          TO  SPA-KIDCD
+               MOVE    "0122"              TO  WRK-KIDCD
            END-IF
       *
       *    保険組合
            MOVE    SPA-HKNCOMBINUM     TO  SPA-GMN-HKNCOMBINUM
            PERFORM 41012-HKNCOMBI-CHANGE-SEC
+           IF      WRK-KIDCD       NOT =   SPACE
+               MOVE    WRK-KIDCD           TO  SPA-KIDCD
+           END-IF
       **** PERFORM 3101-HKNCOMBI-HEN-SEC
       *
            MOVE    HZN-SCR-REC         TO  SPA-SCR-REC
@@ -8272,7 +8287,20 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    WHEN    4
                        MOVE    "1034"              TO  SPA-ERRCD
                        MOVE    5                   TO  SPA-GMN-CUR
+      *H24.9
+      *            アフターケアの中途データ展開
+                   WHEN    9
+                       MOVE    "9041"              TO  SPA-ERRCD
                END-EVALUATE
+      *H24.9
+               IF      SPA-ERRCD           =   SPACE
+      *            アフターケアエラー
+                   IF     (SPA-HKNNUM          =   "971" ) AND
+                          (SPA-RSI-HKNKBN      =   "3" )
+                       MOVE    "9029"              TO  SPA-ERRCD
+                       MOVE    5                   TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
            END-IF
       *    入院料設定ないエラー
            IF      SPA-ERRCD           =   SPACE
@@ -9251,17 +9279,21 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    老人保険編集エラーがある時、エラーとする
            IF      SPA-RJN-ERR         =   1
                MOVE    "1027"              TO  SPA-ERRCD
+               MOVE    SPACE               TO  SPA-ERRMSG2
            END-IF
       *    老人保険編集エラーがある時、エラーとする
            IF      SPA-RJN-ERR         =   2
                MOVE    "1070"              TO  SPA-ERRCD
+               MOVE    SPACE               TO  SPA-ERRMSG2
            END-IF
       *    保険エラーがある時、エラーとする
            IF      SPA-HKN-ERR         =   1
                MOVE    "1028"              TO  SPA-ERRCD
+               MOVE    SPACE               TO  SPA-ERRMSG2
            END-IF
            IF      SPA-HKN-ERR         =   2
                MOVE    "1032"              TO  SPA-ERRCD
+               MOVE    SPACE               TO  SPA-ERRMSG2
            END-IF
       *    保険未選択の場合、エラー
            IF      SPA-HKN-ERR         =   3
@@ -9270,12 +9302,27 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    保険選択エラーの場合
            IF      SPA-HKN-ERR         =   4
                MOVE    "1034"              TO  SPA-ERRCD
+               MOVE    SPACE               TO  SPA-ERRMSG2
                MOVE    5                   TO  SPA-GMN-CUR
            END-IF
       *    退職国保の年齢
            IF      SPA-RJN-ERR         =   9
                MOVE    "1077"              TO  SPA-ERRCD
+               MOVE    SPACE               TO  SPA-ERRMSG2
            END-IF
+      *H24.9
+      *    アフターケアの中途データ展開
+           IF      SPA-HKN-ERR         =   9
+               IF      SPA-KIDCD           =   "0116"
+                                           OR  "0127"
+      *            クリアは行う
+                   CONTINUE
+               ELSE
+                   MOVE    "9041"              TO  SPA-ERRCD
+                   MOVE    SPACE               TO  SPA-ERRMSG2
+               END-IF
+           END-IF
+      *
       *
       *    入院料設定ないエラー
            IF      SPA-ERRCD           =   SPACE

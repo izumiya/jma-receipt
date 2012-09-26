@@ -1006,6 +1006,14 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H24.9
+               WHEN    "9041"
+                   STRING  "アフターケアは入院の登録はできません。"
+                           "保険変更または中途データ削除を行って下さい"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *H24.9
                WHEN    "9030"
                    MOVE    "時間加算区分が選択中の時間加算区分と"
                                        TO  SPA-ERRMSG
