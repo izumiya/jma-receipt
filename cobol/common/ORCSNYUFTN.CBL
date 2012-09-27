@@ -3358,6 +3358,7 @@ grpsys                                    SPA-AREA
                WHEN   101  THRU  109
                WHEN   147  THRU  152
                WHEN   173  THRU  190
+               WHEN   196
                  IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
                  END-IF

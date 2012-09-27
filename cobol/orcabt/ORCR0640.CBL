@@ -9961,6 +9961,7 @@
                WHEN   101  THRU  109
                WHEN   147  THRU  152
                WHEN   173  THRU  190
+               WHEN   196
                  EVALUATE   SYUKEI-IDX
                    WHEN     4
                    WHEN     9
@@ -10104,6 +10105,7 @@
                WHEN   101  THRU  109
                WHEN   147  THRU  152
                WHEN   173  THRU  190
+               WHEN   196
                  EVALUATE   SYUKEI-IDX
                    WHEN     5
                    WHEN    10
