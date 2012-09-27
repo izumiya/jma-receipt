@@ -1558,6 +1558,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN   101  THRU  109
                WHEN   147  THRU  152
                WHEN   173  THRU  190
+               WHEN   196
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     4
                       MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
