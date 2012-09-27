@@ -75,6 +75,9 @@ HCLIST="HC04 HC08 HC18 HC20 HC21 HC22 HC23 HC24"
 	if	[ ${4:7:4} = "HC2Q" ]	;then
 	    ruby -ne '$_.scan(%r|/tmp.*?\.png|m){|a| print "#{a} "}' $4 | xargs rm -f
 	fi
+	if	[ ${4:7:4} = "HC62" ]	;then
+	    ruby -ne '$_.scan(%r|/tmp.*?\.png|m){|a| print "#{a} "}' $4 | xargs rm -f
+	fi
 	rm $4
   fi
 #----------------------------------------------------------------------#
