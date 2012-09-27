@@ -69,6 +69,7 @@
       *  04.05.00    NACL-多々納  09/07/XX  患者公費負担額機能追加
       *                                     公費負担額未入力警告対応
       *  04.06.00    NACL-多々納  11/03/24  患者情報削除サブ対応
+      *  04.07.00    NACL-多々納  12/09/11  患者削除再確認対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -105,6 +106,7 @@
            03  FLG-PTNUM           PIC 9(01).
       *    03  FLG-YYK             PIC 9(01).
            03  FLG-PTINF           PIC 9(01).
+           03  FLG-JYURRK          PIC 9(01).
       *    03  FLG-PTHKNINF        PIC 9(01).
       *    03  FLG-PTKOHINF        PIC 9(01).
       *    03  FLG-HKNCOMBI        PIC 9(01).
@@ -303,8 +305,8 @@
       *    COPY    "CPPTCOM.INC".
       *
       *    受診履歴
-      *01  JYURRK-REC.
-      *    COPY    "CPJYURRK.INC".
+       01  JYURRK-REC.
+           COPY    "CPJYURRK.INC".
       *
       *    診療科履歴
       *01  SRYKARRK-REC.
@@ -479,7 +481,7 @@
       *   画面編集サブ
            COPY    "CPORCSP02.INC".
       *   チェックデジット
-           COPY    "CPORCCHKDGT.INC".
+      *    COPY    "CPORCCHKDGT.INC".
       *
       *    排他制御サブパラメタ
            COPY    "CPORCSLOCK.INC".
@@ -743,6 +745,11 @@
                    IF      SPA-ERRCD       NOT =   SPACE
                        PERFORM 510-ERRSET-SEC
                    END-IF
+      *H24.9
+                   IF      SPA-ERRCD           =   SPACE
+                   AND     SPA-PIDCD       NOT =   SPACE
+                       PERFORM 520-JIDSET-SEC
+                   END-IF
       *        拡張患者番号設定
                WHEN    "P014"
                    MOVE    "P02"           TO  SPA-P02-GAMEN
@@ -946,8 +953,19 @@
       *        削除確認
                WHEN    "0103"
                    IF      SPA-PID1-FLG        =   "OK"
+      *H24.9
+      ***************  PERFORM 4991-DELETE-SYORI-SEC
+                       PERFORM 4990-DELETE-CHEK-SEC
+                   END-IF
+                   IF      SPA-PIDCD       NOT =   SPACE
+                       GO      TO      3001-PID1-SYORI-EXT
+                   END-IF
+      *        削除再確認
+               WHEN    "0113"
+                   IF      SPA-PID1-FLG        =   "OK"
                        PERFORM 4991-DELETE-SYORI-SEC
                    END-IF
+      *
       *        保険変更確認
       *******  WHEN    "9100"
       *        WHEN    "9101"
@@ -2643,6 +2661,54 @@
            .
        499-DELETE-EXT.
            EXIT.
+      *ver.4.7
+      *****************************************************************
+      *    削除処理
+      *****************************************************************
+       4990-DELETE-CHEK-SEC             SECTION.
+      *
+      *    テスト患者
+           IF      SPA-GMN-TSTPTNUMKBN     =   "1"
+      *        削除処理
+               PERFORM 4991-DELETE-SYORI-SEC
+               GO      TO      4990-DELETE-CHEK-EXT
+           END-IF
+      *
+      *    受診履歴チェック
+           MOVE    SPACE               TO  JYURRK-REC
+           INITIALIZE                  JYURRK-REC
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key8"              TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               MOVE    SPACE               TO  JYURRK-REC
+               INITIALIZE                  JYURRK-REC
+               MOVE    1                   TO  FLG-JYURRK
+           END-IF
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-JYURRK          =   ZERO
+      *        再確認メッセージ
+               MOVE    "0113"              TO  SPA-PIDCD
+           ELSE
+      *        削除処理
+               PERFORM 4991-DELETE-SYORI-SEC
+           END-IF
+      *
+           .
+       4990-DELETE-CHEK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    削除処理
@@ -4905,10 +4971,20 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-STRING
                WHEN    "0103"
                    STRING  "該当患者のデータをすべて削除します。"
+                            "復元はできません。"
                             "よろしいですか？"
                                            DELIMITED  BY  SIZE
                                            INTO    WRK-PIDMSG
                    END-STRING
+      *ver.4.7
+               WHEN    "0113"
+                   STRING  "受診履歴のある患者です。"
+                           "削除後に復元はできません。"
+                           "削除してよろしいですか？"
+                                           DELIMITED  BY  SIZE
+                                           INTO    WRK-PIDMSG
+                   END-STRING
+      *
                WHEN    "0104"
                    STRING    SPA-PIDMSG    DELIMITED  BY  SPACE
                              "を老人負担割合へ追加変更します。"
@@ -5026,6 +5102,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            EVALUATE    SPA-PIDCD
                WHEN    "0103"
+               WHEN    "0113"
                    MOVE    "B01"               TO  MCP-WIDGET
                WHEN    OTHER
                    MOVE    "B12"               TO  MCP-WIDGET
@@ -5146,6 +5223,23 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            .
        900-SYSKANRI-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    受診履歴マスター読込
+      *****************************************************************
+       970-JYURRK-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  JYURRK-REC
+               MOVE    ZERO            TO  FLG-JYURRK
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+      *
+           .
+       970-JYURRK-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
