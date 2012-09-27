@@ -1161,9 +1161,9 @@
            MOVE    SPA-SYSYMD          TO  SPA-MAE-HAKYMD
            PERFORM 3102-SYUNOU-HEN-SEC
       *
-           COMPUTE WRK-SKYMONEY        =   SPA-GOK-SKYMONEY
-                                       +   SPA-GOK-CHOSEI
-                                       -   SPA-OLD-SKYMONEY
+      *    COMPUTE WRK-SKYMONEY        =   SPA-GOK-SKYMONEY
+      *                                +   SPA-GOK-CHOSEI
+      *                                -   SPA-OLD-SKYMONEY
       *
       *!!!
       *    一括入金・返金処理
@@ -1174,6 +1174,10 @@
                PERFORM 3106-IKKATU-INIT-SEC
            END-IF
       *!!!
+      *
+           COMPUTE WRK-SKYMONEY        =   SPA-GOK-SKYMONEY
+                                       +   SPA-GOK-CHOSEI
+                                       -   SPA-OLD-SKYMONEY
       *    請求書発行フラグ
            IF     (SPA-GMN-HAKFLG      =   SPACE )  OR
       ****       ((SPA-GMN-HAKFLG      =   "2"   )  AND
