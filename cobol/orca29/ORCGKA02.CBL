@@ -31,6 +31,7 @@
       *  04.05.00    NACL-多々納  09/09/XX  '0086'コメントコード対応
       *  04.05.00    NACL-多々納  10/01/XX  治験対応
       *  04.06.00    NACL-多々納  11/02/22  用法コメント対応
+      *  04.06.00    NACL-多々納  12/09/27  在宅器材・商品名対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -248,6 +249,9 @@
                    07  WRK-YOHOU-KBN       PIC X(01).
            03  WRK-YSRYCD              PIC X(09).
            03  IDXY                    PIC 9(04).
+      *H24.9
+      *    商品名コード
+           03  WRK-SHO-SRYCD           PIC X(09).
       *
       *   年齢表示
        01  WRK-NENREI-G.
@@ -1776,6 +1780,10 @@
            IF      LNK-WKSRY-SRYCD (IDX IDZ)   =   "099209903"
                                                OR  "099209905"
                                                OR  "099209906"
+      *H24.4 改正
+                                               OR  "099209907"
+                                               OR  "099209908"
+      *H24.4 改正
                 PERFORM 3100122-KOUHATU-MEISYO-SEC
                 MOVE    WRK-MEISYO    TO  SPA-GMN-TMEISYO2(IDG)
            END-IF
@@ -4146,10 +4154,21 @@
                    MOVE    ZERO            TO  IDX3
                    MOVE    ZERO                TO  IDXY
                    INITIALIZE                      WRK-YOHOU-G
+      *ver.4.7
+                   MOVE    SPACE               TO  WRK-SHO-SRYCD
                    PERFORM VARYING     IDX-W2  FROM    1   BY  1
                            UNTIL      (IDX-W2  >   50      )  OR
                                       (SPA-PARA-SRYCD (IDX-W IDX-W2)
                                                    =   SPACE)
+      *H24.9
+      *                在宅器材の商品名
+                       IF     (SPA-PARA-SRYKBN (IDX-W)  =   "14" )  AND
+                              (SPA-PARA-SRYCD (IDX-W IDX-W2)(1:3) 
+                                                       =   "058")
+                           MOVE    SPA-PARA-SRYCD (IDX-W IDX-W2)
+                                                       TO  WRK-SHO-SRYCD
+                       END-IF
+      *H24.9
       *                薬剤・コメント・用法・のみ
                        IF     (SPA-PARA-SRYSURYO (IDX-W IDX-W2)
                                                    >   ZERO )
@@ -4163,7 +4182,14 @@
                                                    =   "0082"
                                                    OR  "0083"
                                                    OR  "0084"
-                                                   OR  "0085" ))
+      *??                                          OR  "0085" ))
+                                                   OR  "0085" )
+      *H24.9
+      *                 在宅器材は対象
+                        OR  ((SPA-PARA-SRYKBN (IDX-W)  =   "14" )  AND
+                             (SPA-PARA-SRYCD (IDX-W IDX-W2)(1:1) 
+                                                       =   "7"  )) )
+      *H24.9
       *
                            ADD     1           TO  IDX2
                            MOVE    SPA-PARA-SRYCD (IDX-W IDX-W2)
@@ -4180,6 +4206,16 @@
                            MOVE    SPA-PARA-INPUTCOMENT (IDX-W IDX-W2)
                                            TO  ORCHCN62-INPUTCOMENT
                                                              (IDX1 IDX2)
+      *ver.4.7 
+      *                    商品名コード対応
+                           IF      SPA-PARA-SRYCD(IDX-W IDX-W2)(1:1)
+                                                           =   "7"
+                               MOVE    WRK-SHO-SRYCD
+                                           TO  ORCHCN62-SHO-SRYCD
+                                                             (IDX1 IDX2)
+                           END-IF
+                           MOVE    SPACE               TO  WRK-SHO-SRYCD
+      *ver.4.7 
       *                    薬剤
                            IF      SPA-PARA-SRYCD (IDX-W IDX-W2)(1:1)
                                                        =   "6"

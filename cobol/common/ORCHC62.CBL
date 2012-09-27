@@ -30,6 +30,8 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/06/XX  ¿ôÎÌ¾®¿ô£µ·åÂÐ±þ
       *  04.06.00    NACL-Â¿¡¹Ç¼  11/02/22  ÍÑË¡¥³¡¼¥É¥³¥á¥ó¥ÈÂÐ±þ
       *  04.06.00    NACL-¿¹ÏÆ    11/03/10  ÍÑÎÌ³ä¹ç¥³¡¼¥ÉÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  12/09/03  £Ñ£Ò¥³¡¼¥ÉÂÐ±þ
+      *                                     ¾¦ÉÊÌ¾¥³¡¼¥ÉÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -47,7 +49,7 @@
       *    °õºþÍÑ¥Ç¡¼¥¿
        FD  PRT-FILE.
        01  PRT-REC.
-           03  PRT-PRTDATA         PIC X(20000).
+           03  PRT-PRTDATA         PIC X(50000).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -56,6 +58,9 @@
       *
       *    Ä¢É¼ÎÎ°è
            COPY    "HCM62.INC".
+      *
+      *    £Ñ£ÒÄ¢É¼ÎÎ°è
+           COPY    "HCM62Q.INC".
       *
       *    ¥·¥¹¥Æ¥àÎÎ°è
        01  SYS-AREA.
@@ -71,11 +76,13 @@
            03  FLG-PTINF           PIC 9(01).
            03  FLG-TENSU           PIC 9(01).
            03  FLG-TNSP            PIC 9(01).
-     *
+      *
            03  FLG-KBN             PIC 9(01).
-     *
+      *
            03  FLG-SP              PIC 9(01).
            03  FLG-SOURYO          PIC 9(01).
+      *
+           03  FLG-QROK            PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -93,6 +100,12 @@
            03  IDX-ZAI             PIC 9(03).
            03  IDX-SRY             PIC 9(02).
            03  IDX-KBN             PIC 9(01).
+      *H24.9
+           03  IDX-QR1             PIC 9(04).
+           03  IDX-QR2             PIC 9(04).
+           03  IDX-QRB             PIC 9(04).
+           03  IDX-QY              PIC 9(04).
+           03  IDQ                 PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -137,6 +150,19 @@
            03  WRK-YOURYO          PIC 9(05)V9(05).
            03  WRK-KAISU           PIC 9(01).
       *
+      *H24.9
+      *    £Ñ£ÒÊÔ½¸
+           03  WRK-TNS-NAME        PIC X(100).
+           03  WRK-YOH-NAME-G.
+               05  WRK-YOH-NAME        OCCURS   5.
+                   07  WRK-YOH-NAME-1  PIC X(02).
+                   07  WRK-YOH-NAME-2  PIC X(98).
+           03  WRK-FILE-CNT        PIC 9(02).
+           03  WRK-SYS-TIME        PIC 9(08).
+      *ver.4.7
+           03  WRK-SHO-NAME        PIC X(80).
+           03  WRK-SHO-TANINAME    PIC X(20).
+      *
       *    ºÞÆâÍÆÎÎ°è
        01  WRK-SRY-AREA.
            03  WRK-ZAIKAIKEI       PIC 9(03).
@@ -176,9 +202,36 @@
                05  FILLER          PIC X(54)   VALUE
                "¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²¡²".
       *
+      *
+      *H24.9
+      *    £Ñ£Ò°ÌÃÖ
+       01  QR-FILE-NAME.
+           03  FILLER              PIC X(05)   VALUE   "/tmp/".
+           03  QR-FILE-HOSPNUM     PIC 9(02)   VALUE   ZERO.
+           03  QR-FILE-FORM-ID     PIC X(05)   VALUE   SPACE.
+           03  FILLER              PIC X(01)   VALUE   ".".
+           03  QR-FILE-TERMID      PIC X(32)   VALUE   SPACE.
+           03  FILLER              PIC X(01)   VALUE   ".".
+           03  QR-FILE-SYOHMS      PIC 9(08)   VALUE   ZERO.
+           03  FILLER              PIC X(04)   VALUE   ".qr_".
+           03  QR-FILE-ID          PIC 9(02)   VALUE   ZERO.
+           03  FILLER              PIC X(04)   VALUE   ".png".
+      *
+       01  KUHAKU-FILE-NAME        PIC X(512).
+      *    ¶õÇò¤Î²èÁü
+       01  KUHAKU-NAME.
+           03  FILLER          PIC X(05)   VALUE   "data/".
+           03  FILLER          PIC X(15)   VALUE   "transparent.jpg".
+      *¡¡£Ñ£ÒÌ¾¾Î
+       01  CONS-FORM-ID        PIC X(05)   VALUE   "HC62Q".
+      *H24.9
+      *
       *    ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥ó¥Ñ¥é¥á¥¿
        01  PARA-AREA.
            03  PARA-COMMENT2           PIC X(01).
+      *H24.9
+           03  PARA-QRKBN              PIC X(01).
+           03  PARA-SHOHIN             PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -187,6 +240,7 @@
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
       *
+           COPY    "CPSYSKANRI.INC".
       *    °åÎÅµ¡´Ø¾ðÊó¡Ý´ðËÜ¾ðÊó
            COPY    "CPSK1001.INC".
       *
@@ -237,6 +291,14 @@
       *    ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥óÊÔ½¸¥Ñ¥é¥á¥¿
            COPY    "CPORCSPRGOPTION.INC".
       *
+      *£Ñ£ÒÂÐ±þ
+      *    £Ñ£Ò¥Ç¡¼¥¿ºîÀ®¥µ¥Ö¥Ñ¥é¥á¥¿
+           COPY    "CPORCSQRCSV62.INC".
+      *    ¥Õ¥¡¥¤¥ë¥Ç¥¤¥ì¥¯¥È¥ê°ÌÃÖ»ØÄê¥µ¥Ö
+           COPY    "CPMKPASS.INC".
+      *    ¥Õ¥¡¥¤¥ëÂ¸ºß¥Á¥§¥Ã¥¯
+           COPY    "CPORCSFILECHK.INC".
+      *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
       *****************************************************************
@@ -275,6 +337,10 @@
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  CNT-AREA
+      *H24.9
+           INITIALIZE                  ORCSQRCSV62AREA
+           MOVE    ZERO                TO  IDX-QR1
+           MOVE    ZERO                TO  IDX-QRB
       *
            ACCEPT  SYS-TIME    FROM    TIME
       *
@@ -299,6 +365,15 @@
            MOVE    "COMMENT2"      TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)   TO  PARA-COMMENT2
+      *H24.9
+      *    £Ñ£Ò°õºþ
+           MOVE    "QRKBN"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)   TO  PARA-QRKBN
+      *    ¾¦ÉÊÌ¾µ­ºÜ
+           MOVE    "SHOHIN"        TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)   TO  PARA-SHOHIN
       *
            .
        100-INIT-EXT.
@@ -352,6 +427,11 @@
       *    Ä¢É¼°õºþ½èÍý
            PERFORM 400-PRT-WRITE-SEC
       *
+      *H24.9
+      *    £Ñ£Ò°õºþ
+           IF      PARA-QRKBN          =   "1"
+               PERFORM 500-QR-SYORI-SEC
+           END-IF
            .
        200-MAIN-EXT.
            EXIT.
@@ -416,12 +496,13 @@
                                    TO  WRK-SRYSYUKBN
            MOVE    ORCHC62-SRYKBN(IDX-ZAI)
                                    TO  WRK-SRYKBN
+      *!
+           MOVE    SPACE           TO  WRK-SSTKIJUNCD
            IF      ORCHC62-YSRYCD(IDX-ZAI) NOT =   SPACE
                MOVE    ORCHC62-YSRYCD(IDX-ZAI) TO  WRK-SRYCD
       *        ÅÀ¿ô¸¡º÷
                PERFORM 900-TENSU-READ-SEC
       *        ²ó¿ô¥«¥¦¥ó¥È
-               MOVE    SPACE           TO  WRK-SSTKIJUNCD
                MOVE    ZERO            TO  CNT-KAISU
                PERFORM VARYING IDX-KBN     FROM    1   BY  1
                        UNTIL   IDX-KBN     >   5
@@ -433,11 +514,16 @@
            END-IF
       *
            MOVE    ZERO            TO  CNT-SRY
+      *H24.9
+      *    £Ñ£ÒÂÐ±þ
+           MOVE    ZERO                TO  IDX-QR2
+      *
            PERFORM VARYING IDX-SRY     FROM    1   BY  1
                    UNTIL ( IDX-SRY     >   50  )
                    OR    ( ORCHC62-SRYCD(IDX-ZAI IDX-SRY)  =   SPACE )
       *        ÌÀºÙÊÔ½¸
                PERFORM 230-NAIYO-HENSYU-SEC
+      *
            END-PERFORM
       *
       *    ºÞ¾ðÊó¤¬¤¢¤ì¤Ð½èÍý¤¹¤ë
@@ -458,6 +544,21 @@
       *    ÆâÍÆÊÔ½¸½èÍý
       *****************************************************************
        230-NAIYO-HENSYU-SEC        SECTION.
+      *
+      *ver.4.7
+      *    ¾¦ÉÊÌ¾¥³¡¼¥É
+           MOVE    SPACE               TO  WRK-SHO-TANINAME
+           MOVE    SPACE               TO  WRK-SHO-NAME
+           IF     (PARA-SHOHIN         =   "1"  )
+             AND  (ORCHC62-SHO-SRYCD(IDX-ZAI IDX-SRY)
+                                   NOT =   SPACE )
+               MOVE    ORCHC62-SHO-SRYCD (IDX-ZAI IDX-SRY)
+                                           TO  WRK-SRYCD
+      *        ÅÀ¿ô¸¡º÷
+               PERFORM 900-TENSU-READ-SEC
+               MOVE    TNS-TANINAME        TO  WRK-SHO-TANINAME
+               MOVE    TNS-NAME            TO  WRK-SHO-NAME
+           END-IF
       *
            MOVE    ORCHC62-SRYCD(IDX-ZAI IDX-SRY)
                                    TO  WRK-SRYCD
@@ -481,6 +582,19 @@
                GO  TO  230-NAIYO-HENSYU-EXT
            END-IF
       *
+      *ver.4.7
+      *    ¾¦ÉÊÌ¾¥³¡¼¥É
+           IF      ORCHC62-SHO-SRYCD(IDX-ZAI IDX-SRY)  NOT =   SPACE
+      *        Ì¾¾Î¤ÈÃ±°Ì¤Ï¾¦ÉÊÌ¾¥³¡¼¥É¤ÎÆâÍÆ¤È¤¹¤ë
+               IF      WRK-SHO-TANINAME    NOT =   SPACE
+                   MOVE    WRK-SHO-TANINAME    TO  TNS-TANINAME
+               END-IF
+               IF      WRK-SHO-NAME        NOT =   SPACE
+                   MOVE    WRK-SHO-NAME        TO  TNS-NAME
+               END-IF
+           END-IF
+      *!
+      *
            COMPUTE CNT-SRY     =   CNT-SRY     +   1
       *
            MOVE    ORCHC62-SRYSURYO(IDX-ZAI IDX-SRY)
@@ -493,6 +607,11 @@
                                    TO  WRK-YOURYOU-TBL(CNT-SRY)
       *
            INITIALIZE                  WRK-HEN-AREA
+      *
+      *    £Ñ£ÒÍÑ
+           MOVE    SPACE               TO  WRK-TNS-NAME
+           MOVE    SPACE               TO  WRK-YOH-NAME-G
+           MOVE    ZERO                TO  IDX-QY
       *
       *    £±·ïÌÜ¤À¤±ÈÖ¹æÉ½¼¨
            IF      CNT-SRY         =   1
@@ -509,11 +628,15 @@
                PERFORM 240-YKZNAME-HENSYU-SEC
       *        ¿ôÎÌÊÔ½¸
                PERFORM 240-SURYOU-HENSYU-SEC
-               IF      PARA-COMMENT2   =   "1"
+               IF     (PARA-COMMENT2   =   "1"  )
+               AND    (WRK-SRYCD(1:1)  =   "6"  )
       *            ÍÑÎÌÊÔ½¸
                    PERFORM 240-YOURYOU-HENSYU-SEC
                END-IF
            END-IF
+      *H24.9
+      *    £Ñ£ÒÌ¾¾ÎÊÔ½¸
+           PERFORM 5001-QRMEISAI-HENSYU-SEC
       *
            .
        230-NAIYO-HENSYU-EXT.
@@ -539,6 +662,8 @@
                        INTO            WRK-YOUHOU
                END-STRING
            END-IF
+      *    £Ñ£ÒÍÑ
+           MOVE    WRK-YOUHOU      TO  WRK-TNS-NAME
       *
            MOVE    WRK-YOUHOU      TO  WRK-HENSYUDATA
            PERFORM 250-HENSYU-SYORI-SEC
@@ -570,6 +695,8 @@
                                            TO  WRK-YKZNAME
                END-IF
            END-IF
+      *    £Ñ£ÒÍÑ
+           MOVE    WRK-YKZNAME     TO  WRK-TNS-NAME
       *
            MOVE    WRK-YKZNAME     TO  WRK-HENSYUDATA
            PERFORM 250-HENSYU-SYORI-SEC
@@ -584,9 +711,18 @@
        240-SURYOU-HENSYU-SEC       SECTION.
       *
       *    ÌôºÞ¡¢¤½¤ÎÂ¾ºàÎÁ¡¢ÍÑË¡°Ê³°¤Ï½èÍýÈ´¤±¤ë
-           IF    ( WRK-SRYCD(1:1)  NOT =   "6"   ) AND
-                 ( WRK-SRYCD(1:3)  NOT =   "059" ) AND
-                 ( WRK-SRYCD(1:3)  NOT =   "001" )
+      *    IF    ( WRK-SRYCD(1:1)  NOT =   "6"   ) AND
+      *          ( WRK-SRYCD(1:3)  NOT =   "059" ) AND
+      *          ( WRK-SRYCD(1:3)  NOT =   "001" )
+      *        GO  TO  240-SURYOU-HENSYU-EXT
+      *****END-IF
+      *
+      *    ÌôºÞ¡¢´ïºà¤Î¤ß
+           IF    ( WRK-SRYCD(1:1)      =   "6"   )  OR
+                 ( WRK-SRYCD(1:1)      =   "7"   )  OR
+                 ( WRK-SRYCD(1:3)      =   "059" )
+               CONTINUE
+           ELSE
                GO  TO  240-SURYOU-HENSYU-EXT
            END-IF
       *
@@ -747,6 +883,10 @@
                            TNS-TANINAME    DELIMITED  BY  SPACE
                            INTO            WRK-HENSYUDATA(7:)
                    END-STRING
+      *H24.9
+      *            £Ñ£Ò¡¡°û¤ßÊý¥³¥á¥ó¥È
+                   ADD     1                   TO  IDX-QY
+                   MOVE    WRK-HENSYUDATA      TO  WRK-YOH-NAME(IDX-QY)
       *
                    PERFORM 250-HENSYU-SYORI-SEC
                END-IF
@@ -968,6 +1108,263 @@
        430-FOOT-SET-EXT.
            EXIT.
       *
+      *H24.9
+      *****************************************************************
+      *    £Ñ£ÒºÞÊÔ½¸½èÍý
+      *****************************************************************
+       5001-QRMEISAI-HENSYU-SEC            SECTION.
+      *
+           IF      ORCHC62-SRYKBN (IDX-ZAI)    =   "98"
+      *        È÷¹Í¥³¥á¥ó¥È
+               PERFORM 50012-QR-BIKOU-HEN-SEC
+           ELSE
+      *        £Ñ£ÒºÞÊÔ½¸
+               PERFORM 50011-QR-MEISAI-HEN-SEC
+           END-IF
+      *
+           .
+       5001-QRMEISAI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £Ñ£ÒºÞÊÔ½¸½èÍý
+      *****************************************************************
+       50011-QR-MEISAI-HEN-SEC            SECTION.
+      *
+           IF      IDX-QR2             =   ZERO
+               ADD     1                   TO  IDX-QR1
+      *
+      *        ºÞ²ó¿ô
+               MOVE    ORCHC62-ZAIKAIKEI (IDX-ZAI)
+                                       TO  ORCSQRCVS62-KAISU (IDX-QR1)
+      *        ¿ÇÎÅ¶èÊ¬
+               MOVE    ORCHC62-SRYKBN (IDX-ZAI)
+                                       TO  ORCSQRCVS62-SRYKBN (IDX-QR1)
+      *        ¿ÇÎÅ¼ïÊÌ
+               MOVE    ORCHC62-SRYSYUKBN (IDX-ZAI)
+                                       TO  ORCSQRCVS62-SRYSYUKBN
+                                                              (IDX-QR1)
+           END-IF
+      *
+           ADD     1                   TO  IDX-QR2
+           MOVE    ORCHC62-SRYCD(IDX-ZAI IDX-SRY)
+                                       TO  ORCSQRCVS62-SRYCD
+                                                       (IDX-QR1 IDX-QR2)
+           MOVE    WRK-TNS-NAME        TO  ORCSQRCVS62-TNS-NAME
+                                                       (IDX-QR1 IDX-QR2)
+           MOVE    TNS-TANINAME        TO  ORCSQRCVS62-TANINAME
+                                                       (IDX-QR1 IDX-QR2)
+           MOVE    ORCHC62-SRYSURYO(IDX-ZAI IDX-SRY)
+                                       TO  ORCSQRCVS62-SURYOU
+                                                       (IDX-QR1 IDX-QR2)
+           MOVE    TNS-YKZKBN          TO  ORCSQRCVS62-YKZKBN
+                                                       (IDX-QR1 IDX-QR2)
+           IF      TNSP-SOURYOHENKBN   =   1
+      *        ÆâÉþÅÀºÞ
+               MOVE    "1"             TO  ORCSQRCVS62-NAIHENKBN
+                                                       (IDX-QR1 IDX-QR2)
+           END-IF
+           IF      ORCHC62-SRYCD(IDX-ZAI IDX-SRY)(1:3) =   "001"
+      *        ÍÑË¡¥³¥á¥ó¥È¶èÊ¬
+               MOVE    TNS-KENTAICOMMENT   TO  ORCSQRCVS62-YCOMMNTKBN
+                                                  (IDX-QR1 IDX-QR2)
+           END-IF
+      *
+      *    °û¤ßÊý¥³¥á¥ó¥È
+           PERFORM VARYING     IDX-QY  FROM    1   BY  1
+                   UNTIL      (IDX-QY      >   5   )
+                           OR (WRK-YOH-NAME (IDX-QY)   =   SPACE )
+                           OR (IDX-QR2     >=   50   )
+               ADD     1                   TO  IDX-QR2
+               MOVE    "810000001"         TO  ORCSQRCVS62-SRYCD
+                                                       (IDX-QR1 IDX-QR2)
+               MOVE    WRK-YOH-NAME-2(IDX-QY)
+                                           TO  ORCSQRCVS62-TNS-NAME
+                                                       (IDX-QR1 IDX-QR2)
+           END-PERFORM
+      *
+           .
+       50011-QR-MEISAI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £Ñ£ÒÈ÷¹Í¥³¥á¥ó¥È½èÍý
+      *****************************************************************
+       50012-QR-BIKOU-HEN-SEC            SECTION.
+      *
+           ADD     1                   TO  IDX-QRB
+           IF      IDX-QRB              <=  10
+               MOVE    WRK-TNS-NAME        TO  ORCSQRCVS62-BIKOU
+                                                       (IDX-QRB)
+           END-IF
+           .
+       50012-QR-BIKOU-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £Ñ£Ò°õºþ½èÍý
+      *****************************************************************
+       500-QR-SYORI-SEC            SECTION.
+      *
+           MOVE    ORCHC62-SRYYMD      TO  ORCSQRCVS62-SRYYMD
+      *    °åÎÅµ¡´Ø¾ðÊó
+           MOVE    SYS-1001-PREFNUM    TO  ORCSQRCVS62-PREFNUM
+           MOVE    SYS-1001-HOSPCD     TO  ORCSQRCVS62-HOSPCD
+           MOVE    SYS-1001-HOSPSBT    TO  ORCSQRCVS62-HOSPSBT
+           MOVE    SYS-1001-HOSPNAME   TO  ORCSQRCVS62-HOSPNAME
+      *    ¥É¥¯¥¿¡¼
+           MOVE    SYS-1010-KANANAME   TO  ORCSQRCVS62-DR-KANANAME
+           MOVE    SYS-1010-NAME       TO  ORCSQRCVS62-DR-NAME
+      *    ´µ¼Ô¾ðÊó
+           MOVE    SPA-NAME            TO  ORCSQRCVS62-NAME
+           MOVE    SPA-KANANAME        TO  ORCSQRCVS62-KANANAME
+           MOVE    SPA-SEX             TO  ORCSQRCVS62-SEX
+           MOVE    SPA-BIRTHDAY        TO  ORCSQRCVS62-BIRTHDAY
+      *    »þ´Ö
+           COMPUTE WRK-SYS-TIME        =   SYS-TIME
+                                       +   ORCHC62-CNT
+      *    ¥Õ¥¡¥¤¥ëÌ¾
+           MOVE    CONS-FORM-ID        TO  ORCSQRCVS62-FORM-ID
+      *    ¥Õ¥¡¥¤¥ëÌ¾ÁÈ¤ßÎ©¤Æ¹àÌÜ
+           MOVE    WRK-SYS-TIME        TO  ORCSQRCVS62-SYSTIME
+      *
+           CALL    "ORCSQRCSV62"       USING
+                                       SPA-AREA
+                                       ORCSQRCSV62AREA
+      *
+      *    £Ñ£Ò¥¤¥á¡¼¥¸°õºþ
+           IF      ORCSQRCVS62-RET-COUNT   >   ZERO
+               PERFORM 5003-QRIMAGE-HEN-SEC
+           END-IF
+           .
+       500-QR-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *        £Ñ£Ò¥¤¥á¡¼¥¸°õºþ½èÍý
+      *****************************************************************
+       5003-QRIMAGE-HEN-SEC      SECTION.
+      *
+      *    £Ñ£Ò¶õÇò²èÁü°ÌÃÖ
+           INITIALIZE                  ORCSMKPASSAREA
+           MOVE    KUHAKU-NAME         TO  MKPASS-IN-01
+           CALL    "ORCSMKPASS"        USING
+                                       ORCSMKPASSAREA
+           MOVE    MKPASS-OT-01        TO  KUHAKU-FILE-NAME
+      *
+           MOVE    ZERO                TO  FLG-QROK
+           MOVE    SPACE               TO  HCM62Q
+           MOVE    ZERO                TO  CNT-LINE
+      *
+           MOVE    ZERO                TO  WRK-FILE-CNT
+           PERFORM VARYING     IDQ     FROM    1  BY  1
+                   UNTIL       IDQ     >   15
+               MOVE    KUHAKU-FILE-NAME    TO  HCM62Q-IMAGE-1 (IDQ)
+               ADD     1                   TO  WRK-FILE-CNT
+               IF      WRK-FILE-CNT        <=  ORCSQRCVS62-RET-COUNT 
+                   MOVE    SPA-HOSPNUM         TO  QR-FILE-HOSPNUM
+                   MOVE    CONS-FORM-ID        TO  QR-FILE-FORM-ID
+                   MOVE    SPA-TERMID          TO  QR-FILE-TERMID
+                   MOVE    WRK-SYS-TIME        TO  QR-FILE-SYOHMS
+                   MOVE    WRK-FILE-CNT        TO  QR-FILE-ID
+      *            ¥Õ¥¡¥¤¥ëÂ¸ºß¥Á¥§¥Ã¥¯
+                   INITIALIZE                      ORCSFILECHKAREA
+                   MOVE    QR-FILE-NAME        TO  FILECHK-NAME
+                   CALL    "ORCSFILECHK"       USING
+                                               ORCSFILECHKAREA
+                   IF      FILECHK-RC          =   ZERO OR 2
+                       MOVE   QR-FILE-NAME     TO  HCM62Q-IMAGE-1 (IDQ)
+                       MOVE   1                TO  FLG-QROK
+                   END-IF
+      *
+                   IF      WRK-FILE-CNT        =   1
+      *                Ä¢É¼£È£Å£Á£Ä¥»¥Ã¥È½èÍý
+                       PERFORM 50010-HEAD-SET-SEC
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           IF      FLG-QROK            =   1
+      *        Ä¢É¼½ÐÎÏ½èÍý
+               PERFORM 50031-QRPRT-WRITE-SEC
+           END-IF
+           .
+       5003-QRIMAGE-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ä¢É¼£È£Å£Á£Ä¥»¥Ã¥È½èÍý
+      *****************************************************************
+       50010-HEAD-SET-SEC            SECTION.
+      *
+           COMPUTE CNT-PAGE        =   CNT-PAGE    +   1
+           MOVE    CNT-PAGE        TO  WRK-ZZ9
+      *
+           COMPUTE CNT-LINE        =   CNT-LINE    +   1
+           MOVE    WRK-LINE-1      TO  HCM62Q-NAIYO1(CNT-LINE)
+      *
+           MOVE    SPACE           TO  HCM62Q-NAIYO2(CNT-LINE)
+           STRING  WRK-ZZ9         DELIMITED  BY  SIZE
+                   " ÊÇ"           DELIMITED  BY  SIZE
+                   INTO            HCM62Q-NAIYO2(CNT-LINE)
+           END-STRING
+      *
+           COMPUTE CNT-LINE    =   CNT-LINE    +   1
+           MOVE    WRK-LINE-2      TO  HCM62Q-NAIYO1(CNT-LINE)
+      *
+           MOVE    WRK-LINE-5      TO  HCM62Q-SEN(CNT-LINE)
+      *
+           MOVE    4               TO   CNT-LINE
+           MOVE    WRK-LINE-5      TO  HCM62Q-SEN(CNT-LINE)
+      *    °åÎÅµ¡´ØÌ¾¾Î¥»¥Ã¥È
+           MOVE    WRK-LINE-3      TO  HCM62Q-NAIYO1(CNT-LINE)
+      *
+      *    °åÎÅµ¡´ØÅÅÏÃÈÖ¹æ¥»¥Ã¥È
+           COMPUTE CNT-LINE    =   CNT-LINE    +   1
+           MOVE    WRK-LINE-4      TO  HCM62Q-NAIYO1(CNT-LINE)
+           .
+       50010-HEAD-SET-EXT.
+           EXIT.
+      *
+      *
+      *****************************************************************
+      *    Ä¢É¼½ÐÎÏ½èÍý
+      *****************************************************************
+       50031-QRPRT-WRITE-SEC           SECTION.
+      *
+      *    °õºþÍÑ¥Õ¥¡¥¤¥ëºîÀ®
+           MOVE    SPA-HOSPNUM     TO  HC01PARA-HOSPNUM
+           MOVE    "HC62"          TO  HC01PARA-FORM-ID
+           MOVE    SPA-TERMID      TO  HC01PARA-TERMID
+           MOVE    SYS-TIME        TO  HC01PARA-SYOHMS
+           MOVE    ORCHC62-CNT     TO  HC01PARA-CNT(1:3)
+           MOVE    CNT-PAGE        TO  HC01PARA-CNT(4:3)
+           OPEN    OUTPUT              PRT-FILE
+           MOVE    SPACE           TO  PRT-REC
+      *
+      *    °õºþÍÑ¥Ç¡¼¥¿½ÐÎÏ
+           MOVE    HCM62Q          TO  PRT-PRTDATA
+           WRITE                       PRT-REC
+      *
+           CLOSE                       PRT-FILE
+      *
+      *    Ä¢É¼°õºþ½èÍý
+           INITIALIZE                  ORCSMKPRTAREA
+           MOVE    "HC01.sh"       TO  MKPRT-ID
+           MOVE    "HCM62Q.red"    TO  MKPRT-DIA
+           MOVE    SPACE           TO  MKPRT-DEF
+           MOVE    HC01PARA        TO  MKPRT-DAT
+           MOVE    SYS-1031-PRTNM(16)
+                                   TO  MKPRT-PRTNM
+           MOVE   "¤ªÌô¼êÄ¢"       TO  MKPRT-INFO
+           CALL   "ORCSMKPRT1"         USING
+                                       ORCSMKPRTAREA
+                                       SPA-AREA
+      *
+           .
+       50031-QRPRT-WRITE-EXT.
+           EXIT.
+      *
+      *
       *****************************************************************
       *    ½ªÎ»¡¡¡¡½èÍý
       *****************************************************************
@@ -1093,6 +1490,7 @@
                MOVE    "key10"         TO  MCP-PATHNAME
                PERFORM 920-DBFETCH-SEC
                IF      MCP-RC          =   ZERO
+                   MOVE    MCPDATA-REC     TO  SYSKANRI-REC
                    MOVE    ZERO            TO  FLG-SYSKANRI
                ELSE
                    MOVE    1               TO  FLG-SYSKANRI
@@ -1125,7 +1523,7 @@
            MOVE    SYS-1001-REC    TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-READ-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1001-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1001-REC
            ELSE
                INITIALIZE                  SYS-1001-REC
            END-IF
@@ -1152,7 +1550,7 @@
            MOVE    SYS-1002-REC    TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-READ-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1002-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1002-REC
            ELSE
                INITIALIZE                  SYS-1002-REC
            END-IF
@@ -1179,7 +1577,7 @@
            MOVE    SYS-1010-REC    TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-READ-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1010-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1010-REC
            ELSE
                INITIALIZE                  SYS-1010-REC
            END-IF
@@ -1229,7 +1627,7 @@
            MOVE    SYS-1900-REC    TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-READ-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1900-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1900-REC
                IF      SYS-1900-PRTKBN(18) NOT =   SPACE
       *            °åÎÅµ¡´ØÌ¾¾ÎÊÔ½¸¾ðÊó
                    PERFORM 900-1901-READ-SEC
@@ -1261,7 +1659,7 @@
            MOVE    SYS-1901-REC    TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-READ-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1901-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1901-REC
                MOVE    SYS-1901-HOSPNAME1
                                        TO  WRK-HOSPNAME
            ELSE
@@ -1289,7 +1687,7 @@
            MOVE    SYS-1902-REC    TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-READ-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-1902-REC
+               MOVE    SYSKANRI-REC    TO  SYS-1902-REC
                MOVE    SYS-1902-TEL    TO  WRK-HOSPTEL
            ELSE
                INITIALIZE                  SYS-1902-REC

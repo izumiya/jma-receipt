@@ -30,7 +30,8 @@
       *  04.03.00    NACL-多々納  08/10/31  包括保険対象対応
       *  04.05.00    NACL-多々納  09/09/XX  '0086'コメントコード対応他
       *  04.05.00    NACL-多々納  09/10/XX  換算値数量対応
-      * 04.06.00     NACL-多々納  11/02/22  用法コードコメント対応
+      *  04.06.00    NACL-多々納  11/02/22  用法コードコメント対応
+      *  04.07.00    NACL-多々納  12/09/27  商品コード対応
       *****************************************************************
       *
       *
@@ -140,6 +141,8 @@
            03  IDXY                    PIC 9(04).
            03  FLG-YSET                PIC 9(01).
       *
+      *ver.4.7
+           03  WRK-SHO-SRYCD           PIC X(09).
       *
        01  TBL-DATA-AREA.
       *    ドクター毎
@@ -162,6 +165,8 @@
                    07  TBL-NAI-TBL         OCCURS   50.
       *                コード
                        09  TBL-SRYCD           PIC  X(09).
+      *                商品コード
+                       09  TBL-SHO-SRYCD       PIC  X(09).
       *                数量
                        09  TBL-SRYSURYO        PIC  9(05)V9(05).
       *                換算値数量
@@ -442,6 +447,10 @@
       *            診療明細
                    MOVE    TBL-SRYCD (IDX-T1 IDX-T2 IDX-T3)
                                            TO  ORCHC62-SRYCD
+                                                   (IDX-T2 IDX-T3)
+      *H24.9       商品コード
+                   MOVE    TBL-SHO-SRYCD (IDX-T1 IDX-T2 IDX-T3)
+                                           TO  ORCHC62-SHO-SRYCD
                                                    (IDX-T2 IDX-T3)
                    MOVE    TBL-SRYSURYO (IDX-T1 IDX-T2 IDX-T3)
                                            TO  ORCHC62-SRYSURYO
@@ -1016,9 +1025,17 @@
            MOVE    ZERO                TO  IDX-T4
            MOVE    ZERO                TO  IDXY
            INITIALIZE                      WRK-YOHOU-G
+      *ver.4.7
+           MOVE    SPACE               TO  WRK-SHO-SRYCD
            PERFORM VARYING     IDXA    FROM    1   BY  1
                    UNTIL      (IDXA    >   WRK-SRY-MAX   )   OR
                               (WRK-SRY-SRYCD (IDXA)    =   SPACE)
+      *ver.4.7
+      *        商品名
+               IF     (WRK-SRY-SRYCD (IDXA)(1:3)   =   "058" )
+                   MOVE    WRK-SRY-SRYCD(IDXA)     TO  WRK-SHO-SRYCD
+               END-IF
+      *
       *        薬剤・器材・用法・コメントのみ
                IF     (WRK-SRY-SRYCD (IDXA)(1:1)   =   "6"
                                                    OR  "7"
@@ -1027,6 +1044,7 @@
                                                    OR  "001"
                                                    OR  "008")
                    IF     (WRK-SRY-SRYCD (IDXA)    =   "630010002" )
+                     OR   (WRK-SRY-SRYCD (IDXA)    =   "630010004" )
                      OR   (WRK-SRY-SRYCD (IDXA)(1:4)   =   "0086"  )
                        CONTINUE
                    ELSE
@@ -1048,6 +1066,14 @@
                        MOVE    WRK-SRY-SRYKAISU (IDXA)
                                                TO  TBL-SRYKAISU
                                                   (IDX-T1 IDX-T2 IDX-T3)
+      *ver.4.7
+      *                商品名
+                       IF     (WRK-SRY-SRYCD (IDXA)(1:1)   =   "7" )
+                           MOVE    WRK-SHO-SRYCD   TO  TBL-SHO-SRYCD
+                                                  (IDX-T1 IDX-T2 IDX-T3)
+                           MOVE    SPACE           TO  WRK-SHO-SRYCD
+                       END-IF
+      *
                        MOVE    WRK-SRY-COM-NAME (IDXA)
                                                TO  TBL-INPUTCOMENT
                                                   (IDX-T1 IDX-T2 IDX-T3)
@@ -1303,6 +1329,8 @@
                    AND     (FLG-YKJOKUKBN      =   ZERO   ) )
       *                薬評分対象外
                    OR      (WKSRY-ZAIKBN       =   1      )
+      *                減点外
+                   OR      (WKSRY-ZAIKBN       =   2      )
                        CONTINUE
                    ELSE
                        ADD     1                   TO  LNK-WKSRYACT-MAX
@@ -1388,6 +1416,7 @@
                                                OR  "7"
                                                OR  "8"  )
                  OR   (WKSRY-SRYCD (IDXA)(1:3) =   "001"
+                                               OR  "058"
                                                OR  "059" )
                  OR   (WKSRY-SRYCD (IDXA)(1:4) =   "0082"
                                                OR  "0083"
