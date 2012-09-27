@@ -77,6 +77,7 @@
       * 04.06.00     NACL-Â¿¡¹Ç¼  12/03/01  £È£²£´Ç¯£´·î²þÀµÂÐ±þ
       * 04.06.00     NACL-Â¿¡¹Ç¼  12/04/10  °ìÈÌÌ¾£±£°£°Ê¸»úÂÐ±þ
       *                                     ´ÞÎÌµ¬³ÊÊÑ¹¹ÉÔ²ÄÅù¤ÎÂÐ±þ
+      * 04.06.00     NACL-Â¿¡¹Ç¼  12/09/27  °å»Õ¥³¡¼¥ÉÅùÊÔ½¸ÂÐ±þ
       *****************************************************************
       *
       *
@@ -521,6 +522,11 @@
            03  PARA-ALLERGY            PIC X(01).
            03  PARA-KANSENSYO          PIC X(01).
            03  PARA-COMMENT            PIC X(01).
+      *H24.9
+      *    £Ñ£Ò°å»Õ¥³¡¼¥É
+           03  PARA-QR-DRCD             PIC X(01).
+      *    £Ñ£Ò´µ¼ÔÈÖ¹æ
+           03  PARA-QR-PTNUM            PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -756,6 +762,15 @@
            MOVE    "COMMENT"           TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-COMMENT
+      *H24.9
+      *    £Ñ£Ò°å»Õ¥³¡¼¥É
+           MOVE    "QRDRCD"            TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-QR-DRCD
+      *    £Ñ£Ò´µ¼ÔÈÖ¹æ
+           MOVE    "QRPTNUM"           TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-QR-PTNUM
       *
            .
        100-OPTION-SELECT-EXT.
@@ -2783,7 +2798,8 @@
                               (WRK-SRY-SRYCD (IDXA)    =   SPACE)
       *        ÂÐ¾Ý³°¡Ê´ïºà¾¦ÉÊ¥³¡¼¥É¡¢Äþ¸º¥³¡¼¥É¡¢ÍÑÎÌ¥³¡¼¥É¡Ë
                IF     (WRK-SRY-SRYCD (IDXA)(1:3) =   "058" )
-                  OR  (WRK-SRY-SRYCD (IDXA)      =   "630010002" )
+                  OR  (WRK-SRY-SRYCD (IDXA)      =   "630010002")
+                  OR  (WRK-SRY-SRYCD (IDXA)      =   "630010004")
                   OR  (WRK-SRY-SRYCD (IDXA)(1:7) =   "0992000" )
                   OR  (WRK-SRY-SRYCD (IDXA)(1:7) =   "0999999" )
                    CONTINUE
@@ -4276,6 +4292,34 @@
       *    °å»Õ¾ðÊó
            MOVE    SYS-1010-KANANAME   TO  ORCSQRCSV-DR-KANANAME
            MOVE    SYS-1010-NAME       TO  ORCSQRCSV-DR-NAME
+      *H24.9
+      *    £Ñ£Ò°å»Õ¥³¡¼¥É
+           IF      PARA-QR-DRCD        =   "1"
+      *        °åÀÒÅÐÏ¿ÈÖ¹æ
+               MOVE    WRK-DRCD(2:4)       TO  ORCSQRCSV-DR-CD
+           END-IF
+      *    £Ñ£Ò´µ¼ÔÈÖ¹æ
+           IF      PARA-QR-PTNUM       =   "1"
+      *        ´µ¼ÔÈÖ¹æ¡Ê£±£µ·å¡Ë
+               MOVE    SPA-PTNUM(1:15)     TO  ORCSQRCSV-PTNUM
+           END-IF
+      *    £Ñ£ÒËãÌô»ÜÍÑ¥³¡¼¥É
+           IF      FLG-MAYAKU          =   1
+      *        ËãÌô¥é¥¤¥»¥ó¥¹
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI
+               MOVE    SYS-1010-MAYAKULICENSE(1:15)
+                                           TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"       USING
+                                           ORCSKANACHKAREA
+               IF     (KANACHK-RC          =   ZERO )
+                 AND  (KANACHK-SYUBETU     =   1    )
+      *                È¾³Ñ¤Î¤ßÂÐ¾Ý
+                   MOVE    SYS-1010-MAYAKULICENSE(1:15)
+                                           TO  ORCSQRCSV-MAYAKULICENSE
+               END-IF
+           END-IF
+      *
       *    ´µ¼Ô¾ðÊó
            MOVE    PTINF-NAME          TO  ORCSQRCSV-NAME
            MOVE    PTINF-KANANAME      TO  ORCSQRCSV-KANANAME

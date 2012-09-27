@@ -34,6 +34,7 @@
       *  04.06.00    NACL-多々納  12/03/XX  Ｈ２４年４月改正対応
       *  04.06.00    NACL-多々納  12/04/04  薬品名称を４０文字までとする
       *  04.06.00    NACL-多々納  12/08/17  薬価基準コード変換対応
+      *  04.06.00    NACL-多々納  12/09/27  医師コード等編集対応
       *****************************************************************
       *
       *
@@ -305,6 +306,8 @@
       *    医師レコード
            MOVE    SPACE               TO  TBL-QRCSV-AREA
            MOVE    "5"                 TO  TBL-QRCSV-DATA (1)
+      *    医師コード
+           MOVE    ORCSQRCSV-DR-CD     TO  TBL-QRCSV-DATA (2)
       **** MOVE    ORCSQRCSV-DR-KANANAME
       ****                             TO  TBL-QRCSV-DATA (3)
       *    拡張漢字変換
@@ -320,6 +323,8 @@
       *    患者氏名レコード
            MOVE    SPACE               TO  TBL-QRCSV-AREA
            MOVE    "11"                TO  TBL-QRCSV-DATA (1)
+      *    患者番号
+           MOVE    ORCSQRCSV-PTNUM     TO  TBL-QRCSV-DATA (2)
       **   MOVE    ORCSQRCSV-NAME(1:40)
       **                               TO  TBL-QRCSV-DATA (3)
       *    拡張漢字変換
@@ -508,6 +513,9 @@
            IF      ORCSQRCSV-MAYAKU    =   1
                MOVE    SPACE               TO  TBL-QRCSV-AREA
                MOVE    "61"                TO  TBL-QRCSV-DATA (1)
+      *        麻薬施用コード
+               MOVE    ORCSQRCSV-MAYAKULICENSE
+                                           TO  TBL-QRCSV-DATA (2)
                MOVE    ORCSQRCSV-ADRS      TO  TBL-QRCSV-DATA (3)
                MOVE    ORCSQRCSV-TEL       TO  TBL-QRCSV-DATA (4)
                MOVE    4                   TO  TBL-MAX

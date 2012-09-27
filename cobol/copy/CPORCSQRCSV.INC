@@ -24,6 +24,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.06.00    NACL-多々納  11/02/21  用法コメント対応
       *  04.06.00    NACL-多々納  12/03/01  一般コード追加（H24.4）
+      *  04.06.00    NACL-多々納  12/09/27  医師・麻薬施用コード等追加
       ************************************************************
       *
        01  ORCSQRCSVAREA.
@@ -54,7 +55,12 @@
                05  ORCSQRCSV-DR-KANANAME   PIC  X(40).
       *        氏名
                05  ORCSQRCSV-DR-NAME       PIC  X(40).
+      *        医師コード
+               05  ORCSQRCSV-DR-CD         PIC  X(15).
+      *        麻薬施用コード
+               05  ORCSQRCSV-MAYAKULICENSE PIC  X(15).
       *        患者情報
+               05  ORCSQRCSV-PTNUM         PIC  X(15).
                05  ORCSQRCSV-NAME          PIC  X(40).
                05  ORCSQRCSV-KANANAME      PIC  X(40).
                05  ORCSQRCSV-SEX           PIC  X(01).
