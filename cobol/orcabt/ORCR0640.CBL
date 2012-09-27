@@ -578,6 +578,8 @@
       *  04.05.78    NACL-ÌçÏÆ    12/08/16  ¥ì¥»ÅÅÉéÃ´¶èÊ¬ÊÔ½¸¡Ê¿©»ö¡Ë
       *  04.05.79    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
       *  04.05.80    NACL-ÌçÏÆ    12/09/19  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍó¶â³ÛÃÖ´¹ÂÐ±þ
+      *  04.05.81    NACL-ÌçÏÆ    12/09/26  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.82    NACL-ÌçÏÆ    12/09/26  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -16416,7 +16418,7 @@
                          (WRK-PREFNUM            =   33       ) AND
                          (RECE62-KOHNUM(KH-IDX - 1)(1:1)
                                          >=  "1" AND <=  "8"  ))
-                  OR    ((RECE62-KOUREI          =  "1"       ) AND
+                  OR    ((RECE62-KOUREI          =  "1" OR "2") AND
                          (RECE62-SRYYM          >=  "200804"  ) AND
                          (WRK-PREFNUM            =   27       ) AND
                          (RECE62-KOHNUM(KH-IDX - 1)(1:1)
@@ -16466,6 +16468,10 @@
                 OR   ((WRK-PREFNUM               =   13           ) AND
                       (RECE62-KOHNUM(KH-IDX - 1) =
                         "180" OR "380" OR "181" OR "381"          ))
+                OR   ((WRK-PREFNUM               =   05           ) AND
+                      (RECE62-KOHNUM(KH-IDX - 1) =
+                        "374" OR "474" OR "280"                   ) AND
+                      (RECE62-SRYYM             >=  "200508"      ))
                   COMPUTE  WRK-TAIHI-FTNMONEY-EN(KH-IDX)  =
                            WRK-TAIHI-FTNMONEY-EN(KH-IDX)  +
                           (SYU-KOH-COMPFTN-ENTANI(IDX3)   + 0.5)
@@ -17308,6 +17314,25 @@
                    MOVE WRK-FTNKEI4        TO RECE62-FTNMONEY(3)
                                               RECE62-FTNMONEY-KOJ(3)
       *
+               END-IF
+      *
+             WHEN    "05"
+      *
+               IF   RECE62-SRYYM   >=  "200508"
+                 PERFORM  VARYING   KOHFTN-IDX   FROM   1   BY   1
+                           UNTIL    KOHFTN-IDX     >    4
+                   IF  (RECE62-KOHNUM(KOHFTN-IDX) =
+                          "374" OR "474" OR "280"                 )
+                   AND (RECE62-HON-NYUMJGNGAK(KOHFTN-IDX)
+                                 > RECE62-FTNMONEY(KOHFTN-IDX + 1))
+                     COMPUTE  RECE62-FTNMONEY(KOHFTN-IDX + 1)        =
+                              WRK-TAIHI-FTNMONEY-EN2(KOHFTN-IDX + 1) +
+                              0.5
+                     COMPUTE  RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)    =
+                              WRK-TAIHI-FTNMONEY-EN2(KOHFTN-IDX + 1) +
+                              0.5
+                   END-IF
+                 END-PERFORM
                END-IF
       *
              WHEN    "13"
@@ -18653,6 +18678,12 @@
       ***          OR  ((WRK-PREFNUM             =   33           ) AND
       ***               (RECE62-KOHNUM(KOHFTN-IDX)(1:1)
       ***                                       >= "1" AND <=  "8"))
+                   OR  ((WRK-PREFNUM             =   27           ) AND
+                        (RECE62-KOHNUM(KOHFTN-IDX)(1:1)
+                                                >= "1" AND <=  "8") AND
+                        (RECE62-KOHNUM(KOHFTN-IDX)
+                                             NOT = "100" AND "200") AND
+                        (RECE62-SRYYM           >= "200804"       ))
                    OR  ((WRK-PREFNUM             =   01           ) AND
                         (RECE62-KOHNUM(KOHFTN-IDX) = "183"        ) AND
                         (RECE62-SRYYM             >= "200810"     ))
@@ -21244,8 +21275,9 @@
       *
                MOVE           1           TO   FLG-ZENKOKUKOHI-NISYU3
       *
-               IF ((WRK-PREFNUM         = "27"           ) AND
-                   (FLG-NISYU-KOREI     =  1             ))
+      ***      IF ((WRK-PREFNUM         = "27"           ) AND
+      ***          (FLG-NISYU-KOREI     =  1             ))
+               IF ( WRK-PREFNUM         = "27"            )
                OR ((WRK-PREFNUM         = "28"           ) AND
                    (RECE62-TEISYUTUSAKI =  6             ) AND
                    (FLG-NISYU-KOREI     =  1             ))
@@ -21260,7 +21292,8 @@
                   EVALUATE  WRK-PREFNUM
                     WHEN        "27"
                       IF    RECE62-HKNCOMBI(2)   =   ZERO
-                         IF   RECE62-TEISYUTUSAKI  =   2 OR 6
+                         IF  (RECE62-TEISYUTUSAKI  =   2 OR 6)
+                         AND (FLG-NISYU-KOREI      =   1     )
                            MOVE    3      TO   FLG-ZENKOKUKOHI-NISYU
                          ELSE
                            MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU

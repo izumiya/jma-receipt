@@ -589,6 +589,8 @@
       *                                     ºÜ½¤Àµ¡Ê£°£±£°¡Ë
       *  04.05.68    NACL-ÌçÏÆ    12/08/10  £¸£°¤½¤ÎÂ¾Íó¤ÎÅÀ¿ô½¸·×½¤Àµ
       *  04.05.69    NACL-ÌçÏÆ    12/09/19  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍó¶â³ÛÃÖ´¹ÂÐ±þ
+      *  04.05.70    NACL-ÌçÏÆ    12/09/26  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.71    NACL-ÌçÏÆ    12/09/26  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4791,8 +4793,9 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
       *
                MOVE           1           TO   FLG-ZENKOKUKOHI-NISYU3
       *
-               IF ((SYS-1001-PREFNUM    =  27            ) AND
-                   (FLG-NISYU-KOREI     =  1             ))
+      ***      IF ((SYS-1001-PREFNUM    =  27            ) AND
+      ***          (FLG-NISYU-KOREI     =  1             ))
+               IF ( SYS-1001-PREFNUM    =  27             )
                OR ((SYS-1001-PREFNUM    =  28            ) AND
                    (RECE02-TEISYUTUSAKI =  6             ) AND
                    (FLG-NISYU-KOREI     =  1             ))
@@ -4807,7 +4810,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                   EVALUATE  SYS-1001-PREFNUM
                     WHEN         27
                        IF    RECE02-HKNCOMBI(2)   =   ZERO
-                         IF   RECE02-TEISYUTUSAKI  =   2 OR 6
+                         IF  (RECE02-TEISYUTUSAKI  =   2 OR 6)
+                         AND (FLG-NISYU-KOREI      =   1     )
                            MOVE    3      TO   FLG-ZENKOKUKOHI-NISYU
                          ELSE
                            MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU
@@ -13085,7 +13089,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        (SYS-1001-PREFNUM     =   33       ) AND
                        (RECE02-KOHNUM(KH-IDX - 1)(1:1)
                                        >=  "1" AND <=  "8"))
-                OR    ((RECE02-ZAITAKU       =  "1"       ) AND
+                OR    ((RECE02-ZAITAKU       =  "1" OR "2") AND
                        (RECE02-SRYYM        >=  "200804"  ) AND
                        (SYS-1001-PREFNUM     =   27       ) AND
                        (RECE02-KOHNUM(KH-IDX - 1)(1:1)
@@ -13130,6 +13134,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR    ((SYS-1001-PREFNUM             =   13        ) AND
                      (RECE02-KOHNUM(KH-IDX - 1) =
                        "180" OR "380" OR "181" OR "381"          ))
+              OR    ((SYS-1001-PREFNUM             =   05        ) AND
+                     (RECE02-KOHNUM(KH-IDX - 1) =
+                       "374" OR "474" OR "280"                   ) AND
+                     (RECE02-SRYYM             >=  "200508"      ))
                   COMPUTE  WRK-TAIHI-FTNMONEY-EN(KH-IDX)  =
                            WRK-TAIHI-FTNMONEY-EN(KH-IDX)  +
                           (SYU-KOH-COMPFTN-ENTANI(IDX3)   + 0.5)
@@ -14000,6 +14008,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       ***          OR  ((SYS-1001-PREFNUM        =   33           ) AND
       ***               (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
       ***                                       >= "1" AND <=  "8"))
+                   OR  ((SYS-1001-PREFNUM        =   27           ) AND
+                        (RECE02-KOHNUM(KOHFTN-IDX)(1:1)
+                                                >= "1" AND <=  "8") AND
+                        (RECE02-KOHNUM(KOHFTN-IDX)
+                                             NOT = "100" AND "200") AND
+                        (RECE02-SRYYM           >= "200804"       ))
                    OR  ((SYS-1001-PREFNUM        =   01           ) AND
                         (RECE02-KOHNUM(KOHFTN-IDX) = "183"        ) AND
                         (RECE02-SRYYM             >= "200810"     ))
@@ -16608,6 +16622,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE WRK-FTNKEI         TO RECE02-FTNMONEY(3)
                                               RECE02-FTNMONEY-KOJ(3)
       *
+                END-IF
+      *
+             WHEN    "05"
+      *
+                IF   RECE02-SRYYM   >=  "200508"
+                  PERFORM  VARYING   KOHFTN-IDX   FROM   1   BY   1
+                            UNTIL    KOHFTN-IDX     >    4
+                    IF  (RECE02-KOHNUM(KOHFTN-IDX) =
+                          "374" OR "474" OR "280"                 )
+                    AND (RECE02-HON-GAIMNAIJGNGAK(KOHFTN-IDX)
+                                 > RECE02-FTNMONEY(KOHFTN-IDX + 1))
+                      COMPUTE  RECE02-FTNMONEY(KOHFTN-IDX + 1)        =
+                               WRK-TAIHI-FTNMONEY-EN2(KOHFTN-IDX + 1) +
+                               0.5
+                      COMPUTE  RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)    =
+                               WRK-TAIHI-FTNMONEY-EN2(KOHFTN-IDX + 1) +
+                               0.5
+                    END-IF
+                  END-PERFORM
                 END-IF
       *
              WHEN    "13"

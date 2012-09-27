@@ -343,6 +343,7 @@
       *                                     ¤Î¿©»öÉéÃ´·×»»½¤Àµ¡ÊÄ¹´üÊ»ÍÑ»þ¡Ë
       *  04.05.42    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
       *  04.05.43    NACL-ÌçÏÆ    12/09/19  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.44    NACL-ÌçÏÆ    12/09/26  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -24673,16 +24674,19 @@
               IF      (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
               AND     (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                       COMPUTE   WK-HANGAKU-COMPFTN   =
-                                LNK-SYU-SYUCOMPFTN-ENTANI     *  0.5
+                               (LNK-SYU-SYUCOMPFTN-ENTANI     *  0.5)
+                                                              +  0.5
               ELSE
       ***       IF    LNK-SYU-KOH-COMPFTN(1)   NOT =   ZERO
                 IF    (LNK-SYU-SYUHKNNUM     NOT =   SPACE)
                 AND   (LNK-SYU-KOH1HKNNUM        =   "027")
                       COMPUTE   WK-HANGAKU-COMPFTN   =
-                                LNK-SYU-KOH-COMPFTN-ENTANI(1) *  0.5
+                               (LNK-SYU-KOH-COMPFTN-ENTANI(1) *  0.5)
+                                                              +  0.5
                 ELSE
                       COMPUTE   WK-HANGAKU-COMPFTN   =
-                                WK-ZENGAKU  *  0.5
+                               (WK-ZENGAKU  *  0.5)
+                                            +  0.5
                 END-IF
               END-IF
       *
@@ -24706,7 +24710,8 @@
            AND     (LNK-SYU-KOH1HKNNUM    NOT =   "027")
                    COMPUTE   WK-HANGAKU-COMPFTN   =
       ***                    LNK-SYU-SYUCOMPFTN      *  0.5
-                             WK-TOKUTEI-COMPFTN      *  0.5
+                            (WK-TOKUTEI-COMPFTN      *  0.5)
+                                                     +  0.5
            ELSE
       ***    IF    LNK-SYU-KOH-COMPFTN(1)   NOT =   ZERO
       ***    IF    WK-TOKUTEI-COMPFTN3      NOT =   ZERO
@@ -24714,10 +24719,12 @@
              AND   (LNK-SYU-KOH1HKNNUM        =   "027")
                    COMPUTE   WK-HANGAKU-COMPFTN   =
       ***                    LNK-SYU-KOH-COMPFTN(1)  *  0.5
-                             WK-TOKUTEI-COMPFTN3     *  0.5
+                            (WK-TOKUTEI-COMPFTN3     *  0.5)
+                                                     +  0.5
              ELSE
                    COMPUTE   WK-HANGAKU-COMPFTN   =
-                             WK-ZENGAKU  *  0.5
+                            (WK-ZENGAKU  *  0.5)
+                                         +  0.5
              END-IF
            END-IF
       *
