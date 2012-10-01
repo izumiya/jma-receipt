@@ -85,6 +85,7 @@
       *  04.05.07    NACL-ÌçÏÆ    12/07/31  Ä¹´ü¤ÎÈ½Äê½¤Àµ
       *  04.05.08    NACL-ÌçÏÆ    12/09/18  ·§ËÜ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.09    NACL-ÌçÏÆ    12/09/19  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.10    NACL-ÌçÏÆ    12/10/01  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1323,6 +1324,9 @@
                  (LNK-FTNJGNCHK-SRYYM   >= "201210"))
              OR ((LNK-FTNJGNCHK-PREFNUM  =  07     ) AND
                  (LNK-FTNJGNCHK-KOHNUM   = "480"   ) AND
+                 (LNK-FTNJGNCHK-SRYYM   >= "201210"))
+             OR ((LNK-FTNJGNCHK-PREFNUM  =  11     ) AND
+                 (LNK-FTNJGNCHK-KOHNUM   = "672"   ) AND
                  (LNK-FTNJGNCHK-SRYYM   >= "201210"))
                IF   WRK-KOHFTN   NOT = ZERO
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
