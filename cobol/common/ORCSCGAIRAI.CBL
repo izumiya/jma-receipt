@@ -664,7 +664,8 @@
       *        ワーク診療行為マスタ−が存在した時、削除する
                PERFORM 45002-WKSRYACT-DEL-SEC
       *        受診内容データに時間を設定し、更新する
-               IF      SPA-SYORIFLG        =   ZERO
+               IF     (SPA-SYORIFLG        =   ZERO )
+                  AND (SPA-SYSYMD          =   SPA-SRYYMD)
                    PERFORM 45003-UKETUKE-SEC
                END-IF
            END-IF
