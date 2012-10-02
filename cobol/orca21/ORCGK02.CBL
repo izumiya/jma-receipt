@@ -9980,7 +9980,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+      ****        (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE )  OR
                   (FLG-END             =   1     )
                GO      TO      450-MAEGMN-EXT
            END-IF
@@ -10006,7 +10007,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+      *****       (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE )  OR
                   (FLG-END             =   1     )
                GO      TO      460-ATOGMN-EXT
            END-IF
@@ -10223,7 +10225,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180" )  OR
+     ****         (SPA-KIDCD           =   "0180" )  OR
+                  (SPA-KIDCD       NOT =   SPACE )  OR
                   (FLG-END             =   1     )
                GO      TO      4001-K01-SYORI-EXT
            END-IF
@@ -10800,6 +10803,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        4110S-K10-SYORI-SEC            SECTION.
       *
+           MOVE    SPA-KIDCD           TO  WRK-KIDCD
       *    初期画面セット
            MOVE    SPACE               TO  LINKAREA
            MOVE    SPACE               TO  SPA-MOTOPG
@@ -10826,6 +10830,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "1019"          TO  SPA-ERRCD
                ELSE
                    MOVE    "1018"          TO  SPA-ERRCD
+                   MOVE    WRK-KIDCD       TO  SPA-KIDCD
                END-IF
                GO      TO      4110S-K10-SYORI-EXT
            END-IF
@@ -10875,7 +10880,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    更新前の基本チェック
            PERFORM 41001-KIHON-CHK-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
-                  (SPA-KIDCD           =   "0180")
+      **********  (SPA-KIDCD           =   "0180")
+                  (SPA-KIDCD       NOT =   SPACE )
              OR   (FLG-KINKI           =   1     )
                GO      TO      4100-TOROKU-EXT
            END-IF
