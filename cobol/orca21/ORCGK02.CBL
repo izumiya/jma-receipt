@@ -9017,6 +9017,7 @@
        220-CLEAR-SEC                   SECTION.
       *
            IF      SPA-GMN-PTID    NOT =   ZERO
+           AND    (SPA-KIDCD           =   SPACE )
       *        確認メッセージ
                MOVE    "0116"              TO  SPA-KIDCD
            END-IF
