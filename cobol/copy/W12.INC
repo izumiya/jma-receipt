@@ -144,6 +144,12 @@
                     06  W12-SEIHO-DSPKBN-COUNT   PIC S9(9)   BINARY.
                     06  W12-SEIHO-DSPKBNLST
                             PIC X(34)   OCCURS  5 TIMES.
+                  05  W12-RECEIPT-MAKE-COMBO.
+                    06  W12-RECEIPT-MAKE.
+                      07  W12-VALUE   PIC X(20).
+                    06  W12-RECEIPT-MAKE-COUNT   PIC S9(9)   BINARY.
+                    06  W12-RECEIPT-MAKELST
+                            PIC X(20)   OCCURS  2 TIMES.
                 04  W12-FI30.
                   05  W12-SYAPRTNM.
                     06  W12-VALUE   PIC X(16).

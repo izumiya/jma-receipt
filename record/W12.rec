@@ -170,6 +170,13 @@ W12	{
 					count	int;
 					item	varchar(34)[5];
 				};
+				RECEIPT_MAKE_COMBO	{
+					RECEIPT_MAKE	{
+						value	varchar(20);
+					};
+					count	int;
+					item	varchar(20)[2];
+				};
 			};
 			fi30	{
 				SYAPRTNM	{

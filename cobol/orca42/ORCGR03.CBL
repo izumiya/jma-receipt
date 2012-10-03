@@ -115,6 +115,7 @@
       *                                     不明分ありのとき赤字でエラー
       *                                     表示を行う
       *  04.06.02    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.03    NACL-藤原    12/08/20  点検用・提出用初期表示設定対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -209,6 +210,8 @@
       *
                    07  SPA-NAI-2005-AUTODSPKBN     PIC X(01).
                    07  SPA-NAI-200501-INSPECT-ZERO-KBN
+                                                   PIC X(01).
+                   07  SPA-NAI-200501-RECEIPT-MAKE-KBN
                                                    PIC X(01).
       *
        01  SPA-RECE07-REC. 
@@ -711,8 +714,22 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
                                    =   SPACE
                MOVE    "0"             TO  SYS-200501-INSPECT-ZERO-KBN
            END-IF
+           IF      SYS-200501-RECEIPT-MAKE-KBN
+                                   =   SPACE
+               MOVE    "1"             TO  SYS-200501-RECEIPT-MAKE-KBN
+           END-IF
            MOVE    SYS-200501-INSPECT-ZERO-KBN
                                    TO  SPA-NAI-200501-INSPECT-ZERO-KBN
+           MOVE    SYS-200501-RECEIPT-MAKE-KBN
+                                   TO  SPA-NAI-200501-RECEIPT-MAKE-KBN
+           EVALUATE    SPA-NAI-200501-RECEIPT-MAKE-KBN
+               WHEN    "1"
+                   MOVE    SPA-GMN-PRTKBNLST (1)
+                                           TO  SPA-GMN-PRTKBN-G
+               WHEN    "2"
+                   MOVE    SPA-GMN-PRTKBNLST (2)
+                                           TO  SPA-GMN-PRTKBN-G
+           END-EVALUATE
       *
            IF      SPA-BEDSU           >   ZERO
                MOVE    3                   TO  SPA-GMN-CUR
@@ -1206,8 +1223,14 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
       *
            IF      SPA-GMN-PRTKBN      =   SPACE
                IF      SPA-GMN-SYOKBN      =   "T"
-                   MOVE    SPA-GMN-PRTKBNLST (1)
-                                               TO  SPA-GMN-PRTKBN-G
+                   EVALUATE    SPA-NAI-200501-RECEIPT-MAKE-KBN
+                       WHEN    "1"
+                           MOVE    SPA-GMN-PRTKBNLST (1)
+                                                   TO  SPA-GMN-PRTKBN-G
+                       WHEN    "2"
+                           MOVE    SPA-GMN-PRTKBNLST (2)
+                                                   TO  SPA-GMN-PRTKBN-G
+                   END-EVALUATE
                END-IF
            ELSE
                MOVE    ZERO                TO  WRK-HENFLG
@@ -1222,8 +1245,14 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
                    END-IF
                END-PERFORM
                IF      WRK-HENFLG         =   ZERO
-                   MOVE    SPA-GMN-PRTKBNLST (1)
-                                           TO  SPA-GMN-PRTKBN-G
+                   EVALUATE    SPA-NAI-200501-RECEIPT-MAKE-KBN
+                       WHEN    "1"
+                           MOVE    SPA-GMN-PRTKBNLST (1)
+                                                   TO  SPA-GMN-PRTKBN-G
+                       WHEN    "2"
+                           MOVE    SPA-GMN-PRTKBNLST (2)
+                                                   TO  SPA-GMN-PRTKBN-G
+                   END-EVALUATE
                END-IF
            END-IF
       *
