@@ -69,6 +69,7 @@
       * 04.05.00     NACL-多々納  10/03/XX  平成２２年４月改正対応
       * 04.07.00     NACL=多々納  12/03/XX  平成２４年４月改正対応
       * 04.07.00     NACL=多々納  12/05/01  外来リハビリ診察料等対応
+      * 04.07.00     NACL-多々納  12/10/04  診察料なし同日初診料発生対応
       *****************************************************************
       *
       *
@@ -757,7 +758,8 @@
       *    当日診察料算定有無
            MOVE    ZERO                TO  SPA-DOUJITU
       *    新規の時、受診なし
-           IF      SPA-SYOYMD          =   SPACE
+           IF     (SPA-SYOYMD          =   SPACE )
+           AND    (SPA-SYOSIN          =   1     )
                GO      TO      1000-SINSATU-KAISU-EXT
            END-IF
       *H24.4
@@ -889,6 +891,16 @@
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
            MOVE    "key14"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *!!!!!
+      *    初診算定日がなく、当日の受診がない時、初診料算定へ
+           IF     (SPA-SYORIFLG        =   ZERO  )
+           AND    (SPA-SYOYMD          =   SPACE )
+           AND    (SPA-SYOSIN          =   ZERO  )
+               IF     (SPA-DOUJITU     =   ZERO  )
+                   MOVE    1               TO  SPA-SYOSIN
+               END-IF
+           END-IF
            .
        1000-SINSATU-KAISU-EXT.
            EXIT.
@@ -977,6 +989,12 @@
                 ELSE
                    INITIALIZE                  SRYACT-REC
                    MOVE    1               TO  FLG-SRYACT
+               END-IF
+      *
+      *        自費は対象外とする
+               IF      SRY-SRYKBN          =   "95"
+                                           OR  "96"
+                   MOVE    1                   TO  FLG-SRYACT
                END-IF
       *
                PERFORM

@@ -7620,7 +7620,11 @@
       *    再診で、当日以降受診が無いこと
            IF      (SPA-SYORIFLG       =   ZERO )  AND
       *D           (SPA-SYOSIN         =   ZERO )  AND
-                   (SPA-LSTYMD         <   SPA-SRYYMD)
+                  ((SPA-LSTYMD         <   SPA-SRYYMD)
+      *ver.4.7     同日に診察料なし
+             OR   ((SPA-LSTYMD         =   SPA-SRYYMD) AND
+                   (SPA-DOUJITU        =   ZERO      )))
+      *
       *        病名をチェックする
                PERFORM 41011201-BYOMEI-CHK-SEC
       *        初診料算定時、算定不可のコードチェック
