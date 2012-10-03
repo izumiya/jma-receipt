@@ -3663,8 +3663,13 @@
                IF     (LNK-ORCSC-SYORIFLG  =   ZERO       )  AND
                       (LNK-ORCSC-LSTYMD    =   SPA-SRYYMD )  AND
                       (LNK-ORCSC-SYOYMD    NOT =   LNK-ORCSC-LSTYMD)
-                   MOVE    "0138"          TO  WRK-ERRCD
-                   MOVE    "1"             TO  WRK-COM-CUR (01)
+      *            当日に診察料が算定してないときはチェックなし
+                   IF      (SPA-DOUJITU        =   ZERO  )
+                       CONTINUE
+                   ELSE
+                       MOVE    "0138"          TO  WRK-ERRCD
+                       MOVE    "1"             TO  WRK-COM-CUR (01)
+                   END-IF
                END-IF
            ELSE
       *        再診  初診料が算定済みであること
@@ -3784,8 +3789,13 @@
                    IF     (LNK-ORCSC-SYORIFLG  =   ZERO       )  AND
                           (LNK-ORCSC-LSTYMD    =   SPA-SRYYMD )  AND
                           (LNK-ORCSC-SYOYMD    NOT =   LNK-ORCSC-LSTYMD)
-                       MOVE    "0138"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
+      *                当日に診察料が算定してないときはチェックなし
+                       IF      (SPA-DOUJITU        =   ZERO  )
+                           CONTINUE
+                       ELSE
+                           MOVE    "0138"      TO  WRK-ERRCD
+                           MOVE    "1"         TO  WRK-COM-CUR (IDX-Z)
+                       END-IF
                    END-IF
                WHEN    "099120001"
       *            再診  初診料が算定済みであること
