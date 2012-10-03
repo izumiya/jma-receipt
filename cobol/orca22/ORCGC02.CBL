@@ -279,6 +279,8 @@
       *  04.06.15    NACL-藤原    12/03/22  補足コメントの登録前チェック
       *                                     を複数病名登録時には行わない
       *  04.06.16    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
+      *  04.06.17    NACL-藤原    12/07/31  コラムリストのスクロール対応
+      *  04.06.18    NACL-藤原    12/10/01  入力病名の入力ＣＤ登録対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -871,6 +873,9 @@
       *
            EVALUATE    SPA-MOTOPG(1:3)
                WHEN    "C03"
+      *            自院病名セット処理
+                   PERFORM 320-C03SPASET-SEC
+                   GO      TO      300-SCREEN-EXT
                WHEN    "C09"
                WHEN    "C11"
                WHEN    "C12"
@@ -2003,6 +2008,40 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        3104-SRYKA-SPA-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    自院病名コードセット処理（自院病名画面より戻り）
+      *****************************************************************
+       320-C03SPASET-SEC          SECTION.
+      *
+           IF      SPA-C01KYOUTU       =   SPACE
+               GO  TO  320-C03SPASET-EXT
+           END-IF
+      *
+      *    登録した自院病名コードの表示
+           INITIALIZE                      SPA-GMN-C02-BYOMEICD-G
+           INITIALIZE                      SPA-NAI-C02-BYOMEI-TBL
+      *
+           MOVE    1                   TO  IDZ
+           MOVE    SPA-C01-BYOMEIINPUTCD
+                                       TO  SPA-GMN-C02-BYOMEICD (IDZ)
+                                           SPA-NAI-C02-BYOMEICD (IDZ)
+      *
+           INITIALIZE                      USERBYOMEI-REC
+           MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
+           MOVE    SPA-NAI-C02-BYOMEICD (IDZ)
+                                       TO  USBYO-BYOMEIINPUTCD
+           PERFORM 410112-USERBYOMEI-HENSYU-SEC
+           PERFORM 41021-BYOMEICD-HENSYU-SEC
+      *
+           INITIALIZE                      SPA-C01KYOUTU
+      *
+           MOVE    SPACE               TO  SPA-ERRCD
+           MOVE    34                  TO  SPA-GMN-C02-CUR
+           .
+      *
+       320-C03SPASET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -9533,20 +9572,38 @@ grpsys                                          SPA-AREA
       *****************************************************************
        600-C03-SYORI-SEC           SECTION.
       *
+           INITIALIZE                  SPA-C01KYOUTU
+      *
+      *    病名入力時はそのまま登録を可能とする
+      *    複数病名入力時以外
+           IF    ( SPA-NAI-C02-BYOMEIMOJI   >   ZERO  )
+           AND   ( SPA-NAI-C02-BYOMEICD-MAX =   1     )
+               MOVE    1                        TO  SPA-C01-HENFLG
+      *
+      *        自院病名入力時は対象外
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       6
+                   IF    ( SPA-GMN-C02-BYOMEICD (IDX)
+                                               NOT =   SPACE )
+                   AND   ( SPA-NAI-C02-USERBYOMEIFLG (IDX)
+                                                   =   "1"   )
+                       MOVE    0                   TO  SPA-C01-HENFLG
+                       MOVE    6                   TO  IDX
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
       *    画面移行用のパラメタ変更
-      *    受付と患者検索以外の元をセット
            MOVE    "C02"               TO  SPA-MOTOPG
            MOVE    "C03"               TO  SPA-SAKIPG
-           INITIALIZE                  SPA-C01KYOUTU
            MOVE    SPA-C01KYOUTU       TO  SPA-WORK
       *
-           MOVE   "CHANGE"             TO  MCP-PUTTYPE.
-           MOVE   "C03    "            TO  MCP-WINDOW.
+           MOVE   "CHANGE"             TO  MCP-PUTTYPE
+           MOVE   "C03    "            TO  MCP-WINDOW
       *
-           PERFORM 900-PUT-WINDOW.
+           PERFORM 900-PUT-WINDOW
       *
            MOVE    1                   TO  FLG-END
-      *
       *
            .
        600-C03-SYORI-EXT.

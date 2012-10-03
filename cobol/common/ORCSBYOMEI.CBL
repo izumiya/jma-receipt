@@ -184,6 +184,9 @@
       *    ÉÂÌ¾¥³¡¼¥É£Í£Á£Ø
            03  WRK-CONS-BYOMEI-MAX PIC 9(02)   VALUE   21.
       *
+      *    ¸¡º÷ÉÂÌ¾¾ðÊó£Í£Á£Ø
+           03  WRK-CONS-BYOMEICD-TBL-MAX
+                                   PIC 9(02)   VALUE   40.
       *    
       *    ¥ï¡¼¥¯ÉÂÌ¾
        01  WRK-BYOMEI-REC.
@@ -1183,7 +1186,7 @@ grpsys                            SPA-AREA
            EVALUATE    FLG-HENSYU
                WHEN    1
                    ADD     1               TO  IDY
-                   IF      IDY             >   WRK-CONS-BYOMEI-MAX
+                   IF      IDY             >   WRK-CONS-BYOMEICD-TBL-MAX
                        MOVE    1           TO  FLG-TBLERR
                        GO  TO  2002-BYOMEICD-HENSYU-EXT
                    END-IF
@@ -1606,7 +1609,8 @@ grpsys                            SPA-AREA
                    EVALUATE    FLG-HENSYU
                        WHEN    "1"
                            ADD     1           TO  IDY
-                           IF      IDY         >   WRK-CONS-BYOMEI-MAX
+                           IF      IDY         >
+                                           WRK-CONS-BYOMEICD-TBL-MAX
                                MOVE    1           TO  FLG-TBLERR
                                GO  TO  2006-KAKKO-KENSAKU-EXT
                            END-IF
@@ -1652,7 +1656,7 @@ grpsys                            SPA-AREA
            EVALUATE    FLG-HENSYU
                WHEN    "1"
                    ADD     1           TO  IDY
-                   IF      IDY         >   WRK-CONS-BYOMEI-MAX
+                   IF      IDY         >   WRK-CONS-BYOMEICD-TBL-MAX
                        MOVE    1           TO  FLG-TBLERR 
                        GO  TO  2007-BUBUN-HENSYU-EXT
                    END-IF

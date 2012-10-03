@@ -336,7 +336,7 @@
       <y>360</y>
       <width>530</width>
       <height>24</height>
-      <can_focus>True</can_focus>
+      <can_focus>False</can_focus>
       <signal>
 	<name>activate</name>
 	<handler>send_event</handler>
@@ -698,7 +698,7 @@
       <y>424</y>
       <width>297</width>
       <height>24</height>
-      <can_focus>True</can_focus>
+      <can_focus>False</can_focus>
       <signal>
 	<name>activate</name>
 	<handler>send_event</handler>
