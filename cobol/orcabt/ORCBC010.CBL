@@ -1530,8 +1530,8 @@ grpsys             MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
                    UNTIL      IDX6     >   31
                IF  (WRK-DAY (3 IDX6)    >   ZERO                    )
                AND (WRK-DAY (2 IDX6)    NOT =   ZERO                )
-               AND (WRK-DAY (4 IDX6)    =   ZERO OR 4 OR 5 OR 6 OR 7
-                                                           OR 8 OR 9)
+               AND ((WRK-DAY(4 IDX6)        =   ZERO               ) OR
+                    (WRK-DAY(4 IDX6)       >=    4                 ))
                  IF  (WRK-DAY(2 IDX6)  =   WRK-COMB-HKNCOMBINUM (IDX2))
       *ito 20080425 IF  (COLDAT01-HKNNUM      NOT =   SPACE)   OR
       *ito              (COLDAT01-RJNHKNNUM   NOT =   SPACE)

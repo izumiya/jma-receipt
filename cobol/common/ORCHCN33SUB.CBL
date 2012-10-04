@@ -175,8 +175,9 @@
                    07  WRK-SHOKIKSN        PIC X(09).
                    07  WRK-HYOUKETSU       PIC X(09).
                    07  WRK-GAIHAKU         PIC X(09).
+                   07  WRK-GAIHAKU2        PIC X(09).
                    07  WRK-NYUKHNKSNKBN    PIC 9(03).
-                   07  WRK-GAIHAKU-KBN     PIC 9(01).
+                   07  WRK-GAIHAKU-KBN     PIC 9(03).
                    07  WRK-CHUKSNCD        PIC X(04).
       *
       *    Æþ±¡²ñ·×ÊÂ¤ÓÂØ¤¨¥ï¡¼¥¯
@@ -189,8 +190,6 @@
                    07  WRK-SO-SRYCDTOTAL   PIC 9(14).
                    07  WRK-SO-TEN          PIC S9(07).
                    07  WRK-SO-KAISU        PIC 9(02).
-                   07  WRK-SO-GAIHAKU-TBL.
-                     09  WRK-SO-GAIHAKU-KBN  PIC 9(01)  OCCURS 31.
       *
       *    Æ±°ìºÞ¤Þ¤È¤áÍÑÈæ³Ó¥­¡¼
            03  WRK-OLD-KEY.
@@ -990,9 +989,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM    VARYING   IDX1   FROM   1   BY   1
                               UNTIL     IDX1   >   31
                        IF    (WRK-SRYKA-DAY(IDX1) NOT = SPACE)
-                       AND   (WRK-GAIHAKU-KBN(IDX1)  =
-                                   ZERO OR 4 OR 5 OR 6 OR 7
-                                                  OR 8 OR 9  )
+                       AND   ((WRK-GAIHAKU-KBN(IDX1)  = ZERO) OR
+                              (WRK-GAIHAKU-KBN(IDX1) >=  4  ))
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO )
                            MOVE  "197000570"
                                        TO WRK-SYS5000-SHOKUCD(3 IDX1)
@@ -1028,9 +1026,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                               UNTIL     IDX1   >   31
                        IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)    OR
                              (LNK-NYUINDAY-KBN(IDX1)  =  "1"))
-                       AND  ( WRK-GAIHAKU-KBN(IDX1)  =
-                                   ZERO OR 4 OR 5 OR 6 OR 7
-                                                  OR 8 OR 9  )
+                       AND  ((WRK-GAIHAKU-KBN(IDX1)  = ZERO )    OR
+                             (WRK-GAIHAKU-KBN(IDX1) >=  4   ))
                        AND  ( NACCT-DAY(IDX1)    NOT =  ZERO )
                            IF   FLG-KSN   =  ZERO
                                ADD     1    TO    KSN-IDX
@@ -1072,9 +1069,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                               UNTIL     IDX1   >   31
                        IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                              (LNK-NYUINDAY-KBN(IDX1)  =  "1"))
-                       AND  ( WRK-GAIHAKU-KBN(IDX1)  =
-                                   ZERO OR 4 OR 5 OR 6 OR 7
-                                                  OR 8 OR 9  )
+                       AND  ((WRK-GAIHAKU-KBN(IDX1)  = ZERO )  OR
+                             (WRK-GAIHAKU-KBN(IDX1) >=  4   ))
                        AND  ( NACCT-DAY(IDX1)    NOT =  ZERO )
                            MOVE   NACCT-ZAITEN  
                                         TO  LNK-ORCHCN33SUB-ETCTEN
@@ -1139,9 +1135,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-GAIHAKU(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
-                   MOVE   WRK-GAIHAKU-KBN(IDX1)
-                                            TO  WRK-SO-GAIHAKU-KBN
-                                                           (IDX1 IDX1)
+               END-IF
+      *        ³°Çñ£²
+               IF         WRK-GAIHAKU2(IDX1)  NOT =        SPACE
+                   ADD      1                TO  WRK-MEISAISU
+                   MOVE   WRK-GAIHAKU2(IDX1) TO  WRK-SO-SRYCD
+                                           (IDX1 WRK-MEISAISU)
                END-IF
       *        ½é´ü²Ã»»¡ÊÄ¹´ü¸º»»¡Ë
                IF      (WRK-GAIHAKU(IDX1)        =
@@ -1183,15 +1182,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE   SPACE             TO  WRK-HYOUKETSU(IDX1)
                  END-IF
                END-IF
-      *        ³°Çñ
-      **       IF         WRK-GAIHAKU(IDX1)   NOT =        SPACE
-      **           ADD      1               TO  WRK-MEISAISU
-      **           MOVE   WRK-GAIHAKU(IDX1) TO  WRK-SO-SRYCD
-      **                                   (IDX1 WRK-MEISAISU)
-      **           MOVE   WRK-GAIHAKU-KBN(IDX1)
-      **                                    TO  WRK-SO-GAIHAKU-KBN
-      **                                                   (IDX1 IDX1)
-      **       END-IF
       *        Æþ±¡²ñ·×²Ã»»¾ðÊó
                PERFORM   VARYING   KSN-IDX   FROM   1  BY   1
                          UNTIL (WRK-NYUKSN(KSN-IDX)  =  SPACE)  OR
@@ -1473,6 +1463,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                     WHEN     8
                     WHEN     9
+                    WHEN    10
+                    WHEN    11
+                    WHEN    12
+                    WHEN    13
                       PERFORM   2101-GAIHAKU-GENSAN-SEC
                  END-EVALUATE
               WHEN     "92"
@@ -1488,6 +1482,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                     WHEN     8
                     WHEN     9
+                    WHEN    10
+                    WHEN    11
+                    WHEN    12
+                    WHEN    13
                       PERFORM   2101-GAIHAKU-GENSAN-SEC
                  END-EVALUATE
            END-EVALUATE
@@ -1650,6 +1648,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            EVALUATE   NACCT-DAY(IDX1)
              WHEN     8
+             WHEN    10
+             WHEN    11
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
                       MOVE   "190161470"    TO   WRK-GAIHAKU(IDX1)
@@ -1660,7 +1660,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    WHEN   "9030"
                       MOVE   "190162070"    TO   WRK-GAIHAKU(IDX1)
                 END-EVALUATE
+                IF   NACCT-DAY(IDX1) = 10 OR 11
+                   PERFORM   2101-GAIHAKU-TAKIKAN2-SEC
+                END-IF
              WHEN     9
+             WHEN    12
+             WHEN    13
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
                       MOVE   "190161670"    TO   WRK-GAIHAKU(IDX1)
@@ -1671,10 +1676,40 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    WHEN   "9030"
                       MOVE   "190162170"    TO   WRK-GAIHAKU(IDX1)
                 END-EVALUATE
+                IF   NACCT-DAY(IDX1) = 12 OR 13
+                   PERFORM   2101-GAIHAKU-TAKIKAN2-SEC
+                END-IF
            END-EVALUATE
       *
            .
        2101-GAIHAKU-GENSAN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ³°Çñ¿ÇÎÅ¥³¡¼¥É¼èÆÀ£³
+      *****************************************************************
+       2101-GAIHAKU-TAKIKAN2-SEC           SECTION.
+      *
+           EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
+             WHEN   099  THRU  100
+                EVALUATE   NACCT-DAY(IDX1)
+                    WHEN    10
+                    WHEN    12
+                      MOVE   "190108890"    TO   WRK-GAIHAKU2(IDX1)
+                    WHEN    11
+                    WHEN    13
+                      MOVE   "190142190"    TO   WRK-GAIHAKU2(IDX1)
+                END-EVALUATE
+             WHEN   OTHER
+                EVALUATE   NACCT-DAY(IDX1)
+                    WHEN    11
+                    WHEN    13
+                      MOVE   "190141590"    TO   WRK-GAIHAKU2(IDX1)
+                END-EVALUATE
+           END-EVALUATE
+      *
+           .
+       2101-GAIHAKU-TAKIKAN2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1783,9 +1818,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                   UNTIL     IDX1   >   31
                            IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                                  (LNK-NYUINDAY-KBN(IDX1)  =  "1"))
-                           AND  ( WRK-GAIHAKU-KBN(IDX1)  =
-                                       ZERO OR 4 OR 5 OR 6 OR 7
-                                                      OR 8 OR 9  )
+                           AND  ((WRK-GAIHAKU-KBN(IDX1)  = ZERO )  OR
+                                 (WRK-GAIHAKU-KBN(IDX1) >=  4   ))
                            AND  ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
                               EVALUATE   ACCT-SRYCDTOTAL(6:9)
       *                         Æþ±¡¿ÇÎÅ·×²èÌ¤¼Â»Ü¸º»»
@@ -1879,9 +1913,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                   UNTIL     IDX1   >   31
                            IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                                  (LNK-NYUINDAY-KBN(IDX1)  =  "1"))
-                           AND  ( WRK-GAIHAKU-KBN(IDX1)  =
-                                       ZERO OR 4 OR 5 OR 6 OR 7
-                                                      OR 8 OR 9  )
+                           AND  ((WRK-GAIHAKU-KBN(IDX1)  = ZERO )  OR
+                                 (WRK-GAIHAKU-KBN(IDX1) >=  4   ))
                            AND  ( ACCT-DAY(1 IDX1)   NOT =  ZERO )
                               EVALUATE   ACCT-SRYCDTOTAL(6:9)
                                 WHEN  CONS-ETCNYUIN-KSN(1)
@@ -2414,9 +2447,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF    (WRK-SRYKA-DAY(IDX1) NOT = SPACE)    AND
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                          (WRK-NYUINKHN(IDX1) NOT =  SPACE)    AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =
-                               ZERO OR 4 OR 5 OR 6 OR 7
-                                              OR 8 OR 9  )
+                         ((WRK-GAIHAKU-KBN(IDX1)  = ZERO) OR
+                          (WRK-GAIHAKU-KBN(IDX1) >=  4  ))
                        MOVE   WRK-SRYKA-DAY(IDX1)
                                        TO  WRK-SKJ-SRYKA-DAY(IDX1)
                                            WRK-SKJ2-SRYKA-DAY(IDX1)
@@ -2690,9 +2722,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              AND  ( WRK-SKJ200604-NYUINJI(IDX1)  NOT =  ZERO )
              AND  ((WRK-NYUINKHN(IDX1)           NOT = SPACE)  OR
                    (LNK-NYUINDAY-KBN(IDX1)       =     "1"  ))
-             AND  ( WRK-GAIHAKU-KBN(IDX1)     =
-                                 ZERO OR 4 OR 5 OR 6 OR 7
-                                                OR 8 OR 9    )
+             AND  ((WRK-GAIHAKU-KBN(IDX1)        =     ZERO )  OR
+                   (WRK-GAIHAKU-KBN(IDX1)       >=      4   ))
       *
                EVALUATE   WRK-SYS5000-SHOKUCD(1 IDX1)
       *
@@ -2737,9 +2768,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              IF   ( WRK-SRYKA-DAY(IDX1)          NOT = SPACE )
              AND  ((WRK-NYUINKHN(IDX1)           NOT = SPACE)  OR
                    (LNK-NYUINDAY-KBN(IDX1)       =     "1"  ))
-             AND  ( WRK-GAIHAKU-KBN(IDX1)     =
-                                   ZERO OR 4 OR 5 OR 6 OR 7
-                                                  OR 8 OR 9  )
+             AND  ((WRK-GAIHAKU-KBN(IDX1)        =     ZERO )  OR
+                   (WRK-GAIHAKU-KBN(IDX1)       >=      4   ))
       *
                  MOVE    ZERO    TO   WRK-KEISAN
                  IF   LNK-NYULIFE-KAN-SRYCD(IDX1)   NOT = SPACE
