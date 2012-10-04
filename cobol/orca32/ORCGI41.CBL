@@ -1279,8 +1279,11 @@
                MOVE    "09"                TO  SPA-GMN-SAGAKUNO-41 (9)
                MOVE    "特定曜日入退院減算"
                                        TO  SPA-GMN-SAGAKU-41   (9)
+               MOVE    "13"                TO  SPA-GMN-SAGAKUNO-41 (10)
+               MOVE    "特定曜日＋他受３０％減"
+                                       TO  SPA-GMN-SAGAKU-41   (10)
       *
-               MOVE    9                   TO  SPA-SAGAKU-MAX-41
+               MOVE    10                  TO  SPA-SAGAKU-MAX-41
            END-IF
       *
            .
@@ -4072,6 +4075,7 @@
                                                            OR  7
                                                            OR  8
                                                            OR  9
+                                                           OR 13
                                CONTINUE
                            ELSE
                                MOVE    "0035"         TO  SPA-ERRCD
@@ -4126,6 +4130,7 @@
                                                            OR  7
                                                            OR  8
                                                            OR  9
+                                                           OR 13
                                CONTINUE
                            ELSE
                                MOVE    "0036"         TO  SPA-ERRCD
@@ -4156,7 +4161,7 @@
       *
       *            特定曜日入退院減算の土日曜日チェック
                    IF     SPA-NAI-SRYYM      >=    "201210"
-                     IF  SPA-GMN-DAY-41 (IDX-D)   =    9
+                     IF  SPA-GMN-DAY-41 (IDX-D)   =    9   OR  13
                        IF   SPA-NAI-YOBI(IDX-D)   =  "6"  OR  "7"
                            CONTINUE
                        ELSE
@@ -10486,43 +10491,43 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                  IF   SPA-NAI-SRYYM     >=    "201204"
                    IF  (SPA-NAI-SRYYM     >=    "201204")  AND
                        (SPA-NAI-SRYYM     <=    "201209")
-                     MOVE  "外泊での入力可能な区分は０、１、２、３、４"
+                     MOVE  "外泊で入力可能な区分は０〜７のいずれかです"
                                        TO  WRK-ERRMSG(1:42)
-                     MOVE  "、５、６、７のいずれかです。"
-                                       TO  WRK-ERRMSG(43:28)
+                     MOVE  "。"
+                                       TO  WRK-ERRMSG(43:2)
                    ELSE
-                     MOVE  "外泊での入力可能な区分は０、１、２、３、４"
+                     MOVE  "外泊で入力可能な区分は０〜９、１３のいずれ"
                                        TO  WRK-ERRMSG(1:42)
-                     MOVE  "、５、６、７、８、９のいずれかです。"
-                                       TO  WRK-ERRMSG(43:36)
+                     MOVE  "かです。"
+                                       TO  WRK-ERRMSG(43:8)
                    END-IF
                  ELSE
                    IF  (SPA-NAI-SRYYM     >=    "201004")   AND
                        (SPA-NAI-SRYYM     <=    "201203")
-                     MOVE  "外泊での入力可能な区分は０、１、２、３、４"
+                     MOVE  "外泊で入力可能な区分は０〜５のいずれかです"
                                        TO  WRK-ERRMSG(1:42)
-                     MOVE  "、５のいずれかです。"
-                                       TO  WRK-ERRMSG(43:20)
+                     MOVE  "。"
+                                       TO  WRK-ERRMSG(43:2)
                    ELSE
-                     MOVE  "外泊での入力可能な区分は０、１、２、３、４"
+                     MOVE  "外泊で入力可能な区分は０〜４のいずれかです"
                                        TO  WRK-ERRMSG(1:42)
-                     MOVE  "のいずれかです。"
-                                       TO  WRK-ERRMSG(43:16)
+                     MOVE  "。"
+                                       TO  WRK-ERRMSG(43:2)
                    END-IF
                  END-IF
                WHEN    "0036"
                  IF   SPA-NAI-SRYYM     >=    "201204"
                    IF  (SPA-NAI-SRYYM     >=    "201204")  AND
                        (SPA-NAI-SRYYM     <=    "201209")
-                     MOVE  "選定入院料での入力可能な区分は０、３、４、"
+                     MOVE  "選定入院料で入力可能な区分は０、３〜７のい"
                                        TO  WRK-ERRMSG(1:42)
-                     MOVE    "５、６、７のいずれかです。"
-                                       TO  WRK-ERRMSG(43:26)
+                     MOVE    "ずれかです。"
+                                       TO  WRK-ERRMSG(43:12)
                    ELSE
-                     MOVE  "選定入院料での入力可能な区分は０、３、４、"
+                     MOVE  "選定入院料で入力可能な区分は０、３〜９、１"
                                        TO  WRK-ERRMSG(1:42)
-                     MOVE    "５、６、７、８、９のいずれかです。"
-                                       TO  WRK-ERRMSG(43:34)
+                     MOVE    "３のいずれかです。"
+                                       TO  WRK-ERRMSG(43:18)
                    END-IF
                  ELSE
                    IF  (SPA-NAI-SRYYM     >=    "201004")   AND
