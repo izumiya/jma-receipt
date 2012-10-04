@@ -63,6 +63,7 @@
            03  IDX-ST                          PIC 9(05).
            03  IDX-ED                          PIC 9(05).
            03  IDX-SEI                         PIC 9(05).
+           03  IDX-KSN                         PIC 9(05).
       *
       *    一時領域
        01  WRK-AREA.
@@ -384,6 +385,9 @@
            MOVE    "key17"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+      *    食堂加算算定可能病棟の入院対象日取得
+           PERFORM   2002-SHOKUDOU-CHK-SEC
+      *
            .
        200-MAIN-EXT.
            EXIT.
@@ -668,7 +672,7 @@
                    +  0.5
            END-IF
       *
-           DISPLAY "WRK-ZAITEN = " WRK-ZAITEN
+      **     DISPLAY "WRK-ZAITEN = " WRK-ZAITEN
       *
            IF    ( NACCT-ZAITEN    NOT =   WRK-ZAITEN )
                MOVE    1               TO  FLG-UNMATCH
@@ -677,6 +681,84 @@
            .
        2001-NYUINACT-CHK-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    食堂加算算定可能病棟の入院対象日取得
+      *****************************************************************
+       2002-SHOKUDOU-CHK-SEC                    SECTION.
+      *
+           MOVE    ZERO                TO  FLG-RYOYO-CHK
+      *
+           INITIALIZE                      PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID            TO  PTNYUINRRK-PTID
+      *    転入日セット（月末日）
+           MOVE    SS007-SRYYM         TO  PTNYUINRRK-TENNYUYMD(1:6)
+           INITIALIZE                      STS-AREA-DAY
+           INITIALIZE                      LNK-DAY7-AREA
+           MOVE    "71"                TO  LNK-DAY7-IRAI
+           MOVE    SS007-SRYYM         TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"   USING       STS-AREA-DAY
+                                           LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI     TO  WRK-MATSUYMD
+           MOVE    WRK-MATSUDD         TO  PTNYUINRRK-TENNYUYMD(7:2)
+      *    転出日セット（１日）
+           MOVE    SS007-SRYYM         TO  PTNYUINRRK-TENSTUYMD(1:6)
+           MOVE    "01"                TO  PTNYUINRRK-TENSTUYMD(7:2)
+      *
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key44"             TO  MCP-PATHNAME
+           PERFORM 900-PTNYUINRRK-SELECT-SEC
+           IF      FLG-PTNYUINRRK      =   ZERO
+             MOVE  "tbl_ptnyuinrrk"    TO  MCP-TABLE
+             MOVE  "key44"             TO  MCP-PATHNAME
+             PERFORM 900-PTNYUINRRK-READ-SEC
+             IF  FLG-PTNYUINRRK        =   ZERO
+                 PERFORM UNTIL  FLG-PTNYUINRRK  =  1
+      *              病棟種別の取得
+                     PERFORM    20011-BTUSEL-SEC
+      *
+                     IF     PTNYUINRRK-TENNYUYMD(1:6) <  SS007-SRYYM
+                         MOVE     1  TO  IDX-ST
+                     END-IF
+                     IF     PTNYUINRRK-TENNYUYMD(1:6) =  SS007-SRYYM
+                         MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ST
+                     END-IF
+                     IF     PTNYUINRRK-TENSTUYMD(1:6) >  SS007-SRYYM
+                         MOVE     WRK-MATSUDD  TO  IDX-ED
+                     END-IF
+                     IF     PTNYUINRRK-TENSTUYMD(1:6) =  SS007-SRYYM
+                         MOVE  PTNYUINRRK-TENSTUYMD(7:2)  TO  IDX-ED
+                     END-IF
+      **               DISPLAY   "---------------------"
+      **               DISPLAY   "IDX-ST = " IDX-ST
+      **               DISPLAY   "IDX-ED = " IDX-ED
+                     PERFORM   VARYING   IDX   FROM  IDX-ST  BY  1
+                               UNTIL    (IDX   >     IDX-ED)
+                         IF  SYS-5001-BTU-SYOKUDOKBN    =   '2'
+                             MOVE   "1"     TO  SS007-RC3(IDX)
+                         ELSE
+                             MOVE   SPACE   TO  SS007-RC3(IDX)
+                         END-IF
+                     END-PERFORM
+      **               DISPLAY  "----5----0----5----0----5----0-"
+      **               DISPLAY  SS007-RC3-TBL
+                     MOVE  "tbl_ptnyuinrrk"  TO  MCP-TABLE
+                     MOVE  "key44"           TO  MCP-PATHNAME
+                     PERFORM 900-PTNYUINRRK-READ-SEC
+                 END-PERFORM
+             END-IF
+           END-IF
+      *
+             MOVE    "tbl_ptnyuinrrk"  TO  MCP-TABLE
+             MOVE    "key44"           TO  MCP-PATHNAME
+             PERFORM  910-DBCLOSECURSOR-SEC
+      *
+      *
+           .
+       2002-SHOKUDOU-CHK-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    終了処理
       *****************************************************************

@@ -4781,7 +4781,7 @@
       *****************************************************************
        4701-KAKUTEI-SYORI-SEC             SECTION.
       *
-      *    食事の時、全食事・食事加算の変更
+      *    食事の時、全食事・食堂加算の変更
            MOVE    SPA-NAI-TBANGO (SPA-NAI-BANGO)  TO  IDG
            IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
                                            =   "4"   )  AND
@@ -4801,7 +4801,7 @@
            MOVE    SPA-NAI-IKKATUKAI   TO  SPA-NAI-TIKKATUKAI
                                                        (SPA-NAI-BANGO)
       *
-      *    食事の時、食事加算の変更
+      *    食事の時、食堂加算の変更
            MOVE    SPA-NAI-TBANGO (SPA-NAI-BANGO)  TO  IDG
            IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
                                            =   "4"   )  AND
@@ -4947,7 +4947,7 @@
            EXIT.
       *
       *****************************************************************
-      *    食事加算の変更処理
+      *    食堂加算の変更処理
       *****************************************************************
        47011-SYOKUJI-CHK-SEC             SECTION.
       *
@@ -4977,7 +4977,7 @@
        47011-SYOKUJI-CHK-EXT.
            EXIT.
       *****************************************************************
-      *    全食事・食事加算の変更処理
+      *    全食事・食堂加算の変更処理
       *****************************************************************
        47011-SYOKUJI-ALLCHK-SEC             SECTION.
       *
@@ -5003,6 +5003,13 @@
                                        MOVE    ZERO
                                                    TO  SPA-NAI-DAY-41
                                                       (IDX-KSN IDX-D)
+                                   ELSE
+      *                                食堂加算のセット
+                                       IF   SS007-RC3(IDX-D)  =  "1"
+                                           MOVE    1
+                                                   TO  SPA-NAI-DAY-41
+                                                      (IDX-KSN IDX-D)
+                                       END-IF
                                    END-IF
                                ELSE
                                    MOVE    SPA-GMN-DAY-41(IDX-D)
