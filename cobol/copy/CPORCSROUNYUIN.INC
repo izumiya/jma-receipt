@@ -52,7 +52,7 @@
       *労災入院フラグ（空白：労災入院なし　１：労災入院中）
                    07  LNK-SROUNYUIN-NYUIN-FLG       PIC  X(01).
       *外泊区分
-                   07  LNK-SROUNYUIN-GAIHAKU         PIC  9(01).
+                   07  LNK-SROUNYUIN-GAIHAKU         PIC  9(03).
       *入院基本料診療区分
                    07  LNK-SROUNYUIN-SRYKBN          PIC  X(02).
       *剤点数

@@ -1513,9 +1513,8 @@
                          IF   WRK-DAY5(IDY)   =  RECE62-HKNCOMBI (IDX1)
                               IF   (NACCT-ZAITEN    NOT =    ZERO)  
                               AND  (NACCT-DAY(IDY)  NOT =    ZERO)  
-                              AND  (WRK-DAY2(IDY)   =
-                                         ZERO OR 4 OR 5 OR 6 OR 7
-                                                        OR 8 OR 9)
+                              AND  ((WRK-DAY2(IDY)  =    ZERO   ) OR
+                                    (WRK-DAY2(IDY) >=     4     ))
                                    PERFORM 500-KUMIAWASE-HANBETU-SEC
                                    PERFORM 2001125-RECE62-TENSOU22-SEC
                               END-IF
@@ -1835,6 +1834,10 @@
                          END-IF
                        WHEN   8
                        WHEN   9
+                       WHEN  10
+                       WHEN  11
+                       WHEN  12
+                       WHEN  13
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       8
                              COMPUTE  WRK-NYUKHNRYO =
@@ -1843,6 +1846,34 @@
                            WHEN       9
                              COMPUTE  WRK-NYUKHNRYO =
                                      (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                           WHEN      10
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO      *  0.3 )
+                                                         +  0.5
+                           WHEN      11
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO      *  0.7 )
+                                                         +  0.5
+                           WHEN      12
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO      *  0.3 )
+                                                         +  0.5
+                           WHEN      13
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO      *  0.7 )
                                                          +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUKHNRYO =
@@ -1909,6 +1940,10 @@
                          END-IF
                        WHEN   8
                        WHEN   9
+                       WHEN  10
+                       WHEN  11
+                       WHEN  12
+                       WHEN  13
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       8
                              COMPUTE  WRK-NYUKHNRYO =
@@ -1917,6 +1952,34 @@
                            WHEN       9
                              COMPUTE  WRK-NYUKHNRYO =
                                      (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                           WHEN      10
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO *  0.3 )
+                                                    +  0.5
+                           WHEN      11
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO *  0.7 )
+                                                    +  0.5
+                           WHEN      12
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO *  0.3 )
+                                                    +  0.5
+                           WHEN      13
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUKHNRYO =
+                                     (WRK-NYUKHNRYO *  0.7 )
                                                     +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUKHNRYO =
@@ -2084,6 +2147,10 @@
                          MOVE   1   TO   FLG-GAIHAKU
                        WHEN   8
                        WHEN   9
+                       WHEN  10
+                       WHEN  11
+                       WHEN  12
+                       WHEN  13
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       8
                              COMPUTE  WRK-NYUTOKRYO =
@@ -2092,6 +2159,34 @@
                            WHEN       9
                              COMPUTE  WRK-NYUTOKRYO =
                                      (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                           WHEN      10
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO      *  0.3 )
+                                                         +  0.5
+                           WHEN      11
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO      *  0.7 )
+                                                         +  0.5
+                           WHEN      12
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO      *  0.3 )
+                                                         +  0.5
+                           WHEN      13
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-SENTEI-KHNTEN  *  0.92)
+                                                         +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO      *  0.7 )
                                                          +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUTOKRYO =
@@ -2162,6 +2257,10 @@
                          MOVE   1   TO   FLG-GAIHAKU
                        WHEN   8
                        WHEN   9
+                       WHEN  10
+                       WHEN  11
+                       WHEN  12
+                       WHEN  13
                          EVALUATE  WRK-DAY2(IDY)
                            WHEN       8
                              COMPUTE  WRK-NYUTOKRYO =
@@ -2170,6 +2269,34 @@
                            WHEN       9
                              COMPUTE  WRK-NYUTOKRYO =
                                      (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                           WHEN      10
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO *  0.3 )
+                                                    +  0.5
+                           WHEN      11
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO *  0.7 )
+                                                    +  0.5
+                           WHEN      12
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO *  0.3 )
+                                                    +  0.5
+                           WHEN      13
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-KHNTEN    *  0.92)
+                                                    +  0.5
+                             COMPUTE  WRK-NYUTOKRYO =
+                                     (WRK-NYUTOKRYO *  0.7 )
                                                     +  0.5
                          END-EVALUATE
                          COMPUTE  WRK-NYUTOKRYO =
@@ -2212,9 +2339,8 @@
                   END-EVALUATE
                   IF  (WRK-DAY6(IDY)          NOT =  ZERO)
                   AND (WRK-DAY6-ZAITEN(IDY)   NOT =  ZERO)
-                  AND (WRK-DAY2(IDY)          =
-                                 ZERO OR 4 OR 5 OR 6 OR 7
-                                                OR 8 OR 9)
+                  AND ((WRK-DAY2(IDY)         =    ZERO ) OR
+                       (WRK-DAY2(IDY)        >=     4   ))
                       COMPUTE  WRK-NYUTOKRYO = WRK-NYUTOKRYO
                                              + WRK-DAY6-ZAITEN(IDY)
                   END-IF
@@ -3217,8 +3343,9 @@
               PERFORM  VARYING  IDX1    FROM    1   BY  1
                         UNTIL  (IDX1                  >  10 )
                          OR    (RECE62-HKNCOMBI(IDX1) = ZERO)
-                IF   (WRK-DAY1(IDY)   NOT  =  ZERO  )
-                AND  (WRK-DAY2(IDY)        =  8 OR 9)
+                IF   (WRK-DAY1(IDY)   NOT  =  ZERO              )
+                AND  (WRK-DAY2(IDY)        =  8 OR 9 OR 10 OR 11
+                                                     OR 12 OR 13)
                   IF  WRK-DAY5(IDY) =  RECE62-HKNCOMBI(IDX1)
                      PERFORM   2001133-GENSAN-GET3-SEC
                      MOVE  10    TO    IDX1
@@ -3260,9 +3387,8 @@
                          IF   WRK-DAY5(IDY)  =  RECE62-HKNCOMBI (IDX1)
                               IF   (NACCT-ZAITEN    NOT =    ZERO)  
                               AND  (NACCT-DAY(IDY)  NOT =    ZERO)  
-                              AND  (WRK-DAY2(IDY)   =
-                                         ZERO OR 4 OR 5 OR 6 OR 7
-                                                        OR 8 OR 9)
+                              AND  ((WRK-DAY2(IDY)  =    ZERO   ) OR
+                                    (WRK-DAY2(IDY) >=     4     ))
                                    PERFORM   2001131-NYUINKHN-GET3-SEC
                                    MOVE    31    TO    IDY
                               END-IF
@@ -3494,6 +3620,8 @@
       *
            EVALUATE    WRK-DAY2(IDY)
               WHEN          8
+              WHEN         10
+              WHEN         11
                  MOVE     ZERO     TO    FLG-ARI
                  PERFORM  VARYING  ID1    FROM    1   BY  1
                            UNTIL  (ID1                    >  20  )
@@ -3507,6 +3635,8 @@
                      MOVE  "¸áÁ°¸º"  TO   RECE62-NYUSYUBETU(ID1)(1:6)
                  END-IF
               WHEN          9
+              WHEN         12
+              WHEN         13
                  MOVE     ZERO     TO    FLG-ARI
                  PERFORM  VARYING  ID1    FROM    1   BY  1
                            UNTIL  (ID1                    >  20  )
@@ -3542,9 +3672,8 @@
                   IF  WRK-DAY1(IDY) NOT =  ZERO 
                     IF   WRK-DAY5(IDY)  =  RECE62-HKNCOMBI (IDX1)
                          IF   (WRK-DAY4(IDY)   NOT =    ZERO    )
-                         AND  (WRK-DAY2(IDY)   =
-                                        ZERO OR 4 OR 5 OR 6 OR 7
-                                                       OR 8 OR 9)
+                         AND  ((WRK-DAY2(IDY)  =    ZERO       ) OR
+                               (WRK-DAY2(IDY) >=     4         ))
                          AND  (WRK-SHOKUJIRYOYO(IDY)  NOT = ZERO)
                               PERFORM   201141-NYUINKHN-GET4-SEC
                          END-IF
@@ -3704,9 +3833,8 @@
                    IF   WRK-DAY5(IDY)  =  RECE62-HKNCOMBI (IDX1)
                       IF  (WRK-DAY7(IDY)          NOT =  ZERO)
                       AND (WRK-DAY7-ZAITEN(IDY)   NOT =  ZERO)
-                      AND (WRK-DAY2(IDY)          =
-                                     ZERO OR 4 OR 5 OR 6 OR 7
-                                                    OR 8 OR 9)
+                      AND ((WRK-DAY2(IDY)         =    ZERO ) OR
+                           (WRK-DAY2(IDY)        >=     4   ))
                            PERFORM 500-KUMIAWASE-HANBETU-SEC
                            PERFORM 2001153-RECE62-TENSOU9-RYOYO-SEC
                       END-IF

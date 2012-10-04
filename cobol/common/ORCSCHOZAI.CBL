@@ -806,8 +806,8 @@
                        UNTIL       IDX     >   31
       *************IF      NACCT-DAY (IDX) >   ZERO
       *            陸⑨及未伕午ㄣ反覆擂陸
-                   IF      NACCT-DAY (IDX) =  ZERO OR 4 OR 5 OR 6 OR 7
-                                                             OR 8 OR 9
+                   IF     (NACCT-DAY (IDX)  =  ZERO)
+                   OR     (NACCT-DAY (IDX) >=   4  )
                        CONTINUE
                    ELSE
                        MOVE    NACCT-DAY (IDX)     TO  TBL-GAI-DAY(IDX)
