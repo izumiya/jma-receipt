@@ -76,7 +76,7 @@
                    07  SPA-GMN-BYOCD-G.
                        09  SPA-GMN-BYOCD       PIC X(20)
                                                OCCURS  6.
-                   07  SPA-GMN-BYOMEI          PIC X(100).
+                   07  SPA-GMN-BYOMEI          PIC X(400).
                    07  SPA-GMN-JYKNKBN-G.
                        09  SPA-GMN-JYKNKBN     PIC X(01).
                        09  SPA-GMN-JYKNKBNFL   PIC X(01).
@@ -171,9 +171,11 @@
                                                    PIC X(01)
                                                    OCCURS  50.
                05  SPA-GMN-CDLST-AREA.
+                   07  SPA-GMN-CDLST-CNT       PIC 9(05).
                    07  SPA-GMN-CDLST-MAX       PIC 9(05).
                    07  SPA-GMN-CDLST-SEL       PIC 9(05).
-                   07  SPA-GMN-CDLST-OCC       OCCURS  30.
+                   07  SPA-GMN-CDLST-OCC       OCCURS  150.
+                       09  SPA-GMN-TCDNUM      PIC 9(02).
                        09  SPA-GMN-TCDBYOCD    PIC X(07).
                        09  SPA-GMN-TCDBYOMEI   PIC X(50).
                05  SPA-NAI-HEAD-AREA.
@@ -197,9 +199,17 @@
                    07  SPA-NAI-SELNUM          PIC 9(3).
                    07  SPA-NAI-SELNUM-FLG      PIC 9(1)
                                                OCCURS  200.
-                   07  SPA-NAI-BYOCD-G.
-                       09  SPA-NAI-BYOCD-OCC   OCCURS 21.
-                           11  SPA-NAI-BYOCD   PIC X(07).
+                   07  SPA-NAI-BYOINF-G.
+                       09  SPA-NAI-BYOINF-OVER     PIC 9(01).
+                       09  SPA-NAI-BYOINF-CNT      PIC 9(03).
+                       09  SPA-NAI-BYOINF-MAX      PIC 9(03).
+                       09  SPA-NAI-BYOINF-OCC      OCCURS 6.
+                           11  SPA-NAI-BYOIDX      PIC 9(03).
+                           11  SPA-NAI-BYOMEI      PIC X(100).
+                           11  SPA-NAI-BYOSTATUS   PIC X(1).
+                           11  SPA-NAI-BYOCD-G.
+                               13  SPA-NAI-BYOCD-OCC   OCCURS 21.
+                                   15  SPA-NAI-BYOCD   PIC X(07).
       *
       *    フラグエリア
        01  FLG-AREA.
@@ -246,7 +256,11 @@
            03  IDXE                        PIC 9(05).
            03  IDXF                        PIC 9(05).
            03  IDXI                        PIC 9(05).
+           03  IDXK                        PIC 9(05).
+           03  IDXL                        PIC 9(05).
+           03  IDXN                        PIC 9(05).
            03  IDXS                        PIC 9(05).
+           03  IDXU                        PIC 9(05).
            03  IDX-CMB                     PIC 9(05).
            03  IDX-MAX                     PIC 9(05).
            03  IDX-LST                     PIC 9(05).
@@ -265,8 +279,8 @@
                05  WRK-CMB-ITM2            PIC X(200).
            03  WRK-ZZ9                     PIC ZZ9.
            03  WRK-SKIP-MAX                PIC 9(05).
-           03  WRK-MAE-INPUT               PIC X(100).
-           03  WRK-OUT-INPUT               PIC X(100).
+           03  WRK-MAE-INPUT               PIC X(500).
+           03  WRK-OUT-INPUT               PIC X(500).
            03  WRK-YMD                     PIC X(10). 
            03  WRK-ZOGENPTN                PIC X(01).
            03  WRK-ZOGEN                   PIC S9(05).
@@ -315,10 +329,13 @@
                    07  WRK-KEY-CDSEP       PIC X(01).
            03  WRK-IKOCD                   PIC X(07).
            03  WRK-TBYOMEICD-G.
-               05  WRK-TBYOMEICD            PIC X(07)
+               05  WRK-TBYOMEICD           PIC X(07)
                                            OCCURS  21.
-           03  WRK-GRPCHKKBN                PIC X(01).
-           03  WRK-GRPID                    PIC X(01).
+           03  WRK-GRPCHKKBN               PIC X(01).
+           03  WRK-GRPID                   PIC X(01).
+           03  WRK-BYOCD                   PIC X(07).
+           03  WRK-BYOMEI                  PIC X(100).
+           03  WRK-GMN-CUR                 PIC 9(05).
       *
        01  WRK-WIDGET-AREA.
            03  WRK-WIDGET-BYOMEICD-G.
@@ -335,7 +352,7 @@
            03  CONST-MKCD-MAX              PIC 9(05)   VALUE   21.
            03  CONST-BYOLST-MAX            PIC 9(05)   VALUE   200.
            03  CONST-SRCBYOLST-MAX         PIC 9(05)   VALUE   50.
-           03  CONST-CDLST-MAX             PIC 9(05)   VALUE   30.
+           03  CONST-CDLST-MAX             PIC 9(05)   VALUE   150.
            03  CONST-SRTKBN-MAX            PIC 9(05)   VALUE   50.
            03  CONST-REIGAIYKZ-MAX         PIC 9(05)   VALUE   100.
       *
@@ -386,6 +403,9 @@
       *
       *    病名システム予約コードテーブル
            COPY    "CMBYOMEICD.INC".
+      *
+           COPY    "CPXSUB01.INC"     REPLACING  //XSUB01-//
+                                      BY         //TXSUB01-//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -464,6 +484,7 @@
            COPY    "X04.INC".
            COPY    "X05.INC".
            COPY    "X06.INC".
+           COPY    "X07.INC".
            COPY    "X91.INC".
            COPY    "X97.INC".
            COPY    "X98.INC".
@@ -578,6 +599,9 @@
                PERFORM 340-X03-SET-SEC
                GO  TO  300-SCREEN-EXT
            WHEN    "X06"
+               GO  TO  300-SCREEN-EXT
+           WHEN    "X07"
+               PERFORM 340-X07-SET-SEC
                GO  TO  300-SCREEN-EXT
            END-EVALUATE
       *
@@ -1072,6 +1096,36 @@
        340-X03-SET-EXT.
            EXIT.
       *****************************************************************
+      *    自院病名検索画面戻り時処理
+      *****************************************************************
+       340-X07-SET-SEC             SECTION.
+      *
+           IF    ( SPA-X01-UERBYOMEI-KAKUTEI   =   1 )
+      *
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >   CONST-BYOCD-MAX )
+      *
+                   MOVE    SPA-X01-INPUTCD (IDX0)
+                                   TO  X04-BYOMEICD (IDX0)
+      *
+               END-PERFORM
+      *
+               IF    ( SPA-X01-POSITION    NOT =   ZERO )
+                   MOVE    "BYOMEICD"  TO  WRK-WIDGET-BYOMEICD-STR
+                   MOVE    SPA-X01-POSITION
+                                       TO  WRK-WIDGET-BYOMEICD-NUM
+                   MOVE    WRK-WIDGET-BYOMEICD-G
+                                   TO  WRK-MCP-WIDGET
+               END-IF
+               PERFORM 4100-BYOMEICD-CHK-SEC
+               MOVE    SPACE           TO  SPA-ERRCD
+      *
+           END-IF
+      *
+           .
+       340-X07-SET-EXT.
+           EXIT.
+      *****************************************************************
       *    画面遷移処理
       *****************************************************************
        200-GMNSENI                     SECTION.
@@ -1089,10 +1143,13 @@
       *    削除
            WHEN    "CLICKED"       ALSO    "B03"
                PERFORM 403-DEL-SEC
+      *    自院CD検索
+           WHEN    "CLICKED"       ALSO    "B04"
+               PERFORM 409-X07-SENI-SEC
       *    病名登録
            WHEN    "CLICKED"       ALSO    "B05"
                PERFORM 4101-BYOTRK-SEC
-      *    チェック項目複写
+      *    例外薬剤登録画面
            WHEN    "CLICKED"       ALSO    "B06"
                IF    ( SPA-X01-CHKKBN      =   "1" )
                    PERFORM 409-X06-SENI-SEC
@@ -1478,28 +1535,56 @@
       *
            END-PERFORM
       *
+           MOVE    XSUB01-LNK      TO  TXSUB01-LNK
            CALL    "ORCGXSUB01"    USING   SPA-AREA
                                            XSUB01-LNK
       *
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >       CONST-BYOCD-MAX )
+           INITIALIZE                      SPA-NAI-BYOINF-G
       *
-               MOVE    XSUB01-O-BYOCD (IDX0)
-                                   TO  SPA-GMN-BYOCD (IDX0)
+           MOVE    XSUB01-O-BYOMEI-CNT     TO  SPA-NAI-BYOINF-CNT
       *
+           IF    ( SPA-GMN-BYOLST-SEL  >   ZERO )
+            OR   ( SPA-NAI-INPUT-MODE  =   2 )
+      *
+               MOVE    TXSUB01-LNK TO  XSUB01-LNK
+               MOVE    1           TO  XSUB01-SINGLE
+      *
+               CALL    "ORCGXSUB01"    USING   SPA-AREA
+                                               XSUB01-LNK
+           END-IF
+      *
+           PERFORM VARYING IDXB    FROM    1   BY  1
+                   UNTIL ( IDXB    >       CONST-BYOCD-MAX )
+      *
+               MOVE    XSUB01-O-BYOCD (IDXB)
+                                   TO  SPA-GMN-BYOCD (IDXB)
+      *
+               IF    ( XSUB01-O-TOP (IDXB) =   "1" )
+      *
+                   COMPUTE SPA-NAI-BYOINF-MAX
+                       =   SPA-NAI-BYOINF-MAX  +   1
+                   MOVE    SPA-NAI-BYOINF-MAX
+                                   TO  IDXI
+                   MOVE    IDXB    TO  SPA-NAI-BYOIDX (IDXI)
+                   MOVE    XSUB01-O-BYOSTATUS (IDXB)
+                                   TO  SPA-NAI-BYOSTATUS (IDXI)
+                   MOVE    XSUB01-O-BYOMEI(IDXB)
+                                   TO  SPA-NAI-BYOMEI (IDXI)
+                   PERFORM VARYING IDX0    FROM    1   BY  1
+                           UNTIL ( IDX0    >   CONST-MKCD-MAX )
+      *
+                       MOVE    XSUB01-O-RECECD (IDXB IDX0)
+                                   TO  SPA-NAI-BYOCD (IDXI IDX0)
+      *
+                   END-PERFORM
+      *
+               END-IF
            END-PERFORM
       *
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   CONST-MKCD-MAX )
+           MOVE    XSUB01-O-BYOSTATUSALL
+                                       TO  SPA-GMN-BYOSTATUS
       *
-               MOVE    XSUB01-O-RECECD (IDX0)
-                                   TO  SPA-NAI-BYOCD (IDX0)
-      *
-           END-PERFORM
-      *
-           MOVE    XSUB01-O-BYOSTATUS  TO  SPA-GMN-BYOSTATUS
-      *
-           MOVE    XSUB01-O-BYOMEI     TO  SPA-GMN-BYOMEI
+           MOVE    XSUB01-O-BYOMEIALL  TO  SPA-GMN-BYOMEI
       *
            PERFORM 4101-CDLST-SEC
       *
@@ -1511,7 +1596,43 @@
            WHEN    3
                MOVE    "0007"          TO  SPA-ERRCD
            WHEN    4
-               MOVE    "0008"          TO  SPA-ERRCD
+               IF    ( WRK-MCP-WIDGET (1:8)    =   "BYOMEICD" )
+                AND (( XSUB01-O-ERRIDX >   ZERO )
+                OR   ( XSUB01-O-ERRIDX <=  CONST-BYOCD-MAX ))
+                   INITIALIZE      SPA-X01-USERBYOMEI-G
+                   MOVE    XSUB01-O-ERRIDX
+                                       TO  SPA-X01-POSITION
+                   MOVE    XSUB01-O-ERRIDX
+                                       TO  IDXB
+                   IF    ( SPA-GMN-BYOCD (IDXB)(1:2)
+                                       =   "//" )
+                       INITIALIZE      ORCSNUMAREA
+                       MOVE    SPA-GMN-BYOCD (IDXB)(3:)
+                                               TO  SNUM-INX
+                       CALL    "ORCSNUM"       USING
+                                               ORCSNUMAREA
+                       IF    ( SNUM-RC         =   ZERO )
+                        AND  ( SNUM-SEISUU     <   4 )
+                           MOVE    SNUM-OUTNUM TO  SPA-X01-BUNRUICD
+                       END-IF
+                       MOVE    SPACE           TO  SPA-GMN-BYOCD (IDXB)
+                       PERFORM 4091-X07-SENI-SEC
+                       GO  TO  4101-BYOMEICD-CHK-EXT
+                   ELSE
+                           PERFORM 900-USERBYOMEI-KEY11-SEL-SEC
+                           IF    ( FLG-USERBYOMEI  =   ZERO )
+                               MOVE    IDXB        TO  SPA-X01-INDEX
+                               MOVE    SPA-GMN-BYOCD (IDXB)
+                                               TO  SPA-X01-BYOMEIINPUTCD
+                               PERFORM 4091-X07-SENI-SEC
+                               GO  TO  4101-BYOMEICD-CHK-EXT
+                           ELSE
+                               MOVE    "0008"      TO  SPA-ERRCD
+                           END-IF
+                   END-IF
+               ELSE
+                   MOVE    "0008"      TO  SPA-ERRCD
+               END-IF
            END-EVALUATE
       *
            IF    ( SPA-ERRCD       NOT =   SPACE )
@@ -1521,6 +1642,16 @@
                    COMPUTE SPA-GMN-CUR
                        =   XSUB01-O-ERRIDX
                        +   1
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+               IF    ( SPA-GMN-BYOLST-SEL  >   ZERO )
+                OR   ( SPA-NAI-INPUT-MODE  =   2 )
+                   IF    ( SPA-NAI-BYOINF-MAX  >   1 )
+                       MOVE    2       TO  SPA-GMN-CUR
+                       MOVE    "0114"  TO  SPA-ERRCD
+                   END-IF
                END-IF
            END-IF
       *
@@ -1562,17 +1693,23 @@
            MOVE    SPA-GMN-BYOMEI      TO  LNK-BYO-BYOMEI
            CALL    "ORCSBYOMEI"    USING   ORCSBYOMEIAREA
                                            SPA-AREA
+           MOVE    LNK-BYO-BYOMEIHENFLG
+                                   TO  SPA-GMN-BYOSTATUS
+      *
+           MOVE    1               TO  SPA-NAI-BYOINF-MAX
+           MOVE    1               TO  SPA-NAI-BYOIDX (1)
+           MOVE    SPA-GMN-BYOMEI  TO  SPA-NAI-BYOMEI (1)
+           MOVE    SPA-GMN-BYOSTATUS
+                                   TO  SPA-NAI-BYOSTATUS (1)
       *
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >       LNK-BYO-BYOMEI-MAX )
       *
                MOVE    LNK-BYO-TBYOMEICD (IDX0)
-                                   TO  SPA-NAI-BYOCD (IDX0)
+                                   TO  SPA-NAI-BYOCD (1 IDX0)
       *
            END-PERFORM
       *
-           MOVE    LNK-BYO-BYOMEIHENFLG
-                                   TO  SPA-GMN-BYOSTATUS
       *
            PERFORM 4101-CDLST-SEC
            PERFORM 41011-BYOMEICD-SEC
@@ -2220,7 +2357,7 @@
       *
            INITIALIZE                  SPA-GMN-BYOSTATUS
                                        SPA-GMN-BYOCD-G
-                                       SPA-NAI-BYOCD-G
+                                       SPA-NAI-BYOINF-G
                                        SPA-GMN-BYOMEI
                                        SPA-GMN-CDLST-AREA
       *
@@ -2248,7 +2385,9 @@
                IF    ( SPA-ERRCD   =   "0006" )
                    MOVE    9       TO  SPA-GMN-CUR
                ELSE
-                   PERFORM 41001-BYOCD-CUR-HEN-SEC
+                   IF    ( WRK-MCP-WIDGET (1:8)    =   "BYOMEICD" )
+                       PERFORM 41001-BYOCD-CUR-HEN-SEC
+                   END-IF
                END-IF
       *
            END-IF
@@ -2302,21 +2441,30 @@
       *****************************************************************
        4100-BYOMEI-CHK-SEC             SECTION.
       *
-           INITIALIZE                  SPA-GMN-BYOSTATUS
-                                       SPA-GMN-BYOCD-G
-                                       SPA-NAI-BYOCD-G
-                                       SPA-GMN-BYOMEI
-                                       SPA-GMN-CDLST-AREA
+           IF    ( SPA-NAI-BYOINF-MAX          >   1 )
+               MOVE    "0113"      TO  SPA-ERRCD
+               MOVE    2           TO  SPA-GMN-CUR
+           END-IF
       *
-           MOVE    ZERO            TO  SPA-GMN-BYOMEICD-CHK-FLG
-           MOVE    1               TO  SPA-GMN-BYOMEI-CHK-FLG
-      *
-           MOVE    X04-BYOMEI      TO  SPA-GMN-BYOMEI
-      *
-           PERFORM 4101-BYOMEI-CHK-SEC
            IF    ( SPA-ERRCD       =   SPACE )
-            OR   ( SPA-ERRCD       =   "0006" )
-               MOVE    ZERO        TO  SPA-GMN-BYOMEI-CHK-FLG
+      *
+               INITIALIZE                  SPA-GMN-BYOSTATUS
+                                           SPA-GMN-BYOCD-G
+                                           SPA-NAI-BYOINF-G
+                                           SPA-GMN-BYOMEI
+                                           SPA-GMN-CDLST-AREA
+      *
+               MOVE    ZERO            TO  SPA-GMN-BYOMEICD-CHK-FLG
+               MOVE    1               TO  SPA-GMN-BYOMEI-CHK-FLG
+      *
+               MOVE    X04-BYOMEI      TO  SPA-GMN-BYOMEI
+      *
+               PERFORM 4101-BYOMEI-CHK-SEC
+               IF    ( SPA-ERRCD       =   SPACE )
+                OR   ( SPA-ERRCD       =   "0006" )
+                   MOVE    ZERO        TO  SPA-GMN-BYOMEI-CHK-FLG
+               END-IF
+      *
            END-IF
       *
            .
@@ -2411,11 +2559,17 @@
            MOVE    SPA-NAI-TBYOSTATUS (IDX3)
                                        TO  SPA-GMN-BYOSTATUS
       *
+           MOVE    1               TO  SPA-NAI-BYOINF-MAX
+           MOVE    1               TO  SPA-NAI-BYOIDX (1)
+           MOVE    SPA-GMN-BYOMEI  TO  SPA-NAI-BYOMEI (1)
+           MOVE    SPA-GMN-BYOSTATUS
+                                   TO  SPA-NAI-BYOSTATUS (1)
+      *
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   CONST-MKCD-MAX )
       *
                MOVE    SPA-NAI-TBYOCD (IDX3 IDX0)
-                                       TO  SPA-NAI-BYOCD (IDX0)
+                                       TO  SPA-NAI-BYOCD (1 IDX0)
       *
            END-PERFORM
       *
@@ -2450,6 +2604,10 @@
       *
            END-IF
       *
+           IF    ( SPA-GMN-CDLST-MAX   >   CONST-BYOCD-MAX )
+               MOVE    1               TO  SPA-NAI-BYOINF-OVER
+           END-IF
+      *
            .
       *
        41011-BYOMEICD-EXT.
@@ -2462,63 +2620,79 @@
            MOVE    1                   TO  FLG-CDLST-ROW
            INITIALIZE                  SPA-GMN-CDLST-AREA
       *
-           PERFORM VARYING IDX6    FROM    1   BY  1
-                   UNTIL ( IDX6            >   CONST-MKCD-MAX )
-                    OR   ( SPA-GMN-CDLST-MAX   >=  CONST-CDLST-MAX )
+           PERFORM VARYING IDXB    FROM    1   BY  1
+                   UNTIL ( IDXB    >   SPA-NAI-BYOINF-MAX )
       *
-               IF   ( SPA-NAI-BYOCD (IDX6) NOT =   SPACE )
+               MOVE    SPA-NAI-BYOMEI (IDXB)
+                                       TO  WRK-BYOMEI
       *
-                   COMPUTE SPA-GMN-CDLST-MAX
-                       =   SPA-GMN-CDLST-MAX   +   1
+               PERFORM VARYING IDX6    FROM    1   BY  1
+                       UNTIL ( IDX6    >   CONST-MKCD-MAX )
+                        OR   ( SPA-NAI-BYOCD (IDXB IDX6)
+                                       =  SPACE )
+                        OR   ( SPA-GMN-CDLST-MAX
+                                      >=  CONST-CDLST-MAX )
       *
-                   MOVE    SPA-NAI-BYOCD (IDX6)
-                           TO  SPA-GMN-TCDBYOCD (SPA-GMN-CDLST-MAX)
+                   MOVE    SPA-NAI-BYOCD (IDXB IDX6)
+                                       TO  WRK-BYOCD
+                   MOVE    IDX6        TO  IDXN
+                   PERFORM 41011-CDLST-SEC
       *
-                   IF    ( SPA-NAI-BYOCD (IDX6)
-                                           =   "0000999" )
-                       IF    ( IDX6    =   1 )
-                           MOVE    SPA-GMN-BYOMEI
-                               TO  SPA-GMN-TCDBYOMEI (SPA-GMN-CDLST-MAX)
-                       END-IF
-                   ELSE
-      *
-                       MOVE    SPA-NAI-BYOCD (IDX6)
-                                           TO  WRK-CMB-CD
-                       PERFORM 4200-YYKBYOCD-CHK-SEC
-                       IF    ( WRK-CMB-ITM NOT =   SPACE )
-                           MOVE    WRK-CMB-ITM
-                               TO  SPA-GMN-TCDBYOMEI (SPA-GMN-CDLST-MAX)
-                       ELSE
-      *
-                           INITIALIZE                  BYOMEI-REC
-                           MOVE    SPA-NAI-BYOCD (IDX6)
-                                           TO  BYO-BYOMEICD
-grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
-                           MOVE    BYOMEI-REC  TO  MCPDATA-REC
-                           MOVE    "tbl_byomei"    TO  MCP-TABLE
-                           MOVE    "key"           TO  MCP-PATHNAME
-                           PERFORM 910-DBSELECT-SEC
-                           IF    ( MCP-RC      =   ZERO )
-                               MOVE    MCPDATA-REC TO  BYOMEI-REC
-                           ELSE
-                               INITIALIZE              BYOMEI-REC
-                           END-IF
-      *
-                           MOVE    "tbl_byomei"     TO  MCP-TABLE
-                           MOVE    "key"            TO  MCP-PATHNAME
-                           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-                           MOVE    BYO-BYOMEI
-                               TO  SPA-GMN-TCDBYOMEI (SPA-GMN-CDLST-MAX)
-                       END-IF
-                   END-IF
-      *
-               END-IF
+               END-PERFORM
       *
            END-PERFORM
       *
            .
        4101-CDLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    コード表示リスト編集処理
+      *****************************************************************
+       41011-CDLST-SEC                 SECTION.
+      *
+           COMPUTE SPA-GMN-CDLST-MAX   =   SPA-GMN-CDLST-MAX   +   1
+      *
+           MOVE    IDXN        TO  SPA-GMN-TCDNUM   (SPA-GMN-CDLST-MAX)
+      *
+           MOVE    WRK-BYOCD   TO  SPA-GMN-TCDBYOCD (SPA-GMN-CDLST-MAX)
+      *
+           IF    ( WRK-BYOCD   =   "0000999" )
+               IF    ( IDXN    =   1 )
+                   MOVE    WRK-BYOMEI
+                               TO  SPA-GMN-TCDBYOMEI (SPA-GMN-CDLST-MAX)
+               END-IF
+           ELSE
+               MOVE    WRK-BYOCD
+                               TO  WRK-CMB-CD
+               PERFORM 4200-YYKBYOCD-CHK-SEC
+               IF    ( WRK-CMB-ITM NOT =   SPACE )
+                   MOVE    WRK-CMB-ITM
+                               TO  SPA-GMN-TCDBYOMEI (SPA-GMN-CDLST-MAX)
+               ELSE
+      *
+                   INITIALIZE                  BYOMEI-REC
+                   MOVE    WRK-BYOCD       TO  BYO-BYOMEICD
+                   MOVE    BYOMEI-REC      TO  MCPDATA-REC
+                   MOVE    "tbl_byomei"    TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   PERFORM 910-DBSELECT-SEC
+                   IF    ( MCP-RC      =   ZERO )
+                       MOVE    MCPDATA-REC TO  BYOMEI-REC
+                   ELSE
+                       INITIALIZE              BYOMEI-REC
+                   END-IF
+      *
+                   MOVE    "tbl_byomei"     TO  MCP-TABLE
+                   MOVE    "key"            TO  MCP-PATHNAME
+                   PERFORM 910-DBCLOSECURSOR-SEC
+      *
+                   MOVE    BYO-BYOMEI
+                               TO  SPA-GMN-TCDBYOMEI (SPA-GMN-CDLST-MAX)
+               END-IF
+           END-IF
+      *
+           .
+       41011-CDLST-EXT.
            EXIT.
       *****************************************************************
       *    病名ソースリスト選択処理
@@ -2555,6 +2729,7 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            EVALUATE    SPA-NAI-INPUT-MODE
            WHEN    1
+               MOVE    1           TO  IDXL
                PERFORM 4101-BYOTRK-SIN-UPD-SEC
            WHEN    2
                PERFORM 4101-BYOTRK-MUL-UPD-SEC
@@ -2582,7 +2757,7 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
-               IF    ( SPA-NAI-BYOCD-G     =   SPACE )
+               IF    ( SPA-NAI-BYOINF-MAX  =   ZERO )
                    MOVE    "0105"      TO  SPA-ERRCD
                    MOVE    8           TO  SPA-GMN-CUR
                END-IF
@@ -2616,7 +2791,8 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                MOVE    SPA-GMN-BYOLST-SEL
                                        TO  IDX-LST
       *
-               MOVE    SPA-GMN-BYOMEI  TO  SPA-GMN-TBYOMEI (IDX-LST)
+               MOVE    SPA-NAI-BYOMEI (IDXL)
+                                           TO  SPA-GMN-TBYOMEI (IDX-LST)
                MOVE    SPA-GMN-JYKNKBN TO  SPA-GMN-TJYKN   (IDX-LST)
                MOVE    SPA-GMN-UTAGAIKBN TO  SPA-GMN-TUTAGAI(IDX-LST)
                IF    ( SPA-GMN-GRPID   =   "0" )
@@ -2631,11 +2807,11 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                PERFORM VARYING IDX0    FROM    1   BY  1
                        UNTIL ( IDX0    >       CONST-MKCD-MAX )
       *
-                   MOVE    SPA-NAI-BYOCD (IDX0)
+                   MOVE    SPA-NAI-BYOCD (IDXL IDX0)
                                        TO  SPA-NAI-TBYOCD (IDX-LST IDX0)
                END-PERFORM
       *
-               MOVE    SPA-GMN-BYOSTATUS
+               MOVE    SPA-NAI-BYOSTATUS (IDXL)
                                        TO  SPA-NAI-TBYOSTATUS (IDX-LST)
            END-IF
       *
@@ -2700,11 +2876,24 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                GO  TO  4101-BYOTRK-INS-EXT
            END-IF
       *
-           COMPUTE SPA-GMN-BYOLST-MAX  =   SPA-GMN-BYOLST-MAX  +   1
+           IF    ( SPA-GMN-BYOLST-MAX
+               +   SPA-NAI-BYOINF-MAX  >  CONST-BYOLST-MAX )
+               MOVE    "0112"          TO  SPA-ERRCD
+               GO  TO  4101-BYOTRK-INS-EXT
+           END-IF
       *
-           MOVE    SPA-GMN-BYOLST-MAX  TO  SPA-GMN-BYOLST-SEL
+           PERFORM VARYING IDXK    FROM    1   BY  1
+                   UNTIL ( IDXK    >   SPA-NAI-BYOINF-MAX )
       *
-           PERFORM 4101-BYOTRK-SIN-UPD-SEC
+               COMPUTE SPA-GMN-BYOLST-MAX
+                   =   SPA-GMN-BYOLST-MAX  +   1
+      *
+               MOVE    SPA-GMN-BYOLST-MAX  TO  SPA-GMN-BYOLST-SEL
+      *
+               MOVE    IDXK        TO  IDXL
+               PERFORM 4101-BYOTRK-SIN-UPD-SEC
+      *
+           END-PERFORM
       *
            IF    ( SPA-GMN-BYOLST-MAX  >=  CONST-BYOLST-MAX )
                MOVE    "0102"          TO  SPA-ERRCD
@@ -3267,6 +3456,71 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
        220-CLEAR-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    入力ＣＤ検索画面
+      *****************************************************************
+       409-X07-SENI-SEC                SECTION.
+      *
+           PERFORM 410-INPUT-CHK-SEC
+           IF    ( SPA-ERRCD       =   SPACE )
+               INITIALIZE          SPA-X01-USERBYOMEI-G
+               PERFORM 4091-X07-SENI-SEC
+           END-IF
+      *
+           .
+       409-X07-SENI-EXT.
+           EXIT.
+      *****************************************************************
+      *    入力ＣＤ検索画面
+      *****************************************************************
+       4091-X07-SENI-SEC               SECTION.
+      *
+           MOVE    ZERO            TO  SPA-X01-BYOSEL
+           IF    ( SPA-GMN-BYOLST-SEL  >   ZERO )
+            OR   ( SPA-NAI-INPUT-MODE  =   2 )
+               MOVE    1           TO  SPA-X01-BYOSEL
+           END-IF
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   CONST-BYOCD-MAX )
+      *
+               MOVE    SPA-GMN-BYOCD (IDX0)
+                                   TO  SPA-X01-INPUTCD (IDX0)
+      *
+           END-PERFORM
+      *
+           MOVE    SPA-X01KYOUTU   TO  SPA-WORK
+           MOVE    SPA-AREA        TO  SPA-COMMON
+           MOVE    SPA-X04         TO  SPA-X01SONOTA
+           MOVE    SPA-X01FREE     TO  SPA-FREE
+      *
+           MOVE    "LINK"              TO  MCP-STATUS
+           MOVE    SPACE               TO  MCP-EVENT
+      *
+           CALL    "ORCGX07"           USING
+                                       MCPAREA
+                                       SPAAREA
+                                       LINKAREA
+                                       SCRAREA.
+      *
+           MOVE    SPA-COMMON      TO  SPA-AREA
+           MOVE    SPA-WORK        TO  SPA-X01KYOUTU
+           MOVE    SPA-FREE        TO  SPA-X01FREE
+           MOVE    SPA-X01SONOTA   TO  SPA-X04
+      *
+           MOVE    "X07"               TO  SPA-SAKIPG
+           MOVE    "X04"               TO  SPA-MOTOPG
+      *
+           MOVE   "NEW"                TO  MCP-PUTTYPE
+           MOVE   SPA-SAKIPG           TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       4091-X07-SENI-EXT.
+           EXIT.
       *****************************************************************
       *    例外薬剤登録画面
       *****************************************************************
@@ -3926,18 +4180,26 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            END-PERFORM
       *
-           MOVE    SPA-GMN-CDLST-MAX       TO  X04-CDLST-COUNT
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   SPA-GMN-CDLST-MAX )
       *
-               MOVE    IDX0            TO  WRK-ZZ9
+               IF    ( IDX0           >   1 )
+                AND  ( SPA-GMN-TCDNUM(IDX0)  =   1 )
+                   COMPUTE X04-CDLST-COUNT   =   X04-CDLST-COUNT +   1
+               END-IF
       *
-               MOVE    WRK-ZZ9         TO  X04-TCDNO   (IDX0)
+               COMPUTE X04-CDLST-COUNT =   X04-CDLST-COUNT +   1
+      *
+               MOVE    SPA-GMN-TCDNUM(IDX0)
+                                       TO  WRK-ZZ9
+      *
+               MOVE    WRK-ZZ9     TO  X04-TCDNO   (X04-CDLST-COUNT)
                MOVE    SPA-GMN-TCDBYOCD (IDX0)
-                                       TO  X04-TCDBYOCD(IDX0)
+                                   TO  X04-TCDBYOCD(X04-CDLST-COUNT)
       *
                MOVE    SPA-GMN-TCDBYOMEI (IDX0)
-                                       TO  X04-TCDBYOMEI (IDX0)
+                                   TO  X04-TCDBYOMEI
+                                                   (X04-CDLST-COUNT)
       *
            END-PERFORM
       *
@@ -3948,6 +4210,7 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            MOVE    WIDGET-NORMAL       TO  X04-B03-STATE
+                                           X04-B04-STATE
                                            X04-B05-STATE
                                            X04-B09-STATE
                                            X04-B10-STATE
@@ -3981,13 +4244,20 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            IF    ( SPA-NAI-INPUT-MODE  =   2 )
+            OR   ( SPA-NAI-BYOINF-OVER =   1 )
                PERFORM VARYING IDX0    FROM    1   BY  1
                        UNTIL ( IDX0    >   CONST-BYOCD-MAX )
                    MOVE    WIDGET-INSENSITIVE
                                            TO  X04-BYOMEICD-STATE (IDX0)
                END-PERFORM
       *
-               MOVE    WIDGET-INSENSITIVE  TO  X04-BYOMEI-STATE
+               IF    ( SPA-NAI-INPUT-MODE  =   2 )
+                   MOVE    WIDGET-INSENSITIVE
+                                           TO  X04-BYOMEI-STATE
+               END-IF
+      *
+               MOVE    WIDGET-INSENSITIVE  TO  X04-B04-STATE
+      *
            END-IF
       *
            IF    ( SPA-GMN-SRCBYOKBN   =    "M" )
@@ -4257,7 +4527,7 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            WHEN    "0111"
                STRING  "グループ指定のない病名と"
                                            DELIMITED   BY  SIZE
-                       "ある病名は混在して登録できません。"
+                       "ある病名は混在して登録できません"
                                            DELIMITED   BY  SIZE
                INTO    SPA-ERRMSG
                END-STRING
@@ -4267,6 +4537,19 @@ grpsys*                    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                        TO  SPA-ERRMSG
            WHEN    "0108"
                MOVE    "病名の登録がありません"
+                                       TO  SPA-ERRMSG
+           WHEN    "0112"
+               MOVE    "登録上限を超えるため、追加登録はできません"
+                                       TO  SPA-ERRMSG
+           WHEN    "0113"
+               STRING  "複数の病名を入力中のため、"
+                                           DELIMITED   BY  SIZE
+                       "直接病名の編集はできません"
+                                           DELIMITED   BY  SIZE
+               INTO  SPA-ERRMSG
+               END-STRING
+           WHEN    "0114"
+               MOVE    "変更処理のときは複数病名の入力はできません"
                                        TO  SPA-ERRMSG
            WHEN    "1001"
            WHEN    "1004"
@@ -4790,6 +5073,40 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            .
       *
        900-USERBYOMEI-KEY10-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    自院病名検索処理(KEY11)
+      *****************************************************************
+       900-USERBYOMEI-KEY11-SEL-SEC    SECTION.
+      *
+           MOVE    ZERO                TO  FLG-USERBYOMEI
+      *
+           INITIALIZE                      USERBYOMEI-REC
+           MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
+      *
+           STRING  SPA-GMN-BYOCD (IDXB)    DELIMITED   BY  SPACE
+                   "%"                     DELIMITED   BY  SIZE
+           INTO    USBYO-BYOMEIINPUTCD
+           END-STRING
+      *
+           MOVE    USERBYOMEI-REC      TO  MCPDATA-REC
+           MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC    =     ZERO )
+               MOVE    MCPDATA-REC     TO  USERBYOMEI-REC
+           ELSE
+               INITIALIZE                  USERBYOMEI-REC
+               MOVE    1               TO  FLG-USERBYOMEI
+           END-IF
+      *
+           MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-USERBYOMEI-KEY11-SEL-EXT.
            EXIT.
       *****************************************************************
       *    適応病名マスタ検索処理(KEY)

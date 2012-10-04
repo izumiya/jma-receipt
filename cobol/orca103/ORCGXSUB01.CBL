@@ -46,12 +46,10 @@
            03  FLG-USERBYOMEI              PIC 9(01).
            03  FLG-PTBYOMEI                PIC 9(01).
            03  FLG-BYOINS                  PIC 9(01).
-           03  FLG-OVER                    PIC 9(01).
            03  FLG-BYOMEIERR               PIC 9(01).
            03  FLG-UBYOERR                 PIC 9(01).
-           03  FLG-HENSYU                  PIC 9(01).
            03  FLG-BYOCDARI                PIC 9(01).
-           
+           03  FLG-CHECK                   PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -63,6 +61,9 @@
            03  IDX5                        PIC 9(05).
            03  IDX-BYO                     PIC 9(05).
            03  IDX-CMB                     PIC 9(05).
+           03  IDXB                        PIC 9(05).
+           03  IDXT                        PIC 9(05).
+           03  IDXN                        PIC 9(05).
       *
       *    一時領域
        01  WRK-AREA.
@@ -91,6 +92,7 @@
            03  WRK-CMB-CD                  PIC X(10).
            03  WRK-CMB-ITM-G.
                05  WRK-CMB-ITM             PIC X(200).
+           03  WRK-RECECD-MAX              PIC 9(05).
       *
        01  ERR-AREA.
            03  ERR-RC                      PIC 9(03).
@@ -104,6 +106,14 @@
       *
       *    病名システム予約コードテーブル
            COPY    "CMBYOMEICD.INC".
+      *
+       01  TUSBYO-AREA.
+         02  TUSBYO-OCC                    OCCURS  6.
+           COPY    "CPUSERBYOMEI.INC"      REPLACING   //USBYO-//
+                                           BY          //TUSBYO-//.
+      *
+       01  TUSBYOPLUS-AREA.
+         02  TUSBYOPLUS-CNT-USBUI          PIC 9(03).
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -155,6 +165,8 @@
                                    IDX-AREA
                                    WRK-AREA
                                    ERR-AREA
+                                   TUSBYO-AREA
+                                   TUSBYOPLUS-AREA
       *
            PERFORM 100-INIT-SEC
       *
@@ -343,7 +355,6 @@
                    END-IF
       *
                    IF    ( XSUB01-O-BYOCD (IDX1)   =   CONST-MICODE )
-                       MOVE    SPACE   TO  XSUB01-O-BYOCD (IDX1)
                        MOVE    1       TO  ERR-RC
                        MOVE    IDX1    TO  ERR-IDX
                        PERFORM 2500-ERRCD-HEN-SEC
@@ -363,11 +374,6 @@
            INITIALIZE                  WRK-STR-G
                                        WRK-BYOMEI-G
       *
-           MOVE    ZERO                TO  FLG-OVER
-           MOVE    ZERO                TO  FLG-HENSYU
-      *
-           MOVE    1                   TO  WRK-BYOMEI-LEN
-      *
            MOVE    1                   TO  WRK-BYOCD-LEN-MAX
            STRING  WRK-BYOCD           DELIMITED   BY  SIZE
            INTO    WRK-STR-TMP
@@ -379,10 +385,19 @@
                    =   WRK-BYOCD-LEN-MAX   -   1
            END-IF
       *
+           PERFORM 20011-TUSBYO-HEN-SEC
+      *
+           MOVE    ZERO                    TO  IDXT
+           MOVE    1                       TO  WRK-BYOMEI-LEN
            PERFORM VARYING IDX-BYO FROM    1   BY  1
                    UNTIL ( IDX-BYO         >   CONST-BYOCD-MAX )
       *
                IF    ( XSUB01-O-BYOCD (IDX-BYO)    NOT =   SPACE )
+                   IF    ( IDX-BYO         =   1 )
+                    OR   ( XSUB01-O-TOP (IDX-BYO)      =   1 )
+                       MOVE    IDX-BYO TO  IDXT
+                       MOVE    1       TO  WRK-BYOMEI-LEN
+                   END-IF
       *
                    MOVE    XSUB01-O-BYOCD (IDX-BYO)
                                        TO  WRK-BYOCD
@@ -390,39 +405,181 @@
                    PERFORM 20011-RECECD-HEN-SEC
                END-IF
       *
+           END-PERFORM
+      *
+           MOVE    1                   TO  WRK-BYOMEI-LEN
+           PERFORM VARYING IDXB    FROM    1   BY  1
+                   UNTIL ( IDXB    >   CONST-BYOCD-MAX )
+      *
+               IF    ( XSUB01-O-TOP (IDXB) =   1 )
+                   IF    ( XSUB01-O-OVER   (IDXB)  =   1 )
+                    OR   ( XSUB01-O-HENSYU (IDXB)  =   1 )
+                       INITIALIZE          XSUB01-O-RECECD-G  (IDXB)
+                       MOVE    1       TO  XSUB01-O-RECECD-MAX(IDXB)
+                       MOVE    CONST-MICODE
+                                       TO  XSUB01-O-RECECD    (IDXB 1)
+                       MOVE    XSUB01-O-BYOMEI (IDXB)
+                                       TO  XSUB01-O-RECECDMEI (IDXB 1)
+                       MOVE    "1"     TO  XSUB01-O-BYOSTATUS (IDXB)
+                       IF    ( XSUB01-O-OVER   (IDXB)  =   1 )
+                           MOVE    2           TO  ERR-RC
+                           MOVE    IDXB        TO  ERR-IDX
+                           PERFORM 2500-ERRCD-HEN-SEC
+                       END-IF
+                   ELSE
+                       INITIALIZE                  ORCSBYOMEIAREA
+                       MOVE    "2"             TO  LNK-BYO-SYORI
+                       MOVE    XSUB01-O-RECECD-MAX (IDXB)
+                                               TO  WRK-RECECD-MAX
+                       PERFORM VARYING IDX5    FROM    1   BY  1
+                               UNTIL ( IDX5    >   WRK-RECECD-MAX )
+                           MOVE    XSUB01-O-RECECD (IDXB IDX5)
+                                           TO  LNK-BYO-TBYOMEICD (IDX5)
+                       END-PERFORM
+                       CALL    "ORCSBYOMEI"    USING
+                                               ORCSBYOMEIAREA
+                                               SPA-AREA
+                       MOVE    LNK-BYO-BYOMEIHENFLG
+                                       TO  XSUB01-O-BYOSTATUS (IDXB)
+                   END-IF
+      *
+                   IF    ( XSUB01-O-BYOMEIALL  NOT =   SPACE )
+                       STRING  "／"    DELIMITED   BY  SIZE
+                       INTO    XSUB01-O-BYOMEIALL
+                       WITH    POINTER WRK-BYOMEI-LEN
+                       END-STRING
+                   END-IF
+      *
+                   STRING  XSUB01-O-BYOMEI (IDXB) DELIMITED   BY  SPACE
+                   INTO    XSUB01-O-BYOMEIALL
+                   WITH    POINTER WRK-BYOMEI-LEN
+                   END-STRING
+      *
+                   IF    ( XSUB01-O-BYOSTATUSALL   =   SPACE )
+                       MOVE    XSUB01-O-BYOSTATUS (IDXB)
+                                       TO  XSUB01-O-BYOSTATUSALL
+                   END-IF
+      *
+               END-IF
       *
            END-PERFORM
       *
-           MOVE    WRK-BYOMEI          TO  XSUB01-O-BYOMEI
+           .
+       2001-RECECD-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ユーザー病名退避領域編集処理
+      *****************************************************************
+       20011-TUSBYO-HEN-SEC            SECTION.
       *
-           IF    ( FLG-OVER            =   1 )
-            OR   ( FLG-HENSYU          =   1 )
-               INITIALIZE                  XSUB01-O-RECECD-G
-               MOVE    1               TO  XSUB01-O-RECECD-MAX
-               MOVE    CONST-MICODE    TO  XSUB01-O-RECECD    (1)
-               MOVE    WRK-BYOMEI      TO  XSUB01-O-RECECDMEI (1)
-               MOVE    "1"             TO  XSUB01-O-BYOSTATUS
-               IF    ( FLG-OVER        =   1 )
-                   MOVE    2           TO  XSUB01-O-RC
-                   MOVE    1           TO  XSUB01-O-ERRIDX
+           PERFORM VARYING IDX-BYO FROM    1   BY  1
+                   UNTIL ( IDX-BYO         >   CONST-BYOCD-MAX )
+      *
+               IF    ( XSUB01-O-BYOCD (IDX-BYO)    NOT =   SPACE )
+                   MOVE    XSUB01-O-BYOCD (IDX-BYO)
+                                       TO  WRK-BYOCD
+                   PERFORM 900-USERBYOMEI-KEY6-SEL-SEC
+                   IF    ( FLG-USERBYOMEI  =   ZERO )
+                       MOVE    USERBYOMEI-REC
+                                       TO  TUSBYO-OCC (IDX-BYO)
+                       IF    ( USBYO-BYOMEISBT =   "1" )
+                           COMPUTE TUSBYOPLUS-CNT-USBUI
+                               =   TUSBYOPLUS-CNT-USBUI
+                               +   1
+                       END-IF
+                   END-IF
+      *
+                   IF    ( XSUB01-O-BYOMEI-CNT =   ZERO )
+      *
+                       MOVE    1       TO  XSUB01-O-TOP (IDX-BYO)
+      *
+                       COMPUTE XSUB01-O-BYOMEI-CNT
+                           =   XSUB01-O-BYOMEI-CNT
+                           +   1
+      *
+                   END-IF
+      *
                END-IF
-           ELSE
-               INITIALIZE                  ORCSBYOMEIAREA
-               MOVE    "2"             TO  LNK-BYO-SYORI
-               PERFORM VARYING IDX5    FROM    1   BY  1
-                       UNTIL ( IDX5    >   XSUB01-O-RECECD-MAX )
-                   MOVE    XSUB01-O-RECECD (IDX5)
-                                       TO  LNK-BYO-TBYOMEICD (IDX5)
-               END-PERFORM
-               CALL    "ORCSBYOMEI"    USING   ORCSBYOMEIAREA
-                                               SPA-AREA
-               MOVE    LNK-BYO-BYOMEIHENFLG
-                                       TO  XSUB01-O-BYOSTATUS
       *
+           END-PERFORM
+      *
+           IF    ( TUSBYOPLUS-CNT-USBUI  =   ZERO )
+            AND  ( XSUB01-SINGLE         =   ZERO )
+               PERFORM VARYING IDX-BYO FROM    2   BY  1
+                       UNTIL ( IDX-BYO         >   CONST-BYOCD-MAX )
+                   IF    ( XSUB01-O-BYOCD (IDX-BYO)    NOT =   SPACE )
+                       PERFORM 200111-TUSBYO-HEN-SEC
+                   END-IF
+               END-PERFORM
            END-IF
       *
            .
-       2001-RECECD-HEN-EXT.
+       20011-TUSBYO-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ユーザー病名退避領域編集処理
+      *****************************************************************
+       200111-TUSBYO-HEN-SEC            SECTION.
+      *
+           MOVE    ZERO        TO  FLG-CHECK
+      *
+           COMPUTE IDXB    =   IDX-BYO  -  1
+           IF    ( XSUB01-O-BYOCD (IDXB)   =   SPACE )
+            AND  ( IDXB                    >   1 )
+               COMPUTE IDXB    =   IDXB    -  1
+           END-IF
+      *
+           IF    ( TUSBYO-HOSPNUM (IDX-BYO)    NOT = ZERO )
+               IF    ( TUSBYO-BYOMEISBT (IDX-BYO)  =  "7" OR "0" )
+                   MOVE    1   TO  FLG-CHECK
+               END-IF
+           ELSE
+               EVALUATE    XSUB01-O-BYOCD(IDX-BYO)(1:1)
+                                    ALSO   XSUB01-O-BYOCD(IDX-BYO)(4:1) 
+               WHEN    "Z"          ALSO    "1"    THRU    "7"
+               WHEN    "0" THRU "9" ALSO    ANY
+                   MOVE    1   TO  FLG-CHECK
+               END-EVALUATE
+           END-IF
+      *
+           IF    ( FLG-CHECK       =   1 )
+               IF    ( TUSBYO-HOSPNUM (IDXB)   NOT = ZERO )
+                   IF    ( TUSBYO-BYOMEISBT (IDXB) = "8" OR "0" )
+      *
+                       MOVE    1       TO    XSUB01-O-TOP (IDX-BYO)
+      *
+                       COMPUTE XSUB01-O-BYOMEI-CNT
+                           =   XSUB01-O-BYOMEI-CNT
+                           +   1
+      *
+                   END-IF
+               ELSE
+                   EVALUATE    XSUB01-O-BYOCD (IDXB)(1:1)
+                               ALSO   XSUB01-O-BYOCD (IDXB)(4:1)
+                   WHEN    "Z" ALSO    "8"
+      *
+                       MOVE    1       TO    XSUB01-O-TOP (IDX-BYO)
+      *
+                       COMPUTE XSUB01-O-BYOMEI-CNT
+                           =   XSUB01-O-BYOMEI-CNT
+                           +   1
+      *
+                   WHEN    "Z" ALSO    ANY
+                       CONTINUE
+                   WHEN    OTHER
+      *
+                       MOVE    1       TO    XSUB01-O-TOP (IDX-BYO)
+      *
+                       COMPUTE XSUB01-O-BYOMEI-CNT
+                           =   XSUB01-O-BYOMEI-CNT
+                           +   1
+      *
+                   END-EVALUATE
+               END-IF
+           END-IF
+      *
+           .
+       200111-TUSBYO-HEN-EXT.
            EXIT.
       *****************************************************************
       *    レセ電コード編集処理
@@ -442,7 +599,7 @@
            PERFORM 20011-USERBYO-HEN-SEC
            IF    ( FLG-UBYOERR         =   ZERO )
                STRING  WRK-USBYOMEI        DELIMITED   BY  SPACE
-               INTO    WRK-BYOMEI
+               INTO    XSUB01-O-BYOMEI (IDXT)
                WITH    POINTER WRK-BYOMEI-LEN
                END-STRING
            ELSE
@@ -456,7 +613,7 @@
                    END-IF
       *
                    STRING  WRK-RECECDMEI       DELIMITED   BY  SPACE
-                   INTO    WRK-BYOMEI
+                   INTO    XSUB01-O-BYOMEI (IDXT)
                    WITH    POINTER WRK-BYOMEI-LEN
                    END-STRING
                ELSE
@@ -493,17 +650,20 @@
            END-IF
       *
            IF    ( FLG-BYOMEIERR       =   ZERO )
-               IF    ( XSUB01-O-RECECD-MAX
+               IF    ( XSUB01-O-RECECD-MAX (IDXT)
                                        >=  CONST-MKCD-MAX )
-                   MOVE    1           TO  FLG-OVER
+                   MOVE    1           TO  XSUB01-O-OVER (IDXT)
                ELSE
-                   COMPUTE XSUB01-O-RECECD-MAX
-                       =   XSUB01-O-RECECD-MAX +   1
-                   MOVE    WRK-RECECD  TO  XSUB01-O-RECECD
-                                                   (XSUB01-O-RECECD-MAX)
+                   COMPUTE XSUB01-O-RECECD-MAX (IDXT)
+                       =   XSUB01-O-RECECD-MAX (IDXT) +   1
+      *
+                   MOVE    XSUB01-O-RECECD-MAX (IDXT)
+                                   TO  IDXN
+                   MOVE    WRK-RECECD
+                                   TO  XSUB01-O-RECECD    (IDXT IDXN)
                    MOVE    WRK-RECECDMEI
-                                       TO  XSUB01-O-RECECDMEI
-                                                   (XSUB01-O-RECECD-MAX)
+                                   TO  XSUB01-O-RECECDMEI (IDXT IDXN)
+      *
                END-IF
            END-IF
       *
@@ -518,15 +678,19 @@
            MOVE    SPACE               TO  WRK-USBYOMEI
            MOVE    ZERO                TO  FLG-UBYOERR
       *
-           PERFORM 900-USERBYOMEI-KEY6-SEL-SEC
-           IF    ( FLG-USERBYOMEI  =   ZERO )
+           IF    ( TUSBYO-HOSPNUM (WRK-BYOCD-IDX)
+                                       NOT =   ZERO )
+      *
+               MOVE    TUSBYO-OCC (WRK-BYOCD-IDX)
+                                       TO  USERBYOMEI-REC
+      *
                MOVE    USBYO-BYOMEI    TO  WRK-USBYOMEI
                PERFORM VARYING IDX4    FROM    1   BY  1
                        UNTIL ( IDX4    >   CONST-MKCD-MAX )
                         OR   ( USBYO-BYOMEICD (IDX4)  =   "9999999" )
                         OR   ( USBYO-BYOMEICD (IDX4)  =  SPACE )
                    IF    ( USBYO-BYOMEICD (IDX4)  =   CONST-MICODE )
-                       MOVE    1   TO  FLG-HENSYU
+                       MOVE    1   TO  XSUB01-O-HENSYU (IDXT)
                    ELSE
                        MOVE    USBYO-BYOMEICD (IDX4)
                                        TO  WRK-RECECD
@@ -591,22 +755,33 @@
        800-DISPLAY-SEC                     SECTION.
       *
            DISPLAY "= ST ======================================"
+           DISPLAY "XSUB01-O-BYOMEI-CNT = " XSUB01-O-BYOMEI-CNT
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0    >   CONST-BYOCD-MAX )
-               DISPLAY "XSUB01-O-BYOCD (" IDX0 ") = "
-                        XSUB01-O-BYOCD (IDX0)
+      *
+               DISPLAY IDX0 ":TOP      [" XSUB01-O-TOP      (IDX0) "]"
+               DISPLAY IDX0 ":OVER     [" XSUB01-O-OVER     (IDX0) "]"
+               DISPLAY IDX0 ":HENSYU   [" XSUB01-O-HENSYU   (IDX0) "]"
+               DISPLAY IDX0 ":TOP      [" XSUB01-O-TOP      (IDX0) "]"
+               DISPLAY IDX0 ":BYOCD    [" XSUB01-O-BYOCD    (IDX0) "]"
+               DISPLAY IDX0 ":BYOMEI   [" XSUB01-O-BYOMEI   (IDX0) "]"
+               DISPLAY IDX0 ":BYOSTATUS[" XSUB01-O-BYOSTATUS(IDX0) "]"
+      *
+               IF    ( XSUB01-O-TOP      (IDX0) =  1 )
+                   MOVE    XSUB01-O-RECECD-MAX (IDX0)
+                                       TO  WRK-RECECD-MAX
+                   PERFORM VARYING IDX1    FROM    1   BY  1
+                           UNTIL ( IDX1    >   WRK-RECECD-MAX )
+      *
+                       DISPLAY IDX0 "-" IDX1 ":RECECD ["
+                               XSUB01-O-RECECD (IDX0 IDX1) "]"
+                       DISPLAY IDX0 "-" IDX1 ":RECEMEI["
+                               XSUB01-O-RECECDMEI (IDX0 IDX1) "]"
+      *
+                   END-PERFORM
+               END-IF
+      *
            END-PERFORM
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   XSUB01-O-RECECD-MAX )
-               DISPLAY "XSUB01-O-RECECD (" IDX0 ") = "
-                        XSUB01-O-RECECD (IDX0)
-               DISPLAY "XSUB01-O-RECECDMEI (" IDX0 ") = "
-                        XSUB01-O-RECECDMEI (IDX0)
-           END-PERFORM
-           DISPLAY "XSUB01-O-BYOSTATUS = " XSUB01-O-BYOSTATUS
-           DISPLAY "XSUB01-O-BYOMEI    = " XSUB01-O-BYOMEI
-           DISPLAY "XSUB01-O-RC        = " XSUB01-O-RC
-           DISPLAY "XSUB01-O-ERRIDX    = " XSUB01-O-ERRIDX
            DISPLAY "= ED ======================================"
       *
            .

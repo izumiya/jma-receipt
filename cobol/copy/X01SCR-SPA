@@ -128,6 +128,44 @@
                        09  SPA-GMN-X06-TEKNAME     PIC X(100).
                        09  SPA-GMN-X06-TEKCDBF     PIC X(20).
       *
+      *    £Ø£°£·²èÌÌÍÑ
+           03  SPA-GMN-X07-AREA.
+               05  SPA-GMN-X07-PAGE                PIC 9(05).
+               05  SPA-GMN-X07-CUR                 PIC 9(03).
+               05  SPA-GMN-X07-SELBYOMEI           PIC X(50).
+               05  SPA-GMN-X07-BUNRUICD            PIC 9(03).
+               05  SPA-GMN-X07-SELNUM              PIC 9(05).
+               05  SPA-GMN-X07-INPUT-AREA.
+                   07  SPA-GMN-X07-BYOMEICD-G.
+                       09  SPA-GMN-X07-BYOCD       PIC X(20)
+                                                   OCCURS  6.
+                   07  SPA-GMN-X07-BYOMEI          PIC X(400).
+               05  SPA-GMN-X07-BUNLST-AREA.
+                   07  SPA-GMN-X07-BUNLST-SEL      PIC 9(05).
+                   07  SPA-GMN-X07-BUNLST-MAX      PIC 9(05).
+                   07  SPA-GMN-X07-BUNLST-OCC      OCCURS  100.
+                       09  SPA-GMN-X07-BBUNRUICD   PIC X(07).
+                       09  SPA-GMN-X07-BBUNRUIMEI  PIC X(20).
+               05  SPA-GMN-X07-UBYOLST-PAGE        PIC 9(05).
+               05  SPA-GMN-X07-UBYOLST-AREA.
+                   07  SPA-GMN-X07-UBYOLST-NEXT    PIC 9(01).
+                   07  SPA-GMN-X07-UBYOLST-SEL     PIC 9(05).
+                   07  SPA-GMN-X07-UBYOLST-MAX     PIC 9(05).
+                   07  SPA-GMN-X07-UBYOLST-OCC     OCCURS  100.
+                       09  SPA-GMN-X07-TBANGO      PIC 9(05).
+                       09  SPA-GMN-X07-TINPUTCD    PIC X(10).
+                       09  SPA-GMN-X07-TBYOMEI     PIC X(80).
+           03  SPA-NAI-X07-AREA.
+               05  SPA-NAI-X07-INPUT-AREA.
+                   07  SPA-NAI-X07-BYOINF-MAX      PIC 9(03).
+                   07  SPA-NAI-X07-BYOINF-OCC      OCCURS 6.
+                       09  SPA-NAI-X07-BYOIDX      PIC 9(03).
+                       09  SPA-NAI-X07-BYOMEI      PIC X(100).
+                       09  SPA-NAI-X07-BYOSTATUS   PIC X(1).
+                       09  SPA-NAI-X07-BYOCD-G.
+                           11  SPA-NAI-X07-BYOCD-OCC   OCCURS 21.
+                               13  SPA-NAI-X07-BYOCD   PIC X(07).
+      *
       *    £Ø£¹£¸²èÌÌÍÑ
            03  SPA-X98-MOTOPG                    PIC X(08).
            03  SPA-X98GMN-AREA.

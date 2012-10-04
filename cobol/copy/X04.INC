@@ -1,6 +1,7 @@
         02  X04.
       *     02  X04-FIXED2.
               03  X04-B03-STATE PIC S9(9)   BINARY.
+              03  X04-B04-STATE PIC S9(9)   BINARY.
               03  X04-B05-G.
                   05  X04-B05-LABEL PIC X(10).
                   05  X04-B05-STATE PIC S9(9)   BINARY.
@@ -35,7 +36,7 @@
                 04  X04-BYOMEICD   PIC X(20).
                 04  X04-BYOMEICD-STATE   PIC S9(9)   BINARY.
               03  X04-BYOMEI.
-                04  X04-VALUE   PIC X(100).
+                04  X04-VALUE   PIC X(400).
               03  X04-BYOMEI-STATE   PIC S9(9)   BINARY.
               03  X04-CMB-JYKNKBN.
                 04  X04-JYKNKBN.
@@ -120,9 +121,9 @@
                   05  X04-CDLST-COUNT   PIC S9(9)   BINARY.
                   05  X04-CDLST-ROW     PIC S9(9)   BINARY.
                   05  X04-CDLST-ROWATTR PIC S9(9)   BINARY.
-                  05  X04-CDLST-ITEM    OCCURS  30 TIMES.
+                  05  X04-CDLST-ITEM    OCCURS  150 TIMES.
                     06  X04-TCDNO       PIC X(3).
                     06  X04-TCDBYOCD    PIC X(7).
                     06  X04-TCDBYOMEI   PIC X(40).
                   05  X04-CDLST-SELECT
-                                        PIC X   OCCURS  30 TIMES.
+                                        PIC X   OCCURS  150 TIMES.

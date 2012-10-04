@@ -96,6 +96,8 @@
                05  WRK-SEL-STBYOMEICD      PIC X(07).
                05  WRK-SEL-EDBYOMEICD      PIC X(07).
            03  WRK-NO                      PIC 9(05).
+           03  WRK-TABLE                   PIC X(64).
+           03  WRK-PATHNAME                PIC X(64).
       *
        01  WRK-ROW-AREA.
            03  WRK-SRCBYOLST-ROW           PIC S9(9)   BINARY.
@@ -169,6 +171,7 @@
            COPY    "X04.INC".
            COPY    "X05.INC".
            COPY    "X06.INC".
+           COPY    "X07.INC".
            COPY    "X91.INC".
            COPY    "X97.INC".
            COPY    "X98.INC".
@@ -285,25 +288,35 @@
       *    コンボボックス初期処理
            PERFORM 3101-COMBO-SYOKI-SEC
       *
-           MOVE    SPA-GMN-X99-SRCBYOKBNLST (1)
+           IF    ( SPA-X01-INDEX       =   ZERO )
+      *
+               MOVE    SPA-GMN-X99-SRCBYOKBNLST (1)
                                        TO  SPA-GMN-X99-SRCBYOKBN-G
-           PERFORM 3101-SRTKBNLST-PTBYO-SET-SEC
-           MOVE    SPA-GMN-X99-SRTKBNLST (1)
-                                       TO  SPA-GMN-X99-SRTKBN-G
-           PERFORM 4101-SRCBYOLST-SEC
-           IF    ( SPA-GMN-X99-SRCBYOLST-MAX   =   ZERO )
-               MOVE    SPA-GMN-X99-SRCBYOKBNLST (3)
-                                       TO  SPA-GMN-X99-SRCBYOKBN-G
-               PERFORM 3101-SRTKBNLST-UBYO-SET-SEC
+               PERFORM 3101-SRTKBNLST-PTBYO-SET-SEC
                MOVE    SPA-GMN-X99-SRTKBNLST (1)
                                        TO  SPA-GMN-X99-SRTKBN-G
                PERFORM 4101-SRCBYOLST-SEC
-           END-IF
-      *
-           IF    ( SPA-GMN-X99-SRCBYOLST-MAX   =   ZERO )
-               MOVE    SPA-GMN-X99-SRCBYOKBNLST (2)
+               IF    ( SPA-GMN-X99-SRCBYOLST-MAX   =   ZERO )
+                   MOVE    SPA-GMN-X99-SRCBYOKBNLST (3)
                                        TO  SPA-GMN-X99-SRCBYOKBN-G
-               PERFORM 3101-SRTKBNLST-BYO-SET-SEC
+                   PERFORM 3101-SRTKBNLST-UBYO-SET-SEC
+                   MOVE    SPA-GMN-X99-SRTKBNLST (1)
+                                       TO  SPA-GMN-X99-SRTKBN-G
+                   PERFORM 4101-SRCBYOLST-SEC
+               END-IF
+      *
+               IF    ( SPA-GMN-X99-SRCBYOLST-MAX   =   ZERO )
+                   MOVE    SPA-GMN-X99-SRCBYOKBNLST (2)
+                                       TO  SPA-GMN-X99-SRCBYOKBN-G
+                   PERFORM 3101-SRTKBNLST-BYO-SET-SEC
+                   MOVE    SPA-GMN-X99-SRTKBNLST (1)
+                                       TO  SPA-GMN-X99-SRTKBN-G
+                   PERFORM 4101-SRCBYOLST-SEC
+               END-IF
+           ELSE
+               MOVE    SPA-GMN-X99-SRCBYOKBNLST (3)
+                                       TO  SPA-GMN-X99-SRCBYOKBN-G
+               PERFORM 3101-SRTKBNLST-UBYO-SET-SEC
                MOVE    SPA-GMN-X99-SRTKBNLST (1)
                                        TO  SPA-GMN-X99-SRTKBN-G
                PERFORM 4101-SRCBYOLST-SEC
@@ -468,6 +481,20 @@
       *****************************************************************
        3101-SRTKBNLST-SET-SEC          SECTION.
       *
+           IF    ( SPA-X01-INDEX   =   ZERO )
+               PERFORM 31011-SRTKBNLST-SET-SEC
+           ELSE
+               PERFORM 31012-SRTKBNLST-SET-SEC
+           END-IF
+      *
+           .
+       3101-SRTKBNLST-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ソース病名検索キー編集
+      *****************************************************************
+       31011-SRTKBNLST-SET-SEC         SECTION.
+      *
            INITIALIZE              WRK-SEL-BYOMEI-G
            MOVE    SPA-GMN-X99-SEL-BYOMEI
                                TO  WRK-SEL-BYOMEI
@@ -514,7 +541,21 @@
            END-EVALUATE
       *
            .
-       3101-SRTKBNLST-SET-EXT.
+       31011-SRTKBNLST-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ソース病名検索キー編集
+      *****************************************************************
+       31012-SRTKBNLST-SET-SEC         SECTION.
+      *
+           INITIALIZE              WRK-SEL-BYOMEI-G
+           MOVE    SPA-GMN-X99-SEL-BYOMEI
+                               TO  WRK-SEL-BYOMEI
+      *
+           PERFORM 41013-SRCBYOLST-UBYO-SEC
+      *
+           .
+       31012-SRTKBNLST-SET-EXT.
            EXIT.
       *****************************************************************
       *    画面遷移処理
@@ -612,9 +653,11 @@
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
       *
-           PERFORM 4101-SEL-BYOMEI-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-X01-INDEX   =   ZERO )
+               PERFORM 4101-SEL-BYOMEI-CHK-SEC
+               IF    ( SPA-ERRCD   NOT =   SPACE )
+                   GO  TO  4102-KIHON-CHK-EXT
+               END-IF
            END-IF
       *
            PERFORM 4101-SRCBYOKBN-CHK-SEC
@@ -726,7 +769,6 @@
       *
                IF    ( SPA-ERRCD       =   SPACE )
                    MOVE    SNUM-OUTNUM TO  SPA-NAI-X99-SELNUM
-                   DISPLAY "SNUM-OUTEDT =" SNUM-OUTEDT
                    MOVE    SNUM-OUTEDT TO  SPA-GMN-X99-SELNUM
                END-IF
            END-IF
@@ -1006,7 +1048,34 @@
            INITIALIZE              SPA-GMN-X99-SRCBYOLST-AREA
                                    SPA-NAI-X99-SRCBYOLST-AREA
       *
-           PERFORM 900-USERBYOMEI-KEY10-SEL-SEC
+           IF    ( SPA-X01-INDEX   =   ZERO )
+      *
+               INITIALIZE              USERBYOMEI-REC
+               MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
+      *
+               MOVE    WRK-SEL-BUNRUICD
+                                       TO  USBYO-BUNRUICD
+      *
+               STRING  WRK-SEL-BYOMEI  DELIMITED   BY  SPACE
+                       "%"             DELIMITED   BY  SIZE
+               INTO    USBYO-BYOMEI
+               END-STRING
+               MOVE    "tbl_userbyomei"    TO  WRK-TABLE
+               MOVE    "key10"             TO  WRK-PATHNAME
+           ELSE
+      *
+               INITIALIZE              USERBYOMEI-REC
+               MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
+      *
+               STRING  WRK-SEL-BYOMEI  DELIMITED   BY  SPACE
+                       "%"             DELIMITED   BY  SIZE
+               INTO    USBYO-BYOMEIINPUTCD
+               END-STRING
+               MOVE    "tbl_userbyomei"    TO  WRK-TABLE
+               MOVE    "key11"             TO  WRK-PATHNAME
+           END-IF
+      *
+           PERFORM 900-USERBYOMEI-SEL-SEC
       *
            PERFORM 41013-UBYO-SKIP-SEC
       *
@@ -1033,12 +1102,12 @@
       *
                END-PERFORM
       *
-               PERFORM 900-USERBYOMEI-KEY10-FET-SEC
+               PERFORM 900-USERBYOMEI-FET-SEC
       *
            END-PERFORM
       *
-           MOVE    "tbl_userbyomei"    TO  MCP-TABLE
-           MOVE    "key10"             TO  MCP-PATHNAME
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            MOVE    IDX1            TO  SPA-GMN-X99-SRCBYOLST-MAX
@@ -1066,7 +1135,7 @@
       *
                COMPUTE CNT-SRCBYOLST   =   CNT-SRCBYOLST   +   1
       *
-               PERFORM 900-USERBYOMEI-KEY10-FET-SEC
+               PERFORM 900-USERBYOMEI-FET-SEC
       *
            END-PERFORM
       *
@@ -1330,6 +1399,11 @@
       *
            MOVE    WIDGET-NORMAL       TO  X99-B07-STATE
                                            X99-B07S-STATE
+                                           X99-SEL-BYOMEI-STATE
+                                           X99-SRCBYOKBN-STATE
+                                           X99-SRCBYOKBN-ITEM-STATE
+                                           X99-SRTKBN-STATE
+                                           X99-SRTKBN-ITEM-STATE
       *
            IF    ( SPA-GMN-X99-SRCBYOLST-PAGE  <=  1 )
                MOVE    WIDGET-INSENSITIVE  TO  X99-B07-STATE
@@ -1337,6 +1411,15 @@
       *
            IF    ( SPA-GMN-X99-SRCBYOLST-NEXT   =  ZERO )
                MOVE    WIDGET-INSENSITIVE  TO  X99-B07S-STATE
+           END-IF
+      *
+           IF    ( SPA-X01-INDEX   NOT =   ZERO )
+               MOVE    WIDGET-INSENSITIVE
+                                       TO  X99-SEL-BYOMEI-STATE
+                                           X99-SRCBYOKBN-STATE
+                                           X99-SRCBYOKBN-ITEM-STATE
+                                           X99-SRTKBN-STATE
+                                           X99-SRTKBN-ITEM-STATE
            END-IF
       *
            PERFORM 5001-MAPCUR-SEC
@@ -1355,6 +1438,12 @@
                PERFORM 5011-INPUT-CUR-SEC
            END-IF
       *
+           IF    ( SPA-GMN-X99-CUR     =   1 )
+               IF    ( SPA-GMN-X99-SRCBYOLST-MAX   =   ZERO )
+                   MOVE    201         TO  SPA-GMN-X99-CUR
+               END-IF
+           END-IF
+      *
            EVALUATE    SPA-GMN-X99-CUR
            WHEN    001
                MOVE    "SEL_BYOMEI"    TO  MCP-WIDGET
@@ -1364,6 +1453,8 @@
                MOVE    "SRCBYOKBN"     TO  MCP-WIDGET
            WHEN    004
                MOVE    "SRTKBN"        TO  MCP-WIDGET
+           WHEN    201
+               MOVE    "B01"           TO  MCP-WIDGET
            END-EVALUATE
       *
            .
@@ -1691,25 +1782,14 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *****************************************************************
       *    自院病名検索処理(KEY10)
       *****************************************************************
-       900-USERBYOMEI-KEY10-SEL-SEC    SECTION.
+       900-USERBYOMEI-SEL-SEC    SECTION.
       *
            MOVE    ZERO            TO  FLG-USERBYOMEI
       *
-           INITIALIZE              USERBYOMEI-REC
-           MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
-      *
-           MOVE    WRK-SEL-BUNRUICD
-                                   TO  USBYO-BUNRUICD
-      *
-           STRING  WRK-SEL-BYOMEI  DELIMITED   BY  SPACE
-                   "%"             DELIMITED   BY  SIZE
-           INTO    USBYO-BYOMEI
-           END-STRING
-      *
            MOVE    USERBYOMEI-REC  TO  MCPDATA-REC
-           MOVE    "tbl_userbyomei"
-                                   TO  MCP-TABLE
-           MOVE    "key10"         TO  MCP-PATHNAME
+      *
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC    =     ZERO )
                MOVE    MCPDATA-REC TO  USERBYOMEI-REC
@@ -1720,16 +1800,15 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            .
       *
-       900-USERBYOMEI-KEY10-SEL-EXT.
+       900-USERBYOMEI-SEL-EXT.
            EXIT.
       *****************************************************************
       *    自院病名FETCH処理(KEY10)
       *****************************************************************
-       900-USERBYOMEI-KEY10-FET-SEC    SECTION.
+       900-USERBYOMEI-FET-SEC    SECTION.
       *
-           MOVE    "tbl_userbyomei"
-                                   TO  MCP-TABLE
-           MOVE    "key10"         TO  MCP-PATHNAME
+           MOVE    WRK-TABLE       TO  MCP-TABLE
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC    =     ZERO )
                MOVE    MCPDATA-REC TO  USERBYOMEI-REC
@@ -1740,7 +1819,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            .
       *
-       900-USERBYOMEI-KEY10-FET-EXT.
+       900-USERBYOMEI-FET-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

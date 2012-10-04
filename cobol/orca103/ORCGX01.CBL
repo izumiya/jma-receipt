@@ -135,6 +135,7 @@
            03  FLG-INPUTCD                        PIC 9(01).
            03  FLG-INPUTSET                       PIC 9(01).
            03  FLG-SRYCDCHG                       PIC 9(01).
+           03  FLG-USERBYOMEI                     PIC 9(01).
       *
        01  CNT-AREA.
            03  CNT-STR                 PIC 9(05).
@@ -146,6 +147,7 @@
            03  IDX0                              PIC 9(04).
            03  IDX1                              PIC 9(04).
            03  IDX2                              PIC 9(04).
+           03  IDXB                              PIC 9(04).
            03  IDXL                              PIC 9(04).
            03  IDX-PNT                           PIC 9(04).
            03  IDX-CMB                           PIC 9(04).
@@ -170,7 +172,7 @@
       *    入力項目名
            03  WRK-MCP-WIDGET          PIC X(64).
       *
-           03  WRK-INPUTCD             PIC X(09).
+           03  WRK-INPUTCD             PIC X(20).
            03  WRK-CD-MCNT             PIC 9(02).
            03  WRK-CHKKBN              PIC X(01).
            03  WRK-CHKKBN-G            PIC X(50).
@@ -244,6 +246,9 @@
        01  SRYCDCHG-REC.
            COPY    "CPSRYCDCHG.INC".
       *
+       01  USERBYOMEI-REC.
+           COPY    "CPUSERBYOMEI.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -289,6 +294,7 @@
            COPY    "X04.INC".
            COPY    "X05.INC".
            COPY    "X06.INC".
+           COPY    "X07.INC".
            COPY    "X91.INC".
            COPY    "X97.INC".
            COPY    "X98.INC".
@@ -640,6 +646,7 @@
       *    検索
            WHEN    "CLICKED"       ALSO    "B09"
                IF    ( SPA-GMN-CHKKBN      =   "8" OR "9" )
+                   INITIALIZE              SPA-X01-USERBYOMEI-G
                    MOVE    SPACE               TO  WRK-BYOMEI
                    PERFORM  410-KENSAKU-SEC
                ELSE
@@ -1556,6 +1563,7 @@
       *
       *    検索へ
            IF    ( SPA-GMN-SRYCD(1:1)  =   "/" )
+               INITIALIZE              SPA-X01-USERBYOMEI-G
                MOVE    SPACE       TO  WRK-BYOMEI
                PERFORM 410-KENSAKU-SEC
                GO  TO  4101-BYOMEICD-CHK-EXT
@@ -1576,21 +1584,30 @@
                        XSUB01-BYOCD (6)
            END-UNSTRING
       *
+           MOVE    1               TO  XSUB01-SINGLE
            CALL    "ORCGXSUB01"    USING   SPA-AREA
                                            XSUB01-LNK
       *
            MOVE    SPACE           TO  SPA-NAI-BYOCD-G
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   CONST-MKCD-MAX )
+           PERFORM VARYING IDXB    FROM    1   BY  1
+                   UNTIL ( IDXB    >   CONST-BYOCD-MAX )
       *
-               MOVE    XSUB01-O-RECECD (IDX0)
+               IF    ( XSUB01-O-TOP (IDXB) =   1 )
+                   PERFORM VARYING IDX0    FROM    1   BY  1
+                           UNTIL ( IDX0    >   CONST-MKCD-MAX )
+                       MOVE    XSUB01-O-RECECD (IDXB IDX0)
                                    TO  SPA-NAI-BYOCD (IDX0)
+                   END-PERFORM
+                   MOVE    CONST-BYOCD-MAX
+                                   TO  IDXB
+               END-IF
       *
            END-PERFORM
       *
-           MOVE    XSUB01-O-BYOSTATUS  TO  SPA-GMN-BYOSTATUS
+           MOVE    XSUB01-O-BYOSTATUSALL
+                                        TO  SPA-GMN-BYOSTATUS
       *
-           MOVE    XSUB01-O-BYOMEI     TO  SPA-GMN-NAME
+           MOVE    XSUB01-O-BYOMEIALL  TO  SPA-GMN-NAME
       *
            EVALUATE    XSUB01-O-RC
            WHEN    1
@@ -1600,8 +1617,34 @@
            WHEN    3
                MOVE    "0017"          TO  SPA-ERRCD
            WHEN    4
-               MOVE    "0018"          TO  SPA-ERRCD
+               IF    ( XSUB01-BYOCD (1)  NOT =   SPACE )
+                AND  ( XSUB01-BYOCD (2)      =   SPACE )
+                AND  ( XSUB01-BYOCD (3)      =   SPACE )
+                AND  ( XSUB01-BYOCD (4)      =   SPACE )
+                AND  ( XSUB01-BYOCD (5)      =   SPACE )
+                AND  ( XSUB01-BYOCD (6)      =   SPACE )
+                   MOVE    XSUB01-BYOCD (1)
+                                       TO  WRK-INPUTCD
+                   PERFORM 900-USERBYOMEI-KEY11-SEL-SEC
+                   IF    ( FLG-USERBYOMEI  =   ZERO )
+                       INITIALIZE          SPA-X01-USERBYOMEI-G
+                       MOVE    1       TO  SPA-X01-INDEX
+                       MOVE    XSUB01-BYOCD (1)
+                                       TO  WRK-BYOMEI
+                       PERFORM 410-KENSAKU-SEC
+                       GO  TO  4101-BYOMEICD-CHK-EXT
+                    ELSE
+                        MOVE    "0018" TO  SPA-ERRCD
+                    END-IF
+               ELSE
+                        MOVE    "0018" TO  SPA-ERRCD
+               END-IF
            END-EVALUATE
+      *
+           IF    ( XSUB01-O-BYOMEI-CNT >   1 )
+               MOVE    "0023"          TO  SPA-ERRCD
+               INITIALIZE                  SPA-NAI-BYOCD-G
+           END-IF
       *
            IF    ( SPA-ERRCD           =   SPACE )
             OR   ( SPA-ERRCD           =   "0016" )
@@ -1610,6 +1653,7 @@
                MOVE    SPA-GMN-SRYCD   TO  WRK-MAE-INPUT
                PERFORM 800-KANA-CHK-SEC
                IF    ( FLG-ZENKAKU     =   1 )
+                   INITIALIZE          SPA-X01-USERBYOMEI-G
                    INITIALIZE          SPA-GMN-BYOSTATUS
                                        SPA-NAI-BYOCD-G
                    MOVE    SPACE       TO  SPA-ERRCD
@@ -2680,6 +2724,9 @@
                        "のみ指定可能です"      DELIMITED   BY  SIZE
                INTO    SPA-ERRMSG
                END-STRING
+           WHEN    "0023"
+               MOVE    "複数病名の指定はできません"
+                                                   TO  SPA-ERRMSG
            END-EVALUATE
       *
            MOVE    SPACE                TO  XERR
@@ -3079,6 +3126,40 @@
       *
            .
        900-CHK005-KEY2-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    自院病名検索処理(KEY11)
+      *****************************************************************
+       900-USERBYOMEI-KEY11-SEL-SEC    SECTION.
+      *
+           MOVE    ZERO                TO  FLG-USERBYOMEI
+      *
+           INITIALIZE                      USERBYOMEI-REC
+           MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
+      *
+           STRING  WRK-INPUTCD             DELIMITED   BY  SPACE
+                   "%"                     DELIMITED   BY  SIZE
+           INTO    USBYO-BYOMEIINPUTCD
+           END-STRING
+      *
+           MOVE    USERBYOMEI-REC      TO  MCPDATA-REC
+           MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC    =     ZERO )
+               MOVE    MCPDATA-REC     TO  USERBYOMEI-REC
+           ELSE
+               INITIALIZE                  USERBYOMEI-REC
+               MOVE    1               TO  FLG-USERBYOMEI
+           END-IF
+      *
+           MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-USERBYOMEI-KEY11-SEL-EXT.
            EXIT.
       *****************************************************************
       *    入力コード検索処理

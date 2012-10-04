@@ -17,25 +17,31 @@
       ********************************************************************
        01  XSUB01-LNK.
            03  XSUB01-IN-AREA.
+               05  XSUB01-SINGLE                   PIC 9(01).
                05  XSUB01-BYOCD-G.
-                   07  XSUB01-BYOCD-OCC        OCCURS  6.
-                       11  XSUB01-BYOCD        PIC X(20).
+                   07  XSUB01-BYOCD-OCC            OCCURS  6.
+                       09  XSUB01-BYOCD            PIC X(20).
            03  XSUB01-OT-AREA.
-               05  XSUB01-O-BYOCD-G.
-                   07  XSUB01-O-BYOCD-OCC      OCCURS  6.
-                       11  XSUB01-O-BYOCD      PIC X(20).
-               05  XSUB01-O-RECECD-G.
-                   07  XSUB01-O-RECECD-MAX     PIC 9(05).
-                   07  XSUB01-O-RECECD-OCC     OCCURS  21.
-                       11  XSUB01-O-RECECD     PIC X(07).
-                       11  XSUB01-O-RECECDMEI  PIC X(100).
-               05  XSUB01-O-BYOSTATUS          PIC X(01).
-               05  XSUB01-O-BYOMEI             PIC X(200).
+               05  XSUB01-O-BYOMEI-CNT             PIC 9(05).
+               05  XSUB01-O-BYOCD-OCC              OCCURS  6.
+                   07  XSUB01-O-TOP                PIC 9(01).
+                   07  XSUB01-O-OVER               PIC 9(01).
+                   07  XSUB01-O-HENSYU             PIC 9(01).
+                   07  XSUB01-O-BYOCD              PIC X(20).
+                   07  XSUB01-O-BYOMEI             PIC X(100).
+                   07  XSUB01-O-BYOSTATUS          PIC X(01).
+                   07  XSUB01-O-RECECD-G.
+                       09  XSUB01-O-RECECD-MAX     PIC 9(05).
+                       09  XSUB01-O-RECECD-OCC     OCCURS  21.
+                           11  XSUB01-O-RECECD     PIC X(07).
+                           11  XSUB01-O-RECECDMEI  PIC X(100).
+               05  XSUB01-O-BYOSTATUSALL           PIC X(01).
+               05  XSUB01-O-BYOMEIALL              PIC X(400).
       *        リターンコード
       *        ０：正常
       *        １：未コード化傷病名コードの直接入力
       *        ２：レセ電コードが２１件を超過
       *        ３：該当コードなし（病名マスタ）
       *        ４：該当コードなし（自院病名マスタ）
-               05  XSUB01-O-RC                 PIC 9(03).
-               05  XSUB01-O-ERRIDX             PIC 9(03).
+               05  XSUB01-O-RC                     PIC 9(03).
+               05  XSUB01-O-ERRIDX                 PIC 9(03).

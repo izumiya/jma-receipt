@@ -49,7 +49,20 @@
                07  SPA-X01-CHKKBN              PIC X(01).
                07  SPA-X01-CHKKBNFL            PIC X(01).
                07  SPA-X01-CHKKBNNAME          PIC X(48).
-      *選択番号         
+           05  SPA-X01-USERBYOMEI-G.
+               07  SPA-X01-POSITION        PIC 9(01).
+      *検索分類コード
+               07  SPA-X01-BUNRUICD        PIC 9(03).
+      *検索自院病名コード（コード検索時のみ設定）
+               07  SPA-X01-BYOMEIINPUTCD   PIC X(10).
+               07  SPA-X01-INDEX           PIC 9(01).
+               07  SPA-X01-BYOSEL          PIC 9(05).
+               07  SPA-X01-UERBYOMEI-KAKUTEI
+                                           PIC 9(01).
+               07  SPA-X01-INPUTCD-G.
+                   09  SPA-X01-INPUTCD     PIC X(20)
+                                           OCCURS  6.
+      *選択番号
            05  SPA-X01-SELNUM              PIC 9(03).
            05  SPA-X01-BYOSTATUS           PIC X(1).
            05  SPA-X01-JYKNKBN             PIC X(1).

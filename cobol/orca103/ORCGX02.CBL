@@ -272,6 +272,7 @@
            COPY    "X04.INC".
            COPY    "X05.INC".
            COPY    "X06.INC".
+           COPY    "X07.INC".
            COPY    "X91.INC".
            COPY    "X97.INC".
            COPY    "X98.INC".

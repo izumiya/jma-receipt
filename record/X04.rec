@@ -3,6 +3,9 @@ X04	{
 		B03	{
 			state	int;
 		};
+		B04	{
+			state	int;
+		};
 		B05	{
 			label	varchar(10);
 			state	int;
@@ -76,7 +79,7 @@ X04	{
 			state	int;
 		};
 		BYOMEI	{
-			value	varchar(100);
+			value	varchar(400);
 			state	int;
 		};
 		CMB_JYKNKBN	{
@@ -185,8 +188,8 @@ X04	{
 					value0	varchar(3);
 					value1	varchar(7);
 					value2	varchar(40);
-				}	[30];
-				select	bool[30];
+				}	[150];
+				select	bool[150];
 			};
 		};
 	};

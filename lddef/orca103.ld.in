@@ -10,6 +10,7 @@ bind	"X03"		"OpenCOBOL"	"ORCGX03";
 bind	"X04"		"OpenCOBOL"	"ORCGX04";
 bind	"X05"		"OpenCOBOL"	"ORCGX05";
 bind	"X06"		"OpenCOBOL"	"ORCGX06";
+bind	"X07"		"OpenCOBOL"	"ORCGX07";
 bind	"X91"		"OpenCOBOL"	"ORCGX91";
 bind	"X97"		"OpenCOBOL"	"ORCGX97";
 bind	"X98"		"OpenCOBOL"	"ORCGX98";
@@ -31,6 +32,7 @@ data	{
 		X04;
 		X05;
 		X06;
+		X07;
 		X91;
 		X97;
 		X98;

@@ -11,20 +11,25 @@ X99	{
 		};
 		SEL_BYOMEI	{
 			value	varchar(100);
+			state	int;
 		};
 		CMB_SRCBYOKBN	{
 			SRCBYOKBN	{
 				value	varchar(22);
+				state	int;
 			};
 			count	int;
 			item	varchar(22)[05];
+			state	int;
 		};
 		CMB_SRTKBN	{
 			SRTKBN	{
 				value	varchar(23);
+				state	int;
 			};
 			count	int;
 			item	varchar(23)[50];
+			state	int;
 		};
 		scrolledwindow3	{
 			SRCBYOLST	{
