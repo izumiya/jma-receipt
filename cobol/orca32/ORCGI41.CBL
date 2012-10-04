@@ -169,6 +169,10 @@
            03  FLG-SYOKUJI         PIC 9(01).
            03  FLG-WWK-PTNYUINRRK  PIC 9(01).
       *
+           03  FLG-SKJ-ASA         PIC 9(01).
+           03  FLG-SKJ-HIRU        PIC 9(01).
+           03  FLG-SKJ-YUU         PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -219,6 +223,9 @@
            03  SC-IDX              PIC 9(02).
            03  SC-IDX2             PIC 9(02).
            03  IDXD                PIC 9(02).
+           03  IDX-SKJ-ASA         PIC 9(02).
+           03  IDX-SKJ-HIRU        PIC 9(02).
+           03  IDX-SKJ-YUU         PIC 9(02).
       *
       *    点数マスタ予約コード領域（選定入院料）
        01  WRK-YOYAKU.
@@ -4801,6 +4808,10 @@
            MOVE    SPA-NAI-IKKATUKAI   TO  SPA-NAI-TIKKATUKAI
                                                        (SPA-NAI-BANGO)
       *
+           MOVE    ZERO                TO  FLG-SKJ-ASA
+                                           FLG-SKJ-HIRU
+                                           FLG-SKJ-YUU
+      *
       *    食事の時、食堂加算の変更
            MOVE    SPA-NAI-TBANGO (SPA-NAI-BANGO)  TO  IDG
            IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
@@ -4814,6 +4825,7 @@
            IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
                                            =   "4"   )  AND
                   (SPA-GMN-TSRYCD (IDG)    =   "099999918")
+               MOVE    1                   TO  FLG-SKJ-ASA
                PERFORM 47011-SYOKUJI-CHK-SEC
            END-IF
       *
@@ -4822,6 +4834,7 @@
            IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
                                            =   "4"   )  AND
                   (SPA-GMN-TSRYCD (IDG)    =   "099999919")
+               MOVE    1                   TO  FLG-SKJ-HIRU
                PERFORM 47011-SYOKUJI-CHK-SEC
            END-IF
       *
@@ -4830,6 +4843,7 @@
            IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
                                            =   "4"   )  AND
                   (SPA-GMN-TSRYCD (IDG)    =   "099999920")
+               MOVE    1                   TO  FLG-SKJ-YUU
                PERFORM 47011-SYOKUJI-CHK-SEC
            END-IF
       *
@@ -4976,6 +4990,95 @@
        47011-SYOKUJI-CHK-SEC             SECTION.
       *
            MOVE    ZERO                TO  IDX-KSN
+                                           IDX-SKJ-ASA
+                                           IDX-SKJ-HIRU
+                                           IDX-SKJ-YUU
+      *
+      *    朝食変更時に昼と夕の状態を取得
+           IF     FLG-SKJ-ASA          =   1
+             PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-NAI-MAX-41)
+                         OR   (IDX-SKJ-HIRU >   ZERO           )
+               IF      SPA-NAI-BANGO       NOT =   IDX
+                   MOVE    SPA-NAI-TBANGO (IDX)    TO  IDG
+                   IF     (SPA-NAI-TZAISKBKBN-41 (IDX)
+                                               =   "4"   )  AND
+                          (SPA-GMN-TSRYCD (IDG)    =   "099999919")
+                       MOVE    IDX                 TO  IDX-SKJ-HIRU
+                   END-IF
+               END-IF
+             END-PERFORM
+             PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-NAI-MAX-41)
+                         OR   (IDX-SKJ-YUU >   ZERO           )
+               IF      SPA-NAI-BANGO       NOT =   IDX
+                   MOVE    SPA-NAI-TBANGO (IDX)    TO  IDG
+                   IF     (SPA-NAI-TZAISKBKBN-41 (IDX)
+                                               =   "4"   )  AND
+                          (SPA-GMN-TSRYCD (IDG)    =   "099999920")
+                       MOVE    IDX                 TO  IDX-SKJ-YUU
+                   END-IF
+               END-IF
+             END-PERFORM
+           END-IF
+      *
+      *    昼食変更時に朝と夕の状態を取得
+           IF     FLG-SKJ-HIRU          =   1
+             PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-NAI-MAX-41)
+                         OR   (IDX-SKJ-ASA >   ZERO           )
+               IF      SPA-NAI-BANGO       NOT =   IDX
+                   MOVE    SPA-NAI-TBANGO (IDX)    TO  IDG
+                   IF     (SPA-NAI-TZAISKBKBN-41 (IDX)
+                                               =   "4"   )  AND
+                          (SPA-GMN-TSRYCD (IDG)    =   "099999918")
+                       MOVE    IDX                 TO  IDX-SKJ-ASA
+                   END-IF
+               END-IF
+             END-PERFORM
+             PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-NAI-MAX-41)
+                         OR   (IDX-SKJ-YUU >   ZERO           )
+               IF      SPA-NAI-BANGO       NOT =   IDX
+                   MOVE    SPA-NAI-TBANGO (IDX)    TO  IDG
+                   IF     (SPA-NAI-TZAISKBKBN-41 (IDX)
+                                               =   "4"   )  AND
+                          (SPA-GMN-TSRYCD (IDG)    =   "099999920")
+                       MOVE    IDX                 TO  IDX-SKJ-YUU
+                   END-IF
+               END-IF
+             END-PERFORM
+           END-IF
+      *
+      *    夕食変更時に朝と昼の状態を取得
+           IF     FLG-SKJ-YUU          =   1
+             PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-NAI-MAX-41)
+                         OR   (IDX-SKJ-ASA >   ZERO           )
+               IF      SPA-NAI-BANGO       NOT =   IDX
+                   MOVE    SPA-NAI-TBANGO (IDX)    TO  IDG
+                   IF     (SPA-NAI-TZAISKBKBN-41 (IDX)
+                                               =   "4"   )  AND
+                          (SPA-GMN-TSRYCD (IDG)    =   "099999918")
+                       MOVE    IDX                 TO  IDX-SKJ-ASA
+                   END-IF
+               END-IF
+             END-PERFORM
+             PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-NAI-MAX-41)
+                         OR   (IDX-SKJ-HIRU >   ZERO           )
+               IF      SPA-NAI-BANGO       NOT =   IDX
+                   MOVE    SPA-NAI-TBANGO (IDX)    TO  IDG
+                   IF     (SPA-NAI-TZAISKBKBN-41 (IDX)
+                                               =   "4"   )  AND
+                          (SPA-GMN-TSRYCD (IDG)    =   "099999919")
+                       MOVE    IDX                 TO  IDX-SKJ-HIRU
+                   END-IF
+               END-IF
+             END-PERFORM
+           END-IF
+      *
+      *    食堂加算の添字検索
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-NAI-MAX-41)
                          OR   (IDX-KSN >   ZERO           )
@@ -4988,12 +5091,32 @@
                    END-IF
                END-IF
            END-PERFORM
+      *
            IF     IDX-KSN              >   ZERO
                PERFORM VARYING     IDX-D   FROM    1   BY  1
                        UNTIL       IDX-D   >   31  
                    IF      SPA-GMN-DAY-41(IDX-D)   =   ZERO
-                       MOVE    ZERO           TO  SPA-NAI-DAY-41
-                                                      (IDX-KSN IDX-D)
+                     IF   FLG-SKJ-ASA               =   1
+                      IF (SPA-NAI-DAY-41(IDX-SKJ-HIRU IDX-D) = ZERO) AND
+                         (SPA-NAI-DAY-41(IDX-SKJ-YUU IDX-D)  = ZERO)
+                        MOVE    ZERO           TO  SPA-NAI-DAY-41
+                                                       (IDX-KSN IDX-D)
+                      END-IF
+                     END-IF
+                     IF   FLG-SKJ-HIRU              =   1
+                      IF (SPA-NAI-DAY-41(IDX-SKJ-ASA IDX-D)  = ZERO) AND
+                         (SPA-NAI-DAY-41(IDX-SKJ-YUU IDX-D)  = ZERO)
+                        MOVE    ZERO           TO  SPA-NAI-DAY-41
+                                                       (IDX-KSN IDX-D)
+                      END-IF
+                     END-IF
+                     IF   FLG-SKJ-YUU               =   1
+                      IF (SPA-NAI-DAY-41(IDX-SKJ-ASA IDX-D)  = ZERO) AND
+                         (SPA-NAI-DAY-41(IDX-SKJ-HIRU IDX-D) = ZERO)
+                        MOVE    ZERO           TO  SPA-NAI-DAY-41
+                                                       (IDX-KSN IDX-D)
+                      END-IF
+                     END-IF
                    ELSE
                        IF   SS007-RC3(IDX-D)  =  "1"
                            MOVE    1              TO  SPA-NAI-DAY-41
