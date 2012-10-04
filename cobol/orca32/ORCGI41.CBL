@@ -4809,6 +4809,30 @@
                PERFORM 47011-SYOKUJI-CHK-SEC
            END-IF
       *
+      *    食事（朝）の時、食堂加算の変更
+           MOVE    SPA-NAI-TBANGO (SPA-NAI-BANGO)  TO  IDG
+           IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
+                                           =   "4"   )  AND
+                  (SPA-GMN-TSRYCD (IDG)    =   "099999918")
+               PERFORM 47011-SYOKUJI-CHK-SEC
+           END-IF
+      *
+      *    食事（昼）の時、食堂加算の変更
+           MOVE    SPA-NAI-TBANGO (SPA-NAI-BANGO)  TO  IDG
+           IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
+                                           =   "4"   )  AND
+                  (SPA-GMN-TSRYCD (IDG)    =   "099999919")
+               PERFORM 47011-SYOKUJI-CHK-SEC
+           END-IF
+      *
+      *    食事（夕）の時、食堂加算の変更
+           MOVE    SPA-NAI-TBANGO (SPA-NAI-BANGO)  TO  IDG
+           IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
+                                           =   "4"   )  AND
+                  (SPA-GMN-TSRYCD (IDG)    =   "099999920")
+               PERFORM 47011-SYOKUJI-CHK-SEC
+           END-IF
+      *
       *    外泊の時、他の削除
            MOVE    SPA-NAI-TBANGO (SPA-NAI-BANGO)  TO  IDG
            IF     (SPA-NAI-TZAISKBKBN-41 (SPA-NAI-BANGO)
@@ -4970,6 +4994,11 @@
                    IF      SPA-GMN-DAY-41(IDX-D)   =   ZERO
                        MOVE    ZERO           TO  SPA-NAI-DAY-41
                                                       (IDX-KSN IDX-D)
+                   ELSE
+                       IF   SS007-RC3(IDX-D)  =  "1"
+                           MOVE    1              TO  SPA-NAI-DAY-41
+                                                      (IDX-KSN IDX-D)
+                       END-IF
                    END-IF
                END-PERFORM
            END-IF
