@@ -265,8 +265,9 @@
                    07  WRK-HYOUKETSU       PIC X(09).
                    07  WRK-TEISU           PIC X(09).
                    07  WRK-GAIHAKU         PIC X(09).
+                   07  WRK-GAIHAKU2        PIC X(09).
                    07  WRK-NYUKHNKSNKBN    PIC 9(03).
-                   07  WRK-GAIHAKU-KBN     PIC 9(01).
+                   07  WRK-GAIHAKU-KBN     PIC 9(02).
                    07  WRK-CHUKSNCD        PIC X(04).
       *
       *     °åÎÅ´Ñ»¡ÍÑÂàÈòÎÎ°è
@@ -291,7 +292,7 @@
                    07  WRK-SO-KAISU        PIC 9(02).
                    07  WRK-SO-ADL-TEN-MOJI PIC X(04).
                    07  WRK-SO-GAIHAKU-TBL.
-                     09  WRK-SO-GAIHAKU-KBN  PIC 9(01)  OCCURS 31.
+                     09  WRK-SO-GAIHAKU-KBN  PIC 9(02)  OCCURS 31.
                    07  WRK-SO-IRYOADL-DAY  PIC 9(02).
       *
       *    Æ±°ìºÞ¤Þ¤È¤áÍÑÈæ³Ó¥­¡¼
@@ -4554,9 +4555,8 @@
                    PERFORM    VARYING   IDX1   FROM   1   BY   1
                               UNTIL     IDX1   >   31
                        IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)
-                       AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                             OR 6 OR 7
-                                                             OR 8 OR 9)
+                       AND  ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                             (WRK-GAIHAKU-KBN(IDX1) >=  4))
                        AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
       *                  Æþ±¡»þ¿©»öÎÅÍÜ¡Ê£±¡Ë¤Î¾ì¹ç¤Î¤ß¥»¥Ã¥È
                            IF  WRK-SYS5000-SHOKUCD(1 IDX1)  =
@@ -4634,9 +4634,8 @@
                      UNTIL     IDX1   >   31
                         IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                               (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                        AND   (WRK-GAIHAKU-KBN(IDX1) = ZERO OR 4 OR 5
-                                                            OR 6 OR 7
-                                                            OR 8 OR 9)
+                        AND  ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                              (WRK-GAIHAKU-KBN(IDX1) >=  4))
                         AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
                           MOVE   NACCT-DAY(IDX1)  TO WRK-NYUKSN-DAY-1
                                                       (IDX-NYUKSN IDX1)
@@ -4661,9 +4660,8 @@
                         UNTIL     IDX1   >   31
                           IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                                 (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                          AND   (WRK-GAIHAKU-KBN(IDX1) = ZERO OR 4 OR 5
-                                                              OR 6 OR 7
-                                                              OR 8 OR 9)
+                          AND  ((WRK-GAIHAKU-KBN(IDX1) = ZERO) OR
+                                (WRK-GAIHAKU-KBN(IDX1) >= 4))
                           AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
                              MOVE   NACCT-DAY(IDX1)
                                                  TO WRK-CHUKSN-DAY-1
@@ -4687,9 +4685,8 @@
                       UNTIL     IDX1   >   31
                         IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                               (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                        AND   (WRK-GAIHAKU-KBN(IDX1) = ZERO OR 4 OR 5
-                                                            OR 6 OR 7
-                                                            OR 8 OR 9)
+                        AND  ((WRK-GAIHAKU-KBN(IDX1) = ZERO) OR
+                              (WRK-GAIHAKU-KBN(IDX1) >= 4))
                         AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
                            MOVE   NACCT-DAY(IDX1)  TO WRK-CHUKSN-DAY-2
                                                      (IDX-CHUKSN2 IDX1)
@@ -4776,9 +4773,8 @@
                          UNTIL     IDX1   >   31
                          IF  ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                               (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                         AND  (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                              OR 6 OR 7
-                                                              OR 8 OR 9)
+                         AND ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                              (WRK-GAIHAKU-KBN(IDX1)  >= 4))
                          AND  (ACCT-DAY(1 IDX1)    NOT =  ZERO)
                          AND   (ACCT-HKNCOMBI  =
                                                 WRK-HKNCOMBI-DAY(IDX1))
@@ -4809,9 +4805,8 @@
                            UNTIL     IDX1   >   31
                             IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                                   (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                            AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 
-                                                        OR 5 OR 6 OR 7
-                                                        OR 8 OR 9)
+                            AND  ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                                  (WRK-GAIHAKU-KBN(IDX1) >=  4))
                             AND   (ACCT-DAY(1 IDX1)    NOT =  ZERO)
                             AND   (ACCT-HKNCOMBI  =
                                                 WRK-HKNCOMBI-DAY(IDX1))
@@ -4841,9 +4836,8 @@
                            UNTIL     IDX1   >   31
                             IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
                                   (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                            AND   (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 
-                                                        OR 5 OR 6 OR 7
-                                                        OR 8 OR 9)
+                            AND  ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR
+                                  (WRK-GAIHAKU-KBN(IDX1) >=   4))
                             AND   (ACCT-DAY(1 IDX1)    NOT =  ZERO)
                             AND   (ACCT-HKNCOMBI  =
                                                 WRK-HKNCOMBI-DAY(IDX1))
@@ -4985,7 +4979,7 @@
       *        Â¾°åÎÅµ¡´Ø¼õ¿Ç¡Ê£³£°¡ó¸º»»¤È£·£°¡ó¸º»»¡Ë
       *        ÆÃÄê»þ´ÖÂà±¡¸º»»
       *        ÆÃÄêÍËÆüÆþÂà±¡¸º»»
-               IF      (WRK-GAIHAKU(IDX1)        =
+               IF     ((WRK-GAIHAKU(IDX1)        =
                                     "190142190" OR  "190142090" OR
                                     "190142290" OR  "190141590" OR
                                     "190108790" OR  "190108890" OR
@@ -4995,14 +4989,23 @@
                                     "190161470" OR  "190161570" OR
                                     "190161670" OR  "190161770" OR
                                     "190161870" OR  "190161970" OR
-                                    "190162070" OR  "190162170" )
+                                    "190162070" OR  "190162170" )  OR
+                       (WRK-GAIHAKU2(IDX1)       =
+                                    "190108890" OR  "190142190" OR
+                                    "190141590"))
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-GAIHAKU(IDX1) TO  WRK-SO-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                   IF        (WRK-NYUINKHN(IDX1)  NOT =   SPACE)
+                   AND       (WRK-GAIHAKU2(IDX1)  NOT =   SPACE)
+                       ADD      1               TO  WRK-MEISAISU
+                       MOVE   WRK-GAIHAKU2(IDX1) TO  WRK-SO-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                   END-IF
                END-IF
       *
       *        ½é´ü²Ã»»¡ÊÄ¹´ü¸º»»¡Ë
-               IF      (WRK-GAIHAKU(IDX1)       =   SPACE       OR
+               IF     ((WRK-GAIHAKU(IDX1)       =   SPACE       OR
                                     "190142190" OR  "190142090" OR
                                     "190142290" OR  "190141590" OR
                                     "190108790" OR  "190108890" OR
@@ -5012,7 +5015,10 @@
                                     "190161470" OR  "190161570" OR
                                     "190161670" OR  "190161770" OR
                                     "190161870" OR  "190161970" OR
-                                    "190162070" OR  "190162170" )
+                                    "190162070" OR  "190162170" )  OR
+                       (WRK-GAIHAKU2(IDX1)       =
+                                    "190108890" OR  "190142190" OR
+                                    "190141590"))
                AND     (WRK-SHOKIKSN(IDX1)      NOT =   SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-SHOKIKSN(IDX1) TO  WRK-SO-SRYCD
@@ -5020,7 +5026,7 @@
                END-IF
       *
       *        É¸·ç
-               IF      (WRK-GAIHAKU(IDX1)       =   SPACE       OR
+               IF     ((WRK-GAIHAKU(IDX1)       =   SPACE       OR
                                     "190142190" OR  "190142090" OR
                                     "190142290" OR  "190141590" OR
                                     "190108790" OR  "190108890" OR
@@ -5030,7 +5036,10 @@
                                     "190161470" OR  "190161570" OR
                                     "190161670" OR  "190161770" OR
                                     "190161870" OR  "190161970" OR
-                                    "190162070" OR  "190162170" )
+                                    "190162070" OR  "190162170" )  OR
+                       (WRK-GAIHAKU2(IDX1)       =
+                                    "190108890" OR  "190142190" OR
+                                    "190141590"))
                AND     (WRK-HYOUKETSU(IDX1)   NOT =         SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-HYOUKETSU(IDX1) TO  WRK-SO-SRYCD
@@ -5038,7 +5047,7 @@
                END-IF
       *
       *        Äê¿ôÄ¶²á
-               IF      (WRK-GAIHAKU(IDX1)       =   SPACE       OR
+               IF     ((WRK-GAIHAKU(IDX1)       =   SPACE       OR
                                     "190142190" OR  "190142090" OR
                                     "190142290" OR  "190141590" OR
                                     "190108790" OR  "190108890" OR
@@ -5048,7 +5057,10 @@
                                     "190161470" OR  "190161570" OR
                                     "190161670" OR  "190161770" OR
                                     "190161870" OR  "190161970" OR
-                                    "190162070" OR  "190162170" )
+                                    "190162070" OR  "190162170" )  OR
+                       (WRK-GAIHAKU2(IDX1)       =
+                                    "190108890" OR  "190142190" OR
+                                    "190141590"))
                AND     (WRK-TEISU(IDX1)       NOT =         SPACE)
                    ADD      1               TO  WRK-MEISAISU
                    MOVE   WRK-TEISU(IDX1)  TO  WRK-SO-SRYCD
@@ -5057,7 +5069,7 @@
       *
       *        ³°Çñ
                IF         WRK-GAIHAKU(IDX1)   NOT =        SPACE
-                 IF      (WRK-GAIHAKU(IDX1)     =
+                 IF     ((WRK-GAIHAKU(IDX1)     =
                                     "190142190" OR  "190142090" OR
                                     "190142290" OR  "190141590" OR
                                     "190108790" OR  "190108890" OR
@@ -5067,7 +5079,10 @@
                                     "190161470" OR  "190161570" OR
                                     "190161670" OR  "190161770" OR
                                     "190161870" OR  "190161970" OR
-                                    "190162070" OR  "190162170" )
+                                    "190162070" OR  "190162170" )  OR
+                         (WRK-GAIHAKU2(IDX1)       =
+                                    "190108890" OR  "190142190" OR
+                                    "190141590"))
                           CONTINUE
                  ELSE
                    ADD      1               TO  WRK-MEISAISU
@@ -6220,6 +6235,10 @@
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                     WHEN     8
                     WHEN     9
+                    WHEN    10
+                    WHEN    11
+                    WHEN    12
+                    WHEN    13
                       PERFORM   2101-GAIHAKU-GENSAN-SEC
                  END-EVALUATE
               WHEN     "92"
@@ -6235,6 +6254,10 @@
                       PERFORM   2101-GAIHAKU-TAKIKAN-SEC
                     WHEN     8
                     WHEN     9
+                    WHEN    10
+                    WHEN    11
+                    WHEN    12
+                    WHEN    13
                       PERFORM   2101-GAIHAKU-GENSAN-SEC
                  END-EVALUATE
            END-EVALUATE
@@ -6393,6 +6416,8 @@
       *
            EVALUATE   NACCT-DAY(IDX1)
              WHEN     8
+             WHEN    10
+             WHEN    11
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
                       MOVE   "190161470"    TO   WRK-GAIHAKU(IDX1)
@@ -6402,9 +6427,14 @@
                       MOVE   "190161870"    TO   WRK-GAIHAKU(IDX1)
                    WHEN   "9030"
                       MOVE   "190162070"    TO   WRK-GAIHAKU(IDX1)
+                IF   NACCT-DAY(IDX1) = 10 OR 11
+                   PERFORM   2101-GAIHAKU-TAKIKAN2-SEC
+                END-IF
                 END-EVALUATE
       *
              WHEN     9
+             WHEN    12
+             WHEN    13
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
                       MOVE   "190161670"    TO   WRK-GAIHAKU(IDX1)
@@ -6415,10 +6445,40 @@
                    WHEN   "9030"
                       MOVE   "190162170"    TO   WRK-GAIHAKU(IDX1)
                 END-EVALUATE
+                IF   NACCT-DAY(IDX1) = 12 OR 13
+                   PERFORM   2101-GAIHAKU-TAKIKAN2-SEC
+                END-IF
            END-EVALUATE
       *
            .
        2101-GAIHAKU-GENSAN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ³°Çñ¿ÇÎÅ¥³¡¼¥É¼èÆÀ£³
+      *****************************************************************
+       2101-GAIHAKU-TAKIKAN2-SEC           SECTION.
+      *
+           EVALUATE   WRK-NYUKHNKSNKBN(IDX1)
+             WHEN   099  THRU  100
+                EVALUATE   NACCT-DAY(IDX1)
+                    WHEN    10
+                    WHEN    12
+                      MOVE   "190108890"    TO   WRK-GAIHAKU2(IDX1)
+                    WHEN    11
+                    WHEN    13
+                      MOVE   "190142190"    TO   WRK-GAIHAKU2(IDX1)
+                END-EVALUATE
+             WHEN   OTHER
+                EVALUATE   NACCT-DAY(IDX1)
+                    WHEN    11
+                    WHEN    13
+                      MOVE   "190141590"    TO   WRK-GAIHAKU2(IDX1)
+                END-EVALUATE
+           END-EVALUATE
+      *
+           .
+       2101-GAIHAKU-TAKIKAN2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6941,7 +7001,7 @@
                    IF    (WRK-HKNCOMBI-DAY(IDX1) NOT = ZERO)  AND
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                          (WRK-NYUINKHN(IDX1) NOT =  SPACE)    AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
+                        ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO) OR 4 OR 5
                                                          OR 6 OR 7)
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ-HKNCOMBI-DAY(IDX1)
@@ -8125,9 +8185,8 @@
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7
-                                                         OR 8 OR 9)
+                        ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO)     OR
+                         (WRK-GAIHAKU-KBN(IDX1) >=  4))
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX1)
@@ -8174,9 +8233,8 @@
                          (LNK-NYUINDAY-DOUJITSU-SKJKBN(IDX1) = "1")  AND
       ***                  ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
       ***                   (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))          AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7
-                                                         OR 8 OR 9)
+                           ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO)     OR
+                            (WRK-GAIHAKU-KBN(IDX1) >=  4))
                        MOVE   LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX1)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX1)
@@ -8224,9 +8282,8 @@
                        (LNK-NYUINDAY-DOUJITSU-T-SKJKBN(IDX1) = "1"   OR
                                                                "2"   OR
                                                                "3")  AND
-                       (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                       OR 6 OR 7
-                                                       OR 8 OR 9)
+                      ((WRK-GAIHAKU-KBN(IDX1)    =  ZERO)            OR
+                       (WRK-GAIHAKU-KBN(IDX1)   >=  4))
       *                ¿©Æ²²Ã»»¥¯¥ê¥¢¥Õ¥é¥°¤Î¥»¥Ã¥È
                         MOVE  "1"    TO  WRK-TAHOKEN-SHOKUDOU-FLG(IDX1)
                    END-IF
@@ -8270,9 +8327,8 @@
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7
-                                                         OR 8 OR 9)
+                        ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO)     OR
+                         (WRK-GAIHAKU-KBN(IDX1) >=  4))
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX2)
@@ -8320,9 +8376,8 @@
                                                                "2")  AND
       ***                  ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
       ***                   (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7
-                                                         OR 8 OR 9)
+                           ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO)     OR
+                            (WRK-GAIHAKU-KBN(IDX1) >=  4))
                        MOVE   LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX2)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX2)
@@ -8369,9 +8424,8 @@
                        (NACCT-DAY(IDX1)    NOT =  ZERO)              AND
                        (LNK-NYUINDAY-DOUJITSU-T-SKJKBN(IDX1) = "2"   OR
                                                                "3")  AND
-                       (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                       OR 6 OR 7
-                                                       OR 8 OR 9)
+                      ((WRK-GAIHAKU-KBN(IDX1)    =  ZERO)            OR
+                       (WRK-GAIHAKU-KBN(IDX1)   >=  4))
       *                ¿©Æ²²Ã»»¥¯¥ê¥¢¥Õ¥é¥°¤Î¥»¥Ã¥È
                         MOVE  "1"    TO  WRK-TAHOKEN-SHOKUDOU-FLG(IDX1)
                    END-IF
@@ -8416,9 +8470,8 @@
                          (NACCT-DAY(IDX1)    NOT =  ZERO)     AND
                         ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
                          (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7
-                                                         OR 8 OR 9)
+                        ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO)     OR
+                         (WRK-GAIHAKU-KBN(IDX1) >=  4))
                        MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX3)
@@ -8467,9 +8520,8 @@
                                                                "3")  AND
       ***                  ((WRK-NYUINKHN(IDX1) NOT =  SPACE)    OR
       ***                   (LNK-NYUINDAY-KBN(IDX1) =  "1"  ))   AND
-                         (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                         OR 6 OR 7
-                                                         OR 8 OR 9)
+                           ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO)     OR
+                            (WRK-GAIHAKU-KBN(IDX1) >=  4))
                        MOVE   LNK-NYUINDAY-DOUJITSU-HKNCOMBI(IDX1)
                                        TO  WRK-SKJ4-HKNCOMBI-DAY(IDX3)
       *                                     WRK-SKJ5-HKNCOMBI-DAY(IDX3)
@@ -8515,9 +8567,8 @@
                                LNK-NYUINDAY-DOUJITSU-T-HKNSYU(IDX1)) AND
                        (NACCT-DAY(IDX1)    NOT =  ZERO)              AND
                        (LNK-NYUINDAY-DOUJITSU-T-SKJKBN(IDX1) = "3")  AND
-                       (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                       OR 6 OR 7
-                                                       OR 8 OR 9)
+                      ((WRK-GAIHAKU-KBN(IDX1)    =  ZERO)            OR
+                       (WRK-GAIHAKU-KBN(IDX1)   >=  4))
       *                ¿©Æ²²Ã»»¥¯¥ê¥¢¥Õ¥é¥°¤Î¥»¥Ã¥È
                         MOVE  "1"    TO  WRK-TAHOKEN-SHOKUDOU-FLG(IDX1)
                    END-IF
@@ -9822,9 +9873,8 @@
                      (LNK-NYULIFE-KAN-SRYCD(IDX1)    NOT =  SPACE)  AND
                     ((WRK-NYUINKHN(IDX1)     NOT =  SPACE)          OR
                      (LNK-NYUINDAY-KBN(IDX1)     =  "1"  ))         AND
-                     (WRK-GAIHAKU-KBN(IDX1)  =  ZERO OR 4 OR 5
-                                                     OR 6 OR 7
-                                                     OR 8 OR 9)
+                    ((WRK-GAIHAKU-KBN(IDX1)  =  ZERO)   OR
+                     (WRK-GAIHAKU-KBN(IDX1)  >= 4))
                    MOVE   WRK-HKNCOMBI-DAY(IDX1)
                                      TO  WRK-KANKYO-HKNCOMBI-DAY(IDX1)
                    MOVE   1          TO  WRK-KANKYO-DAY(IDX1 IDX1)
