@@ -415,7 +415,7 @@
            INITIALIZE                  WRK-KEY-AREA
            PERFORM
                UNTIL   (FLG-WKSRYACT   =   1 )  OR
-                       (IDX            >   200 )
+                       (IDX            >   100 )
                IF      (WKSRY-PTID         =   WRK-KEY-PTID  )  AND
                        (WKSRY-SRYKA        =   WRK-KEY-SRYKA )  AND
                        (WKSRY-SRYYMD       =   WRK-KEY-SRYYMD)  AND
@@ -428,7 +428,7 @@
                        (FLG-CHK            =   ZERO ))  AND
                       ( WKSRY-RENNUM       =   1   )
                    ADD     1                   TO  IDX
-                   IF      IDX                 >   200
+                   IF      IDX                 >   100
                        MOVE    1                   TO  SPA-K10-NEXT
                    ELSE
                        PERFORM 3101-TBL-HENSYU-SEC
