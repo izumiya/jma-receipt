@@ -128,6 +128,10 @@
            03  WRK-TENGAKEI-G      PIC S9(10).
            03  WRK-TENGAKEI-K      PIC S9(10).
       *
+           03  WRK-TENGAKEI-G2     PIC S9(10).
+           03  WRK-TENSUKEI-G2     PIC S9(10).
+           03  WRK-GENGAKU-2       PIC S9(10).
+      *
            03  WRK-GOK-TENSUKEI        PIC S9(10).
            03  WRK-GOK-TENGAKEI        PIC S9(10).
            03  WRK-GRSI-TENSUKEI       PIC S9(10).
@@ -1578,7 +1582,7 @@
            COMPUTE WRK-SUM-TENSUKEI    =   WRK-SUM-TENSUKEI
                                        +   WRK-JIN-TENSUKEI
       *    ２以上の手術の逓減計算
-           PERFORM 1008-HEIYOU-KEI-SEC
+      *****PERFORM 1008-HEIYOU-KEI-SEC
       *
            ADD     WRK-SUM-TENSUKEI    TO  WRK-GOK-TENSUKEI
            ADD     WRK-SUM-TENGAKEI    TO  WRK-GOK-TENGAKEI
@@ -1610,6 +1614,10 @@
            MOVE    ZERO                TO  WRK-TENGAKEI-G
            MOVE    ZERO                TO  WRK-TENGAKEI-K
       *
+           MOVE    ZERO                TO  WRK-TENGAKEI-G2
+           MOVE    ZERO                TO  WRK-TENSUKEI-G2
+           MOVE    ZERO                TO  WRK-GENGAKU-2
+      *
            PERFORM VARYING     IDX     FROM    IDX-ZS  BY  1
                    UNTIL       IDX         >=  HZN-IDX
       *        時間外加算のものは、自動加算とする
@@ -1618,11 +1626,29 @@
                       (WRK-COM-TENSIKIBETU(IDX)        =   5    )
                    MOVE    1               TO  WRK-COM-SANFLG (IDX)
                END-IF
+      *施設基準逓減廃止により、手技料に逓減
       *        ５０％減算は最後にする
                IF     (WRK-COM-DATAKBN    (IDX)    =   "2"  )  AND
+                      (WRK-COM-TENSIKIBETU(IDX)    =   6    )  AND
                       (WRK-COM-INPUTCD    (IDX)    =   "150268970")
                    MOVE    5               TO  WRK-COM-SANFLG (IDX)
+                   COMPUTE WRK-TENSUKEI        =   WRK-COM-KISOTEN
+                                                           (IDX-ZS)
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                  MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                  MOVE    WRK-TENSUKEI-9      TO  WRK-GENGAKU-2
+      *           通則加算対象外区分判定
+                  IF      WRK-COM-TUSOKUGAIKBN (IDX-ZS)  =   "1"
+                       MOVE    WRK-TENSUKEI-9  TO  WRK-TENGAKEI-G2
+                   ELSE
+                       MOVE    WRK-TENSUKEI-9  TO  WRK-TENSUKEI-G2
+                   END-IF
                END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING     IDX     FROM    IDX-ZS  BY  1
+                   UNTIL       IDX         >=  HZN-IDX
       *        診察料、加算、労災、時間外・乳幼児以外を対象とする
                IF     (WRK-COM-INPUTCD(IDX)(1:1)   NOT =   "1"  )  OR
                       (WRK-COM-DATAKBN    (IDX)        =   "1"  )  OR
@@ -1634,19 +1660,21 @@
       *        手技料の点数を所定点数とする
                    MOVE    ZERO                TO  WRK-TENSUKEI
       *        ％加算
+      *             （２以上の逓減を減算後の点数に加算
                    IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
                           (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
                           (WRK-COM-SANFLG     (IDX)    =   ZERO)
-                       COMPUTE WRK-TENSUKEI    =   WRK-COM-KISOTEN
-                                                               (IDX-ZS)
+                       COMPUTE WRK-TENSUKEI    =  (WRK-COM-KISOTEN
+                                                               (IDX-ZS) 
+                                               -   WRK-GENGAKU-2  )
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
                                                +   0.5
                        MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-      *                人工心肺不使用加算は施設基準逓減の対象外とする
-                       IF      WRK-COM-INPUTCD (IDX) =   "150301970"
-                           ADD     WRK-TENSUKEI-9  TO  WRK-JIN-TENSUKEI
-                       ELSE
+      *廃止            人工心肺不使用加算は施設基準逓減の対象外とする
+      *                 IF      WRK-COM-INPUTCD (IDX) =   "150301970"
+      *                     ADD     WRK-TENSUKEI-9  TO  WRK-JIN-TENSUKEI
+      *                 ELSE
       *
       *                通則加算対象外区分判定
                        IF      WRK-COM-TUSOKUGAIKBN (IDX-ZS)  =   "1"
@@ -1655,14 +1683,15 @@
                            ADD     WRK-TENSUKEI-9  TO  WRK-TENSUKEI-K
                        END-IF
       *
-                       END-IF
+      ***********      END-IF
                    END-IF
       *            ％減算
-                  IF      (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
+                   IF     (WRK-COM-INPUTCD(IDX)(1:1)   =   "1" )  AND
                           (WRK-COM-TENSIKIBETU(IDX)    =   6   )  AND
                           (WRK-COM-SANFLG     (IDX)    =   ZERO) 
-                       COMPUTE WRK-TENSUKEI    =   WRK-COM-KISOTEN
+                       COMPUTE WRK-TENSUKEI    =  (WRK-COM-KISOTEN
                                                                (IDX-ZS)
+                                               -   WRK-GENGAKU-2  )
                                                *   WRK-COM-KISOTEN(IDX)
                                                /   100
                        MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
@@ -1679,14 +1708,18 @@
       *        労災コードの時、加算のみ算定
                COMPUTE WRK-RSI-TENSUKEI    =   WRK-RSI-TENSUKEI
                                            +   WRK-TENSUKEI-K
+                                           -   WRK-TENSUKEI-G2
            ELSE
                COMPUTE WRK-SUM-TENSUKEI    =   WRK-SUM-TENSUKEI
                                            +   WRK-TENSUKEI-K
                                            -   WRK-TENSUKEI-G
+                                           -   WRK-TENSUKEI-G2
                COMPUTE WRK-SUM-TENGAKEI    =   WRK-SUM-TENGAKEI
                                            +   WRK-TENGAKEI-K
                                            -   WRK-TENGAKEI-G
+                                           -   WRK-TENGAKEI-G2
            END-IF
+      *施設基準廃止　対象なし
       *    自動加算の加算（施設基準）
            MOVE    ZERO                TO  WRK-TENSUKEI-K
            MOVE    ZERO                TO  WRK-TENSUKEI-G
@@ -1729,6 +1762,7 @@
        1006-KASAN-SET-EXT.
            EXIT.
       *
+      *手技点数を逓減（以下廃止）
       *****************************************************************
       *    ２以上の手術の逓減計算処理
       *****************************************************************
