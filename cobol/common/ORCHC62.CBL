@@ -1356,7 +1356,7 @@
            MOVE    SYS-1031-PRTNM(16)
                                    TO  MKPRT-PRTNM
            MOVE   "¤ªÌô¼êÄ¢"       TO  MKPRT-INFO
-           CALL   "ORCSMKPRT1"         USING
+           CALL   "ORCSMKPRT"          USING
                                        ORCSMKPRTAREA
                                        SPA-AREA
       *
