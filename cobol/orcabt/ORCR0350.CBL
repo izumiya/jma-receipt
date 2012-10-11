@@ -358,6 +358,8 @@
       *                                     ¥¿¤Î¤ß¤Î¿ÇÎÅ¶èÊ¬¤Îµ­Ï¿
       *  04.06.10    NACL-Æ£¸¶    11/12/05  È½ÃÇÎÁ¤¬¤¢¤ë¸¡ºº¤ÎÆüÉÕ¾ðÊóµ­
       *                                     Ï¿¤Î½¤Àµ
+      *  04.06.11    NACL-Æ£¸¶    12/10/11  Æþ±¡¤Î¥³¥á¥ó¥ÈÅù¤Îµ­ºÜ¾ò·ï¤Î
+      *                                     ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7089,20 +7091,7 @@
            PERFORM
                UNTIL  ( FLG-END              =   1                   )
                OR     ( FLG-RECE64           =   1                   )
-               OR     ( RECE62-HOSPNUM   NOT =   RECE641-HOSPNUM      )
-               OR     ( RECE62-SRYYM     NOT =   RECE641-SRYYM        )
-               OR     ( RECE62-NYUGAIKBN NOT =   RECE641-NYUGAIKBN    )
-               OR     ( RECE62-PTID      NOT =   RECE641-PTID         )
-               OR     ( RECE62-RECEKA    NOT =   RECE641-RECEKA       )
-               OR     ( RECE62-TEISYUTUSAKI
-                                         NOT =   RECE641-TEISYUTUSAKI )
-               OR     ( RECE62-RECESYUBETU
-                                         NOT =   RECE641-RECESYUBETU  )
-               OR     ( RECE62-HKNJANUM-KEY
-                                         NOT =   RECE641-HKNJANUM     )
-               OR     ( RECE62-HOJOKBN-KEY
-                                         NOT =   RECE641-HOJOKBN      )
-               OR     ( RECE62-TEKSTYMD  NOT =   RECE641-TEKSTYMD     )
+               OR     ( RECE62-KEY       NOT =   RECE641-KEY1        )
                    EVALUATE    IDZ1
                        WHEN    1 
                            IF      RECE641-SRYKBN       >  "90"
