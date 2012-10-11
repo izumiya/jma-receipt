@@ -35,6 +35,7 @@
       *  04.03.00    NACL-多々納  08/08/01  保険組合せ期間チェック追加
       *  04.04.00    NACL-多々納  08/12/17  入院料包括チェック対応
       *  04.05.00    NACL-多々納  09/12/03  前月保険組合せ終了対応
+      *  04.07.00    NACL-多々納  12/10/11  サンプル薬（サ）対応
       *****************************************************************
       *
       *
@@ -79,6 +80,7 @@
            03  FLG-HEN             PIC 9(01).
       *
            03  FLG-NYUIN01         PIC 9(01).
+           03  FLG-ARI2            PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -441,9 +443,10 @@
            END-IF
            PERFORM
                UNTIL       (FLG-SRYACCT         =   1       )
-             IF     (ACCT-YKZTEN       >   ZERO  )
+      *????  IF     (ACCT-YKZTEN       >   ZERO  )
       *        包括まとめ入力は対象外とする
-               AND  (ACCT-HKNCOMBI NOT =   "9999" )
+      *????    AND  (ACCT-HKNCOMBI NOT =   "9999" )
+             IF     (ACCT-HKNCOMBI NOT =   "9999" )
       *        薬評は対象外とする
                AND  (ACCT-ZAIKBN   NOT =   1      )
       *
@@ -662,9 +665,10 @@
            END-IF
            PERFORM
                UNTIL       (FLG-SRYACCT         =   1       )
-               IF      ACCT-YKZTEN       >   ZERO
+      *????    IF      ACCT-YKZTEN       >   ZERO
       *        包括まとめ入力は対象外とする
-               AND  (ACCT-HKNCOMBI NOT =   "9999" )
+      *????    AND  (ACCT-HKNCOMBI NOT =   "9999" )
+               IF     (ACCT-HKNCOMBI NOT =   "9999" )
       *        薬評は対象外とする
                AND  (ACCT-ZAIKBN   NOT =   1      )
       *
@@ -717,6 +721,7 @@
        600111-SRYACT-HEN-SEC             SECTION.
       *
            MOVE    ZERO                TO  FLG-ARI
+           MOVE    ZERO                TO  FLG-ARI2
            MOVE    ZERO                TO  FLG-MADOKU
       *    診療会計マスターから診療行為マスターを検索する
            MOVE    SPACE               TO  SRYACT-REC
@@ -743,7 +748,12 @@
            IF     (FLG-SRYACT          =   ZERO )  AND
                   (SRY-SRYSYUKBN       =   "214"
                                        OR  "224"
-                                       OR  "234" )
+                                       OR  "234"
+      *     院外処方対象外
+                                       OR  "212"
+                                       OR  "222"
+                                       OR  "232"
+                                       OR  "292" )
                MOVE    1                   TO  FLG-SRYACT
                MOVE    1                   TO  FLG-NASI
            ELSE
@@ -765,6 +775,11 @@
                            MOVE    1               TO  FLG-MADOKU
                        END-IF
                    END-IF
+      *ver.4.7
+      *            サンプル薬コメント
+                   IF      SRY-SRYCD (IDX2)    =   "820000046"
+                       MOVE    1                   TO  FLG-ARI2
+                   END-IF
                END-PERFORM
       *
                MOVE    "tbl_sryact_prv"    TO  MCP-TABLE
@@ -775,6 +790,12 @@
            MOVE    "tbl_sryact_prv"    TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *ver.4.7
+           IF     (ACCT-YKZTEN       =   ZERO )
+              AND (FLG-ARI2          =   ZERO )
+               MOVE    1                   TO  FLG-NASI
+           END-IF
       *
            .
        600111-SRYACT-HEN-EXT.

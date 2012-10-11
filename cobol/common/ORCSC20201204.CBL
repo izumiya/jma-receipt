@@ -55,6 +55,7 @@
       *  04.06.00    NACL-多々納  10/11/02  難病外来疾患区分対応
       *  04.06.00    NACL-多々納  12/03/XX  Ｈ２４年４月改正対応
       *  04.07.00    NACL-多々納  12/07/12  処方せん料判定用法他対応
+      *  04.07.00    NACL-多々納  12/10/11  サンプル薬（サ）対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -148,6 +149,11 @@
            03  FLG-GENERIC-OK           PIC 9(01).
            03  FLG-CHK-P                PIC 9(01).
       *
+      *サンプル薬対応
+           03  FLG-SANPURU             PIC 9(01).
+           03  FLG-YAKZAI-ALL          PIC 9(01).
+           03  FLG-ZAIEND2             PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -187,6 +193,8 @@
       *
            03  IDZ5                PIC 9(04).
            03  IDZ6                PIC 9(04).
+      *サンプル薬対応
+           03  IDX-G               PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -1123,7 +1131,6 @@
                    END-IF
                END-IF
            END-IF
-      *TEST
       *
            .
        10021-KEISAN-EXT.
@@ -1402,6 +1409,9 @@
            INITIALIZE                  WRK-HKNKEI-G
       *ver.4.7
            INITIALIZE                  TBL-YOUHO-HEN-AREA
+      *    サンプル薬投薬
+           MOVE    ZERO                TO  FLG-YAKZAI-ALL
+           MOVE    ZERO                TO  FLG-SANPURU
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-MAX-LINE  )  OR
@@ -1412,6 +1422,8 @@
             AND   (WRK-COM-HKNCOMBI (IDX)  NOT =   "9999" )
       *        薬評対象外
             AND   (WRK-COM-YAKUHYO  (IDX)  =   SPACE  )
+      *ver.4.7  減点対象外
+            AND   (WRK-COM-GENTEN   (IDX)  =   SPACE  )
       *        診療種別区分変換
                PERFORM 30001-SRYSYUKBN-SET-SEC
       *        投薬の時、薬剤コードがあること
@@ -2240,12 +2252,6 @@
                MOVE    WRK-ZAITEN-G        TO  WRK-ZAITEN
             END-IF
            END-PERFORM
-      *TEST
-      *     DISPLAY "TBL-Y2-YOUHOU:" TBL-Y2-YOUHOU
-      *          ",WRK-ZAITEN-G:" WRK-ZAITEN-G
-      *        ",WRK-KONGO:" WRK-KONGO
-      *        ",WRK-SONOTA:" WRK-SONOTA
-      *TEST
            IF      WRK-ZAITEN-G        <=  205
                IF      WRK-ZAITEN-G        =   ZERO
                    CONTINUE
@@ -2283,6 +2289,7 @@
        30001-TOUYAKU-CHK-SEC              SECTION.
       *
            MOVE    ZERO                TO  FLG-YAKUZAI-ARI
+           MOVE    ZERO                TO  FLG-SANPURU
       *
            PERFORM VARYING     IDX3    FROM    IDX   BY  1
                    UNTIL      (IDX3    >   SPA-MAX-LINE  )  OR
@@ -2292,9 +2299,17 @@
            IF      WRK-COM-HKNCOMBI (IDX3)  NOT =   "9999"
       *        薬評対象外
             AND   (WRK-COM-YAKUHYO  (IDX3)  =   SPACE  )
+      *ver.4.7  減点対象外
+            AND   (WRK-COM-GENTEN   (IDX3)  =   SPACE  )
                IF      WRK-COM-INPUTCD(IDX3)(1:1)  =   "6"
                    MOVE    1              TO  FLG-YAKUZAI-ARI
                ELSE
+      *ver.4.7
+      *        サンプル薬コメント
+                   IF      WRK-COM-INPUTCD(IDX3)   =   "820000046"
+                       MOVE    1                   TO  FLG-SANPURU
+                   END-IF
+      *!!
                    IF      WRK-COM-ZAIEND (IDX3) =   "1"
                        MOVE    IDX3           TO  IDX
                        MOVE    300            TO  IDX3
@@ -2305,7 +2320,12 @@
            END-PERFORM
       *
            IF      FLG-YAKUZAI-ARI      =   ZERO
+             AND   FLG-SANPURU          =   ZERO
                MOVE    "990"            TO  WRK-CHK-SRYSYUKBN
+           END-IF
+      *
+           IF      FLG-YAKUZAI-ARI      =   1
+               MOVE    1                TO  FLG-YAKZAI-ALL
            END-IF
       *
            .
@@ -2398,6 +2418,10 @@
                   ((WRK-CHK-SRYSYUKBN (1:2)   =   "29" ) AND
                    (WRK-COM-KAISU (IDX)       >   14   ))
                MOVE    1                   TO  FLG-NAIFUKU
+      *        薬剤なし
+               IF      FLG-YAKUZAI-ARI     =   ZERO
+                   MOVE    ZERO                TO  FLG-NAIFUKU
+               END-IF
            ELSE
                MOVE    ZERO                TO  FLG-NAIFUKU
            END-IF
@@ -2551,6 +2575,8 @@
       *ver.4.7
       *    用法毎まとめ対応
            IF      (FLG-NAIFUKU        =   1  )
+      *H24.10 薬剤あり
+              AND  (FLG-YAKUZAI-ARI    =   1  )
               AND  (IDG1               <=  50 )
               AND  (WRK-COM-INPUTCD(IDX)   NOT =   SPACE )
                ADD     1               TO  IDG2
@@ -2702,6 +2728,9 @@
       *    処方せん料算定あり
            IF     (FLG-SYOHO-CHK       =   1   )  AND
                   (FLG-SYOHO-CHK2      =   1   )
+      *H24.8
+      *    サンプル薬のみはなし
+           AND    (FLG-YAKZAI-ALL      =   1    )
                IF     (LNK-ORCSC-KIDCD     =   SPACE )  AND
                       (SPA-CHOZAI-CHK      =   ZERO  )
       *            調基算定チェック
@@ -2767,6 +2796,9 @@
       *    処方せん料算定時の時のみ行う
            IF     (FLG-SYOHO-CHK       =   ZERO) OR
                   (FLG-SYOHOSENN       =   ZERO)
+      *H24.10
+      *    サンプル薬のみはなし
+           OR     (FLG-YAKZAI-ALL      =   ZERO )
                GO      TO      3001-INGAI-SYORI-EXT
            END-IF
       *TEST
@@ -3218,6 +3250,9 @@
                   (SPA-TEISEITOKU-FLG  =   "0"))
       *        病名疾患区分の自動発生なし
                OR (SPA-BYOMEIAUTO-FLG  NOT =   "1" )
+      *H24.11
+      *    サンプル薬のみはなし
+               OR (FLG-YAKZAI-ALL      =   ZERO )
                CONTINUE
            ELSE
       *        特定疾患処方管理加算
@@ -3237,6 +3272,9 @@
                   (FLG-TONPUK          =   1    )  OR
                   (FLG-GAIYAK          =   1    )
                IF     (FLG-YAKUJYO         =   ZERO )
+      *H24.10
+      *    サンプル薬のみはなし
+               AND    (FLG-YAKZAI-ALL      =   1    )
                    PERFORM 30022-INNAI-YAKUJYOUCHK-SEC
                END-IF
            END-IF
@@ -3713,6 +3751,9 @@
                 AND (WRK-COM-HKNCOMBI(IDX) NOT =   "9999" )
       *        薬評対象外
                AND  (WRK-COM-YAKUHYO (IDX) =   SPACE  )
+      *H24.10   減点対象外
+               AND  (WRK-COM-GENTEN (IDX)  =   SPACE  )
+      *
       *        診療種別区分変換
                PERFORM 30001-SRYSYUKBN-SET-SEC
       *        院内の内服薬チェック
@@ -3724,6 +3765,12 @@
                ELSE
                    MOVE    ZERO                TO  FLG-NAIFUKU
                END-IF
+      *        点数ゼロ対象外（サ）のみの剤等
+               IF      FLG-NAIFUKU             =   1
+      *            薬剤料逓減チェック処理
+                   PERFORM 300110-GENTUIKA-CHK-SEC
+               END-IF
+      *
                IF     (FLG-NAIFUKU             =   1     )  AND
                       (FLG-ZAI                 =   ZERO  )
                    IF      WRK-GMN-INPUTCD(IDX)(1:1)   =   "."
@@ -3801,6 +3848,28 @@
            END-PERFORM
            .
        3001-GENHEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    薬剤料逓減チェック処理
+      *****************************************************************
+       300110-GENTUIKA-CHK-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-ZAIEND2
+           PERFORM VARYING     IDX-G   FROM    IDX BY  1
+                   UNTIL      (IDX-G   >   SPA-MAX-LINE  )
+                       OR    ( FLG-ZAIEND2     =   1     )
+      *
+               IF      WRK-COM-ZAIEND (IDX-G)  =   "1"
+                   MOVE    1               TO  FLG-ZAIEND2
+                   IF     (WRK-COM-KEI (IDX-G) =   ZERO   )
+      *                剤点数がゼロの時、対象外
+                       MOVE    ZERO            TO  FLG-NAIFUKU
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       300110-GENTUIKA-CHK-EXT.
            EXIT.
       *
       *****************************************************************
