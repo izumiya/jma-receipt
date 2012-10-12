@@ -380,6 +380,8 @@
       *  04.05.46    NACL-ÌçÏÆ    12/09/19  Ê¡Åç¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.47    NACL-ÌçÏÆ    12/09/26  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.48    NACL-ÌçÏÆ    12/10/01  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.50    NACL-ÌçÏÆ    12/10/11  Ê£¿ô²Ê¤Þ¤È¤á»þ¤Î¼ýÇ¼ÆÉ¤ßÈô¤Ð¤·
+      *                                     ¾ò·ï½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -27751,6 +27753,10 @@
                       (LNK-SYU-GRP-DENPNUM  NOT =  ZERO           ) AND
                       (LNK-SYU-GRP-DENPNUM      =  SYU-GRP-DENPNUM))
                OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-S01-IKTGENMKJFLG     =  SPACE          ) AND
+                      (LNK-SYU-GRP-DENPNUM  NOT =  ZERO           ) AND
+                      (LNK-SYU-GRP-DENPNUM      =  SYU-DENPNUM    ))
+               OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
                       (LNK-S01-IKTKEISANKBN     =   "1"           ) AND
                       (FLG-IKTKEISANKBN         =  ZERO           ) AND
                       (LNK-S01-IKTSORTKBN       =   "0" OR SPACE  ) AND
@@ -27853,6 +27859,10 @@
                       (LNK-S01-IKTGENMKJFLG     =  SPACE          ) AND
                       (LNK-SYU-GRP-DENPNUM  NOT =  ZERO           ) AND
                       (LNK-SYU-GRP-DENPNUM      =  SYU-GRP-DENPNUM))
+               OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-S01-IKTGENMKJFLG     =  SPACE          ) AND
+                      (LNK-SYU-GRP-DENPNUM  NOT =  ZERO           ) AND
+                      (LNK-SYU-GRP-DENPNUM      =  SYU-DENPNUM    ))
                        IF  (LNK-S01-SAIKEISAN-KBN  =   "1"       )
                        AND (LNK-SYU-DENPNUM    NOT =  ZERO       )
                        AND (LNK-SYU-DENPNUM        =  SYU-DENPNUM)
