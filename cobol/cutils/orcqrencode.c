@@ -1,14 +1,24 @@
+#if 0
+#!/bin/bash
+src=$0
+obj=${src%.*}
+gcc -g -Wl,--no-as-needed -lm `pkg-config --cflags --libs libpng12 libqrencode` -o $obj $src
+$obj
+exit
+#endif
+
 /*
  * orcqrencode - QR Code encode front end for jma-receipt
  *
  */
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <qrencode.h>
 #include <png.h>
-#include <jconv.h>
+#include <iconv.h>
 
 /*#define DEBUG*/
 #ifdef DEBUG
@@ -174,23 +184,31 @@ euc2sjis(char *file,
 	char *out)
 {
 	FILE *fp;
-	char *sjis;
 	char src[MAX_DATA_SIZE];
-	int ret;
+	char dst[MAX_DATA_SIZE];
+	char *ip,*op;
+	size_t sib;
+	size_t sob;
+	iconv_t cd;
+	int rc;
 
 	if((fp = fopen(file, "r")) == NULL)return -1;
-	ret = fread(src, 1, MAX_DATA_SIZE, fp);
-	if(ret == 0){
+	sib = fread(src, 1, MAX_DATA_SIZE, fp);
+	if(sib == 0){
 		return -1;	
 	}
-	src[ret] = '\0';
 	fclose(fp);
 
-	if((sjis = convert_kanji_strict(src, "SJIS", "EUCJP")) == NULL){
-		return -1;	
+	ip = src;
+	op = dst;
+	sob = MAX_DATA_SIZE;
+	memset(dst,0,MAX_DATA_SIZE);
+	cd = iconv_open("cp932","euc-jp");
+	rc = iconv(cd,&ip,&sib,&op,&sob);
+	if (rc != 0) {
+		return -1;
 	}
-	strncpy(out, sjis, MAX_DATA_SIZE);
-	free(sjis);
+	strncpy(out,dst,MAX_DATA_SIZE);
 	return 0;
 }
 
@@ -442,9 +460,15 @@ OPENLOG;
 		return;
 	}
 
-	if(parse_csv(buf, buf2) !=0){
-		memset(CTX(ctx, OFFSET_RET_CODE), KANA_CONV_ERROR, SIZE_RET_CODE);
-		return;
+	hint = ctx_string2int(ctx, OFFSET_HINT, SIZE_HINT);
+
+	if (hint < 2) {
+		if(parse_csv(buf, buf2) !=0){
+			memset(CTX(ctx, OFFSET_RET_CODE), KANA_CONV_ERROR, SIZE_RET_CODE);
+			return;
+		}
+	} else {
+		memcpy(buf2,buf,MAX_DATA_SIZE);
 	}
 
 	snprintf(qrfile, SIZE_QRFILE, "%s", CTX(ctx, OFFSET_QRFILE));
@@ -472,9 +496,8 @@ OPENLOG;
 
 	p = strrchr(qrfile, '.');
 	if(p != NULL)*p = '\0';
-	doEncodeStructured = 0;
-
-	hint = ctx_string2int(ctx, OFFSET_HINT, SIZE_HINT) == 0 ? QR_MODE_KANJI : QR_MODE_8;
+	doEncodeStructured = ctx_string2int(ctx, OFFSET_STRUCTURED, SIZE_STRUCTURED);
+	hint = (hint % 2) == 0 ? QR_MODE_KANJI : QR_MODE_8;
 	size = ctx_string2int(ctx, OFFSET_PIXEL, SIZE_PIXEL);
 	margin = ctx_string2int(ctx, OFFSET_MARGIN, SIZE_MARGIN);
 
@@ -485,19 +508,18 @@ OPENLOG;
 				"%s_%02d.png", qrfile, 1);
 			if(writePNG(code, qrfile_suffix, size, margin) != 0){
 				memset(CTX(ctx, OFFSET_RET_CODE), WRITE_PNG_ERROR, SIZE_RET_CODE);
+				QRcode_free(code);
 				return;
 			}
-SYSLOG("write single image");
+		SYSLOG("write single image");
 			sprintf(buf, "%02d" , code->version);
 			memcpy(CTX(ctx, OFFSET_RET_VERSION), buf, SIZE_RET_VERSION);
 			sprintf(buf, "%02d" , 1);
 			memcpy(CTX(ctx, OFFSET_RET_SYMBOLS), "01", SIZE_RET_SYMBOLS);
-		} else {
-			doEncodeStructured = 1;
+			QRcode_free(code);
+			return;
 		}
 		QRcode_free(code);
-	} else {
-		doEncodeStructured = 1;
 	}
 	if (doEncodeStructured) {
 		head = QRcode_encodeStringStructured(buf2, version, level, hint ,1);
@@ -515,7 +537,7 @@ SYSLOG("write single image");
 				entry = entry->next;	
 				i++;
 			}
-SYSLOG("write multi images");
+		SYSLOG("write multi images");
 			QRcode_List_free(entry);
 		}
 		else {
