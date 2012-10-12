@@ -411,6 +411,24 @@ parse_csv(char *in,
 	return(0);
 }
 
+static void
+lf2crlf(char *in, 
+	char *out)
+{
+	unsigned char *p,*q;
+
+	out[0] = 0x00;
+	for(p = in, q = out; *p != 0; p++,q++){
+		if (*p == 0x0a) { 
+			*q = 0x0d;
+			q++;
+			*q = 0x0a;
+		} else {
+			*q = *p;
+		}
+	}
+}
+
 static
 void print_ctx(char *ctx)
 {
@@ -468,7 +486,7 @@ OPENLOG;
 			return;
 		}
 	} else {
-		memcpy(buf2,buf,MAX_DATA_SIZE);
+		lf2crlf(buf,buf2);
 	}
 
 	snprintf(qrfile, SIZE_QRFILE, "%s", CTX(ctx, OFFSET_QRFILE));
