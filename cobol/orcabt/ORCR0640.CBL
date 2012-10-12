@@ -14626,16 +14626,23 @@
                    ELSE
                      ADD    WRK-FTNKEI   TO   RECE62-FTNMONEY(1)
                    END-IF
-                   IF (RECE62-KOHSKY-KOHNUM(1)
+                   IF  (RECE62-KOHNUM(1) = SYU-KOH-HKNNUM(1))
+                   OR  (RECE62-KOHNUM(2) = SYU-KOH-HKNNUM(1))
+                   OR  (RECE62-KOHNUM(3) = SYU-KOH-HKNNUM(1))
+                   OR  (RECE62-KOHNUM(4) = SYU-KOH-HKNNUM(1))
+                    CONTINUE
+                   ELSE
+                    IF (RECE62-KOHSKY-KOHNUM(1)
                                          = SYU-KOH-HKNNUM(1))
-                   OR (RECE62-KOHSKY-KOHNUM(2)
+                    OR (RECE62-KOHSKY-KOHNUM(2)
                                          = SYU-KOH-HKNNUM(1))
-                   OR (RECE62-KOHSKY-KOHNUM(3)
+                    OR (RECE62-KOHSKY-KOHNUM(3)
                                          = SYU-KOH-HKNNUM(1))
-                   OR (RECE62-KOHSKY-KOHNUM(4)
+                    OR (RECE62-KOHSKY-KOHNUM(4)
                                          = SYU-KOH-HKNNUM(1))
                      ADD  SYU-TOTAL-HKNTEN
                                          TO   WRK-JYOGENKBN-TEN5
+                    END-IF
                    END-IF
                  ELSE
                    IF  ( SYU-KOH-HKNNUM(1)(1:1)    = "0" )
@@ -14705,13 +14712,19 @@
                      ELSE
                        ADD    WRK-FTNKEI   TO   RECE62-FTNMONEY(1)
                      END-IF
-                     IF (RECE62-KOHSKY-KOHNUM(1)
+                     IF  (RECE62-KOHNUM(1) = SYU-KOH-HKNNUM(1))
+                     OR  (RECE62-KOHNUM(2) = SYU-KOH-HKNNUM(1))
+                     OR  (RECE62-KOHNUM(3) = SYU-KOH-HKNNUM(1))
+                     OR  (RECE62-KOHNUM(4) = SYU-KOH-HKNNUM(1))
+                      CONTINUE
+                     ELSE
+                      IF (RECE62-KOHSKY-KOHNUM(1)
                                            = SYU-KOH-HKNNUM(1))
-                     OR (RECE62-KOHSKY-KOHNUM(2)
+                      OR (RECE62-KOHSKY-KOHNUM(2)
                                            = SYU-KOH-HKNNUM(1))
-                     OR (RECE62-KOHSKY-KOHNUM(3)
+                      OR (RECE62-KOHSKY-KOHNUM(3)
                                            = SYU-KOH-HKNNUM(1))
-                     OR (RECE62-KOHSKY-KOHNUM(4)
+                      OR (RECE62-KOHSKY-KOHNUM(4)
                                            = SYU-KOH-HKNNUM(1))
                         MOVE    1    TO   FLG-HOKENICHIBU4
                         ADD    SYU-TOTAL-HKNTEN
@@ -14730,6 +14743,7 @@
                                      TO   WRK-JYOGENKBN-TEN5
                         ADD    SYU-TOTAL-HKNTEN
                                      TO   WRK-JYOGENKBN-TEN3
+                      END-IF
                      END-IF
                      ADD    SYU-TOTAL-HKNTEN
                                      TO   WRK-JYOGENKBN-TEN6
@@ -16738,25 +16752,12 @@
       **>        END-IF
                 END-IF
       *
-                IF   ( RECE62-KOHNUM(KH-IDX - 1) =  "012" OR "025" )
-                OR   ((WRK-PREFNUM               =   13           ) AND
-                      (RECE62-KOHNUM(KH-IDX - 1) =  "588"         ) AND
-                      (RECE62-SRYYM             >=  "200710"      ) AND
-                      (RECE62-SRYYM             <=  "200909"      ))
-                OR   ((WRK-PREFNUM               =   13           ) AND
-                      (RECE62-KOHNUM(KH-IDX - 1) =
-                        "180" OR "380" OR "181" OR "381"          ))
-                OR   ((WRK-PREFNUM               =   05           ) AND
-                      (RECE62-KOHNUM(KH-IDX - 1) =
-                        "374" OR "474" OR "280"                   ) AND
-                      (RECE62-SRYYM             >=  "200508"      ))
-                  COMPUTE  WRK-TAIHI-FTNMONEY-EN(KH-IDX)  =
-                           WRK-TAIHI-FTNMONEY-EN(KH-IDX)  +
-                          (SYU-KOH-COMPFTN-ENTANI(IDX3)   + 0.5)
-                  COMPUTE  WRK-TAIHI-FTNMONEY-EN2(KH-IDX) =
-                           WRK-TAIHI-FTNMONEY-EN2(KH-IDX) +
-                           SYU-KOH-COMPFTN-ENTANI(IDX3)
-                END-IF
+                COMPUTE  WRK-TAIHI-FTNMONEY-EN(KH-IDX)  =
+                         WRK-TAIHI-FTNMONEY-EN(KH-IDX)  +
+                        (SYU-KOH-COMPFTN-ENTANI(IDX3)   + 0.5)
+                COMPUTE  WRK-TAIHI-FTNMONEY-EN2(KH-IDX) =
+                         WRK-TAIHI-FTNMONEY-EN2(KH-IDX) +
+                         SYU-KOH-COMPFTN-ENTANI(IDX3)
       *
                 IF    (RECE62-KOHNUM(KH-IDX - 1) =
                                        "010" OR "012" OR "015" OR
@@ -20926,7 +20927,8 @@
       *
            IF  ((FLG-HOKENICHIBU2  NOT = ZERO) AND
                 (FLG-HOKENICHIBU3  NOT = ZERO) AND
-                (FLG-HOKENICHIBU-SYU   = ZERO))
+                (FLG-HOKENICHIBU-SYU   = ZERO) AND
+                (FLG-CHIIKI            = ZERO))
            OR  ( FLG-HOKENICHIBU-CHK   =  1   )
              MOVE   RECE62-TOTALTEN(1)  TO  WRK-HANTEI-TOTALTEN
            ELSE
@@ -20945,11 +20947,11 @@
              END-IF
            END-IF
       *
-           IF  ( RECE62-KOUREI         = "1"  )
-           OR  ( FLG-CHIIKI        NOT = ZERO )
+           IF  ( FLG-CHIIKI        NOT = ZERO )
            OR  ((FLG-HOKENICHIBU2  NOT = ZERO) AND
                 (FLG-HOKENICHIBU3  NOT = ZERO) AND
-                (FLG-HOKENICHIBU-SYU   = ZERO))
+                (FLG-HOKENICHIBU-SYU   = ZERO) AND
+                (FLG-CHIIKI            = ZERO))
            OR  ( FLG-HOKENICHIBU-CHK   =  1   )
              IF   WRK-KINGAKU3  >  WRK-CHK-KOKIGAK2
                COMPUTE  WRK-CHK-KOKIGAK5  =  WRK-KINGAKU3
