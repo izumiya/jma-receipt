@@ -1988,8 +1988,11 @@
                    MOVE    "更新処理ができませんでした。"
                                                TO  SPA-ERRMSG
                WHEN    "1017"
-                   MOVE    "感染症サーベイランスへは参加中です。"
-                                               TO  SPA-ERRMSG
+                   STRING  "ＯＲＣＡサーベイランス調査"
+                           "へは参加中です。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "1018"
                    STRING  "あなたは管理者ではありませんので参加"
                            "する場合は管理者まで連絡してください。"
@@ -2023,7 +2026,8 @@
       *
            EVALUATE    SPA-MIDCD
                WHEN    "9102"
-                   STRING  "感染症へのデータ提供（参加）を"
+                   STRING  "ＯＲＣＡサーベイランス調査"
+                           "へのデータ提供（参加）を"
                            "開始しますか？"
                                                DELIMITED  BY  SIZE
                                                INTO    WRK-MIDMSG
@@ -2348,13 +2352,13 @@
       *
            IF     (SPA-ERRCD           =   SPACE)  AND
                   (SPA-DATATEISYUTUKBN =   ZERO)
-               STRING  "日レセから自動送信による感染症マップを"
+               STRING  "日レセから自動送信による地域マップを"
                        "日本医師会ホームページにて公開中です。"
                        "ご協力ください。"
                                            DELIMITED  BY  SIZE
                                            INTO    SPA-GMN-LBLMSG2
                END-STRING
-               STRING  "下方、Ｆ４キー（感染症設定ボタン）で参加"
+               STRING  "Ｆ４キー（調査協力ボタン）で参加"
                        "登録をお願いします。"
                                            DELIMITED  BY  SIZE
                                            INTO    SPA-GMN-LBLMSG

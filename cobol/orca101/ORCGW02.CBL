@@ -4789,7 +4789,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "データ収集作成フラグ入力エラー"
                                                TO  SPA-ERRMSG
                WHEN    "0204"
-                   MOVE    "データ収集提出方法区分入力エラー"
+      **             MOVE    "データ収集提出方法区分入力エラー"
+                   MOVE    "ＯＲＣＡサーベイランス区分入力エラー"
                                                TO  SPA-ERRMSG
                WHEN    "0205"
                    MOVE    "自費保険集計先区分入力エラー"
