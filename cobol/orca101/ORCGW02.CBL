@@ -4895,7 +4895,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    INTO  SPA-ERRMSG
                    END-STRING
                WHEN    "0217"
-                   MOVE    "データ収集感染症区分入力エラー"
+                   MOVE    "ＯＲＣＡサーベイランス区分入力エラー"
                                                TO  SPA-ERRMSG
                WHEN    "0030"
                    MOVE    "自費名称は全角で入力して下さい。"
