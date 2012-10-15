@@ -220,6 +220,8 @@
       *  04.06.03    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
       *                                     併用から単独になったときのまとめ
       *  04.06.04    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.05    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
+      *                                     えた場合の種別不明対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -392,9 +394,9 @@
            03  WRK-SYUKA-SRYYM         PIC X(06).
            03  WRK-SYUKA-PTID          PIC 9(10).
       *
-           03  WRK-SEIHO-IDX           PIC 9(01).
-           03  WRK-HIBAKU-IDX          PIC 9(01).
-           03  WRK-KOH-IDX             PIC 9(01).
+           03  WRK-SEIHO-IDX           PIC 9(02).
+           03  WRK-HIBAKU-IDX          PIC 9(02).
+           03  WRK-KOH-IDX             PIC 9(02).
       *
            03  WRK-1033-TABLE.
                05  WRK-1033-TBL    OCCURS  5.
@@ -410,7 +412,7 @@
       *
       *    公費並替え用ワーク
            03  WRK-KOHI-AREA.
-               05  WRK-KOHI-TBL        OCCURS  4.
+               05  WRK-KOHI-TBL        OCCURS  10.
                    07  WRK-KOHID-O     PIC  9(10).
                    07  WRK-KOHHKNNUM-O PIC  X(03).
                    07  WRK-KOHPAYKBN-O PIC  X(02).
@@ -428,7 +430,7 @@
       *    請求区分別公費情報（１：レセプト　２：請求書）
            03  WRK-SEIKYUKBN-KOHI-AREA.
                05  WRK-SEIKYU-TBL   OCCURS  2.
-                   07  WRK-SEIKYU-OCC    OCCURS  4.
+                   07  WRK-SEIKYU-OCC    OCCURS  10.
                        09  WRK-SEIKYU-KOHID      PIC  9(10).
                        09  WRK-SEIKYU-KOHHKNNUM  PIC  X(03).
                        09  WRK-SEIKYU-KOHPAYKBN  PIC  X(02).
@@ -2267,11 +2269,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
       *
       *    公費の追加 
            PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       4
+                   UNTIL   IDX >       10
                MOVE    SPACE               TO  WRK-RECESKYKBN
       *
                IF      WRK-SEIKYU-KOHID (IDX1 IDX)    =   ZERO
-                   MOVE    4                   TO  IDX
+                   MOVE    10                  TO  IDX
                ELSE
       *            老人＋原爆のとき  
                    IF    ( WRK-RECE01-KOHID    NOT =   ZERO  )
@@ -2319,9 +2321,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                    UNTIL   IDX >       WRK-SRT-KOHHKNNUM-MAX
                    OR      WRK-SRT-KOHHKNNUM (IDXX IDX)
                                        =   SPACE
-                   OR      TBL-MAX     =   4 
+                   OR      TBL-MAX     =   10 
                PERFORM VARYING IDY FROM    1   BY  1
-                       UNTIL   IDY >       4
+                       UNTIL   IDY >       10
                    IF      WRK-SRT-KOHHKNNUM   (IDXX IDX)
                                        =   WRK-KOHHKNNUM-O (IDY)
                        ADD     1               TO  TBL-MAX
@@ -2335,11 +2337,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
       *
       *    法別、適用開始日による全国公費の並び替え
            PERFORM VARYING IDX FROM    1    BY  1
-                   UNTIL   IDX >       3
+                   UNTIL   IDX >       9
                    OR      WRK-RECE01-KOHHKNNUM-O (IDX) =   SPACE
                COMPUTE IDX1    =   IDX     +   1
                PERFORM VARYING IDY FROM    IDX1    BY  1
-                       UNTIL   IDY >       4
+                       UNTIL   IDY >       10
                        OR      WRK-RECE01-KOHHKNNUM-O (IDY) =   SPACE
                    IF   ( WRK-RECE01-KOHHKNNUM-O (IDX)
                                    =   WRK-RECE01-KOHHKNNUM-O   (IDY) )
@@ -2359,15 +2361,21 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
            AND     WRK-KOHHKNNUM-O (2)     =   SPACE
            AND     WRK-KOHHKNNUM-O (3)     =   SPACE
            AND     WRK-KOHHKNNUM-O (4)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (5)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (6)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (7)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (8)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (9)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (10)    =   SPACE
                GO  TO  20012-KOHID-HENSYU-EXT
            END-IF
       *
       *    地方公費の並び替え
            PERFORM VARYING IDX FROM    1    BY  1
-                   UNTIL   IDX >       3
+                   UNTIL   IDX >       9
                COMPUTE IDX1    =   IDX     +   1
                PERFORM VARYING IDY FROM    IDX1    BY  1
-                       UNTIL   IDY >       4
+                       UNTIL   IDY >       10
                  IF     WRK-KOHHKNNUM-O (IDY) =   SPACE
                    CONTINUE
                  ELSE 
@@ -2446,8 +2454,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
       *
       *    地方公費の追加
            PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX         >   4
-                   OR      TBL-MAX     =   4 
+                   UNTIL   IDX         >   10
+                   OR      TBL-MAX     =   10 
                IF      WRK-KOHID-O (IDX)   >   ZERO
                    ADD     1                   TO  TBL-MAX
                    MOVE    WRK-KOHI-TBL (IDX)  TO 
@@ -2460,7 +2468,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                MOVE    ZERO                TO  WRK-SEIHO-IDX
                                                WRK-HIBAKU-IDX                                                 
                PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       4
+                       UNTIL   IDX >       10
                        OR      WRK-RECE01-KOHHKNNUM-O (IDX)
                                    =       SPACE
                    IF      WRK-RECE01-KOHHKNNUM-O (IDX)
@@ -2468,7 +2476,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                        IF      WRK-HIBAKU-IDX      =   0 
                            MOVE    IDX                 TO  WRK-SEIHO-IDX
                        ELSE
-                           MOVE    4                   TO  IDX
+                           MOVE    10                  TO  IDX
                        END-IF
                    END-IF
                    IF      WRK-RECE01-KOHHKNNUM-O (IDX)
@@ -2482,7 +2490,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                            MOVE    WRK-KOHI    TO  WRK-RECE01-KOHI-TBL
                                                    (WRK-SEIHO-IDX)
                        END-IF
-                       MOVE    4                   TO  IDX
+                       MOVE    10                  TO  IDX
                    END-IF
                END-PERFORM
            END-IF
@@ -2492,7 +2500,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                MOVE    ZERO                TO  WRK-SEIHO-IDX
                                                WRK-HIBAKU-IDX                                                 
                PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       4
+                       UNTIL   IDX >       10
                        OR      WRK-RECE01-KOHHKNNUM-O (IDX)
                                    =       SPACE
                    IF      WRK-RECE01-KOHHKNNUM-O (IDX)
@@ -2500,7 +2508,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                        IF      WRK-HIBAKU-IDX      =   0 
                            MOVE    IDX                 TO  WRK-SEIHO-IDX
                        ELSE
-                           MOVE    4                   TO  IDX
+                           MOVE    10                  TO  IDX
                        END-IF
                    END-IF
                    IF      WRK-RECE01-KOHHKNNUM-O (IDX)
@@ -2514,7 +2522,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                            MOVE    WRK-KOHI    TO  WRK-RECE01-KOHI-TBL
                                                    (WRK-SEIHO-IDX)
                        END-IF
-                       MOVE    4                   TO  IDX
+                       MOVE    10                  TO  IDX
                    END-IF
                END-PERFORM
            END-IF
@@ -2524,7 +2532,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                MOVE    ZERO                TO  WRK-SEIHO-IDX
                                                WRK-HIBAKU-IDX                                                 
                PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       4
+                       UNTIL   IDX >       10
                        OR      WRK-RECE01-KOHHKNNUM-O (IDX)
                                    =       SPACE
                    IF      WRK-RECE01-KOHHKNNUM-O (IDX)
@@ -2532,7 +2540,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                        IF      WRK-HIBAKU-IDX      =   0 
                            MOVE    IDX                 TO  WRK-SEIHO-IDX
                        ELSE
-                           MOVE    4                   TO  IDX
+                           MOVE    10                  TO  IDX
                        END-IF
                    END-IF
                    IF      WRK-RECE01-KOHHKNNUM-O (IDX)
@@ -2546,7 +2554,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                            MOVE    WRK-KOHI    TO  WRK-RECE01-KOHI-TBL
                                                    (WRK-SEIHO-IDX)
                        END-IF
-                       MOVE    4                   TO  IDX
+                       MOVE    10                  TO  IDX
                    END-IF
                END-PERFORM
            END-IF
@@ -2560,7 +2568,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                INITIALIZE                  WRK-KOHI-AREA
                MOVE    ZERO                TO  TBL-MAX   
                PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       4
+                       UNTIL   IDX >       10
                        OR      WRK-RECE01-KOHHKNNUM-O (IDX)
                                    =       SPACE
                    IF      WRK-RECE01-KOHHKNNUM-O (IDX) (1:1)
@@ -2616,8 +2624,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                                                        (WRK-HIBAKU-IDX)
                        END-IF        
                        PERFORM VARYING IDX FROM    1   BY  1
-                               UNTIL   IDX         >   4
-                               OR      TBL-MAX     =   4 
+                               UNTIL   IDX         >   10
+                               OR      TBL-MAX     =   10 
                            IF      IDX             >   WRK-KOH-IDX
                                IF      WRK-RECE01-KOHID-O (IDX)
                                                        >   ZERO
@@ -2645,7 +2653,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
        200121-KOHID-TBL-HENSYU-SEC     SECTION.
       *
            PERFORM VARYING IDY FROM    1   BY  1
-                   UNTIL   IDY >       4
+                   UNTIL   IDY >       10
                IF      WRK-KOHID-O (IDY)   =   ZERO
                    MOVE    WRK-SEIKYU-KOHID    (IDX1 IDX)
                                            TO  WRK-KOHID-O    (IDY)
@@ -2655,11 +2663,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                    MOVE    WRK-SEIKYU-TEKSTYMD (IDX1 IDX)
                                            TO  WRK-KOHTEKSTYMD-O (IDY)
                    MOVE    1               TO  FLG-ADDKBN
-                   MOVE    4               TO  IDY
+                   MOVE    10              TO  IDY
                ELSE 
                    IF      WRK-SEIKYU-KOHID (IDX1 IDX)
                                        =   WRK-KOHID-O  (IDY)
-                       MOVE    4           TO  IDY
+                       MOVE    10          TO  IDY
                    END-IF
                END-IF
            END-PERFORM

@@ -203,6 +203,8 @@
       *  04.06.03    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
       *                                     併用から単独になったときのまとめ
       *  04.06.04    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.05    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
+      *                                     えた場合の種別不明対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1083,6 +1085,24 @@
                            AND   ( RECE61-KOHHKNNUM-O  (4)
                                            =   RECE61-KOHHKNNUM-O (1) 
                                            OR  SPACE                  )
+                           AND   ( RECE61-KOHHKNNUM-O  (5)
+                                           =   RECE61-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                           AND   ( RECE61-KOHHKNNUM-O  (6)
+                                           =   RECE61-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                           AND   ( RECE61-KOHHKNNUM-O  (7)
+                                           =   RECE61-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                           AND   ( RECE61-KOHHKNNUM-O  (8)
+                                           =   RECE61-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                           AND   ( RECE61-KOHHKNNUM-O  (9)
+                                           =   RECE61-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                           AND   ( RECE61-KOHHKNNUM-O  (10)
+                                           =   RECE61-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
                                GO  TO  210-HENSYU-EXT
                            ELSE
       *********************    IF    ( RECE61-KOHHKNNUM-O  (2)
@@ -1141,7 +1161,7 @@
                    PERFORM VARYING IDXX    FROM    1   BY  1
                            UNTIL   IDXX    >       WRK-SEIHO-RECE61-MAX
                        PERFORM VARYING IDYY    FROM    1   BY  1
-                               UNTIL   IDYY    >       4
+                               UNTIL   IDYY    >       10
                                OR      RECE61-KOHID-O (IDYY)
                                                =       ZERO
                            IF      WRK-SEIHO-RECE61-KOHID-O (IDXX 1)
@@ -1166,7 +1186,7 @@
                                        MOVE    10          TO  IDZZ
                                    END-IF
                                END-PERFORM    
-                               MOVE    4           TO  IDYY
+                               MOVE    10          TO  IDYY
                                MOVE    WRK-SEIHO-RECE61-MAX
                                                    TO  IDXX
                            END-IF
@@ -1397,7 +1417,7 @@
       *    長期高額療養費の編集
            MOVE    SPACE              TO   WRK-CHOKI
            PERFORM   VARYING   IDX   FROM    1   BY   1
-                     UNTIL    (IDX     >   4)    
+                     UNTIL    (IDX     >   10)    
                      OR       (RECE61-KOHHKNNUM-O(IDX)  =   SPACE)
                IF    RECE61-KOHHKNNUM-O(IDX)     =    "027"
                    CONTINUE
@@ -1433,7 +1453,7 @@
                            MOVE    RECE61-KOHHKNNUM-O(IDX)  TO
                                                     WRK-CHOKI 
                            MOVE    1            TO  FLG-HKNNUM
-                           MOVE    4            TO  IDX  
+                           MOVE    10           TO  IDX  
                        END-IF     
                    END-IF
                  END-IF
@@ -1446,18 +1466,23 @@
       *    公費情報のセット
            MOVE    ZERO        TO  IDX2
            PERFORM   VARYING   IDX    FROM   1   BY   1
-                     UNTIL    (IDX          >     4)
+                     UNTIL    (IDX          >     10)
                      OR       (RECE61-KOHID-O(IDX)  =   ZERO)  
                IF  (RECE61-KOHHKNNUM-O (IDX)  =       "027")
                      CONTINUE
                ELSE
-                   IF      RECE61-KOHHKNNUM-O (IDX)  =   WRK-CHOKI
-                       MOVE   "4"             TO  WRK-RECESKYKBN
+                   IF      IDX                >   4
+                       MOVE    "9"                TO  RECE61-TEISEIKBN
+                       MOVE    10                 TO  IDX
                    ELSE
-                       MOVE   RECE61-RECESKYKBN-O (IDX)
-                                             TO  WRK-RECESKYKBN
+                       IF      RECE61-KOHHKNNUM-O (IDX)  =   WRK-CHOKI
+                           MOVE   "4"             TO  WRK-RECESKYKBN
+                       ELSE
+                           MOVE   RECE61-RECESKYKBN-O (IDX)
+                                                 TO  WRK-RECESKYKBN
+                       END-IF
+                       PERFORM   KOHI-SET-SEC
                    END-IF
-                   PERFORM   KOHI-SET-SEC
                END-IF
            END-PERFORM
       *
@@ -1620,6 +1645,10 @@
                MOVE    RECE61-ERR-TEKSTYMD   TO  RECE62-ERR-TEKSTYMD
                MOVE    RECE61-ERR-TEKEDYMD   TO  RECE62-ERR-TEKEDYMD
            END-IF 
+      *
+           IF      RECE61-TEISEIKBN      =   "9"
+               MOVE    88                    TO  RECE62-ERR-ERRKBN
+           END-IF
       *
       *    入退院履歴より情報取得
            IF      IDZ             =   1               
@@ -2224,6 +2253,10 @@
       *    保険変更後、訂正していないとき
       *    保険組合せがないとき
            IF      RECE61-TEISEIKBN     =   "1"
+               GO  TO  RECESYUBETU-SET-EXT
+           END-IF
+      *    公費が４つを超えたとき
+           IF      RECE61-TEISEIKBN     =   "9"
                GO  TO  RECESYUBETU-SET-EXT
            END-IF
       *
@@ -2993,7 +3026,7 @@
       *
            IF      WRK-HKNNUM          NOT =   SPACE
                PERFORM VARYING IDY FROM    1   BY  1
-                       UNTIL   IDY >       4
+                       UNTIL   IDY >       10
                        OR      RECE61-KOHHKNNUM-O (IDY)  =   SPACE
                        OR      FLG-CHK     =  1
                    IF      WRK-HKNNUM      =   RECE61-KOHHKNNUM-O (IDY)

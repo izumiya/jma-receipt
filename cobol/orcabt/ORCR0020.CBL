@@ -244,6 +244,8 @@
       *  04.06.04    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *  04.06.05    NACL-藤原    12/08/01  保険履歴ファイルのエラー処理
       *                                     中止 
+      *  04.06.06    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
+      *                                     えた場合の種別不明対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1236,6 +1238,24 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                        AND   ( RECE01-KOHHKNNUM-O  (4)
                                            =   RECE01-KOHHKNNUM-O (1) 
                                            OR  SPACE                  )
+                       AND   ( RECE01-KOHHKNNUM-O  (5)
+                                           =   RECE01-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                       AND   ( RECE01-KOHHKNNUM-O  (6)
+                                           =   RECE01-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                       AND   ( RECE01-KOHHKNNUM-O  (7)
+                                           =   RECE01-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                       AND   ( RECE01-KOHHKNNUM-O  (8)
+                                           =   RECE01-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                       AND   ( RECE01-KOHHKNNUM-O  (9)
+                                           =   RECE01-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
+                       AND   ( RECE01-KOHHKNNUM-O  (10)
+                                           =   RECE01-KOHHKNNUM-O (1) 
+                                           OR  SPACE                  )
                            GO  TO  210-HENSYU-EXT
                        ELSE
       *********************IF    ( RECE01-KOHHKNNUM-O  (2)
@@ -1294,7 +1314,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    PERFORM VARYING IDXX    FROM    1   BY  1
                            UNTIL   IDXX    >       WRK-SEIHO-RECE01-MAX
                        PERFORM VARYING IDYY    FROM    1   BY  1
-                               UNTIL   IDYY    >       4
+                               UNTIL   IDYY    >       10
                                OR      RECE01-KOHID-O (IDYY)
                                                =       ZERO
                            IF      WRK-SEIHO-RECE01-KOHID-O (IDXX 1)
@@ -1343,7 +1363,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                                        END-IF
                                    END-PERFORM
                                END-PERFORM
-                               MOVE    4           TO  IDYY
+                               MOVE    10          TO  IDYY
                                MOVE    WRK-SEIHO-RECE01-MAX
                                                    TO  IDXX
                            END-IF
@@ -1581,7 +1601,7 @@ grpsys                 MOVE   RECE01-HOSPNUM   TO  HKN-HOSPNUM
       *    長期高額療養費の編集
            MOVE    SPACE              TO   WRK-CHOKI
            PERFORM   VARYING   IDX   FROM    1   BY   1
-                     UNTIL    (IDX     >   4)    
+                     UNTIL    (IDX     >   10)    
                      OR       (RECE01-KOHHKNNUM-O(IDX)  =   SPACE)
                IF    RECE01-KOHHKNNUM-O(IDX)     =    "027"
                    CONTINUE
@@ -1617,7 +1637,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                            MOVE    RECE01-KOHHKNNUM-O(IDX)  TO
                                                     WRK-CHOKI 
                            MOVE    1            TO  FLG-HKNNUM
-                           MOVE    4            TO  IDX  
+                           MOVE    10           TO  IDX  
                        END-IF     
                    END-IF
                  END-IF
@@ -1630,18 +1650,27 @@ grpsys           PERFORM 900-DBSELECT-SEC
       *    公費情報のセット
            MOVE    ZERO        TO  IDX2
            PERFORM   VARYING   IDX    FROM   1   BY   1
-                     UNTIL    (IDX          >     4)
-                     OR       (RECE01-KOHID-O(IDX)  =   ZERO)  
+                     UNTIL    (IDX          >     10)
+                     OR       (RECE01-KOHID-O(IDX)  =   ZERO)
                IF  (RECE01-KOHHKNNUM-O (IDX)  =       "027")
                      CONTINUE
                ELSE
-                   IF      RECE01-KOHHKNNUM-O (IDX)  =   WRK-CHOKI
-                       MOVE   "4"             TO  WRK-RECESKYKBN
+                   IF      IDX                >   4
+      *
+                       DISPLAY "err=" IDX " " RECE01-KOHHKNNUM-O (IDX)
+                                          " " RECE01-KOHID-O (IDX)
+      *
+                       MOVE    "9"                TO  RECE01-TEISEIKBN
+                       MOVE    10                 TO  IDX
                    ELSE
-                       MOVE   RECE01-RECESKYKBN-O (IDX)
-                                             TO  WRK-RECESKYKBN
+                       IF      RECE01-KOHHKNNUM-O (IDX)  =   WRK-CHOKI
+                           MOVE   "4"             TO  WRK-RECESKYKBN
+                       ELSE
+                           MOVE   RECE01-RECESKYKBN-O (IDX)
+                                                 TO  WRK-RECESKYKBN
+                       END-IF
+                       PERFORM   KOHI-SET-SEC
                    END-IF
-                   PERFORM   KOHI-SET-SEC
                END-IF
            END-PERFORM
       *
@@ -1764,6 +1793,10 @@ grpsys             PERFORM 900-DBSELECT-SEC
                MOVE    RECE01-ERR-TEKSTYMD   TO  RECE02-ERR-TEKSTYMD
                MOVE    RECE01-ERR-TEKEDYMD   TO  RECE02-ERR-TEKEDYMD
            END-IF 
+      *
+           IF      RECE01-TEISEIKBN      =   "9"
+               MOVE    88                    TO  RECE02-ERR-ERRKBN
+           END-IF
       *
       *    印刷順
            IF      IDZ                 =   1
@@ -2593,6 +2626,10 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
       *    保険変更後、訂正していないとき
       *    保険組合せがないとき
            IF      RECE01-TEISEIKBN     =   "1"
+               GO  TO  RECESYUBETU-SET-EXT
+           END-IF
+      *    公費が４つを超えたとき
+           IF      RECE01-TEISEIKBN     =   "9"
                GO  TO  RECESYUBETU-SET-EXT
            END-IF
       *
@@ -3427,7 +3464,7 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
       *
            IF      WRK-HKNNUM          NOT =   SPACE
                PERFORM VARYING IDY FROM    1   BY  1
-                       UNTIL   IDY >       4
+                       UNTIL   IDY >       10
                        OR      RECE01-KOHHKNNUM-O (IDY)  =   SPACE
                        OR      FLG-CHK     =  1
                    IF      WRK-HKNNUM      =   RECE01-KOHHKNNUM-O (IDY)

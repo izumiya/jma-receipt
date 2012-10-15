@@ -101,6 +101,8 @@
       *                                     ¤Ï¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
       *  04.06.03    NACL-Æ£¸¶    11/02/24  ·îÅÓÃæ¤Ë°åÊÝ¤È»ùÆ¸ÊÝ¸î(53)¤Î
       *                                     Ê»ÍÑ¤«¤éÃ±ÆÈ¤Ë¤Ê¤Ã¤¿¤È¤­¤Î¤Þ¤È¤á
+      *  04.06.04    NACL-Æ£¸¶    12/10/04  Æ±°ì¥ì¥»¥×¥È¤Î¸øÈñ¤¬£´¤Ä¤òÄ¶
+      *                                     ¤¨¤¿¾ì¹ç¤Î¼ïÊÌÉÔÌÀÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -210,7 +212,7 @@
       *
       *    ¸øÈñÊÂÂØ¤¨ÍÑ¥ï¡¼¥¯
            03  WRK-KOHI-AREA.
-               05  WRK-KOHI-TBL        OCCURS  4.
+               05  WRK-KOHI-TBL        OCCURS  10.
                    07  WRK-KOHID-O     PIC  9(10).
                    07  WRK-KOHHKNNUM-O PIC  X(03).
                    07  WRK-KOHPAYKBN-O PIC  X(02).
@@ -230,7 +232,7 @@
       *    ÀÁµá¶èÊ¬ÊÌ¸øÈñ¾ðÊó¡Ê£±¡§¥ì¥»¥×¥È¡¡£²¡§ÀÁµá½ñ¡Ë
            03  WRK-SEIKYUKBN-KOHI-AREA.
                05  WRK-SEIKYU-TBL   OCCURS  2.
-                   07  WRK-SEIKYU-OCC    OCCURS  4.
+                   07  WRK-SEIKYU-OCC    OCCURS  10.
                        09  WRK-SEIKYU-KOHID      PIC  9(10).
                        09  WRK-SEIKYU-KOHHKNNUM  PIC  X(03).
                        09  WRK-SEIKYU-KOHPAYKBN  PIC  X(02).
@@ -329,7 +331,7 @@
       *    ¼çÊÝ¸±¡Ý¸øÈñ¼ïÊÌ¶èÊ¬
            03  WRK-RECE61-HKNKOHSBTKBN PIC X(01).
       *    
-           03  WRK-RECE61-KOH-AREA     OCCURS  4. 
+           03  WRK-RECE61-KOH-AREA     OCCURS  10. 
       *       ¸øÈñ¡ÝË¡ÊÌÈÖ¹æ
                05  WRK-RECE61-KOHHBTNUM    PIC X(02).
       *
@@ -342,7 +344,7 @@
       *    ¼çÊÝ¸±¡Ý¸øÈñ¼ïÊÌ¶èÊ¬
            03  TBL-RECE61-HKNKOHSBTKBN PIC X(01).
       *    
-           03  TBL-RECE61-KOH-AREA     OCCURS  4. 
+           03  TBL-RECE61-KOH-AREA     OCCURS  10. 
       *       ¸øÈñ¡ÝË¡ÊÌÈÖ¹æ
                05  TBL-RECE61-KOHHBTNUM    PIC X(02).
       *     
@@ -354,7 +356,7 @@
       *    ¼çÊÝ¸±¡Ý¸øÈñ¼ïÊÌ¶èÊ¬
            03  WRK-SEIHO-RECE61-HKNKOHSBTKBN PIC X(01).
       *    
-           03  WRK-SEIHO-RECE61-KOH-AREA     OCCURS  4. 
+           03  WRK-SEIHO-RECE61-KOH-AREA     OCCURS  10. 
       *       ¸øÈñ¡ÝË¡ÊÌÈÖ¹æ
                05  WRK-SEIHO-RECE61-KOHHBTNUM    PIC X(02).
       *
@@ -1698,11 +1700,11 @@ grpsys                     MOVE    LNK-SYUBETU-HOSPNUM
       *
       *    ¸øÈñ¤ÎÄÉ²Ã 
            PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       4
+                   UNTIL   IDX >       10
                MOVE    SPACE               TO  WRK-RECESKYKBN
       *
                IF      WRK-SEIKYU-KOHID (IDX1 IDX)    =   ZERO
-                   MOVE    4                   TO  IDX
+                   MOVE    10                  TO  IDX
                ELSE    
       *            Ï·¿Í¡Ü¸¶Çú¤Î¤È¤­  
                    IF    ( WRK-RECE61-KOHID    NOT =   ZERO  )
@@ -1754,16 +1756,16 @@ grpsys                     MOVE    LNK-SYUBETU-HOSPNUM
                    UNTIL   IDX >       WRK-SRT-KOHHKNNUM-MAX
                    OR      WRK-SRT-KOHHKNNUM (IDYY IDX)
                                        =   SPACE
-                   OR      TBL-MAX     =   4 
+                   OR      TBL-MAX     =   10 
                PERFORM VARYING IDY FROM    1   BY  1
-                       UNTIL   IDY >       4
+                       UNTIL   IDY >       10
                    IF      WRK-SRT-KOHHKNNUM   (IDYY IDX)
                                        =   WRK-KOHHKNNUM-O (IDY)
                        ADD     1               TO  TBL-MAX
                        MOVE    WRK-KOHI-TBL    (IDY)   TO
                                            WRK-RECE61-KOHI-TBL (TBL-MAX)
                        INITIALIZE          WRK-KOHI-TBL    (IDY)
-                       MOVE    4               TO  IDY
+                       MOVE    10              TO  IDY
                    END-IF
                END-PERFORM
            END-PERFORM
@@ -1773,15 +1775,21 @@ grpsys                     MOVE    LNK-SYUBETU-HOSPNUM
            AND     WRK-KOHHKNNUM-O (2)     =   SPACE
            AND     WRK-KOHHKNNUM-O (3)     =   SPACE
            AND     WRK-KOHHKNNUM-O (4)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (5)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (6)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (7)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (8)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (9)     =   SPACE
+           AND     WRK-KOHHKNNUM-O (10)    =   SPACE
                GO  TO  2001921-KOHID-HENSYU-EXT
            END-IF
       *
       *    ÃÏÊý¸øÈñ¤ÎÊÂ¤ÓÂØ¤¨
            PERFORM VARYING IDX FROM    1    BY  1
-                   UNTIL   IDX >       3
+                   UNTIL   IDX >       9
                COMPUTE IDX1    =   IDX     +   1
                PERFORM VARYING IDY FROM    IDX1    BY  1
-                       UNTIL   IDY >       4
+                       UNTIL   IDY >       10
                    IF      WRK-KOHHKNNUM-O (IDX)
                                            >   WRK-KOHHKNNUM-O (IDY)
                    OR      WRK-KOHHKNNUM-O (IDX) =   SPACE 
@@ -1794,8 +1802,8 @@ grpsys                     MOVE    LNK-SYUBETU-HOSPNUM
       *
       *    ÃÏÊý¸øÈñ¤ÎÄÉ²Ã
            PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX         >   4
-                   OR      TBL-MAX     =   4 
+                   UNTIL   IDX         >   10
+                   OR      TBL-MAX     =   10 
                IF      WRK-KOHID-O (IDX)   >   ZERO
                    ADD     1                   TO  TBL-MAX
                    MOVE    WRK-KOHI-TBL (IDX)  TO 
@@ -1829,7 +1837,7 @@ grpsys                 MOVE   LNK-SYUBETU-HOSPNUM
        20019211-KOHID-TBL-HENSYU-SEC     SECTION.
       *
            PERFORM VARYING IDY FROM    1   BY  1
-                   UNTIL   IDY >       4
+                   UNTIL   IDY >       10
                IF      WRK-KOHID-O (IDY)   =   ZERO
                    MOVE    WRK-SEIKYU-KOHID    (IDX1 IDX)
                                            TO  WRK-KOHID-O     (IDY)
@@ -1837,11 +1845,11 @@ grpsys                 MOVE   LNK-SYUBETU-HOSPNUM
                                            TO  WRK-KOHHKNNUM-O (IDY)
                    MOVE    WRK-RECESKYKBN  TO  WRK-RECESKYKBN-O(IDY)
                    MOVE    1               TO  FLG-ADDKBN
-                   MOVE    4               TO  IDY
+                   MOVE    10               TO  IDY
                ELSE 
                    IF      WRK-SEIKYU-KOHID (IDX1 IDX)
                                             =   WRK-KOHID-O  (IDY)
-                       MOVE    4                TO  IDY
+                       MOVE    10               TO  IDY
                    END-IF
                END-IF
            END-PERFORM
@@ -1951,6 +1959,30 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                                                     =
                                            WRK-RECE61-KOHHKNNUM-O (1) 
                                                            OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (5)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (6)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (7)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (8)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (9)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (10)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
                                    CONTINUE
                                ELSE
       *****************************IF    ( WRK-RECE61-KOHHKNNUM-O  (2)
@@ -2024,6 +2056,30 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                                                     =
                                            WRK-RECE61-KOHHKNNUM-O (1) 
                                                            OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (5)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (6)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (7)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (8)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (9)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
+                               AND   ( WRK-RECE61-KOHHKNNUM-O  (10)
+                                                    =
+                                           WRK-RECE61-KOHHKNNUM-O (1) 
+                                                           OR  SPACE )
                                    MOVE    1           TO  FLG-WRITE
                                ELSE
                                    IF      FLG-SEIHO            =   1
@@ -2065,7 +2121,7 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                        PERFORM VARYING IDA FROM    1   BY  1
                                UNTIL   IDA >       TBL-SEIHO-RECE61-MAX
                            PERFORM VARYING IDYY    FROM    1   BY  1
-                                   UNTIL   IDYY    >       4
+                                   UNTIL   IDYY    >       10
                                    OR      WRK-RECE61-KOHID-O (IDYY)
                                                    =       ZERO
                                IF      TBL-SEIHO-RECE61-KOHID-O (IDA 1)
@@ -2093,7 +2149,7 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                                            MOVE    10          TO  IDB
                                        END-IF
                                    END-PERFORM    
-                                   MOVE    4               TO  IDYY
+                                   MOVE    10              TO  IDYY
                                    MOVE    TBL-SEIHO-RECE61-MAX
                                                            TO  IDA
                                END-IF
@@ -2270,7 +2326,15 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
       *    ÊÝ¸±ÊÑ¹¹¸å¡¢ÄûÀµ¤·¤Æ¤¤¤Ê¤¤¤È¤­
       *    ÊÝ¸±ÁÈ¹ç¤»¤¬¤Ê¤¤¤È¤­
            IF      WRK-RECE61-TEISEIKBN
-                                   =   "1"
+                                   =   "1" OR  "9"
+               MOVE    ZERO        TO  LNK-SYUBETU-RECESYUBETU  (IDZZ)
+                                       LNK-SYUBETU-RECESYUBETU-Y(IDZZ)
+               GO  TO  30011-RECESYUBETU-SET-EXT
+           END-IF
+      *
+      *    ¸øÈñ¤¬£´¤Ä¤òÄ¶¤¨¤ë»þ
+           IF      WRK-RECE61-KOHID-O (5)
+                                   >   ZERO
                MOVE    ZERO        TO  LNK-SYUBETU-RECESYUBETU  (IDZZ)
                                        LNK-SYUBETU-RECESYUBETU-Y(IDZZ)
                GO  TO  30011-RECESYUBETU-SET-EXT

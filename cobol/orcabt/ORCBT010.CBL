@@ -112,6 +112,8 @@
       *                                     は公費単独のレセプトとする
       *  04.06.04    NACL-藤原    11/02/24  月途中に医保と児童保護(53)の
       *                                     併用から単独になったときのまとめ
+      *  04.06.05    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
+      *                                     えた場合の種別不明対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2392,6 +2394,24 @@ grpsys                                         SPA-AREA
                                AND   ( TOUKEI01-TKOHHKNNUM  (4)
                                            =   TOUKEI01-TKOHHKNNUM (1) 
                                            OR  SPACE                  )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (5)
+                                           =   TOUKEI01-TKOHHKNNUM (1) 
+                                           OR  SPACE                  )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (6)
+                                           =   TOUKEI01-TKOHHKNNUM (1) 
+                                           OR  SPACE                  )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (7)
+                                           =   TOUKEI01-TKOHHKNNUM (1) 
+                                           OR  SPACE                  )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (8)
+                                           =   TOUKEI01-TKOHHKNNUM (1) 
+                                           OR  SPACE                  )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (9)
+                                           =   TOUKEI01-TKOHHKNNUM (1) 
+                                           OR  SPACE                  )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (10)
+                                           =   TOUKEI01-TKOHHKNNUM (1) 
+                                           OR  SPACE                  )
                                    CONTINUE
                                ELSE
       *****************************IF    ( TOUKEI01-TKOHHKNNUM  (2)
@@ -2462,6 +2482,30 @@ grpsys                                         SPA-AREA
                                            TOUKEI01-TKOHHKNNUM (1) 
                                                            OR  SPACE )
                                AND   ( TOUKEI01-TKOHHKNNUM  (4)
+                                                    =
+                                           TOUKEI01-TKOHHKNNUM (1) 
+                                                           OR  SPACE )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (5)
+                                                    =
+                                           TOUKEI01-TKOHHKNNUM (1) 
+                                                           OR  SPACE )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (6)
+                                                    =
+                                           TOUKEI01-TKOHHKNNUM (1) 
+                                                           OR  SPACE )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (7)
+                                                    =
+                                           TOUKEI01-TKOHHKNNUM (1) 
+                                                           OR  SPACE )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (8)
+                                                    =
+                                           TOUKEI01-TKOHHKNNUM (1) 
+                                                           OR  SPACE )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (9)
+                                                    =
+                                           TOUKEI01-TKOHHKNNUM (1) 
+                                                           OR  SPACE )
+                               AND   ( TOUKEI01-TKOHHKNNUM  (10)
                                                     =
                                            TOUKEI01-TKOHHKNNUM (1) 
                                                            OR  SPACE )
@@ -2666,6 +2710,13 @@ grpsys                                         SPA-AREA
            IF      TOUKEI01-TEISEIKBN  =   "1"
                GO  TO  20021-RECESYUBETU-SET-EXT
            END-IF
+      *
+      *    公費が４つを超える時
+           IF      TOUKEI01-TKOHHKNNUM (5)
+                                   NOT =   SPACE
+               GO  TO  20021-RECESYUBETU-SET-EXT
+           END-IF
+      *
       *    包括のとき
            IF      TOUKEI01-HKNJANUM   =   "9999999"
                GO  TO  20021-RECESYUBETU-SET-EXT
