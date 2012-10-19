@@ -304,7 +304,6 @@
            COPY    "MDAS.INC".
            COPY    "MLOG.INC".
            COPY    "MINF.INC".
-           COPY    "MPRT.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -582,6 +581,12 @@
                    PERFORM 210-FILECHECK-SEC
       *        同意する
                WHEN    "CLICKED"   ALSO    "B08"
+      *2012.10 サーベイ簡易設定改修
+      *        メッセージダイアログからの復帰と同様になりすます
+                   IF      SPA-MOTOPG      =   "M00"
+                        MOVE    "9102"          TO  SPA-MIDCD
+                   END-IF
+      *
                    MOVE    "OK"            TO  SPA-MID1-FLG
                    PERFORM 210-BACK
       *        タイマーイベント
@@ -598,10 +603,15 @@
       *****************************************************************
        210-BACK                    SECTION.
       *
-           MOVE    "M98"           TO  SPA-SAKIPG
+      *2012.10 サーベイ簡易設定改修
+           IF      SPA-MOTOPG      =   "M00"
+               MOVE    "M00"           TO  SPA-SAKIPG
+               MOVE    "M00"           TO  MCP-WINDOW
+           ELSE
+               MOVE    "M98"           TO  SPA-SAKIPG
+               MOVE    "M98"           TO  MCP-WINDOW
+           END-IF
            MOVE    "MDAS"          TO  SPA-MOTOPG
-      *
-           MOVE    "M98"           TO  MCP-WINDOW
            MOVE    "JOIN"          TO  MCP-PUTTYPE
       *
            PERFORM 900-PUT-WINDOW

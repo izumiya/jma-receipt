@@ -428,6 +428,9 @@
       *    内部画面より
            EVALUATE    SPA-MOTOPG
                WHEN    "MID1"
+      *2012.10 サーベイ簡易設定改修
+      *        MDASからの復帰はMID1からの復帰になりすます
+               WHEN    "MDAS"
                    PERFORM 3001-MID1-SYORI-SEC
       ****             GO  TO  300-SCREEN-EXT
            END-EVALUATE
@@ -2216,7 +2219,13 @@
            IF    ((SPA-DATAINFECTIONKBN    =   ZERO)  OR
                   (SPA-DATAINFECTIONKBN    =   9   ))
                IF     (SYS-1010-KANRIAUTHFLG   =   "T" )
-                   MOVE    "9102"              TO  SPA-MIDCD
+      *2012.10     MOVE    "9102"              TO  SPA-MIDCD
+                   MOVE    "M00"               TO  SPA-MOTOPG
+                   MOVE    "MDAS"              TO  SPA-SAKIPG
+                   MOVE    "NEW"               TO  MCP-PUTTYPE
+                   MOVE    "MDAS"              TO  MCP-WINDOW
+                   PERFORM 900-PUT-WINDOW
+                   MOVE    1                   TO  FLG-END
                ELSE
                    MOVE    "1018"              TO  SPA-ERRCD
                END-IF 
