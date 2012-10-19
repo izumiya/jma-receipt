@@ -4330,6 +4330,11 @@
            END-IF
       *    他画面遷移時
            IF      FLG-HENKOU          =   1
+      *H24.10
+      *        警告はクリア
+               IF      SPA-ERRCD (1:1)     =   "K"
+                   PERFORM 410129-KEI-INIT-SEC
+               END-IF
                MOVE    SPACE           TO  SPA-KIDCD
                MOVE    SPACE           TO  SPA-ERRCD
                MOVE    ZERO            TO  FLG-END
@@ -4338,6 +4343,37 @@
            .
        410112-KOUI-SPACHK-EXT.
            EXIT.
+      *H24.10
+      *
+      *****************************************************************
+      *    画面変換・削除処理
+      *****************************************************************
+       410129-KEI-INIT-SEC              SECTION.
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-MAX-LINE
+      *
+               IF      SPA-COM-CUR (IDX)   =   "1"   OR  "2"
+      *        警告フラグクリア
+                   EVALUATE    SPA-ERRCD
+                   WHEN    "K236"
+                       MOVE    SPACE           TO  SPA-COM-KZMFLG2(IDX)
+                   WHEN    "K839"
+                       MOVE    SPACE           TO  SPA-COM-KZMFLG3(IDX)
+                   WHEN    "K200"
+                       MOVE    SPACE           TO  SPA-COM-KZMFLG4(IDX)
+                   WHEN    "K201"
+                   WHEN    "K122" 
+                       MOVE    SPACE           TO  SPA-COM-KZMFLG5(IDX)
+                   WHEN    OTHER
+                      MOVE    SPACE            TO  SPA-COM-KZMFLG (IDX)
+                   END-EVALUATE
+               END-IF
+           END-PERFORM
+           .
+       410129-KEI-INIT-EXT.
+           EXIT.
+      *H24.10
       *
       *!!!
       *!!!
