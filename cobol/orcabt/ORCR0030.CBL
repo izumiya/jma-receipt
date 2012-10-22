@@ -591,6 +591,7 @@
       *  04.05.69    NACL-ÌçÏÆ    12/09/19  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍó¶â³ÛÃÖ´¹ÂÐ±þ
       *  04.05.70    NACL-ÌçÏÆ    12/09/26  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.71    NACL-ÌçÏÆ    12/09/26  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.72    NACL-ÌçÏÆ    12/10/22  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅÀ¿ô½¸·×½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -8311,32 +8312,32 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       AND  RECE02-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE02-KOHID(1)
                            MOVE      2       TO     BUN-IDX2
-                           IF   RECE02-SEIHOFLG  =  "1"
-                             IF  (RECE02-HKNNUMHC(HC-IDX)
-                                                   NOT =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 1)
-                                                   NOT =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 2)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 3)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 4)
-                                                       =  SPACE)
-                               MOVE   ZERO   TO     BUN-IDX2
-                             END-IF
-                             IF  (RECE02-HKNNUMHC(HC-IDX)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 1)
-                                                   NOT =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 2)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 3)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 4)
-                                                       =  SPACE)
-                               MOVE    1     TO     BUN-IDX
-                             END-IF
-                           END-IF
+      ***                  IF   RECE02-SEIHOFLG  =  "1"
+      ***                    IF  (RECE02-HKNNUMHC(HC-IDX)
+      ***                                          NOT =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 1)
+      ***                                          NOT =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 2)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 3)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 4)
+      ***                                              =  SPACE)
+      ***                      MOVE   ZERO   TO     BUN-IDX2
+      ***                    END-IF
+      ***                    IF  (RECE02-HKNNUMHC(HC-IDX)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 1)
+      ***                                          NOT =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 2)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 3)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 4)
+      ***                                              =  SPACE)
+      ***                      MOVE    1     TO     BUN-IDX
+      ***                    END-IF
+      ***                  END-IF
                            IF   FLG-SHOSAISIN      =    1               
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1     
                                     UNTIL    ACCT-IDX   >   31          

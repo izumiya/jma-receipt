@@ -580,6 +580,7 @@
       *  04.05.80    NACL-ÌçÏÆ    12/09/19  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍó¶â³ÛÃÖ´¹ÂÐ±þ
       *  04.05.81    NACL-ÌçÏÆ    12/09/26  ½©ÅÄ¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.05.82    NACL-ÌçÏÆ    12/09/26  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.83    NACL-ÌçÏÆ    12/10/22  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅÀ¿ô½¸·×½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5804,32 +5805,32 @@
                                                    RECE62-KOHID(1)
                            IF      RECE62-RECESKYKBN (1)       =   SPACE
                                MOVE      2       TO     BUN-IDX2
-                               IF   RECE62-SEIHOFLG  =  "1"
-                                 IF  (RECE62-HKNNUMHC(HC-IDX)
-                                                       NOT =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 1)
-                                                       NOT =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 2)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 3)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 4)
-                                                           =  SPACE)
-                                   MOVE   ZERO   TO     BUN-IDX2
-                                 END-IF
-                                 IF  (RECE62-HKNNUMHC(HC-IDX)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 1)
-                                                       NOT =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 2)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 3)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 4)
-                                                           =  SPACE)
-                                   MOVE    1     TO     BUN-IDX
-                                 END-IF
-                               END-IF
+      ***                      IF   RECE62-SEIHOFLG  =  "1"
+      ***                        IF  (RECE62-HKNNUMHC(HC-IDX)
+      ***                                              NOT =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 1)
+      ***                                              NOT =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 2)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 3)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 4)
+      ***                                                  =  SPACE)
+      ***                          MOVE   ZERO   TO     BUN-IDX2
+      ***                        END-IF
+      ***                        IF  (RECE62-HKNNUMHC(HC-IDX)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 1)
+      ***                                              NOT =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 2)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 3)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 4)
+      ***                                                  =  SPACE)
+      ***                          MOVE    1     TO     BUN-IDX
+      ***                        END-IF
+      ***                      END-IF
                            END-IF
                       END-IF
                     END-IF
@@ -9656,32 +9657,32 @@
                                                    RECE62-KOHID(1)
                            IF      RECE62-RECESKYKBN (1)       =   SPACE
                                MOVE      2       TO     BUN-IDX2
-                               IF   RECE62-SEIHOFLG  =  "1"
-                                 IF  (RECE62-HKNNUMHC(HC-IDX)
-                                                       NOT =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 1)
-                                                       NOT =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 2)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 3)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 4)
-                                                           =  SPACE)
-                                   MOVE   ZERO   TO     BUN-IDX2
-                                 END-IF
-                                 IF  (RECE62-HKNNUMHC(HC-IDX)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 1)
-                                                       NOT =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 2)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 3)
-                                                           =  SPACE)
-                                 AND (RECE62-KOHNUMHC(HC-IDX 4)
-                                                           =  SPACE)
-                                   MOVE    1     TO     BUN-IDX
-                                 END-IF
-                               END-IF
+      ***                      IF   RECE62-SEIHOFLG  =  "1"
+      ***                        IF  (RECE62-HKNNUMHC(HC-IDX)
+      ***                                              NOT =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 1)
+      ***                                              NOT =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 2)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 3)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 4)
+      ***                                                  =  SPACE)
+      ***                          MOVE   ZERO   TO     BUN-IDX2
+      ***                        END-IF
+      ***                        IF  (RECE62-HKNNUMHC(HC-IDX)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 1)
+      ***                                              NOT =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 2)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 3)
+      ***                                                  =  SPACE)
+      ***                        AND (RECE62-KOHNUMHC(HC-IDX 4)
+      ***                                                  =  SPACE)
+      ***                          MOVE    1     TO     BUN-IDX
+      ***                        END-IF
+      ***                      END-IF
                            END-IF
                       END-IF
                     END-IF
@@ -12282,32 +12283,32 @@
                       AND  RECE62-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE62-KOHID(1)
                            MOVE      2       TO     BUN-IDX2
-                           IF   RECE62-SEIHOFLG  =  "1"
-                             IF  (RECE62-HKNNUMHC(HC-IDX)
-                                                   NOT =  SPACE)
-                             AND (RECE62-KOHNUMHC(HC-IDX 1)
-                                                   NOT =  SPACE)
-                             AND (RECE62-KOHNUMHC(HC-IDX 2)
-                                                       =  SPACE)
-                             AND (RECE62-KOHNUMHC(HC-IDX 3)
-                                                       =  SPACE)
-                             AND (RECE62-KOHNUMHC(HC-IDX 4)
-                                                       =  SPACE)
-                               MOVE   ZERO   TO     BUN-IDX2
-                             END-IF
-                             IF  (RECE62-HKNNUMHC(HC-IDX)
-                                                       =  SPACE)
-                             AND (RECE62-KOHNUMHC(HC-IDX 1)
-                                                   NOT =  SPACE)
-                             AND (RECE62-KOHNUMHC(HC-IDX 2)
-                                                       =  SPACE)
-                             AND (RECE62-KOHNUMHC(HC-IDX 3)
-                                                       =  SPACE)
-                             AND (RECE62-KOHNUMHC(HC-IDX 4)
-                                                       =  SPACE)
-                               MOVE    1     TO     BUN-IDX
-                             END-IF
-                           END-IF
+      ***                  IF   RECE62-SEIHOFLG  =  "1"
+      ***                    IF  (RECE62-HKNNUMHC(HC-IDX)
+      ***                                          NOT =  SPACE)
+      ***                    AND (RECE62-KOHNUMHC(HC-IDX 1)
+      ***                                          NOT =  SPACE)
+      ***                    AND (RECE62-KOHNUMHC(HC-IDX 2)
+      ***                                              =  SPACE)
+      ***                    AND (RECE62-KOHNUMHC(HC-IDX 3)
+      ***                                              =  SPACE)
+      ***                    AND (RECE62-KOHNUMHC(HC-IDX 4)
+      ***                                              =  SPACE)
+      ***                      MOVE   ZERO   TO     BUN-IDX2
+      ***                    END-IF
+      ***                    IF  (RECE62-HKNNUMHC(HC-IDX)
+      ***                                              =  SPACE)
+      ***                    AND (RECE62-KOHNUMHC(HC-IDX 1)
+      ***                                          NOT =  SPACE)
+      ***                    AND (RECE62-KOHNUMHC(HC-IDX 2)
+      ***                                              =  SPACE)
+      ***                    AND (RECE62-KOHNUMHC(HC-IDX 3)
+      ***                                              =  SPACE)
+      ***                    AND (RECE62-KOHNUMHC(HC-IDX 4)
+      ***                                              =  SPACE)
+      ***                      MOVE    1     TO     BUN-IDX
+      ***                    END-IF
+      ***                  END-IF
                       END-IF
                     END-IF
                    END-PERFORM

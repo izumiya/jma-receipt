@@ -152,6 +152,7 @@
       *                                     するフラグ編集
       *  04.05.36    NACL-門脇    12/06/28  生保まとめ分点欄摘要欄記載対応
       *  04.05.37    NACL-門脇    12/09/19  保険欄−一部負担金欄金額置換対応
+      *  04.05.38    NACL-門脇    12/10/22  生保まとめ分点欄点数集計修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4765,19 +4766,19 @@
                        (RECE02-HENTOTALTEN(IDX2) NOT =  ZERO ) AND
                        (RECE02-HENTOTALTEN(IDX1) NOT =
                                      RECE02-HENTOTALTEN(IDX2)))
-      ***         IF    RECE02-SEIHOFLG    =  "1"
-      ***          MOVE    RECE02-TENSU(IDX IDX2)  TO   WRK-TENSUZ
-      ***          MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
+                  IF    RECE02-SEIHOFLG    =  "1"
+                   MOVE    RECE02-TENSU(IDX IDX2)  TO   WRK-TENSUZ
+                   MOVE    WRK-TENSU               TO   HC06-TENSU(IDX)
       *
-      ***          COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX2)
-      ***                                  -     RECE02-TENSU(IDX IDX1)
-      ***          MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ
-      ***          MOVE    WRK-KOUTEN            TO  HC06-KOUTEN  (IDX)
-      ***         ELSE
+                   COMPUTE WRK-SUM-TENSU   =     RECE02-TENSU(IDX IDX2)
+                                           -     RECE02-TENSU(IDX IDX1)
+                   MOVE    WRK-SUM-TENSU         TO  WRK-KOUTENZ
+                   MOVE    WRK-KOUTEN            TO  HC06-KOUTEN  (IDX)
+                  ELSE
                    MOVE    RECE02-TENSU(IDX IDX2)
                                                  TO  WRK-KOUTENZ
                    MOVE    WRK-KOUTEN            TO  HC06-KOUTEN  (IDX)
-      ***         END-IF
+                  END-IF
                  END-IF
                END-IF
            END-PERFORM
