@@ -106,6 +106,7 @@
       *  04.05.09    NACL-門脇    12/06/04  生保の２４併用時の対応
       *  04.05.10    NACL-門脇    12/06/28  生保まとめ分点欄摘要欄記載対応
       *  04.05.11    NACL-門脇    12/09/18  改正対応（外泊区分８，９の対応）
+      *  04.05.12    NACL-門脇    12/10/22  生保まとめ分点欄点数集計修正
       *
       *  04.06.01    NACL-門脇    10/12/13  保険別請求チェック表の本体取込み
       *****************************************************************
@@ -1722,22 +1723,22 @@
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(1)
                       MOVE    2          TO        KH-IDX
-                      IF   RECE62-SEIHOFLG  =  "1"
-                        IF  (RECE62-HKNNUMHC(HC-IDX)   NOT =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-                          MOVE    1      TO   FLG-SEIHO-HENSYU
-                        END-IF
-                        IF  (RECE62-HKNNUMHC(HC-IDX)       =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-                          MOVE    2      TO   FLG-SEIHO-HENSYU
-                        END-IF
-                      END-IF
+      ***             IF   RECE62-SEIHOFLG  =  "1"
+      ***               IF  (RECE62-HKNNUMHC(HC-IDX)   NOT =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
+      ***                 MOVE    1      TO   FLG-SEIHO-HENSYU
+      ***               END-IF
+      ***               IF  (RECE62-HKNNUMHC(HC-IDX)       =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
+      ***                 MOVE    2      TO   FLG-SEIHO-HENSYU
+      ***               END-IF
+      ***             END-IF
                  END-IF
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(2)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(2)
@@ -2553,22 +2554,22 @@
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(1)
                       MOVE    2          TO        KH-IDX
-                      IF   RECE62-SEIHOFLG  =  "1"
-                        IF  (RECE62-HKNNUMHC(HC-IDX)   NOT =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-                          MOVE    1      TO   FLG-SEIHO-HENSYU
-                        END-IF
-                        IF  (RECE62-HKNNUMHC(HC-IDX)       =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-                          MOVE    2      TO   FLG-SEIHO-HENSYU
-                        END-IF
-                      END-IF
+      ***             IF   RECE62-SEIHOFLG  =  "1"
+      ***               IF  (RECE62-HKNNUMHC(HC-IDX)   NOT =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
+      ***                 MOVE    1      TO   FLG-SEIHO-HENSYU
+      ***               END-IF
+      ***               IF  (RECE62-HKNNUMHC(HC-IDX)       =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
+      ***                 MOVE    2      TO   FLG-SEIHO-HENSYU
+      ***               END-IF
+      ***             END-IF
                  END-IF
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(2)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(2)
@@ -3059,22 +3060,22 @@
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(1)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(1)
                       MOVE    2          TO        KH-IDX
-                      IF   RECE62-SEIHOFLG  =  "1"
-                        IF  (RECE62-HKNNUMHC(HC-IDX)   NOT =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-                          MOVE    1      TO   FLG-SEIHO-HENSYU
-                        END-IF
-                        IF  (RECE62-HKNNUMHC(HC-IDX)       =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
-                        AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
-                          MOVE    2      TO   FLG-SEIHO-HENSYU
-                        END-IF
-                      END-IF
+      ***             IF   RECE62-SEIHOFLG  =  "1"
+      ***               IF  (RECE62-HKNNUMHC(HC-IDX)   NOT =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
+      ***                 MOVE    1      TO   FLG-SEIHO-HENSYU
+      ***               END-IF
+      ***               IF  (RECE62-HKNNUMHC(HC-IDX)       =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 1) NOT =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 2)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 3)     =  SPACE)
+      ***               AND (RECE62-KOHNUMHC(HC-IDX 4)     =  SPACE)
+      ***                 MOVE    2      TO   FLG-SEIHO-HENSYU
+      ***               END-IF
+      ***             END-IF
                  END-IF
                  IF   RECE62-KOHNUMHC(HC-IDX IDX2) =  RECE62-KOHNUM(2)
                  AND  RECE62-KOHIDHC(HC-IDX IDX2)  =  RECE62-KOHID(2)
@@ -4306,25 +4307,25 @@
                              TBL-TOTALTEN2-ACCT(IDY)
            END-PERFORM
       *
-           IF   RECE62-SEIHOFLG    =  "1"
-             PERFORM    VARYING  IDX  FROM  1  BY  1
-                         UNTIL   IDX   >   10
-               PERFORM  VARYING  IDY  FROM  1  BY  1
-                         UNTIL   IDY   >    5
-                 MOVE  WRK-NYUKHNKEI-XX(IDX IDY)
-                                 TO  RECE62-NYUKHNKEI(IDX IDY)
-                 MOVE  WRK-NYUTOKKEI-XX(IDX IDY)
-                                 TO  RECE62-NYUTOKKEI(IDX IDY)
-               END-PERFORM
-             END-PERFORM
-             PERFORM    VARYING  IDY  FROM  1  BY  1
-                         UNTIL   IDY   >    5
-                 MOVE  WRK-NYUKHNKEI2-XX(IDY)
-                                 TO  RECE62-NYUKHNKEI2(IDY)
-                 MOVE  WRK-NYUTOKKEI2-XX(IDY)
-                                 TO  RECE62-NYUTOKKEI2(IDY)
-             END-PERFORM
-           END-IF
+      ***  IF   RECE62-SEIHOFLG    =  "1"
+      ***    PERFORM    VARYING  IDX  FROM  1  BY  1
+      ***                UNTIL   IDX   >   10
+      ***      PERFORM  VARYING  IDY  FROM  1  BY  1
+      ***                UNTIL   IDY   >    5
+      ***        MOVE  WRK-NYUKHNKEI-XX(IDX IDY)
+      ***                        TO  RECE62-NYUKHNKEI(IDX IDY)
+      ***        MOVE  WRK-NYUTOKKEI-XX(IDX IDY)
+      ***                        TO  RECE62-NYUTOKKEI(IDX IDY)
+      ***      END-PERFORM
+      ***    END-PERFORM
+      ***    PERFORM    VARYING  IDY  FROM  1  BY  1
+      ***                UNTIL   IDY   >    5
+      ***        MOVE  WRK-NYUKHNKEI2-XX(IDY)
+      ***                        TO  RECE62-NYUKHNKEI2(IDY)
+      ***        MOVE  WRK-NYUTOKKEI2-XX(IDY)
+      ***                        TO  RECE62-NYUTOKKEI2(IDY)
+      ***    END-PERFORM
+      ***  END-IF
       *
            IF   RECE62-SRYYM    >=    "200804"
              CONTINUE

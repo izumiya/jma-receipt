@@ -590,6 +590,7 @@
       *  04.05.69    NACL-門脇    12/09/19  保険欄−一部負担金欄金額置換対応
       *  04.05.70    NACL-門脇    12/09/26  秋田県地方公費対応
       *  04.05.71    NACL-門脇    12/09/26  大阪府地方公費対応
+      *  04.05.72    NACL-門脇    12/10/22  生保まとめ分点欄点数集計修正
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -8360,32 +8361,32 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                       AND  RECE02-KOHIDHC(HC-IDX IDX2)  =
                                                    RECE02-KOHID(1)
                            MOVE      2       TO     BUN-IDX2
-                           IF   RECE02-SEIHOFLG  =  "1"
-                             IF  (RECE02-HKNNUMHC(HC-IDX)
-                                                   NOT =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 1)
-                                                   NOT =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 2)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 3)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 4)
-                                                       =  SPACE)
-                               MOVE   ZERO   TO     BUN-IDX2
-                             END-IF
-                             IF  (RECE02-HKNNUMHC(HC-IDX)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 1)
-                                                   NOT =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 2)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 3)
-                                                       =  SPACE)
-                             AND (RECE02-KOHNUMHC(HC-IDX 4)
-                                                       =  SPACE)
-                               MOVE    1     TO     BUN-IDX
-                             END-IF
-                           END-IF
+      ***                  IF   RECE02-SEIHOFLG  =  "1"
+      ***                    IF  (RECE02-HKNNUMHC(HC-IDX)
+      ***                                          NOT =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 1)
+      ***                                          NOT =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 2)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 3)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 4)
+      ***                                              =  SPACE)
+      ***                      MOVE   ZERO   TO     BUN-IDX2
+      ***                    END-IF
+      ***                    IF  (RECE02-HKNNUMHC(HC-IDX)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 1)
+      ***                                          NOT =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 2)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 3)
+      ***                                              =  SPACE)
+      ***                    AND (RECE02-KOHNUMHC(HC-IDX 4)
+      ***                                              =  SPACE)
+      ***                      MOVE    1     TO     BUN-IDX
+      ***                    END-IF
+      ***                  END-IF
                            IF   FLG-SHOSAISIN      =    1               
                                PERFORM VARYING ACCT-IDX FROM 1 BY 1     
                                     UNTIL    ACCT-IDX   >   31          
