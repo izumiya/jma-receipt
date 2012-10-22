@@ -48,6 +48,7 @@
       *                                     「改正未対応」の記載を行わな
       *                                     いようにする
       *                                     入院略称の変更
+      *  04.05.07    NACL-藤原    12/10/22  入院略称の記載の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1708,7 +1709,7 @@ grpsys        PERFORM 900-DBSELECT-SEC
                        IF      RECE82-NYUTOKRYO-RYAKU (IDX) (11:)
                                              =   SPACE
                            MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
-                                             TO  HCM56-NYUKHNTEN  (IDY)
+                                             TO  HCM56-NYUKHNTENN (IDY)
                        ELSE
                            MOVE    RECE82-NYUTOKRYO-RYAKU (IDX)
                                              TO  HCM56-NYUKHNTENN2(IDY)
