@@ -952,6 +952,7 @@
                    END-IF
       *        ºï½ü³ÎÇ§
                WHEN    "0103"
+                   MOVE    SPACE               TO  SPA-PIDCD
                    IF      SPA-PID1-FLG        =   "OK"
       *H24.9
       ***************  PERFORM 4991-DELETE-SYORI-SEC
