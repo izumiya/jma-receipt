@@ -5760,12 +5760,16 @@
                IF      WRK-COM-SRYKA(IDX-SINSATU2) =   WRK-SRYKA
                    MOVE    SPA-SRYYMD      TO  WRK-SYOYMD
                    MOVE    1               TO  FLG-SYOHEN
+      *
+                   MOVE    0               TO  FLG-TAIIN
                END-IF
            END-IF
       *    初診入力がある時
            IF      LNK-ORCSC-SYOSIN2   =   1
                MOVE    SPA-SRYYMD      TO  WRK-SYOYMD
                MOVE    1               TO  FLG-SYOHEN
+      *
+               MOVE    0               TO  FLG-TAIIN
            END-IF
       *@
       *    小児指導管理料は退院日のみ判定とする
