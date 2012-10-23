@@ -1136,37 +1136,37 @@
       *
       *        剤回数
                MOVE    ORCHC62-ZAIKAIKEI (IDX-ZAI)
-                                       TO  ORCSQRCVS62-KAISU (IDX-QR1)
+                                       TO  ORCSQRCSV62-KAISU (IDX-QR1)
       *        診療区分
                MOVE    ORCHC62-SRYKBN (IDX-ZAI)
-                                       TO  ORCSQRCVS62-SRYKBN (IDX-QR1)
+                                       TO  ORCSQRCSV62-SRYKBN (IDX-QR1)
       *        診療種別
                MOVE    ORCHC62-SRYSYUKBN (IDX-ZAI)
-                                       TO  ORCSQRCVS62-SRYSYUKBN
+                                       TO  ORCSQRCSV62-SRYSYUKBN
                                                               (IDX-QR1)
            END-IF
       *
            ADD     1                   TO  IDX-QR2
            MOVE    ORCHC62-SRYCD(IDX-ZAI IDX-SRY)
-                                       TO  ORCSQRCVS62-SRYCD
+                                       TO  ORCSQRCSV62-SRYCD
                                                        (IDX-QR1 IDX-QR2)
-           MOVE    WRK-TNS-NAME        TO  ORCSQRCVS62-TNS-NAME
+           MOVE    WRK-TNS-NAME        TO  ORCSQRCSV62-TNS-NAME
                                                        (IDX-QR1 IDX-QR2)
-           MOVE    TNS-TANINAME        TO  ORCSQRCVS62-TANINAME
+           MOVE    TNS-TANINAME        TO  ORCSQRCSV62-TANINAME
                                                        (IDX-QR1 IDX-QR2)
            MOVE    ORCHC62-SRYSURYO(IDX-ZAI IDX-SRY)
-                                       TO  ORCSQRCVS62-SURYOU
+                                       TO  ORCSQRCSV62-SURYOU
                                                        (IDX-QR1 IDX-QR2)
-           MOVE    TNS-YKZKBN          TO  ORCSQRCVS62-YKZKBN
+           MOVE    TNS-YKZKBN          TO  ORCSQRCSV62-YKZKBN
                                                        (IDX-QR1 IDX-QR2)
            IF      TNSP-SOURYOHENKBN   =   1
       *        内服点剤
-               MOVE    "1"             TO  ORCSQRCVS62-NAIHENKBN
+               MOVE    "1"             TO  ORCSQRCSV62-NAIHENKBN
                                                        (IDX-QR1 IDX-QR2)
            END-IF
            IF      ORCHC62-SRYCD(IDX-ZAI IDX-SRY)(1:3) =   "001"
       *        用法コメント区分
-               MOVE    TNS-KENTAICOMMENT   TO  ORCSQRCVS62-YCOMMNTKBN
+               MOVE    TNS-KENTAICOMMENT   TO  ORCSQRCSV62-YCOMMNTKBN
                                                   (IDX-QR1 IDX-QR2)
            END-IF
       *
@@ -1176,10 +1176,10 @@
                            OR (WRK-YOH-NAME (IDX-QY)   =   SPACE )
                            OR (IDX-QR2     >=   50   )
                ADD     1                   TO  IDX-QR2
-               MOVE    "810000001"         TO  ORCSQRCVS62-SRYCD
+               MOVE    "810000001"         TO  ORCSQRCSV62-SRYCD
                                                        (IDX-QR1 IDX-QR2)
                MOVE    WRK-YOH-NAME-2(IDX-QY)
-                                           TO  ORCSQRCVS62-TNS-NAME
+                                           TO  ORCSQRCSV62-TNS-NAME
                                                        (IDX-QR1 IDX-QR2)
            END-PERFORM
       *
@@ -1194,7 +1194,7 @@
       *
            ADD     1                   TO  IDX-QRB
            IF      IDX-QRB              <=  10
-               MOVE    WRK-TNS-NAME        TO  ORCSQRCVS62-BIKOU
+               MOVE    WRK-TNS-NAME        TO  ORCSQRCSV62-BIKOU
                                                        (IDX-QRB)
            END-IF
            .
@@ -1206,34 +1206,34 @@
       *****************************************************************
        500-QR-SYORI-SEC            SECTION.
       *
-           MOVE    ORCHC62-SRYYMD      TO  ORCSQRCVS62-SRYYMD
+           MOVE    ORCHC62-SRYYMD      TO  ORCSQRCSV62-SRYYMD
       *    医療機関情報
-           MOVE    SYS-1001-PREFNUM    TO  ORCSQRCVS62-PREFNUM
-           MOVE    SYS-1001-HOSPCD     TO  ORCSQRCVS62-HOSPCD
-           MOVE    SYS-1001-HOSPSBT    TO  ORCSQRCVS62-HOSPSBT
-           MOVE    WRK-HOSPNAME        TO  ORCSQRCVS62-HOSPNAME
+           MOVE    SYS-1001-PREFNUM    TO  ORCSQRCSV62-PREFNUM
+           MOVE    SYS-1001-HOSPCD     TO  ORCSQRCSV62-HOSPCD
+           MOVE    SYS-1001-HOSPSBT    TO  ORCSQRCSV62-HOSPSBT
+           MOVE    WRK-HOSPNAME        TO  ORCSQRCSV62-HOSPNAME
       *    ドクター
-           MOVE    SYS-1010-KANANAME   TO  ORCSQRCVS62-DR-KANANAME
-           MOVE    SYS-1010-NAME       TO  ORCSQRCVS62-DR-NAME
+           MOVE    SYS-1010-KANANAME   TO  ORCSQRCSV62-DR-KANANAME
+           MOVE    SYS-1010-NAME       TO  ORCSQRCSV62-DR-NAME
       *    患者情報
-           MOVE    SPA-NAME            TO  ORCSQRCVS62-NAME
-           MOVE    SPA-KANANAME        TO  ORCSQRCVS62-KANANAME
-           MOVE    SPA-SEX             TO  ORCSQRCVS62-SEX
-           MOVE    SPA-BIRTHDAY        TO  ORCSQRCVS62-BIRTHDAY
+           MOVE    SPA-NAME            TO  ORCSQRCSV62-NAME
+           MOVE    SPA-KANANAME        TO  ORCSQRCSV62-KANANAME
+           MOVE    SPA-SEX             TO  ORCSQRCSV62-SEX
+           MOVE    SPA-BIRTHDAY        TO  ORCSQRCSV62-BIRTHDAY
       *    時間
            COMPUTE WRK-SYS-TIME        =   SYS-TIME
                                        +   ORCHC62-CNT
       *    ファイル名
-           MOVE    CONS-FORM-ID        TO  ORCSQRCVS62-FORM-ID
+           MOVE    CONS-FORM-ID        TO  ORCSQRCSV62-FORM-ID
       *    ファイル名組み立て項目
-           MOVE    WRK-SYS-TIME        TO  ORCSQRCVS62-SYSTIME
+           MOVE    WRK-SYS-TIME        TO  ORCSQRCSV62-SYSTIME
       *
            CALL    "ORCSQRCSV62"       USING
                                        SPA-AREA
                                        ORCSQRCSV62AREA
       *
       *    ＱＲイメージ印刷
-           IF      ORCSQRCVS62-RET-COUNT   >   ZERO
+           IF      ORCSQRCSV62-RET-COUNT   >   ZERO
                PERFORM 5003-QRIMAGE-HEN-SEC
            END-IF
            .
@@ -1261,7 +1261,7 @@
                    UNTIL       IDQ     >   15
                MOVE    KUHAKU-FILE-NAME    TO  HCM62Q-IMAGE-1 (IDQ)
                ADD     1                   TO  WRK-FILE-CNT
-               IF      WRK-FILE-CNT        <=  ORCSQRCVS62-RET-COUNT 
+               IF      WRK-FILE-CNT        <=  ORCSQRCSV62-RET-COUNT 
                    MOVE    SPA-HOSPNUM         TO  QR-FILE-HOSPNUM
                    MOVE    CONS-FORM-ID        TO  QR-FILE-FORM-ID
                    MOVE    SPA-TERMID          TO  QR-FILE-TERMID

@@ -188,29 +188,29 @@
       *
       *    ファイルＯＰＥＮ
            MOVE    SPA-HOSPNUM         TO  FILE-HOSPNUM1
-           MOVE    ORCSQRCVS62-FORM-ID TO  FILE-FORM-ID1
+           MOVE    ORCSQRCSV62-FORM-ID TO  FILE-FORM-ID1
            MOVE    SPA-TERMID          TO  FILE-TERMID1
-           MOVE    ORCSQRCVS62-SYSTIME TO  FILE-SYOHMS1
+           MOVE    ORCSQRCSV62-SYSTIME TO  FILE-SYOHMS1
            OPEN    OUTPUT              QRCSV-FILE
            IF      STS-FILE1       NOT =   ZERO
-               MOVE    9               TO  ORCSQRCVS62-ERRCD
+               MOVE    9               TO  ORCSQRCSV62-ERRCD
            END-IF
       *
       *    ＤＢ検索処理
            PERFORM 1001-DBKENSAKU-SEC
       *    共通情報出力
-           IF      ORCSQRCVS62-ERRCD   =   ZERO
+           IF      ORCSQRCSV62-ERRCD   =   ZERO
                PERFORM 100-HEAD-SYORI-SEC
            END-IF
       *    薬剤情報出力
-           IF      ORCSQRCVS62-ERRCD   =   ZERO
+           IF      ORCSQRCSV62-ERRCD   =   ZERO
                PERFORM 200-MAIN-SYORI-SEC
            END-IF
       *
            CLOSE                       QRCSV-FILE
       *
       *    ＱＲイメージ作成
-           IF      ORCSQRCVS62-ERRCD   =   ZERO
+           IF      ORCSQRCSV62-ERRCD   =   ZERO
                PERFORM 400-QRIMAGE-SEC
            END-IF
       *
@@ -241,44 +241,44 @@
       *    患者氏名　拡張漢字変換
            INITIALIZE                  ORCSKANACHKAREA
            MOVE    "1"                 TO  KANACHK-SYORI
-           MOVE    ORCSQRCVS62-NAME    TO  KANACHK-MAE-INPUT
+           MOVE    ORCSQRCSV62-NAME    TO  KANACHK-MAE-INPUT
            CALL    "ORCSKANACHK"       USING
                                        ORCSKANACHKAREA
            IF      KANACHK-OUT-INPUT(1:40)
-                                       =   ORCSQRCVS62-NAME
+                                       =   ORCSQRCSV62-NAME
       *        拡張漢字なし
-               MOVE    ORCSQRCVS62-NAME    TO  TBL-QRCSV-DATA (2)
+               MOVE    ORCSQRCSV62-NAME    TO  TBL-QRCSV-DATA (2)
            ELSE
       *        拡張漢字あり　カナ氏名
-               MOVE    ORCSQRCVS62-KANANAME
+               MOVE    ORCSQRCSV62-KANANAME
                                            TO  TBL-QRCSV-DATA (2)
            END-IF
       *    性別
-           EVALUATE    ORCSQRCVS62-SEX
+           EVALUATE    ORCSQRCSV62-SEX
                WHEN    "男"
                    MOVE    "1"                 TO  TBL-QRCSV-DATA (3)
                WHEN    "女"
                    MOVE    "2"                 TO  TBL-QRCSV-DATA (3)
            END-EVALUATE
       *    患者生年月日
-           MOVE    ORCSQRCVS62-BIRTHDAY    TO  TBL-QRCSV-DATA (4)
+           MOVE    ORCSQRCSV62-BIRTHDAY    TO  TBL-QRCSV-DATA (4)
            MOVE    4                       TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC
       *
       *    調剤年月日レコード
            MOVE    SPACE                   TO  TBL-QRCSV-AREA
            MOVE    "5"                     TO  TBL-QRCSV-DATA (1)
-           MOVE    ORCSQRCVS62-SRYYMD      TO  TBL-QRCSV-DATA (2)
+           MOVE    ORCSQRCSV62-SRYYMD      TO  TBL-QRCSV-DATA (2)
            MOVE    2                       TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC
       *
       *    医療機関コード
            MOVE    SPACE                   TO  TBL-QRCSV-AREA
            MOVE    "11"                    TO  TBL-QRCSV-DATA (1)
-           MOVE    ORCSQRCVS62-HOSPNAME    TO  TBL-QRCSV-DATA (2)
-           MOVE    ORCSQRCVS62-PREFNUM     TO  TBL-QRCSV-DATA (3)
+           MOVE    ORCSQRCSV62-HOSPNAME    TO  TBL-QRCSV-DATA (2)
+           MOVE    ORCSQRCSV62-PREFNUM     TO  TBL-QRCSV-DATA (3)
            MOVE    "1"                     TO  TBL-QRCSV-DATA (4)
-           MOVE    ORCSQRCVS62-HOSPCD      TO  TBL-QRCSV-DATA (5)
+           MOVE    ORCSQRCSV62-HOSPCD      TO  TBL-QRCSV-DATA (5)
            MOVE    5                       TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC
       *
@@ -288,7 +288,7 @@
       *    拡張漢字変換
            INITIALIZE                  ORCSKANACHKAREA
            MOVE    "1"                 TO  KANACHK-SYORI
-           MOVE    ORCSQRCVS62-DR-NAME TO  KANACHK-MAE-INPUT
+           MOVE    ORCSQRCSV62-DR-NAME TO  KANACHK-MAE-INPUT
            CALL    "ORCSKANACHK"       USING
                                        ORCSKANACHKAREA
            MOVE    KANACHK-OUT-INPUT   TO  TBL-QRCSV-DATA (2)
@@ -345,9 +345,9 @@
       *
            MOVE    FILE-NAME1          TO  QREN-FILENAME
            MOVE    SPA-HOSPNUM         TO  FILE-HOSPNUM2
-           MOVE    ORCSQRCVS62-FORM-ID TO  FILE-FORM-ID2
+           MOVE    ORCSQRCSV62-FORM-ID TO  FILE-FORM-ID2
            MOVE    SPA-TERMID          TO  FILE-TERMID2
-           MOVE    ORCSQRCVS62-SYSTIME TO  FILE-SYOHMS2
+           MOVE    ORCSQRCSV62-SYSTIME TO  FILE-SYOHMS2
            MOVE    FILE-NAME2          TO  QREN-QRFILENAME
            MOVE    "L"                 TO  QREN-SL-OPTION
            MOVE    "1"                 TO  QREN-SS-OPTION
@@ -360,9 +360,9 @@
            MOVE    "1"                 TO  QREN-LC-OPTION
       *
            CALL    "orcqrencode"       USING   ORCSQRENCODEAREA
-           MOVE    QREN-RET-VERSION    TO  ORCSQRCVS62-RET-VERSION
-           MOVE    QREN-RET-COUNT      TO  ORCSQRCVS62-RET-COUNT
-           MOVE    QREN-RET            TO  ORCSQRCVS62-RET
+           MOVE    QREN-RET-VERSION    TO  ORCSQRCSV62-RET-VERSION
+           MOVE    QREN-RET-COUNT      TO  ORCSQRCSV62-RET-COUNT
+           MOVE    QREN-RET            TO  ORCSQRCSV62-RET
            .
        400-QRIMAGE-EXT.
            EXIT.
@@ -405,16 +405,16 @@
            MOVE    ZERO                TO  WRK-RP2
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   50  )
-                         OR   (ORCSQRCVS62-SRYKBN (IDX) =   SPACE )
+                         OR   (ORCSQRCSV62-SRYKBN (IDX) =   SPACE )
                MOVE    ZERO                TO  WRK-RP28
                PERFORM VARYING     IDX2    FROM    1   BY  1
                            UNTIL  (IDX2    >   100  )
       *            薬剤レコード
-                   IF     (ORCSQRCVS62-SRYCD(IDX IDX2)(1:1) =  "6"
+                   IF     (ORCSQRCSV62-SRYCD(IDX IDX2)(1:1) =  "6"
                                                             OR "7" )
-                       OR (ORCSQRCVS62-SRYCD(IDX IDX2)(1:3) =  "059")
+                       OR (ORCSQRCSV62-SRYCD(IDX IDX2)(1:3) =  "059")
       *                （サ）は対象
-                       OR (ORCSQRCVS62-SRYCD(IDX IDX2) =   "820000046")
+                       OR (ORCSQRCSV62-SRYCD(IDX IDX2) =   "820000046")
       *??
                        PERFORM 2003-RP201-SEC
       *                種類チェック
@@ -422,12 +422,12 @@
                    END-IF
       *
       *            薬剤補足レコード
-                   IF     (ORCSQRCVS62-SRYCD(IDX IDX2)(1:1) =  "8" )
-                     OR   (ORCSQRCVS62-SRYCD(IDX IDX2)(1:3) =  "008")
-                     OR  ((ORCSQRCVS62-SRYCD(IDX IDX2)(1:3) =  "001")
-                      AND (ORCSQRCVS62-YCOMMNTKBN(IDX IDX2) =   "2" ))
+                   IF     (ORCSQRCSV62-SRYCD(IDX IDX2)(1:1) =  "8" )
+                     OR   (ORCSQRCSV62-SRYCD(IDX IDX2)(1:3) =  "008")
+                     OR  ((ORCSQRCSV62-SRYCD(IDX IDX2)(1:3) =  "001")
+                      AND (ORCSQRCSV62-YCOMMNTKBN(IDX IDX2) =   "2" ))
       *                （サ）は対象外
-                       IF      ORCSQRCVS62-SRYCD(IDX IDX2)
+                       IF      ORCSQRCSV62-SRYCD(IDX IDX2)
                                                        =   "820000046"
                            CONTINUE
                        ELSE
@@ -444,10 +444,10 @@
       *    備考レコード
            PERFORM VARYING     IDX-B   FROM    1   BY  1
                    UNTIL      (IDX-B   >   10  )
-                           OR (ORCSQRCVS62-BIKOU (IDX-B) =   SPACE)
+                           OR (ORCSQRCSV62-BIKOU (IDX-B) =   SPACE)
                MOVE    SPACE               TO  TBL-QRCSV-AREA
                MOVE    "501"               TO  TBL-QRCSV-DATA (1)
-               MOVE    ORCSQRCVS62-BIKOU (IDX-B)
+               MOVE    ORCSQRCSV62-BIKOU (IDX-B)
                                            TO  TBL-QRCSV-DATA (2)
                MOVE    2                   TO  TBL-MAX
                PERFORM 400-DATAOUT-SEC
@@ -479,9 +479,9 @@
       *****************************************************************
        2004-YKZCHEK-SEC            SECTION.
       *
-           EVALUATE    ORCSQRCVS62-SRYCD(IDX IDX2)(1:1)
+           EVALUATE    ORCSQRCSV62-SRYCD(IDX IDX2)(1:1)
                WHEN    "6"
-                   IF      ORCSQRCVS62-NAIHENKBN (IDX IDX2)  =   "1"
+                   IF      ORCSQRCSV62-NAIHENKBN (IDX IDX2)  =   "1"
                        MOVE    1               TO  FLG-NAI-TEN
                    ELSE
                        MOVE    1               TO  FLG-YAKUZAI
@@ -506,21 +506,21 @@
                    UNTIL      (IDX2    <   1    )
                          OR   (WRK-RP-11   >   ZERO  )
       *        用法レコード
-               IF     (ORCSQRCVS62-SRYCD(IDX IDX2)(1:3) =   "001")
-               AND    (ORCSQRCVS62-YCOMMNTKBN(IDX IDX2) =   "1"
+               IF     (ORCSQRCSV62-SRYCD(IDX IDX2)(1:3) =   "001")
+               AND    (ORCSQRCSV62-YCOMMNTKBN(IDX IDX2) =   "1"
                                                         OR  "0" )
-                   MOVE    ORCSQRCVS62-TNS-NAME (IDX IDX2)
+                   MOVE    ORCSQRCSV62-TNS-NAME (IDX IDX2)
                                                TO  WRK-NAME
                    PERFORM 20021-RP301-SEC
-                   MOVE    SPACE       TO  ORCSQRCVS62-SRYCD(IDX IDX2)
+                   MOVE    SPACE       TO  ORCSQRCSV62-SRYCD(IDX IDX2)
                END-IF
            END-PERFORM
       *
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL      (IDX2    >   100   )
       *        用法補助レコード
-               IF     (ORCSQRCVS62-SRYCD(IDX IDX2)(1:3) =  "001")
-               AND    (ORCSQRCVS62-YCOMMNTKBN(IDX IDX2) =   "1"
+               IF     (ORCSQRCSV62-SRYCD(IDX IDX2)(1:3) =  "001")
+               AND    (ORCSQRCSV62-YCOMMNTKBN(IDX IDX2) =   "1"
                                                         OR  "0" )
                    PERFORM 20022-RP311-SEC
                END-IF
@@ -547,11 +547,11 @@
       *    用法名称
            MOVE    WRK-NAME            TO  TBL-QRCSV-DATA (3)
       *    日数（数量）
-           MOVE    ORCSQRCVS62-KAISU (IDX)   TO  WRK-ZZZ
+           MOVE    ORCSQRCSV62-KAISU (IDX)   TO  WRK-ZZZ
            PERFORM 20011-SUJIHEN-SEC
            MOVE    WRK-H-DATA          TO  TBL-QRCSV-DATA (4)
       *    調剤単位
-           EVALUATE    ORCSQRCVS62-SRYKBN (IDX)
+           EVALUATE    ORCSQRCSV62-SRYKBN (IDX)
                WHEN    "21"
       *            内服
                    MOVE    "日分"          TO  TBL-QRCSV-DATA (5)
@@ -613,7 +613,7 @@
            MOVE    SPACE               TO  TBL-QRCSV-AREA
            MOVE    "311"               TO  TBL-QRCSV-DATA (1)
            MOVE    WRK-H-RP2           TO  TBL-QRCSV-DATA (2)
-           MOVE    ORCSQRCVS62-TNS-NAME (IDX IDX2)
+           MOVE    ORCSQRCSV62-TNS-NAME (IDX IDX2)
                                        TO  TBL-QRCSV-DATA (3)
            MOVE    3                   TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC
@@ -639,20 +639,20 @@
            MOVE    "201"               TO  TBL-QRCSV-DATA (1)
            MOVE    WRK-H-RP2           TO  TBL-QRCSV-DATA (2)
       *    薬品の名称は４０文字とする
-           MOVE    ORCSQRCVS62-TNS-NAME (IDX IDX2)
+           MOVE    ORCSQRCSV62-TNS-NAME (IDX IDX2)
                                        TO  WRK-NAME
            MOVE    WRK-NAME-1          TO  TBL-QRCSV-DATA (3)
       *    用量（数量）
-           MOVE    ORCSQRCVS62-SURYOU(IDX IDX2)  TO  WRK-SURYO
+           MOVE    ORCSQRCSV62-SURYOU(IDX IDX2)  TO  WRK-SURYO
            PERFORM 20031-SURYO-HEN-SEC
            MOVE    WRK-SURYO-H         TO  TBL-QRCSV-DATA (4)
       *    単位名
-           MOVE    ORCSQRCVS62-TANINAME(IDX IDX2)
+           MOVE    ORCSQRCSV62-TANINAME(IDX IDX2)
                                        TO  TBL-QRCSV-DATA (5)
       *    薬品コード種別
-           IF     (ORCSQRCVS62-SRYCD(IDX IDX2)(1:1)  =   "6" )
+           IF     (ORCSQRCSV62-SRYCD(IDX IDX2)(1:1)  =   "6" )
                MOVE    "2"                 TO  TBL-QRCSV-DATA (6)
-               MOVE    ORCSQRCVS62-SRYCD(IDX IDX2)
+               MOVE    ORCSQRCSV62-SRYCD(IDX IDX2)
                                            TO  TBL-QRCSV-DATA (7)
            ELSE
                MOVE    "1"                 TO  TBL-QRCSV-DATA (6)
@@ -688,7 +688,7 @@
            MOVE    "281"               TO  TBL-QRCSV-DATA (1)
            MOVE    WRK-H-RP2           TO  TBL-QRCSV-DATA (2)
       *
-           MOVE    ORCSQRCVS62-TNS-NAME (IDX IDX3)
+           MOVE    ORCSQRCSV62-TNS-NAME (IDX IDX3)
                                        TO  TBL-QRCSV-DATA (3)
            MOVE    3                   TO  TBL-MAX
            PERFORM 400-DATAOUT-SEC
