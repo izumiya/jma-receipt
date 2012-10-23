@@ -427,6 +427,7 @@ lf2crlf(char *in,
 			*q = *p;
 		}
 	}
+	*q = 0;
 }
 
 static
