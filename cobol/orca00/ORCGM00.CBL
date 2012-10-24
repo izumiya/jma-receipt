@@ -2193,7 +2193,8 @@
        810-INFECTION-001-SEC       SECTION.
       *
            IF     (SPA-ERRCD           =   SPACE)  AND
-                  (SPA-DATAINFECTIONKBN    =   ZERO)
+                  (SPA-DATAINFECTIONKBN    =   ZERO)  AND
+                  (ORCSCOMMON-LABLMSG      =   SPACE)
                STRING  "日レセから自動送信による地域マップを"
                        "日本医師会ホームページにて公開中です。"
                        "ご協力ください。"
