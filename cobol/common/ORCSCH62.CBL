@@ -883,6 +883,11 @@
                           OR  (FLG-ZAITAKU-ARI     =   ZERO  )
                            MOVE    1               TO  FLG-TAIGAI
                        END-IF
+      *                ±¡Æâ¼ïÊÌ¤Ç¤¢¤ì¤ÐÂÐ¾Ý
+                       IF     (WRK-SRYSYUKBN       =   "141"
+                                                   OR  "142" )
+                           MOVE    ZERO            TO  FLG-TAIGAI
+                       END-IF
                    END-IF
                    IF     (WRK-SRYSYUKBN       =   "212"  OR
                                                    "222"  OR
@@ -1526,6 +1531,9 @@
       *            ºßÂð¤ÇÌôºÞ¡¦´ïºà¤¬¤¢¤ë»þ¡¢
                    IF     (WRK-YKZTEN      >   ZERO )  OR
                           (WRK-KIZAITEN    >   ZERO )
+      *             ±¡ÆâÌôºÞ¡¦´ïºà¤ÏÂÐ¾Ý
+                    OR    (WRK-SRYSYUKBN   =   "141"
+                                           OR  "142"  )
                        MOVE    1               TO  FLG-OK2
                    END-IF
                END-IF
