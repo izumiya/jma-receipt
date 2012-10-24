@@ -2486,7 +2486,7 @@
       *        同日再診と訂正選択（ＯＫが同日）
                WHEN    "0100"
                    MOVE    SPACE               TO  SPA-KIDCD
-                   MOVE    ZERO                TO  SPA-SYOSIN
+      *****        MOVE    ZERO                TO  SPA-SYOSIN
                    IF      SPA-KID1-FLG        =   "OK"
       *                同日再診
                        PERFORM 300100-DOUSAISIN-SEC
@@ -2501,7 +2501,7 @@
       *        同日再診と訂正選択（ＯＫが訂正）
                WHEN    "0131"
                    MOVE    SPACE               TO  SPA-KIDCD
-                   MOVE    ZERO                TO  SPA-SYOSIN
+      ****         MOVE    ZERO                TO  SPA-SYOSIN
                    IF      SPA-KID1-FLG        =   "OK"
       *                訂正
                        MOVE    "T"             TO  SPA-GMN-TEISEI
