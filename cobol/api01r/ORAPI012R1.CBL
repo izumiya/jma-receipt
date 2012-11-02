@@ -27,7 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *
+      *  04.07.00    NACL-多々納  12/09/28  禁忌・コメント等追加
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -340,6 +340,23 @@
            MOVE    PTINF-HOME-BANTI    TO  PTRES-HOME-ADDRESSES2
            MOVE    PTINF-HOME-TEL1     TO  PTRES-HOME-HPONE1
            MOVE    PTINF-HOME-TEL2     TO  PTRES-HOME-HPONE2
+      *H24.9
+      *    世帯主名
+           MOVE    PTINF-SETAINUSI     TO  PTRES-SETAI-NAME
+      *    続柄
+           MOVE    PTINF-ZOKUGARA      TO  PTRES-ZOKUGARA
+      *    禁忌
+           MOVE    PTINF-TABOO-1       TO  PTRES-TABOO-1
+           MOVE    PTINF-TABOO-2       TO  PTRES-TABOO-2
+      *    アレルギー
+           MOVE    PTINF-ALLERGY-1     TO  PTRES-ALLERGY-1
+           MOVE    PTINF-ALLERGY-2     TO  PTRES-ALLERGY-2
+      *    感染症
+           MOVE    PTINF-KANSENSYO-1   TO  PTRES-KANSENSYO-1
+           MOVE    PTINF-KANSENSYO-2   TO  PTRES-KANSENSYO-2
+      *    コメント
+           MOVE    PTINF-COMMENT-1     TO  PTRES-COMMENT-1
+           MOVE    PTINF-COMMENT-2     TO  PTRES-COMMENT-2
       *
       *    保険種類変換処理
            PERFORM 200210-HKNCOMBI-HEN-SEC
@@ -481,6 +498,11 @@
       *    有効終了日
            MOVE    ORCSAPIHKN-TEKEDYMD  (IDX)
                                    TO  PTRES-MAIN-END-DATE   (IDX)
+      *H24.9
+      *    保険組合せ
+           MOVE    ORCSAPIHKN-THKNCOMBI  (IDX)
+                                   TO  PTRES-COMBINATION-NUMBER (IDX)
+      *
       *    公費情報
            PERFORM VARYING     IDY2    FROM    1   BY  1
                    UNTIL       IDY2    >   4

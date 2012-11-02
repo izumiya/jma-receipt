@@ -13,6 +13,8 @@ xml_patientinfores {
 		WholeName_inKana	varchar(100);
 		BirthDate		varchar(10);
 		Sex			varchar(1);
+		HouseHolder_WholeName	varchar(100);
+		Relationship 		varchar(60);
 		Home_Address_Information	{
 			Address_ZipCode		varchar(07);
 			WholeAddress1		varchar(200);
@@ -20,7 +22,16 @@ xml_patientinfores {
 			PhoneNumber1		varchar(15);
 			PhoneNumber2		varchar(15);
         	};
+		Contraindication1		varchar(200);
+		Contraindication2		varchar(200);
+		Allergy1		varchar(200);
+		Allergy2		varchar(200);
+		Infection1		varchar(200);
+		Infection2		varchar(200);
+		Comment1		varchar(200);
+		Comment2		varchar(200);
 		HealthInsurance_Information	{
+		Insurance_Combination_Number		varchar(4);
 		InsuranceProvider_Class			varchar(03);
             	InsuranceProvider_Number		varchar(08);
             	InsuranceProvider_WholeName		varchar(20);
