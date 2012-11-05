@@ -114,6 +114,9 @@
       *  04.05.07    NACL-門脇    12/04/02  平成２４年４月改正
       *                                     コメント差込
       *  04.05.08    NACL-門脇    12/05/25  リハビリ開始日記載修正
+      *  04.05.09    NACL-門脇    12/11/05  リハビリ開始日と同一剤のコメント
+      *                                     ００８５・００８６で始まるコメント
+      *                                     を記載対象外とする。
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -2523,8 +2526,10 @@ grpsys        PERFORM  900-DBSELECT-SEC
                    PERFORM  VARYING  IDX12  FROM  1  BY  1
                              UNTIL  (IDX12             >    5   )  OR
                                     (SRY-SRYCD(IDX12)  =   SPACE)
-                      IF   (SRY-SRYCD(IDX12)(1:1)     =   "8"  )  OR
-                           (SRY-SRYCD(IDX12)(1:3)     =   "008")
+                      IF  ((SRY-SRYCD(IDX12)(1:1)     =   "8"  )  OR
+                           (SRY-SRYCD(IDX12)(1:3)     =   "008"))
+                      AND ( SRY-SRYCD(IDX12)(1:4) NOT =
+                                              "0085" AND "0086" )
                        IF   SRY-INPUTNUM(IDX12)   NOT =   ZERO
                          INITIALIZE                      PTCOM-REC
                          MOVE    SRY-HOSPNUM         TO  PTCOM-HOSPNUM
