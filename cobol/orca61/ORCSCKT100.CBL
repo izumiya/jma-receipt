@@ -1992,10 +1992,17 @@
                                    (WRK-COM-INPUTCD(IDX + 1)
                                                    =   SPACE  AND
                                     WRK-GMN-INPUTCD(IDX + 1)
-                                                   =   SPACE   )  OR
-                                   (WRK-GMN-SRYKBN (IDX + 1)
-                                                   NOT =   SPACE )
+                                                   =   SPACE   )
+      *                   OR       (WRK-GMN-SRYKBN (IDX + 1)
+      *                                            NOT =   SPACE )
                                MOVE    1               TO  FLG-ERR
+                           ELSE
+      *H24.11
+                               IF    (WRK-GMN-SRYKBN (IDX + 1)
+                                                   NOT =   SPACE )
+      *                            診療種別の行削除チェック
+                                   PERFORM 4201-ZAIDEL-CHK-SEC
+                               END-IF
                            END-IF
                        END-IF
                    END-IF
@@ -2025,6 +2032,54 @@
            .
        420-SYOKYO-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    診療種別の行削除チェック処理
+      *****************************************************************
+       4201-ZAIDEL-CHK-SEC                 SECTION.
+      *
+           MOVE    1               TO  FLG-ERR
+      *
+           IF     (WRK-COM-INPUTCD(IDX + 1)(1:1)   =   "6"   )
+           AND    (SPA-COM-KAIFLG (SPA-GMN-MAX)
+                                               NOT =   "1"   )
+               IF     (SPA-COM-SRYKBN(SPA-GMN-MAX)
+                                               =   "11"
+                                               OR  "12"
+                                               OR  "13" )
+               OR     (SPA-COM-SRYSYUKBN(SPA-GMN-MAX)
+                                               =   "600" )
+                   CONTINUE
+               ELSE
+                   MOVE    "1"                 TO  SPA-COM-KAIFLG
+                                                    (SPA-GMN-MAX)
+                   INITIALIZE                  ORCSC94AREA
+                   MOVE    "1"                 TO  LNK-SC94-KBN
+                   MOVE    "K02"               TO  LNK-SC94-PG
+                   MOVE    SPA-GMN-MAX         TO  LNK-SC94-IDX
+                   CALL    "ORCSC94"           USING
+                                               ORCSC94AREA
+                                               SPA-SCR-REC
+                                               SPA-AREA
+               END-IF
+           END-IF
+      *
+           IF     (WRK-COM-INPUTCD(IDX + 1)(1:1)   =   "6"   )
+           AND    (SPA-COM-SRYSYUKBN(SPA-GMN-MAX)  =   "600" )
+           AND    (SPA-COM-KAISU(SPA-GMN-MAX)  <=  1     )
+      *        検査の時、回数が無効となる為、診療種別を変更する
+               MOVE    ZERO                TO  FLG-ERR
+               MOVE    WRK-COM-SRYKBN(IDX + 1)
+                                           TO  WRK-GMN-INPUTCD
+                                                   (IDX)(2:2)
+               MOVE    "0"                 TO  WRK-GMN-INPUTCD
+                                                   (IDX)(4:1)
+           END-IF
+      *
+           .
+       4201-ZAIDEL-CHK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    各診療行為チェックへ
