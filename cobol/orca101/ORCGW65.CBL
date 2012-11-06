@@ -858,7 +858,11 @@
            MOVE    "変更前の負担を考慮する（同一市町村のみ）"
                                    TO  SPA-GMN-JYUHENKBNMEIL (3)
       *
-           MOVE    3               TO  SPA-GMN-JYUHENKBN-MAX
+           MOVE    "4"             TO  SPA-GMN-JYUHENKBNL    (4)
+           MOVE    "変更前の負担を考慮する（保険者変更時を除く）"
+                                   TO  SPA-GMN-JYUHENKBNMEIL (4)
+      *
+           MOVE    4               TO  SPA-GMN-JYUHENKBN-MAX
       *
            .
        3110-JYUHENKBNLST-EXT.
