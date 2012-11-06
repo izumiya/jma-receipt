@@ -6006,7 +6006,16 @@
                       (WRK-GMN-INPUTCD(IDX + 1)(1:1)  =  "."))
                    IF     (IDX3                =   1  )  AND
                           (WRK-GMN-INPUTCD(IDX3)(1:1)  =  "." )
-                       MOVE    ZERO                TO  IDX3
+      *H24.11
+                       IF     (HZN-GMN-INPUTCD(IDX  + 1)(1:1)
+                                                       =  "." )
+                       OR     (SPA-COM-KAIFLG (IDX2)   =   "1" )
+                           MOVE    ZERO                TO  IDX3
+                       ELSE
+      *                    診療種別の行削除チェック
+                           PERFORM 4201-ZAIDEL-CHK-SEC
+                       END-IF
+      *
                    END-IF
                    PERFORM VARYING     IDX4    FROM   1   BY  1
                            UNTIL       IDX4    >   IDX3
@@ -6069,6 +6078,52 @@
            END-IF
            .
        10102-SINSATU-CHENGE-EXT.
+           EXIT.
+      *****************************************************************
+      *    診療種別の行削除チェック処理
+      *****************************************************************
+       4201-ZAIDEL-CHK-SEC                 SECTION.
+      *
+      *    次が薬剤で前が剤終了でない時
+           IF     (HZN-COM-INPUTCD(IDX  +  1)(1:1) =   "6"   )
+           AND    (SPA-COM-KAIFLG (IDX2)       NOT =   "1"   )
+               IF     (SPA-COM-SRYKBN (IDX2)
+                                               =   "11"
+                                               OR  "12"
+                                               OR  "13" )
+               OR     (SPA-COM-SRYSYUKBN(IDX2)
+                                               =   "600" )
+                   CONTINUE
+               ELSE
+                   MOVE    "1"                 TO  SPA-COM-KAIFLG
+                                                                (IDX2)
+                   INITIALIZE                  ORCSC94AREA
+                   MOVE    "1"                 TO  LNK-SC94-KBN
+                   MOVE    "K02"               TO  LNK-SC94-PG
+                   MOVE    IDX2                TO  LNK-SC94-IDX
+                   CALL    "ORCSC94"           USING
+                                               ORCSC94AREA
+                                               SPA-SCR-REC
+                                               SPA-AREA
+               END-IF
+           END-IF
+      *
+           IF     (HZN-COM-INPUTCD(IDX + 1)(1:1)   =   "6"   )
+           AND    (SPA-COM-SRYSYUKBN(IDX2)     =   "600" )
+           AND    (SPA-COM-KAISU    (IDX2)     <=  1     )
+      *        検査の時、回数が無効となる為、診療種別を変更する
+               MOVE    1                   TO  IDX3
+               MOVE    HZN-COM-SRYKBN(IDX + 1)
+                                           TO  WRK-GMN-INPUTCD
+                                                   (IDX3)(2:2)
+               MOVE    "0"                 TO  WRK-GMN-INPUTCD
+                                                   (IDX3)(4:1)
+           ELSE
+               MOVE    ZERO                TO  IDX3
+           END-IF
+      *
+           .
+       4201-ZAIDEL-CHK-EXT.
            EXIT.
       *****************************************************************
       *    診察料チェック変換処理

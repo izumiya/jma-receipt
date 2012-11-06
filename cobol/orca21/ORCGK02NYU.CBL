@@ -6275,9 +6275,9 @@
                                    (WRK-COM-INPUTCD(IDX + 1)
                                                    =   SPACE  AND
                                     WRK-GMN-INPUTCD(IDX + 1)
-                                                   =   SPACE   )  OR
-                                   (WRK-GMN-SRYKBN (IDX + 1)
-                                                   NOT =   SPACE )
+                                                   =   SPACE   )
+      **                      OR   (WRK-GMN-SRYKBN (IDX + 1)
+      **                                           NOT =   SPACE )
                                MOVE    1               TO  FLG-ERR
                            END-IF
                        END-IF
