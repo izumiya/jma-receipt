@@ -36,6 +36,7 @@
       *  04.01.00    NACL-多々納  07/11/XX  保険組合せ非表示対応
       *  04.05.00    NACL-多々納  09/06/26  入院食事区分対応
       *  04.06.00    NACL-多々納  10/09/29  入外非表示区分対応
+      *  04.06.00    NACL-多々納  12/11/06  生活保護重複対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -89,6 +90,7 @@
       *
            03  FLG-OK              PIC 9(01).
            03  FLG-CHK             PIC 9(01).
+           03  FLG-OVER            PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -137,6 +139,8 @@
            03  WRK-KOHNUM          PIC X(03).
            03  WRK-KOHID           PIC 9(10).
            03  WRK-JKYSNUM         PIC X(20).
+      *
+           03  WRK-H-JKYSNUM       PIC X(20).
       *
            03  WRK-MCP-PATHNAME    PIC X(60).
       *
@@ -602,6 +606,8 @@
                                                    OR  "091"
                                                    OR  "015"
                                                    OR  "016"
+      *H24.11             生活保護　追加
+                                                   OR  "012"
                                                    OR  "038" )
       *            北海道の地方公費
                    OR ((LNK-COMB-KOH1HKNNUM (IDX)  =   "183" ) AND
@@ -615,6 +621,8 @@
                                                    OR  "091"
                                                    OR  "015"
                                                    OR  "016"
+      *H24.11             生活保護　追加
+                                                   OR  "012"
                                                    OR  "038" )
       *            北海道の地方公費
                    OR ((LNK-COMB-KOH2HKNNUM (IDX)  =   "183" ) AND
@@ -628,6 +636,8 @@
                                                    OR  "091"
                                                    OR  "015"
                                                    OR  "016"
+      *H24.11             生活保護　追加
+                                                   OR  "012"
                                                    OR  "038" )
       *            北海道の地方公費
                    OR ((LNK-COMB-KOH3HKNNUM (IDX)  =   "183" ) AND
@@ -641,6 +651,8 @@
                                                    OR  "091"
                                                    OR  "015"
                                                    OR  "016"
+      *H24.11             生活保護　追加
+                                                   OR  "012"
                                                    OR  "038" )
       *            北海道の地方公費
                    OR ((LNK-COMB-KOH4HKNNUM (IDX)  =   "183" ) AND
@@ -708,7 +720,29 @@
            END-PERFORM
       *
            IF      WRK-JKYSNUM     NOT =   SPACE
-               MOVE    WRK-JKYSNUM         TO  SPA-GMN27-TJKYSNUM(IDX)
+               IF      SPA-GMN27-TJKYSNUM(IDX) =   SPACE
+                   MOVE    WRK-JKYSNUM         TO  SPA-GMN27-TJKYSNUM
+                                                               (IDX)
+               ELSE
+                   MOVE    SPACE                   TO  WRK-H-JKYSNUM
+                   IF      SPA-GMN27-TJKYSNUM(IDX)(19:2)
+                                                   =   SPACE
+                       MOVE    ZERO            TO  FLG-OVER
+                       STRING  SPA-GMN27-TJKYSNUM(IDX)
+                                           DELIMITED  BY  SPACE
+                           "/"             DELIMITED  BY  SIZE
+                           WRK-JKYSNUM     DELIMITED  BY  SPACE
+                                           INTO    WRK-H-JKYSNUM
+                       ON   OVERFLOW
+                            MOVE    1           TO  FLG-OVER
+                       END-STRING
+                       IF      FLG-OVER         =   ZERO
+                           MOVE    WRK-H-JKYSNUM
+                                                TO  SPA-GMN27-TJKYSNUM
+                                                                (IDX)
+                       END-IF
+                   END-IF
+               END-IF
            END-IF
       *
            .
