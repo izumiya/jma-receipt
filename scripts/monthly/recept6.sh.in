@@ -112,7 +112,7 @@ fi
         if  [ -e $4 ]; then
             exit 
         else 
-	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0460 -parameter $1$3$5$6,${17},${16},${4}      >> $LOG_FILE 2>&1
+	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0460 -parameter $1$3$5$6,${17},${18},${16},${4}      >> $LOG_FILE 2>&1
 
         fi
 

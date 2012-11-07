@@ -140,6 +140,8 @@
       *  04.05.08    NACL-門脇    12/04/02  平成２４年４月改正
       *                                     「再診」の対応
       *                                     「その他」の対応
+      *  04.06.01    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
+      *                                     レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -297,6 +299,7 @@
                05  WRK-PARA-JOBID      PIC 9(07).
                05  WRK-PARA-SHELLID    PIC X(08).
            03  WRK-PARA-JIBAIPRTKBN    PIC X(01).
+           03  WRK-PARA-PRTKBN         PIC X(01).
            03  WRK-PARA-HOSPNUM        PIC 9(02).
       *
            03  WRK-RECEERR         PIC X(200).
@@ -741,11 +744,13 @@
            03  FILLER          PIC X(09)   VALUE   "099409905".
       *    時間外受診
            03  FILLER          PIC X(09)   VALUE   "099409907".
+      *    寝たきり老人在宅総合診療科算定終了
+           03  FILLER          PIC X(09)   VALUE   "099140001".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   57.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   58.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   57.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   58.
       *
       *    固定値
        01  CONST-AREA.
@@ -981,6 +986,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
                                                WRK-PARA-JIBAIPRTKBN
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
@@ -3514,7 +3520,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                  (RECE44-SRYKBN      =   "11" OR "12"        ) AND
                  (WRK-TENSUGOKEI     =   ZERO                ))
              OR ((FLG-COMMENT3       =    1                  ) AND
-                 (RECE44-SRYKBN      =   "14"                ) AND
+                 (RECE44-SRYKBN      NOT =  "11" AND "12"    ) AND
                  (RECE44-ZAITEN      =   ZERO                ) AND
                  (RECE44-TOYAKUFLG   =   SPACE               ))
              OR ( RECE44-SAFLG   NOT =   SPACE                )
@@ -3940,8 +3946,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                NOT AT  END
                    MOVE    ZERO      TO  FLG-RECE44
                    ADD     1         TO  CNT-IN-CANCEL
-                   IF     (RECE44-MEISAISU    =   ZERO)
-                   OR     (RECE44-TOYAKUFLG   =   "9" )
+                   IF  ( RECE44-MEISAISU       =   ZERO  )
+                   OR  ((WRK-PARA-PRTKBN       =   "1"  ) AND
+                        (RECE44-TOYAKUFLG  NOT =   SPACE))
                        GO  TO  990-RECE44-NEXT-SEC
                    END-IF       
            END-READ

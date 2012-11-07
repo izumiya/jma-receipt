@@ -110,6 +110,8 @@
       *  04.05.03    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
       *  04.05.04    NACL-ÌçÏÆ    10/01/25  ¼£¸³ÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    11/11/30  ²èÁü¿ÇÃÇ¥Õ¥¤¥ë¥àÊ¬²è¿ôÂÐ±þ
+      *  04.06.01    NACL-ÌçÏÆ    12/10/15  ¿ÇÎÅ¹Ô°ÙÆþÎÏ¤·¤¿¥³¥á¥ó¥È¤Î¤ß¤ÎºÞ¤Î
+      *                                     ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -253,6 +255,7 @@
                05  WRK-PARA-JOBID      PIC  9(07).
                05  WRK-PARA-SHELLID    PIC  X(08).
            03  WRK-PARA-JIBAIPRTKBN    PIC  X(01).
+           03  WRK-PARA-PRTKBN         PIC  X(01).
            03  WRK-PARA-HOSPNUM        PIC  9(02).
       *
            03  WRK-RECEERR         PIC X(200).
@@ -586,10 +589,12 @@
            03  FILLER          PIC X(09)   VALUE   "099114001".
       *    ºß°åÁí¡¦ºß°åÁí´É¡Ê£Ä£Õ£Í£Í£Ù¡Ë
            03  FILLER          PIC X(09)   VALUE   "099140003".
+      *    ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅ²Ê»»Äê½ªÎ»
+           03  FILLER          PIC X(09)   VALUE   "099140001".
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS  12.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS  13.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE  12.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE  13.         
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -862,6 +867,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
                                                WRK-PARA-JIBAIPRTKBN
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
@@ -2981,8 +2987,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                   (RECE84-SRYKBN      =   "11"                ) AND
                   (WRK-TENSUGOKEI     =   ZERO                ))
               OR ((FLG-COMMENT3       =    1                  ) AND
-                  (RECE84-SRYKBN      =   "14" OR "33" OR
-                                          "90" OR "92"        ) AND
+                  (RECE84-SRYKBN      NOT =  "11"             ) AND
                   (RECE84-ZAITEN      =   ZERO                ) AND
                   (RECE84-TOYAKUFLG   =   SPACE               ))
               OR ( RECE84-SAFLG   NOT =   SPACE                )
@@ -3522,8 +3527,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    1         TO  FLG-RECE84
                NOT AT  END
                    MOVE    ZERO      TO  FLG-RECE84
-                   IF     (RECE84-MEISAISU    =   ZERO)
-                   OR     (RECE84-TOYAKUFLG   =   "9" )
+                   IF  ( RECE84-MEISAISU       =   ZERO  )
+                   OR  ((WRK-PARA-PRTKBN       =   "1"  ) AND
+                        (RECE84-TOYAKUFLG  NOT =   SPACE))
                        GO  TO  990-RECE84-NEXT-SEC
                    END-IF       
                    ADD     1         TO  CNT-IN-CANCEL 

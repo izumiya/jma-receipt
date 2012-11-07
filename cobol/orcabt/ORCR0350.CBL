@@ -360,6 +360,8 @@
       *                                     録の修正
       *  04.06.11    NACL-藤原    12/10/11  入院のコメント等の記載条件の
       *                                     修正
+      *  04.06.12    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
+      *                                     レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4561,6 +4563,9 @@
                                     MOVE    31          TO  IDY
                                 END-IF 
                             END-PERFORM
+                            IF  RECE641-SRYKBN  = "97"
+                                    MOVE    0           TO  FLG-TAISYO
+                            END-IF
                         END-IF
                      END-IF  
                    ELSE  
@@ -7072,7 +7077,7 @@
                END-PERFORM
       *
       *        差し込みコメント編集
-               IF      IDZ1            <   3 
+               IF      IDZ1            =   1 OR 2 OR 5
                   PERFORM 200771-NYUIN-COMMENT-HENSYU-SEC
                END-IF
            END-PERFORM
@@ -7099,6 +7104,10 @@
                            END-IF
                        WHEN    2 
                            IF      RECE641-SRYKBN       >  "92"
+                               GO  TO  200771-NYUIN-COMMENT-HENSYU-EXT
+                           END-IF
+                       WHEN    5 
+                           IF      RECE641-SRYKBN       >  "97"
                                GO  TO  200771-NYUIN-COMMENT-HENSYU-EXT
                            END-IF
                    END-EVALUATE

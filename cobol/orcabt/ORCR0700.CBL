@@ -57,6 +57,8 @@
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.02    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
+      *                                     レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -356,12 +358,7 @@
               IF     RECE66-ZAITEN  NOT =  ZERO
                   PERFORM     RECE661-WRITE-SEC
               ELSE
-                IF  ( RECE66-SRYKBN  =  "11" OR "33" OR "99"
-                                     OR "90" OR "92" OR SPACE
-                                     OR "40" OR "80" OR "14"
-                                     OR "21" OR "22" OR "23"  )
-                OR  ( RECE66-SAFLG   NOT =  SPACE             )
-                OR  ( RECE66-ZAIKBN      =   1                )
+                IF   RECE66-SRYKBN  NOT =  "95" AND "96"
                      PERFORM  RECE661-WRITE-SEC
                 END-IF
               END-IF

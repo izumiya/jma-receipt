@@ -81,6 +81,8 @@
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.02    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
+      *                                     レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -391,11 +393,7 @@ grpsys     MOVE    RECE06-HOSPNUM       TO      RECE061-HOSPNUM
               IF     RECE06-ZAITEN  NOT =  ZERO
                   PERFORM     2101-RECE061-WRITE-SEC
               ELSE
-                IF  ( RECE06-SRYKBN  =  "11" OR "12" OR "99" OR SPACE
-                                             OR "40" OR "80" OR "14"
-                                             OR "21" OR "22" OR "23"  )
-                OR  ( RECE06-SAFLG   NOT =  SPACE                     )
-                OR  ( RECE06-ZAIKBN      =   1                        )
+                IF   RECE06-SRYKBN  NOT =  "95" AND "96"
                      PERFORM  2101-RECE061-WRITE-SEC
                 END-IF
               END-IF

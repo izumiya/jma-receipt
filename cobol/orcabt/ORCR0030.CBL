@@ -602,6 +602,8 @@
       *  04.06.05    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
       *  04.06.06    NACL-藤原    11/01/05  機能追加（注加算、同時併施等）
+      *  04.06.07    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
+      *                                     レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -796,6 +798,7 @@
            03  FLG-CYOKI-CHECK3                        PIC 9(01).
            03  FLG-NISYU-KOREI                         PIC 9(01).
            03  FLG-KIN-OKIKAE                          PIC 9(01).
+           03  FLG-HENSYU-NG                           PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -5655,6 +5658,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE  ZERO  TO   WRK-SETCOM-JIDO
                                MOVE  ZERO  TO   WRK-SETCOM-JIDO2
                                MOVE  ZERO  TO   FLG-KIN-OKIKAE
+                               MOVE  ZERO  TO   FLG-HENSYU-NG
                                PERFORM 21042-RECE02-TOTALTEN-HENSYU-SEC     
                                PERFORM 21043-RECE04-TENSOU-SEC
                                PERFORM 21044-RECE05-HENSYU-SEC
@@ -5663,11 +5667,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                END-IF
                            ELSE
                              IF   ACCT-ZAIKAISU  NOT =    ZERO
-                               IF ( ACCT-SRYKBN  =  "11" OR "12" OR
-                                                    "99"          )
-                               OR ((RECE02-SRYYM >= "200804"     ) AND
-                                   (ACCT-SRYKBN  =  "21" OR "22" OR
-                                                    "23" OR "14" ))
+                               IF ( ACCT-SRYKBN  NOT =
+                                    "24" AND "90" AND "92" AND "93" AND
+                                    "97" AND "98"                 )
                                OR ( ACCT-ZAIKBN  =   1            )
                                  IF  (ACCT-SRYCDTOTAL(1:12)  =
                                                     "000000999901")
@@ -5711,56 +5713,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       MOVE  ZERO  TO   WRK-SETCOM-JIDO
                                       MOVE  ZERO  TO   WRK-SETCOM-JIDO2
                                       MOVE  ZERO  TO   FLG-KIN-OKIKAE
+                                      MOVE  ZERO  TO   FLG-HENSYU-NG
+                                      IF    ACCT-SRYKBN  =
+                                            "60" OR "64" OR "80"
+                                        PERFORM 21046-SINRYO-CHECK-SEC
+                                      END-IF
                                       PERFORM   21043-RECE04-TENSOU-SEC
                                       PERFORM   21044-RECE05-HENSYU-SEC
                                       IF    FLG-WRITE05  =   1
                                         PERFORM RECE04-WRITE-SEC
                                       END-IF
-                                 END-IF
-                               ELSE
-                                 PERFORM   21046-SINRYO-CHECK-SEC
-                                 IF   FLG-RINYAK  NOT =  ZERO
-                                    MOVE  ZERO  TO   FLG-SHOSAISIN
-                                    MOVE  ZERO  TO   FLG-SHOSAISIN-GEN
-                                    MOVE  ZERO  TO   WRK-SRYSURYO
-                                    MOVE  ZERO  TO   WRK-SRYSURYO2
-                                    MOVE  ZERO  TO   WRK-SRYSURYO3
-                                    MOVE  ZERO  TO   WRK-TANICD
-                                    MOVE  ZERO  TO   WRK-TANIMOJISU
-                                    MOVE  SPACE TO   WRK-TANINAME
-                                    MOVE  ZERO  TO   FLG-HOUSIJI-COM
-                                                     FLG-HOUTEN-COM
-                                                     FLG-SYOBYO-COM
-                                                     FLG-RYOYO-COM
-                                                     FLG-SYODOU-COM
-                                                     FLG-SAIDOU-COM
-                                                     FLG-NIKOCHIN-COM
-                                                     FLG-ZENSOKU-COM
-                                                     FLG-OSIN-COM
-                                                     FLG-ZAIHOU-COM
-                                                     FLG-TAHOKEN
-                                                     FLG-SYOUNI-COM
-                                                     FLG-KENSA-COM
-      *
-                                    MOVE  ZERO  TO   WRK-FILMTEN
-      *
-                                    MOVE  SPACE TO   WRK-FORMALNAME
-                                    MOVE  ZERO  TO
-                                                WRK-KZI058-TEN
-                                                WRK-KZI058-TANICD
-                                                WRK-KZI058-TANIMOJISU
-                                    MOVE  SPACE TO
-                                                WRK-KZI058-TANINAME
-                                    MOVE  ZERO  TO   FLG-WRITE05
-                                    MOVE  ZERO  TO   FLG-SETCOM
-                                    MOVE  ZERO  TO   WRK-SETCOM-JIDO
-                                    MOVE  ZERO  TO   WRK-SETCOM-JIDO2
-                                    MOVE  ZERO  TO   FLG-KIN-OKIKAE
-                                    PERFORM   21043-RECE04-TENSOU-SEC
-                                    PERFORM   21044-RECE05-HENSYU-SEC
-                                    IF    FLG-WRITE05  =   1
-                                      PERFORM RECE04-WRITE-SEC
-                                    END-IF
                                  END-IF
                                END-IF
                              END-IF
@@ -6248,23 +6210,26 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                   MOVE    1     TO    RECE02-YOBIETC(11)
                   MOVE    1     TO    FLG-KIN-OKIKAE
              END-IF
+             IF       SRY-SRYCD(IDX2)(1:5)  =
+                      "09960" OR "09970" OR "09980"
+                  MOVE    1     TO    FLG-HENSYU-NG
+             END-IF
       *
              IF     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
              OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-             OR     ( SRY-SRYCD(IDX2)       =  "099209903"
-                                            OR "099209905"
-                                            OR "099209906"
-                                            OR "099209907"
-                                            OR "099209908"  )
+             OR     ( SRY-SRYCD(IDX2)       =
+                      "099209902" OR "099209903" OR
+                      "099209904" OR "099209905" OR
+                      "099209906" OR "099209907" OR
+                      "099209908"                           )
              OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                             OR "0086"       )
-             OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                            OR "099999904"
-                                            OR "099999905"
-                                            OR "099999906"
-                                            OR "099999907"  )
+             OR     ( SRY-SRYCD(IDX2)       =
+                      "099999903" OR "099999904" OR
+                      "099999905" OR "099999906" OR
+                      "099999907" OR "099999908"            )
              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                     "60" OR "64" OR "70" OR
                                     "80"                   ) AND
@@ -6273,6 +6238,7 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                      (ACCT-YKZTEN           =  ZERO        ) AND
                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
              OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
+             OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
                   COMPUTE   RECE04-MEISAISU    =  RECE04-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -6332,18 +6298,17 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
               OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-              OR     ( SRY-SRYCD(IDX2)       =  "099209903"
-                                             OR "099209905"
-                                             OR "099209906"
-                                             OR "099209907"
-                                             OR "099209908"  )
+              OR     ( SRY-SRYCD(IDX2)       =
+                       "099209902" OR "099209903" OR
+                       "099209904" OR "099209905" OR
+                       "099209906" OR "099209907" OR
+                       "099209908"                           )
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                              OR "0086"       )
-              OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                             OR "099999904"
-                                             OR "099999905"
-                                             OR "099999906"
-                                             OR "099999907"  )
+              OR     ( SRY-SRYCD(IDX2)       =
+                       "099999903" OR "099999904" OR
+                       "099999905" OR "099999906" OR
+                       "099999907" OR "099999908"            )
               OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                      "60" OR "64" OR "70" OR
                                      "80"                   ) AND
@@ -6352,6 +6317,7 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                       (ACCT-YKZTEN           =  ZERO        ) AND
                       (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
               OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
+              OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
       *
                IF   FLG-KIN-OKIKAE   NOT =  ZERO
                  IF  WRK-TAIHI-ZAINUM  =  ZERO
@@ -6446,9 +6412,12 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
                   ELSE
                     IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
                     OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
-                      IF   RECE04-TOYAKUFLG = SPACE
-                        MOVE    "2"       TO    RECE04-TOYAKUFLG
-                      END-IF
+                        IF   SRY-SRYSYUKBN  =  "212" OR "292" OR
+                                               "222" OR "232"
+                          IF   RECE04-TOYAKUFLG = SPACE
+                            MOVE   "2"    TO    RECE04-TOYAKUFLG
+                          END-IF
+                        END-IF
                     ELSE
                         MOVE    "1"       TO    RECE04-TOYAKUFLG
                     END-IF
@@ -10411,7 +10380,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *****************************************************************
        21046-SINRYO-CHECK-SEC                 SECTION.
       *
-           PERFORM   VARYING   IDU   FROM   1   BY   1
+      ***  PERFORM   VARYING   IDU   FROM   1   BY   1
+           PERFORM   VARYING   IDU   FROM   2   BY   1
                       UNTIL  ( IDU   >   TBL-ZAICHECK-MAX )
                        OR    ( FLG-RINYAK  NOT =  ZERO    )
       *

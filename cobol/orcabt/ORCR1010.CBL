@@ -98,6 +98,8 @@
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
       *                                     対応
+      *  04.06.02    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
+      *                                     レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -204,6 +206,7 @@
            03  FLG-WRITE05X                            PIC 9(01).
            03  FLG-TAHOKEN                             PIC 9(01).
            03  FLG-NEBU                                PIC 9(01).
+           03  FLG-HENSYU-NG                           PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -1218,6 +1221,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            WRK-KZI058-TANINAME
       *
                                MOVE  ZERO  TO   FLG-WRITE05
+                               MOVE  ZERO  TO   FLG-HENSYU-NG
                                PERFORM 21043-RECE120-TENSOU-SEC
                                PERFORM 21044-RECE130-HENSYU-SEC
                                IF    FLG-WRITE05  =   1
@@ -1226,14 +1230,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      IF  (ACCT-ZAIKAISU  NOT =    ZERO)  AND
                          (ACCT-JIHOKBN       =   SPACE)
-                               IF ( ACCT-SRYKBN  =  "11" OR "12" OR
-                                                    "99"          )
-                               OR ((RECE100-SRYYM >= "200804"    ) AND
-                                   (ACCT-SRYKBN  =  "14"         ))
-                               OR ((RECE100-SRYYM >= "200804"    ) AND
-                                   (ACCT-SRYKBN  =  "21" OR "22" OR
-                                                    "23"         ) AND
-                                   (WRK-PARA-PRTKBN  =  "2"      ))
+                               IF ( ACCT-SRYKBN  NOT =
+                                    "24" AND "90" AND "92" AND "93" AND
+                                    "97" AND "98"                 )
                                OR ( ACCT-ZAIKBN  =   1            )
                                  IF  (ACCT-SRYCDTOTAL(1:12)  =
                                                     "000000999901")
@@ -1273,53 +1272,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                   WRK-KZI058-TANINAME
       *
                                       MOVE  ZERO  TO   FLG-WRITE05
+                                      MOVE  ZERO  TO   FLG-HENSYU-NG
+                                      IF    ACCT-SRYKBN  =
+                                            "60" OR "64" OR "80"
+                                        PERFORM 21046-SINRYO-CHECK-SEC
+                                      END-IF
                                       PERFORM   21043-RECE120-TENSOU-SEC
                                       PERFORM   21044-RECE130-HENSYU-SEC
                                       IF    FLG-WRITE05  =   1
                                         PERFORM RECE120-WRITE-SEC
                                       END-IF
-                                 END-IF
-                               ELSE
-                                 PERFORM   21046-SINRYO-CHECK-SEC
-                                 IF   FLG-RINYAK  NOT =  ZERO
-                                    MOVE  ZERO  TO   FLG-SHOSAISIN
-                                    MOVE  ZERO  TO   FLG-SHOSAISIN-GEN
-                                    MOVE  ZERO  TO   WRK-SRYSURYO
-                                    MOVE  ZERO  TO   WRK-SRYSURYO2
-                                    MOVE  ZERO  TO   WRK-SRYSURYO3
-                                    MOVE  ZERO  TO   WRK-TANICD
-                                    MOVE  ZERO  TO   WRK-TANIMOJISU
-                                    MOVE  SPACE TO   WRK-TANINAME
-                                    MOVE  ZERO  TO   FLG-HOUSIJI-COM
-                                                     FLG-HOUTEN-COM
-                                                     FLG-SYOBYO-COM
-                                                     FLG-RYOYO-COM
-                                                     FLG-SYODOU-COM
-                                                     FLG-SAIDOU-COM
-                                                     FLG-NIKOCHIN-COM
-                                                     FLG-ZENSOKU-COM
-                                                     FLG-OSIN-COM
-                                                     FLG-ZAIHOU-COM
-                                                     FLG-TAHOKEN
-                                                     FLG-SYOUNI-COM
-                                                     FLG-KENSA-COM
-      *
-                                    MOVE  ZERO  TO   WRK-FILMTEN
-                                    MOVE  ZERO  TO   FLG-NEBU
-      *
-                                    MOVE  ZERO  TO
-                                                WRK-KZI058-TEN
-                                                WRK-KZI058-TANICD
-                                                WRK-KZI058-TANIMOJISU
-                                    MOVE  SPACE TO
-                                                WRK-KZI058-TANINAME
-      *
-                                    MOVE  ZERO  TO   FLG-WRITE05
-                                    PERFORM   21043-RECE120-TENSOU-SEC
-                                    PERFORM   21044-RECE130-HENSYU-SEC
-                                    IF    FLG-WRITE05  =   1
-                                      PERFORM RECE120-WRITE-SEC
-                                    END-IF
                                  END-IF
                                END-IF
                      END-IF
@@ -1504,25 +1466,28 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                              -  1
              END-IF
       *
+             IF       SRY-SRYCD(IDX2)(1:5)  =
+                      "09960" OR "09970" OR "09980"
+                  MOVE    1     TO    FLG-HENSYU-NG
+             END-IF
+      *
              IF     ( SRY-SRYCD(IDX2)(1:7)  =  "0999901"    )
              OR     ( SRY-SRYCD(IDX2)(1:3)  =  "001"        )
              OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                      (TNS-TEN               =  ZERO )       )
              OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-             OR     ( SRY-SRYCD(IDX2)       =  "099209903"
-                                            OR "099209905"
-                                            OR "099209906"
-                                            OR "099209907"
-                                            OR "099209908"  )
+             OR     ( SRY-SRYCD(IDX2)       =
+                      "099209902" OR "099209903" OR
+                      "099209904" OR "099209905" OR
+                      "099209906" OR "099209907" OR
+                      "099209908"                           )
              OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                             OR "0086"       )
-             OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                            OR "099999904"
-                                            OR "099999905"
-                                            OR "099999906"
-                                            OR "099999907"
-                                            OR "099999909"
-                                            OR "099999910"  )
+             OR     ( SRY-SRYCD(IDX2)       =
+                      "099999903" OR "099999904" OR
+                      "099999905" OR "099999906" OR
+                      "099999907" OR "099999908" OR
+                      "099999909" OR "099999910"            )
              OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                     "60" OR "64" OR "70" OR
                                     "80"                   ) AND
@@ -1531,6 +1496,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      (ACCT-JIHOKBN          =  SPACE       ) AND
                      (ACCT-YKZTEN           =  ZERO        ) AND
                      (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
+             OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
                   COMPUTE   RECE120-MEISAISU    =  RECE120-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -1561,20 +1527,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
               OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-              OR     ( SRY-SRYCD(IDX2)       =  "099209903"
-                                             OR "099209905"
-                                             OR "099209906"
-                                             OR "099209907"
-                                             OR "099209908"  )
+              OR     ( SRY-SRYCD(IDX2)       =
+                       "099209902" OR "099209903" OR
+                       "099209904" OR "099209905" OR
+                       "099209906" OR "099209907" OR
+                       "099209908"                           )
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                              OR "0086"       )
-              OR     ( SRY-SRYCD(IDX2)       =  "099999903"
-                                             OR "099999904"
-                                             OR "099999905"
-                                             OR "099999906"
-                                             OR "099999907"
-                                             OR "099999909"
-                                             OR "099999910"  )
+              OR     ( SRY-SRYCD(IDX2)       =
+                       "099999903" OR "099999904" OR
+                       "099999905" OR "099999906" OR
+                       "099999907" OR "099999908" OR
+                       "099999909" OR "099999910"            )
               OR     ((ACCT-SRYKBN = "40" OR "50" OR "54" OR
                                      "60" OR "64" OR "70" OR
                                      "80"                   ) AND
@@ -1583,6 +1547,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       (ACCT-JIHOKBN          =  SPACE       ) AND
                       (ACCT-YKZTEN           =  ZERO        ) AND
                       (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
+              OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
       *
                CONTINUE
       *
@@ -1624,9 +1589,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   ELSE
                     IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
                     OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
-                      IF   RECE120-TOYAKUFLG = SPACE
-                        MOVE    "2"       TO    RECE120-TOYAKUFLG
-                      END-IF
+                        IF   SRY-SRYSYUKBN  =  "212" OR "292" OR
+                                               "222" OR "232"
+                          IF   RECE120-TOYAKUFLG = SPACE
+                            MOVE   "2"    TO    RECE120-TOYAKUFLG
+                          END-IF
+                        END-IF
                     ELSE
                         MOVE    "1"       TO    RECE120-TOYAKUFLG
                     END-IF
@@ -1642,22 +1610,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
                     OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
                         IF   SRY-SRYSYUKBN  =  "148" OR "149"
-                          EVALUATE  WRK-PARA-PRTKBN
-                           WHEN      "1"
-                             MOVE   "9"  TO    RECE120-TOYAKUFLG
-                           WHEN      "2"
-                             IF   RECE120-TOYAKUFLG = SPACE
-                               MOVE "2"  TO    RECE120-TOYAKUFLG
-                             END-IF
-                          END-EVALUATE
+                          IF   RECE120-TOYAKUFLG = SPACE
+                            MOVE   "2"    TO    RECE120-TOYAKUFLG
+                          END-IF
                         END-IF
                     ELSE
-                        EVALUATE  WRK-PARA-PRTKBN
-                          WHEN      "1"
-                            MOVE  "9"    TO    RECE120-TOYAKUFLG
-                          WHEN      "2"
-                            MOVE  "1"    TO    RECE120-TOYAKUFLG
-                        END-EVALUATE
+                        MOVE    "1"       TO    RECE120-TOYAKUFLG
                     END-IF
                   END-IF
                END-IF
@@ -4026,7 +3984,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *****************************************************************
        21046-SINRYO-CHECK-SEC                 SECTION.
       *
-           PERFORM   VARYING   IDU   FROM   1   BY   1
+      ***  PERFORM   VARYING   IDU   FROM   1   BY   1
+           PERFORM   VARYING   IDU   FROM   2   BY   1
                       UNTIL  ( IDU   >   TBL-ZAICHECK-MAX )
                        OR    ( FLG-RINYAK  NOT =  ZERO    )
       *

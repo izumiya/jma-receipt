@@ -170,6 +170,8 @@
       *                                     種別不明レセ対応で生保の負担
       *                                     者番号、受給者番号なしのとき、
       *                                     エラーとしない
+      *  04.06.03    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
+      *                                     レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -774,10 +776,12 @@
            03  FILLER          PIC X(09)   VALUE   "099409903".
       *    在医総・在医総管（ＤＵＭＭＹ）
            03  FILLER          PIC X(09)   VALUE   "099140003".
+      *    寝たきり老人在宅総合診療科算定終了
+           03  FILLER          PIC X(09)   VALUE   "099140001".
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   14.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   15.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   14.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   15.         
       *
       *    固定値
        01  CONST-AREA.
@@ -4034,8 +4038,7 @@
                   (RECE64-SRYKBN      =   "11"                ) AND
                   (WRK-TENSUGOKEI     =   ZERO                ))
               OR ((FLG-COMMENT3       =    1                  ) AND
-                  (RECE64-SRYKBN      =   "14" OR "33" OR
-                                          "90" OR "92"        ) AND
+                  (RECE64-SRYKBN      NOT =  "11"             ) AND
                   (RECE64-ZAITEN      =   ZERO                ) AND
                   (RECE64-TOYAKUFLG   =   SPACE               ))
               OR ( RECE64-SAFLG   NOT =   SPACE                )

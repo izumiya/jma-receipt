@@ -53,6 +53,8 @@
       *  04.05.03    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
       *  04.05.04    NACL-ÌçÏÆ    10/01/27  ¼£¸³ÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    11/11/30  ²èÁü¿ÇÃÇ¥Õ¥¤¥ë¥àÊ¬²è¿ôÂÐ±þ
+      *  04.06.01    NACL-ÌçÏÆ    12/10/15  ¿ÇÎÅ¹Ô°ÙÆþÎÏ¤·¤¿¥³¥á¥ó¥È¤Î¤ß¤ÎºÞ¤Î
+      *                                     ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -198,6 +200,7 @@
                05  WRK-PARA-JOBID  PIC 9(07).
                05  WRK-PARA-SHELLID
                                    PIC X(08).
+           03  WRK-PARA-PRTKBN     PIC X(01).
            03  WRK-PARA-HOSPNUM    PIC 9(02).
       *
            03  WRK-RECEERR         PIC X(200).
@@ -579,10 +582,12 @@
            03  FILLER          PIC X(09)   VALUE   "099409903".
       *    ºß°åÁí¡¦ºß°åÁí´É¡Ê£Ä£Õ£Í£Í£Ù¡Ë
            03  FILLER          PIC X(09)   VALUE   "099140003".
+      *    ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅ²Ê»»Äê½ªÎ»
+           03  FILLER          PIC X(09)   VALUE   "099140001".
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   14.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   15.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   14.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   15.         
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -806,6 +811,7 @@
       *
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
@@ -2799,8 +2805,7 @@
                  (RECE220-SRYKBN     =   "11"                ) AND
                  (WRK-TENSUGOKEI     =   ZERO                ))
              OR ((FLG-COMMENT3       =    1                  ) AND
-                 (RECE220-SRYKBN     =   "14" OR "33" OR "90"
-                                                      OR "92") AND
+                 (RECE220-SRYKBN     NOT =  "11"             ) AND
                  (RECE220-ZAITEN     =   ZERO                ) AND
                  (RECE220-TOYAKUFLG  =   SPACE               ))
              OR ( RECE220-SAFLG  NOT =   SPACE                )
@@ -3400,7 +3405,8 @@
                NOT AT  END
                    MOVE    ZERO      TO  FLG-RECE220
                    ADD     1         TO  CNT-IN-CANCEL
-                   IF   RECE220-TOYAKUFLG   =   "9"
+                   IF   (WRK-PARA-PRTKBN        =   "1"  )
+                   AND  (RECE220-TOYAKUFLG  NOT =   SPACE)
                        GO  TO  990-RECE220-NEXT-SEC
                    END-IF
            END-READ

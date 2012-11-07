@@ -61,6 +61,8 @@
       *                                     キーにkohid 追加
       *  04.06.02    NACL-藤原    11/01/05  機能追加（注加算、同時併施等）
       *  04.06.03    NACL-藤原    11/01/28  キーに剤連番追加
+      *  04.06.04    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
+      *                                     レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -683,8 +685,9 @@
                        OR  (   RECE64-RECESYUBETU  =   ZERO   OR 
                                                        8888   OR 
                                                        6666        )
-                       OR  ( RECE64-SRYKBN         >=  "95"   AND 
-                                                   <   "99"        )
+                       OR  ( RECE64-SRYKBN         =  "95"    OR
+                                                      "96"    OR
+                                                      "98"         )
                                CONTINUE
                        ELSE
                            MOVE    1           TO  FLG-READ
