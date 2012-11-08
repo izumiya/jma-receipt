@@ -153,7 +153,8 @@
       *  04.05.36    NACL-門脇    12/06/28  生保まとめ分点欄摘要欄記載対応
       *  04.05.37    NACL-門脇    12/09/19  保険欄−一部負担金欄金額置換対応
       *  04.05.38    NACL-門脇    12/10/22  生保まとめ分点欄点数集計修正
-      *  04.05.38    NACL-藤原    12/11/05  摘要欄の公費情報の記載方法修正
+      *  04.05.39    NACL-藤原    12/11/05  摘要欄の公費情報の記載方法修正
+      *  04.05.40    NACL-門脇    12/11/08  公費欄−一部負担金欄金額置換対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -9105,6 +9106,21 @@
              END-IF
              IF    RECE02-YOBIETC(14)  NOT =  123456789
                  MOVE   "1"        TO  RECE10-RESERVE-AREA(6:1)
+             END-IF
+           END-IF
+      *
+           IF      RECE02-YOBIETC(19)  =  1
+             IF    RECE02-YOBIETC(15)  NOT =  123456789
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(7:1)
+             END-IF
+             IF    RECE02-YOBIETC(16)  NOT =  123456789
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(8:1)
+             END-IF
+             IF    RECE02-YOBIETC(17)  NOT =  123456789
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(9:1)
+             END-IF
+             IF    RECE02-YOBIETC(18)  NOT =  123456789
+                 MOVE   "1"        TO  RECE10-RESERVE-AREA(10:1)
              END-IF
            END-IF
       *
