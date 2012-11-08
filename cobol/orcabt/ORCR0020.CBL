@@ -246,6 +246,7 @@
       *                                     中止 
       *  04.06.06    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
+      *  04.06.07    NACL-藤原    12/09/27  生活保護期間重複対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1185,7 +1186,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                        WRITE   RECE09-REC
       *
                        IF      STS-RECE09      =   "00"
-                           CONTINUE
+                           ADD     1               TO  CNT-RECE09
                        ELSE
                            MOVE    SPACE           TO  WRK-ERR-AREA
                            INITIALIZE                  WRK-ERR-AREA
@@ -1194,8 +1195,6 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                            MOVE    STS-RECE09      TO  WRK-ERR-FILE-STS
       ****                 PERFORM 500-FILE-ERR-ABORT-SEC
                        END-IF
-      *
-                       ADD     1                       TO  CNT-RECE09
                    END-PERFORM
                END-IF
            END-PERFORM
@@ -1408,6 +1407,11 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            IF    ( RECE01-HKNNUM        =   SPACE            )
            AND   ( RECE01-KOHHKNNUM-O (1)
                                         =   "030"  OR  "053" )
+               MOVE    RECE01-KOH-KOHID TO  RECE02-KOHID-KEY
+           END-IF
+           IF    ( RECE01-HKNNUM        =   SPACE            )
+           AND   ( RECE01-KOHHKNNUM-O (1)
+                                        =   "012"            )
                MOVE    RECE01-KOH-KOHID TO  RECE02-KOHID-KEY
            END-IF
            PERFORM VARYING IDX FROM    1   BY  1
@@ -3737,6 +3741,11 @@ grpsys             PERFORM 900-DBSELECT-SEC
                  MOVE    RECE01-PTID          TO  RECE09-PTID
                  MOVE    RECE01-RECEKA        TO  RECE09-RECEKA
                  MOVE    "000"                TO  RECE09-KOHNUM
+                 IF    ( RECE01-HKNID             =   ZERO  )
+                 AND   ( RECE01-KOHHKNNUM-O (1)   =   "012" ) 
+                 AND   ( RECE01-KOHHKNNUM-O (2)   =   SPACE )
+                     MOVE    RECE01-KOH-KOHID     TO  RECE09-KOHID
+                 END-IF
                  MOVE    RECE01-TEKSTYMDX (IDX)
                                               TO  RECE09-TEKSTYMD
                  PERFORM VARYING IDYY    FROM    1   BY  1

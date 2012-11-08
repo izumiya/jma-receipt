@@ -222,6 +222,7 @@
       *  04.06.04    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *  04.06.05    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
+      *  04.06.06    NACL-藤原    12/09/27  生活保護期間重複対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2236,6 +2237,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
            MOVE    PTKOHINF-REC        TO  MCPDATA-REC
            PERFORM 900-PTKOHINF-READ-SEC
            MOVE    PTKOH-TEKSTYMD      TO  WRK-RECE01-TEKSTYMD
+      *    生活保護期間重複対応のため
+           IF      COMB-KOHHKNNUM (1)  =   "012"
+               MOVE    COMB-KOH1ID         TO  WRK-RECE01-KOH-KOHID
+           END-IF
       *
            MOVE    WRK-RECE01-KEY      TO  RECE01-KEY 
            PERFORM 900-RECE01-READ-SEC

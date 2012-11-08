@@ -103,6 +103,7 @@
       *                                     併用から単独になったときのまとめ
       *  04.06.04    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
+      *  04.06.02    NACL-藤原    12/09/27  生活保護期間重複対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1875,6 +1876,10 @@ grpsys                 MOVE   LNK-SYUBETU-HOSPNUM
            MOVE    PTKOHINF-REC        TO  MCPDATA-REC
            PERFORM 900-PTKOHINF-READ-SEC
            MOVE    PTKOH-TEKSTYMD      TO  WRK-RECE61-TEKSTYMD
+      *    生活保護期間重複対応のため
+           IF      COMB-KOHHKNNUM (1)  =   "012"
+               MOVE    COMB-KOH1ID         TO  WRK-RECE61-KOH-KOHID
+           END-IF
            PERFORM VARYING IDXX    FROM    1   BY  1
                    UNTIL   IDXX    >       100
 grpsys         IF      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO

@@ -9,6 +9,7 @@
                   04  R98-NAME           PIC X(31).
                   04  R98-FTNJANUM       PIC X(9).
                   04  R98-JKYSNUM        PIC X(21).
+                  04  R98-TEKSTYMD       PIC X(9).
               03  R98-SRYYMH.
                   04  R98-SRYYMH-STYLE   PIC X(20).
                   04  R98-SRYYMH-VALUE   PIC X(27).

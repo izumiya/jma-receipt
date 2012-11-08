@@ -403,6 +403,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD01</name>
+      <x>787</x>
+      <y>80</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM02</name>
       <x>40</x>
@@ -512,6 +528,23 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD02</name>
+      <x>787</x>
+      <y>104</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM03</name>
       <x>40</x>
@@ -616,6 +649,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD03</name>
+      <x>787</x>
+      <y>128</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -730,6 +779,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD04</name>
+      <x>787</x>
+      <y>152</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM05</name>
       <x>40</x>
@@ -834,6 +899,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD05</name>
+      <x>787</x>
+      <y>176</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -948,6 +1029,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD06</name>
+      <x>787</x>
+      <y>200</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM07</name>
       <x>40</x>
@@ -1052,6 +1149,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD07</name>
+      <x>787</x>
+      <y>224</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -1166,6 +1279,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD08</name>
+      <x>787</x>
+      <y>248</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM09</name>
       <x>40</x>
@@ -1270,6 +1399,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD09</name>
+      <x>787</x>
+      <y>272</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -1384,6 +1529,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD10</name>
+      <x>787</x>
+      <y>296</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM11</name>
       <x>40</x>
@@ -1488,6 +1649,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD11</name>
+      <x>787</x>
+      <y>320</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -1602,6 +1779,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD12</name>
+      <x>787</x>
+      <y>344</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM13</name>
       <x>40</x>
@@ -1706,6 +1899,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD13</name>
+      <x>787</x>
+      <y>368</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -1820,6 +2029,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD14</name>
+      <x>787</x>
+      <y>392</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM15</name>
       <x>40</x>
@@ -1924,6 +2149,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD15</name>
+      <x>787</x>
+      <y>416</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -2038,6 +2279,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD16</name>
+      <x>787</x>
+      <y>440</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM17</name>
       <x>40</x>
@@ -2142,6 +2399,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD17</name>
+      <x>787</x>
+      <y>464</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -2256,6 +2529,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD18</name>
+      <x>787</x>
+      <y>488</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM19</name>
       <x>40</x>
@@ -2360,6 +2649,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD19</name>
+      <x>787</x>
+      <y>512</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -2474,6 +2779,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD20</name>
+      <x>787</x>
+      <y>536</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM21</name>
       <x>40</x>
@@ -2578,6 +2899,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD21</name>
+      <x>787</x>
+      <y>560</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -2692,6 +3029,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD22</name>
+      <x>787</x>
+      <y>584</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM23</name>
       <x>40</x>
@@ -2796,6 +3149,22 @@
       <text_visible>True</text_visible>
       <text_max_length>20</text_max_length>
       <text>12345678901234567890</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD23</name>
+      <x>787</x>
+      <y>608</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
@@ -2910,6 +3279,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD24</name>
+      <x>787</x>
+      <y>632</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkNumberEntry</class>
       <name>RENNUM25</name>
       <x>40</x>
@@ -3019,6 +3404,22 @@
     </widget>
 
     <widget>
+      <class>GtkPandaEntry</class>
+      <name>TEKSTYMD25</name>
+      <x>787</x>
+      <y>656</y>
+      <width>80</width>
+      <height>24</height>
+      <sensitive>True</sensitive>
+      <can_focus>False</can_focus>
+      <has_focus>False</has_focus>
+      <editable>False</editable>
+      <text>H24.11.11</text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>False</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkHSeparator</class>
       <name>hseparator1</name>
       <x>16</x>
@@ -3106,6 +3507,25 @@
       <xpad>0</xpad>
       <ypad>0</ypad>
     </widget>
+
+      <widget>
+        <class>GtkLabel</class>
+        <name>label167</name>
+        <x>787</x>
+        <y>50</y>
+        <width>76</width>
+        <height>20</height>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <xalign>0.5</xalign>
+        <yalign>0.5</yalign>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <label>適用開始日</label>
+        <justify>GTK_JUSTIFY_CENTER</justify>
+        <wrap>False</wrap>
+      </widget>
 
     <widget>
       <class>GtkLabel</class>
