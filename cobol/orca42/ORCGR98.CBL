@@ -647,7 +647,10 @@ grpsys             MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                                                    >   PTKOH-TEKEDYMD )
                                        CONTINUE
                                    ELSE
-                                       MOVE    1       TO  FLG-SEIHO
+                                       IF      COMB-KOHID (IDX)
+                                                       =   PTKOH-KOHID
+                                           MOVE    1       TO  FLG-SEIHO
+                                       END-IF
                                    END-IF 
                                END-IF
                            END-PERFORM
@@ -738,7 +741,11 @@ grpsys                         MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
                                                    >   PTKOH-TEKEDYMD )
                                                CONTINUE
                                            ELSE
-                                               MOVE    1   TO  FLG-SEIHO
+                                               IF      COMB-KOHID (IDX)
+                                                       =   PTKOH-KOHID
+                                                   MOVE    1
+                                                       TO  FLG-SEIHO
+                                               END-IF
                                            END-IF 
                                          END-IF
                                        END-PERFORM
