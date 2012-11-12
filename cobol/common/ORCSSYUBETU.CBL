@@ -95,6 +95,7 @@
       *  04.05.03    NACL-Æ£¸¶    11/11/22  Æ±ÆüºÆÆþ±¡ÂÐ±þ
       *  04.05.04    NACL-Æ£¸¶    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
       *                                     ¡Ö£¶£²£Â·¿´Î±ê¡×¤ÎÄÉ²Ã
+      *  04.05.05    NACL-Æ£¸¶    12/11/12  Æ±ÆüºÆÆþ±¡¤Î¥Á¥§¥Ã¥¯¾ò·ï¤Î½¤Àµ
       *
       *  04.06.01    NACL-Æ£¸¶    10/10/12  ¸øÈñÃ±ÆÈ¤Î¥ì¥»Ê¬Î¥ÂÐ±þ
       *  04.06.02    NACL-Æ£¸¶    11/02/01  ¼çÊÝ¸±¤¬¤Ê¤¤¾ì¹ç¡¢»ùÆ¸ÊÝ¸î(53)
@@ -2496,7 +2497,7 @@ grpsys                 MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
                                CONTINUE                    
                            ELSE     
                                MOVE    WRK-STYMD       TO  WRK-YMD
-                               MOVE    IDX             TO  WRK-DD
+                               MOVE    IDXX            TO  WRK-DD
                                IF      WRK-COMB-TEKSTYMD (IDX1)
                                                        <=  WRK-YMD
                                AND     WRK-COMB-TEKEDYMD (IDX1)
