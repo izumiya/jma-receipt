@@ -348,6 +348,7 @@
       *  04.05.46    NACL-ÌçÏÆ    12/10/09  ÂçÊ¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°ÀßÄêÄÉ²Ã¡Ë
       *  04.05.47    NACL-ÌçÏÆ    12/11/05  ËÌ³¤Æ»°°Àî»ÔÂÐ±þ
+      *  04.05.48    NACL-ÌçÏÆ    12/11/09  ÆÃÊÌ¿©²Ã»»¤ÎÊÔ½¸½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -435,6 +436,7 @@
            03  FLG-PTHKNINF            PIC 9(01).
            03  FLG-NYUINACCT           PIC 9(01).
            03  FLG-SRYACCT             PIC 9(01).
+           03  FLG-SRYACT              PIC 9(01).
            03  FLG-TENSU               PIC 9(01).
            03  FLG-PTNYUINRRK          PIC 9(01).
            03  FLG-NYUGAI              PIC 9(01).
@@ -1077,6 +1079,7 @@
            03  IDX-ST                  PIC  9(02)  VALUE  ZERO.
            03  IDX-ED                  PIC  9(02)  VALUE  ZERO.
            03  IDY                     PIC  9(02)  VALUE  ZERO.
+           03  IDY2                    PIC  9(02).
            03  IDZ                     PIC  9(02)  VALUE  ZERO.
            03  HKNNYU-IDX              PIC  9(02)  VALUE  ZERO.
            03  KOH-IDX                 PIC  9(02)  VALUE  ZERO.
@@ -1261,6 +1264,21 @@
       *
        01  TBL-TOKUIPAN-MAX    PIC 9(02)   VALUE     2.
       *
+      *
+      *    ÆÃÊÌ¿©²Ã»»ÍÑ¥Æ¡¼¥Ö¥ë
+       01  TBL-TOKUSYOKU-AREA.
+      *    ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡ÊÂ¾Ë¡ÅùÆþ±¡Ãæ¡Ë
+           03  FILLER          PIC X(09)   VALUE    "197001210".
+      *    ÆÃÊÌ¿©²Ã»»¡Ê¿©»öÎÅÍÜ¡Ë
+           03  FILLER          PIC X(09)   VALUE    "197000470".
+      *    ÆÃÊÌ¿©²Ã»»¡ÊÀ¸³èÎÅÍÜ¡Ë
+           03  FILLER          PIC X(09)   VALUE    "197001570".
+      *
+       01  TBL-TOKUSYOKU-R     REDEFINES   TBL-TOKUSYOKU-AREA.
+           03  TBL-TOKUSYOKU   PIC X(09)   OCCURS    3.
+      *
+       01  TBL-TOKUSYOKU-MAX   PIC 9(02)   VALUE     3.
+      *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
@@ -1296,6 +1314,10 @@
       *    ¿ÇÎÅ²ñ·×
        01  SRYACCT-REC.
            COPY    "CPSRYACCT.INC".
+      *
+      *    ¿ÇÎÅ¹Ô°Ù
+       01  SRYACT-REC.
+           COPY    "CPSRYACT.INC".
       *
       *    ¥·¥¹¥Æ¥à´ÉÍý
            COPY    "CPSK1001.INC".
@@ -18324,27 +18346,90 @@
            MOVE    SRYACCT-REC           TO      MCPDATA-REC
            MOVE    "DBSELECT"            TO      MCP-FUNC
            MOVE    "tbl_sryacct"         TO      MCP-TABLE
-           MOVE    "key45"               TO      MCP-PATHNAME
+           MOVE    "key54"               TO      MCP-PATHNAME
            CALL    "ORCDBMAIN"           USING   MCPAREA
                                                  MCPDATA-REC
                                                  SPA-AREA
            IF      MCP-RC                =       ZERO
                MOVE    "tbl_sryacct"     TO      MCP-TABLE
-               MOVE    "key45"           TO      MCP-PATHNAME
+               MOVE    "key54"           TO      MCP-PATHNAME
                PERFORM  SRYACCT-READ-SEC
                PERFORM  UNTIL   FLG-SRYACCT     =    1
       *
                  IF     LNK-SYU-HKNCOMBINUM  =    ACCT-HKNCOMBI
-                         PERFORM    23043-ROSAITOKU-TAIHI-SEC
+                         PERFORM    23043-ROSAITOKU-TAIHI2-SEC
                  END-IF
       *
                  MOVE    "tbl_sryacct"   TO      MCP-TABLE
-                 MOVE    "key45"         TO      MCP-PATHNAME
+                 MOVE    "key54"         TO      MCP-PATHNAME
                  PERFORM  SRYACCT-READ-SEC
                END-PERFORM
            END-IF
            MOVE    "tbl_sryacct"         TO      MCP-TABLE
-           MOVE    "key45"               TO      MCP-PATHNAME
+           MOVE    "key54"               TO      MCP-PATHNAME
+           PERFORM  DB-CLOSE-SEC
+      *
+           INITIALIZE                            SRYACCT-REC
+           MOVE    LNK-SYU-HOSPNUM       TO      ACCT-HOSPNUM
+           MOVE    LNK-SYU-NYUGAIKBN     TO      ACCT-NYUGAIKBN
+           MOVE    LNK-SYU-PTID          TO      ACCT-PTID
+           MOVE    LNK-SYU-SRYYMD(1:6)   TO      ACCT-SRYYM
+           MOVE    SRYACCT-REC           TO      MCPDATA-REC
+           MOVE    "DBSELECT"            TO      MCP-FUNC
+           MOVE    "tbl_sryacct"         TO      MCP-TABLE
+           MOVE    "key55"               TO      MCP-PATHNAME
+           CALL    "ORCDBMAIN"           USING   MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC                =       ZERO
+               MOVE    "tbl_sryacct"     TO      MCP-TABLE
+               MOVE    "key55"           TO      MCP-PATHNAME
+               PERFORM  SRYACCT-READ-SEC
+               PERFORM  UNTIL   FLG-SRYACCT     =    1
+      *
+                 IF     LNK-SYU-HKNCOMBINUM  =    ACCT-HKNCOMBI
+                         PERFORM    23043-ROSAITOKU-TAIHI2-SEC
+                 END-IF
+      *
+                 MOVE    "tbl_sryacct"   TO      MCP-TABLE
+                 MOVE    "key55"         TO      MCP-PATHNAME
+                 PERFORM  SRYACCT-READ-SEC
+               END-PERFORM
+           END-IF
+           MOVE    "tbl_sryacct"         TO      MCP-TABLE
+           MOVE    "key55"               TO      MCP-PATHNAME
+           PERFORM  DB-CLOSE-SEC
+      *
+           INITIALIZE                            SRYACCT-REC
+           MOVE    LNK-SYU-HOSPNUM       TO      ACCT-HOSPNUM
+           MOVE    LNK-SYU-NYUGAIKBN     TO      ACCT-NYUGAIKBN
+           MOVE    LNK-SYU-PTID          TO      ACCT-PTID
+           MOVE    LNK-SYU-SRYYMD(1:6)   TO      ACCT-STSRYYM
+           MOVE    LNK-SYU-SRYYMD(1:6)   TO      ACCT-EDSRYYM
+           MOVE    SRYACCT-REC           TO      MCPDATA-REC
+           MOVE    "DBSELECT"            TO      MCP-FUNC
+           MOVE    "tbl_sryacct"         TO      MCP-TABLE
+           MOVE    "key49"               TO      MCP-PATHNAME
+           CALL    "ORCDBMAIN"           USING   MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC                =       ZERO
+               MOVE    "tbl_sryacct"     TO      MCP-TABLE
+               MOVE    "key49"           TO      MCP-PATHNAME
+               PERFORM  SRYACCT-READ-SEC
+               PERFORM  UNTIL   FLG-SRYACCT     =    1
+      *
+                 IF     LNK-SYU-HKNCOMBINUM  =    ACCT-HKNCOMBI
+                         PERFORM    23043-ROSAITOKU-TAIHI3-SEC
+                 END-IF
+      *
+                 MOVE    "tbl_sryacct"   TO      MCP-TABLE
+                 MOVE    "key49"         TO      MCP-PATHNAME
+                 PERFORM  SRYACCT-READ-SEC
+               END-PERFORM
+           END-IF
+           MOVE    "tbl_sryacct"         TO      MCP-TABLE
+           MOVE    "key49"               TO      MCP-PATHNAME
            PERFORM  DB-CLOSE-SEC
       *
            PERFORM  23046-SHOKUJI-FURIWAKE-SEC
@@ -18426,7 +18511,7 @@
            EXIT.
       *
       ******************************************************************
-      *        Ï«ºÒÆþ±¡Ãæ¤ÎÆÃÊÌ¿©²Ã»»ÂàÈò                              *
+      *    ÆÃÊÌ¿©²Ã»»ÂàÈò                                              *
       ******************************************************************
        23043-ROSAITOKU-TAIHI-SEC         SECTION.
       *
@@ -18467,6 +18552,135 @@
            .
       *
        23043-ROSAITOKU-TAIHI-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    ÆÃÊÌ¿©²Ã»»ÂàÈò£²                                            *
+      ******************************************************************
+       23043-ROSAITOKU-TAIHI2-SEC         SECTION.
+      *
+           PERFORM    VARYING   IDY   FROM   1   BY   1
+                       UNTIL    IDY    >    31
+               IF   ACCT-SRYKBN           =  "97"
+               AND  ACCT-DAY(1 IDY)   NOT =  ZERO
+                  COMPUTE  WK-ROSAITOKU97(IDY) =
+                           WK-ROSAITOKU97(IDY) +
+                           ACCT-SURYOUTOTAL
+                  IF   WK-ROSAITOKU97(IDY)  >  3
+                     MOVE    3    TO   WK-ROSAITOKU97(IDY)
+                  END-IF
+               END-IF
+           END-PERFORM
+      *
+           .
+      *
+       23043-ROSAITOKU-TAIHI2-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    ÆÃÊÌ¿©²Ã»»ÂàÈò£³                                            *
+      ******************************************************************
+       23043-ROSAITOKU-TAIHI3-SEC         SECTION.
+      *
+           PERFORM   VARYING   IDY2   FROM    1    BY    1
+                      UNTIL    IDY2    >   TBL-TOKUSYOKU-MAX
+      *
+             INITIALIZE                        SRYACT-REC
+             MOVE    ACCT-HOSPNUM         TO   SRY-HOSPNUM
+             MOVE    ACCT-NYUGAIKBN       TO   SRY-NYUGAIKBN
+             MOVE    ACCT-PTID            TO   SRY-PTID
+             MOVE    ACCT-SRYYM           TO   SRY-SRYYM
+             MOVE    ACCT-ZAINUM          TO   SRY-ZAINUM
+             MOVE    TBL-TOKUSYOKU(IDY2)  TO   SRY-SRYCD (1)
+             MOVE    TBL-TOKUSYOKU(IDY2)  TO   SRY-SRYCD (2)
+             MOVE    TBL-TOKUSYOKU(IDY2)  TO   SRY-SRYCD (3)
+             MOVE    TBL-TOKUSYOKU(IDY2)  TO   SRY-SRYCD (4)
+             MOVE    TBL-TOKUSYOKU(IDY2)  TO   SRY-SRYCD (5)
+             MOVE    SRYACT-REC           TO   MCPDATA-REC
+             MOVE    "DBSELECT"           TO   MCP-FUNC
+             MOVE    "tbl_sryact"         TO   MCP-TABLE
+             MOVE    "key8"               TO   MCP-PATHNAME
+             CALL    "ORCDBMAIN"          USING   MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+             IF      MCP-RC       =    ZERO
+               MOVE     "tbl_sryact"      TO   MCP-TABLE
+               MOVE     "key8"            TO   MCP-PATHNAME
+               PERFORM   SRYACT-READ-SEC
+               PERFORM  UNTIL   FLG-SRYACT     =    1
+                  PERFORM    VARYING   IDY   FROM   1   BY   1
+                              UNTIL    IDY    >    31
+                    IF   ACCT-SRYKBN           =  "95"
+                    AND  ACCT-DAY(1 IDY)   NOT =  ZERO
+                      IF  SRY-SRYCD (1)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU95(IDY) =
+                                 WK-ROSAITOKU95(IDY) +
+                                 (SRY-SRYSURYO(1) * ACCT-DAY(1 IDY))
+                      END-IF
+                      IF  SRY-SRYCD (2)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU95(IDY) =
+                                 WK-ROSAITOKU95(IDY) +
+                                 (SRY-SRYSURYO(2) * ACCT-DAY(1 IDY))
+                      END-IF
+                      IF  SRY-SRYCD (3)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU95(IDY) =
+                                 WK-ROSAITOKU95(IDY) +
+                                 (SRY-SRYSURYO(3) * ACCT-DAY(1 IDY))
+                      END-IF
+                      IF  SRY-SRYCD (4)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU95(IDY) =
+                                 WK-ROSAITOKU95(IDY) +
+                                 (SRY-SRYSURYO(4) * ACCT-DAY(1 IDY))
+                      END-IF
+                      IF  SRY-SRYCD (5)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU95(IDY) =
+                                 WK-ROSAITOKU95(IDY) +
+                                 (SRY-SRYSURYO(5) * ACCT-DAY(1 IDY))
+                      END-IF
+                    END-IF
+                    IF   ACCT-SRYKBN           =  "96"
+                    AND  ACCT-DAY(1 IDY)   NOT =  ZERO
+                      IF  SRY-SRYCD (1)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU96(IDY) =
+                                 WK-ROSAITOKU96(IDY) +
+                                 (SRY-SRYSURYO(1) * ACCT-DAY(1 IDY))
+                      END-IF
+                      IF  SRY-SRYCD (2)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU96(IDY) =
+                                 WK-ROSAITOKU96(IDY) +
+                                 (SRY-SRYSURYO(2) * ACCT-DAY(1 IDY))
+                      END-IF
+                      IF  SRY-SRYCD (3)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU96(IDY) =
+                                 WK-ROSAITOKU96(IDY) +
+                                 (SRY-SRYSURYO(3) * ACCT-DAY(1 IDY))
+                      END-IF
+                      IF  SRY-SRYCD (4)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU96(IDY) =
+                                 WK-ROSAITOKU96(IDY) +
+                                 (SRY-SRYSURYO(4) * ACCT-DAY(1 IDY))
+                      END-IF
+                      IF  SRY-SRYCD (5)  =  TBL-TOKUSYOKU(IDY2)
+                        COMPUTE  WK-ROSAITOKU96(IDY) =
+                                 WK-ROSAITOKU96(IDY) +
+                                 (SRY-SRYSURYO(5) * ACCT-DAY(1 IDY))
+                      END-IF
+                    END-IF
+                  END-PERFORM
+                  MOVE     "tbl_sryact"      TO   MCP-TABLE
+                  MOVE     "key8"            TO   MCP-PATHNAME
+                  PERFORM   SRYACT-READ-SEC
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_sryact"         TO   MCP-TABLE
+             MOVE    "key8"               TO   MCP-PATHNAME
+             PERFORM  DB-CLOSE-SEC
+      *
+           END-PERFORM
+      *
+           .
+      *
+       23043-ROSAITOKU-TAIHI3-EXT.
            EXIT.
       *
       ******************************************************************
@@ -29082,6 +29296,27 @@
       *
            .
        SRYACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼ÆÉ¹þ
+      *****************************************************************
+       SRYACT-READ-SEC        SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC        TO  SRYACT-REC
+               MOVE    ZERO               TO  FLG-SRYACT
+           ELSE
+               INITIALIZE                     SRYACT-REC
+               MOVE    1                  TO  FLG-SRYACT
+           END-IF
+      *
+           .
+       SRYACT-READ-EXT.
            EXIT.
       *
       *****************************************************************
