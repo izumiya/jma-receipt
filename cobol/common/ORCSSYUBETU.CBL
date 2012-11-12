@@ -97,6 +97,7 @@
       *  04.05.05    NACL-Æ£¸¶    11/11/22  Æ±ÆüºÆÆþ±¡ÂÐ±þ
       *  04.05.06    NACL-Æ£¸¶    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
       *                                     ¡Ö£¶£²£Â·¿´Î±ê¡×¤ÎÄÉ²Ã 
+      *  04.05.07    NACL-Æ£¸¶    12/11/12  Æ±ÆüºÆÆþ±¡¤Î¥Á¥§¥Ã¥¯¾ò·ï¤Î½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2418,7 +2419,7 @@ grpsys                 MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
                                CONTINUE                    
                            ELSE     
                                MOVE    WRK-STYMD       TO  WRK-YMD
-                               MOVE    IDX             TO  WRK-DD
+                               MOVE    IDXX            TO  WRK-DD
                                IF      WRK-COMB-TEKSTYMD (IDX1)
                                                        <=  WRK-YMD
                                AND     WRK-COMB-TEKEDYMD (IDX1)
