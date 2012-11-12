@@ -2813,6 +2813,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM    VARYING   IDX1   FROM   1   BY  1
                      UNTIL   (IDX1         >   31)
                        IF     ACCT-DAY(1 IDX1)   NOT =   ZERO
+                       AND    ACCT-SRYKBN            =   "97"
                            MOVE    ZERO        TO  WRK-KEISAN
                            COMPUTE WRK-KEISAN  =   ACCT-ZAITEN *
                                                    ACCT-DAY(1 IDX1)
@@ -2852,6 +2853,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM    VARYING   IDX1   FROM   1   BY  1
                      UNTIL   (IDX1         >   31)
                        IF     ACCT-DAY(1 IDX1)   NOT =   ZERO
+                       AND    ACCT-SRYKBN            =   "97"
                            MOVE    ZERO        TO  WRK-KEISAN
                            COMPUTE WRK-KEISAN  =   ACCT-ZAITEN *
                                                    ACCT-DAY(1 IDX1)
