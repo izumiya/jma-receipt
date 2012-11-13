@@ -4162,17 +4162,8 @@
             OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                     (TNS-TEN               =  ZERO )       )
             OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-            OR     ( SRY-SRYCD(IDX2)       =
-                     "099209902" OR "099209903" OR
-                     "099209904" OR "099209905" OR
-                     "099209906" OR "099209907" OR
-                     "099209908"                           )
             OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                            OR "0086"       )
-            OR     ( SRY-SRYCD(IDX2)       =
-                     "099999903" OR "099999904" OR
-                     "099999905" OR "099999906" OR
-                     "099999907" OR "099999908"            )
             OR     ((SRY-SRYSYUKBN  = "330" OR "331" OR
                                       "332" OR "350" OR
                                       "352"               ) AND
@@ -4191,6 +4182,15 @@
             OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
             OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
             OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
+            OR     ( SRY-SRYCD(IDX2)       =
+                     "099209902" OR "099209903" OR
+                     "099209904" OR "099209905" OR
+                     "099209906" OR "099209907" OR
+                     "099209908" OR
+                     "099999903" OR "099999904" OR
+                     "099999905" OR "099999906" OR
+                     "099999907" OR "099999908" OR
+                     "099830101"                           )
                   COMPUTE   RECE64-MEISAISU    =  RECE64-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -4265,17 +4265,8 @@
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
               OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-              OR     ( SRY-SRYCD(IDX2)       =
-                       "099209902" OR "099209903" OR
-                       "099209904" OR "099209905" OR
-                       "099209906" OR "099209907" OR
-                       "099209908"                           )
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                              OR "0086"       )
-              OR     ( SRY-SRYCD(IDX2)       =
-                       "099999903" OR "099999904" OR
-                       "099999905" OR "099999906" OR
-                       "099999907" OR "099999908"            )
               OR     ((SRY-SRYSYUKBN  = "330" OR "331" OR
                                         "332" OR "350" OR
                                         "352"               ) AND
@@ -4294,6 +4285,15 @@
               OR     ( FLG-KIN-OKIKAE    NOT =  ZERO         )
               OR     ( FLG-KIN-OKIKAE2   NOT =  ZERO         )
               OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
+              OR     ( SRY-SRYCD(IDX2)       =
+                       "099209902" OR "099209903" OR
+                       "099209904" OR "099209905" OR
+                       "099209906" OR "099209907" OR
+                       "099209908" OR
+                       "099999903" OR "099999904" OR
+                       "099999905" OR "099999906" OR
+                       "099999907" OR "099999908" OR
+                       "099830101"                           )
       *
                IF   FLG-KIN-OKIKAE   NOT =  ZERO
                  IF  WRK-TAIHI-ZAINUM  =  ZERO

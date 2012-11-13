@@ -2384,19 +2384,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
             OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                     (TNS-TEN               =  ZERO )       )
             OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-            OR     ( SRY-SRYCD(IDX2)       =
-                     "099209902" OR "099209903" OR
-                     "099209904" OR "099209905" OR
-                     "099209906" OR "099209907" OR
-                     "099209908"                           )
             OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                            OR "0086"       )
-            OR     ( SRY-SRYCD(IDX2)       =
-                     "099999903" OR "099999904" OR
-                     "099999905" OR "099999906" OR
-                     "099999907" OR "099999908" OR
-                     "099999909" OR "099999910" OR
-                     "099999921"                           )
             OR     ((SRY-SRYSYUKBN  = "330" OR "331" OR
                                       "332" OR "350" OR
                                       "352"               ) AND
@@ -2414,6 +2403,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     (ACCT-YKZTEN           =  ZERO        ) AND
                     (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
             OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
+            OR     ( SRY-SRYCD(IDX2)       =
+                     "099209902" OR "099209903" OR
+                     "099209904" OR "099209905" OR
+                     "099209906" OR "099209907" OR
+                     "099209908" OR
+                     "099999903" OR "099999904" OR
+                     "099999905" OR "099999906" OR
+                     "099999907" OR "099999908" OR
+                     "099999909" OR "099999910" OR
+                     "099999921" OR
+                     "099830101"                           )
                   COMPUTE   RECE84-MEISAISU    =  RECE84-MEISAISU
                                                -  1
                   MOVE      SRY-SRYCD(IDX2)   TO  WRK-SRYCD
@@ -2459,19 +2459,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
               OR     ((SRY-SRYCD(IDX2)(1:3)  =  "059") AND
                       (TNS-TEN               =  ZERO )       )
               OR     ( SRY-SRYCD(IDX2)(1:7)  =  "0992000"    )
-              OR     ( SRY-SRYCD(IDX2)       =
-                       "099209902" OR "099209903" OR
-                       "099209904" OR "099209905" OR
-                       "099209906" OR "099209907" OR
-                       "099209908"                           )
               OR     ( SRY-SRYCD(IDX2)(1:4)  =  "0085"
                                              OR "0086"       )
-              OR     ( SRY-SRYCD(IDX2)       =
-                       "099999903" OR "099999904" OR
-                       "099999905" OR "099999906" OR
-                       "099999907" OR "099999908" OR
-                       "099999909" OR "099999910" OR
-                       "099999921"                           )
               OR     ((SRY-SRYSYUKBN  = "330" OR "331" OR
                                         "332" OR "350" OR
                                         "352"               ) AND
@@ -2489,6 +2478,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       (ACCT-YKZTEN           =  ZERO        ) AND
                       (SRY-SRYCD(IDX2)(1:1)  =  "6"         ))
               OR     ( FLG-HENSYU-NG     NOT =  ZERO         )
+              OR     ( SRY-SRYCD(IDX2)       =
+                       "099209902" OR "099209903" OR
+                       "099209904" OR "099209905" OR
+                       "099209906" OR "099209907" OR
+                       "099209908" OR
+                       "099999903" OR "099999904" OR
+                       "099999905" OR "099999906" OR
+                       "099999907" OR "099999908" OR
+                       "099999909" OR "099999910" OR
+                       "099999921" OR
+                       "099830101"                           )
       *
                CONTINUE
       *
