@@ -403,17 +403,7 @@
       *
                MOVE    SPACE               TO  RECE642-REC
                INITIALIZE                      RECE642-REC
-               MOVE    RECE64-HOSPNUM      TO  RECE642-HOSPNUM
-               MOVE    RECE64-SRYYM        TO  RECE642-SRYYM
-               MOVE    RECE64-NYUGAIKBN    TO  RECE642-NYUGAIKBN
-               MOVE    RECE64-PTID         TO  RECE642-PTID
-               MOVE    RECE64-RECEKA       TO  RECE642-RECEKA
-               MOVE    RECE64-TEISYUTUSAKI TO  RECE642-TEISYUTUSAKI
-               MOVE    RECE64-RECESYUBETU  TO  RECE642-RECESYUBETU
-               MOVE    RECE64-HKNJANUM     TO  RECE642-HKNJANUM
-               MOVE    RECE64-HOJOKBN      TO  RECE642-HOJOKBN
-               MOVE    RECE64-KOHID        TO  RECE642-KOHID
-               MOVE    RECE64-TEKSTYMD     TO  RECE642-TEKSTYMD
+               MOVE    RECE64-KEY1         TO  RECE642-KEY1
                MOVE    RECE64-KOHBUNRI     TO  RECE642-KOHBUNRI
                MOVE    RECE64-SRYKBN       TO  RECE642-SRYKBN
                MOVE    WRK-SRYSYUKBN       TO  RECE642-SRYSYUKBN

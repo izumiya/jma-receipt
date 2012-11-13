@@ -398,17 +398,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                IF      RECE04-COMCDFLG     =   "2"
                    MOVE    SPACE               TO  RECE042-REC
                    INITIALIZE                      RECE042-REC
-grpsys             MOVE    RECE04-HOSPNUM      TO  RECE042-HOSPNUM
-                   MOVE    RECE04-SRYYM        TO  RECE042-SRYYM
-                   MOVE    RECE04-NYUGAIKBN    TO  RECE042-NYUGAIKBN
-                   MOVE    RECE04-PTID         TO  RECE042-PTID
-                   MOVE    RECE04-RECEKA       TO  RECE042-RECEKA
-                   MOVE    RECE04-TEISYUTUSAKI TO  RECE042-TEISYUTUSAKI
-                   MOVE    RECE04-RECESYUBETU  TO  RECE042-RECESYUBETU
-                   MOVE    RECE04-HKNJANUM     TO  RECE042-HKNJANUM
-                   MOVE    RECE04-HOJOKBN      TO  RECE042-HOJOKBN
-                   MOVE    RECE04-KOHID        TO  RECE042-KOHID
-                   MOVE    RECE04-TEKSTYMD     TO  RECE042-TEKSTYMD
+                   MOVE    RECE04-KEY1         TO  RECE042-KEY1
                    MOVE    RECE04-KOHBUNRI     TO  RECE042-KOHBUNRI
                    MOVE    RECE04-SRYKBN       TO  RECE042-SRYKBN
                    MOVE    SPACE               TO  RECE042-SRYSYUKBN
@@ -436,17 +426,7 @@ grpsys             MOVE    RECE04-HOSPNUM      TO  RECE042-HOSPNUM
                ELSE
                    MOVE    SPACE               TO  RECE042-REC
                    INITIALIZE                      RECE042-REC
-grpsys             MOVE    RECE04-HOSPNUM      TO  RECE042-HOSPNUM
-                   MOVE    RECE04-SRYYM        TO  RECE042-SRYYM
-                   MOVE    RECE04-NYUGAIKBN    TO  RECE042-NYUGAIKBN
-                   MOVE    RECE04-PTID         TO  RECE042-PTID
-                   MOVE    RECE04-RECEKA       TO  RECE042-RECEKA
-                   MOVE    RECE04-TEISYUTUSAKI TO  RECE042-TEISYUTUSAKI
-                   MOVE    RECE04-RECESYUBETU  TO  RECE042-RECESYUBETU
-                   MOVE    RECE04-HKNJANUM     TO  RECE042-HKNJANUM
-                   MOVE    RECE04-HOJOKBN      TO  RECE042-HOJOKBN
-                   MOVE    RECE04-KOHID        TO  RECE042-KOHID
-                   MOVE    RECE04-TEKSTYMD     TO  RECE042-TEKSTYMD
+                   MOVE    RECE04-KEY1         TO  RECE042-KEY1
                    MOVE    RECE04-KOHBUNRI     TO  RECE042-KOHBUNRI
                    MOVE    RECE04-SRYKBN       TO  RECE042-SRYKBN
                    MOVE    WRK-SRYSYUKBN       TO  RECE042-SRYSYUKBN

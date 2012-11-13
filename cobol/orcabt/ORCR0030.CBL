@@ -6040,17 +6040,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            MOVE    SPACE                TO      RECE04-REC
            INITIALIZE                           RECE04-REC
-grpsys     MOVE    RECE02-HOSPNUM       TO      RECE04-HOSPNUM
-           MOVE    RECE02-SRYYM         TO      RECE04-SRYYM
-           MOVE    RECE02-NYUGAIKBN     TO      RECE04-NYUGAIKBN
-           MOVE    RECE02-PTID          TO      RECE04-PTID
-           MOVE    RECE02-RECEKA        TO      RECE04-RECEKA
-           MOVE    RECE02-TEISYUTUSAKI  TO      RECE04-TEISYUTUSAKI
-           MOVE    RECE02-RECESYUBETU   TO      RECE04-RECESYUBETU
-           MOVE    RECE02-HKNJANUM-KEY  TO      RECE04-HKNJANUM
-           MOVE    RECE02-HOJOKBN-KEY   TO      RECE04-HOJOKBN
-           MOVE    RECE02-KOHID-KEY     TO      RECE04-KOHID
-           MOVE    RECE02-TEKSTYMD      TO      RECE04-TEKSTYMD
+           MOVE    RECE02-KEY           TO      RECE04-KEY1
            MOVE    ZERO                 TO      RECE04-KOHBUNRI
            MOVE    ACCT-SRYKBN          TO      RECE04-SRYKBN
            MOVE    ACCT-ZAINUM          TO      RECE04-ZAINUM
@@ -6167,17 +6157,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            MOVE    SPACE                TO      RECE05-REC
            INITIALIZE                           RECE05-REC
-grpsys     MOVE    RECE02-HOSPNUM       TO      RECE05-HOSPNUM
-           MOVE    RECE02-SRYYM         TO      RECE05-SRYYM
-           MOVE    RECE02-NYUGAIKBN     TO      RECE05-NYUGAIKBN
-           MOVE    RECE02-PTID          TO      RECE05-PTID
-           MOVE    RECE02-RECEKA        TO      RECE05-RECEKA
-           MOVE    RECE02-TEISYUTUSAKI  TO      RECE05-TEISYUTUSAKI
-           MOVE    RECE02-RECESYUBETU   TO      RECE05-RECESYUBETU
-           MOVE    RECE02-HKNJANUM-KEY  TO      RECE05-HKNJANUM
-           MOVE    RECE02-HOJOKBN-KEY   TO      RECE05-HOJOKBN
-           MOVE    RECE02-KOHID-KEY     TO      RECE05-KOHID
-           MOVE    RECE02-TEKSTYMD      TO      RECE05-TEKSTYMD
+           MOVE    RECE02-KEY           TO      RECE05-KEY1
            MOVE    ZERO                 TO      RECE05-KOHBUNRI
            MOVE    SRY-ZAINUM           TO      RECE05-ZAINUM
            IF      RECE04-ZAINUM        >       88888880
