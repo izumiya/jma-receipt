@@ -1731,7 +1731,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF    ( SPA-W10-MODE            =   ZERO )
       *
                INITIALIZE                          TOUKEIMEMO-REC
-               MOVE    SPA-GMN-W10-PRGNAME     TO  TKIMEMO-PGID
+               IF    ( SPA-W10-KANRICD     =   "3001" )
+                   MOVE    SPA-GMN-W10-PRGNAME TO  TKIMEMO-PGID
+               ELSE
+                   MOVE    SPA-GMN-W10-PRGNAME1 TO TKIMEMO-PGID
+               END-IF
                MOVE    SPA-W10-KANRICD         TO  TKIMEMO-KANRICD
                MOVE    SPA-W10-KBNCD           TO  TKIMEMO-KBNCD
                MOVE    SPA-W10-SEL-STYUKYMD    TO  TKIMEMO-STYUKYMD
