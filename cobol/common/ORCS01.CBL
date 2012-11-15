@@ -26895,6 +26895,7 @@
       ******************************************************************
        230761-GENBUTU-MSG-HENSYU-CHECK-SEC         SECTION.
       *
+           MOVE     ZERO      TO     FLG-HANBETU
            PERFORM VARYING IDX13  FROM   1   BY   1
                     UNTIL (IDX13   >    50                       )
                      OR   (WK-SYUNOU-GENBUTU70-HKNCOMBINUM(IDX13)
