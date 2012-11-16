@@ -1185,12 +1185,36 @@
                    MOVE    SYS-1008-YAKJYOCHK-FLG
                                            TO  SPA-YAKJYOCHK-FLG
                END-IF
+      *!!!!    訂正時の自動発生
+      *        IF      SYS-1008-TEISEIAUTO-FLG   =   SPACE
+      *            MOVE    "1"             TO  SPA-TEISEI-FLG
+      *        ELSE
+      *            MOVE    SYS-1008-TEISEIAUTO-FLG
+      *                                    TO  SPA-TEISEI-FLG
+      ****     END-IF
       *        訂正時の自動発生
-               IF      SYS-1008-TEISEIAUTO-FLG   =   SPACE
-                   MOVE    "1"             TO  SPA-TEISEI-FLG
+      *        外来
+               IF      SPA-NYUGAIKBN       =   "2"
+                   IF      SYS-1008-TEISEIAUTO-FLG   =   SPACE
+                       MOVE    "1"             TO  SPA-TEISEI-FLG
+                   ELSE
+                       MOVE    SYS-1008-TEISEIAUTO-FLG
+                                               TO  SPA-TEISEI-FLG
+                   END-IF
                ELSE
-                   MOVE    SYS-1008-TEISEIAUTO-FLG
-                                           TO  SPA-TEISEI-FLG
+      *        入院
+                   IF      SYS-1008-TEINYUAUTO-FLG =   SPACE
+      *            未設定は外来から
+                       IF      SYS-1008-TEISEIAUTO-FLG =   SPACE
+                           MOVE    "1"             TO  SPA-TEISEI-FLG
+                       ELSE
+                           MOVE    SYS-1008-TEISEIAUTO-FLG
+                                                   TO  SPA-TEISEI-FLG
+                       END-IF
+                   ELSE
+                       MOVE    SYS-1008-TEINYUAUTO-FLG
+                                               TO  SPA-TEISEI-FLG
+                   END-IF
                END-IF
       *        訂正時の自動発生（特定疾患処方管理）
                IF      SYS-1008-TEISEITOKU-FLG   =   SPACE
