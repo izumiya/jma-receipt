@@ -647,6 +647,13 @@
                                                DELIMITED   BY  SPACE
                                                INTO   SPA-ERRMSG
                    END-STRING
+      *H24.11
+               WHEN    "0136"
+                   STRING  "長期・長期（上位）の期間が"
+                           "重複しています"
+                                               DELIMITED   BY  SPACE
+                                               INTO   SPA-ERRMSG
+                   END-STRING
       *    更新前エラー
                WHEN    "0100"
                    MOVE    "カナ氏名は必ず入力して下さい"

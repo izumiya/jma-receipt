@@ -46,6 +46,7 @@
       * 03.05.00     NACL-多々納  07/05/XX  グループ診療対応
       * 04.02.00     NACL-多々納  08/03/XX  平成２０年４月改正対応
       * 04.06.00     NACL-多々納  12/11/06  生活保護重複対応
+      * 04.07.00     NACL-多々納  12/11/16  長期高額療養重複不可
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1884,6 +1885,16 @@
                            MOVE    IDX-K       TO  WRK-IDX1
                            MOVE    IDK2        TO  WRK-IDX2
                        END-IF
+      *H24.11
+      *                長期高額療養費の重複不可
+                       IF      (SPA-NAI-PTKOH-SBTKBN (IDX-K) =  "2") AND
+                               (SPA-NAI-PTKOH-SBTKBN (IDK2)  =  "2")
+                           MOVE    "0136"      TO  SPA-ERRCD
+                           MOVE    23          TO  SPA-GMN-CUR
+                           MOVE    IDX-K       TO  WRK-IDX1
+                           MOVE    IDK2        TO  WRK-IDX2
+                       END-IF
+      *
                    END-IF
       *
                    END-IF
@@ -2007,6 +2018,14 @@
                    IF      (SPA-NAI-PTKOH-SBTKBN (IDX-K) =  "5") AND
                            (SPA-PTKOH-HKN-SBTKBN (IDX)   =  "5")
                        MOVE    "0127"      TO  SPA-ERRCD
+                       MOVE    23          TO  SPA-GMN-CUR
+                       MOVE    IDX         TO  WRK-IDX1
+                   END-IF
+      *H24.11
+      *            長期高額療養の重複不可
+                   IF      (SPA-NAI-PTKOH-SBTKBN (IDX-K) =  "2") AND
+                           (SPA-PTKOH-HKN-SBTKBN (IDX)   =  "2")
+                       MOVE    "0136"      TO  SPA-ERRCD
                        MOVE    23          TO  SPA-GMN-CUR
                        MOVE    IDX         TO  WRK-IDX1
                    END-IF
