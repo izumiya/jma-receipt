@@ -15217,8 +15217,9 @@
            IF   (WK-1001-PREFNUM                =  27             )
            AND  (LNK-SYU-KOH-HKNNUM(IDX3)(1:1) >=  "1" AND <=  "8")
            AND  (LNK-SYU-KOH-HKNNUM(IDX3)   NOT =  "100" AND "200")
-           AND  (WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL               )
-             MOVE     ZERO     TO     FLG-NOCOUNT
+             IF  WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
+               MOVE   ZERO     TO     FLG-NOCOUNT
+             END-IF
              IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
              AND (LNK-SYU-DENPNUM     NOT =  ZERO)
              AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
@@ -15380,8 +15381,9 @@
            IF   (WK-1001-PREFNUM                =  27             )
            AND  (LNK-SYU-KOH-HKNNUM(IDX3)(1:1) >=  "1" AND <=  "8")
            AND  (LNK-SYU-KOH-HKNNUM(IDX3)   NOT =  "100" AND "200")
-           AND  (WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL               )
-             MOVE     ZERO     TO     FLG-NOCOUNT
+             IF  WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
+               MOVE   ZERO     TO     FLG-NOCOUNT
+             END-IF
              IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
              AND (LNK-SYU-DENPNUM     NOT =  ZERO)
              AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
