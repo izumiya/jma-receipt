@@ -21,6 +21,10 @@
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  03.05.01    NACL-藤原    07/04/19  グループ診療対応
+      *
+      *  04.05.01    NACL-藤原    12/11/15  剤点数等のマイナス表記対応
+      *  04.05.02    NACL-藤原    10/10/12  公費単独のレセ分離対応
+      *                                     キーにkohid 追加
       ************************************************************
       *01  TOUKEI02-REC.
            03  TOUKEI02-KEY.
@@ -45,6 +49,8 @@
                    07  TOUKEI02-HONKZKKBN  PIC  X(01).
       *            補助区分
                    07  TOUKEI02-HOJOKBN    PIC  X(01).
+      *            公費ＩＤ（公費単独時使用）
+                   07  TOUKEI02-KOH-KOHID  PIC  9(10).
       *        診療科
                05  TOUKEI02-SRYKA          PIC  X(02).
       *        診療区分
@@ -68,19 +74,19 @@
       *自保区分
            03  TOUKEI02-JIHOKBN            PIC  X(01).
       *剤点数
-           03  TOUKEI02-ZAITEN             PIC  9(08).
+           03  TOUKEI02-ZAITEN             PIC  S9(08).
       *剤回数
            03  TOUKEI02-ZAIKAISU           PIC  9(04).
       *明細数
            03  TOUKEI02-MEISAISU           PIC  9(04).
       *手技点数１
-           03  TOUKEI02-SYUTEN1            PIC  9(07).
+           03  TOUKEI02-SYUTEN1            PIC  S9(07).
       *手技点数２
-           03  TOUKEI02-SYUTEN2            PIC  9(07).
+           03  TOUKEI02-SYUTEN2            PIC  S9(07).
       *薬剤点数
-           03  TOUKEI02-YKZTEN             PIC  9(07).
+           03  TOUKEI02-YKZTEN             PIC  S9(07).
       *器材点数
-           03  TOUKEI02-KIZAITEN           PIC  9(07).
+           03  TOUKEI02-KIZAITEN           PIC  S9(07).
       *ドクターコード
            03  TOUKEI02-DRCD               PIC  X(05).
       *日数回数テーブル

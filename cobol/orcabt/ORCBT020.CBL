@@ -41,6 +41,7 @@
       *
       *  04.05.01    NACL-藤原    10/02/12  拡張漢字対応
       *  04.05.02    NACL-藤原    12/06/22  処理結果画面への件数表示
+      *  04.05.03    NACL-藤原    12/11/15  剤点数等のマイナス表記対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -223,7 +224,8 @@
            03  WRK-REC-LENGTH          PIC 9(04).
            03  WRK-HENSYU-AREA.
                05  WRK-DATA            PIC X(200).
-               05  WRK-NUM             PIC ZZZZZZZZZ9.99999. 
+      *********05  WRK-NUM             PIC ZZZZZZZZZ9.99999. 
+               05  WRK-NUM             PIC ---------9.99999. 
                05  WRK-NAGASA          PIC 9(03).
                05  WRK-ST              PIC 9(02). 
                05  WRK-SYOSUU          PIC 9(01).

@@ -107,6 +107,7 @@
       *                                     併用から単独になったときのまとめ
       *  04.05.05    NACL-藤原    11/08/25  公費単独対応
       *                                     公費を最大５０に変更
+      *  04.05.06    NACL-藤原    12/11/15  剤点数等のマイナス表記対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -450,6 +451,15 @@
            03  WRK-CONS-GENBAKU-HKNNUM PIC X(03)   VALUE   "019".       
       *    公害保険番号 
            03  WRK-CONS-KOUGAI-HKNNUM  PIC X(03)   VALUE   "975".       
+      *
+      *    マイナス表記を行う診療行為コード
+      *    薬剤料減点（合算薬剤料上限超）
+           03  WRK-CONS-SRYCD1         PIC X(09)   VALUE   "630010001".
+      *    薬剤料逓減（９０／１００）（内服薬）
+           03  WRK-CONS-SRYCD2         PIC X(09)   VALUE   "630010002".
+      *    包括点数の治験減点分
+           03  WRK-CONS-SRYCD3         PIC X(09)   VALUE   "199000210".
+      *
       *    疑い
            03  WRK-CONS-UTAGAI     PIC X(06)   VALUE   "の疑い".
            03  WRK-CONS-UTAGAI-MOJISU
@@ -3072,6 +3082,21 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    SRY-SRYSURYO (IDX2) TO  TOUKEI02-SRYSURYO
                MOVE    SRY-SRYKAISU (IDX2) TO  TOUKEI02-SRYKAISU
                MOVE    SRY-INPUTNUM (IDX2) TO  TOUKEI02-INPUTNUM
+      *
+               IF      SRY-SRYCD    (IDX2) =   WRK-CONS-SRYCD1
+                                           OR  WRK-CONS-SRYCD2
+                                           OR  WRK-CONS-SRYCD3
+                   COMPUTE TOUKEI02-ZAITEN     =   TOUKEI02-ZAITEN *
+                                                   (-1)
+                   IF      SRY-SRYCD    (IDX2) =   WRK-CONS-SRYCD1
+                       COMPUTE TOUKEI02-YKZTEN     =   ACCT-YKZTEN     *
+                                                       (-1)
+                   ELSE
+                       COMPUTE TOUKEI02-SYUTEN1    =   ACCT-SYUTEN1    *
+                                                       (-1)
+                   END-IF
+               END-IF
+      *
       *
                INITIALIZE                      TNS-TENSU-REC
                MOVE    SRY-SRYCD(IDX2)     TO  TNS-SRYCD
