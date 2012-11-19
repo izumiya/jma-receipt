@@ -238,6 +238,7 @@
       *  04.05.12    NACL-ÌçÏÆ    12/04/10  Ê¿À®£²£´Ç¯£´·î²þÀµ
       *                                     ¸½ÊªµëÉÕ²½ÂÐ±þ
       *  04.05.13    NACL-ÌçÏÆ    12/05/23  ºß°åÁí»»Äê¥Õ¥é¥°ÊÔ½¸½¤Àµ
+      *  04.05.14    NACL-ÌçÏÆ    12/11/19  £¹£·£²¤È£¹£·£´¤Îº®ºß»þÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -489,6 +490,7 @@
            03  WRK-JIHI-FLG              PIC X(01).
       *
            03  WRK-CHOKI                 PIC X(03).
+           03  WRK-CHOKI2                PIC X(03).
       *
            03  WRK-ZAITAKU               PIC X(01).
       *
@@ -1581,6 +1583,7 @@ grpsys                 MOVE   RECE01-HOSPNUM   TO  HKN-HOSPNUM
       *
       *    Ä¹´ü¹â³ÛÎÅÍÜÈñ¤ÎÊÔ½¸
            MOVE    SPACE              TO   WRK-CHOKI
+           MOVE    SPACE              TO   WRK-CHOKI2
            PERFORM   VARYING   IDX   FROM    1   BY   1
                      UNTIL    (IDX     >   4)    
                      OR       (RECE01-KOHHKNNUM-O(IDX)  =   SPACE)
@@ -1610,15 +1613,15 @@ grpsys           PERFORM 900-DBSELECT-SEC
                               ADD      1           TO  TOKKI-IDX
                               MOVE    "02"         TO  RECE02-TOKKI
                                                        (TOKKI-IDX)
+                              MOVE    RECE01-KOHHKNNUM-O(IDX)
+                                                   TO  WRK-CHOKI
                             WHEN     "974"
                               ADD      1           TO  TOKKI-IDX
                               MOVE    "16"         TO  RECE02-TOKKI
                                                        (TOKKI-IDX)
+                              MOVE    RECE01-KOHHKNNUM-O(IDX)
+                                                   TO  WRK-CHOKI2
                            END-EVALUATE
-                           MOVE    RECE01-KOHHKNNUM-O(IDX)  TO
-                                                    WRK-CHOKI 
-                           MOVE    1            TO  FLG-HKNNUM
-                           MOVE    4            TO  IDX  
                        END-IF     
                    END-IF
                  END-IF
@@ -1637,6 +1640,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                      CONTINUE
                ELSE
                    IF      RECE01-KOHHKNNUM-O (IDX)  =   WRK-CHOKI
+                                                    OR   WRK-CHOKI2
                        MOVE   "4"             TO  WRK-RECESKYKBN
                    ELSE
                        MOVE   RECE01-RECESKYKBN-O (IDX)

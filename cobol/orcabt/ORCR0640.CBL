@@ -13193,6 +13193,7 @@
            IF  (RECE62-NYUINRYOFLG   =   "1"     )
            AND (RECE62-KOUREI        =   "1"     )
            AND (RECE62-SRYYM        >=   "200904")
+           AND (RECE62-SRYYM        <=   "201203")
              INITIALIZE                        SYUNOU-REC
              MOVE    RECE62-HOSPNUM       TO   SYU-HOSPNUM
              MOVE    RECE62-NYUGAIKBN     TO   SYU-NYUGAIKBN

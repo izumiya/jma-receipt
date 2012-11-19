@@ -199,6 +199,7 @@
       *  04.05.12    NACL-Æ£¸¶    11/11/21  ¿ÇÎÅÇ¯·î¡ãÅ¾ÆþÇ¯·î¤ÎÆþ±¡Îò¤ò
       *                                     ½èÍýÂÐ¾Ý³°¤È¤¹¤ë
       *  04.05.13    NACL-Æ£¸¶    11/11/22  Æ±ÆüºÆÆþ±¡ÂÐ±þ
+      *  04.05.14    NACL-ÌçÏÆ    12/11/19  £¹£·£²¤È£¹£·£´¤Îº®ºß»þÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -465,6 +466,7 @@
            03  WRK-JIHI-FLG              PIC X(01).
       *
            03  WRK-CHOKI                 PIC X(03).
+           03  WRK-CHOKI2                PIC X(03).
       *
            03  RJN-RATE-KBN              PIC X(01).
       *
@@ -1377,6 +1379,7 @@
       *
       *    Ä¹´ü¹â³ÛÎÅÍÜÈñ¤ÎÊÔ½¸
            MOVE    SPACE              TO   WRK-CHOKI
+           MOVE    SPACE              TO   WRK-CHOKI2
            PERFORM   VARYING   IDX   FROM    1   BY   1
                      UNTIL    (IDX     >   4)    
                      OR       (RECE61-KOHHKNNUM-O(IDX)  =   SPACE)
@@ -1406,15 +1409,15 @@
                               ADD      1           TO  TOKKI-IDX
                               MOVE    "02"         TO  RECE62-TOKKI
                                                        (TOKKI-IDX)
+                              MOVE    RECE61-KOHHKNNUM-O(IDX)
+                                                   TO  WRK-CHOKI
                             WHEN     "974"
                               ADD      1           TO  TOKKI-IDX
                               MOVE    "16"         TO  RECE62-TOKKI
                                                        (TOKKI-IDX)
+                              MOVE    RECE61-KOHHKNNUM-O(IDX)
+                                                   TO  WRK-CHOKI2
                            END-EVALUATE
-                           MOVE    RECE61-KOHHKNNUM-O(IDX)  TO
-                                                    WRK-CHOKI 
-                           MOVE    1            TO  FLG-HKNNUM
-                           MOVE    4            TO  IDX  
                        END-IF     
                    END-IF
                  END-IF
@@ -1433,6 +1436,7 @@
                      CONTINUE
                ELSE
                    IF      RECE61-KOHHKNNUM-O (IDX)  =   WRK-CHOKI
+                                                    OR   WRK-CHOKI2
                        MOVE   "4"             TO  WRK-RECESKYKBN
                    ELSE
                        MOVE   RECE61-RECESKYKBN-O (IDX)
