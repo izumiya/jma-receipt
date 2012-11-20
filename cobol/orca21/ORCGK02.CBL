@@ -327,6 +327,9 @@
       *
            03  FLG-TEI-ARI             PIC 9(01).
            03  FLG-SANTEI              PIC 9(01).
+      *    会計照会戻りチェック
+           03  FLG-CHK-ERR             PIC 9(01).
+           03  FLG-CHKRRK              PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -1860,6 +1863,11 @@
                END-IF
                IF      SPA-SYORIFLG        =   1
                    IF      (SPA-SRYYMD     =   HZN-SPA-NAI-RRKYMD(IDX))
+                   AND     (SPA-SRYKA      =   HZN-SPA-NAI-RRK-SRYKA
+                                                                 (IDX))
+                   AND     (SPA-HKNCOMBINUM
+                                           =   HZN-SPA-NAI-RRK-HKNCOMBI
+                                                                 (IDX))
                    AND     (SPA-RENNUM     =   HZN-SPA-NAI-RENNUM(IDX))
                    AND     (SPA-DOUJI-RENNUM
                                            =   HZN-SPA-NAI-DOUJI-RENNUM
@@ -1868,6 +1876,15 @@
                    END-IF
                END-IF
            END-PERFORM
+      *H24.11
+      *    訂正で受診履歴の変更があった時のチェック
+           IF      (SPA-SYORIFLG       =   1    )
+              AND  (SPA-ERRCD      NOT =   SPACE)
+              AND  (FLG-OK             =   1    )
+              AND  (SPA-DENPNUM    NOT =   ZERO )
+               PERFORM 300411-J02CHK-DENPNUM-SEC
+           END-IF
+      *
            IF      SPA-GMN-MAX1    NOT =   HZN-SPA-GMN-MAX1
                MOVE    "K178"          TO  SPA-ERRCD
            END-IF
@@ -1883,6 +1900,54 @@
            .
        30041-JYURRK-J02CHK-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    訂正受診履歴変更チェック処理
+      *****************************************************************
+       300411-J02CHK-DENPNUM-SEC              SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHK-ERR
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   SPA-GMN-MAX1 )
+                          OR  (FLG-CHK-ERR     =   1    )
+               IF      SPA-DENPNUM         =   SPA-NAI-GRP-DENPNUM (IDX)
+                   MOVE    ZERO                TO  FLG-CHKRRK
+                   PERFORM VARYING     IDY     FROM    1   BY  1
+                           UNTIL      (IDY     >   SPA-GMN-MAX1 )
+                                  OR  (FLG-CHKRRK  =   1        )
+                       IF      (SPA-DENPNUM
+                                           =   HZN-SPA-NAI-GRP-DENPNUM
+                                                                 (IDY))
+                       AND     (SPA-SRYYMD
+                                           =   HZN-SPA-NAI-RRKYMD(IDY))
+                       AND     (SPA-NAI-RENNUM   (IDX)
+                                           =   HZN-SPA-NAI-RENNUM(IDY))
+                       AND     (SPA-NAI-RRK-HKNCOMBI(IDX)
+                                           =   HZN-SPA-NAI-RRK-HKNCOMBI
+                                                                (IDY))
+                       AND     (SPA-NAI-DOUJI-RENNUM (IDX)
+                                           =   HZN-SPA-NAI-DOUJI-RENNUM
+                                                                 (IDY))
+                       AND    (SPA-NAI-RRK-SRYKA(IDX)
+                                           =   HZN-SPA-NAI-RRK-SRYKA
+                                                                 (IDY))
+                           MOVE    1               TO  FLG-CHKRRK
+                       END-IF
+                   END-PERFORM
+      *            今回受診履歴なし
+                   IF      FLG-CHKRRK          =   ZERO
+                       MOVE    1               TO  FLG-CHK-ERR
+                   END-IF
+               END-IF
+           END-PERFORM
+           IF      FLG-CHK-ERR         =   1
+               MOVE    ZERO            TO  FLG-OK
+           END-IF
+      *
+           .
+       300411-J02CHK-DENPNUM-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    診療行為再編集処理

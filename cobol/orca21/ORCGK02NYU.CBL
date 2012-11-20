@@ -1470,6 +1470,11 @@
                END-IF
                IF      SPA-SYORIFLG        =   1
                    IF      (SPA-SRYYMD     =   HZN-SPA-NAI-RRKYMD(IDX))
+                   AND     (SPA-SRYKA      =   HZN-SPA-NAI-RRK-SRYKA
+                                                                 (IDX))
+                   AND     (SPA-HKNCOMBINUM
+                                           =   HZN-SPA-NAI-RRK-HKNCOMBI
+                                                                 (IDX))
                    AND     (SPA-RENNUM     =   HZN-SPA-NAI-RENNUM(IDX))
                    AND     (SPA-DOUJI-RENNUM
                                            =   HZN-SPA-NAI-DOUJI-RENNUM
