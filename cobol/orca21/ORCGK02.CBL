@@ -1863,9 +1863,9 @@
                END-IF
                IF      SPA-SYORIFLG        =   1
                    IF      (SPA-SRYYMD     =   HZN-SPA-NAI-RRKYMD(IDX))
-                   AND     (SPA-SRYKA      =   HZN-SPA-NAI-RRK-SRYKA
+                   AND     (SPA-OLD-SRYKA  =   HZN-SPA-NAI-RRK-SRYKA
                                                                  (IDX))
-                   AND     (SPA-HKNCOMBINUM
+                   AND     (SPA-OLD-HKNCOMBI
                                            =   HZN-SPA-NAI-RRK-HKNCOMBI
                                                                  (IDX))
                    AND     (SPA-RENNUM     =   HZN-SPA-NAI-RENNUM(IDX))
