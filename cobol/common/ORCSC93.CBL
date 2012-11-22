@@ -787,7 +787,7 @@
                            MOVE    "1"             TO  SPA-COM-CUR(IDX)
                        END-IF
                        IF     (SPA-HKNKBN          =   1   )
-                         AND  (SPA-RSI-JUNKYO  NOT =   "1" )
+      **???????????      AND  (SPA-RSI-JUNKYO  NOT =   "1" )
                            CONTINUE
                        ELSE
                            IF      SPA-ERRCD       =   SPACE
