@@ -403,15 +403,18 @@
            MOVE    1                   TO  WRK-PAGE
            MOVE    ZERO                TO  IDY
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-PTKOH-MAX
+                   UNTIL      (IDX     >   SPA-PTKOH-MAX )
+                          AND (WRK-PAGE    >   8    )
                IF      SPA-PTKOH-SAKJOKBN (IDX)   =   SPACE
                    IF      IDY             >=  5
                        ADD     1               TO  WRK-PAGE
                        MOVE    ZERO            TO  IDY
                    END-IF
-                   ADD     1               TO  IDY
-                   MOVE    IDX             TO  SPA-GMN27-KOHRENNUM
+                   IF      WRK-PAGE        <=   8
+                     ADD     1               TO  IDY
+                     MOVE    IDX             TO  SPA-GMN27-KOHRENNUM
                                                       (WRK-PAGE IDY)
+                   END-IF
                END-IF
            END-PERFORM
       *
