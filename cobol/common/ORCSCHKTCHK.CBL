@@ -163,7 +163,7 @@
                                            OCCURS   50.
                05  TBL-SRYCD-G.
                    07  TBL-SRYCD           PIC X(09)
-                                           OCCURS   50.
+                                           OCCURS   99.
            03  TBL-MAX                 PIC 9(04).
       *Æþ±¡ÎÁ
        01  TBL-NYUAREA.
