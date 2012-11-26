@@ -3285,7 +3285,7 @@
       *
            IF      SPA-GMN-T06-SELNUM  =   ZERO
                MOVE    "0004"              TO  SPA-ERRCD
-               GO  TO  440-SAKUJYO-EXT
+               GO  TO  440-SAKUJYO-GID-EXT
            END-IF
       *
            MOVE    "1007"             TO  SPA-TIDCD
