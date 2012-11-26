@@ -436,13 +436,13 @@
                    UNTIL      (IDX-N       >   TBL-N-MAX )
                            OR (FLG-CHK     =   1         )
                PERFORM VARYING     IDY     FROM    1   BY  1
-                       UNTIL      (IDY     >   50   )  OR
+                       UNTIL      (IDY     >   99   )  OR
                                   (TBL-N-SRYCD (IDX-N IDY) =   SPACE)
                    IF      NSRY-SRYCD(IDZ) =   TBL-N-SRYCD (IDX-N IDY)
                        MOVE    NSRY-SRYCD(IDZ)     TO  WRK-K-SRYCD
                        MOVE    1                   TO  FLG-CHK
                        MOVE    IDX-N               TO  WRK-IDX-N
-                       MOVE    50                  TO  IDY
+                       MOVE    99                  TO  IDY
                    END-IF
                END-PERFORM
            END-PERFORM
