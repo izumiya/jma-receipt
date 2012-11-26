@@ -101,7 +101,7 @@
                                              OCCURS   50.
                05  TBL-N-SRYCD-G.
                    07  TBL-N-SRYCD           PIC X(09)
-                                           OCCURS   50.
+                                           OCCURS   99.
            03  TBL-N-MAX                 PIC 9(04).
       *
            03  TBL-HKTCHKFLG-G.
@@ -298,7 +298,7 @@
            END-IF
            MOVE    ZERO                TO  IDY
            PERFORM UNTIL  (FLG-HKTSRYCD    =   1  )
-                      OR  (IDY             >=  50 )
+                      OR  (IDY             >=  99 )
                ADD     1                   TO  IDY
                MOVE    HKTSRYCD-SRYCD      TO  TBL-N-SRYCD
                                                            (IDX-N IDY)
