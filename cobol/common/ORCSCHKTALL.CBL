@@ -433,7 +433,7 @@
                    IF      NSRY-SRYCD(IDZ) =   TBL-N-SRYCD (IDX-N IDY)
                        MOVE    1                   TO  FLG-CHK
                        MOVE    IDX-N               TO  WRK-IDX-N
-                       MOVE    50                  TO  IDY
+                       MOVE    99                  TO  IDY
                    END-IF
                END-PERFORM
            END-PERFORM
