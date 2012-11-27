@@ -15,6 +15,11 @@
   <name>T05</name>
   <width>905</width>
   <height>355</height>
+  <signal>
+    <name>delete_event</name>
+    <handler>gtk_true</handler>
+    <last_modification_time>Mon, 25 Nov 2002 06:01:39 GMT</last_modification_time>
+  </signal>
   <title>(T05)オンライン請求結果データ取込</title>
   <type>GTK_WINDOW_DIALOG</type>
   <position>GTK_WIN_POS_CENTER</position>
