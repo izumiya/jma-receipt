@@ -110,6 +110,8 @@
       *                                     ÊÝ¸±ÁÈ¹ç¤»ºîÀ®
       *  04.06.02    NACL-ÌçÏÆ    12/08/22  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
       *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
+      *  04.06.03    NACL-ÌçÏÆ    12/11/20  ÆÃµ­»ö¹à£°£±¡Ê¸ø¡Ë¤Ë´Ø¤ï¤ëÁë¸ý·×»»¡¦
+      *                                     ¥ì¥»¥×¥È°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -613,11 +615,10 @@
       *
                MOVE    PARA-DATA-REC       TO  PTKOHINF-REC
                IF     (PTKOH-SAKJOKBN  NOT =   SPACE          )
-               OR     (PTKOH-KOHNUM = "956" OR "957" OR "958"
-                                   OR "959"
-                                   OR "977" OR "978" OR "979"
-                                   OR "976"
-                                   OR "950" OR "951"          )
+               OR     (PTKOH-KOHNUM =
+                       "950" OR "951" OR "955" OR
+                       "956" OR "957" OR "958" OR "959" OR
+                       "976" OR "977" OR "978" OR "979"       )
                OR     (PTKOH-KOHNUM(1:2)   =   "96"           )
                    CONTINUE
       ***          IF   (PTKOH-KOHNUM    = "950" OR "951")
@@ -3000,18 +3001,33 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
               CONTINUE
            WHEN    "3"
               IF  HKN-HON-NYUSKJRYYKBN      =   "0"
+                IF  (IDA                    =    1 )
+                AND (HKN-HON-NYUSKJRYYKBN   =   "0")
+                  CONTINUE
+                ELSE
                   MOVE    HKN-HON-NYUSKJRYYKBN
                                TO  WRK-LCOMB-NYU-SKJRYOKBN(IDX2)
+                END-IF
               END-IF
            WHEN    "2"
               IF  HKN-HON-NYUSKJRYYKBN      =   "3"  OR  "0"
+                IF  (IDA                    =    1 )
+                AND (HKN-HON-NYUSKJRYYKBN   =   "0")
+                  CONTINUE
+                ELSE
                   MOVE    HKN-HON-NYUSKJRYYKBN
                                TO  WRK-LCOMB-NYU-SKJRYOKBN(IDX2)
+                END-IF
               END-IF
            WHEN    "1"
               IF  HKN-HON-NYUSKJRYYKBN      =   "3"  OR  "0"  OR  "2"
+                IF  (IDA                    =    1 )
+                AND (HKN-HON-NYUSKJRYYKBN   =   "0")
+                  CONTINUE
+                ELSE
                   MOVE    HKN-HON-NYUSKJRYYKBN
                                TO  WRK-LCOMB-NYU-SKJRYOKBN(IDX2)
+                END-IF
               END-IF
            WHEN    OTHER
               MOVE    HKN-HON-NYUSKJRYYKBN
@@ -3046,18 +3062,33 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
               CONTINUE
            WHEN    "3"
               IF  HKN-TSY-NYUSKJRYYKBN   =   "0"
+                IF  (IDA                    =    1 )
+                AND (HKN-TSY-NYUSKJRYYKBN   =   "0")
+                  CONTINUE
+                ELSE
                   MOVE    HKN-TSY-NYUSKJRYYKBN
                           TO  WRK-LCOMB-TSY-NYUSKJRYOKBN(IDX2)
+                END-IF
               END-IF
            WHEN    "2"
               IF  HKN-TSY-NYUSKJRYYKBN   =   "3"  OR  "0"
+                IF  (IDA                    =    1 )
+                AND (HKN-TSY-NYUSKJRYYKBN   =   "0")
+                  CONTINUE
+                ELSE
                   MOVE    HKN-TSY-NYUSKJRYYKBN
                           TO  WRK-LCOMB-TSY-NYUSKJRYOKBN(IDX2)
+                END-IF
               END-IF
            WHEN    "1"
               IF  HKN-TSY-NYUSKJRYYKBN   =   "3"  OR  "0"  OR  "2"
+                IF  (IDA                    =    1 )
+                AND (HKN-TSY-NYUSKJRYYKBN   =   "0")
+                  CONTINUE
+                ELSE
                   MOVE    HKN-TSY-NYUSKJRYYKBN
                           TO  WRK-LCOMB-TSY-NYUSKJRYOKBN(IDX2)
+                END-IF
               END-IF
            WHEN    OTHER
               MOVE    HKN-TSY-NYUSKJRYYKBN
@@ -3092,18 +3123,33 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                CONTINUE
            WHEN    "3"
               IF  HKN-TNK-NYUSKJRYYKBN    =   "0"
+                IF  (IDA                    =    1 )
+                AND (HKN-TNK-NYUSKJRYYKBN   =   "0")
+                  CONTINUE
+                ELSE
                   MOVE    HKN-TNK-NYUSKJRYYKBN
                           TO  WRK-LCOMB-TNK-NYUSKJRYOKBN(IDX2)
+                END-IF
               END-IF
            WHEN    "2"
               IF  HKN-TNK-NYUSKJRYYKBN    =   "3"  OR  "0"
+                IF  (IDA                    =    1 )
+                AND (HKN-TNK-NYUSKJRYYKBN   =   "0")
+                  CONTINUE
+                ELSE
                   MOVE    HKN-TNK-NYUSKJRYYKBN
                           TO  WRK-LCOMB-TNK-NYUSKJRYOKBN(IDX2)
+                END-IF
               END-IF
            WHEN    "1"
               IF  HKN-TNK-NYUSKJRYYKBN    =   "3"  OR  "0"  OR  "2"
+                IF  (IDA                    =    1 )
+                AND (HKN-TNK-NYUSKJRYYKBN   =   "0")
+                  CONTINUE
+                ELSE
                   MOVE    HKN-TNK-NYUSKJRYYKBN
                           TO  WRK-LCOMB-TNK-NYUSKJRYOKBN(IDX2)
+                END-IF
               END-IF
            WHEN    OTHER
               MOVE    HKN-TNK-NYUSKJRYYKBN
