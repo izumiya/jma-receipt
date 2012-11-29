@@ -145,7 +145,11 @@ path crtv01	{
          OR ( TBL_HKNCOMBI.KOH2ID = TBL_PTKOHINF.KOHID AND TBL_HKNCOMBI.KOH2HKNNUM = TBL_PTKOHINF.KOHNUM)
          OR ( TBL_HKNCOMBI.KOH3ID = TBL_PTKOHINF.KOHID AND TBL_HKNCOMBI.KOH3HKNNUM = TBL_PTKOHINF.KOHNUM)
          OR ( TBL_HKNCOMBI.KOH4ID = TBL_PTKOHINF.KOHID AND TBL_HKNCOMBI.KOH4HKNNUM = TBL_PTKOHINF.KOHNUM)
-         OR ( TBL_PTKOHINF.KOHNUM IN ('956',
+         OR ( TBL_PTKOHINF.KOHNUM IN (
+                                   '950',
+                                   '951',
+                                   '955',
+                                   '956',
                                    '957',
                                    '958',
                                    '959',
