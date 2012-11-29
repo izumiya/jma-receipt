@@ -109,6 +109,7 @@
       *
            03  IDX-KBN             PIC 9(01).
            03  IDX-LAYER           PIC 9(03).
+           03  IDX-KBN2            PIC 9(04).
       *
            03  IDX-NAIYO           PIC 9(04).
            03  IDX-KEIJYO          PIC 9(04).
@@ -847,7 +848,7 @@
                PERFORM 241-NAIYO-YOUHOU-SET-SEC
            END-IF
       *    コメント
-           IF      PARA-COMMENT        =   1
+           IF      PARA-COMMENT        =   "1"
                IF      ORCHCN30-COMMENT-G(CNT-PARA)    NOT =   SPACE
                    PERFORM 241-NAIYO-COMMENT-SET-SEC
                END-IF
@@ -1136,14 +1137,14 @@
       *****************************************************************
        241-NAIYO-COMMENT-SET-SEC   SECTION.
       *
-           PERFORM VARYING IDX-KBN     FROM    1   BY  1
-                   UNTIL  (IDX-KBN     >   10 )
-                   OR     (ORCHCN30-COMMENT-CD(CNT-PARA IDX-KBN)
+           PERFORM VARYING IDX-KBN2    FROM    1   BY  1
+                   UNTIL  (IDX-KBN2    >   10 )
+                   OR     (ORCHCN30-COMMENT-CD(CNT-PARA IDX-KBN2)
                                        =   SPACE )
-               IF      ORCHCN30-COMMENT-MEI(CNT-PARA IDX-KBN)
+               IF      ORCHCN30-COMMENT-MEI(CNT-PARA IDX-KBN2)
                                            =   SPACE
       *            点数マスタ検索
-                   MOVE    ORCHCN30-COMMENT-CD(CNT-PARA IDX-KBN)
+                   MOVE    ORCHCN30-COMMENT-CD(CNT-PARA IDX-KBN2)
                                            TO  WRK-SRYCD
                    PERFORM 900-TENSU-READ-SEC
                    IF      FLG-TENSU           =   ZERO
@@ -1154,7 +1155,7 @@
                        PERFORM 250-HENSYU-SYORI-SEC
                    END-IF
                ELSE
-                   MOVE    ORCHCN30-COMMENT-MEI(CNT-PARA IDX-KBN)
+                   MOVE    ORCHCN30-COMMENT-MEI(CNT-PARA IDX-KBN2)
                                            TO  WRK-HENSYUDATA
                    PERFORM 250-HENSYU-SYORI-SEC
                END-IF

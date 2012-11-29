@@ -385,12 +385,14 @@
                                                OR  "0083"
                                                OR  "0084"
                                                OR  "0085" )
-               ADD     1                       TO  IDXC
-               MOVE    ORCSHCN30-SRYCD (IDT IDXA)
+               IF     (IDXC                    <   20     )
+                   ADD     1                       TO  IDXC
+                   MOVE    ORCSHCN30-SRYCD (IDT IDXA)
                                                TO  TBL-COMMENT (IDXC)
-               MOVE    ORCSHCN30-INPUTCOMENT (IDT IDXA)
+                   MOVE    ORCSHCN30-INPUTCOMENT (IDT IDXA)
                                                TO  TBL-INPUTCOMENT
                                                              (IDXC)
+               END-IF
            END-IF
       *
            .
