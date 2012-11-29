@@ -413,6 +413,7 @@
                                                OR  "0085" )
       *ver.4.7
                IF     (IDX-S                   >   ZERO  )
+                  AND (IDXD                    <   20    )
       *            薬剤の下のコメント
                    ADD     1                       TO  IDXD
                    MOVE    ORCSHCN30-SRYCD (IDT IDXA)
@@ -423,12 +424,14 @@
                                                        (IDX-S IDXD)
                END-IF
       *ver.4.7
-               ADD     1                       TO  IDXC
-               MOVE    ORCSHCN30-SRYCD (IDT IDXA)
+               IF      IDXC                    <   20
+                   ADD     1                       TO  IDXC
+                   MOVE    ORCSHCN30-SRYCD (IDT IDXA)
                                                TO  TBL-COMMENT (IDXC)
-               MOVE    ORCSHCN30-INPUTCOMENT (IDT IDXA)
+                   MOVE    ORCSHCN30-INPUTCOMENT (IDT IDXA)
                                                TO  TBL-INPUTCOMENT
                                                              (IDXC)
+               END-IF
       *ver.4.7
                IF      IDX-S                   >   ZERO
       *            薬剤あり
@@ -439,9 +442,10 @@
            END-IF
       *    用法コメント
            IF     (ORCSHCN30-SRYCD(IDT IDXA)(1:3)
-                                               =   "001" ) AND
-                  (TNS-KENTAICOMMENT           =   2     ) AND
-                  (IDX-S                   >   ZERO      )
+                                           =   "001" ) AND
+                  (TNS-KENTAICOMMENT       =   2     ) AND
+                  (IDX-S                   >   ZERO  )
+             AND  (IDXD                    <   20    )
                ADD     1                       TO  IDXD
                MOVE    ORCSHCN30-SRYCD (IDT IDXA)
                                                TO  TBL-YCOMMENT

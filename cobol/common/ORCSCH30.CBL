@@ -931,6 +931,7 @@
                                                OR  "0085" )
       *ver.4.7
                IF     (IDX-S                   >   ZERO  )
+                 AND  (IDXD                    <   20    )
       *            泔管及票及戊丟件玄
                    ADD     1                       TO  IDXD
                    MOVE    TBL-SRY-SRYCD (IDXA)    TO  TBL-YCOMMENT
@@ -948,15 +949,18 @@
       *ver.4.7
       *
       *        允屯化及泔管
-               ADD     1                       TO  IDXC
-               MOVE    TBL-SRY-SRYCD (IDXA)    TO  TBL-COMMENT (IDXC)
-               IF     (TBL-SRY-INPUTNUM (IDXA) NOT =   ZERO )
-                   PERFORM 200221-PTCOM-HEN-SEC
-                   MOVE    PTCOM-INPUTCOMENT   TO  TBL-INPUTCOMENT
+               IF      IDXC                <   20
+                   ADD     1                       TO  IDXC
+                   MOVE    TBL-SRY-SRYCD (IDXA)    TO  TBL-COMMENT(IDXC)
+                   IF     (TBL-SRY-INPUTNUM (IDXA) NOT =   ZERO )
+                        PERFORM 200221-PTCOM-HEN-SEC
+                       MOVE    PTCOM-INPUTCOMENT   TO  TBL-INPUTCOMENT
                                                               (IDXC)
-               ELSE
-                   MOVE    TBL-SRY-COM-NAME (IDXA) TO  TBL-INPUTCOMENT
+                   ELSE
+                       MOVE    TBL-SRY-COM-NAME (IDXA)
+                                                   TO  TBL-INPUTCOMENT
                                                              (IDXC)
+                   END-IF
                END-IF
       *ver.4.7
                IF      IDX-S                   >   ZERO
@@ -970,6 +974,7 @@
            IF     (TBL-SRY-SRYCD (IDXA)(1:3)   =   "001" ) AND
                   (TNS-KENTAICOMMENT           =   2     ) AND
                   (IDX-S                       >   ZERO  )
+            AND   (IDXD                        <   20    )
                ADD     1                       TO  IDXD
                MOVE    TBL-SRY-SRYCD (IDXA)    TO  TBL-YCOMMENT
                                                        (IDX-S IDXD)
@@ -1427,6 +1432,7 @@
                                                OR  "0085" )
       *ver.4.7
                IF     (IDX-S                   >   ZERO  )
+                 AND  (IDXD                    <   20    )
       *            泔管及票及戊丟件玄
                    ADD     1                       TO  IDXD
                    MOVE    ORCSCH30-SRYCD(IDT IDXA)
@@ -1439,12 +1445,14 @@
       *ver.4.7
       *
       *        允屯化及泔管
-               ADD     1                       TO  IDXC
-               MOVE    ORCSCH30-SRYCD(IDT IDXA)
+               IF      IDXC                    <   20
+                   ADD     1                       TO  IDXC
+                   MOVE    ORCSCH30-SRYCD(IDT IDXA)
                                                TO  TBL-COMMENT (IDXC)
-               MOVE    ORCSCH30-INPUTCOMENT(IDT IDXA)
+                   MOVE    ORCSCH30-INPUTCOMENT(IDT IDXA)
                                                TO  TBL-INPUTCOMENT
                                                              (IDXC)
+               END-IF
       *ver.4.7
                IF      IDX-S                   >   ZERO
       *            泔管丐曰
@@ -1458,6 +1466,7 @@
                                                =   "001" ) AND
                   (TNS-KENTAICOMMENT           =   2     ) AND
                   (IDX-S                       >   ZERO  )
+            AND   (IDXD                        <   20    )
                ADD     1                       TO  IDXD
                MOVE    ORCSCH30-SRYCD(IDT IDXA)
                                                TO  TBL-YCOMMENT
