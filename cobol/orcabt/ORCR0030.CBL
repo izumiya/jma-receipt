@@ -605,6 +605,8 @@
       *  04.06.06    NACL-藤原    11/01/05  機能追加（注加算、同時併施等）
       *  04.06.07    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.08    NACL-門脇    12/11/20  特記事項０１（公）に関わる窓口計算・
+      *                                     レセプト一部負担金記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -801,6 +803,7 @@
            03  FLG-KIN-OKIKAE                          PIC 9(01).
            03  FLG-KIN-OKIKAE2                         PIC 9(01).
            03  FLG-HENSYU-NG                           PIC 9(01).
+           03  FLG-ZEROKOGAITO                         PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -2593,6 +2596,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      FLG-GENBUTU-TAISYOOK
            MOVE      ZERO       TO      FLG-GENBUTU70
            MOVE      ZERO       TO      FLG-KOHYONKAIME
+           MOVE      ZERO       TO      FLG-ZEROKOGAITO
            MOVE      ZERO       TO      FLG-RJNGENMEN-CHIARI
            INITIALIZE                   WRK-TAIHI-GENKIN-TBL
            MOVE      ZERO       TO      FLG-ZENKI-TOKUREI
@@ -2716,6 +2720,17 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                 PERFORM     2116-KEIKASOCHI-HANTEI-SEC
              ELSE
                 PERFORM     2118-GENBUTU70-HANTEI-SEC
+             END-IF
+           END-IF
+      *
+           IF   (IDZ                 =     1   )
+           AND  (RECE02-SRYYM       >= "201204")
+             IF   (RECE02-HKNNUM       =   SPACE                  )
+             OR   (RECE02-HKNNUM(1:2)  =   "98" OR "90" OR "91"   )
+             OR   (RECE02-HKNNUM       =   "068" OR "069" OR "040")
+                CONTINUE
+             ELSE
+                PERFORM     211V-ZEROKOGAITO-CHECK-SEC
              END-IF
            END-IF
       *
@@ -4706,6 +4721,66 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
       *
            .
        2119-TOKUTEISIKKAN-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ０１公該当対象者の判定
+      *****************************************************************
+       211V-ZEROKOGAITO-CHECK-SEC      SECTION.
+      *
+           MOVE      RECE02-SRYYM          TO   WRK-GEN70-YM
+           IF   RECE02-TEKSTYMD(1:6)  >=  RECE02-SRYYM
+              MOVE   RECE02-TEKSTYMD(7:2)  TO   WRK-GEN70-DD
+           ELSE
+              MOVE   01                    TO   WRK-GEN70-DD
+           END-IF
+      *
+           MOVE      RECE02-SRYYM            TO   WRK-GEN702-YM
+           IF   RECE02-TEKSTYMD-X(1:6)  >=  RECE02-SRYYM
+              MOVE   RECE02-TEKSTYMD-X(7:2)  TO   WRK-GEN702-DD
+           ELSE
+              MOVE   01                      TO   WRK-GEN702-DD
+           END-IF
+      *
+           INITIALIZE                       PTKOHINF-REC
+           MOVE    RECE02-HOSPNUM       TO  PTKOH-HOSPNUM
+           MOVE    RECE02-PTID          TO  PTKOH-PTID
+           MOVE    "955"                TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC               =       ZERO
+             MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+             MOVE    "key4"               TO  MCP-PATHNAME
+             PERFORM  900-PTKOHINF-READ-SEC
+             PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                IF ((PTKOH-TEKSTYMD  <=   WRK-GEN70-YMD ) AND
+                    (WRK-GEN70-YMD   <=   PTKOH-TEKEDYMD) AND
+                    (PTKOH-SAKJOKBN   =   SPACE         ))
+                OR ((PTKOH-TEKSTYMD  <=   WRK-GEN702-YMD) AND
+                    (WRK-GEN702-YMD  <=   PTKOH-TEKEDYMD) AND
+                    (PTKOH-SAKJOKBN   =   SPACE         ))
+                    MOVE     1      TO  FLG-ZEROKOGAITO
+                    MOVE     1      TO  FLG-PTKOHINF
+                ELSE
+                    MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                    MOVE    "key4"               TO  MCP-PATHNAME
+                    PERFORM  900-PTKOHINF-READ-SEC
+                END-IF
+             END-PERFORM
+           END-IF
+           MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+           MOVE    "key4"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           IF   FLG-ZEROKOGAITO   =   1
+             MOVE   12    TO      FLG-TOKKI
+             PERFORM   21045-TOKKI-HENSYU-SEC
+           END-IF
+      *
+           .
+       211V-ZEROKOGAITO-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -10426,6 +10501,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                        MOVE    "12"      TO      WRK-TOKKI
              WHEN       11
                        MOVE    "25"      TO      WRK-TOKKI
+             WHEN       12
+                       MOVE    "01"      TO      WRK-TOKKI
       *
              WHEN       96
                        MOVE    "96"      TO      WRK-TOKKI
@@ -13797,6 +13874,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2109-SAIKEI-KEISAN-SEC               SECTION.
       *
+           IF   FLG-ZEROKOGAITO   =   1
+              IF   (RECE02-ZAITAKU   =  "1" OR "2")
+              AND  (RECE02-KOHNUM(1) =  SPACE     )
+              AND  (RECE02-KOHNUM(2) =  SPACE     )
+              AND  (RECE02-KOHNUM(3) =  SPACE     )
+              AND  (RECE02-KOHNUM(4) =  SPACE     )
+              AND  (FLG-HOKENICHIBU  =  ZERO      )
+                CONTINUE
+              ELSE
+                MOVE   ZERO     TO    FLG-ZEROKOGAITO
+              END-IF
+           END-IF
+      *
            IF   FLG-ZENKOKUKOHI-NISYU2  =  1
               MOVE     ZERO     TO    FLG-KEISAN-TOK1
                                       FLG-KEISAN-TOK2
@@ -13880,7 +13970,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
                IF      FLG-JYOGENKBN   =   1
                 MOVE     WRK-JYOGENKBN-TEN  TO  WRK-JYOGENKBN-TEN9
-                PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
+                IF   FLG-ZEROKOGAITO   =   1
+                  PERFORM  21098X-SYUHKN-JYOHEN-KEISAN2-SEC
+                ELSE
+                  PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
+                END-IF
       *
       **>       IF   WK-GENGAKUKBN    NOT =   ZERO
       **>       AND  WK-GENGAKUKBN-KEISAN =   ZERO
@@ -14298,7 +14392,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
            AND    (RECE02-ZAITAKU  =  "1"     )
       *
                IF      FLG-JYOGENKBN   =   1
-                PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
+                IF   FLG-ZEROKOGAITO   =   1
+                  PERFORM  21098X-SYUHKN-JYOHEN-KEISAN2-SEC
+                ELSE
+                  PERFORM  21098-SYUHKN-JYOHEN-KEISAN-SEC
+                END-IF
       **>       IF   WK-GENGAKUKBN    NOT =   ZERO
       **>       AND  WK-GENGAKUKBN-KEISAN =   ZERO
       **>         EVALUATE   WK-GENGAKUKBN
@@ -16168,7 +16266,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
               END-IF
             WHEN        "2"
-            WHEN        "3"
               EVALUATE    FLG-GENBUTU70
                WHEN           1
                  IF  FLG-KOHYONKAIME = 1
@@ -16716,6 +16813,55 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            .
        21098-SYUHKN-JYOHEN-KEISAN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    主保険の上限金額計算（０１公）
+      *****************************************************************
+       21098X-SYUHKN-JYOHEN-KEISAN2-SEC               SECTION.
+      *
+           MOVE     ZERO     TO   WRK-KINGAKU-GENBUTU3
+           MOVE     ZERO     TO   WRK-CHIHOU-KIN3
+           MOVE     ZERO     TO   FLG-KOUGAKU2
+      *
+           EVALUATE   RECE02-ZAITAKU
+              WHEN        "1"
+                  IF  FLG-TOKU75 = 1 OR 2
+                     MOVE  6000    TO   WRK-KINGAKU-GENBUTU3
+                  ELSE
+                     MOVE  12000   TO   WRK-KINGAKU-GENBUTU3
+                  END-IF
+              WHEN        "2"
+                  COMPUTE   WRK-CHIHOU-KIN3  =
+                            WRK-CHIHOU-KIN3  +
+                           (WRK-JYOGENKBN-TEN9 * 10)
+                  IF  FLG-TOKU75 = 3
+                    IF   WRK-CHIHOU-KIN3  >  133500
+                      COMPUTE  WRK-KINGAKU2 =
+                         (( WRK-CHIHOU-KIN3 -  133500 ) * 0.01 )
+                                                        + 0.5
+                      COMPUTE WRK-KINGAKU-GENBUTU3 =
+                              40050   +   WRK-KINGAKU2
+                      MOVE    1       TO  FLG-KOUGAKU2
+                    ELSE
+                      MOVE    40050   TO  WRK-KINGAKU-GENBUTU3
+                    END-IF
+                  ELSE
+                    IF   WRK-CHIHOU-KIN3  >  267000
+                      COMPUTE  WRK-KINGAKU2 =
+                         (( WRK-CHIHOU-KIN3 -  267000 ) * 0.01 )
+                                                        + 0.5
+                      COMPUTE WRK-KINGAKU-GENBUTU3 =
+                              80100   +   WRK-KINGAKU2
+                      MOVE    1       TO  FLG-KOUGAKU2
+                    ELSE
+                      MOVE    80100   TO  WRK-KINGAKU-GENBUTU3
+                    END-IF
+                  END-IF
+           END-EVALUATE
+      *
+           .
+       21098X-SYUHKN-JYOHEN-KEISAN2-EXT.
            EXIT.
       *
       *****************************************************************

@@ -352,6 +352,8 @@
       *
       *  04.06.01    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
       *  04.06.02    NACL-ÌçÏÆ    12/07/30  ¹â³Û°ÑÇ¤Ê§¤¤À©ÅÙ¾å¸Â³Û£°±ßÂÐ±þ
+      *  04.06.03    NACL-ÌçÏÆ    12/11/20  ÆÃµ­»ö¹à£°£±¡Ê¸ø¡Ë¤Ë´Ø¤ï¤ëÁë¸ý·×»»¡¦
+      *                                     ¥ì¥»¥×¥È°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -508,6 +510,7 @@
            03  FLG-JYOGEN-OKIKAE       PIC 9(01).
            03  FLG-SAIGAI-TAISYO       PIC 9(01).
            03  FLG-ICHIBU-JYOSEI       PIC 9(01).
+           03  FLG-ZEROKOGAITO         PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-PAYKBN               PIC X(02).
@@ -4481,6 +4484,59 @@
              END-IF
            END-IF
       *
+      *    £°£±¸ø³ºÅö
+           MOVE      ZERO     TO    FLG-ZEROKOGAITO
+           IF   LNK-SYU-SRYYMD(1:6)  >=  "201204"
+             IF  ((FLG-GENBUTU70           NOT =   ZERO) AND
+                  (FLG-OITA-GENBUTU70          =   ZERO))
+             OR  ((LNK-S02-KOUREI-NYUIN-KBN    =   "1" ) AND
+                  (COMB-HKNNUM             NOT =  SPACE))
+               IF   (COMB-HKNNUM     NOT =  SPACE)
+               AND  (COMB-KOH1HKNNUM     =  SPACE)
+               AND  (COMB-KOH2HKNNUM     =  SPACE)
+               AND  (COMB-KOH3HKNNUM     =  SPACE)
+               AND  (COMB-KOH4HKNNUM     =  SPACE)
+                 IF  (COMB-SYU-HKNKOHSBTKBN =  "8" OR "9"    )
+                 OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
+                                   OR "068" OR "069" OR "040")
+                   CONTINUE
+                 ELSE
+                   INITIALIZE                        PTKOHINF-REC
+                   MOVE    LNK-SYU-HOSPNUM       TO  PTKOH-HOSPNUM
+                   MOVE    LNK-SYU-PTID          TO  PTKOH-PTID
+                   MOVE    "955"                 TO  PTKOH-KOHNUM
+                   MOVE    PTKOHINF-REC          TO  MCPDATA-REC
+                   MOVE    "DBSELECT"            TO  MCP-FUNC
+                   MOVE    "tbl_ptkohinf"        TO  MCP-TABLE
+                   MOVE    "key4"                TO  MCP-PATHNAME
+                   CALL    "ORCDBMAIN"           USING  MCPAREA
+                                                        MCPDATA-REC
+                                                        SPA-AREA
+                   IF      MCP-RC   =   ZERO
+                     MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+                     MOVE    "key4"              TO  MCP-PATHNAME
+                     PERFORM  PTKOHINF-READ-SEC
+                     PERFORM  UNTIL   FLG-PTKOHINF   =   1
+                       IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                       AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                       AND (PTKOH-SAKJOKBN   =  SPACE         )
+                         MOVE     1    TO   FLG-ZEROKOGAITO
+                         MOVE     1    TO   FLG-PTKOHINF
+                       ELSE
+                         MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
+                         MOVE    "key4"          TO  MCP-PATHNAME
+                         PERFORM  PTKOHINF-READ-SEC
+                       END-IF
+                     END-PERFORM
+                   END-IF
+                   MOVE      "tbl_ptkohinf"      TO  MCP-TABLE
+                   MOVE      "key4"              TO  MCP-PATHNAME
+                   PERFORM    DB-CLOSE-SEC
+                 END-IF
+               END-IF
+             END-IF
+           END-IF
+      *
            MOVE      ZERO          TO    FLG-CYOKI-ARI
            IF   LNK-SYU-SRYYMD(1:6)  >=  "200901"
              IF  (LNK-S02-KOUREI-NYUIN-KBN      =   "1")
@@ -6057,6 +6113,9 @@
                          END-IF
                    END-EVALUATE
                ELSE
+                 IF   FLG-ZEROKOGAITO   =   1
+                   MOVE     44400     TO    MAX-KIN-SYU-M
+                 ELSE
                    EVALUATE   COMB-HOJOKBN
                        WHEN   "1"
                        WHEN   "5"
@@ -6141,10 +6200,11 @@
                            END-IF
                          END-IF
                    END-EVALUATE
-                   IF    FLG-TOKU75  =  1 OR 2
-                      COMPUTE  MAX-KIN-SYU-M  =
-                               MAX-KIN-SYU-M  /  2
-                   END-IF
+                 END-IF
+                 IF    FLG-TOKU75  =  1 OR 2
+                    COMPUTE  MAX-KIN-SYU-M  =
+                             MAX-KIN-SYU-M  /  2
+                 END-IF
                END-IF
            END-IF.
       *
@@ -6369,23 +6429,27 @@
       *
            IF  FLG-GENBUTU70   NOT =   ZERO
       *
-               EVALUATE   FLG-GENBUTU70
-                WHEN        1
-                  MOVE    150000   TO   MAX-KIN-SYU-M
-                  IF  FLG-KOHYONKAIME = 1
-                     MOVE  83400   TO   MAX-KIN-SYU-M
-                  END-IF
-                WHEN        2
-                  MOVE     80100   TO   MAX-KIN-SYU-M
-                  IF  FLG-KOHYONKAIME = 1
-                     MOVE  44400   TO   MAX-KIN-SYU-M
-                  END-IF
-                WHEN        3
-                  MOVE     35400   TO   MAX-KIN-SYU-M
-                  IF  FLG-KOHYONKAIME = 1
-                     MOVE  24600   TO   MAX-KIN-SYU-M
-                  END-IF
-               END-EVALUATE
+               IF   FLG-ZEROKOGAITO   =   1
+                    MOVE     80100   TO   MAX-KIN-SYU-M
+               ELSE
+                 EVALUATE   FLG-GENBUTU70
+                  WHEN        1
+                    MOVE    150000   TO   MAX-KIN-SYU-M
+                    IF  FLG-KOHYONKAIME = 1
+                       MOVE  83400   TO   MAX-KIN-SYU-M
+                    END-IF
+                  WHEN        2
+                    MOVE     80100   TO   MAX-KIN-SYU-M
+                    IF  FLG-KOHYONKAIME = 1
+                       MOVE  44400   TO   MAX-KIN-SYU-M
+                    END-IF
+                  WHEN        3
+                    MOVE     35400   TO   MAX-KIN-SYU-M
+                    IF  FLG-KOHYONKAIME = 1
+                       MOVE  24600   TO   MAX-KIN-SYU-M
+                    END-IF
+                 END-EVALUATE
+               END-IF
                IF    FLG-TOKU75  =  3
                       COMPUTE  MAX-KIN-SYU-M  =
                                MAX-KIN-SYU-M  /  2
