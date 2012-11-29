@@ -4130,6 +4130,9 @@
       *    予約一覧の時ゼロを編集
            MOVE    ZERO                TO  SPA-Y01-YYKID
       *
+      *    排他制御解除処理
+           PERFORM 990-LOCK-OUT-SEC
+      *
            MOVE    SPA-Y01KYOUTU       TO  SPA-WORK
       *
            MOVE    "Y01"               TO  SPA-MOTOPG
@@ -4164,6 +4167,9 @@
            END-IF
       *    未院一覧の時01を編集
            MOVE    01                  TO  SPA-Y01-YYKID
+      *
+      *    排他制御解除処理
+           PERFORM 990-LOCK-OUT-SEC
       *
            MOVE    SPA-Y01KYOUTU       TO  SPA-WORK
       *D   MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
@@ -4202,6 +4208,9 @@
                 MOVE    SPA-NAI-YYYKYMD (01  SPA-SEL-YOUBI)
                                            TO  SPA-Y01-YYKYMDS
            END-IF
+      *
+      *    排他制御解除処理
+           PERFORM 990-LOCK-OUT-SEC
       *
            MOVE    "Y01"               TO  SPA-MOTOPG
            MOVE    "Y04"               TO  SPA-SAKIPG
@@ -4297,6 +4306,10 @@
            MOVE    SPA-GMN-SRYNAIYO    TO  SPA-Y01-SRYNAIYOG
            MOVE    SPA-GMN-DRNAME      TO  SPA-Y01-DRNAME
            MOVE    SPA-NAI-DRCD        TO  SPA-Y01-DRCD
+      *
+      *    排他制御解除処理
+           PERFORM 990-LOCK-OUT-SEC
+      *
            MOVE    SPA-Y01KYOUTU       TO  SPA-WORK
       *
            MOVE    "Y01"               TO  SPA-MOTOPG
