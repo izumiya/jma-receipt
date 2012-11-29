@@ -402,18 +402,21 @@
                                                OR  "0083"
                                                OR  "0084"
                                                OR  "0085" )
-               ADD     1                       TO  IDXC
-               MOVE    ORCSHCN30-SRYCD (IDT IDXA)
+               IF      IDXC                    <   20
+                   ADD     1                       TO  IDXC
+                   MOVE    ORCSHCN30-SRYCD (IDT IDXA)
                                                TO  TBL-COMMENT (IDXC)
-               MOVE    ORCSHCN30-INPUTCOMENT (IDT IDXA)
+                   MOVE    ORCSHCN30-INPUTCOMENT (IDT IDXA)
                                                TO  TBL-INPUTCOMENT
                                                              (IDXC)
+               END-IF
            END-IF
       *    用法コメント
            IF     (ORCSHCN30-SRYCD(IDT IDXA)(1:3)
                                                =   "001" ) AND
                   (TNS-KENTAICOMMENT           =   2     ) AND
                   (IDX-S                   >   ZERO      )
+             AND  (IDXD                        <   20    )
                ADD     1                       TO  IDXD
                MOVE    ORCSHCN30-SRYCD (IDT IDXA)
                                                TO  TBL-YCOMMENT
