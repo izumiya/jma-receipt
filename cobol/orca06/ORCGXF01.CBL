@@ -327,6 +327,7 @@
                        MOVE    1                   TO  SPA-GMN-CUR
                    ELSE
       *                Á÷¿®
+                       MOVE    ZERO            TO  SPA-CLAIM-MULTIHOST
                        PERFORM 4906-CLAIM-SOUSIN-SEC
                    END-IF
                WHEN    OTHER
@@ -612,6 +613,7 @@
                                        *   100
                                        +   1
            PERFORM UNTIL       (FLG-PTMEMOINF  =   1 )
+                           OR  (SPA-GMN-NEXT   =   1 )
                ADD     1               TO  IDX-S2
                IF      IDX-S2          >=  IDX-S
                    ADD     1                   TO  IDX
