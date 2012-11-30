@@ -154,6 +154,8 @@
       *  04.07.01    NACL-Æ£¸¶    11/10/26  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-Æ£¸¶    12/02/13  ·òÊÝÁÈ¹ç¤Ø¤ÎÄ¾ÀÜÀÁµá¤È¿³ºº
       *                                     »ÙÊ§µ¡´ØÀÁµáÂÐ±þ
+      *  04.07.03    NACL-Æ£¸¶    12/11/20  ¥ê¥¢¥ë¥¿¥¤¥à¥×¥ì¥Ó¥å¡¼»þ¤Î
+      *                                     °ì²èÌÌÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4435,6 +4437,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG16
            ELSE
                MOVE    "0"             TO  SHELLTBL-ARG19
            END-IF
+           MOVE    "0"             TO  SHELLTBL-ARG20
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE

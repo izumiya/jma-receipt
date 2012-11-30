@@ -533,6 +533,11 @@ FORM_files = \
               HCM11V06.red \
               HCGS121G.red \
               HCGS121N.red \
+	      HCM11V06P.red \
+	      HCM12V02P.red \
+	      HCM13V02P.red \
+	      HCM14V02P.red \
+	      HCN09V07P.red \
 
 all:   
 

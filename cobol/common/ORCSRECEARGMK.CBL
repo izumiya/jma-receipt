@@ -45,6 +45,8 @@
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *
       *  04.07.01    NACL-藤原    12/11/20  スクリプト起動パスサーチ対応
+      *  04.07.02    NACL-藤原    12/11/20  リアルタイムプレビュー時の
+      *                                     一画面対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -175,6 +177,8 @@
       *     ０：医保  １：労災  ２：自賠責
       *     LINK-PTRSI-HKNKBN
       *     １：労災  ２：自賠責
+      *      LINK-GYOUMUKBN
+      *     １：会計照会  ２：入院会計照会  ３：診療行為
        LINKAGE                 SECTION.
        01  LINK-SHORI-KBN              PIC X(01).
        01  LINK-PTID                   PIC 9(10).
@@ -183,6 +187,7 @@
        01  LINK-HKNKBN                 PIC X(01).
        01  LINK-PTRSI-HKNKBN           PIC X(01).
        01  LINK-PRTKBN                 PIC X(01).
+       01  LINK-GYOUMUKBN              PIC X(01).
       *01  LINK-ERRCD                  PIC X(04).
            COPY    "COMMON-SPA".
       *
@@ -196,6 +201,7 @@
                LINK-HKNKBN
                LINK-PTRSI-HKNKBN
                LINK-PRTKBN
+               LINK-GYOUMUKBN
       *        LINK-ERRCD
                SPA-AREA.
       *
@@ -219,6 +225,7 @@
            DISPLAY "ORCSRECEARGMK ST =" LINK-NYUGAIKBN " " LINK-HKNKBN
                                     " " LINK-PTRSI-HKNKBN
                                     " " LINK-PRTKBN
+                                    " " LINK-GYOUMUKBN
       *???     
            INITIALIZE                  WRK-AREA
                                        FLG-AREA
@@ -738,6 +745,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG34
            MOVE    SYS-200501-COMMENT-ROU-KSIKBN
                                    TO  SHELLTBL-ARG35
            MOVE    LINK-PRTKBN     TO  SHELLTBL-ARG36
+           MOVE    LINK-GYOUMUKBN  TO  SHELLTBL-ARG37
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE

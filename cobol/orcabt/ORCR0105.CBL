@@ -173,6 +173,8 @@
       *  04.07.04    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
       *  04.07.05    NACL-藤原    12/09/24  点検用レセプトの医師名記載対応
+      *  04.07.06    NACL-藤原    12/11/20  リアルタイムプレビュー時の
+      *                                     一画面対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -473,6 +475,7 @@
                05  WRK-PARA-SHELLID PIC  X(08).
            03  WRK-PARA-PRTKBN      PIC  X(01).
            03  WRK-PARA-DLTKBN      PIC  X(01).
+           03  WRK-PARA-GYOUMUKBN   PIC  X(01).
            03  WRK-PARA-HOSPNUM     PIC  9(02).
       *
            03  WRK-SYS-SRYYMD       PIC  X(08).
@@ -511,6 +514,8 @@
            03  WRK-UPDCNT          PIC 9(08).
       *
            03  WRK-HSEQNUM         PIC 9(08).
+      *
+           03  WRK-PRVLAYOUT       PIC X(01).
       *
            03  WRK-HC06-HEAD4-G    PIC X(128).
       *
@@ -1179,6 +1184,10 @@
       *
            COPY    "CPSK1010.INC".
       *
+           COPY    "CPSK1038.INC".
+      *
+           COPY    "CPSK1043.INC".
+      *
            COPY    "CPRCF008.INC".
       *
            COPY    "CPRCF010.INC".
@@ -1300,15 +1309,17 @@
                                        INTO    WRK-PARA
                                                WRK-PARA-PRTKBN
                                                WRK-PARA-DLTKBN
+                                               WRK-PARA-GYOUMUKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
       *
-           DISPLAY "WRK-PARA-HOSPNUM=" WRK-PARA-HOSPNUM
-           DISPLAY "WRK-PARA-SYOKBN =" WRK-PARA-SYOKBN
-           DISPLAY "WRK-PARA-SRYYM  =" WRK-PARA-SRYYM
-           DISPLAY "WRK-PARA-PRTKBN =" WRK-PARA-PRTKBN
-           DISPLAY "WRK-PARA-DLTKBN =" WRK-PARA-DLTKBN 
+           DISPLAY "WRK-PARA-HOSPNUM   =" WRK-PARA-HOSPNUM
+           DISPLAY "WRK-PARA-SYOKBN    =" WRK-PARA-SYOKBN
+           DISPLAY "WRK-PARA-SRYYM     =" WRK-PARA-SRYYM
+           DISPLAY "WRK-PARA-PRTKBN    =" WRK-PARA-PRTKBN
+           DISPLAY "WRK-PARA-DLTKBN    =" WRK-PARA-DLTKBN 
+           DISPLAY "WRK-PARA-GYOUMUKBN =" WRK-PARA-GYOUMUKBN
       *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
       *
@@ -1942,6 +1953,63 @@
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    リアルタイムプレビュー時の画面設定取得
+           MOVE    "0"                 TO  WRK-PRVLAYOUT
+      *
+           IF      WRK-PARA-SHELLID    =   "RECEPTX"
+               EVALUATE    WRK-PARA-GYOUMUKBN
+                   WHEN    "1"
+                   WHEN    "2"
+                       MOVE    SPACE           TO  SYSKANRI-REC
+                       INITIALIZE                  SYSKANRI-REC
+                       MOVE    "1043"          TO  SYS-KANRICD
+                       MOVE    "*"             TO  SYS-KBNCD
+                       MOVE    WRK-PARA-SRYYM  TO  SYS-STYUKYMD (1:6)
+                       MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+                       MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
+                       MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
+                       MOVE    "key10"         TO  WRK-MCP-PATHNAME
+                       PERFORM 900-SYSKANRI-READ-SEC
+                       IF      FLG-SYSKANRI    =   ZERO
+                           MOVE    MCPDATA-REC     TO  SYS-1043-REC
+                       ELSE    
+                           INITIALIZE                  SYS-1043-REC
+                       END-IF
+                       IF      SYS-1043-PRVLAYOUT
+                                               =   SPACE
+                           MOVE    "0"         TO  SYS-1043-PRVLAYOUT
+                       END-IF
+                       MOVE    SYS-1043-PRVLAYOUT
+                                               TO  WRK-PRVLAYOUT
+      *
+                       DISPLAY "SYS-1043-PRVLAYOUT=" SYS-1043-PRVLAYOUT
+                   WHEN    "3"
+                       MOVE    SPACE           TO  SYSKANRI-REC
+                       INITIALIZE                  SYSKANRI-REC
+                       MOVE    "1038"          TO  SYS-KANRICD
+                       MOVE    "*"             TO  SYS-KBNCD
+                       MOVE    WRK-PARA-SRYYM  TO  SYS-STYUKYMD (1:6)
+                       MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+                       MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
+                       MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
+                       MOVE    "key10"         TO  WRK-MCP-PATHNAME
+                       PERFORM 900-SYSKANRI-READ-SEC
+                       IF      FLG-SYSKANRI    =   ZERO
+                           MOVE    MCPDATA-REC     TO  SYS-1038-REC
+                       ELSE    
+                           INITIALIZE                  SYS-1038-REC
+                       END-IF
+                       IF      SYS-1038-PRVLAYOUT
+                                               =   SPACE
+                           MOVE    "0"         TO  SYS-1038-PRVLAYOUT
+                       END-IF
+                       MOVE    SYS-1038-PRVLAYOUT
+                                               TO  WRK-PRVLAYOUT
+      *
+                       DISPLAY "SYS-1038-PRVLAYOUT=" SYS-1038-PRVLAYOUT
+               END-EVALUATE
+           END-IF
       *
       *    パラメタＤＢ読み込み
            INITIALIZE                      BTPARA-REC
@@ -7795,6 +7863,25 @@
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                        MOVE    HC063               TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
+               END-EVALUATE
+           END-IF
+      *
+      *   リアルタイムプレビュー時の画面設定
+           IF    ( WRK-PARA-SHELLID    =   "RECEPTX" )
+           AND   ( WRK-PRVLAYOUT       =   "1"       ) 
+               EVALUATE    TBL-RECE-FORMID  (TBL-RECE-MAX)
+                   WHEN    "HCM11V06.red"
+                       MOVE    "HCM11V06P.red"     TO
+                                       TBL-RECE-FORMID  (TBL-RECE-MAX)
+                   WHEN    "HCM12V02.red"
+                       MOVE    "HCM12V02P.red"     TO
+                                       TBL-RECE-FORMID  (TBL-RECE-MAX)
+                   WHEN    "HCM13V02.red"
+                       MOVE    "HCM13V02P.red"     TO
+                                       TBL-RECE-FORMID  (TBL-RECE-MAX)
+                   WHEN    "HCM14V02.red"
+                       MOVE    "HCM14V02P.red"     TO
+                                       TBL-RECE-FORMID  (TBL-RECE-MAX)
                END-EVALUATE
            END-IF
       *

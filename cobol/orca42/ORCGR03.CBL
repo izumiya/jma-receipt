@@ -119,6 +119,8 @@
       *
       *  04.07.01    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
+      *  04.07.02    NACL-藤原    12/11/20  リアルタイムプレビュー時の
+      *                                     一画面対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2649,6 +2651,7 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG16
                    END-EVALUATE
                    MOVE    SPA-R01-PRTKBN  TO  SHELLTBL-ARG18
                    MOVE    "0"             TO  SHELLTBL-ARG19
+                                               SHELLTBL-ARG20
                    MOVE    SHELLTBL        TO  MCPDATA-REC
                    MOVE    "SHELL"         TO  MCP-FUNC
                    MOVE    "shell"         TO  MCP-TABLE

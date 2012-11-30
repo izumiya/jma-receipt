@@ -652,6 +652,13 @@ W07	{
 				KEICOLORS	{
 					color	varchar(16);
 				};
+				PRVLAYOUT038_COMB	{
+					PRVLAYOUT038	{
+						value	varchar(60);
+					};
+					count	int;
+					item	varchar(60)[5];
+				};
 			};
 			TAGNAME3    {
 			  	state   int;
@@ -1020,6 +1027,13 @@ W07	{
 					};
 					count	int;
 					item	varchar(40)[5];
+				};
+				PRVLAYOUT043_COMB	{
+					PRVLAYOUT043	{
+						value	varchar(60);
+					};
+					count	int;
+					item	varchar(60)[5];
 				};
 			};
 			TAGNAME6    {

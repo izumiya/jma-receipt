@@ -58,6 +58,9 @@
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *  04.06.02    NACL-門脇    12/10/15  コメントのみの剤のレセプト
       *                                     記載対応
+      *
+      *  04.07.01    NACL-藤原    12/11/20  リアルタイムプレビュー時の
+      *                                     一画面対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -134,6 +137,7 @@
                05  WRK-PARA-HOSPID                     PIC  X(24).
                05  WRK-PARA-HOSPNUM                    PIC  9(02).
                05  WRK-PARA-PRTKBN                     PIC  X(01).
+               05  WRK-PARA-GYOUMUKBN                  PIC  X(01).
       *
            03  WRK-PARA0.
                05  WRK-PARA0-A1.
@@ -362,6 +366,7 @@
                                          WRK-PARA-HOSPNUM
                                          WRK-PARA-A35
                                          WRK-PARA-PRTKBN 
+                                         WRK-PARA-GYOUMUKBN 
                                          RECEERR
            END-UNSTRING
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
@@ -588,6 +593,9 @@
                         WRK-PARA-PRTKBN
                                        DELIMITED   BY  SIZE
                         ",0,"          DELIMITED   BY  SIZE
+                        WRK-PARA-GYOUMUKBN
+                                       DELIMITED   BY  SIZE
+                        ","            DELIMITED   BY  SIZE
                         WRK-PARA-HOSPNUM
                                        DELIMITED   BY  SIZE
                         ","            DELIMITED   BY  SIZE
@@ -836,6 +844,9 @@
                             WRK-PARA-PRTKBN
                                            DELIMITED   BY  SIZE
                             ",0,"          DELIMITED   BY  SIZE
+                            WRK-PARA-GYOUMUKBN
+                                           DELIMITED   BY  SIZE
+                            ","            DELIMITED   BY  SIZE
                             WRK-PARA-HOSPNUM
                                            DELIMITED   BY  SIZE
                             ","            DELIMITED   BY  SIZE

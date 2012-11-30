@@ -580,6 +580,8 @@
            03  WRK-D-RENNUM            PIC 9(01).
            03  WRK-D-IDX               PIC 9(03).
            03  WRK-IDX-P               PIC 9(03).
+      *    レセプトプレビュー業務区分
+           03  WRK-GYOUMUKBN           PIC X(01).
       *
        01  TBL-GRP-AREA.
            03  TBL-GRP-OCC             OCCURS   10.
@@ -13347,6 +13349,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        UNTIL       IDH     >   SPA-HKN-MAX
                    IF      SPA-GMN-THKNCOMBINUM (IDH)
                                                =   SPA-GMN-HHKNCOMBI
+      *              入院でアフターケアはエラー
+                     IF     (SPA-NAI-THKNNUM(IDH)      =   "971")
+                       AND  (SPA-NAI-TRSI-HKNKBN (IDH) =   "3"  )
+                       AND  (SPA-NYUGAIKBN             =   "1"  )
+                       MOVE    "0071"          TO  SPA-ERRCD
+                     ELSE
+      *
                        IF      SPA-NAI-THKNKBN (IDH)   =   "0"
                            MOVE    "0"         TO  SPA-XC01-HKNKBN
                            MOVE    SPACE       TO  SPA-XC01-RSI-HKNKBN
@@ -13363,6 +13372,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                TO  SPA-XC01-RSI-HKNKBN
                            END-IF
                        END-IF
+                     END-IF
                        MOVE    SPA-HKN-MAX     TO  IDH
                    END-IF
                END-PERFORM
@@ -13486,6 +13496,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE               TO  SPA-XC01-CHK
            MOVE    ZERO                TO  WRK-RRK-HKNKBN
+      *H24.12
+      *    業務区分追加
+           MOVE    "1"                 TO  WRK-GYOUMUKBN
            CALL    "ORCSRECEARGMK"     USING
                                        "0"
                                        SPA-GMN-PTID
@@ -13495,6 +13508,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        SPA-XC01-HKNKBN
                                        SPA-XC01-RSI-HKNKBN
                                        SPA-XC01-RESPRVFLG
+                                       WRK-GYOUMUKBN
                                        SPA-AREA
       *
            .

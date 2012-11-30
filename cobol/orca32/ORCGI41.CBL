@@ -393,6 +393,9 @@
       *    コラムリスト位置
            03  WRK-DATALIST-ROW        PIC S9(09).
            03  FLG-GMN-INIT            PIC  9(01).
+      *ver.4.7
+      *    レセプトプレビュー業務区分
+           03  WRK-GYOUMUKBN           PIC X(01).
       *
       *    病棟別入院日数算出用
            03  WRK-BTU-NISSU-AREA.
@@ -3277,6 +3280,7 @@
            END-IF
       *
            MOVE    SPACE               TO  I41.
+           INITIALIZE                      I41
       *    コラムリストの位置指定
            MOVE    ZERO                TO  I41-DATELIST-ROW
            MOVE    ZERO                TO  I41-DATELIST-ROWATTR
@@ -10820,6 +10824,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 413011-RESPRVFLG-HEN-SEC
       *
            MOVE    SPACE               TO  SPA-XC01-CHK
+      *ver.4.7
+      *    業務区分追加
+           MOVE    "2"                 TO  WRK-GYOUMUKBN
            CALL    "ORCSRECEARGMK"     USING
                                        "0"
                                        SPA-GMN-PTID
@@ -10828,6 +10835,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                        SPA-XC01-HKNKBN
                                        SPA-XC01-RSI-HKNKBN
                                        SPA-XC01-RESPRVFLG
+                                       WRK-GYOUMUKBN
                                        SPA-AREA
       *
            .

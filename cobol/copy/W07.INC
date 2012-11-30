@@ -505,6 +505,12 @@
                     06  W07-COLOR   PIC X(16).
                   05  W07-KEICOLORS.
                     06  W07-COLOR   PIC X(16).
+                  05  W07-PRVLAYOUT038-COMB.
+                    06  W07-PRVLAYOUT038.
+                      07  W07-VALUE   PIC X(60).
+                    06  W07-PRVLAYOUT038-COUNT   PIC S9(9)   BINARY.
+                    06  W07-PRVLAYOUT038-ITEM
+                            PIC X(60)   OCCURS  5 TIMES.
                 04  W07-TAGNAME3.
                   05  W07-TAGNAME3-STATE   PIC S9(9)   BINARY.
                 04  W07-TAG4.
@@ -708,6 +714,12 @@
                     06  W07-RESPRV043-COUNT   PIC S9(9)   BINARY.
                     06  W07-RESPRV043-ITEM
                             PIC X(40)   OCCURS  5 TIMES.
+                  05  W07-PRVLAYOUT043-COMB.
+                    06  W07-PRVLAYOUT043.
+                      07  W07-VALUE   PIC X(60).
+                    06  W07-PRVLAYOUT043-COUNT   PIC S9(9)   BINARY.
+                    06  W07-PRVLAYOUT043-ITEM
+                            PIC X(60)   OCCURS  5 TIMES.
                 04  W07-TAGNAME6.
                   05  W07-TAGNAME6-STATE   PIC S9(9)   BINARY.
                 04  W07-TAG7.
