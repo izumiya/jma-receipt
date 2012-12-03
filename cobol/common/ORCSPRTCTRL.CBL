@@ -187,6 +187,7 @@
            IF    ORCSPRTCTRL-BATCH-FLG NOT = 1
              MOVE    2                   TO  SPA-CLIENT-PRT-FLG
            END-IF
+           MOVE    SPACE                 TO  IN-ASS
            STRING  "/tmp/"             DELIMITED   BY  SIZE
                    SPA-HOSPNUM         DELIMITED   BY  SPACE
                    "ONLINE"            DELIMITED   BY  SIZE
@@ -251,6 +252,7 @@
                    UNTIL       IDX     >   10
                IF  ORCSPRTCTRL-TITLE-I(IDX)  =  SPACE
                  COMPUTE IDY           = IDX - 1
+                 MOVE    SPACE     TO  ORCSPRTCTRL-PATH-O(IDX)
                  STRING  "orca00/print?filename="
                                            DELIMITED   BY  SIZE
                          SPA-HOSPNUM       DELIMITED   BY  SPACE
@@ -280,6 +282,7 @@
       *
                    MOVE  11            TO  IDX
                ELSE
+                 MOVE    SPACE     TO  ORCSPRTCTRL-PATH-O(IDX)
                  STRING  "orca00/print?filename="
                                            DELIMITED   BY  SIZE
                          SPA-HOSPNUM       DELIMITED   BY  SPACE
@@ -341,6 +344,7 @@
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   10
                IF  ORCSPRTCTRL-TITLE-I(IDX)  =  SPACE
+                 MOVE    SPACE     TO  ORCSPRTCTRL-PATH-O(IDX)
                  STRING  "orca00/print?filename="
                                            DELIMITED   BY  SIZE
                          SPA-HOSPNUM       DELIMITED   BY  SPACE
@@ -370,6 +374,7 @@
       *
                    MOVE  11            TO  IDX
                ELSE
+                 MOVE    SPACE     TO  ORCSPRTCTRL-PATH-O(IDX)
                  STRING  "orca00/print?filename="
                                            DELIMITED   BY  SIZE
                          SPA-HOSPNUM       DELIMITED   BY  SPACE
