@@ -7973,8 +7973,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                            END-IF
                        END-IF
       *                フリーコメントで未入力の行
-                       IF     (SPA-COM-IN2 (IDX)   =   "3" ) AND
-                              (SPA-COM-IN  (IDX)   =   "1" )
+                       IF     (SPA-COM-IN2 (WRK-IDX)   =   "3" ) AND
+                              (SPA-COM-IN  (WRK-IDX)   =   "1" )
                            MOVE    IDX             TO  WRK-MAP-CUR3
                            MOVE    WRK-PAGE        TO  WRK-MAP-PAGE3
                        END-IF
