@@ -1713,6 +1713,7 @@
        500-GMNHEN-SEC              SECTION.
       *
            MOVE    SPACE               TO  P97
+           INITIALIZE                      P97
       *
            MOVE    SPA-GMN-NAMEKEN     TO  P97-NAMEKEN
            MOVE    SPA-GMN-KBIRTHDAY   TO  P97-KBIRTHDAY
