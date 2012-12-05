@@ -2039,8 +2039,8 @@
             <name>label223</name>
             <x>8</x>
             <y>8</y>
-            <width>0</width>
-            <height>0</height>
+            <width>128</width>
+            <height>20</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
