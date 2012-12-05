@@ -294,7 +294,7 @@
                                            DELIMITED   BY  SPACE
                          ORCSPRTCTRL-TBL-GROUP(IDX)
                                            DELIMITED   BY  SPACE
-                         IDX    
+                         ORCSPRTCTRL-SHORI-RENNUM (IDX)
                                            DELIMITED   BY  SPACE
                          ORCSPRTCTRL-EDPAGE(IDX)
                                            DELIMITED   BY  SIZE

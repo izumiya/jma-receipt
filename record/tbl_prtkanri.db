@@ -245,7 +245,7 @@ path	key10		{
 		WHERE 	HOSPNUM		=	:HOSPNUM
                     AND	TBL_KEY		=	:TBL_KEY
                     AND	TBL_GROUP	=	:TBL_GROUP
-                    ORDER BY  RENNUM desc
+                    ORDER BY  RENNUM desc,SHORI_RENNUM desc
 		;
 	};
 };

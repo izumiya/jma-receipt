@@ -145,6 +145,7 @@
            03  IDX                 PIC 9(04).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
+           03  IDL                 PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -176,6 +177,7 @@
       *    入力項目名
            03  WRK-MCP-WIDGET      PIC X(64).
            03  WRK-GMN-CUR         PIC 9(03).
+           03  WRK-TITLE           PIC X(200).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -1537,16 +1539,38 @@
       *    クライアント印刷設定
            IF     ( SPA-XAID1-FLG       =  "OK" )
              AND  ( SPA-CLIENT-PRT-FLG  =  2)
+      *
+               MOVE    SPACE            TO WRK-TITLE
+               PERFORM VARYING IDL FROM 1  BY  1
+                       UNTIL ( IDL             >  SPA-GMN-MAX )
+                        OR   ( WRK-TITLE   NOT =  SPACE )
+                   IF    ( LNK-PRTKANRI-TBL-GROUP
+                               =    SPA-NAI-TTBL-GROUP (IDL))
+                    AND  ( LNK-PRTKANRI-RENNUM
+                               =  ZERO OR  SPA-GMN-TRENNUM (IDL))
+                    AND  ( LNK-PRTKANRI-SHORI-RENNUM
+                               =  ZERO OR  SPA-GMN-TSHORI-RENNUM (IDL))
+                       MOVE    SPA-GMN-TPRT-TITLE (IDL)
+                                        TO WRK-TITLE
+                   END-IF
+               END-PERFORM
+      *
       *    クライアント印刷制御情報取得サブ
                MOVE    SPACE             TO  XADMY01-PANDAPRINT1
+               INITIALIZE                ORCSPRTCTRLAREA
                MOVE    1                 TO  ORCSPRTCTRL-BATCH-FLG
-      *        INITIALIZE                ORCSPRTCTRLAREA
-               MOVE    SPA-GMN-TPRT-TITLE(SPA-GMN-SELNUM)  TO
+               MOVE    WRK-TITLE            TO
                                          ORCSPRTCTRL-TITLE-I(1)
+               MOVE    LNK-PRTKANRI-RENNUM TO
+                                         ORCSPRTCTRL-RENNUM(1)
                MOVE    LNK-PRTKANRI-TBL-KEY TO
                                          ORCSPRTCTRL-TBL-KEY(1)
                MOVE    LNK-PRTKANRI-TBL-GROUP TO
                                          ORCSPRTCTRL-TBL-GROUP(1)
+               MOVE    LNK-PRTKANRI-SHORI-RENNUM TO
+                                         ORCSPRTCTRL-SHORI-RENNUM(1)
+               MOVE    SPA-GMN-STPAGE    TO   ORCSPRTCTRL-STPAGE (1)
+               MOVE    SPA-GMN-EDPAGE    TO   ORCSPRTCTRL-EDPAGE (1)
                CALL    "ORCSPRTCTRL"     USING   SPA-AREA
                                                  ORCSPRTCTRLAREA
                                                  MCPAREA

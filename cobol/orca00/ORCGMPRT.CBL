@@ -62,6 +62,7 @@
            03  FLG-ONLINE              PIC 9(01).
            03  FLG-CANCEL              PIC 9(01).
            03  FLG-BATCH               PIC 9(01).
+           03  FLG-LOOPEND             PIC 9(01).
       *
        01  INDEX-AREA.
            03  IDX                     PIC 9(04).
@@ -76,6 +77,7 @@
            03  POS11                   PIC 9(04).
            03  POS12                   PIC 9(04).
            03  MOJI-CNT                PIC 9(04).
+           03  IDXP                    PIC 9(04).
       *    一時領域
        01  WRK-AREA.
            03  WK-CONT-FLG         PIC 9(02).
@@ -110,8 +112,24 @@
                05  WRK-HEN-T2          PIC X(01).
                05  WRK-HEN-TSS         PIC X(02).
            03  WRK-FILE-TYPE           PIC X(05).
+           03  WRK-LEN                 PIC 9(05).
+           03  WRK-BODY-G.
+               05  WRK-BODY-RENNUM         PIC 9(04).
+               05  WRK-BODY-TBL-GROUP      PIC X(14).
+               05  WRK-BODY-SHORI-RENNUM   PIC 9(04).
+               05  WRK-BODY-EDPAGE         PIC 9(05).
+               05  WRK-BODY-STPAGE         PIC 9(05).
       *    ＱＲ作成用
            COPY    "CPORCSQRENCODE.INC".
+      *
+       01  TBAT-AREA.
+           03  TBAT-BODY-G.
+               05  TBAT-RENNUM             PIC 9(04).
+               05  TBAT-TBL-GROUP          PIC X(14).
+               05  TBAT-SHORI-RENNUM       PIC 9(04).
+               05  TBAT-EDPAGE             PIC 9(05).
+               05  TBAT-STPAGE             PIC 9(05).
+           03  TBAT-FILETYPE               PIC X(05).
       *
        01  WKPRTCTRL-REC.
            COPY    "CPPRTCTRL.INC"      REPLACING
@@ -209,6 +227,7 @@
            DISPLAY "ORCGMPRT MPRT-FILENAME = " MPRT-FILENAME
            INITIALIZE WRK-AREA
                       FLG-AREA
+                      TBAT-AREA
       *    初期処理
            PERFORM 100-INIT-SEC
       *    主処理
@@ -485,6 +504,33 @@
       *
            PERFORM 2201-BTCH-POS-SEC
       *
+           MOVE    ZERO                TO      IDXP
+           PERFORM VARYING     IDXP    FROM    256   BY  -1
+                   UNTIL     ( IDXP    <       1 )
+      *
+               IF    ( MPRT-FILENAME (IDXP : 1)    =   "." )
+                   IF    ( IDXP        <= 255 )
+                       MOVE    MPRT-FILENAME (IDXP + 1 : )
+                                       TO      TBAT-FILETYPE
+                   END-IF
+                   IF    ( IDXP        > 32 )
+                       MOVE    MPRT-FILENAME (IDXP - 32 : 32 )
+                                       TO      TBAT-BODY-G
+                   END-IF
+                   MOVE    1           TO      IDXP
+               END-IF
+      *
+           END-PERFORM
+      *
+           DISPLAY "================================================"
+           DISPLAY "TBAT-RENNUM       = " TBAT-RENNUM
+           DISPLAY "TBAT-TBL-GROUP    = " TBAT-TBL-GROUP
+           DISPLAY "TBAT-SHORI-RENNUM = " TBAT-SHORI-RENNUM
+           DISPLAY "TBAT-EDPAGE       = " TBAT-EDPAGE
+           DISPLAY "TBAT-STPAGE       = " TBAT-STPAGE
+           DISPLAY "TBAT-FILETYPE     = " TBAT-FILETYPE
+           DISPLAY "================================================"
+      *
            INITIALIZE  PRTCTRL-REC
                        WKPRTCTRL-REC
            MOVE    SPA-HOSPNUM         TO  PRTCTRL-HOSPNUM
@@ -498,21 +544,19 @@
                                            WPRTCTRL-TBL-KEY
            MOVE    9999
                                        TO  PRTCTRL-RENNUM
-           MOVE    MPRT-FILENAME(POS2:4)
+           MOVE    TBAT-RENNUM
                                        TO  WPRTCTRL-RENNUM
-           MOVE    MPRT-FILENAME(POS3:14)
-                                       TO  PRTCTRL-TBL-GROUP
+           MOVE    TBAT-TBL-GROUP      TO  PRTCTRL-TBL-GROUP
                                            WPRTCTRL-TBL-GROUP
            MOVE    99
                                        TO  PRTCTRL-SHORI-RENNUM
            COMPUTE IDX = POS4 - 2
       *    MOVE    MPRT-FILENAME(POS4:4)
-           MOVE    MPRT-FILENAME(IDX:4)
-                                       TO  WPRTCTRL-SHORI-RENNUM
+           MOVE    TBAT-SHORI-RENNUM   TO  WPRTCTRL-SHORI-RENNUM
       *    MOVE    MPRT-FILENAME(POS5:5)
       *                                TO  WK-ST-PAGE
       * ファイル名の決定
-           IF    MPRT-FILENAME(POS5:3)  =   ".ps"
+           IF    TBAT-FILETYPE          =   "ps"
                  MOVE  ".ps"           TO  WRK-FILE-TYPE
                  DISPLAY "ps hit !!"
            ELSE
@@ -749,8 +793,32 @@
            DISPLAY "bt prtkanri exist!! rennum = " PRTKANRI-RENNUM
       *      MOVE    PRTKANRI-RENNUM   TO  WK-FILE-NAME(13:4) 
       *      MOVE    PRTKANRI-PAGE     TO  WK-FILE-NAME(35:5) 
-             MOVE    PRTKANRI-RENNUM   TO  WK-FILE-NAME(POS11:4) 
-             MOVE    PRTKANRI-PAGE     TO  WK-FILE-NAME(POS12:5) 
+             INITIALIZE                    WRK-BODY-G
+             IF    ( TBAT-RENNUM       =   ZERO )
+                 MOVE    PRTKANRI-RENNUM
+                                       TO  WRK-BODY-RENNUM
+             ELSE
+                 MOVE    TBAT-RENNUM   TO  WRK-BODY-RENNUM
+             END-IF
+             MOVE    TBAT-TBL-GROUP    TO  WRK-BODY-TBL-GROUP
+             IF    ( TBAT-SHORI-RENNUM =   ZERO )
+                 MOVE    PRTKANRI-SHORI-RENNUM
+                                       TO  WRK-BODY-SHORI-RENNUM
+             ELSE
+                 MOVE    TBAT-SHORI-RENNUM
+                                       TO  WRK-BODY-SHORI-RENNUM
+             END-IF
+             IF    ( TBAT-EDPAGE       =   ZERO )
+                 MOVE    PRTKANRI-PAGE TO  WRK-BODY-EDPAGE
+             ELSE
+                 MOVE    TBAT-EDPAGE   TO  WRK-BODY-EDPAGE
+             END-IF
+             IF    ( TBAT-STPAGE       =   ZERO )
+                 MOVE    1             TO  WRK-BODY-STPAGE
+             ELSE
+                 MOVE    TBAT-STPAGE   TO  WRK-BODY-STPAGE
+             END-IF
+             MOVE    WRK-BODY-G        TO  WK-FILE-NAME(POS11:32) 
              DISPLAY "bt3 WK-FILE-NAME = " WK-FILE-NAME
       *    印刷データ用PRTKANRIあり
       *      印刷実データが存在するかどうかチェックする
@@ -1320,8 +1388,10 @@
       *****************************************************************
        1101-PRTKANRI-READ-SEC        SECTION.
       *
+           MOVE    ZERO                TO  FLG-PRTKANRI
+           MOVE    ZERO                TO  FLG-LOOPEND
+      *
            MOVE    "tbl_prtkanri"      TO  MCP-TABLE
-      *    MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "key10"             TO  MCP-PATHNAME
            MOVE    PRTKANRI-REC        TO  MCPDATA-REC
            PERFORM 900-DBSELECT-SEC
@@ -1334,19 +1404,34 @@
                DISPLAY "SYSTEM ERR !!"
                GO                          TO  1101-PRTKANRI-READ-EXT
            END-IF
+      *
+           PERFORM UNTIL ( FLG-PRTKANRI    NOT = ZERO )
+                    OR   ( FLG-LOOPEND     NOT = ZERO )
+      *
+               MOVE    "tbl_prtkanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               MOVE    PRTKANRI-REC        TO  MCPDATA-REC
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  PRTKANRI-REC
+                   MOVE    ZERO            TO  FLG-PRTKANRI
+      *
+                   MOVE    1               TO  FLG-LOOPEND
+      *
+                   IF    ( TBAT-RENNUM     =   ZERO
+                                         OR    PRTKANRI-RENNUM )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO        TO  FLG-LOOPEND
+                   END-IF
+      *
+               ELSE
+                   MOVE    1               TO  FLG-PRTKANRI
+               END-IF
+      *
+           END-PERFORM
+      *
            MOVE    "tbl_prtkanri"      TO  MCP-TABLE
-      *    MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    "key10"             TO  MCP-PATHNAME
-           MOVE    PRTKANRI-REC        TO  MCPDATA-REC
-           PERFORM 900-DBFETCH-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC     TO  PRTKANRI-REC
-               MOVE    ZERO            TO  FLG-PRTKANRI
-           ELSE
-               MOVE    1               TO  FLG-PRTKANRI
-           END-IF
-           MOVE    "tbl_prtkanri"      TO  MCP-TABLE
-      *    MOVE    "key"               TO  MCP-PATHNAME
            MOVE    "key10"             TO  MCP-PATHNAME
            MOVE    PRTKANRI-REC        TO  MCPDATA-REC
            PERFORM 900-DBCLOSE-SEC
