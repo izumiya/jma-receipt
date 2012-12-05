@@ -704,6 +704,33 @@
                MOVE  "日有"                TO   HCN02-YOBI(12:4)
            END-IF
       *
+      *    印刷対象外箇所の初期化
+           IF   SYS-5000-TAIKSIKBN     =   "2"
+               MOVE   SPACE        TO  HCN02-TKIKAN
+               MOVE   SPACE        TO  HCN02-TKIKANGEN
+               MOVE   SPACE        TO  HCN02-TKIKANYY
+               MOVE   SPACE        TO  HCN02-TKIKANMM
+               MOVE   SPACE        TO  HCN02-TKIKANDD
+           END-IF
+      *
+           IF   SYS-5000-TAIKSIKBN     =   "3"
+               PERFORM    VARYING   IDX   FROM  1  BY  1
+                 UNTIL    IDX   >   3
+                     MOVE   SPACE  TO  HCN02-SYUBETU(IDX)
+                     MOVE   SPACE  TO  HCN02-NISSU(IDX)
+               END-PERFORM
+               MOVE   SPACE        TO  HCN02-KIKAN
+               MOVE   SPACE        TO  HCN02-KIKANSTRGEN
+               MOVE   SPACE        TO  HCN02-KIKANSTRYY
+               MOVE   SPACE        TO  HCN02-KIKANSTRMM
+               MOVE   SPACE        TO  HCN02-KIKANSTRDD
+               MOVE   SPACE        TO  HCN02-KIKANENDGEN
+               MOVE   SPACE        TO  HCN02-KIKANENDYY
+               MOVE   SPACE        TO  HCN02-KIKANENDMM
+               MOVE   SPACE        TO  HCN02-KIKANENDDD
+               MOVE   SPACE        TO  HCN02-YOBI
+           END-IF
+      *
            .
        3101-NTYMD-HEN2-EXT.
            EXIT.

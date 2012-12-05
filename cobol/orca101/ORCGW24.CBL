@@ -1078,7 +1078,7 @@
       *****************************************************************
        310-TAIKSIKBNLST-SET-SEC    SECTION.
       *
-           MOVE    2               TO  SPA-GMN-W24-TAIKSIKBN-MAX
+           MOVE    4               TO  SPA-GMN-W24-TAIKSIKBN-MAX
       *
            MOVE    "0"             TO  SPA-GMN-W24-TAIKSIKBNL    (1)
            MOVE    "２と３を淡很しない"
@@ -1087,6 +1087,14 @@
            MOVE    "1"             TO  SPA-GMN-W24-TAIKSIKBNL    (2)
            MOVE    "２と３を淡很する"
                                    TO  SPA-GMN-W24-TAIKSIKBNMEIL (2)
+      *
+           MOVE    "2"             TO  SPA-GMN-W24-TAIKSIKBNL    (3)
+           MOVE    "２の腕のみ淡很する"
+                                   TO  SPA-GMN-W24-TAIKSIKBNMEIL (3)
+      *
+           MOVE    "3"             TO  SPA-GMN-W24-TAIKSIKBNL    (4)
+           MOVE    "３の腕のみ淡很する"
+                                   TO  SPA-GMN-W24-TAIKSIKBNMEIL (4)
       *
            .
        310-TAIKSIKBNLST-SET-EXT.
