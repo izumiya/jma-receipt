@@ -388,7 +388,7 @@
        41021-DATAKBN-CHK-SEC            SECTION.
       *
            IF      SPA-GMN-T98-DATAKBN     =   SPACE
-               MOVE    SPA-GMN-T98-DATAKBNLST (1)
+               MOVE    SPA-GMN-T98-DATAKBNLST (4)
                                            TO  SPA-GMN-T98-DATAKBN-G
            ELSE
                PERFORM VARYING IDX FROM    1   BY  1
@@ -402,7 +402,7 @@
                    END-IF
                END-PERFORM        
                IF      SPA-GMN-T98-DATAKBNMEI  =   SPACE  
-                   MOVE    SPA-GMN-T98-DATAKBNLST (1)
+                   MOVE    SPA-GMN-T98-DATAKBNLST (4)
                                                TO  SPA-GMN-T98-DATAKBN-G
                END-IF
            END-IF

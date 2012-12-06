@@ -39,6 +39,9 @@
       *  03.05.01    NACL-藤原    07/04/19  グループ診療対応
       *  03.05.02    NACL-藤原    07/08/01  クライアント保存対応
       *
+      *  04.06.01    NACL-藤原    12/12/04  公費ＣＳＶ、出産育児一時金の
+      *                                     クライアント保存（ＣＤ−Ｒ）対応
+      *
       *  04.07.01    NACL-藤原    12/08/01  レセ電データチェック機能対応
       *****************************************************************
       *
@@ -937,20 +940,38 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                MOVE    "BLOBIMPORT"        TO  MCP-FUNC
                MOVE    "key"               TO  MCP-PATHNAME
                MOVE    "blob"              TO  MCP-TABLE
-               STRING  "/tmp/"             DELIMITED  BY  SIZE
-                       SPA-HOSPNUM         DELIMITED  BY  SIZE
-                       SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
-                                           DELIMITED  BY  SPACE
-                                           INTO  ORCA-BLOB-FILE
-               END-STRING
+               IF      SPA-GMN-DATAKBN     =   "6"
+                   STRING  "/tmp/"             DELIMITED  BY  SIZE
+                           SPA-HOSPNUM         DELIMITED  BY  SIZE
+                           SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
+                                               DELIMITED  BY  SPACE
+                            ".iso"             DELIMITED  BY  SIZE
+                                               INTO  ORCA-BLOB-FILE
+                   END-STRING
+               ELSE
+                   STRING  "/tmp/"             DELIMITED  BY  SIZE
+                           SPA-HOSPNUM         DELIMITED  BY  SIZE
+                           SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
+                                               DELIMITED  BY  SPACE
+                                               INTO  ORCA-BLOB-FILE
+                   END-STRING
+               END-IF
                CALL   "ORCDBMAIN"          USING
                                            MCPAREA
                                            ORCA-BLOB
                                            SPA-AREA
       *
                MOVE    ORCA-BLOB-OBJECT    TO  T99-OBJECTDATA
-               MOVE    SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
-                                           TO  T99-FILENAME
+               IF      SPA-GMN-DATAKBN     =   "6"
+                   STRING  SPA-NAI-T04-TTO-DATA    (SPA-NAI-T04-SELNUM)
+                                               DELIMITED  BY  SPACE
+                            ".iso"             DELIMITED  BY  SIZE
+                                               INTO  T99-FILENAME
+                   END-STRING
+               ELSE
+                   MOVE    SPA-NAI-T04-TTO-DATA    (SPA-NAI-T04-SELNUM)
+                                               TO  T99-FILENAME
+               END-IF
            ELSE
                INITIALIZE                      ORCA-BLOB
                MOVE    "BLOBIMPORT"        TO  MCP-FUNC

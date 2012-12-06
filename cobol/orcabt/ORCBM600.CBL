@@ -96,7 +96,9 @@
                05  WRK-PARA-TO-DATA        PIC X(200).
                05  WRK-PARA-JOBID          PIC 9(07).
                05  WRK-PARA-SHELLID        PIC X(08).
-           03  WRK-CSVERR                  PIC X(200). 
+      *
+           03  WRK-CSVERR          PIC X(200). 
+           03  WRK-ERRMSG          PIC X(300). 
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -194,6 +196,19 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *    
            MOVE    CSV-INFO-CSVDATA    TO  CSV-REC
            WRITE   CSV-REC
+      *
+           IF      STS-CSV             =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-CSVERR
+               STRING "ＣＳＶデータ書き込みエラー STS="
+                                                   DELIMITED  BY  SIZE
+                       STS-CSV                     DELIMITED  BY  SIZE
+                                           INTO    WRK-CSVERR
+               END-STRING                                
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF 
            ADD     1                   TO  CNT-CSV
       *
            PERFORM 900-CSV-INFO-READ-SEC   
@@ -227,6 +242,23 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    1                   TO  FLG-END
            .
        500-ERR-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    エラー時終了処理
+      *****************************************************************
+       500-COBABORT-SEC                SECTION.
+      *
+           MOVE    SPACE               TO  WRK-ERRMSG
+           STRING  "ORCBM600 "         DELIMITED  BY  SIZE
+                   WRK-CSVERR          DELIMITED  BY  SIZE
+                   LOW-VALUE           DELIMITED  BY  SIZE
+                                       INTO    WRK-ERRMSG
+           END-STRING   
+           CALL    "cobabort"          USING   WRK-ERRMSG
+      *
+           .
+       500-COBABORT-EXT.
            EXIT.
       *
       *****************************************************************
