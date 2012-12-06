@@ -27,6 +27,9 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.01    NACL-藤原    10/03/23  ＨＯＳＴ名取得方法の変更
+      *
+      *  04.06.01    NACL-藤原    12/12/04  出産育児一時金のＣＳＶ出力時
+      *                                     の履歴作成
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -418,6 +421,9 @@
                        END-IF
                        MOVE    SFILESV-CODE-TYPE   (IDX)
                                            TO  SPA-NAI-T04-TCODE-TYPE
+                                                                (IDY)
+                       MOVE    SFILESV-TEISYUTUSAKI(IDX)
+                                           TO  SPA-NAI-T04-TTEISYUTUSAKI
                                                                 (IDY)
                    END-IF    
                END-PERFORM

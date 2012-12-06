@@ -152,6 +152,10 @@
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *  04.06.02    NACL-藤原    12/06/15  点検レセ０点公費と未請求解除
       *                                     のメッセージ表示を別にする 
+      *  04.06.03    NACL-藤原    12/12/04  出産育児一時金のＣＳＶ出力時
+      *                                     の履歴作成
+      *  04.06.04    NACL-藤原    12/12/04  公費ＣＳＶ、出産育児一時金の
+      *                                     クライアント保存（ＣＤ−Ｒ）対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2145,11 +2149,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                    TO  SHELLTBL-ARG4
            MOVE    SPA-NAI-T04-TRENNUM       (SPA-NAI-T04-SELNUM)
                                    TO  SHELLTBL-ARG5
-           IF      SPA-GMN-DATAKBN  =  "6"
-               MOVE    "5"             TO  SHELLTBL-ARG6
-           ELSE
-               MOVE    SPA-GMN-DATAKBN TO  SHELLTBL-ARG6
-           END-IF
+           MOVE    SPA-GMN-DATAKBN TO  SHELLTBL-ARG6
            MOVE    SPA-NAI-T04-TTO-FOLDER   (SPA-NAI-T04-SELNUM)
                                    TO  SHELLTBL-ARG7
            MOVE    SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
@@ -2181,6 +2181,17 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-STRING
            MOVE    SPA-NAI-T04-TCODE-TYPE   (SPA-NAI-T04-SELNUM)
                                    TO  SHELLTBL-ARG14
+           IF      SPA-NAI-T04-TSHELLID (SPA-NAI-T04-SELNUM)
+                                   =   "execoprg.sh" 
+      *        出産育児一時金のときは履歴保存あり
+               MOVE    SPA-NAI-200501-RECEDEN-RIREKIKBN
+                                       TO  SHELLTBL-ARG15
+               MOVE    SPA-NAI-T04-TTEISYUTUSAKI (SPA-NAI-T04-SELNUM)
+                                       TO  SHELLTBL-ARG16
+           ELSE
+               MOVE    "0"             TO  SHELLTBL-ARG15
+                                           SHELLTBL-ARG16
+           END-IF
       *
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC

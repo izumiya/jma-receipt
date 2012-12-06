@@ -38,6 +38,9 @@
       *
       *  03.05.01    NACL-藤原    07/04/19  グループ診療対応
       *  03.05.02    NACL-藤原    07/08/01  クライアント保存対応
+      *
+      *  04.06.01    NACL-藤原    12/12/04  公費ＣＳＶ、出産育児一時金の
+      *                                     クライアント保存（ＣＤ−Ｒ）対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -586,12 +589,22 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                MOVE    "BLOBIMPORT"        TO  MCP-FUNC
                MOVE    "key"               TO  MCP-PATHNAME
                MOVE    "blob"              TO  MCP-TABLE
-               STRING  "/tmp/"             DELIMITED  BY  SIZE
-                       SPA-HOSPNUM         DELIMITED  BY  SIZE
-                       SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
-                                           DELIMITED  BY  SPACE
-                                           INTO  ORCA-BLOB-FILE
-               END-STRING
+               IF      SPA-GMN-DATAKBN     =   "6"
+                   STRING  "/tmp/"             DELIMITED  BY  SIZE
+                           SPA-HOSPNUM         DELIMITED  BY  SIZE
+                           SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
+                                               DELIMITED  BY  SPACE
+                            ".iso"             DELIMITED  BY  SIZE
+                                               INTO  ORCA-BLOB-FILE
+                   END-STRING
+               ELSE
+                   STRING  "/tmp/"             DELIMITED  BY  SIZE
+                           SPA-HOSPNUM         DELIMITED  BY  SIZE
+                           SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
+                                               DELIMITED  BY  SPACE
+                                               INTO  ORCA-BLOB-FILE
+                   END-STRING
+               END-IF
                CALL   "ORCDBMAIN"          USING
                                            MCPAREA
                                            ORCA-BLOB
@@ -599,12 +612,22 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
       *
                INITIALIZE                      TFIL 
                MOVE    ORCA-BLOB-OBJECT    TO  TFIL-OBJECTDATA
-               STRING  SPA-NAI-T04-TTO-FOLDER   (SPA-NAI-T04-SELNUM)
-                                           DELIMITED  BY  SPACE
-                       SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
-                                           DELIMITED  BY  SPACE
-                                           INTO  TFIL-ENTRY1
-               END-STRING
+               IF      SPA-GMN-DATAKBN     =   "6"
+                   STRING  SPA-NAI-T04-TTO-FOLDER   (SPA-NAI-T04-SELNUM)
+                                               DELIMITED  BY  SPACE
+                           SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
+                                               DELIMITED  BY  SPACE
+                            ".iso"             DELIMITED  BY  SIZE
+                                               INTO  TFIL-ENTRY1
+                   END-STRING
+               ELSE
+                   STRING  SPA-NAI-T04-TTO-FOLDER   (SPA-NAI-T04-SELNUM)
+                                               DELIMITED  BY  SPACE
+                           SPA-NAI-T04-TTO-DATA     (SPA-NAI-T04-SELNUM)
+                                               DELIMITED  BY  SPACE
+                                               INTO  TFIL-ENTRY1
+                   END-STRING
+               END-IF
                MOVE    SPA-GMN-T04-TTITLE   (SPA-NAI-T04-SELNUM)
                                            TO  TFIL-TITLE
                MOVE    SPA-GMN-T04-TCNT-ALL (SPA-NAI-T04-SELNUM)
