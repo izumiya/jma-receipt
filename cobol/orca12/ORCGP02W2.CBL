@@ -105,6 +105,7 @@
       *  04.05.05    NACL-門脇    12/06/28  一般療養、特別療養（旧日雇保険）
       *                                     の場合の生保単独の保険組み合わせ
       *                                     作成変更
+      *  04.05.06    NACL-門脇    12/12/10  ７５歳到達月の特例非該当対応
       *
       *  04.06.01    NACL-小豆沢  11/07/04  更正と特定疾患負担無（水俣）の
       *                                     保険組合せ作成
@@ -616,7 +617,7 @@
                MOVE    PARA-DATA-REC       TO  PTKOHINF-REC
                IF     (PTKOH-SAKJOKBN  NOT =   SPACE          )
                OR     (PTKOH-KOHNUM =
-                       "950" OR "951" OR "955" OR
+                       "950" OR "951" OR "954" OR "955" OR
                        "956" OR "957" OR "958" OR "959" OR
                        "976" OR "977" OR "978" OR "979"       )
                OR     (PTKOH-KOHNUM(1:2)   =   "96"           )
