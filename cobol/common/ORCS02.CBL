@@ -349,6 +349,7 @@
       *                                     ¡Ê¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°ÀßÄêÄÉ²Ã¡Ë
       *  04.05.47    NACL-ÌçÏÆ    12/11/05  ËÌ³¤Æ»°°Àî»ÔÂÐ±þ
       *  04.05.48    NACL-ÌçÏÆ    12/11/09  ÆÃÊÌ¿©²Ã»»¤ÎÊÔ½¸½¤Àµ
+      *  04.05.49    NACL-ÌçÏÆ    12/12/10  ¿À¸Í»ÔÃÏÊý¸øÈñ¹âÃÎ¸©ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -8169,7 +8170,8 @@
                               END-IF
                             END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM =  28 OR 27 OR 12 OR 26  )
+                        IF  (WK-1001-PREFNUM =  28 OR 27 OR 12 OR 26
+                                             OR 39                    )
                         AND (COMB-KOH1HKNNUM = "015" OR "016" OR "021")
                         AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
                           IF   COMB-KOH2HKNNUM =  "100" OR "200"
@@ -8580,7 +8582,8 @@
                               END-IF
                             END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM =  28 OR 27 OR 12 OR 26  )
+                        IF  (WK-1001-PREFNUM =  28 OR 27 OR 12 OR 26
+                                             OR 39                    )
                         AND (COMB-KOH2HKNNUM = "015" OR "016" OR "021")
                         AND (LNK-SYU-SRYYMD(1:6)         >= "200604"  )
                           IF   COMB-KOH3HKNNUM =  "100" OR "200"
