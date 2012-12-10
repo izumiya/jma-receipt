@@ -59,6 +59,13 @@ Z07	{
 			count	int;
 			item	varchar(20)[3];
 		};
+		CMB_PTKINKICHG	{
+			PTKINKICHG{
+				value	varchar(20);
+			};
+			count	int;
+			item	varchar(20)[3];
+		};
 		SELNUM	{
 			value	number(3);
 		};

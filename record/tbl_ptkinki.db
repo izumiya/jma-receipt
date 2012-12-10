@@ -71,9 +71,20 @@ path	key3 	{
 			WHERE   A.HOSPNUM    =   :HOSPNUM
 			AND   A.PTID         =   :PTID
 			AND  (A.SRYCD        =   :SRYCD
-                        OR   (A.HOSPNUM      =  B.HOSPNUM
-                        AND   A.SRYCD        =  B.IPNSRYCD
-                        AND   B.RJNSRYCD     =     :SRYCD ))
+			OR   (A.HOSPNUM      =  B.HOSPNUM
+			AND   A.SRYCD        =  B.IPNSRYCD
+			AND   B.RJNSRYCD     =     :SRYCD ))
+		;
+	};
+};
+
+path	key4 	{
+	DBSELECT	{
+		DECLARE tbl_ptkinki_key4_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptkinki
+			WHERE   HOSPNUM      =   :HOSPNUM
+			AND   SRYCD        =   :SRYCD
 		;
 	};
 };

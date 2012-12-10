@@ -101,6 +101,10 @@
                        09  SPA-GMN-YKJCHG      PIC X(01).
                        09  SPA-GMN-YKJCHGFIL   PIC X(01).
                        09  SPA-GMN-YKJCHGMEI   PIC X(18).
+                   07  SPA-GMN-PTKINKICHG-G.
+                       09  SPA-GMN-PTKINKICHG      PIC X(01).
+                       09  SPA-GMN-PTKINKICHGFIL   PIC X(01).
+                       09  SPA-GMN-PTKINKICHGMEI   PIC X(18).
       *
                05  SPA-GMN-INPUTCD-G.
                    07  SPA-GMN-INPUTCD-OCC     OCCURS  10.
@@ -122,6 +126,12 @@
                        09  SPA-GMN-YKJCHGL     PIC X(01).
                        09  SPA-GMN-YKJCHGFLL   PIC X(01).
                        09  SPA-GMN-YKJCHGMEIL  PIC X(18).
+               05  SPA-GMN-PTKINKICHGLST-G.
+                   07  SPA-GMN-PTKINKICHG-MAX      PIC 9(03).
+                   07  SPA-GMN-PTKINKICHGLST       OCCURS  3.
+                       09  SPA-GMN-PTKINKICHGL     PIC X(01).
+                       09  SPA-GMN-PTKINKICHGFLL   PIC X(01).
+                       09  SPA-GMN-PTKINKICHGMEIL  PIC X(18).
              03  SPA-NAI-AREA.
                  05  SPA-NAI-YUKOYMD       PIC X(08).
       *
@@ -148,11 +158,13 @@
            03  FLG-CHKTRD                      PIC 9(01).
            03  FLG-CHK005                      PIC 9(01).
            03  FLG-YAKUJYO                     PIC 9(01).
+           03  FLG-PTKINKI                     PIC 9(01).
            03  FLG-TCHKMST                     PIC 9(01).
            03  FLG-TCHKSND                     PIC 9(01).
            03  FLG-TCHKTRD                     PIC 9(01).
            03  FLG-TCHK005                     PIC 9(01).
            03  FLG-TYAKUJYO                    PIC 9(01).
+           03  FLG-TPTKINKI                    PIC 9(01).
            03  FLG-LOOPEND                     PIC 9(01).
       *
       *    添字領域
@@ -237,6 +249,10 @@
            COPY    "CPYAKUJYO.INC" REPLACING   //YAKUJYO-//
                                    BY          //TYAKUJYO-//.
       *
+       01  TPTKINKI-REC.
+           COPY    "CPPTKINKI.INC" REPLACING   //PTKINKI-//
+                                   BY          //TPTKINKI-//.
+      *
        01  WRK-LNK-AREA.
            COPY    "CPORCSPRTLNK.INC".
       *
@@ -285,6 +301,9 @@
             COPY    "CPCHK005.INC".
       *
             COPY    "CPYAKUJYO.INC".
+      *
+       01  PTKINKI-REC.
+           COPY    "CPPTKINKI.INC".
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -541,8 +560,15 @@
                MOVE    "複写する"              TO  SPA-GMN-YKJCHGMEIL(2)
                MOVE    2                       TO  SPA-GMN-YKJCHG-MAX
       *
+               MOVE    "0"                 TO  SPA-GMN-PTKINKICHGL (1)
+               MOVE    "複写しない"        TO  SPA-GMN-PTKINKICHGMEIL(1)
+               MOVE    "1"                 TO  SPA-GMN-PTKINKICHGL (2)
+               MOVE    "複写する"          TO  SPA-GMN-PTKINKICHGMEIL(2)
+               MOVE    2                   TO  SPA-GMN-PTKINKICHG-MAX
+      *
                MOVE    SPA-GMN-CHKCHGLST(2)    TO  SPA-GMN-CHKCHG-G
                MOVE    SPA-GMN-YKJCHGLST(2)    TO  SPA-GMN-YKJCHG-G
+               MOVE    SPA-GMN-PTKINKICHGLST(2) TO SPA-GMN-PTKINKICHG-G
            ELSE
                MOVE    "0"                     TO  SPA-GMN-CHKCHGL (1)
                MOVE    "複写しない"            TO  SPA-GMN-CHKCHGMEIL(1)
@@ -552,8 +578,13 @@
                MOVE    "複写しない"            TO  SPA-GMN-YKJCHGMEIL(1)
                MOVE    1                       TO  SPA-GMN-YKJCHG-MAX
       *
+               MOVE    "0"                 TO  SPA-GMN-PTKINKICHGL (1)
+               MOVE    "複写しない"        TO  SPA-GMN-PTKINKICHGMEIL(1)
+               MOVE    1                   TO  SPA-GMN-PTKINKICHG-MAX
+      *
                MOVE    SPA-GMN-CHKCHGLST(1)    TO  SPA-GMN-CHKCHG-G
                MOVE    SPA-GMN-YKJCHGLST(1)    TO  SPA-GMN-YKJCHG-G
+               MOVE    SPA-GMN-PTKINKICHGLST(1) TO SPA-GMN-PTKINKICHG-G
            END-IF
       *
            .
@@ -1146,6 +1177,10 @@
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 4102-PTKINKICHG-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
       *        関連処理
                PERFORM 4103-KANREI-SEC
            END-IF
@@ -1171,6 +1206,7 @@
            MOVE    Z07-INPUTCD10       TO  SPA-GMN-INPUTCD (10)
            MOVE    Z07-CHKCHG          TO  SPA-GMN-CHKCHG-G
            MOVE    Z07-YKJCHG          TO  SPA-GMN-YKJCHG-G
+           MOVE    Z07-PTKINKICHG      TO  SPA-GMN-PTKINKICHG-G
       *
            .
       *
@@ -1430,6 +1466,31 @@
       *
            .
        4102-YKJCHG-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者禁忌薬剤置換チェック処理
+      *****************************************************************
+       4102-PTKINKICHG-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO        TO  IDX-CMB
+           PERFORM VARYING IDZ     FROM    1   BY  1
+                   UNTIL ( IDZ     >   SPA-GMN-PTKINKICHG-MAX )
+                    OR   ( IDX-CMB >   ZERO )
+               IF    ( SPA-GMN-PTKINKICHGL (IDZ)
+                                   =   SPA-GMN-PTKINKICHG )
+                   MOVE    IDZ     TO  IDX-CMB
+               END-IF
+           END-PERFORM
+      *
+           IF    ( IDX-CMB     >   ZERO )
+               MOVE    SPA-GMN-PTKINKICHGLST (IDX-CMB)
+                                   TO  SPA-GMN-PTKINKICHG-G
+           ELSE
+               MOVE    "0017"      TO  SPA-ERRCD
+           END-IF
+      *
+           .
+       4102-PTKINKICHG-CHK-EXT.
            EXIT.
       *****************************************************************
       *    関連処理
@@ -2142,6 +2203,12 @@
            END-IF
       *
            IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( SPA-GMN-PTKINKICHG  =   "1" )
+                   PERFORM 4123-PTKINKI-KOUSIN-SYORI-SEC
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
       *        再表示へ
                PERFORM 3101-TENSU-HENSYU-SEC
                MOVE    SPACE               TO  SPA-ERRCD
@@ -2640,6 +2707,45 @@
        4123-YKJMST-KOUSIN-SYORI-EXT.
            EXIT.
       *****************************************************************
+      *    患者禁忌薬剤更新処理
+      *****************************************************************
+       4123-PTKINKI-KOUSIN-SYORI-SEC    SECTION.
+      *
+           PERFORM 900-PTKINKI-KEY4-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-PTKINKI NOT =   ZERO )
+      *
+               PERFORM 901-PTKINKI-KEY-SEL-SEC
+               IF    ( FLG-TPTKINKI    =   ZERO )
+                   CONTINUE
+               ELSE
+                   MOVE    SPA-GMN-SRYCD   TO  PTKINKI-SRYCD
+                   MOVE    SPACE           TO  PTKINKI-TERMID
+                   MOVE    SPA-OPID        TO  PTKINKI-OPID
+                   MOVE    SMCNDATE-YMD    TO  PTKINKI-CREYMD
+                                               PTKINKI-UPYMD
+                   MOVE    SMCNDATE-HMS    TO  PTKINKI-UPHMS
+                   MOVE    PTKINKI-REC     TO  MCPDATA-REC
+                   MOVE    "tbl_ptkinki"   TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   PERFORM 910-DBINSERT-SEC
+                   IF    ( MCP-RC          NOT =   ZERO )
+                       MOVE    "0400"      TO  SPA-ERRCD
+                   END-IF
+               END-IF
+      *
+               PERFORM 900-PTKINKI-KEY4-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_ptkinki"       TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       4123-PTKINKI-KOUSIN-SYORI-EXT.
+           EXIT.
+      *****************************************************************
       *    前の診療コードの連番付け直し処理
       *****************************************************************
        41211-OLD-INPUTCD-SEC           SECTION.
@@ -2775,6 +2881,16 @@
       *
            END-PERFORM
       *
+           MOVE    SPA-GMN-PTKINKICHG-G    TO  Z07-PTKINKICHG
+           MOVE    SPA-GMN-PTKINKICHG-MAX  TO  Z07-PTKINKICHG-COUNT
+           PERFORM VARYING     IDX     FROM    1   BY   1
+                   UNTIL       IDX     >   SPA-GMN-PTKINKICHG-MAX
+      *
+               MOVE    SPA-GMN-PTKINKICHGLST (IDX)
+                                       TO  Z07-PTKINKICHG-ITEM (IDX)
+      *
+           END-PERFORM
+      *
            PERFORM VARYING     IDX     FROM    1   BY   1
                    UNTIL       IDX     >   SPA-TENSU-MAX
                MOVE    SPA-GMN-TNUM (IDX)      TO  WRK-ZZZ
@@ -2834,6 +2950,8 @@
                    MOVE    "CHKCHG"        TO  MCP-WIDGET
                WHEN    06
                    MOVE    "YKJCHG"        TO  MCP-WIDGET
+               WHEN    07
+                   MOVE    "PTKINKICHG"    TO  MCP-WIDGET
                WHEN    12
                    MOVE    "B12"           TO  MCP-WIDGET
            END-EVALUATE
@@ -2857,6 +2975,8 @@
                WHEN    "CHKCHG"
                    MOVE    6               TO  SPA-GMN-Z07-CUR
                WHEN    "YKJCHG"
+                   MOVE    7               TO  SPA-GMN-Z07-CUR
+               WHEN    "PTKINKICHG"
                    MOVE    12              TO  SPA-GMN-Z07-CUR
                WHEN    OTHER
                    IF      WRK-MCP-WIDGET(1:7)    =   "INPUTCD"
@@ -2940,11 +3060,17 @@
                WHEN    "0016"
                    MOVE    "薬剤情報マスタ置換指示入力エラー"
                                                  TO  SPA-ERRMSG
+               WHEN    "0017"
+                   MOVE    "患者禁忌薬剤置換指示入力エラー"
+                                                 TO  SPA-ERRMSG
                WHEN    "0200"  THRU  "0206"
                    MOVE    "チェックマスタ更新エラー"
                                                  TO  SPA-ERRMSG
                WHEN    "0300"
                    MOVE    "薬剤情報マスタ更新エラー"
+                                                 TO  SPA-ERRMSG
+               WHEN    "0400"
+                   MOVE    "患者禁忌薬剤更新エラー"
                                                  TO  SPA-ERRMSG
                WHEN    "1005"
                WHEN    "1006"
@@ -4077,6 +4203,91 @@
       *
            .
        901-YAKUJYO-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者禁忌薬剤検索処理
+      *****************************************************************
+       900-PTKINKI-KEY4-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTKINKI
+      *
+           INITIALIZE                      PTKINKI-REC
+           MOVE    SPA-HOSPNUM         TO  PTKINKI-HOSPNUM
+           MOVE    SPA-GMN-OLD-SRYCD   TO  PTKINKI-SRYCD
+           MOVE    PTKINKI-REC         TO  MCPDATA-REC
+           MOVE    "tbl_ptkinki"       TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    "tbl_ptkinki"   TO  MCP-TABLE
+               MOVE    "key4"          TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC TO  PTKINKI-REC
+               ELSE
+                   MOVE    1           TO  FLG-PTKINKI
+                   INITIALIZE              PTKINKI-REC
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-PTKINKI
+           END-IF
+      *
+           .
+       900-PTKINKI-KEY4-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者禁忌薬剤検索処理
+      *****************************************************************
+       900-PTKINKI-KEY4-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTKINKI
+      *
+           MOVE    "tbl_ptkinki"   TO  MCP-TABLE
+           MOVE    "key4"          TO  MCP-PATHNAME
+           PERFORM 920-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC TO  PTKINKI-REC
+           ELSE
+               MOVE    1           TO  FLG-PTKINKI
+               INITIALIZE              PTKINKI-REC
+           END-IF
+      *
+           .
+       900-PTKINKI-KEY4-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者禁忌薬剤検索処理
+      *****************************************************************
+       901-PTKINKI-KEY-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TPTKINKI
+      *
+           MOVE    PTKINKI-REC         TO  TPTKINKI-REC
+           MOVE    SPA-GMN-SRYCD       TO  TPTKINKI-SRYCD
+           MOVE    TPTKINKI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkinki"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    "tbl_ptkinki"   TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC TO  TPTKINKI-REC
+               ELSE
+                   MOVE    1           TO  FLG-TPTKINKI
+                   INITIALIZE              TPTKINKI-REC
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-TPTKINKI
+           END-IF
+      *
+           MOVE    "tbl_ptkinki"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       901-PTKINKI-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    点数マスタ検索処理(存在チェックのみで値を返却しない）

@@ -59,6 +59,12 @@
                 04  Z07-YKJCHG-COUNT   PIC S9(9)   BINARY.
                 04  Z07-YKJCHG-ITEM
                         PIC X(20)   OCCURS  3 TIMES.
+              03  Z07-CMB-PTKINKICHG.
+                04  Z07-PTKINKICHG.
+                  05  Z07-VALUE   PIC X(20).
+                04  Z07-PTKINKICHG-COUNT   PIC S9(9)   BINARY.
+                04  Z07-PTKINKICHG-ITEM
+                        PIC X(20)   OCCURS  3 TIMES.
               03  Z07-SELNUM.
                 04  Z07-VALUE   PIC S9(3).
               03  Z07-SCROLLEDWINDOW1.
