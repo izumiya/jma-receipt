@@ -567,3 +567,29 @@ path	key25		{
 		;
 	};
 };
+
+path	del1	{ 	
+	DBDELETE	{
+		DELETE
+		FROM tbl_chksnd
+		WHERE 	HOSPNUM	= :HOSPNUM
+		  AND   CHKKBN    =   :CHKKBN
+		;
+	};
+};
+
+path	key26	{ 	
+	DBSELECT	{
+		DECLARE tbl_chksnd_key26_csr CURSOR FOR
+		SELECT *
+		FROM tbl_chksnd
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   CHKKBN    =   :CHKKBN
+			AND   SRYCD       =   :SRYCD
+			AND   CDKBN       =   '1'
+			ORDER  BY  YUKOSTYMD DESC,
+                                   RENNUM
+		;
+	};
+};
+
