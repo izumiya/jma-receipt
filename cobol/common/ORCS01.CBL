@@ -387,6 +387,7 @@
       *  04.05.51    NACL-ÌçÏÆ    12/11/05  ËÌ³¤Æ»°°Àî»ÔÂÐ±þ
       *  04.05.52    NACL-ÌçÏÆ    12/11/16  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.05.53    NACL-ÌçÏÆ    12/12/10  ¿À¸Í»ÔÃÏÊý¸øÈñ¹âÃÎ¸©ÂÐ±þ
+      *  04.05.54    NACL-ÌçÏÆ    12/12/10  £·£µºÐÅþÃ£·î¤ÎÆÃÎãÈó³ºÅöÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4474,6 +4475,41 @@
                 MOVE    "key4"           TO  MCP-PATHNAME
                 PERFORM  DB-CLOSE-SEC
              END-IF
+           END-IF
+      *
+      *    £·£µºÐÅþÃ£·î¤ÎÆÃÎãÈó³ºÅö
+           IF   FLG-TOKU75   =  1  OR  2  OR  3
+                INITIALIZE                       PTKOHINF-REC
+                MOVE    LNK-SYU-HOSPNUM      TO  PTKOH-HOSPNUM
+                MOVE    LNK-SYU-PTID         TO  PTKOH-PTID
+                MOVE    "954"                TO  PTKOH-KOHNUM
+                MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+                MOVE    "DBSELECT"           TO  MCP-FUNC
+                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                MOVE    "key4"               TO  MCP-PATHNAME
+                CALL    "ORCDBMAIN"          USING  MCPAREA
+                                                    MCPDATA-REC
+                                                    SPA-AREA
+                IF      MCP-RC               =       ZERO
+                    MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                    MOVE    "key4"           TO  MCP-PATHNAME
+                    PERFORM  PTKOHINF-READ-SEC
+                    PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                        IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                        AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                        AND (PTKOH-SAKJOKBN   =  SPACE         )
+                           MOVE    ZERO      TO  FLG-TOKU75
+                           MOVE    1         TO  FLG-PTKOHINF
+                        ELSE
+                           MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                           MOVE    "key4"           TO  MCP-PATHNAME
+                           PERFORM  PTKOHINF-READ-SEC
+                        END-IF
+                    END-PERFORM
+                END-IF
+                MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                MOVE    "key4"           TO  MCP-PATHNAME
+                PERFORM  DB-CLOSE-SEC
            END-IF
       *
            MOVE      ZERO          TO    FLG-CYOKI-ARI

@@ -350,6 +350,7 @@
       *  04.05.47    NACL-門脇    12/11/05  北海道旭川市対応
       *  04.05.48    NACL-門脇    12/11/09  特別食加算の編集修正
       *  04.05.49    NACL-門脇    12/12/10  神戸市地方公費高知県対応
+      *  04.05.50    NACL-門脇    12/12/10  ７５歳到達月の特例非該当対応
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4470,6 +4471,41 @@
                 MOVE    "key4"           TO  MCP-PATHNAME
                 PERFORM  DB-CLOSE-SEC
              END-IF
+           END-IF
+      *
+      *    ７５歳到達月の特例非該当
+           IF   FLG-TOKU75   =  1  OR  2  OR  3
+                INITIALIZE                       PTKOHINF-REC
+                MOVE    LNK-SYU-HOSPNUM      TO  PTKOH-HOSPNUM
+                MOVE    LNK-SYU-PTID         TO  PTKOH-PTID
+                MOVE    "954"                TO  PTKOH-KOHNUM
+                MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+                MOVE    "DBSELECT"           TO  MCP-FUNC
+                MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                MOVE    "key4"               TO  MCP-PATHNAME
+                CALL    "ORCDBMAIN"          USING  MCPAREA
+                                                    MCPDATA-REC
+                                                    SPA-AREA
+                IF      MCP-RC               =       ZERO
+                    MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                    MOVE    "key4"           TO  MCP-PATHNAME
+                    PERFORM  PTKOHINF-READ-SEC
+                    PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                        IF  (PTKOH-TEKSTYMD  <=  LNK-SYU-SRYYMD)
+                        AND (LNK-SYU-SRYYMD  <=  PTKOH-TEKEDYMD)
+                        AND (PTKOH-SAKJOKBN   =  SPACE         )
+                           MOVE    ZERO      TO  FLG-TOKU75
+                           MOVE    1         TO  FLG-PTKOHINF
+                        ELSE
+                           MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                           MOVE    "key4"           TO  MCP-PATHNAME
+                           PERFORM  PTKOHINF-READ-SEC
+                        END-IF
+                    END-PERFORM
+                END-IF
+                MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+                MOVE    "key4"           TO  MCP-PATHNAME
+                PERFORM  DB-CLOSE-SEC
            END-IF
       *
            MOVE      ZERO          TO    FLG-CYOKI-ARI
