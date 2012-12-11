@@ -165,6 +165,7 @@
       *  04.07.05    NACL-藤原    12/10/31  ファイル出力先設定のデフォルト
       *                                     変更
       *  04.07.06    NACL-藤原    12/11/19  主科情報の取得方法変更
+      *  04.07.07    NACL-藤原    12/12/11  確認画面表示の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6589,22 +6590,40 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                                    TO  TID2-B10-LABEL
            MOVE    "F11:印刷しない"
                                    TO  TID2-B11-LABEL
-           IF  (   SPA-NAI-200501-RECEDEN-LST1KBN
-                                   =   "1"             )
-           OR  ( ( SPA-NAI-200501-RECEDEN-LST2KBN
-                                   =   "1"    )   AND
-                 ( SPA-GMN-PRTKBN  =   "1"    )        )
-           OR  ( ( SPA-GMN-RECEDEN-CHK
-                                   =   "1"    )    AND
-                 ( SPA-NAI-SKYYM   >=  201204 )        )
-               MOVE    "T"             TO  TID2-B10-VISIBLE
-               MOVE    "T"             TO  TID2-B11-VISIBLE
-               MOVE    "F12:印刷する"  TO  TID2-B12-LABEL
-           ELSE
-               MOVE    "F"             TO  TID2-B10-VISIBLE
-               MOVE    "F"             TO  TID2-B11-VISIBLE
-               MOVE    "F12:作成する"  TO  TID2-B12-LABEL
-           END-IF
+           MOVE    "T"             TO  TID2-B10-VISIBLE
+           MOVE    "T"             TO  TID2-B11-VISIBLE
+           MOVE    "F12:印刷する"  TO  TID2-B12-LABEL
+      *
+           EVALUATE    SPA-TIDCD
+               WHEN    "1010"
+               WHEN    "1014"
+               WHEN    "1015"
+               WHEN    "1016"
+               WHEN    "1017"
+               WHEN    "1018"
+               WHEN    "1020"
+               WHEN    "1021"
+               WHEN    "1022"
+               WHEN    "1023"
+               WHEN    "1024"
+               WHEN    "1025"
+                   IF  (   SPA-NAI-200501-RECEDEN-LST1KBN
+                                           =   "1"             )
+                   OR  ( ( SPA-NAI-200501-RECEDEN-LST2KBN
+                                           =   "1"    )   AND
+                         ( SPA-GMN-PRTKBN  =   "1"    )        )
+                   OR  ( ( SPA-GMN-RECEDEN-CHK
+                                           =   "1"    )    AND
+                         ( SPA-NAI-SKYYM   >=  201204 )        )
+                       MOVE    "T"             TO  TID2-B10-VISIBLE
+                       MOVE    "T"             TO  TID2-B11-VISIBLE
+                       MOVE    "F12:印刷する"  TO  TID2-B12-LABEL
+                   ELSE
+                       MOVE    "F"             TO  TID2-B10-VISIBLE
+                       MOVE    "F"             TO  TID2-B11-VISIBLE
+                       MOVE    "F12:作成する"  TO  TID2-B12-LABEL
+                   END-IF
+           END-EVALUATE
       * 
            MOVE    ZERO            TO  FLG-RECEDEN-CHK
       *
