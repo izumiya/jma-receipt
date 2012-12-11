@@ -1884,8 +1884,15 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "K873"
+      ***********  STRING  "警告！"
+      *                    "初診料算定日より１年以上経過しています。"
+      *                    "算定できません。"
+      *                                DELIMITED  BY  SPACE
+      *                                INTO    SPA-ERRMSG
+      **********   END-STRING
                    STRING  "警告！"
-                           "初診料算定日より１年以上経過しています。"
+                           "初診料算定日からの算定期間を"
+                           "経過しています。"
                            "算定できません。"
                                        DELIMITED  BY  SPACE
                                        INTO    SPA-ERRMSG
