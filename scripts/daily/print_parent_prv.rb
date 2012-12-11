@@ -103,7 +103,7 @@ std_form = ARGV[2] + '/'   		# 日レセ標準formディレクトリ
 std_record = ARGV[3] + '/' 		# 日レセ標準recordディレクトリ
 site_form = ARGV[4] + '/'  		# 日レセsite固有formディレクトリ
 site_record = ARGV[5] + '/'		# 日レセsite固有recordディレクトリ
-patch_form = ARGV[8] + '/'  		# 日レセsite固有formディレクトリ
+patch_form = ARGV[9] + '/'  		# 日レセsite固有formディレクトリ
 
 
 # .redからpsファイルに変換する際に使用するプログラム
