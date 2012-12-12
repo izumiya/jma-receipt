@@ -249,3 +249,49 @@ path	key10		{
 		;
 	};
 };
+
+path	key11		{ 	
+	DBSELECT	{
+		DECLARE tbl_prtkanri_key11_csr CURSOR FOR
+		SELECT *
+		FROM tbl_prtkanri
+	    	    WHERE 	HOSPNUM	= :HOSPNUM
+                    AND      TBL_KEY    =   :TBL_KEY
+                    AND	     CREYMD	=   :CREYMD
+					AND	     SHORI_RENNUM <> 99
+					AND      PRTNM        <> 'DUMMY'
+                    ORDER BY  TBL_GROUP desc,TBL_UUID,RENNUM,SHORI_RENNUM
+		;
+	};
+};
+
+path	key12		{ 	
+	DBSELECT	{
+		DECLARE tbl_prtkanri_key12_csr CURSOR FOR
+		SELECT *
+		FROM tbl_prtkanri
+	    	    WHERE 	HOSPNUM	= :HOSPNUM
+                    AND      TBL_KEY    =   :TBL_KEY
+		    AND	     CREYMD	=   :CREYMD
+		    AND	     GYOUMU_CD  =   :GYOUMU_CD
+					AND	     SHORI_RENNUM <> 99
+					AND      PRTNM        <> 'DUMMY'
+                    ORDER BY  TBL_GROUP desc,TBL_UUID,RENNUM,SHORI_RENNUM
+		;
+	};
+};
+
+path	key13		{ 	
+	DBSELECT	{
+		DECLARE tbl_prtkanri_key13_csr CURSOR FOR
+		SELECT *
+		FROM tbl_prtkanri
+		WHERE 	HOSPNUM	= :HOSPNUM
+                    AND    TBL_KEY    =   :TBL_KEY
+					AND	     SHORI_RENNUM <> 99
+					AND      PRTNM        <> 'DUMMY'
+                    ORDER BY  TBL_GROUP desc,RENNUM,SHORI_RENNUM
+		;
+	};
+};
+

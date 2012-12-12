@@ -481,7 +481,7 @@
            MOVE    PRTKANRI-REC        TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
            MOVE    "tbl_prtkanri"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    "key13"             TO  MCP-PATHNAME
            PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC             =   ZERO
                PERFORM 900-PRTKANRI-FET-SEC
@@ -543,7 +543,7 @@
            END-PERFORM
       *
            MOVE    "tbl_prtkanri"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    "key13"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
       *                                 
            MOVE    IDX                 TO  SPA-GMN-MAX
@@ -2120,7 +2120,7 @@
        900-PRTKANRI-FET-SEC            SECTION.
       *
            MOVE    "tbl_prtkanri"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    "key13"             TO  MCP-PATHNAME
                PERFORM 900-DBFETCH-SEC
       *                                  
            IF      MCP-RC              =   ZERO

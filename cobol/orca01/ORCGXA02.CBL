@@ -571,9 +571,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  LDMAP-HOSPNUM
            MOVE    SPACE           TO  WRK-PRTKANRI-TBL-GROUP
       *
            IF      SPA-GMN-GYOMU-CD    =   "00"
-                   MOVE "key8"         TO  WRK-MCP-PATHNAME 
+                   MOVE "key11"        TO  WRK-MCP-PATHNAME 
            ELSE
-                   MOVE "key9"         TO  WRK-MCP-PATHNAME 
+                   MOVE "key12"        TO  WRK-MCP-PATHNAME 
            END-IF
       *
            INITIALIZE                  PRTKANRI-REC
