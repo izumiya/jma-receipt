@@ -156,6 +156,7 @@
       *                                     支払機関請求対応
       *  04.07.03    NACL-藤原    12/11/20  リアルタイムプレビュー時の
       *                                     一画面対応
+      *  04.07.04    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4603,6 +4604,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                           SPA-R01-RECE07-RECE-PUTH(2)
                            MOVE    SPACE  TO  SPA-R01-RECE08-DRCD-SRYKA
                                               SPA-R01-RECE08-SORT-1
+                                              SPA-R01-RECE08-SORT-2
                                           SPA-R01-RECE08-RECESYUBETU-SRT
                            MOVE    SPA-RECE07-FUMEI-PAGE
                                            TO  SPA-R01-RECE07-FUMEI-PAGE

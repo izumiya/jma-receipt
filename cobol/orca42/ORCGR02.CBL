@@ -139,6 +139,7 @@
       *  04.07.01    NACL-藤原    11/09/02  起動方法の変更
       *  04.07.02    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
+      *  04.07.03    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1225,6 +1226,19 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-EVALUATE
            END-IF
       *
+      *
+      *    ターミナルデジット出力設定のとき
+           IF    ( SYS-200501-TERMINAL-DIGIT-PRTKBN
+                                       =   "1"   )
+           AND   ( SPA-R01-RECE08-SORT-2 (1:2)
+                                   NOT =   SPACE )
+               ADD     1                     TO  SPA-GMN-PRTJYUN-MAX
+               MOVE    "13"                  TO  SPA-GMN-PRTJYUNL
+                                                 (SPA-GMN-PRTJYUN-MAX)
+               MOVE    "ターミナルデジット"  TO  SPA-GMN-PRTJYUNMEIL
+                                                 (SPA-GMN-PRTJYUN-MAX)
+           END-IF
+      *
       *    社保遍綴順用
            IF      SYS-2005-PRTJYUNKBN1 =   SPACE
                MOVE   "01"             TO  SPA-NAI-2005-PRTJYUNKBN1
@@ -1320,7 +1334,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-PERFORM
                IF      SYS-2005-PRTJYUNKBN1
                                            =   "07"    OR  "08"    OR  
-                                               "11"    OR  "12"
+                                               "11"    OR  "12"    OR
+                                               "13"
                    MOVE    SPA-GMN-PRTJYUN-G   TO  SPA-GMN-PRTJYUN1-G
                ELSE
                    PERFORM VARYING IDX FROM    1   BY  1
@@ -1338,7 +1353,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-IF
                IF      SYS-200501-PRTJYUNKBN5
                                            =   "07"    OR  "08"    OR  
-                                               "11"    OR  "12"
+                                               "11"    OR  "12"    OR
+                                               "13"
                    MOVE    SPA-GMN-PRTJYUN-G   TO  SPA-GMN-PRTJYUN2-G
                ELSE
                    PERFORM VARYING IDX FROM    1   BY  1
@@ -1377,7 +1393,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
            END-IF
            MOVE    SPA-GMN-PRTJYUN     TO  SPA-GMN-PRTJYUN-OLD
       *
-           IF      SPA-GMN-PRTJYUN     =   "07"    OR  "08"
+           IF      SPA-GMN-PRTJYUN     =   "07"    OR  "08"    OR  "13"
                MOVE    SPACE               TO  SPA-GMN-SYUKA-G
            END-IF
       *
@@ -1664,6 +1680,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                WHEN    "08"
                WHEN    "11"
                WHEN    "12"
+               WHEN    "13"
                    MOVE    SPA-GMN-PREFKBNLST (4)
                                                TO  SPA-GMN-PREFKBN-G
                WHEN    OTHER
@@ -1713,6 +1730,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    PERFORM 3101-PAGE-HENSYU-05-SEC     
                WHEN    "12"
                    PERFORM 3101-PAGE-HENSYU-06-SEC     
+               WHEN    "13"
+                   PERFORM 3101-PAGE-HENSYU-08-SEC     
            END-EVALUATE
       *
            EVALUATE    SPA-GMN-PRTJYUN
@@ -3062,6 +3081,90 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    頁・件数の編集処理（ターミナルデジット）
+      *****************************************************************
+       3101-PAGE-HENSYU-08-SEC            SECTION.
+      *
+      *    表示ページ・行の設定
+           MOVE    1               TO  IDW
+           MOVE    1               TO  IDX 
+      *
+           MOVE    "01"            TO  SPA-NAI-PRTJYUNI    (IDW IDX)
+           MOVE    "1"             TO  SPA-NAI-TEISYUTUSAKI(IDW IDX)
+           MOVE    "9999"          TO  SPA-NAI-SYUBETU     (IDW IDX 1)
+           IF      SPA-R01-RECE07-SRYYM    <   WRK-CONS-SRYYM-200804
+               MOVE    "社保・国保"
+                                   TO  SPA-GMN-TSYURUINAME (IDW IDX)
+           ELSE
+               MOVE    "社保・国保・広域"
+                                   TO  SPA-GMN-TSYURUINAME (IDW IDX)
+           END-IF
+           MOVE    "T"             TO  SPA-GMN-TCHK-VALUE  (IDW IDX)
+      *
+      *    ページ数・件数設定
+           INITIALIZE                  RECE07-REC
+           MOVE    SPA-R01-RECE07-KEY  TO  RECE07-KEY
+           MOVE    "%"                 TO  RECE07-TEISYUTUSAKI
+           MOVE    SPA-R01-NYUGAIKBN   TO  RECE07-NYUGAIKBN
+           EVALUATE    SPA-GMN-SYUKA
+               WHEN    SPACE
+               WHEN    "00"
+                   MOVE    "%%"            TO  RECE07-SRYKA
+               WHEN    OTHER
+                   MOVE    SPA-GMN-SYUKA   TO  RECE07-SRYKA
+           END-EVALUATE
+           MOVE    RECE07-REC          TO  MCPDATA-REC                             
+      *
+           MOVE    "tbl_recekanri"     TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+grpsys     PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_recekanri"     TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM 900-RECE07-NEXT-SEC
+           ELSE
+               MOVE    1                   TO  FLG-RECE07
+           END-IF
+      *
+           PERFORM                     UNTIL   FLG-RECE07  =   1
+               IF      RECE07-RECESYUBETU  =   "6666"
+                   CONTINUE
+               ELSE
+                   PERFORM 31011-SYUKA-PAGE-HENSYU-SEC
+               END-IF
+               MOVE    "tbl_recekanri"     TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM 900-RECE07-NEXT-SEC
+           END-PERFORM    
+           MOVE    "tbl_recekanri"     TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+      *    プリンタ設定
+           IF      FLG-PRTNM-SET           =   ZERO
+               EVALUATE    SPA-NAI-TEISYUTUSAKI  (IDW IDX)
+                   WHEN    "1"
+                       MOVE    SPA-NAI-PRTNM-G (1)
+                                       TO  SPA-GMN-TPRTNM-G   (IDW IDX)
+                       MOVE    SPA-NAI-PRTNM-G (2)
+                                       TO  SPA-GMN-TPRTNM-N-G (IDW IDX)
+                   WHEN    "2"
+                       MOVE    SPA-NAI-PRTNM-G (3)
+                                       TO  SPA-GMN-TPRTNM-G   (IDW IDX)
+                       MOVE    SPA-NAI-PRTNM-G (4)
+                                       TO  SPA-GMN-TPRTNM-N-G (IDW IDX)
+                   WHEN    "6"
+                       MOVE    SPA-NAI-PRTNM-G (5)
+                                       TO  SPA-GMN-TPRTNM-G   (IDW IDX)
+                       MOVE    SPA-NAI-PRTNM-G (6)
+                                       TO  SPA-GMN-TPRTNM-N-G (IDW IDX)
+               END-EVALUATE
+           END-IF
+           .
+       3101-PAGE-HENSYU-08-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    頁編集処理
       *****************************************************************
        31011-SYUKA-PAGE-HENSYU-SEC             SECTION.
@@ -3968,7 +4071,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE    "0006"          TO  SPA-ERRCD
                    END-IF
       *            入力順印刷指定のとき
-                   IF      SPA-GMN-PRTJYUN =   "05"
+                   IF      SPA-GMN-PRTJYUN =   "05"    OR  "13"
                        MOVE    "0011"          TO  SPA-ERRCD
                    END-IF
       *            指定印刷のとき
@@ -3984,6 +4087,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        OR  "08"
                                                        OR  "11"
                                                        OR  "12"
+                                                       OR  "13"
                        MOVE    "0013"          TO  SPA-ERRCD
                    END-IF    
            END-EVALUATE
@@ -4120,12 +4224,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF      SPA-GMN-PRTJYUN     =   "07"    OR  "08"
                                                        OR  "11"
                                                        OR  "12"
+                                                       OR  "13"
                    MOVE    SPA-GMN-PRTJYUN-G   TO  SPA-GMN-PRTJYUN1-G
                                                    SPA-GMN-PRTJYUN2-G
                ELSE
                    IF      SPA-GMN-PRTJYUN-OLD  =  "07"    OR  "08"
                                                            OR  "11"
                                                            OR  "12"
+                                                           OR  "13"
                        IF      SPA-GMN-PRTJYUN     =   "06"
                            PERFORM VARYING IDX FROM    1   BY  1
                                    UNTIL   IDX >   SPA-GMN-PRTJYUN1-MAX
@@ -4159,7 +4265,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
                END-IF
            ELSE
-               MOVE     SPA-GMN-PRTJYUN-G   TO  SPA-GMN-PRTJYUN1-G
+               MOVE     SPA-GMN-PRTJYUN-G  TO  SPA-GMN-PRTJYUN1-G
                                                SPA-GMN-PRTJYUN2-G 
            END-IF
       *
@@ -4169,6 +4275,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF      SPA-GMN-PRTJYUN     =  "11"
                    MOVE    SPA-GMN-SYUKALST (1) TO  SPA-GMN-SYUKA-G
                ELSE
+      *          ターミナルデジット設定時
+                 IF      SPA-GMN-PRTJYUN     =  "13"
+                   MOVE    SPACE           TO  SPA-GMN-SYUKA-G
+                 ELSE
                    IF    ( SPA-R01-RECE07-SRYKA
                                            =   "00" )
                    AND   ( SPA-R01-RECE07-SRYKA-KOKUHO
@@ -4201,6 +4311,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            END-IF
                        END-IF
                    END-IF
+                 END-IF
                END-IF    
       *        頁・件数の編集処理
                MOVE    "T"                 TO  SPA-GMN-SYOKBN
@@ -5025,7 +5136,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
       *****************************************************************
        410-SYOKBN-CHK-SEC                SECTION.
       *
-           IF    ( SPA-GMN-PRTJYUN    =   "05" )
+           IF    ( SPA-GMN-PRTJYUN    =   "05" 
+                                      OR  "13" )
            AND   ( SPA-GMN-SYOKBN     =   "T"  )
                MOVE    "0011"             TO  SPA-ERRCD
                MOVE    199                TO  SPA-GMN-CUR
@@ -5128,7 +5240,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                GO  TO  420-CHK-CHK-EXT
            END-IF
       *
-           IF      SPA-GMN-PRTJYUN    =   "05"
+           IF      SPA-GMN-PRTJYUN    =   "05"    OR  "13"
                MOVE    "0011"             TO  SPA-ERRCD
                MOVE    199                TO  SPA-GMN-CUR
                GO  TO  420-CHK-CHK-EXT
@@ -5332,6 +5444,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
             EVALUATE    SPA-GMN-PRTJYUN
              WHEN   "07"
              WHEN   "08"
+             WHEN   "13"
       *        全体指定
                EVALUATE    SPA-GMN-SYUKA
                    WHEN    "00"
@@ -5874,7 +5987,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                                        TO  WRK-RECE09-RECESYUBETU
            IF    ( SPA-GMN-PRTJYUN     =   "07"    OR  "08"
                                                    OR  "11"
-                                                   OR  "12" )
+                                                   OR  "12"
+                                                   OR  "13" )
            AND   ( SPA-NAI-SYUBETU (IDW IDX IDY)
                                        =   "9999"           )        
                MOVE    "%"                 TO  WRK-RECE09-TEISYUTUSAKI
@@ -5937,6 +6051,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    WHEN    "11"                ALSO    "2"
                    WHEN    "11"                ALSO    "4"
                    WHEN    "12"                ALSO    "2"
+                   WHEN    "13"                ALSO    ANY
                        PERFORM VARYING IDZ FROM    20  BY  -1
                                UNTIL   IDZ <       1
                            IF      WRK-RECE09-STDATA(IDZ:1)
@@ -5973,6 +6088,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    WHEN    "11"                ALSO    "2"
                    WHEN    "11"                ALSO    "4"
                    WHEN    "12"                ALSO    "2"
+                   WHEN    "13"                ALSO    ANY
                        PERFORM VARYING IDZ FROM    20  BY  -1
                                UNTIL   IDZ <       1
                            IF      WRK-RECE09-EDDATA(IDZ:1)
@@ -7001,7 +7117,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                MOVE    "  国保"            TO  R02-LABEL2
                MOVE    "  広域"            TO  R02-LABEL3
                IF      SPA-GMN-PRTJYUN     =   "07"    OR  "08"   OR
-                                               "11"    OR  "12"
+                                               "11"    OR  "12"   OR
+                                               "13"
                    MOVE    WIDGET-INSENSITIVE  TO  R02-PRTJYUN1-STATE
                                                    R02-PRTJYUN2-STATE
                END-IF
@@ -7026,10 +7143,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-PERFORM
            IF    ( SPA-GMN-PRTJYUN1    =   "05"  OR  "06"  OR  "07"
                                                  OR  "08"  OR  "11"
-                                                 OR  "12"           )
+                                                 OR  "12"  OR  "13" )
            OR    ( SPA-GMN-PRTJYUN2    =   "05"  OR  "06"  OR  "07"
                                                  OR  "08"  OR  "11"
-                                                 OR  "12"           )
+                                                 OR  "12"  OR  "13" )
                MOVE    WIDGET-INSENSITIVE  TO  R02-PREFKBN-STATE
            ELSE 
                MOVE    WIDGET-NORMAL       TO  R02-PREFKBN-STATE
@@ -7165,6 +7282,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                     MOVE    WIDGET-NORMAL       TO  R02-SYUKA-STATE
                   ELSE
                     IF      SPA-GMN-PRTJYUN     =   "07"    OR  "08"
+                                                            OR  "13"
                       MOVE    WIDGET-INSENSITIVE  TO  R02-SYUKA-STATE
                     ELSE
                       IF      SPA-GMN-PAGE-MAX    =   1
@@ -7947,7 +8065,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "0010"
                    MOVE    "次頁はありません"         TO  SPA-ERRMSG
                WHEN    "0011"
-                   MOVE    "入力順印刷を指定のとき入力できません"
+                   MOVE    "選択されている出力順のときは変更できません"
                                                        TO  SPA-ERRMSG
                WHEN    "0012"
                    MOVE    "診療科入力エラー"          TO  SPA-ERRMSG

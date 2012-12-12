@@ -181,6 +181,7 @@
       *  04.07.05    NACL-藤原    12/11/19  主科情報の取得方法変更
       *  04.07.06    NACL-藤原    12/11/20  リアルタイムプレビュー時の
       *                                     一画面対応
+      *  04.07.07    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -549,6 +550,8 @@
                                    PIC X(08).
                    07  WRK-1033-EDYUKYMD 
                                    PIC X(08).                                       
+      *
+           03  WRK-1009-KETA       PIC 9(02).                                      
       *
       ***  03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
            03  WRK-FUTAN           PIC ZZZZZZZZ9.
@@ -1233,6 +1236,9 @@
       *    レセプト作成指示（個別指示）コード
            COPY    "CPSK2002.INC".
       *
+      *    患者番号構成管理情報
+           COPY    "CPSK1009.INC".
+      *
            COPY    "CPSK1010.INC".
       *
            COPY    "CPSK1038.INC".
@@ -1885,11 +1891,18 @@
                                         =   SPACE
                MOVE    "0"              TO  SYS-200501-DRNAME-KSIKBN
            END-IF
+           IF      SYS-200501-TERMINAL-DIGIT-PRTKBN
+                                   =   SPACE
+               MOVE    "0"             TO
+                                       SYS-200501-TERMINAL-DIGIT-PRTKBN
+           END-IF
            DISPLAY "SYS-200501-INSPECT-CHARACTER-KBN="
                                     SYS-200501-INSPECT-CHARACTER-KBN
                     " " WRK-PARA-PRTKBN
-           DISPLAY "SYS-200501-DRNAME-KSIKBN       ="
+           DISPLAY "SYS-200501-DRNAME-KSIKBN        ="
                                     SYS-200501-DRNAME-KSIKBN
+           DISPLAY "SYS-200501-TERMINAL-DIGIT-PRTKBN="
+                                    SYS-200501-TERMINAL-DIGIT-PRTKBN
       *
       *    レセプト・総括編集情報（区分コード０５のデータ読込）
            MOVE    SPACE            TO  SYSKANRI-REC
@@ -2034,6 +2047,59 @@
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    患者番号構成管理情報編集
+           MOVE    ZERO                TO  WRK-1009-KETA 
+           IF   WRK-PARA-SRYYM    NOT =  ZERO
+               MOVE    SPACE           TO  SYSKANRI-REC
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    "1009"          TO  SYS-KANRICD
+               MOVE    "*"             TO  SYS-KBNCD
+               MOVE    WRK-PARA-SRYYM  TO  SYS-STYUKYMD (1:6)
+               MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+               MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
+               MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
+               MOVE    "key10"         TO  WRK-MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+               IF      FLG-SYSKANRI    =   ZERO
+                   MOVE    MCPDATA-REC     TO  SYS-1009-REC
+      *
+                   DISPLAY "SYS-1009-PTNUMKSIKBN=" SYS-1009-PTNUMKSIKBN
+                          " JIYKSIKETA=" SYS-1009-JIYKSIKETA
+                          " HJNKSIRENNUMKETA=" SYS-1009-HJNKSIRENNUMKETA
+                          " KKCKSIMAEKETA=" SYS-1009-KKCKSIMAEKETA
+                          " KKCKSIRENNUMKETA=" SYS-1009-KKCKSIRENNUMKETA
+                          " KKCKSIATOKETA=" SYS-1009-KKCKSIATOKETA
+      *
+                   EVALUATE    SYS-1009-PTNUMKSIKBN
+                       WHEN    "1"
+                           MOVE    SYS-1009-JIYKSIKETA TO  WRK-1009-KETA
+                       WHEN    "2"
+                           MOVE    SYS-1009-HJNKSIRENNUMKETA
+                                                       TO  WRK-1009-KETA
+                       WHEN    "3"
+                           COMPUTE WRK-1009-KETA   =
+                                           SYS-1009-KKCKSIMAEKETA      +
+                                           SYS-1009-KKCKSIRENNUMKETA   +
+                                           SYS-1009-KKCKSIATOKETA 
+                   END-EVALUATE
+                   IF      WRK-1009-KETA       <   3
+                       MOVE    ZERO                TO  WRK-1009-KETA 
+                   ELSE
+                       COMPUTE WRK-1009-KETA   =   WRK-1009-KETA   -
+                                                   1
+                   END-IF
+                   DISPLAY "WRK-1009-KETA       =" WRK-1009-KETA
+               ELSE
+                   MOVE    "患者番号構成管理情報が取得できませんでした"
+                                           TO  WRK-RECEERR
+                   PERFORM 500-ERR-HENSYU-SEC
+                   MOVE    2               TO  FLG-STS
+                   GO  TO  120-HOSPINF-GET-EXT
+               END-IF
+            ELSE
+               INITIALIZE                  SYS-1009-REC
+            END-IF   
       *
       *    リアルタイムプレビュー時の画面設定取得
            MOVE    "0"                 TO  WRK-PRVLAYOUT
@@ -9223,6 +9289,14 @@
                IF      SYS-200501-BTUNUM-PRTKBN
                                            =   "1"
                    MOVE    RECE62-LASTBTUNUM   TO  RECE08-SORT-1
+               END-IF
+      *        ターミナルデジット出力設定
+               IF    ( SYS-200501-TERMINAL-DIGIT-PRTKBN
+                                           =   "1"  )
+               AND   ( WRK-PARA-SRYYM  NOT =   ZERO )
+               AND   ( WRK-1009-KETA       >   ZERO )
+                   MOVE    RECE62-PTNUM (WRK-1009-KETA:2)
+                                           TO   RECE08-SORT-2
                END-IF
       *
                MOVE    "tbl_receprt"       TO  MCP-TABLE

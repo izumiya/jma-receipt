@@ -91,6 +91,7 @@
       *
       *  04.07.01    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
+      *  04.07.02    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -596,6 +597,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "12"                    ALSO    ANY
       *            病棟別順印刷
                    PERFORM 9003-BTUNUM-RECEPRT-KEY-HENSYU-SEC
+               WHEN    "13"                    ALSO    ANY
+      *            ターミナルデジット
+                   MOVE    "key52"             TO  WRK-MCP-PATHNAME
                WHEN    ANY                     ALSO    "4"
                    IF      WRK-PARA-RECE09-RECESYUBETU  =   "9999"  
                        EVALUATE    WRK-PARA-RECE09-PRTJYUN

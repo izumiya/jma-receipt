@@ -38,6 +38,7 @@ tbl_receprt	{
         DRCD                char(5);
         DRCD_SRYKA          char(2);
         SORT_1              varchar(10);
+        SORT_2              varchar(50);
         FORMID              char(20);
         PRTDATA             varchar(10000);
         PRTNM               char(16);
@@ -1323,6 +1324,22 @@ path	key51	{
                     AND     SRYKA        LIKE :SRYKA
                     AND     HKNJANUM_S   LIKE :HKNJANUM_S
                    ORDER BY RECESYUBETU_SRT,SYUBETU_SRT1,GRP_NO1,CHOUKI,GRP_NO2,KOUHI_NO,HKNJANUM,PTNUM,RECENUM,RENNUM
+		;
+	};
+};
+
+path	key52	{
+	DBSELECT	{
+		DECLARE tbl_receprt_key52_csr CURSOR FOR
+		SELECT *
+		FROM tbl_receprt
+		WHERE 	HOSPNUM	= :HOSPNUM
+                    AND   PRTID        =   :PRTID
+                    AND     RECEYM       =   :RECEYM
+                    AND     CREYMD       =   :CREYMD
+                    AND     CREHMS       =   :CREHMS
+                    AND     NYUGAIKBN    =   :NYUGAIKBN 
+                   ORDER BY SORT_2,PTNUM
 		;
 	};
 };

@@ -483,6 +483,13 @@
                     06  W12-BTUNUM-PRTJYUNKBN-COUNT  PIC S9(9)   BINARY.
                     06  W12-BTUNUM-PRTJYUNKBNLST
                             PIC X(26)   OCCURS  10 TIMES.
+                  05  W12-TERMINAL-DIGIT-PRTKBN-COMBO.
+                    06  W12-TERMINAL-DIGIT-PRTKBN.
+                      07  W12-VALUE   PIC X(38).
+                    06  W12-TERMINAL-DIGIT-PRTKBN-COUNT
+                                                  PIC S9(9) BINARY.
+                    06  W12-TERMINAL-DIGIT-PRTKBNLST
+                            PIC X(38)   OCCURS  2 TIMES.
                 04  W12-FI25.
                   05  W12-MOJI-COMBO.
                     06  W12-MOJI-KISAIKBN.

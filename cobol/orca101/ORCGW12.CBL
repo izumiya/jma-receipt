@@ -153,6 +153,7 @@
       *  04.07.07    NACL-藤原    12/09/24  点検用レセプトの医師名記載対応
       *  04.07.08    NACL-藤原    12/10/31  ファイル出力先設定のデフォルト
       *                                     変更
+      *  04.07.09    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -683,6 +684,12 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-BTUNUM-PRTJYUNKBNMEI
                                               PIC X(24).
+                       09  SPA-GMN-TERMINAL-DIGIT-PRTKBN-G.
+                           11  SPA-GMN-TERMINAL-DIGIT-PRTKBN
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-TERMINAL-DIGIT-PRTKBNMEI
+                                              PIC X(36).
                        09  SPA-GMN-STYUKYMD   PIC X(10).
                        09  SPA-GMN-EDYUKYMD   PIC X(10).
                        09  SPA-GMN-SYUKA-KBN-G.
@@ -1312,6 +1319,16 @@
                        09  SPA-GMN-BTUNUM-PRTJYUNKBNMEIL
                                               PIC X(24).
                    07  SPA-GMN-BTUNUM-PRTJYUNKBN-MAX
+                                              PIC 9(02).   
+      * 
+                   07  SPA-GMN-TERMINAL-DIGIT-PRTKBNLST
+                                                  OCCURS  2.
+                       09  SPA-GMN-TERMINAL-DIGIT-PRTKBNL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-TERMINAL-DIGIT-PRTKBNMEIL
+                                              PIC X(36).
+                   07  SPA-GMN-TERMINAL-DIGIT-PRTKBN-MAX
                                               PIC 9(02).   
       * 
                    07  SPA-GMN-SYUKA-KBNLST   OCCURS  2.
@@ -2409,7 +2426,10 @@
                                        TO  SPA-GMN-PRTJYUN4MEIL (2)
            MOVE    "11"                TO  SPA-GMN-PRTJYUN4L    (3)
            MOVE    "医師別順"          TO  SPA-GMN-PRTJYUN4MEIL (3)
-           MOVE    3                   TO  SPA-GMN-PRTJYUN4-MAX 
+           MOVE    "13"                TO  SPA-GMN-PRTJYUN4L    (4)
+           MOVE    "ターミナルデジット"
+                                       TO  SPA-GMN-PRTJYUN4MEIL (4)
+           MOVE    4                   TO  SPA-GMN-PRTJYUN4-MAX 
       *
            MOVE    "01"                TO  SPA-GMN-PRTJYUN5L    (1)
            MOVE    "種別・保険者番号・カナ氏名順"
@@ -2437,7 +2457,10 @@
            MOVE    "医師別順"          TO  SPA-GMN-PRTJYUN6MEIL (3)
            MOVE    "12"                TO  SPA-GMN-PRTJYUN6L    (4)
            MOVE    "病棟別順"          TO  SPA-GMN-PRTJYUN6MEIL (4)
-           MOVE    4                   TO  SPA-GMN-PRTJYUN6-MAX 
+           MOVE    "13"                TO  SPA-GMN-PRTJYUN6L    (5)
+           MOVE    "ターミナルデジット"
+                                       TO  SPA-GMN-PRTJYUN6MEIL (5)
+           MOVE    5                   TO  SPA-GMN-PRTJYUN6-MAX 
       *
            MOVE    "0"                 TO  SPA-GMN-AUTODSPKBNL    (1)
            MOVE    "自動遷移しない"    TO  SPA-GMN-AUTODSPKBNMEIL (1)
@@ -2606,6 +2629,18 @@
            MOVE    "患者番号順（全体）"
                                    TO  SPA-GMN-BTUNUM-PRTJYUNKBNMEIL(2)
            MOVE    2               TO  SPA-GMN-BTUNUM-PRTJYUNKBN-MAX
+      *
+           MOVE    "0"             TO  SPA-GMN-TERMINAL-DIGIT-PRTKBNL
+                                                                   (1)
+           MOVE    "ターミナルデジットによる出力をしない"
+                                   TO  SPA-GMN-TERMINAL-DIGIT-PRTKBNMEIL
+                                                                   (1)
+           MOVE    "1"             TO  SPA-GMN-TERMINAL-DIGIT-PRTKBNL
+                                                                   (2)
+           MOVE    "ターミナルデジットによる出力をする"
+                                   TO  SPA-GMN-TERMINAL-DIGIT-PRTKBNMEIL
+                                                                   (2)
+           MOVE    2               TO  SPA-GMN-TERMINAL-DIGIT-PRTKBN-MAX
       *
            MOVE    "0"             TO  SPA-GMN-SYUKA-KBNL      (1)
            MOVE    "しない"        TO  SPA-GMN-SYUKA-KBNMEIL   (1)
@@ -3526,6 +3561,20 @@
                    MOVE    SPA-GMN-BTUNUM-PRTJYUNKBNLST (IDY)
                                        TO  SPA-GMN-BTUNUM-PRTJYUNKBN-G
                    MOVE    SPA-GMN-BTUNUM-PRTJYUNKBN-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
+           MOVE    SYS-200501-TERMINAL-DIGIT-PRTKBN
+                                       TO  SPA-GMN-TERMINAL-DIGIT-PRTKBN
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-GMN-TERMINAL-DIGIT-PRTKBN-MAX
+               IF      SPA-GMN-TERMINAL-DIGIT-PRTKBN
+                               =   SPA-GMN-TERMINAL-DIGIT-PRTKBNL (IDY)
+                   MOVE    SPA-GMN-TERMINAL-DIGIT-PRTKBNLST (IDY)
+                                       TO
+                                       SPA-GMN-TERMINAL-DIGIT-PRTKBN-G
+                   MOVE    SPA-GMN-TERMINAL-DIGIT-PRTKBN-MAX
                                        TO  IDY
                END-IF
            END-PERFORM
@@ -4599,6 +4648,8 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    W12-DRCD-PRTJYUNKBN TO  SPA-GMN-DRCD-PRTJYUNKBN-G
            MOVE    W12-BTUNUM-PRTKBN   TO  SPA-GMN-BTUNUM-PRTKBN-G
            MOVE    W12-BTUNUM-PRTJYUNKBN TO  SPA-GMN-BTUNUM-PRTJYUNKBN-G
+           MOVE    W12-TERMINAL-DIGIT-PRTKBN TO
+                                         SPA-GMN-TERMINAL-DIGIT-PRTKBN-G
       *
            MOVE    W12-SYUKA-KBN       TO  SPA-GMN-SYUKA-KBN-G
            MOVE    W12-SYUKA-NYUIN     TO  SPA-GMN-SYUKA-NYUIN-G
@@ -5056,6 +5107,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4171-BTUNUM-PRTJYUNKBN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4191-TERMINAL-DIGIT-PRTKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -6870,6 +6926,36 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    ターミナルデジットによる出力区分チェック
+      *****************************************************************
+       4191-TERMINAL-DIGIT-PRTKBN-CHK-SEC       SECTION.
+      *
+           IF      SPA-GMN-TERMINAL-DIGIT-PRTKBN     =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >   SPA-GMN-TERMINAL-DIGIT-PRTKBN-MAX
+                   IF      SPA-GMN-TERMINAL-DIGIT-PRTKBN
+                               =   SPA-GMN-TERMINAL-DIGIT-PRTKBNL (IDY)
+                       MOVE    SPA-GMN-TERMINAL-DIGIT-PRTKBNLST (IDY)
+                                           TO
+                                       SPA-GMN-TERMINAL-DIGIT-PRTKBN-G
+                       MOVE    SPA-GMN-TERMINAL-DIGIT-PRTKBN-MAX
+                                           TO  IDY
+                   END-IF                                     
+               END-PERFORM
+      *     
+               IF      SPA-GMN-TERMINAL-DIGIT-PRTKBNMEI
+                                       =   SPACE
+                   MOVE    81              TO  SPA-GMN-CUR
+                   MOVE    "0119"          TO  SPA-ERRCD
+               END-IF
+           END-IF    
+           .
+       4191-TERMINAL-DIGIT-PRTKBN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    主科設定フラグチェック
       *****************************************************************
        4135-SYUKA-KBN-CHK-SEC   SECTION.
@@ -8420,6 +8506,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-BTUNUM-PRTJYUNKBN
                                            TO
                                            SYS-200501-BTUNUM-PRTJYUNKBN
+           MOVE    SPA-GMN-TERMINAL-DIGIT-PRTKBN
+                                           TO
+                                       SYS-200501-TERMINAL-DIGIT-PRTKBN
            MOVE    SPA-GMN-COMMENT-NYUINRYO
                                            TO
                                    SYS-200501-COMMENT-NYUINRYO-KSIKBN
@@ -9068,6 +9157,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-BTUNUM-PRTKBN-G  TO  W12-BTUNUM-PRTKBN
            MOVE    SPA-GMN-BTUNUM-PRTJYUNKBN-G
                                             TO  W12-BTUNUM-PRTJYUNKBN
+           MOVE    SPA-GMN-TERMINAL-DIGIT-PRTKBN-G
+                                            TO
+                                            W12-TERMINAL-DIGIT-PRTKBN
            MOVE    SPA-GMN-SYUKA-KBN-G      TO  W12-SYUKA-KBN
            MOVE    SPA-GMN-SYUKA-NYUIN-G    TO  W12-SYUKA-NYUIN
            MOVE    SPA-GMN-SYUKA-GAIRAI-G   TO  W12-SYUKA-GAIRAI
@@ -9627,6 +9719,16 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-BTUNUM-PRTJYUNKBN-MAX
                                        TO  W12-BTUNUM-PRTJYUNKBN-COUNT 
+      *     
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >   SPA-GMN-TERMINAL-DIGIT-PRTKBN-MAX
+               MOVE    SPA-GMN-TERMINAL-DIGIT-PRTKBNLST (IDY)
+                                       TO
+                                       W12-TERMINAL-DIGIT-PRTKBNLST(IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-TERMINAL-DIGIT-PRTKBN-MAX
+                                       TO
+                                       W12-TERMINAL-DIGIT-PRTKBN-COUNT 
       *     
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >   SPA-GMN-SYUKA-KBN-MAX
@@ -10208,6 +10310,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "0119"
+                   MOVE    "ターミナルデジットによる出力設定入力エラー"
+                                               TO  SPA-ERRMSG
       *
                WHEN    "1003"
                    MOVE    "更新ができませんでした"
@@ -10505,6 +10610,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    80
                     MOVE  "BTUNUM_PRTJYUNKBN"
                                              TO   MCP-WIDGET
+                WHEN    81
+                    MOVE  "TERMINAL_DIGIT_PRTKBN"
+                                             TO   MCP-WIDGET
       *
                 WHEN    90
                     MOVE  "SYUKA_KBN"        TO   MCP-WIDGET
@@ -10620,7 +10728,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    100 THRU    121
                 WHEN    44
                     MOVE    3                TO  W12-PAGENO
-                WHEN    70  THRU    80
+                WHEN    70  THRU    81
                     MOVE    4                TO  W12-PAGENO
                 WHEN    50  THRU    52
                     MOVE    5                TO  W12-PAGENO
@@ -10842,6 +10950,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "BTUNUM_PRTKBN"
                    MOVE    80          TO  SPA-GMN-CUR
                WHEN    "BTUNUM_PRTJYUNKBN"
+                   MOVE    81          TO  SPA-GMN-CUR
+               WHEN    "TERMINAL_DIGIT_PRTKBN"
                    MOVE    99          TO  SPA-GMN-CUR
       *
                WHEN    "SYUKA_KBN"

@@ -589,6 +589,13 @@ W12	{
 					count	int;
 					item	varchar(26)[10];
 				};
+				TERMINAL_DIGIT_PRTKBN_COMBO	{
+					TERMINAL_DIGIT_PRTKBN	{
+						value	varchar(38);
+					};
+					count	int;
+					item	varchar(38)[2];
+				};
 			};
 			fi25	{
 				MOJI_COMBO	{

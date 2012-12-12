@@ -73,6 +73,7 @@
       *
       *  04.07.01    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
+      *  04.07.02    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -104,6 +105,7 @@
            03  SPA-RECE08-DRCD-SRYKA
                                    PIC X(02).
            03  SPA-RECE08-SORT-1   PIC X(10).
+           03  SPA-RECE08-SORT-2   PIC X(50).
            03  SPA-RECE08-RECESYUBETU-SRT
                                    PIC X(03).
            03  SPA-RECE07-FUMEI-PAGE
@@ -550,6 +552,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                            TO SPA-R01-RECE08-DRCD-SRYKA
                                    MOVE    SPA-RECE08-SORT-1
                                            TO SPA-R01-RECE08-SORT-1
+                                   MOVE    SPA-RECE08-SORT-2
+                                           TO SPA-R01-RECE08-SORT-2
                                    MOVE    SPA-RECE08-RECESYUBETU-SRT
                                            TO
                                        SPA-R01-RECE08-RECESYUBETU-SRT 
@@ -736,6 +740,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECE07-HOSPNUM
                                            SPA-RECE07-RECE-PUTH-T(2)
                MOVE    SPACE           TO  SPA-RECE08-DRCD-SRYKA
                                            SPA-RECE08-SORT-1
+                                           SPA-RECE08-SORT-2
                                            SPA-RECE08-RECESYUBETU-SRT
                MOVE    ZERO                TO  SPA-RECE07-FUMEI-PAGE
                INITIALIZE                  SPA-RECE07-HKNJANUM-SYAHO-T
@@ -853,7 +858,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECE07-HOSPNUM
                    END-IF
                END-IF  
       *
-      *        一括作成のとき医師別設定、病棟別設定の有無チェック
+      *        一括作成のとき医師別設定、病棟別設定、
+      *                      ターミナルデジット設定の有無チェック
                IF    ( SPA-R01-FILEKBN         =   "1"         )
                    INITIALIZE                      RECE08-REC
                    MOVE    RECE07-HOSPNUM      TO  RECE08-HOSPNUM
@@ -869,6 +875,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECE07-HOSPNUM
                                                SPA-RECE08-DRCD-SRYKA
                        MOVE    RECE08-SORT-1       TO
                                                SPA-RECE08-SORT-1
+                       MOVE    RECE08-SORT-2       TO
+                                               SPA-RECE08-SORT-2
                    END-IF
                END-IF
       *
