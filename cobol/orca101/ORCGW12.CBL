@@ -10259,7 +10259,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "社保または国保、広域の設定がありません"
                                                TO  SPA-ERRMSG
                WHEN    "0103"
-                   MOVE    "レセ電ＣＤ−Ｒ出力入力エラー"
+                   MOVE    "ＣＤ−Ｒ出力入力エラー"
                                                TO  SPA-ERRMSG
                WHEN    "0104"
                    MOVE    "症状詳記作成区分入力エラー"
@@ -10268,7 +10268,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "光ディスク等送付書作成区分入力エラー"
                                                TO  SPA-ERRMSG
                WHEN    "0106"
-                   MOVE    "レセ電データ履歴保存入力エラー"
+                   MOVE    "履歴保存入力エラー"
                                                TO  SPA-ERRMSG
                WHEN    "0107"
                    MOVE    "ファイル出力先設定入力エラー"
