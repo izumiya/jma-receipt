@@ -489,7 +489,7 @@
                     06  W12-TERMINAL-DIGIT-PRTKBN-COUNT
                                                   PIC S9(9) BINARY.
                     06  W12-TERMINAL-DIGIT-PRTKBNLST
-                            PIC X(38)   OCCURS  2 TIMES.
+                            PIC X(38)   OCCURS  5 TIMES.
                 04  W12-FI25.
                   05  W12-MOJI-COMBO.
                     06  W12-MOJI-KISAIKBN.

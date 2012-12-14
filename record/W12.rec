@@ -594,7 +594,7 @@ W12	{
 						value	varchar(38);
 					};
 					count	int;
-					item	varchar(38)[2];
+					item	varchar(38)[5];
 				};
 			};
 			fi25	{
