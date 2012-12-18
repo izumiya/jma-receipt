@@ -88,19 +88,19 @@
       *****************************************************************
        000-PROC-SEC                    SECTION.
       *
-           CALL    "ORCSENCODING"      USING
-                                       MCPAREA
-                                       SPA-AREA
+      *    CALL    "ORCSENCODING"      USING
+      *                                MCPAREA
+      *                                SPA-AREA
       *
-           IF    ( SPA-ENCODING    =   2 )
+      *    IF    ( SPA-ENCODING    =   2 )
       *
-               PERFORM 100-INIT-SEC
+      *        PERFORM 100-INIT-SEC
       *
-               PERFORM 200-MAIN-SEC
+      *        PERFORM 200-MAIN-SEC
       *
-               PERFORM 300-END-SEC
+      *        PERFORM 300-END-SEC
       *
-           END-IF
+      *    END-IF
       *
            .
        000-PROC-EXT.
