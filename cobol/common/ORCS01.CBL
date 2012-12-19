@@ -388,6 +388,7 @@
       *  04.05.52    NACL-門脇    12/11/16  大阪府地方公費対応
       *  04.05.53    NACL-門脇    12/12/10  神戸市地方公費高知県対応
       *  04.05.54    NACL-門脇    12/12/10  ７５歳到達月の特例非該当対応
+      *  04.05.55    NACL-門脇    12/12/19  大阪府地方公費対応
       *
       *  04.06.01    NACL-門脇    10/09/02  出産育児一時金直接支払制度（外来）
       *  04.06.02    NACL-門脇    10/11/08  主保険＋マル長の請求対応
@@ -15258,9 +15259,7 @@
            END-IF.
       *
            IF    WK-2010-KAICNTKBN-G(IDX3)  =  "1"
-             IF  WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
-               MOVE   ZERO     TO     FLG-NOCOUNT
-             END-IF
+             MOVE     ZERO     TO     FLG-NOCOUNT
              IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
              AND (LNK-SYU-DENPNUM     NOT =  ZERO)
              AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
@@ -15420,9 +15419,7 @@
            END-IF.
       *
            IF    WK-2010-KAICNTKBN-G(IDX3)  =  "1"
-             IF  WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
-               MOVE   ZERO     TO     FLG-NOCOUNT
-             END-IF
+             MOVE     ZERO     TO     FLG-NOCOUNT
              IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
              AND (LNK-SYU-DENPNUM     NOT =  ZERO)
              AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
