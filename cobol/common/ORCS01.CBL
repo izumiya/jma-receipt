@@ -388,6 +388,7 @@
       *  04.05.52    NACL-ÌçÏÆ    12/11/16  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.05.53    NACL-ÌçÏÆ    12/12/10  ¿À¸Í»ÔÃÏÊý¸øÈñ¹âÃÎ¸©ÂÐ±þ
       *  04.05.54    NACL-ÌçÏÆ    12/12/10  £·£µºÐÅþÃ£·î¤ÎÆÃÎãÈó³ºÅöÂÐ±þ
+      *  04.05.55    NACL-ÌçÏÆ    12/12/19  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -15256,9 +15257,7 @@
            IF   (WK-1001-PREFNUM                =  27             )
            AND  (LNK-SYU-KOH-HKNNUM(IDX3)(1:1) >=  "1" AND <=  "8")
            AND  (LNK-SYU-KOH-HKNNUM(IDX3)   NOT =  "100" AND "200")
-             IF  WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
-               MOVE   ZERO     TO     FLG-NOCOUNT
-             END-IF
+             MOVE     ZERO     TO     FLG-NOCOUNT
              IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
              AND (LNK-SYU-DENPNUM     NOT =  ZERO)
              AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
@@ -15420,9 +15419,7 @@
            IF   (WK-1001-PREFNUM                =  27             )
            AND  (LNK-SYU-KOH-HKNNUM(IDX3)(1:1) >=  "1" AND <=  "8")
            AND  (LNK-SYU-KOH-HKNNUM(IDX3)   NOT =  "100" AND "200")
-             IF  WK-HKNJANUM2-TBL = WK-HKNJANUM-TBL
-               MOVE   ZERO     TO     FLG-NOCOUNT
-             END-IF
+             MOVE     ZERO     TO     FLG-NOCOUNT
              IF  (LNK-S01-SAIKEISAN-KBN   =   "1")
              AND (LNK-SYU-DENPNUM     NOT =  ZERO)
              AND (LNK-SYU-DENPNUM  <  SYU-DENPNUM)
