@@ -279,6 +279,8 @@
       *                                     を複数病名登録時には行わない
       *  04.06.15    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *  04.06.16    NACL-藤原    12/10/01  入力病名の入力ＣＤ登録対応
+      *  04.06.17    NACL-藤原    12/12/20  自院病名で登録した疾患区分を
+      *                                     優先にする
       *
       *  04.07.01    NACL-藤原    11/06/10  未コード化病名となる病名の別
       *                                     組み立てへの移行を可能にする
@@ -4979,16 +4981,16 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
                                                SPA-NAI-C02-HAISIYMD(IDZ)
                                        END-IF
                                    END-IF
-                                   IF      SPA-NAI-C02-TOKSKNCD(IDZ)
-                                               =   ZERO
-                                       MOVE    BYO-TOKSKNCD    TO
-                                           SPA-NAI-C02-TOKSKNCD(IDZ)
-                                   END-IF
-                                   IF      SPA-NAI-C02-NANBYOCD-O(IDZ)
-                                               =   ZERO
-                                       MOVE    BYO-NANBYOCD        TO
-                                           SPA-NAI-C02-NANBYOCD-O(IDZ)
-                                   END-IF
+      *****************************IF      SPA-NAI-C02-TOKSKNCD(IDZ)
+      *****************************            =   ZERO
+      *****************************    MOVE    BYO-TOKSKNCD    TO
+      *****************************        SPA-NAI-C02-TOKSKNCD(IDZ)
+      *****************************END-IF
+      *****************************IF      SPA-NAI-C02-NANBYOCD-O(IDZ)
+      *****************************            =   ZERO
+      *****************************    MOVE    BYO-NANBYOCD        TO
+      *****************************        SPA-NAI-C02-NANBYOCD-O(IDZ)
+      *****************************END-IF
                                ELSE
                                    MOVE    "■■■"        TO
                                        SPA-NAI-C02-BYOMEI-O  (IDZ IDXX)
