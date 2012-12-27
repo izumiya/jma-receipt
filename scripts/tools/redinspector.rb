@@ -13,6 +13,7 @@ end
 
 def check_red(file)
   redin = read_red(file)
+  redin.gsub!(/&#10;/,"\n")
   redin.gsub!(/&#([0-9]+);/){[$1.to_i.to_s(16)].pack("H*")}
   Iconv.open("utf8","euc-jp") {|i|
     i.iconv(redin)
