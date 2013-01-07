@@ -135,6 +135,8 @@
       *                                     ついて在総診の設定は行わない
       *
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.02    NACL-藤原    13/01/07  自費レセプトを印刷しない設定
+      *                                     のとき、入力順出力の対象としない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6060,7 +6062,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
                    END-STRING
            END-EVALUATE
            MOVE    SPA-GMN-PRTKBN  TO  SHELLTBL-ARG24
-           MOVE    SPA-GMN-PREFKBN TO  SHELLTBL-ARG28
+      *****MOVE    SPA-GMN-PREFKBN TO  SHELLTBL-ARG28
+           MOVE    SPA-NAI-2005-JIHI-PRTKBN
+                                   TO  SHELLTBL-ARG28
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG30
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
