@@ -140,6 +140,9 @@
       *  04.07.02    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
       *  04.07.03    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
+      *  04.07.04    NACL-藤原    13/01/07  自費レセプトを印刷しない設定
+      *                                     のとき、入力順、ターミナルデジット
+      *                                     出力の対象としない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6196,7 +6199,12 @@ grpsys     MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
            MOVE    SPA-GMN-TPRTNM-NMEI (IDW IDX)
                                    TO  SHELLTBL-ARG12
            MOVE    SPA-GMN-PRTKBN  TO  SHELLTBL-ARG24
-           MOVE    SPA-GMN-PREFKBN TO  SHELLTBL-ARG28
+           IF      WRK-RECE09-PRTJYUN  =   "13"
+               MOVE    SPA-NAI-2005-JIHI-PRTKBN
+                                       TO  SHELLTBL-ARG28
+           ELSE
+               MOVE    SPA-GMN-PREFKBN TO  SHELLTBL-ARG28
+           END-IF
            MOVE    WRK-SYUKA       TO  SHELLTBL-ARG29
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG30
            MOVE    SHELLTBL        TO  MCPDATA-REC
@@ -6307,7 +6315,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
                    END-STRING
            END-EVALUATE
            MOVE    SPA-GMN-PRTKBN  TO  SHELLTBL-ARG24
-           MOVE    SPA-GMN-PREFKBN TO  SHELLTBL-ARG28
+      *****MOVE    SPA-GMN-PREFKBN TO  SHELLTBL-ARG28
+           MOVE    SPA-NAI-2005-JIHI-PRTKBN
+                                   TO  SHELLTBL-ARG28
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG30
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
