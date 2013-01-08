@@ -1895,6 +1895,18 @@
                            MOVE    IDK2        TO  WRK-IDX2
                        END-IF
       *
+      *H25.1
+      *                £°£·¡¢£°£¸Æþ½êÃæ¤Î½ÅÊ£ÉÔ²Ä
+                       IF      (SPA-GMN-KOHNUM (IDX-K) =   "950"
+                                                       OR  "951"  )  AND
+                               (SPA-GMN-KOHNUM (IDK2)  =   "950"
+                                                       OR  "951"  ) 
+                           MOVE    "0135"      TO  SPA-ERRCD
+                           MOVE    23          TO  SPA-GMN-CUR
+                           MOVE    IDX-K       TO  WRK-IDX1
+                           MOVE    IDK2        TO  WRK-IDX2
+                       END-IF
+      *
                    END-IF
       *
                    END-IF
@@ -2029,6 +2041,17 @@
                        MOVE    23          TO  SPA-GMN-CUR
                        MOVE    IDX         TO  WRK-IDX1
                    END-IF
+      *H25.1
+      *            £°£·¡¢£°£¸Æþ½êÃæ¤Î½ÅÊ£ÉÔ²Ä
+                   IF      (SPA-GMN-KOHNUM (IDX-K) =   "950"
+                                                   OR  "951"  )  AND
+                           (SPA-PTKOH-KOHNUM(IDX)  =   "950"
+                                                   OR  "951"  ) 
+                       MOVE    "0135"      TO  SPA-ERRCD
+                       MOVE    23          TO  SPA-GMN-CUR
+                       MOVE    IDX         TO  WRK-IDX1
+                   END-IF
+      *
                END-IF
            END-PERFORM
       *

@@ -647,6 +647,13 @@
                                                DELIMITED   BY  SPACE
                                                INTO   SPA-ERRMSG
                    END-STRING
+      *H25.1
+               WHEN    "0135"
+                   STRING  "０７入所中・０８入所中の期間が"
+                           "重複しています"
+                                               DELIMITED   BY  SPACE
+                                               INTO   SPA-ERRMSG
+                   END-STRING
       *H24.11
                WHEN    "0136"
                    STRING  "長期・長期（上位）の期間が"
