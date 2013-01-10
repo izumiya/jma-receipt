@@ -5371,7 +5371,7 @@
                        MOVE    RECE10-HKNJANUM-S(1:4)
                                                    TO  WRK-HKNJANUM(1:4)
                        MOVE    "0000"              TO  WRK-HKNJANUM(5:4)
-                       MOVE    "00000000"          TO  WRK-HKNJANUM2
+                       MOVE    RECE10-HKNJANUM-S   TO  WRK-HKNJANUM2
       *            短期、傷病
                    WHEN    "7"
       *                初回分
