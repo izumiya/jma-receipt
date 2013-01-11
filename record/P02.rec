@@ -1066,6 +1066,85 @@ P02	{
 					count	int;
 					item	varchar(20)[50];
 				};
+				scrolledwindow1	{
+					hpos	int;
+					vpos	int;
+					P026_HDLST	{
+						count	int;
+						row	int;
+						item	{
+							value0	varchar(3);
+							value1	varchar(10);
+							value2	varchar(2);
+							value3	varchar(20);
+							value4	varchar(20);
+						}	[10];
+						select	bool[10];
+					};
+				};
+				P026_HDSELNUM	{
+					value	number(3);
+				};
+				P026_HD_NYUGAI_COMB	{
+					P026_HD_NYUGAI	{
+						value	varchar(20);
+					};
+					count	int;
+					item	varchar(20)[5];
+				};
+				P026_HDSRYYM	{
+					value	varchar(8);
+				};
+				P026_HDDAY	{
+					value	varchar(2);
+				};
+				P026_HD_RESEKBN_COMB	{
+					P026_HD_RESEKBN	{
+						value	varchar(20);
+					};
+					count	int;
+					item	varchar(20)[5];
+				};
+				scrolledwindow2	{
+					hpos	int;
+					vpos	int;
+					P026_HDHKNLST1	{
+						count	int;
+						row	int;
+						item	{
+							value0	varchar(4);
+							value1	varchar(2);
+							value2	varchar(60);
+						}	[20];
+						select	bool[20];
+					};
+				};
+				scrolledwindow3	{
+					hpos	int;
+					vpos	int;
+					P026_HDHKNLST2	{
+						count	int;
+						row	int;
+						item	{
+							value0	varchar(4);
+							value1	varchar(2);
+							value2	varchar(60);
+						}	[20];
+						select	bool[20];
+					};
+				};
+				P026_HDMIDAS1	{
+					value	varchar(20);
+				};
+				P026_HDMIDAS2	{
+					value	varchar(20);
+				};
+				P026_DELSEL1	{
+					value	number(4);
+				};
+				P026_DELSEL2	{
+					value	number(4);
+				};
 			};
 		};
 	};

@@ -52,6 +52,7 @@
       * 04.05.00     NACL-多々納  10/03/XX  平成２２年４月改正対応
       * 04.07.00     NACL-多々納  11/08/XX  保険確認年月日履歴対応
       * 04.07.00     NACL-多々納  12/11/22  地域連携ＩＤ対応
+      * 04.07.00     NACL-多々納  12/12/25  患者レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -129,6 +130,7 @@
            03  FLG-HKNNUM          PIC 9(01).
            03  FLG-PTKOHFTN        PIC 9(01).
            03  FLG-PTTOKKI         PIC 9(01).
+           03  FLG-PTHDISTDAY      PIC 9(01).
       *
            03  FLG-OK              PIC 9(01).
            03  FLG-KOUSIN          PIC 9(01).
@@ -192,6 +194,7 @@
            03  WRK-TEIMSG              PIC X(20).
       *
            03  WRK-HFTNLST2-ROW        PIC S9(09).
+           03  WRK-HKNKUMI-ROW         PIC S9(09).
       *   年齢表示
        01  WRK-NENREI-AREA.
            03  WRK-YMDS1.
@@ -373,6 +376,10 @@
       *    患者特記事項マスタ
        01  PTTOKKI-REC.
            COPY    "CPPTTOKKI.INC".
+      *
+      *    患者レセプト分割テーブル
+       01  PT-HDIST-DAY-REC.
+           COPY    "CPPT-HDIST-DAY.INC".
       *
       *    同一患者識別テーブル
        01  PTSAME-REC.
@@ -2313,6 +2320,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    特記事項ＴＢＬから編集
            PERFORM 100229-PTTOKKI-TBL-SPA-SEC
       *
+      *    患者レセプト分割ＴＢＬから編集
+           PERFORM 100229-PTHDISTDAY-TBL-SPA-SEC
+      *
       *    患者番号管理(変換)マスタ編集
            PERFORM 970-PTNUM-READ-SEC
       *
@@ -2483,6 +2493,51 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 990-DBCLOSE-SEC
            .
        100229-PTTOKKI-TBL-SPA-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者レセプト分割ＴＢＬから編集処理
+      *****************************************************************
+       100229-PTHDISTDAY-TBL-SPA-SEC           SECTION.
+      *
+           INITIALIZE                      SPA-GMN26-HDLIST-TBL
+      *    特記事項
+           INITIALIZE                      PT-HDIST-DAY-REC
+           MOVE    SPA-HOSPNUM         TO  PT-HDIST-DAY-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PT-HDIST-DAY-PTID
+      *
+           MOVE    PT-HDIST-DAY-REC    TO  MCPDATA-REC
+           MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM 991-PTHDISTDAY-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTHDISTDAY
+           END-IF
+           MOVE    ZERO                TO  IDX
+      *
+           PERFORM
+               UNTIL    FLG-PTHDISTDAY     =   1
+               ADD     1                   TO  IDX
+               MOVE    SPACE               TO  PARA-REC
+               INITIALIZE                      PARA-REC
+               MOVE    "PTHDISTDAY"        TO  PARA-FILEMEI
+               MOVE    IDX                 TO  PARA-EDANUM
+               MOVE    PT-HDIST-DAY-REC    TO  PARA-DATA-REC
+               PERFORM 400-PARA-INSERT-SEC
+      *
+               MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+               MOVE    "key3"              TO  MCP-PATHNAME
+               PERFORM 991-PTHDISTDAY-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       100229-PTHDISTDAY-TBL-SPA-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2904,6 +2959,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    ZERO                TO  SPA-NAI24-INIT2
            ELSE
                MOVE    P02-P024-HFTNLST2-ROW   TO  WRK-HFTNLST2-ROW
+           END-IF
+           IF     (SPA-GMN27-MAX        =   ZERO )
+             OR   (SPA-NAI27-SELNUM     =   ZERO )
+             OR   (SPA-P02-GAMEN    NOT =   "P027")
+               MOVE    ZERO                    TO  WRK-HKNKUMI-ROW
+           ELSE
+               MOVE    P02-P027-HKNKUMI-ROW    TO  WRK-HKNKUMI-ROW
            END-IF
       *
            MOVE    SPACE               TO  P02
@@ -3677,6 +3739,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            MOVE    ZERO                TO  P02-P027-HKNKUMI-COUNT
+           IF      WRK-HKNKUMI-ROW     NOT =   ZERO
+               MOVE    WRK-HKNKUMI-ROW     TO  P02-P027-HKNKUMI-ROW
+           END-IF
            PERFORM   VARYING     IDX     FROM   1   BY  1
                      UNTIL       IDX     >   SPA-GMN27-MAX
                      OR        ( SPA-GMN27-NUM   (IDX)
@@ -3717,6 +3782,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                            =   SPA-NAI27-SELNUM
                    MOVE    "T"             TO  P02-P027-HKNKUMI-SELECT
                                                                (IDX)
+      *            MOVE    IDX             TO  P02-P027-HKNKUMI-ROW
+      *            MOVE    2               TO  P02-P027-HKNKUMI-ROWATTR
                ELSE
                    MOVE    "F"             TO  P02-P027-HKNKUMI-SELECT
                                                                (IDX)
@@ -4014,6 +4081,80 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  P02-P026-TOKCD-ITEM (IDX)
            END-PERFORM
            MOVE    SPA-GMN26-TOKMAX    TO  P02-P026-TOKCD-COUNT
+      *
+      *    レセプト分割
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN26-HDLSTMAX )
+                        OR   ( IDX     >   10    )
+               MOVE    SPA-GMN26-THDNUM (IDX)  TO  WRK-RENNUMZ3
+               MOVE    WRK-RENNUMZ3            TO  P02-P026-THDNUM (IDX)
+               MOVE    SPA-GMN26-THDSRYYM (IDX)
+                                           TO  P02-P026-THDSRYYM (IDX)
+               MOVE    SPA-GMN26-THDDAY (IDX)
+                                           TO  P02-P026-THDDAY   (IDX)
+               MOVE    SPA-GMN26-THDNYUGAI (IDX)
+                                           TO  P02-P026-TDNYUGAI(IDX)
+               MOVE    SPA-GMN26-THDRESEKBN(IDX)
+                                           TO  P02-P026-TDRESEKBN(IDX)
+               IF      IDX             =   SPA-GMN26-HDSELNUM
+                   MOVE    "T"         TO  P02-P026-HDLST-SELECT (IDX)
+               ELSE
+                   MOVE    "F"         TO  P02-P026-HDLST-SELECT (IDX)
+               END-IF
+           END-PERFORM
+           MOVE    SPA-GMN26-HDLSTMAX  TO  P02-P026-HDLST-COUNT
+      *
+           MOVE    SPA-GMN26-HDSELNUM  TO  P02-P026-HDSELNUM
+           MOVE    SPA-GMN26-HDSRYYM   TO  P02-P026-HDSRYYM
+           MOVE    SPA-GMN26-HDDAY     TO  P02-P026-HDDAY
+      *
+           MOVE    SPA-GMN26-HDNYUGAI-G    TO  P02-P026-HD-NYUGAI
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN26-HDNYUMAX )
+               MOVE    SPA-GMN26-HDNYUGAI-LST (IDX)
+                                       TO  P02-P026-HD-NYUGAI-ITEM (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN26-HDNYUMAX  TO  P02-P026-HD-NYUGAI-COUNT
+      *
+           MOVE    SPA-GMN26-HDRESEKBN-G   TO  P02-P026-HD-RESEKBN
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN26-HDRESEMAX )
+               MOVE    SPA-GMN26-HDRESEKBN-LST (IDX)
+                                       TO  P02-P026-HD-RESEKBN-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN26-HDRESEMAX TO  P02-P026-HD-RESEKBN-COUNT
+      *
+      *    振分日以前
+           MOVE    SPA-GMN26-HDMIDASI (1)  TO  P02-P026-HDMIDAS1
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   20   )
+                       OR    ( SPA-GMN26-THDHKNCOMBI (1 IDX) =   SPACE)
+               MOVE    SPA-GMN26-THDHKNCOMBI (1 IDX)
+                                           TO  P02-P026-THKNNUM1(IDX)
+               MOVE    SPA-GMN26-THDHKNNAME (1 IDX)
+                                           TO  P02-P026-THKNMEI1(IDX)
+               IF      SPA-GMN26-THDHKNDELFLG (1 IDX)  =   "1"
+                   MOVE    "◎"            TO  P02-P026-TDELKBN1 (IDX)
+               END-IF
+               MOVE    IDX                 TO  P02-P026-HDHKNLST1-COUNT
+           END-PERFORM
+      *    振分日以降
+           MOVE    SPA-GMN26-HDMIDASI (2)  TO  P02-P026-HDMIDAS2
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   20   )
+                       OR    ( SPA-GMN26-THDHKNCOMBI (2 IDX) =   SPACE)
+               MOVE    SPA-GMN26-THDHKNCOMBI (2 IDX)
+                                           TO  P02-P026-THKNNUM2(IDX)
+               MOVE    SPA-GMN26-THDHKNNAME (2 IDX)
+                                           TO  P02-P026-THKNMEI2(IDX)
+               IF      SPA-GMN26-THDHKNDELFLG (2 IDX)  =   "1"
+                   MOVE    "◎"            TO  P02-P026-TDELKBN2 (IDX)
+               END-IF
+               MOVE    IDX                 TO  P02-P026-HDHKNLST2-COUNT
+           END-PERFORM
+           MOVE    SPA-GMN26-DELSEL1       TO  P02-P026-DELSEL1
+           MOVE    SPA-GMN26-DELSEL2       TO  P02-P026-DELSEL2
            .
        2001-P026-SET-EXT.
            EXIT.
@@ -4505,6 +4646,23 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        991-PTTOKKI-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者レセプト分割テーブル読み込み
+      *****************************************************************
+       991-PTHDISTDAY-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PT-HDIST-DAY-REC
+               MOVE    ZERO            TO  FLG-PTHDISTDAY
+           ELSE
+               INITIALIZE                  PT-HDIST-DAY-REC
+               MOVE    1               TO  FLG-PTHDISTDAY
+           END-IF
+      *
+           .
+       991-PTHDISTDAY-READ-EXT.
            EXIT.
       *
       *****************************************************************

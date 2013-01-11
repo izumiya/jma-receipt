@@ -1843,7 +1843,7 @@
            MOVE    ZERO                TO  WRK-SELNUM
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   20
+                   UNTIL       IDX     >   SPA-GMN27-MAX
                IF      P02-P027-HKNKUMI-SELECT (IDX)  =   "T"
                    IF      SPA-NAI27-HKNNUM (IDX)
                                                 =   SPA-NAI27-SELNUM

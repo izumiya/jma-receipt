@@ -3392,6 +3392,20 @@
                MOVE    SPA-FREE            TO  SPA-P02SCRAREA
                MOVE    SPA-WORK            TO  SPA-P02KYOUTU
       *
+      *H24.12
+      *        特記事項情報・レセプト分割
+           WHEN    "P026"
+               MOVE    "CLICKED" TO  MCP-EVENT
+               MOVE    "B12"     TO  MCP-WIDGET
+               MOVE    "PUTG"    TO  MCP-STATUS
+               CALL    "ORCGP026"       USING   MCPAREA
+                                                SPAAREA
+                                                LINKAREA
+                                                SCRAREA
+               MOVE    SPA-COMMON          TO  SPA-AREA
+               MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+               MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+      *
            END-EVALUATE
       *
            IF      SPA-ERRCD       NOT =   SPACE
@@ -3444,6 +3458,25 @@
                MOVE    SPA-WORK            TO  SPA-P02KYOUTU
                IF      SPA-ERRCD       NOT =   SPACE
                    MOVE    "P024"              TO  SPA-P02-GAMEN
+                   MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
+                   GO  TO                  4901-KOUSINMAE-EXT
+               END-IF
+           END-IF
+      *
+           IF      SPA-P02-GAMEN   NOT =   "P026"
+      *        特記事項情報・レセプト分割
+               MOVE    "CLICKED"           TO  MCP-EVENT
+               MOVE    "B12"               TO  MCP-WIDGET
+               MOVE    "PUTG"              TO  MCP-STATUS
+               CALL    "ORCGP026"     USING   MCPAREA
+                                               SPAAREA
+                                               LINKAREA
+                                               SCRAREA
+               MOVE    SPA-COMMON          TO  SPA-AREA
+               MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+               MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+               IF      SPA-ERRCD       NOT =   SPACE
+                   MOVE    "P026"              TO  SPA-P02-GAMEN
                    MOVE    MCP-WIDGET          TO  SPA-P02-WIDGET
                    GO  TO                  4901-KOUSINMAE-EXT
                END-IF

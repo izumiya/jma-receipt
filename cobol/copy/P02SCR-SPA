@@ -42,6 +42,7 @@
       *  04.06.00    NACL-多々納  11/02/XX  京都府通り名称編集機能追加
       *  04.07.00    NACL-多々納  11/08/XX  保険確認年月日履歴対応
       *  04.07.00    NACL-多々納  12/06/XX  公費種別２００件対応
+      *  04.07.00    NACL-多々納  12/12/19  患者レセ分割対応
       *****************************************************************
        01  SPA-P02SCRAREA.
       *
@@ -1015,6 +1016,8 @@
            03  SPA-P026-AREA.
                05  SPA-GMN26-CUR             PIC 9(02).
                05  SPA-GMN26-SYORI           PIC 9(01).
+               05  SPA-P026-KOHKEIFLG        PIC 9(01).
+               05  SPA-NAI26-HDSELNUM-CHK    PIC 9(03).
       *
       *        初期設定内容
                05  SPA-GMN26-INIT.
@@ -1066,6 +1069,71 @@
                        09  SPA-NAI26-DELKBN        PIC X(01).
       *
                    07  SPA-GMN26-TMAX              PIC 9(03).
+      *
+      *    患者レセプト分割情報
+               05  SPA-GMN26-HDIST-INIT.
+                   07  SPA-GMN26-HDNYUGAI-LST      PIC X(20)
+                                                   OCCURS   5.
+                   07  SPA-GMN26-HDNYUMAX          PIC 9(02).
+                   07  SPA-GMN26-HDRESEKBN-LST     PIC X(20)
+                                                   OCCURS   5.
+                   07  SPA-GMN26-HDRESEMAX         PIC 9(02).
+               05  SPA-GMN26-HDIST-INAREA.
+                   07  SPA-GMN26-HDSELNUM          PIC 9(03).
+                   07  SPA-GMN26-HDSRYYM           PIC X(07).
+                   07  SPA-GMN26-HDDAY             PIC X(02).
+      *
+                   07  SPA-GMN26-HDNYUGAI-G.
+                       09  SPA-GMN26-HDNYUGAI      PIC X(01).
+                       09  SPA-GMN26-HD1           PIC X(01).
+                       09  SPA-GMN26-HDNYUGAI-MEI  PIC X(18).
+      *
+                   07  SPA-GMN26-HDRESEKBN-G.
+                       09  SPA-GMN26-HDRESEKBN     PIC X(01).
+                       09  SPA-GMN26-HD2           PIC X(01).
+                       09  SPA-GMN26-HDRESEKBN-MEI PIC X(18).
+      *            保険組合せ削除
+                   07  SPA-GMN26-DELSEL1           PIC 9(04).
+                   07  SPA-GMN26-DELSEL2           PIC 9(04).
+      *
+                   07  SPA-NAI26-HDSRYYM           PIC X(06).
+                   07  SPA-NAI26-STHKNID           PIC 9(10).
+                   07  SPA-NAI26-EDHKNID           PIC 9(10).
+                   07  SPA-NAI26-STHKNNUM          PIC X(03).
+                   07  SPA-NAI26-EDHKNNUM          PIC X(03).
+      *
+      *        患者レセプト分割リスト
+               05  SPA-GMN26-HDLIST-TBL.
+                   07  SPA-GMN26-HDLIST-OCC         OCCURS  20.
+                       09  SPA-GMN26-THDNUM          PIC 9(03).
+                       09  SPA-GMN26-THDSRYYM        PIC X(06).
+                       09  SPA-GMN26-THDDAY          PIC X(02).
+                       09  SPA-GMN26-THDNYUGAI       PIC X(18).
+                       09  SPA-GMN26-THDRESEKBN      PIC X(18).
+      *
+                       09  SPA-NAI26-THDSRYYM        PIC X(06).
+                       09  SPA-NAI26-THDNYUGAI       PIC X(01).
+                       09  SPA-NAI26-THDRESEKBN      PIC X(01).
+      *
+                       09  SPA-NAI26-HDDELKBN        PIC X(01).
+      *                保険組合せ
+                       09  SPA-NAI26-HDHKNLST-TBL.
+                           11  SPA-NAI26-HDHKNLST-OCC    OCCURS  2.
+                               13  SPA-NAI26-THKNCOMBI-G   OCCURS  20.
+                                   15  SPA-NAI26-THKNCOMBI   PIC X(04).
+                                   15  SPA-NAI26-THKNDLTFLG  PIC X(01).
+      *
+                   07  SPA-GMN26-HDLSTMAX            PIC 9(03).
+      *        保険組合せ
+               05  SPA-GMN26-HDMIDASI-G.
+                   07  SPA-GMN26-HDMIDASI          PIC X(20) OCCURS  2.
+               05  SPA-GMN26-HDHKNLST-TBL.
+                   07  SPA-GMN26-HDHKNLST-OCC         OCCURS  2.
+                       09  SPA-GMN26-HDHKNLST-OCC2       OCCURS  20.
+                           11  SPA-GMN26-THDHKNCOMBI     PIC X(04).
+                           11  SPA-GMN26-THDHKNDELFLG    PIC X(01).
+                           11  SPA-GMN26-THDHKNNAME      PIC X(60).
+      *
       *
       *    P0201（未登録受付者一覧）
            03  SPA-P0201-AREA.

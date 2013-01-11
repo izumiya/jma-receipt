@@ -49,6 +49,7 @@
       *  04.07.00    NACL-多々納  11/08/XX  患者保険確認履歴追加
       *  04.07.00    NACL-多々納  12/01/12  印刷処理移動
       *  04.07.00    NACL-多々納  12/11/22  患者地域連携追加
+      *  04.07.00    NACL-多々納  12/12/21  レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -124,6 +125,7 @@
            03  FLG-PTSAME          PIC 9(01).
            03  FLG-PTKOHFTNETC     PIC 9(01).
            03  FLG-PTPUBLIC        PIC 9(01).
+           03  FLG-PTHDISTDAY      PIC 9(01).
       *
            03  FLG-SYORI           PIC X(01).
            03  FLG-SYORI2          PIC X(01).
@@ -271,6 +273,10 @@
       *    患者特記事項マスタ
        01  PTTOKKI-REC.
            COPY    "CPPTTOKKI.INC".
+      *
+      *    患者レセプト分割テーブル
+       01  PT-HDIST-DAY-REC.
+           COPY    "CPPT-HDIST-DAY.INC".
       *
       *    患者公費負担額
        01  PTKOHFTNETC-REC.
@@ -514,6 +520,8 @@
 grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
+      *    患者レセプト分割テーブル削除
+           PERFORM 300-PTHDISTDAY-DELETE-SEC
       *
       *    パラメタファイルより
            INITIALIZE                      PARA-REC
@@ -566,6 +574,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    WHEN    "PTKOHFTN"
       *                公費負担情報更新
                        PERFORM 300-PTKOHFTN-SYORI-SEC
+      *H24.12
+                   WHEN    "PTHDISTDAY"
+      *                患者レセプト分割テーブル更新
+                       PERFORM 300-PTHDISTDAY-SYORI-SEC
                END-EVALUATE
       *
                MOVE    "tbl_para"          TO  MCP-TABLE
@@ -579,10 +591,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    患者公費負担額テーブル更新
            IF      SPA-ERRCD           =   SPACE
                PERFORM 3001-PTKOHFTNETC-SYORI-SEC
-           END-IF
-      *    特記事項テーブル更新
-           IF      SPA-ERRCD           =   SPACE
-               PERFORM 300-PTTOKKI-SYORI-SEC
            END-IF
       *    レセプト作成管理マスタ更新
            IF      SPA-ERRCD           =   SPACE
@@ -2143,6 +2151,102 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        300-PTTOKKI-SYORI-EXT.
            EXIT.
       *****************************************************************
+      *    患者レセプト分割削除処理
+      *****************************************************************
+       300-PTHDISTDAY-DELETE-SEC         SECTION.
+      *
+      *    患者レセプト分割はすべて削除
+           INITIALIZE                      PT-HDIST-DAY-REC
+           MOVE    SPA-HOSPNUM         TO  PT-HDIST-DAY-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PT-HDIST-DAY-PTID
+           MOVE    PT-HDIST-DAY-REC    TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+           MOVE    "del"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+       300-PTHDISTDAY-DELETE-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者レセプト分割更新処理
+      *****************************************************************
+       300-PTHDISTDAY-SYORI-SEC         SECTION.
+      *
+           MOVE    PARA-DATA-REC       TO  PT-HDIST-DAY-REC
+      *
+           MOVE    SPA-HOSPNUM         TO  PT-HDIST-DAY-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PT-HDIST-DAY-PTID
+      *
+           MOVE    PT-HDIST-DAY-REC    TO  MCPDATA-REC
+           MOVE    "tbl_ptkohftn"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohftn"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 991-PTHDISTDAY-READ-SEC
+           ELSE 
+               MOVE    1               TO  FLG-PTHDISTDAY
+           END-IF
+           MOVE    "tbl_ptkohftn"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-PTHDISTDAY        =   1
+               MOVE    PARA-DATA-REC       TO  PT-HDIST-DAY-REC
+               MOVE    SPA-HOSPNUM         TO  PT-HDIST-DAY-HOSPNUM
+               MOVE    SPA-GMN-PTID        TO  PT-HDIST-DAY-PTID
+      *
+               MOVE    SMCNDATE-YMD        TO  PT-HDIST-DAY-CREYMD
+               MOVE    SMCNDATE-YMD        TO  PT-HDIST-DAY-UPYMD
+               MOVE    SMCNDATE-HMS        TO  PT-HDIST-DAY-UPHMS
+      *
+               MOVE    SPA-OPID            TO  PT-HDIST-DAY-OPID
+      *
+      *        新規
+               MOVE    SPA-GMN-PTID        TO  PT-HDIST-DAY-PTID
+               MOVE    PT-HDIST-DAY-REC    TO  MCPDATA-REC
+               MOVE    "DBINSERT"          TO  MCP-FUNC
+               MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC          NOT =   ZERO
+                   DISPLAY "P029 PT-HDIST-DAY INS ERR:" MCP-RC
+                                   ",KEY:" PT-HDIST-DAY-KEY
+                   MOVE    "9000"              TO  SPA-ERRCD
+               END-IF
+           ELSE
+               MOVE    PT-HDIST-DAY-CREYMD     TO  WRK-CREYMD
+               MOVE    PARA-DATA-REC       TO  PT-HDIST-DAY-REC
+      *
+               MOVE    WRK-CREYMD          TO  PT-HDIST-DAY-CREYMD
+               MOVE    SMCNDATE-YMD        TO  PT-HDIST-DAY-UPYMD
+               MOVE    SMCNDATE-HMS        TO  PT-HDIST-DAY-UPHMS
+      *
+               MOVE    SPA-OPID            TO  PT-HDIST-DAY-OPID
+      *
+      *        更新
+               MOVE    PT-HDIST-DAY-REC    TO  MCPDATA-REC
+               MOVE    "DBUPDATE"          TO  MCP-FUNC
+               MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC          NOT =   ZERO
+                   DISPLAY "P029 PT-HDIST-DAY UPD ERR:" MCP-RC
+                                   ",KEY:" PT-HDIST-DAY-KEY
+                   MOVE    "9000"              TO  SPA-ERRCD
+               END-IF
+           END-IF
+           .
+       300-PTHDISTDAY-SYORI-EXT.
+           EXIT.
+      *****************************************************************
       *    患者公費負担額テーブル更新処理
       *****************************************************************
        3001-PTKOHFTNETC-SYORI-SEC         SECTION.
@@ -2964,6 +3068,24 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        900-PTPUBLIC-READ-EXT.
            EXIT.
+      *****************************************************************
+      *    患者レセプト分割テーブル読み込み
+      *****************************************************************
+       991-PTHDISTDAY-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PT-HDIST-DAY-REC
+               MOVE    ZERO            TO  FLG-PTHDISTDAY
+           ELSE
+               INITIALIZE                  PT-HDIST-DAY-REC
+               MOVE    1               TO  FLG-PTHDISTDAY
+           END-IF
+      *
+           .
+       991-PTHDISTDAY-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    テーブル検索処理
       *****************************************************************

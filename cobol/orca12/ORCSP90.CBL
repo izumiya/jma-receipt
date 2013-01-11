@@ -1137,6 +1137,78 @@
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
+      *        レセ分割
+               WHEN    "2630"
+                   STRING  "レセプト分割の選択番号エラー"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2631"
+                   STRING  "対象保険組合せが変更となります。"
+                           "確認ボタン押下で最新の保険組合せに"
+                           "更新して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2639"
+                   STRING  "レセプト分割の保険組合せが変更となります。"
+                           "最新の保険組合せに変更して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2632"
+                   STRING  "対象年月エラー"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2633"
+                   STRING  "振分日エラー"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2634"
+                   STRING  "入外区分エラー"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2635"
+                   STRING  "レセ区分エラー"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2636"
+                   STRING  "レセプト分割が重複します。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2637"
+                   STRING  "振分日で期間変更の保険がありません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2638"
+                   STRING  "対象の保険組合せがありません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2640"
+                   STRING  "振分日で期間変更の保険が"
+                           "同一保険者でありません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2641"
+                   STRING  "振分日で振り分け出来ない保険組合せが"
+                           "あります。"
+                           "レセプト分割はできません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "2642"
+                   STRING  "削除番号選択エラー"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
       *
       *        患者番号取得エラー
                WHEN    "8000"

@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 04.07.00     NACL-多々納  12/11/22  患者地域連携対応
+      * 04.07.00     NACL-多々納  12/12/19  患者レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -282,6 +283,11 @@
       *    患者地域連携テーブル
        01  PTPUBLIC-REC.
            COPY    "CPPTNUM-PUBLIC.INC".
+      *
+      *    患者レセプト分割テーブル
+       01  PT-HDIST-DAY-REC.
+           COPY    "CPPT-HDIST-DAY.INC".
+      *
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -905,6 +911,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    PTTOKKI-REC         TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC
            MOVE    "tbl_pttokki"       TO  MCP-TABLE
+           MOVE    "del"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+      *
+      *    患者レセプト分割テーブル
+           INITIALIZE                      PT-HDIST-DAY-REC
+           MOVE    SPA-HOSPNUM         TO  PT-HDIST-DAY-HOSPNUM
+           MOVE    SPA-PTID            TO  PT-HDIST-DAY-PTID
+           MOVE    PT-HDIST-DAY-REC    TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
            MOVE    "del"               TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
