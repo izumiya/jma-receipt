@@ -182,6 +182,7 @@
       *  04.07.06    NACL-藤原    12/11/20  リアルタイムプレビュー時の
       *                                     一画面対応
       *  04.07.07    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
+      *  04.07.08    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2733,6 +2734,7 @@
            ELSE
                MOVE    RECE62X-TEKSTYMD    TO  KOHSKY-TEKSTYMD
            END-IF
+           MOVE    RECE62X-RECEIPT-KBN TO  KOHSKY-RECEIPT-KBN
       *
            MOVE     999999999          TO  WRK-TAIHI-FTNMONEY
       *    レセプト種別を請求管理より編集
@@ -10115,6 +10117,7 @@
            ELSE
                MOVE    RECE62-TEKSTYMD TO  RECE10-TEKSTYMD
            END-IF
+           MOVE    RECE62-RECEIPT-KBN  TO  RECE10-RECEIPT-KBN
       *
            MOVE    "tbl_seikyu"        TO  WRK-MCP-TABLE
            MOVE    "key"               TO  WRK-MCP-PATHNAME

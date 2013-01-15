@@ -63,6 +63,8 @@
       *  04.06.03    NACL-藤原    11/01/28  キーに剤連番追加
       *  04.06.04    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *
+      *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -180,7 +182,6 @@
       *
            03  WRK-KOHBUNRI            PIC 9(01).
            03  WRK-HKNCOMBI            PIC 9(04).
-      *    03  OLD-KEY                 PIC X(65).
            03  OLD-KEY.
                05  OLD-RECE64-HOSPNUM     PIC  9(02).
                05  OLD-RECE64-SRYYM       PIC  9(06).
@@ -194,6 +195,7 @@
                05  OLD-RECE64-HOJOKBN     PIC  X(01).
                05  OLD-RECE64-KOHID       PIC  9(10).
                05  OLD-RECE64-TEKSTYMD    PIC  X(08). 
+               05  OLD-RECE64-RECEIPT-KBN PIC  X(10).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).
@@ -364,17 +366,7 @@
        200-MAIN-SEC                SECTION.
       *
            INITIALIZE                      RECE641-REC
-           MOVE    RECE64-HOSPNUM      TO  RECE641-HOSPNUM
-           MOVE    RECE64-SRYYM        TO  RECE641-SRYYM
-           MOVE    RECE64-NYUGAIKBN    TO  RECE641-NYUGAIKBN
-           MOVE    RECE64-PTID         TO  RECE641-PTID
-           MOVE    RECE64-RECEKA       TO  RECE641-RECEKA
-           MOVE    RECE64-TEISYUTUSAKI TO  RECE641-TEISYUTUSAKI
-           MOVE    RECE64-RECESYUBETU  TO  RECE641-RECESYUBETU
-           MOVE    RECE64-HKNJANUM     TO  RECE641-HKNJANUM
-           MOVE    RECE64-HOJOKBN      TO  RECE641-HOJOKBN
-           MOVE    RECE64-KOHID        TO  RECE641-KOHID
-           MOVE    RECE64-TEKSTYMD     TO  RECE641-TEKSTYMD
+           MOVE    RECE64-KEY1         TO  RECE641-KEY1
            IF      RECE64-SRYKBN       =   "33"
                PERFORM   210-KBNNUM-SET-SEC
            END-IF

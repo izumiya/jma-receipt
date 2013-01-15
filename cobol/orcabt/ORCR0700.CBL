@@ -59,6 +59,8 @@
       *                                     キーにkohid 追加
       *  04.06.02    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *
+      *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -272,17 +274,7 @@
        210-HENSYU-SEC                   SECTION.
       *
            INITIALIZE                           RECE661-REC
-           MOVE    RECE66-HOSPNUM       TO      RECE661-HOSPNUM
-           MOVE    RECE66-SRYYM         TO      RECE661-SRYYM
-           MOVE    RECE66-NYUGAIKBN     TO      RECE661-NYUGAIKBN
-           MOVE    RECE66-PTID          TO      RECE661-PTID
-           MOVE    RECE66-RECEKA        TO      RECE661-RECEKA
-           MOVE    RECE66-TEISYUTUSAKI  TO      RECE661-TEISYUTUSAKI
-           MOVE    RECE66-RECESYUBETU   TO      RECE661-RECESYUBETU
-           MOVE    RECE66-HKNJANUM      TO      RECE661-HKNJANUM
-           MOVE    RECE66-HOJOKBN       TO      RECE661-HOJOKBN
-           MOVE    RECE66-KOHID         TO      RECE661-KOHID
-           MOVE    RECE66-TEKSTYMD      TO      RECE661-TEKSTYMD
+           MOVE    RECE66-KEY1          TO      RECE661-KEY1
            MOVE    RECE66-KOHBUNRI      TO      RECE661-KOHBUNRI
            MOVE    RECE66-ZAINUM        TO      RECE661-ZAINUM
            IF      RECE66-ZAINUM       =   99999999

@@ -211,6 +211,7 @@
       *                                     中止 
       *
       *  04.07.01    NACL-門脇    12/10/02  高齢者判定フラグ編集
+      *  04.07.02    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1165,6 +1166,9 @@
                ELSE
                    PERFORM VARYING IDXX    FROM    1   BY  1
                            UNTIL   IDXX    >       WRK-SEIHO-RECE61-MAX
+      *              分割区分毎にまとめる
+                     IF      RECE61-RECEIPT-KBN    =
+                                   WRK-SEIHO-RECE61-RECEIPT-KBN (IDXX)
                        PERFORM VARYING IDYY    FROM    1   BY  1
                                UNTIL   IDYY    >       10
                                OR      RECE61-KOHID-O (IDYY)
@@ -1195,7 +1199,8 @@
                                MOVE    WRK-SEIHO-RECE61-MAX
                                                    TO  IDXX
                            END-IF
-                       END-PERFORM      
+                       END-PERFORM
+                     END-IF
                    END-PERFORM
                END-IF                     
            END-IF
@@ -1267,6 +1272,7 @@
                    END-IF
                END-IF
            END-PERFORM
+           MOVE    RECE61-RECEIPT-KBN  TO  RECE62-RECEIPT-KBN
       *    患者番号
            MOVE    RECE61-PTNUM        TO  RECE62-PTNUM
       *    診療科情報のセット
@@ -1875,6 +1881,8 @@
                                    TO  LNK-SYUACC-IO-TEISYUTUSAKI(1)
            MOVE    RECE62-KOHID-KEY
                                    TO  LNK-SYUACC-IO-KOHID       (1)
+           MOVE    RECE62-RECEIPT-KBN
+                                   TO  LNK-SYUACC-IO-RECEIPT-KBN (1)
       *    精神入院か生保単独複数のとき
            IF    ( RECE62-HKNNUM   =   SPACE      )
            AND   ( RECE62-TEKSTYMD
@@ -3181,6 +3189,9 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                          ELSE
                              MOVE    1                TO  FLG-PTHKNINF  
                          END-IF
+      *
+                         MOVE    ZERO                TO  FLG-RIREKI-HEN
+      *
                          PERFORM          UNTIL   FLG-PTHKNINF     =   1
                                           OR      FLG-RIREKI-HEN   =   1
                            IF      PTHKN-SAKJOKBN   =   SPACE
@@ -3277,8 +3288,8 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                          IF      FLG-RIREKI-HEN      =   ZERO
                            MOVE    RECE69-REC        TO
                                                  TBL-RECE69-OCC (IDYY)
-                           MOVE    100               TO  IDYY
                          END-IF
+                         MOVE    100               TO  IDYY
                      ELSE                                            
                          INITIALIZE                      PTKOHINF-REC
                          MOVE    RECE61-HOSPNUM      TO  PTKOH-HOSPNUM
@@ -3805,17 +3816,7 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
            END-IF
       *
            INITIALIZE                      RECE68-REC
-           MOVE    RECE62-HOSPNUM      TO  RECE68-HOSPNUM
-           MOVE    RECE62-SRYYM        TO  RECE68-SRYYM
-           MOVE    RECE62-NYUGAIKBN    TO  RECE68-NYUGAIKBN
-           MOVE    RECE62-PTID         TO  RECE68-PTID
-           MOVE    RECE62-RECEKA       TO  RECE68-RECEKA
-           MOVE    RECE62-TEISYUTUSAKI TO  RECE68-TEISYUTUSAKI
-           MOVE    RECE62-RECESYUBETU  TO  RECE68-RECESYUBETU
-           MOVE    RECE62-HKNJANUM-KEY TO  RECE68-HKNJANUM
-           MOVE    RECE62-HOJOKBN-KEY  TO  RECE68-HOJOKBN
-           MOVE    RECE62-KOHID-KEY    TO  RECE68-KOHID
-           MOVE    RECE62-TEKSTYMD     TO  RECE68-TEKSTYMD
+           MOVE    RECE62-KEY          TO  RECE68-KEY1
            MOVE    PTNYUINRRK-NYUINYMD TO  RECE68-NYUINYMD
            MOVE    RECE68-REC          TO  WRK-RECE68-REC          
            PERFORM 900-RECE68-READ-SEC

@@ -62,6 +62,8 @@
       *  04.06.04    NACL-藤原    11/10/24  予約コード入力による病名編集
       *                                     フラグの設定
       *  04.06.05    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
+      *
+      *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -644,17 +646,7 @@
       *
            MOVE    SPACE               TO  RECE63-REC
            INITIALIZE                      RECE63-REC
-           MOVE    RECE62-HOSPNUM      TO  RECE63-HOSPNUM
-           MOVE    RECE62-SRYYM        TO  RECE63-SRYYM
-           MOVE    RECE62-NYUGAIKBN    TO  RECE63-NYUGAIKBN
-           MOVE    RECE62-PTID         TO  RECE63-PTID
-           MOVE    RECE62-RECEKA       TO  RECE63-RECEKA
-           MOVE    RECE62-TEISYUTUSAKI TO  RECE63-TEISYUTUSAKI
-           MOVE    RECE62-RECESYUBETU  TO  RECE63-RECESYUBETU
-           MOVE    RECE62-HKNJANUM-KEY TO  RECE63-HKNJANUM
-           MOVE    RECE62-HOJOKBN-KEY  TO  RECE63-HOJOKBN
-           MOVE    RECE62-KOHID-KEY    TO  RECE63-KOHID
-           MOVE    RECE62-TEKSTYMD     TO  RECE63-TEKSTYMD
+           MOVE    RECE62-KEY          TO  RECE63-KEY1
            MOVE    PTBYO-SRYYMD        TO  RECE63-SRYYMD
            MOVE    WRK-RENNUM          TO  RECE63-RENNUM
            MOVE    RECE62-PTNUM        TO  RECE63-PTNUM
