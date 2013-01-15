@@ -175,3 +175,19 @@ path	key10		{
 		;
 	};
 };
+
+path	key11		{ 	
+	DBSELECT	{
+		DECLARE tbl_chk005_key11_csr CURSOR FOR
+		SELECT *
+		FROM tbl_chk005
+			WHERE	HOSPNUM	=	:HOSPNUM
+			AND	CHKKBN	=	:CHKKBN
+			AND	BYOMEI	=	:BYOMEI
+			AND	YUKOSTYMD	<=	:YUKOSTYMD
+			AND	YUKOEDYMD	>=	:YUKOEDYMD
+			ORDER BY RENNUM
+		;
+	};
+};
+

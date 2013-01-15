@@ -2,10 +2,17 @@ tbl_chkreigai	{
 	HOSPNUM			number(2,0);
 	PTID			number(10,0);
 	RENNUM			number(8,0);
-	CHKNUM			number(2,0);
-	ERRKBN   		char(4);
-	NYUGAIKBN   		char(1);
+	CHKNUM			char(2);
+	NYUGAIKBN   	char(1);
+	CHKKBN			char(1);
 	SRYCD   		char(9);
+	BYOMEI   		varchar(160);
+	COMPKBN   		char(1);
+	TEKCD   		char(9);
+	TEKBYOMEI   		varchar(160);
+	TEKCOMPKBN   		char(1);
+	ERRCD   		char(6);
+	ERRMSG   		varchar(200);
 	STYUKYMD	  	char(8);
 	EDYUKYMD  		char(8);
 	TERMID  		varchar(16);
@@ -57,7 +64,7 @@ path	key3		{
 		AND	a.NYUGAIKBN =  :NYUGAIKBN
 		AND	a.STYUKYMD <=	:STYUKYMD
 		AND	a.EDYUKYMD >=	:EDYUKYMD
-		ORDER BY b.KANANAME,a.CHKNUM,a.ERRKBN,a.RENNUM
+		ORDER BY b.KANANAME,b.PTID,a.CHKNUM,a.ERRCD,a.RENNUM
 		LIMIT    :SELLIMIT
 		OFFSET   :SELOFFSET
 		;
@@ -85,9 +92,13 @@ path	key5		{
 		WHERE HOSPNUM    =  :HOSPNUM
 		AND PTID	 =  :PTID
 		AND CHKNUM	 =  :CHKNUM
-		AND ERRKBN	 =  :ERRKBN
-		AND NYUGAIKBN	 =  :NYUGAIKBN
-		AND SRYCD	 =  :SRYCD
+		AND NYUGAIKBN    =  :NYUGAIKBN
+		AND ( SRYCD      = :SRYCD  OR  :SRYCD = '')
+		AND ( ERRCD      = :ERRCD  OR  :ERRCD = '')
+		AND ( BYOMEI     = :BYOMEI OR  :BYOMEI = '')
+		AND ( TEKCD      = :TEKCD  OR  :TEKCD  = '')
+		AND ( TEKBYOMEI  = :TEKBYOMEI  OR  :TEKBYOMEI  = '')
+		AND ( TEKCOMPKBN = :TEKCOMPKBN OR  :TEKCOMPKBN = '')
 		AND STYUKYMD	<=  :STYUKYMD
 		AND EDYUKYMD	>=  :EDYUKYMD
 		;
@@ -111,9 +122,13 @@ path	del2		{
 		WHERE HOSPNUM    =  :HOSPNUM
 		AND PTID	 =  :PTID
 		AND CHKNUM	 =  :CHKNUM
-		AND ERRKBN	 =  :ERRKBN
+		AND ( SRYCD      = :SRYCD  OR  :SRYCD = '')
+		AND ( ERRCD      = :ERRCD  OR  :ERRCD = '')
+		AND ( BYOMEI     = :BYOMEI OR  :BYOMEI = '')
+		AND ( TEKCD      = :TEKCD  OR  :TEKCD  = '')
+		AND ( TEKBYOMEI  = :TEKBYOMEI  OR  :TEKBYOMEI  = '')
+		AND ( TEKCOMPKBN = :TEKCOMPKBN OR  :TEKCOMPKBN = '')
 		AND NYUGAIKBN	 =  :NYUGAIKBN
-		AND SRYCD	 =  :SRYCD
 		AND STYUKYMD	<=  :STYUKYMD
 		AND EDYUKYMD	>=  :EDYUKYMD
 		;

@@ -347,6 +347,7 @@
            03  FLG-COMERR                              PIC 9(01).
            03  FLG-ZAIARI                              PIC 9(01).
            03  FLG-AGE70ERR                            PIC 9(01).
+           03  FLG-CHKSKIP                             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -591,9 +592,13 @@
                                                        OCCURS  31.
            03  WRK-DAY-G.
                05  WRK-DAY                             PIC 9(02).
-           03  WRK-CHKNUM                              PIC 9(02).
-           03  WRK-ERRKBN                              PIC X(04).
-           03  WRK-REIGAICD                            PIC X(09).
+           03  WRK-LASTYMD                             PIC X(08).
+           03  WRK-REIGAI-CHKKBN                       PIC X(01).
+           03  WRK-REIGAI-CHKNUM.
+               05  WRK-REIGAI-CHKNUM9                  PIC 9(02).
+           03  WRK-REIGAI-CD                           PIC X(160).
+           03  WRK-REIGAI-TEKCD                        PIC X(160).
+           03  WRK-REIGAI-COMPKBN                      PIC X(1).
            03  WRK-SURYOZ-G.
                05  WRK-SURYOZ                          PIC ZZZZ9.9(5).
                05  WRK-SURYOZ-R    REDEFINES           WRK-SURYOZ.
@@ -616,8 +621,13 @@
                05  WRK-058-TANICD                      PIC X(03).
       *
        01  TERRINF-AREA.
+           03  TERRINF-CHKKBN                          PIC X(01).
            03  TERRINF-SRYCD                           PIC X(09).
            03  TERRINF-SRYKA                           PIC X(02).
+           03  TERRINF-BYOMEI                          PIC X(160).
+           03  TERRINF-TEKCD                           PIC X(09).
+           03  TERRINF-TEKBYOMEI                       PIC X(160).
+           03  TERRINF-TEKCOMPKBN                      PIC X(1).
            03  TERRINF-DAY-G.
                05  TERRINF-DAY                         PIC 9(01)
                                                        OCCURS  31.
@@ -871,14 +881,14 @@
            COPY    "CPPTINF.INC"           REPLACING  //PTINF-//
                                            BY         //ERRPTINF-//.
        01  KEYCHKSND-REC.
-           COPY    "CPCHKSND.INC"  REPLACING  //CHKSND//
-                                   BY         //KEYCHKSND//.
+           COPY    "CPCHKSND.INC"  REPLACING  //CHKSND-//
+                                   BY         //KEYCHKSND-//.
       *
-           COPY    "CPCHKREIGAI.INC"  REPLACING  //CHKREIGAI//
-                                      BY         //KEYREIGAI//.
+           COPY    "CPCHKREIGAI.INC"  REPLACING  //CHKREIGAI-//
+                                      BY         //KEYREIGAI-//.
       *
        01  TCHKSND-REC.
-           COPY    "CPCHKSND.INC"  REPLACING  //CHKSND//
+           COPY    "CPCHKSND.INC"  REPLACING  //CHKSND-//
                                    BY         //TCHKSND-//.
       *
        01  TTNSP2-AREA.
@@ -2115,14 +2125,16 @@
       *            データチェック処理（チェックマスタ以外）
                    PERFORM 20011-DATA-CHK-SEC
       *
-      *            データチェック処理（チェックマスタ）
-                   PERFORM 20011-DATA-CHK-CHKMST-SEC
+                   IF    ( FLG-CHKSKIP     =   ZERO )
+      *                データチェック処理（チェックマスタ）
+                       PERFORM 20011-DATA-CHK-CHKMST-SEC
       *
-      *            禁忌チェック項目退避処理
-                   PERFORM 20012-CHK-KINKI-TAIHI-SEC
+      *                禁忌チェック項目退避処理
+                       PERFORM 20012-CHK-KINKI-TAIHI-SEC
       *
-      *            禁忌データチェック処理
-                   PERFORM 20012-KINKI-CHK-SEC
+      *                禁忌データチェック処理
+                       PERFORM 20012-KINKI-CHK-SEC
+                   END-IF
       *
       *            処理経過編集処理
                    PERFORM 20011-SYORI-KEIKA-HEN-SEC
@@ -4091,6 +4103,20 @@
       *
       *    基本チェック処理
            PERFORM 200111-KIHON-CHK-SEC
+           IF    ( FLG-CHKSKIP     =   ZERO )
+               PERFORM 200111-DATA-CHK-SEC
+           END-IF
+      *
+           CLOSE   DTCHK009-FILE
+      *
+           .
+       20011-DATA-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    データチェック処理
+      *****************************************************************
+       200111-DATA-CHK-SEC              SECTION.
+      *
       *
       *    患者保険情報チェック処理
            IF    ( ORCBSD01-CHKKBN (1) NOT =   ZERO  )
@@ -4134,10 +4160,9 @@
       *    その他必須チェック処理
            PERFORM 200111-SONOTA-HISSU-CHK-SEC
       *
-           CLOSE   DTCHK009-FILE
       *
            .
-       20011-DATA-CHK-EXT.
+       200111-DATA-CHK-EXT.
            EXIT.
       *****************************************************************
       *    データチェック処理
@@ -4251,10 +4276,11 @@
        200111-KIHON-CHK-SEC            SECTION.
       *
            IF    ( FLG-PTINF       NOT =   ZERO )
-               MOVE    "000001"    TO  WRK-ERRCD
+               MOVE    "990000"    TO  WRK-ERRCD
                INITIALIZE              TERRINF-AREA
                PERFORM 210-ERRMES-HEN-SEC
                MOVE    ALL "1"     TO  FLG-CHKEND-G
+               MOVE    1           TO  FLG-CHKSKIP
            END-IF
       *
            .
@@ -6570,10 +6596,10 @@
       *
                    IF    ( TSRYKA-SRYCD (IDX6 IDX7)(1:1)
                                            =   "6" OR "S" )
-                       MOVE    8       TO  WRK-CHKNUM
-                       MOVE    "0801"  TO  WRK-ERRKBN
+                       MOVE    "08"    TO  WRK-REIGAI-CHKNUM
+                       MOVE    "1"     TO  WRK-REIGAI-CHKKBN
                        MOVE    TSRYKA-SRYCD (IDX6 IDX7)
-                                       TO  WRK-REIGAICD
+                                       TO  WRK-REIGAI-CD
                        PERFORM 800-REIGAI-CHK-SEC
                        IF    ( FLG-REIGAI  =   ZERO )
                            MOVE    "1"     TO  WRK-CHK-CHKKBN
@@ -6838,6 +6864,7 @@
       *
                MOVE    WRK-SRYKA           TO  SRH-1005-SRYKA
                INITIALIZE                      TERRINF-AREA
+               MOVE    "1"                 TO  TERRINF-CHKKBN
                MOVE    CHKSND-SRYCD        TO  TERRINF-SRYCD
                MOVE    WRK-SRYKA           TO  TERRINF-SRYKA
                MOVE    WRK-NISSU-DAY-G     TO  TERRINF-DAY-G
@@ -6925,6 +6952,7 @@
       *
            MOVE    WRK-SRYKA       TO  SRH-1005-SRYKA
            INITIALIZE                      TERRINF-AREA
+           MOVE    "1"                 TO  TERRINF-CHKKBN
            MOVE    CHKSND-SRYCD        TO  TERRINF-SRYCD
            MOVE    WRK-SRYKA           TO  TERRINF-SRYKA
            MOVE    WRK-NISSU-DAY-G     TO  TERRINF-DAY-G
@@ -6965,10 +6993,10 @@
       *
                    IF    ( TSRYKA-SRYCD (IDX6 IDX7)(1:1)   NOT =   "6" )
                     AND  ( TSRYKA-SRYCD (IDX6 IDX7)(1:1)   NOT =   "S" )
-                       MOVE    9       TO  WRK-CHKNUM
-                       MOVE    "0901"  TO  WRK-ERRKBN
+                       MOVE    "09"    TO  WRK-REIGAI-CHKNUM
+                       MOVE    "2"     TO  WRK-REIGAI-CHKKBN
                        MOVE    TSRYKA-SRYCD (IDX6 IDX7)
-                                       TO  WRK-REIGAICD
+                                       TO  WRK-REIGAI-CD
                        PERFORM 800-REIGAI-CHK-SEC
                        IF    ( FLG-REIGAI  =   ZERO )
                            MOVE    "2"         TO  WRK-CHK-CHKKBN
@@ -7083,10 +7111,10 @@
                IF    ( CHKSND-NYUGAIKBN    =   SPACE )
                 OR   ( CHKSND-NYUGAIKBN    =   ORCBSD01-NYUGAIKBN )
       *
-                   MOVE    9       TO  WRK-CHKNUM
-                   MOVE    "0901"  TO  WRK-ERRKBN
+                   MOVE    "09"    TO  WRK-REIGAI-CHKNUM
+                   MOVE    "2"     TO  WRK-REIGAI-CHKKBN
                    MOVE    CHKSND-SRYCD
-                                   TO  WRK-REIGAICD
+                                   TO  WRK-REIGAI-CD
                    PERFORM 800-REIGAI-CHK-SEC
                    IF    ( FLG-REIGAI  =   ZERO )
                        PERFORM 20011211-PSET-BYO-CHK-SEC
@@ -7234,6 +7262,7 @@
       *
                MOVE    WRK-SRYKA           TO  SRH-1005-SRYKA
                INITIALIZE                      TERRINF-AREA
+               MOVE    "2"                 TO  TERRINF-CHKKBN
                MOVE    CHKSND-SRYCD        TO  TERRINF-SRYCD
                MOVE    WRK-SRYKA           TO  TERRINF-SRYKA
                MOVE    WRK-NISSU-DAY-G     TO  TERRINF-DAY-G
@@ -7320,6 +7349,7 @@
       *
            MOVE    WRK-SRYKA       TO  SRH-1005-SRYKA
            INITIALIZE                      TERRINF-AREA
+           MOVE    "2"                 TO  TERRINF-CHKKBN
            MOVE    CHKSND-SRYCD        TO  TERRINF-SRYCD
            MOVE    WRK-SRYKA           TO  TERRINF-SRYKA
            MOVE    WRK-NISSU-DAY-G     TO  TERRINF-DAY-G
@@ -7446,19 +7476,23 @@
                    UNTIL ( IDX0    >   THEIYOU-MAX )
                      OR  ( FLG-HIT =   1 )
       *
-               IF  (( WRK-CHKKBN   =   THEIYOU-CHKKBN(IDX0) )
+               IF   ( WRK-CHKKBN   =   THEIYOU-CHKKBN(IDX0) )
+                 AND( THEIYOU-INTERACT (IDX0)
+                                   =   SPACE )
                  AND( TSRYCD-SRYCD (IDX-TSRYCD)
                                    =   THEIYOU-SRYCD1(IDX0) )
                  AND( WRK-CHK-CD
-                                   =   THEIYOU-SRYCD2(IDX0) ))
+                                   =   THEIYOU-SRYCD2(IDX0) )
                    MOVE    1       TO  FLG-HIT
                END-IF
       *
-               IF  (( WRK-CHKKBN   =   THEIYOU-CHKKBN(IDX0) )
+               IF   ( WRK-CHKKBN   =   THEIYOU-CHKKBN(IDX0) )
+                 AND( THEIYOU-INTERACT (IDX0)
+                                   =   SPACE )
                  AND( TSRYCD-SRYCD (IDX-TSRYCD)
                                    =   THEIYOU-SRYCD2(IDX0) )
                  AND( WRK-CHK-CD
-                                   =   THEIYOU-SRYCD1(IDX0) ))
+                                   =   THEIYOU-SRYCD1(IDX0) )
                    MOVE    1       TO  FLG-HIT
                END-IF
       *
@@ -7803,6 +7837,10 @@
                        IF    ( CONST-THEIYOU-MAX   > THEIYOU-MAX )
                            COMPUTE THEIYOU-MAX =   THEIYOU-MAX +   1
       *
+                           MOVE    "4"     TO  THEIYOU-CHKKBN
+                                                         (THEIYOU-MAX)
+                           MOVE    "1"     TO  THEIYOU-INTERACT
+                                                         (THEIYOU-MAX)
                            MOVE    TSRYCD-NYUGAIKBN (IDX-TSRYCD)
                                            TO  THEIYOU-NYUGAIKBN1
                                                          (THEIYOU-MAX)
@@ -7858,6 +7896,7 @@
                    UNTIL ( IDX0    >    WRK-MAX )
       *
                MOVE    SPACE       TO   WRK-ERRMES-PLUS
+               MOVE    SPACE       TO   WRK-LASTYMD
                MOVE    1           TO   WRK-PNT
       *
                IF    ( THEIYOU-NYUGAIKBN1 (IDX0)
@@ -7882,6 +7921,8 @@
                MOVE    THEIYOU-DAY1-G (IDX0)
                                        TO  WRK-NISSU-DAY-G
                PERFORM 200111-NISSU-HEN-SEC
+               MOVE    WRK-NISSU-LASTYMD
+                                       TO  WRK-LASTYMD
       *
                STRING TNS-NAME         DELIMITED   BY  SPACE
                       WRK-NISSU-MES    DELIMITED   BY SPACE
@@ -7920,8 +7961,19 @@
                WITH    POINTER    WRK-PNT
                END-STRING
       *
-               MOVE    "100001"    TO   WRK-ERRCD
+               IF    ( THEIYOU-INTERACT (IDX0) =   SPACE )
+                   MOVE    "100001"    TO   WRK-ERRCD
+               ELSE
+                   MOVE    "100002"    TO   WRK-ERRCD
+               END-IF
                INITIALIZE              TERRINF-AREA
+               MOVE    "4"         TO  TERRINF-CHKKBN
+               MOVE    THEIYOU-SRYCD1 (IDX0)
+                                   TO  TERRINF-SRYCD
+               MOVE    THEIYOU-SRYCD2 (IDX0)
+                                   TO  TERRINF-TEKCD
+               MOVE    WRK-LASTYMD TO  TERRINF-LASTYMD
+      *
                PERFORM 215-ERRMES-HEN-SEC
       *
            END-PERFORM
@@ -7943,6 +7995,7 @@
                          OR  ( FLG-CHKEND (15)  =   1 )
       *
                    IF    ( TSRYKA-SRYCD (IDX6 IDX7)(1:1)   =   "6" )
+      *
                        MOVE    "6"     TO  WRK-CHK-CHKKBN
                        MOVE    "1"     TO  WRK-CHK-CDKBN
                        MOVE    TSRYKA-SRYCD (IDX6 IDX7)
@@ -8052,6 +8105,7 @@
                                        TO  WRK-NISSU-DAY-G
       *
                PERFORM 200111-NISSU-HEN-SEC
+               MOVE    WRK-NISSU-LASTYMD   TO  WRK-LASTYMD
       *
                MOVE    SPACE               TO  WRK-NYUGAI-MES
                IF  ( SDTCHK01-O-NYUGAIKBN (IDX0)
@@ -8095,6 +8149,13 @@
       *
                MOVE    WRK-SRYKA       TO  SRH-1005-SRYKA
                INITIALIZE              TERRINF-AREA
+               MOVE    "6"             TO  TERRINF-CHKKBN
+               MOVE    CHKSND-SRYCD    TO  TERRINF-SRYCD
+               MOVE    WRK-LASTYMD     TO  TERRINF-LASTYMD
+               MOVE    SDTCHK01-O-TEKBYOMEI (IDX0)
+                                       TO  TERRINF-TEKBYOMEI
+               MOVE    SDTCHK01-O-TEKCOMPKBN(IDX0)
+                                       TO  TERRINF-TEKCOMPKBN
                PERFORM 213-ERRMES-HEN-SEC
       *
                IF    ( ORCBSD01-CHKKBN (15) =   "1" )
@@ -8351,6 +8412,7 @@
                    UNTIL ( IDX0    >    WRK-MAX )
       *
                MOVE    SPACE       TO   WRK-ERRMES-PLUS
+               MOVE    SPACE       TO   WRK-LASTYMD
                MOVE    1           TO   WRK-PNT
       *
                IF    ( THEIYOU-CHKKBN (IDX0)   =   "5" )
@@ -8376,6 +8438,8 @@
                    MOVE    THEIYOU-DAY1-G (IDX0)
                                            TO  WRK-NISSU-DAY-G
                    PERFORM 200111-NISSU-HEN-SEC
+                   MOVE    WRK-NISSU-LASTYMD
+                                           TO  WRK-LASTYMD
       *
                    STRING TNS-NAME         DELIMITED   BY  SPACE
                           WRK-NISSU-MES    DELIMITED   BY SPACE
@@ -8415,6 +8479,12 @@
       *
                    MOVE    "110001"    TO   WRK-ERRCD
                    INITIALIZE              TERRINF-AREA
+                   MOVE    "5"         TO  TERRINF-CHKKBN
+                   MOVE    THEIYOU-SRYCD1 (IDX0)
+                                       TO  TERRINF-SRYCD
+                   MOVE    THEIYOU-SRYCD2 (IDX0)
+                                       TO  TERRINF-TEKCD
+                   MOVE    WRK-LASTYMD TO  TERRINF-LASTYMD
                    PERFORM 215-ERRMES-HEN-SEC
                ELSE
       *
@@ -8448,6 +8518,8 @@
                    MOVE    THEIYOU-DAY1-G (IDX0)
                                            TO  WRK-NISSU-DAY-G
                    PERFORM 200111-NISSU-HEN-SEC
+                   MOVE    WRK-NISSU-LASTYMD
+                                           TO  WRK-LASTYMD
       *
                    STRING TNS-NAME         DELIMITED   BY  SPACE
                           WRK-NISSU-MES    DELIMITED   BY SPACE
@@ -8457,6 +8529,12 @@
       *
                    MOVE    "110002"    TO   WRK-ERRCD
                    INITIALIZE              TERRINF-AREA
+                   MOVE    "A"         TO  TERRINF-CHKKBN
+                   MOVE    THEIYOU-SRYCD1 (IDX0)
+                                       TO  TERRINF-SRYCD
+                   MOVE    THEIYOU-SRYCD2 (IDX0)
+                                       TO  TERRINF-TEKCD
+                   MOVE    WRK-LASTYMD TO  TERRINF-LASTYMD
                    PERFORM 215-ERRMES-HEN-SEC
                END-IF
       *
@@ -8494,13 +8572,20 @@
       *
       *        チェックマスタよりチェック
                IF    ( FLG-CHKEND (16)     =   ZERO )
-                   MOVE    "7"         TO  WRK-CHK-CHKKBN
-                   MOVE    "2"         TO  WRK-CHK-CDKBN
+                   MOVE    "16"        TO  WRK-REIGAI-CHKNUM
+                   MOVE    "7"         TO  WRK-REIGAI-CHKKBN
                    MOVE    TSRYCD-SRYCD (IDX6)
-                                       TO  WRK-CHK-SRYCD
-                   PERFORM 900-DTCHK008-READ-SEC
-                   IF    ( FLG-DTCHK008    =   1 )
-                       PERFORM 200112-CHKMST-SRYSNT-CHK-SEC
+                                       TO  WRK-REIGAI-CD
+                   PERFORM 800-REIGAI-CHK-SEC
+                   IF    ( FLG-REIGAI  =   ZERO )
+                       MOVE    "7"         TO  WRK-CHK-CHKKBN
+                       MOVE    "2"         TO  WRK-CHK-CDKBN
+                       MOVE    TSRYCD-SRYCD (IDX6)
+                                           TO  WRK-CHK-SRYCD
+                       PERFORM 900-DTCHK008-READ-SEC
+                       IF    ( FLG-DTCHK008    =   1 )
+                           PERFORM 200112-CHKMST-SRYSNT-CHK-SEC
+                       END-IF
                    END-IF
                END-IF
       *
@@ -8701,6 +8786,8 @@
            END-IF
       *
            PERFORM 200111-NISSU-HEN-SEC
+           MOVE    WRK-NISSU-LASTYMD
+                               TO   WRK-LASTYMD
       *
            MOVE    SPACE       TO   WRK-ERRMES-PLUS
       *
@@ -8710,6 +8797,10 @@
            END-STRING
       *
            INITIALIZE              TERRINF-AREA
+           MOVE    "7"         TO  TERRINF-CHKKBN
+           MOVE    TSRYCD-SRYCD (IDX6)
+                               TO  TERRINF-SRYCD
+           MOVE    WRK-LASTYMD TO  TERRINF-LASTYMD
            PERFORM 215-ERRMES-HEN-SEC
            IF    ( ORCBSD01-CHKKBN (16)    =   "1" )
                MOVE    1       TO  FLG-CHKEND (16)
@@ -8805,6 +8896,25 @@
            MOVE    SDTCHK06-O-ID (IDX33)
                                        TO  TCHK-CHK-ID
            PERFORM 230-CHK005-GET-SEC
+           IF    ( TCHK-ACT-CD-MAX     >   ZERO )
+               MOVE    IDX-CHK         TO  WRK-REIGAI-CHKNUM9
+               MOVE    WRK-CHKKBN      TO  WRK-REIGAI-CHKKBN
+               MOVE    TCHK-ACT-BYOMEI
+                                       TO  WRK-REIGAI-CD
+               PERFORM 800-REIGAI-CHK-SEC
+               IF    ( FLG-REIGAI  =   ZERO )
+                   PERFORM 20011211-CHK005-CHK-SEC
+               END-IF
+           END-IF
+      *
+           .
+       2001121-CHK005-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ５チェック処理
+      *****************************************************************
+       20011211-CHK005-CHK-SEC          SECTION.
+      *
            MOVE    ZERO            TO  FLG-HIT
            PERFORM VARYING IDX31   FROM    1   BY  1
                    UNTIL ( IDX31   >  TCHK-ACT-CD-MAX )
@@ -8857,6 +8967,8 @@
                        MOVE    "180001"        TO  WRK-ERRCD
                    END-IF
                    INITIALIZE              TERRINF-AREA
+                   MOVE    WRK-CHKKBN          TO  TERRINF-CHKKBN
+                   MOVE    TCHK-ACT-BYOMEI     TO  TERRINF-BYOMEI
                    PERFORM 213-ERRMES-HEN-SEC
                    IF    ( ORCBSD01-CHKKBN (IDX-CHK) =   "1" )
                        MOVE    1               TO  FLG-CHKEND (IDX-CHK)
@@ -8864,7 +8976,7 @@
                END-IF
       *
            .
-       2001121-CHK005-CHK-EXT.
+       20011211-CHK005-CHK-EXT.
            EXIT.
       *****************************************************************
       *    実日数算定チェック処理
@@ -10534,6 +10646,19 @@
       *****************************************************************
        210-ERRMES-HEN-SEC              SECTION.
       *
+           PERFORM 220-REIGAI-CHK-SEC
+           IF    ( FLG-REIGAI    =     ZERO )
+               PERFORM 2101-ERRMES-HEN-SEC
+           END-IF
+      *
+           .
+       210-ERRMES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    エラーメッセージ編集処理（メッセージに付加する情報なし）
+      *****************************************************************
+       2101-ERRMES-HEN-SEC              SECTION.
+      *
            PERFORM 2111-ERRMES-GET-SEC
       *
       *    チェック結果ファイル共通編集項目編集処理
@@ -10547,12 +10672,25 @@
       *    DISPLAY "DTCHK004-REC = " DTCHK004-REC
       *
            .
-       210-ERRMES-HEN-EXT.
+       2101-ERRMES-HEN-EXT.
            EXIT.
       *****************************************************************
       *    エラーメッセージ編集処理（１）
       *****************************************************************
        211-ERRMES-HEN-SEC              SECTION.
+      *
+           PERFORM 220-REIGAI-CHK-SEC
+           IF    ( FLG-REIGAI    =     ZERO )
+               PERFORM 2111-ERRMES-HEN-SEC
+           END-IF
+      *
+           .
+       211-ERRMES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    エラーメッセージ編集処理（１）
+      *****************************************************************
+       2111-ERRMES-HEN-SEC              SECTION.
       *
            PERFORM 2111-HKNNUM-GET-SEC
       *
@@ -10578,12 +10716,25 @@
       *    DISPLAY "DTCHK004-REC = " DTCHK004-REC
       *
            .
-       211-ERRMES-HEN-EXT.
+       2111-ERRMES-HEN-EXT.
            EXIT.
       *****************************************************************
       *    エラーメッセージ編集処理（２）
       *****************************************************************
        212-ERRMES-HEN-SEC              SECTION.
+      *
+           PERFORM 220-REIGAI-CHK-SEC
+           IF    ( FLG-REIGAI    =     ZERO )
+               PERFORM 2121-ERRMES-HEN-SEC
+           END-IF
+      *
+           .
+       212-ERRMES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    エラーメッセージ編集処理（２）
+      *****************************************************************
+       2121-ERRMES-HEN-SEC              SECTION.
       *
            PERFORM 2111-KOHNUM-GET-SEC
       *
@@ -10609,13 +10760,26 @@
       *    DISPLAY "DTCHK004-REC = " DTCHK004-REC
       *
            .
-       212-ERRMES-HEN-EXT.
+       2121-ERRMES-HEN-EXT.
            EXIT.
       *****************************************************************
       *    エラーメッセージ編集処理（３）
       *****************************************************************
        213-ERRMES-HEN-SEC              SECTION.
       *
+           PERFORM 220-REIGAI-CHK-SEC
+           IF    ( FLG-REIGAI    =     ZERO )
+               PERFORM 2131-ERRMES-HEN-SEC
+           END-IF
+      *
+           .
+       213-ERRMES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    エラーメッセージ編集処理（３）
+      *****************************************************************
+       2131-ERRMES-HEN-SEC              SECTION.
+      *
            PERFORM 2111-SRYKA-GET-SEC
       *
            PERFORM 2111-ERRMES-GET-SEC
@@ -10648,13 +10812,26 @@
       *    DISPLAY "DTCHK004-REC = " DTCHK004-REC
       *
            .
-       213-ERRMES-HEN-EXT.
+       2131-ERRMES-HEN-EXT.
            EXIT.
       *****************************************************************
       *    エラーメッセージ編集処理（４）
       *****************************************************************
        214-ERRMES-HEN-SEC              SECTION.
       *
+           PERFORM 220-REIGAI-CHK-SEC
+           IF    ( FLG-REIGAI    =     ZERO )
+               PERFORM 2141-ERRMES-HEN-SEC
+           END-IF
+      *
+           .
+       214-ERRMES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    エラーメッセージ編集処理（４）
+      *****************************************************************
+       2141-ERRMES-HEN-SEC              SECTION.
+      *
            PERFORM 2111-SRYKA-GET-SEC
       *
            PERFORM 2111-ERRMES-GET-SEC
@@ -10681,12 +10858,25 @@
       *    DISPLAY "DTCHK004-REC = " DTCHK004-REC
       *
            .
-       214-ERRMES-HEN-EXT.
+       2141-ERRMES-HEN-EXT.
            EXIT.
       *****************************************************************
       *    エラーメッセージ編集処理（５）
       *****************************************************************
        215-ERRMES-HEN-SEC              SECTION.
+      *
+           PERFORM 220-REIGAI-CHK-SEC
+           IF    ( FLG-REIGAI    =     ZERO )
+               PERFORM 2151-ERRMES-HEN-SEC
+           END-IF
+      *
+           .
+       215-ERRMES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    エラーメッセージ編集処理（５）
+      *****************************************************************
+       2151-ERRMES-HEN-SEC              SECTION.
       *
            PERFORM 2111-ERRMES-GET-SEC
       *
@@ -10706,12 +10896,25 @@
       *    DISPLAY "DTCHK004-REC = " DTCHK004-REC
       *
            .
-       215-ERRMES-HEN-EXT.
+       2151-ERRMES-HEN-EXT.
            EXIT.
       *****************************************************************
       *    エラーメッセージ編集処理（６）
       *****************************************************************
        216-ERRMES-HEN-SEC              SECTION.
+      *
+           PERFORM 220-REIGAI-CHK-SEC
+           IF    ( FLG-REIGAI    =     ZERO )
+               PERFORM 2161-ERRMES-HEN-SEC
+           END-IF
+      *
+           .
+       216-ERRMES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    エラーメッセージ編集処理（６）
+      *****************************************************************
+       2161-ERRMES-HEN-SEC              SECTION.
       *
            PERFORM 2111-HKNNUM-GET-SEC
       *
@@ -10745,22 +10948,38 @@
       *    DISPLAY "DTCHK004-REC = " DTCHK004-REC
       *
            .
-       216-ERRMES-HEN-EXT.
+       2161-ERRMES-HEN-EXT.
            EXIT.
       *****************************************************************
       *    エラーメッセージ編集処理（７）
       *****************************************************************
        217-ERRMES-HEN-SEC              SECTION.
       *
+           PERFORM 220-REIGAI-CHK-SEC
+           IF    ( FLG-REIGAI    =     ZERO )
+               PERFORM 2171-ERRMES-HEN-SEC
+           END-IF
+      *
+           .
+       217-ERRMES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    エラーメッセージ編集処理（７）
+      *****************************************************************
+       2171-ERRMES-HEN-SEC             SECTION.
+      *
            PERFORM 2111-ERRMES-GET-SEC
       *
            INITIALIZE  DTCHK004-REC
+      *
+           MOVE    WRK-ERRCD           TO  DTCHK004-ERRCD
       *
            COMPUTE CNT-CHKERR  =   CNT-CHKERR  +   1
            MOVE    CNT-CHKERR          TO  DTCHK004-ERRCD-SEQ
       *
            MOVE    "Z"                 TO  DTCHK004-HKNKBN
            MOVE    TERRINF-LASTYMD     TO  DTCHK004-LASTYMD
+           MOVE    TERRINF-SRYCD       TO  DTCHK004-SRYCD
       *
            MOVE    "1"                 TO  DTCHK004-ERRSBT
            MOVE    "*****"             TO  DTCHK004-PTNUM
@@ -10778,7 +10997,42 @@
            COMPUTE CNT-DTCHK004    =   CNT-DTCHK004    +   1
       *
            .
-       217-ERRMES-HEN-EXT.
+       2171-ERRMES-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    例外チェック処理
+      *****************************************************************
+       220-REIGAI-CHK-SEC              SECTION.
+      *
+           MOVE    ZERO            TO  FLG-REIGAI
+      *
+           EVALUATE    TERRINF-CHKKBN
+           WHEN    SPACE
+               MOVE    SPACE           TO  WRK-REIGAI-CHKKBN
+               MOVE    WRK-ERRCD (1:2) TO  WRK-REIGAI-CHKNUM
+               MOVE    WRK-ERRCD       TO  WRK-REIGAI-CD
+               PERFORM 800-REIGAI-CHK-SEC
+           WHEN    "4"
+           WHEN    "5"
+           WHEN    "A"
+               MOVE    TERRINF-CHKKBN  TO  WRK-REIGAI-CHKKBN
+               MOVE    WRK-ERRCD (1:2) TO  WRK-REIGAI-CHKNUM
+               MOVE    TERRINF-SRYCD   TO  WRK-REIGAI-CD
+               MOVE    TERRINF-TEKCD   TO  WRK-REIGAI-TEKCD
+               PERFORM 800-REIGAI-CHK-SEC
+           WHEN    "6"
+               MOVE    TERRINF-CHKKBN  TO  WRK-REIGAI-CHKKBN
+               MOVE    WRK-ERRCD (1:2) TO  WRK-REIGAI-CHKNUM
+               MOVE    TERRINF-SRYCD   TO  WRK-REIGAI-CD
+               MOVE    TERRINF-TEKBYOMEI
+                                       TO  WRK-REIGAI-TEKCD
+               MOVE    TERRINF-TEKCOMPKBN
+                                       TO  WRK-REIGAI-COMPKBN
+               PERFORM 800-REIGAI-CHK-SEC
+           END-EVALUATE
+      *
+           .
+       220-REIGAI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    エラーメッセージ取得処理
@@ -10805,7 +11059,7 @@
                PERFORM 800-ZENKAKU-HEN-SEC
                MOVE    "sub"           TO  ORCSSTR-COMMAND
                MOVE    WRK-ERRMES      TO  ORCSSTR-STRING1
-               MOVE    "＃＃＃＃"      TO  ORCSSTR-STRING2
+               MOVE    "○○○○"      TO  ORCSSTR-STRING2
                MOVE    WRK-OUT-INPUT   TO  ORCSSTR-STRING3
                CALL    "orcsstring" USING  ORCSSTRINGAREA
                MOVE    ORCSSTR-STRING1 TO  WRK-ERRMES
@@ -10832,8 +11086,13 @@
            MOVE    DTCHK003-MULHKNKBN  TO  DTCHK004-MULHKNKBN
            MOVE    DTCHK003-HKNKBN     TO  DTCHK004-HKNKBN
            MOVE    ERRPTINF-BIRTHDAY   TO  DTCHK004-BIRTHDAY
+           MOVE    TERRINF-CHKKBN      TO  DTCHK004-CHKKBN
            MOVE    TERRINF-SRYCD       TO  DTCHK004-SRYCD
            MOVE    TERRINF-SRYKA       TO  DTCHK004-SRYKA
+           MOVE    TERRINF-BYOMEI      TO  DTCHK004-BYOMEI
+           MOVE    TERRINF-TEKCD       TO  DTCHK004-TEKCD
+           MOVE    TERRINF-TEKBYOMEI   TO  DTCHK004-TEKBYOMEI
+           MOVE    TERRINF-TEKCOMPKBN  TO  DTCHK004-TEKCOMPKBN
            MOVE    TERRINF-DAY-G       TO  DTCHK004-DAY-G
            MOVE    TERRINF-LASTYMD     TO  DTCHK004-LASTYMD
       *
@@ -11500,6 +11759,8 @@
                                        TO  TCHK-ACT-YUKOEDYMD
                    MOVE    TCHK-STK-CDKBN     (TCHK-IDX)
                                        TO  TCHK-ACT-CDKBN
+                   MOVE    TCHK-STK-BYOMEI    (TCHK-IDX)
+                                       TO  TCHK-ACT-BYOMEI
                    MOVE    TCHK-STK-CD-G      (TCHK-IDX)
                                        TO  TCHK-ACT-CD-G
       *
@@ -11533,6 +11794,9 @@
                                                        (TCHK-STOCK-MAX)
                    MOVE    TCHK-ACT-CDKBN
                                        TO  TCHK-STK-CDKBN
+                                                       (TCHK-STOCK-MAX)
+                   MOVE    TCHK-ACT-BYOMEI
+                                       TO  TCHK-STK-BYOMEI
                                                        (TCHK-STOCK-MAX)
                    MOVE    TCHK-ACT-CD-G
                                        TO  TCHK-STK-CD-G
@@ -11673,6 +11937,7 @@
                                                TO  TCHK-ACT-YUKOEDYMD
                        MOVE    CHK005-CDKBN
                                                TO  TCHK-ACT-CDKBN
+                       MOVE    CHK005-BYOMEI   TO  TCHK-ACT-BYOMEI
                    END-IF
       *
                    MOVE    CHK005-SRYCD        TO  TCHK-ACT-CD (IDX-MAX)
@@ -11813,20 +12078,29 @@
                IF    ( DTCHK008-CHKKBN     =   "1" )
                 AND  ( DTCHK008-CDKBN      =   "1" )
                 AND  ( DTCHK008-FORMSTCHK  =   "1" )
+                   MOVE    "A1"        TO  WRK-REIGAI-CHKNUM
+                   MOVE    "1"         TO  WRK-REIGAI-CHKKBN
+                   MOVE    DTCHK008-SRYCD
+                                       TO  WRK-REIGAI-CD
+                   PERFORM 800-REIGAI-CHK-SEC
+                   IF    ( FLG-REIGAI  =   ZERO )
       *
-                   MOVE    DTCHK008-SRYCD  TO  WRK-SRYCD
-                   MOVE    WRK-KJNYMD      TO  WRK-TNS-YMD
-                   PERFORM 900-TENSU-KEY-SEL-SEC
-                   IF    ( FLG-TENSU       NOT =   ZERO )
-                       MOVE    WRK-SRYCD       TO  WRK-MAE-INPUT
-                       PERFORM 800-ZENKAKU-HEN-SEC
-                       MOVE    WRK-OUT-INPUT   TO  TNS-NAME
+                       MOVE    DTCHK008-SRYCD  TO  WRK-SRYCD
+                       MOVE    WRK-KJNYMD      TO  WRK-TNS-YMD
+                       PERFORM 900-TENSU-KEY-SEL-SEC
+                       IF    ( FLG-TENSU       NOT =   ZERO )
+                           MOVE    WRK-SRYCD       TO  WRK-MAE-INPUT
+                           PERFORM 800-ZENKAKU-HEN-SEC
+                           MOVE    WRK-OUT-INPUT   TO  TNS-NAME
+                       END-IF
+                       MOVE    "A10001"        TO  WRK-ERRCD
+                       MOVE    TNS-NAME        TO  WRK-ERRMES-PLUS
+                       INITIALIZE                  TERRINF-AREA
+                       MOVE    "1"             TO  TERRINF-CHKKBN
+                       MOVE    DTCHK008-SRYCD  TO  TERRINF-SRYCD
+                       MOVE    WRK-KJNYMD      TO  TERRINF-LASTYMD
+                       PERFORM 217-ERRMES-HEN-SEC
                    END-IF
-                   MOVE    "A10001"        TO  WRK-ERRCD
-                   MOVE    TNS-NAME        TO  WRK-ERRMES-PLUS
-                   INITIALIZE              TERRINF-AREA
-                   MOVE    WRK-KJNYMD      TO  TERRINF-LASTYMD
-                   PERFORM 217-ERRMES-HEN-SEC
                END-IF
       *
                PERFORM 901-DTCHK008-READ-SEC
@@ -11846,6 +12120,7 @@
            INITIALIZE                  CHKREIGAI-REC
            MOVE    SPA-HOSPNUM    TO   CHKREIGAI-HOSPNUM
            MOVE    DTCHK003-PTID  TO   CHKREIGAI-PTID
+           MOVE    1              TO   CHKREIGAI-RENNUM
            PERFORM 900-DTCHK011-START-SEC
       *
            PERFORM UNTIL ( FLG-DTCHK011    NOT =   ZERO )
@@ -11854,12 +12129,47 @@
                IF    ( DTCHK011-HOSPNUM    =   SPA-HOSPNUM )
                 AND  ( DTCHK011-PTID       =   DTCHK003-PTID )
                 AND  ( DTCHK011-NYUGAIKBN  =   ORCBSD01-NYUGAIKBN )
-                AND  ( DTCHK011-CHKNUM     =   WRK-CHKNUM )
-                AND  ( DTCHK011-ERRKBN     =   WRK-ERRKBN )
-                AND  ( DTCHK011-SRYCD      =   WRK-REIGAICD )
-      *
-                   MOVE    1       TO  FLG-REIGAI
-      *
+                AND  ( DTCHK011-CHKNUM     =   WRK-REIGAI-CHKNUM )
+                   EVALUATE    WRK-REIGAI-CHKKBN
+                   WHEN    SPACE
+                       IF    ( DTCHK011-ERRCD    =   WRK-REIGAI-CD )
+                           MOVE    1       TO  FLG-REIGAI
+                       END-IF
+                   WHEN    "4"
+                   WHEN    "5"
+                   WHEN    "A"
+                       IF    ( DTCHK011-CHKKBN     = WRK-REIGAI-CHKKBN )
+                           IF    ( DTCHK011-SRYCD  = WRK-REIGAI-CD )
+                             AND ( DTCHK011-TEKCD  = WRK-REIGAI-TEKCD )
+                               MOVE    1   TO  FLG-REIGAI
+                           END-IF
+                           IF    ( DTCHK011-SRYCD  = WRK-REIGAI-TEKCD )
+                             AND ( DTCHK011-TEKCD  = WRK-REIGAI-CD )
+                               MOVE    1   TO  FLG-REIGAI
+                           END-IF
+                       END-IF
+                   WHEN    "8"
+                   WHEN    "9"
+                       IF    ( DTCHK011-CHKKBN   =   WRK-REIGAI-CHKKBN )
+                         AND ( DTCHK011-BYOMEI   =   WRK-REIGAI-CD )
+                           MOVE    1       TO  FLG-REIGAI
+                       END-IF
+                   WHEN    "6"
+                       IF    ( DTCHK011-CHKKBN     = WRK-REIGAI-CHKKBN )
+                           IF    ( DTCHK011-SRYCD  = WRK-REIGAI-CD )
+                             AND ( DTCHK011-TEKBYOMEI
+                                                   = WRK-REIGAI-TEKCD )
+                             AND ( DTCHK011-TEKCOMPKBN
+                                                   = WRK-REIGAI-COMPKBN)
+                               MOVE    1   TO  FLG-REIGAI
+                           END-IF
+                       END-IF
+                   WHEN    OTHER
+                       IF    ( DTCHK011-CHKKBN   =   WRK-REIGAI-CHKKBN )
+                         AND ( DTCHK011-SRYCD    =   WRK-REIGAI-CD )
+                           MOVE    1       TO  FLG-REIGAI
+                       END-IF
+                   END-EVALUATE
                END-IF
       *
                PERFORM 900-DTCHK011-READ-SEC

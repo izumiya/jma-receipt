@@ -92,6 +92,8 @@
            03  TBYOMEI-OCC                 OCCURS 101.
                05  TBYOMEI-NYUGAIKBN       PIC X(01).
                05  TBYOMEI-BYOMEI          PIC X(160).
+               05  TBYOMEI-TEKBYOMEI       PIC X(160).
+               05  TBYOMEI-TEKCOMPKBN      PIC X(01).
                05  TBYOMEI-ERRDAY-G.
                    07  TBYOMEI-ERRDAY      PIC 9(01)   OCCURS  31.
                05  TBYOMEI-KEY.
@@ -438,6 +440,10 @@
                                        TO  TBYOMEI-NYUGAIKBN
                                                           (TBYOMEI-MAX)
                MOVE    QDTCHK-PTBYOMEI TO  TBYOMEI-BYOMEI (TBYOMEI-MAX)
+               MOVE    QDTCHK-BYOMEI   TO  TBYOMEI-TEKBYOMEI
+                                                          (TBYOMEI-MAX)
+               MOVE    QDTCHK-COMPKBN  TO  TBYOMEI-TEKCOMPKBN
+                                                          (TBYOMEI-MAX)
                MOVE    QDTCHK-SRYKA    TO  TBYOMEI-SRYKA  (TBYOMEI-MAX)
                MOVE    QDTCHK-SRYYMD   TO  TBYOMEI-SRYYMD (TBYOMEI-MAX)
                MOVE    1               TO  TBYOMEI-ERRDAY
@@ -472,6 +478,10 @@
                                        TO  SDTCHK01-O-SRYYMD (IDX0)
                MOVE    TBYOMEI-BYOMEI (IDX0)
                                        TO  SDTCHK01-O-BYOMEI (IDX0)
+               MOVE    TBYOMEI-TEKBYOMEI (IDX0)
+                                       TO  SDTCHK01-O-TEKBYOMEI (IDX0)
+               MOVE    TBYOMEI-TEKCOMPKBN(IDX0)
+                                       TO  SDTCHK01-O-TEKCOMPKBN(IDX0)
                MOVE    TBYOMEI-NYUGAIKBN (IDX0)
                                        TO  SDTCHK01-O-NYUGAIKBN (IDX0)
                MOVE    TBYOMEI-ERRDAY-G (IDX0)

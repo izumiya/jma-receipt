@@ -25,6 +25,7 @@
                 04  D05-NYUGAIKBN          PIC X(16).
                 04  D05-NYUGAIKBN-COUNT    PIC S9(9)   BINARY.
                 04  D05-NYUGAIKBN-ITEM     PIC X(16)   OCCURS  5 TIMES.
+              03  D05-LBLMSG01             PIC X(220).
               03  D05-SW1.
                 04  D05-SW1-HPOS           PIC S9(9)   BINARY.
                 04  D05-SW1-VPOS           PIC S9(9)   BINARY.
@@ -37,7 +38,7 @@
                     06  D05-TPTNUM         PIC X(20).
                     06  D05-TNAME          PIC X(100).
                     06  D05-TCHKNUMNAME    PIC X(30).
-                    06  D05-TCHKNAIYO      PIC X(100).
+                    06  D05-TCHKNAIYO      PIC X(222).
                     06  D05-TKIKAN         PIC X(10).
                   05  D05-REIGAILST-SELECT PIC X
                                            OCCURS  100 TIMES.

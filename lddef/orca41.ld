@@ -49,7 +49,6 @@ db	{
 	tbl_rrksrh;
 	tbl_ptsrh;
 	tbl_jobkanri;
-	tbl_chk004;
 	tbl_lock;
 	tbl_ldmap;
 	tbl_ptnum;
@@ -66,7 +65,11 @@ db	{
 	tbl_chkreigai;
 	tbl_tensu;
 	tbl_ptbyomei;
+	tbl_chk;
 	tbl_chksnd;
+	tbl_chktrd;
+	tbl_chk004;
+	tbl_chk005;
 	tbl_inputcd;
 };
 

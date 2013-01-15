@@ -41,6 +41,9 @@
                    07  SDTCHK01-O-SRYKA        PIC X(02).
                    07  SDTCHK01-O-SRYYMD       PIC X(08).
                    07  SDTCHK01-O-NYUGAIKBN    PIC X(01).
+                   07  SDTCHK01-O-COMPKBN      PIC X(1).
                    07  SDTCHK01-O-BYOMEI       PIC X(160).
+                   07  SDTCHK01-O-TEKBYOMEI    PIC X(160).
+                   07  SDTCHK01-O-TEKCOMPKBN   PIC X(160).
                    07  SDTCHK01-O-ERRDAY-G.
                        09  SDTCHK01-O-ERRDAY   PIC 9(01)   OCCURS  31.

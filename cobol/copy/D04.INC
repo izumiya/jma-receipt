@@ -26,17 +26,16 @@
               03  D04-LBLSRYYM         PIC X(30).
               03  D04-LBLNYUGAI-STYLE  PIC X(20).
               03  D04-LBLNYUGAI        PIC X(20).
-              03  D04-CMB-CHKKBN.
-                04  D04-CHKKBN             PIC X(43).
-                04  D04-CHKKBN-COUNT       PIC S9(9)   BINARY.
-                04  D04-CHKKBN-ITEM        PIC X(43)   OCCURS  20.
+              03  D04-CMB-CHKNUM.
+                04  D04-CHKNUM             PIC X(43).
+                04  D04-CHKNUM-COUNT       PIC S9(9)   BINARY.
+                04  D04-CHKNUM-ITEM        PIC X(43)   OCCURS  50.
               03  D04-SELNUM               PIC S9(5).
               03  D04-PTNUM                PIC X(20).
               03  D04-NAME                 PIC X(100).
               03  D04-SEX                  PIC X(2).
               03  D04-BIRTHDAY             PIC X(10).
-              03  D04-SRYCD                PIC X(9).
-              03  D04-SRYNAME              PIC X(100).
+              03  D04-SRYNAME              PIC X(222).
               03  D04-CMB-BEHAVE.
                 04  D04-BEHAVE             PIC X(42).
                 04  D04-BEHAVE-STATE       PIC S9(9)   BINARY.
@@ -77,6 +76,8 @@
                   05  D04-BYOLST-SELECT    PIC X       OCCURS  300.
               03  D04-SW3.
                 04  D04-CHKLST.
+                  05  D04-CHKLST-LBLCHKMST PIC X(40).
+                  05  D04-CHKLST-LBLCOMPKBN PIC X(10).
                   05  D04-CHKLST-COUNT     PIC S9(9)   BINARY.
                   05  D04-CHKLST-ROW       PIC S9(9)   BINARY.
                   05  D04-CHKLST-ROWATTR   PIC S9(9)   BINARY.

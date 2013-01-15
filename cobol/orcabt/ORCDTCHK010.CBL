@@ -465,12 +465,17 @@
            MOVE    "99999999"      TO  CK4-1201-EDYUKYMD
            MOVE    DTCHK004-PTID   TO  CK4-1201-PTID
       *
-           EVALUATE    WRK-KBNCD1200-CD
-           WHEN    "08"
-               PERFORM 200111-ERRINF08-EDIT-SEC
-           WHEN    "09"
-               PERFORM 200111-ERRINF09-EDIT-SEC
-           END-EVALUATE
+           MOVE    DTCHK004-DAY-G  TO  CK4-1201-DAY-G
+           MOVE    DTCHK004-LASTYMD TO CK4-1201-LASTYMD
+           MOVE    DTCHK004-SRYCD  TO  CK4-1201-SRYCD
+           MOVE    DTCHK004-SRYKA  TO  CK4-1201-SRYKA
+           MOVE    DTCHK004-BYOMEI TO  CK4-1201-BYOMEI
+           MOVE    DTCHK004-CHKKBN TO  CK4-1201-CHKKBN
+           MOVE    DTCHK004-TEKCD  TO  CK4-1201-TEKCD
+           MOVE    DTCHK004-TEKBYOMEI
+                                   TO  CK4-1201-TEKBYOMEI
+           MOVE    DTCHK004-TEKCOMPKBN
+                                   TO  CK4-1201-TEKCOMPKBN
       *
            MOVE    SMCNDATE-YMD    TO  CK4-1201-CREYMD
                                        CK4-1201-UPYMD
@@ -487,31 +492,6 @@
       *
            .
        20011-ERRINF-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    エラー情報編集処理（薬剤と病名）
-      *****************************************************************
-       200111-ERRINF08-EDIT-SEC        SECTION.
-      *
-           MOVE    DTCHK004-DAY-G  TO  CK4-1201-DAY-G
-           MOVE    DTCHK004-LASTYMD TO CK4-1201-LASTYMD
-           MOVE    DTCHK004-SRYCD  TO  CK4-1201-SRYCD
-           MOVE    DTCHK004-SRYKA  TO  CK4-1201-SRYKA
-      *
-           .
-       200111-ERRINF08-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    エラー情報編集処理（診療行為と病名）
-      *****************************************************************
-       200111-ERRINF09-EDIT-SEC        SECTION.
-      *
-           MOVE    DTCHK004-DAY-G  TO  CK4-1201-DAY-G
-           MOVE    DTCHK004-LASTYMD TO CK4-1201-LASTYMD
-           MOVE    DTCHK004-SRYCD  TO  CK4-1201-SRYCD
-      *
-           .
-       200111-ERRINF09-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    エラー出力処理

@@ -49,14 +49,30 @@
       *    16:診療行為どうしの算定漏れ
       *    17:病名と薬剤
       *    18:病名と診療行為
-           03  CHKREIGAI-CHKNUM            PIC 9(02).
-      *エラー番号
-      *    0801:薬剤と病名,0901:診療行為と病名
-           03  CHKREIGAI-ERRKBN            PIC X(04).
+      *    19:薬剤の月上限回数・月投与量
+      *    99:その他
+      *    A1:未登録薬剤（薬剤と病名）
+           03  CHKREIGAI-CHKNUM            PIC X(02).
       *入外区分
            03  CHKREIGAI-NYUGAIKBN         PIC X(01).
+      *チェック区分
+           03  CHKREIGAI-CHKKBN            PIC X(01).
       *診療コード
            03  CHKREIGAI-SRYCD             PIC X(09).
+      *病名
+           03  CHKREIGAI-BYOMEI            PIC X(160).
+      *条件区分
+           03  CHKREIGAI-COMPKBN           PIC X(1).
+      *適用コード
+           03  CHKREIGAI-TEKCD             PIC X(9).
+      *適応病名
+           03  CHKREIGAI-TEKBYOMEI         PIC X(160).
+      *適応病名条件区分
+           03  CHKREIGAI-TEKCOMPKBN        PIC X(1).
+      *エラーコード
+           03  CHKREIGAI-ERRCD             PIC X(06).
+      *エラーメッセージ
+           03  CHKREIGAI-ERRMSG            PIC X(200).
       *開始有効年月日
            03  CHKREIGAI-STYUKYMD          PIC X(08).
       *終了有効年月日

@@ -19,6 +19,9 @@ D05	{
 			count	int;
 			item	varchar(16)[05];
 		};
+		LBLMSG01	{
+			value	varchar(220);
+		};
 		SW1	{
 			hpos	int;
 			vpos	int;
@@ -31,7 +34,7 @@ D05	{
 					value1	varchar(20);
 					value2	varchar(100);
 					value3	varchar(30);
-					value4	varchar(100);
+					value4	varchar(222);
 					value5	varchar(10);
 				}	[100];
 				select	bool[100];
