@@ -354,3 +354,15 @@ path	key16 	{
 		;
 	};
 };
+
+path	abort 	{
+	DBSELECT	{
+		error	
+		;
+	};
+	DBINSERT	{
+		error	
+		;
+	};
+};
+

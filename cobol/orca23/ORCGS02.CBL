@@ -5652,6 +5652,20 @@
                                        SPA-AREA
                                        LNK-ORCSSAIKEISAN-REC
       *
+           IF    ( SPA-ERRCD       =   SPACE )
+               PERFORM 4401-SAIKEI-SEC
+           ELSE
+               MOVE    "4008"      TO  SPA-ERRCD
+           END-IF
+           .
+       440-SAIKEI-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    再計算処理
+      **************************************************************
+       4401-SAIKEI-SEC           SECTION.
+      *
            INITIALIZE                 ORCSSYUACCAREA
            MOVE    "03"           TO  LNK-SYUACC-I-KBN
            MOVE    SPA-NAI-TSRYYMD (SPA-GMN-SELBAN)(1:6)
@@ -5672,10 +5686,10 @@
            MOVE    2                   TO  FLG-MEILIST-ROW
            PERFORM 300-SYUNOU-HENSYU-SEC
            MOVE    1                   TO  SPA-GMN-CUR
-           .
-       440-SAIKEI-EXT.
-           EXIT.
       *
+           .
+       4401-SAIKEI-EXT.
+           EXIT.
       **************************************************************
       *    外来分一括再計算チェック処理
       **************************************************************
@@ -5892,6 +5906,21 @@
              END-IF
            END-IF
            PERFORM 910-DBCLOSECURSOR-SEC
+           IF    ( SPA-ERRCD      NOT =   "0070" )
+               PERFORM 4401-IKATUSAIKEI-SEC
+           ELSE
+               MOVE    "4009"         TO  SPA-ERRCD
+           END-IF
+      *
+      *
+           .
+       440-IKATUSAIKEI-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    外来分一括再計算処理
+      **************************************************************
+       4401-IKATUSAIKEI-SEC           SECTION.
       *
            IF    SPA-ERRCD   NOT =  SPACE
                   MOVE    "0064"       TO  SPA-ERRCD
@@ -5921,9 +5950,8 @@
            MOVE    1                   TO  SPA-GMN-CUR
       *
            .
-       440-IKATUSAIKEI-EXT.
+       4401-IKATUSAIKEI-EXT.
            EXIT.
-      *
       **************************************************************
       *    返金処理
       **************************************************************
@@ -8094,7 +8122,7 @@
            WHEN    "1007"
                MOVE    "ジョブ管理ＤＢが削除できませんでした"
                                                TO  SPA-ERRMSG
-           WHEN    "4000"  THRU    "4007"
+           WHEN    "4000"  THRU    "4009"
                MOVE    "更新処理に失敗しました"
                                                TO  SPA-ERRMSG
            WHEN    "9999"

@@ -867,6 +867,7 @@
            PERFORM    VARYING   IDY    FROM   1   BY   1
                               UNTIL  (IDY                 >    15 )
                                 OR   (LNK-SYU-SRYYMD(IDY) =  SPACE)
+                                OR   (SPA-ERRCD       NOT =  SPACE)
       *
              IF   LNK-SYU-SRYKA(IDY)  NOT =  "00"
       *
@@ -3056,6 +3057,11 @@
            CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
+           IF       MCP-RC             =   ZERO
+             CONTINUE
+           ELSE
+             MOVE     "0070"           TO  SPA-ERRCD
+           END-IF
            .
       *
        4405-SMEI-SAKUSEI-EXT.

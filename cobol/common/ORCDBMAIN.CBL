@@ -102,6 +102,9 @@
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
       *
+       01  SYUMEI-REC.
+           COPY    "CPSYUMEI.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -153,7 +156,7 @@
                    MOVE    LOW-VALUE       TO  MCP-TABLE
                                                MCP-PATHNAME
                WHEN    "PUTWINDOW"
-                   CONTINUE
+                   MOVE    ZERO            TO  MCP-RC
                WHEN    OTHER
                    IF  MCP-FUNC            =   "DBFETCH"
                        MOVE    LOW-VALUE   TO  MCPDATA-REC
@@ -189,6 +192,18 @@
                    IF    ( JOB-SHELLID =   "PRGMNT" )
                        MOVE    2   TO  MCP-VERSION
                        MOVE    0   TO  MCP-REDIRECT
+                   END-IF
+               END-IF
+      *
+               IF    ( MCP-TABLE   =   "tbl_syumei" )
+                   MOVE    MCPDATA-REC
+                                   TO  SYUMEI-REC
+                   IF    ( MCP-FUNC    =   "DBINSERT" )
+                     IF  ( SMEI-DENPEDANUM   <   1 )
+                       OR( SMEI-DENPEDANUM   >   99 )
+                       MOVE    "abort"
+                                   TO  MCP-PATHNAME
+                     END-IF
                    END-IF
                END-IF
       *
