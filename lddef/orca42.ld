@@ -84,6 +84,7 @@ db	{
 	tbl_dbcatalog;
 	tbl_ptkohftnetc;
 	tbl_ryocom;
+	tbl_pt_hdist_day;
 };
 
 /* #include "orcadb.inc" */
