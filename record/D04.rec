@@ -23,12 +23,12 @@ D04	{
 			style		varchar(20);
 			value		varchar(20);
 		};
-		CMB_CHKKBN	{
-			CHKKBN	{
+		CMB_CHKNUM	{
+			CHKNUM	{
 				value	varchar(43);
 			};
 			count	int;
-			item	varchar(43)[20];
+			item	varchar(43)[50];
 		};
 		SELNUM	{
 			value	number(5);
@@ -45,11 +45,8 @@ D04	{
 		BIRTHDAY	{
 			value	varchar(10);
 		};
-		SRYCD	{
-			value	varchar(09);
-		};
 		SRYNAME	{
-			value	varchar(100);
+			value	varchar(222);
 		};
 		CMB_BEHAVE	{
 			BEHAVE	{
@@ -105,6 +102,12 @@ D04	{
 		};
 		sw3	{
 			CHKLST	{
+				LBLCHKMST	{
+					value	varchar(40);
+				};
+				LBLCOMPKBN	{
+					value	varchar(10);
+				};
 				count	int;
 				row	int;
 				rowattr	int;

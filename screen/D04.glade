@@ -387,50 +387,22 @@
     <widget>
       <class>GtkPandaEntry</class>
       <name>SRYNAME</name>
-      <x>124</x>
+      <x>16</x>
       <y>360</y>
-      <width>412</width>
+      <width>672</width>
       <height>24</height>
       <sensitive>False</sensitive>
       <editable>False</editable>
       <text_visible>True</text_visible>
-      <text_max_length>100</text_max_length>
+      <text_max_length>222</text_max_length>
       <text>ポンタール</text>
       <input_mode>XIM</input_mode>
       <xim_enabled>False</xim_enabled>
     </widget>
 
     <widget>
-      <class>GtkPandaEntry</class>
-      <name>SRYCD</name>
-      <x>16</x>
-      <y>360</y>
-      <width>104</width>
-      <height>24</height>
-      <sensitive>False</sensitive>
-      <signal>
-	<name>activate</name>
-	<handler>send_event</handler>
-	<data>ACTIVATE</data>
-	<last_modification_time>Tue, 26 Dec 2000 01:07:11 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>changed</name>
-	<handler>entry_changed</handler>
-	<data>CHANGED</data>
-	<last_modification_time>Tue, 26 Dec 2000 01:07:31 GMT</last_modification_time>
-      </signal>
-      <editable>False</editable>
-      <text_visible>True</text_visible>
-      <text_max_length>9</text_max_length>
-      <text>600000001</text>
-      <input_mode>XIM</input_mode>
-      <xim_enabled>False</xim_enabled>
-    </widget>
-
-    <widget>
       <class>GtkPandaCombo</class>
-      <name>CMB_CHKKBN</name>
+      <name>CMB_CHKNUM</name>
       <x>748</x>
       <y>12</y>
       <width>264</width>
@@ -445,7 +417,7 @@
       <widget>
 	<class>GtkPandaEntry</class>
 	<child_name>GtkPandaCombo:entry</child_name>
-	<name>CHKKBN</name>
+	<name>CHKNUM</name>
 	<can_focus>True</can_focus>
 	<signal>
 	  <name>activate</name>
@@ -471,9 +443,9 @@
     <widget>
       <class>GtkPandaEntry</class>
       <name>BYOMEI</name>
-      <x>88</x>
+      <x>84</x>
       <y>668</y>
-      <width>460</width>
+      <width>400</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <signal>
@@ -529,7 +501,7 @@
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_BEHAVE</name>
-      <x>540</x>
+      <x>692</x>
       <y>360</y>
       <width>224</width>
       <height>24</height>
@@ -618,7 +590,7 @@
 	  <last_modification_time>Wed, 19 Dec 2001 01:21:12 GMT</last_modification_time>
 	</signal>
 	<columns>5</columns>
-	<column_widths>40,100,190,80,800</column_widths>
+	<column_widths>40,100,130,80,800</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -734,7 +706,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label551</name>
+	  <name>LBLCHKMST</name>
 	  <label>チェックマスタ</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -747,7 +719,7 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
-	  <name>label552</name>
+	  <name>LBLCOMPKBN</name>
 	  <label>一致</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
@@ -959,22 +931,6 @@
       <width>68</width>
       <height>24</height>
       <label>確認項目</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label555</name>
-      <x>552</x>
-      <y>304</y>
-      <width>432</width>
-      <height>24</height>
-      <label>※薬剤と病名・診療行為と病名のチェック内容のみ参照可能です。</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
       <xalign>0</xalign>

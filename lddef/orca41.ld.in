@@ -47,7 +47,6 @@ db	{
 	tbl_ptsrh;
 	tbl_jobkanri;
 	tbl_syskanri;
-	tbl_chk004;
 	tbl_lock;
 	tbl_ldmap;
 	tbl_ptnum;
@@ -65,8 +64,12 @@ db	{
 	tbl_chkreigai;
 	tbl_tensu;
 	tbl_ptbyomei;
-	tbl_chksnd;
 	tbl_inputcd;
+	tbl_chk;
+ 	tbl_chksnd;
+	tbl_chktrd;
+	tbl_chk004;
+	tbl_chk005;
 };
 
 /* #include "orcadb.inc" */

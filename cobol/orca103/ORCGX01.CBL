@@ -399,7 +399,6 @@
       *
       *    他のＬＤより
            IF    ( LINKAREA        NOT =   SPACE )
-               DISPLAY "X01 CCC"
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
                MOVE    SPA-WORK            TO  SENDX01-AREA
                MOVE    SPACE               TO  LINKAREA
@@ -500,22 +499,29 @@
       *
            MOVE    SENDX01-CHKKBN          TO  SPA-GMN-CHKKBN
            PERFORM 4105-CHKKBN-CHK-SEC
-           MOVE    SENDX01-SRYCD           TO  SPA-GMN-SRYCD
-           PERFORM 41041-SRYCD-CHKSND-SEC
       *
-           MOVE    SPA-GMN-SRYCD       TO  WRK-TNS-SRYCD
-           MOVE    SENDX01-SRYYMD      TO  WRK-TNS-YUKOSTYMD
-           PERFORM 41041-SRYNAME-HEN-SEC
-           MOVE    WRK-TNS-NAME        TO  SPA-GMN-NAME
+           EVALUATE    SPA-GMN-CHKKBN
+           WHEN    "8"
+           WHEN    "9"
+               MOVE    SENDX01-BYOMEI  TO  X01-NAME
+               PERFORM 4100-BYOMEI-CHK-SEC
+               DISPLAY "SPA-GMN-NAME=" SPA-GMN-NAME
+            WHEN   OTHER
+               MOVE    SENDX01-SRYCD   TO  SPA-GMN-SRYCD
+               PERFORM 4103-SRYCD-CHK-SEC
+           END-EVALUATE
       *
            MOVE    "00000000"              TO  SPA-NAI-STYUKYMD
                                                SPA-GMN-STYUKYMD
            MOVE    "99999999"              TO  SPA-NAI-EDYUKYMD
                                                SPA-GMN-EDYUKYMD
       *
+           MOVE    SPACE                   TO  SPA-GMN-SELNUM
+           MOVE    ZERO                    TO  SPA-NAI-SELNUM
+      *
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL ( IDX         >   SPA-GMN-MAX )
-                    OR   ( SPA-X01-SELNUM  NOT =   ZERO )
+                    OR   ( SPA-GMN-SELNUM  NOT =   SPACE )
       *
                IF    ( SENDX01-SRYYMD  >=  SPA-NAI-TSTYUKYMD (IDX))
                 AND  ( SENDX01-SRYYMD  <=  SPA-NAI-TEDYUKYMD (IDX))
@@ -525,6 +531,7 @@
                    MOVE    SPA-NAI-TEDYUKYMD (IDX) TO  SPA-NAI-EDYUKYMD
                    MOVE    SPA-GMN-TSTYUKYMD (IDX) TO  SPA-GMN-STYUKYMD
                    MOVE    SPA-GMN-TEDYUKYMD (IDX) TO  SPA-GMN-EDYUKYMD
+                   MOVE    SPA-NAI-TID (IDX)       TO  SPA-NAI-ID
                ELSE
                    IF    ( SENDX01-SRYYMD  >   SPA-NAI-TEDYUKYMD (IDX))
                        MOVE    SPA-NAI-TEDYUKYMD (IDX)
@@ -1219,21 +1226,8 @@
                PERFORM 41041-SRYCD-CHKTRD-SEC
            END-EVALUATE
       *
-           EVALUATE    SPA-GMN-MAX
-           WHEN    ZERO
-               MOVE    4                       TO  SPA-GMN-CUR
-           WHEN    1
-               MOVE    SPA-GMN-TSTYUKYMD (1)   TO  SPA-GMN-STYUKYMD
-               MOVE    SPA-NAI-TSTYUKYMD (1)   TO  SPA-NAI-STYUKYMD
-               MOVE    SPA-GMN-TEDYUKYMD (1)   TO  SPA-GMN-EDYUKYMD
-               MOVE    SPA-NAI-TEDYUKYMD (1)   TO  SPA-NAI-EDYUKYMD
-               MOVE    "001"                   TO  SPA-GMN-SELNUM
-               MOVE    1                       TO  SPA-NAI-SELNUM
-               MOVE    1                       TO  SPA-NAI-SELNO
-               MOVE    12                      TO  SPA-GMN-CUR
-           WHEN    OTHER
-               MOVE    3                       TO  SPA-GMN-CUR
-           END-EVALUATE
+           PERFORM 41041-CHKKBNLIST-SEL-SEC
+      *
            .
        4104-SRYCD-CHK-EXT.
            EXIT.
@@ -1376,6 +1370,71 @@
       *
            .
        41041-SRYCD-CHKTRD-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェック区分リスト選択処理
+      *****************************************************************
+       41041-CHKKBNLIST-SEL-SEC             SECTION.
+      *
+           MOVE    SPACE                       TO  SPA-GMN-SELNUM
+           MOVE    ZERO                        TO  SPA-NAI-SELNUM
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL ( IDX         >   SPA-GMN-MAX )
+                    OR   ( SPA-GMN-SELNUM  NOT =   SPACE )
+      *
+               IF    ( SPA-SYSYMD  >=  SPA-NAI-TSTYUKYMD (IDX))
+                AND  ( SPA-SYSYMD  <=  SPA-NAI-TEDYUKYMD (IDX))
+                   MOVE    IDX                     TO  SPA-NAI-SELNUM
+                   MOVE    SPA-NAI-SELNUM          TO  SPA-GMN-SELNUM
+                                                       SPA-NAI-SELNO
+                   MOVE    SPA-NAI-TSTYUKYMD (IDX) TO  SPA-NAI-STYUKYMD
+                   MOVE    SPA-NAI-TEDYUKYMD (IDX) TO  SPA-NAI-EDYUKYMD
+                   MOVE    SPA-GMN-TSTYUKYMD (IDX) TO  SPA-GMN-STYUKYMD
+                   MOVE    SPA-GMN-TEDYUKYMD (IDX) TO  SPA-GMN-EDYUKYMD
+                   MOVE    SPA-NAI-TID (IDX)       TO  SPA-NAI-ID
+               ELSE
+                   IF    ( SPA-SYSYMD  >   SPA-NAI-TEDYUKYMD (IDX))
+                       MOVE    SPA-NAI-TEDYUKYMD (IDX)
+                                                   TO  WRK-SYMD
+                       MOVE    "1"                 TO  WRK-ZOGENPTN
+                       MOVE    1                   TO  WRK-ZOGEN
+                       PERFORM 800-CALENDAR-SEC
+                       MOVE    WRK-SYMD            TO  WRK-YMD
+                       PERFORM 5002-HIZUKE-CHK-SEC
+                       MOVE    WRK-SYMD            TO  SPA-NAI-STYUKYMD
+                       MOVE    WRK-HENYMDG         TO  SPA-GMN-STYUKYMD
+                   END-IF
+      *
+                   IF    ( SPA-SYSYMD  <   SPA-NAI-TEDYUKYMD (IDX))
+                       MOVE    SPA-NAI-TEDYUKYMD (IDX)
+                                                   TO  WRK-SYMD
+                       MOVE    "1"                 TO  WRK-ZOGENPTN
+                       MOVE    -1                  TO  WRK-ZOGEN
+                       PERFORM 800-CALENDAR-SEC
+                       MOVE    WRK-SYMD            TO  WRK-YMD
+                       PERFORM 5002-HIZUKE-CHK-SEC
+                       MOVE    WRK-SYMD            TO  SPA-NAI-EDYUKYMD
+                       MOVE    WRK-HENYMDG         TO  SPA-GMN-EDYUKYMD
+                   END-IF
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( SPA-GMN-MAX     =   ZERO )
+               MOVE    4                       TO  SPA-GMN-CUR
+           ELSE
+               IF    ( SPA-GMN-SELNUM  NOT =   ZERO )
+                   MOVE    12              TO  SPA-GMN-CUR
+               ELSE
+                   MOVE    3               TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+      *
+           .
+       41041-CHKKBNLIST-SEL-EXT.
            EXIT.
       *****************************************************************
       *    診療行為名称編集処理
@@ -1708,18 +1767,7 @@
            MOVE    "key2"               TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           EVALUATE    SPA-GMN-MAX
-           WHEN    ZERO
-               MOVE    4                       TO  SPA-GMN-CUR
-           WHEN    1
-               MOVE    "001"                   TO  SPA-GMN-SELNUM
-               MOVE    1                       TO  SPA-NAI-SELNUM
-               MOVE    1                       TO  SPA-NAI-SELNO
-               PERFORM 41011-SELNUM-HENSYU-SEC
-               MOVE    12                      TO  SPA-GMN-CUR
-           WHEN    OTHER
-               MOVE    3                       TO  SPA-GMN-CUR
-           END-EVALUATE
+           PERFORM 41041-CHKKBNLIST-SEL-SEC
       *
            .
        41011-BYOMEI-CHK005-EXT.

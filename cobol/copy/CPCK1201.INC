@@ -44,7 +44,13 @@
                05  CK4-1201-LASTYMD     PIC  X(08).
                05  CK4-1201-SRYCD       PIC  X(09).
                05  CK4-1201-SRYKA       PIC  X(02).
-               05  CK4-1201-FILLER      PIC  X(450).
+               05  CK4-1201-CHKKBN      PIC  X(01).
+               05  CK4-1201-BYOMEI      PIC  X(80).
+               05  CK4-1201-COMPKBN     PIC  X(1).
+               05  CK4-1201-TEKCD       PIC  X(09).
+               05  CK4-1201-TEKBYOMEI   PIC  X(80).
+               05  CK4-1201-TEKCOMPKBN  PIC  X(1).
+               05  CK4-1201-FILLER      PIC  X(278).
       *Ã¼Ëö£É£Ä
            03  CK4-1201-TERMID          PIC  X(16).
       *¥ª¥Ú¡¼¥ì¡¼¥¿£É£Ä

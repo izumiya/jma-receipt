@@ -26,13 +26,6 @@
       *
          03  ERRMES-VAL.
       *
-      *    ** 00xxxx 基本チェック
-      *                            +---------+---------+---------+.
-           05 PIC  X(06)   VALUE   "000001".
-           05 PIC  X(30)   VALUE   "患者情報が参照できません      ".
-           05 PIC  X(30)   VALUE   "                              ".
-           05 PIC  X(30)   VALUE   "                              ".
-      *
       *    ** 01xxxx 保険者番号抜け
       *                            +---------+---------+---------+.
            05 PIC  X(06)   VALUE   "010001".
@@ -368,6 +361,11 @@
            05 PIC  X(30)   VALUE   "併用禁忌の薬剤が入力されていま".
            05 PIC  X(30)   VALUE   "す                            ".
            05 PIC  X(30)   VALUE   "                              ".
+      *                            +---------+---------+---------+.
+           05 PIC  X(06)   VALUE   "100002".
+           05 PIC  X(30)   VALUE   "併用禁忌の薬剤が入力されていま".
+           05 PIC  X(30)   VALUE   "す（相互作用マスタより）      ".
+           05 PIC  X(30)   VALUE   "                              ".
       *
       *    ** 11xxxx 併用算定の診療行為
       *                            +---------+---------+---------+.
@@ -497,6 +495,11 @@
            05 PIC  X(30)   VALUE   "                              ".
       *    ** 99xxxx その他必須チェック
       *                            +---------+---------+---------+.
+           05 PIC  X(06)   VALUE   "990000".
+           05 PIC  X(30)   VALUE   "患者情報が参照できません      ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *
            05 PIC  X(06)   VALUE   "990001".
            05 PIC  X(30)   VALUE   "システム管理と診療行為より入力".
            05 PIC  X(30)   VALUE   "された減算のコードが重複してい".
@@ -553,7 +556,7 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  97.
+           05 ERRMES-OCC   OCCURS  98.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(90).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   97.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   98.

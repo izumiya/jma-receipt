@@ -189,6 +189,7 @@
            03  THEIYOU-OCC                             OCCURS 4000.
                05  THEIYOU-SRYCD-G.
                    07  THEIYOU-CHKKBN                  PIC X(01).
+                   07  THEIYOU-INTERACT                PIC X(01).
                    07  THEIYOU-NYUGAIKBN1              PIC X(01).
                    07  THEIYOU-SRYCD1                  PIC X(09).
                    07  THEIYOU-DAY1-G.
@@ -211,6 +212,7 @@
                05  TCHK-ACT-YUKOSTYMD                  PIC X(08).
                05  TCHK-ACT-YUKOEDYMD                  PIC X(08).
                05  TCHK-ACT-CDKBN                      PIC X(01).
+               05  TCHK-ACT-BYOMEI                     PIC X(160).
                05  TCHK-ACT-CD-G.
                    07  TCHK-ACT-CD-MAX                 PIC 9(05).
                    07  TCHK-ACT-CD-OCC                 OCCURS  200.
@@ -235,6 +237,7 @@
                    07  TCHK-STK-YUKOSTYMD              PIC X(08).
                    07  TCHK-STK-YUKOEDYMD              PIC X(08).
                    07  TCHK-STK-CDKBN                  PIC X(01).
+                   07  TCHK-STK-BYOMEI                 PIC X(160).
                    07  TCHK-STK-CD-G.
                        09  TCHK-STK-CD-MAX             PIC 9(05).
                        09  TCHK-STK-CD-OCC             OCCURS  200.

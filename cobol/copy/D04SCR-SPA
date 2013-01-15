@@ -32,10 +32,10 @@
                05  SPA-GMN-ERR-AREA.
                    07  SPA-GMN-LBLSRYYM        PIC X(30).
                    07  SPA-GMN-LBLNYUGAI       PIC X(10).
-                   07  SPA-GMN-CHKKBN-G.
-                       09  SPA-GMN-CHKKBN      PIC X(02).
-                       09  SPA-GMN-CHKKBNFL    PIC X(01).
-                       09  SPA-GMN-CHKKBNMEI   PIC X(40).
+                   07  SPA-GMN-CHKNUM-G.
+                       09  SPA-GMN-CHKNUM      PIC X(02).
+                       09  SPA-GMN-CHKNUMFL    PIC X(01).
+                       09  SPA-GMN-CHKNUMMEI   PIC X(40).
                05  SPA-GMN-PTINF-AREA.
                    07  SPA-GMN-PTNUM           PIC X(20).
                    07  SPA-GMN-NAME            PIC X(100).
@@ -44,6 +44,12 @@
                05  SPA-GMN-PTINFERR-AREA.
                    07  SPA-GMN-SRYCD           PIC X(9).
                    07  SPA-GMN-SRYNAME         PIC X(100).
+                   07  SPA-GMN-CBYOMEI         PIC X(160).
+                   07  SPA-GMN-TEKCD           PIC X(9).
+                   07  SPA-GMN-TEKNAME         PIC X(100).
+                   07  SPA-GMN-TEKBYOMEI       PIC X(80).
+                   07  SPA-GMN-TEKCOMPKBN      PIC X(1).
+                   07  SPA-GMN-ERRCD           PIC X(06).
                    07  SPA-GMN-ERRMSG          PIC X(200).
                    07  SPA-GMN-BEHAVE-G.
                        09  SPA-GMN-BEHAVE      PIC X(1).
@@ -81,14 +87,17 @@
                        09  SPA-GMN-TCHKBYOMEI  PIC X(100).
                        09  SPA-GMN-TGRPID      PIC X(1).
                        09  SPA-GMN-TCOMPKBN    PIC X(4).
+                       09  SPA-GMN-TDAYMONTHKBN PIC X(4).
+                       09  SPA-GMN-TCHKSRYNAME PIC X(100).
+                       09  SPA-GMN-TCHKTEKCD   PIC X(9).
                05  SPA-GMN-BYOMEI              PIC X(100).
            03  SPA-GMN-COMBO-AREA.
-               05  SPA-GMN-CHKKBNLST-G.
-                   07  SPA-GMN-CHKKBN-MAX      PIC 9(03).
-                   07  SPA-GMN-CHKKBNLST       OCCURS  20.
-                       09  SPA-GMN-CHKKBNL     PIC X(02).
-                       09  SPA-GMN-CHKKBNFLL   PIC X(01).
-                       09  SPA-GMN-CHKKBNMEIL  PIC X(40).
+               05  SPA-GMN-CHKNUMLST-G.
+                   07  SPA-GMN-CHKNUM-MAX      PIC 9(03).
+                   07  SPA-GMN-CHKNUMLST       OCCURS  50.
+                       09  SPA-GMN-CHKNUML     PIC X(02).
+                       09  SPA-GMN-CHKNUMFLL   PIC X(01).
+                       09  SPA-GMN-CHKNUMMEIL  PIC X(40).
                05  SPA-GMN-BEHAVELST-G.
                    07  SPA-GMN-BEHAVE-MAX      PIC 9(03).
                    07  SPA-GMN-BEHAVELST       OCCURS  5.
@@ -106,21 +115,26 @@
                    07  SPA-NAI-PTID            PIC 9(10).
                    07  SPA-NAI-BIRTHDAY        PIC X(08).
                05  SPA-NAI-PTINFERR-AREA.
-                   07  SPA-NAI-CHKKBN          PIC X(02).
-                   07  SPA-NAI-ERRKBN          PIC X(04).
+                   07  SPA-NAI-CHKKBN          PIC X(01).
+                   07  SPA-NAI-CHKNUM          PIC X(02).
+                   07  SPA-NAI-ERRMSG          PIC X(200).
                    07  SPA-NAI-SRYKA           PIC X(02).
                    07  SPA-NAI-REIGAI          PIC X(01).
                05  SPA-NAI-ERRLST-AREA.
                    07  SPA-NAI-ERRLST-OCC      OCCURS  200.
                        09  SPA-NAI-TPTID       PIC 9(10).
                        09  SPA-NAI-TKBNCD      PIC X(08).
+                       09  SPA-NAI-TCHKNUM     PIC X(02).
                        09  SPA-NAI-TERRCD      PIC X(06).
-                       09  SPA-NAI-TERRKBN     PIC X(04).
+                       09  SPA-NAI-TCHKKBN     PIC X(01).
                05  SPA-NAI-BYOLST-AREA.
                    07  SPA-NAI-BYOLST-PTID     PIC 9(10).
                05  SPA-NAI-CHKLST-AREA.
-                   07  SPA-NAI-CHKLST-CHKKBN   PIC X(02).
+                   07  SPA-NAI-CHKLST-NOCHK    PIC X(01).
+                   07  SPA-NAI-CHKLST-CHKKBN   PIC X(01).
+                   07  SPA-NAI-CHKLST-CHKNUM   PIC X(02).
                    07  SPA-NAI-CHKLST-SRYCD    PIC X(09).
+                   07  SPA-NAI-CHKLST-BYOMEI   PIC X(160).
       ********
          02  SPA-D05.
            03  SPA-GMN-D05-CUR                 PIC 9(03).
@@ -148,7 +162,7 @@
                    07  SPA-GMN-D05-TPTNUM          PIC X(20).
                    07  SPA-GMN-D05-TNAME           PIC X(100).
                    07  SPA-GMN-D05-TCHKNUMNAME     PIC X(30).
-                   07  SPA-GMN-D05-TCHKNAIYO       PIC X(100).
+                   07  SPA-GMN-D05-TCHKNAIYO       PIC X(222).
                    07  SPA-GMN-D05-TKIKAN          PIC 9(1).
            03  SPA-NAI-D05-AREA.
                05  SPA-NAI-D05-SRYYM               PIC X(06).
