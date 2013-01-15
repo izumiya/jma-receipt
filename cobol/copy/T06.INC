@@ -75,6 +75,7 @@
                     06  T06-RECE-TRECESYUBETU PIC X(4).
                     06  T06-RECE-THKNJANUM    PIC X(8).
                     06  T06-RECE-TKIGO        PIC X(40).
+                    06  T06-RECE-TRECEIPT-KBN PIC X(4).
                     06  T06-RECE-THOJOKBN     PIC X(2).
                     06  T06-RECE-TCREYMD      PIC X(9).
                   05  T06-RECE-LIST-SELECT

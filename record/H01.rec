@@ -2134,6 +2134,10 @@ H01	{
                     style   varchar(20);
 			value	varchar(20);
 		};
+		RECEIPT_KBN	{
+                    style   varchar(20);
+			value	varchar(10);
+		};
 		HENREI_MSG	{
                     style   varchar(20);
 			value	varchar(14);

@@ -41,6 +41,9 @@
       *
       *  04.06.01    NACL-Æ£¸¶    10/10/12  ¸øÈñÃ±ÆÈ¤Î¥ì¥»Ê¬Î¥ÂÐ±þ
       *                                     ¥­¡¼¤Ëkohid ÄÉ²Ã
+      *  04.06.02    NACL-Æ£¸¶    12/10/26  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
+      *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
+      *                                     receipt_kbn ÄÉ²Ã 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1072,6 +1075,8 @@
                                            =   ONRECE-B-KOHID        )
                        AND   ( HENREI-B-S-TEKSTYMD     (IDZZ)
                                            =   ONRECE-B-TEKSTYMD     )
+                       AND   ( HENREI-B-S-RECEIPT-KBN  (IDZZ)
+                                           =   ONRECE-B-RECEIPT-KBN  )
                            MOVE    HENREI-B-REC    TO  WRK-HENREI-B-REC
                            MOVE    1               TO  IDZZ
                            MOVE    1               TO  FLG-HENREI-B
@@ -1223,6 +1228,8 @@
                                    WRK-HENREI-B-S-KOHID-KEY   (IDZZ)
                    AND     ONRECE-B-TEKSTYMD       =
                                    WRK-HENREI-B-S-TEKSTYMD    (IDZZ)
+                   AND     ONRECE-B-RECEIPT-KBN    =
+                                   WRK-HENREI-B-S-RECEIPT-KBN (IDZZ)
                        MOVE    SMCNDATE-YMD    TO
                                        WRK-HENREI-B-S-SYORIYMD (IDZZ)  
                        MOVE    1               TO
@@ -1734,6 +1741,8 @@
            MOVE    ONRECE-B-HOJOKBN    TO  RECEDEN-HOJOKBN-KEY
            MOVE    ONRECE-B-KOHID      TO  RECEDEN-KOHID-KEY
            MOVE    ONRECE-B-TEKSTYMD   TO  RECEDEN-TEKSTYMD
+           MOVE    ONRECE-B-RECEIPT-KBN
+                                       TO  RECEDEN-RECEIPT-KBN
            MOVE    "1"                 TO  RECEDEN-RECKBN
            MOVE    RECEDEN-REC         TO  MCPDATA-REC
            IF      WRK-PARA-PRTKBN     =   "1"

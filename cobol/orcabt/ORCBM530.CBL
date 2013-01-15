@@ -29,6 +29,9 @@
       *  Maj/Min/Rev  修正者       日付      内容
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.02    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1027,6 +1030,8 @@
            MOVE    ONRECE-B-HOJOKBN    TO  RECEDEN-HOJOKBN-KEY
            MOVE    ONRECE-B-KOHID      TO  RECEDEN-KOHID-KEY
            MOVE    ONRECE-B-TEKSTYMD   TO  RECEDEN-TEKSTYMD
+           MOVE    ONRECE-B-RECEIPT-KBN
+                                       TO  RECEDEN-RECEIPT-KBN
            MOVE    "2"                 TO  RECEDEN-RECKBN
            MOVE    RECEDEN-REC         TO  MCPDATA-REC
            MOVE    "tbl_receden"       TO  MCP-TABLE
@@ -1102,6 +1107,8 @@
            MOVE    ONRECE-B-HOJOKBN    TO  RECE10-HOJOKBN-KEY
            MOVE    ONRECE-B-KOHID      TO  RECE10-KOHID-KEY
            MOVE    ONRECE-B-TEKSTYMD   TO  RECE10-TEKSTYMD
+           MOVE    ONRECE-B-RECEIPT-KBN
+                                       TO  RECE10-RECEIPT-KBN
            MOVE    RECE10-REC          TO  MCPDATA-REC
            MOVE    "tbl_seikyu"        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
@@ -1177,7 +1184,6 @@
            MOVE    RECE10-TEKSTYMD TO  PTKOH-TEKSTYMD
            MOVE    RECE10-TEKSTYMD TO  PTKOH-TEKEDYMD
            MOVE    PTKOH-REC       TO  MCPDATA-REC
-      *     MOVE    RECE10-TEKSTYMD     TO  ORC-DBYMD
            MOVE    "DBSELECT"      TO  MCP-FUNC
            MOVE    "tbl_ptkohinf"  TO  MCP-TABLE
            MOVE    "key6"          TO  MCP-PATHNAME

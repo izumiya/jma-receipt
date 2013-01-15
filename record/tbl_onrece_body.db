@@ -29,6 +29,7 @@ tbl_onrece_body   {
 	HOJOKBN			char(1);
 	KOHID			number(10);
 	TEKSTYMD        	char(8);
+	RECEIPT_KBN     	char(10);
 	H_TTL_TEN		number(8);
 	FTNNUM_1		varchar(8);
 	JKYNUM_1		varchar(7);
@@ -224,6 +225,7 @@ path    upd1    {
 	HOJOKBN		=	:HOJOKBN,
 	KOHID		=	:KOHID,
 	TEKSTYMD	=	:TEKSTYMD,
+	RECEIPT_KBN	=	:RECEIPT_KBN,
 	H_TTL_TEN	=	:H_TTL_TEN,
 	FTNNUM_1	=	:FTNNUM_1,
 	JKYNUM_1	=	:JKYNUM_1,

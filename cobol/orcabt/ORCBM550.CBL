@@ -35,6 +35,9 @@
       *  04.06.02    NACL-藤原    11/02/14  OpenCOBOL 1.0.0 対応
       *  04.06.03    NACL-藤原    12/06/19  取り込み時のレコード長変更
       *  04.06.03    NACL-藤原    12/08/10  取り込み時の条件変更
+      *  04.06.04    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -115,6 +118,10 @@
            03  IDXX                    PIC 9(03).
            03  IDYY                    PIC 9(05).
            03  IDZZ                    PIC 9(05).
+      *
+           03  IDX1                    PIC 9(05).
+           03  IDX2                    PIC 9(05).
+           03  IDX3                    PIC 9(05).
       *
       *    取り込みファイル名
        01  ASS-AREA.
@@ -1864,6 +1871,23 @@
                                MOVE    "W42"   TO  WRK-ERRCD
                                PERFORM 500-ERRCD-HENSYU-SEC
                            END-IF
+      *                特記事項（０７、０８）
+                       WHEN    12
+                           PERFORM VARYING IDX1    FROM    1   BY  2
+                                   UNTIL   IDX1    >       WRK-MO-CNT
+                               COMPUTE IDX2    =   WRK-MO-ST   +   IDX1
+                                                               -   1
+                               IF      WRK-PARA-REC (IDX2:2)   =   "07"
+                                   MOVE    "1"         TO
+                                               WRK-HENREI-B-RECEIPT-KBN
+                                   MOVE    WRK-MO-CNT  TO  IDX1
+                               END-IF
+                               IF      WRK-PARA-REC (IDX2:2)   =   "08"
+                                   MOVE    "2"         TO
+                                               WRK-HENREI-B-RECEIPT-KBN
+                                   MOVE    WRK-MO-CNT  TO  IDX1
+                               END-IF
+                           END-PERFORM    
                        WHEN    14
                            MOVE    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
                                                TO  WRK-HENREI-B-PTNUM

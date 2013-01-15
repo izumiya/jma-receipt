@@ -59,6 +59,8 @@
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
       *  04.06.02    NACL-藤原    11/01/05  機能追加（注加算、同時併施等）
+      *  04.06.03    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -171,6 +173,7 @@ grpsys     COPY    "COMMON-SPA".
                05  OLD-RECE041-HOJOKBN     PIC  X(01).
                05  OLD-RECE041-KOHID       PIC  9(10).
                05  OLD-RECE041-TEKSTYMD    PIC  X(08). 
+               05  OLD-RECE041-RECEIPT-KBN PIC  X(10).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).

@@ -223,9 +223,12 @@
       *  04.06.05    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
       *  04.06.06    NACL-藤原    12/09/27  生活保護期間重複対応
+      *  04.06.07    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-藤原    12/03/25  公費記載順設定対応
+      *  04.07.03    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -305,6 +308,7 @@
            03  FLG-BTPARA                              PIC 9(01).
            03  FLG-SYUKA                               PIC 9(01).
            03  FLG-PTKOHINF                            PIC 9(01).
+           03  FLG-PT-HDIST-DAY                        PIC 9(01).
       * 
            03  FLG-KOH                                 PIC 9(01).
            03  FLG-CONTKBN                             PIC 9(01).
@@ -326,6 +330,8 @@
            03  IDX1                                    PIC 9(03). 
            03  IDX2                                    PIC 9(03). 
            03  IDX3                                    PIC 9(03). 
+           03  IDX4                                    PIC 9(03). 
+           03  IDX5                                    PIC 9(03). 
            03  IDY                                     PIC 9(03). 
            03  IDZ                                     PIC 9(03).
            03  IDXX                                    PIC 9(03).
@@ -578,6 +584,22 @@
                    07  TBL-SYS2013     PIC X(610).
            03  TBL-SYS2013-MAX         PIC 9(03).
       *
+      *    施設入所情報（９５０、９５１）退避用領域
+       01  TABLE-PTKOHINF-AREA.
+           02  TBL-PTKOHINF-REC        OCCURS  10.
+           COPY    "CPPTKOHINF.INC"
+                                   REPLACING   //PTKOH//
+                                   BY          //TBL-PTKOH//.
+           02  TBL-PTKOHINF-MAX    PIC 9(02).
+      *
+      *    患者レセプト分割情報退避用領域
+       01  TBL-PT-HDIST-DAY-T.
+         02  TBL-PT-HDIST-DAY-REC      OCCURS  10.
+           COPY    "CPPT-HDIST-DAY.INC"
+                                   REPLACING   //PT-HDIST-DAY//
+                                   BY          //TBL-PT-HDIST-DAY//.
+         02  TBL-PT-HDIST-DAY-MAX  PIC 9(02).
+      *
        01  WRK-CONS-AREA.
       *    労災保険番号 
            03  WRK-CONS-ROUSAI-HKNNUM  PIC X(03)   VALUE   "971". 
@@ -678,6 +700,10 @@
       *    患者公費情報
        01  PTKOHINF-REC.
            COPY    "CPPTKOHINF.INC".
+      *
+      *    患者レセプト分割
+       01  PT-HDIST-DAY-REC.
+           COPY    "CPPT-HDIST-DAY.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -1114,7 +1140,7 @@ grpsys     MOVE    SPA-HOSPNUM             TO  PTINF-HOSPNUM
            MOVE    KEY-N-PTID              TO  WRK-SYUKA-PTID
            PERFORM 800-MISEIKYU-CHECK-SEC
       *
-           DISPLAY "SRYACCT PTID=" KEY-N-PTID 
+           DISPLAY "SRYACCT PTID=" WRK-SYUKA-PTID
                    " TSTPTNUMKBN=" PTINF-TSTPTNUMKBN
                    " MISEIKYU-FLG=" SYUKA-MISEIKYU-FLG
       *
@@ -1129,13 +1155,19 @@ grpsys     MOVE    SPA-HOSPNUM             TO  PTINF-HOSPNUM
                    PERFORM 900-SRYACCT-READ-SEC
                END-PERFORM
            ELSE
+      *        施設入所情報
+               PERFORM 500-SISETU-HENSYU-SEC
+      *
+      *        患者レセプト分割情報情報
+               PERFORM 500-PT-HDIST-DAY-HENSYU-SEC
+      *
+      *        患者年齢計算
+               PERFORM 500-AGECHK-SEC
+      *
                MOVE    KEY-NEW             TO  KEY-OLD
                PERFORM         UNTIL   FLG-SRYACCT     =   1 
                                OR      FLG-END         =   1 
                                OR      KEY-N-PTID  NOT =   KEY-O-PTID
-      *
-      *            患者年齢計算
-                   PERFORM 500-AGECHK-SEC
       *
       *            保険組合せ読込み
                    INITIALIZE                  HKNCOMBI-REC
@@ -1858,7 +1890,83 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
                                                WRK-RECE01-HOJOKBN
                    END-EVALUATE
              END-EVALUATE
-           END-IF           
+           END-IF
+      *
+      *    施設入所の有無
+           IF    ( WRK-RECE01-RECEIPT-KBN (1:1)
+                                           =   SPACE )
+           AND   ( TBL-PTKOHINF-MAX        >   ZERO  )
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL   IDX1    >       TBL-PTKOHINF-MAX
+                   IF    ( TBL-PTKOH-TEKSTYMD (IDX1)
+                                           <=  COMB-TEKSTYMD           )
+                   AND   ( COMB-TEKEDYMD   <=  TBL-PTKOH-TEKEDYMD(IDX1))
+                       IF      TBL-PTKOH-KOHNUM (IDX1)
+                                               =   "950"
+                           MOVE    "1"     TO  WRK-RECE01-RECEIPT-KBN
+                                                                   (1:1)
+                       END-IF
+                       IF      TBL-PTKOH-KOHNUM (IDX1)
+                                               =   "951"
+                           MOVE    "2"     TO  WRK-RECE01-RECEIPT-KBN
+                                                                   (1:1)
+                       END-IF
+                       MOVE    TBL-PTKOHINF-MAX
+                                           TO  IDX1
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *    患者レセプト分割情報の有無
+           IF    ( WRK-RECE01-RECEIPT-KBN (2:3)
+                                           =   SPACE )
+           AND   ( TBL-PT-HDIST-DAY-MAX    >   ZERO  )
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL   IDX1    >       TBL-PT-HDIST-DAY-MAX
+                   PERFORM VARYING IDX4    FROM    1   BY  1
+                           UNTIL   IDX4    >       2
+                       PERFORM VARYING IDX5    FROM    1   BY  1
+                               UNTIL   IDX5    >       10
+                               OR      TBL-PT-HDIST-DAY-HKNCOMBI
+                                                       (IDX1 IDX4 IDX5)
+                                               =   ZERO
+                         IF      TBL-PT-HDIST-DAY-DLTFLG
+                                                       (IDX1 IDX4 IDX5)
+                                                       =   "1"
+                           CONTINUE
+                         ELSE
+                           IF      COMB-HKNCOMBINUM    =
+                                   TBL-PT-HDIST-DAY-HKNCOMBI
+                                                       (IDX1 IDX4 IDX5)
+                               MOVE    TBL-PT-HDIST-DAY-DAY (IDX1)
+                                                       TO
+                                           WRK-RECE01-RECEIPT-KBN (2:2)
+                               IF      IDX4            =   1
+                                   MOVE    "1"         TO
+                                           WRK-RECE01-RECEIPT-KBN (4:1)
+                               ELSE
+                                   MOVE    "2"         TO
+                                           WRK-RECE01-RECEIPT-KBN (4:1)
+                               END-IF
+                               IF    ( TBL-PT-HDIST-DAY-SRYYM   (IDX1)
+                                           =   COMB-TEKSTYMD (1:6) AND
+                                       TBL-PT-HDIST-DAY-DAY (IDX1)
+                                           =   COMB-TEKSTYMD (7:2)     )
+                               OR    ( TBL-PT-HDIST-DAY-SRYYM   (IDX1)
+                                           =   COMB-TEKEDYMD (1:6) AND
+                                       TBL-PT-HDIST-DAY-DAY (IDX1)
+                                           =   COMB-TEKEDYMD (7:2)     )
+                                   MOVE    10              TO  IDX5
+                                   MOVE    2               TO  IDX4
+                                   MOVE    TBL-PT-HDIST-DAY-MAX
+                                                           TO  IDX1   
+                               END-IF
+                           END-IF
+                         END-IF 
+                       END-PERFORM
+                   END-PERFORM
+               END-PERFORM
+           END-IF
       *
       *    レセのとき地方公費のみの場合は出力しない
            IF      WRK-SYOKBN             =   "1"        
@@ -3083,8 +3191,8 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
            MOVE    SYS-2002-PTID       TO  WRK-SYUKA-PTID
            PERFORM 800-MISEIKYU-CHECK-SEC
       *
-           DISPLAY "SYS PTID=" SYS-2002-PTID
-                   " SRYYM="   SYS-2002-SRYYM 
+           DISPLAY "SYS PTID=" WRK-SYUKA-PTID
+                   " SRYYM="   WRK-SYUKA-SRYYM 
                    " MISEIKYU-FLG=" SYUKA-MISEIKYU-FLG
       *
       *    該当診療年月の医療機関情報取得
@@ -3128,9 +3236,15 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
                                                LNK-DAY7-AREA
            MOVE    LNK-DAY7-KOYOMI     TO  WRK-EDYMD
       *
+      *    施設入所情報
+      ***  MOVE    SYS-2002-PTID       TO  WRK-PTKOH-PTID
+           PERFORM 500-SISETU-HENSYU-SEC
+      *
+      *    患者レセプト分割情報情報
+           PERFORM 500-PT-HDIST-DAY-HENSYU-SEC
+      *
       *    患者年齢計算
            PERFORM 500-AGECHK-SEC
-      *
       *
            IF      FLG-END             =   ZERO
       *        診療会計読み込み
@@ -3180,8 +3294,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
            MOVE    SYS-2002-PTID       TO  WRK-SYUKA-PTID
            PERFORM 800-MISEIKYU-CHECK-SEC
       *
-           DISPLAY "SYS PTID=" SYS-2002-PTID
-                   " SRYYM="   SYS-2002-SRYYM 
+           DISPLAY "SYS PTID=" WRK-SYUKA-PTID
+                   " SRYYM="   WRK-SYUKA-SRYYM
                    " MISEIKYU-FLG=" SYUKA-MISEIKYU-FLG
       *
       *    未請求設定時は読み飛ばす
@@ -3229,6 +3343,13 @@ grpsys         MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY7-AREA
                MOVE    LNK-DAY7-KOYOMI     TO  WRK-EDYMD 
+      *
+      *        施設入所情報
+      ***      MOVE    SYS-2002-PTID       TO  WRK-PTKOH-PTID
+               PERFORM 500-SISETU-HENSYU-SEC
+      *
+      *        患者レセプト分割情報情報
+               PERFORM 500-PT-HDIST-DAY-HENSYU-SEC
       *
       *        患者年齢計算
                PERFORM 500-AGECHK-SEC
@@ -3305,7 +3426,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    PTINF-PTID      TO  WRK-SYUKA-PTID
                PERFORM 800-MISEIKYU-CHECK-SEC
       *
-               DISPLAY "JYUSIN PTID=" PTINF-PTID 
+               DISPLAY "JYUSIN PTID=" WRK-SYUKA-PTID
                        " SRYYM="   WRK-SYUKA-SRYYM
                        " MISEIKYU-FLG=" SYUKA-MISEIKYU-FLG
       *
@@ -3313,6 +3434,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF    SYUKA-MISEIKYU-FLG  =   "01"
                    CONTINUE
                ELSE
+      *            施設入所情報
+      ***          MOVE    PTINF-PTID          TO  WRK-PTKOH-PTID
+                   PERFORM 500-SISETU-HENSYU-SEC
+      *
+      *            患者レセプト分割情報情報
+                   PERFORM 500-PT-HDIST-DAY-HENSYU-SEC
       *
       *            患者年齢計算
                    PERFORM 500-AGECHK-SEC
@@ -3629,6 +3756,146 @@ grpsys                                     SPA-AREA
            EXIT.
       *
       *****************************************************************
+      *    施設入所情報処理
+      *****************************************************************
+       500-SISETU-HENSYU-SEC             SECTION.
+      *
+           INITIALIZE                      TABLE-PTKOHINF-AREA
+      *
+      *    ９５０（老併）
+           INITIALIZE                      PTKOHINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+           MOVE    WRK-SYUKA-PTID      TO  PTKOH-PTID
+           MOVE    "950"               TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-PTKOHINF-READ-N-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTKOHINF  
+           END-IF
+           PERFORM     UNTIL   FLG-PTKOHINF    =   1
+                       OR      TBL-PTKOHINF-MAX
+                                               >=  10
+               IF      PTKOH-SAKJOKBN      =  SPACE
+                   ADD     1               TO  TBL-PTKOHINF-MAX
+                   MOVE    PTKOHINF-REC    TO  TBL-PTKOHINF-REC
+                                                   (TBL-PTKOHINF-MAX)
+      *
+                   DISPLAY "   TBL-PTKOHINF-MAX=" TBL-PTKOHINF-MAX
+                           " KOHNUM="
+                                   TBL-PTKOH-KOHNUM   (TBL-PTKOHINF-MAX)
+                           " ST="  TBL-PTKOH-TEKSTYMD (TBL-PTKOHINF-MAX)
+                           " ED="  TBL-PTKOH-TEKEDYMD (TBL-PTKOHINF-MAX)
+      *
+               END-IF
+      *
+               MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+               MOVE    "key4"           TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-N-SEC
+           END-PERFORM
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+      *    ９５１（老健）
+           INITIALIZE                      PTKOHINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+           MOVE    WRK-SYUKA-PTID      TO  PTKOH-PTID
+           MOVE    "951"               TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-PTKOHINF-READ-N-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTKOHINF  
+           END-IF
+           PERFORM     UNTIL   FLG-PTKOHINF    =   1
+                       OR      TBL-PTKOHINF-MAX
+                                               >=  10
+               IF      PTKOH-SAKJOKBN      =  SPACE
+                   ADD     1               TO  TBL-PTKOHINF-MAX
+                   MOVE    PTKOHINF-REC    TO  TBL-PTKOHINF-REC
+                                                   (TBL-PTKOHINF-MAX)
+      *
+                   DISPLAY "   TBL-PTKOHINF-MAX=" TBL-PTKOHINF-MAX
+                           " KOHNUM="
+                                   TBL-PTKOH-KOHNUM   (TBL-PTKOHINF-MAX)
+                           " ST="  TBL-PTKOH-TEKSTYMD (TBL-PTKOHINF-MAX)
+                           " ED="  TBL-PTKOH-TEKEDYMD (TBL-PTKOHINF-MAX)
+      *
+               END-IF
+      *
+               MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+               MOVE    "key4"           TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-N-SEC
+           END-PERFORM
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       500-SISETU-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者レセプト分割情報処理
+      *****************************************************************
+       500-PT-HDIST-DAY-HENSYU-SEC     SECTION.
+      *
+           INITIALIZE                      TBL-PT-HDIST-DAY-T
+      *
+           INITIALIZE                      PT-HDIST-DAY-REC
+           MOVE    SPA-HOSPNUM         TO  PT-HDIST-DAY-HOSPNUM
+           MOVE    WRK-SYUKA-PTID      TO  PT-HDIST-DAY-PTID
+           MOVE    WRK-SYUKA-SRYYM     TO  PT-HDIST-DAY-SRYYM
+           MOVE    "2"                 TO  PT-HDIST-DAY-NYUGAIKBN
+           MOVE    PT-HDIST-DAY-REC    TO  MCPDATA-REC
+           MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-PT-HDIST-DAY-READ-N-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PT-HDIST-DAY
+           END-IF
+           PERFORM     UNTIL   FLG-PT-HDIST-DAY    =   1
+                       OR      TBL-PT-HDIST-DAY-MAX
+                                                   >=  10
+               ADD     1                   TO  TBL-PT-HDIST-DAY-MAX
+               MOVE    PT-HDIST-DAY-REC    TO  TBL-PT-HDIST-DAY-REC
+                                               (TBL-PT-HDIST-DAY-MAX)
+      *
+               DISPLAY "   TBL-PT-HDIST-DAY=" TBL-PT-HDIST-DAY-MAX
+                       " DAY=" TBL-PT-HDIST-DAY-DAY
+                                               (TBL-PT-HDIST-DAY-MAX)
+               DISPLAY "      1=" TBL-PT-HDIST-DAY-HKNCOMBI-OCC
+                                               (TBL-PT-HDIST-DAY-MAX 1)
+               DISPLAY "      2=" TBL-PT-HDIST-DAY-HKNCOMBI-OCC
+                                               (TBL-PT-HDIST-DAY-MAX 2)
+      *
+               MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 900-PT-HDIST-DAY-READ-N-SEC
+           END-PERFORM
+           MOVE    "tbl_pt_hdist_day"  TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+      *
+       500-PT-HDIST-DAY-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    未請求フラグチェック処理
       *****************************************************************
        800-MISEIKYU-CHECK-SEC          SECTION.
@@ -3940,6 +4207,23 @@ grpsys         PERFORM 900-DBFETCH-SEC
            .
        900-PTKOHINF-READ-EXT.
            EXIT.
+      *****************************************************************
+      *    患者公費情報読込
+      *****************************************************************
+       900-PTKOHINF-READ-N-SEC         SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTKOHINF-REC
+               MOVE    ZERO            TO  FLG-PTKOHINF
+           ELSE
+               INITIALIZE                  PTKOHINF-REC
+               MOVE    1               TO  FLG-PTKOHINF
+           END-IF
+      *
+           .
+       900-PTKOHINF-READ-N-EXT.
+           EXIT.
       *
       *****************************************************************
       *    パラメタ読込
@@ -4015,6 +4299,24 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
            .
        900-SYUKA-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者レセプト分割読込
+      *****************************************************************
+       900-PT-HDIST-DAY-READ-N-SEC         SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  PT-HDIST-DAY-REC
+               MOVE    ZERO                TO  FLG-PT-HDIST-DAY
+           ELSE
+               MOVE    1                   TO  FLG-PT-HDIST-DAY
+               INITIALIZE                      PT-HDIST-DAY-REC
+           END-IF
+      *
+           .
+       900-PT-HDIST-DAY-READ-N-EXT.
            EXIT.
       *
       *****************************************************************

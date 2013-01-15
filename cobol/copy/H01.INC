@@ -149,6 +149,9 @@
               03  H01-HKIGO.
                 04  H01-HKIGO-STYLE   PIC X(20).
                 04  H01-HKIGO-VALUE   PIC X(20).
+              03  H01-HRECEIPT-KBN.
+                04  H01-HRECEIPT-KBN-STYLE   PIC X(20).
+                04  H01-HRECEIPT-KBN-VALUE   PIC X(10).
               03  H01-HENREI-MSG.
                 04  H01-HENREI-MSG-STYLE   PIC X(20).
                 04  H01-HENREI-MSG-VALUE   PIC X(14).

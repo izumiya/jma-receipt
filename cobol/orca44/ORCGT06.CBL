@@ -50,6 +50,9 @@
       *  04.06.01    NACL-Æ£¸¶    10/10/12  ¸øÈñÃ±ÆÈ¤Î¥ì¥»Ê¬Î¥ÂÐ±þ
       *                                     ¥­¡¼¤Ëkohid ÄÉ²Ã
       *  04.06.02    NACL-Æ£¸¶    11/12/12  ÅÀ¸¡¥ì¥»£°ÅÀ¸øÈñ°õ»úÂÐ±þ
+      *  04.06.03    NACL-Æ£¸¶    12/10/26  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
+      *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
+      *                                     receipt_kbn ÄÉ²Ã 
       *
       *  04.07.01    NACL-Æ£¸¶    12/01/13  ·òÊÝÁÈ¹ç¤Ø¤ÎÄ¾ÀÜÀÁµá¤È¿³ºº
       *                                     »ÙÊ§µ¡´ØÀÁµáÂÐ±þ
@@ -2780,6 +2783,15 @@
                END-STRING
            END-IF
       *
+           EVALUATE    RECE10-RECEIPT-KBN (1:1)
+               WHEN    "1"
+                   MOVE    "Ï·Ê»"          TO
+                                       SPA-GMN-T09-TRECEIPT-KBN (IDX)
+               WHEN    "2"
+                   MOVE    "Ï··ò"          TO
+                                       SPA-GMN-T09-TRECEIPT-KBN (IDX)
+           END-EVALUATE
+      *
            MOVE    RECE10-CREYMD   TO  SPA-NAI-T09-TCREYMD (IDX)
                                        WRK-SYMD
            PERFORM 5002-HIZUKE-HEN-SEC
@@ -2836,6 +2848,8 @@
                                                =   RECE10-KOHID-KEY    )
                            AND   ( HENREI-B-S-TEKSTYMD     (IDZZ)
                                                =   RECE10-TEKSTYMD     )
+                           AND   ( HENREI-B-S-RECEIPT-KBN  (IDZZ)
+                                               =   RECE10-RECEIPT-KBN  )
                                MOVE    1   TO  FLG-HENREI-B-SEIKYU-CHK
                            END-IF
                        END-PERFORM
@@ -3295,6 +3309,15 @@
                    END-EVALUATE
            END-EVALUATE
       *
+           EVALUATE    RECE10-RECEIPT-KBN (1:1)
+               WHEN    "1"
+                   MOVE    "Ï·Ê»"          TO
+                                       SPA-GMN-T06-R-TRECEIPT-KBN(IDX)
+               WHEN    "2"
+                   MOVE    "Ï··ò"          TO
+                                       SPA-GMN-T06-R-TRECEIPT-KBN(IDX)
+           END-EVALUATE
+      *
            MOVE    RECE10-CREYMD   TO  WRK-SYMD
            PERFORM 5002-HIZUKE-HEN-SEC
            MOVE    WRK-HENYMDG     TO  SPA-GMN-T06-R-TCREYMD (IDX)
@@ -3715,6 +3738,10 @@
                MOVE    ONRECE-B-TEKSTYMD
                                        TO  SPA-NAI-T06-RECE10-TEKSTYMD
                                                                (IDX)
+               MOVE    ONRECE-B-RECEIPT-KBN
+                                       TO
+                                       SPA-NAI-T06-RECE10-RECEIPT-KBN
+                                                               (IDX)
       *        ÀÁµá´ÉÍý¥Á¥§¥Ã¥¯
                MOVE    SPA-NAI-T06-RECE10-KEY (IDX)
                                        TO  RECE10-KEY      
@@ -3832,6 +3859,15 @@
                                             SPA-GMN-T06-R-THOJOKBN(IDX)
                        END-EVALUATE
                END-EVALUATE
+      *
+              EVALUATE    RECE10-RECEIPT-KBN (1:1)
+                    WHEN    "1"
+                       MOVE    "Ï·Ê»"          TO
+                                       SPA-GMN-T06-R-TRECEIPT-KBN(IDX)
+                   WHEN    "2"
+                       MOVE    "Ï··ò"          TO
+                                       SPA-GMN-T06-R-TRECEIPT-KBN(IDX)
+           END-EVALUATE
       *
                MOVE    RECE10-CREYMD   TO  WRK-SYMD
                PERFORM 5002-HIZUKE-HEN-SEC
@@ -4154,6 +4190,8 @@
                                            TO  ONRECE-B-KOHID
                MOVE    SPA-NAI-T06-RECE10-TEKSTYMD    (IDX)
                                            TO  ONRECE-B-TEKSTYMD
+               MOVE    SPA-NAI-T06-RECE10-RECEIPT-KBN (IDX)
+                                           TO  ONRECE-B-RECEIPT-KBN
                MOVE    SPA-GMN-T06-R-TPTNUM           (IDX)
                                            TO  ONRECE-B-PTNUM
                MOVE    SPA-GMN-T06-R-TNAME            (IDX)
@@ -5114,6 +5152,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                                            TO  T06-RECE-TKIGO     (IDX)
                MOVE    SPA-GMN-T06-R-THOJOKBN   (IDX)
                                            TO  T06-RECE-THOJOKBN  (IDX)
+               MOVE    SPA-GMN-T06-R-TRECEIPT-KBN (IDX)
+                                           TO
+                                           T06-RECE-TRECEIPT-KBN  (IDX)
                MOVE    SPA-GMN-T06-R-TCREYMD    (IDX)
                                            TO  T06-RECE-TCREYMD   (IDX)
       *         

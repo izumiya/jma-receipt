@@ -20,6 +20,7 @@ tbl_henrei_body	{
 	HKNJANUM		char(8);
 	KIGO			varchar(40);
 	NUM			varchar(40);
+	RECEIPT_KBN		char(10);
 	FTNNUM_1		varchar(8);
 	JKYNUM_1		varchar(7);
 	FTNNUM_2		varchar(8);
@@ -59,6 +60,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_1		char(1);
 	S_KOHID_KEY_1		number(10);
 	S_TEKSTYMD_1		char(8);
+	S_RECEIPT_KBN_1		char(10);
 	S_KIGO_1		varchar(40);
 	S_SYORIYMD_2		char(8);
 	S_MAKE_FLG_2		number(1,0);
@@ -72,6 +74,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_2		char(1);
 	S_KOHID_KEY_2		number(10);
 	S_TEKSTYMD_2		char(8);
+	S_RECEIPT_KBN_2		char(10);
 	S_KIGO_2		varchar(40);
 	S_SYORIYMD_3		char(8);
 	S_MAKE_FLG_3		number(1,0);
@@ -85,6 +88,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_3		char(1);
 	S_KOHID_KEY_3		number(10);
 	S_TEKSTYMD_3		char(8);
+	S_RECEIPT_KBN_3		char(10);
 	S_KIGO_3		varchar(40);
 	S_SYORIYMD_4		char(8);
 	S_MAKE_FLG_4		number(1,0);
@@ -98,6 +102,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_4		char(1);
 	S_KOHID_KEY_4		number(10);
 	S_TEKSTYMD_4		char(8);
+	S_RECEIPT_KBN_4		char(10);
 	S_KIGO_4		varchar(40);
 	S_SYORIYMD_5		char(8);
 	S_MAKE_FLG_5		number(1,0);
@@ -111,6 +116,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_5		char(1);
 	S_KOHID_KEY_5		number(10);
 	S_TEKSTYMD_5		char(8);
+	S_RECEIPT_KBN_5		char(10);
 	S_KIGO_5		varchar(40);
 	S_SYORIYMD_6		char(8);
 	S_MAKE_FLG_6		number(1,0);
@@ -124,6 +130,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_6		char(1);
 	S_KOHID_KEY_6		number(10);
 	S_TEKSTYMD_6		char(8);
+	S_RECEIPT_KBN_6		char(10);
 	S_KIGO_6		varchar(40);
 	S_SYORIYMD_7		char(8);
 	S_MAKE_FLG_7		number(1,0);
@@ -137,6 +144,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_7		char(1);
 	S_KOHID_KEY_7		number(10);
 	S_TEKSTYMD_7		char(8);
+	S_RECEIPT_KBN_7		char(10);
 	S_KIGO_7		varchar(40);
 	S_SYORIYMD_8		char(8);
 	S_MAKE_FLG_8		number(1,0);
@@ -150,6 +158,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_8		char(1);
 	S_KOHID_KEY_8		number(10);
 	S_TEKSTYMD_8		char(8);
+	S_RECEIPT_KBN_8		char(10);
 	S_KIGO_8		varchar(40);
 	S_SYORIYMD_9		char(8);
 	S_MAKE_FLG_9		number(1,0);
@@ -163,6 +172,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_9		char(1);
 	S_KOHID_KEY_9		number(10);
 	S_TEKSTYMD_9		char(8);
+	S_RECEIPT_KBN_9		char(10);
 	S_KIGO_9		varchar(40);
 	S_SYORIYMD_10		char(8);
 	S_MAKE_FLG_10		number(1,0);
@@ -176,6 +186,7 @@ tbl_henrei_body	{
 	S_HOJOKBN_KEY_10	char(1);
 	S_KOHID_KEY_10		number(10);
 	S_TEKSTYMD_10		char(8);
+	S_RECEIPT_KBN_10	char(10);
 	S_KIGO_10		varchar(40);
 #-----> ここまで
 	TERMID			varchar(64);
@@ -254,6 +265,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_1  =   :S_HOJOKBN_KEY_1,
                 S_KOHID_KEY_1    =   :S_KOHID_KEY_1, 
                 S_TEKSTYMD_1     =   :S_TEKSTYMD_1,
+                S_RECEIPT_KBN_1  =   :S_RECEIPT_KBN_1,
                 S_KIGO_1         =   :S_KIGO_1,
                 S_SYORIYMD_2     =   :S_SYORIYMD_2,
                 S_MAKE_FLG_2     =   :S_MAKE_FLG_2,
@@ -267,6 +279,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_2  =   :S_HOJOKBN_KEY_2,
                 S_KOHID_KEY_2    =   :S_KOHID_KEY_2, 
                 S_TEKSTYMD_2     =   :S_TEKSTYMD_2,
+                S_RECEIPT_KBN_2  =   :S_RECEIPT_KBN_2,
                 S_KIGO_2         =   :S_KIGO_2,
                 S_SYORIYMD_3     =   :S_SYORIYMD_3,
                 S_MAKE_FLG_3     =   :S_MAKE_FLG_3,
@@ -280,6 +293,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_3  =   :S_HOJOKBN_KEY_3,
                 S_KOHID_KEY_3    =   :S_KOHID_KEY_3, 
                 S_TEKSTYMD_3     =   :S_TEKSTYMD_3,
+                S_RECEIPT_KBN_3  =   :S_RECEIPT_KBN_3,
                 S_KIGO_3         =   :S_KIGO_3,
                 S_SYORIYMD_4     =   :S_SYORIYMD_4,
                 S_MAKE_FLG_4     =   :S_MAKE_FLG_4,
@@ -293,6 +307,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_4  =   :S_HOJOKBN_KEY_4,
                 S_KOHID_KEY_4    =   :S_KOHID_KEY_4, 
                 S_TEKSTYMD_4     =   :S_TEKSTYMD_4,
+                S_RECEIPT_KBN_4  =   :S_RECEIPT_KBN_4,
                 S_KIGO_4         =   :S_KIGO_4,
                 S_SYORIYMD_5     =   :S_SYORIYMD_5,
                 S_MAKE_FLG_5     =   :S_MAKE_FLG_5,
@@ -306,6 +321,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_5  =   :S_HOJOKBN_KEY_5,
                 S_KOHID_KEY_5    =   :S_KOHID_KEY_5, 
                 S_TEKSTYMD_5     =   :S_TEKSTYMD_5,
+                S_RECEIPT_KBN_5  =   :S_RECEIPT_KBN_5,
                 S_KIGO_5         =   :S_KIGO_5,
                 S_SYORIYMD_6     =   :S_SYORIYMD_6,
                 S_MAKE_FLG_6     =   :S_MAKE_FLG_6,
@@ -319,6 +335,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_6  =   :S_HOJOKBN_KEY_6,
                 S_KOHID_KEY_6    =   :S_KOHID_KEY_6, 
                 S_TEKSTYMD_6     =   :S_TEKSTYMD_6,
+                S_RECEIPT_KBN_6  =   :S_RECEIPT_KBN_6,
                 S_KIGO_6         =   :S_KIGO_6,
                 S_SYORIYMD_7     =   :S_SYORIYMD_7,
                 S_MAKE_FLG_7     =   :S_MAKE_FLG_7,
@@ -332,6 +349,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_7  =   :S_HOJOKBN_KEY_7,
                 S_KOHID_KEY_7    =   :S_KOHID_KEY_7, 
                 S_TEKSTYMD_7     =   :S_TEKSTYMD_7,
+                S_RECEIPT_KBN_7  =   :S_RECEIPT_KBN_7,
                 S_KIGO_7         =   :S_KIGO_7,
                 S_SYORIYMD_8     =   :S_SYORIYMD_8,
                 S_MAKE_FLG_8     =   :S_MAKE_FLG_8,
@@ -345,6 +363,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_8  =   :S_HOJOKBN_KEY_8,
                 S_KOHID_KEY_8    =   :S_KOHID_KEY_8, 
                 S_TEKSTYMD_8     =   :S_TEKSTYMD_8,
+                S_RECEIPT_KBN_8  =   :S_RECEIPT_KBN_8,
                 S_KIGO_8         =   :S_KIGO_8,
                 S_SYORIYMD_9     =   :S_SYORIYMD_9,
                 S_MAKE_FLG_9     =   :S_MAKE_FLG_9,
@@ -358,6 +377,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_9  =   :S_HOJOKBN_KEY_9,
                 S_KOHID_KEY_9    =   :S_KOHID_KEY_9, 
                 S_TEKSTYMD_9     =   :S_TEKSTYMD_9,
+                S_RECEIPT_KBN_9  =   :S_RECEIPT_KBN_9,
                 S_KIGO_9         =   :S_KIGO_9,
                 S_SYORIYMD_10     =  :S_SYORIYMD_10,
                 S_MAKE_FLG_10     =  :S_MAKE_FLG_10,
@@ -371,6 +391,7 @@ path    upd1    {
                 S_HOJOKBN_KEY_10  =  :S_HOJOKBN_KEY_10,
                 S_KOHID_KEY_10    =   :S_KOHID_KEY_10, 
                 S_TEKSTYMD_10     =  :S_TEKSTYMD_10,
+                S_RECEIPT_KBN_10  =  :S_RECEIPT_KBN_10,
                 S_KIGO_10         =  :S_KIGO_10,
                 UPYMD             =  :UPYMD,
                 UPHMS             =  :UPHMS

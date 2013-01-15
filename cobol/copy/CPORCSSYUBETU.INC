@@ -39,6 +39,9 @@
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     kohid 追加
+      *  04.06.02    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       ************************************************************
       *
        01  ORCSSYUBETUAREA.
@@ -81,6 +84,9 @@
       *            適用開始年月日
                    07  LNK-SYUBETU-TEKSTYMD
                                        PIC X(08).
+      *            分割区分
+                   07  LNK-SYUBETU-RECEIPT-KBN
+                                       PIC X(10).
       *            保険番号（主保険）
                    07  LNK-SYUBETU-HKNNUM
                                        PIC X(03).

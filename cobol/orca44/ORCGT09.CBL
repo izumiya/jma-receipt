@@ -34,6 +34,10 @@
       *  04.05.01    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
       *                                     の変更に伴う月後れ分のチェック
       *
+      *  04.06.01    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
+      *
       *  04.07.01    NACL-藤原    12/01/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
       *  04.07.02    NACL-藤原    12/08/01  レセ電データチェック機能対応
@@ -393,7 +397,7 @@
                                                (SPA-NAI-T09-SELNUM)
            MOVE    ZERO            TO  SPA-NAI-T09-SELNUM
       *
-           MOVE    4               TO  SPA-GMN-T06-CUR
+           MOVE    4               TO  SPA-GMN-T09-CUR
            .
        340-TID2-SET-EXT.
            EXIT.
@@ -1082,6 +1086,8 @@
                                        TO  T09-THOJOKBN     (IDX)
                MOVE    SPA-GMN-T09-TKIGO        (IDX)
                                        TO  T09-TKIGO        (IDX)
+               MOVE    SPA-GMN-T09-TRECEIPT-KBN (IDX)
+                                       TO  T09-TRECEIPT-KBN (IDX)
                MOVE    SPA-GMN-T09-TCREYMD      (IDX)
                                        TO  T09-TCREYMD      (IDX)
                IF      SPA-GMN-T09-TCHK (IDX)  =   "1"

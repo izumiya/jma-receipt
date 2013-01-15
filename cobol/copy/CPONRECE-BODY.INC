@@ -22,6 +22,9 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     kohid 追加
+      *  04.06.02    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       ************************************************************
       *01  ONRECE-BODY-REC.
            03  ONRECE-B-HOSPNUM    PIC 9(2).
@@ -57,6 +60,8 @@
            03  ONRECE-B-HOJOKBN    PIC X(01).
            03  ONRECE-B-KOHID      PIC 9(10).
            03  ONRECE-B-TEKSTYMD   PIC X(08).
+           03  ONRECE-B-RECEIPT-KBN
+                                   PIC X(10).
            03  ONRECE-B-H-TTL-TEN  PIC 9(8).
            03  ONRECE-B-KO-AREA.
               05  ONRECE-B-KO-A        OCCURS  4.

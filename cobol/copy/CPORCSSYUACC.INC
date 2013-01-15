@@ -30,6 +30,9 @@
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     kohid 追加
+      *  04.06.02    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       ************************************************************
       *
            03  LNK-SYUACC-IN.
@@ -66,6 +69,9 @@
       *            公費ＩＤ（公費単独のみ）
                    07  LNK-SYUACC-IO-KOHID
                                        PIC 9(10).
+      *            分割区分
+                   07  LNK-SYUACC-IO-RECEIPT-KBN
+                                       PIC X(10).
       *            保険番号（主保険）
                    07  LNK-SYUACC-IO-HKNNUM
                                        PIC X(03).
@@ -120,6 +126,8 @@
                  09  LNK-IO2-SYU-HOJOKBN       PIC X(01).
       *公費ＩＤ（公費単独のみ）
                  09  LNK-IO2-SYU-KOHID         PIC 9(10).
+      *分割区分
+                 09  LNK-IO2-SYU-RECEIPT-KBN   PIC X(10).
       *レセプト種別
                  09  LNK-IO2-SYU-RECESYUBETU   PIC X(04).
       *診療科

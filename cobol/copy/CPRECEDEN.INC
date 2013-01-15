@@ -31,6 +31,9 @@
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
       *                                     調査用にcrehms,updhms 追加
+      *  04.06.02    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       ************************************************************
        01  RECEDEN-REC.
       *ＫＥＹ
@@ -57,6 +60,8 @@
                05  RECEDEN-KOHID-KEY        PIC  9(10).
       *適用開始年月日
                05  RECEDEN-TEKSTYMD         PIC  X(08).
+      *分割区分
+               05  RECEDEN-RECEIPT-KBN      PIC  X(10).
       *レコード区分（１：レセ電、２：症状詳記）
                05  RECEDEN-RECKBN           PIC  X(01).
       *データ連番

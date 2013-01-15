@@ -85,6 +85,9 @@
       *
       *  04.06.01    NACL-Æ£¸¶    10/10/12  ¸øÈñÃ±ÆÈ¤Î¥ì¥»Ê¬Î¥ÂÐ±þ
       *                                     ¥­¡¼¤Ëkohid ÄÉ²Ã
+      *  04.06.02    NACL-Æ£¸¶    12/10/26  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
+      *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
+      *                                     receipt_kbn ÄÉ²Ã 
       *
       *  04.07.01    NACL-Æ£¸¶    12/02/13  ·òÊÝÁÈ¹ç¤Ø¤ÎÄ¾ÀÜÀÁµá¤È¿³ºº
       *                                     »ÙÊ§µ¡´ØÀÁµáÂÐ±þ
@@ -1206,6 +1209,8 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                                            =   RECE10-KOHID-KEY  )
                        AND   ( HENREI-B-S-TEKSTYMD     (IDZZ)
                                            =   RECE10-TEKSTYMD     )
+                       AND   ( HENREI-B-S-RECEIPT-KBN  (IDZZ)
+                                           =   RECE10-RECEIPT-KBN  )
                            MOVE    HENREI-B-REC    TO  WRK-HENREI-B-REC
                            MOVE    1               TO  IDZZ
                            MOVE    1               TO  FLG-HENREI-B
@@ -1357,6 +1362,8 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                                    WRK-HENREI-B-S-KOHID-KEY   (IDZZ)
                    AND     RECE10-TEKSTYMD     =
                                    WRK-HENREI-B-S-TEKSTYMD    (IDZZ)
+                   AND     RECE10-RECEIPT-KBN  =
+                                   WRK-HENREI-B-S-RECEIPT-KBN (IDZZ)
                        MOVE    SMCNDATE-YMD    TO
                                        WRK-HENREI-B-S-SYORIYMD (IDZZ)  
                        MOVE    1               TO

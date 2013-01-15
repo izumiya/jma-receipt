@@ -10,6 +10,7 @@ HKNJANUM			char(8);
 HOJOKBN_KEY     		char(1);
 KOHID_KEY       		number(10);
 TEKSTYMD			char(8);
+RECEIPT_KBN			char(10);
 PTNUM				char(20);
 PREFKBN                 char(1);
 PREFNUM                 char(2);
@@ -235,7 +236,7 @@ XXTEISYUTUSAKI			number(1,0),virtual;
 };
 
 primary	{
-	HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD;
+	HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN;
 };
 
 path	key		{ 	
@@ -254,6 +255,7 @@ path	key		{
                   AND   HOJOKBN_KEY =   :HOJOKBN_KEY
                   AND   KOHID_KEY   =   :KOHID_KEY 
                   AND   TEKSTYMD    =   :TEKSTYMD
+                  AND   RECEIPT_KBN    =   :RECEIPT_KBN
 		;
 	};
 };
@@ -563,6 +565,7 @@ path	key15		{
                   AND   HOJOKBN_KEY =   :HOJOKBN_KEY
                   AND   KOHID_KEY   =   :KOHID_KEY
                   AND   TEKSTYMD    =   :TEKSTYMD
+                  AND   RECEIPT_KBN    =   :RECEIPT_KBN
 		;
 	};
 };
@@ -1408,6 +1411,7 @@ path	key43		{
                   AND   HOJOKBN_KEY =   :HOJOKBN_KEY
                   AND   KOHID_KEY   =   :KOHID_KEY
                   AND   TEKSTYMD    =   :TEKSTYMD
+                  AND   RECEIPT_KBN    =   :RECEIPT_KBN
                   AND   TEISEIKBN   <>  '1'
                 ORDER  BY  SKYKBN DESC
 		;
@@ -1444,7 +1448,7 @@ path	key45	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key45_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (       a.HOSPNUM      =    :HOSPNUM   )
                   AND (       a.HKNNUM_S    <>   '060'       )
                   AND (       a.HKNNUM_S    <>   '067'       ) 
@@ -1486,7 +1490,7 @@ path	key46	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key46_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1528,7 +1532,7 @@ path	key47	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key47_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1570,7 +1574,7 @@ path	key48	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key48_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1612,7 +1616,7 @@ path	key49	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key49_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1653,7 +1657,7 @@ path	key50	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key50_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a left join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1694,7 +1698,7 @@ path	key51	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key51_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1735,7 +1739,7 @@ path	key52	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key52_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1776,7 +1780,7 @@ path	key53	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key53_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1817,7 +1821,7 @@ path	key54	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key54_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1858,7 +1862,7 @@ path	key55	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key55_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -1898,7 +1902,7 @@ path	key56	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key56_csr CURSOR FOR
 		SELECT a.*
-		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a join tbl_seikyu_etc b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =    :HOSPNUM   )
                   AND (      a.HKNNUM_S    <>   '060'       )
                   AND (      a.HKNNUM_S    <>   '067'       ) 
@@ -2399,7 +2403,7 @@ path	key77	{
 	DBSELECT	{
 		DECLARE tbl_seikyu_main_key77_csr CURSOR FOR
 		SELECT a.*,b.syokaiflg,b.syocd,b.hknkbn
-		FROM tbl_seikyu_main a join tbl_seikyu_rsi b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD)
+		FROM tbl_seikyu_main a join tbl_seikyu_rsi b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
                 WHERE (      a.HOSPNUM      =   :HOSPNUM      )
                   AND (      a.TEISYUTUSAKI =   :TEISYUTUSAKI )
                   AND (   (( a.SRYYM       =   :SKYYM   )

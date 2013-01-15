@@ -9,6 +9,7 @@ tbl_syuka {
     HKNJANUM            char(8);
     HOJOKBN             char(1);
     KOHID               number(10,0);
+    RECEIPT_KBN		char(10);
     RECESYUBETU         char(4);
     SRYKA               char(2);
 #------> key
@@ -42,7 +43,7 @@ tbl_syuka {
     XXPTNUM             char(20),virtual;
 };
 primary {
-    HOSPNUM,NYUGAIKBN,PTID,TEN_KBN,SRYYM,TEISYUTUSAKI,HKNJANUM,HOJOKBN,KOHID,RECESYUBETU,SRYKA;
+    HOSPNUM,NYUGAIKBN,PTID,TEN_KBN,SRYYM,TEISYUTUSAKI,HKNJANUM,HOJOKBN,KOHID,RECEIPT_KBN,RECESYUBETU,SRYKA;
 };
 
 
@@ -62,6 +63,7 @@ path	key		{
 			AND     KOHID          =   :KOHID
 			AND     RECESYUBETU    =   :RECESYUBETU
 			AND     SRYKA          =   :SRYKA
+			AND   RECEIPT_KBN      =   :RECEIPT_KBN
 		;
 	};
 };
@@ -160,6 +162,7 @@ path	key7		{
 			AND     HKNJANUM       =    :HKNJANUM
 			AND     HOJOKBN        =    :HOJOKBN
 			AND     KOHID          =    :KOHID
+			AND     RECEIPT_KBN    =    :RECEIPT_KBN
 			AND     DLT_FLG        <>   '1'
 			ORDER BY SRYKA,TEN_KBN
 		;
@@ -268,6 +271,7 @@ path	upd2	{
 			AND     HOJOKBN        =   :HOJOKBN
 			AND     KOHID          =   :KOHID
 			AND     RECESYUBETU    =   :RECESYUBETU
+			AND   RECEIPT_KBN      =   :RECEIPT_KBN
 		;
 	};
 };
@@ -439,6 +443,7 @@ path	key17		{
 			AND     RECESYUBETU    =    :RECESYUBETU
 			AND     HOJOKBN        =    :HOJOKBN
 			AND     KOHID          =    :KOHID
+			AND     RECEIPT_KBN    =    :RECEIPT_KBN
 			AND     DLT_FLG        <>   '1'
 			ORDER BY SRYKA,TEN_KBN
 		;

@@ -97,6 +97,8 @@
       *                                     Ä´ººÍÑ¤Ëcrehms,updhms ÄÉ²Ã
       *  04.06.03    NACL-Æ£¸¶    10/12/20  ÊÝ¸±¼Ô¤«¤é¤ÎÊÖÌáÂÐ±þ
       *  04.06.04    NACL-Æ£¸¶    11/12/12  ÅÀ¸¡¥ì¥»£°ÅÀ¸øÈñ°õ»úÂÐ±þ
+      *  04.06.05    NACL-Æ£¸¶    12/10/26  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
+      *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
       *
       *  04.07.01    NACL-Æ£¸¶    11/09/02  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-Æ£¸¶    12/11/19  ¼ç²Ê¾ðÊó¤Î¼èÆÀÊýË¡ÊÑ¹¹
@@ -1163,6 +1165,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
                        AND   ( SPA-RECE10-TEKSTYMD     =
                                            TBL-HENREI-B-S-TEKSTYMD    
                                                            (IDXX IDZZ) )
+                       AND   ( SPA-RECE10-RECEIPT-KBN  =
+                                           TBL-HENREI-B-S-RECEIPT-KBN    
+                                                           (IDXX IDZZ) )
                            INITIALIZE          TBL-HENREI-B-SEIKYU-OCC
                                                            (IDXX IDZZ)
                            PERFORM VARYING IDYY    FROM    IDZZ    BY  1
@@ -1875,6 +1880,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        INTO    SPA-H01GMN-HCREYMD
            END-STRING
       *
+           EVALUATE    RECE10-RECEIPT-KBN (1:1)
+               WHEN    "1"
+                   MOVE    "Ï·Ê»"          TO  SPA-H01GMN-HRECEIPT-KBN
+               WHEN    "2"
+                   MOVE    "Ï··ò"          TO  SPA-H01GMN-HRECEIPT-KBN
+           END-EVALUATE
+      *
            MOVE    RECE10-SKYYM        TO  SPA-H01NAI-SKYYM
                                            WRK-SYMD (1:6)
            MOVE    "01"                TO  WRK-SYMD (7:2) 
@@ -2355,6 +2367,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            =   SPA-RECE10-KOHID-KEY    )
                    AND   ( HENREI-B-S-TEKSTYMD     (IDZZ)
                                            =   SPA-RECE10-TEKSTYMD     )
+                   AND   ( HENREI-B-S-RECEIPT-KBN (IDZZ)
+                                           =   SPA-RECE10-RECEIPT-KBN  )
                        IF      SPA-HENREI-B-HOSPNUM    =   ZERO
                            MOVE    HENREI-B-REC    TO  SPA-HENREI-B-REC
                                                        WRK-HENREI-B-REC
@@ -2711,17 +2725,29 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
                            WHEN    1
                                IF      TBL-HENREI-B-TEISYUTUSAKI (IDXX)
                                                =   1
-                                   MOVE    TBL-HENREI-B-REC (IDXX)
+                                   IF    ( TBL-HENREI-B-RECEIPT-KBN
+                                                                 (IDXX)
+                                           =   SPA-RECE10-RECEIPT-KBN )
+                                   AND   ( TBL-HENREI-B-MAX
+                                           =   1                      )
+                                       MOVE    TBL-HENREI-B-REC (IDXX)
                                                    TO  WRK-HENREI-B-REC
-                                   MOVE    1       TO  FLG-HENREI-B-CHK
+                                       MOVE    1   TO  FLG-HENREI-B-CHK
+                                   END-IF
                                END-IF
                            WHEN    2
                            WHEN    6
                                IF      TBL-HENREI-B-TEISYUTUSAKI (IDXX)
                                                =   2
-                                   MOVE    TBL-HENREI-B-REC (IDXX)
+                                   IF    ( TBL-HENREI-B-RECEIPT-KBN
+                                                                 (IDXX)
+                                           =   SPA-RECE10-RECEIPT-KBN )
+                                   AND   ( TBL-HENREI-B-MAX
+                                           =   1                      )
+                                       MOVE    TBL-HENREI-B-REC (IDXX)
                                                    TO  WRK-HENREI-B-REC
-                                   MOVE    1       TO  FLG-HENREI-B-CHK
+                                       MOVE    1   TO  FLG-HENREI-B-CHK
+                                   END-IF    
                                END-IF
                        END-EVALUATE
                    END-IF
@@ -2738,17 +2764,29 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
                            WHEN    1
                                IF      TBL-HENREI-B-TEISYUTUSAKI (IDXX)
                                                =   1
-                                   MOVE    TBL-HENREI-B-REC (IDXX)
+                                   IF    ( TBL-HENREI-B-RECEIPT-KBN
+                                                                 (IDXX)
+                                           =   SPA-RECE10-RECEIPT-KBN )
+                                   AND   ( TBL-HENREI-B-MAX
+                                           =   1                      )
+                                       MOVE    TBL-HENREI-B-REC (IDXX)
                                                    TO  WRK-HENREI-B-REC
-                                   MOVE    1       TO  FLG-HENREI-B-CHK
+                                       MOVE    1   TO  FLG-HENREI-B-CHK
+                                   END-IF
                                END-IF
                            WHEN    2
                            WHEN    6
                                IF      TBL-HENREI-B-TEISYUTUSAKI (IDXX)
                                                =   2
-                                   MOVE    TBL-HENREI-B-REC (IDXX)
+                                   IF    ( TBL-HENREI-B-RECEIPT-KBN
+                                                                 (IDXX)
+                                           =   SPA-RECE10-RECEIPT-KBN )
+                                   AND   ( TBL-HENREI-B-MAX
+                                           =   1                      )
+                                       MOVE    TBL-HENREI-B-REC (IDXX)
                                                    TO  WRK-HENREI-B-REC
-                                   MOVE    1       TO  FLG-HENREI-B-CHK
+                                       MOVE    1   TO  FLG-HENREI-B-CHK
+                                   END-IF
                                END-IF
                        END-EVALUATE
                    END-IF
@@ -2775,6 +2813,8 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
                                            =   SPA-RECE10-KOHID-KEY    )
                    AND   ( TBL-HENREI-B-S-TEKSTYMD     (IDXX IDZZ)
                                            =   SPA-RECE10-TEKSTYMD     )
+                   AND   ( TBL-HENREI-B-S-RECEIPT-KBN (IDXX IDZZ)
+                                           =   SPA-RECE10-RECEIPT-KBN  )
                        MOVE    1       TO  TBL-HENREI-B-ERR
                                                            (IDXX)
                        IF      FLG-HENREI-B-CHK
@@ -3446,6 +3486,8 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                        =   SPA-RECE10-KOHID-KEY    )
                AND   ( WRK-HENREI-B-S-TEKSTYMD     (IDZZ)
                                        =   SPA-RECE10-TEKSTYMD     )
+               AND   ( WRK-HENREI-B-S-RECEIPT-KBN  (IDZZ)
+                                       =   SPA-RECE10-RECEIPT-KBN  )
                AND   ( WRK-HENREI-B-S-HENREIYM     (IDZZ)
                                        =   SPA-H01NAI-SKYYM    )
                    GO  TO  45011-HENREI-B-UPDATE1-EXT
@@ -3469,6 +3511,8 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                        WRK-HENREI-B-S-KOHID-KEY   (IDZZ)
                    MOVE    SPA-RECE10-TEKSTYMD     TO
                                        WRK-HENREI-B-S-TEKSTYMD    (IDZZ)
+                   MOVE    SPA-RECE10-RECEIPT-KBN     TO
+                                       WRK-HENREI-B-S-RECEIPT-KBN (IDZZ)
       *
       *            ¸øÈñÃ±ÆÈ¤ÇÀ¸ÊÝËô¤ÏÃæ¹ñ»ÄÎ±Ë®¿ÍÅù¤Î¤È¤­ÉéÃ´¼ÔÈÖ¹æ¡¢
       *            ¼õµë¼ÔÈÖ¹æ¤ò¥»¥Ã¥È
@@ -3560,6 +3604,8 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                        SPA-HENREI-B-S-KOHID-KEY   (IDZZ)
                AND     SPA-RECE10-TEKSTYMD     =
                                        SPA-HENREI-B-S-TEKSTYMD    (IDZZ)
+               AND     SPA-RECE10-RECEIPT-KBN  =
+                                       SPA-HENREI-B-S-RECEIPT-KBN (IDZZ)
                    INITIALIZE                  SPA-HENREI-B-SEIKYU-OCC
                                                                   (IDZZ)
                    PERFORM VARYING IDYY    FROM    IDZZ    BY  1
@@ -3755,6 +3801,8 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            MOVE    SPA-H01GMN-HHOJOKBN    TO  H01-HHOJOKBN-VALUE
            MOVE    SPA-H01GMN-HKIGO       TO  H01-HKIGO-VALUE
            MOVE    SPA-H01GMN-HCREYMD     TO  H01-HCREYMD-VALUE
+           MOVE    SPA-H01GMN-HRECEIPT-KBN
+                                          TO  H01-HRECEIPT-KBN-VALUE
            MOVE    SPA-H01GMN-TITLE-HKNJANUM
                                           TO  H01-TITLE-HKNJANUM
            MOVE    SPA-H01GMN-TITLE-KIGO  TO  H01-TITLE-KIGO
@@ -3871,6 +3919,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                            H01-HHOJOKBN-STYLE
                                            H01-HCREYMD-STYLE
            MOVE    "darkgreen"         TO  H01-MSG-STYLE
+                                           H01-HRECEIPT-KBN-STYLE
            MOVE    "red"               TO  H01-HENREI-MSG-STYLE
                                            H01-RECEDEN-CHK-MSG-STYLE
       *

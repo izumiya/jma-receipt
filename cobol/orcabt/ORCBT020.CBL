@@ -869,6 +869,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  TOUKEI03PARA-HOSPNUM
                MOVE    TOUKEI01-SRYYM      TO  TOUKEI03-SRYYM
                MOVE    TOUKEI01-NYUGAIKBN  TO  TOUKEI03-NYUGAIKBN
                MOVE    TOUKEI01-PTID       TO  TOUKEI03-PTID
+               MOVE    TOUKEI01-RECEIPT-KBN
+                                           TO  TOUKEI03-RECEIPT-KBN
                MOVE    TOUKEI01-RECEKA     TO  TOUKEI03-RECEKA
       *
                START   TOUKEI03-FILE
@@ -880,8 +882,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  TOUKEI03PARA-HOSPNUM
                END-START
       *     
                PERFORM UNTIL   FLG-TOUKEI03    =   1
-                       OR      TOUKEI01-KEY (1:21)
-                                           NOT =   TOUKEI03-KEY (1:21)
+                       OR      TOUKEI01-KEY (1:31)
+                                           NOT =   TOUKEI03-KEY (1:31)
                    PERFORM 2002-FILE-HENSYU-SEC
                    PERFORM 900-TOUKEI03-READ-SEC
                END-PERFORM

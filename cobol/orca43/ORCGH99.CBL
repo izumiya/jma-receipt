@@ -68,6 +68,8 @@
       *  04.06.02    NACL-藤原    11/02/01  主保険がない場合、児童保護(53)
       *                                     は公費単独のレセプトとする
       *  04.06.03    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.04    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *
       *  04.07.01    NACL-藤原    11/09/02  労災請求書作成対応
       *****************************************************************
@@ -522,6 +524,15 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SYS-1005-HOSPNUM
                MOVE    RECE10-CREYMD       TO  WRK-SYMD
                PERFORM 5002-HIZUKE-HEN-SEC
                MOVE    WRK-HENYMDG         TO  SPA-H99GMN-TCREYMD (IDX)
+      *
+               EVALUATE    RECE10-RECEIPT-KBN (1:1)
+                   WHEN    "1"
+                       MOVE    "老併"          TO
+                                           SPA-H99GMN-TRECEIPT-KBN (IDX)
+                   WHEN    "2"
+                       MOVE    "老健"          TO
+                                           SPA-H99GMN-TRECEIPT-KBN (IDX)
+               END-EVALUATE
       *
       *       公費単独で生保又は中国残留邦人等、自立支援のとき負担者番号、
       *       受給者番号をセット
@@ -1036,6 +1047,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                    TO  H99-TKIGO        (IDX)
                MOVE    SPA-H99GMN-TCREYMD      (IDX)
                                    TO  H99-TCREYMD      (IDX)
+               MOVE    SPA-H99GMN-TRECEIPT-KBN (IDX)
+                                   TO  H99-TRECEIPT-KBN (IDX)
                MOVE    IDX         TO  H99-COUNT
            END-PERFORM
       ***  MOVE    "T"              TO  H99-SELECT (1)

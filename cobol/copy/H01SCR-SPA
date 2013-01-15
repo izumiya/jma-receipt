@@ -50,6 +50,9 @@
       *                                     ¥­¡¼¤Ëkohid ÄÉ²Ã
       *  04.06.02    NACL-Æ£¸¶    10/12/20  ÊÝ¸±¼Ô¤«¤é¤ÎÊÖÌáÂÐ±þ
       *  04.06.03    NACL-Æ£¸¶    11/12/12  ÅÀ¸¡¥ì¥»£°ÅÀ¸øÈñ°õ»úÂÐ±þ
+      *  04.06.04    NACL-Æ£¸¶    12/10/26  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
+      *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
+      *                                     receipt_kbn ÄÉ²Ã 
       *
       *  04.07.01    NACL-Æ£¸¶    11/09/02  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *****************************************************************
@@ -88,6 +91,7 @@
                        09  SPA-H01GMN-HHOJOKBN        PIC X(08).
                        09  SPA-H01GMN-HKIGO           PIC X(20).
                        09  SPA-H01GMN-HCREYMD         PIC X(13).
+                       09  SPA-H01GMN-HRECEIPT-KBN    PIC X(10).
                        09  SPA-H01GMN-SKYYM           PIC X(07).
                        09  SPA-H01GMN-SKYYM-KOHSKY    PIC X(07).
                        09  SPA-H01GMN-HENREIYM        PIC X(07).
@@ -183,6 +187,8 @@
                        09  SPA-RECE10-KOHID-KEY
                                                PIC  9(10).
                        09  SPA-RECE10-TEKSTYMD PIC  X(08).
+                       09  SPA-RECE10-RECEIPT-KBN
+                                               PIC  X(10).
                    07  SPA-RECE10-HKNNUM       PIC  X(03).
                    07  SPA-RECE10-KIGO         PIC  X(80).
                    07  SPA-RECE10-NUM          PIC  X(80).
@@ -229,6 +235,7 @@
                        09  SPA-H02GMN-TRECESYUBETU PIC X(4).
                        09  SPA-H02GMN-THKNJANUM    PIC X(8).
                        09  SPA-H02GMN-TKIGO        PIC X(20).
+                       09  SPA-H02GMN-TRECEIPT-KBN PIC X(4).
                        09  SPA-H02GMN-TERR         PIC X(100).
       *
                        09  SPA-H02GMN-TS-MAKE-FLG  PIC X(2).
@@ -239,6 +246,8 @@
                                                    PIC X(2).
                        09  SPA-H02GMN-TS-HENREI-SIJI-FLG
                                                    PIC X(2).
+                       09  SPA-H02GMN-TS-RECEIPT-KBN
+                                                   PIC X(4).
       *
                05  SPA-H02NAI-AREA.
                    07  SPA-H02NAI-SELNUM           PIC 9(02).
@@ -270,6 +279,8 @@
                                                    PIC X(01).
                        09  SPA-H02NAI-TS-KOHID-KEY PIC 9(10).
                        09  SPA-H02NAI-TS-TEKSTYMD  PIC X(08).
+                       09  SPA-H02NAI-TS-RECEIPT-KBN
+                                                   PIC X(10).
       *
       *£È£¹£¹²èÌÌ
            03  SPA-H99GMN-AREA.
@@ -296,6 +307,8 @@
                        09  SPA-H99GMN-THKNJANUM   PIC X(14).
                        09  SPA-H99GMN-THOJOKBN    PIC X(8).
                        09  SPA-H99GMN-TKIGO       PIC X(20).
+                       09  SPA-H99GMN-TRECEIPT-KBN
+                                                  PIC X(10).
                        09  SPA-H99GMN-TCREYMD     PIC X(9).
       *
                05  SPA-H99NAI-SRYYM           PIC 9(06).
@@ -320,5 +333,7 @@
                                                      PIC  9(10).
                        09  SPA-H99NAI-RECE10-TEKSTYMD
                                                      PIC X(08).
+                       09  SPA-H99NAI-RECE10-RECEITP-KBN
+                                                     PIC X(10).
                    07  SPA-H99NAI-SKYKBN-RECEDEN     PIC X(01)
                                               OCCURS  50.

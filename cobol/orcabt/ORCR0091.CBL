@@ -83,6 +83,8 @@
       *                                     キーにkohid 追加
       *  04.06.02    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.03    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -289,17 +291,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
        210-HENSYU-SEC                   SECTION.
       *
            INITIALIZE                           RECE061-REC
-grpsys     MOVE    RECE06-HOSPNUM       TO      RECE061-HOSPNUM
-           MOVE    RECE06-SRYYM         TO      RECE061-SRYYM
-           MOVE    RECE06-NYUGAIKBN     TO      RECE061-NYUGAIKBN
-           MOVE    RECE06-PTID          TO      RECE061-PTID
-           MOVE    RECE06-RECEKA        TO      RECE061-RECEKA
-           MOVE    RECE06-TEISYUTUSAKI  TO      RECE061-TEISYUTUSAKI
-           MOVE    RECE06-RECESYUBETU   TO      RECE061-RECESYUBETU
-           MOVE    RECE06-HKNJANUM      TO      RECE061-HKNJANUM
-           MOVE    RECE06-HOJOKBN       TO      RECE061-HOJOKBN
-           MOVE    RECE06-KOHID         TO      RECE061-KOHID
-           MOVE    RECE06-TEKSTYMD      TO      RECE061-TEKSTYMD
+grpsys     MOVE    RECE06-KEY1          TO      RECE061-KEY1
            MOVE    RECE06-KOHBUNRI      TO      RECE061-KOHBUNRI
            MOVE    RECE06-ZAINUM        TO      RECE061-ZAINUM
            IF      RECE06-ZAINUM       =   99999981  OR  99999982  OR
