@@ -150,10 +150,9 @@
                WHEN    "DBDISCONNECT"
                WHEN    "DBSTART"
                WHEN    "DBCOMMIT"
+               WHEN    "PUTWINDOW"
                    MOVE    LOW-VALUE       TO  MCP-TABLE
                                                MCP-PATHNAME
-               WHEN    "PUTWINDOW"
-                   CONTINUE
                WHEN    OTHER
                    IF  MCP-FUNC            =   "DBFETCH"
                        MOVE    LOW-VALUE   TO  MCPDATA-REC
