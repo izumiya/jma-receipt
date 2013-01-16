@@ -23,6 +23,9 @@
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     kohid 追加
       *  04.06.02    NACL-藤原    10/12/20  保険者からの返戻対応
+      *  04.06.03    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       ************************************************************
       *01  HENREI-BODY-REC.
            03  HENREI-B-HOSPNUM    PIC 9(2).
@@ -48,6 +51,8 @@
            03  HENREI-B-HKNJANUM   PIC X(8).
            03  HENREI-B-KIGO       PIC X(40).
            03  HENREI-B-NUM        PIC X(40).
+           03  HENREI-B-RECEIPT-KBN
+                                   PIC X(10).
            03  HENREI-B-KO-AREA.
                05  HENREI-B-KO-OCC OCCURS  4.
                    07  HENREI-B-FTNNUM PIC X(8).
@@ -79,6 +84,7 @@
                    07  HENREI-B-S-HOJOKBN-KEY  PIC X(01).
                    07  HENREI-B-S-KOHID-KEY    PIC 9(10).
                    07  HENREI-B-S-TEKSTYMD     PIC X(08).
+                   07  HENREI-B-S-RECEIPT-KBN  PIC X(10).
       *
                    07  HENREI-B-S-KIGO         PIC X(40).
       *端末ＩＤ

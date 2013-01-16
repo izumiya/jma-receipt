@@ -58,6 +58,7 @@
                     06  R97-SYUKA-TRECESYUBETU PIC X(10).
                     06  R97-SYUKA-THKNJANUM    PIC X(8).
                     06  R97-SYUKA-THOJOKBN     PIC X(10).
+                    06  R97-SYUKA-TRECEIPT-KBN PIC X(4).
                     06  R97-SYUKA-TSYUKA-INPUT PIC X(6).
                     06  R97-SYUKA-TSYUKA-AUTO  PIC X(6).
                   05  R97-SYUKALST-SELECT

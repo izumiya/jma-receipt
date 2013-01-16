@@ -36,6 +36,8 @@
       *  04.06.02    NACL-Æ£¸¶    10/11/30  Åý·×Ä¢É¼ÍÑ¤Î¹àÌÜÄÉ²Ã
       *                                     ÀÁµá³Û¾ðÊó¡Ê°åÎÅÈñ¡¢¿©»ö¡Ë
       *                                     ÊÝ¸±ÁÈ¹ç¤»¾ðÊó
+      *  04.06.03    NACL-Æ£¸¶    12/10/26  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
+      *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -180,17 +182,7 @@
        2001-EDIT-SKYMAIN-SEC          SECTION.
       *
            INITIALIZE                          SKYMAIN-REC
-           MOVE    RECE10-HOSPNUM          TO  SKYMAIN-HOSPNUM
-           MOVE    RECE10-SRYYM            TO  SKYMAIN-SRYYM
-           MOVE    RECE10-NYUGAIKBN        TO  SKYMAIN-NYUGAIKBN
-           MOVE    RECE10-PTID             TO  SKYMAIN-PTID
-           MOVE    RECE10-RECEKA           TO  SKYMAIN-RECEKA
-           MOVE    RECE10-TEISYUTUSAKI     TO  SKYMAIN-TEISYUTUSAKI
-           MOVE    RECE10-RECESYUBETU      TO  SKYMAIN-RECESYUBETU
-           MOVE    RECE10-HKNJANUM         TO  SKYMAIN-HKNJANUM
-           MOVE    RECE10-HOJOKBN-KEY      TO  SKYMAIN-HOJOKBN-KEY
-           MOVE    RECE10-KOHID-KEY        TO  SKYMAIN-KOHID-KEY
-           MOVE    RECE10-TEKSTYMD         TO  SKYMAIN-TEKSTYMD
+           MOVE    RECE10-KEY              TO  SKYMAIN-KEY
            MOVE    RECE10-PTNUM            TO  SKYMAIN-PTNUM
            MOVE    RECE10-PREFKBN          TO  SKYMAIN-PREFKBN
            MOVE    RECE10-PREFNUM          TO  SKYMAIN-PREFNUM
@@ -302,17 +294,7 @@
            MOVE    MCPDATA-REC             TO  SKYMAIN-REC
       *
            INITIALIZE                          RECE10-REC
-           MOVE    SKYMAIN-HOSPNUM         TO  RECE10-HOSPNUM
-           MOVE    SKYMAIN-SRYYM           TO  RECE10-SRYYM
-           MOVE    SKYMAIN-NYUGAIKBN       TO  RECE10-NYUGAIKBN
-           MOVE    SKYMAIN-PTID            TO  RECE10-PTID
-           MOVE    SKYMAIN-RECEKA          TO  RECE10-RECEKA
-           MOVE    SKYMAIN-TEISYUTUSAKI    TO  RECE10-TEISYUTUSAKI
-           MOVE    SKYMAIN-RECESYUBETU     TO  RECE10-RECESYUBETU
-           MOVE    SKYMAIN-HKNJANUM        TO  RECE10-HKNJANUM
-           MOVE    SKYMAIN-HOJOKBN-KEY     TO  RECE10-HOJOKBN-KEY
-           MOVE    SKYMAIN-KOHID-KEY       TO  RECE10-KOHID-KEY
-           MOVE    SKYMAIN-TEKSTYMD        TO  RECE10-TEKSTYMD
+           MOVE    SKYMAIN-KEY             TO  RECE10-KEY
            MOVE    SKYMAIN-PTNUM           TO  RECE10-PTNUM
            MOVE    SKYMAIN-PREFKBN         TO  RECE10-PREFKBN
            MOVE    SKYMAIN-PREFNUM         TO  RECE10-PREFNUM
@@ -733,17 +715,7 @@
       *****************************************************************
        9001-SKYKOH-KEY-EDIT-SEC        SECTION.
       *
-           MOVE    SKYMAIN-HOSPNUM     TO  SKYKOH-HOSPNUM
-           MOVE    SKYMAIN-SRYYM       TO  SKYKOH-SRYYM
-           MOVE    SKYMAIN-NYUGAIKBN   TO  SKYKOH-NYUGAIKBN
-           MOVE    SKYMAIN-PTID        TO  SKYKOH-PTID
-           MOVE    SKYMAIN-RECEKA      TO  SKYKOH-RECEKA
-           MOVE    SKYMAIN-TEISYUTUSAKI TO SKYKOH-TEISYUTUSAKI
-           MOVE    SKYMAIN-RECESYUBETU TO  SKYKOH-RECESYUBETU
-           MOVE    SKYMAIN-HKNJANUM    TO  SKYKOH-HKNJANUM
-           MOVE    SKYMAIN-HOJOKBN-KEY TO  SKYKOH-HOJOKBN-KEY
-           MOVE    SKYMAIN-KOHID-KEY   TO  SKYKOH-KOHID-KEY
-           MOVE    SKYMAIN-TEKSTYMD    TO  SKYKOH-TEKSTYMD
+           MOVE    SKYMAIN-KEY         TO  SKYKOH-KEY1
            MOVE    SKYMAIN-XXTEISYUTUSAKI
                                        TO  SKYKOH-XXTEISYUTUSAKI
       *
@@ -802,17 +774,7 @@
       *****************************************************************
        9001-SKYETC-KEY-EDIT-SEC        SECTION.
       *
-           MOVE    SKYMAIN-HOSPNUM     TO  SKYETC-HOSPNUM
-           MOVE    SKYMAIN-SRYYM       TO  SKYETC-SRYYM
-           MOVE    SKYMAIN-NYUGAIKBN   TO  SKYETC-NYUGAIKBN
-           MOVE    SKYMAIN-PTID        TO  SKYETC-PTID
-           MOVE    SKYMAIN-RECEKA      TO  SKYETC-RECEKA
-           MOVE    SKYMAIN-TEISYUTUSAKI TO SKYETC-TEISYUTUSAKI
-           MOVE    SKYMAIN-RECESYUBETU TO  SKYETC-RECESYUBETU
-           MOVE    SKYMAIN-HKNJANUM    TO  SKYETC-HKNJANUM
-           MOVE    SKYMAIN-HOJOKBN-KEY TO  SKYETC-HOJOKBN-KEY
-           MOVE    SKYMAIN-KOHID-KEY   TO  SKYETC-KOHID-KEY
-           MOVE    SKYMAIN-TEKSTYMD    TO  SKYETC-TEKSTYMD
+           MOVE    SKYMAIN-KEY         TO  SKYETC-KEY
            MOVE    SKYMAIN-XXTEISYUTUSAKI
                                        TO  SKYETC-XXTEISYUTUSAKI
            .

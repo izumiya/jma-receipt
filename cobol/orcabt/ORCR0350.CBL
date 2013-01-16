@@ -362,6 +362,8 @@
       *                                     修正
       *  04.06.12    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.13    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4350,7 +4352,7 @@
            END-START
       *
            PERFORM UNTIL ( FLG-RECE68           =  1                   )
-                   OR    ( RECE62-KEY       NOT =  RECE68-KEY1         )
+                   OR    ( RECE62-KEY       NOT =  RECE68-KEY1 (1:53)  )
       *
       *        再入院年月日か入院年月日
                IF    ( RECE68-NYUINYMD     =   RECE62-NYUINYMD )

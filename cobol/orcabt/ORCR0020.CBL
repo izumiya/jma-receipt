@@ -248,6 +248,8 @@
       *  04.06.06    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
       *  04.06.07    NACL-藤原    12/09/27  生活保護期間重複対応
+      *  04.06.08    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1314,6 +1316,9 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                ELSE
                    PERFORM VARYING IDXX    FROM    1   BY  1
                            UNTIL   IDXX    >       WRK-SEIHO-RECE01-MAX
+      *              分割区分毎にまとめる
+                     IF      RECE01-RECEIPT-KBN    =
+                                   WRK-SEIHO-RECE01-RECEIPT-KBN (IDXX)
                        PERFORM VARYING IDYY    FROM    1   BY  1
                                UNTIL   IDYY    >       10
                                OR      RECE01-KOHID-O (IDYY)
@@ -1368,7 +1373,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                                MOVE    WRK-SEIHO-RECE01-MAX
                                                    TO  IDXX
                            END-IF
-                       END-PERFORM      
+                       END-PERFORM
+                     END-IF
                    END-PERFORM
                END-IF                     
            END-IF
@@ -1441,6 +1447,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    END-IF
                END-IF
            END-PERFORM
+           MOVE    RECE01-RECEIPT-KBN  TO  RECE02-RECEIPT-KBN
       *    患者番号
            MOVE    RECE01-PTNUM        TO  RECE02-PTNUM
       *    診療科情報のセット
@@ -1783,6 +1790,17 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    PERFORM 900-CLOSE-SEC
                END-IF
            END-IF              
+      *    老併、老健の編集
+           IF      RECE01-RECEIPT-KBN (1:1)
+                                        =   "1"
+               ADD      1                   TO  TOKKI-IDX
+               MOVE    "07"                 TO  RECE02-TOKKI (TOKKI-IDX)
+           END-IF
+           IF      RECE01-RECEIPT-KBN (1:1)
+                                        =   "2"
+               ADD      1                   TO  TOKKI-IDX
+               MOVE    "08"                 TO  RECE02-TOKKI (TOKKI-IDX)
+           END-IF
       *
            IF   RECE01-SRYYM    >=  "200210"
       *        低所得情報編集
@@ -1996,6 +2014,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
                                    TO  LNK-SYUACC-IO-TEISYUTUSAKI(1)
            MOVE    RECE02-KOHID-KEY
                                    TO  LNK-SYUACC-IO-KOHID       (1)
+           MOVE    RECE02-RECEIPT-KBN
+                                   TO  LNK-SYUACC-IO-RECEIPT-KBN (1)
       *    精神入院か生保単独複数のとき
            IF    ( RECE02-HKNNUM   =   SPACE      )
            AND   ( RECE02-TEKSTYMD
@@ -3808,6 +3828,8 @@ grpsys                   PERFORM 900-DBSELECT-SEC
                              MOVE    1                TO  FLG-PTHKNINF  
                          END-IF
       *
+                         MOVE    ZERO                TO  FLG-RIREKI-HEN
+      *
                          PERFORM          UNTIL   FLG-PTHKNINF     =   1
                                           OR      FLG-RIREKI-HEN   =   1
                            IF      PTHKN-SAKJOKBN   =   SPACE
@@ -3908,8 +3930,8 @@ grpsys                           PERFORM 900-DBSELECT-SEC
                          IF      FLG-RIREKI-HEN      =   ZERO
                            MOVE    RECE09-REC        TO
                                                  TBL-RECE09-OCC (IDYY)
-                           MOVE    100               TO  IDYY
                          END-IF
+                         MOVE    100               TO  IDYY
                      ELSE                                            
                        INITIALIZE                      PTKOHINF-REC
                        MOVE    RECE01-HOSPNUM      TO  PTKOH-HOSPNUM
@@ -4449,17 +4471,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *****************************************************************
        24012-RECE12-WRITE-SEC         SECTION.
       *
-grpsys     MOVE    RECE02-HOSPNUM      TO  RECE12-HOSPNUM
-           MOVE    RECE02-SRYYM        TO  RECE12-SRYYM
-           MOVE    RECE02-NYUGAIKBN    TO  RECE12-NYUGAIKBN
-           MOVE    RECE02-PTID         TO  RECE12-PTID
-           MOVE    RECE02-RECEKA       TO  RECE12-RECEKA
-           MOVE    RECE02-TEISYUTUSAKI TO  RECE12-TEISYUTUSAKI
-           MOVE    RECE02-RECESYUBETU  TO  RECE12-RECESYUBETU
-           MOVE    RECE02-HKNJANUM-KEY TO  RECE12-HKNJANUM
-           MOVE    RECE02-HOJOKBN-KEY  TO  RECE12-HOJOKBN
-           MOVE    RECE02-KOHID-KEY    TO  RECE12-KOHID
-           MOVE    RECE02-TEKSTYMD     TO  RECE12-TEKSTYMD
+           MOVE    RECE02-KEY          TO  RECE12-KEY1
            MOVE    PTNYUINRRK-NYUINYMD TO  RECE12-NYUINYMD
            MOVE    RECE12-REC          TO  WRK-RECE12-REC          
            PERFORM 900-RECE12-READ-SEC

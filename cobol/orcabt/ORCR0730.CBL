@@ -177,6 +177,8 @@
       *  04.06.07    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *  04.06.08    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
+      *  04.06.09    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -8354,7 +8356,7 @@
            END-START
       *
            PERFORM UNTIL ( FLG-RECE68           =  1                   )
-                   OR    ( RECE62-KEY       NOT =  RECE68-KEY1         )
+                   OR    ( RECE62-KEY       NOT =  RECE68-KEY1 (1:53)  )
       *
                IF      WRK-NYUINCHUKBN     =   ZERO
                    MOVE    RECE68-NYUINYMD     TO  WRK-SYMD

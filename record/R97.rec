@@ -85,8 +85,9 @@ R97	{
 					value5	varchar(10);
 					value6	varchar(8);
 					value7	varchar(10);
-					value8	varchar(6);
+					value8	varchar(4);
 					value9	varchar(6);
+					value10	varchar(6);
 				}	[500];
 				select	bool[500];
 			};

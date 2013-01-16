@@ -49,6 +49,8 @@
       *  04.06.02    NACL-藤原    10/11/04  補足コメント対応
       *  04.06.03    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.04    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -147,6 +149,7 @@ grpsys     COPY    "COMMON-SPA".
                05  KEY-N-HOJOKBN       PIC X(01).
                05  KEY-N-KOHID         PIC 9(10).
                05  KEY-N-TEKSTYMD      PIC X(08). 
+               05  KEY-N-RECEIPT-KBN   PIC X(10).
                05  KEY-N-SRYYMD        PIC X(08).
                05  KEY-N-TENKIKBN      PIC X(01).
                05  KEY-N-TENKIYMD      PIC X(08).
@@ -163,6 +166,7 @@ grpsys     COPY    "COMMON-SPA".
                05  KEY-O-HOJOKBN       PIC X(01).
                05  KEY-O-KOHID         PIC 9(10).
                05  KEY-O-TEKSTYMD      PIC X(08). 
+               05  KEY-O-RECEIPT-KBN   PIC X(10).
                05  KEY-O-SRYYMD        PIC X(08).
                05  KEY-O-TENKIKBN      PIC X(01).
                05  KEY-O-TENKIYMD      PIC X(08).
@@ -491,6 +495,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    RECE03-SRYYM        TO  KEY-N-SRYYM
                    MOVE    RECE03-NYUGAIKBN    TO  KEY-N-NYUGAIKBN
                    MOVE    RECE03-PTID         TO  KEY-N-PTID
+                   MOVE    RECE03-RECEIPT-KBN  TO  KEY-N-RECEIPT-KBN
                    MOVE    RECE03-RECEKA       TO  KEY-N-RECEKA
                    MOVE    RECE03-TEISYUTUSAKI TO  KEY-N-TEISYUTUSAKI
                    MOVE    RECE03-RECESYUBETU  TO  KEY-N-RECESYUBETU

@@ -37,8 +37,9 @@ T09	{
 					value5	varchar(8);
 					value6	varchar(8);
 					value7	varchar(40);
-					value8	varchar(9);
-					value9	varchar(1);
+					value8	varchar(4);
+					value9	varchar(9);
+					value10	varchar(1);
 				}	[20];
 				select	bool[20];
 			};

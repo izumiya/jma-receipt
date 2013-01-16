@@ -244,7 +244,7 @@
     <widget>
       <class>GtkScrolledWindow</class>
       <name>scrolledwindow26</name>
-      <x>6</x>
+      <x>3</x>
       <y>27</y>
       <width>1007</width>
       <height>233</height>
@@ -270,8 +270,8 @@
 	  <data>SELECT</data>
 	  <last_modification_time>Thu, 07 Feb 2002 06:04:12 GMT</last_modification_time>
 	</signal>
-	<columns>16</columns>
-	<column_widths>29,58,16,30,39,84,114,140,15,57,30,36,74,111,21,15</column_widths>
+	<columns>18</columns>
+	<column_widths>29,58,16,30,39,84,114,15,140,15,57,30,36,74,111,21,20,15</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -359,6 +359,19 @@
 	  <child_name>CList:title</child_name>
 	  <name>label470</name>
 	  <label>記号・番号</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>label490</name>
+	  <label>施設</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>
@@ -463,6 +476,19 @@
 	  <child_name>CList:title</child_name>
 	  <name>label482</name>
 	  <label>補</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>label489</name>
+	  <label>施設</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>

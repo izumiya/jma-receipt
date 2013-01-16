@@ -37,6 +37,7 @@
                     06  H99-THKNJANUM     PIC X(8).
                     06  H99-THOJOKBN      PIC X(8).
                     06  H99-TKIGO         PIC X(20).
+                    06  H99-TRECEIPT-KBN  PIC X(10).
                     06  H99-TCREYMD       PIC X(9).
                   05  H99-SELECT  PIC X       OCCURS  50 TIMES.
               03  H99-SELNUM.

@@ -43,6 +43,9 @@
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     kohid 追加
       *  04.06.02    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *  04.06.02    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -322,6 +325,8 @@ grpsys     MOVE    SPA-HOSPNUM     TO  LNK-SYUBETU-HOSPNUM
                                    TO  LNK-SYUACC-IO-HOJOKBN      (IDY)
                    MOVE    LNK-SYUBETU-KOHID        (IDY)
                                    TO  LNK-SYUACC-IO-KOHID        (IDY)
+                   MOVE    LNK-SYUBETU-RECEIPT-KBN  (IDY)
+                                   TO  LNK-SYUACC-IO-RECEIPT-KBN  (IDY)
                    MOVE    LNK-SYUBETU-HKNNUM       (IDY)
                                    TO  LNK-SYUACC-IO-HKNNUM       (IDY)
       *            精神入院か生保単独複数のとき

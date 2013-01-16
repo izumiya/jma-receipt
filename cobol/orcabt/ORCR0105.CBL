@@ -170,6 +170,8 @@
       *  04.06.08    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *  04.06.09    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
+      *  04.06.10    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2484,6 +2486,7 @@
            ELSE
                MOVE    RECE02X-TEKSTYMD    TO  KOHSKY-TEKSTYMD
            END-IF
+           MOVE    RECE02X-RECEIPT-KBN TO  KOHSKY-RECEIPT-KBN
       *
            MOVE     999999999          TO  WRK-TAIHI-FTNMONEY
       *    レセプト種別を請求管理より編集
@@ -8873,6 +8876,7 @@
            ELSE
                MOVE    RECE02-TEKSTYMD TO  RECE10-TEKSTYMD
            END-IF
+           MOVE    RECE02-RECEIPT-KBN  TO  RECE10-RECEIPT-KBN
       *
            MOVE    "tbl_seikyu"        TO  WRK-MCP-TABLE
            MOVE    "key"               TO  WRK-MCP-PATHNAME

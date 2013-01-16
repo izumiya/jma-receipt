@@ -105,6 +105,8 @@
       *  04.06.04    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
       *  04.06.02    NACL-藤原    12/09/27  生活保護期間重複対応
+      *  04.06.03    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -374,6 +376,14 @@
            COPY    "CPRCF061.INC"      REPLACING  //RECE61-//
                                        BY         //WRK-KOH-RECE61-//.
       *
+      *    施設入所情報（９５０、９５１）退避用領域
+       01  TABLE-PTKOHINF-AREA.
+           02  TBL-PTKOHINF-REC        OCCURS  10.
+           COPY    "CPPTKOHINF.INC"
+                                   REPLACING   //PTKOH//
+                                   BY          //TBL-PTKOH//.
+           02  TBL-PTKOHINF-MAX    PIC 9(02).
+      *
        01  WRK-CONS-AREA.
       *    労災保険番号 
            03  WRK-CONS-ROUSAI-HKNNUM  PIC X(03)   VALUE   "971".
@@ -642,6 +652,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
        200-MAIN-SEC               SECTION.
       *
            MOVE    LOW-VALUE           TO  KEY-AREA
+      *
+      *    施設入所情報
+           PERFORM 500-SISETU-HENSYU-SEC
       *
       *    診療会計読み込み
            MOVE    "1"                 TO  WRK-DBKBN 
@@ -1412,6 +1425,29 @@ grpsys     MOVE    LNK-SYUBETU-HOSPNUM     TO  WRK-RECE61-HOSPNUM
            END-IF             
            MOVE    SPACE               TO WRK-RECE61-RECEKA
       *
+      *    施設入所の有無
+           IF    ( WRK-RECE61-RECEIPT-KBN  =   SPACE )
+           AND   ( TBL-PTKOHINF-MAX        >   ZERO  )
+           AND   ( LNK-SYUBETU-NYUGAIKBN   =   "2"   )
+               PERFORM VARYING IDXX    FROM    1   BY  1
+                       UNTIL   IDXX    >       TBL-PTKOHINF-MAX
+                   IF    ( TBL-PTKOH-TEKSTYMD (IDXX)
+                                           <=  COMB-TEKSTYMD           )
+                   AND   ( COMB-TEKEDYMD   <=  TBL-PTKOH-TEKEDYMD(IDXX))
+                       IF      TBL-PTKOH-KOHNUM (IDXX)
+                                               =   "950"
+                           MOVE    "1"     TO  WRK-RECE61-RECEIPT-KBN
+                       END-IF
+                       IF      TBL-PTKOH-KOHNUM (IDXX)
+                                               =   "951"
+                           MOVE    "2"     TO  WRK-RECE61-RECEIPT-KBN
+                       END-IF
+                       MOVE    TBL-PTKOHINF-MAX
+                                           TO  IDXX
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
       *    地方公費のみの場合は出力しない
            IF    ( WRK-RECE61-HKNNUM      =   SPACE )
            AND   ( WRK-RECE61-KOHID       =   ZERO  )
@@ -2126,6 +2162,9 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                    ELSE
                        PERFORM VARYING IDA FROM    1   BY  1
                                UNTIL   IDA >       TBL-SEIHO-RECE61-MAX
+      *                  レセプト分割区分毎にまとめる
+                         IF      WRK-RECE61-RECEIPT-KBN    =
+                                   TBL-SEIHO-RECE61-RECEIPT-KBN (IDA)
                            PERFORM VARYING IDYY    FROM    1   BY  1
                                    UNTIL   IDYY    >       10
                                    OR      WRK-RECE61-KOHID-O (IDYY)
@@ -2159,7 +2198,8 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
                                    MOVE    TBL-SEIHO-RECE61-MAX
                                                            TO  IDA
                                END-IF
-                           END-PERFORM      
+                           END-PERFORM
+                         END-IF
                        END-PERFORM
                    END-IF                     
                END-IF
@@ -2236,6 +2276,9 @@ grpsys             OR      TBL-RECE61-HOSPNUM (IDXX)  =   ZERO
       *    適用開始年月日
            MOVE    WRK-RECE61-TEKSTYMD
                                    TO  LNK-SYUBETU-TEKSTYMD (IDZZ)
+      *    分割区分
+           MOVE    WRK-RECE61-RECEIPT-KBN 
+                                   TO  LNK-SYUBETU-RECEIPT-KBN  (IDZZ)
       *    保険番号（主保険）
            MOVE    WRK-RECE61-HKNNUM
                                    TO  LNK-SYUBETU-HKNNUM   (IDZZ)
@@ -2516,6 +2559,91 @@ grpsys                 MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
       *
            .
        500-ORCSNYUINDAY-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    施設入所情報処理
+      *****************************************************************
+       500-SISETU-HENSYU-SEC             SECTION.
+      *
+           INITIALIZE                      TABLE-PTKOHINF-AREA
+      *
+      *    入院外のみ対象
+           IF      LNK-SYUBETU-NYUGAIKBN   =   "1"
+               GO  TO  500-SISETU-HENSYU-EXT
+           END-IF
+      *
+      *    ９５０（老併）
+           INITIALIZE                      PTKOHINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYUBETU-PTID    TO  PTKOH-PTID
+           MOVE    "950"               TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-PTKOHINF-READ-N-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTKOHINF  
+           END-IF
+           PERFORM     UNTIL   FLG-PTKOHINF    =   1
+                       OR      TBL-PTKOHINF-MAX
+                                               >=  10
+               IF    ( PTKOH-TEKSTYMD(1:6) <=  LNK-SYUBETU-SRYYM    )
+               AND   ( LNK-SYUBETU-SRYYM   <=  PTKOH-TEKEDYMD (1:6) )
+               AND   ( PTKOH-SAKJOKBN      =   SPACE                )
+                   ADD     1               TO  TBL-PTKOHINF-MAX
+                   MOVE    PTKOHINF-REC    TO  TBL-PTKOHINF-REC
+                                                   (TBL-PTKOHINF-MAX)
+               END-IF
+      *
+               MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+               MOVE    "key4"           TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-N-SEC
+           END-PERFORM
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+      *    ９５１（老健）
+           INITIALIZE                      PTKOHINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+           MOVE    LNK-SYUBETU-PTID    TO  PTKOH-PTID
+           MOVE    "951"               TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-PTKOHINF-READ-N-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTKOHINF  
+           END-IF
+           PERFORM     UNTIL   FLG-PTKOHINF    =   1
+                       OR      TBL-PTKOHINF-MAX
+                                               >=  10
+               IF    ( PTKOH-TEKSTYMD(1:6) <=  LNK-SYUBETU-SRYYM    )
+               AND   ( LNK-SYUBETU-SRYYM   <=  PTKOH-TEKEDYMD (1:6) )
+               AND   ( PTKOH-SAKJOKBN      =   SPACE                )
+                   ADD     1               TO  TBL-PTKOHINF-MAX
+                   MOVE    PTKOHINF-REC    TO  TBL-PTKOHINF-REC
+                                                   (TBL-PTKOHINF-MAX)
+               END-IF
+      *
+               MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+               MOVE    "key4"           TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-N-SEC
+           END-PERFORM
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       500-SISETU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

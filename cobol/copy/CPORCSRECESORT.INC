@@ -27,6 +27,8 @@
       *
       *  04.06.01    NACL-Æ£¸¶    10/10/12  ¸øÈñÃ±ÆÈ¤Î¥ì¥»Ê¬Î¥ÂÐ±þ
       *                                     kohid ÄÉ²Ã
+      *  04.06.02    NACL-Æ£¸¶    12/10/26  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
+      *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
       ************************************************************
        01  ORCSRECESORTAREA.
       *
@@ -64,6 +66,8 @@
                            11  ORCSRECESORT-IN-KEY-HOJOKBN   PIC X(01).
                            11  ORCSRECESORT-IN-KEY-KOHID     PIC 9(10).
                            11  ORCSRECESORT-IN-KEY-TEKSTYMD  PIC X(08). 
+                           11  ORCSRECESORT-IN-KEY-RECEIPT-KBN
+                                                             PIC X(10).
                            11  ORCSRECESORT-IN-KEY-ZAINUM    PIC 9(08).
                            11  ORCSRECESORT-IN-KEY-ZAIREN    PIC 9(02).
                            11  ORCSRECESORT-IN-KEY-RENNUM    PIC 9(02).
@@ -120,6 +124,8 @@
                            11  ORCSRECESORT-KEY-HOJOKBN    PIC X(01).
                            11  ORCSRECESORT-KEY-KOHID      PIC 9(10).
                            11  ORCSRECESORT-KEY-TEKSTYMD   PIC X(08). 
+                           11  ORCSRECESORT-KEY-RECEIPT-KBN
+                                                           PIC X(10).
                            11  ORCSRECESORT-KEY-ZAINUM     PIC 9(08).
                            11  ORCSRECESORT-KEY-ZAIREN     PIC 9(02).
                            11  ORCSRECESORT-KEY-RENNUM     PIC 9(02).

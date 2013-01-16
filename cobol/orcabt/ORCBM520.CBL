@@ -36,9 +36,14 @@
       *                                     請求に係わる記録条件仕様の
       *                                     変更に伴う修正
       *  04.05.02    NACL-藤原    12/06/05  レセ電データ無し時のエラー処理
+      *  04.05.03    NACL-藤原    12/06/25  返戻ファイル取り込み時のレコ
+      *                                     ード長変更
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.02    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1070,6 +1075,8 @@
                                            =   ONRECE-B-KOHID        )
                        AND   ( HENREI-B-S-TEKSTYMD     (IDZZ)
                                            =   ONRECE-B-TEKSTYMD     )
+                       AND   ( HENREI-B-S-RECEIPT-KBN  (IDZZ)
+                                           =   ONRECE-B-RECEIPT-KBN  )
                            MOVE    HENREI-B-REC    TO  WRK-HENREI-B-REC
                            MOVE    1               TO  IDZZ
                            MOVE    1               TO  FLG-HENREI-B
@@ -1221,6 +1228,8 @@
                                    WRK-HENREI-B-S-KOHID-KEY   (IDZZ)
                    AND     ONRECE-B-TEKSTYMD       =
                                    WRK-HENREI-B-S-TEKSTYMD    (IDZZ)
+                   AND     ONRECE-B-RECEIPT-KBN    =
+                                   WRK-HENREI-B-S-RECEIPT-KBN (IDZZ)
                        MOVE    SMCNDATE-YMD    TO
                                        WRK-HENREI-B-S-SYORIYMD (IDZZ)  
                        MOVE    1               TO
@@ -1345,6 +1354,7 @@
            PERFORM 900-DBDISCONNECT-SEC
            DISPLAY "RECE300  IN   " CNT-IN  
            DISPLAY "RECE300  OUT  " CNT-OUT
+           DISPLAY "RECE300  RE   " WRK-RECENUM
            DISPLAY "RECE300  FILE " WRK-FILE-RENNUM  
            DISPLAY "*** ORCBM520 END ***"
            .
@@ -1730,6 +1740,8 @@
            MOVE    ONRECE-B-HOJOKBN    TO  RECEDEN-HOJOKBN-KEY
            MOVE    ONRECE-B-KOHID      TO  RECEDEN-KOHID-KEY
            MOVE    ONRECE-B-TEKSTYMD   TO  RECEDEN-TEKSTYMD
+           MOVE    ONRECE-B-RECEIPT-KBN
+                                       TO  RECEDEN-RECEIPT-KBN
            MOVE    "1"                 TO  RECEDEN-RECKBN
            MOVE    RECEDEN-REC         TO  MCPDATA-REC
            IF      WRK-PARA-PRTKBN     =   "1"

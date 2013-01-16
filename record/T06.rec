@@ -96,8 +96,9 @@ T06	{
 					value6	varchar(4);
 					value7	varchar(8);
 					value8	varchar(40);
-					value9	varchar(2);
-					value10	varchar(9);
+					value9	varchar(4);
+					value10	varchar(2);
+					value11	varchar(9);
 				}	[1000];
 				select	bool[1000];
 			};

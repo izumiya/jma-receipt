@@ -26,32 +26,37 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.03    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       ************************************************************
        01  SKYKOH-REC.
       *ＫＥＹ
            03  SKYKOH-KEY.
+               05  SKYKOH-KEY1.
       *医療機関ＩＤ
-               05  SKYKOH-HOSPNUM          PIC 9(2).
+                   07  SKYKOH-HOSPNUM          PIC 9(2).
       *診療年月
-               05  SKYKOH-SRYYM            PIC  9(06).
+                   07  SKYKOH-SRYYM            PIC  9(06).
       *入外区分
-               05  SKYKOH-NYUGAIKBN        PIC  X(01).
+                   07  SKYKOH-NYUGAIKBN        PIC  X(01).
       *患者ＩＤ
-               05  SKYKOH-PTID             PIC  9(10).
+                   07  SKYKOH-PTID             PIC  9(10).
       *レセプト科（空白の時ゼロをセット）
-               05  SKYKOH-RECEKA           PIC  X(02).
+                   07  SKYKOH-RECEKA           PIC  X(02).
       *審査支払機関
-               05  SKYKOH-TEISYUTUSAKI     PIC  9(01).
+                   07  SKYKOH-TEISYUTUSAKI     PIC  9(01).
       *レセプト種別
-               05  SKYKOH-RECESYUBETU      PIC  X(04).
+                   07  SKYKOH-RECESYUBETU      PIC  X(04).
       *保険者番号
-               05  SKYKOH-HKNJANUM         PIC  X(08).
+                   07  SKYKOH-HKNJANUM         PIC  X(08).
       *補助区分（船員保険のときのみ）
-               05  SKYKOH-HOJOKBN-KEY      PIC  X(01).
+                   07  SKYKOH-HOJOKBN-KEY      PIC  X(01).
       *公費ＩＤ（公費単独のみ）
-               05  SKYKOH-KOHID-KEY        PIC  9(10).
+                   07  SKYKOH-KOHID-KEY        PIC  9(10).
       *適用開始年月日
-               05  SKYKOH-TEKSTYMD         PIC  X(08).
+                   07  SKYKOH-TEKSTYMD         PIC  X(08).
+      *分割区分
+                   07  SKYKOH-RECEIPT-KBN      PIC  X(10).
       *連番号(1〜4)
                05  SKYKOH-RENNUM           PIC  9(02).
       *公費情報

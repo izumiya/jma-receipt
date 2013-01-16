@@ -33,6 +33,10 @@
       *
       *  04.05.01    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
       *                                     の変更に伴う月後れ分のチェック
+      *
+      *  04.06.01    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
+      *                                     receipt_kbn 追加 
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -1042,6 +1046,8 @@
                                        TO  T09-THOJOKBN     (IDX)
                MOVE    SPA-GMN-T09-TKIGO        (IDX)
                                        TO  T09-TKIGO        (IDX)
+               MOVE    SPA-GMN-T09-TRECEIPT-KBN (IDX)
+                                       TO  T09-TRECEIPT-KBN (IDX)
                MOVE    SPA-GMN-T09-TCREYMD      (IDX)
                                        TO  T09-TCREYMD      (IDX)
                IF      SPA-GMN-T09-TCHK (IDX)  =   "1"

@@ -398,6 +398,8 @@
       *                                     方法の修正
       *  04.06.09    NACL-藤原    11/09/29  基本項目でデータ区分２のデー
       *                                     タのみの診療区分の記録
+      *  04.06.10    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -890,6 +892,7 @@ grpsys     COPY    "COMMON-SPA".
                        09  TBL-ZAIW-HOJOKBN         PIC  X(01).
                        09  TBL-ZAIW-KOHID           PIC  9(10).
                        09  TBL-ZAIW-TEKSTYMD        PIC  X(08). 
+                       09  TBL-ZAIW-RECEIPT-KBN     PIC  X(10).                    
                        09  TBL-ZAIW-ZAINUM          PIC  9(08).
                        09  TBL-ZAIW-RENNUM          PIC  9(02).
                    07  TBL-ZAIW-SHORI-RENNUM        PIC  9(01).
@@ -987,6 +990,7 @@ grpsys     COPY    "COMMON-SPA".
                    07  TBL-KOUI-HOJOKBN         PIC  X(01).
                    07  TBL-KOUI-KOHID           PIC  9(10).
                    07  TBL-KOUI-TEKSTYMD        PIC  X(08). 
+                   07  TBL-KOUI-RECEIPT-KBN     PIC  X(10).                    
                    07  TBL-KOUI-ZAINUM          PIC  9(08).
                    07  TBL-KOUI-RENNUM          PIC  9(02).
                05  TBL-KOUI-SHORI-RENNUM        PIC  9(01).
@@ -1114,8 +1118,9 @@ grpsys     COPY    "COMMON-SPA".
                        09  WRK-KOUI-RECESYUBETU    PIC 9(04).
                        09  WRK-KOUI-HKNJANUM       PIC X(08).
                        09  WRK-KOUI-HOJOKBN        PIC X(01).
-                       09  WRK-KOUI-KOHID          PIC  9(10).
+                       09  WRK-KOUI-KOHID          PIC 9(10).
                        09  WRK-KOUI-TEKSTYMD       PIC X(08). 
+                       09  WRK-KOUI-RECEIPT-KBN    PIC X(10).                    
                        09  WRK-KOUI-ZAINUM         PIC 9(08).
                        09  WRK-KOUI-RENNUM         PIC 9(02).
                    07  WRK-KOUI-SHORI-RENNUM       PIC 9(01).
@@ -1212,6 +1217,7 @@ grpsys     COPY    "COMMON-SPA".
                    07  TBL-KOUI-SRYKBN12-HOJOKBN     PIC X(01).
                    07  TBL-KOUI-SRYKBN12-KOHID       PIC 9(10).
                    07  TBL-KOUI-SRYKBN12-TEKSTYMD    PIC X(08). 
+                   07  TBL-KOUI-SRYKBN12-RECEIPT-KBN PIC  X(10).                    
                    07  TBL-KOUI-SRYKBN12-ZAINUM      PIC 9(08).
                    07  TBL-KOUI-SRYKBN12-RENNUM      PIC 9(02).
                05  TBL-KOUI-SRYKBN12-SHORI-RENNUM    PIC 9(01).
@@ -1293,6 +1299,7 @@ grpsys     COPY    "COMMON-SPA".
                    07  TBL-KENSA-RECE05-HOJOKBN        PIC X(01).
                    07  TBL-KENSA-RECE05-KOHID          PIC 9(10).
                    07  TBL-KENSA-RECE05-TEKSTYMD       PIC X(08). 
+                   07  TBL-KENSA-RECE05-RECEIPT-KBN    PIC X(10).                    
                    07  TBL-KENSA-RECE05-ZAINUM         PIC 9(08).
                    07  TBL-KENSA-RECE05-RENNUM         PIC 9(02).
               05  TBL-KENSA-RECE05-SHORI-RENNUM        PIC 9(01).
@@ -7681,6 +7688,7 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            ELSE
                MOVE    RECE02-TEKSTYMD TO  RECEDEN-TEKSTYMD
            END-IF
+           MOVE    RECE02-RECEIPT-KBN  TO  RECEDEN-RECEIPT-KBN
            .
        50011-KEY-HENSYU-EXT.
            EXIT.
@@ -7730,7 +7738,7 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            EXIT.
       *
       *****************************************************************
-      *    右ずめ編集処理
+      *    右づめ編集処理
       *****************************************************************
        5003-DATA-RIGHT-HENSYU-SEC          SECTION.
       *

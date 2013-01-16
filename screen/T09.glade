@@ -339,8 +339,8 @@
 	  <data>SELECT</data>
 	  <last_modification_time>Thu, 07 Feb 2002 06:04:20 GMT</last_modification_time>
 	</signal>
-	<columns>10</columns>
-	<column_widths>25,81,149,28,54,80,55,168,63,17</column_widths>
+	<columns>11</columns>
+	<column_widths>25,81,149,28,54,80,55,168,30,63,17</column_widths>
 	<selection_mode>GTK_SELECTION_MULTIPLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -441,6 +441,19 @@
 	  <child_name>CList:title</child_name>
 	  <name>label471</name>
 	  <label>記号・番号</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
+	  <name>label480</name>
+	  <label>施設</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
 	  <wrap>False</wrap>
 	  <xalign>0.5</xalign>

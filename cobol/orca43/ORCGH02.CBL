@@ -31,6 +31,9 @@
       *  04.06.02    NACL-Æ£¸¶    10/12/20  ÊÝ¸±¼Ô¤«¤é¤ÎÊÖÌáÂÐ±þ
       *  04.06.03    NACL-Æ£¸¶    11/02/01  ¼çÊÝ¸±¤¬¤Ê¤¤¾ì¹ç¡¢»ùÆ¸ÊÝ¸î(53)
       *                                     ¤Ï¸øÈñÃ±ÆÈ¤Î¥ì¥»¥×¥È¤È¤¹¤ë
+      *  04.06.04    NACL-Æ£¸¶    12/10/26  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
+      *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
+      *                                     receipt_kbn ÄÉ²Ã 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -382,6 +385,14 @@
                                            INTO    SPA-H02GMN-TKIGO(IDY)
                    END-STRING
                END-IF
+               EVALUATE    TBL-HENREI-B-RECEIPT-KBN (IDZZ)(1:1)
+               WHEN    "1"
+                   MOVE    "Ï·Ê»"          TO  SPA-H02GMN-TRECEIPT-KBN
+                                                                  (IDY)
+               WHEN    "2"
+                   MOVE    "Ï··ò"          TO  SPA-H02GMN-TRECEIPT-KBN
+                                                                  (IDY)
+           END-EVALUATE
                MOVE    TBL-HENREI-B-HR-MSG (IDZZ)
                                        TO  SPA-H02GMN-TERR        (IDY)
       *
@@ -447,8 +458,19 @@
                                    TO  SPA-H02NAI-TS-KOHID-KEY    (IDY)
                    MOVE    TBL-HENREI-B-S-TEKSTYMD         (IDZZ IDX)
                                    TO  SPA-H02NAI-TS-TEKSTYMD     (IDY)
+                   MOVE    TBL-HENREI-B-S-RECEIPT-KBN      (IDZZ IDX)
+                                   TO  SPA-H02NAI-TS-RECEIPT-KBN  (IDY)
                    MOVE    TBL-HENREI-B-S-KIGO             (IDZZ IDX)
                                    TO  SPA-H02GMN-TS-KIGO         (IDY)
+      *
+                   EVALUATE    TBL-HENREI-B-S-RECEIPT-KBN(IDZZ IDX)(1:1)
+                       WHEN    "1"
+                           MOVE    "Ï·Ê»"          TO
+                                       SPA-H02GMN-TS-RECEIPT-KBN (IDX)
+                       WHEN    "2"
+                           MOVE    "Ï··ò"          TO
+                                       SPA-H02GMN-TS-RECEIPT-KBN (IDX)
+                   END-EVALUATE
                END-PERFORM
            END-PERFORM
       *
@@ -1060,6 +1082,8 @@
                                        TO  H02-THKNJANUM    (IDX)
                MOVE    SPA-H02GMN-TKIGO        (IDX)
                                        TO  H02-TKIGO        (IDX)
+               MOVE    SPA-H02GMN-TRECEIPT-KBN (IDX)
+                                       TO  H02-TRECEIPT-KBN (IDX)
                MOVE    SPA-H02GMN-TERR         (IDX)
                                        TO  H02-TERR         (IDX)
                MOVE    SPA-H02GMN-TS-MAKE-FLG  (IDX)
@@ -1079,6 +1103,8 @@
                                        TO  H02-TS-KIGO      (IDX)
                MOVE    SPA-H02GMN-TS-HOJOKBN-KEY(IDX)
                                        TO  H02-TS-HOJOKBN   (IDX)
+               MOVE    SPA-H02GMN-TS-RECEIPT-KBN(IDX)
+                                       TO  H02-TS-RECEIPT-KBN (IDX)
                MOVE    SPA-H02GMN-TS-HENREI-SIJI-FLG (IDX)
                                        TO  H02-TS-HENREI-SIJI-FLG (IDX)
       *

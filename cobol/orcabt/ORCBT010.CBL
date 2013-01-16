@@ -116,6 +116,8 @@
       *  04.06.05    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
       *  04.06.06    NACL-藤原    12/09/27  生活保護期間重複対応
+      *  04.06.07    NACL-藤原    12/10/26  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -130,12 +132,6 @@
                                    RECORD  KEY     IS  TOUKEI01-KEY
                                    FILE    STATUS  IS  STS-TOUKEI01.
       *
-           SELECT  TOUKEI011-FILE  ASSIGN  TOUKEI01PARA
-                                   ORGANIZATION    IS  INDEXED
-                                   ACCESS  MODE    IS  SEQUENTIAL
-                                   RECORD  KEY     IS  TOUKEI011-KEY
-                                   FILE    STATUS  IS  STS-TOUKEI01.
-      *
       *    月次統計データ（統計情報）
            SELECT  TOUKEI02-FILE   ASSIGN  TOUKEI02PARA
                                    ORGANIZATION    IS  INDEXED
@@ -143,23 +139,11 @@
                                    RECORD  KEY     IS  TOUKEI02-KEY
                                    FILE    STATUS  IS  STS-TOUKEI02.
       *
-           SELECT  TOUKEI021-FILE  ASSIGN  TOUKEI02PARA
-                                   ORGANIZATION    IS  INDEXED
-                                   ACCESS  MODE    IS  SEQUENTIAL
-                                   RECORD  KEY     IS  TOUKEI021-KEY
-                                   FILE    STATUS  IS  STS-TOUKEI02.
-      *
       *    月次統計データ（病名情報）
            SELECT  TOUKEI03-FILE   ASSIGN  TOUKEI03PARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  TOUKEI03-KEY
-                                   FILE    STATUS  IS  STS-TOUKEI03.
-      *
-           SELECT  TOUKEI031-FILE  ASSIGN  TOUKEI03PARA
-                                   ORGANIZATION    IS  INDEXED
-                                   ACCESS  MODE    IS  SEQUENTIAL
-                                   RECORD  KEY     IS  TOUKEI031-KEY
                                    FILE    STATUS  IS  STS-TOUKEI03.
       *
       *    エラーファイル
@@ -177,33 +161,16 @@
                05  TOUKEI01-SEIHO-KEY
                                    PIC X(50)   OCCURS  10.
       *
-       FD  TOUKEI011-FILE.
-       01  TOUKEI011-REC. 
-           COPY    "CPTCF001.INC"  REPLACING  //TOUKEI01//
-                                   BY         //TOUKEI011//.
-           03  TOUKEI011-SEIHO-OCC.
-               05  TOUKEI011-SEIHO-KEY
-                                   PIC X(50)   OCCURS  10.
-      *
       *    月次統計データ
        FD  TOUKEI02-FILE.
        01  TOUKEI02-REC. 
            COPY    "CPTCF002.INC".
-      *
-       FD  TOUKEI021-FILE.
-       01  TOUKEI021-REC. 
-           COPY    "CPTCF002.INC"  REPLACING  //TOUKEI02//
-                                   BY         //TOUKEI021//.
       *
       *    月次統計データ
        FD  TOUKEI03-FILE.
        01  TOUKEI03-REC. 
            COPY    "CPTCF003.INC".
       *
-       FD  TOUKEI031-FILE.
-       01  TOUKEI031-REC. 
-           COPY    "CPTCF003.INC"  REPLACING  //TOUKEI03//
-                                   BY         //TOUKEI031//.
       *    エラーファイル
        FD  TOUKEIERR-FILE.
        01  TOUKEIERR-REC           PIC X(200). 
@@ -275,6 +242,8 @@
            03  IDX3                            PIC 9(03). 
            03  IDX4                            PIC 9(03). 
            03  IDX5                            PIC 9(03). 
+           03  IDX6                            PIC 9(03). 
+           03  IDX7                            PIC 9(03). 
            03  IDY                             PIC 9(03). 
            03  IDZ                             PIC 9(03).
            03  IDXX                            PIC 9(03).
@@ -442,6 +411,14 @@
                                    BY          //TBL-HKN-//.        
        01  TBL-HKNNUM-CONST-MAX                PIC 9(05)
                                                VALUE   2000.
+      *
+      *    施設入所情報（９５０、９５１）退避用領域
+       01  TABLE-PTKOHINF-AREA.
+           02  TBL-PTKOHINF-REC        OCCURS  10.
+           COPY    "CPPTKOHINF.INC"
+                                   REPLACING   //PTKOH//
+                                   BY          //TBL-PTKOH//.
+           02  TBL-PTKOHINF-MAX    PIC 9(02).
       *
        01  WRK-CONS-AREA.
       *    
@@ -789,12 +766,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  TOUKEI02PARA-HOSPNUM
            MOVE    WRK-PARA-TERMID     TO  TOUKEI03PARA-TERMID
 grpsys     MOVE    WRK-PARA-HOSPNUM    TO  TOUKEI03PARA-HOSPNUM
       *
-           OPEN    OUTPUT              TOUKEI011-FILE
-           CLOSE                       TOUKEI011-FILE
-           OPEN    OUTPUT              TOUKEI021-FILE
-           CLOSE                       TOUKEI021-FILE
-           OPEN    OUTPUT              TOUKEI031-FILE
-           CLOSE                       TOUKEI031-FILE
+           OPEN    OUTPUT              TOUKEI01-FILE
+           CLOSE                       TOUKEI01-FILE
+           OPEN    OUTPUT              TOUKEI02-FILE
+           CLOSE                       TOUKEI02-FILE
+           OPEN    OUTPUT              TOUKEI03-FILE
+           CLOSE                       TOUKEI03-FILE
       *
            OPEN    I-O                 TOUKEI01-FILE
                                        TOUKEI02-FILE
@@ -892,6 +869,7 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    PERFORM 900-NYUINACCT-READ-SEC
                END-PERFORM
            ELSE
+      *
                INITIALIZE                      WRK-DAY-AREA
                                                WRK-HKNCOMBI-TABLE
       *
@@ -1251,6 +1229,9 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
                    PERFORM 900-SRYACCT-READ-SEC
                END-PERFORM
            ELSE
+      *        施設入所情報
+               PERFORM 500-SISETU-HENSYU-SEC
+      *
                MOVE    KEY-NEW             TO  KEY-OLD
                PERFORM         UNTIL   FLG-SRYACCT     =   1 
                                OR      KEY-N-PTID  NOT =   KEY-O-PTID
@@ -1650,6 +1631,31 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
       *
            IF      COMB-HKNCOMBINUM    =    9999
                MOVE    "9999999"            TO  TOUKEI01-HKNJANUM
+           END-IF
+      *
+      *    施設入所の有無
+           IF    ( TOUKEI01-RECEIPT-KBN (1:1)
+                                           =   SPACE )
+           AND   ( TBL-PTKOHINF-MAX        >   ZERO  )
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                       UNTIL   IDX1    >       TBL-PTKOHINF-MAX
+                   IF    ( TBL-PTKOH-TEKSTYMD (IDX1)
+                                           <=  COMB-TEKSTYMD           )
+                   AND   ( COMB-TEKEDYMD   <=  TBL-PTKOH-TEKEDYMD(IDX1))
+                       IF      TBL-PTKOH-KOHNUM (IDX1)
+                                               =   "950"
+                           MOVE    "1"     TO  TOUKEI01-RECEIPT-KBN
+                                                                   (1:1)
+                       END-IF
+                       IF      TBL-PTKOH-KOHNUM (IDX1)
+                                               =   "951"
+                           MOVE    "2"     TO  TOUKEI01-RECEIPT-KBN
+                                                                   (1:1)
+                       END-IF
+                       MOVE    TBL-PTKOHINF-MAX
+                                           TO  IDX1
+                   END-IF
+               END-PERFORM
            END-IF
       *
            PERFORM VARYING IDXX    FROM   1   BY  1
@@ -2973,6 +2979,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    TOUKEI01-SRYYM      TO  TOUKEI03-SRYYM
            MOVE    TOUKEI01-NYUGAIKBN  TO  TOUKEI03-NYUGAIKBN
            MOVE    TOUKEI01-PTID       TO  TOUKEI03-PTID
+           MOVE    TOUKEI01-RECEIPT-KBN
+                                       TO  TOUKEI03-RECEIPT-KBN
            MOVE    TOUKEI01-RECEKA     TO  TOUKEI03-RECEKA
            MOVE    PTBYO-SRYKA         TO  TOUKEI03-SRYKA
            MOVE    PTBYO-SRYYMD        TO  TOUKEI03-SRYYMD
@@ -2983,7 +2991,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    PTBYO-SYUBYOFLG     TO  TOUKEI03-SYUBYOFLG   
            MOVE    PTBYO-MANSEIKBN     TO  TOUKEI03-MANSEIKBN
            MOVE    PTBYO-HKNCOMBI      TO  TOUKEI03-HKNCOMBI
-           MOVE    PTBYO-REZEFLG       TO  TOUKEI03-REZEFLG
+           MOVE    PTBYO-REZEFLG        TO  TOUKEI03-REZEFLG
            IF      WRK-PARA-SRYYM       <   PTBYO-TENKIYMD(1:6)
                CONTINUE
            ELSE    
@@ -3166,7 +3174,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
                END-IF
       *
-               INITIALIZE                      TNS-TENSU-REC
+               INITIALIZE                       TNS-TENSU-REC
                MOVE    SRY-SRYCD(IDX2)     TO  TNS-SRYCD
 grpsys         MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
                MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
@@ -3218,7 +3226,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
                    PERFORM 500-ERR-HENSYU-SEC
                    PERFORM 500-COBABORT-SEC
                END-IF
-      *
+      * 
                ADD     1               TO  CNT-TOUKEI02 
       *
       *        生保単独で別ファイルがあるとき
@@ -3297,7 +3305,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
        500-COBABORT-EXT.
            EXIT.
       *
-      *****************************************************************
+      ************************************ *****************************
       *    終了処理
       *****************************************************************
        300-TERM-SEC                SECTION.
@@ -3325,6 +3333,96 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            DISPLAY "*** ORCBT010 END ***"
            .
        300-TERM-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    施設入所情報処理
+      *****************************************************************
+       500-SISETU-HENSYU-SEC             SECTION.
+      *
+           INITIALIZE                      TABLE-PTKOHINF-AREA
+      *
+      *    ９５０（老併）
+           INITIALIZE                      PTKOHINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+           MOVE    KEY-N-PTID          TO  PTKOH-PTID
+           MOVE    "950"               TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-PTKOHINF-READ-N-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTKOHINF  
+           END-IF
+           PERFORM     UNTIL   FLG-PTKOHINF    =   1
+                       OR      TBL-PTKOHINF-MAX
+                                               >=  10
+               IF      PTKOH-SAKJOKBN      =  SPACE
+                   ADD     1               TO  TBL-PTKOHINF-MAX
+                   MOVE    PTKOHINF-REC    TO  TBL-PTKOHINF-REC
+                                                   (TBL-PTKOHINF-MAX)
+      *
+                   DISPLAY "   TBL-PTKOHINF-MAX=" TBL-PTKOHINF-MAX
+                           " KOHNUM="
+                                   TBL-PTKOH-KOHNUM   (TBL-PTKOHINF-MAX)
+                           " ST="  TBL-PTKOH-TEKSTYMD (TBL-PTKOHINF-MAX)
+                           " ED="  TBL-PTKOH-TEKEDYMD (TBL-PTKOHINF-MAX)
+      *
+               END-IF
+      *
+               MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+               MOVE    "key4"           TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-N-SEC
+           END-PERFORM
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC 
+      *
+      *    ９５１（老健）
+           INITIALIZE                      PTKOHINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+           MOVE    KEY-N-PTID          TO  PTKOH-PTID
+           MOVE    "951"               TO  PTKOH-KOHNUM
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 900-PTKOHINF-READ-N-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTKOHINF  
+           END-IF
+           PERFORM     UNTIL   FLG-PTKOHINF    =   1
+                       OR      TBL-PTKOHINF-MAX
+                                               >=  10
+               IF      PTKOH-SAKJOKBN      =  SPACE
+                   ADD     1               TO  TBL-PTKOHINF-MAX
+                   MOVE    PTKOHINF-REC    TO  TBL-PTKOHINF-REC
+                                                   (TBL-PTKOHINF-MAX)
+      *
+                   DISPLAY "   TBL-PTKOHINF-MAX=" TBL-PTKOHINF-MAX
+                           " KOHNUM="
+                                   TBL-PTKOH-KOHNUM   (TBL-PTKOHINF-MAX)
+                           " ST="  TBL-PTKOH-TEKSTYMD (TBL-PTKOHINF-MAX)
+                           " ED="  TBL-PTKOH-TEKEDYMD (TBL-PTKOHINF-MAX)
+      *
+               END-IF
+      *
+               MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
+               MOVE    "key4"           TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-N-SEC
+           END-PERFORM
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       500-SISETU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
