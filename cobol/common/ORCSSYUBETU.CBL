@@ -1448,6 +1448,7 @@ grpsys     MOVE    LNK-SYUBETU-HOSPNUM     TO  WRK-RECE61-HOSPNUM
       *    »ÜÀßÆþ½ê¤ÎÍ­Ìµ
            IF    ( WRK-RECE61-RECEIPT-KBN  =   SPACE )
            AND   ( TBL-PTKOHINF-MAX        >   ZERO  )
+           AND   ( LNK-SYUBETU-NYUGAIKBN   =   "2"   )
                PERFORM VARYING IDXX    FROM    1   BY  1
                        UNTIL   IDXX    >       TBL-PTKOHINF-MAX
                    IF    ( TBL-PTKOH-TEKSTYMD (IDXX)
@@ -2637,6 +2638,11 @@ grpsys                 MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
        500-SISETU-HENSYU-SEC             SECTION.
       *
            INITIALIZE                      TABLE-PTKOHINF-AREA
+      *
+      *    Æþ±¡³°¤Î¤ßÂÐ¾Ý
+           IF      LNK-SYUBETU-NYUGAIKBN   =   "1"
+               GO  TO  500-SISETU-HENSYU-EXT
+           END-IF
       *
       *    £¹£µ£°¡ÊÏ·Ê»¡Ë
            INITIALIZE                      PTKOHINF-REC
