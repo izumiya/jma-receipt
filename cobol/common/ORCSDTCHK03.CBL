@@ -436,6 +436,8 @@
                COMPUTE TBYOMEI-MAX
                    =   TBYOMEI-MAX     +   1
       *
+               CALL    "ORCSDTCHK07"   USING   QDTCHK-REC
+      *
                MOVE    QDTCHK-NYUGAIKBN
                                        TO  TBYOMEI-NYUGAIKBN
                                                           (TBYOMEI-MAX)
