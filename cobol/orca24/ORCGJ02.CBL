@@ -10792,7 +10792,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    ZERO                TO  WRK-GRP-DENPNUM
            PERFORM
-                   UNTIL   FLG-SYUNOU      =   1
+                   UNTIL  (FLG-SYUNOU      =   1     )
+                       OR (SPA-ERRCD   NOT =   SPACE )
                IF     (SYU-GRP-DENPNUM     =   ZERO )  OR
                       (SYU-GRP-RENNUM      =   1    )
                    MOVE    ZERO                TO  WRK-GRP-DENPNUM
@@ -10874,7 +10875,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            PERFORM VARYING     IDX     FROM    2   BY  1
-                   UNTIL       IDX     >   IDX-SYU
+                   UNTIL      (IDX     >   IDX-SYU       )
+                           OR (SPA-ERRCD   NOT =   SPACE )
       *
                MOVE    TBL-SYUNOU-REC(IDX) TO  SYUNOU-REC
                ADD     1                   TO  SPA-J025-MAX
@@ -10948,7 +10950,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-ERRCD           =   SPACE
                MOVE    0                   TO  FLG-ERR
            ELSE
-               MOVE    1                   TO  FLG-ERR
+      *H25.1
+               IF      SPA-ERRCD           =   "0070"
+      *            ＤＢ更新エラー
+                   MOVE    "2009"              TO  SPA-ERRCD
+                   GO      TO      490121-SYUNOU-SAIKEI-EXT
+               ELSE
+      *            再計算エラー
+                   MOVE    1                   TO  FLG-ERR
+               END-IF
            END-IF
       *
       *    受診履歴更新
@@ -13323,6 +13333,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "2004"
                    MOVE    "削除エラーです。"
                                        TO  WRK-ERRMSG
+      *H25.1
+               WHEN    "2009"
+                   STRING  "収納明細の更新エラーです。"
+                           "再計算できませんでした。"
+                                       DELIMITED   BY  SIZE
+                                       INTO   WRK-ERRMSG
+                   END-STRING
+      *
                WHEN    "1005"
                    MOVE    "受診履歴番号が存在しません"
                                        TO  WRK-ERRMSG
