@@ -596,6 +596,7 @@
       *  04.07.05    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.06    NACL-門脇    12/11/15  システム管理２０１０機能追加対応
       *  04.07.07    NACL-門脇    12/09/25  コメント差込取り止め（在宅持続陽圧）
+      *  04.07.08    NACL-門脇    13/01/17  複数枚レセプト分割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -20736,6 +20737,13 @@
       *
                IF  (FLG-GENBUTU-HANTEI    =   1  )
                AND (FLG-GENBUTU-HANTEI2   =   1  )
+               AND (RECE62-KOUREI         =  "3" )
+                    MOVE    "2"      TO   RECE62-KOUREI
+               END-IF
+      *
+               IF  (FLG-GENBUTU-HANTEI    =   1  )
+               AND (RECE62-RECEIPT-KBN(4:1)
+                                          =  "2" )
                AND (RECE62-KOUREI         =  "3" )
                     MOVE    "2"      TO   RECE62-KOUREI
                END-IF
