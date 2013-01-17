@@ -608,6 +608,8 @@
       *                                     レセプト記載対応
       *  04.06.08    NACL-門脇    12/11/20  特記事項０１（公）に関わる窓口計算・
       *                                     レセプト一部負担金記載対応
+      *  04.06.09    NACL-門脇    13/01/17  特記事項０７（老併）及び
+      *                                     ０８（老健）のレセプト対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -805,6 +807,7 @@
            03  FLG-KIN-OKIKAE2                         PIC 9(01).
            03  FLG-HENSYU-NG                           PIC 9(01).
            03  FLG-ZEROKOGAITO                         PIC 9(01).
+           03  FLG-NYUSYO                              PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -2027,6 +2030,16 @@
       *
        01  TBL-TOKUIPAN-MAX    PIC 9(02)   VALUE     2.
       *
+      *    入所判定用テーブル
+       01  TBL-NYUSYO-AREA.
+           03  FILLER          PIC X(03)   VALUE    "950".
+           03  FILLER          PIC X(03)   VALUE    "951".
+      *
+       01  TBL-NYUSYO-R        REDEFINES   TBL-NYUSYO-AREA.
+           03  TBL-NYUSYO      PIC X(03)   OCCURS    2.
+      *
+       01  TBL-NYUSYO-MAX      PIC 9(02)   VALUE     2.
+      *
       *    酸素 
            COPY    "CMSANSOTBL.INC".
       *
@@ -2598,6 +2611,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      FLG-GENBUTU70
            MOVE      ZERO       TO      FLG-KOHYONKAIME
            MOVE      ZERO       TO      FLG-ZEROKOGAITO
+           MOVE      ZERO       TO      FLG-NYUSYO
            MOVE      ZERO       TO      FLG-RJNGENMEN-CHIARI
            INITIALIZE                   WRK-TAIHI-GENKIN-TBL
            MOVE      ZERO       TO      FLG-ZENKI-TOKUREI
@@ -2734,6 +2748,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                 PERFORM     211V-ZEROKOGAITO-CHECK-SEC
              END-IF
            END-IF
+      *
+           PERFORM          211W-NYUSYOCYU-CHECK-SEC
       *
            PERFORM          211B-TOKU75-HANTEI-SEC
       *
@@ -4782,6 +4798,62 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
       *
            .
        211V-ZEROKOGAITO-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    当月月途中の入所・退所ありの判定
+      *****************************************************************
+       211W-NYUSYOCYU-CHECK-SEC      SECTION.
+      *
+           INITIALIZE                         STS-AREA-DAY
+           INITIALIZE                         LNK-DAY7-AREA
+           MOVE   "71"                    TO  LNK-DAY7-IRAI
+           MOVE   RECE02-SRYYM            TO  LNK-DAY7-YM
+           CALL   "ORCSDAY"            USING  STS-AREA-DAY
+                                              LNK-DAY7-AREA
+           MOVE   LNK-DAY7-KOYOMI         TO  WRK-EDYMD
+      *
+           PERFORM  VARYING  GEN-IDX   FROM   1    BY   1
+                     UNTIL  (GEN-IDX    >    TBL-NYUSYO-MAX)
+                       OR   (FLG-NYUSYO   NOT = ZERO       )
+             INITIALIZE                       PTKOHINF-REC
+             MOVE    RECE02-HOSPNUM       TO  PTKOH-HOSPNUM
+             MOVE    RECE02-PTID          TO  PTKOH-PTID
+             MOVE    TBL-NYUSYO(GEN-IDX)  TO  PTKOH-KOHNUM
+             MOVE    PTKOHINF-REC         TO  MCPDATA-REC
+             MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+             MOVE    "key4"               TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC               =       ZERO
+               MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+               MOVE    "key4"               TO  MCP-PATHNAME
+               PERFORM  900-PTKOHINF-READ-SEC
+               PERFORM  UNTIL   FLG-PTKOHINF    =   1
+                 IF ((PTKOH-TEKSTYMD(1:6)      =  RECE02-SRYYM  ) AND
+                     (PTKOH-TEKSTYMD(7:2)  NOT =  "01"          ) AND
+                     (PTKOH-SAKJOKBN           =  SPACE         ) AND
+                     (RECE02-RECEIPT-KBN(1:1)
+                                           NOT =  SPACE         ))
+                 OR ((PTKOH-TEKEDYMD(1:6)      =  RECE02-SRYYM  ) AND
+                     (PTKOH-TEKEDYMD(7:2)  NOT =  WRK-EDYMD(7:2)) AND
+                     (PTKOH-SAKJOKBN           =  SPACE         ) AND
+                     (RECE02-RECEIPT-KBN(1:1)  =  SPACE         ))
+                    MOVE     1      TO  FLG-NYUSYO
+                    MOVE     1      TO  FLG-PTKOHINF
+                 ELSE
+                    MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+                    MOVE    "key4"               TO  MCP-PATHNAME
+                    PERFORM  900-PTKOHINF-READ-SEC
+                 END-IF
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
+             MOVE    "key4"               TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+           END-PERFORM
+      *
+           .
+       211W-NYUSYOCYU-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -14309,6 +14381,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     MOVE    "2"      TO   RECE02-ZAITAKU
                END-IF
       *
+               IF  (FLG-GENBUTU-HANTEI    =   1  )
+               AND (FLG-NYUSYO            =   1  )
+               AND (RECE02-ZAITAKU        =  "3" )
+                    MOVE    "2"      TO   RECE02-ZAITAKU
+               END-IF
+      *
                IF   (SYS-1001-PREFNUM  =  19     )
                AND  (RECE02-SRYYM     <= "201203")
                 IF ( RECE02-KOHHBTNUM(1) =  "41"        )
@@ -14773,6 +14851,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                IF  (FLG-GENBUTU-HANTEI    =   1  )
                AND (FLG-SYSCHK            =   1  )
+               AND (RECE02-ZAITAKU        =  "4" )
+                    MOVE    "1"      TO   RECE02-ZAITAKU
+               END-IF
+      *
+               IF  (FLG-GENBUTU-HANTEI    =   1  )
+               AND (FLG-NYUSYO            =   1  )
                AND (RECE02-ZAITAKU        =  "4" )
                     MOVE    "1"      TO   RECE02-ZAITAKU
                END-IF
