@@ -179,6 +179,7 @@
       *                                     えた場合の種別不明対応
       *  04.06.09    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
+      *  04.06.10    NACL-藤原    13/01/18  直接請求フラグの追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -10289,6 +10290,8 @@
            ELSE
                MOVE    SPACE               TO  RECE10-SKYKBN-RECEDEN
            END-IF
+      *
+           MOVE    "0"                 TO  RECE10-DIRECT-FLG
       *
            MOVE    RECE10-REC          TO  MCPDATA-REC
            MOVE    "tbl_seikyu"        TO  MCP-TABLE

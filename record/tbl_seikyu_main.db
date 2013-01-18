@@ -217,6 +217,7 @@ FLG4				number(1,0);
 FLG5				number(1,0);
 RESERVE_AREA			char(50);
 HENREI_SIJI_FLG			number(1,0);
+DIRECT_FLG			char(1);
 ETCCREATEFLG			number(1,0);
 HKNNUM_S			char(3); 
 HKNJANUM_S			char(8);
