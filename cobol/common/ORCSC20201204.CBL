@@ -3607,6 +3607,12 @@
                       (WRK-ERRCD6      NOT =   SPACE)
                    IF      SPA-CHOKITOFLG-CHK  =   ZERO
                        MOVE    "K019"          TO  SPA-ERRCD
+      *H25.1
+      *                手帳加算確認は警告の後表示
+                       IF      LNK-ORCSC-KIDCD     =   "2003"
+                           MOVE    SPACE       TO  LNK-ORCSC-KIDCD
+                       END-IF
+      *!!!
                        MOVE    1               TO  SPA-CHOKITOFLG-CHK
                        MOVE    9               TO  SPA-TOKUTEIFLG
                        MOVE    9               TO  SPA-CHOKITOFLG
