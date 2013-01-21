@@ -13,6 +13,7 @@ bindapi	"system01lstv2"	"OpenCOBOL"	"ORAPI101R1V2";
 bindapi	"medicalgetv2"	"OpenCOBOL"	"ORAPI021R1V2";
 bindapi	"diseasegetv2"	"OpenCOBOL"	"ORAPI022R1V2";
 bindapi	"appointlst2v2"	"OpenCOBOL"	"ORAPI014R2V2";
+bindapi	"acsimulatev2"	"OpenCOBOL"	"ORAPI023R1V2";
 
 
 multiplex_group	api01rv2;
@@ -31,6 +32,7 @@ data	{
 		medicalgetv2;
 		diseasegetv2;
 		appointlst2v2;
+		acsimulatev2;
 	};
 };
 db "xml2" {
@@ -55,6 +57,8 @@ db "xml2" {
  xml_disease_infov2req;
  xml_appointlst2v2req;
  xml_appointlst2v2res;
+ xml_acsimulatev2req;
+ xml_acsimulatev2res;
 };
 
 #include "orcadb.inc"

@@ -5507,13 +5507,23 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    患者決定時編集
            PERFORM 1101-PTINF-HENSYU-SEC
+      *    受診履歴一覧編集
+           MOVE    ZERO                TO  SPA-RRK-PAGE
+           PERFORM 2002-JYURRK-SET-SEC
+      *    受診履歴より、診療科等を確定する
+           PERFORM 10011-JYURRK-SEC
+      *    保険組合せ名称編集
+           PERFORM 10013-HKNCOMBI-SEC
+      *
       *    初診日、最終診察日
            MOVE    SPACE               TO  SPA-SYOYMD 
            MOVE    SPACE               TO  SPA-LSTYMD 
            PERFORM 1101-HKN-SYOYMD-SET-SEC
       *
-      *    保険組合せ名称編集
-           PERFORM 10013-HKNCOMBI-SEC
+      *    病名編集
+           PERFORM 11012-BYOMEI-HENSYU-SEC
+      *    特定疾患の有無検索
+           PERFORM 11011-TOKUTEI-SYORI-SEC
       *
            .
        600-API-SPASET-EXT.
