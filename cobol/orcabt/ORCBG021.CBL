@@ -30,6 +30,13 @@
       *  04.04.01    NACL-藤原    09/04/01  診療科を名称で表示する
       *  04.05.00    NACL-太田    10/01/29  拡張漢字対応
       *
+      *  04.06.01    NACL-藤原    12/12/14  コード化可能病名のみ出力対応
+      *                                     自院病名も対応
+      *                                     診療年月までに該当する病名以
+      *                                     外も対象
+      *                                     補足チェック対応
+      *                                     同義語変換対応
+      *
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
       *****************************************************************
       *
@@ -53,6 +60,8 @@
       *
            COPY    "HCMSL55.INC".
       *
+           COPY    "HCMSL80.INC".
+      *
       *    ステータス領域
        01  STS-AREA.
            03  STS-RECEERR         PIC X(02).
@@ -66,15 +75,20 @@
            03  FLG-SRYACCT         PIC 9(01).
            03  FLG-NYUINACCT       PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
+           03  FLG-USERBYOMEI      PIC 9(01).
+           03  FLG-SYNONYM         PIC 9(01).
       *
            03  FLG-CHK             PIC 9(01).
            03  FLG-ERR             PIC 9(01).
+           03  FLG-PRTKBN          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-PAGE            PIC 9(05).
+           03  CNT-PAGE1           PIC 9(05).
            03  CNT-LINE            PIC 9(05).
            03  CNT-OUT             PIC 9(05).
+           03  CNT-OUT1            PIC 9(05).
       *
        01  INDEX-AREA.
            03  IDX                 PIC 9(02).
@@ -89,6 +103,7 @@
            03  WRK-PARA-SRYYM      PIC X(06).
            03  WRK-PARA-PRTKBN     PIC X(01).
            03  WRK-PARA-SYOKBN     PIC X(01).
+           03  WRK-PARA-CDKBN      PIC X(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -115,13 +130,12 @@
            COPY    "CPBYOMEI.INC"  REPLACING  //BYO-//
                                    BY         //WRK-BYO-//.
       *
-      *    印刷内容
+      *    患者病名一覧
        01  HEAD-01.
-           03  FILLER                  PIC X(30)   VALUE   SPACE.
-           03  FILLER                  PIC X(20)   VALUE
-               "未コード化病名一覧（".
+           03  FILLER                  PIC X(23)   VALUE   SPACE.
+           03  H01-TITLE               PIC X(22).
            03  H01-SRYYM               PIC X(16).
-           03  H01-SRYYM-TITLE         PIC X(16)   VALUE   SPACE.
+           03  H01-SRYYM-TITLE         PIC X(32)   VALUE   SPACE.
            03  H01-PRTKBN-TITLE        PIC X(22)   VALUE   SPACE.
            03  FILLER                  PIC X(08)   VALUE   "作成日：".
            03  H01-SYSYMD              PIC X(09).
@@ -154,6 +168,11 @@
            03  FILLER                  PIC X(59)   VALUE   SPACE.
            03  FILLER                  PIC X(20)   VALUE
                "入力コード".
+      *
+       01  HEAD-05.
+           03  FILLER                  PIC X(59)   VALUE   SPACE.
+           03  FILLER                  PIC X(20)   VALUE
+               "補足コメント".
       *
        01  BODY-01.
            03  B01-PTNUM               PIC X(20).
@@ -194,8 +213,72 @@
            03  B04-FIL1                PIC X(59).
            03  B04-BYOMEIINPUTCD       PIC X(22)   OCCURS  4.
       *
+       01  BODY-05.
+           03  B05-FIL1                PIC X(59).
+           03  B05-HOSOKU              PIC X(40).
+      *
+      *    自院病名一覧
+       01  HEAD-011.
+           03  FILLER                  PIC X(05)   VALUE   SPACE.
+           03  H011-TITLE              PIC X(32).
+           03  H011-TITLE1             PIC X(18).
+           03  FILLER                  PIC X(08)   VALUE   "作成日：".
+           03  H011-SYSYMD             PIC X(09).
+           03  FILLER                  PIC X(04)   VALUE   "  P.".
+           03  H011-PAGE               PIC ZZZ9.
+      *
+       01  HEAD-012.
+           03  FILLER                  PIC X(10)   VALUE
+               "入力コード".
+           03  FILLER                  PIC X(04)   VALUE   SPACE.
+           03  FILLER                  PIC X(06)   VALUE   "病名".
+      *
+       01  HEAD-013.
+           03  FILLER                  PIC X(100)  VALUE   "理由".
+      *
+       01  HEAD-014.
+           03  FILLER                  PIC X(10)   VALUE
+               "　　　　　".
+           03  FILLER                  PIC X(04)   VALUE   SPACE.
+           03  FILLER                  PIC X(20)   VALUE
+               "補足コメント".
+      *
+       01  BODY-011.
+           03  B011-BYOMEIINPUTCD      PIC X(10).
+           03  B011-FILL               PIC X(02).
+           03  B011-BYOMEI             PIC X(82).
+           03  B011-BYOMEI-R           REDEFINES   B011-BYOMEI.
+               05  B011-FILL           PIC X(02).
+               05  B011-BYOMEI1        PIC X(80).
+      *
+       01  BODY-013.
+           03  B013-RIYUU              PIC X(104).
+           03  B013-RIYUU-R            REDEFINES   B013-RIYUU.
+               05  B013-RIYUU1         PIC X(24).
+               05  B013-FIL2           PIC X(01).
+               05  B013-HAISIYMD       PIC X(09).
+               05  B013-FIL3           PIC X(01).
+               05  B013-BYOMEICD       PIC X(07).
+               05  B013-FIL4           PIC X(01).
+               05  B013-BYOMEI         PIC X(60).
+               05  B013-FIL5           PIC X(01).
+      *
+       01  BODY-014.
+           03  B014-RIYUU              PIC X(24).
+           03  B014-FIL2               PIC X(01).
+           03  B014-HAISIYMD           PIC X(09).
+           03  B014-FIL3               PIC X(01).
+           03  B014-BYOMEICD           PIC X(07).
+           03  B014-FIL4               PIC X(01).
+           03  B014-BYOMEI             PIC X(60).
+      *
+       01  BODY-015.
+           03  FILLER                  PIC X(12).
+           03  B015-HOSOKU             PIC X(24).
+      *
        01  WRK-CONST-AREA.
            03  WRK-CONS-LINE-MAX       PIC 9(02)   VALUE   55.
+           03  WRK-CONS-LINE-MAX1      PIC 9(02)   VALUE   80.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -222,6 +305,10 @@
       *    自院病名
        01  USERBYOMEI-REC.
            COPY    "CPUSERBYOMEI.INC".
+      *
+      *    同義語マスタ
+       01  SYNONYM-REC.
+           COPY    "CPSYNONYM.INC".
       *
       *    診療会計
        01  SRYACCT-REC.
@@ -267,6 +354,9 @@
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
       *
+      *   画面日付変換サブ
+           COPY    "CPORCSGDAY.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPAREA".
       *
@@ -293,7 +383,7 @@
       *
            PERFORM 100-INIT-SEC
       *
-           PERFORM 200-MAIN-SEC    UNTIL   FLG-END =   1
+           PERFORM 200-MAIN-SEC
       *
            PERFORM 300-END-SEC
       *
@@ -333,16 +423,16 @@
                                        WRK-PARA-SRYYM
                                        WRK-PARA-PRTKBN
                                        WRK-PARA-SYOKBN
+                                       WRK-PARA-CDKBN
            END-UNSTRING
       *
            MOVE    WRK-PARA-HOSPNUM
                                    TO SPA-HOSPNUM
+           MOVE    ZERO            TO  LNK-PRTKANRI-SHORI-RENNUM
+      *
            CALL    "ORCSENCODING"      USING
                                        MCPAREA
                                        SPA-AREA
-      *
-           DISPLAY "PRTKBN="  WRK-PARA-PRTKBN
-                   " SYOKBN=" WRK-PARA-SYOKBN 
       *
       *    ステップ管理開始処理
            MOVE    "STS"           TO  SJOBKANRI-MODE
@@ -353,26 +443,91 @@
       *
            PERFORM 900-CALL-ORCSJOB-SEC
       *
+      *    診療年月編集
+           IF      WRK-PARA-SRYYM  =   "999999" 
+      *        全病名対象時
+               MOVE    "1"             TO  WRK-PARA-SYOKBN
+               MOVE    "0"             TO  WRK-PARA-PRTKBN
+               MOVE    "99999999"      TO  WRK-SRYYMD
+      *
+      **         IF      WRK-PARA-CDKBN  =   "0"
+      **             MOVE    "1"             TO  WRK-PARA-CDKBN
+      **         END-IF
+               MOVE    "全病名対象）"  TO  H01-SRYYM
+               IF      WRK-PARA-CDKBN  =   "2"
+                   MOVE    "【補足コメント】"
+                                           TO  H01-SRYYM-TITLE
+               ELSE
+                   MOVE    "　　　　　　　"
+                                           TO  H01-SRYYM-TITLE
+               END-IF
+           ELSE
+               INITIALIZE                      ORCSGDAYAREA
+               MOVE    "1"                 TO  SGDAY-INTYPE
+               MOVE    WRK-PARA-SRYYM      TO  SGDAY-INDAY
+               CALL    "ORCSGDAY"          USING
+                                           ORCSGDAYAREA
+               IF      SGDAY-RC            =   ZERO
+                   MOVE    SGDAY-SDAY (1:6)    TO  WRK-PARA-SRYYM
+               ELSE
+                   MOVE    "診療年月がエラーです"
+                                               TO  WRK-RECEERR
+                   PERFORM 500-ERR-HENSYU-SEC
+               END-IF
+      *
+               MOVE    WRK-PARA-SRYYM  TO  WRK-SYMD (1:6)
+               MOVE    "01"            TO  WRK-SYMD (7:2)
+               PERFORM 31012-SEIWA-HEN-SEC
+      *
+               MOVE    LNK-DAY2-EDTYMD3(1:16)
+                                       TO  H01-SRYYM
+               IF      WRK-PARA-SYOKBN     =   "0"
+                   IF      WRK-PARA-CDKBN      =   "2"
+                       MOVE    "有効・診療あり）【補足コメント】"
+                                               TO  H01-SRYYM-TITLE
+                   ELSE
+                       MOVE    "有効・診療あり）"
+                                               TO  H01-SRYYM-TITLE
+                   END-IF
+               ELSE
+                   IF      WRK-PARA-CDKBN      =   "2"
+                       MOVE    "有効）【補足コメント】"
+                                               TO  H01-SRYYM-TITLE
+                   ELSE
+                       MOVE    "有効）"        TO  H01-SRYYM-TITLE
+                   END-IF
+               END-IF
+               MOVE    WRK-PARA-SRYYM  TO  WRK-SRYYMD (1:6)
+               MOVE    "31"            TO  WRK-SRYYMD (7:2)
+           END-IF
+      *
+           DISPLAY "SRYYM="  WRK-PARA-SRYYM
+                   " PRTKBN="  WRK-PARA-PRTKBN
+                   " SYOKBN=" WRK-PARA-SYOKBN 
+                   " CDKBN="  WRK-PARA-CDKBN 
+      *
            IF      WRK-PARA-PRTKBN =   "1"
                MOVE    "（病名ＣＤあり）"
                                        TO  H01-PRTKBN-TITLE
            END-IF
       *
-      *    診療年月編集
-           MOVE    WRK-PARA-SRYYM  TO  WRK-SYMD (1:6)
-           MOVE    "01"            TO  WRK-SYMD (7:2)
-           PERFORM 31012-SEIWA-HEN-SEC
-           MOVE    LNK-DAY2-EDTYMD3(1:16)
-                                   TO  H01-SRYYM
-           IF      WRK-PARA-SYOKBN     =   "0"
-               MOVE    "有効・診療あり）"
-                                       TO  H01-SRYYM-TITLE
+           IF      WRK-PARA-CDKBN  =   "0"
+               MOVE    "　未コード化病名一覧（"
+                                       TO  H01-TITLE
+               MOVE    "　未コード化病名一覧（自院病名）"
+                                       TO  H011-TITLE
            ELSE
-               MOVE    "有効）"        TO  H01-SRYYM-TITLE
+               MOVE    "コード化可能病名一覧（"
+                                       TO  H01-TITLE
+               MOVE    "コード化可能病名一覧（自院病名）"
+                                       TO  H011-TITLE
+               IF      WRK-PARA-CDKBN  =   "2"
+                   MOVE    "【補足コメント】"
+                                           TO  H011-TITLE1
+               ELSE
+                   MOVE    SPACE           TO  H011-TITLE1
+               END-IF
            END-IF
-      *
-           MOVE    WRK-PARA-SRYYM  TO  WRK-SRYYMD (1:6)
-           MOVE    "31"            TO  WRK-SRYYMD (7:2)
       *
       *    作成日取得
            INITIALIZE                  ORCSMCNDATEAREA
@@ -382,11 +537,28 @@
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    LNK-DAY2-EDTYMD1
                                    TO  H01-SYSYMD
+                                       H011-SYSYMD
+      *
+           .
+       100-INIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    主処理
+      *****************************************************************
+       200-MAIN-SEC                    SECTION.
+      *
+      *    患者病名の一覧作成処理
+           MOVE    1               TO  FLG-PRTKBN
+           COMPUTE LNK-PRTKANRI-SHORI-RENNUM
+                                   =   LNK-PRTKANRI-SHORI-RENNUM
+                                   +   1
       *
       *    初期値設定
            MOVE    WRK-CONS-LINE-MAX
                                    TO  CNT-LINE
            MOVE    ZERO            TO  CNT-PAGE
+                                       CNT-OUT
                                        WRK-PTID
       *
            INITIALIZE                  PTBYOMEI-REC
@@ -400,17 +572,73 @@
            IF      MCP-RC          =   ZERO
                PERFORM 900-PTBYOMEI-READ-SEC
            ELSE
-               MOVE    1                   TO  FLG-END
+               MOVE    1               TO  FLG-PTBYOMEI
            END-IF
       *
+           PERFORM 200-PTBYOMEI-SYORI-SEC
+                                   UNTIL   FLG-PTBYOMEI =   1
+      *
+           MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
+           MOVE    "key33"         TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+      *    帳票印刷処理
+           IF      CNT-PAGE        >   ZERO
+               PERFORM 200111-PRINT-OUT-SEC
+           END-IF
+      *
+           DISPLAY "*** ORCBG021 PTBYOMEI   OUT  "  CNT-OUT
+           DISPLAY "*** ORCBG021            PAGE "  CNT-PAGE
+      *
+      *    自院病名の一覧作成処理
+           MOVE    2               TO  FLG-PRTKBN
+           COMPUTE LNK-PRTKANRI-SHORI-RENNUM
+                                   =   LNK-PRTKANRI-SHORI-RENNUM
+                                   +   1
+      *
+      *    初期値設定
+           MOVE    WRK-CONS-LINE-MAX1
+                                   TO  CNT-LINE
+           MOVE    ZERO            TO  CNT-PAGE
+                                       CNT-OUT
+      *
+           MOVE    "tbl_userbyomei"
+                                   TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           INITIALIZE                  USERBYOMEI-REC
+           MOVE    WRK-PARA-HOSPNUM
+                                   TO  USBYO-HOSPNUM
+           MOVE    USERBYOMEI-REC  TO  MCPDATA-REC
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC          =   ZERO
+               PERFORM 900-USERBYOMEI-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTBYOMEI
+           END-IF
+      *
+           PERFORM 200-USERTBYOMEI-SYORI-SEC
+                                   UNTIL   FLG-USERBYOMEI  =   1
+      *
+           MOVE    "tbl_userbyomei"
+                                   TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+      *    帳票印刷処理
+           IF      CNT-PAGE        >   ZERO
+               PERFORM 200111-PRINT-OUT-SEC
+           END-IF
+      *
+           DISPLAY "*** ORCBG021 USERBYOMEI OUT  "  CNT-OUT
+           DISPLAY "*** ORCBG021            PAGE "  CNT-PAGE
            .
-       100-INIT-EXT.
+       200-MAIN-EXT.
            EXIT.
       *
       *****************************************************************
-      *    主処理
+      *    患者病名の一覧作成処理
       *****************************************************************
-       200-MAIN-SEC                    SECTION.
+       200-PTBYOMEI-SYORI-SEC         SECTION.
       *
            MOVE    ZERO                TO  FLG-SRYACCT
                                            FLG-NYUINACCT
@@ -424,7 +652,7 @@
       *
            IF    ( FLG-SRYACCT         =   ZERO )
            OR    ( FLG-NYUINACCT       =   ZERO )
-               PERFORM         UNTIL   FLG-END =   1
+               PERFORM         UNTIL   FLG-PTBYOMEI =   1
                                OR      PTBYO-PTID
                                            NOT =   WRK-PTBYO-PTID
       *            患者病名チェック処理
@@ -437,14 +665,14 @@
                    PERFORM 900-PTBYOMEI-READ-SEC
                END-PERFORM
            ELSE
-               PERFORM         UNTIL   FLG-END =   1
+               PERFORM         UNTIL   FLG-PTBYOMEI =   1
                                OR      PTBYO-PTID
                                            NOT =   WRK-PTBYO-PTID
                    PERFORM 900-PTBYOMEI-READ-SEC
                END-PERFORM
            END-IF
            .
-       200-MAIN-EXT.
+       200-PTBYOMEI-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -547,16 +775,39 @@
                END-IF
            END-IF
       *
-      *    対象診療年月に有効な病名か  
-           IF      PTBYO-SRYYMD(1:6)
-                                   =   WRK-SRYYMD (1:6)
+      *    対象診療年月に有効な病名か
+      *    全病名対象のときは判定なし
+           IF      WRK-SRYYMD      =   "99999999"
                CONTINUE
            ELSE
-               IF      PTBYO-TENKIKBN  =   SPACE
+               IF      PTBYO-SRYYMD(1:6)
+                                       =   WRK-SRYYMD (1:6)
                    CONTINUE
                ELSE
-                   IF      PTBYO-TENKIYMD(1:6)
-                                           >=  WRK-SRYYMD (1:6)
+                   IF      PTBYO-TENKIKBN  =   SPACE
+                       CONTINUE
+                   ELSE
+                       IF      PTBYO-TENKIYMD(1:6)
+                                               >=  WRK-SRYYMD (1:6)
+                           CONTINUE
+                       ELSE
+                           GO  TO  2001-PTBYO-CHK-EXT
+                       END-IF
+                   END-IF
+               END-IF
+      *
+               IF      PTBYO-REZEMM        >   ZERO
+                   INITIALIZE                      STS-AREA-DAY
+                   INITIALIZE                      LNK-DAY6-AREA
+                   MOVE    "61"                TO  LNK-DAY6-IRAI
+                   MOVE    PTBYO-SRYYMD        TO  LNK-DAY6-KIJUN
+                   MOVE    "2"                 TO  LNK-DAY6-ZOGENPTN
+                   COMPUTE LNK-DAY6-ZOGEN  =   PTBYO-REZEMM    -   1
+                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
+                                                       LNK-DAY6-AREA
+                   MOVE    LNK-DAY6-KEISAN(1:6)
+                                               TO  WRK-YM
+                   IF      WRK-YM              >=  WRK-SRYYMD (1:6)
                        CONTINUE
                    ELSE
                        GO  TO  2001-PTBYO-CHK-EXT
@@ -564,26 +815,74 @@
                END-IF
            END-IF    
       *
-           IF      PTBYO-REZEMM        >   ZERO
-               INITIALIZE                      STS-AREA-DAY
-               INITIALIZE                      LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    PTBYO-SRYYMD        TO  LNK-DAY6-KIJUN
-               MOVE    "2"                 TO  LNK-DAY6-ZOGENPTN
-               COMPUTE LNK-DAY6-ZOGEN  =   PTBYO-REZEMM    -   1
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN(1:6)
-                                           TO  WRK-YM
-               IF      WRK-YM              >=  WRK-SRYYMD (1:6)
-                   CONTINUE
+      *    コード化可能病名のみのとき
+           IF     WRK-PARA-CDKBN   =   "1" OR  "2"
+               IF      PTBYO-BYOMEIHENFLG
+                                       =   "1"
+      *            病名からコード検索処理
+                   INITIALIZE              ORCSBYOMEIAREA
+                   EVALUATE    WRK-PARA-CDKBN
+                       WHEN    "1"
+                           MOVE    "1"             TO  LNK-BYO-SYORI
+                       WHEN    "2"
+                           MOVE    "3"             TO  LNK-BYO-SYORI
+                   END-EVALUATE
+                   MOVE    PTBYO-BYOMEI    TO  LNK-BYO-BYOMEI
+                   CALL    "ORCSBYOMEI"    USING    ORCSBYOMEIAREA
+                                                     SPA-AREA
+                   IF      LNK-BYO-BYOMEIHENFLG
+                                           =   "1"
+                       GO  TO  2001-PTBYO-CHK-EXT
+                   ELSE
+                     IF   ( WRK-PARA-CDKBN   =   "2"   )
+                     AND  ( LNK-BYO-HOSOKU-BYOMEI
+                                             =   SPACE )  
+                       GO  TO  2001-PTBYO-CHK-EXT
+                     ELSE
+                       MOVE    6               TO  FLG-ERR
+      *                廃止年月日が設定されているとき診療開始日以前か
+      *                なら未傷病名コードにする
+                       IF    ( LNK-BYO-IKOSAKICD   =   SPACE )
+                       AND   ( LNK-BYO-HAISIYMD-ERR
+                                                   =   ZERO  )
+                           CONTINUE
+                       ELSE
+                           MOVE    LNK-BYO-KHNBYOMEICD TO  BYO-BYOMEICD
+                           PERFORM 900-BYOMEI-READ-SEC
+                           MOVE    BYOMEI-REC          TO
+                                                       WRK-BYOMEI-REC
+                           IF      WRK-BYO-HAISIYMD    NOT =   SPACE
+                               IF      WRK-BYO-HAISIYMD
+                                                       <   PTBYO-SRYYMD
+                                   IF      WRK-BYO-IKOSAKICD
+                                                           =   SPACE
+                                       MOVE    7           TO  FLG-ERR
+      *                                推奨病名チェック
+                                       INITIALIZE          SYNONYM-REC
+                                       MOVE    WRK-BYO-BYOMEI
+                                                   TO  SYNONYM-BYOMEI
+                                       PERFORM 5001-SYNONYM-CHK-SEC
+                                       IF      FLG-SYNONYM =   ZERO
+                                           MOVE    5       TO  FLG-ERR
+                                       END-IF                                       
+                                   ELSE
+                                       MOVE    8           TO  FLG-ERR
+                                       MOVE    WRK-BYO-IKOSAKICD
+                                                           TO
+                                                           BYO-BYOMEICD
+                                       PERFORM 900-BYOMEI-READ-SEC
+                                   END-IF
+                               END-IF
+                           END-IF
+                       END-IF
+                     END-IF
+                   END-IF
                ELSE
                    GO  TO  2001-PTBYO-CHK-EXT
                END-IF
-           END-IF
-      *
-      *    編集病名のとき再度チェックを行なう
-           IF      PTBYO-BYOMEIHENFLG
+           ELSE   
+      *      編集病名のとき再度チェックを行なう
+             IF      PTBYO-BYOMEIHENFLG
                                    =   "1"
                IF      PTBYO-BYOMEICD (1)  =   "0000999"
                    IF      PTBYO-BYOMEIINPUTCD (1)
@@ -595,7 +894,7 @@
                ELSE
                    MOVE    2                   TO  FLG-ERR
                END-IF
-           ELSE     
+             ELSE     
       *        廃止年月日が設定されているとき診療開始日以前か
       *        なら未傷病名コードにする
                MOVE    PTBYO-KHNBYOMEICD   TO  BYO-BYOMEICD
@@ -605,6 +904,13 @@
                    IF      WRK-BYO-HAISIYMD    <   PTBYO-SRYYMD
                        IF      WRK-BYO-IKOSAKICD   =   SPACE
                            MOVE    3                   TO  FLG-ERR
+      *                    推奨病名チェック
+                           INITIALIZE                  SYNONYM-REC
+                           MOVE    WRK-BYO-BYOMEI      TO SYNONYM-BYOMEI
+                           PERFORM 5001-SYNONYM-CHK-SEC
+                           IF      FLG-SYNONYM         =   ZERO
+                               MOVE    5                   TO  FLG-ERR
+                           END-IF
                        ELSE
                            MOVE    4                   TO  FLG-ERR
                            MOVE    WRK-BYO-IKOSAKICD   TO  BYO-BYOMEICD
@@ -612,7 +918,9 @@
                        END-IF
                    END-IF
                END-IF
+             END-IF
            END-IF
+      *    
            IF      FLG-ERR         =   ZERO
                GO  TO  2001-PTBYO-CHK-EXT
            END-IF
@@ -623,7 +931,7 @@
            EXIT.
       *
       *****************************************************************
-      *    一覧作成処理
+      *    一覧作成処理（患者病名）
       *****************************************************************
        2002-PRINT-SEC          SECTION.
       *
@@ -635,6 +943,7 @@
                                            BODY-02
                                            BODY-03
                                            BODY-04
+                                           BODY-05
       *
            IF      WRK-PTID            =   PTBYO-PTID
                CONTINUE
@@ -717,13 +1026,25 @@
                                                INTO  B02-RIYUU
                    END-STRING
                WHEN    3
+               WHEN    7
                    MOVE    "◎廃止病名あり【廃止日："
                                                TO  B02-RIYUU1
                    MOVE    LNK-DAY2-EDTYMD1    TO  B02-HAISIYMD
                    MOVE    WRK-BYO-BYOMEICD    TO  B02-BYOMEICD
                    MOVE    WRK-BYO-BYOMEI      TO  B02-BYOMEI
                WHEN    4
+               WHEN    8
                    MOVE    "◎移行病名あり【廃止日："
+                                               TO  B02-RIYUU1
+                   MOVE    LNK-DAY2-EDTYMD1    TO  B02-HAISIYMD
+                   MOVE    WRK-BYO-BYOMEICD    TO  B02-BYOMEICD
+                   MOVE    WRK-BYO-BYOMEI      TO  B02-BYOMEI
+                   MOVE    "　　　　　　　　　　　　"
+                                               TO  B03-RIYUU
+                   MOVE    BYO-BYOMEICD        TO  B03-BYOMEICD
+                   MOVE    BYO-BYOMEI          TO  B03-BYOMEI
+               WHEN    5
+                   MOVE    "◎推奨病名あり【廃止日："
                                                TO  B02-RIYUU1
                    MOVE    LNK-DAY2-EDTYMD1    TO  B02-HAISIYMD
                    MOVE    WRK-BYO-BYOMEICD    TO  B02-BYOMEICD
@@ -751,6 +1072,13 @@
                    MOVE    PTBYO-BYOMEIINPUTCD (IDX)
                                            TO  B04-BYOMEIINPUTCD (IDX)
                END-PERFORM
+           END-IF
+      *
+           IF   ( WRK-PARA-CDKBN   =   "2"   )
+           AND  ( LNK-BYO-HOSOKU-BYOMEI
+                               NOT =   SPACE )
+               MOVE    LNK-BYO-HOSOKU-BYOMEI
+                                           TO  B05-HOSOKU
            END-IF    
       *
            ADD     1               TO  CNT-LINE
@@ -759,8 +1087,14 @@
            IF      CNT-LINE             >=  WRK-CONS-LINE-MAX
                PERFORM 20021-HEAD-PRINT-SEC
            END-IF
-           ADD     1               TO  CNT-LINE
-           MOVE    BODY-02         TO  HCMSL55-MOJI (CNT-LINE)
+      *
+           IF      BODY-02         NOT =   SPACE
+               IF      CNT-LINE             >=  WRK-CONS-LINE-MAX
+                   PERFORM 20021-HEAD-PRINT-SEC
+               END-IF
+               ADD     1               TO  CNT-LINE
+               MOVE    BODY-02         TO  HCMSL55-MOJI (CNT-LINE)
+           END-IF
       *
            IF      BODY-03         NOT =   SPACE
                IF      CNT-LINE             >=  WRK-CONS-LINE-MAX
@@ -768,6 +1102,14 @@
                END-IF
                ADD     1               TO  CNT-LINE
                MOVE    BODY-03         TO  HCMSL55-MOJI (CNT-LINE)
+           END-IF
+      *
+           IF      BODY-05         NOT =   SPACE
+               IF      CNT-LINE             >=  WRK-CONS-LINE-MAX
+                   PERFORM 20021-HEAD-PRINT-SEC
+               END-IF
+               ADD     1               TO  CNT-LINE
+               MOVE    BODY-05         TO  HCMSL55-MOJI (CNT-LINE)
            END-IF
       *
            IF      BODY-04         NOT =   SPACE
@@ -796,17 +1138,315 @@
            END-IF
       *
            ADD     1                   TO  CNT-PAGE
+                                           CNT-PAGE1
            MOVE    CNT-PAGE            TO  H01-PAGE
       *
            MOVE    SPACE               TO  HCMSL55
            MOVE    HEAD-01             TO  HCMSL55-MOJI (1)
            MOVE    HEAD-02             TO  HCMSL55-MOJI (3)
-           MOVE    HEAD-03             TO  HCMSL55-MOJI (4)
-           MOVE    HEAD-04             TO  HCMSL55-MOJI (5)
-      *
-           MOVE    6                   TO  CNT-LINE
+           EVALUATE    WRK-PARA-CDKBN
+               WHEN    "0"
+                   MOVE    HEAD-03             TO  HCMSL55-MOJI (4)
+                   MOVE    HEAD-04             TO  HCMSL55-MOJI (5)
+                   MOVE    6                   TO  CNT-LINE
+               WHEN    "1"
+                   MOVE    HEAD-04             TO  HCMSL55-MOJI (4)
+                   MOVE    5                   TO  CNT-LINE
+               WHEN    "2"
+                   MOVE    HEAD-05             TO  HCMSL55-MOJI (4)
+                   MOVE    HEAD-04             TO  HCMSL55-MOJI (5)
+                   MOVE    6                   TO  CNT-LINE
+           END-EVALUATE
            .
        20021-HEAD-PRINT-EXT.
+           EXIT.
+      *
+      *
+      *****************************************************************
+      *    自院病名の一覧作成処理
+      *****************************************************************
+       200-USERTBYOMEI-SYORI-SEC       SECTION.
+      *
+      *    自院病名チェック処理
+           PERFORM 2001-USERBYOMEI-CHK-SEC
+           IF      FLG-CHK             =   1
+      *        一覧作成処理（自院病名）
+               PERFORM 2002-USERBYOMEI-PRINT-SEC
+           END-IF
+      *
+           PERFORM 900-USERBYOMEI-READ-SEC
+           .
+       200-USERTBYOMEI-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    自院病名チェック処理
+      *****************************************************************
+       2001-USERBYOMEI-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO            TO  FLG-CHK
+                                       FLG-ERR
+           INITIALIZE                  WRK-BYOMEI-REC
+      *
+      *    コード化可能病名のとき
+           IF     WRK-PARA-CDKBN   =   "1" OR  "2"
+               IF      USBYO-BYOMEIHENFLG
+                                       =   "1"
+      *            病名からコード検索処理
+                   INITIALIZE              ORCSBYOMEIAREA
+                   EVALUATE    WRK-PARA-CDKBN
+                       WHEN    "1"
+                           MOVE    "1"             TO  LNK-BYO-SYORI
+                       WHEN    "2"
+                           MOVE    "3"             TO  LNK-BYO-SYORI
+                   END-EVALUATE
+                   MOVE    USBYO-BYOMEI    TO  LNK-BYO-BYOMEI
+                   CALL    "ORCSBYOMEI"    USING   ORCSBYOMEIAREA
+                                                   SPA-AREA
+                   IF      LNK-BYO-BYOMEIHENFLG
+                                           =   "1"
+                       GO  TO  2001-USERBYOMEI-CHK-EXT
+                   ELSE
+                     IF   ( WRK-PARA-CDKBN   =   "2"   )
+                     AND  ( LNK-BYO-HOSOKU-BYOMEI
+                                             =   SPACE )  
+                       GO  TO  2001-USERBYOMEI-CHK-EXT
+                     ELSE
+                       MOVE    6               TO  FLG-ERR
+      *                廃止年月日が設定されているとき
+                       IF    ( LNK-BYO-IKOSAKICD   =   SPACE )
+                       AND   ( LNK-BYO-HAISIYMD-ERR
+                                                   =   ZERO  )
+                           CONTINUE
+                       ELSE
+                           MOVE    LNK-BYO-KHNBYOMEICD TO  BYO-BYOMEICD
+                           PERFORM 900-BYOMEI-READ-SEC
+                           MOVE    BYOMEI-REC          TO
+                                                       WRK-BYOMEI-REC
+                           IF      WRK-BYO-HAISIYMD
+                                                   NOT =   SPACE
+                               IF      WRK-BYO-IKOSAKICD   =   SPACE
+                                   MOVE    7               TO  FLG-ERR
+      *                            推奨病名チェック
+                                   INITIALIZE          SYNONYM-REC
+                                   MOVE    WRK-BYO-BYOMEI
+                                                   TO  SYNONYM-BYOMEI
+                                   PERFORM 5001-SYNONYM-CHK-SEC
+                                   IF      FLG-SYNONYM =   ZERO
+                                       MOVE    5           TO  FLG-ERR
+                                   END-IF
+                               ELSE
+                                   MOVE    8               TO  FLG-ERR
+                                   MOVE    WRK-BYO-IKOSAKICD
+                                                           TO
+                                                           BYO-BYOMEICD
+                                   PERFORM 900-BYOMEI-READ-SEC
+                               END-IF
+                           END-IF
+                       END-IF
+                     END-IF
+                   END-IF
+               ELSE
+                   GO  TO  2001-USERBYOMEI-CHK-EXT
+               END-IF
+           ELSE   
+      *      編集病名のとき再度チェックを行なう
+             IF      USBYO-BYOMEIHENFLG
+                                   =   "1"
+               IF      USBYO-BYOMEICD (1)  =   "0000999"
+                   IF      USBYO-BYOMEIINPUTCD =   USBYO-BYOMEICD (1)
+                       MOVE    9                   TO  FLG-ERR
+                   ELSE
+                       MOVE    1                   TO  FLG-ERR
+                   END-IF
+               ELSE
+                   MOVE    2                   TO  FLG-ERR
+               END-IF
+             ELSE     
+      *        廃止年月日が設定されているとき
+               MOVE    USBYO-KHNBYOMEICD   TO  BYO-BYOMEICD
+               PERFORM 900-BYOMEI-READ-SEC
+               MOVE    BYOMEI-REC          TO  WRK-BYOMEI-REC
+               IF      WRK-BYO-HAISIYMD    NOT =   SPACE
+                   IF      WRK-BYO-IKOSAKICD   =   SPACE
+                       MOVE    3                   TO  FLG-ERR
+      *                推奨病名チェック
+                       INITIALIZE                  SYNONYM-REC
+                       MOVE    WRK-BYO-BYOMEI      TO  SYNONYM-BYOMEI
+                       PERFORM 5001-SYNONYM-CHK-SEC
+                       IF      FLG-SYNONYM         =   ZERO
+                           MOVE    5                   TO  FLG-ERR
+                       END-IF
+                   ELSE
+                       MOVE    4                   TO  FLG-ERR
+                       MOVE    WRK-BYO-IKOSAKICD   TO  BYO-BYOMEICD
+                       PERFORM 900-BYOMEI-READ-SEC
+                   END-IF
+               END-IF
+             END-IF
+           END-IF
+      *    
+           IF      FLG-ERR         =   ZERO
+               GO  TO  2001-USERBYOMEI-CHK-EXT
+           END-IF
+      *
+           MOVE    1               TO  FLG-CHK    
+           .
+       2001-USERBYOMEI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    一覧作成処理（自院病名）
+      *****************************************************************
+       2002-USERBYOMEI-PRINT-SEC          SECTION.
+      *
+           IF      CNT-LINE             >=  79
+               PERFORM 20021-USERBYOMEI-HEAD-PRINT-SEC
+           END-IF
+      *
+           MOVE    SPACE               TO  BODY-011
+                                           BODY-013
+                                           BODY-014
+                                           BODY-015
+      *
+           MOVE    USBYO-BYOMEIINPUTCD
+                                       TO  B011-BYOMEIINPUTCD
+           IF     USBYO-CDSYU          =   "J"
+               INSPECT B011-BYOMEIINPUTCD  REPLACING  ALL "  "  BY  "　"
+           END-IF
+      *
+           IF     USBYO-CDSYU          =   "J"
+               MOVE    USBYO-BYOMEI        TO  B011-BYOMEI1
+               INSPECT B011-BYOMEI1        REPLACING  ALL "  "  BY  "　"
+           ELSE
+               MOVE    USBYO-BYOMEI        TO  B011-BYOMEI
+           END-IF
+      *
+           EVALUATE    FLG-ERR
+               WHEN    3
+               WHEN    4
+                   MOVE    WRK-BYO-HAISIYMD    TO  WRK-SYMD
+                   PERFORM 31012-SEIWA-HEN-SEC
+           END-EVALUATE
+      *
+           EVALUATE    FLG-ERR
+               WHEN    1
+                   MOVE    "◎未コード化傷病名コードで登録"
+                                               TO  B013-RIYUU
+               WHEN    2
+                   STRING  "◎傷病名コードで組み立てができないか、"
+                                               DELIMITED  BY  SIZE
+                           "入力されたコードと異る病名です"
+                                               DELIMITED  BY  SIZE
+                                               INTO  B013-RIYUU
+                   END-STRING
+               WHEN    3
+               WHEN    7
+                   MOVE    "◎廃止病名あり【廃止日："
+                                               TO  B013-RIYUU1
+                   MOVE    LNK-DAY2-EDTYMD1    TO  B013-HAISIYMD
+                   MOVE    WRK-BYO-BYOMEICD    TO  B013-BYOMEICD
+                   MOVE    WRK-BYO-BYOMEI      TO  B013-BYOMEI
+               WHEN    4
+               WHEN    8
+                   MOVE    "◎移行病名あり【廃止日："
+                                               TO  B013-RIYUU1
+                   MOVE    LNK-DAY2-EDTYMD1    TO  B013-HAISIYMD
+                   MOVE    WRK-BYO-BYOMEICD    TO  B013-BYOMEICD
+                   MOVE    WRK-BYO-BYOMEI      TO  B013-BYOMEI
+                   MOVE    "　　　　　　　　　　　　"
+                                               TO  B014-RIYUU
+                   MOVE    BYO-BYOMEICD        TO  B014-BYOMEICD
+                   MOVE    BYO-BYOMEI          TO  B014-BYOMEI
+               WHEN    5
+                   MOVE    "◎推奨病名あり【廃止日："
+                                               TO  B013-RIYUU1
+                   MOVE    LNK-DAY2-EDTYMD1    TO  B013-HAISIYMD
+                   MOVE    WRK-BYO-BYOMEICD    TO  B013-BYOMEICD
+                   MOVE    WRK-BYO-BYOMEI      TO  B013-BYOMEI
+                   MOVE    "　　　　　　　　　　　　"
+                                               TO  B014-RIYUU
+                   MOVE    BYO-BYOMEICD        TO  B014-BYOMEICD
+                   MOVE    BYO-BYOMEI          TO  B014-BYOMEI
+               WHEN    9
+                   MOVE    "●未コード化傷病名コードで登録"
+                                               TO  B013-RIYUU
+           END-EVALUATE
+      *
+           IF   ( WRK-PARA-CDKBN   =   "2"   )
+           AND  ( LNK-BYO-HOSOKU-BYOMEI
+                               NOT =   SPACE )
+               MOVE    LNK-BYO-HOSOKU-BYOMEI
+                                           TO  B015-HOSOKU
+           END-IF    
+      *
+           ADD     1               TO  CNT-LINE
+           MOVE    BODY-011        TO  HCMSL80-MOJI (CNT-LINE)
+      *
+           IF      CNT-LINE             >=  WRK-CONS-LINE-MAX1
+               PERFORM 20021-USERBYOMEI-HEAD-PRINT-SEC
+           END-IF
+      *
+           IF      BODY-013        NOT =   SPACE
+               IF      CNT-LINE            >=  WRK-CONS-LINE-MAX1
+                   PERFORM 20021-USERBYOMEI-HEAD-PRINT-SEC
+               END-IF
+               ADD     1               TO  CNT-LINE
+               MOVE    BODY-013        TO  HCMSL80-MOJI (CNT-LINE)
+           END-IF
+      *
+           IF      BODY-014        NOT =   SPACE
+               IF      CNT-LINE            >=  WRK-CONS-LINE-MAX1
+                   PERFORM 20021-USERBYOMEI-HEAD-PRINT-SEC
+               END-IF
+               ADD     1               TO  CNT-LINE
+               MOVE    BODY-014        TO  HCMSL80-MOJI (CNT-LINE)
+           END-IF
+      *
+           IF      BODY-015        NOT =   SPACE
+               IF      CNT-LINE            >=  WRK-CONS-LINE-MAX1
+                   PERFORM 20021-USERBYOMEI-HEAD-PRINT-SEC
+               END-IF
+               ADD     1               TO  CNT-LINE
+               MOVE    BODY-015        TO  HCMSL80-MOJI (CNT-LINE)
+           END-IF
+      *
+           ADD     1               TO  CNT-LINE
+      *
+           ADD     1               TO  CNT-OUT
+           .
+       2002-USERBYOMEI-PRINT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    見出し編集処理
+      *****************************************************************
+       20021-USERBYOMEI-HEAD-PRINT-SEC SECTION.
+      *
+      *    帳票印刷処理
+           IF      CNT-PAGE            >   ZERO
+               PERFORM 200111-PRINT-OUT-SEC
+           END-IF
+      *
+           ADD     1                   TO  CNT-PAGE
+                                           CNT-PAGE1
+           MOVE    CNT-PAGE            TO  H011-PAGE
+      *
+           MOVE    SPACE               TO  HCMSL80
+           MOVE    HEAD-011            TO  HCMSL80-MOJI (1)
+           MOVE    HEAD-012            TO  HCMSL80-MOJI (3)
+           MOVE    4                   TO  CNT-LINE
+           IF      WRK-PARA-CDKBN  =   "0"
+               MOVE    HEAD-013            TO  HCMSL80-MOJI (4)
+               MOVE    5                   TO  CNT-LINE
+           ELSE
+               IF      WRK-PARA-CDKBN  =   "2"
+                   MOVE    HEAD-014            TO  HCMSL80-MOJI (4)
+                   MOVE    5                   TO  CNT-LINE
+               END-IF
+           END-IF
+           .
+       20021-USERBYOMEI-HEAD-PRINT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -829,10 +1469,41 @@
                                        TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
-           MOVE   "HCMSL55.red"        TO  SPRT-PRTID
-           MOVE    HCMSL55             TO  SPRT-PRTDATA
-           MOVE    "未コード化病名一覧"
-                                       TO  SPRT-TITLE
+           EVALUATE    FLG-PRTKBN
+               WHEN    1
+                   MOVE   "HCMSL55.red"        TO  SPRT-PRTID
+                   MOVE    HCMSL55             TO  SPRT-PRTDATA
+                   IF      WRK-PARA-CDKBN      =   "0"
+                       MOVE    "未コード化病名一覧"
+                                                   TO  SPRT-TITLE
+                   ELSE
+                       IF      WRK-PARA-CDKBN      =   "1"
+                           MOVE    "コード化可能病名一覧"
+                                                       TO  SPRT-TITLE
+                       ELSE
+                           MOVE
+                               "コード化可能病名一覧（補足コメント）"
+                                                       TO  SPRT-TITLE
+                       END-IF
+                   END-IF
+               WHEN    2
+          
+                   MOVE   "HCMSL80.red"        TO  SPRT-PRTID
+                   MOVE    HCMSL80             TO  SPRT-PRTDATA
+                   IF      WRK-PARA-CDKBN      =   "0"
+                       MOVE    "（自院）未コード化病名一覧"
+                                                   TO  SPRT-TITLE
+                   ELSE
+                       IF      WRK-PARA-CDKBN      =   "1"
+                           MOVE    "（自院）コード化可能病名一覧"
+                                                       TO  SPRT-TITLE
+                       ELSE
+                           MOVE
+                          "（自院）コード化可能病名一覧（補足コメント）"
+                                                       TO  SPRT-TITLE
+                       END-IF
+                   END-IF
+           END-EVALUATE
            MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
            MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
            MOVE    LNK-PRTKANRI-PRTNM  TO  SPRT-PRTNM
@@ -878,7 +1549,7 @@
            MOVE    1               TO  FLG-END
       *
            MOVE    SPACE           TO  WRK-ERRMSG
-           STRING  "ORCBG021 "     DELIMITED  BY  SIZE
+           STRING  "ORCBG021 " DELIMITED  BY  SIZE
                    WRK-RECEERR     DELIMITED  BY  SIZE
                    LOW-VALUE       DELIMITED  BY  SIZE
                                    INTO    WRK-ERRMSG
@@ -889,27 +1560,42 @@
            EXIT.
       *
       *****************************************************************
+      *    同義語マスタチェック処理
+      *****************************************************************
+       5001-SYNONYM-CHK-SEC            SECTION.
+      *
+           PERFORM 900-SYNONYM-READ-SEC
+      *
+           IF      FLG-SYNONYM         =   ZERO
+               MOVE    SYNONYM-BYOMEICD    TO  BYO-BYOMEICD
+               MOVE    ZERO                TO  FLG-BYOMEI
+               PERFORM 900-BYOMEI-READ-SEC
+               IF      FLG-BYOMEI          =   1
+                   MOVE    1                   TO  FLG-SYNONYM
+               ELSE
+                   IF      BYO-HAISIYMD        =   SPACE   OR  ALL "9"
+                       CONTINUE
+                   ELSE    
+                       MOVE    1                   TO  FLG-SYNONYM
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       5001-SYNONYM-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    終了処理
       *****************************************************************
        300-END-SEC                 SECTION.
       *
-           MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
-           MOVE    "key33"         TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
-      *
-      *    帳票印刷処理
-           IF      CNT-PAGE            >   ZERO
-               PERFORM 200111-PRINT-OUT-SEC
-           END-IF
-      *
-           DISPLAY "*** ORCBG021 OUT  "  CNT-OUT
-           DISPLAY "*** ORCBG021 PAGE "  CNT-PAGE
            DISPLAY "*** ORCBG021 END ***"
       *     
       *    ステップ管理終了処理
            MOVE    "STE"           TO  SJOBKANRI-MODE
            INITIALIZE                  JOBKANRI-REC
-           MOVE    CNT-PAGE        TO  JOB-UPDCNT
+           MOVE    CNT-PAGE1       TO  JOB-UPDCNT
            PERFORM 900-CALL-ORCSJOB-SEC
       *
            PERFORM 900-DBDISCONNECT-SEC
@@ -942,14 +1628,39 @@
            MOVE    "key33"         TO  MCP-PATHNAME
       *
            PERFORM 900-DBFETCH-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    ZERO                TO  FLG-END
-               MOVE    MCPDATA-REC         TO  PTBYOMEI-REC
+           IF      MCP-RC          =   ZERO
+               MOVE    ZERO            TO  FLG-PTBYOMEI
+               MOVE    MCPDATA-REC     TO  PTBYOMEI-REC
            ELSE
-               MOVE    1                   TO  FLG-END
+               MOVE    1               TO  FLG-PTBYOMEI
            END-IF
            .
        900-SEIKYU-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    自院病名読込
+      *****************************************************************
+       900-USERBYOMEI-READ-SEC           SECTION.
+      *
+           MOVE    "tbl_userbyomei"
+                                   TO  MCP-TABLE
+           MOVE    "key3"          TO  MCP-PATHNAME
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC          =   ZERO
+               MOVE    MCPDATA-REC     TO  USERBYOMEI-REC
+               MOVE    ZERO            TO  FLG-USERBYOMEI
+      *        分類コードは読み飛ばし
+               IF      USBYO-CDSYU     =   "C"
+                   GO  TO  900-USERBYOMEI-READ-SEC
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-USERBYOMEI
+           END-IF
+      *
+           .
+       900-USERBYOMEI-READ-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1077,6 +1788,39 @@
            PERFORM 900-CLOSE-SEC
            .
        900-SYSKANRI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    同義語マスタ読込
+      *****************************************************************
+       900-SYNONYM-READ-SEC         SECTION.
+      *
+           MOVE    SYNONYM-REC         TO  MCPDATA-REC
+           MOVE    "tbl_synonym"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_synonym"       TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  SYNONYM-REC
+                   MOVE    ZERO            TO  FLG-SYNONYM
+               ELSE
+                   INITIALIZE                  SYNONYM-REC
+                   MOVE    1               TO  FLG-SYNONYM
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-SYNONYM
+               INITIALIZE                      SYNONYM-REC
+           END-IF
+      *
+           MOVE    "tbl_synonym"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-SYNONYM-READ-EXT.
            EXIT.
       *
       *****************************************************************
