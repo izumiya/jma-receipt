@@ -473,6 +473,7 @@ RECORD_files = \
 	X07.rec \
 	I411.rec \
 	appointlst2v2.rec \
+	acsimulatev2.rec \
 
 DEF_files = \
 
@@ -723,6 +724,8 @@ DB_files = \
 	xml_appointlst2v2req.db \
 	xml_appointlst2v2res.db \
 	tbl_ptnum_public.db \
+	xml_acsimulatev2req.db \
+	xml_acsimulatev2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@
