@@ -133,6 +133,8 @@
       *  04.05.04    NACL-藤原    12/04/10  平成２４年４月改正対応
       *                                     平成２４年４月以降の社保分に
       *                                     ついて在総診の設定は行わない
+      *  04.05.05    NACL-藤原    13/01/07  自費レセプトを印刷しない設定
+      *                                     のとき、入力順出力の対象としない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6052,7 +6054,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
                    END-STRING
            END-EVALUATE
            MOVE    SPA-GMN-PRTKBN  TO  SHELLTBL-ARG24
-           MOVE    SPA-GMN-PREFKBN TO  SHELLTBL-ARG28
+      *****MOVE    SPA-GMN-PREFKBN TO  SHELLTBL-ARG28
+           MOVE    SPA-NAI-2005-JIHI-PRTKBN
+                                   TO  SHELLTBL-ARG28
            MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG30
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
