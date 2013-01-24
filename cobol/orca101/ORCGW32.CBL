@@ -1073,12 +1073,12 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    UNTIL      IDX      >   SPA-GMN-SRYKBN-MAX
                MOVE    SPA-GMN-SRYKBN-LST (1)
                                            TO  SPA-GMN-SRYKBN-G (IDX)
-               IF      IDX             =    5
-                                       OR   6
+      ****     IF      IDX             =    5
+      *                                OR   6
       *            ¸¡ºº¡¦²èÁü¿ÇÃÇ¤¬Êñ³ç
-                   MOVE    SPA-GMN-SRYKBN-LST (2)
-                                           TO  SPA-GMN-SRYKBN-G (IDX)
-               END-IF
+      *            MOVE    SPA-GMN-SRYKBN-LST (2)
+      *                                    TO  SPA-GMN-SRYKBN-G (IDX)
+      ****     END-IF
            END-PERFORM
       *
            .
