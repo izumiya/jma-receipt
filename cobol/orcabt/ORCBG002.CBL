@@ -1104,7 +1104,7 @@ grpsys     MOVE    "key"               TO  WRK-DBPATH
                MOVE    MCPDATA-REC     TO  PTINF-REC
            END-IF
       *
-           MOVE    "PTINF-KEY"         TO  WRK-DBPATH
+grpsys     MOVE    "key"               TO  WRK-DBPATH
            PERFORM 900-TBL-CLOSE-SEC
       *
       *    ¥µº‘»÷πÊ
