@@ -2159,6 +2159,17 @@
                MOVE    ZERO            TO  WRK-SONOTA
                MOVE    ZERO            TO  WRK-ZAITEN
                MOVE    ZERO            TO  WRK-ZAITEN-G
+      *
+           ELSE
+               IF      (FLG-NAIFUKU            =   ZERO )
+                 AND   (WRK-COM-ZAIEND (IDX)   =   "1"  )
+                 AND  ((WRK-CHK-SRYSYUKBN      =   "291") AND
+                       (WRK-COM-KAISU(IDX) NOT >   14   ))
+      *            ±¡ÆâÎ×»þÅêÌô¤Î£±£´ÆüÌ¤Ëþ¤ÎÅÀ¿ô½¸·×
+                   ADD     WRK-COM-KEI (IDX)   TO  WRK-KEIKEI
+                   ADD     WRK-COM-KEI (IDX)   TO  WRK-HKNKEI-KEIKEI
+                                                       (WRK-CNT-HKN)
+               END-IF
            END-IF
       *H24.4
       **** ¸åÈ¯°åÌôÉÊ¥Á¥§¥Ã¥¯
@@ -3362,10 +3373,12 @@
       *        ¿ÇÎÅ¼ïÊÌ¶èÊ¬ÊÑ´¹
                PERFORM 30001-SRYSYUKBN-SET-SEC
       *        ±¡Æâ¤ÎÆâÉþÌô¥Á¥§¥Ã¥¯
-      *          Î×»þ¤Ç£±£´Æü°ÊÆâ¤Î»þ¤ÏÂÐ¾Ý³°
+      *          Î×»þÅêÌô¤â¤¹¤Ù¤ÆÂÐ¾Ý
+      *******    Î×»þ¤Ç£±£´Æü°ÊÆâ¤Î»þ¤ÏÂÐ¾Ý³°
                IF     ( WRK-CHK-SRYSYUKBN      =   "211" )  OR
-                      ((WRK-CHK-SRYSYUKBN      =   "291") AND
-                       (WRK-COM-KAISU (IDX)    >   14   ))
+                      ( WRK-CHK-SRYSYUKBN      =   "291" )
+      *!!!!!!         ((WRK-CHK-SRYSYUKBN      =   "291") AND
+      *!!!!!!          (WRK-COM-KAISU (IDX)    >   14   ))
                    MOVE    1                   TO  FLG-NAIFUKU
                ELSE
                    MOVE    ZERO                TO  FLG-NAIFUKU
