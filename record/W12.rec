@@ -79,6 +79,13 @@ W12	{
 					count	int;
 					item	varchar(42)[3];
 				};
+				NYUTAIINREKI_NYU_COMBO	{
+					NYUTAIINREKI_NYU	{
+						value	varchar(42);
+					};
+					count	int;
+					item	varchar(42)[2];
+				};
 				SRYKAHENKBN_COMBO	{
 					SRYKAHENKBN	{
 						value	varchar(20);

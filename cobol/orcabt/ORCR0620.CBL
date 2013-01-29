@@ -209,6 +209,8 @@
       *  04.06.06    NACL-藤原    12/09/27  生活保護期間重複対応
       *  04.06.07    NACL-藤原    12/10/25  保険履歴ファイルのエラー処理
       *                                     中止 
+      *  04.06.07    NACL-藤原    12/12/21  入院料の算定がない入退院履歴
+      *                                     の記載対応
       *
       *  04.07.01    NACL-門脇    12/10/02  高齢者判定フラグ編集
       *  04.07.02    NACL-藤原    12/12/17  複数枚レセプト分割対応
@@ -342,6 +344,7 @@
            03  FLG-PTNYUINRRK23                        PIC 9(01).
            03  FLG-KYUSEIRRK                           PIC 9(01).
            03  FLG-PTTOKKI                             PIC 9(01).
+           03  FLG-HKNCOMBI                            PIC 9(01). 
       *   
            03  FLG-ARI                                 PIC 9(01).
            03  FLG-SET                                 PIC 9(01).
@@ -628,6 +631,10 @@
        01  BUNBEN-REC.
            COPY    "CPBUNBEN.INC".
       *
+      *    保険組み合わせ
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
+      *
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
@@ -867,6 +874,16 @@
                                        =   SPACE
                    MOVE    "0"         TO  SYS-200501-DRCD-PRTKBN
                END-IF
+               IF      SYS-200501-NYUTAIINREKI-NYU-KSIKBN
+                                       =   SPACE
+                   MOVE    "0"         TO
+                                   SYS-200501-NYUTAIINREKI-NYU-KSIKBN
+               END-IF
+      *
+               DISPLAY "SYS-200501-DRCD-PRTKBN            ="
+                                    SYS-200501-DRCD-PRTKBN
+               DISPLAY "SYS-200501-NYUTAIINREKI-NYU-KSIKBN="
+                                    SYS-200501-NYUTAIINREKI-NYU-KSIKBN
            END-IF
       *
           .
@@ -3562,9 +3579,42 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                                    MOVE    10                  TO  IDY
                                    MOVE   IDX5                 TO  IDX
                                END-IF
+      *                        入院基本料を算定しない入退院歴の記載
+                               IF     SYS-200501-NYUTAIINREKI-NYU-KSIKBN
+                                               =   "1"
+                                 IF      RECE61-DAY-1 (IDX)
+                                               =   RECE62-HKNCOMBI (IDY)
+                                   PERFORM 2401-PTNYUINRRK-HENSYU-SEC
+                                   MOVE    10                  TO  IDY
+                                   MOVE   IDX5                 TO  IDX
+                                 END-IF
+                               END-IF
                            END-PERFORM
                        END-IF
                    END-PERFORM
+      *
+      ******       自費分の入退院歴の記載
+      ******       IF      SYS-200501-NYUTAIINREKI-NYU-KSIKBN
+      ******                             =   "1"
+      ******           PERFORM VARYING IDX FROM    IDX4    BY  1
+      ******                   UNTIL   IDX >       IDX5
+      ******               IF      RECE61-DAY (IDX)
+      ******                                       >   ZERO
+      *                        保険組合せ読込み
+      ******                   INITIALIZE              HKNCOMBI-REC
+      ******                   MOVE    RECE62-HOSPNUM  TO  COMB-HOSPNUM
+      ******                   MOVE    RECE62-PTID     TO  COMB-PTID
+      ******                   MOVE    RECE61-DAY(IDX) TO
+      ******                                           COMB-HKNCOMBINUM 
+      ******                   MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
+      ******                   PERFORM  900-HKNCOMBI-INV-SEC
+      ******                   IF      COMB-HKNNUM (1:2)   =   "98"
+      ******                       PERFORM 2401-PTNYUINRRK-HENSYU-SEC
+      ******                       MOVE   IDX5                 TO  IDX
+      ******                   END-IF
+      ******               END-IF
+      ******           END-PERFORM
+      ******       END-IF
                END-IF
              END-IF          
       *                 
@@ -4372,6 +4422,41 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *
            .
        900-PTTOKKI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組合せマスタ読込
+      *****************************************************************
+       900-HKNCOMBI-INV-SEC         SECTION.
+      *
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM    900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM    900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-HKNCOMBI
+                   MOVE    MCPDATA-REC         TO  HKNCOMBI-REC
+                   IF      COMB-DELKBN         =   "1"
+                       MOVE    1                   TO  FLG-HKNCOMBI
+                   END-IF
+               ELSE
+                   MOVE    1                   TO  FLG-HKNCOMBI
+                   INITIALIZE                      HKNCOMBI-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-HKNCOMBI
+               INITIALIZE                      HKNCOMBI-REC
+           END-IF
+      *
+           MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-HKNCOMBI-INV-EXT.
            EXIT.
       *
       ****************************************************************

@@ -138,6 +138,10 @@
       *  04.06.04    NACL-Æ£¸¶    12/07/04  É½¼¨´ü´Ö¤Ë¤è¤ë¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *                                     Å¾µ¢ºÑ½ýÉÂÌ¾µ­ºÜ¶èÊ¬¤ÎÄÉ²Ã
       *  04.06.05    NACL-Æ£¸¶    12/09/22  ÅÀ¸¡ÍÑ¡¦Äó½ÐÍÑ½é´üÉ½¼¨ÀßÄêÂÐ±þ
+      *  04.06.06    NACL-Æ£¸¶    12/12/21  Æþ±¡ÎÁ¤Î»»Äê¤¬¤Ê¤¤ÆþÂà±¡ÍúÎò
+      *                                     ¤Îµ­ºÜÂÐ±þ
+      *                                     ÆþÂà±¡ÍúÎò¤Îµ­ºÜ¶èÊ¬¡ÊÆþ±¡¡Ë
+      *                                     ¤ÎÄÉ²Ã
       *
       *  04.07.01    NACL-Æ£¸¶    11/06/02  ÆþÂà±¡ÍúÎò¤Îµ­ºÜ¶èÊ¬¤Ë
       *                                     ¼«ÈñÆþ±¡Ê¬¤Îµ­ºÜÀßÄê¤òÄÉ²Ã
@@ -265,6 +269,12 @@
                                               PIC X(01).
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-NYUTAIINREKI-KSIKBNMEI
+                                              PIC X(40).
+                       09  SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G.
+                           11  SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEI
                                               PIC X(40).
                        09  SPA-GMN-PREFPRGID  PIC X(15).              
                        09  SPA-GMN-PREFPRGID1 PIC X(15).              
@@ -852,6 +862,15 @@
                        09  SPA-GMN-NYUTAIINREKI-KSIKBNMEIL
                                               PIC X(40).
                    07  SPA-GMN-NYUTAIINREKI-KSIKBN-MAX
+                                              PIC 9(02).    
+      *                                        
+                   07  SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST  OCCURS  2.
+                       09  SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEIL
+                                              PIC X(40).
+                   07  SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
                                               PIC 9(02).    
       *                                        
                    07  SPA-GMN-SYAOCRKBNLST           OCCURS  4.
@@ -2001,6 +2020,21 @@
                                    SPA-GMN-NYUTAIINREKI-KSIKBNMEIL (3)
            MOVE    3                   TO
                                    SPA-GMN-NYUTAIINREKI-KSIKBN-MAX 
+      *     
+           MOVE    "0"                 TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL  (1)
+           MOVE    "Æþ±¡ÎÁ¤Î»»Äê¤¬¤Ê¤¤ÆþÂà±¡ÍúÎò¤òµ­ºÜ¤·¤Ê¤¤"
+                                       TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEIL
+                                                                     (1)
+           MOVE    "1"                 TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL  (2)
+           MOVE    "Æþ±¡ÎÁ¤Î»»Äê¤¬¤Ê¤¤ÆþÂà±¡ÍúÎò¤òµ­ºÜ¤¹¤ë"
+                                       TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEIL
+                                                                     (2)
+           MOVE    2                   TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX 
       *     
            MOVE    "0"                 TO  SPA-GMN-KKHPRTKBNL    (1)
            MOVE    "µëÉÕ³ä¹ç¤Ê¤·¤ÎÍÍ¼°"
@@ -3748,6 +3782,21 @@
                                        TO  IDY
                END-IF                                     
            END-PERFORM
+      *         
+           MOVE    SYS-200501-NYUTAIINREKI-NYU-KSIKBN
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >   SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+               IF      SPA-GMN-NYUTAIINREKI-NYU-KSIKBN 
+                               =   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL(IDY)
+                   MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST  (IDY)
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+                   MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+                                       TO  IDY
+               END-IF                                     
+           END-PERFORM
       *
       *    ¥ì¥»¥×¥È¡¦Áí³çÊÔ½¸¾ðÊó¡Ê¶èÊ¬¥³¡¼¥É£±£°¤Î¥Ç¡¼¥¿ÆÉ¹þ¡Ë
            MOVE    SPACE               TO  SYS-200505-REC
@@ -4217,6 +4266,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                MOVE    SPA-GMN-NYUTAIINREKI-KSIKBNLST (1)
                                        TO  SPA-GMN-NYUTAIINREKI-KSIKBN-G
            END-IF                                              
+           IF     SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G  =   SPACE
+               MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST (1)
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+           END-IF                                              
            IF     SPA-GMN-RECECOMKBN   =   SPACE
                MOVE    SPA-GMN-RECECOMKBNLST (1)
                                            TO  SPA-GMN-RECECOMKBN-G
@@ -4535,6 +4589,9 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    W12-KKHOCRKBN       TO  SPA-GMN-KKHOCRKBN-G 
            MOVE    W12-KOUIKIOCRKBN    TO  SPA-GMN-KOUIKIOCRKBN-G 
            MOVE    W12-NYUTAIINREKI    TO  SPA-GMN-NYUTAIINREKI-KSIKBN-G
+           MOVE    W12-NYUTAIINREKI-NYU
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
            MOVE    W12-PREFPRGID       TO  SPA-GMN-PREFPRGID
            MOVE    W12-PREFPRGID1      TO  SPA-GMN-PREFPRGID1
            MOVE    W12-KKHPRTKBN       TO  SPA-GMN-KKHPRTKBN-G 
@@ -4721,6 +4778,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4144-NYUTAIINREKI-KSIKBN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4144-NYUTAIINREKI-NYU-KSIKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -7564,6 +7626,40 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    ÆþÂà±¡ÍúÎòµ­ºÜ¶èÊ¬¡ÊÆþ±¡¡Ë¥Á¥§¥Ã¥¯
+      *****************************************************************
+       4144-NYUTAIINREKI-NYU-KSIKBN-CHK-SEC       SECTION.
+      *
+           IF      SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+                                       =   SPACE
+               MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST (1)
+                                   TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >
+                               SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+                   IF      SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+                                   =
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL(IDY)
+                       MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST (IDY)
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+                       MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+                                       TO  IDY
+                   END-IF                                     
+               END-PERFORM
+      *     
+               IF      SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEI    =   SPACE
+                   MOVE    304                 TO  SPA-GMN-CUR
+                   MOVE    "0076"              TO  SPA-ERRCD
+               END-IF
+           END-IF    
+           .
+       4144-NYUTAIINREKI-NYU-KSIKBN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¿ÇÎÅÊó½·ÀÁµá½ñ¥Þ¥ëÄ¹Ê¬ºîÀ®¶èÊ¬¡Ê¼ÒÊÝ¡Ë¥Á¥§¥Ã¥¯
       *****************************************************************
        4145-SYAPRTKBN-CHK-SEC       SECTION.
@@ -8549,6 +8645,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-ROUPRTKBN-N     TO  SYS-200501-ROUPRTKBN-N
            MOVE    SPA-GMN-TENKIBYOMEI-KBN TO
                                            SYS-200501-TENKIBYOMEI-KBN
+           MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+                                           TO
+                                   SYS-200501-NYUTAIINREKI-NYU-KSIKBN
            MOVE    SYS-200501-REC          TO  SYSKANRI-REC
       *     
            PERFORM 800-MCNDATE-SEC
@@ -9100,6 +9199,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-KOUIKIOCRKBN-G   TO  W12-KOUIKIOCRKBN
            MOVE    SPA-GMN-NYUTAIINREKI-KSIKBN-G
                                             TO  W12-NYUTAIINREKI
+           MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+                                            TO  W12-NYUTAIINREKI-NYU
            MOVE    SPA-GMN-SYAPRTKBN-G      TO  W12-SYAPRTKBN
            MOVE    SPA-GMN-KKHPRTKBN-G      TO  W12-KKHPRTKBN
            MOVE    SPA-GMN-KOUIKIPRTKBN-G   TO  W12-KOUIKIPRTKBN
@@ -9297,6 +9398,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-NYUTAIINREKI-KSIKBN-MAX
                                        TO  W12-NYUTAIINREKI-COUNT 
+      *     
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+               MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST (IDY)
+                                       TO  W12-NYUTAIINREKI-NYULST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+                                       TO  W12-NYUTAIINREKI-NYU-COUNT 
       *
            MOVE    SPA-GMN-PREFPRGID   TO  W12-PREFPRGID
            MOVE    SPA-GMN-PREFPRGID1  TO  W12-PREFPRGID1
@@ -10115,7 +10225,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0034"
                    MOVE    "Ê£¿ô²ÊÆ±°ìÁªÂòÆþÎÏ¥¨¥é¡¼"    TO  SPA-ERRMSG
                WHEN    "0035"
-                   MOVE    "ÆþÂà±¡ÍúÎòµ­ºÜ¶èÊ¬ÆþÎÏ¥¨¥é¡¼"
+                   MOVE    "ÆþÂà±¡ÍúÎòµ­ºÜ¶èÊ¬¡ÊÆþ±¡³°¡ËÆþÎÏ¥¨¥é¡¼"
                                                          TO  SPA-ERRMSG
                WHEN    "0036"
                    MOVE    "¼ÒÊÝ¿ÇÎÅÊó½·ÀÁµá½ñ¶èÊ¬ÆþÎÏ¥¨¥é¡¼"
@@ -10226,6 +10336,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0075"
                    MOVE    "´û¤ËÆþÎÏºÑ¤ÎÊÝ¸±¼ÔÈÖ¹æ¤Ç¤¹"
                                                TO  SPA-ERRMSG
+               WHEN    "0076"
+                   MOVE    "ÆþÂà±¡ÍúÎòµ­ºÜ¶èÊ¬¡ÊÆþ±¡¡ËÆþÎÏ¥¨¥é¡¼"
+                                                         TO  SPA-ERRMSG
       *
                WHEN    "0096"
                    STRING  "°ì³çºîÀ®½ÐÎÏ½ç¡Ê¹ñÊÝ¡Ë¤Î»ØÄê¤¬ÊÔÄÖ½ç¤Ç¤¹¡£"
@@ -10455,6 +10568,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "TENKIBYOMEI_KBN"  TO   MCP-WIDGET
                 WHEN    4
                     MOVE  "NYUTAIINREKI"     TO   MCP-WIDGET
+                WHEN    304
+                    MOVE  "NYUTAIINREKI_NYU" TO   MCP-WIDGET
                 WHEN    7
                     MOVE  "KKHOCRKBN"        TO   MCP-WIDGET
                 WHEN    8
@@ -10710,6 +10825,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    64  THRU    65
                 WHEN    68  THRU    69
                 WHEN    300 THRU    302
+                WHEN    304
                     MOVE    0                TO  W12-PAGENO
                 WHEN    9
                 WHEN    10
@@ -10774,6 +10890,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "RENNUMHENKBN"
                    MOVE    4           TO  SPA-GMN-CUR
                WHEN    "NYUTAIINREKI"
+                   IF      SPA-BEDSU       >   ZERO
+                       MOVE    304         TO  SPA-GMN-CUR
+                   ELSE
+                       MOVE    19          TO  SPA-GMN-CUR
+                   END-IF
+               WHEN    "NYUTAIINREKI_NYU"
                    IF      SPA-BEDSU       >   ZERO
                        MOVE    23          TO  SPA-GMN-CUR
                    ELSE
