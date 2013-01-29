@@ -176,6 +176,8 @@
       *  04.06.05    NACL-藤原    12/10/04  同一レセプトの公費が４つを超
       *                                     えた場合の種別不明対応
       *  04.06.07    NACL-藤原    12/09/27  生活保護期間重複対応
+      *  04.06.08    NACL-藤原    12/12/21  入院料の算定がない入退院履歴
+      *                                     の記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2375,6 +2377,11 @@
                          WRK-DAY (2 IDX3)     >   ZERO
                     MOVE   WRK-DAY(2 IDX3)  TO  WRK-RECE61-DAY(IDX3)
                  END-IF
+                 IF      WRK-DAY (1 IDX3)     =   ZERO    AND
+                         WRK-DAY (2 IDX3)     >   ZERO
+                     MOVE   WRK-DAY (2 IDX3)   TO  WRK-RECE61-DAY-1
+                                                              (IDX3)
+                 END-IF
                END-PERFORM
            END-IF
            MOVE    PTHKN-TEKSTYMD     TO  WRK-RECE61-TEKSTYMDX  (1)
@@ -2676,6 +2683,11 @@
                  IF      WRK-DAY (1 IDX3)     >   ZERO    AND
                          WRK-DAY (2 IDX3)     >   ZERO
                     MOVE   WRK-DAY(2 IDX3)  TO  WRK-RECE61-DAY(IDX3)
+                 END-IF
+                 IF      WRK-DAY (1 IDX3)     =   ZERO    AND
+                         WRK-DAY (2 IDX3)     >   ZERO
+                     MOVE   WRK-DAY (2 IDX3)   TO  WRK-RECE61-DAY-1
+                                                              (IDX3)
                  END-IF
                END-PERFORM
            END-IF

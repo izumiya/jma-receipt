@@ -138,6 +138,10 @@
       *  04.06.04    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *                                     転帰済傷病名記載区分の追加
       *  04.06.05    NACL-藤原    12/08/20  点検用・提出用初期表示設定対応
+      *  04.06.06    NACL-藤原    12/12/21  入院料の算定がない入退院履歴
+      *                                     の記載対応
+      *                                     入退院履歴の記載区分（入院）
+      *                                     の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -250,6 +254,12 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-NYUTAIINREKI-KSIKBNMEI
                                               PIC X(22).
+                       09  SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G.
+                           11  SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEI
+                                              PIC X(40).
                        09  SPA-GMN-PREFPRGID  PIC X(15).              
                        09  SPA-GMN-PREFPRGID1 PIC X(15).              
                        09  SPA-GMN-SYAPRTNM   PIC X(16).              
@@ -800,6 +810,15 @@
                        09  SPA-GMN-NYUTAIINREKI-KSIKBNMEIL
                                               PIC X(22).
                    07  SPA-GMN-NYUTAIINREKI-KSIKBN-MAX
+                                              PIC 9(02).    
+      *                                        
+                   07  SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST  OCCURS  2.
+                       09  SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEIL
+                                              PIC X(40).
+                   07  SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
                                               PIC 9(02).    
       *                                        
                    07  SPA-GMN-SYAOCRKBNLST           OCCURS  4.
@@ -1850,6 +1869,21 @@
                                    SPA-GMN-NYUTAIINREKI-KSIKBNMEIL (2)
            MOVE    2                   TO
                                    SPA-GMN-NYUTAIINREKI-KSIKBN-MAX 
+      *     
+           MOVE    "0"                 TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL  (1)
+           MOVE    "入院料の算定がない入退院履歴を記載しない"
+                                       TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEIL
+                                                                     (1)
+           MOVE    "1"                 TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL  (2)
+           MOVE    "入院料の算定がない入退院履歴を記載する"
+                                       TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEIL
+                                                                     (2)
+           MOVE    2                   TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX 
       *     
            MOVE    "0"                 TO  SPA-GMN-KKHPRTKBNL    (1)
            MOVE    "給付割合なしの様式"
@@ -3523,6 +3557,21 @@
                                        TO  IDY
                END-IF                                     
            END-PERFORM
+      *         
+           MOVE    SYS-200501-NYUTAIINREKI-NYU-KSIKBN
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >   SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+               IF      SPA-GMN-NYUTAIINREKI-NYU-KSIKBN 
+                               =   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL(IDY)
+                   MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST  (IDY)
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+                   MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+                                       TO  IDY
+               END-IF                                     
+           END-PERFORM
       *
       *    レセプト（編綴順）情報
            MOVE    SPACE               TO  SYS-2008-REC
@@ -3945,6 +3994,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                MOVE    SPA-GMN-NYUTAIINREKI-KSIKBNLST (1)
                                        TO  SPA-GMN-NYUTAIINREKI-KSIKBN-G
            END-IF                                              
+           IF     SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G  =   SPACE
+               MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST (1)
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+           END-IF                                              
            IF     SPA-GMN-RECECOMKBN   =   SPACE
                MOVE    SPA-GMN-RECECOMKBNLST (1)
                                            TO  SPA-GMN-RECECOMKBN-G
@@ -4226,6 +4280,9 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    W12-KKHOCRKBN       TO  SPA-GMN-KKHOCRKBN-G 
            MOVE    W12-KOUIKIOCRKBN    TO  SPA-GMN-KOUIKIOCRKBN-G 
            MOVE    W12-NYUTAIINREKI    TO  SPA-GMN-NYUTAIINREKI-KSIKBN-G
+           MOVE    W12-NYUTAIINREKI-NYU
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
            MOVE    W12-PREFPRGID       TO  SPA-GMN-PREFPRGID
            MOVE    W12-PREFPRGID1      TO  SPA-GMN-PREFPRGID1
            MOVE    W12-KKHPRTKBN       TO  SPA-GMN-KKHPRTKBN-G 
@@ -4406,6 +4463,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4144-NYUTAIINREKI-KSIKBN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4144-NYUTAIINREKI-NYU-KSIKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -7023,6 +7085,40 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    入退院履歴記載区分（入院）チェック
+      *****************************************************************
+       4144-NYUTAIINREKI-NYU-KSIKBN-CHK-SEC       SECTION.
+      *
+           IF      SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+                                       =   SPACE
+               MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST (1)
+                                   TO
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >
+                               SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+                   IF      SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+                                   =
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBNL(IDY)
+                       MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST (IDY)
+                                       TO
+                                       SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+                       MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+                                       TO  IDY
+                   END-IF                                     
+               END-PERFORM
+      *     
+               IF      SPA-GMN-NYUTAIINREKI-NYU-KSIKBNMEI    =   SPACE
+                   MOVE    303                 TO  SPA-GMN-CUR
+                   MOVE    "0076"              TO  SPA-ERRCD
+               END-IF
+           END-IF    
+           .
+       4144-NYUTAIINREKI-NYU-KSIKBN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    診療報酬請求書マル長分作成区分（社保）チェック
       *****************************************************************
        4145-SYAPRTKBN-CHK-SEC       SECTION.
@@ -7902,6 +7998,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-ROUPRTKBN-N     TO  SYS-200501-ROUPRTKBN-N
            MOVE    SPA-GMN-TENKIBYOMEI-KBN TO
                                            SYS-200501-TENKIBYOMEI-KBN
+           MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN
+                                           TO
+                                   SYS-200501-NYUTAIINREKI-NYU-KSIKBN
            MOVE    SYS-200501-REC          TO  SYSKANRI-REC
       *     
            PERFORM 800-MCNDATE-SEC
@@ -8239,6 +8338,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-KOUIKIOCRKBN-G   TO  W12-KOUIKIOCRKBN
            MOVE    SPA-GMN-NYUTAIINREKI-KSIKBN-G
                                             TO  W12-NYUTAIINREKI
+           MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-G
+                                            TO  W12-NYUTAIINREKI-NYU
            MOVE    SPA-GMN-SYAPRTKBN-G      TO  W12-SYAPRTKBN
            MOVE    SPA-GMN-KKHPRTKBN-G      TO  W12-KKHPRTKBN
            MOVE    SPA-GMN-KOUIKIPRTKBN-G   TO  W12-KOUIKIPRTKBN
@@ -8428,6 +8529,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-NYUTAIINREKI-KSIKBN-MAX
                                        TO  W12-NYUTAIINREKI-COUNT 
+      *     
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >
+                                   SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+               MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBNLST (IDY)
+                                       TO  W12-NYUTAIINREKI-NYULST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-NYUTAIINREKI-NYU-KSIKBN-MAX
+                                       TO  W12-NYUTAIINREKI-NYU-COUNT 
       *
            MOVE    SPA-GMN-PREFPRGID   TO  W12-PREFPRGID
            MOVE    SPA-GMN-PREFPRGID1  TO  W12-PREFPRGID1
@@ -9188,7 +9298,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0034"
                    MOVE    "複数科同一選択入力エラー"    TO  SPA-ERRMSG
                WHEN    "0035"
-                   MOVE    "入退院履歴記載区分入力エラー"
+                   MOVE    "入退院履歴記載区分（入院外）入力エラー"
                                                          TO  SPA-ERRMSG
                WHEN    "0036"
                    MOVE    "社保診療報酬請求書区分入力エラー"
@@ -9284,7 +9394,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0070"
                    MOVE    "点検用レセプト０点公費記載入力エラー"
                                                          TO  SPA-ERRMSG
-      *
+                WHEN    "0076"
+                   MOVE    "入退院履歴記載区分（入院）入力エラー"
+                                                         TO  SPA-ERRMSG
+     *
                WHEN    "0096"
                    STRING  "一括作成出力順（国保）の指定が編綴順です。"
                                                DELIMITED  BY  SIZE
@@ -9449,6 +9562,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "TENKIBYOMEI_KBN"  TO   MCP-WIDGET
                 WHEN    4
                     MOVE  "NYUTAIINREKI"     TO   MCP-WIDGET
+                WHEN    303
+                    MOVE  "NYUTAIINREKI_NYU" TO   MCP-WIDGET
                 WHEN    7
                     MOVE  "KKHOCRKBN"        TO   MCP-WIDGET
                 WHEN    8
@@ -9688,7 +9803,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    60
                 WHEN    62
                 WHEN    64  THRU    67
-                WHEN    301 THRU    302
+                WHEN    301 THRU    303
                     MOVE    0                TO  W12-PAGENO
                 WHEN    9
                 WHEN    10
@@ -9750,6 +9865,12 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    4           TO  SPA-GMN-CUR
                WHEN    "NYUTAIINREKI"
                    IF      SPA-BEDSU       >   ZERO
+                       MOVE    303         TO  SPA-GMN-CUR
+                   ELSE
+                       MOVE    19          TO  SPA-GMN-CUR
+                   END-IF
+               WHEN    "NYUTAIINREKI_NYU"
+                   IF      SPA-BEDSU       >   ZERO
                        MOVE    23          TO  SPA-GMN-CUR
                    ELSE
                        MOVE    19          TO  SPA-GMN-CUR
@@ -9770,7 +9891,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    64          TO  SPA-GMN-CUR
                WHEN    "COMMENT_NYUINRYO"
                    MOVE    44          TO  SPA-GMN-CUR
-               WHEN    "CHKKBN"
+              WHEN    "CHKKBN"
                    MOVE    65          TO  SPA-GMN-CUR
                WHEN    "BYOMEI_PRTJYUN"
                    MOVE    66          TO  SPA-GMN-CUR
