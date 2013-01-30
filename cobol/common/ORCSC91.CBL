@@ -150,6 +150,13 @@
            03  WRK-CHK-NAME            PIC X(100).
            03  WRK-CHK-DD              PIC 9(02).
       *
+      *    同時算定用
+           03  WRK-CHK2-SRYCD           PIC X(09).
+           03  WRK-CHK2-SRYYMD.
+               05  WRK-CHK2-SRYYM           PIC X(06).
+               05  WRK-CHK2-SRYDD           PIC 9(02).
+           03  WRK-CHK2-NAME            PIC X(100).
+      *
            03  WRK-DAYMAXCNT           PIC 9(04).
            03  WRK-DAY-YMD             PIC X(08).
       *    入院期間
@@ -719,7 +726,9 @@
                    MOVE    WRK-CHK-DD          TO  WRK-CHK-SRYDD
                END-IF
       *        上限回数エラー処理＝９の時、回数エラーは警告とする
-               IF       WRK-CNT        =   ZERO
+               IF      (WRK-CNT        =   ZERO)
+      *H25.1
+                OR     (FLG-DOUCHK     =   1   )
                    IF       WRK-JGNCNTERR      =   9
                        MOVE    "K004"              TO  LNK-SC91-ERRCD
                    END-IF
@@ -793,7 +802,9 @@
                MOVE    WRK-SC91-DAYCHKCNT  TO  WRK-CNT-ERR
                MOVE    "日上限："          TO  WRK-CNT-MSG
       *        上限回数エラー処理＝９の時、回数エラーは警告とする
-               IF       WRK-DAYCNT     =   ZERO
+               IF      (WRK-DAYCNT     =   ZERO)
+      *H25.1
+                OR     (FLG-DOUCHK     =   1   )
                    IF       TNS-JGNCNTERR      =   9
       **               MOVE    "K091"              TO  LNK-SC91-ERRCD
                        MOVE    "K902"              TO  LNK-SC91-ERRCD
@@ -1827,6 +1838,10 @@
            MOVE    TNS-TENSU-REC       TO  TNSWK-TENSU-REC
       *
            PERFORM 2000-SANTEI-HZN-SEC
+      *H25.1
+           MOVE    WRK-CHK-SRYCD       TO  WRK-CHK2-SRYCD
+           MOVE    WRK-CHK-SRYYMD      TO  WRK-CHK2-SRYYMD
+           MOVE    WRK-CHK-NAME        TO  WRK-CHK2-NAME
       *
            MOVE    SPACE               TO  WRK-CHK-SRYCD
            MOVE    SPACE               TO  WRK-CHK-NAME
@@ -1913,6 +1928,13 @@
                    END-IF
                END-IF
            END-PERFORM
+      *
+      *H25.1
+      *    最後に算定した日を表示対象とする
+           IF      WRK-CHK2-SRYYMD     >   WRK-CHK-SRYYMD
+               MOVE    WRK-CHK2-SRYYMD     TO  WRK-CHK-SRYYMD
+           END-IF
+      *
            COMPUTE WRK-DOCNT-SUM       =   WRK-DOCNT-SUM
                                        +   WRK-DOCNT-P
       *
@@ -1933,6 +1955,11 @@
                MOVE    WRK-CHK-SRYCD       TO  TNS-SRYCD
                PERFORM 910-TENSU-READ-SEC
                MOVE    TNS-NAME            TO  WRK-CHK-NAME
+           END-IF
+      *H25.1
+      *    人工腎臓は名称編集なしとする
+           IF      WRK-CODE            =   "008"
+               MOVE    SPACE               TO  WRK-CHK-NAME
            END-IF
       *
       *    上限回数チェック・エラー編集
@@ -2129,13 +2156,17 @@
                       (SANTEI-SRYYM        >   ZERO )
                    MOVE    WRK-SRYCD           TO  WRK-CHK-SRYCD
                    MOVE    SANTEI-SRYYM        TO  WRK-CHK-SRYYM
-                   MOVE    SANTEI-MSANTEID     TO  WRK-CHK-SRYDD
-                   MOVE    TNS-NAME            TO  WRK-CHK-NAME
+      *??          MOVE    SANTEI-MSANTEID     TO  WRK-CHK-SRYDD
+      *??          MOVE    TNS-NAME            TO  WRK-CHK-NAME
                    IF      TNS-JGNCNT          >   ZERO
                        PERFORM VARYING     IDX-Y2  FROM    31  BY  -1
                                UNTIL       IDX-Y2  <   1
-                           IF      SANTEI-DAY (IDX-Y2)    >   ZERO
-                               MOVE    IDX-Y2      TO  WRK-CHK-SRYDD
+                           IF     (SANTEI-DAY (IDX-Y2)    >   ZERO )
+      *H25.1                   最後の算定日を対象
+                               IF    (IDX-Y2       >   WRK-CHK-SRYDD)
+                                   MOVE    TNS-NAME    TO  WRK-CHK-NAME
+                                   MOVE    IDX-Y2      TO  WRK-CHK-SRYDD
+                               END-IF
                                MOVE    1           TO  IDX-Y2
                            END-IF
                        END-PERFORM
@@ -2286,62 +2317,6 @@
            MOVE    IDX-Y2              TO  IDX-ED
       *    画面内算定集計
            PERFORM 10031-INPUT-CNT-SEC
-      *
-      *TEST
-           GO    TO          2003-DOJINPUT-CHK-EXT
-      *
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX         >   SPA-MAX-LINE )  OR
-                             ((SPA-GMN-INPUTCD (IDX)   =   SPACE) AND
-                              (SPA-COM-INPUTCD (IDX)   =   SPACE))
-      *@
-             IF      (SPA-COM-HKNCOMBI (IDX)   =   "9999")
-               CONTINUE
-             ELSE
-      *
-      *        入院で１日上限の時、入力日のみ
-               MOVE    ZERO            TO  FLG-NYU-CHK
-               IF     (SPA-NYUGAIKBN       =   "1"   )  AND
-                      (TNS-JGNCNT1D        >   ZERO  )  AND
-                      (SPA-COM-NYU-KAI(IDX)    >   ZERO )
-                   MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
-                   IF      SPA-COM-NYUINDAY(IDX IDX-Y2)    =   ZERO
-                       MOVE    1               TO  FLG-NYU-CHK
-                   END-IF
-               END-IF
-      *
-      *
-            IF     FLG-NYU-CHK          =   ZERO
-               IF      LNK-SC91-KBN        =   "1"  OR  "3"
-                   IF      IDX             =   LNK-SC91-GMN-IDX
-                       CONTINUE
-                   ELSE
-                       IF     (SPA-COM-INPUTCD(IDX)
-                                           =   WRK-SRYCD  )  OR
-                              (SPA-COM-CHK-SRYCD (IDX)
-                                           =   WRK-SRYCD  )
-                           ADD     SPA-COM-KAISU(IDX)
-                                               TO  WRK-DOCNT
-                           MOVE    SPA-COM-CHK-SRYCD (IDX)
-                                               TO  WRK-CHK-SRYCD
-                       END-IF
-                   END-IF
-               ELSE
-                   IF     (SPA-COM-INPUTCD(IDX)
-                                           =   WRK-SRYCD  )  OR
-                          (SPA-COM-CHK-SRYCD (IDX)
-                                           =   WRK-SRYCD  )
-                       ADD     SPA-COM-KAISU(IDX)
-                                               TO  WRK-DOCNT
-                       MOVE    SPA-COM-CHK-SRYCD (IDX)
-                                               TO  WRK-CHK-SRYCD
-                   END-IF
-               END-IF
-             END-IF
-      *
-             END-IF
-      *
-           END-PERFORM
       *
            .
        2003-DOJINPUT-CHK-EXT.
@@ -2533,9 +2508,6 @@
            MOVE    "key8"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-      *TEST
-           DISPLAY "WRK-NYU:"  WRK-NYU ",FLG-SYOKAI-OK :" FLG-SYOKAI-OK 
-      *TEST 
            MOVE    WRK-NYU             TO  LNK-SC91-CNT
            MOVE    WRK-NYU2            TO  LNK-SC91-NYUZCNT
            IF     (WRK-NYU             >=  CNT-NYU   )
