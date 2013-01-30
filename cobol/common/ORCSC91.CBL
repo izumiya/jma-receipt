@@ -146,6 +146,14 @@
            03  WRK-CHK-NAME            PIC X(100).
            03  WRK-CHK-DD              PIC 9(02).
       *
+      *    同時算定用
+           03  WRK-CHK2-SRYCD           PIC X(09).
+           03  WRK-CHK2-SRYYMD.
+               05  WRK-CHK2-SRYYM           PIC X(06).
+               05  WRK-CHK2-SRYDD           PIC 9(02).
+           03  WRK-CHK2-NAME            PIC X(100).
+           03  WRK-CHKCNT              PIC 9(03).
+      *
            03  WRK-DAYMAXCNT           PIC 9(04).
       *    入院期間
            03  CNT-NYU                 PIC 9(02).
@@ -692,7 +700,9 @@
                    MOVE    WRK-CHK-DD          TO  WRK-CHK-SRYDD
                END-IF
       *        上限回数エラー処理＝９の時、回数エラーは警告とする
-               IF       WRK-CNT        =   ZERO
+               IF      (WRK-CNT        =   ZERO )
+      *H25.1
+                OR     (FLG-DOUCHK     =   1   )
                    IF       WRK-JGNCNTERR      =   9
                        MOVE    "K004"              TO  LNK-SC91-ERRCD
                    END-IF
@@ -765,7 +775,9 @@
                MOVE    WRK-SC91-DAYCHKCNT  TO  WRK-CNT-ERR
                MOVE    "日上限："          TO  WRK-CNT-MSG
       *        上限回数エラー処理＝９の時、回数エラーは警告とする
-               IF       WRK-DAYCNT     =   ZERO
+               IF      (WRK-DAYCNT     =   ZERO )
+      *H25.1
+                OR     (FLG-DOUCHK     =   1   )
                    IF       TNS-JGNCNTERR      =   9
       **               MOVE    "K091"              TO  LNK-SC91-ERRCD
                        MOVE    "K902"              TO  LNK-SC91-ERRCD
@@ -1081,15 +1093,39 @@
       *    月上限最終算定日
            IF     (LNK-SC91-CNT        >   ZERO )
             AND   (LNK-SC91-MAXCNT     >   ZERO )
+      *H25.1   IF      LNK-SC91-SYORIFLG   =   1
+      *            MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
+      *        ELSE
+      *            MOVE    32                  TO  IDX-Y2
+      *        END-IF
+      *        PERFORM VARYING     IDD     FROM    1  BY  1
+      *                UNTIL       IDD     >=  IDX-Y2
+      *            IF      SANTEI-DAY (IDD)    >   ZERO
+      *                MOVE    IDD                 TO  WRK-CHK-SRYDD
+      *            END-IF
+      ****     END-PERFORM
                IF      LNK-SC91-SYORIFLG   =   1
                    MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
                ELSE
-                   MOVE    32                  TO  IDX-Y2
+                   MOVE    ZERO                TO  IDX-Y2
                END-IF
-               PERFORM VARYING     IDD     FROM    1  BY  1
-                       UNTIL       IDD     >=  IDX-Y2
-                   IF      SANTEI-DAY (IDD)    >   ZERO
+               MOVE    ZERO                TO  WRK-CHKCNT
+               PERFORM VARYING     IDD     FROM    31  BY -1
+                       UNTIL      (IDD     <   1   )
+                   IF     (IDD             =   IDX-Y2 )
+                      AND (WRK-TEI-CNT     >   ZERO   )
+                       IF      SANTEI-DAY (IDD) >=  WRK-TEI-CNT
+                           COMPUTE WRK-CHKCNT  =   (SANTEI-DAY (IDD)
+                                               -   WRK-TEI-CNT )
+                       ELSE
+                           MOVE    ZERO            TO  WRK-CHKCNT
+                       END-IF
+                   ELSE
+                       MOVE    SANTEI-DAY (IDD)    TO  WRK-CHKCNT
+                   END-IF
+                   IF      WRK-CHKCNT      >   ZERO
                        MOVE    IDD                 TO  WRK-CHK-SRYDD
+                       MOVE    1                   TO  IDD
                    END-IF
                END-PERFORM
            END-IF
@@ -1778,6 +1814,11 @@
            MOVE    TNS-TENSU-REC       TO  TNSWK-TENSU-REC
       *
            PERFORM 2000-SANTEI-HZN-SEC
+      *H25.1
+      *    入力分
+           MOVE    WRK-CHK-SRYCD       TO  WRK-CHK2-SRYCD
+           MOVE    WRK-CHK-SRYYMD      TO  WRK-CHK2-SRYYMD
+           MOVE    WRK-CHK-NAME        TO  WRK-CHK2-NAME
       *
            MOVE    SPACE               TO  WRK-CHK-SRYCD
            MOVE    SPACE               TO  WRK-CHK-NAME
@@ -1864,6 +1905,12 @@
                    END-IF
                END-IF
            END-PERFORM
+      *H25.1
+      *    最後に算定した日を表示対象とする
+           IF      WRK-CHK2-SRYYMD     >   WRK-CHK-SRYYMD
+               MOVE    WRK-CHK2-SRYYMD     TO  WRK-CHK-SRYYMD
+           END-IF
+      *
            COMPUTE WRK-DOCNT-SUM       =   WRK-DOCNT-SUM
                                        +   WRK-DOCNT-P
       *
@@ -1884,6 +1931,11 @@
                MOVE    WRK-CHK-SRYCD       TO  TNS-SRYCD
                PERFORM 910-TENSU-READ-SEC
                MOVE    TNS-NAME            TO  WRK-CHK-NAME
+           END-IF
+      *H25.1
+      *    人工腎臓は名称編集なしとする
+           IF      WRK-CODE            =   "008"
+               MOVE    SPACE               TO  WRK-CHK-NAME
            END-IF
       *
       *    上限回数チェック・エラー編集
@@ -2079,13 +2131,17 @@
                       (SANTEI-SRYYM        >   ZERO )
                    MOVE    WRK-SRYCD           TO  WRK-CHK-SRYCD
                    MOVE    SANTEI-SRYYM        TO  WRK-CHK-SRYYM
-                   MOVE    SANTEI-MSANTEID     TO  WRK-CHK-SRYDD
-                   MOVE    TNS-NAME            TO  WRK-CHK-NAME
+      *???         MOVE    SANTEI-MSANTEID     TO  WRK-CHK-SRYDD
+      *???         MOVE    TNS-NAME            TO  WRK-CHK-NAME
                    IF      TNS-JGNCNT          >   ZERO
                        PERFORM VARYING     IDX-Y2  FROM    31  BY  -1
                                UNTIL       IDX-Y2  <   1
-                           IF      SANTEI-DAY (IDX-Y2)    >   ZERO
-                               MOVE    IDX-Y2      TO  WRK-CHK-SRYDD
+                           IF     (SANTEI-DAY (IDX-Y2)    >   ZERO  )
+                               IF     (IDX-Y2       >   WRK-CHK-SRYDD)
+      *H25.1                   最後の算定日を対象
+                                   MOVE    TNS-NAME    TO  WRK-CHK-NAME
+                                   MOVE    IDX-Y2      TO  WRK-CHK-SRYDD
+                               END-IF
                                MOVE    1           TO  IDX-Y2
                            END-IF
                        END-PERFORM
