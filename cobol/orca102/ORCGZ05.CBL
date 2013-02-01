@@ -38,6 +38,7 @@
       *  03.05.00    NACL-多々納  07/05/07  グループ診療対応
       *  04.05.00    NACL-多々納  10/04/XX  帳票名称追加対応
       *  04.06.00    NACL-多々納  12/08/16  期間変更警告追加
+      *  04.07.00    NACL-多々納  13/02/01  特定器材２を上限価格へ
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -730,11 +731,17 @@
                END-IF
            END-PERFORM
       *
-      *    特定器材２
-           MOVE    "0 通常"            TO  SPA-GMN-TOKUKIZAISBT2COB (1)
-           MOVE    SPA-GMN-TOKUKIZAISBT2COB (1)
+      *    特定器材２（上限価格（酸素））
+           MOVE    "0 下記以外"        TO  SPA-GMN-TOKUKIZAISBT2COB (1)
+           MOVE    "1 上限価格設定"    TO  SPA-GMN-TOKUKIZAISBT2COB (2)
+           IF      SPA-GMN-TOKUKIZAISBT2   =   "1"
+               MOVE    SPA-GMN-TOKUKIZAISBT2COB (2)
                                        TO  SPA-GMN-TOKUKIZAISBT2-G
-           MOVE    1                   TO  SPA-TOKUKIZAISBT2-MAX
+           ELSE
+               MOVE    SPA-GMN-TOKUKIZAISBT2COB (1)
+                                       TO  SPA-GMN-TOKUKIZAISBT2-G
+           END-IF
+           MOVE    2                   TO  SPA-TOKUKIZAISBT2-MAX
            .
       *
        30012-COB-HEN-EXT.
@@ -2534,7 +2541,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "特定器材種別１がありません"
                                                  TO  SPA-ERRMSG
                WHEN    "0016"
-                   MOVE    "特定器材種別２がありません"
+      ***********  MOVE    "特定器材種別２がありません"
+                   MOVE    "上限価格（酸素）がありません"
                                                  TO  SPA-ERRMSG
                WHEN    "0017"
                    MOVE    "経過措置年月日が違います"
