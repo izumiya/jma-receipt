@@ -157,6 +157,7 @@
       *                                     公費負担医療の連絡先情報追加
       *  04.05.09    NACL-門脇    11/06/20  公費分離区分区切り編集修正
       *  04.05.10    NACL-門脇    11/11/30  画像診断フイルム分画数対応
+      *  04.05.11    NACL-門脇    13/01/22  ワーク領域拡張
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -553,7 +554,7 @@
                05  WRK-RECE64-KOHBUNRI            PIC 9(01).
                05  WRK-RECE64-GAIJINKEN           PIC 9(02).
                05  WRK-RECE64-SRYSYUKBN           PIC X(03).
-               05  WRK-RECE64-REC                 PIC X(700).
+               05  WRK-RECE64-REC                 PIC X(1000).
                05  WRK-RECE64-SRYCD-G.
                    07  WRK-RECE64-KENTAICOMMENT-SRYCD
                                                   PIC 9(09).
@@ -622,7 +623,7 @@
        01  WRK-RECE64GJK-MAX               PIC 9(02).
        01  WRK-RECE64GJK-TABLE.
            03  WRK-RECE64GJK-TBL           OCCURS 31.
-               05  WRK-RECE64GJK-REC       PIC X(700).
+               05  WRK-RECE64GJK-REC       PIC X(1000).
        01  RECE64GJK-REC.
            COPY    "CPRCF064.INC"  REPLACING  //RECE64//
                                    BY         //RECE64GJK//.

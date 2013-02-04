@@ -22388,7 +22388,7 @@
                            WK-ZENGAKU   *  WK-FUTANWARI
                END-IF
       *
-               IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "027"
+               IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0"
       *             ¸º³Û
                     EVALUATE  WK-GENGAKUKBN
                       WHEN        1
@@ -23078,7 +23078,7 @@
                            WK-ZENGAKU   *  WK-FUTANWARI
                END-IF
       *
-               IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)  =  "027"
+               IF   LNK-SYU-KOH-HKNNUM(KOH-IDX)(1:1)  =  "0"
       *             ¸º³Û
                     EVALUATE  WK-GENGAKUKBN
                       WHEN        1
