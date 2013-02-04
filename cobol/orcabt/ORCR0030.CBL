@@ -587,6 +587,7 @@
       *  04.05.72    NACL-ÌçÏÆ    12/10/22  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅÀ¿ô½¸·×½¤Àµ
       *  04.05.73    NACL-ÌçÏÆ    12/11/08  ¸øÈñÍó¡Ý°ìÉôÉéÃ´¶âÍó¶â³ÛÃÖ´¹ÂÐ±þ
       *  04.05.74    NACL-ÌçÏÆ    12/12/10  £·£µºÐÅþÃ£·î¤ÎÆÃÎãÈó³ºÅöÂÐ±þ
+      *  04.05.75    NACL-ÌçÏÆ    13/01/25  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -17355,7 +17356,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND (((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
                    (RECE02-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
-             AND (RECE02-KOHNUM(2)       = SPACE             )
+             AND ((RECE02-KOHNUM(2)       = SPACE           )  OR
+                  (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"  ))
              AND (RECE02-KOHNUM(3)       = SPACE             )
              AND (RECE02-KOHNUM(4)       = SPACE             )
              AND (RECE02-HKNCOMBI(2) NOT = ZERO              )
@@ -17389,7 +17391,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
              AND (((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
                    (RECE02-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
-             AND (RECE02-KOHNUM(2)       = SPACE             )
+             AND ((RECE02-KOHNUM(2)       = SPACE           )  OR
+                  (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"  ))
              AND (RECE02-KOHNUM(3)       = SPACE             )
              AND (RECE02-KOHNUM(4)       = SPACE             )
              AND (RECE02-HKNCOMBI(2) NOT = ZERO              )

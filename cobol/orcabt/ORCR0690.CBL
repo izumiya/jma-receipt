@@ -157,6 +157,7 @@
       *                                     ¸øÈñÉéÃ´°åÎÅ¤ÎÏ¢ÍíÀè¾ðÊóÄÉ²Ã
       *  04.05.09    NACL-ÌçÏÆ    11/06/20  ¸øÈñÊ¬Î¥¶èÊ¬¶èÀÚ¤êÊÔ½¸½¤Àµ
       *  04.05.10    NACL-ÌçÏÆ    11/11/30  ²èÁü¿ÇÃÇ¥Õ¥¤¥ë¥àÊ¬²è¿ôÂÐ±þ
+      *  04.05.11    NACL-ÌçÏÆ    13/01/22  ¥ï¡¼¥¯ÎÎ°è³ÈÄ¥
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -554,7 +555,7 @@
                05  WRK-RECE64-KOHBUNRI            PIC 9(01).
                05  WRK-RECE64-GAIJINKEN           PIC 9(02).
                05  WRK-RECE64-SRYSYUKBN           PIC X(03).
-               05  WRK-RECE64-REC                 PIC X(700).
+               05  WRK-RECE64-REC                 PIC X(1000).
                05  WRK-RECE64-SRYCD-G.
                    07  WRK-RECE64-KENTAICOMMENT-SRYCD
                                                   PIC 9(09).
@@ -623,7 +624,7 @@
        01  WRK-RECE64GJK-MAX               PIC 9(02).
        01  WRK-RECE64GJK-TABLE.
            03  WRK-RECE64GJK-TBL           OCCURS 31.
-               05  WRK-RECE64GJK-REC       PIC X(700).
+               05  WRK-RECE64GJK-REC       PIC X(1000).
        01  RECE64GJK-REC.
            COPY    "CPRCF064.INC"  REPLACING  //RECE64//
                                    BY         //RECE64GJK//.
@@ -2919,6 +2920,7 @@
                      UNTIL   IDW >       WRK-KENSA-SU (IDXX)
                MOVE  WRK-RECE64-IDX (IDXX IDW) TO  IDX1
                MOVE  WRK-RECE64-REC (IDX1)     TO  RECE64-REC
+               MOVE  WRK-RECE64-DAY-AREA(IDX1) TO  RECE64-DAY-AREA
                ADD   RECE64-ZAITEN             TO  WRK-RECE64-ZAITEN
                PERFORM 2002-TBLZAIW-TAIHI-SEC
              END-PERFORM

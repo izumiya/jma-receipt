@@ -53,6 +53,7 @@
       *  04.05.03    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
       *  04.05.04    NACL-ÌçÏÆ    10/01/27  ¼£¸³ÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    11/11/30  ²èÁü¿ÇÃÇ¥Õ¥¤¥ë¥àÊ¬²è¿ôÂÐ±þ
+      *  04.05.06    NACL-ÌçÏÆ    13/01/22  ¥ï¡¼¥¯ÎÎ°è³ÈÄ¥
       *  04.06.01    NACL-ÌçÏÆ    12/10/15  ¿ÇÎÅ¹Ô°ÙÆþÎÏ¤·¤¿¥³¥á¥ó¥È¤Î¤ß¤ÎºÞ¤Î
       *                                     ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *  04.07.01    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
@@ -364,7 +365,7 @@
                05  WRK-RECE220-HOUKNSKBN   PIC 9(02).
                05  WRK-RECE220-GAIJINKEN   PIC 9(02).
                05  WRK-RECE220-SRYSYUKBN   PIC X(03).
-               05  WRK-RECE220-REC         PIC X(700).
+               05  WRK-RECE220-REC         PIC X(1000).
                05  WRK-RECE220-SRYCD-G.
                    07  WRK-RECE220-KENTAICOMMENT-SRYCD
                                            PIC 9(09).
@@ -437,7 +438,7 @@
        01  WRK-RECE220GJK-MAX               PIC 9(02).
        01  WRK-RECE220GJK-TABLE.
            03  WRK-RECE220GJK-TBL           OCCURS 31.
-               05  WRK-RECE220GJK-REC       PIC X(700).
+               05  WRK-RECE220GJK-REC       PIC X(1000).
        01  RECE220GJK-REC.
            COPY    "CPRCF220.INC"  REPLACING  //RECE220//
                                    BY         //RECE220GJK//.
@@ -2232,6 +2233,7 @@
                      UNTIL   IDW >       WRK-KENSA-SU (IDXX)
                MOVE  WRK-RECE220-IDX (IDXX IDW) TO  IDX1
                MOVE  WRK-RECE220-REC (IDX1)     TO  RECE220-REC
+               MOVE  WRK-RECE220-DAY-AREA(IDX1) TO  RECE220-DAY-AREA
                ADD   RECE220-ZAITEN             TO  WRK-RECE220-ZAITEN
                PERFORM 2002-TBLZAIW-TAIHI-SEC
              END-PERFORM

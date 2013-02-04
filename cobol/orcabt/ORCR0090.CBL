@@ -230,6 +230,7 @@
       *                                     「再診」の対応
       *                                     「その他」の対応
       *                                     現物給付化対応
+      *  04.05.14    NACL-門脇    13/01/22  ワーク領域拡張
       *
       *  04.06.01    NACL-藤原    10/06/23  レセ電請求時の受付エラー分の
       *                                     種別不明レセ対応
@@ -633,7 +634,7 @@
                05  WRK-RECE04-KOHBUNRI            PIC 9(01).
                05  WRK-RECE04-GAIJINKEN           PIC 9(02).
                05  WRK-RECE04-SRYSYUKBN           PIC X(03).
-               05  WRK-RECE04-REC                 PIC X(700).
+               05  WRK-RECE04-REC                 PIC X(1000).
                05  WRK-RECE04-SRYCD-G.
                    07  WRK-RECE04-KENTAICOMMENT-SRYCD
                                                   PIC 9(09).
@@ -702,7 +703,7 @@
        01  WRK-RECE04GJK-MAX               PIC 9(02).
        01  WRK-RECE04GJK-TABLE.
            03  WRK-RECE04GJK-TBL           OCCURS 31.
-               05  WRK-RECE04GJK-REC       PIC X(700).
+               05  WRK-RECE04GJK-REC       PIC X(1000).
        01  RECE04GJK-REC.
            COPY    "CPRCF004.INC"  REPLACING  //RECE04//
                                    BY         //RECE04GJK//.
@@ -3509,6 +3510,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                      UNTIL   IDW >       WRK-KENSA-SU (IDXX)
                MOVE  WRK-RECE04-IDX (IDXX IDW) TO  IDX1
                MOVE  WRK-RECE04-REC (IDX1)     TO  RECE04-REC
+               MOVE  WRK-RECE04-DAY-AREA(IDX1) TO  RECE04-DAY-AREA
                ADD   RECE04-ZAITEN             TO  WRK-RECE04-ZAITEN
                PERFORM 2002-TBLZAIW-TAIHI-SEC
              END-PERFORM    

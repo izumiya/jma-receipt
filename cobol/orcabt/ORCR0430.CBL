@@ -117,6 +117,7 @@
       *  04.05.09    NACL-門脇    12/11/05  リハビリ開始日と同一剤のコメント
       *                                     ００８５・００８６で始まるコメント
       *                                     を記載対象外とする。
+      *  04.05.10    NACL-門脇    13/01/22  ワーク領域拡張
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -706,7 +707,7 @@
            03  TBL-YT1-OCC                      OCCURS 100.
              05  TBL-YT1-KEY.
                07  TBL-YT1-SRYKA                PIC X(02).
-             05  TBL-YT1-RECE44-REC             PIC X(300).
+             05  TBL-YT1-RECE44-REC             PIC X(1000).
              05  TBL-YT1-HIKAKU.
                07  TBL-YT1-ZAITEN               PIC 9(08).
                07  TBL-YT1-SRYCDTOTAL           PIC 9(14).
@@ -721,7 +722,7 @@
              05  TBL-YT1-FLG                    PIC 9(01).
       *
       *    並び替え用
-       01  WRK-YAKUTEI-DATA                     PIC X(656).
+       01  WRK-YAKUTEI-DATA                     PIC X(1356).
       *
        01  WRK-TAIHI-YT1-KEY                    PIC X(02).
        01  WRK-YAKUTEI-ZAINUM                   PIC 9(08).
@@ -732,13 +733,13 @@
            03  TBL-YT2-DAY                    OCCURS      31.
              05  TBL-YT2X-KAIT                  OCCURS     3.
                06  TBL-YT2X1-OCC                  OCCURS  25.
-                 07  TBL-YT2X1-RECE44-REC         PIC X(300).
+                 07  TBL-YT2X1-RECE44-REC         PIC X(1000).
                  07  TBL-YT2X1-KAISU              PIC 9(03).
                  07  TBL-YT2X1-DAY-AREA.
                    09  TBL-YT2X1-OCC2               OCCURS  31.
                        11  TBL-YT2X1-DAY            PIC 9(03).
                06  TBL-YT2X2-OCC                  OCCURS   3.
-                 07  TBL-YT2X2-RECE44-REC         PIC X(300).
+                 07  TBL-YT2X2-RECE44-REC         PIC X(1000).
                  07  TBL-YT2X2-KAISU              PIC 9(03).
                  07  TBL-YT2X2-DAY-AREA.
                    09  TBL-YT2X2-OCC2               OCCURS  31.
@@ -766,13 +767,13 @@
            03  TBL-YT3-XXX                    OCCURS     100.
              05  TBL-YT3X-KAIT.
                06  TBL-YT3X1-OCC                  OCCURS  25.
-                 07  TBL-YT3X1-RECE44-REC         PIC X(300).
+                 07  TBL-YT3X1-RECE44-REC         PIC X(1000).
                  07  TBL-YT3X1-KAISU              PIC 9(03).
                  07  TBL-YT3X1-DAY-AREA.
                    09  TBL-YT3X1-OCC2               OCCURS  31.
                        11  TBL-YT3X1-DAY            PIC 9(03).
                06  TBL-YT3X2-OCC                  OCCURS   3.
-                 07  TBL-YT3X2-RECE44-REC         PIC X(300).
+                 07  TBL-YT3X2-RECE44-REC         PIC X(1000).
                  07  TBL-YT3X2-KAISU              PIC 9(03).
                  07  TBL-YT3X2-DAY-AREA.
                    09  TBL-YT3X2-OCC2               OCCURS  31.
