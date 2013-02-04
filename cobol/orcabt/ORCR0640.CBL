@@ -583,6 +583,7 @@
       *  04.05.83    NACL-ÌçÏÆ    12/10/22  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅÀ¿ô½¸·×½¤Àµ
       *  04.05.84    NACL-ÌçÏÆ    12/11/08  ¸øÈñÍó¡Ý°ìÉôÉéÃ´¶âÍó¶â³ÛÃÖ´¹ÂÐ±þ
       *  04.05.85    NACL-ÌçÏÆ    12/12/10  £·£µºÐÅþÃ£·î¤ÎÆÃÎãÈó³ºÅöÂÐ±þ
+      *  04.05.86    NACL-ÌçÏÆ    13/01/25  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -19714,7 +19715,8 @@
              AND (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
                    (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
-             AND (RECE62-KOHNUM(2)       = SPACE             )
+             AND ((RECE62-KOHNUM(2)       = SPACE           )  OR
+                  (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"  ))
              AND (RECE62-KOHNUM(3)       = SPACE             )
              AND (RECE62-KOHNUM(4)       = SPACE             )
              AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
@@ -19751,7 +19753,8 @@
              AND (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
                    (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
-             AND (RECE62-KOHNUM(2)       = SPACE             )
+             AND ((RECE62-KOHNUM(2)       = SPACE           )  OR
+                  (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"  ))
              AND (RECE62-KOHNUM(3)       = SPACE             )
              AND (RECE62-KOHNUM(4)       = SPACE             )
              AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
