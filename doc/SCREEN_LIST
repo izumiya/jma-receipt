@@ -36,13 +36,12 @@ XD01.glade	orca04	(XD01)ユーザプログラム起動
 XDERR.glade	orca04	(XDERR)エラー情報
 XDID1.glade	orca04	(XDID1)確認画面
 
-XE01.glade	orca05	(XE01)QRコードテスト画面
-
 XF01.glade	orca06	(XF01)メモ登録
 XF011.glade	orca06	(XF011)メモ登録−文例検索
 XFERR.glade	orca06	(XFERR)エラー情報
 XFID1.glade	orca06	(XFID1)確認画面
 XF01X.glade	orca06	(XF01X)メモＣＬＡＩＭ送信選択サブ
+XFID2.glade	orca06	(XFID2)確認画面
 
 XG01.glade	orca07	(XG01)ＣＳＶ出力選択画面
 XG02.glade	orca07	(XG02)ＣＳＶ出力指示画面
@@ -164,11 +163,11 @@ S02.glade	orca23	(S02)収納登録−請求一覧
 S03.glade	orca23	(S03)収納登録−請求確認
 S03N.glade	orca23	(S03N)収納登録−請求確認
 S04.glade	orca23	(S04)支払証明書印刷
-S05.glade	orca23	(S05)収納登録−収納検索画面
 S06.glade	orca23	(S06)収納登録−一括入金画面
 S07.glade	orca23	(S07)印刷指示画面
 S08.glade	orca23	(S08)出産育児一時金画面
 S09.glade	orca23	(S09)保険情報変更画面
+S10.glade	orca23	(S10)患者一覧
 S99.glade	orca23	(S99)処理結果
 SERR.glade	orca23	(SERR)エラー情報
 SID1.glade	orca23	(SID1)確認画面
@@ -209,8 +208,6 @@ I03.glade	orca31	(I03)入院歴作成
 I04.glade	orca31	(I04)入退院登録−請求確認
 I05.glade	orca31	(I05)退院事由設定
 I06.glade	orca31	(I06)入院オーダー確認
-I07.glade	orca31	(I07)出産育児一時金画面
-I08.glade	orca31	(I08)保険情報変更画面
 I0ERR.glade	orca31	(I0ERR)エラー情報
 I0ID1.glade	orca31	(I0ID1)確認画面
 I0ID2.glade	orca31	(I0ID2)確認画面
@@ -272,8 +269,10 @@ RERR.glade	orca42	(RERR)エラー情報
 RID1.glade	orca42	(RID1)確認画面
 RID2.glade	orca42	(RID2)確認画面
 RID3.glade	orca42	(RID3)確認画面
+RID4.glade	orca42	(RID4)確認画面
 
 H01.glade	orca43	(H01)レセプト請求管理登録−手書き訂正入力
+H02.glade	orca43	(H02)返戻情報設定
 H99.glade	orca43	(H99)レセプト請求管理登録−レセプト検索
 HERR.glade	orca43	(HERR)エラー情報
 HID1.glade	orca43	(HID1)確認画面
@@ -283,18 +282,25 @@ T02.glade	orca44	(T02)公費請求書−個別指定
 T03.glade	orca44	(T03)総括・公費請求書−プリンタ設定
 T04.glade	orca44	(T04)地方公費ＣＳＶデータ一覧
 T05.glade	orca44	(T05)オンライン請求結果データ取込
+T06.glade	orca44	(T06)レセ電作成−個別指示
+T07.glade	orca44	(T07)レセ電個別履歴
+T08.glade	orca44	(T08)個別レセ電作成履歴
+T09.glade	orca44	(T09)レセ電対象患者一覧
 T91.glade	orca44	(T91)定点調査データ確認
 T99.glade	orca44	(T99)処理結果
 TERR.glade	orca44	(TERR)エラー情報
 TID1.glade	orca44	(TID1)確認画面
 TID2.glade	orca44	(TID2)確認画面
+TID3.glade	orca44	(TID3)確認画面
 TFIL.glade	orca44	(TFIL)クライアント保存画面
 
 L01.glade	orca51	(L01)日次統計
 L02.glade	orca51	(L02)日次統計データ作成
 L03.glade	orca51	(L03)日次統計−パラメータ説明
 L04.glade	orca51	(L04)日次統計−締め時刻登録
+L07.glade	orca51	(L07)統計帳票一覧
 L99.glade	orca51	(L99)処理結果
+L100.glade	orca51	(L100)並び順変更画面
 LERR.glade	orca51	(LERR)エラー情報
 LID1.glade	orca51	(LID1)確認画面
 LID2.glade	orca51	(LID2)確認画面
@@ -303,7 +309,9 @@ LFIL.glade	orca51	(LFIL)クライアント保存画面
 G01.glade	orca51	(G01)月次統計
 G02.glade	orca51	(G02)月次統計データ作成
 G03.glade	orca51	(G03)月次統計−パラメータ説明
+G07.glade	orca51	(G07)統計帳票一覧
 G99.glade	orca51	(G99)処理結果
+G100.glade	orca51	(G100)並び順変更画面
 GERR.glade	orca51	(GERR)エラー情報
 GID1.glade	orca51	(GID1)確認画面
 GID2.glade	orca51	(GID2)確認画面
@@ -354,6 +362,7 @@ W17.glade	orca101	(W17)システム管理情報−データチェック機能情報
 W18.glade	orca101	(W18)システム管理情報−医療機関編集情報
 W19.glade	orca101	(W19)統計帳票一覧
 W20.glade	orca101	(W20)システム管理情報−病棟管理情報設定
+W201.glade	orca101	(W201)システム管理情報−入院料加算設定
 W21.glade	orca101	(W21)システム管理情報−病室管理情報設定
 W22.glade	orca101	(W22)システム管理情報−室料差額設定
 W23.glade	orca101	(W23)定期請求登録指示
