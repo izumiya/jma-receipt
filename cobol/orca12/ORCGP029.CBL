@@ -592,6 +592,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-ERRCD           =   SPACE
                PERFORM 3001-PTKOHFTNETC-SYORI-SEC
            END-IF
+      *    特記事項テーブル更新
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 300-PTTOKKI-SYORI-SEC
+           END-IF
       *    レセプト作成管理マスタ更新
            IF      SPA-ERRCD           =   SPACE
                PERFORM 2009-RECEUPD-UPDATE-SEC
