@@ -148,6 +148,7 @@
       *                                     のチェックを追加
       *  04.05.11    NACL-藤原    12/03/27  算定日情報に係る記録条件仕様
       *                                     の変更に伴う月後れ分のチェック
+      *  04.05.12    NACL-藤原    13/01/30  印刷方法変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1871,14 +1872,9 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                MOVE    0                   TO  WRK-STPAGE
                MOVE    99999               TO  WRK-EDPAGE
       *             
+      *             
                MOVE    SPACE               TO  SHELLTBL
-               MOVE    "scripts/allways/print.sh"
-                                           TO  WRK-SHELL-NAME
-      *        ファイルデイレクトリ位置指定
-               INITIALIZE                  ORCSMKPASSAREA
-               MOVE    WRK-SHELL-NAME      TO  MKPASS-IN-01
-               CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
-               MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME
+               MOVE    "print_prv.sh"      TO  SHELLTBL-NAME
       *                               
                MOVE    SPACE               TO  LNK-PRTKANRI-AREA
                INITIALIZE                      LNK-PRTKANRI-AREA
@@ -1890,7 +1886,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                MOVE    ZERO                TO  LNK-PRTKANRI-SHORI-RENNUM
                MOVE    SPA-NAI-SKYYM       TO  LNK-PRTKANRI-SRYYM 
                MOVE    SPA-NAI-SKYYMD      TO  LNK-PRTKANRI-SKYYMD
-               MOVE    "print.sh"          TO  LNK-PRTKANRI-SHELLID
+               MOVE    "print_prv.sh"      TO  LNK-PRTKANRI-SHELLID
                MOVE    ZERO                TO  LNK-PRTKANRI-PRIORITY
       *****    MOVE    SPA-TERMID          TO  LNK-PRTKANRI-TERMID
                MOVE    WRK-CONS-TERMID     TO  LNK-PRTKANRI-TERMID
@@ -1918,12 +1914,20 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                            TO  SHELLTBL-ARG14
                MOVE    WRK-STPAGE          TO  SHELLTBL-ARG15
                MOVE    WRK-EDPAGE          TO  SHELLTBL-ARG16
-grpsys         MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG17
+               EVALUATE    SPA-TID1-FLG
+               WHEN    "PV"
+                   MOVE    "3"             TO  SHELLTBL-ARG17
+      **       WHEN    "NO"
+      **           MOVE    "3"             TO  SHELLTBL-ARG17
+               WHEN    "OK"
+                   MOVE    "2"             TO  SHELLTBL-ARG17
+               END-EVALUATE
+grpsys         MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                MOVE    SHELLTBL            TO  MCPDATA-REC
                MOVE    "SHELL"             TO  MCP-FUNC
                MOVE    "shell"             TO  MCP-TABLE
-               MOVE    "shell"             TO  MCP-PATHNAME
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+               MOVE    "allways"           TO  MCP-PATHNAME
+grpsys         PERFORM 900-ORCDBMAIN-SEC
            END-IF       
       *
       *    ＪＯＢＩＤ更新処理
@@ -3184,13 +3188,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                MOVE    99999               TO  WRK-EDPAGE
       *             
                MOVE    SPACE               TO  SHELLTBL
-               MOVE    "scripts/allways/print.sh"
-                                           TO  WRK-SHELL-NAME
-      *        ファイルデイレクトリ位置指定
-               INITIALIZE                  ORCSMKPASSAREA
-               MOVE    WRK-SHELL-NAME      TO  MKPASS-IN-01
-               CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
-               MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME
+               MOVE    "print_prv.sh"      TO  SHELLTBL-NAME
       *                               
                MOVE    SPACE               TO  LNK-PRTKANRI-AREA
                INITIALIZE                      LNK-PRTKANRI-AREA
@@ -3202,7 +3200,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                MOVE    ZERO                TO  LNK-PRTKANRI-SHORI-RENNUM
                MOVE    SPA-NAI-SKYYM       TO  LNK-PRTKANRI-SRYYM 
                MOVE    SPA-NAI-SKYYMD      TO  LNK-PRTKANRI-SKYYMD
-               MOVE    "print.sh"          TO  LNK-PRTKANRI-SHELLID
+               MOVE    "print_prv.sh"          TO  LNK-PRTKANRI-SHELLID
                MOVE    ZERO                TO  LNK-PRTKANRI-PRIORITY
       *****    MOVE    SPA-TERMID          TO  LNK-PRTKANRI-TERMID
                MOVE    WRK-CONS-TERMID     TO  LNK-PRTKANRI-TERMID
@@ -3230,12 +3228,20 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                            TO  SHELLTBL-ARG14
                MOVE    WRK-STPAGE          TO  SHELLTBL-ARG15
                MOVE    WRK-EDPAGE          TO  SHELLTBL-ARG16
-grpsys         MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG17
+               EVALUATE    SPA-TID1-FLG
+               WHEN    "PV"
+                   MOVE    "3"             TO  SHELLTBL-ARG17
+      **       WHEN    "NO"
+      **           MOVE    "3"             TO  SHELLTBL-ARG17
+               WHEN    "OK"
+                   MOVE    "2"             TO  SHELLTBL-ARG17
+               END-EVALUATE
+               MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                MOVE    SHELLTBL            TO  MCPDATA-REC
                MOVE    "SHELL"             TO  MCP-FUNC
                MOVE    "shell"             TO  MCP-TABLE
-               MOVE    "shell"             TO  MCP-PATHNAME
-grpsys         PERFORM 900-ORCDBMAIN-SEC
+               MOVE    "allways"           TO  MCP-PATHNAME
+               PERFORM 900-ORCDBMAIN-SEC
            END-IF       
       *
       *    ＪＯＢＩＤ更新処理
