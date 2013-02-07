@@ -30,6 +30,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.05.01    NACL-門脇    13/02/07  金額項目７桁対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -141,7 +142,8 @@
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *
-           COPY    "HCN66.INC".
+           COPY    "HCN66V01.INC"  REPLACING  //HCN66V01//
+                                   BY         //HCN66//.
       *
       *    続紙
            COPY    "HCM24V06.INC"  REPLACING  //HCM24V06//
@@ -460,6 +462,7 @@
            03  WRK-KGK2            PIC ZZ.
            03  WRK-ZZZ             PIC ZZZ.
            03  WRK-RECEKAISU       PIC ZZZ.
+           03  WRK-KINGAKUZ9       PIC Z,ZZZ,ZZZ.
       *
        01  WRK-CONS-AREA.    
       *    改行コード
@@ -1945,14 +1948,14 @@
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   5
       *        <金額>
-               MOVE    RECE82-KINGAKU2(IDX)      TO  WRK-KINGAKUZ
-               MOVE    WRK-KINGAKUZ              TO  HCN66-KINGAKU (IDX)
+               MOVE    RECE82-KINGAKU2(IDX)      TO  WRK-KINGAKUZ9
+               MOVE    WRK-KINGAKUZ9             TO  HCN66-KINGAKU (IDX)
            END-PERFORM
       *
       *    <小計ロ>
            IF      RECE82-KINGAKU2-SYO        >   ZERO
-               MOVE    RECE82-KINGAKU2-SYO    TO  WRK-TOTALTEN2
-               MOVE    WRK-TOTALTEN2          TO  HCN66-SYOKEI
+               MOVE    RECE82-KINGAKU2-SYO    TO  WRK-KINGAKUZ9
+               MOVE    WRK-KINGAKUZ9          TO  HCN66-SYOKEI
            END-IF
       *
       *    ９７食事
@@ -2735,7 +2738,7 @@
       * 
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
-               MOVE    "HCN66.red"         TO
+               MOVE    "HCN66V01.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HCN66               TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -2870,7 +2873,7 @@
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCN66.red"                  
+                       WHEN    "HCN66V01.red"
                            MOVE    RECE08-PRTDATA  TO HCN66
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCN66-PAGE

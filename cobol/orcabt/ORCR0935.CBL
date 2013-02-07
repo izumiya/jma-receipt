@@ -41,6 +41,7 @@
       *
       *  04.05.01    NACL-ÌçÏÆ    09/06/18  ±ßÅ¦Í×Íó¥³¥á¥ó¥ÈÊÔ½¸ÂÐ±þ
       *  04.05.02    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
+      *  04.05.03    NACL-ÌçÏÆ    13/02/07  ¶â³Û¹àÌÜ£··åÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -207,7 +208,7 @@
                05  WRK-TNSKAI-LEN              PIC 9(02).
       *
                05  WRK-TNSKAI.
-                   07  WRK-ZAITEN              PIC X(12).
+                   07  WRK-ZAITEN              PIC X(14).
                    07  WRK-X                   PIC X(02).
                    07  WRK-ZAIKAISU            PIC X(06).
       *             
@@ -608,11 +609,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE87PARA-HOSPNUM
       *                                           
            INITIALIZE              ORCSKANACHKAREA
            MOVE    "2"             TO  KANACHK-SYORI 
-           MOVE    WRK-ZAITENX(4:6)
-                                   TO  KANACHK-MAE-INPUT (1:6)
-           MOVE    "X"             TO  KANACHK-MAE-INPUT (7:1)
+           MOVE    WRK-ZAITENX(3:7)
+                                   TO  KANACHK-MAE-INPUT (1:7)
+           MOVE    "X"             TO  KANACHK-MAE-INPUT (8:1)
            MOVE    WRK-ZAIKAISUX (2:3)
-                                   TO  KANACHK-MAE-INPUT (8:3)
+                                   TO  KANACHK-MAE-INPUT (9:3)
            CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
            IF      KANACHK-RC      =   ZERO
            AND     KANACHK-MAX     >   ZERO
@@ -624,17 +625,17 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE87PARA-HOSPNUM
       *    É¬Í×Í­¸ú·å¿ô¡ÊÅÀ¿ôZZZZZ X ¿ôÎÌZZZ ¤ÎÁ´³Ñ¤Î·å¿ô¡Ë
            MOVE    ZERO                TO  WRK-TNSKAI-KETA
            PERFORM VARYING   IDZ     FROM    1   BY  2
-                   UNTIL     IDZ     >       20
+                   UNTIL     IDZ     >       22
       ***>     IF      WRK-TNSKAI (IDZ:2)      NOT =   SPACE
                IF      WRK-TNSKAI (IDZ:2)      NOT =   "¡¡"
                    IF   IDZ = 1
-                      COMPUTE WRK-TNSKAI-KETA = 20 - IDZ + 1
+                      COMPUTE WRK-TNSKAI-KETA = 22 - IDZ + 1
                       MOVE    IDZ   TO   WRK-TNSKAI-LEN
                    ELSE
-                      COMPUTE WRK-TNSKAI-KETA = 20 - IDZ + 1 + 2
+                      COMPUTE WRK-TNSKAI-KETA = 22 - IDZ + 1 + 2
                       COMPUTE WRK-TNSKAI-LEN  = IDZ  -  2
                    END-IF
-                   MOVE    20                  TO  IDZ
+                   MOVE    22                  TO  IDZ
                END-IF 
            END-PERFORM
       *     

@@ -22,6 +22,7 @@
 # (2008/11/12 ) レイアウトオプション対応
 # (2011/11/14 ) 労災枠有り対応
 # (2012/04/11 ) 改正対応
+# (2013/02/07 ) 労災枠有り対応
 #
 
 # ※複数のプロセスの実行はできない
@@ -601,6 +602,19 @@ end
                         red_file = std_form + ls_w1
                 when    'HCN53V03.red'
                         ls_w1 = 'HCN54V03.red'
+                        red_file = std_form + ls_w1
+#   -----------> 労災分(2013/02/07)
+                when    'HCN50V04.red'
+                        ls_w1 = 'HCN50V04P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN51V04.red'
+                        ls_w1 = 'HCN51V04P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN23V08.red'
+                        ls_w1 = 'HCN48V04.red'
+                        red_file = std_form + ls_w1
+                when    'HCN53V04.red'
+                        ls_w1 = 'HCN54V04.red'
                         red_file = std_form + ls_w1
 		end
 	end
