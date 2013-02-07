@@ -56,6 +56,7 @@
       *                                     の削除処理の有無対応
       *  04.05.06    NACL-藤原    12/04/11  平成２４年４月改正対応
       *                                     入院略称の変更
+      *  04.05.07    NACL-門脇    13/02/07  金額項目７桁対応
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
@@ -174,7 +175,7 @@
                                    BY         //RECEERR//.
       *
       *    短期（３４７０２）     
-           COPY    "HCN50V03.INC"  REPLACING  //HCN50V03//
+           COPY    "HCN50V04.INC"  REPLACING  //HCN50V04//
                                    BY         //HCN50//.
       *
       *    長期・短期（続紙）     
@@ -495,6 +496,7 @@
            03  WRK-KGK2            PIC ZZ.
            03  WRK-ZZZ             PIC ZZZ.
            03  WRK-RECEKAISU       PIC ZZZ.
+           03  WRK-KINGAKUZ9       PIC Z,ZZZ,ZZZ.
       *
        01  WRK-CONS-AREA.    
       *    改行コード
@@ -1980,14 +1982,14 @@ grpsys        PERFORM 900-DBSELECT-SEC
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   5
       *        <金額>
-               MOVE    RECE82-KINGAKU2(IDX)      TO  WRK-KINGAKUZ
-               MOVE    WRK-KINGAKUZ              TO  HCN50-KINGAKU (IDX)
+               MOVE    RECE82-KINGAKU2(IDX)      TO  WRK-KINGAKUZ9
+               MOVE    WRK-KINGAKUZ9             TO  HCN50-KINGAKU (IDX)
            END-PERFORM
       *
       *    <小計ロ>
            IF      RECE82-KINGAKU2-SYO        >   ZERO
-               MOVE    RECE82-KINGAKU2-SYO    TO  WRK-TOTALTEN2
-               MOVE    WRK-TOTALTEN2          TO  HCN50-SYOKEI
+               MOVE    RECE82-KINGAKU2-SYO    TO  WRK-KINGAKUZ9
+               MOVE    WRK-KINGAKUZ9          TO  HCN50-SYOKEI
            END-IF
       *
       *    ９７食事
@@ -2772,10 +2774,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      CNT-PAGE            =   1
                EVALUATE  WRK-PARA-FRAME
                    WHEN      "0"
-                       MOVE    "HCN50V03.red"      TO
+                       MOVE    "HCN50V04.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                    WHEN      "1"
-                       MOVE    "HCN50V03P.red"     TO
+                       MOVE    "HCN50V04P.red"     TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                END-EVALUATE
                MOVE    HCN50                TO
@@ -2921,8 +2923,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCN50V03.red"                  
-                       WHEN    "HCN50V03P.red"                  
+                       WHEN    "HCN50V04.red"                  
+                       WHEN    "HCN50V04P.red"                  
                            MOVE    RECE08-PRTDATA  TO HCN50
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCN50-PAGE

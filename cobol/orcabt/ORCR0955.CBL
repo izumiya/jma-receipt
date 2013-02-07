@@ -80,6 +80,7 @@
       *                                     ¤Îºï½ü½èÍý¤ÎÍ­ÌµÂÐ±þ
       *  04.05.08    NACL-Æ£¸¶    12/04/11  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
       *                                     Æþ±¡Î¬¾Î¤ÎÊÑ¹¹
+      *  04.05.09    NACL-ÌçÏÆ    13/02/07  ¶â³Û¹àÌÜ£··åÂÐ±þ
       *
       *  04.06.01    NACL-Æ£¸¶    10/10/04  ¥ì¥»¥×¥È¥³¥á¥ó¥ÈÊ¸»ú¿ôÁýÂÐ±þ
       *  04.06.02    NACL-Æ£¸¶    11/10/07  ½ýÉÂÌ¾¤ò£³¹Ô¤Þ¤Çµ­ºÜ²ÄÇ½¤È¤¹¤ë
@@ -184,7 +185,7 @@
                                    BY         //RECEERR//.
       *
       *    ¼«ÇåÀÕ     
-           COPY    "HCN23V07.INC"  REPLACING  //HCN23V07//
+           COPY    "HCN23V08.INC"  REPLACING  //HCN23V08//
                                    BY         //HC23//.
       *
       *    ¼«ÇåÀÕ¡ÊÂ³»æ¡Ë     
@@ -497,6 +498,7 @@
            03  WRK-KGK9            PIC Z,ZZZ,ZZZ.
            03  WRK-KGK4            PIC ZZZZ.
            03  WRK-KGK2            PIC ZZ.
+           03  WRK-KINGAKUZ9       PIC Z,ZZZ,ZZZ.
       *
        01  WRK-CONS-AREA.    
       *    ²þ¹Ô¥³¡¼¥É
@@ -1910,21 +1912,21 @@ grpsys        PERFORM 900-DBSELECT-SEC
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   2
       *        <¶â³Û>
-               MOVE    RECE82-KINGAKU2(IDX)  TO  WRK-KINGAKUZ
-               MOVE    WRK-KINGAKUZ          TO  HC23-KINGAKU (IDX)
+               MOVE    RECE82-KINGAKU2(IDX)  TO  WRK-KINGAKUZ9
+               MOVE    WRK-KINGAKUZ9         TO  HC23-KINGAKU (IDX)
            END-PERFORM
       *
       *     ¡Ê£±£°¡Ë¾®·×¥Ï
-           MOVE    RECE82-KINGAKU2-SYO TO  WRK-KINGAKUZ
-           MOVE    WRK-KINGAKUZ        TO  HC23-KINGAKU (3)
+           MOVE    RECE82-KINGAKU2-SYO TO  WRK-KINGAKUZ9
+           MOVE    WRK-KINGAKUZ9       TO  HC23-KINGAKU (3)
       *
       *    ¡Ê£¸£°¡Ë¤½¤ÎÂ¾
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   4
                COMPUTE IDZ     =   IDX     +   3  
       *        <¶â³Û>
-               MOVE    RECE82-KINGAKU3(IDX)  TO  WRK-KINGAKUZ
-               MOVE    WRK-KINGAKUZ          TO  HC23-KINGAKU (IDZ)
+               MOVE    RECE82-KINGAKU3(IDX)  TO  WRK-KINGAKUZ9
+               MOVE    WRK-KINGAKUZ9         TO  HC23-KINGAKU (IDZ)
            END-PERFORM
       *    <Æþ±¡¼¼ÎÁ²Ã»»>
            MOVE    RECE82-HEYA-NINZU     TO  WRK-ZZ
@@ -1933,8 +1935,8 @@ grpsys        PERFORM 900-DBSELECT-SEC
            MOVE    WRK-ZZ                TO  HC23-SONOTAKAISU
       *
       *     ¡Ê£¸£°¡Ë¾®·×
-           MOVE    RECE82-KINGAKU3-SYO TO  WRK-KINGAKUZ
-           MOVE    WRK-KINGAKUZ        TO  HC23-KINGAKU (8)
+           MOVE    RECE82-KINGAKU3-SYO TO  WRK-KINGAKUZ9
+           MOVE    WRK-KINGAKUZ9       TO  HC23-KINGAKU (8)
       *
       *    £¹£·¿©»ö
            STRING    RECE82-SHOKUJISYUBETU (1) DELIMITED   BY  SPACE
@@ -2719,7 +2721,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       * 
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
-               MOVE    "HCN23V07.red"      TO
+               MOVE    "HCN23V08.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HC23                TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -2858,7 +2860,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCN23V07.red"                  
+                       WHEN    "HCN23V08.red"
                            MOVE    RECE08-PRTDATA  TO HC23
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC23-PAGE
