@@ -50,6 +50,7 @@
            03  FLG-SRYACT          PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-PLUS-ARI        PIC 9(01).
+           03  FLG-TENSU          PIC 9(01).
       *
            03  FLG-DOUJI           PIC 9(01).
            03  FLG-END2            PIC 9(01).
@@ -71,11 +72,14 @@
            03  IDY                 PIC 9(04).
            03  IDX3                PIC 9(04).
            03  IDX4                PIC 9(04).
+           03  IDX5                PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
            03  WRK-KIZIGOK         PIC 9(07).
            03  WRK-SRYCD           PIC X(09).
+           03  WRK-72-SRYCD        PIC X(09).
+           03  WRK-SRYSYUKBN       PIC X(03).
            03  TBL-IN-CHK-G.
                05  TBL-IN-CHK          PIC X(01)   OCCURS   50.
       *
@@ -83,6 +87,7 @@
        01  TBL-SRYACT-AREA.
             03  TBL-SRYACT-OCC     OCCURS   50.
                 05  TBL-SRY-SRYCD      PIC X(09).
+                05  TBL-SRY-SRYSYUKBN  PIC X(03).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -95,6 +100,9 @@
       *    診療行為マスタ−
        01  SRYACT-REC.
            COPY    "CPSRYACT.INC".
+      *    点数マスタ−
+      *01  TENSU-REC.
+           COPY    "CPTENSU.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -223,6 +231,14 @@ grpsys     COPY    "COMMON-SPA".
                                   (SRY-SRYCD (IDY) =   SPACE)
                    ADD     1               TO  IDX-SRY
                    MOVE    SRY-SRYCD (IDY) TO  TBL-SRY-SRYCD (IDX-SRY)
+                   IF      SRY-SRYCD (IDY)(1:1)    =   "1"
+                       MOVE    SRY-SRYCD (IDY)     TO  TNS-SRYCD
+                       PERFORM 910-TENSU-READ-SEC
+                       IF      TNS-DATAKBN     =   "1"
+                           MOVE    TNS-SRYSYUKBN   TO  TBL-SRY-SRYSYUKBN
+                                                            (IDX-SRY)
+                       END-IF
+                   END-IF
                END-PERFORM
       *
                MOVE    "tbl_sryact"        TO  MCP-TABLE
@@ -310,6 +326,13 @@ grpsys     COPY    "COMMON-SPA".
       *    窒素
            MOVE    ACCTP-CHISOTEN      TO  ORCSRECESORT-ZAITEN (3)
       *
+      *!!!!!!!
+      *H25.2
+      *    画像診断のフィルム料同時併施有
+           IF      FLG-DOUJI           =   1
+               PERFORM 20071-GAZOU-SRYCD-HEN-SEC
+           END-IF
+      *!!!!!!!
       *    手技毎の点数を集計（本来は別々にレセ電記載する）
            MOVE    ZERO                TO  FLG-PLUS-ARI
            MOVE    ZERO                TO  IDX-SRY
@@ -352,6 +375,57 @@ grpsys     COPY    "COMMON-SPA".
            .
        200-MAIN-SYORI-EXT.
            EXIT.
+      *!!!!!!!
+      *H25.2
+      *****************************************************************
+      *    画像診断フィルム編集処理
+      *****************************************************************
+       20071-GAZOU-SRYCD-HEN-SEC                SECTION.
+      *
+           MOVE    ZERO                TO  IDX5
+           PERFORM VARYING     IDX3    FROM    1   BY  1
+                   UNTIL      (IDX3    >   5   )
+                          OR  (ACCTP-SRYCD(IDX3)   =   SPACE )
+               MOVE    SPACE           TO  WRK-72-SRYCD
+               MOVE    SPACE           TO  WRK-SRYSYUKBN
+               COMPUTE IDX4            =   IDX5    +   1
+               PERFORM VARYING     IDX-SRY    FROM    IDX4  BY  1
+                       UNTIL      (IDX-SRY    >   50  )
+                             OR   (TBL-SRY-SRYCD(IDX-SRY)  =   SPACE)
+                   MOVE    IDX-SRY            TO  IDX5
+                   IF      ACCTP-SRYCD(IDX3)  =   TBL-SRY-SRYCD(IDX-SRY)
+                       MOVE    TBL-SRY-SRYSYUKBN(IDX-SRY)
+                                                  TO  WRK-SRYSYUKBN
+                   END-IF
+                   IF      TBL-SRY-SRYCD (IDX-SRY)(1:1)    =   "7"
+                       IF      WRK-72-SRYCD    NOT =   SPACE
+                           MOVE    50              TO  IDX-SRY
+                       END-IF
+                   ELSE
+                       IF      TBL-SRY-SRYSYUKBN (IDX-SRY)
+                                                    =   "721"
+                                                    OR  "720"
+      *                    Ｘ線撮影料
+                           MOVE    TBL-SRY-SRYCD(IDX-SRY)
+                                                    TO  WRK-72-SRYCD
+                       END-IF
+                   END-IF
+               END-PERFORM
+      *        付加情報のコードが撮影料でない場合は撮影料に置換える
+               IF      WRK-72-SRYCD    NOT =   SPACE
+                   IF      WRK-SRYSYUKBN(1:2)  =   "72"
+                                               OR  "71"
+                       CONTINUE
+                   ELSE
+                       MOVE    WRK-72-SRYCD    TO  ACCTP-SRYCD(IDX3)
+                   END-IF
+               END-IF
+           END-PERFORM
+           .
+       20071-GAZOU-SRYCD-HEN-EX.
+           EXIT.
+      *!!!!!!!
+      *!!!!!!!
       *
       *****************************************************************
       *    画像診断フィルム編集処理
@@ -381,7 +455,7 @@ grpsys     COPY    "COMMON-SPA".
                            UNTIL      (IDX-SRY    >   50  )
                                   OR  (FLG-END2  =   1   )
                                   OR  (FLG-END3  =   1   )
-                      IF      TBL-SRY-SRYCD(IDX-SRY)   =   WRK-SRYCD
+                      IF     (TBL-SRY-SRYCD(IDX-SRY)   =   WRK-SRYCD )
                            MOVE    1               TO  FLG-END2
                            COMPUTE IDX4        =   IDX-SRY   +   1
                       ELSE
@@ -579,6 +653,41 @@ grpsys     COPY    "COMMON-SPA".
       *
            .
        920-SRYACT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数マスター読込
+      *****************************************************************
+       910-TENSU-READ-SEC         SECTION.
+      *
+           MOVE    ORCSRECESORT-HOSPNUM    TO  TNS-HOSPNUM
+           MOVE    ORCSRECESORT-SRYYM      TO  TNS-YUKOSTYMD(1:6)
+           MOVE    "01"                    TO  TNS-YUKOSTYMD(7:2)
+           MOVE    TNS-YUKOSTYMD           TO  TNS-YUKOEDYMD
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
+                   MOVE    ZERO                TO  FLG-TENSU
+               ELSE
+                   INITIALIZE                  TNS-TENSU-REC
+                   MOVE    1                   TO  FLG-TENSU
+               END-IF
+           ELSE
+               INITIALIZE                  TNS-TENSU-REC
+               MOVE    1                   TO  FLG-TENSU
+           END-IF
+      *
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       910-TENSU-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
