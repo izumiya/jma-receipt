@@ -76,7 +76,7 @@ def list4cobol(list)
     if r[:available] == "TRUE"
       if available[r[:name]]
         if r[:version] > available[r[:name]][:version]
-          availabel[r[:name]] = r
+          available[r[:name]] = r
         end
       else
         available[r[:name]] = r

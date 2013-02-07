@@ -184,8 +184,7 @@
       *
       *    シェル
        01  WRK-SHELL-NAME.
-           03  FILLER             PIC X(25) VALUE
-                                  "scripts/allways/plugin.sh".
+           03  FILLER              PIC X(09)  VALUE  "plugin.sh".
       *
        01  CONST-AREA.
            03  CONST-MNTJOBID      PIC 9(07)  VALUE    1.
@@ -202,8 +201,6 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
-      *
-           COPY    "CPMKPASS.INC".
       *
            COPY    "CPSHELLTBL.INC".
       *
@@ -638,11 +635,7 @@
            PERFORM 820-JOBKANRI-JBS-SEC
       *
            MOVE    SPACE               TO  SHELLTBL
-      *    ファイルデイレクトリ位置指定
-           INITIALIZE                      ORCSMKPASSAREA
-           MOVE    WRK-SHELL-NAME      TO  MKPASS-IN-01
-           CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
-           MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME
+           MOVE    WRK-SHELL-NAME      TO  SHELLTBL-NAME
       *
       *    パラメタセット
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG1
@@ -655,7 +648,7 @@
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE
-           MOVE    "shell"             TO  MCP-PATHNAME
+           MOVE    "allways"           TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
