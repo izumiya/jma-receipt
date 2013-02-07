@@ -525,6 +525,16 @@ FORM_files = \
 	      HCM3AV02.red \
 	      HCM3CV02.red \
 	      HCM62Q.red \
+	      HCN23V08.red \
+	      HCN48V04.red \
+	      HCN50V04.red \
+	      HCN50V04P.red \
+	      HCN51V04.red \
+	      HCN51V04P.red \
+	      HCN53V04.red \
+	      HCN54V04.red \
+	      HCN66V01.red \
+	      HCN67V01.red \
 
 all:   
 

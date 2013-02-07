@@ -51,6 +51,7 @@
       *                                     「改正未対応」の記載を行わな
       *                                     いようにする
       *                                     入院略称の変更
+      *  04.05.08    NACL-門脇    13/02/07  金額項目７桁対応
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
@@ -152,7 +153,7 @@
                                    BY         //RECEERR//.
       *
       *    自賠責     
-           COPY    "HCN53V03.INC"  REPLACING  //HCN53V03//
+           COPY    "HCN53V04.INC"  REPLACING  //HCN53V04//
                                    BY         //HC23//.
       *
       *    自賠責（続紙）     
@@ -453,6 +454,7 @@
            03  WRK-KGK9            PIC Z,ZZZ,ZZZ.
            03  WRK-KGK4            PIC ZZZZ.
            03  WRK-KGK2            PIC ZZ.
+           03  WRK-KINGAKUZ9       PIC Z,ZZZ,ZZZ.
       *
        01  WRK-CONS-AREA.    
       *    改行コード
@@ -1844,21 +1846,21 @@ grpsys        PERFORM 900-DBSELECT-SEC
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   2
       *        <金額>
-               MOVE    RECE82-KINGAKU2(IDX)  TO  WRK-KINGAKUZ
-               MOVE    WRK-KINGAKUZ          TO  HC23-KINGAKU (IDX)
+               MOVE    RECE82-KINGAKU2(IDX)  TO  WRK-KINGAKUZ9
+               MOVE    WRK-KINGAKUZ9         TO  HC23-KINGAKU (IDX)
            END-PERFORM
       *
       *     （１０）小計ハ
-           MOVE    RECE82-KINGAKU2-SYO TO  WRK-KINGAKUZ
-           MOVE    WRK-KINGAKUZ        TO  HC23-KINGAKU (3)
+           MOVE    RECE82-KINGAKU2-SYO TO  WRK-KINGAKUZ9
+           MOVE    WRK-KINGAKUZ9       TO  HC23-KINGAKU (3)
       *
       *    （８０）その他
            PERFORM   VARYING   IDX   FROM    1   BY  1
                      UNTIL     IDX       >   4
                COMPUTE IDZ     =   IDX     +   3  
       *        <金額>
-               MOVE    RECE82-KINGAKU3(IDX)  TO  WRK-KINGAKUZ
-               MOVE    WRK-KINGAKUZ          TO  HC23-KINGAKU (IDZ)
+               MOVE    RECE82-KINGAKU3(IDX)  TO  WRK-KINGAKUZ9
+               MOVE    WRK-KINGAKUZ9         TO  HC23-KINGAKU (IDZ)
            END-PERFORM
       *    <入院室料加算>
            MOVE    RECE82-HEYA-NINZU     TO  WRK-ZZ
@@ -1867,8 +1869,8 @@ grpsys        PERFORM 900-DBSELECT-SEC
            MOVE    WRK-ZZ                TO  HC23-SONOTAKAISU
       *
       *     （８０）小計
-           MOVE    RECE82-KINGAKU3-SYO TO  WRK-KINGAKUZ
-           MOVE    WRK-KINGAKUZ        TO  HC23-KINGAKU (8)
+           MOVE    RECE82-KINGAKU3-SYO TO  WRK-KINGAKUZ9
+           MOVE    WRK-KINGAKUZ9       TO  HC23-KINGAKU (8)
       *
       *    ９７食事
            PERFORM   VARYING   IDX   FROM    1   BY  1
@@ -2640,10 +2642,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      CNT-PAGE            =   1
                EVALUATE  WRK-PARA-FRAME
                  WHEN      "0"
-                   MOVE  "HCN53V03.red"    TO
+                   MOVE  "HCN53V04.red"    TO
                                            TBL-RECE-FORMID(TBL-RECE-MAX)
                  WHEN      "1"
-                   MOVE  "HCN54V03.red"    TO
+                   MOVE  "HCN54V04.red"    TO
                                            TBL-RECE-FORMID(TBL-RECE-MAX)
                END-EVALUATE
                MOVE       HC23       TO  TBL-RECE-PRTDATA(TBL-RECE-MAX)
@@ -2784,8 +2786,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCN53V03.red"
-                       WHEN    "HCN54V03.red"
+                       WHEN    "HCN53V04.red"
+                       WHEN    "HCN54V04.red"
                            MOVE    RECE08-PRTDATA  TO HC23
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HC23-PAGE

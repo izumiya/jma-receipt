@@ -22,6 +22,7 @@
 # (2008/07/30 ) 労災、自賠枠なし対応
 # (2008/11/12 ) レイアウトオプション対応
 # (2010/11/08 ) クライアント印刷対応
+# (2013/02/07 ) 労災枠有り対応
 #
 
 # クライアント印刷用(複数ps をまとめる)
@@ -614,6 +615,19 @@ end
                         red_file = std_form + ls_w1
                 when    'HCN53V03.red'
                         ls_w1 = 'HCN54V03.red'
+                        red_file = std_form + ls_w1
+#   -----------> 労災分(2013/02/07)
+                when    'HCN50V04.red'
+                        ls_w1 = 'HCN50V04P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN51V04.red'
+                        ls_w1 = 'HCN51V04P.red'
+                        red_file = std_form + ls_w1
+                when    'HCN23V08.red'
+                        ls_w1 = 'HCN48V04.red'
+                        red_file = std_form + ls_w1
+                when    'HCN53V04.red'
+                        ls_w1 = 'HCN54V04.red'
                         red_file = std_form + ls_w1
 		end
 	end
