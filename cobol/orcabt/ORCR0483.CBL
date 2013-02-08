@@ -44,6 +44,8 @@
       *  04.05.03    NACL-藤原    10/03/03  平成２２年４月改正対応
       *  04.05.04    NACL-藤原    10/03/29  「改正未対応」の記載をやめる
       *  04.05.05    NACL-藤原    11/08/02  点検レセ印字位置変更対応
+      *  04.05.06    NACL-門脇    13/02/08  入外共通redファイル使用の為、
+      *                                     HCM56V03.redに修正
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
@@ -136,7 +138,7 @@
       *    公務災害
       *****COPY    "HCM56.INC".
       *****COPY    "HCM56V01.INC"  REPLACING  //HCM56V01//
-           COPY    "HCM56V02.INC"  REPLACING  //HCM56V02//
+           COPY    "HCM56V03.INC"  REPLACING  //HCM56V03//
                                    BY         //HCM56//.
       *
       *    公務災害（続紙） 
@@ -2354,7 +2356,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       * 
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
-               MOVE    "HCM56V02.red"      TO
+               MOVE    "HCM56V03.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HCM56               TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -2493,7 +2495,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCM56V02.red"                  
+                       WHEN    "HCM56V03.red"
                            MOVE    RECE08-PRTDATA  TO HCM56
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCM56-PAGE
