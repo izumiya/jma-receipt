@@ -10714,6 +10714,44 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    GO      TO      41001-KIHON-CHK-EXT
                END-IF
            END-IF
+      *H25.2
+      *    訂正時の保険自動変換
+           IF     (SPA-ERRCD           =   SPACE  )  AND
+                  (SPA-HKN-ERR2        =   1      )
+               MOVE    "K176"              TO  SPA-ERRCD
+               MOVE    ZERO                TO  SPA-HKN-ERR2
+           END-IF
+      *    前回保険組合せの判定チェック
+           IF     (SPA-ERRCD           =   SPACE  )  AND
+                  (SPA-HKNCHK-FLG  NOT =   ZERO   )  AND 
+                  (SPA-HKNCHK-CHK      =   ZERO   )
+               IF      SPA-HKNCHK-FLG      =   2
+                   MOVE    "K173"              TO  SPA-ERRCD
+               ELSE
+                   MOVE    "K172"              TO  SPA-ERRCD
+               END-IF
+               MOVE    5                   TO  SPA-GMN-CUR
+               MOVE    1                   TO  SPA-HKNCHK-CHK
+               MOVE    ZERO                TO  SPA-HKNCHK-FLG
+           END-IF
+      *
+      *    初診料の併用算定判定
+           IF     (SPA-ERRCD           =   SPACE  )  AND
+                  (SPA-SYOSIN-KEI      =   1      )  AND
+                  (SPA-SYOSIN-KEIFLG   =   ZERO   )
+               MOVE    "K174"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-SYOSIN-KEIFLG
+           END-IF
+      *    初診料の併用算定判定
+           IF     (SPA-ERRCD           =   SPACE  )  AND
+                  (SPA-SYOSIN-KEI      =   2      )  AND
+                  (SPA-SYOSIN-KEIFLG   =   ZERO   )
+               MOVE    "K175"              TO  SPA-ERRCD
+               MOVE    1                   TO  SPA-SYOSIN-KEIFLG
+           END-IF
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      41001-KIHON-CHK-EXT
+           END-IF
       *
       *    診療行為入力チェック
            PERFORM 41011-KOUI-ALLHEN-SEC
