@@ -8628,6 +8628,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
+           IF      SPA-ERRCD           =   SPACE
+      *        訂正時の保険自動変換
+               IF      SPA-HKN-ERR2        =   1
+                   MOVE    "K176"              TO  SPA-ERRCD
+                   MOVE    ZERO                TO  SPA-HKN-ERR2
+               END-IF
+           END-IF
+      *
       *    診療行為入力チェック
            IF      SPA-ERRCD           =   SPACE
                PERFORM 41011-KOUI-ALLHEN-SEC
