@@ -48,6 +48,8 @@
       *                                     「改正未対応」の記載を行う
       *  04.05.07    NACL-藤原    12/04/10  平成２４年４月改正対応
       *                                     「改正未対応」の記載をやめる
+      *  04.05.08    NACL-門脇    13/02/08  入外共通redファイル使用の為、
+      *                                     HCM56V03.redに修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -134,7 +136,7 @@
       *    公務災害
       *****COPY    "HCM56.INC".
       *****COPY    "HCM56V01.INC"  REPLACING  //HCM56V01//
-           COPY    "HCM56V02.INC"  REPLACING  //HCM56V02//
+           COPY    "HCM56V03.INC"  REPLACING  //HCM56V03//
                                    BY         //HCM56//.
       *
       *    公務災害（続紙） 
@@ -2250,7 +2252,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       * 
            MOVE    CNT-PAGE            TO  TBL-RECE-RENNUM(TBL-RECE-MAX)
            IF      CNT-PAGE            =   1
-               MOVE    "HCM56V02.red"      TO
+               MOVE    "HCM56V03.red"      TO
                                        TBL-RECE-FORMID  (TBL-RECE-MAX)
                MOVE    HCM56               TO
                                        TBL-RECE-PRTDATA (TBL-RECE-MAX)
@@ -2385,7 +2387,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE08-HOSPNUM
                    MOVE    "/"                 TO  WRK-PAGE-HEN
                    MOVE    TBL-RECE-MAX        TO  WRK-PAGE2
                    EVALUATE    RECE08-FORMID
-                       WHEN    "HCM56V02.red"                  
+                       WHEN    "HCM56V03.red"
                            MOVE    RECE08-PRTDATA  TO HCM56
                            MOVE    WRK-HEN-PAGE-AREA
                                                    TO HCM56-PAGE
