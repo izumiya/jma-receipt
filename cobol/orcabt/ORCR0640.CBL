@@ -583,6 +583,7 @@
       *  04.05.84    NACL-ÃÁœ∆    12/11/08  ∏¯»ÒÕÛ°›∞Ï…Ù…È√¥∂‚ÕÛ∂‚≥€√÷¥π¬–±˛
       *  04.05.85    NACL-ÃÁœ∆    12/12/10  £∑£µ∫–≈˛√£∑Ó§Œ∆√Œ„»Û≥∫≈ˆ¬–±˛
       *  04.05.86    NACL-ÃÁœ∆    13/01/25   ›∏±ÕÛ°›∞Ï…Ù…È√¥∂‚ÕÛµ≠∫‹Ω§¿µ
+      *  04.05.87    NACL-ÃÁœ∆    13/02/08   ›∏±ÕÛ°›∞Ï…Ù…È√¥∂‚ÕÛµ≠∫‹Ω§¿µ
       *
       *  04.06.01    NACL-∆£∏∂    10/06/23  •Ï•ª≈≈¿¡µ·ª˛§Œºı…’•®•È°º ¨§Œ
       *                                     ºÔ Ã…‘Ã¿•Ï•ª¬–±˛
@@ -13115,7 +13116,8 @@
                             OR    (RECE62-HKNCOMBI(IDX1) = ZERO)
                             OR    (FLG-KOUREI-KBN        =  1  )
                    IF  SYU-HKNCOMBINUM  =  RECE62-HKNCOMBI(IDX1)
-                     IF  SYU-DENPJTIKBN  NOT =  "3"
+                     IF  SYU-DENPJTIKBN   NOT =  "3"
+                     AND SYU-TOTAL-HKNTEN NOT = ZERO
                        IF   SYU-SKJ-FTNGAKU(3)  =  1
                           MOVE   SPACE    TO   RECE62-KOUREI
                           MOVE    1       TO   FLG-KOUREI-KBN
@@ -13351,7 +13353,9 @@
                        IF      SYU-HKNCOMBINUM   =
                                                 RECE62-HKNCOMBI (IDX1)
                            IF  SYU-DENPJTIKBN    NOT =  "3"
-                               PERFORM   21044-RECE62-FTN-HENSYU-SEC
+                               IF  SYU-TOTAL-HKNTEN  NOT = ZERO
+                                 PERFORM   21044-RECE62-FTN-HENSYU-SEC
+                               END-IF
                                MOVE   1   TO   FLG-SYUNOU-ARI
                            END-IF
                            MOVE    10              TO  IDX1
@@ -24205,11 +24209,13 @@
                                MOVE    "key19"         TO  MCP-PATHNAME
                                PERFORM 900-SYUNOU-READ-SEC
                                PERFORM UNTIL   FLG-SYUNOU  =    1
+                                 IF  SYU-DENPJTIKBN    NOT =  "3"
                                    ADD     SYU-KYUFUGAI-GOKEI-TEN
                                                 TO  RECE62-KYUFUGAITEN
-                                   MOVE    "tbl_syunou" TO  MCP-TABLE
-                                   MOVE    "key19"      TO  MCP-PATHNAME
-                                   PERFORM 900-SYUNOU-READ-SEC
+                                 END-IF
+                                 MOVE    "tbl_syunou"  TO  MCP-TABLE
+                                 MOVE    "key19"       TO  MCP-PATHNAME
+                                 PERFORM 900-SYUNOU-READ-SEC
                                END-PERFORM          
                            END-IF
       *

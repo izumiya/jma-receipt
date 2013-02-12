@@ -594,6 +594,7 @@
       *  04.05.73    NACL-門脇    12/11/08  公費欄−一部負担金欄金額置換対応
       *  04.05.74    NACL-門脇    12/12/10  ７５歳到達月の特例非該当対応
       *  04.05.75    NACL-門脇    13/01/25  保険欄−一部負担金欄記載修正
+      *  04.05.76    NACL-門脇    13/02/08  保険欄−一部負担金欄記載修正
       *
       *  04.06.01    NACL-門脇    10/07/02  小児特定疾患カウンセリング料の
       *                                     レセプトコメント自動記載（重複時）
@@ -10765,6 +10766,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                           OR    (RECE02-HKNCOMBI(IDX1) =   ZERO)
                  IF  SYU-HKNCOMBINUM  =  RECE02-HKNCOMBI(IDX1)
                    IF  SYU-DENPJTIKBN   NOT =  "3"
+                   AND SYU-TOTAL-HKNTEN NOT = ZERO
                      PERFORM 211S1-GENBUTU70-KOGAKU-GASSAN-HENSYU-SEC
                    END-IF
                    MOVE    10           TO   IDX1
@@ -10931,6 +10933,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                           OR    (RECE02-HKNCOMBI(IDX1) =   ZERO)
                  IF  SYU-HKNCOMBINUM  =  RECE02-HKNCOMBI(IDX1)
                    IF  SYU-DENPJTIKBN   NOT =  "3"
+                   AND SYU-TOTAL-HKNTEN NOT = ZERO
                      IF  (SYU-KOH-HKNNUM(1) =  "972")
                      OR  (SYU-KOH-HKNNUM(2) =  "972")
                      OR  (SYU-KOH-HKNNUM(3) =  "972")
@@ -11073,11 +11076,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               OR   RECE02-HKNCOMBI (IDX1)   =   ZERO
                        IF    SYU-HKNCOMBINUM   =
                                             RECE02-HKNCOMBI (IDX1)
-                                PERFORM 21052-RECE02-HENSYU3-SEC
-                                IF  SYU-BUNBENINFFLG  =  "1"
-                                  PERFORM 21053-BUNBEN-TOKKI-HENSYU-SEC
-                                END-IF
-                                MOVE    10              TO  IDX1
+                           IF  SYU-DENPJTIKBN    NOT =  "3"
+                               IF  SYU-TOTAL-HKNTEN  NOT = ZERO
+                                 PERFORM   21052-RECE02-HENSYU3-SEC
+                               END-IF
+                               IF  SYU-BUNBENINFFLG  =  "1"
+                                 PERFORM 21053-BUNBEN-TOKKI-HENSYU-SEC
+                               END-IF
+                           END-IF
+                           MOVE    10              TO  IDX1
                        END-IF
                    END-PERFORM
                    MOVE    "tbl_syunou"         TO      MCP-TABLE
