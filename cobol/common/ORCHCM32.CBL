@@ -370,6 +370,8 @@
            MOVE    ZERO            TO  CNT-LINE
       *
            MOVE    1               TO  IDX4
+           PERFORM 20011-SKIP-SEC
+      *
            PERFORM UNTIL ( IDX4    >   WRK-HEN-MAX )
       *
                INITIALIZE              WRK-GHENSYU-TBL
@@ -414,25 +416,22 @@
                     OR       ( WRK-HIDUKE (IDX4)(1:6)
                                        NOT =   KEY-HIDUKE )
       *
-      *            対象データチェック処理
-                   PERFORM 230-TAISYO-CHK-SEC
-                   IF    ( FLG-TAISYO  =   1 )
-                       MOVE    1               TO  WRK-MON-TAISYO
-                       COMPUTE WRK-MON-TENSU
-                           =   WRK-MON-TENSU   +   WRK-TENSU (IDX4)
-                       COMPUTE WRK-MON-HOKEN
-                           =   WRK-MON-HOKEN   +   WRK-HOKEN (IDX4)
-                       COMPUTE WRK-MON-SYOKUJI
-                           =   WRK-MON-SYOKUJI +   WRK-SYOKUJI (IDX4)
-                       COMPUTE WRK-MON-JIHI
-                           =   WRK-MON-JIHI    +   WRK-JIHI (IDX4)
-                       COMPUTE WRK-MON-GAKU
-                           =   WRK-MON-GAKU    +   WRK-GAKU (IDX4)
-                       COMPUTE WRK-MON-BFGAKU
-                           =   WRK-MON-BFGAKU  +   WRK-BFGAKU (IDX4)
-                   END-IF
+                   MOVE    1               TO  WRK-MON-TAISYO
+                   COMPUTE WRK-MON-TENSU
+                       =   WRK-MON-TENSU   +   WRK-TENSU (IDX4)
+                   COMPUTE WRK-MON-HOKEN
+                       =   WRK-MON-HOKEN   +   WRK-HOKEN (IDX4)
+                   COMPUTE WRK-MON-SYOKUJI
+                       =   WRK-MON-SYOKUJI +   WRK-SYOKUJI (IDX4)
+                   COMPUTE WRK-MON-JIHI
+                       =   WRK-MON-JIHI    +   WRK-JIHI (IDX4)
+                   COMPUTE WRK-MON-GAKU
+                       =   WRK-MON-GAKU    +   WRK-GAKU (IDX4)
+                   COMPUTE WRK-MON-BFGAKU
+                       =   WRK-MON-BFGAKU  +   WRK-BFGAKU (IDX4)
       *
                    COMPUTE IDX4    =   IDX4    +   1
+                   PERFORM 20011-SKIP-SEC
       *
                END-PERFORM
       *
@@ -443,6 +442,7 @@
                END-IF
       *
            END-PERFORM
+      
       *
            IF    ( IDX4                    >   WRK-HEN-MAX )
             OR   ( WRK-NYUGAIKBN(IDX4) NOT =   KEY-NYUGAIKBN )
@@ -455,6 +455,24 @@
       *
            .
        2001-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    対象外データ読み飛ばし処理
+      *****************************************************************
+       20011-SKIP-SEC               SECTION.
+      *
+           MOVE    ZERO            TO  FLG-TAISYO
+           PERFORM UNTIL ( IDX4    >   WRK-HEN-MAX )
+                     OR  ( WRK-NYUGAIKBN(IDX4) NOT =   KEY-NYUGAIKBN )
+                     OR  ( FLG-TAISYO  = 1 )
+               PERFORM 230-TAISYO-CHK-SEC
+               IF    ( FLG-TAISYO  NOT = 1 )
+                   COMPUTE IDX4    =   IDX4    +   1
+               END-IF
+           END-PERFORM 
+      *
+           .
+       20011-SKIP-EXT.
            EXIT.
       *****************************************************************
       *    編集処理
