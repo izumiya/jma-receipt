@@ -15016,8 +15016,10 @@
                             OR    (RECE62-HKNCOMBI(IDX1) = ZERO)
                             OR    (FLG-KOUREI-KBN        =  1  )
                    IF  SYU-HKNCOMBINUM  =  RECE62-HKNCOMBI(IDX1)
-                     IF  SYU-DENPJTIKBN   NOT =  "3"
-                     AND SYU-TOTAL-HKNTEN NOT = ZERO
+                     IF  ( SYU-DENPJTIKBN      NOT =  "3" )
+                     AND ((SYU-TOTAL-HKNTEN    NOT = ZERO) OR
+                          (SYU-SYUSKJ-RYOYOHI  NOT = ZERO) OR
+                          (SYU-KOH1SKJ-RYOYOHI NOT = ZERO))
                        IF   SYU-SKJ-FTNGAKU(3)  =  1
                           MOVE   SPACE    TO   RECE62-KOUREI
                           MOVE    1       TO   FLG-KOUREI-KBN
@@ -15253,7 +15255,9 @@
                        IF      SYU-HKNCOMBINUM   =
                                                 RECE62-HKNCOMBI (IDX1)
                            IF  SYU-DENPJTIKBN    NOT =  "3"
-                               IF  SYU-TOTAL-HKNTEN  NOT = ZERO
+                               IF  (SYU-TOTAL-HKNTEN    NOT = ZERO)
+                               OR  (SYU-SYUSKJ-RYOYOHI  NOT = ZERO)
+                               OR  (SYU-KOH1SKJ-RYOYOHI NOT = ZERO)
                                  PERFORM   21044-RECE62-FTN-HENSYU-SEC
                                END-IF
                                MOVE   1   TO   FLG-SYUNOU-ARI
