@@ -595,6 +595,7 @@
       *  04.05.73    NACL-ÃÁœ∆    12/11/08  ∏¯»ÒÕÛ°›∞Ï…Ù…È√¥∂‚ÕÛ∂‚≥€√÷¥π¬–±˛
       *  04.05.74    NACL-ÃÁœ∆    12/12/10  £∑£µ∫–≈˛√£∑Ó§Œ∆√Œ„»Û≥∫≈ˆ¬–±˛
       *  04.05.75    NACL-ÃÁœ∆    13/01/25   ›∏±ÕÛ°›∞Ï…Ù…È√¥∂‚ÕÛµ≠∫‹Ω§¿µ
+      *  04.05.76    NACL-ÃÁœ∆    13/02/08   ›∏±ÕÛ°›∞Ï…Ù…È√¥∂‚ÕÛµ≠∫‹Ω§¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -10608,6 +10609,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                           OR    (RECE02-HKNCOMBI(IDX1) =   ZERO)
                  IF  SYU-HKNCOMBINUM  =  RECE02-HKNCOMBI(IDX1)
                    IF  SYU-DENPJTIKBN   NOT =  "3"
+                   AND SYU-TOTAL-HKNTEN NOT = ZERO
                      PERFORM 211S1-GENBUTU70-KOGAKU-GASSAN-HENSYU-SEC
                    END-IF
                    MOVE    10           TO   IDX1
@@ -10774,6 +10776,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                           OR    (RECE02-HKNCOMBI(IDX1) =   ZERO)
                  IF  SYU-HKNCOMBINUM  =  RECE02-HKNCOMBI(IDX1)
                    IF  SYU-DENPJTIKBN   NOT =  "3"
+                   AND SYU-TOTAL-HKNTEN NOT = ZERO
                      IF  (SYU-KOH-HKNNUM(1) =  "972")
                      OR  (SYU-KOH-HKNNUM(2) =  "972")
                      OR  (SYU-KOH-HKNNUM(3) =  "972")
@@ -10916,8 +10919,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               OR   RECE02-HKNCOMBI (IDX1)   =   ZERO
                        IF    SYU-HKNCOMBINUM   =
                                             RECE02-HKNCOMBI (IDX1)
-                                PERFORM 21052-RECE02-HENSYU3-SEC
-                                MOVE    10              TO  IDX1
+                           IF  SYU-DENPJTIKBN    NOT =  "3"
+                               IF  SYU-TOTAL-HKNTEN  NOT = ZERO
+                                 PERFORM   21052-RECE02-HENSYU3-SEC
+                               END-IF
+                           END-IF
+                           MOVE    10              TO  IDX1
                        END-IF
                    END-PERFORM
                    MOVE    "tbl_syunou"         TO      MCP-TABLE
