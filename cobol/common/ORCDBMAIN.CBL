@@ -183,6 +183,13 @@
                    MOVE    0       TO  MCP-REDIRECT
                END-IF
       *
+               IF    ( MCP-TABLE   =   "tbl_chksnd" )
+                   IF    ( MCP-PATHNAME (1:3)  =   "tmp" )
+                       MOVE    2   TO  MCP-VERSION
+                       MOVE    0   TO  MCP-REDIRECT
+                   END-IF
+               END-IF
+      *
                IF    ( MCP-TABLE   =   "tbl_jobkanri" )
                    MOVE    MCPDATA-REC TO  JOBKANRI-REC
                    IF    ( JOB-SHELLID =   "PRGMNT" )

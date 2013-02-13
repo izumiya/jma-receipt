@@ -567,3 +567,128 @@ path	key25		{
 		;
 	};
 };
+
+path	del1	{ 	
+	DBDELETE	{
+		DELETE
+		FROM tbl_chksnd
+		WHERE 	HOSPNUM	= :HOSPNUM
+		  AND   CHKKBN    =   :CHKKBN
+		;
+	};
+};
+
+path	key26	{ 	
+	DBSELECT	{
+		DECLARE tbl_chksnd_key26_csr CURSOR FOR
+		SELECT *
+		FROM tbl_chksnd
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   CHKKBN    =   :CHKKBN
+			AND   SRYCD       =   :SRYCD
+			AND   CDKBN       =   '1'
+			ORDER  BY  YUKOSTYMD DESC,
+                                   RENNUM
+		;
+	};
+};
+
+path	key27		{ 	
+	DBSELECT	{
+		DECLARE tbl_chksnd_key27_csr CURSOR FOR
+		SELECT *
+		FROM tbl_chksnd
+			WHERE HOSPNUM	  =   :HOSPNUM
+			AND   CHKKBN      =   :CHKKBN
+			AND   SRYCD       =   :SRYCD
+			AND   CDKBN       =   :CDKBN
+			AND   YUKOSTYMD  <=   :YUKOSTYMD
+			AND   YUKOEDYMD  >=   :YUKOEDYMD
+			ORDER   BY    RENNUM DESC
+		;
+	};
+};
+
+#--TEMPテーブルを操作する場合、KEY名の頭に"tmp"をつけること。
+path	tmpkey	{ 	
+	DBCREATE	{
+		CREATE TEMP TABLE tbl_chksnd ON COMMIT PRESERVE ROWS AS
+		SELECT *
+		FROM   tbl_chksnd
+		WHERE  HOSPNUM	  = :HOSPNUM
+		;
+		
+		CREATE INDEX idx_chksnd_tmp ON pg_temp.tbl_chksnd (SRYCD)
+		;
+	};
+
+	DBDROP	{
+		DROP TABLE pg_temp.tbl_chksnd
+		;
+	};
+
+};
+
+path	tmpins1	{ 	
+	DBINSERT	{
+		INSERT INTO      pg_temp.tbl_chksnd
+		SELECT * FROM    public.tbl_chksnd
+		WHERE HOSPNUM   = :HOSPNUM
+		AND   CHKKBN    = :CHKKBN
+		AND   SRYCD     = :SRYCD
+		AND   YUKOSTYMD  <=   :YUKOSTYMD
+		AND   YUKOEDYMD  >=   :YUKOEDYMD
+		;
+	};
+};
+
+path	tmpins2	{ 	
+	DBINSERT	{
+		INSERT INTO pg_temp.tbl_chksnd
+		(
+		HOSPNUM,
+		CHKKBN,
+		SRYCD,
+		YUKOSTYMD,
+		YUKOEDYMD,
+		CDKBN,
+		RENNUM,
+		CD,
+		BYOMEI,
+		COMPKBN,
+		UTAGAIKBN,
+		BYOMEIHENFLG,
+		NYUGAIKBN,
+		GRPCHKKBN,
+		GRPID,
+		TERMID,
+		OPID,
+		CREYMD,
+		UPYMD,
+		UPHMS
+		)VALUES(
+		:HOSPNUM,
+		:CHKKBN,
+		:SRYCD,
+		:YUKOSTYMD,
+		:YUKOEDYMD,
+		:CDKBN,
+		:RENNUM,
+		:CD,
+		:BYOMEI,
+		:COMPKBN,
+		:UTAGAIKBN,
+		:BYOMEIHENFLG,
+		:NYUGAIKBN,
+		:GRPCHKKBN,
+		:GRPID,
+		:TERMID,
+		:OPID,
+		:CREYMD,
+		:UPYMD,
+		:UPHMS
+		)
+		;
+	};
+};
+

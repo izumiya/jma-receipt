@@ -73,18 +73,23 @@
            03  FLG-CHKLST-ROW              PIC 9(01).
            03  FLG-CHKREIGAI               PIC 9(01).
            03  FLG-INPUTCD                 PIC 9(01).
+           03  FLG-TEKIOUBYOMEI            PIC 9(01).
+           03  FLG-GET-TEKBYO              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-2001                    PIC 9(05).
            03  CNT-RENNUM                  PIC 9(05).
            03  CNT-CHK004                  PIC 9(05).
+           03  CNT-TEKBYO                  PIC 9(05).
       *
       *    添字領域
        01  IDX-AREA.
            03  IDX0                        PIC 9(05).
            03  IDXE                        PIC 9(05).
+           03  IDXI                        PIC 9(05).
            03  IDXL                        PIC 9(05).
+           03  IDXM                        PIC 9(05).
            03  IDXH                        PIC 9(05).
            03  IDX-CMB                     PIC 9(05).
       *
@@ -121,6 +126,10 @@
            03  WRK-CHKKBN                  PIC X(01).
            03  WRK-EDIT-COMPKBN            PIC X(01).
            03  WRK-EDIT-COMPKBN-MEI        PIC X(04).
+           03  WRK-IKOCD                   PIC X(07).
+           03  WRK-TBYOMEICD-G.
+               05  WRK-TBYOMEICD           PIC X(07)
+                                           OCCURS  21.
       *
        01  WRK-ROW-AREA.
            03  WRK-ERRLST-ROW              PIC S9(9).
@@ -130,7 +139,8 @@
        01  CONST-AREA.
            03  CONST-ERRLST-MAX            PIC 9(05)   VALUE   200.
            03  CONST-BYOLST-MAX            PIC 9(05)   VALUE   300.
-           03  CONST-CHKLST-MAX            PIC 9(05)   VALUE   200.
+           03  CONST-CHKLST-MAX            PIC 9(05)   VALUE   500.
+           03  CONST-MKCD-MAX              PIC 9(05)   VALUE   21.
       *
       *    データチェック一括処理パラメータ
            COPY    "CPORCBSD01PARA.INC".
@@ -187,6 +197,9 @@
        01  INPUTCD-REC.
            COPY    "CPINPUTCD.INC".
       *
+       01  TEKIOUBYOMEI-REC.
+           COPY    "CPTEKIOUBYOMEI.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -216,6 +229,11 @@
       *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
+      *
+      *    チェックマスタ病名編集サブ
+           COPY    "CPORCSS012.INC".
+      *
+           COPY    "CPORCSNUM.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -418,8 +436,21 @@
                                        SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC    TO  SYS-1101-REC
-           IF    ( SYS-1101-REIGAICHKKBN   =   1 )
-               MOVE    "1"         TO  SPA-NAI-REIGAICHKKBN
+           MOVE    SYS-1101-REIGAICHKKBN
+                                   TO  SPA-NAI-REIGAICHKKBN
+      *
+           IF    ( SYS-1101-TEKBYOYKZKBN   =   SPACE )
+               MOVE    "0"         TO  SPA-NAI-TEKBYOYKZKBN
+           ELSE
+               MOVE    SYS-1101-TEKBYOYKZKBN
+                                   TO  SPA-NAI-TEKBYOYKZKBN
+           END-IF
+      *
+           IF    ( SYS-1101-TEKBYOSRYKBN   =   SPACE )
+               MOVE    "0"         TO  SPA-NAI-TEKBYOSRYKBN
+           ELSE
+              MOVE    SYS-1101-TEKBYOSRYKBN
+                                   TO  SPA-NAI-TEKBYOSRYKBN
            END-IF
       *
            MOVE    1               TO  SPA-GMN-ERRLST-PAGE
@@ -912,6 +943,7 @@
        31011-CHKLST-CHKSND-SEC         SECTION.
       *
            MOVE    ZERO                TO  IDXL
+           MOVE    ZERO                TO  FLG-GET-TEKBYO
       *
            MOVE    1                   TO  FLG-CHKLST-ROW
       *
@@ -922,6 +954,30 @@
                IF    ( CHKSND-NYUGAIKBN    =   "0" )
                    MOVE    "1"         TO  SPA-NAI-CHKLST-NOCHK
                END-IF
+      *
+               IF    ( CHKSND-GRPCHKKBN        =   SPACE )
+                   EVALUATE    CHKSND-CHKKBN
+                   WHEN    "1"
+                       IF    ( SPA-NAI-TEKBYOYKZKBN    =   "1" )
+                           MOVE    1       TO  FLG-GET-TEKBYO
+                       END-IF
+                   WHEN    "2"
+                       IF    ( SPA-NAI-TEKBYOYKZKBN    =   "1" )
+                           MOVE    1       TO  FLG-GET-TEKBYO
+                       END-IF
+                   END-EVALUATE
+               END-IF
+           ELSE
+               EVALUATE    SPA-NAI-CHKKBN
+               WHEN    "1"
+                   IF    ( SPA-NAI-TEKBYOYKZKBN    =   "1" OR "2" )
+                           MOVE    1       TO  FLG-GET-TEKBYO
+                   END-IF
+               WHEN    "2"
+                   IF    ( SPA-NAI-TEKBYOSRYKBN    =   "1" OR "2" )
+                           MOVE    1       TO  FLG-GET-TEKBYO
+                   END-IF
+               END-EVALUATE
            END-IF
       *
            PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
@@ -957,8 +1013,60 @@
            MOVE    "key2"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+           IF    ( FLG-GET-TEKBYO  =   1 )
+               PERFORM 31011-CHKLST-TEKBYO-SEC
+           END-IF
+      *
            .
        31011-CHKLST-CHKSND-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタコラムリスト編集処理
+      *****************************************************************
+       31011-CHKLST-TEKBYO-SEC         SECTION.
+      *
+           MOVE    SPA-GMN-CHKLST-MAX  TO    IDXL
+      *
+           PERFORM 900-TEKIOUBYOMEI-KEY2-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-TEKIOUBYOMEI  NOT =   ZERO )
+                    OR   ( SPA-GMN-CHKLST-MAX >=   CONST-CHKLST-MAX)
+      *
+               INITIALIZE              SS012-AREA
+      *
+               MOVE    TEKBYO-BYOMEI   TO  SS012-I-BYOMEI
+               CALL    "ORCSS012"      USING
+                                       SS012-AREA
+                                       SPA-AREA
+      *
+               IF    ( SS012-HAISHI    =   ZERO )
+      *
+                   COMPUTE IDXL    =   IDXL    +   1
+                   MOVE    IDXL         TO  SPA-GMN-CHKLST-MAX
+      *
+                   MOVE    SS012-O-BYOMEI
+                                        TO  SPA-GMN-TCHKBYOMEI
+                                                               (IDXL)
+      *
+                   MOVE    "1"          TO  WRK-EDIT-COMPKBN
+                   PERFORM 800-EDIT-COMPKBN-MEI-SEC
+                   MOVE    WRK-EDIT-COMPKBN-MEI
+                                            TO  SPA-GMN-TCOMPKBN
+                                                           (IDXL)
+                   MOVE    "1"              TO  SPA-GMN-TTEKBYOMST
+                                                           (IDXL)
+               END-IF
+      *
+               PERFORM 900-TEKIOUBYOMEI-KEY2-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_tekioubyomei"  TO   MCP-TABLE
+           MOVE    "key2"              TO   MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       31011-CHKLST-TEKBYO-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタコラムリスト編集処理
@@ -1414,14 +1522,18 @@
       *
            MOVE    ZERO                TO  SPA-GMN-CHKLST-SEL
       *
-           PERFORM VARYING IDXL FROM    1  BY  1
-                   UNTIL ( IDXL >   SPA-GMN-CHKLST-MAX )
+           PERFORM VARYING IDXL FROM   1   BY  1
+                   UNTIL ( IDXL >   D04-CHKLST-COUNT )
                     OR   ( SPA-GMN-CHKLST-SEL  >   ZERO )
       *
                IF    ( D04-CHKLST-SELECT (IDXL)    =   "T")
-                   MOVE    IDXL     TO  SPA-GMN-CHKLST-SEL
-                   MOVE    SPA-GMN-TCHKBYOMEI (IDXL)
+                   IF    ( D04-TCOMPKBN  (IDXL)    =   SPACE )
+                       CONTINUE
+                   ELSE
+                       MOVE    IDXL    TO  SPA-GMN-CHKLST-SEL
+                       MOVE    SPA-GMN-TCHKBYOMEI (IDXL)
                                        TO  SPA-GMN-BYOMEI
+                   END-IF
                END-IF
       *
            END-PERFORM
@@ -2251,9 +2363,24 @@
                MOVE    "日／月"        TO  D04-CHKLST-LBLCOMPKBN
            END-EVALUATE
       *
-           MOVE    SPA-GMN-CHKLST-MAX  TO  D04-CHKLST-COUNT
+           MOVE    ZERO                TO  CNT-TEKBYO
+                                           IDXM
+      *
            PERFORM VARYING IDXL FROM    1   BY  1
                    UNTIL ( IDXL >   SPA-GMN-CHKLST-MAX )
+      *
+               COMPUTE IDXM    =   IDXM    +   1
+      *
+               IF    ( SPA-GMN-TTEKBYOMST (IDXL)   =   "1" )
+                   COMPUTE CNT-TEKBYO  =   CNT-TEKBYO  +   1
+                   IF    ( CNT-TEKBYO  =   1 )
+                       MOVE    "―――　以下適応病名マスタより　―――"
+                                       TO  D04-TCHKBYOMEI
+                                                    (IDXM)
+      *
+                       COMPUTE IDXM    =   IDXM    +   1
+                   END-IF
+               END-IF
       *
                EVALUATE    SPA-NAI-CHKKBN
                WHEN    "1"
@@ -2261,38 +2388,40 @@
                WHEN    "6"
                    MOVE    SPA-GMN-TGRPID (IDXL)
                                        TO  D04-TCHKBYOMEI
-                                                  (IDXL)
+                                                  (IDXM)
                    MOVE    SPA-GMN-TCHKBYOMEI (IDXL)
                                        TO  D04-TCHKBYOMEI
-                                                  (IDXL) (3:)
+                                                  (IDXM) (3:)
                    MOVE    SPA-GMN-TCOMPKBN   (IDXL)
-                                       TO  D04-TCOMPKBN     (IDXL)
+                                       TO  D04-TCOMPKBN     (IDXM)
                WHEN    "4"
                WHEN    "5"
                WHEN    "A"
                    MOVE    SPA-GMN-TCHKSRYNAME(IDXL)
                                        TO  D04-TCHKBYOMEI
-                                                  (IDXL)(2:)
+                                                  (IDXM)(2:)
                WHEN    "8"
                WHEN    "9"
                    MOVE    SPA-GMN-TCHKSRYNAME(IDXL)
                                        TO  D04-TCHKBYOMEI
-                                                  (IDXL)(2:)
+                                                  (IDXM)(2:)
                WHEN    "7"
                    MOVE    SPA-GMN-TCHKSRYNAME(IDXL)
                                        TO  D04-TCHKBYOMEI
-                                                  (IDXL)(2:)
+                                                  (IDXM)(2:)
                    MOVE    SPA-GMN-TDAYMONTHKBN   (IDXL)
-                                       TO  D04-TCOMPKBN     (IDXL)
+                                       TO  D04-TCOMPKBN     (IDXM)
                END-EVALUATE
       *
                IF    ( IDXL     =   SPA-GMN-CHKLST-SEL )
-                   MOVE    "T"         TO  D04-CHKLST-SELECT (IDXL)
+                   MOVE    "T"         TO  D04-CHKLST-SELECT (IDXM)
                ELSE
-                   MOVE    "F"         TO  D04-CHKLST-SELECT (IDXL)
+                   MOVE    "F"         TO  D04-CHKLST-SELECT (IDXM)
                END-IF
       *
            END-PERFORM
+      *
+           MOVE    IDXM            TO  D04-CHKLST-COUNT
       *
            PERFORM 500-GMNHEN-STATE-EDIT-SEC
       *
@@ -3285,6 +3414,50 @@
       *
            .
        900-INPUTCD-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ検索処理(KEY2)
+      *****************************************************************
+       900-TEKIOUBYOMEI-KEY2-SEL-SEC   SECTION.
+      *
+           MOVE    ZERO            TO  FLG-TEKIOUBYOMEI
+      *
+           INITIALIZE              TEKIOUBYOMEI-REC
+           MOVE    SPA-NAI-CHKKBN  TO  TEKBYO-CHKKBN
+           MOVE    SPA-GMN-SRYCD   TO  TEKBYO-SRYCD
+           MOVE    TEKIOUBYOMEI-REC    TO  MCPDATA-REC
+           MOVE    "tbl_tekioubyomei"  TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC    =     ZERO )
+               MOVE    MCPDATA-REC TO  TEKIOUBYOMEI-REC
+           ELSE
+               INITIALIZE              TEKIOUBYOMEI-REC
+               MOVE    1           TO  FLG-TEKIOUBYOMEI
+           END-IF
+      *
+           .
+      *
+       900-TEKIOUBYOMEI-KEY2-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ検索処理(KEY2)
+      *****************************************************************
+       900-TEKIOUBYOMEI-KEY2-FET-SEC   SECTION.
+      *
+           MOVE    "tbl_tekioubyomei"  TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC    =     ZERO )
+               MOVE    MCPDATA-REC TO  TEKIOUBYOMEI-REC
+           ELSE
+               INITIALIZE              TEKIOUBYOMEI-REC
+               MOVE    1           TO  FLG-TEKIOUBYOMEI
+           END-IF
+      *
+           .
+      *
+       900-TEKIOUBYOMEI-KEY2-FET-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理

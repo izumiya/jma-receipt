@@ -70,6 +70,8 @@ db	{
 	tbl_chktrd;
 	tbl_chk004;
 	tbl_chk005;
+	tbl_tekioubyomei;
+	tbl_byomei;
 };
 
 /* #include "orcadb.inc" */

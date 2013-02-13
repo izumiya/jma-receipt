@@ -83,6 +83,20 @@ W60	{
 			count	int;
 			item	varchar(20)[5];
 		};
+		CMB_TEKBYOYKZKBN	{
+			TEKBYOYKZKBN	{
+				value	varchar(60);
+			};
+			count	int;
+			item	varchar(60)[5];
+		};
+		CMB_TEKBYOSRYKBN	{
+			TEKBYOSRYKBN	{
+				value	varchar(60);
+			};
+			count	int;
+			item	varchar(60)[5];
+		};
 		CMB_YBKENSAYAKUKBN	{
 			YBKENSAYAKUKBN	{
 				value	varchar(32);
