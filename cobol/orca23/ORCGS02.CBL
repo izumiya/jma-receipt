@@ -1891,7 +1891,7 @@
                    MOVE    "key67"         TO  WRK-PATHNAME
                WHEN    OTHER
                    MOVE    "tbl_syunou"    TO  WRK-TABLE
-                   MOVE    "key68"         TO  WRK-PATHNAME
+                   MOVE    "key85"         TO  WRK-PATHNAME
                END-EVALUATE
            ELSE
                EVALUATE SPA-GMN-MODE

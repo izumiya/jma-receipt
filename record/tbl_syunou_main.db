@@ -1645,3 +1645,17 @@ path	key84 	{
 	};
 };
 
+path	key85 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key85_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			ORDER   BY    SRYYMD,NYUGAIKBN,DENPNUM
+		;
+	};
+};
+
