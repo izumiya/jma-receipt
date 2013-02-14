@@ -71,6 +71,8 @@ db	{
 	tbl_chk004;
 	tbl_chk005;
 	tbl_inputcd;
+	tbl_tekioubyomei;
+	tbl_byomei ;
 };
 
 /* #include "orcadb.inc" */

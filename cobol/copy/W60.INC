@@ -49,6 +49,14 @@
                 04  W60-TENKITEKBYOKBN        PIC X(20).
                 04  W60-TENKITEKBYOKBN-COUNT  PIC S9(9)   BINARY.
                 04  W60-TENKITEKBYOKBN-ITEM   PIC X(20)   OCCURS  5.
+              03  W60-CMB-TEKBYOYKZKBN.
+                04  W60-TEKBYOYKZKBN        PIC X(60).
+                04  W60-TEKBYOYKZKBN-COUNT  PIC S9(9)   BINARY.
+                04  W60-TEKBYOYKZKBN-ITEM   PIC X(60)   OCCURS  5.
+              03  W60-CMB-TEKBYOSRYKBN.
+                04  W60-TEKBYOSRYKBN        PIC X(60).
+                04  W60-TEKBYOSRYKBN-COUNT  PIC S9(9)   BINARY.
+                04  W60-TEKBYOSRYKBN-ITEM   PIC X(60)   OCCURS  5.
               03  W60-CMB-YBKENSAYAKUKBN.
                 04  W60-YBKENSAYAKUKBN        PIC X(32).
                 04  W60-YBKENSAYAKUKBN-COUNT  PIC S9(9)   BINARY.

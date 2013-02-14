@@ -76,6 +76,14 @@
                    07  SPA-GMN-TENKITEKBYOKBN  PIC X(01).
                    07  SPA-GMN-TENKITEKBYOKBNFL  PIC X(01).
                    07  SPA-GMN-TENKITEKBYOKBNMEI PIC X(18).
+               05  SPA-GMN-TEKBYOYKZKBN-G.
+                   07  SPA-GMN-TEKBYOYKZKBN    PIC X(01).
+                   07  SPA-GMN-TEKBYOYKZKBNFL  PIC X(01).
+                   07  SPA-GMN-TEKBYOYKZKBNMEI PIC X(58).
+               05  SPA-GMN-TEKBYOSRYKBN-G.
+                   07  SPA-GMN-TEKBYOSRYKBN    PIC X(01).
+                   07  SPA-GMN-TEKBYOSRYKBNFL  PIC X(01).
+                   07  SPA-GMN-TEKBYOSRYKBNMEI PIC X(58).
                05  SPA-GMN-YBKENSAYAKUKBN-G.
                    07  SPA-GMN-YBKENSAYAKUKBN  PIC X(01).
                    07  SPA-GMN-YBKENSAYAKUKBNFL PIC X(01).
@@ -150,6 +158,18 @@
                        09  SPA-GMN-TENKITEKBYOKBNL PIC X(01).
                        09  SPA-GMN-TENKITEKBYOKBNFLL PIC X(01).
                        09  SPA-GMN-TENKITEKBYOKBNMEIL PIC X(18).
+               05  SPA-GMN-TEKBYOYKZKBNLST-G.
+                   07  SPA-GMN-TEKBYOYKZKBN-MAX  PIC 9(03).
+                   07  SPA-GMN-TEKBYOYKZKBNLST   OCCURS   3.
+                       09  SPA-GMN-TEKBYOYKZKBNL PIC X(01).
+                       09  SPA-GMN-TEKBYOYKZKBNFLL PIC X(01).
+                       09  SPA-GMN-TEKBYOYKZKBNMEIL PIC X(58).
+               05  SPA-GMN-TEKBYOSRYKBNLST-G.
+                   07  SPA-GMN-TEKBYOSRYKBN-MAX  PIC 9(03).
+                   07  SPA-GMN-TEKBYOSRYKBNLST   OCCURS   3.
+                       09  SPA-GMN-TEKBYOSRYKBNL PIC X(01).
+                       09  SPA-GMN-TEKBYOSRYKBNFLL PIC X(01).
+                       09  SPA-GMN-TEKBYOSRYKBNMEIL PIC X(58).
                05  SPA-GMN-YBKENSAYAKUKBNLST-G.
                    07  SPA-GMN-YBKENSAYAKUKBN-MAX  PIC 9(03).
                    07  SPA-GMN-YBKENSAYAKUKBNLST   OCCURS   2.
@@ -496,6 +516,24 @@
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-TENKITEKBYOKBN-G
            END-IF
       *
+           MOVE    SPA-GMN-TEKBYOYKZKBN TO  WRK-CMB-CD
+           PERFORM 4200-TEKBYOYKZKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-TEKBYOYKZKBNLST (1)
+                                       TO  SPA-GMN-TEKBYOYKZKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-TEKBYOYKZKBN-G
+           END-IF
+      *
+           MOVE    SPA-GMN-TEKBYOSRYKBN TO  WRK-CMB-CD
+           PERFORM 4200-TEKBYOSRYKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-TEKBYOSRYKBNLST (1)
+                                       TO  SPA-GMN-TEKBYOSRYKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-TEKBYOSRYKBN-G
+           END-IF
+      *
            MOVE    SPA-GMN-YBKENSAYAKUKBN TO  WRK-CMB-CD
            PERFORM 4200-YBKENSAYAKUKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     =   SPACE )
@@ -657,6 +695,10 @@
                                        TO  SPA-GMN-YBKENSAYAKUKBN
                MOVE    SYS-1101-TENKITEKBYOKBN
                                        TO  SPA-GMN-TENKITEKBYOKBN
+               MOVE    SYS-1101-TEKBYOYKZKBN
+                                       TO  SPA-GMN-TEKBYOYKZKBN
+               MOVE    SYS-1101-TEKBYOSRYKBN
+                                       TO  SPA-GMN-TEKBYOSRYKBN
                IF    ( SYS-1101-SYA-INGAITEN   IS  NUMERIC )
                    MOVE    SYS-1101-SYA-INGAITEN
                                        TO  SPA-GMN-SYA-INGAITEN
@@ -749,6 +791,12 @@
       *
       *    過月転帰済適応病名コンボ設定処理
            PERFORM 3101-TENKITEKBYOKBNLST-SEC
+      *
+      *    適応病名マスタ使用（薬剤と病名）コンボ設定処理
+           PERFORM 3101-TEKBYOYKZKBNLST-SEC
+      *
+      *    適応病名マスタ使用（診療行為と病名）コンボ設定処理
+           PERFORM 3101-TEKBYOSRYKBNLST-SEC
       *
       *    検査薬剤対象コンボ設定処理
            PERFORM 3101-YBKENSAYAKUKBNLST-SEC
@@ -893,6 +941,60 @@
       *
            . 
        3101-TENKITEKBYOKBNLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ使用（薬剤と病名）コンボ設定処理
+      *****************************************************************
+       3101-TEKBYOYKZKBNLST-SEC      SECTION.
+      *
+           INITIALIZE                  SPA-GMN-TEKBYOYKZKBNLST-G
+      *
+           MOVE    3               TO  SPA-GMN-TEKBYOYKZKBN-MAX
+      *
+           MOVE    "0"             TO  SPA-GMN-TEKBYOYKZKBNL    (1)
+           MOVE    "行わない"
+                                   TO  SPA-GMN-TEKBYOYKZKBNMEIL (1)
+      *
+           MOVE    "1"             TO  SPA-GMN-TEKBYOYKZKBNL    (2)
+           MOVE    "行う"
+                                   TO  SPA-GMN-TEKBYOYKZKBNMEIL (2)
+      *
+           MOVE    "2"             TO  SPA-GMN-TEKBYOYKZKBNL    (3)
+           MOVE    "チェックマスタに未登録の薬剤のみ行う"
+                                   TO  SPA-GMN-TEKBYOYKZKBNMEIL (3)
+      *
+           MOVE    SPA-GMN-TEKBYOYKZKBNLST  (1)
+                                   TO  SPA-GMN-TEKBYOYKZKBN-G
+      *
+           . 
+       3101-TEKBYOYKZKBNLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ使用（薬剤と病名）コンボ設定処理
+      *****************************************************************
+       3101-TEKBYOSRYKBNLST-SEC      SECTION.
+      *
+           INITIALIZE                  SPA-GMN-TEKBYOSRYKBNLST-G
+      *
+           MOVE    3               TO  SPA-GMN-TEKBYOSRYKBN-MAX
+      *
+           MOVE    "0"             TO  SPA-GMN-TEKBYOSRYKBNL    (1)
+           MOVE    "行わない"
+                                   TO  SPA-GMN-TEKBYOSRYKBNMEIL (1)
+      *
+           MOVE    "1"             TO  SPA-GMN-TEKBYOSRYKBNL    (2)
+           MOVE    "行う"
+                                   TO  SPA-GMN-TEKBYOSRYKBNMEIL (2)
+      *
+           MOVE    "2"             TO  SPA-GMN-TEKBYOSRYKBNL    (3)
+           MOVE    "チェックマスタに未登録の診療行為のみ行う"
+                                   TO  SPA-GMN-TEKBYOSRYKBNMEIL (3)
+      *
+           MOVE    SPA-GMN-TEKBYOSRYKBNLST  (1)
+                                   TO  SPA-GMN-TEKBYOSRYKBN-G
+      *
+           . 
+       3101-TEKBYOSRYKBNLST-EXT.
            EXIT.
       *****************************************************************
       *    検査薬剤対象コンボ設定処理
@@ -1228,6 +1330,8 @@
            MOVE    W60-UTAGAIKKN       TO  SPA-GMN-UTAGAIKKN
            MOVE    W60-KYUSEIKKNKBN    TO  SPA-GMN-KYUSEIKKNKBN-G
            MOVE    W60-TENKITEKBYOKBN  TO  SPA-GMN-TENKITEKBYOKBN-G
+           MOVE    W60-TEKBYOYKZKBN    TO  SPA-GMN-TEKBYOYKZKBN-G
+           MOVE    W60-TEKBYOSRYKBN    TO  SPA-GMN-TEKBYOSRYKBN-G
            MOVE    W60-YBKENSAYAKUKBN  TO  SPA-GMN-YBKENSAYAKUKBN-G
            MOVE    W60-YBUTAGAIKBN     TO  SPA-GMN-YBUTAGAIKBN-G
            MOVE    W60-SRYHEIWRNKBN    TO  SPA-GMN-SRYHEIWRNKBN-G
@@ -1274,6 +1378,14 @@
       *
            IF    ( SPA-ERRCD   =   SPACE )
                PERFORM 4101-TENKITEKBYOKBN-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-TEKBYOYKZKBN-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-TEKBYOSRYKBN-CHK-SEC
            END-IF
       *
            IF    ( SPA-ERRCD   =   SPACE )
@@ -1418,6 +1530,42 @@
            .
       *
        4101-TENKITEKBYOKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ使用（薬剤と病名）区分チェック処理
+      *****************************************************************
+       4101-TEKBYOYKZKBN-CHK-SEC     SECTION.
+      *
+           MOVE    SPA-GMN-TEKBYOYKZKBN TO  WRK-CMB-CD
+           PERFORM 4200-TEKBYOYKZKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-TEKBYOYKZKBNLST (1)
+                                   TO  SPA-GMN-TEKBYOYKZKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-TEKBYOYKZKBN-G
+           END-IF
+      *
+           .
+      *
+       4101-TEKBYOYKZKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ使用（診療行為と病名）区分チェック処理
+      *****************************************************************
+       4101-TEKBYOSRYKBN-CHK-SEC     SECTION.
+      *
+           MOVE    SPA-GMN-TEKBYOSRYKBN TO  WRK-CMB-CD
+           PERFORM 4200-TEKBYOSRYKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-TEKBYOSRYKBNLST (1)
+                                   TO  SPA-GMN-TEKBYOSRYKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-TEKBYOSRYKBN-G
+           END-IF
+      *
+           .
+      *
+       4101-TEKBYOSRYKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    検査薬剤対象区分チェック処理
@@ -1682,6 +1830,54 @@
       *
            .
        4200-TENKITEKBYOKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ使用（薬剤と病名）区分コンボチェック処理
+      *****************************************************************
+       4200-TEKBYOYKZKBNLST-CHK-SEC     SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB     >   SPA-GMN-TEKBYOYKZKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-TEKBYOYKZKBNL (IDX-CMB)
+                                   =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-TEKBYOYKZKBNLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-TEKBYOYKZKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    適応病名マスタ使用（診療行為と病名）区分コンボチェック処理
+      *****************************************************************
+       4200-TEKBYOSRYKBNLST-CHK-SEC     SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB     >   SPA-GMN-TEKBYOSRYKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-TEKBYOSRYKBNL (IDX-CMB)
+                                   =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-TEKBYOSRYKBNLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-TEKBYOSRYKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    検査薬剤対象区分コンボチェック処理
@@ -2097,6 +2293,12 @@
            MOVE    SPA-GMN-TENKITEKBYOKBN
                                        TO   SYS-1101-TENKITEKBYOKBN
       *
+           MOVE    SPA-GMN-TEKBYOYKZKBN
+                                       TO   SYS-1101-TEKBYOYKZKBN
+      *
+           MOVE    SPA-GMN-TEKBYOSRYKBN
+                                       TO   SYS-1101-TEKBYOSRYKBN
+      *
            MOVE    SPA-GMN-YBKENSAYAKUKBN  TO   SYS-1101-YBKENSAYAKUKBN
       *
            MOVE    SPA-GMN-YBUTAGAIKBN TO   SYS-1101-YBUTAGAIKBN
@@ -2347,6 +2549,30 @@
       *
            END-PERFORM
       *
+           MOVE    SPA-GMN-TEKBYOYKZKBN-G   TO  W60-TEKBYOYKZKBN
+      *
+           MOVE    SPA-GMN-TEKBYOYKZKBN-MAX
+                                       TO  W60-TEKBYOYKZKBN-COUNT
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0        >   SPA-GMN-TEKBYOYKZKBN-MAX )
+      *
+               MOVE    SPA-GMN-TEKBYOYKZKBNLST (IDX0)
+                                       TO  W60-TEKBYOYKZKBN-ITEM(IDX0)
+      *
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-TEKBYOSRYKBN-G   TO  W60-TEKBYOSRYKBN
+      *
+           MOVE    SPA-GMN-TEKBYOSRYKBN-MAX
+                                       TO  W60-TEKBYOSRYKBN-COUNT
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0        >   SPA-GMN-TEKBYOSRYKBN-MAX )
+      *
+               MOVE    SPA-GMN-TEKBYOSRYKBNLST (IDX0)
+                                       TO  W60-TEKBYOSRYKBN-ITEM(IDX0)
+      *
+           END-PERFORM
+      *
            MOVE    SPA-GMN-YBKENSAYAKUKBN-G   TO  W60-YBKENSAYAKUKBN
       *
            MOVE    SPA-GMN-YBKENSAYAKUKBN-MAX
@@ -2545,6 +2771,10 @@
                MOVE    "JIH_INGAITEN"  TO MCP-WIDGET
            WHEN    026
                MOVE    "ERRA10001KBN"  TO MCP-WIDGET
+           WHEN    027
+               MOVE    "TEKBYOYKZKBN" TO MCP-WIDGET
+           WHEN    028
+               MOVE    "TEKBYOSRYKBN" TO MCP-WIDGET
            WHEN    212
                MOVE    "B12"           TO  MCP-WIDGET
            END-EVALUATE
@@ -2580,6 +2810,10 @@
            WHEN    "CHKMTRX05"
                MOVE    13              TO  SPA-GMN-CUR
            WHEN    "TENKITEKBYOKBN"
+               MOVE    27              TO  SPA-GMN-CUR
+           WHEN    "TEKBYOYKZKBN"
+               MOVE    28              TO  SPA-GMN-CUR
+           WHEN    "TEKBYOSRYKBN"
                MOVE    12              TO  SPA-GMN-CUR
            WHEN    "YBKENSAYAKUKBN"
                MOVE    10              TO  SPA-GMN-CUR
