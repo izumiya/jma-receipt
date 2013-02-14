@@ -703,7 +703,8 @@
            MOVE    "1"                 TO  QREN-SS-OPTION
            MOVE    "2"                 TO  QREN-SM-OPTION
            MOVE    "12"                TO  QREN-SV-OPTION
-           MOVE    "1"                 TO  QREN-SK-OPTION
+      **** MOVE    "1"                 TO  QREN-SK-OPTION
+           MOVE    "0"                 TO  QREN-SK-OPTION
            MOVE    "1"                 TO  QREN-LC-OPTION
       *
            CALL    "orcqrencode"       USING   ORCSQRENCODEAREA
