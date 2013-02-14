@@ -292,6 +292,9 @@ class Receden_check < Receden_common
 
         if re["BIRTHDAY"].wtos != ""
           myApril="#{re["SRYYM"].wtos[0,4]}0401"
+          if re["SRYYM"].wtos[4,2].to_i <= 3
+            myApril=(myApril.to_i - 10000).to_s
+		  end
           if rece.sbt.honkzk == ROKUSAI
             if re["BIRTHDAY"].wtos.to_i <= myApril.to_i - 60000
               @errors.push("31290",rece,re,"BIRTHDAY")
