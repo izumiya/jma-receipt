@@ -36,6 +36,8 @@
       *                                     外も対象
       *                                     補足チェック対応
       *                                     同義語変換対応
+      *  04.06.02    NACL-藤原    13/02/13  自院病名の廃止病名のチェック
+      *                                     条件修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -90,6 +92,7 @@
       *
        01  INDEX-AREA.
            03  IDX                 PIC 9(02).
+           03  IDY                 PIC 9(02).
       *
       *    パラメタ領域
        01  WRK-PARA.
@@ -1260,10 +1263,24 @@
                END-IF
              ELSE     
       *        廃止年月日が設定されているとき
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >       21
+                       OR      USBYO-BYOMEICD (IDY)
+                                           =   SPACE   OR  ALL "9"
+                   IF      USBYO-BYOMEICD (IDY) (1:1)
+                                               NOT =   "Z"
+                       MOVE    USBYO-BYOMEICD (IDY)
+                                                   TO  USBYO-KHNBYOMEICD
+                       MOVE    21                  TO  IDY
+                   END-IF
+               END-PERFORM         
                MOVE    USBYO-KHNBYOMEICD   TO  BYO-BYOMEICD
                PERFORM 900-BYOMEI-READ-SEC
                MOVE    BYOMEI-REC          TO  WRK-BYOMEI-REC
-               IF      WRK-BYO-HAISIYMD    NOT =   SPACE
+      *********IF      WRK-BYO-HAISIYMD    NOT =   SPACE
+               IF      WRK-BYO-HAISIYMD        =   SPACE   OR  ALL "9"
+                   CONTINUE
+               ELSE
                    IF      WRK-BYO-IKOSAKICD   =   SPACE
                        MOVE    3                   TO  FLG-ERR
       *                推奨病名チェック
