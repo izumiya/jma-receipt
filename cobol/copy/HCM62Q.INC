@@ -6,4 +6,4 @@
             02  HCM62Q-SEN
                         PIC X(54)       OCCURS 5 TIMES.
             02  HCM62Q-IMAGE-1
-                        PIC X(1024)     OCCURS 15 TIMES.
+                        PIC X(1024)     OCCURS 12 TIMES.
