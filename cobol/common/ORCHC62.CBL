@@ -1233,7 +1233,8 @@
                                        ORCSQRCSV62AREA
       *
       *    £Ñ£Ò¥¤¥á¡¼¥¸°õºþ
-           IF      ORCSQRCSV62-RET-COUNT   >   ZERO
+           IF     (ORCSQRCSV62-RET-COUNT   >   ZERO)
+             AND  (ORCSQRCSV62-RET-COUNT   <=  12  )
                PERFORM 5003-QRIMAGE-HEN-SEC
            END-IF
            .
@@ -1258,7 +1259,7 @@
       *
            MOVE    ZERO                TO  WRK-FILE-CNT
            PERFORM VARYING     IDQ     FROM    1  BY  1
-                   UNTIL       IDQ     >   15
+                   UNTIL       IDQ     >   12
                MOVE    KUHAKU-FILE-NAME    TO  HCM62Q-IMAGE-1 (IDQ)
                ADD     1                   TO  WRK-FILE-CNT
                IF      WRK-FILE-CNT        <=  ORCSQRCSV62-RET-COUNT 
