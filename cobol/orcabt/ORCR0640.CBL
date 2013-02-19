@@ -578,6 +578,7 @@
       *  04.05.85    NACL-ÌçÏÆ    12/12/10  £·£µºÐÅþÃ£·î¤ÎÆÃÎãÈó³ºÅöÂÐ±þ
       *  04.05.86    NACL-ÌçÏÆ    13/01/25  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.05.87    NACL-ÌçÏÆ    13/02/08  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
+      *  04.05.88    NACL-ÌçÏÆ    13/02/18  Åçº¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-Æ£¸¶    10/06/23  ¥ì¥»ÅÅÀÁµá»þ¤Î¼õÉÕ¥¨¥é¡¼Ê¬¤Î
       *                                     ¼ïÊÌÉÔÌÀ¥ì¥»ÂÐ±þ
@@ -4166,6 +4167,10 @@
                   OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE62-KOHNUM(KOHFTN-IDX) =  "493"  ) AND
                       (RECE62-SRYYM         >=  "201107"   ))
+                  OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
+                      (RECE62-KOHNUM(KOHFTN-IDX) =
+                                           "625" OR "627"  ) AND
+                      (RECE62-SRYYM         >=  "201302"   ))
                     MOVE "1" TO
                           RECE62-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
                   END-IF
@@ -5340,6 +5345,10 @@
               OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
                   (RECE62-KOHNUM(KOHFTN-IDX) =  "493"  ) AND
                   (RECE62-SRYYM          <  "201107"   ))
+              OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
+                  (RECE62-KOHNUM(KOHFTN-IDX) =
+                                       "625" OR "627"  ) AND
+                  (RECE62-SRYYM          <  "201302"   ))
                 MOVE  SPACE TO RECE62-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
               END-IF
              WHEN     "35"
