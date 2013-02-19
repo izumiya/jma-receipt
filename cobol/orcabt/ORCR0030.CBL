@@ -596,6 +596,7 @@
       *  04.05.74    NACL-ÌçÏÆ    12/12/10  £·£µºÐÅþÃ£·î¤ÎÆÃÎãÈó³ºÅöÂÐ±þ
       *  04.05.75    NACL-ÌçÏÆ    13/01/25  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.05.76    NACL-ÌçÏÆ    13/02/08  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
+      *  04.05.77    NACL-ÌçÏÆ    13/02/18  Åçº¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -17207,6 +17208,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   OR ((RECE02-KOHNUM(KOHFTN-IDX)           = "790") AND
                       (RECE02-SRYYM                   >=  "201107") AND
                       (RECE02-TEISYUTUSAKI             =   2 OR 6 ))
+                  OR ((RECE02-KOHNUM(KOHFTN-IDX)  = "625" OR "627") AND
+                      (RECE02-SRYYM                   >=  "201302") AND
+                      (RECE02-TEISYUTUSAKI             =   2 OR 6 ))
                     IF   RECE02-FTNMONEY(KOHFTN-IDX + 1) NOT = ZERO
                       MOVE  ZERO  TO  RECE02-FTNMONEY(KOHFTN-IDX + 1)
                       MOVE  SPACE TO
@@ -17592,23 +17596,27 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
               IF ((RECE02-TEISYOTOKU2(KOHFTN-IDX)  NOT =   SPACE  ) AND
                   (RECE02-SRYYM                       >=  "200708") AND
                   (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "001"   ) AND
-                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ) AND
-                  (RECE02-FTNMONEY(KOHFTN-IDX + 1)     <   4000   ))
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ))
               OR ((RECE02-TEISYOTOKU2(KOHFTN-IDX)  NOT =   SPACE  ) AND
                   (RECE02-SRYYM                       >=  "200904") AND
                   (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "005"   ) AND
-                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ) AND
-                  (RECE02-FTNMONEY(KOHFTN-IDX + 1)     <   4000   ))
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ))
               OR ((RECE02-TEISYOTOKU2(KOHFTN-IDX)  NOT =   SPACE  ) AND
                   (RECE02-SRYYM                       >=  "200912") AND
                   (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "002"   ) AND
-                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ) AND
-                  (RECE02-FTNMONEY(KOHFTN-IDX + 1)     <   4000   ))
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ))
               OR ((RECE02-TEISYOTOKU2(KOHFTN-IDX)      =   SPACE  ) AND
                   (RECE02-SRYYM                       >=  "200912") AND
                   (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "002"   ) AND
-                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <  12000   ) AND
-                  (RECE02-FTNMONEY(KOHFTN-IDX + 1)     <  12000   ))
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <  12000   ))
+              OR ((RECE02-TEISYOTOKU2(KOHFTN-IDX)  NOT =   SPACE  ) AND
+                  (RECE02-SRYYM                       >=  "201302") AND
+                  (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "003"   ) AND
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <   4000   ))
+              OR ((RECE02-TEISYOTOKU2(KOHFTN-IDX)      =   SPACE  ) AND
+                  (RECE02-SRYYM                       >=  "201302") AND
+                  (RECE02-KOHFTNJANUM(KOHFTN-IDX)(5:3) =  "003"   ) AND
+                  (RECE02-TOTALTEN(KOHFTN-IDX + 1)     <  12000   ))
                 IF  RECE02-ZAITAKU =  "1"
                    CONTINUE
                 ELSE

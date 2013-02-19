@@ -585,6 +585,7 @@
       *  04.05.85    NACL-ÌçÏÆ    12/12/10  £·£µºÐÅþÃ£·î¤ÎÆÃÎãÈó³ºÅöÂÐ±þ
       *  04.05.86    NACL-ÌçÏÆ    13/01/25  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.05.87    NACL-ÌçÏÆ    13/02/08  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
+      *  04.05.88    NACL-ÌçÏÆ    13/02/18  Åçº¬¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -18187,6 +18188,9 @@
                       (RECE62-TEISYUTUSAKI             =   2 OR 6 ))
                   OR ((RECE62-KOHNUM(KOHFTN-IDX)           = "790") AND
                       (RECE62-SRYYM                   >=  "201107") AND
+                      (RECE62-TEISYUTUSAKI             =   2 OR 6 ))
+                  OR ((RECE62-KOHNUM(KOHFTN-IDX)  = "625" OR "627") AND
+                      (RECE62-SRYYM                   >=  "201302") AND
                       (RECE62-TEISYUTUSAKI             =   2 OR 6 ))
                     IF   RECE62-FTNMONEY(KOHFTN-IDX + 1) NOT = ZERO
                       MOVE  ZERO  TO  RECE62-FTNMONEY(KOHFTN-IDX + 1)
