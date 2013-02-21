@@ -1,0 +1,52 @@
+W00	{
+	fixed1	{
+		KBN	{
+			value	varchar(24);
+		};
+		NAME	{
+			value	varchar(100);
+		};
+		HOSPKBNCOMBO	{
+			HOSPKBN	{
+				value	varchar(10);
+			};
+			count	int;
+			item	varchar(10)[2];
+		};
+		LIST	{
+			state	int;
+			style	varchar(20);
+			trow	int;
+			trowattr	int;
+			tcolumn	int;
+			tvalue	varchar(256);
+			rowdata {
+				BANGO {
+					celldata	varchar(6);
+					fgcolor	varchar(20);
+					bgcolor	varchar(20);
+				};
+				MEISYO {
+					celldata	varchar(30);
+					fgcolor	varchar(20);
+					bgcolor	varchar(20);
+				};
+				ATAI {
+					celldata	varchar(40);
+					fgcolor	varchar(20);
+					bgcolor	varchar(20);
+				};
+				YUKOSTYMD {
+					celldata	varchar(9);
+					fgcolor	varchar(20);
+					bgcolor	varchar(20);
+				};
+				YUKOEDYMD {
+					celldata	varchar(9);
+					fgcolor	varchar(20);
+					bgcolor	varchar(20);
+				};
+			}[31];
+		};
+	};
+};

@@ -553,6 +553,7 @@
            COPY    "WERR.INC".
            COPY    "WID1.INC".
            COPY    "WID2.INC".
+           COPY    "W00.INC".
       *
        PROCEDURE                                 DIVISION    USING
                                                  MCPAREA
@@ -865,6 +866,9 @@
       *        前回ＣＤ
                WHEN    "CLICKED"       ALSO    "B03"
                    PERFORM 403-ZENKAICD-SEC
+      *        テスト
+               WHEN    "CLICKED"       ALSO    "B11"
+                   PERFORM 404-W00-SEC
       *        確定
                WHEN    "CLICKED"       ALSO    "B12"
                    PERFORM  410-KAKUTEI-SEC
@@ -2014,6 +2018,28 @@
       *
            .
        403-ZENKAICD-EXT.
+           EXIT.
+      *****************************************************************
+      *    W00
+      *****************************************************************
+       404-W00-SEC           SECTION.
+      *
+           MOVE    SPA-GMN-KANRICD     TO  SPA-W01-MAE-KANRICD
+           MOVE    SPA-W01-KBNCD       TO  SPA-W01-MAE-KBNCD
+      *
+           MOVE    SPA-W01KYOUTU       TO  SPA-WORK
+      *
+           MOVE    "W00"               TO  SPA-SAKIPG
+           MOVE    "W01"               TO  SPA-MOTOPG
+      *
+           MOVE   "CHANGE"             TO  MCP-PUTTYPE
+           MOVE   SPA-SAKIPG           TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+           .
+       404-W00-EXT.
            EXIT.
       *****************************************************************
       *    確定
