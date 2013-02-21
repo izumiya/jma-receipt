@@ -1166,7 +1166,7 @@
            MOVE    SPA-WORK        TO  SPA-P02KYOUTU
       *
            IF      SPA-P02T-MAX        >   ZERO
-               MOVE    "SELNUM"            TO  MCP-WIDGET
+               MOVE    "B01"               TO  MCP-WIDGET
                MOVE    "P02T"              TO  SPA-SAKIPG
                MOVE    "P02"               TO  SPA-MOTOPG
       *
