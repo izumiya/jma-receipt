@@ -475,6 +475,7 @@ RECORD_files = \
 	appointlst2v2.rec \
 	acsimulatev2.rec \
 	W36.rec \
+	W00.rec \
 
 DEF_files = \
 
