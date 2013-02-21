@@ -135,7 +135,7 @@ grpsys     COPY    "COMMON-SPA".
       *
            IF      SPA-CLIENT-PRT-FLG  =   1
                MOVE  2                 TO  SPA-CLIENT-TEMP-FLG
-               CALL   "ORCSMKPRT1"     USING
+               CALL   "ORCSMKPRTSITE1"     USING
                                        ORCSMKPRTAREA
                                        SPA-AREA
                EXIT    PROGRAM
