@@ -764,6 +764,7 @@
            03  FLG-HOKENICHIBU4                        PIC 9(01).
            03  FLG-HOKENICHIBU5                        PIC 9(01).
            03  FLG-HOKENICHIBU6                        PIC 9(01).
+           03  FLG-HOKENICHIBU7                        PIC 9(01).
            03  FLG-HOKENICHIBU-CHK                     PIC 9(01).
            03  FLG-HOUSEI-COM                          PIC 9(01).
            03  FLG-HOUMON-COM                          PIC 9(01).
@@ -15229,6 +15230,7 @@
            MOVE    ZERO                 TO      FLG-HOKENICHIBU4
            MOVE    ZERO                 TO      FLG-HOKENICHIBU5
            MOVE    ZERO                 TO      FLG-HOKENICHIBU6
+           MOVE    ZERO                 TO      FLG-HOKENICHIBU7
       *
            MOVE    ZERO                 TO      FLG-JIRITU-CYUKANSOU1
            MOVE    ZERO                 TO      FLG-JIRITU-CYUKANSOU2
@@ -16410,6 +16412,8 @@
                    OR  ( SYU-KOH-HKNNUM(4)(1:1)    = "0"   )
                    OR  ( TBL-TOKATUKAIFLG2         =  1    )
       *
+                      MOVE         1    TO   FLG-HOKENICHIBU7
+      *
                       IF  (SYU-KOH-HKNNUM(1)(1:1) >= "1" AND <= "8")
                         IF  TBL-TOKATUKAIFLG2  =  1
                            CONTINUE
@@ -16691,6 +16695,8 @@
                    OR  ( SYU-KOH-HKNNUM(3)(1:1)    = "0" )
                    OR  ( SYU-KOH-HKNNUM(4)(1:1)    = "0" )
                    OR  ( TBL-TOKATUKAIFLG2         =  1  )
+      *
+                     MOVE          1    TO   FLG-HOKENICHIBU7
       *
                      IF  (SYU-KOH-HKNNUM(1)(1:1) >= "1" AND <= "8")
                        IF  TBL-TOKATUKAIFLG2  =  1
@@ -21370,14 +21376,30 @@
              AND (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
                    (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
-             AND ((RECE62-KOHNUM(2)       = SPACE           )  OR
-                  (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"  ))
+             AND (RECE62-KOHNUM(2)       = SPACE             )
              AND (RECE62-KOHNUM(3)       = SPACE             )
              AND (RECE62-KOHNUM(4)       = SPACE             )
              AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
              AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
              AND ((FLG-HOKENICHIBU2  NOT = ZERO             )  OR
                   (FLG-HOKENICHIBU3  NOT = ZERO             ))
+                 MOVE     ZERO    TO   FLG-CHIIKI
+                 PERFORM  210466-HOKEN-ICHIBUFTN-CHK-SEC
+             END-IF
+      *@@@
+             IF  (RECE62-KOUREI          = "1"               )
+             AND (RECE62-KYURATE     NOT = 30                )
+             AND (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
+                   (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
+                  ( TBL-TOKATUKAIFLG(1)   =  1              ))
+             AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+             AND (RECE62-KOHNUM(3)       = SPACE             )
+             AND (RECE62-KOHNUM(4)       = SPACE             )
+             AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
+             AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+             AND (FLG-HOKENICHIBU2   NOT = ZERO              )
+             AND (FLG-HOKENICHIBU3       = ZERO              )
+             AND (FLG-HOKENICHIBU-SYU    =  1                )
                  MOVE     ZERO    TO   FLG-CHIIKI
                  PERFORM  210466-HOKEN-ICHIBUFTN-CHK-SEC
              END-IF
@@ -21408,14 +21430,31 @@
              AND (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
                    (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
-             AND ((RECE62-KOHNUM(2)       = SPACE           )  OR
-                  (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"  ))
+             AND (RECE62-KOHNUM(2)       = SPACE             )
              AND (RECE62-KOHNUM(3)       = SPACE             )
              AND (RECE62-KOHNUM(4)       = SPACE             )
              AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
              AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
              AND ((FLG-HOKENICHIBU2  NOT = ZERO             )  OR
                   (FLG-HOKENICHIBU3  NOT = ZERO             ))
+                 MOVE     ZERO    TO   FLG-CHIIKI
+                 PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
+             END-IF
+      *@@@
+             IF  (((RECE62-KOUREI        = "1"             ) AND
+                   (RECE62-KYURATE       = 30              ))  OR
+                  ( RECE62-KOUREI        = "2"              ))
+             AND (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
+                   (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
+                  ( TBL-TOKATUKAIFLG(1)   =  1              ))
+             AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+             AND (RECE62-KOHNUM(3)       = SPACE             )
+             AND (RECE62-KOHNUM(4)       = SPACE             )
+             AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
+             AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+             AND (FLG-HOKENICHIBU2   NOT = ZERO              )
+             AND (FLG-HOKENICHIBU3       = ZERO              )
+             AND (FLG-HOKENICHIBU-SYU    =  1                )
                  MOVE     ZERO    TO   FLG-CHIIKI
                  PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
              END-IF
@@ -21461,6 +21500,24 @@
                                              -  WRK-CHK-KOKIGAK10
                END-IF
              END-IF
+      *
+             IF  (RECE62-KOUREI          = "2"               )
+             AND (RECE62-KOHNUM(1)       = "015"  OR  "016"  )
+             AND (TBL-HKNFTNDATA-JGNXXX(1)
+                                         = 9999999 OR 999999 )
+             AND (RECE62-KOHNUM(2)       = SPACE             )
+             AND (RECE62-KOHNUM(3)       = SPACE             )
+             AND (RECE62-KOHNUM(4)       = SPACE             )
+             AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
+             AND (RECE62-TOTALTEN(1) NOT = RECE62-TOTALTEN(2))
+             AND (FLG-HOKENICHIBU2       = ZERO              )
+             AND (FLG-HOKENICHIBU3       = ZERO              )
+             AND (FLG-HOKENICHIBU7       =  1                )
+             AND (FLG-HOKENICHIBU-SYU    =  1                )
+                 MOVE     ZERO    TO   FLG-CHIIKI
+                 PERFORM  210467-HOKEN-ICHIBUFTN-CHK2-SEC
+             END-IF
+      *
             END-IF
       *
             IF  FLG-ZENKOKUKOHI-NISYU4  =  1
