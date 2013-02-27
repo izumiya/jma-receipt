@@ -257,6 +257,8 @@
       *
            03  FLG-COPY                PIC 9(01).
            03  FLG-COPYOK              PIC 9(01).
+      *    悪性区分前
+           03  FLG-MAE-AKUSEI          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -5678,6 +5680,8 @@
       *****************************************************************
        510-TBLHEN-SEC           SECTION.
       *
+           MOVE    SPA-AKUSEI-FLG      TO  FLG-MAE-AKUSEI
+      *
            MOVE    SPA-K01KYOUTU       TO  SPA-WORK
            INITIALIZE                  ORCSC100AREA
            MOVE    "1"                 TO  ORCSC100-KBN
@@ -5691,6 +5695,12 @@
                                        SPA-K02
                                        SPA-SCR-REC
            MOVE    SPA-WORK            TO  SPA-K01KYOUTU
+      *
+      *    悪性検査一覧選択後のエラー
+           IF     (FLG-MAE-AKUSEI      =   1   )
+             AND  (SPA-ERRCD       NOT =   SPACE)
+               GO      TO      510-TBLHEN-EXT
+           END-IF
       *    悪性腫瘍検査一覧へ
            IF      SPA-AKUSEI-FLG      =   1
                PERFORM 5101-AKUSEI-K98-SEC
