@@ -222,6 +222,7 @@
            03  CONST-H200401           PIC X(08) VALUE "20080401".
            03  CONST-H220401           PIC X(08) VALUE "20100401".
            03  CONST-H240401           PIC X(08) VALUE "20120401".
+           03  CONST-H250401           PIC X(08) VALUE "20130401".
            03  CONST-H241001           PIC X(08) VALUE "20121001".
            03  CONST-KSN-MAX           PIC 9(03) VALUE 10.
            03  CONST-GKSN-MAX          PIC 9(03) VALUE 14.
@@ -1433,6 +1434,16 @@
        3101-CMB-MUKIN-SET-SEC         SECTION.
       *
            EVALUATE    TRUE
+           WHEN  ( WRK-KJN-YUKSTYMD    >=  CONST-H250401 )
+               MOVE    "1"             TO  SPA-GMN-W21-MUKINL(1)
+               MOVE    "»»Äê¤·¤Ê¤¤"    TO  SPA-GMN-W21-MUKINMEIL(1)
+               MOVE    "2"             TO  SPA-GMN-W21-MUKINL(2)
+               MOVE    "Ìµ¶Ý¼£ÎÅ¼¼´ÉÍý²Ã»»£±"
+                                       TO  SPA-GMN-W21-MUKINMEIL(2)
+               MOVE    "4"             TO  SPA-GMN-W21-MUKINL(3)
+               MOVE    "Ìµ¶Ý¼£ÎÅ¼¼´ÉÍý²Ã»»£²"
+                                       TO  SPA-GMN-W21-MUKINMEIL(3)
+               MOVE    3               TO  SPA-GMN-W21-MUKIN-MAX
            WHEN  ( WRK-KJN-YUKSTYMD    >=  CONST-H240401 )
                MOVE    "1"             TO  SPA-GMN-W21-MUKINL(1)
                MOVE    "»»Äê¤·¤Ê¤¤"    TO  SPA-GMN-W21-MUKINMEIL(1)
