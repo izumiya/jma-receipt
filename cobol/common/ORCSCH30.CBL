@@ -1032,18 +1032,21 @@
                    END-IF
                END-IF
            END-PERFORM
-           IF     (WRK-YSRYCD              =   SPACE )
-              AND (IDXY2                   >   ZERO  )
-               MOVE    WRK-YOHOU(IDXY2)    TO  WRK-YSRYCD
-               MOVE    WRK-YOHOU-NAME(IDXY2)
-                                           TO  WRK-YSRYCD-NAME
-               MOVE    SPACE               TO  WRK-YOHOU(IDXY2)
-           END-IF
+      *H25.3
+      * 服用時点がなければ用法なしとする
+      *    IF     (WRK-YSRYCD              =   SPACE )
+      *       AND (IDXY2                   >   ZERO  )
+      *        MOVE    WRK-YOHOU(IDXY2)    TO  WRK-YSRYCD
+      *        MOVE    WRK-YOHOU-NAME(IDXY2)
+      *                                    TO  WRK-YSRYCD-NAME
+      *        MOVE    SPACE               TO  WRK-YOHOU(IDXY2)
+      *    END-IF
       *
       *ver.4.7
       *    用法コードがないとき最後のコメントをすべてに
            IF     (WRK-YSRYCD          =   SPACE )
               AND (IDXC                >   ZERO  )
+              AND (IDXY2               =   ZERO  )
       *        コメント
                IF     (TBL-COMMENT (IDXC)  NOT =   SPACE)
                AND    (TBL-IDX-S   (IDXC)  NOT =   ZERO )
