@@ -220,6 +220,7 @@
       *                                     コード対応
       *  04.06.04    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.06    NACL-門脇    13/02/27  平成２５年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -926,6 +927,8 @@
            03  CONS-SYODOU2-COMMENT  PIC X(09)  VALUE  "830000024".
       *    初診（同日複数診療科）
            03  CONS-SYODOU3-COMMENT  PIC X(09)  VALUE  "111011810".
+      *    初診料（同一日２科目：紹介状なし）
+           03  CONS-SYODOU4-COMMENT  PIC X(09)  VALUE  "111012610".
       *    心大血管疾患リハビリテーション料（１）
            03  CONS-SINDAI1-COMMENT  PIC X(09)  VALUE  "180027410".
       *    心大血管疾患リハビリテーション料（２）
@@ -3404,7 +3407,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      RECE84-SRYKBN      =     "11"
       *       初診（同日複数診療科）
               IF  (SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
-                                      OR    CONS-SYODOU3-COMMENT)
+                                      OR    CONS-SYODOU3-COMMENT
+                                      OR    CONS-SYODOU4-COMMENT)
               AND (FLG-SYODOU-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE84-FLG-SYODOU-COMMENT
                    MOVE   SRY-SRYKA   TO    RECE84-SYODOU-SRYKA(1)

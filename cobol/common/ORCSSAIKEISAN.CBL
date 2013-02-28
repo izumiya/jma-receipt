@@ -59,6 +59,7 @@
       *  04.06.02    NACL-門脇    10/11/08  主保険＋マル長の請求対応
       *  04.06.03    NACL-門脇    10/12/06  労災・自賠責の金額フリー入力
       *                                     コード対応
+      *  04.06.05    NACL-門脇    13/02/27  平成２５年４月改正対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -208,11 +209,12 @@
            03  FILLER          PIC X(09)   VALUE    "113003510".
            03  FILLER          PIC X(09)   VALUE    "113003710".
            03  FILLER          PIC X(09)   VALUE    "099110001".
+           03  FILLER          PIC X(09)   VALUE    "111012510".
       *
        01  TBL-SYOSIN-R        REDEFINES   TBL-SYOSIN-AREA.
-           03  TBL-SYOSIN      PIC X(09)   OCCURS    7.
+           03  TBL-SYOSIN      PIC X(09)   OCCURS    8.
       *
-       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     7.
+       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     8.
       *
       *****************************************************************
       *    ファイルレイアウト

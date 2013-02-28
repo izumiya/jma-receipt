@@ -597,6 +597,7 @@
       *                                     レセプト記載対応
       *  04.06.07    NACL-門脇    12/11/20  特記事項０１（公）に関わる窓口計算・
       *                                     レセプト一部負担金記載対応
+      *  04.06.08    NACL-門脇    13/02/27  平成２５年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1802,6 +1803,8 @@
            03  CONS-SYODOU-COMMENT   PIC X(09)  VALUE  "111011810".
       *    複初算定診療科：
            03  CONS-SYODOU2-COMMENT  PIC X(09)  VALUE  "830000024".
+      *    初診料（同一日２科目：紹介状なし）
+           03  CONS-SYODOU3-COMMENT  PIC X(09)  VALUE  "111012610".
       *    心大血管疾患リハビリテーション料（１）
            03  CONS-SINDAI1-COMMENT  PIC X(09)  VALUE  "180027410".
       *    心大血管疾患リハビリテーション料（２）
@@ -4932,8 +4935,9 @@
       *
            IF      RECE64-SRYKBN      =     "11"
       *       初診（同日複数診療科）
-              IF   SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
-              AND  FLG-SYODOU-COM     =     ZERO
+              IF  (SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
+                                      OR    CONS-SYODOU3-COMMENT)
+              AND (FLG-SYODOU-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE64-FLG-SYODOU-COMMENT
                    MOVE   SRY-SRYKA   TO    RECE64-SYODOU-SRYKA(1)
               END-IF
@@ -5667,6 +5671,7 @@
       *
       *    初診（同日複数診療科）
            IF    RECE65-SRYCD(IDX4)   = CONS-SYODOU-COMMENT
+                                     OR CONS-SYODOU3-COMMENT
                  MOVE   4             TO  WRK-SETCOM-JIDO
            END-IF
       *    傷病手当金意見書交付料

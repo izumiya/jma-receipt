@@ -140,6 +140,7 @@
       *                                     対応
       *  04.06.02    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -7571,7 +7572,7 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *3
                           "113001210" OR "113001310" OR "113002110" OR
       *4
-                          "111011810" OR
+                          "111011810" OR "111012610" OR
       *5
                           "113006510" OR
       *6
@@ -7631,7 +7632,8 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *24
                           "114020910" OR
       *25
-                          "112015810" OR "112015950" OR "112016210"
+                          "112015810" OR "112015950" OR "112016210" OR
+                          "112016410"
       *
                        MOVE   RECE051-RENNUM  TO  WRK-HEN-RENNUM-J
                        MOVE   IDX       TO  WRK-HEN-SHORI-RENNUM-J

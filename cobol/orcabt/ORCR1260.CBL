@@ -55,6 +55,7 @@
       *  04.05.05    NACL-門脇    11/11/30  画像診断フイルム分画数対応
       *  04.06.01    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.02    NACL-門脇    13/02/27  平成２５年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -584,10 +585,14 @@
            03  FILLER          PIC X(09)   VALUE   "099140003".
       *    寝たきり老人在宅総合診療科算定終了
            03  FILLER          PIC X(09)   VALUE   "099140001".
-       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   15.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   15.         
+      *    初診料（紹介状なし）
+           03  FILLER          PIC X(09)   VALUE   "111012510".
+      *
+       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   16.       
+      *
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   16.         
       *
       *    固定値
        01  CONST-AREA.
@@ -716,6 +721,9 @@
       *    初診（夜間・早朝等）加算
            03  WRK-CONS-SYOSIN-KASAN30 PIC X(09)   VALUE 
                                                    "111012470".
+      *    初診料（同一日２科目：紹介状なし）
+           03  WRK-CONS-SYOSIN-KASAN31 PIC X(09)   VALUE 
+                                                   "111012610".
       *
       *    外来迅速検体検査加算
            03  WRK-CONS-GAIJINKEN      PIC X(09)   VALUE 
@@ -1349,6 +1357,7 @@
                                             OR  WRK-CONS-SYOSIN-KASAN27
                                             OR  WRK-CONS-SYOSIN-KASAN28
                                             OR  WRK-CONS-SYOSIN-KASAN30
+                                            OR  WRK-CONS-SYOSIN-KASAN31
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         
