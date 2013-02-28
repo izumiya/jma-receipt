@@ -2377,7 +2377,7 @@
       *****************************************************************
        450-SAINUM-SEC           SECTION.
       *    患者ＩＤがあり、新規の時
-           IF     (SPA-GMN-PTNUM   NOT =   ZERO )  AND
+           IF     (SPA-GMN-PTNUM   NOT =   SPACE)  AND
                   (SPA-P02-SYORI       =   1    )
       *        自由構成の時、登録
                MOVE    1                   TO  FLG-HAKKOU
