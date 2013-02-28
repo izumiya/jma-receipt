@@ -607,6 +607,7 @@
       *                                     ¥ì¥»¥×¥È°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  04.06.09    NACL-ÌçÏÆ    13/01/17  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
       *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
+      *  04.06.10    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -1725,6 +1726,8 @@
            03  CONS-SYODOU-COMMENT   PIC X(09)  VALUE  "111011810".
       *    Ê£½é»»Äê¿ÇÎÅ²Ê¡§
            03  CONS-SYODOU2-COMMENT  PIC X(09)  VALUE  "830000024".
+      *    ½é¿ÇÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  CONS-SYODOU3-COMMENT  PIC X(09)  VALUE  "111012610".
       *    ¥Ë¥³¥Á¥ó°ÍÂ¸¾É´ÉÍýÎÁ¡Ê½é²ó¡Ë
            03  CONS-NIKOCHIN-COMMENT PIC X(09)  VALUE  "113008310".
       *    ¥Ë¥³¥Á¥ó°ÍÂ¸¾É´ÉÍýÎÁ¡Ê£²²óÌÜ¤«¤é£´²óÌÜ¤Þ¤Ç¡Ë
@@ -1991,6 +1994,8 @@
            03  CONS-DOUJITU-DEN    PIC X(09) VALUE "112015950".
       *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë
            03  CONS-DOUJITU-GAI    PIC X(09) VALUE "112016210".
+      *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  CONS-DOUJITU2-GAI   PIC X(09) VALUE "112016410".
       *
       *    Ê£ºÆ»»Äê¿ÇÎÅ²Ê¡§
            03  CONS-DOUJITU-COMMENT
@@ -8658,12 +8663,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               OR "112706050"
       *
                                               OR "111011810"
+                                              OR "111012610"
                                               OR "113013910"
                                               OR "113014010"
                                               OR "113014110"
                                               OR "112015810"
                                               OR "112015950"
-                                              OR "112016210"      )
+                                              OR "112016210"
+                                              OR "112016410"      )
       *
                              MOVE    1      TO    FLG-SHOSAISIN         
       *
@@ -9206,15 +9213,17 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *
            IF      RECE04-SRYKBN      =     "11"
       *       ½é¿ÇÎÁ»»Äê²Ê¡§
-              IF ( SRY-SRYCD(IDX2)    =     "830000020"         )
-              OR ((SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT) AND
-                  (RECE02-SRYYM      >=     "201204"           ))
+              IF ( SRY-SRYCD(IDX2)    =     "830000020"          )
+              OR ((SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT ) AND
+                  (RECE02-SRYYM      >=     "201204"            ))
+              OR ( SRY-SRYCD(IDX2)    =     CONS-SYODOU3-COMMENT )
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-SYOSANTEIKA-COMMENT
               END-IF
       *       ½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë
-              IF   SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
-              AND  FLG-SYODOU-COM     =     ZERO
+              IF  (SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
+                                      OR    CONS-SYODOU3-COMMENT)
+              AND (FLG-SYODOU-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE04-FLG-SYODOU-COMMENT
                    MOVE   SRY-SRYKA   TO    RECE04-SYODOU-SRYKA(1)
               END-IF
@@ -9231,6 +9240,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-DOUJITU-SAI
                                       OR    CONS-DOUJITU-DEN
                                       OR    CONS-DOUJITU-GAI
+                                      OR    CONS-DOUJITU2-GAI
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-SAISANTEIKA-COMMENT
               END-IF
@@ -9360,8 +9370,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *       ºÆ¿Ç¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë
               IF  (SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
                                       OR    CONS-DOUJITU-DEN
-                                      OR    CONS-DOUJITU-GAI)
-              AND (FLG-SAIDOU-COM     =     ZERO            )
+                                      OR    CONS-DOUJITU-GAI
+                                      OR    CONS-DOUJITU2-GAI)
+              AND (FLG-SAIDOU-COM     =     ZERO             )
                  MOVE   "1"        TO   RECE04-FLG-SAIDOU-COMMENT
                  MOVE   SRY-SRYKA  TO   RECE04-SAIDOU-SRYKA(1)
               END-IF
@@ -10145,6 +10156,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *
       *    ½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë
            IF    RECE05-SRYCD(IDX4)   = CONS-SYODOU-COMMENT
+                                     OR CONS-SYODOU3-COMMENT
                  MOVE   4             TO  WRK-SETCOM-JIDO
            END-IF
       *    ½ýÉÂ¼êÅö¶â°Õ¸«½ñ¸òÉÕÎÁ
@@ -10197,6 +10209,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
            IF    RECE05-SRYCD(IDX4)   = CONS-DOUJITU-SAI
                                      OR CONS-DOUJITU-DEN
                                      OR CONS-DOUJITU-GAI
+                                     OR CONS-DOUJITU2-GAI
                  MOVE   25            TO  WRK-SETCOM-JIDO
            END-IF
       *
@@ -10928,6 +10941,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                            IF    SRY-SRYCD(IDX3)   =   CONS-DOUJITU-SAI
                                                   OR   CONS-DOUJITU-DEN
                                                   OR   CONS-DOUJITU-GAI
+                                                  OR   CONS-DOUJITU2-GAI
                              ADD  WK-ZAIKAISU   TO   CNT-SAISIN-DOUJITU
                            ELSE
                              ADD  WK-ZAIKAISU   TO   CNT-SAISIN-ETC

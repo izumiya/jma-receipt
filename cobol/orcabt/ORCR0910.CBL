@@ -113,6 +113,7 @@
       *  04.05.06    NACL-ÌçÏÆ    13/01/22  ¥ï¡¼¥¯ÎÎ°è³ÈÄ¥
       *  04.06.01    NACL-ÌçÏÆ    12/10/15  ¿ÇÎÅ¹Ô°ÙÆþÎÏ¤·¤¿¥³¥á¥ó¥È¤Î¤ß¤ÎºÞ¤Î
       *                                     ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
+      *  04.06.03    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.07.01    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
       *****************************************************************
       *
@@ -593,10 +594,14 @@
            03  FILLER          PIC X(09)   VALUE   "099140003".
       *    ¿²¤¿¤­¤êÏ·¿ÍºßÂðÁí¹ç¿ÇÎÅ²Ê»»Äê½ªÎ»
            03  FILLER          PIC X(09)   VALUE   "099140001".
-       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS  13.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE  13.         
+      *    ½é¿ÇÎÁ¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  FILLER          PIC X(09)   VALUE   "111012510".
+      *
+       01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS  14.       
+      *
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE  14.         
       *
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
@@ -725,6 +730,9 @@
       *    ½é¿Ç¡ÊÌë´Ö¡¦ÁáÄ«Åù¡Ë²Ã»»
            03  WRK-CONS-SYOSIN-KASAN30 PIC X(09)   VALUE 
                                                    "111012470".
+      *    ½é¿ÇÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  WRK-CONS-SYOSIN-KASAN31 PIC X(09)   VALUE 
+                                                   "111012610".
       *
       *    Ì¤¼Â»Ü¸º»»
            03  CONS-GENZAN1            PIC X(09)   VALUE   "190080470".
@@ -1513,6 +1521,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                                             OR  WRK-CONS-SYOSIN-KASAN28
       ***>                                  OR  WRK-CONS-SYOSIN-KASAN29
                                             OR  WRK-CONS-SYOSIN-KASAN30
+                                            OR  WRK-CONS-SYOSIN-KASAN31
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         

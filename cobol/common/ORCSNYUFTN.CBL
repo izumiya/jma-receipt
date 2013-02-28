@@ -136,6 +136,7 @@
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
+      *  04.06.03    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.07.01    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
@@ -486,11 +487,13 @@
            03  FILLER          PIC X(09)   VALUE    "111700110".
       *    ½é¿ÇÎÁ¡Ê£Ä£Õ£Í£Í£Ù¡Ë
            03  FILLER          PIC X(09)   VALUE    "099110001".
+      *    ½é¿ÇÎÁ¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  FILLER          PIC X(09)   VALUE    "111012510".
       *
        01  TBL-SYOSIN-R        REDEFINES   TBL-SYOSIN-AREA.
-           03  TBL-SYOSIN      PIC X(09)   OCCURS    5.
+           03  TBL-SYOSIN      PIC X(09)   OCCURS    6.
       *
-       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     5.
+       01  TBL-SYOSIN-MAX      PIC 9(02)   VALUE     6.
       *
       *    ½é¿ÇÎÁ»»Äê¥Õ¥é¥°ÍÑ¥Æ¡¼¥Ö¥ë¡ÊÊ¡²¬ÍÑ¡Ë
        01  TBL-SYOSIN2-AREA.
@@ -504,11 +507,15 @@
            03  FILLER          PIC X(09)   VALUE    "111700110".
       *    ½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë
            03  FILLER          PIC X(09)   VALUE    "111011810".
+      *    ½é¿ÇÎÁ¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  FILLER          PIC X(09)   VALUE    "111012510".
+      *    ½é¿ÇÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  FILLER          PIC X(09)   VALUE    "111012610".
       *
        01  TBL-SYOSIN2-R       REDEFINES   TBL-SYOSIN2-AREA.
-           03  TBL-SYOSIN2     PIC X(09)   OCCURS    5.
+           03  TBL-SYOSIN2     PIC X(09)   OCCURS    7.
       *
-       01  TBL-SYOSIN2-MAX     PIC 9(02)   VALUE     5.
+       01  TBL-SYOSIN2-MAX     PIC 9(02)   VALUE     7.
       *
       *    Ê¡²¬¸©¸øÈñ¤ÎµëÉÕÂÐ¾Ý³°È½ÄêÍÑ¤Î½é¿ÇÂàÈò¥Æ¡¼¥Ö¥ë
        01  TBL-FUKUOKA.
@@ -5113,6 +5120,7 @@ grpsys                                        SPA-AREA
       ***                     ADD  SANTEI-DAY(FUKU-IDX2)
       ***                          TO  TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
                               IF TBL-SYOSIN2(FUKU-IDX) = "111011810"
+                                                      OR "111012610"
                                  EVALUATE TBL-FUKUOKA-SYOSIN(FUKU-IDX2)
                                    WHEN    0
                                      MOVE  2  TO
@@ -5911,7 +5919,7 @@ grpsys                            SPA-AREA
                 MOVE    1                TO   FLG-SRYACT
               END-IF
               IF      FLG-SRYACT          =   ZERO
-                 IF   SRY-SRYCD(1)  =  "111011810"
+                 IF   SRY-SRYCD(1)  =  "111011810" OR "111012610"
                     CONTINUE
                  ELSE
                     COMPUTE  SYU-KYUFUGAI-SHOSHIN-TEN =

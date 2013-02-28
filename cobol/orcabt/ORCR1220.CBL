@@ -105,6 +105,7 @@
       *  04.06.01    NACL-門脇    10/08/16  入院の点滴入力改善対応
       *  04.06.02    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
       *  04.07.01    NACL-門脇    12/08/28  薬剤料減点対応
       *  04.07.02    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.03    NACL-門脇    12/10/12  保険別請求チェック表（標準帳票）
@@ -671,6 +672,8 @@
            03  CONS-SYODOU-COMMENT   PIC X(09)  VALUE  "111011810".
       *    複初算定診療科：
            03  CONS-SYODOU2-COMMENT  PIC X(09)  VALUE  "830000024".
+      *    初診料（同一日２科目：紹介状なし）
+           03  CONS-SYODOU3-COMMENT  PIC X(09)  VALUE  "111012610".
       *    心大血管疾患リハビリテーション料（１）
            03  CONS-SINDAI1-COMMENT  PIC X(09)  VALUE  "180027410".
       *    心大血管疾患リハビリテーション料（２）
@@ -2409,8 +2412,9 @@
       *
            IF      RECE220-SRYKBN      =     "11"
       *       初診（同日複数診療科）
-              IF   SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
-              AND  FLG-SYODOU-COM     =     ZERO
+              IF  (SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
+                                      OR    CONS-SYODOU3-COMMENT)
+              AND (FLG-SYODOU-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE220-FLG-SYODOU-COMMENT
                    MOVE   SRY-SRYKA   TO    RECE220-SYODOU-SRYKA(1)
               END-IF

@@ -231,6 +231,7 @@
       *                                     ¥³¡¼¥ÉÂÐ±þ
       *  04.06.04    NACL-ÌçÏÆ    12/10/15  ¿ÇÎÅ¹Ô°ÙÆþÎÏ¤·¤¿¥³¥á¥ó¥È¤Î¤ß¤ÎºÞ¤Î
       *                                     ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
+      *  04.06.06    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.07.01    NACL-ÌçÏÆ    12/09/25  ¥³¥á¥ó¥Èº¹¹þÂÐ±þ¡ÊºßÂð»ýÂ³ÍÛ°µ¡Ë
       *  04.07.02    NACL-ÌçÏÆ    12/09/25  ¥³¥á¥ó¥Èº¹¹þ¼è¤ê»ß¤á¡ÊºßÂð»ýÂ³ÍÛ°µ¡Ë
       *****************************************************************
@@ -657,6 +658,7 @@
            03  CONS-GAIRAIRYO1 PIC X(09)     VALUE "112011310".
            03  CONS-GAIRAIRYO2 PIC X(09)     VALUE "112705510".
            03  CONS-GAIRAIRYO3 PIC X(09)     VALUE "112011710".
+           03  CONS-GAIRAIRYO4 PIC X(09)     VALUE "112016310".
       *    ½èÊý¤»¤óÎÁ
            03  CONS-SHOHOSEN1 PIC X(09)      VALUE "120002710".
            03  CONS-SHOHOSEN2 PIC X(09)      VALUE "120002810".
@@ -819,6 +821,8 @@
            03  CONS-SYODOU-COMMENT   PIC X(09)  VALUE  "111011810".
       *    Ê£½é»»Äê¿ÇÎÅ²Ê¡§
            03  CONS-SYODOU2-COMMENT  PIC X(09)  VALUE  "830000024".
+      *    ½é¿ÇÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  CONS-SYODOU3-COMMENT  PIC X(09)  VALUE  "111012610".
       *    ¥Ë¥³¥Á¥ó°ÍÂ¸¾É´ÉÍýÎÁ¡Ê½é²ó¡Ë
            03  CONS-NIKOCHIN-COMMENT PIC X(09)  VALUE  "113008310".
       *    ¥Ë¥³¥Á¥ó°ÍÂ¸¾É´ÉÍýÎÁ¡Ê£²²óÌÜ¤«¤é£´²óÌÜ¤Þ¤Ç¡Ë
@@ -1089,6 +1093,8 @@
            03  CONS-DOUJITU-DEN      PIC X(09)  VALUE  "112015950".
       *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë
            03  CONS-DOUJITU-GAI      PIC X(09)  VALUE  "112016210".
+      *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡§¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  CONS-DOUJITU2-GAI     PIC X(09)  VALUE  "112016410".
       *
       *    Ê£ºÆ»»Äê¿ÇÎÅ²Ê¡§
            03  CONS-DOUJITU-COMMENT  PIC X(09)  VALUE  "830000051".
@@ -2008,7 +2014,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF   SRY-SRYCD(IDX2)   =     CONS-GAIRAIRYO1  OR
                                                 CONS-GAIRAIRYO2  OR
                                                 CONS-GAIRAIRYO3  OR
-                                                CONS-DOUJITU-GAI
+                                                CONS-GAIRAIRYO4  OR
+                                                CONS-DOUJITU-GAI OR
+                                                CONS-DOUJITU2-GAI
                         MOVE   "2"      TO    RECE41-KEIZOKU-PRTKBN
                    END-IF
                    IF   SRY-SRYCD(IDX2)   =     CONS-SAISHIN-A1   
@@ -2972,17 +2980,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF      RECE44-SRYKBN      =     "11"
       *       ½é¿ÇÎÁ»»Äê²Ê¡§
-              IF ( SRY-SRYCD(IDX2)    =     "830000020"         )
-              OR ((SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT) AND
-                  (RECE41-SRYYM      >=     "201204"           ))
-              OR ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI18      ) AND
-                  (RECE41-SRYYM      >=     "201204"           ))
+              IF ( SRY-SRYCD(IDX2)    =     "830000020"          )
+              OR ((SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT ) AND
+                  (RECE41-SRYYM      >=     "201204"            ))
+              OR ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI18       ) AND
+                  (RECE41-SRYYM      >=     "201204"            ))
+              OR ( SRY-SRYCD(IDX2)    =     CONS-SYODOU3-COMMENT )
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-SYOSANTEIKA-COMMENT
               END-IF
       *       ½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë
               IF  (SRY-SRYCD(IDX2)    =     CONS-SYODOU-COMMENT
-                                      OR    CONS-ROUSAI18       )
+                                      OR    CONS-ROUSAI18
+                                      OR    CONS-SYODOU3-COMMENT)
               AND (FLG-SYODOU-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE44-FLG-SYODOU-COMMENT
                    MOVE   SRY-SRYKA   TO    RECE44-SYODOU-SRYKA(1)
@@ -3000,6 +3010,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-DOUJITU-SAI
                                       OR    CONS-DOUJITU-DEN
                                       OR    CONS-DOUJITU-GAI
+                                      OR    CONS-DOUJITU2-GAI
                                       OR    CONS-ROUSAI19
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-SAISANTEIKA-COMMENT
@@ -3111,6 +3122,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
               IF  (SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
                                       OR    CONS-DOUJITU-DEN
                                       OR    CONS-DOUJITU-GAI
+                                      OR    CONS-DOUJITU2-GAI
                                       OR    CONS-ROUSAI19   )
               AND (FLG-SAIDOU-COM     =     ZERO            )
                  MOVE   "1"        TO   RECE44-FLG-SAIDOU-COMMENT
@@ -6041,7 +6053,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                     WHEN  120
                       IF    SRY-SRYCD(IDX3) =  CONS-DOUJITU-SAI OR
                                                CONS-DOUJITU-DEN OR
-                                               CONS-DOUJITU-GAI
+                                               CONS-DOUJITU-GAI OR
+                                               CONS-DOUJITU2-GAI
                         ADD   WK-ZAIKAISU  TO  CNT-SAISIN-DOUJITU
                         COMPUTE    RECE41-TENSU(2)   =
                                    RECE41-TENSU(2)   +
@@ -6857,7 +6870,9 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                      ELSE
                        IF SRY-SRYCD(IDX3) =  CONS-GAIRAIRYO1  OR
                                              CONS-GAIRAIRYO3  OR
-                                             CONS-DOUJITU-GAI
+                                             CONS-GAIRAIRYO4  OR
+                                             CONS-DOUJITU-GAI OR
+                                             CONS-DOUJITU2-GAI
                          IF    RECE41-KHNTEN(3)   =   ZERO
                            MOVE WRK-TNS-TEN(IDX3) TO RECE41-KHNTEN(3)
                          ELSE
