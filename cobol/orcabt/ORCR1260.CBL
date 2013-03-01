@@ -588,13 +588,10 @@
       *    寝たきり老人在宅総合診療科算定終了
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *
-      *    初診料（紹介状なし）
-           03  FILLER          PIC X(09)   VALUE   "111012510".
-      *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   16.       
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   15.       
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   16.         
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   15.         
       *
       *    固定値
        01  CONST-AREA.
@@ -725,8 +722,11 @@
       *    初診（夜間・早朝等）加算
            03  WRK-CONS-SYOSIN-KASAN30 PIC X(09)   VALUE 
                                                    "111012470".
+      *    初診料（紹介状なし）
+           03  WRK-CONS-SYOSIN-KASAN31 PIC X(09)   VALUE
+                                                   "111012510".
       *    初診料（同一日２科目：紹介状なし）
-           03  WRK-CONS-SYOSIN-KASAN31 PIC X(09)   VALUE 
+           03  WRK-CONS-SYOSIN-KASAN32 PIC X(09)   VALUE 
                                                    "111012610".
       *
       *    外来迅速検体検査加算
@@ -1363,6 +1363,7 @@
                                             OR  WRK-CONS-SYOSIN-KASAN28
                                             OR  WRK-CONS-SYOSIN-KASAN30
                                             OR  WRK-CONS-SYOSIN-KASAN31
+                                            OR  WRK-CONS-SYOSIN-KASAN32
                                             OR  CONS-COMMENT5         
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         
