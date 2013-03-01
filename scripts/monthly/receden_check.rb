@@ -1088,7 +1088,7 @@ class Receden_check < Receden_common
 
                   case tbl_tensu["TENSIKIBETU"].to_i
                   when 2
-                   if tbl_tensu["TANKA"].to_i == 0
+                   if zai["TANKA"].value.to_i == 0
                      @errors.push("33130",rece,zai,"TANKA",nil,tbl_tensu["NAME"])
                    end
                   end
