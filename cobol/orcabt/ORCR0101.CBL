@@ -95,6 +95,7 @@
       *  04.07.03    NACL-藤原    13/01/07  自費レセプトを印刷しない設定
       *                                     のとき、入力順、ターミナルデジット
       *                                     出力の対象としない
+      *  04.07.04    NACL-藤原    13/03/01  保険者番号の条件設定変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -306,6 +307,8 @@ grpsys     COPY    "COMMON-SPA".
                                        INTO  WRK-PARA-KKHPRTNM-N
                                              WRK-PARA-KOUIKIPRTNM-N
            END-UNSTRING
+           INSPECT WRK-PARA-RECE09-HKNJANUM  REPLACING   ALL "#"
+                                                         BY  " "
       *
       *    リアルタイムプレビューのとき
            IF      WRK-PARA-SHELLID        =   "RECEPTX"
@@ -317,6 +320,7 @@ grpsys     COPY    "COMMON-SPA".
                                   WRK-PARA-KOUIKIPRTNM-N
            DISPLAY "PRTJYUN    =" WRK-PARA-RECE09-PRTJYUN " "
                                   WRK-PARA-PREFKBN
+           DISPLAY "HKNJANUM   =" WRK-PARA-RECE09-HKNJANUM
       *
            PERFORM 100-DBOPEN-SEC
       *
