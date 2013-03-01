@@ -1975,7 +1975,7 @@
            03  CONS-DOUJITU-DEN    PIC X(09) VALUE "112015950".
       *    外来診療料（同一日２科目）
            03  CONS-DOUJITU-GAI    PIC X(09) VALUE "112016210".
-      *    外来診療料（同一日２科目：紹介状なし）
+      *    外来診療料（同一日２科目：紹介する旨申し出）
            03  CONS-DOUJITU2-GAI   PIC X(09) VALUE "112016410".
       *
       *    複再算定診療科：
