@@ -608,6 +608,7 @@
       *  04.06.09    NACL-ÌçÏÆ    13/01/17  ÆÃµ­»ö¹à£°£·¡ÊÏ·Ê»¡ËµÚ¤Ó
       *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
       *  04.06.10    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
+      *  04.06.11    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -2705,7 +2706,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            PERFORM     2117-GENGAKU-HANTEI-SEC
       *
            IF    (RECE02-SRYYM   >=  "200804")
-           AND   (RECE02-SRYYM   <=  "201303")
+           AND   (RECE02-SRYYM   <=  "201403")
              IF  (RECE02-HKNNUM       =   SPACE                      )
              OR  (RECE02-HKNNUM(1:2)  =   "98" OR "90" OR "91"       )
              OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
@@ -3873,7 +3874,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    ( RECE02-SRYYM   <  "200704"              ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE02-SRYYM   <  "200804") OR
-                    (RECE02-SRYYM   >  "201303")             ))
+                    (RECE02-SRYYM   >  "201403")             ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE02-SRYYM   <  "200901"              ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "25"     ) AND
@@ -12529,7 +12530,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                END-IF
              WHEN      "20"
                IF  (RECE02-SRYYM   >=  "200804")
-               AND (RECE02-SRYYM   <=  "201303")
+               AND (RECE02-SRYYM   <=  "201403")
                    CONTINUE
                ELSE
                    GO  TO  21045-TOKKI-HENSYU-EXT
@@ -17408,6 +17409,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE02-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
              AND (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+             AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
              AND (RECE02-KOHNUM(3)       = SPACE             )
              AND (RECE02-KOHNUM(4)       = SPACE             )
              AND (RECE02-HKNCOMBI(2) NOT = ZERO              )
@@ -17458,6 +17460,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE02-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
              AND (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+             AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
              AND (RECE02-KOHNUM(3)       = SPACE             )
              AND (RECE02-KOHNUM(4)       = SPACE             )
              AND (RECE02-HKNCOMBI(2) NOT = ZERO              )

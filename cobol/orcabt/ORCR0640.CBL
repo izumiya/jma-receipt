@@ -592,6 +592,7 @@
       *  04.06.07    NACL-門脇    12/11/20  特記事項０１（公）に関わる窓口計算・
       *                                     レセプト一部負担金記載対応
       *  04.06.08    NACL-門脇    13/02/27  平成２５年４月改正対応
+      *  04.06.09    NACL-門脇    13/03/01  ７０歳代前半の特例措置延長対応
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-門脇    11/10/17  法定外現物給付対応（法別１０、２１）
@@ -3778,7 +3779,7 @@
                    ( RECE62-SRYYM   <  "200704"              ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE62-SRYYM   <  "200804") OR
-                    (RECE62-SRYYM   >  "201303")             ))
+                    (RECE62-SRYYM   >  "201403")             ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE62-SRYYM   <  "200901"              ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) =
@@ -8907,7 +8908,7 @@
                END-IF
              WHEN      "20"
                IF  (RECE62-SRYYM   >=  "200804")
-               AND (RECE62-SRYYM   <=  "201303")
+               AND (RECE62-SRYYM   <=  "201403")
                    CONTINUE
                ELSE
                    GO  TO  21013-TOKKI-HENSYU-EXT
@@ -15124,7 +15125,7 @@
            END-IF
       *
            IF    (RECE62-SRYYM   >=  "200804")
-           AND   (RECE62-SRYYM   <=  "201303")
+           AND   (RECE62-SRYYM   <=  "201403")
              IF  (RECE62-HKNNUM       =   SPACE                      )
              OR  (RECE62-HKNNUM(1:2)  =   "98"  OR "90"  OR "91"     )
              OR  (RECE62-HKNNUM  =   "068" OR "069" OR "040" OR "039")
@@ -21398,6 +21399,7 @@
                    (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
              AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+             AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
              AND (RECE62-KOHNUM(3)       = SPACE             )
              AND (RECE62-KOHNUM(4)       = SPACE             )
              AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
@@ -21453,6 +21455,7 @@
                    (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
                   ( TBL-TOKATUKAIFLG(1)   =  1              ))
              AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+             AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
              AND (RECE62-KOHNUM(3)       = SPACE             )
              AND (RECE62-KOHNUM(4)       = SPACE             )
              AND (RECE62-HKNCOMBI(2) NOT = ZERO              )
