@@ -308,11 +308,16 @@
            03  FLG-SAISIN-ERR-DAY-G.
                05  FLG-SAISIN-ERR-DAY                  PIC 9(01)
                                                        OCCURS  31.
-           03  FLG-SRYHEI1-DAY-G.
-               05  FLG-SRYHEI1-DAY                     PIC 9(01)
+           03  FLG-SRYHEI-DAY-G.
+               05  FLG-SRYHEI1-DAY-G.
+                   07  FLG-SRYHEI1-DAY                 PIC 9(01)
                                                        OCCURS  31.
-           03  FLG-SRYHEI2-DAY-G.
-               05  FLG-SRYHEI2-DAY                     PIC 9(01)
+               05  FLG-SRYHEI2-DAY-G.
+                   07  FLG-SRYHEI2-DAY                 PIC 9(01)
+                                                       OCCURS  31.
+           03  FLG-SRYHEI-DAY-R  REDEFINES FLG-SRYHEI-DAY-G.
+               05  FLG-SRYHEI-DAY-OCC                  OCCURS  2.
+                   07  FLG-SRYHEI-DAY                  PIC 9(01)
                                                        OCCURS  31.
            03  FLG-PTBYO-TAISYO                        PIC 9(01).
            03  FLG-PTBYO-ERR                           PIC 9(01).
@@ -483,6 +488,10 @@
            03  IDX-KGNM                                PIC 9(05).
            03  IDX-TTNSP2                              PIC 9(05).
            03  IDX-PTSRY                               PIC 9(05).
+           03  IDXS1                                   PIC 9(05).
+           03  IDXS2                                   PIC 9(05).
+           03  IDXD1                                   PIC 9(05).
+           03  IDXD2                                   PIC 9(05).
       *
        01  WRK-AREA.
            03  WRK-SYMD                                PIC X(08).
@@ -3097,6 +3106,7 @@
             AND  ( TNS-DAYCNT      =   1 ))
             OR  (  TNS-SRYCD       =   "111011810"
                                    OR  "101110040"
+                                   OR  "111012610"
                                                     )
       *
                PERFORM VARYING IDX2    FROM    1   BY  1
@@ -3111,6 +3121,7 @@
       *
                        IF    ( TNS-SRYCD       =   "111011810"
                                                OR  "101110040"
+                                               OR  "111012610"
                                                                )
                            CONTINUE
                        ELSE
@@ -3513,6 +3524,7 @@
                                        OR  "112706050"
                                        OR  "111011810"
                                        OR  "101110040"
+                                       OR  "111012610"
                                        OR  "101120100"
                                        OR  "113013910"
                                        OR  "113014010"
@@ -3520,7 +3532,7 @@
                                        OR  "112015810"
                                        OR  "112015950"
                                        OR  "112016210"
-                                                       )
+                                       OR  "112016410"   )
       *
                    MOVE    1           TO  FLG-SHOSAISIN
       *
@@ -7540,45 +7552,48 @@
                     AND  ( TSRYCD-SRYCD (IDX-TSRYCD) =   "113006510" )
                     AND  ( TSRYCD-SRYCD (IDX0)   NOT =   "113006510" )
       *
+                       MOVE    IDX-TSRYCD      TO  IDXS1
+                       MOVE    1               TO  IDXD1
+                       MOVE    IDX0            TO  IDXS2
+                       MOVE    2               TO  IDXD2
+                       PERFORM 200112111-HEIYOU-M-SET-CHK-SEC
+      *
                    WHEN  ( WRK-SYORIKBN              =   "1" )
                     AND  ( TSRYCD-SRYCD (IDX-TSRYCD)
                                                  NOT =   "113006510" )
                     AND  ( TSRYCD-SRYCD (IDX0)       =   "113006510" )
       *
+                       MOVE    IDX-TSRYCD      TO  IDXS2
+                       MOVE    1               TO  IDXD2
+                       MOVE    IDX0            TO  IDXS1
+                       MOVE    2               TO  IDXD1
+                       PERFORM 200112111-HEIYOU-M-SET-CHK-SEC
+      *
                    WHEN  ( WRK-SYORIKBN              =   "2" )
-                    AND  ( TSRYCD-SRYCD (IDX-TSRYCD) =   "111000110" )
+                    AND  ( TSRYCD-SRYCD (IDX-TSRYCD) =   "111000110"
+                                                      OR "111012510" )
                     AND  ( TSRYCD-SRYCD (IDX0)   NOT =   "111000110" )
+                    AND  ( TSRYCD-SRYCD (IDX0)   NOT =   "111012510" )
+      *
+                       MOVE    IDX-TSRYCD      TO  IDXS1
+                       MOVE    1               TO  IDXD1
+                       MOVE    IDX0            TO  IDXS2
+                       MOVE    2               TO  IDXD2
+                       PERFORM 200112112-HEIYOU-M-SET-CHK-SEC
       *
                    WHEN  ( WRK-SYORIKBN              =   "2" )
                     AND  ( TSRYCD-SRYCD (IDX-TSRYCD)
                                                  NOT =   "111000110" )
-                    AND  ( TSRYCD-SRYCD (IDX0)       =   "111000110" )
+                    AND  ( TSRYCD-SRYCD (IDX-TSRYCD)
+                                                 NOT =   "111012510" )
+                    AND  ( TSRYCD-SRYCD (IDX0)       =   "111000110"
+                                                      OR "111012510" )
       *
-                       MOVE    IDX-TSRYCD          TO  IDX-KANRIRYO
-                       MOVE    IDX0                TO  IDX37
-                       IF    ( TSRYCD-SRYCD (IDX0)   =   "113006510" 
-                                                      OR "111000110" )
-                           MOVE    IDX0            TO  IDX-KANRIRYO
-                           MOVE    IDX-TSRYCD      TO  IDX37
-                       END-IF
-      *
-                       MOVE    TSRYCD-DAY-G (IDX-KANRIRYO)
-                                           TO  FLG-SRYHEI1-DAY-G
-      *
-                       PERFORM VARYING IDX-DAY FROM    1   BY  1
-                               UNTIL ( IDX-DAY >   31 )
-      *
-                           IF  ( TSRYCD-DAY (IDX37 IDX-DAY)
-                                                   =   "1" )
-                               MOVE ORCBSD01-SRYYM TO  WRK-YMD
-                               MOVE IDX-DAY        TO  WRK-DD
-                               IF ( WRK-YMD >=  TSRYCD-FSANTEIYMD
-                                                   (IDX-KANRIRYO))
-                                   MOVE    1       TO FLG-SRYHEI2-DAY
-                                                            (IDX-DAY)
-                               END-IF
-                           END-IF
-                       END-PERFORM
+                       MOVE    IDX-TSRYCD      TO  IDXS2
+                       MOVE    1               TO  IDXD2
+                       MOVE    IDX0            TO  IDXS1
+                       MOVE    2               TO  IDXD1
+                       PERFORM 200112112-HEIYOU-M-SET-CHK-SEC
       *
                    WHEN    OTHER
                        MOVE    TSRYCD-DAY-G (IDX-TSRYCD)
@@ -7610,6 +7625,66 @@
       *
            .
        20011211-HEIYOU-M-SET-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    併用算定エラー設定対象チェック処理
+      *    （慢性疼痛疾患管理料の特例チェック）
+      *****************************************************************
+       200112111-HEIYOU-M-SET-CHK-SEC  SECTION.
+      *
+           MOVE    TSRYCD-DAY-G(IDXS1) TO  FLG-SRYHEI-DAY-OCC (IDXD1)
+      *
+           PERFORM VARYING IDX-DAY FROM    1   BY  1
+                   UNTIL ( IDX-DAY >   31 )
+      *
+               IF  ( TSRYCD-DAY (IDXS2 IDX-DAY)
+                                       =   1 )
+                   MOVE ORCBSD01-SRYYM TO  WRK-YMD
+                   MOVE IDX-DAY        TO  WRK-DD
+                   IF ( WRK-YMD >=  TSRYCD-FSANTEIYMD (IDXS1))
+                       MOVE    1       TO FLG-SRYHEI-DAY (IDXD2 IDX-DAY)
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           .
+       200112111-HEIYOU-M-SET-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    併用算定エラー設定対象チェック処理
+      *    （初診料と特定疾患療養管理料）
+      *****************************************************************
+       200112112-HEIYOU-M-SET-CHK-SEC   SECTION.
+      *
+           MOVE    TSRYCD-DAY-G(IDXS1) TO  FLG-SRYHEI-DAY-OCC (IDXD1)
+      *
+           MOVE    ZERO        TO  IDXD
+           PERFORM VARYING IDX-DAY FROM    1   BY  1
+                   UNTIL ( IDX-DAY >   31 )
+                    OR   ( IDXD    >   ZERO )
+      *
+               IF    ( TSRYCD-DAY(IDXS1 IDX-DAY)   =   1 )
+                   MOVE    IDX-DAY TO  IDXD
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( IDXD            >   ZERO )
+               PERFORM VARYING IDX-DAY FROM    1   BY  1
+                       UNTIL ( IDX-DAY >   31 )
+      *
+                   IF  ( TSRYCD-DAY (IDXS2 IDX-DAY)
+                                       =   1 )
+                       IF ( IDX-DAY >= IDXD )
+                           MOVE    1
+                                   TO  FLG-SRYHEI-DAY (IDXD2 IDX-DAY)
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       200112112-HEIYOU-M-SET-CHK-EXT.
            EXIT.
       *****************************************************************
       *    併用算定エラー設定対象チェック処理（同一日）
