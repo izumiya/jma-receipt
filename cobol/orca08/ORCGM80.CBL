@@ -82,11 +82,9 @@
                        09  SPA-GMN-TVERSION      PIC X(20).
                        09  SPA-GMN-TVERSION2     PIC X(20).
                        09  SPA-GMN-TVENDOR       PIC X(20).
-                       09  SPA-GMN-TINS          PIC X(10).
                        09  SPA-GMN-TLINK         PIC X(10).
       *
                        09  SPA-GMN-TDATE         PIC X(10).
-                       09  SPA-NAI-TINS          PIC X(10).
                        09  SPA-NAI-TLINK         PIC X(10).
                    07  SPA-TBL-MAX               PIC 9(04).
       *
@@ -162,11 +160,9 @@
                09  WRK-GMN-TVERSION      PIC X(20).
                09  WRK-GMN-TVERSION2     PIC X(20).
                09  WRK-GMN-TVENDOR       PIC X(20).
-               09  WRK-GMN-TINS          PIC X(10).
                09  WRK-GMN-TLINK         PIC X(10).
       *
                09  WRK-GMN-TDATE         PIC X(10).
-               09  WRK-NAI-TINS          PIC X(10).
                09  WRK-NAI-TLINK         PIC X(10).
       *
        01  WRK-HENSYU-AREA.
@@ -363,6 +359,8 @@
                    IF      SPA-M80ID1-FLG      =   "OK"
                        MOVE    "install"       TO  WRK-COMMAND
                        PERFORM 4010-SHELL-SYORI-SEC
+                       MOVE    "enable"        TO  WRK-COMMAND
+                       PERFORM 4010-SHELL-SYORI-SEC
                    ELSE
                        MOVE    1               TO  SPA-GMN-CUR
                    END-IF
@@ -370,22 +368,6 @@
                WHEN    "0102"
                    IF      SPA-M80ID1-FLG      =   "OK"
                        MOVE    "uninstall"     TO  WRK-COMMAND
-                       PERFORM 4010-SHELL-SYORI-SEC
-                   ELSE
-                       MOVE    1               TO  SPA-GMN-CUR
-                   END-IF
-      *        リンク
-               WHEN    "0103"
-                   IF      SPA-M80ID1-FLG      =   "OK"
-                       MOVE    "enable"        TO  WRK-COMMAND
-                       PERFORM 4010-SHELL-SYORI-SEC
-                   ELSE
-                       MOVE    1               TO  SPA-GMN-CUR
-                   END-IF
-      *        アンリンク
-               WHEN    "0104"
-                   IF      SPA-M80ID1-FLG      =   "OK"
-                       MOVE    "disable"        TO  WRK-COMMAND
                        PERFORM 4010-SHELL-SYORI-SEC
                    ELSE
                        MOVE    1               TO  SPA-GMN-CUR
@@ -438,9 +420,6 @@
       *        UPGRADE
                WHEN    "CLICKED"       ALSO    "B10"
                     PERFORM 410-UPGRADE-SEC
-      *        LINK処理
-               WHEN    "CLICKED"       ALSO    "B11"
-                    PERFORM 411-LINK-SEC
       *        状況
                WHEN    "CLICKED"   ALSO    "pandatimer1"
                    PERFORM 400-JYOKYO-SET-SEC
@@ -597,14 +576,6 @@
                WHEN    "date "
       *            日付
                    MOVE    PLUGIN-DATA     TO  SPA-GMN-TDATE (IDY)
-               WHEN    "install "
-      *            INS
-                   MOVE    PLUGIN-DATA     TO  SPA-NAI-TINS (IDY)
-                   IF      SPA-NAI-TINS  (IDY) =   "FALSE"
-                       MOVE    "-"             TO  SPA-GMN-TINS (IDY)
-                   ELSE
-                       MOVE    "○"             TO  SPA-GMN-TINS (IDY)
-                   END-IF
                WHEN    "link "
       *            LINK
                    MOVE    PLUGIN-DATA     TO  SPA-NAI-TLINK (IDY)
@@ -829,14 +800,7 @@
                WHEN    "date "
       *            日付
                    MOVE    PLUGIN-DATA     TO  WRK-GMN-TDATE
-               WHEN    "install "
-      *            INS
-                   MOVE    PLUGIN-DATA     TO  WRK-NAI-TINS
-                   IF      WRK-NAI-TINS    =   "FALSE"
-                       MOVE    "NO"            TO  WRK-GMN-TINS
-                   ELSE
-                       MOVE    "YES"           TO  WRK-GMN-TINS
-                   END-IF
+      *         WHEN    "install "
                WHEN    "link "
       *            LINK
                    MOVE    PLUGIN-DATA     TO  WRK-NAI-TLINK
@@ -960,19 +924,13 @@
       *****************************************************************
        40011-SEL-SYORI-SEC          SECTION.
       *
-      *    インストール判定
-           IF      SPA-NAI-TINS (SPA-NAI-IDX)  =   "FALSE"
-      *        未
-               MOVE    1                   TO  SPA-NAI-INSTALL
-           ELSE
-      *        済
-               MOVE    2                   TO  SPA-NAI-INSTALL
-           END-IF
       *    リンク判定
            IF      SPA-NAI-TLINK (SPA-NAI-IDX) =   "FALSE"
                MOVE    1                   TO  SPA-NAI-LINK
+               MOVE    1                   TO  SPA-NAI-INSTALL
            ELSE
                MOVE    2                   TO  SPA-NAI-LINK
+               MOVE    2                   TO  SPA-NAI-INSTALL
            END-IF
       *
            MOVE    SPA-GMN-TPGNAME (SPA-NAI-IDX)
@@ -982,11 +940,7 @@
            MOVE    SPA-GMN-TVERSION2(SPA-NAI-IDX)
                                        TO  SPA-NAI-VERSION2
       *
-           IF      SPA-NAI-INSTALL     =   2
-               MOVE    12                  TO  SPA-GMN-CUR
-           ELSE
-               MOVE    11                  TO  SPA-GMN-CUR
-           END-IF
+           MOVE    11                  TO  SPA-GMN-CUR
            .
        40011-SEL-SYORI-EXT.
            EXIT.
@@ -1181,28 +1135,6 @@
        410-UPGRADE-EXT.
            EXIT.
       *****************************************************************
-      *    ＬＩＮＫ処理
-      *****************************************************************
-       411-LINK-SEC       SECTION.
-      *
-           IF     (SPA-GMN-SELNUM      =   ZERO )  OR
-                  (SPA-NAI-IDX         =   ZERO )
-               MOVE    "0003"          TO  SPA-ERRCD
-               MOVE    1               TO  SPA-GMN-CUR
-           END-IF
-           IF      SPA-ERRCD           =   SPACE
-               EVALUATE    SPA-NAI-LINK
-                   WHEN    1
-                       MOVE    "0103"              TO  SPA-M80ID1CD
-                   WHEN    2
-                       MOVE    "0104"              TO  SPA-M80ID1CD
-               END-EVALUATE
-           END-IF
-           .
-       411-LINK-EXT.
-           EXIT.
-      *
-      *****************************************************************
       *    SHELL　ＣＡＬＬ処理
       *****************************************************************
        4010-SHELL-SYORI-SEC       SECTION.
@@ -1216,7 +1148,6 @@
                    MOVE    SPA-NAI-VERSION2    TO  WRK-VERSION
                WHEN    "uninstall"
                WHEN    "enable"
-               WHEN    "disable"
                    MOVE    SPA-NAI-VERSION     TO  WRK-VERSION
                WHEN    OTHER
                    MOVE    SPA-NAI-VERSION2    TO  WRK-VERSION
@@ -1357,7 +1288,6 @@
                MOVE    SPA-GMN-TVERSION(IDX)   TO  M80-TVERSION (IDX)
                MOVE    SPA-GMN-TVERSION2(IDX)  TO  M80-TVERSION2(IDX)
                MOVE    SPA-GMN-TVENDOR (IDX)   TO  M80-TVENDOR (IDX)
-               MOVE    SPA-GMN-TINS    (IDX)   TO  M80-TINS    (IDX)
                MOVE    SPA-GMN-TLINK   (IDX)   TO  M80-TLINK   (IDX)
                IF      SPA-GMN-TNUM (IDX)      =   SPA-GMN-SELNUM
                    MOVE    "T"                 TO  M80-LIST-SELECT(IDX)
@@ -1389,7 +1319,7 @@
       *
            EVALUATE    SPA-NAI-INSTALL
                WHEN    1
-                   MOVE    "取込"              TO  M80-B09-LABEL
+                   MOVE    "組込"              TO  M80-B09-LABEL
                    MOVE    WIDGET-NORMAL       TO  M80-B09-STATE
                WHEN    2
                    MOVE    "削除"              TO  M80-B09-LABEL
@@ -1401,16 +1331,6 @@
       *
            MOVE    SPACE               TO  M80-B11-LABEL
            MOVE    WIDGET-INSENSITIVE  TO  M80-B11-STATE
-           IF      SPA-NAI-INSTALL     =   2
-               EVALUATE    SPA-NAI-LINK
-               WHEN    1
-                   MOVE    "組込"              TO  M80-B11-LABEL
-                   MOVE    WIDGET-NORMAL       TO  M80-B11-STATE
-               WHEN    2
-                   MOVE    "取外"              TO  M80-B11-LABEL
-                   MOVE    WIDGET-NORMAL       TO  M80-B11-STATE
-               END-EVALUATE
-           END-IF
       *
            MOVE   SPA-GMN-SYORIMSG     TO  M80-SYORIMSG-VALUE
            EVALUATE    SPA-NAI-SYORIERR
@@ -1426,11 +1346,16 @@
       *ver.4.7
            MOVE    SPACE               TO  M80-B10-LABEL
            MOVE    WIDGET-INSENSITIVE  TO  M80-B10-STATE
-      *    明細があり未選択の時
+      *    明細があり
            IF     (SPA-TBL-MAX         >   ZERO )
-             AND  (SPA-GMN-SELNUM      =   ZERO )
-               MOVE    "更新"              TO  M80-B10-LABEL
-               MOVE    WIDGET-NORMAL       TO  M80-B10-STATE
+      *        未選択の時
+               IF   (SPA-GMN-SELNUM      =   ZERO )
+                   MOVE    "一括更新"          TO  M80-B10-LABEL
+                   MOVE    WIDGET-NORMAL       TO  M80-B10-STATE
+               ELSE
+                   MOVE    "個別更新"          TO  M80-B10-LABEL
+                   MOVE    WIDGET-NORMAL       TO  M80-B10-STATE
+               END-IF
            END-IF
       *
       *    非活性処理

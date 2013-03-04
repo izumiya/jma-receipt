@@ -133,7 +133,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <label>一覧更新</label>
+        <label>再表示</label>
         <relief>GTK_RELIEF_NORMAL</relief>
         <xalign>0.5</xalign>
         <yalign>0.5</yalign>
@@ -387,8 +387,8 @@
           <has_focus>False</has_focus>
           <border_width>0</border_width>
           <show_titles>True</show_titles>
-          <columns>8</columns>
-          <column_widths>44,312,182,77,77,140,52,52</column_widths>
+          <columns>7</columns>
+          <column_widths>44,312,182,88,78,140,88</column_widths>
           <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
           <signal>
             <name>select_row</name>
@@ -462,7 +462,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>インストール
+            <label>インストール済み
 バージョン</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>True</wrap>
@@ -509,22 +509,8 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>取込</label>
-            <justify>GTK_JUSTIFY_CENTER</justify>
-            <wrap>False</wrap>
-          </widget>
-          <widget>
-            <class>GtkLabel</class>
-            <child_name>CList:title</child_name>
-            <name>label91</name>
-            <sensitive>True</sensitive>
-            <can_focus>False</can_focus>
-            <has_focus>False</has_focus>
-            <xalign>0.5</xalign>
-            <yalign>0.5</yalign>
-            <xpad>0</xpad>
-            <ypad>0</ypad>
-            <label>組込</label>
+            <label>インストール
+済み</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>

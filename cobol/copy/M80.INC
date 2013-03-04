@@ -13,7 +13,6 @@
                     06  M80-TVERSION  PIC X(20).
                     06  M80-TVERSION2 PIC X(20).
                     06  M80-TVENDOR   PIC X(20).
-                    06  M80-TINS      PIC X(10).
                     06  M80-TLINK     PIC X(10).
                   05  M80-LIST-SELECT
                           PIC X       OCCURS  100 TIMES.
