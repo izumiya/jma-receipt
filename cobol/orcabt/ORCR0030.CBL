@@ -596,6 +596,7 @@
       *  04.05.75    NACL-ÌçÏÆ    13/01/25  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.05.76    NACL-ÌçÏÆ    13/02/08  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.05.77    NACL-ÌçÏÆ    13/02/18  Åçº¬¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.05.78    NACL-ÌçÏÆ    13/03/04  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
       *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
@@ -11098,6 +11099,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                IF  SYU-TOTAL-HKNTEN  NOT = ZERO
                                  PERFORM   21052-RECE02-HENSYU3-SEC
                                END-IF
+                               PERFORM   21052X-KOHJNISSUTBL-HENSYU-SEC
                                IF  SYU-BUNBENINFFLG  =  "1"
                                  PERFORM 21053-BUNBEN-TOKKI-HENSYU-SEC
                                END-IF
@@ -11224,8 +11226,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 MOVE     4    TO   IDX3
                       END-EVALUATE
       *
-                      PERFORM   210522-KOHJNISSUTBL-SET-SEC
-      *
                       PERFORM   210524-FTNMONEY-HENSYU-SEC
       *
                       PERFORM   210523-FTNMONEY-FTN-HENSYU-SEC
@@ -11243,8 +11243,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           WHEN  RECE02-KOHNUM(2)  =  SYU-KOH-HKNNUM(4)
                                 MOVE     4    TO   IDX3
                       END-EVALUATE
-      *
-                      PERFORM   210522-KOHJNISSUTBL-SET-SEC
       *
                       PERFORM   210524-FTNMONEY-HENSYU-SEC
       *
@@ -11264,8 +11262,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 MOVE     4    TO   IDX3
                       END-EVALUATE
       *
-                      PERFORM   210522-KOHJNISSUTBL-SET-SEC
-      *
                       PERFORM   210524-FTNMONEY-HENSYU-SEC
       *
                       PERFORM   210523-FTNMONEY-FTN-HENSYU-SEC
@@ -11284,8 +11280,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                 MOVE     4    TO   IDX3
                       END-EVALUATE
       *
-                      PERFORM   210522-KOHJNISSUTBL-SET-SEC
-      *
                       PERFORM   210524-FTNMONEY-HENSYU-SEC
       *
                       PERFORM   210523-FTNMONEY-FTN-HENSYU-SEC
@@ -11294,6 +11288,79 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-PERFORM
            .
        21052-RECE02-HENSYU3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¸øÈñ¼õ¿ÇÆü¤ÎÊÔ½¸
+      *****************************************************************
+       21052X-KOHJNISSUTBL-HENSYU-SEC               SECTION.
+      *
+           MOVE       IDX1              TO   HC-IDX
+      *
+           PERFORM    VARYING   IDX2    FROM   1   BY   1
+             UNTIL    IDX2      >       4
+              IF      RECE02-KOHNUMHC(HC-IDX IDX2)  NOT =  SPACE
+                 IF   RECE02-KOHNUMHC(HC-IDX IDX2) =  RECE02-KOHNUM(1)
+                 AND  RECE02-KOHIDHC(HC-IDX IDX2)  =  RECE02-KOHID(1)
+                      EVALUATE  TRUE
+                          WHEN  RECE02-KOHNUM(1)  =  SYU-KOH-HKNNUM(1)
+                                MOVE     1    TO   IDX3
+                          WHEN  RECE02-KOHNUM(1)  =  SYU-KOH-HKNNUM(2)
+                                MOVE     2    TO   IDX3
+                          WHEN  RECE02-KOHNUM(1)  =  SYU-KOH-HKNNUM(3)
+                                MOVE     3    TO   IDX3
+                          WHEN  RECE02-KOHNUM(1)  =  SYU-KOH-HKNNUM(4)
+                                MOVE     4    TO   IDX3
+                      END-EVALUATE
+                      PERFORM   210522-KOHJNISSUTBL-SET-SEC
+                 END-IF
+                 IF   RECE02-KOHNUMHC(HC-IDX IDX2) =  RECE02-KOHNUM(2)
+                 AND  RECE02-KOHIDHC(HC-IDX IDX2)  =  RECE02-KOHID(2)
+                      EVALUATE  TRUE
+                          WHEN  RECE02-KOHNUM(2)  =  SYU-KOH-HKNNUM(1)
+                                MOVE     1    TO   IDX3
+                          WHEN  RECE02-KOHNUM(2)  =  SYU-KOH-HKNNUM(2)
+                                MOVE     2    TO   IDX3
+                          WHEN  RECE02-KOHNUM(2)  =  SYU-KOH-HKNNUM(3)
+                                MOVE     3    TO   IDX3
+                          WHEN  RECE02-KOHNUM(2)  =  SYU-KOH-HKNNUM(4)
+                                MOVE     4    TO   IDX3
+                      END-EVALUATE
+                      PERFORM   210522-KOHJNISSUTBL-SET-SEC
+                 END-IF
+                 IF   RECE02-KOHNUMHC(HC-IDX IDX2) =  RECE02-KOHNUM(3)
+                 AND  RECE02-KOHIDHC(HC-IDX IDX2)  =  RECE02-KOHID(3)
+                      EVALUATE  TRUE
+                          WHEN  RECE02-KOHNUM(3)  =  SYU-KOH-HKNNUM(1)
+                                MOVE     1    TO   IDX3
+                          WHEN  RECE02-KOHNUM(3)  =  SYU-KOH-HKNNUM(2)
+                                MOVE     2    TO   IDX3
+                          WHEN  RECE02-KOHNUM(3)  =  SYU-KOH-HKNNUM(3)
+                                MOVE     3    TO   IDX3
+                          WHEN  RECE02-KOHNUM(3)  =  SYU-KOH-HKNNUM(4)
+                                MOVE     4    TO   IDX3
+                      END-EVALUATE
+                      PERFORM   210522-KOHJNISSUTBL-SET-SEC
+                 END-IF
+                 IF   RECE02-KOHNUMHC(HC-IDX IDX2) =  RECE02-KOHNUM(4)
+                 AND  RECE02-KOHIDHC(HC-IDX IDX2)  =  RECE02-KOHID(4)
+                      EVALUATE  TRUE
+                          WHEN  RECE02-KOHNUM(4)  =  SYU-KOH-HKNNUM(1)
+                                MOVE     1    TO   IDX3
+                          WHEN  RECE02-KOHNUM(4)  =  SYU-KOH-HKNNUM(2)
+                                MOVE     2    TO   IDX3
+                          WHEN  RECE02-KOHNUM(4)  =  SYU-KOH-HKNNUM(3)
+                                MOVE     3    TO   IDX3
+                          WHEN  RECE02-KOHNUM(4)  =  SYU-KOH-HKNNUM(4)
+                                MOVE     4    TO   IDX3
+                      END-EVALUATE
+                      PERFORM   210522-KOHJNISSUTBL-SET-SEC
+                 END-IF
+              END-IF
+           END-PERFORM
+      *
+           .
+       21052X-KOHJNISSUTBL-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
