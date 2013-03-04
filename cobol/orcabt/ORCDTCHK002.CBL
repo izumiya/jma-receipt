@@ -225,48 +225,6 @@
       *    データチェック共通コピー句
            COPY    "CPDTCHKCOMMON.INC".
       *
-      *    公費ＩＤ退避ワーク
-         02  TKOHID-CUST.
-           03  TKOHID-MARUNYU                          PIC 9(01).
-           03  TKOHID-CUST-OCC                         OCCURS 20.
-               05  TKOHID-COMPFTN                      PIC 9(07).
-               05  TKOHID-PTFTN                        PIC 9(07).
-               05  TKOHID-KOHJGN                       PIC 9(07).
-      *
-      *    診療科退避ワーク
-         02  TSRYKA-CUST.
-           03  TSRYKA-CUST-OCC                         OCCURS 30.
-               05  TSRYKA-SYOHOUSEN                    PIC 9(01)
-                                                       OCCURS  31.
-               05  TSRYKA-FUKUYOU-G.
-                   07  TSRYKA-FUKUYOU-MAX              PIC 9(03).
-                   07  TSRYKA-FUKUYOU-OCC              OCCURS  50.
-                       09  TSRYKA-FUKUYOU-ZAINUM       PIC 9(08).
-                       09  TSRYKA-FUKUYOU-ACCTKBN      PIC X(01).
-                       09  TSRYKA-FUKUYOU-CD1          PIC 9(15).
-                       09  TSRYKA-FUKUYOU-CD2          PIC 9(15).
-                       09  TSRYKA-FUKUYOU-DAY          PIC 9(03)
-                                                       OCCURS  31.
-                   07  TSRYKA-FUKUYOU-YKZCNT           PIC 9(03)
-                                                       OCCURS  31.
-               05  TSRYKA-YKZSURYO-G.
-                   07  TSRYKA-YKZSURYO-MAX             PIC 9(03).
-                   07  TSRYKA-YKZSURYO-OCC             OCCURS  50.
-                       09  TSRYKA-YKZSURYO             PIC 9(05)V9(05).
-                       09  TSRYKA-YKZSURYO-SRYKBN      PIC X(03).
-                       09  TSRYKA-YKZSURYO-SRYCD       PIC X(09).
-                       09  TSRYKA-YKZSURYO-DAY         PIC 9(03)
-                                                       OCCURS  31.
-               05  TSRYKA-SRY21ERR-G.
-                   07  TSRYKA-SRY21ERR-DAY             PIC 9(01)
-                                                       OCCURS  31.
-      *
-      *    実日数退避ワーク（実日数チェック用）
-         02  TJNISSU-CUST.
-           03  TJNISSU-CUST-OCC                        OCCURS 20.
-               05  TJNISSU-DOUSAISIN                   PIC 9(01).
-               05  TJNISSU-MARUNYU                     PIC 9(01).
-      *
       *    フラグ領域
        01  STS-AREA.
            03  STS-DTCHK003                            PIC X(02).
@@ -284,9 +242,6 @@
        01  FLG-AREA.
            03  FLG-END                                 PIC 9(01).
            03  FLG-ERR                                 PIC 9(01).
-           03  FLG-DOUSAISIN                           PIC 9(01).
-           03  FLG-SYUNOU                              PIC 9(01).
-           03  FLG-SYUTTL                              PIC 9(01).
            03  FLG-SYSKANRI                            PIC 9(01).
            03  FLG-HKNNUM                              PIC 9(01).
            03  FLG-DCACCT                              PIC 9(01).
@@ -439,17 +394,6 @@
            03  FLG-TEKBYO                              PIC 9(01).
            03  FLG-HAISHI                              PIC 9(01).
       *
-       01  FLG-CUSTOMIZE-AREA.
-           03  FLG-RECEJIKI                            PIC 9(01).
-           03  FLG-160146210                           PIC 9(01).
-           03  FLG-008200009                           PIC 9(01).
-           03  FLG-CUST-SYOSIN-CHK                     PIC 9(01).
-           03  FLG-CUST-SIDO-CHK                       PIC 9(01).
-           03  FLG-PTSAME                              PIC 9(01).
-           03  FLG-SRYACCT                             PIC 9(01).
-           03  FLG-SRYACT                              PIC 9(01).
-           03  FLG-ZEROTEN                             PIC 9(01).
-      *
       *    カウント領域
        01  CNT-AREA.
            03  CNT-DTCHK003                            PIC 9(06).
@@ -471,10 +415,6 @@
            03  CNT-UNCHIHOU                            PIC 9(06).
            03  CNT-CHKSND                              PIC 9(06).
       *
-       01  CNT-CUSTOMIZE-AREA.
-           03  CNT-CUST-113001810                      PIC 9(05).
-           03  CNT-CUST-SYOSIN                         PIC 9(05).
-      *
       *    システム領域
        01  SYS-AREA.
            03  SYS-TIME                                PIC 9(08).
@@ -484,9 +424,6 @@
                05  SYS-DD                              PIC 9(02).
       *
        01  IDX-AREA.
-           03  IDX-FUKUYOU                             PIC 9(05).
-           03  IDX-BUN                                 PIC 9(05).
-           03  IDX-SYUKOH                              PIC 9(05). 
            03  IDX0                                    PIC 9(05).
            03  IDX1                                    PIC 9(05).
            03  IDX2                                    PIC 9(05).
@@ -533,7 +470,6 @@
            03  IDXD                                    PIC 9(05).
            03  IDXE                                    PIC 9(05).
            03  IDXI                                    PIC 9(05).
-           03  IDXM                                    PIC 9(05).
            03  IDXP                                    PIC 9(05).
            03  IDX-TSRYKA                              PIC 9(05).
            03  IDX-TKAISU                              PIC 9(05).
@@ -558,7 +494,6 @@
            03  IDXD2                                   PIC 9(05).
       *
        01  WRK-AREA.
-           03  WRK-FROMIDX                             PIC 9(03).
            03  WRK-SYMD                                PIC X(08).
            03  WRK-EDTYMD1                             PIC X(10).
            03  WRK-EDTYMD3                             PIC X(22).
@@ -721,38 +656,11 @@
                    07  WRK-SURYOZDOT                   PIC X(01).
                    07  WRK-SURYOZ2                     PIC X(05).
            03  WRK-SRY-NAME                            PIC X(50).
-           03  WRK-TEKBYOCHKKBN                        PIC X(01).
-      *
-       01  WRK-CUSTOMIZE-AREA.
-           03  WRK-SRYCDNUM-G.
-               05  WRK-SRYCDNUM                        PIC 9(09).
-           03  WRK-CHKVAL-G.
-               05  WRK-CHKVAL                          PIC 9(01)
-                                                       OCCURS  9.
-           03  WRK-NUM                                 PIC 9(01).
-           03  WRK-KOH190JGN                           PIC 9(08).
-           03  WRK-KOH290JGN                           PIC 9(08).
-           03  WRK-PTFTN                               PIC 9(08).
-           03  WRK-KOH-COMPFTN                         PIC 9(08).
-           03  WRK-TOTAL-HKNTEN                        PIC 9(08).
            03  WRK-ERRCOM                              PIC X(80).
            03  WRK-MAXLEN                              PIC 9(08).
            03  WRK-COMLEN                              PIC 9(08).
            03  WRK-TNSLEN                              PIC 9(08).
-           03  WRK-LASTNAME                            PIC X(50).
-           03  WRK-FIRSTNAME                           PIC X(50).
-           03  WRK-OPT-NAME                            PIC X(25).
-           03  WRK-OPT                                 PIC X(100).
-           03  WRK-OPT-SIZE                            PIC 9(05).
-           03  WRK-OPTNUM                              PIC 9(07).
-           03  WRK-CUST-ERRMES                         PIC X(100).
-           03  WRK-BUNIN-INF-G.
-               05  WRK-BUNIN-INF-OCC                   OCCURS  20.
-                   07  WRK-BUNIN-HOSPNUMX.
-                       09  WRK-BUNIN-HOSPNUM           PIC 9(02).
-                   07  WRK-BUNIN-PTNUM                 PIC X(10).
-                   07  WRK-BUNIN-SYOSIN                PIC 9(1).
-                   07  WRK-BUNIN-SIDO                  PIC 9(1).
+           03  WRK-TEKBYOCHKKBN                        PIC X(01).
       *
        01  TERRINF-AREA.
            03  TERRINF-CHKKBN                          PIC X(01).
@@ -995,42 +903,6 @@
            03  CONST-H2004                 PIC X(06)   VALUE "200804".
            03  CONST-TEMP                      PIC X(04)   VALUE "TEMP".
       *
-       01  CONST-CUSTOMIZE-AREA.
-           03  CONST-SHIMANE                       PIC 9(02)
-                                                   VALUE   32.
-           03  CONST-ISHII                         PIC X(15)   VALUE
-                                                   "JPN322010110000".
-           03  CONST-ISHII2                        PIC X(15)   VALUE
-                                                   "JPN322010110020".
-           03  CONST-KOBAYASHI                     PIC X(15)   VALUE
-                                                   "JPN322010100014".
-           03  CONST-KOBAYASHI-SAIKA               PIC X(15)   VALUE
-                                                   "JPN322010110011".
-           03  CONST-SUGIHARA                      PIC X(15)   VALUE
-                                                   "JPN322010110011".
-           03  CONST-YOSHIOKA-HOSP                 PIC X(15)   VALUE
-                                                   "JPN322060110005".
-           03  CONST-NAKATA                        PIC X(15)   VALUE
-                                                   "JPN322080110001".
-           03  CONST-NAKATA2                       PIC X(15)   VALUE
-                                                   "JPN322080110001".
-           03  CONST-OHTSUKA                        PIC X(15)   VALUE
-                                                   "JPN322030110010".
-           03  CONST-CHKVAL-G.
-               05  CONST-CHKVAL-VAL      PIC X(20) VALUE
-               "01030507091113151719".
-               05  CONST-CHKVAL-R  REDEFINES   CONST-CHKVAL-VAL.
-                   07  CONST-CHKVAL      PIC 9(02) OCCURS    10.
-      *
-       01  TOPT-CUSTOMIZE-AREA.
-           03  TOPT-TAZAITOUYOCHK                 PIC X(01).
-           03  TOPT-YKZMSTCHK                     PIC X(01).
-           03  TOPT-YKZSURYOCHK                   PIC X(01).
-           03  TOPT-YKZSURYOTANI-MAX              PIC 9(05).
-           03  TOPT-YKZSURYOTANI                  PIC X(03)
-                                                  OCCURS 20.
-           03  TOPT-ZEROTENSKIP                   PIC X(01).
-           03  TOPT-NAIFUKUCHK                    PIC X(01).
       *
       *    エラーメッセージ
            COPY    "CPDTCHKERRMES.INC".
@@ -1079,22 +951,9 @@
                                    REPLACING  //DTCHK001//
                                    BY         //WKDTCHK003//.
       *
-       01  TBUNNUM-REC.
-           COPY    "CPPTNUM.INC"   REPLACING  //PTNUM-//
-                                   BY         //TBUNNUM-//.
-      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
-      *
-      *    収納マスタ
-       01  SYUNOU-REC.
-           COPY    "CPSYUNOU.INC".
-      *
-      *    収納合計
-       01  SYUTTL-REC.
-           COPY    "CPSYUTOTAL.INC".
-      *
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -1134,7 +993,6 @@
       *    患者コメント
        01  PTCOM-REC.
            COPY    "CPPTCOM.INC".
-      *
       *
       *    チェク情報
        01  CHK-REC.
@@ -1222,22 +1080,6 @@
        01  MONTHLYNUM-REC.
            COPY    "CPMONTHLYNUM.INC".
       *
-      *****************************************************************
-      *    ファイルレイアウト（カスタマイズ用）
-      *****************************************************************
-      *
-      *    患者紐付け
-       01  PTSAME-REC.
-           COPY    "CPPTSAME.INC".
-      *
-      *    診療会計
-       01  SRYACCT-REC.
-           COPY    "CPSRYACCT.INC".
-      *
-      *    診療行為
-       01  SRYACT-REC.
-           COPY    "CPSRYACT.INC".
-      *
       *    適応病名マスタ
        01  TEKIOUBYOMEI-REC.
            COPY    "CPTEKIOUBYOMEI.INC".
@@ -1294,9 +1136,6 @@
            COPY    "CPHKNCOMBI.INC"    REPLACING  //COMB-//
                                        BY         //LNK-COMB-//.
       *
-      *    プログラムオプション編集パラメタ
-           COPY    "CPORCSPRGOPTION.INC".
-      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
            COPY    "MCPAREA".
@@ -1348,11 +1187,8 @@
            INITIALIZE                  STS-AREA
                                        IDX-AREA
                                        CNT-AREA
-                                       CNT-CUSTOMIZE-AREA
                                        FLG-AREA
-                                       FLG-CUSTOMIZE-AREA
                                        WRK-AREA
-                                       WRK-CUSTOMIZE-AREA
                                        SPA-AREA
                                        THKN-AREA
                                        WKDTCHK003-REC
@@ -1364,7 +1200,7 @@
            IF      LNK-PRTKANRI-TBL-KEY  NOT =  "RECEPTX"
                PERFORM 900-DBSTART-SEC
       *
-      *        ステップ管理開始処理
+      *    ステップ管理開始処理
                MOVE    "STS"               TO  SJOBKANRI-MODE
                INITIALIZE                      JOBKANRI-REC
                MOVE    WRK-PARA-JOBID      TO  JOB-JOBID
@@ -1385,14 +1221,6 @@
       *
            MOVE    ZERO                TO  FLG-END
                                            FLG-ERR
-      *
-           MOVE    ORCBSD01-SRYYM      TO  WRK-SRYYMD
-           MOVE    "25"                TO  WRK-SRYYMD(7:2)
-           IF    ( LNK-PRTKANRI-SKYYMD     >=  WRK-SRYYMD )
-            OR   ( LNK-PRTKANRI-SKYYMD (1:6)
-                                           >   ORCBSD01-SRYYM )
-               MOVE    1               TO  FLG-RECEJIKI
-           END-IF
       *
       *    データチェック中間ファイル名
            MOVE    WRK-PARA-HOSPNUM    TO  DTCHKACCTPARA-HOSPNUM
@@ -1476,7 +1304,6 @@
       *
       *    データチェック２機能情報
            PERFORM 1001-SYS1101-GET-SEC
-           MOVE   "2"      TO  SYS-1101-TENKITEKBYOKBN
       *
       *    レセプト編集区分取得処理
            PERFORM 1001-SYS2005-GET-SEC
@@ -1500,8 +1327,6 @@
            END-IF
            CLOSE   DTCHK011-FILE
            OPEN    INPUT                 DTCHK011-FILE
-      *
-           PERFORM 100-OPTION-SELECT-SEC
       *
            .
        100-INIT-EXT.
@@ -1771,21 +1596,6 @@
                        PERFORM 10011-KOH-HEN-SEC
                    END-IF
                END-IF
-      *
-               EVALUATE    HKN-HKNNUM
-               WHEN    "190"
-                   IF    ( HKN-HON-GAIMNAIJGNGAK   >   ZERO )
-                       MOVE    HKN-HON-GAIMNAIJGNGAK   TO  WRK-KOH190JGN
-                   ELSE
-                       MOVE    HKN-HON-GAIMGAIJGNGAK   TO  WRK-KOH190JGN
-                   END-IF
-               WHEN    "290"
-                  IF    ( HKN-HON-GAIMNAIJGNGAK   >   ZERO )
-                       MOVE    HKN-HON-GAIMNAIJGNGAK   TO  WRK-KOH290JGN
-                   ELSE
-                       MOVE    HKN-HON-GAIMGAIJGNGAK   TO  WRK-KOH290JGN
-                   END-IF
-               END-EVALUATE
       *
       *        保険番号読み込み
                MOVE    "tbl_hknnum"    TO MCP-TABLE
@@ -2302,78 +2112,6 @@
        1001-CK4-1103-GET-EXT.
            EXIT.
       *****************************************************************
-      *    プログラムオプション取込み処理
-      *****************************************************************
-       100-OPTION-SELECT-SEC           SECTION.
-      *
-           INITIALIZE              TOPT-CUSTOMIZE-AREA
-      *
-           MOVE    ZERO            TO  WRK-OPT-SIZE
-           MOVE    SPACE           TO  WRK-OPT
-           INSPECT WRK-OPT TALLYING WRK-OPT-SIZE FOR ALL " "
-      *
-           MOVE    "TAZAITOUYOCHK" TO  WRK-OPT-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           MOVE    WRK-OPT         TO  TOPT-TAZAITOUYOCHK
-      *
-           MOVE    "YKZMSTCHK"     TO  WRK-OPT-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           MOVE    WRK-OPT         TO  TOPT-YKZMSTCHK
-      *
-           MOVE    "YKZSURYOCHK"   TO  WRK-OPT-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           MOVE    WRK-OPT         TO  TOPT-YKZSURYOCHK
-      *
-           MOVE    "YKZSURYOTANI"  TO  WRK-OPT-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           MOVE    ZERO            TO  TOPT-YKZSURYOTANI-MAX
-           MOVE    1               TO  IDXP
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   20 )
-                    OR   ( IDXP    >   WRK-OPT-SIZE )
-                    OR   ( WRK-OPT (IDXP:) =   SPACE )
-      *
-               UNSTRING WRK-OPT DELIMITED BY ","
-               INTO     TOPT-YKZSURYOTANI (IDX0)
-               WITH POINTER IDXP
-               END-UNSTRING
-      *
-               MOVE    IDX0        TO  TOPT-YKZSURYOTANI-MAX
-      *
-           END-PERFORM
-      *
-           MOVE    "ZEROTENSKIP"   TO  WRK-OPT-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           MOVE    WRK-OPT         TO  TOPT-ZEROTENSKIP
-      *
-           MOVE    "NAIFUKUCHK"    TO  WRK-OPT-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           MOVE    WRK-OPT         TO  TOPT-NAIFUKUCHK
-      *
-           .
-       100-OPTION-SELECT-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    プログラムオプションパラメタ取得処理
-      *****************************************************************
-       1001-OPTION-CALL-SEC             SECTION.
-      *
-           MOVE    SPACE               TO  WRK-OPT
-           MOVE    ZERO                TO  WRK-OPTNUM
-      *
-           INITIALIZE                  ORCSPRGOPTIONAREA
-           MOVE    "DTCHKCUST"         TO  ORCSPRGOPTION-PRGID
-           MOVE    WRK-OPT-NAME        TO  ORCSPRGOPTION-IN-DATA
-           CALL    "ORCSPRGOPTION"     USING   SPA-AREA
-                                               ORCSPRGOPTIONAREA
-           MOVE    ORCSPRGOPTION-OT-PARA
-                                       TO  WRK-OPT
-      *
-           .
-       1001-OPTION-CALL-EXT.
-           EXIT.
-      *****************************************************************
       *    主処理
       *****************************************************************
        200-MAIN-SEC                    SECTION.
@@ -2419,13 +2157,8 @@
       *            チェック項目情報退避処理
                    PERFORM 20011-CHK-DATA-TAIHI-SEC
       *
-                   IF    ( TOPT-ZEROTENSKIP    =   "1" )
-                    AND  ( FLG-ZEROTEN         =   1   )
-                       CONTINUE
-                   ELSE
-      *                データチェック処理（チェックマスタ以外）
-                       PERFORM 20011-DATA-CHK-SEC
-                   END-IF
+      *            データチェック処理（チェックマスタ以外）
+                   PERFORM 20011-DATA-CHK-SEC
       *
                    IF    ( FLG-CHKSKIP     =   ZERO )
       *                データチェック処理（チェックマスタ）
@@ -2464,11 +2197,6 @@
       *    診療情報退避処理
            PERFORM 200111-SRYINF-TAIHI-SEC
       *
-      *    マル乳収納情報退避処理
-           IF    ( TKOHID-MARUNYU      =   1 )
-               PERFORM 200111-SYUINF-TAIHI-SEC
-           END-IF
-      *
            .
        20011-CHK-DATA-TAIHI-EXT.
            EXIT.
@@ -2479,7 +2207,6 @@
       *
            INITIALIZE                  THKNID-AREA
                                        TKOHID-AREA
-                                       TKOHID-CUST
                                        THKNCOMBI-AREA
                                        TNACCT-KKN-AREA
                                        TKHNRYO-HKNCOMBI-AREA
@@ -2487,7 +2214,6 @@
                                        TNACCT-GAIHAKU-AREA
                                        TSRYCD-AREA
                                        TJNISSU-AREA
-                                       TJNISSU-CUST
                                        TNYUIN-CHOZAI-AREA
                                        TNYUIN-ACCT-AREA
                                        TNYUKSN-AREA
@@ -2498,10 +2224,6 @@
                                        PTZAI-AREA
       *
            MOVE    ZERO            TO  FLG-INGAISYOHOU
-           MOVE    1               TO  FLG-ZEROTEN
-      *
-           MOVE    ZERO            TO  FLG-160146210
-                                       FLG-008200009
       *
            PERFORM 200111-TSRYKA-AREA-INIT-SEC
       *
@@ -2519,13 +2241,10 @@
            MOVE    ZERO            TO  TSRYKA-MAX
            INITIALIZE                  TSRYKA-ALL-G
            INITIALIZE                  TSRYKA-OCC (1)
-           INITIALIZE                  TSRYKA-CUST-OCC (1)
       *
            PERFORM VARYING IDX0    FROM    2   BY  1
                    UNTIL ( IDX0    >   CONST-TSRYKA-MAX )
                MOVE    TSRYKA-OCC (1)  TO  TSRYKA-OCC (IDX0)
-               MOVE    TSRYKA-CUST-OCC(1)
-                                       TO  TSRYKA-CUST-OCC(IDX0)
            END-PERFORM
       *
            .
@@ -2755,86 +2474,6 @@
       *
            .
        20011111-SRYINF-TAIHI-EXT.
-           EXIT.
-      *****************************************************************
-      *    マル乳収納情報退避処理
-      *****************************************************************
-       200111-SYUINF-TAIHI-SEC         SECTION.
-      *
-           PERFORM 900-SYUNOU-KEY14-SEL-SEC
-      *
-           PERFORM UNTIL ( FLG-SYUNOU  NOT =   ZERO )
-      *
-               IF    ( SYU-FUKU-DENPNUM    =   ZERO )
-                   PERFORM VARYING IDX-SYUKOH  FROM    1   BY  1
-                           UNTIL ( IDX-SYUKOH  >       4 )
-                       IF    ( SYU-KOH-HKNNUM (IDX-SYUKOH)
-                                           =   "190"   OR  "290" )
-                           MOVE    SYU-HKNCOMBINUM TO  WRK-HKNCOMBI
-                           MOVE    SYU-KOH-COMPFTN(IDX-SYUKOH)
-                                                   TO  WRK-KOH-COMPFTN
-                           MOVE    SYU-TOTAL-HKNTEN
-                                                   TO  WRK-TOTAL-HKNTEN
-                           PERFORM 2001111-SYUINF-TAIHI-SEC
-                       END-IF
-                   END-PERFORM
-               ELSE
-                   IF    ( SYU-DENPNUM     =    SYU-FUKU-DENPNUM )
-                       PERFORM 900-SYUTOTAL-KEY-SEL-SEC
-                       PERFORM VARYING IDX-SYUKOH  FROM    1   BY  1
-                               UNTIL ( IDX-SYUKOH  >       4 )
-                           IF    ( SYUTTL-KOH-HKNNUM (IDX-SYUKOH)
-                                           =   "190"   OR  "290" )
-                               MOVE    SYUTTL-HKNCOMBINUM
-                                                   TO  WRK-HKNCOMBI
-                               MOVE    SYUTTL-KOH-COMPFTN(IDX-SYUKOH)
-                                                   TO  WRK-KOH-COMPFTN
-                               MOVE    SYUTTL-TOTAL-HKNTEN 
-                                                   TO  WRK-TOTAL-HKNTEN
-                               PERFORM 2001111-SYUINF-TAIHI-SEC
-                           END-IF
-                       END-PERFORM
-                   END-IF
-               END-IF
-      *
-               PERFORM 900-SYUNOU-KEY14-FET-SEC
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_syunou"    TO  MCP-TABLE
-           MOVE    "key14"         TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           .
-       200111-SYUINF-TAIHI-EXT.
-           EXIT.
-      *****************************************************************
-      *    マル乳収納情報退避処理
-      *****************************************************************
-       2001111-SYUINF-TAIHI-SEC        SECTION.
-      *
-           PERFORM 220-HKNCOMBI-GET-SEC
-           PERFORM VARYING TKOHID-IDX  FROM    1   BY  1
-                   UNTIL ( TKOHID-IDX  >   TKOHID-MAX )
-               IF    ( TKOHID-KOHID (TKOHID-IDX)
-                                       =   COMB-KOHID (1)
-                                        OR COMB-KOHID (2)
-                                        OR COMB-KOHID (3)
-                                        OR COMB-KOHID (4) )
-                       COMPUTE TKOHID-COMPFTN (TKOHID-IDX)
-                           =   TKOHID-COMPFTN (TKOHID-IDX)
-                           +   WRK-KOH-COMPFTN
-                       COMPUTE WRK-PTFTN
-                           = ( WRK-TOTAL-HKNTEN    +   5 )
-                           /   10
-                       COMPUTE TKOHID-PTFTN (TKOHID-IDX)
-                           =   TKOHID-PTFTN (TKOHID-IDX)
-                           +   WRK-PTFTN           *   10
-               END-IF
-           END-PERFORM
-      *
-           .
-       2001111-SYUINF-TAIHI-EXT.
            EXIT.
       *****************************************************************
       *    会計情報情報退避処理
@@ -3076,19 +2715,6 @@
                    PERFORM 900-PTKOHINF-KEY-SEL-SEC
                    MOVE    PTKOH-KOHNUM
                                        TO  TKOHID-KOHNUM (TKOHID-MAX)
-                   IF    ( ORCBSD01-NYUGAIKBN      =   "2" )
-                    AND  ( SYS-1001-PREFNUM        =   CONST-SHIMANE  )
-                       EVALUATE    COMB-KOHHKNNUM (IDX3)
-                       WHEN    "190"
-                           MOVE    WRK-KOH190JGN
-                                           TO  TKOHID-KOHJGN(TKOHID-MAX)
-                           MOVE    1       TO  TKOHID-MARUNYU
-                       WHEN    "290"
-                           MOVE    WRK-KOH290JGN
-                                           TO  TKOHID-KOHJGN(TKOHID-MAX)
-                           MOVE    1       TO  TKOHID-MARUNYU
-                       END-EVALUATE
-                   END-IF
       *
                    MOVE    TKOHID-MAX  TO  TKOHID-IDX
       *
@@ -3237,14 +2863,8 @@
                                PERFORM 200111-TSRYKA-SYOSIN-HEN-SEC
       *                        診療科退避ワーク再診日編集処理
                                PERFORM 200111-TSRYKA-SAISIN-HEN-SEC
-      *                        診療科退避ワーク実日数編集処理
+      *                        診療科退避ワーク実日数算定日編集処理
                                PERFORM 200111-TSRYKA-JNISSU-HEN-SEC
-      *                        診療科退避ワーク服用方法編集処理
-                               PERFORM 200111-TSRYKA-FUKUYOU-HEN-SEC
-      *                        診療科退避ワーク薬剤数量編集処理
-                               PERFORM 200111-TSRYKA-YKZSURYO-HEN-SEC
-      *                        診療科退避ワーク内服投与日数誤り日編集処理
-                               PERFORM 200111-TSRYKA-SRY21ERR-HEN-SEC
                            END-IF
       *
       *                    診療行為コード退避ワーク編集処理
@@ -3263,15 +2883,6 @@
                             AND  ( TNS-DAYCNT      =   0 )
                                PERFORM 200111-TKAISU-HEN-SEC
                            END-IF
-      *
-                           IF    ( DCSRY-SRYCD =   "160146210" )
-                               MOVE    1       TO  FLG-160146210
-                           END-IF
-      *
-                           IF    ( DCSRY-SRYCD =   "008200009" )
-                               MOVE    1       TO  FLG-008200009
-                           END-IF
-      *
                        END-IF
       *
                        EVALUATE    TRUE
@@ -3352,10 +2963,6 @@
                MOVE                1       TO  FLG-INGAISYOHOU
            END-IF
       *
-           IF    ( DCACCT-ZAITEN       NOT =   ZERO )
-               MOVE    ZERO                TO  FLG-ZEROTEN
-           END-IF
-      *
            .
        200111-TAISO-SRY-CHK-EXT.
            EXIT.
@@ -3433,17 +3040,6 @@
                    IF    ( PTZAI-DAY (IDX-ZAI IDX27)  >   ZERO )
                        MOVE    1       TO  TSRYKA-SRYCD-DAY
                                              (IDX-TSRYKA IDX26 IDX27)
-                   END-IF
-               END-PERFORM
-           END-IF
-      *
-           IF    ( DCSRY-SRYSYUKBN =   "820" )
-            AND  ( DCSRY-SRYCD     =   "120002910" )
-               PERFORM VARYING IDX27   FROM     1   BY  1
-                       UNTIL ( IDX27   >   31 )
-                   IF    ( PTZAI-DAY (IDX-ZAI IDX27)  >   ZERO )
-                       MOVE    1       TO  TSRYKA-SYOHOUSEN
-                                             (IDX-TSRYKA IDX27)
                    END-IF
                END-PERFORM
            END-IF
@@ -3579,177 +3175,6 @@
       *
            .
        200111-TSRYKA-SAISIN-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    診療科退避ワーク服用方法編集処理
-      *****************************************************************
-       200111-TSRYKA-FUKUYOU-HEN-SEC   SECTION.
-      *
-           IF    ( DCACCT-NYUGAIKBN                = "2" )
-               IF    ( DCACCT-SRYKBN               = "21" )
-                AND  ( DCSRY-SRYSYUKBN (1:2)   NOT = "29")
-                   IF    ( DCSRY-SRYCD (1:3)       = "001")
-                       PERFORM 2001111-TSRYKA-FUKUYOU-HEN-SEC
-                   END-IF
-                   IF    ( DCSRY-SRYCD (1:1)       = "6")
-                       PERFORM 2001112-TSRYKA-FUKUYOU-HEN-SEC
-                   END-IF
-               END-IF
-           END-IF
-      *
-           .
-       200111-TSRYKA-FUKUYOU-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    診療科退避ワーク服用方法編集処理
-      *****************************************************************
-       2001111-TSRYKA-FUKUYOU-HEN-SEC   SECTION.
-      *
-           MOVE    ZERO            TO  IDX-FUKUYOU
-           PERFORM VARYING IDX2    FROM    1   BY  1
-                   UNTIL ( IDX2    >   50 )
-                    OR   ( IDX-FUKUYOU     >   ZERO )
-               IF    ( DCACCT-ZAINUM   =   TSRYKA-FUKUYOU-ZAINUM
-                                                     (IDX-TSRYKA IDX2))
-                AND  ( DCACCT-ACCTKBN  =   TSRYKA-FUKUYOU-ACCTKBN
-                                                     (IDX-TSRYKA IDX2))
-      *
-                   MOVE    IDX2    TO  IDX-FUKUYOU
-      *
-               END-IF
-           END-PERFORM
-      *
-           IF    ( IDX-FUKUYOU     =   ZERO )
-               IF    ( TSRYKA-FUKUYOU-MAX (IDX-TSRYKA)  >=  50 )
-                   CONTINUE
-               ELSE
-                   COMPUTE TSRYKA-FUKUYOU-MAX (IDX-TSRYKA)
-                        =  TSRYKA-FUKUYOU-MAX (IDX-TSRYKA) +   1
-                   MOVE    TSRYKA-FUKUYOU-MAX (IDX-TSRYKA)
-                                           TO  IDX-FUKUYOU
-                   MOVE    DCACCT-ZAINUM   TO  TSRYKA-FUKUYOU-ZAINUM
-                                                (IDX-TSRYKA IDX-FUKUYOU)
-                   MOVE    DCACCT-ACCTKBN  TO  TSRYKA-FUKUYOU-ACCTKBN
-                                                (IDX-TSRYKA IDX-FUKUYOU)
-                   PERFORM VARYING IDX-DAY FROM    1   BY  1
-                           UNTIL ( IDX-DAY >   31 )
-                       MOVE    PTZAI-DAY (IDX-ZAI IDX-DAY)
-                                           TO  TSRYKA-FUKUYOU-DAY
-                                        (IDX-TSRYKA IDX-FUKUYOU IDX-DAY)
-                   END-PERFORM
-               END-IF
-           END-IF
-      *
-           IF    ( IDX-FUKUYOU     =   ZERO )
-               CONTINUE
-           ELSE
-               MOVE    DCSRY-SRYCD         TO  WRK-SRYCDNUM-G
-               COMPUTE TSRYKA-FUKUYOU-CD1 (IDX-TSRYKA IDX-FUKUYOU)
-                   =   TSRYKA-FUKUYOU-CD1 (IDX-TSRYKA IDX-FUKUYOU)
-                   +   WRK-SRYCDNUM
-      *
-               MOVE    DCSRY-SRYCD TO  WRK-CHKVAL-G
-      *
-               PERFORM VARYING IDX0    FROM 1  BY  1
-                       UNTIL ( IDX0    >    9 )
-      *
-                   MOVE    WRK-CHKVAL (IDX0)
-                                   TO    WRK-NUM
-      *
-                   COMPUTE TSRYKA-FUKUYOU-CD2 (IDX-TSRYKA IDX-FUKUYOU)
-                       =   TSRYKA-FUKUYOU-CD2 (IDX-TSRYKA IDX-FUKUYOU)
-                       + ((WRK-NUM + 1 )
-                       *   CONST-CHKVAL(WRK-NUM + 1))
-                       *  (10 ** ( 9 - IDX0 ))
-      *
-               END-PERFORM
-      *
-           END-IF
-      *
-           .
-       2001111-TSRYKA-FUKUYOU-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    診療科退避ワーク服用方法編集処理
-      *****************************************************************
-       2001112-TSRYKA-FUKUYOU-HEN-SEC   SECTION.
-      *
-           PERFORM VARYING IDX-DAY FROM    1   BY  1
-                   UNTIL ( IDX-DAY >   31 )
-               IF    ( PTZAI-DAY (IDX-ZAI IDX-DAY) >   ZERO )
-                   COMPUTE TSRYKA-FUKUYOU-YKZCNT (IDX-TSRYKA IDX-DAY)
-                       =   TSRYKA-FUKUYOU-YKZCNT (IDX-TSRYKA IDX-DAY)
-                       +   1
-               END-IF
-           END-PERFORM
-      *
-           .
-       2001112-TSRYKA-FUKUYOU-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    診療科退避ワーク薬剤数量編集処理
-      *****************************************************************
-       200111-TSRYKA-YKZSURYO-HEN-SEC   SECTION.
-      *
-           IF    ( DCACCT-SRYKBN               = "21" OR "22" )
-               IF    ( DCSRY-SRYCD (1:1)       = "6")
-                 AND ( DCSRY-SURYO            >= 10 )
-      *
-                   MOVE    DCSRY-SRYCD     TO  WRK-SRYCD
-                   MOVE    WRK-KJNYMD      TO  WRK-TNS-YMD
-                   PERFORM 900-TENSU-KEY-SEL-SEC
-      *
-                   MOVE    TSRYKA-YKZSURYO-MAX (IDX-TSRYKA)
-                                           TO  IDXM
-                   PERFORM VARYING IDX0    FROM    1   BY  1
-                           UNTIL ( IDX0    >   TOPT-YKZSURYOTANI-MAX )
-                            OR   ( IDXM   >=   50 )
-                       IF    ( TNS-TANICD  =   TOPT-YKZSURYOTANI (IDX0))
-                           COMPUTE IDXM    =   IDXM    +   1
-                           MOVE    DCSRY-SRYCD
-                                           TO  TSRYKA-YKZSURYO-SRYCD
-                                                       (IDX-TSRYKA IDXM)
-                           MOVE    DCACCT-SRYKBN
-                                           TO  TSRYKA-YKZSURYO-SRYKBN
-                                                       (IDX-TSRYKA IDXM)
-                           MOVE    DCSRY-SURYO
-                                           TO  TSRYKA-YKZSURYO
-                                                       (IDX-TSRYKA IDXM)
-                           PERFORM VARYING IDXD    FROM    1    BY  1
-                                   UNTIL ( IDXD    >   31 )
-                               MOVE    PTZAI-DAY (IDX-ZAI IDXD)
-                                           TO  TSRYKA-YKZSURYO-DAY
-                                                  (IDX-TSRYKA IDXM IDXD)
-                           END-PERFORM
-                       END-IF
-      *
-                   END-PERFORM
-                   MOVE    IDXM    TO  TSRYKA-YKZSURYO-MAX (IDX-TSRYKA)
-               END-IF
-           END-IF
-      *
-           .
-       200111-TSRYKA-YKZSURYO-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    診療科退避ワーク内服投与日数誤り日編集処理
-      *****************************************************************
-       200111-TSRYKA-SRY21ERR-HEN-SEC  SECTION.
-      *
-           IF    ( DCACCT-SRYKBN               = "21" )
-               IF    ( DCSRY-SRYCD (1:1)       = "6")
-                   PERFORM VARYING IDXD    FROM    1   BY  1
-                           UNTIL ( IDXD    >   31 )
-                       IF    ( PTZAI-DAY (IDX-ZAI IDXD)    =   1 )
-                           MOVE    1       TO  TSRYKA-SRY21ERR-DAY
-                                                     (IDX-TSRYKA IDXD)
-                       END-IF
-                   END-PERFORM
-               END-IF
-           END-IF
-      *
-           .
-       200111-TSRYKA-SRY21ERR-HEN-EXT.
            EXIT.
       *****************************************************************
       *    診療科退避ワーク実日数算定日編集処理
@@ -4013,15 +3438,6 @@
       *
            IF    ( FLG-SHOSAISIN   =   1 )
                IF    ( IDXA            >   ZERO )
-                   IF    ( FLG-DOUSAISIN   =       1 )
-                       MOVE    1       TO  TJNISSU-DOUSAISIN (IDXA)
-                   END-IF
-                   IF    ( COMB-KOHHKNNUM (1)      =   "190" OR "290" )
-                    OR   ( COMB-KOHHKNNUM (2)      =   "190" OR "290" )
-                    OR   ( COMB-KOHHKNNUM (3)      =   "190" OR "290" )
-                    OR   ( COMB-KOHHKNNUM (4)      =   "190" OR "290" )
-                       MOVE    1       TO  TJNISSU-MARUNYU (IDXA)
-                   END-IF
                    PERFORM VARYING IDX2    FROM    1   BY  1
                            UNTIL ( IDX2    >   31 )
                        IF    ( PTZAI-DAY (IDX-ZAI IDX2)   >   ZERO )
@@ -4040,7 +3456,6 @@
        200111-JNISSU-HEN-SEC           SECTION.
       *
            MOVE    ZERO                TO  FLG-SHOSAISIN
-           MOVE    ZERO                TO  FLG-DOUSAISIN
       *
            IF   (( DCACCT-ZAITEN   NOT =   ZERO )
              AND ( DCACCT-ZAIKAISU NOT =   ZERO )
@@ -4122,16 +3537,6 @@
                    MOVE    1           TO  FLG-SHOSAISIN
       *
                END-IF
-      *
-      *
-               IF    ( DCSRY-SRYCD     =   "112008350"
-                                        OR "112008850"
-                                        OR "112010150"
-                                        OR "112010650"
-                                        OR "112011710" )
-                   MOVE    1           TO  FLG-DOUSAISIN
-               END-IF
-      *
            END-IF
       *
            IF    ( DCACCT-NYUGAIKBN    =   "1" )
@@ -5324,34 +4729,6 @@
       *            長期以外を対象とする
                    IF    ( PTKOH-KOHNUM    NOT =   "972" AND "974" )
                         PERFORM 200111-FTNJKYNUM-CHK-SEC
-                   END-IF
-               END-IF
-      *
-               IF    ( FLG-CHKEND (3)  =   ZERO )
-                   IF    ( ORCBSD01-NYUGAIKBN      =   "2" )
-                    AND  ( SYS-1001-PREFNUM        =   CONST-SHIMANE  )
-                    AND  ( TKOHID-KOHNUM (IDX4)    =   "190" OR "290" )
-      *
-                       EVALUATE    TRUE
-                       WHEN  ( TKOHID-PTFTN (IDX4) 
-                                               <   TKOHID-KOHJGN (IDX4))
-                        AND  ( TKOHID-PTFTN (IDX4)
-                                       NOT =    TKOHID-COMPFTN   (IDX4))
-                       WHEN  ( TKOHID-PTFTN (IDX4) 
-                                               >   TKOHID-KOHJGN (IDX4))
-                        AND  ( TKOHID-KOHJGN(IDX4)
-                                       NOT =    TKOHID-COMPFTN   (IDX4))
-                           MOVE    "031001"        TO  WRK-ERRCD
-                           MOVE    PTKOH-KOHNUM    TO  SRH-KOHNUM
-                           MOVE    PTKOH-PAYKBN    TO  SRH-PAYKBN
-                           PERFORM 2111-KOHNUM-GET-SEC
-                           MOVE    SRH-KOHNUMMEI   TO  WRK-ERRMES-PLUS
-                           INITIALIZE              TERRINF-AREA
-                           PERFORM 210-ERRMES-HEN-SEC
-                           IF    ( ORCBSD01-CHKKBN (3) =   "1" )
-                                MOVE    1           TO  FLG-CHKEND (3)
-                           END-IF
-                       END-EVALUATE
                    END-IF
                END-IF
       *
@@ -6979,7 +6356,7 @@
                    INITIALIZE              TERRINF-AREA
                    PERFORM 210-ERRMES-HEN-SEC
                END-IF
-          END-IF
+           END-IF
       *
            .
        200112-PTBYO-SRYYMD-CHK-EXT.
@@ -7640,7 +7017,7 @@
                                        TO  SDTCHK01-NYUGAIKBN
                MOVE    DTCHK003-HKNKBN TO  SDTCHK01-HKNKBN
                MOVE    CHKSND-GRPCHKKBN
-                                       TO  SDTCHK01-GRPCHKKBN
+                                           TO  SDTCHK01-GRPCHKKBN
                MOVE    TSRYKA-SRYCD-DAY-G (IDX6 IDX7)
                                        TO  SDTCHK01-CHKDAY-G
                CALL    "ORCSDTCHK01"   USING   SDTCHK01AREA
@@ -9767,41 +9144,6 @@
       *
            END-PERFORM
       *
-           IF    ( SYS-1001-HOSPID         =   CONST-ISHII
-                                            OR CONST-ISHII2
-                                            OR CONST-KOBAYASHI
-                                            OR CONST-KOBAYASHI-SAIKA
-                                                                       )
-               PERFORM VARYING IDX13   FROM    1   BY  1
-                       UNTIL ( IDX13   >   TJNISSU-MAX )
-                        OR   ( FLG-CHKEND (12) =   1 )
-      *
-                   IF    ( TJNISSU-DOUSAISIN(IDX13)    =   1 )
-                    AND  ( TJNISSU-MARUNYU  (IDX13)    =   1 )
-                    AND  ( TJNISSU-DAY-CNT  (IDX13)    =   1 )
-      *
-                       INITIALIZE                  WRK-NISSU-AREA
-      *
-                       PERFORM VARYING IDX0    FROM    1   BY  1
-                               UNTIL ( IDX0    >   31 )
-      *
-                           IF    ( TJNISSU-DAY (IDX13 IDX0)    >   ZERO)
-                               MOVE    1       TO  WRK-NISSU-DAY (IDX0)
-                           END-IF
-                       END-PERFORM
-                       PERFORM 200111-NISSU-HEN-SEC
-                       MOVE    WRK-NISSU-MES   TO   WRK-ERRMES-PLUS
-                       MOVE    "121001"        TO  WRK-ERRCD
-      *
-                       INITIALIZE              TERRINF-AREA
-                       PERFORM 215-ERRMES-HEN-SEC
-                       MOVE    1           TO  FLG-CHKEND (12)
-                   END-IF
-      *
-               END-PERFORM
-           END-IF
-      *
-      *
            PERFORM VARYING IDX13   FROM    1   BY  1
                    UNTIL ( IDX13   >   TJNISSU-MAX )
                     OR   ( FLG-CHKEND (12) =   1 )
@@ -9812,18 +9154,6 @@
                    INITIALIZE              TERRINF-AREA
                    PERFORM 211-ERRMES-HEN-SEC
                END-IF
-      *
-               IF    ( SYS-1001-HOSPID     =   CONST-YOSHIOKA-HOSP )
-                AND  ( FLG-RECEJIKI        =   1 )
-                   IF    ( TJNISSU-DAY-CNT (IDX13) =   1 )
-                    AND  ( FLG-160146210           =   1 )
-                    AND  ( FLG-008200009           =   0 )
-                       MOVE    "121002"        TO  WRK-ERRCD
-                       INITIALIZE              TERRINF-AREA
-                       PERFORM 210-ERRMES-HEN-SEC
-                   END-IF
-               END-IF
-      *
            END-PERFORM
       *
            .
@@ -10015,24 +9345,6 @@
                IF    ( ORCBSD01-CHKKBN (13) =   "1" )
                    MOVE    1           TO  FLG-CHKEND (13)
                    GO  TO  200111-NAME-CHK-EXT
-               END-IF
-           END-IF
-      *
-           IF    ( SYS-1001-HOSPID         =   CONST-YOSHIOKA-HOSP )
-            AND  ( FLG-RECEJIKI            =   1 )
-      *
-               MOVE    SPACE               TO  WRK-LASTNAME
-                                               WRK-FIRSTNAME
-      *
-               UNSTRING    WRK-PTINF-NAME  DELIMITED   BY  ALL SPACE
-                           INTO            WRK-LASTNAME
-                                           WRK-FIRSTNAME
-               END-UNSTRING
-      *
-               IF    ( WRK-FIRSTNAME       =   SPACE )
-                   MOVE    "131001"        TO  WRK-ERRCD
-                   INITIALIZE              TERRINF-AREA
-                   PERFORM 210-ERRMES-HEN-SEC
                END-IF
            END-IF
       *
@@ -10533,316 +9845,8 @@
            PERFORM 200111-NBFUKA-CHK-SEC
       *
       *
-           IF    ( SYS-1001-HOSPID         =   CONST-KOBAYASHI
-                                            OR CONST-KOBAYASHI-SAIKA
-                                            OR CONST-OHTSUKA
-                                                                       )
-              OR ( TOPT-TAZAITOUYOCHK      =   "1" )
-      *        服用方法チェック
-               PERFORM 200111-FUKUYOU-CHK-SEC
-           END-IF
-      *
-      *
-           IF    ( TOPT-YKZSURYOCHK        =   "1" )
-      *        薬剤数量入力チェック
-               PERFORM 200111-YKZSURYO-CHK-SEC
-           END-IF
-      *
-           IF    ( TOPT-NAIFUKUCHK         =   "1" )
-      *        内服薬剤投与日数誤りチェック
-               PERFORM 200111-SRY21ERR-CHK-SEC
-           END-IF
-      *
-      *
-      *    石井本院のみチェック
-           IF    ( SYS-1001-HOSPID         =   CONST-ISHII )
-      *
-      *        初診料、特定疾患療養管理料チェック
-               PERFORM 200111-HONIN-BUNIN-CHK-SEC
-      *
-           END-IF
-      *
            .
        200111-SONOTA-HISSU-CHK-EXT.
-           EXIT.
-      *****************************************************************
-      *    初診料、特定疾患療養管理料チェック
-      *****************************************************************
-       200111-HONIN-BUNIN-CHK-SEC      SECTION.
-      *
-           INITIALIZE                  WRK-BUNIN-INF-G
-      *
-           MOVE    ZERO            TO  FLG-CUST-SYOSIN-CHK
-                                       FLG-CUST-SIDO-CHK
-           MOVE    ZERO            TO  CNT-CUST-SYOSIN
-                                       CNT-CUST-113001810
-      *
-           PERFORM VARYING IDXD    FROM    1   BY  1
-                   UNTIL ( IDXD    >   31 )
-                    OR   ( FLG-CUST-SYOSIN-CHK =   1 )
-      *
-               IF    ( TSRYKA-ALL-SYOSIN-DAY (IDXD)
-                                   =   1 )
-                   MOVE    1       TO  FLG-CUST-SYOSIN-CHK
-               END-IF
-      *
-           END-PERFORM
-      *
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   TSRYCD-MAX )
-                    OR   ( FLG-CUST-SIDO-CHK   =   1 )
-      *
-               IF    ( TSRYCD-SRYCD (IDX0) =   "113001810" )
-                AND  ( TSRYCD-KAISU (IDX0) >   ZERO )
-                AND  ( TSRYCD-KAISU (IDX0) <   3 )
-                   MOVE    1       TO  FLG-CUST-SIDO-CHK
-                   MOVE    TSRYCD-KAISU (IDX0)
-                                   TO  CNT-CUST-113001810
-               END-IF
-      *
-           END-PERFORM
-      *
-           IF    ( FLG-CUST-SYOSIN-CHK =   1 )
-            OR   ( FLG-CUST-SIDO-CHK   =   1 )
-      *
-               PERFORM 900-PTSAME-KEY-SEL-SEC
-           IF    ( FLG-PTSAME    =   ZERO )
-                   PERFORM 2001111-OTHER-HOSP-CHK-SEC
-           END-IF
-      *
-           END-IF
-      *
-           .
-       200111-HONIN-BUNIN-CHK-EXT.
-           EXIT.
-      *****************************************************************
-      *    自院以外の医院チェック処理
-      *****************************************************************
-       2001111-OTHER-HOSP-CHK-SEC      SECTION.
-      *
-           PERFORM 900-PTSAME-KEY2-SEL-SEC
-      *
-           PERFORM UNTIL ( FLG-PTSAME  NOT =   ZERO )
-      *
-               MOVE    ZERO            TO  IDX-BUN
-               IF    ( PTSAME-HOSPNUM  >=  1 )
-                AND  ( PTSAME-HOSPNUM  <=  20 )
-                   MOVE    PTSAME-HOSPNUM
-                                       TO  IDX-BUN
-               END-IF
-      *
-               IF    ( IDX-BUN         >   ZERO )
-                   MOVE    IDX-BUN         TO  WRK-BUNIN-HOSPNUM
-                                                      (IDX-BUN)
-                   INITIALIZE                  TBUNNUM-REC
-                   MOVE    PTSAME-HOSPNUM  TO  TBUNNUM-HOSPNUM
-                   MOVE    PTSAME-PTID     TO  TBUNNUM-PTID
-                   MOVE    TBUNNUM-REC     TO  MCPDATA-REC
-                   MOVE    "tbl_ptnum"     TO  MCP-TABLE
-                   MOVE    "key"           TO  MCP-PATHNAME
-                   PERFORM 910-DBSELECT-SEC
-                   IF    ( MCP-RC          =   ZERO )
-                       MOVE    MCPDATA-REC TO  TBUNNUM-REC
-                       MOVE    TBUNNUM-PTNUM
-                                           TO  WRK-BUNIN-PTNUM
-                                                      (IDX-BUN)
-                   END-IF
-      *
-                   MOVE    "tbl_ptnum"     TO  MCP-TABLE
-                   MOVE    "key"           TO  MCP-PATHNAME
-                   PERFORM 910-DBCLOSECURSOR-SEC
-               END-IF
-      *
-               IF    ( FLG-CUST-SYOSIN-CHK =   1 )
-                   PERFORM 2001111-OTHER-SYOSIN-CHK-SEC
-               END-IF
-      *
-               IF    ( FLG-CUST-SIDO-CHK   =   1 )
-                   PERFORM 2001111-OTHER-SIDO-CHK-SEC
-               END-IF
-      *
-               PERFORM 900-PTSAME-KEY2-FET-SEC
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_ptsame"    TO  MCP-TABLE
-           MOVE    "key2"          TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           IF    ( FLG-CUST-SYOSIN-CHK   =   1 )
-               IF    ( CNT-CUST-SYOSIN >   ZERO )
-                   MOVE    SPACE       TO  WRK-CUST-ERRMES
-                   MOVE    1           TO  IDX0
-                   PERFORM VARYING IDX-BUN    FROM 1   BY  1
-                           UNTIL ( IDX-BUN    >    20 )
-                       IF    ( WRK-BUNIN-SYOSIN (IDX-BUN)
-                                              =    1 )
-                        AND  ( WRK-BUNIN-PTNUM  (IDX-BUN)
-                                          NOT =    SPACE )
-                           STRING  "　分院番号："
-                                              DELIMITED BY SIZE
-                                   WRK-BUNIN-HOSPNUMX (IDX-BUN)
-                                              DELIMITED BY SIZE
-                                   " "        DELIMITED BY SIZE
-                                   "患者番号："
-                                              DELIMITED BY SIZE
-                                   WRK-BUNIN-PTNUM  (IDX-BUN)
-                                              DELIMITED BY SPACE
-                           INTO    WRK-CUST-ERRMES
-                           WITH    POINTER    IDX0
-                           END-STRING
-                       END-IF
-                   END-PERFORM
-                   MOVE    WRK-CUST-ERRMES TO  WRK-MAE-INPUT
-                   PERFORM 800-ZENKAKU-HEN-SEC
-                   MOVE    WRK-OUT-INPUT   TO  WRK-CUST-ERRMES
-                   MOVE    "991002"    TO  WRK-ERRCD
-                   INITIALIZE              TERRINF-AREA
-                   PERFORM 210-ERRMES-HEN-SEC
-               END-IF
-           END-IF
-      *
-           IF    ( FLG-CUST-SIDO-CHK     =   1 )
-               IF    ( CNT-CUST-113001810  >=   3 )
-                   MOVE    SPACE       TO  WRK-CUST-ERRMES
-                   MOVE    1           TO  IDX0
-                   PERFORM VARYING IDX-BUN    FROM 1   BY  1
-                           UNTIL ( IDX-BUN    >    20 )
-                       IF    ( WRK-BUNIN-SIDO   (IDX-BUN)
-                                              =    1 )
-                        AND  ( WRK-BUNIN-PTNUM  (IDX-BUN)
-                                          NOT =    SPACE )
-                           STRING  "　分院番号："
-                                              DELIMITED BY SIZE
-                                   WRK-BUNIN-HOSPNUMX (IDX-BUN)
-                                              DELIMITED BY SIZE
-                                   " "        DELIMITED BY SIZE
-                                   "患者番号："
-                                              DELIMITED BY SIZE
-                                   WRK-BUNIN-PTNUM  (IDX-BUN)
-                                              DELIMITED BY SPACE
-                           INTO    WRK-CUST-ERRMES
-                           WITH    POINTER    IDX0
-                           END-STRING
-                       END-IF
-                   END-PERFORM
-                   MOVE    WRK-CUST-ERRMES TO  WRK-MAE-INPUT
-                   PERFORM 800-ZENKAKU-HEN-SEC
-                   MOVE    WRK-OUT-INPUT   TO  WRK-CUST-ERRMES
-                   MOVE    "991003"    TO  WRK-ERRCD
-                   MOVE    "113001810" TO  WRK-SRYCD
-                   MOVE    WRK-KJNYMD  TO  WRK-TNS-YMD
-                   PERFORM 900-TENSU-KEY-SEL-SEC
-                   MOVE    TNS-NAME    TO  WRK-ERRMES-PLUS
-                   INITIALIZE              TERRINF-AREA
-                   PERFORM 210-ERRMES-HEN-SEC
-               END-IF
-           END-IF
-      *
-           .
-       2001111-OTHER-HOSP-CHK-EXT.
-           EXIT.
-      *****************************************************************
-      *    自院以外の初診料算定チェック処理
-      *****************************************************************
-       2001111-OTHER-SYOSIN-CHK-SEC    SECTION.
-      *
-           PERFORM 900-SRYACCT-KEY30-SEL-SEC
-      *
-           PERFORM UNTIL ( FLG-SRYACCT NOT =   ZERO )
-      *
-               PERFORM 900-SRYACT-KEY2-SEL-SEC
-      *
-               PERFORM UNTIL ( FLG-SRYACT NOT =   ZERO )
-      *
-                   PERFORM VARYING IDX-SRY FROM    1   BY  1
-                           UNTIL ( IDX-SRY >   5 )
-      *
-                       IF    ( SRY-SRYCD (IDX-SRY)    NOT =   SPACE )
-                           MOVE    SRY-SRYCD (IDX-SRY)
-                                               TO  WRK-SRYCD
-                           MOVE    WRK-KJNYMD  TO  WRK-TNS-YMD
-                           PERFORM 900-TENSU-KEY-SEL-SEC
-                           IF   (( TNS-JITUDAY     =   2 )
-                            AND  ( TNS-DAYCNT      =   1 ))
-                             OR  (  TNS-SRYCD      =   "111011810" )
-      *
-                               COMPUTE CNT-CUST-SYOSIN
-                                   =   CNT-CUST-SYOSIN
-                                   +   ACCT-ZAIKAISU
-      *
-                               IF    ( IDX-BUN         >   ZERO )
-                                   MOVE    1      TO   WRK-BUNIN-SYOSIN
-                                                               (IDX-BUN)
-                               END-IF
-      *
-                           END-IF
-                       END-IF
-                   END-PERFORM
-      *
-                   PERFORM 900-SRYACT-KEY2-FET-SEC
-               END-PERFORM
-      *
-               MOVE    "tbl_sryact"     TO  MCP-TABLE
-               MOVE    "key2"           TO  MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
-      *
-               PERFORM 900-SRYACCT-KEY30-FET-SEC
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_sryacct"    TO  MCP-TABLE
-           MOVE    "key30"          TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           .
-       2001111-OTHER-SYOSIN-CHK-EXT.
-           EXIT.
-      *****************************************************************
-      *    自院以外の特定疾患療養管理料チェック処理
-      *****************************************************************
-       2001111-OTHER-SIDO-CHK-SEC  SECTION.
-      *
-           PERFORM 900-SRYACCT-KEY30-SEL-SEC
-      *
-           PERFORM UNTIL ( FLG-SRYACCT NOT =   ZERO )
-      *
-               PERFORM 900-SRYACT-KEY2-SEL-SEC
-      *
-               PERFORM UNTIL ( FLG-SRYACT NOT =   ZERO )
-      *
-                   PERFORM VARYING IDX-SRY FROM    1   BY  1
-                           UNTIL ( IDX-SRY >   5 )
-      *
-                       IF    ( SRY-SRYCD (IDX-SRY) =   "113001810" )
-                           COMPUTE CNT-CUST-113001810
-                               =   CNT-CUST-113001810
-                               +   ACCT-ZAIKAISU
-      *
-                           IF    ( IDX-BUN         >   ZERO )
-                               MOVE    1      TO   WRK-BUNIN-SIDO
-                                                           (IDX-BUN)
-                           END-IF
-                       END-IF
-                   END-PERFORM
-      *
-                   PERFORM 900-SRYACT-KEY2-FET-SEC
-               END-PERFORM
-      *
-               MOVE    "tbl_sryact"     TO  MCP-TABLE
-               MOVE    "key2"           TO  MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
-      *
-               PERFORM 900-SRYACCT-KEY30-FET-SEC
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_sryacct"    TO  MCP-TABLE
-           MOVE    "key30"          TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           .
-       2001111-OTHER-SIDO-CHK-EXT.
            EXIT.
       *****************************************************************
       *    減算情報チェック処理
@@ -11303,190 +10307,11 @@
        200111-NBFUKA-CHK-EXT.
            EXIT.
       *****************************************************************
-      *    服用方法チェック処理
-      *****************************************************************
-       200111-FUKUYOU-CHK-SEC          SECTION.
-      *
-           PERFORM VARYING IDX-TSRYKA   FROM    1   BY  1
-                   UNTIL ( IDX-TSRYKA   >   TSRYKA-MAX )
-      *
-               MOVE    ZERO        TO  WRK-NISSU-DAY-G
-      *
-               MOVE    TSRYKA-FUKUYOU-MAX (IDX-TSRYKA)
-                                       TO  WRK-MAX
-      *
-               PERFORM VARYING IDX-FUKUYOU FROM    1   BY  1
-                       UNTIL ( IDX-FUKUYOU >=  WRK-MAX )
-      *
-                   COMPUTE WRK-FROMIDX =   IDX-FUKUYOU +   1
-                   PERFORM VARYING IDX0    FROM    WRK-FROMIDX BY  1
-                           UNTIL ( IDX0    >   WRK-MAX )
-      *
-                       PERFORM VARYING IDX-DAY FROM    1   BY  1
-                               UNTIL ( IDX-DAY >   31 )
-      *
-                           IF    ( TSRYKA-SYOHOUSEN (IDX-TSRYKA IDX-DAY)
-                                           =   1 )
-                            AND  ( TSRYKA-FUKUYOU-DAY
-                                     (IDX-TSRYKA IDX-FUKUYOU IDX-DAY)
-                                           >   ZERO )
-                            AND  ( TSRYKA-FUKUYOU-CD1
-                                     (IDX-TSRYKA IDX-FUKUYOU)
-                                           =   TSRYKA-FUKUYOU-CD1
-                                                   (IDX-TSRYKA IDX0))
-                            AND  ( TSRYKA-FUKUYOU-CD2
-                                     (IDX-TSRYKA IDX-FUKUYOU)
-                                           =   TSRYKA-FUKUYOU-CD2
-                                                   (IDX-TSRYKA IDX0))
-                            AND  ( TSRYKA-FUKUYOU-DAY
-                                     (IDX-TSRYKA IDX-FUKUYOU IDX-DAY)
-                                           =   TSRYKA-FUKUYOU-DAY
-                                           (IDX-TSRYKA IDX0 IDX-DAY))
-                            AND  ( TSRYKA-FUKUYOU-YKZCNT
-                                           (IDX-TSRYKA IDX-DAY)
-                                           >=  7 )
-                               MOVE    1   TO  WRK-NISSU-DAY (IDX-DAY)
-                           END-IF
-      *
-                       END-PERFORM
-      *
-                   END-PERFORM
-               END-PERFORM
-      *
-               IF    ( WRK-NISSU-DAY-G     NOT =   ZERO )
-      *
-                   PERFORM 200111-NISSU-HEN-SEC
-                   MOVE    WRK-NISSU-MES       TO  WRK-ERRMES-PLUS
-                   MOVE    "991001"            TO  WRK-ERRCD
-                   MOVE    TSRYKA-SRYKA (IDX-TSRYKA)
-                                               TO  SRH-1005-SRYKA
-                   INITIALIZE              TERRINF-AREA
-                   PERFORM 213-ERRMES-HEN-SEC
-               END-IF
-      *
-           END-PERFORM
-      *
-           .
-       200111-FUKUYOU-CHK-EXT.
-           EXIT.
-      *****************************************************************
-      *    薬剤数量チェック処理
-      *****************************************************************
-       200111-YKZSURYO-CHK-SEC          SECTION.
-      *
-           PERFORM VARYING IDX-TSRYKA   FROM    1   BY  1
-                   UNTIL ( IDX-TSRYKA   >   TSRYKA-MAX )
-      *
-               MOVE    ZERO        TO  WRK-NISSU-DAY-G
-      *
-               MOVE    TSRYKA-YKZSURYO-MAX (IDX-TSRYKA)
-                                       TO  WRK-MAX
-      *
-               PERFORM VARYING IDXM    FROM    1   BY  1
-                       UNTIL ( IDXM >  WRK-MAX )
-      *
-                   PERFORM VARYING IDXD    FROM    1   BY  1
-                           UNTIL ( IDXD    >   31 )
-                       IF    ( TSRYKA-YKZSURYO-DAY
-                                  (IDX-TSRYKA IDXM IDXD )
-                                           >   ZERO )
-                           MOVE    1   TO  WRK-NISSU-DAY (IDXD)
-                       END-IF
-                   END-PERFORM
-      *
-      *
-                   IF    ( WRK-NISSU-DAY-G     NOT =   ZERO )
-      *
-                       PERFORM 200111-NISSU-HEN-SEC
-      *
-                       MOVE    TSRYKA-YKZSURYO-SRYCD (IDX-TSRYKA IDXM)
-                                                   TO  WRK-SRYCD
-                       MOVE    WRK-KJNYMD          TO  WRK-TNS-YMD
-                       PERFORM 900-TENSU-KEY-SEL-SEC
-      *
-                       MOVE    TSRYKA-YKZSURYO (IDX-TSRYKA IDXM)
-                                                   TO  WRK-SURYOZ
-                       PERFORM VARYING IDX0    FROM    5   BY  -1
-                               UNTIL ( IDX0     <   1 )
-                        OR   ( WRK-SURYOZ2 (IDX0 : 1)
-                                               NOT ="0" )
-                           MOVE    SPACE   TO  WRK-SURYOZ2 (IDX0 : 1)
-                       END-PERFORM
-                       IF    ( WRK-SURYOZ2     =   SPACE )
-                           MOVE    SPACE   TO  WRK-SURYOZDOT
-                       END-IF
-                       MOVE    WRK-SURYOZ-R
-                                           TO  WRK-STR-LEFT
-                       PERFORM 800-STR-HIDARIZUME-HEN-SEC
-                       MOVE    WRK-STR-LEFT    TO  WRK-MAE-INPUT
-                       PERFORM 800-ZENKAKU-HEN-SEC
-      *
-                       MOVE    SPACE       TO  WRK-ERRMES-PLUS
-                       STRING  TNS-NAME    DELIMITED   BY  SPACE
-                               "（数量："  DELIMITED   BY  SIZE
-                               WRK-OUT-INPUT
-                                           DELIMITED   BY  SPACE
-                               "）"        DELIMITED   BY  SIZE
-                               WRK-NISSU-MES
-                                           DELIMITED   BY  SPACE
-                       INTO    WRK-ERRMES-PLUS
-                       END-STRING
-      *
-                       MOVE    "991004"            TO  WRK-ERRCD
-                       MOVE    TSRYKA-SRYKA (IDX-TSRYKA)
-                                                   TO  SRH-1005-SRYKA
-                       INITIALIZE              TERRINF-AREA
-                       PERFORM 213-ERRMES-HEN-SEC
-                   END-IF
-               END-PERFORM
-      *
-           END-PERFORM
-      *
-           .
-       200111-YKZSURYO-CHK-EXT.
-           EXIT.
-      *****************************************************************
-      *    内服薬剤投与日数誤りチェック
-      *****************************************************************
-       200111-SRY21ERR-CHK-SEC          SECTION.
-      *
-           PERFORM VARYING IDX-TSRYKA   FROM    1   BY  1
-                   UNTIL ( IDX-TSRYKA   >   TSRYKA-MAX )
-      *
-               MOVE    ZERO        TO  WRK-NISSU-DAY-G
-      *
-               PERFORM VARYING IDXD    FROM    1   BY  1
-                       UNTIL ( IDXD    >   31 )
-                   IF    ( TSRYKA-SRY21ERR-DAY
-                              (IDX-TSRYKA IDXD )
-                                       >  ZERO )
-                       MOVE    1   TO  WRK-NISSU-DAY (IDXD)
-                   END-IF
-               END-PERFORM
-      *
-               IF    ( WRK-NISSU-DAY-G     NOT =   ZERO )
-      *
-                   PERFORM 200111-NISSU-HEN-SEC
-      *
-                   MOVE    "991005"            TO  WRK-ERRCD
-                   MOVE    WRK-NISSU-MES       TO  WRK-ERRMES-PLUS
-                   MOVE    TSRYKA-SRYKA (IDX-TSRYKA)
-                                               TO  SRH-1005-SRYKA
-                   INITIALIZE              TERRINF-AREA
-                   PERFORM 213-ERRMES-HEN-SEC
-               END-IF
-      *
-           END-PERFORM
-      *
-           .
-       200111-SRY21ERR-CHK-EXT.
-           EXIT.
-      *****************************************************************
       *    日数編集処理
       *****************************************************************
        200111-NISSU-HEN-SEC            SECTION.
       *
-           INITIALIZE                  WRK-NISSU-OT
+           INITIALIZE                      WRK-NISSU-OT
       *
            MOVE    1                   TO  WRK-NISSU-PTR
            MOVE    1                   TO  WRK-NISSU-ST
@@ -12092,55 +10917,6 @@
        2161-ERRMES-HEN-EXT.
            EXIT.
       *****************************************************************
-      *    エラーメッセージ編集処理（７）
-      *****************************************************************
-       217-ERRMES-HEN-SEC              SECTION.
-      *
-           PERFORM 220-REIGAI-CHK-SEC
-           IF    ( FLG-REIGAI    =     ZERO )
-               PERFORM 2171-ERRMES-HEN-SEC
-           END-IF
-      *
-           .
-       217-ERRMES-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    エラーメッセージ編集処理（７）
-      *****************************************************************
-       2171-ERRMES-HEN-SEC             SECTION.
-      *
-           PERFORM 2111-ERRMES-GET-SEC
-      *
-           INITIALIZE  DTCHK004-REC
-      *
-           MOVE    WRK-ERRCD           TO  DTCHK004-ERRCD
-      *
-           COMPUTE CNT-CHKERR  =   CNT-CHKERR  +   1
-           MOVE    CNT-CHKERR          TO  DTCHK004-ERRCD-SEQ
-      *
-           MOVE    "Z"                 TO  DTCHK004-HKNKBN
-           MOVE    TERRINF-LASTYMD     TO  DTCHK004-LASTYMD
-           MOVE    TERRINF-SRYCD       TO  DTCHK004-SRYCD
-      *
-           MOVE    "*****"             TO  DTCHK004-PTNUM
-           MOVE    HIGH-VALUE          TO  DTCHK004-R1-PTNUM
-           MOVE    DTCHK004-ERRCD      TO  DTCHK004-R1-ERRCD
-           MOVE    DTCHK004-ERRCD-SEQ  TO  DTCHK004-R1-ERRCD-SEQ
-      *
-           STRING  WRK-ERRMES          DELIMITED   BY  SPACE
-                  "【"                 DELIMITED   BY  SIZE
-                   WRK-ERRMES-PLUS     DELIMITED   BY  SPACE
-                   "】"
-           INTO    DTCHK004-ERRMSG
-           END-STRING
-      *
-           WRITE   DTCHK004-REC
-           COMPUTE CNT-DTCHK004    =   CNT-DTCHK004    +   1
-      *
-           .
-       2171-ERRMES-HEN-EXT.
-           EXIT.
-      *****************************************************************
       *    例外チェック処理
       *****************************************************************
        220-REIGAI-CHK-SEC              SECTION.
@@ -12182,84 +10958,26 @@
       *
            MOVE    SPACE               TO  WRK-ERRMES
       *
-           IF    ( WRK-ERRCD       =   "991001" )
-               MOVE    "同じ服用方法が複数入力されています"
+           IF    ( WRK-ERRCD           =   "140004" )
+             STRING "保険組合せが正しく作成されていません。"
+                                           DELIMITED BY SIZE
+                    "保険または公費情報を確認してください"
+                                           DELIMITED BY SIZE
+             INTO   WRK-ERRMES
+             END-STRING
+           ELSE
+      *
+             PERFORM VARYING IDX-ERRCD   FROM    1   BY  1
+                   UNTIL ( IDX-ERRCD   >   ERRMES-MAX )
+      *
+               IF    ( WRK-ERRCD       =   ERRMES-CD (IDX-ERRCD) )
+                   MOVE    ERRMES-MESSAGE (IDX-ERRCD)
                                        TO  WRK-ERRMES
+                   MOVE    ERRMES-MAX  TO  IDX-ERRCD
+               END-IF
+      *
+             END-PERFORM
            END-IF
-      *
-           IF    ( WRK-ERRCD       =   "991002" )
-               STRING  "本院と分院で初診料が算定されています"
-                                       DELIMITED BY SIZE
-                       WRK-CUST-ERRMES DELIMITED BY SPACE
-               INTO    WRK-ERRMES
-               END-STRING
-           END-IF
-      *
-           IF    ( WRK-ERRCD       =   "991003" )
-               STRING  WRK-ERRMES-PLUS DELIMITED   BY  SPACE
-                       "が本院と分院合わせて"
-                                       DELIMITED BY SIZE
-                       "３回以上算定されています"
-                                       DELIMITED BY SIZE
-                       WRK-CUST-ERRMES DELIMITED BY SPACE
-               INTO    WRK-ERRMES
-               END-STRING
-           END-IF
-      *
-           IF    ( WRK-ERRCD       =   "991004" )
-               MOVE    "数量が適正（１０未満）か確認してください"
-                                       TO   WRK-ERRMES
-           END-IF
-      *
-           IF    ( WRK-ERRCD       =   "991005" )
-               MOVE    "内服の処方日数が１日です。確認して下さい"
-                                       TO   WRK-ERRMES
-           END-IF
-      *
-           IF    ( WRK-ERRCD       =   "121001" )
-               MOVE    "乳幼児請求書を確認してください"
-                                       TO  WRK-ERRMES
-           END-IF
-      *
-           IF    ( WRK-ERRCD       =   "121002" )
-               MOVE    "注記コメント未入力です"
-                                       TO  WRK-ERRMES
-           END-IF
-      *
-           IF    ( WRK-ERRCD       =   "031001" )
-               STRING  WRK-ERRMES-PLUS DELIMITED   BY  SPACE
-                       "の負担金額を収納業務の一括再計算より訂正して"
-                                       DELIMITED   BY  SIZE
-                       "ください"      DELIMITED   BY  SIZE
-               INTO    WRK-ERRMES
-               END-STRING
-           END-IF
-      *
-           IF    ( WRK-ERRCD       =   "131001" )
-             MOVE  "苗字と名前の両方が入力されているか確認してください"
-                                       TO  WRK-ERRMES
-           END-IF
-      *
-           IF    ( WRK-ERRCD       =   "A10001" )
-               STRING  "チェックマスタ未登録の薬剤です"
-                                       DELIMITED   BY  SIZE
-               INTO    WRK-ERRMES
-               END-STRING
-           END-IF
-      *
-           IF    ( WRK-ERRMES          =   SPACE )
-      *
-               PERFORM VARYING IDX-ERRCD   FROM    1   BY  1
-                       UNTIL ( IDX-ERRCD   >   ERRMES-MAX )
-      *
-                   IF    ( WRK-ERRCD       =   ERRMES-CD (IDX-ERRCD) )
-                       MOVE    ERRMES-MESSAGE (IDX-ERRCD)
-                                           TO  WRK-ERRMES
-                       MOVE    ERRMES-MAX  TO  IDX-ERRCD
-                   END-IF
-      *
-               END-PERFORM
-            END-IF
       *
            .
        2111-ERRMES-GET-EXT.
@@ -12342,19 +11060,6 @@
                MOVE    DTCHK004-ERRCD      TO  DTCHK004-R4-ERRCD
                MOVE    DTCHK004-ERRCD-SEQ  TO  DTCHK004-R4-ERRCD-SEQ
            END-EVALUATE
-      *
-           IF    (     WRK-ERRCD           =   "999001" )
-      *
-               MOVE    SPACE               TO  DTCHK004-KEY
-               MOVE    HIGH-VALUE          TO  DTCHK004-R1-PTNUM
-               MOVE    DTCHK004-ERRCD      TO  DTCHK004-R1-ERRCD
-               MOVE    DTCHK004-ERRCD-SEQ  TO  DTCHK004-R1-ERRCD-SEQ
-      *
-               MOVE    ZERO                TO  DTCHK004-PTID
-               MOVE    "*****"             TO  DTCHK004-PTNUM
-               MOVE    SPACE               TO  DTCHK004-NAME
-                                               DTCHK004-BIRTHDAY
-           END-IF
       *
            .
        2111-DTCHK004-KYOTU-HEN-EXT.
@@ -12765,6 +11470,7 @@
                    WRK-TIME-N          DELIMITED BY SPACE
            INTO    JOB-YOBI
            END-STRING
+      *
            IF      LNK-PRTKANRI-TBL-KEY  NOT =  "RECEPTX"
                MOVE    WRK-PARA-JOBID      TO  JOB-JOBID
                MOVE    WRK-PARA-SHELLID    TO  JOB-SHELLID
@@ -13226,17 +11932,6 @@
                END-IF
            END-IF
       *
-           CLOSE                       DTCHK008-FILE
-           OPEN   INPUT                DTCHK008-FILE
-      *
-           IF    ( SYS-1001-HOSPID         =   CONST-NAKATA
-                                            OR CONST-NAKATA2 )
-             OR  ( TOPT-YKZMSTCHK          =   "1" )
-      *
-                   PERFORM 3001-TEKBYOMEI-MITOUROKU-SEC
-      *
-           END-IF
-      *
            CLOSE                       DCACCT-FILE
                                        DCSRY-FILE
                                        DTCHK003-FILE
@@ -13251,7 +11946,7 @@
            PERFORM 910-DBDROP-SEC
       *
            IF      LNK-PRTKANRI-TBL-KEY  NOT =  "RECEPTX"
-      *        ステップ管理終了処理
+      *    ステップ管理終了処理
                MOVE    "STE"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
                MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
@@ -13271,52 +11966,6 @@
        300-END-EXT.
            EXIT.
       *
-      *****************************************************************
-      *    適応病名未登録薬剤チェック処理
-      *****************************************************************
-       3001-TEKBYOMEI-MITOUROKU-SEC            SECTION.
-      *
-           PERFORM 901-DTCHK008-READ-SEC
-      *
-           PERFORM UNTIL ( FLG-DTCHK008    NOT =   ZERO )
-      *
-               IF    ( DTCHK008-CHKKBN     =   "1" )
-                AND  ( DTCHK008-CDKBN      =   "1" )
-                AND  ( DTCHK008-SRYCD(1:1) =   "6" )
-                   MOVE    "A1"        TO  WRK-REIGAI-CHKNUM
-                   MOVE    "1"         TO  WRK-REIGAI-CHKKBN
-                   MOVE    DTCHK008-SRYCD
-                                       TO  WRK-REIGAI-CD
-                   PERFORM 800-REIGAI-CHK-SEC
-                   IF    ( FLG-REIGAI  =   ZERO )
-      *
-                       MOVE    DTCHK008-SRYCD  TO  WRK-SRYCD
-                       MOVE    WRK-KJNYMD      TO  WRK-TNS-YMD
-                       PERFORM 900-TENSU-KEY-SEL-SEC
-                       IF    ( FLG-TENSU       NOT =   ZERO )
-                           MOVE    WRK-SRYCD       TO  WRK-MAE-INPUT
-                           PERFORM 800-ZENKAKU-HEN-SEC
-                           MOVE    WRK-OUT-INPUT   TO  TNS-NAME
-                       END-IF
-                       IF    ( TNS-YKZKBN      NOT =   3 )
-                           MOVE    "A10001"        TO  WRK-ERRCD
-                           MOVE    TNS-NAME        TO  WRK-ERRMES-PLUS
-                           INITIALIZE                  TERRINF-AREA
-                           MOVE    "1"             TO  TERRINF-CHKKBN
-                           MOVE    DTCHK008-SRYCD  TO  TERRINF-SRYCD
-                           MOVE    WRK-KJNYMD      TO  TERRINF-LASTYMD
-                           PERFORM 217-ERRMES-HEN-SEC
-                       END-IF
-                   END-IF
-               END-IF
-      *
-               PERFORM 901-DTCHK008-READ-SEC
-      *
-           END-PERFORM
-      *
-           .
-       3001-TEKBYOMEI-MITOUROKU-EXT.
-           EXIT.
       *****************************************************************
       *    例外設定チェック処理
       *****************************************************************
@@ -14084,21 +12733,6 @@
       *
            .
        900-DTCHK008-READ-EXT.
-           EXIT.
-      *****************************************************************
-      *    データチェック中間ファイル読込処理
-      *****************************************************************
-       901-DTCHK008-READ-SEC           SECTION.
-      *
-           MOVE    ZERO                TO  FLG-DTCHK008
-      *
-           READ    DTCHK008-FILE       NEXT
-           AT  END
-               MOVE    1               TO  FLG-DTCHK008
-           END-READ
-      *
-           .
-       901-DTCHK008-READ-EXT.
            EXIT.
       *****************************************************************
       *    データチェック中間ファイル読込処理
@@ -15022,87 +13656,6 @@
        900-BYOMEI-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
-      *    収納検索処理
-      *****************************************************************
-       900-SYUNOU-KEY14-SEL-SEC          SECTION.
-      *
-           MOVE    ZERO                TO  FLG-SYUNOU
-      *
-           INITIALIZE                  SYUNOU-REC
-           MOVE    SPA-HOSPNUM     TO  SYU-HOSPNUM
-           MOVE    "2"             TO  SYU-NYUGAIKBN
-           MOVE    DTCHK003-PTID   TO  SYU-PTID
-           MOVE    ORCBSD01-SRYYM  TO  SYU-SRYYMD (1:6)
-           MOVE    "__"            TO  SYU-SRYYMD (7:2)
-           MOVE    SYUNOU-REC      TO  MCPDATA-REC
-           MOVE    "tbl_syunou"    TO  MCP-TABLE
-           MOVE    "key14"         TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC      =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYUNOU-REC
-           ELSE
-               MOVE    1               TO  FLG-SYUNOU
-               INITIALIZE                  SYUNOU-REC
-           END-IF
-      *
-           .
-      *
-       900-SYUNOU-KEY14-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    収納FETCH処理
-      *****************************************************************
-       900-SYUNOU-KEY14-FET-SEC        SECTION.
-      *
-           MOVE    ZERO                TO  FLG-SYUNOU
-      *
-           MOVE    "tbl_syunou"    TO  MCP-TABLE
-           MOVE    "key14"         TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC      =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYUNOU-REC
-           ELSE
-               MOVE    1               TO  FLG-SYUNOU
-               INITIALIZE                  SYUNOU-REC
-           END-IF
-      *
-           .
-      *
-       900-SYUNOU-KEY14-FET-EXT.
-           EXIT.
-      *****************************************************************
-      *    収納合計検索処理
-      *****************************************************************
-       900-SYUTOTAL-KEY-SEL-SEC        SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SYUTTL
-      *
-           INITIALIZE                  SYUTTL-REC
-      *
-           MOVE    SYU-HOSPNUM     TO  SYUTTL-HOSPNUM
-           MOVE    SYU-NYUGAIKBN   TO  SYUTTL-NYUGAIKBN
-           MOVE    SYU-PTID        TO  SYUTTL-PTID
-           MOVE    SYU-DENPNUM     TO  SYUTTL-DENPNUM
-           MOVE    SYUTTL-REC      TO  MCPDATA-REC
-           MOVE    "tbl_syutotal"  TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC      =   ZERO )
-               MOVE    MCPDATA-REC     TO  SYUTTL-REC
-           ELSE
-               MOVE    1               TO  FLG-SYUTTL
-               INITIALIZE                  SYUTTL-REC
-           END-IF
-      *
-           MOVE    "tbl_syutotal"  TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           .
-      *
-       900-SYUTOTAL-KEY-FET-EXT.
-           EXIT.
-      *****************************************************************
       *    入院会計検索処理
       *****************************************************************
        900-NYUINACCT-KEY17-SEL-SEC    SECTION.
@@ -15432,182 +13985,6 @@
       *
            .
        900-PTCOM-KEY-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    患者紐付け検索処理
-      *****************************************************************
-       900-PTSAME-KEY-SEL-SEC          SECTION.
-      *
-           MOVE    ZERO            TO  FLG-PTSAME
-      *
-           INITIALIZE                  PTSAME-REC
-           MOVE    SPA-HOSPNUM     TO  PTSAME-HOSPNUM
-           MOVE    DTCHK003-PTID   TO  PTSAME-PTID
-           MOVE    PTSAME-REC      TO  MCPDATA-REC
-           MOVE    "tbl_ptsame"    TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  PTSAME-REC
-           ELSE
-               MOVE    1           TO  FLG-PTSAME
-               INITIALIZE              PTSAME-REC
-           END-IF
-      *
-           MOVE    "tbl_ptsame"    TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           .
-       900-PTSAME-KEY-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    患者紐付け検索処理
-      *****************************************************************
-       900-PTSAME-KEY2-SEL-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-PTSAME
-      *
-           MOVE    PTSAME-REC      TO  MCPDATA-REC
-           MOVE    "tbl_ptsame"    TO  MCP-TABLE
-           MOVE    "key2"          TO  MCP-PATHNAME
-           PERFORM 911-DBSELECT-SEC
-           IF    ( MCP-RC          =   ZERO )
-               PERFORM 900-PTSAME-KEY2-FET-SEC
-           ELSE
-               MOVE    1           TO  FLG-PTSAME
-               INITIALIZE              PTSAME-REC
-           END-IF
-      *
-           .
-       900-PTSAME-KEY2-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    患者紐付けFETCH処理
-      *****************************************************************
-       900-PTSAME-KEY2-FET-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-PTSAME
-                                       FLG-LOOP-END
-      *
-           PERFORM UNTIL ( FLG-PTSAME      NOT =   ZERO )
-                    OR   ( FLG-LOOP-END    NOT =   ZERO )
-      *
-               MOVE    "tbl_ptsame"    TO  MCP-TABLE
-               MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 910-DBFETCH-SEC
-               IF    ( MCP-RC          =   ZERO )
-                   MOVE    MCPDATA-REC TO  PTSAME-REC
-      *
-                   MOVE    1           TO  FLG-LOOP-END
-      *
-                   IF    ( SPA-HOSPNUM =   PTSAME-HOSPNUM )
-                       MOVE    ZERO    TO  FLG-LOOP-END
-                   END-IF
-      *
-               ELSE
-                   MOVE    1           TO  FLG-PTSAME
-                   INITIALIZE              PTSAME-REC
-               END-IF
-           END-PERFORM
-      *
-           .
-       900-PTSAME-KEY2-FET-EXT.
-           EXIT.
-      *****************************************************************
-      *    診療会計検索処理
-      *****************************************************************
-       900-SRYACCT-KEY30-SEL-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SRYACCT
-      *
-           INITIALIZE                  SRYACCT-REC
-           MOVE    PTSAME-HOSPNUM  TO  ACCT-HOSPNUM
-           MOVE    ORCBSD01-NYUGAIKBN
-                                   TO  ACCT-NYUGAIKBN
-           MOVE    PTSAME-PTID     TO  ACCT-PTID
-           MOVE    ORCBSD01-SRYYM  TO  ACCT-SRYYM
-           MOVE    SRYACCT-REC     TO  MCPDATA-REC
-           MOVE    "tbl_sryacct"   TO  MCP-TABLE
-           MOVE    "key30"         TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  SRYACCT-REC
-           ELSE
-               MOVE    1           TO  FLG-SRYACCT
-               INITIALIZE              SRYACCT-REC
-           END-IF
-      *
-           .
-       900-SRYACCT-KEY30-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    診療会計検索処理
-      *****************************************************************
-       900-SRYACCT-KEY30-FET-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SRYACCT
-      *
-           MOVE    "tbl_sryacct"   TO  MCP-TABLE
-           MOVE    "key30"         TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  SRYACCT-REC
-           ELSE
-               MOVE    1           TO  FLG-SRYACCT
-               INITIALIZE              SRYACCT-REC
-           END-IF
-      *
-           .
-       900-SRYACCT-KEY30-FET-EXT.
-           EXIT.
-      *****************************************************************
-      *    診療行為検索処理
-      *****************************************************************
-       900-SRYACT-KEY2-SEL-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SRYACT
-      *
-           INITIALIZE                  SRYACT-REC
-           MOVE    ACCT-HOSPNUM    TO  SRY-HOSPNUM
-           MOVE    ACCT-NYUGAIKBN  TO  SRY-NYUGAIKBN
-           MOVE    ACCT-PTID       TO  SRY-PTID
-           MOVE    ACCT-SRYKA      TO  SRY-SRYKA
-           MOVE    ACCT-SRYYM      TO  SRY-SRYYM
-           MOVE    ACCT-ZAINUM     TO  SRY-ZAINUM
-           MOVE    SRYACT-REC      TO  MCPDATA-REC
-           MOVE    "tbl_sryact"    TO  MCP-TABLE
-           MOVE    "key2"          TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  SRYACT-REC
-           ELSE
-               MOVE    1           TO  FLG-SRYACT
-               INITIALIZE              SRYACT-REC
-           END-IF
-      *
-           .
-       900-SRYACT-KEY2-SEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    診療行為検索処理
-      *****************************************************************
-       900-SRYACT-KEY2-FET-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-SRYACT
-      *
-           MOVE    "tbl_sryact"    TO  MCP-TABLE
-           MOVE    "key2"          TO  MCP-PATHNAME
-           PERFORM 910-DBFETCH-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC TO  SRYACT-REC
-           ELSE
-               MOVE    1           TO  FLG-SRYACT
-               INITIALIZE              SRYACT-REC
-           END-IF
-      *
-           .
-       900-SRYACT-KEY2-FET-EXT.
            EXIT.
       *****************************************************************
       *    チェックマスタ２検索処理
