@@ -1328,9 +1328,6 @@
                    MOVE    WIDGET-INSENSITIVE  TO  M80-B09-STATE
            END-EVALUATE
       *
-           MOVE    SPACE               TO  M80-B11-LABEL
-           MOVE    WIDGET-INSENSITIVE  TO  M80-B11-STATE
-      *
            MOVE   SPA-GMN-SYORIMSG     TO  M80-SYORIMSG-VALUE
            EVALUATE    SPA-NAI-SYORIERR
                WHEN    1
@@ -1389,8 +1386,6 @@
                    MOVE    "B04"             TO  MCP-WIDGET
                WHEN    11
                    MOVE    "B09"             TO  MCP-WIDGET
-               WHEN    12
-                   MOVE    "B11"             TO  MCP-WIDGET
            END-EVALUATE
       *
            .

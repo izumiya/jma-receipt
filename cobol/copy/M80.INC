@@ -30,8 +30,5 @@
               03  M80-B10.
                 04  M80-B10-STATE   PIC S9(9)   BINARY.
                 04  M80-B10-LABEL   PIC X(10).
-              03  M80-B11.
-                04  M80-B11-STATE   PIC S9(9)   BINARY.
-                04  M80-B11-LABEL   PIC X(10).
               03  M80-PANDATIMER1.
                 04  M80-DURATION    PIC S9(9)   BINARY.

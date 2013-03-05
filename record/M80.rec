@@ -37,10 +37,6 @@ M80	{
 	           	state	int;
 			label	varchar(10);
 		};
-		B11	{
-	           	state	int;
-			label	varchar(10);
-		};
 		pandatimer1     {
 			duration        int;
 		};
