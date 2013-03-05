@@ -351,6 +351,7 @@
       *  04.05.48    NACL-ÌçÏÆ    12/11/09  ÆÃÊÌ¿©²Ã»»¤ÎÊÔ½¸½¤Àµ
       *  04.05.49    NACL-ÌçÏÆ    12/12/10  ¿À¸Í»ÔÃÏÊý¸øÈñ¹âÃÎ¸©ÂÐ±þ
       *  04.05.50    NACL-ÌçÏÆ    12/12/10  £·£µºÐÅþÃ£·î¤ÎÆÃÎãÈó³ºÅöÂÐ±þ
+      *  04.05.51    NACL-ÌçÏÆ    13/03/05  ÂçºåÉÜÃÏÊý¸øÈñÉéÃ´¶â·×»»½¤Àµ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
       *  04.06.02    NACL-ÌçÏÆ    12/07/30  ¹â³Û°ÑÇ¤Ê§¤¤À©ÅÙ¾å¸Â³Û£°±ßÂÐ±þ
@@ -23457,10 +23458,10 @@
       *
                IF   WK-DAY-NYUKFTNRATE  =  ZERO
                     MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE
-               ELSE
-                 IF  WK-DAY-NYUKFTNRATE  > WK-NYUKFTNRATE
-                    MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE
-                 END-IF
+      ***      ELSE
+      ***        IF  WK-DAY-NYUKFTNRATE  > WK-NYUKFTNRATE
+      ***           MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE
+      ***        END-IF
                END-IF
       *
                COMPUTE   WK-FUTANWARI  =
@@ -24087,10 +24088,10 @@
       *
                IF   WK-DAY-NYUKFTNRATE  =  ZERO
                     MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE
-               ELSE
-                 IF  WK-DAY-NYUKFTNRATE  > WK-NYUKFTNRATE
-                    MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE
-                 END-IF
+      ***      ELSE
+      ***        IF  WK-DAY-NYUKFTNRATE  > WK-NYUKFTNRATE
+      ***           MOVE      WK-NYUKFTNRATE   TO   WK-DAY-NYUKFTNRATE
+      ***        END-IF
                END-IF
       *
                COMPUTE   WK-FUTANWARI  =
