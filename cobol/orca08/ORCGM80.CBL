@@ -800,14 +800,13 @@
                WHEN    "date "
       *            ÆüÉÕ
                    MOVE    PLUGIN-DATA     TO  WRK-GMN-TDATE
-      *         WHEN    "install "
                WHEN    "link "
       *            LINK
                    MOVE    PLUGIN-DATA     TO  WRK-NAI-TLINK
-                   IF      WRK-NAI-TLINK   =   "FALSE"
-                       MOVE    "disable"       TO  WRK-GMN-TLINK
+                   IF      WRK-NAI-TLINK  =   "FALSE"
+                       MOVE    "-"             TO  WRK-GMN-TLINK
                    ELSE
-                       MOVE    "enable"        TO  WRK-GMN-TLINK
+                       MOVE    "¡û"            TO  WRK-GMN-TLINK
                    END-IF
            END-EVALUATE
       *
