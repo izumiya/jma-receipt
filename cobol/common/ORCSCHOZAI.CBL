@@ -1306,6 +1306,20 @@
                    IF      TBL-CHO-DAY (IDX2 1 IDX)   >   ZERO
                        IF      FLG-ARI         =   ZERO
                            MOVE    1               TO  FLG-ARI
+      *ver.4.7
+      *                    退院日・入院日判定
+                           IF      TBL-CHO-DAY (IDX2 IDX4 IDX) =   ZERO
+                               MOVE    ZERO            TO  FLG-ARI
+                               MOVE    ZERO            TO  TBL-CHO-DAY
+                                                         (IDX2 1 IDX)
+                               MOVE    ZERO            TO  TBL-CHO-DAY
+                                                         (IDX2 2 IDX)
+                               MOVE    ZERO            TO  TBL-CHO-DAY
+                                                         (IDX2 3 IDX)
+                               MOVE    ZERO            TO  TBL-CHO-DAY
+                                                         (IDX2 4 IDX)
+                           END-IF
+      *ver.4.7
                        ELSE
                            MOVE    ZERO            TO  TBL-CHO-DAY
                                                          (IDX2 1 IDX)
@@ -1328,9 +1342,9 @@
                                                          (IDX2 4 IDX)
                END-IF
            END-PERFORM
-      *?   IF      FLG-ARI             =   1
-      *        GO      TO      4002-TOU-ADD-SYORI-EXT
-      *    END-IF
+           IF      FLG-ARI             =   1
+               GO      TO      4002-TOU-ADD-SYORI-EXT
+           END-IF
       *    当日調剤料指定がない時、対象の剤へ
            IF      WRK-IDX2            >   ZERO
                MOVE    1               TO  TBL-CHO-DAY (WRK-IDX2 1 IDX)
@@ -1447,8 +1461,16 @@
                        IF      FLG-ARI         =   ZERO
                            MOVE    1               TO  FLG-ARI
       *ver.4.7
-                           IF      TBL-MAD-DAY (IDX2 IDX4 IDX) >   ZERO
+                           IF      TBL-MAD-DAY (IDX2 IDX4 IDX) =   ZERO
                                MOVE    ZERO            TO  FLG-ARI
+                               MOVE    ZERO            TO  TBL-MAD-DAY
+                                                         (IDX2 1 IDX)
+                               MOVE    ZERO            TO  TBL-MAD-DAY
+                                                         (IDX2 2 IDX)
+                               MOVE    ZERO            TO  TBL-MAD-DAY
+                                                         (IDX2 3 IDX)
+                               MOVE    ZERO            TO  TBL-MAD-DAY
+                                                         (IDX2 4 IDX)
                            END-IF
       *ver.4.7
                        ELSE
