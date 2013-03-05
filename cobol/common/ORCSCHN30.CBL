@@ -452,13 +452,15 @@
                    END-IF
                END-IF
            END-PERFORM
-           IF     (WRK-YSRYCD              =   SPACE )
-              AND (IDXY2                   >   ZERO  )
-               MOVE    WRK-YOHOU(IDXY2)    TO  WRK-YSRYCD
-               MOVE    WRK-YOHOU-NAME(IDXY2)
-                                           TO  WRK-YSRYCD-NAME
-               MOVE    SPACE               TO  WRK-YOHOU(IDXY2)
-           END-IF
+      *H25.3
+      * 服用時点がなければ用法なしとする
+      *    IF     (WRK-YSRYCD              =   SPACE )
+      *       AND (IDXY2                   >   ZERO  )
+      *        MOVE    WRK-YOHOU(IDXY2)    TO  WRK-YSRYCD
+      *        MOVE    WRK-YOHOU-NAME(IDXY2)
+      *                                    TO  WRK-YSRYCD-NAME
+      *        MOVE    SPACE               TO  WRK-YOHOU(IDXY2)
+      **** END-IF
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   IDX-S   )   OR
