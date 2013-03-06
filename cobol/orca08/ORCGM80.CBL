@@ -94,7 +94,6 @@
       *
                05  SPA-NAI-AREA.
                    07  SPA-NAI-IDX         PIC 9(04).
-                   07  SPA-NAI-INSTALL     PIC 9(01).
                    07  SPA-NAI-LINK        PIC 9(01).
                    07  SPA-NAI-PGNAME      PIC X(50).
                    07  SPA-NAI-VERSION     PIC X(20).
@@ -111,6 +110,9 @@
                05  SPA-NAI-VENDFLG     PIC 9(01).
                05  SPA-NAI-VENDOR      PIC X(20).
                05  SPA-NAI-VENDORALL   PIC X(01).
+      *
+      *        並び替え
+               05  SPA-NAI-SORTFLG     PIC 9(01).
       *
       *        SHELL区分
                05  SPA-SHELLFLG        PIC 9(01).
@@ -159,7 +161,7 @@
       *H24.7
       *    保存
        01  WRK-GMN-HZN-AREA.
-           03  WRK-GMN-TBLREC.
+           03  WRK-GMN-TBLREC          OCCURS  100.
                05  WRK-GMN-TNUM        PIC 9(04).
                05  WRK-GMN-TPGMEISYO   PIC X(100).
                05  WRK-GMN-TPGNAME     PIC X(50).
@@ -169,6 +171,7 @@
                05  WRK-GMN-TLINK       PIC X(10).
                05  WRK-GMN-TDATE       PIC X(10).
                05  WRK-NAI-TLINK       PIC X(10).
+           03  WRK-TBL-MAX             PIC 9(04).
       *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMDG             PIC X(09).
@@ -365,9 +368,7 @@
       *        インストール
                WHEN    "0101"
                    IF      SPA-M80ID1-FLG      =   "OK"
-                       MOVE    "install"   TO  WRK-COMMAND
-                       PERFORM 4010-SHELL-SYORI-SEC
-                       MOVE    "enable"    TO  WRK-COMMAND
+                       MOVE    "install+enable"   TO  WRK-COMMAND
                        PERFORM 4010-SHELL-SYORI-SEC
                    ELSE
                        MOVE    1           TO  SPA-GMN-CUR
@@ -411,6 +412,9 @@
       *        クリア
                WHEN    "CLICKED"   ALSO    "B02"
                     PERFORM 402-CLREA-SEC
+      *        並び替え
+               WHEN    "CLICKED"   ALSO    "B03"
+                    PERFORM 403-SORT-INIT-SEC
       *        一覧更新
                WHEN    "CLICKED"   ALSO    "B04"
                     PERFORM 404-LIST-INIT-SEC
@@ -423,10 +427,10 @@
       *        次頁
                WHEN    "CLICKED"   ALSO    "B07"
                    PERFORM 407-NEXT-PAGE-SEC
-      *        インストール処理
+      *        インストール
                WHEN    "CLICKED"   ALSO    "B09"
                     PERFORM 409-INSTALL-SEC
-      *        UPGRADE
+      *        アップグレード
                WHEN    "CLICKED"   ALSO    "B10"
                     PERFORM 410-UPGRADE-SEC
       *        状況
@@ -461,15 +465,122 @@
            EXIT.
       *
       *****************************************************************
+      *    戻る　処理
+      *****************************************************************
+       210-BACK                    SECTION.
+      *
+           MOVE    "M02"               TO  SPA-SAKIPG
+           MOVE    "M80"               TO  SPA-MOTOPG
+      *
+           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+      *
+           MOVE    "CHANGE"            TO  MCP-PUTTYPE
+           MOVE    SPA-SAKIPG          TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+           .
+       210-BACK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    状況更新
+      *****************************************************************
+       400-JYOKYO-SET-SEC          SECTION.
+      *
+      *    メッセージ編集
+           PERFORM 820-JOBKANRI-READ1-SEC
+      *
+           MOVE    ZERO                TO  FLG-SYORI-END
+           MOVE    SPACE               TO  SPA-GMN-SYORIMSG
+           MOVE    ZERO                TO  SPA-NAI-SYORIERR
+           IF      SJOBKANRI-RETURN    =   ZERO
+               EVALUATE    JOB-ERRCD(1:2)
+                   WHEN    "99"
+                   WHEN    "98"
+                       MOVE    "異常終了しました。"
+                                               TO  SPA-GMN-SYORIMSG
+                       MOVE    1               TO  SPA-NAI-SYORIERR
+                       MOVE    1               TO  FLG-SYORI-END
+                   WHEN    "01"
+                       MOVE    "対象データがありません。"
+                                               TO  SPA-GMN-SYORIMSG
+                       MOVE    2               TO  SPA-NAI-SYORIERR
+                       MOVE    1               TO  FLG-SYORI-END
+                   WHEN    OTHER
+                       IF     (JOB-ENDTIME     NOT =   SPACE)  AND
+                              (JOB-ENDYMD      NOT =   SPACE)
+                           IF      SPA-SHELLFLG        =   2
+                               MOVE    "処理は正常に終了しました。"
+                                                   TO  SPA-GMN-SYORIMSG
+                           END-IF
+                           MOVE    1               TO  FLG-SYORI-END
+                       ELSE
+                           MOVE    "処理中です。"  TO  SPA-GMN-SYORIMSG
+                           MOVE    2               TO  SPA-NAI-SYORIERR
+                       END-IF
+               END-EVALUATE
+           ELSE
+               MOVE    1               TO  FLG-SYORI-END
+           END-IF
+      *
+           MOVE    0           TO  SPA-GMN-DURATION
+      *
+           IF    ( SJOBKANRI-RETURN    =   ZERO )  AND
+                 ( JOB-ERRCD(1:2)  NOT =   "99" )  AND
+                 ( JOB-ERRCD(1:2)  NOT =   "01" )
+               IF    ( JOB-ENDTIME     =   SPACE)  OR
+                     ( JOB-ENDYMD      =   SPACE)
+                   MOVE    3           TO  SPA-GMN-DURATION
+               END-IF
+           END-IF
+      *
+      *    処理終了
+           IF     (FLG-SYORI-END       =   1   )  AND
+                  (SPA-NAI-SYORIERR    =   ZERO )
+      *        一覧表表示
+               PERFORM 4041-LIST-HENSYU-SEC
+               MOVE    1                   TO  SPA-GMN-CUR
+           END-IF
+           .
+       400-JYOKYO-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    クリア処理
+      *****************************************************************
+       402-CLREA-SEC               SECTION.
+      *
+           MOVE    ZERO                TO  SPA-GMN-SELNUM
+           INITIALIZE                      SPA-NAI-AREA
+           MOVE    SPACE               TO  SPA-GMN-SYORIMSG
+           MOVE    ZERO                TO  SPA-NAI-SYORIERR
+           MOVE    ZERO                TO  SPA-NAI-VENDFLG
+           MOVE    SPACE               TO  SPA-NAI-VENDOR
+           MOVE    SPACE               TO  SPA-NAI-VENDORALL
+           MOVE    ZERO                TO  SPA-NAI-SORTFLG
+      *
+           MOVE    1                   TO  SPA-GMN-CUR
+           .
+       402-CLREA-EXT.
+           EXIT.
+      *****************************************************************
+      *    並び替え
+      *****************************************************************
+       403-SORT-INIT-SEC         SECTION.
+      *
+      *    並び替え
+           MOVE    1                   TO  SPA-NAI-SORTFLG
+           PERFORM 404-LIST-INIT-SEC
+           .
+       403-SORT-INIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    リスト更新処理
       *****************************************************************
        404-LIST-INIT-SEC           SECTION.
-      *
-      *    PERFORM 402-CLREA-SEC
-      *
-      *    MOVE    1               TO  FLG-GMN-INIT
-      *    INITIALIZE                  SPA-GMN-LIST-AREA
-      *    MOVE    ZERO            TO  SPA-GMN-NEXT
       *
            MOVE    1               TO  SPA-SHELLFLG
            MOVE    ZERO            TO  SPA-SHELL-RC
@@ -480,6 +591,41 @@
            PERFORM 4041-SHELL-CALL-SEC
            .
        404-LIST-INIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＳＨＥＬＬ起動処理
+      *****************************************************************
+       4041-SHELL-CALL-SEC         SECTION.
+      *
+      *    ジョブ管理削除
+           PERFORM 820-JOBKANRI-DEL-SEC
+      *
+      *    ジョブ管理作成
+           PERFORM 820-JOBKANRI-JBS-SEC
+      *
+           MOVE    SPACE               TO  SHELLTBL
+           MOVE    WRK-SHELL-NAME      TO  SHELLTBL-NAME
+      *
+      *    パラメタセット
+           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG1
+           MOVE    CONST-MNTJOBID      TO  SHELLTBL-ARG2
+           MOVE    CONST-MNTSHELLID    TO  SHELLTBL-ARG3
+           MOVE    WRK-COMMAND         TO  SHELLTBL-ARG4
+           MOVE    WRK-PACKAGE         TO  SHELLTBL-ARG5
+           MOVE    WRK-VERSION         TO  SHELLTBL-ARG6
+      * 
+           MOVE    SHELLTBL            TO  MCPDATA-REC
+           MOVE    "SHELL"             TO  MCP-FUNC
+           MOVE    "shell"             TO  MCP-TABLE
+           MOVE    "allways"           TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *    状況更新
+           PERFORM 400-JYOKYO-SET-SEC
+           .
+       4041-SHELL-CALL-EXT.
            EXIT.
       *
       *****************************************************************
@@ -514,26 +660,31 @@
                MOVE    1               TO  FLG-DATAEND
            END-IF
            PERFORM UNTIL   FLG-DATAEND     =   1
-      *******  PERFORM 4042-LIST-HEN-SEC
-      *H24.7
-      *        一覧表編集
-               EVALUATE    SPA-NAI-VENDFLG
-                   WHEN    ZERO
-      *                全体
-                       PERFORM 4042-LIST-HEN-SEC
-                   WHEN    1
-      *                べンダー一覧
-                       PERFORM 40422-LIST-HEN02-SEC
-                   WHEN    2
-      *                ベンダー毎
-                       IF      SPA-NAI-VENDORALL   =   "1"
+      *
+      *        並び替え
+               IF      SPA-NAI-SORTFLG =   1
+                   PERFORM 40424-LIST-HEN04-SEC
+               ELSE
+      *            一覧表編集
+                   EVALUATE    SPA-NAI-VENDFLG
+                       WHEN    ZERO
       *                    全体
                            PERFORM 4042-LIST-HEN-SEC
-                       ELSE
+                       WHEN    1
+      *                    べンダー一覧
+                           PERFORM 40422-LIST-HEN02-SEC
+                       WHEN    2
       *                    ベンダー毎
-                           PERFORM 40423-LIST-HEN03-SEC
-                       END-IF
-               END-EVALUATE
+                           IF      SPA-NAI-VENDORALL   =   "1"
+      *                        全体
+                               PERFORM 4042-LIST-HEN-SEC
+                           ELSE
+      *                        ベンダー毎
+                               PERFORM 40423-LIST-HEN03-SEC
+                           END-IF
+                   END-EVALUATE
+               END-IF
+      *
            END-PERFORM
       *
            CLOSE                       PLUGINLIST-FILE
@@ -602,105 +753,6 @@
            END-IF
            .
        4042-LIST-HEN-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ＳＨＥＬＬ起動処理
-      *****************************************************************
-       4041-SHELL-CALL-SEC         SECTION.
-      *
-      *    ジョブ管理削除
-           PERFORM 820-JOBKANRI-DEL-SEC
-      *
-      *    ジョブ管理作成
-           PERFORM 820-JOBKANRI-JBS-SEC
-      *
-           MOVE    SPACE               TO  SHELLTBL
-           MOVE    WRK-SHELL-NAME      TO  SHELLTBL-NAME
-      *
-      *    パラメタセット
-           MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG1
-           MOVE    CONST-MNTJOBID      TO  SHELLTBL-ARG2
-           MOVE    CONST-MNTSHELLID    TO  SHELLTBL-ARG3
-           MOVE    WRK-COMMAND         TO  SHELLTBL-ARG4
-           MOVE    WRK-PACKAGE         TO  SHELLTBL-ARG5
-           MOVE    WRK-VERSION         TO  SHELLTBL-ARG6
-      * 
-           MOVE    SHELLTBL            TO  MCPDATA-REC
-           MOVE    "SHELL"             TO  MCP-FUNC
-           MOVE    "shell"             TO  MCP-TABLE
-           MOVE    "allways"           TO  MCP-PATHNAME
-           CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
-      *    状況更新
-           PERFORM 400-JYOKYO-SET-SEC
-           .
-       4041-SHELL-CALL-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    状況更新
-      *****************************************************************
-       400-JYOKYO-SET-SEC          SECTION.
-      *
-      *    メッセージ編集
-           PERFORM 820-JOBKANRI-READ1-SEC
-      *
-           MOVE    ZERO                TO  FLG-SYORI-END
-           MOVE    SPACE               TO  SPA-GMN-SYORIMSG
-           MOVE    ZERO                TO  SPA-NAI-SYORIERR
-           IF      SJOBKANRI-RETURN    =   ZERO
-               EVALUATE    JOB-ERRCD(1:2)
-                   WHEN    "99"
-                   WHEN    "98"
-                       MOVE    "異常終了しました。"
-                                               TO  SPA-GMN-SYORIMSG
-                       MOVE    1               TO  SPA-NAI-SYORIERR
-                       MOVE    1               TO  FLG-SYORI-END
-                   WHEN    "01"
-                       MOVE    "対象データがありません。"
-                                               TO  SPA-GMN-SYORIMSG
-                       MOVE    2               TO  SPA-NAI-SYORIERR
-                       MOVE    1               TO  FLG-SYORI-END
-                   WHEN    OTHER
-                       IF     (JOB-ENDTIME     NOT =   SPACE)  AND
-                              (JOB-ENDYMD      NOT =   SPACE)
-                           IF      SPA-SHELLFLG        =   2
-                               MOVE    "処理は正常に終了しました。"
-                                                   TO  SPA-GMN-SYORIMSG
-                           END-IF
-                           MOVE    1               TO  FLG-SYORI-END
-                       ELSE
-                           MOVE    "処理中です。"
-                                                   TO  SPA-GMN-SYORIMSG
-                           MOVE    2               TO  SPA-NAI-SYORIERR
-                       END-IF
-               END-EVALUATE
-           ELSE
-               MOVE    1               TO  FLG-SYORI-END
-           END-IF
-      *
-           MOVE    0           TO  SPA-GMN-DURATION
-      *
-           IF    ( SJOBKANRI-RETURN    =   ZERO )  AND
-                 ( JOB-ERRCD(1:2)  NOT =   "99" )  AND
-                 ( JOB-ERRCD(1:2)  NOT =   "01" )
-               IF    ( JOB-ENDTIME     =   SPACE)  OR
-                     ( JOB-ENDYMD      =   SPACE)
-                   MOVE    3           TO  SPA-GMN-DURATION
-               END-IF
-           END-IF
-      *
-      *    処理終了
-           IF     (FLG-SYORI-END       =   1   )  AND
-                  (SPA-NAI-SYORIERR    =   ZERO )
-      *        一覧表表示
-               PERFORM 4041-LIST-HENSYU-SEC
-               MOVE    1                   TO  SPA-GMN-CUR
-           END-IF
-           .
-       400-JYOKYO-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -784,7 +836,6 @@
       *****************************************************************
        40423-LIST-HEN03-SEC        SECTION.
       *
-      *
            IF      PLUGIN-ID           =   "name  "
                PERFORM 40423-LIST03-INIT-SEC
            END-IF
@@ -792,31 +843,31 @@
            EVALUATE    PLUGIN-ID
                WHEN    "name "
       *            番号
-                   MOVE    1               TO  WRK-GMN-TNUM
+                   MOVE    1               TO  WRK-GMN-TNUM(1)
       *            プログラムＩＤ
-                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TPGNAME
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TPGNAME(1)
                WHEN    "current "
       *            バージョン
-                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TVERSION
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TVERSION(1)
                WHEN    "available "
       *            バージョン
-                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TVERSION2
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TVERSION2(1)
                WHEN    "description "
       *            プログラム名称
-                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TPGMEISYO
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TPGMEISYO(1)
                WHEN    "vendor "
       *            ベンダー
-                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TVENDOR
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TVENDOR(1)
                WHEN    "date "
       *            日付
-                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TDATE
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TDATE(1)
                WHEN    "link "
       *            LINK
-                   MOVE    PLUGIN-DATA     TO  WRK-NAI-TLINK
-                   IF      WRK-NAI-TLINK  =   "FALSE"
-                       MOVE    "-"             TO  WRK-GMN-TLINK
+                   MOVE    PLUGIN-DATA     TO  WRK-NAI-TLINK(1)
+                   IF      WRK-NAI-TLINK(1)    =   "FALSE"
+                       MOVE    "-"             TO  WRK-GMN-TLINK(1)
                    ELSE
-                       MOVE    "○"            TO  WRK-GMN-TLINK
+                       MOVE    "○"            TO  WRK-GMN-TLINK(1)
                    END-IF
            END-EVALUATE
       *
@@ -838,8 +889,8 @@
        40423-LIST03-INIT-SEC       SECTION.
       *
            MOVE    ZERO                TO  FLG-HENOK
-           IF      WRK-GMN-TNUM        NOT =   ZERO
-               IF     (SPA-NAI-VENDOR      =   WRK-GMN-TVENDOR)
+           IF      WRK-GMN-TNUM(1)     NOT =   ZERO
+               IF     (SPA-NAI-VENDOR      =   WRK-GMN-TVENDOR(1))
       *            対象
                    MOVE    1               TO  FLG-HENOK
                END-IF
@@ -863,14 +914,118 @@
                END-IF
                IF     (FLG-NO              =   ZERO )
                  AND  (SPA-GMN-NEXT        =   ZERO )
-                   MOVE    IDX             TO  WRK-GMN-TNUM
-                   MOVE    WRK-GMN-TBLREC  TO  SPA-GMN-TBLREC (IDY)
+                   MOVE    IDX                 TO  WRK-GMN-TNUM(1)
+                   MOVE    WRK-GMN-TBLREC(1)   TO  SPA-GMN-TBLREC(IDY)
                END-IF
            END-IF
       *    クリア
            INITIALIZE                  WRK-GMN-HZN-AREA
            .
        40423-LIST03-INIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    並び替え処理
+      *****************************************************************
+       40424-LIST-HEN04-SEC        SECTION.
+      *
+           EVALUATE    PLUGIN-ID
+               WHEN    "name "
+      *            番号
+                   ADD     1               TO  IDX
+                   ADD     1               TO  WRK-TBL-MAX
+                   MOVE    IDX             TO  WRK-GMN-TNUM(IDX)
+      *            プログラムＩＤ
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TPGNAME(IDX)
+               WHEN    "current "
+      *            バージョン
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TVERSION(IDX)
+               WHEN    "available "
+      *            バージョン
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TVERSION2(IDX)
+               WHEN    "description "
+      *            プログラム名称
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TPGMEISYO(IDX)
+               WHEN    "vendor "
+      *            ベンダー
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TVENDOR(IDX)
+               WHEN    "date "
+      *            日付
+                   MOVE    PLUGIN-DATA     TO  WRK-GMN-TDATE(IDX)
+               WHEN    "link "
+      *            LINK
+                   MOVE    PLUGIN-DATA     TO  WRK-NAI-TLINK(IDX)
+                   IF      WRK-NAI-TLINK(IDX)  =   "FALSE"
+                       MOVE    "-"             TO  WRK-GMN-TLINK(IDX)
+                   ELSE
+                       MOVE    "○"            TO  WRK-GMN-TLINK(IDX)
+                   END-IF
+           END-EVALUATE
+      *
+           IF      FLG-DATAEND          =   ZERO
+               PERFORM 900-PLUGNDATA-READ-SEC
+           END-IF
+      *
+           IF     (FLG-DATAEND      NOT =   ZERO )
+           AND    (SPA-GMN-NEXT         =   ZERO )
+               PERFORM 40424-LIST04-INIT-SEC
+           END-IF
+           .
+       40424-LIST-HEN04-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    並び替え一覧
+      *****************************************************************
+       40424-LIST04-INIT-SEC       SECTION.
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX         >   WRK-TBL-MAX
+               IF      WRK-NAI-TLINK(IDX)  =   "TRUE"
+                   IF     (SPA-NAI-VENDFLG NOT =   ZERO )
+                       IF      (SPA-NAI-VENDOR =   WRK-GMN-TVENDOR(IDX))
+                           ADD     1           TO  IDY
+                           ADD     1           TO  SPA-TBL-MAX
+                           MOVE    WRK-GMN-TBLREC(IDX)
+                                               TO  SPA-GMN-TBLREC(IDY)
+                           MOVE    IDY         TO  SPA-GMN-TNUM(IDX)
+                       END-IF
+                   ELSE
+                       ADD     1               TO  IDY
+                       ADD     1               TO  SPA-TBL-MAX
+                       MOVE    WRK-GMN-TBLREC(IDX)
+                                               TO  SPA-GMN-TBLREC(IDY)
+                       MOVE    IDY             TO  SPA-GMN-TNUM(IDY)
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX         >   WRK-TBL-MAX
+               IF      WRK-NAI-TLINK(IDX)  =   "FALSE"
+                   IF     (SPA-NAI-VENDFLG NOT =   ZERO )
+                       IF      (SPA-NAI-VENDOR =   WRK-GMN-TVENDOR(IDX))
+                           ADD     1           TO  IDY
+                           ADD     1           TO  SPA-TBL-MAX
+                           MOVE    WRK-GMN-TBLREC(IDX)
+                                               TO  SPA-GMN-TBLREC(IDY)
+                           MOVE    IDY         TO  SPA-GMN-TNUM(IDY)
+                       END-IF
+                   ELSE
+                       ADD     1               TO  IDY
+                       ADD     1               TO  SPA-TBL-MAX
+                       MOVE    WRK-GMN-TBLREC(IDX)
+                                               TO  SPA-GMN-TBLREC(IDY)
+                       MOVE    IDY             TO  SPA-GMN-TNUM(IDY)
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+      *    クリア
+           INITIALIZE                  WRK-GMN-HZN-AREA
+           MOVE    ZERO            TO  SPA-NAI-SORTFLG
+           .
+       40424-LIST04-INIT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -882,11 +1037,11 @@
            MOVE    1                   TO  SPA-NAI-VENDFLG
            MOVE    SPACE               TO  SPA-NAI-VENDOR
            MOVE    SPACE               TO  SPA-NAI-VENDORALL
+           MOVE    ZERO                TO  SPA-NAI-SORTFLG
            PERFORM 404-LIST-INIT-SEC
            .
        405-VENDOR-INIT-EXT.
            EXIT.
-      *
       *
       *****************************************************************
       *    選択番号チェック処理
@@ -936,10 +1091,8 @@
       *    リンク判定
            IF      SPA-NAI-TLINK (SPA-NAI-IDX) =   "FALSE"
                MOVE    1                   TO  SPA-NAI-LINK
-               MOVE    1                   TO  SPA-NAI-INSTALL
            ELSE
                MOVE    2                   TO  SPA-NAI-LINK
-               MOVE    2                   TO  SPA-NAI-INSTALL
            END-IF
       *
            MOVE    SPA-GMN-TPGNAME (SPA-NAI-IDX)
@@ -952,6 +1105,27 @@
            MOVE    11                  TO  SPA-GMN-CUR
            .
        40011-SEL-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ベンダー選択処理
+      *****************************************************************
+       40012-SEL-VENDER-SYORI-SEC  SECTION.
+      *
+           MOVE    2                   TO  SPA-NAI-VENDFLG
+           MOVE    ZERO                TO  SPA-NAI-SORTFLG
+           IF      SPA-GMN-TVENDOR (SPA-NAI-IDX)   =   "全部"
+               MOVE    SPACE               TO  SPA-NAI-VENDOR
+               MOVE    "1"                 TO  SPA-NAI-VENDORALL
+           ELSE
+               MOVE    SPA-GMN-TVENDOR (SPA-NAI-IDX)
+                                           TO  SPA-NAI-VENDOR
+               MOVE    SPACE               TO  SPA-NAI-VENDORALL
+           END-IF
+           PERFORM 404-LIST-INIT-SEC
+      *
+           .
+       40012-SEL-VENDER-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -978,112 +1152,6 @@
        4003-LIST-SEL-EXT.
            EXIT.
       *
-      *****************************************************************
-      *    ベンダー選択処理
-      *****************************************************************
-       40012-SEL-VENDER-SYORI-SEC  SECTION.
-      *
-           MOVE    2                   TO  SPA-NAI-VENDFLG
-           IF      SPA-GMN-TVENDOR (SPA-NAI-IDX)   =   "全部"
-               MOVE    SPACE               TO  SPA-NAI-VENDOR
-               MOVE    "1"                 TO  SPA-NAI-VENDORALL
-           ELSE
-               MOVE    SPA-GMN-TVENDOR (SPA-NAI-IDX)
-                                           TO  SPA-NAI-VENDOR
-               MOVE    SPACE               TO  SPA-NAI-VENDORALL
-           END-IF
-           PERFORM 404-LIST-INIT-SEC
-      *
-           .
-       40012-SEL-VENDER-SYORI-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    入力チェック処理
-      *****************************************************************
-       410-INPUT-CHK-SEC           SECTION.
-      *
-      *    画面をＳＰＡセット
-           PERFORM 4101-GMN-SPA-SET-SEC
-      *    基本チェックと別画面処理
-           PERFORM 4102-KIHON-CHK-SEC
-      *
-           .
-       410-INPUT-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    画面ＳＰＡ編集処理
-      *****************************************************************
-       4101-GMN-SPA-SET-SEC        SECTION.
-      *
-      *
-       4101-GMN-SPA-SET-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    基本チェック処理
-      *****************************************************************
-       4102-KIHON-CHK-SEC          SECTION.
-      *
-           .
-       4102-KIHON-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    更新前チェック処理
-      *****************************************************************
-       4103-KOUSIN-CHK-SEC         SECTION.
-      *
-           .
-       4103-KOUSIN-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    戻る　処理
-      *****************************************************************
-       210-BACK                    SECTION.
-      *
-           MOVE    "M02"               TO  SPA-SAKIPG
-           MOVE    "M80"               TO  SPA-MOTOPG
-      *
-           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
-      *
-           MOVE    "CHANGE"            TO  MCP-PUTTYPE
-           MOVE    SPA-SAKIPG          TO  MCP-WINDOW
-      *
-           PERFORM 900-PUT-WINDOW
-      *
-           MOVE    1                   TO  FLG-END
-           .
-       210-BACK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    クリア処理
-      *****************************************************************
-       402-CLREA-SEC               SECTION.
-      *
-           MOVE    ZERO                TO  SPA-GMN-SELNUM
-           INITIALIZE                      SPA-NAI-AREA
-           MOVE    SPACE               TO  SPA-GMN-SYORIMSG
-           MOVE    ZERO                TO  SPA-NAI-SYORIERR
-           MOVE    ZERO                TO  SPA-NAI-VENDFLG
-           MOVE    SPACE               TO  SPA-NAI-VENDOR
-           MOVE    SPACE               TO  SPA-NAI-VENDORALL
-      *
-           MOVE    1                   TO  SPA-GMN-CUR
-           .
-       402-CLREA-EXT.
-           EXIT.
-      *****************************************************************
-      *    変更確定処理
-      *****************************************************************
-       408-KAKUTEI-SEC             SECTION.
-      *
-           .
-       408-KAKUTEI-EXT.
-           EXIT.
       *****************************************************************
       *    前頁処理
       *****************************************************************
@@ -1122,8 +1190,9 @@
                MOVE    "0003"          TO  SPA-ERRCD
                MOVE    1               TO  SPA-GMN-CUR
            END-IF
+      *
            IF      SPA-ERRCD           =   SPACE
-               EVALUATE    SPA-NAI-INSTALL
+               EVALUATE    SPA-NAI-LINK
                    WHEN    1
                        MOVE    "0101"              TO  SPA-M80ID1CD
                    WHEN    2
@@ -1143,6 +1212,16 @@
        410-UPGRADE-EXT.
            EXIT.
       *****************************************************************
+      *    入力チェック処理
+      *****************************************************************
+       410-INPUT-CHK-SEC           SECTION.
+      *
+      *
+           .
+       410-INPUT-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    SHELL　ＣＡＬＬ処理
       *****************************************************************
        4010-SHELL-SYORI-SEC        SECTION.
@@ -1152,10 +1231,10 @@
            MOVE    SPA-NAI-PGNAME      TO  WRK-PACKAGE
            EVALUATE    WRK-COMMAND
                WHEN    "install"
+               WHEN    "install+enable"
                WHEN    "upgrade"
                    MOVE    SPA-NAI-VERSION2    TO  WRK-VERSION
                WHEN    "uninstall"
-               WHEN    "enable"
                    MOVE    SPA-NAI-VERSION     TO  WRK-VERSION
                WHEN    OTHER
                    MOVE    SPA-NAI-VERSION2    TO  WRK-VERSION
@@ -1163,86 +1242,6 @@
            PERFORM 4041-SHELL-CALL-SEC
            .
        4010-SHELL-SYORI-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ジョブ管理削除
-      *****************************************************************
-       820-JOBKANRI-DEL-SEC        SECTION.
-      *
-      *    ジョブ管理削除
-           MOVE    "DEL"               TO  SJOBKANRI-MODE
-           INITIALIZE                      JOBKANRI-REC
-           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
-           MOVE    CONST-MNTJOBID      TO  JOB-JOBID
-           MOVE    CONST-MNTSHELLID    TO  JOB-SHELLID
-           CALL    "ORCSJOB"           USING
-                                       ORCSJOBKANRIAREA 
-                                       JOBKANRI-REC
-                                       SPA-AREA
-           .
-       820-JOBKANRI-DEL-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ジョブ管理作成
-      *****************************************************************
-       820-JOBKANRI-JBS-SEC        SECTION.
-      *
-           MOVE    "JBS"               TO  SJOBKANRI-MODE
-           INITIALIZE                      JOBKANRI-REC
-           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
-           MOVE    CONST-MNTJOBID      TO  JOB-JOBID
-           MOVE    CONST-MNTSHELLID    TO  JOB-SHELLID
-           CALL    "ORCSJOB"           USING
-                                       ORCSJOBKANRIAREA 
-                                       JOBKANRI-REC
-                                       SPA-AREA
-           .
-       820-JOBKANRI-JBS-EXT.
-           EXIT.
-      *****************************************************************
-      *    ジョブ管理読込
-      *****************************************************************
-       820-JOBKANRI-READ1-SEC      SECTION.
-      *
-           MOVE    "CHK"               TO  SJOBKANRI-MODE
-           INITIALIZE                      JOBKANRI-REC
-           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
-           MOVE    CONST-MNTJOBID      TO  JOB-JOBID
-           MOVE    CONST-MNTSHELLID    TO  JOB-SHELLID
-           CALL    "ORCSJOB"           USING
-                                       ORCSJOBKANRIAREA 
-                                       JOBKANRI-REC
-                                       SPA-AREA
-           .
-       820-JOBKANRI-READ1-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    西暦和暦編集処理
-      *****************************************************************
-       800-SEIWA-HEN-SEC           SECTION.
-      *
-           IF      WRK-SYMD            =   ALL "9"  OR   SPACE
-               MOVE    SPACE           TO  WRK-HGO
-               MOVE    WRK-SYMD(3:2)   TO  WRK-HYY
-               MOVE    WRK-SYMD(5:2)   TO  WRK-HMM
-               MOVE    WRK-SYMD(7:2)   TO  WRK-HDD
-               MOVE    WRK-HENYMD      TO  WRK-HENYMDG
-           ELSE
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY2-AREA
-               MOVE    "21"            TO  LNK-DAY2-IRAI
-               MOVE    WRK-SYMD        TO  LNK-DAY2-YMD
-               CALL    "ORCSDAY"           USING
-                                           STS-AREA-DAY
-                                           LNK-DAY2-AREA
-               MOVE    LNK-DAY2-EDTYMD1    TO  WRK-HENYMDG
-           END-IF
-      *
-           .
-       800-SEIWA-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1283,7 +1282,7 @@
            END-IF
       *
            MOVE    SPACE           TO  M80
-      :
+      *
       *    コラムリストの位置指定
            MOVE    ZERO            TO  M80-LIST-ROW
            IF      WRK-M80-LIST-ROW    NOT =   ZERO
@@ -1328,7 +1327,7 @@
                END-IF
            END-IF
       *
-           EVALUATE    SPA-NAI-INSTALL
+           EVALUATE    SPA-NAI-LINK
                WHEN    1
                    MOVE    "組込"              TO  M80-B09-LABEL
                    MOVE    WIDGET-NORMAL       TO  M80-B09-STATE
@@ -1352,16 +1351,23 @@
       *
            MOVE   SPA-GMN-DURATION     TO  M80-DURATION
       *ver.4.7
+           MOVE    SPACE               TO  M80-B03-LABEL
+           MOVE    WIDGET-INSENSITIVE  TO  M80-B03-STATE
            MOVE    SPACE               TO  M80-B10-LABEL
            MOVE    WIDGET-INSENSITIVE  TO  M80-B10-STATE
+      *
       *    明細があり
            IF     (SPA-TBL-MAX         >   ZERO )
+               IF   (SPA-NAI-VENDFLG   NOT =   1 )
+                   MOVE    "並び替え"          TO  M80-B03-LABEL
+                   MOVE    WIDGET-NORMAL       TO  M80-B03-STATE
+               END-IF
       *        未選択の時
                IF   (SPA-GMN-SELNUM        =   ZERO )
                    MOVE    "一括更新"          TO  M80-B10-LABEL
                    MOVE    WIDGET-NORMAL       TO  M80-B10-STATE
                ELSE
-                   IF      SPA-NAI-INSTALL     =   2
+                   IF      SPA-NAI-LINK        =   2
                        MOVE    "個別更新"          TO  M80-B10-LABEL
                        MOVE    WIDGET-NORMAL       TO  M80-B10-STATE
                    END-IF
@@ -1397,6 +1403,8 @@
            EVALUATE    SPA-GMN-CUR
                WHEN    01
                    MOVE    "SELNUM"        TO  MCP-WIDGET
+               WHEN    09
+                   MOVE    "B03"           TO  MCP-WIDGET
                WHEN    10
                    MOVE    "B04"           TO  MCP-WIDGET
                WHEN    11
@@ -1513,6 +1521,85 @@
            EXIT.
       *
       *****************************************************************
+      *    ジョブ管理削除
+      *****************************************************************
+       820-JOBKANRI-DEL-SEC        SECTION.
+      *
+      *    ジョブ管理削除
+           MOVE    "DEL"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           MOVE    CONST-MNTJOBID      TO  JOB-JOBID
+           MOVE    CONST-MNTSHELLID    TO  JOB-SHELLID
+           CALL    "ORCSJOB"           USING
+                                       ORCSJOBKANRIAREA 
+                                       JOBKANRI-REC
+                                       SPA-AREA
+           .
+       820-JOBKANRI-DEL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ジョブ管理作成
+      *****************************************************************
+       820-JOBKANRI-JBS-SEC        SECTION.
+      *
+           MOVE    "JBS"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           MOVE    CONST-MNTJOBID      TO  JOB-JOBID
+           MOVE    CONST-MNTSHELLID    TO  JOB-SHELLID
+           CALL    "ORCSJOB"           USING
+                                       ORCSJOBKANRIAREA 
+                                       JOBKANRI-REC
+                                       SPA-AREA
+           .
+       820-JOBKANRI-JBS-EXT.
+           EXIT.
+      *****************************************************************
+      *    ジョブ管理読込
+      *****************************************************************
+       820-JOBKANRI-READ1-SEC      SECTION.
+      *
+           MOVE    "CHK"               TO  SJOBKANRI-MODE
+           INITIALIZE                      JOBKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+           MOVE    CONST-MNTJOBID      TO  JOB-JOBID
+           MOVE    CONST-MNTSHELLID    TO  JOB-SHELLID
+           CALL    "ORCSJOB"           USING
+                                       ORCSJOBKANRIAREA 
+                                       JOBKANRI-REC
+                                       SPA-AREA
+           .
+       820-JOBKANRI-READ1-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    西暦和暦編集処理
+      *****************************************************************
+       800-SEIWA-HEN-SEC           SECTION.
+      *
+           IF      WRK-SYMD            =   ALL "9"  OR   SPACE
+               MOVE    SPACE           TO  WRK-HGO
+               MOVE    WRK-SYMD(3:2)   TO  WRK-HYY
+               MOVE    WRK-SYMD(5:2)   TO  WRK-HMM
+               MOVE    WRK-SYMD(7:2)   TO  WRK-HDD
+               MOVE    WRK-HENYMD      TO  WRK-HENYMDG
+           ELSE
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY2-AREA
+               MOVE    "21"            TO  LNK-DAY2-IRAI
+               MOVE    WRK-SYMD        TO  LNK-DAY2-YMD
+               CALL    "ORCSDAY"           USING
+                                           STS-AREA-DAY
+                                           LNK-DAY2-AREA
+               MOVE    LNK-DAY2-EDTYMD1    TO  WRK-HENYMDG
+           END-IF
+           .
+       800-SEIWA-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    データ読込処理
       *****************************************************************
        900-PLUGNDATA-READ-SEC      SECTION.
@@ -1523,7 +1610,6 @@
                NOT AT  END
                    MOVE    ZERO            TO  FLG-DATAEND
            END-READ
-      *
            .
        900-PLUGNDATA-READ-EXT.
            EXIT.
@@ -1538,7 +1624,6 @@
                                        MCPAREA
                                        MCPDATA-REC
                                        SPA-AREA
-      *
            .
        900-PUT-WINDOW-EXT.
            EXIT.

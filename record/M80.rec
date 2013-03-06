@@ -29,6 +29,10 @@ M80	{
 			style   varchar(20);
 			value	varchar(60);
 		};
+		B03	{
+	           	state	int;
+			label	varchar(10);
+		};
 		B09	{
 	           	state	int;
 			label	varchar(10);

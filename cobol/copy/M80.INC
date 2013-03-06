@@ -24,6 +24,9 @@
               03  M80-SYORIMSG.
                 04  M80-SYORIMSG-STYLE   PIC X(20).
                 04  M80-SYORIMSG-VALUE   PIC X(60).
+              03  M80-B03.
+                04  M80-B03-STATE   PIC S9(9)   BINARY.
+                04  M80-B03-LABEL   PIC X(10).
               03  M80-B09.
                 04  M80-B09-STATE   PIC S9(9)   BINARY.
                 04  M80-B09-LABEL   PIC X(10).
