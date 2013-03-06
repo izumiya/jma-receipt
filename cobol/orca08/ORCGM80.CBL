@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  11/12/06  upgrade非活性対応
       *  04.07.00    NACL-多々納  12/07/11  ベンダー毎対応
+      *  04.07.01    MACL-森脇    13/03/06  組込・取込、削除・取外まとめ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -43,22 +44,24 @@
       *
        DATA                        DIVISION.
        FILE                        SECTION.
+      *
       *    プラグインデータ
        FD  PLUGINLIST-FILE.
        01  PLUGINLIST-REC.
-           03  PLUGIN-ID           PIC X(15).
-           03  PLUGIN-KBN          PIC X(01).
-           03  PLUGIN-DATA         PIC X(1024).
+           03  PLUGIN-ID               PIC X(15).
+           03  PLUGIN-KBN              PIC X(01).
+           03  PLUGIN-DATA             PIC X(1024).
       *
        WORKING-STORAGE             SECTION.
       *
-      * プラグインデータ
+      *    プラグインデータ
        01  FILE-NAME1.
-           03  FILLER              PIC X(09)   VALUE   "/var/tmp/".
-           03  FILLER              PIC X(14)   VALUE   "pluginlist".
+           03  FILLER                  PIC X(09)   VALUE   "/var/tmp/".
+           03  FILLER                  PIC X(14)   VALUE   "pluginlist".
+      *
       *    フラグ領域
        01  STS-AREA.
-           03  STS-DATA1           PIC X(02).
+           03  STS-DATA1               PIC X(02).
       *
       *    画面色等
            COPY    "ENUM-VALUE".
@@ -67,68 +70,69 @@
            COPY    "COMMON-SPA".
       *
            COPY    "M80COMMON-SPA".
+      *
       *    画面スパ領域
        01  SPA-M80.
            03  SPA-M80-AREA.
-               05  SPA-GMN-CUR             PIC 9(03).
-               05  SPA-GMN-PAGE            PIC 9(03).
-               05  SPA-GMN-NEXT            PIC 9(01).
+               05  SPA-GMN-CUR         PIC 9(03).
+               05  SPA-GMN-PAGE        PIC 9(03).
+               05  SPA-GMN-NEXT        PIC 9(01).
+      *
       *        一覧表
                05  SPA-GMN-LIST-AREA.
-                   07  SPA-GMN-TBLREC            OCCURS  100.
-                       09  SPA-GMN-TNUM          PIC 9(04).
-                       09  SPA-GMN-TPGMEISYO     PIC X(100).
-                       09  SPA-GMN-TPGNAME       PIC X(50).
-                       09  SPA-GMN-TVERSION      PIC X(20).
-                       09  SPA-GMN-TVERSION2     PIC X(20).
-                       09  SPA-GMN-TVENDOR       PIC X(20).
-                       09  SPA-GMN-TLINK         PIC X(10).
-      *
-                       09  SPA-GMN-TDATE         PIC X(10).
-                       09  SPA-NAI-TLINK         PIC X(10).
-                   07  SPA-TBL-MAX               PIC 9(04).
-      *
-      *        入力項目
-               05  SPA-GMN-SELNUM            PIC 9(04).
+                   07  SPA-GMN-TBLREC          OCCURS  100.
+                       09  SPA-GMN-TNUM        PIC 9(04).
+                       09  SPA-GMN-TPGMEISYO   PIC X(100).
+                       09  SPA-GMN-TPGNAME     PIC X(50).
+                       09  SPA-GMN-TVERSION    PIC X(20).
+                       09  SPA-GMN-TVERSION2   PIC X(20).
+                       09  SPA-GMN-TVENDOR     PIC X(20).
+                       09  SPA-GMN-TLINK       PIC X(10).
+                       09  SPA-GMN-TDATE       PIC X(10).
+                       09  SPA-NAI-TLINK       PIC X(10).
+                   07  SPA-TBL-MAX             PIC 9(04).
       *
                05  SPA-NAI-AREA.
-                   07  SPA-NAI-IDX             PIC 9(04).
-                   07  SPA-NAI-INSTALL         PIC 9(01).
-                   07  SPA-NAI-LINK            PIC 9(01).
-                   07  SPA-NAI-PGNAME          PIC X(50).
-                   07  SPA-NAI-VERSION         PIC X(20).
-                   07  SPA-NAI-VERSION2        PIC X(20).
-      *        処理中
-               05  SPA-GMN-SYORIMSG            PIC X(80).
-               05  SPA-NAI-SYORIERR            PIC 9(01).
-      *        SHELL区分
-               05  SPA-SHELLFLG                PIC 9(01).
-               05  SPA-SHELL-RC                PIC 9(01).
+                   07  SPA-NAI-IDX         PIC 9(04).
+                   07  SPA-NAI-INSTALL     PIC 9(01).
+                   07  SPA-NAI-LINK        PIC 9(01).
+                   07  SPA-NAI-PGNAME      PIC X(50).
+                   07  SPA-NAI-VERSION     PIC X(20).
+                   07  SPA-NAI-VERSION2    PIC X(20).
       *
-               05  SPA-GMN-DURATION            PIC 9(01).
-      *        ベンダー一覧
-               05  SPA-NAI-VENDFLG             PIC 9(01).
+               05  SPA-GMN-SELNUM      PIC 9(04).
+               05  SPA-GMN-DURATION    PIC 9(01).
+      *
+      *        処理中
+               05  SPA-GMN-SYORIMSG    PIC X(80).
+               05  SPA-NAI-SYORIERR    PIC 9(01).
+      *
       *        ベンダー
-               05  SPA-NAI-VENDOR              PIC X(20).
-               05  SPA-NAI-VENDORALL           PIC X(01).
+               05  SPA-NAI-VENDFLG     PIC 9(01).
+               05  SPA-NAI-VENDOR      PIC X(20).
+               05  SPA-NAI-VENDORALL   PIC X(01).
+      *
+      *        SHELL区分
+               05  SPA-SHELLFLG        PIC 9(01).
+               05  SPA-SHELL-RC        PIC 9(01).
       *
       *    フラグ領域
        01  FLG-AREA.
-           03  FLG-END             PIC 9(01).
-           03  FLG-DATAEND         PIC 9(01).
+           03  FLG-END                 PIC 9(01).
+           03  FLG-DATAEND             PIC 9(01).
       *
-           03  FLG-NO              PIC 9(01).
-           03  FLG-OK              PIC 9(01).
-           03  FLG-SYORI-END       PIC 9(01).
-           03  FLG-HENOK           PIC 9(01).
+           03  FLG-NO                  PIC 9(01).
+           03  FLG-OK                  PIC 9(01).
+           03  FLG-SYORI-END           PIC 9(01).
+           03  FLG-HENOK               PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
-           03  IDX                 PIC 9(04).
-           03  IDY                 PIC 9(04).
-           03  IDZ                 PIC 9(04).
-           03  IDX-STR             PIC 9(04).
-           03  IDX-V               PIC 9(04).
+           03  IDX                     PIC 9(04).
+           03  IDY                     PIC 9(04).
+           03  IDZ                     PIC 9(04).
+           03  IDX-STR                 PIC 9(04).
+           03  IDX-V                   PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -140,52 +144,53 @@
            03  WRK-Z9                  PIC ZZZ9.
       *
            03  WRK-MCP-WIDGET          PIC X(64).
+      *
            03  WRK-SYMD.
                05  WRK-SYY             PIC 9(04).
                05  WRK-SMM             PIC 9(02).
                05  WRK-SDD             PIC 9(02).
+      *
       *    コラムリスト位置
            03  WRK-M80-LIST-ROW        PIC S9(09).
-           03  FLG-GMN-INIT            PIC  9(01).
+           03  FLG-GMN-INIT            PIC 9(01).
       *
            03  WRK-VENDOR              PIC X(20).
       *
       *H24.7
       *    保存
        01  WRK-GMN-HZN-AREA.
-           07  WRK-GMN-TBLREC.
-               09  WRK-GMN-TNUM          PIC 9(04).
-               09  WRK-GMN-TPGMEISYO     PIC X(100).
-               09  WRK-GMN-TPGNAME       PIC X(50).
-               09  WRK-GMN-TVERSION      PIC X(20).
-               09  WRK-GMN-TVERSION2     PIC X(20).
-               09  WRK-GMN-TVENDOR       PIC X(20).
-               09  WRK-GMN-TLINK         PIC X(10).
-      *
-               09  WRK-GMN-TDATE         PIC X(10).
-               09  WRK-NAI-TLINK         PIC X(10).
+           03  WRK-GMN-TBLREC.
+               05  WRK-GMN-TNUM        PIC 9(04).
+               05  WRK-GMN-TPGMEISYO   PIC X(100).
+               05  WRK-GMN-TPGNAME     PIC X(50).
+               05  WRK-GMN-TVERSION    PIC X(20).
+               05  WRK-GMN-TVERSION2   PIC X(20).
+               05  WRK-GMN-TVENDOR     PIC X(20).
+               05  WRK-GMN-TLINK       PIC X(10).
+               05  WRK-GMN-TDATE       PIC X(10).
+               05  WRK-NAI-TLINK       PIC X(10).
       *
        01  WRK-HENSYU-AREA.
-           03  WRK-HENYMDG         PIC X(09).
+           03  WRK-HENYMDG             PIC X(09).
            03  WRK-HENYMD.
-               05  WRK-HGO         PIC X(01).
-               05  WRK-HYY         PIC Z9.
-               05  FILLER          PIC X(01)   VALUE  ".".
-               05  WRK-HMM         PIC Z9.
-               05  FILLER          PIC X(01)   VALUE  ".".
-               05  WRK-HDD         PIC Z9.
+               05  WRK-HGO             PIC X(01).
+               05  WRK-HYY             PIC Z9.
+               05  FILLER              PIC X(01)   VALUE  ".".
+               05  WRK-HMM             PIC Z9.
+               05  FILLER              PIC X(01)   VALUE  ".".
+               05  WRK-HDD             PIC Z9.
       *
       *   明細最大数
-       01  MAX-LINE                PIC 9(04)   VALUE   100.
+       01  MAX-LINE                    PIC 9(04)   VALUE   100.
       *
       *    シェル
        01  WRK-SHELL-NAME.
-           03  FILLER              PIC X(09)  VALUE  "plugin.sh".
+           03  FILLER                  PIC X(09)  VALUE  "plugin.sh".
       *
        01  CONST-AREA.
-           03  CONST-MNTJOBID      PIC 9(07)  VALUE    1.
-           03  CONST-MNTSHELLID    PIC X(08)  VALUE    "PLUGIN".
-      *  
+           03  CONST-MNTJOBID          PIC 9(07)  VALUE    1.
+           03  CONST-MNTSHELLID        PIC X(08)  VALUE    "PLUGIN".
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -203,9 +208,10 @@
       *    ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
       *
-      *   日付変換サブ
+      *    日付変換サブ
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
+      *
       *    数字変換領域
            COPY    "CPORCSNUM.INC".
       *
@@ -221,7 +227,7 @@
       *****************************************************************
       *    連絡　領域
       *****************************************************************
-        LINKAGE                     SECTION.
+        LINKAGE                    SECTION.
       *
            COPY    "MCPAREA".
            COPY    "ORCA-SPA".
@@ -248,20 +254,22 @@
            INITIALIZE                  IDX-AREA
            INITIALIZE                  WRK-AREA
       *
-           MOVE    SPA-COMMON          TO  SPA-AREA
-           MOVE    SPA-WORK            TO  SPA-M80KYOUTU
-           MOVE    SPA-FREE            TO  SPA-M80
+           MOVE    SPA-COMMON      TO  SPA-AREA
+           MOVE    SPA-WORK        TO  SPA-M80KYOUTU
+           MOVE    SPA-FREE        TO  SPA-M80
       *
-           MOVE    SPACE               TO  SPA-ERRCD
-           MOVE    ZERO                TO  FLG-END
-           EVALUATE    MCP-STATUS      ALSO    MCP-EVENT
-               WHEN    "LINK"          ALSO    ANY
+           MOVE    SPACE           TO  SPA-ERRCD
+           MOVE    ZERO            TO  FLG-END
+      *
+           EVALUATE    MCP-STATUS  ALSO    MCP-EVENT
+      *        初期
+               WHEN    "LINK"      ALSO    ANY
                    PERFORM 100-INIT-SEC
-      *    画面遷移
-               WHEN     "PUTG"           ALSO   "CLICKED"
+      *        画面遷移
+               WHEN    "PUTG"      ALSO   "CLICKED"
                    PERFORM 200-GMNSENI
-      *    入力
-               WHEN      OTHER
+      *        入力
+               WHEN    OTHER
                    PERFORM 200-ENTRY
            END-EVALUATE
       *
@@ -270,9 +278,9 @@
                PERFORM 500-SET-SCREEN
            END-IF
       *
-           MOVE    SPA-M80KYOUTU       TO  SPA-WORK
-           MOVE    SPA-AREA            TO  SPA-COMMON
-           MOVE    SPA-M80             TO  SPA-FREE
+           MOVE    SPA-M80KYOUTU   TO  SPA-WORK
+           MOVE    SPA-AREA        TO  SPA-COMMON
+           MOVE    SPA-M80         TO  SPA-FREE
       *
            .
            EXIT    PROGRAM
@@ -285,7 +293,7 @@
       *
       *    エラー画面より
            IF      SPA-MOTOPG          =   "M80ERR"
-               MOVE    SPACE               TO  SPA-MOTOPG
+               MOVE    SPACE           TO  SPA-MOTOPG
                PERFORM 5001-MAPCUR-SEC
            ELSE
       *        初期画面編集
@@ -297,13 +305,13 @@
            END-IF
       *
            IF      FLG-END             =   ZERO
-               MOVE    SPACE               TO  LINKAREA
+               MOVE    SPACE           TO  LINKAREA
       *
-               MOVE   SPACE                TO  MCP-PUTTYPE
-               MOVE   "M80"                TO  MCP-WINDOW
+               MOVE   SPACE            TO  MCP-PUTTYPE
+               MOVE   "M80"            TO  MCP-WINDOW
                PERFORM 900-PUT-WINDOW
       *
-               MOVE    1                   TO  FLG-END
+               MOVE    1               TO  FLG-END
            END-IF
            .
       *
@@ -313,10 +321,10 @@
       *****************************************************************
       *    初期画面処理
       *****************************************************************
-       300-SCREEN-SEC             SECTION.
+       300-SCREEN-SEC              SECTION.
       *
            IF      LNK-KYOUTU      NOT =   SPACE
-               MOVE    LNK-KYOUTU          TO  SPA-AREA
+               MOVE    LNK-KYOUTU      TO  SPA-AREA
            END-IF
       *
       *    内部画面より
@@ -335,15 +343,15 @@
       *****************************************************************
       *    初期画面編集処理
       *****************************************************************
-       3001-SPA-SET-SEC             SECTION.
+       3001-SPA-SET-SEC            SECTION.
       *
            INITIALIZE                  SPA-M80
            INITIALIZE                  SPA-M80KYOUTU
       *    一覧更新
            PERFORM 404-LIST-INIT-SEC
       *
-           MOVE    1                   TO  SPA-GMN-PAGE
-           MOVE    1                   TO  SPA-GMN-CUR
+           MOVE    1               TO  SPA-GMN-PAGE
+           MOVE    1               TO  SPA-GMN-CUR
       *
            .
        3001-SPA-SET-EXT.
@@ -351,37 +359,38 @@
       *****************************************************************
       *    確認画面（ＸＤＩＤ１）ＯＫ処理
       *****************************************************************
-       3002-M80ID1-SET-SEC          SECTION.
+       3002-M80ID1-SET-SEC         SECTION.
       *
            EVALUATE    SPA-M80ID1CD
       *        インストール
                WHEN    "0101"
                    IF      SPA-M80ID1-FLG      =   "OK"
-                       MOVE    "install"       TO  WRK-COMMAND
+                       MOVE    "install"   TO  WRK-COMMAND
                        PERFORM 4010-SHELL-SYORI-SEC
-                       MOVE    "enable"        TO  WRK-COMMAND
+                       MOVE    "enable"    TO  WRK-COMMAND
                        PERFORM 4010-SHELL-SYORI-SEC
                    ELSE
-                       MOVE    1               TO  SPA-GMN-CUR
+                       MOVE    1           TO  SPA-GMN-CUR
                    END-IF
       *        アンインストール
                WHEN    "0102"
                    IF      SPA-M80ID1-FLG      =   "OK"
-                       MOVE    "uninstall"     TO  WRK-COMMAND
+                       MOVE    "uninstall" TO  WRK-COMMAND
                        PERFORM 4010-SHELL-SYORI-SEC
                    ELSE
-                       MOVE    1               TO  SPA-GMN-CUR
+                       MOVE    1           TO  SPA-GMN-CUR
                    END-IF
       *        アップグレード
                WHEN    "0105"
                    IF      SPA-M80ID1-FLG      =   "OK"
-                       MOVE    "upgrade"       TO  WRK-COMMAND
+                       MOVE    "upgrade"   TO  WRK-COMMAND
                        PERFORM 4010-SHELL-SYORI-SEC
                    ELSE
-                       MOVE    1               TO  SPA-GMN-CUR
+                       MOVE    1           TO  SPA-GMN-CUR
                    END-IF
            END-EVALUATE
-           MOVE    SPACE               TO  SPA-M80ID1CD
+      *
+           MOVE    SPACE           TO  SPA-M80ID1CD
            IF      SPA-ERRCD       NOT =   SPACE
                PERFORM 510-ERRSET-SEC
            END-IF
@@ -393,32 +402,32 @@
       *****************************************************************
       *    画面遷移処理
       *****************************************************************
-       200-GMNSENI                   SECTION.
+       200-GMNSENI                 SECTION.
       *
-           EVALUATE    MCP-EVENT       ALSO    MCP-WIDGET
+           EVALUATE    MCP-EVENT   ALSO    MCP-WIDGET
       *        戻る
-               WHEN    "CLICKED"       ALSO    "B01"
+               WHEN    "CLICKED"   ALSO    "B01"
                    PERFORM 210-BACK
       *        クリア
-               WHEN    "CLICKED"       ALSO    "B02"
+               WHEN    "CLICKED"   ALSO    "B02"
                     PERFORM 402-CLREA-SEC
       *        一覧更新
-               WHEN    "CLICKED"       ALSO    "B04"
+               WHEN    "CLICKED"   ALSO    "B04"
                     PERFORM 404-LIST-INIT-SEC
       *        ベンダー
-               WHEN    "CLICKED"       ALSO    "B05"
+               WHEN    "CLICKED"   ALSO    "B05"
                     PERFORM 405-VENDOR-INIT-SEC
       *        前頁
-               WHEN    "CLICKED"       ALSO    "B06"
+               WHEN    "CLICKED"   ALSO    "B06"
                    PERFORM 406-MAE-PAGE-SEC
       *        次頁
-               WHEN    "CLICKED"       ALSO    "B07"
+               WHEN    "CLICKED"   ALSO    "B07"
                    PERFORM 407-NEXT-PAGE-SEC
       *        インストール処理
-               WHEN    "CLICKED"       ALSO    "B09"
+               WHEN    "CLICKED"   ALSO    "B09"
                     PERFORM 409-INSTALL-SEC
       *        UPGRADE
-               WHEN    "CLICKED"       ALSO    "B10"
+               WHEN    "CLICKED"   ALSO    "B10"
                     PERFORM 410-UPGRADE-SEC
       *        状況
                WHEN    "CLICKED"   ALSO    "pandatimer1"
@@ -433,15 +442,15 @@
       *****************************************************************
        200-ENTRY                   SECTION.
       *
-           MOVE    MCP-WIDGET          TO  WRK-MCP-WIDGET
-           MOVE    ZERO                TO  SPA-GMN-CUR
+           MOVE    MCP-WIDGET      TO  WRK-MCP-WIDGET
+           MOVE    ZERO            TO  SPA-GMN-CUR
       *
-           EVALUATE    MCP-EVENT       ALSO    MCP-WIDGET
+           EVALUATE    MCP-EVENT   ALSO    MCP-WIDGET
       *        選択番号
-               WHEN    "ACTIVATE"      ALSO    "SELNUM"
+               WHEN    "ACTIVATE"  ALSO    "SELNUM"
                    PERFORM 4001-SELNUM-CHK-SEC
       *        選択
-               WHEN    ANY             ALSO    "LIST"
+               WHEN    ANY         ALSO    "LIST"
                    PERFORM 4003-LIST-SEL-SEC
                WHEN    OTHER
       *            入力チェック処理
@@ -454,20 +463,20 @@
       *****************************************************************
       *    リスト更新処理
       *****************************************************************
-       404-LIST-INIT-SEC          SECTION.
+       404-LIST-INIT-SEC           SECTION.
       *
       *    PERFORM 402-CLREA-SEC
       *
-      *    MOVE    1                   TO  FLG-GMN-INIT
+      *    MOVE    1               TO  FLG-GMN-INIT
       *    INITIALIZE                  SPA-GMN-LIST-AREA
-      *    MOVE    ZERO                TO  SPA-GMN-NEXT
+      *    MOVE    ZERO            TO  SPA-GMN-NEXT
       *
-           MOVE    1                   TO  SPA-SHELLFLG
-           MOVE    ZERO                TO  SPA-SHELL-RC
+           MOVE    1               TO  SPA-SHELLFLG
+           MOVE    ZERO            TO  SPA-SHELL-RC
       *
-           MOVE    "list"              TO  WRK-COMMAND
-           MOVE    SPACE               TO  WRK-PACKAGE
-           MOVE    SPACE               TO  WRK-VERSION
+           MOVE    "list"          TO  WRK-COMMAND
+           MOVE    SPACE           TO  WRK-PACKAGE
+           MOVE    SPACE           TO  WRK-VERSION
            PERFORM 4041-SHELL-CALL-SEC
            .
        404-LIST-INIT-EXT.
@@ -476,21 +485,21 @@
       *****************************************************************
       *    一覧表編集処理
       *****************************************************************
-       4041-LIST-HENSYU-SEC             SECTION.
+       4041-LIST-HENSYU-SEC        SECTION.
       *
-           MOVE    ZERO                TO  SPA-GMN-SELNUM
-           INITIALIZE                      SPA-NAI-AREA
-           MOVE    SPACE               TO  SPA-GMN-SYORIMSG
-           MOVE    ZERO                TO  SPA-NAI-SYORIERR
+           MOVE    ZERO            TO  SPA-GMN-SELNUM
+           INITIALIZE                  SPA-NAI-AREA
+           MOVE    SPACE           TO  SPA-GMN-SYORIMSG
+           MOVE    ZERO            TO  SPA-NAI-SYORIERR
       *
-           MOVE    1                   TO  FLG-GMN-INIT
+           MOVE    1               TO  FLG-GMN-INIT
            INITIALIZE                  SPA-GMN-LIST-AREA
-           MOVE    ZERO                TO  SPA-GMN-NEXT
+           MOVE    ZERO            TO  SPA-GMN-NEXT
       *H24.7
            INITIALIZE                  WRK-GMN-HZN-AREA
       *
-           MOVE    ZERO                TO  FLG-DATAEND
-           MOVE    ZERO                TO  IDX
+           MOVE    ZERO            TO  FLG-DATAEND
+           MOVE    ZERO            TO  IDX
       *
            COMPUTE IDX-STR             =  (SPA-GMN-PAGE  -   1  )
                                        *   MAX-LINE
@@ -501,10 +510,10 @@
            IF      STS-DATA1           =   ZERO
                PERFORM 900-PLUGNDATA-READ-SEC
            ELSE
-               MOVE    "0002"              TO  SPA-ERRCD
-               MOVE    1                   TO  FLG-DATAEND
+               MOVE    "0002"          TO  SPA-ERRCD
+               MOVE    1               TO  FLG-DATAEND
            END-IF
-           PERFORM     UNTIL       FLG-DATAEND  =   1
+           PERFORM UNTIL   FLG-DATAEND     =   1
       *******  PERFORM 4042-LIST-HEN-SEC
       *H24.7
       *        一覧表編集
@@ -535,10 +544,10 @@
       *****************************************************************
       *    ＳＨＥＬＬ起動処理
       *****************************************************************
-       4042-LIST-HEN-SEC             SECTION.
+       4042-LIST-HEN-SEC           SECTION.
       *
            IF      PLUGIN-ID           =   "name  "
-               ADD     1                   TO  IDX
+               ADD     1               TO  IDX
                IF      IDX                 <   IDX-STR
       *            読み飛ばし
                    MOVE    1               TO  FLG-NO
@@ -553,6 +562,7 @@
                    END-IF
                END-IF
            END-IF
+      *
            IF     (FLG-NO              =   ZERO )
              AND  (FLG-DATAEND         =   ZERO )
                EVALUATE    PLUGIN-ID
@@ -582,7 +592,7 @@
                    IF      SPA-NAI-TLINK (IDY) =   "FALSE"
                        MOVE    "-"             TO  SPA-GMN-TLINK (IDY)
                    ELSE
-                       MOVE    "○"             TO  SPA-GMN-TLINK (IDY)
+                       MOVE    "○"            TO  SPA-GMN-TLINK (IDY)
                    END-IF
                END-EVALUATE
            END-IF
@@ -597,7 +607,7 @@
       *****************************************************************
       *    ＳＨＥＬＬ起動処理
       *****************************************************************
-       4041-SHELL-CALL-SEC             SECTION.
+       4041-SHELL-CALL-SEC         SECTION.
       *
       *    ジョブ管理削除
            PERFORM 820-JOBKANRI-DEL-SEC
@@ -696,7 +706,7 @@
       *****************************************************************
       *    ベンダー一覧編集処理
       *****************************************************************
-       40422-LIST-HEN02-SEC             SECTION.
+       40422-LIST-HEN02-SEC        SECTION.
       *
            IF      PLUGIN-ID           =   "vendor "
                MOVE    ZERO                TO  FLG-HENOK
@@ -754,7 +764,7 @@
       *****************************************************************
       *    ベンダー判定処理
       *****************************************************************
-       404221-LIST02-INIT-SEC             SECTION.
+       404221-LIST02-INIT-SEC      SECTION.
       *
            MOVE    1                   TO  FLG-HENOK
            MOVE    PLUGIN-DATA         TO  WRK-VENDOR
@@ -772,7 +782,7 @@
       *****************************************************************
       *    ベンダー毎編集処理
       *****************************************************************
-       40423-LIST-HEN03-SEC             SECTION.
+       40423-LIST-HEN03-SEC        SECTION.
       *
       *
            IF      PLUGIN-ID           =   "name  "
@@ -825,7 +835,7 @@
       *****************************************************************
       *    ベンダー一覧
       *****************************************************************
-       40423-LIST03-INIT-SEC          SECTION.
+       40423-LIST03-INIT-SEC       SECTION.
       *
            MOVE    ZERO                TO  FLG-HENOK
            IF      WRK-GMN-TNUM        NOT =   ZERO
@@ -866,7 +876,7 @@
       *****************************************************************
       *    ベンダー一覧
       *****************************************************************
-       405-VENDOR-INIT-SEC          SECTION.
+       405-VENDOR-INIT-SEC         SECTION.
       *
       *    ベンダー一覧
            MOVE    1                   TO  SPA-NAI-VENDFLG
@@ -881,7 +891,7 @@
       *****************************************************************
       *    選択番号チェック処理
       *****************************************************************
-       4001-SELNUM-CHK-SEC          SECTION.
+       4001-SELNUM-CHK-SEC         SECTION.
       *
            MOVE    M80-SELNUM         TO  SPA-GMN-SELNUM
       *
@@ -921,7 +931,7 @@
       *****************************************************************
       *    内容編集処理
       *****************************************************************
-       40011-SEL-SYORI-SEC          SECTION.
+       40011-SEL-SYORI-SEC         SECTION.
       *
       *    リンク判定
            IF      SPA-NAI-TLINK (SPA-NAI-IDX) =   "FALSE"
@@ -947,7 +957,7 @@
       *****************************************************************
       *    明細リスト選択処理
       *****************************************************************
-       4003-LIST-SEL-SEC          SECTION.
+       4003-LIST-SEL-SEC           SECTION.
       *
            MOVE    ZERO                TO  WRK-SELNUM
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -971,7 +981,7 @@
       *****************************************************************
       *    ベンダー選択処理
       *****************************************************************
-       40012-SEL-VENDER-SYORI-SEC          SECTION.
+       40012-SEL-VENDER-SYORI-SEC  SECTION.
       *
            MOVE    2                   TO  SPA-NAI-VENDFLG
            IF      SPA-GMN-TVENDOR (SPA-NAI-IDX)   =   "全部"
@@ -991,7 +1001,7 @@
       *****************************************************************
       *    入力チェック処理
       *****************************************************************
-       410-INPUT-CHK-SEC          SECTION.
+       410-INPUT-CHK-SEC           SECTION.
       *
       *    画面をＳＰＡセット
            PERFORM 4101-GMN-SPA-SET-SEC
@@ -1005,7 +1015,7 @@
       *****************************************************************
       *    画面ＳＰＡ編集処理
       *****************************************************************
-       4101-GMN-SPA-SET-SEC          SECTION.
+       4101-GMN-SPA-SET-SEC        SECTION.
       *
       *
        4101-GMN-SPA-SET-EXT.
@@ -1023,7 +1033,7 @@
       *****************************************************************
       *    更新前チェック処理
       *****************************************************************
-       4103-KOUSIN-CHK-SEC            SECTION.
+       4103-KOUSIN-CHK-SEC         SECTION.
       *
            .
        4103-KOUSIN-CHK-EXT.
@@ -1032,7 +1042,7 @@
       *****************************************************************
       *    戻る　処理
       *****************************************************************
-       210-BACK                        SECTION.
+       210-BACK                    SECTION.
       *
            MOVE    "M02"               TO  SPA-SAKIPG
            MOVE    "M80"               TO  SPA-MOTOPG
@@ -1052,7 +1062,7 @@
       *****************************************************************
       *    クリア処理
       *****************************************************************
-       402-CLREA-SEC       SECTION.
+       402-CLREA-SEC               SECTION.
       *
            MOVE    ZERO                TO  SPA-GMN-SELNUM
            INITIALIZE                      SPA-NAI-AREA
@@ -1069,8 +1079,7 @@
       *****************************************************************
       *    変更確定処理
       *****************************************************************
-       408-KAKUTEI-SEC       SECTION.
-      *
+       408-KAKUTEI-SEC             SECTION.
       *
            .
        408-KAKUTEI-EXT.
@@ -1078,7 +1087,7 @@
       *****************************************************************
       *    前頁処理
       *****************************************************************
-       406-MAE-PAGE-SEC       SECTION.
+       406-MAE-PAGE-SEC            SECTION.
       *
            IF      SPA-GMN-PAGE        >   1
                COMPUTE SPA-GMN-PAGE    =   SPA-GMN-PAGE
@@ -1092,7 +1101,7 @@
       *****************************************************************
       *    次頁処理
       *****************************************************************
-       407-NEXT-PAGE-SEC       SECTION.
+       407-NEXT-PAGE-SEC           SECTION.
       *
            IF      SPA-GMN-NEXT        =   1
                COMPUTE SPA-GMN-PAGE    =   SPA-GMN-PAGE
@@ -1106,7 +1115,7 @@
       *****************************************************************
       *    インストール処理
       *****************************************************************
-       409-INSTALL-SEC       SECTION.
+       409-INSTALL-SEC             SECTION.
       *
            IF     (SPA-GMN-SELNUM      =   ZERO )  OR
                   (SPA-NAI-IDX         =   ZERO )
@@ -1127,7 +1136,7 @@
       *****************************************************************
       *    ｕｐｇｒａｄｅ処理
       *****************************************************************
-       410-UPGRADE-SEC       SECTION.
+       410-UPGRADE-SEC             SECTION.
       *
            MOVE    "0105"              TO  SPA-M80ID1CD
            .
@@ -1136,7 +1145,7 @@
       *****************************************************************
       *    SHELL　ＣＡＬＬ処理
       *****************************************************************
-       4010-SHELL-SYORI-SEC       SECTION.
+       4010-SHELL-SYORI-SEC        SECTION.
       *
            MOVE    2                   TO  SPA-SHELLFLG
       *
@@ -1213,23 +1222,25 @@
       *****************************************************************
       *    西暦和暦編集処理
       *****************************************************************
-       800-SEIWA-HEN-SEC             SECTION.
+       800-SEIWA-HEN-SEC           SECTION.
       *
            IF      WRK-SYMD            =   ALL "9"  OR   SPACE
-               MOVE    SPACE               TO  WRK-HGO
-               MOVE    WRK-SYMD(3:2)       TO  WRK-HYY
-               MOVE    WRK-SYMD(5:2)       TO  WRK-HMM
-               MOVE    WRK-SYMD(7:2)       TO  WRK-HDD
-               MOVE    WRK-HENYMD          TO  WRK-HENYMDG
+               MOVE    SPACE           TO  WRK-HGO
+               MOVE    WRK-SYMD(3:2)   TO  WRK-HYY
+               MOVE    WRK-SYMD(5:2)   TO  WRK-HMM
+               MOVE    WRK-SYMD(7:2)   TO  WRK-HDD
+               MOVE    WRK-HENYMD      TO  WRK-HENYMDG
            ELSE
-               INITIALIZE                      STS-AREA-DAY
-               INITIALIZE                      LNK-DAY2-AREA
-               MOVE    "21"                TO  LNK-DAY2-IRAI
-               MOVE    WRK-SYMD            TO  LNK-DAY2-YMD
-               CALL    "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY2-AREA
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY2-AREA
+               MOVE    "21"            TO  LNK-DAY2-IRAI
+               MOVE    WRK-SYMD        TO  LNK-DAY2-YMD
+               CALL    "ORCSDAY"           USING
+                                           STS-AREA-DAY
+                                           LNK-DAY2-AREA
                MOVE    LNK-DAY2-EDTYMD1    TO  WRK-HENYMDG
            END-IF
+      *
            .
        800-SEIWA-HEN-EXT.
            EXIT.
@@ -1243,18 +1254,19 @@
       *
            IF      SPA-ERRCD       NOT =   SPACE
                PERFORM 510-ERRSET-SEC
-               GO      TO      500-SET-SCREEN-EXT
+               GO  TO  500-SET-SCREEN-EXT
            END-IF
       *
            IF      SPA-M80ID1CD    NOT =   SPACE
                PERFORM 520-M80IDSET-SEC
-               GO      TO      500-SET-SCREEN-EXT
+               GO  TO  500-SET-SCREEN-EXT
            END-IF
       *
-           MOVE    "CURRENT"           TO  MCP-PUTTYPE.
-           MOVE    "M80"               TO  MCP-WINDOW.
+           MOVE    "CURRENT"       TO  MCP-PUTTYPE.
+           MOVE    "M80"           TO  MCP-WINDOW.
       *
            PERFORM 900-PUT-WINDOW.
+      *
            .
        500-SET-SCREEN-EXT.
            EXIT.
@@ -1262,7 +1274,7 @@
       *****************************************************************
       *    画面編集処理
       *****************************************************************
-       500-GMNHEN-SEC                  SECTION.
+       500-GMNHEN-SEC              SECTION.
       *
            IF      FLG-GMN-INIT        =   1
                MOVE    ZERO            TO  WRK-M80-LIST-ROW
@@ -1270,25 +1282,25 @@
                MOVE    M80-LIST-ROW    TO  WRK-M80-LIST-ROW
            END-IF
       *
-           MOVE    SPACE               TO  M80
+           MOVE    SPACE           TO  M80
+      :
       *    コラムリストの位置指定
-           MOVE    ZERO                TO  M80-LIST-ROW
+           MOVE    ZERO            TO  M80-LIST-ROW
            IF      WRK-M80-LIST-ROW    NOT =   ZERO
                MOVE    WRK-M80-LIST-ROW    TO  M80-LIST-ROW
            END-IF
       *
-           PERFORM VARYING   IDX     FROM    1   BY  1
-                   UNTIL     IDX     >   SPA-TBL-MAX
-               MOVE    SPA-GMN-TNUM    (IDX)   TO  WRK-Z9
-               MOVE    WRK-Z9                  TO  M80-TNUM   (IDX)
-               MOVE    SPA-GMN-TPGMEISYO (IDX)
-                                               TO  M80-TPGMEISYO(IDX)
-               MOVE    SPA-GMN-TPGNAME (IDX)   TO  M80-TPGNAME  (IDX)
-               MOVE    SPA-GMN-TVERSION(IDX)   TO  M80-TVERSION (IDX)
+           PERFORM VARYING   IDX   FROM    1   BY  1
+                   UNTIL     IDX   >   SPA-TBL-MAX
+               MOVE    SPA-GMN-TNUM(IDX)       TO  WRK-Z9
+               MOVE    WRK-Z9                  TO  M80-TNUM(IDX)
+               MOVE    SPA-GMN-TPGMEISYO(IDX)  TO  M80-TPGMEISYO(IDX)
+               MOVE    SPA-GMN-TPGNAME(IDX)    TO  M80-TPGNAME(IDX)
+               MOVE    SPA-GMN-TVERSION(IDX)   TO  M80-TVERSION(IDX)
                MOVE    SPA-GMN-TVERSION2(IDX)  TO  M80-TVERSION2(IDX)
-               MOVE    SPA-GMN-TVENDOR (IDX)   TO  M80-TVENDOR (IDX)
-               MOVE    SPA-GMN-TLINK   (IDX)   TO  M80-TLINK   (IDX)
-               IF      SPA-GMN-TNUM (IDX)      =   SPA-GMN-SELNUM
+               MOVE    SPA-GMN-TVENDOR(IDX)    TO  M80-TVENDOR(IDX)
+               MOVE    SPA-GMN-TLINK(IDX)      TO  M80-TLINK(IDX)
+               IF      SPA-GMN-TNUM(IDX)       =   SPA-GMN-SELNUM
                    MOVE    "T"                 TO  M80-LIST-SELECT(IDX)
                ELSE
                    MOVE    "F"                 TO  M80-LIST-SELECT(IDX)
@@ -1345,12 +1357,14 @@
       *    明細があり
            IF     (SPA-TBL-MAX         >   ZERO )
       *        未選択の時
-               IF   (SPA-GMN-SELNUM      =   ZERO )
+               IF   (SPA-GMN-SELNUM        =   ZERO )
                    MOVE    "一括更新"          TO  M80-B10-LABEL
                    MOVE    WIDGET-NORMAL       TO  M80-B10-STATE
                ELSE
-                   MOVE    "個別更新"          TO  M80-B10-LABEL
-                   MOVE    WIDGET-NORMAL       TO  M80-B10-STATE
+                   IF      SPA-NAI-INSTALL     =   2
+                       MOVE    "個別更新"          TO  M80-B10-LABEL
+                       MOVE    WIDGET-NORMAL       TO  M80-B10-STATE
+                   END-IF
                END-IF
            END-IF
       *
@@ -1358,6 +1372,7 @@
            PERFORM 510-GSRAUTH-SEC
       *
            PERFORM 5001-MAPCUR-SEC
+      *
            .
        500-GMNHEN-EXT.
            EXIT.
@@ -1375,17 +1390,17 @@
       *****************************************************************
        5001-MAPCUR-SEC             SECTION.
       *
-           IF      SPA-GMN-CUR     =   ZERO
+           IF      SPA-GMN-CUR         =   ZERO
                PERFORM 50011-CUR-SET-SEC
            END-IF
       *
            EVALUATE    SPA-GMN-CUR
                WHEN    01
-                   MOVE    "SELNUM"          TO  MCP-WIDGET
+                   MOVE    "SELNUM"        TO  MCP-WIDGET
                WHEN    10
-                   MOVE    "B04"             TO  MCP-WIDGET
+                   MOVE    "B04"           TO  MCP-WIDGET
                WHEN    11
-                   MOVE    "B09"             TO  MCP-WIDGET
+                   MOVE    "B09"           TO  MCP-WIDGET
            END-EVALUATE
       *
            .
@@ -1411,39 +1426,39 @@
       *****************************************************************
        510-ERRSET-SEC              SECTION.
       *
-           MOVE    SPACE               TO  SPA-ERRMSG
+           MOVE    SPACE           TO  SPA-ERRMSG
       *
            EVALUATE    SPA-ERRCD
                WHEN    "0001"
                    MOVE    "選択番号入力エラー"
-                                       TO  SPA-ERRMSG
+                                           TO  SPA-ERRMSG
                WHEN    "0002"
                    MOVE    "一覧表の内容がありません"
-                                       TO  SPA-ERRMSG
+                                           TO  SPA-ERRMSG
                WHEN    "0003"
                    MOVE    "選択番号を入力して下さい"
-                                       TO  SPA-ERRMSG
+                                           TO  SPA-ERRMSG
                WHEN    "0010"
                    MOVE    "スクリプトの起動に失敗しました。"
-                                       TO  SPA-ERRMSG
+                                           TO  SPA-ERRMSG
                WHEN    OTHER
-                   MOVE    SPA-ERRCD   TO  SPA-ERRMSG
+                   MOVE    SPA-ERRCD       TO  SPA-ERRMSG
            END-EVALUATE
       *
-           MOVE    SPACE               TO  M80ERR
-           MOVE    SPA-ERRCD           TO  M80ERR-ERRCODE
-           MOVE    SPA-ERRMSG          TO  M80ERR-ERRMSG
-           MOVE    "B01"               TO  MCP-WIDGET
+           MOVE    SPACE           TO  M80ERR
+           MOVE    SPA-ERRCD       TO  M80ERR-ERRCODE
+           MOVE    SPA-ERRMSG      TO  M80ERR-ERRMSG
+           MOVE    "B01"           TO  MCP-WIDGET
       *
-           MOVE    "M80"               TO  SPA-MOTOPG
-           MOVE    "M80ERR"            TO  SPA-SAKIPG
+           MOVE    "M80"           TO  SPA-MOTOPG
+           MOVE    "M80ERR"        TO  SPA-SAKIPG
       *
-           MOVE    "NEW"               TO  MCP-PUTTYPE
-           MOVE    "M80ERR"            TO  MCP-WINDOW
+           MOVE    "NEW"           TO  MCP-PUTTYPE
+           MOVE    "M80ERR"        TO  MCP-WINDOW
       *
            PERFORM 900-PUT-WINDOW
       *
-           MOVE    1                   TO  FLG-END
+           MOVE    1               TO  FLG-END
       *
            .
        510-ERRSET-EXT.
@@ -1452,58 +1467,47 @@
       *****************************************************************
       *    確認メッセージ表示理
       *****************************************************************
-       520-M80IDSET-SEC              SECTION.
+       520-M80IDSET-SEC            SECTION.
       *
-           MOVE    SPACE               TO  M80ID1
+           MOVE    SPACE           TO  M80ID1
+      *
            EVALUATE    SPA-M80ID1CD
                WHEN    "0101"
-                   STRING  "選択したパッケージを取り込みます。"
-                           "よろしいですか？"
-                                           DELIMITED  BY  SIZE
-                                       INTO   M80ID1-ID1MSG
-                   END-STRING
-               WHEN    "0102"
-                   STRING  "選択したパッケージを削除"
-                           "します。よろしいですか？"
-                                           DELIMITED  BY  SIZE
-                                       INTO   M80ID1-ID1MSG
-                   END-STRING
-               WHEN    "0103"
                    STRING  "選択したパッケージを組み込みます。"
                            "よろしいですか？"
-                                           DELIMITED  BY  SIZE
-                                       INTO   M80ID1-ID1MSG
+                                       DELIMITED  BY  SIZE
+                                       INTO    M80ID1-ID1MSG
                    END-STRING
-               WHEN    "0104"
-                   STRING  "選択したパッケージを取り外します。"
+               WHEN    "0102"
+                   STRING  "選択したパッケージを削除します。"
                            "よろしいですか？"
-                                           DELIMITED  BY  SIZE
-                                       INTO   M80ID1-ID1MSG
+                                       DELIMITED  BY  SIZE
+                                       INTO    M80ID1-ID1MSG
                    END-STRING
                WHEN    "0105"
                    STRING  "パッケージを更新します。"
                            "よろしいですか？"
-                                           DELIMITED  BY  SIZE
-                                       INTO   M80ID1-ID1MSG
+                                       DELIMITED  BY  SIZE
+                                       INTO    M80ID1-ID1MSG
                    END-STRING
                WHEN    OTHER
-                   MOVE    SPA-M80ID1CD
-                                       TO  M80ID1-ID1MSG
+                   MOVE    SPA-M80ID1CD    TO  M80ID1-ID1MSG
            END-EVALUATE
       *
-           MOVE    SPA-M80ID1CD        TO  M80ID1-ID1CODE
-           MOVE    SPACE               TO  SPA-M80ID1-FLG
+           MOVE    SPA-M80ID1CD    TO  M80ID1-ID1CODE
+           MOVE    SPACE           TO  SPA-M80ID1-FLG
       *
-           MOVE    "B12"               TO  MCP-WIDGET
+           MOVE    "B12"           TO  MCP-WIDGET
       *
-           MOVE    "M80"               TO  SPA-MOTOPG
-           MOVE    "M80ID1"            TO  SPA-SAKIPG
+           MOVE    "M80"           TO  SPA-MOTOPG
+           MOVE    "M80ID1"        TO  SPA-SAKIPG
       *
-           MOVE    "NEW"               TO  MCP-PUTTYPE
-           MOVE    "M80ID1"            TO  MCP-WINDOW
+           MOVE    "NEW"           TO  MCP-PUTTYPE
+           MOVE    "M80ID1"        TO  MCP-WINDOW
       *
            PERFORM 900-PUT-WINDOW.
-           MOVE    1                   TO  FLG-END
+           MOVE    1               TO  FLG-END
+      *
            .
        520-M80IDSET-EXT.
            EXIT.
@@ -1511,7 +1515,7 @@
       *****************************************************************
       *    データ読込処理
       *****************************************************************
-       900-PLUGNDATA-READ-SEC                SECTION.
+       900-PLUGNDATA-READ-SEC      SECTION.
       *
            READ    PLUGINLIST-FILE
                AT  END
@@ -1519,6 +1523,7 @@
                NOT AT  END
                    MOVE    ZERO            TO  FLG-DATAEND
            END-READ
+      *
            .
        900-PLUGNDATA-READ-EXT.
            EXIT.
@@ -1528,10 +1533,11 @@
       *****************************************************************
        900-PUT-WINDOW              SECTION.
       *
-           MOVE   "PUTWINDOW"          TO  MCP-FUNC.
-           CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
+           MOVE   "PUTWINDOW"      TO  MCP-FUNC.
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
       *
            .
        900-PUT-WINDOW-EXT.
