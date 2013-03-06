@@ -281,6 +281,8 @@
       *  04.06.16    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *  04.06.17    NACL-藤原    12/07/31  コラムリストのスクロール対応
       *  04.06.18    NACL-藤原    12/10/01  入力病名の入力ＣＤ登録対応
+      *  04.06.19    NACL-藤原    13/03/26  同義語変換時の編集病名フラグ
+      *                                     の初期化
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1010,6 +1012,8 @@
                        MOVE    SPA-CID2-FLG    TO  
                                        SPA-NAI-C02-BYOMEI-CHG (IDZ)
                        INITIALIZE          SPA-NAI-C02-BYOMEI (IDZ)
+                                           SPA-NAI-C02-US-BYOMEIHENFLG
+                                                              (IDZ)
                                            SPA-NAI-C02-BYOMEICD-O
                                                              (IDZ IDX2)
                                            SPA-NAI-C02-BYOMEI-O
