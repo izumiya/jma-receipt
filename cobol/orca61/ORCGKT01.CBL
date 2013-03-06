@@ -5391,6 +5391,8 @@
                                            "113003710"
       *        Ï«ºÒÄÉ²Ã
                                        OR  "101110010"
+      *        ¾Ò²ð¾õ¤Ê¤·ÄÉ²Ã
+                                       OR  "111012510"
                CONTINUE
            ELSE
                GO      TO      4101125-SYOSIN-CHK-EXT
@@ -5403,6 +5405,13 @@
                                        ORCSGDAYAREA
            MOVE    SPACE               TO  WRK-SYOKAI-YMD
            IF      SGDAY-RC            =   ZERO
+      *H25.4   ¾Ò²ð¾õ¤Ê¤·¤Ï¡¢£È£²£µ.4¤«¤é
+               IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012510")
+                  AND  (SGDAY-SDAY             <   "20130401" )
+                   MOVE    "1103"              TO  SPA-ERRCD
+                   GO      TO      4101125-SYOSIN-CHK-EXT
+               END-IF
+      *
                IF      SGDAY-SDAY(1:6)     >=  SPA-SRYYMD(1:6)
                    MOVE    "1101"              TO  SPA-ERRCD
                ELSE

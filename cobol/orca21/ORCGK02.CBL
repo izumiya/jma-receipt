@@ -102,6 +102,7 @@
       *  04.07.00    NACL-多々納  12/01/05  クライアント印刷対応
       *  04.07.00    NACL-多々納  12/08/XX  ドクター選択対応
       *  04.07.00    NACL-多々納  12/10/10  照会からの遷移対応
+      *  04.08.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -7836,6 +7837,8 @@
                                            "113003710"
       *        労災追加
                                        OR  "101110010"
+      *        紹介状なし追加
+                                       OR  "111012510"
                CONTINUE
            ELSE
                GO      TO      4101125-SYOSIN-CHK-EXT
@@ -7847,6 +7850,13 @@
            CALL    "ORCSGDAY"          USING
                                        ORCSGDAYAREA
            IF      SGDAY-RC            =   ZERO
+      *H25.4   紹介状なしは、Ｈ２５.4から
+               IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012510")
+                  AND  (SGDAY-SDAY             <   "20130401" )
+                   MOVE    "1103"              TO  SPA-ERRCD
+                   GO      TO      4101125-SYOSIN-CHK-EXT
+               END-IF
+      *
                IF      SGDAY-SDAY          >   SPA-SRYYMD
                    MOVE    "1101"              TO  SPA-ERRCD
                ELSE
@@ -7884,6 +7894,8 @@
                                                "113003510"  OR
                                                "113003710"
                                            OR  "101110010"
+      *                紹介状なし追加
+                                           OR  "111012510"
                    IF      SPA-SYOSINFLG       =   ZERO
                        MOVE    "099110001"         TO  WRK-SRYCD
                    ELSE
@@ -7896,6 +7908,7 @@
                        MOVE    "1205"              TO  SPA-ERRCD
                    END-IF
                    IF     (WRK-SRYCD           =   "099110001") AND
+                          (SPA-LSTYMD      NOT =   SPACE      ) AND
                           (WRK-SYOKAI-YMD      >   SPA-LSTYMD )
                        MOVE    "1206"              TO  SPA-ERRCD
                    END-IF
@@ -8992,6 +9005,15 @@
       *    訂正日編集処理
       *****************************************************************
        410141-TEISEI-SET-SEC           SECTION.
+      *
+      *H25.3
+      *    レセ電移行分はエラー
+           IF      SPA-NAI-RRK-SRYKA (SPA-NAI-DOSELNUM)(1:1)
+                                       =   "A"
+               MOVE    "7011"              TO  SPA-ERRCD
+               GO      TO      410141-TEISEI-SET-EXT
+           END-IF
+      *
       *
            MOVE    ZERO            TO  FLG-MOD-FLG
            PERFORM 4900-WKSRYACT-CLEAR-SEC

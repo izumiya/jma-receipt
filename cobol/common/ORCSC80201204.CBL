@@ -940,13 +940,18 @@
       *
       *    同日初診の診療科設定
            MOVE    SPA-SRYYMD          TO  WRK-SRYYMD-1
-           IF      WRK-SRYMM           <=  6
-               COMPUTE WRK-SRYMM       =  (WRK-SRYMM   +   12 )
-                                                       -   6
-               COMPUTE WRK-SRYYY       =   WRK-SRYYY   -   1
-           ELSE
-               COMPUTE WRK-SRYMM       =   WRK-SRYMM   -   6
-           END-IF
+      **   IF      WRK-SRYMM           <=  6
+      **       COMPUTE WRK-SRYMM       =  (WRK-SRYMM   +   12 )
+      *                                                -   6
+      *        COMPUTE WRK-SRYYY       =   WRK-SRYYY   -   1
+      *    ELSE
+      *        COMPUTE WRK-SRYMM       =   WRK-SRYMM   -   6
+      ***  END-IF
+      *H25.3
+      *    診療日付から前２年間で判定する
+           MOVE    SPA-SRYYMD          TO  WRK-SRYYMD-1
+           COMPUTE WRK-SRYYY           =   WRK-SRYYY   -   2
+      *
            IF      WRK-SRYYM-1         <   "200604"
                MOVE    "200604"        TO  WRK-SRYYM-1
            END-IF
@@ -961,6 +966,9 @@
                PERFORM 10021-DOUSYOSIN-SRYKA-SEC
       *        同日初診（労災）
                MOVE    "101110040"         TO  WRK-SRYCD
+               PERFORM 10021-DOUSYOSIN-SRYKA-SEC
+      *        同日初診（紹介なし）
+               MOVE    "111012610"         TO  WRK-SRYCD
                PERFORM 10021-DOUSYOSIN-SRYKA-SEC
            END-IF
            .

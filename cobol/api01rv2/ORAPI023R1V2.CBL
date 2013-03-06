@@ -1986,6 +1986,8 @@
                        WHEN    "101110010"
       *                ダミー追加
                        WHEN    "099110001"
+      *                紹介状なし追加
+                       WHEN    "111012510"
                            MOVE    1             TO  FLG-SYOSIN-OK
                    END-EVALUATE
            END-IF

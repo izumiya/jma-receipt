@@ -60,6 +60,7 @@
       *  04.07.00    NACL=多々納  11/09/08  アトピー性皮膚炎と他病名対応
       *  04.07.00    NACL=多々納  11/10/XX  同日再入院対応
       *  04.07.00    NACL=多々納  11/10/30  API検索対応
+      *  04.07.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
       *****************************************************************
       *
       *
@@ -939,6 +940,12 @@
                        MOVE    SPA-SRYKA-MAX   TO  IDY
                    END-IF
                END-PERFORM
+      *	H25.3  科コードなし
+               IF      SPA-GMN-RRKSRYKA(IDX)   =   SPACE
+                   MOVE    SPA-NAI-RRK-SRYKA (IDX)
+                                               TO  SPA-GMN-RRKSRYKA(IDX)
+               END-IF
+      *!!!!!!!
            END-PERFORM
       *
            .
@@ -3887,6 +3894,20 @@
                MOVE    WRK-YMDS        TO  WRK-SYO-YMD
                MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
            END-IF
+      *H25.4 
+      *    初診料（紹介状なし）（Ｈ２５．４から）
+           MOVE    "111012510"         TO  WRK-SRYCD
+           PERFORM 30091-SANTEI-CHK-SEC
+           IF      WRK-YMDS        NOT =   SPACE
+               IF      WRK-YMDS        >   WRK-SYO-YMD
+                   MOVE    WRK-YMDS        TO  WRK-SYO-YMD
+               END-IF
+               IF     (WRK-SYO-YMD1    =   SPACE        )
+               OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
+                  MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
+               END-IF
+           END-IF
+      *
       *    小児科診察料
       *    院外処方   初診
            MOVE    "113003510"         TO  WRK-SRYCD
@@ -4075,6 +4096,14 @@
                   (WRK-YMDS            >   WRK-SYOSINYMD1)
                MOVE    WRK-YMDS            TO  WRK-SYOSINYMD1
            END-IF
+      *H25.4   紹介なし
+      *    同日初診（紹介状なし）（Ｈ２５．４から）
+           MOVE    "111012610"         TO  WRK-SRYCD
+           PERFORM 30091-SANTEI-CHK-SEC
+           IF     (WRK-SYOSINYMD1      =   SPACE  )  OR
+                  (WRK-YMDS            >   WRK-SYOSINYMD1)
+               MOVE    WRK-YMDS            TO  WRK-SYOSINYMD1
+           END-IF
       *    同日初診（労災）
            MOVE    "101110040"         TO  WRK-SRYCD
            PERFORM 30091-SANTEI-CHK-SEC
@@ -4116,6 +4145,18 @@
       *    同日初診（今月）
            MOVE    SPA-SRYYMD(1:6)     TO  WRK-SRYYYMM
            PERFORM 3009111-DOU-SANTEI-SEC
+      *H25.4
+      *    同日初診（紹介状なし）（Ｈ２５．４から）
+           MOVE    "111012610"         TO  WRK-SRYCD
+           MOVE    WRK-SRYYM-1         TO  WRK-SRYYYMM
+           IF      WRK-SRYYYMM         >=  "201304"
+               PERFORM 3009111-DOU-SANTEI-SEC
+           END-IF
+      *    同日初診（今月）
+           MOVE    SPA-SRYYMD(1:6)     TO  WRK-SRYYYMM
+           IF      WRK-SRYYYMM         >=  "201304"
+               PERFORM 3009111-DOU-SANTEI-SEC
+           END-IF
       *
       *    同日初診（労災）（前月）
            MOVE    "101110040"         TO  WRK-SRYCD
@@ -5438,6 +5479,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                OR  "112016210"
                    MOVE    ZERO            TO  FLG-CHK
                END-IF
+      *H24.5
+      *        同一日２科目（初診（紹介状なし）、外来診察料（紹介）
+               IF      WKSRY-SRYCD(IDXF)       =   "111012610"
+                                               OR  "112016410"
+                   MOVE    ZERO            TO  FLG-CHK
+               END-IF
+      *
            END-PERFORM
            .
        3002-SRYKBN-CHK-EXT.

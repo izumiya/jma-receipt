@@ -1207,6 +1207,21 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H25.7   から
+               WHEN    "K402"
+                   STRING  "警告！労災の合成コードで"
+                           "算定して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0402"
+                   STRING  "労災の処置に通則加算があります。"
+                           "労災合成コードに変更して手技毎に"
+                           "剤分離して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *!!!
                WHEN    "K501"
                    STRING  "警告！手術の手技が剤内に複数あります。"
                            "手技毎に剤分離して下さい。"
@@ -1975,6 +1990,13 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H25.2
+               WHEN    "7011"
+                   STRING  "レセプト電算データから移行したデータです。"
+                           "訂正できません。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
@@ -2091,6 +2113,13 @@
                WHEN    "1102"
                    MOVE    "初診算定日が暦日ではありません。"
                                        TO  SPA-ERRMSG
+      *H25.4
+               WHEN    "1103"
+                   STRING  "この初診の初診算定日は平成２５年４月以降"
+                           "にして下さい。"
+                                           DELIMITED   BY  SIZE
+                                           INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "1017"
       *?           MOVE
       *            "初診算定日を登録して、再診料自動算定をして下さい"

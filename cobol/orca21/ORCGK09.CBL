@@ -709,6 +709,10 @@
            MOVE    SPA-NYUGAIKBN       TO  SPA-K09-NYUGAIKBN
            IF      SPA-K02N-TAIINYMD   =   SPACE
             AND   (SPA-NAI-NYUIN       =   ZERO  )
+      *
+      *!!!!レセ電移行の為、すべて入院あり
+            AND   (SPA-BEDFLG              =   ZERO  )
+      *!!!
                MOVE    "2 外来"            TO  SPA-K09-NYUGAIKBN-LST (1)
                MOVE    1                   TO  SPA-K09-NYUGAIKBN-MAX
            ELSE
@@ -820,6 +824,13 @@
                MOVE    IDX                 TO  SPA-K09GMN-MAX1
                MOVE    SPA-NAI-RRKTBLREC (IDX)
                                            TO  SPA-K09NAI-RRKTBLREC(IDX)
+      *!!!!!!!!!!!!!!!!
+      *レセ電移行分
+               IF      SPA-K09GMN-RRKSRYKA(IDX) =  SPACE
+                   MOVE    SPA-K09NAI-RRK-SRYKA (IDX)
+                                           TO  SPA-K09GMN-RRKSRYKA(IDX)
+               END-IF
+      *!!!!!
            END-PERFORM
            .
        3102-JYURRK-SPAHEN-EXT.
@@ -992,6 +1003,13 @@
                        MOVE    SPA-SRYKA-MAX   TO  IDY
                    END-IF
                END-PERFORM
+      *!!!!!!!!!!!!!!!!
+      *レセ電移行分
+               IF      SPA-K09GMN-RRKSRYKA(IDX) =  SPACE
+                   MOVE    SPA-K09NAI-RRK-SRYKA (IDX)
+                                           TO  SPA-K09GMN-RRKSRYKA(IDX)
+               END-IF
+      *!!!!!
            END-PERFORM
       *
            .

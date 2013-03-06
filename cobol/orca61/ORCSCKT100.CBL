@@ -452,6 +452,8 @@
                    IF     (SPA-COM-SRYKBN (IDX)    =   "11"  )  AND
                           (SPA-COM-HKNCOMBI(IDX)   NOT =   "9999") AND
                           (SPA-COM-INPUTCD(IDX)    =   "111011810"
+      *H25.4                        同日初診（紹介なし）
+                                                   OR  "111012610"
                                                    OR  "101110040")
                        MOVE    1               TO  WRK-DOUSIN
                    END-IF
