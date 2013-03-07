@@ -396,6 +396,7 @@
       *  04.06.04    NACL-ÌçÏÆ    12/11/20  ÆÃµ­»ö¹à£°£±¡Ê¸ø¡Ë¤Ë´Ø¤ï¤ëÁë¸ý·×»»¡¦
       *                                     ¥ì¥»¥×¥È°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  04.06.06    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
+      *  04.06.07    NACL-ÌçÏÆ    13/03/05  ËÌ³¤Æ»ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -10112,7 +10113,7 @@
                EVALUATE   WK-1001-PREFNUM
                  WHEN       01
                    IF   COMB-KOHHKNNUM(IDX-CYO)   =
-                                            "142" OR "143" OR "144"
+                                   "142" OR "143" OR "144" OR "364"
                                          OR "190" OR "291" OR "292"
                      MOVE    "1"    TO  WK-2010-SYOKEIKBN-G(IDX-CYO)
                    END-IF
@@ -10506,7 +10507,7 @@
            EVALUATE   WK-1001-PREFNUM
              WHEN       01
                IF  (COMB-KOHHKNNUM(IDX-CYO)   =
-                                        "142" OR "143" OR "144")
+                               "142" OR "143" OR "144" OR "364")
                AND (LNK-SYU-SRYYMD(1:6)      >= "200410"       )
                  MOVE    "1"    TO  WK-2010-SYOKEIKBN-G(IDX-CYO)
                END-IF
@@ -10702,7 +10703,7 @@
            EVALUATE   WK-1001-PREFNUM
              WHEN       01
                IF  (COMB-KOHHKNNUM(IDX-CYO) =
-                               "142" OR "143" OR "144")
+                      "142" OR "143" OR "144" OR "364")
                AND (LNK-SYU-SRYYMD(1:6)     < "200410")
                  MOVE    SPACE  TO  WK-2010-SYOKEIKBN-G(IDX-CYO)
                END-IF
