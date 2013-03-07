@@ -9789,7 +9789,8 @@
                WHEN  ( SPA-PREFNUM     =   CONST-HOKKAIDO )
                 AND  ( SPA-GMN-KOHNUM  =   "142" OR "143"
                                         OR "144" OR "190"
-                                        OR "291" OR "292" )
+                                        OR "291" OR "292"
+                                        OR "364" )
                WHEN  ( SPA-PREFNUM     =   CONST-MIYAGI )
                 AND  ( SPA-GMN-KOHNUM  =   "263" OR "363"
                                         OR "463" OR "563" )
@@ -9805,7 +9806,8 @@
                                         OR "144" OR "190"
                                         OR "291" OR "292"
                                         OR "744" OR "443"
-                                        OR "444" OR "842" )
+                                        OR "444" OR "842"
+                                        OR "364" )
                    MOVE    "1"         TO  SPA-GMN-SYOKEIKBNN
                    MOVE    "0"         TO  SPA-GMN-SYOKEITAIKBNN
                END-EVALUATE
