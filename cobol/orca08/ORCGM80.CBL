@@ -982,42 +982,14 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX         >   WRK-TBL-MAX
                IF      WRK-NAI-TLINK(IDX)  =   "TRUE"
-                   IF     (SPA-NAI-VENDFLG NOT =   ZERO )
-                       IF      (SPA-NAI-VENDOR =   WRK-GMN-TVENDOR(IDX))
-                           ADD     1           TO  IDY
-                           ADD     1           TO  SPA-TBL-MAX
-                           MOVE    WRK-GMN-TBLREC(IDX)
-                                               TO  SPA-GMN-TBLREC(IDY)
-                           MOVE    IDY         TO  SPA-GMN-TNUM(IDX)
-                       END-IF
-                   ELSE
-                       ADD     1               TO  IDY
-                       ADD     1               TO  SPA-TBL-MAX
-                       MOVE    WRK-GMN-TBLREC(IDX)
-                                               TO  SPA-GMN-TBLREC(IDY)
-                       MOVE    IDY             TO  SPA-GMN-TNUM(IDY)
-                   END-IF
+                   PERFORM 40424-LIST042-INIT-SEC
                END-IF
            END-PERFORM
       *
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX         >   WRK-TBL-MAX
                IF      WRK-NAI-TLINK(IDX)  =   "FALSE"
-                   IF     (SPA-NAI-VENDFLG NOT =   ZERO )
-                       IF      (SPA-NAI-VENDOR =   WRK-GMN-TVENDOR(IDX))
-                           ADD     1           TO  IDY
-                           ADD     1           TO  SPA-TBL-MAX
-                           MOVE    WRK-GMN-TBLREC(IDX)
-                                               TO  SPA-GMN-TBLREC(IDY)
-                           MOVE    IDY         TO  SPA-GMN-TNUM(IDY)
-                       END-IF
-                   ELSE
-                       ADD     1               TO  IDY
-                       ADD     1               TO  SPA-TBL-MAX
-                       MOVE    WRK-GMN-TBLREC(IDX)
-                                               TO  SPA-GMN-TBLREC(IDY)
-                       MOVE    IDY             TO  SPA-GMN-TNUM(IDY)
-                   END-IF
+                   PERFORM 40424-LIST042-INIT-SEC
                END-IF
            END-PERFORM
       *
@@ -1026,6 +998,36 @@
            MOVE    ZERO            TO  SPA-NAI-SORTFLG
            .
        40424-LIST04-INIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÊÂ¤ÓÂØ¤¨ÆâÍÆ
+      *****************************************************************
+       40424-LIST042-INIT-SEC       SECTION.
+      *
+           MOVE    ZERO        TO  FLG-HENOK
+      *
+           IF     (SPA-NAI-VENDFLG     =   ZERO )
+               MOVE    1           TO  FLG-HENOK
+           ELSE
+               IF     (SPA-NAI-VENDORALL   =   "1" )
+                   MOVE    1           TO  FLG-HENOK
+               ELSE
+                   IF      (SPA-NAI-VENDOR =   WRK-GMN-TVENDOR(IDX))
+                       MOVE    1           TO  FLG-HENOK
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF     (FLG-HENOK       =   1 )
+               ADD     1                   TO  IDY
+               ADD     1                   TO  SPA-TBL-MAX
+               MOVE    WRK-GMN-TBLREC(IDX) TO  SPA-GMN-TBLREC(IDY)
+               MOVE    IDY                 TO  SPA-GMN-TNUM(IDY)
+           END-IF
+      *
+           .
+       40424-LIST042-INIT-EXT.
            EXIT.
       *
       *****************************************************************
