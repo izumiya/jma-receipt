@@ -45,6 +45,11 @@ case "${COMMAND}" in
     ${PLUGIN_SHELL} -c ${JPPINFO} ${COMMAND} ${PACKAGE}-${VERSION}
     list4cobol
     ;;
+  install+enable)
+    ${PLUGIN_SHELL} -c ${JPPINFO} install ${PACKAGE}-${VERSION}
+    ${PLUGIN_SHELL} -c ${JPPINFO} enable  ${PACKAGE}-${VERSION}
+    list4cobol
+    ;;
   *)
     ${DBSTUB} -dir ${LDDIRECTORY} -bd orcabt ORCBJOB2 -parameter "JBE${JOBID}${SHELLID},${HOSPNUM},,,command error"
     exit 1
