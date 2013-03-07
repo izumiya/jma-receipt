@@ -933,6 +933,12 @@
            PERFORM
                    UNTIL   (SPA-JYURRK-MAX >=  100  )  OR
                            (FLG-JYURRK     =   1    )
+      *H25.2
+      *        レセ電移行分は対象外
+             IF      JYURRK-SRYKA (1:1)    =   "A"
+               CONTINUE
+             ELSE
+      *
       *        院内処方は包括保険を対象とする
                IF     (SPA-NAI-INNAI       =   2  )  AND
                       (JYURRK-HKNCOMBINUM  =   "9999" )
@@ -949,6 +955,9 @@
                    ADD     1               TO  IDX
                    MOVE    JYURRK-REC      TO  WRK-JYURRK-REC (IDX)
                END-IF
+      *
+               END-IF
+      *
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 910-JYURRK-READ-SEC
            END-PERFORM

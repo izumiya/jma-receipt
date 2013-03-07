@@ -951,6 +951,12 @@
            PERFORM
                    UNTIL   (SPA-JYURRK-MAX >=  40   )  OR
                            (FLG-JYURRK     =   1    )
+      *H25.2
+      *        レセ電移行分は対象外
+             IF      JYURRK-SRYKA (1:1)    =   "A"
+               CONTINUE
+             ELSE
+      *
                IF     (JYURRK-HKNCOMBINUM  =   "9999"  )
                  AND  (SPA-NAI-YKJOKUKBN   =   ZERO    )
                    CONTINUE
@@ -966,6 +972,9 @@
                    ADD     1               TO  IDX
                    MOVE    JYURRK-REC      TO  WRK-JYURRK-REC (IDX)
                END-IF
+      *
+               END-IF
+      *
                MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 910-JYURRK-READ-SEC
            END-PERFORM

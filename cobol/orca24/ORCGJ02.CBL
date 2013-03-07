@@ -2512,6 +2512,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            TO  SPA-GMN-RRKSRYKA (IDX)
                END-IF
            END-PERFORM
+      *H25.2
+           IF      SPA-GMN-RRKSRYKA (IDX)  =   SPACE
+               MOVE    JYURRK-SRYKA        TO  SPA-GMN-RRKSRYKA (IDX)
+           END-IF
+      *!!!!
       *    保険組合せ
            MOVE    JYURRK-HKNCOMBINUM  TO  SPA-GMN-RRKHKNCOMBI (IDX)
            IF      JYURRK-HKNKBN       =   "1"
@@ -2955,6 +2960,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    SPA-SRYKA-MAX   TO  IDK
                    END-IF
                END-PERFORM
+      *H25.2
+               IF      WRK-SRYKAMEI        =   SPACE
+                   MOVE    ACCT-SRYKA      TO  WRK-SRYKAMEI
+               END-IF
+      *
                IF      IDG                 <   400
                    MOVE    WRK-SRYKAMEI(1:2)   TO  SPA-NAI-SRYKAMEI
                                                               (IDG + 1)
@@ -4739,6 +4749,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-NAI-MAX     TO  IDX
                END-IF
            END-PERFORM
+      *H25.2
+      *    レセ電移行分はエラー
+           IF     (SPA-GMN-BANGO   NOT =   ZERO )
+             AND  (SPA-NAI-SRYKA   (SPA-NAI-BANGO)(1:1)
+                                       =   "A"   )
+               MOVE    "7011"              TO  SPA-ERRCD
+               GO      TO      41011-BANGO-CHK-EXT
+           END-IF
       *
            IF      SPA-GMN-BANGO       =   ZERO
                INITIALIZE                  SPA-GMN-INPUT
@@ -5704,6 +5722,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    2               TO  SPA-J02-SYORI
                    MOVE    4               TO  SPA-GMN-CUR
                END-IF
+           END-IF
+      *H25.2
+      *    レセ電移行分はエラー
+           IF     (SPA-ERRCD           =   SPACE    )
+             AND  (SPA-NAI-RRKSELNUM   NOT =   ZERO )
+             AND  (SPA-RRK-SRYKA (SPA-NAI-RRKSELNUM)(1:1)
+                                       =   "A"   )
+               MOVE    "7011"              TO  SPA-ERRCD
+               MOVE    3                   TO  SPA-GMN-CUR
            END-IF
       *
            .
@@ -7940,6 +7967,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        420011-SRYACT-DEL-SEC        SECTION.
       *
+           MOVE    ACCT-SRYYM          TO  WRK-SRYYMD(1:6)
+           MOVE    "01"                TO  WRK-SRYYMD(7:2)
+      *
            INITIALIZE                      SRYACT-REC
            MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
            MOVE    ACCT-NYUGAIKBN      TO  SRY-NYUGAIKBN
@@ -8084,7 +8114,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    1               TO  FLG-HKNSAN
       *            Ｈ１８／４月から対応
                    IF      TBL-RIGAKU-RYO(TBL-SAN) =   "H"
-                       IF      ACCT-SRYYM      >=  "200604"
+      **************   IF      ACCT-SRYYM      >=  "200604"
+                       IF      ACCT-SRYYM      <   "200604"
                            MOVE    ZERO            TO  FLG-HKNSAN
                        END-IF
                    END-IF
@@ -12496,7 +12527,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    1               TO  FLG-HKNSAN
       *            Ｈ１８／４月から対応
                    IF      TBL-RIGAKU-RYO(TBL-SAN) =   "H"
-                       IF      WRK-SRYYMD      >=  "20060401"
+      *************    IF      WRK-SRYYMD      >=  "20060401"
+                       IF      WRK-SRYYMD      <   "20060401"
                            MOVE    ZERO            TO  FLG-HKNSAN
                        END-IF
                    END-IF
@@ -13976,6 +14008,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        "保険一括変更をして下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO  WRK-ERRMSG
+                   END-STRING
+      *H25.2
+               WHEN    "7011"
+                   STRING  "レセプト電算データから移行したデータです。"
+                           "変更できません。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    WRK-ERRMSG
                    END-STRING
       *@@
                WHEN    "9009"

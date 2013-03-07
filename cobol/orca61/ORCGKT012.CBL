@@ -1818,6 +1818,16 @@
                            MOVE    ZERO            TO  FLG-OK
                        END-IF
                END-EVALUATE
+      *!!!!!!
+      *        レセ電からは調剤料・処方料は対象外
+               IF     (SRY-SRYKA (1:1)     =   "A"  )
+                  IF     (SRY-SRYSYUKBN(1:2)   =   "24" )
+                     OR  (SRY-SRYSYUKBN        =   "250")
+                     OR  (SRY-SRYSYUKBN        =   "260")
+                       MOVE    ZERO                TO  FLG-OK
+                   END-IF
+               END-IF
+      *
       *
                IF      FLG-OK                  =   1
                    MOVE    ZERO                TO  WRK-DOKAISU
