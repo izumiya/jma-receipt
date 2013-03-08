@@ -474,7 +474,9 @@
                    IF     (SPA-COM-SRYKBN (IDX)    =   "11"  )  AND
                           (SPA-COM-HKNCOMBI(IDX)   NOT =   "9999") AND
                           (SPA-COM-INPUTCD(IDX)    =   "111011810"
-                                                   OR  "101110040")
+                                                   OR  "101110040"
+      *H25.4           紹介なし
+                                                   OR  "111012610")
                        MOVE    1               TO  WRK-DOUSIN
                    END-IF
       *
@@ -2275,6 +2277,12 @@
       *
       *            診療
            IF      SPA-SRYKBN-CNT (01) >   ZERO
+      *H25.7
+      *            労災その他の時もチェックを行う（労災レセ電対応）
+             OR  ((SPA-SRYKBN-CNT (09) >   ZERO      )  AND
+                  (SPA-SRYYMD          >=  "20130701")  AND
+                  (SPA-HKNKBN          =   1         ))
+      *
                CALL    "ORCSC10"       USING
                                        MCPAREA
                                        ORCSC00AREA

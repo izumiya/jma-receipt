@@ -58,6 +58,7 @@
       *  04.06.00    NACL=Â¿¡¹Ç¼  10/11/02  ÆñÉÂ³°Íè»ØÆ³´ÉÍýÎÁÂÐ±þ
       *  04.06.00    NACL=Â¿¡¹Ç¼  10/11/25  ÉÂÌ¾ÊäÂ­¥³¥á¥ó¥ÈÂÐ±þ
       *  04.06.00    NACL=Â¿¡¹Ç¼  12/03/XX  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  13/03/XX  £È£²£µÇ¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -359,25 +360,25 @@
       *    ¥·¥¹¥Æ¥à´ÉÍý¥Þ¥¹¥¿
            COPY    "CPSYSKANRI.INC".
       *
-           COPY    "CPSK1005.INC".
+      *    COPY    "CPSK1005.INC".
       *
-           COPY    "CPSK1006.INC".
+      *    COPY    "CPSK1006.INC".
       *
            COPY    "CPSK1010.INC".
       *
-           COPY    "CPSK1001.INC".
+      *    COPY    "CPSK1001.INC".
       *
-           COPY    "CPSK1007.INC".
+      *    COPY    "CPSK1007.INC".
       *
-           COPY    "CPSK1008.INC".
+      *    COPY    "CPSK1008.INC".
       *
-           COPY    "CPSK1038.INC".
+      *    COPY    "CPSK1038.INC".
       *
-           COPY    "CPSK1030.INC".
+      *    COPY    "CPSK1030.INC".
       *
-           COPY    "CPSK1014.INC".
+      *    COPY    "CPSK1014.INC".
       *    £Ã£Ì£Á£É£ÍÀÜÂ³¾ðÊó 
-           COPY    "CPSK9000.INC".
+      *    COPY    "CPSK9000.INC".
       *
       *    ´µ¼Ô¥Þ¥¹¥¿¡Ý
        01  PTINF-REC.
@@ -3844,6 +3845,19 @@
                MOVE    WRK-YMDS        TO  WRK-SYO-YMD
                MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
            END-IF
+      *H25.4 
+      *    ½é¿ÇÎÁ¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë¡Ê£È£²£µ¡¥£´¤«¤é¡Ë
+           MOVE    "111012510"         TO  WRK-SRYCD
+           PERFORM 30091-SANTEI-CHK-SEC
+           IF      WRK-YMDS        NOT =   SPACE
+               IF      WRK-YMDS        >   WRK-SYO-YMD
+                   MOVE    WRK-YMDS        TO  WRK-SYO-YMD
+               END-IF
+               IF     (WRK-SYO-YMD1    =   SPACE        )
+               OR     (WRK-YMDS-1      <   WRK-SYO-YMD1 )
+                  MOVE    WRK-YMDS-1      TO  WRK-SYO-YMD1
+               END-IF
+           END-IF
       *    ¾®»ù²Ê¿Ç»¡ÎÁ
       *    ±¡³°½èÊý   ½é¿Ç
            MOVE    "113003510"         TO  WRK-SRYCD
@@ -4032,6 +4046,14 @@
                   (WRK-YMDS            >   WRK-SYOSINYMD1)
                MOVE    WRK-YMDS            TO  WRK-SYOSINYMD1
            END-IF
+      *H25.4   ¾Ò²ð¤Ê¤·
+      *    Æ±Æü½é¿Ç¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë¡Ê£È£²£µ¡¥£´¤«¤é¡Ë
+           MOVE    "111012610"         TO  WRK-SRYCD
+           PERFORM 30091-SANTEI-CHK-SEC
+           IF     (WRK-SYOSINYMD1      =   SPACE  )  OR
+                  (WRK-YMDS            >   WRK-SYOSINYMD1)
+               MOVE    WRK-YMDS            TO  WRK-SYOSINYMD1
+           END-IF
       *    Æ±Æü½é¿Ç¡ÊÏ«ºÒ¡Ë
            MOVE    "101110040"         TO  WRK-SRYCD
            PERFORM 30091-SANTEI-CHK-SEC
@@ -4068,6 +4090,14 @@
       *
       *    Æ±Æü½é¿Ç¡ÊÁ°·î¡Ë
            MOVE    "111011810"         TO  WRK-SRYCD
+           MOVE    WRK-SRYYM-1         TO  WRK-SRYYYMM
+           PERFORM 3009111-DOU-SANTEI-SEC
+      *    Æ±Æü½é¿Ç¡Êº£·î¡Ë
+           MOVE    SPA-SRYYMD(1:6)     TO  WRK-SRYYYMM
+           PERFORM 3009111-DOU-SANTEI-SEC
+      *H25.4
+      *    Æ±Æü½é¿Ç¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë¡Ê£È£²£µ¡¥£´¤«¤é¡Ë
+           MOVE    "111012610"         TO  WRK-SRYCD
            MOVE    WRK-SRYYM-1         TO  WRK-SRYYYMM
            PERFORM 3009111-DOU-SANTEI-SEC
       *    Æ±Æü½é¿Ç¡Êº£·î¡Ë
@@ -5385,6 +5415,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                OR  "112016210"
                    MOVE    ZERO            TO  FLG-CHK
                END-IF
+      *H25.4
+      *        Æ±°ìÆü£²²ÊÌÜ¡Ê½é¿Ç¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë¡¢³°Íè¿Ç»¡ÎÁ¡Ê¾Ò²ð¡Ë
+               IF      WKSRY-SRYCD(IDXF)       =   "111012610"
+                                               OR  "112016410"
+                   MOVE    ZERO            TO  FLG-CHK
+               END-IF
+      *
            END-PERFORM
            .
        3002-SRYKBN-CHK-EXT.

@@ -4146,6 +4146,8 @@
                        WHEN    "101110010"
       *                ダミー追加
                        WHEN    "099110001"
+      *                紹介状なし追加
+                       WHEN    "111012510"
                            MOVE    1             TO  FLG-SYOSIN-OK
                    END-EVALUATE
                END-PERFORM
@@ -4893,6 +4895,19 @@
                        ADD     WRK-SINDAN      TO  LNK-S01-RYOYO
                                                       (LNK-SYUNOU2-MAX)
                    END-IF
+      *H25.7
+      *** まだ     救急医療管理加算点数
+      *            IF     (SPA-SRYYMD                  >=  "20130701")
+      *              AND  (LNK-WKSRY-SRYKBN(IDX)       =   "80"      )
+      *              AND  (LNK-WKSRY-SRYCD (IDX IDS)   =   "101800890")
+      *                自賠責療養担当手当点数
+      *                COMPUTE WRK-SINDAN      =   TNS-TEN
+      *                                        *   LNK-WKSRY-ZAIKAIKEI
+      *                                                        (IDX)
+      *                MOVE    WRK-SINDAN      TO  LNK-S01-KYUKYU
+      *                                               (LNK-SYUNOU2-MAX)
+      *!!!!!       END-IF
+      *
       *
                END-PERFORM
            END-IF

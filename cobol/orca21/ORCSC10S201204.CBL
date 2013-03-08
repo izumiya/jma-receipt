@@ -70,6 +70,7 @@
       * 04.07.00     NACL=Â¿¡¹Ç¼  12/03/XX  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
       * 04.07.00     NACL=Â¿¡¹Ç¼  12/05/01  ³°Íè¥ê¥Ï¥Ó¥ê¿Ç»¡ÎÁÅùÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/10/04  ¿Ç»¡ÎÁ¤Ê¤·Æ±Æü½é¿ÇÎÁÈ¯À¸ÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  13/03/XX  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -184,6 +185,8 @@
       *H24.4
       *    £³ºÐÌ¤ËþºÆ¿ÇÎÁ¤¢¤ê
            03  FLG-03MIMAN         PIC 9(01).
+      *H25.4
+           03  FLG-SYOKAINASI      PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -260,6 +263,8 @@
            03  WRK-KBN                 PIC X(01).
            03  WRK-KBN2                PIC X(01).
            03  WRK-KBN3                PIC X(01).
+      *    ¾Ò²ðÂÐ±þ
+           03  WRK-KBN4                PIC X(01).
       *
            03  WRK-IN-KAISU            PIC 9(03).
       *    »»ÄêÇ¯·î
@@ -412,12 +417,23 @@
       *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë
            03  FILLER              PIC X(14)   VALUE   "300KD112016210".
       *H24.4
+      *H25.4 ¤«¤é
+      *    ½é¿ÇÎÁ¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  FILLER              PIC X(14)   VALUE   "110F 111012510".
+      *    Æ±Æü½é¿Ç¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  FILLER              PIC X(14)   VALUE   "110FD111012610".
+      *    ³°Íè¿ÇÎÅÎÁ¡ÊÂ¾°åÎÅµ¡´Ø¤Ø¾Ò²ð¡Ë
+           03  FILLER              PIC X(14)   VALUE   "311  112016310".
+      *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë¡ÊÂ¾°åÎÅµ¡´Ø¤Ø¾Ò²ð¡Ë
+           03  FILLER              PIC X(14)   VALUE   "310KD112016410".
       *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
-           03  TBL-SINSATU-OCC         OCCURS  15    INDEXED  TBL-IDX.
+      ***  03  TBL-SINSATU-OCC         OCCURS  15    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  19    INDEXED  TBL-IDX.
       *        £±¡§°ìÈÌ¡¢£²¡§¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¡¢£³¡§³°Íè¿ÇÎÅÎÁ
                05  TBL-KAISU           PIC 9(01).
-      *        Ï·¿Í°ìÈÌ¶èÊ¬¡Ê£°¡§°ìÈÌ¡¢£±¡§Ï·¿Í¡Ë(£°¡§¤Ê¤·¡Ë
+      *****    Ï·¿Í°ìÈÌ¶èÊ¬¡Ê£°¡§°ìÈÌ¡¢£±¡§Ï·¿Í¡Ë(£°¡§¤Ê¤·¡Ë
+      *H25.4¡¡¤«¤é¡Ê£±:¾Ò²ð¤Ê¤·)
                05  TBL-ROUJIN          PIC 9(01).
       *        ÉÂ±¡¼ïÊÌ¡Ê£±¡§ÉÂ±¡¡¢£²¡§¿ÇÎÅ½ê¡Ë
                05  TBL-HOSPSBT         PIC 9(01).
@@ -429,7 +445,7 @@
       *        ¿ÇÎÅ¥³¡¼¥É
                05  TBL-SRYCD           PIC X(09).
       *
-       01  TBL-SIN-MAX                 PIC 9(04)   VALUE   15.
+      *01  TBL-SIN-MAX                 PIC 9(04)   VALUE   15.
       *
       *
       *    ºÆ¿Ç²Ã»»¥Æ¡¼¥Ö¥ë
@@ -705,6 +721,9 @@
                        MOVE    1              TO  SPA-SYOSIN
       *                Ï«ºÒÊ¬
                    WHEN    "101110010"
+                       MOVE    1              TO  SPA-SYOSIN
+      *H25.4           ¾Ò²ð¤Ê¤·
+                   WHEN    "111012510"
                        MOVE    1              TO  SPA-SYOSIN
                END-EVALUATE
            END-PERFORM
@@ -2780,6 +2799,8 @@
                      AND  (WRK-KBN             =   TBL-KBN    (TBL-IDX))
                      AND  (WRK-SRYKBN          =   TBL-SRYCD(TBL-IDX)
                                                                 (2:2))
+      *H25.4         ¾Ò²ð¤Ê¤·¤ÏÂÐ¾Ý³°
+                     AND  (TBL-ROUJIN(TBL-IDX)  =   "0"   )
                        MOVE    TBL-SRYCD (TBL-IDX)
                                                TO  WRK-SRYCD
            END-SEARCH
@@ -4481,7 +4502,7 @@
                    WHEN    "114019110"
                        MOVE    "114019210"         TO  WRK-SRYCD
                    WHEN    "114019310"
-                       MOVE    "114019140"         TO  WRK-SRYCD
+                       MOVE    "114019410"         TO  WRK-SRYCD
       *H24.4
                END-EVALUATE
            END-IF
@@ -5863,6 +5884,7 @@
       *
            MOVE    ZERO                TO  FLG-TAKA
            MOVE    ZERO                TO  FLG-ARI
+           MOVE    SPACE               TO  WRK-KBN4
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-MAX-LINE    )  OR
                              ((SPA-COM-INPUTCD(IDX) =   SPACE ) AND
@@ -5881,6 +5903,8 @@
                        MOVE    TBL-KBN  (TBL-IDX)  TO  WRK-KBN
                        MOVE    1                   TO  FLG-SINSATU-ARI
                        MOVE    TBL-KBN  (TBL-IDX)  TO  WRK-KBN3
+      *H25.4           ¾Ò²ð¤Ê¤·ÂÐ±þ
+                       MOVE    TBL-ROUJIN(TBL-IDX) TO  WRK-KBN4
                    END-SEARCH
                END-IF
       *
@@ -5950,6 +5974,7 @@
            MOVE    ZERO                TO  FLG-DUMMY
            MOVE    ZERO                TO  FLG-SINSATU-ARI
            MOVE    SPACE               TO  WRK-KBN3
+           MOVE    SPACE               TO  WRK-KBN4
            MOVE    ZERO                TO  FLG-DOUJI-HEN 
       *    »þ´Ö³°¤Ê¤·
            MOVE    ZERO                TO  FLG-JIKANKBN
@@ -6612,6 +6637,12 @@
                                                    OR  "112016210"
                        MOVE    1               TO  FLG-DOUSYOSIN
                    END-IF
+      *H25.4
+      *            ½é¿ÇÎÁ¡¦³°Íè¿Ç»¡ÎÁ¡¡£²²ÊÌÜ¡Ê¾Ò²ð¤Ê¤·¡Ë
+                   IF      SPA-COM-INPUTCD (IDX)   =   "111012610"
+                                                   OR  "112016410"
+                       MOVE    1               TO  FLG-DOUSYOSIN
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -6628,6 +6659,7 @@
            MOVE    ZERO                TO  FLG-SRYKBN
            MOVE    SPACE               TO  WRK-HEN-SRYKA
            MOVE    ZERO                TO  FLG-SYOSIN-ARI
+           MOVE    ZERO                TO  FLG-SYOKAINASI
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >=  IDX-A    )  OR
                               (FLG-CHK     =   1   )
@@ -6654,8 +6686,16 @@
                    IF      SPA-COM-INPUTCD (IDX)   =   "111011810"
       *TE          Ï«ºÒ
                                                    OR  "101110040"
+      *H25.4       ½é¿ÇÎÁ£²²ÊÌÜ¡Ê¾Ò²ð¤Ê¤·¡Ë
+                                                   OR  "111012610"
                        MOVE    1               TO  FLG-DOUSYOSIN
                    END-IF
+      *H25.4
+      *            ½é¿ÇÎÁ¡Ê¾Ò²ð¤Ê¤·¡Ë¤Î»»Äê
+                   IF      SPA-COM-INPUTCD (IDX)   =   "111012510"
+                       MOVE    1               TO  FLG-SYOKAINASI
+                   END-IF
+      *
                END-IF
                IF     (SPA-COM-SRYKBN  (IDX)   =   "12" ) AND
                      ((SPA-COM-INPUTCD (IDX)(1:1)  =   "1" )  OR
@@ -6854,12 +6894,22 @@
                IF      (SPA-RSI-JUNKYO     =   "1" )
       *            ·òÊÝ½àµò
                    MOVE   "111011810"          TO  WRK-SRYCD
+      *H25.4
+      *            ¾Ò²ð¤Ê¤·
+                   IF     FLG-SYOKAINASI       =   1
+                       MOVE   "111012610"          TO  WRK-SRYCD
+                   END-IF
                ELSE
       *            Ï«ºÒ
                    MOVE   "101110040"          TO  WRK-SRYCD
                END-IF
            ELSE
                MOVE   "111011810"          TO  WRK-SRYCD
+      *H25.4
+      *        ¾Ò²ð¤Ê¤·
+               IF     FLG-SYOKAINASI       =   1
+                   MOVE   "111012610"          TO  WRK-SRYCD
+               END-IF
            END-IF
            IF      IDX-A               <   SPA-MAX-LINE
                IF      SPA-COM-INPUTCD(IDX-A + 1)

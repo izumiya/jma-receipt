@@ -30,6 +30,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       * 04.05.00     NACL-多々納  10/03/XX  Ｈ２２年４月改正対応
       * 04.07.00     NACL-多々納  12/03/XX  Ｈ２４年４月改正対応
+      * 04.08.00     NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
       *****************************************************************
       *
       *
@@ -348,11 +349,23 @@
            03  FILLER              PIC X(14)   VALUE   "300KD112016210".
       *H24.4
       *
+      *H25.4 から
+      *    初診料（紹介状なし）
+           03  FILLER              PIC X(14)   VALUE   "110F 111012510".
+      *    同日初診（紹介状なし）
+           03  FILLER              PIC X(14)   VALUE   "110FD111012610".
+      *    外来診療料（他医療機関へ紹介）
+           03  FILLER              PIC X(14)   VALUE   "311  112016310".
+      *    外来診療料（同一日２科目）（他医療機関へ紹介）
+           03  FILLER              PIC X(14)   VALUE   "310KD112016410".
+      *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
-           03  TBL-SINSATU-OCC         OCCURS  15    INDEXED  TBL-IDX.
+      **** 03  TBL-SINSATU-OCC         OCCURS  15    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  19    INDEXED  TBL-IDX.
       *        １：一般、２：小児科外来診察料、３：外来診療料
                05  TBL-KAISU           PIC 9(01).
-      *        老人一般区分（０：一般、１：老人）(０：なし）
+      *******  老人一般区分（０：一般、１：老人）(０：なし）
+      *H25.4　から（１:紹介なし)
                05  TBL-ROUJIN          PIC 9(01).
       *        病院種別（１：病院、２：診療所）
                05  TBL-HOSPSBT         PIC 9(01).
@@ -944,6 +957,8 @@
                      AND  (WRK-KBN             =   TBL-KBN    (TBL-IDX))
                      AND  (WRK-SRYKBN          =   TBL-SRYCD(TBL-IDX)
                                                                 (2:2))
+      *H25.4         紹介なしは対象外
+                     AND  (TBL-ROUJIN(TBL-IDX)  =   "0"   )
                        MOVE    TBL-SRYCD (TBL-IDX)
                                                TO  WRK-SRYCD
            END-SEARCH

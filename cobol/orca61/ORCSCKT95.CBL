@@ -3489,6 +3489,14 @@
                   (WRK-YMDS            >   WRK-SYOSINYMD1)
                MOVE    WRK-YMDS            TO  WRK-SYOSINYMD1
            END-IF
+      *H25.4   紹介なし
+      *    同日初診（紹介状なし）
+           MOVE    "111012610"         TO  WRK-SRYCD
+           PERFORM 30091-SANTEI-CHK-SEC
+           IF     (WRK-SYOSINYMD1      =   SPACE  )  OR
+                  (WRK-YMDS            >   WRK-SYOSINYMD1)
+               MOVE    WRK-YMDS            TO  WRK-SYOSINYMD1
+           END-IF
       *    同日初診（労災）
            MOVE    "101110040"         TO  WRK-SRYCD
            PERFORM 30091-SANTEI-CHK-SEC
@@ -3530,6 +3538,15 @@
       *    同日初診（今月）
            MOVE    SPA-SRYYMD(1:6)     TO  WRK-SRYYYMM
            PERFORM 3009111-DOU-SANTEI-SEC
+      *H25.4
+      *    同日初診（紹介状なし）（Ｈ２５．４から）
+           MOVE    "111012610"         TO  WRK-SRYCD
+           MOVE    WRK-SRYYM-1         TO  WRK-SRYYYMM
+           PERFORM 3009111-DOU-SANTEI-SEC
+      *    同日初診（今月）
+           MOVE    SPA-SRYYMD(1:6)     TO  WRK-SRYYYMM
+           PERFORM 3009111-DOU-SANTEI-SEC
+      *
       *
       *    同日初診（労災）（前月）
            MOVE    "101110040"         TO  WRK-SRYCD

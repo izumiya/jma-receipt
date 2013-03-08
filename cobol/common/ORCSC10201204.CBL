@@ -69,6 +69,7 @@
       * 04.06.00     NACL-Â¿¡¹Ç¼  10/09/XX  ¿Ç»¡ÎÁ²Ã»»½èÍýÂÐ±þÂ¾
       * 04.06.00     NACL-Â¿¡¹Ç¼  10/11/12  Æ±Æü½é¿ÇÎÁÂ¾²Ê¤Ê¤·»»ÄêÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/03/XX  £È£²£´Ç¯£´·î²þÀµÂÐ±þ
+      * 04.08.00     NACL-Â¿¡¹Ç¼  13/03/XX  £È£²£µÇ¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -349,6 +350,10 @@
       *H24.4
            03  WRK-GAIRIHA-SRYKA       PIC X(02).
       *
+      *H25.3
+           03  WRK-SYOUKAI             PIC 9(01).
+           03  FLG-SYOKAINASI          PIC 9(01).
+      *
       *    ÊÝÂ¸ÍÑ£Ó£Ð£Á
        01  HZN-SCR-REC.
            COPY    "CPK02SPASCR.INC"  REPLACING
@@ -418,12 +423,24 @@
            03  FILLER              PIC X(14)   VALUE   "300KD112016210".
       *H24.4
       *
+      *H25.4 ¤«¤é
+      *    ½é¿ÇÎÁ¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  FILLER              PIC X(14)   VALUE   "110F 111012510".
+      *    Æ±Æü½é¿Ç¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
+           03  FILLER              PIC X(14)   VALUE   "110FD111012610".
+      *    ³°Íè¿ÇÎÅÎÁ¡ÊÂ¾°åÎÅµ¡´Ø¤Ø¾Ò²ð¡Ë
+           03  FILLER              PIC X(14)   VALUE   "311  112016310".
+      *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë¡ÊÂ¾°åÎÅµ¡´Ø¤Ø¾Ò²ð¡Ë
+           03  FILLER              PIC X(14)   VALUE   "310KD112016410".
+      *
       *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
-           03  TBL-SINSATU-OCC         OCCURS  15    INDEXED  TBL-IDX.
+      **** 03  TBL-SINSATU-OCC         OCCURS  15    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  19    INDEXED  TBL-IDX.
       *        £±¡§°ìÈÌ¡¢£²¡§¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¡¢£³¡§³°Íè¿ÇÎÅÎÁ
                05  TBL-KAISU           PIC 9(01).
-      *        Ï·¿Í°ìÈÌ¶èÊ¬¡Ê£°¡§°ìÈÌ¡¢£±¡§Ï·¿Í¡Ë(£°¡§¤Ê¤·¡Ë
+      *******  Ï·¿Í°ìÈÌ¶èÊ¬¡Ê£°¡§°ìÈÌ¡¢£±¡§Ï·¿Í¡Ë(£°¡§¤Ê¤·¡Ë
+      *H25.4¡¡¤«¤é¡Ê£±:¾Ò²ð¤Ê¤·)
                05  TBL-ROUJIN          PIC 9(01).
       *        ÉÂ±¡¼ïÊÌ¡Ê£±¡§ÉÂ±¡¡¢£²¡§¿ÇÎÅ½ê¡Ë
                05  TBL-HOSPSBT         PIC 9(01).
@@ -436,7 +453,7 @@
       *        ¿ÇÎÅ¥³¡¼¥É
                05  TBL-SRYCD           PIC X(09).
       *
-       01  TBL-SIN-MAX                 PIC 9(04)   VALUE   15.
+      *01  TBL-SIN-MAX                 PIC 9(04)   VALUE   15.
       *
       *    ³°Íè´ÉÍý²Ã»»Åù²Ã»»¥Æ¡¼¥Ö¥ë
        01  TBL-GAIRAI-AREA.
@@ -1544,6 +1561,9 @@
       *       ½é¿ÇÎÁ¡¦Æ±Æü½é¿Ç
                WHEN    "111000110"
                WHEN    "111011810"
+      *H25.4   ¾Ò²ð¤Ê¤·
+               WHEN    "111012510"
+               WHEN    "111012610"
       *            ¼õ¿ÇÍúÎòÈ½Äê
                    PERFORM 100131-RSIJYURRKCHK-SEC
            END-EVALUATE
@@ -4395,6 +4415,8 @@
            MOVE    ZERO                TO  FLG-FUKUSU
       *    Â¾°å±¡Âà±¡Æü
            MOVE    ZERO                TO  FLG-TAITAIIN
+      *H25.4
+           MOVE    ZERO                TO  FLG-SYOKAINASI
       *    ¿Ç»¡ÎÁ¥Á¥§¥Ã¥¯
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-MAX-LINE      )  OR
@@ -4852,6 +4874,8 @@
                      OR ((SPA-SYOYMD          =   LNK-ORCSC-RRK-LSTYMD)
                       AND (IDX-ZAI1           =   1    )  AND
                           (FLG-DOUJITU        =   1    ))
+      *H25.4         ³°Íè¿Ç»¡ÎÁ¡Ê¾Ò²ð¤Ê¤·¡Ë
+                     OR  (FLG-SYOKAINASI      =   1    )
                        CONTINUE
                    ELSE
                        MOVE    "0101"              TO  LNK-ORCSC-KIDCD
@@ -4986,6 +5010,11 @@
       *            ºÆ¿ÇÎÁ
                    ADD     1               TO  IDX-ZAI2
                    MOVE   IDX-Z            TO  IDX-SYU2
+      *H25.4
+      *            ³°Íè¿Ç»¡ÎÁ¡Ê¾Ò²ð¡Ë 
+                   IF     (WRK-SYOUKAI     =   "1"  )
+                       MOVE    1               TO  FLG-SYOKAINASI
+                   END-IF
                END-IF
            ELSE
       *        Ï«ºÒ¤Î»þ¡¢Ï«ºÒ¥³¡¼¥É¤ÇÈ½Äê¤¹¤ë
@@ -5395,12 +5424,15 @@
                        MOVE    SPACE           TO  WRK-KBN
                        MOVE    SPACE           TO  WRK-KBN2
                        MOVE    ZERO            TO  WRK-KAISU
+                       MOVE    ZERO            TO  WRK-SYOUKAI
                        MOVE    ZERO            TO  FLG-TBL
                    WHEN    WRK-COM-INPUTCD(IDX-Z)
                                                =   TBL-SRYCD (TBL-IDX)
                        MOVE    TBL-KAISU (TBL-IDX) TO  WRK-KAISU
                        MOVE    TBL-KBN (TBL-IDX)   TO  WRK-KBN
                        MOVE    TBL-KBN2(TBL-IDX)   TO  WRK-KBN2
+      *H25.4           ¾Ò²ð¤Ê¤·
+                       MOVE    TBL-ROUJIN(TBL-IDX) TO  WRK-SYOUKAI
                        MOVE    1                   TO  FLG-TBL
            END-SEARCH
       *

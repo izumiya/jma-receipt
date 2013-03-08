@@ -452,7 +452,9 @@
                    IF     (SPA-COM-SRYKBN (IDX)    =   "11"  )  AND
                           (SPA-COM-HKNCOMBI(IDX)   NOT =   "9999") AND
                           (SPA-COM-INPUTCD(IDX)    =   "111011810"
-                                                   OR  "101110040")
+                                                   OR  "101110040"
+      *H25.4                        Æ±Æü½é¿Ç¡Ê¾Ò²ð¤Ê¤·¡Ë
+                                                   OR  "111012610")
                        MOVE    1               TO  WRK-DOUSIN
                    END-IF
       *            Êñ³ç»»Äê¡ÊºÞ¡ËÆþÎÏÈ½Äê

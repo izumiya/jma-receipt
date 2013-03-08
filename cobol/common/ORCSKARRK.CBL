@@ -29,6 +29,7 @@
       *  01.00.03    NACL-Â¿¡¹Ç¼  03/02/13  ÄûÀµ½é¿Ç»»ÄêÆüÈ½Äê½¤Àµ
       *  01.00.04    NACL-Â¿¡¹Ç¼  05/11/22  MONFUNC ÂÐ±þ Â¾
       *  03.05.00    NACL-Â¿¡¹Ç¼  07/05/28  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  13/03/XX  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -254,6 +255,10 @@
                    MOVE    "111003610"         TO  WRK-SRYCD
                    PERFORM 2001-SANTEI-CHK-SEC
       *****END-EVALUATE
+      *H25.4
+      *    ½é¿Ç¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
+           MOVE    "111012510"         TO  WRK-SRYCD
+           PERFORM 2001-SANTEI-CHK-SEC
       *    ¾®»ù²Ê¿Ç»¡ÎÁ
       *    ¡¡¡¡±¡³°½èÊý   ½é¿Ç
            MOVE    "113003510"         TO  WRK-SRYCD
@@ -758,6 +763,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        WHEN    "113003710"
                        WHEN    "099110001"
                        WHEN    "101110010"
+      *H25.4           ¾Ò²ð¤Ê¤·
+                       WHEN    "111012510"
                            MOVE    1               TO  FLG-SRYACCT-CHK
                            MOVE    5               TO  IDX2
                    END-EVALUATE

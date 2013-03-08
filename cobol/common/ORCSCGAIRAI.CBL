@@ -2884,6 +2884,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *                Æ±Æü½é¿Ç
                        WHEN    "101110040"
                        WHEN    "111011810"
+      *H25.4           ¾Ò²ð¤Ê¤·
+                       WHEN    "111012610"
                            IF      LNK-WKSRY-SRYKBN (IDX)  =   "11"
                                MOVE    1               TO  FLG-DOUJITU
                            END-IF

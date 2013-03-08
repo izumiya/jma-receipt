@@ -7630,6 +7630,8 @@
                                            "113003710"
       *        Ï«ºÒÄÉ²Ã
                                        OR  "101110010"
+      *        ¾Ò²ð¾õ¤Ê¤·ÄÉ²Ã
+                                       OR  "111012510"
                CONTINUE
            ELSE
                GO      TO      4101125-SYOSIN-CHK-EXT
@@ -7641,6 +7643,13 @@
            CALL    "ORCSGDAY"          USING
                                        ORCSGDAYAREA
            IF      SGDAY-RC            =   ZERO
+      *H25.4   ¾Ò²ð¾õ¤Ê¤·¤Ï¡¢£È£²£µ.4¤«¤é
+               IF      (SPA-COM-INPUTCD(SPA-GMN-IDX) =  "111012510")
+                  AND  (SGDAY-SDAY             <   "20130401" )
+                   MOVE    "1103"              TO  SPA-ERRCD
+                   GO      TO      4101125-SYOSIN-CHK-EXT
+               END-IF
+      *
                IF      SGDAY-SDAY          >   SPA-SRYYMD
                    MOVE    "1101"              TO  SPA-ERRCD
                ELSE
@@ -7678,6 +7687,8 @@
                                                "113003510"  OR
                                                "113003710"
                                            OR  "101110010"
+      *                ¾Ò²ð¾õ¤Ê¤·ÄÉ²Ã
+                                           OR  "111012510"
                    IF      SPA-SYOSINFLG       =   ZERO
                        MOVE    "099110001"         TO  WRK-SRYCD
                    ELSE

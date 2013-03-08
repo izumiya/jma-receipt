@@ -70,6 +70,8 @@
       *  04.06.00    NACL-Â¿¡¹Ç¼  10/12/20  ´µ¼Ô¶Ø´÷ÌôºÞ·Ð²áÁ¼ÃÖÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/01/10  ¿·À¸»ù£²£¸ÆüÈ½Äê½¤Àµ
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/03/XX  Ê¿À®£²£´Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  13/03/XX  £È£²£µÇ¯£´·î²þÀµÂÐ±þ
+      *                                     Ï«ºÒ¥ì¥»ÅÅ¥³¡¼¥ÉÂÐ±þ(H25.7)
       *****************************************************************
       *
       *
@@ -196,6 +198,8 @@
            03  WRK-SRYCD               PIC X(09).
            03  WRK-SRYCD2              PIC X(09).
            03  WRK-SRYCD-3             PIC X(09).
+      *H25.7
+           03  WRK-CHK-SRYCD           PIC X(09).
       *
            03  WRK-SYOSINYMD1          PIC X(08).
            03  WRK-YMD.
@@ -362,6 +366,9 @@
            COPY   "CMSANTEITBL.INC".
       *    ¥ê¥Ï¥Ó¥êÆ±°ì»»Äê¥³¡¼¥É¥Æ¡¼¥Ö¥ë
            COPY   "CMRIHACDTBL.INC".
+      *H25.7
+      *    Ï«ºÒ¥³¡¼¥ÉÃÖ´¹¤¨¥Æ¡¼¥Ö¥ë 
+           COPY   "CMRSICNGTBL.INC".
       *
       *    »ÀÁÇ¥³¡¼¥É¥Æ¡¼¥Ö¥ë
            COPY     "CMSANSOTBL.INC".
@@ -2530,10 +2537,52 @@
                        END-IF
                    END-IF
            END-SEARCH
+      *H25.7
+      *    Ï«ºÒÊÝ¸±¥³¡¼¥ÉÊÑ¹¹
+           IF     (CHK-CD(1:3)         =   "101"    )   AND
+                  (SPA-SRYYMD          >=  "20130701" )
+               MOVE    CHK-CD              TO  WRK-CHK-SRYCD
+               PERFORM 10001-RSICD-SANTEI-CHK-SEC
+           END-IF
+      *
       *
            .
        1000-SANTEI-CHK-EXT.
            EXIT.
+      *
+      *H25.7
+      *****************************************************************
+      *    Ï«ºÒ¥³¡¼¥ÉÊÝ¸±Ëè¤Î¥³¡¼¥É¤ÎÈ½Äê½èÍý
+      *****************************************************************
+       10001-RSICD-SANTEI-CHK-SEC      SECTION.
+      *
+      *!!!!!! Ì¤ÂÐ±þ
+           GO         TO  10001-RSICD-SANTEI-CHK-EXT
+      *!!!!!!
+      *    Ï«ºÒ¤Î¥³¡¼¥É¤ÎÈ½Äê
+           SET     TBL-RCN             TO  1
+           SEARCH  TBL-RSICHG-OCC      VARYING   TBL-RCN
+               AT  END
+                   MOVE    SPACE           TO  WRK-RSI-KBN
+               WHEN    WRK-CHK-SRYCD       =   TBL-RSICHG-ATO-SRYCD
+                                                          (TBL-RCN)
+                   MOVE    TBL-RSICHG-KBN (TBL-RCN)
+                                           TO  WRK-RSI-KBN
+           END-SEARCH
+      *
+           IF      WRK-RSI-KBN         =   "R"
+               MOVE    1               TO  FLG-HKNSAN
+           ELSE
+               IF      WRK-RSI-KBN         =   "A"
+                   MOVE    1               TO  FLG-HKNSAN
+               ELSE
+                   MOVE    ZERO            TO  FLG-HKNSAN
+               END-IF
+           END-IF
+           .
+       10001-RSICD-SANTEI-CHK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ÂÐ¾Ý¤Î»»ÄêÍúÎòÈ½Äê½èÍý
@@ -2889,6 +2938,13 @@
                        END-IF
                    END-IF
            END-SEARCH
+      *H25.7
+      *    Ï«ºÒÊÝ¸±¥³¡¼¥ÉÊÑ¹¹
+           IF     (WRK-SRYCD(1:3)      =   "101"    )   AND
+                  (SPA-SRYYMD          >=  "20130701" )
+               MOVE    WRK-SRYCD           TO  WRK-CHK-SRYCD
+               PERFORM 10001-RSICD-SANTEI-CHK-SEC
+           END-IF
       *
            INITIALIZE                  SANTEI-REC
            MOVE    ZERO                TO  FLG-SANTEI-OK
@@ -2967,6 +3023,13 @@
                        END-IF
                    END-IF
            END-SEARCH
+      *H25.7
+      *    Ï«ºÒÊÝ¸±¥³¡¼¥ÉÊÑ¹¹
+           IF     (WRK-SRYCD2(1:3)     =   "101"    )   AND
+                  (SPA-SRYYMD          >=  "20130701" )
+               MOVE    WRK-SRYCD2           TO  WRK-CHK-SRYCD
+               PERFORM 10001-RSICD-SANTEI-CHK-SEC
+           END-IF
       *
            INITIALIZE                  HZN-SANTEI-REC
       *
@@ -3129,6 +3192,13 @@
                        END-IF
                    END-IF
            END-SEARCH
+      *H25.7
+      *    Ï«ºÒÊÝ¸±¥³¡¼¥ÉÊÑ¹¹
+           IF     (WRK-SRYCD(1:3)      =   "101"    )   AND
+                  (SPA-SRYYMD          >=  "20130701" )
+               MOVE    WRK-SRYCD            TO  WRK-CHK-SRYCD
+               PERFORM 10001-RSICD-SANTEI-CHK-SEC
+           END-IF
       *
            INITIALIZE                  HZN-SANTEI-REC
       *    »»ÄêÍúÎò¸¡º÷
@@ -3250,10 +3320,13 @@
       *
       *    ½é¿ÇÎÁ
            MOVE    "111000110"         TO  WRK-SRYCD
+      *    ½é¿ÇÎÁ¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
+           MOVE    "111012510"         TO  WRK-SRYCD2
       *
            MOVE    SPA-SRYYMD(7:2)     TO  IDX-Y2
            MOVE    ZERO                TO  FLG-SYO-ERR
            IF      CHK-CD              =   WRK-SRYCD
+                                       OR  WRK-SRYCD2
       *        ½é¿Ç°Ê³°ÆþÎÏ»þ¡¢Á°¤Ë½é¿Ç»»Äê¤¬¤¢¤ì¤Ð¥¨¥é¡¼
                PERFORM VARYING     IDX-Y3  FROM    1   BY   1
                        UNTIL       IDX-Y3  >   31
