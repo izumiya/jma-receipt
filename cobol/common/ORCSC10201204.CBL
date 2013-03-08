@@ -3996,7 +3996,9 @@
                                 OR    (FLG-CHK3        =   1     )
                        IF      (WRK-COM-INPUTCD(IDZ6)
                                                    =   "099209905"
-                                                   OR  "099209906" )
+                                                   OR  "099209906"
+                                                   OR  "099209907"
+                                                   OR  "099209908" )
                            CONTINUE
                        ELSE
                            IF      (WRK-COM-INPUTCD(IDZ6)(1:1)
@@ -4012,9 +4014,9 @@
                        MOVE    "1"             TO  WRK-COM-CUR
                                                              (IDX-Z)
                    END-IF
-      *        °ìÈÌÌ¾µ­ºÜÉÔ²Ä
+      *        ÌÃÊÁÌ¾µ­ºÜ
                WHEN    "099209907"
-      *        °ìÈÌÌ¾µ­ºÜ²Ä
+      *        °ìÈÌÌ¾µ­ºÜ
                WHEN    "099209908"
       *            Á°¹Ô¤ËÌôºÞ¤¬¤¢¤ë¤³¤È
                    IF      (IDX-Z          >   1   ) AND
