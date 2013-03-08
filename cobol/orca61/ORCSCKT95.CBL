@@ -3542,10 +3542,14 @@
       *    同日初診（紹介状なし）（Ｈ２５．４から）
            MOVE    "111012610"         TO  WRK-SRYCD
            MOVE    WRK-SRYYM-1         TO  WRK-SRYYYMM
-           PERFORM 3009111-DOU-SANTEI-SEC
+           IF      WRK-SRYYYMM         >=  "201304"
+               PERFORM 3009111-DOU-SANTEI-SEC
+           END-IF
       *    同日初診（今月）
            MOVE    SPA-SRYYMD(1:6)     TO  WRK-SRYYYMM
-           PERFORM 3009111-DOU-SANTEI-SEC
+           IF      WRK-SRYYYMM         >=  "201304"
+               PERFORM 3009111-DOU-SANTEI-SEC
+           END-IF
       *
       *
       *    同日初診（労災）（前月）
