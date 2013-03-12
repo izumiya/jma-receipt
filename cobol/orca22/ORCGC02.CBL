@@ -259,6 +259,7 @@
       *  04.05.12    NACL-藤原    12/01/13  患者番号未入力時の病名一覧の
       *                                     表示を行わないようにする
       *  04.05.13    NACL-太田    12/02/20  前画面戻り時SPA-PTIDを初期化する
+      *  04.05.14    NACL-藤原    13/03/15  コラムリストのスクロール対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -9447,6 +9448,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
            MOVE    ZERO                    TO  C02-BYO-ROW
            IF      WRK-C02-BYO-ROW         >   ZERO
                MOVE    WRK-C02-BYO-ROW         TO  C02-BYO-ROW
+               COMPUTE C02-BYO-ROW = WRK-C02-BYO-ROW - 1
            END-IF
            IF      SPA-NAI-C02-SELNO-INSERT
                                            >   ZERO
