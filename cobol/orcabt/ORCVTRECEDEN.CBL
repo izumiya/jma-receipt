@@ -16,7 +16,7 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCVTRESEDEN.
+       PROGRAM-ID.                 ORCVTRECEDEN.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
@@ -307,7 +307,7 @@
        01  MES-AREA.
            03  MES-TITLE1.
                05  FILLER              PIC X(26) VALUE
-                                       "【PGID:ORCVTRESEDEN.CBL】".
+                                       "【PGID:ORCVTRECEDEN.CBL】".
                05  FILLER              PIC X(26) VALUE
                                        "  レセ電データＤＯ移行".
                05  MES-TITLE1-YY       PIC X(04) VALUE SPACE.
@@ -507,7 +507,7 @@
                MOVE    PARA-HOSPNUM    TO  SPA-HOSPNUM
            ELSE
                MOVE    1               TO  FLG-CSV
-               DISPLAY "*(ORCVTRESEDEN)* HOSPNUM ERR [" PARA-HOSPNUM"]"
+               DISPLAY "*(ORCVTRECEDEN)* HOSPNUM ERR [" PARA-HOSPNUM"]"
                GO  TO  100-INIT-EXT
            END-IF
       *
@@ -546,7 +546,7 @@
            OPEN    INPUT           CSV-FILE
            IF  STS-CSV         NOT =   ZERO
                MOVE    1           TO  FLG-CSV
-               DISPLAY "*(ORCVTRESEDEN)* RESEDEN-FILE OPN STS["
+               DISPLAY "*(ORCVTRECEDEN)* RESEDEN-FILE OPN STS["
                                        STS-CSV "]"
                GO  TO  100-INIT-EXT
            END-IF
@@ -577,7 +577,7 @@
            OPEN    INPUT           PARA-FILE
            IF      STS-PARA        NOT =   ZERO
                MOVE    2               TO  FLG-PARA
-               DISPLAY "*(ORCVTRESEDEN)* PARA-FILE OPN STS["
+               DISPLAY "*(ORCVTRECEDEN)* PARA-FILE OPN STS["
                        STS-PARA "]"
                GO  TO  101-PARA-GET-EXT
            END-IF
@@ -727,7 +727,7 @@
        200-MAIN-SEC                SECTION.
       *
            IF      CNT-CSV (4:3)       =   ZERO
-               DISPLAY "***(ORCVTRESEDEN)*** CNT-CSV[" CNT-CSV "]"
+               DISPLAY "***(ORCVTRECEDEN)*** CNT-CSV[" CNT-CSV "]"
            END-IF
       *    指定した件数になったらコミット処理を行う
       *    IF      CNT-COMMIT          =   WRK-COMMIT
@@ -2213,6 +2213,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            ADD     1                   TO  WRK-JYURRK-EDANUM
            MOVE    WRK-JYURRK-EDANUM   TO  JYURRK-EDANUM
       *
+      *
            MOVE    SMCNDATE-YMD        TO  JYURRK-CREYMD
       *    MOVE    SMCNDATE-YMD        TO  JYURRK-UPYMD
       *    MOVE    SMCNDATE-HMS        TO  JYURRK-UPHMS
@@ -2466,7 +2467,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            OPEN    OUTPUT              ERR-FILE
            IF  STS-LST             NOT =   ZERO
                MOVE    1               TO  FLG-CSV
-               DISPLAY "*(ORCVTRESEDEN)* ERRFILE OPN STS[" STS-LST "]"
+               DISPLAY "*(ORCVTRECEDEN)* ERRFILE OPN STS[" STS-LST "]"
                GO  TO  2710-ERRLST-INIT-EXT
            END-IF
       *
@@ -2515,9 +2516,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 900-DBDISCONNECT-SEC
       *
       *
-           DISPLAY "*(ORCVTRESEDEN)* CSV     /I CNT[" CNT-CSV      "]"
-           DISPLAY "*(ORCVTRESEDEN)* CNT-RE  /O CNT[" CNT-RE       "]"
-           DISPLAY "*(ORCVTRESEDEN)* ERR     /O CNT[" CNT-ERR      "]"
+           DISPLAY "*(ORCVTRECEDEN)* CSV     /I CNT[" CNT-CSV      "]"
+           DISPLAY "*(ORCVTRECEDEN)* CNT-RE  /O CNT[" CNT-RE       "]"
+           DISPLAY "*(ORCVTRECEDEN)* ERR     /O CNT[" CNT-ERR      "]"
       *
            .
        300-END-EXT.
@@ -2742,7 +2743,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
           END-IF
       *
            IF      CNT-CSV (4:3)       =   ZERO
-               DISPLAY "***(ORCVTRESEDEN)*** CNT-CSV[" CNT-CSV "]"
+               DISPLAY "***(ORCVTRECEDEN)*** CNT-CSV[" CNT-CSV "]"
            END-IF
       *
           .
