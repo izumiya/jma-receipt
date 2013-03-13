@@ -1503,16 +1503,22 @@
                MOVE    PTBYO-BYOMEI        TO  WRK-BYOMEI
       *        補足コメント
                MOVE    PTBYO-HOSOKU-COMMENT    TO  WRK-HOSOKU-COMMENT
+               IF      PARA-UTAGAIKBN      =   "1"
+      *            疑い区分編集
+                   MOVE    PTBYO-UTAGAIFLG     TO  WRK-UTAGAIFLG
+               ELSE
+                   MOVE    SPACE               TO  WRK-UTAGAIFLG
+               END-IF
            ELSE
       *        カルテ病名
                MOVE    PTBYO-CHARTBYOMEI   TO  WRK-BYOMEI
                MOVE    SPACE               TO  WRK-HOSOKU-COMMENT
-           END-IF
-           IF      PARA-UTAGAIKBN      =   "1"
-      *        疑い区分編集
-               MOVE    PTBYO-UTAGAIFLG     TO  WRK-UTAGAIFLG
-           ELSE
-               MOVE    SPACE               TO  WRK-UTAGAIFLG
+               IF      PARA-CHARTKBN       =   "1"
+      *            疑い区分編集
+                   MOVE    PTBYO-UTAGAIFLG     TO  WRK-UTAGAIFLG
+               ELSE
+                   MOVE    SPACE               TO  WRK-UTAGAIFLG
+               END-IF
            END-IF
       *    病名編集
            PERFORM 200211-BYOMEI-UTAGAI-SEC
