@@ -1606,38 +1606,6 @@
 	    </widget>
 
 	    <widget>
-	      <class>GtkLabel</class>
-	      <name>label231</name>
-	      <x>376</x>
-	      <y>24</y>
-	      <width>160</width>
-	      <height>20</height>
-	      <label>標準プログラム名</label>
-	      <justify>GTK_JUSTIFY_CENTER</justify>
-	      <wrap>False</wrap>
-	      <xalign>0.5</xalign>
-	      <yalign>0.5</yalign>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	    </widget>
-
-	    <widget>
-	      <class>GtkLabel</class>
-	      <name>label232</name>
-	      <x>564</x>
-	      <y>24</y>
-	      <width>160</width>
-	      <height>20</height>
-	      <label>独自開発プログラム名</label>
-	      <justify>GTK_JUSTIFY_CENTER</justify>
-	      <wrap>False</wrap>
-	      <xalign>0.5</xalign>
-	      <yalign>0.5</yalign>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	    </widget>
-
-	    <widget>
 	      <class>GtkPandaEntry</class>
 	      <name>ORCAORGNM01</name>
 	      <x>376</x>
@@ -2947,6 +2915,38 @@
 	      <draw_indicator>True</draw_indicator>
 	      <group>GAI12</group>
 	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label231</name>
+	      <x>376</x>
+	      <y>24</y>
+	      <width>160</width>
+	      <height>20</height>
+	      <label>標準プログラム名</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label232</name>
+	      <x>564</x>
+	      <y>24</y>
+	      <width>160</width>
+	      <height>20</height>
+	      <label>ユーザプログラム名</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
 	  </widget>
 
 	  <widget>
@@ -2956,11 +2956,11 @@
 	    <width>34</width>
 	    <label>一般</label>
 	    <justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
 	  </widget>
 
 	  <widget>
@@ -4260,22 +4260,6 @@
 	    </widget>
 
 	    <widget>
-	      <class>GtkLabel</class>
-	      <name>label219</name>
-	      <x>564</x>
-	      <y>24</y>
-	      <width>160</width>
-	      <height>20</height>
-	      <label>独自開発プログラム名</label>
-	      <justify>GTK_JUSTIFY_CENTER</justify>
-	      <wrap>False</wrap>
-	      <xalign>0.5</xalign>
-	      <yalign>0.5</yalign>
-	      <xpad>0</xpad>
-	      <ypad>0</ypad>
-	    </widget>
-
-	    <widget>
 	      <class>GtkPandaCombo</class>
 	      <name>ORCAORGNM03NCOMBO</name>
 	      <x>376</x>
@@ -5236,6 +5220,22 @@
 	      <draw_indicator>True</draw_indicator>
 	      <group>NYU10</group>
 	    </widget>
+
+	    <widget>
+	      <class>GtkLabel</class>
+	      <name>label219</name>
+	      <x>564</x>
+	      <y>24</y>
+	      <width>160</width>
+	      <height>20</height>
+	      <label>ユーザプログラム名</label>
+	      <justify>GTK_JUSTIFY_CENTER</justify>
+	      <wrap>False</wrap>
+	      <xalign>0.5</xalign>
+	      <yalign>0.5</yalign>
+	      <xpad>0</xpad>
+	      <ypad>0</ypad>
+	    </widget>
 	  </widget>
 
 	  <widget>
@@ -5244,11 +5244,11 @@
 	    <name>N0102</name>
 	    <label>入院</label>
 	    <justify>GTK_JUSTIFY_CENTER</justify>
-	<wrap>False</wrap>
-	<xalign>0.5</xalign>
-	<yalign>0.5</yalign>
-	<xpad>0</xpad>
-	<ypad>0</ypad>
+	    <wrap>False</wrap>
+	    <xalign>0.5</xalign>
+	    <yalign>0.5</yalign>
+	    <xpad>0</xpad>
+	    <ypad>0</ypad>
 	  </widget>
 	</widget>
 
@@ -5330,6 +5330,22 @@
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>MSG01</name>
+	  <x>556</x>
+	  <y>8</y>
+	  <width>424</width>
+	  <height>24</height>
+	  <label>インストールされていないプログラムの登録があります</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>1</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
 	</widget>
       </widget>
 

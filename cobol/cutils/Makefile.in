@@ -9,11 +9,13 @@ CSRCS = \
 	cobsleep.c \
 	orcsjistoeuc.c \
 	orcfileencode.c \
-	orcmkdir.c
+	orcmkdir.c \
+	orcnop.c \
+	orcaccess.c 
 
 CJQSRCS = orcqrencode.c
 
-CJKANJIOBJS = kanaconv.so orcsstring.so fixreddata.so
+CJKANJIOBJS = kanaconv.so orcsstring.so fixreddata.so orcaccess.so
 
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
@@ -57,6 +59,10 @@ kanaconv.so: kanaconv.o euc.o
 
 orcsstring.so: orcsstring.o euc.o
 	$(CC) -shared -Wl,-soname,$@ -o $@ $?
+
+orcaccess.so: orcaccess.o euc.o
+	$(CC) -shared -Wl,-soname,$@ -o $@ $?
+
 
 %.so: %.c
 	$(CC) -fPIC -shared $< -o $@

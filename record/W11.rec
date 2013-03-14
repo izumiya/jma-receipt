@@ -269,39 +269,51 @@ W11	{
 							value	bool;
 						};
 						ORCACSTNM01	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM02	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM03	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM04	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM05	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM06	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM07	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM08	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM09	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM10	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM11	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTNM12	{
+							style   varchar(20);
 							value	varchar(20);
 						};
 						ORCACSTCHK01	{
@@ -481,42 +493,6 @@ W11	{
 						ORCAORGNM04N	{
 							value	varchar(20);
 						};
-						ORCAORGCHK01N	{
-							value	bool;
-						};
-						ORCAORGCHK02N	{
-							value	bool;
-						};
-						ORCAORGCHK03N	{
-							value	bool;
-						};
-						ORCAORGCHK04N	{
-							value	bool;
-						};
-						ORCACSTNM01N	{
-							value	varchar(20);
-						};
-						ORCACSTNM02N	{
-							value	varchar(20);
-						};
-						ORCACSTNM03N	{
-							value	varchar(20);
-						};
-						ORCACSTNM04N	{
-							value	varchar(20);
-						};
-						ORCACSTCHK01N	{
-							value	bool;
-						};
-						ORCACSTCHK02N	{
-							value	bool;
-						};
-						ORCACSTCHK03N	{
-							value	bool;
-						};
-						ORCACSTCHK04N	{
-							value	bool;
-						};
 						ORCAORGNM05N	{
 							value	varchar(20);
 						};
@@ -539,23 +515,17 @@ W11	{
 						ORCAORGNM10N	{
 							value	varchar(20);
 						};
-						ORCACSTNM05N	{
-							value	varchar(20);
+						ORCAORGCHK01N	{
+							value	bool;
 						};
-						ORCACSTNM06N	{
-							value	varchar(20);
+						ORCAORGCHK02N	{
+							value	bool;
 						};
-						ORCACSTNM07N	{
-							value	varchar(20);
+						ORCAORGCHK03N	{
+							value	bool;
 						};
-						ORCACSTNM08N	{
-							value	varchar(20);
-						};
-						ORCACSTNM09N	{
-							value	varchar(20);
-						};
-						ORCACSTNM10N	{
-							value	varchar(20);
+						ORCAORGCHK04N	{
+							value	bool;
 						};
 						ORCAORGCHK05N	{
 							value	bool;
@@ -573,6 +543,58 @@ W11	{
 							value	bool;
 						};
 						ORCAORGCHK10N	{
+							value	bool;
+						};
+						ORCACSTNM01N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTNM02N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTNM03N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTNM04N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTNM05N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTNM06N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTNM07N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTNM08N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTNM09N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTNM10N	{
+							style   varchar(20);
+							value	varchar(20);
+						};
+						ORCACSTCHK01N	{
+							value	bool;
+						};
+						ORCACSTCHK02N	{
+							value	bool;
+						};
+						ORCACSTCHK03N	{
+							value	bool;
+						};
+						ORCACSTCHK04N	{
 							value	bool;
 						};
 						ORCACSTCHK05N	{
@@ -597,6 +619,10 @@ W11	{
 			        	N0102	{
 						state	int;
 					};
+				};
+				MSG01	{
+					style   varchar(20);
+					value	varchar(100);
 				};
 			};
 			            N01	{

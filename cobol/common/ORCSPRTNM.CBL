@@ -63,6 +63,7 @@
       *
       *    ワーク領域
        01  WRK-AREA.
+           03  WRK-ERRMSG          PIC X(100).
            03  WRK-SRYYMD          PIC X(08).
            03  WRK-NYUGAIKBN       PIC X(01).
       *
@@ -75,6 +76,9 @@
       *****************************************************************
       *
            COPY    "MCPAREA".
+      *
+      *    ファイル探索サブ
+           COPY    "CPORCSACCESS.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -191,7 +195,30 @@
                    MOVE    10                 TO  ORCSPRTNM-RC
                END-IF
            ELSE
-               MOVE    WRK-PRTPG           TO  ORCSPRTNM-PRTPG
+      *
+               INITIALIZE              SACCESS-AREA
+               MOVE    "X"             TO  SACCESS-MODE
+               STRING  WRK-PRTPG           DELIMITED   BY  SPACE
+                       ".so"               DELIMITED   BY  SIZE
+               INTO    SACCESS-IN-FILENAME
+               END-STRING
+               CALL    "ORCSACCESS"    USING
+                                       SACCESS-AREA
+               IF    ( SACCESS-RC      =   ZERO )
+                   MOVE    WRK-PRTPG   TO  ORCSPRTNM-PRTPG
+               ELSE
+      *
+                   MOVE    "orcnop"    TO  ORCSPRTNM-PRTPG
+      *
+                   MOVE   SPACE            TO  WRK-ERRMSG
+                   STRING "Couldn't find module:"  DELIMITED   BY  SIZE
+                          SACCESS-IN-FILENAME      DELIMITED   BY  SPACE
+                          LOW-VALUE                DELIMITED   BY  SIZE
+                   INTO   WRK-ERRMSG
+                   END-STRING
+                   CALL    "coblog"    USING   WRK-ERRMSG
+      *
+               END-IF
            END-IF
       *
            .

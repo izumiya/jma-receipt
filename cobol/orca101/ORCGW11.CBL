@@ -69,6 +69,7 @@
       * 04.04.00     NACL-多々納  09/01/21  予約票追加
       * 04.05.00     NACL-多々納  09/06/09  予約一覧・予約患者一覧変更
       * 04.05.00     NACL-太田    09/09/04  分娩費用明細書追加
+      * 04.07.00     NACL-太田    13/03/13  プログラム存在チェック追加
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -219,6 +220,9 @@
       *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
+      *
+      *    ファイル存在チェック
+           COPY    "CPORCSACCESS.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1657,16 +1661,11 @@
            END-PERFORM
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-NPGNM-MAX2
+                   UNTIL       IDX     >   SPA-NPGNM-MAX
                MOVE    W11-ORCACSTNM-N (IDX)
                                            TO  SPA-GMN-TCSTPGNM-N (IDX)
            END-PERFORM
-           MOVE    W11-ORCACSTNM05N    TO  SPA-GMN-TCSTPGNM-N (5)
-           MOVE    W11-ORCACSTNM06N    TO  SPA-GMN-TCSTPGNM-N (6)
-           MOVE    W11-ORCACSTNM07N    TO  SPA-GMN-TCSTPGNM-N (7)
-           MOVE    W11-ORCACSTNM08N    TO  SPA-GMN-TCSTPGNM-N (8)
-           MOVE    W11-ORCACSTNM09N    TO  SPA-GMN-TCSTPGNM-N (9)
-           MOVE    W11-ORCACSTNM10N    TO  SPA-GMN-TCSTPGNM-N (10)
+      *
       *    処方せん
            MOVE    W11-ORCAORGNM02     TO  SPA-GMN-TORGPGNM (02)
       *
@@ -2264,29 +2263,8 @@
            IF    ( SPA-GMN-TCSTPGNM-N (IDX1)    =   SPACE )
                MOVE    "T"         TO  SPA-GMN-TORGPGCHK-N (IDX1)
            ELSE
-               EVALUATE    IDX1
-                   WHEN    1   THRU   4
-                       MOVE    W11-ORCAORGCHK-N (IDX1)
+               MOVE    W11-ORCAORGCHK-N (IDX1)
                                    TO  SPA-GMN-TORGPGCHK-N (IDX1)
-                   WHEN    5
-                       MOVE    W11-ORCAORGCHK05N
-                                   TO  SPA-GMN-TORGPGCHK-N (5)
-                   WHEN    6
-                       MOVE    W11-ORCAORGCHK06N
-                                   TO  SPA-GMN-TORGPGCHK-N (6)
-                   WHEN    7
-                       MOVE    W11-ORCAORGCHK07N
-                                   TO  SPA-GMN-TORGPGCHK-N (7)
-                   WHEN    8
-                       MOVE    W11-ORCAORGCHK08N
-                                   TO  SPA-GMN-TORGPGCHK-N (8)
-                   WHEN    9
-                       MOVE    W11-ORCAORGCHK09N
-                                   TO  SPA-GMN-TORGPGCHK-N (9)
-                   WHEN    10
-                       MOVE    W11-ORCAORGCHK10N
-                                   TO  SPA-GMN-TORGPGCHK-N (10)
-               END-EVALUATE
            END-IF
       *
            .
@@ -2305,29 +2283,8 @@
            IF    ( SPA-GMN-TCSTPGNM-N (IDX1)    =   SPACE )
                MOVE    "F"         TO  SPA-GMN-TCSTPGCHK-N (IDX1)
            ELSE
-               EVALUATE    IDX1
-                   WHEN    1   THRU   4
-                       MOVE    W11-ORCACSTCHK-N (IDX1)
+               MOVE    W11-ORCACSTCHK-N (IDX1)
                                    TO  SPA-GMN-TCSTPGCHK-N (IDX1)
-                   WHEN    5
-                       MOVE    W11-ORCACSTCHK05N
-                                   TO  SPA-GMN-TCSTPGCHK-N (IDX1)
-                   WHEN    6
-                       MOVE    W11-ORCACSTCHK06N
-                                   TO  SPA-GMN-TCSTPGCHK-N (IDX1)
-                   WHEN    7
-                       MOVE    W11-ORCACSTCHK07N
-                                   TO  SPA-GMN-TCSTPGCHK-N (IDX1)
-                   WHEN    8
-                       MOVE    W11-ORCACSTCHK08N
-                                   TO  SPA-GMN-TCSTPGCHK-N (IDX1)
-                   WHEN    9
-                       MOVE    W11-ORCACSTCHK09N
-                                   TO  SPA-GMN-TCSTPGCHK-N (IDX1)
-                   WHEN    10
-                       MOVE    W11-ORCACSTCHK10N
-                                   TO  SPA-GMN-TCSTPGCHK-N (IDX1)
-               END-EVALUATE
            END-IF
       *
            .
@@ -3280,7 +3237,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            PERFORM VARYING IDZ2    FROM    1   BY  1
-                   UNTIL   ( IDZ2  >   SPA-NPGNM-MAX2 )
+                   UNTIL   ( IDZ2  >   SPA-NPGNM-MAX )
       *
                IF  ( SPA-GMN-TCSTPGNM-N  (IDZ2)    =   SPACE )
                    IF  ( W11-ORCACSTCHK-N (IDZ2)   =   "F" )
@@ -3293,61 +3250,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *
            END-PERFORM
-      *
-           IF     (SPA-ERRCD           =   SPACE  )  AND
-                  (SPA-GMN-TCSTPGNM-N (5)  =   SPACE )
-               IF  ( W11-ORCACSTCHK05N     =   "F" )
-                   CONTINUE
-               ELSE
-                   MOVE    "0004"          TO  SPA-ERRCD
-                   COMPUTE SPA-GMN-CUR =   5       +   60
-               END-IF
-           END-IF
-           IF     (SPA-ERRCD           =   SPACE  )  AND
-                  (SPA-GMN-TCSTPGNM-N (6)  =   SPACE )
-               IF  ( W11-ORCACSTCHK06N     =   "F" )
-                   CONTINUE
-               ELSE
-                   MOVE    "0004"          TO  SPA-ERRCD
-                   COMPUTE SPA-GMN-CUR =   6       +   60
-               END-IF
-           END-IF
-           IF     (SPA-ERRCD           =   SPACE  )  AND
-                  (SPA-GMN-TCSTPGNM-N (7)  =   SPACE )
-               IF  ( W11-ORCACSTCHK07N     =   "F" )
-                   CONTINUE
-               ELSE
-                   MOVE    "0004"          TO  SPA-ERRCD
-                   COMPUTE SPA-GMN-CUR =   7       +   60
-               END-IF
-           END-IF
-           IF     (SPA-ERRCD           =   SPACE  )  AND
-                  (SPA-GMN-TCSTPGNM-N (8)  =   SPACE )
-               IF  ( W11-ORCACSTCHK08N     =   "F" )
-                   CONTINUE
-               ELSE
-                   MOVE    "0004"          TO  SPA-ERRCD
-                   COMPUTE SPA-GMN-CUR =   8       +   60
-               END-IF
-           END-IF
-           IF     (SPA-ERRCD           =   SPACE  )  AND
-                  (SPA-GMN-TCSTPGNM-N (9)  =   SPACE )
-               IF  ( W11-ORCACSTCHK09N     =   "F" )
-                   CONTINUE
-               ELSE
-                   MOVE    "0004"          TO  SPA-ERRCD
-                   COMPUTE SPA-GMN-CUR =   8       +   60
-               END-IF
-           END-IF
-           IF     (SPA-ERRCD           =   SPACE  )  AND
-                  (SPA-GMN-TCSTPGNM-N (10)  =   SPACE )
-               IF  ( W11-ORCACSTCHK10N     =   "F" )
-                   CONTINUE
-               ELSE
-                   MOVE    "0004"          TO  SPA-ERRCD
-                   COMPUTE SPA-GMN-CUR =   8       +   60
-               END-IF
-           END-IF
            .
        4901-CSTPGNM-CHK-EXT.
            EXIT.
@@ -3454,6 +3356,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE               TO  W11
            INITIALIZE                      W11
+      *
+           MOVE    "black"             TO  W11-MSG01-STYLE
       *
            MOVE    SPA-GMN-USERKBN-G   TO  W11-USERKBN
       *
@@ -3563,6 +3467,22 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                MOVE    SPA-GMN-TCSTPGCHK (IDZ2)
                                         TO  W11-ORCACSTCHK (IDZ2)
+               MOVE    "black"          TO  W11-ORCACSTNM-STYLE (IDZ2)
+               IF    ( W11-ORCACSTCHK (IDZ2)       =   "T" )
+                AND  ( W11-ORCACSTNM  (IDZ2)   NOT =   SPACE )
+                   INITIALIZE               SACCESS-AREA
+                   MOVE    "X"             TO  SACCESS-MODE
+                   STRING  W11-ORCACSTNM  (IDZ2)   DELIMITED   BY  SPACE
+                           ".so"                   DELIMITED   BY  SIZE
+                   INTO    SACCESS-IN-FILENAME
+                   END-STRING
+                   CALL    "ORCSACCESS"    USING
+                                           SACCESS-AREA
+                   IF    ( SACCESS-RC      NOT =   ZERO )
+                       MOVE    "red"   TO  W11-ORCACSTNM-STYLE(IDZ2)
+                       MOVE    "red"   TO  W11-MSG01-STYLE
+                   END-IF
+               END-IF
            END-PERFORM
       *
       *    入院
@@ -3610,7 +3530,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W11-ORCAORGNM-N09-COUNT
       *
            PERFORM VARYING     IDZ2     FROM    1   BY  1
-                   UNTIL       IDZ2     >       SPA-NPGNM-MAX2
+                   UNTIL       IDZ2     >       SPA-NPGNM-MAX
                MOVE    SPA-GMN-TCSTPGNM-N  (IDZ2)
                                         TO  W11-ORCACSTNM-N  (IDZ2)
       *
@@ -3619,27 +3539,23 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                MOVE    SPA-GMN-TCSTPGCHK-N (IDZ2)
                                         TO  W11-ORCACSTCHK-N (IDZ2)
+               MOVE    "black"          TO  W11-ORCACSTNM-N-STYLE (IDZ2)
+               IF    ( W11-ORCACSTCHK-N (IDZ2)     =   "T" )
+                AND  ( W11-ORCACSTNM-N  (IDZ2) NOT =   SPACE )
+                   INITIALIZE               SACCESS-AREA
+                   MOVE    "X"             TO  SACCESS-MODE
+                   STRING  W11-ORCACSTNM-N(IDZ2)   DELIMITED   BY  SPACE
+                           ".so"                   DELIMITED   BY  SIZE
+                   INTO    SACCESS-IN-FILENAME
+                   END-STRING
+                   CALL    "ORCSACCESS"    USING
+                                           SACCESS-AREA
+                   IF    ( SACCESS-RC      NOT =   ZERO )
+                       MOVE    "red"   TO  W11-ORCACSTNM-N-STYLE(IDZ2)
+                       MOVE    "red"   TO  W11-MSG01-STYLE
+                   END-IF
+               END-IF
            END-PERFORM
-           MOVE    SPA-GMN-TCSTPGNM-N (5)  TO  W11-ORCACSTNM05N
-           MOVE    SPA-GMN-TCSTPGNM-N (6)  TO  W11-ORCACSTNM06N
-           MOVE    SPA-GMN-TCSTPGNM-N (7)  TO  W11-ORCACSTNM07N
-           MOVE    SPA-GMN-TCSTPGNM-N (8)  TO  W11-ORCACSTNM08N
-           MOVE    SPA-GMN-TCSTPGNM-N (9)  TO  W11-ORCACSTNM09N
-           MOVE    SPA-GMN-TCSTPGNM-N (10) TO  W11-ORCACSTNM10N
-      *
-           MOVE    SPA-GMN-TORGPGCHK-N (5) TO  W11-ORCAORGCHK05N
-           MOVE    SPA-GMN-TORGPGCHK-N (6) TO  W11-ORCAORGCHK06N
-           MOVE    SPA-GMN-TORGPGCHK-N (7) TO  W11-ORCAORGCHK07N
-           MOVE    SPA-GMN-TORGPGCHK-N (8) TO  W11-ORCAORGCHK08N
-           MOVE    SPA-GMN-TORGPGCHK-N (9) TO  W11-ORCAORGCHK09N
-           MOVE    SPA-GMN-TORGPGCHK-N(10) TO  W11-ORCAORGCHK10N
-      *
-           MOVE    SPA-GMN-TCSTPGCHK-N (5) TO  W11-ORCACSTCHK05N
-           MOVE    SPA-GMN-TCSTPGCHK-N (6) TO  W11-ORCACSTCHK06N
-           MOVE    SPA-GMN-TCSTPGCHK-N (7) TO  W11-ORCACSTCHK07N
-           MOVE    SPA-GMN-TCSTPGCHK-N (8) TO  W11-ORCACSTCHK08N
-           MOVE    SPA-GMN-TCSTPGCHK-N (9) TO  W11-ORCACSTCHK09N
-           MOVE    SPA-GMN-TCSTPGCHK-N(10) TO  W11-ORCACSTCHK10N
       *
            MOVE    SPA-GMN-SYOHOGEPRTFLG-G   TO  W11-SYOHOGEPRTFLG
       *
@@ -3715,6 +3631,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-EVALUATE
            END-EVALUATE
       *----(02.00.03)--ADD-END-----
+      *
+           IF    ( W11-MSG01-STYLE =   "red" )
+               MOVE "ユーザプログラムがインストールされていません"
+                                               TO  W11-MSG01
+           END-IF
       *
            PERFORM 5001-MAPCUR-SEC
       *
