@@ -7121,7 +7121,8 @@
                    MOVE    DTCHK010-SETCD-MAX (IDXD)
                                            TO  TPSET-MAX
       *
-                   IF    ( TPSET-FLG-OCC (IDXD)(1: TPSET-MAX)
+                   IF    ( TPSET-MAX       >   ZERO )
+                    AND  ( TPSET-FLG-OCC (IDXD)(1: TPSET-MAX)
                                                =   ALL "1" )
                        MOVE    1       TO  TPSET-DAY (IDXD)
                        
