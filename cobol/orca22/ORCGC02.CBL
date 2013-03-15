@@ -281,8 +281,9 @@
       *  04.06.16    NACL-藤原    12/10/01  入力病名の入力ＣＤ登録対応
       *  04.06.17    NACL-藤原    12/12/20  自院病名で登録した疾患区分を
       *                                     優先にする
-      *  04.06.18    NACL-藤原    13/03/26  同義語変換時の編集病名フラグ
+      *  04.06.18    NACL-藤原    13/03/06  同義語変換時の編集病名フラグ
       *                                     の初期化
+      *  04.06.19    NACL-藤原    13/03/15  簡単修正時の対象行の設定修正
       *
       *  04.07.01    NACL-藤原    11/06/10  未コード化病名となる病名の別
       *                                     組み立てへの移行を可能にする
@@ -3647,15 +3648,20 @@ grpsys                                         SPA-AREA
                        AND   ( SNUM-MINKBN     =   SPACE )
                        AND   ( SNUM-SYOKBN     =   SPACE ) 
                            MOVE    SNUM-OUTNUM     TO  WRK-BANGO
-                           COMPUTE WRK-BANGO
-                                   =   WRK-BANGO
-                                   - ( SPA-GMN-C02-PAGE    -   1 )
-                                   *   WRK-CONS-C02-MAX
-                           IF    ( WRK-BANGO       >   SPA-GMN-C02-MAX )
-                           OR    ( WRK-BANGO       <   1               )
+      *
+                           PERFORM VARYING IDX     FROM    1   BY  1
+                                   UNTIL   IDX     >   SPA-GMN-C02-MAX
+                               IF      WRK-BANGO
+                                           =   SPA-GMN-C02-TBANGO (IDX)
+                                   MOVE    IDX     TO  WRK-STNUM-O(IDXX)
+                                   MOVE    SPA-GMN-C02-MAX
+                                                   TO  IDX
+                               END-IF    
+                           END-PERFORM
+      *
+                           IF      WRK-STNUM-O(IDXX)   =   ZERO
                                MOVE    "0012"          TO  SPA-ERRCD
                            ELSE
-                               MOVE    WRK-BANGO   TO  WRK-STNUM-O(IDXX)
                                IF      WRK-EDNUM       =   SPACE
                                    MOVE    WRK-STNUM-O(IDXX)
                                                    TO  WRK-EDNUM-O(IDXX)
@@ -3676,15 +3682,20 @@ grpsys                                         SPA-AREA
                        AND   ( SNUM-MINKBN     =   SPACE )
                        AND   ( SNUM-SYOKBN     =   SPACE ) 
                            MOVE    SNUM-OUTNUM     TO  WRK-BANGO
-                           COMPUTE WRK-BANGO
-                                   =   WRK-BANGO
-                                   - ( SPA-GMN-C02-PAGE    -   1 )
-                                   *   WRK-CONS-C02-MAX
-                           IF    ( WRK-BANGO       >   SPA-GMN-C02-MAX )
-                           OR    ( WRK-BANGO       <   1               )
-                               MOVE    "0012"      TO  SPA-ERRCD
+      *
+                           PERFORM VARYING IDX     FROM    1   BY  1
+                                   UNTIL   IDX     >   SPA-GMN-C02-MAX
+                               IF      WRK-BANGO
+                                           =   SPA-GMN-C02-TBANGO (IDX)
+                                   MOVE    IDX     TO  WRK-EDNUM-O(IDXX)
+                                   MOVE    SPA-GMN-C02-MAX
+                                                   TO  IDX
+                               END-IF    
+                           END-PERFORM
+      *
+                           IF      WRK-EDNUM-O(IDXX)   =   ZERO
+                               MOVE    "0012"          TO  SPA-ERRCD
                            ELSE
-                               MOVE    WRK-BANGO   TO  WRK-EDNUM-O(IDXX)
                                IF      WRK-STNUM       =   SPACE
                                    MOVE    WRK-EDNUM-O(IDXX)
                                                    TO  WRK-STNUM-O(IDXX)
@@ -8227,6 +8238,11 @@ grpsys                                       SPA-AREA
       *****************************************************************
        460-MAEGMN-SEC             SECTION.
       *
+           IF      SPA-GMN-C02-BANGO  >   ZERO
+               MOVE    "0005"              TO  SPA-ERRCD
+               GO  TO  460-MAEGMN-EXT
+           END-IF
+      *
            IF      SPA-GMN-C02-PAGE    =   1
                GO      TO      460-MAEGMN-EXT
            END-IF
@@ -8247,6 +8263,11 @@ grpsys                                       SPA-AREA
       *    次頁処理
       *****************************************************************
        470-ATOGMN-SEC             SECTION.
+      *
+           IF      SPA-GMN-C02-BANGO  >   ZERO
+               MOVE    "0005"              TO  SPA-ERRCD
+               GO  TO  470-ATOGMN-EXT
+           END-IF
       *
            IF      SPA-GMN-C02-NEXT        =   ZERO
                GO      TO      470-ATOGMN-EXT
