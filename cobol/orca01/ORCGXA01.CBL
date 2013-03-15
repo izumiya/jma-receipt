@@ -126,6 +126,7 @@
            03  FLG-END             PIC 9(01).
            03  FLG-LIST-ROW        PIC 9(01).
            03  FLG-TOUROKU         PIC 9(01).
+           03  FLG-CP              PIC 9(01).
       *
       *    ¥·¥¹¥Æ¥àÎÎ°è
        01  SYS-AREA.
@@ -247,10 +248,6 @@
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
       *
-      *    °õºþÀ©¸æ¥Þ¥¹¥¿
-       01  PRTCTRL-REC.
-           COPY    "CPPRTCTRL.INC".
-      *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
@@ -286,6 +283,7 @@
            COPY    "XAERR.INC".
            COPY    "XAID1.INC".
            COPY    "XAID2.INC".
+           COPY    "XAPRT.INC".
       *
       *
        PROCEDURE                   DIVISION    USING
@@ -306,6 +304,7 @@
            MOVE    SPA-COMMON      TO  SPA-AREA
            MOVE    SPA-FREE        TO  SPA-XA01
            MOVE    SPA-WORK        TO  SPA-XA01KYOUTU 
+           DISPLAY "xa01 st SPA-XAID1-FLG = " SPA-XAID1-FLG
       *
            MOVE    SPACE           TO  SPA-ERRCD
            MOVE    ZERO            TO  FLG-END
@@ -357,6 +356,7 @@
                    GO  TO  100-INIT-EXT
                END-IF
       *        ²èÌÌÊÔ½¸
+           DISPLAY "SPA-XAID1-FLG1 = " SPA-XAID1-FLG
                PERFORM 500-GMNHEN-SEC
                IF      SPA-ERRCD       NOT =   SPACE
                    PERFORM 510-ERRSET-SEC
@@ -602,6 +602,11 @@
       *
            IF      SPA-XA99-FLG     =   "OK"
                PERFORM 4501-NEXT-GMN-SEC
+           END-IF    
+      *
+      *    PERFORM  600-CLIENT-PRINT
+           IF      SPA-XAID1-FLG    =  "CP"
+               MOVE 1              TO  FLG-CP
            END-IF    
       *
            MOVE    SPACE           TO  SPA-XAID1-FLG
@@ -2035,6 +2040,11 @@
            IF  XA99-COUNT        =  ZERO  
                GO  TO            600-CLIENT-PRINT-EXT
            END-IF
+           IF  FLG-CP             NOT =  1
+               GO  TO            600-CLIENT-PRINT-EXT
+           END-IF
+           DISPLAY "SPA-XAID1-FLG = " SPA-XAID1-FLG
+           DISPLAY "XA99-COUNT    = " XA99-COUNT
       *    AGENT ¼èÆÀ
            INITIALIZE                      ORCA-SYSTEM
            MOVE    "GETVALUE"          TO  MCP-FUNC
@@ -2055,7 +2065,7 @@
            END-IF
       *
            IF    ORCA-SYSTEM-VALUE(1)(1:9) = "glclient/"
-                 STRING  "orca00/print?filename=" 
+                 STRING  "orca01/print?filename=" 
                                            DELIMITED   BY  SIZE
                          SPA-HOSPNUM       DELIMITED   BY  SPACE
                          SPA-PRTKANRI-TBL-KEY
@@ -2075,7 +2085,7 @@
                      MOVE SPA-GMN-TPRT-TITLE (SPA-NAI-SELNUM)
                                        TO XA01-PRTTITLE(01)
            ELSE
-                 STRING  "orca00/print?filename=" 
+                 STRING  "orca01/print?filename=" 
                                            DELIMITED   BY  SIZE
                          SPA-HOSPNUM       DELIMITED   BY  SPACE
                          SPA-PRTKANRI-TBL-KEY
@@ -2095,85 +2105,8 @@
                      MOVE SPA-GMN-TPRT-TITLE (SPA-NAI-SELNUM)
                                        TO XA01-PRTTITLE(01)
            END-IF
-      *    PERFORM 6001-PRTDBINSERT-SEC
            . 
        600-CLIENT-PRINT-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *     °õºþÀ©¸æ£Ä£Â½ñ¤­¹þ¤ß
-      *****************************************************************
-       6001-PRTDBINSERT-SEC        SECTION.
-      *
-           INITIALIZE PRTCTRL-REC
-           MOVE    SPA-HOSPNUM         TO  PRTCTRL-HOSPNUM
-           MOVE    SPA-TERMID          TO  PRTCTRL-TERMID
-           MOVE    SPA-PRTKANRI-TBL-KEY  TO  PRTCTRL-TBL-KEY
-           MOVE    SPA-GMN-RENNUM      TO  PRTCTRL-RENNUM
-           MOVE    SPA-GMN-TBL-GROUP   TO  PRTCTRL-TBL-GROUP
-           MOVE    SPA-GMN-SHORI-RENNUM  TO  PRTCTRL-SHORI-RENNUM
-      *    MOVE    XA01-PRTPATH(01)    TO  PRTCTRL-PRT-PATH(01)
-      *    MOVE    XA01-PRTTITLE(01)   TO  PRTCTRL-PRT-TITLE(01)
-      *    IF    ORCA-SYSTEM-VALUE(1)(1:9) = "glclient/"
-      *          STRING  "/tmp/" 
-      *                                    DELIMITED   BY  SIZE
-      *                  SPA-HOSPNUM       DELIMITED   BY  SPACE
-      *                  SPA-PRTKANRI-TBL-KEY
-      *                                    DELIMITED   BY  SPACE
-      *                  SPA-GMN-RENNUM    DELIMITED   BY  SPACE
-      *                  SPA-GMN-TBL-GROUP DELIMITED   BY  SPACE
-      *                  SPA-GMN-SHORI-RENNUM 
-      *                                    DELIMITED   BY  SPACE
-      *                  SPA-GMN-EDPAGE
-      *                                    DELIMITED   BY  SPACE
-      *                  SPA-GMN-STPAGE
-      *                                    DELIMITED   BY  SPACE
-      *                  ".ps"
-      *                                    DELIMITED   BY  SIZE
-      *          INTO    PRTCTRL-FILE-PATH(01)
-      *          END-STRING
-      *    ELSE
-      *          STRING  "/tmp/" 
-      *                                    DELIMITED   BY  SIZE
-      *                  SPA-HOSPNUM       DELIMITED   BY  SPACE
-      *                  SPA-PRTKANRI-TBL-KEY
-      *                                    DELIMITED   BY  SPACE
-      *                  SPA-GMN-RENNUM    DELIMITED   BY  SPACE
-      *                  SPA-GMN-TBL-GROUP DELIMITED   BY  SPACE
-      *                  SPA-GMN-SHORI-RENNUM 
-      *                                    DELIMITED   BY  SPACE
-      *                  SPA-GMN-EDPAGE
-      *                                    DELIMITED   BY  SPACE
-      *                  SPA-GMN-STPAGE
-      *                                    DELIMITED   BY  SPACE
-      *                  ".pdf"
-      *                                    DELIMITED   BY  SIZE
-      *          INTO    PRTCTRL-FILE-PATH(01)
-      *          END-STRING
-      *    END-IF
-      *    PERFORM 900-PRTCTRL-INSERT-SEC
-           . 
-       6001-PRTDBINSERT-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *     °õºþ´ÉÍý£Ä£ÂÆÉ¤ß¹þ¤ß
-      *****************************************************************
-       900-PRTCTRL-INSERT-SEC            SECTION.
-      *
-           MOVE    "tbl_prtctrl"       TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           MOVE    PRTCTRL-REC         TO  MCPDATA-REC
-               PERFORM 900-DBINSERT-SEC
-      *                                  
-           IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC         TO  PRTKANRI-REC
-               MOVE    ZERO                TO  FLG-PRTKANRI
-           ELSE
-               MOVE    1                   TO  FLG-PRTKANRI
-           END-IF
-           .
-       900-PRTCTRL-INSERT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2280,18 +2213,6 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            .
        900-DBFETCH-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    £Ä£Â£Æ£Å£Ô£Ã£È½èÍý
-      *****************************************************************
-       900-DBINSERT-SEC               SECTION.
-      *
-           MOVE    "DBINSERT"          TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
-      *
-           .
-       900-DBINSERT-EXT.
            EXIT.
       *
       *****************************************************************
