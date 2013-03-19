@@ -56,7 +56,7 @@ int search_file(
 	while( tok != NULL ){
 		sprintf(filename , "%s/%s" ,tok ,in_filename);
 		if (stat(filename, &buf) == 0 && S_ISREG(buf.st_mode) == 1 ){
-			rc = access(filename,X_OK);
+			rc = access(filename,R_OK);
 			if ( rc == 0 ){
 				strncpy(fullpath,filename,str_len);
 				strncpy(out_dirname,filename,str_len);
