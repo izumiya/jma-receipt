@@ -40,9 +40,9 @@ int search_file(
 		int  *file_exists)
 {
 	char *path;
-	char *buf_path;
 	char delimiter[]=":";
 	char *tok;
+	char buf_path[STR_LEN];
 	char filename[STR_LEN];
 	int  rc;
     struct stat buf ; 
@@ -60,10 +60,13 @@ int search_file(
 			rc = access(filename,R_OK);
 			if ( rc == 0 ){
 				strncpy(fullpath,filename,str_len);
-				strncpy(out_dirname,filename,str_len);
-				dirname(out_dirname);
-				strncpy(out_filename,filename,str_len);
-				sprintf(out_filename,"%s",basename(out_filename));
+
+				strncpy(buf_path,filename,str_len);
+				strncpy(out_dirname,dirname(buf_path),str_len);
+
+				strncpy(buf_path,filename,str_len);
+				strncpy(out_filename,basename(buf_path),str_len);
+
 				if (access(filename,F_OK) == 0){
 					*file_exists = 1;
 				};
@@ -83,6 +86,7 @@ void orcaccess (char *args)
     int  str_len,mode,access_mode;
     char *envname;
     char *in_filename;
+	char buf_path[STR_LEN];
     char filename[STR_LEN];
     char *fullpath;
     char *out_dirname;
@@ -151,10 +155,13 @@ void orcaccess (char *args)
 			sprintf(filename,"%s/%s",filename,in_filename);
 		}
 		strncpy(fullpath,filename,str_len);
-		strncpy(out_dirname,filename,str_len);
-		dirname(out_dirname);
-		strncpy(out_filename,filename,str_len);
-		sprintf(out_filename,"%s",basename(out_filename));
+
+		strncpy(buf_path,filename,str_len);
+		strncpy(out_dirname,dirname(buf_path),str_len);
+
+		strncpy(buf_path,filename,str_len);
+		strncpy(out_filename,basename(buf_path),str_len);
+
 		if (stat(out_dirname, &buf) == 0 && S_ISDIR(buf.st_mode) == 1 && access(out_dirname,W_OK) == 0){
 			if (access(filename,F_OK) == 0){
 				if (stat(filename, &buf) == 0 && S_ISDIR(buf.st_mode) == 0){
