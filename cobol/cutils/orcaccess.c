@@ -1,9 +1,10 @@
-#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <unistd.h>
+#include <libgen.h>
 
 #include "euc.h"
 
@@ -61,7 +62,8 @@ int search_file(
 				strncpy(fullpath,filename,str_len);
 				strncpy(out_dirname,filename,str_len);
 				dirname(out_dirname);
-				strncpy(out_filename,(char *)basename(filename),str_len);
+				strncpy(out_filename,filename,str_len);
+				sprintf(out_filename,"%s",basename(out_filename));
 				if (access(filename,F_OK) == 0){
 					*file_exists = 1;
 				};
@@ -151,7 +153,8 @@ void orcaccess (char *args)
 		strncpy(fullpath,filename,str_len);
 		strncpy(out_dirname,filename,str_len);
 		dirname(out_dirname);
-		strncpy(out_filename,(char *)basename(filename),str_len);
+		strncpy(out_filename,filename,str_len);
+		sprintf(out_filename,"%s",basename(out_filename));
 		if (stat(out_dirname, &buf) == 0 && S_ISDIR(buf.st_mode) == 1 && access(out_dirname,W_OK) == 0){
 			if (access(filename,F_OK) == 0){
 				if (stat(filename, &buf) == 0 && S_ISDIR(buf.st_mode) == 0){
