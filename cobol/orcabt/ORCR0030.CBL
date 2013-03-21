@@ -610,6 +610,7 @@
       *                                     £°£¸¡ÊÏ··ò¡Ë¤Î¥ì¥»¥×¥ÈÂÐ±þ
       *  04.06.10    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.06.11    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
+      *  04.06.12    NACL-ÌçÏÆ    13/03/21  Á´¹ñ¸øÈñ¤¢¤ê¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -1199,6 +1200,10 @@
            03  TBL-PTTOKKI-OCC                         OCCURS   5.
                05  TBL-PTTOKKI-NAIYO                   PIC  X(12).
                05  TBL-PTTOKKI-CD                      PIC  X(02).
+      *
+       01  TBL-HKNCOMBI.
+           03  TBL-HKNCOMBI-OCC                        OCCURS  10.
+               05  TBL-HKNCOMBI-TOTALTEN               PIC  9(07).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -4352,6 +4357,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2101-KOREISYA-KOHI-SEC      SECTION.
       *
+           INITIALIZE                   TBL-HKNCOMBI
+      *
            MOVE      ZERO        TO     FLG-ZENKOH-ARI
            PERFORM   VARYING  IDY2    FROM    1   BY  1
                       UNTIL   IDY2    >       10
@@ -4361,6 +4368,60 @@ grpsys         PERFORM 900-DBSELECT-SEC
                        MOVE    10        TO     IDY2
                     END-IF
            END-PERFORM
+      *
+           IF   FLG-ZENKOH-ARI  =  1
+             PERFORM   VARYING  IDY2    FROM    1   BY  1
+                        UNTIL   IDY2    >       10
+                         OR     RECE02-HKNCOMBI (IDY2)  =   ZERO
+               INITIALIZE                      SYUNOU-REC
+               MOVE  RECE02-HOSPNUM        TO  SYU-HOSPNUM
+               MOVE  RECE02-NYUGAIKBN      TO  SYU-NYUGAIKBN
+               MOVE  RECE02-PTID           TO  SYU-PTID
+               MOVE  RECE02-SRYYM          TO  SYU-SRYYMD(1:6)
+               MOVE  "__"                  TO  SYU-SRYYMD(7:2)
+               MOVE  RECE02-HKNCOMBI(IDY2) TO  SYU-HKNCOMBINUM
+               MOVE  SYUNOU-REC            TO  MCPDATA-REC
+               MOVE  "tbl_syunou"          TO  MCP-TABLE
+               MOVE  "key41"               TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF    MCP-RC   =   ZERO
+                 MOVE    "tbl_syunou"      TO  MCP-TABLE
+                 MOVE    "key41"           TO  MCP-PATHNAME
+                 PERFORM  900-SYUNOU-READ-SEC
+                 PERFORM  UNTIL  (FLG-SYUNOU  =  1)
+                   IF    SYU-DENPJTIKBN    NOT =  "3"
+                     ADD   SYU-TOTAL-HKNTEN
+                                TO  TBL-HKNCOMBI-TOTALTEN(IDY2)
+                   END-IF
+                   MOVE    "tbl_syunou"    TO  MCP-TABLE
+                   MOVE    "key41"         TO  MCP-PATHNAME
+                   PERFORM  900-SYUNOU-READ-SEC
+                 END-PERFORM
+               END-IF
+               MOVE      "tbl_syunou"      TO  MCP-TABLE
+               MOVE      "key41"           TO  MCP-PATHNAME
+               PERFORM    900-CLOSE-SEC
+             END-PERFORM
+      *
+             PERFORM   VARYING  IDY2    FROM    1   BY  1
+                        UNTIL   IDY2    >       10
+                         OR     RECE02-HKNCOMBI (IDY2)  =   ZERO
+               IF    (RECE02-HKNCOMBIFLG(IDY2)    =  1 OR 2)
+               AND   (TBL-HKNCOMBI-TOTALTEN(IDY2) =  ZERO  )
+                 MOVE   ZERO    TO  RECE02-HKNCOMBIFLG(IDY2)
+               END-IF
+             END-PERFORM
+      *
+             MOVE       ZERO    TO  FLG-ZENKOH-ARI
+             PERFORM   VARYING  IDY2    FROM    1   BY  1
+                        UNTIL   IDY2    >       10
+                         OR     RECE02-HKNCOMBI (IDY2)  =   ZERO
+               IF     RECE02-HKNCOMBIFLG(IDY2)    =  1 OR 2
+                 MOVE     1     TO  FLG-ZENKOH-ARI
+                 MOVE    10     TO  IDY2
+               END-IF
+             END-PERFORM
+           END-IF
       *
            MOVE      ZERO        TO     FLG-DOTANDOKU-IGAI
                                         FLG-DOTANDOKU
