@@ -468,6 +468,8 @@
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
       *
+      *    チェックマスタ病名編集サブ
+           COPY    "CPORCSS012.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -952,8 +954,33 @@
            MOVE    "自院病名"
                                    TO  SPA-GMN-SRCBYOKBNMEIL (3)
       *
-           PERFORM 900-TEKIOUBYOMEI-KEY-SEL-SEC
-           IF    ( FLG-TEKIOUBYOMEI    =   ZERO )
+           MOVE    SPACE           TO  WRK-SEL-BYOMEI
+           PERFORM 900-TEKIOUBYOMEI-KEY3-SEL-SEC
+      *
+           MOVE    ZERO            TO  IDX1
+           PERFORM UNTIL ( FLG-TEKIOUBYOMEI    NOT =   ZERO )
+                    OR   ( IDX1    >   ZERO )
+      *
+               INITIALIZE              SS012-AREA
+               MOVE    TEKBYO-BYOMEI
+                                   TO  SS012-I-BYOMEI
+               CALL    "ORCSS012"      USING
+                                       SS012-AREA
+                                       SPA-AREA
+      *
+               IF    ( SS012-HAISHI    =   ZERO )
+                   COMPUTE IDX1    =   IDX1    +   1
+               END-IF
+      *
+               PERFORM 900-TEKIOUBYOMEI-KEY3-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_tekioubyomei"      TO  MCP-TABLE
+           MOVE    "key3"                  TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           IF    ( IDX1    >   ZERO )
                MOVE    4           TO  SPA-GMN-SRCBYOKBN-MAX
       *
                MOVE    "M"         TO  SPA-GMN-SRCBYOKBNL    (4)
@@ -2218,61 +2245,30 @@
            PERFORM UNTIL ( FLG-TEKIOUBYOMEI    NOT =   ZERO )
                     OR   ( IDX1    >=  CONST-SRCBYOLST-MAX )
       *
-               MOVE    ZERO        TO  FLG-HAISHI
+               INITIALIZE              SS012-AREA
+               MOVE    TEKBYO-BYOMEI
+                                   TO  SS012-I-BYOMEI
+               CALL    "ORCSS012"      USING
+                                       SS012-AREA
+                                       SPA-AREA
       *
-               INITIALIZE                      ORCSBYOMEIAREA
-               MOVE    "1"                 TO  LNK-BYO-SYORI
-               MOVE    TEKBYO-BYOMEI       TO  LNK-BYO-BYOMEI
-               CALL    "ORCSBYOMEI"    USING   ORCSBYOMEIAREA
-                                               SPA-AREA
-               IF    ( LNK-BYO-BYOMEIHENFLG    =   SPACE ) 
-                   IF    ( LNK-BYO-IKOSAKICD   NOT =   SPACE )
-                       MOVE    SPACE       TO  WRK-TBYOMEICD-G
-                       PERFORM VARYING IDX0 FROM 1 BY 1
-                               UNTIL ( IDX0 >   CONST-MKCD-MAX )
-                                OR   ( LNK-BYO-TBYOMEICD (IDX0)
-                                            = SPACE )
-                           MOVE    LNK-BYO-TBYOMEICD (IDX0)
-                                           TO  WRK-TBYOMEICD (IDX0)
-                       END-PERFORM
-                       MOVE    LNK-BYO-IKOSAKICD   TO  WRK-IKOCD
-                       MOVE    LNK-BYO-IKOSAKICD-INDEX
-                                                   TO  IDXI
-                       INITIALIZE              ORCSBYOMEIAREA
-                       MOVE    "2"         TO  LNK-BYO-SYORI
-                       PERFORM VARYING IDX0 FROM 1 BY 1
-                               UNTIL ( IDX0 >   CONST-MKCD-MAX )
-                                OR   ( WRK-TBYOMEICD (IDX0)    = SPACE )
-                           MOVE WRK-TBYOMEICD (IDX0)
-                                           TO  LNK-BYO-TBYOMEICD (IDX0)
-                       END-PERFORM
-                       MOVE    WRK-IKOCD   TO  LNK-BYO-TBYOMEICD (IDXI)
-                       CALL    "ORCSBYOMEI"    USING   ORCSBYOMEIAREA
-                                                       SPA-AREA
-                   ELSE
-                       IF    ( LNK-BYO-HAISIYMD-ERR  NOT   =   ZERO )
-                           MOVE    1       TO  FLG-HAISHI
-                       END-IF
-                   END-IF
-               END-IF
-      *
-               IF    ( FLG-HAISHI  =       ZERO )
+               IF    ( SS012-HAISHI    =   ZERO )
       *
                    COMPUTE IDX1    =   IDX1    +   1
       *
-                   MOVE    LNK-BYO-BYOMEI
+                   MOVE    SS012-O-BYOMEI
                                        TO  SPA-GMN-TSRCBYOMEI (IDX1)
-                   MOVE    LNK-BYO-BYOMEIHENFLG
+                   MOVE    SS012-BYOMEIHENFLG
                                        TO  SPA-NAI-TSRCBYOSTATUS(IDX1)
       *
                    PERFORM VARYING IDX0    FROM    1   BY  1
                            UNTIL ( IDX0    >   CONST-MKCD-MAX )
                             OR   ( LNK-BYO-TBYOMEICD (IDX0)  =   SPACE )
       *
-                       MOVE    LNK-BYO-TBYOMEICD (IDX0)
+                       MOVE    SS012-BYOMEICD (IDX0)
                                    TO  SPA-NAI-TSRCBYOCD(IDX1 IDX0)
-      *
                    END-PERFORM
+      *
                END-IF
       *
                PERFORM 900-TEKIOUBYOMEI-KEY3-FET-SEC
