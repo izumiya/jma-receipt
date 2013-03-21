@@ -307,7 +307,7 @@
            MOVE    "01"                    TO  TNS-YUKOSTYMD(7:2)
            MOVE    TNS-YUKOSTYMD           TO  TNS-YUKOEDYMD
            PERFORM   910-TENSU-READ-SEC
-      *    入院料加算以外は処理をスッキプする
+      *    入院料加算以外は処理をスキップする
            IF     (TNS-SRYKBN              =   "90"  OR  "92")  AND
                   (TNS-TENSIKIBETU         =    3)
                CONTINUE
@@ -395,7 +395,8 @@
              PERFORM    VARYING   IDX1   FROM   1   BY   1
                       UNTIL     IDX1   >   31
                IF   (ORCSCNKSN-DAY(IDX1)         NOT =   ZERO)  AND
-                    (WRK-KHN-NYUKHNKSNKBN(IDX1)  NOT =   ZERO)
+                    (WRK-KHN-NYUKHNKSNKBN(IDX1)  NOT =   ZERO)  AND
+                    (WRK-KSN-NYUKHNKSNKBN        NOT =   ZERO)
       *
                     INITIALIZE                 NYUKSNCHK-REC
                     MOVE    WRK-KHN-NYUKHNKSNKBN (IDX1)
