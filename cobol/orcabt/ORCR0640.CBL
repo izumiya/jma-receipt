@@ -599,6 +599,7 @@
       *                                     ¥ì¥»¥×¥È°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *  04.06.08    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.06.09    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
+      *  04.06.10    NACL-ÌçÏÆ    13/03/21  Á´¹ñ¸øÈñ¤¢¤ê¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1295,6 +1296,10 @@
            03  TBL-PTTOKKI-OCC                         OCCURS   5.
                05  TBL-PTTOKKI-NAIYO                   PIC  X(12).
                05  TBL-PTTOKKI-CD                      PIC  X(02).
+      *
+       01  TBL-HKNCOMBI.
+           03  TBL-HKNCOMBI-OCC                        OCCURS  10.
+               05  TBL-HKNCOMBI-TOTALTEN               PIC  9(07).
       *
       *    °åÎÅµ¡´Ø¡ÊÆþ±¡´ðËÜ¡ËÂàÈòÍÑÎÎ°è
        01  TBL-SYS5000-T.
@@ -13647,6 +13652,8 @@
       *****************************************************************
        21041-KOREISYA-KOHI-SEC               SECTION.
       *
+           INITIALIZE                   TBL-HKNCOMBI
+      *
            MOVE      ZERO        TO     FLG-ZENKOH-ARI
            PERFORM   VARYING  IDX1    FROM    1   BY  1
                       UNTIL   IDX1    >       10
@@ -13656,6 +13663,60 @@
                        MOVE    10        TO     IDX1
                     END-IF
            END-PERFORM
+      *
+           IF   FLG-ZENKOH-ARI  =  1
+             PERFORM   VARYING  IDX1    FROM    1   BY  1
+                        UNTIL   IDX1    >       10
+                         OR     RECE62-HKNCOMBI (IDX1)  =   ZERO
+               INITIALIZE                      SYUNOU-REC
+               MOVE  RECE62-HOSPNUM        TO  SYU-HOSPNUM
+               MOVE  RECE62-NYUGAIKBN      TO  SYU-NYUGAIKBN
+               MOVE  RECE62-PTID           TO  SYU-PTID
+               MOVE  RECE62-SRYYM          TO  SYU-SRYYMD(1:6)
+               MOVE  "__"                  TO  SYU-SRYYMD(7:2)
+               MOVE  RECE62-HKNCOMBI(IDX1) TO  SYU-HKNCOMBINUM
+               MOVE  SYUNOU-REC            TO  MCPDATA-REC
+               MOVE  "tbl_syunou"          TO  MCP-TABLE
+               MOVE  "key19"               TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF    MCP-RC   =   ZERO
+                 MOVE    "tbl_syunou"      TO  MCP-TABLE
+                 MOVE    "key19"           TO  MCP-PATHNAME
+                 PERFORM  900-SYUNOU-READ-SEC
+                 PERFORM  UNTIL  (FLG-SYUNOU  =  1)
+                   IF    SYU-DENPJTIKBN    NOT =  "3"
+                     ADD   SYU-TOTAL-HKNTEN
+                                TO  TBL-HKNCOMBI-TOTALTEN(IDX1)
+                   END-IF
+                   MOVE    "tbl_syunou"    TO  MCP-TABLE
+                   MOVE    "key19"         TO  MCP-PATHNAME
+                   PERFORM  900-SYUNOU-READ-SEC
+                 END-PERFORM
+               END-IF
+               MOVE      "tbl_syunou"      TO  MCP-TABLE
+               MOVE      "key19"           TO  MCP-PATHNAME
+               PERFORM    900-CLOSE-SEC
+             END-PERFORM
+      *
+             PERFORM   VARYING  IDX1    FROM    1   BY  1
+                        UNTIL   IDX1    >       10
+                         OR     RECE62-HKNCOMBI (IDX1)  =   ZERO
+               IF    (RECE62-HKNCOMBIFLG(IDX1)    =  1 OR 2)
+               AND   (TBL-HKNCOMBI-TOTALTEN(IDX1) =  ZERO  )
+                 MOVE   ZERO    TO  RECE62-HKNCOMBIFLG(IDX1)
+               END-IF
+             END-PERFORM
+      *
+             MOVE       ZERO    TO  FLG-ZENKOH-ARI
+             PERFORM   VARYING  IDX1    FROM    1   BY  1
+                        UNTIL   IDX1    >       10
+                         OR     RECE62-HKNCOMBI (IDX1)  =   ZERO
+               IF     RECE62-HKNCOMBIFLG(IDX1)    =  1 OR 2
+                 MOVE     1     TO  FLG-ZENKOH-ARI
+                 MOVE    10     TO  IDX1
+               END-IF
+             END-PERFORM
+           END-IF
       *
            MOVE      ZERO        TO     FLG-DOTANDOKU-IGAI
                                         FLG-DOTANDOKU
