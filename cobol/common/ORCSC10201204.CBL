@@ -437,11 +437,13 @@
            03  FILLER              PIC X(14)   VALUE   "311  112016310".
       *    外来診療料（同一日２科目）（他医療機関へ紹介）
            03  FILLER              PIC X(14)   VALUE   "310KD112016410".
+      *    同日外来診療料（他医療機関へ紹介）
+           03  FILLER              PIC X(14)   VALUE   "311D 112016550".
       *
       *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
       **** 03  TBL-SINSATU-OCC         OCCURS  15    INDEXED  TBL-IDX.
-           03  TBL-SINSATU-OCC         OCCURS  19    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  20    INDEXED  TBL-IDX.
       *        １：一般、２：小児科外来診察料、３：外来診療料
                05  TBL-KAISU           PIC 9(01).
       *******  老人一般区分（０：一般、１：老人）(０：なし）
@@ -4887,8 +4889,6 @@
                      OR ((SPA-SYOYMD          =   LNK-ORCSC-RRK-LSTYMD)
                       AND (IDX-ZAI1           =   1    )  AND
                           (FLG-DOUJITU        =   1    ))
-      *H25.4         外来診察料（紹介なし）
-                     OR  (FLG-SYOKAINASI      =   1    )
                        CONTINUE
                    ELSE
                        MOVE    "0101"              TO  LNK-ORCSC-KIDCD

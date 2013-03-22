@@ -4098,7 +4098,8 @@
                                            TO  SPA-MAE-INPUTCD(IDX)
                END-IF
       *        ∑Ÿπ…Ωº®§Ú§∑§ §§
-               MOVE    "1"                 TO  SPA-COM-KZMFLG(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG (IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG3(IDX)
                MOVE    "1"                 TO  SPA-COM-HKEIFLG(IDX)
            END-PERFORM
       *    ∆‚ ¨»Á…È≤ŸªÓ∏≥∏°∫∫æ Û
