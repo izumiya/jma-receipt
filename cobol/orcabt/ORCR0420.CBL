@@ -657,6 +657,7 @@
            03  CONS-GAIRAIRYO2 PIC X(09)     VALUE "112705510".
            03  CONS-GAIRAIRYO3 PIC X(09)     VALUE "112011710".
            03  CONS-GAIRAIRYO4 PIC X(09)     VALUE "112016310".
+           03  CONS-GAIRAIRYO5 PIC X(09)     VALUE "112016550".
       *    処方せん料
            03  CONS-SHOHOSEN1 PIC X(09)      VALUE "120002710".
            03  CONS-SHOHOSEN2 PIC X(09)      VALUE "120002810".
@@ -2010,6 +2011,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 CONS-GAIRAIRYO2  OR
                                                 CONS-GAIRAIRYO3  OR
                                                 CONS-GAIRAIRYO4  OR
+                                                CONS-GAIRAIRYO5  OR
                                                 CONS-DOUJITU-GAI OR
                                                 CONS-DOUJITU2-GAI
                         MOVE   "2"      TO    RECE41-KEIZOKU-PRTKBN
@@ -3101,7 +3103,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         MOVE   "1"    TO    RECE44-DOUJITUSAI-COMMENT
               END-IF
               IF  (SRY-SRYCD(IDX2)    =     "112008350"   OR
-                                            "112011710"     )
+                                            "112011710"   OR
+                                            "112016550"     )
               AND (RECE41-SRYYM       >=    "201004"        )
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-DOUJITUSAI-COMMENT
@@ -6857,6 +6860,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                        IF SRY-SRYCD(IDX3) =  CONS-GAIRAIRYO1  OR
                                              CONS-GAIRAIRYO3  OR
                                              CONS-GAIRAIRYO4  OR
+                                             CONS-GAIRAIRYO5  OR
                                              CONS-DOUJITU-GAI OR
                                              CONS-DOUJITU2-GAI
                          IF    RECE41-KHNTEN(3)   =   ZERO
