@@ -1,0 +1,39 @@
+tbl_syskanri_item	{
+	KANRICD		char(4);
+	KBNCD		varchar(8);
+	ITEMCD		number(5,0);
+	YUKOSTYMD	char(8);
+	YUKOEDYMD	char(8);
+	ITEMNAME	varchar(100);
+	ITEMTYPE	number(1,0);
+	ITEMLENGTH	number(3,0);
+	ITEMPRECISION	number(1,0);
+	UPYMD		char(8);
+};
+
+primary	{
+	KANRICD,KBNCD,ITEMCD,YUKOSTYMD,YUKOEDYMD;
+};
+
+path	key1		{ 	
+	DBSELECT	{
+		DECLARE tbl_syskanri_item_key1_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syskanri_item
+		WHERE 	ITEMCD     =   0
+			ORDER BY KANRICD
+		;
+	};
+};
+
+path	key2		{ 	
+	DBSELECT	{
+		DECLARE tbl_syskanri_item_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syskanri_item
+		WHERE 	ITEMCD     >   0
+		AND	KANRICD    =   :KANRICD
+			ORDER BY ITEMCD
+		;
+	};
+};

@@ -1,0 +1,63 @@
+tbl_syskanri_value	{
+	HOSPNUM		number(2,0);
+	KANRICD		char(4);
+	KBNCD		char(8);
+	ITEMCD		number(5,0);
+	YUKOSTYMD	char(8);
+	YUKOEDYMD	char(8);
+	VALUE		varchar(500);
+	OPID		varchar(16);
+	CREYMD		char(8);
+	UPYMD		char(8);
+	UPHMS		char(6);
+#-----> 主キー更新用項目
+	UPHOSPNUM	number(2,0),virtual;
+	UPKANRICD	char(4),virtual;
+	UPKBNCD		char(8),virtual;
+	UPITEMCD	number(5,0),virtual;
+	UPYUKOSTYMD	char(8),virtual;
+	UPYUKOEDYMD	char(8),virtual;
+};
+
+primary	{
+	HOSPNUM,KANRICD,KBNCD,ITEMCD,YUKOSTYMD,YUKOEDYMD;
+};
+
+path	key1		{ 	
+	DBSELECT	{
+		DECLARE tbl_syskanri_value_key1_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syskanri_value
+		WHERE 	HOSPNUM    =   :HOSPNUM
+		AND	KANRICD    =   :KANRICD
+		AND	KBNCD      =   :KBNCD
+		AND	ITEMCD     =   :ITEMCD
+		AND	YUKOSTYMD  =   :YUKOSTYMD
+		AND	YUKOEDYMD  =   :YUKOEDYMD
+		;
+	};
+};
+
+path	upd1	{ 	
+	DBUPDATE	{
+		UPDATE	tbl_syskanri_value 
+				SET	HOSPNUM   	=   :HOSPNUM,
+					KANRICD		=   :KANRICD,
+					KBNCD		=   :KBNCD,
+					ITEMCD		=   :ITEMCD,
+					YUKOSTYMD	=   :YUKOSTYMD,
+					YUKOEDYMD	=   :YUKOEDYMD,
+					VALUE		=   :VALUE,
+					OPID		=   :OPID,
+					CREYMD		=   :CREYMD,
+					UPYMD		=   :UPYMD,
+					UPHMS		=   :UPHMS
+		WHERE 	HOSPNUM		=   :UPHOSPNUM
+		AND	KANRICD		=   :UPKANRICD
+		AND	KBNCD		=   :UPKBNCD
+		AND	ITEMCD		=   :UPITEMCD
+		AND	YUKOSTYMD	=   :UPYUKOSTYMD
+		AND	YUKOEDYMD	=   :UPYUKOEDYMD
+		;
+	};
+};
