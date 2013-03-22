@@ -997,6 +997,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
       *            同日外来診療料
                    WHEN    "112011710"
+                   WHEN    "112016550"
       *            同日外来診療料（老人）
                    WHEN    "112705850"
                        MOVE    2                   TO  WRK-KIHONKBN

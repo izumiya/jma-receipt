@@ -8717,6 +8717,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               OR "112703350"
       *
                                               OR "112011710"
+                                              OR "112016550"
                                               OR "112011810"
                                               OR "112011910"
                                               OR "112012010"
@@ -9398,7 +9399,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE   "1"    TO    RECE04-DOUJITUSAI-COMMENT
               END-IF
               IF  (SRY-SRYCD(IDX2)    =     "112008350"   OR
-                                            "112011710"     )
+                                            "112011710"   OR
+                                            "112016550"     )
               AND (RECE02-SRYYM       >=    "201004"        )
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-DOUJITUSAI-COMMENT

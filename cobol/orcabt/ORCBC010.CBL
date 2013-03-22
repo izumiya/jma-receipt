@@ -3896,6 +3896,7 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                                               OR "112703350"
       *
                                               OR "112011710"
+                                              OR "112016550"
                                               OR "112011810"
                                               OR "112011910"
                                               OR "112012010"
