@@ -176,4 +176,6 @@ db	{
         tbl_generic_price;
         tbl_ptnum_public;
         tbl_pt_hdist_day;
+        tbl_syskanri_item;
+        tbl_syskanri_value;
 };
