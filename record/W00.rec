@@ -1,52 +1,45 @@
 W00	{
 	fixed1	{
-		KBN	{
-			value	varchar(24);
+		LIST	{
+			count	int;
+			row	int;
+			rowattr	int;
+			item	{
+				value0	varchar(2);
+				value1	varchar(30);
+				value2	varchar(40);
+				value3	varchar(8);
+				value4	varchar(8);
+			}	[50];
+			select	bool[50];
+		};
+		SELNUM	{
+			value	number(2);
+		};
+		KANRICD	{
+			value	varchar(4);
+		};
+		KBNCD	{
+			value	varchar(8);
+		};
+		ITEMCD	{
+			value	number(5);
 		};
 		NAME	{
-			value	varchar(100);
+			value	varchar(30);
 		};
-		HOSPKBNCOMBO	{
-			HOSPKBN	{
-				value	varchar(10);
+		YUKOSTYMD	{
+			value	varchar(8);
+		};
+		YUKOEDYMD	{
+			value	varchar(8);
+		};
+		ATAI_COMBO	{
+			ATAI	{
+				value	varchar(40);
 			};
 			count	int;
-			item	varchar(10)[2];
-		};
-		LIST	{
-			state	int;
-			style	varchar(20);
-			trow	int;
-			trowattr	int;
-			tcolumn	int;
-			tvalue	varchar(256);
-			rowdata {
-				BANGO {
-					celldata	varchar(6);
-					fgcolor	varchar(20);
-					bgcolor	varchar(20);
-				};
-				MEISYO {
-					celldata	varchar(30);
-					fgcolor	varchar(20);
-					bgcolor	varchar(20);
-				};
-				ATAI {
-					celldata	varchar(40);
-					fgcolor	varchar(20);
-					bgcolor	varchar(20);
-				};
-				YUKOSTYMD {
-					celldata	varchar(9);
-					fgcolor	varchar(20);
-					bgcolor	varchar(20);
-				};
-				YUKOEDYMD {
-					celldata	varchar(9);
-					fgcolor	varchar(20);
-					bgcolor	varchar(20);
-				};
-			}[31];
+			item	varchar(40)[50];
 		};
 	};
 };

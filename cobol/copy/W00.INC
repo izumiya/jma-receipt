@@ -16,39 +16,25 @@
       * 113-8621, Japan.
       ********************************************************************
         02  W00.
-              03  W00-KBN   PIC X(24).
-              03  W00-NAME   PIC X(100).
-              03  W00-HOSPKBNCOMB.
-                04  W00-HOSPKBN   PIC X(10).
-                04  W00-HOSPKBN-COUNT   PIC S9(9)   BINARY.
-                04  W00-HOSPKBN-ITEM    PIC X(10)   OCCURS  2 TIMES.
-              03  W00-SCROLLEDWINDOW1.
-                04  W00-LIST.
-                  05  W00-LIST-STATE   PIC S9(9)   BINARY.
-                  05  W00-LIST-STYLE   PIC X(20).
-                  05  W00-LIST-TROW    PIC S9(9)   BINARY.
-                  05  W00-LIST-TROWATTR    PIC S9(9)   BINARY.
-                  05  W00-LIST-TCOLUMN PIC S9(9)   BINARY.
-                  05  W00-LIST-TVALUE  PIC X(256).
-                  05  W00-LIST-ROWDATA     OCCURS  31 TIMES.
-                    06  W00-BANGO-G.
-                      07  W00-BANGO  PIC X(6).
-                      07  W00-BANGO-FGCOLOR PIC X(20).
-                      07  W00-BANGO-BGCOLOR PIC X(20).
-                    06  W00-MEISYO-G.
-                      07  W00-MEISYO    PIC X(30).
-                      07  W00-MEISYO-FGCOLOR PIC X(20).
-                      07  W00-MEISYO-BGCOLOR PIC X(20).
-                    06  W00-ATAI-G.
-                      07  W00-ATAI    PIC X(40).
-                      07  W00-ATAI-FGCOLOR PIC X(20).
-                      07  W00-ATAI-BGCOLOR PIC X(20).
-                    06  W00-YUKOSTYMD-G.
-                      07  W00-YUKOSTYMD    PIC X(9).
-                      07  W00-YUKOSTYMD-FGCOLOR PIC X(20).
-                      07  W00-YUKOSTYMD-BGCOLOR PIC X(20).
-                    06  W00-YUKOEDYMD-G.
-                      07  W00-YUKOEDYMD    PIC X(9).
-                      07  W00-YUKOEDYMD-FGCOLOR PIC X(20).
-                      07  W00-YUKOEDYMD-BGCOLOR PIC X(20).
-
+              03  W00-LIST.
+                  05  W00-LIST-COUNT       PIC S9(9)   BINARY.
+                  05  W00-LIST-ROW         PIC S9(9)   BINARY.
+                  05  W00-LIST-ROWATTR     PIC S9(9)   BINARY.
+                  05  W00-LIST-ITEM        OCCURS  50.
+                      07  W00-LIST-NO          PIC X(02).
+                      07  W00-LIST-NAME        PIC X(30).
+                      07  W00-LIST-ATAI        PIC X(40).
+                      07  W00-LIST-YUKOSTYMD   PIC X(08).
+                      07  W00-LIST-YUKOEDYMD   PIC X(08).
+                  05  W00-LIST-SELECT      PIC X       OCCURS  50.
+              03  W00-SELNUM           PIC 9(02).
+              03  W00-KANRICD          PIC X(04).
+              03  W00-KBNCD            PIC X(08).
+              03  W00-ITEMCD           PIC 9(05).
+              03  W00-NAME             PIC X(30).
+              03  W00-YUKOSTYMD        PIC X(08).
+              03  W00-YUKOEDYMD        PIC X(08).
+              03  W00-ATAI-COMBO.
+                  05  W00-ATAI             PIC X(40).
+                  05  W00-ATAI-COUNT       PIC S9(9)   BINARY.
+                  05  W00-ATAI-ITEM        PIC X(40)   OCCURS  50.
