@@ -426,10 +426,12 @@
            03  FILLER              PIC X(14)   VALUE   "311  112016310".
       *    ³°Íè¿ÇÎÅÎÁ¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë¡ÊÂ¾°åÎÅµ¡´Ø¤Ø¾Ò²ð¡Ë
            03  FILLER              PIC X(14)   VALUE   "310KD112016410".
+      *    Æ±Æü³°Íè¿ÇÎÅÎÁ¡ÊÂ¾°åÎÅµ¡´Ø¤Ø¾Ò²ð¡Ë
+           03  FILLER              PIC X(14)   VALUE   "311D 112016550".
       *
        01  TBL-SINSATU-AREAR       REDEFINES   TBL-SINSATU-AREA.
       ***  03  TBL-SINSATU-OCC         OCCURS  15    INDEXED  TBL-IDX.
-           03  TBL-SINSATU-OCC         OCCURS  19    INDEXED  TBL-IDX.
+           03  TBL-SINSATU-OCC         OCCURS  20    INDEXED  TBL-IDX.
       *        £±¡§°ìÈÌ¡¢£²¡§¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¡¢£³¡§³°Íè¿ÇÎÅÎÁ
                05  TBL-KAISU           PIC 9(01).
       *****    Ï·¿Í°ìÈÌ¶èÊ¬¡Ê£°¡§°ìÈÌ¡¢£±¡§Ï·¿Í¡Ë(£°¡§¤Ê¤·¡Ë
@@ -2788,6 +2790,10 @@
            ELSE
                MOVE    SPA-HOSPSBT         TO  WRK-HOSPSBT
            END-IF
+      *H25.4
+           IF      WRK-KBN4        NOT =   "1"
+               MOVE    "0"             TO  WRK-KBN4
+           END-IF
       *    ¿Ç»¡ÎÁ¥»¥Ã¥È
            SET     TBL-IDX             TO  1
            SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
@@ -2799,8 +2805,8 @@
                      AND  (WRK-KBN             =   TBL-KBN    (TBL-IDX))
                      AND  (WRK-SRYKBN          =   TBL-SRYCD(TBL-IDX)
                                                                 (2:2))
-      *H25.4         ¾Ò²ð¤Ê¤·¤ÏÂÐ¾Ý³°
-                     AND  (TBL-ROUJIN(TBL-IDX)  =   "0"   )
+      *H25.4         ¾Ò²ð¤Ê¤·
+                     AND  (WRK-KBN4            =   TBL-ROUJIN(TBL-IDX))
                        MOVE    TBL-SRYCD (TBL-IDX)
                                                TO  WRK-SRYCD
            END-SEARCH
@@ -4205,6 +4211,8 @@
        3001-TELSAISIN-CHK-SEC         SECTION.
       *
            MOVE    ZERO                TO  FLG-TEL-ARI
+      *H25.4
+           MOVE    SPACE               TO  WRK-KBN4
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-MAX-LINE  )  OR
                              ((SPA-GMN-INPUTCD(IDX)    =   SPACE) AND
@@ -4222,6 +4230,8 @@
                        MOVE    TBL-KBN   (TBL-IDX)     TO  WRK-KBN
                        MOVE    TBL-KBN2  (TBL-IDX)     TO  WRK-KBN2
                        MOVE    ZERO            TO  WRK-KAISU
+      *H25.4           ¾Ò²ð¤Ê¤·ÂÐ±þ
+                       MOVE    TBL-ROUJIN(TBL-IDX) TO  WRK-KBN4
                END-SEARCH
       *
       *        Æ±ÆüºÆ¿ÇÎÁ¤ØÃÖ´¹¤¨
