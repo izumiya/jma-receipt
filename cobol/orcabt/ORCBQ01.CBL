@@ -258,8 +258,9 @@
            COPY    "CPJOBKANRI.INC".
       *
       *    出力先プリンタ名割り当て情報
+           COPY  "CPSYSKANRI.INC".
+           COPY  "CPSK1001.INC".
            COPY  "CPSK1031.INC".
-      *
            COPY  "CPSK1044.INC".
       *
       *    患者マスタ
@@ -295,8 +296,8 @@
       *    ファイルデイレクトリ位置指定サブ
            COPY    "CPMKPASS.INC".
       *
-      *    照会用サブ
-           COPY    "CPQSUB03.INC".
+      *    最終受診日取得
+           COPY    "CPORCSLASTYMD.INC".
       *
       *    クライアント保存ＤＢ制御サブ
            COPY    "CPORCSFILESV.INC".
@@ -337,6 +338,9 @@
                                        WRK-AREA
                                        CNT-AREA
       *
+      *    ＤＢオープン
+           PERFORM 120-DBOPEN-SEC
+      *
            MOVE    SPACE               TO  SPA-AREA
            INITIALIZE                      SPA-AREA
       *
@@ -356,9 +360,21 @@
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
            MOVE    WRK-PARA-TERMID     TO  SPA-TERMID
            MOVE    WRK-PARA-STAFFCD    TO  SPA-STAFFCD
+           MOVE    WRK-PARA-SYSYMD     TO  SPA-SYSYMD
       *
-      *    ＤＢオープン
-           PERFORM 120-DBOPEN-SEC
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    "1001"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    SPA-SYSYMD          TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC        TO  SYS-1001-REC
+           DISPLAY "SYS-1001-BEDSU[" SYS-1001-BEDSU "]"
+           IF    ( SYS-1001-BEDSU  >   ZERO )
+               MOVE    1               TO  SPA-BEDFLG
+           END-IF
       *
            CALL    "ORCSENCODING"          USING
                                            MCPAREA
@@ -670,32 +686,36 @@
            MOVE    WRK-AGE-Z       TO  CSV-AGENUM
            MOVE    WRK-AGE-MEI     TO  CSV-AGETANI
       *
-           MOVE    WRK-PARA-HOSPNUM    TO  QSUB03-HOSPNUM
-           MOVE    PTINF-PTID    TO  QSUB03-PTID
-           MOVE    WRK-PARA-SYSYMD     TO  QSUB03-KJNYMD
-           CALL    "ORCGQSUB03"        USING QSUB03-LNK
-                                             SPA-AREA
-           MOVE    QSUB03-HKNCOMBIMEI  TO  CSV-HKN
+           INITIALIZE                  ORCSLASTYMDAREA
+           MOVE    PTINF-PTID      TO  ORCSLASTYMD-PTID
+           CALL    "ORCSLASTYMD"       USING
+                                       ORCSLASTYMDAREA
+                                       SPA-AREA
+           MOVE    ORCSLASTYMD-HKNCOMBI-MEI
+                                   TO  CSV-HKN
       *
       *
       *    電話番号
            MOVE    PTINF-HOME-TEL1
                                        TO  CSV-TEL
       *    病棟番号
-           MOVE    QSUB03-BRMNUM (1:2) TO  CSV-BTUNUM
+           MOVE    ORCSLASTYMD-BRMNUM (1:2) TO  CSV-BTUNUM
       *
       *    病室番号
-           MOVE    QSUB03-BRMNUM (4:)  TO  CSV-BRMNUM
+           MOVE    ORCSLASTYMD-BRMNUM (4:)  TO  CSV-BRMNUM
       *
       *    最終受診日
-           IF    ( QSUB03-LASTYMD      =   SPACE )
+           IF    ( ORCSLASTYMD-LASTYMD      =   SPACE )
                MOVE    SPACE           TO  CSV-LASTYMD
            ELSE
-               MOVE    QSUB03-LASTYMD (1:4)    TO  CSV-LASTYMD (1:4)
+               MOVE    ORCSLASTYMD-LASTYMD (1:4)
+                                               TO  CSV-LASTYMD (1:4)
                MOVE    "/"                     TO  CSV-LASTYMD (5:1)
-               MOVE    QSUB03-LASTYMD (5:2)    TO  CSV-LASTYMD (6:2)
+               MOVE    ORCSLASTYMD-LASTYMD (5:2)
+                                               TO  CSV-LASTYMD (6:2)
                MOVE    "/"                     TO  CSV-LASTYMD (8:1)
-               MOVE    QSUB03-LASTYMD (7:2)    TO  CSV-LASTYMD (9:2)
+               MOVE    ORCSLASTYMD-LASTYMD (7:2)
+                                               TO  CSV-LASTYMD (9:2)
            END-IF
       *
            MOVE    PTINF-HOME-POST
@@ -763,24 +783,26 @@
            MOVE    WRK-AGE-Z       TO  HC28-AGENUM (CNT-LINE)
            MOVE    WRK-AGE-MEI     TO  HC28-AGETANI(CNT-LINE)
       *
-           MOVE    WRK-PARA-HOSPNUM    TO  QSUB03-HOSPNUM
-           MOVE    PTINF-PTID    TO  QSUB03-PTID
-           MOVE    WRK-PARA-SYSYMD     TO  QSUB03-KJNYMD
-           CALL    "ORCGQSUB03"        USING QSUB03-LNK
-                                             SPA-AREA
-           MOVE    QSUB03-HKNCOMBIMEI  TO  HC28-HKN (CNT-LINE)
+           INITIALIZE                  ORCSLASTYMDAREA
+           MOVE    PTINF-PTID      TO  ORCSLASTYMD-PTID
+           CALL    "ORCSLASTYMD"       USING
+                                       ORCSLASTYMDAREA
+                                       SPA-AREA
+           MOVE    ORCSLASTYMD-HKNCOMBI-MEI
+                                   TO  HC28-HKN (CNT-LINE)
       *
       *    電話番号
            MOVE    PTINF-HOME-TEL1
                                        TO  HC28-TEL (CNT-LINE)
       *    最終受診日
-           IF    ( QSUB03-BRMNUM       NOT =   SPACE )
-               MOVE    QSUB03-BRMNUM   TO  HC28-LASTYMD
+           IF    ( ORCSLASTYMD-BRMNUM  NOT =   SPACE )
+               MOVE    ORCSLASTYMD-BRMNUM
+                                       TO  HC28-LASTYMD
                                                     (CNT-LINE)
                                                     (2:)
            ELSE
-               MOVE    QSUB03-LASTYMD  TO  WRK-SYMD
-               IF    ( QSUB03-LASTYMD  NOT =   SPACE )
+               MOVE    ORCSLASTYMD-LASTYMD  TO  WRK-SYMD
+               IF    ( ORCSLASTYMD-LASTYMD  NOT =   SPACE )
                    PERFORM 800-SEIWA-HEN-SEC
                    MOVE    WRK-HENYMDG1    TO  HC28-LASTYMD
                                                     (CNT-LINE)
@@ -1173,6 +1195,32 @@
       *
            .
        900-JOB-STEP-END-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理マスタ検索処理(KEY10)
+      *****************************************************************
+       900-SYSKANRI-KEY10-SEL-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYSKANRI
+      *
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI
+               INITIALIZE                  SYSKANRI-REC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SYSKANRI-KEY10-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ　接続処理
