@@ -90,6 +90,8 @@
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
       *
       *  04.07.01    NACL-門脇    11/09/07  労災請求書作成対応
+      *  04.07.02    NACL-藤原    13/03/25  リアルタイムプレビュー時は
+      *                                     テスト患者にする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -760,6 +762,10 @@ grpsys     MOVE    RECE40-HOSPNUM       TO  SPTID-HOSPNUM
 grpsys     MOVE    RECE40-HOSPNUM       TO      PTINF-HOSPNUM
            MOVE    RECE40-PTID          TO      PTINF-PTID
            PERFORM 800-PTINF-READ-SEC
+      *    リアルタイムプレビュー時はテスト患者にする
+           IF      WRK-PARA-SHELLID     =   "RECEPTX"
+               MOVE    "1"                  TO  PTINF-TSTPTNUMKBN
+           END-IF
            MOVE   PTINF-KANANAME    TO  RECE41-KANANAME
            MOVE   PTINF-NAME        TO  RECE41-NAME
            MOVE   PTINF-SEX         TO  RECE41-SEX
