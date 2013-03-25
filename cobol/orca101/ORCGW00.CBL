@@ -105,9 +105,6 @@
       *    入力項目名
            03  WRK-MCP-WIDGET      PIC X(64).
       *
-           03  WRK-ITEMPATH        PIC X(64).
-           03  WRK-VALUEPATH       PIC X(64).
-      *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
            03  WRK-HENYMD.
@@ -553,8 +550,13 @@
                MOVE    IDX             TO  SPA-GMN-LIST-NO(IDX)
                MOVE    SYS-ITEM-KANRICD
                                        TO  SPA-GMN-LIST-KANRICD(IDX)
-               MOVE    SYS-ITEM-ITEMNAME
-                                       TO  SPA-GMN-LIST-NAME(IDX)
+      *
+               STRING  SYS-ITEM-KANRICD    DELIMITED BY SIZE
+                       " "                 DELIMITED BY SIZE
+                       SYS-ITEM-ITEMNAME   DELIMITED BY SPACE
+                                   INTO    SPA-GMN-LIST-NAME(IDX)
+               END-STRING
+      *
                MOVE    SYS-ITEM-YUKOSTYMD
                                        TO  SPA-GMN-LIST-YUKOSTYMD(IDX)
                MOVE    SYS-ITEM-YUKOEDYMD
