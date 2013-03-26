@@ -1,0 +1,40 @@
+tbl_syskanri_combo	{
+	KANRICD		char(4);
+	KBNCD		varchar(8);
+	ITEMCD		number(5,0);
+	VALUE		char(2);
+	YUKOSTYMD	char(8);
+	YUKOEDYMD	char(8);
+	VALUENAME	varchar(100);
+	UPYMD		char(8);
+};
+
+primary	{
+	KANRICD,KBNCD,ITEMCD,VALUE,YUKOSTYMD,YUKOEDYMD;
+};
+
+path	key1		{ 	
+	DBSELECT	{
+		DECLARE tbl_syskanri_combo_key1_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syskanri_combo
+		WHERE 	KANRICD    =   :KANRICD
+		AND	KBNCD      =   :KBNCD
+		AND	ITEMCD     =   :ITEMCD
+		AND	VALUE      =   :VALUE
+		;
+	};
+};
+
+path	key2		{ 	
+	DBSELECT	{
+		DECLARE tbl_syskanri_combo_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syskanri_combo
+		WHERE 	KANRICD    =   :KANRICD
+		AND	KBNCD      =   :KBNCD
+		AND	ITEMCD     =   :ITEMCD
+			ORDER BY VALUE
+		;
+	};
+};

@@ -6,7 +6,7 @@ W00	{
 			rowattr	int;
 			item	{
 				value0	varchar(2);
-				value1	varchar(30);
+				value1	varchar(40);
 				value2	varchar(40);
 				value3	varchar(8);
 				value4	varchar(8);
@@ -26,7 +26,7 @@ W00	{
 			value	number(5);
 		};
 		NAME	{
-			value	varchar(30);
+			value	varchar(40);
 		};
 		YUKOSTYMD	{
 			value	varchar(8);
