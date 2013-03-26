@@ -16,6 +16,8 @@
       * 113-8621, Japan.
       ********************************************************************
         02  W00.
+              03  W00-B03-STATE        PIC S9(9)   BINARY.
+              03  W00-B12-STATE        PIC S9(9)   BINARY.
               03  W00-LIST.
                   05  W00-LIST-COUNT       PIC S9(9)   BINARY.
                   05  W00-LIST-ROW         PIC S9(9)   BINARY.

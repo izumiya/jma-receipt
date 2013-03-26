@@ -1,5 +1,11 @@
 W00	{
 	fixed1	{
+		B03	{
+			state	int;
+		};
+		B12	{
+			state	int;
+		};
 		LIST	{
 			count	int;
 			row	int;

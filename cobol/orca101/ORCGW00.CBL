@@ -935,6 +935,16 @@
            END-PERFORM
            MOVE    SPA-GMN-ATAI-MAX    TO  W00-ATAI-COUNT
       *
+           MOVE    WIDGET-NORMAL       TO  W00-B03-STATE
+           MOVE    WIDGET-NORMAL       TO  W00-B12-STATE
+      *
+           IF    ( SPA-NAI-KANRICD     =   SPACE ) OR
+                 ( SPA-GMN-SELNUM      =   ZERO )  OR
+                 ( SPA-GMN-SELNUM      >   SPA-GMN-LIST-MAX )
+               MOVE    WIDGET-INSENSITIVE  TO  W00-B03-STATE
+               MOVE    WIDGET-INSENSITIVE  TO  W00-B12-STATE
+           END-IF
+      *
            PERFORM 5001-MAPCUR-SEC
       *
            .
