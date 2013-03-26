@@ -89,6 +89,7 @@
            03  FLG-MADOKU          PIC 9(01).
            03  FLG-SEIBETU         PIC 9(01).
            03  FLG-JIKASAN         PIC 9(01).
+           03  FLG-JIKASAN2        PIC 9(01).
       *
            03  FLG-ADD             PIC 9(01).
       *
@@ -4260,6 +4261,7 @@
            MOVE    ZERO                TO  FLG-SINSATU
            MOVE    ZERO                TO  FLG-SINSATU-ARI
            MOVE    ZERO                TO  FLG-JIKASAN
+           MOVE    ZERO                TO  FLG-JIKASAN2
            MOVE    ZERO                TO  FLG-KENSA
            MOVE    ZERO                TO  IDX-JIKAN
       *
@@ -4321,10 +4323,18 @@
                IF     (SPA-SRYYMD          =   SPA-SYSYMD)  AND
                       (LNK-ORCSC-SYORIFLG  =   ZERO      )  AND
                       (SPA-GAI-JIKANKBN    NOT =   ZERO  )
-                   MOVE    SPA-GAI-JIKANKBN    TO  FLG-JIKASAN
+      *            夜間・早朝は警告なし
+                   IF      SPA-GAI-JIKANKBN    NOT =   8
+                       MOVE    SPA-GAI-JIKANKBN    TO  FLG-JIKASAN2
+                   END-IF
                END-IF
            END-IF
-           IF     (FLG-JIKASAN     NOT =   ZERO )
+           IF     (FLG-JIKASAN         =   ZERO
+                                       OR  6    )
+             AND  (FLG-JIKASAN2        =   ZERO )
+      *        夜間・早朝は警告なし
+               CONTINUE
+           ELSE
                MOVE    "K160"              TO  SPA-ERRCD
            END-IF
            MOVE    1                   TO  SPA-KENJIKAN-CHK

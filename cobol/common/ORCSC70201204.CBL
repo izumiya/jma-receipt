@@ -3705,7 +3705,8 @@
                    MOVE    SPA-GAI-JIKANKBN    TO  FLG-JIKASAN
                END-IF
            END-IF
-           IF     (FLG-JIKASAN         =   ZERO )
+           IF     (FLG-JIKASAN         =   ZERO
+                                       OR  8    )
               AND (FLG-JIKASAN2        =   ZERO
                                        OR  6    )
       *        夜間・早朝加算入力時は、なし
