@@ -412,8 +412,11 @@
            EVALUATE    MCP-EVENT       ALSO    MCP-WIDGET
       *        Ìá¤ë
                WHEN    "CLICKED"       ALSO    "B01"
-                   MOVE   "CHANGE"     TO  MCP-PUTTYPE
-                   PERFORM 210-BACK
+                   IF      SPA-NAI-KANRICD     =   SPACE
+                       PERFORM 210-BACK
+                   ELSE
+                       PERFORM 310-SPASET-SEC
+                   END-IF
       *        ºï½ü
                WHEN    "CLICKED"       ALSO    "B03"
                    MOVE    "1002"      TO  SPA-WIDCD
@@ -474,6 +477,7 @@
            INITIALIZE                  SPA-W01KYOUTU
       *
            MOVE    SPA-SAKIPG      TO  MCP-WINDOW
+           MOVE   "CHANGE"         TO  MCP-PUTTYPE
       *
            PERFORM 900-PUT-WINDOW
       *
@@ -523,7 +527,6 @@
                IF      SPA-NAI-KANRICD     =   SPACE
                    MOVE    SPA-GMN-LIST-KANRICD(SPA-GMN-SELNUM)
                                            TO  SPA-NAI-KANRICD
-                   MOVE    ZERO            TO  SPA-GMN-SELNUM
                    PERFORM 400-LISTSET-SEC
                ELSE
                    PERFORM 400-GMNSET-SEC
@@ -538,6 +541,7 @@
       *****************************************************************
        400-LISTSET-SEC             SECTION.
       *
+           MOVE    ZERO            TO  SPA-GMN-SELNUM
            INITIALIZE                  SPA-GMN-LIST-G
            MOVE    ZERO            TO  SPA-GMN-LIST-MAX
       *
@@ -815,7 +819,7 @@
                GO  TO  490-KOUSHIN-EXT
            END-IF
       *
-           PERFORM 310-SPASET-SEC
+           PERFORM 400-LISTSET-SEC
       *
            .
        490-KOUSHIN-EXT.
@@ -855,7 +859,7 @@
                END-IF
            END-IF
       *
-           PERFORM 310-SPASET-SEC
+           PERFORM 400-LISTSET-SEC
       *
            .
        490-SAKUJYO-EXT.
