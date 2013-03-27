@@ -35,6 +35,7 @@
       *  04.06.00    NACL-多々納  12/04/04  薬品名称を４０文字までとする
       *  04.06.00    NACL-多々納  12/08/17  薬価基準コード変換対応
       *  04.06.00    NACL-多々納  12/09/27  医師コード等編集対応
+      *  04.07.00    NACL-多々納  13/03/27  一般名例外テーブル期間対応
       *****************************************************************
       *
       *
@@ -152,6 +153,8 @@
                05  WRK-NAME-2          PIC X(20).
       *H24.8
            03  WRK-YAKKAKJNCD          PIC X(12).
+           03  WRK-GENERIC-STYMD       PIC X(08).
+           03  WRK-GENERIC-EDYMD       PIC X(08).
       *
       *    ＱＲテーブル
        01  TBL-QRCSV-AREA.
@@ -1052,13 +1055,29 @@
            SET     TBL-GEN             TO  1
            SEARCH      TBL-GENERIC-OCC     VARYING   TBL-GEN
                    AT  END
-                       MOVE    SPACE               TO  WRK-YAKKAKJNCD
+                       MOVE    SPACE            TO  WRK-YAKKAKJNCD
+                       MOVE    SPACE            TO  WRK-GENERIC-STYMD
+                       MOVE    SPACE            TO  WRK-GENERIC-EDYMD
                    WHEN    ORCSQRCSV-YAKKAKJNCD(IDX IDX2)
                                                =   TBL-YAKKAKJNCD
                                                            (TBL-GEN)
                        MOVE    TBL-GENERIC-CODE (TBL-GEN)
                                                 TO  WRK-YAKKAKJNCD
+                       MOVE    TBL-GENERIC-STYMD (TBL-GEN)
+                                                TO  WRK-GENERIC-STYMD
+                       MOVE    TBL-GENERIC-EDYMD (TBL-GEN)
+                                                TO  WRK-GENERIC-EDYMD
            END-SEARCH
+      *H25.4
+           IF      WRK-YAKKAKJNCD  NOT =   SPACE
+      *        有効期間判定
+               IF    (SPA-SRYYMD           >=  WRK-GENERIC-STYMD)
+                 AND (SPA-SRYYMD           <=  WRK-GENERIC-EDYMD)
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE           TO  WRK-YAKKAKJNCD
+               END-IF
+           END-IF
       *
            IF      WRK-YAKKAKJNCD      =   SPACE
                STRING  ORCSQRCSV-YAKKAKJNCD(IDX IDX2)(1:9)
