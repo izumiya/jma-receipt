@@ -4290,45 +4290,58 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                入院科
                        MOVE    PTNYUINRRK-NYUINKA  TO  SPA-NAI-NYUINKA
                        MOVE    1                   TO  FLG-OK
-      *                入院期間設定
-                       IF      PTNYUINRRK-TENSTUYMD(1:6)
-                                                   =   SPA-NAI-SRYYM
-                           MOVE    PTNYUINRRK-TENSTUYMD(7:2)
-                                                       TO  WRK-EDDD
-                       ELSE
-                           MOVE    31                  TO  WRK-EDDD
-                       END-IF
-                       IF      PTNYUINRRK-TENNYUYMD(1:6)
-                                                   =   SPA-NAI-SRYYM
-                           MOVE    PTNYUINRRK-TENNYUYMD(7:2)
-                                                        TO  WRK-STDD
-                       ELSE
-                           MOVE    1                   TO  WRK-STDD
-                       END-IF
+      ****             入院期間設定
+      *                IF      PTNYUINRRK-TENSTUYMD(1:6)
+      *                                            =   SPA-NAI-SRYYM
+      *                    MOVE    PTNYUINRRK-TENSTUYMD(7:2)
+      *                                                TO  WRK-EDDD
+      *                ELSE
+      *                    MOVE    31                  TO  WRK-EDDD
+      *                END-IF
+      *                IF      PTNYUINRRK-TENNYUYMD(1:6)
+      *                                            =   SPA-NAI-SRYYM
+      *                    MOVE    PTNYUINRRK-TENNYUYMD(7:2)
+      *                                                 TO  WRK-STDD
+      *                ELSE
+      *                    MOVE    1                   TO  WRK-STDD
+      *                END-IF
       *                入院中としない
-                       PERFORM VARYING IDX-D   FROM    WRK-STDD BY  1
-                               UNTIL   IDX-D   >   WRK-EDDD
-                           IF    ((PTNYUINRRK-TENNYUYMD(1:6)
-                                                   =   SPA-NAI-SRYYM )
-                              AND (IDX-D           =   WRK-STDD ))
-                           OR    ((PTNYUINRRK-TENSTUYMD(1:6)
-                                                   =   SPA-NAI-SRYYM )
-                              AND (IDX-D           =   WRK-EDDD ))
+      *                PERFORM VARYING IDX-D   FROM    WRK-STDD BY  1
+      *                        UNTIL   IDX-D   >   WRK-EDDD
+      *                    IF    ((PTNYUINRRK-TENNYUYMD(1:6)
+      *                                            =   SPA-NAI-SRYYM )
+      *                       AND (IDX-D           =   WRK-STDD ))
+      *                    OR    ((PTNYUINRRK-TENSTUYMD(1:6)
+      *                                            =   SPA-NAI-SRYYM )
+      *                       AND (IDX-D           =   WRK-EDDD ))
       *                        入院日・退院日
-                               IF      SPA-NAI-NYUIN (IDX-D) =   ZERO
-                                   MOVE    2           TO  SPA-NAI-NYUIN
-                                                               (IDX-D)
-                               ELSE
+      *                        IF      SPA-NAI-NYUIN (IDX-D) =   ZERO
+      *                            MOVE    2           TO  SPA-NAI-NYUIN
+      *                                                        (IDX-D)
+      *                        ELSE
       *                        同日再入院日
-                                   MOVE    3           TO  SPA-NAI-NYUIN
-                                                               (IDX-D)
-                               END-IF
-                           ELSE
-                               MOVE    1           TO  SPA-NAI-NYUIN
-                                                               (IDX-D)
-                           END-IF
-                       END-PERFORM
+      *                            MOVE    3           TO  SPA-NAI-NYUIN
+      *                                                        (IDX-D)
+      *                        END-IF
+      *                    ELSE
+      *                        MOVE    1           TO  SPA-NAI-NYUIN
+      *                                                        (IDX-D)
+      *                    END-IF
+      **********       END-PERFORM
                    END-IF
+      *H25.4
+      *            退院日
+                   IF      (PTNYUINRRK-TAIINYMD    =   SPACE )  OR
+                           (PTNYUINRRK-TAIINYMD(1:6)
+                                               >=  SPA-NAI-SRYYM )
+      *                入院日＝転入日のデータを対象
+                       IF      PTNYUINRRK-NYUINYMD
+                                               =  PTNYUINRRK-TENNYUYMD
+      *                    入院期間設定
+                           PERFORM 4101012-NYUINKIKAN-SEC
+                       END-IF
+                   END-IF
+      *
       *            最終退院日
                    IF     (WRK-TAIINYMD        =   SPACE   )  OR
                           (WRK-TAIINYMD        <   PTNYUINRRK-TAIINYMD)
@@ -4375,6 +4388,52 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        410101-NYUINRRK-CHK-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    入院期間設定処理
+      *****************************************************************
+       4101012-NYUINKIKAN-SEC           SECTION.
+      *
+      *    入院日
+           IF      PTNYUINRRK-NYUINYMD(1:6)
+                                       =   SPA-NAI-SRYYM
+               MOVE    PTNYUINRRK-TENNYUYMD(7:2)
+                                           TO  WRK-STDD
+           ELSE
+               MOVE    1                   TO  WRK-STDD
+           END-IF
+      *    退院日
+           IF      PTNYUINRRK-TAIINYMD(1:6)
+                                       =   SPA-NAI-SRYYM
+               MOVE    PTNYUINRRK-TAIINYMD(7:2)
+                                           TO  WRK-EDDD
+           ELSE
+               MOVE    31                  TO  WRK-EDDD
+           END-IF
+      *    入院中としない
+           PERFORM VARYING     IDX-D   FROM    WRK-STDD BY  1
+                   UNTIL       IDX-D   >   WRK-EDDD
+               IF    ((PTNYUINRRK-NYUINYMD(1:6)
+                                           =   SPA-NAI-SRYYM )
+                  AND (IDX-D               =   WRK-STDD      ))
+               OR    ((PTNYUINRRK-TAIINYMD(1:6)
+                                           =   SPA-NAI-SRYYM )
+                  AND (IDX-D               =   WRK-EDDD      ))
+      *            入院日・退院日
+                   IF      SPA-NAI-NYUIN (IDX-D) =   ZERO
+                       MOVE    2           TO  SPA-NAI-NYUIN (IDX-D)
+                   ELSE
+      *            同日再入院日
+                        MOVE    3          TO  SPA-NAI-NYUIN (IDX-D)
+                   END-IF
+               ELSE
+                   MOVE    1           TO  SPA-NAI-NYUIN (IDX-D)
+               END-IF
+           END-PERFORM
+           .
+       4101012-NYUINKIKAN-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    診療科入力処理
