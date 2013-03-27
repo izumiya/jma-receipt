@@ -71,6 +71,7 @@
       *  04.05.01    NACL-門脇    10/01/18  治験対応
       *  04.05.02    NACL-門脇    11/11/09  同日再入院食事対応
       *  04.05.03    NACL-門脇    12/09/18  改正対応（外泊区分８，９の対応）
+      *  04.06.01    NACL-門脇    13/03/27  エラー時終了処理対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -163,12 +164,23 @@
            03  ERR-ERRMSG              PIC X(80).
            03  ERR-HEN-ERRMSG          PIC X(200).
       *
+       01  WRK-ERR-AREA.
+           03  WRK-RECEERR         PIC X(200).
+           03  WRK-ERRMSG          PIC X(300).
+           03  WRK-MCP-RC          PIC 9(9).
+           03  WRK-ERR-FILE-STS    PIC X(02).
+           03  WRK-ERR-FILE-MSG    PIC X(100).
+           03  WRK-ERR-FILE-MSG1   PIC X(17).
+           03  WRK-ERR-FLG         PIC 9(01).
+      *    エラーファイル名称領域 
+           COPY    "CPRECEDAT1.INC"
+                                   REPLACING  //RECEDAT1PARA//
+                                   BY         //WRK-ERR-FILE-NM//.
+      *
       *    一時領域
        01  WRK-AREA.
       *
            03  WRK-SYS-SRYYMD                          PIC X(08).
-      *
-           03  WRK-RECEERR                             PIC X(200).
       *
            03  WRK-STYMD                               PIC X(08).
            03  WRK-EDYMD                               PIC X(08).
@@ -1933,9 +1945,26 @@
                END-IF
            END-IF
       *                             
-           MOVE    1                   TO  FLG-ERR
+           MOVE    SPACE               TO  WRK-ERRMSG
+           STRING  "ORCR0600 "             DELIMITED  BY  SIZE
+                   WRK-RECEERR             DELIMITED  BY  SIZE
+                   LOW-VALUE               DELIMITED  BY  SIZE
+                                           INTO    WRK-ERRMSG
+           END-STRING
+           PERFORM 500-COBABORT-SEC
            .
        500-ERR-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    エラー時終了処理
+      *****************************************************************
+       500-COBABORT-SEC                SECTION.
+      *
+           CALL    "cobabort"          USING   WRK-ERRMSG
+      *
+           .
+       500-COBABORT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2466,8 +2495,30 @@
            IF      MCP-RC              =   ZERO
                CONTINUE
            ELSE
-               DISPLAY "SELECT ERR table=" MCP-TABLE
-                       " pathname="        MCP-PATHNAME
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    MCP-RC              TO  WRK-MCP-RC
+      *
+               STRING  "ＤＢ読み込みエラー　TABLE="
+                                           DELIMITED   BY  SIZE
+                       MCP-TABLE           DELIMITED   BY  SPACE
+                       " RC="              DELIMITED   BY  SIZE
+                       WRK-MCP-RC          DELIMITED   BY  SIZE
+                                           INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+      *
+               STRING  "ORCR0600 select err TABLE="
+                                           DELIMITED   BY  SIZE
+                       MCP-TABLE           DELIMITED   BY  SPACE
+                       " PATHNAME="        DELIMITED   BY  SIZE
+                       MCP-PATHNAME        DELIMITED   BY  SPACE
+                       " RC="              DELIMITED   BY  SIZE
+                       WRK-MCP-RC          DELIMITED   BY  SIZE
+                       LOW-VALUE           DELIMITED   BY  SIZE
+                                           INTO    WRK-ERRMSG
+               END-STRING
+               PERFORM 500-COBABORT-SEC
            END-IF
            .
        900-DBSELECT-EXT.
