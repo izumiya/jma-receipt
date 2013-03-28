@@ -364,6 +364,8 @@
       *                                     レセプト記載対応
       *  04.06.13    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
+      *  04.06.14    NACL-門脇    13/03/27  船員下船後（食事負担なし）の
+      *                                     生活療養標準負担額の記録をしない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6930,7 +6932,18 @@
                                            =   WRK-CONS-HYOJYUN-FUTAN1
                                            OR  WRK-CONS-HYOJYUN-FUTAN2
                                            OR  WRK-CONS-HYOJYUN-FUTAN3
-                                           OR  WRK-CONS-HYOJYUN-FUTAN4 )
+                                           OR  WRK-CONS-HYOJYUN-FUTAN4
+                                           OR  WRK-CONS-HYOJYUN-FUTAN5
+                                           OR  WRK-CONS-HYOJYUN-FUTAN6
+                                           OR  WRK-CONS-HYOJYUN-FUTAN7
+                                           OR  WRK-CONS-HYOJYUN-FUTAN8
+                                           OR  WRK-CONS-HYOJYUN-FUTAN9
+                                           OR  WRK-CONS-HYOJYUN-FUTAN10
+                                           OR  WRK-CONS-HYOJYUN-FUTAN11
+                                           OR  WRK-CONS-HYOJYUN-FUTAN12
+                                           OR  WRK-CONS-HYOJYUN-FUTAN13
+                                           OR  WRK-CONS-HYOJYUN-FUTAN14
+                                           OR  WRK-CONS-HYOJYUN-FUTAN15)
                                        CONTINUE
                                    ELSE
                                       IF    ( RECE62-HKNNUM (1:2)
@@ -6944,7 +6957,18 @@
                                            =   WRK-CONS-HYOJYUN-FUTAN1
                                            OR  WRK-CONS-HYOJYUN-FUTAN2
                                            OR  WRK-CONS-HYOJYUN-FUTAN3
-                                           OR  WRK-CONS-HYOJYUN-FUTAN4 )
+                                           OR  WRK-CONS-HYOJYUN-FUTAN4
+                                           OR  WRK-CONS-HYOJYUN-FUTAN5
+                                           OR  WRK-CONS-HYOJYUN-FUTAN6
+                                           OR  WRK-CONS-HYOJYUN-FUTAN7
+                                           OR  WRK-CONS-HYOJYUN-FUTAN8
+                                           OR  WRK-CONS-HYOJYUN-FUTAN9
+                                           OR  WRK-CONS-HYOJYUN-FUTAN10
+                                           OR  WRK-CONS-HYOJYUN-FUTAN11
+                                           OR  WRK-CONS-HYOJYUN-FUTAN12
+                                           OR  WRK-CONS-HYOJYUN-FUTAN13
+                                           OR  WRK-CONS-HYOJYUN-FUTAN14
+                                           OR  WRK-CONS-HYOJYUN-FUTAN15)
                                            CONTINUE
                                        ELSE
                                            MOVE    1   TO  FLG-PRT
