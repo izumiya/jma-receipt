@@ -594,6 +594,9 @@
       *  04.06.08    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.06.09    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.06.10    NACL-ÌçÏÆ    13/03/21  Á´¹ñ¸øÈñ¤¢¤ê¥Õ¥é¥°ÊÔ½¸½¤Àµ
+      *  04.06.11    NACL-ÌçÏÆ    13/03/27  Á¥°÷²¼Á¥¸å¡Ê¿©»öÉéÃ´¤Ê¤·¡Ë¤Î
+      *                                     À¸³èÎÅÍÜÉ¸½àÉéÃ´³Û¤Îµ­ºÜ¤ò¤·¤Ê¤¤
+      *                                     ¡ÊÅ¦Í×Íó¡Ë
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -9655,6 +9658,17 @@
                          END-IF
                        END-IF
       *
+                       IF  ((RECE62-HKNNUM       =   "002" ) AND
+                            (RECE62-HOJOKBN      =
+                             "1" OR "2" OR "3" OR "A" OR "B" OR
+                             "C" OR "D" OR "E" OR "F" OR "G" OR
+                             "H" OR "I"                    ))
+                       OR  ((RECE62-HKNNUM (1:2) =   "03"  ) AND
+                            (RECE62-HOJOKBN      =
+                             "2" OR "B" OR "E" OR "H"      ))
+                               MOVE    1     TO    FLG-SKJFTNNASI
+                       END-IF
+      *
                        IF ((RECE62-HKNNUMHC(IDX1)        =  SPACE) AND
                            (RECE62-KOHNUMHC(IDX1 1)  NOT =
                             "010" AND "038" AND "024" AND "079" AND
@@ -9663,6 +9677,11 @@
                            (RECE62-KOHNUMHC(IDX1 3)      =  SPACE) AND
                            (RECE62-KOHNUMHC(IDX1 4)      =  SPACE))
                        OR ( FLG-SKJFTNNASI               =    1   )
+                       OR ((RECE62-HKNNUMHC(IDX1)    NOT =  SPACE) AND
+                           (RECE62-SRYYM            >= "201101"  ) AND
+                           (RECE62-SRYYM            <= "201202"  ) AND
+                           (WK-GENGAKUKBN            =  3  OR  4 ) AND
+                           (FLG-SAIGAI-TAISYO            =  1    ))
                        OR ((RECE62-HKNNUMHC(IDX1)        =  SPACE) AND
                            (RECE62-KOHNUMHC(IDX1 1)  NOT =  SPACE) AND
                            (RECE62-KOHNUMHC(IDX1 2)      =  SPACE) AND

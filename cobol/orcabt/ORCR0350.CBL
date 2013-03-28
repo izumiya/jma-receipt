@@ -355,6 +355,8 @@
       *                                     修正
       *  04.06.12    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.13    NACL-門脇    13/03/27  船員下船後（食事負担なし）の
+      *                                     生活療養標準負担額の記録をしない
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-藤原    12/09/04  薬剤料減点対応
@@ -7064,7 +7066,18 @@
                                            =   WRK-CONS-HYOJYUN-FUTAN1
                                            OR  WRK-CONS-HYOJYUN-FUTAN2
                                            OR  WRK-CONS-HYOJYUN-FUTAN3
-                                           OR  WRK-CONS-HYOJYUN-FUTAN4 )
+                                           OR  WRK-CONS-HYOJYUN-FUTAN4
+                                           OR  WRK-CONS-HYOJYUN-FUTAN5
+                                           OR  WRK-CONS-HYOJYUN-FUTAN6
+                                           OR  WRK-CONS-HYOJYUN-FUTAN7
+                                           OR  WRK-CONS-HYOJYUN-FUTAN8
+                                           OR  WRK-CONS-HYOJYUN-FUTAN9
+                                           OR  WRK-CONS-HYOJYUN-FUTAN10
+                                           OR  WRK-CONS-HYOJYUN-FUTAN11
+                                           OR  WRK-CONS-HYOJYUN-FUTAN12
+                                           OR  WRK-CONS-HYOJYUN-FUTAN13
+                                           OR  WRK-CONS-HYOJYUN-FUTAN14
+                                           OR  WRK-CONS-HYOJYUN-FUTAN15)
                                        CONTINUE
                                    ELSE
                                       IF    ( RECE62-HKNNUM (1:2)
@@ -7078,7 +7091,18 @@
                                            =   WRK-CONS-HYOJYUN-FUTAN1
                                            OR  WRK-CONS-HYOJYUN-FUTAN2
                                            OR  WRK-CONS-HYOJYUN-FUTAN3
-                                           OR  WRK-CONS-HYOJYUN-FUTAN4 )
+                                           OR  WRK-CONS-HYOJYUN-FUTAN4
+                                           OR  WRK-CONS-HYOJYUN-FUTAN5
+                                           OR  WRK-CONS-HYOJYUN-FUTAN6
+                                           OR  WRK-CONS-HYOJYUN-FUTAN7
+                                           OR  WRK-CONS-HYOJYUN-FUTAN8
+                                           OR  WRK-CONS-HYOJYUN-FUTAN9
+                                           OR  WRK-CONS-HYOJYUN-FUTAN10
+                                           OR  WRK-CONS-HYOJYUN-FUTAN11
+                                           OR  WRK-CONS-HYOJYUN-FUTAN12
+                                           OR  WRK-CONS-HYOJYUN-FUTAN13
+                                           OR  WRK-CONS-HYOJYUN-FUTAN14
+                                           OR  WRK-CONS-HYOJYUN-FUTAN15)
                                            CONTINUE
                                        ELSE
                                            MOVE    1   TO  FLG-PRT
