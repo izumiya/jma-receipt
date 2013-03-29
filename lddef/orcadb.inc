@@ -178,4 +178,6 @@ db	{
         tbl_pt_hdist_day;
         tbl_syskanri_item;
         tbl_syskanri_value;
+        tbl_syskanri_combo;
+        tbl_passwd;
 };

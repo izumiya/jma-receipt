@@ -733,6 +733,7 @@ DB_files = \
 	tbl_syskanri_item.db \
 	tbl_syskanri_value.db \
 	tbl_syskanri_combo.db \
+        tbl_passwd.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

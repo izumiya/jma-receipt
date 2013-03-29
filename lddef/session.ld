@@ -14,6 +14,7 @@ data {
 
 db {
  tbl_lock;
+ tbl_passwd;
 };
 
 #include "orcadbh.inc"

@@ -28,34 +28,43 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *****************************************************************
+      *
        ENVIRONMENT         DIVISION.
        CONFIGURATION           SECTION.
+      *
        DATA                DIVISION.
+      *
        WORKING-STORAGE         SECTION.
+      *
+           COPY    "COMMON-SPA".
+      *
       *    フラグ領域
-      * 01  FLG-AREA.
-      *     03  FLG-END             PIC 9(01).
-      *     03  FLG-LOCK            PIC 9(01).
+       01  FLG-AREA.
+           03  FLG-END             PIC 9(01).
+           03  FLG-PASSWD          PIC 9(01).
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
-           COPY    "COMMON-SPA".
-      ***     COPY    "CPTBLLOCK.INC".
+      *
+      *    パスワード
+           COPY    "CPPASSWD.INC".
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
+      *
        LINKAGE                 SECTION.
            COPY    "MCPAREA".
            COPY    "ORCA-SPA".
            COPY    "LINKAREA".
+      *
        01  SCRAREA.
            COPY    "SESSION.INC".
-      ************************************************************************
+      *****************************************************************
        PROCEDURE           DIVISION    USING
            MCPAREA
            SPAAREA
            LINKAREA
            SCRAREA.
-      ************************************************************************
+      *****************************************************************
        000-MAIN                SECTION.
       *
            DISPLAY   "==== ORCGSESSTART"
@@ -71,17 +80,22 @@
        000-MAIN-EXT.
            EXIT    PROGRAM.
       ************************************************************************
-       010-GET                SECTION.
+       010-GET                     SECTION.
       *
            DISPLAY "010-GET start" 
-           MOVE LOW-VALUE TO BODY.
-           IF USER = "ormaster" AND PASSWORD = "ormaster"
-             DISPLAY "auth ok"
-             MOVE 200 TO HTTP-STATUS
+           MOVE    LOW-VALUE       TO  BODY.
+      *
+           PERFORM 900-PASSWD-READ-SEC
+      *
+           IF      FLG-PASSWD      =   ZERO
+      *     IF USER = "ormaster" AND PASSWORD = "ormaster"
+               DISPLAY "auth ok"
+               MOVE    200             TO  HTTP-STATUS
            ELSE
-             DISPLAY "auth ng"
-             MOVE 403 TO HTTP-STATUS
+               DISPLAY "auth ng"
+               MOVE    403             TO  HTTP-STATUS
            END-IF
+      *
            DISPLAY "user:" USER
            DISPLAY "password:" PASSWORD
            DISPLAY "session-type:" SESSION-TYPE
@@ -89,55 +103,66 @@
        010-GET-EXT.
            EXIT.
       ************************************************************************
-       020-ERROR                SECTION.
+       020-ERROR                   SECTION.
       *
            DISPLAY "020-ERROR start" 
-           MOVE 400 TO HTTP-STATUS
+           MOVE    400             TO  HTTP-STATUS
            . 
        020-ERROR-EXT.
            EXIT.
       *****************************************************************
-      *    排他制御削除処理
+      *    パスワード検索処理
       *****************************************************************
-      * 910-LOCK-DLT-SEC            SECTION.
+       900-PASSWD-READ-SEC         SECTION.
       *
-      *     INITIALIZE                  SPA-AREA
-      *     MOVE   "1"                  TO  SPA-NOCHK-HOSPNUM
-      *     MOVE    MCP-TERM            TO  LOCK-TERMID
-      *     MOVE    TBL-LOCK            TO  MCPDATA-REC
-      *     MOVE    "DBSELECT"          TO  MCP-FUNC
-      *     MOVE    "tbl_lock"          TO  MCP-TABLE
-      *     MOVE    "key4"              TO  MCP-PATHNAME
-      *     CALL "ORCDBMAIN" USING MCPAREA
-      *                            MCPDATA-REC
-      *                            SPA-AREA
-      *     IF      MCP-RC              =   ZERO
-      *         MOVE    "DBFETCH"       TO  MCP-FUNC
-      *         MOVE    "tbl_lock"      TO  MCP-TABLE
-      *         MOVE    "key4"          TO  MCP-PATHNAME
-      *         CALL "ORCDBMAIN" USING MCPAREA
-      *                                MCPDATA-REC
-      *                                SPA-AREA
-      *         DISPLAY "FETCH=" MCP-RC
-      *         IF  MCP-RC              =   ZERO
-      *           MOVE    "DBDELETE"      TO  MCP-FUNC
-      *           MOVE    "tbl_lock"      TO  MCP-TABLE
-      *           MOVE    "key"           TO  MCP-PATHNAME
-      *           CALL "ORCDBMAIN" USING  MCPAREA
-      *                                   MCPDATA-REC
-      *                                   SPA-AREA
-      *           DISPLAY "DELETE = " MCP-RC
-      *         END-IF
-      *     END-IF
+           INITIALIZE                  SPA-AREA
+           MOVE    01              TO  SPA-HOSPNUM
+           MOVE    ZERO            TO  FLG-PASSWD
       *
-      *     MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-      *     MOVE    "tbl_lock"          TO  MCP-TABLE
-      *     MOVE    "key4"              TO  MCP-PATHNAME
-      *     CALL "ORCDBMAIN" USING MCPAREA
-      *                            MCPDATA-REC
-      *                            SPA-AREA
+           INITIALIZE                  PASSWD-REC
+           MOVE    USER            TO  PASSWD-USERID
+           MOVE    PASSWD-REC     TO  MCPDATA-REC
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+           MOVE    "tbl_passwd"    TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+           IF      MCP-RC          =   ZERO
+               MOVE    "DBFETCH"       TO  MCP-FUNC
+               MOVE    "tbl_passwd"    TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING
+                                           MCPAREA
+                                           MCPDATA-REC
+                                           SPA-AREA
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  PASSWD-REC
+                   IF      PASSWD-PASSWORD     =   PASSWORD
+                       MOVE    ZERO            TO  FLG-PASSWD
+                   ELSE
+                       MOVE    1               TO  FLG-PASSWD
+                       INITIALIZE                  PASSWD-REC
+                   END-IF
+               ELSE
+                   MOVE    1               TO  FLG-PASSWD
+                   INITIALIZE                  PASSWD-REC
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-PASSWD
+               INITIALIZE                  PASSWD-REC
+           END-IF
       *
-      *     .
-      * 910-LOCK-DLT-EXT.
-      *     EXIT.
+           MOVE    "DBCLOSECURSOR" TO  MCP-FUNC
+           MOVE    "tbl_passwd"    TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       MCPDATA-REC
+                                       SPA-AREA
+      *
+           .
+       900-PASSWD-READ-EXT.
+           EXIT.
       *

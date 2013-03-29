@@ -1,0 +1,18 @@
+tbl_passwd	{
+	USERID		varchar(16);
+	PASSWORD	varchar(256);
+};
+
+primary	{
+	USERID;
+};
+
+path	key		{ 	
+	DBSELECT	{
+		DECLARE tbl_passwd_key_csr CURSOR FOR
+		SELECT *
+		FROM tbl_passwd
+		WHERE 	USERID     =   :USERID
+		;
+	};
+};
