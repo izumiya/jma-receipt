@@ -201,6 +201,8 @@
            03  WRK-GMN-SELNUM        PIC 9(02). 
       *
            03  WRK-MOTOPG            PIC X(08). 
+      *H25.4
+           03  WRK-HZN-MOTOPG          PIC X(08). 
       *    入力項目名
            03  WRK-MCP-WIDGET          PIC X(64).
       *
@@ -589,11 +591,14 @@
            MOVE    1                   TO  SPA-GMN-PAGE
       *
            MOVE    SPACE               TO  WRK-MOTOPG
+           MOVE    SPACE               TO  WRK-HZN-MOTOPG
       *    他のＬＤより
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU          TO  SPA-KYOUTU
       *
                MOVE    SPA-MOTOPG          TO  WRK-MOTOPG
+               MOVE    SPA-HZN-MOTOPG      TO  WRK-HZN-MOTOPG
+      *
       *        元の画面へ戻す
                IF      WRK-MOTOPG          =   "Y01"  OR  "U01"  OR
                                                "P97"
@@ -677,12 +682,20 @@
                    END-IF
                    IF      SPA-MOTOPG(1:3)     =   "K02"
                        MOVE    SPA-MOTOPG          TO  SPA-HZN-MOTOPG
+                   ELSE
+                       IF     WRK-HZN-MOTOPG (1:3)  =  "K02"
+                           MOVE    WRK-HZN-MOTOPG   TO  SPA-HZN-MOTOPG
+                       END-IF
                    END-IF
       *
                WHEN    OTHER
                    PERFORM 310-SPASET-SEC
                    IF      SPA-MOTOPG(1:3)     =   "K02"
                        MOVE    SPA-MOTOPG          TO  SPA-HZN-MOTOPG
+                   ELSE
+                       IF     WRK-HZN-MOTOPG (1:3)  =  "K02"
+                           MOVE    WRK-HZN-MOTOPG   TO  SPA-HZN-MOTOPG
+                       END-IF
                    END-IF
            END-EVALUATE
       *

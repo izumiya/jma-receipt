@@ -1629,6 +1629,9 @@
            MOVE    SPA-GMN-SEX         TO  SPA-SEX
            MOVE    SPA-GMN-BIRTHDAY    TO  SPA-BIRTHDAYW
            MOVE    SPA-NAI-BIRTHDAY    TO  SPA-BIRTHDAY
+      *    前回患者保存
+           MOVE    SPA-PTID            TO  SPA-LAST-PTID
+           MOVE    SPA-PTNUM           TO  SPA-LAST-PTNUM
       *
            MOVE    SPA-GMN-SRYYMD      TO  SPA-SRYYMDW
            MOVE    SPA-NAI-SRYYMD      TO  SPA-SRYYMD
