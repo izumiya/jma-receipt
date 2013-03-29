@@ -410,7 +410,6 @@ RECORD_files = \
 	MDAS.rec \
 	MLOG.rec \
 	MINF.rec \
-	sessionend.rec \
 	M80.rec \
 	M80ERR.rec \
 	M80ID1.rec \
@@ -476,6 +475,8 @@ RECORD_files = \
 	acsimulatev2.rec \
 	W36.rec \
 	W00.rec \
+	session_start.rec \
+	session_end.rec \
 
 DEF_files = \
 

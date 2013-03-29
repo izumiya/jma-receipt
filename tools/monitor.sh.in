@@ -147,7 +147,7 @@ then
     }
 fi
 if test "x"$Start_GLSERVER = "xtrue"; then
-    $GLSERVER -api -screen $SCREEN -record $RECORD -cache /tmp/cache/ &
+    $GLSERVER -api -auth api://localhost/session/session_start -screen $SCREEN -record $RECORD -cache /tmp/cache/ &
     glpid=$!
 fi
 

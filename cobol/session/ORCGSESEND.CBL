@@ -44,13 +44,11 @@
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
        LINKAGE                 SECTION.
-            COPY    "MCPAREA".
-            COPY    "ORCA-SPA".
-            COPY    "LINKAREA".
-        01  SCRAREA.
-            02  SCREENDATA.
-              03  ORCGSESEND.
-                04  DUMMY   PIC X(256).
+           COPY    "MCPAREA".
+           COPY    "ORCA-SPA".
+           COPY    "LINKAREA".
+       01  SCRAREA.
+           COPY    "SESSION.INC".
       ************************************************************************
        PROCEDURE           DIVISION    USING
            MCPAREA

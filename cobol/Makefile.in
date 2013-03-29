@@ -53,7 +53,8 @@ SUBDIRS = \
 	cutils \
 	api21 \
 	api01r \
-	api01rv2 
+	api01rv2 \
+	session
 
 BINDIRS = bin
 
