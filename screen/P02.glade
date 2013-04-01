@@ -2382,7 +2382,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>〜</label>
+            <label>?</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>
@@ -2902,7 +2902,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>〜</label>
+            <label>?</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>
@@ -3374,7 +3374,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>〜</label>
+            <label>?</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>
@@ -3392,7 +3392,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>〜</label>
+            <label>?</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>
@@ -4214,7 +4214,7 @@
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
             <editable>False</editable>
-            <text>回−割合</text>
+            <text>回?割合</text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
           </widget>
@@ -4229,7 +4229,7 @@
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
             <editable>False</editable>
-            <text>回−固定額</text>
+            <text>回?固定額</text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
           </widget>
@@ -4244,7 +4244,7 @@
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
             <editable>False</editable>
-            <text>回−上限額</text>
+            <text>回?上限額</text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
           </widget>
@@ -4259,7 +4259,7 @@
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
             <editable>False</editable>
-            <text>日−上限額</text>
+            <text>日?上限額</text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
           </widget>
@@ -4274,7 +4274,7 @@
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
             <editable>False</editable>
-            <text>日−上回数</text>
+            <text>日?上回数</text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
           </widget>
@@ -4289,7 +4289,7 @@
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
             <editable>False</editable>
-            <text>月−上限額</text>
+            <text>月?上限額</text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
           </widget>
@@ -4304,7 +4304,7 @@
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
             <editable>False</editable>
-            <text>月−上回数</text>
+            <text>月?上回数</text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
           </widget>
@@ -5761,19 +5761,19 @@
               <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
               <signal>
                 <name>select_row</name>
-                <handler>selection_changed</handler>
-                <data>SELECT</data>
-              </signal>
-              <signal>
-                <name>select_row</name>
                 <handler>clist_send_event</handler>
                 <data>SELECT</data>
                 <after>True</after>
               </signal>
               <signal>
+                <name>select_row</name>
+                <handler>selection_changed</handler>
+                <data>SELECT</data>
+              </signal>
+              <signal>
                 <name>unselect_row</name>
-                <handler>           </handler>
-                <data>  </data>
+                <handler>selection_changed</handler>
+                <data>SELECT</data>
               </signal>
               <widget>
                 <class>GtkLabel</class>
@@ -8492,7 +8492,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>〜</label>
+            <label>?</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
@@ -9732,7 +9732,7 @@
             <yalign>0.5</yalign>
             <xpad>0</xpad>
             <ypad>0</ypad>
-            <label>〜</label>
+            <label>?</label>
             <justify>GTK_JUSTIFY_CENTER</justify>
             <wrap>False</wrap>
           </widget>
