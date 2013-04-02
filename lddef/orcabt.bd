@@ -25,6 +25,7 @@ bind    "ORCVTINPUTCD"  	"OpenCOBOL";
 bind    "ORCVTSRYKARRK" 	"OpenCOBOL";
 bind    "ORCVTPTBYOMEI"		"OpenCOBOL";
 bind    "ORCVTUSERBYOMEI"	"OpenCOBOL";
+bind    "ORCVTRECEDEN"		"OpenCOBOL";
 
 bind	"ORCR0010"	"OpenCOBOL";
 bind	"ORCR0020"	"OpenCOBOL";
