@@ -77,6 +77,8 @@
            03  IDX-REN             PIC 9(04).
            03  IDX-JYU             PIC 9(04).
       *
+           03  YOHO-MAX            PIC 9(04).
+      *
       *    システム領域
        01  SYS-AREA.
            03  SYS-TIME            PIC 9(08).
@@ -447,20 +449,23 @@
                    MOVE    1                   TO  IDXY
                ELSE
                    IF     (WRK-YOHOU(IDXY)     NOT =   SPACE )
-                   AND    (IDXY2               =   ZERO      )
+      *************AND    (IDXY2               =   ZERO      )
                        MOVE    IDXY            TO  IDXY2
                    END-IF
                END-IF
            END-PERFORM
-      *H25.3
-      * 服用時点がなければ用法なしとする
-      *    IF     (WRK-YSRYCD              =   SPACE )
-      *       AND (IDXY2                   >   ZERO  )
-      *        MOVE    WRK-YOHOU(IDXY2)    TO  WRK-YSRYCD
-      *        MOVE    WRK-YOHOU-NAME(IDXY2)
-      *                                    TO  WRK-YSRYCD-NAME
-      *        MOVE    SPACE               TO  WRK-YOHOU(IDXY2)
-      **** END-IF
+      *H25.4
+      *    服用時点がなければ用法コードの１件目
+           IF     (WRK-YSRYCD              =   SPACE )
+              AND (IDXY2                   >   ZERO  )
+               MOVE    WRK-YOHOU(IDXY2)    TO  WRK-YSRYCD
+               MOVE    WRK-YOHOU-NAME(IDXY2)
+                                           TO  WRK-YSRYCD-NAME
+               MOVE    SPACE               TO  WRK-YOHOU(IDXY2)
+               MOVE    4                   TO  YOHO-MAX
+           ELSE
+               MOVE    5                   TO  YOHO-MAX
+           END-IF
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   IDX-S   )   OR
@@ -485,7 +490,7 @@
                MOVE    ZERO                TO  IDXY2
                PERFORM VARYING     IDXY    FROM    1   BY  1
                        UNTIL      (IDXY        >   10   )   OR
-                                  (IDXY2       >=  5    )
+                                  (IDXY2       >=  YOHO-MAX  )
                    IF      WRK-YOHOU(IDXY)     NOT =   SPACE
                        ADD     1                   TO  IDXY2
                        MOVE    WRK-YOHOU(IDXY)     TO  ORCHCN30-YOHOU
