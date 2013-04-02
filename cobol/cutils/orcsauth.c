@@ -5,19 +5,23 @@
     for OpenCOBOL 
     arg {
 	char command[8],
+	char id[2],
 	char password1[128],
 	char password2[128],
 	char rc[1]
     }
 *********************************************************************/
 
+#include <crypt.h>
+
 #include <sys/time.h>
 #include <string.h>
 #include <stdlib.h>
-#include <unistd.h>             /* crypt() */
 
 /*
  *	struct auth_ctx;
+ *		char command[8];		COMMAND:"passwd" or "auth"
+ *		char id[2];			ID:01:MD5
  *		char password1[STR_SIZE];	PASSWORD:plain text
  *		char password2[STR_SIZE];	PASSWORD:(crypt)
  *		char rc[1];			RETURN CODE
@@ -88,14 +92,14 @@ orcsauth (char *ctx)
 
 	if (!strncmp("passwd", command, strlen("passwd"))) {
 		if (!strncmp("01", id, 2)) {
-			strcpy(passwd2, (char *)crypt(passwd1, AuthMakeSalt()));
+			strcpy(passwd2, crypt(passwd1, AuthMakeSalt()));
 			memcpy(CTX(ctx, OFFSET_PASSWORD2), passwd2, strlen(passwd2));
 		} else {
 			memset(CTX(ctx, OFFSET_RET_CODE), RET_ERROR, SIZE_RET_CODE);
 		}
 	} else if (!strncmp("auth", command, strlen("auth"))) {
 		if (!strncmp("01", id, 2)) {
-			if (strcmp(passwd2, (char *)crypt(passwd1, passwd2)) != 0) {
+			if (strcmp(passwd2, crypt(passwd1, passwd2)) != 0) {
 				memset(CTX(ctx, OFFSET_RET_CODE), RET_ERROR, SIZE_RET_CODE);
 			}
 		} else {
