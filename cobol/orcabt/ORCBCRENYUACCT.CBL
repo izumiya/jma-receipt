@@ -570,6 +570,8 @@
                                            TO  SPA-SYUKA-MODE
                        MOVE   SYS-2009-SYUKA-SELECT
                                            TO  SPA-SYUKA-SELECT
+                   ELSE
+                       MOVE   "0"          TO  SPA-SYUKA-KBN
                    END-IF
                END-IF
            END-IF
