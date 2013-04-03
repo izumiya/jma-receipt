@@ -336,6 +336,12 @@ W06	{
 		USERID	{
 			value	varchar(16);
 		};
+		PASSWORD1	{
+			value	varchar(16);
+		};
+		PASSWORD2	{
+			value	varchar(16);
+		};
 		KANANAME	{
 			value	varchar(80);
 		};

@@ -187,6 +187,10 @@
                 04  W06-VALUE   PIC X(10).
               03  W06-USERID.
                 04  W06-VALUE   PIC X(16).
+              03  W06-PASSWORD1.
+                04  W06-VALUE   PIC X(16).
+              03  W06-PASSWORD2.
+                04  W06-VALUE   PIC X(16).
               03  W06-KANANAME.
                 04  W06-VALUE   PIC X(80).
               03  W06-NAME.

@@ -82,13 +82,14 @@
       *
            MOVE    LOW-VALUE       TO  BODY.
       *
+           PERFORM 900-PASSWD-READ-SEC
+      *
            IF      FLG-PASSWD      =   ZERO
                INITIALIZE                  ORCSAUTHAREA
                MOVE    "auth"          TO  AUTH-COMMAND
                MOVE    1               TO  AUTH-ID
                MOVE    PASSWORD        TO  AUTH-PASSWORD1
-               MOVE    "$1$nzI/G/JS$l3N5jr4FZ0cX3hXtkKrYf/"
-                                       TO  AUTH-PASSWORD2
+               MOVE    PASSWD-PASSWORD TO  AUTH-PASSWORD2
                CALL    "orcsauth"          USING
                                            ORCSAUTHAREA
                IF      AUTH-RC         =   ZERO
@@ -138,12 +139,7 @@
                                            SPA-AREA
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC     TO  PASSWD-REC
-                   IF      PASSWD-PASSWORD     =   PASSWORD
-                       MOVE    ZERO            TO  FLG-PASSWD
-                   ELSE
-                       MOVE    1               TO  FLG-PASSWD
-                       INITIALIZE                  PASSWD-REC
-                   END-IF
+                   MOVE    ZERO            TO  FLG-PASSWD
                ELSE
                    MOVE    1               TO  FLG-PASSWD
                    INITIALIZE                  PASSWD-REC
