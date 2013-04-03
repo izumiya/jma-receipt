@@ -1,4 +1,4 @@
-      *******************************************************************
+      *****************************************************************
       * Project code name "ORCA"
       * 日医標準レセプトソフト（JMA standard receipt software）
       * Copyright(C) 2002 JMA (Japan Medical Association)
@@ -14,7 +14,7 @@
       * this licence along with this program. If not, stop using this
       * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
       * 113-8621, Japan.
-      ********************************************************************
+      *****************************************************************
        IDENTIFICATION      DIVISION.
        PROGRAM-ID.         ORCGSESSTART.
       *****************************************************************
@@ -46,6 +46,7 @@
       *    ファイルレイアウト
       *****************************************************************
       *
+           COPY    "CPORCSAUTH.INC".
       *    パスワード
            COPY    "CPPASSWD.INC".
       *    ＤＢ検索
@@ -65,47 +66,45 @@
            LINKAREA
            SCRAREA.
       *****************************************************************
-       000-MAIN                SECTION.
+       000-MAIN                    SECTION.
       *
-           DISPLAY   "==== ORCGSESSTART"
-           DISPLAY  MCP-STATUS
-           DISPLAY  HTTP-METHOD
-           EVALUATE    HTTP-METHOD 
-             WHEN     'GET'
-               PERFORM 010-GET
-             WHEN     ANY
-               PERFORM 020-ERROR
+           EVALUATE    HTTP-METHOD
+               WHEN    'GET'
+                   PERFORM 010-GET
+               WHEN    ANY
+                   PERFORM 020-ERROR
            END-EVALUATE
            .
        000-MAIN-EXT.
            EXIT    PROGRAM.
-      ************************************************************************
+      *****************************************************************
        010-GET                     SECTION.
       *
-           DISPLAY "010-GET start" 
            MOVE    LOW-VALUE       TO  BODY.
       *
-           PERFORM 900-PASSWD-READ-SEC
-      *
            IF      FLG-PASSWD      =   ZERO
-      *     IF USER = "ormaster" AND PASSWORD = "ormaster"
-               DISPLAY "auth ok"
-               MOVE    200             TO  HTTP-STATUS
+               INITIALIZE                  ORCSAUTHAREA
+               MOVE    "auth"          TO  AUTH-COMMAND
+               MOVE    1               TO  AUTH-ID
+               MOVE    PASSWORD        TO  AUTH-PASSWORD1
+               MOVE    "$1$nzI/G/JS$l3N5jr4FZ0cX3hXtkKrYf/"
+                                       TO  AUTH-PASSWORD2
+               CALL    "orcsauth"          USING
+                                           ORCSAUTHAREA
+               IF      AUTH-RC         =   ZERO
+                   MOVE    200             TO  HTTP-STATUS
+               ELSE
+                   MOVE    403             TO  HTTP-STATUS
+               END-IF
            ELSE
-               DISPLAY "auth ng"
                MOVE    403             TO  HTTP-STATUS
            END-IF
-      *
-           DISPLAY "user:" USER
-           DISPLAY "password:" PASSWORD
-           DISPLAY "session-type:" SESSION-TYPE
            .
        010-GET-EXT.
            EXIT.
-      ************************************************************************
+      *****************************************************************
        020-ERROR                   SECTION.
       *
-           DISPLAY "020-ERROR start" 
            MOVE    400             TO  HTTP-STATUS
            . 
        020-ERROR-EXT.
@@ -121,7 +120,7 @@
       *
            INITIALIZE                  PASSWD-REC
            MOVE    USER            TO  PASSWD-USERID
-           MOVE    PASSWD-REC     TO  MCPDATA-REC
+           MOVE    PASSWD-REC      TO  MCPDATA-REC
            MOVE    "DBSELECT"      TO  MCP-FUNC
            MOVE    "tbl_passwd"    TO  MCP-TABLE
            MOVE    "key"           TO  MCP-PATHNAME
