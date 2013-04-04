@@ -525,6 +525,8 @@
       *    コラムリスト位置
            03  WRK-J02-DATALIST-ROW    PIC S9(09).
            03  WRK-J02-RRKLIST-ROW     PIC S9(09).
+           03  WRK-J02-DATALIST-ROWATTR    PIC S9(09).
+           03  WRK-J02-RRKLIST-ROWATTR     PIC S9(09).
            03  FLG-GMN-INIT            PIC 9(01).
            03  MAE-J02-DATALIST-ROW    PIC S9(09).
            03  WRK-MAE-ZAINUM          PIC 9(08).
@@ -3443,7 +3445,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    ZERO                TO  WRK-J02-RRKLIST-ROW
            ELSE
                MOVE    J02-DATALIST-ROW    TO  WRK-J02-DATALIST-ROW
+               MOVE    J02-DATALIST-ROWATTR
+                                           TO  WRK-J02-DATALIST-ROWATTR
                MOVE    J02-RRKLIST-ROW     TO  WRK-J02-RRKLIST-ROW
+               MOVE    J02-RRKLIST-ROWATTR TO  WRK-J02-RRKLIST-ROWATTR
            END-IF
       *
            MOVE    SPACE               TO  J02
@@ -3456,6 +3461,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    MOVE    ZERO                TO  J02-RRKLIST-ROWATTR
            IF      WRK-J02-DATALIST-ROW    NOT =   ZERO
                MOVE    WRK-J02-DATALIST-ROW    TO  J02-DATALIST-ROW
+               MOVE    WRK-J02-DATALIST-ROWATTR
+                                               TO  J02-DATALIST-ROWATTR
            END-IF
            IF      MAE-J02-DATALIST-ROW    NOT =   ZERO
                MOVE    MAE-J02-DATALIST-ROW
@@ -3464,6 +3471,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            IF      WRK-J02-RRKLIST-ROW     NOT =   ZERO
                MOVE    WRK-J02-RRKLIST-ROW     TO  J02-RRKLIST-ROW
+               MOVE    WRK-J02-RRKLIST-ROWATTR TO  J02-RRKLIST-ROWATTR
            END-IF
       *
            MOVE    SPA-GMN-PTNUM       TO  J02-PTNUM
