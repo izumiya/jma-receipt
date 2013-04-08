@@ -1689,6 +1689,14 @@
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *H25.4
+      *    レセ電移行対応
+           IF     (SPA-SRYKA-MAX       =   1    )
+             AND  (SPA-PTID        NOT =   ZERO )
+      *        診療科１件の時、レセ電移行チェック
+               PERFORM 310319-RESE-JYURRK-SEC
+           END-IF
+      *
            .
        3005-SRYKA-HEN-EXT.
            EXIT.
@@ -1831,6 +1839,16 @@
                MOVE    1                   TO  SPA-J02-ROUJIN
            ELSE
                MOVE    ZERO                TO  SPA-J02-ROUJIN
+           END-IF
+      *
+      *H25.4 レセ電移行対応
+           IF      SPA-SRYKA-MAX       =   1
+      *        診療科１件の時、レセ電移行チェック
+               PERFORM 310319-RESE-JYURRK-SEC
+               IF      SPA-SRYKA-MAX       =   2
+                   MOVE    SPACE           TO  SPA-J01-SRYKA
+                   MOVE    SPACE           TO  SPA-J01-SRYKAMEI
+               END-IF
            END-IF
       *
       *    診療科選択のない時、以下中止
@@ -2328,10 +2346,99 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    ACCT-SRYKA         TO  SPA-GMN-SRYKA
                END-IF
            END-IF
+      *H25.4
+      *    包括保険・レセ電分判定
+           IF     (SPA-J01-SRYKA       =   SPACE ) 
+               INITIALIZE                  JYURRK-REC
+               MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+               MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
+               MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+               MOVE    SPA-NAI-SRYYM       TO  JYURRK-SRYYMD(1:6)
+               MOVE    "01"                TO  JYURRK-SRYYMD(7:2)
+               MOVE    SPA-NAI-SRYYM       TO  JYURRK-UPSRYYMD(1:6)
+               MOVE    "31"                TO  JYURRK-UPSRYYMD(7:2)
+               MOVE    "9999"              TO  JYURRK-HKNCOMBINUM
+      *
+               MOVE    JYURRK-REC          TO  MCPDATA-REC
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key17"             TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+                   MOVE    "key17"             TO  MCP-PATHNAME
+                   PERFORM 970-JYURRK-READ-SEC
+               ELSE
+                   INITIALIZE                  JYURRK-REC
+                   MOVE    1               TO  FLG-JYURRK
+               END-IF
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key17"             TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+      *
+               IF     (FLG-JYURRK          =   ZERO )
+                   IF      JYURRK-SRYKA (1:1)  =   "A"
+      *                レセ電分　全科へ
+                       MOVE    "00"                TO  SPA-J01-SRYKA
+                       MOVE    "00"                TO  SPA-GMN-SRYKA
+                   ELSE
+                       MOVE    JYURRK-SRYKA        TO  SPA-J01-SRYKA
+                       MOVE    JYURRK-SRYKA        TO  SPA-GMN-SRYKA
+                   END-IF
+               END-IF
+           END-IF
       *
            .
        310310-JYURRK-CHK-EXT.
            EXIT.
+      *
+      *!!!!!!!!!!!!!!!!
+      *****************************************************************
+      *   診療科内容編集処理
+      *****************************************************************
+       310319-RESE-JYURRK-SEC             SECTION.
+      *
+      *    診療科１件の時、レセ電移行チェック
+           INITIALIZE                  JYURRK-REC
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+           MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
+           STRING  SPA-NAI-SRYYM
+                   "%"                 DELIMITED  BY  SIZE
+                                       INTO    JYURRK-SRYYMD
+           END-STRING
+      *
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key54"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key54"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key54"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-JYURRK          =   ZERO
+      *        全科追加
+               MOVE    SPA-GMN-SRYKA-LIST (1)
+                                       TO  SPA-GMN-SRYKA-LIST (2)
+               MOVE    "00 全科"       TO  SPA-GMN-SRYKA-LIST (1)
+               ADD     1               TO  SPA-SRYKA-MAX
+           ELSE
+               IF      SPA-GMN-SRYKA   =   "00"
+                   MOVE    SPA-GMN-SRYKA-LIST(01)
+                                           TO  SPA-GMN-SRYKA-G
+               END-IF
+           END-IF
+           .
+       310319-RESE-JYURRK-EXT.
+           EXIT.
+      *!!!!!!!!!!!!!!!!
       *
       *****************************************************************
       *   診療科内容編集処理

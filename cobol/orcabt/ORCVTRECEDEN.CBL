@@ -143,6 +143,8 @@
            03  IDX-J2                  PIC 9(04).
            03  IDX-D                   PIC 9(04).
       *
+           03  IDH                     PIC 9(04).
+      *
       *    パラメータ保存
        01  PARA-SAVE.
            03  PARA-05-1               PIC X(02).
@@ -492,9 +494,10 @@
            INITIALIZE                  SPA-AREA
       *
       *    パラメタセット
-           UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
-                                       INTO    ASS-PARA
-           END-UNSTRING
+      *    UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
+      *                                INTO    ASS-PARA
+      *    END-UNSTRING
+           MOVE    "/home/orca/ORCADC.PARA"  TO  ASS-PARA
       *
       *    パラメータ情報取得
            PERFORM 101-PARA-GET-SEC
@@ -866,9 +869,18 @@
        20011-PTNUM-SET-SEC          SECTION.
       *
            MOVE    SPACE               TO  SPA-PTNUM
-      *    空白までを編集する
-           MOVE    HZN-IN-KOUMOKU (14)
+      *    前空白の削除
+           MOVE    SPACE               TO  WRK-HEN-PTNUM
+           PERFORM VARYING     IDH     FROM    1   BY  1
+                   UNTIL       IDH     >   20
+               IF      HZN-IN-KOUMOKU (14) (IDH:1)
+                                       NOT =   SPACE
+                   MOVE    HZN-IN-KOUMOKU (14) (IDH:)
                                        TO  WRK-HEN-PTNUM
+                   MOVE    20          TO  IDH
+               END-IF
+           END-PERFORM
+      *
            IF      WRK-HEN-PTNUM       =   SPACE
                MOVE    1               TO  FLG-PTNUM-ERR
                GO  TO  20011-PTNUM-SET-EXT
