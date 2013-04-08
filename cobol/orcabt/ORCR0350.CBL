@@ -357,6 +357,7 @@
       *                                     レセプト記載対応
       *  04.06.13    NACL-門脇    13/03/27  船員下船後（食事負担なし）の
       *                                     生活療養標準負担額の記録をしない
+      *  04.06.14    NACL-藤原    13/04/05  コメントの記録方法の変更
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-藤原    12/09/04  薬剤料減点対応
@@ -661,7 +662,7 @@
                                        PIC X(64).
       *
            03  WRK-KIZAI-SRYCD         PIC X(09).
-      *     右ずめ編集用     
+      *     右づめ編集用     
            03  WRK-HENKAN              PIC X(20).
            03  WRK-LENGTH              PIC 9(02).
            03  WRK-HENSYU              PIC X(20).
@@ -759,6 +760,9 @@
            03  WRK-MCP-PATHNAME        PIC X(64).
       *
            03  WRK-ACCTP-SYUTEN        PIC 9(07).
+      *
+           03  WRK-CO-COMMENT          PIC X(76).
+           03  WRK-CO-SRYCD            PIC X(09).
       *
       *    災害用コメント
            03  WRK-DISASTER-COMMENT    PIC X(76).
@@ -5361,6 +5365,17 @@
                    MOVE    76                  TO  WRK-NAGASA
                    MOVE    1                   TO  WRK-END 
                    PERFORM 5004-MOJI-HENSYU-SEC  
+      *
+                   IF      WRK-RECE65-NAME (1) (77:)
+                                           NOT =   SPACE
+                       PERFORM 5001-FILE-WRITE-SEC
+      *
+                       MOVE    WRK-RECE65-SRYCD (1)
+                                                   TO  WRK-CO-SRYCD
+                       MOVE    WRK-RECE65-NAME  (1) (77:)
+                                                   TO  WRK-CO-COMMENT
+                       PERFORM 5010-CO-RECORD-NEXT-HENSYU-SEC
+                   END-IF
                WHEN    "1"
       *            関連コメント退避処理
                    IF      WRK-RECE641-SETCOMFLG   =   "1"
@@ -6071,6 +6086,17 @@
                        MOVE    76                  TO  WRK-NAGASA
                        MOVE    1                   TO  WRK-END 
                        PERFORM 5004-MOJI-HENSYU-SEC  
+      *
+                       IF      TBL-KOUI-NAME(IDX) (77:)
+                                               NOT =   SPACE
+                           PERFORM 5001-FILE-WRITE-SEC
+      *
+                           MOVE    TBL-KOUI-SRYCD (IDX)
+                                                   TO  WRK-CO-SRYCD
+                           MOVE    TBL-KOUI-NAME  (IDX) (77:)
+                                                   TO  WRK-CO-COMMENT
+                           PERFORM 5010-CO-RECORD-NEXT-HENSYU-SEC
+                       END-IF
                    WHEN    OTHER     
       *                関連コメント退避処理
                        IF      RECE641-SETCOMFLG   =   "1"
@@ -6396,6 +6422,17 @@
            MOVE    76                  TO  WRK-NAGASA
            MOVE    1                   TO  WRK-END 
            PERFORM 5004-MOJI-HENSYU-SEC  
+      *
+           IF      TBL-COMMENT-NAME(IDX) (77:)
+                                   NOT =   SPACE
+               PERFORM 5001-FILE-WRITE-SEC
+      *
+               MOVE    TBL-COMMENT-SRYCD (IDX)
+                                           TO  WRK-CO-SRYCD
+               MOVE    TBL-COMMENT-NAME  (IDX) (77:)
+                                           TO  WRK-CO-COMMENT
+               PERFORM 5010-CO-RECORD-NEXT-HENSYU-SEC
+            END-IF
       *
             PERFORM 5001-FILE-WRITE-SEC
            .
@@ -8553,6 +8590,17 @@
                MOVE    1                   TO  WRK-END 
                PERFORM 5004-MOJI-HENSYU-SEC
       *
+               IF      TBL-RECE655-NAME (IDVV) (77:)
+                                       NOT =   SPACE
+                   PERFORM 5001-FILE-WRITE-SEC
+      *
+                   MOVE    TBL-RECE655-SRYCD (IDVV)
+                                               TO  WRK-CO-SRYCD
+                   MOVE    TBL-RECE655-NAME  (IDVV) (77:)
+                                               TO  WRK-CO-COMMENT
+                   PERFORM 5010-CO-RECORD-NEXT-HENSYU-SEC
+               END-IF
+      *
                PERFORM 5001-FILE-WRITE-SEC
            END-PERFORM
       *
@@ -8829,7 +8877,7 @@
            EXIT.
       *
       *****************************************************************
-      *    右ずめ編集処理
+      *    右づめ編集処理
       *****************************************************************
        5003-DATA-RIGHT-HENSYU-SEC          SECTION.
       *
@@ -8937,6 +8985,35 @@
            INITIALIZE                      WRK-HENSYU-AREA
            .
        5005-NUM-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    コメントレコード記録処理
+      *****************************************************************
+       5010-CO-RECORD-NEXT-HENSYU-SEC  SECTION.
+      *
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+      *
+           MOVE    "CO,"               TO  WRK-REC
+           MOVE    3                   TO  WRK-REC-LENGTH
+      *    診療識別
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    負担区分
+           MOVE    WRK-FTNKBN          TO  WRK-DATA
+           MOVE    1                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    コメントコード
+           MOVE    WRK-CO-SRYCD        TO  WRK-DATA
+           MOVE    9                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    文字データ
+           MOVE    WRK-CO-COMMENT      TO  WRK-DATA
+           MOVE    76                  TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-END 
+           PERFORM 5004-MOJI-HENSYU-SEC
+           .
+       5010-CO-RECORD-NEXT-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

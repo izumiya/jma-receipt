@@ -394,6 +394,7 @@
       *                                     タのみの診療区分の記録
       *  04.06.10    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
+      *  04.06.11    NACL-藤原    13/04/05  コメントの記録方法の変更
       *
       *  04.07.01    NACL-藤原    11/06/02  入退院履歴記載対応
       *                                     「2自費分は含まない」を追加
@@ -678,7 +679,7 @@ grpsys     COPY    "COMMON-SPA".
                                    PIC X(64).
       *
            03  WRK-KIZAI-SRYCD         PIC X(09).
-      *     右ずめ編集用     
+      *     右づめ編集用     
            03  WRK-HENKAN              PIC X(20).
            03  WRK-LENGTH              PIC 9(02).
            03  WRK-HENSYU              PIC X(20).
@@ -768,6 +769,9 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-MCP-PATHNAME        PIC X(64).
       *
            03  WRK-ACCTP-SYUTEN        PIC 9(07).
+      *
+           03  WRK-CO-COMMENT          PIC X(76).
+           03  WRK-CO-SRYCD            PIC X(09).
       *
       *    災害用コメント
            03  WRK-DISASTER-COMMENT    PIC X(76).
@@ -5235,6 +5239,17 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                        MOVE    76                  TO  WRK-NAGASA
                        MOVE    1                   TO  WRK-END 
                        PERFORM 5004-MOJI-HENSYU-SEC  
+      *
+                       IF      TBL-KOUI-NAME(IDX) (77:)
+                                               NOT =   SPACE
+                           PERFORM 5001-FILE-WRITE-SEC
+      *
+                           MOVE    TBL-KOUI-SRYCD (IDX)
+                                                   TO  WRK-CO-SRYCD
+                           MOVE    TBL-KOUI-NAME  (IDX) (77:)
+                                                   TO  WRK-CO-COMMENT
+                           PERFORM 5010-CO-RECORD-NEXT-HENSYU-SEC
+                       END-IF
                    WHEN    OTHER
       *                関連コメント退避処理
                        IF      RECE041-SETCOMFLG   =   "1"
@@ -5527,6 +5542,17 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
            MOVE    76                  TO  WRK-NAGASA
            MOVE    1                   TO  WRK-END 
            PERFORM 5004-MOJI-HENSYU-SEC  
+      *
+           IF      TBL-COMMENT-NAME(IDX) (77:)
+                                   NOT =   SPACE
+               PERFORM 5001-FILE-WRITE-SEC
+      *
+               MOVE    TBL-COMMENT-SRYCD (IDX)
+                                           TO  WRK-CO-SRYCD
+               MOVE    TBL-COMMENT-NAME  (IDX) (77:)
+                                           TO  WRK-CO-COMMENT
+               PERFORM 5010-CO-RECORD-NEXT-HENSYU-SEC
+            END-IF
       *
             PERFORM 5001-FILE-WRITE-SEC
            .
@@ -6150,6 +6176,17 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                    MOVE    76                  TO  WRK-NAGASA
                    MOVE    1                   TO  WRK-END 
                    PERFORM 5004-MOJI-HENSYU-SEC  
+      *
+                   IF      WRK-RECE05-NAME (1)  (77:)
+                                           NOT =   SPACE
+                       PERFORM 5001-FILE-WRITE-SEC
+      *
+                       MOVE    WRK-RECE05-SRYCD (1)
+                                                   TO  WRK-CO-SRYCD
+                       MOVE    WRK-RECE05-NAME  (1) (77:)
+                                                   TO  WRK-CO-COMMENT
+                       PERFORM 5010-CO-RECORD-NEXT-HENSYU-SEC
+                   END-IF
                WHEN    OTHER     
       *            関連コメント退避処理
                    IF      RECE041-SETCOMFLG   =   "1"
@@ -6525,6 +6562,17 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                MOVE    76                  TO  WRK-NAGASA
                MOVE    1                   TO  WRK-END 
                PERFORM 5004-MOJI-HENSYU-SEC
+      *
+               IF      TBL-RECE055-NAME (IDVV) (77:)
+                                       NOT =   SPACE
+                   PERFORM 5001-FILE-WRITE-SEC
+      *
+                   MOVE    TBL-RECE055-SRYCD (IDVV)
+                                               TO  WRK-CO-SRYCD
+                   MOVE    TBL-RECE055-NAME  (IDVV) (77:)
+                                               TO  WRK-CO-COMMENT
+                   PERFORM 5010-CO-RECORD-NEXT-HENSYU-SEC
+               END-IF
       *
                PERFORM 5001-FILE-WRITE-SEC
            END-PERFORM
@@ -7843,6 +7891,35 @@ grpsys     MOVE    RECE02-HOSPNUM      TO  RECEDEN-HOSPNUM
            INITIALIZE                      WRK-HENSYU-AREA
            .
        5005-NUM-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    コメントレコード記録処理
+      *****************************************************************
+       5010-CO-RECORD-NEXT-HENSYU-SEC  SECTION.
+      *
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+      *
+           MOVE    "CO,"               TO  WRK-REC
+           MOVE    3                   TO  WRK-REC-LENGTH
+      *    診療識別
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    負担区分
+           MOVE    WRK-FTNKBN          TO  WRK-DATA
+           MOVE    1                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    コメントコード
+           MOVE    WRK-CO-SRYCD        TO  WRK-DATA
+           MOVE    9                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC  
+      *    文字データ
+           MOVE    WRK-CO-COMMENT      TO  WRK-DATA
+           MOVE    76                  TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-END 
+           PERFORM 5004-MOJI-HENSYU-SEC
+           .
+       5010-CO-RECORD-NEXT-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
