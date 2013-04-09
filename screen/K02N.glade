@@ -23,12 +23,12 @@
     <wmclass_class></wmclass_class>
     <wmclass_name></wmclass_name>
     <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
-    <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -893,14 +893,14 @@
           <signal>clicked</signal>
         </accelerator>
         <signal>
+          <name>toggled</name>
+          <handler>button_toggled</handler>
+        </signal>
+        <signal>
           <name>clicked</name>
           <handler>send_event</handler>
           <data>CLICKED</data>
           <after>True</after>
-        </signal>
-        <signal>
-          <name>toggled</name>
-          <handler>button_toggled</handler>
         </signal>
       </widget>
       <widget>
@@ -1061,14 +1061,14 @@
           <signal>clicked</signal>
         </accelerator>
         <signal>
+          <name>toggled</name>
+          <handler>button_toggled</handler>
+        </signal>
+        <signal>
           <name>clicked</name>
           <handler>send_event</handler>
           <data>CLICKED</data>
           <after>True</after>
-        </signal>
-        <signal>
-          <name>toggled</name>
-          <handler>button_toggled</handler>
         </signal>
       </widget>
       <widget>
@@ -1510,9 +1510,9 @@
       <widget>
         <class>GtkScrolledWindow</class>
         <name>scrolledwindow2</name>
-        <x>10</x>
+        <x>4</x>
         <y>76</y>
-        <width>792</width>
+        <width>798</width>
         <height>584</height>
         <visible>True</visible>
         <sensitive>True</sensitive>
