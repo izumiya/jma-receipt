@@ -194,8 +194,10 @@
            03  HZN-IDK             PIC 9(04).
            03  IDX-IMAX            PIC 9(04).
       *
+           03  PTBYO-CNT           PIC 9(02).
            03  PTBYOMEI-CNT        PIC 9(02).
            03  PTBYOMEI-SRYKA-CNT  PIC 9(02).
+           03  PTBYOMEI-DOUKI-CNT  PIC 9(02).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -2900,8 +2902,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                            WRK-TOKSKNCD
                                            WRK-BYOMEI
       *
-               DISPLAY "--------------------------- " 
-               DISPLAY "IDX=" IDX 
+      **         DISPLAY "--------------------------- " 
+      **         DISPLAY "IDX=" IDX 
       *
                IF    ( LF04-SNDSPITBL-SPICOD2 (IDX 1)  =   SPACE )
                AND   ( LF04-SNDSPITBL-SPINAME2(IDX 1)  =   SPACE )
@@ -2935,6 +2937,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    連結式病名編集処理
       *****************************************************************
        20061-SPICOD1-HENSYU-SEC                 SECTION.
+      *
+           DISPLAY "--------------------------- " 
+           DISPLAY "IDX=" IDX 
       *
            DISPLAY " diagnosis code =" LF04-SND-SPICOD1 (IDX)
            DISPLAY " diagnosis name =" LF04-SND-SPINAME1(IDX)
@@ -2978,6 +2983,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    単独式病名編集処理
       *****************************************************************
        20061-SPICOD2-HENSYU-SEC                 SECTION.
+      *
+           DISPLAY "--------------------------- " 
+           DISPLAY "IDX=" IDX 
       *
       *    病名のみ設定のときコードチェック
            PERFORM VARYING IDY FROM    1   BY  1
@@ -3284,7 +3292,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        WRK-PTBYOMEI-SRYKA-REC
                                        WRK-PTBYOMEI-DOUKI-REC
                                        WRK-UTAGAIFLG-KETASU
-      ********                         PTBYOMEI-CNT
+                                       PTBYOMEI-CNT
+                                       PTBYOMEI-SRYKA-CNT
+                                       PTBYOMEI-DOUKI-CNT
       *
       *    「の疑い」を検索
            PERFORM VARYING IDY FROM    1  BY  2
@@ -3370,15 +3380,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    1                   TO  FLG-PTBYOMEI
            END-IF
            PERFORM             UNTIL   FLG-PTBYOMEI        =   1
-      *
-      ********IF      FLG-BYOMEI-DELETE   =   1
-      ********     IF      WRK-NYUGAIKBN       =   WRK-PTBYO-NYUGAIKBN
-      ********         ADD     1                   TO  PTBYOMEI-CNT
-      ********     END-IF
-      ******** ELSE
-      ********     ADD     1                   TO  PTBYOMEI-CNT
-      ******** END-IF
-      *
       *        最小診療科の病名情報を取得
                IF      WRK-PTBYO-SRYKA     =   SPACE
                    MOVE    PTBYOMEI-REC        TO  WRK-PTBYOMEI-REC
@@ -3390,14 +3391,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *        同一診療科の病名情報を取得
                IF      PTBYO-SRYKA         =   WRK-SRYKA
-      ********     IF      FLG-BYOMEI-DELETE   =   1
-      ********         IF      WRK-NYUGAIKBN   =   WRK-PTBYO-NYUGAIKBN
-      ********             ADD     1           TO  PTBYOMEI-SRYKA-CNT
-      ********         END-IF
-      ********     ELSE
-      ********         ADD     1               TO  PTBYOMEI-SRYKA-CNT
-      ********     END-IF
-      *
                    IF      FLG-PTBYOMEI-UMU    >   2
                        CONTINUE
                    ELSE 
@@ -3431,11 +3424,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *        同一開始日・病名で存在しないとき
                PERFORM 2006123-KOUSIN-01-SEC
            ELSE
-      *******IF      PTBYOMEI-CNT        =   1
-      *******  MOVE    WRK-PTBYOMEI-REC  TO  PTBYOMEI-REC
-      *******  PERFORM 2006124-KOUSIN-02-SEC
-      *******  GO  TO  200612-BYOMEI-HEN-EXT
-      *
                IF    ( SYS-9000-BYOMEI-SYU-FLG
                                             =   SPACE )
                AND   ( SYS-9000-BYOMEI-DOUKI-FLG
@@ -3444,7 +3432,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF      WRK-PTBYO-SRYKA-RENNUM   =   ZERO
                        PERFORM 2006123-KOUSIN-01-SEC
                    ELSE
-                       MOVE    WRK-PTBYOMEI-SRYKA-REC  TO  PTBYOMEI-REC
+                       MOVE    WRK-PTBYOMEI-SRYKA-REC   TO  PTBYOMEI-REC
                        PERFORM 2006124-KOUSIN-02-SEC
                    END-IF
                ELSE
@@ -3471,8 +3459,115 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        END-IF
                    END-IF
                END-IF
-      *******END-IF
            END-IF
+      *
+           IF      FLG-BYOMEI-DELETE   =   1 
+               GO  TO  200612-BYOMEI-HEN-EXT
+           END-IF
+      *
+      *    入外区分の更新
+           INITIALIZE                  FLG-PTBYOMEI-UMU
+                                       WRK-PTBYOMEI-REC
+                                       WRK-PTBYOMEI-SRYKA-REC
+                                       WRK-PTBYOMEI-DOUKI-REC
+                                       PTBYOMEI-CNT
+                                       PTBYOMEI-SRYKA-CNT
+                                       PTBYOMEI-DOUKI-CNT
+      *    患者病名マスタ検索（同一開始日・病名）
+           INITIALIZE                      PTBYOMEI-REC
+           MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
+           MOVE    WRK-PTID            TO  PTBYO-PTID
+           MOVE    WRK-BYOYMD          TO  PTBYO-SRYYMD
+           MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
+                                           PTBYO-XXBYOMEI
+           MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+           MOVE    "key29"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key29"             TO  MCP-PATHNAME
+               PERFORM 900-PTBYO-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTBYOMEI
+           END-IF
+           PERFORM             UNTIL   FLG-PTBYOMEI        =   1
+      *        最小診療科の病名情報を取得
+               IF      WRK-PTBYO-SRYKA     =   SPACE
+                   MOVE    PTBYOMEI-REC        TO  WRK-PTBYOMEI-REC
+               END-IF
+      *        最小診療科で同一病名の件数取得
+               IF      PTBYO-SRYKA         =   WRK-PTBYO-SRYKA
+                   ADD     1                   TO  PTBYOMEI-CNT
+               END-IF
+      *        同一診療科の病名情報を取得
+               IF      PTBYO-SRYKA         =   WRK-SRYKA
+                   ADD     1               TO  PTBYOMEI-SRYKA-CNT
+                   IF      FLG-PTBYOMEI-UMU    >   2
+                       CONTINUE
+                   ELSE 
+                       MOVE    PTBYOMEI-REC    TO
+                                               WRK-PTBYOMEI-SRYKA-REC
+                       IF      FLG-PTBYOMEI-UMU    =   ZERO
+                           MOVE    1               TO  FLG-PTBYOMEI-UMU
+                       END-IF
+                       IF      PTBYO-BYOMEI        =   WRK-BYOMEI1(1:80)
+                           IF      FLG-PTBYOMEI-UMU    =   2
+                               MOVE    4           TO  FLG-PTBYOMEI-UMU
+                           ELSE
+                               MOVE    3           TO  FLG-PTBYOMEI-UMU
+                           END-IF
+                       END-IF
+                   END-IF
+               ELSE
+                   MOVE    2                   TO  FLG-PTBYOMEI-UMU
+               END-IF
+      *
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key29"             TO  MCP-PATHNAME
+               PERFORM 900-PTBYO-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+           MOVE    "key29"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-PTBYOMEI-UMU     =   ZERO
+      *        同一開始日・病名で存在しないとき
+               GO  TO  200612-BYOMEI-HEN-EXT
+           ELSE
+               IF    ( SYS-9000-BYOMEI-SYU-FLG
+                                            =   SPACE )
+               AND   ( SYS-9000-BYOMEI-DOUKI-FLG
+                                            =   SPACE )
+      *            同期・集約フラグの設定がないとき
+                   IF      WRK-PTBYO-SRYKA-RENNUM   >   ZERO
+                       MOVE    WRK-PTBYOMEI-SRYKA-REC   TO  PTBYOMEI-REC
+                       MOVE    PTBYOMEI-SRYKA-CNT       TO  PTBYO-CNT
+                       PERFORM 2006126-KOUSIN-04-SEC
+                   END-IF
+               ELSE
+      *            集約フラグ
+                   IF      SYS-9000-BYOMEI-SYU-FLG
+                                               =   "1"
+                       IF      WRK-PTBYO-SRYKA-SRYKA   =   SPACE
+                           MOVE    WRK-PTBYOMEI-REC    TO  PTBYOMEI-REC
+                           MOVE    PTBYOMEI-CNT        TO  PTBYO-CNT
+                       ELSE
+                           MOVE    WRK-PTBYOMEI-SRYKA-REC
+                                                       TO  PTBYOMEI-REC
+                           MOVE    PTBYOMEI-SRYKA-CNT  TO  PTBYO-CNT
+                       END-IF
+                       PERFORM 2006126-KOUSIN-04-SEC
+                   END-IF
+      *            同期フラグ
+                   IF      SYS-9000-BYOMEI-DOUKI-FLG
+                                               =   "1"
+                       PERFORM 2006127-KOUSIN-05-SEC
+                   END-IF
+               END-IF
+           END-IF
+      *
            .
        200612-BYOMEI-HEN-EXT.
            EXIT.
@@ -3572,8 +3667,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    疑いフラグ・主病名フラグ
            MOVE    WRK-UTAGAIFLG   TO  PTBYO-UTAGAIFLG
            MOVE    WRK-SYUBYOFLG   TO  PTBYO-SYUBYOFLG
-      *    入外区分
-      *****MOVE    WRK-NYUGAIKBN   TO  PTBYO-NYUGAIKBN
       *
       *    疾患コードがエラー又は未コード化傷病名コード以外のとき
            IF      FLG-BYOMEI-CHK      NOT =   1   AND 5
@@ -3779,7 +3872,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      FLG-BYOMEI-DELETE   =   1
                MOVE    "1"                 TO  PTBYO-DLTFLG
-               MOVE    "claim"             to  PTBYO-DLT-OPID
+               MOVE    "claim"             TO  PTBYO-DLT-OPID
            ELSE
       *
       *    転帰日
@@ -3789,9 +3882,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    主病名フラグ
            MOVE    WRK-SYUBYOFLG       TO  PTBYO-SYUBYOFLG
-      *
-      *    入外区分
-      *****MOVE    WRK-NYUGAIKBN       TO  PTBYO-NYUGAIKBN
       *
       *    疑いフラグ
            EVALUATE    PTBYO-UTAGAIFLG ALSO    WRK-UTAGAIFLG
@@ -4047,20 +4137,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
            MOVE    WRK-PTID            TO  PTBYO-PTID
            MOVE    WRK-BYOYMD          TO  PTBYO-SRYYMD
-           IF      WRK-UTAGAIFLG-KETASU    =   ZERO
+           IF      FLG-BYOMEI-DELETE   =   1 
                MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
-               STRING  WRK-BYOMEI1 (1:80)  DELIMITED BY  SPACE
-                       "の疑い"            DELIMITED BY  SIZE  
-                                           INTO    PTBYO-XXBYOMEI
-               END-STRING
+                                               PTBYO-XXBYOMEI
            ELSE
-               MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
-               STRING  WRK-BYOMEI1 (1:WRK-UTAGAIFLG-KETASU - 1)
-                                           DELIMITED BY  SIZE
-                       WRK-BYOMEI1 (WRK-UTAGAIFLG-KETASU + 6:)
-                                           DELIMITED BY  SPACE
-                                           INTO    PTBYO-XXBYOMEI
-               END-STRING
+               IF      WRK-UTAGAIFLG-KETASU    =   ZERO
+                   MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
+                   STRING  WRK-BYOMEI1 (1:80)  DELIMITED BY  SPACE
+                           "の疑い"            DELIMITED BY  SIZE  
+                                               INTO    PTBYO-XXBYOMEI
+                   END-STRING
+               ELSE
+                   IF      WRK-UTAGAIFLG-KETASU    =   1
+                       MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
+                                                       PTBYO-XXBYOMEI
+                   ELSE
+                       MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
+                       STRING  WRK-BYOMEI1 (1:WRK-UTAGAIFLG-KETASU - 1)
+                                                   DELIMITED BY  SIZE
+                               WRK-BYOMEI1 (WRK-UTAGAIFLG-KETASU + 6:)
+                                                   DELIMITED BY  SPACE
+                                               INTO    PTBYO-XXBYOMEI
+                       END-STRING
+                   END-IF
+               END-IF
            END-IF
       *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
@@ -4114,9 +4214,122 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
+      *    患者病名マスタ更新処理（入外区分）
+      *****************************************************************
+       2006126-KOUSIN-04-SEC               SECTION.
+      *
+           IF      PTBYO-NYUGAIKBN     =   SPACE
+               IF      WRK-NYUGAIKBN       =   SPACE
+                   GO  TO  2006126-KOUSIN-04-EXT
+               END-IF
+           ELSE
+               IF      WRK-NYUGAIKBN       =   SPACE
+      *            同一病名が複数のときは更新しない
+                   IF      PTBYO-CNT           >   1
+                       GO  TO  2006126-KOUSIN-04-EXT
+                   END-IF
+               ELSE
+                   IF      WRK-NYUGAIKBN   =   PTBYO-NYUGAIKBN
+                       GO  TO  2006126-KOUSIN-04-EXT
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *    入外区分
+           MOVE    WRK-NYUGAIKBN       TO  PTBYO-NYUGAIKBN
+      *
+           MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC      NOT =   ZERO 
+               DISPLAY "UPD PTBYOMEI-KEY =>" PTBYO-KEY  "."
+           ELSE
+               ADD     1                   TO  CNT-OUT02
+           END-IF
+           .
+       2006126-KOUSIN-04-EXT.
+           EXIT.
+      *
+      *
+      *****************************************************************
+      *    患者病名マスタ更新処理（同期フラグ設定時の入外区分）
+      *****************************************************************
+       2006127-KOUSIN-05-SEC               SECTION.
+      *
+           INITIALIZE                  WRK-PTBYOMEI-REC
+                                       WRK-PTBYOMEI-SRYKA-REC
+                                       WRK-PTBYOMEI-DOUKI-REC
+                                       PTBYOMEI-CNT
+                                       PTBYOMEI-SRYKA-CNT
+                                       PTBYOMEI-DOUKI-CNT
+      *
+      *    患者病名マスタ検索（同一開始日・病名）
+           INITIALIZE                      PTBYOMEI-REC
+           MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
+           MOVE    WRK-PTID            TO  PTBYO-PTID
+           MOVE    WRK-BYOYMD          TO  PTBYO-SRYYMD
+           MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
+                                           PTBYO-XXBYOMEI
+      *
+           MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+           MOVE    "key29"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+               MOVE    "key29"             TO  MCP-PATHNAME
+               PERFORM 900-PTBYO-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTBYOMEI
+           END-IF
+      *
+           PERFORM         UNTIL   FLG-PTBYOMEI    =   1
+               MOVE    PTBYO-SRYKA         TO  KEY-N-SRYKA
+               INITIALIZE                  WRK-PTBYOMEI-DOUKI-REC
+                                           PTBYOMEI-DOUKI-CNT
+      *
+               PERFORM         UNTIL   FLG-PTBYOMEI    =   1
+                               OR      PTBYO-SRYKA NOT =   KEY-N-SRYKA
+      *
+                   IF      WRK-PTBYO-DOUKI-RENNUM
+                                               =   ZERO
+                       MOVE    PTBYOMEI-REC    TO WRK-PTBYOMEI-DOUKI-REC
+                   END-IF 
+                   ADD     1                   TO  PTBYOMEI-DOUKI-CNT
+      *
+                   MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+                   MOVE    "key29"             TO  MCP-PATHNAME
+                   PERFORM 900-PTBYO-READ-SEC
+               END-PERFORM
+      *
+      *        対象病名の更新
+               MOVE    PTBYOMEI-REC        TO  WRK-PTBYOMEI-TAIHI-REC
+      *
+               MOVE    WRK-PTBYOMEI-DOUKI-REC
+                                           TO  PTBYOMEI-REC
+               MOVE    PTBYOMEI-DOUKI-CNT  TO  PTBYO-CNT
+               PERFORM 2006126-KOUSIN-04-SEC
+      *
+               MOVE    WRK-PTBYOMEI-TAIHI-REC
+                                           TO  PTBYOMEI-REC 
+           END-PERFORM
+      *
+           MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
+           MOVE    "key29"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+           .
+       2006127-KOUSIN-05-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    受付に会計待を設定処理
       *****************************************************************
-       2010-UKETUKE-CHK-SEC                 SECTION.
+       2010-UKETUKE-CHK-SEC                SECTION.
       *
       *    受付テーブル読み込み
            INITIALIZE                  UKETUKE-REC
@@ -4333,6 +4546,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      FLG-BYOMEI-DELETE   =   1
                    IF    ( WRK-TENKIYMD    =   PTBYO-TENKIYMD  )
                    AND   ( WRK-UTAGAIFLG   =   PTBYO-UTAGAIFLG )
+                   AND   ( WRK-NYUGAIKBN   =   PTBYO-NYUGAIKBN )
                        CONTINUE
                    ELSE
                        GO  TO  900-PTBYO-READ-SEC
