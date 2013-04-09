@@ -177,6 +177,8 @@
       *H24.4
            03  FLG-FUKACHK             PIC 9(01).
            03  FLG-FUKACHK2            PIC 9(01).
+      *    点数マスタなし
+           03  FLG-QRCHK               PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -906,6 +908,9 @@
                IF      (WRK-DRCD           =   SPACE )
                    OR  (WRK-DRNAME         =   SPACE )
                    OR  (WRK-KOFYMD         =   SPACE )
+      *H25.4
+      *            点数マスタなし
+                   OR  (FLG-QRCHK          =   1     )
                    INITIALIZE                  ORCSQRCSVAREA
                ELSE
                    PERFORM 600-QRDATA-SYORI-SEC
@@ -2265,6 +2270,7 @@
            INITIALIZE                  ORCSQRCSVAREA
            MOVE    ZERO                TO  IDX-QR1
            MOVE    ZERO                TO  IDX-QRB
+           MOVE    ZERO                TO  FLG-QRCHK
       *    時間
            ADD     1                   TO  WRK-FILE-CNT2
            COMPUTE WRK-SYS-TIME        =   SYS-TIME
@@ -3120,6 +3126,12 @@
            PERFORM 910-TENSU-READ-SEC
       *    内容
            IF      WRK-SRYCD  (1:1)   =   "6"
+      *H25.4
+      *        点数マスタなしは、一般名記載なし
+               IF      FLG-TENSU           =   1
+                   MOVE    ZERO                TO  WRK-IPNMEI
+               END-IF
+      *
                IF      TNSP-IPN-KISAIKBN   =   1
                                            OR  3
       *            一般名記載なし
@@ -4784,6 +4796,12 @@
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *H25.4
+           IF      FLG-TENSU           =   1
+      *        QR出力なし
+               MOVE    1                   TO  FLG-QRCHK
+           END-IF
+      *
       *---(03.04.00) LINE ADD START ------------------------------------
       *    点数附加情報検索
            IF     (TNS-SRYCD(1:1)      =   "6" ) AND
@@ -4793,7 +4811,8 @@
                INITIALIZE                      TENSUPLUS-REC
            END-IF
       *H24.4
-           IF     (TNS-SRYCD(1:1)      =   "6" )
+           IF     (TNS-SRYCD(1:1)      =   "6" ) AND
+                  (FLG-TENSU           =   ZERO)
       *        システム管理の変更可によって一般名記載とする
                IF     (TNSP-IPN-KISAIKBN       =   ZERO    )
                   AND (SYS-1030-KOUHATUKA      =   "1"     )
@@ -4817,6 +4836,10 @@
                        END-IF
                    END-IF
                END-IF
+      *
+           ELSE
+      *        一般名マスタなし
+               INITIALIZE                      GENERICNAME-REC
            END-IF
       *---(03.04.00) LINE ADD END   ------------------------------------
       *
