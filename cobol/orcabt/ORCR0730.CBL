@@ -180,6 +180,8 @@
       *  04.06.09    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
       *  04.06.10    NACL-藤原    13/01/18  直接請求フラグの追加
+      *  04.06.11    NACL-藤原    13/04/03  表示期間によるレセプトへの転
+      *                                     帰日有無による病名文字の変更
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -615,6 +617,13 @@
                        09  WRK-BYOMEI2R-TENKI  PIC X(04).
                        09  WRK-BYOMEI2R-TENKIYMD
                                                PIC X(12).
+               05  WRK-BYOMEI2R1-NAMEW REDEFINES   WRK-BYOMEI2-NAME.
+                   07  FILLER                  PIC X(14).
+                   07  WRK-BYOMEI2R1-ELSE.
+                       09  WRK-BYOMEI2R1-YMD   PIC X(20).
+                       09  WRK-BYOMEI2R1-TENKI PIC X(04).
+                       09  WRK-BYOMEI2R1-TENKIYMD
+                                               PIC X(06).
       *
       *    傷病名が３行になるときの編集
            03  WRK-BYOMEI3                     PIC X(48).
@@ -1871,8 +1880,16 @@
                MOVE    ZERO             TO
                                     SYS-200501-INSPECT-CHARACTER-KBN
            END-IF
+           IF      SYS-200501-TENKIBYOMEI-KBN
+                                    =   SPACE
+               MOVE    ZERO             TO  SYS-200501-TENKIBYOMEI-KBN
+           END-IF
+           DISPLAY "SYS-2005-TENKIHENKBN            ="
+                                    SYS-2005-TENKIHENKBN
            DISPLAY "SYS-200501-INSPECT-CHARACTER-KBN="
                                     SYS-200501-INSPECT-CHARACTER-KBN
+           DISPLAY "SYS-200501-TENKIBYOMEI-KBN      ="
+                                    SYS-200501-TENKIBYOMEI-KBN
       *         
       *    レセプト編綴順情報
            MOVE    SPACE            TO  SYSKANRI-REC
@@ -5281,10 +5298,19 @@
                    MOVE    ZERO            TO  FLG-TENKI
                END-IF
            ELSE
-               IF  WRK-BYOMEI2R-ELSE   =   SPACE
-      *            診療年月日・転帰　編集処理
-                   PERFORM 32221-SRYYMD-TENKI-HEN-SEC
-                   MOVE    ZERO            TO  FLG-TENKI
+               IF      SYS-200501-TENKIBYOMEI-KBN
+                                       =   "0"
+                   IF  WRK-BYOMEI2R1-ELSE  =   SPACE
+      *                診療年月日・転帰　編集処理
+                       PERFORM 32221-SRYYMD-TENKI-HEN-SEC
+                       MOVE    ZERO            TO  FLG-TENKI
+                   END-IF
+               ELSE
+                   IF  WRK-BYOMEI2R-ELSE   =   SPACE
+      *                診療年月日・転帰　編集処理
+                       PERFORM 32221-SRYYMD-TENKI-HEN-SEC
+                       MOVE    ZERO            TO  FLG-TENKI
+                   END-IF
                END-IF
            END-IF    
       *
@@ -5368,30 +5394,60 @@
                    MOVE    SPACE           TO  WRK-BYOMEI2-TENKI
                END-EVALUATE
            ELSE
-      *        診療開始日
-               MOVE    WRK-BO-SRYYMD       TO  WRK-SYMD
-               PERFORM 31012-SEIWA-HEN-SEC
-               MOVE    LNK-DAY2-EDTYMD3 (5:)
-                                           TO  WRK-BYOMEI2R-YMD
-      *        転帰
-               EVALUATE    WRK-BO-TENKIKBN
-               WHEN    "1"
-                   MOVE    "治ゆ"          TO  WRK-BYOMEI2R-TENKI
-               WHEN    "2"
-                   MOVE    "死亡"          TO  WRK-BYOMEI2R-TENKI
-               WHEN    "3"
-                   MOVE    "中止"          TO  WRK-BYOMEI2R-TENKI
-               WHEN    OTHER
-                   MOVE    SPACE           TO  WRK-BYOMEI2R-TENKI
-               END-EVALUATE
-      *        転帰日
-               IF      WRK-BO-TENKIYMD     =   SPACE
-                   CONTINUE 
-               ELSE
-                   MOVE    WRK-BO-TENKIYMD     TO  WRK-SYMD
+               IF      SYS-200501-TENKIBYOMEI-KBN
+                                           =   "0"
+      *            診療開始日
+                   MOVE    WRK-BO-SRYYMD       TO  WRK-SYMD
                    PERFORM 31012-SEIWA-HEN-SEC
-                   MOVE    LNK-DAY2-EDTYMD3 (11:)
+                   MOVE    LNK-DAY2-EDTYMD3 (5:)
+                                               TO  WRK-BYOMEI2R1-YMD
+      *            転帰
+                   EVALUATE    WRK-BO-TENKIKBN
+                   WHEN    "1"
+                       MOVE    "治ゆ"          TO  WRK-BYOMEI2R1-TENKI
+                   WHEN    "2"
+                       MOVE    "死亡"          TO  WRK-BYOMEI2R1-TENKI
+                   WHEN    "3"
+                       MOVE    "中止"          TO  WRK-BYOMEI2R1-TENKI
+                   WHEN    OTHER
+                       MOVE    SPACE           TO  WRK-BYOMEI2R1-TENKI
+                   END-EVALUATE
+      *            転帰日
+                   IF      WRK-BO-TENKIYMD     =   SPACE
+                       CONTINUE
+                   ELSE
+                       MOVE    WRK-BO-TENKIYMD     TO  WRK-SYMD
+                       PERFORM 31012-SEIWA-HEN-SEC
+                       MOVE    LNK-DAY2-EDTYMD3 (17:)
+                                                   TO
+                                               WRK-BYOMEI2R1-TENKIYMD
+                   END-IF
+               ELSE
+      *            診療開始日
+                   MOVE    WRK-BO-SRYYMD       TO  WRK-SYMD
+                   PERFORM 31012-SEIWA-HEN-SEC
+                   MOVE    LNK-DAY2-EDTYMD3 (5:)
+                                               TO  WRK-BYOMEI2R-YMD
+      *            転帰
+                   EVALUATE    WRK-BO-TENKIKBN
+                   WHEN    "1"
+                       MOVE    "治ゆ"          TO  WRK-BYOMEI2R-TENKI
+                   WHEN    "2"
+                       MOVE    "死亡"          TO  WRK-BYOMEI2R-TENKI
+                   WHEN    "3"
+                       MOVE    "中止"          TO  WRK-BYOMEI2R-TENKI
+                   WHEN    OTHER
+                       MOVE    SPACE           TO  WRK-BYOMEI2R-TENKI
+                   END-EVALUATE
+      *            転帰日
+                   IF      WRK-BO-TENKIYMD     =   SPACE
+                       CONTINUE 
+                   ELSE
+                       MOVE    WRK-BO-TENKIYMD     TO  WRK-SYMD
+                       PERFORM 31012-SEIWA-HEN-SEC
+                       MOVE    LNK-DAY2-EDTYMD3 (11:)
                                                TO  WRK-BYOMEI2R-TENKIYMD
+                   END-IF
                END-IF                                
            END-IF                                     
       *
