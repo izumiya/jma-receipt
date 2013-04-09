@@ -3043,6 +3043,12 @@
            PERFORM 910-TENSU-READ-SEC
       *    内容
            IF      WRK-SRYCD  (1:1)   =   "6"
+      *H25.4
+      *        点数マスタなしは、一般名記載なし
+               IF      FLG-TENSU           =   1
+                   MOVE    ZERO                TO  WRK-IPNMEI
+               END-IF
+      *
                IF      TNSP-IPN-KISAIKBN   =   1
                                            OR  3
       *            一般名記載なし
@@ -4684,7 +4690,8 @@
                INITIALIZE                      TENSUPLUS-REC
            END-IF
       *H24.4
-           IF     (TNS-SRYCD(1:1)      =   "6" )
+           IF     (TNS-SRYCD(1:1)      =   "6" ) AND
+                  (FLG-TENSU           =   ZERO)
       *        システム管理の変更可によって一般名記載とする
                IF     (TNSP-IPN-KISAIKBN       =   ZERO    )
                   AND (SYS-1030-KOUHATUKA      =   "1"     )
@@ -4708,6 +4715,9 @@
                        END-IF
                    END-IF
                END-IF
+           ELSE
+      *        一般名マスタなし
+               INITIALIZE                      GENERICNAME-REC
            END-IF
       *---(03.04.00) LINE ADD END   ------------------------------------
       *
