@@ -1217,6 +1217,9 @@
                MOVE    "データチェック"    TO  JOB-SHELLMSG
                MOVE    WRK-PARA-HOSPNUM    TO  JOB-HOSPNUM
                PERFORM 800-ORCSJOB-SEC
+      *
+               PERFORM 1001-CHKSND-CD-EDIT-SEC
+      *
            END-IF
       *
            CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
@@ -1363,6 +1366,56 @@
            .
        1001-INIT-VAL-SET-EXT.
            EXIT.
+      *****************************************************************
+      *    チェックマスタ２適用コード編集処理
+      *****************************************************************
+       1001-CHKSND-CD-EDIT-SEC         SECTION.
+      *
+           PERFORM 900-DBCOMMIT-SEC
+           PERFORM 900-DBSTART-SEC
+      *
+           PERFORM 900-CHKSND-KEY28-SEL-SEC
+      *
+           PERFORM UNTIL ( FLG-CHKSND  NOT =   ZERO )
+      *
+               IF    ( CHKSND-BYOMEI   NOT =   SPACE )
+                AND  ( CHKSND-CD           =   SPACE )
+      *
+                   INITIALIZE              SS012-AREA
+                   MOVE    CHKSND-BYOMEI
+                                       TO  SS012-I-BYOMEI
+                   CALL    "ORCSS012"      USING
+                                           SS012-AREA
+                                           SPA-AREA
+                   MOVE    SS012-BYOMEICD-G
+                                       TO  CHKSND-CD
+                   DISPLAY "[" CHKSND-CHKKBN "]"
+                           "[" CHKSND-SRYCD "]"
+                           "[" CHKSND-CD "]"
+                           "[" CHKSND-BYOMEI "]"
+      *
+                   MOVE    CHKSND-REC  TO  MCPDATA-REC
+                   MOVE    "tbl_chksnd"    TO  MCP-TABLE
+                   MOVE    "key28"         TO  MCP-PATHNAME
+                   PERFORM 910-DBUPDATE-SEC
+               END-IF
+      *
+               PERFORM 900-CHKSND-KEY28-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_chksnd"    TO  MCP-TABLE
+           MOVE    "key28"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           PERFORM 900-DBCOMMIT-SEC
+           PERFORM 900-DBSTART-SEC
+      *
+           .
+      *
+       1001-CHKSND-CD-EDIT-EXT.
+           EXIT.
+           .
       *****************************************************************
       *    チェックマスタチェック処理
       *    （チェック用データの存在チェック）
@@ -14404,6 +14457,49 @@
        900-CHKSND-KEY27-SEL-EXT.
            EXIT.
       *****************************************************************
+      *    チェックマスタ２検索処理
+      *****************************************************************
+       900-CHKSND-KEY28-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKSND
+      *
+           INITIALIZE                      CHKSND-REC
+           MOVE    SPA-HOSPNUM         TO  CHKSND-HOSPNUM
+           MOVE    CHKSND-REC          TO  MCPDATA-REC
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key28"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               MOVE    1               TO  FLG-CHKSND
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY28-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    チェックマスタ２FETCH処理
+      *****************************************************************
+       900-CHKSND-KEY28-FET-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHKSND
+      *
+           MOVE    "tbl_chksnd"        TO  MCP-TABLE
+           MOVE    "key28"             TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  CHKSND-REC
+           ELSE
+               MOVE    1               TO  FLG-CHKSND
+               INITIALIZE                  CHKSND-REC
+           END-IF
+      *
+           .
+       900-CHKSND-KEY28-FET-EXT.
+           EXIT.
+      *****************************************************************
       *    適応病名マスタ情報検索(KEY2)
       *****************************************************************
        900-TEKIOUBYOMEI-KEY2-SEL-SEC       SECTION.
@@ -14506,6 +14602,18 @@
            .
       *
        910-DBCLOSECURSOR-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢＵＰＤＡＴＥ処理
+      *****************************************************************
+       910-DBUPDATE-SEC                SECTION.
+      *
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+       910-DBUPDATE-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢＩＮＳＥＲＴ処理

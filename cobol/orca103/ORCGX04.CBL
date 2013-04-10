@@ -2263,7 +2263,7 @@
       *
                    PERFORM VARYING IDX0    FROM    1   BY  1
                            UNTIL ( IDX0    >   CONST-MKCD-MAX )
-                            OR   ( LNK-BYO-TBYOMEICD (IDX0)  =   SPACE )
+                            OR   ( SS012-BYOMEICD (IDX0)  =   SPACE )
       *
                        MOVE    SS012-BYOMEICD (IDX0)
                                    TO  SPA-NAI-TSRCBYOCD(IDX1 IDX0)
