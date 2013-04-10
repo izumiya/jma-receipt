@@ -152,6 +152,8 @@
       *    クライアント印刷有
            03  FLG-CLIENT-OK           PIC 9(01).
       *
+           03  FLG-K02NYUIN            PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                     PIC 9(04).
@@ -650,6 +652,9 @@
                WHEN    OTHER
                    MOVE    SPA-MOTOPG          TO  SPA-MOTOPG2
                    MOVE    SPACE               TO  WRK-MOTOPG
+                   IF      SPA-MOTOPG          =   "M01"
+                       MOVE    SPACE           TO  WRK-HZN-MOTOPG
+                   END-IF
                END-EVALUATE
            END-IF
            IF      WRK-MOTOPG          =   SPACE
@@ -1676,6 +1681,7 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                END-STRING
            END-IF
       *
+           MOVE    SPACE               TO  WRK-HKNKBN-MEI
       *    労災の時、コメントの追加
            IF      COMB-HKNNUM         =   "971"  OR  "973"
       *        患者保険情報検索
@@ -5881,6 +5887,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        493-ORCGK02-SEC              SECTION.
       *
+           IF     (SPA-ERRCD       NOT =   SPACE )
+             OR   (SPA-U2ID1CD     NOT =   SPACE )
+               GO       TO      493-ORCGK02-EXT
+           END-IF
+      *
            IF     (SPA-GMN-SELNUM      >   ZERO  )  AND
                   (SPA-GMN-PTID        =   ZERO  )
                MOVE    "0022"              TO  SPA-ERRCD
@@ -5900,11 +5911,30 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *        PERFORM 4906-QRHKCD-KAIJO-SEC
       **** END-IF
       *
+      *H25.4
+      *    患者の選択がなく、待受けがＫ０２の時、戻る処理
+           IF     (SPA-GMN-PTID       =   ZERO )  AND
+                  (SPA-MACHIPG(1:3)   =   "K02")
+               PERFORM 210-BACK
+               GO       TO      493-ORCGK02-EXT
+           END-IF
+      *
            PERFORM 4921-SPA-SET-SEC
            IF      SPA-GMN-SELNUM      >   ZERO
       *        受付ＩＤ
                MOVE    SPA-GMN-TUKEID  (SPA-GMN-SELNUM)
                                            TO  SPA-P02-UKEID
+           END-IF
+      *H25.4
+           MOVE    ZERO                TO  FLG-K02NYUIN
+           IF     (SPA-GMN-PTID    NOT =   ZERO )  AND
+                  (SPA-NAI-NYUINKBN    =   "1"  )
+      *        入院中は入院へ
+               MOVE    1                   TO  FLG-K02NYUIN
+      *        前が入院以外なら外来へ
+               IF      SPA-HZN-MOTOPG  NOT =   "K02N"
+                   MOVE    ZERO            TO  FLG-K02NYUIN
+               END-IF
            END-IF
       *
       *    排他制御解除処理
@@ -5912,6 +5942,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    "U02"               TO  SPA-MOTOPG
            MOVE    "K02"               TO  SPA-SAKIPG
+      *H25.4
+      *    入院中の患者
+           IF      FLG-K02NYUIN        =   1
+               MOVE    "K02N"              TO  SPA-SAKIPG
+           END-IF
       *
            MOVE    SPACE               TO  LINKAREA
       *
@@ -5919,7 +5954,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-AREA            TO  LNK-KYOUTU
       *
            MOVE   "CHANGE"             TO  MCP-PUTTYPE.
-           MOVE   "K02"                TO  MCP-WINDOW.
+      *****MOVE   "K02"                TO  MCP-WINDOW.
+           MOVE   SPA-SAKIPG           TO  MCP-WINDOW
       *
            PERFORM 900-PUT-WINDOW.
       *
