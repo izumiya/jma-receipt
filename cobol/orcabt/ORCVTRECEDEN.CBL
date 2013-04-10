@@ -494,10 +494,9 @@
            INITIALIZE                  SPA-AREA
       *
       *    パラメタセット
-      *    UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
-      *                                INTO    ASS-PARA
-      *    END-UNSTRING
-           MOVE    "/home/orca/ORCADC.PARA"  TO  ASS-PARA
+           UNSTRING   COMMAND-PARAM    DELIMITED  BY  ","
+                                       INTO    ASS-PARA
+           END-UNSTRING
       *
       *    パラメータ情報取得
            PERFORM 101-PARA-GET-SEC
