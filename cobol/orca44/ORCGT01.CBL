@@ -166,6 +166,7 @@
       *                                     変更
       *  04.07.06    NACL-藤原    12/11/19  主科情報の取得方法変更
       *  04.07.07    NACL-藤原    12/12/11  確認画面表示の修正
+      *  04.07.08    NACL-藤原    13/04/10  個別作成時のプレビュー画面表示
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1978,6 +1979,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                PERFORM 4501-JOBKANRI-CHK-SEC
                IF      SPA-ERRCD      =   SPACE
                    PERFORM 3501-KOBETU-PRINT-SEC
+                   GO  TO  350-T02-SET-EXT
                END-IF
            END-IF
       *
@@ -2215,6 +2217,10 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    ＪＯＢＩＤ更新処理
       *
            PERFORM 45012-JOBID-UPD-SEC
+      *
+      *    印刷データ削除処理
+      *
+           PERFORM 45015-PRTDATA-DEL-SEC
       *     
       *    情報確認画面を表示                                                   
            PERFORM 490-KAKUNIN-SEC
