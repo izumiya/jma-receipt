@@ -161,7 +161,7 @@ fi
             echo "--- iso start ---" >>$LOG_FILE
             DIR=`mktemp -d`
             cp $FILE_3 ${DIR}/${8}
-            mkisofs --input-charset cp437 -o $FILE_3.iso ${DIR}/
+            mkisofs --input-charset cp437 -l -o $FILE_3.iso ${DIR}/
 	    RC=$?
             echo "--- iso end   ---[" $RC  "]" >>$LOG_FILE
 	    if  [ $RC -ne '0' ]; then
