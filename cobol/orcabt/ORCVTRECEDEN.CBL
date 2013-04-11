@@ -67,7 +67,7 @@
       *    レセ電データＣＳＶファイル
        FD  CSV-FILE.
        01  CSV-REC.
-           03  CSV-R                   PIC X(800).
+           03  CSV-R                   PIC X(2404).
       *
       *    出力エラーファイル
        FD  ERR-FILE.
@@ -125,7 +125,7 @@
            03  CNT-ERR                 PIC 9(06).
            03  CNT-COMMIT              PIC 9(06).
            03  CNT-RE                  PIC 9(06).
-           03  CNT-SANTEI              PIC 9(06).
+           03  CNT-OUTRE               PIC 9(06).
       *
       *    添字領域
        01  IDX-AREA.
@@ -304,6 +304,9 @@
       *    レセ電テーブル分解
        01  HZN-IN-TBL.
            03  HZN-IN-KOUMOKU          PIC X(300)  OCCURS  50.
+      *    レセ電テーブル分解
+       01  HZN-SJ-TBL.
+           03  HZN-SJ-KOUMOKU          PIC X(2400) OCCURS  3.
       *
       *    帳票出力領域
        01  MES-AREA.
@@ -779,7 +782,10 @@
                        PERFORM 2001-PTNUM-SYORI-SEC
                    WHEN    "SJ"
       *                症状詳記レコード
-                       PERFORM 2001-SJ-SYORI-SEC
+                       IF      FLG-PTNUM-ERR   =   ZERO
+                           MOVE    1               TO  FLG-CSV-READ
+                           PERFORM 2001-SJ-SYORI-SEC
+                       END-IF
                    WHEN    OTHER
       *                診療行為レコードなど
                        IF      FLG-PTNUM-ERR   =   ZERO
@@ -1429,11 +1435,12 @@
                                        OR  "01" )
              OR   (FLG-SJ-KBN          =   1    )
       *        名称を変更
-               MOVE    "99"                TO  HZN-IN-KOUMOKU (2)
-               MOVE    HZN-IN-KOUMOKU (5)  TO  HZN-IN-KOUMOKU (3)
+               MOVE    SPACE               TO  HZN-SJ-TBL
+               MOVE    "99"                TO  HZN-SJ-KOUMOKU(2)
+               MOVE    HZN-IN-KOUMOKU (5)  TO  HZN-SJ-KOUMOKU(3)
                MOVE    1                   TO  FLG-SJ-KBN
       *        症状詳記レコード
-               PERFORM 2001-SJ-SYORI-SEC
+               PERFORM 2001-SJ-INS-SYORI-SEC
                INITIALIZE                  WRK-RECHEN-AREA
                GO       TO      20011-CO-SYORI-EXT
            END-IF
@@ -1519,6 +1526,8 @@
            END-IF
       *
            ADD     1                   TO  CNT-COMMIT
+      *
+           ADD     1                   TO  CNT-OUTRE
       *
            IF      FLG-ERR         NOT =   ZERO
       *        エラーリスト出力処理
@@ -2271,17 +2280,43 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        2001-SJ-SYORI-SEC        SECTION.
       *
+           INITIALIZE                      HZN-SJ-TBL
+           MOVE    1                   TO  WRK-MO-CNT
+           PERFORM VARYING WRK-MO-ST   FROM    1   BY  1
+                   UNTIL ( WRK-MO-ST   >   3 )
+               UNSTRING                CSV-REC
+                   DELIMITED  BY  ","
+                   INTO                HZN-SJ-KOUMOKU(WRK-MO-ST)
+                   WITH POINTER        WRK-MO-CNT
+               END-UNSTRING
+           END-PERFORM
+      *
+      *    症状詳記レコード処理
+           PERFORM 2001-SJ-INS-SYORI-SEC
+           .
+       2001-SJ-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    症状詳記レコード処理
+      *****************************************************************
+       2001-SJ-INS-SYORI-SEC        SECTION.
+      *
            INITIALIZE                  WRK-RECHEN-AREA
       *    症状詳記区分
-           IF      HZN-IN-KOUMOKU (2)(1:2) NOT =   SPACE
-               MOVE    HZN-IN-KOUMOKU (2)(1:2) TO  WRK-HEN-SJKBN
+           IF      HZN-SJ-KOUMOKU(2)(1:2)  NOT =   SPACE
+               MOVE    HZN-SJ-KOUMOKU(2) (1:2) TO  WRK-HEN-SJKBN
            END-IF
            IF      WRK-HEN-SJKBN       =   "90"
                                        OR  SPACE
                MOVE    "99"                TO  WRK-HEN-SJKBN
            END-IF
-      *    診療コード
-           MOVE    HZN-IN-KOUMOKU (3)      TO  WRK-HEN-COMMENT
+      *    症状詳記データ
+           MOVE    HZN-SJ-KOUMOKU(3)       TO  WRK-HEN-COMMENT
+      *    空白はなし
+           IF      WRK-HEN-COMMENT     =   SPACE
+               GO      TO      2001-SJ-INS-SYORI-EXT
+           END-IF
       *    レセコメント検索
            PERFORM 2120-RECECOM-SEL-SEC
       *
@@ -2326,7 +2361,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
            .
-       2001-SJ-SYORI-EXT.
+       2001-SJ-INS-SYORI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2528,7 +2563,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *
            DISPLAY "*(ORCVTRECEDEN)* CSV     /I CNT[" CNT-CSV      "]"
-           DISPLAY "*(ORCVTRECEDEN)* CNT-RE  /O CNT[" CNT-RE       "]"
+           DISPLAY "*(ORCVTRECEDEN)* CNT-RE  /I CNT[" CNT-RE       "]"
+           DISPLAY "*(ORCVTRECEDEN)* OUT     /O CNT[" CNT-OUTRE    "]"
            DISPLAY "*(ORCVTRECEDEN)* ERR     /O CNT[" CNT-ERR      "]"
       *
            .
