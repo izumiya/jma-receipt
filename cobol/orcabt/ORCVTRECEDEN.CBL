@@ -117,6 +117,8 @@
            03  FLG-SJ-KBN              PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
+           03  FLG-HENKAN              PIC 9(01).
+           03  FLG-HENKANERR           PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -618,15 +620,15 @@
        101-PARA-GET1-SEC           SECTION.
       *
            EVALUATE                PARA-DATKBN
-             WHEN  "12-1"
+             WHEN  "01-A"
                    MOVE  PARA-DATA TO  ASS-CSV
-             WHEN  "12-2"
+             WHEN  "02-A"
                    MOVE  PARA-DATA TO  ASS-ERR
              WHEN  "05-1"
                    MOVE  PARA-DATA TO  PARA-05-1
-             WHEN  "12-3"
+             WHEN  "09-A"
                    MOVE  PARA-DATA TO  PARA-12-3
-             WHEN  "12-4"
+             WHEN  "11-A"
                    MOVE  PARA-DATA TO  PARA-12-4
                WHEN    "HN"
                    MOVE    PARA-DATA     TO  PARA-HOSPNUM
@@ -2094,15 +2096,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPACE               TO  WRK-INPUT-G
            MOVE    ZERO                TO  IDX-H2
+           MOVE    ZERO                TO  FLG-HENKANERR
            PERFORM VARYING     IDX-H1      FROM    1   BY  2
-                   UNTIL       IDX-H1      >   100
+                   UNTIL      (IDX-H1      >   100 )
+                           OR (FLG-HENKANERR   =   1  )
                MOVE    TBL-MEISYO (IDX IDY)(IDX-H1:2)
                                           TO  WRK-MOJI
                IF      WRK-MOJI           =   SPACE
                    MOVE    100                TO  IDX-H1
                ELSE
+                   MOVE    ZERO                TO  FLG-HENKAN
                    PERFORM VARYING     IDK      FROM    1   BY  1
-                           UNTIL       IDK      >   10
+                           UNTIL      (IDK      >   10 )
+                                   OR (FLG-HENKAN   =   1   )
                        IF      WRK-MOJI        =   TBL-SUJI (IDK)
                            ADD     1           TO  IDX-H2
                            IF      IDK         =   10
@@ -2111,25 +2117,35 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                MOVE    IDK     TO  IDK1
                                MOVE    IDK1    TO  WRK-INPUT (IDX-H2)
                            END-IF
+                           MOVE    1           TO  FLG-HENKAN
                        END-IF
                    END-PERFORM
+      *            全角数値変換エラー
+                   IF      FLG-HENKAN          =   ZERO
+                       MOVE    1               TO  FLG-HENKANERR
+                   END-IF
                END-IF
            END-PERFORM
+      *    病名部位変換なし
+           IF      FLG-HENKANERR       =   1
+               MOVE    TBL-MEISYO (IDX IDY)    TO  WRK-MEISYO
+           ELSE
       *
-      *    病名部位から部位名称編集
-           MOVE    WRK-INPUT-G         TO  WRK-BUI-INPUTCD-G
-           MOVE    SPACE               TO  WRK-MEISYO
-           PERFORM VARYING IDX-SST     FROM    1   BY  1
+      *        病名部位から部位名称編集
+               MOVE    WRK-INPUT-G         TO  WRK-BUI-INPUTCD-G
+               MOVE    SPACE               TO  WRK-MEISYO
+               PERFORM VARYING IDX-SST     FROM    1   BY  1
                    UNTIL  (IDX-SST         >   12    )   OR
                           (WRK-BUICD (IDX-SST) =   SPACE )
-               PERFORM 20091229-BUICD-HEN-SEC
-               MOVE    WRK-MEISYO          TO  WRK-MEISYO-H
-               MOVE    SPACE               TO  WRK-MEISYO
-               STRING  WRK-MEISYO-H
-                       BYO-BYOMEI          DELIMITED   BY  SPACE
-                                           INTO      WRK-MEISYO
-               END-STRING
-           END-PERFORM
+                   PERFORM 20091229-BUICD-HEN-SEC
+                   MOVE    WRK-MEISYO          TO  WRK-MEISYO-H
+                   MOVE    SPACE               TO  WRK-MEISYO
+                   STRING  WRK-MEISYO-H
+                           BYO-BYOMEI          DELIMITED   BY  SPACE
+                                               INTO      WRK-MEISYO
+                   END-STRING
+               END-PERFORM
+           END-IF
       *
            MOVE    SPACE                   TO  WRK-INPUTCHI-G
            PERFORM 2009121-PTCOM-INS-SEC
