@@ -126,6 +126,8 @@
       *                                     Æþ±¡Î¬¾Î¤ÎÊÑ¹¹
       *  04.05.05    NACL-ÌçÏÆ    13/02/07  Ï«ºÒ¡¦¼«ÇåÀÕ¡ÊÆþ±¡¡Ë
       *                                     ¶â³Û¹àÌÜ£··åÂÐ±þ
+      *
+      *  04.06.01    NACL-Æ£¸¶    13/04/12  Ä¢É¼¥¿¥¤¥È¥ëÀßÄê¤Î¾ò·ïÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1577,6 +1579,8 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCM21V04.red"  ALSO    ANY
                WHEN    "HCM21V05.red"  ALSO    ANY
                WHEN    "HCM21V05P.red" ALSO    ANY
+               WHEN    "HCM21V06.red"  ALSO    ANY
+               WHEN    "HCM21V06P.red" ALSO    ANY
                WHEN    "HC22"          ALSO    ANY 
                WHEN    "HCM22.red"     ALSO    ANY
                WHEN    "HCM22V01.red"  ALSO    ANY
