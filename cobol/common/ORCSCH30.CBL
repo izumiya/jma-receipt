@@ -652,6 +652,8 @@
                            MOVE    1                   TO  FLG-OK
                        END-IF
                        IF      SRY-SRYCD (IDXA)    =   "630010002"
+      *H25.4               ∈负∷滦据嘲
+                                                   OR  "820000047"
                            CONTINUE
                        ELSE
                            ADD     1               TO  IDX
@@ -1215,6 +1217,8 @@
                               (WKSRY-SRYCD (IDXA)  =   SPACE)
                IF     (WKSRY-SRYCD (IDXA)      =   "630010002" )
                  OR   (WKSRY-SRYCD (IDXA)(1:4)     =   "0086" )
+      *          ∈负∷は滦据嘲
+                 OR   (WKSRY-SRYCD (IDXA)      =   "820000047" )
                    CONTINUE
                ELSE
                    ADD    1                        TO  IDX
