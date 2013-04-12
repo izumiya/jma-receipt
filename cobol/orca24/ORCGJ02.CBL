@@ -1537,6 +1537,12 @@
                        MOVE    1                  TO  SPA-GMN-CUR
                    END-IF
       *
+      *H25.4
+               WHEN    "0149"
+                   MOVE    SPACE           TO  SPA-JIDCD
+      *            レセ電移行データ削除
+                   PERFORM 43990-RECEDEN-DELETE-SYORI-SEC
+      *
                WHEN    "0121"
                    MOVE    SPACE           TO  SPA-JIDCD
       *            プレビュー確認
@@ -2344,6 +2350,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      FLG-SRYACCT         =   ZERO
                    MOVE    ACCT-SRYKA         TO  SPA-J01-SRYKA
                    MOVE    ACCT-SRYKA         TO  SPA-GMN-SRYKA
+      *H25.4
+                   IF      ACCT-SRYKA (1:1)   =   "A"
+      *                レセ電分　全科へ
+                       MOVE    "00"                TO  SPA-J01-SRYKA
+                       MOVE    "00"                TO  SPA-GMN-SRYKA
+                   END-IF
                END-IF
            END-IF
       *H25.4
@@ -8083,6 +8095,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
+      *H25.4
+      *    レセ電移行データの一括削除
+           IF     (SPA-ERRCD           =   SPACE  )
+              AND (SPA-JIDCD           =   SPACE  )
+              AND (SPA-GMN-HHKNCOMBI   =   "9999" )
+              AND (SPA-J01-SRYKA       =   "00"   )
+              AND (SPA-RRK-MAX         >   ZERO   )
+              AND (SPA-GMN-RRKSRYKA(SPA-RRK-MAX)(1:1)
+                                       =   "A"    )
+               MOVE    "0149"          TO  SPA-JIDCD
+           END-IF
+      *
+      *
            IF      SPA-ERRCD           =   SPACE
               AND  SPA-JIDCD           =   SPACE
       *        保存用パラメタ作成
@@ -8403,6 +8428,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "key14"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *H25.4
+      *    レセ電移行データの一括削除
+           IF     (SPA-ERRCD           =   SPACE  )
+              AND (SPA-JIDCD           =   SPACE  )
+              AND (SPA-GMN-HHKNCOMBI   =   "9999" )
+              AND (SPA-J01-SRYKA       =   "00"   )
+              AND (SPA-RRK-MAX         >   ZERO   )
+              AND (SPA-GMN-RRKSRYKA(SPA-RRK-MAX)(1:1)
+                                       =   "A"    )
+               MOVE    "0149"          TO  SPA-JIDCD
+           END-IF
+      *
+      *
            IF      SPA-ERRCD           =   SPACE
               AND  SPA-JIDCD           =   SPACE
       *
@@ -8504,6 +8542,185 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        430011-JYURRK-RENNUM-EXT.
            EXIT.
+      *
+      *H25.4
+      *****************************************************************
+      *    レセ電移行データ削除
+      *****************************************************************
+       43990-RECEDEN-DELETE-SYORI-SEC        SECTION.
+      *
+           IF      SPA-JID1-FLG        =   "OK"
+               PERFORM 439901-RECEDEN-DELETE-SEC
+           END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE
+      *        受診履歴編集
+               PERFORM 3103-JYURRK-HEN-SEC
+      *        保存用パラメタ作成
+               PERFORM 4201-SRYACCT-PARA-SEC
+               MOVE    1                   TO  SPA-GMN-PAGE
+               MOVE    1                   TO  SPA-STRNUM
+      *        診療会計マスターより編集をする
+               PERFORM 410181-SRYACCT-HEN-SEC
+           END-IF
+      *
+           .
+       43990-RECEDEN-DELETE-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセ電移行データ削除
+      *****************************************************************
+       439901-RECEDEN-DELETE-SEC        SECTION.
+      *
+           INITIALIZE                  JYURRK-REC
+           MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  JYURRK-PTID
+           MOVE    SPA-NYUGAIKBN       TO  JYURRK-NYUGAIKBN
+           STRING  SPA-NAI-SRYYM
+                   "%"                 DELIMITED  BY  SIZE
+                                       INTO    JYURRK-SRYYMD
+           END-STRING
+           MOVE    JYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key54"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key54"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           ELSE
+               INITIALIZE                  JYURRK-REC
+               MOVE    1               TO  FLG-JYURRK
+           END-IF
+           PERFORM
+               UNTIL    FLG-JYURRK         =   1
+               PERFORM VARYING     IDZ     FROM    1   BY  1
+                       UNTIL       IDZ     >   15
+                   INITIALIZE                      SRYACCT-REC 
+                   MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
+                   MOVE    JYURRK-NYUGAIKBN    TO  ACCT-NYUGAIKBN
+                   MOVE    JYURRK-PTID         TO  ACCT-PTID
+                   MOVE    JYURRK-SRYYMD(1:6)  TO  ACCT-SRYYM
+                   MOVE    JYURRK-SRYKA        TO  ACCT-SRYKA
+                   MOVE    JYURRK-ZAINUM (IDZ) TO  ACCT-ZAINUM
+      *
+                   MOVE    SRYACCT-REC         TO  MCPDATA-REC
+                   MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                   MOVE    "key5"              TO  MCP-PATHNAME
+                   PERFORM 910-DBSELECT-SEC
+                   IF      MCP-RC              =   ZERO
+                       MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                       MOVE    "key5"              TO  MCP-PATHNAME
+                       PERFORM 900-SRYACCT-READ-SEC
+                   ELSE
+                       INITIALIZE                  SRYACCT-REC
+                       MOVE    1               TO  FLG-SRYACCT
+                   END-IF
+                   IF      FLG-SRYACCT     =   ZERO
+      *                診療行為削除
+                       PERFORM 439901-SRYACCT-DEL-SEC
+                   END-IF
+      *
+                   MOVE    "tbl_sryacct"       TO  MCP-TABLE
+                   MOVE    "key5"             TO  MCP-PATHNAME
+                   PERFORM 990-DBCLOSE-SEC
+               END-PERFORM
+      *
+      *        受診履歴削除
+               PERFORM 490112-JYURRK-DEL-SEC
+      *
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key54"             TO  MCP-PATHNAME
+               PERFORM 970-JYURRK-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key54"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       439901-RECEDEN-DELETE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療行為など削除処理
+      *****************************************************************
+       439901-SRYACCT-DEL-SEC      SECTION.
+      *
+           INITIALIZE                  SRYACT-REC
+           MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN      TO  SRY-NYUGAIKBN
+           MOVE    ACCT-PTID           TO  SRY-PTID
+           MOVE    ACCT-SRYKA          TO  SRY-SRYKA
+           MOVE    ACCT-SRYYM          TO  SRY-SRYYM
+           MOVE    ACCT-ZAINUM         TO  SRY-ZAINUM
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "del11"             TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "K03 SRYACT DEL ERR:" MCP-RC
+                       ",KEY:" SRY-KEY
+               MOVE    "2004"              TO  SPA-ERRCD
+           END-IF
+      *    コメント
+           INITIALIZE                  PTCOM-REC
+           MOVE    ACCT-HOSPNUM        TO  PTCOM-HOSPNUM
+           MOVE    ACCT-PTID           TO  PTCOM-PTID
+           MOVE    ACCT-ZAINUM         TO  PTCOM-ZAINUM
+      *
+           MOVE    PTCOM-REC           TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_ptcom"         TO  MCP-TABLE
+           MOVE    "del11"             TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "J02  PTCOM  DEL ERR:" MCP-RC
+                     ",KEY:" PTCOM-KEY
+               MOVE    "2004"              TO  SPA-ERRCD
+           END-IF
+      *
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "J02 SRYACCT DEL ERR:" MCP-RC
+                        ",KEY:" ACCT-KEY
+               MOVE    "2004"              TO  SPA-ERRCD
+           END-IF
+      *
+      *    附加情報削除
+           INITIALIZE                  SRYACCTPLUS-REC
+           MOVE    ACCT-HOSPNUM        TO  ACCTP-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN      TO  ACCTP-NYUGAIKBN
+           MOVE    ACCT-PTID           TO  ACCTP-PTID
+           MOVE    ACCT-SRYKA          TO  ACCTP-SRYKA
+           MOVE    ACCT-SRYYM          TO  ACCTP-SRYYM
+           MOVE    ACCT-ZAINUM         TO  ACCTP-ZAINUM
+      *
+           MOVE    SRYACCTPLUS-REC     TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_sryacctplus"   TO  MCP-TABLE
+           MOVE    "del2"              TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "J02  SRYACCTPLUS  DEL ERR:" MCP-RC
+                     ",KEY:" ACCTP-KEY
+           END-IF
+           .
+       439901-SRYACCT-DEL-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    剤変更画面へ
@@ -14376,6 +14593,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        DELIMITED  BY  SIZE
                                        INTO    WRK-JIDMSG
                    END-STRING
+      *H25.4
+               WHEN    "0149"
+                   STRING  "表示しているレセ電移行データを削除します。"
+                           "復元はできません。よろしいですか？"
+                                       DELIMITED  BY  SIZE
+                                       INTO    WRK-JIDMSG
+                   END-STRING
       *
                WHEN    "0123"
                    STRING  "既に受診のある日です。"
@@ -14417,6 +14641,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-JIDCD           TO  JID1-ID1CODE
            MOVE    WRK-JIDMSG          TO  JID1-ID1MSG
            MOVE    "B12"               TO  MCP-WIDGET
+      *H25.4
+           EVALUATE    SPA-JIDCD
+               WHEN    "0149"
+                   MOVE    "B01"               TO  MCP-WIDGET
+           END-EVALUATE
       *
            MOVE    "J02"               TO  SPA-MOTOPG
            MOVE    "JID1"              TO  SPA-SAKIPG
