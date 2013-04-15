@@ -55,6 +55,10 @@
       *  04.05.02    NACL-門脇    12/05/16  愛知・三重県地方公費対応
       *
       *  04.06.01    NACL-門脇    11/01/14  保険別請求チェック表の本体取込み
+      *  04.06.02    NACL-門脇    13/04/10  公費を含む場合の主保険の一部負担額
+      *                                     （１円単位）（判定用）の編集追加
+      *                                     公費を含む場合の主保険の一部負担額
+      *                                     の編集修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -79,6 +83,7 @@
            03  FLG-TOKUREI-HKNJYA    PIC 9(01).
            03  FLG-PTKOHINF          PIC 9(01).
            03  FLG-CYOKINOMI         PIC 9(01).
+           03  FLG-KOHHEI            PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -93,6 +98,7 @@
                05  WRK-KYURATE       PIC 9(03).
                05  WRK-ZENKOH-ARI    PIC 9(01).
            03  WRK-FTNKEI            PIC 9(09).
+           03  WRK-FTNKEI2           PIC 9(09).
            03  WRK-KINGAKU           PIC 9(09).
            03  WRK-KINGAKU2          PIC 9(09).
            03  WRK-FTN-KOH-XXX       PIC 9(09).
@@ -324,6 +330,7 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
       *    収納マスタから一部負担額チェック等
            MOVE       ZERO      TO    FLG-CYOKINOMI
            MOVE       ZERO      TO    WRK-CYOKI-HKNCOMBINUM
+           MOVE       ZERO      TO    FLG-KOHHEI
            IF      LNK-KOREIFTNCHK-NYUGAIKBN  =  "1"
                PERFORM       220-NYUIN-SYUKEI-SEC
            ELSE
@@ -351,7 +358,18 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                     MOVE "key"                 TO  MCP-PATHNAME
                     PERFORM 910-HKNCOMBI-READ-SEC
                     IF FLG-HKNCOMBI            =   ZERO
+                      IF  COMB-KOH1HKNNUM = "972" OR "974"
                        MOVE   COMB-KOH1ID      TO  WRK-KOHID-CYOKI
+                      END-IF
+                      IF  COMB-KOH2HKNNUM = "972" OR "974"
+                       MOVE   COMB-KOH2ID      TO  WRK-KOHID-CYOKI
+                      END-IF
+                      IF  COMB-KOH3HKNNUM = "972" OR "974"
+                       MOVE   COMB-KOH3ID      TO  WRK-KOHID-CYOKI
+                      END-IF
+                      IF  COMB-KOH4HKNNUM = "972" OR "974"
+                       MOVE   COMB-KOH4ID      TO  WRK-KOHID-CYOKI
+                      END-IF
                     END-IF
                   END-IF
                   MOVE  "tbl_hkncombi"         TO  MCP-TABLE
@@ -361,6 +379,10 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                   IF  LNK-KOREIFTNCHK-KOHID-CYOKI  NOT = ZERO
                   AND LNK-KOREIFTNCHK-KOHID-CYOKI   =
                                               WRK-KOHID-CYOKI
+      ***           IF   FLG-KOHHEI =  1
+      ***             MOVE  LNK-KOREIFTNCHK-KOHFTNGAKU
+      ***                      TO  LNK-KOREIFTNCHK-ICHIBUGAKU
+      ***           END-IF
                     CONTINUE
                   ELSE
                     INITIALIZE     LNK-KOREIFTNCHK-OUT-AREA
@@ -638,14 +660,19 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                   PERFORM  UNTIL
                              (FLG-SYUNOU        =    1)
       *
-                   IF  ( SYU-KOH-HKNNUM(1)  =  "972" OR "974" )
-                   AND ( SYU-KOH-HKNNUM(2)  =  SPACE          )
-                   AND ( SYU-KOH-HKNNUM(3)  =  SPACE          )
-                   AND ( SYU-KOH-HKNNUM(4)  =  SPACE          )
+                   IF    (SYU-KOH-HKNNUM(1) =  "972" OR "974")
+                   OR    (SYU-KOH-HKNNUM(2) =  "972" OR "974")
+                   OR    (SYU-KOH-HKNNUM(3) =  "972" OR "974")
+                   OR    (SYU-KOH-HKNNUM(4) =  "972" OR "974")
                       IF    FLG-CYOKINOMI   =  ZERO
                          MOVE     1     TO    FLG-CYOKINOMI
                          MOVE   WRK-HKNCOMBINUM(IDX1)
                                         TO    WRK-CYOKI-HKNCOMBINUM
+                      END-IF
+                      IF (SYU-KOH-HKNNUM(2) =  "972" OR "974")
+                      OR (SYU-KOH-HKNNUM(3) =  "972" OR "974")
+                      OR (SYU-KOH-HKNNUM(4) =  "972" OR "974")
+                         MOVE     1     TO    FLG-KOHHEI
                       END-IF
                    ELSE
                          MOVE     9     TO    FLG-CYOKINOMI
@@ -905,9 +932,11 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
        2202-NYUGAI-WAKODO-SYUKEI-SEC            SECTION.
       *
            IF  ( SYU-KOH-HKNNUM(1)  =  "972" OR "974" )
-           AND ( SYU-KOH-HKNNUM(2)  =  SPACE          )
-           AND ( SYU-KOH-HKNNUM(3)  =  SPACE          )
-           AND ( SYU-KOH-HKNNUM(4)  =  SPACE          )
+           OR  ( SYU-KOH-HKNNUM(2)  =  "972" OR "974" )
+           OR  ( SYU-KOH-HKNNUM(3)  =  "972" OR "974" )
+           OR  ( SYU-KOH-HKNNUM(4)  =  "972" OR "974" )
+      *
+               ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *
                COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
                                    * 10
@@ -924,22 +953,28 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                                      + SYU-GRP-SGKMONEY
                END-IF
       *
-               EVALUATE  SYU-KOH-HKNNUM(1)
-                 WHEN      "972"
+               IF  ( SYU-KOH-HKNNUM(1)  =  "972" )
+               OR  ( SYU-KOH-HKNNUM(2)  =  "972" )
+               OR  ( SYU-KOH-HKNNUM(3)  =  "972" )
+               OR  ( SYU-KOH-HKNNUM(4)  =  "972" )
                    IF  LNK-KOREIFTNCHK-TOKU75 = 3
                       MOVE  5000   TO   WRK-KINGAKU
                    ELSE
                       MOVE  10000  TO   WRK-KINGAKU
                    END-IF
                    PERFORM  260-ICHIBUFTN-KOH-SET-SEC
-                 WHEN      "974"
+               END-IF
+               IF  ( SYU-KOH-HKNNUM(1)  =  "974" )
+               OR  ( SYU-KOH-HKNNUM(2)  =  "974" )
+               OR  ( SYU-KOH-HKNNUM(3)  =  "974" )
+               OR  ( SYU-KOH-HKNNUM(4)  =  "974" )
                    IF  LNK-KOREIFTNCHK-TOKU75 = 3
                       MOVE  10000  TO   WRK-KINGAKU
                    ELSE
                       MOVE  20000  TO   WRK-KINGAKU
                    END-IF
                    PERFORM  260-ICHIBUFTN-KOH-SET-SEC
-               END-EVALUATE
+               END-IF
       *
            END-IF
       *
@@ -1014,14 +1049,19 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                   PERFORM  UNTIL
                              (FLG-SYUNOU        =    1)
       *
-                   IF  ( SYU-KOH-HKNNUM(1)  =  "972" OR "974" )
-                   AND ( SYU-KOH-HKNNUM(2)  =  SPACE          )
-                   AND ( SYU-KOH-HKNNUM(3)  =  SPACE          )
-                   AND ( SYU-KOH-HKNNUM(4)  =  SPACE          )
+                   IF    (SYU-KOH-HKNNUM(1) =  "972" OR "974")
+                   OR    (SYU-KOH-HKNNUM(2) =  "972" OR "974")
+                   OR    (SYU-KOH-HKNNUM(3) =  "972" OR "974")
+                   OR    (SYU-KOH-HKNNUM(4) =  "972" OR "974")
                       IF    FLG-CYOKINOMI   =  ZERO
                          MOVE     1     TO    FLG-CYOKINOMI
                          MOVE   WRK-HKNCOMBINUM(IDX1)
                                         TO    WRK-CYOKI-HKNCOMBINUM
+                      END-IF
+                      IF (SYU-KOH-HKNNUM(2) =  "972" OR "974")
+                      OR (SYU-KOH-HKNNUM(3) =  "972" OR "974")
+                      OR (SYU-KOH-HKNNUM(4) =  "972" OR "974")
+                         MOVE     1     TO    FLG-KOHHEI
                       END-IF
                    ELSE
                          MOVE     9     TO    FLG-CYOKINOMI
@@ -1237,6 +1277,12 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
               ADD   WRK-FTNKEI       TO  LNK-KOREIFTNCHK-ICHIBUGAKU
                                          WRK-FTN-KOH-XXX
            END-IF
+      *
+           COMPUTE  WRK-FTNKEI2  = SYU-TOTAL-HKNTEN
+                                 * 10
+                                 * WRK-KYURATE(IDX1)
+                                 / 100
+           ADD      WRK-FTNKEI2      TO  LNK-KOREIFTNCHK-ICHIBUGAKU2
       *
            .
        260-ICHIBUFTN-KOH-SET-EXT.
