@@ -97,6 +97,8 @@
              05 LNK-KOREIFTNCHK-KOHFTNGAKU  PIC 9(07).
       *公費を含む場合の主保険の一部負担額
              05 LNK-KOREIFTNCHK-ICHIBUGAKU  PIC 9(07).
+      *公費を含む場合の主保険の一部負担額（１円単位）（判定用）
+             05 LNK-KOREIFTNCHK-ICHIBUGAKU2 PIC 9(07).
       *入　：高齢者＋地方公費の請求金額
              05 LNK-KOREIFTNCHK-CHIHOUGAKU  PIC 9(07).
       *

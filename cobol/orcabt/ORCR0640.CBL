@@ -597,6 +597,7 @@
       *  04.06.11    NACL-ÌçÏÆ    13/03/27  Á¥°÷²¼Á¥¸å¡Ê¿©»öÉéÃ´¤Ê¤·¡Ë¤Î
       *                                     À¸³èÎÅÍÜÉ¸½àÉéÃ´³Û¤Îµ­ºÜ¤ò¤·¤Ê¤¤
       *                                     ¡ÊÅ¦Í×Íó¡Ë
+      *  04.06.12    NACL-ÌçÏÆ    13/04/10  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -1011,6 +1012,7 @@
            03  WRK-KOH-GAI-GEN70-KIN2                  PIC 9(09).
            03  WRK-KOH-GAI-GEN70-KIN3                  PIC 9(09).
            03  WRK-KOH-GAI-GEN70-KIN4                  PIC 9(09).
+           03  WRK-KOH-GAI-GEN70-KIN5                  PIC 9(09).
            03  FTN-KOH-XXX                             PIC 9(09).       
            03  FTN-KOH-XX2                             PIC 9(09).
            03  FTN-KOH-XX3                             PIC 9(09).
@@ -1075,6 +1077,7 @@
            03  WRK-SKY-KEISAN2                         PIC 9(09).
            03  WRK-SKY-KEISAN3                         PIC 9(09).
            03  WRK-SKY-KEISAN4                         PIC S9(09).
+           03  WRK-SKY-KEISAN5                         PIC 9(09).
            03  WRK-SKY-HOKENJA                         PIC 9(09).
            03  WRK-SKY-HOKENJA-KOH                     PIC 9(09).
            03  WRK-SKY-ICHIBUFTN                       PIC 9(09).
@@ -1337,6 +1340,7 @@
            03  WRK-CHK-HKNID                           PIC 9(10).
            03  WRK-CHK-HKNNUM                          PIC X(03).
            03  WRK-CHK-ICHIBUGAKU                      PIC 9(07).
+           03  WRK-CHK-ICHIBUGAKU2                     PIC 9(07).
            03  WRK-CHK-FTNGAKU                         PIC 9(07).
            03  WRK-CHK-KOHFTNGAKU                      PIC 9(07).
            03  WRK-CHK-KEISAN1                         PIC 9(07).
@@ -14991,6 +14995,7 @@
            MOVE    ZERO                 TO      WRK-CHIHOU-KIN6
       *
            MOVE    ZERO                 TO      WRK-CHK-ICHIBUGAKU
+                                                WRK-CHK-ICHIBUGAKU2
                                                 WRK-CHK-FTNGAKU
                                                 WRK-CHK-KOHFTNGAKU
       *
@@ -15994,6 +15999,8 @@
                       MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU
                                        TO  FTN-KOH-XXX
                                            WRK-CHK-ICHIBUGAKU
+                      MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU2
+                                       TO  WRK-CHK-ICHIBUGAKU2
                     END-IF
                     MOVE   LNK-KOREIFTNCHK-CHIHOUGAKU
                                        TO  WRK-CHIHOU-KIN
@@ -20561,6 +20568,9 @@
                                            * RECE62-KYURATE
                                            / 100
       *
+           COMPUTE  WRK-KOH-GAI-GEN70-KIN5 = WRK-KOH-GAI-GEN70-KIN1
+                                           + WRK-CHK-ICHIBUGAKU2
+      *
            MOVE    ZERO   TO   WRK-KEISAN-YYY
       *
            IF      RECE62-KOUREI  =  "2"
@@ -20704,6 +20714,7 @@
                 ELSE
                  IF  (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2)
                  OR  (WRK-KOH-GAI-GEN70-KIN3 >  WRK-CHK-KINGAKU3)
+                 OR  (WRK-KOH-GAI-GEN70-KIN5 >  WRK-CHK-KINGAKU2)
                     CONTINUE
                  ELSE
                     MOVE    "3"      TO   RECE62-KOUREI
@@ -25231,6 +25242,18 @@
                  AND   (WRK-SKY-KEISAN     >  RECE62-FTNMONEY-SKY)
                    COMPUTE    WRK-SKY-KEISAN2 = WRK-SKY-KEISAN
                                               - RECE62-FTNMONEY-SKY
+                   IF   WRK-CHK-ICHIBUGAKU2  NOT =  ZERO
+                     IF  WRK-SKY-FTNMONEY  >  RECE62-FTNMONEY-SKY
+                       COMPUTE WRK-SKY-KEISAN5 = WRK-SKY-FTNMONEY
+                                               - RECE62-FTNMONEY-SKY
+                       IF  WRK-SKY-KEISAN2 > WRK-SKY-KEISAN5
+                         COMPUTE WRK-SKY-KEISAN2 = WRK-SKY-KEISAN2
+                                                 - WRK-SKY-KEISAN5
+                       ELSE
+                         MOVE    ZERO   TO   WRK-SKY-KEISAN2
+                       END-IF
+                     END-IF
+                   END-IF
                    ADD    WRK-SKY-KEISAN2  TO  RECE62-SKYIRYO-HOKENJA
                  END-IF
                ELSE

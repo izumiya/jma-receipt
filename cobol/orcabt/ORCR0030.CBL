@@ -611,6 +611,7 @@
       *  04.06.10    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.06.11    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.06.12    NACL-ÌçÏÆ    13/03/21  Á´¹ñ¸øÈñ¤¢¤ê¥Õ¥é¥°ÊÔ½¸½¤Àµ
+      *  04.06.13    NACL-ÌçÏÆ    13/04/10  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -1023,6 +1024,7 @@
            03  WRK-KOH-GAI-GEN70-KIN2                  PIC 9(09).
            03  WRK-KOH-GAI-GEN70-KIN3                  PIC 9(09).
            03  WRK-KOH-GAI-GEN70-KIN4                  PIC 9(09).
+           03  WRK-KOH-GAI-GEN70-KIN5                  PIC 9(09).
            03  FTN-KOH-XXX                             PIC 9(09).       
            03  FTN-KOH-XX2                             PIC 9(09).
            03  FTN-KOH-XX3                             PIC 9(09).
@@ -1102,6 +1104,7 @@
            03  WRK-SKY-KEISAN2                         PIC 9(09).
            03  WRK-SKY-KEISAN3                         PIC 9(09).
            03  WRK-SKY-KEISAN4                         PIC S9(09).
+           03  WRK-SKY-KEISAN5                         PIC 9(09).
            03  WRK-SKY-HOKENJA                         PIC 9(09).
            03  WRK-SKY-HOKENJA-KOH                     PIC 9(09).
            03  WRK-SKY-ICHIBUFTN                       PIC 9(09).
@@ -1230,6 +1233,7 @@
            03  WRK-CHK-HKNID                           PIC 9(10).
            03  WRK-CHK-HKNNUM                          PIC X(03).
            03  WRK-CHK-ICHIBUGAKU                      PIC 9(07).
+           03  WRK-CHK-ICHIBUGAKU2                     PIC 9(07).
            03  WRK-CHK-FTNGAKU                         PIC 9(07).
            03  WRK-CHK-KOHFTNGAKU                      PIC 9(07).
            03  WRK-CHK-KEISAN1                         PIC 9(07).
@@ -2642,6 +2646,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            MOVE      ZERO       TO      WRK-CHIHOU-KIN4
            MOVE      ZERO       TO      WRK-CHIHOU-KIN6
            MOVE      ZERO       TO      WRK-CHK-ICHIBUGAKU
+                                        WRK-CHK-ICHIBUGAKU2
                                         WRK-CHK-FTNGAKU
                                         WRK-CHK-KOHFTNGAKU
            MOVE      ZERO       TO      FLG-GENBUTU-TAISYOOK
@@ -4788,6 +4793,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                       MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU
                                        TO  FTN-KOH-XXX
                                            WRK-CHK-ICHIBUGAKU
+                      MOVE   LNK-KOREIFTNCHK-ICHIBUGAKU2
+                                       TO  WRK-CHK-ICHIBUGAKU2
                     END-IF
       ***           MOVE   LNK-KOREIFTNCHK-CHIHOUGAKU
       ***                              TO  WRK-CHIHOU-KIN
@@ -16226,6 +16233,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                            * WRK-KYURATE
                                            / 100
       *
+           COMPUTE  WRK-KOH-GAI-GEN70-KIN5 = WRK-KOH-GAI-GEN70-KIN1
+                                           + WRK-CHK-ICHIBUGAKU2
+      *
            MOVE    ZERO   TO   WRK-KEISAN-YYY
       *
            IF      RECE02-ZAITAKU  =  "2"
@@ -16369,6 +16379,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 ELSE
                  IF  (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2)
                  OR  (WRK-KOH-GAI-GEN70-KIN3 >  WRK-CHK-KINGAKU3)
+                 OR  (WRK-KOH-GAI-GEN70-KIN5 >  WRK-CHK-KINGAKU2)
                     CONTINUE
                  ELSE
                     MOVE    "3"      TO   RECE02-ZAITAKU
@@ -16858,6 +16869,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      IF  (WRK-KOH-GAI-GEN70-KIN1 >  WRK-CHK-KINGAKU2)
                      OR  (WRK-KOH-GAI-GEN70-KIN3 >  WRK-CHK-KINGAKU3)
+                     OR  (WRK-KOH-GAI-GEN70-KIN5 >  WRK-CHK-KINGAKU2)
                         CONTINUE
                      ELSE
                         MOVE    "4"      TO   RECE02-ZAITAKU
@@ -20216,6 +20228,18 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                  AND   (WRK-SKY-KEISAN     >  RECE02-FTNMONEY-SKY)
                    COMPUTE    WRK-SKY-KEISAN2 = WRK-SKY-KEISAN
                                               - RECE02-FTNMONEY-SKY
+                   IF   WRK-CHK-ICHIBUGAKU2  NOT =  ZERO
+                     IF  WRK-SKY-FTNMONEY  >  RECE02-FTNMONEY-SKY
+                       COMPUTE WRK-SKY-KEISAN5 = WRK-SKY-FTNMONEY
+                                               - RECE02-FTNMONEY-SKY
+                       IF  WRK-SKY-KEISAN2 > WRK-SKY-KEISAN5
+                         COMPUTE WRK-SKY-KEISAN2 = WRK-SKY-KEISAN2
+                                                 - WRK-SKY-KEISAN5
+                       ELSE
+                         MOVE    ZERO   TO   WRK-SKY-KEISAN2
+                       END-IF
+                     END-IF
+                   END-IF
                    ADD    WRK-SKY-KEISAN2  TO  RECE02-SKYIRYO-HOKENJA
                  END-IF
                ELSE
