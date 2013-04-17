@@ -71,6 +71,7 @@
                    07  SPA-GMN-NAME        PIC X(40).
                    07  SPA-GMN-YUKOSTYMD   PIC X(08).
                    07  SPA-GMN-YUKOEDYMD   PIC X(08).
+                   07  SPA-GMN-ITEMLENGTH  PIC 9(03).
       *
                    07  SPA-GMN-ATAI-G.
                        09  SPA-GMN-ATAI    PIC X(40).
@@ -80,7 +81,6 @@
       *
                05  SPA-NAI-AREA.
                    07  SPA-NAI-KANRICD     PIC X(04).
-                   07  SPA-NAI-ITEMLENGTH  PIC 9(03).
       *
            COPY    "ENUM-VALUE".
       *
@@ -659,7 +659,7 @@
            MOVE    SPA-GMN-LIST-ITEMCD(SPA-GMN-SELNUM)
                                    TO  SPA-GMN-ITEMCD
            MOVE    SPA-GMN-LIST-ITEMLENGTH(SPA-GMN-SELNUM)
-                                   TO  SPA-NAI-ITEMLENGTH
+                                   TO  SPA-GMN-ITEMLENGTH
            MOVE    SPA-GMN-LIST-NAME(SPA-GMN-SELNUM)
                                    TO  SPA-GMN-NAME
            MOVE    SPA-GMN-LIST-YUKOSTYMD(SPA-GMN-SELNUM)
@@ -719,9 +719,12 @@
        400-ATAICHECK-SEC           SECTION.
       *
            MOVE    W00-ATAI        TO  SPA-GMN-ATAI
+           IF      SPA-GMN-ATAI    =   SPACE
+               GO  TO  400-ATAICHECK-EXT
+           END-IF
       *
            IF      SPA-GMN-ATAI-MAX    =   ZERO
-               IF      SPA-GMN-ATAI(SPA-NAI-ITEMLENGTH:)
+               IF      SPA-GMN-ATAI(SPA-GMN-ITEMLENGTH:)
                                        NOT =   SPACE
                    MOVE    "0003"          TO  SPA-ERRCD
                    MOVE    5               TO  SPA-GMN-CUR
@@ -731,8 +734,8 @@
                PERFORM VARYING IDX     FROM    1   BY  1
                        UNTIL  (IDX     >       SPA-GMN-ATAI-MAX )
                        OR     (FLG-OK  =   1)
-                   IF      SPA-GMN-ATAI(1:SPA-NAI-ITEMLENGTH)
-                           =   SPA-GMN-ATAIL(IDX)(1:SPA-NAI-ITEMLENGTH)
+                   IF      SPA-GMN-ATAI(1:SPA-GMN-ITEMLENGTH)
+                           =   SPA-GMN-ATAIL(IDX)(1:SPA-GMN-ITEMLENGTH)
                        MOVE    SPA-GMN-ATAIL(IDX)
                                                TO  SPA-GMN-ATAI-G
                        MOVE    1               TO  FLG-OK
@@ -784,7 +787,7 @@
                MOVE    SYS-VALUE-YUKOEDYMD
                                        TO  SYSUP-VALUE-YUKOEDYMD
       *
-               MOVE    SPA-GMN-ATAI(1:SPA-NAI-ITEMLENGTH)
+               MOVE    SPA-GMN-ATAI(1:SPA-GMN-ITEMLENGTH)
                                        TO  SYS-VALUE-VALUE
                MOVE    SPA-OPID        TO  SYS-VALUE-OPID
                MOVE    SMCNDATE-YMD    TO  SYS-VALUE-UPYMD
@@ -795,7 +798,7 @@
                MOVE    "upd1"          TO  MCP-PATHNAME
                MOVE    "DBUPDATE"      TO  MCP-FUNC
            ELSE
-               MOVE    SPA-GMN-ATAI(1:SPA-NAI-ITEMLENGTH)
+               MOVE    SPA-GMN-ATAI(1:SPA-GMN-ITEMLENGTH)
                                        TO  SYS-VALUE-VALUE
                MOVE    SPA-OPID        TO  SYS-VALUE-OPID
                MOVE    SMCNDATE-YMD    TO  SYS-VALUE-CREYMD
@@ -818,6 +821,10 @@
                MOVE    "1001"          TO  SPA-ERRCD
                GO  TO  490-KOUSHIN-EXT
            END-IF
+      *
+           MOVE    1               TO  SPA-GMN-CUR
+           MOVE    ZERO            TO  SPA-GMN-SELNUM
+           INITIALIZE                  SPA-GMN-NAIYO
       *
            PERFORM 400-LISTSET-SEC
       *
@@ -858,6 +865,10 @@
                    GO  TO  490-SAKUJYO-EXT
                END-IF
            END-IF
+      *
+           MOVE    1               TO  SPA-GMN-CUR
+           MOVE    ZERO            TO  SPA-GMN-SELNUM
+           INITIALIZE                  SPA-GMN-NAIYO
       *
            PERFORM 400-LISTSET-SEC
       *
