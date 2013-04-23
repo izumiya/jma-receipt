@@ -6330,6 +6330,18 @@
                    WHEN    "K201"
                    WHEN    "K122" 
                        MOVE    SPACE           TO  SPA-COM-KZMFLG5(IDX)
+                   WHEN    "K227"
+                       MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG1
+                                                                  (IDX)
+                   WHEN    "K228"
+                       MOVE    SPACE           TO  SPA-COM-TUKIJGNFLG
+                                                                  (IDX)
+                   WHEN    "K210"
+                   WHEN    "K211"
+                   WHEN    "K212"
+                   WHEN    "K213"
+                       MOVE    SPACE           TO  SPA-COM-KINKIFLG
+                                                                  (IDX)
                    WHEN    OTHER
                       MOVE    SPACE            TO  SPA-COM-KZMFLG (IDX)
                    END-EVALUATE
