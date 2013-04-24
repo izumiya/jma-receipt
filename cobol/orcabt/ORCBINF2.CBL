@@ -67,7 +67,9 @@
       *    レイアウト変更（データ作成区分）
       *01  PRGSKBNO                PIC X(08)  VALUE "20110520".
       *    レイアウト変更（属性区分）
-       01  PRGSKBNO                PIC X(08)  VALUE "20120706".
+      *01  PRGSKBNO                PIC X(08)  VALUE "20120706".
+      *    データ作成区分に空白がセットされる修正
+       01  PRGSKBNO                PIC X(08)  VALUE "20130425".
       *
       *    フラグ領域
        01  STS-AREA.
@@ -329,6 +331,13 @@
                MOVE    "医療機関情報が取得できませんでした。"
                                            TO  WRK-INFECERR
                PERFORM 500-ERR-HENSYU-SEC
+           END-IF
+           IF      SYS-1001-DATAINFECTIONKBN   =   SPACE
+               IF      SYS-1001-DATACREATEFLG  =   "1"
+                   MOVE    "1"         TO  SYS-1001-DATAINFECTIONKBN
+               ELSE
+                   MOVE    "0"         TO  SYS-1001-DATAINFECTIONKBN
+               END-IF
            END-IF
       *
       *    医療機関基本情報1002

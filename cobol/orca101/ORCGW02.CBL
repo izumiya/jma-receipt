@@ -1915,7 +1915,11 @@
       *
       *    データ感染症区分 空白の時、"0"とする
            IF      SYS-1001-DATAINFECTIONKBN   =   SPACE
-               MOVE    "0"             TO  SYS-1001-DATAINFECTIONKBN
+               IF      SYS-1001-DATACREATEFLG  =   "1"
+                   MOVE    "1"         TO  SYS-1001-DATAINFECTIONKBN
+               ELSE
+                   MOVE    "0"         TO  SYS-1001-DATAINFECTIONKBN
+               END-IF
            END-IF
            PERFORM VARYING IDY FROM    1   BY  1
                    UNTIL   IDY >       SPA-GMN-DATAINFECT-MAX
