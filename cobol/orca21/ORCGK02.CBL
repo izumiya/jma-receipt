@@ -4108,6 +4108,8 @@
                MOVE    "1"                 TO  SPA-COM-KZMFLG4(IDX)
                MOVE    "1"                 TO  SPA-COM-KZMFLG5(IDX)
                MOVE    "1"                 TO  SPA-COM-KZMFLG6(IDX)
+               MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG1(IDX)
+               MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG(IDX)
            END-PERFORM
       *    ∆‚ ¨»Á…È≤ŸªÓ∏≥∏°∫∫æ Û
            INITIALIZE                  SPA-NAI-FUKATEN-AREA
