@@ -454,6 +454,7 @@
                    IF      SPA-MID1-FLG        =   "OK"
       *                システム管理登録処理へ
                        PERFORM 810-INFECTION-003-SEC
+                       PERFORM 800-INFECTION-AGREE-EX-SEC
                    END-IF
                    MOVE    1               TO  SPA-GMN-CUR
                    MOVE    SPACE           TO  SPA-MID1-FLG
@@ -2144,7 +2145,17 @@
                  ( INFCHK-RC       NOT =   90   )
                GO  TO    800-INFECTION-AGREE-EXT
 	   END-IF
+      *
+           PERFORM 800-INFECTION-AGREE-EX-SEC
+           .
+       800-INFECTION-AGREE-EXT.
+           EXIT.
       *    
+      *****************************************************************
+      *    感染症参加送信処理
+      *****************************************************************
+       800-INFECTION-AGREE-EX-SEC      SECTION.
+      *
       *    ジョブ開始セット処理
            MOVE    "DEL"               TO  SJOBKANRI-MODE
            INITIALIZE                      JOBKANRI-REC
@@ -2184,7 +2195,7 @@
                                            MCPDATA-REC
                                            SPA-AREA
            .
-       800-INFECTION-AGREE-EXT.
+       800-INFECTION-AGREE-EX-EXT.
            EXIT.
       *
       *****************************************************************
