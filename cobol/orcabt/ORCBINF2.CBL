@@ -339,6 +339,10 @@
                    MOVE    "0"         TO  SYS-1001-DATAINFECTIONKBN
                END-IF
            END-IF
+           IF      SYS-1001-DATAINFECTIONKBN   NOT =   "1"
+               MOVE    1                   TO  FLG-END
+               GO  TO  100-INIT-EXT
+           END-IF
       *
       *    医療機関基本情報1002
            INITIALIZE                      SYS-1002-REC
