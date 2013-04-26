@@ -30,6 +30,7 @@
       *  01.00.04    NACL-Â¿¡¹Ç¼  05/11/22  MONFUNC ÂÐ±þ Â¾
       *  03.05.00    NACL-Â¿¡¹Ç¼  07/05/28  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *  04.08.00    NACL-Â¿¡¹Ç¼  13/03/XX  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  13/04/26  ÄûÀµ½é¿Ç»»Äê²ÊÈ½Äê½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -47,16 +48,20 @@
       *    ¥Õ¥é¥°ÎÎ°è
        01  FLG-AREA.
            03  FLG-SRYKARRK        PIC 9(01).
-           03  FLG-TENSU           PIC 9(01).
+      *****03  FLG-TENSU           PIC 9(01).
            03  FLG-SANTEI          PIC 9(01).
            03  FLG-JYURRK          PIC 9(01).
            03  FLG-SRYACCT         PIC 9(01).
            03  FLG-SRYACT          PIC 9(01).
            03  FLG-OK              PIC 9(01).
       *
+           03  FLG-SRYKARRK-ARI    PIC 9(01).
            03  FLG-JYURRK-ARI      PIC 9(01).
            03  FLG-JYURRK-CHK      PIC 9(01).
            03  FLG-SRYACCT-CHK     PIC 9(01).
+      *
+           03  FLG-SRYACT-OK       PIC 9(01).
+           03  FLG-TAKARRK         PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -64,6 +69,9 @@
            03  IDY                 PIC 9(04).
            03  IDY2                PIC 9(04).
            03  IDX2                PIC 9(04).
+           03  IDX-Y2              PIC 9(02).
+           03  IDS1                PIC 9(04).
+           03  IDS2                PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -73,16 +81,33 @@
            03  WRK-LST-SRYYMD          PIC X(08). 
            03  WRK-LST-SRYYMD2         PIC X(08). 
       *    Æþ±¡ÍúÎò
-           03  WRK-NYULST-SRYYMD          PIC X(08). 
-           03  WRK-NYULST-SRYYMD2         PIC X(08). 
+           03  WRK-NYULST-SRYYMD       PIC X(08). 
+           03  WRK-NYULST-SRYYMD2      PIC X(08). 
       *
            03  WRK-SANTEIYMD           PIC X(08). 
            03  WRK-DAY                 PIC 9(02).
-           03  WRK-DD                  PIC 9(02).
+      ***  03  WRK-DD                  PIC 9(02).
       *
            03  WRK-SRYKBN              PIC X(02).
            03  WRK-SYOSINYMD-RRK       PIC X(08).
            03  WRK-SYOSINYMD-RRK2      PIC X(08).
+      *
+           03  WRK-YMD.
+               05  WRK-YYMM.
+                   07   WRK-YY             PIC X(04).
+                   07   WRK-MM             PIC X(02).
+               05  WRK-DD                  PIC 9(02).
+           03  WRK-DD2                     PIC 9(02).
+      *
+           03  WRK-SRYKA-YMD.
+               05  WRK-SRYKA-YM            PIC X(06).
+               05  WRK-SRYKA-DD            PIC X(02).
+      *
+       01  TBL-SYOSIN-AREA.
+           03  TBL-SYOSIN-OCC          OCCURS   100.
+               05  TBL-SYOSIN-SRYKA    PIC X(02).
+               05  TBL-SYOSIN-YMD      PIC X(08).
+               05  TBL-SYOSIN-FST      PIC X(08).
       *
       *    ¥Þ¥·¥óÆüÉÕ¼èÆÀ¥µ¥Ö
            COPY    "CPORCSMCNDATE.INC".
@@ -95,11 +120,15 @@
            COPY    "MCPAREA".
       *
       *    ÅÀ¿ô¥Þ¥¹¥¿¡Ý
-           COPY    "CPTENSU.INC".
+      **** COPY    "CPTENSU.INC".
       *
       *    ¿ÇÎÅ²ÊÍúÎò
        01  SRYKARRK-REC.
            COPY    "CPSRYKARRK.INC".
+      *    ¿ÇÎÅ²ÊÍúÎò
+       01  WRK-SRYKARRK-REC.
+           COPY    "CPSRYKARRK.INC"  REPLACING
+                                     //KARRK-// BY //WRK-KARRK-//.
       *    ¿ÇÎÅ²ÊÍúÎò
        01  HZN-SRYKARRK-REC.
            COPY    "CPSRYKARRK.INC"  REPLACING
@@ -121,9 +150,8 @@
        01  SRYACCT-REC.
            COPY    "CPSRYACCT.INC".
       *
-      *01  MCPDATA-REC                 PIC X(5000).
            COPY    "MCPDATA.INC".
-      *****COPY    "CPORCMCP.INC".
+      *
       *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
@@ -168,7 +196,8 @@
            PERFORM 100-SRYKA-SYOKI-SEC
            IF      SKARRK-RC           =   ZERO
       *        »»ÄêÍúÎò¥Á¥§¥Ã¥¯½èÍý
-               PERFORM 200-SANTEIRRK-CHK-SEC
+      ******   PERFORM 200-SANTEIRRK-CHK-SEC
+               PERFORM 2001-SANTEI-CHK-SEC
       *        ¿ÇÎÅ²ÊÍúÎò¹¹¿·½èÍý
                PERFORM 300-SRYKARRK-HEN-SEC
            END-IF
@@ -211,6 +240,9 @@
            PERFORM 990-DBCLOSE-SEC
       *    ¿ÇÎÅ²Ê¿·µ¬ºîÀ®
            IF      FLG-SRYKARRK           =   1
+      *        ÅÐÏ¿¤Ê¤·
+               MOVE    ZERO                TO  FLG-SRYKARRK-ARI
+      *
                MOVE    SPACE               TO  SRYKARRK-REC
                INITIALIZE                      SRYKARRK-REC
                MOVE    SPA-HOSPNUM         TO  KARRK-HOSPNUM
@@ -222,6 +254,8 @@
                    MOVE    "¿ÇÎÅ²Ê¤¬ÀßÄê¤µ¤ì¤Æ¤¤¤Þ¤»¤ó"
                                            TO  SKARRK-ERRMSG
                END-IF
+           ELSE
+               MOVE    1                   TO  FLG-SRYKARRK-ARI
            END-IF
            .
       *
@@ -231,92 +265,24 @@
       *****************************************************************
       *    »»ÄêÍúÎò¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
-       200-SANTEIRRK-CHK-SEC                SECTION.
-      *
-      *    ½é¿ÇÎÁ¤Î»»ÄêÍúÎò¤Î¥Á¥§¥Ã¥¯
-           MOVE    SPACE               TO  WRK-SYOSINYMD1
-           MOVE    SPACE               TO  WRK-SYOSINYMD2
-      *
-      **** EVALUATE    SPA-HOSPSBT
-      *    ÉÂ±¡
-      ****     WHEN    1
-      *            Ï·¿Í
-                   MOVE    "111700110"         TO  WRK-SRYCD
-                   PERFORM 2001-SANTEI-CHK-SEC
-      *            Ï·¿Í³°
-                   MOVE    "111000110"         TO  WRK-SRYCD
-                   PERFORM 2001-SANTEI-CHK-SEC
-      *        ¿ÇÎÅ½ê
-      ******** WHEN    2
-      *            Ï·¿Í
-                   MOVE    "111700210"         TO  WRK-SRYCD
-                   PERFORM 2001-SANTEI-CHK-SEC
-      *            Ï·¿Í³°
-                   MOVE    "111003610"         TO  WRK-SRYCD
-                   PERFORM 2001-SANTEI-CHK-SEC
-      *****END-EVALUATE
-      *H25.4
-      *    ½é¿Ç¡Ê¾Ò²ð¾õ¤Ê¤·¡Ë
-           MOVE    "111012510"         TO  WRK-SRYCD
-           PERFORM 2001-SANTEI-CHK-SEC
-      *    ¾®»ù²Ê¿Ç»¡ÎÁ
-      *    ¡¡¡¡±¡³°½èÊý   ½é¿Ç
-           MOVE    "113003510"         TO  WRK-SRYCD
-           PERFORM 2001-SANTEI-CHK-SEC
-      *    ¡¡¡¡±¡Æâ½èÊý   ½é¿Ç
-           MOVE    "113003710"         TO  WRK-SRYCD
-           PERFORM 2001-SANTEI-CHK-SEC
-      *
-      *    ²¾¤Î½é¿ÇÎÁ
-           MOVE    "099110001"         TO  WRK-SRYCD
-           PERFORM 2001-SANTEI-CHK-SEC
-      *
-      *    Ï«ºÒ½é¿ÇÎÁ
-           MOVE    "101110010"         TO  WRK-SRYCD
-           PERFORM 2001-SANTEI-CHK-SEC
-      *
-           .
-      *
-       200-SANTEIRRK-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    »»ÄêÍúÎò¥Á¥§¥Ã¥¯½èÍý
-      *****************************************************************
        2001-SANTEI-CHK-SEC                SECTION.
       *
-      *
-      *!!  MOVE    WRK-SRYCD           TO  TNS-SRYCD
-      *!!  PERFORM 910-TENSU-READ-SEC
+           INITIALIZE                      TBL-SYOSIN-AREA
+           MOVE    SPACE               TO  WRK-SRYKA-YMD
       *
       *    »»ÄêÍúÎò¸¡º÷
            INITIALIZE                  SANTEI-REC
            MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
            MOVE    SPA-PTID            TO  SANTEI-PTID
-      *****MOVE    SKARRK-SRYYM        TO  SANTEI-SRYYM
-           MOVE    WRK-SRYCD           TO  SANTEI-SRYCD
-      ***  EVALUATE    TNS-SANTEIRRKKBN
-      *        WHEN    1
-      *            MOVE    ZERO                TO  SANTEI-NYUGAIKBN
-      *            MOVE    ZERO                TO  SANTEI-SRYKA
-      *        WHEN    2
-      *            MOVE    SPA-NYUGAIKBN       TO  SANTEI-NYUGAIKBN
-      *            MOVE    ZERO                TO  SANTEI-SRYKA
-      *        WHEN    3
-      *            MOVE    ZERO                TO  SANTEI-NYUGAIKBN
-      *            MOVE    SKARRK-SRYKA        TO  SANTEI-SRYKA
-      *        WHEN    4
-      *            MOVE    SPA-NYUGAIKBN       TO  SANTEI-NYUGAIKBN
-      *            MOVE    SKARRK-SRYKA        TO  SANTEI-SRYKA
-      *****END-EVALUATE
+           MOVE    ALL "9"             TO  SANTEI-SRYYM
       *
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "tbl_santei"        TO  MCP-TABLE
-           MOVE    "key12"             TO  MCP-PATHNAME
+           MOVE    "key11"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_santei"        TO  MCP-TABLE
-               MOVE    "key12"             TO  MCP-PATHNAME
+               MOVE    "key11"             TO  MCP-PATHNAME
                PERFORM 920-SANTEI-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-SANTEI
@@ -324,12 +290,18 @@
       *
            PERFORM UNTIL       FLG-SANTEI          =   1
       *
-               IF      SANTEI-MSANTEICNT   >   ZERO
-                   MOVE    ZERO            TO  WRK-DAY
-                   PERFORM VARYING     IDY     FROM    1   BY  1
-                           UNTIL       IDY     >   31
+      *        ¿ÇÎÅ²Ê·èÄê
+               PERFORM 20011-SRYACT-SRYKA-SEC
+      *
+      *        ¿ÇÎÅ¹Ô°Ù¤Ê¤·¡Ê¼õ¿ÇÍúÎò¤Î¤ß¡Ë
+               IF      FLG-SRYACT-OK       =   ZERO
+      *
+                   MOVE    ZERO                TO  WRK-DAY
+                   PERFORM VARYING     IDY     FROM    31  BY  -1
+                           UNTIL       IDY     <   1
                        IF      SANTEI-DAY (IDY)    NOT =   ZERO
                            MOVE    IDY             TO  WRK-DAY
+                           MOVE    1               TO  IDY
                        END-IF
                    END-PERFORM
                    MOVE    SANTEI-SRYYM            TO  WRK-SANTEIYMD
@@ -343,20 +315,154 @@
                    IF      WRK-SANTEIYMD           >   WRK-SYOSINYMD2
                        MOVE    WRK-SANTEIYMD       TO  WRK-SYOSINYMD2
                    END-IF
+      *
                END-IF
       *
-               MOVE    "tbl_santei"        TO  MCP-TABLE
-               MOVE    "key12"             TO  MCP-PATHNAME
-               PERFORM 920-SANTEI-READ-SEC
+               IF     (WRK-SRYKA-YMD   NOT =   SPACE )   AND
+                      (WRK-SRYKA-YM        >   SANTEI-SRYYM )
+      *            ¿ÇÎÅ²Ê¤Î½é¿Ç»»ÄêÆü¤¬¤¢¤ê·îÆâ¤Î»»Äê¤¬½ªÎ»¤·¤¿»þ¡¢½ªÎ»
+                   MOVE    1               TO  FLG-SANTEI
+               END-IF
+      *
+               IF      FLG-SANTEI          =   ZERO
+                   MOVE    "tbl_santei"        TO  MCP-TABLE
+                   MOVE    "key11"             TO  MCP-PATHNAME
+                   PERFORM 920-SANTEI-READ-SEC
+               END-IF
            END-PERFORM
       *
            MOVE    "tbl_santei"        TO  MCP-TABLE
+           MOVE    "key11"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *test
+      *    DISPLAY "SKARRK-SRYKA:" SKARRK-SRYKA
+      *          ",WRK-SYOSINYMD1:" WRK-SYOSINYMD1
+      *          ",WRK-SYOSINYMD2:" WRK-SYOSINYMD2
+      *    DISPLAY "1 TBL-SYOSIN-SRYKA:" TBL-SYOSIN-SRYKA (1)
+      *           ",TBL-SYOSIN-YMD:" TBL-SYOSIN-YMD (1)
+      *           ",TBL-SYOSIN-FST:" TBL-SYOSIN-FST (1)
+      *    DISPLAY "2 TBL-SYOSIN-SRYKA:" TBL-SYOSIN-SRYKA (2)
+      *           ",TBL-SYOSIN-YMD:" TBL-SYOSIN-YMD (2)
+      *           ",TBL-SYOSIN-FST:" TBL-SYOSIN-FST (2)
+      *    DISPLAY "3 TBL-SYOSIN-SRYKA:" TBL-SYOSIN-SRYKA (3)
+      *           ",TBL-SYOSIN-YMD:" TBL-SYOSIN-YMD (3)
+      *           ",TBL-SYOSIN-FST:" TBL-SYOSIN-FST (3)
+      *
+           .
+       2001-SANTEI-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¿ÇÎÅ²ÊÍúÎò¹¹¿·½èÍý
+      *****************************************************************
+       20011-SRYACT-SRYKA-SEC                SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SRYACT-OK
+      *
+      *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¡¼¤«¤é¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼¤ò¸¡º÷¤¹¤ë
+           MOVE    SPACE               TO  SRYACT-REC
+           INITIALIZE                      SRYACT-REC
+           MOVE    SPA-HOSPNUM         TO  SRY-HOSPNUM
+           MOVE    SPA-PTID            TO  SRY-PTID
+           MOVE    SANTEI-SRYYM        TO  SRY-SRYYM
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD (1)
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD (2)
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD (3)
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD (4)
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD (5)
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key12"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key12"             TO  MCP-PATHNAME
+               PERFORM 920-SRYACT-NEXT-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SRYACT
+           END-IF
+           PERFORM UNTIL     (FLG-SRYACT       =   1 )
+      *
+      *        ²ó¿ô¼èÆÀ
+               MOVE    SPACE               TO  SRYACCT-REC
+               INITIALIZE                      SRYACCT-REC
+               MOVE    SRY-HOSPNUM         TO  ACCT-HOSPNUM
+               MOVE    SRY-NYUGAIKBN       TO  ACCT-NYUGAIKBN
+               MOVE    SRY-PTID            TO  ACCT-PTID
+               MOVE    SRY-SRYKA           TO  ACCT-SRYKA
+               MOVE    SRY-SRYYM           TO  ACCT-SRYYM
+               MOVE    SRY-SRYKBN          TO  ACCT-SRYKBN
+               MOVE    SRY-ZAINUM          TO  ACCT-ZAINUM
+      *        ¼ç¥­¡¼ÆÉ¤ß
+               PERFORM 940-SRYACCT-KEYREAD-SEC
+               IF     (FLG-SRYACCT         =   ZERO )
+                 AND  (ACCT-HKNCOMBI   NOT =   "9999")
+      *
+                   MOVE    1               TO  FLG-SRYACT-OK
+      *
+                   MOVE    SPACE           TO  WRK-YMD
+                   MOVE    ACCT-SRYYM      TO  WRK-YMD(1:6)
+                   MOVE    ZERO            TO  WRK-DD
+                   MOVE    ZERO            TO  WRK-DD2
+      *            ºÇ¸å¤Î»»ÄêÆü
+                   PERFORM VARYING     IDX-Y2  FROM    1  BY  1
+                           UNTIL       IDX-Y2  >   31
+                       IF      ACCT-DAY (1 IDX-Y2) >   ZERO
+                           MOVE    IDX-Y2          TO  WRK-DD
+                           IF      WRK-DD2         =   ZERO
+                               MOVE    IDX-Y2          TO  WRK-DD2
+                           END-IF
+                       END-IF
+                   END-PERFORM
+                   IF      WRK-DD              =   ZERO
+                       MOVE    SPACE           TO  WRK-YMD
+                   END-IF
+      *            ¿ÇÎÅ²Ê¤Î½é¿Ç»»Äê¤¬¤¢¤ê¡¢»»Äê·î¤ÎÈ½Äê½ªÎ»»þ¤Ë½ªÎ»
+                   IF     (SRY-SRYKA       =   SKARRK-SRYKA )
+                       IF    (WRK-SRYKA-YMD    =   SPACE  )
+                          OR (WRK-SRYKA-YMD    <   WRK-YMD)
+                           MOVE    WRK-YMD         TO  WRK-SRYKA-YMD
+                       END-IF
+                   END-IF
+      *
+                   PERFORM VARYING     IDX2    FROM    1   BY  1
+                           UNTIL      (IDX2            >   100 )
+                       IF      TBL-SYOSIN-SRYKA (IDX2) =   SPACE
+                           MOVE    SRY-SRYKA       TO  TBL-SYOSIN-SRYKA
+                                                               (IDX2)
+                       END-IF
+                       IF      TBL-SYOSIN-SRYKA (IDX2) =   SRY-SRYKA
+                           IF     (TBL-SYOSIN-YMD (IDX2)  =   SPACE )
+                              OR  (TBL-SYOSIN-YMD (IDX2)  <   WRK-YMD)
+                               MOVE    WRK-YMD     TO  TBL-SYOSIN-YMD
+                                                              (IDX2)
+                           END-IF
+      *
+                           MOVE    WRK-DD2         TO  WRK-DD
+                           IF     (TBL-SYOSIN-FST (IDX2)  =   SPACE )
+                              OR  (TBL-SYOSIN-FST (IDX2)  >   WRK-YMD)
+                               MOVE    WRK-YMD     TO  TBL-SYOSIN-FST
+                                                              (IDX2)
+                           END-IF
+      *
+                           MOVE    100             TO  IDX2
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key12"             TO  MCP-PATHNAME
+               PERFORM 920-SRYACT-NEXT-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
            MOVE    "key12"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            .
-      *
-       2001-SANTEI-CHK-EXT.
+       20011-SRYACT-SRYKA-EXT.
            EXIT.
       *
       *****************************************************************
@@ -372,86 +478,89 @@
            MOVE    SPACE               TO  WRK-SYOSINYMD-RRK
            MOVE    SPACE               TO  WRK-SYOSINYMD-RRK2
       *
+           MOVE    ZERO                TO  FLG-JYURRK-ARI
+           MOVE    ZERO                TO  FLG-JYURRK-CHK
+      *
            MOVE    SPACE               TO  JYURRK-REC
            INITIALIZE                      JYURRK-REC
            MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
            MOVE    SPA-PTID            TO  JYURRK-PTID
-      *****MOVE    SKARRK-SRYKA        TO  JYURRK-SRYKA
+           MOVE    SKARRK-SRYKA        TO  JYURRK-SRYKA
       *
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key8"              TO  MCP-PATHNAME
+           MOVE    "key30"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-               MOVE    "key8"              TO  MCP-PATHNAME
+               MOVE    "key30"             TO  MCP-PATHNAME
                PERFORM 970-JYURRK-NEXT-SEC
            ELSE
                MOVE    1                   TO  FLG-JYURRK
            END-IF
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    "key30"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
            MOVE    ZERO                TO  FLG-JYURRK-ARI
-           MOVE    ZERO                TO  FLG-JYURRK-CHK
-           PERFORM
-               UNTIL      (FLG-JYURRK      =   1   )  OR
-                         ((WRK-LST-SRYYMD  NOT =   SPACE  ) AND
-                          (WRK-LST-SRYYMD2 NOT =   SPACE  ) AND
-                          (FLG-JYURRK-CHK  NOT =   ZERO   ))
-      *        Êñ³ç¤ÏÂÐ¾Ý³°
-             IF      JYURRK-HKNCOMBINUM    NOT =   "9999"
-      *
-      *        ¿ÇÎÅ²ÊÍúÎò¤Ï³°Íè¤Î¤ß¤ÇºîÀ®¤¹¤ë
+           IF      FLG-JYURRK          =   ZERO
+      *        ¿ÇÎÅ²Ê¤ÎºÇ½ª¼õ¿ÇÆü
                IF      JYURRK-NYUGAIKBN    =   "2"
-                   IF      SKARRK-SRYKA        =   JYURRK-SRYKA
-                       IF      WRK-LST-SRYYMD      =   SPACE
-                           MOVE    JYURRK-SRYYMD   TO  WRK-LST-SRYYMD
-                       END-IF
-                       IF     (JYURRK-SRYKBN1      NOT =   SPACE ) AND
-                              (WRK-SYOSINYMD-RRK       =   SPACE )
-                           PERFORM 3001-SYOSIN-SENTEI-SEC
-                           MOVE    1               TO  FLG-JYURRK-CHK
-                       END-IF
-                   ELSE
-                       IF      WRK-LST-SRYYMD2     =   SPACE
-                           MOVE    JYURRK-SRYYMD   TO  WRK-LST-SRYYMD2
-                       END-IF
-                       IF     (JYURRK-SRYKBN1      NOT =   SPACE ) AND
-                              (WRK-SYOSINYMD-RRK2      =   SPACE )
-                           PERFORM 3001-SYOSIN-SENTEI-SEC
-                       END-IF
-                   END-IF
-      *            Æþ±¡ÍúÎò
+                   MOVE    JYURRK-SRYYMD       TO  WRK-LST-SRYYMD
                ELSE
-                   IF      SKARRK-SRYKA       =   JYURRK-SRYKA
-                       IF      WRK-NYULST-SRYYMD   =   SPACE
-                           MOVE    JYURRK-SRYYMD   TO  WRK-NYULST-SRYYMD
-                       END-IF
-                       IF     (JYURRK-SRYKBN1      NOT =   SPACE ) AND
-                              (WRK-SYOSINYMD-RRK       =   SPACE )
-                           PERFORM 3001-SYOSIN-SENTEI-SEC
-                           MOVE    1               TO  FLG-JYURRK-CHK
-                       END-IF
-                    ELSE
-                       IF      WRK-NYULST-SRYYMD2  =   SPACE
+                   MOVE    JYURRK-SRYYMD       TO  WRK-NYULST-SRYYMD
+               END-IF
+               MOVE    1                   TO  FLG-JYURRK-ARI
+           END-IF
+      *
+      *    ¿ÇÎÅ²Ê¤Î¼õ¿ÇÍúÎò¤¬¤Ê¤¤»þ¡¢Á´²Ê
+           IF      FLG-JYURRK-ARI      =   ZERO
+               MOVE    SPACE               TO  JYURRK-REC
+               INITIALIZE                      JYURRK-REC
+               MOVE    SPA-HOSPNUM         TO  JYURRK-HOSPNUM
+               MOVE    SPA-PTID            TO  JYURRK-PTID
+      *
+               MOVE    JYURRK-REC          TO  MCPDATA-REC
+               MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+               MOVE    "key8"              TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+                   MOVE    "key8"              TO  MCP-PATHNAME
+                   PERFORM 970-JYURRK-NEXT-SEC
+               ELSE
+                   MOVE    1                   TO  FLG-JYURRK
+               END-IF
+               PERFORM
+                   UNTIL      (FLG-JYURRK      =   1   )
+      *            Êñ³ç¤ÏÂÐ¾Ý³°
+                   IF      JYURRK-HKNCOMBINUM    NOT =   "9999"
+      *
+                       IF      JYURRK-NYUGAIKBN    =   "2"
+                           MOVE    JYURRK-SRYYMD   TO  WRK-LST-SRYYMD2
+                        ELSE
                            MOVE    JYURRK-SRYYMD   TO
                                                    WRK-NYULST-SRYYMD2
                        END-IF
-                       IF     (JYURRK-SRYKBN1      NOT =   SPACE ) AND
-                              (WRK-SYOSINYMD-RRK2      =   SPACE )
-                           PERFORM 3001-SYOSIN-SENTEI-SEC
-                       END-IF
+                       MOVE    1               TO  FLG-JYURRK
+                       MOVE    1               TO  FLG-JYURRK-ARI
                    END-IF
-               END-IF
-               MOVE    1                   TO  FLG-JYURRK-ARI
       *
-               END-IF
-      *
+                   IF      FLG-JYURRK          =   ZERO
+                       MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+                       MOVE    "key8"              TO  MCP-PATHNAME
+                       PERFORM 970-JYURRK-NEXT-SEC
+                   END-IF
+               END-PERFORM
                MOVE    "tbl_jyurrk"        TO  MCP-TABLE
                MOVE    "key8"              TO  MCP-PATHNAME
-               PERFORM 970-JYURRK-NEXT-SEC
-           END-PERFORM
-           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-           MOVE    "key8"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
+               PERFORM 990-DBCLOSE-SEC
+           END-IF
+      *TEST
+      *    DISPLAY "WRK-LST-SRYYMD:" WRK-LST-SRYYMD
+      *            ",WRK-LST-SRYYMD2:"  WRK-LST-SRYYMD2
+      *    DISPLAY "WRK-NYULST-SRYYMD:" WRK-NYULST-SRYYMD
+      *            ",WRK-NYULST-SRYYMD2:"  WRK-NYULST-SRYYMD2
+      *TEST
       *
       *    ³°Íè¤¬¤Ê¤¯¡¢Æþ±¡¤Î¤Î¤ß¤Î»þ¡¢Æþ±¡¤ÎºÇ½ªÍúÎòÆü¤òÊÔ½¸¤¹¤ë
            IF     (WRK-LST-SRYYMD      =   SPACE )  AND
@@ -479,25 +588,46 @@
            END-IF
            MOVE    WRK-LST-SRYYMD      TO  KARRK-LASTYMD
       *
-           IF      WRK-SYOSINYMD-RRK   NOT =   SPACE
-      *        ¿ÇÎÅ²Ê¤Î½é¿ÇÎÁ¤¢¤ê
-               IF      WRK-SYOSINYMD-RRK       <   WRK-SYOSINYMD2
-      *            »»ÄêÍúÎò¤Î¤ß¤Î¾ì¹ç
-                   MOVE    WRK-SYOSINYMD2      TO  KARRK-SYOSINYMD2
+           MOVE    ZERO                TO  IDS1
+           MOVE    ZERO                TO  IDS2
+           PERFORM VARYING     IDX2    FROM    1   BY  1
+                   UNTIL      (IDX2            >   100 )
+                           OR (TBL-SYOSIN-SRYKA(IDX2)  =   SPACE)
+               IF      TBL-SYOSIN-SRYKA (IDX2) =   SKARRK-SRYKA
+                   MOVE    IDX2            TO  IDS1
                ELSE
-                   MOVE    WRK-SYOSINYMD-RRK   TO  KARRK-SYOSINYMD2
+                   MOVE    IDX2            TO  IDS2
+               END-IF
+           END-PERFORM
+      *
+      *    ¿ÇÎÅ²Ê¤Î½é¿Ç¤¢¤ê
+           IF      IDS1                >   ZERO
+      *        ¿ÇÎÅ²Ê¤Î½é¿ÇÎÁ¤¢¤ê
+               IF      TBL-SYOSIN-YMD (IDS1)   <   WRK-SYOSINYMD2
+      *            »»ÄêÍúÎò¤Î¤ß¤Î¾ì¹ç
+                   MOVE    WRK-SYOSINYMD2          TO  KARRK-SYOSINYMD2
+               ELSE
+                   MOVE    TBL-SYOSIN-YMD (IDS1)   TO  KARRK-SYOSINYMD2
                END-IF
                IF     (KARRK-SYOSINYMD1        =   SPACE           ) OR
-                      (WRK-SYOSINYMD-RRK       <   KARRK-SYOSINYMD1)
-                   MOVE    WRK-SYOSINYMD-RRK   TO  KARRK-SYOSINYMD1
+                      (TBL-SYOSIN-FST (IDS1)   <   KARRK-SYOSINYMD1)
+                   MOVE    TBL-SYOSIN-FST (IDS1)   TO  KARRK-SYOSINYMD1
                END-IF
            ELSE
       *        ¿ÇÎÅ²Ê¤Î½é¿ÇÎÁ¤Ê¤·
                IF      WRK-LST-SRYYMD  NOT =   SPACE
-                   IF      WRK-SYOSINYMD-RRK2  =   SPACE
+      *            ¿ÇÎÅ²Ê¤Î¼õ¿Ç¤¢¤ê¡¢½é¿ÇÎÁ»»Äê¤¬¤Ê¤¤»þ¡¢»»ÄêÍúÎò¤ÎÆü
+                   IF      IDS2                =   ZERO
                        MOVE    WRK-SYOSINYMD2      TO  KARRK-SYOSINYMD2
                    ELSE
-                       MOVE    SPACE           TO  KARRK-SYOSINYMD2
+      *                °Ü¹Ô½é¿ÇÆü¤¬½é¿ÇÆü¤Î»þ
+                       IF     (WRK-SYOSINYMD1  NOT =   SPACE )
+                       AND    (WRK-SYOSINYMD1      =   KARRK-SYOSINYMD1)
+                       AND    (WRK-SYOSINYMD2      =   KARRK-SYOSINYMD2)
+                           CONTINUE
+                       ELSE
+                           MOVE    SPACE           TO  KARRK-SYOSINYMD2
+                       END-IF
                    END-IF
                END-IF
       *        Â¾²Ê¼õ¿Ç¤¢¤ê
@@ -510,9 +640,17 @@
       *        »»ÄêÍúÎò¤Î¤ß
                IF     (WRK-LST-SRYYMD      =   SPACE )   AND
                       (WRK-LST-SRYYMD2     =   SPACE )
-                   MOVE    WRK-SYOSINYMD1      TO  KARRK-SYOSINYMD1
-                   MOVE    WRK-SYOSINYMD2      TO  KARRK-SYOSINYMD2
-                   MOVE    WRK-SYOSINYMD2      TO  KARRK-LASTYMD
+      *            Â¾¤Î¿ÇÎÅ²ÊÍúÎò¥Á¥§¥Ã¥¯
+                   PERFORM 3001-TAKARRK-CHK-SEC
+                   IF      FLG-TAKARRK         =   ZERO
+                       MOVE    WRK-SYOSINYMD1      TO  KARRK-SYOSINYMD1
+                       MOVE    WRK-SYOSINYMD2      TO  KARRK-SYOSINYMD2
+                       MOVE    WRK-SYOSINYMD2      TO  KARRK-LASTYMD
+                   ELSE
+                       MOVE    SPACE           TO  KARRK-SYOSINYMD1
+                       MOVE    SPACE           TO  KARRK-SYOSINYMD2
+                       MOVE    SPACE           TO  KARRK-LASTYMD
+                   END-IF
                END-IF
            END-IF
       *    ½é¿Ç»»ÄêÆü£±¤Ï»»ÄêÆü£²¤ÎÁ°¤Ç¤¢¤ë¤³¤È
@@ -522,34 +660,6 @@
                    MOVE    KARRK-SYOSINYMD2    TO  KARRK-SYOSINYMD1
                END-IF
            END-IF
-      *    ½é¿ÇÎÁ£±
-      *    IF    ( KARRK-SYOSINYMD1    =   SPACE    )  OR
-      *          ( SKARRK-SRYYM        =   KARRK-SYOSINYMD1(1:6))
-      *        IF      WRK-SYOSINYMD1      =   SPACE
-      *            IF      WRK-LST-SRYYMD      =   SPACE  AND
-      *                    WRK-LST-SRYYMD2     =   SPACE
-      *                 ¤¹¤Ù¤Æ¤ÎÍúÎò¤Ê¤·
-      *                MOVE    SPACE           TO  KARRK-SYOSINYMD1
-      *            END-IF
-      *        ELSE
-      *            MOVE   WRK-SYOSINYMD1   TO  KARRK-SYOSINYMD1
-      *        END-IF
-      *    END-IF
-      *    ½é¿ÇÎÁ£²
-      *    IF    ( KARRK-SYOSINYMD2    =   SPACE    )  OR
-      *          ( SKARRK-SRYYM        =   KARRK-SYOSINYMD2(1:6))
-      *        IF      WRK-SYOSINYMD2      =   SPACE
-      *            IF      WRK-LST-SRYYMD      =   SPACE
-      *                MOVE    SPACE           TO  KARRK-SYOSINYMD2
-      *            END-IF
-      *        ELSE
-      *            MOVE   WRK-SYOSINYMD2   TO  KARRK-SYOSINYMD2
-      *        END-IF
-      **** END-IF
-      *    IF      KARRK-LASTYMD       =   SPACE
-      *        ºÇ½ª¼õ¿ÇÆü
-      *        MOVE    KARRK-SYOSINYMD2    TO  KARRK-LASTYMD
-      *    END-IF
       *
       *    ¤¹¤Ù¤Æ¤ÎÍúÎò¤¬¤Ê¤¤»þ¡¢Â¾¤Î¿ÇÎÅ²ÊÍúÎò¤âºï½ü¤¹¤ë
            IF     (FLG-JYURRK-ARI      =   ZERO  )  AND
@@ -565,7 +675,7 @@
            IF     (KARRK-SYOSINYMD1        =   SPACE )  AND
                   (KARRK-SYOSINYMD2        =   SPACE )  AND
                   (KARRK-LASTYMD           =   SPACE )
-               IF      FLG-SRYKARRK           =   ZERO
+               IF      FLG-SRYKARRK-ARI        =   1
                    MOVE    SRYKARRK-REC        TO  MCPDATA-REC
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    MOVE    "tbl_srykarrk"      TO  MCP-TABLE
@@ -584,8 +694,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
               GO      TO      300-SRYKARRK-HEN-EXT
            END-IF
       *
-      *
-           IF      FLG-SRYKARRK           =   ZERO
+           IF      FLG-SRYKARRK-ARI        =   1
       *        ¹¹¿·
                MOVE    SPA-HOSPNUM         TO  KARRK-HOSPNUM
                MOVE    SPA-PTID            TO  KARRK-PTID
@@ -637,149 +746,43 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
-      *    ½é¿Ç»»ÄêÆü¤òÍúÎò¤è¤ê½èÍý
+      *    Â¾¤Î¿ÇÎÅ²ÊÍúÎò¥Á¥§¥Ã¥¯½èÍý
       *****************************************************************
-       3001-SYOSIN-SENTEI-SEC         SECTION.
+       3001-TAKARRK-CHK-SEC         SECTION.
       *
-           MOVE    "11"                TO  WRK-SRYKBN
-           PERFORM 30011-SRYACCT-CHK-SEC
-           IF      FLG-SRYACCT-CHK     =   ZERO
-               MOVE    "13"                TO  WRK-SRYKBN
-               PERFORM 30011-SRYACCT-CHK-SEC
-           END-IF
+           MOVE    SRYKARRK-REC        TO  HZN-SRYKARRK-REC
       *
-           .
-       3001-SYOSIN-SENTEI-EXT.
-           EXIT.
+           MOVE    ZERO                TO  FLG-TAKARRK
+      *    º£²ó¿ÇÎÅ²Ê°Ê³°¤Î¿ÇÎÅ²ÊÍúÎò
+           MOVE    SPACE               TO  SRYKARRK-REC
+           INITIALIZE                      SRYKARRK-REC
+           MOVE    SPA-HOSPNUM         TO  KARRK-HOSPNUM
+           MOVE    SPA-PTID            TO  KARRK-PTID
+           MOVE    SKARRK-SRYKA        TO  KARRK-SRYKA
       *
-      *****************************************************************
-      *    ¿ÇÎÅ²ÊÍúÎòºï½ü½èÍý
-      *****************************************************************
-       30011-SRYACCT-CHK-SEC         SECTION.
-      *
-           MOVE    ZERO                TO  FLG-SRYACCT-CHK
-      *
-      *    ¿ÇÎÅÇ¯·î¤Î¿ÇÎÅ²ñ·×¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
-           MOVE    SPACE               TO  SRYACCT-REC
-           INITIALIZE                      SRYACCT-REC
-           MOVE    JYURRK-HOSPNUM      TO  ACCT-HOSPNUM
-           MOVE    JYURRK-NYUGAIKBN    TO  ACCT-NYUGAIKBN
-           MOVE    JYURRK-PTID         TO  ACCT-PTID
-           MOVE    JYURRK-SRYKA        TO  ACCT-SRYKA
-           MOVE    JYURRK-SRYYMD(1:6)  TO  ACCT-SRYYM
-           MOVE    WRK-SRYKBN          TO  ACCT-SRYKBN
-      *
-           MOVE    SRYACCT-REC         TO  MCPDATA-REC
-           MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    SRYKARRK-REC        TO  MCPDATA-REC
+           MOVE    "tbl_srykarrk"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
-               PERFORM 930-SRYACCT-READ-SEC
+               MOVE    "tbl_srykarrk"      TO  MCP-TABLE
+               MOVE    "key4"              TO  MCP-PATHNAME
+               PERFORM 975-SRYKARRK-READ-SEC
            ELSE
-               MOVE    1                   TO  FLG-SRYACCT
+               MOVE    1                   TO  FLG-SRYKARRK
            END-IF
-           PERFORM
-               UNTIL       (FLG-SRYACCT         =   1    )  OR
-                           (FLG-SRYACCT-CHK     =   1    )
-               IF     (ACCT-ZAIKAISU       >   ZERO  )  AND
-                      (ACCT-HKNCOMBI   NOT =   "9999")
-      *            ¿ÇÎÅ¹Ô°Ù¤è¤ê
-                   PERFORM 300112-SRYACT-HEN-SEC
-                   IF      FLG-SRYACCT-CHK     =   1
-      *            ºÇ¸å¤ÎÆü¤òÊÝÂ¸
-                       PERFORM VARYING     IDY2    FROM    1   BY  1
-                               UNTIL       IDY2    >   31
-                           IF      ACCT-DAY (1 IDY2)   >   ZERO
-                               MOVE    IDY2                TO  WRK-DD
-                           END-IF
-                       END-PERFORM
-                       IF      SKARRK-SRYKA        =   JYURRK-SRYKA
-                           MOVE    ACCT-SRYYM      TO  WRK-SYOSINYMD-RRK
-                                                                 (1:6)
-                           MOVE    WRK-DD          TO  WRK-SYOSINYMD-RRK
-                                                                 (7:2)
-                       ELSE
-                           MOVE    ACCT-SRYYM  TO  WRK-SYOSINYMD-RRK2
-                                                                 (1:6)
-                           MOVE    WRK-DD      TO  WRK-SYOSINYMD-RRK2
-                                                                 (7:2)
-                       END-IF
-                   END-IF
-               END-IF
-      *
-               MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
-               PERFORM 930-SRYACCT-READ-SEC
-           END-PERFORM
-      *
-           MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    "tbl_srykarrk"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           .
-       30011-SRYACCT-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ¿ÇÎÅ¹Ô°ÙÈ½Äê½èÍý
-      *****************************************************************
-       300112-SRYACT-HEN-SEC         SECTION.
-      *
-      *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¡¼¤«¤é¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼¤ò¸¡º÷¤¹¤ë
-           MOVE    SPACE               TO  SRYACT-REC
-           INITIALIZE                      SRYACT-REC
-           MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
-           MOVE    ACCT-NYUGAIKBN      TO  SRY-NYUGAIKBN
-           MOVE    ACCT-PTID           TO  SRY-PTID
-           MOVE    ACCT-SRYKA          TO  SRY-SRYKA
-           MOVE    ACCT-SRYYM          TO  SRY-SRYYM
-           MOVE    ACCT-ZAINUM         TO  SRY-ZAINUM
-      *
-           MOVE    SRYACT-REC          TO  MCPDATA-REC
-           MOVE    "tbl_sryact"        TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_sryact"        TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 920-SRYACT-NEXT-SEC
-           ELSE
-               MOVE    1                   TO  FLG-SRYACT
+           IF      FLG-SRYKARRK        =   ZERO
+               MOVE    1                   TO  FLG-TAKARRK
            END-IF
-           PERFORM UNTIL     (FLG-SRYACT       =   1 )  OR
-                             (FLG-SRYACCT-CHK  =   1 )
-               PERFORM VARYING     IDX2    FROM    1   BY  1
-                       UNTIL      (IDX2            >   5   )  OR
-                                  (SRY-SRYCD(IDX2) =   SPACE )
-      *            ¿Ç»¡ÎÁ¤Ç¤¢¤ë¤³¤È
-                   EVALUATE    SRY-SRYCD (IDX2)
-                       WHEN    "111700110"
-                       WHEN    "111000110"
-                       WHEN    "111700210"
-                       WHEN    "111003610"
-                       WHEN    "113003510"
-                       WHEN    "113003710"
-                       WHEN    "099110001"
-                       WHEN    "101110010"
-      *H25.4           ¾Ò²ð¤Ê¤·
-                       WHEN    "111012510"
-                           MOVE    1               TO  FLG-SRYACCT-CHK
-                           MOVE    5               TO  IDX2
-                   END-EVALUATE
-               END-PERFORM
       *
-               MOVE    "tbl_sryact"        TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 920-SRYACT-NEXT-SEC
-           END-PERFORM
+           MOVE    HZN-SRYKARRK-REC    TO  SRYKARRK-REC
       *
-           MOVE    "tbl_sryact"        TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
            .
-       300112-SRYACT-HEN-EXT.
+       3001-TAKARRK-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -805,15 +808,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    1                   TO  FLG-SRYKARRK
            END-IF
            MOVE    ZERO                TO  FLG-OK
-           MOVE    SPACE               TO  HZN-SRYKARRK-REC
+           MOVE    SPACE               TO  WRK-SRYKARRK-REC
            PERFORM UNTIL    FLG-SRYKARRK   =   1
                IF      KARRK-SYOSINYMD2    NOT =   SPACE
                    MOVE    1                   TO  FLG-OK
                    MOVE    1                   TO  FLG-SRYKARRK
                ELSE
-                   IF     (HZN-SRYKARRK-REC    =   SPACE )  OR
+                   IF     (WRK-SRYKARRK-REC    =   SPACE )  OR
                           (KARRK-SYOSINYMD1    =   WRK-SYOSINYMD2)
-                       MOVE    SRYKARRK-REC        TO  HZN-SRYKARRK-REC
+                       MOVE    SRYKARRK-REC        TO  WRK-SRYKARRK-REC
                    END-IF
                    MOVE    "tbl_srykarrk"      TO  MCP-TABLE
                    MOVE    "key2"              TO  MCP-PATHNAME
@@ -823,9 +826,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "tbl_srykarrk"      TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
-           IF     (HZN-SRYKARRK-REC    NOT =   SPACE )  AND
+           IF     (WRK-SRYKARRK-REC    NOT =   SPACE )  AND
                   (FLG-OK              =   ZERO      )
-               MOVE    HZN-SRYKARRK-REC    TO  SRYKARRK-REC
+               MOVE    WRK-SRYKARRK-REC    TO  SRYKARRK-REC
                MOVE    WRK-SYOSINYMD2      TO  KARRK-SYOSINYMD2
       *        ½é¿Ç»»ÄêÆü£±¤Ï»»ÄêÆü£²¤ÎÁ°¤Ç¤¢¤ë¤³¤È
                IF     (KARRK-SYOSINYMD1    NOT =   SPACE )  AND
@@ -881,40 +884,40 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
       *    ÅÀ¿ô¥Þ¥¹¥¿¡¼ÆÉ¹þ
       *****************************************************************
-       910-TENSU-READ-SEC         SECTION.
+      *910-TENSU-READ-SEC         SECTION.
       *
-           MOVE    SKARRK-SRYYM        TO  TNS-YUKOSTYMD(1:6)
-           MOVE    "01"                TO  TNS-YUKOSTYMD(7:2)
-           MOVE    TNS-YUKOSTYMD       TO  TNS-YUKOEDYMD
+      *    MOVE    SKARRK-SRYYM        TO  TNS-YUKOSTYMD(1:6)
+      *    MOVE    "01"                TO  TNS-YUKOSTYMD(7:2)
+      *    MOVE    TNS-YUKOSTYMD       TO  TNS-YUKOEDYMD
       *
-           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
-           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
-           MOVE    "tbl_tensu"         TO  MCP-TABLE
-           MOVE    "key22"             TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_tensu"         TO  MCP-TABLE
-               MOVE    "key22"             TO  MCP-PATHNAME
-               PERFORM 920-DBFETCH-SEC
-               IF      MCP-RC              =   ZERO
-                   MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
-                   MOVE    ZERO                TO  FLG-TENSU
-               ELSE
-                   INITIALIZE                  TNS-TENSU-REC
-                   MOVE    1                   TO  FLG-TENSU
-               END-IF
-           ELSE
-               INITIALIZE                  TNS-TENSU-REC
-               MOVE    1                   TO  FLG-TENSU
-           END-IF
+      *    MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+      *    MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+      *    MOVE    "tbl_tensu"         TO  MCP-TABLE
+      *    MOVE    "key22"             TO  MCP-PATHNAME
+      *    PERFORM 910-DBSELECT-SEC
+      *    IF      MCP-RC              =   ZERO
+      *        MOVE    "tbl_tensu"         TO  MCP-TABLE
+      *        MOVE    "key22"             TO  MCP-PATHNAME
+      *        PERFORM 920-DBFETCH-SEC
+      *        IF      MCP-RC              =   ZERO
+      *            MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
+      *            MOVE    ZERO                TO  FLG-TENSU
+      *        ELSE
+      *            INITIALIZE                  TNS-TENSU-REC
+      *            MOVE    1                   TO  FLG-TENSU
+      *        END-IF
+      *    ELSE
+      *        INITIALIZE                  TNS-TENSU-REC
+      *        MOVE    1                   TO  FLG-TENSU
+      *    END-IF
       *
-           MOVE    "tbl_tensu"         TO  MCP-TABLE
-           MOVE    "key22"             TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
+      *    MOVE    "tbl_tensu"         TO  MCP-TABLE
+      *    MOVE    "key22"             TO  MCP-PATHNAME
+      *    PERFORM 990-DBCLOSE-SEC
       *
-           .
-       910-TENSU-READ-EXT.
-           EXIT.
+      *    .
+      *910-TENSU-READ-EXT.
+      **** EXIT.
       *
       *****************************************************************
       *    »»ÄêÎò¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
@@ -985,6 +988,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        920-SRYACT-NEXT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¡¼¸¡º÷ÆÉ¹þ½èÍý
+      *****************************************************************
+       940-SRYACCT-KEYREAD-SEC         SECTION.
+      *
+           MOVE    SRYACCT-REC         TO  MCPDATA-REC
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryacct"       TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 930-SRYACCT-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SRYACCT
+           END-IF
+      *
+           MOVE    "tbl_sryacct"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       940-SRYACCT-KEYREAD-EXT.
            EXIT.
       *****************************************************************
       *    ¿ÇÎÅ²ñ·×¥Þ¥¹¥¿¡¼ÆÉ¹þ
