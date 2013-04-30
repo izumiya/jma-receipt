@@ -14,7 +14,7 @@ tbl_rececom {
 	CREYMD  			char(8);
 	UPYMD    			char(8);
 	UPHMS				char(6);
-#-----> 主キー更新用項目
+#-----> 荳ｻ繧ｭ繝ｼ譖ｴ譁ｰ逕ｨ鬆�逶ｮ
 	UPHOSPNUM			number(2,0),virtual;
 	UPPTID 				number(10),virtual;
 	UPNYUGAIKBN			char(1),virtual;
@@ -346,4 +346,36 @@ path	upd1	{
 		;
 	};
 };
+
+path	key16		{ 	
+	DBSELECT	{
+		DECLARE tbl_rececom_key16_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rececom
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     SRYYM     =   :SRYYM
+			AND     NYUGAIKBN =   :NYUGAIKBN
+			AND     SJKBN     =   :SJKBN
+			ORDER BY HKNCOMBI,SRYDD,RENNUM
+		;
+	};
+};
+
+path	key17		{ 	
+	DBSELECT	{
+		DECLARE tbl_rececom_key17_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rececom
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     SRYYM     =   :SRYYM
+			AND     NYUGAIKBN =   :NYUGAIKBN
+			AND     SRYDD     =   :SRYDD
+			AND     SJKBN     =   :SJKBN
+			ORDER BY HKNCOMBI,SJKBN,RENNUM
+		;
+	};
+};
+
 

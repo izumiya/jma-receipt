@@ -51,6 +51,7 @@
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
+      *  04.06.03    NACL-藤原    13/04/30  「傷病の経過」記載対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1110,7 +1111,11 @@ grpsys        PERFORM 900-DBSELECT-SEC
            PERFORM 20023-BYOMEI-HEN-SEC
       *
       *    帳票編集<傷病の経過>処理
-           PERFORM 20024-COMMENT-HEN-SEC 
+           IF      RECE82-SRYYM        <   201307
+               PERFORM 20024-COMMENT-HEN-SEC
+           ELSE
+               PERFORM 20024-KEIKA-HEN-SEC
+           END-IF 
       *
       *    帳票編集<入退院履歴・入院基本料種別の続き>処理
            PERFORM 380-HC101-NYUTAI-RIREKI-HEN-SEC
@@ -1120,6 +1125,11 @@ grpsys        PERFORM 900-DBSELECT-SEC
       *
       *    帳票編集<適用>処理
            PERFORM 20025-ZAI-HEN-SEC
+      *
+      *    帳票編集<傷病の経過>処理
+           IF      RECE82-SRYYM        >=  201307
+               PERFORM 20024-COMMENT-HEN-SEC
+           END-IF
       *
       *    帳票印刷処理（続紙）
            IF      CNT-PAGE           >   1
@@ -2099,6 +2109,26 @@ grpsys        PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    帳票編集<傷病の経過>処理
+      *****************************************************************
+       20024-KEIKA-HEN-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  WRK-RECECOM
+                                           WRK-KEIKA-LINE
+           MOVE    ZERO                TO  FLG-RECECOM-SJKBN
+           MOVE    SPACE               TO  WRK-RECECOM-NAME 
+                                           WRK-RECECOM-SJKBN
+      *     
+      *    適用欄コメント     
+           MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
+           MOVE    "key16"             TO  WRK-MCP-PATHNAME
+           PERFORM 20024-RECECOM-HENSYU-SEC
+      *     
+           .
+       20024-KEIKA-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    帳票編集<コメント>処理
       *****************************************************************
        20024-COMMENT-HEN-SEC      SECTION.
@@ -2108,6 +2138,11 @@ grpsys        PERFORM 900-DBSELECT-SEC
            MOVE    ZERO                TO  FLG-RECECOM-SJKBN
            MOVE    SPACE               TO  WRK-RECECOM-NAME 
                                            WRK-RECECOM-SJKBN
+      *
+      *    適用欄に記載するときの設定
+           IF      RECE82-SRYYM        >=  201307
+               MOVE    WRK-KEIKA-HCM56-LINE    TO  WRK-KEIKA-LINE
+           END-IF
       *     
       *    適用欄コメント     
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
@@ -2142,6 +2177,9 @@ grpsys        PERFORM 900-DBSELECT-SEC
            MOVE    RECE82-SRYYM        TO  RECECOM-SRYYM
            MOVE    RECE82-PTID         TO  RECECOM-PTID
            MOVE    RECE82-NYUGAIKBN    TO  RECECOM-NYUGAIKBN
+           IF      WRK-MCP-PATHNAME    =   "key16"
+               MOVE    "AA"                TO  RECECOM-SJKBN
+           END-IF
       * 
            MOVE    RECECOM-REC         TO  MCPDATA-REC
            MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
