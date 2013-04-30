@@ -4536,7 +4536,7 @@
                    IF     (SPA-SRYYMD                  >=  "20130701")
                      AND  (LNK-WKSRY-SRYKBN(IDX)       =   "80"      )
                      AND  (LNK-WKSRY-SRYCD (IDX IDS)   =   "101800890")
-                       极清勒闻蛙么碰缄碰爬眶
+      *                极清勒闻蛙么碰缄碰爬眶
                        COMPUTE WRK-SINDAN      =   TNS-TEN
                                                *   LNK-WKSRY-ZAIKAIKEI
                                                                (IDX)
