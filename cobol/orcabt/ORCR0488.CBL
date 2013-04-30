@@ -53,6 +53,7 @@
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
+      *  04.06.03    NACL-門脇    13/04/11  実日数９９９の療養期間編集修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1177,9 +1178,9 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
       *
                 IF      RECE41-KYUGYO-END   NOT   NUMERIC
                 OR      RECE41-KYUGYO-END   =  "0000"
-                  MOVE    SPACE             TO  HC23-ENDYY
-                  MOVE    SPACE             TO  HC23-ENDMM
-                  MOVE    SPACE             TO  HC23-ENDDD
+                  MOVE  WRK-HENYY           TO  HC23-ENDYY
+                  MOVE  WRK-HENMM           TO  HC23-ENDMM
+                  MOVE  WRK-HENDD           TO  HC23-ENDDD
                 ELSE
                   MOVE  RECE41-SRYYM(5:2)   TO  WRK-SINRYO-MM
                   MOVE  RECE41-KYUGYO-END(1:2)

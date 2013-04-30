@@ -802,7 +802,19 @@
       *    入院基本情報取得
            PERFORM 1501-SYS5000-GET-SEC
       *
+           IF    ( HCM34S01-HKNNUM     =   "973" )
+            AND  ( SYS-4001-JIBAIKBN   =   "2" )
+               MOVE    1               TO  FLG-KENPO
+           END-IF
+      *
+           IF    ( HCM34S01-HKNNUM     =   "971" )
+            AND  ( PTRSI-HKNKBN        =   "5"   )
+            AND  ( SYS-4001-KOMUKBN    =   "2" )
+               MOVE    1               TO  FLG-KENPO
+           END-IF
+      *
            IF    (   HCM34S01-SANTEIYM   >=  CONST-H1810 )
+            AND  (   FLG-KENPO            =  1 )
                INITIALIZE                      ORCSNYULIFE-AREA
                MOVE    HCM34S01-HOSPNUM     TO  LNK-NYULIFE-HOSPNUM
                MOVE    HCM34S01-PTID       TO  LNK-NYULIFE-PTID
@@ -828,17 +840,6 @@
            IF    ( LNK-NYUINDAY-RC     NOT =   ZERO )
       *            DISPLAY "ORCSNYUINDAY ERR:" LNK-NYUINDAY-RC
                    INITIALIZE              ORCSNYUINDAY-AREA
-           END-IF
-      *
-           IF    ( HCM34S01-HKNNUM     =   "973" )
-            AND  ( SYS-4001-JIBAIKBN   =   "2" )
-               MOVE    1               TO  FLG-KENPO
-           END-IF
-      *
-           IF    ( HCM34S01-HKNNUM     =   "971" )
-            AND  ( PTRSI-HKNKBN        =   "5"   )
-            AND  ( SYS-4001-KOMUKBN    =   "2" )
-               MOVE    1               TO  FLG-KENPO
            END-IF
       *
            PERFORM VARYING     IDXD    FROM    WRK-SKYSTDD BY  1

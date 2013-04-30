@@ -395,6 +395,8 @@
       *  04.06.03    NACL-ÌçÏÆ    12/07/30  ¹â³Û°ÑÇ¤Ê§¤¤À©ÅÙ¾å¸Â³Û£°±ßÂÐ±þ
       *  04.06.04    NACL-ÌçÏÆ    12/11/20  ÆÃµ­»ö¹à£°£±¡Ê¸ø¡Ë¤Ë´Ø¤ï¤ëÁë¸ý·×»»¡¦
       *                                     ¥ì¥»¥×¥È°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
+      *  04.06.05    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.06    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.06.07    NACL-ÌçÏÆ    13/03/05  ËÌ³¤Æ»ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
@@ -2105,12 +2107,26 @@
                             (LNK-SYU-RSISAISHIN-MONEY * WK-4001-KSNRATE)
                                                       +  0.5
       *
+                   IF   LNK-SYU-SRYYMD(1:6)  >=   "201307"
+                    COMPUTE  LNK-SYU-RSISDO-MONEY     =
+                            (LNK-SYU-RSISDO-MONEY     * WK-4001-KSNRATE)
+                                                      +  0.5
+                    COMPUTE  LNK-SYU-RSIETC-MONEY     =
+                             LNK-SYU-RSIETC-MONEY     -
+                             LNK-S01-KYUKYU(IDY)
+                    COMPUTE  WK-KEISAN                =
+                            (LNK-S01-KYUKYU(IDY)      * WK-4001-KSNRATE)
+                                                      +  0.5
+                    COMPUTE  LNK-SYU-RSIETC-MONEY     =
+                             LNK-SYU-RSIETC-MONEY     + WK-KEISAN
+                   ELSE
                     COMPUTE  WK-RSISDO-MONEY2 =
                             (WK-RSISDO-MONEY  *  WK-4001-KSNRATE)
                                               +  0.5
                     COMPUTE  LNK-SYU-RSISDO-MONEY     =
                              LNK-SYU-RSISDO-MONEY     +
                              WK-RSISDO-MONEY2
+                   END-IF
                  END-IF
       *
                  COMPUTE    LNK-SYU-SKYMONEY  =   LNK-SYU-SKYMONEY  +
@@ -2175,12 +2191,26 @@
                          (LNK-SYU-RSISAISHIN-MONEY * WK-4001-KSNRATE)
                                                    +  0.5
       *
+                IF   LNK-SYU-SRYYMD(1:6)  >=   "201307"
+                 COMPUTE  LNK-SYU-RSISDO-MONEY     =
+                         (LNK-SYU-RSISDO-MONEY     * WK-4001-KSNRATE)
+                                                   +  0.5
+                 COMPUTE  LNK-SYU-RSIETC-MONEY     =
+                          LNK-SYU-RSIETC-MONEY     -
+                          LNK-S01-KYUKYU(IDY)
+                 COMPUTE  WK-KEISAN                =
+                         (LNK-S01-KYUKYU(IDY)      * WK-4001-KSNRATE)
+                                                   +  0.5
+                 COMPUTE  LNK-SYU-RSIETC-MONEY     =
+                          LNK-SYU-RSIETC-MONEY     + WK-KEISAN
+                ELSE
                  COMPUTE  WK-RSISDO-MONEY2 =
                          (WK-RSISDO-MONEY  *  WK-4001-KSNRATE)
                                            +  0.5
                  COMPUTE  LNK-SYU-RSISDO-MONEY     =
                           LNK-SYU-RSISDO-MONEY     +
                           WK-RSISDO-MONEY2
+                END-IF
               END-IF
       *
               MOVE    ZERO      TO       LNK-SYU-SKYMONEY
@@ -2808,7 +2838,30 @@
                           ELSE
                               MOVE   ZERO   TO   LNK-SYU-RSIETC-MONEY
                           END-IF
-                          EVALUATE  TNS-NAMECHGKBN
+                          IF  LNK-SYU-SRYYMD(1:6)  >=   "201307"
+                           EVALUATE  TNS-NAMECHGKBN
+                            WHEN        1
+                              COMPUTE  LNK-SYU-RSISHOSHIN-MONEY =
+                                       LNK-SYU-RSISHOSHIN-MONEY +
+                                       WK-KEISAN
+                            WHEN        2
+                              COMPUTE  LNK-SYU-RSISAISHIN-MONEY =
+                                       LNK-SYU-RSISAISHIN-MONEY +
+                                       WK-KEISAN
+                            WHEN        3
+                              COMPUTE  LNK-SYU-RSISDO-MONEY     =
+                                       LNK-SYU-RSISDO-MONEY     +
+                                       WK-KEISAN
+                            WHEN        4
+                              COMPUTE  LNK-SYU-RSIETC-MONEY     =
+                                       LNK-SYU-RSIETC-MONEY     +
+                                       WK-KEISAN
+                              COMPUTE  LNK-S01-KYUKYU(IDY)      =
+                                       LNK-S01-KYUKYU(IDY)      +
+                                       WK-KEISAN
+                           END-EVALUATE
+                          ELSE
+                           EVALUATE  TNS-NAMECHGKBN
                             WHEN        1
                             WHEN        4
                               COMPUTE  LNK-SYU-RSISHOSHIN-MONEY =
@@ -2828,7 +2881,8 @@
                                          LNK-SYU-RSISDO-MONEY   +
                                          WK-KEISAN
                               END-IF
-                          END-EVALUATE
+                           END-EVALUATE
+                          END-IF
                           MOVE       "1"     TO    FLG-TAIGAI
                        END-IF
       *

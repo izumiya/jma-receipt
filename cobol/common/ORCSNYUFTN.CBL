@@ -136,6 +136,8 @@
       *
       *  04.06.01    NACL-門脇    10/12/06  労災・自賠責の金額フリー入力
       *                                     コード対応
+      *  04.06.02    NACL-門脇    13/02/18  労災レセ電対応
+      *                                     （新診療行為コード対応）
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
@@ -188,6 +190,7 @@
            03  WRK-RSIETC2                 PIC 9(09).
            03  WRK-SINDAN                  PIC 9(09).
            03  WRK-MEISAI                  PIC 9(09).
+           03  WRK-KYUKYU                  PIC 9(09).
            03  WRK-YOUBUKASAN              PIC 9(09).
            03  WRK-KYOBUKASAN              PIC 9(09).
            03  WRK-KEIBUKASAN              PIC 9(09).
@@ -200,6 +203,7 @@
               03 WRK-JIBAI-SYUTEN          PIC 9(09).
               03 WRK-JIBAI-SINDAN          PIC 9(09).
               03 WRK-JIBAI-MEISAI          PIC 9(09).
+              03 WRK-JIBAI-KYUKYU          PIC 9(09).
               03 WRK-JIBAI-RYOYO           PIC 9(09).
               03 WRK-JIBAI-RYOYO-NACCT     PIC 9(09).
               03 WRK-JIBAI-SONOTA.
@@ -769,6 +773,8 @@
                 MOVE     WRK-JIBAI-MEISAI(IDX)
                                               TO  LNK-S02-MEISAI
                 MOVE     WRK-JIBAI-RYOYO(IDX) TO  LNK-S02-RYOYO
+                MOVE     WRK-JIBAI-KYUKYU(IDX)
+                                              TO  LNK-S02-KYUKYU
       *
                 MOVE     WRK-SYOSIN(IDX)      TO  LNK-S02-SYOSINFLG
       *
@@ -1011,6 +1017,8 @@
                 MOVE     WRK-JIBAI-MEISAI(IDX)
                                               TO  LNK-S02-MEISAI
                 MOVE     WRK-JIBAI-RYOYO(IDX) TO  LNK-S02-RYOYO
+                MOVE     WRK-JIBAI-KYUKYU(IDX)
+                                              TO  LNK-S02-KYUKYU
       *
                 MOVE     WRK-SYOSIN(IDX)      TO  LNK-S02-SYOSINFLG
       *
@@ -5965,61 +5973,83 @@ grpsys                              SPA-AREA
       *
                       COMPUTE  WRK-TEN     =   TNS-TEN  /  10
       *
-                      IF   SRY-SRYCD(IDZ) =  "101110010"  OR
-                                             "101110020"  OR
-                                             "101110040"
+                      IF   SYU-SRYYMD(1:6)   >=   "201307"
+                        IF   SRY-SRYCD(IDZ)   =
+                             "101110010" OR "101110040"
                            COMPUTE WRK-RSISHOSHIN = WRK-RSISHOSHIN +
                                   (WRK-TEN  *   SINRYO-COUNT)
-                      END-IF
-                      IF   SYU-SRYYMD(1:6)   >=   "200804"
-                        IF SRY-SRYCD(IDZ) =  "101130020"  OR
-                                             "101130030"  OR
-                                             "101130040"  OR
-                                             "101130050"  OR
-                                             "101130060"  OR
-                                             "101130070"  OR
-                                             "101130080"  OR
-                                             "101130090"  OR
-                                             "101130100"
-                           COMPUTE WRK-RSISDO = WRK-RSISDO +
-                                  (WRK-TEN  *   SINRYO-COUNT)
                         END-IF
+                        IF   SRY-SRYCD(IDZ)   =   "101800880"
+                           COMPUTE WRK-RSIETC  = WRK-RSIETC +
+                                  (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                        END-IF
+                        IF   SRY-SRYCD(IDZ)   =
+                             "101800870" OR "101800470" OR
+                             "101800480" OR "101800490" OR
+                             "101800500" OR "101800510" OR
+                             "101800520" OR "101800530" OR
+                             "101800540" OR "101800960" OR
+                             "101800970" OR "101800980"
+                           COMPUTE WRK-RSIETC  = WRK-RSIETC +
+                                  (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                        END-IF
+                        IF   SRY-SRYCD(IDZ)   =
+                             "101800390" OR "101800400" OR
+                             "101800410" OR "101800420" OR
+                             "101800430" OR "101800440" OR
+                             "101800450" OR  "101800460"
+                           COMPUTE WRK-RSIETC = WRK-RSIETC +
+                                  (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                        END-IF
+                        EVALUATE  SRY-SRYCD(IDZ)
+                          WHEN    "101800570"  THRU  "101800860"
+                           COMPUTE WRK-RSIETC = WRK-RSIETC +
+                                  (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                        END-EVALUATE
                       ELSE
-                        IF SRY-SRYCD(IDZ) =  "101130010"  OR
-                                             "101130020"  OR
-                                             "101130030"  OR
-                                             "101130040"  OR
-                                             "101130050"  OR
-                                             "101130060"  OR
-                                             "101130070"  OR
-                                             "101130080"  OR
-                                             "101130090"  OR
-                                             "101130100"
+                        IF   SRY-SRYCD(IDZ)   =
+                             "101110010" OR "101110020" OR
+                             "101110040"
+                           COMPUTE WRK-RSISHOSHIN = WRK-RSISHOSHIN +
+                                  (WRK-TEN  *   SINRYO-COUNT)
+                        END-IF
+                        IF ( SRY-SRYCD(IDZ)   =
+                             "101130020" OR "101130030" OR
+                             "101130040" OR "101130050" OR
+                             "101130060" OR "101130070" OR
+                             "101130080" OR "101130090" OR
+                             "101130100"                        )
+                        OR ((SYU-SRYYMD(1:6) <=   "200803"     ) AND
+                            (SRY-SRYCD(IDZ)   =   "101130010"  ))
                            COMPUTE WRK-RSISDO = WRK-RSISDO +
                                   (WRK-TEN  *   SINRYO-COUNT)
                         END-IF
-                      END-IF
-                      IF   SRY-SRYCD(IDZ) =  "101910010"  OR
-                                             "101910020"  OR
-                                             "101910030"  OR
-                                             "101910040"  OR
-                                             "101910070"  OR
-                                             "101910080"  OR
-                                             "101910090"  OR
-                                             "101910100"
+                        IF   SRY-SRYCD(IDZ)   =
+                             "101910010" OR "101910020" OR
+                             "101910030" OR "101910040" OR
+                             "101910070" OR "101910080" OR
+                             "101910090" OR "101910100"
                            COMPUTE WRK-RSIETC = WRK-RSIETC +
                                   (WRK-TEN  *   SINRYO-COUNT)
                            COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
                                   (TNS-TEN  *   SINRYO-COUNT)
-                      END-IF
-      *
-                      EVALUATE  SRY-SRYCD(IDZ)
-                        WHEN    "101910110"  THRU  "101910400"
+                        END-IF
+                        EVALUATE  SRY-SRYCD(IDZ)
+                          WHEN    "101910110"  THRU  "101910400"
                            COMPUTE WRK-RSIETC = WRK-RSIETC +
                                   (WRK-TEN  *   SINRYO-COUNT)
                            COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
                                   (TNS-TEN  *   SINRYO-COUNT)
-                      END-EVALUATE
+                        END-EVALUATE
+                      END-IF
       *
                       IF     SYU-SYUHKNNUM   =   "971"
       *
@@ -6134,6 +6164,12 @@ grpsys                              SPA-AREA
                                 TO  WRK-JIBAI-SONOTA-TANKA(IDX IDX3)
                              END-IF
                            END-IF
+                         END-IF
+      *
+                         IF   SYU-SRYYMD(1:6)  >=   "201307"
+                         AND  SRY-SRYCD (IDZ)   =   "101800880"
+                           COMPUTE WRK-KYUKYU = WRK-KYUKYU +
+                                  (TNS-TEN  *   SINRYO-COUNT)
                          END-IF
       *
                       END-IF
@@ -6359,6 +6395,8 @@ grpsys                                    SPA-AREA
              COMPUTE   WRK-JIBAI-RYOYO(IDX)
                                   =  WRK-JIBAI-RYOYO(IDX)
                                   +  WRK-JIBAI-RYOYO-NACCT(IDX)
+      *
+             MOVE      WRK-KYUKYU      TO    WRK-JIBAI-KYUKYU(IDX)
       *
            END-IF
       *

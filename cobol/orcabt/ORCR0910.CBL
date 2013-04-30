@@ -110,8 +110,11 @@
       *  04.05.03    NACL-藤原    09/07/14  小数点以下５桁対応
       *  04.05.04    NACL-門脇    10/01/25  治験対応
       *  04.05.05    NACL-門脇    11/11/30  画像診断フイルム分画数対応
+      *
       *  04.06.01    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.02    NACL-門脇    13/02/18  労災レセ電対応
+      *                                     （新診療行為コード対応）
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
       *****************************************************************
       *
@@ -3209,14 +3212,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                        END-IF
                      END-IF
                  END-IF
-      ***        IF   RECE82-SRYYM   >=   "200804"
-      ***          EVALUATE  TBL-ZAIW-SRYCD1
-      ***            WHEN     "101130010"
-      ***              MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-      ***              MOVE      999999981   TO  TBL-ZAIW-KOUHYOJYUNNUM
-      ***          END-EVALUATE
-      ***        END-IF
-                 EVALUATE    TBL-ZAIW-SRYCD1
+                 IF   RECE82-SRYYM   <=   "201306"
+                   EVALUATE    TBL-ZAIW-SRYCD1
                      WHEN     "101800175"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
                        MOVE      999999982   TO  TBL-ZAIW-KOUHYOJYUNNUM
@@ -3229,7 +3226,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                      WHEN     "101800340"
                        MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
                        MOVE      999999985   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                 END-EVALUATE
+                   END-EVALUATE
+                 ELSE
+                   IF  TBL-ZAIW-SRYCD1(1:3) = "101"
+                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
+                       MOVE  TBL-ZAIW-SRYCD1 TO  TBL-ZAIW-KOUHYOJYUNNUM
+                   END-IF
+                 END-IF
                END-IF
                MOVE    TBL-ZAIW-CDKBN-SYO  TO  RECE86-CDKBN-SYO
                MOVE    TBL-ZAIW-CDKBN-BU   TO  RECE86-CDKBN-BU

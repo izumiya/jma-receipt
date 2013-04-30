@@ -87,6 +87,8 @@
       *
       *  04.06.01    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
+      *  04.06.02    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.03    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
@@ -311,7 +313,6 @@
       *    ¸ÇÄêÃÍ
        01  CONST-AREA.
            03  CONS-ROUSAI1    PIC X(09)   VALUE   "101110010".
-           03  CONS-ROUSAI2    PIC X(09)   VALUE   "101110020".
            03  CONS-ROUSAI3    PIC X(09)   VALUE   "101110030".
            03  CONS-ROUSAI4    PIC X(09)   VALUE   "101120030".
            03  CONS-ROUSAI5    PIC X(09)   VALUE   "101120040".
@@ -330,9 +331,27 @@
            03  CONS-ROUSAI18   PIC X(09)   VALUE   "101110040".
            03  CONS-ROUSAI19   PIC X(09)   VALUE   "101120100".
       *
+           03  CONS-ROUSAI20   PIC X(09)   VALUE   "101800870".
+           03  CONS-ROUSAI21   PIC X(09)   VALUE   "101800470".
+           03  CONS-ROUSAI22   PIC X(09)   VALUE   "101800480".
+           03  CONS-ROUSAI23   PIC X(09)   VALUE   "101800490".
+           03  CONS-ROUSAI24   PIC X(09)   VALUE   "101800500".
+           03  CONS-ROUSAI25   PIC X(09)   VALUE   "101800510".
+           03  CONS-ROUSAI26   PIC X(09)   VALUE   "101800520".
+           03  CONS-ROUSAI27   PIC X(09)   VALUE   "101800530".
+           03  CONS-ROUSAI28   PIC X(09)   VALUE   "101800540".
+           03  CONS-ROUSAI29   PIC X(09)   VALUE   "101800960".
+           03  CONS-ROUSAI30   PIC X(09)   VALUE   "101800970".
+           03  CONS-ROUSAI31   PIC X(09)   VALUE   "101800980".
+      *
+           03  CONS-ROUSAI32   PIC X(09)   VALUE   "101800890".
+           03  CONS-ROUSAI33   PIC X(09)   VALUE   "101130190".
+           03  CONS-ROUSAI34   PIC X(09)   VALUE   "101120010".
+      *
            03  CONS-GAIRAI1    PIC X(09)   VALUE   "101120070".
            03  CONS-GAIRAI2    PIC X(09)   VALUE   "101120080".
            03  CONS-GAIRAI3    PIC X(09)   VALUE   "101120090".
+           03  CONS-GAIRAI4    PIC X(09)   VALUE   "101120020".
       *
       *    ¹øÉô¸ÇÄêÂÓ²Ã»»
            03  CONS-YOUBUKASAN PIC X(09)   VALUE   "140037490".
@@ -1307,8 +1326,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               OR "112015950"
                                               OR "112016210"
                                               OR "112016410"
-                                              OR  CONS-ROUSAI18
-                                              OR  CONS-ROUSAI19)
+                                              OR  CONS-ROUSAI18)
+                       OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI19 ) AND
+                            ( RECE41-SRYYM  <=   "201306"     ))
+                       OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI5  ) AND
+                            ( RECE41-SRYYM  >=   "201307"     ))
       *
                           MOVE       1      TO    FLG-SHOSAISIN
       *
@@ -1366,10 +1388,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                              UNTIL    (IDY            >       5)  OR
                                       (SRY-SRYCD(IDY) =   SPACE)  OR
                                       (FLG-KYUKYU     =       1)
-                       IF   SRY-SRYCD(IDY) =  CONS-ROUSAI2  OR
-                                              CONS-ROUSAI3
+                     IF   RECE41-SRYYM    >=   "201307"
+                       IF   SRY-SRYCD(IDY) =  CONS-ROUSAI32
                              MOVE    1      TO    FLG-KYUKYU
                        END-IF
+                     ELSE
+                       IF   SRY-SRYCD(IDY) =  CONS-ROUSAI3
+                             MOVE    1      TO    FLG-KYUKYU
+                       END-IF
+                     END-IF
                    END-PERFORM
       *
                    MOVE    "tbl_sryact"     TO      MCP-TABLE
@@ -1461,11 +1488,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       (SRY-SRYCD(IDY) =   SPACE)  OR
                                       (FLG-GAIRAI26   =       1)  OR
                                       (FLG-GAIRAI52   =       1)
-                       IF   SRY-SRYCD(IDY) =  CONS-GAIRAI1  OR
-                                              CONS-GAIRAI2
+                       IF ((SRY-SRYCD(IDY) =  CONS-GAIRAI1
+                                          OR  CONS-GAIRAI2)  AND
+                           (RECE41-SRYYM  <=  "201306"    ))
+                       OR ((SRY-SRYCD(IDY) =  CONS-GAIRAI4)  AND
+                           (RECE41-SRYYM  >=  "201307"    ))
                              MOVE    1      TO    FLG-GAIRAI52
                        END-IF
-                       IF   SRY-SRYCD(IDY) =  CONS-GAIRAI3
+                       IF  (SRY-SRYCD(IDY) =  CONS-GAIRAI3)
+                       AND (RECE41-SRYYM  <=  "201306"    )
                              MOVE    1      TO    FLG-GAIRAI26
                        END-IF
                    END-PERFORM
@@ -1514,27 +1545,31 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        PERFORM   800-TENSU-TBL-SEC
       *
                        IF ( SRY-SRYCD(IDY) =  CONS-ROUSAI1  OR
-                                              CONS-ROUSAI2  OR
-                                              CONS-ROUSAI3  OR
-                                              CONS-ROUSAI4  OR
-                                              CONS-ROUSAI5  OR
-                                              CONS-ROUSAI6  OR
-                                              CONS-ROUSAI7  OR
-                                              CONS-ROUSAI9  OR
-                                              CONS-ROUSAI10 OR
-                                              CONS-ROUSAI11 OR
-                                              CONS-ROUSAI12 OR
-                                              CONS-ROUSAI13 OR
-                                              CONS-ROUSAI14 OR
-                                              CONS-ROUSAI15 OR
-                                              CONS-ROUSAI16 OR
-                                              CONS-ROUSAI17 OR
-                                              CONS-ROUSAI18 OR
-                                              CONS-ROUSAI19   )
+                                              CONS-ROUSAI18   )
                        OR ((ACCT-SRYKBN         =  "80"      )   AND
                            (SRY-SRYCD(IDY)(1:5) =  "09593"   ))
                        OR ((SRY-SRYCD(IDY) =  CONS-ROUSAI8   )   AND
                            (RECE41-SRYYM   <  "200804"       ))
+                       OR ((SRY-SRYCD(IDY) =
+                            CONS-ROUSAI3  OR CONS-ROUSAI4  OR
+                            CONS-ROUSAI5  OR CONS-ROUSAI6  OR
+                            CONS-ROUSAI7  OR CONS-ROUSAI19 OR
+                            CONS-ROUSAI9  OR CONS-ROUSAI10 OR
+                            CONS-ROUSAI11 OR CONS-ROUSAI12 OR
+                            CONS-ROUSAI13 OR CONS-ROUSAI14 OR
+                            CONS-ROUSAI15 OR CONS-ROUSAI16 OR
+                            CONS-ROUSAI17                    )   AND
+                           (RECE41-SRYYM  <=  "201306"       ))
+                       OR ((SRY-SRYCD(IDY) =
+                            CONS-ROUSAI32 OR CONS-ROUSAI33 OR
+                            CONS-ROUSAI34 OR CONS-ROUSAI5  OR
+                            CONS-ROUSAI20 OR CONS-ROUSAI21 OR
+                            CONS-ROUSAI22 OR CONS-ROUSAI23 OR
+                            CONS-ROUSAI24 OR CONS-ROUSAI25 OR
+                            CONS-ROUSAI26 OR CONS-ROUSAI27 OR
+                            CONS-ROUSAI28 OR CONS-ROUSAI29 OR
+                            CONS-ROUSAI30 OR CONS-ROUSAI31   )   AND
+                           (RECE41-SRYYM  >=  "201307"       ))
       *
                           IF  SRY-SRYSYUKBN = "809"
                             ADD  SRY-JIHIMONEY(IDY)  TO  WRK-KIN
@@ -1764,25 +1799,29 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        PERFORM   800-TENSU-TBL-SEC
       *
                        IF ( SRY-SRYCD(IDY) =  CONS-ROUSAI1  OR
-                                              CONS-ROUSAI2  OR
-                                              CONS-ROUSAI3  OR
-                                              CONS-ROUSAI4  OR
-                                              CONS-ROUSAI5  OR
-                                              CONS-ROUSAI6  OR
-                                              CONS-ROUSAI7  OR
-                                              CONS-ROUSAI9  OR
-                                              CONS-ROUSAI10 OR
-                                              CONS-ROUSAI11 OR
-                                              CONS-ROUSAI12 OR
-                                              CONS-ROUSAI13 OR
-                                              CONS-ROUSAI14 OR
-                                              CONS-ROUSAI15 OR
-                                              CONS-ROUSAI16 OR
-                                              CONS-ROUSAI17 OR
-                                              CONS-ROUSAI18 OR
-                                              CONS-ROUSAI19    )
+                                              CONS-ROUSAI18    )
                        OR ((SRY-SRYCD(IDY) =  CONS-ROUSAI8    ) AND
                            (RECE41-SRYYM   <  "200804"        ))
+                       OR ((SRY-SRYCD(IDY) =
+                            CONS-ROUSAI3  OR CONS-ROUSAI4  OR
+                            CONS-ROUSAI5  OR CONS-ROUSAI6  OR
+                            CONS-ROUSAI7  OR CONS-ROUSAI19 OR
+                            CONS-ROUSAI9  OR CONS-ROUSAI10 OR
+                            CONS-ROUSAI11 OR CONS-ROUSAI12 OR
+                            CONS-ROUSAI13 OR CONS-ROUSAI14 OR
+                            CONS-ROUSAI15 OR CONS-ROUSAI16 OR
+                            CONS-ROUSAI17                     ) AND
+                           (RECE41-SRYYM  <=  "201306"        ))
+                       OR ((SRY-SRYCD(IDY) =
+                            CONS-ROUSAI32 OR CONS-ROUSAI33 OR
+                            CONS-ROUSAI34 OR CONS-ROUSAI5  OR
+                            CONS-ROUSAI20 OR CONS-ROUSAI21 OR
+                            CONS-ROUSAI22 OR CONS-ROUSAI23 OR
+                            CONS-ROUSAI24 OR CONS-ROUSAI25 OR
+                            CONS-ROUSAI26 OR CONS-ROUSAI27 OR
+                            CONS-ROUSAI28 OR CONS-ROUSAI29 OR
+                            CONS-ROUSAI30 OR CONS-ROUSAI31    ) AND
+                           (RECE41-SRYYM  >=  "201307"        ))
       *
                                COMPUTE  WRK-TEN-JI   =  TNS-TEN / 10
                                COMPUTE  TBL-SYUTEN-JI(ID1)  =

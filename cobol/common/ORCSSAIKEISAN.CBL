@@ -59,6 +59,8 @@
       *  04.06.02    NACL-ÌçÏÆ    10/11/08  ¼çÊÝ¸±¡Ü¥Þ¥ëÄ¹¤ÎÀÁµáÂÐ±þ
       *  04.06.03    NACL-ÌçÏÆ    10/12/06  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î¶â³Û¥Õ¥ê¡¼ÆþÎÏ
       *                                     ¥³¡¼¥ÉÂÐ±þ
+      *  04.06.04    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.05    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
@@ -177,6 +179,7 @@
       *
            03  WK-SINDAN                   PIC  9(08).
            03  WK-MEISAI                   PIC  9(08).
+           03  WK-KYUKYU                   PIC  9(08).
       *
            03  WK-YOUBUKASAN               PIC  9(08).
            03  WK-KYOBUKASAN               PIC  9(08).
@@ -1921,6 +1924,8 @@
       *
              MOVE      WK-RYOYOTEATE   TO   LNK-S01-RYOYO(IDY)
       *
+             MOVE      WK-KYUKYU       TO   LNK-S01-KYUKYU(IDY)
+      *
            END-IF
       *
       *    ¸ø³²½èÍý
@@ -2625,49 +2630,66 @@
       *
                          COMPUTE  WRK-TEN     =   TNS-TEN  /  10       
       *                                                                
-                         IF   SRY-SRYCD(IDX3) =  "101110010"  OR       
-                                                 "101110020"  OR       
-                                                 "101110030"  OR
-                                                 "101110040"
-                           COMPUTE WK-RSISHOSHIN = WK-RSISHOSHIN +     
-                                  (WRK-TEN  *   TBL-ZAIKAISU (IDX1))   
-                         END-IF                                        
-                         IF   SRY-SRYCD(IDX3) =  "101120030"  OR       
-                                                 "101120040"  OR       
-                                                 "101120050"  OR       
-                                                 "101120060"  OR
-                                                 "101120100"
-                           COMPUTE WK-RSISAISHIN = WK-RSISAISHIN +     
-                                  (WRK-TEN  *   TBL-ZAIKAISU (IDX1))   
-                         END-IF                                        
-                         IF   LNK-SYU-SRYYMD(IDY)  >=   "200804"
-                          IF  SRY-SRYCD(IDX3) =  "101130020"  OR       
-                                                 "101130030"  OR       
-                                                 "101130040"  OR       
-                                                 "101130050"  OR       
-                                                 "101130060"  OR       
-                                                 "101130070"  OR       
-                                                 "101130080"  OR       
-                                                 "101130090"  OR       
-                                                 "101130100"           
-                           COMPUTE WK-RSISDO = WK-RSISDO +             
-                                  (WRK-TEN  *   TBL-ZAIKAISU (IDX1))   
-                          END-IF
+                         IF   LNK-SYU-SRYYMD(IDY)(1:6)  >=   "201307"
+                           IF  SRY-SRYCD(IDX3) =
+                               "101110010" OR "101110040"
+                             COMPUTE WK-RSISHOSHIN = WK-RSISHOSHIN +
+                                    (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
+                           END-IF
+                           IF  SRY-SRYCD(IDX3) = "101800890"
+                             COMPUTE WK-RSIETC  = WK-RSIETC +
+                                    (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
+                             COMPUTE WK-RSIETC2 = WK-RSIETC2 +
+                                    (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
+                           END-IF
+                           IF  SRY-SRYCD(IDX3) =
+                               "101120010" OR "101120040"
+                             COMPUTE WK-RSISAISHIN = WK-RSISAISHIN +
+                                    (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
+                           END-IF
+                           IF  SRY-SRYCD(IDX3) =  "101130190"
+                             COMPUTE WK-RSISDO = WK-RSISDO +
+                                    (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
+                           END-IF
+                           IF  SRY-SRYCD(IDX3) =
+                               "101800870" OR "101800470" OR
+                               "101800480" OR "101800490" OR
+                               "101800500" OR "101800510" OR
+                               "101800520" OR "101800530" OR
+                               "101800540" OR "101800960" OR
+                               "101800970" OR "101800980"
+                             COMPUTE WK-RSIETC  = WK-RSIETC +
+                                    (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
+                             COMPUTE WK-RSIETC2 = WK-RSIETC2 +
+                                    (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
+                           END-IF
                          ELSE
-                          IF  SRY-SRYCD(IDX3) =  "101130010"  OR       
-                                                 "101130020"  OR       
-                                                 "101130030"  OR       
-                                                 "101130040"  OR       
-                                                 "101130050"  OR       
-                                                 "101130060"  OR       
-                                                 "101130070"  OR       
-                                                 "101130080"  OR       
-                                                 "101130090"  OR       
-                                                 "101130100"           
-                           COMPUTE WK-RSISDO = WK-RSISDO +             
-                                  (WRK-TEN  *   TBL-ZAIKAISU (IDX1))   
-                          END-IF
-                         END-IF                                        
+                           IF  SRY-SRYCD(IDX3) =
+                               "101110010" OR "101110030" OR
+                               "101110040"
+                             COMPUTE WK-RSISHOSHIN = WK-RSISHOSHIN +
+                                    (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
+                           END-IF
+                           IF  SRY-SRYCD(IDX3) =
+                               "101120030" OR "101120040" OR
+                               "101120050" OR "101120060" OR
+                               "101120100"
+                             COMPUTE WK-RSISAISHIN = WK-RSISAISHIN +
+                                    (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
+                           END-IF
+                           IF ( SRY-SRYCD(IDX3) =
+                                "101130020" OR "101130030" OR
+                                "101130040" OR "101130050" OR
+                                "101130060" OR "101130070" OR
+                                "101130080" OR "101130090" OR
+                                "101130100"                      )
+                           OR ((LNK-SYU-SRYYMD(IDY)(1:6)
+                                                   <=   "200803") AND
+                               (SRY-SRYCD(IDX3) =  "101130010"  ))
+                             COMPUTE WK-RSISDO = WK-RSISDO +
+                                    (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
+                           END-IF
+                         END-IF
                          IF    SRY-SRYCD (IDX3)(1:5)   =   "09591"     
                                                      OR    "09592"     
                                                      OR    "09593"     
@@ -2755,6 +2777,13 @@
       *
                          IF    SRY-SRYCD (IDX3)  =   "199000610"
                            COMPUTE WK-RYOYOTEATE = WK-RYOYOTEATE +
+                                  (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
+                         END-IF
+      *
+                         IF    LNK-SYU-SYUHKNNUM(IDY)  =  "973"
+                         AND   LNK-SYU-SRYYMD(IDY)(1:6)  >=   "201307"
+                         AND   SRY-SRYCD (IDX3)  =   "101800890"
+                           COMPUTE WK-KYUKYU = WK-KYUKYU +
                                   (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
                          END-IF
                       ELSE
@@ -2906,25 +2935,6 @@
                          WRK-SYU-SHOHOU-SAI +
                          LNK-SYU-SHOHOU-SAI(IDY)
       *
-      *    ¼«ÇåÀÕÊÝ¸±½èÍý
-      ***  IF  LNK-SYU-SYUHKNNUM(IDY)  =   "973"
-      *
-      ***      COMPUTE   WRK-S01-SYUTEN(1)  =  WRK-S01-SYUTEN(1)
-      ***                                   +  LNK-S01-SYUTEN(IDY)
-      ***      COMPUTE   WRK-S01-SINDAN(1)  =  WRK-S01-SINDAN(1)
-      ***                                   +  LNK-S01-SINDAN(IDY)
-      ***      COMPUTE   WRK-S01-MEISAI(1)  =  WRK-S01-MEISAI(1)
-      ***                                   +  LNK-S01-MEISAI(IDY)
-      ***      COMPUTE   WRK-S01-RYOYO(1)   =  WRK-S01-RYOYO(1)
-      ***                                   +  LNK-S01-RYOYO(IDY)
-      *
-      ***  END-IF
-      *
-      ***  IF      WRK-S01-SENINFLG(1)     =  SPACE
-      ***  AND     LNK-S01-SENINFLG(IDY)   =  "1"
-      ***        MOVE     "1"          TO   WRK-S01-SENINFLG(1)
-      ***  END-IF
-      *
            .
       *
        4403-GOKEI-TAIHI-EXT.
@@ -2969,18 +2979,6 @@
            END-PERFORM
            MOVE    WRK-SYU-SHOHOU-SAI
                              TO    LNK-SYU-SHOHOU-SAI(IDY)
-      *
-      *    ¼«ÇåÀÕÊÝ¸±½èÍý
-      ***  IF  LNK-SYU-SYUHKNNUM(IDY)  =   "973"
-      *
-      ***      MOVE   WRK-S01-SYUTEN(1)    TO    LNK-S01-SYUTEN(IDY)
-      ***      MOVE   WRK-S01-SINDAN(1)    TO    LNK-S01-SINDAN(IDY)
-      ***      MOVE   WRK-S01-MEISAI(1)    TO    LNK-S01-MEISAI(IDY)
-      ***      MOVE   WRK-S01-RYOYO(1)     TO    LNK-S01-RYOYO(IDY)
-      *
-      ***  END-IF
-      *
-      ***  MOVE       WRK-S01-SENINFLG(1)  TO    LNK-S01-SENINFLG(IDY)
       *
            .
       *

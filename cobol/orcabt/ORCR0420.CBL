@@ -231,6 +231,8 @@
       *                                     コード対応
       *  04.06.04    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.05    NACL-門脇    13/02/18  労災レセ電対応
+      *                                     （新診療行為コード対応）
       *  04.06.06    NACL-門脇    13/02/27  平成２５年４月改正対応
       *****************************************************************
       *
@@ -695,24 +697,11 @@
       *    再診（３月超）（５回超）など
       *    （４６５に関係あり）
            03  CONS-SAISHIN-A1     PIC X(09) VALUE "101120060".
-      **   03  CONS-SAISHIN-A2     PIC X(09) VALUE "112001210".
-      **   03  CONS-SAISHIN-A3     PIC X(09) VALUE "112701110".
-      **   03  CONS-SAISHIN-A4     PIC X(09) VALUE "112000970".
-      **   03  CONS-SAISHIN-A5     PIC X(09) VALUE "112001070".
-      **   03  CONS-SAISHIN-A6     PIC X(09) VALUE "112006970".
-      **   03  CONS-SAISHIN-A7     PIC X(09) VALUE "112007070".
-      **   03  CONS-SAISHIN-A8     PIC X(09) VALUE "112001310".
-      **   03  CONS-SAISHIN-A9     PIC X(09) VALUE "112701210".
-      **   03  CONS-SAISHIN-A10    PIC X(09) VALUE "112001110".
-      **   03  CONS-SAISHIN-A11    PIC X(09) VALUE "112701010".
-      **   03  CONS-SAISHIN-A12    PIC X(09) VALUE "112001410".
-      **   03  CONS-SAISHIN-A13    PIC X(09) VALUE "112701310".
       *    外来管理加算（３月超）（５回超）
       *    （４６０に関係あり）
            03  CONS-GAIRAI         PIC X(09) VALUE "101120090".
       *    労災自賠責関係
            03  CONS-ROUSAI1    PIC X(09)   VALUE   "101110010".
-           03  CONS-ROUSAI2    PIC X(09)   VALUE   "101110020".
            03  CONS-ROUSAI3    PIC X(09)   VALUE   "101110030".
            03  CONS-ROUSAI4    PIC X(09)   VALUE   "101120030".
            03  CONS-ROUSAI5    PIC X(09)   VALUE   "101120040".
@@ -730,6 +719,23 @@
            03  CONS-ROUSAI17   PIC X(09)   VALUE   "101130100".
            03  CONS-ROUSAI18   PIC X(09)   VALUE   "101110040".
            03  CONS-ROUSAI19   PIC X(09)   VALUE   "101120100".
+      *
+           03  CONS-ROUSAI20   PIC X(09)   VALUE   "101800870".
+           03  CONS-ROUSAI21   PIC X(09)   VALUE   "101800470".
+           03  CONS-ROUSAI22   PIC X(09)   VALUE   "101800480".
+           03  CONS-ROUSAI23   PIC X(09)   VALUE   "101800490".
+           03  CONS-ROUSAI24   PIC X(09)   VALUE   "101800500".
+           03  CONS-ROUSAI25   PIC X(09)   VALUE   "101800510".
+           03  CONS-ROUSAI26   PIC X(09)   VALUE   "101800520".
+           03  CONS-ROUSAI27   PIC X(09)   VALUE   "101800530".
+           03  CONS-ROUSAI28   PIC X(09)   VALUE   "101800540".
+           03  CONS-ROUSAI29   PIC X(09)   VALUE   "101800960".
+           03  CONS-ROUSAI30   PIC X(09)   VALUE   "101800970".
+           03  CONS-ROUSAI31   PIC X(09)   VALUE   "101800980".
+      *
+           03  CONS-ROUSAI32   PIC X(09)   VALUE   "101800890".
+           03  CONS-ROUSAI33   PIC X(09)   VALUE   "101130190".
+           03  CONS-ROUSAI34   PIC X(09)   VALUE   "101120010".
       *
            03  CONS-ROUCOM1    PIC X(09)   VALUE   "840800001".
            03  CONS-ROUCOM2    PIC X(09)   VALUE   "840800002". 
@@ -852,6 +858,10 @@
            03  CONS-SINDAI7-COMMENT  PIC X(09)  VALUE  "101800080".
       *!   心大血管疾患リハビリテーション料（２）
            03  CONS-SINDAI8-COMMENT  PIC X(09)  VALUE  "101800090".
+      *#   心大血管疾患リハビリテーション料（１）
+           03  CONS-SINDAI9-COMMENT  PIC X(09)  VALUE  "101800230".
+      *#   心大血管疾患リハビリテーション料（２）
+           03  CONS-SINDAI10-COMMENT PIC X(09)  VALUE  "101800240".
       *    呼吸器リハビリテーション料（１）
            03  CONS-KOKYUKI1-COMMENT PIC X(09)  VALUE  "180028010".
       *    呼吸器リハビリテーション料（２）
@@ -868,6 +878,10 @@
            03  CONS-KOKYUKI7-COMMENT PIC X(09)  VALUE  "101800150".
       *!   呼吸器リハビリテーション料（２）
            03  CONS-KOKYUKI8-COMMENT PIC X(09)  VALUE  "101800160".
+      *#   呼吸器リハビリテーション料（１）
+           03  CONS-KOKYUKI9-COMMENT PIC X(09)  VALUE  "101800340".
+      *#   呼吸器リハビリテーション料（２）
+           03  CONS-KOKYUKI10-COMMENT PIC X(09) VALUE  "101800350".
       *    脳血管疾患等リハビリテーション料（１）
            03  CONS-NOUKE1-COMMENT   PIC X(09)  VALUE  "180027610".
       *    脳血管疾患等リハビリテーション料（２）
@@ -906,6 +920,12 @@
            03  CONS-NOUKE18-COMMENT  PIC X(09)  VALUE  "180034310".
       *    脳血管疾患等リハビリテーション料（３）（要介護・廃用症候群）
            03  CONS-NOUKE19-COMMENT  PIC X(09)  VALUE  "180034410".
+      *#   脳血管疾患等リハビリテーション料（１）
+           03  CONS-NOUKE20-COMMENT  PIC X(09)  VALUE  "101800250".
+      *#   脳血管疾患等リハビリテーション料（２）
+           03  CONS-NOUKE21-COMMENT  PIC X(09)  VALUE  "101800260".
+      *#   脳血管疾患等リハビリテーション料（３）
+           03  CONS-NOUKE22-COMMENT  PIC X(09)  VALUE  "101800270".
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -932,6 +952,12 @@
            03  CONS-UNDOKI12-COMMENT  PIC X(09)  VALUE  "180034610".
       *    運動器リハビリテーション料（３）（要介護）
            03  CONS-UNDOKI13-COMMENT PIC X(09)  VALUE  "180034710".
+      *#   運動器リハビリテーション料（１）
+           03  CONS-UNDOKI14-COMMENT PIC X(09)  VALUE  "101800280".
+      *#   運動器リハビリテーション料（２）
+           03  CONS-UNDOKI15-COMMENT PIC X(09)  VALUE  "101800290".
+      *#   運動器リハビリテーション料（３）
+           03  CONS-UNDOKI16-COMMENT PIC X(09)  VALUE  "101800330".
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -2016,22 +2042,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 CONS-DOUJITU2-GAI
                         MOVE   "2"      TO    RECE41-KEIZOKU-PRTKBN
                    END-IF
-                   IF   SRY-SRYCD(IDX2)   =     CONS-SAISHIN-A1   
-      **                                  OR    CONS-SAISHIN-A2   
-      **                                  OR    CONS-SAISHIN-A3   
-      **                                  OR    CONS-SAISHIN-A4   
-      **                                  OR    CONS-SAISHIN-A5   
-      **                                  OR    CONS-SAISHIN-A6   
-      **                                  OR    CONS-SAISHIN-A7   
-      **                                  OR    CONS-SAISHIN-A8   
-      **                                  OR    CONS-SAISHIN-A9   
-      **                                  OR    CONS-SAISHIN-A10  
-      **                                  OR    CONS-SAISHIN-A11  
-      **                                  OR    CONS-SAISHIN-A12  
-      **                                  OR    CONS-SAISHIN-A13  
+                   IF  (SRY-SRYCD(IDX2)   =     CONS-SAISHIN-A1)
+                   AND (RECE41-SRYYM     <=     "201306"       )
                         MOVE   "1"      TO    RECE41-SAISHIN-PRTKBN2
                    END-IF
-                   IF   SRY-SRYCD(IDX2)   =     CONS-GAIRAI 
+                   IF  (SRY-SRYCD(IDX2)   =     CONS-GAIRAI    )
+                   AND (RECE41-SRYYM     <=     "201306"       )
                         MOVE   "1"      TO    RECE41-GAIRAIKSN-PRTKBN
                    END-IF
                END-IF
@@ -2155,21 +2171,29 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    SRY-INPUTNUM(IDX2) TO    RECE45-INPUTNUM(IDX4)
       **
                IF   RECE41-HKNKBN    NOT  =  "4"                        
-                  IF ( SRY-SRYCD(IDX2)  =  CONS-ROUSAI2   OR
-                                           CONS-ROUSAI3   OR
-                                           CONS-ROUSAI4   OR
-                                           CONS-ROUSAI9   OR
-                                           CONS-ROUSAI10  OR
-                                           CONS-ROUSAI11  OR
-                                           CONS-ROUSAI12  OR
-                                           CONS-ROUSAI13  OR
-                                           CONS-ROUSAI14  OR
-                                           CONS-ROUSAI15  OR
-                                           CONS-ROUSAI16  OR
-                                           CONS-ROUSAI17    )
-                  OR ((SRY-SRYCD(IDX2)  =  CONS-ROUSAI8    ) AND
+                  IF ((SRY-SRYCD(IDX2)  =  CONS-ROUSAI8    ) AND
                       (RECE41-SRYYM     <  "200804"        ))
-                    IF     SRY-SRYCD(IDX2)   =   CONS-ROUSAI4
+                  OR ((SRY-SRYCD(IDX2)  =
+                       CONS-ROUSAI3  OR CONS-ROUSAI4  OR
+                       CONS-ROUSAI9  OR CONS-ROUSAI10 OR
+                       CONS-ROUSAI11 OR CONS-ROUSAI12 OR
+                       CONS-ROUSAI13 OR CONS-ROUSAI14 OR
+                       CONS-ROUSAI15 OR CONS-ROUSAI16 OR
+                       CONS-ROUSAI17                       ) AND
+                      (RECE41-SRYYM    <=  "201306"        ))
+                  OR ((SRY-SRYCD(IDX2)  =
+                       CONS-ROUSAI32 OR CONS-ROUSAI33 OR
+                       CONS-ROUSAI20 OR CONS-ROUSAI21 OR
+                       CONS-ROUSAI22 OR CONS-ROUSAI23 OR
+                       CONS-ROUSAI24 OR CONS-ROUSAI25 OR
+                       CONS-ROUSAI26 OR CONS-ROUSAI27 OR
+                       CONS-ROUSAI28 OR CONS-ROUSAI29 OR
+                       CONS-ROUSAI30 OR CONS-ROUSAI31      ) AND
+                      (RECE41-SRYYM    >=  "201307"        ))
+                    IF   ((SRY-SRYCD(IDX2)  =   CONS-ROUSAI4 ) AND
+                          (RECE41-SRYYM    <=   "201306"     ))
+                    OR   ((SRY-SRYCD(IDX2)  =   CONS-ROUSAI33) AND
+                          (RECE41-SRYYM    >=   "201307"     ))
                           MOVE   "13"        TO    RECE44-SRYKBN
                                                    RECE45-SRYKBN
                     ELSE
@@ -2262,23 +2286,28 @@ grpsys     PERFORM 900-DBSELECT-SEC
       ***            END-EVALUATE
                      MOVE    1          TO    FLG-SRYKBN-HEN
                   ELSE
-                   IF ( SRY-SRYCD(IDX2)  =  CONS-ROUSAI2   OR
-                                            CONS-ROUSAI3   OR
-                                            CONS-ROUSAI4   OR
-                                            CONS-ROUSAI9   OR
-                                            CONS-ROUSAI10  OR
-                                            CONS-ROUSAI11  OR
-                                            CONS-ROUSAI12  OR
-                                            CONS-ROUSAI13  OR
-                                            CONS-ROUSAI14  OR
-                                            CONS-ROUSAI15  OR
-                                            CONS-ROUSAI16  OR
-                                            CONS-ROUSAI17    )
-                   OR ( SRY-SRYCD(IDX2)(1:5) = "09593"       )
+                   IF ( SRY-SRYCD(IDX2)(1:5) = "09593"       )
                    OR ((SRY-SRYCD(IDX2)  =  CONS-ROUSAI8    ) AND
                        (RECE41-SRYYM     <  "200804"        ))
                    OR ((RECE41-JIBAIKBN  =  "1"             ) AND
                        (SRY-SRYCD(IDX2)  =  CONS-RYOYOTEATE ))
+                   OR ((SRY-SRYCD(IDX2)  =
+                        CONS-ROUSAI3  OR CONS-ROUSAI4  OR
+                        CONS-ROUSAI9  OR CONS-ROUSAI10 OR
+                        CONS-ROUSAI11 OR CONS-ROUSAI12 OR
+                        CONS-ROUSAI13 OR CONS-ROUSAI14 OR
+                        CONS-ROUSAI15 OR CONS-ROUSAI16 OR
+                        CONS-ROUSAI17                       ) AND
+                       (RECE41-SRYYM    <=  "201306"        ))
+                   OR ((SRY-SRYCD(IDX2)  =
+                        CONS-ROUSAI32 OR CONS-ROUSAI33 OR
+                        CONS-ROUSAI20 OR CONS-ROUSAI21 OR
+                        CONS-ROUSAI22 OR CONS-ROUSAI23 OR
+                        CONS-ROUSAI24 OR CONS-ROUSAI25 OR
+                        CONS-ROUSAI26 OR CONS-ROUSAI27 OR
+                        CONS-ROUSAI28 OR CONS-ROUSAI29 OR
+                        CONS-ROUSAI30 OR CONS-ROUSAI31      ) AND
+                       (RECE41-SRYYM    >=  "201307"        ))
                      IF  SRY-SRYCD(IDX2)(1:5) = "09593"
                        MOVE  TNS-NAMECHGKBN
                                       TO  WRK-TNS-JIBAISYUKEIKBN(IDX2)
@@ -2300,7 +2329,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 RECE45-SRYKBN
                        END-EVALUATE
                      ELSE
-                       IF     SRY-SRYCD(IDX2)   =   CONS-ROUSAI4
+                       IF   ((SRY-SRYCD(IDX2)  =   CONS-ROUSAI4 ) AND
+                             (RECE41-SRYYM    <=   "201306"     ))
+                       OR   ((SRY-SRYCD(IDX2)  =   CONS-ROUSAI33) AND
+                             (RECE41-SRYYM    >=   "201307"     ))
                             MOVE   "13"   TO    RECE44-SRYKBN
                                                 RECE45-SRYKBN
                        ELSE
@@ -2503,21 +2535,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                ELSE
                    MOVE    TNS-NAME            TO    RECE45-NAME(IDX4)
-      *
-      *            IF   RECE41-HKNKBN   =  "4"  
-      *            AND  RECE41-SRYYM   >=  "200302"
-      *                 IF   SRY-SRYCD(IDX2)  =  "101120040"  OR
-      *                                          "101120050"  OR
-      *                                          "101120060"
-      *                    MOVE   "６"   TO    RECE45-NAME(IDX4)(9:2)
-      *                 END-IF
-      *                 IF   SRY-SRYCD(IDX2)  =  "101120070"  OR
-      *                                          "101120080"  OR
-      *                                          "101120090"
-      *                    MOVE   "６"   TO    RECE45-NAME(IDX4)(31:2)
-      *                 END-IF
-      *            END-IF
-      *
                END-IF
       *
                IF          SRY-SRYKBN       =  "21"
@@ -2677,29 +2694,33 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
       *
                IF (  SRY-SRYCD(IDX2) = CONS-ROUSAI1  OR
-                                       CONS-ROUSAI2  OR
-                                       CONS-ROUSAI3  OR
-                                       CONS-ROUSAI4  OR
-                                       CONS-ROUSAI5  OR
-                                       CONS-ROUSAI6  OR
-                                       CONS-ROUSAI7  OR
-                                       CONS-ROUSAI9  OR
-                                       CONS-ROUSAI10 OR
-                                       CONS-ROUSAI11 OR
-                                       CONS-ROUSAI12 OR
-                                       CONS-ROUSAI13 OR
-                                       CONS-ROUSAI14 OR
-                                       CONS-ROUSAI15 OR
-                                       CONS-ROUSAI16 OR
-                                       CONS-ROUSAI17 OR
-                                       CONS-ROUSAI18 OR
-                                       CONS-ROUSAI19   )
+                                       CONS-ROUSAI18   )
                OR (( ACCT-SRYKBN          =  "80"     )   AND           
                    ( SRY-SRYCD(IDX2)(1:5) =  "09591"
                                           OR "09592"
                                           OR "09593"  ))                
                OR (( SRY-SRYCD(IDX2) = CONS-ROUSAI8   )   AND
                    ( RECE41-SRYYM    < "200804"       ))
+               OR (( SRY-SRYCD(IDX2) =
+                     CONS-ROUSAI3  OR CONS-ROUSAI4  OR
+                     CONS-ROUSAI5  OR CONS-ROUSAI6  OR
+                     CONS-ROUSAI7  OR CONS-ROUSAI19 OR
+                     CONS-ROUSAI9  OR CONS-ROUSAI10 OR
+                     CONS-ROUSAI11 OR CONS-ROUSAI12 OR
+                     CONS-ROUSAI13 OR CONS-ROUSAI14 OR
+                     CONS-ROUSAI15 OR CONS-ROUSAI16 OR
+                     CONS-ROUSAI17                    )   AND
+                   ( RECE41-SRYYM   <= "201306"       ))
+               OR (( SRY-SRYCD(IDX2)  =
+                     CONS-ROUSAI32 OR CONS-ROUSAI33 OR
+                     CONS-ROUSAI34 OR CONS-ROUSAI5  OR
+                     CONS-ROUSAI20 OR CONS-ROUSAI21 OR
+                     CONS-ROUSAI22 OR CONS-ROUSAI23 OR
+                     CONS-ROUSAI24 OR CONS-ROUSAI25 OR
+                     CONS-ROUSAI26 OR CONS-ROUSAI27 OR
+                     CONS-ROUSAI28 OR CONS-ROUSAI29 OR
+                     CONS-ROUSAI30 OR CONS-ROUSAI31   )   AND
+                   ( RECE41-SRYYM   >= "201307"       ))
       *
       *           IF     TNS-TENSIKIBETU   =   1
                      ADD      1          TO  WRK-MEISAI-CNT
@@ -2770,46 +2791,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          MOVE  "1"     TO    RECE45-SIKFLG(IDX4)
                       END-IF
                     ELSE
-                      IF  ( SRY-SRYCD(IDX2) = CONS-ROUCOM1  OR
-                                              CONS-ROUCOM2      )
-                      OR  ( SRY-SRYCD(1)    = CONS-ROUSAI2  OR
-                                              CONS-ROUSAI3      )
+                      IF (  SRY-SRYCD(IDX2) = CONS-ROUCOM1  OR
+                                              CONS-ROUCOM2       )
                       OR (( ACCT-SRYKBN     = "11"              ) AND
-                          ( SRY-SRYCD(IDX2)(1:1)   =   "8"      ) AND
+                          ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
+                           (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
                           ( SRY-SRYCD(IDX2) NOT = "830000020"   ) AND
                           ( ACCT-ZAIKBN     NOT =  1 AND 2      ))
-                      OR (( ACCT-SRYKBN     = "11"              ) AND
-                          ( SRY-SRYCD(IDX2)(1:3)   =   "008"    ) AND
-                          ( ACCT-ZAIKBN     NOT =  1 AND 2      ))
                       OR (( ACCT-SRYKBN     = "12"              ) AND
-                          ( SRY-SRYCD(IDX2)(1:1)   =   "8"      ) AND
+                          ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
+                           (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
                           ( SRY-SRYCD(IDX2) NOT = "830000021"   ) AND
                           ( ACCT-ZAIKBN     NOT =  1 AND 2      ))
-                      OR (( ACCT-SRYKBN     = "12"              ) AND
-                          ( SRY-SRYCD(IDX2)(1:3)   =   "008"    ) AND
-                          ( ACCT-ZAIKBN     NOT =  1 AND 2      ))
-                      OR (( ACCT-SRYKBN     = "13"              ) AND
-                          ( SRY-SRYCD(1)    =  CONS-ROUSAI9  OR
-                                               CONS-ROUSAI10 OR
-                                               CONS-ROUSAI11 OR
-                                               CONS-ROUSAI12 OR
-                                               CONS-ROUSAI13 OR
-                                               CONS-ROUSAI14 OR
-                                               CONS-ROUSAI15 OR
-                                               CONS-ROUSAI16 OR
-                                               CONS-ROUSAI17    ) AND
-                          ( SRY-SRYCD(IDX2)(1:3)   =   "008"    ))
-                      OR (( ACCT-SRYKBN     = "13"              ) AND
-                          ( SRY-SRYCD(1)    =  CONS-ROUSAI9  OR
-                                               CONS-ROUSAI10 OR
-                                               CONS-ROUSAI11 OR
-                                               CONS-ROUSAI12 OR
-                                               CONS-ROUSAI13 OR
-                                               CONS-ROUSAI14 OR
-                                               CONS-ROUSAI15 OR
-                                               CONS-ROUSAI16 OR
-                                               CONS-ROUSAI17    ) AND
-                          ( SRY-SRYCD(IDX2)(1:1)   =   "8"      ))
                       OR (( ACCT-SRYKBN     = "13"              ) AND
                           ( SRY-SRYCD(1)    =  CONS-ROUSAI8     ) AND
                           ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
@@ -2819,12 +2812,33 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           ( SRY-SRYCD(1)(1:5)      =  "09591"
                                                    OR "09592"
                                                    OR "09593"   ) AND
-                          ( SRY-SRYCD(IDX2)(1:1)   =   "8"      ))
-                      OR (( ACCT-SRYKBN            =  "80"      ) AND
-                          ( SRY-SRYCD(1)(1:5)      =  "09591"
-                                                   OR "09592"
-                                                   OR "09593"   ) AND
-                          ( SRY-SRYCD(IDX2)(1:3)   =   "008"    ))
+                          ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
+                           (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ))
+                      OR (( SRY-SRYCD(1)    =  CONS-ROUSAI3     ) AND
+                          ( RECE41-SRYYM   <=  "201306"         ))
+                      OR (( ACCT-SRYKBN     = "13"              ) AND
+                          ( SRY-SRYCD(1)    =
+                            CONS-ROUSAI9  OR  CONS-ROUSAI10 OR
+                            CONS-ROUSAI11 OR  CONS-ROUSAI12 OR
+                            CONS-ROUSAI13 OR  CONS-ROUSAI14 OR
+                            CONS-ROUSAI15 OR  CONS-ROUSAI16 OR
+                            CONS-ROUSAI17                       ) AND
+                          ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
+                           (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
+                          ( RECE41-SRYYM   <=  "201306"         ))
+                      OR (( SRY-SRYCD(1)    =  CONS-ROUSAI32    ) AND
+                          ( RECE41-SRYYM   >=  "201307"         ))
+                      OR (( ACCT-SRYKBN     = "80"              ) AND
+                          ( SRY-SRYCD(1)    =
+                            CONS-ROUSAI20 OR  CONS-ROUSAI21 OR
+                            CONS-ROUSAI22 OR  CONS-ROUSAI23 OR
+                            CONS-ROUSAI24 OR  CONS-ROUSAI25 OR
+                            CONS-ROUSAI26 OR  CONS-ROUSAI27 OR
+                            CONS-ROUSAI28 OR  CONS-ROUSAI29 OR
+                            CONS-ROUSAI30 OR  CONS-ROUSAI31     ) AND
+                          ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
+                           (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
+                          ( RECE41-SRYYM   >=  "201307"         ))
       *
                          ADD    1      TO    WRK-MEISAI-CNT             
                          MOVE  "2"     TO    RECE45-SIKFLG(IDX4)
@@ -3003,12 +3017,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            IF      RECE44-SRYKBN      =     "12"
       *       再診料算定科：
-              IF   SRY-SRYCD(IDX2)    =     "830000021"
+              IF ( SRY-SRYCD(IDX2)    =     "830000021"
                                       OR    CONS-DOUJITU-SAI
                                       OR    CONS-DOUJITU-DEN
                                       OR    CONS-DOUJITU-GAI
-                                      OR    CONS-DOUJITU2-GAI
-                                      OR    CONS-ROUSAI19
+                                      OR    CONS-DOUJITU2-GAI)
+              OR ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI19   ) AND
+                  (RECE41-SRYYM      <=     "201306"        ))
+              OR ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI5    ) AND
+                  (RECE41-SRYYM      >=     "201307"        ))
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-SAISANTEIKA-COMMENT
               END-IF
@@ -3117,14 +3134,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
       *
       *       再診（同一日２科目）
-              IF  (SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
+              IF ( SRY-SRYCD(IDX2)    =     CONS-DOUJITU-SAI
                                       OR    CONS-DOUJITU-DEN
                                       OR    CONS-DOUJITU-GAI
-                                      OR    CONS-DOUJITU2-GAI
-                                      OR    CONS-ROUSAI19   )
-              AND (FLG-SAIDOU-COM     =     ZERO            )
+                                      OR    CONS-DOUJITU2-GAI)
+              OR ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI19   ) AND
+                  (RECE41-SRYYM      <=     "201306"        ))
+              OR ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI5    ) AND
+                  (RECE41-SRYYM      >=     "201307"        ))
+               IF   FLG-SAIDOU-COM   =     ZERO
                  MOVE   "1"        TO   RECE44-FLG-SAIDOU-COMMENT
                  MOVE   SRY-SRYKA  TO   RECE44-SAIDOU-SRYKA(1)
+               END-IF
               END-IF
               IF   SRY-SRYCD(IDX2)    =     CONS-DOUJITU-COMMENT
                  MOVE   SPACE      TO   RECE44-FLG-SAIDOU-COMMENT
@@ -3216,22 +3237,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-SINDAI2-COMMENT  OR
                                             CONS-SINDAI3-COMMENT  OR
                                             CONS-SINDAI4-COMMENT  OR
-                                            CONS-SINDAI7-COMMENT  OR
-                                            CONS-SINDAI8-COMMENT  OR
                                             CONS-KOKYUKI1-COMMENT OR
                                             CONS-KOKYUKI2-COMMENT OR
                                             CONS-KOKYUKI3-COMMENT OR
                                             CONS-KOKYUKI4-COMMENT OR
-                                            CONS-KOKYUKI7-COMMENT OR
-                                            CONS-KOKYUKI8-COMMENT OR
                                             CONS-NOUKE1-COMMENT   OR
                                             CONS-NOUKE2-COMMENT   OR
                                             CONS-NOUKE3-COMMENT   OR
                                             CONS-NOUKE4-COMMENT   OR
                                             CONS-NOUKE7-COMMENT   OR
-                                            CONS-NOUKE8-COMMENT   OR
-                                            CONS-NOUKE9-COMMENT   OR
-                                            CONS-NOUKE10-COMMENT  OR
                                             CONS-NOUKE11-COMMENT  OR
                                             CONS-NOUKE12-COMMENT  OR
                                             CONS-NOUKE13-COMMENT  OR
@@ -3245,10 +3259,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
                                             CONS-UNDOKI4-COMMENT  OR
-                                            CONS-UNDOKI7-COMMENT  OR
-                                            CONS-UNDOKI8-COMMENT  OR
                                             CONS-UNDOKI9-COMMENT  OR
-                                            CONS-UNDOKI10-COMMENT OR
                                             CONS-UNDOKI11-COMMENT OR
                                             CONS-UNDOKI12-COMMENT OR
                                             CONS-UNDOKI13-COMMENT OR
@@ -3258,6 +3269,35 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-GANKNJ-COMMENT
       *****             MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-RIHABIRI-COMMENT
+              END-IF
+              IF   RECE41-SRYYM      >=    "201307"
+                IF   SRY-SRYCD(IDX2)  =     CONS-SINDAI9-COMMENT   OR
+                                            CONS-SINDAI10-COMMENT  OR
+                                            CONS-KOKYUKI9-COMMENT  OR
+                                            CONS-KOKYUKI10-COMMENT OR
+                                            CONS-NOUKE20-COMMENT   OR
+                                            CONS-NOUKE21-COMMENT   OR
+                                            CONS-NOUKE22-COMMENT   OR
+                                            CONS-UNDOKI14-COMMENT  OR
+                                            CONS-UNDOKI15-COMMENT  OR
+                                            CONS-UNDOKI16-COMMENT
+      *****             MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-RIHABIRI-COMMENT
+                END-IF
+              ELSE
+                IF   SRY-SRYCD(IDX2)  =     CONS-SINDAI7-COMMENT   OR
+                                            CONS-SINDAI8-COMMENT   OR
+                                            CONS-KOKYUKI7-COMMENT  OR
+                                            CONS-KOKYUKI8-COMMENT  OR
+                                            CONS-NOUKE8-COMMENT    OR
+                                            CONS-NOUKE9-COMMENT    OR
+                                            CONS-NOUKE10-COMMENT   OR
+                                            CONS-UNDOKI7-COMMENT   OR
+                                            CONS-UNDOKI8-COMMENT   OR
+                                            CONS-UNDOKI10-COMMENT
+      *****             MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-RIHABIRI-COMMENT
+                END-IF
               END-IF
               EVALUATE      SRY-SRYCD(IDX2)
                 WHEN     CONS-SINDAI5-COMMENT
@@ -3285,8 +3325,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-SINDAI4-COMMENT
                                       OR    CONS-SINDAI5-COMMENT
                                       OR    CONS-SINDAI6-COMMENT
-                                      OR    CONS-SINDAI7-COMMENT
-                                      OR    CONS-SINDAI8-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-SINDAI-COMMENT
                 END-IF
@@ -3296,8 +3334,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-KOKYUKI4-COMMENT
                                       OR    CONS-KOKYUKI5-COMMENT
                                       OR    CONS-KOKYUKI6-COMMENT
-                                      OR    CONS-KOKYUKI7-COMMENT
-                                      OR    CONS-KOKYUKI8-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-KOKYUKI-COMMENT
                 END-IF
@@ -3308,9 +3344,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-NOUKE5-COMMENT
                                       OR    CONS-NOUKE6-COMMENT
                                       OR    CONS-NOUKE7-COMMENT
-                                      OR    CONS-NOUKE8-COMMENT
-                                      OR    CONS-NOUKE9-COMMENT
-                                      OR    CONS-NOUKE10-COMMENT
                                       OR    CONS-NOUKE11-COMMENT
                                       OR    CONS-NOUKE12-COMMENT
                                       OR    CONS-NOUKE13-COMMENT
@@ -3329,15 +3362,59 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-UNDOKI4-COMMENT
                                       OR    CONS-UNDOKI5-COMMENT
                                       OR    CONS-UNDOKI6-COMMENT
-                                      OR    CONS-UNDOKI7-COMMENT
-                                      OR    CONS-UNDOKI8-COMMENT
                                       OR    CONS-UNDOKI9-COMMENT
-                                      OR    CONS-UNDOKI10-COMMENT
                                       OR    CONS-UNDOKI11-COMMENT
                                       OR    CONS-UNDOKI12-COMMENT
                                       OR    CONS-UNDOKI13-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-UNDOKI-COMMENT
+                END-IF
+                IF   RECE41-SRYYM      >=    "201307"
+                  IF   SRY-SRYCD(IDX2)  =   CONS-SINDAI9-COMMENT
+                                      OR    CONS-SINDAI10-COMMENT
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-SINDAI-COMMENT
+                  END-IF
+                  IF   SRY-SRYCD(IDX2)  =   CONS-KOKYUKI9-COMMENT
+                                      OR    CONS-KOKYUKI10-COMMENT
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-KOKYUKI-COMMENT
+                  END-IF
+                  IF   SRY-SRYCD(IDX2)  =   CONS-NOUKE20-COMMENT
+                                      OR    CONS-NOUKE21-COMMENT
+                                      OR    CONS-NOUKE22-COMMENT
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-NOUKE-COMMENT
+                  END-IF
+                  IF   SRY-SRYCD(IDX2)  =   CONS-UNDOKI14-COMMENT
+                                      OR    CONS-UNDOKI15-COMMENT
+                                      OR    CONS-UNDOKI16-COMMENT
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-UNDOKI-COMMENT
+                  END-IF
+                ELSE
+                  IF   SRY-SRYCD(IDX2)  =   CONS-SINDAI7-COMMENT
+                                      OR    CONS-SINDAI8-COMMENT
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-SINDAI-COMMENT
+                  END-IF
+                  IF   SRY-SRYCD(IDX2)  =   CONS-KOKYUKI7-COMMENT
+                                      OR    CONS-KOKYUKI8-COMMENT
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-KOKYUKI-COMMENT
+                  END-IF
+                  IF   SRY-SRYCD(IDX2)  =   CONS-NOUKE8-COMMENT
+                                      OR    CONS-NOUKE9-COMMENT
+                                      OR    CONS-NOUKE10-COMMENT
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-NOUKE-COMMENT
+                  END-IF
+                  IF   SRY-SRYCD(IDX2)  =   CONS-UNDOKI7-COMMENT
+                                      OR    CONS-UNDOKI8-COMMENT
+                                      OR    CONS-UNDOKI10-COMMENT
+                        MOVE   "1"    TO    RECE41-COMCNTFLG
+                        MOVE   "1"    TO    RECE44-UNDOKI-COMMENT
+                  END-IF
                 END-IF
                 IF   SRY-SRYCD(IDX2)  =     CONS-NANBYO-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
@@ -4262,8 +4339,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                    RECE41-KINGAKU2(1)  +
                                    (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
                    END-IF  
-                   IF   SRY-SRYCD(IDX3) = CONS-ROUSAI2 OR
-                                          CONS-ROUSAI3    
+                   IF  (SRY-SRYCD(IDX3) = CONS-ROUSAI3)
+                   AND (RECE41-SRYYM   <=   "201306"  )
                         COMPUTE    RECE41-KINGAKU2(4)  =
                                    RECE41-KINGAKU2(4)  +
                                    (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
@@ -4273,10 +4350,14 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                  EVALUATE  WRK-TNS-GAITENTTLKBN(IDX3)
       *      （基本手技）
                    WHEN  120
-                     IF   SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
+                     IF ((SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
                                              CONS-ROUSAI6  OR
                                              CONS-ROUSAI7  OR
-                                             CONS-ROUSAI19
+                                             CONS-ROUSAI19) AND
+                         (RECE41-SRYYM   <=    "201306"   ))
+                     OR ((SRY-SRYCD(IDX3) =  CONS-ROUSAI34 OR
+                                             CONS-ROUSAI5 ) AND
+                         (RECE41-SRYYM   >=    "201307"   ))
                          ADD   WK-ZAIKAISU      TO   RECE41-KAISU2(2)
                          COMPUTE    RECE41-KINGAKU2(2)  =
                                     RECE41-KINGAKU2(2)  +
@@ -4363,7 +4444,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                 (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *       （その他）
                    WHEN  OTHER 
-                        IF   SRY-SRYCD(IDX3) =  CONS-ROUSAI4  
+                        IF  (SRY-SRYCD(IDX3) =  CONS-ROUSAI4)
+                        AND (RECE41-SRYYM   <=  "201306"    )
                            ADD   WK-ZAIKAISU   TO   RECE41-KAISU2(3)
                            COMPUTE    RECE41-KINGAKU2(3)  =
                                       RECE41-KINGAKU2(3)  +
@@ -4379,15 +4461,20 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                  END-EVALUATE
       *    指導のレセ点数欄の編集
                WHEN    "13"
-                   IF ( SRY-SRYCD(IDX3) =   CONS-ROUSAI9  OR
-                                            CONS-ROUSAI10 OR
-                                            CONS-ROUSAI11 OR
-                                            CONS-ROUSAI12 OR
-                                            CONS-ROUSAI13 OR
-                                            CONS-ROUSAI14 OR
-                                            CONS-ROUSAI15 OR
-                                            CONS-ROUSAI16 OR
-                                            CONS-ROUSAI17    )
+                 IF   (SRY-SRYCD(IDX3) =  CONS-ROUSAI33)
+                 AND  (RECE41-SRYYM   >=  "201307"     )
+                         ADD   WK-ZAIKAISU   TO   RECE41-KAISU2(3)
+                         COMPUTE    RECE41-KINGAKU2(3)  =
+                                    RECE41-KINGAKU2(3)  +
+                                   (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                 ELSE
+                   IF ((SRY-SRYCD(IDX3) =
+                        CONS-ROUSAI9  OR  CONS-ROUSAI10 OR
+                        CONS-ROUSAI11 OR  CONS-ROUSAI12 OR
+                        CONS-ROUSAI13 OR  CONS-ROUSAI14 OR
+                        CONS-ROUSAI15 OR  CONS-ROUSAI16 OR
+                        CONS-ROUSAI17                       ) AND
+                       (RECE41-SRYYM    <=  "201306"        ))
                    OR ((SRY-SRYCD(IDX3)  =  CONS-ROUSAI8    ) AND
                        (RECE41-SRYYM     <  "200804"        ))
                          COMPUTE    RECE41-KINGAKU2(4)  =
@@ -4404,6 +4491,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                    (WK-ZAITEN   *   WK-ZAIKAISU)
                      END-IF
                    END-IF                   
+                 END-IF
       *
       *    在宅のレセ点数欄の編集
                WHEN    "14"
@@ -4700,6 +4788,19 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                             (WK-YKZTEN   *   WK-ZAIKAISU)
       *    その他のレセ点数欄の編集
                WHEN    "80"
+                 IF   ((SRY-SRYCD(IDX3) =
+                        CONS-ROUSAI32 OR
+                        CONS-ROUSAI20 OR  CONS-ROUSAI21 OR
+                        CONS-ROUSAI22 OR  CONS-ROUSAI23 OR
+                        CONS-ROUSAI24 OR  CONS-ROUSAI25 OR
+                        CONS-ROUSAI26 OR  CONS-ROUSAI27 OR
+                        CONS-ROUSAI28 OR  CONS-ROUSAI29 OR
+                        CONS-ROUSAI30 OR  CONS-ROUSAI31     ) AND
+                       (RECE41-SRYYM    >=  "201307"        ))
+                       COMPUTE    RECE41-KINGAKU2(4)  =
+                                  RECE41-KINGAKU2(4)  +
+                                 (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                 ELSE
                    IF ( ACCT-SRYKBN          =  "80"    )  AND         
                       ( SRY-SRYCD(IDX3)(1:5) =  "09593" )              
                        COMPUTE    RECE41-KINGAKU2(4)  =                 
@@ -4764,6 +4865,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                               RECE41-TENSU(35)  +
                              (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
+                 END-IF
            END-EVALUATE
       *
            .
@@ -4812,10 +4914,14 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                  EVALUATE  WRK-TNS-GAITENTTLKBN(IDX3)
       *      （基本手技）
                    WHEN  120
-                     IF   SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
+                     IF ((SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
                                              CONS-ROUSAI6  OR
                                              CONS-ROUSAI7  OR
-                                             CONS-ROUSAI19
+                                             CONS-ROUSAI19) AND
+                         (RECE41-SRYYM   <=    "201306"   ))
+                     OR ((SRY-SRYCD(IDX3) =  CONS-ROUSAI34 OR
+                                             CONS-ROUSAI5 ) AND
+                         (RECE41-SRYYM   >=    "201307"   ))
                          COMPUTE    RECE41-KINGAKU2(2)  =
                                     RECE41-KINGAKU2(2)  +
                                  (WRK-TNS-TEN(IDX3) * WRK-ZAIKAISU-XXX)
@@ -5260,8 +5366,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                    RECE41-KINGAKU2(1)  +
                                    (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
                    END-IF  
-                   IF   SRY-SRYCD(IDX3) = CONS-ROUSAI2 OR
-                                          CONS-ROUSAI3    
+                   IF  (SRY-SRYCD(IDX3) = CONS-ROUSAI3)
+                   AND (RECE41-SRYYM   <=   "201306"  )
                         COMPUTE    RECE41-KINGAKU2(4)  =
                                    RECE41-KINGAKU2(4)  +
                                    (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
@@ -5271,11 +5377,18 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                  EVALUATE  WRK-TNS-GAITENTTLKBN(IDX3)
       *      （基本手技）
                    WHEN  120
-                     IF   SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
+                     IF ((SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
                                              CONS-ROUSAI6  OR
                                              CONS-ROUSAI7  OR
-                                             CONS-ROUSAI19
-                         IF  SRY-SRYCD(IDX3) = CONS-ROUSAI19
+                                             CONS-ROUSAI19) AND
+                         (RECE41-SRYYM   <=    "201306"   ))
+                     OR ((SRY-SRYCD(IDX3) =  CONS-ROUSAI34 OR
+                                             CONS-ROUSAI5 ) AND
+                         (RECE41-SRYYM   >=    "201307"   ))
+                         IF ((SRY-SRYCD(IDX3) =  CONS-ROUSAI19) AND
+                             (RECE41-SRYYM   <=  "201306"     ))
+                         OR ((SRY-SRYCD(IDX3) =  CONS-ROUSAI5 ) AND
+                             (RECE41-SRYYM   >=  "201307"     ))
                            CONTINUE
                          ELSE
                            ADD    WK-ZAIKAISU   TO   RECE41-KAISU2(2)
@@ -5315,7 +5428,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                 (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *       （その他）
                    WHEN  OTHER 
-                        IF   SRY-SRYCD(IDX3) =  CONS-ROUSAI4  
+                        IF  (SRY-SRYCD(IDX3) =  CONS-ROUSAI4)
+                        AND (RECE41-SRYYM   <=  "201306"    )
                            ADD   WK-ZAIKAISU TO   RECE41-KAISU2(3)
                            COMPUTE    RECE41-KINGAKU2(3)  =
                                       RECE41-KINGAKU2(3)  +
@@ -5329,15 +5443,20 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                  END-EVALUATE
       *    指導のレセ点数欄の編集
                WHEN    "13"
-                   IF ( SRY-SRYCD(IDX3) =   CONS-ROUSAI9  OR
-                                            CONS-ROUSAI10 OR
-                                            CONS-ROUSAI11 OR
-                                            CONS-ROUSAI12 OR
-                                            CONS-ROUSAI13 OR
-                                            CONS-ROUSAI14 OR
-                                            CONS-ROUSAI15 OR
-                                            CONS-ROUSAI16 OR
-                                            CONS-ROUSAI17    )
+                 IF   (SRY-SRYCD(IDX3) =  CONS-ROUSAI33)
+                 AND  (RECE41-SRYYM   >=  "201307"     )
+                         ADD   WK-ZAIKAISU   TO   RECE41-KAISU2(3)
+                         COMPUTE    RECE41-KINGAKU2(3)  =
+                                    RECE41-KINGAKU2(3)  +
+                                   (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                 ELSE
+                   IF ((SRY-SRYCD(IDX3) =
+                        CONS-ROUSAI9  OR  CONS-ROUSAI10 OR
+                        CONS-ROUSAI11 OR  CONS-ROUSAI12 OR
+                        CONS-ROUSAI13 OR  CONS-ROUSAI14 OR
+                        CONS-ROUSAI15 OR  CONS-ROUSAI16 OR
+                        CONS-ROUSAI17                       ) AND
+                       (RECE41-SRYYM    <=  "201306"        ))
                    OR ((SRY-SRYCD(IDX3)  =  CONS-ROUSAI8    ) AND
                        (RECE41-SRYYM     <  "200804"        ))
                          COMPUTE    RECE41-KINGAKU2(6)  =
@@ -5354,6 +5473,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                    (WK-ZAITEN   *   WK-ZAIKAISU)
                      END-IF
                    END-IF                   
+                 END-IF
       *
       *    在宅のレセ点数欄の編集
                WHEN    "14"
@@ -5662,6 +5782,25 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                             (WK-YKZTEN   *   WK-ZAIKAISU)
       *    その他のレセ点数欄の編集
                WHEN    "80"
+                 IF   ((SRY-SRYCD(IDX3) =
+                        CONS-ROUSAI32 OR
+                        CONS-ROUSAI20 OR  CONS-ROUSAI21 OR
+                        CONS-ROUSAI22 OR  CONS-ROUSAI23 OR
+                        CONS-ROUSAI24 OR  CONS-ROUSAI25 OR
+                        CONS-ROUSAI26 OR  CONS-ROUSAI27 OR
+                        CONS-ROUSAI28 OR  CONS-ROUSAI29 OR
+                        CONS-ROUSAI30 OR  CONS-ROUSAI31     ) AND
+                       (RECE41-SRYYM    >=  "201307"        ))
+                   IF   SRY-SRYCD(IDX3) = CONS-ROUSAI32
+                        COMPUTE     RECE41-KINGAKU2(4)  =
+                                    RECE41-KINGAKU2(4)  +
+                                   (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                   ELSE
+                         COMPUTE    RECE41-KINGAKU2(6)  =
+                                    RECE41-KINGAKU2(6)  +
+                                   (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                   END-IF
+                 ELSE
                    IF ( ACCT-SRYKBN          =  "80"    )   AND
                       ( SRY-SRYCD(IDX3)(1:5) =  "09591" OR 
                                                 "09592" )
@@ -5786,6 +5925,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                      END-IF
                     END-IF                                              
                    END-IF
+                 END-IF
            END-EVALUATE
       *
            .
@@ -5841,8 +5981,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                    WRK-KINGAKU-JI   +
                                (WRK-TNS-TEN(IDX3)   * ACCT-ZAIKAISU)
                    END-IF
-                   IF   SRY-SRYCD(IDX3) = CONS-ROUSAI2 OR
-                                          CONS-ROUSAI3
+                   IF  (SRY-SRYCD(IDX3) = CONS-ROUSAI3)
+                   AND (RECE41-SRYYM   <=   "201306"  )
       ****              COMPUTE    RECE41-SONOTAKIN-JYU  =
       ****                         RECE41-SONOTAKIN-JYU  +
       ****                     (WRK-TNS-TEN(IDX3)   * ACCT-ZAIKAISU)
@@ -5888,10 +6028,14 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                    EVALUATE  WRK-TNS-GAITENTTLKBN(IDX3)
       *      （基本手技）
                     WHEN  120
-                     IF   SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
+                     IF ((SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
                                              CONS-ROUSAI6  OR
                                              CONS-ROUSAI7  OR
-                                             CONS-ROUSAI19
+                                             CONS-ROUSAI19) AND
+                         (RECE41-SRYYM   <=    "201306"   ))
+                     OR ((SRY-SRYCD(IDX3) =  CONS-ROUSAI34 OR
+                                             CONS-ROUSAI5 ) AND
+                         (RECE41-SRYYM   >=    "201307"   ))
       ****               ADD   WK-ZAIKAISU      TO   RECE41-KAISU(2)
       ****               COMPUTE    RECE41-SONOTAKIN-JYU  =
       ****                          RECE41-SONOTAKIN-JYU  +
@@ -6018,7 +6162,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                 (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
       *      （その他）
                     WHEN  OTHER
-                        IF   SRY-SRYCD(IDX3) =  CONS-ROUSAI4
+                        IF  (SRY-SRYCD(IDX3) =  CONS-ROUSAI4)
+                        AND (RECE41-SRYYM   <=  "201306"    )
       ****                 COMPUTE    RECE41-SONOTAKIN-JYU  =
       ****                            RECE41-SONOTAKIN-JYU  +
       ****                       (WRK-TNS-TEN(IDX3)   *  ACCT-ZAIKAISU)
@@ -6193,34 +6338,39 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                WHEN    "13"
                  EVALUATE   RECE41-JIBAIKBN
                   WHEN       "1"
-                   IF ( SRY-SRYCD(IDX3) =   CONS-ROUSAI9  OR
-                                            CONS-ROUSAI10 OR
-                                            CONS-ROUSAI11 OR
-                                            CONS-ROUSAI12 OR
-                                            CONS-ROUSAI13 OR
-                                            CONS-ROUSAI14 OR
-                                            CONS-ROUSAI15 OR
-                                            CONS-ROUSAI16 OR
-                                            CONS-ROUSAI17    )
-                   OR ((SRY-SRYCD(IDX3)  =  CONS-ROUSAI8    ) AND
-                       (RECE41-SRYYM     <  "200804"        ))
-                         COMPUTE    RECE41-SONOTAKIN-JYU  =
-                                    RECE41-SONOTAKIN-JYU  +
-                                   (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
-                   ELSE
-                     IF   ACCT-ZAIKBN     =  2
-                         COMPUTE    WRK-RECE41G-TENSU(7)  =
-                                    WRK-RECE41G-TENSU(7)  +
-                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                     IF   (SRY-SRYCD(IDX3) =  CONS-ROUSAI33)
+                     AND  (RECE41-SRYYM   >=  "201307"     )
+                             COMPUTE    WRK-KINGAKU-JI  =
+                                        WRK-KINGAKU-JI  +
+                                  (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
                      ELSE
-                         COMPUTE    RECE41-TENSU(7)   =
-                                    RECE41-TENSU(7)   +
-                                   (WK-ZAITEN   *   WK-ZAIKAISU)
-                         COMPUTE    TBL-SYUTEN-JI(7)  =
-                                    TBL-SYUTEN-JI(7)  +
-                                   (WK-ZAITEN   *   WK-ZAIKAISU)
+                       IF ((SRY-SRYCD(IDX3) =
+                            CONS-ROUSAI9  OR  CONS-ROUSAI10 OR
+                            CONS-ROUSAI11 OR  CONS-ROUSAI12 OR
+                            CONS-ROUSAI13 OR  CONS-ROUSAI14 OR
+                            CONS-ROUSAI15 OR  CONS-ROUSAI16 OR
+                            CONS-ROUSAI17                       ) AND
+                           (RECE41-SRYYM    <=  "201306"        ))
+                       OR ((SRY-SRYCD(IDX3)  =  CONS-ROUSAI8    ) AND
+                           (RECE41-SRYYM     <  "200804"        ))
+                             COMPUTE    RECE41-SONOTAKIN-JYU  =
+                                        RECE41-SONOTAKIN-JYU  +
+                                  (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                       ELSE
+                         IF   ACCT-ZAIKBN     =  2
+                             COMPUTE    WRK-RECE41G-TENSU(7)  =
+                                        WRK-RECE41G-TENSU(7)  +
+                                       (WK-ZAITEN   *   WK-ZAIKAISU)
+                         ELSE
+                             COMPUTE    RECE41-TENSU(7)   =
+                                        RECE41-TENSU(7)   +
+                                       (WK-ZAITEN   *   WK-ZAIKAISU)
+                             COMPUTE    TBL-SYUTEN-JI(7)  =
+                                        TBL-SYUTEN-JI(7)  +
+                                       (WK-ZAITEN   *   WK-ZAIKAISU)
+                         END-IF
+                       END-IF
                      END-IF
-                   END-IF                   
                   WHEN       "2"
                      IF   ACCT-ZAIKBN     =  2
                          COMPUTE    WRK-RECE41G-TENSU(7)  =
@@ -6633,6 +6783,25 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                             (WK-YKZTEN   *   WK-ZAIKAISU)
       *    その他のレセ点数欄の編集
                WHEN    "80"
+                 IF   ((SRY-SRYCD(IDX3) =
+                        CONS-ROUSAI32 OR
+                        CONS-ROUSAI20 OR  CONS-ROUSAI21 OR
+                        CONS-ROUSAI22 OR  CONS-ROUSAI23 OR
+                        CONS-ROUSAI24 OR  CONS-ROUSAI25 OR
+                        CONS-ROUSAI26 OR  CONS-ROUSAI27 OR
+                        CONS-ROUSAI28 OR  CONS-ROUSAI29 OR
+                        CONS-ROUSAI30 OR  CONS-ROUSAI31     ) AND
+                       (RECE41-SRYYM    >=  "201307"        ))
+                   IF   SRY-SRYCD(IDX3) = CONS-ROUSAI32
+                             COMPUTE  WRK-KINGAKU-JI   =
+                                      WRK-KINGAKU-JI   +
+                                     (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                   ELSE
+                             COMPUTE  RECE41-SONOTAKIN-JYU  =
+                                      RECE41-SONOTAKIN-JYU  +
+                                     (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
+                   END-IF
+                 ELSE
                    IF ( ACCT-SRYKBN          =  "80"    )   AND
                       ( SRY-SRYCD(IDX3)(1:5) =  "09591" OR 
                                                 "09592" )
@@ -6794,6 +6963,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                      END-IF
                     END-IF                                              
                    END-IF
+                 END-IF
            END-EVALUATE
       *
            .
@@ -6809,10 +6979,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
            EVALUATE    SRY-SRYKBN
       *    初診のレセ点数欄の編集
                WHEN    "11"
-                   IF   SRY-SRYCD(IDX3) = CONS-ROUSAI1  OR
-                                          CONS-ROUSAI18 OR
-                                          CONS-ROUSAI2  OR
-                                          CONS-ROUSAI3
+                   IF ( SRY-SRYCD(IDX3) = CONS-ROUSAI1  OR
+                                          CONS-ROUSAI18 )
+                   OR ((SRY-SRYCD(IDX3) = CONS-ROUSAI3 ) AND
+                       (RECE41-SRYYM   <=   "201306"   ))
                       CONTINUE
                    ELSE
                       IF   WRK-TNS-DATAKBN(IDX3)  =   2
@@ -6851,10 +7021,14 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                    EVALUATE  WRK-TNS-GAITENTTLKBN(IDX3)
       *      （基本手技）
                     WHEN  120
-                     IF   SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
+                     IF ((SRY-SRYCD(IDX3) =  CONS-ROUSAI5  OR
                                              CONS-ROUSAI6  OR
                                              CONS-ROUSAI7  OR
-                                             CONS-ROUSAI19
+                                             CONS-ROUSAI19) AND
+                         (RECE41-SRYYM   <=    "201306"   ))
+                     OR ((SRY-SRYCD(IDX3) =  CONS-ROUSAI34 OR
+                                             CONS-ROUSAI5 ) AND
+                         (RECE41-SRYYM   >=    "201307"   ))
                          CONTINUE
                      ELSE
                        IF SRY-SRYCD(IDX3) =  CONS-GAIRAIRYO1  OR
@@ -6973,17 +7147,17 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                    END-EVALUATE
       *    指導のレセ点数欄の編集
                WHEN    "13"
-                   IF ( SRY-SRYCD(IDX3) =   CONS-ROUSAI9  OR
-                                            CONS-ROUSAI10 OR
-                                            CONS-ROUSAI11 OR
-                                            CONS-ROUSAI12 OR
-                                            CONS-ROUSAI13 OR
-                                            CONS-ROUSAI14 OR
-                                            CONS-ROUSAI15 OR
-                                            CONS-ROUSAI16 OR
-                                            CONS-ROUSAI17    )
+                   IF ((SRY-SRYCD(IDX3) =
+                        CONS-ROUSAI9  OR  CONS-ROUSAI10 OR
+                        CONS-ROUSAI11 OR  CONS-ROUSAI12 OR
+                        CONS-ROUSAI13 OR  CONS-ROUSAI14 OR
+                        CONS-ROUSAI15 OR  CONS-ROUSAI16 OR
+                        CONS-ROUSAI17                       ) AND
+                       (RECE41-SRYYM    <=  "201306"        ))
                    OR ((SRY-SRYCD(IDX3)  =  CONS-ROUSAI8    ) AND
                        (RECE41-SRYYM     <  "200804"        ))
+                   OR ((SRY-SRYCD(IDX3)  =  CONS-ROUSAI33   ) AND
+                       (RECE41-SRYYM    >=  "201307"        ))
                          CONTINUE
                    ELSE
                      IF   ACCT-ZAIKBN     =  2
@@ -7291,6 +7465,17 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                             (WK-YKZTEN   *   WK-ZAIKAISU)
       *    その他のレセ点数欄の編集
                WHEN    "80"
+                 IF   ((SRY-SRYCD(IDX3) =
+                        CONS-ROUSAI32 OR
+                        CONS-ROUSAI20 OR  CONS-ROUSAI21 OR
+                        CONS-ROUSAI22 OR  CONS-ROUSAI23 OR
+                        CONS-ROUSAI24 OR  CONS-ROUSAI25 OR
+                        CONS-ROUSAI26 OR  CONS-ROUSAI27 OR
+                        CONS-ROUSAI28 OR  CONS-ROUSAI29 OR
+                        CONS-ROUSAI30 OR  CONS-ROUSAI31     ) AND
+                       (RECE41-SRYYM    >=  "201307"        ))
+                       CONTINUE
+                 ELSE
                    IF ( ACCT-SRYKBN          =  "80"    )  AND         
                       ( SRY-SRYCD(IDX3)(1:5) =  "09593" )              
                        IF   FLG-TAISYO   =   1
@@ -7352,6 +7537,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                               RECE41-TENSU(38)  +
                              (WK-YKZTEN   *   WK-ZAIKAISU)
                    END-IF
+                 END-IF
            END-EVALUATE
       *
            .

@@ -34,6 +34,9 @@
       *  01.00.04    NACL-門脇    06/03/22  自立支援法対応
       *  03.05.00    NACL-門脇    07/05/08  グループ診療対応
       *  04.01.01    NACL-門脇    07/12/07  公害対応
+      *
+      *  04.06.01    NACL-門脇    13/02/18  労災レセ電対応
+      *                                     （新診療行為コード対応）
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -69,6 +72,7 @@
            03  WRK-SYUTEN                  PIC 9(07).
            03  WRK-SINDAN                  PIC 9(07).
            03  WRK-MEISAI                  PIC 9(07).
+           03  WRK-KYUKYU                  PIC 9(07).
            03  WRK-RYOYO                   PIC 9(07).
            03  WRK-SENINFLG                PIC X(01).
            03  WRK-ZAITAKU-KBN             PIC X(01).
@@ -278,6 +282,7 @@ grpsys     COPY    "COMMON-SPA".
            MOVE       ZERO      TO     WRK-RYOYO.
            MOVE       SPACE     TO     WRK-SENINFLG.
            INITIALIZE                  WRK-SONOTA-TBL.
+           MOVE       ZERO      TO     WRK-KYUKYU.
            MOVE       ZERO      TO     IDX3.
       *
            PERFORM    VARYING   IDX    FROM   1   BY   1
@@ -301,6 +306,7 @@ grpsys     COPY    "COMMON-SPA".
                        MOVE   WRK-MEISAI    TO    LNK-S01-MEISAI(IDX)
                        MOVE   WRK-RYOYO     TO    LNK-S01-RYOYO(IDX)
                        MOVE   WRK-SONOTA-TBL  TO  LNK-S01-SONOTA(IDX)
+                       MOVE   WRK-KYUKYU    TO    LNK-S01-KYUKYU(IDX)
                     END-IF
                     IF     LNK-SYU-SYUHKNNUM(IDX)  =   "975"
                        MOVE   WRK-SYUTEN    TO    LNK-S01-SYUTEN(IDX)
@@ -317,6 +323,7 @@ grpsys     COPY    "COMMON-SPA".
                           MOVE    ZERO    TO   WRK-RYOYO
                           MOVE    SPACE   TO   WRK-SENINFLG
                           INITIALIZE           WRK-SONOTA-TBL
+                          MOVE    ZERO    TO   WRK-KYUKYU
                           MOVE    ZERO    TO   IDX3
                     END-IF
       *
@@ -344,6 +351,8 @@ grpsys     COPY    "COMMON-SPA".
                                           TO   WRK-SONOTA-TANKA(IDX3)
                          END-IF
                       END-PERFORM
+                      COMPUTE   WRK-KYUKYU  =  WRK-KYUKYU
+                                            +  LNK-S01-KYUKYU(IDX)
                     END-IF
       *
                     IF  LNK-SYU-SYUHKNNUM(IDX)  =   "975"

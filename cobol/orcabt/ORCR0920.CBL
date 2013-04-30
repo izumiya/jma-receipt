@@ -43,6 +43,9 @@
       *  04.04.01    NACL-門脇    10/04/02  特別労災付添看護の対応
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
+      *
+      *  04.06.01    NACL-門脇    13/02/18  労災レセ電対応
+      *                                     （新診療行為コード対応）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -678,14 +681,23 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
            MOVE    WRK-SRYCD1        TO  RECE86-SRYCD1
            MOVE    RECE84-ZAINUM     TO  RECE86-ZAINUM
            MOVE    WRK-LINENUM       TO  RECE86-LINENUM
-           IF   RECE86-SRYCD1   =  "101110020"
+           IF    ((RECE86-SRYCD1   =  "101110020") AND
+                  (RECE82-SRYYM   <=  "201306"   ))
+           OR    ((RECE86-SRYCD1   =  "101800880") AND
+                  (RECE82-SRYYM   >=  "201307"   ))
                 MOVE    777             TO  RECE86-NYUTENTTLKBN
            ELSE
-              IF  (RECE86-SRYCD1(1:5)   =  "09594")
-              OR  (RECE86-SRYCD1  =  "101910010" OR "101910020" OR
+              IF ( RECE86-SRYCD1(1:5)   =  "09594"                 )
+              OR ((RECE86-SRYCD1  =  "101910010" OR "101910020" OR
                                      "101910030" OR "101910040" OR
                                      "101910070" OR "101910080" OR
-                                     "101910090" OR "101910100"   )
+                                     "101910090" OR "101910100"   ) AND
+                  (RECE82-SRYYM  <=  "201306"                     ))
+              OR ((RECE86-SRYCD1  =  "101800390" OR "101800400" OR
+                                     "101800410" OR "101800420" OR
+                                     "101800430" OR "101800440" OR
+                                     "101800450" OR "101800460"   ) AND
+                  (RECE82-SRYYM  >=  "201307"                     ))
                 MOVE    779             TO  RECE86-NYUTENTTLKBN
               ELSE
                 IF  RECE86-SRYCD1(1:5)  =  "09591" OR "09592" OR "09593"
@@ -705,8 +717,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                       END-EVALUATE
                   END-EVALUATE
                 ELSE
-                  IF   RECE86-SRYCD1 >= "101910110" AND
-                                     <= "101910400"
+                  IF ((RECE86-SRYCD1 >= "101910110" AND
+                                     <= "101910400")  AND
+                      (RECE82-SRYYM  <= "201306"   ))
+                  OR ((RECE86-SRYCD1 >= "101800570" AND
+                                     <= "101800860")  AND
+                      (RECE82-SRYYM  >= "201307"   ))
                     MOVE  998              TO  RECE86-NYUTENTTLKBN
                   ELSE
                     MOVE  WRK-NYUTENTTLKBN TO  RECE86-NYUTENTTLKBN
