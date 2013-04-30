@@ -742,6 +742,11 @@
                    MOVE    PLUGIN-DATA     TO  SPA-NAI-TLINK (IDY)
                    IF      SPA-NAI-TLINK (IDY) =   "FALSE"
                        MOVE    "-"             TO  SPA-GMN-TLINK (IDY)
+                       IF      SPA-GMN-TVERSION (IDY)
+                                               NOT =  "-"
+                           MOVE    "ERROR"         TO
+                                               SPA-GMN-TLINK (IDY)
+                       END-IF
                    ELSE
                        MOVE    "¡û"            TO  SPA-GMN-TLINK (IDY)
                    END-IF

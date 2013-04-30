@@ -129,10 +129,8 @@ module JMA::Plugin
           list.each{|l|
               from = File.join(storedir,l[0])
               to = File.expand_path(File.join(@linkprefix,l[1]))
-              if File.exist?(to) && File.symlink?(to)
-                FileUtils.rm_f(to)
-              end
-              FileUtils.symlink(from,to)
+              FileUtils.symlink(from,to,{:force=>true})
+              to = File.join(to,File.basename(from)) if File.directory?(to)
               linked << to
           }
           postlink = File.join(storedir,"meta","postlink")
