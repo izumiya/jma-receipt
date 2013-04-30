@@ -1548,13 +1548,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
            PERFORM             UNTIL   FLG-RECECOM   =   1
-               IF      RECECOM-HKNCOMBI    =   RECE41-HKNCOMBI
-                   PERFORM 3601-COMMENT-HENSYU-SEC                 
-               END-IF
+               IF      RECECOM-SJKBN       =   "AA"
+                   MOVE    1               TO  FLG-RECECOM
+               ELSE
+                   IF      RECECOM-HKNCOMBI    =   RECE41-HKNCOMBI
+                       PERFORM 3601-COMMENT-HENSYU-SEC                 
+                   END-IF
       *                 
-               MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
-               MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-               PERFORM 900-RECECOM-READ-SEC
+                   MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
+                   MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+                   PERFORM 900-RECECOM-READ-SEC
+               END-IF
            END-PERFORM
       *
            MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
