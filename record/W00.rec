@@ -3,6 +3,15 @@ W00	{
 		B03	{
 			state	int;
 		};
+		B04	{
+			state	int;
+		};
+		B06	{
+			state	int;
+		};
+		B07	{
+			state	int;
+		};
 		B12	{
 			state	int;
 		};
@@ -14,10 +23,10 @@ W00	{
 				value0	varchar(2);
 				value1	varchar(40);
 				value2	varchar(40);
-				value3	varchar(8);
-				value4	varchar(8);
-			}	[50];
-			select	bool[50];
+				value3	varchar(9);
+				value4	varchar(9);
+			}	[30];
+			select	bool[30];
 		};
 		SELNUM	{
 			value	number(2);
@@ -35,10 +44,10 @@ W00	{
 			value	varchar(40);
 		};
 		YUKOSTYMD	{
-			value	varchar(8);
+			value	varchar(9);
 		};
 		YUKOEDYMD	{
-			value	varchar(8);
+			value	varchar(9);
 		};
 		ATAI_COMBO	{
 			ATAI	{

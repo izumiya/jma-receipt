@@ -58,8 +58,10 @@
                            11  SPA-GMN-LIST-NO          PIC X(02).
                            11  SPA-GMN-LIST-NAME        PIC X(40).
                            11  SPA-GMN-LIST-ATAI        PIC X(40).
-                           11  SPA-GMN-LIST-YUKOSTYMD   PIC X(08).
-                           11  SPA-GMN-LIST-YUKOEDYMD   PIC X(08).
+                           11  SPA-GMN-LIST-YUKOSTYMD   PIC X(10).
+                           11  SPA-GMN-LIST-YUKOEDYMD   PIC X(10).
+                           11  SPA-NAI-LIST-YUKOSTYMD   PIC X(08).
+                           11  SPA-NAI-LIST-YUKOEDYMD   PIC X(08).
                    07  SPA-GMN-LIST-MAX    PIC 9(05).
       *
                05  SPA-GMN-SELNUM      PIC 9(02).
@@ -69,8 +71,10 @@
                    07  SPA-GMN-KBNCD       PIC X(08).
                    07  SPA-GMN-ITEMCD      PIC 9(05).
                    07  SPA-GMN-NAME        PIC X(40).
-                   07  SPA-GMN-YUKOSTYMD   PIC X(08).
-                   07  SPA-GMN-YUKOEDYMD   PIC X(08).
+                   07  SPA-GMN-YUKOSTYMD   PIC X(10).
+                   07  SPA-GMN-YUKOEDYMD   PIC X(10).
+                   07  SPA-NAI-YUKOSTYMD   PIC X(08).
+                   07  SPA-NAI-YUKOEDYMD   PIC X(08).
                    07  SPA-GMN-ITEMLENGTH  PIC 9(03).
       *
                    07  SPA-GMN-ATAI-G.
@@ -81,6 +85,7 @@
       *
                05  SPA-NAI-AREA.
                    07  SPA-NAI-KANRICD     PIC X(04).
+                   07  SPA-NAI-FLG         PIC 9(01).
       *
            COPY    "ENUM-VALUE".
       *
@@ -93,6 +98,9 @@
       *
        01  IDX-AREA.
            03  IDX                 PIC 9(02).
+           03  IDY                 PIC 9(02).
+           03  PAGE-MAX            PIC 9(01).
+           03  PAGE-IDX            PIC 9(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -109,8 +117,6 @@
                05  WRK-WDD         PIC 9(02).
       *    入力項目名
            03  WRK-MCP-WIDGET      PIC X(64).
-      *
-           03  WRK-ATAI            PIC X(40).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -155,7 +161,7 @@
       *****************************************************************
       *    連絡領域
       *****************************************************************
-        LINKAGE                     SECTION.
+        LINKAGE                    SECTION.
       *
            COPY    "MCPAREA".
            COPY    "ORCA-SPA".
@@ -263,8 +269,7 @@
            MOVE    SPA-AREA        TO  SPA-COMMON
       *
            .
-           EXIT    PROGRAM
-           .
+           EXIT    PROGRAM.
       *****************************************************************
       *    初期　処理
       *****************************************************************
@@ -280,13 +285,13 @@
            ELSE
       *        初期画面セット
                PERFORM 300-SCREEN-SEC
-               IF    ( FLG-END     =   1 )
+               IF      FLG-END             =   1
                    GO  TO  100-INIT-EXT
                END-IF
       *
       *        画面編集
                PERFORM 500-GMNHEN-SEC
-               IF    ( SPA-ERRCD   NOT =   SPACE )
+               IF      SPA-ERRCD       NOT =   SPACE
                    PERFORM 510-ERRSET-SEC
                    GO  TO  100-INIT-EXT
                END-IF
@@ -362,17 +367,19 @@
                                    INTO    SPA-GMN-LIST-NAME(IDX)
                END-STRING
       *
-               MOVE    SYS-ITEM-YUKOSTYMD
-                                       TO  SPA-GMN-LIST-YUKOSTYMD(IDX)
-               MOVE    SYS-ITEM-YUKOEDYMD
-                                       TO  SPA-GMN-LIST-YUKOEDYMD(IDX)
-               MOVE    IDX             TO  SPA-GMN-LIST-MAX
-      *
                MOVE    "tbl_syskanri_item"
                                        TO  MCP-TABLE
                MOVE    "key1"          TO  MCP-PATHNAME
                PERFORM 900-SYS-ITEM-READ-SEC
            END-PERFORM
+      *
+           MOVE    IDX             TO  SPA-GMN-LIST-MAX
+      *
+           MOVE    1               TO  PAGE-IDX
+           MOVE    1               TO  PAGE-MAX
+           IF      IDX > 30
+               COMPUTE PAGE-MAX    = ( IDX  /   30 )   +   1
+           END-IF
       *
            MOVE    "tbl_syskanri_item"
                                    TO  MCP-TABLE
@@ -389,7 +396,7 @@
       *****************************************************************
        330-WID1-SET-SEC            SECTION.
       *
-           IF      SPA-WID1-FLG    =   "OK"
+           IF      SPA-WID1-FLG        =   "OK"
                EVALUATE    SPA-WIDCD
                    WHEN    "1001"
                        PERFORM 490-KOUSHIN-SEC
@@ -420,6 +427,15 @@
       *        削除
                WHEN    "CLICKED"       ALSO    "B03"
                    MOVE    "1002"      TO  SPA-WIDCD
+      *        期間切替
+               WHEN    "CLICKED"       ALSO    "B04"
+                   PERFORM 400-KIRIKAE-SEC
+      *        前頁
+               WHEN    "CLICKED"       ALSO    "B06"
+                   PERFORM 400-MAEPAGE-SEC
+      *        次頁
+               WHEN    "CLICKED"       ALSO    "B07"
+                   PERFORM 400-ATOPAGE-SEC
       *        更新
                WHEN    "CLICKED"       ALSO    "B12"
                    MOVE    "1001"      TO  SPA-WIDCD
@@ -457,10 +473,10 @@
                    PERFORM 400-ATAICHECK-SEC
       *        有効開始日付
                WHEN    "ACTIVATE"  ALSO    "YUKOSTYMD"
-                   MOVE    W00-YUKOSTYMD   TO  SPA-GMN-YUKOSTYMD
+                   PERFORM 400-YUKOSTYMD-SEC
       *        有効終了日付
                WHEN    "ACTIVATE"  ALSO    "YUKOEDYMD"
-                   MOVE    W00-YUKOEDYMD   TO  SPA-GMN-YUKOEDYMD
+                   PERFORM 400-YUKOEDYMD-SEC
            END-EVALUATE
       *
            .
@@ -487,6 +503,55 @@
        210-BACK-EXT.
            EXIT.
       *****************************************************************
+      *    切替処理
+      *****************************************************************
+       400-KIRIKAE-SEC             SECTION.
+      *
+           EVALUATE    SPA-NAI-FLG
+               WHEN    ZERO
+                   MOVE    1          TO  SPA-NAI-FLG
+               WHEN    1
+                   MOVE    ZERO        TO  SPA-NAI-FLG
+           END-EVALUATE
+      *
+           PERFORM 400-LISTSET-SEC
+      *
+           .
+       400-KIRIKAE-EXT.
+           EXIT.
+      *****************************************************************
+      *    前頁処理
+      *****************************************************************
+       400-MAEPAGE-SEC             SECTION.
+      *
+           IF      PAGE-IDX    >   1
+               COMPUTE PAGE-IDX    =   PAGE-IDX    -   1
+           END-IF
+      *
+           INITIALIZE                  SPA-GMN-NAIYO
+           MOVE    ZERO            TO  SPA-GMN-SELNUM
+           MOVE    1               TO  SPA-GMN-CUR
+      *
+           .
+       400-MAEPAGE-EXT.
+           EXIT.
+      *****************************************************************
+      *    次頁処理
+      *****************************************************************
+       400-ATOPAGE-SEC             SECTION.
+      *
+           IF      PAGE-IDX    <   PAGE-MAX
+               COMPUTE PAGE-IDX    =   PAGE-IDX    +   1
+           END-IF
+      *
+           INITIALIZE                  SPA-GMN-NAIYO
+           MOVE    ZERO            TO  SPA-GMN-SELNUM
+           MOVE    1               TO  SPA-GMN-CUR
+      *
+           .
+       400-ATOPAGE-EXT.
+           EXIT.
+      *****************************************************************
       *    リスト選択処理
       *****************************************************************
        400-LIST-SEC            SECTION.
@@ -494,7 +559,8 @@
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL  (IDX     >   SPA-GMN-LIST-MAX)
                IF      W00-LIST-SELECT(IDX)    =   "T"
-                   MOVE    IDX         TO  W00-SELNUM
+                   COMPUTE IDY = ( PAGE-IDX - 1 ) *  30 + IDX
+                   MOVE    IDY             TO  W00-SELNUM
                END-IF
            END-PERFORM
       *
@@ -508,6 +574,8 @@
       *****************************************************************
        400-SELNUM-SEC            SECTION.
       *
+           INITIALIZE                  SPA-GMN-NAIYO
+           MOVE    ZERO            TO  SPA-GMN-SELNUM
            MOVE    1               TO  SPA-GMN-CUR
       *
            MOVE    W00-SELNUM  TO  SPA-GMN-SELNUM
@@ -517,7 +585,12 @@
                    UNTIL  (IDX     >   SPA-GMN-LIST-MAX)
                    OR     (FLG-OK  =   1)
                IF      SPA-GMN-SELNUM  =   IDX
-                   MOVE    1           TO  FLG-OK
+                   MOVE    1               TO  FLG-OK
+                   COMPUTE IDY = ( IDX / 30 )
+                   IF      IDX NOT = ( IDY * 30 )
+                       COMPUTE IDY = ( IDX / 30 ) + 1
+                       MOVE    IDY             TO  PAGE-IDX
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -527,6 +600,7 @@
                IF      SPA-NAI-KANRICD     =   SPACE
                    MOVE    SPA-GMN-LIST-KANRICD(SPA-GMN-SELNUM)
                                            TO  SPA-NAI-KANRICD
+                   MOVE    0               TO  SPA-NAI-FLG
                    PERFORM 400-LISTSET-SEC
                ELSE
                    PERFORM 400-GMNSET-SEC
@@ -541,7 +615,10 @@
       *****************************************************************
        400-LISTSET-SEC             SECTION.
       *
+           INITIALIZE                  SPA-GMN-NAIYO
            MOVE    ZERO            TO  SPA-GMN-SELNUM
+           MOVE    1               TO  SPA-GMN-CUR
+      *
            INITIALIZE                  SPA-GMN-LIST-G
            MOVE    ZERO            TO  SPA-GMN-LIST-MAX
       *
@@ -563,9 +640,10 @@
                MOVE    1               TO  FLG-SYS-ITEM
            END-IF
       *
-           PERFORM VARYING IDX     FROM    1       BY  1
-                   UNTIL  (IDX             >=  50)
+           MOVE    ZERO            TO  IDX
+           PERFORM UNTIL  (IDX             >   200)
                    OR     (FLG-SYS-ITEM    =   1)
+               COMPUTE IDX = IDX + 1
                MOVE    IDX             TO  SPA-GMN-LIST-NO(IDX)
                MOVE    SYS-ITEM-KANRICD
                                        TO  SPA-GMN-LIST-KANRICD(IDX)
@@ -575,19 +653,20 @@
                                        TO  SPA-GMN-LIST-ITEMLENGTH(IDX)
                MOVE    SYS-ITEM-ITEMNAME
                                        TO  SPA-GMN-LIST-NAME(IDX)
-               MOVE    SYS-ITEM-YUKOSTYMD
-                                       TO  SPA-GMN-LIST-YUKOSTYMD(IDX)
-               MOVE    SYS-ITEM-YUKOEDYMD
-                                       TO  SPA-GMN-LIST-YUKOEDYMD(IDX)
                PERFORM 400-LISTATAI-SEC
-      *
-               MOVE    IDX             TO  SPA-GMN-LIST-MAX
       *
                MOVE    "tbl_syskanri_item"
                                        TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
                PERFORM 900-SYS-ITEM-READ-SEC
            END-PERFORM
+      *
+           MOVE    IDX             TO  SPA-GMN-LIST-MAX
+           MOVE    1               TO  PAGE-IDX
+           MOVE    1               TO  PAGE-MAX
+           IF      IDX > 30
+               COMPUTE PAGE-MAX    = ( IDX  /   30 )   +   1
+           END-IF
       *
            MOVE    "tbl_syskanri_item"
                                    TO  MCP-TABLE
@@ -600,9 +679,7 @@
       *****************************************************************
       *    項目値セット
       *****************************************************************
-       400-LISTATAI-SEC           SECTION.
-      *
-           MOVE    SPACE           TO  WRK-ATAI
+       400-LISTATAI-SEC            SECTION.
       *
            INITIALIZE                  SYS-VALUE-REC
            MOVE    SPA-HOSPNUM     TO  SYS-VALUE-HOSPNUM
@@ -610,39 +687,103 @@
                                    TO  SYS-VALUE-KANRICD
            MOVE    SYS-ITEM-KBNCD  TO  SYS-VALUE-KBNCD
            MOVE    SYS-ITEM-ITEMCD TO  SYS-VALUE-ITEMCD
-           MOVE    SYS-ITEM-YUKOSTYMD
-                                   TO  SYS-VALUE-YUKOSTYMD
-           MOVE    SYS-ITEM-YUKOEDYMD
-                                   TO  SYS-VALUE-YUKOEDYMD
+      *
            MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
-           PERFORM 900-SYS-VALUE-READ-SEC
+           MOVE    "tbl_syskanri_value"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+      *
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri_value"
+                                       TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 900-SYS-VALUE-READ2-SEC
+           ELSE
+               INITIALIZE                  SYS-VALUE-REC
+               MOVE    1               TO  FLG-SYS-VALUE
+           END-IF
       *
            IF      FLG-SYS-VALUE   =   ZERO
-               MOVE    MCPDATA-REC     TO  SYS-VALUE-REC
+               PERFORM 400-LISTCOMBO-SEC
       *
-               INITIALIZE                  SYS-COMBO-REC
-               MOVE    SYS-VALUE-KANRICD
-                                       TO  SYS-COMBO-KANRICD
-               MOVE    SYS-VALUE-KBNCD TO  SYS-COMBO-KBNCD
-               MOVE    SYS-VALUE-ITEMCD
-                                       TO  SYS-COMBO-ITEMCD
-               MOVE    SYS-VALUE-VALUE TO  SYS-COMBO-VALUE
-               MOVE    SYS-COMBO-REC   TO  MCPDATA-REC
-               PERFORM 900-SYS-COMBO-READ-SEC
-      *
-               IF      FLG-SYS-COMBO   =   ZERO
-                   MOVE    MCPDATA-REC     TO  SYS-COMBO-REC
-               END-IF
-      *
-               STRING  SYS-VALUE-VALUE     DELIMITED BY SPACE
-                       " "                 DELIMITED BY SIZE
-                       SYS-COMBO-VALUENAME DELIMITED BY SPACE
-                                   INTO    SPA-GMN-LIST-ATAI(IDX)
-               END-STRING
+               MOVE    "tbl_syskanri_value"
+                                       TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 900-SYS-VALUE-READ2-SEC
            END-IF
+      *
+           PERFORM UNTIL  (IDX             >   200)
+                   OR     (FLG-SYS-VALUE   =   1)
+               COMPUTE IDX = IDX + 1
+               MOVE    IDX             TO  SPA-GMN-LIST-NO(IDX)
+               MOVE    SYS-ITEM-KANRICD
+                                       TO  SPA-GMN-LIST-KANRICD(IDX)
+               MOVE    SYS-ITEM-KBNCD  TO  SPA-GMN-LIST-KBNCD(IDX)
+               MOVE    SYS-ITEM-ITEMCD TO  SPA-GMN-LIST-ITEMCD(IDX)
+               MOVE    SYS-ITEM-ITEMLENGTH
+                                       TO  SPA-GMN-LIST-ITEMLENGTH(IDX)
+               MOVE    SYS-ITEM-ITEMNAME
+                                       TO  SPA-GMN-LIST-NAME(IDX)
+               PERFORM 400-LISTCOMBO-SEC
+      *
+               MOVE    "tbl_syskanri_value"
+                                       TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 900-SYS-VALUE-READ2-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_syskanri_value"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 930-DBCLOSE-SEC
       *
            .
        400-LISTATAI-EXT.
+           EXIT.
+      *****************************************************************
+      *    項目値内容セット処理
+      *****************************************************************
+       400-LISTCOMBO-SEC           SECTION.
+      *
+           IF      SYS-VALUE-YUKOSTYMD NOT =   "00000000"
+               MOVE    SYS-VALUE-YUKOSTYMD
+                                       TO  WRK-YMD
+               PERFORM 5002-HIZUKE-CHK-SEC
+               IF      SPA-ERRCD       =   SPACE
+                   MOVE    WRK-SYMD    TO  SPA-NAI-LIST-YUKOSTYMD(IDX)
+                   MOVE    WRK-HENYMDG TO  SPA-GMN-LIST-YUKOSTYMD(IDX)
+               END-IF
+           END-IF
+      *
+           IF      SYS-VALUE-YUKOEDYMD NOT =   "99999999"
+               MOVE    SYS-VALUE-YUKOEDYMD
+                                       TO  WRK-YMD
+               PERFORM 5002-HIZUKE-CHK-SEC
+               IF      SPA-ERRCD       =   SPACE
+                   MOVE    WRK-SYMD    TO  SPA-NAI-LIST-YUKOEDYMD(IDX)
+                   MOVE    WRK-HENYMDG TO  SPA-GMN-LIST-YUKOEDYMD(IDX)
+               END-IF
+           END-IF
+      *
+           INITIALIZE                  SYS-COMBO-REC
+           MOVE    SYS-VALUE-KANRICD
+                                   TO  SYS-COMBO-KANRICD
+           MOVE    SYS-VALUE-KBNCD TO  SYS-COMBO-KBNCD
+           MOVE    SYS-VALUE-ITEMCD
+                                   TO  SYS-COMBO-ITEMCD
+           MOVE    SYS-VALUE-VALUE TO  SYS-COMBO-VALUE
+           MOVE    SYS-COMBO-REC   TO  MCPDATA-REC
+           PERFORM 900-SYS-COMBO-READ-SEC
+      *
+           STRING  SYS-VALUE-VALUE     DELIMITED BY SPACE
+                   " "                 DELIMITED BY SIZE
+                   SYS-COMBO-VALUENAME DELIMITED BY SPACE
+                               INTO    SPA-GMN-LIST-ATAI(IDX)
+           END-STRING
+      *
+           .
+       400-LISTCOMBO-EXT.
            EXIT.
       *****************************************************************
       *    画面セット処理
@@ -662,12 +803,26 @@
                                    TO  SPA-GMN-ITEMLENGTH
            MOVE    SPA-GMN-LIST-NAME(SPA-GMN-SELNUM)
                                    TO  SPA-GMN-NAME
+           MOVE    SPA-GMN-LIST-ATAI(SPA-GMN-SELNUM)
+                                   TO  SPA-GMN-ATAI
            MOVE    SPA-GMN-LIST-YUKOSTYMD(SPA-GMN-SELNUM)
                                    TO  SPA-GMN-YUKOSTYMD
            MOVE    SPA-GMN-LIST-YUKOEDYMD(SPA-GMN-SELNUM)
                                    TO  SPA-GMN-YUKOEDYMD
-           MOVE    SPA-GMN-LIST-ATAI(SPA-GMN-SELNUM)
-                                   TO  SPA-GMN-ATAI
+           MOVE    SPA-NAI-LIST-YUKOSTYMD(SPA-GMN-SELNUM)
+                                   TO  SPA-NAI-YUKOSTYMD
+           MOVE    SPA-NAI-LIST-YUKOEDYMD(SPA-GMN-SELNUM)
+                                   TO  SPA-NAI-YUKOEDYMD
+      *
+           IF      SPA-NAI-YUKOSTYMD   =   SPACE
+               MOVE    "00000000"      TO  SPA-NAI-YUKOSTYMD
+                                           SPA-GMN-YUKOSTYMD
+           END-IF
+      *
+           IF      SPA-NAI-YUKOEDYMD   =   SPACE
+               MOVE    "99999999"      TO  SPA-NAI-YUKOEDYMD
+                                           SPA-GMN-YUKOEDYMD
+           END-IF
       *
            INITIALIZE                  SYS-COMBO-REC
            MOVE    SPA-GMN-KANRICD TO  SYS-COMBO-KANRICD
@@ -753,6 +908,64 @@
        400-ATAICHECK-EXT.
            EXIT.
       *****************************************************************
+      *    有効開始日付チェック処理
+      *****************************************************************
+       400-YUKOSTYMD-SEC           SECTION.
+      *
+           MOVE    W00-YUKOSTYMD   TO  SPA-GMN-YUKOSTYMD
+      *
+           IF      SPA-GMN-YUKOSTYMD   =   SPACE
+               MOVE    "00000000"      TO  SPA-NAI-YUKOSTYMD
+                                           SPA-GMN-YUKOSTYMD
+           ELSE
+               MOVE    SPA-GMN-YUKOSTYMD   TO  WRK-YMD
+               PERFORM 5002-HIZUKE-CHK-SEC
+               IF      SPA-ERRCD            =   SPACE
+                   MOVE    WRK-SYMD             TO  SPA-NAI-YUKOSTYMD
+                   MOVE    WRK-HENYMDG          TO  SPA-GMN-YUKOSTYMD
+               ELSE
+                   MOVE    6               TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF      SPA-NAI-YUKOSTYMD   >   SPA-NAI-YUKOEDYMD
+               MOVE    "0005"          TO  SPA-ERRCD
+               MOVE    6               TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       400-YUKOSTYMD-EXT.
+           EXIT.
+      *****************************************************************
+      *    有効終了日付チェック処理
+      *****************************************************************
+       400-YUKOEDYMD-SEC           SECTION.
+      *
+           MOVE    W00-YUKOEDYMD   TO  SPA-GMN-YUKOEDYMD
+      *
+           IF      SPA-GMN-YUKOEDYMD   =   SPACE
+               MOVE    "99999999"      TO  SPA-NAI-YUKOEDYMD
+                                           SPA-GMN-YUKOEDYMD
+           ELSE
+               MOVE    SPA-GMN-YUKOEDYMD   TO  WRK-YMD
+               PERFORM 5002-HIZUKE-CHK-SEC
+               IF      SPA-ERRCD            =   SPACE
+                   MOVE    WRK-SYMD             TO  SPA-NAI-YUKOEDYMD 
+                   MOVE    WRK-HENYMDG          TO  SPA-GMN-YUKOEDYMD
+               ELSE
+                   MOVE    7               TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF      SPA-NAI-YUKOSTYMD   >   SPA-NAI-YUKOEDYMD
+               MOVE    "0005"          TO  SPA-ERRCD
+               MOVE    7               TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       400-YUKOEDYMD-EXT.
+           EXIT.
+      *****************************************************************
       *    更新処理
       *****************************************************************
        490-KOUSHIN-SEC             SECTION.
@@ -767,9 +980,9 @@
            MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
            MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
            MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
-           MOVE    SPA-GMN-YUKOSTYMD
+           MOVE    SPA-NAI-YUKOSTYMD
                                    TO  SYS-VALUE-YUKOSTYMD
-           MOVE    SPA-GMN-YUKOEDYMD
+           MOVE    SPA-NAI-YUKOEDYMD
                                    TO  SYS-VALUE-YUKOEDYMD
            MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
            PERFORM 900-SYS-VALUE-READ-SEC
@@ -786,7 +999,6 @@
                                        TO  SYSUP-VALUE-YUKOSTYMD
                MOVE    SYS-VALUE-YUKOEDYMD
                                        TO  SYSUP-VALUE-YUKOEDYMD
-      *
                MOVE    SPA-GMN-ATAI(1:SPA-GMN-ITEMLENGTH)
                                        TO  SYS-VALUE-VALUE
                MOVE    SPA-OPID        TO  SYS-VALUE-OPID
@@ -798,6 +1010,14 @@
                MOVE    "upd1"          TO  MCP-PATHNAME
                MOVE    "DBUPDATE"      TO  MCP-FUNC
            ELSE
+               MOVE    SPA-HOSPNUM     TO  SYS-VALUE-HOSPNUM
+               MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
+               MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
+               MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
+               MOVE    SPA-NAI-YUKOSTYMD
+                                       TO  SYS-VALUE-YUKOSTYMD
+               MOVE    SPA-NAI-YUKOEDYMD
+                                       TO  SYS-VALUE-YUKOEDYMD
                MOVE    SPA-GMN-ATAI(1:SPA-GMN-ITEMLENGTH)
                                        TO  SYS-VALUE-VALUE
                MOVE    SPA-OPID        TO  SYS-VALUE-OPID
@@ -841,9 +1061,9 @@
            MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
            MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
            MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
-           MOVE    SPA-GMN-YUKOSTYMD
+           MOVE    SPA-NAI-YUKOSTYMD
                                    TO  SYS-VALUE-YUKOSTYMD
-           MOVE    SPA-GMN-YUKOEDYMD
+           MOVE    SPA-NAI-YUKOEDYMD
                                    TO  SYS-VALUE-YUKOEDYMD
            MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
            PERFORM 900-SYS-VALUE-READ-SEC
@@ -908,26 +1128,45 @@
        500-GMNHEN-SEC              SECTION.
       * 
            INITIALIZE                  W00
+           MOVE    ZERO            TO  IDX
+           MOVE    ZERO            TO  IDY
       *
-           PERFORM VARYING IDX     FROM    1       BY  1
-                   UNTIL  (IDX     >   SPA-GMN-LIST-MAX)
+           IF      SPA-NAI-KANRICD     NOT =   SPACE
+               COMPUTE IDX     = ( PAGE-IDX    -   1 ) *  30
+           END-IF
+      *
+           PERFORM UNTIL  (IDX     =   SPA-GMN-LIST-MAX)
+                   OR     (IDY     =   30)
+               COMPUTE IDX = IDX + 1
+               COMPUTE IDY = IDY + 1
                MOVE    SPA-GMN-LIST-NO(IDX)
-                                       TO  W00-LIST-NO(IDX)
+                                       TO  W00-LIST-NO(IDY)
                MOVE    SPA-GMN-LIST-NAME(IDX)
-                                       TO  W00-LIST-NAME(IDX)
+                                       TO  W00-LIST-NAME(IDY)
                MOVE    SPA-GMN-LIST-ATAI(IDX)
-                                       TO  W00-LIST-ATAI(IDX)
+                                       TO  W00-LIST-ATAI(IDY)
                MOVE    SPA-GMN-LIST-YUKOSTYMD(IDX)
-                                       TO  W00-LIST-YUKOSTYMD(IDX)
+                                       TO  W00-LIST-YUKOSTYMD(IDY)
                MOVE    SPA-GMN-LIST-YUKOEDYMD(IDX)
-                                       TO  W00-LIST-YUKOEDYMD(IDX)
+                                       TO  W00-LIST-YUKOEDYMD(IDY)
                IF      SPA-GMN-SELNUM  =   IDX
-                   MOVE    "T"             TO  W00-LIST-SELECT(IDX)
+                   MOVE    "T"             TO  W00-LIST-SELECT(IDY)
                ELSE
-                   MOVE    "F"             TO  W00-LIST-SELECT(IDX)
+                   MOVE    "F"             TO  W00-LIST-SELECT(IDY)
                END-IF
            END-PERFORM
-           MOVE    SPA-GMN-LIST-MAX    TO  W00-LIST-COUNT
+      *
+           MOVE    IDY                 TO  W00-LIST-COUNT
+      *
+           MOVE    WIDGET-NORMAL       TO  W00-B06-STATE
+           MOVE    WIDGET-NORMAL       TO  W00-B07-STATE
+      *
+           IF      PAGE-IDX    =   1
+               MOVE    WIDGET-INSENSITIVE  TO  W00-B06-STATE
+           END-IF
+           IF      PAGE-IDX    =   PAGE-MAX
+               MOVE    WIDGET-INSENSITIVE  TO  W00-B07-STATE
+           END-IF
       *
            MOVE    SPA-GMN-SELNUM      TO  W00-SELNUM
       *
@@ -939,14 +1178,16 @@
            MOVE    SPA-GMN-YUKOEDYMD   TO  W00-YUKOEDYMD
       *
            MOVE    SPA-GMN-ATAI        TO  W00-ATAI
-           PERFORM VARYING IDX FROM    1       BY  1
-                   UNTIL   IDX >       SPA-GMN-ATAI-MAX
+           PERFORM VARYING IDX     FROM    1       BY  1
+                   UNTIL ( IDX     >   SPA-GMN-ATAI-MAX )
+                   OR    ( IDX     >   50 )
                MOVE    SPA-GMN-ATAILIST(IDX)
                                        TO  W00-ATAI-ITEM(IDX)
            END-PERFORM
            MOVE    SPA-GMN-ATAI-MAX    TO  W00-ATAI-COUNT
       *
            MOVE    WIDGET-NORMAL       TO  W00-B03-STATE
+           MOVE    WIDGET-NORMAL       TO  W00-B04-STATE
            MOVE    WIDGET-NORMAL       TO  W00-B12-STATE
       *
            IF    ( SPA-NAI-KANRICD     =   SPACE ) OR
@@ -954,6 +1195,10 @@
                  ( SPA-GMN-SELNUM      >   SPA-GMN-LIST-MAX )
                MOVE    WIDGET-INSENSITIVE  TO  W00-B03-STATE
                MOVE    WIDGET-INSENSITIVE  TO  W00-B12-STATE
+           END-IF
+      *
+           IF      SPA-NAI-KANRICD     =   SPACE
+               MOVE    WIDGET-INSENSITIVE  TO  W00-B04-STATE
            END-IF
       *
            PERFORM 5001-MAPCUR-SEC
@@ -977,6 +1222,12 @@
                                            TO  SPA-ERRMSG
                WHEN    "0003"
                    MOVE    "値の桁が大きくなっています。"
+                                           TO  SPA-ERRMSG
+               WHEN    "0004"
+                   MOVE    "日付が正しくありません"
+                                           TO  SPA-ERRMSG
+               WHEN    "0005"
+                   MOVE    "有効期間が正しくありません"
                                            TO  SPA-ERRMSG
                WHEN    "1001"
                    MOVE    "更新できませんでした。"
@@ -1095,6 +1346,35 @@
        50011-CUR-SET-EXT.
            EXIT.
       *****************************************************************
+      *    日付チェック・編集処理
+      *****************************************************************
+       5002-HIZUKE-CHK-SEC         SECTION.
+      *
+           EVALUATE    WRK-YMD(1:8)
+               WHEN    ZERO
+                   MOVE    ZERO            TO  WRK-SYMD
+                   MOVE    WRK-YMD(1:8)    TO  WRK-HENYMDG
+               WHEN    "99999999"
+                   MOVE    ALL "9"         TO  WRK-SYMD
+                   MOVE    WRK-YMD(1:8)    TO  WRK-HENYMDG
+               WHEN    OTHER
+      *            日付画面チェックサブ
+                   INITIALIZE                  ORCSGDAYAREA
+                   MOVE    WRK-YMD         TO  SGDAY-INDAY
+                   CALL    "ORCSGDAY"          USING
+                                               ORCSGDAYAREA
+                   IF      SGDAY-RC            =   ZERO
+                       MOVE    SGDAY-OTDAY         TO  WRK-HENYMDG
+                       MOVE    SGDAY-SDAY          TO  WRK-SYMD
+                   ELSE
+                       MOVE    "0004"              TO  SPA-ERRCD
+                   END-IF
+           END-EVALUATE
+      *
+           .
+       5002-HIZUKE-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    システム管理項目読み込み処理
       *****************************************************************
        900-SYS-ITEM-READ-SEC       SECTION.
@@ -1132,11 +1412,14 @@
       *
                IF      MCP-RC              =   ZERO
                    MOVE    ZERO            TO  FLG-SYS-VALUE
+                   MOVE    MCPDATA-REC     TO  SYS-VALUE-REC
                ELSE
                    MOVE    1               TO  FLG-SYS-VALUE
+                   INITIALIZE                  SYS-VALUE-REC
                END-IF
            ELSE
                MOVE    1               TO  FLG-SYS-VALUE
+               INITIALIZE                  SYS-VALUE-REC
            END-IF
       *
            MOVE    "tbl_syskanri_value"
@@ -1146,6 +1429,41 @@
       *
            .
        900-SYS-VALUE-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理項目値読み込み処理
+      *****************************************************************
+       900-SYS-VALUE-READ2-SEC     SECTION.
+      *
+           MOVE    ZERO            TO  FLG-OK
+           MOVE    ZERO            TO  FLG-SYS-VALUE
+      *
+           PERFORM UNTIL ( FLG-OK          =   1 )
+                   OR    ( FLG-SYS-VALUE   =   1 )
+      *
+               PERFORM 920-DBFETCH-SEC
+      *
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO            TO  FLG-SYS-VALUE
+                   MOVE    MCPDATA-REC     TO  SYS-VALUE-REC
+               ELSE
+                   MOVE    1               TO  FLG-SYS-VALUE
+                   INITIALIZE                  SYS-VALUE-REC
+               END-IF
+      *
+               IF      SPA-NAI-FLG         =   ZERO
+                   IF    ( SYS-VALUE-YUKOSTYMD <=  SPA-SYSYMD ) AND
+                         ( SYS-VALUE-YUKOEDYMD >=  SPA-SYSYMD )
+                       MOVE    1               TO  FLG-OK
+                   END-IF
+               ELSE
+                   MOVE    1               TO  FLG-OK
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       900-SYS-VALUE-READ2-EXT.
            EXIT.
       *****************************************************************
       *    システム管理項目値項目読み込み処理
@@ -1167,11 +1485,14 @@
       *
                IF      MCP-RC              =   ZERO
                    MOVE    ZERO            TO  FLG-SYS-COMBO
+                   MOVE    MCPDATA-REC     TO  SYS-COMBO-REC
                ELSE
                    MOVE    1               TO  FLG-SYS-COMBO
+                   INITIALIZE                  SYS-COMBO-REC
                END-IF
            ELSE
                MOVE    1               TO  FLG-SYS-COMBO
+               INITIALIZE                  SYS-COMBO-REC
            END-IF
       *
            MOVE    "tbl_syskanri_combo"
@@ -1185,7 +1506,7 @@
       *****************************************************************
       *    システム管理項目値選択肢読み込み処理
       *****************************************************************
-       900-SYS-COMBO-READ2-SEC       SECTION.
+       900-SYS-COMBO-READ2-SEC     SECTION.
       *
            PERFORM 920-DBFETCH-SEC
       *

@@ -133,14 +133,20 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <label></label>
+        <label>期間切替</label>
         <relief>GTK_RELIEF_NORMAL</relief>
         <xalign>0.5</xalign>
         <yalign>0.5</yalign>
         <response_id>0</response_id>
+        <accelerator>
+          <modifiers>0</modifiers>
+          <key>GDK_F4</key>
+          <signal>clicked</signal>
+        </accelerator>
         <signal>
           <name>clicked</name>
           <handler>send_event</handler>
+          <data>CLICKED</data>
         </signal>
       </widget>
       <widget>
@@ -175,7 +181,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <label></label>
+        <label>前頁</label>
         <relief>GTK_RELIEF_NORMAL</relief>
         <xalign>0.5</xalign>
         <yalign>0.5</yalign>
@@ -202,7 +208,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <border_width>0</border_width>
-        <label></label>
+        <label>次頁</label>
         <relief>GTK_RELIEF_NORMAL</relief>
         <xalign>0.5</xalign>
         <yalign>0.5</yalign>
@@ -359,7 +365,7 @@
         <x>8</x>
         <y>16</y>
         <width>1000</width>
-        <height>550</height>
+        <height>624</height>
         <sensitive>True</sensitive>
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
@@ -475,7 +481,7 @@
         <class>GtkNumberEntry</class>
         <name>SELNUM</name>
         <x>88</x>
-        <y>578</y>
+        <y>650</y>
         <width>50</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -498,7 +504,7 @@
         <class>GtkLabel</class>
         <name>label6</name>
         <x>8</x>
-        <y>578</y>
+        <y>650</y>
         <width>60</width>
         <height>24</height>
         <visible>True</visible>
@@ -517,7 +523,7 @@
         <class>GtkPandaEntry</class>
         <name>KANRICD</name>
         <x>168</x>
-        <y>578</y>
+        <y>650</y>
         <width>100</width>
         <height>24</height>
         <visible>True</visible>
@@ -544,7 +550,7 @@
         <class>GtkPandaEntry</class>
         <name>KBNCD</name>
         <x>280</x>
-        <y>578</y>
+        <y>650</y>
         <width>100</width>
         <height>24</height>
         <visible>True</visible>
@@ -571,7 +577,7 @@
         <class>GtkNumberEntry</class>
         <name>ITEMCD</name>
         <x>392</x>
-        <y>578</y>
+        <y>650</y>
         <width>100</width>
         <height>24</height>
         <sensitive>True</sensitive>
@@ -594,7 +600,7 @@
         <class>GtkLabel</class>
         <name>NAME</name>
         <x>504</x>
-        <y>578</y>
+        <y>650</y>
         <width>500</width>
         <height>24</height>
         <visible>True</visible>
@@ -612,8 +618,8 @@
       <widget>
         <class>GtkPandaEntry</class>
         <name>YUKOSTYMD</name>
-        <x>168</x>
-        <y>662</y>
+        <x>696</x>
+        <y>682</y>
         <width>100</width>
         <height>24</height>
         <visible>True</visible>
@@ -621,6 +627,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <editable>True</editable>
+        <max_length>9</max_length>
         <text></text>
         <input_mode>XIM</input_mode>
         <xim_enabled>False</xim_enabled>
@@ -638,8 +645,8 @@
       <widget>
         <class>GtkLabel</class>
         <name>label7</name>
-        <x>280</x>
-        <y>662</y>
+        <x>808</x>
+        <y>682</y>
         <width>40</width>
         <height>24</height>
         <visible>True</visible>
@@ -657,8 +664,8 @@
       <widget>
         <class>GtkPandaEntry</class>
         <name>YUKOEDYMD</name>
-        <x>328</x>
-        <y>662</y>
+        <x>856</x>
+        <y>682</y>
         <width>100</width>
         <height>24</height>
         <visible>True</visible>
@@ -666,7 +673,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <editable>True</editable>
-        <max_length>8</max_length>
+        <max_length>9</max_length>
         <text></text>
         <input_mode>XIM</input_mode>
         <xim_enabled>False</xim_enabled>
@@ -685,7 +692,7 @@
         <class>GtkPandaCombo</class>
         <name>ATAI_COMBO</name>
         <x>168</x>
-        <y>620</y>
+        <y>682</y>
         <width>500</width>
         <height>24</height>
         <value_in_list>False</value_in_list>

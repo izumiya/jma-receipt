@@ -38,6 +38,20 @@ path	key1		{
 	};
 };
 
+path	key2		{ 	
+	DBSELECT	{
+		DECLARE tbl_syskanri_value_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syskanri_value
+		WHERE 	HOSPNUM    =   :HOSPNUM
+		AND	KANRICD    =   :KANRICD
+		AND	KBNCD      =   :KBNCD
+		AND	ITEMCD     =   :ITEMCD
+		ORDER BY YUKOSTYMD
+		;
+	};
+};
+
 path	upd1	{ 	
 	DBUPDATE	{
 		UPDATE	tbl_syskanri_value 
