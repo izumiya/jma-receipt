@@ -347,3 +347,35 @@ path	upd1	{
 	};
 };
 
+path	key16		{ 	
+	DBSELECT	{
+		DECLARE tbl_rececom_key16_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rececom
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     SRYYM     =   :SRYYM
+			AND     NYUGAIKBN =   :NYUGAIKBN
+			AND     SJKBN     =   :SJKBN
+			ORDER BY HKNCOMBI,SRYDD,RENNUM
+		;
+	};
+};
+
+path	key17		{ 	
+	DBSELECT	{
+		DECLARE tbl_rececom_key17_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rececom
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     SRYYM     =   :SRYYM
+			AND     NYUGAIKBN =   :NYUGAIKBN
+			AND     SRYDD     =   :SRYDD
+			AND     SJKBN     =   :SJKBN
+			ORDER BY HKNCOMBI,SJKBN,RENNUM
+		;
+	};
+};
+
+

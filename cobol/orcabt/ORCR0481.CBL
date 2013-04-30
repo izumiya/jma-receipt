@@ -92,6 +92,7 @@
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
       *  04.06.03    NACL-門脇    13/04/11  実日数９９９の療養期間編集修正
+      *  04.06.04    NACL-藤原    13/04/30  「傷病の経過」記載対応
       *
       *  04.07.01    NACL-藤原    11/09/02  労災請求書作成対応
       *  04.07.02    NACL-藤原    12/01/24  monpe-0.6.20対応
@@ -1188,8 +1189,12 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            PERFORM 320-HC101-BYOMEI-HEN-SEC
       *
       *    帳票編集<傷病の経過>処理
-           IF      WRK-PARA-RECECOM    =   "0"
-               PERFORM 360-HC101-COMMENT-HEN-SEC
+           IF      RECE41-SRYYM        <   201307
+               IF      WRK-PARA-RECECOM    =   "0"
+                   PERFORM 360-HC101-COMMENT-HEN-SEC
+               END-IF
+           ELSE
+               PERFORM 360-COMMENT-HENSYU-SEC
            END-IF 
       *
       *    帳票編集<手術歴>処理
@@ -1199,9 +1204,13 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            PERFORM 340-HC101-ZAI-HEN-SEC
       *
       *    帳票編集<傷病の経過>処理
-           IF      WRK-PARA-RECECOM    =   "1"
+           IF      RECE41-SRYYM        <   201307
+               IF      WRK-PARA-RECECOM    =   "1"
+                   PERFORM 360-HC101-COMMENT-HEN-SEC
+               END-IF
+           ELSE
                PERFORM 360-HC101-COMMENT-HEN-SEC
-           END-IF 
+           END-IF
       *
       *    帳票編集<適用（金額）>処理
            PERFORM 350-HC101-ZAI-HEN1-SEC
@@ -2091,6 +2100,26 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            EXIT.
       *
       *****************************************************************
+      *    帳票編集<傷病の経過>処理
+      *****************************************************************
+       360-COMMENT-HENSYU-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  WRK-RECECOM
+                                           WRK-KEIKA-LINE
+           MOVE    ZERO                TO  FLG-RECECOM-SJKBN
+           MOVE    SPACE               TO  WRK-RECECOM-NAME 
+                                           WRK-RECECOM-SJKBN
+      *     
+      *    適用欄コメント     
+           MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
+           MOVE    "key16"             TO  WRK-MCP-PATHNAME
+           PERFORM 3601-RECECOM-HENSYU-SEC
+      *     
+           .
+       360-COMMENT-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    帳票編集<コメント>処理
       *****************************************************************
        360-HC101-COMMENT-HEN-SEC      SECTION.
@@ -2102,7 +2131,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                                            WRK-RECECOM-SJKBN
       *
       *    適用欄に記載するときの設定
-           IF      WRK-PARA-RECECOM    =   "1"
+           IF    ( WRK-PARA-RECECOM    =   "1"    )
+           OR    ( RECE41-SRYYM        >=  201307 )
                MOVE    WRK-KEIKA-HC21-LINE     TO  WRK-KEIKA-LINE
            END-IF
       *     
@@ -2139,6 +2169,9 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            MOVE    RECE41-SRYYM        TO  RECECOM-SRYYM
            MOVE    RECE41-PTID         TO  RECECOM-PTID
            MOVE    RECE41-NYUGAIKBN    TO  RECECOM-NYUGAIKBN
+           IF      WRK-MCP-PATHNAME    =   "key16"
+               MOVE    "AA"                TO  RECECOM-SJKBN
+           END-IF
       *
            MOVE    RECECOM-REC         TO  MCPDATA-REC
            MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
