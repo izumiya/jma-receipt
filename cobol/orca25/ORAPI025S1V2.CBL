@@ -793,6 +793,10 @@
                WHEN    "52"
                    MOVE    "ÇÑÍÑ¾É¸õ·²¤Ë·¸¤ëÉ¾²ÁÉ½"
                                                TO  WRK-SJKBN-NAME
+      *H25.7
+               WHEN    "AA"
+                   MOVE    "Ï«ºÒ¥ì¥»¥×¥È¡Ö½ýÉÂ¤Î·Ð²á¡×"
+                                               TO  WRK-SJKBN-NAME
                WHEN    OTHER
       *        ¥¨¥é¡¼
                    MOVE    "13"                TO  WRK-ERRCD

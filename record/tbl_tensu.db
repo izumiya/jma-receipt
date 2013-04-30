@@ -1608,3 +1608,18 @@ path	key01gj 	{
 	};
 };
 
+
+path	key32   	{
+	DBSELECT	{
+		DECLARE tbl_tensu_key32_csr CURSOR FOR
+		SELECT *
+		FROM tbl_tensu
+			WHERE HOSPNUM    =   :HOSPNUM
+                        AND   SRYCD      LIKE :SRYCD
+                        AND   IDOKANREN  LIKE :IDOKANREN
+			ORDER  BY  SRYCD,
+				   YUKOSTYMD
+		;
+	};
+};
+

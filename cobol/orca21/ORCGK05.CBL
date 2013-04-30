@@ -6926,7 +6926,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    "セットコードが存在します。修正をしますか？"
                                        TO  WRK-KIDMSG
                WHEN    "0004"
-                   STRING  "ＯＫで約束セットの追加登録をします。"
+                   STRING  "ＯＫでセットの追加登録をします。"
                                        DELIMITED   BY  SIZE
                            "よろしいですか？"
                                        DELIMITED   BY  SIZE

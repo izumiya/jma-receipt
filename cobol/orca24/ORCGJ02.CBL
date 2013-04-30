@@ -67,6 +67,8 @@
       *  04.07.00    NACL-多々納  11/08/XX  算定履歴付加情報削除対応
       *  04.07.00    NACL-多々納  11/09/XX  院外処方点数表示対応
       *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
+      *  04.07.00    NACL-多々納  13/02/06  レセ電データ移行対応
+      *  04.07.00    NACL-多々納  13/04/XX  労災レセ電コード変換対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -632,6 +634,10 @@
       *
       *    保険別算定履歴テーブル
            COPY    "CMSANTEITBL.INC".
+      *!!
+      *H25.7
+      *    労災コード置換えテーブル 
+           COPY   "CMRSICNGTBL.INC".
       *
       *    受診履歴
        01  WRK-JYURRK-REC.
@@ -3281,9 +3287,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        =   "1"   )  AND
                   (TNS-DATAKBN         =   "1"   )  AND
                   (TNS-GAIKANRIKBN     =   1     )  AND
-                  (TNS-TEN             =   SPA-NAI-SYUTEN2(IDX)) AND
-                  (TNS-TEN             <   WRK-RSAI-GAIRAITEN )
-               MOVE    1               TO  FLG-RSIGAIRAI
+      ********    (TNS-TEN             =   SPA-NAI-SYUTEN2(IDX)) AND
+      ********    (TNS-TEN             <   WRK-RSAI-GAIRAITEN )
+      *H25.5
+                  (SPA-NAI-SYUTEN2(IDX)    >   ZERO )
+               IF     ((TNS-TEN            =   SPA-NAI-SYUTEN2(IDX)) AND
+                       (TNS-TEN            <   WRK-RSAI-GAIRAITEN ))
+      *          読み替え手技区分対応
+                 OR   ( SRY-MEISKYFLG (IDZ) =   "R"    )
+                   MOVE    1               TO  FLG-RSIGAIRAI
+               END-IF
            END-IF
       *!!!
       *    コメント以外の最終行セット
@@ -7018,6 +7031,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     (SYU-SRYYMD      NOT =   SPA-NAI-HENSRYYMD) AND
                   (FLG-SYUNOU          =   ZERO   )
                MOVE    SPA-NAI-HENSRYYMD   TO  SYU-SRYYMD
+               MOVE    SPA-NAI-HENSRYYMD   TO  SYU-SKYSTYMD
       *
                MOVE    SMCNDATE-YMD        TO  SYU-UPYMD
                MOVE    SMCNDATE-HMS        TO  SYU-UPHMS
@@ -8320,6 +8334,25 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
            END-SEARCH
       *
+      *H25.7
+      *    労災保険コード変更
+           IF     (WRK-SRYCD(1:3)      =   "101"    )   AND
+                  (ACCT-SRYYM          >=  "201307" )
+               PERFORM 4200111-RSICD-SANTEI-CHK-SEC
+           END-IF
+      *
+      *    労災保険判定
+           MOVE    SPACE               TO  WRK-RSI-HKNKBN
+           PERFORM VARYING     IDH     FROM    1   BY  1
+                   UNTIL       IDH     >   SPA-HKN-MAX
+               IF      SPA-GMN-THKNCOMBINUM (IDH)
+                                           =   ACCT-HKNCOMBI
+                   MOVE    SPA-NAI-THKNKBN (IDH)
+                                               TO  WRK-RSI-HKNKBN
+                   MOVE    SPA-HKN-MAX         TO  IDH
+               END-IF
+           END-PERFORM
+      *
       *    算定履歴検索
            MOVE    SPACE               TO  SANTEI-REC
            INITIALIZE                  SANTEI-REC
@@ -8343,7 +8376,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-EVALUATE
       *
            IF     (FLG-HKNSAN          =   1   )  AND
-                  (SPA-NAI-HKNKBN  NOT =   ZERO)
+                  (WRK-RSI-HKNKBN  NOT =   SPACE )
                MOVE     ACCT-HKNCOMBI      TO  SANTEI-HKNCOMBINUM
            ELSE
                MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
@@ -8382,6 +8415,37 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        4200111-SANTEI-DEL-EXT.
+           EXIT.
+      *
+      *H25.4
+      *****************************************************************
+      *    労災コード保険毎のコードの判定処理
+      *****************************************************************
+       4200111-RSICD-SANTEI-CHK-SEC      SECTION.
+      *
+      *    労災のコードの判定
+           SET     TBL-RCN             TO  1
+           SEARCH  TBL-RSICHG-OCC      VARYING   TBL-RCN
+               AT  END
+                   MOVE    SPACE           TO  WRK-RSI-KBN
+               WHEN    WRK-SRYCD       =   TBL-RSICHG-ATO-SRYCD
+                                                          (TBL-RCN)
+                   MOVE    TBL-RSICHG-KBN (TBL-RCN)
+                                           TO  WRK-RSI-KBN
+           END-SEARCH
+      *
+           IF      WRK-RSI-KBN         =   "R"
+               MOVE    1               TO  FLG-HKNSAN
+           ELSE
+               IF      WRK-RSI-KBN         =   "A"
+                   MOVE    1               TO  FLG-HKNSAN
+               ELSE
+                   MOVE    ZERO            TO  FLG-HKNSAN
+               END-IF
+           END-IF
+      *
+           .
+       4200111-RSICD-SANTEI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    剤のない受診履歴の削除処理
@@ -12877,6 +12941,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *        発生年月日＋３月
       *        発生日を求める
       *        救急医療管理加算のチェック
+      *        　(2004.4から使用なし　労災コード変更対応なし）
                MOVE    SPACE               TO  WRK-HASSYOYMD
                MOVE    "101110030"         TO  WRK-SRYCD
                PERFORM 51011-SANTEI-CHK-SEC

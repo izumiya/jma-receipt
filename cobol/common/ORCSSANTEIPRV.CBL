@@ -35,6 +35,7 @@
       *  03.05.00    NACL-多々納  07/05/08  グループ診療対応
       *  03.05.01    NACL-竹田　  08/02/12  再作成(オリジナルより)
       *  04.05.00    NACL-多々納  10/03/15  平成２２年４月改正対応
+      *  04.07.00    NACL-多々納  13/02/XX  労災レセ電コード対応(H25.7)
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -141,6 +142,9 @@
            COPY   "CMSANTEITBL.INC".
       *    リハビリ同一算定コードテーブル
            COPY   "CMRIHACDTBL.INC".
+      *H25.7
+      *    労災コード置換えテーブル 
+           COPY   "CMRSICNGTBL.INC".
       *
       *    算定履歴
        01  WRK-SANTEI-REC.
@@ -864,6 +868,12 @@
                    MOVE    SPACE           TO  WRK-RIGAKU-RYO
                END-IF
            END-IF
+      *H25.7
+      *    労災保険コード変更
+           IF     (WRK-SRYCD(1:3)      =   "101"    )   AND
+                  (SSANTEI-SRYYMD      >=  "20130701" )
+               PERFORM 10009-RSICD-SANTEI-CHK-SEC
+           END-IF
       *    Ｈ２２年４月から追加のコードは固定で判定
       *     (COPY に追加するのは、パッケージ対応で）
            IF      WRK-SRYCD           =   "099800181"
@@ -954,6 +964,38 @@
            .
        10011-RIHAKANRI-SYORI-EXT.
            EXIT.
+      *
+      *H25.7
+      *****************************************************************
+      *    労災コード保険毎のコードの判定処理
+      *****************************************************************
+       10009-RSICD-SANTEI-CHK-SEC      SECTION.
+      *
+      *    労災のコードの判定
+           SET     TBL-RCN             TO  1
+           SEARCH  TBL-RSICHG-OCC      VARYING   TBL-RCN
+               AT  END
+                   MOVE    SPACE           TO  WRK-RSI-KBN
+               WHEN    WRK-SRYCD       =   TBL-RSICHG-ATO-SRYCD
+                                                          (TBL-RCN)
+                   MOVE    TBL-RSICHG-KBN (TBL-RCN)
+                                           TO  WRK-RSI-KBN
+           END-SEARCH
+      *
+           IF      WRK-RSI-KBN         =   "R"
+               MOVE    1               TO  FLG-HKNSAN
+           ELSE
+               IF      WRK-RSI-KBN         =   "A"
+                   MOVE    1               TO  FLG-HKNSAN
+               ELSE
+                   MOVE    ZERO            TO  FLG-HKNSAN
+               END-IF
+           END-IF
+      *
+           .
+       10009-RSICD-SANTEI-CHK-EXT.
+           EXIT.
+      *!!!!!!!!!!!!!! 
       *
       *****************************************************************
       *     新規、変更処理

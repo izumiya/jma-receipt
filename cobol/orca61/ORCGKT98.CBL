@@ -31,6 +31,7 @@
       *                                     入力ＣＤ表示追加
       *  04.07.00    NACL-多々納  12/04/18  一般名称検索対応
       *  04.07.00    NACL-多々納  12/07/09  労災等名称編集追加
+      *  04.07.00    NACL-多々納  13/03/01  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -520,6 +521,9 @@
            MOVE    "4:コメント"        TO  SPA-KT98-USERLST (4)
            MOVE    "5:労災"            TO  SPA-KT98-USERLST (5)
            MOVE    "6:システム予約"    TO  SPA-KT98-USERLST (6)
+           IF      SPA-SRYYMD          >=  "20130701"
+               MOVE    "7:労災（合成）"    TO  SPA-KT98-USERLST (7)
+           END-IF
            MOVE    SPACE               TO  SPA-KT98-USER-G
       *
            MOVE    SPA-KT98-GMN-SYORI   TO  SPA-KT98-OLD-SYORI
@@ -1778,6 +1782,35 @@
                        MOVE    1               TO  FLG-CHK
                    END-IF
                END-IF
+      *H25.7
+      *        労災の合成コード対象外
+               IF      SPA-KT98-GMN-SYORI3      =   "U5"
+                   IF     (TNS-SRYCD(1:1)           =   "1")
+                   AND    (TNS-DATAKBN              =   "1")
+                   AND    (TNS-KOKUJISKBKBN1        =   3  )
+                       MOVE    1               TO  FLG-CHK
+                       IF     SPA-KT98-GMN-ALL      =   "1"
+                          MOVE    ZERO             TO  FLG-CHK
+                       END-IF
+                   END-IF
+               END-IF
+      *        労災の合成コードのみ
+               IF      SPA-KT98-GMN-SYORI3      =   "U7"
+                   IF     (TNS-SRYCD(1:1)           =   "1")
+                   AND    (TNS-DATAKBN              =   "1")
+                   AND    (TNS-KOKUJISKBKBN1        =   3  )
+                       CONTINUE
+                   ELSE
+                       MOVE    1               TO  FLG-CHK
+                   END-IF
+               END-IF
+      *        労災の外来管理加算（読替）は対象外（レセプト自動記載）
+               IF     (TNS-SRYCD(1:3)           =   "101" )
+               AND    (TNS-SRYKBN           NOT =   "12" )
+               AND    (TNS-GAIKANRIKBN          =   2    )
+                   MOVE    1               TO  FLG-CHK
+               END-IF
+      *
       *
                IF      FLG-CHK             =   ZERO
                    ADD     1               TO  IDX2
@@ -1912,6 +1945,13 @@
                    MOVE    "099000000"          TO  TNS-SRYCD
                    MOVE    "099999999"          TO  TNSUP-SRYCD
                    MOVE    "1"                  TO  SPA-KT98-GMN-ALL
+      *H25.7
+               WHEN    "U7"
+      *            労災診察
+                   MOVE    "key12s"             TO  WRK-PATH
+                   MOVE    "100000000"          TO  TNS-SRYCD
+                   MOVE    "109999999"          TO  TNSUP-SRYCD
+      *TEST
       *TEST
                WHEN    "JK"
       *            自院・器材
@@ -2443,6 +2483,20 @@
                        WHEN    "U5"
                            MOVE    "労災"
                                                TO  KT98-SENTAKU
+      *H25.7
+                           IF     (SPA-SRYYMD      >=  "20130701")
+                               IF     (SPA-KT98-GMN-ALL     =   "1" )
+                                   MOVE    "労災（合成コード含む）"
+                                               TO  KT98-SENTAKU
+                               ELSE
+                                   MOVE    "労災（合成コード以外）"
+                                               TO  KT98-SENTAKU
+                               END-IF
+                           END-IF
+                       WHEN    "U7"
+                           MOVE    "労災合成コード"
+                                               TO  KT98-SENTAKU
+      *
                        WHEN    "U6"
                            MOVE    "システム予約コード"
                                                TO  KT98-SENTAKU
@@ -3808,6 +3862,8 @@
                    MOVE    "U5"            TO  SPA-KT98-GMN-SYORI3
                WHEN    "6"
                    MOVE    "U6"            TO  SPA-KT98-GMN-SYORI3
+               WHEN    "7"
+                   MOVE    "U7"            TO  SPA-KT98-GMN-SYORI3
                WHEN    OTHER
                    MOVE    "0011"          TO  SPA-ERRCD
                    GO      TO      41014-USER-CHK-EXT

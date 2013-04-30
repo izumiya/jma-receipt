@@ -72,8 +72,7 @@
       *  04.07.00    NACL-多々納  12/01/10  新生児２８日判定修正
       *  04.07.00    NACL-多々納  12/03/XX  平成２４年４月改正対応
       *  04.07.00    NACL-多々納  12/09/14  器材、コメントチェックマスタ対応
-      *  04.07.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
-      *                                     労災レセ電コード対応(H25.7)
+      *  04.07.00    NACL-多々納  13/02/XX  労災レセ電コード対応(H25.7)
       *****************************************************************
       *
       *
@@ -2579,9 +2578,6 @@
       *****************************************************************
        10001-RSICD-SANTEI-CHK-SEC      SECTION.
       *
-      *!!!!!! 未対応
-           GO         TO  10001-RSICD-SANTEI-CHK-EXT
-      *!!!!!!
       *    労災のコードの判定
            SET     TBL-RCN             TO  1
            SEARCH  TBL-RSICHG-OCC      VARYING   TBL-RCN
@@ -3506,7 +3502,20 @@
        20088-RSIJIB-CHK-SEC        SECTION.
       *
       *    包括まとめ入力は以下対象外
-          IF      SPA-HKNCOMBINUM     =   "9999"
+           IF      SPA-HKNCOMBINUM     =   "9999"
+               GO      TO      20088-RSIJIB-CHK-EXT
+           END-IF
+      *
+      *H25.4
+      *    労災の外来管理加算（読替）（レセプト自動記載なのでエラー）
+           IF     (LNK-SC92-SRYCD(1:3)     =   "101" )
+           AND    (TNS-SRYKBN           NOT =   "12" )
+           AND    (TNS-GAIKANRIKBN          =   2    )
+               MOVE    "8052"              TO  LNK-SC92-ERRCD8
+           END-IF
+      *
+      *    セット登録は以下対象外
+           IF      LNK-SC92-PG         =   "K05"
                GO      TO      20088-RSIJIB-CHK-EXT
            END-IF
       *
@@ -3514,27 +3523,27 @@
            IF     (LNK-SC92-SRYCD (1:1)    =   "1"  )  AND
                   (LNK-SC92-SRYCD (2:2)    =   "01" )
                IF     (SPA-HKNKBN          NOT =   1 )
-      ********    OR  (SPA-RSI-HKNKBN          =   "5" )
                   OR  (SPA-RSI-JUNKYO          =   "1" )
-                   MOVE    "8000"              TO  SPA-ERRCD
+      ************ MOVE    "8000"              TO  SPA-ERRCD
+                   MOVE    "8000"              TO  LNK-SC92-ERRCD8
                END-IF
            END-IF
       *    労災（器材）
            IF     (LNK-SC92-SRYCD (1:1)    =   "7"  )  AND
                   (LNK-SC92-SRYCD (2:5)    =   "88888")
                IF     (SPA-HKNKBN          NOT =   1 )
-      *******     OR  (SPA-RSI-HKNKBN          =   "5" )
                   OR  (SPA-RSI-JUNKYO          =   "1" )
-                   MOVE    "8000"              TO  SPA-ERRCD
+      ************ MOVE    "8000"              TO  SPA-ERRCD
+                   MOVE    "8000"              TO  LNK-SC92-ERRCD8
                END-IF
            END-IF
       *    労災（コメント）
            IF     (LNK-SC92-SRYCD (1:1)    =   "8"  )  AND
                   (LNK-SC92-SRYCD (4:1)    =   "8"  )
                IF     (SPA-HKNKBN          NOT =   1 )
-     ***********  OR  (SPA-RSI-HKNKBN          =   "5" )
                   OR  (SPA-RSI-JUNKYO          =   "1" )
-                   MOVE    "8000"              TO  SPA-ERRCD
+      ************ MOVE    "8000"              TO  SPA-ERRCD
+                   MOVE    "8000"              TO  LNK-SC92-ERRCD8
                END-IF
            END-IF
       *
@@ -3542,7 +3551,8 @@
            IF      LNK-SC92-SRYCD          =   "099509901"
                IF     (SPA-HKNKBN          NOT =   1   )
                   OR  (SPA-RSI-JUNKYO          =   "1" )
-                   MOVE    "8000"              TO  SPA-ERRCD
+      ************ MOVE    "8000"              TO  SPA-ERRCD
+                   MOVE    "8000"              TO  LNK-SC92-ERRCD8
                END-IF
            END-IF
       *
@@ -3551,7 +3561,8 @@
            IF     (LNK-SC92-SRYCD (1:1)    =   "1"  )  AND
                   (LNK-SC92-SRYCD (2:2)    =   "02" )
                IF     (SPA-HKNKBN          NOT =   2 )
-                   MOVE    "8100"              TO  SPA-ERRCD
+      ************ MOVE    "8100"              TO  SPA-ERRCD
+                   MOVE    "8100"              TO  LNK-SC92-ERRCD8
                END-IF
            END-IF
            .
@@ -3758,6 +3769,13 @@
                END-IF
            ELSE
                MOVE    SPACE               TO  SPA-GMN-TANINAME (IDX-T)
+           END-IF
+      *H25.2
+      *    自賠責特定コードの単位
+           IF     (SPA-COM-INPUTCD (IDX-T)(1:5)    =   "09593" )
+              AND (TNS-TANICD                   NOT =   ZERO   )
+               PERFORM 3004-TANI-HENSYU-SEC
+               MOVE    WRK-TANINAME        TO  SPA-GMN-TANINAME (IDX-T)
            END-IF
       *
       *    診療種別区分

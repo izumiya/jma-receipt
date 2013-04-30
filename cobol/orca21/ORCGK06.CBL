@@ -1188,12 +1188,12 @@
       *        がん患者リハ開始日・終了日
                MOVE    1               TO  FLG-HKNSAN
            END-IF
-      *H25.7　まだ
+      *H25.7
       *    労災保険コード変更
-      *    IF     (WRK-SRYCD(1:3)      =   "101"      )  AND
-      *           (SPA-NAI-SRYYM       >=  "201307"   )
-      *        PERFORM 10001-RSICD-SANTEI-CHK-SEC
-      *    END-IF
+           IF     (WRK-SRYCD(1:3)      =   "101"      )  AND
+                  (SPA-NAI-SRYYM       >=  "201307"   )
+               PERFORM 10001-RSICD-SANTEI-CHK-SEC
+           END-IF
       *
            .
        1000-SANTEI-CHK-EXT.

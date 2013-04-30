@@ -1383,7 +1383,7 @@
       *    º´«Â¿’¥µº‘¿¡µ·∂Ë ¨
            MOVE    P02D-JIBAISEIKBN    TO  SPA-GMN2D-JIBAISEIKBN-G
       *
-           MOVE    P02D-HIHKNJANAME    TO  SPA-GMN2D-HIHKNJANAME
+      *****MOVE    P02D-HIHKNJANAME    TO  SPA-GMN2D-HIHKNJANAME
            MOVE    P02D-KOHNUM1        TO  SPA-GMN2D-KOHNUM1
            MOVE    P02D-KOHNUM2        TO  SPA-GMN2D-KOHNUM2
       *    •≥•·•Û•»

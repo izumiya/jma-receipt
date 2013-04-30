@@ -366,6 +366,10 @@
                            WHEN    "3"
                                MOVE    "2"         TO  TBL-MAE-INPUTKBN
                                                              (IDX-SIN)
+      *H25.3
+                           WHEN    "R"
+                               MOVE    "R"         TO  TBL-MAE-INPUTKBN
+                                                             (IDX-SIN)
                        END-EVALUATE
       *
                        IF     (SRY-SRYCD (IDX2)(1:1)   =   "8" ) OR

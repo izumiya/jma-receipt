@@ -48,6 +48,7 @@
       *  04.06.00    NACL-多々納  10/12/XX  週回数対応
       *  04.07.00    NACL-多々納  11/11/28  同日再入院対応
       *                                     継続初回入院日対応
+      *  04.07.00    NACL-多々納  13/02/XX  労災レセ電コード対応(H25.7)
       *****************************************************************
       *
       *
@@ -142,6 +143,7 @@
            03  WRK-RIGAKU-KBN          PIC X(01). 
       *    労災のリハビリ件数
            03  WRK-RSI-CNT             PIC 9(04).
+           03  WRK-RSI-SRYCD           PIC X(09).
       *
            03  WRK-CHK-SRYCD           PIC X(09).
            03  WRK-CHK-SRYYMD.
@@ -328,6 +330,9 @@
            COPY   "CMSANTEITBL.INC".
       *    リハビリ同一算定コードテーブル
            COPY   "CMRIHACDTBL.INC".
+      *H25.7
+      *    労災コード置換えテーブル 
+           COPY   "CMRSICNGTBL.INC".
       *
       *   日付変換サブ
            COPY    "CPORCSDAY.INC".
@@ -586,6 +591,13 @@
                    MOVE    SPACE           TO  WRK-RSI-KBN
                END-IF
            END-IF
+      *H25.7
+      *    労災保険コード変更
+           IF     (WRK-SRYCD(1:3)      =   "101"      )  AND
+                  (SPA-SRYYMD          >=  "20130701" )
+               PERFORM 10001-RSICD-SANTEI-CHK-SEC
+           END-IF
+      *
       *    Ｈ２２年４月から追加のコードは固定で判定
       *     (COPY に追加するのは、パッケージ対応で）
            IF      WRK-SRYCD           =   "099800181"
@@ -612,6 +624,36 @@
            .
        1000-SANTEI-CHK-EXT.
            EXIT.
+      *H25.7
+      *****************************************************************
+      *    労災コード保険毎のコードの判定処理
+      *****************************************************************
+       10001-RSICD-SANTEI-CHK-SEC      SECTION.
+      *
+      *    労災のコードの判定
+           SET     TBL-RCN             TO  1
+           SEARCH  TBL-RSICHG-OCC      VARYING   TBL-RCN
+               AT  END
+                   MOVE    SPACE           TO  WRK-RSI-KBN
+               WHEN    WRK-SRYCD           =   TBL-RSICHG-ATO-SRYCD
+                                                          (TBL-RCN)
+                   MOVE    TBL-RSICHG-KBN (TBL-RCN)
+                                           TO  WRK-RSI-KBN
+           END-SEARCH
+      *
+           IF      WRK-RSI-KBN         =   "R"
+               MOVE    1               TO  FLG-HKNSAN
+           ELSE
+               IF      WRK-RSI-KBN         =   "A"
+                   MOVE    1               TO  FLG-HKNSAN
+               ELSE
+                   MOVE    ZERO            TO  FLG-HKNSAN
+               END-IF
+           END-IF
+           .
+       10001-RSICD-SANTEI-CHK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    算定回数チェック処理
@@ -1058,6 +1100,15 @@
            IF      FLG-SANTEI          =   1
                INITIALIZE              SANTEI-REC
            END-IF
+      *H25.7
+      *    労災コード変更前コードでの検索
+           IF     (WRK-SRYCD(1:3)      =   "101"      )
+             AND  (SPA-SRYYMD          >=  "20130701" )
+             AND  (WRK-RSI-KBN         =   "R"        )
+             AND  (FLG-SANTEI          =    1         )
+             AND  (SPA-COB-TEKSTYMD    <   "20130701" )
+               PERFORM 10011-RSICD-SANTEI-YMD-SEC
+           END-IF
       *
       *    算定歴の回数をチェックする
            IF      TNS-JGNCNT          >   ZERO
@@ -1149,6 +1200,57 @@
       *
            .
        1001-SANTEI-YMD-EXT.
+           EXIT.
+      *****************************************************************
+      *    労災コード変更前コードでの検索処理
+      *****************************************************************
+       10011-RSICD-SANTEI-YMD-SEC      SECTION.
+      *
+      *    変更前の労災コード判定
+           SET     TBL-RCN             TO  1
+           SEARCH  TBL-RSICHG-OCC      VARYING   TBL-RCN
+               AT  END
+                   MOVE    SPACE           TO  WRK-RSI-SRYCD
+               WHEN    WRK-SRYCD           =   TBL-RSICHG-ATO-SRYCD
+                                                          (TBL-RCN)
+                   MOVE    TBL-RSICHG-MAE-SRYCD (TBL-RCN)
+                                           TO  WRK-RSI-SRYCD
+           END-SEARCH
+      *
+           IF      WRK-RSI-SRYCD   NOT =   SPACE
+      *        算定履歴検索
+               INITIALIZE                  SANTEI-REC
+               MOVE    SPA-HOSPNUM         TO  SANTEI-HOSPNUM
+               MOVE    SPA-PTID            TO  SANTEI-PTID
+               MOVE    SPA-SRYYMD (1:6)    TO  SANTEI-SRYYM
+               MOVE    WRK-RSI-SRYCD       TO  SANTEI-SRYCD
+               MOVE    ZERO                TO  SANTEI-NYUGAIKBN
+               MOVE    ZERO                TO  SANTEI-SRYKA
+               MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
+      *
+      *        労災毎の算定
+               MOVE    "key3"              TO  WRK-ORC-DBPATH
+      *
+               MOVE    SANTEI-REC          TO  MCPDATA-REC
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_santei"        TO  MCP-TABLE
+                   MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
+                   PERFORM 920-SANTEI-READ-SEC
+               ELSE
+                   MOVE    1                   TO  FLG-SANTEI
+                   INITIALIZE                      SANTEI-REC
+               END-IF
+      *
+               MOVE    "tbl_santei"        TO  MCP-TABLE
+               MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+           END-IF
+      *
+           .
+       10011-RSICD-SANTEI-YMD-EXT.
            EXIT.
       *****************************************************************
       *    週数処理
