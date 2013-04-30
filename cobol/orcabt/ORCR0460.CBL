@@ -141,8 +141,11 @@
       *                                     「再診」の対応
       *                                     「その他」の対応
       *  04.05.09    NACL-門脇    13/01/22  ワーク領域拡張
+      *
       *  04.06.01    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
       *                                     レセプト記載対応
+      *  04.06.02    NACL-門脇    13/02/18  労災レセ電対応
+      *                                     （新診療行為コード対応）
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
       *****************************************************************
       *
@@ -553,18 +556,18 @@
       *          
        01  TBL-ZAIW-AREA.
       *    剤の先頭の診療コード
-           03  TBL-ZAIW-SRYCD1             PIC X(09).
+           03  WRK-ZAIW-SRYCD1             PIC X(09).
       *    剤の先頭の診療コードの各種番号等情報
-           03  TBL-ZAIW-CDKBN-AREA.
-               05  TBL-ZAIW-CDKBN-KBN          PIC X(01).
-               05  TBL-ZAIW-CDKBN-SYO          PIC 9(01).
-               05  TBL-ZAIW-CDKBN-BU           PIC 9(02).
-               05  TBL-ZAIW-CDKBN-KBNNUM       PIC 9(03).
-               05  TBL-ZAIW-CDKBN-KBNNUM-EDA   PIC 9(02).
-               05  TBL-ZAIW-CDKBN-KOUBAN       PIC 9(02).
-               05  TBL-ZAIW-KOUHYOJYUNNUM      PIC 9(09).
+           03  WRK-ZAIW-CDKBN-AREA.
+               05  WRK-ZAIW-CDKBN-KBN          PIC X(01).
+               05  WRK-ZAIW-CDKBN-SYO          PIC 9(01).
+               05  WRK-ZAIW-CDKBN-BU           PIC 9(02).
+               05  WRK-ZAIW-CDKBN-KBNNUM       PIC 9(03).
+               05  WRK-ZAIW-CDKBN-KBNNUM-EDA   PIC 9(02).
+               05  WRK-ZAIW-CDKBN-KOUBAN       PIC 9(02).
+               05  WRK-ZAIW-KOUHYOJYUNNUM      PIC 9(09).
       *    剤の先頭の診療コードの検査等実施判断情報
-           03  TBL-ZAIW-KNSJISKBN          PIC 9(01).
+           03  WRK-ZAIW-KNSJISKBN          PIC 9(01).
       *     
       *    診療行為別テーブル
       *    １：ユーザーコメント、２：コメント、
@@ -663,6 +666,8 @@
            03  FILLER          PIC X(09)   VALUE   "120000110".
       *    外来管理加算（３月以内）
            03  FILLER          PIC X(09)   VALUE   "101120070".
+      *    外来管理加算（３月以内）
+           03  FILLER          PIC X(09)   VALUE   "101120020".
       *    外来管理加算（３月超）（５回以内）
            03  FILLER          PIC X(09)   VALUE   "101120080".
       *    実日数算定
@@ -750,9 +755,9 @@
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   58.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   59.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   58.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   59.
       *
       *    固定値
        01  CONST-AREA.
@@ -1403,23 +1408,23 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                            CONTINUE
                          ELSE
                            MOVE    RECE45-SRYCD (IDX)
-                                                 TO  TBL-ZAIW-SRYCD1 
+                                                 TO  WRK-ZAIW-SRYCD1 
                            MOVE    RECE45-CDKBN-KBN(IDX)
-                                                 TO  TBL-ZAIW-CDKBN-KBN
+                                                 TO  WRK-ZAIW-CDKBN-KBN
                            MOVE    RECE45-CDKBN-SYO(IDX)
-                                                 TO  TBL-ZAIW-CDKBN-SYO
+                                                 TO  WRK-ZAIW-CDKBN-SYO
                            MOVE    RECE45-CDKBN-BU(IDX)
-                                                 TO  TBL-ZAIW-CDKBN-BU
+                                                 TO  WRK-ZAIW-CDKBN-BU
                            MOVE    RECE45-CDKBN-KBNNUM(IDX)
-                                         TO  TBL-ZAIW-CDKBN-KBNNUM
+                                         TO  WRK-ZAIW-CDKBN-KBNNUM
                            MOVE    RECE45-CDKBN-KBNNUM-EDA(IDX)
-                                         TO  TBL-ZAIW-CDKBN-KBNNUM-EDA
+                                         TO  WRK-ZAIW-CDKBN-KBNNUM-EDA
                            MOVE    RECE45-CDKBN-KOUBAN(IDX)
-                                         TO  TBL-ZAIW-CDKBN-KOUBAN
+                                         TO  WRK-ZAIW-CDKBN-KOUBAN
                            MOVE    RECE45-KOUHYOJYUNNUM(IDX)
-                                         TO  TBL-ZAIW-KOUHYOJYUNNUM
+                                         TO  WRK-ZAIW-KOUHYOJYUNNUM
                            MOVE    RECE45-KNSJISKBN(IDX)
-                                         TO  TBL-ZAIW-KNSJISKBN
+                                         TO  WRK-ZAIW-KNSJISKBN
                            MOVE    1             TO  WRK-RECE45
                          END-IF
                        END-IF
@@ -1747,12 +1752,23 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                    END-IF
       *
       *            ＊外来管理加算の場合
-                   IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                                         =   "101120070"  OR
-                                             "101120080"
+                   IF  ((TBL-ZAIW-SRYCD(WRK-WIDX1 WRK-WIDX2)
+                           =  "101120070" OR "101120080"     ) AND
+                        (RECE41-SRYYM   <=  "201306"         ))
+                   OR  ((TBL-ZAIW-SRYCD(WRK-WIDX1 WRK-WIDX2)
+                           =  "101120020"                    ) AND
+                        (RECE41-SRYYM   >=  "201307"         ))
                      IF  RECE41-GAIRAIKSN-PRTKBN   =   "1"
                          MOVE    ZERO          TO  FLG-NOPRT
                      END-IF
+                   END-IF
+                   IF  ((TBL-ZAIW-SRYCD(WRK-WIDX1 WRK-WIDX2)
+                           =  "101120070" OR "101120080"     ) AND
+                        (RECE41-SRYYM   >=  "201307"         ))
+                   OR  ((TBL-ZAIW-SRYCD(WRK-WIDX1 WRK-WIDX2)
+                           =  "101120020"                    ) AND
+                        (RECE41-SRYYM   <=  "201306"         ))
+                         MOVE    ZERO          TO  FLG-NOPRT
                    END-IF
       *            一つの剤に他の明細も存在する場合
       ***          IF  RECE44-MEISAISU       >   1
@@ -2127,7 +2143,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *
            COMPUTE WRK-ZAIWMAX (6)   =   WRK-ZAIWMAX  (6)     +   
                                          WRK-ZAIWMAX  (3) 
-           MOVE    TBL-ZAIW-SRYCD1   TO  TBL-ZAIW-SRYCD (3 1) 
+           MOVE    WRK-ZAIW-SRYCD1   TO  TBL-ZAIW-SRYCD (3 1) 
       *
            PERFORM 20052-SRYKBNELSE-CHECK-SEC
            .
@@ -2341,7 +2357,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                               OR  WRK-CONS-SAIKETSU3 
                    CONTINUE
                ELSE
-                   IF      TBL-ZAIW-KNSJISKBN  =  "2"
+                   IF      WRK-ZAIW-KNSJISKBN  =  "2"
                        CONTINUE
                    ELSE 
                        ADD     RECE44-ZAIKAISU   TO  WRK-KENSA-KAISU
@@ -2514,7 +2530,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
            MOVE    ZERO                TO  WRK-RECE44GJK-MAX
       *
            IF      ( RECE41-KENTAIKASANFLG   =   '1' )
-             AND   ( TBL-ZAIW-KNSJISKBN  NOT =   2 )
+             AND   ( WRK-ZAIW-KNSJISKBN  NOT =   2 )
              AND  (((RECE44-KNSJISGRPKBN     >   0)
              AND    (RECE44-KNSJISGRPKBN     <   7))
              OR     (RECE44-SRYCDTOTAL       =   WRK-CONS-NYOIPPAN-N))
@@ -3598,55 +3614,55 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                END-IF                                     
       *---------適用欄並び替え用の編集（表用番号等）-----------------
                IF      IDY               =   1
-                 IF       (TBL-ZAIW-SRYCD1(1:1)  =   "6"  OR  "7")
-                 OR       (TBL-ZAIW-SRYCD1(1:3)  =   "059"       )
+                 IF       (WRK-ZAIW-SRYCD1(1:1)  =   "6"  OR  "7")
+                 OR       (WRK-ZAIW-SRYCD1(1:3)  =   "059"       )
                  OR       (RECE44-SAFLG     NOT  =   SPACE       )
                  OR       (RECE44-ZAIKBN         =    1          )
                      MOVE    ALL "9"            TO
-                                            TBL-ZAIW-CDKBN-AREA
+                                            WRK-ZAIW-CDKBN-AREA
                      IF   (RECE44-SAFLG     NOT  =   SPACE)
                      OR   (RECE44-ZAIKBN         =    1   )
-                         MOVE    999999999   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                         MOVE    999999999   TO  WRK-ZAIW-KOUHYOJYUNNUM
                      ELSE
-                       IF    TBL-ZAIW-SRYCD1(1:1)  =   "6"
-                         MOVE    999999997   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       IF    WRK-ZAIW-SRYCD1(1:1)  =   "6"
+                         MOVE    999999997   TO  WRK-ZAIW-KOUHYOJYUNNUM
                        ELSE
-                         MOVE    999999998   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                         MOVE    999999998   TO  WRK-ZAIW-KOUHYOJYUNNUM
                        END-IF
                      END-IF
                  END-IF
-      ***        IF   RECE41-SRYYM   >=   "200804"
-      ***          EVALUATE  TBL-ZAIW-SRYCD1
-      ***            WHEN     "101130010"
-      ***              MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-      ***              MOVE      999999981   TO  TBL-ZAIW-KOUHYOJYUNNUM
-      ***          END-EVALUATE
-      ***        END-IF
-                 EVALUATE    TBL-ZAIW-SRYCD1
+                 IF   RECE41-SRYYM   <=   "201306"
+                   EVALUATE    WRK-ZAIW-SRYCD1
                      WHEN     "101800175"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999982   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       MOVE      ALL "9"     TO  WRK-ZAIW-CDKBN-AREA
+                       MOVE      999999982   TO  WRK-ZAIW-KOUHYOJYUNNUM
                      WHEN     "101800180"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999983   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       MOVE      ALL "9"     TO  WRK-ZAIW-CDKBN-AREA
+                       MOVE      999999983   TO  WRK-ZAIW-KOUHYOJYUNNUM
                      WHEN     "101800330"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999984   TO  TBL-ZAIW-KOUHYOJYUNNUM
+                       MOVE      ALL "9"     TO  WRK-ZAIW-CDKBN-AREA
+                       MOVE      999999984   TO  WRK-ZAIW-KOUHYOJYUNNUM
                      WHEN     "101800340"
-                       MOVE      ALL "9"     TO  TBL-ZAIW-CDKBN-AREA
-                       MOVE      999999985   TO  TBL-ZAIW-KOUHYOJYUNNUM
-                 END-EVALUATE
+                       MOVE      ALL "9"     TO  WRK-ZAIW-CDKBN-AREA
+                       MOVE      999999985   TO  WRK-ZAIW-KOUHYOJYUNNUM
+                   END-EVALUATE
+                 ELSE
+                   IF  WRK-ZAIW-SRYCD1(1:3) = "101"
+                       MOVE      ALL "9"     TO  WRK-ZAIW-CDKBN-AREA
+                       MOVE  WRK-ZAIW-SRYCD1 TO  WRK-ZAIW-KOUHYOJYUNNUM
+                   END-IF
+                 END-IF
                END-IF
-               MOVE    TBL-ZAIW-CDKBN-SYO  TO  RECE46-CDKBN-SYO
-               MOVE    TBL-ZAIW-CDKBN-BU   TO  RECE46-CDKBN-BU
-               MOVE    TBL-ZAIW-CDKBN-KBN  TO  RECE46-CDKBN-KBN
-               MOVE    TBL-ZAIW-CDKBN-KBNNUM
+               MOVE    WRK-ZAIW-CDKBN-SYO  TO  RECE46-CDKBN-SYO
+               MOVE    WRK-ZAIW-CDKBN-BU   TO  RECE46-CDKBN-BU
+               MOVE    WRK-ZAIW-CDKBN-KBN  TO  RECE46-CDKBN-KBN
+               MOVE    WRK-ZAIW-CDKBN-KBNNUM
                                            TO  RECE46-CDKBN-KBNNUM
-               MOVE    TBL-ZAIW-CDKBN-KBNNUM-EDA
+               MOVE    WRK-ZAIW-CDKBN-KBNNUM-EDA
                                            TO  RECE46-CDKBN-KBNNUM-EDA
-               MOVE    TBL-ZAIW-CDKBN-KOUBAN
+               MOVE    WRK-ZAIW-CDKBN-KOUBAN
                                            TO  RECE46-CDKBN-KOUBAN
-               MOVE    TBL-ZAIW-KOUHYOJYUNNUM
+               MOVE    WRK-ZAIW-KOUHYOJYUNNUM
                                            TO  RECE46-KOUHYOJUNNUM
       *
                IF    RECE44-GAZOGEN = "1"
@@ -3658,7 +3674,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                MOVE    RECE44-ZAITEN     TO  RECE46-ZAITEN
       *
                IF      RECE44-SRYKBN     =   "60" OR "64"
-                       MOVE   TBL-ZAIW-KNSJISKBN
+                       MOVE   WRK-ZAIW-KNSJISKBN
                                              TO  RECE46-KNSJISKBN
                ELSE
                        MOVE   ZERO           TO  RECE46-KNSJISKBN
@@ -3710,7 +3726,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                MOVE    RECE44-OKIKAEFLG  TO  RECE46-OKIKAEFLG
       *
                IF      RECE44-SRYKBN     =   "80"
-                 IF  TBL-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
+                 IF  WRK-ZAIW-SRYCD1 = "120002710" OR "120002810" OR
                                        "120002910" OR "120003010" OR
                                        "120002470" OR "120002570" OR
                                        "120003270" OR "120003470" OR

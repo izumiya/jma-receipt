@@ -42,6 +42,9 @@
       *  04.01.02    NACL-ÌçÏÆ    07/11/26  ÆÃÄê´ïºà¾¦ÉÊÌ¾µ­ºÜÂÐ±þ
       *
       *  04.03.01    NACL-ÌçÏÆ    08/09/25  ¼«ÇåÀÕ£°£¹£µ£¹£³¤Î½¸·×ÀèÂÐ±þ
+      *
+      *  04.06.01    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -294,6 +297,7 @@
        01  CONST-AREA.
       *    µßµÞ°åÎÅ´ÉÍý²Ã»»
            03  CONS-KYUKYU         PIC X(09)  VALUE   "101110020".
+           03  CONS-KYUKYU2        PIC X(09)  VALUE   "101800880".
       *
       *
            COPY    "MCPAREA".
@@ -496,7 +500,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE851PARA-HOSPNUM
                    END-IF
                  WHEN      "80"
                    IF (( RECE82-KYUKYU-PRTKBN    =      1         ) AND
-                       ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU  ))
+                       ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU  ) AND
+                       ( RECE82-SRYYM           <=   "201306"     ))
+                   OR (( RECE82-KYUKYU-PRTKBN    =      1         ) AND
+                       ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU2 ) AND
+                       ( RECE82-SRYYM           >=   "201307"     ))
                    OR (( RECE84-JIBAISYUKEIKBN   =      4         ) AND
                        ( RECE84-SRYCDTOTAL(6:5)  =   "09593"      ))
                        MOVE    SPACE   TO   WRK-TAIHI-SRYYMD

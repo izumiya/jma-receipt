@@ -357,6 +357,8 @@
       *  04.06.02    NACL-ÌçÏÆ    12/07/30  ¹â³Û°ÑÇ¤Ê§¤¤À©ÅÙ¾å¸Â³Û£°±ßÂÐ±þ
       *  04.06.03    NACL-ÌçÏÆ    12/11/20  ÆÃµ­»ö¹à£°£±¡Ê¸ø¡Ë¤Ë´Ø¤ï¤ëÁë¸ý·×»»¡¦
       *                                     ¥ì¥»¥×¥È°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
+      *  04.06.04    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.05    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.06.06    NACL-ÌçÏÆ    13/03/05  ËÌ³¤Æ»ÃÏÊý¸øÈñÂÐ±þ
       *
@@ -2159,6 +2161,15 @@
                  COMPUTE  LNK-SYU-RSISAISHIN-MONEY  =
                          (LNK-SYU-RSISAISHIN-MONEY  *  WK-KSNRATE)
                                                     +  0.5
+                 IF    LNK-SYU-SRYYMD(1:6)  >=   "201307"
+                   COMPUTE  LNK-SYU-RSIETC-MONEY    =
+                            LNK-SYU-RSIETC-MONEY    -  LNK-S02-KYUKYU
+                   COMPUTE  WK-KEISAN               =
+                           (LNK-S02-KYUKYU          *  WK-KSNRATE)
+                                                    +  0.5
+                   COMPUTE  LNK-SYU-RSIETC-MONEY    =
+                            LNK-SYU-RSIETC-MONEY    +  WK-KEISAN
+                 END-IF
               END-IF
       *
                  COMPUTE    LNK-SYU-SKYMONEY  =   
@@ -2229,6 +2240,15 @@
                  COMPUTE  LNK-SYU-RSISAISHIN-MONEY  =
                          (LNK-SYU-RSISAISHIN-MONEY  *  WK-KSNRATE)
                                                     +  0.5
+                 IF    LNK-SYU-SRYYMD(1:6)  >=   "201307"
+                   COMPUTE  LNK-SYU-RSIETC-MONEY    =
+                            LNK-SYU-RSIETC-MONEY    -  LNK-S02-KYUKYU
+                   COMPUTE  WK-KEISAN               =
+                           (LNK-S02-KYUKYU          *  WK-KSNRATE)
+                                                    +  0.5
+                   COMPUTE  LNK-SYU-RSIETC-MONEY    =
+                            LNK-SYU-RSIETC-MONEY    +  WK-KEISAN
+                 END-IF
               END-IF
       *
               MOVE    ZERO      TO       LNK-SYU-SKYMONEY
@@ -2851,13 +2871,29 @@
                           ELSE
                               MOVE   ZERO   TO   LNK-SYU-RSIETC-MONEY
                           END-IF
-                          EVALUATE  TNS-KANANAMECHGKBN
+                          IF  LNK-SYU-SRYYMD(1:6)  >=   "201307"
+                           EVALUATE  TNS-KANANAMECHGKBN
+                            WHEN        1
+                              COMPUTE  LNK-SYU-RSISHOSHIN-MONEY =
+                                       LNK-SYU-RSISHOSHIN-MONEY +
+                                       WK-KEISAN
+                            WHEN        4
+                              COMPUTE  LNK-SYU-RSIETC-MONEY     =
+                                       LNK-SYU-RSIETC-MONEY     +
+                                       WK-KEISAN
+                              COMPUTE  LNK-S02-KYUKYU           =
+                                       LNK-S02-KYUKYU           +
+                                       WK-KEISAN
+                           END-EVALUATE
+                          ELSE
+                           EVALUATE  TNS-KANANAMECHGKBN
                             WHEN        1
                             WHEN        4
                               COMPUTE  LNK-SYU-RSISHOSHIN-MONEY =
                                        LNK-SYU-RSISHOSHIN-MONEY +
                                        WK-KEISAN
-                          END-EVALUATE
+                           END-EVALUATE
+                          END-IF
                           MOVE       "1"     TO    FLG-TAIGAI
                        END-IF
       *
@@ -20249,6 +20285,10 @@
                                 TO  WK-NYULIFE-SKJFTN-MONEY(NYULIFE-IDX)
                  MOVE  LNK-NYULIFE-KANFTN-MONEY(NYULIFE-IDX)
                                 TO  WK-NYULIFE-KANFTN-MONEY(NYULIFE-IDX)
+                 IF   (LNK-SYU-SYUHKNNUM   =  "971" OR "973")
+                 AND  (FLG-KENPOJYUNKYO    =  ZERO          )
+                   MOVE  SPACE  TO  WK-NYULIFE-KBN(NYULIFE-IDX)
+                 END-IF
                END-PERFORM
              END-IF
            END-IF

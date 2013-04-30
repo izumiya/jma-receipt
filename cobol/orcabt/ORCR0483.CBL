@@ -49,6 +49,7 @@
       *
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
+      *  04.06.03    NACL-門脇    13/04/11  実日数９９９の療養期間編集修正
       *
       *  04.07.01    NACL-藤原    11/09/02  労災請求書作成対応
       *  04.07.02    NACL-藤原    12/01/24  monpe-0.6.20対応
@@ -1214,9 +1215,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
       *
                 IF      RECE41-KYUGYO-END   NOT   NUMERIC
                 OR      RECE41-KYUGYO-END   =  "0000"
-                  MOVE    SPACE             TO  WRK-HCM56-ENDYY
-                  MOVE    SPACE             TO  WRK-HCM56-ENDMM
-                  MOVE    SPACE             TO  WRK-HCM56-ENDDD
+                  MOVE  LNK-DAY2-EDTYMD3    TO  WRK-HCM56-ENDYMD
                 ELSE
                   MOVE  RECE41-SRYYM(5:2)   TO  WRK-SINRYO-MM
                   MOVE  RECE41-KYUGYO-END(1:2)

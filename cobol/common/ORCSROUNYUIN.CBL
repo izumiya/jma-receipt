@@ -86,6 +86,9 @@
       *  04.05.04    NACL-ÌçÏÆ    12/04/09  ²þÀµÂÐ±þ¡ÊÆþ±¡Î¬¾Î¤ÎÊ¸»ú¿ô³ÈÄ¥¡Ë
       *  04.05.05    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
       *
+      *  04.06.01    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
+      *
       *  04.07.01    NACL-ÌçÏÆ    11/11/22  Æ±ÆüºÆÆþ±¡ÂÐ±þ
       *****************************************************************
       *
@@ -240,6 +243,14 @@
            03  CONS-201204-KSN16           PIC X(09) VALUE "190145170".
       *    ´Ç¼è¤ê²Ã»»¡Êºß»Ù¿Ç¡Ë¡ÊÍ­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡Ë
            03  CONS-201204-KSN17           PIC X(09) VALUE "190145270".
+      *
+      *--Ê¿À®£²£µÇ¯£··î°Ê¹ß¤ËÂÐ½è¤òÄÉ²Ã¤·¤¿²Ã»»------------------------
+      *    °ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»¡Ê°ìÈÌÉÂÅïÆþ±¡´ðËÜÎÁ¡Ë¡ÊÏ«ºÒÍÑ¡Ë
+           03  CONS-201307-KSN1            PIC X(09) VALUE "101900100".
+      *    ½ÅÅÙÇ§ÃÎ¾É²Ã»»¡ÊÀº¿ÀÉÂÅïÆþ±¡´ðËÜÎÁ¡Ë¡ÊÏ«ºÒÍÑ¡Ë
+           03  CONS-201307-KSN2            PIC X(09) VALUE "101900110".
+      *    °ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»¡ÊÀìÌçÉÂ±¡Æþ±¡´ðËÜÎÁ¡Ë¡ÊÏ«ºÒÍÑ¡Ë
+           03  CONS-201307-KSN3            PIC X(09) VALUE "101900120".
       *----------------------------------------------------------------
       *
       *    Ï«ºÒ¼£ÎÅ·×²è²Ã»»
@@ -3736,6 +3747,9 @@
                                                   OR CONS-201204-KSN9
                                                   OR CONS-201204-KSN10
                                                   OR CONS-201204-KSN11)
+                         OR (NACCT-SRYCDTOTAL(6:9) = CONS-201307-KSN1
+                                                  OR CONS-201307-KSN2
+                                                  OR CONS-201307-KSN3)
                           IF  (WRK-NYUINKHN(IDX1)      NOT = SPACE)
                           AND ((LNK-SROUNYUIN-GAIHAKU(IDX1)
                                                            = ZERO) OR
@@ -3776,12 +3790,15 @@
       ***                         MOVE   NACCT-DAY(IDX1)
       ***                               TO  WRK-201004-KSN11(IDX1)
                              WHEN  CONS-201004-KSN13
+                             WHEN  CONS-201307-KSN1
                                   MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-201004-KSN13(IDX1)
                              WHEN  CONS-201004-KSN15
+                             WHEN  CONS-201307-KSN2
                                   MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-201004-KSN15(IDX1)
                              WHEN  CONS-201004-KSN17
+                             WHEN  CONS-201307-KSN3
                                   MOVE   NACCT-DAY(IDX1)
                                         TO  WRK-201004-KSN17(IDX1)
       *
@@ -3924,6 +3941,9 @@
                                               OR CONS-201204-KSN9
                                               OR CONS-201204-KSN10
                                               OR CONS-201204-KSN11)
+                            OR (SRY-SRYCD(1)  =  CONS-201307-KSN1
+                                              OR CONS-201307-KSN2
+                                              OR CONS-201307-KSN3)
                                 MOVE  SRY-SRYCD(1)   TO
                                                ACCT-SRYCDTOTAL(6:9)
                             END-IF
@@ -3956,6 +3976,10 @@
                                         OR  CONS-201204-KSN9
                                         OR  CONS-201204-KSN10
                                         OR  CONS-201204-KSN11 )
+                     OR ( ACCT-SRYCDTOTAL(6:9)  =
+                                            CONS-201307-KSN1
+                                        OR  CONS-201307-KSN2
+                                        OR  CONS-201307-KSN3)
       *                Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
                        PERFORM    VARYING   IDX1   FROM   1   BY   1
                                   UNTIL     IDX1   >   31
@@ -4022,16 +4046,19 @@
       ***                               TO  WRK-201004-KSN11(IDX1)
       ***                         END-IF
                                 WHEN  CONS-201004-KSN13
+                                WHEN  CONS-201307-KSN1
                                   IF  ACCT-DAY(1 IDX1)   NOT = ZERO
                                       MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN13(IDX1)
                                   END-IF
                                 WHEN  CONS-201004-KSN15
+                                WHEN  CONS-201307-KSN2
                                   IF  ACCT-DAY(1 IDX1)   NOT = ZERO
                                       MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN15(IDX1)
                                   END-IF
                                 WHEN  CONS-201004-KSN17
+                                WHEN  CONS-201307-KSN3
                                   IF  ACCT-DAY(1 IDX1)   NOT = ZERO
                                       MOVE   ACCT-DAY(1 IDX1)
                                         TO  WRK-201004-KSN17(IDX1)
@@ -4298,24 +4325,39 @@
       *        °ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»
                IF         WRK-201004-KSN13(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201004-KSN13    TO  LNK-SROUNYUIN-SRYCD
+                   IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
+                    MOVE  CONS-201307-KSN1     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                   ELSE
+                    MOVE  CONS-201004-KSN13    TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   END-IF
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *        ½ÅÅÙÇ§ÃÎ¾É²Ã»»¡ÊÀº¿ÀÉÂÅïÆþ±¡´ðËÜÎÁ¡Ë
                IF         WRK-201004-KSN15(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201004-KSN15    TO  LNK-SROUNYUIN-SRYCD
+                   IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
+                    MOVE  CONS-201307-KSN2     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                   ELSE
+                    MOVE  CONS-201004-KSN15    TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   END-IF
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
       *        °ìÈÌÉÂÅï´Ç¸îÉ¬Í×ÅÙÉ¾²Á²Ã»»¡ÊÀìÌçÉÂ±¡¡Ë
                IF         WRK-201004-KSN17(IDX1)      NOT =   ZERO
                    ADD      1                  TO  WRK-MEISAISU
-                   MOVE   CONS-201004-KSN17    TO  LNK-SROUNYUIN-SRYCD
+                   IF    LNK-SROUNYUIN-SANTEIYM   >=   "201307"
+                    MOVE  CONS-201307-KSN3     TO  LNK-SROUNYUIN-SRYCD
                                            (IDX1 WRK-MEISAISU)
+                   ELSE
+                    MOVE  CONS-201004-KSN17    TO  LNK-SROUNYUIN-SRYCD
+                                           (IDX1 WRK-MEISAISU)
+                   END-IF
                    MOVE    "3"             TO  LNK-SROUNYUIN-SRYCD-SK
                                            (IDX1 WRK-MEISAISU)
                END-IF
