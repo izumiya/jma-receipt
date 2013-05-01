@@ -9421,6 +9421,8 @@
                 AND  ( SPA-GMN-KOHNUM  =   "186" )
                    MOVE    "1"         TO  SPA-GMN-PTJGNKBN
                    MOVE    "0"         TO  SPA-GMN-PTJGNTAIKBN
+               WHEN  ( SPA-PREFNUM     =   CONST-OSAKA )
+                AND  ( SPA-GMN-KOHNUM  =   "192" )
                WHEN  ( SPA-PREFNUM     =   CONST-FUKUSHIMA )
                 AND  ( SPA-GMN-KOHNUM  =   "281" )
                    MOVE    "2"         TO  SPA-GMN-PTJGNKBN
