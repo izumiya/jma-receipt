@@ -678,6 +678,15 @@
                    MOVE    "Æþ³°¾å¸Â³Û"         TO  SPA-GMN24-FTNMSG1
                    MOVE    "Â¾°ìÉôÉéÃ´Îß·×"     TO  SPA-GMN24-FTNMSG2
                END-IF
+      *H25.5   Âçºå
+               IF     (SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "192"        )  AND
+                      (SPA-PREFNUM         =    27          )  AND
+                      (SPA-NAI24-TKOHSTYMD (SPA-NAI24-FTNSELNUM)
+                                           >=   "20121101"  )
+                   MOVE    "Æþ³°¾å¸Â³Û"         TO  SPA-GMN24-FTNMSG1
+                   MOVE    "Â¾°ìÉôÉéÃ´Îß·×"     TO  SPA-GMN24-FTNMSG2
+               END-IF
            END-IF
       *
            .
@@ -802,6 +811,10 @@
                      OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
                                                =   "152" ) AND
                           (SPA-PREFNUM         = 23 OR 24))
+      *H25.5         Âçºå
+                     OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
+                                               =   "192" ) AND
+                          (SPA-PREFNUM         =    27   ))
                        PERFORM 31021-PTKOHFTNETC-HEN-SEC
                    END-IF
                END-IF

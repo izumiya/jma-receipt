@@ -6598,6 +6598,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                  OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "152"     )  AND
                       (SPA-PREFNUM             =   23 OR 24  )  AND
                       (SPA-PTKOH-TEKSTYMD(IDX) >=  "20110401"))
+      *H25.5
+      *            Âçºå¤ÎÃÏÊý¸øÈñ¡Ê£È£²£´¡¥£±£±°Ê¹ß¡Ë
+                 OR  ((SPA-PTKOH-KOHNUM(IDX)   =   "192" )  AND
+                      (SPA-PREFNUM             =   27    )  AND
+                      (SPA-PTKOH-TEKSTYMD(IDX) >=  "20121101"))
       *
                    MOVE    ZERO                TO  IDY
                    PERFORM VARYING     IDX2    FROM    1   BY  1
