@@ -1294,8 +1294,8 @@
                    MOVE    THKN-KENSU (IDX1 IDX2)     TO  WRK-Z4
                    MOVE    WRK-Z4  TO  HCGS139N-KENSU (CNT-LINE)
       *
-                   MOVE    THKN-NISSU (IDX1 IDX2)     TO  WRK-Z4
-                   MOVE    WRK-Z4  TO  HCGS139N-NISSU (CNT-LINE)
+                   MOVE    THKN-NISSU (IDX1 IDX2)     TO  WRK-Z5
+                   MOVE    WRK-Z5  TO  HCGS139N-NISSU (CNT-LINE)
       *
                    MOVE    THKN-TENSU (IDX1 IDX2)     TO  WRK-Z9
                    MOVE    WRK-Z9  TO  HCGS139N-TENSU (CNT-LINE)
