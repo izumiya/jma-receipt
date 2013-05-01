@@ -37,6 +37,8 @@
       *
       *  04.05.01    NACL-ÌçÏÆ    09/07/28  ½êÆÀ¼Ô¾ðÊó¤Î¸øÈñÆþÎÏµ¡Ç½¸þ¾å
       *  04.05.02    NACL-ÌçÏÆ    12/05/16  °¦ÃÎ¡¦»°½Å¸©ÃÏÊý¸øÈñÂÐ±þ
+      *
+      *  04.06.01    NACL-ÌçÏÆ    13/05/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -327,6 +329,19 @@
            AND   (LNK-ORCSJGNGET-PREFNUM  =   "23" OR "24")
                EVALUATE   LNK-ORCSJGNGET-KOHHKNNUM
                   WHEN     "152"
+                     MOVE   LNK-ORCSJGNGET-NYUJGNGAK
+                                TO  LNK-ORCSJGNGET-TAFTNRUIKEI
+                     MOVE   LNK-ORCSJGNGET-GAIJGNGAK
+                                TO  LNK-ORCSJGNGET-NYUJGNGAK
+      *
+                     PERFORM 1001-TAFTNRUIKEI-HENSYU-SEC
+               END-EVALUATE
+           END-IF
+      *    ÂçºåÉÜ
+           IF    (LNK-ORCSJGNGET-SRYYM   >=   "201211")
+           AND   (LNK-ORCSJGNGET-PREFNUM  =   "27"    )
+               EVALUATE   LNK-ORCSJGNGET-KOHHKNNUM
+                  WHEN     "192"
                      MOVE   LNK-ORCSJGNGET-NYUJGNGAK
                                 TO  LNK-ORCSJGNGET-TAFTNRUIKEI
                      MOVE   LNK-ORCSJGNGET-GAIJGNGAK

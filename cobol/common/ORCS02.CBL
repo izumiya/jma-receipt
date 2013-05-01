@@ -361,6 +361,7 @@
       *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.05    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.06.06    NACL-ÌçÏÆ    13/03/05  ËÌ³¤Æ»ÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.07    NACL-ÌçÏÆ    13/05/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -5354,6 +5355,12 @@
                  OR ((WK-1001-PREFNUM         =  08           ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) = "152"         ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "200904"      ))
+                 OR ((WK-1001-PREFNUM         =  23 OR 24     ) AND
+                     (COMB-KOHHKNNUM(IDX-CYO) = "152"         ) AND
+                     (LNK-SYU-SRYYMD(1:6)    >= "201104"      ))
+                 OR ((WK-1001-PREFNUM         =  27           ) AND
+                     (COMB-KOHHKNNUM(IDX-CYO) = "192"         ) AND
+                     (LNK-SYU-SRYYMD(1:6)    >= "201211"      ))
       *
                  OR ((WK-1001-PREFNUM         =  13           ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) = "182" OR "382"))
@@ -5393,9 +5400,6 @@
                  OR ((WK-1001-PREFNUM         =  11           ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) = "462" OR "762") AND
                      (LNK-SYU-SRYYMD(1:6)    >= "201112"      ))
-                 OR ((WK-1001-PREFNUM         =  23 OR 24     ) AND
-                     (COMB-KOHHKNNUM(IDX-CYO) = "152"         ) AND
-                     (LNK-SYU-SRYYMD(1:6)    >= "201104"      ))
                  OR ((WK-1001-PREFNUM         =  07           ) AND
                      (COMB-KOHHKNNUM(IDX-CYO) = "480"         ) AND
                      (LNK-SYU-SRYYMD(1:6)    >= "201210"      ))
@@ -7906,6 +7910,10 @@
                  (COMB-KOHHKNNUM(KOH-IDX)      = "152"   )  AND
                  (LNK-SYU-SRYYMD(1:6)         >= "201104"))
       *
+             OR ((WK-1001-PREFNUM              =  27     )  AND
+                 (COMB-KOHHKNNUM(KOH-IDX)      = "192"   )  AND
+                 (LNK-SYU-SRYYMD(1:6)         >= "201211"))
+      *
       ***    OR ( COMB-KOHHKNNUM(KOH-IDX)(1:1) = "1" OR "2" OR "3" OR 
       ***                                        "4" OR "5" OR "6" OR
       ***                                        "7" OR "8"          )
@@ -8189,9 +8197,12 @@
                                        TO WK-SYOGAI-SKJGENMEN(KOH-IDX)
                               END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM      =  07       )
-                        AND (COMB-KOH1HKNNUM      = "281"     )
-                        AND (LNK-SYU-SRYYMD(1:6) >= "200702"  )
+                        IF ((WK-1001-PREFNUM      =  07       ) AND
+                            (COMB-KOH1HKNNUM      = "281"     ) AND
+                            (LNK-SYU-SRYYMD(1:6) >= "200702"  ))
+                        OR ((WK-1001-PREFNUM      =  27       ) AND
+                            (COMB-KOH1HKNNUM      = "192"     ) AND
+                            (LNK-SYU-SRYYMD(1:6) >= "201211"  ))
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
                         END-IF
@@ -8661,9 +8672,12 @@
                                        TO WK-SYOGAI-SKJGENMEN(KOH-IDX)
                               END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM      =  07       )
-                        AND (COMB-KOH2HKNNUM      = "281"     )
-                        AND (LNK-SYU-SRYYMD(1:6) >= "200702"  )
+                        IF ((WK-1001-PREFNUM      =  07       ) AND
+                            (COMB-KOH2HKNNUM      = "281"     ) AND
+                            (LNK-SYU-SRYYMD(1:6) >= "200702"  ))
+                        OR ((WK-1001-PREFNUM      =  27       ) AND
+                            (COMB-KOH2HKNNUM      = "192"     ) AND
+                            (LNK-SYU-SRYYMD(1:6) >= "201211"  ))
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
                         END-IF
@@ -8900,9 +8914,12 @@
                              END-IF
                           END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM      =  07       )
-                        AND (COMB-KOH3HKNNUM      = "281"     )
-                        AND (LNK-SYU-SRYYMD(1:6) >= "200702"  )
+                        IF ((WK-1001-PREFNUM      =  07       ) AND
+                            (COMB-KOH3HKNNUM      = "281"     ) AND
+                            (LNK-SYU-SRYYMD(1:6) >= "200702"  ))
+                        OR ((WK-1001-PREFNUM      =  27       ) AND
+                            (COMB-KOH3HKNNUM      = "192"     ) AND
+                            (LNK-SYU-SRYYMD(1:6) >= "201211"  ))
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
                         END-IF
@@ -9052,9 +9069,12 @@
                              END-IF
                           END-IF
                         END-IF
-                        IF  (WK-1001-PREFNUM      =  07       )
-                        AND (COMB-KOH4HKNNUM      = "281"     )
-                        AND (LNK-SYU-SRYYMD(1:6) >= "200702"  )
+                        IF ((WK-1001-PREFNUM      =  07       ) AND
+                            (COMB-KOH4HKNNUM      = "281"     ) AND
+                            (LNK-SYU-SRYYMD(1:6) >= "200702"  ))
+                        OR ((WK-1001-PREFNUM      =  27       ) AND
+                            (COMB-KOH4HKNNUM      = "192"     ) AND
+                            (LNK-SYU-SRYYMD(1:6) >= "201211"  ))
                               MOVE  LNK-ORCSJGNGET-TAFTNRUIKEI
                                    TO WK-CHIHOU-TAFTNRUIKEI(KOH-IDX)
                         END-IF
@@ -10061,25 +10081,21 @@
                IF   WK-1001-PREFNUM       =    07
                AND  LNK-SYU-SRYYMD(1:6)  >=   "200702"
                     IF   LNK-SYU-KOH1HKNNUM  = "281"
-      ***               MOVE     1    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(1) TO FTN-KOHI1-M
                                                           FTN-KOHI1-M2
                                                           FTN-KOHI1-M3
                     END-IF
                     IF   LNK-SYU-KOH2HKNNUM  = "281"
-      ***               MOVE     2    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(2) TO FTN-KOHI2-M
                                                           FTN-KOHI2-M2
                                                           FTN-KOHI2-M3
                     END-IF
                     IF   LNK-SYU-KOH3HKNNUM  = "281"
-      ***               MOVE     3    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(3) TO FTN-KOHI3-M
                                                           FTN-KOHI3-M2
                                                           FTN-KOHI3-M3
                     END-IF
                     IF   LNK-SYU-KOH4HKNNUM  = "281"
-      ***               MOVE     4    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(4) TO FTN-KOHI4-M
                                                           FTN-KOHI4-M2
                                                           FTN-KOHI4-M3
@@ -10096,25 +10112,44 @@
                IF  (WK-1001-PREFNUM       =    23 OR 24)
                AND (LNK-SYU-SRYYMD(1:6)  >=   "201104" )
                     IF   LNK-SYU-KOH1HKNNUM  = "152"
-      ***               MOVE     1    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(1) TO FTN-KOHI1-M
                                                           FTN-KOHI1-M2
                                                           FTN-KOHI1-M3
                     END-IF
                     IF   LNK-SYU-KOH2HKNNUM  = "152"
-      ***               MOVE     2    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(2) TO FTN-KOHI2-M
                                                           FTN-KOHI2-M2
                                                           FTN-KOHI2-M3
                     END-IF
                     IF   LNK-SYU-KOH3HKNNUM  = "152"
-      ***               MOVE     3    TO     FLG-NYUGAI2
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(3) TO FTN-KOHI3-M
                                                           FTN-KOHI3-M2
                                                           FTN-KOHI3-M3
                     END-IF
                     IF   LNK-SYU-KOH4HKNNUM  = "152"
-      ***               MOVE     4    TO     FLG-NYUGAI2
+                        MOVE  WK-CHIHOU-TAFTNRUIKEI(4) TO FTN-KOHI4-M
+                                                          FTN-KOHI4-M2
+                                                          FTN-KOHI4-M3
+                    END-IF
+               END-IF
+               IF   WK-1001-PREFNUM       =    27
+               AND  LNK-SYU-SRYYMD(1:6)  >=   "201211"
+                    IF   LNK-SYU-KOH1HKNNUM  = "192"
+                        MOVE  WK-CHIHOU-TAFTNRUIKEI(1) TO FTN-KOHI1-M
+                                                          FTN-KOHI1-M2
+                                                          FTN-KOHI1-M3
+                    END-IF
+                    IF   LNK-SYU-KOH2HKNNUM  = "192"
+                        MOVE  WK-CHIHOU-TAFTNRUIKEI(2) TO FTN-KOHI2-M
+                                                          FTN-KOHI2-M2
+                                                          FTN-KOHI2-M3
+                    END-IF
+                    IF   LNK-SYU-KOH3HKNNUM  = "192"
+                        MOVE  WK-CHIHOU-TAFTNRUIKEI(3) TO FTN-KOHI3-M
+                                                          FTN-KOHI3-M2
+                                                          FTN-KOHI3-M3
+                    END-IF
+                    IF   LNK-SYU-KOH4HKNNUM  = "192"
                         MOVE  WK-CHIHOU-TAFTNRUIKEI(4) TO FTN-KOHI4-M
                                                           FTN-KOHI4-M2
                                                           FTN-KOHI4-M3
@@ -16108,6 +16143,9 @@
              OR   ((WK-1001-PREFNUM               =   23 OR 24  ) AND
                    (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2) =  "152"   ) AND
                    (LNK-SYU-SRYYMD(1:6)             >=  "201104"))
+             OR   ((WK-1001-PREFNUM                  =   27     ) AND
+                   (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2) =  "192"   ) AND
+                   (LNK-SYU-SRYYMD(1:6)             >=  "201211"))
                   MOVE    KOHFUKA-IDX2     TO  FLG-NYUGAI2
              ELSE
                IF  (LNK-SYU-KOH-HKNNUM(KOHFUKA-IDX2)(1:1)
@@ -21528,6 +21566,11 @@
            IF  (LNK-SYU-SRYYMD(1:6)      >=  "201104"      )
            AND (WK-1001-PREFNUM           =   23 OR 24     )
            AND (COMB-KOHHKNNUM(KOH-IDX)   =  "152"         )
+                MOVE    "2"              TO   WK-NYUSKJRYYKBN
+           END-IF.
+           IF  (LNK-SYU-SRYYMD(1:6)      >=  "201211"      )
+           AND (WK-1001-PREFNUM           =   27           )
+           AND (COMB-KOHHKNNUM(KOH-IDX)   =  "192"         )
                 MOVE    "2"              TO   WK-NYUSKJRYYKBN
            END-IF.
       *

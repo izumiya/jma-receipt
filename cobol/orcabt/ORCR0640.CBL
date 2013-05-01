@@ -604,6 +604,7 @@
       *                                     À¸³èÎÅÍÜÉ¸½àÉéÃ´³Û¤Îµ­ºÜ¤ò¤·¤Ê¤¤
       *                                     ¡ÊÅ¦Í×Íó¡Ë
       *  04.06.12    NACL-ÌçÏÆ    13/04/10  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
+      *  04.06.13    NACL-ÌçÏÆ    13/05/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -17643,6 +17644,9 @@
              OR  ((WRK-PREFNUM               =  "23" OR "24"  )   AND
                   (RECE62-KOHNUM(KOHFTN-IDX) =  "152"         )   AND
                   (RECE62-SRYYM             >=  "201104"      ))
+             OR  ((WRK-PREFNUM               =  "27"          )   AND
+                  (RECE62-KOHNUM(KOHFTN-IDX) =  "192"         )   AND
+                  (RECE62-SRYYM             >=  "201211"      ))
       *
                IF ((RECE62-KOHNUM(KOHFTN-IDX) =  "015" OR "016")  AND
                    (RECE62-SRYYM             >=  "200604"      ))
@@ -18036,6 +18040,14 @@
                 IF    RECE62-SRYYM        >=  "201104"
                   IF  (WRK-PREFNUM               =   23 OR 24)
                   AND (RECE62-KOHNUM(KOHFTN-IDX) =  "152"    )
+                    MOVE  "1"   TO  RECE62-KISAIFLG(KOHFTN-IDX + 1)
+                    MOVE  "1"   TO  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
+                  END-IF
+                END-IF
+      *
+                IF    RECE62-SRYYM        >=  "201211"
+                  IF  (WRK-PREFNUM               =   27  )
+                  AND (RECE62-KOHNUM(KOHFTN-IDX) =  "192")
                     MOVE  "1"   TO  RECE62-KISAIFLG(KOHFTN-IDX + 1)
                     MOVE  "1"   TO  RECE62-ZEROKISAIFLG(KOHFTN-IDX + 1)
                   END-IF
