@@ -879,8 +879,8 @@
            END-IF
       *
            IF      SPA-GMN-ATAI-MAX    =   ZERO
-               IF      SPA-GMN-ATAI(SPA-GMN-ITEMLENGTH:)
-                                       NOT =   SPACE
+               COMPUTE IDY =   SPA-GMN-ITEMLENGTH  +   1
+               IF      SPA-GMN-ATAI(IDY:)  NOT =   SPACE
                    MOVE    "0003"          TO  SPA-ERRCD
                    MOVE    5               TO  SPA-GMN-CUR
                END-IF
