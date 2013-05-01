@@ -38,6 +38,8 @@
       *  04.05.01    NACL-門脇    09/07/28  所得者情報の公費入力機能向上
       *  04.05.02    NACL-門脇    12/05/16  愛知・三重県地方公費対応
       *
+      *  04.06.01    NACL-門脇    13/05/01  大阪府地方公費対応
+      *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
@@ -934,6 +936,11 @@
                        AND (LNK-ORCSJGNGET-TEKSTYMD(1:6) >= "200904")
                          MOVE     1     TO   LNK-ORCSJGNGET-TAISYOKBN
                        END-IF
+                     WHEN       "27"
+                       IF  (LNK-ORCSJGNGET-KOHHKNNUM      = "192"   )
+                       AND (LNK-ORCSJGNGET-TEKSTYMD(1:6) >= "201211")
+                         MOVE     2     TO   LNK-ORCSJGNGET-TAISYOKBN
+                       END-IF
                      WHEN       "28"
                        IF  (LNK-ORCSJGNGET-KOHHKNNUM      = "186"   )
                        AND (LNK-ORCSJGNGET-TEKSTYMD(1:6) >= "200310")
@@ -964,6 +971,9 @@
                     OR  ((LNK-ORCSJGNGET-PREFNUM       = "08"    ) AND
                          (LNK-ORCSJGNGET-KOHHKNNUM     = "152"   ) AND
                          (LNK-ORCSJGNGET-TEKSTYMD(1:6) < "200904"))
+                    OR  ((LNK-ORCSJGNGET-PREFNUM       = "27"    ) AND
+                         (LNK-ORCSJGNGET-KOHHKNNUM     = "192"   ) AND
+                         (LNK-ORCSJGNGET-TEKSTYMD(1:6) < "201211"))
                     OR  ((LNK-ORCSJGNGET-PREFNUM       = "28"    ) AND
                          (LNK-ORCSJGNGET-KOHHKNNUM     = "186"   ) AND
                          (LNK-ORCSJGNGET-TEKSTYMD(1:6) < "200310"))
@@ -993,6 +1003,9 @@
                     OR  ((LNK-ORCSJGNGET-PREFNUM       = "08"    ) AND
                          (LNK-ORCSJGNGET-KOHHKNNUM     = "152"   ) AND
                          (LNK-ORCSJGNGET-TEKSTYMD(1:6) < "200904"))
+                    OR  ((LNK-ORCSJGNGET-PREFNUM       = "27"    ) AND
+                         (LNK-ORCSJGNGET-KOHHKNNUM     = "192"   ) AND
+                         (LNK-ORCSJGNGET-TEKSTYMD(1:6) < "201211"))
                     OR  ((LNK-ORCSJGNGET-PREFNUM       = "28"    ) AND
                          (LNK-ORCSJGNGET-KOHHKNNUM     = "186"   ) AND
                          (LNK-ORCSJGNGET-TEKSTYMD(1:6) < "200310"))
