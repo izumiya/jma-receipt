@@ -2598,7 +2598,7 @@
                  MOVE  RECE10-FTNMONEY(1)  TO  WRK-TAIHI-FTNMONEY
                END-IF
            ELSE
-               GO  TO  2002-KOHSKY-WRITE-EXT
+               GO  TO  20022-KOHSKY-WRITE-EXT
            END-IF
       *
            PERFORM 900-KOHSKY-INV-SEC
