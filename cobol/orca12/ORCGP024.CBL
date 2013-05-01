@@ -1421,6 +1421,10 @@
                  OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "152" ) AND
                       (SPA-PREFNUM         = 23 OR 24))
+      *H25.5     Âçºå
+                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "192" ) AND
+                      (SPA-PREFNUM         =   27    ))
                    CONTINUE
                ELSE
                    MOVE    "2440"              TO  SPA-ERRCD
@@ -1583,6 +1587,10 @@
                  OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
                                            =   "152" ) AND
                       (SPA-PREFNUM         = 23 OR 24))
+      *H25.5     Âçºå
+                 OR  ((SPA-NAI24-KOHNUM (SPA-NAI24-FTNSELNUM)
+                                           =   "192" ) AND
+                      (SPA-PREFNUM         =   27    ))
                    CONTINUE
                ELSE
                    MOVE    "2445"              TO  SPA-ERRCD
@@ -2586,6 +2594,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                      OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
                                                =   "152" ) AND
                           (SPA-PREFNUM         = 23 OR 24))
+      *H25.5     Âçºå
+                     OR  ((SPA-NAI24-KOHNUM (WRK-FTN1-IDX)
+                                               =   "192" ) AND
+                          (SPA-PREFNUM         =   27    ))
                        PERFORM 31021-PTKOHFTNETC-HEN-SEC
                    END-IF
                END-IF
@@ -2888,6 +2900,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                  OR  ((SPA-NAI24-KOHNUM (IDX2)
                                            =   "152" ) AND
                       (SPA-PREFNUM         = 23 OR 24))
+      *H25.5     Âçºå
+                 OR  ((SPA-NAI24-KOHNUM (IDX2)
+                                           =   "192" ) AND
+                      (SPA-PREFNUM         =   27    ))
       *            º£²óºï½üÊ¬
                    IF      SPA-NAI24-FTNDELKBN (IDX2)  =   "1" 
       *                ¹¹¿·ÂÐ¾ÝÊÔ½¸
