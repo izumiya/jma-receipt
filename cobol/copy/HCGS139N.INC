@@ -20,7 +20,7 @@
                                         OCCURS 31 TIMES.
                 04  HCGS139N-KENSU
                         PIC X(4).
-                04  HCGS139N-NISSU
+                04  HCGS139N-NISSU-DM
                         PIC X(4).
                 04  HCGS139N-TENSU
                         PIC X(9).
@@ -60,5 +60,7 @@
                         PIC X(20).
             02  HCGS139N-LBLJIBAI
                         PIC X(20).
+            02  HCGS139N-NISSU
+                        PIC X(5)        OCCURS 31 TIMES.
             02  HCGS139N-SKYSBT
                         PIC X(50).
