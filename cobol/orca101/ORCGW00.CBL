@@ -879,10 +879,12 @@
            END-IF
       *
            IF      SPA-GMN-ATAI-MAX    =   ZERO
-               COMPUTE IDY =   SPA-GMN-ITEMLENGTH  +   1
-               IF      SPA-GMN-ATAI(IDY:)  NOT =   SPACE
-                   MOVE    "0003"          TO  SPA-ERRCD
-                   MOVE    5               TO  SPA-GMN-CUR
+               IF      SPA-GMN-ITEMLENGTH  <   40
+                   COMPUTE IDY =   SPA-GMN-ITEMLENGTH  +   1
+                   IF      SPA-GMN-ATAI(IDY:)  NOT =   SPACE
+                       MOVE    "0003"          TO  SPA-ERRCD
+                       MOVE    5               TO  SPA-GMN-CUR
+                   END-IF
                END-IF
            ELSE
                MOVE    ZERO            TO  FLG-OK
