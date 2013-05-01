@@ -10,7 +10,7 @@
               03  HCGS139N-KOHKENSU   PIC X(4).
               03  HCGS139N-HKN-TBL        OCCURS  31 TIMES.
                 04  HCGS139N-KENSU  PIC X(4).
-                04  HCGS139N-NISSU  PIC X(4).
+                04  HCGS139N-NISSU-DM   PIC X(4).
                 04  HCGS139N-TENSU  PIC X(9).
                 04  HCGS139N-FTNMONEY   PIC X(9).
                 04  HCGS139N-HKNMONEY   PIC X(9).
@@ -27,3 +27,5 @@
                 04  HCGS139N-CHOSEI1    PIC X(9).
                 04  HCGS139N-CHOSEI2    PIC X(9).
                 04  HCGS139N-HASU   PIC X(9).
+            02  HCGS139N-NISSU
+                    PIC X(5)    OCCURS  31 TIMES.
