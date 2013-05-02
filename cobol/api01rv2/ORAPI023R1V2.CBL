@@ -2199,6 +2199,18 @@
                        ADD     WRK-SINDAN      TO  LNK-S01-RYOYO
                                                       (LNK-SYUNOU2-MAX)
                    END-IF
+      *H25.7
+      *            µﬂµﬁ∞ÂŒ≈¥…Õ˝≤√ªª≈¿øÙ
+                   IF     (SPA-SRYYMD                  >=  "20130701")
+                     AND  (LNK-WKSRY-SRYKBN(IDX)       =   "80"      )
+                     AND  (LNK-WKSRY-SRYCD (IDX IDS)   =   "101800890")
+      *                º´«Â¿’Œ≈Õ‹√¥≈ˆºÍ≈ˆ≈¿øÙ
+                       COMPUTE WRK-SINDAN      =   TNS-TEN
+                                               *   LNK-WKSRY-ZAIKAIKEI
+                                                               (IDX)
+                       MOVE    WRK-SINDAN      TO  LNK-S01-KYUKYU
+                                                      (LNK-SYUNOU2-MAX)
+                   END-IF
       *
                END-PERFORM
            END-IF
