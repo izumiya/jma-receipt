@@ -131,6 +131,7 @@
            03  WRK-INPUTCD-G.
                05  WRK-INPUTCD         PIC X(20)   OCCURS  5.
            03  WRK-HEN-INPUTCD         PIC X(50).
+           03  WRK-HEN-INPUTCD-N       PIC X(50).
       *
       *    ÆâÍÆ
        01  WRK-HEN-AREA.
@@ -240,8 +241,7 @@
            03  B301-Y1                 PIC X(01).
            03  B301-YUKOEDYMD          PIC X(08).
            03  FILLER                  PIC X(01).
-           03  B301-SET-INPSET         PIC X(44).
-           03  FILLER                  PIC X(01).
+           03  B301-SET-INPSET         PIC X(48).
        01  BODY3-02.
            03  FILLER                  PIC X(20).
            03  B302-RSIKBN             PIC X(08).
@@ -1181,32 +1181,51 @@
       *****************************************************************
        200321-INPUTCD-HEN-SEC          SECTION.
       *
+      *
+           MOVE    SPACE                TO  B301-SET-INPSET
            MOVE    SPACE                TO  WRK-HEN-INPUTCD
+           MOVE    SPACE                TO  WRK-HEN-INPUTCD-N
            PERFORM VARYING     IDX2     FROM    1   BY  1
                    UNTIL       IDX2     >  IDY
                IF      IDX2                >   1
-                   MOVE    B301-SET-INPSET     TO  WRK-HEN-INPUTCD
-                   MOVE    SPACE               TO  B301-SET-INPSET
-                   STRING  WRK-HEN-INPUTCD
+                   MOVE    WRK-HEN-INPUTCD     TO  WRK-HEN-INPUTCD-N
+                   MOVE    SPACE               TO  WRK-HEN-INPUTCD
+                   STRING  WRK-HEN-INPUTCD-N
                            "," 
                            WRK-INPUTCD (IDX2)   DELIMITED  BY  SPACE
-                                                INTO   B301-SET-INPSET
+                                                INTO   WRK-HEN-INPUTCD
                    END-STRING
+                   INITIALIZE                  ORCSKANACHKAREA
+                   MOVE    "1"                 TO  KANACHK-SYORI
+                   MOVE    WRK-HEN-INPUTCD     TO  KANACHK-MAE-INPUT
+                   MOVE    48                  TO  KANACHK-MAX-CNT
+                   CALL    "ORCSKANACHK"       USING
+                                               ORCSKANACHKAREA
+                   MOVE    KANACHK-MAE-INPUT   TO  WRK-HEN-INPUTCD
                ELSE
                    STRING  "¡Ú"
                            WRK-INPUTCD (IDX2)   DELIMITED  BY  SPACE
-                                                INTO   B301-SET-INPSET
+                                                INTO   WRK-HEN-INPUTCD
                    END-STRING
                END-IF
            END-PERFORM
-           IF      B301-SET-INPSET     NOT =   SPACE
-               MOVE    B301-SET-INPSET     TO  WRK-HEN-INPUTCD
-               MOVE    SPACE               TO  B301-SET-INPSET
-               STRING  WRK-HEN-INPUTCD
+           IF     (WRK-HEN-INPUTCD     NOT =   SPACE )
+              AND (WRK-HEN-INPUTCD(45:4)   =   SPACE )
+               MOVE    WRK-HEN-INPUTCD     TO  WRK-HEN-INPUTCD-N
+               MOVE    SPACE               TO  WRK-HEN-INPUTCD
+               STRING  WRK-HEN-INPUTCD-N
                        "¡Û"                DELIMITED   BY  SPACE
-                                                INTO   B301-SET-INPSET
+                                                INTO   WRK-HEN-INPUTCD
                END-STRING
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI
+               MOVE    WRK-HEN-INPUTCD     TO  KANACHK-MAE-INPUT
+               MOVE    48                  TO  KANACHK-MAX-CNT
+               CALL    "ORCSKANACHK"       USING
+                                           ORCSKANACHKAREA
+               MOVE    KANACHK-MAE-INPUT   TO  WRK-HEN-INPUTCD
            END-IF
+           MOVE    WRK-HEN-INPUTCD     TO  B301-SET-INPSET
       *
            .
        200321-INPUTCD-HEN-EXT.
