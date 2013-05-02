@@ -118,6 +118,8 @@
       *    入力項目名
            03  WRK-MCP-WIDGET      PIC X(64).
       *
+           03  WRK-PATHNAME        PIC X(64).
+      *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
            03  WRK-HENYMD.
@@ -348,7 +350,7 @@
                MOVE    "tbl_syskanri_item"
                                        TO  MCP-TABLE
                MOVE    "key1"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-ITEM-READ-SEC
+               PERFORM 900-SYS-ITEM-FETCH-SEC
            ELSE
                INITIALIZE                  SYS-ITEM-REC
                MOVE    1               TO  FLG-SYS-ITEM
@@ -370,7 +372,7 @@
                MOVE    "tbl_syskanri_item"
                                        TO  MCP-TABLE
                MOVE    "key1"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-ITEM-READ-SEC
+               PERFORM 900-SYS-ITEM-FETCH-SEC
            END-PERFORM
       *
            MOVE    IDX             TO  SPA-GMN-LIST-MAX
@@ -509,7 +511,7 @@
       *
            EVALUATE    SPA-NAI-FLG
                WHEN    ZERO
-                   MOVE    1          TO  SPA-NAI-FLG
+                   MOVE    1           TO  SPA-NAI-FLG
                WHEN    1
                    MOVE    ZERO        TO  SPA-NAI-FLG
            END-EVALUATE
@@ -572,7 +574,7 @@
       *****************************************************************
       *    番号選択処理
       *****************************************************************
-       400-SELNUM-SEC            SECTION.
+       400-SELNUM-SEC              SECTION.
       *
            INITIALIZE                  SPA-GMN-NAIYO
            MOVE    ZERO            TO  SPA-GMN-SELNUM
@@ -634,7 +636,7 @@
                MOVE    "tbl_syskanri_item"
                                        TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-ITEM-READ-SEC
+               PERFORM 900-SYS-ITEM-FETCH-SEC
            ELSE
                INITIALIZE                  SYS-ITEM-REC
                MOVE    1               TO  FLG-SYS-ITEM
@@ -658,10 +660,11 @@
                MOVE    "tbl_syskanri_item"
                                        TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-ITEM-READ-SEC
+               PERFORM 900-SYS-ITEM-FETCH-SEC
            END-PERFORM
       *
            MOVE    IDX             TO  SPA-GMN-LIST-MAX
+      *
            MOVE    1               TO  PAGE-IDX
            MOVE    1               TO  PAGE-MAX
            IF      IDX > 30
@@ -681,24 +684,32 @@
       *****************************************************************
        400-LISTATAI-SEC            SECTION.
       *
+           IF      SPA-NAI-FLG     =   ZERO
+               MOVE    "key1"          TO  WRK-PATHNAME
+           ELSE
+               MOVE    "key2"          TO  WRK-PATHNAME
+           END-IF
+      *
            INITIALIZE                  SYS-VALUE-REC
            MOVE    SPA-HOSPNUM     TO  SYS-VALUE-HOSPNUM
            MOVE    SYS-ITEM-KANRICD
                                    TO  SYS-VALUE-KANRICD
            MOVE    SYS-ITEM-KBNCD  TO  SYS-VALUE-KBNCD
            MOVE    SYS-ITEM-ITEMCD TO  SYS-VALUE-ITEMCD
+           MOVE    SPA-SYSYMD      TO  SYS-VALUE-YUKOSTYMD
+                                       SYS-VALUE-YUKOEDYMD
       *
            MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
            MOVE    "tbl_syskanri_value"
                                    TO  MCP-TABLE
-           MOVE    "key2"          TO  MCP-PATHNAME
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
       *
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri_value"
                                        TO  MCP-TABLE
-               MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-VALUE-READ2-SEC
+               MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
+               PERFORM 900-SYS-VALUE-FETCH-SEC
            ELSE
                INITIALIZE                  SYS-VALUE-REC
                MOVE    1               TO  FLG-SYS-VALUE
@@ -709,8 +720,8 @@
       *
                MOVE    "tbl_syskanri_value"
                                        TO  MCP-TABLE
-               MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-VALUE-READ2-SEC
+               MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
+               PERFORM 900-SYS-VALUE-FETCH-SEC
            END-IF
       *
            PERFORM UNTIL  (IDX             >   200)
@@ -729,13 +740,13 @@
       *
                MOVE    "tbl_syskanri_value"
                                        TO  MCP-TABLE
-               MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-VALUE-READ2-SEC
+               MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
+               PERFORM 900-SYS-VALUE-FETCH-SEC
            END-PERFORM
       *
            MOVE    "tbl_syskanri_value"
                                    TO  MCP-TABLE
-           MOVE    "key2"          TO  MCP-PATHNAME
+           MOVE    WRK-PATHNAME    TO  MCP-PATHNAME
            PERFORM 930-DBCLOSE-SEC
       *
            .
@@ -838,7 +849,7 @@
                MOVE    "tbl_syskanri_combo"
                                        TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-COMBO-READ2-SEC
+               PERFORM 900-SYS-COMBO-FETCH-SEC
            ELSE
                INITIALIZE                  SYS-COMBO-REC
                MOVE    1               TO  FLG-SYS-COMBO
@@ -857,7 +868,7 @@
                MOVE    "tbl_syskanri_combo"
                                        TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-COMBO-READ2-SEC
+               PERFORM 900-SYS-COMBO-FETCH-SEC
            END-PERFORM
       *
            MOVE    "tbl_syskanri_combo"
@@ -1001,6 +1012,14 @@
                                        TO  SYSUP-VALUE-YUKOSTYMD
                MOVE    SYS-VALUE-YUKOEDYMD
                                        TO  SYSUP-VALUE-YUKOEDYMD
+               MOVE    SPA-HOSPNUM     TO  SYS-VALUE-HOSPNUM
+               MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
+               MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
+               MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
+               MOVE    SPA-NAI-YUKOSTYMD
+                                       TO  SYS-VALUE-YUKOSTYMD
+               MOVE    SPA-NAI-YUKOEDYMD
+                                       TO  SYS-VALUE-YUKOEDYMD
                MOVE    SPA-GMN-ATAI(1:SPA-GMN-ITEMLENGTH)
                                        TO  SYS-VALUE-VALUE
                MOVE    SPA-OPID        TO  SYS-VALUE-OPID
@@ -1130,6 +1149,7 @@
        500-GMNHEN-SEC              SECTION.
       * 
            INITIALIZE                  W00
+      *
            MOVE    ZERO            TO  IDX
            MOVE    ZERO            TO  IDY
       *
@@ -1178,8 +1198,8 @@
            MOVE    SPA-GMN-NAME        TO  W00-NAME
            MOVE    SPA-GMN-YUKOSTYMD   TO  W00-YUKOSTYMD
            MOVE    SPA-GMN-YUKOEDYMD   TO  W00-YUKOEDYMD
-      *
            MOVE    SPA-GMN-ATAI        TO  W00-ATAI
+      *
            PERFORM VARYING IDX     FROM    1       BY  1
                    UNTIL ( IDX     >   SPA-GMN-ATAI-MAX )
                    OR    ( IDX     >   50 )
@@ -1379,7 +1399,7 @@
       *****************************************************************
       *    システム管理項目読み込み処理
       *****************************************************************
-       900-SYS-ITEM-READ-SEC       SECTION.
+       900-SYS-ITEM-FETCH-SEC      SECTION.
       *
            PERFORM 920-DBFETCH-SEC
       *
@@ -1392,7 +1412,7 @@
            END-IF
       *
            .
-       900-SYS-ITEM-READ-EXT.
+       900-SYS-ITEM-FETCH-EXT.
            EXIT.
       *****************************************************************
       *    システム管理項目値読み込み処理
@@ -1410,15 +1430,7 @@
                MOVE    "tbl_syskanri_value"
                                        TO  MCP-TABLE
                MOVE    "key1"          TO  MCP-PATHNAME
-               PERFORM 920-DBFETCH-SEC
-      *
-               IF      MCP-RC              =   ZERO
-                   MOVE    ZERO            TO  FLG-SYS-VALUE
-                   MOVE    MCPDATA-REC     TO  SYS-VALUE-REC
-               ELSE
-                   MOVE    1               TO  FLG-SYS-VALUE
-                   INITIALIZE                  SYS-VALUE-REC
-               END-IF
+               PERFORM 900-SYS-VALUE-FETCH-SEC
            ELSE
                MOVE    1               TO  FLG-SYS-VALUE
                INITIALIZE                  SYS-VALUE-REC
@@ -1435,40 +1447,23 @@
       *****************************************************************
       *    システム管理項目値読み込み処理
       *****************************************************************
-       900-SYS-VALUE-READ2-SEC     SECTION.
+       900-SYS-VALUE-FETCH-SEC     SECTION.
       *
-           MOVE    ZERO            TO  FLG-OK
-           MOVE    ZERO            TO  FLG-SYS-VALUE
+           PERFORM 920-DBFETCH-SEC
       *
-           PERFORM UNTIL ( FLG-OK          =   1 )
-                   OR    ( FLG-SYS-VALUE   =   1 )
-      *
-               PERFORM 920-DBFETCH-SEC
-      *
-               IF      MCP-RC              =   ZERO
-                   MOVE    ZERO            TO  FLG-SYS-VALUE
-                   MOVE    MCPDATA-REC     TO  SYS-VALUE-REC
-               ELSE
-                   MOVE    1               TO  FLG-SYS-VALUE
-                   INITIALIZE                  SYS-VALUE-REC
-               END-IF
-      *
-               IF      SPA-NAI-FLG         =   ZERO
-                   IF    ( SYS-VALUE-YUKOSTYMD <=  SPA-SYSYMD ) AND
-                         ( SYS-VALUE-YUKOEDYMD >=  SPA-SYSYMD )
-                       MOVE    1               TO  FLG-OK
-                   END-IF
-               ELSE
-                   MOVE    1               TO  FLG-OK
-               END-IF
-      *
-           END-PERFORM
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO            TO  FLG-SYS-VALUE
+               MOVE    MCPDATA-REC     TO  SYS-VALUE-REC
+           ELSE
+               MOVE    1               TO  FLG-SYS-VALUE
+               INITIALIZE                  SYS-VALUE-REC
+           END-IF
       *
            .
-       900-SYS-VALUE-READ2-EXT.
+       900-SYS-VALUE-FETCH-EXT.
            EXIT.
       *****************************************************************
-      *    システム管理項目値項目読み込み処理
+      *    システム管理項目値選択肢読み込み処理
       *****************************************************************
        900-SYS-COMBO-READ-SEC      SECTION.
       *
@@ -1483,15 +1478,7 @@
                MOVE    "tbl_syskanri_combo"
                                        TO  MCP-TABLE
                MOVE    "key1"          TO  MCP-PATHNAME
-               PERFORM 920-DBFETCH-SEC
-      *
-               IF      MCP-RC              =   ZERO
-                   MOVE    ZERO            TO  FLG-SYS-COMBO
-                   MOVE    MCPDATA-REC     TO  SYS-COMBO-REC
-               ELSE
-                   MOVE    1               TO  FLG-SYS-COMBO
-                   INITIALIZE                  SYS-COMBO-REC
-               END-IF
+               PERFORM 900-SYS-COMBO-FETCH-SEC
            ELSE
                MOVE    1               TO  FLG-SYS-COMBO
                INITIALIZE                  SYS-COMBO-REC
@@ -1508,7 +1495,7 @@
       *****************************************************************
       *    システム管理項目値選択肢読み込み処理
       *****************************************************************
-       900-SYS-COMBO-READ2-SEC     SECTION.
+       900-SYS-COMBO-FETCH-SEC     SECTION.
       *
            PERFORM 920-DBFETCH-SEC
       *
@@ -1521,7 +1508,7 @@
            END-IF
       *
            .
-       900-SYS-COMBO-READ2-EXT.
+       900-SYS-COMBO-FETCH-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理
