@@ -7806,7 +7806,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        450-MAEGMN-SEC             SECTION.
       *
       *    診療行為入力チェック
-           MOVE    1                  TO  FLG-HENKOU
+      *H25.5  警告メッセージ表示対応
+      **** MOVE    1                  TO  FLG-HENKOU
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
                   (SPA-KIDCD           =   "0180" )  OR
@@ -7837,7 +7838,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        460-ATOGMN-SEC             SECTION.
       *
       *    診療行為入力チェック
-           MOVE    1                   TO  FLG-HENKOU
+      *H25.5  警告メッセージ表示対応
+      **** MOVE    1                   TO  FLG-HENKOU
            PERFORM 41011-KOUI-ALLHEN-SEC
            IF     (SPA-ERRCD       NOT =   SPACE )  OR
                   (SPA-KIDCD           =   "0180")  OR
