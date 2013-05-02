@@ -9836,6 +9836,8 @@
                WHEN  ( SPA-PREFNUM     =   CONST-CHIBA )
                 AND  ( SPA-GMN-KOHNUM  =   "263" OR "363"
                                         OR "463" )
+               WHEN  ( SPA-PREFNUM     =   CONST-SAITAMA )
+                AND  ( SPA-GMN-KOHNUM  =   "772" )
                WHEN  ( SPA-PREFNUM     =   CONST-FUKUOKA )
                 AND  ( SPA-GMN-KOHNUM  =   "383" )
                WHEN  ( SPA-PREFNUM     =   CONST-OITA )
