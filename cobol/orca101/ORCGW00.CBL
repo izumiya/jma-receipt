@@ -440,7 +440,7 @@
                    PERFORM 400-ATOPAGE-SEC
       *        更新
                WHEN    "CLICKED"       ALSO    "B12"
-                   MOVE    "1001"      TO  SPA-WIDCD
+                   PERFORM 400-KAKUNIN-SEC
            END-EVALUATE
       *
            .
@@ -979,6 +979,57 @@
        400-YUKOEDYMD-EXT.
            EXIT.
       *****************************************************************
+      *    確認処理
+      *****************************************************************
+       400-KAKUNIN-SEC             SECTION.
+      *
+           INITIALIZE                  SYS-VALUE-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-VALUE-HOSPNUM
+           MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
+           MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
+           MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
+      *
+           MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
+           MOVE    "tbl_syskanri_value"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+      *
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri_value"
+                                       TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 900-SYS-VALUE-FETCH-SEC
+           ELSE
+               INITIALIZE                  SYS-VALUE-REC
+               MOVE    1               TO  FLG-SYS-VALUE
+           END-IF
+      *
+           MOVE    ZERO            TO  IDY
+           PERFORM UNTIL   FLG-SYS-VALUE   =   1
+               IF    ( SYS-VALUE-YUKOEDYMD <   SPA-NAI-YUKOSTYMD )  OR
+                     ( SYS-VALUE-YUKOSTYMD >   SPA-NAI-YUKOEDYMD )
+                   CONTINUE
+               ELSE
+                   COMPUTE IDY = IDY + 1
+               END-IF
+      *
+               MOVE    "tbl_syskanri_value"
+                                       TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 900-SYS-VALUE-FETCH-SEC
+           END-PERFORM
+      *
+           IF      IDY      >   1
+               MOVE    "0006"          TO  SPA-ERRCD
+           ELSE
+               MOVE    "1001"          TO  SPA-WIDCD
+           END-IF
+      *
+           .
+       400-KAKUNIN-EXT.
+           EXIT.
+      *****************************************************************
       *    更新処理
       *****************************************************************
        490-KOUSHIN-SEC             SECTION.
@@ -1250,6 +1301,9 @@
                                            TO  SPA-ERRMSG
                WHEN    "0005"
                    MOVE    "有効期間が正しくありません"
+                                           TO  SPA-ERRMSG
+               WHEN    "0006"
+                   MOVE    "有効期間重複します"
                                            TO  SPA-ERRMSG
                WHEN    "1001"
                    MOVE    "更新できませんでした。"
