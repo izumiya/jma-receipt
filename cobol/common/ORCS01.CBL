@@ -399,6 +399,7 @@
       *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.06    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.06.07    NACL-ÌçÏÆ    13/03/05  ËÌ³¤Æ»ÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.08    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -10222,6 +10223,11 @@
                          MOVE  "4"    TO  WK-2010-NINNASIKBN(IDX-CYO)
                        END-IF
                      END-IF
+                   WHEN       11
+                     IF  (COMB-KOHHKNNUM(IDX-CYO)   =  "772"         )
+                     AND (LNK-SYU-SRYYMD(1:6)      >= "201304"       )
+                       MOVE    "1"    TO  WK-2010-NINNASIKBN(IDX-CYO)
+                     END-IF
                    WHEN       12
                      IF  (COMB-KOHHKNNUM(IDX-CYO)   =
                                               "263" OR "363" OR "463")
@@ -10791,6 +10797,11 @@
                                "145" OR "245" OR "146"
                             OR "246" OR "143" OR "243")
                AND (LNK-SYU-SRYYMD(1:6)     < "201104")
+                 MOVE    SPACE  TO  WK-2010-NINNASIKBN(IDX-CYO)
+               END-IF
+             WHEN       11
+               IF  (COMB-KOHHKNNUM(IDX-CYO) =  "772"  )
+               AND (LNK-SYU-SRYYMD(1:6)     < "201304")
                  MOVE    SPACE  TO  WK-2010-NINNASIKBN(IDX-CYO)
                END-IF
              WHEN       12

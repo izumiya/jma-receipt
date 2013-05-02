@@ -598,6 +598,7 @@
       *                                     À¸³èÎÅÍÜÉ¸½àÉéÃ´³Û¤Îµ­ºÜ¤ò¤·¤Ê¤¤
       *                                     ¡ÊÅ¦Í×Íó¡Ë
       *  04.06.12    NACL-ÌçÏÆ    13/04/10  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
+      *  04.06.13    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -19504,6 +19505,11 @@
                          MOVE     1     TO    FLG-SKY-TOKKOH
                        END-IF
                      END-IF
+                   WHEN      "11"
+                     IF  (SYU-KOH1HKNNUM  =  "772"                  )
+                     AND (RECE62-SRYYM   >=  "201304"               )
+                         MOVE     1     TO    FLG-SKY-TOKKOH
+                     END-IF
                    WHEN      "12"
                      IF  (SYU-KOH1HKNNUM  =  "263" OR "363" OR "463")
                      AND (RECE62-SRYYM   >=  "201203"               )
@@ -19613,6 +19619,11 @@
               IF  (SYU-KOH1HKNNUM  =  "145" OR "245" OR "146"
                                    OR "246" OR "143" OR "243")
               AND (RECE62-SRYYM    <  "201104"               )
+                         MOVE    ZERO   TO    FLG-SKY-TOKKOH
+              END-IF
+             WHEN      "11"
+              IF  (SYU-KOH1HKNNUM  =  "772"   )
+              AND (RECE62-SRYYM    <  "201304")
                          MOVE    ZERO   TO    FLG-SKY-TOKKOH
               END-IF
              WHEN      "12"
