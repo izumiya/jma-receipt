@@ -605,6 +605,7 @@
       *                                     ¡ÊÅ¦Í×Íó¡Ë
       *  04.06.12    NACL-ÌçÏÆ    13/04/10  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.06.13    NACL-ÌçÏÆ    13/05/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.14    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -17503,6 +17504,10 @@
                     (SYU-KOH1HKNNUM       =  "383"         ) AND
                     (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
                     (RECE62-SRYYM        >=  "201010"      ))
+                OR ((WRK-PREFNUM          =  "11"          ) AND
+                    (SYU-KOH1HKNNUM       =  "772"         ) AND
+                    (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
+                    (RECE62-SRYYM        >=  "201304"      ))
                    MOVE     1     TO    FLG-SKY-TOKKOH
                 END-IF
               END-IF

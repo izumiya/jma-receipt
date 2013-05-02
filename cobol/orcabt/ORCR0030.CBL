@@ -619,6 +619,7 @@
       *  04.06.12    NACL-ÌçÏÆ    13/03/21  Á´¹ñ¸øÈñ¤¢¤ê¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *  04.06.13    NACL-ÌçÏÆ    13/04/10  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.06.14    NACL-ÌçÏÆ    13/05/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.15    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -13892,6 +13893,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     (SYU-KOH1HKNNUM       =  "383"         ) AND
                     (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
                     (RECE02-SRYYM        >=  "201010"      ))
+                OR ((SYS-1001-PREFNUM     =   11           ) AND
+                    (SYU-KOH1HKNNUM       =  "772"         ) AND
+                    (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
+                    (RECE02-SRYYM        >=  "201304"      ))
                    MOVE     1     TO    FLG-SKY-TOKKOH
                 END-IF
               END-IF
