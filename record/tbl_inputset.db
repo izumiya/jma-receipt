@@ -145,4 +145,19 @@ path	key7	{
 	};
 };
 
+path	key8	{
+	DBSELECT	{
+		DECLARE tbl_inputset_key8_csr CURSOR FOR
+		SELECT *
+		FROM tbl_inputset
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND    (INPUTCD   LIKE '101%'
+                          OR    INPUTCD   LIKE '78888%' )
+			ORDER   BY        SETCD,
+					  YUKOSTYMD,
+			                  SETSEQ
+		;
+	};
+};
+
 

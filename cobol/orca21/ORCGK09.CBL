@@ -39,6 +39,7 @@
       * 04.05.00     NACL-多々納  09/06/XX  数量小数５桁対応
       * 04.05.00     NACL-多々納  09/10/XX  換算値入力対応
       * 04.07.00     NACL-多々納  12/03/07  処方せん料表示対応（H24.4対応）
+      *  04.07.00    NACL-多々納  13/05/XX  労災レセ電コード対応(H25.7)
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -328,6 +329,8 @@
            03  FLG-GMN-INIT1           PIC  9(01).
            03  FLG-GMN-INIT2           PIC  9(01).
       *
+           03  WRK-SRYCD               PIC X(09).
+      *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
            03  WRK-HENYMD.
@@ -345,6 +348,10 @@
       *
       *    診療種別名テーブル
            COPY    "CPORCSSRYSYU.INC".
+      *
+      *H25.7
+      *    労災コード置換えテーブル 
+           COPY   "CMRSICNGTBL.INC".
       *
       *   日本語数字
       * 01  TBL-SUJI-AREA.
@@ -2162,6 +2169,17 @@
                    IF      SRY-INPUTNUM (IDX)  NOT =   ZERO
                        PERFORM 490111-PTCOM-SET-SEC
                    END-IF
+      *
+      *H25.7       診療行為作成時の労災レセ電コード変換
+                   IF     (FLG-WRITE           =   1        )
+                     AND  (SRY-SRYYM           <   "201307" )
+                     AND  (SPA-SRYYMD          >=  "20130701")
+                     AND  (SRY-SRYCD(IDX)(1:3) =   "101"
+                                               OR  "788"     )
+      *                レセ電コードの変換
+                       PERFORM 410121-RSISRYCD-HEN-SEC
+                   END-IF
+      *
                    MOVE    IDY                 TO  IDX-W
                END-IF
                ADD     1                   TO  IDX-KAI
@@ -2197,6 +2215,29 @@
            END-IF
            .
        490111-PTCOM-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセ電コードの変換
+      *****************************************************************
+       410121-RSISRYCD-HEN-SEC              SECTION.
+      *
+      *    労災のコードの判定
+           SET     TBL-RCN             TO  1
+           SEARCH  TBL-RSICHG-OCC      VARYING   TBL-RCN
+               AT  END
+                   MOVE    SPACE           TO  WRK-SRYCD
+               WHEN    SRY-SRYCD(IDX)      =   TBL-RSICHG-MAE-SRYCD
+                                                          (TBL-RCN)
+                   MOVE    TBL-RSICHG-ATO-SRYCD (TBL-RCN)
+                                           TO  WRK-SRYCD
+           END-SEARCH
+           IF      WRK-SRYCD       NOT =   SPACE
+               MOVE    WRK-SRYCD           TO  WKSRY-SRYCD (IDY)
+           END-IF
+      *
+           .
+       410121-RSISRYCD-HEN-EXT.
            EXIT.
       *
       *****************************************************************

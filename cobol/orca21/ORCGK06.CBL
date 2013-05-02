@@ -34,6 +34,7 @@
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
       *  04.05.00    NACL-多々納  09/06/XX  数量小数５桁対応
       *  04.05.00    NACL-多々納  09/11/XX  移行履歴、リハビリコメント登録対応、登録変更対応
+      *  04.07.00    NACL-多々納  13/05/XX  労災レセ電コード対応(H25.7)
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -179,6 +180,9 @@
       *
       *    保険別算定履歴テーブル
            COPY   "CMSANTEITBL.INC".
+      *H25.7
+      *    労災コード置換えテーブル 
+           COPY   "CMRSICNGTBL.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1178,10 +1182,47 @@
       *        がん患者リハ開始日・終了日
                MOVE    1               TO  FLG-HKNSAN
            END-IF
+      *H25.7
+      *    労災保険コード変更
+           IF     (WRK-SRYCD(1:3)      =   "101"      )  AND
+                  (SPA-NAI-SRYYM       >=  "201307"   )
+               PERFORM 10001-RSICD-SANTEI-CHK-SEC
+           END-IF
+      *
       *
            .
        1000-SANTEI-CHK-EXT.
            EXIT.
+      *H25.7
+      *****************************************************************
+      *    労災コード保険毎のコードの判定処理
+      *****************************************************************
+       10001-RSICD-SANTEI-CHK-SEC      SECTION.
+      *
+      *    労災のコードの判定
+           SET     TBL-RCN             TO  1
+           SEARCH  TBL-RSICHG-OCC      VARYING   TBL-RCN
+               AT  END
+                   MOVE    SPACE           TO  WRK-RSI-KBN
+               WHEN    WRK-SRYCD           =   TBL-RSICHG-ATO-SRYCD
+                                                          (TBL-RCN)
+                   MOVE    TBL-RSICHG-KBN (TBL-RCN)
+                                           TO  WRK-RSI-KBN
+           END-SEARCH
+      *
+           IF      WRK-RSI-KBN         =   "R"
+               MOVE    1               TO  FLG-HKNSAN
+           ELSE
+               IF      WRK-RSI-KBN         =   "A"
+                   MOVE    1               TO  FLG-HKNSAN
+               ELSE
+                   MOVE    ZERO            TO  FLG-HKNSAN
+               END-IF
+           END-IF
+           .
+       10001-RSICD-SANTEI-CHK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    初回算定日  入力処理

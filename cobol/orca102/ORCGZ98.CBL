@@ -47,7 +47,6 @@
       *  04.01.00    NACL-多々納  08/01/30  次頁表示の追加
       *  04.05.00    NACL-多々納  09/07/24  診療行為一覧と同期
       *  04.06.00    NACL-多々納  12/04/20  一般名記載区分他対応
-      *  04.06.00    NACL-多々納  12/07/09  労災等名称編集追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -412,6 +411,7 @@
            COPY    "ZFIL.INC".
            COPY    "CPAPIMOD.INC".
       *
+      *
        PROCEDURE                   DIVISION    USING
            MCPAREA
            SPAAREA
@@ -526,6 +526,9 @@
            MOVE    "4:コメント"        TO  SPA-Z98-USERLST (4)
            MOVE    "5:労災"            TO  SPA-Z98-USERLST (5)
            MOVE    "6:システム予約"    TO  SPA-Z98-USERLST (6)
+           IF      SPA-SYSYMD          >=  "20130701"
+               MOVE    "7:労災（合成）"    TO  SPA-Z98-USERLST (7)
+           END-IF
            MOVE    SPACE               TO  SPA-Z98-USER-G
       *
            MOVE    SPA-Z98-GMN-SYORI   TO  SPA-Z98-OLD-SYORI
@@ -1557,19 +1560,8 @@
            MOVE    IDX                 TO  SPA-Z98-GMN-NO     (IDX)
            MOVE    ICD-INPUTCD         TO  SPA-Z98-GMN-INPUTCD (IDX)
            MOVE    ICD-SRYCD           TO  SPA-Z98-GMN-SRYCD   (IDX)
-           MOVE    TNS-NAME            TO  SPA-Z98-GMN-NAME    (IDX)
-           MOVE    TNS-TEN             TO  SPA-Z98-GMN-KISOTEN (IDX)
-      *    薬剤・器材の時単位
-           IF      TNS-SRYCD (1:1) =   "6"  OR  "7"
-                MOVE    TNS-TANINAME       TO  SPA-Z98-GMN-TANI(IDX)
-           END-IF
       *
-      *    診療コードの時、種別
-           IF      TNS-SRYCD (1:1)     =   "1"
-               MOVE    TNS-SRYKBN          TO  SPA-Z98-GMN-TANI(IDX)
-           END-IF
-      *
-      *H24.7
+      *ver.4.7
       *    共通編集処理
            PERFORM 310211-TENSU-KYOHEN-SEC
       *
@@ -1779,6 +1771,35 @@
                        MOVE    1               TO  FLG-CHK
                    END-IF
                END-IF
+      *H25.7
+      *        労災の合成コード対象外
+               IF      SPA-Z98-GMN-SYORI3      =   "U5"
+                   IF     (TNS-SRYCD(1:1)           =   "1")
+                   AND    (TNS-DATAKBN              =   "1")
+                   AND    (TNS-KOKUJISKBKBN1        =   3  )
+                       MOVE    1               TO  FLG-CHK
+                       IF     SPA-Z98-GMN-ALL      =   "1"
+                          MOVE    ZERO             TO  FLG-CHK
+                       END-IF
+                   END-IF
+               END-IF
+      *        労災の合成コードのみ
+               IF      SPA-Z98-GMN-SYORI3      =   "U7"
+                   IF     (TNS-SRYCD(1:1)           =   "1")
+                   AND    (TNS-DATAKBN              =   "1")
+                   AND    (TNS-KOKUJISKBKBN1        =   3  )
+                       CONTINUE
+                   ELSE
+                       MOVE    1               TO  FLG-CHK
+                   END-IF
+               END-IF
+      *        労災の外来管理加算（読替）は対象外（レセプト自動記載）
+      *        IF     (TNS-SRYCD(1:3)           =   "101" )
+      *        AND    (TNS-SRYKBN           NOT =   "12" )
+      *        AND    (TNS-GAIKANRIKBN          =   2    )
+      *            MOVE    1               TO  FLG-CHK
+      *        END-IF
+      *
       *
                IF      FLG-CHK             =   ZERO
                    ADD     1               TO  IDX2
@@ -1906,13 +1927,19 @@
                    MOVE    "key12s"             TO  WRK-PATH
                    MOVE    "100000000"          TO  TNS-SRYCD
                    MOVE    "109999999"          TO  TNSUP-SRYCD
-                   MOVE    "1"                  TO  SPA-Z98-GMN-ALL
+      *H25.7       MOVE    "1"                  TO  SPA-Z98-GMN-ALL
                WHEN    "U6"
       *            予約コード
                    MOVE    "key12s"             TO  WRK-PATH
                    MOVE    "099000000"          TO  TNS-SRYCD
                    MOVE    "099999999"          TO  TNSUP-SRYCD
                    MOVE    "1"                  TO  SPA-Z98-GMN-ALL
+      *H25.7
+               WHEN    "U7"
+      *            労災診察
+                   MOVE    "key12s"             TO  WRK-PATH
+                   MOVE    "100000000"          TO  TNS-SRYCD
+                   MOVE    "109999999"          TO  TNSUP-SRYCD
       *TEST
                WHEN    "JK"
       *            自院・器材
@@ -2052,30 +2079,15 @@
            MOVE    TNS-SRYCD           TO  SPA-Z98-GMN-INPUTCD
                                                             (IDX)
            MOVE    TNS-SRYCD           TO  SPA-Z98-GMN-SRYCD(IDX)
-           MOVE    TNS-NAME            TO  SPA-Z98-GMN-NAME
-                                                             (IDX)
-           MOVE    TNS-TEN             TO  SPA-Z98-GMN-KISOTEN
-                                                            (IDX)
-      *     薬剤・器材の時単位
-           IF      TNS-SRYCD (1:1)     =   "6"  OR  "7"
-               MOVE    TNS-TANINAME        TO  SPA-Z98-GMN-TANI(IDX)
-           END-IF
       *
-      *    診療コードの時、種別
-           IF      SPA-Z98-GMN-SYORI   =   "9"
-               CONTINUE
-           ELSE
-               IF      TNS-SRYCD (1:1)     =   "1"
-                   MOVE    TNS-SRYKBN          TO  SPA-Z98-GMN-TANI(IDX)
-               END-IF
-               IF      TNS-SRYCD (1:3)     =   "099"
-                   MOVE    TNS-SRYKBN          TO  SPA-Z98-GMN-TANI(IDX)
-               END-IF
-           END-IF
+      *ver.4.7
+      *    共通編集処理
+           PERFORM 310211-TENSU-KYOHEN-SEC
       *!!!!
       *    ユーザ登録はコードの頭３桁を単位に表示する（点数マスタ登録）
            IF     (TNS-SRYCD (1:1)     =   "0" )
             AND   (TNS-SRYCD (1:3) NOT =   "099" )
+               MOVE    SPACE               TO  SPA-Z98-GMN-TANI(IDX)
                MOVE    "("                 TO  SPA-Z98-GMN-TANI(IDX)
                                                               (1:1)
                MOVE    TNS-SRYCD(1:3)      TO  SPA-Z98-GMN-TANI(IDX)
@@ -2085,9 +2097,6 @@
            END-IF
       *!!!T
       *
-      *H24.7
-      *    共通編集処理
-           PERFORM 310211-TENSU-KYOHEN-SEC
       *!!
       *    入力ＣＤ
            PERFORM 3200-SETCD-HEN-SEC
@@ -2168,6 +2177,25 @@
       *    点数マスタ共通編集処理
       *****************************************************************
        310211-TENSU-KYOHEN-SEC             SECTION.
+      *
+           MOVE    TNS-NAME            TO  SPA-Z98-GMN-NAME    (IDX)
+           MOVE    TNS-TEN             TO  SPA-Z98-GMN-KISOTEN (IDX)
+      *    薬剤・器材の時単位
+           IF      TNS-SRYCD (1:1)     =   "6"  OR  "7"
+               MOVE    TNS-TANINAME        TO  SPA-Z98-GMN-TANI(IDX)
+           END-IF
+      *
+      *    診療コードの時、種別
+           IF      SPA-Z98-GMN-SYORI   =   "9"
+               CONTINUE
+           ELSE
+               IF      TNS-SRYCD (1:1)     =   "1"
+                   MOVE    TNS-SRYKBN          TO  SPA-Z98-GMN-TANI(IDX)
+               END-IF
+               IF      TNS-SRYCD (1:3)     =   "099"
+                   MOVE    TNS-SRYKBN          TO  SPA-Z98-GMN-TANI(IDX)
+               END-IF
+           END-IF
       *
       *    診療行為で老人の時、再編集
            IF     (TNS-SRYCD(1:1)      =   "1") AND
@@ -2256,8 +2284,8 @@
                       INTO                 SPA-Z98-GMN-NAME(IDX)
                END-STRING
            END-IF
-      *
-      *H24.7
+      *!!
+      *H24.6
       *    労災コード名称編集
            IF      (TNS-SRYCD(1:3)     =   "101")
       *    労災（器材）
@@ -2281,12 +2309,11 @@
                       INTO                 SPA-Z98-GMN-NAME(IDX)
                END-STRING
            END-IF
-      *
+      *!!
       *
            .
        310211-TENSU-KYOHEN-EXT.
            EXIT.
-      *
       *
       *****************************************************************
       *    検査名称再編集処理
@@ -2458,6 +2485,20 @@
                        WHEN    "U5"
                            MOVE    "労災"
                                                TO  Z98-SENTAKU
+      *H25.7
+                           IF     (SPA-SYSYMD      >=  "20130701")
+                               IF     (SPA-Z98-GMN-ALL     =   "1" )
+                                   MOVE    "労災（合成コード含む）"
+                                               TO  Z98-SENTAKU
+                               ELSE
+                                   MOVE    "労災（合成コード以外）"
+                                               TO  Z98-SENTAKU
+                               END-IF
+                           END-IF
+                       WHEN    "U7"
+                           MOVE    "労災合成コード"
+                                               TO  Z98-SENTAKU
+      *
                        WHEN    "U6"
                            MOVE    "システム予約コード"
                                                TO  Z98-SENTAKU
@@ -3663,6 +3704,9 @@
                    MOVE    "U5"            TO  SPA-Z98-GMN-SYORI3
                WHEN    "6"
                    MOVE    "U6"            TO  SPA-Z98-GMN-SYORI3
+      *H25.7
+               WHEN    "7"
+                   MOVE    "U7"            TO  SPA-Z98-GMN-SYORI3
                WHEN    OTHER
                    MOVE    "0011"          TO  SPA-ERRCD
                    GO      TO      41014-USER-CHK-EXT
@@ -4239,6 +4283,10 @@
                        WHEN    "U6"
                            MOVE
                            "システム予約コードコードがありません"
+                                               TO  SPA-ERRMSG
+      *H25.7
+                       WHEN    "U7"
+                           MOVE    "労災合成コードがありません"
                                                TO  SPA-ERRMSG
                        WHEN    "JK"
                            MOVE    "自院採用の器材コードがありません"

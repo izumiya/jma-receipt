@@ -40,6 +40,13 @@
            03  FILLER      PIC X(20)   VALUE   "A101130010 101800920".
            03  FILLER      PIC X(20)   VALUE   "A101130005 101800910".
       *
+      *    ∫∆ø«Œ¡
+           03  FILLER      PIC X(20)   VALUE   " 101120040 101120010".
+      *    ≥∞ÕË¥…Õ˝≤√ªª° ∆…§ﬂ¬ÿ§®°À
+           03  FILLER      PIC X(20)   VALUE   " 101120070 101120020".
+      *    ∫∆ø«Œ¡° ∆±∞Ï∆¸£≤≤ Ã‹°À
+           03  FILLER      PIC X(20)   VALUE   " 101120100 101120040".
+      *
       *    ∫∆ø«ª˛Œ≈Õ‹ªÿ∆≥¥…Õ˝Œ¡
            03  FILLER      PIC X(20)   VALUE   " 101120030 101130190".
       *    µŸ∂»æ⁄Ã¿
@@ -136,7 +143,7 @@
            03  FILLER      PIC X(20)   VALUE   " 788888005 788888009".
       *    
        01  TBL-RSICHG-AREA-R       REDEFINES   TBL-RSICHG-AREA.
-           03  TBL-RSICHG-OCC      OCCURS   55  INDEXED   TBL-RCN.
+           03  TBL-RSICHG-OCC      OCCURS   58  INDEXED   TBL-RCN.
       *        (R:œ´∫“ÀË£±≤Û)
                05  TBL-RSICHG-KBN             PIC X(01).
       *        ¡∞•≥°º•…

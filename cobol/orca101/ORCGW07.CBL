@@ -2075,7 +2075,10 @@
                                        TO  SPA-GMN-SJKBNLST (12)
            MOVE    "99 レセプト摘要欄コメント"
                                        TO  SPA-GMN-SJKBNLST (13)
-           MOVE    13                  TO  SPA-GMN-SJKBN-MAX
+      *H25.7 から追加
+           MOVE    "AA 労災レセプト「傷病の経過」"
+                                       TO  SPA-GMN-SJKBNLST (14)
+           MOVE    14                  TO  SPA-GMN-SJKBN-MAX
       *
       *    会計照会情報
            MOVE    "0 診療科順"        TO  SPA-GMN-SRYKBN-LIST(1)

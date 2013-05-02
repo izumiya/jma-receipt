@@ -1242,6 +1242,19 @@
                END-IF
                MOVE    1               TO  FLG-SYUGI
            END-IF
+      *H25.7
+      *    洢碳戊□玉及公及職ㄧㄟ反管坌峊
+           IF     (SPA-SRYYMD          >=  "20130701" )
+               IF     (SPA-COM-SRYKBN (IDX)    =   "80" )
+                AND   (SPA-COM-INPUTCD(IDX)(1:3)   =   "101")
+                AND   (SPA-COM-DATAKBN (IDX)   =   "1"  )
+                   IF      FLG-SYUGI           =   1
+                       MOVE    2               TO  FLG-SYORI
+                   END-IF
+                   MOVE    1               TO  FLG-SYUGI
+               END-IF
+           END-IF
+      *!!
       *!!
       *    質杅六氏恔反澎絰恔匹管坌峊午允月
            IF     (SPA-COM-SRYKBN (IDX)    =   "80" )  AND

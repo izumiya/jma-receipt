@@ -31,6 +31,7 @@
       *                                     ÆþÎÏ£Ã£ÄÉ½¼¨ÄÉ²Ã
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/04/18  °ìÈÌÌ¾¾Î¸¡º÷ÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/07/09  Ï«ºÒÅùÌ¾¾ÎÊÔ½¸ÄÉ²Ã
+      *  04.07.00    NACL-Â¿¡¹Ç¼  13/03/01  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -520,6 +521,9 @@
            MOVE    "4:¥³¥á¥ó¥È"        TO  SPA-KT98-USERLST (4)
            MOVE    "5:Ï«ºÒ"            TO  SPA-KT98-USERLST (5)
            MOVE    "6:¥·¥¹¥Æ¥àÍ½Ìó"    TO  SPA-KT98-USERLST (6)
+           IF      SPA-SRYYMD          >=  "20130701"
+               MOVE    "7:Ï«ºÒ¡Ê¹çÀ®¡Ë"    TO  SPA-KT98-USERLST (7)
+           END-IF
            MOVE    SPACE               TO  SPA-KT98-USER-G
       *
            MOVE    SPA-KT98-GMN-SYORI   TO  SPA-KT98-OLD-SYORI
@@ -1778,6 +1782,35 @@
                        MOVE    1               TO  FLG-CHK
                    END-IF
                END-IF
+      *H25.7
+      *        Ï«ºÒ¤Î¹çÀ®¥³¡¼¥ÉÂÐ¾Ý³°
+               IF      SPA-KT98-GMN-SYORI3      =   "U5"
+                   IF     (TNS-SRYCD(1:1)           =   "1")
+                   AND    (TNS-DATAKBN              =   "1")
+                   AND    (TNS-KOKUJISKBKBN1        =   3  )
+                       MOVE    1               TO  FLG-CHK
+                       IF     SPA-KT98-GMN-ALL      =   "1"
+                          MOVE    ZERO             TO  FLG-CHK
+                       END-IF
+                   END-IF
+               END-IF
+      *        Ï«ºÒ¤Î¹çÀ®¥³¡¼¥É¤Î¤ß
+               IF      SPA-KT98-GMN-SYORI3      =   "U7"
+                   IF     (TNS-SRYCD(1:1)           =   "1")
+                   AND    (TNS-DATAKBN              =   "1")
+                   AND    (TNS-KOKUJISKBKBN1        =   3  )
+                       CONTINUE
+                   ELSE
+                       MOVE    1               TO  FLG-CHK
+                   END-IF
+               END-IF
+      *        Ï«ºÒ¤Î³°Íè´ÉÍý²Ã»»¡ÊÆÉÂØ¡Ë¤ÏÂÐ¾Ý³°¡Ê¥ì¥»¥×¥È¼«Æ°µ­ºÜ¡Ë
+               IF     (TNS-SRYCD(1:3)           =   "101" )
+               AND    (TNS-SRYKBN           NOT =   "12" )
+               AND    (TNS-GAIKANRIKBN          =   2    )
+                   MOVE    1               TO  FLG-CHK
+               END-IF
+      *
       *
                IF      FLG-CHK             =   ZERO
                    ADD     1               TO  IDX2
@@ -1912,6 +1945,13 @@
                    MOVE    "099000000"          TO  TNS-SRYCD
                    MOVE    "099999999"          TO  TNSUP-SRYCD
                    MOVE    "1"                  TO  SPA-KT98-GMN-ALL
+      *H25.7
+               WHEN    "U7"
+      *            Ï«ºÒ¿Ç»¡
+                   MOVE    "key12s"             TO  WRK-PATH
+                   MOVE    "100000000"          TO  TNS-SRYCD
+                   MOVE    "109999999"          TO  TNSUP-SRYCD
+      *TEST
       *TEST
                WHEN    "JK"
       *            ¼«±¡¡¦´ïºà
@@ -2243,9 +2283,8 @@
                       INTO                 SPA-KT98-GMN-NAME(IDX)
                END-STRING
            END-IF
-      *!!
       *
-      *H24.7
+      *H24.6
       *    Ï«ºÒ¥³¡¼¥ÉÌ¾¾ÎÊÔ½¸
            IF      (TNS-SRYCD(1:3)     =   "101")
       *    Ï«ºÒ¡Ê´ïºà¡Ë
@@ -2269,7 +2308,6 @@
                       INTO                 SPA-KT98-GMN-NAME(IDX)
                END-STRING
            END-IF
-      *
       *
            .
        310211-TENSU-KYOHEN-EXT.
@@ -2445,6 +2483,20 @@
                        WHEN    "U5"
                            MOVE    "Ï«ºÒ"
                                                TO  KT98-SENTAKU
+      *H25.7
+                           IF     (SPA-SRYYMD      >=  "20130701")
+                               IF     (SPA-KT98-GMN-ALL     =   "1" )
+                                   MOVE    "Ï«ºÒ¡Ê¹çÀ®¥³¡¼¥É´Þ¤à¡Ë"
+                                               TO  KT98-SENTAKU
+                               ELSE
+                                   MOVE    "Ï«ºÒ¡Ê¹çÀ®¥³¡¼¥É°Ê³°¡Ë"
+                                               TO  KT98-SENTAKU
+                               END-IF
+                           END-IF
+                       WHEN    "U7"
+                           MOVE    "Ï«ºÒ¹çÀ®¥³¡¼¥É"
+                                               TO  KT98-SENTAKU
+      *
                        WHEN    "U6"
                            MOVE    "¥·¥¹¥Æ¥àÍ½Ìó¥³¡¼¥É"
                                                TO  KT98-SENTAKU
@@ -3810,6 +3862,8 @@
                    MOVE    "U5"            TO  SPA-KT98-GMN-SYORI3
                WHEN    "6"
                    MOVE    "U6"            TO  SPA-KT98-GMN-SYORI3
+               WHEN    "7"
+                   MOVE    "U7"            TO  SPA-KT98-GMN-SYORI3
                WHEN    OTHER
                    MOVE    "0011"          TO  SPA-ERRCD
                    GO      TO      41014-USER-CHK-EXT

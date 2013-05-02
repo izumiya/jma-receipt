@@ -2315,6 +2315,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        WHEN    "3"
                            MOVE    "2"         TO  ORCSCZAICHK-INPUTKBN
                                                              (IDX)
+      *H25.7
+      *            Ï«ºÒÆÉ¤ßÂØ¤¨¼êµ»
+                       WHEN    "R"
+                           MOVE    "R"         TO  ORCSCZAICHK-INPUTKBN
+                                                             (IDX)
                    END-EVALUATE
       *
                    IF     (SRY-SRYCD (IDX2)(1:1)   =   "8" ) OR
