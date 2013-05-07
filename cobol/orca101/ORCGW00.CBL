@@ -983,47 +983,52 @@
       *****************************************************************
        400-KAKUNIN-SEC             SECTION.
       *
-           INITIALIZE                  SYS-VALUE-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-VALUE-HOSPNUM
-           MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
-           MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
-           MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
-      *
-           MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
-           MOVE    "tbl_syskanri_value"
-                                   TO  MCP-TABLE
-           MOVE    "key2"          TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-      *
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_syskanri_value"
-                                       TO  MCP-TABLE
-               MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-VALUE-FETCH-SEC
+           IF      SPA-GMN-LIST-YUKOSTYMD(SPA-GMN-SELNUM)
+                                   =   SPA-GMN-YUKOSTYMD
+               MOVE    "1001"          TO  SPA-WIDCD
            ELSE
                INITIALIZE                  SYS-VALUE-REC
-               MOVE    1               TO  FLG-SYS-VALUE
-           END-IF
+               MOVE    SPA-HOSPNUM     TO  SYS-VALUE-HOSPNUM
+               MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
+               MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
+               MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
       *
-           MOVE    ZERO            TO  IDY
-           PERFORM UNTIL   FLG-SYS-VALUE   =   1
-               IF    ( SYS-VALUE-YUKOEDYMD <   SPA-NAI-YUKOSTYMD )  OR
-                     ( SYS-VALUE-YUKOSTYMD >   SPA-NAI-YUKOEDYMD )
-                   CONTINUE
-               ELSE
-                   COMPUTE IDY = IDY + 1
-               END-IF
-      *
+               MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
                MOVE    "tbl_syskanri_value"
                                        TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 900-SYS-VALUE-FETCH-SEC
-           END-PERFORM
+               PERFORM 910-DBSELECT-SEC
       *
-           IF      IDY      >   1
-               MOVE    "0006"          TO  SPA-ERRCD
-           ELSE
-               MOVE    "1001"          TO  SPA-WIDCD
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_syskanri_value"
+                                           TO  MCP-TABLE
+                   MOVE    "key2"          TO  MCP-PATHNAME
+                   PERFORM 900-SYS-VALUE-FETCH-SEC
+               ELSE
+                   INITIALIZE                  SYS-VALUE-REC
+                   MOVE    1               TO  FLG-SYS-VALUE
+               END-IF
+      *
+               MOVE    ZERO            TO  IDY
+               PERFORM UNTIL   FLG-SYS-VALUE   =   1
+                   IF    ( SYS-VALUE-YUKOEDYMD <   SPA-NAI-YUKOSTYMD ) 
+                     OR  ( SYS-VALUE-YUKOSTYMD >   SPA-NAI-YUKOEDYMD )
+                       CONTINUE
+                   ELSE
+                       COMPUTE IDY = IDY + 1
+                   END-IF
+      *
+                   MOVE    "tbl_syskanri_value"
+                                           TO  MCP-TABLE
+                   MOVE    "key2"          TO  MCP-PATHNAME
+                   PERFORM 900-SYS-VALUE-FETCH-SEC
+               END-PERFORM
+      *
+               IF      IDY      >=   1
+                   MOVE    "0006"          TO  SPA-ERRCD
+               ELSE
+                   MOVE    "1001"          TO  SPA-WIDCD
+               END-IF
            END-IF
       *
            .
@@ -1046,7 +1051,8 @@
            MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
            MOVE    SPA-NAI-YUKOSTYMD
                                    TO  SYS-VALUE-YUKOSTYMD
-           MOVE    SPA-NAI-YUKOEDYMD
+      *     MOVE    SPA-NAI-YUKOEDYMD
+           MOVE    SPA-NAI-YUKOSTYMD
                                    TO  SYS-VALUE-YUKOEDYMD
            MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
            PERFORM 900-SYS-VALUE-READ-SEC
