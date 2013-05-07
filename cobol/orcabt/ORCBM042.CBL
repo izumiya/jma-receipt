@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.01    NACL-藤原    13/05/07  公務災害を対象外とする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1109,7 +1110,7 @@
       *
                EVALUATE    FLG-SYORI
                    WHEN    1
-                       IF      RECE10-HKNKBN   =   "3" OR  "5"
+                       IF      RECE10-HKNKBN   =   "3" OR  "4"
                            GO  TO  900-SEIKYU-READ-SEC
                        END-IF
                    WHEN    2
@@ -1130,6 +1131,8 @@
                        " SRYYM="    RECE10-SRYYM 
                        " SYOKAFLG=" RECE10-SYOKAIFLG
                        " HKNJANUM-S="    RECE10-HKNJANUM-S
+                       " HKNKBN="    RECE10-HKNKBN 
+                       " " RECE10-RECESYUBETU
                        " FTNMONEY=" RECE10-FTNMONEY (1)
       *         
            ELSE
