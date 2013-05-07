@@ -167,6 +167,8 @@
       *  04.07.06    NACL-藤原    12/11/19  主科情報の取得方法変更
       *  04.07.07    NACL-藤原    12/12/11  確認画面表示の修正
       *  04.07.08    NACL-藤原    13/04/10  個別作成時のプレビュー画面表示
+      *  04.07.10    NACL-藤原    13/05/02  プレビュー画面戻り時の公費Ｃ
+      *                                     ＳＶの状態設定
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -289,6 +291,8 @@
                05  WRK-PRTNM-FIL   PIC X(02).
                05  WRK-PRTNM-X     PIC X(02). 
            03  WRK-DASUPLOAD       PIC 9(01).
+      *
+           03  WRK-MOTOPG          PIC X(08). 
       *
       *    パラメタＤＢ編集用
            03  WRK-BTPARA-INFO-PARA.
@@ -633,8 +637,13 @@
       *        元の画面へ戻す
                IF      SPA-MOTOPG      =   "XA01"  OR  "XB01"  OR
                                            "XC01"
+                   MOVE    SPA-MOTOPG      TO  WRK-MOTOPG
                    MOVE    LNK-COMMON      TO  SPA-KYOUTU
                    MOVE    LNK-SCRSPA      TO  SPA-T01FREE
+                   IF      WRK-MOTOPG      =   "XC01"
+      *                公費ＣＳＶボタンの状態設定
+                       PERFORM 3102-FILE-INFO-CHECK-SEC
+                   END-IF
                    INITIALIZE              SPA-T01KYOUTU
                    GO  TO  300-SCREEN-EXT
                END-IF
