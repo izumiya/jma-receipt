@@ -2936,6 +2936,23 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        4900-KANRENCHK-SEC           SECTION.
       *
+      *    ¿¦°÷¶èÊ¬
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-SYOKUKBN-MAX
+               IF      SPA-GMN-SYOKUKBN    =   SPA-GMN-SYOKUKBN-LIST
+                                                     (IDX)(1:1)
+                   MOVE    SPA-SYOKUKBN-MAX    TO  IDX
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    "0001"          TO  SPA-ERRCD
+               MOVE    1               TO  SPA-GMN-CUR
+               GO      TO      4900-KANRENCHK-EXT
+           END-IF
+      *
+      *
       *    ¿¦°÷¥³¡¼¥É
            IF     (SPA-GMN-SYOKUCOD    =   SPACE )  OR
                   (SPA-GMN-SYOKUCOD    NOT NUMERIC)
