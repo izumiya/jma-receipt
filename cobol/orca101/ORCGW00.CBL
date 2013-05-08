@@ -662,6 +662,10 @@
                                        TO  SPA-GMN-LIST-ITEMTYPE(IDX)
                MOVE    SYS-ITEM-ITEMNAME
                                        TO  SPA-GMN-LIST-NAME(IDX)
+               MOVE    "00000000"      TO  SPA-NAI-LIST-YUKOSTYMD(IDX)
+                                           SPA-GMN-LIST-YUKOSTYMD(IDX)
+               MOVE    "99999999"      TO  SPA-NAI-LIST-YUKOEDYMD(IDX)
+                                           SPA-GMN-LIST-YUKOEDYMD(IDX)
                PERFORM 400-LISTATAI-SEC
       *
                MOVE    "tbl_syskanri_item"
@@ -1211,9 +1215,9 @@
            MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
            MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
            MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
-           MOVE    SPA-NAI-YUKOSTYMD
+           MOVE    SPA-NAI-LIST-YUKOSTYMD(SPA-GMN-SELNUM)
                                    TO  SYS-VALUE-YUKOSTYMD
-           MOVE    SPA-NAI-YUKOEDYMD
+           MOVE    SPA-NAI-LIST-YUKOEDYMD(SPA-GMN-SELNUM)
                                    TO  SYS-VALUE-YUKOEDYMD
            MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
            PERFORM 900-SYS-VALUE-READ-SEC
