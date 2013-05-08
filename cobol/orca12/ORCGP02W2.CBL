@@ -113,6 +113,8 @@
       *                                     ０８（老健）のレセプト対応
       *  04.06.03    NACL-門脇    12/11/20  特記事項０１（公）に関わる窓口計算・
       *                                     レセプト一部負担金記載対応
+      *  04.06.04    NACL-門脇    13/05/08  特定負有と特定負無（水俣）の
+      *                                     保険組合せ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3856,8 +3858,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                              END-IF
                           ELSE
                            IF   WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) = "091"
-      *                      精神通院と特定疾患（水俣）の保険組合せ対応
-      *                      IF   SPA-PREFNUM    =    43
+      *                      （精神通院、更生、特定負有）＋特定負無（水俣）
                              IF  WRK-KOH-FTNJANUM(WRK-COMB-HJOIDX)
                                            =   "51153013" OR
                                                "51153021" OR
@@ -3870,7 +3871,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                "51463016" OR
                                                "51463024" OR
                                                "51463032"
-                               IF  WRK-SRT-HJO-KOHNO     =   "021"
+                               IF  WRK-SRT-HJO-KOHNO  =
+                                   "021" OR "015" OR "051"
                                   PERFORM 5701413-SYUKOH-HJO-SEC
                                END-IF
                              END-IF
@@ -3881,25 +3883,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                IF  WRK-SRT-HJO-KOHNO(2:2)  =  "41"
                                   PERFORM 5701413-SYUKOH-HJO-SEC
                                END-IF
-                           END-IF
-                           IF   WRK-KOH-HKNNUM(WRK-COMB-HJOIDX) = "091"
-      *                      更正と特定疾患（水俣）の保険組合せ対応
-                             IF  WRK-KOH-FTNJANUM(WRK-COMB-HJOIDX)
-                                           =   "51153013" OR
-                                               "51153021" OR
-                                               "51153039" OR
-                                               "51153047" OR
-                                               "51433019" OR
-                                               "51433027" OR
-                                               "51433035" OR
-                                               "51433043" OR
-                                               "51463016" OR
-                                               "51463024" OR
-                                               "51463032"
-                               IF  WRK-SRT-HJO-KOHNO     =   "015"
-                                  PERFORM 5701413-SYUKOH-HJO-SEC
-                               END-IF
-                             END-IF
                            END-IF
                           END-IF
                        ELSE
