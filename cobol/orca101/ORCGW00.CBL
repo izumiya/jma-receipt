@@ -55,6 +55,7 @@
                            11  SPA-GMN-LIST-KBNCD       PIC X(08).
                            11  SPA-GMN-LIST-ITEMCD      PIC 9(05).
                            11  SPA-GMN-LIST-ITEMLENGTH  PIC 9(03).
+                           11  SPA-GMN-LIST-ITEMTYPE    PIC 9(01).
                            11  SPA-GMN-LIST-NO          PIC X(02).
                            11  SPA-GMN-LIST-NAME        PIC X(40).
                            11  SPA-GMN-LIST-ATAI        PIC X(40).
@@ -76,6 +77,7 @@
                    07  SPA-NAI-YUKOSTYMD   PIC X(08).
                    07  SPA-NAI-YUKOEDYMD   PIC X(08).
                    07  SPA-GMN-ITEMLENGTH  PIC 9(03).
+                   07  SPA-GMN-ITEMTYPE    PIC 9(01).
       *
                    07  SPA-GMN-ATAI-G.
                        09  SPA-GMN-ATAI    PIC X(40).
@@ -156,6 +158,9 @@
            COPY    "CPORCSLNK.INC".
       *    画面日付変換サブ
            COPY    "CPORCSGDAY.INC".
+      *
+      *    全角チェックパラメタ
+           COPY    "CPORCSKANACHK.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -653,6 +658,8 @@
                MOVE    SYS-ITEM-ITEMCD TO  SPA-GMN-LIST-ITEMCD(IDX)
                MOVE    SYS-ITEM-ITEMLENGTH
                                        TO  SPA-GMN-LIST-ITEMLENGTH(IDX)
+               MOVE    SYS-ITEM-ITEMTYPE
+                                       TO  SPA-GMN-LIST-ITEMTYPE(IDX)
                MOVE    SYS-ITEM-ITEMNAME
                                        TO  SPA-GMN-LIST-NAME(IDX)
                PERFORM 400-LISTATAI-SEC
@@ -734,6 +741,8 @@
                MOVE    SYS-ITEM-ITEMCD TO  SPA-GMN-LIST-ITEMCD(IDX)
                MOVE    SYS-ITEM-ITEMLENGTH
                                        TO  SPA-GMN-LIST-ITEMLENGTH(IDX)
+               MOVE    SYS-ITEM-ITEMTYPE
+                                       TO  SPA-GMN-LIST-ITEMTYPE(IDX)
                MOVE    SYS-ITEM-ITEMNAME
                                        TO  SPA-GMN-LIST-NAME(IDX)
                PERFORM 400-LISTCOMBO-SEC
@@ -757,24 +766,20 @@
       *****************************************************************
        400-LISTCOMBO-SEC           SECTION.
       *
-           IF      SYS-VALUE-YUKOSTYMD NOT =   "00000000"
-               MOVE    SYS-VALUE-YUKOSTYMD
-                                       TO  WRK-YMD
-               PERFORM 5002-HIZUKE-CHK-SEC
-               IF      SPA-ERRCD       =   SPACE
-                   MOVE    WRK-SYMD    TO  SPA-NAI-LIST-YUKOSTYMD(IDX)
-                   MOVE    WRK-HENYMDG TO  SPA-GMN-LIST-YUKOSTYMD(IDX)
-               END-IF
+           MOVE    SYS-VALUE-YUKOSTYMD
+                                   TO  WRK-YMD
+           PERFORM 5002-HIZUKE-CHK-SEC
+           IF      SPA-ERRCD       =   SPACE
+               MOVE    WRK-YMD     TO  SPA-NAI-LIST-YUKOSTYMD(IDX)
+               MOVE    WRK-HENYMDG TO  SPA-GMN-LIST-YUKOSTYMD(IDX)
            END-IF
       *
-           IF      SYS-VALUE-YUKOEDYMD NOT =   "99999999"
-               MOVE    SYS-VALUE-YUKOEDYMD
-                                       TO  WRK-YMD
-               PERFORM 5002-HIZUKE-CHK-SEC
-               IF      SPA-ERRCD       =   SPACE
-                   MOVE    WRK-SYMD    TO  SPA-NAI-LIST-YUKOEDYMD(IDX)
-                   MOVE    WRK-HENYMDG TO  SPA-GMN-LIST-YUKOEDYMD(IDX)
-               END-IF
+           MOVE    SYS-VALUE-YUKOEDYMD
+                                   TO  WRK-YMD
+           PERFORM 5002-HIZUKE-CHK-SEC
+           IF      SPA-ERRCD       =   SPACE
+               MOVE    WRK-YMD     TO  SPA-NAI-LIST-YUKOEDYMD(IDX)
+               MOVE    WRK-HENYMDG TO  SPA-GMN-LIST-YUKOEDYMD(IDX)
            END-IF
       *
            INITIALIZE                  SYS-COMBO-REC
@@ -812,6 +817,8 @@
                                    TO  SPA-GMN-ITEMCD
            MOVE    SPA-GMN-LIST-ITEMLENGTH(SPA-GMN-SELNUM)
                                    TO  SPA-GMN-ITEMLENGTH
+           MOVE    SPA-GMN-LIST-ITEMTYPE(SPA-GMN-SELNUM)
+                                   TO  SPA-GMN-ITEMTYPE
            MOVE    SPA-GMN-LIST-NAME(SPA-GMN-SELNUM)
                                    TO  SPA-GMN-NAME
            MOVE    SPA-GMN-LIST-ATAI(SPA-GMN-SELNUM)
@@ -824,16 +831,6 @@
                                    TO  SPA-NAI-YUKOSTYMD
            MOVE    SPA-NAI-LIST-YUKOEDYMD(SPA-GMN-SELNUM)
                                    TO  SPA-NAI-YUKOEDYMD
-      *
-           IF      SPA-NAI-YUKOSTYMD   =   SPACE
-               MOVE    "00000000"      TO  SPA-NAI-YUKOSTYMD
-                                           SPA-GMN-YUKOSTYMD
-           END-IF
-      *
-           IF      SPA-NAI-YUKOEDYMD   =   SPACE
-               MOVE    "99999999"      TO  SPA-NAI-YUKOEDYMD
-                                           SPA-GMN-YUKOEDYMD
-           END-IF
       *
            INITIALIZE                  SYS-COMBO-REC
            MOVE    SPA-GMN-KANRICD TO  SYS-COMBO-KANRICD
@@ -885,18 +882,14 @@
        400-ATAICHECK-SEC           SECTION.
       *
            MOVE    W00-ATAI        TO  SPA-GMN-ATAI
+      *
            IF      SPA-GMN-ATAI    =   SPACE
                GO  TO  400-ATAICHECK-EXT
            END-IF
       *
+      *    コンボでない場合は文字チェック
            IF      SPA-GMN-ATAI-MAX    =   ZERO
-               IF      SPA-GMN-ITEMLENGTH  <   40
-                   COMPUTE IDY =   SPA-GMN-ITEMLENGTH  +   1
-                   IF      SPA-GMN-ATAI(IDY:)  NOT =   SPACE
-                       MOVE    "0003"          TO  SPA-ERRCD
-                       MOVE    5               TO  SPA-GMN-CUR
-                   END-IF
-               END-IF
+               PERFORM 400-MOJICHECK-SEC
            ELSE
                MOVE    ZERO            TO  FLG-OK
                PERFORM VARYING IDX     FROM    1   BY  1
@@ -912,13 +905,71 @@
       *
                IF      FLG-OK          =   ZERO
                    MOVE    "0002"          TO  SPA-ERRCD
-                   MOVE    SPACE           TO  SPA-GMN-ATAI(3:)
                    MOVE    5               TO  SPA-GMN-CUR
+                   MOVE    SPACE           TO  SPA-GMN-ATAI(3:)
                END-IF
            END-IF
       *
            .
        400-ATAICHECK-EXT.
+           EXIT.
+      *****************************************************************
+      *    値文字チェック処理
+      *****************************************************************
+       400-MOJICHECK-SEC           SECTION.
+      *
+      *    カナチェック
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"             TO  KANACHK-SYORI
+           MOVE    SPA-GMN-ATAI    TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT
+                                   TO  SPA-GMN-ATAI
+      *
+      *    文字サイズオーバー
+           IF      KANACHK-MAX     >   SPA-GMN-ITEMLENGTH
+               MOVE    "0003"          TO  SPA-ERRCD
+               MOVE    5               TO  SPA-GMN-CUR
+               GO  TO  400-MOJICHECK-EXT
+           END-IF
+      *
+      *    混在以外の時文字タイプチェック
+           IF      SPA-GMN-ITEMTYPE    =   5
+               GO  TO  400-MOJICHECK-EXT
+           END-IF
+      *
+      *    混在の場合エラー
+           IF      KANACHK-RC  NOT =   ZERO
+               MOVE    "0011"          TO  SPA-ERRCD
+           ELSE
+      *        全角
+               IF    SPA-GMN-ITEMTYPE    =   4
+      *            半角の場合エラー
+                   IF      KANACHK-SYUBETU =   1
+                       MOVE    "0012"          TO  SPA-ERRCD
+                   END-IF
+               ELSE
+      *            全角の場合エラー
+                   IF      KANACHK-SYUBETU =   2
+                       MOVE    "0013"          TO  SPA-ERRCD
+                   ELSE
+      *                英数字の場合エラー
+                       IF    ( SPA-GMN-ITEMTYPE    NOT =   3 ) AND
+                             ( SPA-GMN-ATAI(1:KANACHK-MAX)
+                                                   NOT NUMERIC )
+                           MOVE    "0014"          TO  SPA-ERRCD
+                       END-IF
+                   END-IF
+               END-IF
+           END-IF
+      *
+           IF      SPA-ERRCD   NOT =   SPACE
+               MOVE    5               TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       400-MOJICHECK-EXT.
            EXIT.
       *****************************************************************
       *    有効開始日付チェック処理
@@ -983,52 +1034,73 @@
       *****************************************************************
        400-KAKUNIN-SEC             SECTION.
       *
-           IF      SPA-GMN-LIST-YUKOSTYMD(SPA-GMN-SELNUM)
-                                   =   SPA-GMN-YUKOSTYMD
-               MOVE    "1001"          TO  SPA-WIDCD
-           ELSE
-               INITIALIZE                  SYS-VALUE-REC
-               MOVE    SPA-HOSPNUM     TO  SYS-VALUE-HOSPNUM
-               MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
-               MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
-               MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
+      *    値チェック
+           PERFORM 400-ATAICHECK-SEC
+           IF      SPA-ERRCD   NOT =   SPACE
+               GO  TO  400-KAKUNIN-EXT
+           END-IF
       *
-               MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
+      *    有効開始日チェック
+           PERFORM 400-YUKOSTYMD-SEC
+           IF      SPA-ERRCD   NOT =   SPACE
+               GO  TO  400-KAKUNIN-EXT
+           END-IF
+      *
+      *    有効終了日チェック
+           PERFORM 400-YUKOEDYMD-SEC
+           IF      SPA-ERRCD   NOT =   SPACE
+               GO  TO  400-KAKUNIN-EXT
+           END-IF
+      *
+      *    開始期間が変更していなければチェックを行わない
+           IF      SPA-NAI-LIST-YUKOSTYMD(SPA-GMN-SELNUM)
+                                   =   SPA-NAI-YUKOSTYMD
+               MOVE    "1001"          TO  SPA-WIDCD
+               GO  TO  400-KAKUNIN-EXT
+           END-IF
+      *
+      *    重複チェック
+           INITIALIZE                  SYS-VALUE-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-VALUE-HOSPNUM
+           MOVE    SPA-GMN-KANRICD TO  SYS-VALUE-KANRICD
+           MOVE    SPA-GMN-KBNCD   TO  SYS-VALUE-KBNCD
+           MOVE    SPA-GMN-ITEMCD  TO  SYS-VALUE-ITEMCD
+      *
+           MOVE    SYS-VALUE-REC   TO  MCPDATA-REC
+           MOVE    "tbl_syskanri_value"
+                                   TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+      *
+           IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri_value"
                                        TO  MCP-TABLE
                MOVE    "key2"          TO  MCP-PATHNAME
-               PERFORM 910-DBSELECT-SEC
+               PERFORM 900-SYS-VALUE-FETCH-SEC
+           ELSE
+               INITIALIZE                  SYS-VALUE-REC
+               MOVE    1               TO  FLG-SYS-VALUE
+           END-IF
       *
-               IF      MCP-RC              =   ZERO
-                   MOVE    "tbl_syskanri_value"
-                                           TO  MCP-TABLE
-                   MOVE    "key2"          TO  MCP-PATHNAME
-                   PERFORM 900-SYS-VALUE-FETCH-SEC
+           MOVE    ZERO            TO  IDY
+           PERFORM UNTIL   FLG-SYS-VALUE   =   1
+               IF    ( SYS-VALUE-YUKOEDYMD <   SPA-NAI-YUKOSTYMD ) 
+                 OR  ( SYS-VALUE-YUKOSTYMD >   SPA-NAI-YUKOEDYMD )
+                   CONTINUE
                ELSE
-                   INITIALIZE                  SYS-VALUE-REC
-                   MOVE    1               TO  FLG-SYS-VALUE
+                   COMPUTE IDY = IDY + 1
                END-IF
       *
-               MOVE    ZERO            TO  IDY
-               PERFORM UNTIL   FLG-SYS-VALUE   =   1
-                   IF    ( SYS-VALUE-YUKOEDYMD <   SPA-NAI-YUKOSTYMD ) 
-                     OR  ( SYS-VALUE-YUKOSTYMD >   SPA-NAI-YUKOEDYMD )
-                       CONTINUE
-                   ELSE
-                       COMPUTE IDY = IDY + 1
-                   END-IF
+               MOVE    "tbl_syskanri_value"
+                                       TO  MCP-TABLE
+               MOVE    "key2"          TO  MCP-PATHNAME
+               PERFORM 900-SYS-VALUE-FETCH-SEC
+           END-PERFORM
       *
-                   MOVE    "tbl_syskanri_value"
-                                           TO  MCP-TABLE
-                   MOVE    "key2"          TO  MCP-PATHNAME
-                   PERFORM 900-SYS-VALUE-FETCH-SEC
-               END-PERFORM
-      *
-               IF      IDY      >=   1
-                   MOVE    "0006"          TO  SPA-ERRCD
-               ELSE
-                   MOVE    "1001"          TO  SPA-WIDCD
-               END-IF
+           IF      IDY      >=   1
+               MOVE    "0006"          TO  SPA-ERRCD
+           ELSE
+               MOVE    "1001"          TO  SPA-WIDCD
            END-IF
       *
            .
@@ -1224,10 +1296,14 @@
                                        TO  W00-LIST-NAME(IDY)
                MOVE    SPA-GMN-LIST-ATAI(IDX)
                                        TO  W00-LIST-ATAI(IDY)
-               MOVE    SPA-GMN-LIST-YUKOSTYMD(IDX)
-                                       TO  W00-LIST-YUKOSTYMD(IDY)
-               MOVE    SPA-GMN-LIST-YUKOEDYMD(IDX)
-                                       TO  W00-LIST-YUKOEDYMD(IDY)
+               IF      SPA-GMN-LIST-YUKOSTYMD(IDX) NOT =   "00000000"
+                   MOVE    SPA-GMN-LIST-YUKOSTYMD(IDX)
+                                           TO  W00-LIST-YUKOSTYMD(IDY)
+               END-IF
+               IF      SPA-GMN-LIST-YUKOEDYMD(IDX) NOT =   "99999999"
+                   MOVE    SPA-GMN-LIST-YUKOEDYMD(IDX)
+                                           TO  W00-LIST-YUKOEDYMD(IDY)
+               END-IF
                IF      SPA-GMN-SELNUM  =   IDX
                    MOVE    "T"             TO  W00-LIST-SELECT(IDY)
                ELSE
@@ -1303,13 +1379,25 @@
                    MOVE    "値の桁が大きくなっています。"
                                            TO  SPA-ERRMSG
                WHEN    "0004"
-                   MOVE    "日付が正しくありません"
+                   MOVE    "日付が正しくありません。"
                                            TO  SPA-ERRMSG
                WHEN    "0005"
-                   MOVE    "有効期間が正しくありません"
+                   MOVE    "有効期間が正しくありません。"
                                            TO  SPA-ERRMSG
                WHEN    "0006"
-                   MOVE    "有効期間重複します"
+                   MOVE    "有効期間重複しています。"
+                                           TO  SPA-ERRMSG
+              WHEN    "0011"
+                   MOVE    "文字が混在しています。"
+                                           TO  SPA-ERRMSG
+              WHEN    "0012"
+                   MOVE    "全角で入力してください。"
+                                           TO  SPA-ERRMSG
+              WHEN    "0013"
+                   MOVE    "半角で入力してください。"
+                                           TO  SPA-ERRMSG
+              WHEN    "0014"
+                   MOVE    "数字で入力してください。"
                                            TO  SPA-ERRMSG
                WHEN    "1001"
                    MOVE    "更新できませんでした。"
