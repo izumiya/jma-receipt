@@ -1561,9 +1561,9 @@
                END-IF
            END-PERFORM
       *
-      *    労災の時、合成コード使用を促す
+      *    労災（短期・傷病）の時、合成コード使用を促す
            IF     (SPA-HKNKBN          =   1   )
-             AND  (SPA-RSI-JUNKYO  NOT =   "1" )
+             AND  (SPA-RSI-HKNKBN      =   "1"  OR  "2")
                IF     (IDX-FUKU-J1         >   1   )
                  OR   (IDX-FUKU-J2         >   1   )
                  OR   (IDX-FUKU-J3         >   1   )
@@ -1598,15 +1598,20 @@
       *            時間外加算のある時は１剤１手技とする
                    IF     (SPA-HKNKBN          =   1   )
                      AND  (SPA-RSI-JUNKYO  NOT =   "1" )
-      *                労災の時
-                       MOVE    "0401"          TO  WRK-ERRCD
-                       MOVE    "1"             TO  WRK-COM-CUR (IDX-F)
-                       IF     (IDX-FUKU-J1         >   1   )
-                         OR   (IDX-FUKU-J2         >   1   )
-                         OR   (IDX-FUKU-J3         >   1   )
-                         OR   (IDX-FUKU-J4         >   1   )
-                         OR   (IDX-FUKU-J5         >   1   )
-                           MOVE    "0402"          TO  WRK-ERRCD
+      *                労災（自賠責・公害）の時、エラーとしない
+                       IF     (SPA-RSI-HKNKBN      =   "1"
+                                                   OR  "2")
+      *                    労災（短期・傷病）の時エラー
+                           MOVE    "0401"          TO  WRK-ERRCD
+                           MOVE    "1"             TO  WRK-COM-CUR
+                                                         (IDX-F)
+                           IF     (IDX-FUKU-J1         >   1   )
+                             OR   (IDX-FUKU-J2         >   1   )
+                             OR   (IDX-FUKU-J3         >   1   )
+                             OR   (IDX-FUKU-J4         >   1   )
+                             OR   (IDX-FUKU-J5         >   1   )
+                               MOVE    "0402"          TO  WRK-ERRCD
+                           END-IF
                        END-IF
                    ELSE
                        MOVE    "0401"          TO  WRK-ERRCD

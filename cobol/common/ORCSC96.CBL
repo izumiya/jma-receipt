@@ -1219,9 +1219,9 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "0402"
-                   STRING  "労災の処置に通則加算があります。"
-                           "労災合成コードに変更して手技毎に"
-                           "剤分離して下さい。"
+                   STRING  "処置に通則加算があります。"
+                           "手技毎に剤分離するか、"
+                           "労災の合成コードで算定して下さい"
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
