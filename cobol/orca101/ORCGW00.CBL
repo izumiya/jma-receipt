@@ -466,15 +466,6 @@
       *        番号選択
                WHEN    "ACTIVATE"  ALSO    "SELNUM"
                    PERFORM 400-SELNUM-SEC
-      *        管理コード
-               WHEN    "ACTIVATE"  ALSO    "KANRICD"
-                   MOVE    W00-KANRICD     TO  SPA-GMN-KANRICD
-      *        区分コード
-               WHEN    "ACTIVATE"  ALSO    "KBNCD"
-                   MOVE    W00-KBNCD       TO  SPA-GMN-KBNCD
-      *        値コード
-               WHEN    "ACTIVATE"  ALSO    "ITEMCD"
-                   MOVE    W00-ITEMCD      TO  SPA-GMN-ITEMCD
       *        値
                WHEN    "ACTIVATE"  ALSO    "ATAI"
                    PERFORM 400-ATAICHECK-SEC
@@ -909,7 +900,7 @@
       *
                IF      FLG-OK          =   ZERO
                    MOVE    "0002"          TO  SPA-ERRCD
-                   MOVE    5               TO  SPA-GMN-CUR
+                   MOVE    2               TO  SPA-GMN-CUR
                    MOVE    SPACE           TO  SPA-GMN-ATAI(3:)
                END-IF
            END-IF
@@ -934,7 +925,7 @@
       *    文字サイズオーバー
            IF      KANACHK-MAX     >   SPA-GMN-ITEMLENGTH
                MOVE    "0003"          TO  SPA-ERRCD
-               MOVE    5               TO  SPA-GMN-CUR
+               MOVE    2               TO  SPA-GMN-CUR
                GO  TO  400-MOJICHECK-EXT
            END-IF
       *
@@ -969,7 +960,7 @@
            END-IF
       *
            IF      SPA-ERRCD   NOT =   SPACE
-               MOVE    5               TO  SPA-GMN-CUR
+               MOVE    2               TO  SPA-GMN-CUR
            END-IF
       *
            .
@@ -992,13 +983,13 @@
                    MOVE    WRK-SYMD             TO  SPA-NAI-YUKOSTYMD
                    MOVE    WRK-HENYMDG          TO  SPA-GMN-YUKOSTYMD
                ELSE
-                   MOVE    6               TO  SPA-GMN-CUR
+                   MOVE    3               TO  SPA-GMN-CUR
                END-IF
            END-IF
       *
            IF      SPA-NAI-YUKOSTYMD   >   SPA-NAI-YUKOEDYMD
                MOVE    "0005"          TO  SPA-ERRCD
-               MOVE    6               TO  SPA-GMN-CUR
+               MOVE    3               TO  SPA-GMN-CUR
            END-IF
       *
            .
@@ -1021,13 +1012,13 @@
                    MOVE    WRK-SYMD             TO  SPA-NAI-YUKOEDYMD 
                    MOVE    WRK-HENYMDG          TO  SPA-GMN-YUKOEDYMD
                ELSE
-                   MOVE    7               TO  SPA-GMN-CUR
+                   MOVE    4               TO  SPA-GMN-CUR
                END-IF
            END-IF
       *
            IF      SPA-NAI-YUKOSTYMD   >   SPA-NAI-YUKOEDYMD
                MOVE    "0005"          TO  SPA-ERRCD
-               MOVE    7               TO  SPA-GMN-CUR
+               MOVE    4               TO  SPA-GMN-CUR
            END-IF
       *
            .
@@ -1476,16 +1467,10 @@
                WHEN    1
                    MOVE    "SELNUM"        TO  MCP-WIDGET
                WHEN    2
-                   MOVE    "KANRICD"       TO  MCP-WIDGET
-               WHEN    3
-                   MOVE    "KBNCD"         TO  MCP-WIDGET
-               WHEN    4
-                   MOVE    "ITEMCD"        TO  MCP-WIDGET
-               WHEN    5
                    MOVE    "ATAI"          TO  MCP-WIDGET
-               WHEN    6
+               WHEN    3
                    MOVE    "YUKOSTYMD"     TO  MCP-WIDGET
-               WHEN    7
+               WHEN    4
                    MOVE    "YUKOEDYMD"     TO  MCP-WIDGET
                WHEN    99
                    MOVE    "B12"           TO  MCP-WIDGET
@@ -1502,16 +1487,10 @@
            EVALUATE    WRK-MCP-WIDGET
                WHEN    "SELNUM"
                    MOVE    2               TO  SPA-GMN-CUR
-               WHEN    "KANRICD"
-                   MOVE    3               TO  SPA-GMN-CUR
-               WHEN    "KBNCD"
-                   MOVE    4               TO  SPA-GMN-CUR
-               WHEN    "ITEMCD"
-                   MOVE    5               TO  SPA-GMN-CUR
                WHEN    "ATAI"
-                   MOVE    6               TO  SPA-GMN-CUR
+                   MOVE    3               TO  SPA-GMN-CUR
                WHEN    "YUKOSTYMD"
-                   MOVE    7               TO  SPA-GMN-CUR
+                   MOVE    4               TO  SPA-GMN-CUR
                WHEN    "YUKOEDYMD"
                    MOVE    99              TO  SPA-GMN-CUR
            END-EVALUATE
