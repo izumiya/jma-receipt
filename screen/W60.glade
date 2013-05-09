@@ -1493,10 +1493,10 @@
     <widget>
       <class>GtkLabel</class>
       <name>label327</name>
-      <x>0</x>
-      <y>0</y>
-      <width>0</width>
-      <height>0</height>
+      <x>36</x>
+      <y>52</y>
+      <width>264</width>
+      <height>24</height>
       <label>生活保護・残留邦人等の受給者番号抜け</label>
       <justify>GTK_JUSTIFY_CENTER</justify>
       <wrap>False</wrap>
