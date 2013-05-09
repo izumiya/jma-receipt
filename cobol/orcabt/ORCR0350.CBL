@@ -358,6 +358,7 @@
       *  04.06.13    NACL-門脇    13/03/27  船員下船後（食事負担なし）の
       *                                     生活療養標準負担額の記録をしない
       *  04.06.14    NACL-藤原    13/04/05  コメントの記録方法の変更
+      *  04.06.15    NACL-藤原    13/05/02  氏名の外字チェックに条件追加
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-藤原    12/09/04  薬剤料減点対応
@@ -2508,6 +2509,15 @@
            MOVE    RECE62-NAME         TO  KANACHK2-MAE-INPUT
            CALL    "ORCSKANACHK2"      USING   ORCSKANACHK2AREA
            IF      KANACHK2-RC4        =   ZERO
+               PERFORM VARYING IDX FROM    1   BY  2
+                       UNTIL   IDX >       49
+      *                                            F4A5 F4A6
+                   IF      RECE62-NAME (IDX:2) =   "凜" 
+                                               OR  "熙"
+                       MOVE    "　"                TO  RECE62-NAME
+                       MOVE    49                  TO  IDX
+                   END-IF
+               END-PERFORM
                IF      RECE62-NAME (1:2)   =   "　"
                    IF      RECE62-KANANAME (1:2)   =   "　"
                        PERFORM VARYING IDX FROM    1   BY  2
@@ -9227,6 +9237,7 @@
                        OR  (   RECE62-RECESYUBETU  =   ZERO   OR 
                                                        8888   OR 
                                                        6666        )
+                       OR  (   RECE62-ERR-ERRKBN   >   ZERO        )
                            MOVE    2               TO  FLG-READ
                        ELSE
       *                    主科設定のとき未設定なら更新しない

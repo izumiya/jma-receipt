@@ -395,6 +395,7 @@
       *  04.06.10    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
       *  04.06.11    NACL-藤原    13/04/05  コメントの記録方法の変更
+      *  04.06.12    NACL-藤原    13/06/02  氏名の外字チェックに条件追加
       *
       *  04.07.01    NACL-藤原    11/06/02  入退院履歴記載対応
       *                                     「2自費分は含まない」を追加
@@ -2245,6 +2246,15 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2009-HOSPNUM
            MOVE    RECE02-NAME         TO  KANACHK2-MAE-INPUT
            CALL    "ORCSKANACHK2"      USING   ORCSKANACHK2AREA
            IF      KANACHK2-RC4        =   ZERO
+               PERFORM VARYING IDX FROM    1   BY  2
+                       UNTIL   IDX >       49
+      *                                            F4A5 F4A6
+                   IF      RECE02-NAME (IDX:2) =   "凜" 
+                                               OR  "熙"
+                       MOVE    "　"                TO  RECE02-NAME
+                       MOVE    49                  TO  IDX
+                   END-IF
+               END-PERFORM 
                IF      RECE02-NAME (1:2)   =   "　"
                    IF      RECE02-KANANAME (1:2)   =   "　"
                        PERFORM VARYING IDX FROM    1   BY  2
@@ -8268,6 +8278,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
                        OR  (   RECE02-RECESYUBETU  =   ZERO   OR 
                                                        8888   OR 
                                                        6666        )
+                       OR  (   RECE02-ERR-ERRKBN     >   ZERO      )
                            MOVE    2               TO  FLG-READ
                        ELSE
       *                    主科設定のとき未設定なら更新しない
