@@ -1225,6 +1225,10 @@
       *
            END-IF
       *
+           CALL    "ORCSENCODING"      USING
+                                       MCPAREA
+                                       SPA-AREA
+      *
            CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
            MOVE    SPA-HOSPNUM     TO  CHKSND-HOSPNUM
            MOVE    CHKSND-REC      TO  MCPDATA-REC
@@ -1392,10 +1396,6 @@
                                            SPA-AREA
                    MOVE    SS012-BYOMEICD-G
                                        TO  CHKSND-CD
-                   DISPLAY "[" CHKSND-CHKKBN "]"
-                           "[" CHKSND-SRYCD "]"
-                           "[" CHKSND-CD "]"
-                           "[" CHKSND-BYOMEI "]"
       *
                    MOVE    CHKSND-REC  TO  MCPDATA-REC
                    MOVE    "tbl_chksnd"    TO  MCP-TABLE
@@ -9560,7 +9560,7 @@
       *
            IF    ( PTINF-NAME          NOT =   SPACE )
                MOVE    PTINF-NAME      TO  WRK-KANACHK-MAE-INPUT
-               PERFORM 800-KANA-CHK-SEC
+               PERFORM 801-KANA-CHK-SEC
                IF  ( FLG-KANACHK   NOT =   ZERO )
       *
                    IF    ( FLG-KANACHK =   2 )
@@ -12492,11 +12492,91 @@
            MOVE    WRK-KANACHK-MAE-INPUT
                                        TO  KANACONV-INDATA
            CALL    "kanaconv"          USING ORCXKANACONVAREA
-           MOVE    KANACONV-RETURN     TO  FLG-KANACHK
+           IF    ( KANACONV-RETURN     =   ZERO )
+               MOVE    ZERO            TO  FLG-KANACHK
+           ELSE
+               INITIALIZE                  ORCSSTRINGAREA
+               MOVE    "check"         TO  ORCSSTR-COMMAND
+               MOVE    WRK-KANACHK-MAE-INPUT
+                                       TO  ORCSSTR-STRING1
+               CALL    "orcsstring"        USING
+                                           ORCSSTRINGAREA
+               IF    ( ORCSSTR-NUM2    =   ZERO )
+                   MOVE    1           TO  FLG-KANACHK
+               ELSE
+                   MOVE    2           TO  FLG-KANACHK
+               END-IF
+           END-IF
            MOVE    KANACONV-MAXLEN     TO  WRK-MAXLEN
       *
            .
        800-KANA-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    全角半角混在チェック
+      *****************************************************************
+       801-KANA-CHK-SEC                    SECTION.
+      *
+           IF    ( SPA-ENCODING        =   1 )
+               PERFORM 800-KANA-CHK-SEC
+               MOVE    KANACONV-OUTDATA    TO  WRK-KANACHK-MAE-INPUT
+           ELSE
+               PERFORM 802-KANA-CHK-SEC
+           END-IF
+      *
+           .
+       801-KANA-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    全角半角混在チェック（ENCODING ≠ EUC）
+      *****************************************************************
+       802-KANA-CHK-SEC                    SECTION.
+      *
+           MOVE    ZERO                TO  FLG-KANACHK
+           MOVE    ZERO                TO  WRK-MAXLEN
+      *
+           INITIALIZE                  ORCXKANACONVAREA
+      *
+           IF  ( WRK-KANACHK-MAE-INPUT NOT =   SPACE )
+      *
+               MOVE    300                 TO  KANACONV-LEN
+               MOVE    1000                TO  KANACONV-STLEN
+               MOVE    0                   TO  KANACONV-CONV-FLAG
+               MOVE    14                  TO  KANACONV-CHAR-TYPE
+               MOVE    WRK-KANACHK-MAE-INPUT
+                                       TO  KANACONV-INDATA
+               CALL    "kanaconv"          USING ORCXKANACONVAREA
+               IF    ( KANACONV-RETURN     =   ZERO )
+                   MOVE    ZERO            TO  FLG-KANACHK
+               ELSE
+                   MOVE    300             TO  KANACONV-LEN
+                   MOVE    1000            TO  KANACONV-STLEN
+                   MOVE    0               TO  KANACONV-CONV-FLAG
+                   MOVE    14              TO  KANACONV-CHAR-TYPE
+                   MOVE    KANACONV-OUTDATA
+                                           TO  KANACONV-INDATA
+                   CALL    "kanaconv"      USING ORCXKANACONVAREA
+                   IF    ( KANACONV-RETURN NOT =   ZERO )
+                       MOVE    1           TO  FLG-KANACHK
+                   END-IF
+      *
+                   MOVE    300             TO  KANACONV-LEN
+                   MOVE    1000            TO  KANACONV-STLEN
+                   MOVE    0               TO  KANACONV-CONV-FLAG
+                   MOVE    256             TO  KANACONV-CHAR-TYPE
+                   MOVE    WRK-KANACHK-MAE-INPUT
+                                           TO  KANACONV-INDATA
+                   CALL    "kanaconv"          USING ORCXKANACONVAREA
+      *
+               END-IF
+      *
+               MOVE    KANACONV-OUTDATA    TO  WRK-KANACHK-MAE-INPUT
+               MOVE    KANACONV-MAXLEN     TO  WRK-MAXLEN
+      *
+           END-IF
+      *
+           .
+       802-KANA-CHK-EXT.
            EXIT.
       *****************************************************************
       *    全角カタカナ入力チェック
@@ -12578,7 +12658,7 @@
            INITIALIZE                  ORCXKANACONVAREA
       *
            IF  ( WRK-KANACHK-MAE-INPUT =   SPACE )
-               GO  TO  800-HANKAKU-CHK-EXT
+               GO  TO  800-ZENKAKU-CHK-EXT
            END-IF
       *
            MOVE    300                 TO  KANACONV-LEN
@@ -12588,7 +12668,21 @@
            MOVE    WRK-KANACHK-MAE-INPUT
                                        TO  KANACONV-INDATA
            CALL    "kanaconv"          USING ORCXKANACONVAREA
-           MOVE    KANACONV-RETURN     TO  FLG-KANACHK
+           IF    ( KANACONV-RETURN     =   ZERO )
+               MOVE    ZERO            TO  FLG-KANACHK
+           ELSE
+               INITIALIZE                  ORCSSTRINGAREA
+               MOVE    "check"         TO  ORCSSTR-COMMAND
+               MOVE    WRK-KANACHK-MAE-INPUT
+                                       TO  ORCSSTR-STRING1
+               CALL    "orcsstring"        USING
+                                           ORCSSTRINGAREA
+               IF    ( ORCSSTR-NUM2    =   ZERO )
+                   MOVE    1           TO  FLG-KANACHK
+               ELSE
+                   MOVE    2           TO  FLG-KANACHK
+               END-IF
+           END-IF
            MOVE    KANACONV-MAXLEN     TO  WRK-MAXLEN
       *
            .
@@ -13955,8 +14049,9 @@
                MOVE    KANACONV-OUTDATA    TO  ERRPTINF-KANANAME
       *
                MOVE    ERRPTINF-NAME       TO  WRK-KANACHK-MAE-INPUT
-               PERFORM 800-KANA-CHK-SEC
-               MOVE    KANACONV-OUTDATA    TO  ERRPTINF-NAME
+               PERFORM 801-KANA-CHK-SEC
+               MOVE    WRK-KANACHK-MAE-INPUT
+                                           TO  ERRPTINF-NAME
       *
            ELSE
                MOVE    "患者情報の検索に失敗しました"
