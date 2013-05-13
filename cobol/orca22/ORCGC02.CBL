@@ -290,6 +290,7 @@
       *  04.07.02    NACL-太田    11/09/15  データチェック業務からの病名
       *                                     引継ぎ対応
       *  04.07.03    NACL-太田    12/02/20  前画面戻り時SPA-PTIDを初期化する
+      *  04.07.04    NACL-藤原    13/05/13  病名コード未入力時の病名表示の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -342,6 +343,7 @@
            03  FLG-KYUSEI          PIC 9(01).
            03  FLG-SYUBYO          PIC 9(01).
            03  FLG-CHK             PIC 9(01).
+           03  FLG-CHANGE          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -5146,8 +5148,38 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
                GO  TO  4102-BYOMEICD-CHK-EXT
            END-IF     
       *
-           IF      C02-BYOMEICD (IDZ)  =   SPACE
-               CONTINUE
+           IF    ( C02-BYOMEICD  (IDZ)
+                                   =   SPACE )
+           AND   ( SPA-GMN-C02-BYOMEICD-G  
+                               NOT =   SPACE )
+      *      病名コード未入力時他の病名コードに入力があるときの処理
+             IF    ( C02-BYOMEICD  (1)
+                                   =   SPA-GMN-C02-BYOMEICD (1) )
+             AND   ( C02-BYOMEICD  (2)
+                                   =   SPA-GMN-C02-BYOMEICD (2) )
+             AND   ( C02-BYOMEICD  (3)
+                                   =   SPA-GMN-C02-BYOMEICD (3) )
+             AND   ( C02-BYOMEICD  (4)
+                                   =   SPA-GMN-C02-BYOMEICD (4) )
+             AND   ( C02-BYOMEICD  (5)
+                                   =   SPA-GMN-C02-BYOMEICD (5) )
+             AND   ( C02-BYOMEICD  (6)
+                                   =   SPA-GMN-C02-BYOMEICD (6) )
+                 MOVE    ZERO            TO  FLG-CHANGE
+                 PERFORM VARYING IDX3    FROM    IDZ   BY  1
+                         UNTIL   IDX3    >       6
+                     IF       SPA-GMN-C02-BYOMEICD (IDX3)
+                                         NOT =   SPACE
+                         MOVE    1               TO  FLG-CHANGE
+                         MOVE    6               TO  IDX3
+                     END-IF
+                 END-PERFORM
+                 IF      FLG-CHANGE    =   ZERO
+                     MOVE    34             TO  SPA-GMN-C02-CUR
+                     MOVE    SPACE           TO  WRK-SEIGYO
+                     GO  TO  4102-BYOMEICD-CHK-EXT
+                 END-IF
+             END-IF
            ELSE
       *      病名欄入力後、病名コード置換え後にコード入力した時の処理
              IF    ( SPA-NAI-C02-BYOMEICD (1)
