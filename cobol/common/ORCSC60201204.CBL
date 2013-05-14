@@ -636,6 +636,128 @@
            COPY     "CMSANSOTBL.INC".
       *
       *****************************************************************
+      *    時間外加算テーブル（緊急時間外の判定）（画像診断と同じ）
+      *****************************************************************
+       01  TBL-TIMEKSN-AREA.
+      *初診
+      *    時間外
+           03  FILLER              PIC X(12)   VALUE   "11 111000570".
+      *    休日
+           03  FILLER              PIC X(12)   VALUE   "12 111000670".
+      *    深夜
+           03  FILLER              PIC X(12)   VALUE   "13 111000770".
+      *    時間外特例
+           03  FILLER              PIC X(12)   VALUE   "14 111000870".
+      *    早朝加算
+           03  FILLER              PIC X(12)   VALUE   "18 111012470".
+      *（乳幼児） 時間外
+           03  FILLER              PIC X(12)   VALUE   "11 111011970".
+      *    休日
+           03  FILLER              PIC X(12)   VALUE   "12 111012070".
+      *    深夜
+           03  FILLER              PIC X(12)   VALUE   "13 111012170".
+      *    時間外特例
+           03  FILLER              PIC X(12)   VALUE   "14 111012270".
+      *    夜間（時間外）加算
+           03  FILLER              PIC X(12)   VALUE   "15 111011570".
+      *    休日加算
+           03  FILLER              PIC X(12)   VALUE   "16 111011670".
+      *    深夜加算
+           03  FILLER              PIC X(12)   VALUE   "17 111011770".
+      *再診料加算
+      *    時間外
+           03  FILLER              PIC X(12)   VALUE   "21 112001110".
+      *    休日
+           03  FILLER              PIC X(12)   VALUE   "22 112001210".
+      *    深夜
+           03  FILLER              PIC X(12)   VALUE   "23 112001310".
+      *    時間外特例
+           03  FILLER              PIC X(12)   VALUE   "24 112001410".
+      *    早朝加算
+           03  FILLER              PIC X(12)   VALUE   "28 112015570".
+      *（乳幼児）    時間外
+           03  FILLER              PIC X(12)   VALUE   "21 112014770".
+      *    休日
+           03  FILLER              PIC X(12)   VALUE   "22 112014870".
+      *    深夜
+           03  FILLER              PIC X(12)   VALUE   "23 112014970".
+      *    時間外特例
+           03  FILLER              PIC X(12)   VALUE   "24 112015070".
+      *    夜間（時間外）加算
+           03  FILLER              PIC X(12)   VALUE   "25 112014170".
+      *    休日加算
+           03  FILLER              PIC X(12)   VALUE   "26 112014270".
+      *    深夜加算
+           03  FILLER              PIC X(12)   VALUE   "27 112014370".
+      *外来診察料加算
+      *    時間外
+           03  FILLER              PIC X(12)   VALUE   "21 112006470".
+      *    休日
+           03  FILLER              PIC X(12)   VALUE   "22 112006570".
+      *    深夜
+           03  FILLER              PIC X(12)   VALUE   "23 112006670".
+      *    時間外特例
+           03  FILLER              PIC X(12)   VALUE   "24 112006770".
+      *（乳幼児）    時間外
+           03  FILLER              PIC X(12)   VALUE   "21 112015170".
+      *    休日
+           03  FILLER              PIC X(12)   VALUE   "22 112015270".
+      *    深夜
+           03  FILLER              PIC X(12)   VALUE   "23 112015370".
+      *    時間外特例
+           03  FILLER              PIC X(12)   VALUE   "24 112015470".
+      *    夜間（時間外）加算
+           03  FILLER              PIC X(12)   VALUE   "25 112014470".
+      *    休日加算
+           03  FILLER              PIC X(12)   VALUE   "26 112014570".
+      *    深夜加算
+           03  FILLER              PIC X(12)   VALUE   "27 112014670".
+      *小児科外来診療科（初診）
+      *    時間外
+           03  FILLER              PIC X(12)   VALUE   "11 113009670".
+      *    休日
+           03  FILLER              PIC X(12)   VALUE   "12 113007170".
+      *    深夜
+           03  FILLER              PIC X(12)   VALUE   "13 113007270".
+      *    時間外特例
+           03  FILLER              PIC X(12)   VALUE   "14 111010770".
+      *    夜間（時間外）加算
+           03  FILLER              PIC X(12)   VALUE   "15 113007070".
+      *小児科外来診療科（再診）
+      *    時間外
+           03  FILLER              PIC X(12)   VALUE   "21 113009770".
+      *    休日
+           03  FILLER              PIC X(12)   VALUE   "22 113007470".
+      *    深夜
+           03  FILLER              PIC X(12)   VALUE   "23 113007570".
+      *    時間外特例
+           03  FILLER              PIC X(12)   VALUE   "24 112006070".
+      *    夜間（時間外）加算
+           03  FILLER              PIC X(12)   VALUE   "25 113007370".
+      *外来診察料外来診療科（再診）
+      *    時間外
+           03  FILLER              PIC X(12)   VALUE   "21 113009870".
+      *    休日
+           03  FILLER              PIC X(12)   VALUE   "22 113007770".
+      *    深夜
+           03  FILLER              PIC X(12)   VALUE   "23 113007870".
+      *    時間外特例
+           03  FILLER              PIC X(12)   VALUE   "24 113005570".
+      *    夜間（時間外）加算
+           03  FILLER              PIC X(12)   VALUE   "25 113007670".
+      *
+       01  TBL-TIMEKSN-AREA-R      REDEFINES   TBL-TIMEKSN-AREA.
+           03  TBL-TIMEKSN-OCC     OCCURS   50
+                                   INDEXED  TBL-TIDX.
+      *        1:初診、2：再診
+               05  TBL-TM-KBN1         PIC X(01).
+      *        1:時間外、2：休日、3:深夜、4:特定時間外、5:夜間、8:夜間・早朝
+               05  TBL-TM-KBN2         PIC X(01).
+               05  TBL-TM-YOBI         PIC X(01).
+      *
+               05  TBL-TM-SRYCD        PIC X(09).
+      *
+      *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
       *
@@ -4285,16 +4407,20 @@
                        END-IF
                        IF     (WRK-COM-DATAKBN   (IDX-Z)   =   "2"  )
                        AND    (WRK-COM-TIMEKSNKBN(IDX-Z)   NOT =   ZERO)
-                           MOVE    WRK-COM-TIMEKSNKBN(IDX-Z)
-                                                   TO  FLG-JIKASAN 
+      *??                  MOVE    WRK-COM-TIMEKSNKBN(IDX-Z)
+      *??                                          TO  FLG-JIKASAN 
+      *                    時間外加算コードチェック処理
+                           PERFORM 10053-TIMEKSNKBNSET-SEC
                        END-IF
                    END-IF
       *           小児科外来診察料の時間外加算
                    IF     (WRK-COM-SRYKBN  (IDX-Z)     =   "13" )
                        IF     (WRK-COM-DATAKBN   (IDX-Z)   =   "2"  )
                        AND    (WRK-COM-TIMEKSNKBN(IDX-Z)   NOT =   ZERO)
-                           MOVE    WRK-COM-TIMEKSNKBN(IDX-Z)
-                                                   TO  FLG-JIKASAN 
+      *??                  MOVE    WRK-COM-TIMEKSNKBN(IDX-Z)
+      *??                                          TO  FLG-JIKASAN 
+      *                    時間外加算コードチェック処理
+                           PERFORM 10053-TIMEKSNKBNSET-SEC
                        END-IF
                    END-IF
       *
@@ -4323,18 +4449,14 @@
                IF     (SPA-SRYYMD          =   SPA-SYSYMD)  AND
                       (LNK-ORCSC-SYORIFLG  =   ZERO      )  AND
                       (SPA-GAI-JIKANKBN    NOT =   ZERO  )
-      *            夜間・早朝は警告なし
-                   IF      SPA-GAI-JIKANKBN    NOT =   8
-                       MOVE    SPA-GAI-JIKANKBN    TO  FLG-JIKASAN2
-                   END-IF
+                   MOVE    SPA-GAI-JIKANKBN    TO  FLG-JIKASAN
                END-IF
            END-IF
-           IF     (FLG-JIKASAN         =   ZERO
-                                       OR  6    )
-             AND  (FLG-JIKASAN2        =   ZERO )
-      *        夜間・早朝は警告なし
-               CONTINUE
-           ELSE
+           IF     (FLG-JIKASAN         =   1
+                                       OR  2
+                                       OR  3
+                                       OR  4   )
+      *        時間外・休日・深夜・時間外特例のみ警告
                MOVE    "K160"              TO  SPA-ERRCD
            END-IF
            MOVE    1                   TO  SPA-KENJIKAN-CHK
@@ -4342,6 +4464,26 @@
            .
       *
        3001-JIKANGAI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    時間外加算コードチェック処理
+      *****************************************************************
+       10053-TIMEKSNKBNSET-SEC                SECTION.
+      *
+      *    診察料検索
+           SET     TBL-TIDX            TO  1
+           SEARCH  TBL-TIMEKSN-OCC     VARYING   TBL-TIDX
+               AT  END
+                   MOVE    ZERO            TO  FLG-JIKASAN
+                WHEN   WRK-COM-INPUTCD (IDX-Z)
+                                           =   TBL-TM-SRYCD
+                                                      (TBL-TIDX)
+                   MOVE    TBL-TM-KBN2 (TBL-TIDX)
+                                           TO  FLG-JIKASAN
+           END-SEARCH
+      *
+           .
+       10053-TIMEKSNKBNSET-EXT.
            EXIT.
       *ver.4.7
       *
