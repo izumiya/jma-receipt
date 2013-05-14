@@ -763,8 +763,13 @@
            END-IF
       *
       *    ´µ¼ÔÌ¾¾Î
-           MOVE    PTINF-NAME
+           IF    ( SYU-SRYYMD         >=   CONST-H200401 )
+               MOVE    PTINF-NAME
                                        TO  HCN03-KNJNAMW
+           ELSE
+               MOVE    PTINF-NAME
+                                       TO  HCN03-DKNJNAMW
+           END-IF
       *
            IF    ( TPARA-ROOMKBN       =   "1" )
       *        ÉÂÅï¡¦ÉÂ¼¼Ì¾ÊÔ½¸½èÍý
@@ -1322,6 +1327,7 @@
            MOVE    HCN03-HAKYMD            TO  HCN03V01-HAKYMD
            MOVE    HCN03-KANANAME          TO  HCN03V01-KANANAME
            MOVE    HCN03-KNJNAMW           TO  HCN03V01-KNJNAMW
+           MOVE    HCN03-DKNJNAMW          TO  HCN03V01-DKNJNAMW
            MOVE    HCN03-KNJNO             TO  HCN03V01-KNJNO
            MOVE    HCN03-ROOM              TO  HCN03V01-ROOM
            MOVE    HCN03-HOKEN             TO  HCN03V01-HOKEN
@@ -1400,6 +1406,7 @@
            MOVE    HCN03-HAKYMD            TO  HCN03V02-HAKYMD
            MOVE    HCN03-KANANAME          TO  HCN03V02-KANANAME
            MOVE    HCN03-KNJNAMW           TO  HCN03V02-KNJNAMW
+           MOVE    HCN03-DKNJNAMW          TO  HCN03V02-DKNJNAMW
            MOVE    HCN03-KNJNO             TO  HCN03V02-KNJNO
            MOVE    HCN03-ROOM              TO  HCN03V02-ROOM
            MOVE    HCN03-HOKEN             TO  HCN03V02-HOKEN
