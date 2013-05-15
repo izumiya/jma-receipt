@@ -33,6 +33,7 @@
       *  04.02.00    NACL-Â¿¡¹Ç¼  08/03/XX  £È£²£°Ç¯£´·î²þÀµÄÉ²Ã
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/03/XX  £È£²£²Ç¯£´·î²þÀµÄÉ²Ã
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/03/XX  £È£²£´Ç¯£´·î²þÀµÄÉ²Ã
+      *  04.07.00    NACL-Â¿¡¹Ç¼  12/05/15  £È£²£µÇ¯£´·îÄÉ²Ã
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -129,8 +130,15 @@
                                                WRK-SCR-REC
                                                SPA-AREA
                WHEN   (SPA-SRYYMD          >=  "20120401" )  AND
-                      (SPA-SRYYMD          <   "99999999" )
+                      (SPA-SRYYMD          <   "20130401" )
                    CALL    "ORCSC80201204"     USING
+                                               MCPAREA
+                                               ORCSC00AREA
+                                               WRK-SCR-REC
+                                               SPA-AREA
+               WHEN   (SPA-SRYYMD          >=  "20130401" )  AND
+                      (SPA-SRYYMD          <   "99999999" )
+                   CALL    "ORCSC80201304"     USING
                                                MCPAREA
                                                ORCSC00AREA
                                                WRK-SCR-REC

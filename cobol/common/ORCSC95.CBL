@@ -5029,7 +5029,9 @@
            END-IF
       *
            IF      WRK-HEN-SRYCD   NOT =   SPACE
-               IF      TNS-SANTEIRRKKBN        =   ZERO
+               IF     (TNS-SANTEIRRKKBN        =   ZERO   )
+      *H25.4      リハビリは追加
+                  OR  (WRK-HEN-SRYCD           =   "099800201" )
                    ADD     1                   TO  IDX-TEI
                END-IF
                IF      IDX-TEI             <=  SPA-MAX-LINE
