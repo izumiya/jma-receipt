@@ -5819,6 +5819,7 @@
            MOVE    BUNBEN-BIKOU        TO  LNKBUNBEN-BIKOU
            MOVE    "1"                 TO  LNKBUNBEN-UPDKBN
            MOVE    BUNBEN-CREYMD       TO  LNKBUNBEN-CREYMD
+           MOVE    BUNBEN-TEISYUTUBIKBN TO LNKBUNBEN-TEISYUTUBIKBN
       *
            MOVE    LNKBUNBEN-REC       TO  BUNBEN-REC
       *
