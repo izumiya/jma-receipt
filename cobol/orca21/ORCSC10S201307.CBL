@@ -3687,6 +3687,31 @@
                END-PERFORM
            END-IF
       *
+      *H25.5
+           IF     (LNK-SC10S-SYORI     =   "W"  )
+      *        ÃæÅÓ½ªÎ»Å¸³«¤Ç¡¢¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤òºÆ¿ÇÎÁ¤ØÊÑ´¹¤·¤¿»þ
+      *        ¾®»ù²Ê³°Íè¿Ç»¡ÎÁºï½ü
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   SPA-MAX-LINE )
+                   IF     (WRK-COM-INPUTCD (IDX)(1:1)  =   "1" )
+                      AND (WRK-COM-SRYKBN (IDX)    =   "13"    )
+                       SET     TBL-IDX             TO  1
+                       SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
+                           AT  END
+                               MOVE    ZERO        TO  FLG-ARI
+                           WHEN   WRK-COM-INPUTCD (IDX)
+                                               =   TBL-SRYCD (TBL-IDX)
+                           MOVE    1                   TO  FLG-ARI
+                       END-SEARCH
+                       IF      FLG-ARI         =   1
+                           MOVE    SPACE       TO  WRK-COM-INPUTCD (IDX)
+                           MOVE    SPA-MAX-LINE    TO  IDX
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+      *
            INITIALIZE                  ORCSC92AREA
            MOVE    "3"                 TO  LNK-SC92-KBN
            MOVE    SPA-SYORIFLG        TO  LNK-SC92-SYORIFLG
