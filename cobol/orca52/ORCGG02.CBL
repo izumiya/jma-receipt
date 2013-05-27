@@ -466,7 +466,7 @@
                MOVE    6               TO  SPA-GMN-G02-FILE2-MAX
            END-IF
       *
-           MOVE    SPA-GMN-G02-FILE2LST (1)
+           MOVE    SPA-GMN-G02-FILE2LST (3)
                                    TO  SPA-GMN-G02-FILE2-G
       *
            MOVE    "T"             TO  SPA-GMN-G02-DATAKBN1-VALUE
@@ -782,7 +782,7 @@
        41024-FILE2-CHK-SEC           SECTION.
       *
            IF      SPA-GMN-G02-FILE2     =   SPACE
-               MOVE    SPA-GMN-G02-FILE2LST (1)
+               MOVE    SPA-GMN-G02-FILE2LST (3)
                                            TO  SPA-GMN-G02-FILE2-G
            ELSE
                PERFORM VARYING IDX FROM    1   BY  1
@@ -796,7 +796,7 @@
                    END-IF
                END-PERFORM        
                IF      SPA-GMN-G02-FILE2MEI  =   SPACE  
-                   MOVE    SPA-GMN-G02-FILE2LST (1)
+                   MOVE    SPA-GMN-G02-FILE2LST (3)
                                                TO  SPA-GMN-G02-FILE2-G
                END-IF
            END-IF
