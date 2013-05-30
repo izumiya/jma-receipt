@@ -5904,20 +5904,8 @@
       *    病名編集処理（疑いフラグを考慮して文字数を求める）
            PERFORM 2001121-PTBYO-BYOMEI-HEN-SEC
       *
-           IF    ( SYS-2005-SYUBYOHENFLG   =   "0" )
-               IF    ( CNT-BYOMEIMOJI      >   40 )
-                   MOVE    2           TO  FLG-PTBYO-LEN-ERR
-               END-IF
-           ELSE
-               IF    ( PTBYO-SYUBYOFLG     =   "1" )
-                   IF    ( CNT-BYOMEIMOJI  >   34 )
-                       MOVE    1           TO  FLG-PTBYO-LEN-ERR
-                   END-IF
-               ELSE
-                   IF    ( CNT-BYOMEIMOJI  >   40 )
-                       MOVE    2           TO  FLG-PTBYO-LEN-ERR
-                   END-IF
-               END-IF
+           IF    ( CNT-BYOMEIMOJI      >   40 )
+               MOVE    2           TO  FLG-PTBYO-LEN-ERR
            END-IF
       *
            IF    ( FLG-PTBYO-LEN-ERR       NOT =   ZERO )
