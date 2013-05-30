@@ -284,6 +284,8 @@
       *  04.06.18    NACL-藤原    13/03/06  同義語変換時の編集病名フラグ
       *                                     の初期化
       *  04.06.19    NACL-藤原    13/03/15  簡単修正時の対象行の設定修正
+      *  04.06.20    NACL-藤原    13/05/29  レセ電エラーフラグの判定に
+      *                                     主病名フラグを使用しない
       *
       *  04.07.01    NACL-藤原    11/06/10  未コード化病名となる病名の別
       *                                     組み立てへの移行を可能にする
@@ -10886,16 +10888,9 @@ grpsys                                          SPA-AREA
            IF  (   WRK-BYOMEIHENFLG    =   "1"                       )
            OR  ( ( WRK-HAISIYMD-CHK    >   ZERO                 ) AND
                  ( WRK-HAISIYMD-CHK    <   WRK-PTBYO-CHK-SRYYMD )    )
-               EVALUATE    WRK-PTBYO-CHK-SYUBYOFLG
-                   WHEN    "1"
-                       IF      WRK-MOJISU  >   17
-                           MOVE    "1"     TO  WRK-PTBYO-CHK-RECEDENFLG
-                       END-IF
-                   WHEN    SPACE
-                       IF      WRK-MOJISU  >   20
-                           MOVE    "1"     TO  WRK-PTBYO-CHK-RECEDENFLG
-                       END-IF
-               END-EVALUATE
+               IF      WRK-MOJISU  >   20
+                   MOVE    "1"     TO  WRK-PTBYO-CHK-RECEDENFLG
+               END-IF
            END-IF
            .
        5001-RECEDENFLG-HENSYU-EXT.

@@ -45,6 +45,8 @@
       *                                     補足コメントのチェック
       *
       *  04.06.01    NACL-藤原    10/10/20  難病外来指導管理料対応
+      *  04.06.02    NACL-藤原    13/05/29  レセ電エラーフラグの判定に
+      *                                     主病名フラグを使用しない
       *
       *  04.07.01    NACL-藤原    11/06/10  病名からコード検索時、複数の
       *                                     組み立てを返却可能にする
@@ -642,18 +644,9 @@ grpsys     COPY    "COMMON-SPA".
            IF  (   WRK-BYOMEIHENFLG        =   "1"                    )
            OR  ( ( LNK-BYO-HAISIYMD-ERR    >   ZERO             ) AND
                  ( LNK-BYO-HAISIYMD-ERR    <   LNK-BYO-SRYYMD-IN )    )
-               EVALUATE    LNK-BYO-SYUBYOFLG
-                   WHEN    "1"
-                       IF      WRK-MOJISU      >   17
-                           MOVE    "1"         TO  LNK-BYO-RECEDENFLG
-                       END-IF
-                   WHEN    SPACE
-                       IF      WRK-MOJISU      >   20
-                           MOVE    "1"         TO  LNK-BYO-RECEDENFLG
-                       END-IF
-                   WHEN    OTHER
-                       MOVE    "4"         TO  LNK-BYO-RC
-               END-EVALUATE
+               IF      WRK-MOJISU      >   20
+                   MOVE    "1"         TO  LNK-BYO-RECEDENFLG
+               END-IF
            END-IF    
            .
        200-RECEDENFLG-HENSYU-EXT.

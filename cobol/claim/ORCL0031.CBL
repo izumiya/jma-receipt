@@ -65,6 +65,8 @@
       *  04.06.03    NACL-藤原    10/10/20  難病外来指導管理料対応
       *  04.06.02    NACL-多々納  10/11/19  ４０剤、４０明細対応他
       *  04.06.02    NACL-多々納  11/02/18  用法コメント対応
+      *  04.06.04    NACL-藤原    13/05/29  レセ電エラーフラグの判定に
+      *                                     主病名フラグを使用しない
       *
       *  04.07.01    NACL-藤原    10/10/20  病名の削除処理対応
       *  04.07.00    NACL-多々納  11/10/13  ＵＩＤ編集対応
@@ -3738,16 +3740,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *        レセ電エラーフラグ（編集病名のとき）
                IF      PTBYO-BYOMEIHENFLG          =   "1"
-                   EVALUATE    PTBYO-SYUBYOFLG       
-                       WHEN    "1"
-                           IF      PTBYO-BYOMEIMOJI        >   17
-                               MOVE    "1" TO  PTBYO-RECEDENFLG       
-                           END-IF
-                       WHEN    SPACE
-                           IF      PTBYO-BYOMEIMOJI        >   20
-                               MOVE    "1" TO  PTBYO-RECEDENFLG       
-                           END-IF
-                   END-EVALUATE
+                   IF      PTBYO-BYOMEIMOJI        >   20
+                       MOVE    "1" TO  PTBYO-RECEDENFLG       
+                   END-IF
                END-IF
       *
       *        レセ電エラーフラグ（疑いフラグが設定されているとき）
@@ -3764,16 +3759,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                    COMPUTE WRK-MOJISU      =   SMKBYO-LENGTH  /   2
                    IF      PTBYO-BYOMEIHENFLG    =   "1"
-                       EVALUATE    PTBYO-SYUBYOFLG
-                           WHEN    "1"
-                               IF      WRK-MOJISU  >   17
-                                   MOVE    "1"     TO  PTBYO-RECEDENFLG
-                               END-IF
-                           WHEN    SPACE
-                               IF      WRK-MOJISU  >   20
-                                   MOVE    "1"     TO  PTBYO-RECEDENFLG
-                               END-IF
-                       END-EVALUATE
+                       IF      WRK-MOJISU  >   20
+                           MOVE    "1"     TO  PTBYO-RECEDENFLG
+                       END-IF
                    END-IF    
                END-IF    
            ELSE
@@ -3965,16 +3953,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *        レセ電エラーフラグ（編集病名のとき）
                IF      PTBYO-BYOMEIHENFLG          =   "1"
-                   EVALUATE    PTBYO-SYUBYOFLG       
-                       WHEN    "1"
-                           IF      PTBYO-BYOMEIMOJI        >   17
-                               MOVE    "1" TO  PTBYO-RECEDENFLG       
-                           END-IF
-                       WHEN    SPACE
-                           IF      PTBYO-BYOMEIMOJI        >   20
-                               MOVE    "1" TO  PTBYO-RECEDENFLG       
-                           END-IF
-                   END-EVALUATE
+                   IF      PTBYO-BYOMEIMOJI        >   20
+                       MOVE    "1" TO  PTBYO-RECEDENFLG       
+                   END-IF
                END-IF
       *
       *        レセ電エラーフラグ（疑いフラグが設定されているとき）
@@ -4016,18 +3997,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        COMPUTE WRK-MOJISU          =      
                                 WRK-MOJISU +   WRK-CONS-UTAGAI-MOJISU
                        IF      PTBYO-BYOMEICD (21) NOT =   SPACE             
-                           EVALUATE    PTBYO-SYUBYOFLG       
-                               WHEN    "1"
-                                   IF      WRK-MOJISU      >   17
-                                       MOVE    "1"     TO
-                                                       PTBYO-RECEDENFLG       
-                                   END-IF
-                               WHEN    SPACE
-                                   IF      WRK-MOJISU      >   20
-                                       MOVE    "1"     TO
-                                                       PTBYO-RECEDENFLG       
-                                   END-IF
-                           END-EVALUATE
+                           IF      WRK-MOJISU      >   20
+                               MOVE    "1"         TO  PTBYO-RECEDENFLG       
+                           END-IF
                        END-IF
                    END-IF    
                    IF    ( PTBYO-UTAGAIFLG     =   "2" OR  "3" )
@@ -4035,18 +4007,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        COMPUTE WRK-MOJISU          =      
                                 WRK-MOJISU +   WRK-CONS-KYUSEI-MOJISU
                        IF      PTBYO-BYOMEICD (21) NOT =   SPACE             
-                           EVALUATE    PTBYO-SYUBYOFLG       
-                               WHEN    "1"
-                                   IF      WRK-MOJISU      >   17
-                                       MOVE    "1"     TO
-                                                       PTBYO-RECEDENFLG       
-                                   END-IF
-                               WHEN    SPACE
-                                   IF      WRK-MOJISU      >   20
-                                       MOVE    "1"     TO
-                                                       PTBYO-RECEDENFLG       
-                                   END-IF
-                           END-EVALUATE
+                           IF      WRK-MOJISU      >   20
+                               MOVE    "1"         TO  PTBYO-RECEDENFLG       
+                           END-IF
                        END-IF
                    END-IF
                END-IF    
