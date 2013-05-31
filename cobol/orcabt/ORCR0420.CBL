@@ -234,6 +234,8 @@
       *  04.06.05    NACL-門脇    13/02/18  労災レセ電対応
       *                                     （新診療行為コード対応）
       *  04.06.06    NACL-門脇    13/02/27  平成２５年４月改正対応
+      *  04.06.07    NACL-門脇    13/05/31  平成２５年７月診療分以降の
+      *                                     休業証明のみの対応
       *
       *  04.07.01    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.02    NACL-門脇    12/09/25  コメント差込取り止め（在宅持続陽圧）
@@ -2029,7 +2031,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                ADD     1                  TO    IDX4
                MOVE    SRY-SRYCD(IDX2)    TO    RECE45-SRYCD(IDX4)
       *
-               IF      SRY-SRYCD(IDX2)    =     CONS-ROUSAI10
+               IF    ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI10) AND
+                      (RECE41-SRYYM      <=     "201306"     ))
+               OR    ((SRY-SRYCD(IDX2)    =     CONS-ROUSAI21) AND
+                      (RECE41-SRYYM      >=     "201307"     ))
                         MOVE   "1"        TO    RECE41-KYUGYOFLG
                                                 WRK-KYUGYOFLG
                END-IF
