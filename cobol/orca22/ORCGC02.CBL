@@ -293,6 +293,8 @@
       *                                     引継ぎ対応
       *  04.07.03    NACL-太田    12/02/20  前画面戻り時SPA-PTIDを初期化する
       *  04.07.04    NACL-藤原    13/05/13  病名コード未入力時の病名表示の修正
+      *  04.07.05    NACL-藤原    13/06/01  病名コード未入力時のカーソル
+      *                                     位置の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5177,7 +5179,12 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
                      END-IF
                  END-PERFORM
                  IF      FLG-CHANGE    =   ZERO
-                     MOVE    34             TO  SPA-GMN-C02-CUR
+                     IF      SPA-NAI-C02-BYOMEICD-MAX
+                                           >   1
+                         MOVE    9             TO  SPA-GMN-C02-CUR
+                     ELSE
+                         MOVE    34            TO  SPA-GMN-C02-CUR
+                     END-IF
                      MOVE    SPACE           TO  WRK-SEIGYO
                      GO  TO  4102-BYOMEICD-CHK-EXT
                  END-IF
