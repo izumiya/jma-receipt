@@ -378,4 +378,54 @@ path	key17		{
 	};
 };
 
+path	key18		{ 	
+	DBSELECT	{
+		DECLARE tbl_rececom_key18_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rececom
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     SRYYM     =   :SRYYM
+			AND     NYUGAIKBN =   :NYUGAIKBN
+			AND     SJKBN     <   '07'
+			AND     SRYDD     =   :SRYDD
+			ORDER BY HKNCOMBI,SJKBN,RENNUM
+		;
+	};
+};
+
+path	key19		{ 	
+	DBSELECT	{
+		DECLARE tbl_rececom_key19_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rececom
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     SRYYM     =   :SRYYM
+			AND     NYUGAIKBN =   :NYUGAIKBN
+			AND     SJKBN     >=  '07'
+			AND     SJKBN     <=  '09'
+			AND     SRYDD     =   :SRYDD
+			ORDER BY HKNCOMBI,SJKBN,RENNUM
+		;
+	};
+};
+
+path	key20		{ 	
+	DBSELECT	{
+		DECLARE tbl_rececom_key20_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rececom
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     SRYYM     =   :SRYYM
+			AND     NYUGAIKBN =   :NYUGAIKBN
+			AND     SJKBN     >=  '50'
+			AND     SJKBN     <=  '52'
+			AND     SRYDD     =   :SRYDD
+			ORDER BY HKNCOMBI,SJKBN,RENNUM
+		;
+	};
+};
+
 
