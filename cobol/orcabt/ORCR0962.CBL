@@ -52,6 +52,8 @@
       *  04.06.01    NACL-藤原    10/10/04  レセプトコメント文字数増対応
       *  04.06.02    NACL-藤原    11/10/07  傷病名を３行まで記載可能とする
       *  04.06.03    NACL-藤原    13/04/30  「傷病の経過」記載対応
+      *  04.06.04    NACL-藤原    13/05/27  症状詳記の表題を平成２５年７月
+      *                                     診療分以降は全て記載
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -487,11 +489,27 @@
       *   症状詳記区分の表題
        01  TBL-RECECOM-AREA.
            03  FILLER              PIC X(52)   VALUE
+               "【主たる疾患の診断根拠となる臨床症状】".
+           03  FILLER              PIC X(52)   VALUE
+               "【主たる疾患の診断根拠となる臨床症状の診察検査所見】".
+           03  FILLER              PIC X(52)   VALUE
+               "【主な治療行為（手術、処置、薬物治療等）の必要性】".
+           03  FILLER              PIC X(52)   VALUE
+               "【主な治療行為（手術、処置、薬物治療等）の経過】".
+           03  FILLER              PIC X(52)   VALUE
+               "【合計点数が１００万点以上の薬剤に係る症状等】".
+           03  FILLER              PIC X(52)   VALUE
+               "【合計点数が１００万点以上の処置に係る症状等】".
+           03  FILLER              PIC X(52)   VALUE
+               "【その他】".
+           03  FILLER              PIC X(52)   VALUE
+               "【薬事法に規定する治験に係る治験概要】".
+           03  FILLER              PIC X(52)   VALUE
                "【疾患別リハビリテーションに係る治療継続の理由等】".
            03  FILLER              PIC X(52)   VALUE
                "【廃用症候群に係る評価表】".
        01  TBL-RECECOM-AREA-R      REDEFINES   TBL-RECECOM-AREA.
-           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   2.
+           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   10.
       *
       *    傷病名欄
        01  TBL-BYOMEI-NO-AREA.
@@ -2222,23 +2240,39 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    ZERO            TO  FLG-RECECOM-SJKBN
       *
       *    症状詳記区分の見出しを記載
-           IF      RECECOM-SJKBN   =   "51"   OR  "52"
-               MOVE    RECECOM-SJKBN   TO  RECECOM-SJKBN
+      *   （平成２５年７月以降は全て記載）
+           IF      RECE82-SRYYM    <   201307
+               IF      RECECOM-SJKBN   =   "51"   OR  "52"
+                   MOVE    RECECOM-SJKBN   TO  RECECOM-SJKBN
+               ELSE
+                   MOVE    SPACE           TO  RECECOM-SJKBN
+               END-IF
            ELSE
-               MOVE    SPACE           TO  RECECOM-SJKBN
+               IF      RECECOM-SJKBN   =   "07"    OR  "08"    OR  "09"
+                   MOVE    "07"            TO  RECECOM-SJKBN
+               END-IF
            END-IF 
            IF      RECECOM-SJKBN   NOT =   WRK-RECECOM-SJKBN
                MOVE   RECECOM-SJKBN        TO  WRK-RECECOM-SJKBN
       *
                MOVE    SPACE           TO  WRK-RECECOM-NAME
                EVALUATE    WRK-RECECOM-SJKBN
+                   WHEN    "01"    THRU    "07"
+                       MOVE    1               TO  FLG-RECECOM-SJKBN
+                       MOVE    RECECOM-SJKBN   TO  WRK-SJKBN-X
+                       MOVE    TBL-RECECOM-NAME (WRK-SJKBN)
+                                               TO  WRK-RECECOM-NAME
+                   WHEN    "50"
+                       MOVE    1               TO  FLG-RECECOM-SJKBN
+                       MOVE    TBL-RECECOM-NAME (8)
+                                               TO  WRK-RECECOM-NAME
                    WHEN    "51"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
-                       MOVE    TBL-RECECOM-NAME (1)
+                       MOVE    TBL-RECECOM-NAME (9)
                                                TO  WRK-RECECOM-NAME
                    WHEN    "52"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
-                       MOVE    TBL-RECECOM-NAME (2)
+                       MOVE    TBL-RECECOM-NAME (10)
                                                TO  WRK-RECECOM-NAME
                END-EVALUATE
            END-IF
