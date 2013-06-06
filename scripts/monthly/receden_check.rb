@@ -1313,11 +1313,12 @@ class Receden_check < Receden_common
                   flg_tensu_required = true
                 when ( tekiyo.srykbn =~ /^(11|12|13|14)$/)
                   case tbl_tensu["KOKUJISKBKBN1"].to_i
-                  when 1,3,5,7
+                  when 1,3,5,7,9
                     if tekiyo.zai[zai_idx + 1].tbl_tensu.empty?
                       flg_tensu_required = true
                     else
-                      if tekiyo.zai[zai_idx + 1].tbl_tensu["KOKUJISKBKBN1"].to_i == 7 
+                      if tekiyo.zai[zai_idx + 1].tbl_tensu["KOKUJISKBKBN1"].to_i == 7 ||
+                         tekiyo.zai[zai_idx + 1].tbl_tensu["KOKUJISKBKBN1"].to_i == 9 
                       else
                         flg_tensu_required = true
                       end
