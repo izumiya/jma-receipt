@@ -39,6 +39,8 @@
       *  04.06.02    NACL-藤原    11/03/15  平成２３年４月以降提出分は
       *                                     様式変更（１枚１名記載） 
       *                                     HCN61V02.red
+      *  04.06.03    NACL-藤原    13/06/05  退職国保の保険者番号を請求書の
+      *                                     保険者番号欄へ記載する
       *
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
       *****************************************************************
@@ -2408,8 +2410,8 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
       *
                MOVE    BUNBEN-BUNBENKBN
                                        TO  KEY-N-BUNBENKBN
-               MOVE    BUNBEN-HKNJANUM-S
-                                       TO  KEY-N-HKNJANUM    
+      *********MOVE    BUNBEN-HKNJANUM-S
+               MOVE    BUNBEN-HKNJANUM TO  KEY-N-HKNJANUM    
                ADD     1               TO  CNT-IN
       *  
                DISPLAY "PTNUM="         BUNBEN-PTNUM
