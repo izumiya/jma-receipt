@@ -29,6 +29,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.00    NACL-太田    10/01/29  拡張漢字対応
       *  04.05.01    NACL-藤原    10/07/07  ２５日請求対応
+      *
+      *  04.06.01    NACL-藤原    13/06/05  退職国保の保険者番号を記載する
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -838,8 +840,8 @@
                                            TO  KEY-N-TEISYUTUSAKI
                    MOVE    BUNBEN-BUNBENKBN
                                            TO  KEY-N-BUNBENKBN
-                   MOVE    BUNBEN-HKNJANUM-S
-                                           TO  KEY-N-HKNJANUM    
+      *********    MOVE    BUNBEN-HKNJANUM-S
+                   MOVE    BUNBEN-HKNJANUM TO  KEY-N-HKNJANUM    
                END-IF
                ADD     1               TO  CNT-IN
       *  
