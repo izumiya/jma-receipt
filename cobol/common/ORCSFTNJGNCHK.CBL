@@ -145,6 +145,7 @@
            03  WRK-KOHFTN-H       PIC 9(10)V9(01).
            03  WRK-KOHFTN9-H      PIC 9(10)V9(01).
            03  WRK-KOHFTN9-X      PIC 9(10).
+           03  WRK-KOHFTN-X       PIC 9(10).
            03  WRK-KOHFTN-SKJ     PIC 9(10).
            03  WRK-KOHFTN-TOKU75  PIC 9(10).
            03  WRK-KOHFTN-RITU    PIC 9(03).
@@ -382,6 +383,24 @@
       *        ÉéÃ´¾å¸Â³Û¤Î¼èÆÀ
                PERFORM    2003-PTKOHFTN-GET-SEC
              END-IF
+      *
+      *      ÀßÄê¤È°Û¤Ê¤ëµ­ºÜÀßÄê¤ÎÊÔ½¸
+             IF    LNK-FTNJGNCHK-NYUGAIKBN   =   "1"
+               EVALUATE  WRK-RECEKSIFLG-N
+                 WHEN      "1"
+                    MOVE    999999      TO  WRK-HKNMST-JGNGAK
+                 WHEN      "2"
+                    MOVE    999998      TO  WRK-HKNMST-JGNGAK
+               END-EVALUATE
+             ELSE
+               EVALUATE  WRK-RECEKSIFLG-G
+                 WHEN      "1"
+                    MOVE    999999      TO  WRK-HKNMST-JGNGAK
+                 WHEN      "2"
+                    MOVE    999998      TO  WRK-HKNMST-JGNGAK
+               END-EVALUATE
+             END-IF
+      *
       *      ÊÝ¸±¤Î¾å¸Â³Û¤È¼ýÇ¼¤ÎÉéÃ´³Û¤òÈæ³ÓÈ½Äê
              PERFORM      2004-HANTEI-SEC
            END-IF
@@ -1253,22 +1272,6 @@
                END-EVALUATE
            END-IF
       *
-      *    ÀßÄê¤È°Û¤Ê¤ëµ­ºÜÀßÄê¤ÎÊÔ½¸
-           IF    LNK-FTNJGNCHK-NYUGAIKBN   =   "1"
-               EVALUATE  WRK-RECEKSIFLG-N
-                 WHEN      "1"
-                    MOVE    999999      TO  WRK-HKNMST-JGNGAK
-                 WHEN      "2"
-                    MOVE    999998      TO  WRK-HKNMST-JGNGAK
-               END-EVALUATE
-           ELSE
-               EVALUATE  WRK-RECEKSIFLG-G
-                 WHEN      "1"
-                    MOVE    999999      TO  WRK-HKNMST-JGNGAK
-                 WHEN      "2"
-                    MOVE    999998      TO  WRK-HKNMST-JGNGAK
-               END-EVALUATE
-           END-IF
       *@@@ IF   (LNK-FTNJGNCHK-PREFNUM   =  11                    )
       *@@@ AND  (LNK-FTNJGNCHK-KOHNUM    = "343" OR "342" OR "344")
       *@@@ AND  (LNK-FTNJGNCHK-NYUGAIKBN = "1"                    )
@@ -1630,6 +1633,7 @@
            MOVE      ZERO          TO      WRK-KOHFTN-H
            MOVE      ZERO          TO      WRK-KOHFTN9-H
            MOVE      ZERO          TO      WRK-KOHFTN9-X
+           MOVE      ZERO          TO      WRK-KOHFTN-X
            MOVE      ZERO          TO      WRK-KOHFTN-SKJ
            MOVE      ZERO          TO      WRK-KOHFTN-TOKU75
            MOVE      ZERO          TO      WRK-KOHFTN-HKNFTNMONEY
@@ -1671,12 +1675,13 @@
                        END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(1)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
-                       ADD  SYU-KOH-COMPFTN(1)     TO  WRK-KOHFTN
+                       ADD  SYU-KOH-HKNFTNMONEY(1) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN-ENTANI(1) TO WRK-KOHFTN-EN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                        AND (WRK-HKNCOMBINUM-HKNID(IDX1)
                                                   = LNK-FTNJGNCHK-HKNID)
                          ADD SYU-KOH-COMPFTN-ENTANI(1) TO WRK-KOHFTN-H
+                         ADD SYU-KOH-HKNFTNMONEY(1)    TO WRK-KOHFTN-X
                          ADD SYU-SYUCOMPFTN-ENTANI     TO WRK-KOHFTN9-H
                          ADD SYU-SYUCOMPFTN            TO WRK-KOHFTN9-X
                        END-IF
@@ -1686,7 +1691,6 @@
                        END-IF
                        IF  (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
                        AND (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
-      **>                 MOVE SYU-KOH-COMPFTN(1)  TO  WRK-COMPFTN
                           MOVE SYU-KOH-COMPFTN-ENTANI(1) TO WRK-COMPFTN
                           PERFORM  2004111-CYOKI-HENSYU-SEC
                        END-IF
@@ -1707,20 +1711,15 @@
                        END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(2)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
-                       ADD  SYU-KOH-COMPFTN(2)     TO  WRK-KOHFTN
+                       ADD  SYU-KOH-HKNFTNMONEY(2) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN-ENTANI(2) TO WRK-KOHFTN-EN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                        AND (WRK-HKNCOMBINUM-HKNID(IDX1)
                                                   = LNK-FTNJGNCHK-HKNID)
                          ADD SYU-KOH-COMPFTN-ENTANI(2) TO WRK-KOHFTN-H
+                         ADD SYU-KOH-HKNFTNMONEY(2)    TO WRK-KOHFTN-X
                          ADD SYU-KOH-COMPFTN-ENTANI(1) TO WRK-KOHFTN9-H
-                         IF  SYU-KOH-HKNNUM(1) = "015" OR "016" OR "021"
-                                              OR "024" OR "038" OR "051"
-                                              OR "052" OR "079"
-                           ADD SYU-KOH-HKNFTNMONEY(1)  TO WRK-KOHFTN9-X
-                         ELSE
-                           ADD SYU-KOH-COMPFTN(1)      TO WRK-KOHFTN9-X
-                         END-IF
+                         ADD SYU-KOH-HKNFTNMONEY(1)    TO WRK-KOHFTN9-X
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(2)        =  "2"
@@ -1728,7 +1727,6 @@
                        END-IF
                        IF  (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
                        AND (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
-      **>                 MOVE SYU-KOH-COMPFTN(2)  TO  WRK-COMPFTN
                           MOVE SYU-KOH-COMPFTN-ENTANI(2) TO WRK-COMPFTN
                           PERFORM  2004111-CYOKI-HENSYU-SEC
                        END-IF
@@ -1749,14 +1747,15 @@
                        END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(3)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
-                       ADD  SYU-KOH-COMPFTN(3)     TO  WRK-KOHFTN
+                       ADD  SYU-KOH-HKNFTNMONEY(3) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN-ENTANI(3) TO WRK-KOHFTN-EN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                        AND (WRK-HKNCOMBINUM-HKNID(IDX1)
                                                   = LNK-FTNJGNCHK-HKNID)
                          ADD SYU-KOH-COMPFTN-ENTANI(3) TO WRK-KOHFTN-H
+                         ADD SYU-KOH-HKNFTNMONEY(3)    TO WRK-KOHFTN-X
                          ADD SYU-KOH-COMPFTN-ENTANI(2) TO WRK-KOHFTN9-H
-                         ADD SYU-KOH-COMPFTN(2)        TO WRK-KOHFTN9-X
+                         ADD SYU-KOH-HKNFTNMONEY(2)    TO WRK-KOHFTN9-X
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(3)        =  "2"
@@ -1764,7 +1763,6 @@
                        END-IF
                        IF  (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
                        AND (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
-      **>                 MOVE SYU-KOH-COMPFTN(3)  TO  WRK-COMPFTN
                           MOVE SYU-KOH-COMPFTN-ENTANI(3) TO WRK-COMPFTN
                           PERFORM  2004111-CYOKI-HENSYU-SEC
                        END-IF
@@ -1785,14 +1783,15 @@
                        END-IF
                        ADD  SYU-KOH-HKNFTNMONEY(4)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
-                       ADD  SYU-KOH-COMPFTN(4)     TO  WRK-KOHFTN
+                       ADD  SYU-KOH-HKNFTNMONEY(4) TO  WRK-KOHFTN
                        ADD  SYU-KOH-COMPFTN-ENTANI(4) TO WRK-KOHFTN-EN
                        IF  (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                        AND (WRK-HKNCOMBINUM-HKNID(IDX1)
                                                   = LNK-FTNJGNCHK-HKNID)
                          ADD SYU-KOH-COMPFTN-ENTANI(4) TO WRK-KOHFTN-H
+                         ADD SYU-KOH-HKNFTNMONEY(4)    TO WRK-KOHFTN-X
                          ADD SYU-KOH-COMPFTN-ENTANI(3) TO WRK-KOHFTN9-H
-                         ADD SYU-KOH-COMPFTN(3)        TO WRK-KOHFTN9-X
+                         ADD SYU-KOH-HKNFTNMONEY(3)    TO WRK-KOHFTN9-X
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(4)        =  "2"
@@ -1800,7 +1799,6 @@
                        END-IF
                        IF  (LNK-FTNJGNCHK-KOHNUM = "972" OR "974")
                        AND (SYU-SKJ-FTNDAY(1)  NOT = ZERO        )
-      **>                 MOVE SYU-KOH-COMPFTN(4)  TO  WRK-COMPFTN
                           MOVE SYU-KOH-COMPFTN-ENTANI(4) TO WRK-COMPFTN
                           PERFORM  2004111-CYOKI-HENSYU-SEC
                        END-IF
@@ -2164,7 +2162,6 @@
                      END-IF
                     ELSE
                      IF   FLG-TOKU75  =  1
-      **>              IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
                        IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN-EN
                          EVALUATE  LNK-FTNJGNCHK-KOHNUM
                            WHEN      "972"
@@ -2178,7 +2175,6 @@
                          END-EVALUATE
                        END-IF
                      ELSE
-      **>              IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN
                        IF   WRK-HKNMST-JGNGAK   >   WRK-KOHFTN-EN
                          MOVE   01        TO  LNK-FTNJGNCHK-RC
                        END-IF
@@ -2193,22 +2189,21 @@
                      AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
                      AND (LNK-FTNJGNCHK-SRYYM       >= "200704"      )
                        IF  (WRK-KOHFTN9-H  =  WRK-KOHFTN-H)
-                       OR  (WRK-KOHFTN9-X  =  WRK-KOHFTN  )
+                       OR  (WRK-KOHFTN9-X  =  WRK-KOHFTN-X)
                              MOVE   01         TO  LNK-FTNJGNCHK-RC
                        END-IF
                      ELSE
                        IF   LNK-FTNJGNCHK-SRYYM  >= "200804"
-                         IF  (WRK-HKNMST-JGNGAK  >=  WRK-KOHFTN  )
-                         AND (WRK-KOHFTN9-H       =  WRK-KOHFTN-H)
+                         IF   WRK-KOHFTN9-H  =  WRK-KOHFTN-H
                            IF  WRK-HKNMST-JGNGAK2   =  ZERO
                                  MOVE     01   TO  LNK-FTNJGNCHK-RC
                            ELSE
                              IF  LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
-                               IF WRK-HKNMST-JGNGAK2 > WRK-KOHFTN
+                               IF WRK-HKNMST-JGNGAK2 > WRK-KOHFTN-X
                                  MOVE     01   TO  LNK-FTNJGNCHK-RC
                                END-IF
                              ELSE
-                               IF WRK-HKNMST-JGNGAK2 > WRK-KOHFTN-EN
+                               IF WRK-HKNMST-JGNGAK2 > WRK-KOHFTN-H
                                  MOVE     01   TO  LNK-FTNJGNCHK-RC
                                END-IF
                              END-IF
@@ -2240,7 +2235,6 @@
       *****************************************************************
        200412-SYUKEI-HENSYU2-SEC            SECTION.
       *
-           MOVE      ZERO       TO      WRK-KOHFTN
            MOVE      ZERO       TO      WRK-KOHFTN-SKJ
            MOVE      ZERO       TO      WRK-KOHFTN-HKNFTNMONEY
            MOVE      ZERO       TO      WRK-SEIKYU
@@ -2262,7 +2256,6 @@
                     WHEN   SYU-KOH-HKNNUM(1)
                      ADD  SYU-KOH-HKNFTNMONEY(1)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
-                     ADD  SYU-KOH-COMPFTN(1)  TO  WRK-KOHFTN
                      IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                      AND  SYU-SKJ-FTNKBN(1)        =  "2"
                        ADD  SYU-SKJ-FTN(1)    TO  WRK-KOHFTN-SKJ
@@ -2270,7 +2263,6 @@
                     WHEN   SYU-KOH-HKNNUM(2)
                      ADD  SYU-KOH-HKNFTNMONEY(2)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
-                     ADD  SYU-KOH-COMPFTN(2)  TO  WRK-KOHFTN
                      IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                      AND  SYU-SKJ-FTNKBN(2)        =  "2"
                        ADD  SYU-SKJ-FTN(2)    TO  WRK-KOHFTN-SKJ
@@ -2278,7 +2270,6 @@
                     WHEN   SYU-KOH-HKNNUM(3)
                      ADD  SYU-KOH-HKNFTNMONEY(3)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
-                     ADD  SYU-KOH-COMPFTN(3)  TO  WRK-KOHFTN
                      IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                      AND  SYU-SKJ-FTNKBN(3)        =  "2"
                        ADD  SYU-SKJ-FTN(3)    TO  WRK-KOHFTN-SKJ
@@ -2286,7 +2277,6 @@
                     WHEN   SYU-KOH-HKNNUM(4)
                      ADD  SYU-KOH-HKNFTNMONEY(4)
                                        TO  WRK-KOHFTN-HKNFTNMONEY
-                     ADD  SYU-KOH-COMPFTN(4)  TO  WRK-KOHFTN
                      IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                      AND  SYU-SKJ-FTNKBN(4)        =  "2"
                        ADD  SYU-SKJ-FTN(4)    TO  WRK-KOHFTN-SKJ
@@ -2320,6 +2310,12 @@
              END-IF
              PERFORM  910-SYUNOU-READ-SEC
            END-PERFORM
+      *
+           IF    LNK-FTNJGNCHK-RC  =   ZERO
+              IF    WRK-HKNMST-JGNGAK  =  999999
+                   MOVE   01        TO  LNK-FTNJGNCHK-RC
+              END-IF
+           END-IF
       *
            IF    LNK-FTNJGNCHK-RC  =   ZERO
            AND   FLG-ARI2          =    1
