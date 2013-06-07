@@ -289,6 +289,9 @@
       *    积鲁此靳及缝闭呱册
            03  FILLER                  PIC X(04)   VALUE   "008".
            03  FILLER                  PIC X(09)   VALUE   "140029850".
+      *    客供空隆∈她拉拜积譬老呱册∷
+           03  FILLER                  PIC X(04)   VALUE   "008".
+           03  FILLER                  PIC X(09)   VALUE   "140052810".
       *
       *    费鲁瓷妄裁换∈办忍∷
            03  FILLER                  PIC X(04)   VALUE   "006".
@@ -308,14 +311,14 @@
       *****03  TBL-DOUJI-OCC           OCCURS   9   INDEXED   TBL-IDX.
       *****03  TBL-DOUJI-OCC           OCCURS   13  INDEXED   TBL-IDX.
       **** 03  TBL-DOUJI-OCC           OCCURS   24  INDEXED   TBL-IDX.
-           03  TBL-DOUJI-OCC           OCCURS   29  INDEXED   TBL-IDX.
+           03  TBL-DOUJI-OCC           OCCURS   30  INDEXED   TBL-IDX.
                05  TBL-CODE                PIC X(03).
                05  TBL-CHK                 PIC X(01).
                05  TBL-SRYCD               PIC X(09).
       *01  TBL-MAX                     PIC 9(04)   VALUE   9.
       *01  TBL-MAX                     PIC 9(04)   VALUE   18.
       *01  TBL-MAX                     PIC 9(04)   VALUE   24.
-       01  TBL-MAX                     PIC 9(04)   VALUE   29.
+       01  TBL-MAX                     PIC 9(04)   VALUE   30.
       *
       *    瘦副侍换年旺悟テ〖ブル
            COPY   "CMSANTEITBL.INC".
