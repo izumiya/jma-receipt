@@ -90,6 +90,7 @@
       *  04.06.01    NACL-∆£∏∂    10/10/04  •Ï•ª•◊•»•≥•·•Û•» ∏ª˙øÙ¡˝¬–±˛
       *  04.06.02    NACL-∆£∏∂    11/10/07  Ω˝…¬Ãæ§Ú£≥π‘§ﬁ§«µ≠∫‹≤ƒ«Ω§»§π§Î
       *  04.06.03    NACL-ÃÁœ∆    13/04/11  º¬∆¸øÙ£π£π£π§ŒŒ≈Õ‹¥¸¥÷ ‘Ω∏Ω§¿µ
+      *  04.06.04    NACL-ÃÁœ∆    13/06/07  πÁ∑◊≥€•Ô°º•ØŒŒ∞Ë§Œ•Ø•Í•¢
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1273,26 +1274,29 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            END-IF
            MOVE    RECE41-KSNRATE(2:2) TO  HC23-SEIKYU(1)
                                            HC23-SEIKYU(2)
-      *    ¿¡µ·≥€£¡
-           MOVE    RECE41-TOTALKIN       TO  WRK-SEIKYUZ
-           MOVE    WRK-SEIKYUZ           TO  HC23-SEIKYUGAKU(1)
-      *    ¿¡µ·≥€£¬
-           MOVE    RECE41-TOTALKIN-YAK   TO  WRK-SEIKYUZ
-           MOVE    WRK-SEIKYUZ           TO  HC23-SEIKYUGAKU(2) 
-      *    ¿¡µ·≥€£√
-           MOVE    RECE41-TOTALKIN2      TO  WRK-SEIKYUZ
-           MOVE    WRK-SEIKYUZ           TO  HC23-SEIKYUGAKU(3) 
-      *    ¿¡µ·≥€£ƒ
-           MOVE    RECE41-TOTALKIN2-ETC  TO  WRK-SEIKYUZ
-           MOVE    WRK-SEIKYUZ           TO  HC23-SEIKYUGAKU(4)
       *    ¿¡µ·≥€∑◊
+           MOVE    ZERO                    TO  WRK-GOKEI
            COMPUTE WRK-GOKEI   =    RECE41-TOTALKIN
                                +    RECE41-TOTALKIN-YAK
                                +    RECE41-TOTALKIN2
                                +    RECE41-TOTALKIN2-ETC
-
-           MOVE    WRK-GOKEI             TO  WRK-SEIKYUZ
-           MOVE    WRK-SEIKYUZ           TO  HC23-SEIKYUGAKU(5)
+           IF    WRK-GOKEI  >  ZERO
+              MOVE    WRK-GOKEI            TO  WRK-SEIKYUZ
+              MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUGAKU(5)
+      *
+      *       ¿¡µ·≥€£¡
+              MOVE    RECE41-TOTALKIN      TO  WRK-SEIKYUZ
+              MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUGAKU(1)
+      *       ¿¡µ·≥€£¬
+              MOVE    RECE41-TOTALKIN-YAK  TO  WRK-SEIKYUZ
+              MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUGAKU(2)
+      *       ¿¡µ·≥€£√
+              MOVE    RECE41-TOTALKIN2     TO  WRK-SEIKYUZ
+              MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUGAKU(3)
+      *       ¿¡µ·≥€£ƒ
+              MOVE    RECE41-TOTALKIN2-ETC TO  WRK-SEIKYUZ
+              MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUGAKU(4)
+           END-IF
       *    ƒÃ±°∑Ó
            MOVE    WRK-STYMDW(3:2)     TO  HC23-TSUINMM(1) 
       *    ƒÃ±°∆¸
@@ -1307,12 +1311,15 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            MOVE    RECE41-TUUIN-KEI     TO  WRK-Z9
            MOVE    WRK-Z9               TO  HC23-TSUINSUU(1)
       *    ¿¡µ·≥€
+           MOVE    ZERO                 TO  WRK-GOKEI
            COMPUTE WRK-GOKEI   =    RECE41-TOTALKIN
                                +    RECE41-TOTALKIN-YAK
                                +    RECE41-TOTALKIN2
                                +    RECE41-TOTALKIN2-ETC
-           MOVE    WRK-GOKEI             TO  WRK-SEIKYUZ
-           MOVE    WRK-SEIKYUZ           TO  HC23-SEIKYUGAKUTOTAL
+           IF    WRK-GOKEI  >  ZERO
+             MOVE    WRK-GOKEI          TO  WRK-SEIKYUZ
+             MOVE    WRK-SEIKYUZ        TO  HC23-SEIKYUGAKUTOTAL
+           END-IF
       *    ΩÍ∫ﬂ√œ
            IF      FLG-SYS-1902        =   1
                MOVE    SYS-1902-ADRS1      TO  HC23-HOSPJYUSYO (1:)

@@ -34,6 +34,7 @@
       *  04.06.01    NACL-藤原    13/04/30  「傷病の経過」記載対応
       *  04.06.02    NACL-藤原    13/05/27  症状詳記の表題を平成２５年７月
       *                                     診療分以降は全て記載
+      *  04.06.03    NACL-門脇    13/06/07  合計額ワーク領域のクリア
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1290,6 +1291,7 @@
       *    転帰事由
            MOVE    RECE82-TENKI        TO  HCN67-TENKI 
       *    合計額
+           MOVE    ZERO                TO  WRK-GOKEI
            COMPUTE WRK-GOKEI   =   RECE82-TOTALKIN
                                +   RECE82-KINGAKU2-SYO
                                +   RECE82-SHOKUJITOTALKIN
