@@ -2247,8 +2247,9 @@
       *!
            END-IF
       *
-      *    初診時ブラッシング料判定
-           IF      SPA-COM-INPUTCD(IDX)    =   "101400030"
+      *    初診時ブラッシング料判定（Ｈ２５年７月からは手術あり）
+           IF     (SPA-COM-INPUTCD(IDX)    =   "101400030" )
+             AND  (SPA-SRYYMD              <   "20130701"  )
                IF     (IDX                 >   1  )  AND
                      ((SPA-GMN-INPUTCD(IDX - 1)(1:1) =   ".") OR
                       (SPA-COM-ZAIEND(IDX -  1)   =  SPACE  ))

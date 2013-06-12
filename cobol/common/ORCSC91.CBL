@@ -211,6 +211,8 @@
       *
            03  WRK-CHKCNT              PIC 9(03).
       *
+           03  WRK-HZN-SRYCD           PIC X(09).
+      *
       *    同時に算定する診療行為コード一覧
        01  TBL-DOUJI-AREA.
       *     寝たきり老人在宅総合診療科（処方箋交付あり）
@@ -1109,8 +1111,15 @@
              AND  (SPA-SRYYMD          >=  "20130701" )
              AND  (WRK-RSI-KBN         =   "R"        )
              AND  (FLG-SANTEI          =    1         )
-             AND  (SPA-COB-TEKSTYMD    <   "20130701" )
-               PERFORM 10011-RSICD-SANTEI-YMD-SEC
+               IF    (SPA-COB-TEKSTYMD    <   "20130701" )
+                   PERFORM 10011-RSICD-SANTEI-YMD-SEC
+               ELSE
+      *            労災の初診時ブラッシング料（処置）(手術)の時
+                   IF      WRK-SRYCD           =   "101400030"
+                                               OR  "101500150"
+                       PERFORM 10011-RSICD-SANTEI-YMD-SEC
+                   END-IF
+               END-IF
            END-IF
       *
       *    算定歴の回数をチェックする
@@ -1219,6 +1228,10 @@
                    MOVE    TBL-RSICHG-MAE-SRYCD (TBL-RCN)
                                            TO  WRK-RSI-SRYCD
            END-SEARCH
+      *    労災の初診時ブラッシング料（処置）の時、手術を検索
+           IF      WRK-SRYCD           =   "101400030"
+               MOVE    "101500150"         TO  WRK-RSI-SRYCD
+           END-IF
       *
            IF      WRK-RSI-SRYCD   NOT =   SPACE
       *        算定履歴検索
@@ -1250,6 +1263,15 @@
                MOVE    "tbl_santei"        TO  MCP-TABLE
                MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
                PERFORM 990-DBCLOSE-SEC
+           END-IF
+           IF      WRK-RSI-SRYCD   NOT =   SPACE
+               IF     (LNK-SC91-SYORIFLG   =   1 )
+                  AND (WRK-TEI-CNT         =   ZERO )
+                   MOVE    WRK-SRYCD           TO  WRK-HZN-SRYCD
+                   MOVE    WRK-RSI-SRYCD       TO  WRK-SRYCD
+                   PERFORM 1001-TEISEI-CNT-SEC
+                   MOVE    WRK-HZN-SRYCD       TO  WRK-SRYCD
+               END-IF
            END-IF
       *
            .
@@ -2074,126 +2096,6 @@
       *    点数マスタの内容を入力分へ戻す
            MOVE    TNSWK-TENSU-REC     TO  TNS-TENSU-REC
       *
-      *!!!!!!!!!!!!!!!!!!!1     
-           GO     TO  200-DOUJI-CHK-EXT.
-      *    当月のＭＡＸ
-           IF     (LNK-SC91-MAXCNT     >   ZERO  )  AND
-                  (LNK-SC91-MAXCNT     <= ( WRK-SC91-CNT  +  WRK-CNT
-                                       +  WRK-DOCNT-SUM))
-               MOVE    "0033"          TO  LNK-SC91-ERRCD
-      *        上限回数エラー処理＝９の時、回数エラーは警告とする
-               IF       WRK-JGNCNTERR      =   9
-                   MOVE    "K004"              TO  LNK-SC91-ERRCD
-               END-IF
-      *        人工腎臓の時メッセージ変更
-               IF      WRK-CODE            =   "008"
-                   MOVE    "K242"         TO  LNK-SC91-ERRCD
-               END-IF
-           END-IF
-      *    薬剤情報提供料はチェック判定
-           IF      WRK-CODE            =   "002"
-      *        H22.4　から併用算定チェックなしとする（手帳加算対象外）
-               IF      SPA-SRYYMD          <   "20100401"
-                   IF      (SPA-YAKJYOCHK-FLG   =   "0"   ) OR
-                          ((WRK-CHK             =   "0")  AND
-                           (SPA-YAKJYO-1        =   2  ))   OR
-                          ((WRK-CHK             =   "1" )  AND
-                          ((SPA-YAKJYO-2        =   2 ) OR
-                           (SPA-YAKJYO-3        =   2 )) )
-                       MOVE    LNK-SC91-ERRCD      TO  LNK-SC91-ERRCD2
-                       MOVE    SPACE               TO  LNK-SC91-ERRCD
-                   END-IF
-               ELSE
-      *        H22.4　から薬情のコードは１つ
-                   IF      (SPA-YAKJYOCHK-FLG   =   "0"   ) OR
-                         (( WRK-CHK             =   "0" ) AND
-                          ((SPA-YAKJYO-1        =   2  ) OR
-                           (SPA-YAKJYO-2        =   2  ) OR
-                           (SPA-YAKJYO-3        =   2  )) )
-                       MOVE    LNK-SC91-ERRCD      TO  LNK-SC91-ERRCD2
-                       MOVE    SPACE               TO  LNK-SC91-ERRCD
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    保険毎のコードの判定
-           MOVE    LNK-SC91-SRYCD      TO  WRK-SRYCD
-           PERFORM 1000-SANTEI-CHK-SEC
-      *
-      *    労災で消炎鎮痛処置の時、当日上限回数を変更する
-           MOVE    LNK-SC91-DAYMAXCNT  TO  WRK-DAYMAXCNT
-           IF     (SPA-HKNKBN          =   1 ) AND
-                  (SPA-RSI-JUNKYO  NOT =   "1" )
-               EVALUATE    WRK-RIGAKU-KBN
-      *            マッサージ
-                   WHEN    "M"
-      *            器具
-                   WHEN    "K"
-                       MOVE    3               TO  WRK-DAYMAXCNT
-      *            介達牽引
-                   WHEN    "T"
-                       MOVE    3               TO  WRK-DAYMAXCNT
-      *           湿布
-                   WHEN    "P"
-                       MOVE    ZERO            TO  WRK-DAYMAXCNT
-      *            腰部固定帯固定等
-                   WHEN    "E"
-                       MOVE    3               TO  WRK-DAYMAXCNT
-               END-EVALUATE
-           END-IF
-      *    当日のＭＡＸ
-           IF     (LNK-SC91-ERRCD      =   SPACE  )  AND
-                  (WRK-DAYMAXCNT       >   ZERO   )
-               IF      WRK-DAYMAXCNT
-                                   <=  (  WRK-SC91-DAYCNT
-                                       +  WRK-DAYCNT-SUM
-                                       +  WRK-DOCNT-SUM )
-                   MOVE    "0033"          TO  LNK-SC91-ERRCD
-      *            消炎鎮痛処置の時、エラーメッセージを換える
-                   IF      WRK-CODE        =   "005"
-                       MOVE    "1022"          TO  LNK-SC91-ERRCD
-      *                入院の時、日を表示する
-                       IF      (SPA-NYUGAIKBN      =   "1"   )  AND
-                               (WRK-CHK-NAME   NOT =   SPACE )  AND
-                               (WRK-CHK-SRYDD  NOT =   SPA-SRYYMD(7:2))
-                           MOVE    SPA-SRYYMD(7:2)     TO  WRK-CHK-SRYDD
-                       END-IF
-                   END-IF
-      *            上限回数エラー処理＝９の時、回数エラーは警告とする
-                   IF       WRK-JGNCNTERR      =   9
-      ****            MOVE    "K091"              TO  LNK-SC91-ERRCD
-                      MOVE    "K902"              TO  LNK-SC91-ERRCD
-                   END-IF
-               END-IF
-           END-IF
-      *
-      *    併用算定エラーの内容を編集する（最後に算定したもの）
-           IF     LNK-SC91-ERRCD   NOT =   SPACE
-               IF      WRK-CHK-NAME        =   SPACE
-                   MOVE    WRK-CHK-SRYCD       TO  TNS-SRYCD
-                   PERFORM 910-TENSU-READ-SEC
-                   MOVE    TNS-NAME            TO  WRK-CHK-NAME
-                   STRING  "今回　"            DELIMITED  BY  SIZE
-                           WRK-CHK-NAME        DELIMITED  BY  SPACE
-                           INTO                LNK-SC91-ERRMSG
-                   END-STRING
-               ELSE
-                   INITIALIZE                      STS-AREA-DAY
-                   INITIALIZE                      LNK-DAY2-AREA
-                   MOVE    "21"                TO  LNK-DAY2-IRAI
-                   MOVE    WRK-CHK-SRYYMD      TO  LNK-DAY2-YMD
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY2-AREA
-                   STRING  LNK-DAY2-EDTYMD3    DELIMITED  BY  SIZE
-                           "　"                DELIMITED  BY  SIZE
-                           WRK-CHK-NAME        DELIMITED  BY  SPACE
-                           INTO                LNK-SC91-ERRMSG
-                   END-STRING
-               END-IF
-           END-IF
-      *
-      *    点数マスタの内容を入力分へ戻す
-           MOVE    TNSWK-TENSU-REC     TO  TNS-TENSU-REC
            .
        200-DOUJI-CHK-EXT.
            EXIT.
