@@ -202,6 +202,8 @@
            03  WRK-CNT-MAXJ            PIC X(06).
            03  IDXM                    PIC 9(04).
       *
+           03  WRK-HZN-SRYCD           PIC X(09).
+      *
       *    同時に算定する診療行為コード一覧
        01  TBL-DOUJI-AREA.
       *     寝たきり老人在宅総合診療科（処方箋交付あり）
@@ -1084,8 +1086,15 @@
              AND  (SPA-SRYYMD          >=  "20130701" )
              AND  (WRK-RSI-KBN         =   "R"        )
              AND  (FLG-SANTEI          =    1         )
-             AND  (SPA-COB-TEKSTYMD    <   "20130701" )
-               PERFORM 10011-RSICD-SANTEI-YMD-SEC
+               IF    (SPA-COB-TEKSTYMD    <   "20130701" )
+                   PERFORM 10011-RSICD-SANTEI-YMD-SEC
+               ELSE
+      *            労災の初診時ブラッシング料（処置）(手術)の時
+                   IF      WRK-SRYCD           =   "101400030"
+                                               OR  "101500150"
+                       PERFORM 10011-RSICD-SANTEI-YMD-SEC
+                   END-IF
+               END-IF
            END-IF
       *
       *    算定歴の回数をチェックする
@@ -1204,6 +1213,10 @@
                    MOVE    TBL-RSICHG-MAE-SRYCD (TBL-RCN)
                                            TO  WRK-RSI-SRYCD
            END-SEARCH
+      *    労災の初診時ブラッシング料（処置）の時、手術を検索
+           IF      WRK-SRYCD           =   "101400030"
+               MOVE    "101500150"         TO  WRK-RSI-SRYCD
+           END-IF
       *
            IF      WRK-RSI-SRYCD   NOT =   SPACE
       *        算定履歴検索
@@ -1235,6 +1248,16 @@
                MOVE    "tbl_santei"        TO  MCP-TABLE
                MOVE    WRK-ORC-DBPATH      TO  MCP-PATHNAME
                PERFORM 990-DBCLOSE-SEC
+           END-IF
+      *
+           IF      WRK-RSI-SRYCD   NOT =   SPACE
+               IF     (LNK-SC91-SYORIFLG   =   1 )
+                  AND (WRK-TEI-CNT         =   ZERO )
+                   MOVE    WRK-SRYCD           TO  WRK-HZN-SRYCD
+                   MOVE    WRK-RSI-SRYCD       TO  WRK-SRYCD
+                   PERFORM 1001-TEISEI-CNT-SEC
+                   MOVE    WRK-HZN-SRYCD       TO  WRK-SRYCD
+               END-IF
            END-IF
       *
            .
