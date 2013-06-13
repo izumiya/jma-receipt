@@ -77,6 +77,8 @@
       *                                     ¥³¡¼¥ÉÂÐ±þ
       *  04.06.02    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
+      *  04.06.03    NACL-ÌçÏÆ    13/06/12  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î
+      *                                     ´Ç¸îÎÁ³äÁý²Ã»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -207,6 +209,8 @@
                05  WRK-TAIHI-SRYD                      PIC  9(02).
       *
            03  WRK-TEN                                 PIC  9(09).
+           03  WRK-TEN-KG                              PIC  9(09).
+           03  WRK-TEN-KG2                             PIC  9(09).
            03  WRK-KIN                                 PIC  9(09).
            03  WRK-KIN2                                PIC  9(09).
       *
@@ -234,6 +238,8 @@
       *
            03  WRK-KEISAN                              PIC  9(09).
            03  WRK-KEISAN2                             PIC  9(09).
+           03  WRK-KEISAN-KG                           PIC  9(09).
+           03  WRK-KEISAN-KG2                          PIC  9(09).
       *
            03  WRK-STDAY                               PIC  9(02).
            03  WRK-STDAY2                              PIC  9(02).
@@ -242,6 +248,8 @@
       *
            03  WRK-SYUTEN-TOTALTEN                     PIC S9(09).
            03  WRK-YKZTEN-TOTALTEN                     PIC  9(09).
+      *
+           03  WRK-FUTANWARI                           PIC  9V99.
       *
        01  WRK-TENTEK.
            03  WRK-TENTEK-SYUTEN                       PIC  9(07).
@@ -1763,7 +1771,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            EVALUATE  SRY-SRYCD(SRYACT-IDX)
                              WHEN    "101800570"  THRU  "101800860"
                               ADD    TNS-TEN      TO    WRK-KIN2
+      *
+                              COMPUTE WRK-TEN-KG2 = TNS-TEN
                            END-EVALUATE
+                           IF   SRY-SRYCD(SRYACT-IDX) = "101800550" OR
+                                         "101800560" OR "101800990"
+                              COMPUTE WRK-FUTANWARI = TNS-TEN / 100
+      *
+                              COMPUTE WRK-KEISAN-KG2 =
+                                     (WRK-TEN-KG2 * WRK-FUTANWARI)
+                              ADD  WRK-KEISAN-KG2 TO    WRK-KIN2
+                           END-IF
                          ELSE
                            EVALUATE  SRY-SRYCD(SRYACT-IDX)
                              WHEN    "101910110"  THRU  "101910400"
@@ -1828,7 +1846,23 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               ADD    TNS-TEN      TO    WRK-KIN
                               COMPUTE  WRK-TEN  =   WRK-TEN   +
                                        ( TNS-TEN / 10)
+      *
+                              COMPUTE WRK-TEN-KG  = TNS-TEN / 10
+                              COMPUTE WRK-TEN-KG2 = TNS-TEN
                            END-EVALUATE
+                           IF   SRY-SRYCD(SRYACT-IDX) = "101800550" OR
+                                         "101800560" OR "101800990"
+                              COMPUTE WRK-FUTANWARI = TNS-TEN / 100
+      *
+                              COMPUTE WRK-KEISAN-KG2 =
+                                     (WRK-TEN-KG2 * WRK-FUTANWARI)
+                              ADD  WRK-KEISAN-KG2 TO    WRK-KIN
+      *
+                              COMPUTE WRK-KEISAN-KG  =
+                                     (WRK-TEN-KG  * WRK-FUTANWARI)
+                                                  + 0.5
+                              ADD  WRK-KEISAN-KG  TO    WRK-TEN
+                           END-IF
                          ELSE
                            EVALUATE  SRY-SRYCD(SRYACT-IDX)
                              WHEN    "101910110"  THRU  "101910400"
@@ -2135,7 +2169,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               COMPUTE  TBL-SYUTEN-JI(IDY)  =
                                        TBL-SYUTEN-JI(IDY)  -
                                 ( WRK-ZAIKAISU-JI * WRK-TEN-JI )
+      *
+                              COMPUTE  WRK-TEN-KG = TNS-TEN / 10
                          END-EVALUATE
+                         IF   SRY-SRYCD(SRYACT-IDX) = "101800550" OR
+                                       "101800560" OR "101800990"
+                              COMPUTE  WRK-FUTANWARI = TNS-TEN / 100
+      *
+                              COMPUTE  WRK-KEISAN-KG =
+                                      (WRK-TEN-KG * WRK-FUTANWARI)
+                                                  + 0.5
+                              COMPUTE  TBL-SYUTEN-JI(IDY)  =
+                                       TBL-SYUTEN-JI(IDY)  -
+                                ( WRK-ZAIKAISU-JI * WRK-KEISAN-KG )
+                         END-IF
                        ELSE
                          EVALUATE  SRY-SRYCD(SRYACT-IDX)
                            WHEN    "101910110"  THRU  "101910400"

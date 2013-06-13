@@ -139,6 +139,8 @@
       *  04.06.02    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.03    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
+      *  04.06.04    NACL-ÌçÏÆ    13/06/12  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î
+      *                                     ´Ç¸îÎÁ³äÁý²Ã»»ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -180,6 +182,7 @@
            03  WRK-DOJITU-TENTEK           PIC 9(07).
            03  WRK-HKNJANUM                PIC X(08).
            03  WRK-YUSENYMD                PIC X(08).
+           03  WRK-FUTANWARI               PIC 9V99.
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -188,6 +191,8 @@
            03  WRK-RSISDO                  PIC 9(09).
            03  WRK-RSIETC                  PIC 9(09).
            03  WRK-RSIETC2                 PIC 9(09).
+           03  WRK-TEN-KG                  PIC 9(09).
+           03  WRK-TEN-KG2                 PIC 9(09).
            03  WRK-SINDAN                  PIC 9(09).
            03  WRK-MEISAI                  PIC 9(09).
            03  WRK-KYUKYU                  PIC 9(09).
@@ -6013,7 +6018,29 @@ grpsys                              SPA-AREA
                                   (WRK-TEN  *   SINRYO-COUNT)
                            COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
                                   (TNS-TEN  *   SINRYO-COUNT)
+      *
+                           COMPUTE WRK-TEN-KG     = WRK-TEN
+                           COMPUTE WRK-TEN-KG2    = TNS-TEN
                         END-EVALUATE
+                        IF   SRY-SRYCD(IDZ)   = "101800550" OR
+                                 "101800560" OR "101800990"
+                           COMPUTE WRK-FUTANWARI  = TNS-TEN / 100
+      *
+                           COMPUTE WRK-KEISAN     =
+                                  (WRK-TEN-KG     * WRK-FUTANWARI)
+                                                  + 0.5
+                           COMPUTE WRK-KEISAN     =
+                                  (WRK-KEISAN     * SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC     =
+                                   WRK-RSIETC     + WRK-KEISAN
+      *
+                           COMPUTE WRK-KEISAN     =
+                                  (WRK-TEN-KG2    * WRK-FUTANWARI)
+                           COMPUTE WRK-KEISAN     =
+                                  (WRK-KEISAN     * SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2    =
+                                   WRK-RSIETC2    + WRK-KEISAN
+                        END-IF
                       ELSE
                         IF   SRY-SRYCD(IDZ)   =
                              "101110010" OR "101110020" OR
