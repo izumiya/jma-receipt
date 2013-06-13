@@ -2516,3 +2516,46 @@ path	key82	{
 		;
 	};
 };
+
+path	key83	{
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key83_csr CURSOR FOR
+		SELECT a.*,b.syokaiflg,b.syocd,b.hknkbn
+		FROM tbl_seikyu_main a join tbl_seikyu_rsi b using (HOSPNUM,SRYYM,NYUGAIKBN,PTID,RECEKA,TEISYUTUSAKI,RECESYUBETU,HKNJANUM,HOJOKBN_KEY,KOHID_KEY,TEKSTYMD,RECEIPT_KBN)
+                WHERE (      a.HOSPNUM      =   :HOSPNUM      )
+                  AND (      a.TEISYUTUSAKI =   :TEISYUTUSAKI )
+                  AND (      NYUGAIKBN   LIKE   :NYUGAIKBN    )
+                  AND (   (( a.SRYYM        =   :SKYYM   )
+                       AND ( a.SKYKBN       <>  '0'      )
+                       AND (( a.SKYYM       =   '000000' ) OR ( a.SKYYM = :SKYYM )))
+                       OR (( a.SKYYM        =   :SKYYM   )
+                       AND ( a.SKYKBN       <>  '0'      ))   )
+                  AND (   (  HENREIYM       =   '000000'  )
+                       OR (( HENREIYM       <>  '000000' )
+                       AND ( HENREI_SIJI_FLG =  1        ))   )
+                  AND (    ( HKNKBN         <>  '3'       )
+                       AND ( HKNKBN         <>  '5'       )   )
+                ORDER  BY  b.SYOKAIFLG DESC,HKNJANUM_S,PTNUM
+		;
+	};
+};
+
+path	key84		{ 	
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key84_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_main
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM       =   :SRYYM
+                  AND   NYUGAIKBN   =   :NYUGAIKBN
+                  AND   PTID        =   :PTID
+                  AND   TEISYUTUSAKI =  :TEISYUTUSAKI
+                  AND   HKNJANUM    =   :HKNJANUM
+                  AND   HOJOKBN_KEY =   :HOJOKBN_KEY
+                  AND   KOHID_KEY   =   :KOHID_KEY
+                  AND   RECEIPT_KBN    =   :RECEIPT_KBN
+                  AND   TEISEIKBN   <>  '1'
+                ORDER  BY  SKYKBN DESC
+		;
+	};
+};
