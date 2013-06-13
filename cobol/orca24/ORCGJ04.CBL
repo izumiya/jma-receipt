@@ -5932,6 +5932,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-COM-AUTOKBN2 (IDX)  =   "1"
                MOVE    "1"                 TO  SRY-MEISKYFLG (IDS)
            END-IF
+      *!!!!
+      *    関連コメント指示
+           IF      SPA-COM-INPUTCONT(IDX)  =   "1"
+               MOVE    "2"                 TO  SRY-MEISKYFLG (IDS)
+           END-IF
+      *    内服種類数指示
+           IF      SPA-COM-INPUTNAIF(IDX)  =   "1"
+               MOVE    "3"                 TO  SRY-MEISKYFLG (IDS)
+           END-IF
       *!!
       *    時間外区分入力がある時、英字変換後セット
            IF      SPA-COM-AUTOKBN (IDX)    =   SPACE
