@@ -2343,3 +2343,23 @@ path	key79	{
 		;
 	};
 };
+
+path	key84		{ 	
+	DBSELECT	{
+		DECLARE tbl_seikyu_main_key84_csr CURSOR FOR
+		SELECT *
+		FROM tbl_seikyu_main
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM       =   :SRYYM
+                  AND   NYUGAIKBN   =   :NYUGAIKBN
+                  AND   PTID        =   :PTID
+                  AND   TEISYUTUSAKI =  :TEISYUTUSAKI
+                  AND   HKNJANUM    =   :HKNJANUM
+                  AND   HOJOKBN_KEY =   :HOJOKBN_KEY
+                  AND   KOHID_KEY   =   :KOHID_KEY
+                  AND   RECEIPT_KBN    =   :RECEIPT_KBN
+                  AND   TEISEIKBN   <>  '1'
+                ORDER  BY  SKYKBN DESC
+		;
+	};
+};

@@ -182,6 +182,10 @@
       *  04.06.10    NACL-藤原    13/01/18  直接請求フラグの追加
       *  04.06.11    NACL-藤原    13/04/03  表示期間によるレセプトへの転
       *                                     帰日有無による病名文字の変更
+      *  04.06.12    NACL-藤原    13/06/12  国保で本人・家族の変更があるが
+      *                                     給付割合の変更がないときは１枚
+      *                                     にまとめるときの公費データの
+      *                                     更新方法の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2598,7 +2602,29 @@
                  MOVE  RECE10-FTNMONEY(1)  TO  WRK-TAIHI-FTNMONEY
                END-IF
            ELSE
-               GO  TO  20022-KOHSKY-WRITE-EXT
+               INITIALIZE                      RECE10-REC
+               MOVE    KOHSKY-KEY          TO  RECE10-KEY
+               MOVE    "tbl_seikyu"        TO  WRK-MCP-TABLE
+               MOVE    "key84"             TO  WRK-MCP-PATHNAME
+               PERFORM 900-SEIKYU-INV-SEC
+               IF      FLG-SEIKYU          =   ZERO
+                   MOVE    MCPDATA-REC         TO  RECE10-REC
+      *            点検用レセ０点公費のとき作成しない
+                   IF      RECE10-SKYKBN-RECEDEN   =   "1"
+                       DISPLAY "RECE10-SKYKBN-RECEDEN="
+                                               RECE10-SKYKBN-RECEDEN
+                       GO  TO  20022-KOHSKY-WRITE-EXT
+                   END-IF
+      *
+                   MOVE    RECE10-RECESYUBETU  TO  KOHSKY-RECESYUBETU
+                   MOVE    RECE10-RECEKA       TO  KOHSKY-RECEKA
+                   MOVE    RECE10-TEKSTYMD     TO  KOHSKY-TEKSTYMD
+                   IF      RECE10-FLG (5)  NOT =   ZERO
+                       MOVE    RECE10-FTNMONEY(1)  TO WRK-TAIHI-FTNMONEY
+                   END-IF
+               ELSE
+                   GO  TO  20022-KOHSKY-WRITE-EXT
+               END-IF
            END-IF
       *
            PERFORM 900-KOHSKY-INV-SEC
