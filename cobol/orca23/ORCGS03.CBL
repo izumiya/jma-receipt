@@ -282,6 +282,7 @@
        01  WRK-AREA.
            03  WRK-SKYMONEY                        PIC S9(10).
            03  WRK-NYUKIN                          PIC S9(10).
+           03  WRK-KAKO-NYUKIN                     PIC S9(10).
            03  WRK-MISYU-ZAN                       PIC S9(10).
            03  WRK-MOTOPG                          PIC X(08).
            03  WRK-SIDMSG                          PIC X(70).
@@ -309,6 +310,7 @@
            03  WRK-SRYPRT-DENPEDANUM               PIC 9(02).
            03  WRK-SKYPRT-SKYMONEY                 PIC S9(10).
            03  WRK-SKYPRT-NYUKIN                   PIC S9(10).
+           03  WRK-SKYPRT-TAX-SAI                  PIC S9(10).
            03  WRK-SEIKYU-PG                       PIC X(20).
            03  WRK-MEISAI-PG                       PIC X(20).
            03  WRK-SKYPRTKBN                       PIC X(01).
@@ -2914,6 +2916,8 @@
       *
            INITIALIZE                  WRK-SKYPRT-SKYMONEY
                                        WRK-SKYPRT-NYUKIN
+                                       WRK-SKYPRT-TAX-SAI
+                                       WRK-KAKO-NYUKIN
       *
            MOVE    ZERO                TO  FLG-SYUMEI
            INITIALIZE                      SYUMEI-REC
@@ -2949,6 +2953,31 @@
                    COMPUTE WRK-SKYPRT-SKYMONEY
                        =   WRK-SKYPRT-SKYMONEY
                        -   SMEI-NYUHEN-MONEY
+      *
+                   COMPUTE WRK-KAKO-NYUKIN
+                       =   WRK-KAKO-NYUKIN
+                       +   SMEI-NYUHEN-MONEY
+      *
+               END-IF
+      *
+               IF    ( SMEI-SYURRKNUM      NOT =   ZERO )
+      *
+                   PERFORM 900-SYURRK-KEY3-SEL-SEC
+      *
+                   PERFORM UNTIL ( FLG-SYURRK  NOT =   ZERO )
+      *
+                       COMPUTE WRK-SKYPRT-TAX-SAI
+                           =   WRK-SKYPRT-TAX-SAI
+                           +   SYURRK-SKYMONEY-TAX-SAI
+      *
+                       PERFORM 900-SYURRK-KEY3-FET-SEC
+      *
+                   END-PERFORM
+      *
+                   MOVE    "tbl_syurrk"        TO  MCP-TABLE
+                   MOVE    "key3"              TO  MCP-PATHNAME
+                   PERFORM 910-DBCLOSECURSOR-SEC
+      *
                END-IF
       *
                MOVE    "tbl_syumei"        TO  MCP-TABLE
@@ -3002,8 +3031,13 @@
       *
            MOVE    SPA-S01-SRYYMD  TO  ORCHCN03-KJNYMD  (1)
            MOVE    SPA-S01-DENPNUM TO  ORCHCN03-DENPNUM (1)
-      *    MOVE    ?????           TO  ORCHCN03-SEIKYU-TAX-SAI
-      *                                                 (1)
+           IF    ( WRK-KAKO-NYUKIN >   ZERO )
+               CONTINUE
+           ELSE
+               MOVE    WRK-SKYPRT-TAX-SAI
+                                   TO  ORCHCN03-SEIKYU-TAX-SAI
+                                                        (1)
+           END-IF
            MOVE    WRK-SKYPRT-SKYMONEY
                                    TO  ORCHCN03-SEIKYU  (1)
            MOVE    WRK-SKYPRT-NYUKIN
@@ -3056,6 +3090,8 @@
       *
            INITIALIZE                  WRK-SKYPRT-SKYMONEY
                                        WRK-SKYPRT-NYUKIN
+                                       WRK-SKYPRT-TAX-SAI
+                                       WRK-KAKO-NYUKIN
       *
            MOVE    ZERO                TO  FLG-SYUMEI
            INITIALIZE                      SYUMEI-REC
@@ -3091,6 +3127,31 @@
                    COMPUTE WRK-SKYPRT-SKYMONEY
                        =   WRK-SKYPRT-SKYMONEY
                        -   SMEI-NYUHEN-MONEY
+      *
+                   COMPUTE WRK-KAKO-NYUKIN
+                       =   WRK-KAKO-NYUKIN
+                       +   SMEI-NYUHEN-MONEY
+      *
+               END-IF
+      *
+               IF    ( SMEI-SYURRKNUM      NOT =   ZERO )
+      *
+                   PERFORM 900-SYURRK-KEY3-SEL-SEC
+      *
+                   PERFORM UNTIL ( FLG-SYURRK  NOT =   ZERO )
+      *
+                       COMPUTE WRK-SKYPRT-TAX-SAI
+                           =   WRK-SKYPRT-TAX-SAI
+                           +   SYURRK-SKYMONEY-TAX-SAI
+      *
+                       PERFORM 900-SYURRK-KEY3-FET-SEC
+      *
+                   END-PERFORM
+      *
+                   MOVE    "tbl_syurrk"        TO  MCP-TABLE
+                   MOVE    "key3"              TO  MCP-PATHNAME
+                   PERFORM 910-DBCLOSECURSOR-SEC
+      *
                END-IF
       *
                MOVE    "tbl_syumei"    TO  MCP-TABLE
@@ -3131,7 +3192,12 @@
            INITIALIZE      ORCHC03AREA
            MOVE   SPA-S01-DENPNUM      TO  ORCHC03-DENPNUM
            MOVE   WRK-SKYPRT-SKYMONEY  TO  ORCHC03-SEIKYU
-      *    MOVE   ????                 TO  ORCHC03-SEIKYU-TAX-SAI
+           IF   ( WRK-KAKO-NYUKIN      >   ZERO )
+               CONTINUE
+           ELSE
+               MOVE   WRK-SKYPRT-TAX-SAI
+                                       TO  ORCHC03-SEIKYU-TAX-SAI
+           END-IF
            MOVE   WRK-SKYPRT-NYUKIN    TO  ORCHC03-NYUKIN
       *
            PERFORM 900-SYUNOU-KEY-SEL-SEC
@@ -4699,6 +4765,53 @@
       *
            .
        900-SYURRK-KEY-SEL-EXT.
+           EXIT.
+      *************************************************************
+      *    収納履歴検索処理
+      *************************************************************
+       900-SYURRK-KEY3-SEL-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYURRK
+      *
+           INITIALIZE                      SYURRK-REC
+           MOVE    SMEI-HOSPNUM        TO  SYURRK-HOSPNUM
+           MOVE    SMEI-NYUGAIKBN      TO  SYURRK-NYUGAIKBN
+           MOVE    SMEI-PTID           TO  SYURRK-PTID
+           MOVE    SMEI-DENPNUM        TO  SYURRK-DENPNUM
+           MOVE    SMEI-SYURRKNUM      TO  SYURRK-SYURRKNUM
+           MOVE    SYURRK-REC          TO  MCPDATA-REC
+           MOVE    "tbl_syurrk"        TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYURRK-REC
+           ELSE
+               MOVE    1               TO  FLG-SYURRK
+               INITIALIZE                  SYURRK-REC
+           END-IF
+      *
+           .
+       900-SYURRK-KEY3-SEL-EXT.
+           EXIT.
+      *************************************************************
+      *    収納履歴FETCH処理
+      *************************************************************
+       900-SYURRK-KEY3-FET-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYURRK
+      *
+           MOVE    "tbl_syurrk"        TO  MCP-TABLE
+           MOVE    "key3"              TO  MCP-PATHNAME
+           PERFORM 910-DBFETCH-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYURRK-REC
+           ELSE
+               MOVE    1               TO  FLG-SYURRK
+               INITIALIZE                  SYURRK-REC
+           END-IF
+      *
+           .
+       900-SYURRK-KEY3-FET-EXT.
            EXIT.
       *************************************************************
       *    トランザクションキャンセル処理
