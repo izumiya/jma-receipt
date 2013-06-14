@@ -389,7 +389,7 @@ path	key17	{
 			AND   PTID        =   :PTID
 			AND   SRYYMD      <=  :SRYYMD
 			AND   DLTFLG      =   ' '
-			ORDER  BY  PTID,SRYYMD,SRYKA,RENNUM
+			ORDER  BY  PTID,SRYYMD,SEQNUM,SRYKA,RENNUM
 		;
 	};
 };
@@ -533,7 +533,7 @@ path	key25	{
 			AND  (TENKIKBN    =   :TENKIKBN  OR
                               TENKIYMD    >=  :SRYYMD)
 			AND   DLTFLG      =   ' '
-			ORDER BY SRYYMD,SRYKA,RENNUM
+			ORDER BY SRYYMD,SEQNUM,SRYKA,RENNUM
 		;
 	};
 };
