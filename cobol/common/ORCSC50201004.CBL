@@ -42,6 +42,7 @@
       * 04.02.00     NACL-多々納  08/06/24  通則加算を通則加算対象の所定点数としない
       * 04.05.00     NACL-多々納  10/03/XX  Ｈ２２年４月改正追加
       * 04.06.00     NACL-多々納  10/07/01  残量廃棄自動算定対応
+      * 04.08.00     NACL-多々納  13/06/XX  自己血輸血６歳未満対応
       *****************************************************************
       *
       *
@@ -170,6 +171,20 @@
                05  WRK-SURYO-S1    PIC 9(07).
                05  WRK-SURYO-S2    PIC 9(05).
       *
+      *    自己血輸血用
+           03  WRK-TAIJYU              PIC 9(09).
+      *
+           03  WRK-TAIJYU-2            PIC 9(05)V9.
+           03  WRK-KEISAN              PIC 9(05)V9(03).
+      *   きざみ値行為再計算用
+           03  WRK-KZMKGN              PIC 9(14)V9(01).
+           03  WRK-KZMJGN              PIC 9(14)V9(01).
+           03  WRK-KZM                 PIC 9(14)V9(01).
+           03  WRK-KEI-TEN             PIC 9(08)V9(04).
+           03  WRK-KEI-TEN1            PIC 9(08)V9(04).
+           03  WRK-KEI-TEN2            PIC 9(08).
+      *
+      *
       *    保存用
        01  HOZ-SCR-REC.
            COPY    "CPK02SPASCR.INC"  REPLACING
@@ -177,6 +192,15 @@
       *
       *    酸素コードテーブル
            COPY     "CMSANSOTBL.INC".
+      *
+      *自己血輸血（６歳未満）
+       01  CONS-JIKOYK1            PIC X(09)  VALUE    "150286410".
+       01  CONS-JIKOYK2            PIC X(09)  VALUE    "150286510".
+       01  CONS-JIKOYK3            PIC X(09)  VALUE    "150327710".
+       01  CONS-JIKOYK4            PIC X(09)  VALUE    "150327810".
+      *
+       01  CONS-JIKOCOM            PIC X(09)  VALUE    "840000082".
+      *
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -187,11 +211,11 @@
       *
       *    点数マスタ−
       *01  TENSU-REC.
-           COPY    "CPTENSU.INC".
+      *    COPY    "CPTENSU.INC".
       *
       *    算定履歴
-       01  SANTEI-REC.
-           COPY    "CPSANTEI.INC".
+      *01  SANTEI-REC.
+      *    COPY    "CPSANTEI.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -206,6 +230,11 @@
       *
       *    診療行為算定歴チェックパラメタ
            COPY    "CPORCSC92.INC".
+      *
+      *    画面表示編集パラメタ
+           COPY    "CPORCSC94.INC".
+      *    数字変換領域
+           COPY    "CPORCSNUM.INC".
       *
       *01  MCPDATA-REC                 PIC X(5000).
            COPY    "MCPDATA.INC".
@@ -377,6 +406,13 @@
       ***********    AND  (SPA-RSI-HKNKBN  NOT =   "5" )
                      AND  (SPA-RSI-JUNKYO  NOT =   "1" )
                        PERFORM 100113-RSIHKN-SYORI-SEC
+                   END-IF
+      *            自己血輸血（６歳未満）のコメント
+                   IF     (WRK-COM-INPUTCD (IDX-Z) =   CONS-JIKOYK1
+                                                   OR  CONS-JIKOYK2
+                                                   OR  CONS-JIKOYK3
+                                                   OR  CONS-JIKOYK4)
+                       PERFORM 100114-JIKOYUKETU-COM-SEC
                    END-IF
       *        薬剤
                WHEN    "6"
@@ -918,6 +954,45 @@
        10013-RISIKASAN-SET-EXT.
            EXIT.
       *
+      *H25.5
+      *****************************************************************
+      *    自己血輸血（６歳未満）のコメント追加処理
+      *****************************************************************
+       100114-JIKOYUKETU-COM-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-ARI
+           PERFORM VARYING     IDX1    FROM    IDX-Z   BY  1
+                   UNTIL      (IDX1    >   SPA-MAX-LINE  )  OR
+                             ((WRK-COM-INPUTCD(IDX1)   =   SPACE ) AND
+                              (WRK-GMN-INPUTCD(IDX1)   =   SPACE ))
+               IF       WRK-COM-INPUTCD (IDX1) =   CONS-JIKOCOM
+                   MOVE    1                   TO  FLG-ARI
+               END-IF
+           END-PERFORM
+      *
+           IF      FLG-ARI             =   ZERO
+               MOVE    CONS-JIKOCOM        TO  WRK-SRYCD
+               MOVE    IDX-Z               TO  IDX-S
+               MOVE    ZERO                TO  FLG-ARI
+               PERFORM 1002-KASAN-SET-SEC
+               MOVE    IDX-S               TO  IDX-Z
+               IF      FLG-ADD             =   1
+      *            継続コメントとする
+                   MOVE    "1"             TO  WRK-COM-INPUTCONT (IDX-Z)
+                   INITIALIZE                  ORCSC94AREA
+                   MOVE    "1"                 TO  LNK-SC94-KBN
+                   MOVE    LNK-ORCSC-PG        TO  LNK-SC94-PG
+                   MOVE    IDX-Z               TO  LNK-SC94-IDX
+                   CALL    "ORCSC94"           USING
+                                               ORCSC94AREA
+                                               WRK-SCR-REC
+                                               SPA-AREA
+               END-IF
+           END-IF
+           .
+       100114-JIKOYUKETU-COM-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    自動加算追加処理
       *****************************************************************
@@ -1224,8 +1299,29 @@
       *    年齢加算追加処理（共通）
       *****************************************************************
        10013-NENREI-SET-SEC            SECTION.
+      *
       *    手技料の直下とする
            MOVE    IDX-ZS              TO  IDX-S
+      *    自己血輸血（６歳未満）の時、継続コメントの下
+           IF     (WRK-COM-INPUTCD(IDX-ZS) =   CONS-JIKOYK1
+                                           OR  CONS-JIKOYK2
+                                           OR  CONS-JIKOYK3
+                                           OR  CONS-JIKOYK4)
+               PERFORM VARYING     IDXS    FROM    IDX-ZS  BY  1
+                       UNTIL      (IDXS        >   SPA-MAX-LINE )
+                            OR    (WRK-COM-INPUTCD (IDXS)  =   SPACE)
+                   IF      (WRK-COM-INPUTCD (IDXS)(1:1)    =   "8")
+                       OR  (WRK-COM-INPUTCD (IDXS)(1:3)    =   "008")
+                       IF      WRK-COM-INPUTCONT (IDXS)    =   "1"
+                           MOVE    IDXS            TO  IDX-S
+                       END-IF
+                   ELSE
+                       IF      IDXS                >   IDX-ZS
+                           MOVE    SPA-MAX-LINE        TO  IDXS
+                       END-IF
+                   END-IF
+               END-PERFORM
+           END-IF
       *
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL      (IDX2        >   4       )   OR
@@ -1523,6 +1619,14 @@
                                                  OR  6
                GO      TO      100212-SYUGI-KEI-EXT
            END-IF
+      *H25.5
+      *    自己血輸血（６歳未満）対応
+           IF     (WRK-COM-INPUTCD (IDX-Z) =   CONS-JIKOYK1
+                                           OR  CONS-JIKOYK2
+                                           OR  CONS-JIKOYK3
+                                           OR  CONS-JIKOYK4)
+               PERFORM 1002122-JIKOYUKETU-KEI-SEC
+           END-IF
       *
       *    労災の手技の時、
            IF      WRK-COM-INPUTCD(IDX-Z)(1:3) =   "101"
@@ -1550,6 +1654,117 @@
            .
        100212-SYUGI-KEI-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    自己血輸血（６歳未満）の計算処理
+      *****************************************************************
+       1002122-JIKOYUKETU-KEI-SEC             SECTION.
+      *
+      *    手技の下の体重コメント
+           MOVE    ZERO                TO  WRK-TAIJYU
+           PERFORM VARYING     IDXS    FROM    IDX-Z   BY  1
+                       UNTIL      (IDXS        >   SPA-MAX-LINE )
+                            OR    (WRK-COM-INPUTCD (IDXS)  =   SPACE)
+               IF      WRK-COM-INPUTCD(IDXS)   =   CONS-JIKOCOM
+      *            体重決定
+                   INITIALIZE                      ORCSNUMAREA
+                   MOVE    WRK-COM-ATAI1 (IDXS)    TO  SNUM-INX
+                   CALL    "ORCSNUM"           USING
+                                               ORCSNUMAREA
+                   IF     (SNUM-RC             =   ZERO  )
+                       MOVE    SNUM-OUTNUM         TO  WRK-TAIJYU
+                   END-IF
+                   MOVE    SPA-MAX-LINE        TO  IDXS
+               END-IF
+           END-PERFORM
+      *
+           IF      WRK-TAIJYU          =   ZERO
+               MOVE    ZERO            TO  WRK-TAIJYU-2
+           ELSE
+               COMPUTE WRK-KEISAN      =  (WRK-TAIJYU   /   1000 )
+                                       +   0.05
+               MOVE    WRK-KEISAN      TO  WRK-TAIJYU-2
+           END-IF
+           MOVE    WRK-COM-SURYO (IDX-Z)   TO  WRK-SURYO
+           MOVE    ZERO                    TO  WRK-KEI-TEN2
+      *    体重×下限値
+           COMPUTE WRK-KZMKGN          =   WRK-TAIJYU-2
+                                       *   WRK-COM-KZMKGN(IDX-Z)
+      *    体重×上限値
+           IF      WRK-COM-KZMJGN(IDX-Z)   =    99999999
+               MOVE    WRK-COM-KZMJGN(IDX-Z)    TO  WRK-KZMJGN
+           ELSE
+               COMPUTE WRK-KZMJGN          =   WRK-TAIJYU-2
+                                           *   WRK-COM-KZMJGN(IDX-Z)
+           END-IF
+      *    体重×きざみ値
+           COMPUTE WRK-KZM             =   WRK-TAIJYU-2
+                                       *   WRK-COM-KZM (IDX-Z)
+      *    きざみ値判定
+           EVALUATE    TRUE
+      *        輸血量≦（体重×下限値−体重×きざみ値）
+               WHEN    WRK-SURYO       <=   (WRK-KZMKGN
+                                        -    WRK-KZM     )
+                   IF      WRK-COM-KZMERR (IDX-Z)  =   2  OR  3
+                       MOVE    "0021"          TO  SPA-ERRCD
+                   ELSE
+                       MOVE    WRK-COM-TEN (IDX-Z) TO  WRK-KEI-TEN2
+                   END-IF
+      *      （体重×下限値−体重×きざみ値）＜輸血量≦（体重×下限値）
+               WHEN   ((WRK-KZMKGN   -   WRK-KZM )  <  WRK-SURYO )  AND
+                      ( WRK-SURYO                   <= WRK-KZMKGN)
+                   MOVE    WRK-COM-TEN (IDX-Z)     TO  WRK-KEI-TEN2
+      *
+      *       （体重×下限値）＜輸血量≦（体重×上限値）
+               WHEN     (WRK-KZMKGN            <   WRK-SURYO )   AND
+                        (WRK-KZMJGN            >=  WRK-SURYO )
+      *            点数計算式１
+                   COMPUTE WRK-KEI-TEN1    =  (WRK-SURYO
+                                           -   WRK-KZMKGN)
+                                           /   WRK-KZM
+                                           +   0.9999
+                   MOVE    WRK-KEI-TEN1    TO  WRK-KEI-TEN2
+                   COMPUTE WRK-KEI-TEN     =   WRK-COM-TEN (IDX-Z)
+                                           + ( WRK-KEI-TEN2
+                                           *   WRK-COM-KZMTEN (IDX-Z))
+                   COMPUTE WRK-KEI-TEN2    =   WRK-KEI-TEN    +  0.5
+      *
+      *            （体重×上限値）＜データ
+               WHEN    WRK-KZMJGN          <   WRK-SURYO
+                   IF      WRK-COM-KZMERR (IDX-T)  =   0  OR  2
+      *                点数計算式１
+                       COMPUTE WRK-KEI-TEN1    =  (WRK-SURYO
+                                               -   WRK-KZMKGN)
+                                               /   WRK-KZM
+                                               +   0.9999
+                       MOVE    WRK-KEI-TEN1    TO  WRK-KEI-TEN2
+                       COMPUTE WRK-KEI-TEN     =   WRK-COM-TEN (IDX-Z)
+                                               + ( WRK-KEI-TEN2
+                                               *   WRK-COM-KZMTEN
+                                                               (IDX-Z))
+                       COMPUTE WRK-KEI-TEN2    =   WRK-KEI-TEN    +  0.5
+                   ELSE
+      *            点数計算式２
+                       COMPUTE WRK-KEI-TEN1    =  (WRK-KZMJGN
+                                               -   WRK-KZMKGN)
+                                               /   WRK-COM-KZM  (IDX-Z)
+                                               +   0.9999
+                       MOVE    WRK-KEI-TEN1    TO  WRK-KEI-TEN2
+                       COMPUTE WRK-KEI-TEN     =   WRK-COM-TEN (IDX-Z)
+                                               + ( WRK-KEI-TEN2
+                                               *   WRK-COM-KZMTEN
+                                                               (IDX-Z))
+                       COMPUTE WRK-KEI-TEN2    =   WRK-KEI-TEN  +  0.5
+                   END-IF
+           END-EVALUATE
+      *
+           IF     (SPA-ERRCD           =   SPACE )
+               MOVE    WRK-KEI-TEN2    TO  WRK-COM-KISOTEN  (IDX-Z)
+           END-IF
+           .
+       1002122-JIKOYUKETU-KEI-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    手技料の計算処理
