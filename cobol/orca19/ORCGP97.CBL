@@ -1480,6 +1480,14 @@
                MOVE    4               TO  SPA-GMN-CUR
                MOVE    "0002"          TO  SPA-ERRCD
            END-IF
+      *H25.6
+      *    予約日検索のみ、排他チェックなし
+           IF     (SPA-MOTOPG          =   "Y05" )
+             OR   (SPA-NAI-MOTOPG      =   "Y05" )
+               PERFORM 2021-SPA-OKSET-SEC
+               PERFORM 210-BACK
+               GO      TO      202-SELNO-EXT
+           END-IF
       *
       *    排他制御チェック
            MOVE    1                   TO  SLOCK-MODE
@@ -1530,6 +1538,15 @@
                MOVE    "0002"          TO  SPA-ERRCD
            END-IF
       *
+      *H25.6
+      *    予約日検索のみ、排他チェックなし
+           IF     (SPA-MOTOPG          =   "Y05" )
+             OR   (SPA-NAI-MOTOPG      =   "Y05" )
+               PERFORM 2021-SPA-OKSET-SEC
+               PERFORM 210-BACK
+               GO      TO      203-SELNO-EXT
+           END-IF
+      *
       *    排他制御チェック
            MOVE    1                   TO  SLOCK-MODE
            MOVE    SPA-GMN-SELNO       TO  IDX
@@ -1552,6 +1569,7 @@
            IF      SPA-LOCK            =   1
                MOVE    SPACE           TO  SPA-ERRCD
            END-IF
+      *
       *    ＯＫの時、ＳＰＡ確定後、元の画面へ
            IF      SPA-ERRCD           =   SPACE
                PERFORM 2021-SPA-OKSET-SEC
