@@ -79,6 +79,7 @@
       *                                     （新診療行為コード対応）
       *  04.06.03    NACL-門脇    13/06/12  労災・自賠責の
       *                                     看護料割増加算対応
+      *  04.06.04    NACL-門脇    13/06/14  救急医療管理加算算定判定修正
       *
       *  04.07.01    NACL-門脇    11/09/09  労災請求書作成対応
       *  04.07.02    NACL-門脇    12/08/28  薬剤料減点対応
@@ -899,7 +900,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    1    TO    FLG-SHOSAISIN
                             END-IF
                         END-IF
-                        IF   ACCT-SRYKBN  =  "11"   
+                        IF   ACCT-SRYKBN  =  "11"  OR  "80"
                             PERFORM   2204-KYUKYU-HANTEI-SEC
                         END-IF
                         PERFORM   2205-RECE82-TENSOU12-SEC

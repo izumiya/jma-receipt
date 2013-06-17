@@ -90,6 +90,7 @@
       *  04.06.02    NACL-門脇    13/02/18  労災レセ電対応
       *                                     （新診療行為コード対応）
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
+      *  04.06.04    NACL-門脇    13/06/14  救急医療管理加算算定判定修正
       *
       *  04.07.01    NACL-門脇    11/09/07  労災請求書作成対応
       *  04.07.02    NACL-藤原    13/03/25  リアルタイムプレビュー時は
@@ -1236,8 +1237,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                     "13"  OR  "14"
                                    PERFORM   21031-SHOSAISIN-HANTEI-SEC
                                END-IF
-      *                        IF   ACCT-SRYKBN  =  "11"  OR  "12"  
-                               IF   ACCT-SRYKBN  =  "11"   
+                               IF   ACCT-SRYKBN  =  "11"  OR  "80"
                                    PERFORM   21032-KYUKYU-HANTEI-SEC
                                END-IF
                                IF   ACCT-SRYKBN  =  "40"  OR  "50"  OR

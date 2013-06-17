@@ -613,6 +613,7 @@
       *  04.06.12    NACL-門脇    13/03/21  全国公費ありフラグ編集修正
       *  04.06.13    NACL-門脇    13/04/10  保険欄−一部負担金欄記載修正
       *  04.06.14    NACL-門脇    13/05/02  埼玉県地方公費対応
+      *  04.06.15    NACL-門脇    12/06/14  実日数・請求点記載フラグ編集修正
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-門脇    11/10/17  法定外現物給付対応（法別１０、２１）
@@ -2777,6 +2778,22 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                  AND (RECE02-KOHIDHC (1 3)     =  RECE02-KOHIDHC (2 3))
                  AND (RECE02-KOHNUMHC(1 4)     =  RECE02-KOHNUMHC(2 4))
                  AND (RECE02-KOHIDHC (1 4)     =  RECE02-KOHIDHC (2 4))
+                     MOVE  SPACE  TO    RECE02-JSKISAIFLG
+                 END-IF
+                 IF ((RECE02-HKNNUMHC(1)   NOT =  SPACE         ) AND
+                     (RECE02-HKNNUMHC(2)   NOT =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(1 1)     =  SPACE OR "972"
+                                                        OR "974") AND
+                     (RECE02-KOHNUMHC(1 2)     =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(1 3)     =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(1 4)     =  SPACE         ))
+                 OR ((RECE02-HKNNUMHC(1)   NOT =  SPACE         ) AND
+                     (RECE02-HKNNUMHC(2)   NOT =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(2 1)     =  SPACE OR "972"
+                                                        OR "974") AND
+                     (RECE02-KOHNUMHC(2 2)     =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(2 3)     =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(2 4)     =  SPACE         ))
                      MOVE  SPACE  TO    RECE02-JSKISAIFLG
                  END-IF
               END-IF

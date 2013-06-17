@@ -359,6 +359,8 @@
       *                                     生活療養標準負担額の記録をしない
       *  04.06.14    NACL-藤原    13/04/05  コメントの記録方法の変更
       *  04.06.15    NACL-藤原    13/05/02  氏名の外字チェックに条件追加
+      *  04.06.16    NACL-門脇    13/06/14  食事標準負担額の記録修正
+      *                                     （主保険がない場合）
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-藤原    12/09/04  薬剤料減点対応
@@ -7055,7 +7057,7 @@
                                MOVE    ZERO            TO  FLG-PRT
                                IF    ( RECE62-RECESYUBETU
                                            =   "1211"  OR  "1221"  OR
-                                               "1231"                  )
+                                               "1231"  OR  "1241"      )
                                AND   (  LNK-NYURECEDEN-SRYCD
                                                        (IDZ1 IDZ2 IDXZ)
                                            =   WRK-CONS-HYOJYUN-FUTAN1
@@ -7076,24 +7078,38 @@
                                    EVALUATE    WRK-FTNKBN
                                        WHEN    "5"
                                        WHEN    "7"
+                                       WHEN    "H"
+                                       WHEN    "I"
+                                       WHEN    "R"
+                                       WHEN    "S"
+                                       WHEN    "T"
                                            IF      RECE62-SHOKUJIFTN (2)
                                                                >   ZERO
                                                MOVE    1   TO  FLG-PRT
                                            END-IF 
                                        WHEN    "6"
+                                       WHEN    "J"
+                                       WHEN    "K"
+                                       WHEN    "U"
                                            IF      RECE62-SHOKUJIFTN (3)
                                                                >   ZERO
                                                MOVE    1   TO  FLG-PRT
                                            END-IF 
-                                       WHEN    "1"
-                                       WHEN    "2"
-                                       WHEN    "3"
-                                       WHEN    "4"
+                                       WHEN    "B"
+                                       WHEN    "L"
                                            IF      RECE62-SHOKUJIFTN (4)
                                                                >   ZERO
                                                MOVE    1   TO  FLG-PRT
                                            END-IF 
+                                       WHEN    "C"
+                                           IF      RECE62-SHOKUJIFTN (5)
+                                                               >   ZERO
+                                               MOVE    1   TO  FLG-PRT
+                                           END-IF 
                                    END-EVALUATE
+                                   IF  FLG-PRT  =   1
+                                     PERFORM  200773-SKJFTNFLG-CHECK-SEC
+                                   END-IF
                                ELSE
                                    IF    ( RECE62-HKNNUM     =   "002" )
                                    AND   ( RECE62-HOJOKBN    =   "1" OR 
@@ -7155,39 +7171,26 @@
                                            MOVE    1   TO  FLG-PRT
                                        END-IF 
                                    END-IF
-                                   IF  FLG-PRT  =   1
-                                    IF LNK-NYURECEDEN-SRYCD
-                                          (IDZ1 IDZ2 IDXZ)
-                                       =   WRK-CONS-HYOJYUN-FUTAN1
-                                       OR  WRK-CONS-HYOJYUN-FUTAN2
-                                       OR  WRK-CONS-HYOJYUN-FUTAN3
-                                       OR  WRK-CONS-HYOJYUN-FUTAN4
-                                       OR  WRK-CONS-HYOJYUN-FUTAN5
-                                       OR  WRK-CONS-HYOJYUN-FUTAN6
-                                       OR  WRK-CONS-HYOJYUN-FUTAN7
-                                       OR  WRK-CONS-HYOJYUN-FUTAN8
-                                       OR  WRK-CONS-HYOJYUN-FUTAN9
-                                       OR  WRK-CONS-HYOJYUN-FUTAN10
-                                       OR  WRK-CONS-HYOJYUN-FUTAN11
-                                       OR  WRK-CONS-HYOJYUN-FUTAN12
-                                       OR  WRK-CONS-HYOJYUN-FUTAN13
-                                       OR  WRK-CONS-HYOJYUN-FUTAN14
-                                       OR  WRK-CONS-HYOJYUN-FUTAN15
-                                     IF ((RECE62-SEIHOFLG   = "1") AND
-                                         (RECE62-YOBIETC(1) =  2 ) AND
-                                         (WRK-FTNKBN        = "5"))
-                                     OR ((RECE62-SEIHOFLG   = "1") AND
-                                         (RECE62-YOBIETC(1) =  3 ) AND
-                                         (WRK-FTNKBN        = "6"))
-                                     OR ((RECE62-SEIHOFLG   = "1") AND
-                                         (RECE62-YOBIETC(1) =  4 ) AND
-                                         (WRK-FTNKBN        = "B"))
-                                     OR ((RECE62-SEIHOFLG   = "1") AND
-                                         (RECE62-YOBIETC(1) =  5 ) AND
-                                         (WRK-FTNKBN        = "C"))
-                                       MOVE  ZERO  TO  FLG-PRT
-                                     END-IF
-                                    END-IF
+                                   IF  (FLG-PRT           =   1    )
+                                   AND (RECE62-SEIHOFLG   =  "1"   )
+                                   AND (LNK-NYURECEDEN-SRYCD
+                                         (IDZ1 IDZ2 IDXZ) =
+                                           WRK-CONS-HYOJYUN-FUTAN1  OR
+                                           WRK-CONS-HYOJYUN-FUTAN2  OR
+                                           WRK-CONS-HYOJYUN-FUTAN3  OR
+                                           WRK-CONS-HYOJYUN-FUTAN4  OR
+                                           WRK-CONS-HYOJYUN-FUTAN5  OR
+                                           WRK-CONS-HYOJYUN-FUTAN6  OR
+                                           WRK-CONS-HYOJYUN-FUTAN7  OR
+                                           WRK-CONS-HYOJYUN-FUTAN8  OR
+                                           WRK-CONS-HYOJYUN-FUTAN9  OR
+                                           WRK-CONS-HYOJYUN-FUTAN10 OR
+                                           WRK-CONS-HYOJYUN-FUTAN11 OR
+                                           WRK-CONS-HYOJYUN-FUTAN12 OR
+                                           WRK-CONS-HYOJYUN-FUTAN13 OR
+                                           WRK-CONS-HYOJYUN-FUTAN14 OR
+                                           WRK-CONS-HYOJYUN-FUTAN15)
+                                     PERFORM  200773-SKJFTNFLG-CHECK-SEC
                                    END-IF
                                END-IF   
                                IF      FLG-PRT         =   1
@@ -7395,7 +7398,7 @@
                    END-IF
                END-IF
                IF    RECE62-SEIHOFLG   =  "1"
-               AND   RECE62-YOBIETC(2) =   1 
+               AND   RECE62-SKJFTNFLG2 =  "1"
                    INITIALIZE                     HKNCOMBI-REC
                    MOVE  WRK-RECE641-HOSPNUM  TO  COMB-HOSPNUM
                    MOVE  WRK-RECE641-PTID     TO  COMB-PTID
@@ -7787,6 +7790,43 @@
       *
            .
        2007721-SKJ-FTNKBN-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    食事標準負担額記録判定用フラグチェック（主保険がない場合）
+      *****************************************************************
+       200773-SKJFTNFLG-CHECK-SEC      SECTION.
+      *
+           IF ((RECE62-SKJFTNFLG(1) = "1" ) AND
+               (WRK-FTNKBN          = "5" ))
+           OR ((RECE62-SKJFTNFLG(2) = "1" ) AND
+               (WRK-FTNKBN          = "6" ))
+           OR ((RECE62-SKJFTNFLG(3) = "1" ) AND
+               (WRK-FTNKBN          = "B" ))
+           OR ((RECE62-SKJFTNFLG(4) = "1" ) AND
+               (WRK-FTNKBN          = "C" ))
+      *
+             INITIALIZE                 HKNCOMBI-REC
+             MOVE  RECE62-HOSPNUM   TO  COMB-HOSPNUM
+             MOVE  RECE62-PTID      TO  COMB-PTID
+             MOVE  LNK-NYURECEDEN-HKNCOMBI(IDZ1 IDZ2)
+                                    TO  COMB-HKNCOMBINUM
+             MOVE  HKNCOMBI-REC     TO  MCPDATA-REC
+             PERFORM 910-HKNCOMBI-INV-SEC
+             IF    FLG-HKNCOMBI  =  ZERO
+                IF    COMB-HKNNUM          = SPACE
+                AND   COMB-KOH1HKNNUM  NOT = SPACE
+                AND   COMB-KOH2HKNNUM      = SPACE
+                AND   COMB-KOH3HKNNUM      = SPACE
+                AND   COMB-KOH4HKNNUM      = SPACE
+                   MOVE   ZERO      TO  FLG-PRT
+                END-IF
+             END-IF
+      *
+           END-IF
+      *
+           .
+       200773-SKJFTNFLG-CHECK-EXT.
            EXIT.
       *
       *****************************************************************

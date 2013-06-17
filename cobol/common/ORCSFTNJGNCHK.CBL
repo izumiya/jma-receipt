@@ -90,6 +90,7 @@
       *  04.06.01    NACL-ÌçÏÆ    11/12/13  ±¡³°½èÊý¤Î¤ß¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥ÈÂÐ±þ
       *                                     ¡ÊÀÁµáÅÀ¿ô£°ÅÀ¸øÈñÊ¬¡Ë
       *  04.06.02    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
+      *  04.06.03    NACL-ÌçÏÆ    13/06/14  À¸ÊÝ¤Î£·£¹¡¦£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ½¤Àµ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    12/08/27  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
@@ -129,6 +130,7 @@
            03  FLG-TENKEN          PIC 9(01).
            03  FLG-ZENKI-TOKUREI   PIC 9(01).
            03  FLG-KOREI-HIGAITO   PIC 9(01).
+           03  FLG-SEIHO-CHECK     PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1649,6 +1651,7 @@
            MOVE      ZERO          TO      FLG-SAIGAI-ARI2
            MOVE      ZERO          TO      WRK-SYUSKJ-FTN
            MOVE      ZERO          TO      WRK-SKYMONEY-SKJ
+           MOVE      ZERO          TO      FLG-SEIHO-CHECK
            PERFORM   UNTIL    FLG-SYUNOU  =   1
              MOVE    ZERO          TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -1833,7 +1836,11 @@
                     IF  (SYU-SYUHKNNUM     =   SPACE        )
                     AND (SYU-KOH-HKNNUM(1) =  "079" OR "024")
                     AND (SYU-KOH-HKNNUM(2) =  "012"         )
+                    AND (SYU-HKNCOMBINUM
+                               =   LNK-FTNJGNCHK-HKNCOMBINUM)
                         ADD  SYU-SKJ-FTN-RECE(1) TO  WRK-SKJ-FTN
+                    ELSE
+                        MOVE    1                TO  FLG-SEIHO-CHECK
                     END-IF
                   END-IF
                   IF     WRK-HKNCOMBINUM-FLG(IDX1) =  1
@@ -2133,7 +2140,8 @@
            ELSE
                EVALUATE   LNK-FTNJGNCHK-KOHNUM
                  WHEN       "012"
-                   IF   WRK-SKJ-FTN  >=  14880
+                   IF  (WRK-SKJ-FTN     >=  14880)
+                   AND (FLG-SEIHO-CHECK  =  ZERO )
                        MOVE   01        TO  LNK-FTNJGNCHK-RC
                    END-IF
                  WHEN       "972"
