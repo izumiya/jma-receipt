@@ -606,6 +606,8 @@
       *  04.06.12    NACL-ÌçÏÆ    13/04/10  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.06.13    NACL-ÌçÏÆ    13/05/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.06.14    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.15    NACL-ÌçÏÆ    13/06/14  À¸ÊÝ¤Î£·£¹¡¦£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ½¤Àµ
+      *  04.06.16    NACL-ÌçÏÆ    12/06/14  ¼ÂÆü¿ô¡¦ÀÁµáÅÀµ­ºÜ¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -818,6 +820,9 @@
            03  FLG-KIN-OKIKAE2                         PIC 9(01).
            03  FLG-HENSYU-NG                           PIC 9(01).
            03  FLG-ZEROKOGAITO                         PIC 9(01).
+           03  FLG-SYOGAISEIHO                         PIC 9(01).
+           03  FLG-SYOGAISEIHO2                        PIC 9(01).
+           03  FLG-SYOGAISEIHO3                        PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -13223,6 +13228,22 @@
                  AND (RECE62-KOHIDHC (1 4)     =  RECE62-KOHIDHC (2 4))
                      MOVE     SPACE     TO      RECE62-JSKISAIFLG
                  END-IF
+                 IF ((RECE62-HKNNUMHC(1)   NOT =  SPACE         ) AND
+                     (RECE62-HKNNUMHC(2)   NOT =  SPACE         ) AND
+                     (RECE62-KOHNUMHC(1 1)     =  SPACE OR "972"
+                                                        OR "974") AND
+                     (RECE62-KOHNUMHC(1 2)     =  SPACE         ) AND
+                     (RECE62-KOHNUMHC(1 3)     =  SPACE         ) AND
+                     (RECE62-KOHNUMHC(1 4)     =  SPACE         ))
+                 OR ((RECE62-HKNNUMHC(1)   NOT =  SPACE         ) AND
+                     (RECE62-HKNNUMHC(2)   NOT =  SPACE         ) AND
+                     (RECE62-KOHNUMHC(2 1)     =  SPACE OR "972"
+                                                        OR "974") AND
+                     (RECE62-KOHNUMHC(2 2)     =  SPACE         ) AND
+                     (RECE62-KOHNUMHC(2 3)     =  SPACE         ) AND
+                     (RECE62-KOHNUMHC(2 4)     =  SPACE         ))
+                     MOVE     SPACE     TO      RECE62-JSKISAIFLG
+                 END-IF
               END-IF
            END-IF
       *
@@ -17255,20 +17276,8 @@
                                    RECE62-HENSHOKUJIRYOYOHI(KH-IDX)
                      ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
                                    WRK-KOHTAN-SHOKUJIRYOYOHI(KH-IDX)
-                     IF     RECE62-SEIHOFLG   =  "1"
-                        IF  RECE62-YOBIETC(1) =  ZERO
-                           EVALUATE  KH-IDX
-                             WHEN      2
-                                MOVE  2   TO  RECE62-YOBIETC(1)
-                             WHEN      3
-                                MOVE  3   TO  RECE62-YOBIETC(1)
-                             WHEN      4
-                                MOVE  4   TO  RECE62-YOBIETC(1)
-                             WHEN      5
-                                MOVE  5   TO  RECE62-YOBIETC(1)
-                           END-EVALUATE
-                        END-IF
-                     END-IF
+      *
+                     MOVE   "1"    TO   RECE62-SKJFTNFLG(KH-IDX - 1)
                    ELSE
                      ADD   SYU-SKJ-NISSU(IDX3)    TO
                                    RECE62-SHOKUJINISSU(KH-IDX)
@@ -17277,9 +17286,7 @@
                      ADD   SYU-SKJ-FTN-RECE(IDX3) TO
                                    RECE62-SHOKUJIFTN(KH-IDX)
                      IF     RECE62-SEIHOFLG   =  "1"
-                       IF   RECE62-YOBIETC(2) =  ZERO
-                                MOVE  1   TO  RECE62-YOBIETC(2)
-                       END-IF
+                       MOVE  "1"   TO  RECE62-SKJFTNFLG2
                      ELSE
                        MOVE  SPACE                  TO
                                      RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
@@ -18323,32 +18330,12 @@
                END-IF
            END-EVALUATE
       *
+      *    £°£·£¹¡Ü£°£±£²¤Ë´Ø¤ï¤ëÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¥Á¥§¥Ã¥¯
            IF  ( RECE62-HKNNUM          =  SPACE         )
            AND ( RECE62-KOHNUM(1)       =  "079" OR "024")
            AND ( RECE62-KOHNUM(2)       =  "012"         )
            AND ( RECE62-SRYYM          >=  "200804"      )
-               MOVE     ZERO    TO    RECE62-TOTALTEN(3)
-               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                           UNTIL    KOHFTN-IDX     >   30
-                 MOVE   ZERO    TO    RECE62-TENSU(KOHFTN-IDX 3)
-               END-PERFORM
-               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                           UNTIL    KOHFTN-IDX     >   10
-                 MOVE   ZERO    TO    RECE62-NYUKHNKEI(KOHFTN-IDX 3)
-                                      RECE62-NYUTOKKEI(KOHFTN-IDX 3)
-               END-PERFORM
-               MOVE     ZERO    TO    RECE62-NYUKHNKEI2(3)
-                                      RECE62-NYUTOKKEI2(3)
-      *
-               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
-                           UNTIL   (KOHFTN-IDX                  >  10 )
-                            OR     (RECE62-HKNCOMBI(KOHFTN-IDX) = ZERO)
-                 IF  (RECE62-HKNNUMHC(KOHFTN-IDX)    =  SPACE        )
-                 AND (RECE62-KOHNUMHC(KOHFTN-IDX 1)  = "079" OR "024")
-                 AND (RECE62-KOHNUMHC(KOHFTN-IDX 2)  = "012"         )
-                    MOVE   1    TO    RECE62-FTNKBNFLG(KOHFTN-IDX 2)
-                 END-IF
-               END-PERFORM
+              PERFORM    210455-SYOGAISEIHO-HKNCOMBI-CHECK-SEC
            END-IF
       *
            IF   ( RECE62-SHOKUJIRYOYOHI(1) = ZERO )
@@ -18797,6 +18784,106 @@
       *
            .
        210454-ETCKISAIFLGINF-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    £°£·£¹¡Ü£°£±£²¤Ë´Ø¤ï¤ëÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¥Á¥§¥Ã¥¯
+      *****************************************************************
+       210455-SYOGAISEIHO-HKNCOMBI-CHECK-SEC               SECTION.
+      *
+           MOVE    ZERO    TO   FLG-SYOGAISEIHO
+           MOVE    ZERO    TO   FLG-SYOGAISEIHO2
+           MOVE    ZERO    TO   FLG-SYOGAISEIHO3
+           PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                       UNTIL   (KOHFTN-IDX                  >  10 )
+                        OR     (RECE62-HKNCOMBI(KOHFTN-IDX) = ZERO)
+              IF  (RECE62-HKNNUMHC(KOHFTN-IDX)    =  SPACE        )
+              AND (RECE62-KOHNUMHC(KOHFTN-IDX 1)  = "079" OR "024")
+              AND (RECE62-KOHNUMHC(KOHFTN-IDX 2)  = "012"         )
+                MOVE    1    TO   FLG-SYOGAISEIHO
+              END-IF
+              IF  (RECE62-HKNNUMHC(KOHFTN-IDX)    =  SPACE        )
+              AND (RECE62-KOHNUMHC(KOHFTN-IDX 1)  = "012"         )
+              AND (RECE62-KOHNUMHC(KOHFTN-IDX 2)  =  SPACE        )
+                MOVE    1    TO   FLG-SYOGAISEIHO2
+              END-IF
+              IF  (RECE62-HKNNUMHC(KOHFTN-IDX)    =  SPACE        )
+              AND (RECE62-KOHNUMHC(KOHFTN-IDX 1)  = "079" OR "024")
+              AND (RECE62-KOHNUMHC(KOHFTN-IDX 2)  =  SPACE        )
+                MOVE    1    TO   FLG-SYOGAISEIHO3
+              END-IF
+           END-PERFORM
+      *
+           IF  ((FLG-SYOGAISEIHO  =  1  ) AND
+                (FLG-SYOGAISEIHO2 =  1  ) AND
+                (FLG-SYOGAISEIHO3 = ZERO))
+               COMPUTE  RECE62-TOTALTEN(3) = RECE62-TOTALTEN(3)
+                                           - RECE62-TOTALTEN(2)
+               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                           UNTIL    KOHFTN-IDX     >   30
+                 COMPUTE  RECE62-TENSU(KOHFTN-IDX 3) =
+                          RECE62-TENSU(KOHFTN-IDX 3) -
+                          RECE62-TENSU(KOHFTN-IDX 2)
+               END-PERFORM
+               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                           UNTIL    KOHFTN-IDX     >   10
+                 COMPUTE  RECE62-NYUKHNKEI(KOHFTN-IDX 3) =
+                          RECE62-NYUKHNKEI(KOHFTN-IDX 3) -
+                          RECE62-NYUKHNKEI(KOHFTN-IDX 2)
+                 COMPUTE  RECE62-NYUTOKKEI(KOHFTN-IDX 3) =
+                          RECE62-NYUTOKKEI(KOHFTN-IDX 3) -
+                          RECE62-NYUTOKKEI(KOHFTN-IDX 2)
+               END-PERFORM
+               COMPUTE    RECE62-NYUKHNKEI2(3) =
+                          RECE62-NYUKHNKEI2(3) -
+                          RECE62-NYUKHNKEI2(2)
+               COMPUTE    RECE62-NYUTOKKEI2(3) =
+                          RECE62-NYUTOKKEI2(3) -
+                          RECE62-NYUTOKKEI2(2)
+      *
+               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                           UNTIL   (KOHFTN-IDX                  >  10 )
+                            OR     (RECE62-HKNCOMBI(KOHFTN-IDX) = ZERO)
+                 IF  (RECE62-HKNNUMHC(KOHFTN-IDX)    =  SPACE        )
+                 AND (RECE62-KOHNUMHC(KOHFTN-IDX 1)  = "079" OR "024")
+                 AND (RECE62-KOHNUMHC(KOHFTN-IDX 2)  = "012"         )
+                    MOVE   1    TO    RECE62-FTNKBNFLG(KOHFTN-IDX 2)
+                 END-IF
+               END-PERFORM
+           END-IF
+      *
+           IF  ((FLG-SYOGAISEIHO  =  1  ) AND
+                (FLG-SYOGAISEIHO2 = ZERO) AND
+                (FLG-SYOGAISEIHO3 = ZERO))
+           OR  ((FLG-SYOGAISEIHO  =  1  ) AND
+                (FLG-SYOGAISEIHO2 = ZERO) AND
+                (FLG-SYOGAISEIHO3 =  1  ))
+               MOVE     ZERO    TO    RECE62-TOTALTEN(3)
+               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                           UNTIL    KOHFTN-IDX     >   30
+                 MOVE   ZERO    TO    RECE62-TENSU(KOHFTN-IDX 3)
+               END-PERFORM
+               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                           UNTIL    KOHFTN-IDX     >   10
+                 MOVE   ZERO    TO    RECE62-NYUKHNKEI(KOHFTN-IDX 3)
+                                      RECE62-NYUTOKKEI(KOHFTN-IDX 3)
+               END-PERFORM
+               MOVE     ZERO    TO    RECE62-NYUKHNKEI2(3)
+                                      RECE62-NYUTOKKEI2(3)
+      *
+               PERFORM    VARYING   KOHFTN-IDX   FROM   1   BY   1
+                           UNTIL   (KOHFTN-IDX                  >  10 )
+                            OR     (RECE62-HKNCOMBI(KOHFTN-IDX) = ZERO)
+                 IF  (RECE62-HKNNUMHC(KOHFTN-IDX)    =  SPACE        )
+                 AND (RECE62-KOHNUMHC(KOHFTN-IDX 1)  = "079" OR "024")
+                 AND (RECE62-KOHNUMHC(KOHFTN-IDX 2)  = "012"         )
+                    MOVE   1    TO    RECE62-FTNKBNFLG(KOHFTN-IDX 2)
+                 END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       210455-SYOGAISEIHO-HKNCOMBI-CHECK-EXT.
            EXIT.
       *
       *****************************************************************

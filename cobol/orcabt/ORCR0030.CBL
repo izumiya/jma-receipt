@@ -620,6 +620,7 @@
       *  04.06.13    NACL-ÌçÏÆ    13/04/10  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.06.14    NACL-ÌçÏÆ    13/05/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.06.15    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.16    NACL-ÌçÏÆ    12/06/14  ¼ÂÆü¿ô¡¦ÀÁµáÅÀµ­ºÜ¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2747,6 +2748,22 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                  AND (RECE02-KOHIDHC (1 3)     =  RECE02-KOHIDHC (2 3))
                  AND (RECE02-KOHNUMHC(1 4)     =  RECE02-KOHNUMHC(2 4))
                  AND (RECE02-KOHIDHC (1 4)     =  RECE02-KOHIDHC (2 4))
+                     MOVE  SPACE  TO    RECE02-JSKISAIFLG
+                 END-IF
+                 IF ((RECE02-HKNNUMHC(1)   NOT =  SPACE         ) AND
+                     (RECE02-HKNNUMHC(2)   NOT =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(1 1)     =  SPACE OR "972"
+                                                        OR "974") AND
+                     (RECE02-KOHNUMHC(1 2)     =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(1 3)     =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(1 4)     =  SPACE         ))
+                 OR ((RECE02-HKNNUMHC(1)   NOT =  SPACE         ) AND
+                     (RECE02-HKNNUMHC(2)   NOT =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(2 1)     =  SPACE OR "972"
+                                                        OR "974") AND
+                     (RECE02-KOHNUMHC(2 2)     =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(2 3)     =  SPACE         ) AND
+                     (RECE02-KOHNUMHC(2 4)     =  SPACE         ))
                      MOVE  SPACE  TO    RECE02-JSKISAIFLG
                  END-IF
               END-IF

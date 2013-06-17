@@ -90,6 +90,7 @@
       *  04.06.02    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.03    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
+      *  04.06.04    NACL-ÌçÏÆ    13/06/14  µßµÞ°åÎÅ´ÉÍý²Ã»»»»ÄêÈ½Äê½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1164,8 +1165,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                     "13"  OR  "14"
                                    PERFORM   21031-SHOSAISIN-HANTEI-SEC
                                END-IF
-      *                        IF   ACCT-SRYKBN  =  "11"  OR  "12"  
-                               IF   ACCT-SRYKBN  =  "11"   
+                               IF   ACCT-SRYKBN  =  "11"  OR  "80"
                                    PERFORM   21032-KYUKYU-HANTEI-SEC
                                END-IF
                                IF   ACCT-SRYKBN  =  "40"  OR  "50"  OR

@@ -79,6 +79,7 @@
       *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.03    NACL-ÌçÏÆ    13/06/12  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î
       *                                     ´Ç¸îÎÁ³äÁý²Ã»»ÂÐ±þ
+      *  04.06.04    NACL-ÌçÏÆ    13/06/14  µßµÞ°åÎÅ´ÉÍý²Ã»»»»ÄêÈ½Äê½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -896,7 +897,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    1    TO    FLG-SHOSAISIN
                             END-IF
                         END-IF
-                        IF   ACCT-SRYKBN  =  "11"   
+                        IF   ACCT-SRYKBN  =  "11"  OR  "80"
                             PERFORM   2204-KYUKYU-HANTEI-SEC
                         END-IF
                         PERFORM   2205-RECE82-TENSOU12-SEC
