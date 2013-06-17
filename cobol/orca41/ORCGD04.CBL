@@ -834,7 +834,7 @@
                MOVE    ZERO            TO  IDXL
       *
                MOVE    1               TO  FLG-BYOLST-ROW
-               PERFORM 900-PTBYOMEI-KEY3-SEL-SEC
+               PERFORM 900-PTBYOMEI-KEY39-SEL-SEC
       *
                PERFORM UNTIL ( FLG-PTBYOMEI    NOT =   ZERO )
                         OR   ( SPA-GMN-BYOLST-MAX >=   CONST-BYOLST-MAX)
@@ -914,12 +914,12 @@
                        END-PERFORM
                    END-IF
       *
-                   PERFORM 900-PTBYOMEI-KEY3-FET-SEC
+                   PERFORM 900-PTBYOMEI-KEY39-FET-SEC
       *
                END-PERFORM
       *
                MOVE    "tbl_ptbyomei"  TO  MCP-TABLE
-               MOVE    "key3"          TO  MCP-PATHNAME
+               MOVE    "key39"          TO  MCP-PATHNAME
                PERFORM 910-DBCLOSECURSOR-SEC
            END-IF
       *
@@ -3125,7 +3125,7 @@
       *****************************************************************
       *    患者病名検索処理
       *****************************************************************
-       900-PTBYOMEI-KEY3-SEL-SEC         SECTION.
+       900-PTBYOMEI-KEY39-SEL-SEC         SECTION.
       *
            MOVE    ZERO                TO  FLG-PTBYOMEI
       *
@@ -3134,22 +3134,22 @@
            MOVE    SPA-NAI-PTID        TO  PTBYO-PTID
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key3"              TO  MCP-PATHNAME
+           MOVE    "key39"              TO  MCP-PATHNAME
            PERFORM 911-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
-               PERFORM 900-PTBYOMEI-KEY3-FET-SEC
+               PERFORM 900-PTBYOMEI-KEY39-FET-SEC
            ELSE
                INITIALIZE                  PTBYOMEI-REC
                MOVE    1               TO  FLG-PTBYOMEI
            END-IF
       *
            .
-       900-PTBYOMEI-KEY3-SEL-EXT.
+       900-PTBYOMEI-KEY39-SEL-EXT.
            EXIT.
       *****************************************************************
       *    患者病名FETCH処理
       *****************************************************************
-       900-PTBYOMEI-KEY3-FET-SEC        SECTION.
+       900-PTBYOMEI-KEY39-FET-SEC        SECTION.
       *
            MOVE    ZERO                TO  FLG-PTBYOMEI
                                            FLG-LOOPEND
@@ -3158,7 +3158,7 @@
                     OR   ( FLG-LOOPEND     NOT =   ZERO )
       *
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key3"              TO  MCP-PATHNAME
+               MOVE    "key39"              TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
                IF    ( MCP-RC          =   ZERO )
                    MOVE    MCPDATA-REC     TO  PTBYOMEI-REC
@@ -3208,7 +3208,7 @@
            END-PERFORM
       *
            .
-       900-PTBYOMEI-KEY3-FET-EXT.
+       900-PTBYOMEI-KEY39-FET-EXT.
            EXIT.
       *****************************************************************
       *    システム管理検索処理
