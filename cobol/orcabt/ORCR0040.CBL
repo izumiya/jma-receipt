@@ -141,6 +141,7 @@
       *  04.06.02    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
+      *  04.06.04    NACL-門脇    13/06/18  在支援コメントの診療区分修正
       *
       *  04.07.01    NACL-門脇    10/09/12  複数リハビリ開始日・リハビリ
       *                                     コメントの対応
@@ -1211,7 +1212,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE059PARA-HOSPNUM
                    WHEN      "40"
       *            （人工腎臓のカウント）
                       IF  RECE04-JINKOJIN-COMMENT     =  "1"
-                        MOVE    RECE04-REC    TO      WRK-RECE04-REC
                         COMPUTE  WRK-KOHBUNRI 
                                    =    RECE04-KOHBUNRI  +  1
                         PERFORM  VARYING   IDX1  FROM  1  BY  1
@@ -2206,7 +2206,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    WRK-ZAINUM          TO  RECE049-ZAINUM
            COMPUTE WRK-KOHBUNRI  =  IDX  -  1
            MOVE    WRK-KOHBUNRI        TO  RECE049-KOHBUNRI
-           MOVE    WRK-RECE04-SRYKBN   TO  RECE049-SRYKBN
+           MOVE    "40"                TO  RECE049-SRYKBN
       *
            MOVE    1                   TO  RECE049-MEISAISU
       *
@@ -2221,7 +2221,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    WRK-ZAINUM          TO  RECE059-ZAINUM
            COMPUTE WRK-KOHBUNRI  =  IDX  -  1
            MOVE    WRK-KOHBUNRI        TO  RECE059-KOHBUNRI
-           MOVE    WRK-RECE04-SRYKBN   TO  RECE059-SRYKBN
+           MOVE    "40"                TO  RECE059-SRYKBN
       *    人工腎臓コメントの挿入
            MOVE    SPACE                TO  WRK-RECE05XX-REC
            INITIALIZE                       WRK-RECE05XX-REC
