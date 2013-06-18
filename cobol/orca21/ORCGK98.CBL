@@ -1293,6 +1293,20 @@
                WHEN    "//c"
       *        ¥³¥á¥ó¥È
                    MOVE    "U4"            TO  SPA-K98-GMN-SYORI3
+      *H25.6
+               WHEN    "//R"
+               WHEN    "//r"
+      *        Ï«ºÒ
+                   MOVE    "U5"            TO  SPA-K98-GMN-SYORI3
+                   MOVE    SPA-K98-USERLST (5) TO  SPA-K98-USER-G
+                   IF     (SPA-K98-GMN-INPUT(4:1)  =   "G"  OR  "g" )
+                      AND (SPA-SRYYMD          >=  "20130701"   )
+      *             Ï«ºÒ¡Ê¹çÀ®¡Ë
+                       MOVE    "U7"            TO  SPA-K98-GMN-SYORI3
+                       MOVE    SPA-K98-USERLST (7) TO  SPA-K98-USER-G
+                   END-IF
+                   MOVE    SPACE           TO  SPA-K98-GMN-INPUT
+      *
                WHEN    OTHER
                    MOVE    "0011"          TO  SPA-ERRCD
                    MOVE    21              TO  SPA-K98-GMN-CUR
@@ -1974,8 +1988,10 @@
                WHEN    "U5"
       *            Ï«ºÒ¿Ç»¡
                    MOVE    "key12s"             TO  WRK-PATH
-                   MOVE    "100000000"          TO  TNS-SRYCD
-                   MOVE    "109999999"          TO  TNSUP-SRYCD
+      *****        MOVE    "100000000"          TO  TNS-SRYCD
+      *****        MOVE    "109999999"          TO  TNSUP-SRYCD
+                   MOVE    "101000000"          TO  TNS-SRYCD
+                   MOVE    "101999999"          TO  TNSUP-SRYCD
       *H25.7       MOVE    "1"                  TO  SPA-K98-GMN-ALL
                WHEN    "U6"
       *            Í½Ìó¥³¡¼¥É
@@ -1985,10 +2001,10 @@
                    MOVE    "1"                  TO  SPA-K98-GMN-ALL
       *H25.7
                WHEN    "U7"
-      *            Ï«ºÒ¿Ç»¡
+      *            Ï«ºÒ¹çÀ®¥³¡¼¥É
                    MOVE    "key12s"             TO  WRK-PATH
-                   MOVE    "100000000"          TO  TNS-SRYCD
-                   MOVE    "109999999"          TO  TNSUP-SRYCD
+                   MOVE    "101000000"          TO  TNS-SRYCD
+                   MOVE    "101999999"          TO  TNSUP-SRYCD
       *TEST
                WHEN    "JK"
       *            ¼«±¡¡¦´ïºà

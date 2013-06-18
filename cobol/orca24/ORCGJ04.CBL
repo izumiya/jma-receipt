@@ -3428,6 +3428,11 @@
                        MOVE    SPA-J98-GMN-INPUT   TO  SPA-J98-INPUTCD
                    WHEN    "/"
                        MOVE    SPA-J98-GMN-INPUT   TO  SPA-J98-INPUTCD
+      *H25.6       Ï«ºÒ°ìÍ÷
+                   WHEN    "R"
+                   WHEN    "r"
+                       MOVE    SPA-J98-INPUTCD     TO  SPA-J98-GMN-INPUT
+      *
                    WHEN    OTHER
                        MOVE    SPACE               TO  SPA-J98-INPUTCD
                END-EVALUATE

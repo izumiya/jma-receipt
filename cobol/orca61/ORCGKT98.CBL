@@ -1936,8 +1936,10 @@
                WHEN    "U5"
       *            Ï«ºÒ¿Ç»¡
                    MOVE    "key12s"             TO  WRK-PATH
-                   MOVE    "100000000"          TO  TNS-SRYCD
-                   MOVE    "109999999"          TO  TNSUP-SRYCD
+      *****        MOVE    "100000000"          TO  TNS-SRYCD
+      *****        MOVE    "109999999"          TO  TNSUP-SRYCD
+                   MOVE    "101000000"          TO  TNS-SRYCD
+                   MOVE    "101999999"          TO  TNSUP-SRYCD
                    MOVE    "1"                  TO  SPA-KT98-GMN-ALL
                WHEN    "U6"
       *            Í½Ìó¥³¡¼¥É
@@ -1947,10 +1949,10 @@
                    MOVE    "1"                  TO  SPA-KT98-GMN-ALL
       *H25.7
                WHEN    "U7"
-      *            Ï«ºÒ¿Ç»¡
+      *            Ï«ºÒ¹çÀ®¥³¡¼¥É
                    MOVE    "key12s"             TO  WRK-PATH
-                   MOVE    "100000000"          TO  TNS-SRYCD
-                   MOVE    "109999999"          TO  TNSUP-SRYCD
+                   MOVE    "101000000"          TO  TNS-SRYCD
+                   MOVE    "101999999"          TO  TNSUP-SRYCD
       *TEST
       *TEST
                WHEN    "JK"

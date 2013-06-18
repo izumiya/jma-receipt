@@ -4901,31 +4901,34 @@
       *****IF      SPA-K98-INPUTCD         =   SPACE
            IF      SPA-K98-INPUTCD(1:2)    =   "//"
                MOVE    SPA-K98-INPUTCD     TO  SPA-K98-GMN-INPUT
+               EVALUATE    SPA-K98-INPUTCD(3:1)
       *        コメント一覧
-               IF      SPA-K98-INPUTCD(3:1)    =   "C" OR "c"
+               WHEN    "C"
+               WHEN    "c"
                    MOVE    "U"                 TO  SPA-K98-GMN-SYORI
                    MOVE    "U4"                TO  SPA-K98-GMN-SYORI3
                    MOVE    SPACE               TO  SPA-K98-INPUTCD
-               END-IF
       *        用法
-               IF      SPA-K98-INPUTCD(3:1)    =   "Y" OR "y"
+               WHEN    "Y"
+               WHEN    "y"
                    MOVE    "U"                 TO  SPA-K98-GMN-SYORI
                    MOVE    "U1"                TO  SPA-K98-GMN-SYORI3
                    MOVE    SPACE               TO  SPA-K98-INPUTCD
-               END-IF
       *        診療種別一覧
-               IF      SPA-K98-INPUTCD(3:1)    =   "."
+               WHEN    "."
                    MOVE    "."                 TO  SPA-K98-INPUTCD
-               ELSE
-      *            区分番号別
-                   IF      SPA-K98-INPUTCD(3:1)    =   "*"
-                                                   OR  "/"
-                       MOVE    SPA-K98-GMN-INPUT(3:)
-                                                   TO  SPA-K98-INPUTCD
-                   ELSE
-                       MOVE    SPACE               TO  SPA-K98-INPUTCD
-                   END-IF
-               END-IF
+      *        区分番号別
+               WHEN    "*"
+               WHEN    "/"
+                   MOVE    SPA-K98-GMN-INPUT(3:)   TO  SPA-K98-INPUTCD
+      *H25.6   労災一覧
+               WHEN    "R"
+               WHEN    "r"
+                   MOVE    SPA-K98-INPUTCD     TO  SPA-K98-GMN-INPUT
+      *
+               WHEN    OTHER
+                   MOVE    SPACE               TO  SPA-K98-INPUTCD
+               END-EVALUATE
       *        画面編集
                PERFORM 4101-K98-SET-SEC
            ELSE
