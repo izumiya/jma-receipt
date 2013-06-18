@@ -141,6 +141,7 @@
       *  04.06.02    NACL-Æ£¸¶    10/10/12  ¸øÈñÃ±ÆÈ¤Î¥ì¥»Ê¬Î¥ÂÐ±þ
       *                                     ¥­¡¼¤Ëkohid ÄÉ²Ã
       *  04.06.03    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
+      *  04.06.04    NACL-ÌçÏÆ    13/06/18  ºß»Ù±ç¥³¥á¥ó¥È¤Î¿ÇÎÅ¶èÊ¬½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1205,7 +1206,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE059PARA-HOSPNUM
                    WHEN      "40"
       *            ¡Ê¿Í¹©¿ÕÂ¡¤Î¥«¥¦¥ó¥È¡Ë
                       IF  RECE04-JINKOJIN-COMMENT     =  "1"
-                        MOVE    RECE04-REC    TO      WRK-RECE04-REC
                         COMPUTE  WRK-KOHBUNRI 
                                    =    RECE04-KOHBUNRI  +  1
                         PERFORM  VARYING   IDX1  FROM  1  BY  1
@@ -2196,7 +2196,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    WRK-ZAINUM          TO  RECE049-ZAINUM
            COMPUTE WRK-KOHBUNRI  =  IDX  -  1
            MOVE    WRK-KOHBUNRI        TO  RECE049-KOHBUNRI
-           MOVE    WRK-RECE04-SRYKBN   TO  RECE049-SRYKBN
+           MOVE    "40"                TO  RECE049-SRYKBN
       *
            MOVE    1                   TO  RECE049-MEISAISU
       *
@@ -2211,7 +2211,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    WRK-ZAINUM          TO  RECE059-ZAINUM
            COMPUTE WRK-KOHBUNRI  =  IDX  -  1
            MOVE    WRK-KOHBUNRI        TO  RECE059-KOHBUNRI
-           MOVE    WRK-RECE04-SRYKBN   TO  RECE059-SRYKBN
+           MOVE    "40"                TO  RECE059-SRYKBN
       *    ¿Í¹©¿ÕÂ¡¥³¥á¥ó¥È¤ÎÁÞÆþ
            MOVE    SPACE                TO  WRK-RECE05XX-REC
            INITIALIZE                       WRK-RECE05XX-REC
