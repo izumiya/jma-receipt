@@ -119,6 +119,7 @@
       *
       *  04.07.01    NACL-藤原    11/06/10  未コード化病名となる病名の別
       *                                     組み立てへの移行を可能にする
+      *  04.07.02    NACL-藤原    13/06/20  廃止病名警告表示の条件変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1709,14 +1710,17 @@
                                IF      FLG-SYNONYM =   ZERO
                                    MOVE    "0102"      TO  SPA-CIDCD2
                                ELSE 
-                                   MOVE    WRK-BYO-HAISIYMD
-                                                   TO  WRK-SYMD
-                                   PERFORM 5002-HIZUKE-HEN-SEC
-                                   MOVE    LNK-DAY2-EDTYMD3
-                                                   TO  WRK-HAISIYMDH
-                                   MOVE    BYO-BYOMEI
-                                                   TO
-                                               SPA-C03-HAISI-BYOMEI
+                                   IF      SPA-C02-1042-MSG3-DSPKBN
+                                                           =   ZERO
+                                       MOVE    WRK-BYO-HAISIYMD
+                                                       TO  WRK-SYMD
+                                       PERFORM 5002-HIZUKE-HEN-SEC
+                                       MOVE    LNK-DAY2-EDTYMD3
+                                                       TO  WRK-HAISIYMDH
+                                       MOVE    BYO-BYOMEI
+                                                       TO
+                                                   SPA-C03-HAISI-BYOMEI
+                                   END-IF
                                END-IF
                              END-IF        
                            END-IF
@@ -3248,8 +3252,10 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       6
                    OR      SPA-ERRCD   NOT =   SPACE
-               IF      SPA-NAI-C03-HAISIYMD (IDX)
-                                       NOT =   SPACE
+               IF    ( SPA-NAI-C03-HAISIYMD (IDX)
+                                       NOT =   SPACE )
+               AND   ( SPA-NAI-C03-IKOSAKI-BYOMEICD (IDX)
+                                           =   SPACE )
                    MOVE    "0074"              TO  SPA-ERRCD
                    COMPUTE SPA-GMN-C03-CUR     =   4   +   IDX
                    MOVE    SPA-NAI-C03-HAISIYMD(IDX)
