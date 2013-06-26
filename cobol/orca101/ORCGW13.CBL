@@ -49,6 +49,7 @@
       *  04.05.00    NACL-太田    09/06/23  休業証明療養期間記載追加
       *                                     自賠責請求区分追加
       *                                     公務災害請求区分追加
+      *  04.08.00    NACL-太田    13/03/07  医療機関コード数字チェック追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -327,6 +328,7 @@
            03  IDX1                PIC 9(04).
            03  IDX2                PIC 9(04).
            03  IDX3                PIC 9(04).
+           03  IDXP                PIC 9(04).
            03  IDX-LST             PIC 9(04).
       *
       *    一時領域
@@ -1606,36 +1608,35 @@
            EXIT.
       *
       *****************************************************************
-      *    指定医療機関コード（漢字）チェック
+      *    指定医療機関コード（全角数字７桁）チェック
       *****************************************************************
        4103-RSIIRYOCDN-CHK-SEC       SECTION.
       *
-      *    半角チェック
+      *    全角チェック
            IF    ( SPA-GMN-RSIIRYOCDN      NOT =   SPACE )
+      *
                INITIALIZE                  ORCSKANACHKAREA
-               MOVE    "1"                 TO  KANACHK-SYORI 
+               MOVE    "2"                 TO  KANACHK-SYORI 
                MOVE    SPA-GMN-RSIIRYOCDN  TO  KANACHK-MAE-INPUT
                CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
-               IF    ( KANACHK-RC          =   ZERO )
-                AND  ( KANACHK-SYUBETU     =   "2" )
-                   MOVE    KANACHK-OUT-INPUT
-                                           TO  SPA-GMN-RSIIRYOCDN 
-               ELSE
-                   IF    ( KANACHK-RC2     =   7 )
-                       MOVE    KANACHK-OUT-INPUT
-                                           TO  SPA-GMN-RSIIRYOCDN 
+               MOVE    KANACHK-OUT-INPUT   TO  SPA-GMN-RSIIRYOCDN
+      *
+           END-IF
+      *
+           IF    ( SPA-ERRCD               =   SPACE )
+               IF    ( SPA-GMN-RSIIRYOKBN      =   "1" )
+                   IF    ( SPA-GMN-RSIIRYOCDN  =   SPACE )
+                       MOVE    2               TO  SPA-GMN-CUR
+                       MOVE    "0003"          TO  SPA-ERRCD
                    END-IF
-                   MOVE    "0004"          TO  SPA-ERRCD
-                   MOVE    2               TO  SPA-GMN-CUR
-                   GO  TO  4103-RSIIRYOCDN-CHK-EXT
                END-IF
            END-IF
       *
-           IF    ( SPA-GMN-RSIIRYOKBN      =   "1" )
-               IF    ( SPA-GMN-RSIIRYOCDN  =   SPACE )
-                   MOVE    2               TO  SPA-GMN-CUR
-                   MOVE    "0003"          TO  SPA-ERRCD
-               END-IF
+           IF  ( SPA-GMN-RSIIRYOKBN      =   "0"  )  AND
+               ( SPA-GMN-RSIIRYOCDN      NOT =   SPACE )
+                       MOVE    2               TO  SPA-GMN-CUR
+                       MOVE    "1007"          TO  SPA-ERRCD
+      *
            END-IF
       *
            .
@@ -2984,6 +2985,32 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    IF      SPA-ERRCD            =   SPACE
       *        MOVE    WRK-GMN-CUR          TO  SPA-GMN-CUR
       *****END-IF             
+      *
+      *
+           IF    ( SPA-ERRCD               =   SPACE )
+      *
+               IF    ( SPA-GMN-RSIIRYOKBN  =   "1" )
+                   IF    ( SPA-GMN-RSIIRYOCDN (15 :)   NOT =   SPACE )
+                       MOVE    "0004"      TO  SPA-ERRCD
+                       MOVE    2           TO  SPA-GMN-CUR
+                   END-IF
+      *
+                   PERFORM VARYING IDXP    FROM    1   BY  2
+                           UNTIL ( IDXP    >   13 )
+                            OR   ( SPA-ERRCD   NOT =   SPACE )
+      *
+                       IF    ( SPA-GMN-RSIIRYOCDN (IDXP : 2)  >=  "０" )
+                        AND  ( SPA-GMN-RSIIRYOCDN (IDXP : 2)  <=  "９" )
+                           CONTINUE
+                       ELSE
+                           MOVE    "0004"      TO  SPA-ERRCD
+                           MOVE    2           TO  SPA-GMN-CUR
+                       END-IF
+      *
+                   END-PERFORM
+               END-IF
+           END-IF
+      *
            .
        4900-KANRENCHK-EXT.
            EXIT.
@@ -3283,7 +3310,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "労災指定のときは入力して下さい"
                                                          TO  SPA-ERRMSG
                WHEN    "0004"
-                   MOVE    "全角入力して下さい"        TO  SPA-ERRMSG
+                   MOVE    "全角数字７桁で入力して下さい" TO  SPA-ERRMSG
                WHEN    "0005"
                    MOVE    "加算率は１００％以上で入力して下さい"
                                                          TO  SPA-ERRMSG
@@ -3333,6 +3360,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "1006"
                    MOVE    "追加ができませんでした"
                                                TO  SPA-ERRMSG
+               WHEN    "1007"
+                   MOVE    "労災指定でないときは入力しないで下さい"
+                                                         TO  SPA-ERRMSG
            END-EVALUATE
       *
            MOVE    SPACE                TO  WERR

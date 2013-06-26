@@ -439,6 +439,11 @@
            05 PIC  X(30)   VALUE   "カナ氏名に外字が入力されていま".
            05 PIC  X(30)   VALUE   "す                            ".
            05 PIC  X(30)   VALUE   "                              ".
+      *                            +---------+---------+---------+.
+           05 PIC  X(06)   VALUE   "130007".
+           05 PIC  X(30)   VALUE   "カナ氏名に労災レセ電データに記".
+           05 PIC  X(30)   VALUE   "録できない文字が入力されていま".
+           05 PIC  X(30)   VALUE   "す。                          ".
       *
       *    ** 14xxxx 保険組合せ有効期間
       *                            +---------+---------+---------+.
@@ -632,7 +637,7 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  113.
+           05 ERRMES-OCC   OCCURS  114.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(90).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   113.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   114.
