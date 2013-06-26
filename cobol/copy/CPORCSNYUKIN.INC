@@ -56,6 +56,13 @@
            03  LNK-SCNYUKIN-NYUKIN-HOHO      PIC X(02).
       *出力値
            03  LNK-SCNYUKIN-OUT-AREA.
+      *
+      *        まとめ入金区分
+               05  LNK-SCNYUKIN-MATOME-NYUHENKIN-KBN.
+      *            空白：入金なし1:入金あり
+                   07  LNK-SCNYUKIN-MATOME-NYUKIN-KBN  PIC X(01).
+      *            空白：返金なし1:返金あり
+                   07  LNK-SCNYUKIN-MATOME-HENKIN-KBN  PIC X(01).
       *        入金振り分け情報
                05  LNK-SCNYUKIN-FURIWAKE-INF   OCCURS  100.
       *            伝票番号

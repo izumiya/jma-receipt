@@ -396,7 +396,9 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
            MOVE    "tbl_syumei"        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBINSERT-SEC
-           IF    ( MCP-RC          NOT =   ZERO )
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    "1"         TO  LNK-SCNYUKIN-MATOME-HENKIN-KBN
+           ELSE
                DISPLAY "SYUMEI INSERT ERR " MCP-RC
                MOVE    15              TO  LNK-SCNYUKIN-RC
            END-IF
@@ -556,7 +558,9 @@ grpsys*    MOVE SPA-HOSPNUM TO -HOSPNUM
            MOVE    "tbl_syumei"        TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBINSERT-SEC
-           IF    ( MCP-RC          NOT =   ZERO )
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    "1"         TO  LNK-SCNYUKIN-MATOME-NYUKIN-KBN
+           ELSE
                DISPLAY "ORCSNYUKIN SYUMEI INS ERR:"  MCP-RC  "."
                MOVE    14              TO  LNK-SCNYUKIN-RC
            END-IF
