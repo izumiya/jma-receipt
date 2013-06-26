@@ -4,6 +4,7 @@ tbl_shoukaikanri {
 	RENNUM		number(5,0);
 	NAME	  	varchar(100);
 	NYUGAIKBN	char(1);
+	TITLEKBN	char(1);
 	TERMID		varchar(32);
 	OPID		varchar(16);
 	CREYMD		char(8);
@@ -66,7 +67,8 @@ path	key4 	{
 path	upd1		{ 	
 	DBUPDATE	{
 		UPDATE	tbl_shoukaikanri
-		SET			NAME    = :NAME
+		SET			NAME     = :NAME ,
+					TITLEKBN = :TITLEKBN
 		WHERE 	HOSPNUM	= :HOSPNUM
 		AND			UID			=	:UID
 		;

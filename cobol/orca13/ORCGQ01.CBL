@@ -204,6 +204,7 @@
            03  WRK-CMB-ITM-G.
                05  WRK-CMB-ITM                     PIC X(200).
                05  WRK-CMB-ITM2                    PIC X(200).
+               05  WRK-CMB-ITM3                    PIC X(200).
            03  WRK-QIDMSG                          PIC X(80).
            03  WRK-UPDKBN               PIC X(03).
            03  WRK-RECECOM-G.
@@ -711,13 +712,11 @@
        310-Q04SPASET-SEC               SECTION.
       *
            IF  ( SPA-Q01-Q04-NAME  NOT =  SPACE )
-               MOVE    SPA-Q01-Q04-NAME   TO   WRK-SELPATTERNMEI
                IF    ( SPA-Q01-Q04-UPDKBN =    "UPD" )
                    PERFORM 4601-SELPATTERN-UPD-SEC
                ELSE
                    PERFORM 700-SELPATTERN-INS-SEC
                END-IF
-           
            END-IF
       *
            .
@@ -942,6 +941,9 @@
       *
                MOVE    SHOKANRI-UID
                                    TO  SPA-NAI-Q01-SELPATTERN-UIDL
+                                                        (WRK-SELPATTERN)
+               MOVE    SHOKANRI-TITLEKBN
+                                   TO  SPA-NAI-Q01-SELPATTERN-TTLKBNL
                                                         (WRK-SELPATTERN)
       *
                PERFORM 900-SHOUKAIKANRI-KEY2-FET-SEC
@@ -4758,6 +4760,7 @@
       *
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-Q01-SELPATTERN-G
                MOVE    WRK-CMB-ITM2    TO  SPA-NAI-Q01-SELPATTERN-UID
+               MOVE    WRK-CMB-ITM3    TO  SPA-NAI-Q01-SELPATTERN-TTLKBN
       *
                PERFORM 700-GMNHEN-SEC
       *
@@ -6277,6 +6280,8 @@
                                        TO  WRK-CMB-ITM
                    MOVE    SPA-NAI-Q01-SELPATTERN-UIDL(IDX-CMB)
                                        TO  WRK-CMB-ITM2
+                   MOVE    SPA-NAI-Q01-SELPATTERN-TTLKBNL(IDX-CMB)
+                                       TO  WRK-CMB-ITM3
                END-IF
            END-PERFORM
       *
@@ -6300,6 +6305,8 @@
                                        TO  WRK-CMB-ITM
                    MOVE    SPA-NAI-Q01-SELPATTERN-UIDL(IDX-CMB)
                                        TO  WRK-CMB-ITM2
+                   MOVE    SPA-NAI-Q01-SELPATTERN-TTLKBNL(IDX-CMB)
+                                       TO  WRK-CMB-ITM3
                END-IF
            END-PERFORM
       *
@@ -6881,7 +6888,8 @@
            MOVE    SPA-HOSPNUM         TO  SHOKANRI-HOSPNUM
            MOVE    SPA-NAI-Q01-SELPATTERN-UID
                                        TO  SHOKANRI-UID
-           MOVE    WRK-SELPATTERNMEI   TO  SHOKANRI-NAME
+           MOVE    SPA-Q01-Q04-NAME    TO  SHOKANRI-NAME
+           MOVE    SPA-Q01-Q04-TITLEKBN TO SHOKANRI-TITLEKBN
            MOVE    SHOUKAIKANRI-REC    TO  MCPDATA-REC
            MOVE    "tbl_shoukaikanri"  TO  MCP-TABLE
            MOVE    "upd1"              TO  MCP-PATHNAME
@@ -6909,6 +6917,7 @@
                PERFORM 4201-SELPATTERNLST-CHK-SEC
                MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-SELPATTERN-G
                MOVE    WRK-CMB-ITM2 TO SPA-NAI-Q01-SELPATTERN-UID
+               MOVE    WRK-CMB-ITM3 TO SPA-NAI-Q01-SELPATTERN-TTLKBN
            END-IF
       *
            .
@@ -6934,6 +6943,8 @@
                                        TO  SPA-Q01-Q04-NAME
                    MOVE    SPA-NAI-Q01-SELPATTERN-UID
                                        TO  SPA-Q01-Q04-UID
+                   MOVE    SPA-NAI-Q01-SELPATTERN-TTLKBN
+                                       TO  SPA-Q01-Q04-TITLEKBN
                END-IF
       *
                MOVE    SPA-AREA        TO  SPA-COMMON
@@ -7834,6 +7845,13 @@
        4901-SPASET-SEC             SECTION.
       *
            INITIALIZE              SPA-Q01-Q02-SENI-AREA
+      *
+      *    表題
+           IF    ( SPA-NAI-Q01-SELPATTERN-TTLKBN
+                                     =     "1" )
+               MOVE    SPA-GMN-Q01-SELPATTERNMEI
+                                     TO    SPA-Q01-HYODAI
+           END-IF
       *
       *    診療年月日
            MOVE    SPA-NAI-Q01-STSRYYMD    TO  PTSRH-DBSTR
@@ -11407,6 +11425,7 @@
                PERFORM 4201-SELPATTERNLST-CHK-SEC
                MOVE    WRK-CMB-ITM TO  SPA-GMN-Q01-SELPATTERN-G
                MOVE    WRK-CMB-ITM2 TO SPA-NAI-Q01-SELPATTERN-UID
+               MOVE    WRK-CMB-ITM3 TO SPA-NAI-Q01-SELPATTERN-TTLKBN
            END-IF
       *
            .
@@ -12765,7 +12784,8 @@
            MOVE    SPA-HOSPNUM         TO  SHOKANRI-HOSPNUM
            MOVE    WRK-UID             TO  SHOKANRI-UID
            MOVE    WRK-RENNUM          TO  SHOKANRI-RENNUM
-           MOVE    WRK-SELPATTERNMEI   TO  SHOKANRI-NAME
+           MOVE    SPA-Q01-Q04-NAME    TO  SHOKANRI-NAME
+           MOVE    SPA-Q01-Q04-TITLEKBN TO SHOKANRI-TITLEKBN
            MOVE    "0"                 TO  SHOKANRI-NYUGAIKBN
            MOVE    SMCNDATE-YMD        TO  SHOKANRI-CREYMD
                                            SHOKANRI-UPYMD

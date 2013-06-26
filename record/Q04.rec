@@ -6,5 +6,8 @@ Q04	{
 		NAME	{
 			value	varchar(30);
 		};
+		TITLEKBN	{
+			value	bool;
+		};
 	};
 };

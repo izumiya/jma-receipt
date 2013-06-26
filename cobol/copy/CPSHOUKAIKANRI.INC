@@ -35,6 +35,8 @@
            03  SHOKANRI-NAME           PIC  X(100).
       *入外区分
            03  SHOKANRI-NYUGAIKBN      PIC  X(01).
+      *表題区分
+           03  SHOKANRI-TITLEKBN       PIC  X(01).
       *端末ＩＤ
            03  SHOKANRI-TERMID         PIC  X(32).
       *オペーレータＩＤ

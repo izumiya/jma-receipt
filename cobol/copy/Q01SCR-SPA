@@ -488,6 +488,9 @@
       *                    UID
                            11  SPA-NAI-Q01-SELPATTERN-UID
                                                        PIC X(36).
+      *                    É½Âê¶èÊ¬
+                           11  SPA-NAI-Q01-SELPATTERN-TTLKBN
+                                                       PIC X(01).
       *                ¿ÇÎÅÇ¯·îÆü³«»ÏÆü
                        09  SPA-NAI-Q01-STSRYYMD        PIC X(08).
       *                ¿ÇÎÅÇ¯·îÆü½ªÎ»Æü
@@ -791,6 +794,8 @@
                            11  SPA-NAI-Q01-SELPATTERN-OCC  OCCURS  50.
                                13  SPA-NAI-Q01-SELPATTERN-UIDL
                                                               PIC X(36).
+                               13  SPA-NAI-Q01-SELPATTERN-TTLKBNL
+                                                              PIC X(01).
       *    £Ñ£°£²¡¢£Ñ£°£²£Á¡¢£Ñ£°£²£ÂÍÑ
            03  SPA-Q02.
                05  SPA-Q02-AREA.
@@ -970,6 +975,7 @@
                    07  SPA-GMN-Q04-CUR                 PIC 9(03).
                    07  SPA-GMN-Q04-AREA.
                        09  SPA-GMN-Q04-NAME            PIC X(30).
+                       09  SPA-GMN-Q04-TITLEKBN        PIC X(01).
       *
       *
       *    £Ñ£¹£¶ÍÑ
@@ -1137,6 +1143,7 @@
       *        Q01¢«¢ªQ02Á«°Ü¾ðÊó
                05  SPA-Q01-Q02-SENI-AREA.
                    07  SPA-Q01-SAKIPG                  PIC X(10).
+                   07  SPA-Q01-HYODAI                  PIC X(100).
                    07  SPA-Q01-GAITO-TBL.
                        09  SPA-Q01-GITEM-G.
                            11  SPA-Q01-GPTNUM          PIC X(01).
@@ -1302,6 +1309,7 @@
                    07  SPA-Q01-Q04-UPDKBN              PIC  X(03).
                    07  SPA-Q01-Q04-UID                 PIC  X(36).
                    07  SPA-Q01-Q04-NAME                PIC  X(30).
+                   07  SPA-Q01-Q04-TITLEKBN            PIC  X(01).
       *
       *        Q02¢«¢ªQ03Á«°Ü¾ðÊó
                05  SPA-Q02-Q03-SENI-AREA.

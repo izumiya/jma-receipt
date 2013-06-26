@@ -859,6 +859,8 @@
       *
            MOVE    ZERO            TO  SPA-GMN-Q02-TOTAL-GET-FLG
       *
+           MOVE    SPA-Q01-HYODAI  TO  SPA-GMN-Q02-HYODAI
+      *
       *    画面条件編集処理
            PERFORM 3101-JYOKEN-EDIT-SEC
       *

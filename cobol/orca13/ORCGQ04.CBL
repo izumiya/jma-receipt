@@ -210,6 +210,12 @@
            MOVE    SPA-Q01-Q04-NAME
                                    TO  SPA-GMN-Q04-NAME
       *
+           IF    ( SPA-Q01-Q04-TITLEKBN    =   "0" )
+               MOVE    "F"     TO  SPA-GMN-Q04-TITLEKBN
+           ELSE
+               MOVE    "T"     TO  SPA-GMN-Q04-TITLEKBN
+           END-IF
+      *
            .
        310-SPASET-EXT.
            EXIT.
@@ -226,6 +232,8 @@
                MOVE   "CHANGE"         TO  MCP-PUTTYPE
                MOVE   SPACE            TO  SPA-Q01-Q04-NAME
                PERFORM 210-BACK
+           WHEN    "CLICKED"       ALSO    "TITLEKBN"
+               PERFORM 4100-TITLEKBN-CHK-SEC
            WHEN    "CLICKED"       ALSO    "B12"
                PERFORM 220-TOUROKU-SEC
            END-EVALUATE.
@@ -309,6 +317,20 @@
        4102-KIHON-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    表題区分チェック処理
+      *****************************************************************
+       4100-TITLEKBN-CHK-SEC               SECTION.
+      *
+           PERFORM 4101-GMN-SPA-SET-SEC
+      *
+           MOVE    Q04-TITLEKBN    TO  SPA-GMN-Q04-TITLEKBN
+      *
+           MOVE    212             TO  SPA-GMN-Q04-CUR
+      *
+           .
+       4100-TITLEKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    登録名チェック処理
       *****************************************************************
        4101-NAME-CHK-SEC               SECTION.
@@ -380,6 +402,11 @@
            IF    (  SPA-ERRCD      =   SPACE )
                MOVE    SPA-GMN-Q04-NAME
                                    TO  SPA-Q01-Q04-NAME
+               IF    ( SPA-GMN-Q04-TITLEKBN    =   "T" )
+                   MOVE    "1"     TO  SPA-Q01-Q04-TITLEKBN
+               ELSE
+                   MOVE    "0"     TO  SPA-Q01-Q04-TITLEKBN
+               END-IF
                MOVE    "CHANGE"    TO  MCP-PUTTYPE
                PERFORM 210-BACK
            END-IF
@@ -417,6 +444,10 @@
       *
       *    登録名
            MOVE    SPA-GMN-Q04-NAME   TO  Q04-NAME
+      *
+      *    表題区分
+           MOVE    SPA-GMN-Q04-TITLEKBN
+                                      TO  Q04-TITLEKBN
       *
            IF    ( SPA-Q01-Q04-UPDKBN =   "INS" )
                MOVE    "条件保存"     TO  Q04-TITLE
