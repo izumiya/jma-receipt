@@ -172,3 +172,16 @@ path	key4	{
 	};
 };
 
+path	del4 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_receden
+                WHERE   HOSPNUM      =   :HOSPNUM
+                  AND   SRYYM        =   :SRYYM
+                  AND   NYUGAIKBN    =   :NYUGAIKBN
+                  AND   PTID         =   :PTID
+                  AND   TEISYUTUSAKI =   :TEISYUTUSAKI
+		;
+	};
+};
+

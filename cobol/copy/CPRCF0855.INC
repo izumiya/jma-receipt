@@ -16,36 +16,42 @@
       * 113-8621, Japan.
       ********************************************************************
       ************************************************************
-      *    労災レセプト明細書（入院）                            *
-      *                     入退院履歴情報   (CPRCF088.INC)      *
-      ************************************************************
+      *    レセプト明細書     COPY (CPRCF0855.INC)               *
+      *                       労災レセ電の関連コメント（入院）   *
       ************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  03.05.01    NACL-門脇    07.06.01  グループ診療対応
       ************************************************************
-      *01  RECE88-REC.
-           03  RECE88-KEY.
-               05  RECE88-KEY1.
+      *01  RECE855-REC.
+           03  RECE855-KEY.
+             05  RECE855-KEY1.
       *医療機関ＩＤ
-                   07  RECE88-HOSPNUM      PIC 9(02).
+               07  RECE855-HOSPNUM         PIC 9(02).
       *診療年月
-                   07  RECE88-SRYYM        PIC 9(06).
+               07  RECE855-SRYYM           PIC 9(06).
       *入外区分
-                   07  RECE88-NYUGAIKBN    PIC X(01).
+               07  RECE855-NYUGAIKBN       PIC X(01).
       *患者ＩＤ
-                   07  RECE88-PTID         PIC 9(10).
+               07  RECE855-PTID            PIC 9(10).
       *レセプト科
-                   07  RECE88-RECEKA       PIC X(02).
-      *保険ＩＤ        
-                   07  RECE88-HKNID        PIC 9(10).
+               07  RECE855-RECEKA          PIC X(02).
+      *保険ＩＤ
+               07  RECE855-HKNID           PIC 9(10).
       *適用開始年月日
-                   07  RECE88-TEKSTYMD     PIC X(08).
-      *入院年月日
-               05  RECE88-NYUINYMD         PIC X(08).
-      *退院年月日
-           03  RECE88-TAIINYMD             PIC X(08).
-      *自院歴−入院中区分
-           03  RECE88-NYUINCHUKBN          PIC X(01).
-      *初回番号（入院年月日と同じときだけセット）
-           03  RECE88-SHONUM               PIC 9(03).
+               07  RECE855-TEKSTYMD        PIC X(08).
+      *剤番号
+               07  RECE855-ZAINUM          PIC 9(08).
+      *連番号
+               07  RECE855-RENNUM          PIC 9(02).
+      *
+             05  RECE855-SHORI-RENNUM      PIC 9(01).
+      *
+             05  RECE855-SEQNO             PIC 9(02).
+      *コメント情報
+           03  RECE855-SRYACTINF.
+      *診療コード
+               05  RECE855-SRYCD           PIC X(09).
+      *漢字名称
+               05  RECE855-NAME            PIC X(200).
+      *入力コメント
+               05  RECE855-INPUTCOMENT     PIC X(80).

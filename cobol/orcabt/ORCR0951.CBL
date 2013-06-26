@@ -59,6 +59,7 @@
       *  03.05.03    NACL-門脇    07/07/17  個別時のシステム管理編集修正
       *
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
+      *  04.07.02    NACL-門脇    13/01/21  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1206,8 +1207,10 @@ grpsys        PERFORM 900-DBSELECT-SEC
            MOVE    WRK-JNISSU          TO  HC21-NISSU
       *
       *    労災レセプト回数
-           MOVE    RECE82-RECEKAISU    TO  WRK-RECEKAISU
-           MOVE    WRK-RECEKAISU       TO  HC21-KAI
+           IF   RECE82-ROUKAISU   =   "2"
+             MOVE    RECE82-RECEKAISU  TO  WRK-RECEKAISU
+             MOVE    WRK-RECEKAISU     TO  HC21-KAI
+           END-IF
       *
            .
        20021-HEAD-HEN-EXT.

@@ -31,23 +31,26 @@
       *  04.01.01    NACL-門脇    07/11/26  特定器材商品名記載対応
       *
       *  04.05.01    NACL-藤原    09/07/14  小数点以下５桁対応
+      *
+      *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
       ************************************************************
       *01  RECE85-REC.
            03  RECE85-KEY.
+               05  RECE85-KEY1.
       *医療機関ＩＤ
-               05  RECE85-HOSPNUM         PIC  9(02).
+                   07  RECE85-HOSPNUM     PIC  9(02).
       *診療年月
-               05  RECE85-SRYYM           PIC  9(06).
+                   07  RECE85-SRYYM       PIC  9(06).
       *入外区分
-               05  RECE85-NYUGAIKBN       PIC  X(01).
+                   07  RECE85-NYUGAIKBN   PIC  X(01).
       *患者ＩＤ
-               05  RECE85-PTID            PIC  9(10).
+                   07  RECE85-PTID        PIC  9(10).
       *レセプト科
-               05  RECE85-RECEKA          PIC  X(02).
+                   07  RECE85-RECEKA      PIC  X(02).
       *保険ＩＤ        
-               05  RECE85-HKNID           PIC  9(10).
+                   07  RECE85-HKNID       PIC  9(10).
       *適用開始年月日
-               05  RECE85-TEKSTYMD        PIC  X(08).
+                   07  RECE85-TEKSTYMD    PIC  X(08).
       *剤番号
                05  RECE85-ZAINUM          PIC  9(08).
       *連番号
@@ -68,6 +71,8 @@
              05  RECE85-SRYACTINF.
       *診療コード
                  07  RECE85-SRYCD         PIC  X(09).
+      *診療種別区分
+                 07  RECE85-SRYSYUKBN-X   PIC  X(03).
       *数量
                  07  RECE85-SRYSURYO      PIC  9(05)V9(05).
       *回数
@@ -90,11 +95,44 @@
                  07  RECE85-INPUTNUM      PIC  9(03).
       *点数欄集計先識別
                  07  RECE85-TENTTLKBN     PIC  9(03).
-      *検体検査コメント
-                 07  RECE85-KENTAICOMMENT PIC  9(01).
+      *データ区分
+                 07  RECE85-DATAKBN       PIC  9(01).
+      *包括対象検査
+                 07  RECE85-HOUKNSKBN     PIC  9(02).
+      *検査等実施判断
+                 07  RECE85-KNSJISKBN     PIC  9(01).
+      *検査等実施判断グループ
+                 07  RECE85-KNSJISGRPKBN  PIC  9(02).
+      *各種番号等
+                 07  RECE85-CDKBNINF.
+                     09  RECE85-CDKBN-KBN        PIC  X(01).
+                     09  RECE85-CDKBN-SYO        PIC  9(01).
+                     09  RECE85-CDKBN-BU         PIC  9(02).
+                     09  RECE85-CDKBN-KBNNUM     PIC  9(03).
+                     09  RECE85-CDKBN-KBNNUM-EDA PIC  9(02).
+                     09  RECE85-CDKBN-KOUBAN     PIC  9(02).
+                     09  RECE85-KOUHYOJYUNNUM    PIC  9(09).
+      *告示等識別区分１
+                 07  RECE85-KOKUJISKBKBN1 PIC  9(01).
+      *告示等識別区分２
+                 07  RECE85-KOKUJISKBKBN2 PIC  9(01).
+      *通則加算対象外区分
+                 07  RECE85-TUSOKUGAIKBN  PIC  9(01).
+      *時間外加算区分
+                 07  RECE85-TIMEKSNKBN    PIC  9(01).
       *きざみ値計算識別
                  07  RECE85-KZMCOMPSIKIBETU
                                           PIC  9(01).
+      *注加算コード
+                 07  RECE85-CHUKSNINF.
+      *コード
+                     09  RECE85-CHUKSNCD         PIC  X(04).
+      *通番
+                     09  RECE85-CHUKSNTUBAN      PIC  X(01).
+      *検体検査コメント
+                 07  RECE85-KENTAICOMMENT        PIC  9(01).
+      *入力コメント
+                 07  RECE85-INPUTCOMENT          PIC  X(80).
       *名称情報
              05  RECE85-NAMEINF.
       *漢字有効桁数
@@ -105,34 +143,23 @@
              05  RECE85-SIKFLGINF.
       *識別フラグ
                  07  RECE85-SIKFLG        PIC  X(01).
-      *データ区分情報
-             05  RECE85-DATAKBNINF.
-      *データ区分
-                 07  RECE85-DATAKBN       PIC  9(01).
-      *包括対象検査情報
-             05  RECE85-HOUKNSKBNINF.
-      *包括対象検査
-                 07  RECE85-HOUKNSKBN     PIC  9(02).
-      *検査等実施判断情報
-             05  RECE85-KNSJISKBNINF.
-      *検査等実施判断
-                 07  RECE85-KNSJISKBN     PIC  9(01).
-      *検査等実施判断グループ
-                 07  RECE85-KNSJISGRPKBN  PIC  9(02).
-      *各種番号等情報
-             05  RECE85-CDKBNINF.
-      *各種番号等
-                 07  RECE85-CDKBN-KBN        PIC  X(01).
-                 07  RECE85-CDKBN-SYO        PIC  9(01).
-                 07  RECE85-CDKBN-BU         PIC  9(02).
-                 07  RECE85-CDKBN-KBNNUM     PIC  9(03).
-                 07  RECE85-CDKBN-KBNNUM-EDA PIC  9(02).
-                 07  RECE85-CDKBN-KOUBAN     PIC  9(02).
-                 07  RECE85-KOUHYOJYUNNUM    PIC  9(09).
+      *特定器材種別１
+             05  RECE85-TOKUKIZAISBT1     PIC  9(01).
+      *酸素等区分
+             05  RECE85-SANSOKBN          PIC  9(01).
+      *レセプト編集情報
+             05  RECE85-SSTKIJUNCDTBL     OCCURS 10.
+                 07  RECE85-SSTKIJUNCD    PIC  9(03).
       *その他情報
              05  RECE85-SONOTAINF.
+      *レセプト電算対象外フラグ
+                 07  RECE85-RECEDENFLG       PIC  X(01).
       *レセプト対象外フラグ
                  07  RECE85-RECEPTFLG        PIC  X(01).
+      *レセ電用特定器材商品名
+                 07  RECE85-RECEDENNAME      PIC  X(300).
       *レセ用特定器材商品名編集フラグ
                  07  RECE85-RECEHENFLG       PIC  X(01).
+      *関係コメント関連設定フラグ
+                 07  RECE85-SETCOMATFLG      PIC  9(03).
       *

@@ -45,6 +45,8 @@
       *
       *  04.06.01    NACL-門脇    13/02/18  労災レセ電対応
       *                                     （新診療行為コード対応）
+      *
+      *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -75,21 +77,11 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE841-KEY
                                    FILE    STATUS  IS  STS-RECE841.
-           SELECT  RECE841X-FILE   ASSIGN  RECE841PARA
-                                   ORGANIZATION    IS  INDEXED
-                                   ACCESS  MODE    IS  SEQUENTIAL
-                                   RECORD  KEY     IS  RECE841X-KEY
-                                   FILE    STATUS  IS  STS-RECE841.
       *
            SELECT  RECE851-FILE    ASSIGN  RECE851PARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE851-KEY
-                                   FILE    STATUS  IS  STS-RECE851.
-           SELECT  RECE851X-FILE   ASSIGN  RECE851PARA
-                                   ORGANIZATION    IS  INDEXED
-                                   ACCESS  MODE    IS  SEQUENTIAL
-                                   RECORD  KEY     IS  RECE851X-KEY
                                    FILE    STATUS  IS  STS-RECE851.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
@@ -122,16 +114,6 @@
        01  RECE851-REC. 
            COPY    "CPRCF085.INC"  REPLACING   //RECE85//
                                    BY          //RECE851//.
-      *
-       FD  RECE841X-FILE.
-       01  RECE841X-REC. 
-           COPY    "CPRCF084.INC"  REPLACING   //RECE84//
-                                   BY          //RECE841X//.
-      *
-       FD  RECE851X-FILE.
-       01  RECE851X-REC. 
-           COPY    "CPRCF085.INC"  REPLACING   //RECE85//
-                                   BY          //RECE851X//.
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -233,6 +215,12 @@
            03  WRK-FREEINF2                  OCCURS 50.
                05  WK-FREE-YUKOKETA2         PIC  9(03).
                05  WK-FREE-NAME2             PIC  X(200).
+               05  WK-FREE-MEISKYFLG2        PIC  X(01).
+               05  WK-FREE-SETCOMATFLG2      PIC  9(03).
+      *
+       01  WRK-JIDO-SETCOM-AREA.
+           03  WRK-JIDO-SETCOMATFLG          PIC  9(03).
+           03  WRK-JIDO-SETCOMFLG            PIC  X(01).
       *
        01  TBL-NYU-DAY.
            03  TBL-NYU-DAY-OCC               OCCURS  31.
@@ -431,15 +419,15 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE851PARA-HOSPNUM
       *
            OPEN    INPUT               RECE85-FILE
       *
-           OPEN    OUTPUT              RECE841X-FILE
-           CLOSE                       RECE841X-FILE
-      *
-           OPEN    OUTPUT              RECE851X-FILE
-           CLOSE                       RECE851X-FILE
-      *
            OPEN    OUTPUT              RECE841-FILE
+           CLOSE                       RECE841-FILE
       *
            OPEN    OUTPUT              RECE851-FILE
+           CLOSE                       RECE851-FILE
+      *
+           OPEN    I-O                 RECE841-FILE
+      *
+           OPEN    I-O                 RECE851-FILE
       *
            .
        110-FILE-OPEN-EXT.
@@ -449,6 +437,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE851PARA-HOSPNUM
       *    主処理
       *****************************************************************
        200-MAIN-SEC                SECTION.
+      *
+           INITIALIZE                      WRK-JIDO-SETCOM-AREA
       *
            INITIALIZE                      RECE84-REC
            MOVE    RECE82-HOSPNUM      TO  RECE84-HOSPNUM
@@ -560,8 +550,16 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE851PARA-HOSPNUM
       *****************************************************************
        2001-KYUKYU-COMMENT-SEC          SECTION.
       *
+           INITIALIZE            WRK-JIDO-SETCOM-AREA
+           MOVE      "1"       TO     WRK-JIDO-SETCOMFLG
+           MOVE      301       TO     WRK-JIDO-SETCOMATFLG
+      *
            MOVE       RECE84-REC    TO   RECE841-REC
            ADD        1             TO   RECE841-MEISAISU
+           IF   WRK-JIDO-SETCOMFLG   =  "1"
+             MOVE  WRK-JIDO-SETCOMFLG
+                                    TO   RECE841-SETCOMFLG
+           END-IF
            WRITE      RECE841-REC
            ADD        1             TO   CNT-RECE84
       *
@@ -604,6 +602,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE851PARA-HOSPNUM
                                         TO  DAY-IDX
            MOVE     TBL-DAY(DAY-IDX)    TO  RECE851-NAME(2)(13:4)
       *
+           IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO
+             MOVE  "2"                  TO  RECE851-MEISKYFLG(2)
+             MOVE  WRK-JIDO-SETCOMATFLG TO  RECE851-SETCOMATFLG(2)
+           END-IF
+      *
            MOVE     "2"                 TO  RECE851-SIKFLG(2)
       *
            WRITE    RECE851-REC
@@ -617,6 +620,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE851PARA-HOSPNUM
       *    救急医療管理加算のコメント編集（２００６０４以降）
       *****************************************************************
        2001-KYUKYU-COMMENT200604-SEC          SECTION.
+      *
+           INITIALIZE            WRK-JIDO-SETCOM-AREA
+           MOVE      "1"       TO     WRK-JIDO-SETCOMFLG
+           MOVE      301       TO     WRK-JIDO-SETCOMATFLG
       *
            PERFORM     20011-NYU-DAY-SEC
       *
@@ -677,6 +684,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE851PARA-HOSPNUM
                  MOVE    TBL-DAY(DAY-IDX)
                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(19:4)
                END-IF
+               IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO
+                 MOVE  "2" TO  WRK-RECE85XX-MEISKYFLG(MAX-MEISAISU 1)
+                 MOVE  WRK-JIDO-SETCOMATFLG
+                           TO  WRK-RECE85XX-SETCOMATFLG(MAX-MEISAISU 1)
+               END-IF
                MOVE    "2"   TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
            END-PERFORM
       *
@@ -731,6 +743,10 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE851PARA-HOSPNUM
       *****************************************************************
        2001-SYODOU-COMMENT-SEC          SECTION.
       *
+           INITIALIZE            WRK-JIDO-SETCOM-AREA
+           MOVE      "1"       TO     WRK-JIDO-SETCOMFLG
+           MOVE      204       TO     WRK-JIDO-SETCOMATFLG
+      *
            MOVE       ZERO       TO   IDZ
            INITIALIZE            WRK-FREE-AREA2
       *
@@ -765,6 +781,11 @@ grpsys       PERFORM 900-DBSELECT-SEC
              MOVE    "tbl_syskanri"      TO  MCP-TABLE
              MOVE    "key10"             TO  MCP-PATHNAME
              PERFORM 900-CLOSE-SEC
+      *
+             IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO
+               MOVE  "2"                   TO  WK-FREE-MEISKYFLG2(IDZ)
+               MOVE  WRK-JIDO-SETCOMATFLG  TO  WK-FREE-SETCOMATFLG2(IDZ)
+             END-IF
       *
              PERFORM   VARYING   IDW   FROM   200   BY  -1
                         UNTIL    IDW   <   1
@@ -812,6 +833,10 @@ grpsys       PERFORM 900-DBSELECT-SEC
                              TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
                 MOVE   WK-FREE-NAME2(IDX)
                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+                MOVE   WK-FREE-MEISKYFLG2(IDX)
+                          TO  WRK-RECE85XX-MEISKYFLG(MAX-MEISAISU 1)
+                MOVE   WK-FREE-SETCOMATFLG2(IDX)
+                          TO  WRK-RECE85XX-SETCOMATFLG(MAX-MEISAISU 1)
                 MOVE    "2"  TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
            END-PERFORM
       *
@@ -890,6 +915,10 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            MOVE    RECE84-REC        TO      RECE841-REC
            MOVE    WRK-CNT-MEISAI    TO      RECE841-MEISAISU
+           IF   WRK-JIDO-SETCOMFLG   =  "1"
+             MOVE  WRK-JIDO-SETCOMFLG
+                                     TO      RECE841-SETCOMFLG
+           END-IF
            WRITE   RECE841-REC
            ADD     1                 TO      CNT-RECE84
       *

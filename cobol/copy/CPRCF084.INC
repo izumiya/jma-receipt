@@ -46,173 +46,218 @@
       *  04.05.03    NACL-門脇    12/04/10  改正対応項目追加
       *
       *  04.07.01    NACL-門脇    12/09/25  コメント差込項目追加
+      *  04.07.02    NACL-門脇    13/01/21  労災レセ電対応
+      *  04.07.03    NACL-門脇    13/02/12  労災レセ電対応
+      *                                     剤（点数）・剤（金額）
+      *                                     コード表用番号−区分番号追加
       ************************************************************
       *01  RECE84-REC.
            03  RECE84-KEY.
+               05  RECE84-KEY1.
       *医療機関ＩＤ
-               05  RECE84-HOSPNUM         PIC  9(02).
+                   07  RECE84-HOSPNUM     PIC  9(02).
       *診療年月
-               05  RECE84-SRYYM           PIC  9(06).
+                   07  RECE84-SRYYM       PIC  9(06).
       *入外区分
-               05  RECE84-NYUGAIKBN       PIC  X(01).
+                   07  RECE84-NYUGAIKBN   PIC  X(01).
       *患者ＩＤ
-               05  RECE84-PTID            PIC  9(10).
+                   07  RECE84-PTID        PIC  9(10).
       *レセプト科
-               05  RECE84-RECEKA          PIC  X(02).
+                   07  RECE84-RECEKA      PIC  X(02).
       *保険ＩＤ        
-               05  RECE84-HKNID           PIC  9(10).
+                   07  RECE84-HKNID       PIC  9(10).
       *適用開始年月日
-               05  RECE84-TEKSTYMD        PIC  X(08).
+                   07  RECE84-TEKSTYMD    PIC  X(08).
       *剤番号
                05  RECE84-ZAINUM          PIC  9(08).
       *診療区分
            03  RECE84-SRYKBN              PIC  X(02).
+      *
+           03  RECE84-DATA-AREA. 
+      *診療種別区分
+               05  RECE84-SRYSYUKBN           PIC  X(03).
       *剤識別区分
-           03  RECE84-ZAISKBKBN           PIC  X(01).
+               05  RECE84-ZAISKBKBN           PIC  X(01).
       *患者番号
-           03  RECE84-PTNUM               PIC  X(20).
+               05  RECE84-PTNUM               PIC  X(20).
       *診療科
-           03  RECE84-SRYKA               PIC  X(02).
+               05  RECE84-SRYKA               PIC  X(02).
       *保険組合せ番号
-           03  RECE84-HKNCOMBI            PIC  9(04).
+               05  RECE84-HKNCOMBI            PIC  9(04).
       *自保区分
-           03  RECE84-JIHOKBN             PIC  X(01).
+               05  RECE84-JIHOKBN             PIC  X(01).
       *剤点数
-           03  RECE84-ZAITEN              PIC  9(08).
+               05  RECE84-ZAITEN              PIC  9(08).
       *診療コード計
-           03  RECE84-SRYCDTOTAL          PIC  9(14).
+               05  RECE84-SRYCDTOTAL          PIC  9(14).
       *数量計
-           03  RECE84-SURYOUTOTAL         PIC  9(07)V9(05).
+               05  RECE84-SURYOUTOTAL         PIC  9(07)V9(05).
       *診療コード＊数量の累計
-           03  RECE84-RUIKEITOTAL         PIC  9(13)V9(05).
+               05  RECE84-RUIKEITOTAL         PIC  9(13)V9(05).
       *明細数
-           03  RECE84-MEISAISU            PIC  9(04).
+               05  RECE84-MEISAISU            PIC  9(04).
       *剤回数
-           03  RECE84-ZAIKAISU            PIC  9(04).
+               05  RECE84-ZAIKAISU            PIC  9(04).
       *手技点数１
-           03  RECE84-SYUTEN1             PIC  9(07).
+               05  RECE84-SYUTEN1             PIC  9(07).
       *手技点数２
-           03  RECE84-SYUTEN2             PIC  9(07).
+               05  RECE84-SYUTEN2             PIC  9(07).
       *薬剤点数
-           03  RECE84-YKZTEN              PIC  9(07).
+               05  RECE84-YKZTEN              PIC  9(07).
       *器材点数
-           03  RECE84-KIZAITEN            PIC  9(07).
+               05  RECE84-KIZAITEN            PIC  9(07).
       *ドクターコード
-           03  RECE84-DRCD                PIC  X(05).
+               05  RECE84-DRCD                PIC  X(05).
       *剤請求フラグ
-           03  RECE84-ZAIREQFLG           PIC  X(01).
+               05  RECE84-ZAIREQFLG           PIC  X(01).
       *逓減率
-           03  RECE84-TEIGENRATE          PIC  X(01).
+               05  RECE84-TEIGENRATE          PIC  X(01).
       *コメントコードフラグ
-           03  RECE84-COMCDFLG            PIC  X(01).
+               05  RECE84-COMCDFLG            PIC  X(01).
       *（サ）フラグ
-           03  RECE84-SAFLG               PIC  X(01).
+               05  RECE84-SAFLG               PIC  X(01).
       *投薬剤点０（１又は２（コメントのみ））
-           03  RECE84-TOYAKUFLG           PIC  X(01).
+               05  RECE84-TOYAKUFLG           PIC  X(01).
       *診療区分置き換えフラグ（自賠責リハ用）
-           03  RECE84-OKIKAEFLG           PIC  X(01).
+               05  RECE84-OKIKAEFLG           PIC  X(01).
       *療養病棟入院料剤点記載明細数
-           03  RECE84-RYOTENKISAISU       PIC  9(04).
+               05  RECE84-RYOTENKISAISU       PIC  9(04).
       *自賠責集計等取扱
-           03  RECE84-JIBAISYUKEIKBN      PIC  9(01).
+               05  RECE84-JIBAISYUKEIKBN      PIC  9(01).
+      *関係コメント存在フラグ
+               05  RECE84-SETCOMFLG           PIC  X(01).
       *剤区分
-           03  RECE84-ZAIKBN              PIC  9(03).
+               05  RECE84-ZAIKBN              PIC  9(03).
       *画像診断（２回目以降減算あり）
-           03  RECE84-GAZOGEN             PIC  X(01).
+               05  RECE84-GAZOGEN             PIC  X(01).
       *
       *リハビリ
-           03  RECE84-RIHABIRI-COMMENT    PIC  X(01).
+               05  RECE84-RIHABIRI-COMMENT    PIC  X(01).
       *リハビリ（心大血管疾患）
-           03  RECE84-SINDAI-COMMENT      PIC  X(01).
+               05  RECE84-SINDAI-COMMENT      PIC  X(01).
       *リハビリ（呼吸器）
-           03  RECE84-KOKYUKI-COMMENT     PIC  X(01).
+               05  RECE84-KOKYUKI-COMMENT     PIC  X(01).
       *リハビリ（脳血管疾患等）
-           03  RECE84-NOUKE-COMMENT       PIC  X(01).
+               05  RECE84-NOUKE-COMMENT       PIC  X(01).
       *リハビリ（運動器）
-           03  RECE84-UNDOKI-COMMENT      PIC  X(01).
+               05  RECE84-UNDOKI-COMMENT      PIC  X(01).
       *リハビリ（難病患者）
-           03  RECE84-NANBYO-COMMENT      PIC  X(01).
+               05  RECE84-NANBYO-COMMENT      PIC  X(01).
       *リハビリ（障害児（者））
-           03  RECE84-SYOGAI-COMMENT      PIC  X(01).
+               05  RECE84-SYOGAI-COMMENT      PIC  X(01).
       *リハビリ（摂食）
-           03  RECE84-SESSYOKU-COMMENT    PIC  X(01).
+               05  RECE84-SESSYOKU-COMMENT    PIC  X(01).
       *介達牽引
-           03  RECE84-KAITATU-COMMENT     PIC  X(01).
+               05  RECE84-KAITATU-COMMENT     PIC  X(01).
       *
       *薬剤管理指導料
-           03  RECE84-FLG-YAKUKAN-COMMENT PIC  X(01).
+               05  RECE84-FLG-YAKUKAN-COMMENT PIC  X(01).
       *入院栄養食事指導料
-           03  RECE84-FLG-NYUEIYO-COMMENT PIC  X(01).
+               05  RECE84-FLG-NYUEIYO-COMMENT PIC  X(01).
       *退院前訪問指導料
-           03  RECE84-FLG-HOUMON-COMMENT  PIC  X(01).
+               05  RECE84-FLG-HOUMON-COMMENT  PIC  X(01).
       *傷病手当金意見書交付料
-           03  RECE84-FLG-SYOBYO-COMMENT  PIC  X(01).
+               05  RECE84-FLG-SYOBYO-COMMENT  PIC  X(01).
       *療養費同意書交付料
-           03  RECE84-FLG-RYOYO-COMMENT   PIC  X(01).
+               05  RECE84-FLG-RYOYO-COMMENT   PIC  X(01).
       *退院時服薬指導加算を算定時の薬剤管理指導料
-           03  RECE84-FLG-TAIIN-COMMENT   PIC  X(01).
+               05  RECE84-FLG-TAIIN-COMMENT   PIC  X(01).
       *訪問看護指示料
-           03  RECE84-FLG-HOUSIJI-COMMENT PIC  X(01).
+               05  RECE84-FLG-HOUSIJI-COMMENT PIC  X(01).
       *手術（輸血は除く）
-           03  RECE84-FLG-SHUJUTU-COMMENT PIC  X(01).
+               05  RECE84-FLG-SHUJUTU-COMMENT PIC  X(01).
       *ＣＴ・ＭＲＩ
-           03  RECE84-FLG-CTMRI-COMMENT   PIC  X(01).
+               05  RECE84-FLG-CTMRI-COMMENT   PIC  X(01).
       *精神科退院前訪問指導料
-           03  RECE84-FLG-HOUSEI-COMMENT  PIC  X(01).
+               05  RECE84-FLG-HOUSEI-COMMENT  PIC  X(01).
       *精神科隔離病室管理加算（入院料加算）
-           03  RECE84-FLG-KAKURI-COMMENT  PIC  X(01).
+               05  RECE84-FLG-KAKURI-COMMENT  PIC  X(01).
       *労災治療計画加算（入院料加算）
-           03  RECE84-FLG-CHIRYO-COMMENT  PIC  X(01).
+               05  RECE84-FLG-CHIRYO-COMMENT  PIC  X(01).
       *在宅血液透析頻回指導管理料
-           03  RECE84-FLG-HINKAI-COMMENT  PIC  X(01).
+               05  RECE84-FLG-HINKAI-COMMENT  PIC  X(01).
       *酸素
-           03  RECE84-FLG-SANSO-COMMENT   PIC  X(01).
+               05  RECE84-FLG-SANSO-COMMENT   PIC  X(01).
       *初診（同日複数診療科）
-           03  RECE84-FLG-SYODOU-COMMENT  PIC  X(01).
-           03  RECE84-SYODOU-SRYKA-AREA.
-               05  RECE84-SYODOU-SRYKA    PIC  X(02)     OCCURS  10.
+               05  RECE84-FLG-SYODOU-COMMENT  PIC  X(01).
+               05  RECE84-SYODOU-SRYKA-AREA.
+                   07  RECE84-SYODOU-SRYKA    PIC  X(02)     OCCURS  10.
+      *検査等実施判断
+               05  RECE84-KNSJISKBN           PIC  9(01).
       *検査等実施判断グループ
-           03  RECE84-KNSJISGRPKBN        PIC  9(02).
+               05  RECE84-KNSJISGRPKBN        PIC  9(02).
       *往診・特別往診
-           03  RECE84-FLG-OSIN-COMMENT    PIC  X(01).
+               05  RECE84-FLG-OSIN-COMMENT    PIC  X(01).
       *在支援に関する診療
-           03  RECE84-FLG-ZAISIEN-COMMENT PIC  X(01).
+               05  RECE84-FLG-ZAISIEN-COMMENT PIC  X(01).
+      *レセ電用入院料加算フラグ
+               05  RECE84-NYUKSNFLG           PIC  9(01).
       *検査（ＢＮＰ、ＮＴ−ｐｒｏＢＮＰ、ＨＡＮＰ）
-           03  RECE84-FLG-KENSA-COMMENT   PIC  X(01).
+               05  RECE84-FLG-KENSA-COMMENT   PIC  X(01).
       *
       *介護支援連携指導料
-           03  RECE84-FLG-KAISIEN-COMMENT PIC  X(01).
+               05  RECE84-FLG-KAISIEN-COMMENT PIC  X(01).
       *集団栄養食事指導料
-           03  RECE84-FLG-SYUEIYO-COMMENT PIC  X(01).
+               05  RECE84-FLG-SYUEIYO-COMMENT PIC  X(01).
       *人工腎臓等
-           03  RECE84-FLG-JINZOU-COMMENT  PIC  X(01).
+               05  RECE84-FLG-JINZOU-COMMENT  PIC  X(01).
       *局所陰圧閉鎖処置
-           03  RECE84-FLG-KYOKUIN-COMMENT PIC  X(01).
+               05  RECE84-FLG-KYOKUIN-COMMENT PIC  X(01).
       *麻酔
-           03  RECE84-FLG-MASUI-COMMENT   PIC  X(01).
+               05  RECE84-FLG-MASUI-COMMENT   PIC  X(01).
       *栄養サポートチーム加算
-           03  RECE84-FLG-EISAPO-COMMENT  PIC  X(01).
+               05  RECE84-FLG-EISAPO-COMMENT  PIC  X(01).
       *呼吸ケアチーム加算
-           03  RECE84-FLG-KOKKEA-COMMENT  PIC  X(01).
+               05  RECE84-FLG-KOKKEA-COMMENT  PIC  X(01).
       *重症者加算（精神療養病棟入院料）
-           03  RECE84-FLG-JYUSYO-COMMENT  PIC  X(01).
+               05  RECE84-FLG-JYUSYO-COMMENT  PIC  X(01).
+      *
+      *画像診断フイルム
+               05  RECE84-FLG-FILM-COMMENT    PIC  X(01).
       *
       *介護職員等喀痰吸引等指示料
-           03  RECE84-FLG-KAISYOKU-COMMENT
+               05  RECE84-FLG-KAISYOKU-COMMENT
                                           PIC  X(01).
       *精神科ショート・ケア・精神科デイ・ケア
-           03  RECE84-FLG-SEIKEA-COMMENT  PIC  X(01).
+               05  RECE84-FLG-SEIKEA-COMMENT  PIC  X(01).
       *精神科リエゾンチーム加算
-           03  RECE84-FLG-SEIRIE-COMMENT  PIC  X(01).
+               05  RECE84-FLG-SEIRIE-COMMENT  PIC  X(01).
       *病棟薬剤業務実施加算
-           03  RECE84-FLG-BYOYAK-COMMENT  PIC  X(01).
+               05  RECE84-FLG-BYOYAK-COMMENT  PIC  X(01).
       *
       *在宅持続陽圧呼吸療法指導管理料
-           03  RECE84-FLG-YOUATU-COMMENT  PIC  X(01).
+               05  RECE84-FLG-YOUATU-COMMENT  PIC  X(01).
+      *
+      *手技毎の内容（手術・画像診断・処置）
+               05  RECE84-ACCTP-SYUGI-TBL-G.
+                   07    RECE84-ACCTP-SYUGI-TBL     OCCURS  5.
+      *手技開始コード
+                         09  RECE84-ACCTP-SRYCD     PIC X(09).
+      *手技点数
+                         09  RECE84-ACCTP-SYUTEN    PIC 9(07).
+      *薬剤点数
+                         09  RECE84-ACCTP-YKZTEN    PIC 9(07).
+      *その他器材点数（フィルム・酸素・窒素以外）
+                         09  RECE84-ACCTP-KIZAITEN  PIC 9(07).
+      *フィルム点数
+                         09  RECE84-ACCTP-FIRTEN    PIC 9(07).
+      *酸素点数
+               05  RECE84-ACCTP-SANSOTEN            PIC 9(07).
+      *窒素点数
+               05  RECE84-ACCTP-CHISOTEN            PIC 9(07).
+      *
+      *剤（点数）
+               05  RECE84-ZAI-TENSU                 PIC 9(09).
+      *剤（金額）
+               05  RECE84-ZAI-KINGAKU               PIC 9(09).
       *
       *日数回数テーブル
-           03  RECE84-DAY-AREA.
+               05  RECE84-DAY-AREA.
       *        診療回数テーブル（1:合計,2:１回,3:２回, 4:３回以上）
-             04  RECE84-DAY-TBL           OCCURS  4.
-                 05  RECE84-KAISUINF      OCCURS  31.
-                     07  RECE84-KAISU     PIC  9(03).
+                  07  RECE84-DAY-TBL           OCCURS  4.
+                      09  RECE84-KAISUINF      OCCURS  31.
+                          11  RECE84-KAISU     PIC  9(03).
+      *レセプト種別
+               05  RECE84-RECESYUBETU          PIC 9(04).
+      *コード表用番号−区分番号
+           03  RECE84-CDKBN-KBNNUM        PIC  9(03).

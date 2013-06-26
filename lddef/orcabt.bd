@@ -278,6 +278,15 @@ bind    "ORCBS02"       "OpenCOBOL";
 bind    "ORHCML13"      "OpenCOBOL";
 bind    "ORCBM560"      "OpenCOBOL";
 bind	"ORCBI202"	"OpenCOBOL";
+bind    "ORCR0550"      "OpenCOBOL";
+bind    "ORCR0551"      "OpenCOBOL";
+bind    "ORCR0552"      "OpenCOBOL";
+bind    "ORCR0555"      "OpenCOBOL";
+bind    "ORCR0980"      "OpenCOBOL";
+bind    "ORCR0981"      "OpenCOBOL";
+bind    "ORCR0982"      "OpenCOBOL";
+bind    "ORCR0985"      "OpenCOBOL";
+bind    "ORCBM700"      "OpenCOBOL";
 
 #include "orcadb.inc"
 db "shell" {

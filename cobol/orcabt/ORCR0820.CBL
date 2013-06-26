@@ -50,6 +50,7 @@
       *                                     履歴対応
       *
       *  04.07.01    NACL-門脇    11/09/07  労災請求書作成対応
+      *  04.07.02    NACL-門脇    13/01/21  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -173,6 +174,10 @@
            03  WRK-EDYMD.
                05  WRK-EDYM            PIC 9(06).
                05  WRK-EDDD            PIC 9(02).
+      *
+           03  WK-PTNYUINRRK-TENSTUYMD    PIC  X(08).
+           03  WK-PTNYUINRRK-TENSTUYMD2   PIC  X(08).
+           03  WK-PTNYUINRRK-TENNYUYMD    PIC  X(08).
       *
       *    病棟区分テーブル                                             
        01  WRK-BYOTOKBN-TABLE.                                          
@@ -369,7 +374,6 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
       *    労災レセプト回数取得
            IF    ( RECE82-HKNKBN     =   "1"  OR  "2" )
-      **>  AND   ( RECE82-ROUKAISU   =   "2"          )
              INITIALIZE                    LNK-ORCSROUKAISU-REC
              MOVE  RECE82-HOSPNUM      TO  LNK-ORCSROUKAISU-HOSPNUM
              MOVE  RECE82-NYUGAIKBN    TO  LNK-ORCSROUKAISU-NYUGAIKBN
@@ -410,10 +414,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
               IF   LNK-ORCSROUKAISU-RECEKAISU  =  1
                 MOVE   "1"               TO  RECE82-SYOKAIFLG
               END-IF
-              IF   RECE82-ROUKAISU   =   "2"
-                MOVE   LNK-ORCSROUKAISU-RECEKAISU
+              MOVE     LNK-ORCSROUKAISU-RECEKAISU
                                          TO  RECE82-RECEKAISU
-              END-IF
              END-IF
            END-IF
       *
@@ -433,6 +435,9 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE         SPACE       TO     WRK-RYOSTYMD
                                            WRK-RYOEDYMD
            MOVE         SPACE       TO     WRK-EDYMD
+      *
+           MOVE         SPACE       TO     WK-PTNYUINRRK-TENSTUYMD2
+           MOVE         SPACE       TO     WK-PTNYUINRRK-TENNYUYMD
       *
       *    月末日編集
            INITIALIZE                      STS-AREA-DAY
@@ -543,6 +548,42 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
            MOVE    "key23"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    病棟区分並替え
+      *
+           PERFORM    VARYING    IDX3    FROM    1    BY    1
+                       UNTIL    (IDX3                >   4   )
+                         OR     (WRK-BYOTOKBN(IDX3)  =  SPACE)
+             COMPUTE    IDX4  =  IDX3  +  1
+             PERFORM  VARYING    IDX5    FROM   IDX4  BY    1
+                       UNTIL    (IDX5                >   4   )
+                         OR     (WRK-BYOTOKBN(IDX5)  =  SPACE)
+                IF       WRK-BYOTOKBN(IDX3)  >
+                                           WRK-BYOTOKBN(IDX5)
+                   MOVE  WRK-BYOTOKBN(IDX3) TO  WRK-BYOTOKBN-DATA
+                   MOVE  WRK-BYOTOKBN(IDX5) TO  WRK-BYOTOKBN(IDX3)
+                   MOVE  WRK-BYOTOKBN-DATA  TO  WRK-BYOTOKBN(IDX5)
+                END-IF
+             END-PERFORM
+           END-PERFORM
+      *
+           MOVE    ZERO    TO    IDX4
+           PERFORM    VARYING    IDX3    FROM    1    BY    1
+                       UNTIL     IDX3     >      4
+             IF      RECE82-SRYYM     <=  "200609"
+                   MOVE    WRK-BYOTOKBN(IDX3)
+                                TO  RECE82-BYOTOKBN(IDX3)
+             ELSE
+               EVALUATE  WRK-BYOTOKBN(IDX3)
+                 WHEN     "01"
+                 WHEN     "02"
+                 WHEN     "07"
+                   ADD     1    TO  IDX4
+                   MOVE    WRK-BYOTOKBN(IDX3)
+                                TO  RECE82-BYOTOKBN(IDX4)
+               END-EVALUATE
+             END-IF
+           END-PERFORM
       *
            .
        2101-RECE88-HENSYU-EXT.
@@ -680,6 +721,36 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *    病棟番号・種別セット                                              
       *****************************************************************
        210112-BYOTOKBN-SET-SEC        SECTION. 
+      *
+      *    異動による転室等の場合は転出日を前日に置き換える
+           MOVE    SPACE     TO     WK-PTNYUINRRK-TENSTUYMD
+           IF      PTNYUINRRK-TENSTUYMD  =  PTNYUINRRK-TAIINYMD
+             MOVE  PTNYUINRRK-TENSTUYMD  TO  WK-PTNYUINRRK-TENSTUYMD
+             IF  (WK-PTNYUINRRK-TENSTUYMD2     NOT =  SPACE  )
+             AND (WK-PTNYUINRRK-TENSTUYMD(1:6) NOT = "999999")
+             AND (WK-PTNYUINRRK-TENSTUYMD  =
+                                     WK-PTNYUINRRK-TENSTUYMD2)
+               INITIALIZE                       STS-AREA-DAY
+               INITIALIZE                       LNK-DAY6-AREA
+               MOVE    "61"                 TO  LNK-DAY6-IRAI
+               MOVE   PTNYUINRRK-TENSTUYMD  TO  LNK-DAY6-KIJUN
+               MOVE    "1"                  TO  LNK-DAY6-ZOGENPTN
+               MOVE    -1                   TO  LNK-DAY6-ZOGEN
+               CALL  "ORCSDAY"              USING   STS-AREA-DAY
+                                                    LNK-DAY6-AREA
+               MOVE   LNK-DAY6-KEISAN    TO  WK-PTNYUINRRK-TENSTUYMD
+             END-IF
+           ELSE
+             INITIALIZE                         STS-AREA-DAY
+             INITIALIZE                         LNK-DAY6-AREA
+             MOVE      "61"                 TO  LNK-DAY6-IRAI
+             MOVE     PTNYUINRRK-TENSTUYMD  TO  LNK-DAY6-KIJUN
+             MOVE      "1"                  TO  LNK-DAY6-ZOGENPTN
+             MOVE      -1                   TO  LNK-DAY6-ZOGEN
+             CALL    "ORCSDAY"              USING   STS-AREA-DAY
+                                                    LNK-DAY6-AREA
+             MOVE     LNK-DAY6-KEISAN    TO  WK-PTNYUINRRK-TENSTUYMD
+           END-IF
       *                       
       *    病棟情報                                           
            MOVE    SPACE                 TO  SYSKANRI-REC     
@@ -692,6 +763,33 @@ grpsys     MOVE    SPA-HOSPNUM           TO  SYS-HOSPNUM
            PERFORM 900-SYSKANRI-READ-SEC                      
            IF      FLG-SYSKANRI        =   ZERO               
                MOVE  MCPDATA-REC           TO  SYS-5001-REC     
+      *
+               IF ( WK-PTNYUINRRK-TENSTUYMD(1:6) <   RECE82-SRYYM  )
+               OR ( PTNYUINRRK-TENNYUYMD(1:6)    >   RECE82-SRYYM  )
+               OR ((PTNYUINRRK-TENNYUYMD = WK-PTNYUINRRK-TENNYUYMD) AND
+                   (WK-PTNYUINRRK-TENNYUYMD  NOT =   SPACE        ))
+                 CONTINUE
+               ELSE
+                 IF  SYS-5001-RECEDSPKBN  =  SPACE
+                   CONTINUE
+                 ELSE
+                   PERFORM  VARYING  IDX3  FROM  1  BY  1
+                             UNTIL  (IDX3    >       4              )
+                               OR   (WRK-BYOTOKBN(IDX3)
+                                             =   SYS-5001-RECEDSPKBN)
+                     IF     WRK-BYOTOKBN(IDX3)  =  SPACE
+                       MOVE    SYS-5001-RECEDSPKBN
+                                       TO   WRK-BYOTOKBN(IDX3)
+                       MOVE    4       TO   IDX3
+                     END-IF
+                   END-PERFORM
+                 END-IF
+                 MOVE   WK-PTNYUINRRK-TENSTUYMD   TO
+                                        WK-PTNYUINRRK-TENSTUYMD2
+                 MOVE   PTNYUINRRK-TENNYUYMD      TO
+                                        WK-PTNYUINRRK-TENNYUYMD
+               END-IF
+      *
       *        病棟番号・種別
                MOVE    RECE82-SRYYM        TO  WRK-SRYYYMM
                PERFORM VARYING IDX3    FROM    1   BY  1

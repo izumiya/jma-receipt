@@ -16,117 +16,18 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION          DIVISION.
-       PROGRAM-ID.             ORCR0430.
+       PROGRAM-ID.             ORCR0551.
       *****************************************************************
       *  ¥·¥¹¥Æ¥àÌ¾        : £Ï£Ò£Ã£Á
       *  ¥µ¥Ö¥·¥¹¥Æ¥àÌ¾    : ¥ì¥»¥×¥È¡ÊÏ«ºÒ¡¦¼«ÇåÀÕ¡Ë
       *  ¥³¥ó¥Ý¡¼¥Í¥ó¥ÈÌ¾  : ·î¼¡¶ÈÌ³¡¡Ï«ºÒ¼«ÇåÀÕÌÀºÙ½ñ¥Õ¥¡¥¤¥ëºîÀ®
-      *                      ¥³¥á¥ó¥ÈÊÔ½¸¡ÊÏ«ºÒ¡¦¼«ÇåÀÕ¡Ë
+      *                      ¥³¥á¥ó¥ÈÊÔ½¸¡ÊÏ«ºÒ¡¦¼«ÇåÀÕ¡Ë¡Ê¥ì¥»ÅÅÍÑ¡Ë
       *  ´ÉÍý¼Ô            : 
       *  ºîÀ®ÆüÉÕ    ºî¶È¼Ô        µ­½Ò
-      *  02/07/01    MCC-ÌçÏÆ¡¡    ¿·µ¬ºîÀ®
+      *  13/02/12    NACL¡ÝÌçÏÆ    ¿·µ¬ºîÀ®
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
-      *  01.00.01    NACL-ÌçÏÆ    02.09.18  ¼«ÇåÀÕÂÐ±þ¡¡¡¡¡¡¡¡¡¡¡¡
-      *  01.00.02    NACL-ÌçÏÆ    02.11.29  Ê£¿ô¿ÇÎÅ²Ê¼õ¿Ç¤Î
-      *                                     ¥³¥á¥ó¥Èº¹¹þ¤ß
-      *  01.00.03    NACL-ÌçÏÆ    03.02.04  ºÞ¤Þ¤È¤áÂÐ±þÅù
-      *  01.00.04    NACL-ÌçÏÆ    03.02.06  ¥³¥á¥ó¥È¥«¥¦¥ó¥È¥Õ¥é¥°¤Ç¤Î
-      *                                     È½ÄêÄÉ²Ã
-      *  01.00.05    NACL-ÌçÏÆ    03.03.03  ºÞÈÖ¹æ·å½¤ÀµÂÐ±þ
-      *  01.00.06    NACL-ÌçÏÆ    03.03.12  £Ã£Ô¡¦£Í£Ò£É¤Î¼Â»ÜÆüÄÉ²Ã
-      *  01.00.07    NACL-ÌçÏÆ    03.04.04  ½ýÉÂ¼êÅö¶â°Õ¸«½ñ¸òÉÕÎÁ¤Î¸òÉÕÆüÊÔ½¸
-      *                                     ÎÅÍÜÈñÆ±°Õ½ñ¸òÉÕÎÁ¤Î¸òÉÕÆüÊÔ½¸
-      *  01.00.08    NACL-ÌçÏÆ    03.04.24  Í¢·ì¤Ï¥³¥á¥ó¥ÈÊÔ½¸ÂÐ¾Ý³°¤È¤¹¤ë
-      *  01.00.09    NACL-ÌçÏÆ    03.05.28  ¼õ¿ÇÍúÎò¥­¡¼¤ÎÊÑ¹¹
-      *  01.00.10    NACL-ÌçÏÆ    03.06.19  Ê£¿ô¿ÇÎÅ²Ê¼õ¿Ç¤ÎÊÔ½¸½¤Àµ
-      *  01.00.11    NACL-ÌçÏÆ    03.09.24  ¥³¥á¥ó¥ÈÊÔ½¸½¤Àµ
-      *  01.00.12    NACL-ÌçÏÆ    03.09.29  ¥³¥á¥ó¥ÈÊÔ½¸½¤Àµ
-      *  £²£°£°£´Ç¯£´·î²þÀµÂÐ±þ
-      *  01.01.01    NACL-ÌçÏÆ    04.04.01  ¥ê¥Ï¸À¸ìÄ°³ÐÎÅË¡¡Ê£³¡ËÄÉ²ÃÂÐ±þ
-      *  01.01.02    NACL-ÌçÏÆ    04.04.05  ºßÂð·ì±ÕÆ©ÀÏÉÑ²ó»ØÆ³´ÉÍýÎÁ¤Î
-      *                                     ¥³¥á¥ó¥ÈÂÐ±þ
-      *  01.01.03    NACL-ÌçÏÆ    04.04.10  ºßÂð´µ¼ÔË¬ÌäÅÀÅ©Ãí¼Í´ÉÍý»ØÆ³ÎÁ
-      *                                     »»Äê»þ¤ÎÅÀÅ©Ãí¼Í¤Î¥³¥á¥ó¥ÈÂÐ±þ
-      *  01.01.04    NACL-ÌçÏÆ    04.04.15  Ç¾·ì´É¼À´µµÞÀ­È¯¾ÉÆü¤Î¥³¥á¥ó¥È
-      *                                     ÂÐ±þ
-      *  01.01.05    NACL-ÌçÏÆ    04.06.07  ¥³¥Ô¡¼¶ç£°£´£µÊÑ¹¹¤ËÈ¼¤¦½¤Àµ
-      *  01.01.06    NACL-ÌçÏÆ    04.07.30  Æ±ÆüÊ£¿ôºÆ¿Ç¤Î¥³¥á¥ó¥È½¤Àµ
-      *  Ãæ»ß½èÍýÄÉ²Ã
-      *  01.02.01    NACL-Æ£¸¶    04/10/13  Ãæ»ß½èÍý¤ÎÄÉ²Ã
-      *  01.02.02    NACL-ÌçÏÆ    04/12/09  Ç¾·ì´É¼À´µµÞÀ­È¯¾É½ªÎ»ÆüÂÐ±þ
-      *  01.02.03    NACL-ÌçÏÆ    05/01/18  »ÀÁÇ·×»»¼°¥³¥á¥ó¥ÈÂÐ±þ
-      *  01.02.04    NACL-ÌçÏÆ    05/04/20  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸ÂÐ±þ
-      *  01.02.05    NACL-ÌçÏÆ    05/05/10  Ç¾·ì´É¼À´µµÞÀ­È¯¾ÉÉÂÌ¾µ­ºÜÂÐ±þ
-      *  01.02.06    NACL-ÌçÏÆ    05/08/22  ¥ê¥Ï¥Ó¥ê¼Â»Ü²ó¿ôº¹¤·¹þ¤ß½¤ÀµÂÐ±þ
-      *  01.02.07    NACL-ÌçÏÆ    05/08/31  ¼«ÇåÀÕ½¾ÍèÍÍ¼°ÂÐ±þ
-      *  01.02.08    NACL-ÌçÏÆ    05/11/01  ¡Ê¸¡Áª¡ËÅù¥³¥á¥ó¥ÈÂÐ±þ
-      *  01.02.09    NACL-ÌçÏÆ    05/11/15  ½ýÉÂ¼êÅö¶â¡¢ÎÅÍÜÈñÆ±°Õ½ñ¤Î¼«Æ°
-      *                                     µ­ºÜÊÔ½¸½¤Àµ
-      *  02.09.01    NACL-ÌçÏÆ    06/04/13  £²£°£°£¶Ç¯£´·î²þÀµÂÐ±þ
-      *  02.09.02    NACL-ÌçÏÆ    06/04/28  ¥ê¥Ï¸¡º÷¾ò·ï½¤Àµ
-      *  02.09.03    NACL-ÌçÏÆ    06/05/01  ¥ê¥ÏÈ¯¾ÉÆüÅö·îÊ¬µ­ºÜ½¤Àµ
-      *  02.09.04    NACL-ÌçÏÆ    05/05/10  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
-      *  02.09.05    NACL-ÌçÏÆ    06/05/30  ¥ê¥ÏÈ¯¾ÉÆüµ­ºÜ½¤Àµ
-      *  03.01.01    NACL-ÌçÏÆ    06/06/22  ±ý¿Ç¡¢ºßÂð´µ¼ÔË¬Ìä¿ÇÎÅÎÁ¤Î
-      *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜÂÐ±þ
-      *  03.01.02    NACL-ÌçÏÆ    06/07/10  ºß»Ù±ç¥³¥á¥ó¥È¼«Æ°µ­ºÜÂÐ±þ
-      *  03.01.03    NACL-ÌçÏÆ    06/07/14  ¿ÇÎÅ¶èÊ¬ÃÖ¤­´¹¤¨¥Õ¥é¥°¤ÎÊÔ½¸
-      *  03.02.01    NACL-ÌçÏÆ    06/08/01  ¥ê¥ÏÈ¯¾ÉÆüµ­ºÜ½¤Àµ
-      *  03.02.02    NACL-ÌçÏÆ    06/09/07  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
-      *  03.03.01    NACL-ÌçÏÆ    06/11/10  ±ý¿Ç¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜ¾ò·ï½¤Àµ
-      *  03.04.01    NACL-ÌçÏÆ    06/12/01  ¼«ÇåÀÕ·òÊÝ½àµòÂÐ±þ
-      *  03.04.02    NACL-ÌçÏÆ    07/01/12  ¥ê¥Ï¥Ó¥êÈ¯¾É½ªÎ»ÆüÂÐ±þ
-      *  03.04.03    NACL-ÌçÏÆ    07/01/15  ¥ê¥Ï¥Ó¥ê¼ê½ÑÆü¡¦µÞÀ­Áý°­Æüµ­ºÜÂÐ±þ
-      *  03.04.04    NACL-ÌçÏÆ    07/03/05  »ÀÁÇ·×»»¼°½¤Àµ
-      *  03.04.05    NACL-ÌçÏÆ    07/04/13  ¥ê¥Ï¥Ó¥êÂÐ±þ
-      *
-      *  03.05.01    NACL-ÌçÏÆ    07/05/25  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
-      *  03.05.02    NACL-Æ£¸¶    07/06/01  realtime preview ½èÍýÄÉ²Ã
-      *  03.05.03    NACL-ÌçÏÆ    07/06/26  ¼«ÇåÀÕÊ¿À®£±£¹Ç¯£´·î²þÀµÍÍ¼°ÂÐ±þ
-      *  03.05.04    NACL-ÌçÏÆ    07/08/07  »»ÄêÍúÎò¤Ë´Ø¤ï¤ëµ­ºÜ½¤Àµ
-      *  04.01.01    NACL-ÌçÏÆ    07/10/31  ¸øÌ³ºÒ³²ÂÐ±þ
-      *  04.01.02    NACL-ÌçÏÆ    07/11/26  ÆÃÄê´ïºà¾¦ÉÊÌ¾µ­ºÜÂÐ±þ
-      *  04.02.01    NACL-ÌçÏÆ    08/03/24  Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
-      *                                     ¡Ê¿ÇÎÅ¶èÊ¬£¶£´¡§ÉÂÍý¿ÇÃÇÂÐ±þ¡Ë
-      *                                     ¡Ê¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ
-      *                                       ¤Î¼«Æ°µ­ºÜÂÐ±þ¡Ë
-      *                                     ¡Êºß»ÙÉÂ¼«Æ°µ­ºÜÂÐ±þ¡Ë
-      *  04.02.02    NACL-ÌçÏÆ    08/10/14  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
-      *
-      *  04.03.01    NACL-ÌçÏÆ    08/11/04  ¥ê¥Ï¥Ó¥êÈ¯¾ÉÆüÇ¯·îÆüÂÐ±þ
-      *  04.03.02    NACL-ÌçÏÆ    08/12/22  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
-      *
-      *  04.04.01    NACL-ÌçÏÆ    09/02/04  ¸¡ºº¤Î¥³¥á¥ó¥È¼«Æ°µ­ºÜÂÐ±þ
-      *  04.04.02    NACL-ÌçÏÆ    10/03/23  Æ±ÆüÅÅÏÃºÆ¿Ç¤Î²ó¿ôµ­ºÜÂÐ±þ
-      *  04.04.03    NACL-ÌçÏÆ    10/04/06  ²þÀµÂÐ±þ
-      *                                     ¡Ê¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ë
-      *  04.04.04    NACL-ÌçÏÆ    10/04/23  ºßÂð·ì±ÕÆ©ÀÏÉÑ²ó»ØÆ³´ÉÍýÎÁ¤Î
-      *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
-      *
-      *  04.05.01    NACL-Æ£¸¶    09/07/14  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
-      *  04.05.02    NACL-ÌçÏÆ    09/08/17  ¾®¿ôÅÀ°Ê²¼£µ·åÂÐ±þ
-      *  04.05.03    NACL-ÌçÏÆ    09/11/25  ¥ê¥Ï¥Ó¥ê¥³¥á¥ó¥ÈÂÐ±þ
-      *  04.05.04    NACL-ÌçÏÆ    10/11/10  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
-      *  04.05.05    NACL-ÌçÏÆ    10/12/03  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
-      *  04.05.06    NACL-ÌçÏÆ    11/10/11  ÆâÉþÌôºÞÄþ¸ºÊÔ½¸½¤Àµ
-      *  04.05.07    NACL-ÌçÏÆ    12/04/02  Ê¿À®£²£´Ç¯£´·î²þÀµ
-      *                                     ¥³¥á¥ó¥Èº¹¹þ
-      *  04.05.08    NACL-ÌçÏÆ    12/05/25  ¥ê¥Ï¥Ó¥ê³«»ÏÆüµ­ºÜ½¤Àµ
-      *  04.05.09    NACL-ÌçÏÆ    12/11/05  ¥ê¥Ï¥Ó¥ê³«»ÏÆü¤ÈÆ±°ìºÞ¤Î¥³¥á¥ó¥È
-      *                                     £°£°£¸£µ¡¦£°£°£¸£¶¤Ç»Ï¤Þ¤ë¥³¥á¥ó¥È
-      *                                     ¤òµ­ºÜÂÐ¾Ý³°¤È¤¹¤ë¡£
-      *  04.05.10    NACL-ÌçÏÆ    13/01/22  ¥ï¡¼¥¯ÎÎ°è³ÈÄ¥
-      *
-      *  04.06.01    NACL-ÌçÏÆ    10/07/02  ¾®»ùÆÃÄê¼À´µ¥«¥¦¥ó¥»¥ê¥ó¥°ÎÁ¤Î
-      *                                     ¥ì¥»¥×¥È¥³¥á¥ó¥È¼«Æ°µ­ºÜ¡Ê½ÅÊ£»þ¡Ë
-      *                                     ÂÐ±þ
-      *
-      *  04.07.01    NACL-ÌçÏÆ    10/09/12  Ê£¿ô¥ê¥Ï¥Ó¥ê³«»ÏÆü¡¦¥ê¥Ï¥Ó¥ê
-      *                                     ¥³¥á¥ó¥È¤ÎÂÐ±þ
-      *  04.07.02    NACL-ÌçÏÆ    12/09/25  ¥³¥á¥ó¥Èº¹¹þÂÐ±þ¡ÊºßÂð»ýÂ³ÍÛ°µ¡Ë
-      *  04.07.03    NACL-ÌçÏÆ    13/01/21  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -175,6 +76,12 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE459-KEY
                                    FILE    STATUS  IS  STS-RECE459.
+      *
+           SELECT  RECE455-FILE    ASSIGN  RECE455PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  DYNAMIC
+                                   RECORD  KEY     IS  RECE455-KEY
+                                   FILE    STATUS  IS  STS-RECE455.
       *    ¥¨¥é¡¼¥Õ¥¡¥¤¥ë
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
                                    FILE    STATUS  IS  STS-RECEERR.
@@ -196,8 +103,7 @@
       *
        FD  RECE441-FILE.
        01  RECE441-REC. 
-           COPY    "CPRCF044.INC"  REPLACING   //RECE44//
-                                   BY          //RECE441//.
+           COPY    "CPRCF0441.INC".
       *
        FD  RECE451-FILE.
        01  RECE451-REC. 
@@ -206,13 +112,17 @@
       *¥ï¡¼¥¯
        FD  RECE449-FILE.
        01  RECE449-REC. 
-           COPY    "CPRCF044.INC"  REPLACING   //RECE44//
+           COPY    "CPRCF0441.INC" REPLACING   //RECE441//
                                    BY          //RECE449//.
       *
        FD  RECE459-FILE.
        01  RECE459-REC. 
            COPY    "CPRCF045.INC"  REPLACING   //RECE45//
                                    BY          //RECE459//.
+      *
+       FD  RECE455-FILE.
+       01  RECE455-REC. 
+           COPY    "CPRCF0455.INC".
       *
       *    ¥¨¥é¡¼¥Õ¥¡¥¤¥ë
        FD  RECEERR-FILE.
@@ -248,6 +158,10 @@
                                    REPLACING  //RECEDAT1//
                                    BY         //RECE459//.
       *
+           COPY    "CPRECEDAT1.INC"
+                                   REPLACING  //RECEDAT1//
+                                   BY         //RECE455//.
+      *
       *    ¥¨¥é¡¼¥Õ¥¡¥¤¥ë Ì¾¾ÎÎÎ°è 
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
@@ -261,6 +175,7 @@
            03  STS-RECE451         PIC X(02).
            03  STS-RECE449         PIC X(02).
            03  STS-RECE459         PIC X(02).
+           03  STS-RECE455         PIC X(02).
            03  STS-RECEERR         PIC X(02).
       *
       *    ¥Õ¥é¥°ÎÎ°è
@@ -268,8 +183,10 @@
            03  FLG-END             PIC 9(01).
            03  FLG-RECE44          PIC 9(01).
            03  FLG-RECE449         PIC 9(01).
+           03  FLG-RECE441         PIC 9(01).
            03  FLG-RECE45          PIC 9(01).
            03  FLG-RECE459         PIC 9(01).
+           03  FLG-RECE451         PIC 9(01).
            03  FLG-WRKRECE45       PIC 9(01).
            03  FLG-SHIDOU-COMMENT  PIC 9(01).
            03  FLG-HINKAI-COMMENT  PIC 9(01).
@@ -301,6 +218,10 @@
                                    PIC 9(01).
            03  FLG-TAKYO-HENSYU    PIC 9(01).
            03  FLG-OK              PIC 9(01).
+           03  FLG-SETCOM          PIC 9(01).
+           03  FLG-MEISKY-OKIKAE   PIC 9(01).
+           03  FLG-SETCOM-OKIKAE   PIC 9(01).
+           03  FLG-HANTEI          PIC 9(01).
            03  FLG-GAIKAN          PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
@@ -310,14 +231,15 @@
            03  CNT-RECE45          PIC 9(06).
            03  CNT-RECE449         PIC 9(06).
            03  CNT-RECE459         PIC 9(06).
+           03  CNT-RECE455         PIC 9(06).
+           03  CNT-RECE44-RE       PIC 9(06).
+           03  CNT-RECE45-RE       PIC 9(06).
            03  CNT-RIHA            PIC 9(06).
            03  CNT-JUSHIN          PIC 9(06).
            03  CNT-SANTEIKA        PIC 9(06).
            03  CNT-DOUJITU         PIC 9(06).
            03  CNT-DENWA           PIC 9(06).
            03  CNT-DOUDEN          PIC 9(06).
-           03  CNT-IN-COMMIT       PIC 9(06).
-           03  CNT-IN-CANCEL       PIC 9(06).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -340,6 +262,7 @@
            03  IDX17               PIC 9(04).
            03  IDX18               PIC 9(04).
            03  IDX19               PIC 9(01).
+           03  IDX20               PIC 9(02).
            03  IDX21               PIC 9(04).
            03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
@@ -378,7 +301,6 @@
            03  WRK-KETA-TAIHI      PIC 9(04).
            03  WRK-KETA2           PIC 9(04).
            03  WRK-ZAINUM          PIC 9(08).
-           03  WRK-RECEERR         PIC X(200).
       *
            03  WRK-FSANTEIYMD      PIC 9(08).
            03  WRK-AFTER2          PIC 9(08).
@@ -474,8 +396,43 @@
                05  WRK-CHAR-N-CNT            PIC 9(01).
                05  WRK-CHAR-IDX              PIC 9(01).
       *
+           03  WRK-HEN-RENNUM                PIC 9(02).
+           03  WRK-HEN-SHORI-RENNUM          PIC 9(01).
+           03  WRK-HEN-SEQNO                 PIC 9(02).
+      *
+           03  WRK-HEN-RENNUM-X              PIC 9(02).
+           03  WRK-HEN-SHORI-RENNUM-X        PIC 9(01).
+           03  WRK-HEN-SEQNO-X               PIC 9(02).
+      *
+           03  WRK-HEN-RENNUM-J              PIC 9(02).
+           03  WRK-HEN-SHORI-RENNUM-J        PIC 9(01).
+           03  WRK-HEN-SEQNO-J               PIC 9(02).
+      *
+           03  WRK-HEN-RENNUM-J2             PIC 9(02).
+           03  WRK-HEN-SHORI-RENNUM-J2       PIC 9(01).
+           03  WRK-HEN-SEQNO-J2              PIC 9(02).
+      *
+           03  WRK-TAIHI-SRYYMD.
+               05  WRK-TAIHI-SRYYM           PIC 9(06).
+               05  WRK-TAIHI-SRYD            PIC 9(02).
+      *
            03  WRK-TENSU-SRYCD               PIC X(09).
            03  WRK-TENSU-SRYYM               PIC X(06).
+      *
+           03  WRK-ZAIKAISUX                 PIC Z9.
+           03  WRK-TNSKAI                    PIC X(10).
+      *
+       01  WRK-ERR-AREA.
+           03  WRK-RECEERR             PIC X(200).
+           03  WRK-ERRMSG              PIC X(300).
+           03  WRK-MCP-RC              PIC 9(9).
+           03  WRK-ERR-FILE-STS        PIC X(02).
+           03  WRK-ERR-FILE-MSG        PIC X(100).
+           03  WRK-ERR-FILE-MSG1       PIC X(17).
+           03  WRK-ERR-FLG             PIC 9(01).
+      *    ¥¨¥é¡¼¥Õ¥¡¥¤¥ëÌ¾¾ÎÎÎ°è 
+           COPY    "CPRECEDAT1.INC"    REPLACING  //RECEDAT1PARA//
+                                       BY         //WRK-ERR-FILE-NM//.
       *
        01  WRK-RECE44-REC. 
            COPY    "CPRCF044.INC"  REPLACING   //RECE44//
@@ -636,6 +593,10 @@
            03  CONS-NINSEN          PIC X(09) VALUE "113014610".
       *    ²ð¸î¿¦°÷ÅùÓ½áâµÛ°úÅù»Ø¼¨ÎÁ
            03  CONS-KAISYOKU        PIC X(09) VALUE "114020910".
+      *
+      *    µßµÞ°åÎÅ´ÉÍý²Ã»»
+           03  CONS-KYUKYU          PIC X(09) VALUE "101110030".
+           03  CONS-KYUKYU2         PIC X(09) VALUE "101800890".
       *
       *    Ê£¿ô¿ÇÎÅ²Ê¼õ¿Ç¤ÎÂàÈò¥Æ¡¼¥Ö¥ë
        01  TBL-JUSHIN-INF.
@@ -873,11 +834,7 @@
       *
            PERFORM 300-END-SEC
       *
-           IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
-               STOP    RUN
-           ELSE
-               EXIT    PROGRAM
-           END-IF 
+           STOP    RUN
            .
       *****************************************************************
       *    ½é´ü¡¡½èÍý
@@ -894,19 +851,15 @@
       *
            PERFORM 110-FILE-OPEN-SEC
       *
-           IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
-               PERFORM 120-DBOPEN-SEC
+           PERFORM 120-DBOPEN-SEC
       *
-      *        ¥¹¥Æ¥Ã¥×´ÉÍý³«»Ï½èÍý
-               MOVE    "STS"           TO  SJOBKANRI-MODE
-               INITIALIZE                  JOBKANRI-REC
-               MOVE    "ORCR0430"      TO  JOB-PGID
-               MOVE    "¥³¥á¥ó¥ÈÊÔ½¸¡ÊÏ«ºÒ¡¦¼«ÇåÀÕ¡Ë" 
-                                       TO  JOB-SHELLMSG
-grpsys         PERFORM 900-CALL-ORCSJOB-SEC
-      *        ½èÍýÃæ»ßÀßÄê½èÍý
-               PERFORM 500-CANCEL-HENSYU-SEC
-           END-IF
+      *    ¥¹¥Æ¥Ã¥×´ÉÍý³«»Ï½èÍý
+           MOVE    "STS"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           MOVE    "ORCR0551"      TO  JOB-PGID
+           MOVE    "¥³¥á¥ó¥ÈÊÔ½¸¡ÊÏ«ºÒ¡¦¼«ÇåÀÕ¡Ë¡Ê¥ì¥»ÅÅÍÑ¡Ë" 
+                                   TO  JOB-SHELLMSG
+           PERFORM 900-CALL-ORCSJOB-SEC
       *    
            PERFORM 990-RECE41-READ-SEC
            .
@@ -928,37 +881,71 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            MOVE    "RECE410"           TO  RECE41PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE41PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE41PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE41PARA-HOSPNUM
       *
-           MOVE    "RECE44W"           TO  RECE44PARA-FILE-ID
+           MOVE    "RECE44E"           TO  RECE44PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE44PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE44PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE44PARA-HOSPNUM
       *
-           MOVE    "RECE450"           TO  RECE45PARA-FILE-ID
+           MOVE    "RECE45C"           TO  RECE45PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE45PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE45PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE45PARA-HOSPNUM
       *
-           MOVE    "RECE44A"           TO  RECE441PARA-FILE-ID
+           MOVE    "RECE44F"           TO  RECE441PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE441PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE441PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE441PARA-HOSPNUM
       *
-           MOVE    "RECE45A"           TO  RECE451PARA-FILE-ID
+           MOVE    "RECE45F"           TO  RECE451PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE451PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE451PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE451PARA-HOSPNUM
       *
-           MOVE    "RECE44Y"           TO  RECE449PARA-FILE-ID
+           MOVE    "RECE44G"           TO  RECE449PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE449PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE449PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE449PARA-HOSPNUM
       *
-           MOVE    "RECE45Y"           TO  RECE459PARA-FILE-ID
+           MOVE    "RECE45G"           TO  RECE459PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE459PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE459PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE459PARA-HOSPNUM
+      *
+           MOVE    "RECE456"           TO  RECE455PARA-FILE-ID
+           MOVE    WRK-PARA-TERMID     TO  RECE455PARA-TERMID
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE455PARA-HOSPNUM
       *
            OPEN    INPUT               RECE41-FILE
+           IF      STS-RECE41          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    1                   TO  WRK-ERR-FLG
+               MOVE    RECE41PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE41          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
       *
            OPEN    INPUT               RECE44-FILE
+           IF      STS-RECE44          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    1                   TO  WRK-ERR-FLG
+               MOVE    RECE44PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE44          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
       *
            OPEN    INPUT               RECE45-FILE
+           IF      STS-RECE45          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    1                   TO  WRK-ERR-FLG
+               MOVE    RECE45PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE45          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
       *
            OPEN    OUTPUT              RECE441-FILE
            CLOSE                       RECE441-FILE
@@ -972,11 +959,16 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE459PARA-HOSPNUM
            OPEN    OUTPUT              RECE459-FILE
            CLOSE                       RECE459-FILE
       *
+           OPEN    OUTPUT              RECE455-FILE
+           CLOSE                       RECE455-FILE
+      *
            OPEN    I-O                 RECE441-FILE
            OPEN    I-O                 RECE449-FILE
       *
            OPEN    I-O                 RECE451-FILE
            OPEN    I-O                 RECE459-FILE
+      *
+           OPEN    OUTPUT              RECE455-FILE
       *
            .
        110-FILE-OPEN-EXT.
@@ -1287,11 +1279,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE459PARA-HOSPNUM
              MOVE    RECE41-SRYYM        TO  SYS-1005-STYUKYMD(1:6)
              MOVE    "01"                TO  SYS-1005-STYUKYMD(7:2)
              MOVE    SYS-1005-STYUKYMD   TO  SYS-1005-EDYUKYMD
-grpsys       MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
+             MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
              MOVE    SYS-1005-REC        TO  MCPDATA-REC
              MOVE    "tbl_syskanri"      TO  MCP-TABLE
              MOVE    "key2"              TO  MCP-PATHNAME
-grpsys       PERFORM 900-DBSELECT-SEC
+             PERFORM 900-DBSELECT-SEC
              IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri"    TO  MCP-TABLE
                MOVE    "key2"            TO  MCP-PATHNAME
@@ -1369,6 +1361,13 @@ grpsys       PERFORM 900-DBSELECT-SEC
                PERFORM     2001-ZAISIEN-COMMENT-SEC
            END-IF
       *
+      *+++++++++++++++++++++++++++++++++++++++++++++++++
+      *    ³°Íè´ÉÍý²Ã»»¡ÊÆÃ)¤Î¥³¥á¥ó¥È¡Ê¥ì¥»ÅÅÍÑ¡Ë
+           IF     RECE41-GAITOKU-PRTKBN1    =  "1"
+               PERFORM     2001-GAITOK-COMMENT-SEC
+           END-IF
+      *+++++++++++++++++++++++++++++++++++++++++++++++++
+      *
       *    ¥Ñ¥é¥á¡¼¥¿£°£´¥Õ¥¡¥¤¥ë¤è¤êÊÔ½¸
            PERFORM 800-RECE41-SET44-SEC
            MOVE    ZERO                TO  RECE44-ZAINUM
@@ -1397,30 +1396,32 @@ grpsys       PERFORM 900-DBSELECT-SEC
                    WHEN      "11"
                       IF   RECE41-HKNKBN     =   "5"
                       AND  RECE41-KOMUKBN    =   "2"
-                          MOVE   ZERO   TO  FLG-COMMENT
-      *                ¡Ê½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë»»Äê²Ê¤Î¥»¥Ã¥È¡Ë
-                          IF   FLG-COMMENT  =  ZERO
-                            PERFORM    2001-SYODOU-HANTEI-SEC
-                          END-IF
-                          IF   FLG-COMMENT  =  ZERO
-                            PERFORM    2099-RECE44-TENSOU-SEC
-                          END-IF
+                         MOVE    1     TO  FLG-HANTEI
                       ELSE
-                          PERFORM      2099-RECE44-TENSOU-SEC
+                         MOVE    2     TO  FLG-HANTEI
+                      END-IF
+                      MOVE   ZERO   TO  FLG-COMMENT
+      *               ¡Ê½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë»»Äê²Ê¤Î¥»¥Ã¥È¡Ë
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-SYODOU-HANTEI-SEC
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2099-RECE44-TENSOU-SEC
                       END-IF
                    WHEN      "12"
                       IF   RECE41-HKNKBN     =   "5"
                       AND  RECE41-KOMUKBN    =   "2"
-                          MOVE   ZERO   TO  FLG-COMMENT
-      *                ¡ÊºÆ¿Ç¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë»»Äê²Ê¤Î¥»¥Ã¥È¡Ë
-                          IF   FLG-COMMENT  =  ZERO
-                            PERFORM    2001-SAIDOU-HANTEI-SEC
-                          END-IF
-                          IF   FLG-COMMENT  =  ZERO
-                            PERFORM    2099-RECE44-TENSOU-SEC
-                          END-IF
+                         MOVE    1     TO  FLG-HANTEI
                       ELSE
-                          PERFORM      2099-RECE44-TENSOU-SEC
+                         MOVE    2     TO  FLG-HANTEI
+                      END-IF
+                      MOVE   ZERO   TO  FLG-COMMENT
+      *               ¡ÊºÆ¿Ç¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë»»Äê²Ê¤Î¥»¥Ã¥È¡Ë
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-SAIDOU-HANTEI-SEC
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2099-RECE44-TENSOU-SEC
                       END-IF
                    WHEN      "13"
                       MOVE   ZERO   TO  FLG-COMMENT
@@ -1568,6 +1569,10 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-NINRYO-HANTEI-SEC
                       END-IF
+      *            ¡ÊµßµÞ°åÎÅ´ÉÍý²Ã»»¤Î»»ÄêÆü¤Î¥»¥Ã¥È¡Ë
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2001-KYUKYU-HANTEI-SEC
+                      END-IF
                       IF   FLG-COMMENT  =  ZERO
                             PERFORM   2099-RECE44-TENSOU-SEC
                       END-IF
@@ -1579,31 +1584,33 @@ grpsys       PERFORM 900-DBSELECT-SEC
                    WHEN      "11"
                       EVALUATE   RECE41-JIBAIKBN
                         WHEN       "1"
-                          PERFORM      2099-RECE44-TENSOU-SEC
+                          MOVE    2     TO  FLG-HANTEI
                         WHEN       "2"
-                          MOVE   ZERO   TO  FLG-COMMENT
-      *                ¡Ê½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë»»Äê²Ê¤Î¥»¥Ã¥È¡Ë
-                          IF   FLG-COMMENT  =  ZERO
-                            PERFORM    2001-SYODOU-HANTEI-SEC
-                          END-IF
-                          IF   FLG-COMMENT  =  ZERO
-                            PERFORM    2099-RECE44-TENSOU-SEC
-                          END-IF
+                          MOVE    1     TO  FLG-HANTEI
                       END-EVALUATE
+                      MOVE   ZERO   TO  FLG-COMMENT
+      *               ¡Ê½é¿Ç¡ÊÆ±ÆüÊ£¿ô¿ÇÎÅ²Ê¡Ë»»Äê²Ê¤Î¥»¥Ã¥È¡Ë
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-SYODOU-HANTEI-SEC
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2099-RECE44-TENSOU-SEC
+                      END-IF
                    WHEN      "12"
                       EVALUATE   RECE41-JIBAIKBN
                         WHEN       "1"
-                          PERFORM      2099-RECE44-TENSOU-SEC
+                          MOVE    2     TO  FLG-HANTEI
                         WHEN       "2"
-                          MOVE   ZERO   TO  FLG-COMMENT
-      *                ¡ÊºÆ¿Ç¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë»»Äê²Ê¤Î¥»¥Ã¥È¡Ë
-                          IF   FLG-COMMENT  =  ZERO
-                            PERFORM    2001-SAIDOU-HANTEI-SEC
-                          END-IF
-                          IF   FLG-COMMENT  =  ZERO
-                            PERFORM    2099-RECE44-TENSOU-SEC
-                          END-IF
+                          MOVE    1     TO  FLG-HANTEI
                       END-EVALUATE
+                      MOVE   ZERO   TO  FLG-COMMENT
+      *               ¡ÊºÆ¿Ç¡ÊÆ±°ìÆü£²²ÊÌÜ¡Ë»»Äê²Ê¤Î¥»¥Ã¥È¡Ë
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2001-SAIDOU-HANTEI-SEC
+                      END-IF
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM    2099-RECE44-TENSOU-SEC
+                      END-IF
                    WHEN      "13"                                       
                       MOVE   ZERO   TO  FLG-COMMENT
       *            ¡ÊËýÀ­áÖÄË¼À´µ´ÉÍýÎÁ»»ÄêÆü¤Î¥»¥Ã¥È¡Ë
@@ -1746,6 +1753,10 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       IF   FLG-COMMENT  =  ZERO
                         PERFORM       2001-NINRYO-HANTEI-SEC
                       END-IF
+      *            ¡ÊµßµÞ°åÎÅ´ÉÍý²Ã»»¤Î»»ÄêÆü¤Î¥»¥Ã¥È¡Ë
+                      IF   FLG-COMMENT  =  ZERO
+                        PERFORM       2001-KYUKYU-HANTEI-SEC
+                      END-IF
                       IF   FLG-COMMENT  =  ZERO
                             PERFORM   2099-RECE44-TENSOU-SEC
                       END-IF
@@ -1764,19 +1775,10 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *****º¹¹þÊÔ½¸£²********************
            PERFORM     250-SASHIKOMI2-SEC
       *
+      *****´Ø·¸¥³¥á¥ó¥ÈÊÔ½¸****************
+           PERFORM     260-SETCOM-HENSYU-SEC
+      *
            PERFORM 990-RECE41-READ-SEC
-      *
-           IF  CNT-IN-COMMIT   =    300
-                 MOVE  ZERO          TO      CNT-IN-COMMIT
-                 PERFORM 900-DBCOMMIT-SEC
-                 PERFORM 900-DBSTART-SEC
-           END-IF
-      *
-      *    ½èÍýÃæ»ßÀßÄê½èÍý
-           IF      CNT-IN-CANCEL   =   50
-               MOVE    ZERO            TO  CNT-IN-CANCEL
-               PERFORM 500-CANCEL-HENSYU-SEC
-           END-IF
       *
            .
        200-MAIN-EXT.
@@ -1801,7 +1803,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
            MOVE    JYURRK-REC          TO  MCPDATA-REC
            MOVE    "tbl_jyurrk"        TO  MCP-TABLE
            MOVE    "key24"             TO  MCP-PATHNAME
-grpsys     PERFORM 900-DBSELECT-SEC
+           PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_jyurrk"    TO  MCP-TABLE
                MOVE    "key24"         TO  MCP-PATHNAME
@@ -2089,8 +2091,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF  
                 END-PERFORM
                 IF   RECE459-SRYCD(1)  NOT =  SPACE
-                   WRITE   RECE459-REC
-                   ADD     1            TO   CNT-RECE459
+                   PERFORM 800-RECE459-WRITE-SEC
                 END-IF
            END-PERFORM     
       *
@@ -2103,8 +2104,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    WRK-CNT-MEISAI      TO  RECE449-MEISAISU
       *
            MOVE    RECE41-HKNCOMBI     TO  RECE449-HKNCOMBI
-           WRITE   RECE449-REC
-           ADD     1                   TO  CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            .
        2001-JUSHIN-COMMENT-EXT.
@@ -2130,8 +2130,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
            MOVE    RECE41-HKNCOMBI     TO  RECE449-HKNCOMBI
-           WRITE   RECE449-REC
-           ADD     1                   TO  CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       ***
            PERFORM 800-RECE41-SET459-SEC
            MOVE    99999991            TO  RECE459-ZAINUM
@@ -2233,8 +2232,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
            END-IF
       *
-           WRITE   RECE459-REC
-           ADD     1                    TO  CNT-RECE459
+           PERFORM 800-RECE459-WRITE-SEC
       *
            .
        2001-DENWA-DOUJITU-COMMENT-EXT.
@@ -2364,7 +2362,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "tbl_santei"        TO  MCP-TABLE
            MOVE    "key3"              TO  MCP-PATHNAME
-grpsys     PERFORM 900-DBSELECT-SEC
+           PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
       *
                 MOVE    "tbl_santei"   TO  MCP-TABLE
@@ -2463,7 +2461,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    SRYACT-REC            TO  MCPDATA-REC
            MOVE    "tbl_sryact"          TO  MCP-TABLE
            MOVE    "key7"                TO  MCP-PATHNAME
-grpsys     PERFORM  900-DBSELECT-SEC
+           PERFORM  900-DBSELECT-SEC
            IF      MCP-RC               =       ZERO
                MOVE    "tbl_sryact"      TO  MCP-TABLE
                MOVE    "key7"            TO  MCP-PATHNAME
@@ -2480,11 +2478,11 @@ grpsys     PERFORM  900-DBSELECT-SEC
                  MOVE    SRYACCT-REC      TO    MCPDATA-REC
                  MOVE    "tbl_sryacct"    TO    MCP-TABLE
                  MOVE    "key31"          TO    MCP-PATHNAME
-grpsys           PERFORM  900-DBSELECT-SEC
+                 PERFORM  900-DBSELECT-SEC
                  IF     MCP-RC            =  ZERO
                     MOVE    "tbl_sryacct" TO    MCP-TABLE
                     MOVE    "key31"       TO    MCP-PATHNAME
-grpsys              PERFORM  900-DBFETCH-SEC
+                    PERFORM  900-DBFETCH-SEC
                     IF      MCP-RC        =       ZERO
                         MOVE    MCPDATA-REC  TO  SRYACCT-REC
       *
@@ -2527,7 +2525,7 @@ grpsys              PERFORM  900-DBFETCH-SEC
               MOVE    SRYACT-REC             TO    MCPDATA-REC
               MOVE    "tbl_sryact"           TO    MCP-TABLE
               MOVE    "key2"                 TO    MCP-PATHNAME
-grpsys        PERFORM  900-DBSELECT-SEC
+              PERFORM  900-DBSELECT-SEC
               IF     MCP-RC            =  ZERO
                  MOVE    "tbl_sryact"        TO    MCP-TABLE
                  MOVE    "key2"              TO    MCP-PATHNAME
@@ -2749,8 +2747,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                    END-IF
                 END-PERFORM
                 IF   RECE459-SRYCD(1)  NOT =  SPACE
-                   WRITE   RECE459-REC
-                   ADD     1            TO   CNT-RECE459
+                    PERFORM 800-RECE459-WRITE-SEC
                 END-IF
            END-PERFORM
       *
@@ -2762,8 +2759,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
            MOVE    WRK-CNT-MEISAI      TO  RECE449-MEISAISU
       *
            MOVE    RECE41-HKNCOMBI     TO  RECE449-HKNCOMBI
-           WRITE   RECE449-REC
-           ADD     1                   TO  CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            .
        20011-KYUSEIHASSYO-COMMENT-EXT.
@@ -3073,8 +3069,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                    END-IF
                 END-PERFORM
                 IF   RECE459-SRYCD(1)  NOT =  SPACE
-                   WRITE   RECE459-REC
-                   ADD     1            TO   CNT-RECE459
+                    PERFORM 800-RECE459-WRITE-SEC
                 END-IF
            END-PERFORM
       *
@@ -3087,8 +3082,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
            MOVE    WRK-CNT-MEISAI      TO  RECE449-MEISAISU
       *
            MOVE    RECE41-HKNCOMBI     TO  RECE449-HKNCOMBI
-           WRITE   RECE449-REC
-           ADD     1                   TO  CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            .
        20011-HASSYO-COMMENT-EXT.
@@ -3163,7 +3157,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "tbl_santei"        TO  MCP-TABLE
            MOVE    "key3"              TO  MCP-PATHNAME
-grpsys     PERFORM 900-DBSELECT-SEC
+           PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
       *
                 MOVE    "tbl_santei"   TO  MCP-TABLE
@@ -3236,7 +3230,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    SANTEI-REC          TO  MCPDATA-REC
            MOVE    "tbl_santei"        TO  MCP-TABLE
            MOVE    "key3"              TO  MCP-PATHNAME
-grpsys     PERFORM 900-DBSELECT-SEC
+           PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
       *
                 MOVE    "tbl_santei"   TO  MCP-TABLE
@@ -3482,8 +3476,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    1                   TO  RECE449-MEISAISU
       *
            MOVE    RECE41-HKNCOMBI     TO  RECE449-HKNCOMBI
-           WRITE   RECE449-REC
-           ADD     1                   TO  CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            PERFORM 800-RECE41-SET459-SEC
            MOVE    99999998            TO  RECE459-ZAINUM
@@ -3510,8 +3503,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    "1"                  TO  WRK-RECE45XX-SIKFLG(1 1)
            MOVE    WRK-RECE45XX-SRYACT-TBL(1 1)
                                         TO  RECE459-SRYACT-TBL(1)
-           WRITE   RECE459-REC
-           ADD     1                    TO  CNT-RECE459
+           PERFORM 800-RECE459-WRITE-SEC
       *
            .
        2001-KASANRITU-COMMENT-EXT.
@@ -3551,8 +3543,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    1                   TO  RECE449-MEISAISU
       *
            MOVE    RECE41-HKNCOMBI     TO  RECE449-HKNCOMBI
-           WRITE   RECE449-REC
-           ADD     1                   TO  CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            PERFORM 800-RECE41-SET459-SEC
            MOVE    99999998            TO  RECE459-ZAINUM
@@ -3579,8 +3570,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    "1"                  TO  WRK-RECE45XX-SIKFLG(1 1)
            MOVE    WRK-RECE45XX-SRYACT-TBL(1 1)
                                         TO  RECE459-SRYACT-TBL(1)
-           WRITE   RECE459-REC
-           ADD     1                    TO  CNT-RECE459
+           PERFORM 800-RECE459-WRITE-SEC
       *
            .
        2001-YKZTENTANKA-COMMENT-EXT.
@@ -3597,8 +3587,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    1                   TO  RECE449-MEISAISU
       *
            MOVE    RECE41-HKNCOMBI     TO  RECE449-HKNCOMBI
-           WRITE   RECE449-REC
-           ADD     1                   TO  CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            PERFORM 800-RECE41-SET459-SEC
            MOVE    99999990            TO  RECE459-ZAINUM
@@ -3622,8 +3611,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            MOVE    WRK-RECE45XX-SRYACT-TBL(1 1)
                                         TO  RECE459-SRYACT-TBL(1)
-           WRITE   RECE459-REC
-           ADD     1                    TO  CNT-RECE459
+           PERFORM 800-RECE459-WRITE-SEC
       *
            .
        2001-NYUYOJI-COMMENT-EXT.
@@ -3640,8 +3628,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    1                   TO  RECE449-MEISAISU
       *
            MOVE    RECE41-HKNCOMBI     TO  RECE449-HKNCOMBI
-           WRITE   RECE449-REC
-           ADD     1                   TO  CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            PERFORM 800-RECE41-SET459-SEC
            MOVE    99999965            TO  RECE459-ZAINUM
@@ -3662,11 +3649,64 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    "1"                  TO  WRK-RECE45XX-SIKFLG(1 1)
            MOVE    WRK-RECE45XX-SRYACT-TBL(1 1)
                                         TO  RECE459-SRYACT-TBL(1)
-           WRITE   RECE459-REC
-           ADD     1                    TO  CNT-RECE459
+           PERFORM 800-RECE459-WRITE-SEC
       *
            .
        2001-ZAISIEN-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ³°Íè´ÉÍý²Ã»»¡ÊÆÃ)¤Î¥³¥á¥ó¥ÈÊÔ½¸¡Ê¥ì¥»ÅÅÍÑ¡Ë
+      *****************************************************************
+       2001-GAITOK-COMMENT-SEC          SECTION.
+      *
+           PERFORM 800-RECE41-SET449-SEC
+           MOVE    99999986            TO  RECE449-ZAINUM
+           MOVE    "99"                TO  RECE449-SRYKBN
+           MOVE    1                   TO  RECE449-MEISAISU
+      *
+           MOVE    RECE41-HKNCOMBI     TO  RECE449-HKNCOMBI
+           PERFORM 800-RECE449-WRITE-SEC
+      *
+           PERFORM 800-RECE41-SET459-SEC
+           MOVE    99999986            TO  RECE459-ZAINUM
+           MOVE    "99"                TO  RECE459-SRYKBN
+      *
+      *    ¡Ö¡ÊÆÃ)¡¡£µ£²¡ß²ó¿ô¡×¤Î¥³¥á¥ó¥ÈÁÞÆþ
+           MOVE    SPACE               TO  WRK-RECE45XX-REC
+           INITIALIZE                      WRK-RECE45XX-REC
+           MOVE    "810000001"         TO  WRK-RECE45XX-SRYCD(1 1)
+           MOVE    ZERO                TO  WRK-RECE45XX-SRYSURYO(1 1)
+           MOVE    9                   TO  WRK-RECE45XX-YUKOKETA(1 1)
+      *
+           MOVE    "¡ÊÆÃ¡Ë¡¡"          TO  WRK-RECE45XX-NAME(1 1)(1:8)
+      *
+           MOVE    "¡¡¡¡¡¡¡¡¡¡"    TO  WRK-TNSKAI
+           MOVE    RECE41-GAITOKU-KAISU1
+                                   TO  WRK-ZAIKAISUX
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "2"             TO  KANACHK-SYORI
+           MOVE    "52"            TO  KANACHK-MAE-INPUT (1:2)
+           MOVE    "X"             TO  KANACHK-MAE-INPUT (3:1)
+           MOVE    WRK-ZAIKAISUX   TO  KANACHK-MAE-INPUT (4:2)
+           CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+           IF      KANACHK-RC      =   ZERO
+           AND     KANACHK-MAX     >   ZERO
+             MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                   TO  WRK-TNSKAI
+             MOVE    "¡ß"          TO  WRK-TNSKAI(5:2)
+           END-IF
+           MOVE    WRK-TNSKAI          TO  WRK-RECE45XX-NAME(1 1)(9:10)
+      *
+           MOVE    "1"                 TO  WRK-RECE45XX-RECEPTFLG(1 1)
+      *
+           MOVE    "2"                 TO  WRK-RECE45XX-SIKFLG(1 1)
+           MOVE    WRK-RECE45XX-SRYACT-TBL(1 1)
+                                       TO  RECE459-SRYACT-TBL(1)
+           PERFORM 800-RECE459-WRITE-SEC
+      *
+           .
+       2001-GAITOK-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3677,7 +3717,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
            IF      RECE44-FLG-SYODOU-COMMENT   =    "1"
                 INITIALIZE            WRK-JIDO-SETCOM-AREA
                 MOVE      "1"       TO     WRK-JIDO-SETCOMFLG
-                MOVE       4        TO     WRK-JIDO-SETCOMATFLG
+                EVALUATE  FLG-HANTEI
+                  WHEN       1
+                    MOVE    4       TO     WRK-JIDO-SETCOMATFLG
+                  WHEN       2
+                    MOVE  204       TO     WRK-JIDO-SETCOMATFLG
+                END-EVALUATE
                 MOVE       99       TO     FLG-COMMENT
                 PERFORM    20011-SYODOU-COMMENT-SEC
            END-IF
@@ -3708,11 +3753,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
              MOVE    RECE41-SRYYM        TO  SYS-1005-STYUKYMD(1:6)
              MOVE    "01"                TO  SYS-1005-STYUKYMD(7:2)
              MOVE    SYS-1005-STYUKYMD   TO  SYS-1005-EDYUKYMD
-grpsys       MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
+             MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
              MOVE    SYS-1005-REC        TO  MCPDATA-REC
              MOVE    "tbl_syskanri"      TO  MCP-TABLE
              MOVE    "key10"             TO  MCP-PATHNAME
-grpsys       PERFORM 900-DBSELECT-SEC
+             PERFORM 900-DBSELECT-SEC
              IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri"    TO  MCP-TABLE
                MOVE    "key10"           TO  MCP-PATHNAME
@@ -3766,7 +3811,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
                           TO  WRK-RECE45XX-MEISKYFLG(MAX-MEISAISU 1)
                 MOVE   WK-FREE-SETCOMATFLG2(IDX)
                           TO  WRK-RECE45XX-SETCOMATFLG(MAX-MEISAISU 1)
-                MOVE    "1"  TO  WRK-RECE45XX-SIKFLG(MAX-MEISAISU 1)
+                EVALUATE  FLG-HANTEI
+                  WHEN       1
+                    MOVE  "1"  TO  WRK-RECE45XX-SIKFLG(MAX-MEISAISU 1)
+                  WHEN       2
+                    MOVE  "2"  TO  WRK-RECE45XX-SIKFLG(MAX-MEISAISU 1)
+                END-EVALUATE
            END-PERFORM
       *
            PERFORM    200111-SRYACTINF-HENSYU-SEC
@@ -3783,7 +3833,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
            IF      RECE44-FLG-SAIDOU-COMMENT   =    "1"
                 INITIALIZE            WRK-JIDO-SETCOM-AREA
                 MOVE      "1"       TO     WRK-JIDO-SETCOMFLG
-                MOVE       25       TO     WRK-JIDO-SETCOMATFLG
+                EVALUATE  FLG-HANTEI
+                  WHEN       1
+                    MOVE   25       TO     WRK-JIDO-SETCOMATFLG
+                  WHEN       2
+                    MOVE  225       TO     WRK-JIDO-SETCOMATFLG
+                END-EVALUATE
                 MOVE       99       TO     FLG-COMMENT
                 PERFORM    20011-SAIDOU-COMMENT-SEC
            END-IF
@@ -3814,11 +3869,11 @@ grpsys       PERFORM 900-DBSELECT-SEC
              MOVE    RECE41-SRYYM        TO  SYS-1005-STYUKYMD(1:6)
              MOVE    "01"                TO  SYS-1005-STYUKYMD(7:2)
              MOVE    SYS-1005-STYUKYMD   TO  SYS-1005-EDYUKYMD
-grpsys       MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
+             MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
              MOVE    SYS-1005-REC        TO  MCPDATA-REC
              MOVE    "tbl_syskanri"      TO  MCP-TABLE
              MOVE    "key10"             TO  MCP-PATHNAME
-grpsys       PERFORM 900-DBSELECT-SEC
+             PERFORM 900-DBSELECT-SEC
              IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri"    TO  MCP-TABLE
                MOVE    "key10"           TO  MCP-PATHNAME
@@ -3872,7 +3927,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
                           TO  WRK-RECE45XX-MEISKYFLG(MAX-MEISAISU 1)
                 MOVE   WK-FREE-SETCOMATFLG2(IDX)
                           TO  WRK-RECE45XX-SETCOMATFLG(MAX-MEISAISU 1)
-                MOVE    "1"  TO  WRK-RECE45XX-SIKFLG(MAX-MEISAISU 1)
+                EVALUATE  FLG-HANTEI
+                  WHEN       1
+                    MOVE  "1"  TO  WRK-RECE45XX-SIKFLG(MAX-MEISAISU 1)
+                  WHEN       2
+                    MOVE  "2"  TO  WRK-RECE45XX-SIKFLG(MAX-MEISAISU 1)
+                END-EVALUATE
            END-PERFORM
       *
            PERFORM    200111-SRYACTINF-HENSYU-SEC
@@ -3902,7 +3962,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
              MOVE    SANTEI-REC          TO  MCPDATA-REC
              MOVE    "tbl_santei"        TO  MCP-TABLE
              MOVE    "key"               TO  MCP-PATHNAME
-grpsys       PERFORM  900-DBSELECT-SEC
+             PERFORM  900-DBSELECT-SEC
              IF      MCP-RC              =   ZERO
                   MOVE    "tbl_santei"   TO  MCP-TABLE
                   MOVE    "key"          TO  MCP-PATHNAME
@@ -3942,10 +4002,13 @@ grpsys       PERFORM  900-DBSELECT-SEC
            PERFORM   200111-SANTEI-DAY-SEC
       *
            MOVE       RECE44-REC    TO   RECE449-REC
+      *@@@@
+           MOVE       RECE44-ZAINUM TO   RECE449-ZAINUM
+           MOVE       RECE44-SRYKBN TO   RECE449-SRYKBN
+      *@@@@
            ADD        1             TO   RECE449-MEISAISU
            MOVE      "1"            TO   RECE449-SETCOMFLG
-           WRITE      RECE449-REC
-           ADD        1             TO   CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            PERFORM 800-RECE44-SET45-SEC
            MOVE    RECE44-ZAINUM       TO  RECE45-ZAINUM
@@ -3977,8 +4040,7 @@ grpsys       PERFORM  900-DBSELECT-SEC
       *
            MOVE     "1"                 TO  RECE459-SIKFLG(2)
       *
-           WRITE    RECE459-REC
-           ADD      1                   TO  CNT-RECE459
+           PERFORM 800-RECE459-WRITE-SEC
       *
            .
        20011-SHIDOU-COMMENT-EXT.
@@ -4013,7 +4075,7 @@ grpsys       PERFORM  900-DBSELECT-SEC
              MOVE    SANTEI-REC          TO  MCPDATA-REC
              MOVE    "tbl_santei"        TO  MCP-TABLE
              MOVE    "key3"              TO  MCP-PATHNAME
-grpsys       PERFORM  900-DBSELECT-SEC
+             PERFORM  900-DBSELECT-SEC
              IF      MCP-RC              =   ZERO
                  MOVE    "tbl_santei"    TO  MCP-TABLE
                  MOVE    "key3"          TO  MCP-PATHNAME
@@ -4502,7 +4564,7 @@ grpsys       PERFORM  900-DBSELECT-SEC
              MOVE    SANTEI-REC          TO  MCPDATA-REC
              MOVE    "tbl_santei"        TO  MCP-TABLE
              MOVE    "key3"              TO  MCP-PATHNAME
-grpsys       PERFORM 900-DBSELECT-SEC
+             PERFORM 900-DBSELECT-SEC
              IF      MCP-RC              =   ZERO
                     MOVE    "tbl_santei" TO  MCP-TABLE
                     MOVE    "key3"       TO  MCP-PATHNAME
@@ -5284,22 +5346,22 @@ grpsys       PERFORM 900-DBSELECT-SEC
                          MOVE  WRK-RECE45XX-SRYACT-TBL(IDX-RECE45 1)
                                           TO   RECE459-SRYACT-TBL(IDX)
       *
-                         IF    WRK-RECE45XX-SIKFLG(IDX-RECE45 1)  =  "1"
-                              ADD    1    TO   WRK-CNT-MEISAI
-                         END-IF    
+                         ADD    1    TO   WRK-CNT-MEISAI
       *
                      END-IF  
                   END-PERFORM
                   IF   RECE459-SRYCD(1)  NOT =  SPACE
-                     WRITE   RECE459-REC
-                     ADD     1            TO   CNT-RECE459
+                      PERFORM 800-RECE459-WRITE-SEC
                   END-IF
            END-PERFORM     
       *
            MOVE    RECE44-REC        TO      RECE449-REC
+      *@@@@
+           MOVE    RECE44-ZAINUM     TO      RECE449-ZAINUM
+           MOVE    RECE44-SRYKBN     TO      RECE449-SRYKBN
+      *@@@@
            MOVE    WRK-CNT-MEISAI    TO      RECE449-MEISAISU
-           WRITE   RECE449-REC
-           ADD     1                 TO      CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            .
        20011-KENSENTOU-COMMENT-EXT.
@@ -6004,6 +6066,105 @@ grpsys       PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    µßµÞ°åÎÅ´ÉÍý²Ã»»¤ÎÈ½Äê
+      *****************************************************************
+       2001-KYUKYU-HANTEI-SEC          SECTION.
+      *
+           IF (( RECE41-KYUKYU-PRTKBN    =      1         ) AND
+               ( RECE44-SRYCDTOTAL(6:9)  =   CONS-KYUKYU  ) AND
+               ( RECE41-SRYYM           <=   "201306"     ))
+           OR (( RECE41-KYUKYU-PRTKBN    =      1         ) AND
+               ( RECE44-SRYCDTOTAL(6:9)  =   CONS-KYUKYU2 ) AND
+               ( RECE41-SRYYM           >=   "201307"     ))
+           OR (( RECE44-JIBAISYUKEIKBN   =      4         ) AND
+               ( RECE44-SRYCDTOTAL(6:5)  =   "09593"      ))
+               MOVE    SPACE   TO   WRK-TAIHI-SRYYMD
+               IF  (RECE44-JIBAISYUKEIKBN   =    4   )
+               AND (RECE44-SRYCDTOTAL(6:5)  = "09593")
+                 PERFORM  VARYING  IDX20  FROM  1  BY  1
+                           UNTIL   IDX20   >   31
+                   IF  RECE44-KAISU(1 IDX20)   NOT =    ZERO
+                     MOVE  RECE44-SRYYM  TO  WRK-TAIHI-SRYYM
+                     MOVE  IDX20         TO  WRK-TAIHI-SRYD
+                     MOVE  31            TO  IDX20
+                   END-IF
+                 END-PERFORM
+               ELSE
+                 MOVE  RECE41-KYUKYUYMD  TO  WRK-TAIHI-SRYYMD
+               END-IF
+               MOVE        99            TO  FLG-COMMENT
+               PERFORM     2001-KYUKYU-COMMENT-SEC
+           END-IF
+      *
+           .
+       2001-KYUKYU-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    µßµÞ°åÎÅ´ÉÍý²Ã»»¤Î¥³¥á¥ó¥ÈÊÔ½¸
+      *****************************************************************
+       2001-KYUKYU-COMMENT-SEC          SECTION.
+      *
+           INITIALIZE                    WRK-JIDO-SETCOM-AREA
+           MOVE      "1"            TO   WRK-JIDO-SETCOMFLG
+           MOVE      301            TO   WRK-JIDO-SETCOMATFLG
+      *
+           MOVE      RECE44-REC     TO   RECE449-REC
+      *@@@@
+           MOVE      RECE44-ZAINUM  TO   RECE449-ZAINUM
+           MOVE      RECE44-SRYKBN  TO   RECE449-SRYKBN
+      *@@@@
+           ADD        1             TO   RECE449-MEISAISU
+           IF   WRK-JIDO-SETCOMFLG   =  "1"
+             MOVE  WRK-JIDO-SETCOMFLG
+                                    TO   RECE449-SETCOMFLG
+           END-IF
+           PERFORM 800-RECE449-WRITE-SEC
+      *
+           PERFORM 800-RECE44-SET45-SEC
+           MOVE    RECE44-ZAINUM    TO   RECE45-ZAINUM
+           START   RECE45-FILE
+                 KEY IS    >=   RECE45-KEY
+                 INVALID
+                     MOVE    1      TO   FLG-RECE45
+                 NOT INVALID
+                     PERFORM 990-RECE45-NEXT-SEC
+           END-START
+      *
+           MOVE    RECE45-REC           TO  RECE459-REC
+           MOVE    RECE45-SRYACT-TBL(1) TO  RECE459-SRYACT-TBL(1)
+           MOVE    RECE45-SRYACT-TBL(2) TO  RECE459-SRYACT-TBL(3)
+           MOVE    RECE45-SRYACT-TBL(3) TO  RECE459-SRYACT-TBL(4)
+           MOVE    RECE45-SRYACT-TBL(4) TO  RECE459-SRYACT-TBL(5)
+      *
+           MOVE    SPACE                TO  RECE459-SRYACT-TBL(2)
+           INITIALIZE                       RECE459-SRYACT-TBL(2)
+           MOVE    "810000001"          TO  RECE459-SRYCD(2)
+           MOVE    ZERO                 TO  RECE459-SRYSURYO(2)
+           MOVE    9                    TO  RECE459-YUKOKETA(2)
+      * 
+           MOVE    "»»Äê¡¡¡¡¡¡·î¡¡¡¡Æü" TO  RECE459-NAME(2)
+           MOVE     WRK-TAIHI-SRYYMD(5:2)
+                                        TO  DAY-IDX2
+           MOVE     TBL-DAY(DAY-IDX2)   TO  RECE459-NAME(2)(7:4)
+           MOVE     WRK-TAIHI-SRYYMD(7:2)
+                                        TO  DAY-IDX2
+           MOVE     TBL-DAY(DAY-IDX2)   TO  RECE459-NAME(2)(13:4)
+      *
+           IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO
+             MOVE  "2"                  TO  RECE459-MEISKYFLG(2)
+             MOVE  WRK-JIDO-SETCOMATFLG TO  RECE459-SETCOMATFLG(2)
+           END-IF
+      *
+           MOVE     "2"                 TO  RECE459-SIKFLG(2)
+      *
+           PERFORM 800-RECE459-WRITE-SEC
+      *    
+           .
+       2001-KYUKYU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ÆâÉþÌôºÞÎÁÄþ¸º¤Ë´Ø¤¹¤ëÊÔ½¸
       *****************************************************************
        2001-YAKUTEI-HENSYU-SEC          SECTION.
@@ -6057,8 +6218,11 @@ grpsys       PERFORM 900-DBSELECT-SEC
        2099-RECE44-TENSOU-SEC     SECTION.
       *
            MOVE       RECE44-REC    TO   RECE449-REC
-           WRITE      RECE449-REC
-           ADD        1             TO   CNT-RECE449
+      *@@@@
+           MOVE       RECE44-ZAINUM TO   RECE449-ZAINUM
+           MOVE       RECE44-SRYKBN TO   RECE449-SRYKBN
+      *@@@@
+           PERFORM 800-RECE449-WRITE-SEC
            PERFORM    20991-RECE45-TENSOU-SEC
       *
            .
@@ -6092,8 +6256,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
       *
                MOVE          RECE45-REC       TO      RECE459-REC
-               WRITE         RECE459-REC
-               ADD     1                 TO  CNT-RECE459
+               PERFORM 800-RECE459-WRITE-SEC
       *
                PERFORM 990-RECE45-NEXT-SEC
       *
@@ -6178,26 +6341,26 @@ grpsys       PERFORM 900-DBSELECT-SEC
                          MOVE  WRK-RECE45XX-SRYACT-TBL(IDX-RECE45 1)
                                           TO   RECE459-SRYACT-TBL(IDX)
       *
-                         IF    WRK-RECE45XX-SIKFLG(IDX-RECE45 1)  =  "1"
-                              ADD    1    TO   WRK-CNT-MEISAI
-                         END-IF    
+                         ADD    1    TO   WRK-CNT-MEISAI
       *
                      END-IF  
                   END-PERFORM
                   IF   RECE459-SRYCD(1)  NOT =  SPACE
-                     WRITE   RECE459-REC
-                     ADD     1            TO   CNT-RECE459
+                      PERFORM 800-RECE459-WRITE-SEC
                   END-IF
            END-PERFORM     
       *
            MOVE    RECE44-REC        TO      RECE449-REC
+      *@@@@
+           MOVE    RECE44-ZAINUM     TO      RECE449-ZAINUM
+           MOVE    RECE44-SRYKBN     TO      RECE449-SRYKBN
+      *@@@@
            MOVE    WRK-CNT-MEISAI    TO      RECE449-MEISAISU
            IF   WRK-JIDO-SETCOMFLG   =  "1"
              MOVE  WRK-JIDO-SETCOMFLG
                                      TO      RECE449-SETCOMFLG
            END-IF
-           WRITE   RECE449-REC
-           ADD     1                 TO      CNT-RECE449
+           PERFORM 800-RECE449-WRITE-SEC
       *
            .
        200111-SRYACTINF-HENSYU-EXT.
@@ -6493,6 +6656,13 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       INITIALIZE       RECE449-REC
                       MOVE   TBL-YT3X1-RECE44-REC(IDX7 IDX8)
                                   TO   RECE449-REC
+                                       WRK-RECE44-REC
+      *@@@@
+                      MOVE   WRK-RECE44-ZAINUM
+                                  TO   RECE449-ZAINUM
+                      MOVE   WRK-RECE44-SRYKBN
+                                  TO   RECE449-SRYKBN
+      *@@@@
                       MOVE   RECE449-ZAINUM  TO  WRK-YAKUTEI-ZAINUM
                       MOVE   TBL-YT3X1-KAISU(IDX7 IDX8)
                                   TO   RECE449-ZAIKAISU
@@ -6507,8 +6677,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       MOVE      WRK-ZAINUM    TO  RECE449-ZAINUM
                       MOVE      RECE449-ZAINUM  TO  WRK-YAKUTEI-ZAINUM2
       *
-                      WRITE     RECE449-REC
-                      ADD       1            TO  CNT-RECE449
+                      PERFORM 800-RECE449-WRITE-SEC
                       PERFORM   24021-YAKUTEI-RECE45-TENSOU-SEC
       *
                  END-PERFORM
@@ -6521,6 +6690,13 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       INITIALIZE       RECE449-REC
                       MOVE   TBL-YT3X2-RECE44-REC(IDX7 IDX8)
                                   TO   RECE449-REC
+                                       WRK-RECE44-REC
+      *@@@@
+                      MOVE   WRK-RECE44-ZAINUM
+                                  TO   RECE449-ZAINUM
+                      MOVE   WRK-RECE44-SRYKBN
+                                  TO   RECE449-SRYKBN
+      *@@@@
                       MOVE   RECE449-ZAINUM  TO  WRK-YAKUTEI-ZAINUM
                       MOVE   TBL-YT3X2-KAISU(IDX7 IDX8)
                                   TO   RECE449-ZAIKAISU
@@ -6535,8 +6711,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                       MOVE      WRK-ZAINUM    TO  RECE449-ZAINUM
                       MOVE      RECE449-ZAINUM  TO  WRK-YAKUTEI-ZAINUM2
       *
-                      WRITE     RECE449-REC
-                      ADD       1            TO  CNT-RECE449
+                      PERFORM 800-RECE449-WRITE-SEC
                       PERFORM   24021-YAKUTEI-RECE45-TENSOU-SEC
       *
                  END-PERFORM
@@ -6574,8 +6749,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
                MOVE     RECE45-REC            TO      RECE459-REC
                MOVE     WRK-YAKUTEI-ZAINUM2   TO      RECE459-ZAINUM
-               WRITE    RECE459-REC
-               ADD      1                     TO      CNT-RECE459
+               PERFORM 800-RECE459-WRITE-SEC
       *
                PERFORM 990-RECE45-NEXT-SEC
       *
@@ -6592,6 +6766,9 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
       *    ¥Ñ¥é¥á¡¼¥¿£´£´£¹¥Õ¥¡¥¤¥ë¤è¤êÊÔ½¸
            PERFORM 800-RECE41-SET449-SEC
+      *@@@@
+           MOVE    SPACE               TO  RECE449-SRYKBN
+      *@@@@
            MOVE    ZERO                TO  RECE449-ZAINUM
       *
            START   RECE449-FILE
@@ -7460,15 +7637,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
                          MOVE  WRK-RECE45XX-SRYACT-TBL(IDX-RECE45 1)
                                           TO   RECE451-SRYACT-TBL(IDX)
       *
-                         IF    WRK-RECE45XX-SIKFLG(IDX-RECE45 1)  =  "1"
-                              ADD    1    TO   WRK-CNT-MEISAI
-                         END-IF    
+                         ADD    1    TO   WRK-CNT-MEISAI
       *
                      END-IF  
                   END-PERFORM
                   IF   RECE451-SRYCD(1)  NOT =  SPACE
-                     WRITE   RECE451-REC
-                     ADD     1            TO   CNT-RECE45
+                     PERFORM 800-RECE451-WRITE-SEC
                   END-IF
            END-PERFORM     
       *
@@ -7477,8 +7651,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
            IF   WRK-JIDO-SETCOMFLG   =  "1"
              MOVE  WRK-JIDO-SETCOMFLG   TO   RECE441-SETCOMFLG
            END-IF
-           WRITE   RECE441-REC
-           ADD     1                 TO      CNT-RECE44
+           PERFORM 800-RECE441-WRITE-SEC
       *
            .
        2509-SRYACTINF2-KYOTU-HENSYU-EXT.
@@ -7490,8 +7663,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
        2599-RECE449-TENSOU-SEC     SECTION.
       *
            MOVE       RECE449-REC    TO   RECE441-REC
-           WRITE      RECE441-REC
-           ADD        1              TO   CNT-RECE44
+           PERFORM 800-RECE441-WRITE-SEC
            PERFORM    25991-RECE459-TENSOU-SEC
       *
            .
@@ -7524,8 +7696,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                OR     ( RECE449-ZAINUM    NOT =   RECE459-ZAINUM       )
       *
                MOVE    RECE459-REC       TO   RECE451-REC
-               WRITE   RECE451-REC
-               ADD     1                 TO   CNT-RECE45
+               PERFORM 800-RECE451-WRITE-SEC
       *
                PERFORM 990-RECE459-NEXT-SEC
       *
@@ -7533,6 +7704,366 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        25991-RECE459-TENSOU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´Ø·¸¥³¥á¥ó¥ÈÊÔ½¸
+      *****************************************************************
+       260-SETCOM-HENSYU-SEC     SECTION.
+      *
+      *    ¥Ñ¥é¥á¡¼¥¿£´£´£±¥Õ¥¡¥¤¥ë¤è¤êÊÔ½¸
+           PERFORM 800-RECE41-SET441-SEC
+      *@@@@
+           MOVE    SPACE               TO  RECE441-SRYKBN
+      *@@@@
+           MOVE    ZERO                TO  RECE441-ZAINUM
+      *
+           START   RECE441-FILE
+               KEY IS    >=   RECE441-KEY
+               INVALID
+                   MOVE    1           TO  FLG-RECE441
+               NOT INVALID
+                   PERFORM 990-RECE441-NEXT-SEC
+           END-START
+           PERFORM
+               UNTIL  ( FLG-RECE441          =   1                 )
+               OR     ( RECE41-HOSPNUM   NOT =   RECE441-HOSPNUM   )
+               OR     ( RECE41-SRYYM     NOT =   RECE441-SRYYM     )
+               OR     ( RECE41-NYUGAIKBN NOT =   RECE441-NYUGAIKBN )
+               OR     ( RECE41-PTID      NOT =   RECE441-PTID      )
+               OR     ( RECE41-RECEKA    NOT =   RECE441-RECEKA    )
+               OR     ( RECE41-HKNID     NOT =   RECE441-HKNID     )
+               OR     ( RECE41-TEKSTYMD  NOT =   RECE441-TEKSTYMD  )
+      *
+               MOVE      ZERO      TO    FLG-SETCOM-OKIKAE
+      *
+               IF     RECE441-SETCOMFLG   =    "1"
+                  PERFORM 2601-SETCOM-HENSYU2-SEC
+                  IF   FLG-SETCOM-OKIKAE  =  "1"
+                    CONTINUE
+                  ELSE
+                    MOVE   SPACE   TO   RECE441-SETCOMFLG
+                    REWRITE   RECE441-REC
+                    IF      STS-RECE441         =   "00"
+                       CONTINUE
+                    ELSE
+                       MOVE    SPACE               TO  WRK-ERR-AREA
+                       INITIALIZE                      WRK-ERR-AREA
+                       MOVE    4                   TO  WRK-ERR-FLG
+                       MOVE    RECE441PARA         TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE441         TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                    END-IF
+       *
+                    ADD     1      TO   CNT-RECE44-RE
+                  END-IF
+               END-IF
+      *
+               PERFORM 990-RECE441-NEXT-SEC
+      *
+           END-PERFORM
+      *
+           .
+       260-SETCOM-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´Ø·¸¥³¥á¥ó¥ÈÊÔ½¸£²
+      *****************************************************************
+       2601-SETCOM-HENSYU2-SEC     SECTION.
+      *
+           MOVE    ZERO    TO    FLG-SETCOM
+      *
+           MOVE    ZERO    TO    WRK-HEN-RENNUM-X
+                                 WRK-HEN-SHORI-RENNUM-X
+                                 WRK-HEN-SEQNO-X
+           MOVE    ZERO    TO    WRK-HEN-RENNUM-J
+                                 WRK-HEN-SHORI-RENNUM-J
+                                 WRK-HEN-SEQNO-J
+           MOVE    ZERO    TO    WRK-HEN-RENNUM-J2
+                                 WRK-HEN-SHORI-RENNUM-J2
+                                 WRK-HEN-SEQNO-J2
+      *
+           PERFORM 800-RECE441-SET451-SEC
+           MOVE    RECE441-ZAINUM      TO  RECE451-ZAINUM
+           START   RECE451-FILE
+               KEY IS    >=   RECE451-KEY
+               INVALID
+                   MOVE    1           TO  FLG-RECE451
+               NOT INVALID
+                   PERFORM 990-RECE451-NEXT-SEC
+           END-START
+           PERFORM
+               UNTIL  ( FLG-RECE451           =   1                 )
+               OR     ( RECE441-HOSPNUM   NOT =   RECE451-HOSPNUM   )
+               OR     ( RECE441-SRYYM     NOT =   RECE451-SRYYM     )
+               OR     ( RECE441-NYUGAIKBN NOT =   RECE451-NYUGAIKBN )
+               OR     ( RECE441-PTID      NOT =   RECE451-PTID      )
+               OR     ( RECE441-RECEKA    NOT =   RECE451-RECEKA    )
+               OR     ( RECE441-HKNID     NOT =   RECE451-HKNID     )
+               OR     ( RECE441-TEKSTYMD  NOT =   RECE451-TEKSTYMD  )
+               OR     ( RECE441-ZAINUM    NOT =   RECE451-ZAINUM    )
+      *
+               MOVE      ZERO      TO    FLG-MEISKY-OKIKAE
+      *
+               PERFORM   VARYING   IDX   FROM    1   BY  1
+                         UNTIL   ( IDX                >   5     )
+                         OR      ( RECE451-SRYCD(IDX) =   SPACE )
+                 IF   RECE451-MEISKYFLG(IDX)  =  "2"
+                   IF      RECE451-SRYYM  >=  "201307"
+                    IF     RECE451-SETCOMATFLG(IDX) = ZERO
+                      IF   (FLG-SETCOM              =  1   )
+                      AND  (RECE451-RECEDENFLG(IDX) = SPACE)
+                        ADD    1                 TO  WRK-HEN-SEQNO-X
+                        IF   WRK-HEN-SEQNO-X  >  3
+                          MOVE   SPACE   TO  RECE451-MEISKYFLG(IDX)
+                          MOVE   1       TO  FLG-MEISKY-OKIKAE
+                        ELSE
+                          MOVE   WRK-HEN-RENNUM-X  TO  WRK-HEN-RENNUM
+                          MOVE   WRK-HEN-SHORI-RENNUM-X
+                                         TO  WRK-HEN-SHORI-RENNUM
+                          MOVE   WRK-HEN-SEQNO-X   TO  WRK-HEN-SEQNO
+                          PERFORM  26011-SETCOM-HENSYU3-SEC
+                        END-IF
+                        IF  (WRK-HEN-RENNUM-X = WRK-HEN-RENNUM-J )
+                        AND (WRK-HEN-SHORI-RENNUM-X
+                                        = WRK-HEN-SHORI-RENNUM-J )
+                          ADD  1                 TO  WRK-HEN-SEQNO-J
+                        END-IF
+                        IF  (WRK-HEN-RENNUM-X = WRK-HEN-RENNUM-J2)
+                        AND (WRK-HEN-SHORI-RENNUM-X
+                                        = WRK-HEN-SHORI-RENNUM-J2)
+                          ADD  1                 TO  WRK-HEN-SEQNO-J2
+                        END-IF
+                      END-IF
+                    ELSE
+                      EVALUATE   RECE451-SETCOMATFLG(IDX)
+                        WHEN    1
+                        WHEN    3  THRU   16
+                        WHEN   17  THRU   26
+                        WHEN  204
+                        WHEN  225
+                        WHEN  301
+                          ADD  1                 TO  WRK-HEN-SEQNO-J
+                          IF   WRK-HEN-SEQNO-J  >  3
+                            MOVE   SPACE   TO  RECE451-MEISKYFLG(IDX)
+                            MOVE   1       TO  FLG-MEISKY-OKIKAE
+                          ELSE
+                            MOVE WRK-HEN-RENNUM-J  TO  WRK-HEN-RENNUM
+                            MOVE WRK-HEN-SHORI-RENNUM-J
+                                         TO  WRK-HEN-SHORI-RENNUM
+                            MOVE WRK-HEN-SEQNO-J   TO  WRK-HEN-SEQNO
+                            PERFORM  26011-SETCOM-HENSYU3-SEC
+                          END-IF
+                          IF  (WRK-HEN-RENNUM-X = WRK-HEN-RENNUM-J )
+                          AND (WRK-HEN-SHORI-RENNUM-X
+                                          = WRK-HEN-SHORI-RENNUM-J )
+                            ADD    1             TO  WRK-HEN-SEQNO-X
+                          END-IF
+                        WHEN    2
+                          ADD  1                 TO  WRK-HEN-SEQNO-J2
+                          IF   WRK-HEN-SEQNO-J2 >  3
+                            MOVE   SPACE   TO  RECE451-MEISKYFLG(IDX)
+                            MOVE   1       TO  FLG-MEISKY-OKIKAE
+                          ELSE
+                            MOVE WRK-HEN-RENNUM-J2 TO  WRK-HEN-RENNUM
+                            MOVE WRK-HEN-SHORI-RENNUM-J2
+                                         TO  WRK-HEN-SHORI-RENNUM
+                            MOVE WRK-HEN-SEQNO-J2  TO  WRK-HEN-SEQNO
+                            PERFORM  26011-SETCOM-HENSYU3-SEC
+                          END-IF
+                          IF  (WRK-HEN-RENNUM-X = WRK-HEN-RENNUM-J2)
+                          AND (WRK-HEN-SHORI-RENNUM-X
+                                          = WRK-HEN-SHORI-RENNUM-J2)
+                            ADD    1             TO  WRK-HEN-SEQNO-X
+                          END-IF
+                      END-EVALUATE
+                    END-IF
+                   ELSE
+                    MOVE   SPACE   TO  RECE451-MEISKYFLG(IDX)
+                    MOVE   1       TO  FLG-MEISKY-OKIKAE
+                   END-IF
+                 ELSE
+                   IF      RECE451-SRYYM  >=  "201307"
+                    IF   (RECE451-SRYCD(IDX)(1:1) = "1" OR "6" OR "7")
+                    OR   (RECE451-SRYCD(IDX)(1:3) = "059"            )
+                     IF   RECE451-SRYCD(IDX) =
+                          "101400040" OR "101500210" OR "101600150" OR
+                          "101800380"
+                      CONTINUE
+                     ELSE
+                      MOVE   1               TO  FLG-SETCOM
+                      MOVE   RECE451-RENNUM  TO  WRK-HEN-RENNUM-X
+                      MOVE   IDX             TO  WRK-HEN-SHORI-RENNUM-X
+                      MOVE   ZERO            TO  WRK-HEN-SEQNO-X
+                     END-IF
+                    END-IF
+      *
+                    IF   (RECE451-SRYCD(IDX) =
+      *1
+                          "113000410" OR "113000510" OR "180000110" OR
+                          "180000210" OR
+      *3
+                          "113001210" OR "113001310" OR "113002110" OR
+      *4
+                          "111011810" OR "111012610" OR
+      *5
+                          "113006510" OR
+      *6
+                          "180000710" OR
+      *7
+                          "113004310" OR
+      *8
+                          "113008310" OR "113008410" OR "113008510" OR
+      *9
+                          "113008070" OR "113008170" OR
+      *10
+                          "113000810" OR "113009910" OR
+      *11
+                          "114008010" OR
+      *12
+                          "114009410" OR
+      *13
+                          "114000110" OR "114001610" OR
+      *14
+                          "114001110" OR "114012910" OR "114018010" OR
+      *16
+                          "180027410" OR "180027510" OR "180028010" OR
+                          "180028110" OR "180027610" OR "180027710" OR
+                          "180030810" OR "180027810" OR "180027910" OR
+                          "180028210" OR "180028310" OR "180028410" OR
+                          "180032410" OR "180032510" OR "180032610" OR
+                          "180032710" OR "180033110" OR
+                          "180033910" OR "180034010" OR "180034110" OR
+                          "180034210" OR "180034310" OR "180034410" OR
+                          "180034510" OR "180034610" OR "180034710" OR
+      *17
+                          "113001510" OR
+      *18
+                          "113003410" OR
+      *19
+                          "180033210" OR "180035910" OR
+      *20
+                          "700010000" OR "700030000" OR "700050000" OR
+                          "700080000" OR "700110000" OR "700140000" OR
+                          "700290000" OR "700310000" OR "700330000" OR
+                          "700710000" OR "700730000" OR "700750000" OR
+                          "700780000" OR "700810000" OR "700840000" OR
+                          "700870000" OR "700160000" OR "700180000" OR
+                          "700190000" OR "700200000" OR "700210000" OR
+                          "700220000" OR "700230000" OR "700240000" OR
+                          "700250000" OR "700260000" OR "700270000" OR
+                          "700280000" OR "700590000" OR "700600000" OR
+                          "700630000" OR "700640000" OR "700650000" OR
+                          "700680000" OR "729780000" OR
+      *21
+                          "113014610" OR
+      *22
+                          "113014370" OR
+      *23
+                          "113013910" OR "113014010" OR "113014110" OR
+      *24
+                          "114020910" OR
+      *25
+                          "112015810" OR "112015950" OR "112016210" OR
+                          "112016410" OR
+      *26
+                          "114009710"                              )
+      *
+      *16
+                    OR   (RECE451-SRYCD(IDX) =
+                          "101800230" OR "101800240" OR "101800250" OR
+                          "101800260" OR "101800270" OR "101800280" OR
+                          "101800290" OR "101800330" OR "101800340" OR
+                          "101800350"                              )
+      *204
+                    OR   (RECE451-SRYCD(IDX) = "101110040"         )
+      *225
+                    OR   (RECE451-SRYCD(IDX) = "101120040"         )
+      *301
+                    OR   (RECE451-SRYCD(IDX) = "101800890"         )
+      *
+                    OR   (RECE451-SRYCD(IDX)(1:5)  =  "09593"      )
+      *
+                       MOVE   RECE451-RENNUM  TO  WRK-HEN-RENNUM-J
+                       MOVE   IDX       TO  WRK-HEN-SHORI-RENNUM-J
+                       MOVE   ZERO            TO  WRK-HEN-SEQNO-J
+                    END-IF
+      *
+                    IF    RECE451-SRYCD(IDX) =
+      *2
+                          "113000670"
+      *
+                       MOVE   RECE451-RENNUM  TO  WRK-HEN-RENNUM-J2
+                       MOVE   IDX       TO  WRK-HEN-SHORI-RENNUM-J2
+                       MOVE   ZERO            TO  WRK-HEN-SEQNO-J2
+                    END-IF
+                   END-IF
+                 END-IF
+               END-PERFORM
+      *
+               IF    FLG-MEISKY-OKIKAE  =  1
+                  REWRITE   RECE451-REC
+                  IF      STS-RECE451        =   "00"
+                       CONTINUE
+                  ELSE
+                       MOVE    SPACE               TO  WRK-ERR-AREA
+                       INITIALIZE                      WRK-ERR-AREA
+                       MOVE    4                   TO  WRK-ERR-FLG
+                       MOVE    RECE451PARA         TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE451         TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                  END-IF
+      *
+                  ADD       1        TO   CNT-RECE45-RE
+               END-IF
+      *
+               PERFORM 990-RECE451-NEXT-SEC
+      *
+           END-PERFORM
+      *
+           .
+       2601-SETCOM-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´Ø·¸¥³¥á¥ó¥ÈÊÔ½¸£³
+      *****************************************************************
+       26011-SETCOM-HENSYU3-SEC     SECTION.
+      *
+           MOVE    SPACE                 TO  RECE455-REC
+           INITIALIZE                        RECE455-REC
+      *
+           MOVE    RECE451-KEY           TO  RECE455-KEY
+      *
+           MOVE    WRK-HEN-RENNUM        TO  RECE455-RENNUM
+           MOVE    WRK-HEN-SHORI-RENNUM  TO  RECE455-SHORI-RENNUM
+           MOVE    WRK-HEN-SEQNO         TO  RECE455-SEQNO
+      *
+           MOVE    RECE451-SRYCD(IDX)    TO  RECE455-SRYCD
+           MOVE    RECE451-NAME(IDX)     TO  RECE455-NAME
+           MOVE    RECE451-INPUTCOMENT(IDX)
+                                         TO  RECE455-INPUTCOMENT
+      *
+           WRITE   RECE455-REC
+           IF      STS-RECE455         =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+      *
+               MOVE    3                   TO  WRK-ERR-FLG
+               MOVE    RECE455PARA         TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE455         TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
+           ADD     1                     TO  CNT-RECE455
+      *
+           MOVE    1                     TO  FLG-SETCOM-OKIKAE
+      *
+           .
+       26011-SETCOM-HENSYU3-EXT.
            EXIT.
       *
       *****************************************************************
@@ -7556,57 +8087,79 @@ grpsys       PERFORM 900-DBSELECT-SEC
                    INITIALIZE                  JOBKANRI-REC
                    MOVE    WRK-RECEERR     TO  JOB-YOBI
                    MOVE    "9999"          TO  JOB-ERRCD
-grpsys             PERFORM 900-CALL-ORCSJOB-SEC
+                   PERFORM 900-CALL-ORCSJOB-SEC
                END-IF
            END-IF
       *                             
-           MOVE    1                   TO  FLG-END
-      *
+           MOVE    SPACE               TO  WRK-ERRMSG
+           STRING  "ORCR0551 "         DELIMITED  BY  SIZE
+                   WRK-RECEERR         DELIMITED  BY  SIZE
+                   LOW-VALUE           DELIMITED  BY  SIZE
+                                       INTO    WRK-ERRMSG
+           END-STRING
+           PERFORM 500-COBABORT-SEC
            .
        500-ERR-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
-      *    ½èÍýÃæ»ß½èÍý
+      *    ¥¨¥é¡¼»þ½ªÎ»½èÍý
       *****************************************************************
-       500-CANCEL-HENSYU-SEC                SECTION.
+       500-COBABORT-SEC            SECTION.
       *
-           IF      WRK-PARA-SHELLID    =   "RECEPTX"
-               CONTINUE
-           ELSE
-               MOVE    "CHK"           TO  SJOBKANRI-MODE
-               INITIALIZE                  JOBKANRI-REC
-grpsys         PERFORM 900-CALL-ORCSJOB-SEC
-               IF    ( SJOBKANRI-RETURN
-                                       =   ZERO )
-               AND   ( JOB-STOPFLG     =   1    )
-                   MOVE    "½èÍý¤¬Ãæ»ß¤µ¤ì¤Þ¤·¤¿"
-                                           TO  WRK-RECEERR
+           CALL    "cobabort"          USING   WRK-ERRMSG
       *
-                   OPEN    INPUT   RECEERR-FILE
-                   IF      STS-RECEERR         =   ZERO
-                       CLOSE   RECEERR-FILE
-                   ELSE
-                       OPEN    OUTPUT              RECEERR-FILE
-      *    
-                       MOVE    WRK-RECEERR         TO  RECEERR-REC
-                       WRITE   RECEERR-REC
-                       CLOSE   RECEERR-FILE
-      *         
-      *                ¥¸¥ç¥Ö´ÉÍý½ªÎ»½èÍý
-                       MOVE    "CAN"           TO  SJOBKANRI-MODE
-                       INITIALIZE                  JOBKANRI-REC
-                       MOVE    WRK-RECEERR     TO  JOB-YOBI
-                       MOVE    "8888"          TO  JOB-ERRCD
-                       MOVE    2               TO  JOB-STOPFLG
-grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
-                   END-IF
-      *                             
-                   MOVE    1                   TO  FLG-END
-               END-IF
-           END-IF
            .
-       500-CANCEL-HENSYU-EXT.
+       500-COBABORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥Õ¥¡¥¤¥ë¥¨¥é¡¼½èÍý
+      *****************************************************************
+       500-FILE-ERR-ABORT-SEC      SECTION.
+      *
+           EVALUATE    WRK-ERR-FLG
+               WHEN    1
+                   MOVE    "¥Õ¥¡¥¤¥ë£Ï£Ð£Å£Î¥¨¥é¡¼¡¡FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file open err" TO  WRK-ERR-FILE-MSG1
+               WHEN    2
+                   MOVE    "¥Õ¥¡¥¤¥ëÆÉ¤ß¹þ¤ß¥¨¥é¡¼¡¡FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file read err" TO  WRK-ERR-FILE-MSG1
+               WHEN    3
+                   MOVE    "¥Õ¥¡¥¤¥ë½ñ¤­¹þ¤ß¥¨¥é¡¼¡¡FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file write err"
+                                           TO  WRK-ERR-FILE-MSG1
+               WHEN    4
+                   MOVE    "¥Õ¥¡¥¤¥ë¹¹¿·¥¨¥é¡¼¡¡FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file rewrite err"
+                                           TO  WRK-ERR-FILE-MSG1
+           END-EVALUATE
+      *
+           STRING  WRK-ERR-FILE-MSG        DELIMITED   BY  SPACE
+                   WRK-ERR-FILE-NM-FILE-ID DELIMITED   BY  SIZE
+                   " STS="                 DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-STS        DELIMITED   BY  SIZE
+                                           INTO    WRK-RECEERR
+           END-STRING
+           PERFORM 500-ERR-HENSYU-SEC
+      *
+           STRING  "ORCR0551 "             DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-MSG1       DELIMITED   BY  SIZE
+                   " FILE="                DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-NM         DELIMITED   BY  SIZE
+                   "  STS="                DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-STS        DELIMITED   BY  SIZE
+                   LOW-VALUE               DELIMITED   BY  SIZE
+                                           INTO    WRK-ERRMSG
+           END-STRING
+           PERFORM 500-COBABORT-SEC
+      *
+           .
+       500-FILE-ERR-ABORT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -7614,48 +8167,34 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
       *****************************************************************
        300-END-SEC                 SECTION.
       *
-      *    ¥Õ¥¡¥¤¥ë£Ã£Ì£Ï£Ó£Å½èÍý
-           PERFORM 310-FILE-CLOSE-SEC
+           CLOSE                       RECE41-FILE
+           CLOSE                       RECE44-FILE
+           CLOSE                       RECE45-FILE
+           CLOSE                       RECE441-FILE     
+           CLOSE                       RECE451-FILE     
+           CLOSE                       RECE449-FILE
+           CLOSE                       RECE459-FILE
+           CLOSE                       RECE455-FILE
       *
-           IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
       *    ¥¹¥Æ¥Ã¥×´ÉÍý½ªÎ»½èÍý
-               MOVE    "STE"           TO  SJOBKANRI-MODE
-               INITIALIZE                  JOBKANRI-REC
-grpsys         PERFORM 900-CALL-ORCSJOB-SEC
+           MOVE    "STE"           TO  SJOBKANRI-MODE
+           INITIALIZE                  JOBKANRI-REC
+           PERFORM 900-CALL-ORCSJOB-SEC
       *
-               PERFORM 900-DBDISCONNECT-SEC
-           END-IF
+           PERFORM 900-DBDISCONNECT-SEC
       *
            DISPLAY "RECE41  CNT-IN  :" CNT-RECE41  
-           DISPLAY "RECE449 CNT-WK  :" CNT-RECE449 
-           DISPLAY "RECE459 CNT-WK  :" CNT-RECE459 
-           DISPLAY "RECE44  CNT-OUT :" CNT-RECE44  
-           DISPLAY "RECE45  CNT-OUT :" CNT-RECE45  
-           DISPLAY "*** ORCR0430 END ***"
+           DISPLAY "RECE44G CNT-WK  :" CNT-RECE449 
+           DISPLAY "RECE45G CNT-WK  :" CNT-RECE459 
+           DISPLAY "RECE44F CNT-OUT :" CNT-RECE44  
+           DISPLAY "RECE45F CNT-OUT :" CNT-RECE45  
+           DISPLAY "RECE44F REWRITE :" CNT-RECE44-RE
+           DISPLAY "RECE45F REWRITE :" CNT-RECE45-RE
+           DISPLAY "RECE456 CNT-OUT :" CNT-RECE455
+           DISPLAY "*** ORCR0551 END ***"
       *
            .
        300-END-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ¥Õ¥¡¥¤¥ë£Ã£Ì£Ï£Ó£Å½èÍý
-      *****************************************************************
-       310-FILE-CLOSE-SEC              SECTION.
-      *
-           CLOSE                       RECE41-FILE
-      *
-           CLOSE                       RECE44-FILE
-      *
-           CLOSE                       RECE45-FILE
-      *
-           CLOSE                       RECE441-FILE     
-           CLOSE                       RECE451-FILE     
-      *
-           CLOSE                       RECE449-FILE
-           CLOSE                       RECE459-FILE
-      *
-           .
-       310-FILE-CLOSE-EXT.
            EXIT.
       *
       *****************************************************************
@@ -7690,8 +8229,28 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    RECE41-HKNID        TO  RECE449-HKNID
            MOVE    RECE41-TEKSTYMD     TO  RECE449-TEKSTYMD
       *
+           MOVE    RECE41-RECESYUBETU  TO  RECE449-RECESYUBETU 
+      *
            .
        800-RECE41-SET449-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥ì¥»¥×¥È£´£±¥Ç¡¼¥¿ÊÔ½¸½èÍý¡Ê£´£´£±¡Ë
+      *****************************************************************
+       800-RECE41-SET441-SEC           SECTION.
+      *
+           INITIALIZE                      RECE441-REC
+           MOVE    RECE41-HOSPNUM      TO  RECE441-HOSPNUM
+           MOVE    RECE41-SRYYM        TO  RECE441-SRYYM
+           MOVE    RECE41-NYUGAIKBN    TO  RECE441-NYUGAIKBN
+           MOVE    RECE41-PTID         TO  RECE441-PTID
+           MOVE    RECE41-RECEKA       TO  RECE441-RECEKA
+           MOVE    RECE41-HKNID        TO  RECE441-HKNID
+           MOVE    RECE41-TEKSTYMD     TO  RECE441-TEKSTYMD
+      *
+           .
+       800-RECE41-SET441-EXT.
            EXIT.
       *
       *****************************************************************
@@ -7767,6 +8326,132 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
+      *    ¥ì¥»¥×¥È£´£´£±¥Ç¡¼¥¿ÊÔ½¸½èÍý¡Ê£´£µ£±¡Ë
+      *****************************************************************
+       800-RECE441-SET451-SEC           SECTION.
+      *
+           INITIALIZE                       RECE451-REC
+           MOVE    RECE441-HOSPNUM      TO  RECE451-HOSPNUM
+           MOVE    RECE441-SRYYM        TO  RECE451-SRYYM
+           MOVE    RECE441-NYUGAIKBN    TO  RECE451-NYUGAIKBN
+           MOVE    RECE441-PTID         TO  RECE451-PTID
+           MOVE    RECE441-RECEKA       TO  RECE451-RECEKA
+           MOVE    RECE441-HKNID        TO  RECE451-HKNID
+           MOVE    RECE441-TEKSTYMD     TO  RECE451-TEKSTYMD
+      *
+           .
+       800-RECE441-SET451-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥ì¥»¥×¥È£´£´£¹£×£Ò£É£Ô£Å½èÍý
+      *****************************************************************
+       800-RECE449-WRITE-SEC           SECTION.
+      *
+           WRITE   RECE449-REC
+           IF      STS-RECE449         =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+      *
+               MOVE    3                   TO  WRK-ERR-FLG
+               MOVE    RECE449PARA         TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE449         TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
+           ADD     1                   TO  CNT-RECE449
+      *
+           .
+       800-RECE449-WRITE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥ì¥»¥×¥È£´£µ£¹£×£Ò£É£Ô£Å½èÍý
+      *****************************************************************
+       800-RECE459-WRITE-SEC           SECTION.
+      *
+           WRITE   RECE459-REC
+           IF      STS-RECE459         =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+      *
+               MOVE    3                   TO  WRK-ERR-FLG
+               MOVE    RECE459PARA         TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE459         TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
+           ADD     1            TO   CNT-RECE459
+      *
+           .
+       800-RECE459-WRITE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥ì¥»¥×¥È£´£´£±£×£Ò£É£Ô£Å½èÍý
+      *****************************************************************
+       800-RECE441-WRITE-SEC           SECTION.
+      *
+           IF      RECE441-SRYKBN      =   "99"
+               IF      RECE441-SRYSYUKBN   =   "991"
+                   MOVE    "99"            TO  RECE441-SRYKBN
+               ELSE
+                   MOVE    "01"            TO  RECE441-SRYKBN
+               END-IF
+           ELSE
+               IF      RECE441-SRYKBN   =   "64"
+                   MOVE    "60"            TO  RECE441-SRYKBN
+               END-IF
+           END-IF
+      *
+           WRITE   RECE441-REC
+           IF      STS-RECE441         =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+      *
+               MOVE    3                   TO  WRK-ERR-FLG
+               MOVE    RECE441PARA         TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE441         TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
+           ADD     1                 TO      CNT-RECE44
+      *
+           .
+       800-RECE441-WRITE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥ì¥»¥×¥È£´£µ£±£×£Ò£É£Ô£Å½èÍý
+      *****************************************************************
+       800-RECE451-WRITE-SEC           SECTION.
+      *
+           WRITE   RECE451-REC
+           IF      STS-RECE451         =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+      *
+               MOVE    3                   TO  WRK-ERR-FLG
+               MOVE    RECE451PARA         TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE451         TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
+           ADD     1            TO   CNT-RECE45
+      *
+           .
+       800-RECE451-WRITE-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¥ì¥»¥×¥È£°£²¥Ç¡¼¥¿½ç¸¡º÷½èÍý
       *****************************************************************
        990-RECE41-READ-SEC           SECTION.
@@ -7775,9 +8460,33 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                AT  END
                    MOVE    1           TO  FLG-END
                NOT AT  END
+                   IF      STS-RECE41          =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE41PARA      TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE41      TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
+      *            ¸øÌ³ºÒ³²¡¢¥¢¥Õ¥¿¡¼¥±¥¢¡¢¼ïÊÌÉÔÌÀ¤Î¤È¤­ÂÐ¾Ý³°
+      *            »ØÄê°åÎÅµ¡´Ø¤Ç¤Ï¤Ê¤¤¤È¤­ÂÐ¾Ý³°
+                   IF  (   RECE41-SRYYM        <   201307 )
+                   OR  (   RECE41-PTNUM        =   SPACE  )
+                   OR  (   RECE41-TSTPTNUMKBN  =   "1"    )
+                   OR  (   RECE41-RECESYUBETU  =   ZERO
+                                               OR  7021
+                                               OR  7051   )
+                   OR  (   RECE41-RSIIRYOKBN   =   "0"    )
+                   OR  ((  RECE41-HKNKBN    = "1" OR "2" ) AND
+                        (  RECE41-TOTALKIN  =  ZERO      ) AND
+                        (  RECE41-TOTALKIN2 =  ZERO      ))
+                       GO  TO  990-RECE41-READ-SEC
+                   END-IF
+      *
                    ADD     1           TO  CNT-RECE41
-                   ADD     1           TO  CNT-IN-COMMIT
-                                           CNT-IN-CANCEL
       *
                    DISPLAY "RECE41  PTNUM=" RECE41-PTNUM
       *
@@ -7796,6 +8505,17 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                AT  END
                    MOVE    1         TO  FLG-RECE44
                NOT AT  END
+                   IF      STS-RECE44          =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE44PARA      TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE44      TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
                    MOVE    ZERO      TO  FLG-RECE44
            END-READ
       *
@@ -7812,11 +8532,49 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                AT  END
                    MOVE    1         TO  FLG-RECE449
                NOT AT  END
+                   IF      STS-RECE449         =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE449PARA    TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE449     TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
                    MOVE    ZERO      TO  FLG-RECE449
            END-READ
       *
            .
        990-RECE449-NEXT-EXT.
+           EXIT.
+      *
+      ****************************************************************
+      *    ¥ì¥»¥×¥È£´£´£±¥Ç¡¼¥¿ÆÉ¤ß
+      ****************************************************************
+       990-RECE441-NEXT-SEC           SECTION.
+      *
+           READ    RECE441-FILE       NEXT
+               AT  END
+                   MOVE    1         TO  FLG-RECE441
+               NOT AT  END
+                   IF      STS-RECE441         =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE441PARA     TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE441     TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
+                   MOVE    ZERO      TO  FLG-RECE441
+           END-READ
+      *
+           .
+       990-RECE441-NEXT-EXT.
            EXIT.
       *
       ****************************************************************
@@ -7828,6 +8586,17 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                AT  END
                    MOVE    1         TO  FLG-RECE45
                NOT AT  END
+                   IF      STS-RECE45          =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE45PARA      TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE45      TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
                    MOVE    ZERO      TO  FLG-RECE45
            END-READ
       *
@@ -7844,11 +8613,49 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                AT  END
                    MOVE    1         TO  FLG-RECE459
                NOT AT  END
+                   IF      STS-RECE459         =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE459PARA     TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE459     TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
                    MOVE    ZERO      TO  FLG-RECE459
            END-READ
       *
            .
        990-RECE459-NEXT-EXT.
+           EXIT.
+      *
+      ****************************************************************
+      *    ¥ì¥»¥×¥È£´£µ£±¥Ç¡¼¥¿ÆÉ¤ß
+      ****************************************************************
+       990-RECE451-NEXT-SEC           SECTION.
+      *
+           READ    RECE451-FILE       NEXT
+               AT  END
+                   MOVE    1         TO  FLG-RECE451
+               NOT AT  END
+                   IF      STS-RECE451         =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE451PARA     TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE451     TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
+                   MOVE    ZERO      TO  FLG-RECE451
+           END-READ
+      *
+           .
+       990-RECE451-NEXT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -7858,11 +8665,11 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-grpsys     PERFORM 900-DBSELECT-SEC
+           PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
                MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
-grpsys         PERFORM 900-DBFETCH-SEC
+               PERFORM 900-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  SANTEI-REC
                    MOVE    ZERO                TO  FLG-SANTEI
@@ -7888,7 +8695,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *****************************************************************
        900-SANTEI-READ-SEC         SECTION.
       *
-grpsys     PERFORM 900-DBFETCH-SEC
+           PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC         TO  SANTEI-REC
                MOVE    ZERO                TO  FLG-SANTEI
@@ -7906,7 +8713,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *****************************************************************
        900-SYSKANRI-READ-SEC         SECTION.
       *
-grpsys     PERFORM 900-DBFETCH-SEC
+           PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC     TO  SYS-1005-REC
                MOVE    ZERO            TO  FLG-SYSKANRI
@@ -7924,7 +8731,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *****************************************************************
        900-JYURRK-READ-SEC         SECTION.
       *
-grpsys     PERFORM 900-DBFETCH-SEC
+           PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC     TO  JYURRK-REC
                MOVE    ZERO            TO  FLG-JYURRK
@@ -7942,7 +8749,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *****************************************************************
        900-SRYACT-READ-SEC           SECTION.
       *
-grpsys     PERFORM 900-DBFETCH-SEC
+           PERFORM 900-DBFETCH-SEC
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC     TO  SRYACT-REC
                MOVE    ZERO            TO  FLG-SRYACT
@@ -7982,11 +8789,11 @@ grpsys     PERFORM 900-DBFETCH-SEC
       *
            MOVE    "tbl_ptcom"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-grpsys     PERFORM 900-DBSELECT-SEC
+           PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_ptcom"         TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
-grpsys         PERFORM 900-DBFETCH-SEC
+               PERFORM 900-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  PTCOM-REC
                    MOVE    ZERO                TO  FLG-PTCOM
@@ -8013,7 +8820,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
        900-TENSU-TBL-SEC               SECTION.
       *
            INITIALIZE                       TNS-TENSU-REC
-grpsys     MOVE    SPA-HOSPNUM      TO      TNS-HOSPNUM
+           MOVE    SPA-HOSPNUM      TO      TNS-HOSPNUM
            MOVE    WRK-TENSU-SRYCD  TO      TNS-SRYCD
            MOVE    WRK-TENSU-SRYYM  TO      TNS-YUKOSTYMD(1:6)
            MOVE    "01"             TO      TNS-YUKOSTYMD(7:2)
@@ -8022,11 +8829,11 @@ grpsys     MOVE    SPA-HOSPNUM      TO      TNS-HOSPNUM
            MOVE    TNS-TENSU-REC    TO      MCPDATA-REC
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
-grpsys     PERFORM 900-DBSELECT-SEC
+           PERFORM 900-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_tensu"     TO  MCP-TABLE
                MOVE    "key"           TO  MCP-PATHNAME
-grpsys         PERFORM 900-DBFETCH-SEC
+               PERFORM 900-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
                    MOVE    ZERO            TO  FLG-TENSU
@@ -8055,7 +8862,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
            MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
-grpsys     MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA 
                                    JOBKANRI-REC
@@ -8070,12 +8877,34 @@ grpsys     MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
        900-DBSELECT-SEC                SECTION.
       *
            MOVE    "DBSELECT"          TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
                CONTINUE
            ELSE
-               DISPLAY "SELECT ERR table=" MCP-TABLE
-                       " pathname="        MCP-PATHNAME
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    MCP-RC              TO  WRK-MCP-RC
+      *
+               STRING  "£Ä£ÂÆÉ¤ß¹þ¤ß¥¨¥é¡¼¡¡TABLE="
+                                           DELIMITED   BY  SIZE
+                       MCP-TABLE           DELIMITED   BY  SPACE
+                       " RC="              DELIMITED   BY  SIZE
+                       WRK-MCP-RC          DELIMITED   BY  SIZE
+                                           INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+      *
+               STRING  "ORCR0551 select err TABLE="
+                                           DELIMITED   BY  SIZE
+                       MCP-TABLE           DELIMITED   BY  SPACE
+                       " PATHNAME="        DELIMITED   BY  SIZE
+                       MCP-PATHNAME        DELIMITED   BY  SPACE
+                       " RC="              DELIMITED   BY  SIZE
+                       WRK-MCP-RC          DELIMITED   BY  SIZE
+                       LOW-VALUE           DELIMITED   BY  SIZE
+                                           INTO    WRK-ERRMSG
+               END-STRING
+               PERFORM 500-COBABORT-SEC
            END-IF
            .
        900-DBSELECT-EXT.
@@ -8087,7 +8916,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
        900-DBFETCH-SEC                SECTION.
       *
            MOVE    "DBFETCH"           TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            .
        900-DBFETCH-EXT.
@@ -8099,7 +8928,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
        900-CLOSE-SEC               SECTION.
       *
            MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            .
        900-CLOSE-EXT.
@@ -8110,7 +8939,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        900-ORCDBMAIN-SEC               SECTION.
       *
-grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+           CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
            .
@@ -8126,12 +8955,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBOPEN"            TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBSTART"           TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
            .
        120-DBOPEN-EXT.
            EXIT.
@@ -8144,12 +8973,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBCOMMIT"          TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBDISCONNECT"      TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
            .
        900-DBDISCONNECT-EXT.
            EXIT.
@@ -8162,7 +8991,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBCOMMIT"          TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            .
        900-DBCOMMIT-EXT.
@@ -8176,7 +9005,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBSTART"           TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            .
        900-DBSTART-EXT.

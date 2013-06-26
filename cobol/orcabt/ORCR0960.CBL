@@ -67,6 +67,7 @@
       *
       *  04.07.01    NACL-藤原    11/09/02  労災請求書作成対応
       *  04.07.02    NACL-藤原    12/01/24  monpe-0.6.20対応
+      *  04.07.03    NACL-門脇    13/01/21  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -606,6 +607,9 @@
       *
       *    請求管理
            COPY    "CPRCF010.INC".
+      *
+      *    レセプト電算
+           COPY    "CPRECEDEN.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1395,8 +1399,10 @@ grpsys        PERFORM 900-DBSELECT-SEC
            END-EVALUATE                             
       *
       *    労災レセプト回数
-           MOVE    RECE82-RECEKAISU    TO  WRK-RECEKAISU
-           MOVE    WRK-RECEKAISU       TO  HCN50-KAI
+           IF   RECE82-ROUKAISU   =   "2"
+             MOVE    RECE82-RECEKAISU  TO  WRK-RECEKAISU
+             MOVE    WRK-RECEKAISU     TO  HCN50-KAI
+           END-IF
       *
       *    労災基準監督署コード
            IF      RECE82-SYOKAIFLG    =   "1"
@@ -3476,6 +3482,26 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                    PERFORM 500-ERR-HENSYU-SEC
                    GO  TO  5001-DB-DELETE-EXT
                END-IF      
+      *        レセ電
+               INITIALIZE                  RECEDEN-REC
+               MOVE    WRK-PARA-HOSPNUM    TO  RECEDEN-HOSPNUM
+               MOVE    WRK-PARA-SRYYM      TO  RECEDEN-SRYYM
+               MOVE    3                   TO  RECEDEN-TEISYUTUSAKI
+               MOVE    "1"                 TO  RECEDEN-NYUGAIKBN
+               MOVE    RECEDEN-REC         TO  MCPDATA-REC
+               MOVE    "DBDELETE"          TO  MCP-FUNC
+               MOVE    "tbl_receden"       TO  MCP-TABLE
+               MOVE    "del1"              TO  MCP-PATHNAME
+               PERFORM 900-ORCDBMAIN-SEC
+               IF      MCP-RC           NOT =   ZERO
+                   DISPLAY "DBPATH=" MCP-TABLE " " MCP-PATHNAME
+                           " MCP-RC=" MCP-RC
+                   MOVE
+                   "レセ電削除処理でエラーとなりました"
+                                           TO    WRK-RECEERR
+                   PERFORM 500-ERR-HENSYU-SEC
+                   GO  TO  5001-DB-DELETE-EXT
+               END-IF      
       *        診療年月レセプト管理削除処理（一括分）
                INITIALIZE                  RECE07-REC
 grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE07-HOSPNUM
@@ -3597,7 +3623,7 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
       *
       *            診療年月の請求管理削除処理
                    INITIALIZE                  RECE10-REC
-                   MOVE    SYS-1001-HOSPNUM    TO  RECE10-HOSPNUM
+                   MOVE    WRK-PARA-HOSPNUM    TO  RECE10-HOSPNUM
                    MOVE    SYS-2002-PTID       TO  RECE10-PTID
                    MOVE    SYS-2002-SRYYM      TO  RECE10-SRYYM
                    MOVE    SYS-2002-NYUGAIKBN  TO  RECE10-NYUGAIKBN
@@ -3619,6 +3645,29 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                        "請求管理削除処理（個別分）でエラーとなりました"
                                                    TO    WRK-RECEERR
                         PERFORM 500-ERR-HENSYU-SEC
+                       GO  TO  5001-DB-DELETE-EXT
+                   END-IF
+      *
+      *            診療年月のレセ電削除処理
+                   INITIALIZE                  RECEDEN-REC
+                   MOVE    WRK-PARA-HOSPNUM    TO  RECEDEN-HOSPNUM
+                   MOVE    SYS-2002-PTID       TO  RECEDEN-PTID
+                   MOVE    SYS-2002-SRYYM      TO  RECEDEN-SRYYM
+                   MOVE    SYS-2002-NYUGAIKBN  TO  RECEDEN-NYUGAIKBN
+                   MOVE    3                   TO  RECEDEN-TEISYUTUSAKI
+                   MOVE    RECEDEN-REC         TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "tbl_receden"       TO  MCP-TABLE
+                   MOVE    "del4"              TO  MCP-PATHNAME
+                   PERFORM 900-ORCDBMAIN-SEC
+                   IF      MCP-RC           NOT =   ZERO
+                       DISPLAY "DBPATH=" MCP-TABLE
+                                       " " MCP-PATHNAME
+                                       " MCP-RC=" MCP-RC
+                       MOVE
+                          "レセ電削除処理（個別分）でエラーとなりました"
+                                                   TO    WRK-RECEERR
+                       PERFORM 500-ERR-HENSYU-SEC
                        GO  TO  5001-DB-DELETE-EXT
                    END-IF
       *

@@ -93,8 +93,11 @@
       *  04.06.04    NACL-ÌçÏÆ    13/06/14  µßµÞ°åÎÅ´ÉÍý²Ã»»»»ÄêÈ½Äê½¤Àµ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/07  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
-      *  04.07.02    NACL-Æ£¸¶    13/03/25  ¥ê¥¢¥ë¥¿¥¤¥à¥×¥ì¥Ó¥å¡¼»þ¤Ï
+      *  04.07.02    NACL-ÌçÏÆ    13/01/21  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *  04.07.03    NACL-Æ£¸¶    13/03/25  ¥ê¥¢¥ë¥¿¥¤¥à¥×¥ì¥Ó¥å¡¼»þ¤Ï
       *                                     ¥Æ¥¹¥È´µ¼Ô¤Ë¤¹¤ë
+      *  04.07.04    NACL-ÌçÏÆ    13/04/16  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *                                     Ï«ºÒ»ØÄê°åÎÅµ¡´Ø¶èÊ¬ÊÔ½¸
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -236,6 +239,7 @@
            03  WRK-KOMUKBN                             PIC  X(01).
            03  WRK-KOMUTENTANKA                        PIC  9(02).
            03  WRK-KYUGYO-PRTKBN                       PIC  X(01).
+           03  WRK-RSIIRYOKBN                          PIC  X(01).
       *
            03  WRK-TAIHI-FLG                           PIC  9(01).
            03  WRK-TAIHI-SRYYMD.
@@ -667,6 +671,12 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-4001-HOSPNUM
                     MOVE SYS-4001-KYUGYO-PRTKBN
                                            TO    WRK-KYUGYO-PRTKBN
                   END-IF
+                  IF     SYS-4001-RSIIRYOKBN      =  SPACE
+                    MOVE "0"               TO    WRK-RSIIRYOKBN
+                  ELSE
+                    MOVE SYS-4001-RSIIRYOKBN
+                                           TO    WRK-RSIIRYOKBN
+                  END-IF
               ELSE
                   MOVE    "Ï«ºÒ¼«Çå°åÎÅµ¡´Ø¾ðÊó¤¬¼èÆÀ¤Ç¤­¤Þ¤»¤ó¤Ç¤·¤¿"     
                                               TO  WRK-RECEERR
@@ -1012,10 +1022,14 @@ grpsys         PERFORM 900-DBSELECT-SEC
            MOVE    WRK-KOMUTENTANKA      TO   RECE41-KOMUTENTANKA
       *    µÙ¶È¾ÚÌÀÎÅÍÜ´ü´Öµ­ºÜ
            MOVE    WRK-KYUGYO-PRTKBN     TO   RECE41-KYUGYO-PRTKBN
+      *    Ï«ºÒ»ØÄê°åÎÅµ¡´Ø¶èÊ¬
+           MOVE    WRK-RSIIRYOKBN        TO   RECE41-RSIIRYOKBN
+           IF      RECE41-HKNKBN     =   "4"
+               MOVE    "0"               TO   RECE41-RSIIRYOKBN
+           END-IF
       *
       *    Ï«ºÒ¥ì¥»¥×¥È²ó¿ô¼èÆÀ
            IF    ( RECE41-HKNKBN     =   "1"  OR  "2" )
-      **>  AND   ( RECE41-ROUKAISU   =   "2"          )
              INITIALIZE                    LNK-ORCSROUKAISU-REC
              MOVE  RECE41-HOSPNUM      TO  LNK-ORCSROUKAISU-HOSPNUM
              MOVE  RECE41-NYUGAIKBN    TO  LNK-ORCSROUKAISU-NYUGAIKBN
@@ -1064,10 +1078,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
               IF   LNK-ORCSROUKAISU-RECEKAISU  =  1
                 MOVE   "1"               TO  RECE41-SYOKAIFLG
               END-IF
-              IF   RECE41-ROUKAISU   =   "2"
-                MOVE   LNK-ORCSROUKAISU-RECEKAISU
+              MOVE     LNK-ORCSROUKAISU-RECEKAISU
                                          TO  RECE41-RECEKAISU
-              END-IF
              END-IF
            END-IF
       *
@@ -3020,6 +3032,12 @@ grpsys     PERFORM 900-DBFETCH-SEC
                    ELSE
                      MOVE SYS-4001-KYUGYO-PRTKBN
                                             TO    WRK-KYUGYO-PRTKBN
+                   END-IF
+                   IF     SYS-4001-RSIIRYOKBN      =  SPACE
+                     MOVE "0"               TO    WRK-RSIIRYOKBN
+                   ELSE
+                     MOVE SYS-4001-RSIIRYOKBN
+                                            TO    WRK-RSIIRYOKBN
                    END-IF
                 END-IF
       *

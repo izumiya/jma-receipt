@@ -147,6 +147,8 @@
       *  04.06.02    NACL-門脇    13/02/18  労災レセ電対応
       *                                     （新診療行為コード対応）
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
+      *
+      *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -577,6 +579,7 @@
                    07  TBL-ZAIW-SRYACTINF.
       *                診療コード/数量/回数
                        09  TBL-ZAIW-SRYCD           PIC  X(09).
+                       09  TBL-ZAIW-SRYSYUKBN-X     PIC  X(03).
                        09  TBL-ZAIW-SRYSURYO        PIC  9(05)V9(05).
                        09  TBL-ZAIW-SRYKAISU        PIC  9(03).
       *                単位コード/単位名称有効桁数/単位名称
@@ -591,20 +594,33 @@
                        09  TBL-ZAIW-AUTOKBN         PIC  X(01).
                        09  TBL-ZAIW-INPUTNUM        PIC  9(03).
                        09  TBL-ZAIW-TENTTLKBN       PIC  9(03).
-      *                検体検査コメント
-                       09  TBL-ZAIW-KENTAICOMMENT   PIC  9(01).
-      *                きざみ値計算識別
+      *
+                       09  TBL-ZAIW-DATAKBN         PIC  9(01).
+                       09  TBL-ZAIW-HOUKNSKBN       PIC  9(02).
+                       09  TBL-ZAIW-KNSJISKBN       PIC  9(01).
+                       09  TBL-ZAIW-KNSJISGRPKBN    PIC  9(02).
+                       09  TBL-ZAIW-CDKBNINF.
+                         11 TBL-ZAIW-CDKBN-KBN        PIC  X(01).
+                         11 TBL-ZAIW-CDKBN-SYO        PIC  9(01).
+                         11 TBL-ZAIW-CDKBN-BU         PIC  9(02).
+                         11 TBL-ZAIW-CDKBN-KBNNUM     PIC  9(03).
+                         11 TBL-ZAIW-CDKBN-KBNNUM-EDA PIC  9(02).
+                         11 TBL-ZAIW-CDKBN-KOUBAN     PIC  9(02).
+                         11 TBL-ZAIW-KOUHYOJYUNNUM    PIC  9(09).
+                       09  TBL-ZAIW-KOKUJISKBKBN1   PIC  9(01).
+                       09  TBL-ZAIW-KOKUJISKBKBN2   PIC  9(01).
+                       09  TBL-ZAIW-TUSOKUGAIKBN    PIC  9(01).
+                       09  TBL-ZAIW-TIMEKSNKBN      PIC  9(01).
                        09  TBL-ZAIW-KZMCOMPSIKIBETU PIC  9(01).
+                       09  TBL-ZAIW-CHUKSNINF.
+                         11 TBL-ZAIW-CHUKSNCD       PIC  X(04).
+                         11 TBL-ZAIW-CHUKSNTUBAN    PIC  X(01).
+                       09  TBL-ZAIW-KENTAICOMMENT   PIC  9(01).
+                       09  TBL-ZAIW-INPUTCOMENT     PIC  X(80).
                    07  TBL-ZAIW-NAMEINF.
       *                漢字有効桁数/漢字名称
                        09  TBL-ZAIW-YUKOKETA        PIC  9(03).
                        09  TBL-ZAIW-NAME            PIC  X(200).
-      *                データ区分情報
-                   07  TBL-ZAIW-DATAKBNINF.
-                       09  TBL-ZAIW-DATAKBN         PIC  9(01).
-      *                包括対象検査情報
-                   07  TBL-ZAIW-HOUKNSKBNINF.
-                       09  TBL-ZAIW-HOUKNSKBN       PIC  9(02).
                    07  TBL-ZAIW-SRYSYUKBN-INPUT     PIC  X(03).
                    07  TBL-ZAIW-KENTAICOMMENT-SRYCD PIC  9(09).
       *            レセ用特定器材商品名編集フラグ
@@ -672,8 +688,6 @@
            03  FILLER          PIC X(09)   VALUE   "101120080".
       *    実日数算定
            03  FILLER          PIC X(09)   VALUE   "099409901".
-      *    労災（加算なし）
-           03  FILLER          PIC X(09)   VALUE   "099509901".
       *    初診料ダミー
            03  FILLER          PIC X(09)   VALUE   "099110001".
       *    再診料ダミー
@@ -755,9 +769,9 @@
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   59.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   58.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   59.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   58.
       *
       *    固定値
        01  CONST-AREA.
@@ -1438,10 +1452,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                      TO  TBL-ZAIW-NAMEINF   (IDY IDZ)
                        MOVE    RECE45-RECEHENFLG(IDX)
                                      TO  TBL-ZAIW-RECEHENFLG(IDY IDZ)
-                       MOVE    RECE45-DATAKBNINF(IDX)
-                                     TO  TBL-ZAIW-DATAKBNINF(IDY IDZ)
-                       MOVE    RECE45-HOUKNSKBNINF(IDX)
-                                     TO  TBL-ZAIW-HOUKNSKBNINF(IDY IDZ)
                        MOVE    RECE45-SRYSYUKBN  TO
                                      TBL-ZAIW-SRYSYUKBN-INPUT(IDY IDZ)
                        IF      WRK-KENTAICOMMENT-SRYCD  NOT =  ZERO

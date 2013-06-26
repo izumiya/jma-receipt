@@ -46,6 +46,8 @@
       *
       *  04.06.01    NACL-藤原    10/11/04  補足コメント対応
       *  04.06.02    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
+      *
+      *  04.07.01    NACL-藤原    13/01/21  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -135,13 +137,29 @@
            03  WRK-YM              PIC 9(06).
            03  WRK-RENNUM          PIC 9(02).
       *
-           03  WRK-RECEERR         PIC X(200). 
-      *
        01  KEY-AREA                            VALUE   LOW-VALUE.
            03  KEY-NEW.
                05  KEY-N-SRYYMD    PIC 9(08).
            03  KEY-OLD.
                05  KEY-O-SRYYMD    PIC 9(08).
+      *
+       01  WRK-ERR-AREA.
+           03  WRK-RECEERR             PIC X(200).
+           03  WRK-ERRMSG              PIC X(300).
+           03  WRK-MCP-RC              PIC 9(9).
+           03  WRK-ERR-FILE-STS        PIC X(02).
+           03  WRK-ERR-FILE-MSG        PIC X(100).
+           03  WRK-ERR-FILE-MSG1       PIC X(17).
+           03  WRK-ERR-FLG             PIC 9(01).
+      *    エラーファイル名称領域 
+           COPY    "CPRECEDAT1.INC"    REPLACING  //RECEDAT1PARA//
+                                       BY         //WRK-ERR-FILE-NM//.
+      *
+      *    ワーク患者病名
+       01  WRK-PTBYOMEI-REC.
+           COPY    "CPPTBYOMEI.INC"
+                                   REPLACING  //PTBYO-//
+                                   BY         //WRK-PTBYO-//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -178,6 +196,9 @@
       *
       *    半角チェックサブ
            COPY    "CPORCSKANACHK.INC".
+      *
+      *    拡張漢字チェックサブ
+           COPY    "CPORCSKANACHK2.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -254,10 +275,20 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            OPEN    OUTPUT              RECE42-FILE
            CLOSE                       RECE42-FILE
+           OPEN    I-O                 RECE42-FILE
       *
            OPEN    INPUT               RECE41-FILE    
-           OPEN    I-O                 RECE42-FILE
-      *     
+           IF      STS-RECE41          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    1                   TO  WRK-ERR-FLG
+               MOVE    RECE01PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE41          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
       *    レセプト編集区分情報
            MOVE    SPACE            TO  SYSKANRI-REC
            INITIALIZE                   SYSKANRI-REC
@@ -293,7 +324,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            DISPLAY "SYS-200501-TENKIBYOMEI-KBN="
                                     SYS-200501-TENKIBYOMEI-KBN
       *
-      *    レセプト明細０２読み込み
+      *    レセプト明細読み込み
            PERFORM 900-RECE41-READ-SEC
            .
        100-INIT-EXT.
@@ -364,6 +395,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    患者病名チェック処理
       *****************************************************************
        2001-PTBYO-CHK-SEC         SECTION.
+      *
+      *    拡張漢字チェック
+           INITIALIZE                      ORCSKANACHK2AREA
+           MOVE    "1"                 TO  KANACHK2-SYORI
+           MOVE    PTBYO-BYOMEI        TO  KANACHK2-MAE-INPUT
+           CALL    "ORCSKANACHK2"      USING   ORCSKANACHK2AREA
+           IF      KANACHK2-RC4        =   ZERO
+               CONTINUE
+           ELSE
+               CALL    "coblog" USING   "ptbyomei kanachk2 err"
+               MOVE    SPACE               TO  WRK-RECEERR
+               STRING "病名名称文字コード不正　患者番号="
+                                               DELIMITED  BY  SIZE
+                       RECE41-PTNUM            DELIMITED  BY  SPACE
+                                       INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+               PERFORM 500-COBABORT-SEC
+           END-IF
       *
       *    診療科
            MOVE    ZERO                TO  FLG-CHK 
@@ -471,12 +521,31 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EXIT. 
       *            
       *****************************************************************
-      *    レセプト明細０３編集処理
+      *    レセプト明細編集処理
       *****************************************************************
        20011-RECE42-WRITE-SEC              SECTION.
       *
+           IF      PTBYO-BYOMEIHENFLG  =   SPACE
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       21
+                   IF      PTBYO-BYOMEICD (IDX) (1:4)  =   "ZZZC"
+                                                       OR  "ZZZ("
+                       MOVE    "1"         TO  PTBYO-BYOMEIHENFLG
+                       MOVE    21          TO  IDX
+                   END-IF
+               END-PERFORM
+           END-IF   
+      *
+           INITIALIZE                      ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI 
+           MOVE    PTBYO-HOSOKU-COMMENT
+                                       TO  KANACHK-MAE-INPUT
+           MOVE    40                  TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT   TO  PTBYO-HOSOKU-COMMENT
+      *
            IF      PTBYO-BYOMEIHENFLG  =   "1"
-               INITIALIZE                  ORCSKANACHKAREA
+               INITIALIZE                      ORCSKANACHKAREA
                MOVE    "1"                 TO  KANACHK-SYORI 
                MOVE    PTBYO-BYOMEI        TO  KANACHK-MAE-INPUT
                MOVE    80                  TO  KANACHK-MAX-CNT
@@ -485,7 +554,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                COMPUTE PTBYO-BYOMEIMOJI    =   KANACHK-MAX  /   2
            END-IF
       *
+           MOVE    PTBYO-BYOMEI        TO  WRK-PTBYO-BYOMEI
+           MOVE    PTBYO-BYOMEIMOJI    TO  WRK-PTBYO-BYOMEIMOJI
+      *
       *    疑いフラグ、補足コメントより病名を編集
+      *   （病名のみ編集を行う）
            IF    ( PTBYO-UTAGAIFLG NOT =   SPACE )
            OR    ( PTBYO-HOSOKU-COMMENT
                                    NOT =   SPACE )
@@ -500,20 +573,22 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                COMPUTE PTBYO-BYOMEIMOJI    =   SMKBYO-LENGTH   /   2
                MOVE    SMKBYO-BYOMEI       TO  PTBYO-BYOMEI
-               MOVE    SMKBYO-BYOMEIHENFLG TO  PTBYO-BYOMEIHENFLG
-               MOVE    SMKBYO-BYOMEICD-G   TO  PTBYO-BYOMEICD-G
+               EVALUATE    SMKBYO-STS-UTAGAI   ALSO    SMKBYO-STS-KYUSEI
+                   WHEN    1                   ALSO    1
+                       MOVE    "3"             TO  PTBYO-UTAGAIFLG
+                   WHEN    1                   ALSO    0
+                       MOVE    "1"             TO  PTBYO-UTAGAIFLG
+                   WHEN    0                   ALSO    1
+                       MOVE    "2"             TO  PTBYO-UTAGAIFLG
+                   WHEN    OTHER
+                       MOVE    SPACE           TO  PTBYO-UTAGAIFLG
+               END-EVALUATE     
            END-IF
       *
            ADD     1                   TO  WRK-RENNUM
       *
            INITIALIZE                      RECE42-REC
-           MOVE    RECE41-HOSPNUM      TO  RECE42-HOSPNUM
-           MOVE    RECE41-SRYYM        TO  RECE42-SRYYM
-           MOVE    RECE41-NYUGAIKBN    TO  RECE42-NYUGAIKBN
-           MOVE    RECE41-PTID         TO  RECE42-PTID
-           MOVE    RECE41-RECEKA       TO  RECE42-RECEKA
-           MOVE    RECE41-HKNID        TO  RECE42-HKNID
-           MOVE    RECE41-TEKSTYMD     TO  RECE42-TEKSTYMD
+           MOVE    RECE41-KEY          TO  RECE42-KEY1
            MOVE    PTBYO-SRYYMD        TO  RECE42-SRYYMD
            MOVE    WRK-RENNUM          TO  RECE42-RENNUM
            MOVE    RECE41-PTNUM        TO  RECE42-PTNUM
@@ -525,19 +600,39 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    PTBYO-SYUBYOFLG     TO  RECE42-SYUBYOFLG    
            ELSE
                MOVE    "9"                 TO  RECE42-SYUBYOFLG 
-           END-IF   
+           END-IF
            MOVE    PTBYO-MANSEIKBN     TO  RECE42-MANSEIKBN
            IF      RECE41-SRYYM        <   PTBYO-TENKIYMD(1:6)
                CONTINUE
            ELSE    
                MOVE    PTBYO-TENKIKBN      TO  RECE42-TENKIKBN
-               MOVE    PTBYO-TENKIYMD      TO  RECE42-TENKIYMD   
-           END-IF    
+               MOVE    PTBYO-TENKIYMD      TO  RECE42-TENKIYMD
+           END-IF
            MOVE    PTBYO-BYOMEI        TO  RECE42-BYOMEI
            MOVE    PTBYO-BYOMEIMOJI    TO  RECE42-BYOMEIMOJI
-           MOVE    PTBYO-BYOMEIHENFLG  TO  RECE42-BYOMEIHENFLG   
+           MOVE    PTBYO-BYOMEIHENFLG  TO  RECE42-BYOMEIHENFLG
+      *
+           MOVE    WRK-PTBYO-BYOMEI    TO  RECE42-IN-BYOMEI
+           MOVE    WRK-PTBYO-BYOMEIMOJI
+                                       TO  RECE42-IN-BYOMEIMOJI
+      *
+           MOVE    PTBYO-HOSOKU-COMMENT
+                                       TO  RECE42-HOSOKU-COMMENT
+      *
+           MOVE    RECE41-RECESYUBETU  TO  RECE42-RECESYUBETU   
       *
            WRITE   RECE42-REC
+           IF      STS-RECE42          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE           TO  WRK-ERR-AREA
+               INITIALIZE                  WRK-ERR-AREA
+               MOVE    3               TO  WRK-ERR-FLG
+               MOVE    RECE42PARA      TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE42      TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
            ADD     1                   TO  CNT-OUT   
            .
        20011-RECE42-WRITE-EXT.
@@ -600,6 +695,66 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
+      *    エラー時終了処理
+      *****************************************************************
+       500-COBABORT-SEC                SECTION.
+      *
+           CALL    "cobabort"          USING   WRK-ERRMSG
+      *
+           .
+       500-COBABORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ファイルエラー処理
+      *****************************************************************
+       500-FILE-ERR-ABORT-SEC           SECTION.
+      *
+           EVALUATE    WRK-ERR-FLG
+               WHEN    1
+                   MOVE    "ファイルＯＰＥＮエラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file open err" TO  WRK-ERR-FILE-MSG1
+               WHEN    2
+                   MOVE    "ファイル読み込みエラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file read err" TO  WRK-ERR-FILE-MSG1
+               WHEN    3
+                   MOVE    "ファイル書き込みエラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file write err"
+                                           TO  WRK-ERR-FILE-MSG1
+               WHEN    4
+                   MOVE    "ファイル更新エラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file rewrite err"
+                                           TO  WRK-ERR-FILE-MSG1
+           END-EVALUATE
+      *
+           STRING  WRK-ERR-FILE-MSG        DELIMITED   BY  SPACE
+                   WRK-ERR-FILE-NM-FILE-ID DELIMITED   BY  SIZE
+                   " STS="                 DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-STS        DELIMITED   BY  SIZE
+                                           INTO    WRK-RECEERR
+           END-STRING
+           PERFORM 500-ERR-HENSYU-SEC
+      *
+           STRING  "ORCR0440 "             DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-MSG1       DELIMITED   BY  SIZE
+                   " FILE="                DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-NM         DELIMITED   BY  SIZE
+                   "  STS="                DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-STS        DELIMITED   BY  SIZE
+                   LOW-VALUE               DELIMITED   BY  SIZE
+                                           INTO    WRK-ERRMSG
+           END-STRING
+           PERFORM 500-COBABORT-SEC
+      *
+           .
+       500-FILE-ERR-ABORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    処理中止処理
       *****************************************************************
        500-CANCEL-HENSYU-SEC                SECTION.
@@ -643,7 +798,7 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
-      *    患者病名マスタ　ＲＥＡＤ
+      *    患者病名ＲＥＡＤ
       *****************************************************************
        900-PTBYO-READ-SEC         SECTION.
       *
@@ -661,7 +816,7 @@ grpsys     PERFORM 900-DBFETCH-SEC
            EXIT.
       *
       *****************************************************************
-      *    レセプト明細書０２読込
+      *    レセプト明細書読込
       *****************************************************************
        900-RECE41-READ-SEC             SECTION.
       *
@@ -669,6 +824,17 @@ grpsys     PERFORM 900-DBFETCH-SEC
                AT  END
                    MOVE    1           TO  FLG-END
                NOT AT  END
+                   IF      STS-RECE41          =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE01PARA      TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE41      TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
                    ADD     1           TO  CNT-IN
                                            CNT-IN-CANCEL
       *
@@ -735,12 +901,34 @@ grpsys     MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
        900-DBSELECT-SEC                SECTION.
       *
            MOVE    "DBSELECT"          TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
                CONTINUE
            ELSE
-               DISPLAY "SELECT ERR table=" MCP-TABLE
-                       " pathname="        MCP-PATHNAME
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    MCP-RC              TO  WRK-MCP-RC
+      *
+               STRING  "ＤＢ読み込みエラー　TABLE="
+                                           DELIMITED   BY  SIZE
+                       MCP-TABLE           DELIMITED   BY  SPACE
+                       " RC="              DELIMITED   BY  SIZE
+                       WRK-MCP-RC          DELIMITED   BY  SIZE
+                                           INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+      *
+               STRING  "ORCR0440 select err TABLE="
+                                           DELIMITED   BY  SIZE
+                       MCP-TABLE           DELIMITED   BY  SPACE
+                       " PATHNAME="        DELIMITED   BY  SIZE
+                       MCP-PATHNAME        DELIMITED   BY  SPACE
+                       " RC="              DELIMITED   BY  SIZE
+                       WRK-MCP-RC          DELIMITED   BY  SIZE
+                       LOW-VALUE           DELIMITED   BY  SIZE
+                                           INTO    WRK-ERRMSG
+               END-STRING
+               PERFORM 500-COBABORT-SEC
            END-IF
            .
        900-DBSELECT-EXT.

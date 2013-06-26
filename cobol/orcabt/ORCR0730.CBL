@@ -189,6 +189,7 @@
       *                                     一画面対応
       *  04.07.07    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *  04.07.08    NACL-藤原    12/12/17  複数枚レセプト分割対応
+      *  04.07.09    NACL-藤原    13/02/07  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -11322,9 +11323,52 @@
                    MOVE    SYS-2002-PTID       TO  RECEDEN-PTID
                    MOVE    SYS-2002-SRYYM      TO  RECEDEN-SRYYM
                    MOVE    SYS-2002-NYUGAIKBN  TO  RECEDEN-NYUGAIKBN
+                   MOVE    1                   TO  RECEDEN-TEISYUTUSAKI
                    MOVE    RECEDEN-REC         TO  MCPDATA-REC
                    MOVE    "tbl_receden"       TO  MCP-TABLE
-                   MOVE    "del2"              TO  MCP-PATHNAME
+                   MOVE    "del4"              TO  MCP-PATHNAME
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   PERFORM   900-ORCDBMAIN-SEC
+                   IF      MCP-RC           NOT =   ZERO
+                     DISPLAY "TABLE=" MCP-TABLE "PATHNAME=" MCP-PATHNAME
+                     DISPLAY " MCP-RC=" MCP-RC
+                       MOVE
+                       "レセ電削除処理（個別分）でエラーとなりました"
+                                                   TO    WRK-RECEERR
+                       PERFORM 500-ERR-HENSYU-SEC
+                       GO  TO  5001-DB-DELETE-EXT
+                   END-IF
+      *
+                   INITIALIZE                  RECEDEN-REC
+                   MOVE    SYS-1001-HOSPNUM    TO  RECEDEN-HOSPNUM
+                   MOVE    SYS-2002-PTID       TO  RECEDEN-PTID
+                   MOVE    SYS-2002-SRYYM      TO  RECEDEN-SRYYM
+                   MOVE    SYS-2002-NYUGAIKBN  TO  RECEDEN-NYUGAIKBN
+                   MOVE    2                   TO  RECEDEN-TEISYUTUSAKI
+                   MOVE    RECEDEN-REC         TO  MCPDATA-REC
+                   MOVE    "tbl_receden"       TO  MCP-TABLE
+                   MOVE    "del4"              TO  MCP-PATHNAME
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   PERFORM   900-ORCDBMAIN-SEC
+                   IF      MCP-RC           NOT =   ZERO
+                     DISPLAY "TABLE=" MCP-TABLE "PATHNAME=" MCP-PATHNAME
+                     DISPLAY " MCP-RC=" MCP-RC
+                       MOVE
+                       "レセ電削除処理（個別分）でエラーとなりました"
+                                                   TO    WRK-RECEERR
+                       PERFORM 500-ERR-HENSYU-SEC
+                       GO  TO  5001-DB-DELETE-EXT
+                   END-IF
+      *
+                   INITIALIZE                  RECEDEN-REC
+                   MOVE    SYS-1001-HOSPNUM    TO  RECEDEN-HOSPNUM
+                   MOVE    SYS-2002-PTID       TO  RECEDEN-PTID
+                   MOVE    SYS-2002-SRYYM      TO  RECEDEN-SRYYM
+                   MOVE    SYS-2002-NYUGAIKBN  TO  RECEDEN-NYUGAIKBN
+                   MOVE    6                   TO  RECEDEN-TEISYUTUSAKI
+                   MOVE    RECEDEN-REC         TO  MCPDATA-REC
+                   MOVE    "tbl_receden"       TO  MCP-TABLE
+                   MOVE    "del4"              TO  MCP-PATHNAME
                    MOVE    "DBDELETE"          TO  MCP-FUNC
                    PERFORM   900-ORCDBMAIN-SEC
                    IF      MCP-RC           NOT =   ZERO

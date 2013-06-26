@@ -59,6 +59,8 @@
       *  04.05.01    NACL-Æ£¸¶    11/11/22  Æ±ÆüºÆÆþ±¡ÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/07  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
+      *  04.07.02    NACL-ÌçÏÆ    13/04/16  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *                                     Ï«ºÒ»ØÄê°åÎÅµ¡´Ø¶èÊ¬ÊÔ½¸
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -197,6 +199,8 @@
       *
            03  WRK-KOMUKBN             PIC X(01).
            03  WRK-KOMUTENTANKA        PIC 9(02).
+      *
+           03  WRK-RSIIRYOKBN          PIC X(01).
       *
            03  WRK-STYMD               PIC X(08).
            03  WRK-EDYMD               PIC X(08).
@@ -528,6 +532,12 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-4001-HOSPNUM
                   ELSE
                     MOVE SYS-4001-KOMUTENTANKA
                                            TO    WRK-KOMUTENTANKA
+                  END-IF
+                  IF     SYS-4001-RSIIRYOKBN      =  SPACE
+                    MOVE "0"               TO    WRK-RSIIRYOKBN
+                  ELSE
+                    MOVE SYS-4001-RSIIRYOKBN
+                                           TO    WRK-RSIIRYOKBN
                   END-IF
               ELSE
                   MOVE    "Ï«ºÒ¼«Çå°åÎÅµ¡´Ø¾ðÊó¤¬¼èÆÀ¤Ç¤­¤Þ¤»¤ó¤Ç¤·¤¿"     
@@ -1255,6 +1265,11 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
            MOVE    WRK-KOMUKBN           TO   WRK-RECE82-KOMUKBN
       *    ¸øÌ³ºÒ³²ÅÀÃ±²Á
            MOVE    WRK-KOMUTENTANKA      TO   WRK-RECE82-KOMUTENTANKA
+      *    Ï«ºÒ»ØÄê°åÎÅµ¡´Ø¶èÊ¬
+           MOVE    WRK-RSIIRYOKBN        TO   WRK-RECE82-RSIIRYOKBN
+           IF      WRK-RECE82-HKNKBN     =   "4"
+               MOVE    "0"               TO   WRK-RECE82-RSIIRYOKBN
+           END-IF
       *
            IF    WRK-RECE82-SYOCD  =  SPACE
              EVALUATE  WRK-RECE82-HKNKBN
@@ -1499,6 +1514,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       MOVE SYS-4001-KOMUTENTANKA
                                              TO    WRK-KOMUTENTANKA
                     END-IF
+                    IF     SYS-4001-RSIIRYOKBN     =  SPACE
+                      MOVE "0"               TO    WRK-RSIIRYOKBN
+                    ELSE
+                      MOVE SYS-4001-RSIIRYOKBN
+                                             TO    WRK-RSIIRYOKBN
+                    END-IF
                 END-IF
       *
            END-PERFORM
@@ -1687,6 +1708,12 @@ grpsys         MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
                     ELSE
                       MOVE SYS-4001-KOMUTENTANKA
                                              TO    WRK-KOMUTENTANKA
+                    END-IF
+                    IF     SYS-4001-RSIIRYOKBN     =  SPACE
+                      MOVE "0"               TO    WRK-RSIIRYOKBN
+                    ELSE
+                      MOVE SYS-4001-RSIIRYOKBN
+                                             TO    WRK-RSIIRYOKBN
                     END-IF
                 END-IF
       *

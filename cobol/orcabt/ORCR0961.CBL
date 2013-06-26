@@ -66,6 +66,7 @@
       *
       *  04.07.01    NACL-Æ£¸¶    11/09/02  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-Æ£¸¶    12/01/24  monpe-0.6.20ÂÐ±þ
+      *  04.07.03    NACL-ÌçÏÆ    13/01/21  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1370,8 +1371,10 @@ grpsys        PERFORM 900-DBSELECT-SEC
            MOVE    WRK-JNISSU          TO  HCN51-NISSU
       *
       *    Ï«ºÒ¥ì¥»¥×¥È²ó¿ô
-           MOVE    RECE82-RECEKAISU    TO  WRK-RECEKAISU
-           MOVE    WRK-RECEKAISU       TO  HCN51-KAI
+           IF   RECE82-ROUKAISU   =   "2"
+             MOVE    RECE82-RECEKAISU  TO  WRK-RECEKAISU
+             MOVE    WRK-RECEKAISU     TO  HCN51-KAI
+           END-IF
       *
       *    Ï«ºÒ´ð½à´ÆÆÄ½ð¥³¡¼¥É
            IF      RECE82-SYOKAIFLG    =   "1"

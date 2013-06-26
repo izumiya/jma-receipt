@@ -99,6 +99,7 @@
       *
       *  04.07.01    NACL-Æ£¸¶    11/09/02  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-Æ£¸¶    12/01/24  monpe-0.6.20ÂÐ±þ
+      *  04.07.03    NACL-ÌçÏÆ    13/01/21  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1428,8 +1429,10 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            MOVE    WRK-JNISSU          TO  HC21-NISSU
       *
       *    Ï«ºÒ¥ì¥»¥×¥È²ó¿ô
-           MOVE    RECE41-RECEKAISU    TO  WRK-RECEKAISU
-           MOVE    WRK-RECEKAISU       TO  HC21-KAI
+           IF   RECE41-ROUKAISU   =   "2"
+             MOVE    RECE41-RECEKAISU  TO  WRK-RECEKAISU
+             MOVE    WRK-RECEKAISU     TO  HC21-KAI
+           END-IF
       *
       *    Ï«ºÒ´ð½à´ÆÆÄ½ð¥³¡¼¥É
            IF      RECE41-SYOKAIFLG    =   "1"

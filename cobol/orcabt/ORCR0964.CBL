@@ -35,6 +35,8 @@
       *  04.06.02    NACL-藤原    13/05/27  症状詳記の表題を平成２５年７月
       *                                     診療分以降は全て記載
       *  04.06.03    NACL-門脇    13/06/07  合計額ワーク領域のクリア
+      *
+      *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -638,7 +640,7 @@
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
                                                WRK-PARA-RECECOM
-                                                WRK-PARA-PRTKBN
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
@@ -1362,8 +1364,10 @@
            MOVE    WRK-JNISSU          TO  HCN67-NISSU
       *
       *    労災レセプト回数
-           MOVE    RECE82-RECEKAISU    TO  WRK-RECEKAISU
-           MOVE    WRK-RECEKAISU       TO  HCN67-KAI
+           IF   RECE82-ROUKAISU   =   "2"
+             MOVE    RECE82-RECEKAISU  TO  WRK-RECEKAISU
+             MOVE    WRK-RECEKAISU     TO  HCN67-KAI
+           END-IF
       *
       *    労災基準監督署コード
            IF      RECE82-SYOKAIFLG    =   "1"
