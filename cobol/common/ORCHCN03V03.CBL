@@ -95,6 +95,7 @@
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX1                 PIC 9(04).
+           03  IDXD                 PIC 9(04).
            03  IDX-M                PIC 9(04).
            03  IDX-JIHI             PIC 9(04).
            03  IDX-MEMO             PIC 9(04).
@@ -341,6 +342,9 @@
       *
       *    ÀÁµá½ñ·óÎÎ¼ý½ñ¤Þ¤È¤á¥µ¥Ö
            COPY    "CPORCHCN03S02.INC".
+      *
+      *    ÀÁµá´ü´ÖÊÔ½¸¥µ¥Ö
+           COPY    "CPORCHCN03S03.INC".
       *
       *    Ì¤¼ý³ÛÊÔ½¸
            COPY    "CPORCSMISYU.INC".
@@ -739,6 +743,19 @@
       *****************************************************************
        2001-HCN03-HEN-SEC              SECTION.
       *
+           INITIALIZE                  ORCHCN03S03AREA
+           MOVE    SYU-PTID            TO  ORCHCN03S03-PTID
+           PERFORM VARYING IDXD    FROM    1   BY  1
+                   UNTIL ( IDXD    >   ORCHCN03S02-GRP-CNT )
+               MOVE    ORCHCN03S02-GRP-DENPNUM (IDXD)
+                                   TO  ORCHCN03S03-DENPNUM (IDXD)
+           END-PERFORM
+           MOVE    SYU-SKYSTYMD    TO  ORCHCN03S03-SYUSTYMD
+           MOVE    SYU-SKYEDYMD    TO  ORCHCN03S03-SYUEDYMD
+           CALL    "ORCHCN03S03"       USING
+                                       SPA-AREA
+                                       ORCHCN03S03AREA
+      *
            INITIALIZE                  HCN03
       *
       *    ÅÁÉ¼ÈÖ¹æ
@@ -859,11 +876,13 @@
            END-IF
       *
       *    ÀÁµá³«»ÏÆü
-           MOVE    SYU-SKYSTYMD        TO  WRK-SYMD
+           MOVE    ORCHCN03S03-SKYSTYMD
+                                       TO  WRK-SYMD
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  HCN03-NYUINSTRYMD
       *    ÀÁµá½ªÎ»Æü
-           MOVE    SYU-SKYEDYMD        TO  WRK-SYMD
+           MOVE    ORCHCN03S03-SKYEDYMD
+                                       TO  WRK-SYMD
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  HCN03-NYUINENDYMD
       *    È¯¹ÔÆü

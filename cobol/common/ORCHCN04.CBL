@@ -112,6 +112,7 @@
            03  IDX-SYU             PIC 9(04).
            03  IDX-HZN             PIC 9(04).
            03  IDX1                PIC 9(04).
+           03  IDXD                PIC 9(04).
            03  IDXM                PIC 9(04).
            03  IDXJ                PIC 9(04).
            03  IDXM2               PIC 9(04).
@@ -426,6 +427,9 @@
       *
       *    保険組合せ名称編集サブ
            COPY    "CPORCSHKNMEI.INC".
+      *
+      *    請求期間編集サブ
+           COPY    "CPORCHCN03S03.INC".
       *
            COPY    "MCPAREA".
       *
@@ -781,6 +785,29 @@
       *****************************************************************
        20021-INIT-HENSYU-SEC          SECTION.
       *
+           INITIALIZE                  ORCHCN03S03AREA
+           MOVE    ORCHCN04-PTID   TO  ORCHCN03S03-PTID
+           PERFORM VARYING IDXD    FROM    1   BY  1
+                   UNTIL ( IDXD    >   10  )
+                      OR ( ORCHCN04-DENPNUM (IDXD) =   ZERO )
+               MOVE    ORCHCN04-DENPNUM (IDXD)
+                                   TO  ORCHCN03S03-DENPNUM (IDXD)
+           END-PERFORM
+           IF      ORCHCN04-SKYSTYMD   =   SPACE
+               MOVE    SYU-SKYSTYMD        TO  ORCHCN03S03-SYUSTYMD
+           ELSE
+               MOVE    ORCHCN04-SKYSTYMD   TO  ORCHCN03S03-SYUSTYMD
+           END-IF
+
+           IF      ORCHCN04-SKYEDYMD   =   SPACE
+               MOVE    SYU-SKYEDYMD        TO  ORCHCN03S03-SYUEDYMD
+           ELSE
+               MOVE    ORCHCN04-SKYEDYMD   TO  ORCHCN03S03-SYUEDYMD
+           END-IF
+           CALL    "ORCHCN03S03"       USING
+                                       SPA-AREA
+                                       ORCHCN03S03AREA
+      *
            MOVE    SYU-DENPNUM         TO  WRK-HEAD-DENPNUM
       *    発行日
            IF     (ORCHCN04-DENPPRTYMD NOT =   SPACE )
@@ -797,19 +824,11 @@
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  WRK-HEAD-HAKYMD
       *    請求開始日
-           IF      ORCHCN04-SKYSTYMD   =   SPACE
-               MOVE    SYU-SKYSTYMD        TO  WRK-SYMD
-           ELSE
-               MOVE    ORCHCN04-SKYSTYMD   TO  WRK-SYMD
-           END-IF
+           MOVE    ORCHCN03S03-SKYSTYMD TO WRK-SYMD
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  WRK-HEAD-NYUINSTRYMD
       *
-           IF      ORCHCN04-SKYEDYMD   =   SPACE
-               MOVE    SYU-SKYEDYMD        TO  WRK-SYMD
-           ELSE
-               MOVE    ORCHCN04-SKYEDYMD   TO  WRK-SYMD
-           END-IF
+           MOVE    ORCHCN03S03-SKYEDYMD TO WRK-SYMD
            PERFORM 800-SEIWA-HEN-SEC
            MOVE    WRK-HENYMDG         TO  WRK-HEAD-NYUINENDYMD
       *
