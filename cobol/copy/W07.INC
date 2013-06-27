@@ -72,7 +72,7 @@
                     06  W07-GAIMOVE.
                       07  W07-VALUE   PIC X(22).
                     06  W07-GAIMOVE-COUNT   PIC S9(9)   BINARY.
-                    06  W07-GAIMOVE-ITEM    PIC X(22)   OCCURS  3 TIMES.
+                    06  W07-GAIMOVE-ITEM    PIC X(22)   OCCURS  9 TIMES.
                   05  W07-HOUKATU-COMBO.
                     06  W07-HOUKATU.
                       07  W07-VALUE   PIC X(30).

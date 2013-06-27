@@ -214,7 +214,8 @@
                            11  SPA-GMN-GAIMOVEMEI          PIC X(20).
                        09  SPA-GMN-GAIMOVE-COMB.
                            11  SPA-GMN-GAIMOVE-LIST        PIC X(22)
-                                                           OCCURS  3.
+                                                           OCCURS  9.
+                       09  SPA-GMN-GAIMOVEMAX              PIC 9(02).
       *                時間外加算チェック
                        09  SPA-GMN-JIKANTOKU-CHK-G.
                            11  SPA-GMN-JIKANTOKU-CHK       PIC X(01).
@@ -1675,6 +1676,9 @@
            MOVE    "0 標準"            TO  SPA-GMN-GAIMOVE-LIST(1)
            MOVE    "1 保険組合せ"      TO  SPA-GMN-GAIMOVE-LIST(2)
            MOVE    "2 診療科"          TO  SPA-GMN-GAIMOVE-LIST(3)
+           MOVE    "3 診療科→ドクター"
+                                       TO  SPA-GMN-GAIMOVE-LIST(4)
+           MOVE    4                   TO  SPA-GMN-GAIMOVEMAX
       *
       *
            MOVE    "0 包括分入力をしない"
@@ -2533,6 +2537,9 @@
                                                TO  SPA-GMN-GAIMOVE-G
                 WHEN    "2"
                     MOVE    SPA-GMN-GAIMOVE-LIST(3)
+                                               TO  SPA-GMN-GAIMOVE-G
+                WHEN    "3"
+                    MOVE    SPA-GMN-GAIMOVE-LIST(4)
                                                TO  SPA-GMN-GAIMOVE-G
                 WHEN    OTHER
                     MOVE    SPA-GMN-GAIMOVE-LIST(1)
@@ -6195,7 +6202,7 @@
       *
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   3
+                   UNTIL       IDX     >   SPA-GMN-GAIMOVEMAX
                IF      SPA-GMN-GAIMOVE
                                       =   SPA-GMN-GAIMOVE-LIST(IDX)
                                                                 (1:1)
@@ -10383,11 +10390,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    外来カーソル移動
            MOVE    SPA-GMN-GAIMOVE-G       TO  W07-GAIMOVE
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   3
+                   UNTIL       IDX     >   SPA-GMN-GAIMOVEMAX
                MOVE    SPA-GMN-GAIMOVE-LIST (IDX)
                                        TO  W07-GAIMOVE-ITEM(IDX)
            END-PERFORM
-           MOVE    3                   TO  W07-GAIMOVE-COUNT
+           MOVE    SPA-GMN-GAIMOVEMAX  TO  W07-GAIMOVE-COUNT
       *
       *    数量ゼロ入力
            MOVE    SPA-GMN-SURYOZERO-G TO  W07-SURYOZERO

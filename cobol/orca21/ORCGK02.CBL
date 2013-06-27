@@ -103,6 +103,7 @@
       *  04.07.00    NACL-多々納  12/08/XX  ドクター選択対応
       *  04.07.00    NACL-多々納  12/10/10  照会からの遷移対応
       *  04.08.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
+      *  04.08.00    NACL-多々納  13/06/28  ドクターカーソル移動対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1699,6 +1700,7 @@
       *                保険組合せ
                        MOVE    05              TO  SPA-GMN-CUR
                    WHEN    "2"
+                   WHEN    "3"
       *                受付一覧からの時
                        IF      SPA-MOTOPG          =   "U02"
                            MOVE    1               TO  SPA-GMN-CUR
@@ -2491,6 +2493,7 @@
       *                保険組合せ
                            MOVE    05              TO  SPA-GMN-CUR
                        WHEN    "2"
+                       WHEN    "3"
       *                診療科
       *                受付一覧からの時
                            IF      WRK-MOTOPG          =   "U01"
@@ -2713,10 +2716,22 @@
                    ELSE
                        PERFORM 41013-SRYKA-CHANGE-SEC
                    END-IF
+      *H25.7
+                   IF     (SPA-GAI-CURSOR-SET  =   "3"   )
+                    AND   (SPA-ERRCD           =   SPACE )
+      *                ドクターへ
+                       MOVE    10              TO  SPA-GMN-CUR
+                   END-IF
       *!!
                WHEN    "0138"
                    MOVE    SPACE               TO  SPA-KIDCD
                    PERFORM 41013-SRYKA-CHANGE02-SEC
+      *H25.7
+                   IF     (SPA-GAI-CURSOR-SET  =   "3"   )
+                    AND   (SPA-ERRCD           =   SPACE )
+      *                ドクターへ
+                       MOVE    10              TO  SPA-GMN-CUR
+                   END-IF
       *!!
       *
       *        同日再診３回以上の確認
@@ -2762,6 +2777,12 @@
                WHEN    "0109"
                    MOVE    SPACE               TO  SPA-KIDCD
                    PERFORM 30019-DOUSAISIN-SEC
+      *H25.7
+                   IF     (SPA-GAI-CURSOR-SET  =   "3"   )
+                    AND   (SPA-ERRCD           =   SPACE )
+      *                ドクターへ
+                       MOVE    10              TO  SPA-GMN-CUR
+                   END-IF
       *
       *        再診を初診料へ自動算定の確認
                WHEN    "0110"
@@ -2916,6 +2937,12 @@
                    ELSE
                        MOVE    1                   TO  SPA-GMN-CUR
                        MOVE    SPA-MAE-SRYKA-G     TO  SPA-GMN-SRYKA-G
+                   END-IF
+      *H25.7
+                   IF     (SPA-GAI-CURSOR-SET  =   "3"   )
+                    AND   (SPA-ERRCD           =   SPACE )
+      *                ドクターへ
+                       MOVE    10              TO  SPA-GMN-CUR
                    END-IF
       *
       *        他保険算定あり
@@ -5210,6 +5237,7 @@
       *            保険組合せ
                    MOVE    05              TO  SPA-GMN-CUR
                WHEN    "2"
+               WHEN    "3"
       *            診療科
                    MOVE    06              TO  SPA-GMN-CUR
                END-EVALUATE
@@ -5865,6 +5893,11 @@
            IF      K02-SRYKA           =   SPA-GMN-SRYKA-G
                MOVE    1               TO  SPA-GMN-PAGE
                MOVE    1               TO  SPA-GMN-CUR
+      *H25.7
+               IF      SPA-GAI-CURSOR-SET  =   "3"
+      *            ドクターへ
+                   MOVE    10              TO  SPA-GMN-CUR
+               END-IF
                GO      TO      41013-SRYKAI-SYORI-EXT
            END-IF
            IF      SPA-PTID            =   ZERO
@@ -5917,6 +5950,13 @@
                    MOVE    "0107"              TO  SPA-KIDCD
                ELSE
                    PERFORM 41013-SRYKA-CHANGE-SEC
+               END-IF
+           END-IF
+      *
+           IF    SPA-ERRCD             =   SPACE
+               IF      SPA-GAI-CURSOR-SET  =   "3"
+      *            ドクターへ
+                   MOVE    10              TO  SPA-GMN-CUR
                END-IF
            END-IF
       *

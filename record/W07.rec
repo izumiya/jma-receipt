@@ -90,7 +90,7 @@ W07	{
 						value	varchar(22);
 					};
 					count	int;
-					item	varchar(22)[3];
+					item	varchar(22)[9];
 				};
 				HOUKATU_COMBO	{
 					HOUKATU	{
