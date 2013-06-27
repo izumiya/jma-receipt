@@ -7599,7 +7599,11 @@
                          TO WRK-RECE45YY-TOKUKIZAISBT1(IDX-RECE45 1)
            MOVE TNS-SANSOKBN
                          TO WRK-RECE45YY-SANSOKBN(IDX-RECE45 1)
-      ***  MOVE "1"      TO WRK-RECE45YY-RECEPTFLG(IDX-RECE45 1)
+           IF   RECE41-HKNKBN  = "1" OR "2"
+              CONTINUE
+           ELSE
+              MOVE  "1"  TO WRK-RECE45YY-RECEPTFLG(IDX-RECE45 1)
+           END-IF
       *
            .
        250321-GAIKAN-TBL-HENSYU-EXT.
