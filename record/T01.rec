@@ -24,6 +24,9 @@ T01	{
 		B16	{
 			state	int;
 		};
+		B17	{
+			state	int;
+		};
 		B19	{
 			state	int;
 		};
