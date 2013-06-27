@@ -2848,7 +2848,8 @@
            MOVE    SPA-GMN-W20-BTUNUM
                                    TO  SYS-KBNCD
            MOVE    "%"             TO  SYS-KBNCD(3:1)
-           MOVE    SPA-NAI-W20-KJNYMD      TO  SYS-STYUKYMD
+           MOVE    SPA-NAI-W20-YUKOEDYMD
+                                   TO  SYS-STYUKYMD
                                        SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY-SEL-SEC
       *
