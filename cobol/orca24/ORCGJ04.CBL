@@ -55,6 +55,7 @@
       * 04.05.00     NACL-多々納  09/09/16  "0086XXXXX"コメント対応
       * 04.06.00     NACL-多々納  10/07/01  残量廃棄自動算定対応
       * 04.06.00     NACL-多々納  10/10/XX  包括算定（剤）対応
+      * 04.08.00     NACL-多々納  13/06/XX  労災レセ電対応
       ***************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1370,6 +1371,23 @@
                                                           (SPA-GMN-IDX)
                        END-IF
                END-EVALUATE
+           END-PERFORM
+      *
+      *    入力コード・名称チェック処理
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   (IDX        >   SPA-MAX-LINE )  OR
+                          ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
+                           (SPA-COM-INPUTCD(IDX)   =   SPACE ))
+      *        警告表示をしない
+               MOVE    "1"                 TO  SPA-COM-KZMFLG (IDX)
+               MOVE    "1"                 TO  SPA-COM-HKEIFLG(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG2(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG3(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG4(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG5(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG6(IDX)
+               MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG1(IDX)
+               MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG(IDX)
            END-PERFORM
       *
       *    診療行為、計計算処理、編集
