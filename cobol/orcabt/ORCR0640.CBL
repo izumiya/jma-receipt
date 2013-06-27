@@ -610,6 +610,7 @@
       *  04.07.06    NACL-門脇    12/11/15  システム管理２０１０機能追加対応
       *  04.07.07    NACL-門脇    12/09/25  コメント差込取り止め（在宅持続陽圧）
       *  04.07.08    NACL-門脇    13/01/17  複数枚レセプト分割対応
+      *  04.07.09    NACL-門脇    13/07/01  入院料他保険算定時コメント記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2648,6 +2649,10 @@
            IF      SYS-200501-COMMENT-NYUINRYO-KSIKBN
                                     =   SPACE
                MOVE    "1"   TO  SYS-200501-COMMENT-NYUINRYO-KSIKBN
+           END-IF
+           IF      SYS-200501-COMMENT-NYUINRYO1-KSIKBN
+                                    =   SPACE
+               MOVE    "2"   TO  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
            END-IF
       *
            MOVE    "tbl_syskanri"       TO  MCP-TABLE
@@ -16266,7 +16271,14 @@
       *
                 IF         WRK-DAY5(IDY)      NOT =  ZERO
                 AND        WRK-DAY1(IDY)      NOT =  ZERO
-                   PERFORM  2104411-NYUINRYOFLG-HENSYU-SEC
+                     EVALUATE  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
+                       WHEN     "0"
+                          MOVE   SPACE    TO   RECE62-NYUINRYOFLG
+                       WHEN     "1"
+                          MOVE    "6"     TO   RECE62-NYUINRYOFLG
+                       WHEN     "2"
+                          PERFORM  2104411-NYUINRYOFLG-HENSYU-SEC
+                     END-EVALUATE
                 ELSE
                    IF      WRK-DAY5(IDY)              NOT =  ZERO
                    AND     RECE62-NYUINDAY-KBN(IDY)   NOT =  "1"
@@ -16295,7 +16307,14 @@
                    IF      WRK-DAY5(IDY)              NOT =  ZERO
                    AND     RECE62-NYUINDAY-KBN(IDY)       =  "1"
                    AND     RECE62-SRYYM                  >=  "200904"
+                     EVALUATE  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
+                       WHEN     "0"
+                          MOVE   SPACE    TO   RECE62-NYUINRYOFLG
+                       WHEN     "1"
+                          MOVE    "6"     TO   RECE62-NYUINRYOFLG
+                       WHEN     "2"
                           PERFORM  2104411-NYUINRYOFLG-HENSYU-SEC
+                     END-EVALUATE
                    END-IF
                 END-IF
                 IF  RECE62-HKNNUM(1:2)  =  "98"  OR  "90"  OR "91"

@@ -230,6 +230,7 @@
       *  04.07.02    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.03    NACL-門脇    12/09/25  コメント差込取り止め（在宅持続陽圧）
       *  04.07.04    NACL-門脇    13/01/21  労災レセ電対応
+      *  04.07.05    NACL-門脇    13/07/01  入院料他保険算定時コメント記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1700,6 +1701,10 @@ grpsys       PERFORM 900-DBSELECT-SEC
            IF      SYS-200501-COMMENT-NYUINRYO-KSIKBN
                                     =   SPACE
                MOVE    "1"   TO  SYS-200501-COMMENT-NYUINRYO-KSIKBN
+           END-IF
+           IF      SYS-200501-COMMENT-NYUINRYO1-KSIKBN
+                                    =   SPACE
+               MOVE    "2"   TO  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
            END-IF
       *
            OPEN    OUTPUT              RECE84-FILE
@@ -10903,7 +10908,14 @@ grpsys     PERFORM  900-DBSELECT-SEC
       *
                 IF         WRK-DAY5(IDY)      NOT =  ZERO
                 AND        WRK-DAY1(IDY)      NOT =  ZERO
-                   PERFORM   260111-NYUINRYOFLG-HENSYU-SEC
+                     EVALUATE  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
+                       WHEN     "0"
+                          MOVE   SPACE    TO   RECE82-NYUINRYOFLG
+                       WHEN     "1"
+                          MOVE    "6"     TO   RECE82-NYUINRYOFLG
+                       WHEN     "2"
+                          PERFORM  260111-NYUINRYOFLG-HENSYU-SEC
+                     END-EVALUATE
                 ELSE
                    IF      WRK-DAY5(IDY)              NOT =  ZERO
                    AND     RECE82-NYUINDAY-KBN(IDY)   NOT =  "1"
@@ -10921,7 +10933,14 @@ grpsys     PERFORM  900-DBSELECT-SEC
                    IF      WRK-DAY5(IDY)              NOT =  ZERO
                    AND     RECE82-NYUINDAY-KBN(IDY)       =  "1"
                    AND     RECE82-SRYYM                  >=  "200904"
-                          PERFORM   260111-NYUINRYOFLG-HENSYU-SEC
+                     EVALUATE  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
+                       WHEN     "0"
+                          MOVE   SPACE    TO   RECE82-NYUINRYOFLG
+                       WHEN     "1"
+                          MOVE    "6"     TO   RECE82-NYUINRYOFLG
+                       WHEN     "2"
+                          PERFORM  260111-NYUINRYOFLG-HENSYU-SEC
+                     END-EVALUATE
                    END-IF
                 END-IF
       *
