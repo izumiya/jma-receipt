@@ -304,6 +304,8 @@
                    07  SPA-NAI-NYKHNKKBN              PIC X(01).
       *            一括入金・返金
                    07  SPA-IKKATUKBN                  PIC X(01).
+      *            入金まとめ返却区分
+                   07  SPA-MATOME-NYUHENKIN-KBN       PIC X(02).
       *
       *    ＣＬＡＩＭ画面
            03  SPA-K03X-AREA.

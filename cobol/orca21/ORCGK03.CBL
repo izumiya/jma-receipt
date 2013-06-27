@@ -5957,6 +5957,9 @@
       *        MOVE    SYUNOU-REC      TO  SPA-SYUNOU-REC
       *                                        (SPA-SYUNOU-IDX)
       *****END-IF
+      *ver.4.7
+           MOVE    SPACE               TO  SPA-MATOME-NYUHENKIN-KBN
+      *
       *    入金額振り分け処理
            IF      SPA-GMN-NYUKINKBN   =   "1"
                MOVE    SPA-GOK-NYUKIN      TO  WRK-NYUKIN
@@ -6200,6 +6203,11 @@
            END-IF
       *    返金振り分け残額
            MOVE    LNK-SCNYUKIN-HENKINZAN    TO  SPA-NYU-ZENHENKIN
+      *
+      *ver.4.7
+      *    充当処理あり
+           MOVE    LNK-SCNYUKIN-MATOME-NYUHENKIN-KBN
+                                       TO  SPA-MATOME-NYUHENKIN-KBN
       *
            IF      SPA-GMN-NYUKINKBN   =   "2"  OR  "3"
                COMPUTE SPA-NYU-ZENHENKIN   =   SPA-NYU-ZENHENKIN
@@ -6445,6 +6453,10 @@
                COMPUTE ORCHC03-ZEN-HENKIN  =   SPA-GOK-HENKIN
                                            -   WRK-HENKIN
            END-IF
+      *ver.4.7
+      *    充当処理あり
+           MOVE    SPA-MATOME-NYUHENKIN-KBN
+                                       TO  ORCHC03-MATOME-NYUHENKIN-KBN
       *
            IF      SPA-GMN-HAKFLG  NOT =   ZERO
                MOVE    "02"                TO  SPA-PRT-FLG
