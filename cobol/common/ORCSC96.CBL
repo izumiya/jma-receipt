@@ -1218,10 +1218,40 @@
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
-               WHEN    "0402"
-                   STRING  "処置に通則加算があります。"
+               WHEN    "0404"
+                   STRING  "手技と薬剤が混在しています。"
                            "手技毎に剤分離するか、"
-                           "労災の合成コードで算定して下さい"
+                           "薬剤をまとめて下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0405"
+                   STRING  "手技と器材が混在しています。"
+                           "手技毎に剤分離するか、"
+                           "器材をまとめて下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K404"
+                   STRING  "警告！"
+                           "手技と薬剤が混在しています。"
+                           "手技毎に剤分離するか、"
+                           "薬剤をまとめて下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K405"
+                   STRING  "警告！"
+                           "手技と器材が混在しています。"
+                           "手技毎に剤分離するか、"
+                           "器材をまとめて下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "K406"
+                   STRING  "警告！"
+                           "複数の手技と時間外加算があります。"
+                           "労災の合成コードで算定して下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING

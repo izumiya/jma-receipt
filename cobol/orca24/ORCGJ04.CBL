@@ -1367,6 +1367,22 @@
                END-EVALUATE
            END-PERFORM
       *
+      *    入力コード・名称チェック処理
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   (IDX        >   SPA-MAX-LINE )  OR
+                          ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
+                           (SPA-COM-INPUTCD(IDX)   =   SPACE ))
+      *        警告表示をしない
+               MOVE    "1"                 TO  SPA-COM-KZMFLG (IDX)
+               MOVE    "1"                 TO  SPA-COM-HKEIFLG(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG2(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG3(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG4(IDX)
+               MOVE    "1"                 TO  SPA-COM-KZMFLG5(IDX)
+               MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG1(IDX)
+               MOVE    "1"                 TO  SPA-COM-TUKIJGNFLG(IDX)
+           END-PERFORM
+      *
       *    診療行為、計計算処理、編集
            MOVE    "2"             TO  FLG-TOROKU
            PERFORM 510-TBLHEN-SEC
