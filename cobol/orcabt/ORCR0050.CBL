@@ -75,6 +75,9 @@
       *  04.06.06    NACL-藤原    11/10/24  予約コード入力による病名編集
       *                                     フラグの設定
       *  04.06.07    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
+      *
+      *  04.07.01    NACL-藤原    13/07/01  レセ電請求時の受付エラー分の
+      *                                     自費レセプト対象の有無設定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -402,7 +405,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
            PERFORM 900-CLOSE-SEC
       *
       *    対象病名がなかったとき
-           IF      SYS-200501-CHKKBN   =   "1"
+           IF    ( SYS-200501-CHKKBN   =   "1"     )
+           OR    ( SYS-200501-CHKKBN   =   "2" AND
+                   RECE02-RECESYUBETU
+                                   NOT =   "8888"  )
                IF      CNT-RECE-OUT        =   ZERO
                    IF      RECE02-ERR-ERRKBN   =   ZERO 
                        MOVE    10                  TO  RECE02-ERR-ERRKBN

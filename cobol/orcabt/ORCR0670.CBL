@@ -64,6 +64,8 @@
       *  04.06.05    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *
       *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
+      *  04.07.02    NACL-藤原    13/07/01  レセ電請求時の受付エラー分の
+      *                                     自費レセプト対象の有無設定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -396,7 +398,10 @@
            PERFORM 900-CLOSE-SEC
       *
       *    対象病名がなかったとき
-           IF      SYS-200501-CHKKBN   =   "1"
+           IF    ( SYS-200501-CHKKBN   =   "1"     )
+           OR    ( SYS-200501-CHKKBN   =   "2" AND
+                   RECE62-RECESYUBETU
+                                   NOT =   "8888"  )
                IF      CNT-RECE-OUT        =   ZERO
                    IF      RECE62-ERR-ERRKBN   =   ZERO 
                        MOVE    10                  TO  RECE62-ERR-ERRKBN

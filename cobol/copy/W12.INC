@@ -102,12 +102,18 @@
                     06  W12-COMMENT-NYUINRYO-COUNT   PIC S9(9)   BINARY.
                     06  W12-COMMENT-NYUINRYOLST
                             PIC X(34)   OCCURS  5 TIMES.
+                  05  W12-COMMENT-NYUINRYO1-COMBO.
+                    06  W12-COMMENT-NYUINRYO1.
+                      07  W12-VALUE   PIC X(34).
+                    06  W12-COMMENT-NYUINRYO1-COUNT   PIC S9(9)  BINARY.
+                    06  W12-COMMENT-NYUINRYO1LST
+                            PIC X(34)   OCCURS  5 TIMES.
                   05  W12-CHKKBN-COMBO.
                     06  W12-CHKKBN.
-                      07  W12-VALUE   PIC X(20).
+                      07  W12-VALUE   PIC X(36).
                     06  W12-CHKKBN-COUNT   PIC S9(9)   BINARY.
                     06  W12-CHKKBNLST
-                            PIC X(20)   OCCURS  5 TIMES.
+                            PIC X(36)   OCCURS  5 TIMES.
                   05  W12-BYOMEI-PRTJYUN-COMBO.
                     06  W12-BYOMEI-PRTJYUN.
                       07  W12-VALUE   PIC X(36).
@@ -328,6 +334,12 @@
                       07  W12-VALUE   PIC X(24).
                     06  W12-KOUIKIRECEKBN-COUNT   PIC S9(9)   BINARY.
                     06  W12-KOUIKIRECEKBNLST
+                            PIC X(24)   OCCURS  4 TIMES.
+                  05  W12-ROURECEKBN-COMBO.
+                    06  W12-ROURECEKBN.
+                      07  W12-VALUE   PIC X(24).
+                    06  W12-ROURECEKBN-COUNT   PIC S9(9)   BINARY.
+                    06  W12-ROURECEKBNLST
                             PIC X(24)   OCCURS  4 TIMES.
                   05  W12-RECEDENOUT.
                     06  W12-VALUE   PIC X(30).
@@ -584,6 +596,7 @@
                     06  W12-SYUKA-KOUIKI-COUNT   PIC S9(9)   BINARY.
                     06  W12-SYUKA-KOUIKILST
                             PIC X(22)   OCCURS  3 TIMES.
+                04  W12-FI31.
                   05  W12-INSPECT-CHARACTER-KBN-COMBO.
                     06  W12-INSPECT-CHARACTER-KBN.
                       07  W12-VALUE   PIC X(36).
@@ -591,7 +604,6 @@
                                       PIC S9(9)   BINARY.
                     06  W12-INSPECT-CHARACTER-KBNLST
                             PIC X(36)   OCCURS  5 TIMES.
-                04  W12-FI31.
                   05  W12-INSPECT-ZERO-KBN-COMBO.
                     06  W12-INSPECT-ZERO-KBN.
                       07  W12-VALUE   PIC X(24).

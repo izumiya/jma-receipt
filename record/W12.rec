@@ -121,12 +121,19 @@ W12	{
 					count	int;
 					item	varchar(34)[5];
 				};
-				CHKKBN_COMBO	{
-					CHKKBN	{
-						value	varchar(20);
+				COMMENT_NYUINRYO1_COMBO	{
+					COMMENT_NYUINRYO1	{
+						value	varchar(34);
 					};
 					count	int;
-					item	varchar(20)[5];
+					item	varchar(34)[5];
+				};
+				CHKKBN_COMBO	{
+					CHKKBN	{
+						value	varchar(36);
+					};
+					count	int;
+					item	varchar(36)[5];
 				};
 				BYOMEI_PRTJYUN_COMBO	{
 					BYOMEI_PRTJYUN	{
@@ -401,6 +408,13 @@ W12	{
 				};
 				KOUIKIRECEKBN_COMBO	{
 					KOUIKIRECEKBN	{
+						value	varchar(24);
+					};
+					count	int;
+					item	varchar(24)[4];
+				};
+				ROURECEKBN_COMBO	{
+					ROURECEKBN	{
 						value	varchar(24);
 					};
 					count	int;
