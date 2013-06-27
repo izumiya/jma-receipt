@@ -1639,6 +1639,8 @@
                            MOVE    "K402"          TO  WRK-ERRCD
                            MOVE    "1"             TO  WRK-COM-KZMFLG
                                                               (IDX-F-J)
+                           MOVE    "1"             TO  WRK-COM-CUR
+                                                              (IDX-F-J)
                            MOVE    IDX-F-J         TO  LNK-ORCSC-KEI-IDX
                        END-IF
                    END-IF
@@ -1750,9 +1752,6 @@
                PERFORM 990-DBCLOSE-SEC
                IF      FLG-SYSKANRI        =   ZERO
                    MOVE    SYSKANRI-REC        TO  SYS-200501-REC
-      *TEST
-               DISPLAY "SYS-200501-ROURECEKBN:" SYS-200501-ROURECEKBN 
-      *TEST
                    IF      SYS-200501-ROURECEKBN   =   SPACE
                        MOVE    "0"             TO  SYS-200501-ROURECEKBN
                    END-IF
@@ -2488,11 +2487,10 @@
                               OR  (SPA-ERRCD   NOT =   SPACE )
                    IF      TBL-IDX-F (IDXF)    >   ZERO
                        MOVE    TBL-IDX-F (IDXF)    TO  IDXF2
-                       IF     (WRK-COM-KZMFLG(IDXF2)   =   SPACE
-                                                       OR  "1"  )
+                       IF     (WRK-COM-KZMFLG(IDXF2)   =   SPACE)
                           AND (LNK-ORCSC-KEI-IDX       =   ZERO )
                            MOVE    "K406"          TO  SPA-ERRCD
-                           MOVE    "2"             TO  WRK-COM-KZMFLG
+                           MOVE    "1"             TO  WRK-COM-KZMFLG
                                                               (IDXF2)
                            MOVE    "1"             TO  WRK-COM-CUR
                                                               (IDXF2)
