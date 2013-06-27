@@ -157,6 +157,7 @@
       *  04.07.03    NACL-藤原    12/11/20  リアルタイムプレビュー時の
       *                                     一画面対応
       *  04.07.04    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
+      *  04.07.05    NACL-藤原    12/11/21  労災レセ電作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -234,6 +235,7 @@
            03  FLG-TOUROKU         PIC 9(01).
            03  FLG-SEIKYU-UMU      PIC 9(01).
            03  FLG-TAISYO          PIC 9(01).
+           03  FLG-4001-RSIIRYOKBN PIC X(01).
       *
       *    フラグ領域
        01  STS-AREA.
@@ -3500,7 +3502,6 @@ grpsys             MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                    MOVE    "1003"          TO  SPA-ERRCD
                    GO  TO  4801-DBDELETE-SYORI-EXT
                END-IF
-      *
       *        レセ電削除
                INITIALIZE                  RECEDEN-REC
                MOVE    SPA-HOSPNUM     TO  RECEDEN-HOSPNUM
@@ -3508,9 +3509,68 @@ grpsys             MOVE    SPA-HOSPNUM     TO  PTINF-HOSPNUM
                MOVE    WRK-ACCT-NYUGAIKBN
                                        TO  RECEDEN-NYUGAIKBN
                MOVE    WRK-ACCT-PTID   TO  RECEDEN-PTID
+               MOVE    1               TO  RECEDEN-TEISYUTUSAKI
                MOVE    RECEDEN-REC     TO  MCPDATA-REC
                MOVE    "tbl_receden"   TO  MCP-TABLE
-               MOVE    "del2"          TO  MCP-PATHNAME
+               MOVE    "del4"          TO  MCP-PATHNAME
+               MOVE    "DBDELETE"      TO  MCP-FUNC
+               PERFORM 900-ORCDBMAIN-SEC
+               IF      MCP-RC      NOT =   ZERO
+                   DISPLAY "RECEDEN KEY=" RECEDEN-KEY
+                   MOVE    "1004"          TO  SPA-ERRCD
+                   GO  TO  4801-DBDELETE-SYORI-EXT
+               END-IF
+      *
+               INITIALIZE                  RECEDEN-REC
+               MOVE    SPA-HOSPNUM     TO  RECEDEN-HOSPNUM
+               MOVE    WRK-ACCT-SRYYM  TO  RECEDEN-SRYYM
+               MOVE    WRK-ACCT-NYUGAIKBN
+                                       TO  RECEDEN-NYUGAIKBN
+               MOVE    WRK-ACCT-PTID   TO  RECEDEN-PTID
+               MOVE    2               TO  RECEDEN-TEISYUTUSAKI
+               MOVE    RECEDEN-REC     TO  MCPDATA-REC
+               MOVE    "tbl_receden"   TO  MCP-TABLE
+               MOVE    "del4"          TO  MCP-PATHNAME
+               MOVE    "DBDELETE"      TO  MCP-FUNC
+               PERFORM 900-ORCDBMAIN-SEC
+               IF      MCP-RC      NOT =   ZERO
+                   DISPLAY "RECEDEN KEY=" RECEDEN-KEY
+                   MOVE    "1004"          TO  SPA-ERRCD
+                   GO  TO  4801-DBDELETE-SYORI-EXT
+               END-IF
+      *
+               INITIALIZE                  RECEDEN-REC
+               MOVE    SPA-HOSPNUM     TO  RECEDEN-HOSPNUM
+               MOVE    WRK-ACCT-SRYYM  TO  RECEDEN-SRYYM
+               MOVE    WRK-ACCT-NYUGAIKBN
+                                       TO  RECEDEN-NYUGAIKBN
+               MOVE    WRK-ACCT-PTID   TO  RECEDEN-PTID
+               MOVE    6               TO  RECEDEN-TEISYUTUSAKI
+               MOVE    RECEDEN-REC     TO  MCPDATA-REC
+               MOVE    "tbl_receden"   TO  MCP-TABLE
+               MOVE    "del4"          TO  MCP-PATHNAME
+               MOVE    "DBDELETE"      TO  MCP-FUNC
+               PERFORM 900-ORCDBMAIN-SEC
+               IF      MCP-RC      NOT =   ZERO
+                   DISPLAY "RECEDEN KEY=" RECEDEN-KEY
+                   MOVE    "1004"          TO  SPA-ERRCD
+                   GO  TO  4801-DBDELETE-SYORI-EXT
+               END-IF
+           END-IF     
+      *
+           IF    ( SPA-R01-RECEKBN     =   "3"      )
+           AND   ( WRK-ACCT-SRYYM      >=  "201307" )
+      *        レセ電削除
+               INITIALIZE                  RECEDEN-REC
+               MOVE    SPA-HOSPNUM     TO  RECEDEN-HOSPNUM
+               MOVE    WRK-ACCT-SRYYM  TO  RECEDEN-SRYYM
+               MOVE    WRK-ACCT-NYUGAIKBN
+                                       TO  RECEDEN-NYUGAIKBN
+               MOVE    WRK-ACCT-PTID   TO  RECEDEN-PTID
+               MOVE    3               TO  RECEDEN-TEISYUTUSAKI
+               MOVE    RECEDEN-REC     TO  MCPDATA-REC
+               MOVE    "tbl_receden"   TO  MCP-TABLE
+               MOVE    "del4"          TO  MCP-PATHNAME
                MOVE    "DBDELETE"      TO  MCP-FUNC
                PERFORM 900-ORCDBMAIN-SEC
                IF      MCP-RC      NOT =   ZERO
@@ -4294,6 +4354,41 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
                                        =   SPACE
                MOVE    ZERO            TO  SYS-200501-ROUPRTKBN-N
            END-IF
+           IF      SYS-200501-ROURECEKBN
+                                       =   SPACE
+               MOVE    "0"             TO  SYS-200501-ROURECEKBN
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-4001-RSIIRYOKBN
+           INITIALIZE                      SYS-4001-REC
+           MOVE    "4001"              TO  SYS-4001-KANRICD
+           MOVE    "*"                 TO  SYS-4001-KBNCD
+           MOVE    SPA-HOSPNUM         TO  SYS-4001-HOSPNUM
+           MOVE    SYS-4001-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key8"              TO  MCP-PATHNAME
+               PERFORM  900-SYSKANRI-READ-SEC
+               PERFORM  UNTIL   FLG-SYSKANRI   =    1
+                  MOVE    MCPDATA-REC     TO  SYS-4001-REC
+                  IF    ( SYS-4001-EDYUKYMD   >=  20130701 )
+                  AND   ( SYS-4001-RSIIRYOKBN =   "1"      )
+                      MOVE    SYS-4001-RSIIRYOKBN
+                                      TO  FLG-4001-RSIIRYOKBN
+                      MOVE    1       TO  FLG-SYSKANRI
+                  END-IF
+      *
+                  MOVE    "tbl_syskanri"  TO  MCP-TABLE
+                  MOVE    "key8"          TO  MCP-PATHNAME
+                  PERFORM 900-SYSKANRI-READ-SEC
+              END-PERFORM
+          END-IF
+          MOVE    "tbl_syskanri"      TO  MCP-TABLE
+          MOVE    "key8"              TO  MCP-PATHNAME
+          PERFORM 900-CLOSE-SEC
       *
            MOVE    SPACE           TO  SHELLTBL
            EVALUATE    SPA-R01-RECEKBN
@@ -4371,22 +4466,32 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
            END-EVALUATE
            MOVE    SMCNDATE-YMD    TO  SHELLTBL-ARG9
            MOVE    SMCNDATE-HMS    TO  SHELLTBL-ARG10 (1:6)
-            MOVE    "00"           TO  SHELLTBL-ARG10 (7:2)
+           MOVE    "00"            TO  SHELLTBL-ARG10 (7:2)
            MOVE    "00"            TO  SHELLTBL-ARG11
-           IF      SYS-2005-SYARECEKBN
-                                   =   ZERO
-               MOVE    "0"             TO  SHELLTBL-ARG12
-           ELSE
-               MOVE    SYS-2005-SYARECEKBN
-                                       TO  SHELLTBL-ARG12
-           END-IF
-           IF      SYS-2005-KKHRECEKBN
-                                   =   ZERO
-               MOVE    "0"             TO  SHELLTBL-ARG13
-           ELSE
-               MOVE    SYS-2005-KKHRECEKBN
-                                       TO  SHELLTBL-ARG13
-           END-IF
+           EVALUATE    SPA-R01-RECEKBN
+               WHEN    "0"
+                   IF      SYS-2005-SYARECEKBN
+                                           =   ZERO
+                       MOVE    "0"             TO  SHELLTBL-ARG12
+                   ELSE
+                       MOVE    SYS-2005-SYARECEKBN
+                                               TO  SHELLTBL-ARG12
+                   END-IF
+                   IF      SYS-2005-KKHRECEKBN
+                                           =   ZERO
+                       MOVE    "0"             TO  SHELLTBL-ARG13
+                   ELSE
+                       MOVE    SYS-2005-KKHRECEKBN
+                                               TO  SHELLTBL-ARG13
+                   END-IF
+               WHEN    "3"
+                   MOVE    SYS-200501-ROURECEKBN
+                                               TO  SHELLTBL-ARG12
+                   MOVE    FLG-4001-RSIIRYOKBN TO  SHELLTBL-ARG13
+               WHEN    OTHER
+                   MOVE    "0"                 TO  SHELLTBL-ARG12
+                                                   SHELLTBL-ARG13
+           END-EVALUATE
            EVALUATE    SPA-R01-RECEKBN
                WHEN    "3"
                    MOVE    SYS-200501-COMMENT-ROU-KSIKBN
