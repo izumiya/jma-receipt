@@ -74,6 +74,7 @@
       *  04.07.02    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
       *  04.07.03    NACL-藤原    12/08/01  レセ電データチェック機能対応
+      *  04.07.04    NACL-藤原    13/02/07  労災レセ電対応
       *****************************************************************
       *
        01  SPA-T01FREE.
@@ -191,6 +192,7 @@
                    07  SPA-B10-STATE               PIC S9(09)  BINARY.
                    07  SPA-B15-STATE               PIC S9(09)  BINARY.
                    07  SPA-B16-STATE               PIC S9(09)  BINARY.
+                   07  SPA-B17-STATE               PIC S9(09)  BINARY.
                    07  SPA-B19-STATE               PIC S9(09)  BINARY.
                    07  SPA-B20-STATE               PIC S9(09)  BINARY.
                    07  SPA-B21-STATE               PIC S9(09)  BINARY.
@@ -250,6 +252,7 @@
                05  SPA-NAI-200501-KOUIKIRECEKBN    PIC X(01).
                05  SPA-NAI-2005-SYARECEKBN         PIC X(01).
                05  SPA-NAI-2005-KKHRECEKBN         PIC X(01).
+               05  SPA-NAI-200501-ROURECEKBN       PIC X(01).
       *
                05  SPA-NAI-200501-RECEDEN-LST1KBN  PIC X(01).
                05  SPA-NAI-200501-RECEDEN-LST2KBN  PIC X(01).
@@ -264,6 +267,14 @@
                05  SPA-NAI-2009-SYUKA-SYAHO        PIC X(01).
                05  SPA-NAI-2009-SYUKA-KOKUHO       PIC X(01).
                05  SPA-NAI-2009-SYUKA-KOUIKI       PIC X(01).
+      *
+               05  SPA-NAI-4001-T.
+                   07  SPA-NAI-4001-OCC            OCCURS  100.
+                       09  SPA-NAI-4001-STYUKYMD   PIC X(08).
+                       09  SPA-NAI-4001-EDYUKYMD   PIC X(08).
+                       09  SPA-NAI-4001-RSIIRYOKBN PIC X(01).
+                   07  SPA-NAI-4001-MAX            PIC 9(03).
+               05  SPA-NAI-4001-RSIIRYOKBN-FLG     PIC 9(01).
       *
       *    公費個別指定
            03  SPA-T02-AREA.

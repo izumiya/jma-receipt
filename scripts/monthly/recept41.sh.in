@@ -1,0 +1,197 @@
+#!/bin/bash
+
+if test -z "$JMARECEIPT_ENV" ; then
+    JMARECEIPT_ENV="@jma-receipt-env@"
+fi
+if ! test -f "$JMARECEIPT_ENV"; then
+    exit 0
+fi
+
+. $JMARECEIPT_ENV
+
+#-------------------------------------------#
+#    労災レセ電ファイル作成処理
+#        $1-${11} 印刷ＤＢ用固定引数
+#        $12 労災指定医療機関
+#        $13 レセ電ファイル出力先
+#        $14 JOBID 
+#        $15 SHELLID
+#        $16 エラーファイル名 
+#        $17 ファイル出力先区分
+#        $18 端末ｉｐアドレス
+#        $19 入外区分
+#        ${20} HOSPNUM
+#        ${21} レセプト作成区分
+#            1:提出用レセ、2:点検用レセ
+#        ${22} 症状詳記作成区分
+#            1:作成する
+#        ${23} 光ディスク等送付書作成区分
+#            0:作成する
+#        ${24} レセ電データ履歴保存設定区分
+#            1:履歴保存する
+#-------------------------------------------#
+
+    rennum=0
+##  2HD flesize  
+    fixedsize=1441500
+
+##  エラーファイル削除
+	echo $#
+	echo "echo " ${16}
+    if  [ -e ${16} ]; then
+        rm ${16}
+    fi
+
+    LOG_FILE="/var/log/jma-receipt/${20}recept41.log"
+
+    echo "arg5 =  [" ${5} "]"  >$LOG_FILE
+    echo "arg12 = [" ${12} "]" >>$LOG_FILE
+    echo "arg13 = [" ${13} "]" >>$LOG_FILE
+    echo "arg17 = [" ${17} "]" >>$LOG_FILE
+    echo "arg18 = [" ${18} "]" >>$LOG_FILE
+    echo "arg19 = [" ${19} "]" >>$LOG_FILE
+    echo "arg20 = [" ${20} "]" >>$LOG_FILE
+    echo "arg21 = [" ${21} "]" >>$LOG_FILE
+    echo "arg22 = [" ${22} "]" >>$LOG_FILE
+    echo "arg23 = [" ${23} "]" >>$LOG_FILE
+    echo "arg24 = [" ${24} "]" >>$LOG_FILE
+    echo "hostname =  [" `hostname`  "]" >>$LOG_FILE
+
+    RECEFILE1="RREC"
+    RECEFILE2="RECEDEN"
+
+    if  [ ${21} -eq '2' ]; then
+	RECEFILE1="TENC"
+	RECEFILE2="TENKENT"
+	echo "file name change!" >>$LOG_FILE
+    fi
+
+#   該当ファイル削除
+    rm  ${13}${20}${RECEFILE1}*.UKE
+    rm  /tmp/${20}${RECEFILE2}*.txt
+
+    rm -fr "/tmp/${20}Rousai_"*
+    rm -fr "/tmp/${20}TRousai_"*
+
+
+#   レセ電ファイル作成
+    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM700 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${13},${14},${15},${19},${17},$fixedsize,${21},${12},${20},${16} >> $LOG_FILE 2>&1
+    if  [ -e ${16} ]; then
+        echo "--- BM700 err file exist ---" >> $LOG_FILE 2>&1
+        exit 
+    fi
+
+    if  [ ${21} -eq '2' ]; then
+        ROUSAI_FOLDER="${20}_TRousai_${5}"
+    else
+        ROUSAI_FOLDER="${20}_Rousai_${5}"
+    fi
+    OUT_FOLDER="/tmp/$ROUSAI_FOLDER/"
+
+
+#   一時フォルダ作成
+    if ( [ ${17} -eq '3' ]|| [ ${17} -eq '4' ] ) && [ ${24} -eq '0' ]; then
+        echo "--- not out holder  ---" >>$LOG_FILE
+    else
+        echo "--- folder name  [" ${OUT_FOLDER} "]" >>$LOG_FILE
+        if ! test -d  "$OUT_FOLDER"; then
+            mkdir ${OUT_FOLDER}
+            RC=$?
+            if  [ $RC -ne '0' ]; then
+                ERRCD='0077'
+                $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15}'  '${ERRCD},${20} >> $LOG_FILE
+                echo "--- mkdir  err   ---" >>$LOG_FILE
+                exit
+            fi
+            chmod -R g+r ${OUT_FOLDER}
+            echo "--- mkdir out holder ---" >>$LOG_FILE
+        else
+            rm ${OUT_FOLDER}*
+            echo "--- rm out holder file ---" >>$LOG_FILE
+        fi
+    fi
+
+#   漢字コード変換
+    echo "ファイルの処理(sjis変換)"
+
+    all=`ls  /tmp/${20}${RECEFILE2}*.txt`
+ 
+    for f in $all ; do
+        echo "f= " $f >> $LOG_FILE 2>&1
+        echo "mm = " ${f:14:2} >> $LOG_FILE 2>&1
+        echo "nn = " ${f:16:2} >> $LOG_FILE 2>&1
+
+#       システム管理場所出力のとき
+        if ( [ ${17} -eq '3' ]|| [ ${17} -eq '4' ] ) && [ ${24} -eq '0' ]; then
+            echo ${13}${20}${RECEFILE1}${f:14:2}${f:16:2}.UKE >> $LOG_FILE 2>&1
+            nkf -s $f > ${13}${20}${RECEFILE1}${f:14:2}${f:16:2}.UKE
+        else
+            echo ${OUT_FOLDER}${RECEFILE1}${f:14:2}${f:16:2}.UKE >> $LOG_FILE 2>&1
+            nkf -s $f > ${OUT_FOLDER}${RECEFILE1}${f:14:2}${f:16:2}.UKE
+        fi
+    done
+
+#   システム管理場所（履歴保存先）出力のとき
+    if  [ ${17} -eq '3' ]|| [ ${17} -eq '4' ]; then
+        if  [ ${24} -eq '1' ]; then
+#           履歴保存先のフォルダへファイル作成
+            RIREKI_FOLDER="${13}${20}_Rousai_${5}/"
+            echo "--- rireki folder name  [" ${RIREKI_FOLDER} "]" >>$LOG_FILE
+            if ! test -d  "${RIREKI_FOLDER}"; then
+                 mkdir ${RIREKI_FOLDER}
+                 RC=$?
+                 echo "--- mkdir end   ---[" $RC  "]" >>$LOG_FILE
+                 if  [ $RC -ne '0' ]; then
+                     ERRCD='0077'
+                     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15}'  '${ERRCD},${20} >> $LOG_FILE
+                     echo "--- mkdir  err   ---" >>$LOG_FILE
+                     exit
+                 fi
+                 chmod -R g+r ${RIREKI_FOLDER}
+                 echo "--- mkdir rireki holder ---" >>$LOG_FILE
+            else
+                 rm ${RIREKI_FOLDER}*
+                 echo "--- rm rireki holder file ---" >>$LOG_FILE
+            fi
+            cp ${OUT_FOLDER}${RECEFILE1}*.UKE ${RIREKI_FOLDER}
+            chmod -R g+r ${RIREKI_FOLDER}${RECEFILE1}*.UKE
+        fi
+    fi
+
+#   クライアント保存
+    if  [ ${17} -eq '5' ]; then
+        cd  /tmp/
+#       chmod -R g+r ${OUT_FOLDER}*
+        echo "--- zip name [" ${ROUSAI_FOLDER}.zip "]" >>$LOG_FILE
+        rm  ${ROUSAI_FOLDER}.zip
+        zip -r ${ROUSAI_FOLDER}.zip ${ROUSAI_FOLDER}/
+	RC=$?
+        echo "--- zip end   ---[" $RC  "]" >>$LOG_FILE
+	if  [ $RC -ne '0' ]; then
+	    ERRCD='0000'$RC
+	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15}'  '${ERRCD:${#ERRCD}-4:4},${20} >> $LOG_FILE
+            echo "--- zip err   ---" >>$LOG_FILE
+            exit
+	fi
+    fi
+
+#   ＣＤ−Ｒ出力のときisoファイル作成
+    if  [ ${17} -eq '6' ]; then
+        echo "--- iso start ---" >>$LOG_FILE
+        cd  /tmp/
+        echo "--- iso name [" ${13}${ROUSAI_FOLDER}.iso "]" >>$LOG_FILE
+        mkisofs --input-charset cp437 -l -o ${13}${ROUSAI_FOLDER}.iso ${ROUSAI_FOLDER}/
+	RC=$?
+        echo "--- iso end   ---[" $RC  "]" >>$LOG_FILE
+	if  [ $RC -ne '0' ]; then
+	    ERRCD='0000'$RC
+	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15}'  '${ERRCD:${#ERRCD}-4:4},${20} >> $LOG_FILE
+            echo "--- iso err   ---" >>$LOG_FILE
+            exit
+	fi
+    fi
+
+
+
+    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15},${20} >> $LOG_FILE
+    exit 

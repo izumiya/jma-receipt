@@ -747,6 +747,13 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        4903-PRINT-SEC            SECTION.
       *
+      *    労災レセ電のときは印刷処理はしない
+           IF      SPA-LNK-PRTKANRI-SHELLID
+                                   =   "recept41.sh"
+               MOVE    9               TO  SPA-T01-SYORIFLG
+               GO  TO  4903-PRINT-EXT
+           END-IF
+      *
       *    ジョブ開始セット処理
            ADD     1               TO  SPA-T01-JOB-JOBID
       *       
