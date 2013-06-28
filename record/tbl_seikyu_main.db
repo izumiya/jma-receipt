@@ -2534,7 +2534,7 @@ path	key83	{
                        OR (( HENREIYM       <>  '000000' )
                        AND ( HENREI_SIJI_FLG =  1        ))   )
                   AND (    ( HKNKBN         <>  '3'       )
-                       AND ( HKNKBN         <>  '5'       )   )
+                       AND ( HKNKBN         <>  '4'       )   )
                 ORDER  BY  b.SYOKAIFLG DESC,HKNJANUM_S,PTNUM
 		;
 	};
