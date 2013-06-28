@@ -222,6 +222,10 @@
            03  WRK-HOSPTEL             PIC X(15).
       *----(03.04.01)--ADD-END-----
            03  WRK-FORMID              PIC X(30).
+           03  WRK-FILEMEI.
+               05  WRK-FILEMEI-YMD     PIC X(08).
+               05  WRK-FILEMEI-HMS     PIC X(06).
+               05  WRK-FILEMEI-CD      PIC X(06).
       *
       *    プログラムオプションパラメタ
        01  TPARA-AREA.
@@ -231,6 +235,8 @@
            03  TPARA-HAKKOUBIKBN        PIC X(01).
            03  TPARA-TEISEIKBN          PIC X(01).
            03  TPARA-KANANAME           PIC X(01).
+           03  TPARA-MISYUKBN1          PIC X(01).
+           03  TPARA-MISYUKBN2          PIC X(01).
            03  TPARA-YUKOSTYMD          PIC X(08).
            03  TPARA-YUKOEDYMD          PIC X(08).
            03  TPARA-MEMO               PIC X(80) OCCURS 10.
@@ -320,6 +326,7 @@
       *    パラメタテーブル
        01  PARA-REC.
            COPY    "CPPARA.INC".
+           COPY    "CPSYUPARA01.INC".
            COPY    "CPSYUPARA03.INC".
       *
       *****************************************************************
@@ -566,6 +573,9 @@
                    MOVE    ZERO            TO  WRK-MISYUMONEY
                END-IF
            END-IF
+      *
+           PERFORM 2011-MISYU-OPTION-CHK-SEC
+      *
       *    返金対応
            IF      (ORCHC03-HAKKOFLG   =   ZERO )  AND
                    (ORCHC03-NYUKIN     =   ZERO )  AND
@@ -602,6 +612,32 @@
        201-ONLY-SYUNOU-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    プログラムオプションによる前回未収額印字判定
+      *****************************************************************
+       2011-MISYU-OPTION-CHK-SEC       SECTION.
+      *
+           IF    ( ORCHC03-PARAFLG     =   ZERO )
+               IF    ( ORCHC03-MOTOID      =   ZERO )
+                  AND( TPARA-MISYUKBN1     =   ZERO )
+                   IF    ( ORCHC03-MATOME-NYUHENKIN-KBN
+                                       =   SPACE )
+                       MOVE    ZERO    TO  WRK-MISYUMONEY
+                   END-IF
+               END-IF
+      *
+               IF    ( ORCHC03-MOTOID      =   3 )
+                  AND( TPARA-MISYUKBN2     =   ZERO )
+                   IF    ( ORCHC03-MATOME-NYUHENKIN-KBN
+                                       =   SPACE )
+                       MOVE    ZERO    TO  WRK-MISYUMONEY
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       2011-MISYU-OPTION-CHK-EXT.
+           EXIT.
       *****************************************************************
       *    初期編集処理
       *****************************************************************
@@ -887,6 +923,8 @@
            MOVE    "0"             TO  TPARA-HAKKOUBIKBN
            MOVE    "1"             TO  TPARA-TEISEIKBN
            MOVE    "0"             TO  TPARA-KANANAME
+           MOVE    "1"             TO  TPARA-MISYUKBN1
+           MOVE    "1"             TO  TPARA-MISYUKBN2
            MOVE    "00000000"      TO  TPARA-YUKOSTYMD
            MOVE    "99999999"      TO  TPARA-YUKOEDYMD
       *
@@ -930,6 +968,20 @@
            PERFORM 1001-OPTION-CALL-SEC
            IF    ( WRK-PARA        =   "0" OR "1" )
                MOVE    WRK-PARA    TO  TPARA-KANANAME
+           END-IF
+      *
+      *    前回未収額（診療行為業務）
+           MOVE    "MISYUKBN1"     TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-MISYUKBN1
+           END-IF
+      *
+      *    前回未収額（収納業務）
+           MOVE    "MISYUKBN2"     TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           IF    ( WRK-PARA        =   "0" OR "1" )
+               MOVE    WRK-PARA    TO  TPARA-MISYUKBN2
            END-IF
       *
       *    有効開始日
@@ -1193,7 +1245,6 @@
            MOVE    WRK-GOKTEN          TO  WRK-Z72
            PERFORM 800-HENKAN-SEC
            MOVE    WRK-Z72-G           TO  HC03-GOKTEN
-           DISPLAY "AHC03-GOKTEN =" HC03-GOKTEN " " WRK-GOKTEN
       *
       *    労災・自賠で患者請求が無い場合、点数表示なし
            IF    ( COMB-HKNNUM             =    "971"
@@ -1763,6 +1814,9 @@
                            MOVE    ZERO            TO  WRK-MISYUMONEY
                        END-IF
                    END-IF
+      *
+                   PERFORM 2011-MISYU-OPTION-CHK-SEC
+      *
       *            返金対応
                    IF      (ORCHC03-HAKKOFLG   =   ZERO )  AND
                            (WRK-NYUKIN         =   ZERO )  AND
@@ -1800,6 +1854,9 @@
       *****************************************************************
        203-PARA-SYUNOU-SEC                 SECTION.
       *
+           PERFORM 900-PARA-KEY4-SEL-SEC
+           MOVE    PARA-DATA-REC       TO  SYUPARA01-AREA
+      *
            PERFORM 900-PARA-KEY5-SEL-SEC
       *
            PERFORM UNTIL ( FLG-PARA    NOT =   ZERO )
@@ -1813,6 +1870,15 @@
                                            TO  WRK-SKYMONEY-TAX-SAI
                MOVE    SYUPARA03-NYUKIN    TO  WRK-NYUKIN
                MOVE    SYUPARA03-MISYU     TO  WRK-MISYUMONEY
+               IF    ( ORCHC03-MOTOID      =   1 OR 2 OR 3 OR 4 )
+                  AND( SYUPARA01-UPDFLG    =   ZERO )
+                  AND( TPARA-MISYUKBN2     =   ZERO )
+                   IF    ( ORCHC03-MATOME-NYUHENKIN-KBN
+                                           =   SPACE )
+                       MOVE    ZERO        TO  WRK-MISYUMONEY
+                   END-IF
+               END-IF
+      *
                IF    ( ORCHC03-HAKKOFLG    =   4 )
                    MOVE    SPACE           TO  WRK-SRYKA-MEI
                ELSE
@@ -2339,6 +2405,49 @@
       *
            .
        900-PARA-KEY5-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    パラメタテーブル検索処理
+      *****************************************************************
+       900-PARA-KEY4-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PARA
+      *
+           INITIALIZE                      PARA-REC
+           MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
+           MOVE    ORCHC03-PARA-GYOUMUID
+                                       TO  PARA-GYOUMUID
+           MOVE    ORCHC03-PARA-TERMID TO  PARA-TERMID
+           MOVE    ORCHC03-PARA-FILEMEI TO WRK-FILEMEI
+           MOVE    "00101"             TO  WRK-FILEMEI-CD
+           MOVE    WRK-FILEMEI         TO  PARA-FILEMEI
+           MOVE    1                   TO  PARA-EDANUM
+           MOVE    PARA-REC            TO  MCPDATA-REC
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    "tbl_para"      TO  MCP-TABLE
+               MOVE    "key4"          TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC TO  PARA-REC
+               ELSE
+                   MOVE    1           TO  FLG-PARA
+                   INITIALIZE              PARA-REC
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-PARA
+               INITIALIZE                  PARA-REC
+           END-IF
+      *
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+      *
+       900-PARA-KEY4-SEL-EXT.
            EXIT.
       *****************************************************************
       *    収納マスター読込

@@ -295,7 +295,7 @@
        20011-SYUSUM-SEC                 SECTION.
       *
       *
-               IF    ( SYUPARA01-SKYSUMFLG =   ZERO )
+               IF    ( SYUPARA01-SKYSUMFLG =   ZERO OR 9 )
                        MOVE    SYU-SRYYMD (1:6) TO WRK-SRYYM
                        MOVE    SYU-DENPNUM     TO  WRK-DENPNUM
                        MOVE    SYU-SRYKA       TO  WRK-SRYKA
@@ -803,6 +803,8 @@
                                TO  SYUPARA03-SEIKYU-TAX-SAI
            END-IF
       *
+           MOVE    SRT-KBT-NYUKIN  (IDX4)  TO  SYUPARA03-NYUKIN
+      *
            IF    ( PARA-EDANUM     =   1 )
                IF    ( SYUPARA01-GAI-MISYU >=  ZERO )
                    MOVE    SYUPARA01-GAI-MISYU
@@ -819,8 +821,16 @@
                MOVE    SYUPARA01-NYU-MISYU
                                TO  SYUPARA03-NYU-MISYU
       *
+               IF    ( SYUPARA01-SKYSUMFLG =   9 )
+                   MOVE    SYUPARA01-SEIKYU
+                               TO  SYUPARA03-SEIKYU
+                   MOVE    SYUPARA01-SEIKYU-TAX-SAI
+                               TO  SYUPARA03-SEIKYU-TAX-SAI
+                   MOVE    SYUPARA01-NYUKIN
+                               TO  SYUPARA03-NYUKIN
+               END-IF
+      *
            END-IF
-           MOVE    SRT-KBT-NYUKIN  (IDX4)  TO  SYUPARA03-NYUKIN
            IF    ( SYUPARA03-STSRYYMD  NOT =   SYUPARA03-EDSRYYMD )
                MOVE    "1"     TO  SYUPARA03-KIKANKBN
            END-IF
@@ -918,7 +928,7 @@
       *
            MOVE    SYUPARA03-STSRYYMD  TO  LNKSYU-SRYYMD (IDX4)
       *
-           IF    ( SYUPARA01-SKYSUMFLG =   0 )
+           IF    ( SYUPARA01-SKYSUMFLG =   0 OR 9 )
             OR   ( SYUPARA01-HAKKOFLG  =   1 )
                MOVE    SRT-KBT-DENPPRTYMD (IDX4)
                                        TO  LNKSYU-DENPPRTYMD (IDX4)

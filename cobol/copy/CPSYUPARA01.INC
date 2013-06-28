@@ -22,6 +22,7 @@
        01  SYUPARA01-AREA.
            03  SYUPARA01-NYUGAIKBN         PIC X(01).
            03  SYUPARA01-SEIKYU            PIC S9(10).
+           03  SYUPARA01-SEIKYU-TAX-SAI    PIC S9(10).
            03  SYUPARA01-NYUKIN            PIC S9(10).
            03  SYUPARA01-ZENMISYU          PIC S9(10).
            03  SYUPARA01-ZENMISYU-2        PIC S9(10).
