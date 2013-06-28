@@ -55,6 +55,7 @@
       *                                     receipt_kbn ÄÉ²Ã 
       *
       *  04.07.01    NACL-Æ£¸¶    11/09/02  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
+      *  04.07.02    NACL-Æ£¸¶    13/02/07  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *****************************************************************
        01  SPA-H01FREE.
          02  SPA-H01FREE-AREA.
@@ -205,8 +206,17 @@
                05  SPA-NAI-2005-SYARECEKBN     PIC X(01).
                05  SPA-NAI-200501-KOUIKIRECEKBN
                                                PIC X(01).
+               05  SPA-NAI-200501-ROURECEKBN   PIC X(01).
                05  SPA-NAI-200501-RECEDEN-DISASTER
                                                PIC X(01).
+      *
+               05  SPA-NAI-4001-T.
+                   07  SPA-NAI-4001-OCC            OCCURS  100.
+                       09  SPA-NAI-4001-STYUKYMD   PIC X(08).
+                       09  SPA-NAI-4001-EDYUKYMD   PIC X(08).
+                       09  SPA-NAI-4001-RSIIRYOKBN PIC X(01).
+                   07  SPA-NAI-4001-MAX            PIC 9(03).
+               05  SPA-NAI-4001-RSIIRYOKBN-FLG     PIC 9(01).
       *
       *£È£°£²²èÌÌ
            03  SPA-H02-AREA.
@@ -333,7 +343,7 @@
                                                      PIC  9(10).
                        09  SPA-H99NAI-RECE10-TEKSTYMD
                                                      PIC X(08).
-                       09  SPA-H99NAI-RECE10-RECEITP-KBN
+                       09  SPA-H99NAI-RECE10-RECEIPT-KBN
                                                      PIC X(10).
                    07  SPA-H99NAI-SKYKBN-RECEDEN     PIC X(01)
                                               OCCURS  50.
