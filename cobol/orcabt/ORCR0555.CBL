@@ -159,6 +159,7 @@
            03  FLG-KOUI                PIC 9(01).
            03  FLG-TOYAKUFLG           PIC 9(01).
            03  FLG-RECECOM-XX          PIC 9(01).
+           03  FLG-RECECOM-AA          PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -4885,18 +4886,21 @@
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
            MOVE    "key9"              TO  WRK-MCP-PATHNAME
            PERFORM 2009-RECECOM-HENSYU-SEC
+      *
+      *    傷病の経過（５０文字を超えるとき）
+           IF      FLG-RECECOM-XX      =   "1"
+      *        表題を設定
+                MOVE    1                  TO  FLG-RECECOM-AA
+      *
+               MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
+               MOVE    "key16"             TO  WRK-MCP-PATHNAME
+               PERFORM 2009-RECECOM-HENSYU-SEC
+           END-IF
       *     
       *    症状詳記コメント（５０、５１）       
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
            MOVE    "key12"             TO  WRK-MCP-PATHNAME
            PERFORM 2009-RECECOM-HENSYU-SEC
-      *
-      *    傷病の経過（５０文字を超えるとき）
-           IF      FLG-RECECOM-XX      =   "1"
-               MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
-               MOVE    "key16"             TO  WRK-MCP-PATHNAME
-               PERFORM 2009-RECECOM-HENSYU-SEC
-           END-IF
            .
        2009-COMMENT-HEN-99-EXT.
            EXIT.
@@ -4915,8 +4919,7 @@
       *        傷病の経過
                MOVE    "AA"                TO  RECECOM-SJKBN
            END-IF
-      * 
-      * 
+      *
            MOVE    RECECOM-REC         TO  MCPDATA-REC
            MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
            MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
@@ -5030,7 +5033,7 @@
                MOVE    "07"            TO  RECECOM-SJKBN
            END-IF 
            IF      RECECOM-SJKBN   =   "AA"
-               MOVE    "90"            TO  RECECOM-SJKBN
+               MOVE    "07"            TO  RECECOM-SJKBN
            END-IF 
            IF      RECECOM-SJKBN   NOT =   WRK-RECECOM-SJKBN
                MOVE   RECECOM-SJKBN        TO  WRK-RECECOM-SJKBN
@@ -5116,6 +5119,31 @@
            IF      WRK-SJ-CHK          =   ZERO
                GO  TO  200921-SJ-HENSYU-EXT
            END-IF   
+      *
+      *    傷病の経過なら先頭に表題を記録する
+           IF      FLG-RECECOM-AA      =   1
+               MOVE    SPACE               TO  WRK-REC
+               MOVE    ZERO                TO  WRK-REC-LENGTH
+      *
+               MOVE    "SJ,"               TO  WRK-REC
+               MOVE    3                   TO  WRK-REC-LENGTH
+      *        症状詳記区分
+               IF      WRK-SJ-KBN      NOT =   SPACE     
+                   MOVE    WRK-SJ-KBN          TO  WRK-DATA
+                   MOVE    2                   TO  WRK-NAGASA
+               END-IF
+               MOVE    SPACE               TO  WRK-SJ-KBN
+               PERFORM 5004-MOJI-HENSYU-SEC  
+      *        症状詳記データ
+               MOVE    "【傷病の経過】"    TO  WRK-DATA
+               MOVE    2400                TO  WRK-NAGASA
+               MOVE    1                   TO  WRK-END 
+               PERFORM 5004-MOJI-HENSYU-SEC  
+      *
+                PERFORM 5001-FILE-WRITE-SEC
+      *
+                MOVE    0                  TO  FLG-RECECOM-AA
+           END-IF
       *
            MOVE    SPACE               TO  WRK-REC
            MOVE    ZERO                TO  WRK-REC-LENGTH
