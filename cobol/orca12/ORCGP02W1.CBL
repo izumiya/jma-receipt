@@ -7668,6 +7668,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-ERRCD           =   SPACE
                IF      SPA-GMN-HAKKO       =   "1"
                                            OR  "2"
+                                           OR  "3"
                    IF      SPA-NAI-KARUTE-HAKKO    =   "2"
                        IF      SPA-GMN-SELNUM      =   ZERO
                            PERFORM 4901-KARUTE-CHEK-SEC
