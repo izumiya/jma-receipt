@@ -396,6 +396,8 @@
       *                                     ０８（老健）のレセプト対応
       *  04.06.11    NACL-藤原    13/04/05  コメントの記録方法の変更
       *  04.06.12    NACL-藤原    13/06/02  氏名の外字チェックに条件追加
+      *  04.06.13    NACL-藤原    13/06/28  ００８２で始まるコメントの
+      *                                     記録方法の修正
       *
       *  04.07.01    NACL-藤原    11/06/02  入退院履歴記載対応
       *                                     「2自費分は含まない」を追加
@@ -4214,7 +4216,8 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                    END-IF
       *            コメント
                    IF    ( RECE05-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE05-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE05-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE05-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE05-INPUTCOMENT (IDX)     TO
                                            TBL-KOUI-NAME  (WRK-TBLMAX1)
                    END-IF
@@ -4271,7 +4274,8 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                    END-IF
       *            コメント
                    IF    ( RECE05-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE05-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE05-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE05-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE05-INPUTCOMENT (IDX)     TO
                                        TBL-COMMENT-NAME  (WRK-TBLMAX8)
                    END-IF
@@ -4601,7 +4605,8 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                    END-IF
       *            コメント
                    IF    ( RECE05-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE05-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE05-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE05-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE05-INPUTCOMENT (IDX)     TO
                                        TBL-KENSA-RECE05-NAME
                            (TBL-KENSA-RECE04-MAX TBL-KENSA-RECE05-MAX)
@@ -6518,7 +6523,9 @@ grpsys         MOVE    RECE02-HOSPNUM      TO  ORCSRECESORT-HOSPNUM
                END-IF
       *        コメント
                IF    ( RECE055-SRYCD (1:1) =   "8"   )
-               OR    ( RECE055-SRYCD (1:3) =   "008" )
+               OR    ( RECE055-SRYCD (1:3) =   "008"  AND
+                       RECE055-SRYCD (4:1)
+                                       NOT =   "2"   )
                    MOVE    RECE055-INPUTCOMENT TO
                                            TBL-RECE055-NAME
                                                (TBL-RECE055-MAX)

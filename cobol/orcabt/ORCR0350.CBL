@@ -361,6 +361,8 @@
       *  04.06.15    NACL-藤原    13/05/02  氏名の外字チェックに条件追加
       *  04.06.16    NACL-門脇    13/06/14  食事標準負担額の記録修正
       *                                     （主保険がない場合）
+      *  04.06.17    NACL-藤原    13/06/28  ００８２で始まるコメントの
+      *                                     記録方法の修正
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-藤原    12/09/04  薬剤料減点対応
@@ -4775,7 +4777,8 @@
                    END-IF
       *            コメント
                    IF    ( RECE65-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE65-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE65-INPUTCOMENT (IDX)     TO
                                            TBL-KOUI-NAME  (WRK-TBLMAX1)
                    END-IF
@@ -4832,7 +4835,8 @@
                    END-IF
       *            コメント
                    IF    ( RECE65-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE65-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE65-INPUTCOMENT (IDX)     TO
                                        TBL-COMMENT-NAME  (WRK-TBLMAX8)
                    END-IF
@@ -5078,7 +5082,8 @@
                    END-IF
       *            コメント
                    IF    ( RECE65-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE65-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE65-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE65-INPUTCOMENT (IDX)     TO
                                        TBL-KENSA-RECE65-NAME
                            (TBL-KENSA-RECE64-MAX TBL-KENSA-RECE65-MAX)
@@ -8585,7 +8590,9 @@
                END-IF
       *        コメント
                IF    ( RECE655-SRYCD (1:1) =   "8"   )
-               OR    ( RECE655-SRYCD (1:3) =   "008" )
+               OR    ( RECE655-SRYCD (1:3) =   "008"  AND
+                       RECE655-SRYCD (4:1)
+                                       NOT =   "2"   )
                    MOVE    RECE655-INPUTCOMENT TO
                                            TBL-RECE655-NAME
                                                (TBL-RECE655-MAX)
