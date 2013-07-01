@@ -2395,7 +2395,8 @@
                    END-IF
       *            コメント
                    IF    ( RECE45-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE45-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE45-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE45-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE45-INPUTCOMENT (IDX)     TO
                                            TBL-KOUI-NAME  (WRK-TBLMAX1)
                    END-IF
@@ -2452,7 +2453,8 @@
                    END-IF
       *            コメント
                    IF    ( RECE45-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE45-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE45-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE45-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE45-INPUTCOMENT (IDX)     TO
                                        TBL-COMMENT-NAME  (WRK-TBLMAX8)
                    END-IF
@@ -2781,7 +2783,8 @@
                    END-IF
       *            コメント
                    IF    ( RECE45-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE45-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE45-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE45-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE45-INPUTCOMENT (IDX)     TO
                                        TBL-KENSA-RECE45-NAME
                            (TBL-KENSA-RECE04-MAX TBL-KENSA-RECE45-MAX)
@@ -4672,7 +4675,8 @@
                END-IF
       *        コメント
                IF    ( RECE455-SRYCD (1:1) =   "8"   )
-               OR    ( RECE455-SRYCD (1:3) =   "008" )
+               OR    ( RECE455-SRYCD (1:3)     =   "008"  AND
+                       RECE455-SRYCD (4:1) NOT =   "2"   )
                    MOVE    RECE455-INPUTCOMENT TO
                                            TBL-RECE455-NAME
                                                (TBL-RECE455-MAX)

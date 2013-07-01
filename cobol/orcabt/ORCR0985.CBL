@@ -2561,7 +2561,8 @@
                    END-IF
       *            コメント
                    IF    ( RECE85-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE85-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE85-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE85-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE85-INPUTCOMENT (IDX)     TO
                                            TBL-KOUI-NAME  (WRK-TBLMAX1)
                    END-IF
@@ -2618,7 +2619,8 @@
                    END-IF
       *            コメント
                    IF    ( RECE85-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE85-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE85-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE85-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE85-INPUTCOMENT (IDX)     TO
                                        TBL-COMMENT-NAME  (WRK-TBLMAX8)
                    END-IF
@@ -2863,7 +2865,8 @@
                    END-IF
       *            コメント
                    IF    ( RECE85-SRYCD (IDX) (1:1)     =   "8"   )
-                   OR    ( RECE85-SRYCD (IDX) (1:3)     =   "008" )
+                   OR    ( RECE85-SRYCD (IDX) (1:3)     =   "008"  AND
+                           RECE85-SRYCD (IDX) (4:1) NOT =   "2"   )
                        MOVE    RECE85-INPUTCOMENT (IDX)     TO
                                        TBL-KENSA-RECE85-NAME
                            (TBL-KENSA-RECE84-MAX TBL-KENSA-RECE85-MAX)
@@ -4950,7 +4953,9 @@
                END-IF
       *        コメント
                IF    ( RECE855-SRYCD (1:1) =   "8"   )
-               OR    ( RECE855-SRYCD (1:3) =   "008" )
+               OR    ( RECE855-SRYCD (1:3) =   "008"  AND
+                       RECE855-SRYCD (4:1)
+                                       NOT =   "2"   )
                    MOVE    RECE855-INPUTCOMENT TO
                                            TBL-RECE855-NAME
                                                (TBL-RECE855-MAX)
