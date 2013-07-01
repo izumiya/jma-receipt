@@ -6292,7 +6292,6 @@
                     OR   ( IDXM           >=   CONST-EDANUM-MAX )
       *
                IF    ( SMEI-NYUHEN-MONEY   NOT = ZERO )
-                AND  ( SMEI-JOUTAIKBN      NOT = "4" )
       *
                    COMPUTE TNYUKIN-MAX =   TNYUKIN-MAX     +   1
                    MOVE    SMEI-NYUHEN-MONEY
@@ -6342,6 +6341,34 @@
       *
            END-PERFORM
       *
+           PERFORM VARYING IDXM    FROM    1   BY  1
+                   UNTIL ( IDXM    >   TNYUKIN-MAX )
+      *
+               IF    ( TNYUKIN-NYUKIN (IDXM)   <   ZERO )
+                   PERFORM VARYING IDX0    FROM    1   BY  1
+                           UNTIL ( IDX0    >   TNYUKIN-MAX )
+                            OR   ( TNYUKIN-NYUKIN (IDXM)   =   ZERO )
+      *
+                       IF    ( IDX0                    NOT =   IDXM )
+                         AND ( TNYUKIN-NYUKIN (IDX0)       >   ZERO )
+                           COMPUTE WRK-NYUKIN
+                               =   TNYUKIN-NYUKIN (IDX0)
+                               +   TNYUKIN-NYUKIN (IDXM)
+                           IF    ( WRK-NYUKIN      >   ZERO )
+                               MOVE    WRK-NYUKIN
+                                               TO  TNYUKIN-NYUKIN (IDX0)
+                               MOVE    ZERO    TO  TNYUKIN-NYUKIN (IDXM)
+                           ELSE
+                               MOVE    ZERO    TO  TNYUKIN-NYUKIN (IDX0)
+                               MOVE    WRK-NYUKIN
+                                               TO  TNYUKIN-NYUKIN (IDXM)
+                           END-IF
+                       END-IF
+                   END-PERFORM
+               END-IF
+      *
+           END-PERFORM
+      *
            PERFORM VARYING IDXM    FROM    TNYUKIN-MAX BY  -1
                    UNTIL ( IDXM    <   1 )
                     OR   ( WRK-SAGAKU  =   ZERO )
@@ -6360,20 +6387,20 @@
                            COMPUTE THOHO-NYUKIN(IDXH)
                                =   THOHO-NYUKIN(IDXH)
                                +   TNYUKIN-NYUKIN (IDXM)
-                           COMPUTE TNYUKIN-NYUKIN (IDXM)
-                               =   0
                            COMPUTE WRK-SAGAKU
                                =   WRK-SAGAKU
                                -   TNYUKIN-NYUKIN (IDXM)
+                           COMPUTE TNYUKIN-NYUKIN (IDXM)
+                               =   0
                        ELSE
                            COMPUTE THOHO-NYUKIN(IDXH)
                                =   THOHO-NYUKIN(IDXH)
                                +   WRK-SAGAKU
-                           COMPUTE WRK-SAGAKU
-                               =   0
                            COMPUTE TNYUKIN-NYUKIN (IDXM)
                                =   TNYUKIN-NYUKIN (IDXM)
                                -   WRK-SAGAKU
+                           COMPUTE WRK-SAGAKU
+                               =   0
                        END-IF
                        MOVE    CONST-EDANUM-MAX
                                            TO  IDXH
@@ -6671,6 +6698,43 @@
       *
            IF    ( SPA-ERRCD       =   SPACE )
                PERFORM 49021-SYUMEI-UPD-SEC
+           END-IF
+      *
+           PERFORM 900-SYUMEI-KEY2-SEL-SEC
+      *
+           MOVE    ZERO                TO  WRK-NYUKIN
+           PERFORM UNTIL ( FLG-SYUMEI  NOT =   ZERO )
+      *
+               COMPUTE WRK-NYUKIN
+                   =   WRK-NYUKIN
+                   +   SMEI-NYUHEN-MONEY
+      *
+               PERFORM 900-SYUMEI-KEY2-FET-SEC
+      *
+           END-PERFORM
+      *
+           MOVE    "tbl_syumei"    TO  MCP-TABLE
+           MOVE    "key2"          TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+      *    入金額の不整合をチェックし補正
+           INITIALIZE                      SYUNOU-REC
+           MOVE    SPA-HOSPNUM         TO  SYU-HOSPNUM
+           MOVE    SPA-S01-NYUGAIKBN   TO  SYU-NYUGAIKBN
+           MOVE    SPA-S01-PTID        TO  SYU-PTID
+           MOVE    SPA-S01-DENPNUM     TO  SYU-DENPNUM
+           PERFORM 900-SYUNOU-KEY-SEL-SEC
+      *
+           IF    ( WRK-NYUKIN         >=  ZERO )
+            AND  ( WRK-NYUKIN      NOT =  SYU-NYUKIN-TOTAL )
+               MOVE    WRK-NYUKIN          TO  SYU-NYUKIN-TOTAL
+               MOVE    SYUNOU-REC          TO  MCPDATA-REC
+               MOVE    "tbl_syunou"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBUPDATE-SEC
+               IF    ( MCP-RC              NOT =   ZERO )
+                   MOVE    "4010"          TO  SPA-ERRCD
+               END-IF
            END-IF
       *
            .
@@ -8122,7 +8186,7 @@
            WHEN    "1007"
                MOVE    "ジョブ管理ＤＢが削除できませんでした"
                                                TO  SPA-ERRMSG
-           WHEN    "4000"  THRU    "4009"
+           WHEN    "4000"  THRU    "4010"
                MOVE    "更新処理に失敗しました"
                                                TO  SPA-ERRMSG
            WHEN    "9999"
