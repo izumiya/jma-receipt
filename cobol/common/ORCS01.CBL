@@ -7026,7 +7026,7 @@
              IF      MCP-RC               =      ZERO
                  MOVE    "tbl_syunou"     TO     MCP-TABLE
                  MOVE    "key14"          TO     MCP-PATHNAME
-                 PERFORM  SYUNOU-READ-SEC
+                 PERFORM  SYUNOU-READ3-SEC
                  PERFORM  UNTIL  (FLG-SYUNOU   =    "1")
                      IF   SYU-DENPJTIKBN  NOT =   "3"
                          IF   SYU-INGAISHOHOKBN   =     "1"
@@ -7037,7 +7037,7 @@
                      END-IF
                      MOVE     "tbl_syunou"  TO   MCP-TABLE
                      MOVE     "key14"       TO   MCP-PATHNAME
-                     PERFORM   SYUNOU-READ-SEC
+                     PERFORM   SYUNOU-READ3-SEC
                  END-PERFORM
              END-IF
              MOVE     "tbl_syunou"  TO   MCP-TABLE
@@ -28521,6 +28521,43 @@
            .
       *
        SYUNOU-READ2-EXT.
+           EXIT.
+      *****************************************************************
+      *    収納マスター読込３
+      *****************************************************************
+       SYUNOU-READ3-SEC          SECTION.
+      *
+       SYUNOU-READ3-100.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SYU-SYUNOU-REC
+               IF    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-SYU-DENPNUM      NOT =  ZERO           ) AND
+                      (LNK-SYU-DENPNUM          =  SYU-DENPNUM    ))
+               OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-S01-IKTGENMKJFLG     =  SPACE          ) AND
+                      (LNK-SYU-GRP-DENPNUM  NOT =  ZERO           ) AND
+                      (LNK-SYU-GRP-DENPNUM      =  SYU-GRP-DENPNUM))
+               OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-S01-IKTGENMKJFLG     =  SPACE          ) AND
+                      (LNK-SYU-GRP-DENPNUM  NOT =  ZERO           ) AND
+                      (LNK-SYU-GRP-DENPNUM      =  SYU-DENPNUM    ))
+                       GO    TO    SYUNOU-READ3-100
+               ELSE
+                       MOVE    ZERO    TO  FLG-SYUNOU
+               END-IF
+           ELSE
+               INITIALIZE                  SYU-SYUNOU-REC
+               MOVE    1               TO  FLG-SYUNOU
+           END-IF
+      *
+           .
+      *
+       SYUNOU-READ3-EXT.
            EXIT.
       *****************************************************************
       *    日別収納マスタ読込

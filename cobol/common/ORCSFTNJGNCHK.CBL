@@ -130,6 +130,7 @@
            03  FLG-ZENKI-TOKUREI   PIC 9(01).
            03  FLG-KOREI-HIGAITO   PIC 9(01).
            03  FLG-SEIHO-CHECK     PIC 9(01).
+           03  FLG-INGAI           PIC 9(01).
       *
       *    ≈∫ª˙ŒŒ∞Ë
        01  IDX-AREA.
@@ -141,6 +142,8 @@
        01  WRK-AREA.
            03  WRK-HKNMST-JGNGAK  PIC 9(06).
            03  WRK-HKNMST-JGNGAK2 PIC 9(06).
+           03  WRK-HKNMST-JGNGAK-N
+                                  PIC 9(06).
            03  WRK-KOHFTN         PIC 9(10).
            03  WRK-KOHFTN-EN      PIC 9(10)V9(01).
            03  WRK-KOHFTN-H       PIC 9(10)V9(01).
@@ -487,9 +490,6 @@
            ELSE
                EVALUATE   WRK-TEISYOTOKU
                  WHEN     SPACE
-                   IF    HKN-HON-GAIMNAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-HON-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK
-                   END-IF
                    IF    HKN-HON-GAIMGAIJGNGAK   NOT =    ZERO
                       MOVE HKN-HON-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
                    END-IF
@@ -503,22 +503,38 @@
                    AND (LNK-FTNJGNCHK-SRYYM     >= "200910")
                       MOVE HKN-HON-GAIDJGNGAK    TO WRK-HKNMST-JGNGAK
                    END-IF
+      *****        ±°∆‚Õ—
+                   IF    HKN-HON-GAIMNAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-HON-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK-N
+                   END-IF
+                   IF  (LNK-FTNJGNCHK-PREFNUM      =     12        )
+                   AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
+                   AND (HKN-HON-GAIKJGNGAK     NOT = ZERO          )
+                      MOVE HKN-HON-GAIKJGNGAK    TO WRK-HKNMST-JGNGAK-N
+                   END-IF
+                   IF  (LNK-FTNJGNCHK-PREFNUM    =  13     )
+                   AND (LNK-FTNJGNCHK-KOHNUM     = "588"   )
+                   AND (LNK-FTNJGNCHK-SRYYM     >= "200910")
+                      MOVE HKN-HON-GAIDJGNGAK    TO WRK-HKNMST-JGNGAK-N
+                   END-IF
                    MOVE    HKN-HON-GAIKFTNRATE   TO WRK-KOHFTN-RITU
                  WHEN     "1"
                  WHEN     "4"
-                   IF    HKN-TNK-GAIMNAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-TNK-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK
-                   END-IF
                    IF    HKN-TNK-GAIMGAIJGNGAK   NOT =    ZERO
                       MOVE HKN-TNK-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
                    END-IF
+      *****        ±°∆‚Õ—
+                   IF    HKN-TNK-GAIMNAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-TNK-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK-N
+                   END-IF
                    MOVE    HKN-TNK-GAIKFTNRATE   TO WRK-KOHFTN-RITU
                  WHEN     "2"
-                   IF    HKN-TSY-GAIMNAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-TSY-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK
-                   END-IF
                    IF    HKN-TSY-GAIMGAIJGNGAK   NOT =    ZERO
                       MOVE HKN-TSY-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
+                   END-IF
+      *****        ±°∆‚Õ—
+                   IF    HKN-TSY-GAIMNAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-TSY-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK-N
                    END-IF
                    MOVE    HKN-TSY-GAIKFTNRATE   TO WRK-KOHFTN-RITU
                END-EVALUATE
@@ -1050,6 +1066,7 @@
            MOVE      ZERO          TO      WRK-SYUSKJ-FTN
            MOVE      ZERO          TO      WRK-SKYMONEY-SKJ
            MOVE      ZERO          TO      FLG-SEIHO-CHECK
+           MOVE      ZERO          TO      FLG-INGAI
            PERFORM   UNTIL    FLG-SYUNOU  =   1
              MOVE    ZERO          TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -1244,6 +1261,11 @@
                   IF     WRK-HKNCOMBINUM-FLG(IDX1) =  1
                         MOVE   01                TO  LNK-FTNJGNCHK-RC
                   END-IF
+                  IF     LNK-FTNJGNCHK-NYUGAIKBN   =  "2"
+                    IF      SYU-INGAISHOHOKBN   =  "1"
+                        MOVE    1    TO  FLG-INGAI
+                    END-IF
+                  END-IF
                END-IF
              END-PERFORM
              IF      LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
@@ -1255,6 +1277,18 @@
              END-IF
              PERFORM  910-SYUNOU-READ-SEC
            END-PERFORM
+      *
+           IF    LNK-FTNJGNCHK-NYUGAIKBN   =  "2"
+             IF    WRK-HKNMST-JGNGAK  =  999999
+                CONTINUE
+             ELSE
+                IF    FLG-INGAI      =   1
+                   CONTINUE
+                ELSE
+                   MOVE  WRK-HKNMST-JGNGAK-N  TO  WRK-HKNMST-JGNGAK
+                END-IF
+             END-IF
+           END-IF
       *
            IF  ((LNK-FTNJGNCHK-PREFNUM    =  27           ) AND
                 (LNK-FTNJGNCHK-KOHNUM     = "141" OR "241") AND
