@@ -1129,6 +1129,7 @@
            PERFORM 31012-SEIWA-HEN-SEC
            MOVE    WRK-HENYMD      TO  HCM38-LASTYMD(CNT-LINE)
       *
+           MOVE    SPACE           TO  WRK-BIKOU
       *    Æþ±¡Ãæ
            IF    ( ORCSLASTYMD-BRMNUM  NOT =   SPACE )
                IF      ORCSLASTYMD-LASTYMD     =   SPACE
