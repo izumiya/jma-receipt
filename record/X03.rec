@@ -34,8 +34,8 @@ X03	{
 				rowattr	int;
 				item	{
 					value0	varchar(6);
-					value1	varchar(100);
-					value2	varchar(4);
+					value1	varchar(150);
+					value2	varchar(12);
 				}	[200];
 				select	bool[200];
 			};
@@ -62,8 +62,8 @@ X03	{
 				rowattr	int;
 				item	{
 					value0	varchar(6);
-					value1	varchar(100);
-					value2	varchar(4);
+					value1	varchar(150);
+					value2	varchar(12);
 				}	[200];
 				select	bool[200];
 			};

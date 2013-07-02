@@ -95,7 +95,10 @@
            03  CONST-BUNLST-MAX    PIC 9(05)   VALUE   100.
            03  CONST-UBYOLST-MAX   PIC 9(05)   VALUE   100.
            03  CONST-BYOCD-MAX     PIC 9(05)   VALUE   6.
+           03  CONST-HOSOKUCD-MAX  PIC 9(05)   VALUE   3.
            03  CONST-MKCD-MAX      PIC 9(05)   VALUE   21.
+           03  CONST-SELKBN-BYOMEI           PIC X(01)     VALUE "1".
+           03  CONST-SELKBN-HOSOKU           PIC X(01)     VALUE "2".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -256,8 +259,16 @@
       *
            MOVE    1               TO  SPA-GMN-X07-CUR
       *
+           IF    ( SPA-X01-SELKBN  =   CONST-SELKBN-BYOMEI )
+               MOVE    CONST-BYOCD-MAX
+                                   TO  SPA-GMN-X07-BYOCD-MAX
+           ELSE
+               MOVE    CONST-HOSOKUCD-MAX
+                                   TO  SPA-GMN-X07-BYOCD-MAX
+           END-IF
+      *
            PERFORM VARYING IDXI    FROM    1   BY  1
-                   UNTIL ( IDXI    >       CONST-BYOCD-MAX )
+                   UNTIL ( IDXI    >       SPA-GMN-X07-BYOCD-MAX )
                MOVE    SPA-X01-INPUTCD (IDXI)
                                    TO  SPA-GMN-X07-BYOCD (IDXI)
            END-PERFORM
@@ -520,7 +531,7 @@
       *
            MOVE    ZERO            TO  IDXJ
            PERFORM VARYING IDX1    FROM    1   BY  1
-                   UNTIL ( IDX1    >   CONST-BYOCD-MAX )
+                   UNTIL ( IDX1    >   SPA-GMN-X07-BYOCD-MAX )
                     OR   ( IDXJ    >   ZERO )
       *
                IF    ( SPA-GMN-X07-BYOCD (IDX1)    =   SPACE )
@@ -678,7 +689,7 @@
        4100-INPUTCD-CHK-SEC            SECTION.
       *
            PERFORM VARYING IDXI    FROM    1   BY  1
-                   UNTIL ( IDXI    >       CONST-BYOCD-MAX )
+                   UNTIL ( IDXI    >       SPA-GMN-X07-BYOCD-MAX )
       *
                MOVE    X07-INPUTCD (IDXI)
                                    TO  SPA-GMN-X07-BYOCD (IDXI)
@@ -928,7 +939,7 @@
       *
            INITIALIZE                      SPA-X01-INPUTCD-G
            PERFORM VARYING IDXI    FROM    1   BY  1
-                   UNTIL ( IDXI    >   CONST-BYOCD-MAX )
+                   UNTIL ( IDXI    >   SPA-GMN-X07-BYOCD-MAX )
                MOVE    SPA-GMN-X07-BYOCD (IDXI)
                                    TO  SPA-X01-INPUTCD (IDXI)
            END-PERFORM
@@ -955,7 +966,7 @@
       *
            INITIALIZE                  XSUB01-LNK
            PERFORM VARYING IDXI    FROM    1   BY  1
-                   UNTIL ( IDXI    >       CONST-BYOCD-MAX )
+                   UNTIL ( IDXI    >       SPA-GMN-X07-BYOCD-MAX )
       *
                MOVE    SPA-GMN-X07-BYOCD (IDXI)
                                        TO  WRK-MAE-INPUT
@@ -974,7 +985,7 @@
       *
            INITIALIZE                      SPA-NAI-X07-INPUT-AREA
            PERFORM VARYING IDXS    FROM    1   BY  1
-                   UNTIL ( IDXS    >       CONST-BYOCD-MAX )
+                   UNTIL ( IDXS    >       SPA-GMN-X07-BYOCD-MAX )
       *
                MOVE    XSUB01-O-BYOCD (IDXS)
                                    TO  SPA-GMN-X07-BYOCD (IDXS)
@@ -1021,7 +1032,7 @@
                    MOVE    SPACE       TO  SPA-ERRCD
                ELSE
                    IF    ( XSUB01-O-ERRIDX >   ZERO )
-                    OR   ( XSUB01-O-ERRIDX <=  CONST-BYOCD-MAX )
+                    OR   ( XSUB01-O-ERRIDX <=  SPA-GMN-X07-BYOCD-MAX )
                        COMPUTE SPA-GMN-X07-CUR
                            =   XSUB01-O-ERRIDX
                            +   2
@@ -1048,7 +1059,7 @@
       *
            INITIALIZE                  WRK-INPUTCD-CUR-G
            PERFORM VARYING IDXI    FROM    1   BY  1
-                   UNTIL ( IDXI    >   CONST-BYOCD-MAX )
+                   UNTIL ( IDXI    >   SPA-GMN-X07-BYOCD-MAX )
                IF    ( SPA-GMN-X07-BYOCD (IDXI)
                                    =   SPACE )
                    IF    ( WRK-INPUTCD-CUR-SPC     =   ZERO )
@@ -1132,7 +1143,7 @@
            MOVE    SPA-GMN-X07-BUNRUICD    TO  X07-BUNRUICD
            MOVE    SPA-GMN-X07-SELNUM      TO  X07-SELNUM2
            PERFORM VARYING     IDX0    FROM   1   BY  1
-                   UNTIL     ( IDX0    >      CONST-BYOCD-MAX )
+                   UNTIL     ( IDX0    >      SPA-GMN-X07-BYOCD-MAX )
                MOVE    SPA-GMN-X07-BYOCD (IDX0)
                                            TO  X07-INPUTCD (IDX0)
            END-PERFORM
@@ -1164,10 +1175,12 @@
                                                X07-BUNRUICD-STATE
                                                X07-KENBYOMEI-STATE
       *
+      *
            PERFORM VARYING     IDX0    FROM    1   BY  1
                    UNTIL     ( IDX0    >       6 )
       *
                MOVE    WIDGET-NORMAL   TO  X07-INPUTCD-STATE (IDX0)
+               MOVE    "T"             TO  X07-INPUTCD-VISIBLE (IDX0)
       *
            END-PERFORM
       *
@@ -1197,6 +1210,15 @@
                MOVE    "検索病名"      TO  X07-TITLE
            ELSE
                MOVE    "検索コード"    TO  X07-TITLE
+           END-IF
+      *
+           IF    ( SPA-X01-SELKBN  =   CONST-SELKBN-HOSOKU )
+               MOVE    "補足コメント" TO   X07-LBLBYOMEI
+               MOVE    "F"            TO   X07-INPUTCD-VISIBLE (4)
+                                           X07-INPUTCD-VISIBLE (5)
+                                           X07-INPUTCD-VISIBLE (6)
+           ELSE
+               MOVE    "病　名"       TO   X07-LBLBYOMEI
            END-IF
       *
            PERFORM 5001-MAPCUR-SEC

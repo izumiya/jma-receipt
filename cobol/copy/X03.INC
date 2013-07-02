@@ -41,8 +41,8 @@
                   05  X03-LCHKLST-ROWATTR PIC S9(9)   BINARY.
                   05  X03-LCHKLST-ITEM    OCCURS  200 TIMES.
                     06  X03-TLCHK-NUM         PIC X(6).
-                    06  X03-TLCHK-NAME        PIC X(100).
-                    06  X03-TLCHK-JYKN        PIC X(4).
+                    06  X03-TLCHK-NAME        PIC X(150).
+                    06  X03-TLCHK-JYKN        PIC X(12).
                   05  X03-LCHKLST-SELECT
                           PIC X       OCCURS  200 TIMES.
               03  X03-RCHKKBNMEI.
@@ -61,8 +61,8 @@
                   05  X03-RCHKLST-ROWATTR PIC S9(9)   BINARY.
                   05  X03-RCHKLST-ITEM        OCCURS  200 TIMES.
                     06  X03-TRCHK-NUM     PIC X(6).
-                    06  X03-TRCHK-NAME    PIC X(100).
-                    06  X03-TRCHK-JYKN    PIC X(4).
+                    06  X03-TRCHK-NAME    PIC X(150).
+                    06  X03-TRCHK-JYKN    PIC X(12).
                   05  X03-RCHKLST-SELECT
                           PIC X       OCCURS  200 TIMES.
               03  X03-CMB-CHKKBN.

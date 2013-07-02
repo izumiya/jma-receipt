@@ -295,6 +295,8 @@
       *  04.07.04    NACL-藤原    13/05/13  病名コード未入力時の病名表示の修正
       *  04.07.05    NACL-藤原    13/06/01  病名コード未入力時のカーソル
       *                                     位置の修正
+      *  04.07.06    NACL-太田    13/06/11  データチェック業務からの補足
+      *                                     コメント引継ぎ対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1449,7 +1451,7 @@ grpsys     MOVE    SPA-HOSPNUM      TO  SYS-HOSPNUM
                                                    OR  "Q02"  )
            AND   ( SPA-PTNUM       NOT =   SPACE              )
                IF      SPA-C02-MOTOPG      =   "D04"
-                   MOVE    SPA-WORK        TO  LNK-D04-BYOMEI
+                   MOVE    SPA-WORK        TO  LNK-D04-AREA
                END-IF
                MOVE    SPA-PTNUM       TO  C02-PTNUM
                PERFORM 41015-PTNUM-CHK-SEC
@@ -1483,10 +1485,34 @@ grpsys     MOVE    SPA-HOSPNUM      TO  SYS-HOSPNUM
       *************MOVE    1               TO  SPA-GMN-C02-CUR
                END-IF
                IF      SPA-C02-MOTOPG      =   "D04"
-                   IF      LNK-D04-BYOMEI  NOT =   SPACE
-                       MOVE    LNK-D04-BYOMEI      TO  C02-BYOMEI
-                       PERFORM 41013-BYOMEI-CHK-SEC
+      *
+                   MOVE    LNK-D04-BYOMEI
+                                       TO  C02-BYOMEI
+                   MOVE    LNK-D04-HOSOKU-COMMENT
+                                       TO  C02-HOSOKU-COMMENT
+      *
+                   PERFORM 41025-HOSOKU-COMMENT-CHK-SEC
+                   MOVE    SPACE       TO  SPA-ERRCD
+      *
+                   PERFORM 41013-BYOMEI-CHK-SEC
+      *
+                   IF    ( FLG-END     =   ZERO )
+                    AND  ( SPA-ERRCD   =   SPACE )
+                       EVALUATE    TRUE
+                       WHEN  ( SPA-GMN-C02-BYOMEI         NOT = SPACE )
+                         AND ( SPA-GMN-C02-HOSOKU-COMMENT NOT = SPACE )
+                           MOVE    28  TO  SPA-GMN-C02-CUR
+                       WHEN  ( SPA-GMN-C02-BYOMEI         NOT = SPACE )
+                         AND ( SPA-GMN-C02-HOSOKU-COMMENT     = SPACE )
+                           MOVE    34  TO  SPA-GMN-C02-CUR
+                       WHEN  ( SPA-GMN-C02-BYOMEI             = SPACE )
+                         AND ( SPA-GMN-C02-HOSOKU-COMMENT NOT = SPACE )
+                           MOVE    2   TO  SPA-GMN-C02-CUR
+                       WHEN  OTHER
+                           MOVE    1   TO  SPA-GMN-C02-CUR
+                       END-EVALUATE
                    END-IF
+      *
                END-IF
            ELSE    
                MOVE    26              TO  SPA-GMN-C02-CUR

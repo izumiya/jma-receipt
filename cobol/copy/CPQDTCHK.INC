@@ -42,6 +42,9 @@
            03  QDTCHK-REZEMM               PIC 9(02).
            03  QDTCHK-ID                   PIC S9(9)   BINARY.
            03  QDTCHK-GRPID                PIC X(01).
+           03  QDTCHK-PTHOSOKU             PIC X(40).
+           03  QDTCHK-HOSOKU               PIC X(40).
+           03  QDTCHK-HOSOKU-COMPKBN       PIC X(01).
       *
            03  QDTCHK-SELHOSPNUM           PIC 9(02).
            03  QDTCHK-SELPTID              PIC 9(10).

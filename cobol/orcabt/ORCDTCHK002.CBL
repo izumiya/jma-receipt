@@ -515,6 +515,7 @@
            03  WRK-PTKOH-FTNJANUM                      PIC X(08).
            03  WRK-PTKOH-JKYSNUM                       PIC X(20).
            03  WRK-HEN-PTBYOMEI                        PIC X(100).
+           03  WRK-HEN-PTBYOMEI2                       PIC X(144).
            03  WRK-STR                                 PIC X(500).
            03  WRK-STR-TMP                             PIC X(500).
            03  WRK-PNT                                 PIC 9(05).
@@ -6074,16 +6075,18 @@
                INITIALIZE  DTCHK009-REC
                MOVE    WRK-DTCHK009-SRYKA  TO  DTCHK009-SRYKA
                MOVE    WRK-HEN-PTBYOMEI    TO  DTCHK009-BYOMEI
+               MOVE    PTBYO-HOSOKU-COMMENT TO DTCHK009-HOSOKU
                PERFORM 900-DTCHK009-READ-SEC
                IF    ( FLG-DTCHK009    =   ZERO )
                    MOVE    PTBYO-SRYKA         TO  SRH-1005-SRYKA
-                   MOVE    WRK-HEN-PTBYOMEI    TO  WRK-ERRMES-PLUS
+                   MOVE    WRK-HEN-PTBYOMEI2   TO  WRK-ERRMES-PLUS
                    MOVE    "050012"            TO  WRK-ERRCD
                    INITIALIZE              TERRINF-AREA
                    PERFORM 213-ERRMES-HEN-SEC
                ELSE
                    MOVE    WRK-DTCHK009-SRYKA  TO  DTCHK009-SRYKA
                    MOVE    WRK-HEN-PTBYOMEI    TO  DTCHK009-BYOMEI
+                   MOVE    PTBYO-HOSOKU-COMMENT TO DTCHK009-HOSOKU
                    WRITE   DTCHK009-REC
                END-IF
            END-IF
@@ -6213,6 +6216,14 @@
       *
            MOVE    SMKBYO-BYOMEI   TO  WRK-HEN-PTBYOMEI
            MOVE    SMKBYO-LENGTH   TO  CNT-BYOMEIMOJI
+      *
+           INITIALIZE                  ORCSMKBYOMEIAREA
+           MOVE    PTBYO-UTAGAIFLG TO  SMKBYO-UTAGAIFLG
+           MOVE    PTBYO-BYOMEI    TO  SMKBYO-BYOMEI
+           MOVE    PTBYO-HOSOKU-COMMENT
+                                   TO  SMKBYO-HOSOKU-COMMENT
+           CALL    "ORCSMKBYOMEI"  USING   ORCSMKBYOMEIAREA
+           MOVE    SMKBYO-BYOMEI   TO  WRK-HEN-PTBYOMEI2
       *
            .
        2001121-PTBYO-BYOMEI-HEN-EXT.
@@ -7162,13 +7173,28 @@
            END-IF
       *
            MOVE    SPACE           TO  WRK-ERRMES-PLUS
-           STRING  WRK-SRY-NAME        DELIMITED BY SPACE
-                   "、"                DELIMITED BY SIZE
-                   SDTCHK01-O-BYOMEI (IDX0)
-                                       DELIMITED BY SPACE
-                   WRK-NISSU-MES       DELIMITED BY SPACE
-           INTO    WRK-ERRMES-PLUS
-           END-STRING
+           IF    ( SDTCHK01-O-HOSOKU (IDX0)
+                                   =   SPACE )
+               STRING  WRK-SRY-NAME        DELIMITED BY SPACE
+                       "、"                DELIMITED BY SIZE
+                       SDTCHK01-O-BYOMEI (IDX0)
+                                           DELIMITED BY SPACE
+                       WRK-NISSU-MES       DELIMITED BY SPACE
+               INTO    WRK-ERRMES-PLUS
+               END-STRING
+           ELSE
+               STRING  WRK-SRY-NAME        DELIMITED BY SPACE
+                       "、"                DELIMITED BY SIZE
+                       SDTCHK01-O-BYOMEI (IDX0)
+                                           DELIMITED BY SPACE
+                       "（"                DELIMITED BY SIZE
+                       SDTCHK01-O-HOSOKU (IDX0)
+                                           DELIMITED BY SPACE
+                       "）"                DELIMITED BY SIZE
+                       WRK-NISSU-MES       DELIMITED BY SPACE
+               INTO    WRK-ERRMES-PLUS
+               END-STRING
+           END-IF
       *
            MOVE    WRK-SRYKA       TO  SRH-1005-SRYKA
            INITIALIZE                      TERRINF-AREA
@@ -7577,13 +7603,28 @@
            END-IF
       *
            MOVE    SPACE           TO  WRK-ERRMES-PLUS
-           STRING  WRK-SRY-NAME        DELIMITED BY SPACE
-                   "、"                DELIMITED BY SIZE
-                   SDTCHK01-O-BYOMEI (IDX0)
-                                       DELIMITED BY SPACE
-                   WRK-NISSU-MES       DELIMITED BY SPACE
-           INTO    WRK-ERRMES-PLUS
-           END-STRING
+           IF    ( SDTCHK01-O-HOSOKU (IDX0)
+                                       =   SPACE )
+               STRING  WRK-SRY-NAME        DELIMITED BY SPACE
+                       "、"                DELIMITED BY SIZE
+                       SDTCHK01-O-BYOMEI (IDX0)
+                                           DELIMITED BY SPACE
+                       WRK-NISSU-MES       DELIMITED BY SPACE
+               INTO    WRK-ERRMES-PLUS
+               END-STRING
+           ELSE
+               STRING  WRK-SRY-NAME        DELIMITED BY SPACE
+                       "、"                DELIMITED BY SIZE
+                       SDTCHK01-O-BYOMEI (IDX0)
+                                           DELIMITED BY SPACE
+                       "（"                DELIMITED BY SIZE
+                       SDTCHK01-O-HOSOKU (IDX0)
+                                           DELIMITED BY SPACE
+                       "）"                DELIMITED BY SIZE
+                       WRK-NISSU-MES       DELIMITED BY SPACE
+               INTO    WRK-ERRMES-PLUS
+               END-STRING
+           END-IF
       *
            MOVE    WRK-SRYKA       TO  SRH-1005-SRYKA
            INITIALIZE                      TERRINF-AREA
@@ -12981,17 +13022,7 @@
                    PERFORM 80011-TMPSND-EDIT-SEC
                END-IF
            ELSE
-               MOVE    SPA-HOSPNUM TO  CHKSND-HOSPNUM
-               MOVE    WRK-CHK-CHKKBN
-                                   TO  CHKSND-CHKKBN
-               MOVE    WRK-CHK-SRYCD
-                                   TO  CHKSND-SRYCD
-               MOVE    WRK-CHK-CDKBN
-                                   TO  CHKSND-CDKBN
-               MOVE    "00000000"  TO  CHKSND-YUKOSTYMD
-               MOVE    "99999999"  TO  CHKSND-YUKOEDYMD
-               MOVE    SPACE       TO  CHKSND-GRPCHKKBN
-               MOVE    SPACE       TO  CHKSND-NYUGAIKBN
+               INITIALIZE          CHKSND-REC
                PERFORM 80011-TMPSND-EDIT-SEC
            END-IF
       *
@@ -13029,8 +13060,15 @@
                IF    ( SS012-HAISHI    =   ZERO )
       *
                    INITIALIZE                  TMPSND-REC
-      *
-                   MOVE    CHKSND-REC      TO  TMPSND-REC
+                   MOVE    SPA-HOSPNUM     TO  TMPSND-HOSPNUM
+                   MOVE    WRK-CHK-CHKKBN  TO  TMPSND-CHKKBN
+                   MOVE    WRK-CHK-SRYCD   TO  TMPSND-SRYCD
+                   MOVE    "00000000"      TO  TMPSND-YUKOSTYMD
+                   MOVE    "99999999"      TO  TMPSND-YUKOEDYMD
+                   MOVE    WRK-CHK-CDKBN   TO  TMPSND-CDKBN
+                   MOVE    SPACE           TO  TMPSND-GRPCHKKBN
+                   MOVE    SPACE           TO  TMPSND-GRPID
+                   MOVE    SPACE           TO  TMPSND-NYUGAIKBN
       *
                    COMPUTE CHKSND-RENNUM   =   CHKSND-RENNUM  +   1
                    MOVE    CHKSND-RENNUM   TO  TMPSND-RENNUM
@@ -13040,6 +13078,10 @@
       *
                    MOVE    SS012-O-BYOMEI  TO  TMPSND-BYOMEI
                    MOVE    "1"             TO  TMPSND-COMPKBN
+      *
+                   MOVE    SPACE           TO  TMPSND-HOSOKU
+                   MOVE    "1"             TO  TMPSND-HOSOKU-COMPKBN
+      *
                    IF    ( CHK-CHKKBN      =   "1" )
                        MOVE    "0"         TO  TMPSND-UTAGAIKBN
                    ELSE

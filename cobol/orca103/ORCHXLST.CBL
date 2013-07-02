@@ -76,19 +76,22 @@
                05  B01R-MSTSEQ         PIC 9(10).
            03  B01R-UTAGAIKBN          PIC X(01).
            03  B01R-COMPKBN            PIC X(01).
+           03  B01R-HOSOKU-COMPKBN     PIC X(01).
            03  B01R-TEKIYO-G.
                05  B01R-COMPKBNMEI     PIC X(02).
+               05  B01R-HOSOKU-COMPKBNMEI
+                                       PIC X(04).
                05  B01R-UTAGAIKBNMEI   PIC X(01).
                05  B01R-GRPID          PIC X(01).
                05  B01R-FIL1           PIC X(01).
-               05  B01R-TEKIYO         PIC X(90).
+               05  B01R-TEKIYO         PIC X(86).
                05  B01R-TEKIYO-R1      REDEFINES  B01R-TEKIYO.
                    07  B01R-BYOMEICD   PIC X(07).
-                   07  B01R-FIL2       PIC X(03).
-                   07  B01R-BYOMEI     PIC X(80).
+                   07  B01R-FIL2       PIC X(01).
+                   07  B01R-BYOMEI     PIC X(78).
                05  B01R-TEKIYO-R2      REDEFINES  B01R-TEKIYO.
-                   07  B01R-FIL3       PIC X(10).
-                   07  B01R-MEISAI     PIC X(80).
+                   07  B01R-FIL3       PIC X(08).
+                   07  B01R-MEISAI     PIC X(78).
       *
        FD  B01T-FILE.
        01  B01T-REC.
@@ -146,12 +149,13 @@
            03  FLG-MEISAI              PIC 9(01).
            03  FLG-LINE-FEED           PIC 9(01).
            03  FLG-TOTUGO-G.
+               05  FLG-BUBUN           PIC 9(01).
                05  FLG-KANZEN          PIC 9(01).
                05  FLG-ZENPO           PIC 9(01).
                05  FLG-KOHO            PIC 9(01).
            03  FLG-TOTUGO-R    REDEFINES   FLG-TOTUGO-G.
                05  FLG-TOTUGO          PIC 9(01)
-                                       OCCURS  3.
+                                       OCCURS  4.
            03  FLG-TEKCD               PIC 9(01).
            03  FLG-UTAGAIKBN           PIC 9(01).
            03  FLG-NOCHECK             PIC 9(01).
@@ -299,19 +303,20 @@
        01  CONST-AREA.
            03  CONST-HCM44-MAX         PIC 9(05)   VALUE   55.
            03  CONST-MEISAI-ST         PIC 9(05)   VALUE   4.
-           03  CONST-TEKIYO-MAX        PIC 9(05)   VALUE   90.
-           03  CONST-TEKIYO-R3-MAX     PIC 9(05)   VALUE   80.
+           03  CONST-TEKIYO-MAX        PIC 9(05)   VALUE   86.
+           03  CONST-TEKIYO-R3-MAX     PIC 9(05)   VALUE   78.
            03  CONST-LEFT-MAX          PIC 9(05)   VALUE   60.
            03  CONST-LEFT-R2-MAX       PIC 9(05)   VALUE   50.
            03  CONST-MKCD-MAX          PIC 9(05)   VALUE   21.
            03  CONST-SETCD-MAX         PIC 9(05)   VALUE   100.
-           03  CONST-TOTUGO-MES-MAX    PIC 9(05)   VALUE   3.
+           03  CONST-TOTUGO-MES-MAX    PIC 9(05)   VALUE   4.
            03  CONST-TOTUGO-MES-VAL.
+               05  CONST-TOTUGO-BUBUN  PIC X(12)   VALUE "部：部分一致".
                05  CONST-TOTUGO-KANZEN PIC X(12)   VALUE "完：完全一致".
                05  CONST-TOTUGO-ZENPO  PIC X(12)   VALUE "前：前方一致".
                05  CONST-TOTUGO-KOHO   PIC X(12)   VALUE "後：後方一致".
            03  CONST-TOTUGO-MES-R      REDEFINES   CONST-TOTUGO-MES-VAL.
-               05  CONST-TOTUGO-MES    PIC X(12)   OCCURS  3.
+               05  CONST-TOTUGO-MES    PIC X(12)   OCCURS  4.
            03  CONST-CHKERR-MES-MAX    PIC 9(05)   VALUE   2.
            03  CONST-CHKERR-MES-VAL.
                05  CONST-CHKERR-KEIKOKU PIC X(20) 
@@ -716,7 +721,7 @@
                                        TO  H01-MIDASI
                    MOVE    "  薬剤コード@"
                                        TO  WRK-MIDASI1
-                   MOVE    "病名コード@"
+                   MOVE    "    病名コード@"
                                        TO  WRK-MIDASI2
            WHEN    "2"
                MOVE
@@ -724,7 +729,7 @@
                                        TO  H01-MIDASI
                    MOVE    "  診療行為コード@"
                                        TO  WRK-MIDASI1
-                   MOVE    "病名コード@"
+                   MOVE    "    病名コード@"
                                        TO  WRK-MIDASI2
            WHEN    "6"
                MOVE
@@ -732,7 +737,7 @@
                                        TO  H01-MIDASI
                    MOVE    "  薬剤コード@"
                                        TO  WRK-MIDASI1
-                   MOVE    "病名コード@"
+                   MOVE    "    病名コード@"
                                        TO  WRK-MIDASI2
            END-EVALUATE
       *
@@ -1301,15 +1306,35 @@
            MOVE    CHKSND-COMPKBN     TO  B01R-COMPKBN
       *
            EVALUATE    CHKSND-COMPKBN
+           WHEN    "1"
+               IF    ( CHKSND-CHKKBN      =   "1" OR "2" )
+                AND  ( CHKSND-HOSOKU  NOT =   SPACE )
+                   MOVE    "部"       TO  B01R-COMPKBNMEI
+               END-IF
            WHEN    "2"
                MOVE    "完"           TO  B01R-COMPKBNMEI
            WHEN    "3"
                MOVE    "前"           TO  B01R-COMPKBNMEI
            WHEN    "4"
                MOVE    "後"           TO  B01R-COMPKBNMEI
-           WHEN    OTHER
-               MOVE    "　"           TO  B01R-COMPKBNMEI
            END-EVALUATE
+           MOVE    CHKSND-COMPKBN     TO  B01R-COMPKBN
+      *
+           IF    ( CHKSND-CHKKBN      =   "1" OR "2" )
+            AND  ( CHKSND-HOSOKU  NOT =   SPACE )
+               MOVE    CHKSND-HOSOKU-COMPKBN
+                                      TO  B01R-HOSOKU-COMPKBN
+               EVALUATE    CHKSND-HOSOKU-COMPKBN
+               WHEN    "1"
+                   MOVE    "(部)"     TO  B01R-HOSOKU-COMPKBNMEI
+               WHEN    "2"
+                   MOVE    "(完)"     TO  B01R-HOSOKU-COMPKBNMEI
+               WHEN    "3"
+                   MOVE    "(前)"     TO  B01R-HOSOKU-COMPKBNMEI
+               WHEN    "4"
+                   MOVE    "(後)"     TO  B01R-HOSOKU-COMPKBNMEI
+               END-EVALUATE
+           END-IF
       *
            EVALUATE    CHKSND-UTAGAIKBN
            WHEN    "0"
@@ -1333,7 +1358,20 @@
       *
            IF    ( WRK-KEY-CD (2)  =   SPACE )
                MOVE    WRK-KEY-CD (1)  TO  B01R-BYOMEICD
-               MOVE    CHKSND-BYOMEI   TO  B01R-BYOMEI
+               MOVE    1           TO  FLG-MEISAI
+               MOVE    1           TO  FLG-TEKCD
+               MOVE    CHKSND-BYOMEI   TO  WRK-MEISAISTR
+               PERFORM 20011-MEISAI-CHKSND-SYORI-SEC
+               IF    ( CHKSND-CHKKBN   =   "1" OR "2" )
+                AND  ( CHKSND-HOSOKU   NOT =   SPACE )
+                   MOVE    SPACE    TO WRK-MEISAISTR
+                   STRING  "（"             DELIMITED BY SIZE
+                           CHKSND-HOSOKU    DELIMITED BY SPACE
+                           "）"             DELIMITED BY SPACE
+                   INTO    WRK-MEISAISTR
+                   END-STRING
+                   PERFORM 20011-MEISAI-CHKSND-SYORI-SEC
+               END-IF
            ELSE
                PERFORM 2001-MEISAI-CHKSND-SYORI-SEC
            END-IF
@@ -1415,6 +1453,17 @@
            MOVE    "】"            TO  WRK-MEISAISTR
            PERFORM 20011-MEISAI-CHKSND-SYORI-SEC
       *
+           IF    ( CHKSND-CHKKBN   =   "1" OR "2" )
+            AND  ( CHKSND-HOSOKU   NOT =   SPACE )
+               MOVE    SPACE    TO WRK-MEISAISTR
+               STRING  "（"             DELIMITED BY SIZE
+                       CHKSND-HOSOKU    DELIMITED BY SPACE
+                       "）"             DELIMITED BY SPACE
+               INTO    WRK-MEISAISTR
+               END-STRING
+               PERFORM 20011-MEISAI-CHKSND-SYORI-SEC
+           END-IF
+      *
            .
        2001-MEISAI-CHKSND-SYORI-EXT.
            EXIT.
@@ -1473,6 +1522,21 @@
        210-BODY-01-RIGHT-SEC           SECTION.
       *
            EVALUATE    B01R-COMPKBN
+           WHEN    "1"
+               IF    ( B01R-HOSOKU-COMPKBN NOT =   SPACE )
+                   MOVE    1  TO  FLG-BUBUN
+               END-IF
+           WHEN    "2"
+               MOVE    1      TO  FLG-KANZEN
+           WHEN    "3"
+               MOVE    1      TO  FLG-ZENPO
+           WHEN    "4"
+               MOVE    1      TO  FLG-KOHO
+           END-EVALUATE
+      *
+           EVALUATE    B01R-HOSOKU-COMPKBN
+           WHEN    "1"
+               MOVE    1      TO  FLG-BUBUN
            WHEN    "2"
                MOVE    1      TO  FLG-KANZEN
            WHEN    "3"
@@ -1501,13 +1565,15 @@
       *
            MOVE    ZERO            TO  FLG-LINE-FEED
       *
-           IF    (      FLG-MEISAI         =   ZERO )
-               IF    (  WRK-TEKIYOLEN  >   CONST-TEKIYO-MAX )
-                   MOVE    1       TO  FLG-LINE-FEED
-               END-IF
-           ELSE
-               IF    (  WRK-TEKIYOLEN  >   CONST-TEKIYO-R3-MAX )
-                   MOVE    1       TO  FLG-LINE-FEED
+           IF    ( WRK-PNT         >   1 )
+               IF    (      FLG-MEISAI         =   ZERO )
+                   IF    (  WRK-TEKIYOLEN  >   CONST-TEKIYO-MAX )
+                       MOVE    1   TO  FLG-LINE-FEED
+                   END-IF
+               ELSE
+                   IF    (  WRK-TEKIYOLEN  >   CONST-TEKIYO-R3-MAX )
+                       MOVE    1   TO  FLG-LINE-FEED
+                   END-IF
                END-IF
            END-IF
       *
@@ -2022,7 +2088,7 @@
            MOVE    1                   TO  WRK-TGPNT
            MOVE    SPACE               TO  H02-MIDASI2
            STRING  WRK-MIDASI2         DELIMITED   BY  "@"
-                   "　　"              DELIMITED   BY  SIZE
+                   " "                 DELIMITED   BY  SIZE
            INTO    H02-MIDASI2
            WITH    POINTER WRK-TGPNT
            END-STRING
@@ -2047,21 +2113,12 @@
       *
            IF        ( HXLST-CHKKBN    =   "1" OR "2" OR "6" )
                IF    ( FLG-UTAGAIKBN       =   1 )
-                   IF    ( HXLST-CHKKBN    =   "1" OR "2" )
-                       STRING "#:疑い病名を認めない（適応としない）"
-                              DELIMITED   BY  SPACE
-                          " " DELIMITED   BY  SIZE
-                       INTO   H02-MIDASI2
-                       WITH   POINTER  WRK-TGPNT
-                       END-STRING
-                   ELSE
                        STRING "#:疑い病名を認めない"
                               DELIMITED   BY  SPACE
                           " " DELIMITED   BY  SIZE
                        INTO   H02-MIDASI2
                        WITH   POINTER  WRK-TGPNT
                        END-STRING
-                   END-IF
                END-IF
            END-IF
       *

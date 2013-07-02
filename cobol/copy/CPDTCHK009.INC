@@ -26,3 +26,4 @@
            03  DTCHK009-KEY.
                05  DTCHK009-SRYKA              PIC X(02).
                05  DTCHK009-BYOMEI             PIC X(200).
+               05  DTCHK009-HOSOKU             PIC X(40).

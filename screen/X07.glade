@@ -578,38 +578,6 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label526</name>
-      <x>90</x>
-      <y>328</y>
-      <width>72</width>
-      <height>24</height>
-      <label>病名コード</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label502</name>
-      <x>90</x>
-      <y>360</y>
-      <width>72</width>
-      <height>24</height>
-      <label>病    名</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
       <name>label476</name>
       <x>224</x>
       <y>296</y>
@@ -661,6 +629,38 @@
       </signal>
       <label>F6:前頁</label>
       <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label526</name>
+      <x>90</x>
+      <y>328</y>
+      <width>72</width>
+      <height>24</height>
+      <label>病名コード</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLBYOMEI</name>
+      <x>90</x>
+      <y>360</y>
+      <width>88</width>
+      <height>24</height>
+      <label>病名</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
     </widget>
   </widget>
 </widget>

@@ -50,6 +50,7 @@
                07  SPA-X01-CHKKBNFL            PIC X(01).
                07  SPA-X01-CHKKBNNAME          PIC X(48).
            05  SPA-X01-USERBYOMEI-G.
+               07  SPA-X01-SELKBN          PIC X(01).
                07  SPA-X01-POSITION        PIC 9(01).
       *検索分類コード
                07  SPA-X01-BUNRUICD        PIC 9(03).
@@ -75,6 +76,7 @@
                07  SPA-X01-MAE-SRYCD       PIC X(09).
                07  SPA-X01-MAE-NAME        PIC X(100).
            05  SPA-X01-BYOMEI              PIC X(100).
+           05  SPA-X01-HOSOKU              PIC X(40).
       *
       *----(01.00.02)--ADD-START---
            05  SPA-X91-TBL-GROUP           PIC  X(14).

@@ -113,6 +113,7 @@
                            11  SPA-NAI-TID        PIC 9(09).
                    07  SPA-MAE-SRYCD              PIC X(09). 
                    07  SPA-NAI-BYOMEI             PIC X(100).
+                   07  SPA-NAI-HOSOKU             PIC X(40).
                    07  SPA-NAI-MOTOPG             PIC X(10). 
       *
               05  SPA-NAI-SELNO                   PIC 9(03).
@@ -563,6 +564,7 @@
       *
            MOVE    SENDX01-MOTOPG      TO  SPA-NAI-MOTOPG
            MOVE    SENDX01-BYOMEI      TO  SPA-NAI-BYOMEI
+           MOVE    SENDX01-HOSOKU      TO  SPA-NAI-HOSOKU
       *
            MOVE    1                   TO  FLG-TOUROKU
            PERFORM 4102-KIHON-CHK-SEC
@@ -2415,6 +2417,7 @@
       *
            MOVE    SPA-NAI-MOTOPG      TO  SPA-X01-MOTOPG
            MOVE    SPA-NAI-BYOMEI      TO  SPA-X01-BYOMEI
+           MOVE    SPA-NAI-HOSOKU      TO  SPA-X01-HOSOKU
       *
            MOVE    SPA-X01-CHKKBN      TO  SPA-X01-MAE-CHKKBN
            MOVE    SPA-X01-SRYCD       TO  SPA-X01-MAE-SRYCD

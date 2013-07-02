@@ -120,6 +120,8 @@
            03  WRK-PRT-NUM-G.
                05  WRK-PRT-NUM             PIC ZZZ9.
                05  WRK-PRT-GRPID           PIC X(02).
+           03  WRK-BYOMEI-JYKN             PIC X(10).
+           03  WRK-HOSOKU-JYKN             PIC X(10).
       *
        01  WRK-LCHKLST-AREA.
            03  WRK-LCHKLST-MAX             PIC 9(05).
@@ -136,6 +138,8 @@
                05  WRK-LCHKLST-NGBNDKBN    PIC X(01).
                05  WRK-LCHKLST-CHKERR      PIC 9(01).
                05  WRK-LCHKLST-DATAKBN     PIC X(01).
+               05  WRK-LCHKLST-HOSOKU      PIC X(40).
+               05  WRK-LCHKLST-HOSOKU-JYKN PIC X(01).
       *
        01  WRK-ROW-AREA.
            03  WRK-LCHKLST-ROW             PIC S9(9)   BINARY.
@@ -1786,6 +1790,12 @@
                                                                (IDXA)
                    END-IF
                END-IF
+      *
+               MOVE    CHKSND-HOSOKU    TO  SPA-X03-GMN-TRCHK-HOSOKU
+                                                               (IDXA)
+               MOVE    CHKSND-HOSOKU-COMPKBN
+                                        TO SPA-X03-GMN-TRCHK-HOSOKU-JYKN
+                                                               (IDXA)
              END-IF
       *
                MOVE    "tbl_chksnd"            TO  MCP-TABLE
@@ -2127,6 +2137,9 @@
                                                                (IDXA)
                END-IF
       *
+               MOVE    "1"             TO  SPA-X03-GMN-TRCHK-HOSOKU-JYKN
+                                                               (IDXA)
+      *
                MOVE    "tbl_tekioubyomei"      TO  MCP-TABLE
                MOVE    "key2"                  TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
@@ -2258,6 +2271,10 @@
                                =   SPA-X03-GMN-TLCHK-JYKN  (IDX6) )
                             AND  ( SPA-X03-GMN-TRCHK-GRPID (IDX0)
                                =   SPA-X03-GMN-TLCHK-GRPID (IDX6) )
+                            AND  ( SPA-X03-GMN-TRCHK-HOSOKU  (IDX0)
+                               =   SPA-X03-GMN-TLCHK-HOSOKU  (IDX6))
+                            AND  ( SPA-X03-GMN-TRCHK-HOSOKU-JYKN (IDX0)
+                               =   SPA-X03-GMN-TLCHK-HOSOKU-JYKN (IDX6))
                                MOVE    1   TO  FLG-HIT
                            END-IF
                        WHEN    "6"
@@ -2320,6 +2337,12 @@
                                                       (WRK-LCHKLST-MAX)
                        MOVE    SPA-X03-NAI-TRCHK-DATAKBN (IDX0)
                                        TO  WRK-LCHKLST-DATAKBN
+                                                      (WRK-LCHKLST-MAX)
+                       MOVE    SPA-X03-GMN-TRCHK-HOSOKU (IDX0)
+                                       TO  WRK-LCHKLST-HOSOKU
+                                                      (WRK-LCHKLST-MAX)
+                       MOVE    SPA-X03-GMN-TRCHK-HOSOKU-JYKN (IDX0)
+                                       TO  WRK-LCHKLST-HOSOKU-JYKN
                                                       (WRK-LCHKLST-MAX)
       *
                    END-IF
@@ -2385,6 +2408,10 @@
                                TO  SPA-X03-NAI-TLCHK-CHKERR (IDXA)
                MOVE    WRK-LCHKLST-DATAKBN (IDX0)
                                TO  SPA-X03-NAI-TLCHK-DATAKBN (IDXA)
+               MOVE    WRK-LCHKLST-HOSOKU(IDX0)
+                               TO  SPA-X03-GMN-TLCHK-HOSOKU(IDXA)
+               MOVE    WRK-LCHKLST-HOSOKU-JYKN(IDX0)
+                               TO  SPA-X03-GMN-TLCHK-HOSOKU-JYKN (IDXA)
       *
            END-PERFORM
       *
@@ -2462,6 +2489,10 @@
                                =   SPA-X03-GMN-TLCHK-JYKN  (IDX6) )
                             AND  ( SPA-X03-GMN-TRCHK-GRPID (IDX0)
                                =   SPA-X03-GMN-TLCHK-GRPID (IDX6) )
+                            AND  ( SPA-X03-GMN-TRCHK-HOSOKU(IDX0)
+                               =   SPA-X03-GMN-TLCHK-HOSOKU(IDX6) )
+                            AND  ( SPA-X03-GMN-TRCHK-HOSOKU-JYKN (IDX0)
+                               =   SPA-X03-GMN-TLCHK-HOSOKU-JYKN (IDX6))
                                MOVE    1   TO  FLG-HIT
                            END-IF
                        WHEN    "6"
@@ -2523,6 +2554,12 @@
                                                       (WRK-LCHKLST-MAX)
                        MOVE    SPA-X03-NAI-TRCHK-DATAKBN (IDX0)
                                        TO  WRK-LCHKLST-DATAKBN
+                                                      (WRK-LCHKLST-MAX)
+                       MOVE    SPA-X03-GMN-TRCHK-HOSOKU (IDX0)
+                                       TO  WRK-LCHKLST-HOSOKU
+                                                      (WRK-LCHKLST-MAX)
+                       MOVE    SPA-X03-GMN-TRCHK-HOSOKU-JYKN (IDX0)
+                                       TO  WRK-LCHKLST-HOSOKU-JYKN
                                                       (WRK-LCHKLST-MAX)
       *
                    END-IF
@@ -2593,6 +2630,12 @@
                    MOVE    SPA-X03-NAI-TLCHK-DATAKBN (IDX0)
                                        TO  WRK-LCHKLST-DATAKBN
                                                       (WRK-LCHKLST-MAX)
+                   MOVE    SPA-X03-GMN-TLCHK-HOSOKU (IDX0)
+                                       TO  WRK-LCHKLST-HOSOKU
+                                                      (WRK-LCHKLST-MAX)
+                   MOVE    SPA-X03-GMN-TLCHK-HOSOKU-JYKN (IDX0)
+                                       TO  WRK-LCHKLST-HOSOKU-JYKN
+                                                      (WRK-LCHKLST-MAX)
       *
                END-IF
       *
@@ -2633,6 +2676,10 @@
                                TO  SPA-X03-NAI-TLCHK-CHKERR (IDX0)
                MOVE    WRK-LCHKLST-DATAKBN (IDX0)
                                TO  SPA-X03-NAI-TLCHK-DATAKBN(IDX0)
+               MOVE    WRK-LCHKLST-HOSOKU (IDX0)
+                               TO  SPA-X03-GMN-TLCHK-HOSOKU(IDX0)
+               MOVE    WRK-LCHKLST-HOSOKU-JYKN (IDX0)
+                               TO  SPA-X03-GMN-TLCHK-HOSOKU-JYKN(IDX0)
       *
            END-PERFORM
       *
@@ -2860,17 +2907,53 @@
                                            =   "1" )
                    MOVE    "◎"        TO  X03-TLCHK-NUM  (IDX1) (1:2)
                END-IF
-               MOVE    SPA-X03-GMN-TLCHK-NAME (IDX1)
+      *
+               IF    ( SPA-X01-CHKKBN  =   "1" OR "2" )
+                AND  ( SPA-X03-GMN-TLCHK-HOSOKU (IDX1)
+                                   NOT =   SPACE )
+                   STRING  SPA-X03-GMN-TLCHK-NAME (IDX1)
+                                                   DELIMITED BY SPACE
+                           "（"                    DELIMITED BY SIZE
+                           SPA-X03-GMN-TLCHK-HOSOKU (IDX1)
+                                                   DELIMITED BY SPACE
+                           "）"                    DELIMITED BY SIZE
+                   INTO  X03-TLCHK-NAME (IDX1)
+                   END-STRING
+               ELSE
+                   MOVE    SPA-X03-GMN-TLCHK-NAME (IDX1)
                                        TO  X03-TLCHK-NAME (IDX1)
+               END-IF
       *
                EVALUATE    SPA-X01-CHKKBN
                WHEN    "1"
                WHEN    "2"
                WHEN    "6"
+                   MOVE    SPACE       TO  WRK-BYOMEI-JYKN
+                                           WRK-HOSOKU-JYKN
+      *
                    MOVE    SPA-X03-GMN-TLCHK-JYKN (IDX1)
-                                           TO  WRK-CMB-CD
+                                       TO  WRK-CMB-CD
                    PERFORM 4300-JYKNLST-CHK-SEC
-                   MOVE    WRK-CMB-ITM     TO  X03-TLCHK-JYKN(IDX1)
+                   MOVE    WRK-CMB-ITM TO  WRK-BYOMEI-JYKN
+      *
+                   MOVE    SPA-X03-GMN-TLCHK-HOSOKU-JYKN (IDX1)
+                                       TO  WRK-CMB-CD
+                   PERFORM 4300-JYKNLST-CHK-SEC
+                   MOVE    WRK-CMB-ITM TO  WRK-HOSOKU-JYKN
+      *
+                   IF    ( SPA-X01-CHKKBN  =   "1" OR "2" )
+                    AND  ( SPA-X03-GMN-TLCHK-HOSOKU (IDX1)
+                                       NOT =   SPACE )
+                       STRING  WRK-BYOMEI-JYKN     DELIMITED BY SPACE
+                               "（"                DELIMITED BY SIZE
+                               WRK-HOSOKU-JYKN     DELIMITED BY SPACE
+                               "）"                DELIMITED BY SIZE
+                       INTO    X03-TLCHK-JYKN(IDX1)
+                       END-STRING
+                   ELSE
+                       MOVE    WRK-BYOMEI-JYKN
+                                       TO  X03-TLCHK-JYKN(IDX1)
+                   END-IF
                WHEN    "7"
                WHEN    "8"
                WHEN    "9"
@@ -2902,17 +2985,53 @@
                MOVE    SPA-X03-GMN-TRCHK-GRPID(IDX1)
                                        TO  WRK-PRT-GRPID(2:1)
                MOVE    WRK-PRT-NUM-G   TO  X03-TRCHK-NUM  (IDX1)
-               MOVE    SPA-X03-GMN-TRCHK-NAME (IDX1)
+      *
+               IF    ( SPA-X01-CHKKBN  =   "1" OR "2" )
+                AND  ( SPA-X03-GMN-TRCHK-HOSOKU (IDX1)
+                                   NOT =   SPACE )
+                   STRING  SPA-X03-GMN-TRCHK-NAME (IDX1)
+                                                   DELIMITED BY SPACE
+                           "（"                    DELIMITED BY SIZE
+                           SPA-X03-GMN-TRCHK-HOSOKU (IDX1)
+                                                   DELIMITED BY SPACE
+                           "）"                    DELIMITED BY SIZE
+                   INTO  X03-TRCHK-NAME (IDX1)
+                   END-STRING
+               ELSE
+                   MOVE    SPA-X03-GMN-TRCHK-NAME (IDX1)
                                        TO  X03-TRCHK-NAME (IDX1)
+               END-IF
       *
                EVALUATE    SPA-X01-CHKKBN
                WHEN    "1"
                WHEN    "2"
                WHEN    "6"
+                   MOVE    SPACE       TO  WRK-BYOMEI-JYKN
+                                           WRK-HOSOKU-JYKN
+      *
                    MOVE    SPA-X03-GMN-TRCHK-JYKN (IDX1)
-                                           TO  WRK-CMB-CD
+                                       TO  WRK-CMB-CD
                    PERFORM 4300-JYKNLST-CHK-SEC
-                   MOVE    WRK-CMB-ITM     TO  X03-TRCHK-JYKN(IDX1)
+                   MOVE    WRK-CMB-ITM TO  WRK-BYOMEI-JYKN
+      *
+                   MOVE    SPA-X03-GMN-TRCHK-HOSOKU-JYKN (IDX1)
+                                       TO  WRK-CMB-CD
+                   PERFORM 4300-JYKNLST-CHK-SEC
+                   MOVE    WRK-CMB-ITM TO  WRK-HOSOKU-JYKN
+      *
+                   IF    ( SPA-X01-CHKKBN  =   "1" OR "2" )
+                    AND  ( SPA-X03-GMN-TRCHK-HOSOKU (IDX1)
+                                       NOT =   SPACE )
+                       STRING  WRK-BYOMEI-JYKN     DELIMITED BY SPACE
+                               "（"                DELIMITED BY SIZE
+                               WRK-HOSOKU-JYKN     DELIMITED BY SPACE
+                               "）"                DELIMITED BY SIZE
+                       INTO    X03-TRCHK-JYKN(IDX1)
+                       END-STRING
+                   ELSE
+                       MOVE    WRK-BYOMEI-JYKN
+                                       TO  X03-TRCHK-JYKN(IDX1)
+                   END-IF
                WHEN    "7"
                WHEN    "8"
                WHEN    "9"

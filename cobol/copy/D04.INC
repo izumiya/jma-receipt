@@ -44,6 +44,7 @@
                 04  D04-BEHAVE-ITEM-STATE  PIC S9(9)   BINARY.
               03  D04-BYOSELNUM            PIC S9(4).
               03  D04-BYOMEI               PIC X(100).
+              03  D04-HOSOKU               PIC X(40).
               03  D04-CHKSELNUM            PIC S9(4).
               03  D04-SW1.
                 04  D04-ERRLST.
@@ -71,6 +72,7 @@
                     06  D04-TTENKIYMD      PIC X(10).
                     06  D04-TTENKIKBN      PIC X(10).
                     06  D04-TSYUBYO        PIC X(2).
+                    06  D04-TUTAGAI        PIC X(14).
                     06  D04-TNYUGAIKBN     PIC X(2).
                     06  D04-THKNCOMBI      PIC X(40).
                   05  D04-BYOLST-SELECT    PIC X       OCCURS  300.
@@ -82,8 +84,10 @@
                   05  D04-CHKLST-ROW       PIC S9(9)   BINARY.
                   05  D04-CHKLST-ROWATTR   PIC S9(9)   BINARY.
                   05  D04-CHKLST-ITEM      OCCURS  200.
-                    06  D04-TCHKLSTNO      PIC X(5).
+                    06  D04-TCHKLSTNO-G.
+                      07  D04-TCHKLSTNO    PIC X(4).
+                      07  D04-TCHKGRPID    PIC X(1).
                     06  D04-TCHKBYOMEI     PIC X(101).
-                    06  D04-TCOMPKBN       PIC X(4).
+                    06  D04-TCOMPKBN       PIC X(12).
                   05  D04-CHKLST-SELECT    PIC X       OCCURS  200.
 

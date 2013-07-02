@@ -81,6 +81,7 @@
            03  WRK-SRYYMD.
                05  WRK-SRYYM               PIC X(06).
                05  WRK-SRYDD               PIC 9(02).
+           03  WRK-COMPKBN                 PIC X(1).
       *
        01  LEN-AREA.
            03  LEN-CHKMST                  PIC 9(05).
@@ -102,6 +103,7 @@
            03  TBYOMEI-MAX                 PIC 9(05).
            03  TBYOMEI-OCC                 OCCURS 101.
                05  TBYOMEI-BYOMEI          PIC X(160).
+               05  TBYOMEI-HOSOKU          PIC X(40).
                05  TBYOMEI-ERRDAY-G.
                    07  TBYOMEI-ERRDAY      PIC 9(01)   OCCURS  31.
                05  TBYOMEI-KEY.
@@ -153,6 +155,9 @@
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
+      *
+      *    文字列操作サブ
+           COPY    "CPORCSSTRING.INC".
       *
       *    日付変換サブ
            COPY    "CPORCSDAY.INC".
@@ -416,6 +421,7 @@
                        PERFORM 20011-BYOMEICDKEY-HEN-SEC
                        MOVE    QDTCHK-CD       TO  WRK-CHKMST-KEY
                        MOVE    WRK-BYOMEICD-G  TO  WRK-PTBYOMEI-KEY
+                       MOVE    QDTCHK-COMPKBN  TO  WRK-COMPKBN
                        PERFORM 20011-TOTUGO-SEC
                     END-IF
                 END-IF
@@ -424,6 +430,7 @@
                     IF   ( FLG-MATCH           =   ZERO )
                        MOVE    QDTCHK-BYOMEI   TO  WRK-CHKMST-KEY
                        MOVE    QDTCHK-PTBYOMEI TO  WRK-PTBYOMEI-KEY
+                       MOVE    QDTCHK-COMPKBN  TO  WRK-COMPKBN
                        PERFORM 20011-TOTUGO-SEC
                     END-IF
                 END-IF
@@ -437,6 +444,7 @@
                     IF   ( FLG-MATCH           =   ZERO )
                        MOVE    QDTCHK-BYOMEI   TO  WRK-CHKMST-KEY
                        MOVE    QDTCHK-PTBYOMEI TO  WRK-PTBYOMEI-KEY
+                       MOVE    QDTCHK-COMPKBN  TO  WRK-COMPKBN
                        PERFORM 20011-TOTUGO-SEC
                     END-IF
                 END-IF
@@ -450,6 +458,7 @@
                     IF   ( FLG-MATCH           =   ZERO )
                        MOVE    QDTCHK-BYOMEI   TO  WRK-CHKMST-KEY
                        MOVE    QDTCHK-PTBYOMEI TO  WRK-PTBYOMEI-KEY
+                       MOVE    QDTCHK-COMPKBN  TO  WRK-COMPKBN
                        PERFORM 20011-TOTUGO-SEC
                     END-IF
                 END-IF
@@ -463,10 +472,27 @@
                     IF   ( FLG-MATCH           =   ZERO )
                        MOVE    QDTCHK-BYOMEI   TO  WRK-CHKMST-KEY
                        MOVE    QDTCHK-PTBYOMEI TO  WRK-PTBYOMEI-KEY
+                       MOVE    QDTCHK-COMPKBN  TO  WRK-COMPKBN
                        PERFORM 20011-TOTUGO-SEC
                     END-IF
                 END-IF
       *
+           END-IF
+      *
+           IF    ( FLG-MATCH           =   1 )
+               IF    ( QDTCHK-HOSOKU   NOT =   SPACE )
+      *
+                   MOVE    ZERO            TO  FLG-MATCH
+      *
+                   MOVE    QDTCHK-HOSOKU   TO  WRK-CHKMST-KEY
+                   MOVE    QDTCHK-PTHOSOKU TO  WRK-PTBYOMEI-KEY
+                   MOVE    QDTCHK-HOSOKU-COMPKBN
+                                           TO  WRK-COMPKBN
+                   PERFORM 20011-TOTUGO-SEC
+                   DISPLAY "WRK-CHKMST-KEY[" WRK-CHKMST-KEY "]"
+                   DISPLAY "WRK-PTBYOMEI-KEY[" WRK-PTBYOMEI-KEY "]"
+                   DISPLAY "FLG-MATCH[" FLG-MATCH "]"
+               END-IF
            END-IF
       *
            .
@@ -500,7 +526,7 @@
       *****************************************************************
        20011-TOTUGO-SEC                SECTION.
       *
-           EVALUATE    QDTCHK-COMPKBN
+           EVALUATE    WRK-COMPKBN
            WHEN    "2"
                IF    ( WRK-CHKMST-KEY  =   WRK-PTBYOMEI-KEY )
                        MOVE    1   TO  FLG-MATCH
@@ -534,7 +560,15 @@
                    END-IF
                END-IF
            WHEN    OTHER
-               MOVE    1           TO  FLG-MATCH
+               INITIALIZE       ORCSSTRINGAREA
+               MOVE    "search"        TO  ORCSSTR-COMMAND
+               MOVE    WRK-PTBYOMEI-KEY
+                                       TO  ORCSSTR-STRING1
+               MOVE    WRK-CHKMST-KEY  TO  ORCSSTR-STRING2
+               CALL    "orcsstring" USING  ORCSSTRINGAREA
+               IF    ( ORCSSTR-NUM1    >   ZERO )
+                   MOVE    1           TO  FLG-MATCH
+               END-IF
            END-EVALUATE
       *
            .
@@ -598,11 +632,13 @@
       *
                IF    ( SYS-1101-BYOSRYKAKBN    =   "1" OR SPACE)
                    IF    ( TBYOMEI-BYOMEI (IDX1)   =   QDTCHK-BYOMEI )
+                    AND  ( TBYOMEI-HOSOKU (IDX1)   =   QDTCHK-HOSOKU )
                     AND  ( TBYOMEI-SRYKA  (IDX1)   =   QDTCHK-SRYKA )
                        MOVE    IDX1    TO  TBYOMEI-IDX1
                    END-IF
                ELSE
                    IF    ( TBYOMEI-BYOMEI (IDX1)   =   QDTCHK-BYOMEI )
+                    AND  ( TBYOMEI-HOSOKU (IDX1)   =   QDTCHK-HOSOKU )
                        MOVE    IDX1    TO  TBYOMEI-IDX1
                    END-IF
                END-IF
@@ -618,6 +654,7 @@
                    =   TBYOMEI-MAX     +   1
       *
                MOVE    QDTCHK-BYOMEI   TO  TBYOMEI-BYOMEI (TBYOMEI-MAX)
+               MOVE    QDTCHK-HOSOKU   TO  TBYOMEI-HOSOKU (TBYOMEI-MAX)
                MOVE    QDTCHK-SRYKA    TO  TBYOMEI-SRYKA  (TBYOMEI-MAX)
                MOVE    "00000000"      TO  TBYOMEI-SRYYMD (TBYOMEI-MAX)
       *
@@ -790,6 +827,9 @@
                                                 (SDTCHK01-O-MAX)
                    MOVE    TBYOMEI-BYOMEI (IDX0)
                                        TO  SDTCHK01-O-BYOMEI
+                                                (SDTCHK01-O-MAX)
+                   MOVE    TBYOMEI-HOSOKU (IDX0)
+                                       TO  SDTCHK01-O-HOSOKU
                                                 (SDTCHK01-O-MAX)
                    MOVE    TBYOMEI-ERRDAY-G (IDX0)
                                        TO  SDTCHK01-O-ERRDAY-G

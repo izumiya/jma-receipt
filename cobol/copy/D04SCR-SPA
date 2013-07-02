@@ -78,8 +78,10 @@
                        09  SPA-GMN-TTENKIYMD   PIC X(10).
                        09  SPA-GMN-TTENKIKBN   PIC X(10).
                        09  SPA-GMN-TSYUBYO     PIC X(2).
+                       09  SPA-GMN-TUTAGAI     PIC X(12).
                        09  SPA-GMN-TNYUGAIKBN  PIC X(2).
                        09  SPA-GMN-THKNCOMBI   PIC X(40).
+                       09  SPA-GMN-TBYOHOSOKU  PIC X(40).
                05  SPA-GMN-CHKLST-AREA.
                    07  SPA-GMN-CHKLST-MAX      PIC 9(5).
                    07  SPA-GMN-CHKLST-SELNUM   PIC 9(5).
@@ -87,12 +89,14 @@
                    07  SPA-GMN-CHKLST-OCC      OCCURS  500.
                        09  SPA-GMN-TCHKBYOMEI  PIC X(100).
                        09  SPA-GMN-TGRPID      PIC X(1).
-                       09  SPA-GMN-TCOMPKBN    PIC X(4).
+                       09  SPA-GMN-TCOMPKBN    PIC X(12).
                        09  SPA-GMN-TDAYMONTHKBN PIC X(4).
                        09  SPA-GMN-TCHKSRYNAME PIC X(100).
                        09  SPA-GMN-TCHKTEKCD   PIC X(9).
                        09  SPA-GMN-TTEKBYOMST  PIC X(1).
+                       09  SPA-GMN-TCHKHOSOKU  PIC X(40).
                05  SPA-GMN-BYOMEI              PIC X(100).
+               05  SPA-GMN-HOSOKU              PIC X(40).
            03  SPA-GMN-COMBO-AREA.
                05  SPA-GMN-CHKNUMLST-G.
                    07  SPA-GMN-CHKNUM-MAX      PIC 9(03).
@@ -110,6 +114,7 @@
                05  SPA-NAI-REIGAICHKKBN        PIC X(01).
                05  SPA-NAI-TEKBYOYKZKBN        PIC X(01).
                05  SPA-NAI-TEKBYOSRYKBN        PIC X(01).
+               05  SPA-NAI-TENKIBYOMEIKBN      PIC X(01).
                05  SPA-NAI-GSRAUTH-22          PIC X(01).
                05  SPA-NAI-GSRAUTH-103         PIC X(01).
                05  SPA-NAI-ERR-AREA.

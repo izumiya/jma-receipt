@@ -81,6 +81,14 @@
                        09  SPA-GMN-JYKNKBN     PIC X(01).
                        09  SPA-GMN-JYKNKBNFL   PIC X(01).
                        09  SPA-GMN-JYKNKBNMEI  PIC X(10).
+                   07  SPA-GMN-HOSOKU          PIC X(40).
+                   07  SPA-GMN-HOSOKU-JYKNKBN-G.
+                       09  SPA-GMN-HOSOKU-JYKNKBN
+                                               PIC X(01).
+                       09  SPA-GMN-HOSOKU-JYKNKBNFL
+                                               PIC X(01).
+                       09  SPA-GMN-HOSOKU-JYKNKBNMEI
+                                               PIC X(10).
                    07  SPA-GMN-UTAGAIKBN-G.
                        09  SPA-GMN-UTAGAIKBN     PIC X(01).
                        09  SPA-GMN-UTAGAIKBNFL   PIC X(01).
@@ -160,11 +168,14 @@
                        09  SPA-GMN-TSRTKEY.
                            11  SPA-GMN-TGRPID    PIC X(01).
                            11  SPA-GMN-TGROUPCHG   PIC 9(05).
+                       09  SPA-GMN-THOSOKU         PIC X(40).
+                       09  SPA-GMN-THOSOKU-JYKN    PIC X(01).
                05  SPA-GMN-SRCBYOLST-AREA.
                    07  SPA-GMN-SRCBYOLST-NEXT      PIC 9(01).
                    07  SPA-GMN-SRCBYOLST-MAX       PIC 9(05).
                    07  SPA-GMN-SRCBYOLST-OCC       OCCURS  50.
                        09  SPA-GMN-TSRCBYOMEI      PIC X(100).
+                       09  SPA-GMN-TSRCHOSOKU      PIC X(40).
                        09  SPA-GMN-TSRCCD          PIC X(12).
                    07  SPA-GMN-SRCBYOLST-SELECT-G.
                        09  SPA-GMN-SRCBYOLST-SELECT
@@ -230,6 +241,7 @@
            03  FLG-HAISHI                  PIC 9(01).
            03  FLG-GROUP                   PIC 9(01).
            03  FLG-UNGROUP                 PIC 9(01).
+           03  FLG-ZENKAKU                 PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -337,6 +349,11 @@
            03  WRK-BYOCD                   PIC X(07).
            03  WRK-BYOMEI                  PIC X(100).
            03  WRK-GMN-CUR                 PIC 9(05).
+           03  WRK-HOSOKU                  PIC X(40).
+           03  WRK-BYOMEIINPUTCD           PIC X(20).
+           03  WRK-BYOMEI-JYKN             PIC X(10).
+           03  WRK-HOSOKU-JYKN             PIC X(10).
+           03  WRK-KANACHK-MAX             PIC 9(04).
       *
        01  WRK-WIDGET-AREA.
            03  WRK-WIDGET-BYOMEICD-G.
@@ -356,6 +373,7 @@
            03  CONST-CDLST-MAX             PIC 9(05)   VALUE   150.
            03  CONST-SRTKBN-MAX            PIC 9(05)   VALUE   50.
            03  CONST-REIGAIYKZ-MAX         PIC 9(05)   VALUE   100.
+           03  CONST-HOSOKUCD-MAX          PIC 9(05)   VALUE   3.
       *
            03  CONST-JYKNKBN-G.
                05  CONST-JYKNKBN-MAX    PIC 9(05) VALUE 4.
@@ -401,6 +419,8 @@
                  07  CONST-UTAGAIKBN-OCC  OCCURS   5.
                      09  CONST-UTAGAIKBNCD   PIC X(01).
                      09  CONST-UTAGAIKBNMEI1 PIC X(30).
+           03  CONST-SELKBN-BYOMEI           PIC X(01)     VALUE "1".
+           03  CONST-SELKBN-HOSOKU           PIC X(01)     VALUE "2".
       *
       *    病名システム予約コードテーブル
            COPY    "CMBYOMEICD.INC".
@@ -650,6 +670,7 @@
       *    一致条件初期値
            MOVE    SPA-GMN-JYKNKBNLST (1)
                                        TO  SPA-GMN-JYKNKBN-G
+                                           SPA-GMN-HOSOKU-JYKNKBN-G
                                            SPA-GMN-SRCJYKNKBN-G
       *
       *    疑い区分初期値
@@ -683,10 +704,17 @@
            END-IF
       *
            IF    ( SPA-X01-BYOMEI      =   SPACE )
+            AND  ( SPA-X01-HOSOKU      =   SPACE )
                MOVE    1                   TO  SPA-GMN-CUR
            ELSE
-               MOVE    SPA-X01-BYOMEI      TO  X04-BYOMEI
-               PERFORM 4100-BYOMEI-CHK-SEC
+               IF    ( SPA-X01-BYOMEI  NOT =   SPACE )
+                   MOVE    SPA-X01-BYOMEI  TO  X04-BYOMEI
+                   PERFORM 4100-BYOMEI-CHK-SEC
+               END-IF
+               IF    ( SPA-X01-HOSOKU  NOT =   SPACE )
+                   MOVE    SPA-X01-HOSOKU  TO  X04-HOSOKU
+                   PERFORM 4100-HOSOKU-CHK-SEC
+               END-IF
                MOVE    8                   TO  SPA-GMN-CUR
            END-IF
       *
@@ -1063,6 +1091,11 @@
                                                       (IDX-MAX IDX0)
                    END-PERFORM
       *
+                   MOVE    CHKSND-HOSOKU   TO  SPA-GMN-THOSOKU (IDX-MAX)
+                   MOVE    CHKSND-HOSOKU-COMPKBN
+                                           TO  SPA-GMN-THOSOKU-JYKN
+                                                               (IDX-MAX)
+      *
                END-IF
       *
                PERFORM 900-CHKSND-KEY2-FET-SEC
@@ -1122,8 +1155,6 @@
                                        TO  SPA-GMN-TBYOMEI (IDXE)
                MOVE    SPA-X03-GMN-TLCHK-JYKN (IDXE)
                                        TO  SPA-GMN-TJYKN (IDXE)
-               MOVE    SPA-X03-GMN-TLCHK-GRPID(IDXE)
-                                       TO  SPA-GMN-TGRPID (IDXE)
       *
                PERFORM VARYING IDXF    FROM    1   BY  1
                        UNTIL ( IDXF    >   CONST-MKCD-MAX )
@@ -1134,8 +1165,21 @@
                MOVE    SPA-X03-NAI-TLCHK-BYOSTATUS (IDXE)
                                        TO  SPA-NAI-TBYOSTATUS  (IDXE)
       *
-               MOVE    SPA-X03-NAI-TLCHK-UTAGAI (IDXE)
+               IF    ( SPA-X01-CHKKBN  =   "1" OR "2" )
+                   MOVE    SPA-X03-NAI-TLCHK-UTAGAI (IDXE)
                                        TO  SPA-GMN-TUTAGAI  (IDXE)
+                   MOVE    SPA-X03-GMN-TLCHK-HOSOKU (IDXE)
+                                       TO  SPA-GMN-THOSOKU  (IDXE)
+                   MOVE    SPA-X03-GMN-TLCHK-HOSOKU-JYKN (IDXE)
+                                       TO  SPA-GMN-THOSOKU-JYKN (IDXE)
+                   MOVE    SPA-X03-GMN-TLCHK-GRPID(IDXE)
+                                       TO  SPA-GMN-TGRPID (IDXE)
+               ELSE
+                   MOVE    "1"         TO  SPA-GMN-TUTAGAI  (IDXE)
+                   MOVE    SPACE       TO  SPA-GMN-THOSOKU  (IDXE)
+                   MOVE    "1"         TO  SPA-GMN-THOSOKU-JYKN (IDXE)
+                   MOVE    SPACE       TO  SPA-GMN-TGRPID (IDXE)
+               END-IF
       *
            END-PERFORM
       *
@@ -1149,24 +1193,54 @@
       *
            IF    ( SPA-X01-UERBYOMEI-KAKUTEI   =   1 )
       *
-               PERFORM VARYING IDX0    FROM    1   BY  1
-                       UNTIL ( IDX0    >   CONST-BYOCD-MAX )
+               IF    ( SPA-X01-SELKBN    =   CONST-SELKBN-BYOMEI )
       *
-                   MOVE    SPA-X01-INPUTCD (IDX0)
+                   PERFORM VARYING IDX0    FROM    1   BY  1
+                           UNTIL ( IDX0    >   CONST-BYOCD-MAX )
+      *
+                       MOVE    SPA-X01-INPUTCD (IDX0)
                                    TO  X04-BYOMEICD (IDX0)
       *
-               END-PERFORM
+                   END-PERFORM
       *
-               IF    ( SPA-X01-POSITION    NOT =   ZERO )
-                   MOVE    "BYOMEICD"  TO  WRK-WIDGET-BYOMEICD-STR
-                   MOVE    SPA-X01-POSITION
+                   IF    ( SPA-X01-POSITION    NOT =   ZERO )
+                       MOVE    "BYOMEICD"  TO  WRK-WIDGET-BYOMEICD-STR
+                       MOVE    SPA-X01-POSITION
                                        TO  WRK-WIDGET-BYOMEICD-NUM
-                   MOVE    WRK-WIDGET-BYOMEICD-G
-                                   TO  WRK-MCP-WIDGET
-               END-IF
-               PERFORM 4100-BYOMEICD-CHK-SEC
-               MOVE    SPACE           TO  SPA-ERRCD
+                       MOVE    WRK-WIDGET-BYOMEICD-G
+                                       TO  WRK-MCP-WIDGET
+                   END-IF
+                   PERFORM 4100-BYOMEICD-CHK-SEC
+                   MOVE    SPACE           TO  SPA-ERRCD
+               ELSE
       *
+                   INITIALIZE          XSUB01-LNK
+      *
+                   PERFORM VARYING IDX0    FROM    1   BY  1
+                           UNTIL ( IDX0    >   CONST-HOSOKUCD-MAX )
+      *
+                       MOVE    SPA-X01-INPUTCD (IDX0)
+                                   TO  XSUB01-BYOCD (IDX0)
+      *
+                   END-PERFORM
+      *
+                   MOVE    1               TO  XSUB01-SINGLE
+                   CALL    "ORCGXSUB01"    USING   SPA-AREA
+                                           XSUB01-LNK
+      *
+                   MOVE    XSUB01-O-BYOMEIALL
+                                           TO  X04-HOSOKU
+                   MOVE    "HOSOKU"        TO  WRK-MCP-WIDGET
+                   PERFORM 4100-HOSOKU-CHK-SEC
+                   MOVE    SPACE           TO  SPA-ERRCD
+               END-IF
+      *
+           ELSE
+               IF    ( SPA-X01-SELKBN      =   CONST-SELKBN-BYOMEI )
+                   CONTINUE
+               ELSE
+                   MOVE    18              TO  SPA-GMN-CUR
+               END-IF
            END-IF
       *
            .
@@ -1258,6 +1332,8 @@
                PERFORM 4100-BYOMEICD-CHK-SEC
            WHEN        ANY         ALSO    "BYOMEI"
                PERFORM 4100-BYOMEI-CHK-SEC
+           WHEN        ANY         ALSO    "HOSOKU"
+               PERFORM 4100-HOSOKU-CHK-SEC
            WHEN        ANY         ALSO    "SEL_BYOMEI"
                PERFORM 4100-SEL-BYOMEI-CHK-SEC
            WHEN        ANY         ALSO    "BYOLST"
@@ -1302,6 +1378,8 @@
       *
            MOVE   X04-JYKNKBN      TO  SPA-GMN-JYKNKBN
            MOVE   X04-UTAGAIKBN    TO  SPA-GMN-UTAGAIKBN
+           MOVE   X04-HOSOKU-JYKNKBN
+                                   TO  SPA-GMN-HOSOKU-JYKNKBN
            MOVE   X04-GRPID      TO  SPA-GMN-GRPID
            MOVE   X04-SRTKBN       TO  SPA-GMN-SRTKBN-G
            MOVE   X04-SRCBYOKBN    TO  SPA-GMN-SRCBYOKBN-G
@@ -1316,75 +1394,73 @@
       *****************************************************************
        4102-KIHON-CHK-SEC              SECTION.
       *
-           PERFORM 4101-SELNUM-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-SELNUM-CHK-SEC
            END-IF
       *
-           IF    ( SPA-GMN-BYOMEICD-CHK-FLG    =   1 )
-               PERFORM 4101-BYOMEICD-CHK-SEC
-               IF    ( SPA-ERRCD   NOT =   SPACE )
-                   GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               IF    ( SPA-GMN-BYOMEICD-CHK-FLG    =   1 )
+                   PERFORM 4101-BYOMEICD-CHK-SEC
                END-IF
            END-IF
       *
-           IF    ( SPA-GMN-BYOMEI-CHK-FLG      =   1 )
-               PERFORM 4101-BYOMEI-CHK-SEC
-               IF    ( SPA-ERRCD   NOT =   SPACE )
-                   GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               IF    ( SPA-GMN-BYOMEI-CHK-FLG      =   1 )
+                   PERFORM 4101-BYOMEI-CHK-SEC
                END-IF
            END-IF
       *
-           PERFORM 4101-JYKNKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-JYKNKBN-CHK-SEC
            END-IF
       *
-           PERFORM 4101-UTAGAIKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-HOSOKU-CHK-SEC
            END-IF
       *
-           PERFORM 4101-GRPID-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-HOSOKU-JYKNKBN-CHK-SEC
            END-IF
       *
-           PERFORM 4101-SEL-BYOMEI-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-UTAGAIKBN-CHK-SEC
            END-IF
       *
-           PERFORM 4101-SRCBYOKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-GRPID-CHK-SEC
            END-IF
       *
-           PERFORM 4101-SRTKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-SEL-BYOMEI-CHK-SEC
            END-IF
       *
-           PERFORM 4101-SRCJYKNKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-SRCBYOKBN-CHK-SEC
            END-IF
       *
-           PERFORM 4101-SRCUTAGAIKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-SRTKBN-CHK-SEC
            END-IF
       *
-           PERFORM 4101-NYUGAIKBN-CHK-SEC
-           IF    ( SPA-ERRCD   NOT =   SPACE )
-               GO  TO  4102-KIHON-CHK-EXT
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-SRCJYKNKBN-CHK-SEC
            END-IF
       *
-           IF    ( WRK-MCP-WIDGET  =   "SRTKBN" )
-            OR   ( WRK-MCP-WIDGET  =   "SRCBYOKBN" )
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-SRCUTAGAIKBN-CHK-SEC
+           END-IF
       *
-               PERFORM 4101-SRCBYOLST-SEC
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-NYUGAIKBN-CHK-SEC
+           END-IF
       *
+           IF    ( SPA-ERRCD   =   SPACE )
+               IF    ( WRK-MCP-WIDGET  =   "SRTKBN" )
+                OR   ( WRK-MCP-WIDGET  =   "SRCBYOKBN" )
+      *
+                   PERFORM 4101-SRCBYOLST-SEC
+      *
+               END-IF
            END-IF
       *
            .
@@ -1647,6 +1723,8 @@
                 AND (( XSUB01-O-ERRIDX >   ZERO )
                 OR   ( XSUB01-O-ERRIDX <=  CONST-BYOCD-MAX ))
                    INITIALIZE      SPA-X01-USERBYOMEI-G
+                   MOVE    CONST-SELKBN-BYOMEI
+                                       TO  SPA-X01-SELKBN
                    MOVE    XSUB01-O-ERRIDX
                                        TO  SPA-X01-POSITION
                    MOVE    XSUB01-O-ERRIDX
@@ -1666,6 +1744,8 @@
                        PERFORM 4091-X07-SENI-SEC
                        GO  TO  4101-BYOMEICD-CHK-EXT
                    ELSE
+                           MOVE    SPA-GMN-BYOCD (IDXB)
+                                               TO  WRK-BYOMEIINPUTCD
                            PERFORM 900-USERBYOMEI-KEY11-SEL-SEC
                            IF    ( FLG-USERBYOMEI  =   ZERO )
                                MOVE    IDXB        TO  SPA-X01-INDEX
@@ -1702,6 +1782,12 @@
                END-IF
            END-IF
       *
+           IF    ( SPA-ERRCD           =   SPACE )
+               IF    ( SPA-NAI-BYOINF-MAX  >   1 )
+                   MOVE    SPACE       TO  SPA-GMN-HOSOKU
+               END-IF
+           END-IF
+      *
            .
        4101-BYOMEICD-CHK-EXT.
            EXIT.
@@ -1711,10 +1797,18 @@
        4101-BYOMEI-CHK-SEC             SECTION.
       *
            IF    ( SPA-GMN-BYOMEI      =   SPACE )
-      *
-               GO  TO  4101-BYOMEI-CHK-EXT
-      *
+               CONTINUE
+           ELSE
+               PERFORM 41011-BYOMEI-CHK-SEC
            END-IF
+      *
+           .
+       4101-BYOMEI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    病名チェック処理
+      *****************************************************************
+       41011-BYOMEI-CHK-SEC             SECTION.
       *
            MOVE    SPA-GMN-BYOMEI      TO  WRK-MAE-INPUT
            PERFORM 800-KANA-CHK-SEC
@@ -1722,51 +1816,52 @@
            IF    ( FLG-ERR         NOT =   ZERO )
                MOVE    "0009"          TO SPA-ERRCD
                MOVE    8               TO SPA-GMN-CUR
-               GO  TO  4101-BYOMEI-CHK-EXT
            END-IF
       *
-      *
-           MOVE    ZERO                TO  CNT-STR
-           INSPECT SPA-GMN-BYOMEI          TALLYING
-                       CNT-STR FOR ALL "■"
-           IF    ( CNT-STR        >    ZERO )
-               MOVE    "0010"          TO SPA-ERRCD
-               MOVE    8               TO SPA-GMN-CUR
-               GO  TO  4101-BYOMEI-CHK-EXT
+           IF    ( SPA-ERRCD       =   SPACE )
+               MOVE    ZERO                TO  CNT-STR
+               INSPECT SPA-GMN-BYOMEI          TALLYING
+                           CNT-STR FOR ALL "■"
+               IF    ( CNT-STR        >    ZERO )
+                   MOVE    "0010"          TO SPA-ERRCD
+                   MOVE    8               TO SPA-GMN-CUR
+               END-IF
            END-IF
       *
-           INITIALIZE                      ORCSBYOMEIAREA
-           MOVE    "1"                 TO  LNK-BYO-SYORI
-           MOVE    SPA-GMN-BYOMEI      TO  LNK-BYO-BYOMEI
-           CALL    "ORCSBYOMEI"    USING   ORCSBYOMEIAREA
-                                           SPA-AREA
-           MOVE    LNK-BYO-BYOMEIHENFLG
-                                   TO  SPA-GMN-BYOSTATUS
+           IF    ( SPA-ERRCD       =   SPACE )
+               INITIALIZE                      ORCSBYOMEIAREA
+               MOVE    "1"                 TO  LNK-BYO-SYORI
+               MOVE    SPA-GMN-BYOMEI      TO  LNK-BYO-BYOMEI
+               CALL    "ORCSBYOMEI"    USING   ORCSBYOMEIAREA
+                                               SPA-AREA
+               MOVE    LNK-BYO-BYOMEIHENFLG
+                                       TO  SPA-GMN-BYOSTATUS
       *
-           MOVE    1               TO  SPA-NAI-BYOINF-MAX
-           MOVE    1               TO  SPA-NAI-BYOIDX (1)
-           MOVE    SPA-GMN-BYOMEI  TO  SPA-NAI-BYOMEI (1)
-           MOVE    SPA-GMN-BYOSTATUS
-                                   TO  SPA-NAI-BYOSTATUS (1)
+               MOVE    1               TO  SPA-NAI-BYOINF-MAX
+               MOVE    1               TO  SPA-NAI-BYOIDX (1)
+               MOVE    SPA-GMN-BYOMEI  TO  SPA-NAI-BYOMEI (1)
+               MOVE    SPA-GMN-BYOSTATUS
+                                       TO  SPA-NAI-BYOSTATUS (1)
       *
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >       LNK-BYO-BYOMEI-MAX )
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >       LNK-BYO-BYOMEI-MAX )
       *
-               MOVE    LNK-BYO-TBYOMEICD (IDX0)
+                   MOVE    LNK-BYO-TBYOMEICD (IDX0)
                                    TO  SPA-NAI-BYOCD (1 IDX0)
       *
-           END-PERFORM
+               END-PERFORM
       *
       *
-           PERFORM 4101-CDLST-SEC
-           PERFORM 41011-BYOMEICD-SEC
+               PERFORM 4101-CDLST-SEC
+               PERFORM 41011-BYOMEICD-SEC
       *
-           IF    ( LNK-BYO-BYOMEICD-MAX-ERR    =   1 )
-               MOVE    "0006"          TO  SPA-ERRCD
+               IF    ( LNK-BYO-BYOMEICD-MAX-ERR    =   1 )
+                   MOVE    "0006"          TO  SPA-ERRCD
+               END-IF
            END-IF
       *
            .
-       4101-BYOMEI-CHK-EXT.
+       41011-BYOMEI-CHK-EXT.
            EXIT.
       *****************************************************************
       *    一致条件区分チェック処理
@@ -1788,6 +1883,120 @@
       *
            .
        4101-JYKNKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    補足コメントチェック処理
+      *****************************************************************
+       4101-HOSOKU-CHK-SEC             SECTION.
+      *
+           EVALUATE    TRUE
+           WHEN  ( SPA-GMN-HOSOKU      =   SPACE )
+               MOVE    "1"             TO  SPA-GMN-HOSOKU-JYKNKBN
+           WHEN  ( SPA-GMN-HOSOKU(1:2) =   "//"  )
+              OR ( SPA-GMN-HOSOKU      =   "・" OR "・・"
+                                       OR  "／" OR "／／" )
+                   MOVE    SPACE       TO  SPA-GMN-HOSOKU
+                   INITIALIZE          SPA-X01-USERBYOMEI-G
+                   MOVE    CONST-SELKBN-HOSOKU
+                                       TO  SPA-X01-SELKBN
+                   PERFORM 4091-X07-SENI-SEC
+           WHEN   ( SPA-GMN-HOSOKU(1:1)
+                                       =   "/"  )
+               IF    ( SPA-GMN-HOSOKU(2:)  =   SPACE )
+                   MOVE    18      TO  SPA-GMN-CUR
+                   MOVE    "0011"  TO  SPA-ERRCD
+               ELSE
+                   MOVE    SPA-GMN-HOSOKU(2:)
+                                       TO  WRK-HOSOKU
+                   PERFORM 41011-HOSOKU-CHK-SEC
+               END-IF
+           WHEN  OTHER
+               MOVE    SPA-GMN-HOSOKU  TO  WRK-MAE-INPUT
+               PERFORM 800-KANA-CHK-SEC
+               MOVE    WRK-OUT-INPUT   TO  SPA-GMN-HOSOKU
+               IF    ( FLG-ERR         =   ZERO )
+                AND  ( FLG-ZENKAKU     =   1 )
+                    CONTINUE
+               ELSE
+                   MOVE    SPA-GMN-HOSOKU
+                                       TO  WRK-HOSOKU
+                   PERFORM 41011-HOSOKU-CHK-SEC
+               END-IF
+           END-EVALUATE
+      *
+           .
+       4101-HOSOKU-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    補足コメントチェック処理
+      *****************************************************************
+       41011-HOSOKU-CHK-SEC            SECTION.
+      *
+           INITIALIZE                  XSUB01-LNK
+      *
+           UNSTRING    WRK-HOSOKU      DELIMITED   BY  ","
+           INTO        XSUB01-BYOCD (1)
+           END-UNSTRING
+           MOVE        XSUB01-BYOCD (1)
+                                   TO  WRK-HOSOKU
+      *
+           MOVE    1               TO  XSUB01-SINGLE
+           CALL    "ORCGXSUB01"    USING   SPA-AREA
+                                           XSUB01-LNK
+           EVALUATE    XSUB01-O-RC
+           WHEN    ZERO
+           WHEN    2
+               MOVE    XSUB01-O-BYOMEIALL
+                                   TO  SPA-GMN-HOSOKU
+           WHEN    1
+               MOVE    SPACE       TO  SPA-GMN-HOSOKU
+           WHEN    4
+               IF    ( WRK-MCP-WIDGET  =   "HOSOKU" )
+                   MOVE    WRK-HOSOKU  TO  WRK-BYOMEIINPUTCD
+                   PERFORM 900-USERBYOMEI-KEY11-SEL-SEC
+                   IF    ( FLG-USERBYOMEI  =   ZERO )
+                       INITIALIZE          SPA-X01-USERBYOMEI-G
+                       MOVE    CONST-SELKBN-HOSOKU
+                                       TO  SPA-X01-SELKBN
+                       MOVE    1       TO  SPA-X01-INDEX
+                       MOVE    WRK-HOSOKU
+                                       TO  SPA-X01-BYOMEIINPUTCD
+                       PERFORM 4091-X07-SENI-SEC
+                       GO  TO  41011-HOSOKU-CHK-EXT
+                   ELSE
+                       MOVE    18      TO  SPA-GMN-CUR
+                       MOVE    "0011"  TO  SPA-ERRCD
+                   END-IF
+               ELSE
+                       MOVE    18      TO  SPA-GMN-CUR
+                       MOVE    "0011"  TO  SPA-ERRCD
+               END-IF
+           END-EVALUATE
+      *
+           .
+       41011-HOSOKU-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    補足コメント一致条件区分チェック処理
+      *****************************************************************
+       4101-HOSOKU-JYKNKBN-CHK-SEC     SECTION.
+      *
+           MOVE    SPA-GMN-HOSOKU-JYKNKBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-JYKNKBNLST-CHK-SEC
+           IF    ( WRK-CMB-CD      =   SPACE )
+               IF    ( SPA-NAI-INPUT-MODE   =   2 )
+                   MOVE    SPACE       TO  SPA-GMN-HOSOKU-JYKNKBN-G
+               ELSE
+                   MOVE    SPA-GMN-JYKNKBNLST (1)
+                                       TO  SPA-GMN-HOSOKU-JYKNKBN-G
+               END-IF
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-HOSOKU-JYKNKBN-G
+           END-IF
+      *
+           .
+       4101-HOSOKU-JYKNKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    疑い区分チェック処理
@@ -2045,6 +2254,7 @@
                COMPUTE IDX1    =   IDX1    +   1
       *
                MOVE    PTBYO-BYOMEI    TO  SPA-GMN-TSRCBYOMEI (IDX1)
+               MOVE    SPACE           TO  SPA-GMN-TSRCHOSOKU (IDX1)
                MOVE    SPACE           TO  SPA-GMN-TSRCCD     (IDX1)
       *
                PERFORM 900-PTBYOMEI-KEY26-FET-SEC
@@ -2108,6 +2318,7 @@
                COMPUTE IDX1    =   IDX1    +   1
       *
                MOVE    BYO-BYOMEI      TO  SPA-GMN-TSRCBYOMEI (IDX1)
+               MOVE    SPACE           TO  SPA-GMN-TSRCHOSOKU (IDX1)
                MOVE    BYO-BYOMEICD    TO  SPA-GMN-TSRCCD     (IDX1)
                                            SPA-NAI-TSRCBYOCD  (IDX1 1)
       *
@@ -2172,6 +2383,7 @@
                COMPUTE IDX1    =   IDX1    +   1
       *
                MOVE    USBYO-BYOMEI    TO  SPA-GMN-TSRCBYOMEI (IDX1)
+               MOVE    SPACE           TO  SPA-GMN-TSRCHOSOKU (IDX1)
                MOVE    USBYO-BYOMEIINPUTCD
                                        TO  SPA-GMN-TSRCCD     (IDX1)
                MOVE    USBYO-BYOMEIHENFLG
@@ -2258,6 +2470,7 @@
       *
                    MOVE    SS012-O-BYOMEI
                                        TO  SPA-GMN-TSRCBYOMEI (IDX1)
+                   MOVE    SPACE       TO  SPA-GMN-TSRCHOSOKU (IDX1)
                    MOVE    SS012-BYOMEIHENFLG
                                        TO  SPA-NAI-TSRCBYOSTATUS(IDX1)
       *
@@ -2487,6 +2700,24 @@
        4100-BYOMEI-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    補足コメントチェック処理
+      *****************************************************************
+       4100-HOSOKU-CHK-SEC             SECTION.
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+      *
+               MOVE    X04-HOSOKU      TO  SPA-GMN-HOSOKU
+      *
+               PERFORM 4101-HOSOKU-CHK-SEC
+      *
+               PERFORM 4101-HOSOKU-JYKNKBN-CHK-SEC
+      *
+           END-IF
+      *
+           .
+       4100-HOSOKU-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    検索病名チェック処理
       *****************************************************************
        4100-SEL-BYOMEI-CHK-SEC         SECTION.
@@ -2592,6 +2823,14 @@
            PERFORM 4101-CDLST-SEC
       *
            PERFORM 41011-BYOMEICD-SEC
+      *
+           MOVE    SPA-GMN-THOSOKU (IDX3)
+                                       TO  SPA-GMN-HOSOKU
+      *
+           MOVE    SPA-GMN-THOSOKU-JYKN (IDX3)
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-JYKNKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-HOSOKU-JYKNKBN-G
       *
            IF    ( SPA-GMN-BYOCD (1)   =   SPACE )
                MOVE    8               TO  SPA-GMN-CUR
@@ -2829,6 +3068,10 @@
       *
                MOVE    SPA-NAI-BYOSTATUS (IDXL)
                                        TO  SPA-NAI-TBYOSTATUS (IDX-LST)
+               MOVE    SPA-GMN-HOSOKU
+                                       TO  SPA-GMN-THOSOKU (IDX-LST)
+               MOVE    SPA-GMN-HOSOKU-JYKNKBN
+                                       TO  SPA-GMN-THOSOKU-JYKN(IDX-LST)
            END-IF
       *
            .
@@ -3046,6 +3289,8 @@
                                        =   SPA-GMN-TBYOMEI (IDX2) )
                         AND  ( SPA-GMN-SRCJYKNKBN
                                        =   SPA-GMN-TJYKN(IDX2) )
+                        AND  ( SPA-GMN-TSRCHOSOKU  (IDX1)
+                                       =   SPA-GMN-THOSOKU (IDX2) )
                            MOVE    1   TO  FLG-HIT
                        END-IF
       *
@@ -3093,6 +3338,8 @@
                                        =   SPA-GMN-TBYOMEI (IDX2) )
                     AND  ( SPA-GMN-SRCJYKNKBN
                                        =   SPA-GMN-TJYKN(IDX2) )
+                    AND  ( SPA-GMN-TSRCHOSOKU (IDX1)
+                                       =   SPA-GMN-THOSOKU (IDX2) )
                        MOVE    1   TO  FLG-HIT
                    END-IF
       *
@@ -3135,6 +3382,10 @@
                                TO  SPA-GMN-TJYKN   (IDX-MAX)
            MOVE    SPA-GMN-SRCUTAGAIKBN
                                TO  SPA-GMN-TUTAGAI (IDX-MAX)
+      *
+           MOVE    SPACE       TO  SPA-GMN-THOSOKU (IDX-MAX)
+      *
+           MOVE    "1"         TO  SPA-GMN-THOSOKU-JYKN (IDX-MAX)
       *
            EVALUATE    SPA-GMN-SRCBYOLST-PTN
            WHEN    "2"
@@ -3478,6 +3729,8 @@
            PERFORM 410-INPUT-CHK-SEC
            IF    ( SPA-ERRCD       =   SPACE )
                INITIALIZE          SPA-X01-USERBYOMEI-G
+               MOVE    CONST-SELKBN-BYOMEI
+                                   TO  SPA-X01-SELKBN
                PERFORM 4091-X07-SENI-SEC
            END-IF
       *
@@ -3492,16 +3745,19 @@
            MOVE    ZERO            TO  SPA-X01-BYOSEL
            IF    ( SPA-GMN-BYOLST-SEL  >   ZERO )
             OR   ( SPA-NAI-INPUT-MODE  =   2 )
+            OR   ( SPA-X01-SELKBN      =   CONST-SELKBN-HOSOKU )
                MOVE    1           TO  SPA-X01-BYOSEL
            END-IF
       *
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   CONST-BYOCD-MAX )
+           IF    ( SPA-X01-SELKBN  =   CONST-SELKBN-BYOMEI )
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >   CONST-BYOCD-MAX )
       *
-               MOVE    SPA-GMN-BYOCD (IDX0)
+                   MOVE    SPA-GMN-BYOCD (IDX0)
                                    TO  SPA-X01-INPUTCD (IDX0)
       *
-           END-PERFORM
+               END-PERFORM
+           END-IF
       *
            MOVE    SPA-X01KYOUTU   TO  SPA-WORK
            MOVE    SPA-AREA        TO  SPA-COMMON
@@ -3620,9 +3876,6 @@
                                        TO  SPA-X03-GMN-TLCHK-NAME (IDXE)
                MOVE    SPA-GMN-TJYKN   (IDXE)
                                        TO  SPA-X03-GMN-TLCHK-JYKN (IDXE)
-               MOVE    SPA-GMN-TGRPID (IDXE)
-                                       TO  SPA-X03-GMN-TLCHK-GRPID
-                                                                  (IDXE)
       *
                MOVE    SPA-NAI-TBYOCD  (IDXE 1)
                                        TO  SPA-X03-NAI-TLCHK-SRYCD(IDXE)
@@ -3638,9 +3891,26 @@
                MOVE    SPA-NAI-TBYOSTATUS  (IDXE)
                                        TO  SPA-X03-NAI-TLCHK-BYOSTATUS
                                                                   (IDXE)
-               MOVE    SPA-GMN-TUTAGAI  (IDXE)
+               IF    ( SPA-X01-CHKKBN  =   "1" OR "2" )
+                   MOVE    SPA-GMN-TUTAGAI  (IDXE)
                                        TO  SPA-X03-NAI-TLCHK-UTAGAI
                                                                   (IDXE)
+                   MOVE    SPA-GMN-THOSOKU  (IDXE)
+                                   TO  SPA-X03-GMN-TLCHK-HOSOKU
+                                                                  (IDXE)
+                   MOVE    SPA-GMN-THOSOKU-JYKN  (IDXE)
+                                   TO  SPA-X03-GMN-TLCHK-HOSOKU-JYKN
+                                                                  (IDXE)
+                   MOVE    SPA-GMN-TGRPID (IDXE)
+                                       TO  SPA-X03-GMN-TLCHK-GRPID
+                                                                  (IDXE)
+               ELSE
+                   MOVE    "1"     TO  SPA-X03-NAI-TLCHK-UTAGAI   (IDXE)
+                   MOVE    SPACE   TO  SPA-X03-GMN-TLCHK-HOSOKU   (IDXE)
+                   MOVE    "1"     TO  SPA-X03-GMN-TLCHK-HOSOKU-JYKN
+                                                                  (IDXE)
+                   MOVE    SPACE   TO  SPA-X03-GMN-TLCHK-GRPID    (IDXE)
+               END-IF
       *
            END-PERFORM
       *
@@ -3838,8 +4108,14 @@
                IF    ( SPA-X01-CHKKBN      =   "1" OR "2" )
                    MOVE    SPA-GMN-TGRPID (IDXD)
                                            TO  CHKSND-GRPID
+                   MOVE    SPA-GMN-THOSOKU (IDXD)
+                                           TO  CHKSND-HOSOKU
+                   MOVE    SPA-GMN-THOSOKU-JYKN (IDXD)
+                                           TO  CHKSND-HOSOKU-COMPKBN
                ELSE
                    MOVE    SPACE           TO  CHKSND-GRPID
+                   MOVE    SPACE           TO  CHKSND-HOSOKU
+                   MOVE    "1"             TO  CHKSND-HOSOKU-COMPKBN
                END-IF
                MOVE    SPA-NAI-TBYOSTATUS (IDXD)
                                            TO  CHKSND-BYOMEIHENFLG
@@ -4070,6 +4346,9 @@
       *
            MOVE    SPA-GMN-BYOMEI          TO  X04-BYOMEI
            MOVE    SPA-GMN-JYKNKBN-G       TO  X04-JYKNKBN
+           MOVE    SPA-GMN-HOSOKU          TO  X04-HOSOKU
+           MOVE    SPA-GMN-HOSOKU-JYKNKBN-G
+                                           TO  X04-HOSOKU-JYKNKBN
            MOVE    SPA-GMN-UTAGAIKBN-G     TO  X04-UTAGAIKBN
            MOVE    SPA-GMN-GRPID-G       TO  X04-GRPID
            MOVE    SPA-GMN-SEL-BYOMEI      TO  X04-SEL-BYOMEI
@@ -4079,13 +4358,15 @@
            MOVE    SPA-GMN-SRCUTAGAIKBN-G  TO  X04-SRCUTAGAIKBN
       *
            MOVE    SPA-GMN-JYKNKBN-MAX TO  X04-JYKNKBN-COUNT
+                                           X04-HOSOKU-JYKNKBN-COUNT
                                            X04-SRCJYKNKBN-COUNT
            PERFORM VARYING IDX0    FROM    1   BY  1
                    UNTIL ( IDX0        >   SPA-GMN-JYKNKBN-MAX )
       *
                MOVE    SPA-GMN-JYKNKBNLST (IDX0)
-                                       TO  X04-JYKNKBN-ITEM (IDX0)
-                                           X04-SRCJYKNKBN-ITEM (IDX0)
+                                   TO  X04-JYKNKBN-ITEM (IDX0)
+                                       X04-HOSOKU-JYKNKBN-ITEM (IDX0)
+                                       X04-SRCJYKNKBN-ITEM (IDX0)
       *
            END-PERFORM
       *
@@ -4144,17 +4425,47 @@
                END-IF
                MOVE    WRK-PRT-NO-G    TO  X04-TNO   (IDX0)
       *
-               MOVE    SPA-GMN-TBYOMEI (IDX0)
-                                       TO  X04-TBYOMEI(IDX0)
-      *
+               MOVE    SPACE       TO  WRK-BYOMEI-JYKN
+                                       WRK-HOSOKU-JYKN
                PERFORM VARYING IDX1    FROM    1   BY  1
                        UNTIL ( IDX1    >   CONST-JYKNKBN-MAX )
+      *
                    IF    ( SPA-GMN-TJYKN (IDX0)
                                        =   CONST-JYKNKBNCD (IDX1))
                        MOVE    CONST-JYKNKBNMEI2 (IDX1)
-                                       TO  X04-TJYKN(IDX0)
+                                       TO  WRK-BYOMEI-JYKN
                    END-IF
+      *
+                   IF    ( SPA-GMN-THOSOKU-JYKN (IDX0)
+                                       =   CONST-JYKNKBNCD (IDX1))
+                       MOVE    CONST-JYKNKBNMEI2 (IDX1)
+                                       TO  WRK-HOSOKU-JYKN
+                   END-IF
+      *
                END-PERFORM
+      *
+               IF    ( SPA-GMN-THOSOKU (IDX0)  =   SPACE )
+                   MOVE    SPA-GMN-TBYOMEI (IDX0)
+                                       TO  X04-TBYOMEI(IDX0)
+      *
+                   MOVE    WRK-BYOMEI-JYKN
+                                       TO  X04-TJYKN(IDX0)
+               ELSE
+                   STRING  SPA-GMN-TBYOMEI (IDX0)  DELIMITED BY SPACE
+                           "（"                    DELIMITED BY SIZE
+                           SPA-GMN-THOSOKU (IDX0)  DELIMITED BY SPACE
+                           "）"                    DELIMITED BY SIZE
+                   INTO    X04-TBYOMEI(IDX0)
+                   END-STRING
+      *
+                   STRING  WRK-BYOMEI-JYKN  DELIMITED BY SPACE
+                           "（"             DELIMITED BY SIZE
+                           WRK-HOSOKU-JYKN  DELIMITED BY SPACE
+                           "）"             DELIMITED BY SIZE
+                   INTO    X04-TJYKN(IDX0)
+                   END-STRING
+      *
+               END-IF
       *
                EVALUATE    SPA-GMN-TUTAGAI (IDX0)
                WHEN    "0"
@@ -4179,6 +4490,8 @@
                    IF    ( SPA-NAI-INPUT-MODE  NOT =   2 )
                        IF    ( SPA-GMN-BYOMEI
                                        =   SPA-GMN-TBYOMEI (IDX0) )
+                        AND  ( SPA-GMN-HOSOKU
+                                       =   SPA-GMN-THOSOKU (IDX0) )
                            MOVE    "==>" 
                                        TO  X04-TNO   (IDX0)
                            MOVE    "<="
@@ -4251,12 +4564,20 @@
                MOVE    "病名変更"      TO  X04-B05-LABEL
            END-IF
       *
-           MOVE    WIDGET-NORMAL       TO  X04-B03-STATE
-                                           X04-B04-STATE
-                                           X04-B05-STATE
-                                           X04-B09-STATE
-                                           X04-B10-STATE
-                                           X04-BTN-ALLINS-STATE
+           MOVE    WIDGET-NORMAL   TO  X04-B03-STATE
+                                       X04-B04-STATE
+                                       X04-B05-STATE
+                                       X04-B09-STATE
+                                       X04-B10-STATE
+                                       X04-BTN-ALLINS-STATE
+                                       X04-BYOMEI-STATE
+                                       X04-HOSOKU-STATE
+                                       X04-HOSOKU-JYKNKBN-STATE
+                                       X04-HOSOKU-JYKNKBN-ITEM-STATE
+                                       X04-UTAGAIKBN-STATE
+                                       X04-UTAGAIKBN-ITEM-STATE
+                                       X04-GRPID-STATE
+                                       X04-GRPID-ITEM-STATE
       *
            IF    ( SPA-X01-SELNUM         <=  ZERO )
             OR   ( SPA-GMN-BYOMEI      NOT =   SPACE )
@@ -4269,8 +4590,6 @@
                    UNTIL ( IDX0    >   CONST-BYOCD-MAX )
                MOVE    WIDGET-NORMAL   TO  X04-BYOMEICD-STATE (IDX0)
            END-PERFORM
-      *
-           MOVE    WIDGET-NORMAL       TO  X04-BYOMEI-STATE
       *
            IF    ( SPA-GMN-BYOLST-MAX  >=  CONST-BYOLST-MAX )
             AND  ( SPA-NAI-INPUT-MODE  =   ZERO )
@@ -4295,7 +4614,10 @@
       *
                IF    ( SPA-NAI-INPUT-MODE  =   2 )
                    MOVE    WIDGET-INSENSITIVE
-                                           TO  X04-BYOMEI-STATE
+                                       TO  X04-BYOMEI-STATE
+                                           X04-HOSOKU-STATE
+                                           X04-HOSOKU-JYKNKBN-STATE
+                                           X04-HOSOKU-JYKNKBN-ITEM-STATE
                END-IF
       *
                MOVE    WIDGET-INSENSITIVE  TO  X04-B04-STATE
@@ -4322,32 +4644,52 @@
                END-IF
            END-IF
       *
+           MOVE    "補足コメント"  TO  X04-LBLHOSOKU
+           MOVE    "（"            TO  X04-LBLHOSOKU-KAKKO-L
+           MOVE    "）"            TO  X04-LBLHOSOKU-KAKKO-R
+           MOVE    "一致条件"      TO  X04-LBLHOSOKU-JYKNKBN
+      *
            MOVE    "疑い病名"      TO  X04-LBLUTAGAIKBN
-           MOVE    WIDGET-NORMAL   TO  X04-UTAGAIKBN-STATE
-                                       X04-UTAGAIKBN-ITEM-STATE
       *
            MOVE    "グループ"      TO  X04-LBLGRPID
-           MOVE    WIDGET-NORMAL   TO  X04-GRPID-STATE
-                                       X04-GRPID-ITEM-STATE
-      *
-           IF    ( SPA-X01-CHKKBN  =   "6" )
-               INITIALIZE              X04-LBLUTAGAIKBN
-                                       X04-UTAGAIKBN
-                                       X04-CMB-UTAGAIKBN
-               MOVE    WIDGET-INSENSITIVE
-                                   TO  X04-UTAGAIKBN-STATE
-                                       X04-UTAGAIKBN-ITEM-STATE
-           END-IF
       *
            IF    ( SPA-X01-CHKKBN  =   "1" OR "2" )
                CONTINUE
            ELSE
-               INITIALIZE              X04-LBLGRPID
+               INITIALIZE              X04-LBLUTAGAIKBN
+                                       X04-UTAGAIKBN
+                                       X04-CMB-UTAGAIKBN
+                                       X04-LBLGRPID
                                        X04-GRPID
                                        X04-CMB-GRPID
+                                       X04-LBLHOSOKU
+                                       X04-LBLHOSOKU-KAKKO-L
+                                       X04-LBLHOSOKU-KAKKO-R
+                                       X04-HOSOKU
+                                       X04-LBLHOSOKU-JYKNKBN
+                                       X04-HOSOKU-JYKNKBN
+      *
                MOVE    WIDGET-INSENSITIVE
-                                   TO  X04-GRPID-STATE
+                                   TO  X04-UTAGAIKBN-STATE
+                                       X04-UTAGAIKBN-ITEM-STATE
+                                       X04-GRPID-STATE
                                        X04-GRPID-ITEM-STATE
+                                       X04-HOSOKU-STATE
+                                       X04-HOSOKU-JYKNKBN-STATE
+                                       X04-HOSOKU-JYKNKBN-ITEM-STATE
+           END-IF
+      *
+           IF    ( SPA-NAI-BYOINF-MAX  >   1 )
+               MOVE    SPACE       TO  X04-HOSOKU
+               MOVE    WIDGET-INSENSITIVE
+                                       TO  X04-HOSOKU-STATE
+           END-IF
+      *
+           IF    ( SPA-GMN-HOSOKU  =   SPACE )
+               MOVE    SPACE       TO  X04-HOSOKU-JYKNKBN
+               MOVE    WIDGET-INSENSITIVE
+                                   TO  X04-HOSOKU-JYKNKBN-STATE
+                                       X04-HOSOKU-JYKNKBN-ITEM-STATE
            END-IF
       *
            IF    ( SPA-X01-CHKKBN  =   "1" )
@@ -4389,6 +4731,20 @@
                 IF   ( X04-BYOMEI-STATE
                                        =   WIDGET-INSENSITIVE )
                    MOVE    9           TO  SPA-GMN-CUR
+                END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR         =   18 )
+                IF   ( X04-HOSOKU-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    19          TO  SPA-GMN-CUR
+                END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR         =   19 )
+                IF   ( X04-HOSOKU-JYKNKBN-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    15          TO  SPA-GMN-CUR
                 END-IF
            END-IF
       *
@@ -4440,7 +4796,11 @@
            WHEN    16
                MOVE    "SRCUTAGAIKBN"  TO  MCP-WIDGET
            WHEN    17
-               MOVE    "GRPID"       TO  MCP-WIDGET
+               MOVE    "GRPID"         TO  MCP-WIDGET
+           WHEN    18
+               MOVE    "HOSOKU"        TO  MCP-WIDGET
+           WHEN    19
+               MOVE    "HOSOKU_JYKNKBN" TO MCP-WIDGET
            WHEN    105
                MOVE    "B05"           TO  MCP-WIDGET
            WHEN    112
@@ -4474,6 +4834,10 @@
            WHEN    "BYOMEI"
                MOVE    09              TO  SPA-GMN-CUR
            WHEN    "JYKNKBN"
+               MOVE    18              TO  SPA-GMN-CUR
+           WHEN    "HOSOKU"
+               MOVE    19              TO  SPA-GMN-CUR
+           WHEN    "HOSOKU_JYKNKBN"
                MOVE    15              TO  SPA-GMN-CUR
            WHEN    "UTAGAIKBN"
                MOVE    17              TO  SPA-GMN-CUR
@@ -4510,16 +4874,16 @@
       *
            EVALUATE    SPA-ERRCD
            WHEN    "0001"
-               MOVE    "選択番号入力エラー"
+               MOVE    "選択番号の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0002"
                MOVE    "病名番号の指定数が多すぎます"
                                        TO  SPA-ERRMSG
            WHEN    "0003"
-               MOVE    "検索対象マスタ入力エラー"
+               MOVE    "検索対象マスタの入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0004"
-               MOVE    "検索病名入力エラー"
+               MOVE    "検索病名の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0005"
                STRING  "未コード化傷病名は他のコードといっしょに"
@@ -4540,10 +4904,13 @@
                MOVE    "自院病名コードがありません"
                                        TO  SPA-ERRMSG
            WHEN    "0009"
-               MOVE    "病名入力エラー"
+               MOVE    "病名の入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0010"
                MOVE    "不明の病名コードが入力されています"
+                                       TO  SPA-ERRMSG
+           WHEN    "0011"
+               MOVE    "補足コメントの入力に誤りがあります"
                                        TO  SPA-ERRMSG
            WHEN    "0101"
                MOVE    "病名番号を入力してください"
@@ -4592,6 +4959,9 @@
                END-STRING
            WHEN    "0114"
                MOVE    "変更処理のときは複数病名の入力はできません"
+                                       TO  SPA-ERRMSG
+           WHEN    "0115"
+               MOVE    "補足コメントの前後に（）があります"
                                        TO  SPA-ERRMSG
            WHEN    "1001"
            WHEN    "1004"
@@ -4664,11 +5034,15 @@
       *****************************************************************
        800-KANA-CHK-SEC             SECTION.
       *
+           MOVE    ZERO                TO  FLG-ZENKAKU
+           MOVE    ZERO                TO  WRK-KANACHK-MAX
+      *
            INITIALIZE                  ORCSKANACHKAREA
            MOVE    "1"                 TO  KANACHK-SYORI
            MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
            CALL    "ORCSKANACHK"       USING
                                        ORCSKANACHKAREA
+           MOVE    KANACHK-MAX         TO  WRK-KANACHK-MAX
            IF     (KANACHK-RC      NOT =   ZERO  )  OR
                   (KANACHK-SYUBETU     =   1     )
                MOVE    1                   TO  FLG-ERR
@@ -4680,6 +5054,10 @@
            ELSE
                MOVE    ZERO                TO  FLG-ERR
                MOVE    KANACHK-OUT-INPUT   TO  WRK-OUT-INPUT
+           END-IF
+      *
+           IF    ( KANACHK-SYUBETU     =   2   )
+               MOVE    1               TO  FLG-ZENKAKU
            END-IF
       *
            .
@@ -5127,7 +5505,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            INITIALIZE                      USERBYOMEI-REC
            MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
       *
-           STRING  SPA-GMN-BYOCD (IDXB)    DELIMITED   BY  SPACE
+           STRING  WRK-BYOMEIINPUTCD       DELIMITED   BY  SPACE
                    "%"                     DELIMITED   BY  SIZE
            INTO    USBYO-BYOMEIINPUTCD
            END-STRING

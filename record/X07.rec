@@ -15,31 +15,40 @@ X07	{
 		TITLE	{
 			value	varchar(10);
 		};
+		LBLBYOMEI	{
+			value	varchar(20);
+		};
 		SELNUM2	{
 			value	number(5);
 		};
 		INPUTCD1	{
 			state	int;
+			visible	bool;
 			value	varchar(10);
 		};
 		INPUTCD2	{
 			state	int;
+			visible	bool;
 			value	varchar(10);
 		};
 		INPUTCD3	{
 			state	int;
+			visible	bool;
 			value	varchar(10);
 		};
 		INPUTCD4	{
 			state	int;
+			visible	bool;
 			value	varchar(10);
 		};
 		INPUTCD5	{
 			state	int;
+			visible	bool;
 			value	varchar(10);
 		};
 		INPUTCD6	{
 			state	int;
+			visible	bool;
 			value	varchar(10);
 		};
 		BYOMEI	{

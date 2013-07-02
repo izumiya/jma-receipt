@@ -44,6 +44,9 @@
                        09  SPA-X03-GMN-TLCHK-NAME      PIC X(100).
                        09  SPA-X03-GMN-TLCHK-JYKN      PIC X(01).
                        09  SPA-X03-GMN-TLCHK-GRPID     PIC X(01).
+                       09  SPA-X03-GMN-TLCHK-HOSOKU    PIC X(40).
+                       09  SPA-X03-GMN-TLCHK-HOSOKU-JYKN
+                                                       PIC X(01).
                    07  SPA-X03-GMN-LCHKLST-FLG         PIC 9(01)
                                                        OCCURS  200.
                05  SPA-X03-GMN-RCHKKBNMEI              PIC X(70).
@@ -57,6 +60,9 @@
                        09  SPA-X03-GMN-TRCHK-NAME      PIC X(100).
                        09  SPA-X03-GMN-TRCHK-JYKN      PIC X(01).
                        09  SPA-X03-GMN-TRCHK-GRPID     PIC X(01).
+                       09  SPA-X03-GMN-TRCHK-HOSOKU    PIC X(40).
+                       09  SPA-X03-GMN-TRCHK-HOSOKU-JYKN
+                                                       PIC X(01).
                    07  SPA-X03-GMN-RCHKLST-FLG-G.
                        09  SPA-X03-GMN-RCHKLST-FLG     PIC 9(01)
                                                        OCCURS  200.
@@ -137,6 +143,7 @@
                05  SPA-GMN-X07-SELNUM              PIC 9(05).
                05  SPA-GMN-X07-INPUT-AREA.
                    07  SPA-GMN-X07-BYOMEICD-G.
+                       09  SPA-GMN-X07-BYOCD-MAX   PIC 9(03).
                        09  SPA-GMN-X07-BYOCD       PIC X(20)
                                                    OCCURS  6.
                    07  SPA-GMN-X07-BYOMEI          PIC X(400).

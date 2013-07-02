@@ -21,10 +21,12 @@
               03  X07-B07-STATE PIC S9(9)   BINARY.
               03  X07-B12-STATE PIC S9(9)   BINARY.
               03  X07-TITLE     PIC X(10).
+              03  X07-LBLBYOMEI PIC X(20).
               03  X07-SELNUM2.
                 04  X07-VALUE   PIC S9(5).
               03  X07-INPUTCD-G    OCCURS  6.
                 04  X07-INPUTCD-STATE   PIC S9(9)   BINARY.
+                04  X07-INPUTCD-VISIBLE PIC X(1).
                 04  X07-INPUTCD PIC X(10).
               03  X07-BYOMEI.
                 04  X07-VALUE   PIC X(400).

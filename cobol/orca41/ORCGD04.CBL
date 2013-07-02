@@ -126,9 +126,11 @@
            03  WRK-TENKIYMD                PIC X(08).
            03  WRK-OFFSET                  PIC 9(08).
            03  WRK-BYOMEI                  PIC X(100).
+           03  WRK-HOSOKU                  PIC X(40).
            03  WRK-CHKKBN                  PIC X(01).
            03  WRK-EDIT-COMPKBN            PIC X(01).
            03  WRK-EDIT-COMPKBN-MEI        PIC X(04).
+           03  WRK-EDIT-BYOMEI-COMPKBN     PIC X(04).
            03  WRK-IKOCD                   PIC X(07).
            03  WRK-TBYOMEICD-G.
                05  WRK-TBYOMEICD           PIC X(07)
@@ -183,6 +185,7 @@
            COPY    "CPSK1005.INC".
            COPY    "CPSK1010.INC".
            COPY    "CPSK1101.INC".
+           COPY    "CPSK200501.INC".
       *
            COPY    "CPCHKREIGAI.INC".
       *
@@ -367,6 +370,7 @@
                                            TO  SPA-D04
                    MOVE    DSUB01-COMMON   TO  SPA-D01KYOUTU
                    MOVE    SPA-GMN-BYOMEI  TO  WRK-BYOMEI
+                   MOVE    SPA-GMN-HOSOKU  TO  WRK-HOSOKU
                    IF    ( SPA-MOTOPG      =   "X01" )
                        MOVE    SPA-GMN-CHKLST-SEL
                                            TO  WRK-CHKLST-SEL
@@ -377,6 +381,8 @@
                        PERFORM 3101-CHKLST-SEC
                        IF    ( SPA-GMN-TCHKBYOMEI (WRK-CHKLST-SEL)
                                            =   WRK-BYOMEI )
+                        AND  ( SPA-GMN-TCHKHOSOKU (WRK-CHKLST-SEL)
+                                           =   WRK-HOSOKU )
                            MOVE    WRK-CHKLST-SEL
                                            TO  SPA-GMN-CHKLST-SELNUM
                                                SPA-GMN-CHKLST-SEL
@@ -393,12 +399,15 @@
                        END-IF
                        IF    ( SPA-GMN-TBYOMEI (WRK-BYOLST-SEL)
                                            =   WRK-BYOMEI )
+                        AND  ( SPA-GMN-TBYOHOSOKU (WRK-BYOLST-SEL)
+                                           =   WRK-HOSOKU )
                            MOVE    WRK-BYOLST-SEL
                                            TO  SPA-GMN-BYOLST-SELNUM
                                                SPA-GMN-BYOLST-SEL
                        END-IF
                    END-IF
                    MOVE    WRK-BYOMEI  TO  SPA-GMN-BYOMEI
+                   MOVE    WRK-HOSOKU  TO  SPA-GMN-HOSOKU
                    EVALUATE    TRUE
                    WHEN  ( SPA-GMN-BYOLST-SELNUM   >   ZERO )
                        MOVE    4       TO  SPA-GMN-CUR
@@ -481,6 +490,24 @@
            ELSE
               MOVE    SYS-1101-TEKBYOSRYKBN
                                    TO  SPA-NAI-TEKBYOSRYKBN
+           END-IF
+      *
+           INITIALIZE                  SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "2005"          TO  SYS-KANRICD
+           MOVE    "01"            TO  SYS-KBNCD
+           MOVE    ORCBSD01-SRYYM  TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           MOVE    "01"            TO  SYS-STYUKYMD (7:2)
+                                       SYS-EDYUKYMD (7:2)
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-200501-REC
+           IF    ( SYS-200501-TENKIBYOMEI-KBN
+                                   =   SPACE )
+               MOVE    "0"         TO  SPA-NAI-TENKIBYOMEIKBN
+           ELSE
+               MOVE    SYS-200501-TENKIBYOMEI-KBN
+                                   TO  SPA-NAI-TENKIBYOMEIKBN
            END-IF
       *
            MOVE    1               TO  SPA-GMN-ERRLST-PAGE
@@ -828,6 +855,7 @@
                INITIALIZE                  SPA-GMN-BYOLST-AREA
                                            SPA-NAI-BYOLST-AREA
                                            SPA-GMN-BYOMEI
+                                           SPA-GMN-HOSOKU
       *
                MOVE    SPA-NAI-PTID    TO  SPA-NAI-BYOLST-PTID
       *
@@ -852,6 +880,8 @@
                    MOVE    SYSKANRI-REC    TO  SYS-1005-REC
       *
                    MOVE    PTBYO-BYOMEI    TO  SPA-GMN-TBYOMEI (IDXL)
+                   MOVE    PTBYO-HOSOKU-COMMENT
+                                            TO  SPA-GMN-TBYOHOSOKU(IDXL)
                    MOVE    SYS-1005-SRYKANAME3
                                            TO  SPA-GMN-TSRYKA  (IDXL)
                    MOVE    PTBYO-SRYYMD    TO  WRK-YMD
@@ -878,6 +908,24 @@
                        MOVE    "主"        TO  SPA-GMN-TSYUBYO
                                                              (IDXL)
                    END-IF
+      *
+                   IF    ( PTBYO-SYUBYOFLG =   "1" )
+                       MOVE    "主"        TO  SPA-GMN-TSYUBYO
+                                                             (IDXL)
+                   END-IF
+      *
+                   EVALUATE    PTBYO-UTAGAIFLG
+                   WHEN    "1"
+                       MOVE    "疑い"      TO  SPA-GMN-TUTAGAI
+                                                             (IDXL)
+                   WHEN    "2"
+                       MOVE    "急性"      TO  SPA-GMN-TUTAGAI
+                                                             (IDXL)
+                   WHEN    "3"
+                       MOVE    "急性かつ疑い"
+                                           TO  SPA-GMN-TUTAGAI
+                                                             (IDXL)
+                   END-EVALUATE
       *
                    EVALUATE    PTBYO-NYUGAIKBN
                    WHEN    "1"
@@ -1023,6 +1071,9 @@
                        MOVE    CHKSND-GRPID
                                            TO  SPA-GMN-TGRPID
                                                            (IDXL)
+                       MOVE    CHKSND-HOSOKU
+                                           TO  SPA-GMN-TCHKHOSOKU
+                                                           (IDXL)
                    END-IF
       *
                    MOVE    CHKSND-BYOMEI   TO  SPA-GMN-TCHKBYOMEI
@@ -1030,9 +1081,23 @@
       *
                    MOVE    CHKSND-COMPKBN  TO  WRK-EDIT-COMPKBN
                    PERFORM 800-EDIT-COMPKBN-MEI-SEC
-                   MOVE    WRK-EDIT-COMPKBN-MEI
-                                            TO  SPA-GMN-TCOMPKBN
-                                                           (IDXL)
+                   IF    ( CHKSND-CHKKBN   =   "1" OR "2" )
+                    AND  ( CHKSND-HOSOKU   NOT =   SPACE )
+                       MOVE    WRK-EDIT-COMPKBN-MEI
+                                            TO  WRK-EDIT-BYOMEI-COMPKBN
+                       MOVE    CHKSND-HOSOKU-COMPKBN
+                                            TO  WRK-EDIT-COMPKBN
+                       MOVE    SPACE        TO  SPA-GMN-TCOMPKBN (IDXL)
+                       STRING  WRK-EDIT-BYOMEI-COMPKBN DELIMITED BY SIZE
+                               "（"                    DELIMITED BY SIZE
+                               WRK-EDIT-COMPKBN-MEI    DELIMITED BY SIZE
+                               "）"                    DELIMITED BY SIZE
+                       INTO    SPA-GMN-TCOMPKBN (IDXL)
+                       END-STRING
+                   ELSE
+                       MOVE    WRK-EDIT-COMPKBN-MEI
+                                            TO  SPA-GMN-TCOMPKBN (IDXL)
+                   END-IF
                END-IF
       *
              PERFORM 900-CHKSND-KEY2-FET-SEC
@@ -1352,6 +1417,7 @@
       *
            MOVE    D04-BEHAVE      TO  SPA-GMN-BEHAVE-G
            MOVE    D04-BYOMEI      TO  SPA-GMN-BYOMEI
+           MOVE    D04-HOSOKU      TO  SPA-GMN-HOSOKU
       *
            .
       *
@@ -1471,6 +1537,8 @@
                    MOVE    WRK-BYOLST-SEL  TO  SPA-GMN-BYOLST-SEL
                    MOVE    SPA-GMN-TBYOMEI (SPA-GMN-BYOLST-SEL)
                                        TO  SPA-GMN-BYOMEI
+                   MOVE    SPA-GMN-TBYOHOSOKU (SPA-GMN-BYOLST-SEL)
+                                       TO  SPA-GMN-HOSOKU
                    MOVE    5           TO  SPA-GMN-CUR
                END-IF
            END-IF
@@ -1521,6 +1589,8 @@
                    MOVE    WRK-CHKLST-SEL  TO  SPA-GMN-CHKLST-SEL
                    MOVE    SPA-GMN-TCHKBYOMEI (SPA-GMN-CHKLST-SEL)
                                        TO  SPA-GMN-BYOMEI
+                   MOVE    SPA-GMN-TCHKHOSOKU (SPA-GMN-CHKLST-SEL)
+                                       TO  SPA-GMN-HOSOKU
                    MOVE    5           TO  SPA-GMN-CUR
                END-IF
            END-IF
@@ -1708,6 +1778,31 @@
            .
       *
        4101-BYOMEI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    補足コメントチェック処理
+      *****************************************************************
+       4101-HOSOKU-CHK-SEC             SECTION.
+      *
+           IF    ( SPA-GMN-HOSOKU  NOT =   SPACE )
+               INITIALIZE   ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI
+               MOVE    SPA-GMN-HOSOKU      TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"   USING
+                                       ORCSKANACHKAREA
+               MOVE    KANACHK-MAE-INPUT   TO  SPA-GMN-HOSOKU
+               IF    ( KANACHK-RC          =   ZERO )
+                AND  ( KANACHK-SYUBETU     =   "2" )
+                   CONTINUE
+               ELSE
+                   MOVE    "0009"              TO  SPA-ERRCD
+                   MOVE    5                   TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           .
+      *
+       4101-HOSOKU-CHK-EXT.
            EXIT.
       *****************************************************************
       *    患者情報編集処理
@@ -1942,7 +2037,29 @@
       *
            PERFORM 410-INPUT-CHK-SEC
            IF    ( SPA-ERRCD           =   SPACE )
-               PERFORM 2801-C02-SENI-SEC
+      *
+               IF    ( SPA-GMN-HOSOKU  NOT =   SPACE )
+                   INITIALIZE   ORCSKANACHKAREA
+                   MOVE    "1"                 TO  KANACHK-SYORI
+                   MOVE    SPA-GMN-HOSOKU      TO  KANACHK-MAE-INPUT
+                   CALL    "ORCSKANACHK"   USING
+                                           ORCSKANACHKAREA
+                   MOVE    KANACHK-MAX         TO  IDX0
+                   IF    ( IDX0                <   2 )
+                       MOVE    1               TO  IDX0
+                   ELSE
+                       COMPUTE IDX0 = IDX0 - 1
+                   END-IF
+                   IF    ( SPA-GMN-HOSOKU (1:2)    =   "（" )
+                     OR  ( SPA-GMN-HOSOKU (IDX0:2) =   "）" )
+                      MOVE    "0010"           TO  SPA-ERRCD
+                   END-IF
+               END-IF
+      *
+               IF    ( SPA-ERRCD           =   SPACE )
+                   PERFORM 2801-C02-SENI-SEC
+               END-IF
+      *
            END-IF
       *
            .
@@ -1977,6 +2094,7 @@
       *
            INITIALIZE                      LNK-D04-AREA
            MOVE    SPA-GMN-BYOMEI      TO  LNK-D04-BYOMEI
+           MOVE    SPA-GMN-HOSOKU      TO  LNK-D04-HOSOKU-COMMENT
            MOVE    LNK-D04-AREA        TO  SPA-WORK
            MOVE    SPA-AREA            TO  LNK-KYOUTU
       *
@@ -2038,6 +2156,10 @@
            WHEN     "2"
            WHEN     "6"
                MOVE     SPA-GMN-BYOMEI TO  SENDX01-BYOMEI
+               IF     ( SPA-NAI-CHKKBN =   "1" OR "2" )
+                   MOVE    SPA-GMN-HOSOKU
+                                       TO  SENDX01-HOSOKU
+               END-IF
            WHEN     "8"
            WHEN     "9"
                MOVE     SPA-GMN-CBYOMEI TO SENDX01-BYOMEI
@@ -2398,6 +2520,7 @@
            MOVE    SPA-GMN-BYOLST-SELNUM
                                        TO  D04-BYOSELNUM
            MOVE    SPA-GMN-BYOMEI      TO  D04-BYOMEI
+           MOVE    SPA-GMN-HOSOKU      TO  D04-HOSOKU
            MOVE    SPA-GMN-CHKLST-SELNUM
                                        TO  D04-CHKSELNUM
       *
@@ -2434,12 +2557,39 @@
                    MOVE    SPA-GMN-BYOMEI  TO  ORCSSTR-STRING2
                    CALL    "orcsstring" USING  ORCSSTRINGAREA
                    IF    ( ORCSSTR-NUM1    >   ZERO )
-                       MOVE    "*"     TO  D04-TBYOMEI   (IDXL)(1:1)
+                       IF    ( SPA-GMN-HOSOKU
+                                           NOT =   SPACE )
+                           MOVE    "search"
+                                           TO  ORCSSTR-COMMAND
+                           MOVE    SPA-GMN-TBYOHOSOKU (IDXL)
+                                           TO  ORCSSTR-STRING1
+                           MOVE    SPA-GMN-HOSOKU
+                                           TO  ORCSSTR-STRING2
+                           CALL    "orcsstring" USING  ORCSSTRINGAREA
+                           IF    ( ORCSSTR-NUM1    >   ZERO )
+                               MOVE    "*" TO  D04-TBYOMEI   (IDXL)(1:1)
+                           END-IF
+                       ELSE
+                           MOVE    "*" TO  D04-TBYOMEI   (IDXL)(1:1)
+                       END-IF
                    END-IF
                END-IF
       *
-               MOVE    SPA-GMN-TBYOMEI (IDXL)
-                                       TO  D04-TBYOMEI   (IDXL)(2:)
+               IF    ( SPA-GMN-TBYOHOSOKU (IDXL)   NOT =   SPACE )
+                   STRING  SPA-GMN-TBYOMEI (IDXL)
+                                               DELIMITED BY SPACE
+                           "（"                DELIMITED BY SIZE
+                           SPA-GMN-TBYOHOSOKU (IDXL)
+                                               DELIMITED BY SPACE
+                           "）"                DELIMITED BY SIZE
+                   INTO    D04-TBYOMEI (IDXL)(2:)
+                   END-STRING
+               ELSE
+                   MOVE    SPA-GMN-TBYOMEI (IDXL)
+                                       TO  D04-TBYOMEI
+                                                  (IDXL)(2:)
+               END-IF
+      *
                MOVE    SPA-GMN-TSRYKA  (IDXL)
                                        TO  D04-TSRYKA    (IDXL)
                MOVE    SPA-GMN-TSRYYMD(IDXL)
@@ -2447,9 +2597,11 @@
                MOVE    SPA-GMN-TTENKIYMD (IDXL)
                                        TO  D04-TTENKIYMD (IDXL)
                MOVE    SPA-GMN-TTENKIKBN (IDXL)
-                                       TO  SPA-GMN-TTENKIKBN (IDXL)
+                                       TO  D04-TTENKIKBN (IDXL)
                MOVE    SPA-GMN-TSYUBYO (IDXL)
                                        TO  D04-TSYUBYO   (IDXL)
+               MOVE    SPA-GMN-TUTAGAI (IDXL)
+                                       TO  D04-TUTAGAI   (IDXL)
                MOVE    SPA-GMN-TNYUGAIKBN (IDXL)
                                        TO  D04-TNYUGAIKBN(IDXL)
                MOVE    SPA-GMN-THKNCOMBI (IDXL)
@@ -2507,7 +2659,7 @@
                WHEN    "2"
                WHEN    "6"
                    MOVE    SPA-GMN-TGRPID (IDXL)
-                                       TO  D04-TCHKLSTNO (IDXM)(5:1)
+                                       TO  D04-TCHKGRPID (IDXM)
                    IF    ( SPA-GMN-BYOMEI  NOT =   SPACE )
                        MOVE    "search"
                                        TO  ORCSSTR-COMMAND
@@ -2516,13 +2668,38 @@
                        MOVE    SPA-GMN-BYOMEI  TO  ORCSSTR-STRING2
                        CALL    "orcsstring" USING  ORCSSTRINGAREA
                        IF    ( ORCSSTR-NUM1    >   ZERO )
-                           MOVE    "*" TO  D04-TCHKBYOMEI (IDXM)(1:1)
+                           IF    ( SPA-GMN-HOSOKU
+                                               NOT =   SPACE )
+                               MOVE    "search"
+                                       TO  ORCSSTR-COMMAND
+                               MOVE    SPA-GMN-TCHKHOSOKU (IDXL)
+                                       TO  ORCSSTR-STRING1
+                               MOVE    SPA-GMN-HOSOKU TO ORCSSTR-STRING2
+                               CALL    "orcsstring" USING ORCSSTRINGAREA
+                               IF    ( ORCSSTR-NUM1    >   ZERO )
+                                   MOVE    "*"
+                                           TO  D04-TCHKBYOMEI(IDXM)(1:1)
+                               END-IF
+                           ELSE
+                               MOVE    "*" TO  D04-TCHKBYOMEI(IDXM)(1:1)
+                           END-IF
                        END-IF
                    END-IF
       *
-                   MOVE    SPA-GMN-TCHKBYOMEI (IDXL)
+                   IF    ( SPA-GMN-TCHKHOSOKU (IDXL)   NOT =   SPACE )
+                       STRING  SPA-GMN-TCHKBYOMEI (IDXL)
+                                                   DELIMITED BY SPACE
+                               "（"                DELIMITED BY SIZE
+                               SPA-GMN-TCHKHOSOKU (IDXL)
+                                                   DELIMITED BY SPACE
+                               "）"                DELIMITED BY SIZE
+                       INTO    D04-TCHKBYOMEI (IDXM)(2:)
+                       END-STRING
+                   ELSE
+                       MOVE    SPA-GMN-TCHKBYOMEI (IDXL)
                                        TO  D04-TCHKBYOMEI
                                                   (IDXM)(2:)
+                   END-IF
       *
                    MOVE    SPA-GMN-TCOMPKBN   (IDXL)
                                        TO  D04-TCOMPKBN (IDXM)
@@ -2632,6 +2809,8 @@
                MOVE    "BYOMEI"        TO  MCP-WIDGET
            WHEN    006
                MOVE    "CHKSELNUM"     TO  MCP-WIDGET
+           WHEN    007
+               MOVE    "HOSOKU"        TO  MCP-WIDGET
            WHEN    208
                MOVE    "B08"           TO  MCP-WIDGET
            WHEN    209
@@ -2663,6 +2842,8 @@
            WHEN    "BYOSELNUM"
                MOVE    005             TO  SPA-GMN-CUR
            WHEN    "BYOMEI"
+               MOVE    007             TO  SPA-GMN-CUR
+           WHEN    "HOSOKU"
                MOVE    006             TO  SPA-GMN-CUR
                IF    ( SPA-GMN-BYOLST-SELNUM   >   ZERO )
                    MOVE    209         TO  SPA-GMN-CUR
@@ -2732,6 +2913,12 @@
            WHEN    "0008"
                MOVE    "「チェックしない」が選択されていません"
                                        TO  SPA-ERRMSG
+           WHEN    "0009"
+               MOVE    "補足コメントは全角で入力してください"
+                                       TO  SPA-ERRMSG
+           WHEN    "0010"
+               MOVE    "補足コメントの前後に（）があります"
+                                       TO  SPA-ERRMSG   
            WHEN    "4001"  THRU    "4999"
                MOVE    "更新処理に失敗しました"
                                        TO  SPA-ERRMSG
@@ -3158,7 +3345,7 @@
                     OR   ( FLG-LOOPEND     NOT =   ZERO )
       *
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key39"              TO  MCP-PATHNAME
+               MOVE    "key39"             TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
                IF    ( MCP-RC          =   ZERO )
                    MOVE    MCPDATA-REC     TO  PTBYOMEI-REC
@@ -3182,7 +3369,10 @@
                     AND  ( WRK-TENKIYMD (1:6) >=  SPA-NAI-SRYYM )
                        CONTINUE
                    ELSE
-                       MOVE    ZERO        TO  FLG-LOOPEND
+      *                IF    ( SPA-NAI-TENKIBYOMEIKBN  =   "0" )
+      *                 OR   ( PTBYO-REZEMM            =   ZERO )
+                           MOVE    ZERO        TO  FLG-LOOPEND
+      *                END-IF
                    END-IF
       *
                    IF    ( PTBYO-REZEMM        >   ZERO )

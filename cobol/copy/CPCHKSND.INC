@@ -53,6 +53,10 @@
            03  CHKSND-GRPCHKKBN          PIC  X(1).
       *グループＩＤ
            03  CHKSND-GRPID              PIC  X(1).
+      *補足コメント
+           03  CHKSND-HOSOKU             PIC  X(40).
+      *補足コメント条件区分
+           03  CHKSND-HOSOKU-COMPKBN     PIC  X(1).
       *端末ＩＤ
            03  CHKSND-TERMID             PIC  X(16).
       *オペーレータＩＤ

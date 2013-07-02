@@ -29,5 +29,5 @@
            03  SENDX01-SRYCD               PIC X(09).
            03  SENDX01-SRYYMD              PIC X(08).
            03  SENDX01-BYOMEI              PIC X(100).
-      *
+           03  SENDX01-HOSOKU              PIC X(40).
       *

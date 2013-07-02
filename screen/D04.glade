@@ -443,9 +443,9 @@
     <widget>
       <class>GtkPandaEntry</class>
       <name>BYOMEI</name>
-      <x>84</x>
+      <x>60</x>
       <y>668</y>
-      <width>400</width>
+      <width>268</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <signal>
@@ -536,22 +536,6 @@
 	<input_mode>XIM</input_mode>
 	<xim_enabled>False</xim_enabled>
       </widget>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label476</name>
-      <x>16</x>
-      <y>304</y>
-      <width>64</width>
-      <height>24</height>
-      <label>選択番号</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
     </widget>
 
     <widget>
@@ -698,7 +682,7 @@
 	  <last_modification_time>Wed, 19 Dec 2001 01:21:12 GMT</last_modification_time>
 	</signal>
 	<columns>3</columns>
-	<column_widths>40,312,48</column_widths>
+	<column_widths>40,291,48</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -745,6 +729,146 @@
     </widget>
 
     <widget>
+      <class>GtkLabel</class>
+      <name>LBLSRYYM</name>
+      <x>232</x>
+      <y>12</y>
+      <width>160</width>
+      <height>24</height>
+      <label>平成○○年○○月診療分</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLNYUGAI</name>
+      <x>396</x>
+      <y>12</y>
+      <width>100</width>
+      <height>24</height>
+      <label>入院外・入院</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label532</name>
+      <x>680</x>
+      <y>12</y>
+      <width>68</width>
+      <height>24</height>
+      <label>確認項目</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label553</name>
+      <x>16</x>
+      <y>12</y>
+      <width>212</width>
+      <height>24</height>
+      <label>前回データチェックエラー内容</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkNumberEntry</class>
+      <name>BYOSELNUM</name>
+      <x>16</x>
+      <y>668</y>
+      <width>44</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>activate</name>
+	<handler>send_event</handler>
+	<data>ACTIVATE</data>
+	<last_modification_time>Tue, 26 Dec 2000 01:04:18 GMT</last_modification_time>
+      </signal>
+      <signal>
+	<name>changed</name>
+	<handler>entry_changed</handler>
+	<data>CHANGED</data>
+	<last_modification_time>Tue, 26 Dec 2000 01:04:36 GMT</last_modification_time>
+      </signal>
+      <editable>True</editable>
+      <format>ZZZZ</format>
+    </widget>
+
+    <widget>
+      <class>GtkNumberEntry</class>
+      <name>CHKSELNUM</name>
+      <x>508</x>
+      <y>668</y>
+      <width>44</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>activate</name>
+	<handler>send_event</handler>
+	<data>ACTIVATE</data>
+	<last_modification_time>Tue, 26 Dec 2000 01:04:18 GMT</last_modification_time>
+      </signal>
+      <signal>
+	<name>changed</name>
+	<handler>entry_changed</handler>
+	<data>CHANGED</data>
+	<last_modification_time>Tue, 26 Dec 2000 01:04:36 GMT</last_modification_time>
+      </signal>
+      <editable>True</editable>
+      <format>ZZZZ</format>
+    </widget>
+
+    <widget>
+      <class>GtkPandaEntry</class>
+      <name>HOSOKU</name>
+      <x>352</x>
+      <y>668</y>
+      <width>136</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>activate</name>
+	<handler>send_event</handler>
+	<data>ACTIVATE</data>
+	<last_modification_time>Wed, 04 Mar 2009 09:45:50 GMT</last_modification_time>
+      </signal>
+      <signal>
+	<name>changed</name>
+	<handler>entry_changed</handler>
+	<data>CHANGED</data>
+	<last_modification_time>Wed, 04 Mar 2009 09:46:09 GMT</last_modification_time>
+      </signal>
+      <editable>True</editable>
+      <text_visible>True</text_visible>
+      <text_max_length>40</text_max_length>
+      <text></text>
+      <input_mode>XIM</input_mode>
+      <xim_enabled>True</xim_enabled>
+    </widget>
+
+    <widget>
       <class>GtkScrolledWindow</class>
       <name>sw2</name>
       <x>16</x>
@@ -779,8 +903,8 @@
 	  <data>SELECT</data>
 	  <last_modification_time>Wed, 19 Dec 2001 01:21:12 GMT</last_modification_time>
 	</signal>
-	<columns>9</columns>
-	<column_widths>40,300,40,80,80,70,40,40,70</column_widths>
+	<columns>10</columns>
+	<column_widths>40,300,40,80,80,70,40,90,40,70</column_widths>
 	<selection_mode>GTK_SELECTION_SINGLE</selection_mode>
 	<show_titles>True</show_titles>
 	<shadow_type>GTK_SHADOW_IN</shadow_type>
@@ -879,6 +1003,19 @@
 	<widget>
 	  <class>GtkLabel</class>
 	  <child_name>CList:title</child_name>
+	  <name>label1528</name>
+	  <label>疑い</label>
+	  <justify>GTK_JUSTIFY_CENTER</justify>
+	  <wrap>False</wrap>
+	  <xalign>0.5</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <child_name>CList:title</child_name>
 	  <name>label528</name>
 	  <label>入外</label>
 	  <justify>GTK_JUSTIFY_CENTER</justify>
@@ -906,114 +1043,50 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>LBLSRYYM</name>
-      <x>232</x>
-      <y>12</y>
-      <width>160</width>
-      <height>24</height>
-      <label>平成○○年○○月診療分</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>LBLNYUGAI</name>
-      <x>396</x>
-      <y>12</y>
-      <width>100</width>
-      <height>24</height>
-      <label>入院外・入院</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label532</name>
-      <x>680</x>
-      <y>12</y>
-      <width>68</width>
-      <height>24</height>
-      <label>確認項目</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label553</name>
+      <name>label476</name>
       <x>16</x>
-      <y>12</y>
-      <width>212</width>
-      <height>24</height>
-      <label>前回データチェックエラー内容</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkNumberEntry</class>
-      <name>BYOSELNUM</name>
-      <x>16</x>
-      <y>668</y>
+      <y>304</y>
       <width>64</width>
       <height>24</height>
-      <can_focus>True</can_focus>
-      <signal>
-	<name>activate</name>
-	<handler>send_event</handler>
-	<data>ACTIVATE</data>
-	<last_modification_time>Tue, 26 Dec 2000 01:04:18 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>changed</name>
-	<handler>entry_changed</handler>
-	<data>CHANGED</data>
-	<last_modification_time>Tue, 26 Dec 2000 01:04:36 GMT</last_modification_time>
-      </signal>
-      <editable>True</editable>
-      <format>ZZZZ</format>
+      <label>選択番号</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
     </widget>
 
     <widget>
-      <class>GtkNumberEntry</class>
-      <name>CHKSELNUM</name>
+      <class>GtkLabel</class>
+      <name>label556</name>
       <x>488</x>
       <y>668</y>
-      <width>64</width>
+      <width>20</width>
       <height>24</height>
-      <can_focus>True</can_focus>
-      <signal>
-	<name>activate</name>
-	<handler>send_event</handler>
-	<data>ACTIVATE</data>
-	<last_modification_time>Tue, 26 Dec 2000 01:04:18 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>changed</name>
-	<handler>entry_changed</handler>
-	<data>CHANGED</data>
-	<last_modification_time>Tue, 26 Dec 2000 01:04:36 GMT</last_modification_time>
-      </signal>
-      <editable>True</editable>
-      <format>ZZZZ</format>
+      <label>）</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label555</name>
+      <x>332</x>
+      <y>668</y>
+      <width>20</width>
+      <height>24</height>
+      <label>（</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0.5</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
     </widget>
   </widget>
 </widget>

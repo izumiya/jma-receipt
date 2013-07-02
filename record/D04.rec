@@ -63,6 +63,9 @@ D04	{
 		BYOMEI	{
 			value	varchar(100);
 		};
+		HOSOKU	{
+			value	varchar(40);
+		};
 		CHKSELNUM	{
 			value	number(4);
 		};
@@ -97,8 +100,9 @@ D04	{
 					value4	varchar(10);
 					value5	varchar(10);
 					value6	varchar(2);
-					value7	varchar(2);
-					value8	varchar(40);
+					value7	varchar(14);
+					value8	varchar(2);
+					value9	varchar(40);
 				}	[300];
 				select	bool[300];
 			};
@@ -117,7 +121,7 @@ D04	{
 				item	{
 					value0	varchar(5);
 					value1	varchar(101);
-					value2	varchar(4);
+					value2	varchar(12);
 				}	[200];
 				select	bool[200];
 			};

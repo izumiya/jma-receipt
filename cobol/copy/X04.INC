@@ -44,6 +44,21 @@
                 04  X04-JYKNKBN-COUNT   PIC S9(9)   BINARY.
                 04  X04-JYKNKBN-ITEM
                         PIC X(12)   OCCURS  5 TIMES.
+              03  X04-LBLHOSOKU     PIC X(12).
+              03  X04-LBLHOSOKU-KAKKO-L
+                                    PIC X(2).
+              03  X04-LBLHOSOKU-KAKKO-R
+                                    PIC X(2).
+              03  X04-HOSOKU        PIC X(40).
+              03  X04-HOSOKU-STATE   PIC S9(9)   BINARY.
+              03  X04-LBLHOSOKU-JYKNKBN  PIC X(8).
+              03  X04-CMB-HOSOKU-JYKNKBN.
+                04  X04-HOSOKU-JYKNKBN         PIC X(12).
+                04  X04-HOSOKU-JYKNKBN-STATE   PIC S9(9)   BINARY.
+                04  X04-HOSOKU-JYKNKBN-COUNT   PIC S9(9)   BINARY.
+                04  X04-HOSOKU-JYKNKBN-ITEM
+                        PIC X(12)   OCCURS  5 TIMES.
+                04  X04-HOSOKU-JYKNKBN-ITEM-STATE PIC S9(9)   BINARY.
               03  X04-LBLUTAGAIKBN      PIC X(10).
               03  X04-CMB-UTAGAIKBN.
                 04  X04-UTAGAIKBN       PIC X(32).
@@ -99,8 +114,8 @@
                   05  X04-BYOLST-ITEM        OCCURS  200 TIMES.
                     06  X04-TNO       PIC X(5).
                     06  X04-TMARK     PIC X(2).
-                    06  X04-TBYOMEI   PIC X(100).
-                    06  X04-TJYKN     PIC X(4).
+                    06  X04-TBYOMEI   PIC X(150).
+                    06  X04-TJYKN     PIC X(12).
                     06  X04-TUTAGAI   PIC X(4).
                   05  X04-BYOLST-SELECT
                           PIC X       OCCURS  200 TIMES.
