@@ -135,7 +135,7 @@ fi
     if  [ ${17} -eq '3' ]|| [ ${17} -eq '4' ]; then
         if  [ ${24} -eq '1' ]; then
 #           履歴保存先のフォルダへファイル作成
-            RIREKI_FOLDER="${13}${20}_Rousai_${5}/"
+            RIREKI_FOLDER="${13}$ROUSAI_FOLDER/"
             echo "--- rireki folder name  [" ${RIREKI_FOLDER} "]" >>$LOG_FILE
             if ! test -d  "${RIREKI_FOLDER}"; then
                  mkdir ${RIREKI_FOLDER}
