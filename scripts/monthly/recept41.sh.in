@@ -131,7 +131,7 @@ fi
         fi
     done
 
-#   システム管理場所（履歴保存先）出力のとき
+#   システム管理場所出力のとき
     if  [ ${17} -eq '3' ]|| [ ${17} -eq '4' ]; then
         if  [ ${24} -eq '1' ]; then
 #           履歴保存先のフォルダへファイル作成
@@ -155,13 +155,15 @@ fi
             fi
             cp ${OUT_FOLDER}${RECEFILE1}*.UKE ${RIREKI_FOLDER}
             chmod -R g+r ${RIREKI_FOLDER}${RECEFILE1}*.UKE
+        else
+#           履歴保存を行わないとき
+            chmod -R g+r ${13}${20}${RECEFILE1}*.UKE
         fi
     fi
 
 #   クライアント保存
     if  [ ${17} -eq '5' ]; then
         cd  /tmp/
-#       chmod -R g+r ${OUT_FOLDER}*
         echo "--- zip name [" ${ROUSAI_FOLDER}.zip "]" >>$LOG_FILE
         rm  ${ROUSAI_FOLDER}.zip
         zip -r ${ROUSAI_FOLDER}.zip ${ROUSAI_FOLDER}/
