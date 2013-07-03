@@ -1542,6 +1542,7 @@
       *
                05  SPA-1001-PREFNUM           PIC 9(02). 
                05  SPA-1001-HOSPSBT1          PIC 9(01). 
+               05  SPA-4001-RSIIRYOKBN-FLG    PIC 9(01).
                05  SPA-W12-PAGENO             PIC S9(9)   BINARY.
       *
                05  SPA-WIDCD-1004-FLG         PIC 9(01).
@@ -1647,6 +1648,8 @@
       *
       *    レセ電記号番号区切り文字設定情報
            COPY    "CPSK2011.INC".
+      *
+           COPY    "CPSK4001.INC".
       *
       *    保険者番号
        01  HKNJAINF-REC.
@@ -4577,6 +4580,39 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                            SPA-GMN-RECEIPT-MAKEKBN-G
            END-IF                                              
       *
+      *    労災医療機関情報
+           INITIALIZE                      SYS-4001-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-4001-HOSPNUM
+           MOVE    "4001"              TO  SYS-4001-KANRICD
+           MOVE    "*"                 TO  SYS-4001-KBNCD
+           MOVE    SYS-4001-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key8"              TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+               PERFORM UNTIL ( FLG-SYSKANRI        =   1   )
+                   MOVE    MCPDATA-REC         TO  SYS-4001-REC
+                   IF      SYS-4001-EDYUKYMD   <   "20130701"
+                       CONTINUE
+                   ELSE
+                       IF      SYS-4001-RSIIRYOKBN =   "1"
+                           MOVE    1           TO
+                                               SPA-4001-RSIIRYOKBN-FLG
+                       END-IF
+                   END-IF
+                   MOVE    "tbl_syskanri"    TO  MCP-TABLE
+                   MOVE    "key8"            TO  MCP-PATHNAME
+                   PERFORM 900-SYSKANRI-READ-SEC
+               END-PERFORM
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key8"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
       *    入力前退避
            MOVE    SPA-GMN-KKHRECEKBN  TO  SPA-GMN-KKHRECEKBN-O 
            MOVE    SPA-GMN-SYARECEKBN  TO  SPA-GMN-SYARECEKBN-O 
@@ -5491,6 +5527,14 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    "0121"                  TO  SPA-ERRCD
                END-IF
            END-IF    
+      *
+           IF      SPA-ERRCD           =   SPACE
+               IF    ( SPA-4001-RSIIRYOKBN-FLG =   0             )
+               AND   ( SPA-GMN-ROURECEKBN  NOT =   SPACE AND "0" )       
+                   MOVE    306                     TO  SPA-GMN-CUR
+                   MOVE    "0122"                  TO  SPA-ERRCD
+               END-IF
+           END-IF
       *
            .
        4193-ROURECEKBN-CHK-EXT.
@@ -10627,6 +10671,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0121"
                    MOVE    "労災レセ電出力区分入力エラー"
                                                TO  SPA-ERRMSG
+               WHEN    "0122"
+                   STRING  "労災指定医療機関でないため"
+                                               DELIMITED  BY  SIZE
+                           "レセ電出力区分の設定はできません"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "1003"
                    MOVE    "更新ができませんでした"
@@ -11418,6 +11469,21 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
+      *    システム管理マスタＲＥＡＤ
+      *****************************************************************
+       900-SYSKANRI-READ-SEC         SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO            TO  FLG-SYSKANRI
+           ELSE
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           .
+       900-SYSKANRI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    保険者マスター読込（キー）
       *****************************************************************
        900-HKNJAINF-READ-SEC         SECTION.
@@ -11454,17 +11520,59 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
+      *    ＤＢＳＥＬＥＣＴ処理
+      *****************************************************************
+       900-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           IF      MCP-RC              =   ZERO
+               CONTINUE
+           ELSE
+               DISPLAY "SELECT ERR table=" MCP-TABLE
+                       " pathname="        MCP-PATHNAME
+               CALL    "coblog" USING "SELECT ERR table=" MCP-TABLE
+                       " pathname="        MCP-PATHNAME
+           END-IF
+           .
+       900-DBSELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢＦＥＴＣＨ処理
+      *****************************************************************
+       900-DBFETCH-SEC                SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+      *
+           .
+       900-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    テーブルクローズ処理
       *****************************************************************
        900-CLOSE-SEC               SECTION.
       *
            MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
-grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
+           PERFORM 900-ORCDBMAIN-SEC
       *
            .
        900-CLOSE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブルアクセス処理
+      *****************************************************************
+       900-ORCDBMAIN-SEC               SECTION.
+      *
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+      *
+       900-ORCDBMAIN-EXT.
            EXIT.
       *
       *****************************************************************
