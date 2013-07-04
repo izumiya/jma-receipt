@@ -141,6 +141,8 @@
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
       *  04.06.04    NACL-門脇    13/06/12  労災・自賠責の
       *                                     看護料割増加算対応
+      *  04.06.05    NACL-門脇    13/07/04  月末に同日再入院した場合、かつ、
+      *                                     定期請求時の計算修正
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2144,7 +2146,8 @@
                            MOVE       1   TO  WRK-DOJITU-FLG (IDX IDY)
                            MOVE       1   TO  WRK-DOJITU-FLG2(IDX IDY)
                          WHEN     OTHER
-                           IF   ( IDX-ED  =  IDY          )
+                           IF   ((IDX-ED      = IDY      ) AND
+                                 (IDX-ST  NOT = IDY      ))
                            OR   ((LNK-S02-TEIKI-KBN = "Y") AND
                                  (IDX-ST  NOT = IDY      ) AND
                                  (IDX-ED  NOT = IDY      ))
