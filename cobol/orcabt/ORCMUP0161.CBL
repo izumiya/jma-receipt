@@ -32,6 +32,7 @@
       * 04.04.00     NACL-伊藤    09/03/25  更新データレイアウト変更
       *                                     OPTION 5000 -> 44000
       * 04.04.00     NACL-太田    09/03/27  ２重追加チェック修正
+      * 04.07.01     NACL-森脇    13/07/04  OPIDセット
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -135,7 +136,9 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-IN                  PIC X(01).
            03  WRK-OPTION              PIC X(60000).
            03  WRK-OPTION-LEN          PIC 9(08).
+      *----(04.07.01)--ADD-START---
            03  WRK-OPID                PIC X(16).
+      *----(04.07.01)--ADD-END-----
       *
            03  WRK-MAE-NAIYO           PIC X(100).
            03  WRK-ATO-NAIYO           PIC X(100).
@@ -662,11 +665,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                COMPUTE CNT-MAE     =   CNT-MAE     +   1
                MOVE    WRK-MAE-NAIYO   TO  WRK-MAE-OPTION(CNT-MAE)
            END-IF
+      *----(04.07.01)--ADD-START---
            IF      CNT-MAE     =   ZERO
                MOVE    SPACE           TO  WRK-OPID
            ELSE
                MOVE    PRGOPTION-OPID  TO  WRK-OPID
            END-IF
+      *----(04.07.01)--ADD-END-----
       *
       *    更新データ
            INITIALIZE                      PRGOPTION-REC
@@ -768,8 +773,9 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            END-PERFORM
       *
            MOVE    WRK-OPTION          TO  PRGOPTION-OPTION
-           
+      *----(04.07.01)--ADD-START---
            MOVE    WRK-OPID            TO  PRGOPTION-OPID
+      *----(04.07.01)--ADD-END-----
       *
            MOVE    LNK-MNTYMD          TO  PRGOPTION-UPYMD
            MOVE    LNK-MNTHMS          TO  PRGOPTION-UPHMS
