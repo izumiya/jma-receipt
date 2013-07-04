@@ -259,8 +259,17 @@
            03  SYS-2010-KOGAKKEIKBN         PIC  X(01).
            03  SYS-2010-KOGAKKEI-TAIKBN     PIC  X(01).
       *
+      *ÀßÄê³Û¤ò½õÀ®¤¹¤ëÉéÃ´¶â·×»»
+           03  SYS-2010-KINJYOKBN-G         PIC  X(01).
+           03  SYS-2010-KINJYO-TAIKBN-G     PIC  X(01).
+           03  SYS-2010-KINJYOKBN-N         PIC  X(01).
+           03  SYS-2010-KINJYO-TAIKBN-N     PIC  X(01).
+      *·î¡Ý±¡Æâ¡Ý¾å¸Â³Û»²¾È¾ò·ï
+           03  SYS-2010-INNAIKBN            PIC  X(01).
+           03  SYS-2010-INNAI-TAIKBN        PIC  X(01).
+      *
       *Í½È÷
-           03  SYS-2010-YOBI                PIC  X(352).
+           03  SYS-2010-YOBI                PIC  X(346).
       *Ã¼Ëö£É£Ä
            03  SYS-2010-TERMID              PIC  X(16).
       *¥ª¥Ú¥ì¡¼¥¿£É£Ä

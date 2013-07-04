@@ -885,6 +885,54 @@ W65	{
 					item	varchar(40)[10];
 					state	int;
 				};
+				CMB_KINJYOKBNG	{
+					KINJYOKBNG	{
+						value	varchar(80);
+					};
+					count	int;
+					item	varchar(80)[10];
+				};
+				CMB_KINJYOTAIKBNG	{
+					KINJYOTAIKBNG	{
+						value	varchar(40);
+						state	int;
+					};
+					count	int;
+					item	varchar(40)[10];
+					state	int;
+				};
+				CMB_KINJYOKBNN	{
+					KINJYOKBNN	{
+						value	varchar(80);
+					};
+					count	int;
+					item	varchar(80)[10];
+				};
+				CMB_KINJYOTAIKBNN	{
+					KINJYOTAIKBNN	{
+						value	varchar(40);
+						state	int;
+					};
+					count	int;
+					item	varchar(40)[10];
+					state	int;
+				};
+				CMB_INNAIKBN	{
+					INNAIKBN	{
+						value	varchar(80);
+					};
+					count	int;
+					item	varchar(80)[10];
+				};
+				CMB_INNAITAIKBN	{
+					INNAITAIKBN	{
+						value	varchar(40);
+						state	int;
+					};
+					count	int;
+					item	varchar(40)[10];
+					state	int;
+				};
 			};
 			fxd13	{
 				LBLSKJHON	{

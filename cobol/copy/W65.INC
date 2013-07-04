@@ -591,6 +591,39 @@
                     06  W65-SKJKEITAIKBN-ITEM    PIC X(40) OCCURS 10.
                     06  W65-SKJKEITAIKBN-ITEM-STATE
                                                  PIC S9(9) BINARY.
+                  05  W65-CMB-KINJYOKBNG.
+                    06  W65-KINJYOKBNG            PIC X(80).
+                    06  W65-KINJYOKBNG-COUNT      PIC S9(9) BINARY.
+                    06  W65-KINJYOKBNG-ITEM       PIC X(80) OCCURS 10.
+                  05  W65-CMB-KINJYOTAIKBNG.
+                    06  W65-KINJYOTAIKBNG         PIC X(40).
+                    06  W65-KINJYOTAIKBNG-STATE   PIC S9(9) BINARY.
+                    06  W65-KINJYOTAIKBNG-COUNT   PIC S9(9) BINARY.
+                    06  W65-KINJYOTAIKBNG-ITEM    PIC X(40) OCCURS 10.
+                    06  W65-KINJYOTAIKBNG-ITEM-STATE
+                                                 PIC S9(9) BINARY.
+                  05  W65-CMB-KINJYOKBNN.
+                    06  W65-KINJYOKBNN            PIC X(80).
+                    06  W65-KINJYOKBNN-COUNT      PIC S9(9) BINARY.
+                    06  W65-KINJYOKBNN-ITEM       PIC X(80) OCCURS 10.
+                  05  W65-CMB-KINJYOTAIKBNN.
+                    06  W65-KINJYOTAIKBNN         PIC X(40).
+                    06  W65-KINJYOTAIKBNN-STATE   PIC S9(9) BINARY.
+                    06  W65-KINJYOTAIKBNN-COUNT   PIC S9(9) BINARY.
+                    06  W65-KINJYOTAIKBNN-ITEM    PIC X(40) OCCURS 10.
+                    06  W65-KINJYOTAIKBNN-ITEM-STATE
+                                                 PIC S9(9) BINARY.
+                  05  W65-CMB-INNAIKBN.
+                    06  W65-INNAIKBN            PIC X(80).
+                    06  W65-INNAIKBN-COUNT      PIC S9(9) BINARY.
+                    06  W65-INNAIKBN-ITEM       PIC X(80) OCCURS 10.
+                  05  W65-CMB-INNAITAIKBN.
+                    06  W65-INNAITAIKBN         PIC X(40).
+                    06  W65-INNAITAIKBN-STATE   PIC S9(9) BINARY.
+                    06  W65-INNAITAIKBN-COUNT   PIC S9(9) BINARY.
+                    06  W65-INNAITAIKBN-ITEM    PIC X(40) OCCURS 10.
+                    06  W65-INNAITAIKBN-ITEM-STATE
+                                                 PIC S9(9) BINARY.
                 04  W65-FXD13.
                   05  W65-LBLSKJHON              PIC X(40).
                   05  W65-CMB-SKJRYOKBNHON.
