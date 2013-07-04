@@ -94,6 +94,7 @@
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    12/08/27  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
+      *  04.07.03    NACL-ÌçÏÆ    13/07/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -131,6 +132,8 @@
            03  FLG-ZENKI-TOKUREI   PIC 9(01).
            03  FLG-KOREI-HIGAITO   PIC 9(01).
            03  FLG-SEIHO-CHECK     PIC 9(01).
+           03  FLG-INGAI           PIC 9(01).
+           03  FLG-INNAI           PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -142,6 +145,8 @@
        01  WRK-AREA.
            03  WRK-HKNMST-JGNGAK  PIC 9(06).
            03  WRK-HKNMST-JGNGAK2 PIC 9(06).
+           03  WRK-HKNMST-JGNGAK-N
+                                  PIC 9(06).
            03  WRK-KOHFTN         PIC 9(10).
            03  WRK-KOHFTN-EN      PIC 9(10)V9(01).
            03  WRK-KOHFTN-H       PIC 9(10)V9(01).
@@ -208,6 +213,7 @@
                05  WRK-KOHSKYFLG-N          PIC X(01).
                05  WRK-IRYOKEIKBN-G         PIC X(01).
                05  WRK-IRYOKEIKBN-N         PIC X(01).
+               05  WRK-INNAIKBN             PIC X(01).
       *
            03  WRK-KYURATE                  PIC 9(03).
       *
@@ -844,6 +850,11 @@
                END-EVALUATE
            END-EVALUATE
       *
+           EVALUATE  SYS-2010-INNAIKBN
+             WHEN      "1"
+                    MOVE  "1"  TO WRK-INNAIKBN
+           END-EVALUATE
+      *
            .
        20021-SYS2010-SET-EXT.
            EXIT.
@@ -1214,9 +1225,6 @@
            ELSE
                EVALUATE   WRK-TEISYOTOKU
                  WHEN     SPACE
-                   IF    HKN-HON-GAIMNAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-HON-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK
-                   END-IF
                    IF    HKN-HON-GAIMGAIJGNGAK   NOT =    ZERO
                       MOVE HKN-HON-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
                    END-IF
@@ -1231,12 +1239,24 @@
                         MOVE  HKN-HON-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK
                       END-IF
                    END-EVALUATE
+      *****        ±¡ÆâÍÑ
+                   IF    HKN-HON-GAIMNAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-HON-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK-N
+                   END-IF
+      *            ¥Á¥§¥Ã¥¯ÂÐ¾Ý¾å¸Â³ÛÈ½Äê
+                   EVALUATE  WRK-CHKJGNFLG-G
+                    WHEN      "1"
+                      IF  HKN-HON-GAIDJGNGAK  NOT = ZERO
+                        MOVE  HKN-HON-GAIDJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                      END-IF
+                    WHEN      "2"
+                      IF  HKN-HON-GAIKJGNGAK  NOT = ZERO
+                        MOVE  HKN-HON-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                      END-IF
+                   END-EVALUATE
                    MOVE    HKN-HON-GAIKFTNRATE   TO WRK-KOHFTN-RITU
                  WHEN     "1"
                  WHEN     "4"
-                   IF    HKN-TNK-GAIMNAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-TNK-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK
-                   END-IF
                    IF    HKN-TNK-GAIMGAIJGNGAK   NOT =    ZERO
                       MOVE HKN-TNK-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
                    END-IF
@@ -1251,11 +1271,23 @@
                         MOVE  HKN-TNK-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK
                       END-IF
                    END-EVALUATE
+      *****        ±¡ÆâÍÑ
+                   IF    HKN-TNK-GAIMNAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-TNK-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK-N
+                   END-IF
+      *            ¥Á¥§¥Ã¥¯ÂÐ¾Ý¾å¸Â³ÛÈ½Äê
+                   EVALUATE  WRK-CHKJGNFLG-G
+                    WHEN      "1"
+                      IF  HKN-TNK-GAIDJGNGAK  NOT = ZERO
+                        MOVE  HKN-TNK-GAIDJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                      END-IF
+                    WHEN      "2"
+                      IF  HKN-TNK-GAIKJGNGAK  NOT = ZERO
+                        MOVE  HKN-TNK-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                      END-IF
+                   END-EVALUATE
                    MOVE    HKN-TNK-GAIKFTNRATE   TO WRK-KOHFTN-RITU
                  WHEN     "2"
-                   IF    HKN-TSY-GAIMNAIJGNGAK   NOT =    ZERO
-                      MOVE HKN-TSY-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK
-                   END-IF
                    IF    HKN-TSY-GAIMGAIJGNGAK   NOT =    ZERO
                       MOVE HKN-TSY-GAIMGAIJGNGAK TO WRK-HKNMST-JGNGAK
                    END-IF
@@ -1268,6 +1300,21 @@
                     WHEN      "2"
                       IF  HKN-TSY-GAIKJGNGAK  NOT = ZERO
                         MOVE  HKN-TSY-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK
+                      END-IF
+                   END-EVALUATE
+      *****        ±¡ÆâÍÑ
+                   IF    HKN-TSY-GAIMNAIJGNGAK   NOT =    ZERO
+                      MOVE HKN-TSY-GAIMNAIJGNGAK TO WRK-HKNMST-JGNGAK-N
+                   END-IF
+      *            ¥Á¥§¥Ã¥¯ÂÐ¾Ý¾å¸Â³ÛÈ½Äê
+                   EVALUATE  WRK-CHKJGNFLG-G
+                    WHEN      "1"
+                      IF  HKN-TSY-GAIDJGNGAK  NOT = ZERO
+                        MOVE  HKN-TSY-GAIDJGNGAK TO  WRK-HKNMST-JGNGAK-N
+                      END-IF
+                    WHEN      "2"
+                      IF  HKN-TSY-GAIKJGNGAK  NOT = ZERO
+                        MOVE  HKN-TSY-GAIKJGNGAK TO  WRK-HKNMST-JGNGAK-N
                       END-IF
                    END-EVALUATE
                    MOVE    HKN-TSY-GAIKFTNRATE   TO WRK-KOHFTN-RITU
@@ -1652,6 +1699,8 @@
            MOVE      ZERO          TO      WRK-SYUSKJ-FTN
            MOVE      ZERO          TO      WRK-SKYMONEY-SKJ
            MOVE      ZERO          TO      FLG-SEIHO-CHECK
+           MOVE      ZERO          TO      FLG-INGAI
+           MOVE      ZERO          TO      FLG-INNAI
            PERFORM   UNTIL    FLG-SYUNOU  =   1
              MOVE    ZERO          TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -1846,6 +1895,15 @@
                   IF     WRK-HKNCOMBINUM-FLG(IDX1) =  1
                         MOVE   01                TO  LNK-FTNJGNCHK-RC
                   END-IF
+                  IF     LNK-FTNJGNCHK-NYUGAIKBN   =  "2"
+                    IF      SYU-INGAISHOHOKBN   =  "1"
+                        MOVE    1    TO  FLG-INGAI
+                    ELSE
+                      IF    SYU-TYK-HKNTEN  NOT =  ZERO
+                        MOVE    1    TO  FLG-INNAI
+                      END-IF
+                    END-IF
+                  END-IF
                END-IF
              END-PERFORM
              IF      LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
@@ -1857,6 +1915,21 @@
              END-IF
              PERFORM  910-SYUNOU-READ-SEC
            END-PERFORM
+      *
+           IF    LNK-FTNJGNCHK-NYUGAIKBN   =  "2"
+             IF    WRK-HKNMST-JGNGAK  =  999999  OR  999998
+                CONTINUE
+             ELSE
+                IF  ( FLG-INGAI      =   1   )
+                OR  ((WRK-INNAIKBN   =  "1" ) AND
+                     (FLG-INGAI      =  ZERO) AND
+                     (FLG-INNAI      =  ZERO))
+                   CONTINUE
+                ELSE
+                   MOVE  WRK-HKNMST-JGNGAK-N  TO  WRK-HKNMST-JGNGAK
+                END-IF
+             END-IF
+           END-IF
       *
            IF  ((LNK-FTNJGNCHK-PREFNUM    =  27           ) AND
                 (LNK-FTNJGNCHK-KOHNUM     = "141" OR "241") AND

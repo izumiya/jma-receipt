@@ -406,6 +406,7 @@
       *  04.07.03    NACL-ÌçÏÆ    12/04/26  ¸ºÌÈ·×»»ÂÐ¾Ý¶èÊ¬¡Ê¼«ÈñÊ¬¤Î¤ß¡ËÂÐ±þ
       *  04.07.04    NACL-ÌçÏÆ    12/08/27  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.05    NACL-ÌçÏÆ    12/11/15  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
+      *  04.07.06    NACL-ÌçÏÆ    13/07/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -643,6 +644,8 @@
                  06  WK-2010-NINJYOKBN           PIC X(01).
       *
                  06  WK-2010-KOGAKKEIKBN         PIC X(01).
+      *
+                 06  WK-2010-INNAIKBN            PIC X(01).
       *
       *    ÊÝ¸±¶èÊ¬¡Ê¶õÇò¡§°åÊÝ¡¢£±¡§Ï«ºÒ¼«Çå¡¢£²¡§¸ø³²¡Ë
            03  WK-HKNKBN               PIC X(01).
@@ -902,6 +905,14 @@
            03  WK-SYUNOU-GENBUTU-KOREI-SYUHKNFLG        PIC  9(01).
       *
            03  WK-SYUNOU-GENBUTU-SECMONEY-MAE           PIC  9(07).
+      *
+           03  WK-SHOHOUSEN-HKNCOMBINUM-TBL.
+               05  WK-SHOHOUSEN-HKNCOMBINUM-OCC         OCCURS 50.
+                 07  WK-SHOHOUSEN-HKNCOMBINUM           PIC  9(04).
+      *
+           03  WK-INNAI-SANSHOU-TBL.
+               05  WK-INNAI-SANSHOU-OCC                 OCCURS  4.
+                 07  WK-INNAI-SANSHOU                   PIC  9(01).
       *
       *    ¸øÈñ¤Î´µ¼ÔÉéÃ´¾å¸Â²ó¿ô¤È¾å¸Â¶â³Û¤ÎÂàÈòÍÑ¥¨¥ê¥¢
        01  HOKEN-MAX-AREA.
@@ -1266,6 +1277,7 @@
            03  KOHFUKA-IDX             PIC  9(02).
            03  KOHFUKA-IDX2            PIC  9(01).
            03  IDX-CYO                 PIC  9(03).
+           03  IDX-CYO2                PIC  9(03).
       *
       *Ê¿À®£±£´Ç¯£±£°·î²þÀµÂÐ±þ
       *¹âÎð¼Ô¤ÎºßÂðÁí¹ç¡¦ºßÂðËö´ü»»Äê´µ¼Ô¤ÎÉéÃ´¾å¸Â»»Äê¥¨¥ê¥¢
@@ -7045,7 +7057,7 @@
              IF      MCP-RC               =      ZERO
                  MOVE    "tbl_syunou"     TO     MCP-TABLE
                  MOVE    "key14"          TO     MCP-PATHNAME
-                 PERFORM  SYUNOU-READ-SEC
+                 PERFORM  SYUNOU-READ3-SEC
                  PERFORM  UNTIL  (FLG-SYUNOU   =    "1")
                      IF   SYU-DENPJTIKBN  NOT =   "3"
                          IF   SYU-INGAISHOHOKBN   =     "1"
@@ -7056,7 +7068,7 @@
                      END-IF
                      MOVE     "tbl_syunou"  TO   MCP-TABLE
                      MOVE     "key14"       TO   MCP-PATHNAME
-                     PERFORM   SYUNOU-READ-SEC
+                     PERFORM   SYUNOU-READ3-SEC
                  END-PERFORM
              END-IF
              MOVE     "tbl_syunou"  TO   MCP-TABLE
@@ -7064,7 +7076,115 @@
              PERFORM   DB-CLOSE-SEC
            END-IF.
       *
+           INITIALIZE      WK-INNAI-SANSHOU-TBL.
+           PERFORM   VARYING   IDX-CYO   FROM    1   BY  1
+                      UNTIL    IDX-CYO     >     4
+             INITIALIZE    WK-SHOHOUSEN-HKNCOMBINUM-TBL
+             IF   WK-2010-INNAIKBN(IDX-CYO)  =  "1"
+             AND  FLG-INGAI                  =  SPACE
+               MOVE        9     TO    WK-INNAI-SANSHOU(IDX-CYO)
+               IF    LNK-SYU-TYK-HKNTEN  NOT =  ZERO
+                 MOVE      1     TO    WK-INNAI-SANSHOU(IDX-CYO)
+               ELSE
+                 PERFORM   21021-SHOHOUSEN-HANTEI2-SEC
+               END-IF
+             END-IF
+           END-PERFORM.
+      *
        2102-SHOHOUSEN-HANTEI-EXT.
+           EXIT.
+      *
+      ***************************************************************
+      *        ¼ýÇ¼¥Æ¡¼¥Ö¥ë¤«¤é±¡Æâ½èÊý¡¢±¡³°½èÊý¤ÎÈ½Äê             *
+      ***************************************************************
+       21021-SHOHOUSEN-HANTEI2-SEC           SECTION.
+      *
+           INITIALIZE                         WRK-HKNCOMBI-REC
+           MOVE    LNK-SYU-HOSPNUM       TO   WRK-COMB-HOSPNUM
+           MOVE    LNK-SYU-PTID          TO   WRK-COMB-PTID
+           MOVE    COMB-KOHID(IDX-CYO)   TO   WRK-COMB-KOHID(1)
+           MOVE    COMB-KOHID(IDX-CYO)   TO   WRK-COMB-KOHID(2)
+           MOVE    COMB-KOHID(IDX-CYO)   TO   WRK-COMB-KOHID(3)
+           MOVE    COMB-KOHID(IDX-CYO)   TO   WRK-COMB-KOHID(4)
+           MOVE    WRK-HKNCOMBI-REC      TO   MCPDATA-REC
+           MOVE    "DBSELECT"            TO   MCP-FUNC
+           MOVE    "tbl_hkncombi"        TO   MCP-TABLE
+           MOVE    "key4"                TO   MCP-PATHNAME
+           CALL    "ORCDBMAIN"           USING   MCPAREA
+                                                 MCPDATA-REC
+                                                 SPA-AREA
+           IF      MCP-RC   =    ZERO
+             MOVE    "tbl_hkncombi"      TO   MCP-TABLE
+             MOVE    "key4"              TO   MCP-PATHNAME
+             PERFORM  HKNCOMBI-READ2-SEC
+      *
+             MOVE     ZERO               TO   IDX-CYO2
+             PERFORM  UNTIL (IDX-CYO2       >=    50)
+                       OR   (FLG-HKNCOMBI    =    1 )
+               IF   (WRK-COMB-DELKBN         =  SPACE                 )
+               AND  (WRK-COMB-TEKSTYMD(1:6) <=  LNK-SYU-SRYYMD(1:6)   )
+               AND  (LNK-SYU-SRYYMD(1:6)    <=  WRK-COMB-TEKEDYMD(1:6))
+                 ADD     1               TO   IDX-CYO2
+                 MOVE   WRK-COMB-HKNCOMBINUM
+                            TO  WK-SHOHOUSEN-HKNCOMBINUM(IDX-CYO2)
+               END-IF
+               MOVE    "tbl_hkncombi"    TO   MCP-TABLE
+               MOVE    "key4"            TO   MCP-PATHNAME
+               PERFORM  HKNCOMBI-READ2-SEC
+             END-PERFORM
+           END-IF
+           MOVE    "tbl_hkncombi"        TO   MCP-TABLE
+           MOVE    "key4"                TO   MCP-PATHNAME
+           PERFORM  DB-CLOSE-SEC
+      *
+           INITIALIZE                           SYU-SYUNOU-REC
+           MOVE    LNK-SYU-HOSPNUM          TO  SYU-HOSPNUM
+           MOVE    LNK-SYU-NYUGAIKBN        TO  SYU-NYUGAIKBN
+           MOVE    LNK-SYU-PTID             TO  SYU-PTID
+           MOVE    LNK-SYU-SRYYMD(1:6)      TO  SYU-SRYYMD(1:6)
+           MOVE    "__"                     TO  SYU-SRYYMD(7:2)
+           MOVE    COMB-KOHHKNNUM(IDX-CYO)  TO  SYU-KOH-HKNNUM(1)
+           MOVE    COMB-KOHHKNNUM(IDX-CYO)  TO  SYU-KOH-HKNNUM(2)
+           MOVE    COMB-KOHHKNNUM(IDX-CYO)  TO  SYU-KOH-HKNNUM(3)
+           MOVE    COMB-KOHHKNNUM(IDX-CYO)  TO  SYU-KOH-HKNNUM(4)
+           MOVE    SYU-SYUNOU-REC           TO  MCPDATA-REC 
+           MOVE    "DBSELECT"               TO  MCP-FUNC
+           MOVE    "tbl_syunou"             TO  MCP-TABLE
+           MOVE    "key25"                  TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"              USING  MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+           IF      MCP-RC   =    ZERO
+             MOVE    "tbl_syunou"           TO  MCP-TABLE
+             MOVE    "key25"                TO  MCP-PATHNAME
+             PERFORM  SYUNOU-READ3-SEC
+             PERFORM  UNTIL  (FLG-SYUNOU                =  1 )
+                        OR   (WK-INNAI-SANSHOU(IDX-CYO) =  1 )
+               IF   SYU-DENPJTIKBN  NOT =   "3"
+                 PERFORM  VARYING  IDX-CYO2   FROM  1  BY  1
+                           UNTIL  (IDX-CYO2              >  50 )
+                             OR   (WK-SHOHOUSEN-HKNCOMBINUM(IDX-CYO2)
+                                                         = ZERO)
+                   IF  SYU-HKNCOMBINUM =
+                               WK-SHOHOUSEN-HKNCOMBINUM(IDX-CYO2)
+                     IF    SYU-TYK-HKNTEN  NOT =  ZERO
+                        MOVE   1      TO   WK-INNAI-SANSHOU(IDX-CYO)
+                     END-IF
+                     MOVE      50     TO   IDX-CYO2
+                   END-IF
+                 END-PERFORM
+               END-IF
+               MOVE     "tbl_syunou"  TO   MCP-TABLE
+               MOVE     "key25"       TO   MCP-PATHNAME
+               PERFORM   SYUNOU-READ3-SEC
+             END-PERFORM
+           END-IF
+           MOVE     "tbl_syunou"  TO   MCP-TABLE
+           MOVE     "key25"       TO   MCP-PATHNAME
+           PERFORM   DB-CLOSE-SEC
+      *
+           .
+       21021-SHOHOUSEN-HANTEI2-EXT.
            EXIT.
       *
       ******************************************************************
@@ -7081,7 +7201,8 @@
                     MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                     MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                     MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                    IF    FLG-INGAI          =   "1"
+                    IF  (FLG-INGAI           = "1")
+                    OR  (WK-INNAI-SANSHOU(1) =  9 )
                           MOVE  HKN-HON-GAIMGAIJGNGAK
                                              TO  MAX-KIN-KOHI1-M
                     ELSE
@@ -7095,7 +7216,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(1) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI1-M
                       ELSE
@@ -7108,7 +7230,8 @@
                       MOVE  HKN-TSY-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                       MOVE  HKN-TSY-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                       MOVE  HKN-TSY-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(1) =  9 )
                             MOVE  HKN-TSY-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI1-M
                       ELSE
@@ -7123,7 +7246,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(1) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI1-M
                       ELSE
@@ -7136,7 +7260,8 @@
                       MOVE  HKN-TNK-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                       MOVE  HKN-TNK-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                       MOVE  HKN-TNK-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(1) =  9 )
                             MOVE  HKN-TNK-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI1-M
                       ELSE
@@ -7179,7 +7304,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(1) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI1-M
                       ELSE
@@ -7193,7 +7319,8 @@
                         MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                         MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                         MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(1) =  9 )
                               MOVE  HKN-HON-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI1-M
                         ELSE
@@ -7206,7 +7333,8 @@
                         MOVE  HKN-TSY-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                         MOVE  HKN-TSY-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                         MOVE  HKN-TSY-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(1) =  9 )
                               MOVE  HKN-TSY-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI1-M
                         ELSE
@@ -7221,7 +7349,8 @@
                         MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                         MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                         MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(1) =  9 )
                               MOVE  HKN-HON-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI1-M
                         ELSE
@@ -7234,7 +7363,8 @@
                         MOVE  HKN-TNK-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                         MOVE  HKN-TNK-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                         MOVE  HKN-TNK-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(1) =  9 )
                               MOVE  HKN-TNK-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI1-M
                         ELSE
@@ -7249,7 +7379,8 @@
                  MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
                  MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
                  MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-                 IF    FLG-INGAI          =   "1"
+                 IF  (FLG-INGAI           = "1")
+                 OR  (WK-INNAI-SANSHOU(1) =  9 )
                        MOVE  HKN-HON-GAIMGAIJGNGAK
                                           TO  MAX-KIN-KOHI1-M
                  ELSE
@@ -7264,7 +7395,8 @@
              MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI1-D
              MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI1-M
              MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI1-D
-             IF    FLG-INGAI          =   "1"
+             IF  (FLG-INGAI           = "1")
+             OR  (WK-INNAI-SANSHOU(1) =  9 )
                    MOVE  HKN-HON-GAIMGAIJGNGAK
                                       TO  MAX-KIN-KOHI1-M
              ELSE
@@ -7424,7 +7556,8 @@
                     MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                     MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                     MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                    IF    FLG-INGAI          =   "1"
+                    IF  (FLG-INGAI           = "1")
+                    OR  (WK-INNAI-SANSHOU(2) =  9 )
                           MOVE  HKN-HON-GAIMGAIJGNGAK
                                              TO  MAX-KIN-KOHI2-M
                     ELSE
@@ -7438,7 +7571,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(2) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI2-M
                       ELSE
@@ -7451,7 +7585,8 @@
                       MOVE  HKN-TSY-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                       MOVE  HKN-TSY-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                       MOVE  HKN-TSY-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(2) =  9 )
                             MOVE  HKN-TSY-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI2-M
                       ELSE
@@ -7466,7 +7601,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(2) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI2-M
                       ELSE
@@ -7479,7 +7615,8 @@
                       MOVE  HKN-TNK-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                       MOVE  HKN-TNK-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                       MOVE  HKN-TNK-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(2) =  9 )
                             MOVE  HKN-TNK-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI2-M
                       ELSE
@@ -7522,7 +7659,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(2) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI2-M
                       ELSE
@@ -7536,7 +7674,8 @@
                         MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                         MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                         MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(2) =  9 )
                               MOVE  HKN-HON-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI2-M
                         ELSE
@@ -7549,7 +7688,8 @@
                         MOVE  HKN-TSY-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                         MOVE  HKN-TSY-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                         MOVE  HKN-TSY-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(2) =  9 )
                               MOVE  HKN-TSY-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI2-M
                         ELSE
@@ -7564,7 +7704,8 @@
                         MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                         MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                         MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(2) =  9 )
                               MOVE  HKN-HON-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI2-M
                         ELSE
@@ -7577,7 +7718,8 @@
                         MOVE  HKN-TNK-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                         MOVE  HKN-TNK-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                         MOVE  HKN-TNK-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(2) =  9 )
                               MOVE  HKN-TNK-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI2-M
                         ELSE
@@ -7592,7 +7734,8 @@
                  MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
                  MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
                  MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-                 IF    FLG-INGAI          =   "1"
+                 IF  (FLG-INGAI           = "1")
+                 OR  (WK-INNAI-SANSHOU(2) =  9 )
                        MOVE  HKN-HON-GAIMGAIJGNGAK
                                           TO  MAX-KIN-KOHI2-M
                  ELSE
@@ -7607,7 +7750,8 @@
              MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI2-D
              MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI2-M
              MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI2-D
-             IF    FLG-INGAI          =   "1"
+             IF  (FLG-INGAI           = "1")
+             OR  (WK-INNAI-SANSHOU(2) =  9 )
                    MOVE  HKN-HON-GAIMGAIJGNGAK
                                       TO  MAX-KIN-KOHI2-M
              ELSE
@@ -7761,7 +7905,8 @@
                     MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                     MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                     MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                    IF    FLG-INGAI          =   "1"
+                    IF  (FLG-INGAI           = "1")
+                    OR  (WK-INNAI-SANSHOU(3) =  9 )
                           MOVE  HKN-HON-GAIMGAIJGNGAK
                                              TO  MAX-KIN-KOHI3-M
                     ELSE
@@ -7775,7 +7920,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(3) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI3-M
                       ELSE
@@ -7788,7 +7934,8 @@
                       MOVE  HKN-TSY-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                       MOVE  HKN-TSY-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                       MOVE  HKN-TSY-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(3) =  9 )
                             MOVE  HKN-TSY-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI3-M
                       ELSE
@@ -7803,7 +7950,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(3) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI3-M
                       ELSE
@@ -7816,7 +7964,8 @@
                       MOVE  HKN-TNK-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                       MOVE  HKN-TNK-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                       MOVE  HKN-TNK-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(3) =  9 )
                             MOVE  HKN-TNK-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI3-M
                       ELSE
@@ -7859,7 +8008,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(3) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI3-M
                       ELSE
@@ -7873,7 +8023,8 @@
                         MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                         MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                         MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(3) =  9 )
                               MOVE  HKN-HON-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI3-M
                         ELSE
@@ -7886,7 +8037,8 @@
                         MOVE  HKN-TSY-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                         MOVE  HKN-TSY-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                         MOVE  HKN-TSY-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(3) =  9 )
                               MOVE  HKN-TSY-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI3-M
                         ELSE
@@ -7901,7 +8053,8 @@
                         MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                         MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                         MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(3) =  9 )
                               MOVE  HKN-HON-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI3-M
                         ELSE
@@ -7914,7 +8067,8 @@
                         MOVE  HKN-TNK-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                         MOVE  HKN-TNK-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                         MOVE  HKN-TNK-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(3) =  9 )
                               MOVE  HKN-TNK-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI3-M
                         ELSE
@@ -7929,7 +8083,8 @@
                  MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
                  MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
                  MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-                 IF    FLG-INGAI          =   "1"
+                 IF  (FLG-INGAI           = "1")
+                 OR  (WK-INNAI-SANSHOU(3) =  9 )
                        MOVE  HKN-HON-GAIMGAIJGNGAK
                                           TO  MAX-KIN-KOHI3-M
                  ELSE
@@ -7944,7 +8099,8 @@
              MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI3-D
              MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI3-M
              MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI3-D
-             IF    FLG-INGAI          =   "1"
+             IF  (FLG-INGAI           = "1")
+             OR  (WK-INNAI-SANSHOU(3) =  9 )
                    MOVE  HKN-HON-GAIMGAIJGNGAK
                                       TO  MAX-KIN-KOHI3-M
              ELSE
@@ -8098,7 +8254,8 @@
                     MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                     MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                     MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                    IF    FLG-INGAI          =   "1"
+                    IF  (FLG-INGAI           = "1")
+                    OR  (WK-INNAI-SANSHOU(4) =  9 )
                           MOVE  HKN-HON-GAIMGAIJGNGAK
                                              TO  MAX-KIN-KOHI4-M
                     ELSE
@@ -8112,7 +8269,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(4) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI4-M
                       ELSE
@@ -8125,7 +8283,8 @@
                       MOVE  HKN-TSY-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                       MOVE  HKN-TSY-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                       MOVE  HKN-TSY-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(4) =  9 )
                             MOVE  HKN-TSY-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI4-M
                       ELSE
@@ -8140,7 +8299,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(4) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI4-M
                       ELSE
@@ -8153,7 +8313,8 @@
                       MOVE  HKN-TNK-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                       MOVE  HKN-TNK-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                       MOVE  HKN-TNK-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(4) =  9 )
                             MOVE  HKN-TNK-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI4-M
                       ELSE
@@ -8196,7 +8357,8 @@
                       MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                       MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                       MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                      IF    FLG-INGAI          =   "1"
+                      IF  (FLG-INGAI           = "1")
+                      OR  (WK-INNAI-SANSHOU(4) =  9 )
                             MOVE  HKN-HON-GAIMGAIJGNGAK
                                                TO  MAX-KIN-KOHI4-M
                       ELSE
@@ -8210,7 +8372,8 @@
                         MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                         MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                         MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(4) =  9 )
                               MOVE  HKN-HON-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI4-M
                         ELSE
@@ -8223,7 +8386,8 @@
                         MOVE  HKN-TSY-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                         MOVE  HKN-TSY-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                         MOVE  HKN-TSY-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(4) =  9 )
                               MOVE  HKN-TSY-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI4-M
                         ELSE
@@ -8238,7 +8402,8 @@
                         MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                         MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                         MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(4) =  9 )
                               MOVE  HKN-HON-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI4-M
                         ELSE
@@ -8251,7 +8416,8 @@
                         MOVE  HKN-TNK-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                         MOVE  HKN-TNK-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                         MOVE  HKN-TNK-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                        IF    FLG-INGAI          =   "1"
+                        IF  (FLG-INGAI           = "1")
+                        OR  (WK-INNAI-SANSHOU(4) =  9 )
                               MOVE  HKN-TNK-GAIMGAIJGNGAK
                                                  TO  MAX-KIN-KOHI4-M
                         ELSE
@@ -8266,7 +8432,8 @@
                  MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
                  MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
                  MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-                 IF    FLG-INGAI          =   "1"
+                 IF  (FLG-INGAI           = "1")
+                 OR  (WK-INNAI-SANSHOU(4) =  9 )
                        MOVE  HKN-HON-GAIMGAIJGNGAK
                                           TO  MAX-KIN-KOHI4-M
                  ELSE
@@ -8281,7 +8448,8 @@
              MOVE  HKN-HON-GAIDJGNCNT TO  MAX-KAI-KOHI4-D
              MOVE  HKN-HON-GAIMJGNCNT TO  MAX-KAI-KOHI4-M
              MOVE  HKN-HON-GAIDJGNGAK TO  MAX-KIN-KOHI4-D
-             IF    FLG-INGAI          =   "1"
+             IF  (FLG-INGAI           = "1")
+             OR  (WK-INNAI-SANSHOU(4) =  9 )
                    MOVE  HKN-HON-GAIMGAIJGNGAK
                                       TO  MAX-KIN-KOHI4-M
              ELSE
@@ -10455,6 +10623,11 @@
                  END-EVALUATE
              END-EVALUATE
            END-IF
+      *
+           EVALUATE  SYS-2010-INNAIKBN
+             WHEN      "1"
+                 MOVE    "1"          TO  WK-2010-INNAIKBN(IDX-CYO)
+           END-EVALUATE
       *
            .
       *
@@ -28031,6 +28204,43 @@
            .
       *
        SYUNOU-READ2-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¼ýÇ¼¥Þ¥¹¥¿¡¼ÆÉ¹þ£³
+      *****************************************************************
+       SYUNOU-READ3-SEC          SECTION.
+      *
+       SYUNOU-READ3-100.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SYU-SYUNOU-REC
+               IF    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-SYU-DENPNUM      NOT =  ZERO           ) AND
+                      (LNK-SYU-DENPNUM          =  SYU-DENPNUM    ))
+               OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-S01-IKTGENMKJFLG     =  SPACE          ) AND
+                      (LNK-SYU-GRP-DENPNUM  NOT =  ZERO           ) AND
+                      (LNK-SYU-GRP-DENPNUM      =  SYU-GRP-DENPNUM))
+               OR    ((LNK-S01-SAIKEISAN-KBN    =   "1"           ) AND
+                      (LNK-S01-IKTGENMKJFLG     =  SPACE          ) AND
+                      (LNK-SYU-GRP-DENPNUM  NOT =  ZERO           ) AND
+                      (LNK-SYU-GRP-DENPNUM      =  SYU-DENPNUM    ))
+                       GO    TO    SYUNOU-READ3-100
+               ELSE
+                       MOVE    ZERO    TO  FLG-SYUNOU
+               END-IF
+           ELSE
+               INITIALIZE                  SYU-SYUNOU-REC
+               MOVE    1               TO  FLG-SYUNOU
+           END-IF
+      *
+           .
+      *
+       SYUNOU-READ3-EXT.
            EXIT.
       *****************************************************************
       *    ÆüÊÌ¼ýÇ¼¥Þ¥¹¥¿ÆÉ¹þ
