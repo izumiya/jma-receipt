@@ -135,6 +135,7 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-IN                  PIC X(01).
            03  WRK-OPTION              PIC X(60000).
            03  WRK-OPTION-LEN          PIC 9(08).
+           03  WRK-OPID                PIC X(16).
       *
            03  WRK-MAE-NAIYO           PIC X(100).
            03  WRK-ATO-NAIYO           PIC X(100).
@@ -661,6 +662,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                COMPUTE CNT-MAE     =   CNT-MAE     +   1
                MOVE    WRK-MAE-NAIYO   TO  WRK-MAE-OPTION(CNT-MAE)
            END-IF
+           IF      CNT-MAE     =   ZERO
+               MOVE    SPACE           TO  WRK-OPID
+           ELSE
+               MOVE    PRGOPTION-OPID  TO  WRK-OPID
+           END-IF
       *
       *    更新データ
            INITIALIZE                      PRGOPTION-REC
@@ -762,6 +768,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            END-PERFORM
       *
            MOVE    WRK-OPTION          TO  PRGOPTION-OPTION
+           
+           MOVE    WRK-OPID            TO  PRGOPTION-OPID
       *
            MOVE    LNK-MNTYMD          TO  PRGOPTION-UPYMD
            MOVE    LNK-MNTHMS          TO  PRGOPTION-UPHMS
