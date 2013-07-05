@@ -270,6 +270,7 @@
                05  SPA-NAI-AREA.
                    07  SPA-NAI-SRYYM               PIC X(08).
                    07  SPA-NAI-SYS1039TBL          PIC X(500).
+                   07  SPA-NAI-S10-CHK             PIC X(01).
                    07  SPA-NAI-HEAD.
                        09  SPA-NAI-LOCK            PIC 9(01).
                        09  SPA-NAI-SLOCK-MSG       PIC X(32).
@@ -389,6 +390,7 @@
            03  FLG-GENBUTU2        PIC 9(01).
            03  FLG-GENBUTU3        PIC 9(01).
            03  FLG-CLIENT-OK       PIC 9(01).
+           03  FLG-S10-CHK         PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -606,6 +608,8 @@
       *
            COPY    "CPLNKS08.INC".
       *
+           COPY    "CPSK1039.INC"  REPLACING //SYS-//
+                                   BY        //TMP-//.
       **************************************************************
       *    ファイルレイアウト
       **************************************************************
@@ -1320,10 +1324,39 @@
       *
            PERFORM 3101-COMBO-SYOKI-SET-SEC
       *
+           PERFORM 3111-S10-CHK-SEC
+      *
            MOVE    2               TO  SPA-GMN-CUR
       *
            .
        311-SPA-SET-EXT.
+           EXIT.
+      **************************************************************
+      *    再計算該当患者チェック処理
+      **************************************************************
+       3111-S10-CHK-SEC                SECTION.
+      *
+           MOVE    SPA-NAI-SYS1039TBL  TO TMP-1039-TBL
+      *
+           IF    ( TMP-1039-SAIKEISANSKYCHK
+                                           =   SPACE OR "1" )
+            AND  ( FLG-S10-CHK             =   ZERO )
+      *
+               MOVE    SPACE               TO  SPA-NAI-S10-CHK
+               IF    ( SPA-GMN-MODE        =  CONST-MODE-NORMON )
+                 AND ( SPA-NAI-SRYYM   NOT =   SPACE )
+                   PERFORM 900-SYUNOU-KEY86-SEL-SEC
+                   IF    ( FLG-SYUNOU      =   ZERO )
+                       MOVE    "1"         TO  SPA-NAI-S10-CHK
+                   END-IF
+               END-IF
+      *
+               MOVE    1               TO  FLG-S10-CHK
+      *
+           END-IF
+      *
+           .
+       3111-S10-CHK-EXT.
            EXIT.
       **************************************************************
       *    コンボボックス編集処理
@@ -1813,6 +1846,8 @@
            IF    ( WRK-ORG-SYORINO      =   SPACE )
                PERFORM 300-SYUMEI-HENSYU-SEC
            END-IF
+      *
+           PERFORM 3111-S10-CHK-SEC
       *
            .
        300-SYUNOU-HENSYU-EXT.
@@ -3073,8 +3108,13 @@
            ELSE
              IF    FLG-MISYORI    =      1
                  MOVE    "blue"   TO    S02-LBLMSG-STYLE
-                 MOVE    "☆　会計照会【収納更新】未処理分"
-                                  TO    S02-LBLMSG
+                 MOVE    SPACE    TO    S02-LBLMSG
+                 STRING  "☆　再計算を行ってください"
+                                        DELIMITED BY SIZE
+                         "（会計照会【収納更新】未処理）"
+                                        DELIMITED BY SIZE
+                 INTO    S02-LBLMSG
+                 END-STRING
              END-IF
            END-IF
       *
@@ -3378,10 +3418,15 @@
                MOVE    WIDGET-INSENSITIVE      TO  S02-B04S-STATE
            END-IF
       *
-           MOVE    WIDGET-INSENSITIVE          TO  S02-B12C-STATE
-           MOVE    "一括再計算該当"            TO  S02-B12C-LABEL
+           MOVE    WIDGET-INSENSITIVE      TO  S02-B12C-STATE
+           MOVE    "black"                 TO  S02-B12C-STYLE
+           MOVE    "再計算該当者一覧"      TO  S02-B12C-LABEL
+      *
            IF    ( SPA-GMN-MODE    =   CONST-MODE-NORMON )
-               MOVE    WIDGET-NORMAL           TO  S02-B12C-STATE
+               MOVE    WIDGET-NORMAL       TO  S02-B12C-STATE
+               IF    ( SPA-NAI-S10-CHK     =   "1" )
+                   MOVE    "blue"          TO  S02-B12C-STYLE
+               END-IF
            END-IF
       *
            PERFORM 5001-MAPCUR-SEC
@@ -3600,6 +3645,7 @@
                PERFORM 440-IKATUSAIKEI-CHK-SEC
       *    一括再計算該当
            WHEN    "CLICKED"       ALSO    "B12C"
+           WHEN    "CLICKED"       ALSO    "B12C_2"
                PERFORM 412-S10-SENI-SEC
            END-EVALUATE
            .
@@ -7852,6 +7898,9 @@
            MOVE    WRK-HENYMDG (1:6)   TO  SPA-GMN-SRYYM
            MOVE    WRK-SYMD    (1:6)   TO  SPA-NAI-SRYYM
       *
+           MOVE    ZERO                TO  FLG-S10-CHK
+           PERFORM 3111-S10-CHK-SEC
+      *
            MOVE    2                   TO  SPA-GMN-CUR
       *
            .
@@ -9045,6 +9094,37 @@
       *
            .
        900-SYUNOU-KEY61-FET-EXT.
+           EXIT.
+      **************************************************************
+      *    収納検索処理
+      **************************************************************
+       900-SYUNOU-KEY86-SEL-SEC          SECTION.
+      *
+           MOVE    ZERO            TO  FLG-SYUNOU
+      *
+           INITIALIZE                  SYUNOU-REC
+           MOVE    SPA-HOSPNUM     TO  SYU-HOSPNUM
+           MOVE    "2"             TO  SYU-NYUGAIKBN
+           MOVE    SPA-NAI-SRYYM (1:6)
+                                   TO  SYU-SRYYMD(1:6)
+           MOVE    "__"            TO  SYU-SRYYMD(7:)
+           MOVE    SYUNOU-REC      TO  MCPDATA-REC
+           MOVE    "tbl_syunou"    TO  MCP-TABLE
+           MOVE    "key86"         TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  SYUNOU-REC
+           ELSE
+               INITIALIZE              SYUNOU-REC
+               MOVE    1           TO  FLG-SYUNOU
+           END-IF
+      *
+           MOVE    "tbl_syunou"    TO  MCP-TABLE
+           MOVE    "key86"         TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SYUNOU-KEY86-SEL-EXT.
            EXIT.
       **************************************************************
       *    収納明細検索処理

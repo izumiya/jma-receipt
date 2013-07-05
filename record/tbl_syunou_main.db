@@ -1707,8 +1707,8 @@ path	key84 	{
 			AND   NYUGAIKBN   =   :NYUGAIKBN
 			AND   SRYYMD      LIKE :SRYYMD
 			AND   CREATEKBN   <>  '3'
-			AND   SECMONEY    <>  0
-			AND   SECMONEY    <>  9
+			AND ( SECMONEY  NOT IN (0,9)
+			 OR   ACCT_UPDKBN <>  '' )
 			ORDER   BY    PTID
 		;
 	};
@@ -1724,6 +1724,22 @@ path	key85 	{
 			AND   SRYYMD      LIKE :SRYYMD
 			AND   CREATEKBN   <>  '3'
 			ORDER   BY    SRYYMD,NYUGAIKBN,DENPNUM
+		;
+	};
+};
+
+path	key86 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key86_csr CURSOR FOR
+		SELECT * 
+		FROM tbl_syunou_main
+			WHERE HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   SRYYMD      LIKE :SRYYMD
+			AND   CREATEKBN   <>  '3'
+			AND ( SECMONEY  NOT IN (0,9)
+			 OR   ACCT_UPDKBN <>  '' )
+            LIMIT 1
 		;
 	};
 };

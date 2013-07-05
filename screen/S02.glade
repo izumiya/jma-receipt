@@ -1668,22 +1668,6 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>LBLMSG6</name>
-      <x>748</x>
-      <y>68</y>
-      <width>200</width>
-      <height>24</height>
-      <label>１２３４５６７８９０</label>
-      <justify>GTK_JUSTIFY_CENTER</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
       <name>LBLMSG2</name>
       <x>308</x>
       <y>68</y>
@@ -1816,7 +1800,7 @@
       <name>NYUGAIKBNCOMBO</name>
       <x>788</x>
       <y>36</y>
-      <width>108</width>
+      <width>100</width>
       <height>24</height>
       <value_in_list>False</value_in_list>
       <ok_if_empty>True</ok_if_empty>
@@ -1851,12 +1835,13 @@
 	<xim_enabled>False</xim_enabled>
       </widget>
     </widget>
+
     <widget>
       <class>GtkButton</class>
       <name>B12C</name>
-      <x>900</x>
+      <x>892</x>
       <y>36</y>
-      <width>116</width>
+      <width>120</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
@@ -1870,8 +1855,24 @@
 	<data>CLICKED</data>
 	<last_modification_time>Mon, 25 Dec 2000 06:46:00 GMT</last_modification_time>
       </signal>
-      <label>一括再計算該当</label>
+      <label>再計算該当者一覧</label>
       <relief>GTK_RELIEF_NORMAL</relief>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>LBLMSG6</name>
+      <x>748</x>
+      <y>68</y>
+      <width>200</width>
+      <height>24</height>
+      <label>１２３４５６７８９０</label>
+      <justify>GTK_JUSTIFY_CENTER</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
     </widget>
   </widget>
 </widget>

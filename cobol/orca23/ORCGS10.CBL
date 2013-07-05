@@ -313,11 +313,15 @@
                IF      SYU-SECMONEY    =   3
                    MOVE     1              TO  SPA-GMN-TSECMONEY(IDXL)
                END-IF
-               IF    ( SYU-SECMONEY    =   1 OR 3 )
+               EVALUATE    TRUE
+               WHEN  ( SYU-SECMONEY    =   1 OR 3 )
                    MOVE    "£·£°ºÐÌ¤Ëþ"    TO  SPA-GMN-TKBNMEI (IDXL)
-               ELSE
+               WHEN  ( SYU-SECMONEY    =   2 )
                    MOVE    "¹âÎð¼Ô"        TO  SPA-GMN-TKBNMEI (IDXL)
-               END-IF
+               WHEN  ( SYU-ACCT-UPDKBN NOT =   SPACE )
+                   MOVE    "¼ýÇ¼¹¹¿·Ì¤½èÍý"
+                                           TO  SPA-GMN-TKBNMEI (IDXL)
+               END-EVALUATE
       *
                PERFORM 900-SYUNOU-KEY84-FET-SEC
       *
@@ -736,6 +740,7 @@
       *
                    MOVE    1               TO  FLG-LOOP-END
                    IF    ( SYU-SECMONEY    =   1 OR 2 OR 3 )
+                     OR  ( SYU-ACCT-UPDKBN NOT = SPACE  )
                        CONTINUE
                    ELSE
                        MOVE    ZERO        TO  FLG-LOOP-END

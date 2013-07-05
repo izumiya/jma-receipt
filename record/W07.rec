@@ -706,6 +706,13 @@ W07	{
 					count	int;
 					item	varchar(22)[5];
 				};
+				SAIKEISANSKYCHK_COMBO{
+					SAIKEISANSKYCHK{
+						value	varchar(60);
+					};
+					count	int;
+					item	varchar(60)[5];
+				};
 				IKTSORTKBN_COMBO	{
 					IKTSORTKBN{
 						value	varchar(22);

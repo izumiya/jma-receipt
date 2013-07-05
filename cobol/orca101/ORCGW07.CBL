@@ -121,6 +121,7 @@
       *                                     リハビリ等表示区分追加
       *  04.07.00    NACL-多々納  12/01/26  入力スクロール等背景色追加
       *  04.07.00    NACL-多々納  12/05/08  確認画面処方名称区分追加
+      *  04.07.00    NACL-太田    12/07/04  再計算該当者チェック設定追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -862,6 +863,10 @@
                            11  SPA-GMN-S02SORTKBN          PIC X(01).
                            11  SPA-GMN-S02SORTKBN-F1       PIC X(01).
                            11  SPA-GMN-S02SORTKBNMEI       PIC X(20).
+                       09  SPA-GMN-SAIKEISANSKYCHK-G.
+                           11  SPA-GMN-SAIKEISANSKYCHK     PIC X(01).
+                           11  SPA-GMN-SAIKEISANSKYCHK-F1  PIC X(01).
+                           11  SPA-GMN-SAIKEISANSKYCHKMEI  PIC X(60).
                        09  SPA-GMN-IKTSORTKBN-G.
                            11  SPA-GMN-IKTSORTKBN          PIC X(01).
                            11  SPA-GMN-IKTSORTKBN-F1       PIC X(01).
@@ -996,6 +1001,14 @@
                                13  SPA-GMN-S02SORTKBNL     PIC X(01).
                                13  SPA-GMN-S02SORTKBN-F1L  PIC X(01).
                                13  SPA-GMN-S02SORTKBNMEIL  PIC X(20).
+                       09  SPA-GMN-SAIKEISANSKYCHKLST-G.
+                           11  SPA-GMN-SAIKEISANSKYCHK-MAX    PIC 9(03).
+                           11  SPA-GMN-SAIKEISANSKYCHKLST     OCCURS  5.
+                               13  SPA-GMN-SAIKEISANSKYCHKL   PIC X(01).
+                               13  SPA-GMN-SAIKEISANSKYCHK-F1L
+                                                              PIC X(01).
+                               13  SPA-GMN-SAIKEISANSKYCHKMEIL
+                                                              PIC X(60).
                        09  SPA-GMN-IKTSORTKBNLST-G.
                            11  SPA-GMN-IKTSORTKBN-MAX      PIC 9(03).
                            11  SPA-GMN-IKTSORTKBNLST       OCCURS  5.
@@ -2110,6 +2123,12 @@
            MOVE    "1 診療日順"
                                        TO  SPA-GMN-S02SORTKBNLST(2)
            MOVE    2                   TO  SPA-GMN-S02SORTKBN-MAX
+      *
+           MOVE "0 しない"
+                                       TO  SPA-GMN-SAIKEISANSKYCHKLST(1)
+           MOVE "1 する（存在する場合ボタンの文字色を変更する）"
+                                       TO  SPA-GMN-SAIKEISANSKYCHKLST(2)
+           MOVE    2                   TO  SPA-GMN-SAIKEISANSKYCHK-MAX
       *
            MOVE    "0 伝票番号順"
                                        TO  SPA-GMN-IKTSORTKBNLST(1)
@@ -3887,6 +3906,11 @@
                                        TO  SPA-GMN-S02SORTKBN
            PERFORM 3101-S02SORTKBN-SYOKI-SEC
       *
+      *    再計算該当者チェック
+           MOVE    SYS-1039-SAIKEISANSKYCHK
+                                       TO  SPA-GMN-SAIKEISANSKYCHK
+           PERFORM 3101-SAIKEISANSKYCHK-SYOKI-SEC
+      *
       *    一括計算順
            MOVE    SYS-1039-IKTSORTKBN
                                        TO  SPA-GMN-IKTSORTKBN
@@ -4341,6 +4365,31 @@
       *
            . 
        3101-S02SORTKBN-SYOKI-EXT.
+           EXIT.
+      *****************************************************************
+      *    再計算対象者チェック初期値設定処理
+      *****************************************************************
+       3101-SAIKEISANSKYCHK-SYOKI-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL   IDY         >   SPA-GMN-SAIKEISANSKYCHK-MAX
+               IF      SPA-GMN-SAIKEISANSKYCHK
+                                       =   SPA-GMN-SAIKEISANSKYCHKL(IDY)
+                   MOVE    SPA-GMN-SAIKEISANSKYCHKLST(IDY)
+                                       TO  SPA-GMN-SAIKEISANSKYCHK-G
+                   MOVE    1           TO  FLG-OK
+                   MOVE    SPA-GMN-SAIKEISANSKYCHK-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-SAIKEISANSKYCHKLST (2)
+                                       TO  SPA-GMN-SAIKEISANSKYCHK-G
+           END-IF
+      *
+           . 
+       3101-SAIKEISANSKYCHK-SYOKI-EXT.
            EXIT.
       *****************************************************************
       *    一括計算順初期値設定処理
@@ -5126,6 +5175,7 @@
            MOVE    W07-TUKISKYMISYUPRT TO  SPA-GMN-TUKISKYMISYUPRT-G
            MOVE    W07-TUKISUM         TO  SPA-GMN-TUKISUM-G
            MOVE    W07-S02SORTKBN      TO  SPA-GMN-S02SORTKBN-G
+           MOVE    W07-SAIKEISANSKYCHK TO  SPA-GMN-SAIKEISANSKYCHK-G
            MOVE    W07-IKTSORTKBN      TO  SPA-GMN-IKTSORTKBN-G
            MOVE    W07-IKTKEISANKBN      TO  SPA-GMN-IKTKEISANKBN-G
            MOVE    W07-SYUSTIME-HH     TO  SPA-GMN-SYUSTIME-HH
@@ -5581,6 +5631,10 @@
       *            請求一覧画面並び順区分チェック
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4110-S02SORTKBN-CHK-SEC
+                   END-IF
+      *            再計算該当者チェックチェック
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4110-SAIKEISANSKYCHK-CHK-SEC
                    END-IF
       *            一括計算順区分チェック
                    IF      SPA-ERRCD           =   SPACE
@@ -8244,6 +8298,29 @@
        4110-S02SORTKBN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    再計算該当者チェックチェック
+      *****************************************************************
+       4110-SAIKEISANSKYCHK-CHK-SEC      SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-SAIKEISANSKYCHK-MAX
+               IF      SPA-GMN-SAIKEISANSKYCHK
+                                       =   SPA-GMN-SAIKEISANSKYCHKL(IDX)
+                   MOVE    SPA-GMN-SAIKEISANSKYCHKLST(IDX)
+                                          TO  SPA-GMN-SAIKEISANSKYCHK-G
+                   MOVE    1              TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    SPA-GMN-SAIKEISANSKYCHKLST(2)
+                                          TO  SPA-GMN-SAIKEISANSKYCHK-G
+           END-IF
+      *
+           .
+       4110-SAIKEISANSKYCHK-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    一括計算順区分チェック
       *****************************************************************
        4110-IKTSORTKBN-CHK-SEC      SECTION.
@@ -9938,6 +10015,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-TUKISUM         TO SYS-1039-TUKISUMKBN
            MOVE    SPA-GMN-S02SORTKBN
                                        TO SYS-1039-S02SORTKBN
+           MOVE    SPA-GMN-SAIKEISANSKYCHK
+                                       TO SYS-1039-SAIKEISANSKYCHK
            MOVE    SPA-GMN-IKTSORTKBN
                                        TO SYS-1039-IKTSORTKBN
            MOVE    SPA-GMN-IKTKEISANKBN
@@ -11058,6 +11137,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-S02SORTKBN-MAX
                                        TO  W07-S02SORTKBN-COUNT
+      *
+      *    再計算該当者チェック
+           MOVE    SPA-GMN-SAIKEISANSKYCHK-G TO  W07-SAIKEISANSKYCHK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN-SAIKEISANSKYCHK-MAX
+               MOVE    SPA-GMN-SAIKEISANSKYCHKLST (IDX)
+                                       TO  W07-SAIKEISANSKYCHK-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-SAIKEISANSKYCHK-MAX
+                                       TO  W07-SAIKEISANSKYCHK-COUNT
       *
       *    一括計算順区分
            MOVE    SPA-GMN-IKTSORTKBN-G TO  W07-IKTSORTKBN
@@ -12307,6 +12396,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "TUKISUM"         TO   MCP-WIDGET
                WHEN    432
                    MOVE  "MISYUKIKANKBN"  TO   MCP-WIDGET
+               WHEN    433
+                   MOVE  "SAIKEISANSKYCHK" TO   MCP-WIDGET
       *病名・コメント情報
                WHEN    500
                    MOVE  "MSG1_DSPKBN"     TO   MCP-WIDGET
@@ -12645,6 +12736,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "TUKISUM"
                    MOVE    426             TO  SPA-GMN-CUR
                WHEN    "S02SORTKBN"
+                   MOVE    433             TO  SPA-GMN-CUR
+               WHEN    "SAIKEISANSKYCHK"
                    MOVE    427             TO  SPA-GMN-CUR
                WHEN    "IKTSORTKBN"
                    MOVE    428             TO  SPA-GMN-CUR

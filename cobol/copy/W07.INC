@@ -544,6 +544,10 @@
                       07  W07-VALUE   PIC X(22).
                     06  W07-S02SORTKBN-COUNT   PIC S9(9)   BINARY.
                     06  W07-S02SORTKBN-ITEM    PIC X(22)   OCCURS  5.
+                  05  W07-SAIKEISANSKYCHK-COMBO.
+                    06  W07-SAIKEISANSKYCHK       PIC X(60).
+                    06  W07-SAIKEISANSKYCHK-COUNT PIC S9(9) BINARY.
+                    06  W07-SAIKEISANSKYCHK-ITEM  PIC X(60) OCCURS  5.
                   05  W07-IKTSORTKBN-COMBO.
                     06  W07-IKTSORTKBN.
                       07  W07-VALUE   PIC X(22).

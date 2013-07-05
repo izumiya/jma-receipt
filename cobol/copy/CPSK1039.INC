@@ -112,8 +112,10 @@
                05  SYS-1039-TUKISUMKBN          PIC X(01).
       *請求書未収金集計期間区分（入院）
                05  SYS-1039-MISYUKIKANKBN       PIC X(01).
+      *再計算該当者チェック
+               05  SYS-1039-SAIKEISANSKYCHK     PIC X(01).
       *予備
-               05  SYS-1039-YOBI                PIC  X(424).
+               05  SYS-1039-YOBI                PIC  X(423).
       *端末ＩＤ
            03  SYS-1039-TERMID          PIC  X(16).
       *オペーレータＩＤ

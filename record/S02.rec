@@ -26,6 +26,7 @@ S02	{
 		};
 		B12C	{
 			state	int;
+			style	varchar(20);
 			label	varchar(20);
 		};
 		LBLMSG	{
