@@ -631,13 +631,23 @@
            05 PIC  X(30)   VALUE   "定曜日入退院減算（外泊）の入力".
            05 PIC  X(30)   VALUE   "に誤りがあります              ".
       *
+           05 PIC  X(06)   VALUE   "990028".
+           05 PIC  X(30)   VALUE   "労災基準監督署コードが未設定で".
+           05 PIC  X(30)   VALUE   "す                            ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *
+           05 PIC  X(06)   VALUE   "990029".
+           05 PIC  X(30)   VALUE   "存在しない労災基準監督署コード".
+           05 PIC  X(30)   VALUE   "が設定されています            ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *
            05 PIC  X(06)   VALUE   "A10001".
            05 PIC  X(30)   VALUE   "チェックマスタ「薬剤と病名」に".
            05 PIC  X(30)   VALUE   "登録がありません              ".
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  114.
+           05 ERRMES-OCC   OCCURS  116.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(90).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   114.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   116.

@@ -262,6 +262,8 @@
            03  FLG-NYUINACCT                           PIC 9(01).
            03  FLG-MONTHLYNUM                          PIC 9(01).
            03  FLG-PTCOM                               PIC 9(01).
+           03  FLG-PTRSIINF                            PIC 9(01).
+           03  FLG-LABOR-SIO                           PIC 9(01).
            03  FLG-DTCHK003                            PIC 9(01).
            03  FLG-DTCHK008                            PIC 9(01).
            03  FLG-DTCHK009                            PIC 9(01).
@@ -1004,6 +1006,14 @@
       *    患者保険情報
        01  PTHKNINF-REC.
            COPY    "CPPTHKNINF.INC".
+      *
+      *    患者労災保険情報
+       01  PTRSIINF-REC.
+           COPY    "CPPTRSIINF.INC".
+      *
+      *    労働基準監督署コード
+       01  LABOR-SIO-REC.
+           COPY    "CPLABOR-SIO.INC".
       *
       *    患者公費情報
        01  PTKOHINF-REC.
@@ -2797,8 +2807,7 @@
       *****************************************************************
        200111-THKNID-HEN-CHK-SEC       SECTION.
       *
-           IF    ( FLG-RSI-JBI         =   ZERO )
-             AND ( FLG-JIHI            =   ZERO )
+           IF    ( FLG-JIHI            =   ZERO )
                IF    ( COMB-HKNID  NOT =   ZERO )
                    IF    ( CONST-THKNID-MAX    >   THKNID-MAX )
                        PERFORM 200111-THKNID-HEN-SEC
@@ -2829,20 +2838,26 @@
                IF    ( CONST-THKNID-MAX    >   THKNID-MAX )
                    COMPUTE THKNID-MAX  =   THKNID-MAX  +   1
                    MOVE    COMB-HKNID  TO  THKNID-HKNID (THKNID-MAX)
-                   MOVE    COMB-HKNID  TO  WRK-HKNID
-                   PERFORM 900-PTHKNINF-KEY-SEL-SEC
-                   MOVE    PTHKN-HKNNUM
-                                       TO  THKNID-HKNNUM(THKNID-MAX)
-                   MOVE    PTHKN-HOJOKBN
+                   MOVE    COMB-HKNNUM TO  THKNID-HKNNUM(THKNID-MAX)
+      *
+                   IF    ( FLG-RSI-JBI =   1 )
+                       CONTINUE
+                   ELSE
+                       MOVE    COMB-HKNID  TO  WRK-HKNID
+                       PERFORM 900-PTHKNINF-KEY-SEL-SEC
+                       MOVE    PTHKN-HOJOKBN
                                        TO  THKNID-HOJOKBN
                                                         (THKNID-MAX)
-                   MOVE    PTHKN-TEKSTYMD
+                       MOVE    PTHKN-TEKSTYMD
                                        TO  THKNID-TEKSTYMD
                                                         (THKNID-MAX)
-                   MOVE    PTHKN-KAKUNINYMD
+                       MOVE    PTHKN-KAKUNINYMD
                                        TO  THKNID-KAKUNINYMD
                                                         (THKNID-MAX)
+                   END-IF
+      *
                    MOVE    THKNID-MAX  TO  THKNID-IDX
+      *
                END-IF
            ELSE
                    MOVE    IDX0        TO  THKNID-IDX
@@ -4326,12 +4341,8 @@
       *****************************************************************
        200111-DATA-CHK-SEC              SECTION.
       *
-      *
       *    患者保険情報チェック処理
-           IF    ( ORCBSD01-CHKKBN (1) NOT =   ZERO  )
-            OR   ( ORCBSD01-CHKKBN (2) NOT =   ZERO  )
-               PERFORM 200111-PTHKNINF-CHK-SEC
-           END-IF
+           PERFORM 200111-PTHKNINF-CHK-SEC
       *
       *    患者公費情報チェック処理
            IF    ( ORCBSD01-CHKKBN (3) NOT =   ZERO  )
@@ -4511,30 +4522,66 @@
            PERFORM VARYING IDX4    FROM    1   BY  1
                    UNTIL ( IDX4    >   THKNID-MAX )
       *
-      *        患者保険情報検索処理
-               MOVE    THKNID-HKNID (IDX4)
+               IF    ( THKNID-HKNNUM (IDX4)
+                                   =   "971" OR "973" )
+                   MOVE    THKNID-HKNID (IDX4)
                                        TO  WRK-HKNID
-               PERFORM 900-PTHKNINF-KEY-SEL-SEC
+                   PERFORM 900-PTRSIINF-KEY-SEL-SEC
       *
-      *        保険者番号抜けチェック
-               IF    ( FLG-CHKEND (1)          =   ZERO )
-                   PERFORM 200111-HKNNUM-CHK-SEC
-               END-IF
+      *            労災・自賠責保険情報チェック
+                   PERFORM 200111-PTRSIINF-CHK-SEC
       *
-      *        被保険者記号・番号抜け
-               IF    ( FLG-CHKEND (2)          =   ZERO )
-                   PERFORM 200111-KIGONUM-CHK-SEC
-               END-IF
+               ELSE
+      *            患者保険情報検索処理
+                   MOVE    THKNID-HKNID (IDX4)
+                                       TO  WRK-HKNID
+                   PERFORM 900-PTHKNINF-KEY-SEL-SEC
       *
-               IF    ( FLG-CHKEND (1)  =   1 )
-                AND  ( FLG-CHKEND (2)  =   1 )
-                   MOVE    THKNID-MAX  TO  IDX4
+      *            保険者番号抜けチェック
+                   IF    ( FLG-CHKEND (1)          =   ZERO )
+                       PERFORM 200111-HKNNUM-CHK-SEC
+                   END-IF
+      *
+      *            被保険者記号・番号抜け
+                   IF    ( FLG-CHKEND (2)          =   ZERO )
+                       PERFORM 200111-KIGONUM-CHK-SEC
+                   END-IF
+      *
                END-IF
       *
            END-PERFORM
       *
            .
        200111-PTHKNINF-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者労災・自賠責保険情報チェック
+      *****************************************************************
+       200111-PTRSIINF-CHK-SEC         SECTION.
+      *
+           IF    ( PTRSI-HKNKBN            =   "1" OR "2" )
+            AND  ( PTRSI-RYOSTYMD (1:6)    =   ORCBSD01-SRYYM )
+               IF    ( PTRSI-SYOCD         =   SPACE )
+                   MOVE    PTRSI-HKNNUM    TO  SRH-HKNNUM
+                   MOVE    "990028"        TO  WRK-ERRCD
+                   INITIALIZE              TERRINF-AREA
+                   PERFORM 211-ERRMES-HEN-SEC
+               ELSE
+                   PERFORM 900-LABOR-SIO-KEY-SEL-SEC
+                   IF    ( FLG-LABOR-SIO   NOT =   ZERO )
+                       MOVE    PTRSI-HKNNUM    TO  SRH-HKNNUM
+                       MOVE    PTRSI-SYOCD     TO  WRK-MAE-INPUT
+                       PERFORM 800-ZENKAKU-HEN-SEC
+                       MOVE    WRK-OUT-INPUT   TO  WRK-ERRMES-PLUS
+                       MOVE    "990029"        TO  WRK-ERRCD
+                       INITIALIZE              TERRINF-AREA
+                       PERFORM 216-ERRMES-HEN-SEC
+                   END-IF
+               END-IF
+           END-IF
+      *
+           .
+       200111-PTRSIINF-CHK-EXT.
            EXIT.
       *****************************************************************
       *    保険者番号抜けチェック
@@ -14293,6 +14340,62 @@
            .
       *
        900-PTHKNINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者労災保険情報検索処理
+      *****************************************************************
+       900-PTRSIINF-KEY-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTRSIINF
+     *
+           INITIALIZE                      PTRSIINF-REC
+           MOVE    DTCHK003-HOSPNUM    TO  PTRSI-HOSPNUM
+           MOVE    DTCHK003-PTID       TO  PTRSI-PTID
+           MOVE    WRK-HKNID           TO  PTRSI-HKNID
+           MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTRSIINF-REC
+           ELSE
+               MOVE    1               TO  FLG-PTRSIINF
+           END-IF
+     *
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTRSIINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    労災基準監督署コード検索処理
+      *****************************************************************
+       900-LABOR-SIO-KEY-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-LABOR-SIO
+      *
+           INITIALIZE                      LABOR-SIO-REC
+           MOVE    PTRSI-SYOCD         TO  LABOR-SIO-SYOCD
+           MOVE    WRK-KJNYMD          TO  LABOR-SIO-YUKOSTYMD
+                                           LABOR-SIO-YUKOEDYMD
+           MOVE    LABOR-SIO-REC       TO  MCPDATA-REC
+           MOVE    "tbl_labor_sio"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  LABOR-SIO-REC
+           ELSE
+               MOVE    1               TO  FLG-LABOR-SIO
+           END-IF
+     *
+           MOVE    "tbl_labor_sio" TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-LABOR-SIO-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    患者公費情報検索処理
