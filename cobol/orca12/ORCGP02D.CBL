@@ -2510,6 +2510,11 @@
                        MOVE    1                   TO  SPA-NAI2D-KEIFLG2
                        MOVE    "K049"              TO  SPA-ERRCD
                        MOVE    30                  TO  SPA-GMN2D-CUR
+      *H25.7
+      *                職業安定所判定
+                       IF      SPA-GMN2D-SYOCD(3:1)    =   "3"
+                            MOVE    "K052"              TO  SPA-ERRCD
+                       END-IF
                    END-IF
                END-IF
            END-IF
@@ -3381,6 +3386,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "K050"
                    STRING  "警告！！"
                            "労働基準監督署コードが未入力です。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+      *H25.7 
+               WHEN    "K052"
+                   STRING  "警告！！"
+                           "労働基準監督署コードで入力して下さい。"
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING
