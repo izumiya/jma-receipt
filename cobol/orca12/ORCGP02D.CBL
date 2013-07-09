@@ -3392,7 +3392,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *H25.7 
                WHEN    "K052"
                    STRING  "警告！！"
-                           "労働基準監督署コードで入力して下さい。"
+                           "労働基準監督署コードで再入力して下さい。"
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING
