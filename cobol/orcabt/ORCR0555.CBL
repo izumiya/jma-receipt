@@ -1756,6 +1756,8 @@
                            MOVE    "¡¼"            TO  WRK-DATA (IDY:2)
                            ADD     2               TO  IDY    
                        WHEN    "¡¡"
+      *                    A1 BC
+                       WHEN    "¡¼"
                            MOVE    RECE41-KANANAME (IDX:2)
                                                    TO  WRK-DATA (IDY:2)
                            ADD     2               TO  IDY    
