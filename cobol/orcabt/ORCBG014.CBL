@@ -46,6 +46,7 @@
       *  04.07.00    NACL-øπœ∆     12/02/07  ø∑•‚•Û•⁄°¢£∞≈¿∏¯»Òµ≠∫‹¬–±˛
       *  04.07.01    NACL-øπœ∆     12/03/30  ∑Ú ›¡»πÁ§ÿ§Œƒæ¿‹¿¡µ·§»ø≥∫∫
       *                                      ªŸ ßµ°¥ÿ¿¡µ·¬–±˛
+      *  04.07.02    NACL-øπœ∆     13/06/14  ∫ﬂ¡Ìø«∂Ë ¨ ¨Œ‡§ §∑ƒ…≤√   
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -222,7 +223,7 @@
       *        HKNJANUM     ›∏±º‘»÷πÊ  πÒ ›§»π≠∞Ëœ¢πÁ§Œª˛§¿§±ª»Õ—
       *        SYOKBN      ΩËÕ˝∂Ë ¨    0:¡¥…Ù°¢1:ƒÃæÔ ¨°¢2: ÷Ã· ¨°¢3:∑Ó√Ÿ§Ï ¨°¢4:¿¡µ·§∑§ §§
       *        NYUGAIKBN   ∆˛≥∞∂Ë ¨    O:¡¥…Ù°¢1:∆˛±° ¨°¢2:≥∞ÕË ¨
-      *        ZAIKBN      ∫ﬂ¡Ìø«∂Ë ¨  0:¡¥…Ù°¢1:§Ω§Œ¬æ§Œ•Ï•ª°¢2:∫ﬂ¡Ìø«§ﬁ§ø§œ∫ﬂ∞Â¡Ì§ÚªªƒÍ§∑§ø•Ï•ª
+      *        ZAIKBN      ∫ﬂ¡Ìø«∂Ë ¨  0:¡¥…Ù°¢1:§Ω§Œ¬æ§Œ•Ï•ª°¢2:∫ﬂ¡Ìø«§ﬁ§ø§œ∫ﬂ∞Â¡Ì§ÚªªƒÍ§∑§ø•Ï•ª°¢3: ¨Œ‡§ §∑
       *        SYUBETUKBN  ºÔ Ã∂Ë ¨
       *                    º“ ›  ∞Â ›  1:£∑£∞∫–∞ æÂ∞Ï»Ã°¶ƒ„ΩÍ∆¿°¢2:£∑£∞∫–∞ æÂ£∑≥‰°¢3:À‹øÕ°¢4:≤»¬≤°¢5:£∂∫–
       *                          ∏¯»Ò  8:∏¯»Ò§»∏¯»Ò§Œ ªÕ—°¢9:∏¯»Ò√±∆»
@@ -5320,18 +5321,25 @@
                COMPUTE WRK-SRYYMFLG    =   WRK-HENSYY * 12
                                        +   WRK-HENSMM
            END-IF
+      *----(04.07.02)--UPD-START---------------
       *    ∫ﬂ¡Ìø«•¡•ß•√•Ø
-           IF          RECE10-ZAITAKU      =   "1"
-               IF      WRK-PARA-ZAIKBN     =   "1"
-                   GO  TO  900-SEIKYU-CHEK-EXT
-               END-IF
-               MOVE    "2"             TO  WRK-ZAIKBN
-           ELSE
-               IF      WRK-PARA-ZAIKBN     =   "2"
-                   GO  TO  900-SEIKYU-CHEK-EXT
-               END-IF
+           IF    ( WRK-PARA-ZAIKBN     =   "3" )   AND
+                 ( RECE10-SRYYM        >=  "201204" )
                MOVE    "1"             TO  WRK-ZAIKBN
+           ELSE
+               IF          RECE10-ZAITAKU      =   "1"
+                   IF      WRK-PARA-ZAIKBN     =   "1"
+                       GO  TO  900-SEIKYU-CHEK-EXT
+                   END-IF
+                   MOVE    "2"             TO  WRK-ZAIKBN
+               ELSE
+                   IF      WRK-PARA-ZAIKBN     =   "2"
+                       GO  TO  900-SEIKYU-CHEK-EXT
+                   END-IF
+                   MOVE    "1"             TO  WRK-ZAIKBN
+               END-IF
            END-IF
+      *----(04.07.02)--UPD-END-----------------
       *
            IF      WRK-PATH-PATHNAME   =   "key5"
       *        ¿¡µ·∂Ë ¨•¡•ß•√•Ø° ¿¡µ·§∑§ §§ ¨°À
