@@ -29,6 +29,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.00    NACL-多々納  13/07/10  算定日記録なし対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1657,6 +1658,12 @@
            END-IF
       *    診療会計テーブル
            PERFORM 200911-SRYACCT-INIT-SEC
+      *    算定日なしは対象外
+           IF      ACCT-ZAIKAISU       =   ZERO
+               COMPUTE WRK-ZAINUM      =   WRK-ZAINUM  -   1
+               GO      TO      20091-MEISAI-HEN-EXT
+           END-IF
+      *
       *    診療行為テーブル
            PERFORM 200912-SRYACT-SYORI-SEC
       *    診療会計テーブル
