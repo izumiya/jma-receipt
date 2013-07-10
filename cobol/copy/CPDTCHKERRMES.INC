@@ -632,12 +632,12 @@
            05 PIC  X(30)   VALUE   "に誤りがあります              ".
       *
            05 PIC  X(06)   VALUE   "990028".
-           05 PIC  X(30)   VALUE   "労災基準監督署コードが未設定で".
+           05 PIC  X(30)   VALUE   "労働基準監督署コードが未設定で".
            05 PIC  X(30)   VALUE   "す                            ".
            05 PIC  X(30)   VALUE   "                              ".
       *
            05 PIC  X(06)   VALUE   "990029".
-           05 PIC  X(30)   VALUE   "存在しない労災基準監督署コード".
+           05 PIC  X(30)   VALUE   "存在しない労働基準監督署コード".
            05 PIC  X(30)   VALUE   "が設定されています            ".
            05 PIC  X(30)   VALUE   "                              ".
       *
