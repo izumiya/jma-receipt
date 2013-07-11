@@ -557,6 +557,9 @@
            03  WRK-IPNMEI              PIC 9(01).
            03  IDG-Z                   PIC 9(04).
            03  IDG-X                   PIC 9(04).
+      *ver.4.7
+      *    レセプトプレビュー業務区分
+           03  WRK-GYOUMUKBN           PIC X(01).
       *
       *    集計収納請求内容
        01  WRK-SUM-AREA.
@@ -5358,6 +5361,9 @@
            END-IF
       *    レセプトプレビュー区分
            MOVE    SPA-NAI-RESPRVFLG   TO  WRK-PRV-KBN
+      *ver.4.7
+      *    業務区分追加
+           MOVE    "3"                 TO  WRK-GYOUMUKBN
            IF      FLG-PRVSYORI        =   1
       *        レセプトプレビュー
                CALL    "ORCSRECEARGMK"     USING
@@ -5368,6 +5374,7 @@
                                        WRK-PRV-HKNKBN
                                        WRK-PRV-RSI-HKNKBN
                                        WRK-PRV-KBN
+                                       WRK-GYOUMUKBN
                                        SPA-AREA
            ELSE
       *        リアルタイムデータチェック
