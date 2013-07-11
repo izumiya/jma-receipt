@@ -975,6 +975,10 @@
            COPY    "CPDTCHK001.INC"
                                    REPLACING  //DTCHK001//
                                    BY         //WKDTCHK003//.
+       01  TPTRSIINF-REC.
+           COPY    "CPPTRSIINF.INC"
+                                   REPLACING  //PTRSI//
+                                   BY         //TPTRSI//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -4527,6 +4531,26 @@
                    MOVE    THKNID-HKNID (IDX4)
                                        TO  WRK-HKNID
                    PERFORM 900-PTRSIINF-KEY-SEL-SEC
+                   IF    ( PTRSI-SYOCD     =   SPACE )
+                       EVALUATE    PTRSI-HKNKBN
+                       WHEN    "1"
+                           MOVE  PTRSI-KOFUNUM(1:5)
+                                       TO  PTRSI-SYOCD
+                       WHEN    "2"
+                           MOVE    PTRSIINF-REC    TO  TPTRSIINF-REC
+                           PERFORM 900-PTRSIINF-KEY4-SEL-SEC
+                           IF    ( FLG-PTRSIINF    =   ZERO )
+                               IF    ( PTRSI-SYOCD     =   SPACE )
+                                   MOVE  PTRSI-KOFUNUM(1:5)
+                                       TO  TPTRSI-SYOCD
+                               ELSE
+                                   MOVE    PTRSI-SYOCD
+                                       TO  TPTRSI-SYOCD
+                               END-IF
+                           END-IF
+                           MOVE    TPTRSIINF-REC   TO  PTRSIINF-REC
+                       END-EVALUATE
+                   END-IF
       *
       *            労災・自賠責保険情報チェック
                    PERFORM 200111-PTRSIINF-CHK-SEC
@@ -14359,6 +14383,7 @@
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  PTRSIINF-REC
            ELSE
+               INITIALIZE                  PTRSIINF-REC
                MOVE    1               TO  FLG-PTRSIINF
            END-IF
      *
@@ -14368,6 +14393,32 @@
       *
            .
        900-PTRSIINF-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者労災保険情報検索処理
+      *****************************************************************
+       900-PTRSIINF-KEY4-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTRSIINF
+     *
+           MOVE    "1"                 TO  PTRSI-HKNKBN
+           MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTRSIINF-REC
+           ELSE
+               INITIALIZE                  PTRSIINF-REC
+               MOVE    1               TO  FLG-PTRSIINF
+           END-IF
+     *
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key4"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-PTRSIINF-KEY4-SEL-EXT.
            EXIT.
       *****************************************************************
       *    労災基準監督署コード検索処理
