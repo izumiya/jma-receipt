@@ -417,7 +417,11 @@
            03  WRK-PARA-STRYMD     PIC X(08).
            03  WRK-PARA-ENDYMD     PIC X(08).
            03  WRK-PARA-KIKANFLG   PIC X(01).
-           03  WRK-PARA-NYUGAIKBN  PIC X(01).
+           03  WRK-PARA-NYUGAIKBN-G.
+               05  WRK-PARA-NYUGAIKBN
+                                   PIC X(01).
+               05  WRK-PARA-HOKATSUKBN
+                                   PIC X(01).
            03  WRK-PARA-SRYKA      PIC X(02).
            03  WRK-PARA-SRYKBN     PIC X(02)
                                    OCCURS  7.
@@ -505,6 +509,12 @@
                CONTINUE
            ELSE
                MOVE    "2"             TO  WRK-PARA-NYUGAIKBN
+           END-IF
+      *
+           IF    ( WRK-PARA-HOKATSUKBN =   "1" )
+               CONTINUE
+           ELSE
+               MOVE    SPACE           TO  WRK-PARA-HOKATSUKBN
            END-IF
       *
       *    対象年月編集
@@ -792,6 +802,13 @@
            IF    ( ACCT-ZAIKBN     =   1 ) OR
                  ( ACCT-ZAIKBN     =   2 )
                GO  TO  20011-IN01-HEN-EXT
+           END-IF
+      *
+           IF    ( WRK-PARA-HOKATSUKBN   = "1" )
+               IF  ( ACCT-JIHOKBN        = "1"
+                OR   ACCT-HKNCOMBI       = 9999 )
+                   GO  TO  20011-IN01-HEN-EXT
+               END-IF
            END-IF
       *
            MOVE    SRY-PTID            TO  WRK-PTID
@@ -1249,6 +1266,11 @@
                MOVE    "（入院）"      TO  HCG017-NYUGAIKBN
            ELSE
                MOVE    "（外来）"      TO  HCG017-NYUGAIKBN
+           END-IF
+      *
+           IF    ( WRK-PARA-HOKATSUKBN =   "1" )
+               MOVE    "（包括分を含まない）"
+                                       TO  HCG017-HOKATSUKBN
            END-IF
       *
            COMPUTE CNT-PAGE        =   CNT-PAGE        +   1

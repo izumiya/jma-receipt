@@ -49,7 +49,11 @@
            03  WRK-PARA-STRYMD     PIC X(08).
            03  WRK-PARA-ENDYMD     PIC X(08).
            03  WRK-PARA-KIKANFLG   PIC X(01).
-           03  WRK-PARA-NYUGAIKBN  PIC X(01).
+           03  WRK-PARA-NYUGAIKBN-G.
+               05  WRK-PARA-NYUGAIKBN
+                                   PIC X(01).
+               05  WRK-PARA-HOKATSUKBN
+                                   PIC X(01).
            03  WRK-PARA-SRYKA      PIC X(02).
            03  WRK-PARA-SRYKBN     PIC X(02)
                                    OCCURS  7.
@@ -103,7 +107,7 @@
                                                WRK-PARA-HOSPNUM
                                                RECEERR
                                                WRK-PARA-STRYM
-                                               WRK-PARA-NYUGAIKBN
+                                               WRK-PARA-NYUGAIKBN-G
                                                WRK-PARA-SRYKA
                                                WRK-PARA-SRYKBN (1)
                                                WRK-PARA-SRYKBN (2)

@@ -150,7 +150,11 @@
            03  WRK-PARA-HOSPNUM    PIC 9(02).
            03  RECEERR             PIC X(100).
            03  WRK-PARA-SRYYM      PIC X(06).
-           03  WRK-PARA-NYUGAIKBN  PIC X(01).
+           03  WRK-PARA-NYUGAIKBN-G.
+               05  WRK-PARA-NYUGAIKBN
+                                   PIC X(01).
+               05  WRK-PARA-HOKATSUKBN
+                                   PIC X(01).
            03  WRK-PARA-SRYKA      PIC X(02).
            03  WRK-PARA-SYORIKBN   PIC X(01).
            03  WRK-PARA-SRYCD      PIC X(20)
@@ -429,7 +433,7 @@ grpsys*DD                                      WRK-PARA-HOSPID
 grpsys                                         WRK-PARA-HOSPNUM
 grpsys                                         RECEERR
                                                WRK-PARA-SRYYM
-                                               WRK-PARA-NYUGAIKBN
+                                               WRK-PARA-NYUGAIKBN-G
                                                WRK-PARA-SRYKA
                                                WRK-PARA-SYORIKBN
                                                WRK-PARA-SRYCD (1)
@@ -495,13 +499,13 @@ grpsys     MOVE    SPA-HOSPNUM     TO  BG0162-HOSPNUM
       *
           MOVE    SPACE                TO  WRK-KANACHK-INPUT
           MOVE    1                    TO  WRK-KANACHK-MAX
-          STRING  WRK-PARA-NYUGAIKBN   DELIMITED   BY  SIZE
+          STRING  WRK-PARA-NYUGAIKBN-G DELIMITED   BY  SIZE
           INTO    WRK-KANACHK-INPUT
           WITH    POINTER WRK-KANACHK-MAX
           END-STRING
           COMPUTE WRK-KANACHK-MAX      =   WRK-KANACHK-MAX -   1
           PERFORM 800-HANKAKU-CHK-SEC
-          MOVE    WRK-KANACHK-INPUT    TO  WRK-PARA-NYUGAIKBN
+          MOVE    WRK-KANACHK-INPUT    TO  WRK-PARA-NYUGAIKBN-G
       *
           MOVE    SPACE                TO  WRK-KANACHK-INPUT
           MOVE    1                    TO  WRK-KANACHK-MAX
@@ -536,6 +540,12 @@ grpsys     MOVE    SPA-HOSPNUM     TO  BG0162-HOSPNUM
                CONTINUE
            ELSE
                MOVE    "2"             TO  WRK-PARA-NYUGAIKBN
+           END-IF
+      *
+           IF    ( WRK-PARA-HOKATSUKBN =   "1" )
+               CONTINUE
+           ELSE
+               MOVE    SPACE           TO  WRK-PARA-HOKATSUKBN
            END-IF
       *
       *    対象年月日編集
@@ -806,6 +816,13 @@ grpsys     MOVE    SPA-HOSPNUM     TO  BG0162-HOSPNUM
            IF    ( ACCT-ZAIKBN     =   1 ) OR
                  ( ACCT-ZAIKBN     =   2 )
                GO  TO  20011-IN01-HEN-EXT
+           END-IF
+      *
+           IF    ( WRK-PARA-HOKATSUKBN   = "1" )
+               IF  ( ACCT-JIHOKBN        = "1"
+                OR   ACCT-HKNCOMBI       = 9999 )
+                   GO  TO  20011-IN01-HEN-EXT
+               END-IF
            END-IF
       *
            MOVE    SRY-PTID            TO  WRK-PTID
@@ -1117,6 +1134,11 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                MOVE    "（入院）"      TO  HCG016-NYUGAIKBN
            ELSE
                MOVE    "（外来）"      TO  HCG016-NYUGAIKBN
+           END-IF
+      *
+           IF    ( WRK-PARA-HOKATSUKBN =   "1" )
+               MOVE    "（包括分を含まない）"
+                                       TO  HCG016-HOKATSUKBN
            END-IF
       *
            COMPUTE CNT-PAGE        =   CNT-PAGE        +   1

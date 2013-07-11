@@ -478,19 +478,11 @@ Q01	{
 				};
 			};
 			fixed18	{
-				CMB_UTAGAIKBN	{
-					UTAGAIKBN	{
-						value	varchar(20);
-					};
-					count	int;
-					item	varchar(20)[3];
+				STBYOYMD	{
+					value	varchar(10);
 				};
-				CMB_KYUSEIKBN	{
-					KYUSEIKBN	{
-						value	varchar(20);
-					};
-					count	int;
-					item	varchar(20)[3];
+				EDBYOYMD	{
+					value	varchar(10);
 				};
 				CMB_TENKIKBN	{
 					TENKIKBN	{
@@ -506,6 +498,20 @@ Q01	{
 				EDTENKIYMD	{
 					value	varchar(10);
 					state	int;
+				};
+				CMB_UTAGAIKBN	{
+					UTAGAIKBN	{
+						value	varchar(20);
+					};
+					count	int;
+					item	varchar(20)[3];
+				};
+				CMB_KYUSEIKBN	{
+					KYUSEIKBN	{
+						value	varchar(20);
+					};
+					count	int;
+					item	varchar(20)[3];
 				};
 				CMB_SYUBYOKBN	{
 					SYUBYOKBN	{
@@ -629,6 +635,13 @@ Q01	{
 					count	int;
 					item	varchar(23)[10];
 					state	int;
+				};
+				CMB_HOKATSUKBN	{
+					HOKATSUKBN	{
+						value	varchar(22);
+					};
+					count	int;
+					item	varchar(22)[5];
 				};
 				SRYACTSEL	{
 					value	varchar(80);

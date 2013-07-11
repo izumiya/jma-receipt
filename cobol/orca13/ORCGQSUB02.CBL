@@ -87,6 +87,8 @@
            03  WRK-EDBIRTHDAY                      PIC X(08).
            03  WRK-STLASTYMD                       PIC X(08).
            03  WRK-EDLASTYMD                       PIC X(08).
+           03  WRK-STBYOYMD                        PIC X(08).
+           03  WRK-EDBYOYMD                        PIC X(08).
            03  WRK-STTENKIYMD                      PIC X(08).
            03  WRK-EDTENKIYMD                      PIC X(08).
            03  WRK-STTSYYMD                        PIC X(08).
@@ -446,6 +448,20 @@
            ELSE
                MOVE    SPA-Q01-EDLASTYMD
                                    TO  WRK-EDLASTYMD
+           END-IF
+      *
+           IF      ( SPA-Q01-STBYOYMD =   SPACE )
+               MOVE    ALL "0"     TO  WRK-STBYOYMD
+           ELSE
+               MOVE    SPA-Q01-STBYOYMD
+                                   TO  WRK-STBYOYMD
+           END-IF
+      *
+           IF      ( SPA-Q01-EDBYOYMD =   SPACE )
+               MOVE    ALL "9"     TO  WRK-EDBYOYMD
+           ELSE
+               MOVE    SPA-Q01-EDBYOYMD
+                                   TO  WRK-EDBYOYMD
            END-IF
       *
            IF      ( SPA-Q01-STTENKIYMD =   SPACE )
@@ -1832,6 +1848,11 @@
                PERFORM 10011-SRYKA-SQL-EDIT-SEC
            END-IF
       *
+           IF    ( SPA-Q01-STBYOYMD    NOT =   SPACE )
+            OR   ( SPA-Q01-EDBYOYMD    NOT =   SPACE )
+               PERFORM 10011-BYOYMD-SQL-EDIT-SEC
+           END-IF
+      *
            IF    ( SPA-Q01-UTAGAIKBN   NOT =   SPACE )
                PERFORM 10011-UTAGAIFLG-SQL-EDIT-SEC
            END-IF
@@ -1973,6 +1994,11 @@
       *
                    IF    ( SPA-Q01-SRYKA   NOT =   SPACE )
                        PERFORM 10011-SRYKA-SQL-EDIT-SEC
+                   END-IF
+      *
+                   IF    ( SPA-Q01-STBYOYMD    NOT =   SPACE )
+                    OR   ( SPA-Q01-EDBYOYMD    NOT =   SPACE )
+                      PERFORM  10011-BYOYMD-SQL-EDIT-SEC
                    END-IF
       *
                    IF    ( SPA-Q01-UTAGAIKBN   NOT =   SPACE )
@@ -2962,6 +2988,10 @@
                PERFORM 10011-SRYKBN-SQL-EDIT-SEC
            END-IF
       *
+           IF    ( SPA-Q01-HOKATSUKBN  =   "1" )
+               PERFORM 10011-HOKATSUKBN-SQL-EDIT-SEC
+           END-IF
+      *
            IF    ( SPA-Q01-GHKNINF     =   "1" )
                PERFORM 10011-HKNCOMBINUM-SQL-EDIT-SEC
            END-IF
@@ -3047,6 +3077,10 @@
       *
                    IF    ( SPA-Q01-SRYKBN  NOT =   SPACE )
                        PERFORM 10011-SRYKBN-SQL-EDIT-SEC
+                   END-IF
+      *
+                   IF    ( SPA-Q01-HOKATSUKBN  =   "1" )
+                       PERFORM 10011-HOKATSUKBN-SQL-EDIT-SEC
                    END-IF
       *
                    IF    ( SPA-Q01-GHKNINF     =   "1" )
@@ -3830,6 +3864,30 @@
        10011-SRYKBN-SQL-EDIT-EXT.
            EXIT.
       *****************************************************************
+      *    包括区分編集処理
+      *****************************************************************
+       10011-HOKATSUKBN-SQL-EDIT-SEC           SECTION.
+      *
+           MOVE    1                   TO  CNT-JYOKEN
+      *
+           PERFORM 900-SQL-JYOKEN-EDIT2-SEC
+      *
+           STRING  WRK-SQL-TBL-NAME    DELIMITED BY SPACE
+                   ".HOKATSUKBN =''"   DELIMITED BY SIZE
+                   "AND "              DELIMITED BY SIZE
+                   WRK-SQL-TBL-NAME    DELIMITED BY SPACE
+                   ".HKNCOMBINUM <> 9999"
+                                       DELIMITED BY SIZE
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           PERFORM 900-SQL-JYOKEN-EDIT3-SEC
+      *
+           .
+       10011-HOKATSUKBN-SQL-EDIT-EXT.
+           EXIT.
+      *****************************************************************
       *    保険組合せ編集処理
       *****************************************************************
        10011-HKNCOMBINUM-SQL-EDIT-SEC  SECTION.
@@ -4140,6 +4198,33 @@
       *
            .
        10011-TENKIKBN-SQL-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    病名診療開始日編集処理
+      *****************************************************************
+       10011-BYOYMD-SQL-EDIT-SEC       SECTION.
+      *
+           MOVE    1                   TO  CNT-JYOKEN
+      *
+           PERFORM 900-SQL-JYOKEN-EDIT2-SEC
+      *
+           STRING  "("                 DELIMITED BY SIZE
+                   WRK-SQL-TBL-NAME    DELIMITED BY SPACE
+                   ".SRYYMD >= '"      DELIMITED BY SIZE
+                   WRK-STBYOYMD        DELIMITED BY SIZE
+                   "') AND ("          DELIMITED BY SIZE
+                   WRK-SQL-TBL-NAME    DELIMITED BY SPACE
+                   ".SRYYMD <= '"      DELIMITED BY SIZE
+                   WRK-EDBYOYMD        DELIMITED BY SIZE
+                   "')"                DELIMITED BY SIZE
+           INTO    WRK-SQL
+           WITH    POINTER WRK-SQL-PNT
+           END-STRING
+      *
+           PERFORM 900-SQL-JYOKEN-EDIT3-SEC
+      *
+           .
+       10011-BYOYMD-SQL-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    GROUP BY編集処理(通常検索)

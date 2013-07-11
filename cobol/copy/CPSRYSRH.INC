@@ -54,6 +54,8 @@
                05  SRYSRH-SRYCD-OCC    OCCURS 5.
                    07  SRYSRH-SRYCD    PIC X(9).
                    07  SRYSRH-SRYSURYO PIC 9(05)V9(05).
+      *Êñ³ç¶èÊ¬
+           03  SRYSRH-HOKATSUKBN   PIC X(01).
       *²ñ·×¶èÊ¬¡Ê1:¿ÇÎÅ²ñ·×ºÞ 2:Æþ±¡²ñ·×ºÞ¡Ë
            03  SRYSRH-ACCTKBN      PIC X(01).
       *

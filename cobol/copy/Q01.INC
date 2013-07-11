@@ -175,6 +175,17 @@
                   06  Q01-RDHKNKOH-AND         PIC X.
                   06  Q01-RDHKNKOH-OR          PIC X.
                 05  Q01-FIXED18.
+                  06  Q01-STBYOYMD             PIC X(10).
+                  06  Q01-EDBYOYMD             PIC X(10).
+                  06  Q01-CMB-TENKIKBN.
+                    07  Q01-TENKIKBN          PIC X(20).
+                    07  Q01-CMB-TENKIKBN-COUNT
+                                               PIC S9(9)   BINARY.
+                    07  Q01-CMB-TENKIKBN-ITEM PIC X(20)    OCCURS  10.
+                  06  Q01-STTENKIYMD           PIC X(10).
+                  06  Q01-STTENKIYMD-STATE     PIC S9(9)   BINARY.
+                  06  Q01-EDTENKIYMD           PIC X(10).
+                  06  Q01-EDTENKIYMD-STATE     PIC S9(9)   BINARY.
                   06  Q01-CMB-UTAGAIKBN.
                     07  Q01-UTAGAIKBN          PIC X(20).
                     07  Q01-CMB-UTAGAIKBN-COUNT
@@ -185,15 +196,6 @@
                     07  Q01-CMB-KYUSEIKBN-COUNT
                                                PIC S9(9)   BINARY.
                     07  Q01-CMB-KYUSEIKBN-ITEM PIC X(20)   OCCURS  3.
-                  06  Q01-CMB-TENKIKBN.
-                    07  Q01-TENKIKBN          PIC X(20).
-                    07  Q01-CMB-TENKIKBN-COUNT
-                                               PIC S9(9)   BINARY.
-                    07  Q01-CMB-TENKIKBN-ITEM PIC X(20)    OCCURS  10.
-                  06  Q01-STTENKIYMD           PIC X(10).
-                  06  Q01-STTENKIYMD-STATE     PIC S9(9)   BINARY.
-                  06  Q01-EDTENKIYMD           PIC X(10).
-                  06  Q01-EDTENKIYMD-STATE     PIC S9(9)   BINARY.
                   06  Q01-CMB-SYUBYOKBN.
                     07  Q01-SYUBYOKBN           PIC X(20).
                     07  Q01-CMB-SYUBYOKBN-COUNT PIC S9(9)   BINARY.
@@ -240,6 +242,10 @@
                     07  Q01-CMB-SRYSYUKBN-COUNT   PIC S9(9)   BINARY.
                     07  Q01-CMB-SRYSYUKBN-ITEM    PIC X(23)  OCCURS  10.
                     07  Q01-CMB-SRYSYUKBN-STATE   PIC S9(9)   BINARY.
+                  06  Q01-CMB-HOKATSUKBN.
+                    07  Q01-HOKATSUKBN            PIC X(22).
+                    07  Q01-CMB-HOKATSUKBN-COUNT  PIC S9(9)   BINARY.
+                    07  Q01-CMB-HOKATSUKBN-ITEM   PIC X(22)   OCCURS  5.
                   06  Q01-SRYACTSEL            PIC X(80).
                   06  Q01-SRYCD-TBL.
                     07  Q01-SRYCD-OCC   OCCURS   5.

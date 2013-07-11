@@ -22,13 +22,14 @@ tbl_srysrh {
 	SRYSURYO4 			number(10,5);
 	SRYCD5				char(9);
 	SRYSURYO5 			number(10,5);
+	HOKATSUKBN			char(1);
 	ACCTKBN				char(1);
 	CREYMD				char(8);
 	UPYMD				char(8);
 	UPHMS				char(6);
 	PTNUM				varchar(20),virtual;
 	KANANAME			varchar(100),virtual;
-	SEX				char(1),virtual;
+	SEX					char(1),virtual;
 	BIRTHDAY			char(8),virtual;
 	STSRYYMD			char(8),virtual;
 	EDSRYYMD			char(8),virtual;
@@ -84,6 +85,7 @@ path	ins1 	{
 	       SRYSURYO4,
 	       SRYCD5,
 	       SRYSURYO5,
+	       HOKATSUKBN,
 	       ACCTKBN,
 	       CREYMD,
 	       UPYMD,
@@ -112,6 +114,7 @@ path	ins1 	{
 	       SRYSURYO4,
 	       SRYCD5,
 	       SRYSURYO5,
+	       '0',
 	       '1',
 	      :CREYMD,
 	      :UPYMD,
@@ -166,7 +169,8 @@ path	ins1 	{
 	;
 	
 	UPDATE TBL_SRYSRH
-	SET    HKNCOMBINUM = A.HKNCOMBI
+	SET    HKNCOMBINUM = A.HKNCOMBI,
+	       HOKATSUKBN  = A.JIHOKBN
 	FROM   TBL_SRYACCT_MAIN AS A
 	WHERE  TBL_SRYSRH.HOSPNUM = A.HOSPNUM
 	 AND   TBL_SRYSRH.PTID    = A.PTID
@@ -198,6 +202,7 @@ path	ins1 	{
 	       SRYSURYO4,
 	       SRYCD5,
 	       SRYSURYO5,
+	       HOKATSUKBN,
 	       ACCTKBN,
 	       CREYMD,
 	       UPYMD,
@@ -226,6 +231,7 @@ path	ins1 	{
 	       0.0,
 	       '',
 	       0.0,
+	      '0',
 	      '2',
 	      :CREYMD,
 	      :UPYMD,
@@ -266,6 +272,7 @@ path	ins2 	{
 	       SRYSURYO4,
 	       SRYCD5,
 	       SRYSURYO5,
+	       HOKATSUKBN,
 	       ACCTKBN,
 	       CREYMD,
 	       UPYMD,
@@ -278,7 +285,7 @@ path	ins2 	{
         A.ZAINUM,
         A.NYUGAIKBN,
         A.SRYKA,
-	cast (B.HKNCOMBINUM as smallint),
+        C.HKNCOMBI,
         A.SRYKBN,
         A.SRYSYUKBN,
         B.SRYYMD,
@@ -295,12 +302,14 @@ path	ins2 	{
         A.SRYSURYO4,
         A.SRYCD5,
         A.SRYSURYO5,
+        C.JIHOKBN,
         '1',
 	:CREYMD,
 	:UPYMD,
 	:UPHMS
       FROM TBL_SRYACT A,
-           TBL_JYURRK B 
+           TBL_JYURRK B,
+           TBL_SRYACCT_MAIN C
      WHERE A.HOSPNUM   = :HOSPNUM
        AND A.NYUGAIKBN LIKE :NYUGAIKBN
        AND A.SRYKA     LIKE :SRYKA
@@ -308,6 +317,9 @@ path	ins2 	{
        AND A.SRYSYUKBN LIKE :SRYSYUKBN
        AND A.SRYYM    >= :STSRYYM
        AND A.SRYYM    <= :EDSRYYM
+       AND A.HOSPNUM   = C.HOSPNUM
+       AND A.PTID      = C.PTID
+       AND A.ZAINUM    = C.ZAINUM
        AND A.HOSPNUM   = B.HOSPNUM
        AND A.PTID      = B.PTID
        AND A.NYUGAIKBN = B.NYUGAIKBN
@@ -398,6 +410,7 @@ path	ins2 	{
 	       SRYSURYO4,
 	       SRYCD5,
 	       SRYSURYO5,
+	       HOKATSUKBN,
 	       ACCTKBN,
 	       CREYMD,
 	       UPYMD,
@@ -426,6 +439,7 @@ path	ins2 	{
                0.0,
                '',
                0.0,
+               '0',
                '2',
                :CREYMD,
                :UPYMD,
@@ -457,7 +471,7 @@ path	ins3 	{
 	       PTID,
 	       NYUGAIKBN,
 	       SRYKA,
-               HKNCOMBINUM,
+           HKNCOMBINUM,
 	       SRYKBN,
 	       SRYSYUKBN,
 	       SRYYMD,
@@ -466,11 +480,12 @@ path	ins3 	{
 	       SRYCD3,
 	       SRYCD4,
 	       SRYCD5,
+	       HOKATSUKBN,
 	       CREYMD,
 	       UPYMD,
 	       UPHMS
 	)
-	SELECT DISTINCT ON (A.HOSPNUM,A.PTID,A.NYUGAIKBN,A.SRYKA,B.HKNCOMBI,A.SRYKBN,A.SRYSYUKBN) 
+	SELECT DISTINCT ON (A.HOSPNUM,A.PTID,A.NYUGAIKBN,A.SRYKA,B.HKNCOMBI,A.SRYKBN,A.SRYSYUKBN,B.JIHOKBN) 
 	       A.HOSPNUM,
 	      :TERMID,
 	       A.PTID,
@@ -485,6 +500,7 @@ path	ins3 	{
 	       A.SRYCD3,
 	       A.SRYCD4,
 	       A.SRYCD5,
+	       B.JIHOKBN,
 	      :CREYMD,
 	      :UPYMD,
 	      :UPHMS
@@ -512,6 +528,7 @@ path	ins3 	{
 	       SRYCD3,
 	       SRYCD4,
 	       SRYCD5,
+	       HOKATSUKBN,
 	       CREYMD,
 	       UPYMD,
 	       UPHMS
@@ -531,6 +548,7 @@ path	ins3 	{
 	       '',
 	       '',
 	       '',
+	       '0',
 	      :CREYMD,
 	      :UPYMD,
 	      :UPHMS
@@ -561,17 +579,18 @@ path	ins4 	{
 	       SRYCD3,
 	       SRYCD4,
 	       SRYCD5,
+	       HOKATSUKBN,
 	       CREYMD,
 	       UPYMD,
 	       UPHMS
 	)
-	SELECT DISTINCT ON (A.HOSPNUM,A.PTID,A.NYUGAIKBN,A.SRYKA,B.HKNCOMBINUM,A.SRYKBN,B.SRYYMD,A.SRYSYUKBN) 
+	SELECT DISTINCT ON (A.HOSPNUM,A.PTID,A.NYUGAIKBN,A.SRYKA,C.HKNCOMBI,A.SRYKBN,B.SRYYMD,A.SRYSYUKBN,C.JIHOKBN) 
         A.HOSPNUM,
         :TERMID,
         A.PTID,
         A.NYUGAIKBN,
         A.SRYKA,
-	cast(B.HKNCOMBINUM as smallint),
+        C.HKNCOMBI,
         A.SRYKBN,
         A.SRYSYUKBN,
         B.SRYYMD,
@@ -580,11 +599,13 @@ path	ins4 	{
         A.SRYCD3,
         A.SRYCD4,
         A.SRYCD5,
+        C.JIHOKBN,
 	:CREYMD,
 	:UPYMD,
 	:UPHMS
       FROM TBL_SRYACT A,
-           TBL_JYURRK B 
+           TBL_JYURRK B ,
+           TBL_SRYACCT_MAIN C
      WHERE A.HOSPNUM   = :HOSPNUM
        AND A.NYUGAIKBN LIKE :NYUGAIKBN
        AND A.SRYKA     LIKE :SRYKA
@@ -592,6 +613,9 @@ path	ins4 	{
        AND A.SRYSYUKBN LIKE :SRYSYUKBN
        AND A.SRYYM    >= :STSRYYM
        AND A.SRYYM    <= :EDSRYYM
+       AND A.HOSPNUM   = C.HOSPNUM
+       AND A.PTID      = C.PTID
+       AND A.ZAINUM    = C.ZAINUM
        AND A.HOSPNUM   = B.HOSPNUM
        AND A.PTID      = B.PTID
        AND A.NYUGAIKBN = B.NYUGAIKBN
@@ -632,6 +656,7 @@ path	ins4 	{
 	       SRYCD3,
 	       SRYCD4,
 	       SRYCD5,
+	       HOKATSUKBN,
 	       CREYMD,
 	       UPYMD,
 	       UPHMS
@@ -651,6 +676,7 @@ path	ins4 	{
                '',
                '',
                '',
+               '0',
                :CREYMD,
                :UPYMD,
                :UPHMS

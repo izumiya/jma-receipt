@@ -1398,6 +1398,8 @@
       *****************************************************************
        900-SRYSRH-INS1-SEC             SECTION.
       *
+           DISPLAY "SRYSRH-INS1"
+      *
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_srysrh"    TO  MCP-TABLE
@@ -1411,6 +1413,8 @@
       *    診療行為照会追加処理
       *****************************************************************
        900-SRYSRH-INS2-SEC             SECTION.
+      *
+           DISPLAY "SRYSRH-INS2"
       *
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
@@ -1426,6 +1430,8 @@
       *****************************************************************
        900-SRYSRH-INS3-SEC             SECTION.
       *
+           DISPLAY "SRYSRH-INS3"
+      *
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
            MOVE    "tbl_srysrh"    TO  MCP-TABLE
@@ -1439,6 +1445,8 @@
       *    診療行為照会追加処理
       *****************************************************************
        900-SRYSRH-INS4-SEC             SECTION.
+      *
+           DISPLAY "SRYSRH-INS4"
       *
            PERFORM 9001-SRYSRH-INS-SEC
            MOVE    SRYSRH-REC      TO  MCPDATA-REC
