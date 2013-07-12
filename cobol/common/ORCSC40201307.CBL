@@ -1624,7 +1624,10 @@
            IF     (SPA-HKNKBN          =   1   )
              AND  (SPA-RSI-HKNKBN      =   "1"  OR  "2")
       *ver.4.7 のみ　システム管理検索
-               PERFORM 10099-ROURECEKBN-SET-SEC
+      ******** PERFORM 10099-ROURECEKBN-SET-SEC
+      *!!レセ電開始までシステム管理設定なしとする
+               MOVE    ZERO                TO  WRK-ORCSC-ROURECEKBN
+      *!!!!!
                IF     (WRK-ORCSC-ROURECEKBN   =   ZERO )
       *********IF     (LNK-ORCSC-ROURECEKBN   =   ZERO )
       *     レセ電対応なし
