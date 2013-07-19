@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  11/12/06  チェックマスタの併用禁忌対応
+      *  04.07.00    NACL-多々納  13/07/12  相互の症状コード編集対応
       *****************************************************************
       *
       *
@@ -60,6 +61,7 @@
       *
            03  FLG-ARI             PIC 9(01).
            03  FLG-ARI2            PIC 9(01).
+           03  FLG-KINKI-CHK       PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -75,6 +77,8 @@
            03  IDX-K4              PIC 9(04).
            03  IDX-Y2              PIC 9(02).
            03  IDX-C               PIC 9(04).
+      *
+           03  IDX-S2              PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -115,6 +119,7 @@
                        09  WRK-KNK-TOUYMDW         PIC X(09).
                        09  WRK-KNK-SRYCD           PIC X(09).
                        09  WRK-KNK-SYOJYOUCD       PIC X(07).
+                       09  WRK-KNK-CHKFLG          PIC X(01).
            03  WRK-KNK-MAX             PIC 9(04).
       *
        01  WRK-KNKCHK-GMN-AREA.
@@ -130,6 +135,7 @@
                    09  WRK-SRT-TOUYMDW         PIC X(09).
                    09  WRK-SRT-SRYCD           PIC X(09).
                    09  WRK-SRT-SYOJYOUCD       PIC X(07).
+                   09  WRK-SRT-CHKFLG          PIC X(01).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -618,7 +624,7 @@
            END-IF
            IF      IDX-K2              >   ZERO
                MOVE    "1"                 TO  SPA-COM-KNKFLG (IDX-Z)
-               MOVE    SPA-GMN-MEISYO (IDX-Z)
+               MOVE    SPA-COM-NAME   (IDX-Z)
                                            TO  WRK-KNK-TOUMEI (IDX-K1)
                MOVE    SPA-COM-INPUTCD(IDX-Z)
                                            TO  WRK-KNK-TOUSRYCD (IDX-K1)
@@ -636,7 +642,7 @@
                    PERFORM VARYING     IDX-K       FROM    1   BY  1
                            UNTIL      (IDX-K       >     100  )
                        IF      WRK-KNK-GSRYCD (IDX-K)    =  SPACE
-                           MOVE    SPA-GMN-MEISYO (IDX-Z)
+                           MOVE    SPA-COM-NAME   (IDX-Z)
                                                TO  WRK-KNK-GNAME(IDX-K)
                            MOVE    SPA-COM-INPUTCD(IDX-Z)
                                                TO  WRK-KNK-GSRYCD(IDX-K)
@@ -700,10 +706,27 @@
                               (FLG-KINKI-ARI   =   1   ) OR
                               (IDX-K2          >   100  )  OR
                               (SPA-KNK-SRYCD (IDX-S)   =   SPACE )
-               IF    ((SPA-KNK-SRYCD (IDX-S)   =   INTERACT-DRUGCD ) OR
-                      (SPA-KNK-SRYCD (IDX-S)   =  INTERACT-DRUGCD2)) AND
-                     ( SPA-COM-INPUTCD (IDX-Z)
+      *H25.7
+               MOVE    ZERO                    TO  FLG-KINKI-CHK
+               IF    ( SPA-COM-INPUTCD (IDX-Z)
                                            NOT =   SPA-KNK-SRYCD(IDX-S))
+      *            前
+                   IF     (SPA-KNK-SRYCD (IDX-S)   =   INTERACT-DRUGCD)
+                       MOVE    1                   TO  FLG-KINKI-CHK
+                   END-IF
+      *            後
+                   IF     (SPA-KNK-SRYCD (IDX-S)   =   INTERACT-DRUGCD2)
+                       MOVE    2                   TO  FLG-KINKI-CHK
+                   END-IF
+      *            今回入力分は対象外
+                   PERFORM 200111-INPUT-CHK-SEC
+               END-IF
+      ****     IF    ((SPA-KNK-SRYCD (IDX-S)   =   INTERACT-DRUGCD ) OR
+      *               (SPA-KNK-SRYCD (IDX-S)   =  INTERACT-DRUGCD2)) AND
+      *              ( SPA-COM-INPUTCD (IDX-Z)
+      *****                                NOT =   SPA-KNK-SRYCD(IDX-S))
+      *
+               IF      FLG-KINKI-CHK       NOT =   ZERO
                    MOVE    1                   TO  FLG-KINKI-ARI
                    MOVE    1                   TO  FLG-KINKI-ARI2
                    ADD     1                   TO  IDX-K2
@@ -719,16 +742,21 @@
                                                         (IDX-K1 IDX-K2)
                    MOVE    SPA-KNK-TOUYMD (IDX-S)  TO  WRK-KNK-TOUYMD
                                                         (IDX-K1 IDX-K2)
+                   MOVE    INTERACT-SYOJYOUCD      TO  WRK-KNK-SYOJYOUCD
+                                                        (IDX-K1 IDX-K2)
+                   MOVE    FLG-KINKI-CHK           TO  WRK-KNK-CHKFLG
+                                                        (IDX-K1 IDX-K2)
                END-IF
            END-PERFORM
-      *    診療会計マスタとのチェック
+      *    前の画面とのチェック
            PERFORM VARYING     IDX-S       FROM    1   BY  1
                    UNTIL      (IDX-S           >   100  )  OR
                               (WRK-KNK-GSRYCD (IDX-S)  =   SPACE )  OR
                               (FLG-KINKI-ARI   =   1    ) OR
                               (IDX-K2          >   100  )
-               IF    ((WRK-KNK-GSRYCD (IDX-S)  =   INTERACT-DRUGCD ) OR
-                      (WRK-KNK-GSRYCD (IDX-S)  =   INTERACT-DRUGCD2))
+     ****      IF    ((WRK-KNK-GSRYCD (IDX-S)  =   INTERACT-DRUGCD ) OR
+     ****             (WRK-KNK-GSRYCD (IDX-S)  =   INTERACT-DRUGCD2))
+               IF    ( WRK-KNK-GSRYCD (IDX-S)  =   INTERACT-DRUGCD )
                AND   ( SPA-COM-INPUTCD (IDX-Z)
                                            NOT =   WRK-KNK-GSRYCD
                                                              (IDX-S))
@@ -749,7 +777,8 @@
                MOVE    1                   TO  IDX-K3
                COMPUTE IDX-K4              =   IDX-Z   -   1
            ELSE
-               COMPUTE IDX-K3              =   IDX-Z   +   1
+      *H25.7   COMPUTE IDX-K3              =   IDX-Z   +   1
+               MOVE    1                   TO  IDX-K3
                MOVE    SPA-MAX-LINE        TO  IDX-K4
            END-IF
            PERFORM VARYING     IDX-S       FROM    IDX-K3  BY  1
@@ -757,14 +786,15 @@
                               (FLG-KINKI-ARI   =   1    ) OR
                               (SPA-GMN-INPUTCD(IDX-S)  =   SPACE  AND
                                SPA-COM-INPUTCD(IDX-S)  =   SPACE )
-               IF    ((SPA-COM-INPUTCD (IDX-S) =   INTERACT-DRUGCD)  OR
-                      (SPA-COM-INPUTCD (IDX-S) =   INTERACT-DRUGCD2))
+      *****    IF    ((SPA-COM-INPUTCD (IDX-S) =   INTERACT-DRUGCD)  OR
+      *****           (SPA-COM-INPUTCD (IDX-S) =   INTERACT-DRUGCD2))
+               IF     (SPA-COM-INPUTCD (IDX-S) =   INTERACT-DRUGCD)
                  AND  (SPA-COM-INPUTCD (IDX-S)
                                            NOT =   SPA-COM-INPUTCD
                                                            (IDX-Z))
                  AND  (IDX-S               NOT =   IDX-Z          )
                    ADD     1                   TO  IDX-K2
-                   MOVE    SPA-GMN-MEISYO (IDX-S)  TO  WRK-KNK-KNKMEI
+                   MOVE    SPA-COM-NAME   (IDX-S)  TO  WRK-KNK-KNKMEI
                                                         (IDX-K1 IDX-K2)
                    MOVE    SPA-COM-INPUTCD (IDX-S) TO  WRK-KNK-SRYCD
                                                         (IDX-K1 IDX-K2)
@@ -784,6 +814,27 @@
            .
        20011-KNKCHK-SYORI-EXT.
            EXIT.
+      *****************************************************************
+      *    今回入力分チェック処理
+      *****************************************************************
+       200111-INPUT-CHK-SEC              SECTION.
+      *
+           PERFORM VARYING     IDX-S2      FROM    1   BY  1
+                   UNTIL      (IDX-S2          >   SPA-MAX-LINE )  OR
+                              (SPA-GMN-INPUTCD(IDX-S2) =   SPACE  AND
+                               SPA-COM-INPUTCD(IDX-S2) =   SPACE )
+               IF     (SPA-COM-INPUTCD (IDX-S2)
+                                            =   SPA-KNK-SRYCD (IDX-S))
+                 AND  (SPA-COM-INPUTCD (IDX-S2)
+                                        NOT =   SPA-COM-INPUTCD
+                                                           (IDX-Z))
+                   MOVE    ZERO             TO  FLG-KINKI-CHK
+               END-IF
+           END-PERFORM
+           .
+       200111-INPUT-CHK-EXT.
+           EXIT.
+      *
       *ver.4.7
       *****************************************************************
       *    チェックマスタとのチェック処理
@@ -864,7 +915,7 @@
       *
            IF      IDX-K2              >   ZERO
                MOVE    "1"                 TO  SPA-COM-KNKFLG (IDX-Z)
-               MOVE    SPA-GMN-MEISYO (IDX-Z)
+               MOVE    SPA-COM-NAME   (IDX-Z)
                                            TO  WRK-KNK-TOUMEI (IDX-K1)
                MOVE    SPA-COM-INPUTCD(IDX-Z)
                                            TO  WRK-KNK-TOUSRYCD (IDX-K1)
@@ -946,8 +997,28 @@
                        MOVE    IDX-K               TO  SPA-KT011-TSEQNO
                                                                (IDX-K)
                    END-IF
-                   MOVE    WRK-KNK-KNKMEI (IDX-K1 IDX-K2)
+      *            方向設定
+                   IF     (WRK-KNK-CHKFLG (IDX-K1 IDX-K2)
+                                               =  "2"  )
+                       STRING   "←"
+                               WRK-KNK-KNKMEI (IDX-K1 IDX-K2)
+                               DELIMITED  BY  SIZE
+                                       INTO    SPA-KT011-TKNKMEI(IDX-K)
+                       END-STRING
+                   ELSE
+                       STRING   "→"
+                               WRK-KNK-KNKMEI (IDX-K1 IDX-K2)
+                               DELIMITED  BY  SIZE
+                                       INTO    SPA-KT011-TKNKMEI(IDX-K)
+                       END-STRING
+                   END-IF
+      *            チェックマスタは方向なし
+                   IF      WRK-KNK-SYOJYOUCD (IDX-K1 IDX-K2)
+                                               =   ALL "*"
+                       MOVE    WRK-KNK-KNKMEI (IDX-K1 IDX-K2)
                                            TO  SPA-KT011-TKNKMEI(IDX-K)
+                   END-IF
+      *
                    MOVE    WRK-KNK-TOUYMD (IDX-K1 IDX-K2)
                                            TO  SPA-KT011-TTOUYMD (IDX-K)
                    MOVE    WRK-KNK-SYOJYOUCD (IDX-K1 IDX-K2)
@@ -992,6 +1063,10 @@
                        IF     (IDX-K           NOT =   IDX-K2)  AND
                               (WRK-SRT-SRYCD (IDX-K)
                                               =   WRK-SRT-SRYCD(IDX-K2))
+      *!!!
+                        AND   (WRK-SRT-SYOJYOUCD (IDX-K)
+                                              =   WRK-SRT-SYOJYOUCD
+                                                              (IDX-K2))
                            IF      WRK-SRT-TOUYMD (IDX-K)
                                                <   WRK-SRT-TOUYMD
                                                                (IDX-K2)
@@ -1064,6 +1139,9 @@
                               (WRK-KNK-SRYCD (IDX-K3 IDX-K4)
                                                    =   WRK-KNK-TOUSRYCD
                                                             (IDX-K1))
+                       AND    (WRK-KNK-SYOJYOUCD(IDX-K3 IDX-K4)
+                                                   =   WRK-KNK-SYOJYOUCD
+                                                        (IDX-K1 IDX-K2))
                            MOVE    SPACE           TO  WRK-KNK-TBL2
                                                         (IDX-K3 IDX-K4)
                        END-IF
