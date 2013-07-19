@@ -345,10 +345,12 @@
       *****************************************************************
        4101-SELNUM-SYORI-SEC           SECTION.
       *
-           IF      SPA-K021-TTOUMEI (IDX)  =   SPACE
+           IF     (SPA-K021-TTOUMEI (IDX)  =   SPACE    )
                PERFORM VARYING     IDY     FROM    IDX  BY  -1
                        UNTIL       IDY     <   1
-                   IF      SPA-K021-TTOUMEI (IDY)  NOT =   SPACE
+                   IF      SPA-K021-TTOUMEI (IDY)  =   SPACE
+                       CONTINUE
+                   ELSE
                        MOVE    SPA-K021-TTOUMEI (IDY)
                                                TO  WRK-K021-TOUMEI
                        MOVE    1               TO  IDY
@@ -357,7 +359,7 @@
            ELSE
                MOVE    SPA-K021-TTOUMEI (IDX)  TO  WRK-K021-TOUMEI
            END-IF
-           MOVE    SPA-K021-TKNKMEI (IDX)  TO  WRK-K021-KNKMEI
+           MOVE    SPA-K021-TKNKMEI (IDX)(3:)  TO  WRK-K021-KNKMEI
            MOVE    "1"                     TO  WRK-K021-KNKMEIFLG
       *    ¾É¾õÊÔ½¸
            INITIALIZE                  SSKIJYO-REC
