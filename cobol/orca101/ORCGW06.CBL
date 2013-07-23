@@ -1295,6 +1295,7 @@
       *        職員情報編集
                PERFORM 2009-SYOKUIN-HENSYU-SEC
                MOVE    3                   TO  SPA-GMN-CUR
+               MOVE    2                   TO  SPA-GMN-SYORI
            ELSE
                IF      SPA-GMN-SELNUM      =   ZERO
       *            選択番号が無い時、新規追加とする
