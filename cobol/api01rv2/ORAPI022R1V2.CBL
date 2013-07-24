@@ -27,7 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *
+      *  04.07.00    NACL-多々納  13/07/24  保険病名フラグ追加対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -740,6 +740,14 @@
            IF      SBYOINFO-REZEMM (IDX)   NOT =   ZERO
                MOVE    SBYOINFO-REZEMM (IDX)
                                        TO  DISERES-RECEIPT-PERIOD (IDX)
+           END-IF
+      *    保険病名フラグ
+           IF      SBYOINFO-HKNBYOMEIFLG (IDX) =   "1"
+               MOVE    "True"          TO  DISERES-INSURANCE-DISEASE
+                                                                  (IDX)
+           ELSE
+               MOVE    "False"         TO  DISERES-INSURANCE-DISEASE
+                                                                  (IDX)
            END-IF
            .
        20021-BYOMEI-HEN-EXT.

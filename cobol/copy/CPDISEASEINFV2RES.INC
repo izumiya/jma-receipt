@@ -88,3 +88,6 @@
                    05  DISERES-RECEIPT-PRINT       PIC X(01).
       *            レセプト表示月数
                    05  DISERES-RECEIPT-PERIOD      PIC X(02).
+      *            保険病名フラグ
+                   05  DISERES-INSURANCE-DISEASE   PIC X(05).
+      *
