@@ -144,6 +144,7 @@
       *                                     のとき、入力順、ターミナルデジット
       *                                     出力の対象としない
       *  04.07.05    NACL-藤原    13/03/01  保険者番号の条件設定変更
+      *  04.07.06    NACL-藤原    13/07/24  入力順指定時の画面表示の修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1807,7 +1808,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *************    MOVE    3                   TO  SPA-GMN-PAGE-MAX
                        CONTINUE
                    WHEN    "05"            ALSO    ANY    ALSO     ANY
-                       MOVE    3                   TO  SPA-GMN-PAGE-MAX
+                       MOVE    2                   TO  SPA-GMN-PAGE-MAX
                    WHEN    "03"            ALSO    "03"    ALSO    "03"
                    WHEN    "03"            ALSO    "04"    ALSO    "03"
                    WHEN    "03"            ALSO    "03"    ALSO    "04"
