@@ -667,11 +667,11 @@
                IF    ( SPA-COM-INPUTCD (IDX-Z)
                                            NOT =   SPA-KNK-SRYCD(IDX-S))
       *            前
-                   IF     (SPA-KNK-SRYCD (IDX-S)   =   INTERACT-DRUGCD)
+                   IF     (SPA-KNK-SRYCD (IDX-S)   =   INTERACT-DRUGCD2)
                        MOVE    1                   TO  FLG-KINKI-CHK
                    END-IF
       *            後
-                   IF     (SPA-KNK-SRYCD (IDX-S)   =   INTERACT-DRUGCD2)
+                   IF     (SPA-KNK-SRYCD (IDX-S)   =   INTERACT-DRUGCD)
                        MOVE    2                   TO  FLG-KINKI-CHK
                    END-IF
       *            今回入力分は対象外
@@ -720,7 +720,7 @@
                                SPA-COM-INPUTCD(IDX-S)  =   SPACE )
       *****    IF    ((SPA-COM-INPUTCD (IDX-S) =   INTERACT-DRUGCD)  OR
       *******         (SPA-COM-INPUTCD (IDX-S) =   INTERACT-DRUGCD2))
-               IF     (SPA-COM-INPUTCD (IDX-S) =   INTERACT-DRUGCD)
+               IF     (SPA-COM-INPUTCD (IDX-S) =   INTERACT-DRUGCD2)
                  AND  (SPA-COM-INPUTCD (IDX-S)
                                            NOT =   SPA-COM-INPUTCD
                                                            (IDX-Z))
