@@ -498,6 +498,8 @@
                05  TCOMBI-SENTEI-PTFTN             PIC 9(08).
       *
        01  TRECECOM-AREA.
+           03  TRECECOM-AA                         PIC 9(01).
+           03  TRECECOM-SRYDD                      PIC 9(02).
            03  TRECECOM-KARAGYO                    PIC 9(01).
            03  TRECECOM-PNT                        PIC 9(05).
            03  TRECECOM-SKJKBN                     PIC X(02).
@@ -672,8 +674,12 @@
                "¡Ú¼À´µÊÌ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó¤Ë·¸¤ë¼£ÎÅ·ÑÂ³¤ÎÍýÍ³Åù¡Û".
                05  FILLER                       PIC X(52)   VALUE
                "¡ÚÇÑÍÑ¾É¸õ·²¤Ë·¸¤ëÉ¾²ÁÉ½¡Û".
+               05  FILLER                       PIC X(52)   VALUE
+               "¡Ú¥ì¥»¥×¥ÈÅ¦Í×Íó¥³¥á¥ó¥È¡Û".
+               05  FILLER                       PIC X(52)   VALUE
+               "¡ÚÏ«ºÒ¥ì¥»¥×¥È¡Ö½ýÉÂ¤Î·Ð²á¡×¡Û".
            03  CONST-RECECOM-R     REDEFINES   CONST-RECECOM-VAL.
-               05  CONST-RECECOM   PIC X(52)   OCCURS   10.
+               05  CONST-RECECOM   PIC X(52)   OCCURS   12.
       *    ÌôºÞÎÁÄþ¸º
            03  CONST-TEIGEN                PIC X(09)   VALUE
                "630010002".
@@ -5736,24 +5742,11 @@
            INITIALIZE                      TRECECOM-AREA
       *
            IF    ( FLG-AFTER-CARE      =   ZERO )
-      *        Å¬ÍÑÍó¥³¥á¥ó¥È
-               MOVE    "key7"              TO  WRK-PATHNAME
-               PERFORM 2002111-RECECOM-HEN-SEC
-      *
-      *        ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£°£±¡Á£°£¶¡Ë
-               MOVE    "key8"              TO  WRK-PATHNAME
-               PERFORM 2002111-RECECOM-HEN-SEC
-      *
-      *        ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê¤½¤ÎÂ¾¡Ë    
-               MOVE    "key9"              TO  WRK-PATHNAME
-               PERFORM 2002111-RECECOM-HEN-SEC
-      *
-      *        ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£µ£°¡¢£µ£±¡¢£µ£²¡Ë     
-               MOVE    "key12"             TO  WRK-PATHNAME
+               MOVE    "key21"              TO  WRK-PATHNAME
                PERFORM 2002111-RECECOM-HEN-SEC
            ELSE
       *        ¥³¥á¥ó¥È
-               MOVE    "key13"             TO  WRK-PATHNAME
+               MOVE    "key22"             TO  WRK-PATHNAME
                PERFORM 2002111-RECECOM-HEN-SEC
            END-IF
       *
@@ -5780,20 +5773,29 @@
       *
                MOVE    1               TO  FLG-TARGET
       *
-               IF    ( WKCOMB-HKNNUM       =   "971" OR "973" )
-                   IF    ( RECECOM-SJKBN   =   "51"  OR "52" )
-                       CONTINUE
-                   ELSE
-                       MOVE    ZERO    TO  FLG-TARGET
-                   END-IF
-               END-IF
-      *
-               IF    ( FLG-AFTER-CARE  =   1 )
-                       MOVE    ZERO    TO  FLG-TARGET
-               END-IF
-      *
                IF    ( FLG-TARGET  =   1 )
+                   IF    ( FLG-AFTER-CARE  =   1 )
+                       IF    ( RECECOM-SRYDD   NOT =   TRECECOM-SRYDD )
+                           MOVE    RECECOM-SRYDD
+                                           TO  WRK-Z9
+                           MOVE    SPACE   TO  WRK-MAE-INPUT
+                           STRING  "¡ö¡ö¡ö¡¡"   DELIMITED BY SIZE
+                                   WRK-Z9       DELIMITED BY SIZE
+                                   "Æü¡¡¡ö¡ö¡ö"
+                                                DELIMITED BY SIZE
+                           INTO    WRK-MAE-INPUT
+                           END-STRING
+                           PERFORM 800-ZENKAKU-HEN-SEC
+                           MOVE    WRK-OUT-INPUT   TO  WRK-LONGSTR
+                           PERFORM 20021111-RECECOM-HEN2-SEC
+      *
+                           MOVE    RECECOM-SRYDD   TO  TRECECOM-SRYDD
+      *
+                       END-IF
+                   END-IF
+      *
                    MOVE    SPACE           TO  WRK-LONGSTR
+      *
                    IF    ( RECECOM-SJKBN
                                    =   "07"    OR  "08"    OR  "09" )
                        MOVE    "07"            TO  RECECOM-SJKBN
@@ -5816,6 +5818,15 @@
                                                TO  WRK-LONGSTR
                        WHEN    "52"
                            MOVE    CONST-RECECOM (10)
+                                               TO  WRK-LONGSTR
+                       WHEN    "99"
+                           IF    ( TRECECOM-AA =   1 )
+                               MOVE    CONST-RECECOM (11)
+                                               TO  WRK-LONGSTR
+                           END-IF
+                       WHEN    "AA"
+                           MOVE    1           TO  TRECECOM-AA
+                           MOVE    CONST-RECECOM (12)
                                                TO  WRK-LONGSTR
                        END-EVALUATE
                    END-IF
