@@ -527,6 +527,22 @@
                        WHEN    "840"
                            MOVE    9               TO  IDX-SRY
                    END-EVALUATE
+      *H25.7 ÄÉ²Ã
+               WHEN    OTHER
+                   EVALUATE    ORCSCHKTALL-HKTSRYKBN
+                       WHEN    "13"
+      *                »ØÆ³ÎÁ
+                           MOVE    11              TO  IDX-SRY
+                       WHEN    "14"
+      *                ºßÂðÎÁ
+                           MOVE    12              TO  IDX-SRY
+                       WHEN    "11"
+                       WHEN    "12"
+                       WHEN    "90"
+                       WHEN    "92"
+      *                ½é¿Ç¡¦ºÆ¿Ç¡¦Æþ±¡
+                           MOVE    13              TO  IDX-SRY
+                   END-EVALUATE
            END-EVALUATE
            .
        3001-HKTSRYKBN-SET-EXT.
@@ -713,8 +729,8 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *****************************************************************
        300222-ETENSU-CHK-SEC         SECTION.
       *
-           IF      FLG-HKTCHK          =   1
-      *        ¿ÇÎÅ¶èÊ¬¤ÇÊñ³ç¤Î»þ¤Î¤ß
+      *????IF      FLG-HKTCHK          =   1
+      *!!!!!!! ¿ÇÎÅ¶èÊ¬¤ÇÊñ³ç¤Î»þ¤Î¤ß
                INITIALIZE                  ORCSCETNSCHKAREA
                MOVE    "1"                 TO  ORCSCETNSCHK-SYORI
                MOVE    WRK-SRYYMD          TO  ORCSCETNSCHK-SRYYMD
@@ -727,7 +743,11 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *            Êñ³çÂÐ¾Ý¤Ê¤·
                    MOVE    ZERO            TO  FLG-HKTCHK
                END-IF
-           END-IF
+               IF      ORCSCETNSCHK-CHKKBN =   1
+      *            Êñ³ç¤¢¤ê
+                   MOVE    1               TO  FLG-HKTCHK
+               END-IF
+      *****END-IF
            .
        300222-ETENSU-CHK-EXT.
            EXIT.
