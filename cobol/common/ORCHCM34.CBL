@@ -7716,6 +7716,14 @@
                        MOVE    ZERO    TO  FLG-LOOPEND
                    END-IF
       *
+                   IF    ( RECECOM-SJKBN       =   "AA" )
+                       IF    ( WKCOMB-HKNNUM   =   "971" )
+                           CONTINUE
+                       ELSE
+                           MOVE    ZERO    TO  FLG-LOOPEND
+                       END-IF
+                   END-IF
+      *
                    IF    ( FLG-AFTER-CARE  =   1 )
                        MOVE    RECECOM-SRYDD   TO  WRK-DD-G
                        IF    ( WRK-DD          >=  ORCHCM34-STDAY )
