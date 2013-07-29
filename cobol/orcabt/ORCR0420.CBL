@@ -238,6 +238,7 @@
       *                                     µÙ¶È¾ÚÌÀ¤Î¤ß¤ÎÂÐ±þ
       *  04.06.08    NACL-ÌçÏÆ    13/06/27  Ê¿À®£²£µÇ¯£··î¿ÇÎÅÊ¬°Ê¹ß¤ÎºÆ¿Ç»þ
       *                                     ÎÅÍÜ»ØÆ³´ÉÍýÎÁ¤Î¥³¥á¥ó¥Èµ­ºÜ½¤Àµ
+      *  04.06.09    NACL-ÌçÏÆ    13/07/26  ¶â³ÛÍó½¸·×Ê¬¤Î¥³¥á¥ó¥ÈÊÔ½¸½¤Àµ
       *
       *  04.07.01    NACL-ÌçÏÆ    12/09/25  ¥³¥á¥ó¥Èº¹¹þÂÐ±þ¡ÊºßÂð»ýÂ³ÍÛ°µ¡Ë
       *  04.07.02    NACL-ÌçÏÆ    12/09/25  ¥³¥á¥ó¥Èº¹¹þ¼è¤ê»ß¤á¡ÊºßÂð»ýÂ³ÍÛ°µ¡Ë
@@ -653,6 +654,8 @@
       *
            03  WRK-SETCOM-JIDO                 PIC 9(03).
            03  WRK-SETCOM-JIDO2                PIC 9(03).
+      *
+           03  WRK-CHECK-SRYCD                 PIC X(09).
       *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
@@ -1882,6 +1885,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21012-RECE45-HENSYU-SEC               SECTION.
       *
+           MOVE    SPACE                TO      WRK-CHECK-SRYCD
+      *
            INITIALIZE                           SRYACT-REC
            MOVE    ACCT-HOSPNUM         TO      SRY-HOSPNUM
            MOVE    ACCT-NYUGAIKBN       TO      SRY-NYUGAIKBN
@@ -1897,6 +1902,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    "tbl_sryact"     TO      MCP-TABLE
                MOVE    "key2"           TO      MCP-PATHNAME
                PERFORM  800-SRYACT-READ-SEC
+      *
+               IF    WRK-CHECK-SRYCD  =  SPACE
+                 MOVE   SRY-SRYCD(1)    TO      WRK-CHECK-SRYCD
+               END-IF
+      *
                PERFORM  UNTIL  FLG-SRYACT    =    1
                    MOVE   ZERO   TO  FLG-ZANHAIKI
                                      FLG-FORMAL-KISAI
@@ -2967,12 +2977,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     OR  ((RECE41-HKNKBN      =   "5") AND
                          (RECE41-KOMUKBN     =   "2"))
                       IF (( ACCT-SRYKBN            =  "80"      ) AND
-                          ( SRY-SRYCD(1)(1:5)      =  "09591"
+                          ( WRK-CHECK-SRYCD(1:5)   =  "09591"
                                                    OR "09592"
                                                    OR "09593"   ) AND
                           ( SRY-SRYCD(IDX2)(1:1)   =   "8"      ))
                       OR (( ACCT-SRYKBN            =  "80"      ) AND
-                          ( SRY-SRYCD(1)(1:5)      =  "09591"
+                          ( WRK-CHECK-SRYCD(1:5)   =  "09591"
                                                    OR "09592"
                                                    OR "09593"   ) AND
                           ( SRY-SRYCD(IDX2)(1:3)   =   "008"    ))
@@ -3007,20 +3017,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           ( SRY-SRYCD(IDX2) NOT = "830000021"   ) AND
                           ( ACCT-ZAIKBN     NOT =  1 AND 2      ))
                       OR (( ACCT-SRYKBN     = "13"              ) AND
-                          ( SRY-SRYCD(1)    =  CONS-ROUSAI8     ) AND
+                          ( WRK-CHECK-SRYCD =  CONS-ROUSAI8     ) AND
                           ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
                            (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
                           ( RECE41-SRYYM    <  "200804"         ))
                       OR (( ACCT-SRYKBN            =  "80"      ) AND
-                          ( SRY-SRYCD(1)(1:5)      =  "09591"
+                          ( WRK-CHECK-SRYCD(1:5)   =  "09591"
                                                    OR "09592"
                                                    OR "09593"   ) AND
                           ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
                            (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ))
-                      OR (( SRY-SRYCD(1)    =  CONS-ROUSAI3     ) AND
+                      OR (( WRK-CHECK-SRYCD =  CONS-ROUSAI3     ) AND
                           ( RECE41-SRYYM   <=  "201306"         ))
                       OR (( ACCT-SRYKBN     = "13"              ) AND
-                          ( SRY-SRYCD(1)    =
+                          ( WRK-CHECK-SRYCD =
                             CONS-ROUSAI9  OR  CONS-ROUSAI10 OR
                             CONS-ROUSAI11 OR  CONS-ROUSAI12 OR
                             CONS-ROUSAI13 OR  CONS-ROUSAI14 OR
@@ -3029,10 +3039,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
                            (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
                           ( RECE41-SRYYM   <=  "201306"         ))
-                      OR (( SRY-SRYCD(1)    =  CONS-ROUSAI32    ) AND
+                      OR (( WRK-CHECK-SRYCD =  CONS-ROUSAI32    ) AND
                           ( RECE41-SRYYM   >=  "201307"         ))
                       OR (( ACCT-SRYKBN     = "80"              ) AND
-                          ( SRY-SRYCD(1)    =
+                          ( WRK-CHECK-SRYCD =
                             CONS-ROUSAI20 OR  CONS-ROUSAI21 OR
                             CONS-ROUSAI22 OR  CONS-ROUSAI23 OR
                             CONS-ROUSAI24 OR  CONS-ROUSAI25 OR
@@ -3042,7 +3052,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
                            (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
                           ( RECE41-SRYYM   >=  "201307"         ))
-                      OR (( SRY-SRYCD(1)    =  CONS-ROUSAI33    ) AND
+                      OR (( WRK-CHECK-SRYCD =  CONS-ROUSAI33    ) AND
                           ( RECE41-SRYYM   >=  "201307"         ))
       *
                          ADD    1      TO    WRK-MEISAI-CNT             
