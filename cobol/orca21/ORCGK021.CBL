@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    NACL-多々納  05/11/17  MONFUNC 対応
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
+      *  04.07.00    NACL-多々納  13/07/XX  相互症状機序対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -358,7 +359,12 @@
            ELSE
                MOVE    SPA-K021-TTOUMEI (IDX)  TO  WRK-K021-TOUMEI
            END-IF
-           MOVE    SPA-K021-TKNKMEI (IDX)(3:)  TO  WRK-K021-KNKMEI
+           IF      SPA-K021-TKNKMEI (IDX)(1:2) =   "→"
+                                               OR  "←"
+               MOVE    SPA-K021-TKNKMEI(IDX)(3:)   TO  WRK-K021-KNKMEI
+           ELSE
+               MOVE    SPA-K021-TKNKMEI(IDX)       TO  WRK-K021-KNKMEI
+           END-IF
            MOVE    "1"                     TO  WRK-K021-KNKMEIFLG
       *    症状編集
            INITIALIZE                  SSKIJYO-REC
