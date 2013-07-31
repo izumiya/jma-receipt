@@ -75,6 +75,7 @@
       * 04.07.00     NACL-多々納  12/08/08  診察料なし同日初診料発生対応
       * 04.08.00     NACL-多々納  13/03/XX  平成２５年４月改正対応
       * 04.08.00     NACL-多々納  13/02/XX  労災コードレセ電対応
+      * 04.07.00     NACL-多々納  13/08/XX  電話再診の加算算定対応
       *****************************************************************
       *
       *
@@ -225,6 +226,8 @@
       *
            03  IDX-STR              PIC 9(02).
            03  IDX-R                PIC 9(02).
+      *
+           03  IDX-TEL                 PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -5950,6 +5953,29 @@
            IF     (SPA-INITAUTO-FLG    =   "0" )
                MOVE    ZERO                TO  FLG-HENKAN
            END-IF
+      *
+      *ver.4.7
+      *    電話再診処理済み区分設定
+           IF     (WRK-KBN3            =   "T"  OR  "S" )
+             AND  (IDX-TEL             >   ZERO         )
+      *        ＣＬＡＩＭからは、環境設定は反映なし
+               IF     (SPA-WKSRY-KARTE-FLG NOT =   1   )
+      *ver.4.8 ****MOVE    "2"             TO  SPA-COM-KSNAUTO
+                   MOVE    "2"             TO  SPA-COM-YOBI1
+                                                   (IDX-TEL)(1:1)
+               END-IF
+      *        診察料自動発生なし時CLAIMもなし
+               IF     (SPA-INITAUTO-FLG    =   "0" )
+      *        中途終了で再算定しない時
+                 OR  ((SPA-CHUTOTENKAI-FLG =   "0"  )  AND
+                      (SPA-WKSRY-KARTE-FLG =   1    ))
+      *ver.4.8 ****MOVE    "1"             TO  SPA-COM-KSNAUTO
+                   MOVE    "1"             TO  SPA-COM-YOBI1
+                                                   (IDX-TEL)(1:1)
+               END-IF
+           END-IF
+      *ver.4.8
+      *
       *    診察料変換
            IF      FLG-HENKAN          =   1
       *        時間外なし
@@ -5967,6 +5993,7 @@
       *
            MOVE    ZERO                TO  FLG-TAKA
            MOVE    ZERO                TO  FLG-ARI
+           MOVE    ZERO                TO  IDX-TEL
            MOVE    SPACE               TO  WRK-KBN4
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL      (IDX     >   SPA-MAX-LINE    )  OR
@@ -6018,6 +6045,12 @@
                    IF      WRK-KBN             =   "G"
                        MOVE    1               TO  FLG-GAI
                    END-IF
+      *ver.4.7
+      *            電話再診の位置
+                   IF     (WRK-KBN3            =   "T"  OR  "S" )
+                       MOVE    IDX             TO  IDX-TEL
+                   END-IF
+      *
                END-IF
                EVALUATE    SPA-COM-INPUTCD (IDX)
       *                ＤＵＭＭＹ診察料
@@ -6090,6 +6123,16 @@
                    (FLG-HENKAN         =   ZERO)
                IF     (SPA-TAKA-SRYKA-R    NOT =   SPACE ) AND
                       (FLG-SINSATU-ARI     =   1         )
+                   MOVE    1               TO  FLG-DOUJI-HEN 
+                   MOVE    1               TO  FLG-HENKAN
+               END-IF
+           END-IF
+      *
+      *H25.7
+      *    再診料変換（．１２）で他科受診ありは同日再診料とする
+           IF      (LNK-SC10S-SYORI    =   "E" )  AND
+                   (FLG-HENKAN         =   ZERO)
+               IF     (SPA-TAKA-SRYKA-R    NOT =   SPACE )
                    MOVE    1               TO  FLG-DOUJI-HEN 
                    MOVE    1               TO  FLG-HENKAN
                END-IF
