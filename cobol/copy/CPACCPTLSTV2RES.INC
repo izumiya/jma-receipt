@@ -41,6 +41,8 @@
                   05  ACPLSTRES-ACCEPT-LST      OCCURS   500.
       *               ¼õÉÕ»þ´Ö
                       07  ACPLSTRES-ACCEPT-TIME        PIC X(8).
+      *               ¼õÉÕ£É£Ä
+                      07  ACPLSTRES-ACCEPT-ID          PIC X(5).
       *               ¿ÇÎÅ²Ê
                       07  ACPLSTRES-ACCEPT-DEP-CODE    PIC X(2).
       *               ¿ÇÎÅ²ÊÌ¾¾Î

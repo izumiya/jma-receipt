@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.01    NACL-多々納  13/08/01  受付ＩＤ追加対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -782,6 +783,9 @@
            MOVE    UKE-UKETIME         TO  WRK-THMS
            PERFORM 801-DAYHEN01-SEC
            MOVE    WRK-HEN-TIME        TO  ACPLSTRES-ACCEPT-TIME (IDX)
+      *ver.4.7
+      *    受付ＩＤ
+           MOVE    UKE-UKEID           TO  ACPLSTRES-ACCEPT-ID  (IDX)
       *    診療内容
            MOVE    UKE-SRYNAIYO        TO  ACPLSTRES-ACCEPT-DEP-INFO
                                                                  (IDX)

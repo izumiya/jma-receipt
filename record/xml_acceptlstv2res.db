@@ -12,6 +12,7 @@ xml_acceptlstv2res {
 	Acceptance_Date			varchar(10);
 	Acceptlst_Information {
 		Acceptance_Time			varchar(08);
+		Acceptance_Id			varchar(5);
 		Department_Code			varchar(2);
 		Department_WholeName		varchar(80);
 		Physician_Code			varchar(5);
