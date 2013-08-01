@@ -52,118 +52,153 @@ W06	{
 				};
 				CHK33	{
 					value	bool;
-		                        state   int;
+					state   int;
 				};
 				CHK36	{
 					value	bool;
+					state   int;
 				};
 				CHK11	{
 					value	bool;
+					state   int;
 				};
 				CHK01	{
 					value	bool;
+					state   int;
 				};
 				CHK10	{
 					value	bool;
+					state   int;
 				};
 				CHK14	{
 					value	bool;
+					state   int;
 				};
 				CHK24	{
 					value	bool;
+					state   int;
 				};
 				CHK20	{
 					value	bool;
+					state   int;
 				};
 				CHK18	{
 					value	bool;
+					state   int;
 				};
 				CHK19	{
 					value	bool;
-		                        state   int;
+					state   int;
 				};
 				CHK03	{
 					value	bool;
+					state   int;
 				};
 				CHK04	{
 					value	bool;
+					state   int;
 				};
 				CHK05	{
 					value	bool;
+					state   int;
 				};
 				CHK02	{
 					value	bool;
+					state   int;
 				};
 				CHK06	{
 					value	bool;
+					state   int;
 				};
 				CHK07	{
 					value	bool;
+					state   int;
 				};
 				CHK08	{
 					value	bool;
+					state   int;
 				};
 				CHK09	{
 					value	bool;
+					state   int;
 				};
 				CHK27	{
 					value	bool;
+					state   int;
 				};
 				CHK28	{
 					value	bool;
+					state   int;
 				};
 				CHK29	{
 					value	bool;
+					state   int;
 				};
 				CHK30	{
 					value	bool;
+					state   int;
 				};
 				CHK31	{
 					value	bool;
+					state   int;
 				};
 				CHK32	{
 					value	bool;
+					state   int;
 				};
 				CHK12	{
 					value	bool;
+					state   int;
 				};
 				CHK13	{
 					value	bool;
+					state   int;
 				};
 				CHK15	{
 					value	bool;
+					state   int;
 				};
 				CHK16	{
 					value	bool;
+					state   int;
 				};
 				CHK17	{
 					value	bool;
+					state   int;
 				};
 				CHK26	{
 					value	bool;
+					state   int;
 				};
 				CHK25	{
 					value	bool;
+					state   int;
 				};
 				CHK21	{
 					value	bool;
+					state   int;
 				};
 				CHK22	{
 					value	bool;
+					state   int;
 				};
 				CHK23	{
 					value	bool;
+					state   int;
 				};
 				CHK34	{
 					value	bool;
+					state   int;
 				};
 				CHK35	{
 					value	bool;
+					state   int;
 				};
 				KKANRIAUTHFLG_COMB	{
 					KANRIAUTHFLG	{
 						value	varchar(12);
 					};
+					state   int;
 					count	int;
 					item	varchar(12)[2];
 				};

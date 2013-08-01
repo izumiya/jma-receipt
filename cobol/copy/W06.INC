@@ -39,79 +39,114 @@
                     06  W06-CHK33-VALUE   PIC X.
                     06  W06-CHK33-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK36.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK36-VALUE   PIC X.
+                    06  W06-CHK36-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK11.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK11-VALUE   PIC X.
+                    06  W06-CHK11-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK01.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK01-VALUE   PIC X.
+                    06  W06-CHK01-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK10.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK10-VALUE   PIC X.
+                    06  W06-CHK10-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK14.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK14-VALUE   PIC X.
+                    06  W06-CHK14-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK24.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK24-VALUE   PIC X.
+                    06  W06-CHK24-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK20.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK20-VALUE   PIC X.
+                    06  W06-CHK20-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK18.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK18-VALUE   PIC X.
+                    06  W06-CHK18-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK19.
                     06  W06-CHK19-VALUE   PIC X.
                     06  W06-CHK19-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK03.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK03-VALUE   PIC X.
+                    06  W06-CHK03-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK04.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK04-VALUE   PIC X.
+                    06  W06-CHK04-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK05.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK05-VALUE   PIC X.
+                    06  W06-CHK05-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK02.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK02-VALUE   PIC X.
+                    06  W06-CHK02-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK06.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK06-VALUE   PIC X.
+                    06  W06-CHK06-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK07.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK07-VALUE   PIC X.
+                    06  W06-CHK07-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK08.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK08-VALUE   PIC X.
+                    06  W06-CHK08-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK09.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK09-VALUE   PIC X.
+                    06  W06-CHK09-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK27.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK27-VALUE   PIC X.
+                    06  W06-CHK27-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK28.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK28-VALUE   PIC X.
+                    06  W06-CHK28-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK29.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK29-VALUE   PIC X.
+                    06  W06-CHK29-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK30.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK30-VALUE   PIC X.
+                    06  W06-CHK30-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK31.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK31-VALUE   PIC X.
+                    06  W06-CHK31-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK32.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK32-VALUE   PIC X.
+                    06  W06-CHK32-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK12.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK12-VALUE   PIC X.
+                    06  W06-CHK12-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK13.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK13-VALUE   PIC X.
+                    06  W06-CHK13-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK15.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK15-VALUE   PIC X.
+                    06  W06-CHK15-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK16.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK16-VALUE   PIC X.
+                    06  W06-CHK16-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK17.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK17-VALUE   PIC X.
+                    06  W06-CHK17-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK26.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK26-VALUE   PIC X.
+                    06  W06-CHK26-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK25.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK25-VALUE   PIC X.
+                    06  W06-CHK25-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK21.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK21-VALUE   PIC X.
+                    06  W06-CHK21-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK22.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK22-VALUE   PIC X.
+                    06  W06-CHK22-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK23.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK23-VALUE   PIC X.
+                    06  W06-CHK23-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK34.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK34-VALUE   PIC X.
+                    06  W06-CHK34-STATE   PIC S9(9)   BINARY.
                   05  W06-CHK35.
-                    06  W06-VALUE   PIC X.
+                    06  W06-CHK35-VALUE   PIC X.
+                    06  W06-CHK35-STATE   PIC S9(9)   BINARY.
                   05  W06-KKANRIAUTHFLG-COMB.
                     06  W06-KANRIAUTHFLG.
                       07  W06-VALUE   PIC X(12).
+                    06  W06-KANRIAUTHFLG-STATE   PIC S9(9)   BINARY.
                     06  W06-KANRIAUTHFLG-COUNT   PIC S9(9)   BINARY.
                     06  W06-KANRIAUTHFLG-ITEM
                             PIC X(12)   OCCURS  2 TIMES.
