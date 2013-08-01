@@ -576,7 +576,7 @@
       *
            EVALUATE    MNOTE-H-LOCATION-CD
            WHEN    "01"
-               MOVE    "壳闻乖百∈懒滇澄千∷"
+               MOVE    "壳闻乖百"
                                        TO  SPA-GMN-TLDNAME (IDXL)
            WHEN    "02"
                MOVE    "壳闻乖百∈面庞姜位∷"
