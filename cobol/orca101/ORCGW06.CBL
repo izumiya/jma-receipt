@@ -3375,7 +3375,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                            END-IF
                        END-IF
                    END-IF
-      *----(04.07.01)--UPD-END-----               END-EVALUATE
+      *----(04.07.01)--UPD-END-----
+               END-EVALUATE
            END-IF
            .
        480-BETUGAMEN-EXT.
