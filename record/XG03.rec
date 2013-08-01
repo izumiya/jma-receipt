@@ -1,0 +1,114 @@
+XG03	{
+	fixed32	{
+		B04	{
+			label	varchar(10);
+		};
+		B06S	{
+			state	int;
+		};
+		B07S	{
+			state	int;
+		};
+		B09	{
+			state	int;
+		};
+		B10	{
+			label	varchar(10);
+		};
+		B11	{
+			state	int;
+		};
+		B12	{
+			state	int;
+		};
+		LBLMSG01	{
+            style   varchar(20);
+            value   varchar(100);
+		};
+		LBLMSG02	{
+            style   varchar(20);
+            value   varchar(100);
+		};
+		SELNUM	{
+			value	number(3);
+		};
+		PTNUM	{
+			state	int;
+            value   varchar(20);
+		};
+        PTNAME    {
+            style   varchar(20);
+            value   varchar(50);
+        };
+		CREYMD	{
+			state	int;
+            value   varchar(10);
+		};
+		scrolledwindow26	{
+			LIST	{
+				count	int;
+				row	int;
+				rowattr	int;
+				item	{
+					value0	varchar(5);
+					value1	varchar(20);
+					value2	varchar(50);
+					value3	varchar(50);
+					value4	varchar(10);
+					value5	varchar(9);
+					value6	varchar(50);
+					value7	varchar(20);
+					value8	varchar(9);
+					value9	varchar(8);
+					value10	varchar(6);
+				}	[200];
+				select	bool[200];
+			};
+		};
+				IPTNUM	{
+					value	varchar(20);
+				};
+				IPTNAME	{
+					value	varchar(50);
+				};
+				ITITLE	{
+					value	varchar(50);
+				};
+				IVERSION	{
+					value	varchar(10);
+				};
+				IDRNAME	{
+					value	varchar(50);
+				};
+				ISRYYMD	{
+					value	varchar(9);
+				};
+				ILDNAME	{
+					value	varchar(20);
+				};
+				ICREYMD	{
+					value	varchar(9);
+				};
+				ICREHMS	{
+					value	varchar(8);
+				};
+				IOPID	{
+					value	varchar(16);
+				};
+				ISTATUS	{
+					value	varchar(6);
+				};
+        		sw1     {
+					CONTEXT	{
+						value	varchar(50000);
+					};
+				};
+        pandatimer1     {
+			duration        int;
+        };
+        pandadownload1 {
+            objectdata      object;
+            filename        varchar(1024);
+        };
+	};
+};

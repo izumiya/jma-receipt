@@ -53,6 +53,7 @@
       *  04.04.00    NACL-森脇    09/01/27  排他ＳＰＡ共通対応
       *  04.04.00    NACL-森脇    09/01/30  他院切替対応
       *  04.07.00    NACL-森脇    12/07/04  ユーザーＩＤ表示
+      *  04.07.00    NACL-太田    13/07/16  電子お薬手帳対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -675,6 +676,9 @@
       *    印刷削除
                WHEN    "CLICKED"       ALSO    "B07"
                    MOVE    "0001"      TO  SPA-MIDCD
+      *    電子版手帳画面
+               WHEN    "CLICKED"       ALSO    "B08"
+                   PERFORM 470-MNOTE-SEC
       *    各業務移動へ
                WHEN    "CLICKED"       ALSO    ANY
                    PERFORM 400-GYOMU-SEL-SEC
@@ -1184,6 +1188,28 @@
            EXIT.
       *
       *****************************************************************
+      *    電子版手帳画面へ
+      *****************************************************************
+       470-MNOTE-SEC             SECTION.
+      *
+      *    画面移行用のパラメタ変更
+           MOVE    "M01"               TO  SPA-MOTOPG
+           MOVE    "XG03"              TO  SPA-SAKIPG
+      *
+           INITIALIZE                  SPA-KYOTUKEY
+           MOVE    SPA-KYOUTU          TO  LNK-KYOUTU
+      *
+           MOVE   "CHANGE"             TO  MCP-PUTTYPE.
+           MOVE   "XG03"               TO  MCP-WINDOW.
+      *
+           PERFORM 900-PUT-WINDOW.
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       470-MNOTE-EXT.
+           EXIT.
+      *****************************************************************
       *    定点調査確認画面へ
       *****************************************************************
        490-TEITEN-SEC             SECTION.
@@ -1267,6 +1293,8 @@
       ***         MOVE    "未読緊急情報あり！"    TO  M01-ALERT
       ***     END-IF
       *----(01.00.04) LINE DEL START ----------------------------------
+      *
+           MOVE    "電子版手帳" TO  M01-B08-LABEL
       *
            PERFORM 5001-MAPCUR-SEC
       *

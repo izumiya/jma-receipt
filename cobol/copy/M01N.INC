@@ -24,6 +24,7 @@
             03  M01N-BGCOLORS.
               04  M01N-VALUE   PIC X(20).
             03  M01N-FIXED1.
+              04  M01N-B08-LABEL     PIC X(10).
               04  M01N-STATE-G.
                 05  M01N-G11-STATE   PIC S9(09) BINARY.
                 05  M01N-G12-STATE   PIC S9(09) BINARY.

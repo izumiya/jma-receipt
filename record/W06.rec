@@ -274,6 +274,13 @@ W06	{
 					count	int;
 					item	varchar(40)[2];
 				};
+				ICCARDRW_COMB	{
+					ICCARDRW	{
+						value	varchar(40);
+					};
+					count	int;
+					item	varchar(40)[2];
+				};
 			};
               		TGN3	{
 				state   int;

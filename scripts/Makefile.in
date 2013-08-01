@@ -93,6 +93,7 @@ utf8_shell_sources = \
 	tools/orcred2conv.sh.in \
 	allways/orc_print_dmy.sh.in \
 	allways/orcbi202.sh.in \
+	allways/store_mnote.sh.in \
 
 shell_sources = \
 	allways/master_standard_upgrade.sh.in \

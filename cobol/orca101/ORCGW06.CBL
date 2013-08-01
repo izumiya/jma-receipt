@@ -56,6 +56,7 @@
       * 04.07.00     NACL-太田    12/05/27  タブラベル対応
       * 04.07.01     NACL-森脇    13/07/05  業務処理権限変更不可
       *                           13/07/17  スーパーバイザー処理変更
+      * 04.07.01     NACL-太田    13/07/22  ＩＣカードリーダ／ライタ設定追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -220,6 +221,10 @@
                        09  SPA-GMN-DIALOGFLG-LST   PIC X(40)
                                                    OCCURS  2. 
                    07  SPA-DIALOGFLG-MAX       PIC 9(04).  
+                   07  SPA-GMN-ICCARDRW-LSTG.
+                       09  SPA-GMN-ICCARDRW-LST   PIC X(40)
+                                                   OCCURS  2. 
+                   07  SPA-ICCARDRW-MAX           PIC 9(04).  
       *            基本情報の発行区分
                    07  SPA-1001-SKYPRTFLG      PIC  X(01).
                    07  SPA-1001-SYOHOPRTFLG    PIC  X(01).
@@ -273,6 +278,11 @@
                        09  SPA-GMN-DIALOGFLG       PIC X(01).
                        09  SPA-GMN-DIALOGFLG-F1    PIC X(01).
                        09  SPA-GMN-DIALOGFLG-MEI   PIC X(24).
+      *            ＩＣカードリーダ／ライタ
+                   07  SPA-GMN-ICCARDRW-G. 
+                       09  SPA-GMN-ICCARDRW        PIC X(01).
+                       09  SPA-GMN-ICCARDRW-F1     PIC X(01).
+                       09  SPA-GMN-ICCARDRW-MEI    PIC X(24).
       *
                05  SPA-PAGE3-G.
       *            他院医療機関情報
@@ -349,6 +359,10 @@
                        09  SPA-MAE-DIALOGFLG       PIC X(01).
                        09  SPA-MAE-DIALOGFLG-F1    PIC X(01).
                        09  SPA-MAE-DIALOGFLG-MEI   PIC X(24).
+                   07  SPA-MAE-ICCARDRW-G. 
+                       09  SPA-MAE-ICCARDRW        PIC X(01).
+                       09  SPA-MAE-ICCARDRW-F1     PIC X(01).
+                       09  SPA-MAE-ICCARDRW-MEI    PIC X(24).
       *
                    07  SPA-MAE-GRPHOSP-G.
                        09  MAE-GMN-GRPHOSP-MAX     PIC 9(02).
@@ -442,6 +456,8 @@
            COPY  "CPSK1005.INC".
       *    職員情報
            COPY  "CPSK1010.INC".
+      *    職員情報２
+           COPY  "CPSK1050.INC".
       *    基本情報
            COPY  "CPSK1001.INC".
       *    基本情報
@@ -773,6 +789,10 @@
            MOVE    "0 表示しない"      TO  SPA-GMN-DIALOGFLG-LST(1)
            MOVE    "1 表示する"        TO  SPA-GMN-DIALOGFLG-LST(2)
            MOVE    2                   TO  SPA-DIALOGFLG-MAX
+      *    ＩＣカードリーダ／ライタ
+           MOVE    "0 使用しない"      TO  SPA-GMN-ICCARDRW-LST(1)
+           MOVE    "1 使用する"        TO  SPA-GMN-ICCARDRW-LST(2)
+           MOVE    2                   TO  SPA-ICCARDRW-MAX
       *
       *    基本情報の発行フラグ
            PERFORM 3202-KIHON-HEN-SEC
@@ -1395,6 +1415,14 @@
            INITIALIZE                      SYS-1010-REC
            PERFORM 320-SPASET-GSRAUTH-SEC
       *
+           MOVE    "0"                 TO  SPA-GMN-CLIENT-SAVE
+           MOVE    "0"                 TO  SPA-GMN-USER-KANRI
+           MOVE    "0"                 TO  SPA-GMN-CLIENT-PRT
+           MOVE    "0"                 TO  SPA-GMN-DIALOGFLG
+           MOVE    "0"                 TO  SPA-GMN-ICCARDRW
+      *
+           PERFORM 20091-PRTFLG-HEN-SEC
+      *
            .
        200212-INIT-GMN-EXT.
            EXIT.
@@ -1481,6 +1509,24 @@
            PERFORM 900-SYSKANRI-KEY-SEC
            IF      FLG-SYSKANRI            =   ZERO
                MOVE    MCPDATA-REC             TO  SYS-1010-REC
+      *
+               MOVE    SPACE               TO  SYS-1050-REC
+               INITIALIZE                      SYS-1050-REC
+               MOVE    "1050"              TO  SYS-1050-KANRICD
+               MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1050-KBNCD (1:1)
+               MOVE    SPA-GMN-SYOKUCOD    TO  SYS-1050-KBNCD (2:4)
+               MOVE    SPA-NAI-STYUKYMD    TO  SYS-1050-STYUKYMD 
+               MOVE    SPA-NAI-STYUKYMD    TO  SYS-1050-EDYUKYMD 
+               MOVE    SPA-HOSPNUM         TO  SYS-1050-HOSPNUM
+               MOVE    SYS-1050-REC        TO  MCPDATA-REC
+               PERFORM 900-SYSKANRI-KEY-SEC
+               IF      FLG-SYSKANRI            =   ZERO
+                   MOVE    MCPDATA-REC     TO  SYS-1050-REC
+               ELSE
+                   MOVE    SPACE           TO  SYS-1050-REC
+                   INITIALIZE                  SYS-1050-REC
+               END-IF
+      *
                MOVE    SYS-1010-USERID         TO  SPA-GMN-USERID
                MOVE    SYS-1010-KANANAME       TO  SPA-GMN-KANANAME
                MOVE    SYS-1010-NAME           TO  SPA-GMN-NAME
@@ -1558,7 +1604,7 @@
                MOVE    SYS-1010-USER-KANRI     TO  SPA-GMN-USER-KANRI
                MOVE    SYS-1010-CLIENT-PRT     TO  SPA-GMN-CLIENT-PRT
                MOVE    SYS-1010-DIALOGFLG      TO  SPA-GMN-DIALOGFLG
-               PERFORM 20091-PRTFLG-HEN-SEC
+               MOVE    SYS-1050-ICCARDRW       TO  SPA-GMN-ICCARDRW
       *
                INITIALIZE                     SPA-PAGE3-G
                PERFORM VARYING IDX FROM    1   BY  1
@@ -1580,8 +1626,25 @@
                        END-IF
                    END-PERFORM
                END-PERFORM
-      *
            END-IF
+      *
+           IF    ( SPA-GMN-CLIENT-SAVE =   SPACE )
+               MOVE    "0"             TO  SPA-GMN-CLIENT-SAVE
+           END-IF
+           IF    ( SPA-GMN-USER-KANRI  =   SPACE )
+               MOVE    "0"             TO  SPA-GMN-USER-KANRI
+           END-IF
+           IF    ( SPA-GMN-CLIENT-PRT  =   SPACE )
+               MOVE    "0"             TO  SPA-GMN-CLIENT-PRT
+           END-IF
+           IF    ( SPA-GMN-DIALOGFLG   =   SPACE )
+               MOVE    "0"             TO  SPA-GMN-DIALOGFLG
+           END-IF
+           IF    ( SPA-GMN-ICCARDRW    =   SPACE )
+               MOVE    "0"             TO  SPA-GMN-ICCARDRW
+           END-IF
+      *
+           PERFORM 20091-PRTFLG-HEN-SEC
       *
            . 
        2009-SYOKUIN-HENSYU-EXT.
@@ -1679,6 +1742,16 @@
                    MOVE    SPA-GMN-DIALOGFLG-LST (IDX)
                                            TO  SPA-GMN-DIALOGFLG-G
                    MOVE    SPA-DIALOGFLG-MAX   TO  IDX
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-ICCARDRW-MAX
+               IF      SPA-GMN-ICCARDRW   =   SPA-GMN-ICCARDRW-LST
+                                                      (IDX)(1:1)
+                   MOVE    SPA-GMN-ICCARDRW-LST (IDX)
+                                           TO  SPA-GMN-ICCARDRW-G
+                   MOVE    SPA-ICCARDRW-MAX   TO  IDX
                END-IF
            END-PERFORM
       *
@@ -2013,6 +2086,7 @@
            MOVE    W06-USER-KANRI      TO  SPA-GMN-USER-KANRI-G
            MOVE    W06-CLIENT-PRT      TO  SPA-GMN-CLIENT-PRT-G
            MOVE    W06-DIALOGFLG       TO  SPA-GMN-DIALOGFLG-G
+           MOVE    W06-ICCARDRW        TO  SPA-GMN-ICCARDRW-G
       *
       *    他院情報設定画面
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -2063,6 +2137,7 @@
            MOVE    SPA-GMN-USER-KANRI-G    TO  SPA-MAE-USER-KANRI-G
            MOVE    SPA-GMN-CLIENT-PRT-G    TO  SPA-MAE-CLIENT-PRT-G
            MOVE    SPA-GMN-DIALOGFLG-G     TO  SPA-MAE-DIALOGFLG-G
+           MOVE    SPA-GMN-ICCARDRW-G      TO  SPA-MAE-ICCARDRW-G
       *
       *    他院情報設定画面
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -2160,6 +2235,9 @@
                MOVE    1               TO  FLG-OK
            END-IF
            IF      SPA-GMN-DIALOGFLG-G NOT =   SPA-MAE-DIALOGFLG-G
+               MOVE    1               TO  FLG-OK
+           END-IF
+           IF      SPA-GMN-ICCARDRW-G  NOT =   SPA-MAE-ICCARDRW-G
                MOVE    1               TO  FLG-OK
            END-IF
       *
@@ -2271,6 +2349,10 @@
       *
            IF      SPA-ERRCD           =   SPACE
                PERFORM 4121-DIALOGFLG-CHK-SEC
+           END-IF
+      *
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4121-ICCARDRW-CHK-SEC
            END-IF
       *
            PERFORM VARYING IDX-GRP FROM    1   BY  1
@@ -3013,6 +3095,34 @@
        4121-DIALOGFLG-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    ダイアログ表示チェック処理
+      *****************************************************************
+       4121-ICCARDRW-CHK-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-CHK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-ICCARDRW-MAX
+               IF      SPA-GMN-ICCARDRW   =   SPA-GMN-ICCARDRW-LST
+                                                       (IDX)(1:1)
+                   MOVE    SPA-GMN-ICCARDRW-LST (IDX)
+                                               TO  SPA-GMN-ICCARDRW-G
+                   MOVE    1                   TO  FLG-CHK
+                   MOVE    SPA-ICCARDRW-MAX   TO  IDX
+               END-IF
+           END-PERFORM
+           IF     (FLG-CHK             =   ZERO )
+               IF      SPA-GMN-ICCARDRW   =   SPACE
+                   MOVE    SPACE           TO  SPA-GMN-ICCARDRW-G
+               ELSE
+                   MOVE    "0032"          TO  SPA-ERRCD
+                   MOVE    30              TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           .
+       4121-ICCARDRW-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    他院オペレータＩＤチェック処理
       *****************************************************************
        4122-GRPUSERID-CHK-SEC          SECTION.
@@ -3259,6 +3369,31 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "1002"              TO  SPA-ERRCD
                DISPLAY "W06 DB DEL ERR SYSKANRI-KEY =>" SYS-1010-KEY 
            END-IF
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+               MOVE    SPACE               TO  SYS-1050-REC
+               INITIALIZE                      SYS-1050-REC
+               MOVE    "1050"              TO  SYS-1050-KANRICD
+               MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1050-KBNCD(1:1)
+               MOVE    SPA-GMN-SYOKUCOD    TO  SYS-1050-KBNCD(2:4)
+               MOVE    SPA-MAE-STYUKYMD    TO  SYS-1050-STYUKYMD
+               MOVE    SPA-MAE-EDYUKYMD    TO  SYS-1050-EDYUKYMD
+      *
+               MOVE    SPA-HOSPNUM         TO  SYS-1050-HOSPNUM
+               MOVE    SYS-1050-REC        TO  MCPDATA-REC
+               MOVE    "DBDELETE"          TO  MCP-FUNC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+               IF      MCP-RC          NOT =   ZERO 
+                 MOVE    "1002"            TO  SPA-ERRCD
+                 DISPLAY "W06 DB DEL ERR SYSKANRI-KEY =>" SYS-1050-KEY
+               END-IF
+           END-IF
+      *
       *    ユーザＩＤ登録判定
            MOVE    ZERO                TO  FLG-USERID-UPD
            IF      SPA-GMN-TBL-MAX     >   1
@@ -3270,7 +3405,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-GMN-USERID      TO  SYSUSER-USERID
                MOVE    SYSUSER-REC         TO  MCPDATA-REC
                MOVE    "tbl_sysuser"       TO  MCP-TABLE 
-               MOVE    "key"               TO  MCP-PATHNAME 
+               MOVE    "key"               TO  MCP-PATHNAME
                MOVE    "DBDELETE"          TO  MCP-FUNC
                CALL    "ORCDBMAIN"         USING   MCPAREA
                                                    MCPDATA-REC
@@ -3694,6 +3829,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
+           IF     (SPA-ERRCD           =   SPACE )
+               PERFORM 4905-SYS1050-UPD-SEC
+           END-IF
+      *
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (FLG-USERID-UPD      =   1     )
       *        システムユーザー更新処理
@@ -3941,6 +4080,85 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        4900-KOUSHIN-GSRAUTH-EXT.
            EXIT.
       *
+      *****************************************************************
+      *    職員情報２更新処理
+      *****************************************************************
+       4905-SYS1050-UPD-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  SYS-1050-REC
+           INITIALIZE                      SYS-1050-REC
+           MOVE    "1050"              TO  SYS-1050-KANRICD
+           MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1050-KBNCD(1:1)
+           MOVE    SPA-GMN-SYOKUCOD    TO  SYS-1050-KBNCD(2:4)
+           MOVE    SPA-MAE-STYUKYMD    TO  SYS-1050-STYUKYMD
+           MOVE    SPA-MAE-STYUKYMD    TO  SYS-1050-EDYUKYMD
+      *
+           MOVE    SPA-HOSPNUM         TO  SYS-1050-HOSPNUM
+           MOVE    SYS-1050-REC        TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-KEY-SEC
+           IF    ( FLG-SYSKANRI        =   ZERO )
+               PERFORM 49051-SYS1050-UPD-SEC
+               MOVE    SMCNDATE-YMD        TO  SYS-1050-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYS-1050-UPHMS
+               MOVE    SYS-1050-REC        TO  SYSKANRI-REC
+      *
+               MOVE    SPA-HOSPNUM         TO  SYSUP-HOSPNUM
+               MOVE    SYS-KANRICD         TO  SYSUP-KANRICD
+               MOVE    SYS-KBNCD           TO  SYSUP-KBNCD
+               MOVE    SPA-MAE-STYUKYMD    TO  SYSUP-STYUKYMD
+               MOVE    SPA-MAE-EDYUKYMD    TO  SYSUP-EDYUKYMD
+      *
+               MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+               MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+               MOVE    "DBUPDATE"          TO  MCP-FUNC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "upd1"              TO  MCP-PATHNAME
+grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF    ( MCP-RC          NOT =   ZERO )
+                   MOVE    "1001"              TO  SPA-ERRCD
+                   DISPLAY "W06 DB UPD ERR KEY:" SYS-1050-KEY 
+               END-IF
+           ELSE
+               PERFORM 49051-SYS1050-UPD-SEC
+               MOVE    SMCNDATE-YMD        TO  SYS-1050-CREYMD
+               MOVE    SMCNDATE-YMD        TO  SYS-1050-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYS-1050-UPHMS
+               MOVE    SPA-HOSPNUM         TO  SYS-1050-HOSPNUM
+               MOVE    SYS-1050-REC        TO  MCPDATA-REC
+               MOVE    "DBINSERT"          TO  MCP-FUNC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                   MCPDATA-REC
+                                                   SPA-AREA
+               IF      MCP-RC          NOT =   ZERO 
+                   MOVE    "1001"              TO  SPA-ERRCD
+                   DISPLAY "W06 DB INS ERR KEY:" SYS-1050-KEY 
+               END-IF
+           END-IF
+      *
+          .
+       4905-SYS1050-UPD-EXT.
+           EXIT.
+      *****************************************************************
+      *    職員情報２更新処理
+      *****************************************************************
+       49051-SYS1050-UPD-SEC               SECTION.
+      *
+           MOVE    SPACE               TO  SYS-1050-REC
+           INITIALIZE                      SYS-1050-REC
+           MOVE    "1050"              TO  SYS-1050-KANRICD
+           MOVE    SPA-GMN-SYOKUKBN    TO  SYS-1050-KBNCD(1:1)
+           MOVE    SPA-GMN-SYOKUCOD    TO  SYS-1050-KBNCD(2:4)
+           MOVE    SPA-NAI-STYUKYMD    TO  SYS-1050-STYUKYMD
+           MOVE    SPA-NAI-EDYUKYMD    TO  SYS-1050-EDYUKYMD
+           MOVE    SPA-GMN-ICCARDRW    TO  SYS-1050-ICCARDRW
+      *
+          .
+       49051-SYS1050-UPD-EXT.
+           EXIT.
       *****************************************************************
       *    システムユーザー更新処理
       *****************************************************************
@@ -4233,6 +4451,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE  SPA-DIALOGFLG-MAX     TO  W06-DIALOGFLG-COUNT
            MOVE  SPA-GMN-DIALOGFLG-G   TO  W06-DIALOGFLG
+      *    ＩＣカードリーダ／ライタ
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-ICCARDRW-MAX
+               MOVE    SPA-GMN-ICCARDRW-LST(IDX)
+                                       TO  W06-ICCARDRW-ITEM(IDX)
+           END-PERFORM
+           MOVE  SPA-ICCARDRW-MAX      TO  W06-ICCARDRW-COUNT
+           MOVE  SPA-GMN-ICCARDRW-G    TO  W06-ICCARDRW
       *
       *    他院情報設定画面
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -4537,6 +4763,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0031"
                    MOVE    "本院・分院機能が有効な場合に設定可能です。"
                                                TO  SPA-ERRMSG
+               WHEN    "0032"
+                   MOVE    "ＩＣカードリーダ／ライタ入力エラー"
+                                               TO  SPA-ERRMSG
                WHEN    "0100"
                    MOVE
                    "オルカマスターはシステム管理を有効にして下さい"
@@ -4684,6 +4913,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "CLIENT_PRT"     TO   MCP-WIDGET
                 WHEN    29
                     MOVE  "DIALOGFLG"      TO   MCP-WIDGET
+                WHEN    30
+                    MOVE  "ICCARDRW"       TO   MCP-WIDGET
       *
                 WHEN    99
                     MOVE  "B12"            TO   MCP-WIDGET
@@ -4792,6 +5023,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN     "CLIENT_PRT"
                    MOVE    29              TO  SPA-GMN-CUR
                WHEN     "DIALOGFLG"
+                   MOVE    30              TO  SPA-GMN-CUR
+               WHEN     "ICCARDRW"
                    MOVE    99              TO  SPA-GMN-CUR
       *    他院設定画面
                WHEN     "GRPUSERID01"  THRU    "GRPUSERID08"

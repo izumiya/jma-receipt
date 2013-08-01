@@ -2,6 +2,9 @@ M01	{
 	title  varchar(120);
 	bgcolor		varchar(20);
 	fixed1	{
+		                 B08	{
+		                	label	varchar(10);
+	                          };
 		                 G11	{
 		                	state	int;
 	                          };

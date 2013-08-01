@@ -1,0 +1,62 @@
+#!/bin/bash
+
+if test -z "$JMARECEIPT_ENV" ; then
+    JMARECEIPT_ENV="@jma-receipt-env@"
+fi
+if ! test -f "$JMARECEIPT_ENV"; then
+    exit 0
+fi
+
+
+. $JMARECEIPT_ENV
+#-------------------------------------------#
+#        オンラインからのお薬手帳ＣＳＶ作成処理
+#        $1    TERMID
+#        $2    HOSPNUM
+#        $3    MODE
+#        $4    TBL-KEY
+#        $5    RENNUM
+#        $6    TBL-GROUP
+#        $7    SHORI-RENNUM
+#        $8    SHELLID
+#        $9    SRYYM
+#        ${10} SRYYMD
+#        ${11} PUTFLG
+#        ${12} NYUGAIKBN
+#        ${13} PTID
+#        ${14} DRCD
+#        ${15} TO-FOLDER
+#        ${16} TO-DATA
+#        ${17} CODE-TYPE
+#        ${18} TITLE
+#        ${19} CSVFILE
+#        ${20} TBL-UUID
+#        ${21} GYOUMU-CD
+#        ${22} DATA-VERSION
+#        ${23} OPID
+#-------------------------------------------#
+#
+
+BASENAME=$(basename ${0%%.sh})
+LOG=/var/log/jma-receipt/$2${BASENAME}.log
+CSVFILE=${18}
+
+DIRNAME1=jma-receipt-${BASENAME}
+DIRNAME2=${DIRNAME1}-$(date +"%Y%m%d")
+
+[ -e "${LOG}" ] && rm -f ${LOG}
+
+echo $(printf "argv=")$(printf "[%s]" "$@") >> ${LOG}
+
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBMNOTE -parameter $(printf "%s," "$@")  >>${LOG} 2>&1
+
+[ -e "${CSVFILE}" ] && rm -f ${CSVFILE}
+
+[ -d /tmp/${DIRNAME2} ] &&  exit 0
+
+find  /tmp -maxdepth 1 -name "${DIRNAME1}*" -print0  | xargs -r -0  rm -R
+mkdir /tmp/${DIRNAME2}
+
+echo "CHECK AND DELETE OLD CSVFILES "  >>${LOG} 2>&1
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBDELMNOTE -parameter $2  >>${LOG} 2>&1
+

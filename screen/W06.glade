@@ -1618,7 +1618,7 @@
 	  <class>GtkLabel</class>
 	  <name>label254</name>
 	  <x>56</x>
-	  <y>80</y>
+	  <y>72</y>
 	  <width>152</width>
 	  <height>24</height>
 	  <label>院外処方せん発行フラグ</label>
@@ -1634,7 +1634,7 @@
 	  <class>GtkLabel</class>
 	  <name>label255</name>
 	  <x>56</x>
-	  <y>112</y>
+	  <y>100</y>
 	  <width>160</width>
 	  <height>24</height>
 	  <label>薬剤情報発行フラグ</label>
@@ -1650,7 +1650,7 @@
 	  <class>GtkLabel</class>
 	  <name>label257</name>
 	  <x>56</x>
-	  <y>144</y>
+	  <y>128</y>
 	  <width>160</width>
 	  <height>24</height>
 	  <label>診療費明細書発行フラグ</label>
@@ -1682,7 +1682,7 @@
 	  <class>GtkLabel</class>
 	  <name>label253</name>
 	  <x>56</x>
-	  <y>48</y>
+	  <y>44</y>
 	  <width>120</width>
 	  <height>24</height>
 	  <label>請求書発行フラグ</label>
@@ -1696,57 +1696,9 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label258</name>
-	  <x>16</x>
-	  <y>184</y>
-	  <width>96</width>
-	  <height>24</height>
-	  <label>＜画面表示＞</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label259</name>
-	  <x>56</x>
-	  <y>216</y>
-	  <width>160</width>
-	  <height>24</height>
-	  <label>検査正式名称表示フラグ</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
-	  <name>label261</name>
-	  <x>16</x>
-	  <y>256</y>
-	  <width>144</width>
-	  <height>28</height>
-	  <label>＜クライアント保存＞</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label260</name>
 	  <x>56</x>
-	  <y>288</y>
+	  <y>248</y>
 	  <width>180</width>
 	  <height>24</height>
 	  <label>クライアント保存可否</label>
@@ -1762,9 +1714,9 @@
 	  <class>GtkLabel</class>
 	  <name>label261</name>
 	  <x>16</x>
-	  <y>328</y>
+	  <y>280</y>
 	  <width>184</width>
-	  <height>28</height>
+	  <height>24</height>
 	  <label>＜ログインユーザー管理＞</label>
 	  <justify>GTK_JUSTIFY_LEFT</justify>
 	  <wrap>False</wrap>
@@ -1778,7 +1730,7 @@
 	  <class>GtkLabel</class>
 	  <name>label260</name>
 	  <x>56</x>
-	  <y>360</y>
+	  <y>308</y>
 	  <width>180</width>
 	  <height>24</height>
 	  <label>ログインユーザー管理権限</label>
@@ -1792,25 +1744,9 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label263</name>
-	  <x>16</x>
-	  <y>400</y>
-	  <width>152</width>
-	  <height>28</height>
-	  <label>＜クライアント印刷＞</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>0</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label264</name>
 	  <x>56</x>
-	  <y>432</y>
+	  <y>368</y>
 	  <width>180</width>
 	  <height>24</height>
 	  <label>クライアント印刷</label>
@@ -1826,7 +1762,7 @@
 	  <class>GtkLabel</class>
 	  <name>label265</name>
 	  <x>56</x>
-	  <y>464</y>
+	  <y>396</y>
 	  <width>180</width>
 	  <height>24</height>
 	  <label>ダイアログ表示</label>
@@ -1842,7 +1778,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>SKYPRTFLG_COMB</name>
 	  <x>240</x>
-	  <y>48</y>
+	  <y>44</y>
 	  <width>220</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1882,7 +1818,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>SYOHOPRTFLG_COMB</name>
 	  <x>240</x>
-	  <y>80</y>
+	  <y>72</y>
 	  <width>220</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1922,7 +1858,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>YAKUJYOFLG_COMB</name>
 	  <x>240</x>
-	  <y>112</y>
+	  <y>100</y>
 	  <width>220</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1962,7 +1898,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>MEIPRTFLG_COMB</name>
 	  <x>240</x>
-	  <y>144</y>
+	  <y>128</y>
 	  <width>220</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -2002,7 +1938,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>FORMALFLG_COMB</name>
 	  <x>240</x>
-	  <y>216</y>
+	  <y>188</y>
 	  <width>220</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -2042,7 +1978,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>CLIENT_SAVE_COMB</name>
 	  <x>240</x>
-	  <y>288</y>
+	  <y>248</y>
 	  <width>220</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -2082,7 +2018,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>USER_KANRI_COMB</name>
 	  <x>240</x>
-	  <y>360</y>
+	  <y>308</y>
 	  <width>220</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -2122,7 +2058,7 @@
 	  <class>GtkPandaCombo</class>
 	  <name>CLIENT_PRT_COMB</name>
 	  <x>240</x>
-	  <y>432</y>
+	  <y>368</y>
 	  <width>220</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -2159,10 +2095,74 @@
 	</widget>
 
 	<widget>
+	  <class>GtkLabel</class>
+	  <name>label258</name>
+	  <x>16</x>
+	  <y>160</y>
+	  <width>96</width>
+	  <height>24</height>
+	  <label>＜画面表示＞</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label259</name>
+	  <x>56</x>
+	  <y>188</y>
+	  <width>160</width>
+	  <height>24</height>
+	  <label>検査正式名称表示フラグ</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label261</name>
+	  <x>16</x>
+	  <y>220</y>
+	  <width>144</width>
+	  <height>24</height>
+	  <label>＜クライアント保存＞</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label263</name>
+	  <x>16</x>
+	  <y>340</y>
+	  <width>152</width>
+	  <height>24</height>
+	  <label>＜クライアント印刷＞</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>DIALOGFLG_COMB</name>
 	  <x>240</x>
-	  <y>464</y>
+	  <y>396</y>
 	  <width>220</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -2196,6 +2196,78 @@
 	    <input_mode>XIM</input_mode>
 	    <xim_enabled>False</xim_enabled>
 	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>ICCARDRW_COMB</name>
+	  <x>240</x>
+	  <y>456</y>
+	  <width>220</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>ICCARDRW</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Thu, 01 Dec 2005 06:52:27 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Thu, 01 Dec 2005 06:52:44 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>40</text_max_length>
+	    <text></text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label266</name>
+	  <x>16</x>
+	  <y>428</y>
+	  <width>200</width>
+	  <height>24</height>
+	  <label>＜ＩＣカードリーダ／ライタ＞</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label267</name>
+	  <x>36</x>
+	  <y>456</y>
+	  <width>200</width>
+	  <height>24</height>
+	  <label>ＩＣカードリーダ／ライタ</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>0</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
 	</widget>
       </widget>
 
