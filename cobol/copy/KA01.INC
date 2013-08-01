@@ -80,3 +80,5 @@
                 04  KA01-VALUE  PIC X(9).
               03  KA01-KEISUURYO-G  OCCURS  6.
                 04  KA01-KEISUURYO  PIC X(12).
+              03  KA01-B12S.
+                04   KA01-B12S-STATE   PIC S9(9)   BINARY.

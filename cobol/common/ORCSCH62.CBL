@@ -32,6 +32,7 @@
       *  04.05.00    NACL-多々納  09/10/XX  換算値数量対応
       *  04.06.00    NACL-多々納  11/02/22  用法コードコメント対応
       *  04.07.00    NACL-多々納  12/09/27  商品コード対応
+      *  04.07.00    NACL-多々納  13/07/XX  パソリ対応他
       *****************************************************************
       *
       *
@@ -56,6 +57,7 @@
            03  FLG-WKSRYACT        PIC 9(01).
            03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-PTCOM           PIC 9(01).
+           03  FLG-PTCONF          PIC 9(01).
       *
            03  FLG-KAISU           PIC 9(01).
            03  FLG-OK              PIC 9(01).
@@ -143,6 +145,11 @@
       *
       *ver.4.7
            03  WRK-SHO-SRYCD           PIC X(09).
+      *
+      *    ＱＲ設定区分
+           03  WRK-QRKBN               PIC X(01).
+           03  WRK-CSVKBN              PIC X(01).
+           03  WRK-PRTKBN              PIC X(01).
       *
        01  TBL-DATA-AREA.
       *    ドクター毎
@@ -267,6 +274,10 @@
        01  PTCOM-REC.
            COPY    "CPPTCOM.INC".
       *
+      *    患者個別設定
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
+      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -383,6 +394,33 @@
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *ver.4.7
+      *    ＱＲ出力設定
+           MOVE    SPACE               TO  PTCONF-REC
+           INITIALIZE                  PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCONF-PTID
+           MOVE    "MNOTEQR"           TO  PTCONF-CKEY
+           PERFORM 970-PTCONF-READ-SEC
+           IF      FLG-PTCONF          =   ZERO
+               MOVE    PTCONF-CDATA(1:1)   TO  WRK-QRKBN
+           END-IF
+      *    データフォーマット区分設定
+           MOVE    SPACE               TO  PTCONF-REC
+           INITIALIZE                  PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCONF-PTID
+           MOVE    "MNOTEVER"          TO  PTCONF-CKEY
+           PERFORM 970-PTCONF-READ-SEC
+           IF      FLG-PTCONF          =   ZERO
+               MOVE    PTCONF-CDATA(1:1)   TO  WRK-CSVKBN
+           END-IF
+      *    ＣＳＶ出力のみの設定
+           IF     (ORCSCH62-KBN2       =   "1"   )
+              AND (WRK-CSVKBN      NOT =   SPACE )
+               MOVE    "1"                 TO  WRK-PRTKBN
+           END-IF
            .
        100-INIT-EXT.
            EXIT.
@@ -413,6 +451,12 @@
            MOVE    SPA-SRYYMD          TO  ORCHC62-SRYYMD
            ADD     1                   TO  WRK-CNT
            MOVE    WRK-CNT             TO  ORCHC62-CNT
+      *ver.4.7
+      *    ＱＲ区分など
+           MOVE    WRK-QRKBN           TO  ORCHC62-QRKBN
+           MOVE    WRK-CSVKBN          TO  ORCHC62-CSVKBN
+           MOVE    WRK-PRTKBN          TO  ORCHC62-PRTKBN
+           MOVE    ORCSCH62-PGKBN      TO  ORCHC62-PGKBN
       *    ドクター
            MOVE    TBL-DRCD (IDX-T1)   TO  ORCHC62-DRCD
       *    伝票番号
@@ -498,35 +542,6 @@
                END-PERFORM
            END-PERFORM
       *
-      *TEST
-      *    DISPLAY "ORCHC62-DRCD:" ORCHC62-DRCD
-      *      ",ORCHC62-CNT:" ORCHC62-CNT
-      *    DISPLAY "ORCHC62-DENPNUM:" ORCHC62-DENPNUM
-      *    PERFORM VARYING    IDY   FROM    1  BY  1
-      *            UNTIL      IDY   >  10 
-      *     DISPLAY "ORCHC62-GRP-DENPNUM "  IDY 
-      *                ":" ORCHC62-GRP-DENPNUM(IDY)
-      *    END-PERFORM
-          PERFORM VARYING    IDX   FROM    1  BY  1
-                   UNTIL      IDX   >  ORCHC62-ZAI-MAX
-             DISPLAY "ORCHC62-SRYKBN:" ORCHC62-SRYKBN (IDX)
-               ",YSRYCD:" ORCHC62-YSRYCD (IDX)
-          PERFORM VARYING    IDY   FROM    1  BY  1
-                   UNTIL      IDY   >  50 
-              IF      ORCHC62-SRYCD (IDX IDY)  NOT =   SPACE
-             DISPLAY "ORCHC62-SRYCD:" ORCHC62-SRYCD (IDX IDY)
-                     ",ORCHC62-SRYSURYO:" ORCHC62-SRYSURYO (IDX IDY)
-                     ",KANSURYO:" ORCHC62-KANSURYO (IDX IDY)
-      ***          ",COMMNT:"  ORCHC62-INPUTCOMENT (IDX IDY)(1:10)
-                   ",YOURYOU:"  ORCHC62-YOURYOU (IDX IDY 1)
-                   ",YOURYOU:"  ORCHC62-YOURYOU (IDX IDY 2)
-                   ",YOURYOU:"  ORCHC62-YOURYOU (IDX IDY 3)
-                   ",YOURYOU:"  ORCHC62-YOURYOU (IDX IDY 4)
-                   ",YOURYOU:"  ORCHC62-YOURYOU (IDX IDY 5)
-              END-IF
-           END-PERFORM 
-           END-PERFORM 
-      *TEST
       *    印刷処理
            PERFORM 300-HC62-PRINT-SEC
            .
@@ -1796,6 +1811,36 @@
       *
            .
        960-KANRIMST-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定テーブル読込処理
+      *****************************************************************
+       970-PTCONF-READ-SEC         SECTION.
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PTCONF-REC
+                   MOVE    ZERO                TO  FLG-PTCONF
+               ELSE
+                   INITIALIZE                  PTCONF-REC
+                   MOVE    1                   TO  FLG-PTCONF
+               END-IF
+           ELSE
+               INITIALIZE                  PTCONF-REC
+               MOVE    1                   TO  FLG-PTCONF
+           END-IF
+      *
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       970-PTCONF-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理

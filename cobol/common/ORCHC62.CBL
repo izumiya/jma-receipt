@@ -32,6 +32,7 @@
       *  04.06.00    NACL-森脇    11/03/10  用量割合コード対応
       *  04.07.00    NACL-多々納  12/09/03  ＱＲコード対応
       *                                     商品名コード対応
+      *  04.08.00    NACL-多々納  13/07/XX  パソリ対応他
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -168,6 +169,8 @@
            03  WRK-SHO-NAME        PIC X(80).
            03  WRK-SHO-TANINAME    PIC X(20).
       *
+           03  WRK-QRKBN           PIC X(01).
+      *
       *    剤内容領域
        01  WRK-SRY-AREA.
            03  WRK-ZAIKAIKEI       PIC 9(03).
@@ -231,16 +234,16 @@
        01  CONS-FORM-ID        PIC X(05)   VALUE   "HC62Q".
       *H24.9
       *
-       01  CONS-CSVDIR             PIC X(28)   VALUE
-                                   "/var/lib/jma-receipt/jahistc".
+      *01  CONS-CSVDIR             PIC X(28)   VALUE
+      *                            "/var/lib/jma-receipt/jahistc".
       *    プログラムオプションパラメタ
        01  PARA-AREA.
            03  PARA-COMMENT2           PIC X(01).
       *H24.9
            03  PARA-QRKBN              PIC X(01).
            03  PARA-SHOHIN             PIC X(01).
-           03  PARA-CSVKBN             PIC X(01).
-           03  PARA-CSVDIR             PIC X(256).
+      ***  03  PARA-CSVKBN             PIC X(01).
+      ***  03  PARA-CSVDIR             PIC X(256).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -308,9 +311,9 @@
       *    ファイル存在チェック
            COPY    "CPORCSFILECHK.INC".
       *    ＣＳＶファイル作成パラメタ
-           COPY    "CPORCSFILEENCODE.INC".
+      **** COPY    "CPORCSFILEENCODE.INC".
       *    ディレクトリ作成パラメタ
-           COPY    "CPORCSMKDIR.INC".
+      **** COPY    "CPORCSMKDIR.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -388,35 +391,46 @@
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)   TO  PARA-SHOHIN
       *    CSVファイル作成
-           MOVE    "CSVKBN"        TO  WRK-PARA-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           MOVE    WRK-PARA(1:1)   TO  PARA-CSVKBN
+      *    MOVE    "CSVKBN"        TO  WRK-PARA-NAME
+      *    PERFORM 1001-OPTION-CALL-SEC
+      *    MOVE    WRK-PARA(1:1)   TO  PARA-CSVKBN
       *    CSVファイルディレクトリ
-           MOVE    "CSVDIR"        TO  WRK-PARA-NAME
-           PERFORM 1001-OPTION-CALL-SEC
-           MOVE    ORCSPRGOPTION-OT-PARA(1:)
-                                   TO  PARA-CSVDIR
+      *    MOVE    "CSVDIR"        TO  WRK-PARA-NAME
+      *    PERFORM 1001-OPTION-CALL-SEC
+      *    MOVE    ORCSPRGOPTION-OT-PARA(1:)
+      *                            TO  PARA-CSVDIR
       *
-           IF     (PARA-QRKBN      =   "1")  AND
-                  (PARA-CSVKBN     =   "1")
-               IF      PARA-CSVDIR     =   SPACE
-                   MOVE    CONS-CSVDIR     TO  WRK-DIRECTORY
-               ELSE
-                   MOVE    PARA-CSVDIR     TO  WRK-DIRECTORY
-                   INITIALIZE                  ORCSMKDIRAREA
-                   MOVE    WRK-DIRECTORY   TO  MKDIR-DIRECTORY
-                   MOVE    "0755"          TO  MKDIR-MODE
-                   MOVE    ZERO            TO  MKDIR-RESULT
-                   CALL    "orcmkdir"   USING  ORCSMKDIRAREA
-                   IF      MKDIR-RESULT NOT =  ZERO
-                       MOVE    "0"             TO  PARA-CSVKBN
-                   END-IF
-               END-IF
+      *    IF     (PARA-QRKBN      =   "1")  AND
+      *           (PARA-CSVKBN     =   "1")
+      *        IF      PARA-CSVDIR     =   SPACE
+      *            MOVE    CONS-CSVDIR     TO  WRK-DIRECTORY
+      *        ELSE
+      *            MOVE    PARA-CSVDIR     TO  WRK-DIRECTORY
+      *            INITIALIZE                  ORCSMKDIRAREA
+      *            MOVE    WRK-DIRECTORY   TO  MKDIR-DIRECTORY
+      *            MOVE    "0755"          TO  MKDIR-MODE
+      *            MOVE    ZERO            TO  MKDIR-RESULT
+      *            CALL    "orcmkdir"   USING  ORCSMKDIRAREA
+      *            IF      MKDIR-RESULT NOT =  ZERO
+      *                MOVE    "0"             TO  PARA-CSVKBN
+      *            END-IF
+      *        END-IF
+      *    ELSE
+      *        MOVE    "0"             TO  PARA-CSVKBN
+      *        MOVE    SPACE           TO  WRK-DIRECTORY
+      **** END-IF
+      *
+      *ver.4.7
+      *    ＱＲ印刷判定
+           IF      ORCHC62-QRKBN       =   SPACE
+      *        患者設定のない時、オプション設定
+               MOVE    PARA-QRKBN          TO  WRK-QRKBN
            ELSE
-               MOVE    "0"             TO  PARA-CSVKBN
-               MOVE    SPACE           TO  WRK-DIRECTORY
+      *        患者設定の印刷あり
+               IF      ORCHC62-QRKBN       =   "1"
+                   MOVE    "1"             TO  WRK-QRKBN
+               END-IF
            END-IF
-      *
            .
        100-INIT-EXT.
            EXIT.
@@ -471,7 +485,8 @@
       *
       *H24.9
       *    ＱＲ印刷
-           IF      PARA-QRKBN          =   "1"
+           IF     (WRK-QRKBN           =   "1"  )
+              OR  (ORCHC62-CSVKBN  NOT =   SPACE )
                PERFORM 500-QR-SYORI-SEC
            END-IF
            .
@@ -1074,6 +1089,13 @@
       *****************************************************************
        400-PRT-WRITE-SEC           SECTION.
       *
+      *ver.4.7
+      *    ＳＣＶ出力のみは印刷なし
+           IF      ORCHC62-PRTKBN      =   "1"
+               GO      TO      400-PRT-WRITE-EXT
+           END-IF
+      *
+      *
       *    印刷用ファイル作成
            MOVE    SPA-HOSPNUM     TO  HC01PARA-HOSPNUM
            MOVE    "HC62"          TO  HC01PARA-FORM-ID
@@ -1271,11 +1293,16 @@
       *    ファイル名組み立て項目
            MOVE    WRK-SYS-TIME        TO  ORCSQRCSV62-SYSTIME
       *
-           IF      PARA-CSVKBN     =   "1"
+           IF      ORCHC62-CSVKBN  NOT =   SPACE
       *        ＣＳＶ保存ファイル名 
                PERFORM 50034-QRCSVFILE-SEC
                MOVE    WRK-CSV-FILE        TO  ORCSQRCSV62-CSV-FILENAME
            END-IF
+      *
+           MOVE    ORCHC62-CSVKBN      TO  ORCSQRCSV62-CSV-KBN
+           MOVE    WRK-QRKBN           TO  ORCSQRCSV62-QR-KBN
+           MOVE    ORCHC62-CNT         TO  ORCSQRCSV62-CNT
+           MOVE    ORCHC62-PGKBN       TO  ORCSQRCSV62-PGKBN
       *
            CALL    "ORCSQRCSV62"       USING
                                        SPA-AREA
@@ -1284,6 +1311,7 @@
       *    ＱＲイメージ印刷
            IF     (ORCSQRCSV62-RET-COUNT   >   ZERO)
              AND  (ORCSQRCSV62-RET-COUNT   <=  12  )
+             AND  (WRK-QRKBN               =   "1"  )
                PERFORM 5003-QRIMAGE-HEN-SEC
            END-IF
            .
@@ -1419,61 +1447,75 @@
       *****************************************************************
        50034-QRCSVFILE-SEC             SECTION.
       *
-      *    ディレクトリ作成（医療機関識別番号）
-           INITIALIZE                      ORCSMKDIRAREA
-           MOVE    SPACE               TO  WRK-DIRECTORY-E
-           STRING  WRK-DIRECTORY       DELIMITED   BY  SPACE
-                   "/"
-                   SPA-HOSPNUM         DELIMITED   BY  SIZE
-                                       INTO    WRK-DIRECTORY-E
-           END-STRING
-           MOVE    WRK-DIRECTORY-E     TO  MKDIR-DIRECTORY
-           MOVE    "0755"              TO  MKDIR-MODE
-           MOVE    ZERO                TO  MKDIR-RESULT
-           CALL    "orcmkdir"          USING   ORCSMKDIRAREA
-           IF      MKDIR-RESULT     NOT =  ZERO
-               MOVE    "0"                 TO  PARA-CSVKBN
-               GO  TO  50034-QRCSVFILE-EXT
-           END-IF
-      *
-      *    ディレクトリ作成（診療日）
-           INITIALIZE                      ORCSMKDIRAREA
-           STRING  WRK-DIRECTORY-E     DELIMITED   BY  SPACE
-                   "/"
-                   SPA-SRYYMD          DELIMITED   BY  SIZE
-                                       INTO    MKDIR-DIRECTORY
-           END-STRING
-      *
-           MOVE    MKDIR-DIRECTORY     TO  WRK-DIRECTORY-E
-      *
-           MOVE    "0755"              TO  MKDIR-MODE
-           MOVE    ZERO                TO  MKDIR-RESULT
-           CALL    "orcmkdir"          USING   ORCSMKDIRAREA
-           IF      MKDIR-RESULT     NOT =  ZERO
-               MOVE    "0"                 TO  PARA-CSVKBN
-               GO  TO  50034-QRCSVFILE-EXT
-           END-IF
-      *
            IF      ORCHC62-DRCD        =   SPACE
                MOVE    "XXXXX"             TO  WRK-DRCD-E
            ELSE
                MOVE    ORCHC62-DRCD        TO  WRK-DRCD-E
            END-IF
+      *
       *    ファイル名作成
            MOVE    SPACE               TO  WRK-CSV-FILE
-           STRING  WRK-DIRECTORY-E     DELIMITED   BY  SPACE
-                   "/JAHISTC"
-                   SPA-HOSPNUM         DELIMITED   BY  SIZE
-                   SPA-PTNUM           DELIMITED   BY  SPACE
-                   "-"
-                   "2"
-                   SPA-SRYYMD          DELIMITED   BY  SIZE
+           STRING  "okusuri_techo_"
+                   ORCHC62-SRYYMD      DELIMITED   BY  SIZE
+                   "_"
                    WRK-DRCD-E          DELIMITED   BY  SIZE
+                   "_"
                    SPA-SYSYMD          DELIMITED   BY  SIZE
+                   "_"
                    WRK-SYS-TIME        DELIMITED   BY  SIZE
                    ".csv"
                                        INTO    WRK-CSV-FILE
            END-STRING
+      *
+      *    ディレクトリ作成（医療機関識別番号）
+      *    INITIALIZE                      ORCSMKDIRAREA
+      *    MOVE    SPACE               TO  WRK-DIRECTORY-E
+      *    STRING  WRK-DIRECTORY       DELIMITED   BY  SPACE
+      *            "/"
+      *            SPA-HOSPNUM         DELIMITED   BY  SIZE
+      *                                INTO    WRK-DIRECTORY-E
+      *    END-STRING
+      *    MOVE    WRK-DIRECTORY-E     TO  MKDIR-DIRECTORY
+      *    MOVE    "0755"              TO  MKDIR-MODE
+      *    MOVE    ZERO                TO  MKDIR-RESULT
+      *    CALL    "orcmkdir"          USING   ORCSMKDIRAREA
+      *    IF      MKDIR-RESULT     NOT =  ZERO
+      *        MOVE    "0"                 TO  PARA-CSVKBN
+      *        GO  TO  50034-QRCSVFILE-EXT
+      *    END-IF
+      *
+      *    ディレクトリ作成（診療日）
+      *    INITIALIZE                      ORCSMKDIRAREA
+      *    STRING  WRK-DIRECTORY-E     DELIMITED   BY  SPACE
+      *            "/"
+      *            SPA-SRYYMD          DELIMITED   BY  SIZE
+      *                                INTO    MKDIR-DIRECTORY
+      *    END-STRING
+      *
+      *    MOVE    MKDIR-DIRECTORY     TO  WRK-DIRECTORY-E
+      *
+      *    MOVE    "0755"              TO  MKDIR-MODE
+      *    MOVE    ZERO                TO  MKDIR-RESULT
+      *    CALL    "orcmkdir"          USING   ORCSMKDIRAREA
+      *    IF      MKDIR-RESULT     NOT =  ZERO
+      *        MOVE    "0"                 TO  PARA-CSVKBN
+      *        GO  TO  50034-QRCSVFILE-EXT
+      *    END-IF
+      *    ファイル名作成
+      *    MOVE    SPACE               TO  WRK-CSV-FILE
+      *    STRING  WRK-DIRECTORY-E     DELIMITED   BY  SPACE
+      *            "/JAHISTC"
+      *            SPA-HOSPNUM         DELIMITED   BY  SIZE
+      *            SPA-PTNUM           DELIMITED   BY  SPACE
+      *            "-"
+      *            "2"
+      *            SPA-SRYYMD          DELIMITED   BY  SIZE
+      *            WRK-DRCD-E          DELIMITED   BY  SIZE
+      *            SPA-SYSYMD          DELIMITED   BY  SIZE
+      *            WRK-SYS-TIME        DELIMITED   BY  SIZE
+      *            ".csv"
+      *                                INTO    WRK-CSV-FILE
+      **** END-STRING
       *
            .
        50034-QRCSVFILE-EXT.

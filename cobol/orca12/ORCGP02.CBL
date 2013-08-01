@@ -1129,6 +1129,12 @@
                                                    SPAAREA
                                                    LINKAREA
                                                    SCRAREA
+      *        個別設定情報
+               WHEN     "P028"
+                   CALL    "ORCGP028"      USING   MCPAREA
+                                                   SPAAREA
+                                                   LINKAREA
+                                                   SCRAREA
       ******   紹介情報入力
       *        WHEN     "P023"
       *            CALL    "ORCGP023"      USING   MCPAREA
@@ -1621,6 +1627,11 @@
                    MOVE    "P026"          TO  SPA-P02-GAMEN
                    MOVE    "N09"           TO  SPA-P02-WIDGET
                WHEN    "P026"
+      **           MOVE    "P020"          TO  SPA-P02-GAMEN
+      **           MOVE    "N01"           TO  SPA-P02-WIDGET
+                   MOVE    "P028"          TO  SPA-P02-GAMEN
+                   MOVE    "N10"           TO  SPA-P02-WIDGET
+               WHEN    "P028"
                    MOVE    "P020"          TO  SPA-P02-GAMEN
                    MOVE    "N01"           TO  SPA-P02-WIDGET
            END-EVALUATE
@@ -1666,8 +1677,10 @@
                WHEN    "P020"
       ****         MOVE    "P025"          TO  SPA-P02-GAMEN
       ****         MOVE    "N08"           TO  SPA-P02-WIDGET
-                   MOVE    "P026"          TO  SPA-P02-GAMEN
-                   MOVE    "N09"           TO  SPA-P02-WIDGET
+      ****         MOVE    "P026"          TO  SPA-P02-GAMEN
+      ****         MOVE    "N09"           TO  SPA-P02-WIDGET
+                   MOVE    "P028"          TO  SPA-P02-GAMEN
+                   MOVE    "N10"           TO  SPA-P02-WIDGET
                WHEN    "P02"
                    MOVE    "P020"          TO  SPA-P02-GAMEN
                    MOVE    "N01"           TO  SPA-P02-WIDGET
@@ -1686,6 +1699,9 @@
                WHEN    "P026"
                    MOVE    "P025"          TO  SPA-P02-GAMEN
                    MOVE    "N08"           TO  SPA-P02-WIDGET
+               WHEN    "P028"
+                   MOVE    "P026"          TO  SPA-P02-GAMEN
+                   MOVE    "N09"           TO  SPA-P02-WIDGET
            END-EVALUATE
       *
            MOVE    SPA-P02-WIDGET     TO  MCP-WIDGET
@@ -1723,6 +1739,8 @@
                    MOVE    "N08"               TO  WRK-WIDGET
                WHEN    6
                    MOVE    "N09"               TO  WRK-WIDGET
+               WHEN    7
+                   MOVE    "N10"               TO  WRK-WIDGET
            END-EVALUATE
       *
       *    患者指定がない時、チェックなし
@@ -1770,6 +1788,9 @@
       *        特記事項
                WHEN    "N09"
                    MOVE    "P026"          TO  SPA-P02-GAMEN
+      *        個別設定
+               WHEN    "N10"
+                   MOVE    "P028"          TO  SPA-P02-GAMEN
            END-EVALUATE
       *
       *    画面ＳＰＡ編集のみ（各画面の初期編集）
@@ -3407,6 +3428,20 @@
                MOVE    SPA-FREE            TO  SPA-P02SCRAREA
                MOVE    SPA-WORK            TO  SPA-P02KYOUTU
       *
+      *VER.4.7
+      *        個別設定
+           WHEN    "P028"
+               MOVE    "CLICKED" TO  MCP-EVENT
+               MOVE    "B12"     TO  MCP-WIDGET
+               MOVE    "PUTG"    TO  MCP-STATUS
+               CALL    "ORCGP028"       USING   MCPAREA
+                                                SPAAREA
+                                                LINKAREA
+                                                SCRAREA
+               MOVE    SPA-COMMON          TO  SPA-AREA
+               MOVE    SPA-FREE            TO  SPA-P02SCRAREA
+               MOVE    SPA-WORK            TO  SPA-P02KYOUTU
+      *
            END-EVALUATE
       *
            IF      SPA-ERRCD       NOT =   SPACE
@@ -4068,6 +4103,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE  "P025_SELNUM1"    TO   MCP-WIDGET
                    WHEN    6
                        MOVE  "P026_SELNUM"     TO   MCP-WIDGET
+                   WHEN    7
+                       MOVE  "P028_MNOTE_QRKBN"     TO   MCP-WIDGET
                END-EVALUATE
            ELSE
                MOVE    SPA-P02-WIDGET          TO  MCP-WIDGET

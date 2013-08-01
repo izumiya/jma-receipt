@@ -669,6 +669,13 @@
                                                DELIMITED   BY  SPACE
                                                INTO   SPA-ERRMSG
                    END-STRING
+      *H25.XX
+               WHEN    "0143"
+                   STRING  "第三者行為はこの画面では変更できません。"
+                           "労災・自賠ボタンを選択して下さい"
+                                               DELIMITED   BY  SPACE
+                                               INTO   SPA-ERRMSG
+                   END-STRING
       *    更新前エラー
                WHEN    "0100"
                    MOVE    "カナ氏名は必ず入力して下さい"
@@ -1209,6 +1216,14 @@
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
+      *
+      *        個別設定
+               WHEN    "2801"
+                   MOVE    "お薬手帳ＱＲコード入力エラー"
+                                                   TO  SPA-ERRMSG
+               WHEN    "2802"
+                   MOVE    "お薬手帳データフォーマット入力エラー"
+                                                   TO  SPA-ERRMSG
       *
       *        患者番号取得エラー
                WHEN    "8000"

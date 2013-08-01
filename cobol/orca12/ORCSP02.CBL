@@ -125,6 +125,7 @@
            03  FLG-SYSKANRI        PIC 9(01).
            03  FLG-PTSAME          PIC 9(01).
            03  FLG-PTPUBLIC        PIC 9(01).
+           03  FLG-PTCONF          PIC 9(01).
       *
            03  FLG-PTRSIINF        PIC 9(01).
            03  FLG-HKNNUM          PIC 9(01).
@@ -192,6 +193,8 @@
                05  WRK-TMSG2           PIC X(02).
                05  WRK-TMSG3           PIC X(10).
            03  WRK-TEIMSG              PIC X(20).
+      *
+           03  WRK-IDOMSG              PIC X(10).
       *
            03  WRK-HFTNLST2-ROW        PIC S9(09).
            03  WRK-HKNKUMI-ROW         PIC S9(09).
@@ -388,6 +391,10 @@
       *    患者地域連携テーブル
        01  PTPUBLIC-REC.
            COPY    "CPPTNUM-PUBLIC.INC".
+      *
+      *    患者個別設定テーブル
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -1433,6 +1440,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "4 地方公費＋食事標準負担額対象"
                                        TO  SPA-GMN24-TNKTEKKBN-LST (5)
            MOVE    5                   TO  SPA-GMN24-TNKTEKKBN-MAX
+      *
+      *ver.4.7
+      *    患者個別設定
+      *    お薬手帳　ＱＲ
+           MOVE    "0 出力しない"
+                                       TO  SPA-GMN28-MNOTE-QRKBN-LST(1)
+           MOVE    "1 出力する"
+                                       TO  SPA-GMN28-MNOTE-QRKBN-LST(2)
+           MOVE    2                   TO  SPA-GMN28-QRKBN-MAX
+      *    お薬手帳　ＣＳＶ
+           MOVE    "1 Ver.1.0"
+                                       TO  SPA-GMN28-MNOTE-CSV-LST(1)
+           MOVE    1                   TO  SPA-GMN28-CSV-MAX
            .
        1005-COMB-SET-EXT.
            EXIT.
@@ -1640,6 +1660,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7
       *    地域連携編集
            PERFORM 10025-PTNUMPUBLIC-SET-SEC
+      *ver.4.7
+      *    患者個別情報編集
+           PERFORM 10028-PTCONF-SET-SEC
       *
       *    患者労災情報編集
            PERFORM 10023-RSIPARA-SET-SEC
@@ -2810,6 +2833,72 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        10025-PTNUMPUBLIC-SET-EXT.
            EXIT.
+      *ver.4.7
+      *****************************************************************
+      *    患者個別情報編集処理
+      *****************************************************************
+       10028-PTCONF-SET-SEC           SECTION.
+      *
+           INITIALIZE                  PTCONF-REC
+           MOVE    PTINF-HOSPNUM       TO  PTCONF-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCONF-PTID
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+           PERFORM UNTIL       FLG-PTCONF      =   1
+               EVALUATE    PTCONF-CKEY
+                   WHEN    "MNOTEQR"
+      *            お薬手帳ＱＲ区分
+                       MOVE    PTCONF-CDATA(1:1)
+                                           TO  SPA-GMN28-MNOTE-QRKBN
+                   WHEN    "MNOTEVER"
+      *            お薬手帳データフォーマット区分
+                       MOVE    PTCONF-CDATA(1:1)
+                                           TO  SPA-GMN28-MNOTE-CSV
+               END-EVALUATE
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN28-QRKBN-MAX )
+               IF      SPA-GMN28-MNOTE-QRKBN
+                                       =  SPA-GMN28-MNOTE-QRKBN-LST
+                                                  (IDX)(1:1)
+                   MOVE    SPA-GMN28-MNOTE-QRKBN-LST (IDX)
+                                       TO  SPA-GMN28-MNOTE-QRKBN-G
+                   MOVE    SPA-GMN28-QRKBN-MAX     TO  IDX
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN28-CSV-MAX )
+               IF      SPA-GMN28-MNOTE-CSV
+                                       =  SPA-GMN28-MNOTE-CSV-LST
+                                                  (IDX)(1:1)
+                   MOVE    SPA-GMN28-MNOTE-CSV-LST (IDX)
+                                       TO  SPA-GMN28-MNOTE-CSV-G
+                   MOVE    SPA-GMN28-CSV-MAX       TO  IDX
+               END-IF
+           END-PERFORM
+           .
+       10028-PTCONF-SET-EXT.
+           EXIT.
       *
       *****************************************************************
       *    患者労災情報編集処理
@@ -2990,6 +3079,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    5                   TO  P02-PAGENO
                WHEN    "P026"
                    MOVE    6                   TO  P02-PAGENO
+               WHEN    "P028"
+                   MOVE    7                   TO  P02-PAGENO
                WHEN    OTHER
                    MOVE    "P02 "              TO  SPA-P02-GAMEN
                    MOVE    1                   TO  P02-PAGENO
@@ -3027,6 +3118,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 2001-P025-SET-SEC
       *
            PERFORM 2001-P026-SET-SEC
+      *
+           PERFORM 2001-P028-SET-SEC
       *
       *    主科対応
            IF      SPA-SYUKA-KBN       =   "1"
@@ -3503,6 +3596,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-HKNJA-ADRS      TO  P02-P02-HKNJAADRS
            MOVE    SPA-HKNJA-BANTI     TO  P02-P02-HKNJAADRS2
            MOVE    SPA-HKNJA-TEL       TO  P02-P02-HKNJATEL
+      *ver.4.7
+      *    保険者マスタの異動年月日編集
+           IF      SPA-HKNJA-IDOYMD    NOT =   SPACE
+               PERFORM 20012-P02W1-HKNJASET-SEC
+           END-IF
+      *
       *    ラベルの全角空白を半角へ
       **** INSPECT P02-P02-HKNNAME
       *            REPLACING   ALL "　"  BY  "  "
@@ -3686,6 +3785,48 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-KOHMAX      TO  P02-KOHNUM3-COUNT
            .
        20011-HOKNUM-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険者マスタの異動年月日編集処理
+      *****************************************************************
+       20012-P02W1-HKNJASET-SEC         SECTION.
+      *
+           EVALUATE    SPA-HKNJA-IDOKBN
+               WHEN    "1"
+                   MOVE    "廃止"              TO  WRK-IDOMSG
+               WHEN    "2"
+                   MOVE    "支部廃止"          TO  WRK-IDOMSG
+               WHEN    "3"
+                   MOVE    "解散"              TO  WRK-IDOMSG
+               WHEN    "4"
+                   MOVE    "合併後消滅"        TO  WRK-IDOMSG
+               WHEN    OTHER
+                   MOVE    SPACE               TO  WRK-IDOMSG
+           END-EVALUATE
+           MOVE    SPA-HKNJA-IDOYMD    TO  WRK-SYMD
+           PERFORM 4001-SEIWA-YMDEDIT-SEC
+           IF      WRK-IDOMSG          =   SPACE
+               STRING  "【異動年月日　"
+                       WRK-HENYMD
+                       "】"            DELIMITED   BY  SIZE
+                                       INTO    P02-HKNJA-IDOMSG-VALUE
+               END-STRING
+           ELSE
+               STRING  "【"
+                       WRK-IDOMSG      DELIMITED   BY  SPACE
+                       "　"
+                       WRK-HENYMD
+                       "】"            DELIMITED   BY  SIZE
+                                       INTO    P02-HKNJA-IDOMSG-VALUE
+               END-STRING
+           END-IF
+           IF      SPA-HKNJA-IDOYMD    <   SPA-NAI-HTEKEDYMD
+               MOVE    "red"               TO  P02-HKNJA-IDOMSG-STYLE
+           ELSE
+               MOVE    "black"             TO  P02-HKNJA-IDOMSG-STYLE
+           END-IF
+           .
+       20012-P02W1-HKNJASET-EXT.
            EXIT.
       *****************************************************************
       *    連絡先画面編集処理
@@ -4466,6 +4607,35 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        2001-P025-SET-EXT.
            EXIT.
       *****************************************************************
+      *    個別設定画面編集処理
+      *****************************************************************
+       2001-P028-SET-SEC         SECTION.
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN28-QRKBN-MAX )
+               MOVE    SPA-GMN28-MNOTE-QRKBN-LST (IDX)
+                                       TO  P02-P028-MNOTE-QRKBN-ITEM
+                                                          (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN28-QRKBN-MAX TO  P02-P028-MNOTE-QRKBN-COUNT
+           MOVE    SPA-GMN28-MNOTE-QRKBN-G
+                                       TO  P02-P028-MNOTE-QRKBN
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN28-CSV-MAX )
+               MOVE    SPA-GMN28-MNOTE-CSV-LST (IDX)
+                                       TO  P02-P028-MNOTE-CSV-ITEM
+                                                          (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN28-CSV-MAX   TO  P02-P028-MNOTE-CSV-COUNT
+           MOVE    SPA-GMN28-MNOTE-CSV-G
+                                       TO  P02-P028-MNOTE-CSV
+      *
+           .
+       2001-P028-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    システム管理マスタ読込
       *****************************************************************
        900-SYSTEM-READ-SEC         SECTION.
@@ -4805,6 +4975,24 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        920-PTPUBLIC-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者個別情報データ読込処理
+      *****************************************************************
+       930-PTCONF-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTCONF
+               MOVE    MCPDATA-REC         TO  PTCONF-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+      *
+           .
+       930-PTCONF-READ-EXT.
            EXIT.
       *
       *****************************************************************

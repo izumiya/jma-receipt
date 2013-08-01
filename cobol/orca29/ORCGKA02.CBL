@@ -34,6 +34,7 @@
       *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *  04.07.00    NACL-多々納  12/01/10  クライアント印刷対応
       *  04.07.00    NACL-多々納  12/09/03  在宅器材・商品名対応
+      *  04.07.00    NACL-多々納  13/07/XX  ＱＲ患者個別設定対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -113,6 +114,7 @@
            03  FLG-PTNYUINRRK      PIC 9(01).
            03  FLG-TENSUPLUS       PIC 9(01).
            03  FLG-SRYACCTPLUS     PIC 9(01).
+           03  FLG-PTCONF          PIC 9(01).
       *
            03  FLG-OK              PIC 9(01).
            03  FLG-CHK             PIC 9(01).
@@ -260,6 +262,11 @@
       *    商品名コード
            03  WRK-SHO-SRYCD           PIC X(09).
       *
+      *    ＱＲ設定区分
+           03  WRK-QRKBN               PIC X(01).
+           03  WRK-CSVKBN              PIC X(01).
+           03  WRK-PRTKBN              PIC X(01).
+      *
       *   年齢表示
        01  WRK-NENREI-G.
            03  WRK-NENREI-Z        PIC ZZ9.
@@ -363,6 +370,10 @@
       *    患者入院履歴
        01  PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC".
+      *
+      *    患者個別設定
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -4190,6 +4201,9 @@
            END-IF
       *    病棟・病室編集
       **** PERFORM 41041-BTUNAME-HEN-SEC
+      *ver.4.7
+      *    患者個別設定取得
+           PERFORM 41041-PTCONF-HEN-SEC
       *
            INITIALIZE                      ORCHCN62AREA
       *
@@ -4202,6 +4216,11 @@
            MOVE    SPA-NAI-BTUNAME     TO  ORCHCN62-BTUNAME
            MOVE    SPA-NAI-ROOMNO      TO  ORCHCN62-ROOMNO
            MOVE    1                   TO  ORCHCN62-CNT
+      *ver.4.7
+           MOVE    WRK-QRKBN           TO  ORCHCN62-QRKBN
+      *    ＣＳＶ
+      *    MOVE    WRK-CSVKBN          TO  ORCHCN62-CSVKBN
+      *
            PERFORM 41041-ORCHC62-HENSYU-SEC
            IF      SPA-ERRCD           =   SPACE
                MOVE    "03"                TO  SPA-PRT-FLG
@@ -4473,6 +4492,35 @@
                                        ORCSNYUINSHOAREA
            .
        451-SHOHOSEN-PRINT-EXT.
+           EXIT.
+      *!!
+      *****************************************************************
+      *    患者個別設定取得編集処理
+      *****************************************************************
+       41041-PTCONF-HEN-SEC             SECTION.
+      *
+      *    ＱＲ出力設定
+           MOVE    SPACE               TO  PTCONF-REC
+           INITIALIZE                  PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCONF-PTID
+           MOVE    "MNOTEQR"           TO  PTCONF-CKEY
+           PERFORM 970-PTCONF-READ-SEC
+           IF      FLG-PTCONF          =   ZERO
+               MOVE    PTCONF-CDATA(1:1)   TO  WRK-QRKBN
+           END-IF
+      *    データフォーマット区分設定
+           MOVE    SPACE               TO  PTCONF-REC
+           INITIALIZE                  PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCONF-PTID
+           MOVE    "MNOTEVER"          TO  PTCONF-CKEY
+           PERFORM 970-PTCONF-READ-SEC
+           IF      FLG-PTCONF          =   ZERO
+               MOVE    PTCONF-CDATA(1:1)   TO  WRK-CSVKBN
+           END-IF
+           .
+       41041-PTCONF-HEN-EXT.
            EXIT.
       *!!
       *****************************************************************
@@ -5324,6 +5372,37 @@
            .
        980-TENSUPLUS-READ-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    患者個別設定テーブル読込処理
+      *****************************************************************
+       970-PTCONF-READ-SEC         SECTION.
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PTCONF-REC
+                   MOVE    ZERO                TO  FLG-PTCONF
+               ELSE
+                   INITIALIZE                  PTCONF-REC
+                   MOVE    1                   TO  FLG-PTCONF
+               END-IF
+           ELSE
+               INITIALIZE                  PTCONF-REC
+               MOVE    1                   TO  FLG-PTCONF
+           END-IF
+      *
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       970-PTCONF-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    テーブル検索処理
       *****************************************************************

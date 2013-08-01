@@ -73,6 +73,7 @@
       *  04.06.00    NACL-多々納  10/11/16  マル長負担額を保険負担額反映
       *  04.06.01    NACL-伊藤    11/01/28  リアルタイム送信
       *  04.07.01    NACL-多々納  12/01/05  クライアント印刷対応
+      *  04.07.01    NACL-多々納  13/07/23  お薬手帳ＣＳＶ患者毎対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -138,6 +139,7 @@
            03  FLG-SANTEI          PIC 9(01).
            03  FLG-PARA            PIC 9(01).
            03  FLG-SYUTTL          PIC 9(01).
+           03  FLG-PTCONF          PIC 9(01).
       *
            03  FLG-OK              PIC 9(01).
            03  FLG-CHK             PIC 9(01).
@@ -435,6 +437,10 @@
       *    収納合計マスタ−
        01  SYUTTL-REC.
            COPY    "CPSYUTOTAL.INC".
+      *
+      *    患者個別設定
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
       *
       *    診療会計マスタ−
       *01  SRYACCT-REC.
@@ -1237,6 +1243,9 @@
                MOVE    SPA-GMN-USERPG-LIST(1)  TO  SPA-GMN-USERPG-G
            END-IF
       *
+      *ver.4.7
+      *    患者個別設定検索
+           PERFORM 3108-PTCONF-SET-SEC
             .
        310-SPA-SET-EXT.
            EXIT.
@@ -1301,6 +1310,26 @@
            END-PERFORM
            .
        3105-MEIPRTFLG-SET-EXT.
+           EXIT.
+      *
+      *ver.4.7
+      *****************************************************************
+      *    患者個別設定検索処理
+      *****************************************************************
+       3108-PTCONF-SET-SEC             SECTION.
+      *
+      *    お薬手帳データフォーマット区分設定
+           MOVE    SPACE               TO  PTCONF-REC
+           INITIALIZE                  PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCONF-PTID
+           MOVE    "MNOTEVER"          TO  PTCONF-CKEY
+           PERFORM 970-PTCONF-READ-SEC
+           IF      FLG-PTCONF          =   ZERO
+               MOVE    PTCONF-CDATA(1:1)   TO  SPA-NAI-CSVKBN
+           END-IF
+           .
+       3108-PTCONF-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6503,8 +6532,21 @@
                MOVE    WRK-DENPNUM         TO  ORCSCH62-DENPNUM
                MOVE    SPA-GMN-OKUSURIFLG  TO  ORCSCH62-KBN
                MOVE    "05"                TO  SPA-PRT-FLG
+               MOVE    "1"                 TO  ORCSCH62-PGKBN
                CALL    "ORCSCH62"          USING   SPA-AREA
                                                    ORCSCH62AREA
+           ELSE
+      *        ＣＳＶのみ出力（院内分の出力）
+               IF      SPA-NAI-CSVKBN      NOT =   SPACE
+                   INITIALIZE                      ORCSCH62AREA
+                   MOVE    WRK-DENPNUM         TO  ORCSCH62-DENPNUM
+                   MOVE    "1"                 TO  ORCSCH62-KBN
+                   MOVE    "1"                 TO  ORCSCH62-KBN2
+                   MOVE    "05"                TO  SPA-PRT-FLG
+                   MOVE    "1"                 TO  ORCSCH62-PGKBN
+                   CALL    "ORCSCH62"          USING   SPA-AREA
+                                                       ORCSCH62AREA
+               END-IF
            END-IF
       *
       *    予約票発行
@@ -7373,6 +7415,36 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        980-SYUNOU-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定テーブル読込処理
+      *****************************************************************
+       970-PTCONF-READ-SEC         SECTION.
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PTCONF-REC
+                   MOVE    ZERO                TO  FLG-PTCONF
+               ELSE
+                   INITIALIZE                  PTCONF-REC
+                   MOVE    1                   TO  FLG-PTCONF
+               END-IF
+           ELSE
+               INITIALIZE                  PTCONF-REC
+               MOVE    1                   TO  FLG-PTCONF
+           END-IF
+      *
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       970-PTCONF-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理

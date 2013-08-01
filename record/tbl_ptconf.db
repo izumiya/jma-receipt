@@ -26,3 +26,26 @@ path	key		{
 	};
 };
 
+path	key2		{ 	
+	DBSELECT	{
+		DECLARE tbl_ptconf_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptconf
+			WHERE   HOSPNUM     =   :HOSPNUM
+			 AND	PTID  		=   :PTID
+			 	ORDER	 BY	 CKEY
+		;
+	};
+};
+
+path	del1 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_ptconf
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID        =   :PTID
+		;
+	};
+};
+
+

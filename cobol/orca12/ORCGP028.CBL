@@ -1,0 +1,461 @@
+      *******************************************************************
+      * Project code name "ORCA"
+      * 日医標準レセプトソフト（JMA standard receipt software）
+      * Copyright(C) 2002 JMA (Japan Medical Association)
+      *
+      * This program is part of "JMA standard receipt software".
+      *
+      *     This program is distributed in the hope that it will be useful
+      * for further advancement in medical care, according to JMA Open
+      * Source License, but WITHOUT ANY WARRANTY.
+      *     Everyone is granted permission to use, copy, modify and
+      * redistribute this program, but only under the conditions described
+      * in the JMA Open Source License. You should have received a copy of
+      * this license along with this program. If not, stop using this
+      * program and contact JMA, 2-28-16 Honkomagome, Bunkyo-ku, Tokyo,
+      * 113-8621, Japan.
+      ********************************************************************
+       IDENTIFICATION          DIVISION.
+       PROGRAM-ID.             ORCGP028.
+      *****************************************************************
+      *  システム名        : ＯＲＣＡ
+      *  サブシステム名    : 患者登録
+      *  コンポーネント名  : 患者個別設定（Ｐ０２８）
+      *  管理者            : 
+      *  作成日付    作業者        記述
+      *  13/07/22    NACL-多々納   新規作成
+      *****************************************************************
+      *  プログラム修正履歴
+      * Maj/Min/Rev  修正者       日付      内容
+      *****************************************************************
+      *
+       ENVIRONMENT             DIVISION.
+       CONFIGURATION               SECTION.
+       INPUT-OUTPUT                SECTION.
+       FILE-CONTROL.
+      *
+       DATA                        DIVISION.
+      *FILE                        SECTION.
+      *
+       WORKING-STORAGE             SECTION.
+      *
+      *    スパ領域
+           COPY    "COMMON-SPA".
+      *    患者登録スパ領域
+           COPY    "P02COMMON-SPA".
+      *    患者画面スパ領域
+           COPY    "P02SCR-SPA".
+      *
+      *    フラグ領域
+       01  STS-AREA.
+           03  STS-PARA            PIC X(02).
+      *
+      *    フラグ領域
+       01  FLG-AREA.
+           03  FLG-PARA            PIC 9(01).
+           03  FLG-END             PIC 9(01).
+      *
+           03  FLG-ERR             PIC 9(01).
+           03  FLG-OK              PIC 9(01).
+           03  FLG-TOUROKU         PIC 9(01).
+      *
+      *    添字領域
+       01  IDX-AREA.
+           03  IDX                 PIC 9(04).
+      *
+      *    一時領域
+       01  WRK-AREA.
+           03  WRK-MCP-WIDGET      PIC X(64).
+      *
+      *
+      *****************************************************************
+      *    ファイルレイアウト
+      *****************************************************************
+      *
+      *
+      *****************************************************************
+      *    サブプロ用　領域
+      *****************************************************************
+      *
+      *   日付変換サブ
+           COPY    "CPORCSDAY.INC".
+           COPY    "CPORCSLNK.INC".
+      *   数字変換領域
+           COPY    "CPORCSNUM.INC".
+      *
+      *   画面日付変換サブ
+          COPY    "CPORCSGDAY.INC".
+      *
+      *    全角チェックパラメタ
+           COPY    "CPORCSKANACHK.INC".
+      *
+      *    ＤＢ検索
+           COPY    "MCPDATA.INC".
+      *
+      *****************************************************************
+      *    連絡　領域
+      *****************************************************************
+        LINKAGE                     SECTION.
+      *
+           COPY    "MCPAREA".
+           COPY    "ORCA-SPA".
+           COPY    "LINKAREA".
+      *
+      *
+       01  SCRAREA.
+           COPY    "ORCA12SCRAREA.INC".
+      *
+       PROCEDURE                   DIVISION    USING
+           MCPAREA
+           SPAAREA
+           LINKAREA
+           SCRAREA.
+      *
+      *****************************************************************
+      *    主　　処理
+      *****************************************************************
+       000-PROC-SEC                SECTION.
+      *
+           INITIALIZE                  FLG-AREA
+           INITIALIZE                  STS-AREA
+           INITIALIZE                  WRK-AREA
+      *
+           MOVE    SPA-COMMON      TO  SPA-AREA
+           MOVE    SPA-FREE        TO  SPA-P02SCRAREA
+           MOVE    SPA-WORK        TO  SPA-P02KYOUTU
+      *
+           MOVE    SPACE           TO  SPA-ERRCD
+           MOVE    ZERO            TO  SPA-FLG-END
+      *
+           EVALUATE    MCP-STATUS      ALSO    MCP-EVENT
+               WHEN    "LINK"          ALSO    ANY
+                   PERFORM 100-INIT-SEC
+      *    画面遷移
+               WHEN     "PUTG"         ALSO   "CLICKED"
+                   PERFORM 200-GMNSENI
+      *    入力
+               WHEN      OTHER
+                   PERFORM 200-ENTRY
+           END-EVALUATE.
+      *
+           IF      SPA-FLG-END         =   ZERO
+               PERFORM 5001-MAPCUR-SEC
+      *********PERFORM 500-GMNHEN-SEC
+           END-IF
+      *
+           MOVE    SPA-P02KYOUTU       TO  SPA-WORK
+           MOVE    SPA-AREA        TO  SPA-COMMON
+           MOVE    SPA-P02SCRAREA  TO  SPA-FREE
+      *
+           .
+           EXIT    PROGRAM
+           .
+      *****************************************************************
+      *    初期　処理
+      *****************************************************************
+       100-INIT-SEC                SECTION.
+      *
+           INITIALIZE                  FLG-AREA
+           INITIALIZE                  STS-AREA
+           INITIALIZE                  WRK-AREA
+      *
+      *    初期画面編集
+           PERFORM 300-SCREEN-SEC
+      *
+           .
+       100-INIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    初期画面処理
+      *****************************************************************
+       300-SCREEN-SEC              SECTION.
+      *
+      *    パラメタファイル検索処理
+      **** PERFORM 320-PARAFILE-KENSAKU-SEC
+      *
+           MOVE    SPA-WORK        TO  SPA-P02KYOUTU
+      *
+      *    初期画面編集
+           PERFORM 310-SPASET-SEC
+      *
+           MOVE    1                   TO  SPA-GMN28-CUR
+      *
+           .
+       300-SCREEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    スパ初期編集処理
+      *****************************************************************
+       310-SPASET-SEC              SECTION.
+           .
+       310-SPASET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画面編集処理
+      *****************************************************************
+       500-GMNHEN-SEC              SECTION.
+      *
+           .
+       500-GMNHEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画面カーソルセット処理
+      *****************************************************************
+       5001-MAPCUR-SEC             SECTION.
+      *
+      *    カーソル指定のない時、入力した項目の次ぎへ
+           IF     (SPA-ERRCD           =   SPACE)  AND
+                  (SPA-GMN28-CUR       =   ZERO )
+               PERFORM 50011-INPUT-CUR-SEC
+           END-IF
+      *
+           EVALUATE    SPA-GMN28-CUR
+               WHEN    01
+                   MOVE    "P028_MNOTE_QRKBN"   TO  MCP-WIDGET
+               WHEN    02
+                   MOVE    "P028_MNOTE_CSV"     TO  MCP-WIDGET
+               WHEN    03
+                   MOVE    "B08"                TO  MCP-WIDGET
+           END-EVALUATE
+      *
+           .
+       5001-MAPCUR-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入力個所のセット処理
+      *****************************************************************
+       50011-INPUT-CUR-SEC          SECTION.
+      *
+           EVALUATE    WRK-MCP-WIDGET
+               WHEN    "P028_MNOTE_QRKBN"
+                   MOVE    2           TO  SPA-GMN28-CUR
+               WHEN    "P028_MNOTE_CSV"
+                   MOVE    3           TO  SPA-GMN28-CUR
+           END-EVALUATE
+      *
+           .
+       50011-INPUT-CUR-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画面遷移処理
+      *****************************************************************
+       200-GMNSENI                   SECTION.
+      *
+           EVALUATE    MCP-EVENT       ALSO    MCP-WIDGET
+      *    登録処理
+               WHEN    "CLICKED"       ALSO    "B12"
+                   PERFORM 490-TOUROKU-SEC
+      *
+      *     以外はエラー
+               WHEN    "CLICKED"       ALSO     ANY
+                   MOVE    "0110"          TO  SPA-ERRCD
+                   MOVE    1               TO  SPA-GMN28-CUR
+           END-EVALUATE
+      *
+           .
+       200-GMNSENI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    登録処理
+      *****************************************************************
+       490-TOUROKU-SEC             SECTION.
+      *
+           MOVE    1                   TO  FLG-TOUROKU
+      *    入力チェック処理
+           PERFORM 410-INPUT-CHK-SEC
+           .
+       490-TOUROKU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    会話　処理
+      *****************************************************************
+       200-ENTRY                   SECTION.
+      *
+      *    入力個所のセット
+           PERFORM 400-GMN-INPUT-SEC
+      *
+           MOVE    ZERO                TO  FLG-TOUROKU
+      *    入力チェック処理
+           PERFORM 410-INPUT-CHK-SEC
+           .
+       200-ENTRY-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入力個所のセット処理
+      *****************************************************************
+       400-GMN-INPUT-SEC          SECTION.
+      *
+           MOVE    MCP-WIDGET          TO  WRK-MCP-WIDGET
+           MOVE    ZERO                TO  SPA-GMN28-CUR
+      *
+           .
+       400-GMN-INPUT-EXT.
+           EXIT.
+      *****************************************************************
+      *    入力チェック処理
+      *****************************************************************
+       410-INPUT-CHK-SEC          SECTION.
+      *
+      *    画面をＳＰＡセット
+           PERFORM 4101-GMN-SPA-SET-SEC
+      *    基本チェックと別画面処理
+           PERFORM 4102-KIHON-CHK-SEC
+      *
+      *    登録チェック
+           IF      FLG-TOUROKU         =   1
+               IF      SPA-ERRCD           =   SPACE
+                   PERFORM 4109-TOUROKU-CHK-SEC
+               END-IF
+           END-IF
+           .
+       410-INPUT-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画面ＳＰＡ編集処理
+      *****************************************************************
+       4101-GMN-SPA-SET-SEC          SECTION.
+      *
+           MOVE    P02-P028-MNOTE-QRKBN
+                                       TO  SPA-GMN28-MNOTE-QRKBN-G
+           MOVE    P02-P028-MNOTE-CSV
+                                       TO  SPA-GMN28-MNOTE-CSV-G
+           .
+       4101-GMN-SPA-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    基本チェックと別画面処理
+      *****************************************************************
+       4102-KIHON-CHK-SEC          SECTION.
+      *
+      *    お薬手帳ＱＲ区分
+           PERFORM 41012-MNOTE-QRKBN-CHK-SEC
+      *    お薬手帳ＣＳＶ区分
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 41012-MNOTE-CSV-CHK-SEC
+           END-IF
+           .
+      *
+       4102-KIHON-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    お薬手帳ＱＲ区分チェック処理
+      *****************************************************************
+       41012-MNOTE-QRKBN-CHK-SEC           SECTION.
+      *
+           IF      SPA-GMN28-MNOTE-QRKBN   =   SPACE
+               MOVE    SPACE           TO  SPA-GMN28-MNOTE-QRKBN-G
+           ELSE
+      *
+               MOVE    ZERO                TO  FLG-OK
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   SPA-GMN28-QRKBN-MAX)
+                              OR  (FLG-OK  =   1                )
+                   IF      SPA-GMN28-MNOTE-QRKBN
+                                       =   SPA-GMN28-MNOTE-QRKBN-LST
+                                                      (IDX) (1:1)
+                       MOVE    SPA-GMN28-MNOTE-QRKBN-LST (IDX)
+                                           TO  SPA-GMN28-MNOTE-QRKBN-G
+                       MOVE    1           TO  FLG-OK
+                   END-IF
+               END-PERFORM
+               IF      FLG-OK              =   ZERO
+                   MOVE    "2801"          TO  SPA-ERRCD
+                   MOVE    1               TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+           .
+       41012-MNOTE-QRKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    お薬手帳ＱＲ区分チェック処理
+      *****************************************************************
+       41012-MNOTE-CSV-CHK-SEC           SECTION.
+      *
+           IF      SPA-GMN28-MNOTE-CSV   =   SPACE
+               MOVE    SPACE           TO  SPA-GMN28-MNOTE-CSV-G
+           ELSE
+      *
+               MOVE    ZERO                TO  FLG-OK
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   SPA-GMN28-CSV-MAX)
+                              OR  (FLG-OK  =   1                )
+                   IF      SPA-GMN28-MNOTE-CSV
+                                       =   SPA-GMN28-MNOTE-CSV-LST
+                                                      (IDX) (1:1)
+                       MOVE    SPA-GMN28-MNOTE-CSV-LST (IDX)
+                                           TO  SPA-GMN28-MNOTE-CSV-G
+                       MOVE    1           TO  FLG-OK
+                   END-IF
+               END-PERFORM
+               IF      FLG-OK              =   ZERO
+                   MOVE    "2802"          TO  SPA-ERRCD
+                   MOVE    2               TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+           .
+       41012-MNOTE-CSV-CHK-EXT.
+           EXIT.
+      *
+      ****************************************************************
+      **    登録前関連チェック処理
+      ****************************************************************
+       4109-TOUROKU-CHK-SEC             SECTION.
+      *
+      *
+           .
+       4109-TOUROKU-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブル検索処理
+      *****************************************************************
+       910-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"      TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       910-DBSELECT-EXT.
+           EXIT.
+      *****************************************************************
+      *    ＤＢ読み込み処理
+      *****************************************************************
+       920-DBFETCH-SEC                 SECTION.
+      *
+           MOVE    "DBFETCH"       TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+      *
+       920-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢクローズ処理
+      *****************************************************************
+       990-DBCLOSE-SEC         SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       990-DBCLOSE-EXT.
+           EXIT.
+      *

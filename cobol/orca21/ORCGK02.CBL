@@ -11785,6 +11785,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *        ±°∆‚ ¨
                MOVE    "3"                 TO  ORCSCH62-KBN
            END-IF
+           MOVE    "2"                 TO  ORCSCH62-PGKBN
            MOVE    "03"                TO  SPA-PRT-FLG
            CALL    "ORCSCH62"          USING   SPA-AREA
                                                ORCSCH62AREA

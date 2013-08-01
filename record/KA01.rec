@@ -137,5 +137,8 @@ KA01	{
 		KEISUURYO6	{
 			value	varchar(12);
 		};
+		B12S	{
+	           	state	int;
+		};
 	};
 };

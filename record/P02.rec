@@ -413,7 +413,7 @@ P02	{
 						rowattr	int;
 						item	{
 							value0	varchar(4);
-							value1	varchar(40);
+							value1	varchar(60);
 						}	[30];
 						select	bool[30];
 					};
@@ -425,13 +425,17 @@ P02	{
 					value	varchar(30);
 				};
 				P02_HKNJAADRS	{
-					value	varchar(30);
+					value	varchar(40);
 				};
 				P02_HKNJAADRS2	{
-					value	varchar(30);
+					value	varchar(40);
 				};
 				P02_HKNJATEL	{
 					value	varchar(16);
+				};
+				P02_HKNJA_IDOMSG	{
+					style	varchar(20);
+					value	varchar(36);
 				};
 				P02_NYUKIN_COB	{
 					P02_NYUKIN	{
@@ -1144,6 +1148,22 @@ P02	{
 				};
 				P026_DELSEL2	{
 					value	number(4);
+				};
+			};
+			FP10	{
+				P028_MNOTE_QRKBN_COMB	{
+					P028_MNOTE_QRKBN	{
+						value	varchar(30);
+					};
+					count	int;
+					item	varchar(30)[9];
+				};
+				P028_MNOTE_CSV_COMB	{
+					P028_MNOTE_CSV	{
+						value	varchar(50);
+					};
+					count	int;
+					item	varchar(50)[20];
 				};
 			};
 		};

@@ -25,7 +25,9 @@
       *
        01  ORCSQRCSV62AREA.
       *    帳票名
-           03  ORCSQRCSV62-FORM-ID          PIC X(06).
+           03  ORCSQRCSV62-FORM-ID         PIC X(06).
+      *    処理回数
+           03  ORCSQRCSV62-CNT             PIC 9(03).
       *
       *    共通情報
            03  ORCSQRCSV62-IN01-G.
@@ -85,17 +87,25 @@
                    07  ORCSQRCSV62-BIKOU       PIC X(100).
       *
       *    ファイル名組み立て項目
-           03  ORCSQRCSV62-SYSTIME       PIC 9(08).
-      *    エラーコード
-           03  ORCSQRCSV62-ERRCD         PIC 9(01).
-      *
-      *    リターンコード(ＱＲ画像バージョン)
-           03  ORCSQRCSV62-RET-VERSION        PIC 9(02).
-      *    リターンコード(ＱＲ画像ファイル数)
-           03  ORCSQRCSV62-RET-COUNT          PIC 9(02).
-      *    qrencode return-code
-           03  ORCSQRCSV62-RET                PIC X(01).
+           03  ORCSQRCSV62-SYSTIME         PIC 9(08).
       *
       *    ＱＲＣＳＶファイル名
-           03  ORCSQRCSV62-CSV-FILENAME       PIC X(256).
+           03  ORCSQRCSV62-CSV-FILENAME    PIC X(256).
+      *    ＱＲ出力区分
+           03  ORCSQRCSV62-QR-KBN          PIC X(01).
+      *    ＱＲＣＳＶ処理区分
+           03  ORCSQRCSV62-CSV-KBN         PIC X(01).
+      *    発行画面区分
+           03  ORCSQRCSV62-PGKBN           PIC X(01).
+      *
+      *出力
+      *    エラーコード
+           03  ORCSQRCSV62-ERRCD           PIC 9(01).
+      *
+      *    リターンコード(ＱＲ画像バージョン)
+           03  ORCSQRCSV62-RET-VERSION     PIC 9(02).
+      *    リターンコード(ＱＲ画像ファイル数)
+           03  ORCSQRCSV62-RET-COUNT       PIC 9(02).
+      *    qrencode return-code
+           03  ORCSQRCSV62-RET             PIC X(01).
       *

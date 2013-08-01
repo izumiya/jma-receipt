@@ -322,18 +322,21 @@
                       07  P02-HKNLIST-ROWATTR PIC S9(9)   BINARY.
                       07  P02-ITEM        OCCURS  30 TIMES.
                         08  P02-HKNCOBNUM     PIC X(4).
-                        08  P02-HKNCOBNAME    PIC X(40).
+                        08  P02-HKNCOBNAME    PIC X(60).
                       07  P02-HKNLIST-SELECT  PIC X   OCCURS  30 TIMES.
                   05  P02-P02-HKNNAME.
                     06  P02-VALUE   PIC X(30).
                   05  P02-P02-HKNNAME2.
                     06  P02-VALUE   PIC X(30).
                   05  P02-P02-HKNJAADRS.
-                    06  P02-VALUE   PIC X(30).
+                    06  P02-VALUE   PIC X(40).
                   05  P02-P02-HKNJAADRS2.
-                    06  P02-VALUE   PIC X(30).
+                    06  P02-VALUE   PIC X(40).
                   05  P02-P02-HKNJATEL.
                     06  P02-VALUE   PIC X(16).
+                  05  P02-P02-HKNJA-IDOMSG.
+                    06  P02-HKNJA-IDOMSG-STYLE   PIC X(20).
+                    06  P02-HKNJA-IDOMSG-VALUE   PIC X(36).
                   05  P02-P02-NYUKIN-COB.
                     06  P02-P02-NYUKIN.
                       07  P02-VALUE   PIC X(23).
@@ -826,5 +829,19 @@
                     06  P02-VALUE   PIC S9(4).
                   05  P02-P026-DELSEL2.
                     06  P02-VALUE   PIC S9(4).
+                04  P02-FP10.
+                  05  P02-P028-MNOTE-QRKBN-COMB.
+                    06  P02-P028-MNOTE-QRKBN.
+                      07  P02-VALUE   PIC X(30).
+                    06  P02-P028-MNOTE-QRKBN-COUNT   PIC S9(9) BINARY.
+                    06  P02-P028-MNOTE-QRKBN-ITEM
+                            PIC X(30)   OCCURS  9 TIMES.
+                  05  P02-P028-MNOTE-CSV-COMB.
+                    06  P02-P028-MNOTE-CSV.
+                      07  P02-VALUE   PIC X(50).
+                    06  P02-P028-MNOTE-CSV-COUNT   PIC S9(9)   BINARY.
+                    06  P02-P028-MNOTE-CSV-ITEM
+                            PIC X(50)   OCCURS  20 TIMES.
+
 
 

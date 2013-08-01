@@ -185,6 +185,7 @@
       *    Ï«ºÒ¡¦¼«ÇåÀÕÊÝ¸±ÅÐÏ¿Í­Ìµ
            03  SPA-ROSAI-FLG                PIC 9(01).
            03  SPA-JIBAI-FLG                PIC 9(01).
+           03  SPA-DAISAN-FLG               PIC 9(01).
       *
       *    Ì¤ÅÐÏ¿¼õÉÕ¥Ñ¥é¥á¥¿¥Ç¡¼¥¿
            03  UKEPARA-REC.

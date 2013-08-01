@@ -126,6 +126,7 @@
            03  FLG-PTKOHFTNETC     PIC 9(01).
            03  FLG-PTPUBLIC        PIC 9(01).
            03  FLG-PTHDISTDAY      PIC 9(01).
+           03  FLG-PTCONF          PIC 9(01).
       *
            03  FLG-SYORI           PIC X(01).
            03  FLG-SYORI2          PIC X(01).
@@ -187,6 +188,11 @@
            03  WRK-CREYMD              PIC X(08).
       *
            03  WRK-PTSAME-CNT          PIC 9(02).
+      *
+      *    患者個別設定　設定ＫＥＹ
+           03  WRK-CONF-CKEY           PIC  X(25).
+      *                  設定データ
+           03  WRK-CONF-CDATA          PIC  X(10).
       *
       *    カルテＰＧ名
       *    03  WRK-KARUTE-PG           PIC X(20).
@@ -338,6 +344,10 @@
        01  PTPUBLIC-REC.
            COPY    "CPPTNUM-PUBLIC.INC".
       *
+      *
+      *    患者個別設定テーブル
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
       *
       *****************************************************************
       *    サブプロ用　領域
@@ -505,9 +515,21 @@
       *ver.4.7
       *    患者地域連携情報更新
            PERFORM 210-PTPUBLIC-SYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      200-MAIN-EXT
+           END-IF
+      *ver.4.7
+      *    患者個別設定情報更新
+           PERFORM 211-PTCONF-SYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      200-MAIN-EXT
+           END-IF
       *
       *    旧姓履歴更新
            PERFORM 260-KYUSEIRRK-SYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      200-MAIN-EXT
+           END-IF
       *
       *    公費負担額
            INITIALIZE                      PTKOHFTN-REC
@@ -544,6 +566,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            PERFORM
                UNTIL  (FLG-PARA            =   1 )
+                  OR  (SPA-ERRCD       NOT =   SPACE )
                EVALUATE    PARA-FILEMEI
                    WHEN    "PTHKNINF"
                        PERFORM 220-PTHKNINF-SYORI-SEC
@@ -884,6 +907,149 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        2101-PTPUBLIC-UPS-EXT.
            EXIT.
+      *ver.4.7
+      *****************************************************************
+      *    患者個別設定情報更新処理
+      *****************************************************************
+       211-PTCONF-SYORI-SEC        SECTION.
+      *
+      *    お薬手帳ＱＲ区分
+           MOVE    SPA-GMN28-MNOTE-QRKBN   TO  WRK-CONF-CDATA
+           MOVE    "MNOTEQR"               TO  WRK-CONF-CKEY
+           PERFORM 2111-PTCONF-DBSYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      211-PTCONF-SYORI-EXT
+           END-IF
+      *
+      *    お薬手帳データフォーマット区分
+           MOVE    SPA-GMN28-MNOTE-CSV     TO  WRK-CONF-CDATA
+           MOVE    "MNOTEVER"              TO  WRK-CONF-CKEY
+           PERFORM 2111-PTCONF-DBSYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      211-PTCONF-SYORI-EXT
+           END-IF
+           .
+       211-PTCONF-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定登録処理
+      *****************************************************************
+       2111-PTCONF-DBSYORI-SEC        SECTION.
+      *
+      *
+           INITIALIZE                  PTCONF-REC
+           MOVE    PTINF-HOSPNUM       TO  PTCONF-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCONF-PTID
+           MOVE    WRK-CONF-CKEY       TO  PTCONF-CKEY
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    ＤＢあり
+           IF      FLG-PTCONF          =   ZERO
+               IF      WRK-CONF-CDATA      =   SPACE
+      *            ＤＢ削除
+                   MOVE    PTCONF-REC          TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "tbl_ptconf"        TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   CALL    "ORCDBMAIN"         USING   MCPAREA
+                                                       MCPDATA-REC
+                                                       SPA-AREA
+                   IF      MCP-RC          NOT =   ZERO
+                       DISPLAY "P029 PTCONF DEL ERR:" MCP-RC
+                               ",KEY:" PTCONF-KEY
+                       MOVE    "9000"          TO  SPA-ERRCD
+                   END-IF
+               ELSE
+      *            ＤＢ更新
+                   PERFORM 21111-PTCONF-UPS-SEC
+               END-IF
+           ELSE
+               IF      WRK-CONF-CDATA  NOT =   SPACE
+      *            登録
+                   PERFORM 21112-PTCONF-INS-SEC
+               END-IF
+           END-IF
+      *
+           .
+       2111-PTCONF-DBSYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定データ登録処理
+      *****************************************************************
+       21112-PTCONF-INS-SEC        SECTION.
+      *
+           INITIALIZE                      PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTCONF-PTID
+           MOVE    WRK-CONF-CKEY       TO  PTCONF-CKEY
+      *    入力値編集
+           MOVE    WRK-CONF-CDATA      TO  PTCONF-CDATA
+      *    作成年月日
+           MOVE    SMCNDATE-YMD        TO  PTCONF-CREYMD
+           MOVE    SMCNDATE-YMD        TO  PTCONF-UPYMD
+           MOVE    SMCNDATE-HMS        TO  PTCONF-UPHMS
+           MOVE    SPA-OPID            TO  PTCONF-OPID
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "DBINSERT"          TO  MCP-FUNC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "P029 PTCONF INS ERR:" MCP-RC
+                           ",KEY:" PTCONF-KEY
+               MOVE    "9000"          TO  SPA-ERRCD
+           END-IF
+           .
+       21112-PTCONF-INS-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定データ更新処理
+      *****************************************************************
+       21111-PTCONF-UPS-SEC        SECTION.
+      *
+      *    入力値編集
+           MOVE    WRK-CONF-CDATA      TO  PTCONF-CDATA
+      *    更新年月日
+           MOVE    SMCNDATE-YMD        TO  PTCONF-UPYMD
+           MOVE    SMCNDATE-HMS        TO  PTCONF-UPHMS
+           MOVE    SPA-OPID            TO  PTCONF-OPID
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "DBUPDATE"          TO  MCP-FUNC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               DISPLAY "P029 PTCONF UPD ERR:" MCP-RC
+                           ",KEY:" PTCONF-KEY
+               MOVE    "9000"          TO  SPA-ERRCD
+           END-IF
+           .
+       21111-PTCONF-UPS-EXT.
+           EXIT.
+      *
+      *
       *****************************************************************
       *    患者保険マスター処理
       *****************************************************************
@@ -3088,6 +3254,23 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        991-PTHDISTDAY-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    患者個別設定テーブル読み込み
+      *****************************************************************
+       930-PTCONF-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTCONF-REC
+               MOVE    ZERO            TO  FLG-PTCONF
+           ELSE
+               INITIALIZE                  PTCONF-REC
+               MOVE    1               TO  FLG-PTCONF
+           END-IF
+      *
+           .
+       930-PTCONF-READ-EXT.
            EXIT.
       *
       *****************************************************************

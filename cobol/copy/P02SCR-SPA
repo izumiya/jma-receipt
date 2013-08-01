@@ -43,6 +43,7 @@
       *  04.07.00    NACL-多々納  11/08/XX  保険確認年月日履歴対応
       *  04.07.00    NACL-多々納  12/06/XX  公費種別２００件対応
       *  04.07.00    NACL-多々納  12/12/19  患者レセ分割対応
+      *  04.07.00    NACL-多々納  13/07/19  患者個別設定追加対応
       *****************************************************************
        01  SPA-P02SCRAREA.
       *
@@ -261,8 +262,10 @@
                            11  SPA-HKNJA-ADRS          PIC X(100).
                            11  SPA-HKNJA-BANTI         PIC X(100).
                            11  SPA-HKNJA-TEL           PIC X(15).
-      *                    保険者警告表示
+      *                    異動情報
                            11  SPA-HKNJA-IDOYMD        PIC X(08).
+                           11  SPA-HKNJA-IDOKBN        PIC X(01).
+      *
                            11  SPA-HKNJA-HON-GAIKYURATE    PIC 9(03).
                            11  SPA-HKNJA-HON-NYUKYURATE    PIC 9(03).
                            11  SPA-HKNJA-KZK-GAIKYURATE    PIC 9(03).
@@ -342,7 +345,7 @@
                05  SPA-HKNCOMBI-AREA.
                    07  SPA-GMN-HKNCOMBI-LIST       OCCURS   15.
                        09  SPA-GMN-THKNCOMBINUM    PIC 9(04).
-                       09  SPA-GMN-THKNCOMBIMEI    PIC X(40).
+                       09  SPA-GMN-THKNCOMBIMEI    PIC X(60).
                        09  SPA-GMN-TTEKSTYMD       PIC X(09).
                        09  SPA-GMN-TTEKEDYMD       PIC X(09).
                        09  SPA-GMN-THKNNUM         PIC X(03).
@@ -354,6 +357,7 @@
                        09  SPA-NAI-TKOH2HKNNUM     PIC X(03).
                        09  SPA-NAI-TKOH3HKNNUM     PIC X(03).
                        09  SPA-NAI-TKOH4HKNNUM     PIC X(03).
+                       09  SPA-NAI-TKOH1ID         PIC 9(10).
       *
                        09  SPA-NAI-THYOJIKBN       PIC X(01).
                    07  SPA-HKNCOMBI-MAX            PIC 9(04).
@@ -1135,6 +1139,28 @@
                            11  SPA-GMN26-THDHKNNAME      PIC X(60).
       *
       *
+      *    P028(個別設定）
+           03  SPA-P028-AREA.
+               05  SPA-GMN28-CUR             PIC 9(02).
+               05  SPA-GMN28-MNOTE-QRKBN-G.
+                   07  SPA-GMN28-MNOTE-QRKBN       PIC X(01).
+                   07  SPA-GMN28-MNOTE-F1          PIC X(01).
+                   07  SPA-GMN28-MNOTE-QRKBNMEI    PIC X(28).
+               05  SPA-GMN28-MNOTE-QRKBN-COMB.
+                   07  SPA-GMN28-MNOTE-QRKBN-LST   PIC X(30)
+                                                      OCCURS 9.
+               05  SPA-GMN28-QRKBN-MAX         PIC 9(02).
+      *
+               05  SPA-GMN28-MNOTE-CSV-G.
+                   07  SPA-GMN28-MNOTE-CSV         PIC X(01).
+                   07  SPA-GMN28-MNOTE-F1          PIC X(01).
+                   07  SPA-GMN28-MNOTE-CSVMEI      PIC X(48).
+               05  SPA-GMN28-MNOTE-CSV-COMB.
+                   07  SPA-GMN28-MNOTE-CSV-LST     PIC X(50)
+                                                      OCCURS 20.
+               05  SPA-GMN28-CSV-MAX           PIC 9(02).
+      *
+      *
       *    P0201（未登録受付者一覧）
            03  SPA-P0201-AREA.
                05  SPA-GMN201-MAX                   PIC 9(04).
@@ -1253,7 +1279,7 @@
                        09  SPA-GMN2D-HKNKBNMEI     PIC X(14).
                    07  SPA-GMN2D-HKNKBN-COMB.
                        09  SPA-GMN2D-HKNKBN-LST    PIC X(16)
-                                                   OCCURS   5.
+                                                   OCCURS   9.
                    07  SPA-GMN2D-HKNKBN-MAX        PIC 9(04).
       *            自費請求区分
                    07  SPA-GMN2D-JIBAISEIKBN-G.
@@ -1419,6 +1445,32 @@
       *            前労働基準監督署コード
                    07  SPA-NAI2D-MAE-SYOCD         PIC  X(05).
                    07  SPA-NAI2D-SYOCDCHK          PIC  X(01).
+      *
+      *     第三者対応
+      *        労災保険の時、労災保険の連番
+               05  SPA-NAI2D-RSHKN-EDANUM      PIC 9(04).
+      *
+               05  SPA-NAI2D-HKNID             PIC 9(10).
+               05  SPA-NAI2D-KOHID             PIC 9(10).
+      *
+               05  SPA-NAI2D-KOHIDX            PIC 9(04).
+               05  SPA-NAI2D-KOHIADD           PIC 9(01).
+      *
+      *        労災リスト
+               05  SPA-GMN2D-RSILST-AREA.
+                   07  SPA-GMN2D-RSILST-OCC        OCCURS   40.
+                       11  SPA-GMN2D-TRENNUM       PIC 9(03).
+                       11  SPA-GMN2D-TPARANUM      PIC 9(03).
+                       11  SPA-GMN2D-THKNKBN       PIC X(03).
+                       11  SPA-GMN2D-THKNKBNMEI    PIC X(16).
+                       11  SPA-GMN2D-TRSIKIKAN     PIC X(20).
+                       11  SPA-GMN2D-THKNID        PIC 9(10).
+                       11  SPA-GMN2D-TKOHID        PIC 9(10).
+                       11  SPA-GMN2D-TRYOSTYMD     PIC X(08).
+                       11  SPA-GMN2D-TRYOEDYMD     PIC X(08).
+                   07  SPA-GMN2D-RSIMAX            PIC 9(04).
+               05  SPA-GMN2D-SELNUM                PIC 9(03).
+               05  SPA-GMN2D-MAE-SELNUM            PIC 9(03).
       *
       *
       *----(01.00.03) LINE ADD START ---------------------------------

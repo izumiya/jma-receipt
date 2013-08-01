@@ -500,6 +500,7 @@
                END-IF
       *
                MOVE    HKNJA-IDOYMD        TO  SPA-HKNJA-IDOYMD
+               MOVE    HKNJA-IDOKBN        TO  SPA-HKNJA-IDOKBN
                MOVE    HKNJA-HON-GAIKYURATE
                                            TO  SPA-HKNJA-HON-GAIKYURATE
                MOVE    HKNJA-HON-NYUKYURATE
@@ -516,6 +517,7 @@
       *
                MOVE    SPACE               TO  SPA-HKNJA-KEIFLG
                MOVE    SPACE               TO  SPA-HKNJA-IDOYMD
+               MOVE    SPACE               TO  SPA-HKNJA-IDOKBN
                MOVE    ZERO                TO  SPA-HKNJA-HON-GAIKYURATE
                MOVE    ZERO                TO  SPA-HKNJA-HON-NYUKYURATE
                MOVE    ZERO                TO  SPA-HKNJA-KZK-GAIKYURATE
