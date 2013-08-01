@@ -574,15 +574,17 @@
            PERFORM 800-HIZUKE-SEC
            MOVE    WRK-HENYMDG         TO  SPA-GMN-TSRYYMD   (IDXL)
       *
-           SET     TBLLOCK-IDX TO  1
-           SEARCH  ORC-LOCKCONST-TX    VARYING  TBLLOCK-IDX
-           AT  END
-               MOVE    "§Ω§Œ¬æ"        TO  SPA-GMN-TLDNAME (IDXL)
-           WHEN  ( MNOTE-H-GYOUMU-CD   =
-                                  ORC-LOCKCONST-GNUM (TBLLOCK-IDX))
-               MOVE    ORC-LOCKCONST-NAME (TBLLOCK-IDX)
+           EVALUATE    MNOTE-H-LOCATION-CD
+           WHEN    "01"
+               MOVE    "ø«Œ≈π‘∞Ÿ° ¿¡µ·≥Œ«ß°À"
                                        TO  SPA-GMN-TLDNAME (IDXL)
-           END-SEARCH
+           WHEN    "02"
+               MOVE    "ø«Œ≈π‘∞Ÿ° √Ê≈”Ω™Œª°À"
+                                       TO  SPA-GMN-TLDNAME (IDXL)
+           WHEN    "03"
+               MOVE    "ø«Œ≈π‘∞Ÿ° ¡∞≤ÛΩË ˝°À"
+                                       TO  SPA-GMN-TLDNAME (IDXL)
+           END-EVALUATE
       *
            MOVE    SYS-1010-NAME       TO  SPA-GMN-TDRNAME  (IDXL)
            MOVE    MNOTE-H-TBL-GROUP (1:8)
