@@ -105,7 +105,7 @@
                MOVE ZERO           TO  WRK-SHORI-RENNUM
            END-IF
            MOVE    WRK-SHORI-RENNUM TO SMNOTE-SHORI-RENNUM
-           MOVE    SPACE           TO  SMNOTE-SHELLID
+           MOVE    "store_mnote.sh" TO  SMNOTE-SHELLID
            MOVE    SPA-SRYYMD      TO  SMNOTE-SRYYM
                                        SMNOTE-SRYYMD
            MOVE    SPA-PRT-UUID    TO  SMNOTE-TBL-UUID
