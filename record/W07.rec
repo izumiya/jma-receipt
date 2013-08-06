@@ -299,6 +299,13 @@ W07	{
 					count	int;
 					item	varchar(30)[5];
 				};
+				JGAIKEIKBN_COMB	{
+					JGAIKEIKBN	{
+						value	varchar(30);
+					};
+					count	int;
+					item	varchar(30)[5];
+				};
 			};
 			TAGNAME1    {
 			    state   int;

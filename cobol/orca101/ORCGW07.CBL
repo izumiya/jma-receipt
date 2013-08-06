@@ -122,6 +122,8 @@
       *  04.07.00    NACL-多々納  12/01/26  入力スクロール等背景色追加
       *  04.07.00    NACL-多々納  12/05/08  確認画面処方名称区分追加
       *  04.07.00    NACL-太田    12/07/04  再計算該当者チェック設定追加
+      *  04.07.00    NACL-多々納  13/08/01  時間外緊急院内チェック区分追加
+      *                                     (CPSK1008.INC　YOBI2使用）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -357,6 +359,16 @@
                            11  SPA-GMN-INITAUTO-LIST       PIC X(12)
                                                            OCCURS  2.
                        09  SPA-GMN-INITAUTO-MAX            PIC 9(02).
+      *v4.7
+      *                時間外緊急院内チェック
+                       09  SPA-GMN-JGAIKEIKBN-G.
+                           11  SPA-GMN-JGAIKEIKBN          PIC X(01).
+                           11  SPA-GMN-JGAIKEIKBN-F1       PIC X(01).
+                           11  SPA-GMN-JGAIKEIKBN-MEI      PIC X(28).
+                       09  SPA-GMN-JGAIKEIKBN-COMB.
+                           11  SPA-GMN-JGAIKEIKBN-LIST     PIC X(30)
+                                                           OCCURS  5.
+                       09  SPA-JGAIKEIKBN-MAX              PIC 9(02).
       *
                    07  SPA-GMN-PAGE2-AREA.
       *                カルテの病名対象
@@ -1776,6 +1788,13 @@
            MOVE    "1 チェックする"
                                        TO  SPA-GMN-TECHOKBN-LIST(2)
            MOVE    2                   TO  SPA-TECHOKBN-MAX
+      *v4.7
+      *    時間外緊急院内チェック
+           MOVE    "0 チェックしない"
+                                       TO  SPA-GMN-JGAIKEIKBN-LIST(1)
+           MOVE    "1 チェックする"
+                                       TO  SPA-GMN-JGAIKEIKBN-LIST(2)
+           MOVE    2                   TO  SPA-JGAIKEIKBN-MAX
       *    病名表示区分
            MOVE    "0 表示しない"      TO  SPA-GMN-BYOHYOKBN-LIST(1)
            MOVE    "1 表示する"        TO  SPA-GMN-BYOHYOKBN-LIST(2)
@@ -2460,6 +2479,11 @@
       *        初診再診料の自動発生
                MOVE    SYS-1008-INITAUTO-FLG
                                        TO  SPA-GMN-INITAUTO
+      *v4.7
+      *        時間外緊急院内チェック
+      *v48**** MOVE    SYS-1008-JGAIKEIKBN-FLG
+               MOVE    SYS-1008-YOBI2(1:1)
+                                       TO  SPA-GMN-JGAIKEIKBN
       *
       *        時間外加算チェック
                MOVE    SYS-1008-JIKANTOKU-CHK
@@ -2792,6 +2816,25 @@
                     MOVE    SPA-GMN-TECHOKBN-LIST(1)
                                                TO  SPA-GMN-TECHOKBN-G
            END-EVALUATE
+      *v4.7
+      *    時間外緊急院内チェック
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY         FROM    1   BY  1
+                   UNTIL   IDY         >   SPA-JGAIKEIKBN-MAX
+               IF      SPA-GMN-JGAIKEIKBN
+                                       =   SPA-GMN-JGAIKEIKBN-LIST
+                                                   (IDY)(1:1)
+                   MOVE    SPA-GMN-JGAIKEIKBN-LIST(IDY)
+                                           TO  SPA-GMN-JGAIKEIKBN-G
+                   MOVE    1                   TO  FLG-OK
+                   MOVE    SPA-JGAIKEIKBN-MAX  TO  IDY
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+      *        初期は「チェックする」
+               MOVE    SPA-GMN-JGAIKEIKBN-LIST(2)
+                                           TO  SPA-GMN-JGAIKEIKBN-G
+           END-IF
       *
       *    診療科コードセット
            PERFORM 4102-SRYKACD-CHK-SEC
@@ -5081,6 +5124,7 @@
            MOVE    W07-YAKJYOCHK       TO  SPA-GMN-YAKJYOCHK-G
            MOVE    W07-ZENHKNCHK       TO  SPA-GMN-ZENHKNCHK-G
            MOVE    W07-TECHOKBN        TO  SPA-GMN-TECHOKBN-G
+           MOVE    W07-JGAIKEIKBN      TO  SPA-GMN-JGAIKEIKBN-G
       *
            MOVE    W07-HOUKATU         TO  SPA-GMN-HOUKATU-G
            MOVE    W07-BYOHYOKBN       TO  SPA-GMN-BYOHYOKBN-G
@@ -5339,6 +5383,11 @@
       *            手帳加算確認チェック
                    IF      SPA-ERRCD           =   SPACE
                        PERFORM 4103-TECHOKBN-CHK-SEC
+                   END-IF
+      *ver.4.8
+      *            時間外緊急院内チェック
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 4103-JGAIKEIKBN-CHK-SEC
                    END-IF
       *            包括入力チェック
                    IF      SPA-ERRCD           =   SPACE
@@ -6429,6 +6478,31 @@
       *
           .
        4103-TECHOKBN-CHK-EXT.
+           EXIT.
+      *ver.4.8
+      *****************************************************************
+      *    時間外緊急院内チェック処理
+      *****************************************************************
+       4103-JGAIKEIKBN-CHK-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-JGAIKEIKBN-MAX
+               IF      SPA-GMN-JGAIKEIKBN
+                                      =   SPA-GMN-JGAIKEIKBN-LIST(IDX)
+                                                                (1:1)
+                   MOVE    SPA-GMN-JGAIKEIKBN-LIST(IDX)
+                                          TO  SPA-GMN-JGAIKEIKBN-G
+                   MOVE    1              TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    88              TO  SPA-GMN-CUR
+               MOVE    "0043"          TO  SPA-ERRCD
+           END-IF
+      *
+          .
+       4103-JGAIKEIKBN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -9742,6 +9816,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-ZENHKNCHK       TO  SYS-1008-ZENHKNCHK-FLG
       *    手帳加算確認チェック
            MOVE    SPA-GMN-TECHOKBN       TO  SYS-1008-TECHOKBN-FLG
+      *v4.7
+      *    時間外緊急院内チェック
+      *v48*MOVE    SPA-GMN-JGAIKEIKBN     TO  SYS-1008-JGAIKEIKBN-FLG
+           MOVE    SPA-GMN-JGAIKEIKBN     TO  SYS-1008-YOBI2(1:1)
       *
       *    時間外加算特例乳幼児
            MOVE    SPA-GMN-JIKANTOKU-NYU   TO
@@ -10525,6 +10603,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W07-TECHOKBN-ITEM(IDX)
            END-PERFORM
            MOVE    SPA-TECHOKBN-MAX    TO  W07-TECHOKBN-COUNT
+      *
+      *    時間外緊急院内チェック
+           MOVE    SPA-GMN-JGAIKEIKBN-G  TO  W07-JGAIKEIKBN
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-JGAIKEIKBN-MAX
+               MOVE    SPA-GMN-JGAIKEIKBN-LIST (IDX)
+                                       TO  W07-JGAIKEIKBN-ITEM(IDX)
+           END-PERFORM
+           MOVE    SPA-JGAIKEIKBN-MAX  TO  W07-JGAIKEIKBN-COUNT
       *
       *    包括入力
            MOVE    SPA-GMN-HOUKATU-G       TO  W07-HOUKATU
@@ -11719,6 +11806,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                            DELIMITED  BY  SIZE
                                                        INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "0043"
+                   STRING  "時間外緊急院内検査・画像診断加算"
+                           "算定チェックエラー"
+                           DELIMITED  BY  SIZE
+                                                       INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "0020"
                    MOVE    "外来初診・再診料区分エラー"
                                                        TO  SPA-ERRMSG
@@ -12145,6 +12238,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE  "ZENHKNCHK"       TO   MCP-WIDGET
                WHEN    87
                    MOVE  "TECHOKBN"        TO   MCP-WIDGET
+               WHEN    88
+                   MOVE  "JGAIKEIKBN"      TO   MCP-WIDGET
                WHEN    84
                    MOVE  "HOUKATU"         TO   MCP-WIDGET
                WHEN    85
@@ -12587,6 +12682,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       ********     MOVE    84              TO  SPA-GMN-CUR
                    MOVE    87              TO  SPA-GMN-CUR
                WHEN    "TECHOKBN"
+      ************ MOVE    84              TO  SPA-GMN-CUR
+                   MOVE    88              TO  SPA-GMN-CUR
+      *
+               WHEN    "JGAIKEIKBN"
                    MOVE    84              TO  SPA-GMN-CUR
       *
                WHEN    "HOUKATU"

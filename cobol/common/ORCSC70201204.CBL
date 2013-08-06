@@ -54,6 +54,7 @@
       * 04.06.00     NACL-多々納  10/07/01  残量廃棄自動算定対応
       * 04.07.00     NACL-多々納  12/03/XX  Ｈ２４．４改正対応
       * 04.07.00     NACL-多々納  12/10/XX  時間外緊急院内画像診断加算チェック対応
+      *  04.07.00    NACL-多々納  13/08/XX  時間外緊急院内チェック設定
       *****************************************************************
       *
       *
@@ -316,6 +317,10 @@
            03  WRK-SURYO-HR            REDEFINES   WRK-SURYO-H.
                05  WRK-SURYOH-S1       PIC 9(07).
                05  WRK-SURYOH-S2       PIC 9(05).
+      *ver.4.7
+      *    時間外緊急院内チェック区分
+           03  WRK-JGAIKEIKBN-FLG      PIC X(01).
+      *
       *    入院日
        01  WRK-NYUINDAY-AREA.
            03  WRK-XSEN-DAY            PIC 9(02).
@@ -763,6 +768,10 @@
       *
       *    システム管理マスタ（施設基準）
            COPY    "CPSK1006.INC".
+      *    システム管理マスタ
+           COPY    "CPSYSKANRI.INC".
+      *
+           COPY    "CPSK1008.INC".
       *
       *    点数マスタ−
       *01  TENSU-REC.
@@ -3739,6 +3748,14 @@
       *****************************************************************
        3001-JIKANGAI-CHK-SEC             SECTION.
       *
+      *ver.4.7
+      *    時間外緊急院内チェック区分のシステム管理検索
+           PERFORM 30011-JGAIKEIKBN-SEC
+           IF      WRK-JGAIKEIKBN-FLG  NOT =   "1"
+               MOVE    1               TO  SPA-GAZJIKAN-CHK
+               GO      TO      3001-JIKANGAI-CHK-EXT
+           END-IF
+      *
            MOVE    ZERO                TO  FLG-SINSATU
            MOVE    ZERO                TO  FLG-SINSATU-ARI
            MOVE    ZERO                TO  FLG-JIKASAN
@@ -3852,6 +3869,48 @@
       *
            .
        3001-JIKANGAI-CHK-EXT.
+           EXIT.
+      *ver.4.7
+      *****************************************************************
+      *    時間外緊急院内チェック区分のシステム管理検索処理
+      *****************************************************************
+       30011-JGAIKEIKBN-SEC                SECTION.
+      *
+      *    システム管理検索（チェック機能制御情報）
+           MOVE    SPACE               TO  SYS-1008-REC
+           INITIALIZE                  SYS-1008-REC
+           MOVE    "1008"              TO  SYS-1008-KANRICD
+           MOVE    "*"                 TO  SYS-1008-KBNCD
+           MOVE    SPA-SRYYMD          TO  SYS-1008-STYUKYMD
+           MOVE    SPA-SRYYMD          TO  SYS-1008-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-1008-HOSPNUM
+           MOVE    SYS-1008-REC        TO  SYSKANRI-REC
+      *
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC        TO  SYS-1008-REC
+           ELSE
+               INITIALIZE                  SYS-1008-REC
+           END-IF
+      *
+           IF      FLG-SYSKANRI        =   ZERO
+      *
+      *        時間外緊急院内チェック
+      *v48*****IF      SYS-1008-JGAIKEIKBN-FLG   =   SPACE
+               IF      SYS-1008-YOBI2(1:1)     =   SPACE
+                   MOVE    "1"             TO  WRK-JGAIKEIKBN-FLG
+               ELSE
+      *v48*********MOVE    SYS-1008-JGAIKEIKBN-FLG
+                   MOVE    SYS-1008-YOBI2(1:1)
+                                           TO  WRK-JGAIKEIKBN-FLG
+               END-IF
+           ELSE
+      *        時間外緊急院内チェック
+               MOVE    "1"                 TO  WRK-JGAIKEIKBN-FLG
+           END-IF
+           .
+      *
+       30011-JGAIKEIKBN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4239,6 +4298,37 @@
       *
            .
        910-TENSU-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    管理マスター読込（キー）
+      *****************************************************************
+       900-SYSKANRI-INV-SEC         SECTION.
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+                   MOVE    ZERO            TO  FLG-SYSKANRI
+               ELSE
+                   MOVE    1               TO  FLG-SYSKANRI
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-SYSKANRI
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-SYSKANRI-INV-EXT.
            EXIT.
       *
       *****************************************************************

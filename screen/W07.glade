@@ -23,12 +23,12 @@
     <wmclass_class></wmclass_class>
     <wmclass_name></wmclass_name>
     <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
-    <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -354,6 +354,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <editable>False</editable>
+        <max_length>9</max_length>
         <text></text>
         <input_mode>XIM</input_mode>
         <xim_enabled>False</xim_enabled>
@@ -369,6 +370,7 @@
         <can_focus>True</can_focus>
         <has_focus>False</has_focus>
         <editable>False</editable>
+        <max_length>9</max_length>
         <text></text>
         <input_mode>XIM</input_mode>
         <xim_enabled>False</xim_enabled>
@@ -415,6 +417,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -463,6 +466,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -476,13 +480,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -500,6 +504,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -513,13 +518,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -537,6 +542,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -550,13 +556,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -574,6 +580,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -587,13 +594,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -611,6 +618,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -624,13 +632,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -648,6 +656,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -661,13 +670,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -685,6 +694,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -698,13 +708,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -722,6 +732,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -735,13 +746,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -759,6 +770,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -772,13 +784,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -796,6 +808,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -809,13 +822,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -833,6 +846,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -846,13 +860,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -870,6 +884,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -883,13 +898,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -907,6 +922,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -920,13 +936,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -944,6 +960,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -957,13 +974,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -981,6 +998,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -994,13 +1012,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -1018,6 +1036,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -1031,13 +1050,13 @@
               <data>CHANGED</data>
             </signal>
             <signal>
-              <name>focus_in_event</name>
-              <handler>select_all</handler>
-            </signal>
-            <signal>
               <name>activate</name>
               <handler>send_event</handler>
               <data>ACTIVATE</data>
+            </signal>
+            <signal>
+              <name>focus_in_event</name>
+              <handler>select_all</handler>
             </signal>
             <signal>
               <name>focus_out_event</name>
@@ -1305,7 +1324,7 @@
             <class>GtkPandaCombo</class>
             <name>ZAIJUNKBN_COMB</name>
             <x>656</x>
-            <y>552</y>
+            <y>568</y>
             <width>120</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1323,6 +1342,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>16</max_length>
               <text>1 診療区分順</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1342,7 +1362,7 @@
             <class>GtkPandaCombo</class>
             <name>BYOHYOKBN_COMB</name>
             <x>656</x>
-            <y>520</y>
+            <y>540</y>
             <width>120</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1360,6 +1380,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text>1 表示する</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1379,7 +1400,7 @@
             <class>GtkPandaCombo</class>
             <name>HOUKATU_COMBO</name>
             <x>656</x>
-            <y>488</y>
+            <y>512</y>
             <width>248</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1397,6 +1418,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>30</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1434,6 +1456,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>22</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1471,6 +1494,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>22</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1508,6 +1532,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>22</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1545,6 +1570,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>22</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1582,6 +1608,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>32</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1601,7 +1628,7 @@
             <class>GtkLabel</class>
             <name>label235</name>
             <x>528</x>
-            <y>492</y>
+            <y>512</y>
             <width>120</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1619,7 +1646,7 @@
             <class>GtkLabel</class>
             <name>label305</name>
             <x>528</x>
-            <y>524</y>
+            <y>540</y>
             <width>112</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1637,7 +1664,7 @@
             <class>GtkLabel</class>
             <name>label306</name>
             <x>528</x>
-            <y>552</y>
+            <y>568</y>
             <width>123</width>
             <height>24</height>
             <sensitive>True</sensitive>
@@ -1763,6 +1790,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1800,6 +1828,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1837,6 +1866,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -1874,6 +1904,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2019,6 +2050,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2182,6 +2214,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>30</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2255,6 +2288,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>22</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2292,6 +2326,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>22</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2365,6 +2400,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>30</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2414,6 +2450,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2451,6 +2488,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2488,6 +2526,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2537,6 +2576,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2574,6 +2614,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>22</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2611,6 +2652,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>22</max_length>
               <text>1 算定する（月１回）</text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2648,6 +2690,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>22</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2685,6 +2728,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2722,6 +2766,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>30</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2759,6 +2804,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2796,6 +2842,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2833,6 +2880,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -2870,6 +2918,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>12</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3123,9 +3172,9 @@
             <class>GtkLabel</class>
             <name>label234</name>
             <x>492</x>
-            <y>468</y>
+            <y>492</y>
             <width>184</width>
-            <height>16</height>
+            <height>20</height>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>
@@ -3154,6 +3203,63 @@
             <label>＜チェック制御機能＞</label>
             <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>label10</name>
+            <x>528</x>
+            <y>449</y>
+            <width>200</width>
+            <height>36</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>時間外緊急院内検査加算・
+画像診断加算算定チェック</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkPandaCombo</class>
+            <name>JGAIKEIKBN_COMB</name>
+            <x>732</x>
+            <y>454</y>
+            <width>200</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <border_width>0</border_width>
+            <items></items>
+            <case_sensitive>False</case_sensitive>
+            <use_arrows>True</use_arrows>
+            <widget>
+              <class>GtkPandaEntry</class>
+              <child_name>GtkPandaCombo:entry</child_name>
+              <name>JGAIKEIKBN</name>
+              <sensitive>True</sensitive>
+              <can_focus>True</can_focus>
+              <has_focus>False</has_focus>
+              <editable>True</editable>
+              <max_length>30</max_length>
+              <text></text>
+              <input_mode>XIM</input_mode>
+              <xim_enabled>False</xim_enabled>
+              <signal>
+                <name>changed</name>
+                <handler>entry_changed</handler>
+                <data>CHANGED</data>
+              </signal>
+              <signal>
+                <name>activate</name>
+                <handler>send_event</handler>
+                <data>ACTIVATE</data>
+              </signal>
+            </widget>
           </widget>
         </widget>
         <widget>
@@ -3192,6 +3298,7 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
+            <max_length>2</max_length>
             <text></text>
             <input_mode>XIM</input_mode>
             <xim_enabled>False</xim_enabled>
@@ -3228,6 +3335,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3265,6 +3373,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3302,6 +3411,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3339,6 +3449,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3376,6 +3487,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3413,6 +3525,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>60</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3450,6 +3563,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3487,6 +3601,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3524,6 +3639,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3597,6 +3713,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3634,6 +3751,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3671,6 +3789,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3708,6 +3827,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3745,6 +3865,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>40</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3782,6 +3903,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3927,6 +4049,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -3964,6 +4087,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>28</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -4225,6 +4349,7 @@
               <can_focus>True</can_focus>
               <has_focus>False</has_focus>
               <editable>True</editable>
+              <max_length>40</max_length>
               <text></text>
               <input_mode>XIM</input_mode>
               <xim_enabled>False</xim_enabled>
@@ -6817,13 +6942,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -6845,13 +6970,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -6873,13 +6998,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -6901,13 +7026,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -6929,13 +7054,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -6957,13 +7082,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -6985,13 +7110,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -7013,13 +7138,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -7041,13 +7166,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -7069,13 +7194,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -7097,13 +7222,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -7125,13 +7250,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -7153,13 +7278,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
@@ -7181,13 +7306,13 @@
             <active>False</active>
             <draw_indicator>False</draw_indicator>
             <signal>
+              <name>toggled</name>
+              <handler>button_toggled</handler>
+            </signal>
+            <signal>
               <name>clicked</name>
               <handler>send_event</handler>
               <data>CLICKED</data>
-            </signal>
-            <signal>
-              <name>toggled</name>
-              <handler>button_toggled</handler>
             </signal>
           </widget>
           <widget>
