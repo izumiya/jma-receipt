@@ -2418,8 +2418,9 @@
                    WHEN    "001"
                    WHEN    "002"
                    WHEN    "003"
-                   WHEN    "004"
-                   WHEN    "005"
+      *疾患別リハビリのみ対象
+      *********    WHEN    "004"
+      *********    WHEN    "005"
                        EVALUATE    SPA-RSI-SISIKBN
                            WHEN    1
                            WHEN    2
