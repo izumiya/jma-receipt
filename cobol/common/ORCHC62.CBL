@@ -32,7 +32,7 @@
       *  04.06.00    NACL-森脇    11/03/10  用量割合コード対応
       *  04.07.00    NACL-多々納  12/09/03  ＱＲコード対応
       *                                     商品名コード対応
-      *  04.08.00    NACL-多々納  13/07/XX  パソリ対応他
+      *  04.07.00    NACL-多々納  13/07/XX  電子版お薬手帳アプリ連携対応他
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -390,7 +390,7 @@
            MOVE    "SHOHIN"        TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)   TO  PARA-SHOHIN
-      *    CSVファイル作成
+      *****CSVファイル作成
       *    MOVE    "CSVKBN"        TO  WRK-PARA-NAME
       *    PERFORM 1001-OPTION-CALL-SEC
       *    MOVE    WRK-PARA(1:1)   TO  PARA-CSVKBN
@@ -1090,7 +1090,7 @@
        400-PRT-WRITE-SEC           SECTION.
       *
       *ver.4.7
-      *    ＳＣＶ出力のみは印刷なし
+      *    ＣＳＶ出力のみは印刷なし
            IF      ORCHC62-PRTKBN      =   "1"
                GO      TO      400-PRT-WRITE-EXT
            END-IF
