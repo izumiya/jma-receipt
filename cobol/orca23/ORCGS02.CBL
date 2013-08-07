@@ -482,7 +482,6 @@
       *----(03.04.01)--ADD-START---
            03  WRK-PRT-PAGE        PIC 9(10).
       *----(03.04.01)--ADD-END-----
-      *
            03  WRK-DENPNUM-END-TABLE.
                05  WRK-DENPNUM-END PIC 9(07)   OCCURS  100.
       *
@@ -518,6 +517,8 @@
            03  WRK-PAGE-CNT        PIC 9(06).
            03  WRK-DENPEDANUM      PIC 9(02).
            03  WRK-OLD-NYUHEN-YMD  PIC X(08).
+           03  WRK-S01-NYUGAIKBN   PIC X(01).
+           03  WRK-S01-DENPNUM     PIC 9(07).
       *
        01  WRK-ROW.
            05  WRK-SYULIST-ROW     PIC S9(9)   BINARY.
@@ -6689,6 +6690,10 @@
                                    TO  SPA-S01-GRP-DENPNUM
            MOVE    SPA-NAI-SYORINO TO  SPA-S01-SYORINO
       *
+           MOVE    SPA-S01-DENPNUM TO  WRK-S01-DENPNUM
+           MOVE    SPA-S01-NYUGAIKBN
+                                   TO  WRK-S01-NYUGAIKBN
+      *
            IF    ( SPA-ERRCD       =   SPACE )
                EVALUATE    SPA-S01-SYORINO
                WHEN    CONST-PROC-NYUKIN
@@ -6705,7 +6710,7 @@
                MOVE    2           TO  FLG-MEILIST-ROW
                PERFORM 300-SYUNOU-HENSYU-SEC
                MOVE    SPA-GMN-TBL-SEL TO  S02-SELNUM
-               PERFORM 4101-SELNUM-CHK-SEC
+               PERFORM 41011-DENPNUM-CHK-SEC
                IF    ( SPA-S01-SYORINO =   CONST-PROC-RRKSYU )
                    PERFORM 490-RIREKI-SEC
                END-IF
@@ -6713,6 +6718,43 @@
       *
            .
        4101-TOROKU-EXT.
+           EXIT.
+      *************************************************************
+      *    伝票番号チェック処理
+      *************************************************************
+       41011-DENPNUM-CHK-SEC           SECTION.
+      *
+           MOVE    1                   TO  SPA-GMN-CUR
+      *
+           MOVE    ZERO                TO  SPA-GMN-TBL-SEL
+                                           SPA-GMN-SELBAN
+      *
+           PERFORM VARYING IDXL FROM    1   BY  1
+                   UNTIL ( IDXL         >   SPA-GMN-MAX )
+                    OR   ( SPA-GMN-TBL-SEL  >   ZERO )
+      *
+               IF    ( WRK-S01-NYUGAIKBN
+                                   =   SPA-NAI-TNYUGAIKBN (IDXL))
+                AND  ( WRK-S01-DENPNUM
+                                   =   SPA-GMN-TDENPNUM   (IDXL))
+      *
+                   MOVE    IDXL     TO SPA-GMN-TBL-SEL
+                                       SPA-GMN-SELBAN
+      *
+                   PERFORM 300-SYUMEI-HENSYU-SEC
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( SPA-NAI-SYORINO     =   SPACE )
+               MOVE    1               TO  SPA-GMN-CUR
+           ELSE
+               MOVE    8               TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       41011-DENPNUM-CHK-EXT.
            EXIT.
       *************************************************************
       *    入金編集処理
