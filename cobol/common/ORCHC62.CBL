@@ -1312,6 +1312,7 @@
            IF     (ORCSQRCSV62-RET-COUNT   >   ZERO)
              AND  (ORCSQRCSV62-RET-COUNT   <=  12  )
              AND  (WRK-QRKBN               =   "1"  )
+             AND  (ORCHC62-PRTKBN          =   SPACE)
                PERFORM 5003-QRIMAGE-HEN-SEC
            END-IF
            .
