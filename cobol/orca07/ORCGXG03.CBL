@@ -1631,12 +1631,11 @@
       *
            MOVE    SPA-NAI-IPTID       TO  WRK-PTID
            PERFORM 900-PTINF-KEY-SEL-SEC
-           IF    ( PTINF-BIRTHDAY      <   SPA-NAI-TODAY )
+           IF    ( SPA-NAI-TODAY       <   PTINF-BIRTHDAY )
                MOVE    ZERO            TO  WRK-AGE
            ELSE
-               MOVE    SPA-NAI-TODAY
-                                       TO  WRK-YMD1
-               MOVE    PTINF-BIRTHDAY  TO  WRK-YMD2
+               MOVE    PTINF-BIRTHDAY  TO  WRK-YMD1
+               MOVE    SPA-NAI-TODAY   TO  WRK-YMD2
                COMPUTE WRK-AGE     =   WRK-YY2
                                    -   WRK-YY1
                IF    ( WRK-YMD1(5:4)  >   WRK-YMD2(5:4) )
