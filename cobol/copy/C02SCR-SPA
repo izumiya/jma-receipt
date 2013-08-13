@@ -108,6 +108,7 @@
       *
       *  04.07.01    NACL-藤原    11/06/10  未コード化病名となる病名の別
       *                                     組み立てへの移行を可能にする
+      *  04.07.02    NACL-藤原    13/07/05  病名の複数自院病名登録対応
       *****************************************************************
       *
        01  SPA-C02FREE.
@@ -519,8 +520,8 @@
                            11  SPA-GMN-C03-TBLO            OCCURS   100.
                                13  SPA-GMN-C03-TBANGO      PIC 9(05).
                                13  SPA-GMN-C03-TBUNRUIMEI  PIC X(30).
-                               13  SPA-GMN-C03-TBYOMEIINPUTCD
-                                                       PIC X(10).
+                               13  SPA-GMN-C03-TBYOMEIINPUTCD 
+                                                           PIC X(10).
                                13  SPA-GMN-C03-TBYOMEISBT  PIC X(06).
                                13  SPA-GMN-C03-TBYOMEI     PIC X(80).
                                13  SPA-GMN-C03-TCHARTBYOMEI
@@ -536,10 +537,13 @@
                          10  SPA-GMN-C03-BUNRUIMEI         PIC X(30).
                          10  SPA-GMN-C03-KOUMOKU1.
                            11  SPA-GMN-C03-BANGO           PIC 9(05).
-                           11  SPA-GMN-C03-BYOMEIINPUTCD   PIC X(10).
+                           11  SPA-GMN-C03-BYOMEIINPUTCD-G.
+                               13  SPA-GMN-C03-BYOMEIINPUTCD
+                                                           PIC X(10)
+                                                           OCCURS  3. 
                            11  SPA-GMN-C03-BYOMEICD-G.
-                               13  SPA-GMN-C03-BYOMEICD    OCCURS  6
-                                                       PIC X(08).
+                               13  SPA-GMN-C03-BYOMEICD   PIC X(08)
+                                                           OCCURS  6. 
                            11  SPA-GMN-C03-UTAGAIFLG-G.
                                13  SPA-GMN-C03-UTAGAIFLG   PIC X(01).
                                13  SPA-GMN-C03-F1          PIC X(01).
@@ -593,10 +597,22 @@
       *
                    07  SPA-NAIB-C03-AREA.
                        09  SPA-NAI-C03-KOUMOKU.
-                           11  SPA-NAI-C03-BYOMEIINPUTCD   PIC X(10).
+                           11  SPA-NAI-C03-BYOMEIINPUTCD-G.
+                               13  SPA-NAI-C03-BYOMEIINPUTCD-OCC
+                                                           OCCURS  3.
+                                   15  SPA-NAI-C03-BYOMEIINPUTCD
+                                                           PIC X(10).
+                                   15  SPA-NAI-C03-CDSYU
+                                                           PIC X(01).
+                           11  SPA-NAI-C03-BYOMEIINPUTCD-CHK.
+                               13  SPA-NAI-C03-BYOMEIINPUTCD-CHK-OCC
+                                                           OCCURS  3.
+                                   15  SPA-NAI-C03-BYOMEIINPUTCD-FLG
+                                                           PIC X(02).
+                                   15  SPA-NAI-C03-BYOMEIINPUTCD-ERRCD
+                                                           PIC X(04).
                            11  SPA-NAI-C03-BYOMEIINPUTCD-OLD
                                                            PIC X(10).
-                           11  SPA-NAI-C03-CDSYU           PIC X(01).
                            11  SPA-NAI-C03-CDSYU-OLD       PIC X(01).
                            11  SPA-NAI-C03-BYOMEIMOJI      PIC 9(02).
                            11  SPA-NAI-C03-BYOMEIHENFLG    PIC X(01).
@@ -669,6 +685,10 @@
                                                        OCCURS  21.  
       *                自院病名更新フラグ
                        09  SPA-NAI-C03-HENFLG          PIC 9(01).
+      *
+      *                入力コードエラー表示用領域
+                       09  SPA-C03-BYOMEIINPUTCD-ERR-INDEX
+                                                       PIC 9(02).
       *
       *    自院病名検索画面
            03  SPA-C04.

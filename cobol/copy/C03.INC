@@ -63,7 +63,7 @@
                   05  C03-VALUE   PIC X(14).
                 04  C03-UTAGAIFLG-COUNT     PIC S9(9)   BINARY.
                 04  C03-UTAGAIFLG-ITEM      PIC X(14)   OCCURS  3 TIMES.
-              03  C03-BYOMEIINPUTCD.
+              03  C03-BYOMEIINPUTCD OCCURS  3.
                 04  C03-VALUE   PIC X(10).
               03  C03-HKNBYOMEIFLGCOMBO.
                 04  C03-HKNBYOMEIFLG.

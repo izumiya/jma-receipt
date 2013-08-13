@@ -81,6 +81,12 @@ C03	{
 		BYOMEIINPUTCD	{
 			value	varchar(10);
 		};
+		BYOMEIINPUTCD_1	{
+			value	varchar(10);
+		};
+		BYOMEIINPUTCD_2	{
+			value	varchar(10);
+		};
 		HKNBYOMEIFLGCOMBO	{
 			HKNBYOMEIFLG	{
 				value	varchar(10);
