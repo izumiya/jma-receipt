@@ -296,9 +296,9 @@
            05 PIC  X(30)   VALUE   "い                            ".
       *
            05 PIC  X(06)   VALUE   "060006".
-           05 PIC  X(30)   VALUE   "病名開始日が正しく入力されてい".
-           05 PIC  X(30)   VALUE   "るか確認してください。        ".
-           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "当月の病名の診療開始日が正しく".
+           05 PIC  X(30)   VALUE   "入力されているか確認してくださ".
+           05 PIC  X(30)   VALUE   "い。                          ".
       *
            05 PIC  X(06)   VALUE   "060007".
            05 PIC  X(30)   VALUE   "診療日に継続中の病名が存在しま".

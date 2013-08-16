@@ -20,6 +20,7 @@
               03  W60-B03-STATE PIC S9(9)   BINARY.
               03  W60-STYUKYMD              PIC X(10).
               03  W60-EDYUKYMD              PIC X(10).
+              03  W60-PAGENO                PIC S9(9)   BINARY.
               03  W60-CMB-SEIHOJNUMCHKKBN.
                 04  W60-SEIHOJNUMCHKKBN        PIC X(22).
                 04  W60-SEIHOJNUMCHKKBN-COUNT  PIC S9(9)   BINARY.
@@ -37,6 +38,10 @@
                 04  W60-KYUSEIKKNKBN       PIC X(10).
                 04  W60-KYUSEIKKNKBN-COUNT PIC S9(9)   BINARY.
                 04  W60-KYUSEIKKNKBN-ITEM  PIC X(10)   OCCURS  15.
+              03  W60-CMB-COMPBYONISSUKBN.
+                04  W60-COMPBYONISSUKBN       PIC X(22).
+                04  W60-COMPBYONISSUKBN-COUNT PIC S9(9)   BINARY.
+                04  W60-COMPBYONISSUKBN-ITEM  PIC X(22)   OCCURS  5.
               03  W60-CHKMTRXNIL-G.
                   05  W60-CHKMTRXNIL-OCC   OCCURS 4.
                    06 W60-CHKMTRXNIL-STATE PIC S9(9)   BINARY.
@@ -61,6 +66,18 @@
                 04  W60-YBKENSAYAKUKBN        PIC X(32).
                 04  W60-YBKENSAYAKUKBN-COUNT  PIC S9(9)   BINARY.
                 04  W60-YBKENSAYAKUKBN-ITEM   PIC X(32)   OCCURS  5.
+              03  W60-CMB-YBSJTYKZKBN.
+                04  W60-YBSJTYKZKBN           PIC X(32).
+                04  W60-YBSJTYKZKBN-COUNT     PIC S9(9)   BINARY.
+                04  W60-YBSJTYKZKBN-ITEM      PIC X(32)   OCCURS  5.
+              03  W60-CMB-YBMSIYKZKBN.
+                04  W60-YBMSIYKZKBN           PIC X(32).
+                04  W60-YBMSIYKZKBN-COUNT     PIC S9(9)   BINARY.
+                04  W60-YBMSIYKZKBN-ITEM      PIC X(32)   OCCURS  5.
+              03  W60-CMB-YBSHOHOYKZKBN.
+                04  W60-YBSHOHOYKZKBN         PIC X(32).
+                04  W60-YBSHOHOYKZKBN-COUNT   PIC S9(9)   BINARY.
+                04  W60-YBSHOHOYKZKBN-ITEM    PIC X(32)   OCCURS  5.
               03  W60-CMB-YBUTAGAIKBN.
                 04  W60-YBUTAGAIKBN        PIC X(32).
                 04  W60-YBUTAGAIKBN-COUNT  PIC S9(9)   BINARY.

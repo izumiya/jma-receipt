@@ -68,7 +68,11 @@
                05  SYS-1101-CKN-INGAITEN    PIC 9(04).
                05  SYS-1101-TEKBYOYKZKBN    PIC  X(1).
                05  SYS-1101-TEKBYOSRYKBN    PIC  X(1).
-               05  SYS-1101-YOBI            PIC  X(445).
+               05  SYS-1101-COMPBYONISSUKBN PIC  X(1).
+               05  SYS-1101-YBSJTYKZKBN     PIC  X(1).
+               05  SYS-1101-YBMSIYKZKBN     PIC  X(1).
+               05  SYS-1101-YBSHOHOYKZKBN   PIC  X(1).
+               05  SYS-1101-YOBI            PIC  X(441).
       *Ã¼Ëö£É£Ä
            03  SYS-1101-TERMID          PIC  X(16).
       *¥ª¥Ú¡¼¥ì¡¼¥¿£É£Ä

@@ -660,6 +660,9 @@
                05  WRK-058-TANICD                      PIC X(03).
            03  WRK-TEKBYOCHKKBN                        PIC X(01).
            03  WRK-ERR-KANA                            PIC X(100).
+           03  WRK-JNISSU-DAY-G.
+               05  WRK-JNISSU-DAY                      PIC 9(01)
+                                                       OCCURS  31.
       *
        01  TERRINF-AREA.
            03  TERRINF-CHKKBN                          PIC X(01).
@@ -2003,6 +2006,18 @@
            IF    ( SYS-1101-TEKBYOSRYKBN   =   SPACE )
                MOVE    ZERO            TO  SYS-1101-TEKBYOSRYKBN
            END-IF
+           IF    ( SYS-1101-COMPBYONISSUKBN =  SPACE )
+               MOVE    "1"             TO  SYS-1101-COMPBYONISSUKBN
+           END-IF
+           IF    ( SYS-1101-YBSJTYKZKBN    =   SPACE )
+               MOVE    "1"             TO  SYS-1101-YBSJTYKZKBN
+           END-IF
+           IF    ( SYS-1101-YBMSIYKZKBN    =   SPACE )
+               MOVE    "1"             TO  SYS-1101-YBMSIYKZKBN
+           END-IF
+           IF    ( SYS-1101-YBSHOHOYKZKBN  =   SPACE )
+               MOVE    "1"             TO  SYS-1101-YBSHOHOYKZKBN
+           END-IF
       *
            .
        1001-SYS1101-GET-EXT.
@@ -3039,17 +3054,28 @@
                    IF    ( FLG-TAISYO-SRY  =   1 )
       *
                        IF    ( DCSRY-SRYCD (1:1) = "6" OR "S" )
-                           IF    ( SYS-1101-YBKENSAYAKUKBN =   "2" )
-                            AND  ( DCACCT-SRYKBN =   "40" OR "60"
-                                                  OR "64" OR "70" )
+                           EVALUATE    TRUE
+                           WHEN  ( SYS-1101-YBKENSAYAKUKBN =   "2" )
+                            AND  ( DCACCT-SRYKBN = "40" OR "60"
+                                               OR  "64" OR "70" )
+      *
+                           WHEN  ( SYS-1101-YBSJTYKZKBN    =   "2" )
+                            AND  ( DCACCT-SRYKBN           =   "50" )
+      *
+                           WHEN  ( SYS-1101-YBMSIYKZKBN    =   "2" )
+                            AND  ( DCACCT-SRYKBN           =   "54" )
+      *
+                           WHEN  ( SYS-1101-YBSHOHOYKZKBN  =   "2" )
+                            AND  ( DCSRY-SRYSYUKBN =   "213" OR "223"
+                                                    OR "233" )
                                CONTINUE
-                           ELSE
+                           WHEN    OTHER
                                IF    ( FLG-TSRYKA-OVER =   ZERO )
                                 AND  ( IDX-TSRYKA      >   ZERO )
       *                            ¿ÇÎÅ²ÊÂàÈò¥ï¡¼¥¯¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÊÔ½¸½èÍý
                                    PERFORM 200111-TSRYKA-SRYCD-HEN-SEC
                                END-IF
-                           END-IF
+                           END-EVALUATE
                        ELSE
                                IF    ( FLG-TSRYKA-OVER =   ZERO )
                                 AND  ( IDX-TSRYKA      >   ZERO )
@@ -3166,10 +3192,6 @@
                WHEN    "2"
                    IF   (  DCACCT-SRYKBN(1:1)    =   "2"   )
                     AND (  DCACCT-ZAITEN     NOT =   ZERO  )
-                       MOVE    ZERO    TO  FLG-TAISYO-SRY
-                   END-IF
-                   IF    ( DCACCT-SRYKBN         =   "14"   )
-                    AND  ( DCSRY-SRYSYUKBN   NOT =   "148" )
                        MOVE    ZERO    TO  FLG-TAISYO-SRY
                    END-IF
                    IF    ( DCACCT-SRYKBN         =   "14"   )
@@ -6638,6 +6660,7 @@
                                    FLG-SAISIN-ERR-DAY-G
                                    CNT-JNISSU
                                    CNT-SRYYMD
+                                   WRK-JNISSU-DAY-G
       *
            IF    ( SYS-1101-BYOSRYKAKBN    =   "1" OR SPACE )
                MOVE    FLG-PTBYO-DAY-KA-OCC (IDX4)
@@ -6662,6 +6685,7 @@
                    END-IF
                    IF    ( TSRYKA-JNISSU-DAY   (IDX4 IDX0) =   1 )
                        COMPUTE CNT-JNISSU  =   CNT-JNISSU  +   1
+                       MOVE    1      TO   WRK-JNISSU-DAY (IDX0)
                    END-IF
                ELSE
                    IF    ( TSRYKA-JNISSU-DAY   (IDX4 IDX0) =   1 )
@@ -6671,6 +6695,7 @@
                    END-IF
                    IF    ( TSRYKA-ALL-JNISSU-DAY  (IDX0)   =   1 )
                        COMPUTE CNT-JNISSU  =   CNT-JNISSU  +   1
+                       MOVE    1      TO   WRK-JNISSU-DAY (IDX0)
                    END-IF
                END-IF
       *
@@ -6705,16 +6730,33 @@
            END-IF
       *
            IF    ( CNT-SRYYMD          >   CNT-JNISSU )
-               IF    ( SYS-1101-BYOSRYKAKBN    =   "1" OR SPACE )
-                   MOVE    TSRYKA-SRYKA (IDX4)
-                                       TO  SRH-1005-SRYKA
+               IF    ( SYS-1101-COMPBYONISSUKBN  =   "1" )
+      *
+                   MOVE    SPACE           TO  WRK-ERRMES-PLUS
+                   MOVE    FLG-PTBYO-DAY-G TO  WRK-NISSU-DAY-G
+                   PERFORM 200111-NISSU-HEN-SEC
+                   MOVE    WRK-NISSU-MES   TO  WRK-STR
+                   MOVE    WRK-JNISSU-DAY-G
+                                           TO  WRK-NISSU-DAY-G
+                   PERFORM 200111-NISSU-HEN-SEC
+                   STRING  "¿ÇÎÅ³«»ÏÆü"
+                                                   DELIMITED BY SIZE
+                           WRK-STR                 DELIMITED BY SPACE
+                           "¡¿¿ÇÎÅÆü"              DELIMITED BY SIZE
+                           WRK-NISSU-MES           DELIMITED BY SPACE
+                   INTO    WRK-ERRMES-PLUS
+                   END-STRING
+      *
+                   IF    ( SYS-1101-BYOSRYKAKBN    =   "1" OR SPACE )
+                       MOVE    TSRYKA-SRYKA (IDX4)
+                                           TO  SRH-1005-SRYKA
+                   ELSE
+                       MOVE    LOW-VALUE   TO  SRH-1005-SRYKA
+                   END-IF
+      *
                    MOVE    "060006"    TO  WRK-ERRCD
                    INITIALIZE              TERRINF-AREA
-                   PERFORM 214-ERRMES-HEN-SEC
-               ELSE
-                   MOVE    "060006"    TO  WRK-ERRCD
-                   INITIALIZE              TERRINF-AREA
-                   PERFORM 210-ERRMES-HEN-SEC
+                   PERFORM 213-ERRMES-HEN-SEC
                END-IF
            END-IF
       *
