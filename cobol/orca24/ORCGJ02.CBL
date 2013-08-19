@@ -3173,7 +3173,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *    ¿ôÎÌ¡ÊÌôºÞ¡¢´ïºà¤Î¤È¤­¡Ë
-           IF     (SRY-SRYCD  (IDZ)(1:1)   =   "6"  OR  "7" )
+           IF    ((SRY-SRYCD  (IDZ)(1:1)   =   "6"  OR  "7" )
+               OR (SRY-SRYCD  (IDZ)(1:3)   =   "059"        ))
              AND  (ACCT-ZAIKBN         NOT =   1            )
                MOVE    SRY-SRYSURYO (IDZ)  TO  WRK-SURYO
                PERFORM 310121-SURYO-HEN-SEC
