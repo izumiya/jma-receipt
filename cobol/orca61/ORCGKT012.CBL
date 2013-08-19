@@ -2327,7 +2327,8 @@
            END-IF
       *
       *    数量（薬剤、器材のとき）
-           IF      LNK-WKSRY-SRYCD (IDX IDZ)(1:1)   =   "6"  OR  "7"
+           IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)   =   "6"  OR  "7")
+               OR (LNK-WKSRY-SRYCD (IDX IDZ)(1:3)   =   "059"       )
       *        金額で点数ゼロの時、表示なし
                IF     (LNK-WKSRY-SRYCD (IDX IDZ)(1:1)   =   "6" )  AND
                      ((TNS-TEN                 =   ZERO   )  OR
