@@ -380,6 +380,8 @@
            03  FLG-TEKBYO                              PIC 9(01).
            03  FLG-HAISHI                              PIC 9(01).
            03  FLG-RSI-KANA                            PIC 9(01).
+           03  FLG-NORMAL                              PIC 9(01).
+           03  FLG-TANKI-SHOBYO                        PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -551,6 +553,7 @@
            03  WRK-HKNCOMBI                            PIC 9(04).
            03  WRK-ACCTKBN                             PIC X(01).
            03  WRK-HKNCOMBIMEI                         PIC X(50).
+           03  WRK-COMB-RSI-HKNKBN                     PIC X(01).
            03  WRK-HKNCOMBINUM                         PIC X(50).
            03  WRK-HKNCOMBI-DAY-G.
                05  WRK-HKNCOMBI-DAY                    PIC 9(03)
@@ -786,6 +789,8 @@
                                                    VALUE   20.
            03  CONST-TKZI-MAX                      PIC 9(05)
                                                    VALUE   30.
+           03  CONST-TRSIRECEDEN-MAX               PIC 9(05)
+                                                   VALUE   10.
            03  CONST-CHKPTN                        PIC X(05)
                                                    VALUE   "1 111".
            03  CONST-NBHOUKTCD                     PIC X(09)
@@ -2416,6 +2421,7 @@
                                        TGENZAN-AREA
                                        TINGAI-AREA
                                        TKZI-AREA
+                                       TRSIRECEDEN-AREA
                                        PTACCT-AREA
                                        PTSRY-AREA
                                        PTZAI-AREA
@@ -3112,6 +3118,9 @@
       *                    診療行為コード退避ワーク編集処理
                            PERFORM 200111-TSRYCD-HEN-SEC
       *
+      *                    労災レセ電チェックファイル編集処理
+                           PERFORM 200111-TRSIRECEDEN-HEN-SEC
+      *
       *                    減算情報ワーク診療行為退避処理
                            IF    ( ORCBSD01-NYUGAIKBN  =   "1" )
                                PERFORM 200111-TGENZAN-SRY-HEN-SEC
@@ -3588,6 +3597,75 @@
       *
            .
        200111-TSRYCD-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    労災レセ電チェックファイル編集処理
+      *****************************************************************
+       200111-TRSIRECEDEN-HEN-SEC         SECTION.
+      *
+           IF    ( DTCHK003-HKNKBN     =   CONST-ROSAI )
+            AND  ( FLG-RSI-RECEDEN-CHK =   1 )
+            AND  ( SYS-4001-RSIIRYOKBN =   "1" )
+            AND  ( DCACCT-SRYKBN       =   "80" )
+            AND  ( DCSRY-SRYCD (1:5)   =   "09593" )
+               MOVE    DCACCT-HKNCOMBI TO  WRK-HKNCOMBI
+               PERFORM 220-HKNCOMBI-GET-SEC
+               IF    ( COMB-HKNNUM         =   "971" )
+                AND  ( WRK-COMB-RSI-HKNKBN =   "1" OR "2" )
+                   PERFORM 2001111-TRSIRECEDEN-HEN-SEC
+               END-IF
+           END-IF
+      *
+           .
+       200111-TRSIRECEDEN-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    労災レセ電チェックファイル編集処理
+      *****************************************************************
+       2001111-TRSIRECEDEN-HEN-SEC        SECTION.
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   TRSIRECEDEN-MAX )
+                    OR   ( IDX0    >   CONST-TRSIRECEDEN-MAX )
+                    OR   ( TRSIRECEDEN-SRYCD (IDX0)
+                                   =   DCSRY-SRYCD )
+      *
+               CONTINUE
+      *
+           END-PERFORM
+      *
+           MOVE    ZERO        TO  IDX26
+      *
+           IF    ( IDX0                    >   TRSIRECEDEN-MAX )
+               IF    ( CONST-TRSIRECEDEN-MAX    >   TRSIRECEDEN-MAX )
+      *
+                   COMPUTE TRSIRECEDEN-MAX  =   TRSIRECEDEN-MAX  +   1
+      *
+                   MOVE    DCSRY-SRYCD
+                               TO  TRSIRECEDEN-SRYCD (TRSIRECEDEN-MAX)
+                   MOVE    TRSIRECEDEN-MAX
+                               TO  IDX26
+               END-IF
+           ELSE
+               MOVE    IDX0    TO  IDX26
+           END-IF
+      *
+           IF    ( IDX26           >   ZERO )
+               PERFORM VARYING IDX27   FROM     1   BY  1
+                       UNTIL ( IDX27   >   31 )
+      *
+                   IF    ( PTZAI-DAY (IDX-ZAI IDX27)  >   ZERO )
+                       MOVE    1       TO  TRSIRECEDEN-DAY (IDX26 IDX27)
+                       COMPUTE TRSIRECEDEN-KAISU (IDX26)
+                           =   TRSIRECEDEN-KAISU (IDX26)
+                           +   PTZAI-DAY (IDX-ZAI IDX27)
+                   END-IF
+      *
+               END-PERFORM
+           END-IF
+      *
+           .
+       2001111-TRSIRECEDEN-HEN-EXT.
            EXIT.
       *****************************************************************
       *    減算情報ワーク診療行為退避処理
@@ -9724,6 +9802,25 @@
       *****************************************************************
        200111-PTNAME-CHK-SEC           SECTION.
       *
+           MOVE    ZERO                TO  FLG-NORMAL
+           MOVE    ZERO                TO  FLG-TANKI-SHOBYO
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   THKNCOMBI-MAX )
+               MOVE    THKNCOMBI-HKNCOMBI (IDX0)
+                                       TO  WRK-HKNCOMBI
+               PERFORM 220-HKNCOMBI-GET-SEC
+               IF    ( DTCHK003-HKNKBN     =   CONST-ROSAI )
+                AND  ( COMB-HKNNUM         =   "971" )
+                AND  ( FLG-RSI-RECEDEN-CHK =   1 )
+                AND  ( SYS-4001-RSIIRYOKBN =   "1" )
+                AND  ( WRK-COMB-RSI-HKNKBN =   "1" OR "2" )
+                   MOVE    1           TO  FLG-TANKI-SHOBYO
+               ELSE
+                   MOVE    1           TO  FLG-NORMAL
+               END-IF
+           END-PERFORM
+      *
            IF    ( ORCBSD01-CHKKBN(13) =   ZERO )
                MOVE    1                   TO  FLG-CHKEND (13)
            END-IF
@@ -9810,9 +9907,17 @@
                    GO  TO  200111-KANANAME-CHK-EXT
                END-IF
            ELSE
-               IF    ( DTCHK003-HKNKBN     =   CONST-ROSAI )
-                AND  ( FLG-RSI-RECEDEN-CHK =   1 )
-                AND  ( SYS-4001-RSIIRYOKBN =   "1" )
+               IF    ( FLG-NORMAL          =   1 )
+                   MOVE    PTINF-KANANAME      TO  WRK-KANACHK-MAE-INPUT
+                   PERFORM 800-KATAKANA-CHK-SEC
+                   IF  ( FLG-KANACHK   NOT =   ZERO )
+                       MOVE    "130002"        TO  WRK-ERRCD
+                       INITIALIZE              TERRINF-AREA
+                       PERFORM 210-ERRMES-HEN-SEC
+                   END-IF
+               END-IF
+      *
+               IF    ( FLG-TANKI-SHOBYO    =   1 )
                    MOVE    PTINF-KANANAME      TO  WRK-KANACHK-MAE-INPUT
                    PERFORM 801-KATAKANA-CHK-SEC
                    IF  ( FLG-KANACHK   NOT =   ZERO )
@@ -9820,14 +9925,6 @@
                        MOVE    "130007"        TO  WRK-ERRCD
                        INITIALIZE              TERRINF-AREA
                        PERFORM 215-ERRMES-HEN-SEC
-                   END-IF
-               ELSE
-                   MOVE    PTINF-KANANAME      TO  WRK-KANACHK-MAE-INPUT
-                   PERFORM 800-KATAKANA-CHK-SEC
-                   IF  ( FLG-KANACHK   NOT =   ZERO )
-                       MOVE    "130002"        TO  WRK-ERRCD
-                       INITIALIZE              TERRINF-AREA
-                       PERFORM 210-ERRMES-HEN-SEC
                    END-IF
                END-IF
       *
@@ -10285,6 +10382,8 @@
                PERFORM 200111-KIZAI-TANICD-CHK-SEC
            END-IF
       *
+           PERFORM 200111-RSIRECEDEN-CHK-SEC
+      *
            PERFORM 200111-PTCOM-CHK-SEC
       *
       *    院内・院外混在チェック処理
@@ -10493,6 +10592,54 @@
       *
            .
        200111-KIZAI-TANICD-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    労災レセ電チェック処理
+      *****************************************************************
+       200111-RSIRECEDEN-CHK-SEC   SECTION.
+      *
+           PERFORM VARYING IDX6    FROM    1   BY  1
+                   UNTIL ( IDX6    >   TRSIRECEDEN-MAX )
+      *
+               INITIALIZE  WRK-NISSU-DAY-G
+               PERFORM VARYING IDX-DAY FROM    1   BY  1
+                       UNTIL ( IDX-DAY >   31 )
+                   IF    ( TRSIRECEDEN-DAY (IDX6 IDX-DAY)  >   ZERO )
+                       MOVE    1   TO  WRK-NISSU-DAY (IDX-DAY)
+                   END-IF
+               END-PERFORM
+      *
+               IF    ( WRK-NISSU-DAY-G    NOT  =   ZERO )
+      *
+                   PERFORM 200111-NISSU-HEN-SEC
+      *
+                   MOVE    SPACE          TO  WRK-STR
+                   MOVE    SPACE          TO  WRK-ERRMES-PLUS
+                   MOVE    TRSIRECEDEN-SRYCD (IDX6)
+                                          TO  WRK-SRYCD
+                   MOVE    WRK-KJNYMD     TO  WRK-TNS-YMD
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+      *
+                   STRING  TRSIRECEDEN-SRYCD(IDX6) DELIMITED   BY  SIZE
+                           "　"                    DELIMITED   BY  SIZE
+                           TNS-NAME                DELIMITED   BY  SPACE
+                           WRK-NISSU-MES           DELIMITED   BY  SPACE
+                   INTO    WRK-ERRMES-PLUS
+                   END-STRING
+      *
+                   MOVE    WRK-ERRMES-PLUS    TO   WRK-MAE-INPUT
+                   PERFORM 800-ZENKAKU-HEN-SEC
+                   MOVE    WRK-OUT-INPUT      TO   WRK-ERRMES-PLUS
+      *
+                   MOVE    "990030"       TO  WRK-ERRCD
+                   INITIALIZE                 TERRINF-AREA
+                   PERFORM 215-ERRMES-HEN-SEC
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       200111-RSIRECEDEN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    患者コメントチェック処理
@@ -12065,6 +12212,7 @@
       *
            INITIALIZE                  HKNCOMBI-REC
                                        WRK-HKNCOMBIMEI
+                                       WRK-COMB-RSI-HKNKBN
       *
            PERFORM VARYING IDX-COMB    FROM    1   BY  1
                    UNTIL ( IDX-COMB    >   SDTCHK02-O-MAX )
@@ -12076,6 +12224,8 @@
                                   TO   HKNCOMBI-REC
                    MOVE    SDTCHK02-O-HKNCOMBIMEI (IDX-COMB)
                                   TO   WRK-HKNCOMBIMEI
+                   MOVE    SDTCHK02-O-RSI-HKNKBN  (IDX-COMB)
+                                  TO   WRK-COMB-RSI-HKNKBN
                END-IF
       *
            END-PERFORM

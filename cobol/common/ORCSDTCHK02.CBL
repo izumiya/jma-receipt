@@ -66,6 +66,7 @@
            03  WRK-HKNKBN-MEI          PIC X(02).
            03  WRK-SYUHKNNUM           PIC X(03).
            03  WRK-HKNNUM              PIC X(03).
+           03  WRK-RSI-HKNKBN          PIC X(01).
       *
        01  CONST-AREA.
            03  CONST-HKNCOMBI-MAX      PIC 9(05)   VALUE   1000.
@@ -157,6 +158,9 @@
                    PERFORM 1101-HKNCOMBIMEI-HEN-SEC
                    MOVE    WRK-HKNCOMBI TO  SDTCHK02-O-HKNCOMBIMEI
                                                              (IDX-MAX)
+                   MOVE    WRK-RSI-HKNKBN
+                                        TO  SDTCHK02-O-RSI-HKNKBN
+                                                             (IDX-MAX)
                    PERFORM 1101-HKNINF-HEN-SEC
                END-IF
       *
@@ -183,6 +187,7 @@
        1101-HKNCOMBIMEI-HEN-SEC             SECTION.
       *
            MOVE    SPACE               TO  WRK-HKNCOMBI
+                                           WRK-RSI-HKNKBN
       *
            MOVE    1                   TO  IDX-PNT
       *
@@ -217,6 +222,8 @@
            IF    ( COMB-HKNNUM         =   "971"  OR  "973" )
       *
                PERFORM 900-PTRSIINF-KEY-SEL-SEC
+      *
+               MOVE    PTRSI-HKNKBN    TO  WRK-RSI-HKNKBN
       *
                MOVE    SPACE           TO  WRK-HKNKBN-MEI
                EVALUATE    PTRSI-HKNKBN

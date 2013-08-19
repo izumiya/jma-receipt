@@ -34,9 +34,6 @@
                05  THKNID-HOJOKBN                      PIC X(01).
                05  THKNID-TEKSTYMD                     PIC X(08).
                05  THKNID-KAKUNINYMD                   PIC X(08).
-               05  THKNID-RSI-HKNKBN                   PIC X(01).
-               05  THKNID-RSI-RYOSTYMD                 PIC X(08).
-               05  THKNID-RSI-SYOCD                    PIC X(05).
                05  THKNID-HKNID-DAY-G.
                    07  THKNID-HKNID-DAY                PIC 9(01)
                                                        OCCURS  31.
@@ -330,6 +327,16 @@
                05  TCOMERR-DAY-G.
                    07  TCOMERR-DAY                 PIC 9(01)
                                                    OCCURS  31.
+      *
+         02  TRSIRECEDEN-AREA.
+           03  TRSIRECEDEN-MAX                     PIC 9(05).
+           03  TRSIRECEDEN-OCC                     OCCURS  10.
+               05  TRSIRECEDEN-SRYCD               PIC X(09).
+               05  TRSIRECEDEN-KAISU               PIC 9(05).
+               05  TRSIRECEDEN-DAY-G.
+                   07  TRSIRECEDEN-DAY             PIC 9(01)
+                                                   OCCURS  31.
+      *
       *  ±¡³°½èÊýÎÎ°è
          02  TINGAI-AREA.
            03  TINGAI-MAX                          PIC 9(07).
