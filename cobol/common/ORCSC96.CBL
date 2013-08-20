@@ -256,6 +256,16 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+      *H25.8
+               WHEN    "K035"
+                   STRING  "警告！"
+                           "上記算定済です。"
+                           "労災では併用算定はできません。"
+                           "保険の確認をして下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *
                WHEN    "0034"
                    MOVE
                    "初診料算定日より、１月以内です。算定できません。"

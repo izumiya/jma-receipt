@@ -2145,6 +2145,14 @@
            MOVE    WRK-KEI-SRYCD       TO  TNS-SRYCD
            PERFORM 911-TENSU-READ22-SEC
       *
+      *H25.8
+      *    労災の再診時
+           IF     (WRK-KEI-SRYCD       =   "101130190")
+             OR   (LNK-SC92-SRYCD      =   "101130190")
+               MOVE    "K035"              TO  LNK-SC92-ERRCD6
+           END-IF
+      *H25.8
+      *
            PERFORM 200531-ERRMSG-HEN-SEC
            .
        20054-CHKKEIMSG-EXT.
@@ -2176,6 +2184,13 @@
            IF      FLG-SANTEI-OK       =   ZERO
                INITIALIZE                  SANTEI-REC
            END-IF
+      *H25.8
+      *    労災以外で労災コードは対象外
+           IF     (SPA-HKNKBN          =   ZERO   )
+              AND (CHK-CD (1:3)        =   "101"  )
+               INITIALIZE                  SANTEI-REC
+           END-IF
+      *H25.8
       *
       *    算定歴の回数をチェックする
            MOVE    SANTEI-MSANTEICNT   TO  WRK-SANTEI-CNT
