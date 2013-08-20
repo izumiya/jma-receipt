@@ -583,7 +583,8 @@
                    MOVE    1               TO  FLG-SYSBASE
                END-IF
                MOVE    ZERO                TO  IDX
-               PERFORM UNTIL   FLG-SYSBASE =   1
+               PERFORM UNTIL  (FLG-SYSBASE =   1 )
+                         OR   (IDX         >=  9 )
                    IF     (SYSBASE-KIGEN   >=  SPA-SYSYMD )
                    AND    (SYSBASE-HOSPNUM NOT =   SPA-HOSPNUM)
                      ADD     1               TO  IDX
