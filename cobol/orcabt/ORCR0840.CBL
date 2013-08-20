@@ -232,6 +232,8 @@
       *  04.07.03    NACL-ÌçÏÆ    12/09/25  ¥³¥á¥ó¥Èº¹¹þ¼è¤ê»ß¤á¡ÊºßÂð»ýÂ³ÍÛ°µ¡Ë
       *  04.07.04    NACL-ÌçÏÆ    13/01/21  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *  04.07.05    NACL-ÌçÏÆ    13/07/01  Æþ±¡ÎÁÂ¾ÊÝ¸±»»Äê»þ¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
+      *  04.07.06    NACL-ÌçÏÆ    13/08/20  £°£¹£µ£¹£³¤Ç»Ï¤Þ¤ë¥³¡¼¥É¤ÎÍ­Ìµ¶èÊ¬
+      *                                     ÊÔ½¸
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3734,6 +3736,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                AND     FLG-HENSYU-OK      =     ZERO
                  PERFORM  220217-TENTEKI-CDKBN-KBNNUM-HENSYU-SEC
                  MOVE     1     TO    FLG-HENSYU-OK
+               END-IF
+      *
+      *        £°£¹£µ£¹£³¤Ç»Ï¤Þ¤ë¥³¡¼¥É¤¬¤¢¤ë¾ì¹ç¡¢Ï«ºÒ¥ì¥»ÅÅ¤ÎºîÀ®ÂÐ¾Ý³°
+               IF    (RECE82-HKNKBN           =   "1" OR "2")
+               AND   (RECE82-SRYYM           >=   "201307"  )
+               AND   (RECE82-RSIIRYOKBN   NOT =   "0"       )
+                 IF  (ACCT-SRYKBN          =  "80"   )
+                 AND (SRY-SRYCD(IDX2)(1:5) =  "09593")
+                    MOVE     1      TO  RECE82-ORIGINALCDKBN
+                 END-IF
                END-IF
       *
               END-IF

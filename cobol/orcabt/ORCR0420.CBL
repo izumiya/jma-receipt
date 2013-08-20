@@ -243,6 +243,8 @@
       *  04.07.01    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.02    NACL-門脇    12/09/25  コメント差込取り止め（在宅持続陽圧）
       *  04.07.03    NACL-門脇    13/01/21  労災レセ電対応
+      *  04.07.04    NACL-門脇    13/08/20  ０９５９３で始まるコードの有無区分
+      *                                     編集
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3188,6 +3190,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
       *
                PERFORM  2101216-SETCOM-HENSYU-SEC
+      *
+      *        ０９５９３で始まるコードがある場合、労災レセ電の作成対象外
+               IF    (RECE41-HKNKBN           =   "1" OR "2")
+               AND   (RECE41-SRYYM           >=   "201307"  )
+               AND   (RECE41-RSIIRYOKBN   NOT =   "0"       )
+                 IF  (ACCT-SRYKBN          =  "80"   )
+                 AND (SRY-SRYCD(IDX2)(1:5) =  "09593")
+                    MOVE     1      TO  RECE41-ORIGINALCDKBN
+                 END-IF
+               END-IF
       *
               END-IF
              END-IF  
