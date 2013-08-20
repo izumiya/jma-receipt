@@ -61,8 +61,10 @@
        01  FLG-AREA.
            03  FLG-END                 PIC 9(01).
            03  FLG-SRYACCT             PIC 9(01).
+           03  FLG-SRYACT              PIC 9(01).
            03  FLG-NYUINACCT           PIC 9(01).
            03  FLG-SANTEI              PIC 9(01).
+           03  FLG-RIHA                PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -111,6 +113,10 @@
       *    診療会計マスタ
        01  SRYACCT-REC.
            COPY    "CPSRYACCT.INC".
+      *
+      *    診療行為マスター
+       01  SRYACT-REC.
+           COPY    "CPSRYACT.INC".
       *
       *    入院診療会計マスタ−
        01  NYUINACCT-REC.
@@ -310,8 +316,11 @@
       *
            PERFORM UNTIL ( FLG-SRYACCT NOT =   ZERO )
       *
-               PERFORM VARYING IDX1    FROM    WRK-STIDX   BY  1
-                       UNTIL ( IDX1    >       WRK-EDIDX )
+               PERFORM 201-SRYACCT-RIHA-SYYK-SEC
+      *
+               IF      FLG-RIHA    =   ZERO
+                 PERFORM VARYING IDX1    FROM    WRK-STIDX   BY  1
+                         UNTIL ( IDX1    >       WRK-EDIDX )
       *
                    COMPUTE ACCT-ZAIKAISU   =   ACCT-ZAIKAISU
                                            -   ACCT-DAY (1 IDX1)
@@ -321,23 +330,25 @@
                                            ACCT-DAY (3 IDX1 )
                                            ACCT-DAY (4 IDX1 )
       *
-               END-PERFORM
+                 END-PERFORM
       *
-               MOVE    SRYACCT-REC     TO  MCPDATA-REC
-               MOVE    "DBUPDATE"      TO  MCP-FUNC
-               MOVE    "tbl_sryacct"   TO  MCP-TABLE
-               MOVE    "key"           TO  MCP-PATHNAME
-               PERFORM   900-ORCDBMAIN-SEC
-               IF    ( MCP-RC      NOT =   ZERO )
-                   DISPLAY "ORCBMRECE SRYACCT UPD ERR:"  MCP-RC
-                           ",PTID:"   ACCT-PTID
-                   MOVE    "診療会計の更新に失敗しました"
+                 MOVE    SRYACCT-REC     TO  MCPDATA-REC
+                 MOVE    "DBUPDATE"      TO  MCP-FUNC
+                 MOVE    "tbl_sryacct"   TO  MCP-TABLE
+                 MOVE    "key"           TO  MCP-PATHNAME
+                 PERFORM   900-ORCDBMAIN-SEC
+                 IF    ( MCP-RC      NOT =   ZERO )
+                     DISPLAY "ORCBMRECE SRYACCT UPD ERR:"  MCP-RC
+                             ",PTID:"   ACCT-PTID
+                     MOVE    "診療会計の更新に失敗しました"
                                        TO  WRK-RECEERR
-                   PERFORM 500-ERR-HENSYU-SEC
-                   GO  TO  201-SRYACCT-UPD-EXT
-               END-IF
+                     PERFORM 500-ERR-HENSYU-SEC
+                     GO  TO  201-SRYACCT-UPD-EXT
+                 END-IF
       *
-               COMPUTE CNT-SRYACCT-UPD =   CNT-SRYACCT-UPD +   1
+                 COMPUTE CNT-SRYACCT-UPD =   CNT-SRYACCT-UPD +   1
+      *
+               END-IF
       *
                MOVE    "tbl_sryacct"   TO  MCP-TABLE
                MOVE    "all2"          TO  MCP-PATHNAME
@@ -356,6 +367,98 @@
       *
            .
        201-SRYACCT-UPD-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    リハビリテーション開始日、終了日のシステム予約コード判定
+      *****************************************************************
+       201-SRYACCT-RIHA-SYYK-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  FLG-RIHA
+      *
+           INITIALIZE                      SRYACT-REC
+           MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN      TO  SRY-NYUGAIKBN
+           MOVE    ACCT-PTID           TO  SRY-PTID
+           MOVE    ACCT-SRYKA          TO  SRY-SRYKA
+           MOVE    ACCT-SRYYM          TO  SRY-SRYYM
+           MOVE    ACCT-ZAINUM         TO  SRY-ZAINUM
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-SRYACT-SELECT-SEC
+           IF      FLG-SRYACT     =    ZERO
+      *            心大血管疾患リハビリテーション開始日
+                   IF    SRY-SRYCD(1)  =  "099800111"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            心大血管疾患リハビリテーション終了日
+                   IF    SRY-SRYCD(1)  =  "099800112"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            脳血管疾患等リハビリテーション開始日
+                   IF    SRY-SRYCD(1)  =  "099800121"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            脳血管疾患等リハビリテーション終了日
+                   IF    SRY-SRYCD(1)  =  "099800122"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            運動器リハビリテーション開始日
+                   IF    SRY-SRYCD(1)  =  "099800131"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            運動器リハビリテーション終了日
+                   IF    SRY-SRYCD(1)  =  "099800132"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            呼吸器リハビリテーション開始日
+                   IF    SRY-SRYCD(1)  =  "099800141"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            呼吸器リハビリテーション終了日
+                   IF    SRY-SRYCD(1)  =  "099800142"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            摂食機能療法開始日
+                   IF    SRY-SRYCD(1)  =  "099800151"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            摂食機能療法終了日
+                   IF    SRY-SRYCD(1)  =  "099800152"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            難病患者リハビリテーション開始日
+                   IF    SRY-SRYCD(1)  =  "099800161"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            難病患者リハビリテーション終了日
+                   IF    SRY-SRYCD(1)  =  "099800162"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            障害児（者）リハビリテーション開始日
+                   IF    SRY-SRYCD(1)  =  "099800171"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            障害児（者）リハビリテーション終了日
+                   IF    SRY-SRYCD(1)  =  "099800172"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            がん患者リハビリテーション開始日
+                   IF    SRY-SRYCD(1)  =  "099800181"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+      *            がん患者リハビリテーション終了日
+                   IF    SRY-SRYCD(1)  =  "099800182"
+                       MOVE   1        TO  FLG-RIHA
+                   END-IF
+           END-IF
+      *    診療行為クローズ
+           MOVE     "tbl_sryact"   TO  MCP-TABLE
+           MOVE     "key2"          TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+           .
+       201-SRYACCT-RIHA-SYYK-EXT.
            EXIT.
       *****************************************************************
       *    入院会計更新処理
@@ -445,28 +548,50 @@
       *
            PERFORM UNTIL ( FLG-SANTEI NOT =   ZERO )
       *
-               PERFORM VARYING IDX1    FROM    WRK-STIDX   BY  1
-                       UNTIL ( IDX1    >       WRK-EDIDX )
+      *        リハビリテーション開始日、終了日のシステム予約コードは
+      *        クリア対象外とする
+               IF     SANTEI-SRYCD     =    "099800111"  OR
+                                            "099800112"  OR
+                                            "099800121"  OR
+                                            "099800122"  OR
+                                            "099800131"  OR
+                                            "099800132"  OR
+                                            "099800141"  OR
+                                            "099800142"  OR
+                                            "099800151"  OR
+                                            "099800152"  OR
+                                            "099800161"  OR
+                                            "099800162"  OR
+                                            "099800171"  OR
+                                            "099800172"  OR
+                                            "099800181"  OR
+                                            "099800182"
+                   CONTINUE
+               ELSE
+                 PERFORM VARYING IDX1    FROM    WRK-STIDX   BY  1
+                         UNTIL ( IDX1    >       WRK-EDIDX )
       *
-                   MOVE    ZERO        TO  SANTEI-DAY (IDX1)
+                     MOVE    ZERO        TO  SANTEI-DAY (IDX1)
       *
-               END-PERFORM
+                 END-PERFORM
       *
-               MOVE    SANTEI-REC      TO  MCPDATA-REC
-               MOVE    "DBUPDATE"      TO  MCP-FUNC
-               MOVE    "tbl_santei"    TO  MCP-TABLE
-               MOVE    "key"           TO  MCP-PATHNAME
-               PERFORM   900-ORCDBMAIN-SEC
-               IF    ( MCP-RC      NOT =   ZERO )
-                   DISPLAY "ORCBMRECE SANTEI UPD ERR:"  MCP-RC
-                           ",PTID:"   SANTEI-PTID
-                   MOVE    "算定履歴の更新に失敗しました"
-                                       TO  WRK-RECEERR
-                   PERFORM 500-ERR-HENSYU-SEC
-                   GO  TO  201-SANTEI-UPD-EXT
+                 MOVE    SANTEI-REC      TO  MCPDATA-REC
+                 MOVE    "DBUPDATE"      TO  MCP-FUNC
+                 MOVE    "tbl_santei"    TO  MCP-TABLE
+                 MOVE    "key"           TO  MCP-PATHNAME
+                 PERFORM   900-ORCDBMAIN-SEC
+                 IF    ( MCP-RC      NOT =   ZERO )
+                     DISPLAY "ORCBMRECE SANTEI UPD ERR:"  MCP-RC
+                             ",PTID:"   SANTEI-PTID
+                     MOVE    "算定履歴の更新に失敗しました"
+                                         TO  WRK-RECEERR
+                     PERFORM 500-ERR-HENSYU-SEC
+                     GO  TO  201-SANTEI-UPD-EXT
+                 END-IF
+      *
+                 COMPUTE CNT-SANTEI-UPD  =   CNT-SANTEI-UPD   +   1
+      *
                END-IF
-      *
-               COMPUTE CNT-SANTEI-UPD  =   CNT-SANTEI-UPD   +   1
       *
                MOVE    "tbl_santei"    TO  MCP-TABLE
                MOVE    "all2"          TO  MCP-PATHNAME
@@ -534,6 +659,25 @@
       *
            .
        500-ERR-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療行為マスター検索
+      *****************************************************************
+       910-SRYACT-SELECT-SEC        SECTION.
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           PERFORM   910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SRYACT-REC
+               MOVE    ZERO            TO  FLG-SRYACT
+           ELSE
+               INITIALIZE                  SRYACT-REC
+               MOVE    1               TO  FLG-SRYACT
+           END-IF
+      *
+           .
+       910-SRYACT-SELECT-EXT.
            EXIT.
       *
       *****************************************************************
