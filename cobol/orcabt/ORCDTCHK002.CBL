@@ -917,6 +917,7 @@
            03  CONST-H039                      PIC X(03)   VALUE "039".
            03  CONST-H009                      PIC X(03)   VALUE "009".
            03  CONST-H2004                 PIC X(06)   VALUE "200804".
+           03  CONST-H2507                 PIC X(06)   VALUE "201307".
            03  CONST-TEMP                      PIC X(04)   VALUE "TEMP".
            03  CONST-RSI-KATAKANA-G.
                05  CONST-RSI-KATAKANA-VAL.
@@ -3604,6 +3605,7 @@
        200111-TRSIRECEDEN-HEN-SEC         SECTION.
       *
            IF    ( DTCHK003-HKNKBN     =   CONST-ROSAI )
+            AND  ( ORCBSD01-SRYYM     >=   CONST-H2507 )
             AND  ( FLG-RSI-RECEDEN-CHK =   1 )
             AND  ( SYS-4001-RSIIRYOKBN =   "1" )
             AND  ( DCACCT-SRYKBN       =   "80" )
@@ -4653,7 +4655,9 @@
                    END-IF
       *
       *            Ï«ºÒ¡¦¼«ÇåÀÕÊÝ¸±¾ðÊó¥Á¥§¥Ã¥¯
-                   PERFORM 200111-PTRSIINF-CHK-SEC
+                   IF    ( ORCBSD01-SRYYM  >=      CONST-H2507 )
+                       PERFORM 200111-PTRSIINF-CHK-SEC
+                   END-IF
       *
                ELSE
       *            ´µ¼ÔÊÝ¸±¾ðÊó¸¡º÷½èÍý
@@ -9812,6 +9816,7 @@
                PERFORM 220-HKNCOMBI-GET-SEC
                IF    ( DTCHK003-HKNKBN     =   CONST-ROSAI )
                 AND  ( COMB-HKNNUM         =   "971" )
+                AND  ( ORCBSD01-SRYYM     >=   CONST-H2507 )
                 AND  ( FLG-RSI-RECEDEN-CHK =   1 )
                 AND  ( SYS-4001-RSIIRYOKBN =   "1" )
                 AND  ( WRK-COMB-RSI-HKNKBN =   "1" OR "2" )
