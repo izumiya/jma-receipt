@@ -28,6 +28,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.01    NACL-藤原    13/08/20  ０９５９３で始まるコードがあ
+      *                                     るレセプトは対象外とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -656,8 +658,9 @@
        01  TBL-YAKUTEI-INF.
            03  TBL-YT1-OCC                      OCCURS 100.
              05  TBL-YT1-KEY.
+               07  TBL-YT1-JIHOKBN              PIC X(01).
                07  TBL-YT1-SRYKA                PIC X(02).
-             05  TBL-YT1-RECE44-REC             PIC X(1000).
+             05  TBL-YT1-RECE44-REC             PIC X(2000).
              05  TBL-YT1-HIKAKU.
                07  TBL-YT1-ZAITEN               PIC 9(08).
                07  TBL-YT1-SRYCDTOTAL           PIC 9(14).
@@ -667,34 +670,35 @@
                07  TBL-YT1-MEISAISU             PIC 9(04).
              05  TBL-YT1-RECE44-DAY-AREA.
                07  TBL-YT1-OCC2                 OCCURS  31.
-                 09  TBL-YT1-OCC3               OCCURS   3.
+                 09  TBL-YT1-OCC3               OCCURS   9.
                    11  TBL-YT1-KAISU            PIC 9(03).
              05  TBL-YT1-FLG                    PIC 9(01).
       *
       *    並び替え用
-       01  WRK-YAKUTEI-DATA                     PIC X(1356).
+       01  WRK-YAKUTEI-DATA                     PIC X(2915).
       *
-       01  WRK-TAIHI-YT1-KEY                    PIC X(02).
+       01  WRK-TAIHI-YT1-KEY                    PIC X(03).
+       01  WRK-TAIHI-YT1-KEY3                   PIC X(01).
        01  WRK-YAKUTEI-ZAINUM                   PIC 9(08).
        01  WRK-YAKUTEI-ZAINUM2                  PIC 9(08).
       *
       *    薬剤逓減情報（キー単位の編集テーブル）
        01  TBL-YAKUTEI-INF2.
            03  TBL-YT2-DAY                    OCCURS      31.
-             05  TBL-YT2X-KAIT                  OCCURS     3.
+             05  TBL-YT2X-KAIT                  OCCURS     9.
                06  TBL-YT2X1-OCC                  OCCURS  25.
-                 07  TBL-YT2X1-RECE44-REC         PIC X(1000).
+                 07  TBL-YT2X1-RECE44-REC         PIC X(2000).
                  07  TBL-YT2X1-KAISU              PIC 9(03).
                  07  TBL-YT2X1-DAY-AREA.
                    09  TBL-YT2X1-OCC2               OCCURS  31.
                        11  TBL-YT2X1-DAY            PIC 9(03).
                06  TBL-YT2X2-OCC                  OCCURS   3.
-                 07  TBL-YT2X2-RECE44-REC         PIC X(1000).
+                 07  TBL-YT2X2-RECE44-REC         PIC X(2000).
                  07  TBL-YT2X2-KAISU              PIC 9(03).
                  07  TBL-YT2X2-DAY-AREA.
                    09  TBL-YT2X2-OCC2               OCCURS  31.
                        11  TBL-YT2X2-DAY            PIC 9(03).
-             05  TBL-YT2Y-KAIT                  OCCURS     3.
+             05  TBL-YT2Y-KAIT                  OCCURS     9.
                06  TBL-YT2Y1-OCC                  OCCURS  26.
                  07  TBL-YT2Y1-HIKAKU.
                    09  TBL-YT2Y1-ZAITEN           PIC 9(08).
@@ -717,13 +721,13 @@
            03  TBL-YT3-XXX                    OCCURS     100.
              05  TBL-YT3X-KAIT.
                06  TBL-YT3X1-OCC                  OCCURS  25.
-                 07  TBL-YT3X1-RECE44-REC         PIC X(1000).
+                 07  TBL-YT3X1-RECE44-REC         PIC X(2000).
                  07  TBL-YT3X1-KAISU              PIC 9(03).
                  07  TBL-YT3X1-DAY-AREA.
                    09  TBL-YT3X1-OCC2               OCCURS  31.
                        11  TBL-YT3X1-DAY            PIC 9(03).
                06  TBL-YT3X2-OCC                  OCCURS   3.
-                 07  TBL-YT3X2-RECE44-REC         PIC X(1000).
+                 07  TBL-YT3X2-RECE44-REC         PIC X(2000).
                  07  TBL-YT3X2-KAISU              PIC 9(03).
                  07  TBL-YT3X2-DAY-AREA.
                    09  TBL-YT3X2-OCC2               OCCURS  31.
@@ -1391,7 +1395,11 @@
       *
                INITIALIZE    WRK-JIDO-SETCOM-AREA
       *
-               IF   RECE41-HKNKBN    NOT  =  "4"                        
+               IF   RECE44-JIHOKBN  NOT =  SPACE
+                INITIALIZE  WRK-JIDO-SETCOM-AREA
+                PERFORM     20011-HOKATU-COMMENT-SEC
+               ELSE
+                IF   RECE41-HKNKBN    NOT  =  "4"                        
                  EVALUATE      RECE44-SRYKBN                   
                    WHEN      "11"
                       IF   RECE41-HKNKBN     =   "5"
@@ -1579,7 +1587,7 @@
                    WHEN   OTHER
                       PERFORM       2099-RECE44-TENSOU-SEC
                  END-EVALUATE
-               ELSE                                                     
+                ELSE                                                     
                  EVALUATE      RECE44-SRYKBN                            
                    WHEN      "11"
                       EVALUATE   RECE41-JIBAIKBN
@@ -1763,6 +1771,7 @@
                    WHEN   OTHER                                         
                       PERFORM       2099-RECE44-TENSOU-SEC
                  END-EVALUATE                                           
+                END-IF
                END-IF                                                   
       *
                PERFORM 990-RECE44-NEXT-SEC
@@ -5486,6 +5495,31 @@
            EXIT.
       *
       *****************************************************************
+      *    包括診療分のコメント編集（差込：上）
+      *****************************************************************
+       20011-HOKATU-COMMENT-SEC          SECTION.
+      *
+           PERFORM  200111-RECE45-TAIHI-SEC
+      *
+      *    ＲＥＣＥ０５ファイルの内容をテーブルに退避
+           MOVE    ZERO                 TO  IDX-RECE45
+           MOVE    SPACE                TO  WRK-RECE45XX-REC
+           INITIALIZE                       WRK-RECE45XX-REC
+      *
+           ADD    1             TO  IDX-RECE45
+           MOVE  "810000001"    TO  WRK-RECE45XX-SRYCD(IDX-RECE45 1)
+           MOVE   ZERO          TO  WRK-RECE45XX-SRYSURYO(IDX-RECE45 1)
+           MOVE   6             TO  WRK-RECE45XX-YUKOKETA(IDX-RECE45 1)
+           MOVE  "【包括診療】" TO  WRK-RECE45XX-NAME(IDX-RECE45 1)
+           MOVE  "1"            TO  WRK-RECE45XX-SIKFLG(IDX-RECE45 1)
+      *
+           PERFORM    200111-SRYACTINF-HENSYU-SEC
+      *
+           .
+       20011-HOKATU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    算定日の確定
       *****************************************************************
        200111-SANTEI-DAY-SEC          SECTION.
@@ -6172,6 +6206,7 @@
            ADD       1        TO         IDX6
       *
            IF    IDX6    <=    100
+             MOVE    RECE44-JIHOKBN      TO   TBL-YT1-JIHOKBN(IDX6)
              MOVE    RECE44-SRYKA        TO   TBL-YT1-SRYKA(IDX6)
       *
              MOVE    RECE44-REC          TO   TBL-YT1-RECE44-REC(IDX6)
@@ -6184,7 +6219,7 @@
              MOVE    RECE44-MEISAISU     TO   TBL-YT1-MEISAISU(IDX6)
       *
              PERFORM   VARYING   IDX7    FROM   2   BY   1
-                        UNTIL   (IDX7      >    4)
+                        UNTIL   (IDX7      >   10)
       *
                COMPUTE   IDX9    =   IDX7  -   1
                PERFORM   VARYING   IDX8    FROM   1   BY   1
@@ -6396,6 +6431,7 @@
            INITIALIZE                   TBL-YAKUTEI-INF2
            INITIALIZE                   TBL-YAKUTEI-INF3
            MOVE       SPACE     TO      WRK-TAIHI-YT1-KEY
+           MOVE       SPACE     TO      WRK-TAIHI-YT1-KEY3
       *
            MOVE       ZERO      TO      IDX11
       *
@@ -6406,11 +6442,16 @@
               IF     TBL-YT1-KEY(IDX6)   NOT =  WRK-TAIHI-YT1-KEY
       *
                  IF   WRK-TAIHI-YT1-KEY  NOT =  SPACE
-                      PERFORM   2401-YAKUTEI-MATOME-SEC
+                   PERFORM   2401-YAKUTEI-MATOME-SEC
+                   IF  TBL-YT1-JIHOKBN(IDX6)  NOT = WRK-TAIHI-YT1-KEY3
+                       PERFORM 2402-YAKUTEI-WRITE-SEC
+                       INITIALIZE                  TBL-YAKUTEI-INF3
+                   END-IF
                  END-IF
       *
                  INITIALIZE                        TBL-YAKUTEI-INF2
                  MOVE   TBL-YT1-KEY(IDX6)      TO  WRK-TAIHI-YT1-KEY
+                 MOVE   TBL-YT1-JIHOKBN(IDX6)  TO  WRK-TAIHI-YT1-KEY3
       *
               END-IF
       *
@@ -6420,7 +6461,7 @@
                               UNTIL   (IDX7      >    31)
       *
                      PERFORM   VARYING   IDX8    FROM   1   BY   1
-                                UNTIL   (IDX8      >    3)
+                                UNTIL   (IDX8      >    9)
       *
                         IF   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
                                                         NOT =  ZERO
@@ -6480,7 +6521,7 @@
                               UNTIL   (IDX7      >    31)
       *
                      PERFORM   VARYING   IDX8    FROM   1   BY   1
-                                UNTIL   (IDX8      >    3)
+                                UNTIL   (IDX8      >    9)
       *
                         IF   TBL-YT1-KAISU(IDX6 IDX7 IDX8)
                                                         NOT =  ZERO
@@ -6556,7 +6597,7 @@
                       UNTIL   (IDX7      >    31)
       *
               PERFORM   VARYING   IDX8    FROM   1   BY   1
-                         UNTIL   (IDX8      >    3)
+                         UNTIL   (IDX8      >    9)
       *
                IF  (TBL-YT2Y1-HIKAKU(IDX7 IDX8 26)  NOT = ZERO)
                OR  (TBL-YT2Y2-HIKAKU(IDX7 IDX8  4)  NOT = ZERO)
@@ -8477,6 +8518,7 @@
       *
       *            公務災害、アフターケア、種別不明のとき対象外
       *            指定医療機関ではないとき対象外
+      *            ０９５９３で始まるコードがあるとき対象外
                    IF  (   RECE41-SRYYM        <   201307 )
                    OR  (   RECE41-PTNUM        =   SPACE  )
                    OR  (   RECE41-TSTPTNUMKBN  =   "1"    )
@@ -8487,6 +8529,8 @@
                    OR  ((  RECE41-HKNKBN    = "1" OR "2" ) AND
                         (  RECE41-TOTALKIN  =  ZERO      ) AND
                         (  RECE41-TOTALKIN2 =  ZERO      ))
+                   OR  (   RECE41-ORIGINALCDKBN
+                                               =   1      )
                        GO  TO  990-RECE41-READ-SEC
                    END-IF
       *

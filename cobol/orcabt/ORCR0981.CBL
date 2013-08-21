@@ -28,6 +28,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.01    NACL-藤原    13/08/20  ０９５９３で始まるコードがあ
+      *                                     るレセプトは対象外とする
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1216,7 +1218,11 @@
                INITIALIZE    WRK-JIDO-SETCOM-AREA
                MOVE    ZERO   TO   FLG-KAISIEN
       *
-               IF   RECE82-HKNKBN    NOT  =  "4"                        
+               IF   RECE84-JIHOKBN  NOT =  SPACE
+                INITIALIZE  WRK-JIDO-SETCOM-AREA
+                PERFORM     20011-HOKATU-COMMENT-SEC
+               ELSE
+                IF   RECE82-HKNKBN    NOT  =  "4"                        
                  EVALUATE      RECE84-SRYKBN                   
                    WHEN      "11"
                       IF   RECE82-HKNKBN     =   "5"
@@ -1411,7 +1417,7 @@
                    WHEN   OTHER
                          PERFORM    2099-RECE84-WRITE-SEC
                  END-EVALUATE
-               ELSE                                                     
+                ELSE                                                     
                  EVALUATE      RECE84-SRYKBN                            
                    WHEN      "11"
                       EVALUATE   RECE82-JIBAIKBN
@@ -1599,6 +1605,7 @@
                    WHEN   OTHER                                         
                          PERFORM    2099-RECE84-WRITE-SEC
                  END-EVALUATE                                           
+                END-IF
                END-IF                                                   
       *
                PERFORM 990-RECE84-NEXT-SEC
@@ -4541,6 +4548,31 @@
       *
            .
        20011-SHUJUTSU-ETC2-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    包括診療分のコメント編集（差込：上）
+      *****************************************************************
+       20011-HOKATU-COMMENT-SEC          SECTION.
+      *
+           PERFORM  200111-RECE85-TAIHI-SEC
+      *
+      *    ＲＥＣＥ０５ファイルの内容をテーブルに退避
+           MOVE    ZERO                 TO  IDX-RECE85
+           MOVE    SPACE                TO  WRK-RECE85XX-REC
+           INITIALIZE                       WRK-RECE85XX-REC
+      *
+           ADD    1             TO  IDX-RECE85
+           MOVE  "810000001"    TO  WRK-RECE85XX-SRYCD(IDX-RECE85 1)
+           MOVE   ZERO          TO  WRK-RECE85XX-SRYSURYO(IDX-RECE85 1)
+           MOVE   6             TO  WRK-RECE85XX-YUKOKETA(IDX-RECE85 1)
+           MOVE  "【包括診療】" TO  WRK-RECE85XX-NAME(IDX-RECE85 1)
+           MOVE  "1"            TO  WRK-RECE85XX-SIKFLG(IDX-RECE85 1)
+      *
+           PERFORM    200111-SRYACTINF-HENSYU-SEC
+      *
+           .
+       20011-HOKATU-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -7978,6 +8010,7 @@
       *
       *            公務災害、種別不明のとき対象外
       *            指定医療機関ではないとき対象外
+      *            ０９５９３で始まるコードがあるとき対象外
                    IF  (   RECE82-SRYYM        <   201307 )
                    OR  (   RECE82-PTNUM        =   SPACE  )
                    OR  (   RECE82-TSTPTNUMKBN  =   "1"    )
@@ -7988,6 +8021,8 @@
                         (  RECE82-TOTALKIN        = ZERO ) AND
                         (  RECE82-KINGAKU2-SYO    = ZERO ) AND
                         (  RECE82-SHOKUJITOTALKIN = ZERO ))
+                   OR  (   RECE82-ORIGINALCDKBN
+                                               =   1      )
                        GO  TO  990-RECE82-READ-SEC
                    END-IF
       *

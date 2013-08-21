@@ -37,6 +37,8 @@
       *  04.06.04    NACL-門脇    13/06/07  合計額ワーク領域のクリア
       *
       *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
+      *  04.07.02    NACL-藤原    13/08/20  ０９５９３で始まるコードの有
+      *                                     無区分を追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2914,6 +2916,9 @@
       *
            MOVE    "00000000000000000000000000000000000000000000000000"
                                        TO  RECE10-RESERVE-AREA
+      *
+           MOVE    RECE41-ORIGINALCDKBN
+                                       TO  RECE10-FLG (1)
       *
            MOVE    RECE10-REC          TO  MCPDATA-REC
            MOVE    "tbl_seikyu"        TO  MCP-TABLE

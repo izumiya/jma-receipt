@@ -67,6 +67,8 @@
       *  04.07.01    NACL-藤原    11/09/02  労災請求書作成対応
       *  04.07.02    NACL-藤原    12/01/24  monpe-0.6.20対応
       *  04.07.03    NACL-門脇    13/01/21  労災レセ電対応
+      *  04.07.04    NACL-藤原    13/08/20  ０９５９３で始まるコードの有
+      *                                     無区分を追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3235,6 +3237,9 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    "00000000000000000000000000000000000000000000000000"
                                        TO  RECE10-RESERVE-AREA
+      *
+           MOVE    RECE82-ORIGINALCDKBN
+                                       TO  RECE10-FLG (1)
       *
            MOVE    RECE10-REC          TO  MCPDATA-REC
            MOVE    "tbl_seikyu"        TO  MCP-TABLE
