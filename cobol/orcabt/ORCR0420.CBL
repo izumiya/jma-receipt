@@ -1246,6 +1246,8 @@
       *
            COPY    "CPSK4003.INC".
       *
+           COPY    "CPSK200501.INC".
+      *
       *
       *****************************************************************
       *    サブプロ用領域
@@ -1500,6 +1502,24 @@ grpsys           PERFORM 900-DBSELECT-SEC
                END-IF
               END-PERFORM
       *
+           END-IF
+      *
+           INITIALIZE                      SYS-200501-REC
+           MOVE    "2005"              TO  SYS-200501-KANRICD
+           MOVE    "01"                TO  SYS-200501-KBNCD
+           MOVE    WRK-PARA-SRYYM      TO  SYS-200501-STYUKYMD (1:6)
+           MOVE    "01"                TO  SYS-200501-STYUKYMD (7:2)
+           MOVE    SYS-200501-STYUKYMD TO  SYS-200501-EDYUKYMD
+           MOVE    SPA-HOSPNUM         TO  SYS-200501-HOSPNUM
+           MOVE    SYS-200501-REC      TO  MCPDATA-REC
+           PERFORM 800-SYSKANRI-READ-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    MCPDATA-REC     TO  SYS-200501-REC
+           ELSE
+               INITIALIZE                  SYS-200501-REC
+           END-IF
+           IF      SYS-200501-ROURECEKBN  =   SPACE
+               MOVE    "0"             TO  SYS-200501-ROURECEKBN
            END-IF
       *                             
       *    レセプト処理
@@ -3195,6 +3215,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF    (RECE41-HKNKBN           =   "1" OR "2")
                AND   (RECE41-SRYYM           >=   "201307"  )
                AND   (RECE41-RSIIRYOKBN   NOT =   "0"       )
+               AND   (SYS-200501-ROURECEKBN   =   "1" OR "3")
                  IF  (ACCT-SRYKBN          =  "80"   )
                  AND (SRY-SRYCD(IDX2)(1:5) =  "09593")
                     MOVE     1      TO  RECE41-ORIGINALCDKBN

@@ -1711,6 +1711,9 @@ grpsys       PERFORM 900-DBSELECT-SEC
                                     =   SPACE
                MOVE    "2"   TO  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
            END-IF
+           IF      SYS-200501-ROURECEKBN  =   SPACE
+               MOVE    "0"   TO  SYS-200501-ROURECEKBN
+           END-IF
       *
            OPEN    OUTPUT              RECE84-FILE
            CLOSE                       RECE84-FILE
@@ -3742,6 +3745,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF    (RECE82-HKNKBN           =   "1" OR "2")
                AND   (RECE82-SRYYM           >=   "201307"  )
                AND   (RECE82-RSIIRYOKBN   NOT =   "0"       )
+               AND   (SYS-200501-ROURECEKBN   =   "2" OR "3")
                  IF  (ACCT-SRYKBN          =  "80"   )
                  AND (SRY-SRYCD(IDX2)(1:5) =  "09593")
                     MOVE     1      TO  RECE82-ORIGINALCDKBN
