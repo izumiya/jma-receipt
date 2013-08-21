@@ -170,6 +170,10 @@
       *  04.07.09    NACL-藤原    13/02/07  労災レセ電対応
       *  04.07.10    NACL-藤原    13/05/02  プレビュー画面戻り時の公費Ｃ
       *                                     ＳＶの状態設定
+      *  04.07.11    NACL-藤原    13/08/20  月遅れ分のレセ電データの有無
+      *                                     チェックのとき０９５９３で始
+      *                                     まるコードがあるレセプトは対
+      *                                     象外とする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -4905,8 +4909,13 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                                            =   6   OR  7  OR  8 )
                    CONTINUE
                ELSE
-      *            労災で平成２５年６月以前またはアフターケアと公務災害は対象外
+      *            労災のとき
                    IF      RECE10-TEISYUTUSAKI =   "3"
+      *              ０９５９３で始まるコードがあるレセプトは対象外
+                     IF      RECE10-FLG (1)        =   1
+                       CONTINUE
+                     ELSE 
+      *                平成２５年６月以前またはアフターケアと公務災害は対象外
                        IF    ( RECE10-SRYYM        <
                                                WRK-CONS-SRYYM-201307   ) 
                        OR    ( RECE10-RECESYUBETU  =   7021   OR  7051
@@ -4937,6 +4946,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                                END-IF
                            END-PERFORM
                        END-IF
+                     END-IF
                    ELSE
                        PERFORM 46011-RECEDEN-CHK-SEC
                    END-IF
