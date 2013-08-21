@@ -361,6 +361,7 @@
       *
            03  WRK-SPA-CHIIKKBN        PIC 9(01).
            03  WRK-SPA-MEISAKBN        PIC 9(01).
+           03  WRK-SPA-INITAUTO-FLG    PIC X(01).
       *H25.3
            03  WRK-SYOUKAI             PIC 9(01).
            03  FLG-SYOKAINASI          PIC 9(01).
@@ -731,12 +732,14 @@
                    MOVE    SPA-WORK            TO  SPA-K01KYOUTU
                    MOVE    SPA-CHIIKKBN        TO  WRK-SPA-CHIIKKBN
                    MOVE    SPA-MEISAKBN        TO  WRK-SPA-MEISAKBN
+                   MOVE    SPA-INITAUTO-FLG    TO  WRK-SPA-INITAUTO-FLG
                END-IF
                INITIALIZE                      SPA-K01KYOUTU
       *ver.4.8
       *        電話再診の加算発生用
                MOVE    WRK-SPA-CHIIKKBN    TO  SPA-CHIIKKBN
                MOVE    WRK-SPA-MEISAKBN    TO  SPA-MEISAKBN
+               MOVE    WRK-SPA-INITAUTO-FLG    TO  SPA-INITAUTO-FLG
            END-IF
       *
            EVALUATE    LNK-ORCSC-KBN
@@ -1306,7 +1309,8 @@
              AND  (WRK-COM-YOBI1(IDX-Z)(1:1)
                                            =   SPACE
                                            OR  "2" )
-             AND  (LNK-ORCSC-SYORIFLG   =   ZERO)
+             AND  (LNK-ORCSC-SYORIFLG  =   ZERO )
+             AND  (SPA-INITAUTO-FLG    =   "1"  )
                PERFORM 1001149-TELSAISIN-SET-SEC
            END-IF
       *ver.4.8
