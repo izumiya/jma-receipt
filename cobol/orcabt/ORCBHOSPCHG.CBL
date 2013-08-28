@@ -282,6 +282,15 @@
                PERFORM 500-ERR-HENSYU-SEC
                GO  TO  110-PARA-HENSYU-EXT
            END-IF
+      *
+           IF   WRK-PARA-STIDX  IS  NUMERIC
+               CONTINUE
+           ELSE
+               MOVE    "開始日が誤りです"   TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+               GO  TO  110-PARA-HENSYU-EXT
+           END-IF
+      *
            IF ( WRK-PARA-EDIDX     >=   "01")   AND
               ( WRK-PARA-EDIDX     <=   "31")
                CONTINUE
@@ -290,6 +299,15 @@
                PERFORM 500-ERR-HENSYU-SEC
                GO  TO  110-PARA-HENSYU-EXT
            END-IF
+      *
+           IF   WRK-PARA-EDIDX  IS  NUMERIC
+               CONTINUE
+           ELSE
+               MOVE    "終了日が誤りです"   TO  WRK-RECEERR
+               PERFORM 500-ERR-HENSYU-SEC
+               GO  TO  110-PARA-HENSYU-EXT
+           END-IF
+      *
            IF ( WRK-PARA-STIDX     <=    WRK-PARA-EDIDX)
                CONTINUE
            ELSE
