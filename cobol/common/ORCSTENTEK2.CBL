@@ -64,7 +64,9 @@
            03  FLG-ZAINUM-MATCH    PIC 9(01).
            03  FLG-TENTEK-SET      PIC 9(01).
            03  FLG-CHUJOU-SET      PIC 9(01).
+           03  FLG-SEIBUTSU-SET    PIC 9(01).
            03  FLG-SEIMITSU-SET    PIC 9(01).
+           03  FLG-MAYAKU-SET    PIC 9(01).
            03  FLG-TAISYOUGAI      PIC 9(01).
            03  FLG-YKZ             PIC 9(01).
       *
@@ -1367,8 +1369,10 @@
                                   UNTIL     IDX1   >   31
                            IF   ACCT-DAY(1 IDX1)    NOT =   ZERO
       *                      点滴注射
+                             MOVE    ZERO      TO   FLG-SEIBUTSU-SET
                              IF  LNK-ORCSTEN2-TENTEK-MEISAISU(IDX1)
                                               NOT =   ZERO
+                               MOVE  1     TO   FLG-SEIBUTSU-SET
                                MOVE  1     TO   FLG-TENTEK-SET
                                ADD   1     TO
                                     LNK-ORCSTEN2-TENTEK-MEISAISU(IDX1)
@@ -1405,6 +1409,7 @@
       *                      中心静脈注射
                              IF  LNK-ORCSTEN2-CHUJOU-MEISAISU(IDX1)
                                               NOT =   ZERO
+                               MOVE  1     TO   FLG-SEIBUTSU-SET
                                MOVE  1     TO   FLG-CHUJOU-SET
                                ADD   1     TO 
                                     LNK-ORCSTEN2-CHUJOU-MEISAISU(IDX1)
@@ -1435,6 +1440,43 @@
                                IF   WRK-COMMENT-MEISAISU   NOT =  ZERO
                                     PERFORM    300-COMMENT-SET-SEC
                                     PERFORM    320-COMMENT-SET-SEC
+                               END-IF
+                               PERFORM   300-ZAINUM-SET-SEC
+                             END-IF
+                             IF      FLG-SEIBUTSU-SET    =    ZERO
+      *                        手技料が算定されていない場合でも、
+      *                        生物学的製剤注射については取り込みを行う
+                               MOVE  1     TO   FLG-SEIBUTSU-SET
+                               MOVE  1     TO   FLG-TENTEK-SET
+                               ADD   1     TO 
+                                    LNK-ORCSTEN2-TENTEK-MEISAISU(IDX1)
+                               EVALUATE   TRUE
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 1)
+                                              =    SPACE
+                                   MOVE   1   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 2)
+                                              =    SPACE
+                                   MOVE   2   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 3)
+                                              =    SPACE
+                                   MOVE   3   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 4)
+                                              =    SPACE
+                                   MOVE   4   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 5)
+                                              =    SPACE
+                                   MOVE   5   TO     WRK-MEISAISU
+                               END-EVALUATE
+                               ADD   ACCT-ZAITEN     TO 
+                                    LNK-ORCSTEN2-TENTEK-ZAITEN(IDX1)
+                               ADD   ACCT-SRYCDTOTAL     TO 
+                                    LNK-ORCSTEN2-TENTEK-SRYCDTOTAL(IDX1)
+                               MOVE   "130000110"    TO
+                                    LNK-ORCSTEN2-TENTEK-SRYCD
+                                                  (IDX1 WRK-MEISAISU)
+                               IF   WRK-COMMENT-MEISAISU   NOT =  ZERO
+                                    PERFORM    300-COMMENT-SET-SEC
+                                    PERFORM    310-COMMENT-SET-SEC
                                END-IF
                                PERFORM   300-ZAINUM-SET-SEC
                              END-IF
@@ -1627,8 +1669,10 @@
                                   UNTIL     IDX1   >   31
                            IF   ACCT-DAY(1 IDX1)    NOT =   ZERO
       *                      点滴注射
+                             MOVE    ZERO      TO   FLG-MAYAKU-SET
                              IF  LNK-ORCSTEN2-TENTEK-MEISAISU(IDX1)
                                               NOT =   ZERO
+                               MOVE  1     TO   FLG-MAYAKU-SET
                                MOVE  1     TO   FLG-TENTEK-SET
                                ADD   1     TO 
                                     LNK-ORCSTEN2-TENTEK-MEISAISU(IDX1)
@@ -1665,6 +1709,7 @@
       *                      中心静脈注射
                              IF  LNK-ORCSTEN2-CHUJOU-MEISAISU(IDX1)
                                               NOT =   ZERO
+                               MOVE  1     TO   FLG-MAYAKU-SET
                                MOVE  1     TO   FLG-CHUJOU-SET
                                ADD   1     TO 
                                     LNK-ORCSTEN2-CHUJOU-MEISAISU(IDX1)
@@ -1695,6 +1740,43 @@
                                IF   WRK-COMMENT-MEISAISU   NOT =  ZERO
                                     PERFORM    300-COMMENT-SET-SEC
                                     PERFORM    320-COMMENT-SET-SEC
+                               END-IF
+                               PERFORM   300-ZAINUM-SET-SEC
+                             END-IF
+                             IF      FLG-MAYAKU-SET    =    ZERO
+      *                        手技料が算定されていない場合でも、
+      *                        麻薬注射については取り込みを行う
+                               MOVE  1     TO   FLG-MAYAKU-SET
+                               MOVE  1     TO   FLG-TENTEK-SET
+                               ADD   1     TO 
+                                    LNK-ORCSTEN2-TENTEK-MEISAISU(IDX1)
+                               EVALUATE   TRUE
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 1)
+                                              =    SPACE
+                                   MOVE   1   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 2)
+                                              =    SPACE
+                                   MOVE   2   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 3)
+                                              =    SPACE
+                                   MOVE   3   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 4)
+                                              =    SPACE
+                                   MOVE   4   TO     WRK-MEISAISU
+                                 WHEN  LNK-ORCSTEN2-TENTEK-SRYCD(IDX1 5)
+                                              =    SPACE
+                                   MOVE   5   TO     WRK-MEISAISU
+                               END-EVALUATE
+                               ADD   ACCT-ZAITEN     TO 
+                                    LNK-ORCSTEN2-TENTEK-ZAITEN(IDX1)
+                               ADD   ACCT-SRYCDTOTAL     TO 
+                                    LNK-ORCSTEN2-TENTEK-SRYCDTOTAL(IDX1)
+                               MOVE   "130000310"    TO
+                                    LNK-ORCSTEN2-TENTEK-SRYCD
+                                                  (IDX1 WRK-MEISAISU)
+                               IF   WRK-COMMENT-MEISAISU   NOT =  ZERO
+                                    PERFORM    300-COMMENT-SET-SEC
+                                    PERFORM    310-COMMENT-SET-SEC
                                END-IF
                                PERFORM   300-ZAINUM-SET-SEC
                              END-IF
