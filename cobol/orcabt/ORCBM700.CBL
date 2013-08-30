@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.01    NACL-藤原    13/08/20  ０９５９３で始まるコードがあ
       *                                     るレセプトは対象外とする
+      *  04.07.01    NACL-藤原    13/08/30  改行コードの編集追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1169,6 +1170,12 @@
            MOVE    2                   TO  WRK-NAGASA
            MOVE    1                   TO  WRK-END 
            PERFORM 5004-MOJI-HENSYU-SEC
+      *
+      *    改行コード編集 
+           STRING  WRK-REC(1:WRK-REC-LENGTH) DELIMITED  BY  SIZE
+                   WRK-KAIGYO                DELIMITED  BY  SIZE
+                   INTO        WRK-REC
+           END-STRING
       *
            MOVE    WRK-REC             TO  RECE30-R
            WRITE   RECE30-R
