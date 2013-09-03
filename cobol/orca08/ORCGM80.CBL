@@ -384,7 +384,11 @@
       *        アップグレード
                WHEN    "0105"
                    IF      SPA-M80ID1-FLG      =   "OK"
-                       MOVE    "upgrade"   TO  WRK-COMMAND
+                       IF      SPA-NAI-LINK        =   2
+                           MOVE    "install"       TO  WRK-COMMAND
+                       ELSE
+                           MOVE    "upgrade"       TO  WRK-COMMAND
+                       END-IF
                        PERFORM 4010-SHELL-SYORI-SEC
                    ELSE
                        MOVE    1           TO  SPA-GMN-CUR
