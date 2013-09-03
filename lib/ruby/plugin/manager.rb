@@ -95,7 +95,6 @@ module JMA::Plugin
             old = c[:old]
             @log.info("upgrade #{old[:name]}-#{old[:version]} to #{new[:name]}-#{new[:version]} ...")
             _install(new[:name],new[:version])
-            @db.delete(old[:name],old[:version])
           rescue Exception => ex
             raise ex
           end
