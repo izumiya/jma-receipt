@@ -1032,6 +1032,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                IF      SPA-COM-ZAIEND (IDX-Z)  =   "1"
                    MOVE    ZERO                TO  FLG-SANTEIOK
                    MOVE    ZERO                TO  FLG-INPUTOK
+                   MOVE    ZERO                TO  FLG-INPUTOK2
                END-IF
                IF      SPA-COM-INPUTCD (IDX-Z) =   "099999903"
                    MOVE    1                   TO  FLG-SANTEIOK
