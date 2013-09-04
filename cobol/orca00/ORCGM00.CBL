@@ -501,6 +501,9 @@
                                        OR  "KT01"
                                        OR  "MLOG"
                                        OR  "M98"
+      *H25.9
+                                       OR  "M97"
+                                       OR  "MDAS"
                MOVE    SPA-SYSYMDWH        TO  WRK-WSYSYMDH
                MOVE    SPA-SYSYMD          TO  WRK-SYSYMD
                MOVE    SPA-SYSYMDW         TO  WRK-WYMD
