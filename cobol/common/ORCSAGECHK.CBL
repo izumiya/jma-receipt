@@ -312,7 +312,8 @@
            MOVE    WRK-SRYYMD          TO  WRK-SYMD
            COMPUTE WRK-NENREI-YY       =   WRK-SYY
                                        -   WRK-BYY
-           IF      WRK-BYMD(5:4)       >   WRK-SYMD(5:4)
+           IF     (WRK-BYMD(5:4)       >   WRK-SYMD(5:4))
+            AND   (WRK-NENREI-YY       >   ZERO         )
                COMPUTE WRK-NENREI-YY       =   WRK-NENREI-YY
                                            -   1
                COMPUTE WRK-NENREI-MM       =  (WRK-BMM   +  12 )
