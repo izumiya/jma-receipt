@@ -474,6 +474,7 @@ RECORD_files = \
 	I411.rec \
 	appointlst2v2.rec \
 	acsimulatev2.rec \
+	visitptlstv2.rec \
 
 DEF_files = \
 
@@ -729,6 +730,9 @@ DB_files = \
 	tbl_mnote_h.db \
 	tbl_mnote_b.db \
 	tbl_ptconf.db \
+	xml_visitptlstv2req.db \
+	xml_visitptlst01v2res.db \
+	xml_visitptlst02v2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

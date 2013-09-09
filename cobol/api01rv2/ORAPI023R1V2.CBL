@@ -422,26 +422,27 @@
             COPY    "ORCA-SPA".
             COPY    "LINKAREA".
        01  SCRAREA.
-           COPY    "CPAPIPTAV2.INC".
-           COPY    "CPAPILSTV2.INC".
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST1-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST2-//.
-           COPY    "CPAPILSTV2.INC"  REPLACING
-                                     //APILST-// BY //APILST3-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST4-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST5-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST6-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST7-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST8-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST9-//.
+           COPY    "API01RV2SCRAREA.INC".
+      ***  COPY    "CPAPIPTAV2.INC".
+      *    COPY    "CPAPILSTV2.INC".
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST1-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST2-//.
+      *    COPY    "CPAPILSTV2.INC"  REPLACING
+      *                              //APILST-// BY //APILST3-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST4-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST5-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST6-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST7-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST8-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      ****                           //APILST-// BY //APILST9-//.
       *
       *
        PROCEDURE                   DIVISION    USING
@@ -455,9 +456,9 @@
       *****************************************************************
        000-MAIN-SEC                SECTION.
       *
-           DISPLAY   "***************"
-           DISPLAY   "* accept start*"
-           DISPLAY   "***************"
+           DISPLAY   "*******************"
+           DISPLAY   "* acsimulate start*"
+           DISPLAY   "*******************"
       *
            INITIALIZE                      FLG-AREA
            INITIALIZE                      IDX-AREA
@@ -475,9 +476,9 @@
       *    返却領域編集
            PERFORM 300-APTXMLMAKE-SEC
       *
-           DISPLAY   "***************"
-           DISPLAY   "* accept end  *"
-           DISPLAY   "***************"
+           DISPLAY   "*******************"
+           DISPLAY   "* acsimulate end  *"
+           DISPLAY   "*******************"
            .
        000-MAIN-EXIT.
            EXIT    PROGRAM.
@@ -1377,7 +1378,7 @@
                            PERFORM 3100-KIHONCHK-SEC
                        END-IF
       *v4.8から        電話再診の加算処理なし
-      *               IF     (SPA-COM-SRYKBN(IDX) =   "12"  )
+      *                IF     (SPA-COM-SRYKBN(IDX) =   "12"  )
       *                  AND  (SPA-COM-INPUTCD(IDX)(1:1) =  "1")
       *                    MOVE    "1"         TO  SPA-COM-KSNAUTO(IDX)
       *!!!!            END-IF
@@ -2211,6 +2212,7 @@
                        MOVE    WRK-SINDAN      TO  LNK-S01-KYUKYU
                                                       (LNK-SYUNOU2-MAX)
                    END-IF
+      *
       *
                END-PERFORM
            END-IF

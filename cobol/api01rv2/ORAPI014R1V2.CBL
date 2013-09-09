@@ -185,24 +185,25 @@
             COPY    "ORCA-SPA".
             COPY    "LINKAREA".
        01  SCRAREA.
-           COPY    "CPAPIPTAV2.INC".
-           COPY    "CPAPILSTV2.INC".
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //APILST1-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //APILST2-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //APILST3-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //APILST4-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //APILST5-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //APILST6-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //APILST7-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //APILST8-//.
+           COPY    "API01RV2SCRAREA.INC".
+      *    COPY    "CPAPIPTAV2.INC".
+      *    COPY    "CPAPILSTV2.INC".
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST1-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST2-//.
+      *    COPY    "CPAPILSTV2.INC"  REPLACING
+      *                              //APILST-// BY //APILST3-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST4-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST5-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST6-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST7-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                                //APILST-// BY //APILST8-//.
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -215,9 +216,9 @@
       *****************************************************************
        000-MAIN-SEC                SECTION.
       *
-           DISPLAY   "***************"
-           DISPLAY   "* appoint start*"
-           DISPLAY   "***************"
+           DISPLAY   "*******************"
+           DISPLAY   "* appointlst start*"
+           DISPLAY   "*******************"
       *
            INITIALIZE                      FLG-AREA
            INITIALIZE                      IDX-AREA
@@ -235,9 +236,9 @@
       *    ÊÖµÑÎÎ°èÊÔ½¸
            PERFORM 300-APTLSTMAKE-SEC
       *
-           DISPLAY   "***************"
-           DISPLAY   "* appoint end  *"
-           DISPLAY   "***************"
+           DISPLAY   "*******************"
+           DISPLAY   "* appointlst end  *"
+           DISPLAY   "*******************"
            .
        000-MAIN-EXIT.
            EXIT    PROGRAM.
@@ -324,9 +325,6 @@
       *
            EVALUATE    APILST1-CLASS
            WHEN    "01"
-      *TEST
-               DISPLAY "Í½Ìó°ìÍ÷"    
-      *TEST
       *        Í½Ìó°ìÍ÷½èÍý
                PERFORM 2002-YYK-LIST-SEC
            END-EVALUATE
@@ -464,8 +462,7 @@
                MOVE    "application/xml"   TO  APILST1-CONTENT-TYPE
            ELSE
                DISPLAY "XMLCLOSE failure = " MCP-RC
-               DISPLAY "appoint xml write failure "
-      * CALL    "coblog"    USING   WRK-ERRMSG
+               DISPLAY "appointlst xml write failure "
            END-IF
       *
           .

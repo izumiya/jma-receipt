@@ -14,10 +14,9 @@ bindapi	"medicalgetv2"	"OpenCOBOL"	"ORAPI021R1V2";
 bindapi	"diseasegetv2"	"OpenCOBOL"	"ORAPI022R1V2";
 bindapi	"appointlst2v2"	"OpenCOBOL"	"ORAPI014R2V2";
 bindapi	"acsimulatev2"	"OpenCOBOL"	"ORAPI023R1V2";
-
+bindapi	"visitptlstv2"	"OpenCOBOL"	"ORAPI021R2V2";
 
 multiplex_group	api01rv2;
-
 
 data	{
 	spa	orcaspa;
@@ -33,6 +32,7 @@ data	{
 		diseasegetv2;
 		appointlst2v2;
 		acsimulatev2;
+		visitptlstv2;
 	};
 };
 db "xml2" {
@@ -59,6 +59,9 @@ db "xml2" {
  xml_appointlst2v2res;
  xml_acsimulatev2req;
  xml_acsimulatev2res;
+ xml_visitptlstv2req;
+ xml_visitptlst01v2res;
+ xml_visitptlst02v2res;
 };
 
 #include "orcadb.inc"

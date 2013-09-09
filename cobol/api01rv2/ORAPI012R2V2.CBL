@@ -153,25 +153,25 @@
             COPY    "ORCA-SPA".
             COPY    "LINKAREA".
        01  SCRAREA.
-           COPY    "CPAPIPTAV2.INC".
-           COPY    "CPAPILSTV2.INC".
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST1-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST2-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST3-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST4-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST5-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST6-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                     //APILST-// BY //APILST7-//.
-           COPY    "CPAPILSTV2.INC"    REPLACING
-                                       //APILST-// BY //APILST8-//.
-      *
+           COPY    "API01RV2SCRAREA.INC".
+      *    COPY    "CPAPIPTAV2.INC".
+      *    COPY    "CPAPILSTV2.INC".
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST1-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST2-//.
+      *    COPY    "CPAPILSTV2.INC"  REPLACING
+      *                              //APILST-// BY //APILST3-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST4-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST5-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST6-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                              //APILST-// BY //APILST7-//.
+      *    COPY    "CPAPILSTV2.INC"    REPLACING
+      *                                //APILST-// BY //APILST8-//.
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -186,7 +186,7 @@
        000-MAIN-SEC                SECTION.
       *
            DISPLAY   "********************"
-           DISPLAY   "* patient res start*"
+           DISPLAY   "* patientlst1 start*"
            DISPLAY   "********************"
       *
            INITIALIZE                      FLG-AREA
@@ -206,7 +206,7 @@
            PERFORM 300-PTXMLMAKE-SEC
       *
            DISPLAY   "*******************"
-           DISPLAY   "* patient res end *"
+           DISPLAY   "* patientlst1 end *"
            DISPLAY   "*******************"
            .
        000-MAIN-EXIT.

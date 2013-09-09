@@ -317,10 +317,6 @@
                    UNTIL    (IDY           >   40)
                        OR   (ORAPIWKSRY-MDC-CLASS (IDY) =   SPACE )
                        OR   (ORAPIWKSRY-ERRCD  NOT =   SPACE )
-      *TEST
-            DISPLAY "IDY:"  IDY
-                 ", ORAPIWKSRY-MDC-CLASS:"  ORAPIWKSRY-MDC-CLASS (IDY)
-      *TEST
       *        ºÞËè¤ÎÊÔ½¸
                PERFORM 200211-ZAI-HENSYU-SEC
                IF      TBL-MAX             >   ZERO

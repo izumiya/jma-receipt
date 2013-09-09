@@ -1139,3 +1139,39 @@ path	key54 	{
 	};
 };
 
+path	key55	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key55_csr CURSOR FOR
+		SELECT *
+		FROM tbl_jyurrk
+			WHERE HOSPNUM      =   :HOSPNUM
+			AND   NYUGAIKBN    =   :NYUGAIKBN
+			AND   SRYYMD       =   :SRYYMD
+			AND   HKNCOMBINUM  <>  '9999'
+			AND   EDANUM      =   1
+			ORDER   BY        DENPNUM
+		;
+	};
+};
+
+path	key56	{
+	DBSELECT	{
+		DECLARE tbl_jyurrk_key56_csr CURSOR FOR
+		SELECT a.*
+                FROM tbl_jyurrk a,tbl_ptnum b
+			WHERE a.HOSPNUM      =   :HOSPNUM
+			AND   a.NYUGAIKBN    =   :NYUGAIKBN
+			AND   a.SRYKA        =   :SRYKA
+			AND   a.SRYYMD     like :SRYYMD
+			AND   a.HKNCOMBINUM  <>  '9999'
+			AND   a.EDANUM      =   1
+	        	AND   a.HOSPNUM     =  b.HOSPNUM
+	        	AND   a.PTID        =  b.PTID
+			ORDER   BY        b.PTNUM,
+			                  a.SRYYMD,
+			                  a.DENPNUM
+		;
+	};
+};
+
+
