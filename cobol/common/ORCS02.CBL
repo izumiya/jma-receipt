@@ -5626,9 +5626,9 @@
                    END-IF
                END-IF
       *
-               IF  ( WK-1001-PREFNUM       =  35     )
-               AND ( COMB-KOH1HKNNUM       = "781"   )
-               AND ( LNK-SYU-SRYYMD(1:6)  >= "201309")
+               IF  ( WK-1001-PREFNUM       =  35 OR 34)
+               AND ( COMB-KOH1HKNNUM       = "781"    )
+               AND ( LNK-SYU-SRYYMD(1:6)  >= "201309" )
                    IF  MAX-KIN-KOHI1-M   =  ZERO
                       MOVE  99999999   TO   MAX-KIN-KOHI1-M
                       MOVE  "1"        TO   COMB-KOH1-NYUJGNKBN
@@ -5787,9 +5787,9 @@
                    END-IF
                END-IF
       *
-               IF  ( WK-1001-PREFNUM       =  35     )
-               AND ( COMB-KOH2HKNNUM       = "781"   )
-               AND ( LNK-SYU-SRYYMD(1:6)  >= "201309")
+               IF  ( WK-1001-PREFNUM       =  35 OR 34)
+               AND ( COMB-KOH2HKNNUM       = "781"    )
+               AND ( LNK-SYU-SRYYMD(1:6)  >= "201309" )
                    IF  MAX-KIN-KOHI2-M   =  ZERO
                       MOVE  99999999   TO   MAX-KIN-KOHI2-M
                       MOVE  "1"        TO   COMB-KOH2-NYUJGNKBN
@@ -5929,9 +5929,9 @@
                    END-IF
                END-IF
       *
-               IF  ( WK-1001-PREFNUM       =  35     )
-               AND ( COMB-KOH3HKNNUM       = "781"   )
-               AND ( LNK-SYU-SRYYMD(1:6)  >= "201309")
+               IF  ( WK-1001-PREFNUM       =  35 OR 34)
+               AND ( COMB-KOH3HKNNUM       = "781"    )
+               AND ( LNK-SYU-SRYYMD(1:6)  >= "201309" )
                    IF  MAX-KIN-KOHI3-M   =  ZERO
                       MOVE  99999999   TO   MAX-KIN-KOHI3-M
                       MOVE  "1"        TO   COMB-KOH3-NYUJGNKBN
@@ -6071,9 +6071,9 @@
                    END-IF
                END-IF
       *
-               IF  ( WK-1001-PREFNUM       =  35     )
-               AND ( COMB-KOH4HKNNUM       = "781"   )
-               AND ( LNK-SYU-SRYYMD(1:6)  >= "201309")
+               IF  ( WK-1001-PREFNUM       =  35 OR 34)
+               AND ( COMB-KOH4HKNNUM       = "781"    )
+               AND ( LNK-SYU-SRYYMD(1:6)  >= "201309" )
                    IF  MAX-KIN-KOHI4-M   =  ZERO
                       MOVE  99999999   TO   MAX-KIN-KOHI4-M
                       MOVE  "1"        TO   COMB-KOH4-NYUJGNKBN
@@ -10993,8 +10993,8 @@
              END-IF
            END-IF.
       *
-           IF   (WK-1001-PREFNUM       =  35     )
-           AND  (LNK-SYU-SRYYMD(1:6)  >= "201309")
+           IF   (WK-1001-PREFNUM       =  35 OR 34)
+           AND  (LNK-SYU-SRYYMD(1:6)  >= "201309" )
              IF   (SYU-KOH1HKNNUM  = "781")
              OR   (SYU-KOH2HKNNUM  = "781")
              OR   (SYU-KOH3HKNNUM  = "781")
@@ -21732,9 +21732,9 @@
                    MOVE     ZERO     TO    WK-NYUKFTNRATE
            END-IF.
       *
-           IF   (WK-1001-PREFNUM         =  35     )
-           AND  (COMB-KOHHKNNUM(KOH-IDX) = "781"   )
-           AND  (LNK-SYU-SRYYMD(1:6)    >= "201309")
+           IF   (WK-1001-PREFNUM         =  35 OR 34)
+           AND  (COMB-KOHHKNNUM(KOH-IDX) = "781"    )
+           AND  (LNK-SYU-SRYYMD(1:6)    >= "201309" )
                    MOVE     ZERO     TO    WK-NYUKFTNRATE
                    MOVE     SPACE    TO    FLG-CHIHOU(KOH-IDX)
            END-IF.
@@ -23038,7 +23038,7 @@
                END-IF
       *        ÆÃ¼ì·×»»
       *********¡Ê»³¸ý¸©¡Ë
-               IF  (WK-1001-PREFNUM             =  35           ) AND
+               IF  (WK-1001-PREFNUM             =  35 OR 34     ) AND
                    (LNK-SYU-KOH-HKNNUM(KOH-IDX) = "781"         ) AND
                    (LNK-SYU-SRYYMD(1:6)        >= "201309"      )
                   PERFORM   23083-JYOSEI-KOHI-SEC
@@ -28875,7 +28875,7 @@
       *
            END-IF
       *
-           IF  (WK-1001-PREFNUM             =  35      )
+           IF  (WK-1001-PREFNUM             =  35 OR 34)
            AND (LNK-SYU-SRYYMD(1:6)        >= "201309" )
            AND ((LNK-SYU-KOH1HKNNUM  =  "781") OR
                 (LNK-SYU-KOH2HKNNUM  =  "781") OR

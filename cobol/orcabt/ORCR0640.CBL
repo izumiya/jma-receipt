@@ -18212,6 +18212,7 @@
                       (RECE62-KOHFTNJANUM(KOHFTN-IDX)(1:7)
                                                        = "9032005") AND
                       (RECE62-SRYYM                   >=  "201007") AND
+                      (RECE62-SRYYM                   <=  "201309") AND
                       (RECE62-TEISYUTUSAKI             =   2 OR 6 ))
                   OR ((RECE62-KOHNUM(KOHFTN-IDX)           = "493") AND
                       (RECE62-KOHFTNJANUM(KOHFTN-IDX)(1:7)

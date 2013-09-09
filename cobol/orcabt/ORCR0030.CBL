@@ -17732,6 +17732,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       (RECE02-KOHFTNJANUM(KOHFTN-IDX)(1:7)
                                                        = "9032005") AND
                       (RECE02-SRYYM                   >=  "201007") AND
+                      (RECE02-SRYYM                   <=  "201309") AND
                       (RECE02-TEISYUTUSAKI             =   2 OR 6 ))
                   OR ((RECE02-KOHNUM(KOHFTN-IDX)           = "493") AND
                       (RECE02-KOHFTNJANUM(KOHFTN-IDX)(1:7)
