@@ -4191,7 +4191,8 @@
                       (RECE62-SRYYM         >=  "201107"   ))
                   OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE62-KOHNUM(KOHFTN-IDX) =  "393"  ) AND
-                      (RECE62-SRYYM         >=  "201007"   ))
+                      (RECE62-SRYYM         >=  "201007"   ) AND
+                      (RECE62-SRYYM         <=  "201309"   ))
                   OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE62-KOHNUM(KOHFTN-IDX) =  "493"  ) AND
                       (RECE62-SRYYM         >=  "201107"   ))
@@ -4223,7 +4224,17 @@
                   END-IF
                END-EVALUATE
              WHEN      "0"
-                    MOVE SPACE TO RECE62-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
+               MOVE SPACE TO RECE62-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
+               EVALUATE   WRK-PREFNUM
+                 WHEN     "32"
+                  IF ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
+                      (RECE62-KOHNUM(KOHFTN-IDX) =  "393"  ) AND
+                      (RECE62-SRYYM         >=  "201007"   ) AND
+                      (RECE62-SRYYM         <=  "201309"   ))
+                    MOVE "1" TO
+                          RECE62-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
+                  END-IF
+               END-EVALUATE
              WHEN      "1"
                EVALUATE  SYS-2010-FTNKEI-TAIKBN-N
                  WHEN        "0"
@@ -5367,9 +5378,6 @@
               IF ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
                   (RECE62-KOHNUM(KOHFTN-IDX) =  "790"  ) AND
                   (RECE62-SRYYM          <  "201107"   ))
-              OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
-                  (RECE62-KOHNUM(KOHFTN-IDX) =  "393"  ) AND
-                  (RECE62-SRYYM          <  "201007"   ))
               OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
                   (RECE62-KOHNUM(KOHFTN-IDX) =  "493"  ) AND
                   (RECE62-SRYYM          <  "201107"   ))

@@ -6435,7 +6435,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                       (RECE02-SRYYM         >=  "201107"   ))
                   OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE02-KOHNUM(KOHFTN-IDX) =  "393"  ) AND
-                      (RECE02-SRYYM         >=  "201007"   ))
+                      (RECE02-SRYYM         >=  "201007"   ) AND
+                      (RECE02-SRYYM         <=  "201309"   ))
                   OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE02-KOHNUM(KOHFTN-IDX) =  "493"  ) AND
                       (RECE02-SRYYM         >=  "201107"   ))
@@ -6467,7 +6468,17 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                   END-IF
                END-EVALUATE
              WHEN      "0"
-                    MOVE SPACE TO RECE02-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
+               MOVE SPACE TO RECE02-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
+               EVALUATE   SYS-1001-PREFNUM
+                 WHEN     "32"
+                  IF ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
+                      (RECE02-KOHNUM(KOHFTN-IDX) =  "393"  ) AND
+                      (RECE02-SRYYM         >=  "201007"   ) AND
+                      (RECE02-SRYYM         <=  "201309"   ))
+                    MOVE "1" TO
+                          RECE02-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
+                  END-IF
+               END-EVALUATE
              WHEN      "1"
                EVALUATE  SYS-2010-FTNKEI-TAIKBN-G
                  WHEN        "0"
@@ -7538,9 +7549,6 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
               IF ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
                   (RECE02-KOHNUM(KOHFTN-IDX) =  "790"  ) AND
                   (RECE02-SRYYM          <  "201107"   ))
-              OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
-                  (RECE02-KOHNUM(KOHFTN-IDX) =  "393"  ) AND
-                  (RECE02-SRYYM          <  "201007"   ))
               OR ((RECE02-TEISYUTUSAKI   =   2 OR 6    ) AND
                   (RECE02-KOHNUM(KOHFTN-IDX) =  "493"  ) AND
                   (RECE02-SRYYM          <  "201107"   ))
