@@ -91,6 +91,8 @@
       *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
       *  04.06.03    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.06.04    NACL-ÌçÏÆ    13/06/14  µßµÞ°åÎÅ´ÉÍý²Ã»»»»ÄêÈ½Äê½¤Àµ
+      *  04.06.05    NACL-ÌçÏÆ    13/09/09  ÅÀ¿ô¥Þ¥¹¥¿·îÅÓÃæ¶â³ÛÊÑ¹¹ÂÐ±þ
+      *                                     ¡Ê£°£¹£µ£¹£±¡Á£¹£´¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -198,6 +200,7 @@
            03  IDX2                                    PIC  9(02).
            03  IDX3                                    PIC  9(02).
            03  IDX4                                    PIC  9(02).
+           03  IDX8                                    PIC  9(02).
            03  SYSKAN-IDX                              PIC  9(03).
            03  IDX-ROU                                 PIC  9(02).
            03  IDX-ST                                  PIC  9(02).
@@ -266,6 +269,8 @@
                05  WRK-EDDD                            PIC  9(02).
       *
            03  WRK-HKNKBN                              PIC  X(01).
+      *
+           03  WRK-TAIHI-DAY                           PIC  9(02).
       *
       *    ¼êµ»ÅÀ¡¦ÌôºÞÅùÅÀ¿ôÍÑÎÎ°è
        01  TBL-TENSUG-JI.
@@ -1237,6 +1242,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21031-SHOSAISIN-HANTEI-SEC                 SECTION.
       *
+           PERFORM      2110-DAY-CHECK-SEC
+      *
            INITIALIZE                           SRYACT-REC
            MOVE    ACCT-HOSPNUM         TO      SRY-HOSPNUM
            MOVE    ACCT-NYUGAIKBN       TO      SRY-NYUGAIKBN
@@ -1419,6 +1426,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21033-GAIRAIXX-HANTEI-SEC                 SECTION.
       *
+           PERFORM      2110-DAY-CHECK-SEC
+      *
            INITIALIZE                           SRYACT-REC
            MOVE    ACCT-HOSPNUM         TO      SRY-HOSPNUM
            MOVE    ACCT-NYUGAIKBN       TO      SRY-NYUGAIKBN
@@ -1521,6 +1530,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        21035-ENDATE-HANTEI-SEC                 SECTION.
       *
+           PERFORM      2110-DAY-CHECK-SEC
+      *
            INITIALIZE                           SRYACT-REC
            MOVE    ACCT-HOSPNUM         TO      SRY-HOSPNUM
            MOVE    ACCT-NYUGAIKBN       TO      SRY-NYUGAIKBN
@@ -1604,6 +1615,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    ¼«ÇåÀÕ¤Î¿ÇÃÇ½ñÎÁ¡¦ÌÀºÙ½ñÎÁ¤Ç¤¢¤ë¤«¤ÎÈ½Äê
       *****************************************************************
        21036-SINDAN-HANTEI-SEC                 SECTION.
+      *
+           PERFORM      2110-DAY-CHECK-SEC
       *
            INITIALIZE                           SRYACT-REC
            MOVE    ACCT-HOSPNUM         TO      SRY-HOSPNUM
@@ -1734,6 +1747,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    ÆüÃ±°Ì¤Î¼êµ»ÅÀ¡¦ÌôºÞÅÀÅù¤ò¥»¥Ã¥È
       *****************************************************************
        21037-SYUGITEN-HANTEI-SEC                 SECTION.
+      *
+           PERFORM      2110-DAY-CHECK-SEC
       *
            INITIALIZE                           SRYACT-REC
            MOVE    ACCT-HOSPNUM         TO      SRY-HOSPNUM
@@ -2406,6 +2421,31 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    »»ÄêÆü¥Á¥§¥Ã¥¯
+      *****************************************************************
+       2110-DAY-CHECK-SEC              SECTION.
+      *
+           MOVE     ZERO           TO    WRK-TAIHI-DAY
+           IF      RECE41-HKNKBN   NOT  =   "3"
+             PERFORM   VARYING   IDX8   FROM    1    BY   1
+                        UNTIL    IDX8     >    31
+                IF   ACCT-DAY(1 IDX8)  NOT =   ZERO
+                  MOVE     IDX8    TO    WRK-TAIHI-DAY
+                  MOVE     31      TO    IDX8
+                END-IF
+             END-PERFORM
+           ELSE
+             MOVE     WRK-DAY      TO    WRK-TAIHI-DAY
+           END-IF
+           IF   WRK-TAIHI-DAY  =  ZERO
+             MOVE          01      TO    WRK-TAIHI-DAY
+           END-IF
+      *
+           .
+       2110-DAY-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ¥Ç¡¼¥¿½ÐÎÏ½èÍý
       *****************************************************************
        220-DATA-WRITE-SEC                SECTION.
@@ -2695,9 +2735,9 @@ grpsys     PERFORM 900-DBFETCH-SEC
 grpsys     MOVE    SRY-HOSPNUM          TO      TNS-HOSPNUM
            MOVE    SRY-SRYCD(IDY)       TO      TNS-SRYCD
            MOVE    ACCT-SRYYM           TO      TNS-YUKOSTYMD(1:6)
-           MOVE    "01"                 TO      TNS-YUKOSTYMD(7:2)
+           MOVE    WRK-TAIHI-DAY        TO      TNS-YUKOSTYMD(7:2)
            MOVE    ACCT-SRYYM           TO      TNS-YUKOEDYMD(1:6)
-           MOVE    "01"                 TO      TNS-YUKOEDYMD(7:2)
+           MOVE    WRK-TAIHI-DAY        TO      TNS-YUKOEDYMD(7:2)
            MOVE    TNS-TENSU-REC        TO      MCPDATA-REC
            MOVE    "tbl_tensu"          TO      MCP-TABLE
            MOVE    "key"                TO      MCP-PATHNAME

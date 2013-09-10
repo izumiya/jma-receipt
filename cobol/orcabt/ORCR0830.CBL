@@ -80,6 +80,8 @@
       *  04.06.03    NACL-ÌçÏÆ    13/06/12  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î
       *                                     ´Ç¸îÎÁ³äÁý²Ã»»ÂÐ±þ
       *  04.06.04    NACL-ÌçÏÆ    13/06/14  µßµÞ°åÎÅ´ÉÍý²Ã»»»»ÄêÈ½Äê½¤Àµ
+      *  04.06.05    NACL-ÌçÏÆ    13/09/09  ÅÀ¿ô¥Þ¥¹¥¿·îÅÓÃæ¶â³ÛÊÑ¹¹ÂÐ±þ
+      *                                     ¡Ê£°£¹£µ£¹£±¡Á£¹£´¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -150,6 +152,7 @@
            03  IDX2                                    PIC 9(03).
            03  IDX3                                    PIC 9(02).
            03  IDX4                                    PIC 9(02).
+           03  IDX8                                    PIC 9(02).
            03  IDY                                     PIC 9(03).
            03  IDY2                                    PIC 9(03).
            03  ID1                                     PIC 9(03).
@@ -251,6 +254,8 @@
            03  WRK-YKZTEN-TOTALTEN                     PIC  9(09).
       *
            03  WRK-FUTANWARI                           PIC  9V99.
+      *
+           03  WRK-TAIHI-DAY                           PIC  9(02).
       *
        01  WRK-TENTEK.
            03  WRK-TENTEK-SYUTEN                       PIC  9(07).
@@ -1710,6 +1715,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2602-ENDATE-HANTEI-SEC                 SECTION.
       *
+           PERFORM 290-DAY-CHECK-SEC
+      *
            PERFORM 800-ACCT-SETACT9-SEC
       *
            IF      MCP-RC               =       ZERO
@@ -1913,6 +1920,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2603-SINDAN-HANTEI-SEC                 SECTION.
       *
+           PERFORM 290-DAY-CHECK-SEC
+      *
            PERFORM 800-ACCT-SETACT9-SEC
       *
            IF      MCP-RC               =       ZERO
@@ -2041,6 +2050,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    ÆüÃ±°Ì¤Î¼êµ»ÅÀ¡¦ÌôºÞÅÀÅù¤ò¥»¥Ã¥È
       *****************************************************************
        2604-SYUGITEN-HANTEI-SEC                 SECTION.
+      *
+           PERFORM 290-DAY-CHECK-SEC
       *
            PERFORM 800-ACCT-SETACT9-SEC
       *
@@ -2684,6 +2695,27 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    »»ÄêÆü¥Á¥§¥Ã¥¯
+      *****************************************************************
+       290-DAY-CHECK-SEC              SECTION.
+      *
+           MOVE     ZERO         TO    WRK-TAIHI-DAY
+           PERFORM   VARYING   IDX8   FROM    1    BY   1
+                      UNTIL    IDX8     >    31
+              IF   ACCT-DAY(1 IDX8)  NOT =   ZERO
+                MOVE     IDX8    TO    WRK-TAIHI-DAY
+                MOVE     31      TO    IDX8
+              END-IF
+           END-PERFORM
+           IF   WRK-TAIHI-DAY  =  ZERO
+              MOVE       01      TO    WRK-TAIHI-DAY
+           END-IF
+      *
+           .
+       290-DAY-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ½ªÎ»½èÍý
       *****************************************************************
        300-TERM-SEC                SECTION.
@@ -2969,9 +3001,9 @@ grpsys     PERFORM 900-DBFETCH-SEC
 grpsys     MOVE    SRY-HOSPNUM            TO   TNS-HOSPNUM
            MOVE    SRY-SRYCD(SRYACT-IDX)  TO   TNS-SRYCD
            MOVE    ACCT-SRYYM             TO   TNS-YUKOSTYMD(1:6)
-           MOVE    "01"                   TO   TNS-YUKOSTYMD(7:2)
+           MOVE    WRK-TAIHI-DAY          TO   TNS-YUKOSTYMD(7:2)
            MOVE    ACCT-SRYYM             TO   TNS-YUKOEDYMD(1:6)
-           MOVE    "01"                   TO   TNS-YUKOEDYMD(7:2)
+           MOVE    WRK-TAIHI-DAY          TO   TNS-YUKOEDYMD(7:2)
       *
            MOVE    TNS-TENSU-REC          TO   MCPDATA-REC
       *
