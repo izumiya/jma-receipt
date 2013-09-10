@@ -143,6 +143,8 @@
       *                                     ´Ç¸îÎÁ³äÁý²Ã»»ÂÐ±þ
       *  04.06.05    NACL-ÌçÏÆ    13/07/04  ·îËö¤ËÆ±ÆüºÆÆþ±¡¤·¤¿¾ì¹ç¡¢¤«¤Ä¡¢
       *                                     Äê´üÀÁµá»þ¤Î·×»»½¤Àµ
+      *  04.06.06    NACL-ÌçÏÆ    13/09/09  ÅÀ¿ô¥Þ¥¹¥¿·îÅÓÃæ¶â³ÛÊÑ¹¹ÂÐ±þ
+      *                                     ¡Ê£°£¹£µ£¹£±¡Á£¹£´¡Ë
       *
       *  04.07.01    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
       *****************************************************************
@@ -188,6 +190,7 @@
            03  WRK-HKNJANUM                PIC X(08).
            03  WRK-YUSENYMD                PIC X(08).
            03  WRK-FUTANWARI               PIC 9V99.
+           03  WRK-TAIHI-DAY               PIC 9(02).
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -461,6 +464,7 @@
            03  IDX5                        PIC 9(02).
            03  IDX6                        PIC 9(02).
            03  IDX7                        PIC 9(02).
+           03  IDX8                        PIC 9(02).
            03  SYU-IDX                     PIC 9(02).
            03  NYUINACT-IDX                PIC 9(02).
            03  RMSAGAKU-IDX                PIC 9(02).
@@ -5982,6 +5986,18 @@ grpsys                            SPA-AREA
                 END-IF
              END-IF
       *
+             MOVE          ZERO    TO      WRK-TAIHI-DAY
+             PERFORM   VARYING   IDX8   FROM    1    BY   1
+                        UNTIL    IDX8     >    31
+                IF   ACCT-DAY(1 IDX8)  NOT =   ZERO
+                  MOVE     IDX8    TO      WRK-TAIHI-DAY
+                  MOVE     31      TO      IDX8
+                END-IF
+             END-PERFORM
+             IF   WRK-TAIHI-DAY  =  ZERO
+                MOVE       01      TO      WRK-TAIHI-DAY
+             END-IF
+      *
              INITIALIZE                      SRYACT-REC
              MOVE    ACCT-HOSPNUM        TO   SRY-HOSPNUM
              MOVE    ACCT-NYUGAIKBN     TO   SRY-NYUGAIKBN
@@ -6012,7 +6028,7 @@ grpsys                              SPA-AREA
                     MOVE    SRY-SRYCD(IDZ)    TO   TNS-SRYCD
                     MOVE     SYU-SRYYMD(1:6)  TO   TNS-YUKOSTYMD
                                                    TNS-YUKOEDYMD
-                    MOVE     "01"             TO   TNS-YUKOSTYMD(7:2)
+                    MOVE     WRK-TAIHI-DAY    TO   TNS-YUKOSTYMD(7:2)
                                                    TNS-YUKOEDYMD(7:2)
                     PERFORM    TENSU-READ-SEC
       *
