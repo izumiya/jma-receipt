@@ -1,0 +1,80 @@
+C06	{
+	fixed6	{
+		scrolledwindow28	{
+			SETCDLST	{
+				count	int;
+				row	int;
+				rowattr int;
+				item	{
+					value0	varchar(3);
+					value1	varchar(10);
+					value2	varchar(40);
+				}	[100];
+				select	bool[100];
+			};
+		};
+		SELNUM	{
+			value	number(3);
+		};
+		SETCD	{
+			value	varchar(10);
+		};
+		SETNAME	{
+			value	varchar(40);
+		};
+		INPUTCD1	{
+			value	varchar(10);
+		};
+		INPUTCD2	{
+			value	varchar(10);
+		};
+		INPUTCD3	{
+			value	varchar(10);
+		};
+		INPUTCD4	{
+			value	varchar(10);
+		};
+		INPUTCD5	{
+			value	varchar(10);
+		};
+		INPUTCD6	{
+			value	varchar(10);
+		};
+		BYOMEITOP1  {
+			value   varchar(2);
+		};
+		BYOMEITOP2  {
+			value   varchar(2);
+		};
+		BYOMEITOP3  {
+			value   varchar(2);
+		};
+		BYOMEITOP4  {
+			value   varchar(2);
+		};
+		BYOMEITOP5  {
+			value   varchar(2);
+		};
+		BYOMEITOP6  {
+			value   varchar(2);
+		};
+		BYOMEI1	{
+			value	varchar(80);
+		};
+		BYOMEI2	{
+			value	varchar(80);
+		};
+		BYOMEI3	{
+			value	varchar(80);
+		};
+		BYOMEI4	{
+			value	varchar(80);
+		};
+		BYOMEI5	{
+			value	varchar(80);
+		};
+		BYOMEI6	{
+			value	varchar(80);
+		};
+	};
+};

@@ -55,6 +55,7 @@
                   05  C04-BYOMEILST-ROWATTR PIC S9(9)   BINARY.
                   05  C04-ITEM        OCCURS  700 TIMES.
                     06  C04-TBANGO          PIC X(5).
+                    06  C04-TMARK           PIC X(02).
                     06  C04-TBYOMEIINPUTCD  PIC X(10).
                     06  C04-TBYOMEI         PIC X(80).
                   05  C04-BYOMEILST-SELECT  PIC X   OCCURS  100 TIMES.

@@ -179,4 +179,5 @@ db	{
         tbl_mnote_h;
         tbl_mnote_b;
         tbl_ptconf;
+        tbl_byomeiinputset;
 };

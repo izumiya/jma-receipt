@@ -121,6 +121,7 @@
       *                                     組み立てへの移行を可能にする
       *  04.07.02    NACL-藤原    13/06/20  廃止病名警告表示の条件変更
       *  04.07.03    NACL-藤原    13/07/05  病名の複数自院病名登録対応
+      *  04.07.04    NACL-藤原    13/07/30  自院病名のセット登録対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -163,6 +164,7 @@
            03  FLG-USERBYOMEI      PIC 9(01).
            03  FLG-SYNONYM         PIC 9(01).
            03  FLG-JOBEND          PIC 9(01).
+           03  FLG-BYOMEIINPUTSET  PIC 9(01).
       *
            03  FLG-ROW             PIC 9(01).
            03  FLG-MANSEI          PIC 9(01).
@@ -319,6 +321,10 @@
        01  SYNONYM-REC.
            COPY    "CPSYNONYM.INC".
       *
+      *    病名入力セット
+       01  BYOMEIINPUTSET-REC.
+           COPY    "CPBYOMEIINPUTSET.INC".
+      *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
@@ -365,6 +371,7 @@
            COPY    "C03.INC".
            COPY    "C04.INC".
            COPY    "C05.INC".
+           COPY    "C06.INC".
            COPY    "C09.INC".
            COPY    "C10.INC".
            COPY    "C11.INC".
@@ -519,6 +526,10 @@
                WHEN    SPA-MOTOPG(1:4)  =  "CID3"
                    PERFORM 350-CID3-SET-SEC
                    GO  TO  300-SCREEN-EXT
+      *            確認画面４より
+               WHEN    SPA-MOTOPG(1:4)  =  "CID4"
+                   PERFORM 360-CID4-SET-SEC
+                   GO  TO  300-SCREEN-EXT
       *            確認画面５より
                WHEN    SPA-MOTOPG(1:4)  =  "CID5"
                    PERFORM 360-CID5-SET-SEC
@@ -548,117 +559,6 @@
                        MOVE    "JOIN"              TO  MCP-PUTTYPE
                        PERFORM 210-BACK
                    END-IF
-               WHEN    "0103"
-      *            分類名の削除の確認
-                   IF      SPA-CID1-FLG        =   "OK"
-                       INITIALIZE                  USBYO-KEY
-                       MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
-                       MOVE    SPA-GMN-C03-BUNRUICD    TO
-                                                   USBYO-BYOMEIINPUTCD
-                       MOVE    USERBYOMEI-REC      TO  MCPDATA-REC
-                       MOVE    "DBDELETE"          TO  MCP-FUNC
-                       MOVE    "tbl_userbyomei"    TO  MCP-TABLE
-                       MOVE    "del1"              TO  MCP-PATHNAME
-                       CALL    "ORCDBMAIN"         USING
-                                                       MCPAREA
-                                                       MCPDATA-REC
-                                                       SPA-AREA
-                       IF      MCP-RC          NOT =   ZERO 
-                           MOVE    "1002"              TO  SPA-ERRCD
-                           DISPLAY "USERBYOMEI-KEY =>" USBYO-KEY 
-                           GO  TO  330-CID1-SET-EXT
-                       END-IF
-      *                分類一覧
-                       INITIALIZE              SPA-GMN-C03-BUNRUICD-TBL
-                                               SPA-NAI-C03-BUNRUI-SELNO
-                       PERFORM 3102-BUNRUI-LST-SEC
-      *                自院病名一覧
-                       INITIALIZE              SPA-GMN-C03-BYOMEI-TBL
-                                               SPA-NAI-C03-TBL
-                                               SPA-GMN-C03-KOUMOKU
-                                               SPA-NAI-C03-KOUMOKU
-                                               SPA-NAI-C03-SELNO
-                       MOVE    ZERO                TO  SPA-GMN-C03-MAX
-                       MOVE    "tbl_userbyomei"    TO  WRK-MCP-TABLE
-                       MOVE    "key3"              TO  WRK-MCP-PATHNAME
-                       INITIALIZE                  USERBYOMEI-REC
-      *****************MOVE    SPA-HOSPID          TO  USBYO-HOSPID
-                       PERFORM 3101-USERBYOMEI-LST-SEC
-                   END-IF
-               WHEN    "0104"
-      *            自院病名の削除の確認
-                   IF      SPA-CID1-FLG        =   "OK"
-                       INITIALIZE                  USBYO-KEY
-      *****************MOVE    SPA-HOSPID          TO  USBYO-HOSPID
-                       MOVE    SPA-NAI-C03-CDSYU         (1)
-                                                   TO  USBYO-CDSYU
-                       MOVE    SPA-GMN-C03-BYOMEIINPUTCD (1)
-                                               TO  USBYO-BYOMEIINPUTCD 
-                       MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
-                       MOVE    USERBYOMEI-REC      TO  MCPDATA-REC
-                       MOVE    "DBDELETE"          TO  MCP-FUNC
-                       MOVE    "tbl_userbyomei"    TO  MCP-TABLE
-                       MOVE    "key"               TO  MCP-PATHNAME
-                       CALL    "ORCDBMAIN"         USING
-                                                       MCPAREA
-                                                       MCPDATA-REC
-                                                       SPA-AREA
-                       IF      MCP-RC      NOT =   ZERO 
-                           MOVE    "1002"          TO  SPA-ERRCD
-                           DISPLAY "USERBYOMEI-KEY =>" USBYO-KEY 
-                           GO  TO  330-CID1-SET-EXT
-                       END-IF
-      *                自院病名一覧
-                       INITIALIZE              SPA-GMN-C03-BYOMEI-TBL
-                                               SPA-NAI-C03-TBL
-                                               SPA-GMN-C03-KOUMOKU
-                                               SPA-NAI-C03-KOUMOKU
-                                               SPA-NAI-C03-SELNO
-                       MOVE    ZERO            TO  SPA-GMN-C03-MAX
-                       INITIALIZE              USERBYOMEI-REC
-      *****************MOVE    SPA-HOSPID          TO  USBYO-HOSPID
-                       IF      SPA-NAI-C03-BUNRUI-SELNO    >   ZERO
-                           MOVE
-                               SPA-GMN-C03-BBUNRUICD
-                                           (SPA-NAI-C03-BUNRUI-SELNO)
-                                                       TO
-                                                       USBYO-BUNRUICD
-                           MOVE    "tbl_userbyomei"    TO
-                                                       WRK-MCP-TABLE
-                           MOVE    "key7"              TO
-                                                       WRK-MCP-PATHNAME
-                       ELSE
-                           MOVE    "tbl_userbyomei"    TO
-                                                       WRK-MCP-TABLE
-                           MOVE    "key3"              TO
-                                                       WRK-MCP-PATHNAME
-                       END-IF
-                       PERFORM 3101-USERBYOMEI-LST-SEC
-                       IF    ( SPA-GMN-C03-MAX         =   ZERO )
-                       AND   ( SPA-GMN-C03-PAGE        >   1    )
-                           COMPUTE SPA-GMN-C03-PAGE
-                                                   =   SPA-GMN-C03-PAGE
-                                                   -   1
-                           INITIALIZE                  USERBYOMEI-REC
-      *********************MOVE    SPA-HOSPID          TO  USBYO-HOSPID
-                           IF      SPA-NAI-C03-BUNRUI-SELNO    >   ZERO
-                               MOVE    SPA-GMN-C03-BBUNRUICD 
-                                           (SPA-NAI-C03-BUNRUI-SELNO)
-                                                           TO
-                                                       USBYO-BUNRUICD
-                               MOVE    "tbl_userbyomei"    TO
-                                                       WRK-MCP-TABLE
-                               MOVE    "key7"              TO
-                                                       WRK-MCP-PATHNAME
-                           ELSE
-                               MOVE    "tbl_userbyomei"    TO
-                                                       WRK-MCP-TABLE
-                               MOVE    "key3"              TO
-                                                       WRK-MCP-PATHNAME
-                           END-IF
-                           PERFORM 3101-USERBYOMEI-LST-SEC
-                       END-IF
-                   END-IF    
                WHEN    "0105"
                WHEN    "0106"
       *            慢性と急性の混在または分類名警告時の更新の確認
@@ -844,6 +744,136 @@
                                        SPA-C03-HAISI-AREA
            .
        350-CID3-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *     確認画面４よりの処理
+      *****************************************************************
+       360-CID4-SET-SEC            SECTION.
+      *
+           EVALUATE    SPA-CIDCD4
+               WHEN    "0103"
+      *            分類名の削除の確認
+                   IF      SPA-CID4-FLG        =   "OK"
+                       INITIALIZE                  USBYO-KEY
+                       MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
+                       MOVE    SPA-GMN-C03-BUNRUICD    TO
+                                                   USBYO-BYOMEIINPUTCD
+                       MOVE    USERBYOMEI-REC      TO  MCPDATA-REC
+                       MOVE    "DBDELETE"          TO  MCP-FUNC
+                       MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+                       MOVE    "del1"              TO  MCP-PATHNAME
+                       CALL    "ORCDBMAIN"         USING
+                                                       MCPAREA
+                                                       MCPDATA-REC
+                                                       SPA-AREA
+                       IF      MCP-RC          NOT =   ZERO 
+                           MOVE    "1002"              TO  SPA-ERRCD
+                           DISPLAY "USERBYOMEI-KEY =>" USBYO-KEY 
+                           GO  TO  360-CID4-SET-EXT
+                       END-IF
+      *                分類一覧
+                       INITIALIZE              SPA-GMN-C03-BUNRUICD-TBL
+                                               SPA-NAI-C03-BUNRUI-SELNO
+                       PERFORM 3102-BUNRUI-LST-SEC
+      *                自院病名一覧
+                       INITIALIZE              SPA-GMN-C03-BYOMEI-TBL
+                                               SPA-NAI-C03-TBL
+                                               SPA-GMN-C03-KOUMOKU
+                                               SPA-NAI-C03-KOUMOKU
+                                               SPA-NAI-C03-SELNO
+                       MOVE    ZERO                TO  SPA-GMN-C03-MAX
+                       MOVE    "tbl_userbyomei"    TO  WRK-MCP-TABLE
+                       MOVE    "key3"              TO  WRK-MCP-PATHNAME
+                       INITIALIZE                  USERBYOMEI-REC
+      *****************MOVE    SPA-HOSPID          TO  USBYO-HOSPID
+                       PERFORM 3101-USERBYOMEI-LST-SEC
+                   END-IF
+               WHEN    "0104"
+      *            自院病名の削除の確認
+                   IF      SPA-CID4-FLG        =   "OK"
+                       INITIALIZE                  USBYO-KEY
+      *****************MOVE    SPA-HOSPID          TO  USBYO-HOSPID
+                       MOVE    SPA-NAI-C03-CDSYU         (1)
+                                                   TO  USBYO-CDSYU
+                       MOVE    SPA-GMN-C03-BYOMEIINPUTCD (1)
+                                               TO  USBYO-BYOMEIINPUTCD 
+                       MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
+                       MOVE    USERBYOMEI-REC      TO  MCPDATA-REC
+                       MOVE    "DBDELETE"          TO  MCP-FUNC
+                       MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+                       MOVE    "key"               TO  MCP-PATHNAME
+                       CALL    "ORCDBMAIN"         USING
+                                                       MCPAREA
+                                                       MCPDATA-REC
+                                                       SPA-AREA
+                       IF      MCP-RC      NOT =   ZERO 
+                           MOVE    "1002"          TO  SPA-ERRCD
+                           DISPLAY "USERBYOMEI-KEY =>" USBYO-KEY 
+                           GO  TO  360-CID4-SET-EXT
+                       END-IF
+      *                自院病名一覧
+                       INITIALIZE              SPA-GMN-C03-BYOMEI-TBL
+                                               SPA-NAI-C03-TBL
+                                               SPA-GMN-C03-KOUMOKU
+                                               SPA-NAI-C03-KOUMOKU
+                                               SPA-NAI-C03-SELNO
+                       MOVE    ZERO            TO  SPA-GMN-C03-MAX
+                       INITIALIZE              USERBYOMEI-REC
+      *****************MOVE    SPA-HOSPID          TO  USBYO-HOSPID
+                       IF      SPA-NAI-C03-BUNRUI-SELNO    >   ZERO
+                           MOVE
+                               SPA-GMN-C03-BBUNRUICD
+                                           (SPA-NAI-C03-BUNRUI-SELNO)
+                                                       TO
+                                                       USBYO-BUNRUICD
+                           MOVE    "tbl_userbyomei"    TO
+                                                       WRK-MCP-TABLE
+                           MOVE    "key7"              TO
+                                                       WRK-MCP-PATHNAME
+                       ELSE
+                           MOVE    "tbl_userbyomei"    TO
+                                                       WRK-MCP-TABLE
+                           MOVE    "key3"              TO
+                                                       WRK-MCP-PATHNAME
+                       END-IF
+                       PERFORM 3101-USERBYOMEI-LST-SEC
+                       IF    ( SPA-GMN-C03-MAX         =   ZERO )
+                       AND   ( SPA-GMN-C03-PAGE        >   1    )
+                           COMPUTE SPA-GMN-C03-PAGE
+                                                   =   SPA-GMN-C03-PAGE
+                                                   -   1
+                           INITIALIZE                  USERBYOMEI-REC
+      *********************MOVE    SPA-HOSPID          TO  USBYO-HOSPID
+                           IF      SPA-NAI-C03-BUNRUI-SELNO    >   ZERO
+                               MOVE    SPA-GMN-C03-BBUNRUICD 
+                                           (SPA-NAI-C03-BUNRUI-SELNO)
+                                                           TO
+                                                       USBYO-BUNRUICD
+                               MOVE    "tbl_userbyomei"    TO
+                                                       WRK-MCP-TABLE
+                               MOVE    "key7"              TO
+                                                       WRK-MCP-PATHNAME
+                           ELSE
+                               MOVE    "tbl_userbyomei"    TO
+                                                       WRK-MCP-TABLE
+                               MOVE    "key3"              TO
+                                                       WRK-MCP-PATHNAME
+                           END-IF
+                           PERFORM 3101-USERBYOMEI-LST-SEC
+                       END-IF
+                   END-IF
+           END-EVALUATE
+      *     
+           MOVE    1               TO  SPA-GMN-C03-CUR
+      *
+           INITIALIZE                  SPA-CIDCD-AREA
+                                       SPA-CID1-AREA
+           INITIALIZE                  SPA-C03-IKOSAKI-AREA
+                                       SPA-C03-CHANGE-AREA
+                                       SPA-C03-HAISI-AREA
+           .
+       360-CID4-SET-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2160,6 +2190,21 @@
                    END-IF
                END-IF    
            END-IF
+      *
+           IF      SPA-NAI-C03-BYOMEIINPUTCD-ERRCD(IDYY)
+                                   =   SPACE
+      *        病名入力セット検索
+               INITIALIZE                      BYOMEIINPUTSET-REC
+               MOVE    SPA-HOSPNUM         TO  BYOSET-HOSPNUM
+               MOVE    SPA-GMN-C03-BYOMEIINPUTCD (IDYY)
+                                           TO   BYOSET-BYOMEIINPUTSET
+               MOVE    BYOMEIINPUTSET-REC  TO  MCPDATA-REC
+               PERFORM 900-BYOMEIINPUTSET-READ-SEC
+               IF      FLG-BYOMEIINPUTSET  =   ZERO
+                   MOVE    "0031"              TO
+                                   SPA-NAI-C03-BYOMEIINPUTCD-ERRCD(IDYY)
+               END-IF
+           END-IF 
       *
            IF      SPA-NAI-C03-BYOMEIINPUTCD-ERRCD(IDYY)
                                 NOT =   SPACE     
@@ -4043,7 +4088,7 @@ grpsys                                         SPA-AREA
                IF      SPA-GMN-C03-MAX         >  ZERO
                    MOVE    "0101"              TO  SPA-CIDCD3
                ELSE
-                   MOVE    "0103"              TO  SPA-CIDCD
+                   MOVE    "0103"              TO  SPA-CIDCD4
                END-IF
                GO  TO  480-SAKUJYO-EXT
            END-IF
@@ -4051,7 +4096,7 @@ grpsys                                         SPA-AREA
            IF      SPA-NAI-C03-UPDFLG      =   ZERO
                MOVE    "0004"              TO  SPA-ERRCD
            ELSE
-               MOVE    "0104"              TO  SPA-CIDCD
+               MOVE    "0104"              TO  SPA-CIDCD4
            END-IF
       *
           .
@@ -5120,6 +5165,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
                GO      TO      500-SET-SCREEN-EXT
            END-IF
       *
+           IF      SPA-CIDCD4      NOT =   SPACE
+               PERFORM 540-CIDSET4-SEC
+               GO      TO      500-SET-SCREEN-EXT
+           END-IF
+      *
            IF      SPA-CIDCD5      NOT =   SPACE
                PERFORM 550-CIDSET5-SEC
                GO      TO      500-SET-SCREEN-EXT
@@ -5183,6 +5233,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
                ELSE
                    MOVE    "F"         TO  C03-BYOMEILST-SELECT (IDX)
                END-IF
+      *
            END-PERFORM
            MOVE    SPA-GMN-C03-MAX         TO  C03-BYOMEILST-COUNT
            MOVE    ZERO                TO  C03-BYOMEILST-ROW
@@ -5434,9 +5485,12 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
                       "先頭の文字が入力できない文字です"
                                                        TO  SPA-ERRMSG
                WHEN    "0031"
-                   MOVE
-                   "病名マスタ又は予約病名コードに存在するコードです"
-                                                       TO  SPA-ERRMSG
+                   STRING   "病名マスタ、病名セットコード"
+                                               DELIMITED   BY  SIZE
+                            "又は予約病名コードに存在するコードです"
+                                               DELIMITED   BY  SIZE 
+                                               INTO        SPA-ERRMSG
+                   END-STRING
                WHEN    "0032"
                    MOVE
                        "登録できない入力コードです"    TO  SPA-ERRMSG
@@ -5738,6 +5792,40 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
       *
            .
        540-CIDSET3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    確認画面４表示処理
+      *****************************************************************
+       540-CIDSET4-SEC              SECTION.
+      *
+           MOVE    SPACE               TO  SPA-CID4-FLG
+      *
+           MOVE    SPACE               TO  CID4
+           MOVE    SPA-CIDCD4          TO  CID4-ID1CODE
+           EVALUATE    SPA-CIDCD4
+               WHEN    "0103"
+                   MOVE    "分類名を削除します。よろしいですか？"
+                                       TO  CID4-ID1MSG
+               WHEN    "0104"
+                   MOVE    "自院病名を削除します。よろしいですか？"
+                                       TO  CID4-ID1MSG
+           END-EVALUATE
+      *
+           MOVE    "B01"               TO  MCP-WIDGET
+      *
+           MOVE    "C03"               TO  SPA-MOTOPG
+           MOVE    "CID4"              TO  SPA-SAKIPG
+      *
+           MOVE    "NEW"               TO  MCP-PUTTYPE
+           MOVE    "CID4"              TO  MCP-WINDOW
+      *
+           PERFORM 900-PUT-WINDOW
+      *
+           MOVE    1                   TO  FLG-END
+      *
+           .
+       540-CIDSET4-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6193,6 +6281,41 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG3
       *
            .
        900-SYNONYM-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    病名入力セット読込
+      *****************************************************************
+       900-BYOMEIINPUTSET-READ-SEC     SECTION.
+      *
+           MOVE    "tbl_byomeiinputset"
+                                       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_byomeiinputset"
+                                           TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  BYOMEIINPUTSET-REC
+                   MOVE    ZERO                TO  FLG-BYOMEIINPUTSET
+               ELSE
+                   INITIALIZE                      BYOMEIINPUTSET-REC
+                   MOVE    1                   TO  FLG-BYOMEIINPUTSET
+               END-IF
+           ELSE
+               INITIALIZE                      BYOMEIINPUTSET-REC
+               MOVE    1                   TO  FLG-BYOMEIINPUTSET
+           END-IF
+      *
+           MOVE    "tbl_byomeiinputset"
+                                       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-BYOMEIINPUTSET-READ-EXT.
            EXIT.
       *
       *****************************************************************

@@ -85,6 +85,7 @@ C04	{
 				rowattr	int;
 				item	{
 					value1	varchar(5);
+					value2	varchar(2);
 					value3	varchar(10);
 					value4	varchar(80);
 				}	[700];

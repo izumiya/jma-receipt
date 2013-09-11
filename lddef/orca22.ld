@@ -8,6 +8,7 @@ bind	"C02"		"OpenCOBOL"	"ORCGC02";
 bind	"C03"		"OpenCOBOL"	"ORCGC03";
 bind	"C04"		"OpenCOBOL"	"ORCGC04";
 bind	"C05"		"OpenCOBOL"	"ORCGC05";
+bind	"C06"		"OpenCOBOL"	"ORCGC06";
 bind	"C09"		"OpenCOBOL"	"ORCGC09";
 bind	"C10"		"OpenCOBOL"	"ORCGC10";
 bind	"C11"		"OpenCOBOL"	"ORCGC11";
@@ -31,6 +32,7 @@ data	{
 		C03;
 		C04;
 		C05;
+		C06;
 		C09;
 		C10;
 		C11;
@@ -48,6 +50,7 @@ data	{
 
 db	{
 	tbl_byomei;
+	tbl_byomeiinputset;
 	tbl_example;
 	tbl_hkncombi;
 	tbl_hknnum;

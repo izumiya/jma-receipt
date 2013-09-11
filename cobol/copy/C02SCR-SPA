@@ -109,6 +109,7 @@
       *  04.07.01    NACL-藤原    11/06/10  未コード化病名となる病名の別
       *                                     組み立てへの移行を可能にする
       *  04.07.02    NACL-藤原    13/07/05  病名の複数自院病名登録対応
+      *  04.07.03    NACL-藤原    13/07/30  自院病名のセット登録対応
       *****************************************************************
       *
        01  SPA-C02FREE.
@@ -499,6 +500,18 @@
                                                        OCCURS  21.  
                            11  SPA-C02-CHANGE-BYOMEI   PIC X(200)
                                                        OCCURS  21.  
+      *
+      *            セットコード退避領域
+                       09  SPA-C02-BYOSET-INDEX-AREA.
+                           11  SPA-C02-BYOSET-INDEX-ST PIC 9(02).  
+                           11  SPA-C02-BYOSET-INDEX-ED PIC 9(02).  
+                       09  SPA-C02-BYOMEIINPUTSET-AREA.
+                           11  SPA-C02-BYOSET-INDEX-MAX
+                                                       PIC 9(02).  
+                           11  SPA-C02-BYOSET-BYOMEIINPUTCD-G.
+                               13  SPA-C02-BYOSET-BYOMEIINPUTCD
+                                                       PIC X(20)
+                                                       OCCURS  6.
                05  SPA-C02-MOTOPG             PIC X(08).
       *
       *              
@@ -730,7 +743,8 @@
       *
                05  SPA-NAIB-C04-AREA.
                    07  SPA-NAI-C04-BUNRUICD-IDX    PIC 9(05).
-                   07  SPA-NAI-C04-BYOMEI-OCC  OCCURS  6.
+                   07  SPA-NAI-C04-BYOMEI-AREA.
+                     08  SPA-NAI-C04-BYOMEI-OCC  OCCURS  6.
                        09  SPA-NAI-C04-BYOMEICD    PIC X(10).
                        09  SPA-NAI-C04-BYOMEITOP   PIC X(01).
                        09  SPA-NAI-C04-BYOMEISBT   PIC X(01).
@@ -752,6 +766,8 @@
                    07  SPA-NAI-C04-BYOMEI-TBL.
                        09  SPA-NAI-C04-TBLO        OCCURS   100.
                            11  SPA-NAI-C04-TBYOMEISBT  PIC X(01).
+                           11  SPA-NAI-C04-TBYOMEIINPUTSET
+                                                       PIC X(01).
       *            病名コード移行用領域
                    07  SPA-C04-IKOSAKI-AREA.
                        09  SPA-C04-IKOSAKI-BYOMEICD
@@ -776,6 +792,18 @@
                                                    OCCURS  21.  
                        09  SPA-C04-CHANGE-BYOMEI   PIC X(200)
                                                    OCCURS  21.  
+      *
+      *            セットコード退避領域
+                   07  SPA-C04-BYOSET-INDEX-AREA.
+                       09  SPA-C04-BYOSET-INDEX-ST PIC 9(02).  
+                       09  SPA-C04-BYOSET-INDEX-ED PIC 9(02).  
+                   07  SPA-C04-BYOMEIINPUTSET-AREA.
+                       09  SPA-C04-BYOSET-INDEX-MAX
+                                                   PIC 9(02).  
+                       09  SPA-C04-BYOSET-BYOMEIINPUTCD-G.
+                           11  SPA-C04-BYOSET-BYOMEIINPUTCD
+                                                   PIC X(20)
+                                                   OCCURS  6.
       *            検索対象
                    07  SPA-NAI-C04-B10-WIDGET      PIC X(10).
       *            病名コード移行用領域
@@ -839,6 +867,54 @@
       *
                    07  SPA-NAI-C05-SELNO1              PIC 9(04).                             
                    07  SPA-NAI-C05-SELNO2              PIC 9(02).                             
+      *
+      *    病名セット登録画面
+           03  SPA-C06.
+               05  SPA-GMN-C06-MAX         PIC 9(04).
+               05  SPA-GMN-C06-CUR         PIC 9(02).
+               05  SPA-GMN-C06-PAGE        PIC 9(02).
+               05  SPA-GMN-C06-NEXT        PIC 9(01).
+               05  SPA-GMN-C06-AREA.
+                   07  SPA-GMN-C06-SETCD-TBL.
+                       09  SPA-GMN-C06-TBL         OCCURS   100.
+                           11  SPA-GMN-C06-TSELNUM PIC 9(03).
+                           11  SPA-GMN-C06-TBYOMEIINPUTSET
+                                                   PIC X(10).
+                           11  SPA-GMN-C06-TBYOMEIINPUTSETNAME
+                                                   PIC X(40).
+      *                 
+                   07  SPA-GMN-C06-KOUMOKU.
+                       09  SPA-GMN-C06-SELNUM      PIC 9(03).
+                       09  SPA-GMN-C06-BYOMEIINPUTSET
+                                                   PIC X(10).
+                       09  SPA-GMN-C06-BYOMEIINPUTSETNAME
+                                                   PIC X(40).
+                       09  SPA-GMN-C06-INPUTCD-G.
+                           11  SPA-GMN-C06-BYOMEI-OCC  OCCURS  6.
+                               13  SPA-GMN-C06-INPUTCD
+                                                   PIC X(10).
+                               13  SPA-GMN-C06-BYOMEI
+                                                   PIC X(80).
+      *
+               05  SPA-NAI-C06-AREA.
+                   07  SPA-NAI-C06-KOUMOKU.
+                       09  SPA-NAI-C06-SELNUM      PIC 9(03).
+                       09  SPA-NAI-C06-BYOMEIINPUTSET
+                                                   PIC X(10).
+                       09  SPA-NAI-C06-INPUTCD-G.
+                           11  SPA-NAI-C06-BYOMEI-OCC  OCCURS  6.
+                               13  SPA-NAI-C06-BYOMEITOP
+                                                   PIC X(01).
+                               13  SPA-NAI-C06-BYOMEISBT
+                                                   PIC X(01).
+                               13  SPA-NAI-C06-BYOMEICD-O
+                                                   PIC X(07)
+                                                           OCCURS  21.
+                               13  SPA-NAI-C06-BYOMEI-O
+                                                   PIC X(80)
+                                                           OCCURS  21.
+                       09  SPA-NAI-C06-BYOMEIINPUTSET-OLD
+                                                   PIC X(10).
       *              
       *    簡単修正画面
            03  SPA-C10.

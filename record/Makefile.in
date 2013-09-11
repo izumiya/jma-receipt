@@ -477,6 +477,7 @@ RECORD_files = \
 	visitptlstv2.rec \
 	hsconfbasev2.rec \
 	hsconfwardv2.rec \
+	C06.rec \
 
 DEF_files = \
 
@@ -740,6 +741,7 @@ DB_files = \
 	xml_hsconfroomv2res.db \
 	xml_hsconfwardv2req.db \
 	xml_hsconfwardv2res.db \
+	tbl_byomeiinputset.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@
