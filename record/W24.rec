@@ -481,5 +481,19 @@ W24	{
 			item	varchar(20)[05];
 			state	int;
 		};
+		CMB_REKI_JITAKBN	{
+			REKI_JITAKBN	{
+				value	varchar(40);
+			};
+			count	int;
+			item	varchar(40)[05];
+		};
+		CMB_REKI_TAIINKBN	{
+			REKI_TAIINKBN	{
+				value	varchar(20);
+			};
+			count	int;
+			item	varchar(20)[05];
+		};
 	};
 };

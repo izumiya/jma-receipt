@@ -180,6 +180,8 @@
            03  WRK-KSNCD                           PIC X(09).
            03  WRK-KBN1-G.
                05  WRK-KBN1                        PIC 9(01).
+           03  WRK-5020-STYUKYMD                   PIC X(08).
+           03  WRK-5020-EDYUKYMD                   PIC X(08).
       *
        01  SSTKJN-AREA.
            03  SSTKJN-VAL.
@@ -416,6 +418,8 @@
            COPY  "CPSK1006.INC".
       *    医療機関入院基本情報
            COPY  "CPSK5000.INC".
+      *    医療機関入院基本情報（２）
+           COPY  "CPSK5020.INC".
       *    点数マスタ
            COPY  "CPTENSU.INC".
       *
@@ -743,6 +747,12 @@
       *!!
       *    退院時院外処方せん発行区分コンボ
            PERFORM 310-SHOHOUKBNLST-SET-SEC
+      *
+      *    入院歴作成初期表示自院／他院設定コンボ
+           PERFORM 310-REKI-JITAKBNLST-SET-SEC
+      *
+      *    入院歴作成初期表示退院日設定コンボ
+           PERFORM 310-REKI-TAIINKBNLST-SET-SEC
       *
            .
        310-CMB-SYOKI-EXT.
@@ -1314,6 +1324,48 @@
        310-EIYOUKSNLST-SET-EXT.
            EXIT.
       *****************************************************************
+      *    入院歴作成初期表示自院／他院設定コンボ
+      *****************************************************************
+       310-REKI-JITAKBNLST-SET-SEC     SECTION.
+      *
+           MOVE    3               TO  SPA-GMN-W24-REKI-JITAKBN-MAX
+      *
+           MOVE    "1"             TO  SPA-GMN-W24-REKI-JITAKBNL    (1)
+           MOVE    "自院歴"
+                                   TO  SPA-GMN-W24-REKI-JITAKBNMEIL (1)
+      *
+           MOVE    "2"             TO  SPA-GMN-W24-REKI-JITAKBNL    (2)
+           MOVE    "他院歴"
+                                   TO  SPA-GMN-W24-REKI-JITAKBNMEIL (2)
+      *
+           MOVE    "3"             TO  SPA-GMN-W24-REKI-JITAKBNL    (3)
+           MOVE    "他院歴（特別な関係にある医療機関）"
+                                   TO  SPA-GMN-W24-REKI-JITAKBNMEIL (3)
+      *
+      *
+           .
+       310-REKI-JITAKBNLST-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院歴作成初期表示退院日設定コンボ
+      *****************************************************************
+       310-REKI-TAIINKBNLST-SET-SEC    SECTION.
+      *
+           MOVE    2               TO  SPA-GMN-W24-REKI-TAIINKBN-MAX
+      *
+           MOVE    "0"             TO  SPA-GMN-W24-REKI-TAIINKBNL    (1)
+           MOVE    "入院日と同日"
+                                   TO  SPA-GMN-W24-REKI-TAIINKBNMEIL (1)
+      *
+           MOVE    "1"             TO  SPA-GMN-W24-REKI-TAIINKBNL    (2)
+           MOVE    "空白（未設定）"
+                                   TO  SPA-GMN-W24-REKI-TAIINKBNMEIL (2)
+      *
+      *
+           .
+       310-REKI-TAIINKBNLST-SET-EXT.
+           EXIT.
+      *****************************************************************
       *    入力情報編集処理
       *****************************************************************
        310-INPUT-AREA-EDIT-SEC     SECTION.
@@ -1500,6 +1552,26 @@
                                        TO  SPA-GMN-W24-EIYOUKSN-G
            END-IF
       *
+      *    入院歴作成初期表示自院歴／他院歴設定
+           MOVE    SYS-5020-REKI-JITAKBN   TO  WRK-CMB-CD
+           PERFORM 4200-REKI-JITAKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     NOT =   SPACE )
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-W24-REKI-JITAKBN-G
+           ELSE
+               MOVE    SPA-GMN-W24-REKI-JITAKBNLST (2)
+                                       TO  SPA-GMN-W24-REKI-JITAKBN-G
+           END-IF
+      *
+      *    入院歴作成初期表示退院日設定設定
+           MOVE    SYS-5020-REKI-TAIINKBN   TO  WRK-CMB-CD
+           PERFORM 4200-REKI-TAIINKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     NOT =   SPACE )
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-W24-REKI-TAIINKBN-G
+           ELSE
+               MOVE    SPA-GMN-W24-REKI-TAIINKBNLST (1)
+                                       TO  SPA-GMN-W24-REKI-TAIINKBN-G
+           END-IF
+      *
       *    入院料加算情報
            PERFORM 3101-INPUT-AREA-KSN-SET-SEC
       *
@@ -1544,7 +1616,6 @@
            END-PERFORM
       *
       *    選定区分
-           DISPLAY "SYS-5000-SENTEIKBN =" SYS-5000-SENTEIKBN
            MOVE    SYS-5000-SENTEIKBN  TO  WRK-CMB-CD
            PERFORM 4200-SENTEIKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     NOT =   SPACE )
@@ -1808,6 +1879,15 @@
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    MCPDATA-REC         TO  SYS-5000-REC
       *
+      *    医療機関入院基本情報検索（２）
+           INITIALIZE                      SYSKANRI-REC
+           MOVE    "5020"              TO  SYS-KANRICD
+           MOVE    "*"                 TO  SYS-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    MCPDATA-REC         TO  SYS-5020-REC
+      *
            .
       *
        310-SYS-5000-SEL-EXT.
@@ -1818,12 +1898,26 @@
        311-SYS-5000-SEL-SEC        SECTION.
       *
       *    医療機関入院基本情報検索
-           INITIALIZE                      SYSKANRI-REC
-           MOVE    "5000"              TO  SYS-KANRICD
-           MOVE    "*"                 TO  SYS-KBNCD
-           MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
+           INITIALIZE                          SYSKANRI-REC
+           MOVE    "5000"                  TO  SYS-KANRICD
+           MOVE    "*"                     TO  SYS-KBNCD
+           MOVE    SPA-W01-STYUKYMD        TO  SYS-STYUKYMD
            PERFORM 900-SYSKANRI-KEY16-SEL-SEC
-           MOVE    MCPDATA-REC         TO  SYS-5000-REC
+           MOVE    MCPDATA-REC             TO  SYS-5000-REC
+      *
+      *    医療機関入院基本情報検索（２）
+           IF    ( FLG-SYSKANRI            =   ZERO )
+               INITIALIZE                      SYSKANRI-REC
+               MOVE    "5020"              TO  SYS-KANRICD
+               MOVE    "*"                 TO  SYS-KBNCD
+               MOVE    SYS-5000-STYUKYMD   TO  SYS-STYUKYMD
+                                               SYS-EDYUKYMD
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    MCPDATA-REC         TO  SYS-5020-REC
+           ELSE
+               INITIALIZE                      SYS-5020-REC
+           END-IF
+      *
            .
       *
        311-SYS-5000-SEL-EXT.
@@ -2059,6 +2153,13 @@
       *    栄養管理経過措置区分
            MOVE    W24-EIYOUKSN        TO  SPA-GMN-W24-EIYOUKSN-G
       *
+      *    入院歴作成初期表示自院歴／他院歴設定
+           MOVE    W24-REKI-JITAKBN    TO  SPA-GMN-W24-REKI-JITAKBN-G
+      *
+      *    入院歴作成初期表示退院日設定設定
+           MOVE    W24-REKI-TAIINKBN   TO  SPA-GMN-W24-REKI-TAIINKBN-G
+      *
+      *
       *    退院時院外処方せん区分
            MOVE    W24-SHOHOUKBN       TO  SPA-GMN-W24-SHOHOUKBN-G
       *
@@ -2291,6 +2392,18 @@
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
       *
+      *    入院歴作成初期表示自院歴／他院歴設定
+           PERFORM 4100-REKI-JITAKBN-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *
+      *    入院歴作成初期表示退院日設定設定
+           PERFORM 4100-REKI-TAIINKBN-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *
            .
       *
        4102-KIHON-CHK-EXT.
@@ -2457,10 +2570,28 @@
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBDELETE-SEC
            IF    ( MCP-RC          =   ZERO )
-               MOVE   "JOIN"           TO  MCP-PUTTYPE
-               PERFORM 210-BACK
+               CONTINUE
            ELSE
                MOVE    "1202"          TO  SPA-ERRCD
+           END-IF
+      *
+           IF    ( SPA-ERRCD           =   SPACE )
+               INITIALIZE                      SYS-5020-REC
+               MOVE    SPA-HOSPNUM         TO  SYS-5020-HOSPNUM
+               MOVE    "5020"              TO  SYS-5020-KANRICD
+               MOVE    "*"                 TO  SYS-5020-KBNCD
+               MOVE    SPA-W01-STYUKYMD    TO  SYS-5020-STYUKYMD
+               MOVE    SPA-W01-EDYUKYMD    TO  SYS-5020-EDYUKYMD
+               MOVE    SYS-5020-REC        TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBDELETE-SEC
+               IF    ( MCP-RC          =   ZERO )
+                   MOVE   "JOIN"           TO  MCP-PUTTYPE
+                   PERFORM 210-BACK
+               ELSE
+                   MOVE    "1203"          TO  SPA-ERRCD
+               END-IF
            END-IF
       *
            .
@@ -2493,6 +2624,8 @@
       *****************************************************************
        481-TOUROKU-SEC                 SECTION.
       *
+           PERFORM 800-MCNDATE-SEC
+      *
            INITIALIZE                      SYSKANRI-REC
            MOVE    "5000"              TO  SYS-KANRICD
            MOVE    "*"                 TO  SYS-KBNCD
@@ -2512,8 +2645,6 @@
                MOVE    SYS-5000-EDYUKYMD   TO  WRK-EDYUKYMD
                MOVE    SYS-5000-CREYMD     TO  WRK-CREYMD
                PERFORM 4811-HOSP-NYUINKHN-EDIT-SEC
-      *
-               PERFORM 800-MCNDATE-SEC
                MOVE    WRK-CREYMD          TO  SYS-5000-CREYMD
                MOVE    SMCNDATE-YMD        TO  SYS-5000-UPYMD
                MOVE    SMCNDATE-HMS        TO  SYS-5000-UPHMS
@@ -2528,18 +2659,30 @@
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
                MOVE    "upd1"              TO  MCP-PATHNAME
                PERFORM 910-DBUPDATE-SEC
+      *
+               MOVE    SMCNDATE-YMD        TO  SYS-5020-CREYMD
+                                               SYS-5020-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYS-5020-UPHMS
+               MOVE    SYSUP-STYUKYMD      TO  SYS-5020-UPD-STYUKYMD
+               PERFORM 810-SYS-5020-UPD-SEC
            ELSE
                PERFORM 4811-HOSP-NYUINKHN-EDIT-SEC
       *
-               PERFORM 800-MCNDATE-SEC
                MOVE    SMCNDATE-YMD        TO  SYS-5000-CREYMD
                                                SYS-5000-UPYMD
                MOVE    SMCNDATE-HMS        TO  SYS-5000-UPHMS
       *
-               MOVE    SYS-5000-REC        TO  MCPDATA-REC
+               MOVE    SYS-5000-REC        TO  SYSKANRI-REC
+               MOVE    SYSKANRI-REC        TO  MCPDATA-REC
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
                PERFORM 910-DBINSERT-SEC
+      *
+               MOVE    SMCNDATE-YMD        TO  SYS-5020-CREYMD
+                                               SYS-5020-UPYMD
+               MOVE    SMCNDATE-HMS        TO  SYS-5020-UPHMS
+               MOVE    SYS-STYUKYMD        TO  SYS-5020-UPD-STYUKYMD
+               PERFORM 810-SYS-5020-UPD-SEC
            END-IF
       *
            IF    ( MCP-RC          =   ZERO )
@@ -2561,6 +2704,9 @@
            MOVE    SPACE           TO  SYS-5000-REC
            INITIALIZE                  SYS-5000-REC
       *
+           MOVE    SPACE           TO  SYS-5020-REC
+           INITIALIZE                  SYS-5020-REC
+      *
            MOVE    SPA-HOSPNUM         TO  SYS-5000-HOSPNUM
       *
       *    管理コード
@@ -2571,6 +2717,13 @@
            MOVE    SPA-W01-STYUKYMD    TO  SYS-5000-STYUKYMD
       *    有効終了年月日
            MOVE    SPA-W01-EDYUKYMD    TO  SYS-5000-EDYUKYMD
+      *
+           MOVE    SPA-HOSPNUM         TO  SYS-5020-HOSPNUM
+           MOVE    "5020"              TO  SYS-5020-KANRICD
+           MOVE    "*"                 TO  SYS-5020-KBNCD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-5020-STYUKYMD
+           MOVE    SPA-W01-EDYUKYMD    TO  SYS-5020-EDYUKYMD
+      *
       *    食事療養費
            EVALUATE    SPA-GMN-W24-SKJRYOYO
            WHEN    "1"
@@ -2783,6 +2936,14 @@
       *    退院時院外処方せん発行区分
            MOVE    SPA-GMN-W24-SHOHOUKBN
                                    TO  SYS-5000-SHOHOUKBN
+      *-!! SYS-5020-REC
+      *    入院歴作成初期表示自院歴／他院歴設定
+           MOVE    SPA-GMN-W24-REKI-JITAKBN
+                                   TO  SYS-5020-REKI-JITAKBN
+      *
+      *    入院歴作成初期表示退院日設定設定
+           MOVE    SPA-GMN-W24-REKI-TAIINKBN
+                                   TO  SYS-5020-REKI-TAIINKBN
       *
            .
       *
@@ -3661,6 +3822,44 @@
        4100-EIYOUKSN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    入院歴作成初期表示自院歴／他院歴設定チェック処理
+      *****************************************************************
+       4100-REKI-JITAKBN-CHK-SEC          SECTION.
+      *
+           MOVE    SPA-GMN-W24-REKI-JITAKBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-REKI-JITAKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    SPA-GMN-W24-REKI-JITAKBNLST (2)
+                                       TO  SPA-GMN-W24-REKI-JITAKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-W24-REKI-JITAKBN-G
+           END-IF
+      *
+           .
+      *
+       4100-REKI-JITAKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院歴作成初期表示退院日設定チェック処理
+      *****************************************************************
+       4100-REKI-TAIINKBN-CHK-SEC          SECTION.
+      *
+           MOVE    SPA-GMN-W24-REKI-TAIINKBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-REKI-TAIINKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    SPA-GMN-W24-REKI-TAIINKBNLST (1)
+                                       TO  SPA-GMN-W24-REKI-TAIINKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-W24-REKI-TAIINKBN-G
+           END-IF
+      *
+           .
+      *
+       4100-REKI-TAIINKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    入院時食事療養コンボチェック処理
       *****************************************************************
        4200-SKJRYOYOLST-CHK-SEC    SECTION.
@@ -4320,6 +4519,52 @@
        4200-EIYOUKSNLST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    入院歴作成初期表示自院歴／他院歴設定コンボチェック処理
+      *****************************************************************
+       4200-REKI-JITAKBNLST-CHK-SEC   SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W24-REKI-JITAKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-W24-REKI-JITAKBNL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W24-REKI-JITAKBNLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+                   MOVE    IDX-CMB     TO  WRK-CMB-IDX
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-REKI-JITAKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院歴作成初期表示退院日設定設定コンボチェック処理
+      *****************************************************************
+       4200-REKI-TAIINKBNLST-CHK-SEC   SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W24-REKI-TAIINKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-W24-REKI-TAIINKBNL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W24-REKI-TAIINKBNLST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+                   MOVE    IDX-CMB     TO  WRK-CMB-IDX
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-REKI-TAIINKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    入力情報領域初期化処理
       *****************************************************************
        4201-INPUT-AREA-INIT-SEC        SECTION.
@@ -4460,6 +4705,10 @@
                                    TO  SPA-GMN-W24-KYUKYUKSN-G
            MOVE    SPA-GMN-W24-EIYOUKSNLST (1)
                                    TO  SPA-GMN-W24-EIYOUKSN-G
+           MOVE    SPA-GMN-W24-REKI-JITAKBNLST (2)
+                                   TO  SPA-GMN-W24-REKI-JITAKBN-G
+           MOVE    SPA-GMN-W24-REKI-TAIINKBNLST (1)
+                                   TO  SPA-GMN-W24-REKI-TAIINKBN-G
       *
            MOVE    SPA-GMN-W24-SHOHOUKBNLST    (1)
                                    TO  SPA-GMN-W24-SHOHOUKBN-G
@@ -5137,6 +5386,36 @@
       *
            END-PERFORM
       *
+      *    入院歴作成初期表示自院歴／他院歴設定
+           MOVE    SPA-GMN-W24-REKI-JITAKBN-G
+                                       TO  W24-REKI-JITAKBN
+           MOVE    SPA-GMN-W24-REKI-JITAKBN-MAX
+                                       TO  W24-REKI-JITAKBN-CNT
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   W24-REKI-JITAKBN-CNT )
+      *
+      *
+               MOVE    SPA-GMN-W24-REKI-JITAKBNLST (IDX0)
+                                       TO  W24-REKI-JITAKBN-ITM (IDX0)
+      *
+           END-PERFORM
+      *
+      *    入院歴作成初期表示退院日設定設定
+           MOVE    SPA-GMN-W24-REKI-TAIINKBN-G
+                                       TO  W24-REKI-TAIINKBN
+           MOVE    SPA-GMN-W24-REKI-TAIINKBN-MAX
+                                       TO  W24-REKI-TAIINKBN-CNT
+      *
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   W24-REKI-TAIINKBN-CNT )
+      *
+      *
+               MOVE    SPA-GMN-W24-REKI-TAIINKBNLST (IDX0)
+                                       TO  W24-REKI-TAIINKBN-ITM (IDX0)
+      *
+           END-PERFORM
+      *
            IF    ( SPA-W01-EDYUKYMD    >=  CONST-H180401 )
                MOVE    "入院加算情報"          TO  W24-FRAME3-LABEL
       *
@@ -5361,10 +5640,6 @@
                MOVE    "TEIKISAGAKUACT" TO MCP-WIDGET
            WHEN    059
                MOVE    "RYOYODSP"      TO MCP-WIDGET
-           WHEN    063
-               MOVE    "IPPANKSN"      TO MCP-WIDGET
-           WHEN    064
-               MOVE    "KYUKYUKSN"     TO MCP-WIDGET
       *    退院時院外処方せん
            WHEN    060
                MOVE    "SHOHOUKBN"     TO MCP-WIDGET
@@ -5372,6 +5647,14 @@
                MOVE    "SKYSUMKBN"     TO MCP-WIDGET
            WHEN    062
                MOVE    "SENTEIKBN"     TO MCP-WIDGET
+           WHEN    063
+               MOVE    "IPPANKSN"      TO MCP-WIDGET
+           WHEN    064
+               MOVE    "KYUKYUKSN"     TO MCP-WIDGET
+           WHEN    065
+               MOVE    "REKI_JITAKBN"  TO MCP-WIDGET
+           WHEN    066
+               MOVE    "REKI_TAIINKBN" TO MCP-WIDGET
            WHEN    212
                MOVE    "B12"           TO  MCP-WIDGET
            END-EVALUATE
@@ -5512,6 +5795,10 @@
       ******** MOVE    212             TO  SPA-GMN-W24-CUR
                MOVE    060             TO  SPA-GMN-W24-CUR
            WHEN    "SHOHOUKBN"
+               MOVE    065             TO  SPA-GMN-W24-CUR
+           WHEN    "REKI_JITAKBN"
+               MOVE    066             TO  SPA-GMN-W24-CUR
+           WHEN    "REKI_TAIINKBN"
                MOVE    212             TO  SPA-GMN-W24-CUR
            WHEN    "RYOYODSP"
                MOVE    063             TO  SPA-GMN-W24-CUR
@@ -5680,10 +5967,7 @@
            WHEN    "1010"
                MOVE    "標欠または定数超過と同時設定できません"
                                        TO  SPA-ERRMSG
-           WHEN    "1201"
-               MOVE    "更新できませんでした"
-                                       TO  SPA-ERRMSG
-           WHEN    "1202"
+           WHEN    "1201"    THRU "1203"
                MOVE    "更新できませんでした"
                                        TO  SPA-ERRMSG
            END-EVALUATE
@@ -5841,6 +6125,8 @@
       *****************************************************************
        8001-KAISEI-CHK-SEC           SECTION.
       *
+           PERFORM 800-MCNDATE-SEC
+      *
            IF    ( SPA-W01-SELNUM          >   ZERO )
                IF    ( WRK-KAISEISTYMD     >   SPA-W01-SEL-STYUKYMD )
                 AND  ( WRK-KAISEISTYMD    <=   SPA-W01-EDYUKYMD )
@@ -5848,7 +6134,6 @@
                    IF    ( FLG-SYSKANRI    =   ZERO )
                        MOVE    SYS-5000-EDYUKYMD   TO  WRK-EDYUKYMD
                        MOVE    WRK-KAISEIEDYMD     TO  SYS-5000-EDYUKYMD
-                       PERFORM 800-MCNDATE-SEC
                        MOVE    SMCNDATE-YMD    TO  SYS-5000-UPYMD
                        MOVE    SMCNDATE-HMS    TO  SYS-5000-UPHMS
                        MOVE    SYS-5000-REC    TO  SYSKANRI-REC
@@ -5865,6 +6150,13 @@
                            DISPLAY "1:DBUPDATE ERR"
                        END-IF
       *
+                       MOVE    WRK-KAISEIEDYMD TO  SYS-5020-EDYUKYMD
+                       MOVE    SMCNDATE-YMD    TO  SYS-5020-CREYMD
+                                                   SYS-5020-UPYMD
+                       MOVE    SMCNDATE-HMS    TO  SYS-5020-UPHMS
+                       MOVE    SYSUP-STYUKYMD  TO  SYS-5020-UPD-STYUKYMD
+                       PERFORM 810-SYS-5020-UPD-SEC
+      *
                        MOVE    SPA-W01-STYUKYMD    TO  WRK-STYUKYMD
                        MOVE    SPA-W01-EDYUKYMD    TO  WRK-EDYUKYMD
                        MOVE    SPA-W01-SELNUM      TO  WRK-SELNUM
@@ -5880,7 +6172,6 @@
                        PERFORM 3101-SPASET-SEC
                        PERFORM 4811-HOSP-NYUINKHN-EDIT-SEC
       *
-                       PERFORM 800-MCNDATE-SEC
                        MOVE    SMCNDATE-YMD        TO  SYS-5000-CREYMD
                                                        SYS-5000-UPYMD
                        MOVE    SMCNDATE-HMS        TO  SYS-5000-UPHMS
@@ -5893,6 +6184,13 @@
                        IF    ( MCP-RC  NOT =   ZERO )
                            DISPLAY "2:DBINSERT ERR"
                        END-IF
+      *
+                       MOVE    SMCNDATE-YMD    TO  SYS-5020-CREYMD
+                                                   SYS-5020-UPYMD
+                       MOVE    SMCNDATE-HMS    TO  SYS-5020-UPHMS
+                       MOVE    SYS-STYUKYMD    TO  SYS-5020-UPD-STYUKYMD
+                       PERFORM 810-SYS-5020-UPD-SEC
+      *
                        COMPUTE SPA-W01-SELNUM
                            =   SPA-W01-SELNUM  +   1
                        MOVE    WRK-EDYUKYMD    TO  SPA-W01-EDYUKYMD
@@ -5919,7 +6217,6 @@
                    PERFORM 3101-SPASET-SEC
                    PERFORM 4811-HOSP-NYUINKHN-EDIT-SEC
       *
-                   PERFORM 800-MCNDATE-SEC
                    MOVE    SMCNDATE-YMD    TO  SYS-5000-CREYMD
                                                SYS-5000-UPYMD
                    MOVE    SMCNDATE-HMS    TO  SYS-5000-UPHMS
@@ -5933,12 +6230,17 @@
                        DISPLAY "3:DBINSERT ERR"
                    END-IF
       *
+                   MOVE    SMCNDATE-YMD    TO  SYS-5020-CREYMD
+                                               SYS-5020-UPYMD
+                   MOVE    SMCNDATE-HMS    TO  SYS-5020-UPHMS
+                   MOVE    SYS-STYUKYMD    TO  SYS-5020-UPD-STYUKYMD
+                   PERFORM 810-SYS-5020-UPD-SEC
+      *
                    MOVE    WRK-KAISEISTYMD TO  SPA-W01-STYUKYMD
                    MOVE    WRK-EDYUKYMD    TO  SPA-W01-EDYUKYMD
                    PERFORM 3101-SPASET-SEC
                    PERFORM 4811-HOSP-NYUINKHN-EDIT-SEC
       *
-                   PERFORM 800-MCNDATE-SEC
                    MOVE    SMCNDATE-YMD    TO  SYS-5000-CREYMD
                                                SYS-5000-UPYMD
                    MOVE    SMCNDATE-HMS    TO  SYS-5000-UPHMS
@@ -5951,6 +6253,12 @@
                    IF    ( MCP-RC  NOT =   ZERO )
                        DISPLAY "4:DBINSERT ERR"
                    END-IF
+      *
+                   MOVE    SMCNDATE-YMD    TO  SYS-5020-CREYMD
+                                               SYS-5020-UPYMD
+                   MOVE    SMCNDATE-HMS    TO  SYS-5020-UPHMS
+                   MOVE    SYS-STYUKYMD    TO  SYS-5020-UPD-STYUKYMD
+                   PERFORM 810-SYS-5020-UPD-SEC
       *
                    MOVE    WRK-KAISEISTYMD TO  SPA-W01-STYUKYMD
                                                SPA-W01-SEL-STYUKYMD
@@ -5974,6 +6282,39 @@
            .
       *
        8001-KAISEI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院基本情報（２）更新処理
+      *****************************************************************
+       810-SYS-5020-UPD-SEC            SECTION.
+      *
+           MOVE    SYS-5020-REC        TO  SYSKANRI-REC
+           MOVE    SYS-5020-UPD-STYUKYMD
+                                       TO  SYS-STYUKYMD
+                                           SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           IF    ( FLG-SYSKANRI    =   ZERO )
+               MOVE    SYS-KEY         TO  SYS-5020-UPD-KEY
+               MOVE    SYS-CREYMD      TO  SYS-5020-CREYMD
+               MOVE    SYS-5020-REC    TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "upd1"          TO  MCP-PATHNAME
+               PERFORM 910-DBUPDATE-SEC
+               IF    ( MCP-RC  NOT =   ZERO )
+                   DISPLAY "5020 1:DBUPDATE ERR"
+               END-IF
+           ELSE
+               MOVE    SYS-5020-REC    TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"  TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 910-DBINSERT-SEC
+               IF    ( MCP-RC  NOT =   ZERO )
+                   DISPLAY "5020 1:DBINSERT ERR"
+               END-IF
+           END-IF
+      *
+           .
+       810-SYS-5020-UPD-EXT.
            EXIT.
       *****************************************************************
       *    システム管理検索処理(KEY2)

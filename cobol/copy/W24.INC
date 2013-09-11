@@ -253,4 +253,15 @@
                                                OCCURS  5.
                 05  W24-KYUKYUKSN-ITM-STATE    PIC S9(9)
                                                BINARY.
-
+              04  W24-CMB-REKI-JITAKBN.
+                05  W24-REKI-JITAKBN           PIC X(40).
+                05  W24-REKI-JITAKBN-CNT       PIC S9(9)
+                                               BINARY.
+                05  W24-REKI-JITAKBN-ITM       PIC X(40)
+                                               OCCURS  5.
+              04  W24-CMB-REKI-TAIINKBN.
+                05  W24-REKI-TAIINKBN       PIC X(20).
+                05  W24-REKI-TAIINKBN-CNT   PIC S9(9)
+                                               BINARY.
+                05  W24-REKI-TAIINKBN-ITM   PIC X(20)
+                                               OCCURS  5.

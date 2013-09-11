@@ -647,6 +647,9 @@
                                                    PIC X(08).
       *
       *        画面入力部領域
+             07  SPA-NAI-I03-AREA.
+               09  SPA-NAI-I03-JITAKBN             PIC X(01).
+               09  SPA-NAI-I03-TAIINKBN            PIC X(01).
                09  SPA-NAI-I03-INPUT-AREA.
       *          入院日
                  11  SPA-NAI-I03-NYUINYMD          PIC X(08).

@@ -156,6 +156,9 @@
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
       *
+      *    医療機関情報−入院基本（２）
+           COPY    "CPSK5020.INC".
+      *
       *    患者入院履歴
        01  PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC".
@@ -329,6 +332,26 @@
            INITIALIZE              I03
                                    SPA-I03
       *
+           INITIALIZE              SYSKANRI-REC
+           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+           MOVE    "5020"          TO  SYS-KANRICD
+           MOVE    "*"             TO  SYS-KBNCD
+           MOVE    SPA-SYSYMD      TO  SYS-STYUKYMD
+                                       SYS-EDYUKYMD
+           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    SYSKANRI-REC    TO  SYS-5020-REC
+           IF    ( SYS-5020-REKI-JITAKBN   =   SPACE )
+               MOVE    "2"         TO   SYS-5020-REKI-JITAKBN
+           END-IF
+           IF    ( SYS-5020-REKI-TAIINKBN  =   SPACE )
+               MOVE    "0"         TO   SYS-5020-REKI-TAIINKBN
+           END-IF
+      *
+           MOVE    SYS-5020-REKI-JITAKBN
+                                   TO   SPA-NAI-I03-JITAKBN
+           MOVE    SYS-5020-REKI-TAIINKBN
+                                   TO   SPA-NAI-I03-TAIINKBN
+      *
       *    コンボボックス初期化
            PERFORM 310-CMB-SYOKI-SEC
       *
@@ -347,15 +370,6 @@
                    MOVE    SPA-GMN-I03-SHOKAI-ITM (01)
                                    TO    SPA-GMN-I03-SHOKAI
                END-IF
-      *
-               MOVE    SPA-GMN-I03-RRKKBN-ITM (02)
-                                   TO    SPA-GMN-I03-RRKKBN
-      *
-      *        MOVE    SPA-GMN-I03-NYUINCHUKBN-ITM (01)
-      *                            TO    SPA-GMN-I03-NYUINCHUKBN
-               MOVE    SPACE
-                                   TO    SPA-GMN-I03-NYUINCHUKBN
-      *
            END-IF
       *
            .
@@ -877,10 +891,12 @@
            MOVE    WRK-SYMD        TO  SPA-NAI-I03-NYUINYMD
       *
            IF      ( SPA-GMN-I03-TAIINYMD  =   SPACE )
-               MOVE    SPA-GMN-I03-NYUINYMD
+               IF    ( SPA-NAI-I03-TAIINKBN    =   "0" )
+                   MOVE    SPA-GMN-I03-NYUINYMD
                                    TO  SPA-GMN-I03-TAIINYMD
-               MOVE    SPA-NAI-I03-NYUINYMD
+                   MOVE    SPA-NAI-I03-NYUINYMD
                                    TO  SPA-NAI-I03-TAIINYMD
+               END-IF
            END-IF
       *
       *    通算日数計算処理
@@ -1202,12 +1218,10 @@
       *
            MOVE    SPA-GMN-I03-SHOKAI-ITM (01)
                                        TO  SPA-GMN-I03-SHOKAI
-           MOVE    SPA-GMN-I03-RRKKBN-ITM (02)
-                                       TO  SPA-GMN-I03-RRKKBN
-      *    MOVE    SPA-GMN-I03-NYUINCHUKBN-ITM (1)
-      *                                TO  SPA-GMN-I03-NYUINCHUKBN
-           MOVE    SPACE
-                                       TO  SPA-GMN-I03-NYUINCHUKBN
+           MOVE    SPA-NAI-I03-JITAKBN TO  I03-RRKKBN
+           DISPLAY "I03-RRKKBN[" I03-RRKKBN "]"
+           PERFORM 4101-RRKKBN-CHK-SEC
+           DISPLAY "SPA-GMN-I03-RRKKBN[" SPA-GMN-I03-RRKKBN "]"
       *
            .
       *
@@ -2857,6 +2871,32 @@
       *
            .
        900-PTTAINFUKA-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    システム管理検索処理
+      *****************************************************************
+       900-SYSKANRI-KEY10-SEL-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  FLG-SYSKANRI
+      *
+           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC              =   ZERO )
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+           ELSE
+               INITIALIZE                  SYSKANRI-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       900-SYSKANRI-KEY10-SEL-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

@@ -215,6 +215,17 @@
                    13  SPA-GMN-W24-SHOHOUKBN           PIC X(01).
                    13  SPA-GMN-W24-SHOHOUKBNFL         PIC X(01).
                    13  SPA-GMN-W24-SHOHOUKBNMEI        PIC X(28).
+      *          入院歴作成時、自院歴・他院歴初期表示区分
+                 11  SPA-GMN-W24-REKI-JITAKBN-G.
+                   13  SPA-GMN-W24-REKI-JITAKBN        PIC X(01).
+                   13  SPA-GMN-W24-REKI-JITAKBNFL      PIC X(01).
+                   13  SPA-GMN-W24-REKI-JITAKBNMEI     PIC X(38).
+      *
+      *          入院歴作成時、退院日初期表示区分
+                 11  SPA-GMN-W24-REKI-TAIINKBN-G.
+                   13  SPA-GMN-W24-REKI-TAIINKBN    PIC X(01).
+                   13  SPA-GMN-W24-REKI-TAIINKBFNL  PIC X(01).
+                   13  SPA-GMN-W24-REKI-TAIINKBNMEI PIC X(18).
       *!!
       *        コンボ項目領域
                09  SPA-GMN-W24-CMB-DAT-AREA.
@@ -438,6 +449,22 @@
                        15  SPA-GMN-W24-EIYOUKSNL       PIC X(01).
                        15  SPA-GMN-W24-EIYOUKSNLFL     PIC X(01).
                        15  SPA-GMN-W24-EIYOUKSNMEIL    PIC X(26).
+      *
+      *          入院歴作成時、自院歴・他院歴初期表示区分
+                 11  SPA-GMN-W24-REKI-JITAKBNLST-G.
+                   13  SPA-GMN-W24-REKI-JITAKBN-MAX        PIC 9(03).
+                   13  SPA-GMN-W24-REKI-JITAKBNLST         OCCURS  5.
+                       15  SPA-GMN-W24-REKI-JITAKBNL       PIC X(01).
+                       15  SPA-GMN-W24-REKI-JITAKBNLFL     PIC X(01).
+                       15  SPA-GMN-W24-REKI-JITAKBNMEIL    PIC X(38).
+      *
+      *          入院歴作成時、退院日初期表示区分
+                 11  SPA-GMN-W24-REKI-TAIINKBNLST-G.
+                   13  SPA-GMN-W24-REKI-TAIINKBN-MAX      PIC 9(03).
+                   13  SPA-GMN-W24-REKI-TAIINKBNLST       OCCURS  5.
+                       15  SPA-GMN-W24-REKI-TAIINKBNL     PIC X(01).
+                       15  SPA-GMN-W24-REKI-TAIINKBNLFL   PIC X(01).
+                       15  SPA-GMN-W24-REKI-TAIINKBNMEIL  PIC X(18).
       *
              07  SPA-NAI-W24-AREA.
                09  SPA-NAI-W24-SKJSRY-SRYCD-G.
