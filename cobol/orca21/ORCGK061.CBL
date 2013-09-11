@@ -2805,7 +2805,7 @@
       *        リハビリコメント有
                IF    ((SANTEI-SRYYM    =   SPA-K061-SANYMD(1:6))
                   AND (WRK-DAY         =   SPA-K061-SANYMD(7:2)))
-               AND   ( SPA-K061-THKNCOMBIMEI (SPA-K061-SELNUM)
+               AND   ( SPA-K061-THKNCOMBI (SPA-K061-SELNUM)
                                        =   SPA-K061-HKNCOMBI   )
                    CONTINUE
                ELSE

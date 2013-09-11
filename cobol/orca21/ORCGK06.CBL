@@ -73,8 +73,6 @@
            03  FLG-TOUROKU         PIC 9(01).
            03  FLG-SANTEIPLUS-CHK  PIC 9(01).
       *
-           03  FLG-SANTEIPLUS-OK   PIC 9(01).
-      *
       *    添字領域
        01  IDX-AREA.
            03  IDW                 PIC 9(04).
@@ -1883,42 +1881,31 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    2                   TO  SPA-GMN-CUR
                END-IF
            ELSE
+      *        保険組合せの変更はエラー
+               MOVE    SPA-GMN-RENNUM      TO  IDX
+               IF     (SPA-GMN-HKNCOMBI    =   SPA-NAI-THKNCOMBI(IDX))
+                   CONTINUE
+               ELSE
+                   MOVE    "0033"              TO  SPA-ERRCD
+                   MOVE    5                   TO  SPA-GMN-CUR
+               END-IF
+      *
                IF     (SPA-NAI-PLUSKBN     =   1    )  AND
                       (SPA-KEIFLG3         =   ZERO )
+                 AND  (SPA-ERRCD           =   SPACE )
                    MOVE    SPA-GMN-RENNUM      TO  IDX
                    MOVE    ZERO                TO  FLG-SANTEIPLUS-CHK
                    PERFORM VARYING     IDY     FROM    1   BY  1
                            UNTIL      (IDY     >       31  )
                                   OR  (FLG-SANTEIPLUS-CHK  NOT =   ZERO)
-      ****             IF     (SPA-NAI-TDAY (IDX IDY)  >   ZERO )  AND
-      *                       (SPA-GMN-DAY (IDY)       =   ZERO )
+                       IF     (SPA-NAI-TDAY (IDX IDY)  >   ZERO )  AND
+                              (SPA-GMN-DAY (IDY)       =   ZERO )
       *                    今回削除の付加情報チェック
-      *                    PERFORM 45011-SANTEIPLUS-CHK-SEC
-      *****            END-IF
-                       MOVE    ZERO            TO  FLG-SANTEIPLUS-OK
-                       IF     (SPA-NAI-TDAY (IDX IDY)  >   ZERO )
-      *                    付加情報検索
                            PERFORM 45011-SANTEIPLUS-CHK-SEC
-                       END-IF
-                       IF     (FLG-SANTEIPLUS-OK       =   1    )
-                         AND  (SPA-GMN-DAY (IDY)       =   ZERO )
-      *                    今回削除
-                           MOVE    1           TO  FLG-SANTEIPLUS-CHK
-                       END-IF
-                       IF     (FLG-SANTEIPLUS-OK       =   1    )
-                          AND (FLG-SANTEIPLUS-CHK      =   ZERO )
-                          AND (SPA-NAI-THKNCOMBI(IDX)
-                                               NOT =   SPA-GMN-HKNCOMBI)
-      *                    保険組合せ変更
-                           MOVE    2           TO  FLG-SANTEIPLUS-CHK
                        END-IF
                    END-PERFORM
                    IF     FLG-SANTEIPLUS-CHK   =   1
                        MOVE    "K032"          TO  SPA-ERRCD
-                       MOVE    99              TO  SPA-GMN-CUR
-                   END-IF
-                   IF     FLG-SANTEIPLUS-CHK   =   2
-                       MOVE    "K033"          TO  SPA-ERRCD
                        MOVE    99              TO  SPA-GMN-CUR
                    END-IF
                    MOVE    1                   TO  SPA-KEIFLG3
@@ -1950,8 +1937,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            PERFORM 900-SANTEIPLUS-INV-SEC
            IF      FLG-SANTEIPLUS      =   ZERO
-      *****    MOVE    1               TO  FLG-SANTEIPLUS-CHK
-               MOVE    1               TO  FLG-SANTEIPLUS-OK 
+               MOVE    1               TO  FLG-SANTEIPLUS-CHK
            END-IF
            .
        45011-SANTEIPLUS-CHK-EXT.
@@ -2036,18 +2022,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                IF     (SPA-NAI-PLUSKBN     =   1  )
                    PERFORM VARYING     IDY     FROM    1   BY  1
                            UNTIL       IDY     >       31
-      *********        IF     (SANTEI-DAY  (IDY)   >   ZERO )  AND
-      *                       (SPA-GMN-DAY (IDY)   =   ZERO )
+                       IF     (SANTEI-DAY  (IDY)   >   ZERO )  AND
+                              (SPA-GMN-DAY (IDY)   =   ZERO )
       *                    算定付加情報削除
-      *                    PERFORM 45013-SANTEIPLUS-DEL-SEC
-      *********        END-IF
-                       IF     (SANTEI-DAY  (IDY)   >   ZERO )
-                           IF     (SPA-GMN-DAY (IDY)   =   ZERO )
-                           OR     (SANTEI-HKNCOMBINUM
-                                               NOT =  SPA-GMN-HKNCOMBI)
-      *                        算定付加情報削除
-                               PERFORM 45013-SANTEIPLUS-DEL-SEC
-                           END-IF
+                           PERFORM 45013-SANTEIPLUS-DEL-SEC
                        END-IF
                    END-PERFORM
                END-IF
@@ -2678,10 +2656,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                            DELIMITED   BY  SIZE        INTO  SPA-ERRMSG
                    END-STRING
       *H25.9
-               WHEN    "K033"
-                   STRING  "警告！"
-                           "保険組合せが変更されました。"
-                           "リハビリコメントを削除します。"
+               WHEN    "0033"
+                   STRING  "保険組合せの変更はできません。"
                            DELIMITED   BY  SIZE        INTO  SPA-ERRMSG
                    END-STRING
                WHEN    "0034"
