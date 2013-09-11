@@ -86,6 +86,7 @@
            03  FLG-END                             PIC 9(01).
            03  FLG-HIT                             PIC 9(01).
            03  FLG-SYSKANRI                        PIC 9(01).
+           03  FLG-SYS5000                         PIC 9(01).
            03  FLG-TENSU                           PIC 9(01).
            03  FLG-KANJI                           PIC 9(01).
            03  FLG-KENSAKU                         PIC 9(01).
@@ -1372,13 +1373,13 @@
       *
       *    医療機関入院基本情報検索処理
            PERFORM 310-SYS-5000-SEL-SEC
-           IF    ( FLG-SYSKANRI    =   ZERO )
+           IF    ( FLG-SYS5000     =   ZERO )
                CONTINUE
            ELSE
       *
       *        医療機関入院基本情報検索処理（期間切り替えチェック）
                PERFORM 311-SYS-5000-SEL-SEC
-               IF    ( FLG-SYSKANRI    =   ZERO )
+               IF    ( FLG-SYS5000     =   ZERO )
                    CONTINUE
                ELSE
                    GO  TO  310-INPUT-AREA-EDIT-EXT
@@ -1877,6 +1878,7 @@
            MOVE    SPA-W01-STYUKYMD    TO  SYS-STYUKYMD
                                            SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+           MOVE    FLG-SYSKANRI        TO  FLG-SYS5000
            MOVE    MCPDATA-REC         TO  SYS-5000-REC
       *
       *    医療機関入院基本情報検索（２）
@@ -1903,6 +1905,7 @@
            MOVE    "*"                     TO  SYS-KBNCD
            MOVE    SPA-W01-STYUKYMD        TO  SYS-STYUKYMD
            PERFORM 900-SYSKANRI-KEY16-SEL-SEC
+           MOVE    FLG-SYSKANRI            TO  FLG-SYS5000
            MOVE    MCPDATA-REC             TO  SYS-5000-REC
       *
       *    医療機関入院基本情報検索（２）
@@ -6131,7 +6134,7 @@
                IF    ( WRK-KAISEISTYMD     >   SPA-W01-SEL-STYUKYMD )
                 AND  ( WRK-KAISEISTYMD    <=   SPA-W01-EDYUKYMD )
                    PERFORM 310-SYS-5000-SEL-SEC
-                   IF    ( FLG-SYSKANRI    =   ZERO )
+                   IF    ( FLG-SYS5000     =   ZERO )
                        MOVE    SYS-5000-EDYUKYMD   TO  WRK-EDYUKYMD
                        MOVE    WRK-KAISEIEDYMD     TO  SYS-5000-EDYUKYMD
                        MOVE    SMCNDATE-YMD    TO  SYS-5000-UPYMD
