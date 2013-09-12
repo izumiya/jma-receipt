@@ -414,6 +414,10 @@
                    IF      SPA-KID1-FLG        =   "OK"
       *                登録処理
                        PERFORM 4501-TOUROKU-SYORI-SEC
+      *
+                       IF      SPA-ERRCD       NOT =   SPACE
+                           PERFORM 510-ERRSET-SEC
+                       END-IF
                    ELSE
                        MOVE    1               TO  SPA-GMN-CUR
                    END-IF
@@ -1119,6 +1123,17 @@
       *****************************************************************
        4109-HKNCOMBI-CHK-SEC              SECTION.
       *
+      *    保険組合せの変更はエラー
+           IF     (SPA-ERRCD           =   SPACE )
+             AND  (SPA-GMN-RENNUM      >   ZERO  )
+               IF      SPA-GMN-HKNCOMBI NOT =   SPA-NAI-THKNCOMBI
+                                                       (SPA-GMN-RENNUM)
+                   MOVE    "0033"              TO  SPA-ERRCD
+                   MOVE    5                   TO  SPA-GMN-CUR
+                   GO      TO      4109-HKNCOMBI-CHK-EXT
+               END-IF
+           END-IF
+      *
            IF     (SPA-GMN-HKNCOMBI    =   ZERO  )
            OR     (SPA-GMN-SRYCD       =   SPACE )
                MOVE    SPACE               TO  SPA-GMN-HKNCOMBIMEI
@@ -1820,6 +1835,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                IF     (SPA-NAI-PLUSKBN     =   1    )  AND
                       (SPA-KEIFLG3         =   ZERO )
+                 AND  (SPA-ERRCD           =   SPACE )
                    MOVE    SPA-GMN-RENNUM      TO  IDX
                    MOVE    ZERO                TO  FLG-SANTEIPLUS-CHK
                    PERFORM VARYING     IDY     FROM    1   BY  1
@@ -1896,7 +1912,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
               END-IF
            ELSE
               IF      SPA-GMN-RENNUM       >   ZERO
-                   MOVE    "00XX"              TO  SPA-ERRCD
+                   MOVE    "0034"              TO  SPA-ERRCD
                    MOVE    2                   TO  SPA-GMN-CUR
               END-IF
            END-IF
@@ -2158,7 +2174,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            INITIALIZE                     SPA-K062-GMN-G
            MOVE    SPA-GMN-SRYCD       TO  SPA-K062-SRYCD
            MOVE    SPA-NAI-SRYYM       TO  SPA-K062-SRYYM
-           MOVE    SPA-GMN-HKNCOMBI    TO  SPA-K062-HKNCOMBI
+      **** MOVE    SPA-GMN-HKNCOMBI    TO  SPA-K062-HKNCOMBI
+           MOVE    SPA-NAI-THKNCOMBI (SPA-GMN-RENNUM)
+                                       TO  SPA-K062-HKNCOMBI
            MOVE    "K06"               TO  SPA-K062-MOTOPG
            MOVE    SPACE               TO  SPA-MOTOPG
       *    初期画面セット
@@ -2564,6 +2582,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                            "リハビリコメントを同時に削除します。"
                            DELIMITED   BY  SIZE        INTO  SPA-ERRMSG
                    END-STRING
+      *H25.9
+               WHEN    "0033"
+                   STRING  "保険組合せの変更はできません。"
+                           DELIMITED   BY  SIZE        INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0034"
+                   MOVE    "算定履歴が存在しません。更新できません。"
+                                                       TO  SPA-ERRMSG
+      *H25.9
                WHEN    "1001"
                    MOVE    "更新処理でエラーになりました"
                                                    TO  SPA-ERRMSG
