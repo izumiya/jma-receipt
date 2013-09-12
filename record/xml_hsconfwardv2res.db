@@ -76,7 +76,7 @@ xml_hsconfwardv2res {
 					Name	varchar(30);
 				};
 			};
-			Room_Id{
+			Room_Number{
 				Label	varchar(10);
 				Data	varchar(06);
 			}[200];

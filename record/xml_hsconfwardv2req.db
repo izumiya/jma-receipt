@@ -7,6 +7,6 @@ xml_hsconfwardv2req {
 		Request_Number		varchar(01);
 		Base_Date			varchar(10);
 		Ward_Number			varchar(02);
-		Room_Id				varchar(06);
+		Room_Number			varchar(06);
 	};
 };

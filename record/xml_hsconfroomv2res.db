@@ -19,7 +19,7 @@ xml_hsconfroomv2res {
 				Label	varchar(20);
 				Data	varchar(20);
 			};
-			Room_Id{
+			Room_Number{
 				Label	varchar(20);
 				Data	varchar(06);
 			};
