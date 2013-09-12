@@ -1180,6 +1180,17 @@
       *****************************************************************
        4109-HKNCOMBI-CHK-SEC              SECTION.
       *
+      *    保険組合せの変更はエラー
+           IF     (SPA-ERRCD           =   SPACE )
+              AND (SPA-GMN-RENNUM      >   ZERO  )
+               IF      SPA-GMN-HKNCOMBI    NOT =   SPA-NAI-THKNCOMBI
+                                                    (SPA-GMN-RENNUM)
+                   MOVE    "0033"              TO  SPA-ERRCD
+                   MOVE    5                   TO  SPA-GMN-CUR
+                   GO      TO      4109-HKNCOMBI-CHK-EXT
+               END-IF
+           END-IF
+      *
            IF     (SPA-GMN-HKNCOMBI    =   ZERO  )
            OR     (SPA-GMN-SRYCD       =   SPACE )
                MOVE    SPACE               TO  SPA-GMN-HKNCOMBIMEI
@@ -1881,15 +1892,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    2                   TO  SPA-GMN-CUR
                END-IF
            ELSE
-      *        保険組合せの変更はエラー
-               MOVE    SPA-GMN-RENNUM      TO  IDX
-               IF     (SPA-GMN-HKNCOMBI    =   SPA-NAI-THKNCOMBI(IDX))
-                   CONTINUE
-               ELSE
-                   MOVE    "0033"              TO  SPA-ERRCD
-                   MOVE    5                   TO  SPA-GMN-CUR
-               END-IF
-      *
                IF     (SPA-NAI-PLUSKBN     =   1    )  AND
                       (SPA-KEIFLG3         =   ZERO )
                  AND  (SPA-ERRCD           =   SPACE )

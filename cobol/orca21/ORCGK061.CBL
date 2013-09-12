@@ -2027,7 +2027,6 @@
            END-IF
       *    保険組合せチェック
            IF     (SPA-ERRCD           =   SPACE )
-              AND (SPA-K061-HKNCOMBI   NOT =   SPACE )
                PERFORM 41012-HKNCOMBI-CHK-SEC
            END-IF
       *    最終来院日
@@ -2260,6 +2259,12 @@
       *    保険組合せ  入力処理
       *****************************************************************
        41012-HKNCOMBI-CHK-SEC              SECTION.
+      *
+      *
+           IF     (SPA-K061-HKNCOMBI   =   SPACE )
+               MOVE    SPACE               TO  SPA-K061-HKNCOMBIMEI
+               GO      TO      4109-HKNCOMBI-CHK-EXT
+           END-IF
       *
       *    保険毎のコードの判定
            MOVE    SPA-K061-SRYCD      TO  WRK-SRYCD
