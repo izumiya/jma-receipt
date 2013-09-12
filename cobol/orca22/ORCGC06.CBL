@@ -893,8 +893,12 @@
            IF      SPA-CID4-FLG    =   "OK"
                CONTINUE
            ELSE
+      *        病名セットコード編集処理
                PERFORM 4100111-BYOMEIINPUTSET-HENSYU-SEC
            END-IF
+      *
+           MOVE    SPA-GMN-C06-BYOMEIINPUTSET
+                                   TO  SPA-NAI-C06-BYOMEIINPUTSET-OLD
       *
       *    一覧にあれば行選択する
            PERFORM VARYING     IDX FROM    1   BY  1
