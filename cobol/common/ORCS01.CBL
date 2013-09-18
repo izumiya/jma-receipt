@@ -402,6 +402,7 @@
       *  04.06.08    NACL-ÌçÏÆ    13/05/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.06.09    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.10    NACL-ÌçÏÆ    13/08/08  »³¸ý¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.11    NACL-ÌçÏÆ    13/09/17  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4386,6 +4387,9 @@
                 (LNK-SYU-SRYYMD(1:6)  >=  "201201"      ) AND
                 (LNK-SYU-KOH1HKNNUM    =  "463" OR "563"
                                        OR "263" OR "363"))
+           OR  ((WK-1001-PREFNUM       =   04           ) AND
+                (LNK-SYU-SRYYMD(1:6)  >=  "201310"      ) AND
+                (LNK-SYU-KOH1HKNNUM    =  "663" OR "763"))
            OR  ((WK-1001-PREFNUM       =   10           ) AND
                 (LNK-SYU-SRYYMD(1:6)  >= "201104"       ) AND
                 (LNK-SYU-KOH1HKNNUM    =  "145" OR "245"
@@ -11211,6 +11215,9 @@
                 ( LNK-SYU-SRYYMD(1:6)    >= "201201" ) AND
                 ( SYU-KOH1HKNNUM   = "463" OR "563"
                                   OR "263" OR "363"  ))
+           OR  (( WK-1001-PREFNUM         =  04      ) AND
+                ( LNK-SYU-SRYYMD(1:6)    >= "201310" ) AND
+                ( SYU-KOH1HKNNUM   = "663" OR "763"  ))
            OR  (( WK-1001-PREFNUM         =  10      ) AND
                 ( LNK-SYU-SRYYMD(1:6)    >= "201104" ) AND
                 ( SYU-KOH1HKNNUM   = "145" OR "245"
@@ -12071,6 +12078,9 @@
                        (LNK-SYU-KOH1HKNNUM  = "463" OR "563"
                                            OR "263" OR "363") AND
                        (LNK-SYU-SRYYMD(1:6)     >= "201201" ))
+                   OR ((WK-1001-PREFNUM          =  04      ) AND
+                       (LNK-SYU-KOH1HKNNUM  = "663" OR "763") AND
+                       (LNK-SYU-SRYYMD(1:6)     >= "201310" ))
                    OR ((WK-1001-PREFNUM          =  10      ) AND
                        (LNK-SYU-KOH1HKNNUM  = "145" OR "245"
                                            OR "146" OR "246"
@@ -13146,6 +13156,9 @@
                        (LNK-SYU-KOH2HKNNUM  = "463" OR "563"
                                            OR "263" OR "363") AND
                        (LNK-SYU-SRYYMD(1:6)     >= "201201" ))
+                   OR ((WK-1001-PREFNUM          =  04      ) AND
+                       (LNK-SYU-KOH2HKNNUM  = "663" OR "763") AND
+                       (LNK-SYU-SRYYMD(1:6)     >= "201310" ))
                    OR ((WK-1001-PREFNUM          =  10      ) AND
                        (LNK-SYU-KOH2HKNNUM  = "145" OR "245"
                                            OR "146" OR "246"
@@ -14063,6 +14076,9 @@
                        (LNK-SYU-KOH3HKNNUM  = "463" OR "563"
                                            OR "263" OR "363") AND
                        (LNK-SYU-SRYYMD(1:6)     >= "201201" ))
+                   OR ((WK-1001-PREFNUM          =  04      ) AND
+                       (LNK-SYU-KOH3HKNNUM  = "663" OR "763") AND
+                       (LNK-SYU-SRYYMD(1:6)     >= "201310" ))
                    OR ((WK-1001-PREFNUM          =  10      ) AND
                        (LNK-SYU-KOH3HKNNUM  = "145" OR "245"
                                            OR "146" OR "246"
@@ -14916,6 +14932,9 @@
                        (LNK-SYU-KOH4HKNNUM  = "463" OR "563"
                                            OR "263" OR "363") AND
                        (LNK-SYU-SRYYMD(1:6)     >= "201201" ))
+                   OR ((WK-1001-PREFNUM          =  04      ) AND
+                       (LNK-SYU-KOH4HKNNUM  = "663" OR "763") AND
+                       (LNK-SYU-SRYYMD(1:6)     >= "201310" ))
                    OR ((WK-1001-PREFNUM          =  10      ) AND
                        (LNK-SYU-KOH4HKNNUM  = "145" OR "245"
                                            OR "146" OR "246"
@@ -27028,6 +27047,15 @@
                 (LNK-SYU-SYUHKNNUM    NOT = SPACE     )  AND
                 (LNK-SYU-SYUHKNNUM    NOT =
                              "060" AND "067" AND "039"))
+           OR  ((WK-1001-PREFNUM            =  04     )  AND
+                (LNK-SYU-SRYYMD(1:6)       >= "201310")  AND
+                (LNK-SYU-KOH1HKNNUM   = "763"         ))
+           OR  ((WK-1001-PREFNUM            =  04     )  AND
+                (LNK-SYU-SRYYMD(1:6)       >= "201310")  AND
+                (LNK-SYU-KOH1HKNNUM   = "663"         )  AND
+                (LNK-SYU-SYUHKNNUM    NOT = SPACE     )  AND
+                (LNK-SYU-SYUHKNNUM    NOT =
+                             "060" AND "067" AND "039"))
            OR  ((WK-1001-PREFNUM            =  12     )  AND
                 (LNK-SYU-SRYYMD(1:6)       >= "201203")  AND
                 (LNK-SYU-KOH1HKNNUM   = "263" OR "363"
@@ -27197,6 +27225,11 @@
                                                         OR "363" ) OR
                  (LNK-SYU-KOH4HKNNUM   = "463" OR "563" OR "263"
                                                         OR "363" )))
+           OR  (( WK-1001-PREFNUM             =  04               ) AND
+                ( LNK-SYU-SRYYMD(1:6)        >= "201310"          ) AND
+                ((LNK-SYU-KOH2HKNNUM   = "663" OR "763"          ) OR
+                 (LNK-SYU-KOH3HKNNUM   = "663" OR "763"          ) OR
+                 (LNK-SYU-KOH4HKNNUM   = "663" OR "763"          )))
            OR  (( WK-1001-PREFNUM             =  10               ) AND
                 ( LNK-SYU-SRYYMD(1:6)        >= "201104"          ) AND
                 ((LNK-SYU-KOH2HKNNUM   = "145" OR "245" OR "146"
@@ -27227,7 +27260,8 @@
                     "145" OR "245" OR "146" OR
                     "246" OR "143" OR "243" OR
                     "463" OR "563" OR "263" OR "363" OR
-                    "263" OR "363" OR "463" OR "772"
+                    "263" OR "363" OR "463" OR "772" OR
+                    "663" OR "763"
                   MOVE  LNK-SYU-KOH-COMPFTN(1)
                                     TO  LNK-SYU-JYO-HKNFTNMONEY
              END-IF
@@ -27237,7 +27271,8 @@
                     "145" OR "245" OR "146" OR
                     "246" OR "143" OR "243" OR
                     "463" OR "563" OR "263" OR "363" OR
-                    "263" OR "363" OR "463" OR "772"
+                    "263" OR "363" OR "463" OR "772" OR
+                    "663" OR "763"
                   MOVE  LNK-SYU-KOH-COMPFTN(2)
                                     TO  LNK-SYU-JYO-HKNFTNMONEY
              END-IF
@@ -27247,7 +27282,8 @@
                     "145" OR "245" OR "146" OR
                     "246" OR "143" OR "243" OR
                     "463" OR "563" OR "263" OR "363" OR
-                    "263" OR "363" OR "463" OR "772"
+                    "263" OR "363" OR "463" OR "772" OR
+                    "663" OR "763"
                   MOVE  LNK-SYU-KOH-COMPFTN(3)
                                     TO  LNK-SYU-JYO-HKNFTNMONEY
              END-IF

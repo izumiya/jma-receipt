@@ -608,6 +608,7 @@
       *  04.06.14    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.15    NACL-ÌçÏÆ    13/06/14  À¸ÊÝ¤Î£·£¹¡¦£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ½¤Àµ
       *  04.06.16    NACL-ÌçÏÆ    12/06/14  ¼ÂÆü¿ô¡¦ÀÁµáÅÀµ­ºÜ¥Õ¥é¥°ÊÔ½¸½¤Àµ
+      *  04.06.17    NACL-ÌçÏÆ    13/09/17  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -17168,6 +17169,14 @@
                                 "8304079"                   ) AND
                     (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
                     (RECE62-SRYYM         >=  "201010"      ))
+                OR ((WRK-PREFNUM           =  "04"          ) AND
+                    (RECE62-KOHNUM(KH-IDX - 1) =
+                          "263" OR "363" OR "463" OR "563"  ) AND
+                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
+                                "8304017" OR "8304028" OR
+                                "8304079"                   ) AND
+                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (RECE62-SRYYM         >=  "201310"      ))
                    MOVE       1      TO    FLG-MIYAGI
                 END-IF
       ****
@@ -17496,6 +17505,10 @@
                                           OR "263" OR "363") AND
                     (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
                     (RECE62-SRYYM        >=  "201201"      ))
+                OR ((WRK-PREFNUM          =  "04"          ) AND
+                    (SYU-KOH1HKNNUM       =  "663" OR "763") AND
+                    (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
+                    (RECE62-SRYYM        >=  "201310"      ))
                 OR ((WRK-PREFNUM          =  "10"          ) AND
                     (SYU-KOH1HKNNUM       =  "145" OR "245"
                                           OR "146" OR "246"

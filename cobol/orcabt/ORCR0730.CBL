@@ -186,6 +186,7 @@
       *                                     給付割合の変更がないときは１枚
       *                                     にまとめるときの公費データの
       *                                     更新方法の修正
+      *  04.06.13    NACL-門脇    13/09/17  宮城県地方公費対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6199,7 +6200,8 @@
                  IF   (SYS-1001-PREFNUM  =  04                    )
                  AND  (RECE62-KOHNUM(1)  = "183" OR "483" OR "583"
                                         OR "783" OR "463" OR "563"
-                                        OR "263" OR "363"         )
+                                        OR "263" OR "363"
+                                        OR "663" OR "763"         )
                      MOVE    RECE62-SHOKUJINISSU (IDX2)
                                                  TO  WRK-KGK2 
                      MOVE    WRK-KGK2            TO
@@ -6327,7 +6329,8 @@
                  IF   (SYS-1001-PREFNUM  =  04                    )
                  AND  (RECE62-KOHNUM(2)  = "183" OR "483" OR "583"
                                         OR "783" OR "463" OR "563"
-                                        OR "263" OR "363"         )
+                                        OR "263" OR "363"
+                                        OR "663" OR "763"         )
                      MOVE    RECE62-SHOKUJINISSU (IDX3)
                                                  TO  WRK-KGK2 
                      MOVE    WRK-KGK2            TO
@@ -6464,7 +6467,8 @@
                        IF   (SYS-1001-PREFNUM      =   04              )
                        AND  (RECE62-KOHNUM(3) = "183" OR "483" OR "583"
                                              OR "783" OR "463" OR "563"
-                                             OR "263" OR "363"         )
+                                             OR "263" OR "363"
+                                             OR "663" OR "763"         )
                            MOVE    RECE62-SHOKUJINISSU (IDX4)
                                                    TO  WRK-KGK2 
                            MOVE    WRK-KGK2        TO
@@ -6605,7 +6609,8 @@
                        IF   (SYS-1001-PREFNUM      =   04              )
                        AND  (RECE62-KOHNUM(4) = "183" OR "483" OR "583"
                                              OR "783" OR "463" OR "563"
-                                             OR "263" OR "363"         )
+                                             OR "263" OR "363"
+                                             OR "663" OR "763"         )
                            MOVE    RECE62-SHOKUJINISSU (IDX5)
                                                    TO  WRK-KGK2 
                            MOVE    WRK-KGK2        TO

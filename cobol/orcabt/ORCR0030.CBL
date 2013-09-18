@@ -621,6 +621,7 @@
       *  04.06.14    NACL-ÌçÏÆ    13/05/01  ÂçºåÉÜÃÏÊý¸øÈñÂÐ±þ
       *  04.06.15    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.16    NACL-ÌçÏÆ    12/06/14  ¼ÂÆü¿ô¡¦ÀÁµáÅÀµ­ºÜ¥Õ¥é¥°ÊÔ½¸½¤Àµ
+      *  04.06.17    NACL-ÌçÏÆ    13/09/17  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -13895,6 +13896,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                           OR "263" OR "363") AND
                     (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
                     (RECE02-SRYYM        >=  "201201"      ))
+                OR ((SYS-1001-PREFNUM     =   04           ) AND
+                    (SYU-KOH1HKNNUM       =  "663" OR "763") AND
+                    (SYU-JYO-COMPFTN  NOT =   ZERO         ) AND
+                    (RECE02-SRYYM        >=  "201310"      ))
                 OR ((SYS-1001-PREFNUM     =   10           ) AND
                     (SYU-KOH1HKNNUM       =  "145" OR "245"
                                           OR "146" OR "246"
