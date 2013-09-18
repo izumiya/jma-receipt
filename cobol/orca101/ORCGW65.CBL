@@ -9841,7 +9841,8 @@
                    MOVE    "0"         TO  SPA-GMN-SKJRYOTAIKBNHON
                WHEN  ( SPA-PREFNUM     =   CONST-MIYAGI )
                 AND  ( SPA-GMN-KOHNUM  =   "183" OR "483" OR "583"
-                                        OR "783" )
+                                        OR "783" OR "263" OR "363"
+                                        OR "463" OR "563")
                WHEN  ( SPA-PREFNUM     =   CONST-SAITAMA )
                 AND  ( SPA-GMN-KOHNUM  =   "352" OR "353" OR "354"
                                         OR "683" )
@@ -10171,7 +10172,7 @@
                WHEN  ( SPA-PREFNUM     =   CONST-MIYAGI )
                 AND  ( SPA-GMN-KOHNUM  =   "583" OR "683"
                                         OR "783" OR "363"
-                                        OR "563" )
+                                        OR "563" OR "763" )
                WHEN  ( SPA-PREFNUM     =   CONST-CHIBA )
                 AND  ( SPA-GMN-KOHNUM  =   "263" OR "363"
                                         OR "463" )
@@ -10184,7 +10185,8 @@
                    MOVE    "1"         TO  SPA-GMN-NINNASIKBN
                    MOVE    "0"         TO  SPA-GMN-NINNASITAIKBN
                WHEN  ( SPA-PREFNUM     =   CONST-MIYAGI )
-                AND  ( SPA-GMN-KOHNUM  =   "263" OR "463" )
+                AND  ( SPA-GMN-KOHNUM  =   "263" OR "463"
+                                                 OR "663" )
                    MOVE    "1"         TO  SPA-GMN-NINNASIKBN
                    MOVE    "2"         TO  SPA-GMN-NINNASITAIKBN
                WHEN  ( SPA-PREFNUM     =   CONST-GUNMA )

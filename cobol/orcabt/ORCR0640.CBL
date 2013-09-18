@@ -601,6 +601,7 @@
       *  04.06.13    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.14    NACL-ÌçÏÆ    13/06/14  À¸ÊÝ¤Î£·£¹¡¦£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ½¤Àµ
       *  04.06.15    NACL-ÌçÏÆ    12/06/14  ¼ÂÆü¿ô¡¦ÀÁµáÅÀµ­ºÜ¥Õ¥é¥°ÊÔ½¸½¤Àµ
+      *  04.06.16    NACL-ÌçÏÆ    13/09/17  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -1649,6 +1650,7 @@
                 07  WRK-TOTALTENFLG            PIC X(01).
                 07  WRK-KISAIFLG               PIC X(01).
                 07  WRK-OCRFLG                 PIC X(01).
+                07  WRK-SKJRYOKBN-HON          PIC X(01).
       *
            03  WRK-SYS2012-TAIHI-TBL.
               05  WRK-SYS2012-TAIHI-OCC        OCCURS   4.
@@ -5285,6 +5287,30 @@
                END-EVALUATE
            END-EVALUATE
       *
+      *@@@
+      *
+           IF   (RECE62-SRYYM   >=  "200604")
+           AND  (WRK-PREFNUM     =  "04"    )
+             EVALUATE  SYS-2010-SKJRYOKBN-HON
+               WHEN      SPACE
+                 IF ((RECE62-KOHNUM(KOHFTN-IDX) = "183" OR "483") AND
+                     (RECE62-SRYYM             >= "200510"      ))
+                 OR ((RECE62-KOHNUM(KOHFTN-IDX) = "583" OR "783") AND
+                     (RECE62-SRYYM             >= "201010"      ))
+                 OR ((RECE62-KOHNUM(KOHFTN-IDX) =
+                                "263" OR "363" OR "463" OR "563") AND
+                     (RECE62-SRYYM             >= "201310"      ))
+                   MOVE  "2"  TO  WRK-SKJRYOKBN-HON(KOHFTN-IDX + 1)
+                 END-IF
+               WHEN      "0"
+               WHEN      "1"
+               WHEN      "2"
+               WHEN      "3"
+                   MOVE  SYS-2010-SKJRYOKBN-HON
+                              TO  WRK-SKJRYOKBN-HON(KOHFTN-IDX + 1)
+             END-EVALUATE
+           END-IF
+      *
            .
        21181-ETCKISAIFLGINF-SET-EXT.
            EXIT.
@@ -5363,6 +5389,30 @@
                                                  (KOHFTN-IDX + 1)
               END-IF
            END-EVALUATE
+      *
+      *@@@
+      *
+           IF   (RECE62-SRYYM   >=  "200604")
+           AND  (WRK-PREFNUM     =  "04"    )
+             EVALUATE  SYS-2010-SKJRYOKBN-HON
+               WHEN      SPACE
+                 IF ((RECE62-KOHNUM(KOHFTN-IDX) = "183" OR "483") AND
+                     (RECE62-SRYYM             >= "200510"      ))
+                 OR ((RECE62-KOHNUM(KOHFTN-IDX) = "583" OR "783") AND
+                     (RECE62-SRYYM             >= "201010"      ))
+                 OR ((RECE62-KOHNUM(KOHFTN-IDX) =
+                                "263" OR "363" OR "463" OR "563") AND
+                     (RECE62-SRYYM             >= "201310"      ))
+                   MOVE  "2"  TO  WRK-SKJRYOKBN-HON(KOHFTN-IDX + 1)
+                 END-IF
+               WHEN      "0"
+               WHEN      "1"
+               WHEN      "2"
+               WHEN      "3"
+                   MOVE  SYS-2010-SKJRYOKBN-HON
+                              TO  WRK-SKJRYOKBN-HON(KOHFTN-IDX + 1)
+             END-EVALUATE
+           END-IF
       *
            .
        21182-ETCKISAIFLGINF-SET2-EXT.
@@ -5467,6 +5517,21 @@
                                                   (KOHFTN-IDX + 1)
               END-IF
            END-EVALUATE
+      *
+      *@@@
+      *
+           IF   (RECE62-SRYYM   >=  "200604")
+           AND  (WRK-PREFNUM     =  "04"    )
+              IF ((RECE62-KOHNUM(KOHFTN-IDX) =  "183" OR "483") AND
+                  (RECE62-SRYYM              < "200510"       ))
+              OR ((RECE62-KOHNUM(KOHFTN-IDX) =  "583" OR "783") AND
+                  (RECE62-SRYYM              <  "201010"      ))
+              OR ((RECE62-KOHNUM(KOHFTN-IDX) =
+                              "263" OR "363" OR "463" OR "563") AND
+                  (RECE62-SRYYM              <  "201310"      ))
+                MOVE  "0"  TO WRK-SKJRYOKBN-HON(KOHFTN-IDX + 1)
+              END-IF
+           END-IF
       *
            .
        21183-ETCKISAIFLGINF-KURIA-EXT.
@@ -19041,6 +19106,18 @@
                                 "8304036" OR "8304041"      ) AND
                     (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
                     (RECE62-SRYYM         >=  "200510"      ) AND
+                    (RECE62-SRYYM         <   "200604"      ))
+                OR ((WRK-PREFNUM           =  "04"          ) AND
+                    (RECE62-KOHNUM(KH-IDX - 1) =
+                                   "183" OR "483"           ) AND
+                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
+                                "8304004" OR "8304009" OR
+                                "8304017" OR "8304023" OR
+                                "8304026" OR "8304028" OR
+                                "8304036" OR "8304041"      ) AND
+                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
+                    (RECE62-SRYYM         >=  "200604"      ) AND
                     (RECE62-SRYYM         <   "200610"      ))
                 OR ((WRK-PREFNUM           =  "04"          ) AND
                     (RECE62-KOHNUM(KH-IDX - 1) =
@@ -19049,6 +19126,7 @@
                                 "8304017" OR "8304028" OR
                                 "8304079"                   ) AND
                     (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
                     (RECE62-SRYYM         >=  "200610"      ))
                 OR ((WRK-PREFNUM           =  "04"          ) AND
                     (RECE62-KOHNUM(KH-IDX - 1) =
@@ -19056,8 +19134,18 @@
                     (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
                                 "8304017" OR "8304028" OR
                                 "8304079"                   ) AND
+                    (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
                     (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
                     (RECE62-SRYYM         >=  "201010"      ))
+                OR ((WRK-PREFNUM           =  "04"          ) AND
+                    (RECE62-KOHNUM(KH-IDX - 1) =
+                          "263" OR "363" OR "463" OR "563"  ) AND
+                    (RECE62-KOHFTNJANUM(KH-IDX - 1)(1:7)   =
+                                "8304017" OR "8304028" OR
+                                "8304079"                   ) AND
+                    (WRK-SKJRYOKBN-HON(KH-IDX) = "2"        ) AND
+                    (SYU-SKJ-FTNKBN(IDX3)  =  "1"           ) AND
+                    (RECE62-SRYYM         >=  "201310"      ))
                    MOVE       1      TO    FLG-MIYAGI
                 END-IF
       ****
@@ -19525,6 +19613,18 @@
                          MOVE     1     TO    FLG-SKY-TOKKOH
                        END-IF
                      END-IF
+                     IF  (SYU-KOH1HKNNUM  =  "763"         )
+                     AND (RECE62-SRYYM   >=  "201310"      )
+                         MOVE     1     TO    FLG-SKY-TOKKOH
+                     END-IF
+                     IF  (SYU-KOH1HKNNUM  =  "663"         )
+                     AND (RECE62-SRYYM   >=  "201310"      )
+                       IF ((RECE62-HKNNUM    NOT =  SPACE) AND
+                           (RECE62-HKNNUM    NOT =
+                                "060" AND "067" AND "039"))
+                         MOVE     1     TO    FLG-SKY-TOKKOH
+                       END-IF
+                     END-IF
                    WHEN      "10"
                      IF  (SYU-KOH1HKNNUM  =  "145" OR "245" OR "146"
                                           OR "246" OR "143" OR "243")
@@ -19647,6 +19747,10 @@
               IF  (SYU-KOH1HKNNUM  =
                              "363" OR "563" OR "263" OR "463")
               AND (RECE62-SRYYM    <  "201201"               )
+                         MOVE    ZERO   TO    FLG-SKY-TOKKOH
+              END-IF
+              IF  (SYU-KOH1HKNNUM  =           "663" OR "763")
+              AND (RECE62-SRYYM    <  "201310"               )
                          MOVE    ZERO   TO    FLG-SKY-TOKKOH
               END-IF
              WHEN      "10"

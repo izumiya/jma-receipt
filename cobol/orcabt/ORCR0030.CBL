@@ -614,6 +614,7 @@
       *  04.06.13    NACL-ÌçÏÆ    13/04/10  ÊÝ¸±Íó¡Ý°ìÉôÉéÃ´¶âÍóµ­ºÜ½¤Àµ
       *  04.06.14    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.15    NACL-ÌçÏÆ    12/06/14  ¼ÂÆü¿ô¡¦ÀÁµáÅÀµ­ºÜ¥Õ¥é¥°ÊÔ½¸½¤Àµ
+      *  04.06.16    NACL-ÌçÏÆ    13/09/17  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    11/10/17  Ë¡Äê³°¸½ÊªµëÉÕÂÐ±þ¡ÊË¡ÊÌ£±£°¡¢£²£±¡Ë
@@ -15785,6 +15786,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          MOVE     1     TO    FLG-SKY-TOKKOH
                        END-IF
                      END-IF
+                     IF  (SYU-KOH1HKNNUM  =  "763"         )
+                     AND (RECE02-SRYYM   >=  "201310"      )
+                         MOVE     1     TO    FLG-SKY-TOKKOH
+                     END-IF
+                     IF  (SYU-KOH1HKNNUM  =  "663"         )
+                     AND (RECE02-SRYYM   >=  "201310"      )
+                       IF ((RECE02-HKNNUM    NOT =  SPACE) AND
+                           (RECE02-HKNNUM    NOT =
+                                "060" AND "067" AND "039"))
+                         MOVE     1     TO    FLG-SKY-TOKKOH
+                       END-IF
+                     END-IF
                    WHEN      "10"
                      IF  (SYU-KOH1HKNNUM  =  "145" OR "245" OR "146"
                                           OR "246" OR "143" OR "243")
@@ -15907,6 +15920,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
               IF  (SYU-KOH1HKNNUM  =
                              "363" OR "563" OR "263" OR "463")
               AND (RECE02-SRYYM    <  "201201"               )
+                         MOVE    ZERO   TO    FLG-SKY-TOKKOH
+              END-IF
+              IF  (SYU-KOH1HKNNUM  =           "663" OR "763")
+              AND (RECE02-SRYYM    <  "201310"               )
                          MOVE    ZERO   TO    FLG-SKY-TOKKOH
               END-IF
              WHEN      "10"
