@@ -78,6 +78,7 @@
            03  WRK-TNS-KJNYMD                  PIC X(08).
            03  WRK-ZAINUM-G.
                05  WRK-ZAINUM                  PIC 9(08).
+           03  WRK-ZAISKBKBN                   PIC X(01).
       *
        01  CALENDAR-AREA.
            03  CL-RYOYO-FLG                    PIC 9(01).
@@ -219,6 +220,12 @@
            MOVE    "tbl_ryocom"    TO  MCP-TABLE
            MOVE    "key2"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           MOVE    "5"             TO  WRK-ZAISKBKBN
+           PERFORM 900-NYUINACCT-KEY17-SEL-SEC
+           IF    ( FLG-NYUINACCT   NOT =   ZERO )
+               MOVE    1           TO  FLG-END
+           END-IF
       *
            PERFORM 900-PTNYUINRRK-KEY24-SEL-SEC
            IF    ( FLG-PTNYUINRRK  =   ZERO )
@@ -383,25 +390,6 @@
       *
            .
        1001111-RYOYOCD-CHK-EXT.
-           EXIT.
-      *****************************************************************
-      *    入院期間編集処理
-      *****************************************************************
-       10011-EDIT-NYUIN-DAY-SEC         SECTION.
-      *
-           PERFORM 900-NYUINACCT-KEY19-SEL-SEC
-      *
-           PERFORM VARYING IDX-DAY FROM    1   BY  1
-                   UNTIL ( IDX-DAY >   31 )
-      *
-               IF    ( NACCT-DAY (IDX-DAY) =   ZERO )
-                   MOVE    ZERO    TO  CL-DAY (IDX-DAY)
-               END-IF
-      *
-           END-PERFORM
-      *
-           .
-       10011-EDIT-NYUIN-DAY-EXT.
            EXIT.
       *****************************************************************
       *    主処理
@@ -704,7 +692,7 @@
       *****************************************************************
       *    入院会計検索処理
       *****************************************************************
-       900-NYUINACCT-KEY19-SEL-SEC     SECTION.
+       900-NYUINACCT-KEY17-SEL-SEC     SECTION.
       *
            MOVE    ZERO                TO  FLG-NYUINACCT
       *
@@ -713,10 +701,10 @@
            MOVE    "1"                 TO  NACCT-NYUGAIKBN
            MOVE    SPA-PTID            TO  NACCT-PTID
            MOVE    WRK-SRYYM           TO  NACCT-SRYYM
-           MOVE    "5"                 TO  NACCT-ZAISKBKBN
+           MOVE    WRK-ZAISKBKBN       TO  NACCT-ZAISKBKBN
            MOVE    NYUINACCT-REC       TO  MCPDATA-REC
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-           MOVE    "key19"             TO  MCP-PATHNAME
+           MOVE    "key17"             TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC          =   ZERO )
                MOVE    MCPDATA-REC TO  NYUINACCT-REC
@@ -726,11 +714,11 @@
            END-IF
       *
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-           MOVE    "key19"             TO  MCP-PATHNAME
+           MOVE    "key17"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
-       900-NYUINACCT-KEY19-SEL-EXT.
+       900-NYUINACCT-KEY17-SEL-EXT.
            EXIT.
       *****************************************************************
       *    入院会計検索処理
