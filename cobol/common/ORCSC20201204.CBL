@@ -197,6 +197,8 @@
       *サンプル薬対応
            03  IDX-G               PIC 9(04).
       *
+           03  IDXW                PIC 9(04).
+      *
       *    一時領域
        01  WRK-AREA.
            03  WRK-SRYCD           PIC X(09).
@@ -254,7 +256,7 @@
                05  WRK-SANTEN-GEN      PIC 9(08).
                05  WRK-SANTENSU        PIC 9(08).
                05  WRK-SANTEN-KEI      PIC 9(08).
-               05  WRK-HKNKEI-TBL      OCCURS   5.
+               05  WRK-HKNKEI-TBL      OCCURS   15.
                    07  WRK-HKNKEI-COMBI    PIC X(04).
                    07  WRK-HKNKEI-CHIKEN   PIC X(01).
                    07  WRK-HKNKEI-KEIKEI   PIC 9(08).
@@ -2372,18 +2374,36 @@
       *    複数保険判定（内服のみ）
            IF      WRK-CHK-SRYSYUKBN   =   "211"
                                        OR  "291"
-               IF      WRK-HKNKEI-COMBI (WRK-CNT-HKN)
+      *****    IF      WRK-HKNKEI-COMBI (WRK-CNT-HKN)
+      *                                =   WRK-COM-HKNCOMBI (IDX)
+      *            CONTINUE
+      *        ELSE
+      *            ADD     1               TO  WRK-CNT-HKN
+      *            MOVE    WRK-COM-HKNCOMBI (IDX)
+      *                                    TO  WRK-HKNKEI-COMBI
+      *                                               (WRK-CNT-HKN)
+      *            MOVE    WRK-COM-CHIKENKBN(IDX)
+      *                                    TO  WRK-HKNKEI-CHIKEN
+      *                                               (WRK-CNT-HKN)
+      *****    END-IF
+      *
+      *        保険毎にまとめる
+               PERFORM VARYING   IDXW      FROM    1   BY  1
+                       UNTIL    (IDXW      >   15   )
+                   IF      WRK-HKNKEI-COMBI (IDXW) =   SPACE
+                       MOVE    WRK-COM-HKNCOMBI (IDX)
+                                               TO  WRK-HKNKEI-COMBI
+                                                      (IDXW)
+                       MOVE    WRK-COM-CHIKENKBN(IDX)
+                                               TO  WRK-HKNKEI-CHIKEN
+                                                      (IDXW)
+                   END-IF
+                   IF      WRK-HKNKEI-COMBI (IDXW)
                                        =   WRK-COM-HKNCOMBI (IDX)
-                   CONTINUE
-               ELSE
-                   ADD     1               TO  WRK-CNT-HKN
-                   MOVE    WRK-COM-HKNCOMBI (IDX)
-                                           TO  WRK-HKNKEI-COMBI
-                                                      (WRK-CNT-HKN)
-                   MOVE    WRK-COM-CHIKENKBN(IDX)
-                                           TO  WRK-HKNKEI-CHIKEN
-                                                      (WRK-CNT-HKN)
-               END-IF
+                       MOVE    IDXW            TO  WRK-CNT-HKN
+                       MOVE    15              TO  IDXW
+                   END-IF
+               END-PERFORM
            END-IF
       *
       *H24.4
@@ -3902,6 +3922,15 @@
            MOVE    ZERO                TO  WRK-SANTEN-G
            COMPUTE WRK-SANTEN-KEI      =   WRK-KEIKEI
                                        -   WRK-SANTEN
+      *    複数保険最終行
+           MOVE    ZERO                TO  WRK-CNT-HKN
+           PERFORM VARYING IDX-GEN     FROM    1   BY  1
+                   UNTIL  (IDX-GEN         >   15 )
+               IF      WRK-HKNKEI-COMBI (IDX-GEN)
+                                       NOT =   SPACE
+                   MOVE    IDX-GEN         TO  WRK-CNT-HKN
+               END-IF
+           END-PERFORM
       *
            PERFORM VARYING IDX-GEN     FROM    1   BY  1
                    UNTIL   IDX-GEN     >   WRK-CNT-HKN
@@ -4507,6 +4536,10 @@
            END-IF
            IF      FLG-ERR             =   ZERO
                ADD     1               TO  IDXS
+               IF      IDXS            >   30
+                   MOVE    "XXXX"          TO  SPA-ERRCD
+                   GO      TO     3002-KASAN-SYORI-EXT
+               END-IF
                MOVE    WRK-SRYCD       TO  LNK-ORCSC-SRYCD
                                                    (02 IDXS)
                MOVE    TNS-TEN         TO  LNK-ORCSC-TENSU
