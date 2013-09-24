@@ -21,7 +21,7 @@ fi
 SRYCD=${1}
 TERMID=${2}
 JOBID=${3}
-SHELLID=${4}
+SHELLID=$(printf "%-8s" ${4})
 HOSPNUM=${5}
 
 MEDPHOTOPATH="${MSTSRVPATH}/siori/image"

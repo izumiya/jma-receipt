@@ -107,6 +107,10 @@ fi
 rm -f ${WORKDIR}/${FILENAME}.sql
 
 MSG="マスター取得処理が終了しました"
-jobend 0 0000 ${HOSPNUM} "${JOBID}" "${SHELLID}" "${MSG}" ${LOG}
+if [ "${MASTERID}" = "SIORI" ] ; then
+  echomsg "${MSG}" ${LOG} 
+else
+  jobend 0 0000 ${HOSPNUM} "${JOBID}" "${SHELLID}" "${MSG}" ${LOG}
+fi
 
 exit 0
