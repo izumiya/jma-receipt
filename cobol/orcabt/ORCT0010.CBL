@@ -253,6 +253,9 @@
            COPY    "CPPTNYUINRRK.INC"  REPLACING   //PTNYUINRRK-//
                                        BY          //WKPTNYUINRR-//.
       *
+           COPY    "CPSK5010.INC"      REPLACING   //SYS-//
+                                       BY          //WKSYS-//.
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -1201,10 +1204,12 @@
       *****************************************************************
       *    個別編集処理
       *****************************************************************
-       20021-KOBETU-HENSYU-SEC              SECTION.
+       20021-KOBETU-HENSYU-SEC             SECTION.
       *
       *    請求期間取得処理
+           MOVE    SYS-5010-REC    TO      WKSYS-5010-REC
            PERFORM 20021-SEIKYU-KIKAN-GET-SEC
+           MOVE    WKSYS-5010-REC  TO      SYS-5010-REC
       *
            PERFORM VARYING IDX10   FROM    1   BY  1
                    UNTIL ( IDX10   >   WRK-KIKAN-MAX )
