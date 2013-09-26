@@ -72,6 +72,7 @@
       * 04.07.00     NACL-多々納  12/10/04  診察料なし同日初診料発生対応
       * 04.08.00     NACL-多々納  13/03/XX  平成２５年４月改正対応
       * 04.08.00     NACL-多々納  13/02/XX  労災コードレセ電対応
+      * 04.08.00     NACL-多々納  13/09/XX  労災同日再診コード追加対応
       *****************************************************************
       *
       *
@@ -476,25 +477,41 @@
            03  FILLER              PIC X(13)   VALUE   "0 FD101110040".
       *    再診料
       *!!! 03  FILLER              PIC X(13)   VALUE   "0 S 101120040".
-           03  FILLER              PIC X(13)   VALUE   "0 S 101120010".
+           03  FILLER              PIC X(13)   VALUE   "0   101120010".
       *    再診料（同日２科目）
       *!!! 03  FILLER              PIC X(13)   VALUE   "0 SD101120100".
-           03  FILLER              PIC X(13)   VALUE   "0 SD101120040".
+           03  FILLER              PIC X(13)   VALUE   "0 KD101120040".
       *    外来管理加算
       *!!! 03  FILLER              PIC X(13)   VALUE   "0 G 101120070".
-           03  FILLER              PIC X(13)   VALUE   "0 G 101120020".
+      *****03  FILLER              PIC X(13)   VALUE   "0 G 101120020".
+      *H25.9 追加
+      *    電話再診料
+           03  FILLER              PIC X(13)   VALUE   "0 T 101120050".
+      *    同日再診料
+           03  FILLER              PIC X(13)   VALUE   "0 D 101120060".
+      *    同日電話再診料
+           03  FILLER              PIC X(13)   VALUE   "0 S 101120070".
+      *    電話再診（同一日２科目）
+           03  FILLER              PIC X(13)   VALUE   "0 JD101120080".
       *
        01  TBL-RSI-SINSATU-AREAR   REDEFINES   TBL-RSI-SINSATU-AREA.
-           03  TBL-RSI-SINSATU-OCC     OCCURS  5    INDEXED  TBL-RSI.
+           03  TBL-RSI-SINSATU-OCC     OCCURS  8    INDEXED  TBL-RSI.
       *        回数
                05  TBLR-KAISU           PIC 9(01).
                05  FILLER               PIC X(01).
-      *        F:初診、S:再診、G:外来管理加算
+      ******** F:初診、S:再診、G:外来管理加算
+      *        F:初診、 :再診
+      *        D:同日再診、T:電話再診,S:同日電話再診,J:電話２科目
                05  TBLR-KBN             PIC X(01).
       *        D:同日初診
                05  TBLR-KBN2            PIC X(01).
       *        診療コード
                05  TBLR-SRYCD           PIC X(09).
+      *H25.7
+      *    労災外来管理加算等加算テーブル
+       01  TBLR-GAIRAI-AREA.
+      *    外来管理加算
+           03  TBLRG-SRYCD         PIC X(09)   VALUE   "101120020".
       *
       *    保険別算定履歴テーブル
            COPY   "CMSANTEITBL.INC".
@@ -1156,11 +1173,11 @@
                    MOVE    TBLR-KAISU (TBL-RSI)   TO  WRK-KAISU
                    MOVE    TBLR-KBN   (TBL-RSI)   TO  WRK-KBN
            END-SEARCH
-           IF      WRK-KBN             =   "S"  OR  "F"
-               MOVE    1              TO  FLG-ARI
-           ELSE
-               MOVE    ZERO           TO  FLG-ARI
-           END-IF
+      *****IF      WRK-KBN             =   "S"  OR  "F"
+      *        MOVE    1              TO  FLG-ARI
+      *    ELSE
+      *        MOVE    ZERO           TO  FLG-ARI
+      **** END-IF
       *
            IF      FLG-ARI             =   1
                MOVE    1               TO  FLG-SINSATU
@@ -4031,21 +4048,56 @@
                MOVE    SPACE               TO  WRK-KBN2
                PERFORM 20091-RSI-SINSATU-SEC
            ELSE
-      *        再診料
-               IF     (SPA-LSTYMD          =   SPA-SRYYMD  ) AND
-                      (SPA-TAKA-SRYKA-R    NOT =   SPACE   )
-               AND    (WRK-KBN             =   SPACE   )
-               AND    (LNK-SC10S-SYORI     NOT =   "J"   )
+      *****    再診料
+      *        IF     (SPA-LSTYMD          =   SPA-SRYYMD  ) AND
+      *               (SPA-TAKA-SRYKA-R    NOT =   SPACE   )
+      *        AND    (WRK-KBN             =   SPACE   )
+      *        AND    (LNK-SC10S-SYORI     NOT =   "J"   )
       *            同日再診・他科受診あり
-                   PERFORM 3301-DOUSAISIN-SEC
-               ELSE
+      *            PERFORM 3301-DOUSAISIN-SEC
+      *        ELSE
       *            平成１５年９月１日から逓減廃止とする
-                   MOVE    ZERO                TO  WRK-KAISU
-                   MOVE    "S"                 TO  WRK-KBN
+      *            MOVE    ZERO                TO  WRK-KAISU
+      *            MOVE    "S"                 TO  WRK-KBN
+      *            MOVE    SPACE               TO  WRK-KBN2
+      *            PERFORM 20091-RSI-SINSATU-SEC
+      ******   END-IF
+      *H25.9
+      *        同日再診料算定
+               MOVE    ZERO                TO  FLG-DOUJITU
+               IF     ( SPA-SYORIFLG        =   ZERO     ) AND
+                      ( SPA-RRK-LSTYMD      =   SPA-SRYYMD )
+                   IF      SPA-DOUJITU     NOT =   ZERO
+                       MOVE    1                   TO  FLG-DOUJITU
+                   END-IF
+               END-IF
+               IF      (SPA-SYORIFLG        =   1       )   AND
+                       (WRK-DAY-SINSATUCNT  >   ZERO    )
+                   MOVE    1                   TO  FLG-DOUJITU
+               END-IF
+               IF      FLG-DOUJITU         =   1
+                   IF     (SPA-TAKA-SRYKA-R    =   SPACE ) OR
+                          (LNK-SC10S-SYORI     =   "J"   )
+                     OR   (FLG-DOUJI-HEN       =   1     )
+                     OR   (FLG-DOUJI-HEN2      =   1     )
+                       MOVE    "12"                TO  WRK-SRYKBN
+                       MOVE    "D"                 TO  WRK-KBN
+                       MOVE    SPACE               TO  WRK-KBN2
+      *                診察コードをテーブルより決定
+                       PERFORM 20091-RSI-SINSATU-SEC
+                   ELSE
+                       PERFORM 3301-DOUSAISIN-SEC
+                   END-IF
+               ELSE
+      *        再診料算定
+                   MOVE    "12"                TO  WRK-SRYKBN
+                   MOVE    SPACE               TO  WRK-KBN
                    MOVE    SPACE               TO  WRK-KBN2
+      *            診察コードをテーブルより決定
                    PERFORM 20091-RSI-SINSATU-SEC
                END-IF
            END-IF
+      *
       *    診察料自動追加処理
            PERFORM 3301-SYOSIN-HEN-SEC
            IF      FLG-ADD             =   1
@@ -4172,7 +4224,9 @@
            MOVE    "G"                 TO  WRK-KBN
       *
       *    テーブル検索
-           PERFORM 20091-RSI-SINSATU-SEC
+      *****PERFORM 20091-RSI-SINSATU-SEC
+      *    労災外来管理加算コード
+           MOVE    TBLRG-SRYCD         TO  WRK-SRYCD
            PERFORM 3301-SYOSIN-HEN-SEC
      ***** MOVE    ZERO                TO  WRK-GAIRAI-IDX
       *    自動算定あり
@@ -4211,6 +4265,8 @@
              AND  (SPA-RSI-JUNKYO  NOT =   "1" )
       *        労災の同日再診料算定
                MOVE    "D"                 TO  WRK-KBN
+               MOVE    SPACE               TO  WRK-KBN2
+               MOVE    1                   TO  FLG-DOUJI-HEN
                PERFORM 2009-RSIHKN-SET-SEC
            ELSE
       *        同日再診料へ置換え
@@ -4249,35 +4305,96 @@
                               (FLG-TEL-ARI     =   1   )
       *        電話再診かのチェック
                MOVE    SPA-COM-INPUTCD (IDX)   TO  WRK-SRYCD
-               SET     TBL-IDX             TO  1
-               SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
-                  AT   END
-                       MOVE    SPACE           TO  WRK-KBN
-                       MOVE    SPACE           TO  WRK-KBN2
-                       MOVE    ZERO            TO  WRK-KAISU
-                   WHEN   (TBL-SRYCD (TBL-IDX) =   WRK-SRYCD) 
-                       MOVE    TBL-KBN   (TBL-IDX)     TO  WRK-KBN
-                       MOVE    TBL-KBN2  (TBL-IDX)     TO  WRK-KBN2
-                       MOVE    ZERO            TO  WRK-KAISU
+               MOVE    IDX                 TO  SPA-GMN-IDX
+               PERFORM 30011-TELSAISIN-CHKSYORI-SEC
+      *
+      *****    SET     TBL-IDX             TO  1
+      *        SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
+      *           AT   END
+      *                MOVE    SPACE           TO  WRK-KBN
+      *                MOVE    SPACE           TO  WRK-KBN2
+      *                MOVE    ZERO            TO  WRK-KAISU
+      *            WHEN   (TBL-SRYCD (TBL-IDX) =   WRK-SRYCD) 
+      *                MOVE    TBL-KBN   (TBL-IDX)     TO  WRK-KBN
+      *                MOVE    TBL-KBN2  (TBL-IDX)     TO  WRK-KBN2
+      *                MOVE    ZERO            TO  WRK-KAISU
       *H25.4           紹介なし対応
-                       MOVE    TBL-ROUJIN(TBL-IDX) TO  WRK-KBN4
-               END-SEARCH
+      *                MOVE    TBL-ROUJIN(TBL-IDX) TO  WRK-KBN4
+      *        END-SEARCH
       *
       *        同日再診料へ置換え
+      *        IF      WRK-KBN             =   "T"
+      *            MOVE    "12"                TO  WRK-SRYKBN
+      *            MOVE    "S"                 TO  WRK-KBN
+      *            診察コードをテーブルより決定
+      *            PERFORM 2001-SRYCD-TBL-SEC
+      *            電話再診の時、同日電話再診へ振り替え
+      *            MOVE    IDX                 TO  SPA-GMN-IDX
+      *            MOVE    SPA-GMN-IDX         TO  WRK-IDX-IN
+      *            PERFORM 33041-SRYCD-ADD-SEC
+      *            MOVE    1                   TO  FLG-TEL-ARI
+      ******** END-IF
+           END-PERFORM
+           .
+       3001-TELSAISIN-CHK-EXT.
+           EXIT.
+      *H25.9
+      *****************************************************************
+      *    電話再診コード判定変換処理
+      *****************************************************************
+       30011-TELSAISIN-CHKSYORI-SEC         SECTION.
+      *
+           SET     TBL-IDX             TO  1
+           SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
+              AT   END
+                   MOVE    SPACE           TO  WRK-KBN
+                   MOVE    SPACE           TO  WRK-KBN2
+                   MOVE    ZERO            TO  WRK-KAISU
+               WHEN   (TBL-SRYCD (TBL-IDX) =   WRK-SRYCD) 
+                   MOVE    TBL-KBN   (TBL-IDX)     TO  WRK-KBN
+                   MOVE    TBL-KBN2  (TBL-IDX)     TO  WRK-KBN2
+                   MOVE    ZERO            TO  WRK-KAISU
+      *H25.4       紹介なし対応
+                   MOVE    TBL-ROUJIN(TBL-IDX) TO  WRK-KBN4
+           END-SEARCH
+      *
+      *    同日再診料へ置換え
+           IF      WRK-KBN             =   "T"
+               MOVE    "12"                TO  WRK-SRYKBN
+               MOVE    "S"                 TO  WRK-KBN
+      *        診察コードをテーブルより決定
+               PERFORM 2001-SRYCD-TBL-SEC
+      *        電話再診の時、同日電話再診へ振り替え
+               MOVE    SPA-GMN-IDX         TO  WRK-IDX-IN
+               PERFORM 33041-SRYCD-ADD-SEC
+               MOVE    1                   TO  FLG-TEL-ARI
+           END-IF
+      *    労災判定
+           IF     (FLG-TEL-ARI         =   ZERO )
+              AND (SPA-HKNKBN          =   1    )
+              AND (SPA-RSI-JUNKYO  NOT =   "1" )
+               SET     TBL-RSI              TO  1
+               SEARCH  TBL-RSI-SINSATU-OCC  VARYING   TBL-RSI
+                   AT  END
+                       MOVE    SPACE              TO  WRK-KBN
+                       MOVE    SPACE              TO  WRK-KBN2
+                   WHEN    TBLR-SRYCD (TBL-RSI)   =   WRK-SRYCD
+                       MOVE    TBLR-KBN   (TBL-RSI)   TO  WRK-KBN
+                       MOVE    TBLR-KBN2  (TBL-RSI)   TO  WRK-KBN2
+               END-SEARCH
+      *
+      *        同日電話再診料へ置換え
                IF      WRK-KBN             =   "T"
-                   MOVE    "12"                TO  WRK-SRYKBN
                    MOVE    "S"                 TO  WRK-KBN
       *            診察コードをテーブルより決定
-                   PERFORM 2001-SRYCD-TBL-SEC
-      *            電話再診の時、同日電話再診へ振り替え
-                   MOVE    IDX                 TO  SPA-GMN-IDX
+                   PERFORM 20091-RSI-SINSATU-SEC
                    MOVE    SPA-GMN-IDX         TO  WRK-IDX-IN
                    PERFORM 33041-SRYCD-ADD-SEC
                    MOVE    1                   TO  FLG-TEL-ARI
                END-IF
-           END-PERFORM
+           END-IF
            .
-       3001-TELSAISIN-CHK-EXT.
+       30011-TELSAISIN-CHKSYORI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4597,29 +4714,35 @@
       *
       *    電話再診かのチェック
            MOVE    SPA-COM-INPUTCD (SPA-GMN-IDX)   TO  WRK-SRYCD
-           SET     TBL-IDX             TO  1
-           SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
-                   AT   END
-                       MOVE    SPACE           TO  WRK-KBN
-                       MOVE    SPACE           TO  WRK-KBN2
-                       MOVE    ZERO            TO  WRK-KAISU
-                   WHEN   (TBL-SRYCD (TBL-IDX) =   WRK-SRYCD) 
-                       MOVE    TBL-KBN   (TBL-IDX)     TO  WRK-KBN
-                       MOVE    TBL-KBN2  (TBL-IDX)     TO  WRK-KBN2
-                       MOVE    ZERO            TO  WRK-KAISU
-           END-SEARCH
-      *
-      *    同日再診料へ置換え
-           IF      WRK-KBN             =   "T"
-               MOVE    "12"                TO  WRK-SRYKBN
-               MOVE    "S"                 TO  WRK-KBN
-      *        診察コードをテーブルより決定
-               PERFORM 2001-SRYCD-TBL-SEC
-      *        電話再診の時、同日電話再診へ振り替え
-               MOVE    SPA-GMN-IDX         TO  WRK-IDX-IN
-               PERFORM 33041-SRYCD-ADD-SEC
+      *H25.7
+           PERFORM 30011-TELSAISIN-CHKSYORI-SEC
+           IF      FLG-TEL-ARI         =   1
                GO      TO      500-TELDOUSAISIN-SET-EXT
            END-IF
+      *H25.7
+      **** SET     TBL-IDX             TO  1
+      *    SEARCH  TBL-SINSATU-OCC     VARYING   TBL-IDX
+      *            AT   END
+      *                MOVE    SPACE           TO  WRK-KBN
+      *                MOVE    SPACE           TO  WRK-KBN2
+      *                MOVE    ZERO            TO  WRK-KAISU
+      *            WHEN   (TBL-SRYCD (TBL-IDX) =   WRK-SRYCD) 
+      *                MOVE    TBL-KBN   (TBL-IDX)     TO  WRK-KBN
+      *                MOVE    TBL-KBN2  (TBL-IDX)     TO  WRK-KBN2
+      *                MOVE    ZERO            TO  WRK-KAISU
+      *    END-SEARCH
+      *
+      *    同日再診料へ置換え
+      *    IF      WRK-KBN             =   "T"
+      *        MOVE    "12"                TO  WRK-SRYKBN
+      *        MOVE    "S"                 TO  WRK-KBN
+      *        診察コードをテーブルより決定
+      *        PERFORM 2001-SRYCD-TBL-SEC
+      *        電話再診の時、同日電話再診へ振り替え
+      *        MOVE    SPA-GMN-IDX         TO  WRK-IDX-IN
+      *        PERFORM 33041-SRYCD-ADD-SEC
+      *        GO      TO      500-TELDOUSAISIN-SET-EXT
+      **** END-IF
       *
       *    電話再診以外の時、再度診察料算定へ
            MOVE    SPACE               TO  SPA-SCR-REC
@@ -4868,6 +4991,26 @@
                                MOVE    1           TO  SPA-SYONIKA-ARI
                            END-IF
                    END-EVALUATE
+      *H25.9
+               ELSE
+      *            労災コード判定
+                   SET     TBL-RSI              TO  1
+                   SEARCH  TBL-RSI-SINSATU-OCC  VARYING   TBL-RSI
+                   AT  END
+                       MOVE    SPACE              TO  WRK-KBN
+                    WHEN   SPA-COM-INPUTCD (IDX)
+                                              =   TBLR-SRYCD (TBL-RSI)
+                       MOVE    1                  TO  FLG-ARI
+                       MOVE    TBLR-KBN   (TBL-RSI)   TO  WRK-KBN
+                   END-SEARCH
+                   EVALUATE    WRK-KBN
+      *                電話再診、同日電話再診
+                       WHEN    "T"
+                       WHEN    "S"
+                       WHEN    "J"
+                           MOVE    1               TO  SPA-TELSAI-ARI
+                   END-EVALUATE
+      *
                END-IF
              END-IF
            END-PERFORM
@@ -5958,11 +6101,12 @@
                                               =   TBLR-SRYCD (TBL-RSI)
                            MOVE    1                  TO  FLG-ARI
                            MOVE    TBLR-KBN (TBL-RSI) TO  WRK-KBN
-                           IF      WRK-KBN     NOT =   "G"
+      *H25.9***            IF      WRK-KBN     NOT =   "G"
                                MOVE    1           TO  FLG-SINSATU-ARI
                                MOVE    TBLR-KBN (TBL-RSI)
                                                    TO  WRK-KBN2
-                           END-IF
+      ******               END-IF
+                           MOVE    TBLR-KBN (TBL-RSI)  TO  WRK-KBN3
                    END-SEARCH
                END-IF
                IF      FLG-ARI             =   1
@@ -5989,6 +6133,11 @@
       *        外来管理加算
                IF      SPA-COM-INPUTCD (IDX)   =   TBLG-SRYCD
                    MOVE    1            TO  FLG-GAI
+               END-IF
+      *H25.9
+      *        労災外来管理加算
+               IF      SPA-COM-INPUTCD (IDX)   =   TBLRG-SRYCD
+                   MOVE    1               TO  FLG-GAI
                END-IF
       *******  SET     TBLG-IDX              TO  1
       *        SEARCH  TBL-GAIRAI-OCC       VARYING   TBLG-IDX
@@ -6314,10 +6463,15 @@
                        MOVE    ZERO                TO  FLG-ARI
                    WHEN    WRK-SRYCD       =   TBLR-SRYCD (TBL-RSI)
                        MOVE    1                   TO  FLG-ARI
-                       IF      TBLR-KBN (TBL-RSI)  =   "F"   OR "S"
-                           MOVE    1                   TO  FLG-ARI3
-                       END-IF
+                       MOVE    1                   TO  FLG-ARI3
+      ****             IF      TBLR-KBN (TBL-RSI)  =   "F"   OR "S"
+      *                    MOVE    1                   TO  FLG-ARI3
+      ****             END-IF
                END-SEARCH
+      *        労災外来管理加算
+               IF      WRK-SRYCD           =   TBLRG-SRYCD
+                   MOVE    1                   TO  FLG-ARI
+               END-IF
            END-IF
       *    診察料で同じコードがある時
            IF      FLG-ARI3            =   1
