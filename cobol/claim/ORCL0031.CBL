@@ -74,6 +74,7 @@
       *  04.07.00    NACL=多々納  12/03/XX  平成２４年４月改正対応
       *  04.07.02    NACL-藤原    12/05/31  病名の入外区分対応
       *  04.07.00    NACL=多々納  12/07/18  API病名のみ登録対応
+      *  04.07.03    NACL-藤原    13/09/05  病名の補足コメント対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -131,10 +132,12 @@
            03  FLG-HKNCOMBI        PIC 9(01).
            03  FLG-UKETUKE         PIC 9(01).
            03  FLG-UKE             PIC 9(01).
+           03  FLG-USERBYOMEI      PIC 9(01).
       *
            03  FLG-ZAIEND          PIC 9(01).
            03  FLG-CHK             PIC 9(01).
            03  FLG-OK              PIC 9(01).
+           03  FLG-HOSOKU-CHK      PIC 9(01). 
       *    0:正常 1:エラー  2:単独病名エラー
       *    3:コード順エラー 4:修飾語のみ
       *    5:未コード化傷病名コード
@@ -267,6 +270,14 @@
            03  WRK-UTAGAIFLG           PIC X(01).
            03  WRK-UTAGAIFLG-KETASU    PIC 9(02).
       *
+           03  WRK-HOSOKU-TBL. 
+               05  WRK-HOSOKU-G    OCCURS  3.
+                   07  WRK-THOSOKUCD   PIC X(10).
+                   07  WRK-THOSOKU-COMMENT
+                                       PIC X(40).
+           03  WRK-HOSOKU-COMMENT  PIC X(40).
+           03  WRK-HOSOKU-COMMENT1 PIC X(40).
+      *
            03  WRK-BYOMEI-TBL. 
                05  WRK-BYOMEI-G    OCCURS  7.
                    07  WRK-TBYOMEICD   PIC X(10).
@@ -308,6 +319,7 @@
                05  WRK-SYSDD       PIC X(02).
       *                             
            03  WRK-PATHNAME             PIC X(64).
+           03  WRK-PTBYO-MCP-PATHNAME   PIC X(64).
       *                             
       *    03  WRK-DBPATH.
       *        05  FIL1                PIC S9(9)   BINARY.
@@ -420,6 +432,10 @@
        01  PTBYOMEI-REC.
            COPY    "CPPTBYOMEI.INC".
       *
+      *    自院病名マスタ
+       01  USERBYOMEI-REC.
+           COPY    "CPUSERBYOMEI.INC".
+      *
       *    保険組み合わせ
        01  HKNCOMBI-REC.
            COPY    "CPHKNCOMBI.INC".
@@ -508,6 +524,7 @@
        01  LNK-ERROR-AREA.
            03  LNK-KBN-CODE            PIC X(01).
            03  LNK-KBN-CODE2           PIC X(01).
+           03  LNK-KBN-V2              PIC X(01).
            03  LNK-ERR-CODE            PIC 9(02).
            03  LNK-ERR-MSG             PIC X(100).
            03  LNK-OUT-HKNCOMBI        PIC X(04).
@@ -2900,9 +2917,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    UNTIL       IDX     >   50
       *
                INITIALIZE                  WRK-BYOMEI-TBL
+                                           WRK-HOSOKU-TBL
                                            FLG-BYOMEI-CHK
                                            WRK-TOKSKNCD
                                            WRK-BYOMEI
+                                           WRK-HOSOKU-COMMENT
       *
       **         DISPLAY "--------------------------- " 
       **         DISPLAY "IDX=" IDX 
@@ -3199,6 +3218,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            DISPLAY " diagnosis connectname ="  WRK-BYOMEI
            DISPLAY " diagnosis check flag  ="  FLG-BYOMEI-CHK
       *
+      *
       *    病名全角チェック
            IF      WRK-BYOMEI      NOT =   SPACE    
                INITIALIZE                  ORCSKANACHKAREA
@@ -3211,6 +3231,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
                    MOVE    "？？？？？"        TO  WRK-BYOMEI
                END-IF
+           END-IF
+      *
+      *    補足コメントチェック
+           IF    ( LNK-KBN-V2          =   "1" )
+           AND   ( LNK-KBN-CODE        =   "1" )
+               PERFORM 2006128-HOSOKU-COMMENT-CHK-SEC
            END-IF
       *
       *    疾患開始日
@@ -3344,6 +3370,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
            MOVE    WRK-PTID            TO  PTBYO-PTID
            MOVE    WRK-BYOYMD          TO  PTBYO-SRYYMD
+           MOVE    WRK-HOSOKU-COMMENT  TO  PTBYO-HOSOKU-COMMENT
            IF      FLG-BYOMEI-DELETE   =   1 
                MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
                                                PTBYO-XXBYOMEI
@@ -3372,11 +3399,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key29"             TO  MCP-PATHNAME
+           IF    ( LNK-KBN-V2          =   "1" )
+           AND   ( LNK-KBN-CODE        =   "1" )
+               MOVE    "key47"             TO  WRK-PTBYO-MCP-PATHNAME
+           ELSE
+               MOVE    "key29"             TO  WRK-PTBYO-MCP-PATHNAME
+           END-IF
+           MOVE    WRK-PTBYO-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key29"             TO  MCP-PATHNAME
+               MOVE    WRK-PTBYO-MCP-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-PTBYO-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-PTBYOMEI
@@ -3414,12 +3449,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key29"             TO  MCP-PATHNAME
+               MOVE    WRK-PTBYO-MCP-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-PTBYO-READ-SEC
            END-PERFORM
       *
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key29"             TO  MCP-PATHNAME
+           MOVE    WRK-PTBYO-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            IF      FLG-PTBYOMEI-UMU     =   ZERO
@@ -3482,13 +3519,22 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WRK-BYOYMD          TO  PTBYO-SRYYMD
            MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
                                            PTBYO-XXBYOMEI
+           MOVE    WRK-HOSOKU-COMMENT  TO  PTBYO-HOSOKU-COMMENT
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key29"             TO  MCP-PATHNAME
+           IF    ( LNK-KBN-V2          =   "1" )
+           AND   ( LNK-KBN-CODE        =   "1" )
+               MOVE    "key47"             TO  WRK-PTBYO-MCP-PATHNAME
+           ELSE
+               MOVE    "key29"             TO  WRK-PTBYO-MCP-PATHNAME
+           END-IF
+           MOVE    WRK-PTBYO-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key29"             TO  MCP-PATHNAME
+               MOVE    WRK-PTBYO-MCP-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-PTBYO-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-PTBYOMEI
@@ -3526,12 +3572,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
       *
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key29"             TO  MCP-PATHNAME
+               MOVE    WRK-PTBYO-MCP-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-PTBYO-READ-SEC
            END-PERFORM
       *
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key29"             TO  MCP-PATHNAME
+           MOVE    WRK-PTBYO-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            IF      FLG-PTBYOMEI-UMU     =   ZERO
@@ -3669,6 +3717,20 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    疑いフラグ・主病名フラグ
            MOVE    WRK-UTAGAIFLG   TO  PTBYO-UTAGAIFLG
            MOVE    WRK-SYUBYOFLG   TO  PTBYO-SYUBYOFLG
+      *
+           IF    ( LNK-KBN-V2          =   "1" )
+           AND   ( LNK-KBN-CODE        =   "1" )
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >       3
+                       OR      WRK-THOSOKUCD (IDY) =   SPACE
+      *           補足コメントコード
+                   MOVE    WRK-THOSOKUCD (IDY) 
+                                           TO  PTBYO-HOSOKUCD (IDY)
+               END-PERFORM
+      *        補足コメント
+               MOVE    WRK-HOSOKU-COMMENT 
+                                       TO  PTBYO-HOSOKU-COMMENT
+           END-IF
       *
       *    疾患コードがエラー又は未コード化傷病名コード以外のとき
            IF      FLG-BYOMEI-CHK      NOT =   1   AND 5
@@ -4128,11 +4190,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key29"             TO  MCP-PATHNAME
+           IF    ( LNK-KBN-V2          =   "1" )
+           AND   ( LNK-KBN-CODE        =   "1" )
+               MOVE    "key47"             TO  WRK-PTBYO-MCP-PATHNAME
+           ELSE
+               MOVE    "key29"             TO  WRK-PTBYO-MCP-PATHNAME
+           END-IF
+           MOVE    WRK-PTBYO-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key29"             TO  MCP-PATHNAME
+               MOVE    WRK-PTBYO-MCP-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-PTBYO-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-PTBYOMEI
@@ -4154,7 +4224,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF 
       *
                    MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-                   MOVE    "key29"             TO  MCP-PATHNAME
+                  MOVE    WRK-PTBYO-MCP-PATHNAME
+                                               TO  MCP-PATHNAME
                    PERFORM 900-PTBYO-READ-SEC
                END-PERFORM
       *
@@ -4170,7 +4241,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key29"             TO  MCP-PATHNAME
+           MOVE    WRK-PTBYO-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
            .
        2006125-KOUSIN-03-EXT.
@@ -4240,11 +4312,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key29"             TO  MCP-PATHNAME
+           IF    ( LNK-KBN-V2          =   "1" )
+           AND   ( LNK-KBN-CODE        =   "1" )
+               MOVE    "key47"             TO  WRK-PTBYO-MCP-PATHNAME
+           ELSE
+               MOVE    "key29"             TO  WRK-PTBYO-MCP-PATHNAME
+           END-IF
+           MOVE    WRK-PTBYO-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-               MOVE    "key29"             TO  MCP-PATHNAME
+               MOVE    WRK-PTBYO-MCP-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-PTBYO-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-PTBYOMEI
@@ -4265,7 +4345,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    ADD     1                   TO  PTBYOMEI-DOUKI-CNT
       *
                    MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-                   MOVE    "key29"             TO  MCP-PATHNAME
+                   MOVE    WRK-PTBYO-MCP-PATHNAME
+                                               TO  MCP-PATHNAME
                    PERFORM 900-PTBYO-READ-SEC
                END-PERFORM
       *
@@ -4282,11 +4363,139 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
-           MOVE    "key29"             TO  MCP-PATHNAME
+           MOVE    WRK-PTBYO-MCP-PATHNAME
+                                       TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
            .
            .
        2006127-KOUSIN-05-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    補足コメントチェック処理
+      *****************************************************************
+       2006128-HOSOKU-COMMENT-CHK-SEC  SECTION.
+      *
+           MOVE    SPACE               TO  WRK-HOSOKU-COMMENT
+      *
+           DISPLAY " disease_sname ="  LF04-HOSOKU-COMMENT (IDX)
+      *
+           IF      LF04-HOSOKUCD-G (IDX) =   SPACE
+      *
+               MOVE    LF04-HOSOKU-COMMENT (IDX)
+                                             TO  WRK-HOSOKU-COMMENT
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >       3
+                       OR      LF04-HOSOKUCD (IDX IDY) 
+                                   =       SPACE
+      *
+                   DISPLAY " IDY="   IDY
+                   DISPLAY " disease_scode ="
+                                     LF04-HOSOKUCD (IDX IDY)
+      *
+                   MOVE    LF04-HOSOKUCD (IDX IDY)
+                                           TO  WRK-THOSOKUCD (IDY)
+               END-PERFORM
+      *     
+      *        補足コメントコードチェック
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >       3
+                       OR      WRK-THOSOKUCD (IDY) =   SPACE
+      *
+                   MOVE    ZERO                TO  FLG-HOSOKU-CHK
+      *
+      *            病名コードの長さチェック
+                   MOVE    ZERO                TO  WRK-LENGTH 
+                   PERFORM VARYING IDZ FROM    10  BY  -1
+                           UNTIL   IDZ <       1
+                       IF      WRK-THOSOKUCD (IDY)(IDZ:1)
+                                               NOT =   SPACE
+                           MOVE    IDZ             TO  WRK-LENGTH
+                           MOVE    1               TO  IDZ
+                       END-IF
+                   END-PERFORM
+                   EVALUATE    WRK-LENGTH
+                       WHEN    4
+                           MOVE    SPACE       TO  WRK-BYOMEICD
+                           MOVE    "ZZZ"       TO  WRK-BYOMEICD (1:3)
+                           MOVE    WRK-THOSOKUCD (IDY)(1:4)
+                                               TO  WRK-BYOMEICD (4:4)
+                           MOVE    WRK-BYOMEICD
+                                               TO  WRK-THOSOKUCD (IDY)
+                       WHEN    7
+                           CONTINUE
+                       WHEN    OTHER            
+                           MOVE    1           TO  FLG-HOSOKU-CHK
+                   END-EVALUATE
+      *
+      *            病名マスタチェック
+                   IF      FLG-HOSOKU-CHK      =   ZERO
+                       INITIALIZE                      BYOMEI-REC
+                       MOVE    WRK-THOSOKUCD (IDY) TO  BYO-BYOMEICD
+                       PERFORM 900-BYOMEI-READ-SEC
+                       IF      FLG-BYOMEI          =   ZERO  
+                           MOVE    BYO-BYOMEI      TO
+                                               WRK-THOSOKU-COMMENT (IDY)
+                       END-IF
+                   END-IF
+                   IF    ( FLG-HOSOKU-CHK      =   1 )
+                   OR    ( FLG-BYOMEI          =   1 )
+      *                自院病名チェック
+                       INITIALIZE              USERBYOMEI-REC
+                       MOVE    WRK-THOSOKUCD (IDY)
+                                               TO  USBYO-BYOMEIINPUTCD
+                       PERFORM 900-USBYO-INV-SEC
+                       IF      FLG-USERBYOMEI  =   ZERO
+                           MOVE    USBYO-BYOMEI    TO
+                                               WRK-THOSOKU-COMMENT (IDY)
+                       END-IF
+                   END-IF
+               END-PERFORM
+      *           
+      *       補足コメントを組み立てる
+               MOVE    SPACE                   TO  WRK-HOSOKU-COMMENT
+               STRING  WRK-THOSOKU-COMMENT (1)     DELIMITED   BY  SPACE
+                       WRK-THOSOKU-COMMENT (2)     DELIMITED   BY  SPACE
+                       WRK-THOSOKU-COMMENT (3)     DELIMITED   BY  SPACE
+                                           INTO    WRK-HOSOKU-COMMENT
+               END-STRING
+           END-IF
+      *
+      *    全角チェック
+           IF      WRK-HOSOKU-COMMENT  NOT =   SPACE    
+               INITIALIZE                      ORCSKANACHKAREA
+               MOVE    "2"                 TO  KANACHK-SYORI 
+               MOVE    WRK-HOSOKU-COMMENT  TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+               IF      KANACHK-RC          =   ZERO
+                   MOVE    KANACHK-OUT-INPUT (1:KANACHK-MAX)
+                                               TO  WRK-HOSOKU-COMMENT
+               ELSE
+                   MOVE    "？？？？？"        TO  WRK-HOSOKU-COMMENT
+               END-IF
+           END-IF
+      *
+      *    前後の（）をはずす
+           MOVE    SPACE               TO  WRK-HOSOKU-COMMENT1
+           COMPUTE IDY     =   KANACHK-MAX     -   1
+           IF      WRK-HOSOKU-COMMENT (IDY:2)
+                                           =   "）"
+               COMPUTE IDZ     =   KANACHK-MAX     -   2
+               MOVE    WRK-HOSOKU-COMMENT (1:IDZ)
+                                               TO  WRK-HOSOKU-COMMENT1
+               MOVE    WRK-HOSOKU-COMMENT1     TO  WRK-HOSOKU-COMMENT
+           END-IF
+           MOVE    SPACE               TO  WRK-HOSOKU-COMMENT1
+           IF      WRK-HOSOKU-COMMENT (1:2)
+                                           =   "（"
+               MOVE    WRK-HOSOKU-COMMENT (3:) TO  WRK-HOSOKU-COMMENT1
+               MOVE    WRK-HOSOKU-COMMENT1     TO  WRK-HOSOKU-COMMENT
+           END-IF
+      *
+           DISPLAY " diagnosis supplement ="  WRK-HOSOKU-COMMENT
+           .
+       2006128-HOSOKU-COMMENT-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4627,6 +4836,41 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        903-CLMUID-READ-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    自院病名マスター読込（主キー）
+      *****************************************************************
+       900-USBYO-INV-SEC         SECTION.
+      *
+           MOVE    SPA-HOSPNUM         TO  USBYO-HOSPNUM
+           MOVE    USERBYOMEI-REC      TO  MCPDATA-REC
+           MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+               MOVE    "key6"              TO  MCP-PATHNAME
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  USERBYOMEI-REC
+                   MOVE    ZERO            TO  FLG-USERBYOMEI
+               ELSE
+                   INITIALIZE                  USERBYOMEI-REC
+                   MOVE    1               TO  FLG-USERBYOMEI
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-USERBYOMEI
+               INITIALIZE                  USERBYOMEI-REC
+           END-IF
+      *
+           MOVE    "tbl_userbyomei"    TO  MCP-TABLE
+           MOVE    "key6"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       900-USBYO-INV-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    テーブル検索処理
       *****************************************************************

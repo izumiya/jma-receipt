@@ -869,3 +869,20 @@ path	key46	{
 		;
 	};
 };
+
+path	key47	{ 	
+	DBSELECT	{
+		DECLARE tbl_ptbyomei_key47_csr CURSOR FOR
+		SELECT *
+		FROM tbl_ptbyomei
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     SRYYMD    =   :SRYYMD
+			AND   ( BYOMEI    =  :BYOMEI  OR
+			        BYOMEI    =  :XXBYOMEI )
+			AND     HOSOKU_COMMENT =   :HOSOKU_COMMENT
+			AND   DLTFLG      =   ' '
+			ORDER  BY  SRYKA,BYOMEI
+		;
+	};
+};

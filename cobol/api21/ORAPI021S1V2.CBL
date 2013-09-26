@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.00    NACL-多々納  13/08/XX  病名補足コメント追加対応
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -140,6 +141,7 @@
        01  WRK-ERROR-AREA.
            03  WRK-KBN-CODE            PIC X(01).
            03  WRK-KBN-CODE2           PIC X(01).
+           03  WRK-KBN-V2              PIC X(01).
            03  WRK-ERR-CODE            PIC 9(02).
            03  WRK-ERR-MSG             PIC X(100).
            03  WRK-OUT-HKNCOMBI        PIC X(04).
@@ -1115,6 +1117,17 @@
                        ADD     1               TO  CNT-BYOCNT
                    END-IF
                END-PERFORM
+      *ver.4.7
+      *        補足コメント
+               MOVE    MDCREQ-DIAGNOSIS-SCODE1(IDY)
+                                           TO  LF04-HOSOKUCD(IDY 1)
+               MOVE    MDCREQ-DIAGNOSIS-SCODE2(IDY)
+                                           TO  LF04-HOSOKUCD(IDY 2)
+               MOVE    MDCREQ-DIAGNOSIS-SCODE3(IDY)
+                                           TO  LF04-HOSOKUCD(IDY 3)
+               MOVE    MDCREQ-DIAGNOSIS-SNAME (IDY)
+                                           TO  LF04-HOSOKU-COMMENT(IDY)
+      *
                IF      MDCREQ-DIAGNOSIS-CATEGORY (IDY)
                                            = "PD"
                    MOVE    "MML0012"       TO  LF04-SNDBNRTBL-BNRTBL1
@@ -1179,6 +1192,8 @@
            IF     (CNT-SRYCNT          =   ZERO )
                MOVE    "1"                 TO  WRK-KBN-CODE2
            END-IF
+      *    V2区分
+           MOVE    "1"                 TO  WRK-KBN-V2
            CALL    "ORCL0031"          USING LF04-REC
                                              WRK-ERROR-AREA
       *
