@@ -598,7 +598,12 @@
                                            OR  "112016550" )
            OR   (( SRY-SRYCD (IDX-SRYCD)   =   "101120100") AND
                  ( SRY-SRYYM              <=   "201306"   ))
-           OR   (( SRY-SRYCD (IDX-SRYCD)   =   "101120040") AND
+           OR   (( SRY-SRYCD (IDX-SRYCD)   =   "101120040"
+                                           OR  "101120050"
+                                           OR  "101120060"
+                                           OR  "101120070"
+                                           OR  "101120080"
+                                                          ) AND
                  ( SRY-SRYYM              >=   "201307"   ))
                IF    ( WRK-SYOSAISIN-KBN   =   "1" )
                    CONTINUE
