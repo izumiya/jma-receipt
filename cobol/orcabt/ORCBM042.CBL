@@ -28,6 +28,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.07.01    NACL-Æ£¸¶    13/05/07  ¸øÌ³ºÒ³²¤òÂÐ¾Ý³°¤È¤¹¤ë
+      *  04.07.02    NACL-Æ£¸¶    13/09/27  ¡ï¥Þ¡¼¥¯¤ÎÊÑ¹¹
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -71,9 +72,11 @@
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //RECEERR//.
       *
-           COPY    "HCM72.INC". 
+           COPY    "HCM72V01.INC"  REPLACING  //HCM72V01//
+                                   BY         //HCM72//.
       *
-           COPY    "HCM73.INC". 
+           COPY    "HCM73V01.INC"  REPLACING  //HCM73V01//
+                                   BY         //HCM73//.
       *
       *    ¥¹¥ÑÎÎ°è
        01  STS-AREA.
@@ -642,7 +645,7 @@
                    PERFORM VARYING IDX FROM    8   BY  -1
                            UNTIL   IDX <       1
                        IF      WRK-KINGAKZ (IDX:1) =   SPACE
-                           MOVE    "¡ï"            TO
+                           MOVE    "\"             TO
                                                    HCM73-MARK-S (IDX)
                            MOVE    1               TO  IDX
                        END-IF
@@ -711,7 +714,7 @@
                    PERFORM VARYING IDX FROM    8   BY  -1
                            UNTIL   IDX <       1
                        IF      WRK-KINGAKZ (IDX:1) =   SPACE
-                           MOVE    "¡ï"            TO
+                           MOVE    "\"            TO
                                                    HCM72-MARK-S (IDX)
                            MOVE    1               TO  IDX
                        END-IF
@@ -780,7 +783,7 @@
                                        TO  SPRT-PRIORITY
            EVALUATE    FLG-SYORI
                WHEN    1
-                   MOVE   "HCM73.red"          TO  SPRT-PRTID
+                   MOVE   "HCM73V01.red"       TO  SPRT-PRTID
                    MOVE    HCM73               TO  SPRT-PRTDATA
       *
                    IF    ( KEY-O-SYOKAIFLG     =   "1"  )
@@ -795,7 +798,7 @@
                                                    TO  SPRT-TITLE
                    END-IF
                WHEN    2
-                   MOVE   "HCM72.red"          TO  SPRT-PRTID
+                   MOVE   "HCM72V01.red"       TO  SPRT-PRTID
                    MOVE    HCM72               TO  SPRT-PRTDATA
                    MOVE    "¥¢¥Õ¥¿¡¼¥±¥¢°ÑÂ÷ÈñÀÁµá½ñ" 
                                                TO  SPRT-TITLE
