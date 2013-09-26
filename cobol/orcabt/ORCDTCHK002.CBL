@@ -3863,7 +3863,12 @@
                                        OR  "112016550"  )
                OR   (( DCSRY-SRYCD     =   "101120100") AND
                      ( DCACCT-SRYYMD(1:6) <=  "201306"))
-               OR   (( DCSRY-SRYCD     =   "101120040") AND
+               OR   (( DCSRY-SRYCD     =   "101120040"
+                                       OR  "101120050"
+                                       OR  "101120060"
+                                       OR  "101120070"
+                                       OR  "101120080"
+                                                      ) AND
                      ( DCACCT-SRYYMD(1:6) >=  "201307"))
       *
                    MOVE    1           TO  FLG-SHOSAISIN
