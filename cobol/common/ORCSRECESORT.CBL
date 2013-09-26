@@ -464,6 +464,8 @@ grpsys     COPY    "COMMON-SPA".
                                                           (IDX-SRY))
                                IF     (ORCSRECESORT-IN-SRYCD(IDX2)(1:1)
                                                        =   "7"   )
+                                 AND  (ORCSRECESORT-IN-DATAKBN(IDX2)
+                                                       =   "3"   )
                                    ADD     1               TO  IDXZ
                                    PERFORM 2009-TBL-HEN-SEC
                                    MOVE    1               TO  FLG-END3
