@@ -69,6 +69,8 @@
       *  04.06.02    NACL-門脇    13/02/18  労災レセ電対応
       *                                     （新診療行為コード対応）
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
+      *  04.06.04    NACL-門脇    13/09/25  労災マスタ追加対応
+      *                                     （電話再診料　等）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3919,7 +3921,11 @@ grpsys             MOVE    SPA-HOSPNUM             TO  PTCOM-HOSPNUM
                                               OR "101110040"      )
                        OR ( (SRY-SRYCD(IDX2)  =  "101120100" ) AND
                             (SRY-SRYYM       <=  "201306"    )    )
-                       OR ( (SRY-SRYCD(IDX2)  =  "101120040" ) AND
+                       OR ( (SRY-SRYCD(IDX2)  =  "101120040"
+                                              OR "101120050"
+                                              OR "101120060"
+                                              OR "101120070"
+                                              OR "101120080" ) AND
                             (SRY-SRYYM       >=  "201307"    )    )
                              MOVE    1      TO    FLG-SHOSAISIN
                        END-IF

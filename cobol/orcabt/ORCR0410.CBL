@@ -93,6 +93,8 @@
       *  04.06.04    NACL-ÌçÏÆ    13/06/14  µßµÞ°åÎÅ´ÉÍý²Ã»»»»ÄêÈ½Äê½¤Àµ
       *  04.06.05    NACL-ÌçÏÆ    13/09/09  ÅÀ¿ô¥Þ¥¹¥¿·îÅÓÃæ¶â³ÛÊÑ¹¹ÂÐ±þ
       *                                     ¡Ê£°£¹£µ£¹£±¡Á£¹£´¡Ë
+      *  04.06.06    NACL-ÌçÏÆ    13/09/25  Ï«ºÒ¥Þ¥¹¥¿ÄÉ²ÃÂÐ±þ
+      *                                     ¡ÊÅÅÏÃºÆ¿ÇÎÁ¡¡Åù¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -353,6 +355,11 @@
            03  CONS-ROUSAI32   PIC X(09)   VALUE   "101800890".
            03  CONS-ROUSAI33   PIC X(09)   VALUE   "101130190".
            03  CONS-ROUSAI34   PIC X(09)   VALUE   "101120010".
+      *
+           03  CONS-ROUSAI35   PIC X(09)   VALUE   "101120050".
+           03  CONS-ROUSAI36   PIC X(09)   VALUE   "101120060".
+           03  CONS-ROUSAI37   PIC X(09)   VALUE   "101120070".
+           03  CONS-ROUSAI38   PIC X(09)   VALUE   "101120080".
       *
            03  CONS-GAIRAI1    PIC X(09)   VALUE   "101120070".
            03  CONS-GAIRAI2    PIC X(09)   VALUE   "101120080".
@@ -1336,7 +1343,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               OR  CONS-ROUSAI18)
                        OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI19 ) AND
                             ( RECE41-SRYYM  <=   "201306"     ))
-                       OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI5  ) AND
+                       OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI5
+                                             OR CONS-ROUSAI35
+                                             OR CONS-ROUSAI36
+                                             OR CONS-ROUSAI37
+                                             OR CONS-ROUSAI38 ) AND
                             ( RECE41-SRYYM  >=   "201307"     ))
       *
                           MOVE       1      TO    FLG-SHOSAISIN
@@ -1579,7 +1590,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             CONS-ROUSAI24 OR CONS-ROUSAI25 OR
                             CONS-ROUSAI26 OR CONS-ROUSAI27 OR
                             CONS-ROUSAI28 OR CONS-ROUSAI29 OR
-                            CONS-ROUSAI30 OR CONS-ROUSAI31   )   AND
+                            CONS-ROUSAI30 OR CONS-ROUSAI31 OR
+                            CONS-ROUSAI35 OR CONS-ROUSAI36 OR
+                            CONS-ROUSAI37 OR CONS-ROUSAI38   )   AND
                            (RECE41-SRYYM  >=  "201307"       ))
       *
                           IF  SRY-SRYSYUKBN = "809"
@@ -1835,7 +1848,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             CONS-ROUSAI24 OR CONS-ROUSAI25 OR
                             CONS-ROUSAI26 OR CONS-ROUSAI27 OR
                             CONS-ROUSAI28 OR CONS-ROUSAI29 OR
-                            CONS-ROUSAI30 OR CONS-ROUSAI31    ) AND
+                            CONS-ROUSAI30 OR CONS-ROUSAI31 OR
+                            CONS-ROUSAI35 OR CONS-ROUSAI36 OR
+                            CONS-ROUSAI37 OR CONS-ROUSAI38   )   AND
                            (RECE41-SRYYM  >=  "201307"        ))
       *
                                COMPUTE  WRK-TEN-JI   =  TNS-TEN / 10

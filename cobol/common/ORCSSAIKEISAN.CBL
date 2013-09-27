@@ -62,6 +62,8 @@
       *  04.06.04    NACL-門脇    13/02/18  労災レセ電対応
       *                                     （新診療行為コード対応）
       *  04.06.05    NACL-門脇    13/02/27  平成２５年４月改正対応
+      *  04.06.06    NACL-門脇    13/09/25  労災マスタ追加対応
+      *                                     （電話再診料　等）
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2643,7 +2645,9 @@
                                     (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
                            END-IF
                            IF  SRY-SRYCD(IDX3) =
-                               "101120010" OR "101120040"
+                               "101120010" OR "101120040" OR
+                               "101120050" OR "101120060" OR
+                               "101120070" OR "101120080"
                              COMPUTE WK-RSISAISHIN = WK-RSISAISHIN +
                                     (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
                            END-IF

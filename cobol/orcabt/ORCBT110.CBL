@@ -45,6 +45,8 @@
       *  04.06.01    NACL-門脇    13/02/18  労災レセ電対応
       *                                     （新診療行為コード対応）
       *  04.06.02    NACL-門脇    13/02/27  平成２５年４月改正対応
+      *  04.06.03    NACL-門脇    13/09/25  労災マスタ追加対応
+      *                                     （電話再診料　等）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -969,6 +971,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    WHEN    "112010150"
       *            電話同日再診（一般 診療所）
                    WHEN    "112010650"
+      *
+                   WHEN    "112015810"
+                   WHEN    "112015950"
                        MOVE    3                   TO  WRK-KIHONKBN
       *
       *            再診料（老人 病院）
@@ -1003,16 +1008,28 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    WHEN    "112016550"
       *            同日外来診療料（老人）
                    WHEN    "112705850"
-                       MOVE    2                   TO  WRK-KIHONKBN
+      *
+                   WHEN    "112016210"
+                   WHEN    "112016410"
+                       MOVE    3                   TO  WRK-KIHONKBN
       *
       *            労災再診料
                    WHEN    "101120040"
                        IF     SRY-SRYYM       <=   "201306"
                            MOVE    2               TO  WRK-KIHONKBN
+                       ELSE
+                           MOVE    3               TO  WRK-KIHONKBN
                        END-IF
                    WHEN    "101120010"
+                   WHEN    "101120050"
                        IF     SRY-SRYYM       >=   "201307"
                            MOVE    2               TO  WRK-KIHONKBN
+                       END-IF
+                   WHEN    "101120060"
+                   WHEN    "101120070"
+                   WHEN    "101120080"
+                       IF     SRY-SRYYM       >=   "201307"
+                           MOVE    3               TO  WRK-KIHONKBN
                        END-IF
       *
       *            他科受診
