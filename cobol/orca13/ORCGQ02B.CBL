@@ -2063,7 +2063,7 @@
       *
            MOVE    "B01"           TO  MCP-WIDGET
       *
-           MOVE    "Q02"           TO  SPA-MOTOPG
+           MOVE    SPA-Q01-SAKIPG  TO  SPA-MOTOPG
                                        SPA-Q97-MOTOPG
            MOVE    "Q97"           TO  SPA-SAKIPG
       *
