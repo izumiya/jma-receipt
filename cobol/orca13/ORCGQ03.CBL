@@ -397,7 +397,7 @@
       *
            MOVE    ZERO                TO  SPA-Q02-Q03-RTOK-FLG
       *
-           MOVE    "Q02"               TO  SPA-SAKIPG
+           MOVE    SPA-Q01-SAKIPG      TO  SPA-SAKIPG
            MOVE    "Q03"               TO  SPA-MOTOPG
       *
       *****MOVE    "BACK"              TO  MCP-PUTTYPE
@@ -429,11 +429,11 @@
       *
            MOVE    1                   TO  SPA-Q02-Q03-RTOK-FLG
       *
-           MOVE    "Q02"               TO  SPA-SAKIPG
+           MOVE    SPA-Q01-SAKIPG      TO  SPA-SAKIPG
            MOVE    "Q03"               TO  SPA-MOTOPG
       *
            MOVE    "JOIN"              TO  MCP-PUTTYPE
-           MOVE    "Q02"               TO  MCP-WINDOW
+           MOVE    SPA-Q01-SAKIPG      TO  MCP-WINDOW
       *
            PERFORM 900-PUT-WINDOW
       *
