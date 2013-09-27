@@ -93,6 +93,8 @@
       *  04.06.04    NACL-門脇    13/06/14  救急医療管理加算算定判定修正
       *  04.06.05    NACL-門脇    13/09/09  点数マスタ月途中金額変更対応
       *                                     （０９５９１〜９４）
+      *  04.06.06    NACL-門脇    13/09/25  労災マスタ追加対応
+      *                                     （電話再診料　等）
       *
       *  04.07.01    NACL-門脇    11/09/07  労災請求書作成対応
       *  04.07.02    NACL-門脇    13/01/21  労災レセ電対応
@@ -361,6 +363,11 @@
            03  CONS-ROUSAI32   PIC X(09)   VALUE   "101800890".
            03  CONS-ROUSAI33   PIC X(09)   VALUE   "101130190".
            03  CONS-ROUSAI34   PIC X(09)   VALUE   "101120010".
+      *
+           03  CONS-ROUSAI35   PIC X(09)   VALUE   "101120050".
+           03  CONS-ROUSAI36   PIC X(09)   VALUE   "101120060".
+           03  CONS-ROUSAI37   PIC X(09)   VALUE   "101120070".
+           03  CONS-ROUSAI38   PIC X(09)   VALUE   "101120080".
       *
            03  CONS-GAIRAI1    PIC X(09)   VALUE   "101120070".
            03  CONS-GAIRAI2    PIC X(09)   VALUE   "101120080".
@@ -1420,7 +1427,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               OR  CONS-ROUSAI18)
                        OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI19 ) AND
                             ( RECE41-SRYYM  <=   "201306"     ))
-                       OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI5  ) AND
+                       OR  (( SRY-SRYCD(IDY) =  CONS-ROUSAI5
+                                             OR CONS-ROUSAI35
+                                             OR CONS-ROUSAI36
+                                             OR CONS-ROUSAI37
+                                             OR CONS-ROUSAI38 ) AND
                             ( RECE41-SRYYM  >=   "201307"     ))
       *
                           MOVE       1      TO    FLG-SHOSAISIN
@@ -1663,7 +1674,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             CONS-ROUSAI24 OR CONS-ROUSAI25 OR
                             CONS-ROUSAI26 OR CONS-ROUSAI27 OR
                             CONS-ROUSAI28 OR CONS-ROUSAI29 OR
-                            CONS-ROUSAI30 OR CONS-ROUSAI31   )   AND
+                            CONS-ROUSAI30 OR CONS-ROUSAI31 OR
+                            CONS-ROUSAI35 OR CONS-ROUSAI36 OR
+                            CONS-ROUSAI37 OR CONS-ROUSAI38   )   AND
                            (RECE41-SRYYM  >=  "201307"       ))
       *
                           IF  SRY-SRYSYUKBN = "809"
@@ -1919,7 +1932,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             CONS-ROUSAI24 OR CONS-ROUSAI25 OR
                             CONS-ROUSAI26 OR CONS-ROUSAI27 OR
                             CONS-ROUSAI28 OR CONS-ROUSAI29 OR
-                            CONS-ROUSAI30 OR CONS-ROUSAI31    ) AND
+                            CONS-ROUSAI30 OR CONS-ROUSAI31 OR
+                            CONS-ROUSAI35 OR CONS-ROUSAI36 OR
+                            CONS-ROUSAI37 OR CONS-ROUSAI38   )   AND
                            (RECE41-SRYYM  >=  "201307"        ))
       *
                                COMPUTE  WRK-TEN-JI   =  TNS-TEN / 10

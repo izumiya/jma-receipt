@@ -49,6 +49,8 @@
       *
       *  04.06.01    NACL-ÌçÏÆ    13/02/18  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *                                     ¡Ê¿·¿ÇÎÅ¹Ô°Ù¥³¡¼¥ÉÂÐ±þ¡Ë
+      *  04.06.02    NACL-ÌçÏÆ    13/09/25  Ï«ºÒ¥Þ¥¹¥¿ÄÉ²ÃÂÐ±þ
+      *                                     ¡ÊÅÅÏÃºÆ¿ÇÎÁ¡¡Åù¡Ë
       *
       *  04.07.01    NACL-ÌçÏÆ    13/01/21  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *****************************************************************
@@ -328,17 +330,20 @@
       *    ½é¿Ç
            03  CONS-SYOSHIN    PIC X(09)   VALUE   "101110010".
       *     
-      *    ºÆ¿Ç¡Ê£²£°£±£³Ç¯£³·î¤Þ¤Ç¡Ë
+      *    ºÆ¿Ç¡Ê£²£°£±£³Ç¯£¶·î¤Þ¤Ç¡Ë
            03  CONS-SAISHIN-G.
                05  FILLER      PIC X(09)   VALUE   "101120040".
                05  FILLER      PIC X(09)   VALUE   "101120050".
            03  CONS-SAISHIN-R              REDEFINES   CONS-SAISHIN-G.
                05  CONS-SAISHIN            PIC X(09)   OCCURS  2. 
-      *    ºÆ¿Ç¡Ê£²£°£±£³Ç¯£´·î¤«¤é¡Ë
+      *    ºÆ¿Ç¡Ê£²£°£±£³Ç¯£··î¤«¤é¡Ë
            03  CONS-SAISHIN2-G.
                05  FILLER      PIC X(09)   VALUE   "101120010".
+               05  FILLER      PIC X(09)   VALUE   "101120050".
+               05  FILLER      PIC X(09)   VALUE   "101120060".
+               05  FILLER      PIC X(09)   VALUE   "101120070".
            03  CONS-SAISHIN2-R             REDEFINES   CONS-SAISHIN2-G.
-               05  CONS-SAISHIN2           PIC X(09)   OCCURS  1. 
+               05  CONS-SAISHIN2           PIC X(09)   OCCURS  4. 
       *
            COPY    "MCPAREA".
       *
@@ -667,7 +672,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                WHEN    "12"
                    IF  RECE41-SRYYM   >=  "201307"
                      PERFORM VARYING IDY FROM    1   BY  1
-                               UNTIL   IDY         >   1
+                               UNTIL   IDY         >   4
                                OR      FLG-NOPRT   =   1
                        IF  TBL-ZAIW-SRYCD (WRK-WIDX1)
                                          =   CONS-SAISHIN2(IDY)
