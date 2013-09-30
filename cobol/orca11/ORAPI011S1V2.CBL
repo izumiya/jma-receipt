@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.00    NACL-多々納  13/09/26  CLAIM診療区分名称編集
       *
       *****************************************************************
       *
@@ -1738,8 +1739,14 @@
            ELSE
                MOVE    UKE-HKNCOMBI    TO  SHELLTBL-ARG9
            END-IF
-      *    診療内容
-           MOVE    UKE-SRYNAIYO        TO  SHELLTBL-ARG10
+      *    診療内容（名称編集）
+           MOVE    UKE-SRYNAIYO        TO  WRK-SRYNAIYO
+           PERFORM 20011-SRYNAIYO-CHK-SEC
+           IF      WRK-ERRCD           =   SPACE
+               MOVE    WRK-SRYNAIYO-NAME   TO  SHELLTBL-ARG10
+           ELSE
+               MOVE    UKE-SRYNAIYO        TO  SHELLTBL-ARG10
+           END-IF
       *    連番
            ADD     1                   TO  WRK-RENNUM
            MOVE    WRK-RENNUM          TO  SHELLTBL-ARG11 (1:2)
