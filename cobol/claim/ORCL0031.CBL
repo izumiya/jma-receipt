@@ -3493,9 +3493,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *            同期フラグ
                    IF      SYS-9000-BYOMEI-DOUKI-FLG
                                                =   "1"
-                       IF      FLG-PTBYOMEI-UMU    =   2
+      *****************IF      FLG-PTBYOMEI-UMU    =   2
                            PERFORM 2006125-KOUSIN-03-SEC
-                       END-IF
+      *****************END-IF
                    END-IF
                END-IF
            END-IF
@@ -4136,6 +4136,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              END-IF
            END-IF
       *
+           MOVE    SMCNDATE-YMD        TO  PTBYO-UPYMD
+           MOVE    SMCNDATE-HMS        TO  PTBYO-UPHMS
+      *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
@@ -4162,6 +4165,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-HOSPNUM         TO  PTBYO-HOSPNUM
            MOVE    WRK-PTID            TO  PTBYO-PTID
            MOVE    WRK-BYOYMD          TO  PTBYO-SRYYMD
+           MOVE    WRK-HOSOKU-COMMENT  TO  PTBYO-HOSOKU-COMMENT
            IF      FLG-BYOMEI-DELETE   =   1 
                MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
                                                PTBYO-XXBYOMEI
@@ -4273,6 +4277,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    入外区分
            MOVE    WRK-NYUGAIKBN       TO  PTBYO-NYUGAIKBN
       *
+           MOVE    SMCNDATE-YMD        TO  PTBYO-UPYMD
+           MOVE    SMCNDATE-HMS        TO  PTBYO-UPHMS
+      *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
@@ -4309,6 +4316,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    WRK-BYOYMD          TO  PTBYO-SRYYMD
            MOVE    WRK-BYOMEI1 (1:80)  TO  PTBYO-BYOMEI
                                            PTBYO-XXBYOMEI
+           MOVE    WRK-HOSOKU-COMMENT  TO  PTBYO-HOSOKU-COMMENT
       *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
