@@ -2015,7 +2015,6 @@
             <can_focus>True</can_focus>
             <has_focus>False</has_focus>
             <editable>True</editable>
-            <text_max_length>4</text_max_length>
             <format>ZZZZ</format>
             <signal>
               <name>changed</name>
