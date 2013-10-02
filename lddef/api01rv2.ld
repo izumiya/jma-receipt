@@ -17,6 +17,7 @@ bindapi	"acsimulatev2"	"OpenCOBOL"	"ORAPI023R1V2";
 bindapi	"visitptlstv2"	"OpenCOBOL"	"ORAPI021R2V2";
 bindapi	"hsconfbasev2"	"OpenCOBOL"	"ORAPI031RC1V2";
 bindapi	"hsconfwardv2"	"OpenCOBOL"	"ORAPI031RC2V2";
+bindapi	"tmedicalgetv2"	"OpenCOBOL"	"ORAPI021R3V2";
 
 multiplex_group	api01rv2;
 
@@ -37,6 +38,7 @@ data	{
 		visitptlstv2;
 		hsconfbasev2;
 		hsconfwardv2;
+		tmedicalgetv2;
 	};
 };
 db "xml2" {
@@ -71,6 +73,8 @@ db "xml2" {
  xml_hsconfwardv2req;
  xml_hsconfwardv2res;
  xml_hsconfroomv2res;
+ xml_tmedicalgetv2req;
+ xml_tmedicalgetv2res;
 };
 
 #include "orcadb.inc"

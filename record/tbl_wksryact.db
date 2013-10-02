@@ -409,3 +409,40 @@ path	del13 	{
 	};
 };
 
+path	key14 	{
+	DBSELECT	{
+		DECLARE tbl_wksryact_key14_csr CURSOR FOR
+		SELECT distinct a.*,b.ptnum
+		FROM tbl_wksryact a,tbl_ptnum b
+			WHERE  a.HOSPNUM      =   :HOSPNUM
+			AND    a.NYUGAIKBN    =   :NYUGAIKBN
+			AND    a.SRYYMD       =   :SRYYMD
+			AND    a.HOSPNUM      =   b.HOSPNUM
+                        AND    a.PTID         =   b.PTID
+			ORDER   BY        b.PTNUM,
+                                          a.SRYKA,
+                                          a.HKNCOMBI,
+                                          a.DOUJITSUKBN,
+                                          a.ZAINUM,
+                                          a.RENNUM
+		;
+	};
+};
+
+path	key15 	{
+	DBSELECT	{
+		DECLARE tbl_wksryact_key15_csr CURSOR FOR
+		SELECT *
+		FROM tbl_wksryact
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   :NYUGAIKBN
+			AND   PTID        =   :PTID
+			AND   SRYYMD      =   :SRYYMD
+			ORDER   BY        SRYKA,
+					  HKNCOMBI,
+                                          DOUJITSUKBN,
+				          ZAINUM,
+                                          RENNUM
+		;
+	};
+};
