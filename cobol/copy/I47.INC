@@ -16,6 +16,8 @@
       * 113-8621, Japan.
       ********************************************************************
         02  I47.
+          03  I47-B10-STATE     PIC S9(9)   BINARY.
+          03  I47-B10S-STATE    PIC S9(9)   BINARY.  
           03  I47-LBLINFO-STYLE PIC X(20).
           03  I47-LBLINFO   PIC X(80).
           03  I47-PTNUM.

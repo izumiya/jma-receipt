@@ -67,6 +67,7 @@
                        09  SPA-I47-RYOYO-CD        PIC X(09).
                        09  SPA-I47-RYOYO-KHN       PIC 9(02).
                05  SPA-GMN-CUR                     PIC 9(03).
+               05  SPA-I47-CHG-FLG                 PIC 9(01).
                05  SPA-GMN-AREA.
                    07  SPA-GMN-SELNUM              PIC X(50).
                    07  SPA-GMN-MEISYO              PIC X(200).
@@ -120,6 +121,7 @@
            03  FLG-MEDCOM                  PIC 9(01).
            03  FLG-TARGET                  PIC 9(01).
            03  FLG-RYOLIST-ROW             PIC 9(01).
+           03  FLG-DIFFER                  PIC 9(01).
       *
       *    •´•¶•Û•»ŒŒ∞Ë
        01  CNT-AREA.
@@ -1261,6 +1263,10 @@
            COPY    "CPORCSS010.INC".
            COPY    "CPORCSS011.INC".
       *
+      *    ∞ÂŒ≈∂Ë ¨°¶£¡£ƒ£Ã…æ≤¡…º
+           COPY    "CPORCHCN68.INC".
+           COPY    "CPONPRTDATA.INC".
+      *
       *    £ƒ£¬∏°∫˜
            COPY    "MCPDATA.INC".
       *
@@ -1776,6 +1782,7 @@
                        UNTIL ( IDX2 >   MEDH20-MAX )
                         OR   ( SPA-GMN-TNAME   (IDX-LST)
                                        NOT =   SPACE )
+                   DISPLAY IDX2 " MEDH20-ZAINUM:" MEDH20-ZAINUM (IDX2)
                    IF    ( MEDH20-STYMD  (IDX2)
                                       <=   SPA-I40-SRYYMD )
                      AND ( MEDH20-EDYMD  (IDX2)
@@ -1891,12 +1898,17 @@
            MOVE    SPACE           TO  SPA-I4ID-FLG
       *
            IF    ( WRK-I4ID-FLG    =   "OK" )
-               IF    ( WRK-IIDCD   =   "2001" )
+               EVALUATE    WRK-IIDCD
+               WHEN    "2001"
                    PERFORM 2121-TOUROKU-SEC
-               END-IF
-               IF    ( WRK-IIDCD   =   "2002" )
+               WHEN    "2002"
                    PERFORM 2111-TOUROKU-SEC
-               END-IF
+               WHEN    "2003"
+                   PERFORM 2111-TOUROKU-SEC
+                   IF    ( SPA-ERRCD       =   SPACE )
+                       PERFORM 2101-HYOKAHYO-SEC
+                   END-IF
+               END-EVALUATE
            END-IF
       *
            .
@@ -1921,6 +1933,12 @@
       *    ∫ﬁ —ππ
            WHEN    "CLICKED"       ALSO    "B08"
                PERFORM 4101-ZAIHENKOU-SEC
+      *    …æ≤¡…º»Øπ‘
+           WHEN    "CLICKED"       ALSO    "B10"
+               PERFORM 210-HYOKAHYO-SEC
+      *    …æ≤¡…º»Øπ‘° ∆¨ªÊ°À
+           WHEN    "CLICKED"       ALSO    "B10S"
+               PERFORM 2102-HYOKAHYO-SEC
       *    ∆˛±°Œ¡ —ππ
            WHEN    "CLICKED"       ALSO    "B11"
                PERFORM 211-TOUROKU-SEC
@@ -1992,6 +2010,134 @@
       *
            .
        220-CLEAR-EXT.
+           EXIT.
+      *****************************************************************
+      *    …æ≤¡…º»Øπ‘ΩËÕ˝
+      *****************************************************************
+       210-HYOKAHYO-SEC                 SECTION.
+      *
+           PERFORM 410-INPUT-CHK-SEC
+           IF    ( SPA-ERRCD       =   SPACE )
+               IF    ( SPA-GMN-SELNUM  NOT =  SPACE )
+                   MOVE    "1001"  TO  SPA-ERRCD
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-ERRCD       =   SPACE )
+      *
+               PERFORM 2101-PTSTS-CHK-SEC
+      *
+               IF    ( SPA-I47-CHG-FLG =   ZERO )
+                AND  ( FLG-DIFFER      =   ZERO )
+                   PERFORM 2101-HYOKAHYO-SEC
+               ELSE
+                   MOVE    "2003"      TO  SPA-IIDCD
+               END-IF
+           END-IF
+      *
+           .
+       210-HYOKAHYO-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥µº‘æı¬÷•¡•ß•√•ØΩËÕ˝
+      *****************************************************************
+       2101-PTSTS-CHK-SEC              SECTION.
+      *
+           MOVE    ZERO            TO  FLG-DIFFER
+      *
+           PERFORM 50011-EDIT-MEDADL-SEC
+      *
+           INITIALIZE          SS011-AREA
+           MOVE    SPA-GMN-PTID    TO  SS011-PTID
+           MOVE    SPA-I40-SRYYMD (1:6)
+                                   TO  SS011-SRYYM
+           MOVE    1               TO  SS011-DAYFLG
+           MOVE    1               TO  SS011-MEDADLFLG
+           PERFORM VARYING IDX-DAY FROM    1   BY  1
+                   UNTIL ( IDX-DAY >   31 )
+               IF    ( SPA-I47-RYOYO-DAY (IDX-DAY) >  ZERO )
+                   MOVE    SPA-I47-RYOYO-DAY (IDX-DAY)
+                               TO  SS011-DAY (IDX-DAY)
+                   MOVE    SPA-I47-RYOYO-KHN (IDX-DAY)
+                               TO  SS011-KHN (IDX-DAY)
+                   EVALUATE    TRUE
+                   WHEN  ( MEDKBN-DAYALL (1)        =  1 )
+                   WHEN  ( MEDKBN-DAY (1 IDX-DAY)   =  1 )
+                       MOVE    3   TO  SS011-MEDKBN (IDX-DAY)
+                   WHEN  ( MEDKBN-DAYALL (2)        =  1 )
+                   WHEN  ( MEDKBN-DAY (2 IDX-DAY)   =  1 )
+                       MOVE    2   TO  SS011-MEDKBN (IDX-DAY)
+                   WHEN    OTHER
+                       MOVE    1   TO  SS011-MEDKBN (IDX-DAY)
+                   END-EVALUATE
+               END-IF
+      *
+               COMPUTE SS011-ADLTEN (IDX-DAY)
+                   =   ADLTEN-DAY   (IDX-DAY)   +   ADLTEN-DAYALL
+           END-PERFORM
+           CALL    "ORCSS011"  USING   SS011-AREA
+                                       SPA-AREA
+           PERFORM VARYING IDX-DAY FROM    1   BY  1
+                   UNTIL ( IDX-DAY >   31 )
+               IF    ( SS011-DAY (IDX-DAY)
+                                   NOT = SS011-DAY2 (IDX-DAY))
+                   MOVE    1       TO  FLG-DIFFER
+               END-IF
+           END-PERFORM
+      *
+           .
+       2101-PTSTS-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    …æ≤¡…º»Øπ‘ΩËÕ˝
+      *****************************************************************
+       2101-HYOKAHYO-SEC                 SECTION.
+      *
+           INITIALIZE                    ORCHCN68AREA
+           MOVE    "1"             TO    ORCHCN68-PRTKBN
+      *
+           PERFORM 21011-HYOKAHYO-SEC
+      *
+           .
+       2101-HYOKAHYO-EXT.
+           EXIT.
+      *****************************************************************
+      *    …æ≤¡…º»Øπ‘ΩËÕ˝
+      *****************************************************************
+       21011-HYOKAHYO-SEC                 SECTION.
+      *
+           INITIALIZE                      ONPRTDATA
+      *
+      *    ∞ı∫˛¿©∏Êæ ÛºË∆¿•µ•÷
+           CALL    "ORCSONPRTSET"  USING   SPA-AREA
+      *
+           MOVE    SPA-SYSYMD      TO    SPA-SRYYMD
+           MOVE    SPA-I40-SRYYMD (1:6)
+                                   TO    ORCHCN68-SRYYM
+           MOVE    SPA-GMN-PTID    TO    ORCHCN68-PTID
+           MOVE    SPA-GMN-PTNUM   TO    ORCHCN68-PTNUM
+           MOVE    ORCHCN68AREA    TO    ONPRTDATA-DATA
+           MOVE    "01"            TO    SPA-PRT-FLG
+           CALL    "ORCHCN68"      USING
+                                   SPA-AREA
+                                   ONPRTDATA
+           MOVE    SPACE           TO    SPA-PRT-FLG
+      *
+           .
+       21011-HYOKAHYO-EXT.
+           EXIT.
+      *****************************************************************
+      *    …æ≤¡…º»Øπ‘ΩËÕ˝
+      *****************************************************************
+       2102-HYOKAHYO-SEC                 SECTION.
+      *
+           INITIALIZE                    ORCHCN68AREA
+           MOVE    "0"             TO    ORCHCN68-PRTKBN
+      *
+           PERFORM 21011-HYOKAHYO-SEC
+      *
+           .
+       2102-HYOKAHYO-EXT.
            EXIT.
       *****************************************************************
       *    ≈–œø°°ΩËÕ˝
@@ -2990,6 +3136,7 @@
       *
                IF    (SPA-NAI-SELNUM-FLG (IDX-LST)  =  1 )
                    PERFORM 41011-ZAIHENKOU-SEC
+                   MOVE    1           TO  SPA-I47-CHG-FLG
                END-IF
       *
            END-PERFORM
@@ -3772,6 +3919,16 @@
       *****************************************************************
        500-GMNHEN-STATE-EDIT-SEC       SECTION.
       *
+           MOVE    WIDGET-NORMAL       TO  I47-B10-STATE
+                                           I47-B10S-STATE
+      *
+           IF    ( SPA-I40-SRYYMD      >   CONST-H240401 )
+               CONTINUE
+           ELSE
+               MOVE    WIDGET-INSENSITIVE
+                                       TO  I47-B10-STATE
+                                           I47-B10S-STATE
+           END-IF
       *
            .
        500-GMNHEN-STATE-EDIT-EXT.
@@ -3936,6 +4093,9 @@
                                        TO  WRK-I4IDMSG
            WHEN    "2002"
              MOVE "∞ÂŒ≈∂Ë ¨°¶£¡£ƒ£Ã∂Ë ¨§Ú≈–œø∏Â°¢∆˛±°Œ¡§Œ —ππ§Úπ‘§§§ﬁ§π"
+                                       TO  WRK-I4IDMSG
+           WHEN    "2003"
+               MOVE    "∆˛±°Œ¡ —ππΩËÕ˝∏Â°¢…æ≤¡…º§Œ»Øπ‘§Úπ‘§§§ﬁ§π"
                                        TO  WRK-I4IDMSG
            END-EVALUATE
       *

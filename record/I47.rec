@@ -1,5 +1,11 @@
 I47	{
 	fixed2	{
+		B10	{
+			state	int;
+		};
+		B10S	{
+			state	int;
+		};
 		LBLINFO	{
 			style	varchar(20);
 			value	varchar(80);
