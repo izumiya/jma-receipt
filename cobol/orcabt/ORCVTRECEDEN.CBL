@@ -30,6 +30,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.00    NACL-多々納  13/07/10  算定日記録なし対応
+      *  04.07.00    NACL-多々納  13/10/XX  部位・用法コード変換対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -125,9 +126,13 @@
            03  FLG-SJ-KBN              PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
+           03  FLG-ERR2                PIC 9(01).
            03  FLG-HENKAN              PIC 9(01).
            03  FLG-HENKANERR           PIC 9(01).
            03  FLG-PARACHK             PIC 9(01).
+           03  FLG-BUIARI              PIC 9(01).
+           03  FLG-BUIOK               PIC 9(01).
+           03  FLG-SYUGI               PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -479,6 +484,10 @@
       *
       *    LIKE使用KEY対応
            COPY    "CPORCSADDSIGN.INC".
+      *
+      *!!!
+      *    コメントコード検索
+           COPY    "CPORCSSRCCOMMCD.INC".
       *
       *
       ****************************************************************
@@ -1615,6 +1624,12 @@
       *
            ADD     1                   TO  CNT-OUTRE
       *
+      *    症状詳記連番エラー
+           IF     (FLG-ERR2        NOT =   ZERO )
+            AND   (FLG-ERR             =   ZERO )
+               MOVE    FLG-ERR2        TO  FLG-ERR
+           END-IF
+      *
            IF      FLG-ERR         NOT =   ZERO
       *        エラーリスト出力処理
                PERFORM 270-ERRREC-EDIT-SEC
@@ -1897,6 +1912,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    ZERO                TO  WRK-SRY-RENNUM
            MOVE    ZERO                TO  IDX-SIN
+           MOVE    ZERO                TO  FLG-BUIARI
+           MOVE    ZERO                TO  FLG-SYUGI
       *
            MOVE    SPACE               TO  SRYACT-REC
            INITIALIZE                      SRYACT-REC
@@ -1955,6 +1972,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                             (IDX-SIN)
                    END-IF
                END-IF
+      *        手技料あり
+               IF      SRY-SRYCD (IDX-SIN)(1:1)    =   "1"
+                   MOVE    1               TO  FLG-SYUGI
+               END-IF
+      *
       *        明細数
                ADD     1                   TO  WRK-ACCT-MEISAISU
       *        診療コード計
@@ -2015,6 +2037,25 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        2009121-PTCOM-SYORI-SEC        SECTION.
       *
+      *!!!!
+           IF      TBL-SRYCD (IDX IDY) =   "810000001"
+      *        画像診断の部位変換
+               IF      (WRK-SRYKBN         =   "70" )
+                  AND  (FLG-BUIARI         =   ZERO )
+                  AND  (FLG-SYUGI          =   ZERO )
+                   MOVE    TBL-MEISYO (IDX IDY)    TO  WRK-MEISYO
+                   PERFORM 2009122-BUIHEN-SEC
+               END-IF
+      *        投薬のコメントを用法変換
+               IF      (WRK-SRYKBN         =   "21"
+                                           OR  "22"
+                                           OR  "23" )
+                   MOVE    TBL-MEISYO (IDX IDY)    TO  WRK-MEISYO
+                   PERFORM 2009122-YOUHOUHEN-SEC
+               END-IF
+           END-IF
+      *!!!!
+      *
            IF      TBL-SRYCD (IDX IDY) =   "810000001"
       *        フリーコメント
                MOVE    TBL-MEISYO (IDX IDY)    TO  WRK-MEISYO
@@ -2032,6 +2073,58 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            .
        2009121-PTCOM-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    画像診断コメント部位変換処理
+      *****************************************************************
+       2009122-BUIHEN-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-BUIOK
+      *
+           INITIALIZE                  ORCSSRCCOMMCD-AREA
+           MOVE    2                   TO  SRCCOM-COMMENT-KBN
+           MOVE    WRK-SRYYMD          TO  SRCCOM-MSTYMD
+           MOVE    WRK-MEISYO          TO  SRCCOM-COMMENT
+      *
+           CALL    "ORCSSRCCOMMCD" USING   ORCSSRCCOMMCD-AREA
+                                           SPA-AREA
+      *
+           IF     (SRCCOM-RC               =   ZERO  )
+             AND  (SRCCOM-COMMENT-CODE NOT =   SPACE )
+               MOVE    SRCCOM-COMMENT-CODE TO  TBL-SRYCD (IDX IDY)
+      *
+               MOVE    TBL-SRYCD (IDX IDY) TO  SRY-SRYCD (IDX-SIN)
+               MOVE    1                   TO  FLG-BUIOK
+               MOVE    1                   TO  FLG-BUIARI
+           END-IF
+      *
+           .
+       2009122-BUIHEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    投薬コメント用法変換処理
+      *****************************************************************
+       2009122-YOUHOUHEN-SEC        SECTION.
+      *
+           INITIALIZE                  ORCSSRCCOMMCD-AREA
+           MOVE    1                   TO  SRCCOM-COMMENT-KBN
+           MOVE    WRK-SRYYMD          TO  SRCCOM-MSTYMD
+           MOVE    WRK-MEISYO          TO  SRCCOM-COMMENT
+      *
+           CALL    "ORCSSRCCOMMCD" USING   ORCSSRCCOMMCD-AREA
+                                           SPA-AREA
+      *
+           IF     (SRCCOM-RC               =   ZERO  )
+             AND  (SRCCOM-COMMENT-CODE NOT =   SPACE )
+               MOVE    SRCCOM-COMMENT-CODE TO  TBL-SRYCD (IDX IDY)
+      *
+               MOVE    TBL-SRYCD (IDX IDY) TO  SRY-SRYCD (IDX-SIN)
+           END-IF
+      *
+           .
+       2009122-YOUHOUHEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2242,8 +2335,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                END-PERFORM
            END-IF
       *
-           MOVE    SPACE                   TO  WRK-INPUTCHI-G
-           PERFORM 2009121-PTCOM-INS-SEC
+      *    画像診断の１行目を部位変換
+           MOVE    ZERO                TO  FLG-BUIOK
+           IF      (WRK-SRYKBN         =   "70" )
+              AND  (FLG-BUIARI         =   ZERO )
+              AND  (FLG-SYUGI          =   ZERO )
+              AND  (WRK-MEISYO     NOT =   SPACE)
+               PERFORM 2009122-BUIHEN-SEC
+           END-IF
+      *
+           IF      FLG-BUIOK           =   ZERO
+               MOVE    SPACE                   TO  WRK-INPUTCHI-G
+               PERFORM 2009121-PTCOM-INS-SEC
+           END-IF
       *
            .
        2009122-PTCOM-89-EXT.
@@ -2433,7 +2537,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    最大連番
            IF      WRK-RENNUM-MAX      =   99
-               MOVE    7                   TO  FLG-ERR
+               MOVE    7                   TO  FLG-ERR2
            ELSE
       *        追加
                MOVE    SPACE               TO  RECECOM-REC

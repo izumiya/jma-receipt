@@ -1623,3 +1623,17 @@ path	key32   	{
 	};
 };
 
+path	key33 	{
+	DBSELECT	{
+		DECLARE tbl_tensu_key33_csr CURSOR FOR
+		SELECT *
+		FROM tbl_tensu
+			WHERE HOSPNUM	 =   :HOSPNUM
+			AND   YUKOSTYMD  <=  :YUKOSTYMD
+			AND   YUKOEDYMD  >=  :YUKOEDYMD
+			AND   SRYCD      >=  :SRYCD
+			AND   SRYCD      <=  :UPSRYCD
+			AND   NAME       =   :NAME
+		;
+	};
+};
