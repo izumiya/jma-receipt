@@ -762,6 +762,12 @@
            05 PIC  X(30)   VALUE   "で請求を行ってください。      ".
            05 PIC  X(30)   VALUE   "                              ".
       *
+           05 PIC  X(06)   VALUE   "990031".
+           05 PIC  X(30)   VALUE   "０９５９４で始まるコードがコー".
+           05 PIC  X(30)   VALUE   "ド作成範囲外で作成されている為".
+           05 PIC  X(30)   VALUE   "、レセ電データの記録が正しくで".
+           05 PIC  X(30)   VALUE   "きません                      ".
+      *
            05 PIC  X(06)   VALUE   "A10001".
            05 PIC  X(30)   VALUE   "チェックマスタ「薬剤と病名」に".
            05 PIC  X(30)   VALUE   "登録がありません              ".
@@ -769,7 +775,7 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  117.
+           05 ERRMES-OCC   OCCURS  118.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(120).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   117.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   118.

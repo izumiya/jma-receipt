@@ -790,7 +790,7 @@
            03  CONST-TKZI-MAX                      PIC 9(05)
                                                    VALUE   30.
            03  CONST-TRSIRECEDEN-MAX               PIC 9(05)
-                                                   VALUE   10.
+                                                   VALUE   20.
            03  CONST-CHKPTN                        PIC X(05)
                                                    VALUE   "1 111".
            03  CONST-NBHOUKTCD                     PIC X(09)
@@ -3609,12 +3609,23 @@
             AND  ( FLG-RSI-RECEDEN-CHK =   1 )
             AND  ( SYS-4001-RSIIRYOKBN =   "1" )
             AND  ( DCACCT-SRYKBN       =   "80" )
-            AND  ( DCSRY-SRYCD (1:5)   =   "09593" )
                MOVE    DCACCT-HKNCOMBI TO  WRK-HKNCOMBI
                PERFORM 220-HKNCOMBI-GET-SEC
                IF    ( COMB-HKNNUM         =   "971" )
                 AND  ( WRK-COMB-RSI-HKNKBN =   "1" OR "2" )
-                   PERFORM 2001111-TRSIRECEDEN-HEN-SEC
+                   IF    ( DCSRY-SRYCD (1:5)   =   "09593" )
+                       PERFORM 2001111-TRSIRECEDEN-HEN-SEC
+                   END-IF
+                   IF    ( DCSRY-SRYCD (1:5)       =   "09594" )
+                       IF    ( DCSRY-SRYCD (6:2)   =   "01" OR "02"
+                                                    OR "03" OR "04"
+                                                    OR "07" OR "08"
+                                                    OR "09" OR "10" )
+                           CONTINUE
+                       ELSE
+                           PERFORM 2001111-TRSIRECEDEN-HEN-SEC
+                       END-IF
+                   END-IF
                END-IF
            END-IF
       *
@@ -10641,7 +10652,10 @@
                    PERFORM 800-ZENKAKU-HEN-SEC
                    MOVE    WRK-OUT-INPUT      TO   WRK-ERRMES-PLUS
       *
-                   MOVE    "990030"       TO  WRK-ERRCD
+                   MOVE    "990030"           TO  WRK-ERRCD
+                   IF    ( TRSIRECEDEN-SRYCD (IDX6)(1:5)   =   "09594" )
+                       MOVE    "990031"       TO  WRK-ERRCD
+                   END-IF
                    INITIALIZE                 TERRINF-AREA
                    PERFORM 215-ERRMES-HEN-SEC
                END-IF

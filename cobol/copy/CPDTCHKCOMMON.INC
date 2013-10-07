@@ -330,7 +330,7 @@
       *
          02  TRSIRECEDEN-AREA.
            03  TRSIRECEDEN-MAX                     PIC 9(05).
-           03  TRSIRECEDEN-OCC                     OCCURS  10.
+           03  TRSIRECEDEN-OCC                     OCCURS  20.
                05  TRSIRECEDEN-SRYCD               PIC X(09).
                05  TRSIRECEDEN-KAISU               PIC 9(05).
                05  TRSIRECEDEN-DAY-G.
