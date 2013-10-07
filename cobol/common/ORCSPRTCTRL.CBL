@@ -277,7 +277,7 @@
                                        ORCSPRTCTRL-TITLE-O(IDX)
                  MOVE    SPA-CLIENT-SHOWDIALOG   TO
                                        ORCSPRTCTRL-SHOWDIALOG(IDX)
-                 MOVE    100               TO
+                 MOVE    1000              TO
                                        ORCSPRTCTRL-NRETRY(IDX)
       *
                    MOVE  11            TO  IDX
@@ -307,7 +307,7 @@
                                        ORCSPRTCTRL-TITLE-O(IDX)
                  MOVE    SPA-CLIENT-SHOWDIALOG   TO
                                        ORCSPRTCTRL-SHOWDIALOG(IDX)
-                 MOVE    100               TO
+                 MOVE    1000              TO
                                        ORCSPRTCTRL-NRETRY(IDX)
                END-IF
            END-PERFORM
@@ -369,7 +369,7 @@
                                        ORCSPRTCTRL-TITLE-O(IDX)
                  MOVE    SPA-CLIENT-SHOWDIALOG   TO
                                        ORCSPRTCTRL-SHOWDIALOG(IDX)
-                 MOVE    100               TO
+                 MOVE    1000              TO
                                        ORCSPRTCTRL-NRETRY(IDX)
       *
                    MOVE  11            TO  IDX
@@ -399,7 +399,7 @@
                                        ORCSPRTCTRL-TITLE-O(IDX)
                  MOVE    SPA-CLIENT-SHOWDIALOG   TO
                                        ORCSPRTCTRL-SHOWDIALOG(IDX)
-                 MOVE    100               TO
+                 MOVE    1000              TO
                                        ORCSPRTCTRL-NRETRY(IDX)
                END-IF
            END-PERFORM
