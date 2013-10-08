@@ -54,6 +54,7 @@
                05  HCN68S01-PTSTS-OCC              OCCURS  31.
                    07  HCN68S01-PTSTS-DAY          PIC 9(02).
                    07  HCN68S01-PTSTS-DAY2         PIC 9(02).
+                   07  HCN68S01-PTSTS-DAY3         PIC 9(02).
                    07  HCN68S01-PTSTS-SRYCD        PIC X(09).
       *
            03  HCN68S01-MEDKBN-DAY-AREA.

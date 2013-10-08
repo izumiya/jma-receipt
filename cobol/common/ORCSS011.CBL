@@ -56,6 +56,7 @@
            03  IDX0                    PIC 9(05).
            03  IDX-SRY                 PIC 9(05).
            03  IDX-RYO                 PIC 9(05).
+           03  IDX-PTRYO               PIC 9(05).
            03  IDX-KHN                 PIC 9(05).
            03  IDX-RYOYOCD             PIC 9(05).
            03  IDX-DAY                 PIC 9(05).
@@ -534,12 +535,9 @@
                IF    ( SS011-DAY (IDX-DAY) >   ZERO )
       *
                    MOVE    ZERO        TO  IDX-RYO
+                   MOVE    ZERO        TO  IDX-PTRYO
                    MOVE    SS011-KHN (IDX-DAY)
                                        TO  IDX-KHN
-      *
-                   IF    ( IDX-KHN     =   5 OR 6 OR 9 OR 10 )
-                           MOVE    1   TO  IDX-RYO
-                   ELSE
                        IF    ( SS011-SRYYM    >=   CONST-H2204 )
                         AND  ( SPA-HOSPSBT     =   1 )
                            MOVE    SS011-MEDKBN (IDX-DAY)
@@ -574,6 +572,10 @@
                                END-IF
                            END-EVALUATE
                        END-IF
+      *
+                   MOVE    IDX-RYO     TO  IDX-PTRYO
+                   IF    ( IDX-KHN     =   5 OR 6 OR 9 OR 10 )
+                           MOVE    1   TO  IDX-RYO
                    END-IF
       *
                    COMPUTE TNACCT-KHN-CNT (IDX-KHN)
@@ -581,6 +583,8 @@
                        +   1
       *
                    MOVE    IDX-RYO TO  SS011-DAY2 (IDX-DAY)
+                   MOVE    IDX-PTRYO
+                                   TO  SS011-DAY3 (IDX-DAY)
                    MOVE    CONST-RYOYOCD (IDX-KHN IDX-RYO)
                                        TO  SS011-SRYCD(IDX-DAY)
                    MOVE    1   TO  TNACCT-DAY (IDX-KHN IDX-RYO IDX-DAY)

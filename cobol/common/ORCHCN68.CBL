@@ -663,35 +663,35 @@
                MOVE    "´µ¼Ô¤Î¾õÂÖÁüÉ¾²Á"  TO  HCN69-LBLHPTSTS
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
-                   IF    ( HCN68S01-RYOYO-KHN (IDX-DAY)
-                                       = 5 OR 6 OR 9 OR 10 )
-                       CONTINUE
-                   ELSE
-                       MOVE    HCN68S01-PTSTS-DAY (IDX-DAY)
+      *            IF    ( HCN68S01-RYOYO-KHN (IDX-DAY)
+      *                                = 5 OR 6 OR 9 OR 10 )
+      *                CONTINUE
+      *            ELSE
+                       MOVE    HCN68S01-PTSTS-DAY3(IDX-DAY)
                                            TO  IDX-RYO
                        IF    ( IDX-RYO  >=  1 )
                         AND  ( IDX-RYO  <=  9 )
                            MOVE    "¡û"
                                TO  HCN69-HPTSTS-DAY (IDX-RYO IDX-DAY)
                        END-IF
-                   END-IF
+      *            END-IF
                END-PERFORM
            ELSE
                MOVE    "´µ¼Ô¤Î¾õÂÖÁüÉ¾²Á"  TO  HCN69-LBLCPTSTS
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
-                   IF    ( HCN68S01-RYOYO-KHN (IDX-DAY)
-                                       = 5 OR 6 OR 9 OR 10 )
-                       CONTINUE
-                   ELSE
-                       MOVE    HCN68S01-PTSTS-DAY (IDX-DAY)
+      *            IF    ( HCN68S01-RYOYO-KHN (IDX-DAY)
+      *                                = 5 OR 6 OR 9 OR 10 )
+      *                CONTINUE
+      *            ELSE
+                       MOVE    HCN68S01-PTSTS-DAY3(IDX-DAY)
                                            TO  IDX-RYO
                        IF    ( IDX-RYO  >=  1 )
                         AND  ( IDX-RYO  <=  5 )
                            MOVE    "¡û"
                                TO  HCN69-CPTSTS-DAY (IDX-RYO IDX-DAY)
                        END-IF
-                   END-IF
+      *            END-IF
                END-PERFORM
            END-IF
       *

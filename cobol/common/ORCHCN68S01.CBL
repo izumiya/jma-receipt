@@ -592,6 +592,8 @@
                                 TO  HCN68S01-PTSTS-DAY (IDX-DAY)
                MOVE    SS011-DAY2  (IDX-DAY)
                                 TO  HCN68S01-PTSTS-DAY2(IDX-DAY)
+               MOVE    SS011-DAY3  (IDX-DAY)
+                                TO  HCN68S01-PTSTS-DAY3(IDX-DAY)
                MOVE    SS011-SRYCD (IDX-DAY)
                                 TO  HCN68S01-PTSTS-SRYCD (IDX-DAY)
       *
