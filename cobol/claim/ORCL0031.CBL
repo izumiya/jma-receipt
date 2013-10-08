@@ -75,6 +75,7 @@
       *  04.07.02    NACL-藤原    12/05/31  病名の入外区分対応
       *  04.07.00    NACL=多々納  12/07/18  API病名のみ登録対応
       *  04.07.03    NACL-藤原    13/09/05  病名の補足コメント対応
+      *  04.07.04    NACL-藤原    13/10/08  病名更新時のuserid 設定
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -3689,6 +3690,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SMCNDATE-YMD        TO  PTBYO-UPYMD
            MOVE    SMCNDATE-HMS        TO  PTBYO-UPHMS
       *
+           IF      LNK-KBN-CODE        =   "1"
+               MOVE    "api"               TO  PTBYO-OPID
+           ELSE
+               MOVE    "claim"             TO  PTBYO-OPID
+           END-IF
+      *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
@@ -3922,7 +3929,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      FLG-BYOMEI-DELETE   =   1
                MOVE    "1"                 TO  PTBYO-DLTFLG
-               MOVE    "claim"             TO  PTBYO-DLT-OPID
+               IF      LNK-KBN-CODE        =   "1"
+                   MOVE    "api"               TO  PTBYO-DLT-OPID
+               ELSE
+                   MOVE    "claim"             TO  PTBYO-DLT-OPID
+               END-IF
            ELSE
       *
       *    転帰日
@@ -4139,6 +4150,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SMCNDATE-YMD        TO  PTBYO-UPYMD
            MOVE    SMCNDATE-HMS        TO  PTBYO-UPHMS
       *
+           IF      LNK-KBN-CODE        =   "1"
+               MOVE    "api"               TO  PTBYO-OPID
+           ELSE
+               MOVE    "claim"             TO  PTBYO-OPID
+           END-IF
+      *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
            MOVE    "tbl_ptbyomei"      TO  MCP-TABLE
@@ -4279,6 +4296,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SMCNDATE-YMD        TO  PTBYO-UPYMD
            MOVE    SMCNDATE-HMS        TO  PTBYO-UPHMS
+      *
+           IF      LNK-KBN-CODE        =   "1"
+               MOVE    "api"               TO  PTBYO-OPID
+           ELSE
+               MOVE    "claim"             TO  PTBYO-OPID
+           END-IF
       *
            MOVE    PTBYOMEI-REC        TO  MCPDATA-REC
            MOVE    "DBUPDATE"          TO  MCP-FUNC
