@@ -479,6 +479,7 @@ RECORD_files = \
 	hsconfwardv2.rec \
 	C06.rec \
 	tmedicalgetv2.rec \
+	hsfoodv2.rec \
 
 DEF_files = \
 
@@ -745,6 +746,8 @@ DB_files = \
 	tbl_byomeiinputset.db \
 	xml_tmedicalgetv2req.db \
 	xml_tmedicalgetv2res.db \
+	xml_hsfoodv2req.db \
+	xml_hsfoodv2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

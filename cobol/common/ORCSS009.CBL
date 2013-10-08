@@ -339,26 +339,24 @@
       *
            END-PERFORM
       *
-           IF    (     IDX2               >   TCOMBI-MAX )
+           IF    (     IDX2                >   TCOMBI-MAX )
                IF    ( CONST-TCOMBI-MAX    >   TCOMBI-MAX )
-                   COMPUTE TCOMBI-MAX  =   TCOMBI-MAX  +   1
+                   MOVE    IDX2            TO  TCOMBI-MAX
                    MOVE    WRK-HKNCOMBINUM
                                            TO  TCOMBI-HKNCOMBI
                                                        (TCOMBI-MAX)
-                   COMPUTE TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
-                       =   TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
-                       +   1
-                   MOVE    1       TO  TCOMBI-HKNCOMBI-DAY
-                                               (TCOMBI-MAX IDX1)
                ELSE
-                   IF    ( TCOMBI-HKNCOMBI-DAY (IDX2 IDX1)
+                   MOVE    ZERO            TO  IDX2
+               END-IF
+           END-IF
+      *
+           IF    ( IDX2    >   ZERO )
+               IF    ( TCOMBI-HKNCOMBI-DAY (IDX2 IDX1)
                                            =    ZERO )
-                       COMPUTE TCOMBI-HKNCOMBI-CNT (IDX2)
-                           =   TCOMBI-HKNCOMBI-CNT (IDX2)
-                           +   1
-                       MOVE    1   TO  TCOMBI-HKNCOMBI-DAY
-                                                   (IDX2 IDX1)
-                   END-IF
+                   COMPUTE TCOMBI-HKNCOMBI-CNT (IDX2)
+                       =   TCOMBI-HKNCOMBI-CNT (IDX2)
+                       +   1
+                   MOVE    1   TO  TCOMBI-HKNCOMBI-DAY (IDX2 IDX1)
                END-IF
            END-IF
       *
