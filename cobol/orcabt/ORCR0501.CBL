@@ -35,6 +35,7 @@
       *  04.06.03    NACL-藤原    13/05/27  症状詳記の表題を平成２５年７月
       *                                     診療分以降は全て記載
       *  04.06.04    NACL-門脇    13/06/07  合計額ワーク領域のクリア
+      *  04.06.05    NACL-門脇    13/10/07  療養期間記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1239,25 +1240,27 @@
                MOVE  RECE41-RYOEDYMD(7:2)  TO  IDX6
            END-IF    
       *    療養開始年月日再セット
-           PERFORM   VARYING   IDX4   FROM   IDX5   BY  1
-                     UNTIL     IDX4    >     IDX6
+           IF      RECE41-RYOSTYMD(1:6)   =   WRK-STYMD(1:6)
+             PERFORM   VARYING   IDX4   FROM   IDX5   BY  1
+                       UNTIL     IDX4    >     IDX6
                  IF  (RECE41-NYUINBITBL(IDX4)  =  SPACE)  OR
                      (RECE41-JNISSUTBL(IDX4)   =  "1"  )
                      MOVE    IDX4                TO  WRK-KGK2
                      MOVE    WRK-KGK2            TO  HCM69-STRYMD (5:2)
                      MOVE    IDX6                TO  IDX4
                  END-IF
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *    療養終了年月日再セット
-           PERFORM   VARYING   IDX4   FROM   IDX6   BY  -1
-                     UNTIL     IDX4    <     IDX5
-                 IF  (RECE41-NYUINBITBL(IDX4)   =  SPACE) OR
-                     (RECE41-JNISSUTBL(IDX4)    =  "1"  )
-                     MOVE    IDX4                TO  WRK-KGK2
-                     MOVE    WRK-KGK2            TO  HCM69-ENDYMD (5:2)
-                     MOVE    IDX5                TO  IDX4
-                 END-IF
-           END-PERFORM
+      ***  PERFORM   VARYING   IDX4   FROM   IDX6   BY  -1
+      ***            UNTIL     IDX4    <     IDX5
+      ***        IF  (RECE41-NYUINBITBL(IDX4)   =  SPACE) OR
+      ***            (RECE41-JNISSUTBL(IDX4)    =  "1"  )
+      ***            MOVE    IDX4                TO  WRK-KGK2
+      ***            MOVE    WRK-KGK2            TO  HCM69-ENDYMD (5:2)
+      ***            MOVE    IDX5                TO  IDX4
+      ***        END-IF
+      ***  END-PERFORM
       *
            IF      RECE41-JNISSU  =  999
               IF  (RECE41-KYUGYOFLG      =   SPACE)

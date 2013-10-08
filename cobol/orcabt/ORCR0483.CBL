@@ -58,6 +58,7 @@
       *  04.06.05    NACL-Æ£¸¶    13/05/27  ¾É¾õ¾Üµ­¤ÎÉ½Âê¤òÊ¿À®£²£µÇ¯£··î
       *                                     ¿ÇÎÅÊ¬°Ê¹ß¤ÏÁ´¤Æµ­ºÜ
       *  04.06.06    NACL-ÌçÏÆ    13/06/07  ¹ç·×³Û¥ï¡¼¥¯ÎÎ°è·å¿ôÊÑ¹¹
+      *  04.06.07    NACL-ÌçÏÆ    13/10/07  ÎÅÍÜ´ü´Öµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1245,8 +1246,9 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                                                TO  IDX6
                END-IF
       *        ¿ÇÎÅ´ü´Ö¡Ê³«»Ï¡Ë
-               PERFORM VARYING   IDX4   FROM   IDX5    BY  1
-                       UNTIL     IDX4    >     IDX6
+               IF      RECE41-RYOSTYMD(1:6)   =   WRK-STYMD(1:6)
+                 PERFORM VARYING   IDX4   FROM   IDX5    BY  1
+                         UNTIL     IDX4    >     IDX6
                    IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE)  OR
                          ( RECE41-JNISSUTBL (IDX4) =   "1"  )
                        MOVE    IDX4                TO  WRK-ZZ
@@ -1261,25 +1263,26 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                        END-IF
                        MOVE    IDX6                TO  IDX4
                    END-IF
-               END-PERFORM
+                 END-PERFORM
+               END-IF
       *        ¿ÇÎÅ´ü´Ö¡Ê½ªÎ»¡Ë
-               PERFORM VARYING   IDX4   FROM   IDX6    BY  -1
-                       UNTIL     IDX4    <     IDX5
-                   IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE ) OR
-                         ( RECE41-JNISSUTBL (IDX4) =   "1"   )
-                       MOVE    IDX4                    TO  WRK-ZZ
-                       INITIALIZE                      ORCSKANACHKAREA
-                       MOVE    "2"                 TO  KANACHK-SYORI
-                       MOVE    WRK-ZZ              TO  KANACHK-MAE-INPUT
-                       CALL    "ORCSKANACHK"       USING
-                                                   ORCSKANACHKAREA
-                       IF      KANACHK-RC      =   ZERO
-                            MOVE    KANACHK-OUT-INPUT(1:4)
-                                                   TO  WRK-HCM56-ENDDD
-                       END-IF
-                       MOVE    IDX5                    TO  IDX4
-                   END-IF
-               END-PERFORM
+      ***      PERFORM VARYING   IDX4   FROM   IDX6    BY  -1
+      ***              UNTIL     IDX4    <     IDX5
+      ***          IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE ) OR
+      ***                ( RECE41-JNISSUTBL (IDX4) =   "1"   )
+      ***              MOVE    IDX4                    TO  WRK-ZZ
+      ***              INITIALIZE                      ORCSKANACHKAREA
+      ***              MOVE    "2"                 TO  KANACHK-SYORI
+      ***              MOVE    WRK-ZZ              TO  KANACHK-MAE-INPUT
+      ***              CALL    "ORCSKANACHK"       USING
+      ***                                          ORCSKANACHKAREA
+      ***              IF      KANACHK-RC      =   ZERO
+      ***                   MOVE    KANACHK-OUT-INPUT(1:4)
+      ***                                          TO  WRK-HCM56-ENDDD
+      ***              END-IF
+      ***              MOVE    IDX5                    TO  IDX4
+      ***          END-IF
+      ***      END-PERFORM
            END-IF
            MOVE    "¤«¤é"              TO  WRK-HCM56-STRFL 
            MOVE    "¤Þ¤Ç"              TO  WRK-HCM56-ENDFL 
