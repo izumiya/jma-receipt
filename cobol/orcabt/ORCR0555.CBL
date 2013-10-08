@@ -29,6 +29,7 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.07.01    NACL-藤原    13/08/20  ０９５９３で始まるコードがあ
       *                                     るレセプトは対象外とする
+      *  04.07.02    NACL-門脇    13/10/07  療養期間記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1668,22 +1669,24 @@
                    MOVE    RECE41-RYOEDYMD (7:2)
                                                TO  IDX6
                END-IF    
-               PERFORM VARYING IDX4    FROM    IDX5    BY  1
-                       UNTIL   IDX4    >       IDX6
+               IF      RECE41-RYOSTYMD(1:6)   =   WRK-STYMD(1:6)
+                 PERFORM VARYING IDX4    FROM    IDX5    BY  1
+                         UNTIL   IDX4    >       IDX6
                    IF    ( RECE41-NYUINBITBL(IDX4) =  SPACE )
                    OR    ( RECE41-JNISSUTBL (IDX4) =  "1"   )
                        MOVE    IDX4                TO  WRK-RYOSTYMD-DD
                        MOVE    IDX6                TO  IDX4
                    END-IF
-               END-PERFORM
-               PERFORM VARYING IDX4    FROM    IDX6    BY  -1
-                       UNTIL   IDX4    <       IDX5
-                   IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE )
-                   OR    ( RECE41-JNISSUTBL (IDX4) =   "1"   )
-                       MOVE    IDX4                TO  WRK-RYOEDYMD-DD
-                       MOVE    IDX5                TO  IDX4
-                   END-IF
-               END-PERFORM
+                 END-PERFORM
+               END-IF
+      ***      PERFORM VARYING IDX4    FROM    IDX6    BY  -1
+      ***              UNTIL   IDX4    <       IDX5
+      ***          IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE )
+      ***          OR    ( RECE41-JNISSUTBL (IDX4) =   "1"   )
+      ***              MOVE    IDX4                TO  WRK-RYOEDYMD-DD
+      ***              MOVE    IDX5                TO  IDX4
+      ***          END-IF
+      ***      END-PERFORM
            END-IF
       *
       *    療養期間−初日
