@@ -1669,16 +1669,14 @@
                    MOVE    RECE41-RYOEDYMD (7:2)
                                                TO  IDX6
                END-IF    
-               IF      RECE41-RYOSTYMD(1:6)   =   WRK-STYMD(1:6)
-                 PERFORM VARYING IDX4    FROM    IDX5    BY  1
-                         UNTIL   IDX4    >       IDX6
-                   IF    ( RECE41-NYUINBITBL(IDX4) =  SPACE )
-                   OR    ( RECE41-JNISSUTBL (IDX4) =  "1"   )
-                       MOVE    IDX4                TO  WRK-RYOSTYMD-DD
-                       MOVE    IDX6                TO  IDX4
-                   END-IF
-                 END-PERFORM
-               END-IF
+      ***      PERFORM VARYING IDX4    FROM    IDX5    BY  1
+      ***              UNTIL   IDX4    >       IDX6
+      ***          IF    ( RECE41-NYUINBITBL(IDX4) =  SPACE )
+      ***          OR    ( RECE41-JNISSUTBL (IDX4) =  "1"   )
+      ***              MOVE    IDX4                TO  WRK-RYOSTYMD-DD
+      ***              MOVE    IDX6                TO  IDX4
+      ***          END-IF
+      ***      END-PERFORM
       ***      PERFORM VARYING IDX4    FROM    IDX6    BY  -1
       ***              UNTIL   IDX4    <       IDX5
       ***          IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE )
