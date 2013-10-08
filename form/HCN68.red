@@ -78799,12 +78799,12 @@
         <dia:point val="0.8,2.88125"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="0.8,2.58125;5.5275,2.92375"/>
+        <dia:rectangle val="0.8,2.57269;5.53606,2.94088"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#Ⅰ  算定機関に限りがある区分#</dia:string>
+            <dia:string>#Ⅰ  算定期間に限りがある区分#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="Takao明朝" style="0" name="Courier"/>
@@ -79163,7 +79163,7 @@
         <dia:point val="1.6,7.6075"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.6,7.40181;8.13069,7.9286"/>
+        <dia:rectangle val="1.6,7.4075;8.125,7.91722"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -79395,7 +79395,7 @@
         <dia:point val="0.875,10.1"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="0.875,9.84287;2.99962,10.1493"/>
+        <dia:rectangle val="0.875,9.85;2.9925,10.135"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -79923,7 +79923,7 @@
         <dia:point val="0.875,19.45"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="0.875,19.1929;2.99962,19.4992"/>
+        <dia:rectangle val="0.875,19.2;2.9925,19.485"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
@@ -82431,12 +82431,12 @@
         <dia:point val="0.8,8.8375"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="0.8,8.5375;5.3575,8.88"/>
+        <dia:rectangle val="0.8,8.52894;5.36606,8.89713"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#Ⅱ 算定機関に限りがない区分#</dia:string>
+            <dia:string>#Ⅱ 算定期間に限りがない区分#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="Takao明朝" style="0" name="Courier"/>
