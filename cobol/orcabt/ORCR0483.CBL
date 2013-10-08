@@ -1246,25 +1246,23 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                                                TO  IDX6
                END-IF
       *        診療期間（開始）
-               IF      RECE41-RYOSTYMD(1:6)   =   WRK-STYMD(1:6)
-                 PERFORM VARYING   IDX4   FROM   IDX5    BY  1
-                         UNTIL     IDX4    >     IDX6
-                   IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE)  OR
-                         ( RECE41-JNISSUTBL (IDX4) =   "1"  )
-                       MOVE    IDX4                TO  WRK-ZZ
-                       INITIALIZE                      ORCSKANACHKAREA
-                       MOVE    "2"                 TO  KANACHK-SYORI
-                       MOVE    WRK-ZZ              TO  KANACHK-MAE-INPUT
-                       CALL    "ORCSKANACHK"       USING
-                                                   ORCSKANACHKAREA
-                       IF      KANACHK-RC      =   ZERO
-                            MOVE    KANACHK-OUT-INPUT(1:4)
-                                                   TO  WRK-HCM56-STRDD
-                       END-IF
-                       MOVE    IDX6                TO  IDX4
-                   END-IF
-                 END-PERFORM
-               END-IF
+      ***      PERFORM VARYING   IDX4   FROM   IDX5    BY  1
+      ***              UNTIL     IDX4    >     IDX6
+      ***          IF    ( RECE41-NYUINBITBL(IDX4) =   SPACE)  OR
+      ***                ( RECE41-JNISSUTBL (IDX4) =   "1"  )
+      ***              MOVE    IDX4                TO  WRK-ZZ
+      ***              INITIALIZE                      ORCSKANACHKAREA
+      ***              MOVE    "2"                 TO  KANACHK-SYORI
+      ***              MOVE    WRK-ZZ              TO  KANACHK-MAE-INPUT
+      ***              CALL    "ORCSKANACHK"       USING
+      ***                                          ORCSKANACHKAREA
+      ***              IF      KANACHK-RC      =   ZERO
+      ***                   MOVE    KANACHK-OUT-INPUT(1:4)
+      ***                                          TO  WRK-HCM56-STRDD
+      ***              END-IF
+      ***              MOVE    IDX6                TO  IDX4
+      ***          END-IF
+      ***      END-PERFORM
       *        診療期間（終了）
       ***      PERFORM VARYING   IDX4   FROM   IDX6    BY  -1
       ***              UNTIL     IDX4    <     IDX5
