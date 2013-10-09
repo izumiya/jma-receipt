@@ -59,3 +59,15 @@ path	all	{
  		;
 	};
 };
+
+path	key3		{ 	
+	DBSELECT	{
+		DECLARE tbl_hknjainf_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_hknjainf
+			WHERE   HOSPNUM      =   :HOSPNUM  AND
+				HKNNUM       =   :HKNNUM
+                        ORDER   BY     HKNJANUM
+		;
+	};
+};
