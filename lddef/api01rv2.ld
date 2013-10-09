@@ -18,7 +18,7 @@ bindapi	"visitptlstv2"	"OpenCOBOL"	"ORAPI021R2V2";
 bindapi	"hsconfbasev2"	"OpenCOBOL"	"ORAPI031RC1V2";
 bindapi	"hsconfwardv2"	"OpenCOBOL"	"ORAPI031RC2V2";
 bindapi	"tmedicalgetv2"	"OpenCOBOL"	"ORAPI021R3V2";
-bindapi "hsfoodv2"      "OpenCOBOL" "ORAPI031RFDV2";
+bindapi "hsfoodv2"      "OpenCOBOL" "ORAPI032R1V2";
 bindapi	"insprogetv2"	"OpenCOBOL"	"ORAPI105R1V2";
 
 multiplex_group	api01rv2;

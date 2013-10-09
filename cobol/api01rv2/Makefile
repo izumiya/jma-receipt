@@ -16,7 +16,7 @@ SRCS = ORAPI012R1V2.CBL \
        ORAPI031RC2V2S1.CBL \
        ORAPI031RC2V2S2.CBL \
        ORAPI021R3V2.CBL \
-       ORAPI031RFDV2.CBL \
+       ORAPI032R1V2.CBL \
        ORAPI105R1V2.CBL \
        
 top_builddir = ../..
