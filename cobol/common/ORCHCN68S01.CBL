@@ -146,14 +146,12 @@
        LINKAGE                     SECTION.
       *
        COPY    "COMMON-SPA".
-       COPY    "CPORCHCN68.INC".
        COPY    "CPORCHCN68S01.INC".
       *
       ******************************************************************
        PROCEDURE               DIVISION
                                    USING
                                    SPA-AREA
-                                   ORCHCN68AREA
                                    HCN68S01-AREA
                                    .
       *
@@ -392,7 +390,7 @@
                    UNTIL ( IDX0    >   MEDINF-MAX )
                     OR   ( IDX-LST >=  CONST-RYOLIST-MAX )
       *
-               MOVE    ORCHCN68-SRYYM  TO  WRK-SRYYM
+               MOVE    HCN68S01-SRYYM  TO  WRK-SRYYM
                MOVE    MEDINF-ZAINUM (IDX0)
                                        TO  WRK-ZAINUM
                PERFORM 900-RYOCOM-KEY-SEL-SEC
@@ -437,7 +435,7 @@
                MOVE    CONST-ADLKBN-NAME   (IDX0)
                                    TO  HCN68S01-TNAME   (IDX-LST)
       *
-               MOVE    ORCHCN68-SRYYM  TO  WRK-SRYYM
+               MOVE    HCN68S01-SRYYM  TO  WRK-SRYYM
                MOVE    HCN68S01-TZAINUM (IDX-LST)
                                    TO  WRK-ZAINUM
                PERFORM 900-RYOCOM-KEY-SEL-SEC
@@ -556,7 +554,7 @@
            PERFORM 21011-EDIT-MEDADL-SEC
       *
            INITIALIZE                  SS011-AREA
-           MOVE    ORCHCN68-PTID   TO  SS011-PTID
+           MOVE    HCN68S01-PTID   TO  SS011-PTID
            MOVE    HCN68S01-SRYYMD TO  SS011-SRYYM
            MOVE    1               TO  SS011-DAYFLG
            MOVE    1               TO  SS011-MEDADLFLG
@@ -729,8 +727,8 @@
            INITIALIZE  NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    "1"                 TO  NACCT-NYUGAIKBN
-           MOVE    ORCHCN68-PTID       TO  NACCT-PTID
-           MOVE    ORCHCN68-SRYYM      TO  NACCT-SRYYM
+           MOVE    HCN68S01-PTID       TO  NACCT-PTID
+           MOVE    HCN68S01-SRYYM      TO  NACCT-SRYYM
            MOVE    "5"                 TO  NACCT-ZAISKBKBN
            MOVE    NYUINACCT-REC       TO  MCPDATA-REC
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
@@ -759,8 +757,8 @@
       *
            INITIALIZE                  NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
-           MOVE    ORCHCN68-PTID       TO  NACCT-PTID
-           MOVE    ORCHCN68-SRYYM      TO  NACCT-SRYYM
+           MOVE    HCN68S01-PTID       TO  NACCT-PTID
+           MOVE    HCN68S01-SRYYM      TO  NACCT-SRYYM
            MOVE    NYUINACCT-REC       TO  MCPDATA-REC
            MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
            MOVE    "key35"             TO  MCP-PATHNAME
@@ -888,7 +886,7 @@
            INITIALIZE                  RYOCOM-REC
            MOVE    SPA-HOSPNUM     TO  RYOCOM-HOSPNUM
            MOVE    "1"             TO  RYOCOM-NYUGAIKBN
-           MOVE    ORCHCN68-PTID   TO  RYOCOM-PTID
+           MOVE    HCN68S01-PTID   TO  RYOCOM-PTID
            MOVE    WRK-SRYYM       TO  RYOCOM-SRYYM
            MOVE    WRK-ZAINUM      TO  RYOCOM-ZAINUM
            MOVE    RYOCOM-REC      TO  MCPDATA-REC

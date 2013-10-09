@@ -205,11 +205,12 @@
            MOVE    SYSKANRI-REC    TO  SYS-1001-REC
       *
            INITIALIZE                  HCN68S01-AREA
-           MOVE    ORCHCN68-SRYYM  TO  HCN68S01-SRYYMD
+           MOVE    ORCHCN68-PTID   TO  HCN68S01-PTID
+           MOVE    ORCHCN68-SRYYM  TO  HCN68S01-SRYYM
+                                       HCN68S01-SRYYMD
            MOVE    "01"            TO  HCN68S01-SRYYMD (7:)
            CALL    "ORCHCN68S01"   USING
                                    SPA-AREA
-                                   ORCHCN68AREA
                                    HCN68S01-AREA
       *
            .
