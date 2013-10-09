@@ -91,6 +91,7 @@
       *                                     ¡ÊÀÁµáÅÀ¿ô£°ÅÀ¸øÈñÊ¬¡Ë
       *  04.06.02    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.06.03    NACL-ÌçÏÆ    13/06/14  À¸ÊÝ¤Î£·£¹¡¦£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ½¤Àµ
+      *  04.06.04    NACL-ÌçÏÆ    13/10/09  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    12/08/27  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
@@ -577,9 +578,12 @@
              WHEN      SPACE
                EVALUATE   LNK-FTNJGNCHK-PREFNUM
                  WHEN      42
-                  IF  (LNK-FTNJGNCHK-KOHNUM  = "287" OR "380"
-                                            OR "281" OR "282"       )
-                  AND (PTHKN-HKNNUM  NOT = "060" AND "067" AND "039")
+                  IF ((LNK-FTNJGNCHK-KOHNUM  = "287" OR "380"
+                                            OR "281" OR "282"      ) AND
+                      (PTHKN-HKNNUM NOT = "060" AND "067" AND "039"))
+                  OR ((LNK-FTNJGNCHK-KOHNUM  = "188"               ) AND
+                      (PTHKN-HKNNUM NOT = "060" AND "067" AND "039") AND
+                      (LNK-FTNJGNCHK-SRYYM  >= "201310"            ))
                     MOVE  "2"  TO WRK-RECEKSIFLG-G
                   END-IF
                END-EVALUATE
@@ -1006,10 +1010,13 @@
       *
            EVALUATE  LNK-FTNJGNCHK-PREFNUM
              WHEN      42
-               IF  (LNK-FTNJGNCHK-KOHNUM  = "287" OR "380"
-                                         OR "281" OR "282"       )
-               AND (LNK-FTNJGNCHK-SRYYM   < "200704"             )
-               AND (PTHKN-HKNNUM  NOT = "060" AND "067" AND "039")
+               IF ((LNK-FTNJGNCHK-KOHNUM  = "287" OR "380"
+                                         OR "281" OR "282"       ) AND
+                   (LNK-FTNJGNCHK-SRYYM   < "200704"             ) AND
+                   (PTHKN-HKNNUM  NOT = "060" AND "067" AND "039"))
+               OR ((LNK-FTNJGNCHK-KOHNUM  = "188"                ) AND
+                   (PTHKN-HKNNUM  NOT = "060" AND "067" AND "039") AND
+                   (LNK-FTNJGNCHK-SRYYM   < "201310"             ))
                  MOVE  SPACE  TO  WRK-RECEKSIFLG-G
                END-IF
            END-EVALUATE
@@ -1885,6 +1892,8 @@
                     IF  (SYU-SYUHKNNUM     =   SPACE        )
                     AND (SYU-KOH-HKNNUM(1) =  "079" OR "024")
                     AND (SYU-KOH-HKNNUM(2) =  "012"         )
+                    AND (SYU-KOH-HKNNUM(3) =   SPACE        )
+                    AND (SYU-KOH-HKNNUM(4) =   SPACE        )
                     AND (SYU-HKNCOMBINUM
                                =   LNK-FTNJGNCHK-HKNCOMBINUM)
                         ADD  SYU-SKJ-FTN-RECE(1) TO  WRK-SKJ-FTN

@@ -825,6 +825,7 @@
            03  FLG-KIN-OKIKAE2                         PIC 9(01).
            03  FLG-HENSYU-NG                           PIC 9(01).
            03  FLG-ZEROKOGAITO                         PIC 9(01).
+           03  FLG-SKJ-CHECK                           PIC 9(01).
            03  FLG-SYOGAISEIHO                         PIC 9(01).
            03  FLG-SYOGAISEIHO2                        PIC 9(01).
            03  FLG-SYOGAISEIHO3                        PIC 9(01).
@@ -15378,6 +15379,8 @@
       *
            INITIALIZE                           WRK-KOGAKU-TAISYOGAI-T
       *
+           MOVE    ZERO                 TO      FLG-SKJ-CHECK
+      *
            INITIALIZE                           SYUNOU-REC
            MOVE    RECE62-HOSPNUM       TO      SYU-HOSPNUM
            MOVE    RECE62-NYUGAIKBN     TO      SYU-NYUGAIKBN
@@ -19197,6 +19200,17 @@
                        (SYU-KOH4HKNNUM      =   SPACE    ) AND
                        (RECE62-KOHNUM(KH-IDX - 1) = "010") AND
                        (KH-IDX              =   2        ))
+                  OR  ((SYU-KOH1HKNNUM   = "079" OR "024") AND
+                       (SYU-KOH2HKNNUM      =  "012"     ) AND
+                       (SYU-KOH3HKNNUM      =   SPACE    ) AND
+                       (SYU-KOH4HKNNUM      =   SPACE    ) AND
+                       (RECE62-KOHNUM(KH-IDX - 1) = "012") AND
+                       (KH-IDX              =   3        ) AND
+                       (SYU-SKJ-FTN-RECE(1)  >=  14880   ) AND
+                       (RECE62-HKNNUM       =  SPACE     ) AND
+                       (RECE62-KOHNUM(1) = "079" OR "024") AND
+                       (RECE62-KOHNUM(2)    =  "012"     ) AND
+                       (RECE62-SRYYM       >=  "200804"  ))
                      IF   RECE62-SHOKUJIRYOYOHI(KH-IDX) =  ZERO
                          MOVE    "1"      TO
                                  RECE62-FUKUSHIFLG-SKJ(KH-IDX - 1)
@@ -19210,6 +19224,19 @@
                      END-IF
                      ADD   SYU-SKJ-RYOYOHI(IDX3)  TO
                                    RECE62-HENSHOKUJIRYOYOHI(KH-IDX)
+                     IF  (SYU-KOH1HKNNUM   = "079" OR "024")
+                     AND (SYU-KOH2HKNNUM      =  "012"     )
+                     AND (SYU-KOH3HKNNUM      =   SPACE    )
+                     AND (SYU-KOH4HKNNUM      =   SPACE    )
+                     AND (RECE62-KOHNUM(KH-IDX - 1) = "012")
+                     AND (KH-IDX              =   3        )
+                     AND (SYU-SKJ-FTN-RECE(1)  >=  14880   )
+                     AND (RECE62-HKNNUM       =  SPACE     )
+                     AND (RECE62-KOHNUM(1) = "079" OR "024")
+                     AND (RECE62-KOHNUM(2)    =  "012"     )
+                     AND (RECE62-SRYYM       >=  "200804"  )
+                         MOVE     1    TO    FLG-SKJ-CHECK
+                     END-IF
                   ELSE
                    IF   ((SYU-KOH1HKNNUM  NOT =
                           "010" AND "038" AND "024" AND "079" AND
@@ -20707,6 +20734,20 @@
                     MOVE   1    TO    RECE62-FTNKBNFLG(KOHFTN-IDX 2)
                  END-IF
                END-PERFORM
+           END-IF
+      *
+           IF  (RECE62-HKNNUM          =  SPACE         )
+           AND (RECE62-KOHNUM(1)       =  "079" OR "024")
+           AND (RECE62-KOHNUM(2)       =  "012"         )
+           AND (RECE62-SRYYM          >=  "200804"      )
+      *
+               IF   FLG-SKJ-CHECK   =   1
+                 MOVE     "3"     TO   RECE62-FUKUSHIFLG-SKJIPA(2)
+                 MOVE     "3"     TO   RECE62-FUKUSHIFLG-SKJSEI(2)
+                 MOVE      2      TO   KOHFTN-IDX4
+                 PERFORM  2104531-SEIKYUGAK-SKJ-HENSYU2-SEC
+               END-IF
+      *
            END-IF
       *
            .

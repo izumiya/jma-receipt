@@ -9674,7 +9674,8 @@
                EVALUATE    TRUE
                WHEN  ( SPA-PREFNUM     =   CONST-NAGASAKI )
                 AND  ( SPA-GMN-KOHNUM  =   "287" OR "380" 
-                                        OR "281" OR "282" )
+                                        OR "281" OR "282"
+                                        OR "188"          )
                    MOVE    "2"         TO  SPA-GMN-RECEKSIKBNG
                    MOVE    "2"         TO  SPA-GMN-RECEKSITAIKBNG
                END-EVALUATE
