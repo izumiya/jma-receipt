@@ -622,6 +622,7 @@
       *  04.06.15    NACL-ÌçÏÆ    13/05/02  ºë¶Ì¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.16    NACL-ÌçÏÆ    12/06/14  ¼ÂÆü¿ô¡¦ÀÁµáÅÀµ­ºÜ¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *  04.06.17    NACL-ÌçÏÆ    13/09/17  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.18    NACL-ÌçÏÆ    13/10/09  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5140,12 +5141,14 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
       *
              IF   SYS-1001-PREFNUM = 42
                IF  ((RECE02-KOHNUM(1)       =  "186"         ) AND
-                    (RECE02-KOHNUM(2)       =  "187" OR "287") AND
+                    (RECE02-KOHNUM(2)       =  "187" OR "287"
+                                                     OR "188") AND
                     (RECE02-KOHNUM(3)       =  SPACE         ) AND
                     (RECE02-KOHNUM(4)       =  SPACE         ))
                OR  ((RECE02-KOHNUM(1)       =  "972" OR "974") AND
                     (RECE02-KOHNUM(2)       =  "186"         ) AND
-                    (RECE02-KOHNUM(3)       =  "187" OR "287") AND
+                    (RECE02-KOHNUM(3)       =  "187" OR "287"
+                                                     OR "188") AND
                     (RECE02-KOHNUM(4)       =  SPACE         ))
       *
                   MOVE        4           TO   FLG-ZENKOKUKOHI-NISYU
@@ -5156,7 +5159,8 @@ grpsys          MOVE    RECE02-HOSPNUM TO  LNK-KOREIFTNCHK-HOSPNUM
                      PERFORM   VARYING  IDY2  FROM  1  BY  1
                                 UNTIL  (IDY2                  >  10 )
                                  OR    (RECE02-HKNCOMBI(IDY2) = ZERO)
-                        IF   (RECE02-KOHNUMHC(IDY2 1) = "187" OR "287")
+                        IF   (RECE02-KOHNUMHC(IDY2 1) = "187" OR "287"
+                                                              OR "188")
                         AND  (RECE02-KOHNUMHC(IDY2 2) = "186"         )
                            MOVE    ZERO   TO   FLG-ZENKOKUKOHI-NISYU
                         END-IF
