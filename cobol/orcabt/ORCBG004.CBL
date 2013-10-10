@@ -489,39 +489,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  PTNYUINRRK-HOSPNUM
       *
            MOVE    ZERO                TO  FLG-WKPTNYUINRRK
       *
-      *    Æþ±¡ÍúÎò¥Þ¥¹¥¿¸¡º÷
            MOVE    PTNYUINRRK-REC      TO  WKPTNYUINRRK-REC
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key4"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC          =   ZERO )
-               MOVE    MCPDATA-REC     TO  WKPTNYUINRRK-REC
-           ELSE
-               MOVE    PTNYUINRRK-REC  TO  WKPTNYUINRRK-REC
-               MOVE    1               TO  FLG-WKPTNYUINRRK
-           END-IF
-      *
-           PERFORM UNTIL ( FLG-WKPTNYUINRRK    =   1 )
-                    OR  (( WKPTNYUINRRK-TENNYUYMD
-                                              <=  WRK-PARA-KJNYMD )
-                     AND ( WKPTNYUINRRK-TENNYUYMD
-                                              >=  WRK-PARA-KJNYMD ))
-      *
-               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-               MOVE    "key4"              TO  MCP-PATHNAME
-               PERFORM 910-DBFETCH-SEC
-               IF    ( MCP-RC          =   ZERO )
-                   MOVE    MCPDATA-REC     TO  WKPTNYUINRRK-REC
-               ELSE
-                   MOVE    PTNYUINRRK-REC  TO  WKPTNYUINRRK-REC
-                   MOVE    1               TO  FLG-WKPTNYUINRRK
-               END-IF
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
-           MOVE    "key4"              TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
       *
            MOVE    WKPTNYUINRRK-BTUNUM TO  BG00401DYN-SRT-BTUNUM
            MOVE    WKPTNYUINRRK-BRMNUM TO  BG00401DYN-SRT-BRMNUM
