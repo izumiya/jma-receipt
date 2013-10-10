@@ -132,6 +132,7 @@
            03  FLG-KOREI-HIGAITO   PIC 9(01).
            03  FLG-SEIHO-CHECK     PIC 9(01).
            03  FLG-INGAI           PIC 9(01).
+           03  FLG-HKNCOMBI-CHECK  PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1068,6 +1069,7 @@
            MOVE      ZERO          TO      WRK-SKYMONEY-SKJ
            MOVE      ZERO          TO      FLG-SEIHO-CHECK
            MOVE      ZERO          TO      FLG-INGAI
+           MOVE      ZERO          TO      FLG-HKNCOMBI-CHECK
            PERFORM   UNTIL    FLG-SYUNOU  =   1
              MOVE    ZERO          TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -1261,6 +1263,21 @@
                         MOVE    1                TO  FLG-SEIHO-CHECK
                     END-IF
                   END-IF
+                  IF    LNK-FTNJGNCHK-PREFNUM  =  42
+                    IF  ((LNK-FTNJGNCHK-KOHNUM      =
+                            "287" OR "380" OR "281" OR "282"   ) AND
+                         (LNK-FTNJGNCHK-SRYYM      >=  "200704"))
+                    OR  ((LNK-FTNJGNCHK-KOHNUM      =  "188"   ) AND
+                         (LNK-FTNJGNCHK-NYUGAIKBN   =  "2"     ) AND
+                         (LNK-FTNJGNCHK-SRYYM      >=  "201310"))
+                     IF  (SYU-SYUHKNNUM     NOT =   SPACE              )
+                     AND (SYU-KOH-HKNNUM(1) = "015" OR "016" OR "021"  )
+                     AND (SYU-KOH-HKNNUM(2) = "188"                    )
+                     AND (SYU-HKNCOMBINUM   = LNK-FTNJGNCHK-HKNCOMBINUM)
+                        MOVE    1                TO  FLG-HKNCOMBI-CHECK
+                     END-IF
+                    END-IF
+                  END-IF
                   IF     WRK-HKNCOMBINUM-FLG(IDX1) =  1
                         MOVE   01                TO  LNK-FTNJGNCHK-RC
                   END-IF
@@ -1303,14 +1320,16 @@
            AND (LNK-FTNJGNCHK-KOHNUM(1:1) >= "1" AND <= "8")
            AND (LNK-FTNJGNCHK-SRYYM       >= "200704"      )
              MOVE     ZERO       TO    FLG-TAISYO
-             IF  ( LNK-FTNJGNCHK-KOHNUM      =
-                     "287" OR "380" OR "281" OR "282"    )
+             IF  ((LNK-FTNJGNCHK-KOHNUM      =
+                     "287" OR "380" OR "281" OR "282"   ) AND
+                  (LNK-FTNJGNCHK-SRYYM      >=  "200704"))
              OR  ((LNK-FTNJGNCHK-KOHNUM      =  "188"   ) AND
                   (LNK-FTNJGNCHK-NYUGAIKBN   =  "2"     ) AND
                   (LNK-FTNJGNCHK-SRYYM      >=  "201310"))
                MOVE     LNK-FTNJGNCHK-HKNID  TO  WRK-HKNID
                PERFORM  210112-HKNINF-KENSAKU-SEC
-               IF   PTHKN-HKNNUM  NOT = "060" AND "067" AND "039"
+               IF  (PTHKN-HKNNUM    NOT = "060" AND "067" AND "039")
+               AND (FLG-HKNCOMBI-CHECK  =  1                       )
                  MOVE      1     TO    FLG-TAISYO
                END-IF
              END-IF
