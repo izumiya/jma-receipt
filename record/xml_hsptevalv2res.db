@@ -1,0 +1,38 @@
+xml_hsfoodv2res {
+    context	int;
+    object	object;
+    mode	int;
+    recordname	varchar(128);
+	private_objects {
+		Information_Date 		varchar(10);
+		Information_Time 		varchar(08);
+		Api_Result	     		varchar(02);
+		Api_Result_Message 		varchar(100);
+		Patient_Information{
+			Patient_ID			varchar(20);
+			WholeName			varchar(100);
+			WholeName_inKana	varchar(100);
+			BirthDate			varchar(10);
+			Sex					varchar(01);
+		};
+		Perform_Month			varchar(07);
+		Medical_Condition	{
+			Level				varchar(1);
+			Id					varchar(2);
+			Name				varchar(100);
+			Evaluation_Month	varchar(1);
+			Evaluation_Daily		varchar(256);
+		}[41];
+		ADL_Score	{
+			Id					varchar(1);
+			Name				varchar(100);
+			Evaluation_Daily	varchar(256);
+		}[4];
+		Medical_Condition_Level_Daily	varchar(256);
+		ADL_Total_Score_Daily	varchar(256);
+		Patient_Condition	{
+			Evaluation_Daily		varchar(256);
+			Evaluation_Difference	varchar(256);
+		};
+	};
+};

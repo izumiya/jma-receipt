@@ -205,6 +205,7 @@
            MOVE    SYSKANRI-REC    TO  SYS-1001-REC
       *
            INITIALIZE                  HCN68S01-AREA
+           MOVE    "1"             TO  HCN68S01-RANGE
            MOVE    ORCHCN68-PTID   TO  HCN68S01-PTID
            MOVE    ORCHCN68-SRYYM  TO  HCN68S01-SRYYM
                                        HCN68S01-SRYYMD
@@ -439,18 +440,16 @@
            PERFORM VARYING IDX-DAY FROM    1   BY  1
                    UNTIL ( IDX-DAY >   31 )
       *
+               IF    ( HCN68S01-MEDKBN-DAY (1 IDX-DAY) =  1 )
+                   MOVE    "¡û"    TO  HCN68-TTL-MEDKBN-DAY (1 IDX-DAY)
+               END-IF
+      *
+               IF    ( HCN68S01-MEDKBN-DAY (2 IDX-DAY)   =  1 )
+                   MOVE    "¡û"    TO  HCN68-TTL-MEDKBN-DAY (2 IDX-DAY)
+               END-IF
+      *
                IF    ( HCN68S01-RYOYO-CD (IDX-DAY)
                                    NOT =   SPACE )
-      *
-                   IF    ( HCN68S01-MEDKBN-DAY (1 IDX-DAY) =  1 )
-                       MOVE    "¡û"
-                                   TO  HCN68-TTL-MEDKBN-DAY (1 IDX-DAY)
-                   END-IF
-      *
-                   IF    ( HCN68S01-MEDKBN-DAY (2 IDX-DAY)   =  1 )
-                       MOVE    "¡û"
-                                   TO  HCN68-TTL-MEDKBN-DAY (2 IDX-DAY)
-                   END-IF
       *
                    IF    ( HCN68S01-MEDKBN-DAYALL (1)      = ZERO )
                     AND  ( HCN68S01-MEDKBN-DAY (1 IDX-DAY) = ZERO )
@@ -481,11 +480,8 @@
                      UNTIL ( IDX-DAY >   31 )
                  IF  ( HCN68S01-TDAY (IDXL IDX-DAY)
                                            >   ZERO )
-                       IF    ( HCN68S01-RYOYO-CD (IDX-DAY)
-                                       NOT =   SPACE )
-                           MOVE    "¡û"
+                       MOVE    "¡û"
                                TO  HCN68-MEDKBN-DAY (IDX-MED IDX-DAY)
-                       END-IF
                  END-IF
              END-PERFORM
          END-IF
@@ -618,7 +614,7 @@
          PERFORM VARYING IDX-DAY FROM    1   BY  1
                  UNTIL ( IDX-DAY >   31 )
                IF    ( HCN68S01-RYOYO-CD (IDX-DAY)
-                                     NOT =   SPACE )
+                                   NOT =   SPACE )
                    MOVE    HCN68S01-TDAY (IDXL IDX-DAY)
                            TO  WRK-ADLTEN
                    PERFORM 2001111-EDIT-ADLTEN-SEC

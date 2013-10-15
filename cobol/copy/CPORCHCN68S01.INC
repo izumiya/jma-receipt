@@ -25,6 +25,7 @@
       ************************************************************
       *
        01  HCN68S01-AREA.
+           03  HCN68S01-RANGE                      PIC X(01).
            03  HCN68S01-PTID                       PIC 9(10).
            03  HCN68S01-SRYYM                      PIC X(06).
            03  HCN68S01-SRYYMD                     PIC X(08).
@@ -41,6 +42,7 @@
                05  HCN68S01-RYOLIST-ADL-STIDX      PIC 9(03).
                05  HCN68S01-RYOLIST-MAX            PIC 9(05).
                05  HCN68S01-RYOLIST-OCC            OCCURS  100.
+                   07  HCN68S01-TID                PIC X(02).
                    07  HCN68S01-TNAME              PIC X(100).
                    07  HCN68S01-TZAISKBKBN         PIC X(01).
                    07  HCN68S01-TMEDKBN            PIC X(01).
