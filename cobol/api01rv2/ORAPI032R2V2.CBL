@@ -127,6 +127,9 @@
       *    患者番号変換サブ
            COPY    "CPORCSPTID.INC".
       *
+      *    入退院日取得サブパラメタ
+           COPY    "CPORCSNTYMD.INC".
+      *
       *    保険組合せセット領域
            COPY    "CPORCSAPIHKN.INC".
       *
@@ -270,6 +273,22 @@
            MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC    TO  SYS-1001-REC
+      *
+           IF    ( WRK-ERRCD           =   SPACE )
+               INITIALIZE                      ORCSNTYMDAREA
+               MOVE    SPA-HOSPNUM         TO  SNTYMD-HOSPNUM
+               MOVE    SPA-PTID            TO  SNTYMD-PTID
+               MOVE    "2"                 TO  SNTYMD-KBN
+               CALL    "ORCSNTYMD" USING   ORCSNTYMDAREA
+                                               SPA-AREA
+               IF  ( SNTYMD-RC             =   ZERO )
+                   IF  ( SNTYMD-MAX        =   ZERO )
+                       MOVE    "50"        TO  WRK-ERRCD
+                   END-IF
+               ELSE
+                   MOVE    "03"            TO  WRK-ERRCD
+               END-IF
+           END-IF
       *
            IF    ( WRK-ERRCD           =   SPACE )
       *
@@ -430,6 +449,27 @@
            MOVE    "01"            TO  WRK-SYMD(7:2)
            PERFORM 800-DATE-SEC
            MOVE    WRK-DATE (1:7)  TO  HSPTEVALRES-SRYYM
+      *
+           MOVE    ZERO            TO      IDXA
+           PERFORM VARYING IDX0    FROM    SNTYMD-MAX   BY  -1
+                   UNTIL ( IDXA    >   5 )
+                    OR   ( IDX0    <   1)
+      *
+               IF    ( KEY-SRYYM   >=  SNTYMD-NYUINYMD (IDX0)(1:6))
+                AND  ( KEY-SRYYM   <=  SNTYMD-TAIINYMD (IDX0)(1:6))
+                   COMPUTE IDXA    =   IDXA    +   1
+                   MOVE    SNTYMD-NYUINYMD (IDX0)
+                                   TO  WRK-SYMD
+                   PERFORM 800-DATE-SEC
+                   MOVE    WRK-DATE    TO  HSPTEVALRES-NYUINYMD (IDXA)
+      *
+                   MOVE    SNTYMD-TAIINYMD (IDX0)
+                                       TO  WRK-SYMD
+                   PERFORM 800-DATE-SEC
+                   MOVE    WRK-DATE    TO  HSPTEVALRES-TAIINYMD (IDXA)
+               END-IF
+      *
+           END-PERFORM
       *
           .
        2001-SRYYM-EDIT-EXT.
@@ -936,6 +976,9 @@
            WHEN    "02"
                MOVE    "患者番号の設定に誤りがあります"
                                        TO  WRK-ERRMSG
+           WHEN    "03"
+               MOVE    "入退院情報の取得に失敗しました"
+                                       TO  WRK-ERRMSG
            WHEN    "04"
                MOVE    "入院会計情報の取得に失敗しました"
                                        TO  WRK-ERRMSG
@@ -950,6 +993,9 @@
                  MOVE "有床診療所療養病床入院基本料が算定されていません"
                                        TO  WRK-ERRMSG
                END-IF
+           WHEN    "50"
+               MOVE    "診療年月にかかる入退院情報はありません"
+                                       TO  WRK-ERRMSG
       *共通エラー
            WHEN    "89"
       *        ORCSCOMMON のエラー

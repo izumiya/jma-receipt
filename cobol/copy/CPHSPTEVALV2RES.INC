@@ -36,6 +36,10 @@
                    07  HSPTEVALRES-KANANAME            PIC X(100).
                    07  HSPTEVALRES-BIRTHDAY            PIC X(10).
                    07  HSPTEVALRES-SEX                 PIC X(01).
+               05  HSPTEVALRES-NYUTAIINYMD-AREA.
+                   07  HSPTEVALRES-NYUTAIINYMD-OCC     OCCURS  5.
+                       09  HSPTEVALRES-NYUINYMD        PIC X(10).
+                       09  HSPTEVALRES-TAIINYMD        PIC X(10).
                05  HSPTEVALRES-SRYYM                   PIC X(07).
                05  HSPTEVALRES-MEDKBN-AREA.
                    07  HSPTEVALRES-MEDKBN-OCC          OCCURS  41.

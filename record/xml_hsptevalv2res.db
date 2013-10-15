@@ -15,6 +15,10 @@ xml_hsfoodv2res {
 			BirthDate			varchar(10);
 			Sex					varchar(01);
 		};
+		Admission_Discharge_Date {
+			Admission_Date		varchar(10);
+			Discharge_Date		varchar(10);
+		}[5];
 		Perform_Month			varchar(07);
 		Medical_Condition	{
 			Level				varchar(1);
