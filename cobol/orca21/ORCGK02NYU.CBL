@@ -710,6 +710,15 @@
       *ÆþÎÏÊ¸»ú¿ô
        01  CONS-INPUT              PIC 9(04)   VALUE   54.
       *
+      *PandaTable¿§
+      *ÀÄ
+       01  CL-BLUE                 PIC X(07)   VALUE   "#0000EE".
+      *ÀÖ
+       01  CL-RED                  PIC X(07)   VALUE   "#FF0000".
+      *¥¯¥í
+       01  CL-BLACK                PIC X(07)   VALUE   "#000000".
+      *
+      *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
@@ -10143,24 +10152,28 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            Êñ³ç¹Ô
                    IF     (SPA-COM-HOUKATU-ZAI (WRK-IDX) =   1 )
       *ver.4.7
-                       MOVE    "blue"         TO  K02N-SRYKBN-FGCOLOR
+      ***********      MOVE    "blue"         TO  K02N-SRYKBN-FGCOLOR
+                       MOVE    CL-BLUE        TO  K02N-SRYKBN-FGCOLOR
                                                                 (IDX)
-                       MOVE    "blue"         TO  K02N-MEISYO-FGCOLOR
+                       MOVE    CL-BLUE        TO  K02N-MEISYO-FGCOLOR
                                                                  (IDX)
                        IF      SPA-COM-HOUKATU-FLG2(WRK-IDX)   =   1
-                           MOVE    "red"          TO
+      ***********          MOVE    "red"          TO
+                           MOVE    CL-RED         TO
                                        K02N-SRYKBN-FGCOLOR (IDX)
                                        K02N-MEISYO-FGCOLOR (IDX)
                        END-IF
                    ELSE
-                       MOVE    "black"        TO  K02N-SRYKBN-FGCOLOR
+      ************     MOVE    "black"        TO  K02N-SRYKBN-FGCOLOR
+                       MOVE    CL-BLACK       TO  K02N-SRYKBN-FGCOLOR
                                                                  (IDX)
-                       MOVE    "black"        TO  K02N-MEISYO-FGCOLOR
+                       MOVE    CL-BLACK       TO  K02N-MEISYO-FGCOLOR
                                                                  (IDX)
                    END-IF
       *!!          ¶Ø´÷ÌôºÞ
                    IF      SPA-COM-PTKINKI-ARI (WRK-IDX)   =   1
-                       MOVE    "red"          TO  K02N-MEISYO-FGCOLOR
+      **************   MOVE    "red"          TO  K02N-MEISYO-FGCOLOR
+                       MOVE    CL-RED         TO  K02N-MEISYO-FGCOLOR
                                                                  (IDX)
                    END-IF
       *!
@@ -10536,7 +10549,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *@
       *    Êñ³çºÞ
            IF    ( SPA-COM-HOUKATU-ZAI (WRK-IDX) =   1  ) 
-              MOVE    "blue"         TO  K02N-SURYO-FGCOLOR (IDX)
+      ******* MOVE    "blue"         TO  K02N-SURYO-FGCOLOR (IDX)
+              MOVE    CL-BLUE        TO  K02N-SURYO-FGCOLOR (IDX)
            END-IF
       *
            .
