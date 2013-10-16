@@ -403,6 +403,7 @@
       *  04.06.09    NACL-門脇    13/05/02  埼玉県地方公費対応
       *  04.06.10    NACL-門脇    13/08/08  山口県地方公費対応
       *  04.06.11    NACL-門脇    13/09/17  宮城県地方公費対応
+      *  04.06.12    NACL-門脇    13/10/16  滋賀県地方公費対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -17500,6 +17501,7 @@
                  MOVE  SYS-2010-JYUHENKBN  TO  FLG-KOHFUKA-HENSYU
                  PERFORM   220272-KOHFUKA-HENSYU1-SEC
              WHEN      "4"
+             WHEN      "6"
                  IF   WK-HKNJANUM2  =  WK-HKNJANUM
                    MOVE   1   TO   FLG-KOHFUKA-HENSYU
                    PERFORM   220272-KOHFUKA-HENSYU1-SEC
