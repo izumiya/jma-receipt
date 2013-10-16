@@ -402,6 +402,7 @@
       *  04.06.08    NACL-門脇    13/05/02  埼玉県地方公費対応
       *  04.06.09    NACL-門脇    13/08/08  山口県地方公費対応
       *  04.06.10    NACL-門脇    13/09/17  宮城県地方公費対応
+      *  04.06.11    NACL-門脇    13/10/16  滋賀県地方公費対応
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-門脇    11/10/17  法定外現物給付対応（法別１０、２１）
@@ -17485,6 +17486,7 @@
              WHEN      "3"
                  CONTINUE
              WHEN      "4"
+             WHEN      "6"
                  IF   WK-HKNJANUM2  =  WK-HKNJANUM
                    MOVE   1   TO   FLG-KOHFUKA-HENSYU
                    PERFORM   220272-KOHFUKA-HENSYU1-SEC
