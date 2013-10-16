@@ -864,7 +864,7 @@
       *
            MOVE    "5"             TO  SPA-GMN-JYUHENKBNL    (5)
            MOVE
-             "変更前の負担を考慮する（保険者変更時を除く（外来のみ））"
+             "変更前の負担を考慮する（入院は１と同様。外来は４と同様）"
                                    TO  SPA-GMN-JYUHENKBNMEIL (5)
       *
            MOVE    5               TO  SPA-GMN-JYUHENKBN-MAX
