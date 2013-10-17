@@ -257,6 +257,7 @@
                        09  TBL-DAY         PIC 9(03)
                                                OCCURS   31.
       *    外泊
+           03  TBL-GAIHAKU-SRYYYMM         PIC X(06).
            03  TBL-GAIHAKU-G.
                05  TBL-GAIHAKU             PIC 9(03)
                                            OCCURS   31.
@@ -1197,6 +1198,7 @@
                    WHEN    "2"
       *            外泊
                        MOVE    NACCT-DAY-AREA  TO  TBL-GAIHAKU-G
+                       MOVE    NACCT-SRYYM     TO  TBL-GAIHAKU-SRYYYMM
                END-EVALUATE
       *
                MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
@@ -1351,12 +1353,15 @@
       *            外泊日の加算を表示しない
                    PERFORM VARYING     TBL-IDX3    FROM    1   BY  1
                            UNTIL       TBL-IDX3    >   31
+                     IF      TBL-GAIHAKU-SRYYYMM  = WRK-TBL-SRYYYMM
+                                                        (9 TBL-IDX1)
                        IF      TBL-GAIHAKU (TBL-IDX3)  =   1
                                                        OR  2
                                                        OR  3
                            MOVE    ZERO            TO  WRK-TBL-KAISU
                                                    (9 TBL-IDX1 TBL-IDX3)
                        END-IF
+                     END-IF
                    END-PERFORM
                END-IF
            END-PERFORM
@@ -1811,6 +1816,10 @@
                    WHEN    "2"
       *            外泊
                        MOVE    NACCT-DAY-AREA  TO  TBL-GAIHAKU-G
+                       MOVE    NACCT-SRYYM     TO  TBL-GAIHAKU-SRYYYMM
+      *            食事関係
+                   WHEN    "4"
+                       CONTINUE
                    WHEN    "5"
       *            保険
                        MOVE    NACCT-DAY-AREA  TO  TBL-HKNCOMBI-NYU-G
