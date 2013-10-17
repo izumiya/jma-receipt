@@ -126,6 +126,7 @@
                WHEN    "°¡"    THRU    "ô¦"
                    MOVE    1       TO  SDTCHK04-KANJI
                WHEN    "£Á"    THRU     "£Ú"
+               WHEN    "£á"    THRU     "£ú"
                    MOVE    1       TO  SDTCHK04-ALPHABET
                WHEN    "¡Ý"
                WHEN    "¡½"
