@@ -482,6 +482,7 @@ RECORD_files = \
 	hsfoodv2.rec \
 	insprogetv2.rec \
 	hsptevalv2.rec \
+	hsptinfv2.rec \
 
 DEF_files = \
 
@@ -754,6 +755,8 @@ DB_files = \
 	xml_insprogetv2res.db \
 	xml_hsptevalv2req.db \
 	xml_hsptevalv2res.db \
+	xml_hsptinfv2req.db \
+	xml_hsptinfv2res.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

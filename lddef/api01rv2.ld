@@ -21,6 +21,7 @@ bindapi	"tmedicalgetv2"	"OpenCOBOL"	"ORAPI021R3V2";
 bindapi "hsfoodv2"      "OpenCOBOL" "ORAPI032R1V2";
 bindapi	"insprogetv2"	"OpenCOBOL"	"ORAPI105R1V2";
 bindapi "hsptevalv2"    "OpenCOBOL" "ORAPI032R2V2";
+bindapi "hsptinfv2"     "OpenCOBOL" "ORAPI031R1V2";
 
 multiplex_group	api01rv2;
 
@@ -45,6 +46,7 @@ data	{
         hsfoodv2;
 	    insprogetv2;
         hsptevalv2;
+        hsptinfv2;
 	};
 };
 db "xml2" {
@@ -87,6 +89,8 @@ db "xml2" {
  xml_insprogetv2res;
  xml_hsptevalv2res;
  xml_hsptevalv2req;
+ xml_hsptinfv2res;
+ xml_hsptinfv2req;
 };
 
 #include "orcadb.inc"
