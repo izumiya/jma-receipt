@@ -269,6 +269,7 @@
                        09  TBL-DAY         PIC 9(03)
                                                OCCURS   31.
       *    外泊
+           03  TBL-GAIHAKU-SRYYM           PIC X(06).
            03  TBL-GAIHAKU-G.
                05  TBL-GAIHAKU             PIC 9(03)
                                            OCCURS   31.
@@ -1268,6 +1269,7 @@
                EVALUATE    NACCT-ZAISKBKBN
                    WHEN    "2"
       *            外泊
+                       MOVE    NACCT-SRYYM     TO  TBL-GAIHAKU-SRYYM
                        MOVE    NACCT-DAY-AREA  TO  TBL-GAIHAKU-G
                END-EVALUATE
       *
@@ -1433,12 +1435,15 @@
       *            外泊日の加算を表示しない
                    PERFORM VARYING     TBL-IDX3    FROM    1   BY  1
                            UNTIL       TBL-IDX3    >   31
+                     IF    WRK-TBL-SRYYYMM(9 TBL-IDX1)
+                                               =   TBL-GAIHAKU-SRYYM
                        IF      TBL-GAIHAKU (TBL-IDX3)  =   1
                                                        OR  2
                                                        OR  3
                            MOVE    ZERO            TO  WRK-TBL-KAISU
                                                    (9 TBL-IDX1 TBL-IDX3)
                        END-IF
+                     END-IF
                    END-PERFORM
                END-IF
            END-PERFORM
@@ -1904,7 +1909,11 @@
                        MOVE    NACCT-DAY-AREA  TO  TBL-DAY-G  (IDX-N)
                    WHEN    "2"
       *            外泊
+                       MOVE    NACCT-SRYYM     TO  TBL-GAIHAKU-SRYYM
                        MOVE    NACCT-DAY-AREA  TO  TBL-GAIHAKU-G
+      *            食事関係
+                   WHEN    "4"
+                       CONTINUE
                    WHEN    "5"
       *            保険
                        MOVE    NACCT-DAY-AREA  TO  TBL-HKNCOMBI-NYU-G
@@ -2002,6 +2011,10 @@
                MOVE    1               TO  TBL-HKNKBN (IDX)
            ELSE
                MOVE    ZERO            TO  TBL-HKNKBN (IDX)
+           END-IF
+      *    第三者行為は、自賠責とする
+           IF      COMB-KOH1HKNNUM     =   "970"
+               MOVE    1               TO  TBL-HKNKBN (IDX)
            END-IF
            .
        310911-HKNCOMBI-HEN-EXT.
