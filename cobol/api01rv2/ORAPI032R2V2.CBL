@@ -240,27 +240,28 @@
                                        SPA-AREA
            IF    ( SPA-ERRCD   NOT =   SPACE )
                MOVE   "99"         TO  WRK-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
-           IF    ( WRK-ERRCD          =   SPACE )
-      *        ＳＰＡ共通設定
-               INITIALIZE                  SYS-1010-REC
-               INITIALIZE                  ORCSCOMMONAREA
-               MOVE    "M00"               TO  ORCSCOMMON-PG
-               CALL    "ORCSCOMMON"        USING
-                                           MCPAREA
-                                           SPA-AREA
-                                           ORCSCOMMONAREA
-                                           SYS-1010-REC
-               IF    ( SPA-ERRCD       NOT =   SPACE )
-                   MOVE   "89"         TO  WRK-ERRCD
-               END-IF
+      *    ＳＰＡ共通設定
+           INITIALIZE                  SYS-1010-REC
+           INITIALIZE                  ORCSCOMMONAREA
+           MOVE    "M00"               TO  ORCSCOMMON-PG
+           CALL    "ORCSCOMMON"        USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSCOMMONAREA
+                                       SYS-1010-REC
+           IF    ( SPA-ERRCD       NOT =   SPACE )
+               MOVE   "89"         TO  WRK-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
-      *
-           
       *
       *    XML情報取り出し
            PERFORM 900-XML-READ-SEC
+           IF    ( WRK-ERRCD           NOT =   SPACE )
+               PERFORM 990-EXIT-PROGRAM-SEC
+           END-IF
       *
            PERFORM 1001-INIT-CHECK-SEC
       *
@@ -274,52 +275,43 @@
            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
            MOVE    SYSKANRI-REC    TO  SYS-1001-REC
       *
-           IF    ( WRK-ERRCD           =   SPACE )
-               INITIALIZE                      ORCSNTYMDAREA
-               MOVE    SPA-HOSPNUM         TO  SNTYMD-HOSPNUM
-               MOVE    SPA-PTID            TO  SNTYMD-PTID
-               MOVE    "2"                 TO  SNTYMD-KBN
-               CALL    "ORCSNTYMD" USING   ORCSNTYMDAREA
-                                               SPA-AREA
-               IF  ( SNTYMD-RC             =   ZERO )
-                   IF  ( SNTYMD-MAX        =   ZERO )
-                       MOVE    "50"        TO  WRK-ERRCD
-                   END-IF
-               ELSE
-                   MOVE    "03"            TO  WRK-ERRCD
-               END-IF
+           INITIALIZE                      ORCSNTYMDAREA
+           MOVE    SPA-HOSPNUM         TO  SNTYMD-HOSPNUM
+           MOVE    SPA-PTID            TO  SNTYMD-PTID
+           MOVE    "2"                 TO  SNTYMD-KBN
+           CALL    "ORCSNTYMD" USING   ORCSNTYMDAREA
+                                           SPA-AREA
+           IF  ( SNTYMD-RC         NOT =   ZERO )
+               MOVE    "03"            TO  WRK-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
-           IF    ( WRK-ERRCD           =   SPACE )
-      *
-               MOVE    "5"                 TO  WRK-ZAISKBKBN
-               PERFORM 900-NYUINACCT-KEY17-SEL-SEC
-               IF    ( FLG-NYUINACCT   =   ZERO )
-                   MOVE    NYUINACCT-REC   TO  TCOMB-AREA
-               ELSE
-                   MOVE    "04"            TO  WRK-ERRCD
-               END-IF
+           MOVE    "5"                 TO  WRK-ZAISKBKBN
+           PERFORM 900-NYUINACCT-KEY17-SEL-SEC
+           IF    ( FLG-NYUINACCT   =   ZERO )
+               MOVE    NYUINACCT-REC   TO  TCOMB-AREA
+           ELSE
+               MOVE    "04"            TO  WRK-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
-           IF    ( WRK-ERRCD           =   SPACE )
-               PERFORM 900-RYOCOM-KEY2-SEL-SEC
-               IF    ( FLG-RYOCOM  NOT =   ZERO )
-                   MOVE    "05"        TO  WRK-ERRCD
-               END-IF
+           PERFORM 900-RYOCOM-KEY2-SEL-SEC
+           IF    ( FLG-RYOCOM  NOT =   ZERO )
+               MOVE    "05"        TO  WRK-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
-           IF    ( WRK-ERRCD           =   SPACE )
-               INITIALIZE                  HCN68S01-AREA
-               MOVE    "1"             TO  HCN68S01-RANGE
-               MOVE    SPA-PTID        TO  HCN68S01-PTID
-               MOVE    KEY-SRYYM       TO  HCN68S01-SRYYM
-               MOVE    SPA-SRYYMD      TO  HCN68S01-SRYYMD
-               CALL    "ORCHCN68S01"   USING
-                                       SPA-AREA
-                                       HCN68S01-AREA
-               IF    ( HCN68S01-RYOYO-FLG  =   ZERO )
-                   MOVE    "06"        TO  WRK-ERRCD
-               END-IF
+           INITIALIZE                  HCN68S01-AREA
+           MOVE    "1"             TO  HCN68S01-RANGE
+           MOVE    SPA-PTID        TO  HCN68S01-PTID
+           MOVE    KEY-SRYYM       TO  HCN68S01-SRYYM
+           MOVE    SPA-SRYYMD      TO  HCN68S01-SRYYMD
+           CALL    "ORCHCN68S01"   USING
+                                   SPA-AREA
+                                   HCN68S01-AREA
+           IF    ( HCN68S01-RYOYO-FLG  =   ZERO )
+               MOVE    "06"        TO  WRK-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
            .
@@ -335,9 +327,7 @@
            MOVE    KEY-SRYYM       TO  SPA-SRYYMD
            MOVE    "01"            TO  SPA-SRYYMD (7:2)
       *
-           IF    ( WRK-ERRCD       =   SPACE )
-               PERFORM 10011-PTNUM-CHECK-SEC
-           END-IF
+           PERFORM 10011-PTNUM-CHECK-SEC
       *
            .
        1001-INIT-CHECK-EXT.
@@ -358,16 +348,16 @@
                PERFORM 800-HIZUKE-SEC
                IF    ( WRK-EDTYMD1     =   SPACE )
                    MOVE    "01"    TO  WRK-ERRCD
+                   PERFORM 990-EXIT-PROGRAM-SEC
                ELSE
                    MOVE    WRK-SYMD (1:6)
                                    TO  KEY-SRYYM
                END-IF
            END-IF
       *
-           IF    ( WRK-ERRCD       =   SPACE )
-               IF    ( KEY-SRYYM   <   CONST-H240401 (1:6))
-                   MOVE    "92"    TO  WRK-ERRCD
-               END-IF
+           IF    ( KEY-SRYYM   <   CONST-H240401 (1:6))
+               MOVE    "92"    TO  WRK-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
            .
@@ -380,6 +370,7 @@
       *
            IF    ( HSPTEVALREQ-PTNUM   =   SPACE )
                MOVE    "02"            TO  WRK-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            ELSE
                INITIALIZE                  ORCSPTIDAREA
                MOVE    SPA-HOSPNUM     TO  SPTID-HOSPNUM
@@ -389,17 +380,17 @@
                                        SPA-AREA
                IF    ( SPTID-RC        NOT =   ZERO )
                    MOVE    "02"        TO  WRK-ERRCD
+                   PERFORM 990-EXIT-PROGRAM-SEC
                END-IF
       *
                MOVE    SPTID-PTNUM     TO  SPA-PTNUM
                MOVE    SPTID-PTID      TO  SPA-PTID
            END-IF
       *
-           IF    ( WRK-ERRCD           =   SPACE )
-               PERFORM 900-PTINF-KEY-SEL-SEC
-               IF    ( FLG-PTINF       NOT =   ZERO )
-                   MOVE    "02"        TO  WRK-ERRCD
-               END-IF
+           PERFORM 900-PTINF-KEY-SEL-SEC
+           IF    ( FLG-PTINF       NOT =   ZERO )
+               MOVE    "02"        TO  WRK-ERRCD
+               PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
            .
@@ -412,13 +403,13 @@
       *
            PERFORM 2001-PTINF-EDIT-SEC
       *
-           IF    ( WRK-ERRCD       =   SPACE )
+           PERFORM 2001-SRYYM-EDIT-SEC
       *
-               PERFORM 2001-SRYYM-EDIT-SEC
-               PERFORM 2001-MEDKBN-EDIT-SEC
-               PERFORM 2001-ADLTEN-EDIT-SEC
-               PERFORM 2001-PTEVAL-EDIT-SEC
-           END-IF
+           PERFORM 2001-MEDKBN-EDIT-SEC
+      *
+           PERFORM 2001-ADLTEN-EDIT-SEC
+      *
+           PERFORM 2001-PTEVAL-EDIT-SEC
       *
            .
        200-MAIN-EXT.
@@ -993,9 +984,6 @@
                  MOVE "有床診療所療養病床入院基本料が算定されていません"
                                        TO  WRK-ERRMSG
                END-IF
-           WHEN    "50"
-               MOVE    "診療年月にかかる入退院情報はありません"
-                                       TO  WRK-ERRMSG
       *共通エラー
            WHEN    "89"
       *        ORCSCOMMON のエラー
@@ -1373,4 +1361,28 @@
            .
       *
        910-XMLCLOSE-EXT.
+           EXIT.
+      *****************************************************************
+      *    プログラム終了処理（エラー時）
+      *****************************************************************
+       990-EXIT-PROGRAM-SEC            SECTION.
+      *
+           MOVE    SMCNDATE-YMD        TO  WRK-SYMD
+           PERFORM 800-DATE-SEC
+           MOVE    WRK-DATE            TO  HSPTEVALRES-INFORMATION-DATE
+      *
+           MOVE    SMCNDATE-HMS        TO  WRK-HMS
+           PERFORM 800-TIME-SEC
+           MOVE    WRK-TIME            TO  HSPTEVALRES-INFORMATION-TIME
+      *
+           PERFORM 890-ERRCD-MSG-SEC
+           MOVE    WRK-ERRCD           TO  HSPTEVALRES-API-RESULT
+           MOVE    WRK-ERRMSG          TO  HSPTEVALRES-API-RESULT-MSG
+      *
+           PERFORM 900-XML-WRITE-SEC
+      *
+           EXIT PROGRAM
+      *
+           .
+       990-EXIT-PROGRAM-EXT.
            EXIT.
