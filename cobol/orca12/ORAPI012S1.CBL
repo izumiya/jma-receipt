@@ -27,7 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *
+      * 04.07.00     NACL-多々納  13/10/21  PARA削除追加
       *****************************************************************
       *
        ENVIRONMENT         DIVISION.
@@ -293,6 +293,10 @@
       *    患者病名
        01  PTBYOMEI-REC.
            COPY    "CPPTBYOMEI.INC".
+      *
+      *    パラメタテーブル
+       01  PARA-REC.
+           COPY    "CPPARA.INC".
       *
       *   （ＣＬＡＩＭ接続）
            COPY    "CPSK9000.INC".
@@ -1061,6 +1065,10 @@
            IF      WRK-ERRCD           =   SPACE
                PERFORM 20023-PTINFINS-SYORI-SEC
            END-IF
+      *
+      *    パラメタ削除処理（保険情報）
+           PERFORM 4904-PARA-DEL-SEC
+      *
       *    保険組合せ編集処理
            IF      WRK-ERRCD           =   SPACE
                PERFORM 20023-HKNCOMBI-HEN-SEC
@@ -3105,6 +3113,29 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            .
        20031-DELETE-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    パラメタ削除処理
+      *****************************************************************
+       4904-PARA-DEL-SEC          SECTION.
+      *
+      *    パラメタ削除
+           INITIALIZE                      PARA-REC
+           MOVE    "P02"               TO  PARA-GYOUMUID
+           MOVE    SPA-TERMID          TO  PARA-TERMID
+      *
+           MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
+           MOVE    PARA-REC            TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "del2"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+           .
+       4904-PARA-DEL-EXT.
            EXIT.
       *
       *****************************************************************
