@@ -1162,10 +1162,10 @@
                           OR  (SPA-ERRCD   NOT =   SPACE )
                IF      SPA-K062-COMMENT(IDX)   NOT =   SPACE
                    PERFORM 410121-MEISYO-HENKAN-SEC
-               END-IF
-               IF     (SPA-K062-TENDYMDG(IDX)  NOT =   SPACE )
-               AND    (SPA-ERRCD                   =   SPACE )
-                   PERFORM 410122-TENDYMD-CHK-SEC
+      **********   IF     (SPA-K062-TENDYMDG(IDX)  NOT =   SPACE )
+                   IF     (SPA-ERRCD                   =   SPACE )
+                       PERFORM 410122-TENDYMD-CHK-SEC
+                   END-IF
                END-IF
                IF      SPA-ERRCD       NOT =   SPACE
                    MOVE    IDX                 TO  IDX-ERR
