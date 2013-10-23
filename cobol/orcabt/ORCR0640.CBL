@@ -609,6 +609,8 @@
       *  04.06.15    NACL-ÌçÏÆ    13/06/14  À¸ÊÝ¤Î£·£¹¡¦£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ½¤Àµ
       *  04.06.16    NACL-ÌçÏÆ    12/06/14  ¼ÂÆü¿ô¡¦ÀÁµáÅÀµ­ºÜ¥Õ¥é¥°ÊÔ½¸½¤Àµ
       *  04.06.17    NACL-ÌçÏÆ    13/09/17  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.18    NACL-ÌçÏÆ    13/10/23  Á´¹ñ¸øÈñÊ»ÍÑ»þ¤ÎÃÏÊý¸øÈñ°ìÉô
+      *                                     ÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -18427,6 +18429,49 @@
                END-PERFORM
              END-PERFORM
       *
+           END-IF
+      *
+      *****
+      *
+           IF  (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
+                 (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
+                ( TBL-TOKATUKAIFLG(1)   =  1              ))
+           AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
+           AND (RECE62-TOTALTEN(2)  = RECE62-HENTOTALTEN(3))
+             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
+                                     WRK-TAIHI-FTNMONEY-EN2(3))
+             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
+                MOVE  RECE62-FTNMONEY(2)     TO  RECE62-FTNMONEY(3)
+                MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(3)
+             END-IF
+           END-IF
+      *
+           IF  ((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
+                (RECE62-KOHNUM(1)  NOT = "012" AND "025")  )
+           AND (RECE62-KOHNUM(2)       = "972" OR "974"    )
+           AND (RECE62-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
+           AND (RECE62-TOTALTEN(2)  = RECE62-HENTOTALTEN(4))
+             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
+                                     WRK-TAIHI-FTNMONEY-EN2(4))
+             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
+                MOVE  RECE62-FTNMONEY(2)     TO  RECE62-FTNMONEY(4)
+                MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(4)
+             END-IF
+           END-IF
+      *
+           IF  (RECE62-KOHNUM(1)       = "972" OR "974"    )
+           AND (TBL-TOKATUKAIFLG(2)    =  1                )
+           AND (RECE62-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
+           AND (RECE62-TOTALTEN(3)  = RECE62-HENTOTALTEN(4))
+             IF   (WRK-TAIHI-FTNMONEY-EN2(3) =
+                                     WRK-TAIHI-FTNMONEY-EN2(4))
+             AND  (WRK-TAIHI-FTNMONEY-EN2(3) NOT = ZERO       )
+                MOVE  RECE62-FTNMONEY(3)     TO  RECE62-FTNMONEY(4)
+                MOVE  RECE62-FTNMONEY-KOJ(3) TO  RECE62-FTNMONEY-KOJ(4)
+             END-IF
            END-IF
       *
            .
