@@ -568,7 +568,6 @@
            END-PERFORM
       *
            IF    ( SYS-1001-HOSPSBT    =   "1" )
-               MOVE    "´µ¼Ô¤Î¾õÂÖÁüÉ¾²Á"  TO  HCN69-LBLHPTSTS
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
       *            IF    ( HCN68S01-RYOYO-KHN (IDX-DAY)
@@ -585,7 +584,6 @@
       *            END-IF
                END-PERFORM
            ELSE
-               MOVE    "´µ¼Ô¤Î¾õÂÖÁüÉ¾²Á"  TO  HCN69-LBLCPTSTS
                PERFORM VARYING IDX-DAY FROM    1   BY  1
                        UNTIL ( IDX-DAY >   31 )
       *            IF    ( HCN68S01-RYOYO-KHN (IDX-DAY)

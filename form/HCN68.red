@@ -55529,7 +55529,7 @@
       </dia:attribute>
     </dia:object>
   </dia:layer>
-  <dia:layer name="線" visible="true" active="true">
+  <dia:layer name="線" visible="true">
     <dia:object type="Standard - Line" version="0" id="O1319">
       <dia:attribute name="obj_pos">
         <dia:point val="0.8,2.425"/>
@@ -78632,7 +78632,7 @@
       </dia:attribute>
     </dia:object>
   </dia:layer>
-  <dia:layer name="文字" visible="true">
+  <dia:layer name="文字" visible="true" active="true">
     <dia:object type="Standard - Text" version="1" id="O2319">
       <dia:attribute name="obj_pos">
         <dia:point val="0.8,2.88125"/>
@@ -85675,13 +85675,13 @@
         <dia:point val="1.59438,18.755"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="1.59438,18.555;8.56938,19.0647"/>
+        <dia:rectangle val="1.59438,18.5493;8.57507,19.0761"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#人工腎臓、持続緩徐式血液濾過、腹膜灌流又は血漿交換を実施してい
-る状態#</dia:string>
+            <dia:string>#人工腎臓、持続緩徐式血液濾過、腹膜灌流又は血漿交換療法を実施し
+ている状態#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="Takao明朝" style="0" name="Courier"/>
