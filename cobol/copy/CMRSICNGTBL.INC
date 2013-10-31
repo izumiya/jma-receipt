@@ -21,6 +21,7 @@
       *****************************************************************
       *  コピー句修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.00    NACL-多々納  13/11/01  労災電子化加算追加
       *****************************************************************
       *
        01  TBL-RSICHG-AREA.
@@ -141,10 +142,13 @@
            03  FILLER      PIC X(20)   VALUE   " 788888004 788888008".
       *    膝・足関節の創部固定帯
            03  FILLER      PIC X(20)   VALUE   " 788888005 788888009".
-      *    
+      *H25.10
+      *    労災電子化加算（保険毎）
+           03  FILLER      PIC X(20)   VALUE   "A101801000 101801000".
+      *
        01  TBL-RSICHG-AREA-R       REDEFINES   TBL-RSICHG-AREA.
-           03  TBL-RSICHG-OCC      OCCURS   58  INDEXED   TBL-RCN.
-      *        (R:労災毎１回)
+           03  TBL-RSICHG-OCC      OCCURS   59  INDEXED   TBL-RCN.
+      *        (R:労災毎１回、A:保険毎）
                05  TBL-RSICHG-KBN             PIC X(01).
       *        前コード
                05  TBL-RSICHG-MAE-SRYCD       PIC X(09).
