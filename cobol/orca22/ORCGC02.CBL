@@ -298,6 +298,8 @@
       *  04.07.06    NACL-太田    13/06/11  データチェック業務からの補足
       *                                     コメント引継ぎ対応
       *  04.07.07    NACL-藤原    13/07/30  自院病名のセット登録対応
+      *  04.07.09    NACL-藤原    13/11/05  補足コメントのコード検索戻り
+      *                                     時の病名欄設定の変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2299,6 +2301,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
            IF      SPA-C01-B10-FLG =   ZERO    OR  1
+             IF    ( SPA-C01-INDEX     >   ZERO       )
+             AND   ( SPA-C01-WIDGET    =   "HOSOKUCD" )
+      *        補足コードのコード検索時は病名の置き換えはしない
+               CONTINUE
+             ELSE
                PERFORM VARYING IDZ FROM    1   BY  1
                        UNTIL   IDZ >       6      
                    MOVE    SPA-C01-TBYOMEICD (IDZ)
@@ -2366,6 +2373,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-PERFORM
                END-PERFORM
                PERFORM 3201-C04SPASET-BYOMEI-HENSYU-SEC
+             END-IF
            END-IF
       *
            IF      SPA-C01-INDEX   =   ZERO
