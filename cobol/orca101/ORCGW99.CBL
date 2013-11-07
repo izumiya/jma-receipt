@@ -634,11 +634,11 @@
            MOVE    SPA-HOSPNUM         TO  SYS-9001-HOSPNUM
            MOVE    SYS-9001-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key5"              TO  MCP-PATHNAME
+               MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-SYSKANRI-READ-SEC
            ELSE
                INITIALIZE                  SYSKANRI-REC
@@ -661,12 +661,12 @@
                                        TO  SPA-GMN-SMEMO (IDX)  
       *
                MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key5"              TO  MCP-PATHNAME
+               MOVE    "key2"              TO  MCP-PATHNAME
                PERFORM 900-SYSKANRI-READ-SEC
            END-PERFORM
       *    カーソルクロース
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key5"              TO  MCP-PATHNAME
+           MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *                                  
            MOVE    IDX                 TO  SPA-GMN-MAX
@@ -1481,8 +1481,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ＣＬＡＩＭ接続設定名称削除処理
            INITIALIZE                  SYS-9001-REC
            MOVE    "9001"              TO  SYS-9001-KANRICD
-           MOVE    SPA-SYSYMD          TO  SYS-9001-STYUKYMD
-           MOVE    SPA-SYSYMD          TO  SYS-9001-EDYUKYMD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-9001-STYUKYMD
+           MOVE    SPA-W01-STYUKYMD    TO  SYS-9001-EDYUKYMD
            MOVE    SPA-HOSPNUM         TO  SYS-9001-HOSPNUM
            MOVE    SYS-9001-REC        TO  MCPDATA-REC
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
@@ -1491,8 +1491,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      FLG-SYSKANRI        =   ZERO
                INITIALIZE                      SYS-9001-REC
                MOVE    "9001"                  TO  SYS-9001-KANRICD
-               MOVE    SPA-SYSYMD              TO  SYS-9001-STYUKYMD
-               MOVE    SPA-SYSYMD              TO  SYS-9001-EDYUKYMD
+               MOVE    SPA-W01-STYUKYMD        TO  SYS-9001-STYUKYMD
+               MOVE    SPA-W01-STYUKYMD        TO  SYS-9001-EDYUKYMD
                MOVE    SPA-HOSPNUM             TO  SYS-9001-HOSPNUM
                MOVE    SYS-9001-REC            TO  MCPDATA-REC
                MOVE    "DBDELETE"              TO  MCP-FUNC

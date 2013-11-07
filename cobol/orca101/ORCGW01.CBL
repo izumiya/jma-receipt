@@ -2057,6 +2057,8 @@
                WHEN    "1031"
       *        レセプト・総括印刷情報
                WHEN    "2005"
+      *        ＣＬＡＩＭ接続情報
+               WHEN    "9000"
                    IF     (SPA-NAI-STYUKYMD    =   ZERO )  AND
                           (SPA-NAI-EDYUKYMD    =   99999999)
                        CONTINUE
