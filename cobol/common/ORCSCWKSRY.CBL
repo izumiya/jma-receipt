@@ -2398,6 +2398,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
       *
                        IF     (SPA-COM-SYUTEN2 (IDX)  >   ZERO )
                         AND   (WRK-SYUTEN2            =   ZERO )
+      *H25.11           ²èÁü¿ÇÃÇ¤Î¤ß
+                        AND   (SPA-COM-SRYKBN  (IDX)  =   "70"  )
                            MOVE    SPA-COM-SYUTEN2 (IDX)
                                                       TO  WRK-SYUTEN2
                        END-IF
