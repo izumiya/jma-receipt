@@ -2251,7 +2251,9 @@
                WHEN    "1031"
       *        ¥ì¥»¥×¥È¡¦Áí³ç°õºþ¾ðÊó
                WHEN    "2005"
-                   IF     (SPA-NAI-STYUKYMD    =   ZERO )  AND
+      *        £Ã£Ì£Á£É£ÍÀÜÂ³¾ðÊó
+               WHEN    "9000"
+                  IF      (SPA-NAI-STYUKYMD    =   ZERO )  AND
                           (SPA-NAI-EDYUKYMD    =   99999999)
                        CONTINUE
                    ELSE
