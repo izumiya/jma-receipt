@@ -3563,6 +3563,17 @@
                    MOVE    "8100"              TO  LNK-SC92-ERRCD8
                END-IF
            END-IF
+      *
+      *H25.11
+      *    ¸øÌ³ºÒ³²¤Î¥³¡¼¥É
+           IF     (LNK-SC92-SRYCD (1:6)    =   "101989") 
+               IF     (SPA-HKNKBN          =   1 )
+                  AND (SPA-RSI-HKNKBN      =   5 )
+                   CONTINUE
+               ELSE
+                   MOVE    "8101"              TO  LNK-SC92-ERRCD8
+               END-IF
+           END-IF
            .
        20088-RSIJIB-CHK-EXT.
            EXIT.

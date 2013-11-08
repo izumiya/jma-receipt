@@ -2350,7 +2350,15 @@
                END-STRING
            END-IF
       *!!
-      *
+      *H25.11
+      *    ¸øÌ³ºÒ³²¤Î¥³¡¼¥É
+           IF      (TNS-SRYCD (1:6)    =   "101989")
+               MOVE    SPACE               TO  SPA-J98-GMN-NAME (IDX)
+               STRING  "¡ÚÏ«¸ø¡Û"          DELIMITED   BY  SIZE
+                      TNS-NAME             DELIMITED   BY  SPACE
+                      INTO                 SPA-J98-GMN-NAME(IDX)
+               END-STRING
+           END-IF
            .
        310211-TENSU-KYOHEN-EXT.
            EXIT.
