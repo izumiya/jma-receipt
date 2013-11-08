@@ -34,8 +34,8 @@ class KsnSort
   attr_accessor :khn_exists,:tsusoku_exists,:chuksncd,:chuksntsuban
 
   def initialize
-    @khn_exists == false
-    @tsusoku_exists == false
+    @khn_exists = false
+    @tsusoku_exists = false
     @chuksncd = 0
     @chuksntsuban = 0
   end
@@ -1137,7 +1137,7 @@ class Receden_check < Receden_common
                       if zai[mycommoji].value.gsub(/¡¡/,"").strip == ""
                         @errors.push("34410",rece,zai,mycommoji,nil,myfooter)
                       end
-                    when "40"
+                    when "40","41"
                       if zai[mycommoji].value.gsub(/¡¡/,"").strip == ""
                         @errors.push("34410",rece,zai,mycommoji,nil,myfooter)
                       elsif zai[mycommoji].value.gsub(/^[£°-£¹]+$/,"").strip == ""
@@ -1311,7 +1311,7 @@ class Receden_check < Receden_common
                 when ( tbl_tensu["JITUDAY"].to_i == 4 && tbl_tensu["DAYCNT"].to_i == 0 ) ||
                      ( tbl_tensu["TENSIKIBETU"].to_i == 4 || tbl_tensu["TENSIKIBETU"].to_i == 7 )
                   flg_tensu_required = true
-                when ( tekiyo.srykbn =~ /^(11|12|13|14)$/)
+                when ( tekiyo.srykbn =~ /^(11|12|13|14|97)$/)
                   case tbl_tensu["KOKUJISKBKBN1"].to_i
                   when 1,3,5,7,9
                     if tekiyo.zai[zai_idx + 1].tbl_tensu.empty?
@@ -1329,13 +1329,9 @@ class Receden_check < Receden_common
             end
 
             if flg_tensu_required == true
-              if @check_level == 1
+              if ( @check_level == "1" ) || ( @check_level == "2" && zai["RECID"].value != "IY" )
                 if zai["TEN"].value.to_i == 0
                   @errors.push("33070",rece,zai,"TEN",nil,tbl_tensu["NAME"])
-                end
-              else
-                if zai["TEN"].value == ""
-                  @errors.push("33071",rece,zai,"TEN",nil,tbl_tensu["NAME"])
                 end
               end
             end
@@ -1355,7 +1351,7 @@ class Receden_check < Receden_common
               if zai["DATA"].value.gsub(/¡¡/,"").strip == ""
                 @errors.push("34380",rece,zai,"DATA",nil,myfooter)
               end
-            when "40"
+            when "40","41"
               if zai["DATA"].value.gsub(/¡¡/,"").strip == ""
                 @errors.push("34380",rece,zai,"DATA",nil,myfooter)
               elsif zai["DATA"].value.gsub(/^[£°-£¹]+$/,"").strip == ""
