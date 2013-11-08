@@ -241,6 +241,8 @@
       *  04.06.09    NACL-ÌçÏÆ    13/07/26  ¶â³ÛÍó½¸·×Ê¬¤Î¥³¥á¥ó¥ÈÊÔ½¸½¤Àµ
       *  04.06.10    NACL-ÌçÏÆ    13/09/25  Ï«ºÒ¥Þ¥¹¥¿ÄÉ²ÃÂÐ±þ
       *                                     ¡ÊÅÅÏÃºÆ¿ÇÎÁ¡¡Åù¡Ë
+      *  04.06.11    NACL-ÌçÏÆ    13/11/07  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÃÏ¸øºÒÆÃÊÌ
+      *                                     ²Ã»»ÂÐ±þ¡ÊµþÅÔÉÜ¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -468,6 +470,7 @@
            03  CNT-NYUYOJI                             PIC 9(02).
            03  CNT-SAISIN-DOUJITU                      PIC 9(02).
            03  CNT-SAISIN-ETC                          PIC 9(02).
+           03  CNT-KOMU-TOK                            PIC 9(02).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1533,6 +1536,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
               INITIALIZE                   TBL-TENSUG-JI
       *
               MOVE       ZERO       TO     CNT-NYUYOJI
+              MOVE       ZERO       TO     CNT-KOMU-TOK
       *
               MOVE       ZERO       TO     WRK-KINGAKU-JI
       *
@@ -2867,7 +2871,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           ( RECE41-SRYYM   >=  "201307"         ))
                       OR (( WRK-CHECK-SRYCD =  CONS-ROUSAI33    ) AND
                           ( RECE41-SRYYM   >=  "201307"         ))
-      *
+                       IF   WRK-CHECK-SRYCD(1:6) = "101989"
+                         MOVE  "1"     TO    RECE45-SIKFLG(IDX4)
+                       ELSE
                          ADD    1      TO    WRK-MEISAI-CNT             
                          MOVE  "2"     TO    RECE45-SIKFLG(IDX4)
       *
@@ -2881,6 +2887,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               (SRY-SRYCD(IDX2)(1:3)  =   "008"))
                             MOVE  "2"  TO    RECE44-COMCDFLG
                          END-IF
+                       END-IF
                       ELSE
                          MOVE  "1"     TO    RECE45-SIKFLG(IDX4)
                       END-IF
@@ -7127,8 +7134,12 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                            END-IF
                          ELSE
                            IF   FLG-COUNT-ARI  =  ZERO
+                             IF   SRY-SRYCD(IDX3) = "101989030"
+                               ADD   WK-ZAIKAISU  TO   CNT-KOMU-TOK
+                             ELSE
                                ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
-                               MOVE  1            TO   FLG-COUNT-ARI
+                             END-IF
+                             MOVE    1            TO   FLG-COUNT-ARI
                            END-IF
                          END-IF
                          COMPUTE    RECE41-TENSU(2)   =
@@ -8598,6 +8609,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
            IF        FLG-KHNTEN22-KO =    1
              MOVE    ZERO             TO   RECE41-KHNTEN(22)
+           END-IF
+      *
+           IF    (CNT-KOMU-TOK     NOT =  ZERO)
+           AND   (RECE41-KAISU(2)      =  ZERO)
+              MOVE   CNT-KOMU-TOK     TO   RECE41-KAISU(2)
            END-IF
       *
            .

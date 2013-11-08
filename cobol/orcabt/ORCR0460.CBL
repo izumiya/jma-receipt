@@ -146,6 +146,8 @@
       *  04.06.02    NACL-門脇    13/02/18  労災レセ電対応
       *                                     （新診療行為コード対応）
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
+      *  04.06.04    NACL-門脇    13/11/07  公務災害（労災準拠）の地公災特別
+      *                                     加算対応（京都府）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1650,6 +1652,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                   TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                                                      NOT = "830000020")
            OR    (TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)(1:3)  = "008"  )
+           OR    (TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
+                                          = "101989010" OR "101989020")
                CONTINUE
            ELSE
                MOVE    1             TO  FLG-NOPRT
