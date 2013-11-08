@@ -226,6 +226,8 @@
       *  04.06.07    NACL-ÌçÏÆ    13/06/12  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î
       *                                     ´Ç¸îÎÁ³äÁý²Ã»»ÂÐ±þ
       *  04.06.08    NACL-ÌçÏÆ    13/07/26  ¶â³ÛÍó½¸·×Ê¬¤Î¥³¥á¥ó¥ÈÊÔ½¸½¤Àµ
+      *  04.06.09    NACL-ÌçÏÆ    13/11/07  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÃÏ¸øºÒÆÃÊÌ
+      *                                     ²Ã»»ÂÐ±þ¡ÊµþÅÔÉÜ¡Ë
       *
       *  04.07.01    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    12/09/25  ¥³¥á¥ó¥Èº¹¹þÂÐ±þ¡ÊºßÂð»ýÂ³ÍÛ°µ¡Ë
@@ -3612,7 +3614,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                           ((SRY-SRYCD(IDX2)(1:3)   =   "008") OR
                            (SRY-SRYCD(IDX2)(1:1)   =   "8"  )   ) AND
                           ( RECE82-SRYYM   >=  "201307"         ))
-      *
+                       IF   WRK-CHECK-SRYCD(1:6) = "101989"
+                         MOVE  "1"     TO    RECE85-SIKFLG(IDX4)
+                       ELSE
                          ADD    1      TO    WRK-MEISAI-CNT             
                          MOVE  "2"     TO    RECE85-SIKFLG(IDX4)
       *
@@ -3626,6 +3630,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               (SRY-SRYCD(IDX2)(1:3)  =   "008"))
                             MOVE  "2"  TO    RECE84-COMCDFLG
                          END-IF
+                       END-IF
                       ELSE
                          MOVE  "1"     TO    RECE85-SIKFLG(IDX4)
                       END-IF
