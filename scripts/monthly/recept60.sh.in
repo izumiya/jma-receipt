@@ -68,19 +68,19 @@ fi
 #       コード区分によりコード変換
 
         if   [ ${14} = '1' ]; then
-            echo "nkf -s"   >> $LOG_FILE
+            echo "nkf -sx"   >> $LOG_FILE
             if  [ ${6} != '5' ]&& [ ${6} != '6' ]; then
-                 nkf -s $FILE_1 > $FILE_2
+                 nkf -sx $FILE_1 > $FILE_2
             else
-                 nkf -s $FILE_1 > $FILE_3
+                 nkf -sx $FILE_1 > $FILE_3
             fi
         else
             if   [ ${14} = '3' ]; then
-            echo "nkf -w"   >> $LOG_FILE
+            echo "nkf -wx"   >> $LOG_FILE
                 if  [ ${6} != '5' ]&& [ ${6} != '6' ]; then
-                    nkf -w $FILE_1 > $FILE_2
+                    nkf -wx $FILE_1 > $FILE_2
                 else
-                    nkf -w $FILE_1 > $FILE_3
+                    nkf -wx $FILE_1 > $FILE_3
                 fi
             else
             echo "cp"   >> $LOG_FILE
