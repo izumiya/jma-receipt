@@ -28,6 +28,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/07/24  Ï«ºÒ¶èÊ¬ÄÉ²ÃÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  13/11/01  ÊÝ¸±ÁÈ¹ç¤»£²£°·ï°Ê¾åÂÐ±þ
       *****************************************************************
       *
       *
@@ -62,6 +63,7 @@
            03  FLG-IN-OK           PIC 9(01).
            03  FLG-KOHARI          PIC 9(01).
            03  FLG-CHK-OK          PIC 9(01).
+           03  FLG-COMBIOK         PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -78,6 +80,7 @@
            03  IDK-MAX             PIC 9(04).
            03  IDX-KOH             PIC 9(04).
            03  IDX-TBL             PIC 9(04).
+           03  IDXH                PIC 9(04).
       *
            03  HZN-IDK             PIC 9(04).
       *
@@ -174,19 +177,19 @@
       *
       *    ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»
        01  TBL-HKNCOMBI-AREA.
-           02  TBL-HKNCOMBI-REC        OCCURS   40.
+           02  TBL-HKNCOMBI-REC        OCCURS   200.
            COPY    "CPHKNCOMBI.INC"    REPLACING
                                        //COMB-// BY //TBL-COMB-//.
       *
       *    ´µ¼ÔÊÝ¸±¾ðÊó
        01  TBL-PTHKNINF-AREA.
-         02  TBL-PTHKNINF-REC           OCCURS  40.
+         02  TBL-PTHKNINF-REC           OCCURS  90.
            COPY    "CPPTHKNINF.INC"     REPLACING
                                         //PTHKN-// BY //TBL-PTHKN-//.
       *
       *    ¸øÈñ¥Þ¥¹¥¿¡Ê¥Æ¡¼¥Ö¥ë¡Ë
        01  TBL-PTKOHINF-AREA.
-         02  TBL-PTKOHINF-REC           OCCURS  40.
+         02  TBL-PTKOHINF-REC           OCCURS  90.
            COPY    "CPPTKOHINF.INC"     REPLACING
                                         //PTKOH-// BY //TBL-PTKOH-//.
       *
@@ -314,7 +317,7 @@
            END-IF
            MOVE    ZERO                TO  IDX-MAX
            PERFORM UNTIL   (FLG-HKNCOMBI   =   1   )  OR
-                           (IDX-MAX        >   40  )
+                           (IDX-MAX        >=  200 )
                MOVE    ZERO                TO  FLG-CHK-OK
                IF     (COMB-DELKBN         =   SPACE     ) AND
                       (COMB-HYOJIKBN   NOT =   "1"       )
@@ -381,7 +384,7 @@
            END-IF
            MOVE    ZERO                TO  IDH-MAX 
            PERFORM     UNTIL   ( FLG-PTHKNINF  =   1 )  OR
-                               ( IDH-MAX       >=  40)
+                               ( IDH-MAX       >=  90)
                MOVE    ZERO                TO  FLG-CHK-OK
                IF     (PTHKN-SAKJOKBN      =   SPACE )
       *ver.4.7     IF      ORCSAPIHKN-KBN2     =   "1"
@@ -447,7 +450,7 @@
            END-IF
            MOVE    ZERO                TO  IDK-MAX 
            PERFORM     UNTIL   ( FLG-PTKOHINF  =   1 )  OR
-                               ( IDK-MAX       >=  40)
+                               ( IDK-MAX       >=  90)
                MOVE    ZERO                TO  FLG-CHK-OK
                IF     (PTKOH-SAKJOKBN      =   SPACE )
       *ver.4.7**   IF      ORCSAPIHKN-KBN2     =   "1"
@@ -932,14 +935,52 @@
        290-HKNCOMBI-OUTHENSYU-SEC             SECTION.
       *
            MOVE    ZERO                TO  IDX-TBL
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   IDX-MAX )
-                          OR  (IDX     >   20      )
-               IF      TBL-COMB-HKNCOMBINUM (IDX)  NOT =   SPACE
+           MOVE    ZERO                TO  FLG-COMBIOK
+           IF      IDX-MAX             >   20
+      *        £²£°·ï°Ê¾å¤Ï¡¢ºÇ¸å¤«¤éÊÔ½¸
+               MOVE    20                  TO  IDXH
+               PERFORM VARYING     IDX     FROM    IDX-MAX BY  -1
+                       UNTIL      (IDX     <   1       )
+                              OR  (IDXH    <   1       )
                    PERFORM 2901-HKNCOMBI-HEN-SEC
-                   MOVE    IDX                 TO  IDX-TBL
-               END-IF
-           END-PERFORM
+                   IF      TBL-COMB-HKNCOMBINUM (IDX) 
+                                           =   ORCSAPIHKN-OT-HKNCOMBI
+                       MOVE    1               TO  FLG-COMBIOK
+                   END-IF
+                   COMPUTE IDXH            =   IDXH    -   1
+               END-PERFORM
+               MOVE    20                  TO  IDX-TBL
+               MOVE    9                   TO  ORCSAPIHKN-ERRCD
+           ELSE
+               MOVE    1                   TO  IDXH
+               PERFORM VARYING     IDX      FROM    1   BY  1
+                       UNTIL      (IDX     >   IDX-MAX )
+                              OR  (IDXH    >   20      )
+                   IF      TBL-COMB-HKNCOMBINUM (IDX) NOT =   SPACE
+                       PERFORM 2901-HKNCOMBI-HEN-SEC
+                       IF      TBL-COMB-HKNCOMBINUM (IDX) 
+                                           =   ORCSAPIHKN-OT-HKNCOMBI
+                           MOVE    1               TO  FLG-COMBIOK
+                       END-IF
+                       ADD     1                   TO  IDXH
+                       MOVE    IDXH                TO  IDX-TBL
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           IF     (ORCSAPIHKN-OT-HKNCOMBI  NOT =   SPACE )
+             AND  (FLG-COMBIOK             =   ZERO )
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   IDX-MAX )
+                              OR  (FLG-COMBIOK =   1   )
+                   IF      TBL-COMB-HKNCOMBINUM (IDX)
+                                           =   ORCSAPIHKN-OT-HKNCOMBI
+                       MOVE    1               TO  IDXH
+                       PERFORM 2901-HKNCOMBI-HEN-SEC
+                       MOVE    1               TO  FLG-COMBIOK
+                   END-IF
+               END-PERFORM
+           END-IF
            .
        290-HKNCOMBI-OUTHENSYU-EXT.
            EXIT.
@@ -951,62 +992,62 @@
       *
            MOVE    TBL-COMB-HKNCOMBINUM (IDX)
                                        TO  ORCSAPIHKN-THKNCOMBI
-                                                               (IDX)
+                                                               (IDXH)
            MOVE    TBL-COMB-HKNNUM (IDX)
-                                       TO  ORCSAPIHKN-HKNNUM (IDX)
+                                       TO  ORCSAPIHKN-HKNNUM (IDXH)
       *    ¼çÊÝ¸±¡ÝÃ»½ÌÀ©ÅÙÌ¾
            MOVE    TBL-COMB-SYU-TANSEIDONAME (IDX)
                                        TO  ORCSAPIHKN-HKNNUM-NAME
-                                                                 (IDX)
+                                                                 (IDXH)
       *    ËÜ¿Í²ÈÂ²¶èÊ¬
            MOVE    TBL-COMB-HONKZKKBN (IDX)
-                                       TO  ORCSAPIHKN-HONKZKKBN(IDX)
+                                       TO  ORCSAPIHKN-HONKZKKBN(IDXH)
       *    Êä½õ¶èÊ¬
            MOVE    TBL-COMB-HOJOKBN (IDX)
-                                       TO  ORCSAPIHKN-HOJOKBN (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN (IDXH)
            PERFORM 29013-HOJOKBN-NAME-HEN-SEC
       *
       *    ·ÑÂ³¶èÊ¬
            MOVE    TBL-COMB-CONTKBN (IDX)
-                                       TO  ORCSAPIHKN-CONTKBN (IDX)
+                                       TO  ORCSAPIHKN-CONTKBN (IDXH)
       *
       *    ÊÝ¸±¾ðÊó
            PERFORM VARYING     IDH     FROM    1   BY  1
                    UNTIL      (IDH         >   IDH-MAX  )
                IF      TBL-COMB-HKNID (IDX)    =   TBL-PTHKN-HKNID (IDH)
                    MOVE    TBL-PTHKN-HKNJANUM(IDH)
-                                           TO  ORCSAPIHKN-HKNJANUM (IDX)
+                                           TO  ORCSAPIHKN-HKNJANUM(IDXH)
                    MOVE    TBL-PTHKN-KIGO (IDH)
-                                           TO  ORCSAPIHKN-KIGO (IDX)
+                                           TO  ORCSAPIHKN-KIGO (IDXH)
                    MOVE    TBL-PTHKN-NUM  (IDH)
-                                           TO  ORCSAPIHKN-NUM  (IDX)
+                                           TO  ORCSAPIHKN-NUM  (IDXH)
                    MOVE    TBL-PTHKN-HIHKNJANAME(IDH)
                                            TO  ORCSAPIHKN-HIHKNJANAME
-                                                                (IDX)
+                                                                (IDXH)
       *            ÊÝ¸±Í­¸ú´ü´Ö
                    MOVE    TBL-PTHKN-TEKSTYMD (IDH) TO  WRK-SYMD
                    PERFORM 800-DAYHEN01-SEC
-                   MOVE    WRK-HEN-DATE    TO  ORCSAPIHKN-TEKSTYMD(IDX)
+                   MOVE    WRK-HEN-DATE    TO  ORCSAPIHKN-TEKSTYMD(IDXH)
                    MOVE    TBL-PTHKN-TEKEDYMD (IDH) TO  WRK-SYMD
                    PERFORM 800-DAYHEN01-SEC
-                   MOVE    WRK-HEN-DATE    TO  ORCSAPIHKN-TEKEDYMD(IDX)
+                   MOVE    WRK-HEN-DATE    TO  ORCSAPIHKN-TEKEDYMD(IDXH)
       *
                    MOVE    TBL-PTHKN-TEKSTYMD (IDH)
                                            TO  ORCSAPIHKN-NAI-TEKSTYMD
-                                                               (IDX)
+                                                               (IDXH)
                    MOVE    TBL-PTHKN-TEKEDYMD (IDH)
                                            TO  ORCSAPIHKN-NAI-TEKEDYMD
-                                                               (IDX)
+                                                               (IDXH)
       *            »ñ³Ê¼èÆÀÆü
                    IF      TBL-PTHKN-SKKGETYMD (IDH) NOT =   SPACE
                        MOVE    TBL-PTHKN-SKKGETYMD (IDH) TO  WRK-SYMD
                        PERFORM 800-DAYHEN01-SEC
                        MOVE    WRK-HEN-DATE    TO  ORCSAPIHKN-SKKGETYMD
-                                                                (IDX)
+                                                                (IDXH)
                    END-IF
                    MOVE    TBL-PTHKN-SKKGETYMD (IDH)
                                            TO  ORCSAPIHKN-NAI-SKKGETYMD
-                                                                (IDX)
+                                                                (IDXH)
                    MOVE    IDH-MAX         TO  IDH
                END-IF
            END-PERFORM
@@ -1040,37 +1081,37 @@
                EVALUATE    TBL-COMB-HOJOKBN (IDX)
                    WHEN    "1"
                        MOVE    "¿¦Ì³" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "2"
                        MOVE    "²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "3"
                        MOVE    "ÄÌ¶Ð" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "7"
                        MOVE    "£³³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "9"
                        MOVE    "£±³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "A"
                        MOVE    "£±³ä¿¦Ì³" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "B"
                        MOVE    "£±³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "C"
                        MOVE    "£±³äÄÌ¶Ð" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "G"
                        MOVE    "£³³ä¿¦Ì³" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "H"
                        MOVE    "£³³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "I"
                        MOVE    "£³³äÄÌ¶Ð" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                END-EVALUATE
       *    ¸å´ü¹âÎð¼Ô
                WHEN    "039"
@@ -1078,10 +1119,10 @@
                EVALUATE    TBL-COMB-HOJOKBN (IDX)
                    WHEN    "1"
                        MOVE    "£±³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "3"
                        MOVE    "£³³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                END-EVALUATE
       *        ¶¦ºÑ
                WHEN    "031"
@@ -1091,19 +1132,19 @@
                EVALUATE    TBL-COMB-HOJOKBN (IDX)
                    WHEN    "2"
                        MOVE    "²¼Á¥£³·î"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "7"
                        MOVE    "£³³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "9"
                        MOVE    "£±³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "B"
                        MOVE    "£±³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "H"
                        MOVE    "£³³ä²¼Á¥" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                END-EVALUATE
       *        ¹ñÊÝ
                WHEN    "060"
@@ -1111,25 +1152,25 @@
                EVALUATE    TBL-COMB-HOJOKBN (IDX)
                    WHEN    "0"
                        MOVE    "Ìµ¤·"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "1"
                        MOVE    "£±³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "2"
                        MOVE    "£²³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "3"
                        MOVE    "£³³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "4"
                        MOVE    "³°£±³ä Æþ£°³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "5"
                        MOVE    "³°£²³ä Æþ£±³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "6"
                        MOVE    "³°£³³ä Æþ£²³ä"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                END-EVALUATE
       *        ¼£¸³
                WHEN    "900"
@@ -1137,20 +1178,20 @@
                EVALUATE    TBL-COMB-HOJOKBN (IDX)
                    WHEN    "1"
                        MOVE    "²ÝÀÇ"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "2"
                        MOVE    "Èó²ÝÀÇ"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                END-EVALUATE
       *        ¼«Èñ
                WHEN    "980"   THRU   "989"
                EVALUATE    TBL-COMB-HOJOKBN (IDX)
                    WHEN    "1"
                        MOVE    "²ÝÀÇ"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "2"
                        MOVE    "Èó²ÝÀÇ"
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                END-EVALUATE
       *
                WHEN    OTHER
@@ -1161,10 +1202,10 @@
                    EVALUATE    TBL-COMB-HOJOKBN (IDX)
                        WHEN    "9"
                            MOVE    "£±³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                        WHEN    "7"
                            MOVE    "£³³ä" 
-                                       TO  ORCSAPIHKN-HOJOKBN-NAME (IDX)
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    END-EVALUATE
                    END-IF
            END-EVALUATE
@@ -1201,7 +1242,7 @@
            IF      FLG-PTRSIINF        =   ZERO
       *        Ï«ºÒ¶èÊ¬
                MOVE    PTRSI-HKNKBN        TO  ORCSAPIHKN-RSI-HKNKBN
-                                                              (IDX)
+                                                             (IDXH)
            END-IF
            .
        29013-PTRSIINF-HEN-EXT.
@@ -1289,29 +1330,29 @@
       *            ¸øÈñ¤Î¼ïÎà
                    MOVE    TBL-PTKOH-KOHNUM (IDH)
                                            TO  ORCSAPIHKN-KOHNUM
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
       *            ¸øÈñ¤ÎÌ¾¾Î
                    MOVE    WRK-KOHNUMMEI-O (IDY)
                                            TO  ORCSAPIHKN-KOHNUM-NAME
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
       *            ÉéÃ´¼ÔÈÖ¹æ
                    MOVE    TBL-PTKOH-FTNJANUM (IDH)
                                            TO  ORCSAPIHKN-FTNJANUM
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
       *            ¼õµë¼ÔÈÖ¹æ
                    MOVE    TBL-PTKOH-JKYSNUM (IDH)
                                            TO  ORCSAPIHKN-JKYSNUM
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
       *            Í­¸ú³«»ÏÆü
                    MOVE    TBL-PTKOH-TEKSTYMD (IDH)    TO  WRK-SYMD
                    PERFORM 800-DAYHEN01-SEC
                    MOVE    WRK-HEN-DATE    TO  ORCSAPIHKN-KOH-TEKSTYMD
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
       *            Í­¸ú½ªÎ»Æü
                    MOVE    TBL-PTKOH-TEKEDYMD (IDH)    TO  WRK-SYMD
                    PERFORM 800-DAYHEN01-SEC
                    MOVE    WRK-HEN-DATE    TO  ORCSAPIHKN-KOH-TEKEDYMD
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
       *
       *            ÉéÃ´Î¨¡¦ÉéÃ´³ÛÊÔ½¸
                    PERFORM 400-KOHFTN-HENSYU-SEC
@@ -1358,7 +1399,7 @@
            MOVE    WRK-FTNRATE         TO  WRK-Z9
            MOVE    WRK-Z9              TO  WRK-FTNRATEMEI
            MOVE    WRK-FTNRATEMEI      TO  ORCSAPIHKN-RATE-OUTPATIENT
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
       *    ³°Íè¾å¸Â³Û
            IF      HKN-HON-GAIKKOTGAK  =   ZERO
       *        ËÜ¿Í¡Ý³°Íè¡ÝÆü¡Ý¾å¸Â³Û
@@ -1368,7 +1409,7 @@
                MOVE    HKN-HON-GAIKKOTGAK  TO  WRK-ZZ9
            END-IF
            MOVE    WRK-ZZ9             TO  ORCSAPIHKN-MONEY-OUTPATIENT
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
       *
       *    ËÜ¿Í¡ÝÆþ±¡¡Ý²ó¡ÝÉéÃ´³ä¹ç
            COMPUTE WRK-FTNRATE         =   HKN-HON-NYUKFTNRATE
@@ -1376,7 +1417,7 @@
            MOVE    WRK-FTNRATE         TO  WRK-Z9
            MOVE    WRK-Z9              TO  WRK-FTNRATEMEI
            MOVE    WRK-FTNRATEMEI      TO  ORCSAPIHKN-RATE-ADMISSION
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
       *    ³°Íè¾å¸Â³Û
            IF      HKN-HON-NYUKKOTGAK  =   ZERO
       *        ËÜ¿Í¡ÝÆþ±¡¡ÝÆü¡Ý¾å¸Â³Û
@@ -1386,7 +1427,7 @@
                MOVE    HKN-HON-NYUKKOTGAK  TO  WRK-ZZ9
            END-IF
            MOVE    WRK-ZZ9             TO  ORCSAPIHKN-MONEY-ADMISSION
-                                                               (IDX IDY)
+                                                            (IDXH IDY)
            .
        400-KOHFTN-HENSYU-EXT.
            EXIT.
@@ -1410,6 +1451,8 @@
                                                OR  "979"
                                                OR  "976"  )
                OR     (TBL-PTKOH-KOHNUM(IDH) (1:2)  =   "96"  )
+      *        ÅöÆüÅÐÏ¿Ê¬¤Î¤ß
+                 IF     (TBL-PTKOH-CREYMD(IDH)   =   SPA-SYSYMD )
                    ADD     1               TO  IDX
       *            ÊÝ¸±ÁÈ¹ç¤»ºîÀ®¤Ê¤·
                    MOVE    ALL "*"         TO  ORCSAPIHKN-THKNCOMBI(IDX)
@@ -1445,6 +1488,8 @@
                    MOVE    HKN-TANSEIDONAME
                                            TO  ORCSAPIHKN-KOHNUM-NAME
                                                                (IDX IDY)
+                 END-IF
+      *
                END-IF
            END-PERFORM
            .

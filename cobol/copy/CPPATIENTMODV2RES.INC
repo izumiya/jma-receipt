@@ -37,6 +37,10 @@
               03  PTMODRES-API-RESULT          PIC X(2).
       *       返却メッセージ
               03  PTMODRES-API-RESULT-MSG      PIC X(100).
+      *       ワーニングメッセージ
+              03  PTMODRES-API-WARNING-MSG-G.
+                  05  PTMODRES-API-WARNING-MSG     PIC X(100)
+                                                   OCCURS   5.
       *
               03  PTMODRES-RESKEY              PIC X(100).
       *       患者番号
@@ -108,6 +112,8 @@
                 05  PTMODRES-INSURANCE-INFO-G.
       *           保険情報（保険組合せ）
                   06  PTMODRES-INSURANCE-INFO     OCCURS  20 TIMES.
+      *               保険組合せ番号
+                      07  PTMODRES-COMBINATION-NUMBER     PIC X(04).
       *               保険の種類
                       07  PTMODRES-MAIN-INSURANCE-CLASS   PIC X(03).
       *               保険者番号

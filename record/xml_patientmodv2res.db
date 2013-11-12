@@ -8,6 +8,11 @@ xml_patientmodv2res {
        	Information_Time	varchar(8);
 	Api_Result		varchar(2);
 	Api_Result_Message	varchar(100);
+	Api_Warning_Message1	varchar(100);
+	Api_Warning_Message2	varchar(100);
+	Api_Warning_Message3	varchar(100);
+	Api_Warning_Message4	varchar(100);
+	Api_Warning_Message5	varchar(100);
        	Reskey			varchar(100);
 	Patient_Information	{
 		Patient_ID		varchar(20);
@@ -44,6 +49,7 @@ xml_patientmodv2res {
 		Comment1		varchar(200);
 		Comment2		varchar(200);
 		HealthInsurance_Information	{
+		Insurance_Combination_Number		varchar(4);
 		InsuranceProvider_Class			varchar(03);
             	InsuranceProvider_Number		varchar(08);
             	InsuranceProvider_WholeName		varchar(20);
