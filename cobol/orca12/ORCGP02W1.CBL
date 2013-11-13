@@ -390,6 +390,7 @@
       *
       *    É½¼¨ÍÑÊÝ¸±
            03  WRK-IDXH                PIC 9(04).
+           03  WRK-IDXH2               PIC 9(04).
            03  WRK-CNT-HKN             PIC 9(04).
            03  WRK-CNT-HKN2            PIC 9(04).
       *    ÉÂ±¡¼ïÊÌ
@@ -412,10 +413,6 @@
                05  WRK-P02-KOHNUM      PIC X(03).
                05  WRK-P02-KOHNUM2     PIC X(01).
                05  WRK-P02-KOHNUMMEI   PIC X(16).
-      *TEST
-           03  WRK-IDOMSG              PIC X(30).
-      *TEST
-      *
       *
       *    ¸øÈñ£Ó£Ï£Ò£ÔÍÑ¡Ê£Ó£Ð£Á¤ÈÆ±¤¸ÎÎ°è¡Ë
        01  WRK-KOUHI-AREA.
@@ -2296,6 +2293,9 @@
            END-PERFORM
       *
       *    £Ó£Ð£ÁÊÔ½¸¡ÊÉ½¼¨Ê¬¡Ë
+           MOVE    SPA-GMN-SELNUM      TO  WRK-GMN-SELNUM
+           MOVE    ZERO                TO  SPA-GMN-SELNUM
+      *
            MOVE    ZERO                TO   SPA-HKNCOMBI-MAX
            INITIALIZE                  SPA-HKNCOMBI-AREA
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -2305,6 +2305,12 @@
                    MOVE    WRK-GMN-HKNCOMBI-LIST (IDX)
                                        TO  SPA-GMN-HKNCOMBI-LIST
                                                   (SPA-HKNCOMBI-MAX)
+      *
+                   IF     (WRK-GMN-SELNUM  NOT =   ZERO )
+                      AND (WRK-GMN-SELNUM      =   SPA-GMN-THKNCOMBINUM
+                                                   (SPA-HKNCOMBI-MAX))
+                       MOVE    WRK-GMN-SELNUM  TO  SPA-GMN-SELNUM
+                   END-IF
                END-IF
            END-PERFORM
       *    £Ó£Ð£ÁÊÔ½¸¡ÊÈóÉ½¼¨Ê¬¡Ë
@@ -4918,6 +4924,7 @@
       *    ÁªÂòÈÖ¹æ¥Á¥§¥Ã¥¯½èÍý
       ****************************************************************
        4101-SELNUM-CHK-SEC      SECTION.
+      *
       *
            IF      SPA-GMN-SELNUM  NOT =   ZERO
                MOVE    ZERO                TO  FLG-CHK
@@ -8213,10 +8220,18 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  WRK-CNT-HKN
            MOVE    ZERO                TO  WRK-CNT-HKN2
            MOVE    ZERO                TO  WRK-IDXH
+           MOVE    ZERO                TO  WRK-IDXH2
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-HKNCOMBI-MAX
                MOVE    ZERO                TO  WRK-CNT-HKN2
+      *        ÈóÉ½¼¨ÂÐ¾Ý³°
+               IF      SPA-NAI-THYOJIKBN (IDX) =   "1"
+                   CONTINUE
+               ELSE
+                   IF      WRK-IDXH2           =   ZERO
+                       MOVE    IDX                 TO  WRK-IDXH2
+                   END-IF
       *
                IF      SPA-GMN-THKNNUM (IDX)       NOT =   SPACE
                    ADD     1                   TO  WRK-CNT-HKN2
@@ -8243,13 +8258,20 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    IDX                 TO  WRK-IDXH
                    MOVE    SPA-HKNCOMBI-MAX    TO  IDX
                END-IF
+      *
+               END-IF
            END-PERFORM
       *
            IF      WRK-IDXH            =   ZERO
-               MOVE    1               TO  WRK-IDXH
+               MOVE    WRK-IDXH2       TO  WRK-IDXH
            END-IF
-           MOVE    SPA-GMN-THKNCOMBINUM (WRK-IDXH)
+           IF      WRK-IDXH            =   ZERO
+               MOVE    ZERO            TO  SPA-GMN-SELNUM
+           ELSE
+               MOVE    SPA-GMN-THKNCOMBINUM (WRK-IDXH)
                                        TO  SPA-GMN-SELNUM
+           END-IF
+      *
       *
            .
        4901-KARUTE-CHEK-EXT.
