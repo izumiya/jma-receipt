@@ -193,7 +193,7 @@ if [ "$METHOD" = "update" ]; then
     if [ $CONN_NUMBER -gt 1 ]; then
       NOTICE_MSG="端末は強制終了しました。"
       echomsg "moninfo abortall go! $NOTICE_MSG" ${LOG}
-      $MONINFO abortall $NOTICE_MSG
+      $MONINFO abort-all $NOTICE_MSG
       sleep 4
     fi
     echomsg "monitor restart." ${LOG}
