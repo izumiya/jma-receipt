@@ -19374,6 +19374,10 @@
                                         TO WRK-TENROOM-SKJ20(1 IDX-SKJ)
                         END-PERFORM
                  END-EVALUATE
+      *          異動日前月末日の食事（夕食）を異動翌月の食事退避項目へ
+      *          セットしておく
+                 MOVE    WRK-TENROOM-MAE-SKJ1  TO  WRK-TENROOM-MAE-SKJ2
+      *
                  MOVE    SPACE           TO  WRK-TENROOM-SKJ-SRYYM(1)
                END-IF
       *        入院会計マスタクローズ
