@@ -388,14 +388,14 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>button12</name>
+      <name>B06S</name>
       <x>432</x>
       <y>694</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
-	<modifiers>0</modifiers>
+	<modifiers>GDK_SHIFT_MASK</modifiers>
 	<key>GDK_F6</key>
 	<signal>clicked</signal>
       </accelerator>
@@ -411,15 +411,15 @@
 
     <widget>
       <class>GtkButton</class>
-      <name>button13</name>
+      <name>B07S</name>
       <x>512</x>
       <y>694</y>
       <width>80</width>
       <height>24</height>
       <can_focus>True</can_focus>
       <accelerator>
-	<modifiers>0</modifiers>
-	<key>GDK_F6</key>
+	<modifiers>GDK_SHIFT_MASK</modifiers>
+	<key>GDK_F7</key>
 	<signal>clicked</signal>
       </accelerator>
       <signal>
