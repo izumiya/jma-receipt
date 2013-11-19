@@ -1826,11 +1826,16 @@
                    COMPUTE WRK-SKYMONEY    =   SYU-SKYMONEY
                                            -   WRK-JIHIKEI
       *            …È√¥≥€
+      *H25.11
+                   IF      WRK-SKYMONEY    NOT =   ZERO
+      *
                    ADD     1                   TO  IDX-T1
                    MOVE    WRK-SKYMONEY        TO  WRK-Z79S
                    MOVE    WRK-Z79S            TO  TBL-NAIYO (IDX-T1 9)
       *            ∑Ó∑◊…È√¥≥€
                    ADD     WRK-SKYMONEY        TO  WRK-TUK-SKYMONEY
+      *
+                   END-IF
                END-IF
       *
                MOVE    "tbl_syunou"        TO  MCP-TABLE
