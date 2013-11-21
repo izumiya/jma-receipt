@@ -2805,6 +2805,18 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    "0027"              TO  SPA-ERRCD
                        MOVE    21                  TO  SPA-GMN2D-CUR
                    END-IF
+      *            ¿··Ñ¶èÊ¬
+                   IF     (SPA-GMN2D-SINKEI        =   SPACE )
+                     AND  (SPA-ERRCD               =   SPACE )
+                       MOVE    "0005"              TO  SPA-ERRCD
+                       MOVE    5                   TO  SPA-GMN2D-CUR
+                   END-IF
+      *            Å¾µ¢»öÍ³
+                   IF     (SPA-GMN2D-TENKI         =   SPACE )
+                     AND  (SPA-ERRCD               =   SPACE )
+                       MOVE    "0006"              TO  SPA-ERRCD
+                       MOVE    6                   TO  SPA-GMN2D-CUR
+                   END-IF
                    IF      SPA-GMN2D-SHOBYOYMD     =   SPACE
                      AND  (SPA-ERRCD               =   SPACE )
                        MOVE    "0025"              TO  SPA-ERRCD
@@ -2838,6 +2850,18 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                      AND  (SPA-ERRCD               =   SPACE )
                        MOVE    "0027"              TO  SPA-ERRCD
                        MOVE    21                  TO  SPA-GMN2D-CUR
+                   END-IF
+      *            ¿··Ñ¶èÊ¬
+                   IF     (SPA-GMN2D-SINKEI        =   SPACE )
+                     AND  (SPA-ERRCD               =   SPACE )
+                       MOVE    "0005"              TO  SPA-ERRCD
+                       MOVE    5                   TO  SPA-GMN2D-CUR
+                   END-IF
+      *            Å¾µ¢»öÍ³
+                   IF     (SPA-GMN2D-TENKI         =   SPACE )
+                     AND  (SPA-ERRCD               =   SPACE )
+                       MOVE    "0006"              TO  SPA-ERRCD
+                       MOVE    6                   TO  SPA-GMN2D-CUR
                    END-IF
                    IF      SPA-GMN2D-SHOBYOYMD     =   SPACE
                      AND  (SPA-ERRCD               =   SPACE )
@@ -2874,6 +2898,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
       *        ¼«ÇåÀÕ
                WHEN    "4"
+      *            Å¾µ¢»öÍ³
+                   IF     (SPA-GMN2D-TENKI         =   SPACE )
+                     AND  (SPA-ERRCD               =   SPACE )
+                       MOVE    "0006"              TO  SPA-ERRCD
+                       MOVE    6                   TO  SPA-GMN2D-CUR
+                   END-IF
                    IF      SPA-GMN2D-SHOBYOYMD     =   SPACE
                      AND  (SPA-ERRCD               =   SPACE )
                        MOVE    "0025"              TO  SPA-ERRCD
@@ -2886,6 +2916,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
       *        ¸øÌ³ºÒ³²
                WHEN    "5"
+      *            Å¾µ¢»öÍ³
+                   IF     (SPA-GMN2D-TENKI         =   SPACE )
+                     AND  (SPA-ERRCD               =   SPACE )
+                       MOVE    "0006"              TO  SPA-ERRCD
+                       MOVE    6                   TO  SPA-GMN2D-CUR
+                   END-IF
                    IF      SPA-GMN2D-SHOBYOYMD     =   SPACE
                      AND  (SPA-ERRCD               =   SPACE )
                        MOVE    "0025"              TO  SPA-ERRCD
