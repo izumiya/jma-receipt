@@ -1,4 +1,4 @@
-hsfoodv2 {
+hsmealv2 {
 		argument {
 			class			varchar(02);
 		};

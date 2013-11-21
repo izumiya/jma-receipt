@@ -70,7 +70,7 @@ xml_hsfoodv2res {
 				Data				varchar(01);
 				Name				varchar(20);
 			};
-			Extra_Charge	{
+			Room_Charge	{
 				Label			varchar(20);
 				Data			varchar(07);
 				Name			varchar(10);

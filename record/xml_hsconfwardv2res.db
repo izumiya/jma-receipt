@@ -60,7 +60,7 @@ xml_hsconfwardv2res {
 					Data	varchar(1);
 					Name	varchar(30);
 				};
-				Charge_Sales_Tax {
+				Consumption_Tax {
 					Label	varchar(30);
 					Data	varchar(1);
 					Name	varchar(30);

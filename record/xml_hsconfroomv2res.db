@@ -33,7 +33,7 @@ xml_hsconfroomv2res {
 				Data	varchar(02);
 				Name	varchar(10);
 			};
-			Extra_Charge{
+			Room_Charge{
 				Label	varchar(20);
 				Data	varchar(07);
 				Name	varchar(10);

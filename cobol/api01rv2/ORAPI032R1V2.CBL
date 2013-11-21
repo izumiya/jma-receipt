@@ -1083,18 +1083,18 @@
        900-XML-READ-SEC             SECTION.
       *
            IF    ( APILST14-BODY    NOT =   LOW-VALUE )
-               DISPLAY "hsfoodv2 object is not low_value"
+               DISPLAY "hsmealv2 object is not low_value"
            END-IF
       *
            INITIALIZE                      XML-APIREQ
       * XML情報取り出し
-           MOVE    "xml_hsfoodv2req"   TO  MCP-TABLE
+           MOVE    "xml_hsmealv2req"   TO  MCP-TABLE
            MOVE    "key"                   TO  MCP-PATHNAME
            MOVE    APILST14-BODY           TO  APIREQ-OBJECT
            MOVE    ZERO                    TO  APIREQ-MODE
            PERFORM 910-XMLOPEN-SEC
            IF    ( MCP-RC              =   ZERO  OR  1 )
-               MOVE    "xml_hsfoodv2req"
+               MOVE    "xml_hsmealv2req"
                                            TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
                MOVE    "private_objects"   TO  APIREQ-RECORDNAME
@@ -1111,7 +1111,7 @@
                MOVE   "97"                 TO  WRK-ERRCD
            END-IF
       *
-           MOVE    "xml_hsfoodv2req"   TO  MCP-TABLE
+           MOVE    "xml_hsmealv2req"   TO  MCP-TABLE
            MOVE    "key"                   TO  MCP-PATHNAME
            PERFORM 910-XMLCLOSE-SEC
        *
@@ -1143,11 +1143,11 @@
        900-XML-WRITE-SEC             SECTION.
       *
            IF    ( APILST14-BODY    NOT =   LOW-VALUE )
-               DISPLAY "hsfoodv2 object is not low_value"
+               DISPLAY "hsmealv2 object is not low_value"
            END-IF
       *
            INITIALIZE                      XML-APIREQ
-           MOVE    "xml_hsfoodv2res"   TO  MCP-TABLE
+           MOVE    "xml_hsmealv2res"   TO  MCP-TABLE
            MOVE    "key"                   TO  MCP-PATHNAME
            MOVE    1                       TO  APIREQ-MODE
            PERFORM 910-XMLOPEN-SEC
@@ -1158,7 +1158,7 @@
            END-IF
       *
            MOVE    HSFDRES-PRIVATE-OBJECTS TO  APIREQ-PATIENTINFOREQ
-           MOVE    "xml_hsfoodv2res"   TO  MCP-TABLE
+           MOVE    "xml_hsmealv2res"   TO  MCP-TABLE
            MOVE    "key"                   TO  MCP-PATHNAME
            MOVE    "private_objects"       TO  APIREQ-RECORDNAME
            PERFORM 910-XMLWRITE-SEC
@@ -1168,7 +1168,7 @@
                DISPLAY "XMLWRITE failure = " MCP-RC
            END-IF
       *
-           MOVE    "xml_hsfoodv2res"       TO  MCP-TABLE
+           MOVE    "xml_hsmealv2res"       TO  MCP-TABLE
            MOVE    "key"                   TO  MCP-PATHNAME
            PERFORM 910-XMLCLOSE-SEC
            IF     (MCP-RC              =   ZERO  OR  1  )
