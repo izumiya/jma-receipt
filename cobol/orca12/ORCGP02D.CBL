@@ -3102,7 +3102,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "年金証書番号は半角９桁で入力して下さい"
                                                TO  SPA-ERRMSG
                WHEN    "0005"
-                   MOVE    "新継再区分入力エラー"
+                   MOVE    "新継再別入力エラー"
                                                TO  SPA-ERRMSG
                WHEN    "0006"
                    MOVE    "転帰事由入力エラー"
