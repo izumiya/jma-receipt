@@ -58,6 +58,7 @@
            03  FLG-TENSUWRK                PIC 9(01).
            03  FLG-TOKU-SET                PIC 9(01).
            03  FLG-TOKU-SHOKU              PIC 9(01).
+           03  FLG-JOUSU                   PIC 9(01).
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -77,6 +78,7 @@
            03  CIDX2                       PIC 9(04).
            03  IDX-DAY                     PIC 9(04).
            03  IDX-NYUKSN                  PIC 9(02).
+           03  IDX-CHUKSN0                 PIC 9(02).
            03  IDX-CHUKSN1                 PIC 9(02).
            03  IDX-CHUKSN1S                PIC 9(02).
            03  IDX-CHUKSN1SS               PIC 9(02).
@@ -191,6 +193,16 @@
       *
       *-------------------------------------------------------------
       *  Ê¿À®£²£´Ç¯£´·îÆþ±¡Ê¬¤«¤é¤ÎÃí²Ã»»ÂàÈòÎÎ°è
+      *
+      *    Ï«ºÒ¾è¿ô¤ÎÂÐ¾Ý¤È¤Ê¤ëÆþ±¡ÎÁ²Ã»»ÂàÈòÍÑ
+           03  WRK-CHUKSN-AREA-0.
+             05   WRK-CHUKSN-TBL-0      OCCURS  50.
+               07  WRK-CHUKSN-SRYCD-0          PIC X(09).
+               07  WRK-CHUKSN-CHUCD-0.
+                 09  WRK-CHUKSN-CHUKSNCD-0     PIC X(04).
+                 09  WRK-CHUKSN-CHUKSNTUBAN-0  PIC X(01).
+               07  WRK-CHUKSN-ZAITEN-0         PIC 9(08).
+               07  WRK-CHUKSN-DAY-0            PIC 9(03)  OCCURS 31.
       *
       *    Æþ±¡ÎÁ¡Ê£Á£±£°£°ÈÖÂæ¡Ë¡¢ÆÃÄêÆþ±¡ÎÁ¡Ê£Á£³£°£°ÈÖÂæ¡Ë¤ÎÃí²Ã»»ÂàÈòÍÑ
            03  WRK-CHUKSN-AREA-1.
@@ -960,7 +972,49 @@
                    MOVE   999          TO   TNS-CDKBN-KBNNUM
                END-IF
       *
-      *        Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+      *        Ï«ºÒ¾è¿ô¤ÎÂÐ¾Ý¤È¤Ê¤ëÆþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+               IF ((TNS-CDKBN-KBNNUM   >=   100)   AND
+                   (TNS-CDKBN-KBNNUM   <=   199))
+                 MOVE      ZERO       TO   FLG-JOUSU
+                 PERFORM   VARYING   IDX1   FROM   1   BY   1
+                   UNTIL   (IDX1   >   50)   OR
+                           (LNK-SROUNYUIN-CHUKSNSRYCD(IDX1) = SPACE) OR
+                           (FLG-JOUSU   =    1)
+                     IF   NSRY-SRYCD(1)  =  LNK-SROUNYUIN-CHUKSNSRYCD
+                                                                 (IDX1)
+                          MOVE    1    TO   FLG-JOUSU
+                     END-IF
+                 END-PERFORM
+                 IF   FLG-JOUSU         =    1
+                      ADD    1         TO  IDX-CHUKSN0
+                      MOVE   NSRY-SRYCD(1) TO  WRK-CHUKSN-SRYCD-0
+                                                      (IDX-CHUKSN0)
+                      MOVE   TNS-CHUKSNCD  TO  WRK-CHUKSN-CHUKSNCD-0
+                                                      (IDX-CHUKSN0)
+                      MOVE   TNS-CHUKSNTUBAN
+                                           TO  WRK-CHUKSN-CHUKSNTUBAN-0
+                                                          (IDX-CHUKSN0)
+                      MOVE   NACCT-ZAITEN  TO  WRK-CHUKSN-ZAITEN-0
+                                                      (IDX-CHUKSN0)
+                      PERFORM    VARYING   IDX1   FROM   1   BY   1
+                        UNTIL     IDX1   >   31
+                          IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
+                                (LNK-NYUINDAY-KBN(IDX1) = "1"))
+                          AND  ((WRK-GAIHAKU-KBN(IDX1) = ZERO) OR
+                                (WRK-GAIHAKU-KBN(IDX1) >= 4))
+                          AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
+                             MOVE   NACCT-DAY(IDX1)
+                                                 TO WRK-CHUKSN-DAY-0
+                                                     (IDX-CHUKSN0 IDX1)
+                          END-IF
+                      END-PERFORM
+                      MOVE   "9999"       TO   TNS-CHUKSNCD
+                      MOVE   999          TO   TNS-CDKBN-KBNNUM
+                 END-IF
+               END-IF
+      *
+      *
+      *        Ï«ºÒ¾è¿ôÂÐ¾Ý³°¤ÎÆþ±¡ÎÁ²Ã»»¤ÎÂàÈò
       *
                IF   TNS-CHUKSNCD     =   "0000"
                    ADD    1         TO  IDX-NYUKSN
@@ -1393,6 +1447,33 @@
                  END-IF
                END-IF
       *
+      *        Ï«ºÒ¾è¿ô¤ÎÂÐ¾Ý¤È¤Ê¤ëÆþ±¡ÎÁ²Ã»»¥»¥Ã¥È
+               PERFORM    VARYING   IDX-CHUKSN0  FROM  1   BY  1
+                 UNTIL    (IDX-CHUKSN0    >   50)    OR
+                          (WRK-CHUKSN-SRYCD-0(IDX-CHUKSN0)  =  SPACE)
+                   IF    WRK-CHUKSN-DAY-0(IDX-CHUKSN0 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-SRYCD-0(IDX-CHUKSN1)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+               END-PERFORM
+      *
+      *        Ï«ºÒ¾è¿ô¥»¥Ã¥È
+               IF    WRK-SO-SRYKBN(IDX1)    =     "90"
+                 IF         LNK-SROUNYUIN-JOUSU-KBN(IDX1)   =    "1"
+                     ADD      1               TO  WRK-MEISAISU
+                     MOVE   "101900010"   TO  WRK-SO-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                 END-IF
+                 IF         LNK-SROUNYUIN-JOUSU-KBN(IDX1)   =    "2"
+                     ADD      1               TO  WRK-MEISAISU
+                     MOVE   "101900020"   TO  WRK-SO-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                 END-IF
+               END-IF
+      *
       *        Æþ±¡ÎÁ²Ã»»¥»¥Ã¥È¡Ê£Á£±£°£°ÈÖÂæ¡¢£Á£³£°£°ÈÖÂæ¡Ë
                PERFORM    VARYING   IDX-CHUKSN1  FROM  1   BY  1
                  UNTIL    (IDX-CHUKSN1    >   50)    OR
@@ -1431,20 +1512,6 @@
                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                   END-IF
                END-PERFORM
-      *
-      *        Ï«ºÒ¾è¿ô¥»¥Ã¥È
-               IF    WRK-SO-SRYKBN(IDX1)    =     "90"
-                 IF         LNK-SROUNYUIN-JOUSU-KBN(IDX1)   =    "1"
-                     ADD      1               TO  WRK-MEISAISU
-                     MOVE   "101900010"   TO  WRK-SO-SRYCD
-                                               (IDX1 WRK-MEISAISU)
-                 END-IF
-                 IF         LNK-SROUNYUIN-JOUSU-KBN(IDX1)   =    "2"
-                     ADD      1               TO  WRK-MEISAISU
-                     MOVE   "101900020"   TO  WRK-SO-SRYCD
-                                               (IDX1 WRK-MEISAISU)
-                 END-IF
-               END-IF
       *
       *
       *
