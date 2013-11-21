@@ -79,6 +79,8 @@
            03  IDX-DAY                     PIC 9(04).
            03  IDX-NYUKSN                  PIC 9(02).
            03  IDX-CHUKSN0                 PIC 9(02).
+           03  IDX-CHUKSN0S                PIC 9(02).
+           03  IDX-CHUKSN0SS               PIC 9(02).
            03  IDX-CHUKSN1                 PIC 9(02).
            03  IDX-CHUKSN1S                PIC 9(02).
            03  IDX-CHUKSN1SS               PIC 9(02).
@@ -1162,7 +1164,49 @@
                      MOVE     "tbl_sryact"   TO  MCP-TABLE
                      MOVE     "key"          TO  MCP-PATHNAME
                      PERFORM   900-CLOSE-SEC
-      *             Æþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+      *
+      *              Ï«ºÒ¾è¿ô¤ÎÂÐ¾Ý¤È¤Ê¤ëÆþ±¡ÎÁ²Ã»»¤ÎÂàÈò
+                     IF ((TNS-CDKBN-KBNNUM   >=   100)   AND
+                         (TNS-CDKBN-KBNNUM   <=   199))
+                       MOVE      ZERO       TO   FLG-JOUSU
+                       PERFORM   VARYING   IDX1   FROM   1   BY   1
+                         UNTIL   (IDX1   >   50)   OR
+                           (LNK-SROUNYUIN-CHUKSNSRYCD(IDX1) = SPACE) OR
+                           (FLG-JOUSU   =    1)
+                           IF SRY-SRYCD(1) = LNK-SROUNYUIN-CHUKSNSRYCD
+                                                                 (IDX1)
+                                MOVE    1    TO   FLG-JOUSU
+                           END-IF
+                       END-PERFORM
+                       IF   FLG-JOUSU         =    1
+                            ADD    1         TO  IDX-CHUKSN0
+                            MOVE   SRY-SRYCD(1) TO  WRK-CHUKSN-SRYCD-0
+                                                          (IDX-CHUKSN0)
+                            MOVE   TNS-CHUKSNCD TO WRK-CHUKSN-CHUKSNCD-0
+                                                          (IDX-CHUKSN0)
+                            MOVE   TNS-CHUKSNTUBAN
+                                           TO  WRK-CHUKSN-CHUKSNTUBAN-0
+                                                          (IDX-CHUKSN0)
+                            MOVE   ACCT-ZAITEN TO WRK-CHUKSN-ZAITEN-0
+                                                          (IDX-CHUKSN0)
+                            PERFORM   VARYING  IDX1   FROM   1   BY   1
+                              UNTIL     IDX1   >   31
+                                IF  ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
+                                     (LNK-NYUINDAY-KBN(IDX1) = "1"))
+                                AND ((WRK-GAIHAKU-KBN(IDX1) = ZERO) OR
+                                     (WRK-GAIHAKU-KBN(IDX1) >= 4))
+                                AND  (ACCT-DAY(1 IDX1)    NOT =  ZERO)
+                                   MOVE   ACCT-DAY(1 IDX1)
+                                                 TO WRK-CHUKSN-DAY-0
+                                                     (IDX-CHUKSN0 IDX1)
+                                END-IF
+                            END-PERFORM
+                            MOVE   "9999"       TO   TNS-CHUKSNCD
+                            MOVE   999          TO   TNS-CDKBN-KBNNUM
+                       END-IF
+                     END-IF
+      *
+      *             Ï«ºÒ¾è¿ôÂÐ¾Ý³°¤ÎÆþ±¡ÎÁ²Ã»»¤ÎÂàÈò
                     IF  TNS-CHUKSNCD         =   "0000"
                        ADD    1              TO  IDX-NYUKSN
                        MOVE   SRY-SRYCD(1)   TO  WRK-NYUKSN-SRYCD-1
@@ -1264,6 +1308,26 @@
       *
       *
       *    ¼èÆÀ¤·¤¿Æþ±¡ÎÁ²Ã»»¤òÃí²Ã»»¥³¡¼¥É¡¢Ãí²Ã»»ÄÌÈÖ½ç¤ËÊÂ¤ÓÂØ¤¨
+           PERFORM      VARYING    IDX-CHUKSN0   FROM   1  BY  1
+             UNTIL     (IDX-CHUKSN0   >   50)   OR
+                       (WRK-CHUKSN-SRYCD-0(IDX-CHUKSN0)  =   SPACE)
+               COMPUTE   IDX-CHUKSN0SS   =   IDX-CHUKSN0  +  1
+               PERFORM   VARYING IDX-CHUKSN0S FROM IDX-CHUKSN0SS  BY  1
+                 UNTIL   (IDX-CHUKSN0S   >   50)   OR
+                         (WRK-CHUKSN-SRYCD-0(IDX-CHUKSN0S) =  SPACE)
+                   IF  WRK-CHUKSN-CHUCD-0(IDX-CHUKSN0)
+                                   <=  WRK-CHUKSN-CHUCD-0(IDX-CHUKSN0S)
+                       CONTINUE
+                   ELSE
+                       MOVE   WRK-CHUKSN-TBL-0(IDX-CHUKSN0)
+                                      TO   WRK-CHUKSN-TAIHI
+                       MOVE   WRK-CHUKSN-TBL-0(IDX-CHUKSN0S)
+                                      TO  WRK-CHUKSN-TBL-0(IDX-CHUKSN0)
+                       MOVE   WRK-CHUKSN-TAIHI
+                                      TO  WRK-CHUKSN-TBL-0(IDX-CHUKSN0S)
+                   END-IF
+               END-PERFORM
+           END-PERFORM
            PERFORM      VARYING    IDX-CHUKSN1   FROM   1  BY  1
              UNTIL     (IDX-CHUKSN1   >   50)   OR
                        (WRK-CHUKSN-SRYCD-1(IDX-CHUKSN1)  =   SPACE)
@@ -1455,7 +1519,7 @@
                        CONTINUE
                    ELSE
                        ADD   1    TO  WRK-MEISAISU
-                       MOVE  WRK-CHUKSN-SRYCD-0(IDX-CHUKSN1)
+                       MOVE  WRK-CHUKSN-SRYCD-0(IDX-CHUKSN0)
                                   TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
                    END-IF
                END-PERFORM
