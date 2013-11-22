@@ -5405,11 +5405,56 @@
                WHEN    "160061910"
       *            生体検査１０項目算定日より前日に算定
                    IF     WRK-YMD          <   WRK-HOU-YMD
-                       MOVE    1           TO  FLG-KENSA-ARI
+      ***              MOVE    1           TO  FLG-KENSA-ARI
+      *H25.11          入院日算定は入院での算定をチェック
+                       IF      WRK-YMD         =  SPA-K02N-NYUINYMD
+                           PERFORM 300811-SYOKAI-CHK02-SEC
+                       ELSE
+                           MOVE    1           TO  FLG-KENSA-ARI
+                       END-IF
                    END-IF
            END-EVALUATE
            .
        30081-SYOKAI-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入院時初回算定有無判定
+      *****************************************************************
+       300811-SYOKAI-CHK02-SEC         SECTION.
+      *
+           MOVE    SPACE               TO  SRYACT-REC
+           INITIALIZE                      SRYACT-REC
+           MOVE    SPA-HOSPNUM         TO  SRY-HOSPNUM
+           MOVE    SPA-NYUGAIKBN       TO  SRY-NYUGAIKBN
+           MOVE    SPA-PTID            TO  SRY-PTID
+           MOVE    SANTEI-SRYYM        TO  SRY-SRYYM
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD(1)
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD(2)
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD(3)
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD(4)
+           MOVE    SANTEI-SRYCD        TO  SRY-SRYCD(5)
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key7"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key7"              TO  MCP-PATHNAME
+               PERFORM 900-SRYACT-NEXT-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SRYACT
+           END-IF
+      *
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key7"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *    診療行為テーブルに存在しない時、算定なし
+           IF      FLG-SRYACT          =   ZERO
+               MOVE    1               TO  FLG-KENSA-ARI
+           END-IF
+           .
+       300811-SYOKAI-CHK02-EXT.
            EXIT.
       *****************************************************************
       *    入院時初回算定有無判定
