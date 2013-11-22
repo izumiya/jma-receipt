@@ -58,7 +58,6 @@
            03  FLG-TENSUWRK                PIC 9(01).
            03  FLG-TOKU-SET                PIC 9(01).
            03  FLG-TOKU-SHOKU              PIC 9(01).
-           03  FLG-JOUSU                   PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -974,49 +973,54 @@
                    MOVE   999          TO   TNS-CDKBN-KBNNUM
                END-IF
       *
-      *        労災乗数の対象となる入院料加算の退避
-               IF ((TNS-CDKBN-KBNNUM   >=   100)   AND
-                   (TNS-CDKBN-KBNNUM   <=   199))
-                 MOVE      ZERO       TO   FLG-JOUSU
-                 PERFORM   VARYING   IDX1   FROM   1   BY   1
-                   UNTIL   (IDX1   >   50)   OR
-                           (LNK-SROUNYUIN-CHUKSNSRYCD(IDX1) = SPACE) OR
-                           (FLG-JOUSU   =    1)
-                     IF   NSRY-SRYCD(1)  =  LNK-SROUNYUIN-CHUKSNSRYCD
-                                                                 (IDX1)
-                          MOVE    1    TO   FLG-JOUSU
-                     END-IF
-                 END-PERFORM
-                 IF   FLG-JOUSU         =    1
-                      ADD    1         TO  IDX-CHUKSN0
-                      MOVE   NSRY-SRYCD(1) TO  WRK-CHUKSN-SRYCD-0
+      *        入院料加算の内容を労災マスタの内容に置き換える
+      *        一般病棟看護必要度評価加算（一般病棟）（労災用）
+               IF    NSRY-SRYCD(1)  =  "190131570"
+                   MOVE   "9017"       TO   TNS-CHUKSNCD
+                   MOVE   "5"          TO   TNS-CHUKSNTUBAN
+                   MOVE   7            TO   TNS-KOKUJISKBKBN1
+               END-IF
+      *        一般病棟看護必要度評価加算（専門病院）（労災用）
+               IF    NSRY-SRYCD(1)  =  "190134970"
+                   MOVE   "9030"       TO   TNS-CHUKSNCD
+                   MOVE   "4"          TO   TNS-CHUKSNTUBAN
+                   MOVE   7            TO   TNS-KOKUJISKBKBN1
+               END-IF
+      *        重度認知症加算（精神病棟）（労災用）
+               IF    NSRY-SRYCD(1)  =  "190118570"
+                   MOVE   7            TO   TNS-KOKUJISKBKBN1
+               END-IF
+      *
+      *        告示等識別区分（１）が７（加算項目）以外の入院料加算の退避
+               IF   TNS-KOKUJISKBKBN1   NOT =   7
+                   ADD    1         TO  IDX-CHUKSN0
+                   MOVE   NSRY-SRYCD(1) TO  WRK-CHUKSN-SRYCD-0
                                                       (IDX-CHUKSN0)
-                      MOVE   TNS-CHUKSNCD  TO  WRK-CHUKSN-CHUKSNCD-0
+                   MOVE   TNS-CHUKSNCD  TO  WRK-CHUKSN-CHUKSNCD-0
                                                       (IDX-CHUKSN0)
-                      MOVE   TNS-CHUKSNTUBAN
-                                           TO  WRK-CHUKSN-CHUKSNTUBAN-0
+                   MOVE   TNS-CHUKSNTUBAN
+                                        TO  WRK-CHUKSN-CHUKSNTUBAN-0
                                                           (IDX-CHUKSN0)
-                      MOVE   NACCT-ZAITEN  TO  WRK-CHUKSN-ZAITEN-0
+                   MOVE   NACCT-ZAITEN  TO  WRK-CHUKSN-ZAITEN-0
                                                       (IDX-CHUKSN0)
-                      PERFORM    VARYING   IDX1   FROM   1   BY   1
-                        UNTIL     IDX1   >   31
-                          IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
-                                (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                          AND  ((WRK-GAIHAKU-KBN(IDX1) = ZERO) OR
-                                (WRK-GAIHAKU-KBN(IDX1) >= 4))
-                          AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
-                             MOVE   NACCT-DAY(IDX1)
-                                                 TO WRK-CHUKSN-DAY-0
-                                                     (IDX-CHUKSN0 IDX1)
-                          END-IF
-                      END-PERFORM
-                      MOVE   "9999"       TO   TNS-CHUKSNCD
-                      MOVE   999          TO   TNS-CDKBN-KBNNUM
-                 END-IF
+                   PERFORM    VARYING   IDX1   FROM   1   BY   1
+                     UNTIL     IDX1   >   31
+                       IF   ((WRK-NYUINKHN(IDX1) NOT = SPACE)  OR
+                             (LNK-NYUINDAY-KBN(IDX1) = "1"))
+                       AND  ((WRK-GAIHAKU-KBN(IDX1) = ZERO) OR
+                             (WRK-GAIHAKU-KBN(IDX1) >= 4))
+                       AND   (NACCT-DAY(IDX1)    NOT =  ZERO)
+                          MOVE   NACCT-DAY(IDX1)
+                                          TO WRK-CHUKSN-DAY-0
+                                                (IDX-CHUKSN0 IDX1)
+                       END-IF
+                   END-PERFORM
+                   MOVE   "9999"       TO   TNS-CHUKSNCD
+                   MOVE   999          TO   TNS-CDKBN-KBNNUM
                END-IF
       *
       *
-      *        労災乗数対象外の入院料加算の退避
+      *        告示等識別区分（１）が７（加算項目）の入院料加算の退避
       *
                IF   TNS-CHUKSNCD     =   "0000"
                    ADD    1         TO  IDX-NYUKSN
@@ -1136,10 +1140,10 @@
                      MOVE    "key"          TO  MCP-PATHNAME
                      PERFORM 910-SRYACT-SELECT-SEC
                      IF      FLG-SRYACT     =    ZERO
-                         MOVE     "tbl_sryact"   TO  MCP-TABLE
-                         MOVE     "key"          TO  MCP-PATHNAME
-                         PERFORM   910-SRYACT-READ-SEC
-                         IF  FLG-SRYACT    =    ZERO
+                        MOVE     "tbl_sryact"   TO  MCP-TABLE
+                        MOVE     "key"          TO  MCP-PATHNAME
+                        PERFORM   910-SRYACT-READ-SEC
+                        IF  FLG-SRYACT    =    ZERO
       *                    点数マスタより注加算の判定
                            INITIALIZE                TNS-TENSU-REC
                            MOVE    LNK-RNYURECEDEN-HOSPNUM
@@ -1158,55 +1162,61 @@
                                MOVE   "9999"      TO   TNS-CHUKSNCD
                                MOVE   999         TO   TNS-CDKBN-KBNNUM
                            END-IF
-                         END-IF
+      *
+      *                   入院料加算の内容を労災マスタの内容に置き換える
+      *                   一般病棟看護必要度評価加算（一般病棟）（労災用）
+                          IF     SRY-SRYCD(1)     =    "190131570"
+                              MOVE   "9017"       TO   TNS-CHUKSNCD
+                              MOVE   "5"          TO   TNS-CHUKSNTUBAN
+                              MOVE   7            TO   TNS-KOKUJISKBKBN1
+                          END-IF
+      *                   一般病棟看護必要度評価加算（専門病院）（労災用）
+                          IF     SRY-SRYCD(1)     =    "190134970"
+                              MOVE   "9030"       TO   TNS-CHUKSNCD
+                              MOVE   "4"          TO   TNS-CHUKSNTUBAN
+                              MOVE   7            TO   TNS-KOKUJISKBKBN1
+                          END-IF
+      *                   重度認知症加算（精神病棟）（労災用）
+                          IF     SRY-SRYCD(1)     =    "190118570"
+                              MOVE   7            TO   TNS-KOKUJISKBKBN1
+                          END-IF
+      *
+                        END-IF
                      END-IF
       *              診療行為クローズ
                      MOVE     "tbl_sryact"   TO  MCP-TABLE
                      MOVE     "key"          TO  MCP-PATHNAME
                      PERFORM   900-CLOSE-SEC
       *
-      *              労災乗数の対象となる入院料加算の退避
-                     IF ((TNS-CDKBN-KBNNUM   >=   100)   AND
-                         (TNS-CDKBN-KBNNUM   <=   199))
-                       MOVE      ZERO       TO   FLG-JOUSU
-                       PERFORM   VARYING   IDX1   FROM   1   BY   1
-                         UNTIL   (IDX1   >   50)   OR
-                           (LNK-SROUNYUIN-CHUKSNSRYCD(IDX1) = SPACE) OR
-                           (FLG-JOUSU   =    1)
-                           IF SRY-SRYCD(1) = LNK-SROUNYUIN-CHUKSNSRYCD
-                                                                 (IDX1)
-                                MOVE    1    TO   FLG-JOUSU
-                           END-IF
-                       END-PERFORM
-                       IF   FLG-JOUSU         =    1
-                            ADD    1         TO  IDX-CHUKSN0
-                            MOVE   SRY-SRYCD(1) TO  WRK-CHUKSN-SRYCD-0
+      *              告示等識別区分（１）が７（加算項目）以外の入院料加算の退避
+                     IF   TNS-KOKUJISKBKBN1   NOT =   7
+                         ADD    1         TO  IDX-CHUKSN0
+                         MOVE   SRY-SRYCD(1) TO  WRK-CHUKSN-SRYCD-0
+                                                       (IDX-CHUKSN0)
+                         MOVE   TNS-CHUKSNCD TO WRK-CHUKSN-CHUKSNCD-0
+                                                       (IDX-CHUKSN0)
+                         MOVE   TNS-CHUKSNTUBAN
+                                        TO  WRK-CHUKSN-CHUKSNTUBAN-0
                                                           (IDX-CHUKSN0)
-                            MOVE   TNS-CHUKSNCD TO WRK-CHUKSN-CHUKSNCD-0
+                         MOVE   ACCT-ZAITEN TO WRK-CHUKSN-ZAITEN-0
                                                           (IDX-CHUKSN0)
-                            MOVE   TNS-CHUKSNTUBAN
-                                           TO  WRK-CHUKSN-CHUKSNTUBAN-0
-                                                          (IDX-CHUKSN0)
-                            MOVE   ACCT-ZAITEN TO WRK-CHUKSN-ZAITEN-0
-                                                          (IDX-CHUKSN0)
-                            PERFORM   VARYING  IDX1   FROM   1   BY   1
-                              UNTIL     IDX1   >   31
-                                IF  ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
-                                     (LNK-NYUINDAY-KBN(IDX1) = "1"))
-                                AND ((WRK-GAIHAKU-KBN(IDX1) = ZERO) OR
-                                     (WRK-GAIHAKU-KBN(IDX1) >= 4))
-                                AND  (ACCT-DAY(1 IDX1)    NOT =  ZERO)
-                                   MOVE   ACCT-DAY(1 IDX1)
-                                                 TO WRK-CHUKSN-DAY-0
-                                                     (IDX-CHUKSN0 IDX1)
-                                END-IF
-                            END-PERFORM
-                            MOVE   "9999"       TO   TNS-CHUKSNCD
-                            MOVE   999          TO   TNS-CDKBN-KBNNUM
-                       END-IF
+                         PERFORM   VARYING  IDX1   FROM   1   BY   1
+                           UNTIL     IDX1   >   31
+                             IF  ((WRK-NYUINKHN(IDX1) NOT = SPACE) OR
+                                  (LNK-NYUINDAY-KBN(IDX1) = "1"))
+                             AND ((WRK-GAIHAKU-KBN(IDX1) = ZERO) OR
+                                  (WRK-GAIHAKU-KBN(IDX1) >= 4))
+                             AND  (ACCT-DAY(1 IDX1)    NOT =  ZERO)
+                                MOVE   ACCT-DAY(1 IDX1)
+                                              TO WRK-CHUKSN-DAY-0
+                                                    (IDX-CHUKSN0 IDX1)
+                             END-IF
+                         END-PERFORM
+                         MOVE   "9999"       TO   TNS-CHUKSNCD
+                         MOVE   999          TO   TNS-CDKBN-KBNNUM
                      END-IF
       *
-      *             労災乗数対象外の入院料加算の退避
+      *             告示等識別区分（１）が７（加算項目）の入院料加算の退避
                     IF  TNS-CHUKSNCD         =   "0000"
                        ADD    1              TO  IDX-NYUKSN
                        MOVE   SRY-SRYCD(1)   TO  WRK-NYUKSN-SRYCD-1
@@ -1511,34 +1521,8 @@
                  END-IF
                END-IF
       *
-      *        労災乗数の対象となる入院料加算セット
-               PERFORM    VARYING   IDX-CHUKSN0  FROM  1   BY  1
-                 UNTIL    (IDX-CHUKSN0    >   50)    OR
-                          (WRK-CHUKSN-SRYCD-0(IDX-CHUKSN0)  =  SPACE)
-                   IF    WRK-CHUKSN-DAY-0(IDX-CHUKSN0 IDX1)  =  ZERO
-                       CONTINUE
-                   ELSE
-                       ADD   1    TO  WRK-MEISAISU
-                       MOVE  WRK-CHUKSN-SRYCD-0(IDX-CHUKSN0)
-                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
-                   END-IF
-               END-PERFORM
-      *
-      *        労災乗数セット
-               IF    WRK-SO-SRYKBN(IDX1)    =     "90"
-                 IF         LNK-SROUNYUIN-JOUSU-KBN(IDX1)   =    "1"
-                     ADD      1               TO  WRK-MEISAISU
-                     MOVE   "101900010"   TO  WRK-SO-SRYCD
-                                               (IDX1 WRK-MEISAISU)
-                 END-IF
-                 IF         LNK-SROUNYUIN-JOUSU-KBN(IDX1)   =    "2"
-                     ADD      1               TO  WRK-MEISAISU
-                     MOVE   "101900020"   TO  WRK-SO-SRYCD
-                                               (IDX1 WRK-MEISAISU)
-                 END-IF
-               END-IF
-      *
-      *        入院料加算セット（Ａ１００番台、Ａ３００番台）
+      *        告示等識別区分（１）が７（加算項目）の入院料加算セット
+      *       （Ａ１００番台、Ａ３００番台）
                PERFORM    VARYING   IDX-CHUKSN1  FROM  1   BY  1
                  UNTIL    (IDX-CHUKSN1    >   50)    OR
                           (WRK-CHUKSN-SRYCD-1(IDX-CHUKSN1)  =  SPACE)
@@ -1551,7 +1535,8 @@
                    END-IF
                END-PERFORM
       *
-      *        入院料加算セット（Ａ２００番台）
+      *        告示等識別区分（１）が７（加算項目）の入院料加算セット
+      *       （Ａ２００番台）
                PERFORM    VARYING   IDX-CHUKSN2  FROM  1   BY  1
                  UNTIL    (IDX-CHUKSN2    >   50)    OR
                           (WRK-CHUKSN-SRYCD-2(IDX-CHUKSN2)  =  SPACE)
@@ -1577,7 +1562,32 @@
                   END-IF
                END-PERFORM
       *
+      *        労災乗数セット
+               IF    WRK-SO-SRYKBN(IDX1)    =     "90"
+                 IF         LNK-SROUNYUIN-JOUSU-KBN(IDX1)   =    "1"
+                     ADD      1               TO  WRK-MEISAISU
+                     MOVE   "101900010"   TO  WRK-SO-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                 END-IF
+                 IF         LNK-SROUNYUIN-JOUSU-KBN(IDX1)   =    "2"
+                     ADD      1               TO  WRK-MEISAISU
+                     MOVE   "101900020"   TO  WRK-SO-SRYCD
+                                               (IDX1 WRK-MEISAISU)
+                 END-IF
+               END-IF
       *
+      *        告示等識別区分（１）が７（加算項目）以外の入院料加算セット
+               PERFORM    VARYING   IDX-CHUKSN0  FROM  1   BY  1
+                 UNTIL    (IDX-CHUKSN0    >   50)    OR
+                          (WRK-CHUKSN-SRYCD-0(IDX-CHUKSN0)  =  SPACE)
+                   IF    WRK-CHUKSN-DAY-0(IDX-CHUKSN0 IDX1)  =  ZERO
+                       CONTINUE
+                   ELSE
+                       ADD   1    TO  WRK-MEISAISU
+                       MOVE  WRK-CHUKSN-SRYCD-0(IDX-CHUKSN0)
+                                  TO  WRK-SO-SRYCD(IDX1 WRK-MEISAISU)
+                   END-IF
+               END-PERFORM
       *
            END-PERFORM
       *
@@ -1883,11 +1893,11 @@
                                     LNK-RNYURECEDEN-SRYSKB(1 IDX2 IDX3)
                          END-IF
       *                  入院料加算の労災用置き換え
-      *                  一般病棟看護必要度加算（一般病棟）（労災用）
+      *                  一般病棟看護必要度評価加算（一般病棟）（労災用）
                          IF    WRK-SO-SRYCD(IDX1 IDX3)  =  "190131570"
                             MOVE "101900100" TO WRK-SO-SRYCD(IDX1 IDX3)
                          END-IF
-      *                  一般病棟看護必要度加算（専門病院）（労災用）
+      *                  一般病棟看護必要度評価加算（専門病院）（労災用）
                          IF    WRK-SO-SRYCD(IDX1 IDX3)  =  "190134970"
                             MOVE "101900120" TO WRK-SO-SRYCD(IDX1 IDX3)
                          END-IF
