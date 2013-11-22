@@ -886,6 +886,13 @@
                                            DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "K811"
+                   STRING  "警告！"
+                           "京都府の労災保険【公務災害】の"
+                           "診療コードです。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
       *
                WHEN    "S001"
                    STRING  "約束セット内に使用できないコードがあります"
