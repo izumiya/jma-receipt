@@ -3569,7 +3569,10 @@
            IF     (LNK-SC92-SRYCD (1:6)    =   "101989") 
                IF     (SPA-HKNKBN          =   1 )
                   AND (SPA-RSI-HKNKBN      =   5 )
-                   CONTINUE
+      *            µþÅÔ°Ê³°¤Ï·Ù¹ð
+                   IF     (SPA-PREFNUM         NOT =   26    )
+                       MOVE    "K811"          TO  LNK-SC92-ERRCD8
+                   END-IF
                ELSE
                    MOVE    "8101"              TO  LNK-SC92-ERRCD8
                END-IF
