@@ -434,9 +434,16 @@
                    MOVE    "公費の種別は変更できません"
                                                TO  SPA-ERRMSG
       *!
+      *        WHEN    "2074"
+      *            STRING  "961 減額（円）は現在 使用できません。"
+      *                    "削除して下さい。"
+      *                                        DELIMITED  BY  SIZE
+      *                                        INTO  SPA-ERRMSG
+      *            END-STRING
+      *!H25.12 から
                WHEN    "2074"
-                   STRING  "961 減額（円）は現在 使用できません。"
-                           "削除して下さい。"
+                   STRING  "961 減額（円）は平成２４年４月以降を"
+                           "開始日として入力して下さい。"
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING

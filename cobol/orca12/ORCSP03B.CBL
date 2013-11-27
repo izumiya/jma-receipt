@@ -893,11 +893,11 @@
            END-IF
       *
       *!９６１ 減免金額は仕様決定までエラーとする
-           IF      SPA-GMN-KOHNUM(IDX-K)   =   "961"
-               MOVE    "2074"          TO  SPA-ERRCD
-               MOVE    22              TO  SPA-GMN-CUR
-               GO      TO      1001-KOHNUM-CHK-EXT
-           END-IF
+      *    IF      SPA-GMN-KOHNUM(IDX-K)   =   "961"
+      *        MOVE    "2074"          TO  SPA-ERRCD
+      *        MOVE    22              TO  SPA-GMN-CUR
+      *        GO      TO      1001-KOHNUM-CHK-EXT
+      *    END-IF
       *!
       *    新規の時、チェック・編集
            IF     (FLG-KOHINS          =   1   )
@@ -1176,6 +1176,15 @@
                END-IF
            END-IF
       *!!
+      *H25.12
+      *    "961"減額（円）はＨ２４年４月からとする
+           IF     (SPA-GMN-KOHNUM(IDX-K)   =   "961" )
+             AND  (SPA-ERRCD               =   SPACE )
+               IF      SPA-NAI-KTEKSTYMD(IDX-K)    <   "20120401"
+                   MOVE    "2074"              TO  SPA-ERRCD
+                   MOVE    23                  TO  SPA-GMN-CUR
+               END-IF
+           END-IF
            .
        1001-KTEKSTYMD-CHK-EXT.
            EXIT.
@@ -2195,8 +2204,9 @@
                IF     (FLG-CHK2        =   1  )
                   AND (SPA-GMN-KOHNUM (IDX-K) =   "012")
                   AND (SPA-PTKOH-KOHNUM(IDX)  =   "012")
-                  AND (SPA-NAI-JFKCHKFLG (IDX-K) =   ZERO )
-                   MOVE    1               TO  SPA-NAI-JFKCHKFLG(IDX-K)
+                  AND (SPA-NAI-JFKCHKFLG (IDX-K)  =   ZERO )
+                   MOVE    1               TO  SPA-NAI-JFKCHKFLG
+                                                              (IDX-K)
                    MOVE    "K136"          TO  SPA-ERRCD
                    MOVE    23              TO  SPA-GMN-CUR
                    MOVE    IDX             TO  WRK-IDX1
