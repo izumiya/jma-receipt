@@ -4408,23 +4408,6 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****************************************************************
        49001-KOUSIN-SEC             SECTION.
       *
-      *H25.11
-      *    選択番号のＥＮＴＥＲチェック
-           IF     (SPA-GMN-SELNUM  NOT =   ZERO  )
-               MOVE    SPA-GMN-SELNUM          TO  IDX
-               IF     (SPA-GMN-TPTNUM (IDX)    =   SPA-GMN-PTNUM)
-                  AND (SPA-GMN-TNAME  (IDX)    =   SPA-GMN-NAME )
-                  AND (SPA-GMN-TUKEID  (IDX)   =   SPA-NAI-UKEID)
-                  AND (SPA-GMN-TKYYKTIME(IDX)  =   SPA-NAI-KYYKTIME)
-                  AND (SPA-GMN-TYYKID   (IDX)  =   SPA-NAI-YYKID)
-                   CONTINUE
-               ELSE
-                   MOVE    "1012"              TO  SPA-ERRCD
-                   MOVE    1                   TO  SPA-GMN-CUR
-                   GO  TO  49001-KOUSIN-EXT
-               END-IF
-           END-IF
-      *
       *    更新日取得
            INITIALIZE                  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"       USING
@@ -6883,12 +6866,6 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "1010"
                    STRING  "選択番号の受付情報が選択されていません。"
                            "再度、受付を選択して下さい。"
-                                                DELIMITED  BY  SIZE
-                                                INTO  SPA-ERRMSG
-                   END-STRING
-               WHEN    "1012"
-                   STRING  "選択番号の情報が受付選択されていません。"
-                           "再度、選択番号を入力して下さい。"
                                                 DELIMITED  BY  SIZE
                                                 INTO  SPA-ERRMSG
                    END-STRING
