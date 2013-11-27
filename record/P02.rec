@@ -808,9 +808,6 @@ P02	{
 				P021_KISTEL	{
 					value	varchar(15);
 				};
-				P021_PATIENTID1	{
-					value	varchar(20);
-				};
 			};
 			FP7	{
 				P024_TSRSELNUM	{
@@ -1160,6 +1157,23 @@ P02	{
 				};
 				P028_MNOTE_CSV_COMB	{
 					P028_MNOTE_CSV	{
+						value	varchar(50);
+					};
+					count	int;
+					item	varchar(50)[20];
+				};
+				P028_PATIENTID1	{
+					value	varchar(20);
+				};
+				P028_AGREEMENT_COMB	{
+					P028_AGREEMENT	{
+						value	varchar(20);
+					};
+					count	int;
+					item	varchar(20)[5];
+				};
+				P028_YOBI1_CSV_COMB	{
+					P028_YOBI1_CSV	{
 						value	varchar(50);
 					};
 					count	int;

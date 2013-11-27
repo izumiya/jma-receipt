@@ -27,6 +27,7 @@
       *****************************************************************
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  13/11/26  ´µ¼Ô¸ÄÊÌÀßÄêÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -67,6 +68,10 @@
        01  WRK-AREA.
            03  WRK-MCP-WIDGET      PIC X(64).
       *
+       01  WRK-HENKAN-AREA.
+           03  WRK-MAE-INPUT       PIC X(400).
+           03  WRK-ATO-INPUT       PIC X(400).
+           03  WRK-MAX             PIC 9(04).
       *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
@@ -215,10 +220,14 @@
       *
            EVALUATE    SPA-GMN28-CUR
                WHEN    01
-                   MOVE    "P028_MNOTE_QRKBN"   TO  MCP-WIDGET
+                   MOVE    "P028_PATIENTID1"    TO  MCP-WIDGET
                WHEN    02
-                   MOVE    "P028_MNOTE_CSV"     TO  MCP-WIDGET
+                   MOVE    "P028_AGREEMENT"     TO  MCP-WIDGET
                WHEN    03
+                   MOVE    "P028_MNOTE_QRKBN"   TO  MCP-WIDGET
+               WHEN    04
+                   MOVE    "P028_MNOTE_CSV"     TO  MCP-WIDGET
+               WHEN    05
                    MOVE    "B08"                TO  MCP-WIDGET
            END-EVALUATE
       *
@@ -232,10 +241,14 @@
        50011-INPUT-CUR-SEC          SECTION.
       *
            EVALUATE    WRK-MCP-WIDGET
-               WHEN    "P028_MNOTE_QRKBN"
+               WHEN    "P028_PATIENTID1"
                    MOVE    2           TO  SPA-GMN28-CUR
-               WHEN    "P028_MNOTE_CSV"
+               WHEN    "P028_AGREEMENT"
                    MOVE    3           TO  SPA-GMN28-CUR
+               WHEN    "P028_MNOTE_QRKBN"
+                   MOVE    4           TO  SPA-GMN28-CUR
+               WHEN    "P028_MNOTE_CSV"
+                   MOVE    5           TO  SPA-GMN28-CUR
            END-EVALUATE
       *
            .
@@ -329,6 +342,11 @@
                                        TO  SPA-GMN28-MNOTE-QRKBN-G
            MOVE    P02-P028-MNOTE-CSV
                                        TO  SPA-GMN28-MNOTE-CSV-G
+      *    ÃÏ°èÏ¢·È£É£Ä
+           MOVE    P02-P028-PATIENTID1 TO  SPA-GMN28-PATIENTID1
+      *    ¾ðÊóÄó¶¡Æ±°ÕÍ­Ìµ
+           MOVE    P02-P028-AGREEMENT
+                                       TO  SPA-GMN28-AGREEMENT-G
            .
        4101-GMN-SPA-SET-EXT.
            EXIT.
@@ -338,8 +356,18 @@
       *****************************************************************
        4102-KIHON-CHK-SEC          SECTION.
       *
+      *    ÃÏ°èÏ¢·È£É£Ä
+           IF     (SPA-ERRCD           =   SPACE )
+               PERFORM 4101-PATIENTID1-CHK-SEC
+           END-IF
+      *    ¾ðÊóÄó¶¡Æ±°ÕÍ­Ìµ
+           IF     (SPA-ERRCD           =   SPACE )
+               PERFORM 41012-AGREEMENT-CHK-SEC
+           END-IF
       *    ¤ªÌô¼êÄ¢£Ñ£Ò¶èÊ¬
-           PERFORM 41012-MNOTE-QRKBN-CHK-SEC
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 41012-MNOTE-QRKBN-CHK-SEC
+           END-IF
       *    ¤ªÌô¼êÄ¢£Ã£Ó£Ö¶èÊ¬
            IF      SPA-ERRCD           =   SPACE
                PERFORM 41012-MNOTE-CSV-CHK-SEC
@@ -347,6 +375,54 @@
            .
       *
        4102-KIHON-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÃÏ°èÏ¢·È£É£Ä¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       4101-PATIENTID1-CHK-SEC          SECTION.
+      *
+           IF      SPA-GMN28-PATIENTID1    NOT =   SPACE
+               MOVE    SPA-GMN28-PATIENTID1    TO  WRK-MAE-INPUT
+               MOVE    20                      TO  WRK-MAX
+               PERFORM 891-HALF-CHK-SEC
+               MOVE    WRK-ATO-INPUT       TO  SPA-GMN28-PATIENTID1
+               IF      FLG-ERR         NOT =   ZERO
+                   MOVE    "2801"              TO  SPA-ERRCD
+                   MOVE    1                   TO  SPA-GMN28-CUR
+               END-IF
+           END-IF
+      *
+           .
+       4101-PATIENTID1-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¤ªÌô¼êÄ¢£Ñ£Ò¶èÊ¬¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       41012-AGREEMENT-CHK-SEC           SECTION.
+      *
+           IF      SPA-GMN28-AGREEMENT =   SPACE
+               MOVE    SPACE               TO  SPA-GMN28-AGREEMENT-G
+           ELSE
+      *
+               MOVE    ZERO                TO  FLG-OK
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   SPA-GMN28-AGREEMENT-MAX)
+                              OR  (FLG-OK  =   1                )
+                   IF      SPA-GMN28-AGREEMENT
+                                       =   SPA-GMN28-AGREEMENT-LST
+                                                      (IDX) (1:1)
+                       MOVE    SPA-GMN28-AGREEMENT-LST (IDX)
+                                           TO  SPA-GMN28-AGREEMENT-G
+                       MOVE    1           TO  FLG-OK
+                   END-IF
+               END-PERFORM
+               IF      FLG-OK              =   ZERO
+                   MOVE    "2802"          TO  SPA-ERRCD
+                   MOVE    2               TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+           .
+       41012-AGREEMENT-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ¤ªÌô¼êÄ¢£Ñ£Ò¶èÊ¬¥Á¥§¥Ã¥¯½èÍý
@@ -370,8 +446,8 @@
                    END-IF
                END-PERFORM
                IF      FLG-OK              =   ZERO
-                   MOVE    "2801"          TO  SPA-ERRCD
-                   MOVE    1               TO  SPA-GMN26-CUR
+                   MOVE    "2803"          TO  SPA-ERRCD
+                   MOVE    3               TO  SPA-GMN26-CUR
                END-IF
            END-IF
            .
@@ -399,8 +475,8 @@
                    END-IF
                END-PERFORM
                IF      FLG-OK              =   ZERO
-                   MOVE    "2802"          TO  SPA-ERRCD
-                   MOVE    2               TO  SPA-GMN26-CUR
+                   MOVE    "2804"          TO  SPA-ERRCD
+                   MOVE    4               TO  SPA-GMN26-CUR
                END-IF
            END-IF
            .
@@ -415,6 +491,30 @@
       *
            .
        4109-TOUROKU-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Á´³Ñ¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       891-HALF-CHK-SEC         SECTION.
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE    "1"                 TO  KANACHK-SYORI
+           MOVE    WRK-MAE-INPUT       TO  KANACHK-MAE-INPUT
+           MOVE    WRK-MAX             TO  KANACHK-MAX-CNT
+           CALL    "ORCSKANACHK"       USING
+                                       ORCSKANACHKAREA
+           MOVE    KANACHK-MAE-INPUT   TO  WRK-ATO-INPUT
+           IF     (KANACHK-RC          =   ZERO  )  AND
+                  (KANACHK-SYUBETU     =   1     )
+      *        È¾³Ñ
+               MOVE    ZERO                TO  FLG-ERR
+           ELSE
+               MOVE    1                   TO  FLG-ERR
+           END-IF
+      *
+           .
+       891-HALF-CHK-EXT.
            EXIT.
       *
       *****************************************************************

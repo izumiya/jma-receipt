@@ -464,6 +464,9 @@
                WHEN    "GMN"
       *            初期パラメタ、ＳＰＡ初期編集
                    PERFORM 200-P02-SET-SEC
+               WHEN    "API"
+      *            ＡＰＩ初期パラメタ、ＳＰＡ初期編集
+                   PERFORM 300-APIP02-SET-SEC
            END-EVALUATE
       *
       *
@@ -1453,6 +1456,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "1 Ver.1.0"
                                        TO  SPA-GMN28-MNOTE-CSV-LST(1)
            MOVE    1                   TO  SPA-GMN28-CSV-MAX
+      *    情報提供同意有無
+           MOVE    "0 同意しない"
+                                       TO  SPA-GMN28-AGREEMENT-LST(1)
+           MOVE    "1 同意する"
+                                       TO  SPA-GMN28-AGREEMENT-LST(2)
+           MOVE    2                   TO  SPA-GMN28-AGREEMENT-MAX
            .
        1005-COMB-SET-EXT.
            EXIT.
@@ -1980,8 +1989,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            INITIALIZE                  SPA-PTHKNINF-AREA
       *    保険者編集
            INITIALIZE                  PTHKNINF-REC
-           MOVE    PTINF-HOSPNUM       TO  PTHKN-HOSPNUM
-           MOVE    PTINF-PTID          TO  PTHKN-PTID
+           MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTHKN-PTID
       *
            MOVE    PTHKNINF-REC        TO  MCPDATA-REC
            MOVE    "tbl_pthkninf"      TO  MCP-TABLE
@@ -2029,8 +2038,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    公費編集
            INITIALIZE                  SPA-PTKOHINF-AREA
            INITIALIZE                  PTKOHINF-REC
-           MOVE    PTINF-HOSPNUM       TO  PTKOH-HOSPNUM
-           MOVE    PTINF-PTID          TO  PTKOH-PTID
+           MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTKOH-PTID
       *
            MOVE    PTKOHINF-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
@@ -2075,7 +2084,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-      *    受診マスターより
+      *    受付データ
+           IF      ORCSP02-SYORI       =   "API"
+      *        APIの時は編集なし
+               CONTINUE
+           ELSE
+      *
            INITIALIZE                      UKETUKE-REC
            MOVE    SPA-HOSPNUM         TO  UKE-HOSPNUM
            MOVE    SPA-SYSYMD          TO  UKE-UKEYMD
@@ -2094,17 +2108,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
            PERFORM VARYING     IDX     FROM    1  BY  1
                    UNTIL       FLG-UKETUKE     =  1
-             IF      UKE-UKEID           =   ZERO
-                 CONTINUE
-             ELSE
-               MOVE    SPACE               TO  PARA-REC
-               INITIALIZE                      PARA-REC
-               MOVE    "UKETUKE"           TO  PARA-FILEMEI
-               MOVE    IDX                 TO  PARA-EDANUM
-               MOVE    UKETUKE-REC         TO  PARA-DATA-REC
-               PERFORM 400-PARA-INSERT-SEC
-             END-IF
-      ******** WRITE   PARA-REC
+               IF      UKE-UKEID           =   ZERO
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE               TO  PARA-REC
+                   INITIALIZE                      PARA-REC
+                   MOVE    "UKETUKE"           TO  PARA-FILEMEI
+                   MOVE    IDX                 TO  PARA-EDANUM
+                   MOVE    UKETUKE-REC         TO  PARA-DATA-REC
+                   PERFORM 400-PARA-INSERT-SEC
+               END-IF
       *
                MOVE    "tbl_uketuke"       TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -2114,6 +2127,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "tbl_uketuke"       TO  MCP-TABLE
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+           END-IF
+      *
       *
       *    保険組合せより
            INITIALIZE                      HKNCOMBI-REC
@@ -2809,8 +2825,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        10025-PTNUMPUBLIC-SET-SEC           SECTION.
       *
            INITIALIZE                  PTPUBLIC-REC
-           MOVE    PTINF-HOSPNUM       TO  PTPUBLIC-HOSPNUM
-           MOVE    PTINF-PTID          TO  PTPUBLIC-PTID
+           MOVE    SPA-HOSPNUM         TO  PTPUBLIC-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTPUBLIC-PTID
       *
            MOVE    PTPUBLIC-REC        TO  MCPDATA-REC
            MOVE    "tbl_ptnum_public"  TO  MCP-TABLE
@@ -2829,7 +2845,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           MOVE    PTPUBLIC-PATIENT-ID1    TO  SPA-GMN21-PATIENTID1
+           MOVE    PTPUBLIC-PATIENT-ID1    TO  SPA-GMN28-PATIENTID1
+      *    情報提供同意有無
+           MOVE    PTPUBLIC-AGREEMENT  TO  SPA-GMN28-AGREEMENT
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN28-AGREEMENT-MAX )
+               IF      SPA-GMN28-AGREEMENT
+                                       =  SPA-GMN28-AGREEMENT-LST
+                                                  (IDX)(1:1)
+                   MOVE    SPA-GMN28-AGREEMENT-LST (IDX)
+                                       TO  SPA-GMN28-AGREEMENT-G
+                   MOVE    SPA-GMN28-AGREEMENT-MAX    TO  IDX
+               END-IF
+           END-PERFORM
            .
        10025-PTNUMPUBLIC-SET-EXT.
            EXIT.
@@ -2840,8 +2868,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        10028-PTCONF-SET-SEC           SECTION.
       *
            INITIALIZE                  PTCONF-REC
-           MOVE    PTINF-HOSPNUM       TO  PTCONF-HOSPNUM
-           MOVE    PTINF-PTID          TO  PTCONF-PTID
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTCONF-PTID
       *
            MOVE    PTCONF-REC          TO  MCPDATA-REC
            MOVE    "tbl_ptconf"        TO  MCP-TABLE
@@ -3855,8 +3883,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN21-KISEI-ADRS     TO  P02-P021-KISADRS
            MOVE    SPA-GMN21-KISEI-BANTI    TO  P02-P021-KISBANTI
            MOVE    SPA-GMN21-KISEI-TEL      TO  P02-P021-KISTEL
-      *    地域連携ＩＤ
-           MOVE    SPA-GMN21-PATIENTID1     TO  P02-P021-PATIENTID1
            .
        2001-P021-SET-EXT.
            EXIT.
@@ -4611,6 +4637,20 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        2001-P028-SET-SEC         SECTION.
       *
+      *    地域連携ＩＤ
+           MOVE    SPA-GMN28-PATIENTID1     TO  P02-P028-PATIENTID1
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN28-AGREEMENT-MAX )
+               MOVE    SPA-GMN28-AGREEMENT-LST (IDX)
+                                       TO  P02-P028-AGREEMENT-ITEM
+                                                          (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN28-AGREEMENT-MAX
+                                       TO  P02-P028-AGREEMENT-COUNT
+           MOVE    SPA-GMN28-AGREEMENT-G
+                                       TO  P02-P028-AGREEMENT
+      *
            PERFORM VARYING     IDX     FROM    1   BY  1
                     UNTIL    ( IDX     >   SPA-GMN28-QRKBN-MAX )
                MOVE    SPA-GMN28-MNOTE-QRKBN-LST (IDX)
@@ -4633,6 +4673,75 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        2001-P028-SET-EXT.
+           EXIT.
+      *API
+      *****************************************************************
+      *    ＡＰＩ初期パラメタ、ＳＰＡ初期編集
+      *****************************************************************
+       300-APIP02-SET-SEC               SECTION.
+      *
+      *    パラメタファイルのクリア
+           PERFORM 1001-PARA-DEL-SEC
+      *
+           MOVE    SPA-GMN-PTID        TO  WRK-PTID
+           MOVE    SPA-GMN-PTNUM       TO  WRK-PTNUM
+           INITIALIZE                      SPA-P02GMNAREA
+           INITIALIZE                      SPA-P02SCRAREA
+           MOVE    WRK-PTNUM           TO  SPA-GMN-PTNUM
+           MOVE    WRK-PTID            TO  SPA-GMN-PTID
+      *
+      *    システム管理より情報取り込み
+           PERFORM 1003-SYSKAN-SET-SEC
+      *
+      *    保険・公費一覧情報取り込み
+           PERFORM 1004-HKNKOH-SET-SEC
+      *
+      *    その他のコンボ
+           PERFORM 1005-COMB-SET-SEC
+      *
+      *    患者情報取り込み
+           IF     (SPA-P02-SYORI       =   1     )  OR
+                  (SPA-GMN-PTNUM       =   SPACE )
+               CONTINUE
+           ELSE
+      *        患者情報取り込み
+               PERFORM 3001-API-KYOUTU-SET-SEC
+           END-IF
+      *
+           .
+       300-APIP02-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＡＰＩ　患者登録へＳＰＡ、パラメタ設定処理
+      *****************************************************************
+       3001-API-KYOUTU-SET-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  WRK-HKNID-MAX
+           MOVE    ZERO                TO  WRK-KOHID-MAX
+      *
+      *    患者情報編集
+           PERFORM 10021-PTINF-SET-SEC
+      *
+      *    他の情報編集
+           PERFORM 10022-PARA-SET-SEC
+      *ver.4.7
+      *    地域連携編集
+      *    PERFORM 10025-PTNUMPUBLIC-SET-SEC
+      *ver.4.7
+      *    患者個別情報編集
+      *****PERFORM 10028-PTCONF-SET-SEC
+      *
+      *    患者労災情報編集
+           PERFORM 10023-RSIPARA-SET-SEC
+      *
+      *    同一患者識別編集
+      **** PERFORM 10025-PTSAME-SET-SEC
+      *
+      *    前回来院日編集
+      *****PERFORM 10024-LASTYMD-SET-SEC
+           .
+       3001-KYOUTU-SET-EXT.
            EXIT.
       *
       *****************************************************************

@@ -2,6 +2,7 @@ tbl_ptnum_public {
 	HOSPNUM			number(2,0);
 	PTID			number(10);
 	PATIENT_ID_1		varchar(20);
+	AGREEMENT		varchar(1);
 	TERMID			varchar(16);
 	OPID			varchar(16);
 	CREYMD			char(8);

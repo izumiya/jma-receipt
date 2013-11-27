@@ -819,7 +819,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 900-PTPUBLIC-READ-SEC
       *
            IF      FLG-PTPUBLIC        =   ZERO
-               IF      SPA-GMN21-PATIENTID1    =   SPACE
+               IF     (SPA-GMN28-PATIENTID1    =   SPACE )
+                  AND (SPA-GMN28-AGREEMENT     =   SPACE )
       *            地域連携ＩＤが空白なら削除
                    MOVE    PTPUBLIC-REC        TO  MCPDATA-REC
                    MOVE    "DBDELETE"          TO  MCP-FUNC
@@ -838,8 +839,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    PERFORM 2101-PTPUBLIC-UPS-SEC
                END-IF
            ELSE
-               IF      SPA-GMN21-PATIENTID1    NOT =   SPACE
-      *            地域連携情ＩＤあれば登録
+               IF     (SPA-GMN28-PATIENTID1    =   SPACE )
+                  AND (SPA-GMN28-AGREEMENT     =   SPACE )
+                   CONTINUE
+               ELSE
+      *            地域連携情ＩＤ・同意区分あれば登録
                    PERFORM 2101-PTPUBLIC-INS-SEC
                END-IF
            END-IF
@@ -855,8 +859,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-HOSPNUM         TO  PTPUBLIC-HOSPNUM
            MOVE    SPA-GMN-PTID        TO  PTPUBLIC-PTID
       *    入力値編集
-           MOVE    SPA-GMN21-PATIENTID1
+           MOVE    SPA-GMN28-PATIENTID1
                                        TO  PTPUBLIC-PATIENT-ID1
+           MOVE    SPA-GMN28-AGREEMENT
+                                       TO  PTPUBLIC-AGREEMENT
       *    作成年月日
            MOVE    SMCNDATE-YMD        TO  PTPUBLIC-CREYMD
            MOVE    SMCNDATE-YMD        TO  PTPUBLIC-UPYMD
@@ -885,8 +891,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    MCPDATA-REC         TO  PTPUBLIC-REC
       *    入力値編集
-           MOVE    SPA-GMN21-PATIENTID1
+           MOVE    SPA-GMN28-PATIENTID1
                                        TO  PTPUBLIC-PATIENT-ID1
+           MOVE    SPA-GMN28-AGREEMENT
+                                       TO  PTPUBLIC-AGREEMENT
       *    更新年月日
            MOVE    SMCNDATE-YMD        TO  PTPUBLIC-UPYMD
            MOVE    SMCNDATE-HMS        TO  PTPUBLIC-UPHMS

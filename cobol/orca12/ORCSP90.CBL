@@ -669,6 +669,13 @@
                                                DELIMITED   BY  SPACE
                                                INTO   SPA-ERRMSG
                    END-STRING
+      *H25.11
+               WHEN    "K136"
+                   STRING  "警告！"
+                           "生活保護の期間が重複しています。"
+                                               DELIMITED   BY  SPACE
+                                               INTO   SPA-ERRMSG
+                   END-STRING
       *H25.XX
                WHEN    "0143"
                    STRING  "第三者行為はこの画面では変更できません。"
@@ -790,9 +797,6 @@
                                                TO  SPA-ERRMSG
                WHEN    "2118"
                    MOVE    "携帯番号は半角で入力して下さい"
-                                               TO  SPA-ERRMSG
-               WHEN    "2119"
-                   MOVE    "地域連携ＩＤは半角で入力して下さい"
                                                TO  SPA-ERRMSG
       *ver.4.7
       *    受付エラー
@@ -1219,9 +1223,15 @@
       *
       *        個別設定
                WHEN    "2801"
+                   MOVE    "地域連携ＩＤは半角で入力して下さい"
+                                               TO  SPA-ERRMSG
+               WHEN    "2802"
+                   MOVE    "情報提供区分入力エラー"
+                                               TO  SPA-ERRMSG
+               WHEN    "2803"
                    MOVE    "お薬手帳ＱＲコード入力エラー"
                                                    TO  SPA-ERRMSG
-               WHEN    "2802"
+               WHEN    "2804"
                    MOVE    "お薬手帳データフォーマット入力エラー"
                                                    TO  SPA-ERRMSG
       *

@@ -99,6 +99,7 @@
       * 04.07.00     NACL-多々納  11/11/07  地方公費負担額変更対応
       * 04.07.00     NACL-多々納  13/07/XX  第三者行為対応など
       * 04.07.00     NACL-多々納  13/11/01  API保険・公費追加対応
+      * 04.07.00     NACL-多々納  13/11/13  生活保護重複警告対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -465,6 +466,8 @@
                    07  WRK-NAI-JYUCHK              PIC 9(01).
       *            確認年月日警告
                    07  WRK-KOH-KAKUINFLG           PIC 9(01).
+      *v48         重複警告（生保）
+                   07  WRK-NAI-JFKCHKFLG           PIC 9(01).
                05  WRK-KOH-MAX             PIC 9(04).
       *
       *    保険組合せ（ＳＰＡと同じ）
@@ -2007,6 +2010,9 @@
                                            TO  SPA-MAE-KKAKUNINYMD(IDY)
            MOVE    SPA-PTKOH-MAEKAKUNINYMDW(IDX)
                                            TO  SPA-MAE-KKAKUNINYMDW(IDY)
+      *    生保重複警告
+           MOVE    SPA-PTKOH-JFKCHKFLG (IDX)
+                                           TO  SPA-NAI-JFKCHKFLG(IDY)
       *    新規以外の時老人チェック済みとする
            IF      SPA-MAE-KOHNUM (IDY)    NOT =   SPACE
                MOVE    1                   TO  SPA-NAI-AGE65 (IDY)
@@ -2014,6 +2020,8 @@
                MOVE    1                   TO  SPA-NAI-FTNCHK(IDY)
       *        受給者番号警告
                MOVE    1                   TO  SPA-NAI-JYUCHK(IDY)
+      *        生保重複警告
+               MOVE    1                   TO  SPA-NAI-JFKCHKFLG(IDY)
            END-IF
            MOVE    SPA-PTKOH-KAKUINFLG (IDX)
                                            TO  SPA-KOH-KAKUINFLG(IDY)
@@ -2516,12 +2524,12 @@
            PERFORM
                UNTIL   FLG-PARA            =   1
       *
-               MOVE    PARA-DATA-REC       TO  PTRSIINF-REC
-      *v48     IF      PTRSI-KOHID         =   SPA-NAI-TKOH1ID (IDX)
+      *H26.1   MOVE    PARA-DATA-REC       TO  PTRSIINF-REC
+      *        IF      PTRSI-KOHID         =   SPA-NAI-TKOH1ID (IDX)
       *            IF      PTRSI-COMMENT   NOT =   SPACE
       *                MOVE    SPACE               TO  WRK-HKNCOMBI
       *                STRING  SPA-GMN-THKNCOMBIMEI (IDX)
-      *                                            DELIMITED  BY  "  "
+      **                                           DELIMITED  BY  "  "
       *                    "（"                    DELIMITED  BY  SIZE
       *                    PTRSI-COMMENT(1:24)     DELIMITED  BY  SPACE
       *                    "）"                    DELIMITED  BY  SIZE
@@ -2529,9 +2537,9 @@
       *                END-STRING
       *            END-IF
       *            MOVE    WRK-HKNCOMBI        TO  SPA-GMN-THKNCOMBIMEI
-      *                                                            (IDX)
-      *            MOVE    1               TO  FLG-PARA
-      *        END-IF
+      ****                                                         (IDX)
+                   MOVE    1               TO  FLG-PARA
+      ***      END-IF
       *
                IF      FLG-PARA         =   ZERO
                    MOVE    "tbl_para"          TO  MCP-TABLE
@@ -3089,18 +3097,24 @@
                   (P02-P02-KTEKSTYMD1  NOT =   SPA-GMN-KTEKSTYMD(1)) OR
                   (P02-P02-KTEKEDYMD1  NOT =   SPA-GMN-KTEKEDYMD(1))
                MOVE    ZERO                TO  SPA-NAI-AGECHK   (1)
+      *        重複チェック
+               MOVE    ZERO                TO  SPA-NAI-JFKCHKFLG (1)
            END-IF
            IF     (P02-P02-FTNJANUM2   NOT =   SPA-GMN-FTNJANUM (2)) OR
                   (P02-P02-KOHNUM2     NOT =   SPA-GMN-KOHNUM-G (2)) OR
                   (P02-P02-KTEKSTYMD2  NOT =   SPA-GMN-KTEKSTYMD(2)) OR
                   (P02-P02-KTEKEDYMD2  NOT =   SPA-GMN-KTEKEDYMD(2))
                MOVE    ZERO                TO  SPA-NAI-AGECHK   (2)
+      *        重複チェック
+               MOVE    ZERO                TO  SPA-NAI-JFKCHKFLG (2)
            END-IF
            IF     (P02-P02-FTNJANUM3   NOT =   SPA-GMN-FTNJANUM (3)) OR
                   (P02-P02-KOHNUM3     NOT =   SPA-GMN-KOHNUM-G (3)) OR
                   (P02-P02-KTEKSTYMD3  NOT =   SPA-GMN-KTEKSTYMD(3)) OR
                   (P02-P02-KTEKEDYMD3  NOT =   SPA-GMN-KTEKEDYMD(3))
                MOVE    ZERO                TO  SPA-NAI-AGECHK   (3)
+      *        重複チェック
+               MOVE    ZERO                TO  SPA-NAI-JFKCHKFLG (3)
            END-IF
       *    負担者番号警告クリアする
            IF     (P02-P02-FTNJANUM1   NOT =   SPA-GMN-FTNJANUM (1))
@@ -4925,7 +4939,6 @@
       ****************************************************************
        4101-SELNUM-CHK-SEC      SECTION.
       *
-      *
            IF      SPA-GMN-SELNUM  NOT =   ZERO
                MOVE    ZERO                TO  FLG-CHK
                PERFORM VARYING   IDX       FROM    1   BY  1
@@ -5411,6 +5424,7 @@
                                                                   (IDY)
       *
            MOVE    SPA-KOH-KAKUINFLG (IDX) TO  SPA-PTKOH-KAKUINFLG (IDY)
+           MOVE    SPA-NAI-JFKCHKFLG (IDX) TO  SPA-PTKOH-JFKCHKFLG (IDY)
       *
            .
        3102-KOH-SPATBL-HEN-EXT.
@@ -8271,7 +8285,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-GMN-THKNCOMBINUM (WRK-IDXH)
                                        TO  SPA-GMN-SELNUM
            END-IF
-      *
       *
            .
        4901-KARUTE-CHEK-EXT.

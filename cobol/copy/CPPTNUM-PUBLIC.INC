@@ -31,6 +31,8 @@
                05  PTPUBLIC-PTID           PIC  9(10).
       *地域連携ＩＤ
            03  PTPUBLIC-PATIENT-ID1        PIC  X(20).
+      *情報提供同意有無
+           03  PTPUBLIC-AGREEMENT          PIC  X(01).
       *端末ＩＤ
            03  PTPUBLIC-TERMID             PIC  X(16).
       *オペーレータＩＤ

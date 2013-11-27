@@ -562,8 +562,6 @@
                     06  P02-VALUE   PIC X(100).
                   05  P02-P021-KISTEL.
                     06  P02-VALUE   PIC X(15).
-                  05  P02-P021-PATIENTID1.
-                    06  P02-VALUE   PIC X(20).
                 04  P02-FIXPAGE7.
                   05  P02-P024-TSRSELNUM.
                     06  P02-VALUE   PIC X(4).
@@ -842,6 +840,21 @@
                     06  P02-P028-MNOTE-CSV-COUNT   PIC S9(9)   BINARY.
                     06  P02-P028-MNOTE-CSV-ITEM
                             PIC X(50)   OCCURS  20 TIMES.
+                  05  P02-P028-PATIENTID1.
+                    06  P02-VALUE   PIC X(20).
+                  05  P02-P028-AGREEMENT-COMB.
+                    06  P02-P028-AGREEMENT.
+                      07  P02-VALUE   PIC X(20).
+                    06  P02-P028-AGREEMENT-COUNT   PIC S9(9)   BINARY.
+                    06  P02-P028-AGREEMENT-ITEM
+                            PIC X(20)   OCCURS  5 TIMES.
+                  05  P02-P028-YOBI1-CSV-COMB.
+                    06  P02-P028-YOBI1-CSV.
+                      07  P02-VALUE   PIC X(50).
+                    06  P02-P028-YOBI1-CSV-COUNT   PIC S9(9)   BINARY.
+                    06  P02-P028-YOBI1-CSV-ITEM
+                            PIC X(50)   OCCURS  20 TIMES.
+
 
 
 

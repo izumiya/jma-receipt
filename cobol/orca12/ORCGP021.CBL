@@ -457,8 +457,6 @@
                WHEN    21
                    MOVE    "P021_KISTEL"        TO  MCP-WIDGET
                WHEN    22
-                   MOVE    "P021_PATIENTID1"    TO  MCP-WIDGET
-               WHEN    23
                    MOVE    "B08"                TO  MCP-WIDGET
            END-EVALUATE
       *
@@ -515,8 +513,6 @@
                    MOVE    20              TO  SPA-GMN21-CUR
                WHEN    "P021_KISTEL"
                    MOVE    21              TO  SPA-GMN21-CUR
-               WHEN    "P021_PATIENTID1"
-                   MOVE    22              TO  SPA-GMN21-CUR
            END-EVALUATE
       *
            .
@@ -633,8 +629,6 @@
            MOVE    P02-P021-KISADRS    TO  SPA-GMN21-KISEI-ADRS
            MOVE    P02-P021-KISBANTI   TO  SPA-GMN21-KISEI-BANTI
            MOVE    P02-P021-KISTEL     TO  SPA-GMN21-KISEI-TEL
-      *    ÃÏ°èÏ¢·È£É£Ä
-           MOVE    P02-P021-PATIENTID1 TO  SPA-GMN21-PATIENTID1
            .
       *
        4101-GMN-SPA-SET-EXT.
@@ -748,11 +742,6 @@
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (SPA-FLG-END         =   ZERO  )
                PERFORM 4101-KISTEL-CHK-SEC
-           END-IF
-      *    ÃÏ°èÏ¢·È£É£Ä
-           IF     (SPA-ERRCD           =   SPACE )  AND
-                  (SPA-FLG-END         =   ZERO  )
-               PERFORM 4101-PATIENTID1-CHK-SEC
            END-IF
            .
       *
@@ -1243,25 +1232,6 @@
       *
            .
        4101-KISTEL-CHK-EXT.
-           EXIT.
-      *****************************************************************
-      *    ÃÏ°èÏ¢·È£É£Ä¥Á¥§¥Ã¥¯½èÍý
-      *****************************************************************
-       4101-PATIENTID1-CHK-SEC          SECTION.
-      *
-           IF      SPA-GMN21-PATIENTID1    NOT =   SPACE
-               MOVE    SPA-GMN21-PATIENTID1    TO  WRK-MAE-INPUT
-               MOVE    20                      TO  WRK-MAX
-               PERFORM 891-HALF-CHK-SEC
-               MOVE    WRK-ATO-INPUT       TO  SPA-GMN21-PATIENTID1
-               IF      FLG-ERR         NOT =   ZERO
-                   MOVE    "2119"              TO  SPA-ERRCD
-                   MOVE    22                  TO  SPA-GMN21-CUR
-               END-IF
-           END-IF
-      *
-           .
-       4101-PATIENTID1-CHK-EXT.
            EXIT.
       *
       *****************************************************************

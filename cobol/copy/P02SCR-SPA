@@ -331,7 +331,9 @@
       *                    ¼õµë¼ÔÈÖ¹æ·Ù¹ð
                            11  SPA-NAI-JYUCHK              PIC 9(01).
       *                    ³ÎÇ§Ç¯·îÆü·Ù¹ð
-                           11  SPA-KOH-KAKUINFLG        PIC 9(01).
+                           11  SPA-KOH-KAKUINFLG           PIC 9(01).
+      *                    À¸ÊÝ½ÅÊ£·Ù¹ð
+                           11  SPA-NAI-JFKCHKFLG           PIC 9(01).
       *
                        09  SPA-KOH-MAX             PIC 9(04).
       *            ÂÐ¾Ý³«»Ï°ÌÃÖ
@@ -565,6 +567,8 @@
                        09  SPA-PTKOH-KEIFLG            PIC X(01).
       *                ³ÎÇ§Ç¯·îÆü·Ù¹ð
                        09  SPA-PTKOH-KAKUINFLG         PIC 9(01).
+      *                À¸ÊÝ½ÅÊ£·Ù¹ð
+                       09  SPA-PTKOH-JFKCHKFLG         PIC 9(01).
       *
                    07  SPA-PTKOH-MAX               PIC 9(04).
       *
@@ -792,10 +796,6 @@
                    07  SPA-GMN21-KISEI-ADRS        PIC X(100).
                    07  SPA-GMN21-KISEI-BANTI       PIC X(100).
                    07  SPA-GMN21-KISEI-TEL         PIC X(15).
-      *            ´µ¼ÔÃÏ°èÏ¢·ÈÎÎ°è
-                   07  SPA-GMN21-PTPUBLIC-AREA.
-      *                ÃÏ°èÏ¢·È£É£Ä
-                       09  SPA-GMN21-PATIENTID1        PIC X(20).
       *
                05  SPA-NAI21-AREA.
                    07  SPA-MAE-RENRAKU-ADRS        PIC X(100).
@@ -1159,6 +1159,29 @@
                    07  SPA-GMN28-MNOTE-CSV-LST     PIC X(50)
                                                       OCCURS 20.
                05  SPA-GMN28-CSV-MAX           PIC 9(02).
+      *
+      *        ´µ¼ÔÃÏ°èÏ¢·ÈÎÎ°è
+               05  SPA-GMN28-PTPUBLIC-AREA.
+      *            ÃÏ°èÏ¢·È£É£Ä
+                   07  SPA-GMN28-PATIENTID1        PIC X(20).
+      *            ¾ðÊóÄó¶¡Æ±°ÕÍ­Ìµ
+                   07  SPA-GMN28-AGREEMENT-G.
+                       09  SPA-GMN28-AGREEMENT     PIC X(01).
+                       09  SPA-GMN28-AGREEMENT-F1  PIC X(01).
+                       09  SPA-GMN28-AGREEMENT-MEI PIC X(18).
+                   07  SPA-GMN28-AGREEMENT-COMB.
+                       09  SPA-GMN28-AGREEMENT-LST PIC X(20)
+                                                   OCCURS 5.
+               05  SPA-GMN28-AGREEMENT-MAX         PIC 9(02).
+      *
+               05  SPA-GMN28-YOBI1-CSV-G.
+                   07  SPA-GMN28-YOBI1-CSV         PIC X(01).
+                   07  SPA-GMN28-YOBI1-F1          PIC X(01).
+                   07  SPA-GMN28-YOBI1-CSVMEI      PIC X(48).
+               05  SPA-GMN28-YOBI1-CSV-COMB.
+                   07  SPA-GMN28-YOBI1-CSV-LST     PIC X(50)
+                                                   OCCURS 20.
+               05  SPA-GMN28-YOBI1-MAX         PIC 9(02).
       *
       *
       *    P0201¡ÊÌ¤ÅÐÏ¿¼õÉÕ¼Ô°ìÍ÷¡Ë

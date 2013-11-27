@@ -4104,7 +4104,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    WHEN    6
                        MOVE  "P026_SELNUM"     TO   MCP-WIDGET
                    WHEN    7
-                       MOVE  "P028_MNOTE_QRKBN"     TO   MCP-WIDGET
+                       MOVE  "P028_PATIENTID1" TO   MCP-WIDGET
                END-EVALUATE
            ELSE
                MOVE    SPA-P02-WIDGET          TO  MCP-WIDGET
