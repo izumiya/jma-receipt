@@ -1172,8 +1172,8 @@ P02	{
 					count	int;
 					item	varchar(20)[5];
 				};
-				P028_YOBI1_CSV_COMB	{
-					P028_YOBI1_CSV	{
+				P028_JMAMRVER_COMB	{
+					P028_JMAMRVER	{
 						value	varchar(50);
 					};
 					count	int;

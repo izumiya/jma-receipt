@@ -1462,6 +1462,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "1 同意する"
                                        TO  SPA-GMN28-AGREEMENT-LST(2)
            MOVE    2                   TO  SPA-GMN28-AGREEMENT-MAX
+      *    日医データフォーマット区分
+           MOVE    "1 Ver.?.?"
+                                       TO  SPA-GMN28-JMAMRVER-LST(1)
+           MOVE    1                   TO  SPA-GMN28-JMAMRVER-MAX
            .
        1005-COMB-SET-EXT.
            EXIT.
@@ -2894,6 +2898,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            お薬手帳データフォーマット区分
                        MOVE    PTCONF-CDATA(1:1)
                                            TO  SPA-GMN28-MNOTE-CSV
+                   WHEN    "JMAMRVER"
+      *            日医データフォーマット区分
+                       MOVE    PTCONF-CDATA(1:1)
+                                           TO  SPA-GMN28-JMAMRVER
                END-EVALUATE
                MOVE    "tbl_ptconf"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -2922,6 +2930,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-GMN28-MNOTE-CSV-LST (IDX)
                                        TO  SPA-GMN28-MNOTE-CSV-G
                    MOVE    SPA-GMN28-CSV-MAX       TO  IDX
+               END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN28-JMAMRVER-MAX )
+               IF      SPA-GMN28-JMAMRVER
+                                       =  SPA-GMN28-JMAMRVER-LST
+                                                  (IDX)(1:1)
+                   MOVE    SPA-GMN28-JMAMRVER-LST (IDX)
+                                           TO  SPA-GMN28-JMAMRVER-G
+                   MOVE    SPA-GMN28-JMAMRVER-MAX  TO  IDX
                END-IF
            END-PERFORM
            .
@@ -4670,6 +4689,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN28-CSV-MAX   TO  P02-P028-MNOTE-CSV-COUNT
            MOVE    SPA-GMN28-MNOTE-CSV-G
                                        TO  P02-P028-MNOTE-CSV
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN28-JMAMRVER-MAX )
+               MOVE    SPA-GMN28-JMAMRVER-LST (IDX)
+                                       TO  P02-P028-JMAMRVER-ITEM
+                                                          (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN28-JMAMRVER-MAX  TO  P02-P028-JMAMRVER-COUNT
+           MOVE    SPA-GMN28-JMAMRVER-G
+                                       TO  P02-P028-JMAMRVER
       *
            .
        2001-P028-SET-EXT.

@@ -62,6 +62,7 @@
            03  FLG-PTBYOMEI            PIC 9(01).
            03  FLG-PTNYUINRRK          PIC 9(01).
            03  FLG-HKNJAINF            PIC 9(01).
+           03  FLG-KYUSEIRRK           PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
            03  FLG-HKNEND              PIC 9(01).
@@ -1117,7 +1118,7 @@
            MOVE    SPA-GMN-NAME        TO  SPA-NAME
            MOVE    ZERO                TO  SPA-P02-UKEID
            MOVE    1                   TO  SPA-P02-SYORI
-           MOVE    "INIT"              TO  ORCSP02-SYORI
+           MOVE    "API"               TO  ORCSP02-SYORI
            CALL    "ORCSP02"           USING   ORCSP02AREA
                                                SPA-AREA
                                                SPA-P02KYOUTU
@@ -2689,6 +2690,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        20031-UPDATE-CHK-SEC        SECTION.
       *
+           MOVE    SPA-PTID            TO  SPA-GMN-PTID
+           MOVE    SPA-PTNUM           TO  SPA-GMN-PTNUM
       *    ´ðËÜ¾ðÊó
            PERFORM 200211-PTINF-CHK-SEC
       *    µìÀ«ÍúÎò¥Á¥§¥Ã¥¯
@@ -2709,17 +2712,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
              AND  (SPA-GMN-KANANAME    =   PTINF-KANANAME)
                CONTINUE
            ELSE
-               MOVE    SPA-NAI25-KYU-MAX   TO  IDX
-               IF    ( IDX                         >   ZERO      ) AND
-                     ( SPA-GMN25-KYU-CHGYMD(IDX)   =   SPA-SYSYMD)
-                   CONTINUE
-               ELSE
-      *            ÅöÆü¤ÎµìÀ«¤Ï£±·ï¤Ç¡¢£²£°·ï°Ê¾å¤ÏÅÐÏ¿¤Ç¤­¤Ê¤¤
-                   ADD     1               TO  IDX
-                   IF      IDX             <=  20
-                      MOVE    1                TO  FLG-KYUSEI
-                   END-IF
-               END-IF
+               MOVE    1                   TO  FLG-KYUSEI
            END-IF
            .
        20031-KYUSEI-HEN-EXT.
@@ -2802,6 +2795,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    µìÀ«ÍúÎòÅÐÏ¿½èÍý
       *****************************************************************
        200232-KYUSEI-INS-SEC     SECTION.
+      *
+      *    ÅöÆü¤ÎµìÀ«ÍúÎòÅÐÏ¿ºÑ¤ß¤ÏÅÐÏ¿¤Ê¤·
+           INITIALIZE                      KYUSEIRRK-REC
+           MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
+           MOVE    SPA-PTID            TO  KYUSEI-PTID
+           MOVE    SPA-SYSYMD          TO  KYUSEI-CHGYMD
+           PERFORM 903-KYUSEIRRK-READ-SEC
+           IF      FLG-KYUSEIRRK       =   ZERO
+               GO      TO      200232-KYUSEI-INS-EXT
+           END-IF
       *
            INITIALIZE                      KYUSEIRRK-REC
            MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
@@ -3189,7 +3192,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-PTID            TO  SPA-GMN-PTID
            MOVE    SPA-PTNUM           TO  SPA-GMN-PTNUM
            MOVE    ZERO                TO  SPA-P02-UKEID
-           MOVE    "INIT"              TO  ORCSP02-SYORI
+           MOVE    ZERO                TO  SPA-P02-SYORI
+           MOVE    "API"               TO  ORCSP02-SYORI
            CALL    "ORCSP02"           USING   ORCSP02AREA
                                                SPA-AREA
                                                SPA-P02KYOUTU
@@ -4476,6 +4480,38 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        900-HKNJAINF-READ-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    µìÀ«ÍúÎò¾ðÊó¼èÆÀ
+      *****************************************************************
+       903-KYUSEIRRK-READ-SEC              SECTION.
+      *
+           MOVE    KYUSEIRRK-REC       TO  MCPDATA-REC
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-KYUSEIRRK
+                   MOVE    MCPDATA-REC         TO  KYUSEIRRK-REC
+               ELSE
+                   MOVE    1                   TO  FLG-KYUSEIRRK
+                   INITIALIZE                  KYUSEIRRK-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-KYUSEIRRK
+               INITIALIZE                  KYUSEIRRK-REC
+           END-IF
+           MOVE    "tbl_kyuseirrk"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       903-KYUSEIRRK-READ-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ¥Æ¡¼¥Ö¥ë¸¡º÷½èÍý

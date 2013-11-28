@@ -1174,14 +1174,14 @@
                                                    OCCURS 5.
                05  SPA-GMN28-AGREEMENT-MAX         PIC 9(02).
       *
-               05  SPA-GMN28-YOBI1-CSV-G.
-                   07  SPA-GMN28-YOBI1-CSV         PIC X(01).
-                   07  SPA-GMN28-YOBI1-F1          PIC X(01).
-                   07  SPA-GMN28-YOBI1-CSVMEI      PIC X(48).
-               05  SPA-GMN28-YOBI1-CSV-COMB.
-                   07  SPA-GMN28-YOBI1-CSV-LST     PIC X(50)
+               05  SPA-GMN28-JMAMRVER-G.
+                   07  SPA-GMN28-JMAMRVER          PIC X(01).
+                   07  SPA-GMN28-JMAMRVER-F1       PIC X(01).
+                   07  SPA-GMN28-JMAMRVER-MEI      PIC X(48).
+               05  SPA-GMN28-JMAMRVER-COMB.
+                   07  SPA-GMN28-JMAMRVER-LST      PIC X(50)
                                                    OCCURS 20.
-               05  SPA-GMN28-YOBI1-MAX         PIC 9(02).
+               05  SPA-GMN28-JMAMRVER-MAX         PIC 9(02).
       *
       *
       *    P0201（未登録受付者一覧）

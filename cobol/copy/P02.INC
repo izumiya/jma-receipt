@@ -848,11 +848,11 @@
                     06  P02-P028-AGREEMENT-COUNT   PIC S9(9)   BINARY.
                     06  P02-P028-AGREEMENT-ITEM
                             PIC X(20)   OCCURS  5 TIMES.
-                  05  P02-P028-YOBI1-CSV-COMB.
-                    06  P02-P028-YOBI1-CSV.
+                  05  P02-P028-JMAMRVER-COMB.
+                    06  P02-P028-JMAMRVER.
                       07  P02-VALUE   PIC X(50).
-                    06  P02-P028-YOBI1-CSV-COUNT   PIC S9(9)   BINARY.
-                    06  P02-P028-YOBI1-CSV-ITEM
+                    06  P02-P028-JMAMRVER-COUNT   PIC S9(9)   BINARY.
+                    06  P02-P028-JMAMRVER-ITEM
                             PIC X(50)   OCCURS  20 TIMES.
 
 

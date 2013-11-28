@@ -11179,7 +11179,7 @@
           </widget>
           <widget>
             <class>GtkPandaCombo</class>
-            <name>P028_YOBI1_CSV_COMB</name>
+            <name>P028_JMAMRVER_COMB</name>
             <x>250</x>
             <y>140</y>
             <width>256</width>
@@ -11196,7 +11196,7 @@
             <widget>
               <class>GtkPandaEntry</class>
               <child_name>GtkPandaCombo:entry</child_name>
-              <name>P028_YOBI1_CSV</name>
+              <name>P028_JMAMRVER</name>
               <visible>True</visible>
               <sensitive>True</sensitive>
               <can_focus>True</can_focus>

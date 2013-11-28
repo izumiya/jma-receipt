@@ -936,6 +936,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      211-PTCONF-SYORI-EXT
            END-IF
+      *
+      *    日医データフォーマット区分
+           MOVE    SPA-GMN28-JMAMRVER      TO  WRK-CONF-CDATA
+           MOVE    "JMAMRVER"              TO  WRK-CONF-CKEY
+           PERFORM 2111-PTCONF-DBSYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      211-PTCONF-SYORI-EXT
+           END-IF
            .
        211-PTCONF-SYORI-EXT.
            EXIT.

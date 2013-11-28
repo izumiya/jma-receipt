@@ -228,6 +228,8 @@
                WHEN    04
                    MOVE    "P028_MNOTE_CSV"     TO  MCP-WIDGET
                WHEN    05
+                   MOVE    "P028_JMAMRVER"      TO  MCP-WIDGET
+               WHEN    90
                    MOVE    "B08"                TO  MCP-WIDGET
            END-EVALUATE
       *
@@ -249,6 +251,8 @@
                    MOVE    4           TO  SPA-GMN28-CUR
                WHEN    "P028_MNOTE_CSV"
                    MOVE    5           TO  SPA-GMN28-CUR
+               WHEN    "P028_JMAMRVER"
+                   MOVE    90          TO  SPA-GMN28-CUR
            END-EVALUATE
       *
            .
@@ -347,6 +351,9 @@
       *    情報提供同意有無
            MOVE    P02-P028-AGREEMENT
                                        TO  SPA-GMN28-AGREEMENT-G
+      *    日医データフォーマット区分
+           MOVE    P02-P028-JMAMRVER
+                                       TO  SPA-GMN28-JMAMRVER-G
            .
        4101-GMN-SPA-SET-EXT.
            EXIT.
@@ -371,6 +378,10 @@
       *    お薬手帳ＣＳＶ区分
            IF      SPA-ERRCD           =   SPACE
                PERFORM 41012-MNOTE-CSV-CHK-SEC
+           END-IF
+      *    日医データフォーマット区分
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 41012-JMAMRVER-CHK-SEC
            END-IF
            .
       *
@@ -481,6 +492,35 @@
            END-IF
            .
        41012-MNOTE-CSV-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    日医データフォーマット区分チェック処理
+      *****************************************************************
+       41012-JMAMRVER-CHK-SEC           SECTION.
+      *
+           IF      SPA-GMN28-JMAMRVER  =   SPACE
+               MOVE    SPACE           TO  SPA-GMN28-JMAMRVER-G
+           ELSE
+      *
+               MOVE    ZERO                TO  FLG-OK
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX     >   SPA-GMN28-JMAMRVER-MAX)
+                              OR  (FLG-OK  =   1                )
+                   IF      SPA-GMN28-JMAMRVER
+                                       =   SPA-GMN28-JMAMRVER-LST
+                                                      (IDX) (1:1)
+                       MOVE    SPA-GMN28-JMAMRVER-LST (IDX)
+                                           TO  SPA-GMN28-JMAMRVER-G
+                       MOVE    1           TO  FLG-OK
+                   END-IF
+               END-PERFORM
+               IF      FLG-OK              =   ZERO
+                   MOVE    "2805"          TO  SPA-ERRCD
+                   MOVE    5               TO  SPA-GMN26-CUR
+               END-IF
+           END-IF
+           .
+       41012-JMAMRVER-CHK-EXT.
            EXIT.
       *
       ****************************************************************

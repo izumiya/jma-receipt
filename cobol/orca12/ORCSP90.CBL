@@ -1241,6 +1241,9 @@
                WHEN    "2804"
                    MOVE    "お薬手帳データフォーマット入力エラー"
                                                    TO  SPA-ERRMSG
+               WHEN    "2805"
+                   MOVE    "予備１データフォーマット入力エラー"
+                                                   TO  SPA-ERRMSG
       *
       *        患者番号取得エラー
                WHEN    "8000"
