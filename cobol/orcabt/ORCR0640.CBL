@@ -614,6 +614,7 @@
       *  04.07.07    NACL-ÌçÏÆ    12/09/25  ¥³¥á¥ó¥Èº¹¹þ¼è¤ê»ß¤á¡ÊºßÂð»ýÂ³ÍÛ°µ¡Ë
       *  04.07.08    NACL-ÌçÏÆ    13/01/17  Ê£¿ôËç¥ì¥»¥×¥ÈÊ¬³äÂÐ±þ
       *  04.07.09    NACL-ÌçÏÆ    13/07/01  Æþ±¡ÎÁÂ¾ÊÝ¸±»»Äê»þ¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
+      *  04.07.11    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1048,6 +1049,7 @@
            03  WRK-FTNKEI-SAGAKU2                      PIC S9(09).
            03  WRK-FTNKEI-SAGAKU9                      PIC S9(09).
            03  WRK-FTNKEI-FTN                          PIC 9(09).
+           03  WRK-FTNKEI-GENGAKU                      PIC 9(09).
            03  WRK-FTNKEI2                             PIC 9(09).
            03  WRK-FTNKEI3                             PIC 9(09).
            03  WRK-FTNKEI4                             PIC 9(09).
@@ -1526,7 +1528,11 @@
            03  WK-GENGAKU-RITU                 PIC  9(03).
            03  WK-GENGAKU-RITUX                PIC  9(03).
            03  WK-GENGAKU-KIN                  PIC  9(07).
+           03  WK-GENGAKU-KIN2                 PIC  9(07).
            03  WK-GENGAKU-KTKBN                PIC  9(01).
+      *
+           03  WK-GENGAKU-KEISAN1              PIC  9(07).
+           03  WK-GENGAKU-KEISAN2              PIC  9(07).
       *
            03  WK-GENGAKU-YMD.
                05  WK-GENGAKU-YM               PIC  9(06).
@@ -1573,17 +1579,21 @@
            03  WRK-CYOKI-GENDO2                PIC  9(07).
            03  WRK-JYOGEN-KOH                  PIC  9(07).
            03  WRK-JYOGEN-KOH2                 PIC  9(07).
+           03  WRK-JYOGEN-KOH9                 PIC  9(07).
            03  WRK-JIRITU-TAFTNRUIKEI          PIC  9(07).
            03  WRK-JIRITU-CYUKANSOU            PIC  9(01).
            03  WRK-KOUREI-IRYOHI70             PIC  9(09).
            03  WRK-KOUREI-IRYOHI70X            PIC  9(09).
            03  WRK-FTNKEI-KOH                  PIC  9(07).
-           03  WRK-TAIHI-GENKIN2               PIC  9(07).
+           03  WRK-TAIHI-GENKIN2               PIC  9(07)V9(01).
            03  WRK-TAIHI-GENKIN3               PIC  9(07).
+           03  WRK-TAIHI-GENKIN4               PIC  9(07).
            03  WRK-TAIHI-GENKIN-TBL.
               05  WRK-TAIHI-GENKIN-OCC         OCCURS   4.
                 07  WRK-TAIHI-GENKIN           PIC  9(07).
-                07  WRK-TAIHI-GENKIN-EN        PIC  9(07).
+                07  WRK-TAIHI-GENKIN-EN        PIC  9(07)V9(01).
+           03  WRK-TAIHI-GENKIN-XXX            PIC  9(07).
+           03  WRK-TAIHI-GENKIN-XXX-EN         PIC  9(07).
       *
            03  WRK-FORMALNAME                  PIC  X(300).
       *
@@ -2969,6 +2979,8 @@
       *
            INITIALIZE          WRK-KOHJGNGET-TAISYOKBN-T
       *
+           MOVE      ZERO      TO   WK-GENGAKU-KEISAN2
+      *
            MOVE      ZERO      TO   WRK-TAIHI-ZAINUM
            MOVE      ZERO      TO   WRK-TAIHI-OKIKAE
            MOVE      ZERO      TO   WRK-TAIHI-ZAINUM2
@@ -3430,6 +3442,17 @@
       *    ºÆ·Ç¡¦°ìÉôÉéÃ´¶âÃÖ¤­´¹¤¨ÊÔ½¸
            PERFORM     211A-ICHIBUFUTAN-OKIKAE2-SEC
       *
+      *    ¸º³Û¡Ê±ß¡ËÃÖ¤­´¹¤¨ÊÔ½¸
+           IF   WK-GENGAKUKBN   =   2
+             IF   RECE62-KOUREI   =  "1" OR "2"
+               MOVE      ZERO              TO  RECE62-GENGAKU
+             ELSE
+               IF  RECE62-GENGAKU > WK-GENGAKU-KEISAN2
+                 MOVE  WK-GENGAKU-KEISAN2  TO  RECE62-GENGAKU
+               END-IF
+             END-IF
+           END-IF
+      *
            PERFORM     RECE62-REWRITE-SEC
            .
        210-HENSYU-EXT.
@@ -3486,6 +3509,7 @@
            MOVE     ZERO     TO     WK-GENGAKU-KOHID
            MOVE     ZERO     TO     WK-GENGAKU-RITU
            MOVE     ZERO     TO     WK-GENGAKU-KIN
+           MOVE     ZERO     TO     WK-GENGAKU-KIN2
            MOVE     ZERO     TO     WK-GENGAKU-KTKBN
       *
            MOVE     ZERO     TO     FLG-SAIGAI-TAISYO
@@ -3531,7 +3555,8 @@
       *
             END-IF
       *
-            IF   WK-GENGAKUKBN    =   2
+            IF   (WK-GENGAKUKBN        =   2      )
+            AND  (RECE62-SRYYM         <  "201204")
                    MOVE     ZERO    TO    WK-GENGAKUKBN
             END-IF
       *
@@ -3643,6 +3668,7 @@
                    WHEN          2
                       MOVE    LNK-ORCSJGNGET-NYUJGNGAK
                                        TO  WK-GENGAKU-KIN
+                                           WK-GENGAKU-KIN2
                       IF   WK-GENGAKU-KIN   =  ZERO
                           MOVE   ZERO  TO  WK-GENGAKUKBN
                       END-IF
@@ -16073,6 +16099,8 @@
                 MOVE    WK-GENGAKU-RITU
                                        TO  LNK-KOREIFTNCHK-GENGAKU-RITU
                 MOVE    WK-GENGAKU-KIN TO  LNK-KOREIFTNCHK-GENGAKU-KIN
+                MOVE    WK-GENGAKUKBN-KEISAN
+                                       TO  LNK-KOREIFTNCHK-GENGAKUFLG
                 MOVE    FLG-KOHYONKAIME
                                        TO  LNK-KOREIFTNCHK-KOHYONKAIME
                 MOVE    RECE62-KOUREI  TO  LNK-KOREIFTNCHK-NENREIKBN
@@ -16126,6 +16154,17 @@
       *    ¥ì¥»¥×¥ÈÃæ´Ö¥Õ¥¡¥¤¥ë¤Î¹àÌÜÅ¾Á÷¡ÝÉéÃ´¶â¡Ê£Æ£°£°£²¡Ë
       *****************************************************************
        21044-RECE62-FTN-HENSYU-SEC               SECTION.
+      *
+           IF    SYU-YKZKENNUM   =   2
+              COMPUTE  WK-GENGAKU-KEISAN1 = SYU-TOTAL-HKNTEN
+                                          * 10
+                                          * RECE62-KYURATE
+                                          / 100
+      ***     COMPUTE  WK-GENGAKU-KEISAN1 = WK-GENGAKU-KEISAN1 +  5
+      ***     COMPUTE  WK-GENGAKU-KEISAN1 = WK-GENGAKU-KEISAN1 / 10
+      ***     COMPUTE  WK-GENGAKU-KEISAN1 = WK-GENGAKU-KEISAN1 * 10
+              ADD   WK-GENGAKU-KEISAN1  TO  WK-GENGAKU-KEISAN2
+           END-IF
       *
            IF    SYU-YKZKENNUM  NOT = ZERO
               MOVE    1     TO   FLG-GENMEN-ARI
@@ -16563,8 +16602,10 @@
                  ELSE
                    MOVE    10000     TO   WRK-KINGAKU
                  END-IF
-                 MOVE      WRK-KINGAKU
-                                     TO   WRK-CYOKI-JGNGAK
+                 MOVE  WRK-KINGAKU   TO   WRK-CYOKI-JGNGAK
+                 IF    FLG-KEISAN   =    4
+                   PERFORM 2104426-ICHIBUFTN-GEN-SEC
+                 END-IF
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                  PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                ELSE
@@ -16592,8 +16633,11 @@
                     ELSE
                       MOVE    20000  TO   WRK-KINGAKU
                     END-IF
-                    MOVE      WRK-KINGAKU
+                    MOVE  WRK-KINGAKU
                                      TO   WRK-CYOKI-JGNGAK
+                    IF    FLG-KEISAN   =    4
+                      PERFORM 2104426-ICHIBUFTN-GEN-SEC
+                    END-IF
                     PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                     PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                 ELSE
@@ -16819,8 +16863,10 @@
                  ELSE
                     MOVE   10000      TO   WRK-KINGAKU
                  END-IF
-                 MOVE      WRK-KINGAKU
-                                      TO   WRK-CYOKI-JGNGAK
+                 MOVE  WRK-KINGAKU    TO   WRK-CYOKI-JGNGAK
+                 IF    FLG-KEISAN   =    4
+                   PERFORM 2104426-ICHIBUFTN-GEN-SEC
+                 END-IF
                  PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                  PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                  IF  FLG-ZENKOKUKOHI-NISYU  =  5
@@ -16858,8 +16904,10 @@
                     ELSE
                        MOVE   20000   TO   WRK-KINGAKU
                     END-IF
-                    MOVE      WRK-KINGAKU
-                                      TO   WRK-CYOKI-JGNGAK
+                    MOVE  WRK-KINGAKU TO   WRK-CYOKI-JGNGAK
+                    IF    FLG-KEISAN   =    4
+                      PERFORM 2104426-ICHIBUFTN-GEN-SEC
+                    END-IF
                     PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
                     PERFORM   210442B-ICHIBUFTN-NISYU-HEN-SEC
                 ELSE
@@ -17636,10 +17684,10 @@
       *
            IF   WK-GENGAKUKBN    NOT =   ZERO
       *
-              COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
-                                  * 10
-                                  * RECE62-KYURATE
-                                  / 100
+      ***     COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
+      ***                         * 10
+      ***                         * RECE62-KYURATE
+      ***                         / 100
               EVALUATE   WK-GENGAKUKBN
                 WHEN        1
                   IF  WK-GENGAKU-RITU = 100
@@ -17655,7 +17703,29 @@
                       END-IF
                   END-IF
                 WHEN        2
-                  CONTINUE
+                  MOVE     WRK-FTNKEI   TO   WRK-FTNKEI-GENGAKU
+                  COMPUTE  WRK-FTNKEI-GENGAKU =
+                           WRK-FTNKEI-GENGAKU +  5
+                  COMPUTE  WRK-FTNKEI-GENGAKU =
+                           WRK-FTNKEI-GENGAKU /  10
+                  COMPUTE  WRK-FTNKEI-GENGAKU =
+                           WRK-FTNKEI-GENGAKU *  10
+      *
+                  IF  WRK-FTNKEI < WK-GENGAKU-KIN2
+                    MOVE   ZERO   TO   WRK-FTNKEI
+                  ELSE
+                    COMPUTE  WRK-FTNKEI     =
+                             WRK-FTNKEI     -
+                             WK-GENGAKU-KIN2
+                  END-IF
+      *
+                  IF  WK-GENGAKU-KIN2  <=  WRK-FTNKEI-GENGAKU
+                    MOVE   ZERO   TO   WK-GENGAKU-KIN2
+                  ELSE
+                    COMPUTE  WK-GENGAKU-KIN2   =
+                             WK-GENGAKU-KIN2   -
+                             WRK-FTNKEI-GENGAKU
+                  END-IF
                 WHEN        3
                 WHEN        4
                       MOVE   ZERO     TO   WRK-FTNKEI
@@ -17686,7 +17756,13 @@
                       END-IF
                   END-IF
                 WHEN        2
-                  CONTINUE
+                  IF  WRK-KINGAKU < WK-GENGAKU-KIN
+                    MOVE   ZERO   TO   WRK-KINGAKU
+                  ELSE
+                    COMPUTE  WRK-KINGAKU    =
+                             WRK-KINGAKU    -
+                             WK-GENGAKU-KIN
+                  END-IF
                 WHEN        3
                 WHEN        4
                       MOVE   ZERO     TO   WRK-KINGAKU
@@ -18872,16 +18948,6 @@
                                    WRK-SKJ-FTN(KH-IDX)
                   END-IF
                 ELSE
-      **>        IF  (RECE62-KOUREI              =  "2"  )
-      **>        AND (RECE62-KOHNUM(KH-IDX - 1)  =  "010")
-      **>        AND (SYU-KOHTAIYKZKBN       NOT =  "9"  )
-      **>          COMPUTE  WRK-KEISAN-ZZZ =
-      **>                   SYU-KOH-COMPFTN-ENTANI(IDX3) + 0.5
-      **>          ADD   WRK-KEISAN-ZZZ             TO
-      **>                          RECE62-FTNMONEY(KH-IDX)
-      **>                          RECE62-FTNMONEY-KOJ(KH-IDX)
-      **>          MOVE   1   TO   WRK-KOGAKU-TAISYOGAI(KH-IDX - 1)
-      **>        ELSE
                   IF   (RECE62-EKF-ENCHGKBN-K(KH-IDX) NOT = SPACE)
                   OR   (RECE62-EKF-ENCHGKBN-Y(KH-IDX) NOT = SPACE)
                    IF    RECE62-KOUREI-HANTEIFLG   =   "1"
@@ -18964,7 +19030,6 @@
                                       WRK-SKJ-FTN(KH-IDX)
                    END-IF
                   END-IF
-      **>        END-IF
                 END-IF
       *
                 COMPUTE  WRK-TAIHI-FTNMONEY-EN(KH-IDX)  =
@@ -18982,22 +19047,22 @@
                                        "020"                     )
                   EVALUATE   RECE62-KOHNUM(KH-IDX - 1)
                     WHEN       "010"
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                              (SYU-TOTAL-HKNTEN  * 10 * 5 / 100) + 0.5
-                      ADD      WRK-TAIHI-GENKIN2
-                               TO   WRK-TAIHI-GENKIN-EN(KH-IDX - 1)
                       COMPUTE  WRK-TAIHI-GENKIN2 = SYU-TOTAL-HKNTEN
                                                  * 10
                                                  * 5
                                                  / 100
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                               WRK-TAIHI-GENKIN2 +  5
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                               WRK-TAIHI-GENKIN2 / 10
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                               WRK-TAIHI-GENKIN2 * 10
-                      ADD      WRK-TAIHI-GENKIN2
-                               TO   WRK-TAIHI-GENKIN(KH-IDX - 1)
+                      ADD      WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN-EN(KH-IDX - 1)
+                      MOVE     WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN4
+                      COMPUTE  WRK-TAIHI-GENKIN4 =
+                               WRK-TAIHI-GENKIN4 +  5
+                      COMPUTE  WRK-TAIHI-GENKIN4 =
+                               WRK-TAIHI-GENKIN4 / 10
+                      COMPUTE  WRK-TAIHI-GENKIN4 =
+                               WRK-TAIHI-GENKIN4 * 10
+                      ADD      WRK-TAIHI-GENKIN4  TO
+                                        WRK-TAIHI-GENKIN(KH-IDX - 1)
                     WHEN       "012"
                     WHEN       "051"
                     WHEN       "052"
@@ -19019,16 +19084,18 @@
                                                    * RECE62-KYURATE
                                                    / 100
                       END-IF
-                      ADD      WRK-TAIHI-GENKIN2
-                               TO   WRK-TAIHI-GENKIN-EN(KH-IDX - 1)
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                               WRK-TAIHI-GENKIN2 +  5
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                               WRK-TAIHI-GENKIN2 / 10
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                               WRK-TAIHI-GENKIN2 * 10
-                      ADD      WRK-TAIHI-GENKIN2
-                               TO   WRK-TAIHI-GENKIN(KH-IDX - 1)
+                      ADD      WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN-EN(KH-IDX - 1)
+                      MOVE     WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN4
+                      COMPUTE  WRK-TAIHI-GENKIN4 =
+                               WRK-TAIHI-GENKIN4 +  5
+                      COMPUTE  WRK-TAIHI-GENKIN4 =
+                               WRK-TAIHI-GENKIN4 / 10
+                      COMPUTE  WRK-TAIHI-GENKIN4 =
+                               WRK-TAIHI-GENKIN4 * 10
+                      ADD      WRK-TAIHI-GENKIN4  TO
+                                        WRK-TAIHI-GENKIN(KH-IDX - 1)
                     WHEN       "015"
                     WHEN       "016"
                     WHEN       "021"
@@ -19038,16 +19105,18 @@
                                                  * 10
                                                  * 10
                                                  / 100
-                      ADD      WRK-TAIHI-GENKIN2
-                               TO   WRK-TAIHI-GENKIN-EN(KH-IDX - 1)
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                               WRK-TAIHI-GENKIN2 +  5
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                               WRK-TAIHI-GENKIN2 / 10
-                      COMPUTE  WRK-TAIHI-GENKIN2 =
-                               WRK-TAIHI-GENKIN2 * 10
-                      ADD      WRK-TAIHI-GENKIN2
-                               TO   WRK-TAIHI-GENKIN(KH-IDX - 1)
+                      ADD      WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN-EN(KH-IDX - 1)
+                      MOVE     WRK-TAIHI-GENKIN2  TO
+                                        WRK-TAIHI-GENKIN4
+                      COMPUTE  WRK-TAIHI-GENKIN4 =
+                               WRK-TAIHI-GENKIN4 +  5
+                      COMPUTE  WRK-TAIHI-GENKIN4 =
+                               WRK-TAIHI-GENKIN4 / 10
+                      COMPUTE  WRK-TAIHI-GENKIN4 =
+                               WRK-TAIHI-GENKIN4 * 10
+                      ADD      WRK-TAIHI-GENKIN4  TO
+                                        WRK-TAIHI-GENKIN(KH-IDX - 1)
                   END-EVALUATE
                 END-IF
       *
@@ -19071,13 +19140,18 @@
                                                  * RECE62-KYURATE
                                                  / 100
                     END-IF
-                    ADD      WRK-TAIHI-GENKIN2
-                             TO   WRK-TAIHI-GENKIN-EN(KH-IDX - 1)
-                    COMPUTE  WRK-TAIHI-GENKIN2 = WRK-TAIHI-GENKIN2 +  5
-                    COMPUTE  WRK-TAIHI-GENKIN2 = WRK-TAIHI-GENKIN2 / 10
-                    COMPUTE  WRK-TAIHI-GENKIN2 = WRK-TAIHI-GENKIN2 * 10
-                    ADD      WRK-TAIHI-GENKIN2
-                             TO   WRK-TAIHI-GENKIN(KH-IDX - 1)
+                    ADD      WRK-TAIHI-GENKIN2  TO
+                                      WRK-TAIHI-GENKIN-EN(KH-IDX - 1)
+                    MOVE     WRK-TAIHI-GENKIN2  TO
+                                      WRK-TAIHI-GENKIN4
+                    COMPUTE  WRK-TAIHI-GENKIN4 =
+                             WRK-TAIHI-GENKIN4 +  5
+                    COMPUTE  WRK-TAIHI-GENKIN4 =
+                             WRK-TAIHI-GENKIN4 / 10
+                    COMPUTE  WRK-TAIHI-GENKIN4 =
+                             WRK-TAIHI-GENKIN4 * 10
+                    ADD      WRK-TAIHI-GENKIN4  TO
+                                      WRK-TAIHI-GENKIN(KH-IDX - 1)
                 END-IF
       *
                 IF   RECE62-SRYYM    >=  "200610"
@@ -20919,7 +20993,13 @@
       **>                END-IF
       **>            END-IF
       **>           WHEN        2
-      **>            CONTINUE
+      **>            IF  WRK-KINGAKU-GENBUTU3 < WK-GENGAKU-KIN
+      **>              MOVE   ZERO   TO   WRK-KINGAKU-GENBUTU3
+      **>            ELSE
+      **>              COMPUTE  WRK-KINGAKU-GENBUTU3    =
+      **>                       WRK-KINGAKU-GENBUTU3    -
+      **>                       WK-GENGAKU-KIN
+      **>            END-IF
       **>           WHEN        3
       **>           WHEN        4
       **>                MOVE   ZERO     TO   WRK-KINGAKU-GENBUTU3
@@ -21271,6 +21351,9 @@
                IF   WK-GENGAKUKBN    =   3 OR 4
                     MOVE    "4"      TO   RECE62-KOUREI
                END-IF
+               IF   WK-GENGAKUKBN    =   1 OR 2
+                    MOVE    "1"      TO   RECE62-KOUREI
+               END-IF
       *
                EVALUATE  WRK-TAIHI-OKIKAE
                  WHEN        1
@@ -21426,21 +21509,6 @@
                       PERFORM  210462-GENGAKU-OKIKAE-SEC
                    END-IF
                  END-IF
-      **>      ELSE
-      **>        IF  RECE62-KOHNUM(1) = "972" OR "974"
-      **>          IF   RECE62-KOUREI    = "1" OR "2"
-      **>            IF  RECE62-FTNMONEY(1) >=  FTN-KOH-XXX
-      **>              COMPUTE WRK-TAIHI-GENKIN3  =  RECE62-FTNMONEY(1)
-      **>                                         -  FTN-KOH-XXX
-      **>              COMPUTE RECE62-FTNMONEY(1) =  RECE62-FTNMONEY(2)
-      **>                                         +  WRK-TAIHI-GENKIN3
-      **>              MOVE    RECE62-FTNMONEY(2) TO FTN-KOH-XXX
-      **>            ELSE
-      **>              MOVE    RECE62-FTNMONEY(2) TO RECE62-FTNMONEY(1)
-      **>                                            FTN-KOH-XXX
-      **>            END-IF
-      **>          END-IF
-      **>        END-IF
                END-IF
              END-IF
            END-IF
@@ -22334,6 +22402,7 @@
       *
       *    ¸øÈñ¾å¸Â
            MOVE      ZERO         TO   WRK-JYOGEN-KOH
+                                       WRK-JYOGEN-KOH9
                                        WRK-JIRITU-TAFTNRUIKEI
                                        WRK-JIRITU-CYUKANSOU
            MOVE      ZERO         TO   FLG-IRYOHI70K
@@ -22373,6 +22442,7 @@
              IF     LNK-ORCSJGNGET-RC   =   ZERO
                MOVE    LNK-ORCSJGNGET-NYUJGNGAK
                                         TO  WRK-JYOGEN-KOH
+                                            WRK-JYOGEN-KOH9
                MOVE    LNK-ORCSJGNGET-TAFTNRUIKEI
                                         TO  WRK-JIRITU-TAFTNRUIKEI
              END-IF
@@ -22576,6 +22646,11 @@
               END-IF
            END-IF
       *
+           MOVE   WRK-TAIHI-GENKIN(1)  TO   WRK-TAIHI-GENKIN-XXX
+           COMPUTE  WRK-TAIHI-GENKIN-XXX-EN   =
+                    WRK-TAIHI-GENKIN-EN(1)    +
+                    0.5
+      *
       *    ¸øÈñ¤ÎÉéÃ´·×»»
            IF   WRK-JYOGEN-KOH   =    ZERO
                MOVE    ZERO    TO   WRK-FTNKEI-KOH
@@ -22587,31 +22662,35 @@
                  ELSE
                   IF  (RECE62-KOUREI           =   "2")
                   AND (WRK-KOGAKU-TAISYOGAI(1) =    1 )
-                    IF     WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN-EN(1)
+                    IF     WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN-XXX-EN
                       MOVE  WRK-JYOGEN-KOH      TO WRK-FTNKEI-KOH
                     ELSE
-                      MOVE  WRK-TAIHI-GENKIN-EN(1)
+                      MOVE  WRK-TAIHI-GENKIN-XXX-EN
                                                 TO WRK-FTNKEI-KOH
                     END-IF
                   ELSE
-                    IF     WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN(1)
+                    IF     WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN-XXX
                       MOVE  WRK-JYOGEN-KOH      TO WRK-FTNKEI-KOH
                     ELSE
-                      MOVE  WRK-TAIHI-GENKIN(1) TO WRK-FTNKEI-KOH
+                      MOVE  WRK-TAIHI-GENKIN-XXX
+                                                TO WRK-FTNKEI-KOH
                     END-IF
                   END-IF
                  END-IF
                ELSE
-                 IF        WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN-EN(1)
+                 IF        WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN-XXX-EN
                       MOVE  WRK-JYOGEN-KOH      TO WRK-FTNKEI-KOH
                  ELSE
-                      MOVE  WRK-TAIHI-GENKIN-EN(1)
+                      MOVE  WRK-TAIHI-GENKIN-XXX-EN
                                                 TO WRK-FTNKEI-KOH
                  END-IF
                END-IF
            END-IF
       *
-           IF   RECE62-FTNMONEY(2) = ZERO
+           IF  ((WK-GENGAKUKBN      NOT =   2  ) AND
+                (RECE62-FTNMONEY(2)     =  ZERO))
+           OR  ((WK-GENGAKUKBN          =   2  ) AND
+                (WRK-JYOGEN-KOH9        =  ZERO))
             CONTINUE
            ELSE
             IF   RECE62-KOUREI    =   "1" OR "2"
@@ -22620,20 +22699,24 @@
                                                  RECE62-FTNMONEY-KOJ(2)
               IF    RECE62-FTNMONEY(2)    NOT =  ZERO
               AND   RECE62-KOUREI             =  "1"
-                IF   RECE62-FTNMONEY(2)   <   RECE62-FTNMONEY(1)
+                IF   RECE62-FTNMONEY(2) > WRK-TAIHI-GENKIN3
+                  COMPUTE  WRK-TAIHI-GENKIN4 = RECE62-FTNMONEY(2)
+                                             - WRK-TAIHI-GENKIN3
+                ELSE
+                  MOVE     ZERO        TO  WRK-TAIHI-GENKIN4
+                END-IF
+                IF   RECE62-FTNMONEY(1) > WRK-TAIHI-GENKIN4
                   COMPUTE  RECE62-FTNMONEY(1) =  RECE62-FTNMONEY(1)
-                                              -  RECE62-FTNMONEY(2)
+                                              -  WRK-TAIHI-GENKIN4
                 ELSE
                   MOVE     ZERO        TO  RECE62-FTNMONEY(1)
                 END-IF
-                ADD  WRK-TAIHI-GENKIN3 TO  RECE62-FTNMONEY(1)
-                IF   RECE62-FTNMONEY(2)   <   FTN-KOH-XXX
+                IF   FTN-KOH-XXX        > WRK-TAIHI-GENKIN4
                   COMPUTE  FTN-KOH-XXX        =  FTN-KOH-XXX
-                                              -  RECE62-FTNMONEY(2)
+                                              -  WRK-TAIHI-GENKIN4
                 ELSE
                   MOVE     ZERO        TO  FTN-KOH-XXX
                 END-IF
-                ADD  WRK-TAIHI-GENKIN3 TO  FTN-KOH-XXX
               END-IF
             ELSE
               MOVE   WRK-FTNKEI-KOH          TO  RECE62-FTNMONEY(2)
@@ -22682,7 +22765,13 @@
                                   100
                      END-IF
                    WHEN        2
-                     CONTINUE
+                     IF  WRK-KOH-GENDOGAKU < WK-GENGAKU-KIN
+                       MOVE   ZERO   TO   WRK-KOH-GENDOGAKU
+                     ELSE
+                       COMPUTE  WRK-KOH-GENDOGAKU     =
+                                WRK-KOH-GENDOGAKU     -
+                                WK-GENGAKU-KIN
+                     END-IF
                    WHEN        3
                    WHEN        4
                          MOVE   ZERO     TO   WRK-KOH-GENDOGAKU
@@ -22708,7 +22797,13 @@
                                   100
                      END-IF
                    WHEN        2
-                     CONTINUE
+                     IF  WRK-JYOGEN-KOH < WK-GENGAKU-KIN
+                       MOVE   ZERO   TO   WRK-JYOGEN-KOH
+                     ELSE
+                       COMPUTE  WRK-JYOGEN-KOH     =
+                                WRK-JYOGEN-KOH     -
+                                WK-GENGAKU-KIN
+                     END-IF
                    WHEN        3
                    WHEN        4
                          MOVE   ZERO     TO   WRK-JYOGEN-KOH
@@ -22718,6 +22813,79 @@
                  COMPUTE  WRK-JYOGEN-KOH = WRK-JYOGEN-KOH * 10
              END-IF
             END-IF
+           END-IF
+      *
+           MOVE     WRK-TAIHI-GENKIN(KOHFTN-IDX)
+                                     TO   WRK-TAIHI-GENKIN-XXX
+           COMPUTE  WRK-TAIHI-GENKIN-XXX-EN         =
+                    WRK-TAIHI-GENKIN-EN(KOHFTN-IDX) +
+                    0.5
+      *
+           IF   ((RECE62-KOHNUM(KOHFTN-IDX)      = "051") AND
+                 (TBL-DOTANDOKU-FLG(KOHFTN-IDX)  =   1  ))
+           OR   ((WRK-PREFNUM                    = "13" ) AND
+                 (RECE62-KOHNUM(KOHFTN-IDX)      = "151") AND
+                 (RECE62-SRYYM               <  "200905"))
+             CONTINUE
+           ELSE
+             IF  WRK-TAIHI-GENKIN-XXX   NOT =  ZERO
+                 EVALUATE   WK-GENGAKUKBN
+                   WHEN        1
+                     IF  WK-GENGAKU-RITU = 100
+                       MOVE   ZERO     TO   WRK-TAIHI-GENKIN-XXX
+                     ELSE
+                       COMPUTE  WK-GENGAKU-RITUX         =
+                                100 - WK-GENGAKU-RITU
+                       COMPUTE  WRK-TAIHI-GENKIN-XXX     =
+                                WRK-TAIHI-GENKIN-XXX     *
+                                WK-GENGAKU-RITUX         /
+                                100
+                     END-IF
+                   WHEN        2
+                     IF  WRK-TAIHI-GENKIN-XXX < WK-GENGAKU-KIN
+                       MOVE   ZERO     TO   WRK-TAIHI-GENKIN-XXX
+                     ELSE
+                       COMPUTE  WRK-TAIHI-GENKIN-XXX      =
+                                WRK-TAIHI-GENKIN-XXX      -
+                                WK-GENGAKU-KIN
+                     END-IF
+                   WHEN        3
+                   WHEN        4
+                       MOVE   ZERO     TO   WRK-TAIHI-GENKIN-XXX
+                 END-EVALUATE
+                 COMPUTE  WRK-TAIHI-GENKIN-XXX =
+                          WRK-TAIHI-GENKIN-XXX +  5
+                 COMPUTE  WRK-TAIHI-GENKIN-XXX =
+                          WRK-TAIHI-GENKIN-XXX / 10
+                 COMPUTE  WRK-TAIHI-GENKIN-XXX =
+                          WRK-TAIHI-GENKIN-XXX * 10
+             END-IF
+             IF  WRK-TAIHI-GENKIN-XXX-EN   NOT =  ZERO
+                 EVALUATE   WK-GENGAKUKBN
+                   WHEN        1
+                     IF  WK-GENGAKU-RITU = 100
+                       MOVE   ZERO     TO   WRK-TAIHI-GENKIN-XXX-EN
+                     ELSE
+                       COMPUTE  WK-GENGAKU-RITUX         =
+                                100 - WK-GENGAKU-RITU
+                       COMPUTE  WRK-TAIHI-GENKIN-XXX-EN  =
+                                WRK-TAIHI-GENKIN-XXX-EN  *
+                                WK-GENGAKU-RITUX         /
+                                100
+                     END-IF
+                   WHEN        2
+                     IF  WRK-TAIHI-GENKIN-XXX-EN < WK-GENGAKU-KIN
+                       MOVE   ZERO     TO   WRK-TAIHI-GENKIN-XXX-EN
+                     ELSE
+                       COMPUTE  WRK-TAIHI-GENKIN-XXX-EN   =
+                                WRK-TAIHI-GENKIN-XXX-EN   -
+                                WK-GENGAKU-KIN
+                     END-IF
+                   WHEN        3
+                   WHEN        4
+                       MOVE   ZERO     TO   WRK-TAIHI-GENKIN-XXX-EN
+                 END-EVALUATE
+             END-IF
            END-IF
       *
            IF  RECE62-KOHNUM(KOHFTN-IDX) = "038"
@@ -22751,7 +22919,10 @@
            END-IF
       *
       *    ¸øÈñ¤ÎÉéÃ´·×»»
-           IF  ( RECE62-FTNMONEY(KOHFTN-IDX + 1)   =  ZERO   )
+           IF  ((WK-GENGAKUKBN                 NOT =   2    ) AND
+                (RECE62-FTNMONEY(KOHFTN-IDX + 1)   =  ZERO  ))
+           OR  ((WK-GENGAKUKBN                     =   2    ) AND
+                (TBL-HKNFTNDATA-JGN(KOHFTN-IDX)    =  ZERO  ))
            OR  ( TBL-HKNFTNDATA-FLG(KOHFTN-IDX)    =  1 OR 2 )
             CONTINUE
            ELSE
@@ -22759,17 +22930,16 @@
                MOVE    ZERO    TO   WRK-FTNKEI-KOH
             ELSE
              IF  RECE62-KOUREI    =   "1"
-               IF   WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN(KOHFTN-IDX)
+               IF   WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN-XXX
                   MOVE  WRK-JYOGEN-KOH       TO   WRK-FTNKEI-KOH
                ELSE
-                  MOVE  WRK-TAIHI-GENKIN(KOHFTN-IDX)
-                                             TO   WRK-FTNKEI-KOH
+                  MOVE  WRK-TAIHI-GENKIN-XXX TO   WRK-FTNKEI-KOH
                END-IF
              ELSE
-               IF   WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN-EN(KOHFTN-IDX)
+               IF   WRK-JYOGEN-KOH  <  WRK-TAIHI-GENKIN-XXX-EN
                   MOVE  WRK-JYOGEN-KOH       TO   WRK-FTNKEI-KOH
                ELSE
-                  MOVE  WRK-TAIHI-GENKIN-EN(KOHFTN-IDX)
+                  MOVE  WRK-TAIHI-GENKIN-XXX-EN
                                              TO   WRK-FTNKEI-KOH
                END-IF
              END-IF
@@ -22991,7 +23161,13 @@
                    END-IF
                  END-IF
                WHEN        2
-                 CONTINUE
+                 IF  WRK-KINGAKU3 < WK-GENGAKU-KIN
+                   MOVE   ZERO   TO   WRK-KINGAKU3
+                 ELSE
+                   COMPUTE  WRK-KINGAKU3     =
+                            WRK-KINGAKU3     -
+                            WK-GENGAKU-KIN
+                 END-IF
                WHEN        3
                WHEN        4
                  MOVE   ZERO     TO   WRK-KINGAKU3

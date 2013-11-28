@@ -59,6 +59,8 @@
       *                                     ¡Ê£±±ßÃ±°Ì¡Ë¡ÊÈ½ÄêÍÑ¡Ë¤ÎÊÔ½¸ÄÉ²Ã
       *                                     ¸øÈñ¤ò´Þ¤à¾ì¹ç¤Î¼çÊÝ¸±¤Î°ìÉôÉéÃ´³Û
       *                                     ¤ÎÊÔ½¸½¤Àµ
+      *
+      *  04.07.02    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -78,17 +80,13 @@
            03  FLG-PTINF             PIC 9(01).
            03  FLG-HKNCOMBI          PIC 9(01).
            03  FLG-SYUNOU            PIC 9(01).
-           03  FLG-ZENKOH-ARI        PIC 9(01).
            03  FLG-PTHKNINF          PIC 9(01).
            03  FLG-TOKUREI-HKNJYA    PIC 9(01).
-           03  FLG-PTKOHINF          PIC 9(01).
            03  FLG-CYOKINOMI         PIC 9(01).
-           03  FLG-KOHHEI            PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX1                  PIC 9(04).
-           03  IDX2                  PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -96,18 +94,14 @@
              04  WRK-HKNCOMBINUM-OCC    OCCURS  50.
                05  WRK-HKNCOMBINUM   PIC 9(04).
                05  WRK-KYURATE       PIC 9(03).
-               05  WRK-ZENKOH-ARI    PIC 9(01).
            03  WRK-FTNKEI            PIC 9(09).
            03  WRK-FTNKEI2           PIC 9(09).
            03  WRK-KINGAKU           PIC 9(09).
-           03  WRK-KINGAKU2          PIC 9(09).
            03  WRK-FTN-KOH-XXX       PIC 9(09).
            03  WRK-FTN-KOH-YYY       PIC 9(09).
            03  WRK-GENGAKU-RITUX     PIC 9(03).
-      *
-           03  WRK-DOTANDOKU-TBL.
-             04  WRK-DOTANDOKU-OCC      OCCURS   4.
-               05  WRK-DOTANDOKU     PIC 9(01).
+           03  WRK-FTNKEI-GENGAKU    PIC 9(09).
+           03  WRK-GENGAKU-KIN       PIC 9(07).
       *
            03  WRK-CYOKI-HKNCOMBINUM PIC 9(04).
            03  WRK-KOHID-CYOKI       PIC 9(10).
@@ -130,10 +124,6 @@
       *    ´µ¼ÔÊÝ¸±¾ðÊó
        01  PTHKNINF-REC.
            COPY    "CPPTHKNINF.INC".
-      *
-      *    ´µ¼Ô¸øÈñ¾ðÊó
-       01  PTKOHINF-REC.
-           COPY    "CPPTKOHINF.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -235,86 +225,8 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                             (FLG-HKNCOMBI  NOT =   ZERO)
       *
                    ADD     1     TO     IDX1
-                   MOVE    COMB-HKNCOMBINUM  TO
-                                     WRK-HKNCOMBINUM(IDX1)
-      ***
-                   INITIALIZE        WRK-DOTANDOKU-TBL
-      *
-                   IF  (LNK-KOREIFTNCHK-PREFNUM   = "01"    )
-                   AND (LNK-KOREIFTNCHK-SRYYM    >= "200510")
-                   AND (LNK-KOREIFTNCHK-SRYYM    <  "200810")
-      *
-                     PERFORM    VARYING   IDX2    FROM   1   BY   1
-                                 UNTIL    IDX2      >    4
-      *
-                      IF  COMB-KOHHKNNUM(IDX2) = "051"
-                        INITIALIZE                       PTKOHINF-REC
-                        MOVE LNK-KOREIFTNCHK-HOSPNUM TO  PTKOH-HOSPNUM
-                        MOVE LNK-KOREIFTNCHK-PTID    TO  PTKOH-PTID
-                        MOVE COMB-KOHID(IDX2)        TO  PTKOH-KOHID
-                        MOVE "tbl_ptkohinf"          TO  MCP-TABLE
-                        MOVE "key8"                  TO  MCP-PATHNAME
-                        PERFORM 900-PTKOHINF-SELECT-SEC
-                        IF      FLG-PTKOHINF         =       ZERO
-                            MOVE    "tbl_ptkohinf"   TO  MCP-TABLE
-                            MOVE    "key8"           TO  MCP-PATHNAME
-                            PERFORM 910-PTKOHINF-READ-SEC
-                            IF      FLG-PTKOHINF     =       ZERO
-                              IF (PTKOH-JKYSNUM(1:2) >= "91"
-                                                 AND <= "95")
-                              OR (PTKOH-JKYSNUM(1:2) >= "71"
-                                                 AND <= "88")
-                                  MOVE   1   TO  WRK-DOTANDOKU(IDX2)
-                              END-IF
-                            END-IF
-                        END-IF
-                        MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                        MOVE    "key8"               TO  MCP-PATHNAME
-                        PERFORM  920-DB-CLOSE-SEC
-                      END-IF
-      *
-                     END-PERFORM
-      *
-                   END-IF
-      ***
-                   IF   COMB-KOH1HKNNUM =  "027"
-                     IF ((COMB-KOH2HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ) AND
-                         (WRK-DOTANDOKU(2)         =  ZERO   ))
-                     OR ((COMB-KOH3HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ) AND
-                         (WRK-DOTANDOKU(3)         =  ZERO   ))
-                     OR ((COMB-KOH4HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ) AND
-                         (WRK-DOTANDOKU(4)         =  ZERO   ))
-                        MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
-                     END-IF
-                   ELSE
-                     IF ((COMB-KOH1HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH1HKNNUM(1:2) NOT = "99"    ) AND
-                         (WRK-DOTANDOKU(1)         =  ZERO   ))
-                     OR ((COMB-KOH2HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH2HKNNUM(1:2) NOT = "99"    ) AND
-                         (WRK-DOTANDOKU(2)         =  ZERO   ))
-                     OR ((COMB-KOH3HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH3HKNNUM(1:2) NOT = "99"    ) AND
-                         (WRK-DOTANDOKU(3)         =  ZERO   ))
-                     OR ((COMB-KOH4HKNNUM(1:1)  =  "0" OR "9") AND
-                         (COMB-KOH4HKNNUM(1:2) NOT = "99"    ) AND
-                         (WRK-DOTANDOKU(4)         =  ZERO   ))
-                     OR ((LNK-KOREIFTNCHK-PREFNUM  = "13"    ) AND
-                         (COMB-KOH1HKNNUM          = "151"   ) AND
-                         (LNK-KOREIFTNCHK-SRYYM   >= "200905"))
-                     OR ((LNK-KOREIFTNCHK-PREFNUM  = "23"    ) AND
-                         (COMB-KOH1HKNNUM          = "191"   ) AND
-                         (LNK-KOREIFTNCHK-SRYYM   >= "200910"))
-                     OR ((LNK-KOREIFTNCHK-PREFNUM  =
-                                             "23" OR "24"    ) AND
-                         (COMB-KOH1HKNNUM          = "152"   ) AND
-                         (LNK-KOREIFTNCHK-SRYYM   >= "201104"))
-                        MOVE     1    TO   WRK-ZENKOH-ARI(IDX1)
-                     END-IF
-                   END-IF
+                   MOVE    COMB-HKNCOMBINUM
+                                 TO     WRK-HKNCOMBINUM(IDX1)
                    PERFORM   210-KYURATE-HENSYU-SEC
       *
                    MOVE   "tbl_hkncombi"   TO  MCP-TABLE
@@ -327,10 +239,10 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
            MOVE     "key5"           TO  MCP-PATHNAME
            PERFORM   920-DB-CLOSE-SEC
       *
+           MOVE    LNK-KOREIFTNCHK-GENGAKU-KIN  TO  WRK-GENGAKU-KIN
       *    ¼ýÇ¼¥Þ¥¹¥¿¤«¤é°ìÉôÉéÃ´³Û¥Á¥§¥Ã¥¯Åù
            MOVE       ZERO      TO    FLG-CYOKINOMI
            MOVE       ZERO      TO    WRK-CYOKI-HKNCOMBINUM
-           MOVE       ZERO      TO    FLG-KOHHEI
            IF      LNK-KOREIFTNCHK-NYUGAIKBN  =  "1"
                PERFORM       220-NYUIN-SYUKEI-SEC
            ELSE
@@ -361,15 +273,6 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                       IF  COMB-KOH1HKNNUM = "972" OR "974"
                        MOVE   COMB-KOH1ID      TO  WRK-KOHID-CYOKI
                       END-IF
-                      IF  COMB-KOH2HKNNUM = "972" OR "974"
-                       MOVE   COMB-KOH2ID      TO  WRK-KOHID-CYOKI
-                      END-IF
-                      IF  COMB-KOH3HKNNUM = "972" OR "974"
-                       MOVE   COMB-KOH3ID      TO  WRK-KOHID-CYOKI
-                      END-IF
-                      IF  COMB-KOH4HKNNUM = "972" OR "974"
-                       MOVE   COMB-KOH4ID      TO  WRK-KOHID-CYOKI
-                      END-IF
                     END-IF
                   END-IF
                   MOVE  "tbl_hkncombi"         TO  MCP-TABLE
@@ -379,10 +282,6 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                   IF  LNK-KOREIFTNCHK-KOHID-CYOKI  NOT = ZERO
                   AND LNK-KOREIFTNCHK-KOHID-CYOKI   =
                                               WRK-KOHID-CYOKI
-      ***           IF   FLG-KOHHEI =  1
-      ***             MOVE  LNK-KOREIFTNCHK-KOHFTNGAKU
-      ***                      TO  LNK-KOREIFTNCHK-ICHIBUGAKU
-      ***           END-IF
                     CONTINUE
                   ELSE
                     INITIALIZE     LNK-KOREIFTNCHK-OUT-AREA
@@ -598,43 +497,6 @@ grpsys     MOVE   LNK-KOREIFTNCHK-HOSPNUM
       *****************************************************************
        220-NYUIN-SYUKEI-SEC            SECTION.
       *
-      *    Á´¹ñ¸øÈñ¤ò´Þ¤àÊÝ¸±ÁÈ¹ç¤ï¤»¤Î¼ýÇ¼¤¬¤¢¤ë¤«¥Á¥§¥Ã¥¯
-           PERFORM   VARYING   IDX1   FROM  1  BY  1
-                 UNTIL   (IDX1                  >    50 )   OR
-                         (WRK-HKNCOMBINUM(IDX1) =   ZERO)
-      *
-              IF   WRK-ZENKOH-ARI(IDX1)  =  1
-                 INITIALIZE                            SYUNOU-REC
-grpsys           MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
-                 MOVE    LNK-KOREIFTNCHK-NYUGAIKBN TO  SYU-NYUGAIKBN
-                 MOVE    LNK-KOREIFTNCHK-PTID      TO  SYU-PTID
-                 MOVE    LNK-KOREIFTNCHK-SRYYM     TO  SYU-SRYYMD(1:6)
-                 MOVE    "__"                      TO  SYU-SRYYMD(7:2)
-                 MOVE    WRK-HKNCOMBINUM(IDX1)     TO  SYU-HKNCOMBINUM
-                 MOVE    "tbl_syunou"              TO  MCP-TABLE
-                 MOVE    "key19"                   TO  MCP-PATHNAME
-                 PERFORM 900-SYUNOU-SELECT-SEC
-                 IF      FLG-SYUNOU            NOT =   ZERO
-                     MOVE    01                TO  LNK-KOREIFTNCHK-RC
-                     GO  TO  220-NYUIN-SYUKEI-EXT
-                 ELSE
-                     MOVE   "tbl_syunou"           TO  MCP-TABLE
-                     MOVE   "key19"                TO  MCP-PATHNAME
-                     PERFORM 910-SYUNOU-READ-SEC
-                     IF    FLG-SYUNOU   =    ZERO
-                         MOVE    1    TO    FLG-ZENKOH-ARI
-                         MOVE   50    TO    IDX1
-                     END-IF
-                 END-IF
-      *
-                 MOVE     "tbl_syunou"             TO  MCP-TABLE
-                 MOVE     "key19"                  TO  MCP-PATHNAME
-                 PERFORM   920-DB-CLOSE-SEC
-      *
-              END-IF
-      *
-           END-PERFORM
-      *
       *    °ìÉôÉéÃ´³Û¥Á¥§¥Ã¥¯
            PERFORM   VARYING   IDX1   FROM  1  BY  1
                  UNTIL   (IDX1                  >    50 )   OR
@@ -660,32 +522,23 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                   PERFORM  UNTIL
                              (FLG-SYUNOU        =    1)
       *
-                   IF    (SYU-KOH-HKNNUM(1) =  "972" OR "974")
-                   OR    (SYU-KOH-HKNNUM(2) =  "972" OR "974")
-                   OR    (SYU-KOH-HKNNUM(3) =  "972" OR "974")
-                   OR    (SYU-KOH-HKNNUM(4) =  "972" OR "974")
+                   IF     SYU-KOH-HKNNUM(1) =  "972" OR "974"
                       IF    FLG-CYOKINOMI   =  ZERO
                          MOVE     1     TO    FLG-CYOKINOMI
                          MOVE   WRK-HKNCOMBINUM(IDX1)
                                         TO    WRK-CYOKI-HKNCOMBINUM
                       END-IF
-                      IF (SYU-KOH-HKNNUM(2) =  "972" OR "974")
-                      OR (SYU-KOH-HKNNUM(3) =  "972" OR "974")
-                      OR (SYU-KOH-HKNNUM(4) =  "972" OR "974")
-                         MOVE     1     TO    FLG-KOHHEI
-                      END-IF
+      *
+                      EVALUATE   LNK-KOREIFTNCHK-NENREIKBN
+                        WHEN       "1"
+                          PERFORM     2201-NYUIN-KOREI-SYUKEI-SEC
+                        WHEN       "2"
+                          PERFORM     2202-NYUGAI-WAKODO-SYUKEI-SEC
+                      END-EVALUATE
                    ELSE
-                         MOVE     9     TO    FLG-CYOKINOMI
-                         MOVE   ZERO    TO    WRK-CYOKI-HKNCOMBINUM
+                      MOVE        9     TO    FLG-CYOKINOMI
+                      MOVE      ZERO    TO    WRK-CYOKI-HKNCOMBINUM
                    END-IF
-      *
-                   EVALUATE   LNK-KOREIFTNCHK-NENREIKBN
-                     WHEN       "1"
-                       PERFORM     2201-NYUIN-KOREI-SYUKEI-SEC
-                     WHEN       "2"
-                       PERFORM     2202-NYUGAI-WAKODO-SYUKEI-SEC
-                   END-EVALUATE
-      *
                    MOVE   "tbl_syunou"          TO  MCP-TABLE
                    MOVE   "key19"               TO  MCP-PATHNAME
                    PERFORM 910-SYUNOU-READ-SEC
@@ -707,87 +560,33 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *****************************************************************
        2201-NYUIN-KOREI-SYUKEI-SEC            SECTION.
       *
-           IF  ( SYU-KOH-HKNNUM(1)  =  SPACE  OR "027" )
-           AND ( SYU-KOH-HKNNUM(2)  =  SPACE           )
-           AND ( SYU-KOH-HKNNUM(3)  =  SPACE           )
-           AND ( SYU-KOH-HKNNUM(4)  =  SPACE           )
-             IF   SYU-KOH-HKNNUM(1)  =  "027"
-               ADD  SYU-KOH1COMPFTN  TO  LNK-KOREIFTNCHK-FTNGAKU
-             ELSE
-               ADD  SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
-             END-IF
-           ELSE
-             ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
+           ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *
-             COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
-                                 * 10
-                                 * WRK-KYURATE(IDX1)
-                                 / 100
-             COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
-             COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
-             COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
+           COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
+                               * 10
+                               * WRK-KYURATE(IDX1)
+                               / 100
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
       *
-             IF   ( SYU-KOH-HKNNUM(1)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(3)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(4)   =   "012" OR "025" )
+           IF     SYU-KOH-HKNNUM(1) = "972"
                IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                  MOVE    7500   TO   WRK-KINGAKU
+                  MOVE  5000   TO   WRK-KINGAKU
                ELSE
-                  MOVE    15000  TO   WRK-KINGAKU
+                  MOVE  10000  TO   WRK-KINGAKU
                END-IF
+               PERFORM  270-ICHIBUFTN-GEN-SEC
                PERFORM  260-ICHIBUFTN-KOH-SET-SEC
-             ELSE
-               IF   ( SYU-KOH-HKNNUM(1) =   "972" )
-               OR   ( SYU-KOH-HKNNUM(2) =   "972" )
-               OR   ( SYU-KOH-HKNNUM(3) =   "972" )
-               OR   ( SYU-KOH-HKNNUM(4) =   "972" )
-                 IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                    MOVE  5000   TO   WRK-KINGAKU
-                 ELSE
-                    MOVE  10000  TO   WRK-KINGAKU
-                 END-IF
-                 PERFORM  260-ICHIBUFTN-KOH-SET-SEC
+           END-IF
+           IF     SYU-KOH-HKNNUM(1) = "974"
+               IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
+                  MOVE  10000  TO   WRK-KINGAKU
                ELSE
-                 IF  ( SYU-KOH-HKNNUM(1) = "974" )
-                 OR  ( SYU-KOH-HKNNUM(2) = "974" )
-                 OR  ( SYU-KOH-HKNNUM(3) = "974" )
-                 OR  ( SYU-KOH-HKNNUM(4) = "974" )
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE  10000  TO   WRK-KINGAKU
-                   ELSE
-                      MOVE  20000  TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM  260-ICHIBUFTN-KOH-SET-SEC
-                 ELSE
-                   IF    FLG-ZENKOH-ARI  =  ZERO
-                     PERFORM  22011-NYUIN-KOREI-HEN1-SEC
-                   ELSE
-                     IF ((SYU-KOH-HKNNUM(1)     NOT = "027") AND
-                         (SYU-KOH-HKNNUM(1)(1:1)    = "0"  ))
-                     OR ( SYU-KOH-HKNNUM(2)(1:1)    = "0"   )
-                     OR ( SYU-KOH-HKNNUM(3)(1:1)    = "0"   )
-                     OR ( SYU-KOH-HKNNUM(4)(1:1)    = "0"   )
-                     OR ((LNK-KOREIFTNCHK-PREFNUM  = "13"  ) AND
-                         (SYU-KOH-HKNNUM(1)        = "151" ) AND
-                         (LNK-KOREIFTNCHK-SRYYM >= "200905"))
-                     OR ((LNK-KOREIFTNCHK-PREFNUM  = "23"  ) AND
-                         (SYU-KOH-HKNNUM(1)        = "191" ) AND
-                         (LNK-KOREIFTNCHK-SRYYM >= "200910"))
-                     OR ((LNK-KOREIFTNCHK-PREFNUM  =
-                                             "23" OR "24"  ) AND
-                         (SYU-KOH-HKNNUM(1)        = "152" ) AND
-                         (LNK-KOREIFTNCHK-SRYYM >= "201104"))
-      ***              PERFORM   22012-NYUIN-KOREI-HEN2-SEC
-                       CONTINUE
-                     ELSE
-      ***              PERFORM   22011-NYUIN-KOREI-HEN1-SEC
-                       CONTINUE
-                     END-IF
-                   END-IF
-                 END-IF
+                  MOVE  20000  TO   WRK-KINGAKU
                END-IF
-             END-IF
+               PERFORM  270-ICHIBUFTN-GEN-SEC
+               PERFORM  260-ICHIBUFTN-KOH-SET-SEC
            END-IF
       *
            .
@@ -795,187 +594,43 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
            EXIT.
       *
       *****************************************************************
-      *    °ìÉôÉéÃ´³ÛÊÔ½¸£±¡ÊÆþ±¡¡Ë¡Ê¹âÎð¼Ô¡Ë
-      *****************************************************************
-       22011-NYUIN-KOREI-HEN1-SEC               SECTION.
-      *
-           IF  ((LNK-KOREIFTNCHK-PREFNUM   = "42" ) AND
-                (SYU-KOH-HKNNUM(1)         = "186"))
-                IF  LNK-KOREIFTNCHK-SRYYM   >=  "200610"
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE    22200  TO   WRK-KINGAKU
-                   ELSE
-                      MOVE    44400  TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM    270-ICHIBUFTN-GEN-SEC
-                   PERFORM    260-ICHIBUFTN-KOH-SET-SEC
-                ELSE
-                   MOVE       40200  TO   WRK-KINGAKU
-                   PERFORM    270-ICHIBUFTN-GEN-SEC
-                   PERFORM    260-ICHIBUFTN-KOH-SET-SEC
-                END-IF
-           ELSE
-            IF   LNK-KOREIFTNCHK-TEISYOTOKU   NOT =  SPACE
-              EVALUATE   LNK-KOREIFTNCHK-TEISYOTOKU
-                WHEN  "1"
-                WHEN  "4"
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE   7500      TO   WRK-KINGAKU
-                   ELSE
-                      MOVE   15000     TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM   270-ICHIBUFTN-GEN-SEC
-                   PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-                WHEN  "2"
-                WHEN  "3"
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE   12300     TO   WRK-KINGAKU
-                   ELSE
-                      MOVE   24600     TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM   270-ICHIBUFTN-GEN-SEC
-                   PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-              END-EVALUATE
-            ELSE
-              IF   (  WRK-KYURATE(IDX1)       =  20 OR 30   )
-              AND  (  LNK-KOREIFTNCHK-KEIKASOCHI  =  SPACE  )
-              AND  (  LNK-KOREIFTNCHK-KOHYONKAIME =  ZERO   )
-                IF  LNK-KOREIFTNCHK-SRYYM   >=  "200610"
-                  IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                   COMPUTE LNK-KOREIFTNCHK-CHIHOUGAKU =
-                           LNK-KOREIFTNCHK-CHIHOUGAKU +
-                           (SYU-TOTAL-HKNTEN * 10)
-                   IF   LNK-KOREIFTNCHK-CHIHOUGAKU  >  133500
-                     COMPUTE WRK-KINGAKU2 =
-                     (( LNK-KOREIFTNCHK-CHIHOUGAKU - 133500 ) * 0.01 )
-                                                              + 0.5
-                     COMPUTE WRK-KINGAKU  =  40050 + WRK-KINGAKU2
-                   ELSE
-                     MOVE    40050  TO   WRK-KINGAKU
-                   END-IF
-                  ELSE
-                   COMPUTE LNK-KOREIFTNCHK-CHIHOUGAKU =
-                           LNK-KOREIFTNCHK-CHIHOUGAKU +
-                           (SYU-TOTAL-HKNTEN * 10)
-                   IF   LNK-KOREIFTNCHK-CHIHOUGAKU  >  267000
-                     COMPUTE WRK-KINGAKU2 =
-                     (( LNK-KOREIFTNCHK-CHIHOUGAKU - 267000 ) * 0.01 )
-                                                              + 0.5
-                     COMPUTE WRK-KINGAKU  =  80100 + WRK-KINGAKU2
-                   ELSE
-                     MOVE    80100  TO   WRK-KINGAKU
-                   END-IF
-                  END-IF
-                  PERFORM   270-ICHIBUFTN-GEN-SEC
-                  PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-                ELSE
-                  COMPUTE LNK-KOREIFTNCHK-CHIHOUGAKU =
-                          LNK-KOREIFTNCHK-CHIHOUGAKU +
-                          (SYU-TOTAL-HKNTEN * 10)
-                  IF   LNK-KOREIFTNCHK-CHIHOUGAKU  >  361500
-                    COMPUTE WRK-KINGAKU2 =
-                    (( LNK-KOREIFTNCHK-CHIHOUGAKU - 361500 ) * 0.01 )
-                                                             + 0.5
-                    COMPUTE  WRK-KINGAKU =  72300 + WRK-KINGAKU2
-                  ELSE
-                    MOVE    72300  TO   WRK-KINGAKU
-                  END-IF
-                  PERFORM   270-ICHIBUFTN-GEN-SEC
-                  PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-                END-IF
-              ELSE
-                IF  LNK-KOREIFTNCHK-SRYYM   >=  "200610"
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE    22200  TO   WRK-KINGAKU
-                   ELSE
-                      MOVE    44400  TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM    270-ICHIBUFTN-GEN-SEC
-                   PERFORM    260-ICHIBUFTN-KOH-SET-SEC
-                ELSE
-                   MOVE       40200  TO   WRK-KINGAKU
-                   PERFORM    270-ICHIBUFTN-GEN-SEC
-                   PERFORM    260-ICHIBUFTN-KOH-SET-SEC
-                END-IF
-              END-IF
-            END-IF
-           END-IF
-      *
-           .
-       22011-NYUIN-KOREI-HEN1-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    °ìÉôÉéÃ´³ÛÊÔ½¸£²¡ÊÆþ±¡¡Ë¡Ê¹âÎð¼Ô¡Ë
-      *****************************************************************
-       22012-NYUIN-KOREI-HEN2-SEC               SECTION.
-      *
-           IF  LNK-KOREIFTNCHK-SRYYM   >=  "200610"
-              IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                 MOVE    22200  TO   WRK-KINGAKU
-              ELSE
-                 MOVE    44400  TO   WRK-KINGAKU
-              END-IF
-              PERFORM    260-ICHIBUFTN-KOH-SET-SEC
-           ELSE
-              MOVE       40200  TO   WRK-KINGAKU
-              PERFORM    260-ICHIBUFTN-KOH-SET-SEC
-           END-IF
-      *
-           .
-       22012-NYUIN-KOREI-HEN2-EXT.
-           EXIT.
-      *
-      *****************************************************************
       *    °ìÉôÉéÃ´³Û½¸·×¡ÊÆþ³°¡Ë¡Ê¼ã¿Í¡Ë
       *****************************************************************
        2202-NYUGAI-WAKODO-SYUKEI-SEC            SECTION.
       *
-           IF  ( SYU-KOH-HKNNUM(1)  =  "972" OR "974" )
-           OR  ( SYU-KOH-HKNNUM(2)  =  "972" OR "974" )
-           OR  ( SYU-KOH-HKNNUM(3)  =  "972" OR "974" )
-           OR  ( SYU-KOH-HKNNUM(4)  =  "972" OR "974" )
+           ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *
-               ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
+           COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
+                               * 10
+                               * WRK-KYURATE(IDX1)
+                               / 100
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
+           IF   LNK-KOREIFTNCHK-NYUGAIKBN  =  "1"
+             CONTINUE
+           ELSE
+             COMPUTE  WRK-FTNKEI = WRK-FTNKEI
+                                 + SYU-GRP-SGKMONEY
+           END-IF
       *
-               COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
-                                   * 10
-                                   * WRK-KYURATE(IDX1)
-                                   / 100
-               COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
-               COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
-               COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
-      *
-               IF   LNK-KOREIFTNCHK-NYUGAIKBN  =  "1"
-                 CONTINUE
+           IF     SYU-KOH-HKNNUM(1) = "972"
+               IF  LNK-KOREIFTNCHK-TOKU75 = 3
+                  MOVE  5000   TO   WRK-KINGAKU
                ELSE
-                 COMPUTE  WRK-FTNKEI = WRK-FTNKEI
-                                     + SYU-GRP-SGKMONEY
+                  MOVE  10000  TO   WRK-KINGAKU
                END-IF
-      *
-               IF  ( SYU-KOH-HKNNUM(1)  =  "972" )
-               OR  ( SYU-KOH-HKNNUM(2)  =  "972" )
-               OR  ( SYU-KOH-HKNNUM(3)  =  "972" )
-               OR  ( SYU-KOH-HKNNUM(4)  =  "972" )
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 3
-                      MOVE  5000   TO   WRK-KINGAKU
-                   ELSE
-                      MOVE  10000  TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM  260-ICHIBUFTN-KOH-SET-SEC
+               PERFORM  270-ICHIBUFTN-GEN-SEC
+               PERFORM  260-ICHIBUFTN-KOH-SET-SEC
+           END-IF
+           IF     SYU-KOH-HKNNUM(1) = "974"
+               IF  LNK-KOREIFTNCHK-TOKU75 = 3
+                  MOVE  10000  TO   WRK-KINGAKU
+               ELSE
+                  MOVE  20000  TO   WRK-KINGAKU
                END-IF
-               IF  ( SYU-KOH-HKNNUM(1)  =  "974" )
-               OR  ( SYU-KOH-HKNNUM(2)  =  "974" )
-               OR  ( SYU-KOH-HKNNUM(3)  =  "974" )
-               OR  ( SYU-KOH-HKNNUM(4)  =  "974" )
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 3
-                      MOVE  10000  TO   WRK-KINGAKU
-                   ELSE
-                      MOVE  20000  TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM  260-ICHIBUFTN-KOH-SET-SEC
-               END-IF
-      *
+               PERFORM  270-ICHIBUFTN-GEN-SEC
+               PERFORM  260-ICHIBUFTN-KOH-SET-SEC
            END-IF
       *
            .
@@ -986,43 +641,6 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *    ¼ýÇ¼¥Þ¥¹¥¿¤«¤é°ìÉôÉéÃ´³Û¥Á¥§¥Ã¥¯Åù¡Ê³°Íè¡Ë
       *****************************************************************
        230-GAIRAI-SYUKEI-SEC            SECTION.
-      *
-      *    Á´¹ñ¸øÈñ¤ò´Þ¤àÊÝ¸±ÁÈ¹ç¤ï¤»¤Î¼ýÇ¼¤¬¤¢¤ë¤«¥Á¥§¥Ã¥¯
-           PERFORM   VARYING   IDX1   FROM  1  BY  1
-                 UNTIL   (IDX1                  >    50 )   OR
-                         (WRK-HKNCOMBINUM(IDX1) =   ZERO)
-      *
-              IF   WRK-ZENKOH-ARI(IDX1)  =  1
-                 INITIALIZE                            SYUNOU-REC
-grpsys           MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
-                 MOVE    LNK-KOREIFTNCHK-NYUGAIKBN TO  SYU-NYUGAIKBN
-                 MOVE    LNK-KOREIFTNCHK-PTID      TO  SYU-PTID
-                 MOVE    LNK-KOREIFTNCHK-SRYYM     TO  SYU-SRYYMD(1:6)
-                 MOVE    "__"                      TO  SYU-SRYYMD(7:2)
-                 MOVE    WRK-HKNCOMBINUM(IDX1)     TO  SYU-HKNCOMBINUM
-                 MOVE    "tbl_syunou"              TO  MCP-TABLE
-                 MOVE    "key41"                   TO  MCP-PATHNAME
-                 PERFORM 900-SYUNOU-SELECT-SEC
-                 IF      FLG-SYUNOU            NOT =   ZERO
-                     MOVE    01                TO  LNK-KOREIFTNCHK-RC
-                     GO  TO  230-GAIRAI-SYUKEI-EXT
-                 ELSE
-                     MOVE   "tbl_syunou"           TO  MCP-TABLE
-                     MOVE   "key41"                TO  MCP-PATHNAME
-                     PERFORM 910-SYUNOU-READ-SEC
-                     IF    FLG-SYUNOU   =    ZERO
-                         MOVE    1    TO    FLG-ZENKOH-ARI
-                         MOVE   50    TO    IDX1
-                     END-IF
-                 END-IF
-      *
-                 MOVE     "tbl_syunou"             TO  MCP-TABLE
-                 MOVE     "key41"                  TO  MCP-PATHNAME
-                 PERFORM   920-DB-CLOSE-SEC
-      *
-              END-IF
-      *
-           END-PERFORM
       *
       *    °ìÉôÉéÃ´³Û¥Á¥§¥Ã¥¯
            PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -1049,32 +667,23 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                   PERFORM  UNTIL
                              (FLG-SYUNOU        =    1)
       *
-                   IF    (SYU-KOH-HKNNUM(1) =  "972" OR "974")
-                   OR    (SYU-KOH-HKNNUM(2) =  "972" OR "974")
-                   OR    (SYU-KOH-HKNNUM(3) =  "972" OR "974")
-                   OR    (SYU-KOH-HKNNUM(4) =  "972" OR "974")
+                   IF     SYU-KOH-HKNNUM(1) =  "972" OR "974"
                       IF    FLG-CYOKINOMI   =  ZERO
                          MOVE     1     TO    FLG-CYOKINOMI
                          MOVE   WRK-HKNCOMBINUM(IDX1)
                                         TO    WRK-CYOKI-HKNCOMBINUM
                       END-IF
-                      IF (SYU-KOH-HKNNUM(2) =  "972" OR "974")
-                      OR (SYU-KOH-HKNNUM(3) =  "972" OR "974")
-                      OR (SYU-KOH-HKNNUM(4) =  "972" OR "974")
-                         MOVE     1     TO    FLG-KOHHEI
-                      END-IF
+      *
+                      EVALUATE   LNK-KOREIFTNCHK-NENREIKBN
+                        WHEN       "1"
+                          PERFORM     2301-GAIRAI-KOREI-SYUKEI-SEC
+                        WHEN       "2"
+                          PERFORM     2202-NYUGAI-WAKODO-SYUKEI-SEC
+                      END-EVALUATE
                    ELSE
-                         MOVE     9     TO    FLG-CYOKINOMI
-                         MOVE   ZERO    TO    WRK-CYOKI-HKNCOMBINUM
+                      MOVE        9     TO    FLG-CYOKINOMI
+                      MOVE      ZERO    TO    WRK-CYOKI-HKNCOMBINUM
                    END-IF
-      *
-                   EVALUATE   LNK-KOREIFTNCHK-NENREIKBN
-                     WHEN       "1"
-                       PERFORM     2301-GAIRAI-KOREI-SYUKEI-SEC
-                     WHEN       "2"
-                       PERFORM     2202-NYUGAI-WAKODO-SYUKEI-SEC
-                   END-EVALUATE
-      *
                    MOVE   "tbl_syunou"          TO  MCP-TABLE
                    MOVE   "key41"               TO  MCP-PATHNAME
                    PERFORM 910-SYUNOU-READ-SEC
@@ -1096,169 +705,55 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *****************************************************************
        2301-GAIRAI-KOREI-SYUKEI-SEC            SECTION.
       *
-           IF  ( SYU-KOH-HKNNUM(1)  =  SPACE  OR "027" )
-           AND ( SYU-KOH-HKNNUM(2)  =  SPACE           )
-           AND ( SYU-KOH-HKNNUM(3)  =  SPACE           )
-           AND ( SYU-KOH-HKNNUM(4)  =  SPACE           )
-             IF   SYU-KOH-HKNNUM(1)  =  "027"
-               ADD  SYU-KOH1COMPFTN  TO  LNK-KOREIFTNCHK-FTNGAKU
-             ELSE
-               ADD  SYU-SYUCOMPFTN   TO  LNK-KOREIFTNCHK-FTNGAKU
-             END-IF
-           ELSE
-             ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
+           ADD    SYU-KOH-FTN      TO  LNK-KOREIFTNCHK-KOHFTNGAKU
       *
-             COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
-                                 * 10
-                                 * WRK-KYURATE(IDX1)
-                                 / 100
-             COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
-             COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
-             COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
+           COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
+                               * 10
+                               * WRK-KYURATE(IDX1)
+                               / 100
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
+           COMPUTE  WRK-FTNKEI = WRK-FTNKEI
+                               + SYU-GRP-SGKMONEY
       *
-             COMPUTE  WRK-FTNKEI = WRK-FTNKEI
-                                 + SYU-GRP-SGKMONEY
-      *
-             IF   ( SYU-KOH-HKNNUM(1)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(2)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(3)   =   "012" OR "025" )
-             OR   ( SYU-KOH-HKNNUM(4)   =   "012" OR "025" )
+           IF     SYU-KOH-HKNNUM(1) = "972"
+             IF   LNK-KOREIFTNCHK-TEISYOTOKU  NOT =  SPACE
                IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                  MOVE    4000     TO   WRK-KINGAKU
+                  MOVE  4000     TO   WRK-KINGAKU
                ELSE
-                  MOVE    8000     TO   WRK-KINGAKU
+                  MOVE  8000     TO   WRK-KINGAKU
                END-IF
-               PERFORM    260-ICHIBUFTN-KOH-SET-SEC
+               PERFORM  270-ICHIBUFTN-GEN-SEC
+               PERFORM  260-ICHIBUFTN-KOH-SET-SEC
              ELSE
-               IF   ( SYU-KOH-HKNNUM(1) =   "972" )
-               OR   ( SYU-KOH-HKNNUM(2) =   "972" )
-               OR   ( SYU-KOH-HKNNUM(3) =   "972" )
-               OR   ( SYU-KOH-HKNNUM(4) =   "972" )
-                 IF   LNK-KOREIFTNCHK-TEISYOTOKU  NOT =  SPACE
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE  4000     TO   WRK-KINGAKU
-                   ELSE
-                      MOVE  8000     TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM  260-ICHIBUFTN-KOH-SET-SEC
-                 ELSE
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE  5000     TO   WRK-KINGAKU
-                   ELSE
-                      MOVE  10000    TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM  260-ICHIBUFTN-KOH-SET-SEC
-                 END-IF
+               IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
+                  MOVE  5000     TO   WRK-KINGAKU
                ELSE
-                 IF    FLG-ZENKOH-ARI  =  ZERO
-                   PERFORM  23011-GAIRAI-KOREI-HEN1-SEC
-                 ELSE
-                   IF  ((SYU-KOH-HKNNUM(1)     NOT = "027") AND
-                        (SYU-KOH-HKNNUM(1)(1:1)    = "0"  ))
-                   OR  ( SYU-KOH-HKNNUM(2)(1:1)    = "0"   )
-                   OR  ( SYU-KOH-HKNNUM(3)(1:1)    = "0"   )
-                   OR  ( SYU-KOH-HKNNUM(4)(1:1)    = "0"   )
-                   OR  ((LNK-KOREIFTNCHK-PREFNUM  = "13"  ) AND
-                        (SYU-KOH-HKNNUM(1)        = "151" ) AND
-                        (LNK-KOREIFTNCHK-SRYYM >= "200905"))
-                   OR  ((LNK-KOREIFTNCHK-PREFNUM  = "23"  ) AND
-                        (SYU-KOH-HKNNUM(1)        = "191" ) AND
-                        (LNK-KOREIFTNCHK-SRYYM >= "200910"))
-                   OR  ((LNK-KOREIFTNCHK-PREFNUM  =
-                                            "23" OR "24"  ) AND
-                        (SYU-KOH-HKNNUM(1)        = "152" ) AND
-                        (LNK-KOREIFTNCHK-SRYYM >= "201104"))
-      ***            IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-      ***               MOVE   6000      TO   WRK-KINGAKU
-      ***            ELSE
-      ***               MOVE   12000     TO   WRK-KINGAKU
-      ***            END-IF
-      ***            PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-                     CONTINUE
-                   ELSE
-                     IF   ( WRK-KYURATE(IDX1) =  20 OR 30 )
-                     AND  ((SYU-KOH-HKNNUM(1) = "974"    ) OR
-                           (SYU-KOH-HKNNUM(2) = "974"    ) OR
-                           (SYU-KOH-HKNNUM(3) = "974"    ) OR
-                           (SYU-KOH-HKNNUM(4) = "974"    ))
-                       IF   LNK-KOREIFTNCHK-KEIKASOCHI =  SPACE
-                         IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                            MOVE  10000  TO   WRK-KINGAKU
-                         ELSE
-                            MOVE  20000  TO   WRK-KINGAKU
-                         END-IF
-                         PERFORM  260-ICHIBUFTN-KOH-SET-SEC
-                       ELSE
-                         MOVE     12000  TO   WRK-KINGAKU
-                         PERFORM  260-ICHIBUFTN-KOH-SET-SEC
-                       END-IF
-                     ELSE
-      ***              PERFORM    23011-GAIRAI-KOREI-HEN1-SEC
-                       CONTINUE
-                     END-IF
-                   END-IF
-                 END-IF
+                  MOVE  10000    TO   WRK-KINGAKU
                END-IF
+               PERFORM  270-ICHIBUFTN-GEN-SEC
+               PERFORM  260-ICHIBUFTN-KOH-SET-SEC
+             END-IF
+           END-IF
+           IF     SYU-KOH-HKNNUM(1) = "974"
+             IF   LNK-KOREIFTNCHK-KEIKASOCHI =  SPACE
+               IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
+                  MOVE  10000    TO   WRK-KINGAKU
+               ELSE
+                  MOVE  20000    TO   WRK-KINGAKU
+               END-IF
+               PERFORM  270-ICHIBUFTN-GEN-SEC
+               PERFORM  260-ICHIBUFTN-KOH-SET-SEC
+             ELSE
+               MOVE     12000    TO   WRK-KINGAKU
+               PERFORM  270-ICHIBUFTN-GEN-SEC
+               PERFORM  260-ICHIBUFTN-KOH-SET-SEC
              END-IF
            END-IF
       *
            .
        2301-GAIRAI-KOREI-SYUKEI-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    °ìÉôÉéÃ´³ÛÊÔ½¸£±¡Ê³°Íè¡Ë¡Ê¹âÎð¼Ô¡Ë
-      *****************************************************************
-       23011-GAIRAI-KOREI-HEN1-SEC               SECTION.
-      *
-           IF  ((LNK-KOREIFTNCHK-PREFNUM   = "42" ) AND
-                (SYU-KOH-HKNNUM(1)         = "186"))
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE   6000    TO   WRK-KINGAKU
-                   ELSE
-                      MOVE   12000   TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM   270-ICHIBUFTN-GEN-SEC
-                   PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-           ELSE
-            IF   LNK-KOREIFTNCHK-TEISYOTOKU   NOT =  SPACE
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE   4000    TO   WRK-KINGAKU
-                   ELSE
-                      MOVE   8000    TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM   270-ICHIBUFTN-GEN-SEC
-                   PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-            ELSE
-             IF   (  WRK-KYURATE(IDX1)          =  20 OR 30  )
-             AND  (  LNK-KOREIFTNCHK-KEIKASOCHI =  SPACE     )
-               IF   LNK-KOREIFTNCHK-SRYYM  >=  "200610"
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE   22200   TO   WRK-KINGAKU
-                   ELSE
-                      MOVE   44400   TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM   270-ICHIBUFTN-GEN-SEC
-                   PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-               ELSE
-                   MOVE      40200   TO   WRK-KINGAKU
-                   PERFORM   270-ICHIBUFTN-GEN-SEC
-                   PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-               END-IF
-             ELSE
-                   IF  LNK-KOREIFTNCHK-TOKU75 = 1 OR 2
-                      MOVE   6000    TO   WRK-KINGAKU
-                   ELSE
-                      MOVE   12000   TO   WRK-KINGAKU
-                   END-IF
-                   PERFORM   270-ICHIBUFTN-GEN-SEC
-                   PERFORM   260-ICHIBUFTN-KOH-SET-SEC
-             END-IF
-            END-IF
-           END-IF
-      *
-           .
-       23011-GAIRAI-KOREI-HEN1-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1295,10 +790,10 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *
            IF   LNK-KOREIFTNCHK-GENGAKUKBN   NOT =   ZERO
       *
-               COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
-                                   * 10
-                                   * WRK-KYURATE(IDX1)
-                                   / 100
+      ***      COMPUTE  WRK-FTNKEI = SYU-TOTAL-HKNTEN
+      ***                          * 10
+      ***                          * WRK-KYURATE(IDX1)
+      ***                          / 100
                EVALUATE   LNK-KOREIFTNCHK-GENGAKUKBN
                  WHEN        1
                    IF  LNK-KOREIFTNCHK-GENGAKU-RITU = 100
@@ -1314,7 +809,30 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                        END-IF
                    END-IF
                  WHEN        2
-                   CONTINUE
+                   MOVE     WRK-FTNKEI   TO   WRK-FTNKEI-GENGAKU
+                   COMPUTE  WRK-FTNKEI-GENGAKU =
+                            WRK-FTNKEI-GENGAKU +  5
+                   COMPUTE  WRK-FTNKEI-GENGAKU =
+                            WRK-FTNKEI-GENGAKU /  10
+                   COMPUTE  WRK-FTNKEI-GENGAKU =
+                            WRK-FTNKEI-GENGAKU *  10
+      *
+                   IF  WRK-FTNKEI < WRK-GENGAKU-KIN
+                     MOVE   ZERO   TO   WRK-FTNKEI
+                   ELSE
+                     COMPUTE  WRK-FTNKEI     =
+                              WRK-FTNKEI     -
+                              WRK-GENGAKU-KIN
+                   END-IF
+      *
+                   IF  WRK-GENGAKU-KIN
+                                   <=  WRK-FTNKEI-GENGAKU
+                     MOVE   ZERO   TO   WRK-GENGAKU-KIN
+                   ELSE
+                     COMPUTE  WRK-GENGAKU-KIN   =
+                              WRK-GENGAKU-KIN   -
+                              WRK-FTNKEI-GENGAKU
+                   END-IF
                  WHEN        3
                  WHEN        4
                        MOVE   ZERO     TO   WRK-FTNKEI
@@ -1322,6 +840,11 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI +  5
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI / 10
                COMPUTE  WRK-FTNKEI = WRK-FTNKEI * 10
+      *
+           END-IF
+      *
+           IF   LNK-KOREIFTNCHK-GENGAKUKBN   NOT =   ZERO
+           AND  LNK-KOREIFTNCHK-GENGAKUFLG       =   ZERO
       *
                EVALUATE   LNK-KOREIFTNCHK-GENGAKUKBN
                  WHEN        1
@@ -1331,18 +854,27 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
                        COMPUTE  WRK-GENGAKU-RITUX =
                                 100 - LNK-KOREIFTNCHK-GENGAKU-RITU
                        IF    WRK-KINGAKU  NOT = ZERO
-                         COMPUTE  WRK-KINGAKU         =
-                                 (WRK-KINGAKU         *
-                                  WRK-GENGAKU-RITUX   /
-                                  100) + 0.5
+                          COMPUTE  WRK-KINGAKU        =
+                                   WRK-KINGAKU        *
+                                   WRK-GENGAKU-RITUX  /
+                                   100
                        END-IF
                    END-IF
                  WHEN        2
-                   CONTINUE
+                   IF  WRK-KINGAKU < LNK-KOREIFTNCHK-GENGAKU-KIN
+                     MOVE   ZERO   TO   WRK-KINGAKU
+                   ELSE
+                     COMPUTE  WRK-KINGAKU    =
+                              WRK-KINGAKU    -
+                              LNK-KOREIFTNCHK-GENGAKU-KIN
+                   END-IF
                  WHEN        3
                  WHEN        4
                        MOVE   ZERO     TO   WRK-KINGAKU
                END-EVALUATE
+               COMPUTE  WRK-KINGAKU = WRK-KINGAKU +  5
+               COMPUTE  WRK-KINGAKU = WRK-KINGAKU / 10
+               COMPUTE  WRK-KINGAKU = WRK-KINGAKU * 10
       *
            END-IF
       *
@@ -1490,47 +1022,6 @@ grpsys        MOVE    LNK-KOREIFTNCHK-HOSPNUM   TO  SYU-HOSPNUM
       *
            .
        900-PTHKNINF-READ-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ´µ¼Ô¸øÈñ¾ðÊó¸¡º÷
-      *****************************************************************
-       900-PTKOHINF-SELECT-SEC        SECTION.
-      *
-           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
-           MOVE    "DBSELECT"          TO  MCP-FUNC
-           CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
-           IF      MCP-RC              =   ZERO
-               MOVE    ZERO               TO  FLG-PTKOHINF
-           ELSE
-               MOVE    1                  TO  FLG-PTKOHINF
-           END-IF
-      *
-           .
-       900-PTKOHINF-SELECT-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ´µ¼Ô¸øÈñ¾ðÊóÆÉ¹þ
-      *****************************************************************
-       910-PTKOHINF-READ-SEC         SECTION.
-      *
-           MOVE    "DBFETCH"           TO  MCP-FUNC
-           CALL    "ORCDBMAIN"         USING   MCPAREA
-                                               MCPDATA-REC
-                                               SPA-AREA
-           IF      MCP-RC              =   ZERO
-               MOVE    MCPDATA-REC     TO  PTKOHINF-REC
-               MOVE    ZERO            TO  FLG-PTKOHINF
-           ELSE
-               INITIALIZE                  PTKOHINF-REC
-               MOVE    1               TO  FLG-PTKOHINF
-           END-IF
-      *
-           .
-       910-PTKOHINF-READ-EXT.
            EXIT.
       *
       *****************************************************************

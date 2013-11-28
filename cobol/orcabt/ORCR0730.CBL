@@ -191,6 +191,7 @@
       *  04.07.07    NACL-Æ£¸¶    12/12/03  ¥¿¡¼¥ß¥Ê¥ë¥Ç¥¸¥Ã¥È¤Ë¤è¤ë½ÐÎÏÂÐ±þ
       *  04.07.08    NACL-Æ£¸¶    12/12/17  Ê£¿ôËç¥ì¥»¥×¥ÈÊ¬³äÂÐ±þ
       *  04.07.09    NACL-Æ£¸¶    13/02/07  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *  04.07.11    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -6246,12 +6247,7 @@
       *    ÊÝ¸±¡Ê¸ºÌÈ¡Ë
            EVALUATE    RECE62-GENMENKBN
                WHEN    1
-                   IF      RECE62-GENGAKU      >   ZERO
-                       MOVE    RECE62-GENGAKU      TO  WRK-KGK6
-                       MOVE    WRK-KGK6            TO  HC06-GENMENKIN
-                       MOVE    "¸º³Û"              TO  HC06-GENMEN
-                       MOVE    "±ß"                TO  HC06-GENMEN2
-                   ELSE
+                   IF    RECE62-GENGAKURATE  >   ZERO
                        COMPUTE WRK-KYURATE-9   =
                                        RECE62-GENGAKURATE  /   10 
                        MOVE    WRK-KYURATE-9   TO  WRK-KYURATE
@@ -6266,6 +6262,16 @@
                        END-IF    
                        MOVE   "¸º³Û"               TO  HC06-GENMEN(1:4)
                        MOVE   "³ä"                 TO  HC06-GENMEN(9:2)
+                   ELSE
+                     IF  RECE62-GENGAKU      >   ZERO
+                       MOVE    RECE62-GENGAKU      TO  WRK-KGK6
+                       MOVE    WRK-KGK6            TO  HC06-GENMENKIN
+                       MOVE    "¸º³Û¶â³Û"          TO  HC06-GENMEN
+                       MOVE    "±ß"                TO  HC06-GENMEN2
+                     ELSE
+                       MOVE    "¸º³Û¸å¶â³Û"        TO  HC06-GENMEN
+                       MOVE    "±ß"                TO  HC06-GENMEN2
+                     END-IF
                    END-IF
                WHEN    2
                    MOVE    "ÌÈ½ü"             TO  HC06-GENMEN

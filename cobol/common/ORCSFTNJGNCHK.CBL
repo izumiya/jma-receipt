@@ -96,6 +96,7 @@
       *  04.07.01    NACL-ÌçÏÆ    11/09/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    12/08/27  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.03    NACL-ÌçÏÆ    13/07/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
+      *  04.07.05    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1887,10 +1888,10 @@
                   IF  WRK-HKNCOMBINUM-KYUFUGAI(IDX1) =  1
                     ADD  SYU-KYUFUGAI-GOKEI-TEN    TO  WRK-KYUFUGAITEN
                   END-IF
-                  IF    (SYU-YKZKENNUM  NOT = ZERO )
-                  AND   (SYU-SYUHKNNUM  NOT = SPACE)
-                       MOVE    1    TO   FLG-GENMEN
-                  END-IF
+      ***         IF    (SYU-YKZKENNUM  NOT = ZERO )
+      ***         AND   (SYU-SYUHKNNUM  NOT = SPACE)
+      ***              MOVE    1    TO   FLG-GENMEN
+      ***         END-IF
                   IF  (LNK-FTNJGNCHK-NYUGAIKBN  = "1"     )
                   AND (LNK-FTNJGNCHK-KOHNUM     = "012"   )
                   AND (LNK-FTNJGNCHK-SRYYM     >= "200804")
