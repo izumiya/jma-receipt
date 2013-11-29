@@ -539,10 +539,10 @@
                GO  TO  20021-NYUINRRK-CHK-EXT
            END-IF
       *
-           IF    ( PTNYUINRRK-HKNCOMBINUM  NOT =   ITEM-HKNCOMBI )
-               MOVE    "0088"      TO  ERRCD-ORDER
-               GO  TO  20021-NYUINRRK-CHK-EXT
-           END-IF
+      *    IF    ( PTNYUINRRK-HKNCOMBINUM  NOT =   ITEM-HKNCOMBI )
+      *        MOVE    "0088"      TO  ERRCD-ORDER
+      *        GO  TO  20021-NYUINRRK-CHK-EXT
+      *    END-IF
       *
            .
        20021-NYUINRRK-CHK-EXT.

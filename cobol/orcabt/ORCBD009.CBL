@@ -322,6 +322,12 @@
            PERFORM 400-YMD-HEN-SEC
            MOVE    WRK-HENYMDG     TO  WRK-SAKYMDWH
       *
+           IF      WRK-PARA-SYORIKBN   =   "0" OR "1"
+               CONTINUE
+           ELSE
+               MOVE    "0"         TO  WRK-PARA-SYORIKBN
+           END-IF
+      *
            IF      WRK-PARA-SYORIKBN   =   "1"
                MOVE    "Á´¤Æ"      TO  WRK-SYORIKBN
            ELSE
@@ -826,7 +832,7 @@
                    MOVE    MCPDATA-REC     TO  ORDER-REC
                    MOVE    1               TO  FLG-LOOP-END
       *
-                   IF    ( WRK-PARA-SYORIKBN   =   "1" )
+                   IF    ( WRK-PARA-SYORIKBN   =   "0" )
                        IF    ( ORDER-STATUS    =   1 OR 2 OR 4 OR 5)
                             CONTINUE
                        ELSE
