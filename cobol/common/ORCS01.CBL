@@ -404,6 +404,7 @@
       *  04.06.10    NACL-ÌçÏÆ    13/08/08  »³¸ý¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.11    NACL-ÌçÏÆ    13/09/17  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.12    NACL-ÌçÏÆ    13/10/16  ¼¢²ì¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.13    NACL-ÌçÏÆ    13/11/28  ¸å´ü¹âÎð¤Î·îÅÓÃæ¸©³°Å¾½ÐÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -15531,7 +15532,13 @@
                   MOVE  WK-NUM        TO  WK-NUM2
              END-IF
              MOVE   WK-HKNJANUM2-TBL  TO  WK-HKNJANUM3-TBL
-             MOVE   WK-HKNJANUM-TBL   TO  WK-HKNJANUM2-TBL
+             IF   LNK-SYU-SRYYMD(1:6) >= "201204"
+               IF   WK-HKNJANUM2(1:4)  =  WK-HKNJANUM(1:4)
+                 MOVE WK-HKNJANUM-TBL TO  WK-HKNJANUM2-TBL
+               END-IF
+             ELSE
+                 MOVE WK-HKNJANUM-TBL TO  WK-HKNJANUM2-TBL
+             END-IF
            ELSE
              IF  (FLG-KOUREI-KBN   =   "1" )
              OR  (COMB-HKNNUM      =  "060")
@@ -15549,7 +15556,9 @@
              WHEN        2
                  IF    COMB-HKNNUM    = "039"
                    IF  SYU-SYUHKNNUM  = "039"
+                     IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
                           MOVE    1    TO   FLG-RUITAISYO
+                     END-IF
                    END-IF
                  ELSE
                    IF  FLG-TOKU75     =   1

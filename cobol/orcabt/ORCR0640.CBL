@@ -611,6 +611,8 @@
       *  04.06.17    NACL-ÌçÏÆ    13/09/17  µÜ¾ë¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.18    NACL-ÌçÏÆ    13/10/23  Á´¹ñ¸øÈñÊ»ÍÑ»þ¤ÎÃÏÊý¸øÈñ°ìÉô
       *                                     ÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  04.06.19    NACL-ÌçÏÆ    13/11/29  Á´¹ñ¸øÈñÊ»ÍÑ»þ¤ÎÃÏÊý¸øÈñ°ìÉô
+      *                                     ÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1522,6 +1524,12 @@
            03  WK-GENGAKU-RITUX                PIC  9(03).
            03  WK-GENGAKU-KIN                  PIC  9(07).
            03  WK-GENGAKU-KTKBN                PIC  9(01).
+      *
+           03  WK-GENGAKU-SKJFLG-T.
+             04  WK-GENGAKU-SKJFLG-OCC         OCCURS  5.
+               05  WK-GENGAKU-SKJMAE           PIC  9(07).
+               05  WK-GENGAKU-SKJMAEFLG        PIC  9(01).
+               05  WK-GENGAKU-SKJKASANFLG      PIC  9(01).
       *
            03  WK-GENGAKU-YMD.
                05  WK-GENGAKU-YM               PIC  9(06).
@@ -2930,6 +2938,8 @@
                                WRK-TENTEKI2-TABLE
       *
            INITIALIZE          WRK-RECE62G-REC
+      *
+           INITIALIZE          WK-GENGAKU-SKJFLG-T
       *
            MOVE      ZERO      TO   WRK-TAIHI-ZAINUM
            MOVE      ZERO      TO   WRK-TAIHI-OKIKAE
@@ -17711,10 +17721,14 @@
                    (RECE62-SRYYM             >=  "200510"      )  AND
                    (RECE62-SRYYM             <   "200810"      ))
                OR ((FLG-ZENKI-TOKUREI         =   1            )  AND
-                   (RECE62-KOHNUM(KOHFTN-IDX) =  "051"         ))
+                   (RECE62-KOHNUM(KOHFTN-IDX) =  "051"         )  AND
+                   (WK-GENGAKU-SKJKASANFLG(KOHFTN-IDX + 1)
+                                              =   ZERO         ))
                OR ((FLG-ZENKI-TOKUREI         =   1            )  AND
                    (WRK-PREFNUM               =  "13"          )  AND
-                   (RECE62-KOHNUM(KOHFTN-IDX) =  "151"         ))
+                   (RECE62-KOHNUM(KOHFTN-IDX) =  "151"         )  AND
+                   (WK-GENGAKU-SKJKASANFLG(KOHFTN-IDX + 1)
+                                              =   ZERO         ))
                OR ((WRK-PREFNUM               =  "01"          )  AND
                    (RECE62-KOHNUM(KOHFTN-IDX) =  "183"         )  AND
                    (RECE62-KOHJKYSNUM(KOHFTN-IDX)(1:2) >= "91"
@@ -17724,16 +17738,22 @@
                    (WRK-PREFNUM               =  "23"          )  AND
                    (RECE62-KOHNUM(KOHFTN-IDX) =  "191"         )  AND
                    (RECE62-SRYYM             >=  "200910"      )  AND
-                   (RECE62-SRYYM             <=  "201108"      ))
+                   (RECE62-SRYYM             <=  "201108"      )  AND
+                   (WK-GENGAKU-SKJKASANFLG(KOHFTN-IDX + 1)
+                                              =   ZERO         ))
                OR ((FLG-ZENKI-TOKUREI         =   1            )  AND
                    (WRK-PREFNUM               =  "23"          )  AND
                    (RECE62-KOHNUM(KOHFTN-IDX) =  "191"         )  AND
                    (RECE62-TEISYUTUSAKI       =   1            )  AND
-                   (RECE62-SRYYM             >=  "201109"      ))
+                   (RECE62-SRYYM             >=  "201109"      )  AND
+                   (WK-GENGAKU-SKJKASANFLG(KOHFTN-IDX + 1)
+                                              =   ZERO         ))
                OR ((FLG-ZENKI-TOKUREI         =   1            )  AND
                    (WRK-PREFNUM               =  "23" OR "24"  )  AND
                    (RECE62-KOHNUM(KOHFTN-IDX) =  "152"         )  AND
-                   (RECE62-SRYYM             >=  "201104"      ))
+                   (RECE62-SRYYM             >=  "201104"      )  AND
+                   (WK-GENGAKU-SKJKASANFLG(KOHFTN-IDX + 1)
+                                              =   ZERO         ))
                 CONTINUE
                ELSE
                 COMPUTE  WRK-FTNKEI2 = RECE62-FTNMONEY(KOHFTN-IDX + 1)
@@ -18429,49 +18449,6 @@
                END-PERFORM
              END-PERFORM
       *
-           END-IF
-      *
-      *****
-      *
-           IF  (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
-                 (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
-                ( TBL-TOKATUKAIFLG(1)   =  1              ))
-           AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
-           AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
-           AND (RECE62-TOTALTEN(2)  = RECE62-HENTOTALTEN(3))
-             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
-                                     WRK-TAIHI-FTNMONEY-EN2(3))
-             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
-                MOVE  RECE62-FTNMONEY(2)     TO  RECE62-FTNMONEY(3)
-                MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(3)
-             END-IF
-           END-IF
-      *
-           IF  ((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
-                (RECE62-KOHNUM(1)  NOT = "012" AND "025")  )
-           AND (RECE62-KOHNUM(2)       = "972" OR "974"    )
-           AND (RECE62-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
-           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
-           AND (RECE62-TOTALTEN(2)  = RECE62-HENTOTALTEN(4))
-             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
-                                     WRK-TAIHI-FTNMONEY-EN2(4))
-             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
-                MOVE  RECE62-FTNMONEY(2)     TO  RECE62-FTNMONEY(4)
-                MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(4)
-             END-IF
-           END-IF
-      *
-           IF  (RECE62-KOHNUM(1)       = "972" OR "974"    )
-           AND (TBL-TOKATUKAIFLG(2)    =  1                )
-           AND (RECE62-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
-           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
-           AND (RECE62-TOTALTEN(3)  = RECE62-HENTOTALTEN(4))
-             IF   (WRK-TAIHI-FTNMONEY-EN2(3) =
-                                     WRK-TAIHI-FTNMONEY-EN2(4))
-             AND  (WRK-TAIHI-FTNMONEY-EN2(3) NOT = ZERO       )
-                MOVE  RECE62-FTNMONEY(3)     TO  RECE62-FTNMONEY(4)
-                MOVE  RECE62-FTNMONEY-KOJ(3) TO  RECE62-FTNMONEY-KOJ(4)
-             END-IF
            END-IF
       *
            .
@@ -19527,6 +19504,8 @@
              END-IF
            END-IF
       *
+           PERFORM  21046A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC
+      *
            MOVE    999999999   TO   WRK-FTNMONEY-MAE
            PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
                      UNTIL   KOHFTN-IDX   >    4
@@ -19563,6 +19542,7 @@
                    ELSE
                      IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
                        PERFORM  210465-KOH-ICHIBUFTN-HENSYU-SEC
+                       PERFORM  21046A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC
                      END-IF
                    END-IF
                 END-IF
@@ -20859,6 +20839,9 @@
                                                  RECE62-FTNMONEY-KOJ(2)
               IF    RECE62-FTNMONEY(2)    NOT =  ZERO
               AND   RECE62-KOUREI             =  "1"
+                IF   WK-GENGAKU-SKJMAEFLG(2)  =  1
+                  MOVE  WK-GENGAKU-SKJMAE(2) TO  WRK-TAIHI-GENKIN3
+                END-IF
                 IF   RECE62-FTNMONEY(2)   <   RECE62-FTNMONEY(1)
                   COMPUTE  RECE62-FTNMONEY(1) =  RECE62-FTNMONEY(1)
                                               -  RECE62-FTNMONEY(2)
@@ -20879,6 +20862,8 @@
                                                  RECE62-FTNMONEY-KOJ(2)
             END-IF
            END-IF
+      *
+           MOVE      1      TO     WK-GENGAKU-SKJKASANFLG(2)
       *
            .
        210462-GENGAKU-OKIKAE-EXT.
@@ -21038,6 +21023,10 @@
                                    + WRK-SKJ-FTN    (KOHFTN-IDX + 1)
               MOVE     RECE62-FTNMONEY(KOHFTN-IDX + 1)
                               TO  WRK-FTNKEI3
+      *
+              MOVE     1      TO  WK-GENGAKU-SKJMAEFLG(KOHFTN-IDX + 1)
+              MOVE     RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                              TO  WK-GENGAKU-SKJMAE(KOHFTN-IDX + 1)
       *
               IF  WRK-JYOGEN-KOH2  NOT =  ZERO
                 IF   WRK-FTNKEI3  =  WRK-JYOGEN-KOH2
@@ -21681,6 +21670,59 @@
       *
            .
        210468X-SYUHKN-JYOHEN-KEISAN2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Á´¹ñ¸øÈñÊ»ÍÑ»þ¤ÎÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âÊÔ½¸
+      *****************************************************************
+       21046A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC               SECTION.
+      *
+           IF  (((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
+                 (RECE62-KOHNUM(1)  NOT = "012" AND "025"))  OR
+                ( TBL-TOKATUKAIFLG(1)   =  1              ))
+           AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
+           AND (RECE62-TOTALTEN(2)  = RECE62-HENTOTALTEN(3))
+             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
+                                     WRK-TAIHI-FTNMONEY-EN2(3))
+             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
+             AND  (RECE62-FTNMONEY(2)        NOT = ZERO       )
+                MOVE  RECE62-FTNMONEY(2)     TO  RECE62-FTNMONEY(3)
+                MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(3)
+             END-IF
+           END-IF
+      *
+           IF  ((RECE62-KOHNUM(1)(1:1) = "0"            ) AND
+                (RECE62-KOHNUM(1)  NOT = "012" AND "025")  )
+           AND (RECE62-KOHNUM(2)       = "972" OR "974"    )
+           AND (RECE62-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
+           AND (RECE62-TOTALTEN(2)  = RECE62-HENTOTALTEN(4))
+             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
+                                     WRK-TAIHI-FTNMONEY-EN2(4))
+             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
+             AND  (RECE62-FTNMONEY(2)        NOT = ZERO       )
+                MOVE  RECE62-FTNMONEY(2)     TO  RECE62-FTNMONEY(4)
+                MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(4)
+             END-IF
+           END-IF
+      *
+           IF  (RECE62-KOHNUM(1)       = "972" OR "974"    )
+           AND (TBL-TOKATUKAIFLG(2)    =  1                )
+           AND (RECE62-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
+           AND (RECE62-TOTALTEN(3)  = RECE62-HENTOTALTEN(4))
+             IF   (WRK-TAIHI-FTNMONEY-EN2(3) =
+                                     WRK-TAIHI-FTNMONEY-EN2(4))
+             AND  (WRK-TAIHI-FTNMONEY-EN2(3) NOT = ZERO       )
+             AND  (RECE62-FTNMONEY(3)        NOT = ZERO       )
+                MOVE  RECE62-FTNMONEY(3)     TO  RECE62-FTNMONEY(4)
+                MOVE  RECE62-FTNMONEY-KOJ(3) TO  RECE62-FTNMONEY-KOJ(4)
+             END-IF
+           END-IF
+      *
+           .
+       21046A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

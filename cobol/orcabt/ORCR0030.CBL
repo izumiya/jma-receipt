@@ -625,6 +625,9 @@
       *  04.06.18    NACL-ÌçÏÆ    13/10/09  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
       *  04.06.19    NACL-ÌçÏÆ    13/10/23  Á´¹ñ¸øÈñÊ»ÍÑ»þ¤ÎÃÏÊý¸øÈñ°ìÉô
       *                                     ÉéÃ´¶âµ­ºÜ½¤Àµ
+      *  04.06.20    NACL-ÌçÏÆ    13/11/28  ¸å´ü¹âÎð¤Î·îÅÓÃæ¸©³°Å¾½ÐÂÐ±þ
+      *  04.06.21    NACL-ÌçÏÆ    13/11/29  Á´¹ñ¸øÈñÊ»ÍÑ»þ¤ÎÃÏÊý¸øÈñ°ìÉô
+      *                                     ÉéÃ´¶âµ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4691,12 +4694,14 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
                PERFORM RECE09-NEXT-SEC
            END-PERFORM
       *
-           IF   WRK-CHK-TAISYO3      =  1
-           AND  WRK-CHK-CNT          =  2
-             IF ((RECE02-HKNJANUM  NOT = SPACE            ) AND
-                 (RECE02-HKNJANUM  NOT = WRK-CHK-HKNJANUM ))
-             OR ( RECE02-HONKZKKBN NOT = WRK-CHK-HONKZKKBN )
-               MOVE    1     TO    FLG-GENBUTU-HANTEI2
+           IF   (RECE02-SRYYM       >=  "201204")
+           AND  (WRK-CHK-TAISYO3     =   1      )
+           AND  (WRK-CHK-CNT         =   2      )
+             IF  (RECE02-HKNJANUM  NOT = SPACE           )
+             AND (RECE02-HKNJANUM  NOT = WRK-CHK-HKNJANUM)
+               IF   RECE02-HKNJANUM(1:4) = WRK-CHK-HKNJANUM(1:4)
+                  MOVE    1      TO  FLG-GENBUTU-HANTEI2
+               END-IF
              END-IF
            END-IF
       *
@@ -4743,6 +4748,20 @@ grpsys             OR    ( RECE02-HOSPNUM   NOT =   RECE09-HOSPNUM   )
              END-IF
            ELSE
              MOVE        ZERO    TO  WRK-CHK-TAISYO
+           END-IF
+      *
+           IF   (RECE02-SRYYM       >=  "201204")
+           AND  (WRK-CHK-TAISYO3     =   1      )
+           AND  (WRK-CHK-CNT         =   2      )
+           AND  (FLG-TOKU75          =   1      )
+             IF  (RECE02-HKNJANUM  NOT = SPACE           )
+             AND (RECE02-HKNJANUM  NOT = WRK-CHK-HKNJANUM)
+               IF   RECE02-HKNJANUM(1:4) = WRK-CHK-HKNJANUM(1:4)
+                  CONTINUE
+               ELSE
+                  MOVE   ZERO    TO  WRK-CHK-TAISYO
+               END-IF
+             END-IF
            END-IF
       *
            IF   WRK-CHK-TAISYO       =  1
@@ -15147,6 +15166,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *
+           PERFORM  2109A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC
+      *
            MOVE    999999999   TO   WRK-FTNMONEY-MAE
            PERFORM  VARYING  KOHFTN-IDX  FROM  1  BY  1
                      UNTIL   KOHFTN-IDX   >    4
@@ -15184,6 +15205,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ELSE
                      IF   TBL-HKNFTNDATA-FLG(KOHFTN-IDX)  =  1
                        PERFORM  21095-KOH-ICHIBUFTN-HENSYU-SEC
+                       PERFORM  2109A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC
                      END-IF
                    END-IF
                 END-IF
@@ -17258,6 +17280,59 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    Á´¹ñ¸øÈñÊ»ÍÑ»þ¤ÎÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âÊÔ½¸
+      *****************************************************************
+       2109A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC               SECTION.
+      *
+           IF  (((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
+                 (RECE02-KOHNUM(1)  NOT = "012" AND "025"))  OR
+                ( TBL-TOKATUKAIFLG(1)   =  1              ))
+           AND (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
+           AND (RECE02-TOTALTEN(2)  = RECE02-HENTOTALTEN(3))
+             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
+                                     WRK-TAIHI-FTNMONEY-EN2(3))
+             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
+             AND  (RECE02-FTNMONEY(2)        NOT = ZERO       )
+                MOVE  RECE02-FTNMONEY(2)     TO  RECE02-FTNMONEY(3)
+                MOVE  RECE02-FTNMONEY-KOJ(2) TO  RECE02-FTNMONEY-KOJ(3)
+             END-IF
+           END-IF
+      *
+           IF  ((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
+                (RECE02-KOHNUM(1)  NOT = "012" AND "025")  )
+           AND (RECE02-KOHNUM(2)       = "972" OR "974"    )
+           AND (RECE02-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
+           AND (RECE02-TOTALTEN(2)  = RECE02-HENTOTALTEN(4))
+             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
+                                     WRK-TAIHI-FTNMONEY-EN2(4))
+             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
+             AND  (RECE02-FTNMONEY(2)        NOT = ZERO       )
+                MOVE  RECE02-FTNMONEY(2)     TO  RECE02-FTNMONEY(4)
+                MOVE  RECE02-FTNMONEY-KOJ(2) TO  RECE02-FTNMONEY-KOJ(4)
+             END-IF
+           END-IF
+      *
+           IF  (RECE02-KOHNUM(1)       = "972" OR "974"    )
+           AND (TBL-TOKATUKAIFLG(2)    =  1                )
+           AND (RECE02-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
+           AND (RECE02-TOTALTEN(3)  = RECE02-HENTOTALTEN(4))
+             IF   (WRK-TAIHI-FTNMONEY-EN2(3) =
+                                     WRK-TAIHI-FTNMONEY-EN2(4))
+             AND  (WRK-TAIHI-FTNMONEY-EN2(3) NOT = ZERO       )
+             AND  (RECE02-FTNMONEY(3)        NOT = ZERO       )
+                MOVE  RECE02-FTNMONEY(3)     TO  RECE02-FTNMONEY(4)
+                MOVE  RECE02-FTNMONEY-KOJ(3) TO  RECE02-FTNMONEY-KOJ(4)
+             END-IF
+           END-IF
+      *
+           .
+       2109A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ÆýÍÄ»ù¡¦ÍÄ»ù¤Î¥³¥á¥ó¥È¥Õ¥é¥°¥»¥Ã¥È
       *****************************************************************
        2110-NYUYOJI-COMENTFLG-SET-SEC               SECTION.
@@ -17927,49 +18002,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
       *
            END-EVALUATE
-      *
-      *****
-      *
-           IF  (((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
-                 (RECE02-KOHNUM(1)  NOT = "012" AND "025"))  OR
-                ( TBL-TOKATUKAIFLG(1)   =  1              ))
-           AND (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
-           AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
-           AND (RECE02-TOTALTEN(2)  = RECE02-HENTOTALTEN(3))
-             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
-                                     WRK-TAIHI-FTNMONEY-EN2(3))
-             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
-                MOVE  RECE02-FTNMONEY(2)     TO  RECE02-FTNMONEY(3)
-                MOVE  RECE02-FTNMONEY-KOJ(2) TO  RECE02-FTNMONEY-KOJ(3)
-             END-IF
-           END-IF
-      *
-           IF  ((RECE02-KOHNUM(1)(1:1) = "0"            ) AND
-                (RECE02-KOHNUM(1)  NOT = "012" AND "025")  )
-           AND (RECE02-KOHNUM(2)       = "972" OR "974"    )
-           AND (RECE02-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
-           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
-           AND (RECE02-TOTALTEN(2)  = RECE02-HENTOTALTEN(4))
-             IF   (WRK-TAIHI-FTNMONEY-EN2(2) =
-                                     WRK-TAIHI-FTNMONEY-EN2(4))
-             AND  (WRK-TAIHI-FTNMONEY-EN2(2) NOT = ZERO       )
-                MOVE  RECE02-FTNMONEY(2)     TO  RECE02-FTNMONEY(4)
-                MOVE  RECE02-FTNMONEY-KOJ(2) TO  RECE02-FTNMONEY-KOJ(4)
-             END-IF
-           END-IF
-      *
-           IF  (RECE02-KOHNUM(1)       = "972" OR "974"    )
-           AND (TBL-TOKATUKAIFLG(2)    =  1                )
-           AND (RECE02-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
-           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
-           AND (RECE02-TOTALTEN(3)  = RECE02-HENTOTALTEN(4))
-             IF   (WRK-TAIHI-FTNMONEY-EN2(3) =
-                                     WRK-TAIHI-FTNMONEY-EN2(4))
-             AND  (WRK-TAIHI-FTNMONEY-EN2(3) NOT = ZERO       )
-                MOVE  RECE02-FTNMONEY(3)     TO  RECE02-FTNMONEY(4)
-                MOVE  RECE02-FTNMONEY-KOJ(3) TO  RECE02-FTNMONEY-KOJ(4)
-             END-IF
-           END-IF
       *
            .
        2111-ICHIBUFUTAN-OKIKAE-EXT.

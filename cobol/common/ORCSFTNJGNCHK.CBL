@@ -93,6 +93,7 @@
       *  04.06.02    NACL-ÌçÏÆ    13/03/01  £·£°ºÐÂåÁ°È¾¤ÎÆÃÎãÁ¼ÃÖ±äÄ¹ÂÐ±þ
       *  04.06.03    NACL-ÌçÏÆ    13/06/14  À¸ÊÝ¤Î£·£¹¡¦£²£´Ê»ÍÑ»þ¤ÎÂÐ±þ½¤Àµ
       *  04.06.04    NACL-ÌçÏÆ    13/10/09  Ä¹ºê¸©ÃÏÊý¸øÈñÂÐ±þ
+      *  04.06.05    NACL-ÌçÏÆ    13/11/28  ¸å´ü¹âÎð¤Î·îÅÓÃæ¸©³°Å¾½ÐÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1570,7 +1571,17 @@
       *
            IF    (WRK-HKNNUM        =  "039")
            AND   (WRK-HKNNUM2       =  "039")
-             MOVE   WRK-HKNJANUM-TBL   TO  WRK-HKNJANUM2-TBL
+             IF    LNK-FTNJGNCHK-NYUGAIKBN   =   "1"
+               MOVE     WRK-HKNJANUM-TBL  TO  WRK-HKNJANUM2-TBL
+             ELSE
+               IF   LNK-FTNJGNCHK-SRYYM >= "201204"
+                 IF   WRK-HKNJANUM2(1:4)  =  WRK-HKNJANUM(1:4)
+                   MOVE WRK-HKNJANUM-TBL  TO  WRK-HKNJANUM2-TBL
+                 END-IF
+               ELSE
+                 MOVE   WRK-HKNJANUM-TBL  TO  WRK-HKNJANUM2-TBL
+               END-IF
+             END-IF
            ELSE
              IF  (SYU-SKJ-FTNDAY(1) =  1  OR  2)
              OR  (WRK-HKNNUM        =  "060"   )
@@ -1587,8 +1598,10 @@
              WHEN       2
                  IF  WRK-HKNNUM     =  "039"
                     IF  WRK-HKNNUM2   =  "039"
+                      IF    WRK-HKNJANUM-TBL  =  WRK-HKNJANUM2-TBL
                          MOVE   1             TO  FLG-TOKU75
                          ADD  WRK-COMPFTN     TO  WRK-KOHFTN-TOKU75
+                      END-IF
                     END-IF
                  ELSE
                     IF  SYU-SKJ-FTNDAY(1)  =   1
