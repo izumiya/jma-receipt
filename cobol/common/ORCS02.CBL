@@ -12040,7 +12040,9 @@
              WHEN        2
                  IF    COMB-HKNNUM    = "039"
                    IF  SYU-SYUHKNNUM  = "039"
+                     IF    WK-HKNJANUM-TBL  =  WK-HKNJANUM2-TBL
                           MOVE    1    TO   FLG-RUITAISYO
+                     END-IF
                    END-IF
                  ELSE
                    IF  FLG-TOKU75     =   1
