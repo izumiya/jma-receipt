@@ -2215,6 +2215,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *        当日有効な公費のみ判定
                IF     (SPA-NAI24-TKOHSTYMD (IDX2)  <=  SPA-SYSYMD )
                  AND  (SPA-NAI24-TKOHEDYMD (IDX2)  >=  SPA-SYSYMD )
+                 AND  (SPA-NAI24-FTNDELKBN (IDX2)  =   SPACE      )
                    MOVE    ZERO                TO  FLG-OK
                    PERFORM VARYING IDX         FROM    1   BY  1
                        UNTIL  (IDX         >   TBL-MAX-KOH   )  OR
