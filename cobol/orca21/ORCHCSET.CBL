@@ -1063,11 +1063,11 @@
                    END-IF
                END-IF
       *        経過措置日
-               IF      TNS-KEIKASOCHIYMD   =   SPACE  OR  ZERO
-                   CONTINUE
-               ELSE
+      *        IF      TNS-KEIKASOCHIYMD   =   SPACE  OR  ZERO
+      *            CONTINUE
+      *        ELSE
                    MOVE    TNS-KEIKASOCHIYMD   TO  WRK-TNS-KEIKASOCHIYMD
-               END-IF
+      *        END-IF
       *
                MOVE    TNS-KZMCOMPSIKIBETU TO  WRK-TNS-KZMCOMPSIKIBETU
                MOVE    TNS-TANICD          TO  WRK-TNS-TANICD
@@ -1106,15 +1106,16 @@
            END-IF
       *
       *    経過措置日
-           IF      WRK-TNS-KEIKASOCHIYMD   NOT =   SPACE
+           IF      WRK-TNS-KEIKASOCHIYMD   =   SPACE
+                                           OR  ZERO
+               MOVE    SPACE               TO  WRK-KEIKAYMD-G
+           ELSE
                MOVE    SPACE               TO  WRK-KEIKAYMD-G
                MOVE    WRK-TNS-KEIKASOCHIYMD   TO  WRK-SYMD
                PERFORM 800-SEIWA-HEN-SEC
                MOVE    WRK-HENYMDG         TO  WRK-KEIKAYMD
                MOVE    "【経過措置日】"    TO  WRK-KEIKA-H
                PERFORM 200231-SRYCDCHG-CHK-SEC
-           ELSE
-               MOVE    SPACE               TO  WRK-KEIKAYMD-G
            END-IF
       *
            MOVE    SPACE               TO  WRK-HEN-SURYO
