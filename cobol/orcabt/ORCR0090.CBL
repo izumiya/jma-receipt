@@ -250,6 +250,7 @@
       *
       *  04.07.01    NACL-藤原    13/07/01  レセ電請求時の受付エラー分の
       *                                     自費レセプト対象の有無設定
+      *  04.07.02    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2223,7 +2224,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    初診加算の時だけ印刷＋検診
-           IF    (TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
+           IF   RECE04-JIHOKBN  =  SPACE
+             IF  (TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                                             =   WRK-CONS-SYOSIN-KASAN1
                                             OR  WRK-CONS-SYOSIN-KASAN2
                                             OR  WRK-CONS-SYOSIN-KASAN5
@@ -2258,13 +2260,14 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                             OR  CONS-COMMENT6         
                                             OR  CONS-COMMENT7         
                                             OR  CONS-COMMENT8         )
-           OR    (TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)(1:1)  = "8" AND    
+             OR  (TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)(1:1)  = "8" AND    
                   TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)   
                                                      NOT = "830000020")
-           OR    (TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)(1:3)  = "008"  )
+             OR  (TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)(1:3)  = "008"  )
                    CONTINUE
-           ELSE
+             ELSE
                    MOVE    1                 TO  FLG-NOPRT
+             END-IF
            END-IF
       *
       *    識別が点数の場合
@@ -2276,7 +2279,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-IF
            END-IF
       *
-           IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2) =
+           IF   RECE04-JIHOKBN  =  SPACE
+            IF TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2) =
                                             WRK-CONS-SYOSIN-KASAN29
       *
                MOVE     1              TO  TBL-DENSHI-FLG(1)
@@ -2286,6 +2290,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                ADD   RECE04-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(1 IDX5)
                MOVE  RECE04-HKNCOMBI   TO  TBL-DENSHI-HKNCOMBI(1 IDX5)
       *
+            END-IF
            END-IF
       *
            .
@@ -2363,9 +2368,10 @@ grpsys         PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    診療行為テーブルに存在した場合、印字しないこと
-           PERFORM   VARYING   IDY   FROM    1   BY  1
-                     UNTIL   ( IDY           >   TBL-NOSRYCD-MAX )
-                     OR      ( FLG-NOPRT     =    1              )
+           IF   RECE04-JIHOKBN  =  SPACE
+             PERFORM   VARYING   IDY   FROM    1   BY  1
+                       UNTIL   ( IDY           >   TBL-NOSRYCD-MAX )
+                       OR      ( FLG-NOPRT     =    1              )
       *
                IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2) 
                                          =   TBL-NOSRYCD (IDY)
@@ -2427,7 +2433,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *                                             
                END-IF
       *
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *
            IF  FLG-NOPRT             =   ZERO
       *        識別が点数の場合
@@ -2446,15 +2453,16 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-IF
            END-IF    
       *
-           IF (( RECE02-SRYYM   >=  "200804"             ) AND
-               ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                      =   "112015570"  OR  "112001410"  OR
-                          "112014170"  OR  "112014270"  OR
-                          "112014370"  OR  "112015070"   ))
-           OR (( RECE02-SRYYM   >=  "201004"             ) AND
-               ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
-                      =   "112015670"  OR  "112015770"  OR
-                          "112016070"  OR  "112016170"   ))
+           IF   RECE04-JIHOKBN  =  SPACE
+            IF (( RECE02-SRYYM   >=  "200804"             ) AND
+                ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
+                       =   "112015570"  OR  "112001410"  OR
+                           "112014170"  OR  "112014270"  OR
+                           "112014370"  OR  "112015070"   ))
+            OR (( RECE02-SRYYM   >=  "201004"             ) AND
+                ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
+                       =   "112015670"  OR  "112015770"  OR
+                           "112016070"  OR  "112016170"   ))
       *
              EVALUATE   TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                WHEN       "112001410"
@@ -2486,6 +2494,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
              ADD   RECE04-ZAIKAISU   TO  TBL-DENSHI-ZAIKAISU(IDX6 IDX5)
              MOVE  RECE04-HKNCOMBI   TO  TBL-DENSHI-HKNCOMBI(IDX6 IDX5)
       *
+            END-IF
            END-IF
       *
            .
@@ -2581,6 +2590,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
                IF      RECE04-SRYKBN      >=  "33"
                AND     RECE04-ZAIKBN   NOT =   1
+               AND     RECE04-JIHOKBN      =   SPACE
                    CONTINUE
                ELSE        
                    MOVE    WRK-TBLMAX       TO  IDY
@@ -2948,10 +2958,18 @@ grpsys         PERFORM 900-DBSELECT-SEC
       **       AND     RECE04-YKZTEN     <=  20
       **           CONTINUE
       *********ELSE    
-               IF    (    (RECE04-YKZTEN     =   ZERO )
-                      AND (IDX1              =   5    ) )
-               OR    (    (RECE04-KIZAITEN   =   ZERO )
-                      AND (IDX1              =   4    ) )
+               IF    ((RECE04-YKZTEN           =   ZERO) AND
+                      (RECE04-JIHOKBN          =  SPACE) AND
+                      (IDX1                    =   5   ))
+               OR    ((RECE04-KIZAITEN         =   ZERO) AND
+                      (RECE04-JIHOKBN          =  SPACE) AND
+                      (IDX1                    =   4   ))
+               OR    ((RECE04-HOKATU-YKZTEN    =   ZERO) AND
+                      (RECE04-JIHOKBN      NOT =  SPACE) AND
+                      (IDX1                    =   5   ))
+               OR    ((RECE04-HOKATU-KIZAITEN  =   ZERO) AND
+                      (RECE04-JIHOKBN      NOT =  SPACE) AND
+                      (IDX1                    =   4   ))
                    CONTINUE
                ELSE    
       ***          IF   (RECE04-SRYKBN     =   "31" OR "32")
@@ -2959,7 +2977,9 @@ grpsys         PERFORM 900-DBSELECT-SEC
       ***          AND  (IDX1              =    3          )
       ***              CONTINUE
       ***          ELSE    
-                       IF   RECE04-SRYKBN     =   "31" OR "32"
+                       IF  ( RECE04-SRYKBN        =   "31" OR "32" )
+                       OR  ((RECE04-SRYKBN        =   "33"        ) AND
+                            (RECE04-JIHOKBN   NOT =   SPACE       ))
                          IF   WRK-TBLMAX      >    ZERO
                              MOVE     SPACE      TO  WRK-ZAI-MK
                          END-IF
@@ -2984,6 +3004,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *        点数・回数セット処理（診療行為）
                IF      IDX1              =   3
                AND     WRK-ZAIWMAX(IDX1) >   ZERO
+               AND     RECE04-JIHOKBN    =   SPACE
                    IF      RECE04-SRYKBN     >=  "33"       
                        MOVE    RECE04-SYUTEN1    TO  WRK-ZAITENX
                        MOVE    RECE04-ZAIKAISU   TO  WRK-ZAIKAISUX
@@ -2994,9 +3015,10 @@ grpsys         PERFORM 900-DBSELECT-SEC
                    END-IF
                END-IF    
       *        点数・回数セット処理（特定器材）
-               IF      IDX1              =   4
-               AND     WRK-ZAIWMAX(IDX1) >   ZERO
-               AND     RECE04-KIZAITEN   >   ZERO
+               IF     ( IDX1                =   4    )
+               AND    ( WRK-ZAIWMAX(IDX1)   >   ZERO )
+               AND    ( RECE04-JIHOKBN      =   SPACE)
+                 IF     RECE04-KIZAITEN     >   ZERO
                    IF      RECE04-SRYKBN     >=  "33"   
                        MOVE    RECE04-KIZAITEN   TO  WRK-ZAITENX
                        MOVE    RECE04-ZAIKAISU   TO  WRK-ZAIKAISUX
@@ -3005,11 +3027,13 @@ grpsys         PERFORM 900-DBSELECT-SEC
                        PERFORM 440-TNSKAI-SET-SEC
                        MOVE    IDY               TO  WRK-TBLMAX 
                    END-IF
+                 END-IF
                END-IF     
       *        点数・回数セット処理（薬剤）
-               IF      IDX1              =   5
-               AND     WRK-ZAIWMAX(IDX1) >   ZERO
-               AND     RECE04-YKZTEN     >   ZERO
+               IF     ( IDX1                =   5    )
+               AND    ( WRK-ZAIWMAX(IDX1)   >   ZERO )
+               AND    ( RECE04-JIHOKBN      =   SPACE)
+                 IF     RECE04-YKZTEN       >   ZERO
       ***          IF      RECE04-SRYKBN     >=  "31"   
       *****************IF      RECE04-SRYKBN     =   "31"    OR  
       **                                             "32"    OR  "33"  
@@ -3028,12 +3052,14 @@ grpsys         PERFORM 900-DBSELECT-SEC
                            MOVE    IDY               TO  WRK-TBLMAX 
                        END-IF          
       ***          END-IF
+                 END-IF
                END-IF        
            END-PERFORM
       *             
       *    検査のとき回数を集計
            IF     (WRK-ZAIWMAX(3)     >   ZERO        )
            AND    (RECE04-SRYKBN      =   "60" OR "64")
+           AND    (RECE04-JIHOKBN     =   SPACE       )
                IF      TBL-ZAIW-SRYCD (3 1)   =   WRK-CONS-SAIKETSU1
                                               OR  WRK-CONS-SAIKETSU2
                                               OR  WRK-CONS-SAIKETSU3 
@@ -3093,15 +3119,17 @@ grpsys         PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *    診療行為テーブルに存在した場合、印字しないこと
-           PERFORM   VARYING   IDY   FROM    1   BY  1
-                     UNTIL   ( IDY           >   TBL-NOSRYCD-MAX )
-                     OR      ( FLG-NOPRT     =    1 )
+           IF   RECE04-JIHOKBN  =  SPACE
+             PERFORM   VARYING   IDY   FROM    1   BY  1
+                       UNTIL   ( IDY           >   TBL-NOSRYCD-MAX )
+                       OR      ( FLG-NOPRT     =    1 )
       *
                IF  TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                                 =   TBL-NOSRYCD (IDY)
                    MOVE    1                 TO  FLG-NOPRT
                END-IF
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *
       ***  IF   ( RECE04-SRYKBN               = "31" OR "32" )
       ***  AND  ( TBL-ZAIW-NAME (3 1)         = SPACE )
@@ -3110,7 +3138,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
       ***  AND  ( WRK-WIDX2               NOT = 1     )
       ***          MOVE    1                 TO  FLG-NOPRT
       ***  END-IF
-           IF     RECE04-SRYKBN   = "31" OR "32"
+           IF    (RECE04-SRYKBN    =   "31" OR "32")
+           AND   (RECE04-JIHOKBN   =   SPACE       )
               IF  FLG-HIKAKIN     =  ZERO
                 IF   ( TBL-ZAIW-NAME (3 1)         = SPACE )
                 AND  ( TBL-ZAIW-NAME (3 2)     NOT = SPACE )
@@ -4320,6 +4349,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
            MOVE    TBL-DENSHI-HKNCOMBI(IDX6 IDX5)
                                      TO  RECE06-HKNCOMBI
       *
+           MOVE    SPACE             TO  RECE06-JIHOKBN
+      *
            WRITE   RECE06-REC
       *
            IF      STS-RECE06          =   "00"
@@ -4804,7 +4835,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                  (RECE04-ZAITEN      =   ZERO                ) AND
                  (RECE04-TOYAKUFLG   =   SPACE               ))
              OR ( RECE04-SAFLG   NOT =   SPACE                )
-             OR ( RECE04-TOYAKUFLG   =   "2"                  )
+             OR ( RECE04-TOYAKUFLG   =   "2" OR "4"           )
              OR ( RECE04-ZAIKBN      =    1                   )
                   GO  TO  440-TNSKAI-SET-EXT
              END-IF
@@ -4913,7 +4944,11 @@ grpsys         PERFORM 900-DBSELECT-SEC
                AND  (RECE04-SRYKBN  = "95" OR "96"   )
                    MOVE    RECE04-SYUTEN1    TO  RECE06-ZAITEN
                ELSE
-                   MOVE    RECE04-ZAITEN     TO  RECE06-ZAITEN
+                 IF  RECE04-JIHOKBN = SPACE
+                   MOVE    RECE04-ZAITEN         TO  RECE06-ZAITEN
+                 ELSE
+                   MOVE    RECE04-HOKATU-ZAITEN  TO  RECE06-ZAITEN
+                 END-IF
                END-IF
       *
                IF      RECE04-SRYKBN     =   "60" OR "64"
@@ -4979,6 +5014,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-IF
       *
                MOVE    RECE04-HKNCOMBI   TO  RECE06-HKNCOMBI
+      *
+               MOVE    RECE04-JIHOKBN    TO  RECE06-JIHOKBN
       *
                WRITE   RECE06-REC
       *

@@ -61,6 +61,7 @@
       *                                     レセプト記載対応
       *
       *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
+      *  04.07.02    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -345,6 +346,8 @@
            MOVE   RECE66-DAY2        TO   RECE661-DAY2
       *
            MOVE   RECE66-HKNCOMBI    TO   RECE661-HKNCOMBI
+      *
+           MOVE   RECE66-JIHOKBN     TO   RECE661-JIHOKBN
       *
            IF     RECE66-RECESYUBETU  =  8888
               IF     RECE66-ZAITEN  NOT =  ZERO

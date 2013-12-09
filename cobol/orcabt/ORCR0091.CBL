@@ -85,6 +85,8 @@
       *                                     レセプト記載対応
       *  04.06.03    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
+      *
+      *  04.07.01    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -380,6 +382,8 @@ grpsys     MOVE    RECE06-KEY1          TO      RECE061-KEY1
            MOVE   RECE06-DAY2        TO   RECE061-DAY2
       *
            MOVE   RECE06-HKNCOMBI    TO   RECE061-HKNCOMBI
+      *
+           MOVE   RECE06-JIHOKBN     TO   RECE061-JIHOKBN
       *
            IF     RECE06-RECESYUBETU  =  8888
               IF     RECE06-ZAITEN  NOT =  ZERO

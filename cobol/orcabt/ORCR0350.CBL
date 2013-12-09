@@ -367,6 +367,7 @@
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-藤原    12/09/04  薬剤料減点対応
       *  04.07.03    NACL-藤原    12/12/17  複数枚レセプト分割対応
+      *  04.07.04    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4567,6 +4568,7 @@
                    IF      RECE641-SRYKBN              >=  "90"
                      IF    ( RECE65-SRYCD (IDX) (1:1)  =   "8"   OR
                              RECE65-SRYCD (IDX) (1:3)  =   "008"    )
+                     OR    ( RECE641-JIHOKBN  NOT =  SPACE          )
                          MOVE    1                     TO  FLG-TAISYO
                      ELSE
                         IF  ( RECE65-SRYCD (IDX)       =   "190128310"
@@ -7005,6 +7007,8 @@
                        OR      LNK-NYURECEDEN-HKNCOMBI (IDZ1 IDZ2)
                                                =   ZERO
       *
+                   MOVE    ZERO                    TO  FLG-TOYAKUFLG
+      *
                    MOVE    ZERO                    TO  FLG-CHK
       *
                    PERFORM VARYING IDXZ    FROM    1   BY  1
@@ -7339,6 +7343,14 @@
       *
       *                明細テーブル退避処理
                        PERFORM 20071-ZAI-TAIHI-SEC
+      *
+      *                仮レセデータフラグ設定
+                       IF      RECE641-TOYAKUFLG  =  SPACE
+                           MOVE    ZERO     TO  FLG-TOYAKUFLG
+                       ELSE
+                           MOVE    1        TO  FLG-TOYAKUFLG
+                       END-IF
+      *
       *               摘要データ編集処理
                        IF      FLG-END           =   ZERO
                            PERFORM 20072-ZAI-HENSYU-SEC

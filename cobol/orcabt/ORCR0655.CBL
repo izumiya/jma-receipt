@@ -45,6 +45,7 @@
       *
       *  04.06.01    NACL-藤原    10/10/12  公費単独のレセ分離対応
       *                                     キーにkohid 追加
+      *  04.07.01    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -412,6 +413,7 @@
                MOVE    RECE64-SURYOUTOTAL  TO  RECE642-SURYOUTOTAL
                MOVE    RECE64-RUIKEITOTAL  TO  RECE642-RUIKEITOTAL
                MOVE    RECE64-MEISAISU     TO  RECE642-MEISAISU 
+               MOVE    RECE64-JIHOKBN      TO  RECE642-JIHOKBN
                IF      RECE64-COMCDFLG   =   "1"
                  ADD     1                 TO  WRK-COMRENNUM
                  MOVE    WRK-COMRENNUM     TO  RECE642-COMRENNUM
@@ -806,6 +808,7 @@
            MOVE    RECE64-SURYOUTOTAL  TO  RECE642-SURYOUTOTAL
            MOVE    RECE64-RUIKEITOTAL  TO  RECE642-RUIKEITOTAL
            MOVE    RECE64-MEISAISU     TO  RECE642-MEISAISU
+           MOVE    RECE64-JIHOKBN      TO  RECE642-JIHOKBN
            START   RECE642-FILE
                KEY IS    >=   RECE642-KEY
                INVALID
@@ -823,6 +826,7 @@
                   (RECE64-SURYOUTOTAL  NOT =  RECE642-SURYOUTOTAL)  OR
                   (RECE64-RUIKEITOTAL  NOT =  RECE642-RUIKEITOTAL)  OR
                   (RECE64-MEISAISU     NOT =  RECE642-MEISAISU)     OR
+                  (RECE64-JIHOKBN      NOT =  RECE642-JIHOKBN)      OR
                   (FLG-RECE642             =  1)
       *
                   MOVE     ZERO     TO     FLG-NASHI

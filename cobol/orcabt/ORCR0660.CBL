@@ -145,6 +145,7 @@
       *  04.07.01    NACL-門脇    10/09/12  複数リハビリ開始日・リハビリ
       *                                     コメントの対応
       *  04.07.02    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
+      *  04.07.03    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1307,7 +1308,11 @@
                  END-IF
                END-IF
       *
-               EVALUATE      RECE64-SRYKBN
+               IF   RECE64-JIHOKBN  NOT =  SPACE
+                 INITIALIZE  WRK-JIDO-SETCOM-AREA
+                 PERFORM     20011-HOKATU-COMMENT-SEC
+               ELSE
+                 EVALUATE      RECE64-SRYKBN
                    WHEN      "11"
                       MOVE   ZERO   TO  FLG-COMMENT
       *            （初診（同日複数診療科）算定科のセット）
@@ -1485,7 +1490,8 @@
                       END-EVALUATE
                    WHEN   OTHER
                       PERFORM       2099-RECE64-TENSOU-SEC
-               END-EVALUATE
+                 END-EVALUATE
+               END-IF
       *
                PERFORM 990-RECE64-NEXT-SEC
       *
@@ -4804,6 +4810,30 @@
       *
            .
        20011-SHUJUTSU-ETC2-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    包括診療分のコメント編集（差込：上）
+      *****************************************************************
+       20011-HOKATU-COMMENT-SEC          SECTION.
+      *
+           PERFORM  200111-RECE65-TAIHI-SEC
+      *
+      *    ＲＥＣＥ０５ファイルの内容をテーブルに退避
+           MOVE    ZERO                 TO  IDX-RECE65
+           MOVE    SPACE                TO  WRK-RECE65XX-REC
+           INITIALIZE                       WRK-RECE65XX-REC
+      *
+           ADD    1             TO  IDX-RECE65
+           MOVE  "810000001"    TO  WRK-RECE65XX-SRYCD(IDX-RECE65 1)
+           MOVE   ZERO          TO  WRK-RECE65XX-SRYSURYO(IDX-RECE65 1)
+           MOVE   6             TO  WRK-RECE65XX-YUKOKETA(IDX-RECE65 1)
+           MOVE  "【包括診療】" TO  WRK-RECE65XX-NAME(IDX-RECE65 1)
+      *
+           PERFORM  200111-SRYACTINF-HENSYU-SEC
+      *
+           .
+       20011-HOKATU-COMMENT-EXT.
            EXIT.
       *
       *****************************************************************

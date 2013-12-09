@@ -146,6 +146,7 @@
       *  04.07.01    NACL-門脇    10/09/12  複数リハビリ開始日・リハビリ
       *                                     コメントの対応
       *  04.07.02    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
+      *  04.07.03    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -786,6 +787,7 @@
            03  TBL-YT1-OCC                      OCCURS 100.
              05  TBL-YT1-KEY.
                07  TBL-YT1-KOHBUNRI             PIC 9(01).
+               07  TBL-YT1-JIHOKBN              PIC X(01).
                07  TBL-YT1-HKNCOMBI             PIC 9(04).
                07  TBL-YT1-SRYKA                PIC X(02).
              05  TBL-YT1-RECE04-REC             PIC X(1000).
@@ -803,10 +805,11 @@
              05  TBL-YT1-FLG                    PIC 9(01).
       *
       *    並び替え用
-       01  WRK-YAKUTEI-DATA                     PIC X(1361).
+       01  WRK-YAKUTEI-DATA                     PIC X(1362).
       *
-       01  WRK-TAIHI-YT1-KEY                    PIC X(07).
+       01  WRK-TAIHI-YT1-KEY                    PIC X(08).
        01  WRK-TAIHI-YT1-KEY2                   PIC 9(01).
+       01  WRK-TAIHI-YT1-KEY3                   PIC X(01).
        01  WRK-YAKUTEI-ZAINUM                   PIC 9(08).
        01  WRK-YAKUTEI-ZAINUM2                  PIC 9(08).
       *
@@ -1376,7 +1379,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE059PARA-HOSPNUM
                  END-IF
                END-IF
       *
-               EVALUATE      RECE04-SRYKBN
+               IF   RECE04-JIHOKBN  NOT =  SPACE
+                 INITIALIZE  WRK-JIDO-SETCOM-AREA
+                 PERFORM     20011-HOKATU-COMMENT-SEC
+               ELSE
+                 EVALUATE      RECE04-SRYKBN
                    WHEN      "11"
                       MOVE   ZERO   TO  FLG-COMMENT
       *            （初診（同日複数診療科）算定科のセット）
@@ -1546,7 +1553,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE059PARA-HOSPNUM
                       END-IF
                    WHEN   OTHER
                       PERFORM    2099-RECE04-TENSOU-SEC
-               END-EVALUATE
+                 END-EVALUATE
+               END-IF
       *
                PERFORM 990-RECE04-NEXT-SEC
       *
@@ -5657,6 +5665,30 @@ grpsys       PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    包括診療分のコメント編集（差込：上）
+      *****************************************************************
+       20011-HOKATU-COMMENT-SEC          SECTION.
+      *
+           PERFORM  200111-RECE05-TAIHI-SEC
+      *
+      *    ＲＥＣＥ０５ファイルの内容をテーブルに退避
+           MOVE   ZERO          TO  IDX-RECE05
+           MOVE   SPACE         TO  WRK-RECE05XX-REC
+           INITIALIZE               WRK-RECE05XX-REC
+      *
+           ADD    1             TO  IDX-RECE05
+           MOVE  "810000001"    TO  WRK-RECE05XX-SRYCD(IDX-RECE05 1)
+           MOVE   ZERO          TO  WRK-RECE05XX-SRYSURYO(IDX-RECE05 1)
+           MOVE   6             TO  WRK-RECE05XX-YUKOKETA(IDX-RECE05 1)
+           MOVE  "【包括診療】" TO  WRK-RECE05XX-NAME(IDX-RECE05 1)
+      *
+           PERFORM  200111-SRYACTINF-HENSYU-SEC
+      *
+           .
+       20011-HOKATU-COMMENT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    算定日の確定
       *****************************************************************
        200111-SANTEI-DAY-SEC          SECTION.
@@ -6251,6 +6283,7 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *
            IF    IDX6    <=    100
              MOVE    RECE04-KOHBUNRI     TO   TBL-YT1-KOHBUNRI(IDX6)
+             MOVE    RECE04-JIHOKBN      TO   TBL-YT1-JIHOKBN(IDX6)
              MOVE    RECE04-HKNCOMBI     TO   TBL-YT1-HKNCOMBI(IDX6)
              MOVE    RECE04-SRYKA        TO   TBL-YT1-SRYKA(IDX6)
       *
@@ -6458,6 +6491,7 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
            INITIALIZE                   TBL-YAKUTEI-INF3
            MOVE       SPACE     TO      WRK-TAIHI-YT1-KEY
            MOVE       ZERO      TO      WRK-TAIHI-YT1-KEY2
+           MOVE       SPACE     TO      WRK-TAIHI-YT1-KEY3
       *
            MOVE       ZERO      TO      IDX11
       *
@@ -6469,7 +6503,8 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
       *
                  IF   WRK-TAIHI-YT1-KEY  NOT =  SPACE
                    PERFORM   2401-YAKUTEI-MATOME-SEC
-                   IF  TBL-YT1-KOHBUNRI(IDX6)  NOT =  WRK-TAIHI-YT1-KEY2
+                   IF (TBL-YT1-KOHBUNRI(IDX6) NOT = WRK-TAIHI-YT1-KEY2)
+                   OR (TBL-YT1-JIHOKBN(IDX6)  NOT = WRK-TAIHI-YT1-KEY3)
                        PERFORM 2402-YAKUTEI-WRITE-SEC
                        INITIALIZE                  TBL-YAKUTEI-INF3
                    END-IF
@@ -6478,6 +6513,7 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                  INITIALIZE                        TBL-YAKUTEI-INF2
                  MOVE   TBL-YT1-KEY(IDX6)      TO  WRK-TAIHI-YT1-KEY
                  MOVE   TBL-YT1-KOHBUNRI(IDX6) TO  WRK-TAIHI-YT1-KEY2
+                 MOVE   TBL-YT1-JIHOKBN(IDX6)  TO  WRK-TAIHI-YT1-KEY3
       *
               END-IF
       *
