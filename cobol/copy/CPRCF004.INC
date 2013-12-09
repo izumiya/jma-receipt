@@ -71,6 +71,7 @@
       *                                     ０８（老健）のレセプト対応
       *
       *  04.07.01    NACL-門脇    12/09/25  コメント差込項目追加
+      *  04.07.02    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
       ************************************************************
       *01  RECE04-REC.
            03  RECE04-KEY.
@@ -290,4 +291,16 @@
            03  RECE04-ACCTP-SANSOTEN       PIC 9(07).
       *窒素点数
            03  RECE04-ACCTP-CHISOTEN       PIC 9(07).
-
+      *
+      *包括診療分退避点数
+           03  RECE04-HOKATU-TENSU-AREA.
+      *剤点数
+               05  RECE04-HOKATU-ZAITEN    PIC 9(08).
+      *手技点数１
+               05  RECE04-HOKATU-SYUTEN1   PIC 9(07).
+      *手技点数２
+               05  RECE04-HOKATU-SYUTEN2   PIC 9(07).
+      *薬剤点数
+               05  RECE04-HOKATU-YKZTEN    PIC 9(07).
+      *器材点数
+               05  RECE04-HOKATU-KIZAITEN  PIC 9(07).
