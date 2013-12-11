@@ -402,6 +402,7 @@
       *  04.07.01    NACL-藤原    11/06/02  入退院履歴記載対応
       *                                     「2自費分は含まない」を追加
       *  04.07.02    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
+      *  04.07.04    NACL-門脇    13/12/09  医療情報連携対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4055,6 +4056,9 @@ grpsys         OR     ( RECE041-KEY1       NOT =   RECE05-KEY1         )
                        MOVE    RECE05-SRYCD (IDX)
                                                 TO  WRK-KIZAI-SRYCD
                        MOVE    "777770000"      TO  RECE05-SRYCD (IDX)
+                   END-IF
+                   IF      RECE05-INGAIFLG(IDX) = "1"
+                       MOVE    "699990001"      TO  RECE05-SRYCD (IDX)
                    END-IF
       *
                    EVALUATE    RECE05-SRYCD (IDX) (1:1)

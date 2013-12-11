@@ -618,6 +618,7 @@
       *  04.07.09    NACL-門脇    13/07/01  入院料他保険算定時コメント記載対応
       *  04.07.11    NACL-門脇    13/11/11  減額（円）の対応
       *  04.07.12    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
+      *  04.07.13    NACL-門脇    13/12/09  医療情報連携対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5754,7 +5755,7 @@
            MOVE    RECE62-SRYYM         TO      ACCT-SRYYM
            MOVE    SRYACCT-REC          TO      MCPDATA-REC
            MOVE    "tbl_sryacct"        TO      MCP-TABLE
-           IF      WRK-PARA-PRTKBN     =   "4" OR  "5" 
+           IF      WRK-PARA-PRTKBN     =   "9"
                MOVE    "key63"             TO  WRK-SRYACCT-PATHNAME
            ELSE
                MOVE    "key33"             TO  WRK-SRYACCT-PATHNAME

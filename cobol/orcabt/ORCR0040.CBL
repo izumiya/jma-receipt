@@ -147,6 +147,7 @@
       *                                     コメントの対応
       *  04.07.02    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.03    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
+      *  04.07.04    NACL-門脇    13/12/09  医療情報連携対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -521,6 +522,10 @@
            03  WRK-HEN-RENNUM-J2             PIC 9(02).
            03  WRK-HEN-SHORI-RENNUM-J2       PIC 9(01).
            03  WRK-HEN-SEQNO-J2              PIC 9(02).
+      *
+           03  WRK-HEN-RENNUM-J3             PIC 9(02).
+           03  WRK-HEN-SHORI-RENNUM-J3       PIC 9(01).
+           03  WRK-HEN-SEQNO-J3              PIC 9(02).
       *
            03  WRK-MCP-TABLE       PIC X(64).
            03  WRK-MCP-PATHNAME    PIC X(64).
@@ -7667,6 +7672,9 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
            MOVE    ZERO    TO    WRK-HEN-RENNUM-J2
                                  WRK-HEN-SHORI-RENNUM-J2
                                  WRK-HEN-SEQNO-J2
+           MOVE    ZERO    TO    WRK-HEN-RENNUM-J3
+                                 WRK-HEN-SHORI-RENNUM-J3
+                                 WRK-HEN-SEQNO-J3
       *
            PERFORM 800-RECE041-SET051-SEC
            MOVE    RECE041-ZAINUM      TO  RECE051-ZAINUM
@@ -7852,6 +7860,27 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                        MOVE   IDX       TO  WRK-HEN-SHORI-RENNUM-J2
                        MOVE   ZERO            TO  WRK-HEN-SEQNO-J2
                     END-IF
+      *
+      *             医療情報連携編集
+                    IF    RECE051-INGAIFLG(IDX)  =   "1"
+                       MOVE   RECE051-RENNUM  TO  WRK-HEN-RENNUM-J3
+                       MOVE   IDX       TO  WRK-HEN-SHORI-RENNUM-J3
+                       MOVE   ZERO            TO  WRK-HEN-SEQNO-J3
+      *
+                       ADD    1         TO  WRK-HEN-SEQNO-J3
+                       MOVE   WRK-HEN-RENNUM-J3
+                                        TO  WRK-HEN-RENNUM
+                       MOVE   WRK-HEN-SHORI-RENNUM-J3
+                                        TO  WRK-HEN-SHORI-RENNUM
+                       MOVE   WRK-HEN-SEQNO-J3
+                                        TO  WRK-HEN-SEQNO
+                       PERFORM  26011-SETCOM-HENSYU3-SEC
+                       IF  (WRK-HEN-RENNUM-J3 = WRK-HEN-RENNUM-X)
+                       AND (WRK-HEN-SHORI-RENNUM-J3
+                                        = WRK-HEN-SHORI-RENNUM-X)
+                         ADD  1         TO  WRK-HEN-SEQNO-X
+                       END-IF
+                    END-IF
                  END-IF
                END-PERFORM
       *
@@ -7882,10 +7911,20 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
            MOVE    WRK-HEN-SHORI-RENNUM  TO  RECE055-SHORI-RENNUM
            MOVE    WRK-HEN-SEQNO         TO  RECE055-SEQNO
       *
-           MOVE    RECE051-SRYCD(IDX)    TO  RECE055-SRYCD
-           MOVE    RECE051-NAME(IDX)     TO  RECE055-NAME
-           MOVE    RECE051-INPUTCOMENT(IDX)
+           IF    RECE051-INGAIFLG(IDX)  =   "1"
+             IF   RECE051-GENERIC-KBN(IDX)  =  "1"
+               MOVE  RECE051-YAKKAKJNCD(IDX)(1:9)
+                                         TO  RECE055-SRYCD
+             END-IF
+             MOVE    RECE051-GENERICNAME(IDX)
+                                         TO  RECE055-NAME
+                                             RECE055-INPUTCOMENT
+           ELSE
+             MOVE    RECE051-SRYCD(IDX)  TO  RECE055-SRYCD
+             MOVE    RECE051-NAME(IDX)   TO  RECE055-NAME
+             MOVE    RECE051-INPUTCOMENT(IDX)
                                          TO  RECE055-INPUTCOMENT
+           END-IF
       *
            WRITE   RECE055-REC
            ADD     1                     TO  CNT-RECE055
