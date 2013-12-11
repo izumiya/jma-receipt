@@ -484,6 +484,7 @@ RECORD_files = \
 	hsptevalv2.rec \
 	hsptinfv2.rec \
 	hsacsimulatev2.rec \
+	W91.rec \
 
 DEF_files = \
 

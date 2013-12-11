@@ -1,0 +1,19 @@
+W91	{
+	title	varchar(256);
+	popup_summary	varchar(256);
+	popup_body	varchar(1024);
+	popup_icon	varchar(256);
+	popup_timeout	int;
+	fixed1	{
+		FILEDIR	{
+			value	varchar(200);
+		};
+		COOPBASE_COMB	{
+			COOPBASE	{
+				value	varchar(20);
+			};
+			count	int;
+			item	varchar(20)[10];
+		};
+	};
+};
