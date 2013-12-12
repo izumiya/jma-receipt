@@ -174,6 +174,7 @@
       *                                     チェックのとき０９５９３で始
       *                                     まるコードがあるレセプトは対
       *                                     象外とする
+      *  04.07.12    NACL-藤原    13/12/09  医療情報連係基盤対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -454,6 +455,8 @@
       *
            COPY    "CPSK4100.INC".
       *
+           COPY    "CPSK9101.INC".
+      *
       *    印刷データ削除設定情報
            COPY    "CPSK8000.INC".
       *
@@ -700,6 +703,28 @@
       *
            INITIALIZE              SPA-T01FREE
       *
+      *    医療情報連携基盤用情報
+           INITIALIZE                  SYS-9101-REC
+           MOVE    "9101"          TO  SYS-9101-KANRICD
+           MOVE    "*"             TO  SYS-9101-KBNCD
+           MOVE    SPA-SYSYMD      TO  SYS-9101-STYUKYMD
+                                       SYS-9101-EDYUKYMD
+           MOVE    SPA-HOSPNUM     TO  SYS-9101-HOSPNUM
+           MOVE    SYS-9101-REC    TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE   MCPDATA-REC  TO  SYS-9101-REC
+           ELSE
+               MOVE   SPACE        TO  SYS-9101-REC
+           END-IF
+           IF      SYS-9101-COOPBASE   =   SPACE
+               MOVE    "0"             TO  SYS-9101-COOPBASE
+           END-IF
+           MOVE    SYS-9101-COOPBASE
+                                   TO  SPA-NAI-9101-COOPBASE
+           MOVE    SYS-9101-FILE-DIR
+                                   TO  SPA-NAI-9101-FILE-DIR
+      *
       *    出力先プリンタ名割り当て情報編集
            MOVE    SPACE               TO  SYS-1031-REC
            INITIALIZE                  SYS-1031-REC
@@ -757,6 +782,15 @@ grpsys                                         SPA-AREA
            MOVE    "点検用（院外処方含）"
                                        TO  SPA-GMN-PRTKBNMEIL    (2)
            MOVE    2                   TO  SPA-GMN-PRTKBN-MAX
+           IF      SPA-NAI-9101-COOPBASE
+                                       =   "1"
+               MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
+               MOVE    "連係基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
+               MOVE    "7"                 TO  SPA-GMN-PRTKBNL   (4)
+               MOVE    "連係基盤用（当日分まで）"
+                                           TO  SPA-GMN-PRTKBNMEIL(4)
+               MOVE    4                   TO  SPA-GMN-PRTKBN-MAX
+           END-IF
            MOVE    SPA-GMN-PRTKBNLST (1)
                                        TO  SPA-GMN-PRTKBN-G
       *
@@ -1683,6 +1717,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    "点検用（院外処方含）"
                                            TO  SPA-GMN-PRTKBNMEIL    (2)
                MOVE    2                   TO  SPA-GMN-PRTKBN-MAX
+               IF      SPA-NAI-9101-COOPBASE
+                                           =   "1"
+                   MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
+                   MOVE    "連係基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
+                   MOVE    "7"                 TO  SPA-GMN-PRTKBNL   (4)
+                   MOVE    "連係基盤用（当日分まで）"
+                                               TO  SPA-GMN-PRTKBNMEIL(4)
+                   MOVE    4                   TO  SPA-GMN-PRTKBN-MAX
+               END-IF
       *
                MOVE    SPACE               TO  SPA-GMN-TITLE
       *
@@ -1692,6 +1735,15 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    "点検用（院外処方含）"
                                            TO  SPA-GMN-PRTKBNMEIL    (1)
                MOVE    1                   TO  SPA-GMN-PRTKBN-MAX
+               IF      SPA-NAI-9101-COOPBASE
+                                           =   "1"
+                   MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (2)
+                   MOVE    "連係基盤用"        TO  SPA-GMN-PRTKBNMEIL(2)
+                   MOVE    "7"                 TO  SPA-GMN-PRTKBNL   (3)
+                   MOVE    "連係基盤用（当日分まで）"
+                                               TO  SPA-GMN-PRTKBNMEIL(3)
+                   MOVE    3                   TO  SPA-GMN-PRTKBN-MAX
+               END-IF
       *
                STRING  "該当の診療年月に０点公費記載ありの点検用レセ"
                                                DELIMITED  BY  SIZE
@@ -3061,6 +3113,11 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                                                TO  SPA-GMN-DATAKBN-G
                END-IF
            END-IF
+      *
+           IF      SPA-GMN-PRTKBN  =   "6" OR  "7"
+               MOVE    SPA-GMN-DATAKBNLST (4)
+                                       TO  SPA-GMN-DATAKBN-G
+           END-IF
            .
        4104-DATAKBN-CHK-EXT.
            EXIT.
@@ -3116,6 +3173,13 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                    MOVE    SPA-GMN-PRTKBNLST (1)
                                                TO  SPA-GMN-PRTKBN-G
                END-IF
+           END-IF
+      *
+           IF      SPA-GMN-PRTKBN  =   "6" OR  "7"
+               MOVE    SPA-GMN-DATAKBNLST     (4)
+                                       TO  SPA-GMN-DATAKBN-G
+               MOVE    SPA-GMN-RECEDEN-CHKLST (1)
+                                       TO  SPA-GMN-RECEDEN-CHK-G
            END-IF
            .
        4106-PRTKBN-CHK-EXT.
@@ -3246,6 +3310,25 @@ grpsys         MOVE    SPA-HOSPNUM     TO  HKNJA-HOSPNUM
                    IF      SPA-GMN-DATAKBN =   "1" OR  "2" OR  "3"
                        MOVE    "0013"          TO  SPA-ERRCD
                        MOVE    4               TO  SPA-GMN-CUR
+                   END-IF
+                   IF      SPA-GMN-PRTKBN  =   "6" OR  "7"
+                       MOVE    "0014"          TO  SPA-ERRCD
+                       MOVE    4               TO  SPA-GMN-CUR
+                   END-IF
+               WHEN    "B06"
+               WHEN    "B07"
+               WHEN    "B08"
+                   IF      SPA-GMN-PRTKBN  =   "6" OR  "7"
+                       IF      SPA-GMN-NYUGAIKBN   =   "0"
+                           MOVE    "0015"          TO  SPA-ERRCD
+                           MOVE    5               TO  SPA-GMN-CUR
+                       END-IF
+                       IF      SPA-GMN-DATAKBN =   "4"
+                           CONTINUE
+                       ELSE
+                           MOVE    "0016"          TO  SPA-ERRCD
+                           MOVE    4               TO  SPA-GMN-CUR
+                       END-IF
                    END-IF
            END-EVALUATE
       *
@@ -4670,16 +4753,19 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  460-RECEDEN-GID-EXT
            END-IF
-      *    
-      *    主科設定時の主科未設定データの存在チェック
-           MOVE    ZERO                TO  FLG-SYUKA-CHK
+      *
+           IF      SPA-GMN-PRTKBN  =   "6" OR  "7"
+             CONTINUE
+           ELSE
+      *      主科設定時の主科未設定データの存在チェック
+             MOVE    ZERO                TO  FLG-SYUKA-CHK
       *   
-           MOVE    SPACE               TO  RECE10-REC
-           INITIALIZE                      RECE10-REC
-           MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
-           MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
-           MOVE    "00"                TO  RECE10-RECEKA
-           EVALUATE    MCP-WIDGET
+             MOVE    SPACE               TO  RECE10-REC
+             INITIALIZE                      RECE10-REC
+             MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+             MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
+             MOVE    "00"                TO  RECE10-RECEKA
+             EVALUATE    MCP-WIDGET
                WHEN    "B06"
                    IF     SPA-NAI-2009-SYUKA-SYAHO  =   "1"
                        MOVE    1               TO  RECE10-TEISYUTUSAKI
@@ -4707,21 +4793,21 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                        MOVE    6               TO  RECE10-TEISYUTUSAKI
                        PERFORM 4602-SYUKA-CHK-SEC
                    END-IF
-           END-EVALUATE
-           IF      FLG-SYUKA-CHK       =   1
+             END-EVALUATE
+             IF      FLG-SYUKA-CHK       =   1
                MOVE    "0011"              TO  SPA-ERRCD
                GO  TO  460-RECEDEN-GID-EXT
-           END-IF
+             END-IF
       *    
-      *    月遅れ分のレセ電データの存在チェック
-           MOVE    ZERO                TO  FLG-RECEDEN-CHK
-                                           FLG-RECEDEN-201203-CHK
+      *      月遅れ分のレセ電データの存在チェック
+             MOVE    ZERO                TO  FLG-RECEDEN-CHK
+                                             FLG-RECEDEN-201203-CHK
       *   
-           MOVE    SPACE               TO  RECE10-REC
-           INITIALIZE                      RECE10-REC
-           MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
-           MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
-           EVALUATE    MCP-WIDGET
+             MOVE    SPACE               TO  RECE10-REC
+             INITIALIZE                      RECE10-REC
+             MOVE    SPA-HOSPNUM         TO  RECE10-HOSPNUM
+             MOVE    SPA-NAI-SKYYM       TO  RECE10-SKYYM
+             EVALUATE    MCP-WIDGET
                WHEN    "B06"
                    MOVE    1               TO  RECE10-TEISYUTUSAKI
                    EVALUATE    SPA-GMN-NYUGAIKBN
@@ -4819,8 +4905,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                            MOVE    SPACE       TO  RECE10-NYUGAIKBN
                    END-EVALUATE
                    PERFORM 4601-RECEDEN-CHK-SEC
-           END-EVALUATE
-      *
+             END-EVALUATE
+           END-IF
       * 
       *    ジョブ管理チェック処理
            IF      SPA-ERRCD       =   SPACE
@@ -5023,7 +5109,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *****************************************************************
-      *    レセ電出力処理
+      *    レセ電出力処理（医保分）
       *****************************************************************
        460-RECEDEN-SEC                SECTION.
       *
@@ -5254,6 +5340,19 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG20
            ELSE
                MOVE    SPA-GMN-RECEDEN-CHK
                                        TO  SHELLTBL-ARG26
+           END-IF
+      *
+      *    連係基盤用の時、再設定
+           IF      SPA-GMN-PRTKBN  =   "6" OR  "7"
+               MOVE    SPACE           TO  SHELLTBL-ARG13 
+               STRING  SPA-NAI-9101-FILE-DIR   DELIMITED  BY  SPACE
+                       "/"                     DELIMITED  BY  SIZE
+                                       INTO    SHELLTBL-ARG13
+               END-STRING
+               MOVE    "0"             TO  SHELLTBL-ARG22
+               MOVE    "0"             TO  SHELLTBL-ARG23
+               MOVE    "0"             TO  SHELLTBL-ARG24
+               MOVE    "0"             TO  SHELLTBL-ARG26
            END-IF
       *
            MOVE    SHELLTBL        TO  MCPDATA-REC
@@ -6695,6 +6794,25 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                                                DELIMITED  BY  SIZE
                            "選択できません"    DELIMITED  BY  SIZE
                                                INTO  TERR-ERRMSG
+                   END-STRING
+               WHEN    "0014"
+                   STRING  "連係基盤用は労災のときは"
+                                               DELIMITED  BY  SIZE
+                           "選択できません"    DELIMITED  BY  SIZE
+                                               INTO  TERR-ERRMSG
+                   END-STRING
+               WHEN    "0015"
+                   STRING  "連係基盤用のときは入院・入院外は"
+                                               DELIMITED  BY  SIZE
+                           "選択できません"    DELIMITED  BY  SIZE
+                                               INTO  TERR-ERRMSG
+                   END-STRING
+               WHEN    "0016"
+                   STRING  "選択したファイル出力先は連係基盤用のときは"
+                                               DELIMITED  BY  SIZE
+                           "選択できません"    DELIMITED  BY  SIZE
+                                               INTO  TERR-ERRMSG
+                   END-STRING
                WHEN    "0020"
                    STRING  "改正パッチ提供以降に平成２４年３月以前の"
                                                    DELIMITED  BY  SIZE
@@ -6991,14 +7109,17 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "1023"
                WHEN    "1024"
                WHEN    "1025"
-                   IF  (   SPA-NAI-200501-RECEDEN-LST1KBN
+                   IF      SPA-GMN-PRTKBN    =   "6" OR  "7"
+                     MOVE    WRK-TIDMSG      TO  TID2-ID1MSG
+                   ELSE
+                     IF  (   SPA-NAI-200501-RECEDEN-LST1KBN
                                            =   "1"         )
-                   OR  ( ( SPA-NAI-200501-RECEDEN-LST2KBN
+                     OR  ( ( SPA-NAI-200501-RECEDEN-LST2KBN
                                            =   "1"    )    AND
-                         ( SPA-GMN-PRTKBN  =   "1"    )        )
-                   OR  ( ( SPA-GMN-RECEDEN-CHK
+                           ( SPA-GMN-PRTKBN  =   "1"    )        )
+                     OR  ( ( SPA-GMN-RECEDEN-CHK
                                            =   "1"    )    AND
-                         ( SPA-NAI-SKYYM   >=  201204 )        )
+                           ( SPA-NAI-SKYYM   >=  201204 )        )
                        MOVE    SPACE           TO  WRK-TIDMSG1
                                                    WRK-TIDCD-MSG
       *
@@ -7035,15 +7156,19 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                                   "の印刷を指定）" DELIMITED  BY  SIZE
                                                    INTO    TID2-ID1MSG
                        END-STRING
-                   ELSE
+                     ELSE
                        MOVE    WRK-TIDMSG      TO  TID2-ID1MSG
-                   END-IF    
+                     END-IF
+                   END-IF
                    IF      FLG-RECEDEN-CHK =   1
                        MOVE    "red"           TO  TID2-ID1MSG-STYLE
                    END-IF
                    MOVE    "blue"              TO  TID2-LABEL-STYLE
                    IF      SPA-GMN-PRTKBN      =   "2"
                        MOVE    "【点検用】"        TO  TID2-LABEL
+                   END-IF
+                   IF      SPA-GMN-PRTKBN      =   "6" OR  "7"
+                       MOVE    "【連係用】"        TO  TID2-LABEL
                    END-IF
       *
                    EVALUATE    SPA-TIDCD
@@ -7092,21 +7217,27 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "1023"
                WHEN    "1024"
                WHEN    "1025"
-                   IF  (   SPA-NAI-200501-RECEDEN-LST1KBN
-                                           =   "1"             )
-                   OR  ( ( SPA-NAI-200501-RECEDEN-LST2KBN
-                                           =   "1"    )   AND
-                         ( SPA-GMN-PRTKBN  =   "1"    )        )
-                   OR  ( ( SPA-GMN-RECEDEN-CHK
-                                           =   "1"    )    AND
-                         ( SPA-NAI-SKYYM   >=  201204 )        )
+                   IF      SPA-GMN-PRTKBN    =   "6" OR  "7"
+                     MOVE    "F"             TO  TID2-B10-VISIBLE
+                     MOVE    "F"             TO  TID2-B11-VISIBLE
+                     MOVE    "F12:作成する"  TO  TID2-B12-LABEL
+                   ELSE
+                     IF  (   SPA-NAI-200501-RECEDEN-LST1KBN
+                                             =   "1"             )
+                     OR  ( ( SPA-NAI-200501-RECEDEN-LST2KBN
+                                             =   "1"    )   AND
+                           ( SPA-GMN-PRTKBN  =   "1"    )        )
+                     OR  ( ( SPA-GMN-RECEDEN-CHK
+                                             =   "1"    )    AND
+                           ( SPA-NAI-SKYYM   >=  201204 )        )
                        MOVE    "T"             TO  TID2-B10-VISIBLE
                        MOVE    "T"             TO  TID2-B11-VISIBLE
                        MOVE    "F12:印刷する"  TO  TID2-B12-LABEL
-                   ELSE
+                     ELSE
                        MOVE    "F"             TO  TID2-B10-VISIBLE
                        MOVE    "F"             TO  TID2-B11-VISIBLE
                        MOVE    "F12:作成する"  TO  TID2-B12-LABEL
+                     END-IF
                    END-IF
                WHEN    "1027"
                WHEN    "1028"

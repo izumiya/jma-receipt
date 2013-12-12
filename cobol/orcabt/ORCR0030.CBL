@@ -2306,7 +2306,7 @@
       *
            UNSTRING    COMMAND-PARAM   DELIMITED  BY  ","
                                        INTO    WRK-PARA
-      *@@@@                                    WRK-PARA-PRTKBN
+                                               WRK-PARA-PRTKBN
                                                WRK-PARA-HOSPNUM
                                                RECEERR
            END-UNSTRING
@@ -12749,7 +12749,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
              MOVE    WRK-1030-KOUHATUKA  TO  ORCSGETGE-KOUHATUKA
              CALL    "ORCSGETGENERIC"    USING
                                          ORCSGETGENERICAREA
-                                         SPA-AREA 
+                                         SPA-AREA
              IF      ORCSGETGE-ERRCD     =   ZERO
                PERFORM   VARYING  IDX15    FROM    1   BY  1
                           UNTIL   IDX15     >     50

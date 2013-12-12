@@ -23,6 +23,7 @@ fi
 #        ${20} HOSPNUM
 #        ${21} レセプト作成区分
 #            1:提出用レセ、2:点検用レセ
+#            6:連係基盤用、7:連係基盤用（当日）
 #        ${22} 症状詳記作成区分
 #            1:作成する
 #        ${23} 光ディスク等送付書作成区分
@@ -47,9 +48,14 @@ fi
     fi
 
     rm -f /home/orca/recept4.log
-    LOG_FILE="/var/log/jma-receipt/${20}recept4.log"
+    if  [ ${21} -eq '6' ] || [ ${21} -eq '7' ]; then
+        LOG_FILE="/var/log/jma-receipt/${20}recept4_renkei.log"
+    else
+        LOG_FILE="/var/log/jma-receipt/${20}recept4.log"
+    fi
 
-    echo "arg5 =  [" ${5} "]"  >$LOG_FILE
+    echo "arg3 =  [" ${3} "]"  >$LOG_FILE
+    echo "arg5 =  [" ${5} "]"  >>$LOG_FILE
     echo "arg12 = [" ${12} "]" >>$LOG_FILE
     echo "arg13 = [" ${13} "]" >>$LOG_FILE
     echo "arg17 = [" ${17} "]" >>$LOG_FILE
@@ -77,8 +83,64 @@ fi
 	rm  ${13}${20}${RECEFILE1}*.UKE
 	rm  /tmp/${20}${RECEFILE2}*.txt
 
-#   レセ電ファイル作成
 
+#   連係基盤ファイル作成
+    if  [ ${21} -eq '6' ] || [ ${21} -eq '7' ]; then
+        if  [ ${12} -eq '1' ]; then
+            if  [ ${19} -eq '1' ]; then
+                RECEFILE1="RECEIPTCS2"
+                RECEFILE2="RECEDENS2"
+            else
+                RECEFILE1="RECEIPTCS1"
+                RECEFILE2="RECEDENS1"
+            fi
+        else
+            if  [ ${19} -eq '1' ]; then
+                RECEFILE1="RECEIPTCK2"
+                RECEFILE2="RECEDENK2"
+            else 
+                RECEFILE1="RECEIPTCK1"
+                RECEFILE2="RECEDENK1"
+            fi 
+        fi
+	echo "file name change![" ${RECEFILE1} ${RECEFILE2} "]" >>$LOG_FILE
+
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM580 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${19},${17},$fixedsize,${21},${25},${20},${16} >> $LOG_FILE 2>&1
+        if  [ -e ${16} ]; then
+            echo "--- BM580 err file exist ---" >> $LOG_FILE 2>&1
+            exit 
+        fi
+
+        if ! test -d  "${13}"; then
+             mkdir ${13}
+             RC=$?
+             echo "--- mkdir end   ---[" $RC  "]" >>$LOG_FILE
+             if  [ $RC -ne '0' ]; then
+                 ERRCD='0077'
+                 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15}'  '${ERRCD},${20} >> $LOG_FILE
+                 echo "--- mkdir  err   ---" >>$LOG_FILE
+                 exit
+             fi
+             chmod -R g+r ${13}
+             echo "--- mkdir rireki holder ---" >>$LOG_FILE
+        else
+             rm ${13}${RECEFILE1}*.UKE
+             echo "--- rm holder file ---" ${13}${RECEFILE1}*.UKE "]" >>$LOG_FILE
+        fi
+        echo "--- folder name  [" ${13} "]" >>$LOG_FILE
+
+        echo "--- file name  [" /tmp/${20}${RECEFILE2}${3}.txt "=>" ${13}${RECEFILE1}${3}.UKE "]" >>$LOG_FILE
+        nkf -s /tmp/${20}${RECEFILE2}${3}.txt > ${13}${RECEFILE1}${3}.UKE
+##      RC=$?
+##      echo "--- nkf end   ---[" $RC  "]" >>$LOG_FILE
+        chmod -R g+r ${13}${RECEFILE1}${3}.UKE
+
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15},${20} >> $LOG_FILE
+        exit 
+    fi     
+
+
+#   レセ電ファイル作成
     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM500 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${19},${17},$fixedsize,${21},${25},${20},${16} >> $LOG_FILE 2>&1
     if  [ -e ${16} ]; then
         echo "--- BM500 err file exist ---" >> $LOG_FILE 2>&1
@@ -121,7 +183,7 @@ fi
 	ERRLOG="${TMPFILEBASE}${SHNAME%%.sh}.log"
 	INFILE="/tmp/${20}${RECEFILE2}01.txt"
 	EUCFILE="${TMPFILEBASE}$(basename ${INFILE}).euc"
-	PRM="${20},${EUCFILE},${ERRFILE},${ERRLOG},${21}}"
+	PRM="${20},${EUCFILE},${ERRFILE},${ERRLOG},${21}"
 
 	export  RUBYLIB=$SITESCRIPTSDIR:$PATCHSCRIPTSDIR:$SCRIPTSDIR:$RUBYLIB
 	export  APS_EXEC_PATH=$(dirname $0)

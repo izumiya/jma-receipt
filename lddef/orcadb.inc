@@ -180,4 +180,5 @@ db	{
         tbl_mnote_b;
         tbl_ptconf;
         tbl_byomeiinputset;
+        tbl_renkei_tmp;
 };

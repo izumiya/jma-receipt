@@ -192,6 +192,7 @@
       *  04.07.08    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.09    NACL-藤原    13/02/07  労災レセ電対応
       *  04.07.11    NACL-門脇    13/11/11  減額（円）の対応
+      *  04.07.12    NACL-藤原    13/12/09  医療情報連係基盤対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1442,8 +1443,14 @@
                PERFORM 5001-DB-DELETE-SEC
            END-IF
       *
-           IF      FLG-STS             =   ZERO
-              PERFORM 900-RECE62-READ-SEC
+      *
+      *    連係基盤用のとき処理終了
+           IF      WRK-PARA-PRTKBN      =   "9"
+               MOVE    2                    TO  FLG-STS
+           ELSE
+               IF      FLG-STS             =   ZERO
+                   PERFORM 900-RECE62-READ-SEC
+               END-IF
            END-IF
            .
        100-INIT-EXT.
@@ -10923,6 +10930,91 @@
       *    データ削除処理
       *****************************************************************
        5001-DB-DELETE-SEC               SECTION.
+      *
+      *    連係基盤用のとき
+           IF      WRK-PARA-PRTKBN =   "9"
+               IF      WRK-PARA-SYOKBN     =   "1"
+                   INITIALIZE                      RECEDEN-REC
+                   MOVE    WRK-PARA-HOSPNUM    TO  RECEDEN-HOSPNUM
+      *************MOVE    WRK-PARA-SRYYM      TO  RECEDEN-SRYYM
+                   MOVE    "1"                 TO  RECEDEN-NYUGAIKBN
+                   MOVE    RECEDEN-REC         TO  MCPDATA-REC
+                   MOVE    "DBDELETE"          TO  MCP-FUNC
+                   MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
+                   MOVE    "del1"              TO  MCP-PATHNAME
+                   PERFORM 900-ORCDBMAIN-SEC
+                   IF      MCP-RC           NOT =   ZERO
+                       DISPLAY "DBPATH=" MCP-TABLE " " MCP-PATHNAME
+                               " MCP-RC=" MCP-RC
+                       MOVE
+                       "連係基盤削除処理でエラーとなりました"
+                                               TO    WRK-RECEERR
+                       PERFORM 500-ERR-HENSYU-SEC
+                       GO  TO  5001-DB-DELETE-EXT
+                   END-IF
+               ELSE
+                   EVALUATE    BTPARA-INFO-KBN
+                     WHEN    "01"
+      *                レセプト指示（個別指示）コード読み込み
+                       INITIALIZE                      SYS-2002-REC
+                       MOVE    "2002"              TO  SYS-2002-KANRICD
+                       MOVE    WRK-PARA-HOSPNUM    TO  SYS-2002-HOSPNUM
+                       MOVE    ZERO                TO  SYS-2002-STYUKYMD
+                       MOVE    ZERO                TO  SYS-2002-EDYUKYMD
+                       MOVE    SYS-2002-REC        TO  MCPDATA-REC
+                       MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                       MOVE    "key2"              TO  MCP-PATHNAME
+                       PERFORM 900-DBSELECT-SEC
+                       IF      MCP-RC              =   ZERO
+                           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+                           MOVE    "key2"          TO  MCP-PATHNAME
+                           PERFORM 900-SYSKANRI-N-SEC
+                       ELSE
+                           MOVE    1                   TO  FLG-SYSKANRI
+                       END-IF
+      *
+                       PERFORM         UNTIL       FLG-SYSKANRI    =   1
+                           MOVE    MCPDATA-REC     TO  SYS-2002-REC
+      *
+                           DISPLAY "DELETE PTNUM=" SYS-2002-PTNUM
+                                           " SRYYM=" SYS-2002-SRYYM
+      *                    診療年月のレセ電削除処理
+                           INITIALIZE                  RECEDEN-REC
+                           MOVE    WRK-PARA-HOSPNUM    TO
+                                                       RECEDEN-HOSPNUM
+                           MOVE    SYS-2002-PTID       TO  RECEDEN-PTID
+                           MOVE    SYS-2002-SRYYM      TO  RECEDEN-SRYYM
+                           MOVE    SYS-2002-NYUGAIKBN  TO
+                                                       RECEDEN-NYUGAIKBN
+                           MOVE    RECEDEN-REC         TO  MCPDATA-REC
+                           MOVE    "DBDELETE"          TO  MCP-FUNC
+                           MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
+                           MOVE    "del2"              TO  MCP-PATHNAME
+                           PERFORM 900-ORCDBMAIN-SEC
+                           IF      MCP-RC           NOT =   ZERO
+                               DISPLAY "DBPATH=" MCP-TABLE
+                                       " " MCP-PATHNAME
+                                       " MCP-RC=" MCP-RC
+                               MOVE
+                        "連係基盤削除処理（個別分）でエラーとなりました"
+                                                   TO    WRK-RECEERR
+                               PERFORM 500-ERR-HENSYU-SEC
+                               GO  TO  5001-DB-DELETE-EXT
+                           END-IF
+      *
+                           MOVE    "tbl_syskanri"  TO  MCP-TABLE
+                           MOVE    "key2"          TO  MCP-PATHNAME
+                           PERFORM 900-SYSKANRI-N-SEC
+                       END-PERFORM
+      *
+                       MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                       MOVE    "key2"              TO  MCP-PATHNAME
+                       PERFORM 900-CLOSE-SEC
+                 END-EVALUATE
+               END-IF      
+               GO  TO  5001-DB-DELETE-EXT
+           END-IF
+      * 
       *
            IF      WRK-PARA-SYOKBN     =   "1"
       *

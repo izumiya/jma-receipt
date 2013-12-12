@@ -61,6 +61,7 @@
       *
       *  04.07.01    NACL-藤原    12/11/20  リアルタイムプレビュー時の
       *                                     一画面対応
+      *  04.07.02    NACL-藤原    13/12/09  医療情報連係基盤対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -503,6 +504,8 @@
            MOVE     SPACE       TO WRK-ARG
            STRING   WRK-PARA2      DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
+                    WRK-PARA-PRTKBN
+                    ","            DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
@@ -512,6 +515,17 @@
            DISPLAY "ORCR0030 start = [" WRK-ARG "]"
            CALL    "ORCR0030"          USING
                                        WRK-ARG
+      *
+           MOVE     SPACE       TO WRK-ARG
+           STRING   WRK-PARA2      DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    WRK-PARA-HOSPNUM
+                                   DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    RECEERR        DELIMITED   BY  SPACE
+                                   INTO    WRK-ARG
+           END-STRING
+           DISPLAY "ORCR0035 start = [" WRK-ARG "]"
            CALL    "ORCR0035"          USING
                                        WRK-ARG
            CALL    "ORCR0038"          USING
@@ -758,8 +772,32 @@
            DISPLAY "ORCR0630 start = [" WRK-ARG "]"
            CALL    "ORCR0630"          USING
                                    WRK-ARG
+      *
+           MOVE     SPACE       TO WRK-ARG
+           STRING   WRK-PARA2      DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    WRK-PARA-PRTKBN
+                    ","            DELIMITED   BY  SIZE
+                    WRK-PARA-HOSPNUM
+                                   DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    RECEERR        DELIMITED   BY  SPACE
+                                   INTO    WRK-ARG
+           END-STRING
+           DISPLAY "ORCR0640 start = [" WRK-ARG "]"
            CALL    "ORCR0640"          USING
                                    WRK-ARG
+      *
+           MOVE     SPACE       TO WRK-ARG
+           STRING   WRK-PARA2      DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    WRK-PARA-HOSPNUM
+                                   DELIMITED   BY  SIZE
+                    ","            DELIMITED   BY  SIZE
+                    RECEERR        DELIMITED   BY  SPACE
+                                   INTO    WRK-ARG
+           END-STRING
+           DISPLAY "ORCR0650 start = [" WRK-ARG "]"
            CALL    "ORCR0650"          USING
                                    WRK-ARG
       *

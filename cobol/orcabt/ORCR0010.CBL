@@ -230,6 +230,7 @@
       *  04.07.02    NACL-藤原    12/03/25  公費記載順設定対応
       *  04.07.03    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.04    NACL-藤原    13/08/01  公費記載順設定時の条件の修正
+      *  04.07.05    NACL-藤原    13/12/09  医療情報連係基盤対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -375,6 +376,7 @@
       *
            03  WRK-MCP-TABLE           PIC X(64).
            03  WRK-MCP-PATHNAME        PIC X(64).
+           03  WRK-SRYACCT-PATHNAME    PIC X(64).
       *
            03  WRK-PRTSEQ              PIC 9(03).
       *
@@ -1103,11 +1105,18 @@ grpsys         MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
                MOVE    "2"                 TO  ACCT-NYUGAIKBN
                MOVE    SRYACCT-REC         TO  MCPDATA-REC
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key36"             TO  MCP-PATHNAME
-grpsys         PERFORM 900-DBSELECT-SEC
+               IF      WRK-PARA-PRTKBN     =   "9"
+                   MOVE    "key60"             TO  WRK-SRYACCT-PATHNAME
+               ELSE
+                   MOVE    "key36"             TO  WRK-SRYACCT-PATHNAME
+               END-IF
+               MOVE    WRK-SRYACCT-PATHNAME
+                                           TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                   MOVE    "key36"             TO  MCP-PATHNAME
+                   MOVE    WRK-SRYACCT-PATHNAME
+                                               TO  MCP-PATHNAME
                    PERFORM 900-SRYACCT-READ-SEC
                ELSE
                    INITIALIZE                  SRYACCT-REC
@@ -1120,7 +1129,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-PERFORM
       *        カーソルクロース
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key36"             TO  MCP-PATHNAME
+               MOVE    WRK-SRYACCT-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
            END-IF
            .
@@ -1152,7 +1162,8 @@ grpsys     MOVE    SPA-HOSPNUM             TO  PTINF-HOSPNUM
                                OR      FLG-END         =   1 
                                OR      KEY-N-PTID  NOT =   KEY-O-PTID
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                   MOVE    "key36"             TO  MCP-PATHNAME
+                   MOVE    WRK-SRYACCT-PATHNAME
+                                               TO  MCP-PATHNAME
                    PERFORM 900-SRYACCT-READ-SEC
                END-PERFORM
            ELSE
@@ -1215,12 +1226,14 @@ grpsys             MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                                        OR      FLG-END     =   1 
                                        OR      KEY-NEW NOT =   KEY-OLD
                                MOVE    "tbl_sryacct"   TO  MCP-TABLE
-                               MOVE    "key36"         TO  MCP-PATHNAME
+                               MOVE    WRK-SRYACCT-PATHNAME
+                                                       TO  MCP-PATHNAME
                                PERFORM 900-SRYACCT-READ-SEC
                            END-PERFORM
                        ELSE
                            MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                           MOVE    "key36"             TO  MCP-PATHNAME
+                           MOVE    WRK-SRYACCT-PATHNAME
+                                                       TO  MCP-PATHNAME
                            PERFORM 900-SRYACCT-READ-SEC
                        END-IF
                    END-PERFORM    
@@ -1478,7 +1491,7 @@ grpsys                 MOVE    SPA-HOSPNUM TO  LNK-FTNJGNCHK-HOSPNUM
                        CALL    "ORCSFTNJGNCHK"     USING
                                                    ORCSFTNJGNCHKAREA
 grpsys                                             SPA-AREA
-                       IF      WRK-PARA-PRTKBN     =   "3"
+                       IF      WRK-PARA-PRTKBN     =   "3" OR  "9"
                            DISPLAY "LNK-FTNJGNCHK-KOHNUM="
                                                LNK-FTNJGNCHK-KOHNUM
                                    " LNK-FTNJGNCHK-TENKEN-RC="
@@ -1536,7 +1549,7 @@ grpsys                 MOVE    SPA-HOSPNUM TO  LNK-FTNJGNCHK-HOSPNUM
                        CALL    "ORCSFTNJGNCHK"     USING
                                                    ORCSFTNJGNCHKAREA
 grpsys                                             SPA-AREA
-                       IF      WRK-PARA-PRTKBN     =   "3"
+                       IF      WRK-PARA-PRTKBN     =   "3" OR  "9"
                            DISPLAY "LNK-FTNJGNCHK-KOHNUM="
                                                LNK-FTNJGNCHK-KOHNUM
                                    " LNK-FTNJGNCHK-TENKEN-RC="
@@ -3256,11 +3269,14 @@ grpsys         MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
                MOVE    SYS-2002-NYUGAIKBN  TO  ACCT-NYUGAIKBN
                MOVE    SRYACCT-REC         TO  MCPDATA-REC
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key37"             TO  MCP-PATHNAME
+               MOVE    "key37"             TO  WRK-SRYACCT-PATHNAME
+               MOVE    WRK-SRYACCT-PATHNAME
+                                           TO  MCP-PATHNAME
 grpsys         PERFORM 900-DBSELECT-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                   MOVE    "key37"             TO  MCP-PATHNAME
+                   MOVE    WRK-SRYACCT-PATHNAME
+                                               TO  MCP-PATHNAME
                    PERFORM 900-SRYACCT-READ-SEC
                ELSE
                    INITIALIZE                  SRYACCT-REC
@@ -3273,7 +3289,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                END-PERFORM
       *        カーソルクロース
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
-               MOVE    "key37"             TO  MCP-PATHNAME
+               MOVE    WRK-SRYACCT-PATHNAME
+                                           TO  MCP-PATHNAME
                PERFORM 900-CLOSE-SEC
       *
       *        MOVE    "SYSKANRI-KEY2"     TO  ORC-DBPATH
@@ -3367,11 +3384,18 @@ grpsys             MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
                    MOVE    SYS-2002-NYUGAIKBN  TO  ACCT-NYUGAIKBN
                    MOVE    SRYACCT-REC         TO  MCPDATA-REC
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                   MOVE    "key37"             TO  MCP-PATHNAME
+                   IF      WRK-PARA-PRTKBN     =   "9"
+                       MOVE    "key61"         TO  WRK-SRYACCT-PATHNAME
+                   ELSE
+                       MOVE    "key37"         TO  WRK-SRYACCT-PATHNAME
+grpsys             END-IF
+                   MOVE    WRK-SRYACCT-PATHNAME
+                                               TO  MCP-PATHNAME
 grpsys             PERFORM 900-DBSELECT-SEC
                    IF      MCP-RC              =   ZERO
                        MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                       MOVE    "key37"             TO  MCP-PATHNAME
+                       MOVE    WRK-SRYACCT-PATHNAME
+                                                   TO  MCP-PATHNAME
                        PERFORM 900-SRYACCT-READ-SEC
                    ELSE
                        INITIALIZE                  SRYACCT-REC
@@ -3384,7 +3408,8 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    END-PERFORM
       *            カーソルクロース
                    MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                   MOVE    "key37"             TO  MCP-PATHNAME
+                   MOVE    WRK-SRYACCT-PATHNAME
+                                               TO  MCP-PATHNAME
                    PERFORM 900-CLOSE-SEC
                END-IF
            END-IF
@@ -3464,11 +3489,15 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  ACCT-HOSPNUM
                        MOVE    "2"                 TO  ACCT-NYUGAIKBN
                        MOVE    SRYACCT-REC         TO  MCPDATA-REC
                        MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                       MOVE    "key37"             TO  MCP-PATHNAME
+                       MOVE    "key37"             TO
+                                                   WRK-SRYACCT-PATHNAME
+                       MOVE    WRK-SRYACCT-PATHNAME
+                                                   TO  MCP-PATHNAME
 grpsys                  PERFORM 900-DBSELECT-SEC
                        IF      MCP-RC              =   ZERO
                            MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                           MOVE    "key37"             TO  MCP-PATHNAME
+                           MOVE    WRK-SRYACCT-PATHNAME
+                                                       TO  MCP-PATHNAME
                            PERFORM 900-SRYACCT-READ-SEC
                        ELSE
                            INITIALIZE                  SRYACCT-REC
@@ -3481,7 +3510,8 @@ grpsys                  PERFORM 900-DBSELECT-SEC
                        END-PERFORM
       *                カーソルクロース
                        MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                       MOVE    "key37"             TO  MCP-PATHNAME
+                       MOVE    WRK-SRYACCT-PATHNAME
+                                                   TO  MCP-PATHNAME
                        PERFORM 900-CLOSE-SEC
                    END-IF
                END-IF
@@ -3553,12 +3583,14 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
                                    OR      FLG-END         =   1
                                    OR      KEY-NEW     NOT =   KEY-OLD
                            MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                           MOVE    "key37"             TO  MCP-PATHNAME
+                           MOVE    WRK-SRYACCT-PATHNAME
+                                                       TO  MCP-PATHNAME
                            PERFORM 900-SRYACCT-READ-SEC
                         END-PERFORM
                    ELSE
                        MOVE    "tbl_sryacct"       TO  MCP-TABLE
-                       MOVE    "key37"             TO  MCP-PATHNAME
+                       MOVE    WRK-SRYACCT-PATHNAME
+                                                   TO  MCP-PATHNAME
                        PERFORM 900-SRYACCT-READ-SEC
                    END-IF
                END-PERFORM    
@@ -3900,6 +3932,12 @@ grpsys                                     SPA-AREA
       *    未請求フラグチェック処理
       *****************************************************************
        800-MISEIKYU-CHECK-SEC          SECTION.
+      *
+      *    連係基盤用のとき未請求設定分も作成する
+           IF      WRK-PARA-PRTKBN     =   "9"
+               INITIALIZE                      SYUKA-REC
+               GO  TO  800-MISEIKYU-CHECK-EXT
+           END-IF
       *
            INITIALIZE                      SYUKA-REC
 grpsys     MOVE    SPA-HOSPNUM         TO  SYUKA-HOSPNUM
@@ -4333,32 +4371,6 @@ grpsys         PERFORM 900-DBFETCH-SEC
            END-READ
            .
        900-RECE01-READ-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    レセプト明細書読込（順読み）
-      *****************************************************************
-       910-RECE01-READ-N-SEC             SECTION.
-      *
-           READ    RECE01-FILE     NEXT
-               AT  END
-                   MOVE    1           TO  FLG-RECE01
-               NOT AT  END
-                   IF      STS-RECE01          =   "00"
-                       CONTINUE
-                   ELSE
-                       MOVE    SPACE           TO  WRK-ERRMSG-AREA
-                       INITIALIZE                  WRK-ERRMSG-AREA
-                       MOVE    2               TO  WRK-ERR-FLG
-                       MOVE    RECE01PARA      TO  WRK-ERR-FILE-NM
-                       MOVE    STS-RECE01      TO  WRK-ERR-FILE-STS
-                       PERFORM 500-FILE-ERR-ABORT-SEC
-                   END-IF
-      *
-                   MOVE    ZERO        TO  FLG-RECE01
-           END-READ
-           .
-       910-RECE01-READ-N-EXT.
            EXIT.
       *
       *****************************************************************

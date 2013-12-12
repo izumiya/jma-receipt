@@ -29,7 +29,7 @@ R03	{
 				value	varchar(32);
 			};
 			count	int;
-			item	varchar(32)[2];
+			item	varchar(32)[3];
 		};
 		PRTKBN_LABEL	{
 			style   varchar(20);
