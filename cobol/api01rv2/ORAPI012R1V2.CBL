@@ -28,7 +28,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *
+      * 04.07.00     NACL-多々納  13/12/11  地域連携ＩＤ等対応
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -47,6 +47,7 @@
            03  FLG-END                 PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
+           03  FLG-PTPUBLIC            PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
            03  FLG-SYORI               PIC 9(01).
@@ -130,6 +131,10 @@
        01  PTINF-REC.
            COPY    "CPPTINF.INC".
       *
+      *    患者地域連携テーブル
+       01  PTPUBLIC-REC.
+           COPY    "CPPTNUM-PUBLIC.INC".
+      *
            COPY    "MCPDATA.INC".
       *
            COPY    "ORCA-BLOB".
@@ -143,22 +148,6 @@
             COPY    "LINKAREA".
        01  SCRAREA.
            COPY    "API01RV2SCRAREA.INC".
-      *    COPY    "CPAPIPTAV2.INC".
-      *    COPY    "CPAPILSTV2.INC".
-      *    COPY    "CPAPILSTV2.INC"    REPLACING
-      *                              //APILST-// BY //APILST1-//.
-      *    COPY    "CPAPILSTV2.INC"    REPLACING
-      *                              //APILST-// BY //APILST2-//.
-      *    COPY    "CPAPILSTV2.INC"  REPLACING
-      *                              //APILST-// BY //APILST3-//.
-      *    COPY    "CPAPILSTV2.INC"    REPLACING
-      *                              //APILST-// BY //APILST4-//.
-      *    COPY    "CPAPILSTV2.INC"    REPLACING
-      *                              //APILST-// BY //APILST5-//.
-      *    COPY    "CPAPILSTV2.INC"    REPLACING
-      *                              //APILST-// BY //APILST6-//.
-      *    COPY    "CPAPILSTV2.INC"    REPLACING
-      *                              //APILST-// BY //APILST7-//.
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -362,9 +351,37 @@
       *    保険種類変換処理
            PERFORM 200210-HKNCOMBI-HEN-SEC
       *
+      *    地域連携編集処理
+           PERFORM 20022-PTNUMPUBLIC-HEN-SEC
+      *
            .
        2002-PTINF-HENSYU-EXT.
            EXIT.
+      *ver.4.7
+      *****************************************************************
+      *    地域連携編集処理
+      *****************************************************************
+       20022-PTNUMPUBLIC-HEN-SEC       SECTION.
+      *
+           INITIALIZE                  PTPUBLIC-REC
+           MOVE    SPA-HOSPNUM         TO  PTPUBLIC-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTPUBLIC-PTID
+           PERFORM 920-PTPUBLIC-READ-SEC
+      *
+      *    地域連携ID
+           MOVE    PTPUBLIC-PATIENT-ID1    TO  PTRES-COMMUNITY-CID
+      *    情報提供同意有無
+           IF      PTPUBLIC-AGREEMENT  =   "1"
+      *        同意する
+               MOVE    "True"              TO  PTRES-COMMUNITY-CID-AGREE
+           ELSE
+      *        同意しない
+               MOVE    "False"             TO  PTRES-COMMUNITY-CID-AGREE
+           END-IF
+           .
+       20022-PTNUMPUBLIC-HEN-EXT.
+           EXIT.
+      *ver.4.7
       *
       *****************************************************************
       *    XML情報書き込み処理
@@ -693,6 +710,36 @@
       *
            .
        900-PTINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    地域連携編情報取得
+      *****************************************************************
+       920-PTPUBLIC-READ-SEC              SECTION.
+      *
+           MOVE    PTPUBLIC-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptnum_public"  TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 910-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC         TO  PTPUBLIC-REC
+                   MOVE    ZERO                TO  FLG-PTPUBLIC
+               ELSE
+                   MOVE    1                   TO  FLG-PTPUBLIC
+                   INITIALIZE                  PTPUBLIC-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTPUBLIC
+               INITIALIZE                  PTPUBLIC-REC
+           END-IF
+           MOVE    "tbl_ptnum_public"  TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       920-PTPUBLIC-READ-EXT.
            EXIT.
       *****************************************************************
       *    テーブル検索処理

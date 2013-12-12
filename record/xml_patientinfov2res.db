@@ -26,12 +26,14 @@ xml_patientinfov2res {
         	};
 		Contraindication1		varchar(200);
 		Contraindication2		varchar(200);
-		Allergy1		varchar(200);
-		Allergy2		varchar(200);
-		Infection1		varchar(200);
-		Infection2		varchar(200);
-		Comment1		varchar(200);
-		Comment2		varchar(200);
+		Allergy1			varchar(200);
+		Allergy2			varchar(200);
+		Infection1			varchar(200);
+		Infection2			varchar(200);
+		Comment1			varchar(200);
+		Comment2			varchar(200);
+		Community_Cid			varchar(20);
+		Community_Cid_Agree		varchar(5);
 		HealthInsurance_Information	{
 		Insurance_Combination_Number		varchar(04);
 		InsuranceProvider_Class			varchar(03);

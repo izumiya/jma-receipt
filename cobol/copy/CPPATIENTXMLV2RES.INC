@@ -78,6 +78,12 @@
                   04  PTRES-COMMENT-1            PIC  X(200).
       *           コメント２
                   04  PTRES-COMMENT-2            PIC  X(200).
+      *H25.12
+      *           地域連携ID
+                  04  PTRES-COMMUNITY-CID        PIC  X(20).
+      *           同意フラグ
+                  04  PTRES-COMMUNITY-CID-AGREE  PIC  X(05).
+      *
       *           保険情報
                   04  PTRES-INSURANCE-INFO     OCCURS  20 TIMES.
       *               保険組合せ番号
