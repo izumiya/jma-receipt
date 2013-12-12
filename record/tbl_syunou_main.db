@@ -1744,3 +1744,18 @@ path	key86 	{
 	};
 };
 
+path	key87 	{
+	DBSELECT	{
+		DECLARE tbl_syunou_main_key87_csr CURSOR FOR
+		SELECT *
+		FROM tbl_syunou_main
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   CREATEKBN   <>  '3'
+			AND   SKYNYUKINKBN =  '1'
+            AND   SKYMONEY    <>  NYUKIN_TOTAL
+			ORDER   BY            SRYYMD DESC,NYUGAIKBN,DENPNUM
+		;
+	};
+};
+

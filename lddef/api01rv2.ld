@@ -23,6 +23,7 @@ bindapi	"insprogetv2"	"OpenCOBOL"	"ORAPI105R1V2";
 bindapi "hsptevalv2"    "OpenCOBOL" "ORAPI032R2V2";
 bindapi "hsptinfv2"     "OpenCOBOL" "ORAPI031R1V2";
 bindapi	"hsacsimulatev2" "OpenCOBOL"	"ORAPI034R1V2";
+bindapi	"incomeinfv2"	"OpenCOBOL"	"ORAPI023R2V2";
 
 multiplex_group	api01rv2;
 
@@ -49,6 +50,7 @@ data	{
         hsptevalv2;
         hsptinfv2;
 		hsacsimulatev2;
+		incomeinfv2;
 	};
 };
 db "xml2" {
@@ -95,6 +97,8 @@ db "xml2" {
  xml_hsptinfv2req;
  xml_hsacsimulatev2req;
  xml_hsacsimulatev2res;
+ xml_incomeinfv2res;
+ xml_incomeinfv2req;
 };
 
 #include "orcadb.inc"
