@@ -3146,6 +3146,26 @@
       *****************************************************************
        3001099-SYOKAISET-SEC     SECTION.
       *
+      *H25.12
+      *    ¼õ¿ÇÍúÎò¤ÎÅÐÏ¿¤µ¤ì¤¤¤ë¿ÇÎÅ²Ê¤ÇºîÀ®¤¹¤ë
+           MOVE    SPACE               TO  WRK-SRYKA
+           PERFORM   VARYING   IDX     FROM    1   BY  1
+                     UNTIL    (IDX         >   SPA-GMN-MAX1)
+                          OR  (SPA-NAI-RRK-SRYKA (IDX)(1:1)  =   "A")
+               IF      SPA-NAI-RRK-SRYKA (IDX) =   SPA-SRYKA
+                   MOVE    SPA-SRYKA       TO  WRK-SRYKA
+                   MOVE    SPA-GMN-MAX1    TO  IDX
+               ELSE
+                   IF      WRK-SRYKA       =   SPACE
+                       MOVE    SPA-NAI-RRK-SRYKA (IDX)
+                                           TO   WRK-SRYKA
+                   END-IF
+               END-IF
+           END-PERFORM
+           IF      WRK-SRYKA           =   SPACE
+               MOVE    SPA-SRYKA       TO  WRK-SRYKA
+           END-IF
+      *
       *    »»ÄêÍúÎòºîÀ®
            INITIALIZE                  ORCSSANTEIAREA
            MOVE    "1"                 TO  SSANTEI-SYORI
@@ -3154,7 +3174,7 @@
            MOVE    SPA-SYOKAI-YMD      TO  SSANTEI-SRYYMD
            MOVE    SPA-PTID            TO  SSANTEI-PTID
            MOVE    1                   TO  SSANTEI-KAISU
-           MOVE    SPA-SRYKA           TO  SSANTEI-SRYKA
+           MOVE    WRK-SRYKA           TO  SSANTEI-SRYKA
            MOVE    SPA-HKNCOMBINUM     TO  SSANTEI-HKNCOMBINUM
            MOVE    SPA-HKNKBN          TO  SSANTEI-HKNKBN
            MOVE    SPA-RSI-HKNKBN      TO  SSANTEI-RSI-HKNKBN
@@ -3166,7 +3186,7 @@
            IF      SPA-SYOKAI-SRYCD     =   "099110001"
                INITIALIZE                  ORCSKARRKAREA
                MOVE    SPA-SRYYMD(1:6)     TO  SKARRK-SRYYM
-               MOVE    SPA-SRYKA           TO  SKARRK-SRYKA
+               MOVE    WRK-SRYKA           TO  SKARRK-SRYKA
                CALL    "ORCSKARRK"         USING
                                            ORCSKARRKAREA
                                            SPA-AREA
