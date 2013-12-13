@@ -123,7 +123,7 @@
       *                                     一画面対応
       *  04.07.03    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *  04.07.04    NACL-藤原    12/11/21  労災レセ電作成対応
-      *  04.07.05    NACL-藤原    13/12/09  医療情報連係基盤対応
+      *  04.07.05    NACL-藤原    13/12/09  医療情報連携基盤対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -631,7 +631,7 @@
            IF      SPA-NAI-9101-COOPBASE
                                        =   "1"
                MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
-               MOVE    "連係基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
+               MOVE    "連携基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
                MOVE    3                   TO  SPA-GMN-PRTKBN-MAX
            END-IF
            MOVE    SPA-GMN-PRTKBNLST (1)
@@ -927,7 +927,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
            IF      SPA-NAI-9101-COOPBASE
                                        =   "1"
                MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
-               MOVE    "連係基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
+               MOVE    "連携基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
                MOVE    3                   TO  SPA-GMN-PRTKBN-MAX
            END-IF
            EVALUATE    SPA-R01-PRTKBN
@@ -1387,7 +1387,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
       *****************************************************************
        4103-KAKUTEI-CHK-SEC        SECTION.
       *
-      *    医保分のみ連係基盤を選択可能
+      *    医保分のみ連携基盤を選択可能
            IF      SPA-GMN-PRTKBN   =   "6"
                EVALUATE    TRUE
                    WHEN    SPA-DATAKBN1-VALUE  =   "T"
@@ -2895,7 +2895,7 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                                        =   "1"            )
                MOVE    "3"                 TO  SPA-R01-PRTKBN
            END-IF
-      *    医保分で連係基盤用のとき
+      *    医保分で連携基盤用のとき
            IF    ( SPA-R01-RECEKBN     =   "0" OR  "1" OR
                                            "2" OR  "7"    )
            AND   ( SPA-R01-PRTKBN      =   "6"            )
@@ -3380,7 +3380,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                    END-STRING
                WHEN    "0011"
                    MOVE
-                   "医保分（一括全体）しか連係基盤用は選択できません"
+                   "医保分（一括全体）しか連携基盤用は選択できません"
                                                        TO  SPA-ERRMSG
                WHEN    "0012"
                    MOVE    "レセプト作成区分入力エラー"
@@ -3515,7 +3515,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            END-IF
            IF    ( SPA-GMN-PRTKBN       =   "6" )
            AND   ( SPA-RIDCD (1:1)      =   "1" )
-               MOVE    "【連係基盤用レセプト】" TO  RID1-LABEL
+               MOVE    "【連携基盤用レセプト】" TO  RID1-LABEL
            END-IF
       *
            MOVE    "戻る"               TO  RID1-B01-LABEL

@@ -2731,6 +2731,10 @@
       *    µ­Ï¿¾ò·ï»ÅÍÍÇ¯·î¾ðÊó
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    ÀÁµá¾ðÊó
+           IF      WRK-PARA-PRTKBN =   "9"
+               MOVE    RECE62-TAIINYMD TO  WRK-DATA
+               MOVE    8               TO  WRK-NAGASA
+           END-IF
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    ¿ÇÎÅ²ÊÌ¾£±
            IF      RECE62-SYUKA    NOT =   SPACE

@@ -174,7 +174,7 @@
       *                                     チェックのとき０９５９３で始
       *                                     まるコードがあるレセプトは対
       *                                     象外とする
-      *  04.07.12    NACL-藤原    13/12/09  医療情報連係基盤対応
+      *  04.07.12    NACL-藤原    13/12/09  医療情報連携基盤対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -785,9 +785,9 @@ grpsys                                         SPA-AREA
            IF      SPA-NAI-9101-COOPBASE
                                        =   "1"
                MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
-               MOVE    "連係基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
+               MOVE    "連携基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
                MOVE    "7"                 TO  SPA-GMN-PRTKBNL   (4)
-               MOVE    "連係基盤用（当日分まで）"
+               MOVE    "連携基盤用（当日分まで）"
                                            TO  SPA-GMN-PRTKBNMEIL(4)
                MOVE    4                   TO  SPA-GMN-PRTKBN-MAX
            END-IF
@@ -1720,9 +1720,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF      SPA-NAI-9101-COOPBASE
                                            =   "1"
                    MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
-                   MOVE    "連係基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
+                   MOVE    "連携基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
                    MOVE    "7"                 TO  SPA-GMN-PRTKBNL   (4)
-                   MOVE    "連係基盤用（当日分まで）"
+                   MOVE    "連携基盤用（当日分まで）"
                                                TO  SPA-GMN-PRTKBNMEIL(4)
                    MOVE    4                   TO  SPA-GMN-PRTKBN-MAX
                END-IF
@@ -1738,9 +1738,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                IF      SPA-NAI-9101-COOPBASE
                                            =   "1"
                    MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (2)
-                   MOVE    "連係基盤用"        TO  SPA-GMN-PRTKBNMEIL(2)
+                   MOVE    "連携基盤用"        TO  SPA-GMN-PRTKBNMEIL(2)
                    MOVE    "7"                 TO  SPA-GMN-PRTKBNL   (3)
-                   MOVE    "連係基盤用（当日分まで）"
+                   MOVE    "連携基盤用（当日分まで）"
                                                TO  SPA-GMN-PRTKBNMEIL(3)
                    MOVE    3                   TO  SPA-GMN-PRTKBN-MAX
                END-IF
@@ -5342,7 +5342,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG20
                                        TO  SHELLTBL-ARG26
            END-IF
       *
-      *    連係基盤用の時、再設定
+      *    連携基盤用の時、再設定
            IF      SPA-GMN-PRTKBN  =   "6" OR  "7"
                MOVE    SPACE           TO  SHELLTBL-ARG13 
                STRING  SPA-NAI-9101-FILE-DIR   DELIMITED  BY  SPACE
@@ -6796,19 +6796,19 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                                                INTO  TERR-ERRMSG
                    END-STRING
                WHEN    "0014"
-                   STRING  "連係基盤用は労災のときは"
+                   STRING  "連携基盤用は労災のときは"
                                                DELIMITED  BY  SIZE
                            "選択できません"    DELIMITED  BY  SIZE
                                                INTO  TERR-ERRMSG
                    END-STRING
                WHEN    "0015"
-                   STRING  "連係基盤用のときは入院・入院外は"
+                   STRING  "連携基盤用のときは入院・入院外は"
                                                DELIMITED  BY  SIZE
                            "選択できません"    DELIMITED  BY  SIZE
                                                INTO  TERR-ERRMSG
                    END-STRING
                WHEN    "0016"
-                   STRING  "選択したファイル出力先は連係基盤用のときは"
+                   STRING  "選択したファイル出力先は連携基盤用のときは"
                                                DELIMITED  BY  SIZE
                            "選択できません"    DELIMITED  BY  SIZE
                                                INTO  TERR-ERRMSG
@@ -7168,7 +7168,7 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                        MOVE    "【点検用】"        TO  TID2-LABEL
                    END-IF
                    IF      SPA-GMN-PRTKBN      =   "6" OR  "7"
-                       MOVE    "【連係用】"        TO  TID2-LABEL
+                       MOVE    "【連携用】"        TO  TID2-LABEL
                    END-IF
       *
                    EVALUATE    SPA-TIDCD

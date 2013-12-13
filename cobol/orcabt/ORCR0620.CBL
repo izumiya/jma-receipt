@@ -438,6 +438,8 @@
            03  WK-PTNYUINRRK-TENSTUYMD2                PIC  X(08).
            03  WK-PTNYUINRRK-TENNYUYMD                 PIC  X(08).
       *
+           03  WRK-TAIINYMD        PIC X(08).
+      *
            03  WRK-MCP-TABLE       PIC X(64).
            03  WRK-MCP-PATHNAME    PIC X(64).
       *
@@ -3475,6 +3477,7 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                                            WRK-SHONUM
            MOVE      SPACE             TO  WK-PTNYUINRRK-TENSTUYMD2
            MOVE      SPACE             TO  WK-PTNYUINRRK-TENNYUYMD
+           MOVE      SPACE             TO  WRK-TAIINYMD
       *
            MOVE      ZERO              TO  FLG-BUNBEN-SET
       *
@@ -3665,7 +3668,8 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                     END-EVALUATE
                 END-IF                                                
            END-PERFORM                                                 
-      *                                                                
+      *
+           MOVE    WRK-TAIINYMD    TO  RECE62-TAIINYMD                                                                
            .
        240-PTNYUINRRK-SYORI-EXT.
            EXIT.
@@ -3893,7 +3897,11 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                END-IF
       *
                ADD     1                   TO  CNT-RECE68
-           END-IF    
+           END-IF
+      *
+           IF      WRK-TAIINYMD        <   RECE68-TAIINYMD
+               MOVE    RECE68-TAIINYMD     TO  WRK-TAIINYMD
+           END-IF
            .
        24012-RECE68-WRITE-EXT.
            EXIT.
