@@ -123,9 +123,9 @@ fi
              fi
              chmod -R g+r ${13}
              echo "--- mkdir rireki holder ---" >>$LOG_FILE
-        else
-             rm ${13}${RECEFILE1}*.UKE
-             echo "--- rm holder file ---" ${13}${RECEFILE1}*.UKE "]" >>$LOG_FILE
+#        else
+#             rm ${13}${RECEFILE1}*.UKE
+#             echo "--- rm holder file ---" ${13}${RECEFILE1}*.UKE "]" >>$LOG_FILE
         fi
         echo "--- folder name  [" ${13} "]" >>$LOG_FILE
 

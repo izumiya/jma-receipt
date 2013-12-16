@@ -27,6 +27,9 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  00.00.00    NACL-伊藤    13.12.16  R1レコード編集
+      *                                     地域連携IDなし・同意なしは
+      *                                     出力しない
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -83,7 +86,7 @@
        01  FLG-AREA.
            03  FLG-END                 PIC 9(01).
            03  FLG-SYSKANRI            PIC 9(01).
-      *
+           03  FLG-PTPUBLIC            PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -148,6 +151,9 @@
                05  WRK-END             PIC 9(01).
       *    日付変換用
            03  WRK-SYMD                PIC X(08).
+           03  WRK-NYUTAIYMD.
+               05  WRK-NYUINYMD        PIC X(07).
+               05  WRK-TAIINYMD        PIC X(07).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR             PIC X(200).
@@ -211,6 +217,10 @@
        01  JOBKANRI-REC.
            COPY    "CPJOBKANRI.INC".
       *
+      *    患者地域連携
+       01  PTPUBLIC-REC.
+           COPY    "CPPTNUM-PUBLIC.INC".
+      *
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
@@ -231,6 +241,9 @@
       *
       *    マシン日付取得サブ
            COPY    "CPORCSMCNDATE.INC".
+      *
+      *    CSV分割サブ
+           COPY    "CPORCSDIVCSV.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -482,6 +495,30 @@
            IF      RECEDEN-RECEDATA (1:2)  =   "RE"
       *        データ出力処理
                PERFORM 2002-FILE-WRITE-SEC
+      *        患者IDを退避
+               MOVE    RECEDEN-PTID        TO  SPA-PTID
+      *        入退院日をレセプト共通レコードから取得
+               MOVE    SPACE               TO  WRK-NYUTAIYMD
+               IF      WRK-PARA-NYUGAIKBN  =   "1"
+                   INITIALIZE  ORCSDIVCSV-AREA
+                   MOVE    RECEDEN-RECEDATA    TO  ORCSDIVCSV-REC
+                   MOVE    36                  TO  ORCSDIVCSV-ELE-C
+                   MOVE    ","                 TO  ORCSDIVCSV-DELI
+                   MOVE    ZERO                TO  ORCSDIVCSV-DQ
+                   CALL    "ORCSDIVCSV"     USING  ORCSDIVCSV-AREA
+                   IF      ORCSDIVCSV-RC       =   ZERO
+                       IF      ORCSDIVCSV-D (9)
+                                               NOT =   SPACE
+                           MOVE    ORCSDIVCSV-D (9)    TO  WRK-NYUINYMD
+                       END-IF
+                       IF     (ORCSDIVCSV-D (21) (1:7)
+                                               NOT =   "9999999")
+                         AND  (ORCSDIVCSV-D (21)
+                                               NOT =   SPACE)
+                           MOVE    ORCSDIVCSV-D (21)   TO  WRK-TAIINYMD
+                       END-IF
+                   END-IF
+               END-IF
            END-IF
       *
            ADD     1                   TO  TABLE-MAX
@@ -498,14 +535,18 @@
        2002-FILE-WRITE-SEC         SECTION.
       *
            IF      TABLE-MAX        >   1
-               IF      CNT-OUT         =   ZERO
-      *            医療機関情報レコード編集処理
-                   PERFORM     20021-HENSYU-SEC
-               END-IF
-      *
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       TABLE-MAX
                    IF      TBL-RECEDATA (IDX) (1:2)    =   "RE"
+      *                データ提出同意か確認
+                       PERFORM 900-PTPUBLIC-READ-SEC
+      *                地域連携IDなし又は同意しない場合はスキップする
+                       IF     (PTPUBLIC-AGREEMENT
+                                               NOT =   "1")  OR
+                              (PTPUBLIC-PATIENT-ID1
+                                                   =   SPACE)
+                           EXIT  PERFORM
+                       END-IF
       *                レセプト番号の編集
                        MOVE    SPACE               TO  WRK-REC
                        MOVE    "RE,"               TO  WRK-REC
@@ -522,6 +563,11 @@
                                                    INTO        WRK-REC
                        END-STRING
                        MOVE    WRK-REC         TO  TBL-RECEDATA (IDX)
+                   END-IF
+      *
+                   IF      CNT-OUT         =   ZERO
+      *                医療機関情報レコード編集処理
+                       PERFORM     20021-HENSYU-SEC
                    END-IF
       *
                    MOVE    TBL-RECEDATA (IDX)  TO  RECE30-R
@@ -543,6 +589,11 @@
                    END-IF
       *
                    ADD     1                   TO  CNT-OUT
+      *
+      *            R1レコードを編集して出力
+                   IF      TBL-RECEDATA (IDX) (1:2)    =   "RE"
+                       PERFORM 20022-R1-HENSYU-SEC
+                   END-IF
                END-PERFORM
            END-IF
       *
@@ -647,6 +698,38 @@
            PERFORM 5001-FILE-WRITE-SEC
            .
        20021-HENSYU-EXT.
+           EXIT. 
+      *
+      *****************************************************************
+      *    連携用レセプト共通レコード編集処理
+      *****************************************************************
+       20022-R1-HENSYU-SEC          SECTION.
+      *
+           MOVE    ZERO                TO  WRK-DATA-LENGTH
+      *
+           MOVE    SPACE               TO  WRK-REC
+           MOVE    ZERO                TO  WRK-REC-LENGTH
+      *
+           MOVE    "R1,"               TO  WRK-REC
+           MOVE    3                   TO  WRK-REC-LENGTH
+      *
+           MOVE    PTPUBLIC-PATIENT-ID1
+                                       TO  WRK-DATA
+           MOVE    20                  TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           MOVE    WRK-NYUINYMD        TO  WRK-DATA
+           MOVE    7                   TO  WRK-NAGASA
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           MOVE    WRK-TAIINYMD        TO  WRK-DATA
+           MOVE    7                   TO  WRK-NAGASA
+           MOVE    1                   TO  WRK-END 
+           PERFORM 5004-MOJI-HENSYU-SEC
+      *
+           PERFORM 5001-FILE-WRITE-SEC
+           .
+       20022-R1-HENSYU-EXT.
            EXIT. 
       *
       *****************************************************************
@@ -1125,6 +1208,42 @@
                                    SPA-AREA
            .
        900-CALL-ORCSJOB-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    患者地域連携読込
+      *****************************************************************
+       900-PTPUBLIC-READ-SEC       SECTION.
+      *
+           INITIALIZE  PTPUBLIC-REC
+           MOVE    SPA-HOSPNUM         TO  PTPUBLIC-HOSPNUM
+           MOVE    SPA-PTID            TO  PTPUBLIC-PTID
+           MOVE    PTPUBLIC-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptnum_public"  TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+      *
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptnum_public"  TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-PTPUBLIC
+                   MOVE    MCPDATA-REC         TO  PTPUBLIC-REC
+               ELSE
+                   INITIALIZE  PTPUBLIC-REC
+                   MOVE    1               TO  FLG-PTPUBLIC
+               END-IF
+           ELSE
+               INITIALIZE  PTPUBLIC-REC
+               MOVE    1                   TO  FLG-PTPUBLIC
+           END-IF
+      *
+           MOVE    "tbl_ptnum_public"  TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       900-PTPUBLIC-READ-EXT.
            EXIT.
       *
       *****************************************************************
