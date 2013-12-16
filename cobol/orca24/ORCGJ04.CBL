@@ -141,7 +141,7 @@
            03  FLG-NAIYAK          PIC X(01).
            03  FLG-TONPUK          PIC X(01).
            03  FLG-GAIYAK          PIC X(01).
-           03  FLG-ARI             PIC X(01).
+           03  FLG-ARI             PIC 9(01).
       *----(01.00.01) LINE ADD START ----------------------------------
       *    セット処理有無
            03  FLG-SETSYORI        PIC 9(01).
@@ -642,6 +642,11 @@
        01  HZN-JYURRK-REC.
            COPY    "CPJYURRK.INC"  REPLACING
                                      //JYURRK-// BY //HZN-JYURRK-//.
+      *
+      *    受診履歴ワーク２
+       01  HZN2-JYURRK-REC.
+           COPY    "CPJYURRK.INC"  REPLACING
+                                     //JYURRK-// BY //HZN2-JYURRK-//.
       *
       *    患者マスタ−
        01  PTINF-REC.
@@ -6433,6 +6438,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            ELSE
                MOVE    1                   TO  FLG-JYURRK
            END-IF
+           MOVE    ZERO                TO  FLG-ARI
            MOVE    ZERO                TO  FLG-UPD
            MOVE    ZERO                TO  FLG-UPD2
            MOVE    ZERO                TO  WRK-RENNUM
@@ -6468,8 +6474,13 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                            MOVE    1           TO  FLG-UPD
                            MOVE    1           TO  FLG-UPD2
                            MOVE    15          TO  IDX-J2
+                           MOVE    ZERO        TO  FLG-ARI
                        END-IF
                    END-PERFORM
+                   IF      FLG-UPD2            =   ZERO
+                       MOVE    JYURRK-REC      TO  HZN2-JYURRK-REC
+                       MOVE    1               TO  FLG-ARI
+                   END-IF
                END-IF
       *
                IF     (FLG-UPD2        =   1  )
@@ -6484,8 +6495,19 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "key9"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *
            IF      FLG-UPD             =   ZERO
-               PERFORM 450215-JYURRK-SAKUSEI-SEC
+               IF      FLG-ARI             =   1
+      *            枝番＋１で追加
+                   MOVE    HZN2-JYURRK-REC     TO  JYURRK-REC
+                   ADD     1                   TO  JYURRK-EDANUM
+                   INITIALIZE                      JYURRK-ZAINUM-G
+                   MOVE    WRK-ZAINUM          TO  JYURRK-ZAINUM(1)
+                   PERFORM 450211-JYURRK-INS-SEC
+               ELSE
+      *            新規追加
+                   PERFORM 450215-JYURRK-SAKUSEI-SEC
+               END-IF
            END-IF
            .
       *
