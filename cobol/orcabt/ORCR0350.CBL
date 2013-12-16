@@ -368,7 +368,7 @@
       *  04.07.02    NACL-藤原    12/09/04  薬剤料減点対応
       *  04.07.03    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.04    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
-      *  04.07.05    NACL-藤原    13/12/09  医療情報連係基盤対応
+      *  04.07.05    NACL-藤原    13/12/09  医療情報連携基盤対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2732,8 +2732,10 @@
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    請求情報
            IF      WRK-PARA-PRTKBN =   "9"
-               MOVE    RECE62-TAIINYMD TO  WRK-DATA
-               MOVE    8               TO  WRK-NAGASA
+               MOVE    RECE62-TAIINYMD TO  WRK-SYMD
+               PERFORM 5002-HIZUKE-HEN-SEC
+               MOVE    WRK-HENYMD          TO  WRK-DATA
+               MOVE    7                   TO  WRK-NAGASA
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC         
       *    診療科名１
