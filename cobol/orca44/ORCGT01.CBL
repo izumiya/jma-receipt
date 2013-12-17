@@ -6084,6 +6084,10 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            END-IF
       *
            MOVE    SPA-GMN-RECEDEN-CHK TO  SPA-T01-RECEDEN-CHK
+           MOVE    SPA-GMN-PRTKBN      TO  SPA-T01-PRTKBN
+           MOVE    SPA-GMN-NYUGAIKBN   TO  SPA-T01-NYUGAIKBN
+           MOVE    SPA-NAI-9101-FILE-DIR
+                                       TO  SPA-T01-9101-FILE-DIR
       *
            MOVE    SPA-T01KYOUTU       TO  SPA-WORK
            MOVE    SPA-AREA            TO  SPA-COMMON

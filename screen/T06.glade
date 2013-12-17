@@ -23,12 +23,12 @@
     <wmclass_class></wmclass_class>
     <wmclass_name></wmclass_name>
     <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
-    <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -709,13 +709,13 @@
         <draw_indicator>True</draw_indicator>
         <group>TEISYUTUSAKI2</group>
         <signal>
+          <name>toggled</name>
+          <handler>button_toggled</handler>
+        </signal>
+        <signal>
           <name>clicked</name>
           <handler>send_event</handler>
           <data>CLICKED</data>
-        </signal>
-        <signal>
-          <name>toggled</name>
-          <handler>button_toggled</handler>
         </signal>
       </widget>
       <widget>
@@ -738,13 +738,13 @@
         <draw_indicator>True</draw_indicator>
         <group>TEISYUTUSAKI2</group>
         <signal>
+          <name>toggled</name>
+          <handler>button_toggled</handler>
+        </signal>
+        <signal>
           <name>clicked</name>
           <handler>send_event</handler>
           <data>CLICKED</data>
-        </signal>
-        <signal>
-          <name>toggled</name>
-          <handler>button_toggled</handler>
         </signal>
       </widget>
       <widget>
@@ -767,13 +767,13 @@
         <draw_indicator>True</draw_indicator>
         <group>TEISYUTUSAKI2</group>
         <signal>
+          <name>toggled</name>
+          <handler>button_toggled</handler>
+        </signal>
+        <signal>
           <name>clicked</name>
           <handler>send_event</handler>
           <data>CLICKED</data>
-        </signal>
-        <signal>
-          <name>toggled</name>
-          <handler>button_toggled</handler>
         </signal>
       </widget>
       <widget>
@@ -1357,7 +1357,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>label400</name>
-        <x>90</x>
+        <x>100</x>
         <y>8</y>
         <width>70</width>
         <height>24</height>
@@ -1375,7 +1375,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>label540</name>
-        <x>90</x>
+        <x>100</x>
         <y>35</y>
         <width>70</width>
         <height>24</height>
@@ -1406,6 +1406,44 @@
         <ypad>0</ypad>
         <label>直接請求する保険者以外２３４５</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
+        <wrap>False</wrap>
+      </widget>
+      <widget>
+        <class>GtkLabel</class>
+        <name>TITLE1</name>
+        <x>2</x>
+        <y>2</y>
+        <width>93</width>
+        <height>24</height>
+        <visible>True</visible>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <xalign>0</xalign>
+        <yalign>0.5</yalign>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <label>連携用（当月）</label>
+        <justify>GTK_JUSTIFY_LEFT</justify>
+        <wrap>False</wrap>
+      </widget>
+      <widget>
+        <class>GtkLabel</class>
+        <name>TITLE2</name>
+        <x>2</x>
+        <y>28</y>
+        <width>93</width>
+        <height>24</height>
+        <visible>True</visible>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <xalign>0</xalign>
+        <yalign>0.5</yalign>
+        <xpad>0</xpad>
+        <ypad>0</ypad>
+        <label>入院外</label>
+        <justify>GTK_JUSTIFY_LEFT</justify>
         <wrap>False</wrap>
       </widget>
     </widget>

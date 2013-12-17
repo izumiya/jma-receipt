@@ -23,6 +23,7 @@ fi
 #        ${23} HOSPNUM
 #        ${24} レセプト作成区分
 #            1:提出用レセ、2:点検用レセ
+#            6:連携基盤用、7:連携基盤用（当日）
 #        ${25} 症状詳記作成区分
 #            1:作成する
 #        ${26} レセ電データ履歴保存設定区分
@@ -31,6 +32,7 @@ fi
 #            99999999:設定なし
 #        ${28} レセ電データチェックの有無
 #            1:チェックする
+#        ${29} 入外区分
 #-------------------------------------------#
 
     rennum=0
@@ -44,12 +46,19 @@ fi
         rm ${20}
     fi
 
-    LOG_FILE="/var/log/jma-receipt/${23}recept4_kobetu.log"
+    if  [ ${24} -eq '6' ] || [ ${24} -eq '7' ]; then
+        LOG_FILE="/var/log/jma-receipt/${23}recept4_kobetu_renkei.log"
+    else
+        LOG_FILE="/var/log/jma-receipt/${23}recept4_kobetu.log"
+    fi
 
     echo "arg5  = [" ${5} "]"  >$LOG_FILE
     echo "arg12 = [" ${12} "]" >>$LOG_FILE
     echo "arg13 = [" ${13} "]" >>$LOG_FILE
     echo "arg17 = [" ${17} "]" >>$LOG_FILE
+    echo "arg18 = [" ${18} "]" >>$LOG_FILE
+    echo "arg19 = [" ${19} "]" >>$LOG_FILE
+    echo "arg20 = [" ${20} "]" >>$LOG_FILE
     echo "arg21 = [" ${21} "]" >>$LOG_FILE
     echo "arg22 = [" ${22} "]" >>$LOG_FILE
     echo "arg23 = [" ${23} "]" >>$LOG_FILE
@@ -58,6 +67,7 @@ fi
     echo "arg26 = [" ${26} "]" >>$LOG_FILE
     echo "arg27 = [" ${27} "]" >>$LOG_FILE
     echo "arg28 = [" ${28} "]" >>$LOG_FILE
+    echo "arg29 = [" ${29} "]" >>$LOG_FILE
     echo "hostname =  ["`hostname`  "]" >>$LOG_FILE
 
     RECEFILE1="RECEIPTC"
@@ -72,6 +82,61 @@ fi
 #   該当ファイル削除
 	rm  ${17}${23}${RECEFILE1}*.UKE
 	rm  /tmp/${23}${RECEFILE2}*.txt
+
+#   連携基盤ファイル作成
+    if  [ ${24} -eq '6' ] || [ ${24} -eq '7' ]; then
+        if  [ ${12} -eq '1' ]; then
+            if  [ ${29} -eq '1' ]; then
+                RECEFILE1="RECEIPTCS2"
+                RECEFILE2="RECEDENS2"
+            else
+                RECEFILE1="RECEIPTCS1"
+                RECEFILE2="RECEDENS1"
+            fi
+        else
+            if  [ ${29} -eq '1' ]; then
+                RECEFILE1="RECEIPTCK2"
+                RECEFILE2="RECEDENK2"
+            else 
+                RECEFILE1="RECEIPTCK1"
+                RECEFILE2="RECEDENK1"
+            fi 
+        fi
+	echo "file name change![" ${RECEFILE1} ${RECEFILE2} "]" >>$LOG_FILE
+
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM590 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${13},${17},${18},${19},${29},${21},$fixedsize,${24},${23},${20} >> $LOG_FILE 2>&1
+        if  [ -e ${20} ]; then
+            echo "--- BM590 err file exist ---" >> $LOG_FILE 2>&1
+            exit 
+        fi
+
+        if ! test -d  "${17}"; then
+             mkdir ${17}
+             RC=$?
+             echo "--- mkdir end   ---[" $RC  "]" >>$LOG_FILE
+             if  [ $RC -ne '0' ]; then
+                 ERRCD='0077'
+                 $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19}'  '${ERRCD},${23} >> $LOG_FILE
+                 echo "--- mkdir  err   ---" >>$LOG_FILE
+                 exit
+             fi
+             chmod -R g+r ${17}
+             echo "--- mkdir rireki holder ---" >>$LOG_FILE
+        else
+             rm ${17}${RECEFILE1}*.UKE
+             echo "--- rm holder file ---" ${17}${RECEFILE1}*.UKE "]" >>$LOG_FILE
+        fi
+        echo "--- folder name  [" ${17} "]" >>$LOG_FILE
+
+        echo "--- file name  [" /tmp/${23}${RECEFILE2}${3}.txt "=>" ${17}${RECEFILE1}${3}.UKE "]" >>$LOG_FILE
+        nkf -s /tmp/${23}${RECEFILE2}${3}.txt > ${17}${RECEFILE1}${3}.UKE
+##      RC=$?
+##      echo "--- nkf end   ---[" $RC  "]" >>$LOG_FILE
+        chmod -R g+r ${17}${RECEFILE1}${3}.UKE
+
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19},${23} >> $LOG_FILE
+        exit 
+    fi     
 
 #   レセ電ファイル作成
 

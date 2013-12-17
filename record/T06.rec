@@ -12,6 +12,14 @@ T06	{
 		B18	{
 			state   int;
 		};
+		TITLE1	{
+			style	varchar(20);
+			value	varchar(14);
+		};
+		TITLE2	{
+			style	varchar(20);
+			value	varchar(10);
+		};
 		SELNUM	{
 			value	number(4);
 		};

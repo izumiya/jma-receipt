@@ -3,6 +3,10 @@
               03  T06-B12-STATE   PIC S9(9)   BINARY.
               03  T06-B17-STATE   PIC S9(9)   BINARY.
               03  T06-B18-STATE   PIC S9(9)   BINARY.
+              03  T06-TITLE1-STYLE PIC X(20).
+              03  T06-TITLE1       PIC X(14).
+              03  T06-TITLE2-STYLE PIC X(20).
+              03  T06-TITLE2       PIC X(10).
               03  T06-SELNUM.
                 04  T06-VALUE   PIC S9(4).
               03  T06-SRYYM.

@@ -38,6 +38,7 @@
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
       *
       *  04.07.01    NACL-藤原    12/08/01  レセ電データチェック機能対応
+      *  04.07.02    NACL-藤原    13/12/09  医療情報連携基盤対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -255,24 +256,39 @@
                END-IF
            END-IF
       *
-           IF      SPA-NAI-T06-RECEDEN-CHK =   SPACE
-               MOVE    "1"                 TO  SPA-GMN-T98-PRTKBNL   (1)
-               MOVE    "提出用"            TO  SPA-GMN-T98-PRTKBNMEIL(1)
-               MOVE    "2"                 TO  SPA-GMN-T98-PRTKBNL   (2)
-               MOVE    "点検用（院外処方含）"
-                                           TO  SPA-GMN-T98-PRTKBNMEIL(2)
-               MOVE    2                   TO  SPA-GMN-T98-PRTKBN-MAX
-           ELSE
-               MOVE    "2"                 TO  SPA-GMN-T98-PRTKBNL   (1)
-               MOVE    "点検用（院外処方含）"
+           EVALUATE    SPA-T01-PRTKBN
+               WHEN    "6"
+                   MOVE    "6"             TO  SPA-GMN-T98-PRTKBNL   (1)
+                   MOVE    "連携基盤用"    TO  SPA-GMN-T98-PRTKBNMEIL(1)
+                   MOVE    1           TO  SPA-GMN-T98-PRTKBN-MAX
+               WHEN    "7"
+                   MOVE    "7"             TO  SPA-GMN-T98-PRTKBNL   (1)
+                   MOVE    "連携基盤用（当日分まで）"
                                            TO  SPA-GMN-T98-PRTKBNMEIL(1)
-               MOVE    1                   TO  SPA-GMN-T98-PRTKBN-MAX
-           END-IF
+                   MOVE    1           TO  SPA-GMN-T98-PRTKBN-MAX
+               WHEN    OTHER
+                   IF      SPA-NAI-T06-RECEDEN-CHK =   SPACE
+                       MOVE    "1"         TO  SPA-GMN-T98-PRTKBNL   (1)
+                       MOVE    "提出用"    TO  SPA-GMN-T98-PRTKBNMEIL(1)
+                       MOVE    "2"         TO  SPA-GMN-T98-PRTKBNL   (2)
+                       MOVE    "点検用（院外処方含）"
+                                           TO  SPA-GMN-T98-PRTKBNMEIL(2)
+                       MOVE    2           TO  SPA-GMN-T98-PRTKBN-MAX
+                   ELSE
+                       MOVE    "2"         TO  SPA-GMN-T98-PRTKBNL   (1)
+                       MOVE    "点検用（院外処方含）"
+                                           TO  SPA-GMN-T98-PRTKBNMEIL(1)
+                       MOVE    1           TO  SPA-GMN-T98-PRTKBN-MAX
+                   END-IF
+           END-EVALUATE    
            MOVE    SPA-GMN-T98-PRTKBNLST (1)
                                        TO  SPA-GMN-T98-PRTKBN-G
       *
            MOVE    SYS-200501-RECEDEN-DATAKBN
                                        TO  SPA-GMN-T98-DATAKBN
+           IF      SPA-T01-PRTKBN      =   "6" OR  "7"
+               MOVE    "4"                 TO  SPA-GMN-T98-DATAKBN
+           END-IF
            PERFORM 41021-DATAKBN-CHK-SEC                                 
       *
            MOVE    1               TO  SPA-GMN-T98-CUR
@@ -406,6 +422,11 @@
                                                TO  SPA-GMN-T98-DATAKBN-G
                END-IF
            END-IF
+      *
+           IF      SPA-T01-PRTKBN      =   "6" OR  "7"
+               MOVE    SPA-GMN-T98-DATAKBNLST (4)
+                                           TO  SPA-GMN-T98-DATAKBN-G
+           END-IF
            .
        41021-DATAKBN-CHK-EXT.
            EXIT.
@@ -525,9 +546,12 @@
            MOVE    "レセプト電算データを作成します"
                                        TO  WRK-TIDMSG 
       *
-           IF  (   SPA-NAI-T06-200501-RECEDEN-LST1KBN
+           IF      SPA-T01-PRTKBN    =   "6" OR  "7"
+               MOVE    WRK-TIDMSG          TO  T98-ID1MSG
+           ELSE
+             IF  (   SPA-NAI-T06-200501-RECEDEN-LST1KBN
                                            =   "1"             )
-           OR  ( ( SPA-NAI-T06-200501-RECEDEN-CHK-KBN
+             OR  ( ( SPA-NAI-T06-200501-RECEDEN-CHK-KBN
                                            =   "1"    )    AND
                  ( SPA-NAI-T06-SRYYM-H     >=  201204 )        )
                MOVE    SPACE           TO  WRK-TIDMSG1
@@ -555,9 +579,10 @@
                                   "の印刷を指定）" DELIMITED  BY  SIZE
                                                    INTO    T98-ID1MSG
                        END-STRING
-           ELSE
-               MOVE    WRK-TIDMSG          TO  T98-ID1MSG
-           END-IF
+             ELSE
+                 MOVE    WRK-TIDMSG          TO  T98-ID1MSG
+             END-IF
+           END-IF  
       *
            MOVE    SPA-GMN-T98-DATAKBN-G
                                        TO  T98-DATA
@@ -577,18 +602,24 @@
            END-PERFORM
            MOVE    SPA-GMN-T98-PRTKBN-MAX  TO  T98-PRTKBN-COUNT
       *
-           IF  (   SPA-NAI-T06-200501-RECEDEN-LST1KBN
-                                       =   "0"            )
-           AND ( ( SPA-NAI-T06-200501-RECEDEN-CHK-KBN
-                                       =   "0"    )    OR
-                 ( SPA-NAI-T06-SRYYM-H <   201204 )       )
+           IF      SPA-T01-PRTKBN    =   "6" OR  "7"
                MOVE    "F"                 TO  T98-B10-VISIBLE
                MOVE    "F"                 TO  T98-B11-VISIBLE
                MOVE    "F12:作成する"      TO  T98-B12-LABEL
            ELSE
-               MOVE    "T"                 TO  T98-B10-VISIBLE
-               MOVE    "T"                 TO  T98-B11-VISIBLE
-               MOVE    "F12:印刷する"      TO  T98-B12-LABEL
+               IF  (   SPA-NAI-T06-200501-RECEDEN-LST1KBN
+                                           =   "0"            )
+               AND ( ( SPA-NAI-T06-200501-RECEDEN-CHK-KBN
+                                           =   "0"    )    OR
+                     ( SPA-NAI-T06-SRYYM-H <   201204 )       )
+                   MOVE    "F"                 TO  T98-B10-VISIBLE
+                   MOVE    "F"                 TO  T98-B11-VISIBLE
+                   MOVE    "F12:作成する"      TO  T98-B12-LABEL
+               ELSE
+                   MOVE    "T"                 TO  T98-B10-VISIBLE
+                   MOVE    "T"                 TO  T98-B11-VISIBLE
+                   MOVE    "F12:印刷する"      TO  T98-B12-LABEL
+               END-IF
            END-IF
       *
            PERFORM 5001-MAPCUR-SEC
