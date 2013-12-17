@@ -2133,7 +2133,15 @@
            END-STRING
       *
       *
-           MOVE    2               TO  SPA-GMN-KAK32KBN-MAX
+           MOVE  "2"               TO  SPA-GMN-KAK32KBNL    (3)
+           STRING    "（主＋地＋長の主保険負担相当額）と"
+                                       DELIMITED BY SIZE
+                     "（月上限額）を比較"
+                                       DELIMITED BY SIZE
+           INTO                        SPA-GMN-KAK32KBNMEIL (3)
+           END-STRING
+      *
+           MOVE    3               TO  SPA-GMN-KAK32KBN-MAX
       *
            .
        3110-KAK32KBNLST-EXT.
@@ -9915,8 +9923,10 @@
       *
                EVALUATE    TRUE
                WHEN  ( SPA-PREFNUM     =   CONST-HIROSHIMA )
-               WHEN  ( SPA-PREFNUM     =   CONST-EHIME )
                    MOVE    "1"         TO  SPA-GMN-KAK32KBNK
+                   MOVE    "1"         TO  SPA-GMN-KAK32TAIKBNK
+               WHEN  ( SPA-PREFNUM     =   CONST-EHIME )
+                   MOVE    "2"         TO  SPA-GMN-KAK32KBNK
                    MOVE    "1"         TO  SPA-GMN-KAK32TAIKBNK
                END-EVALUATE
       *
