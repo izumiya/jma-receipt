@@ -158,7 +158,7 @@
       *                                     一画面対応
       *  04.07.04    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *  04.07.05    NACL-藤原    12/11/21  労災レセ電作成対応
-      *  04.07.06    NACL-藤原    13/12/09  医療情報連係基盤対応
+      *  04.07.06    NACL-藤原    13/12/09  医療情報連携基盤対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2136,6 +2136,8 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-4001-HOSPNUM
            END-IF
       *
            IF      SPA-R01-PRTKBN       =   "9"
+             CONTINUE
+           ELSE
              IF      SPA-ERRCD            =   SPACE
       *        未請求設定のチェック（医保）
                IF      SPA-R01-RECEKBN     =   "0"
