@@ -1120,6 +1120,12 @@
              AND  (WRK-COM-CDKBN-KBNNUM-EDA(IDX-Z) =   "00" )
                IF      WRK-MASUI-CNT       >   1
                    PERFORM 100214-HEISA-TENKEI-SEC
+               ELSE
+      *            ºÆ·×»»
+                   MOVE    WRK-COM-SURYO (IDX-Z)
+                                               TO  WRK-COM-SURYO2(IDX-Z)
+                   PERFORM 1002141-HEIMA-KEISAN01-SEC
+                   MOVE    ZERO                TO  WRK-COM-SURYO2(IDX-Z)
                END-IF
            END-IF
       *!!
