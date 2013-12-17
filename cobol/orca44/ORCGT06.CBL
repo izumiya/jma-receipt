@@ -776,6 +776,10 @@
            INITIALIZE                  SPA-GMN-T06-RECE-KOUMOKU
                                        SPA-NAI-T06-RECE-KOUMOKU
       *
+           IF      SPA-T01-PRTKBN  =   "6" OR  "7"
+               GO  TO  3101-ONRECE-KANRI-HENSYU-EXT
+           END-IF
+      *
            MOVE    ZERO            TO  IDX
       *
            INITIALIZE                  ONRECE-K-REC
@@ -2514,6 +2518,21 @@
            PERFORM 900-RENKEI-TMP-READ-SEC
       *
            IF      FLG-RENKEI-TMP      =   ZERO
+      *        レセ電請求一覧とのチェック
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >       SPA-GMN-T06-RECE-MAX
+                   IF      RECEDEN-PTID    =   SPA-NAI-T06-RECE10-PTID
+                                                                  (IDY)
+                       MOVE    "0008"          TO  SPA-ERRCD
+                       MOVE    SPA-GMN-T06-RECE-MAX
+                                               TO  IDY  
+                   END-IF
+               END-PERFORM
+           ELSE
+               MOVE    "0021"          TO  SPA-ERRCD
+           END-IF
+      *
+           IF      SPA-ERRCD            =   SPACE
                IF      SPA-GMN-T06-SELNUM  =   ZERO
                    ADD     1                   TO  SPA-GMN-T06-RECE-MAX
                    MOVE    SPA-GMN-T06-RECE-MAX
@@ -2540,12 +2559,7 @@
                MOVE    RECEDEN-CREYMD  TO  WRK-SYMD
                PERFORM 5002-HIZUKE-HEN-SEC
                MOVE    WRK-HENYMDG     TO  SPA-GMN-T06-R-TCREYMD (IDX)
-          ELSE
-               MOVE    "0021"          TO  SPA-ERRCD
-           END-IF
       *
-      *
-           IF      SPA-ERRCD            =   SPACE
                IF      SPA-GMN-T06-SELNUM  =   ZERO
                    MOVE    SPA-GMN-T06-RECE-MAX
                                             TO  T06-RECE-LIST-ROW
@@ -3735,6 +3749,13 @@
            IF      FLG-ONRECE-B    =   1
                MOVE    "0025"          TO  SPA-ERRCD
                GO  TO  480-ZENKAI-HYOUJI-TID-EXT
+           ELSE
+      *        前回が連係用のとき
+               IF      ONRECE-B-U-HENREI-FLG
+                                       =   "9"
+                   MOVE    "0029"          TO  SPA-ERRCD
+                   GO  TO  480-ZENKAI-HYOUJI-TID-EXT
+               END-IF
            END-IF
       *
       *    直接請求する保険者とのチェック（社保）
@@ -4313,9 +4334,14 @@
                                            TO  ONRECE-B-KIGO
                MOVE    SPA-NAI-T06-R-THKNNUM      (IDX)
                                            TO  ONRECE-B-HKNNUM
-               IF      SPA-NAI-T06-R-THENREI-SIJI-FLG (IDX)
-                                           =   1
-                   MOVE    "1"                 TO  ONRECE-B-U-HENREI-FLG
+               IF      SPA-T01-PRTKBN      =   "6" OR  "7"
+      *            連係用のとき識別のためにセット
+                   MOVE    "9"             TO  ONRECE-B-U-HENREI-FLG
+               ELSE
+                   IF      SPA-NAI-T06-R-THENREI-SIJI-FLG (IDX)
+                                               =   1
+                       MOVE    "1"             TO  ONRECE-B-U-HENREI-FLG
+                  END-IF
                END-IF
                MOVE    SMCNDATE-YMD        TO  ONRECE-B-CREYMD
                MOVE    SPA-TERMID          TO  ONRECE-B-TERMID
@@ -5530,6 +5556,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                WHEN    "0028"
                    MOVE
                    "連係用のときは違う診療年月は入力できません"
+                                                       TO  TERR-ERRMSG
+               WHEN    "0029"
+                   MOVE    "前回作成分が連係用ですので表示できません"
                                                        TO  TERR-ERRMSG
                WHEN    "0041"
                    MOVE    "データが入力してあるので遷移できません"

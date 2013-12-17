@@ -6058,7 +6058,17 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        480-RECEDEN-KOBETU-SEC             SECTION.
       *
-           IF      SPA-GMN-DIRECT-HKNJANUM-MAX
+          IF      SPA-GMN-PRTKBN       =   "6" OR  "7"
+              IF      SPA-GMN-NYUGAIKBN    =   "1" OR  "2"
+                  CONTINUE
+              ELSE
+                  MOVE    "0010"               TO  SPA-ERRCD
+                  MOVE    5                    TO  SPA-GMN-CUR
+                  GO  TO  480-RECEDEN-KOBETU-EXT
+              END-IF
+          END-IF
+      *
+          IF      SPA-GMN-DIRECT-HKNJANUM-MAX
                                        >   ZERO
                MOVE    SPA-GMN-DIRECT-HKNJANUM
                                            TO  SPA-T01-DIRECT-HKNJANUM
@@ -6783,6 +6793,10 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "0009"
                    MOVE
                   "総括表・広域の処理対象データが選択してありません"
+                                               TO  TERR-ERRMSG
+               WHEN    "0010"
+                   MOVE
+                      "連携基盤用のときは入外区分を設定してください"
                                                TO  TERR-ERRMSG
                WHEN    "0011"
                    STRING  "主科未設定データがあります"
