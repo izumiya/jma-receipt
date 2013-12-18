@@ -608,6 +608,10 @@
       *                                     負担金記載修正
       *  04.06.19    NACL-門脇    13/12/17  愛媛県地方公費対応
       *                                     （マル長併用時記載修正）
+      *  04.06.20    NACL-門脇    13/12/18  主保険＋０７９又０２４の食事療養
+      *                                     記載修正
+      *  04.06.21    NACL-門脇    13/12/18  全国公費一部負担金記載修正
+      *                                     （上限額に達した場合）
       *
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-門脇    11/10/17  法定外現物給付対応（法別１０、２１）
@@ -19367,6 +19371,7 @@
                   OR ( SYU-SKJ-FTNKBN(IDX3)  =  "6"            )
       *           OR ( SYU-SKJ-NISSU(IDX3)   =   ZERO          )
                   OR ( SYU-SKJ-RYOYOHI(IDX3) =   ZERO          )
+                  OR ( SYU-KOH-HKNNUM(IDX3)  =  "079" OR "024" )
       *              IF   RECE62-SHOKUJINISSU(KH-IDX)  =  ZERO
                      IF   RECE62-SHOKUJIRYOYOHI(KH-IDX) =  ZERO
                          MOVE    "1"      TO
@@ -23354,11 +23359,19 @@
                                       / 100
            END-IF
       *
-           IF  (WRK-KOH-KINGAKU   NOT = ZERO                     )
-           AND (WRK-KOH-KINGAKU < RECE62-FTNMONEY(KOHFTN-IDX + 1))
-             MOVE  WRK-KOH-KINGAKU  TO
+           IF   WRK-KOH-KINGAKU   NOT = ZERO
+            IF    WRK-KOH-KINGAKU < RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                MOVE  WRK-KOH-KINGAKU  TO
                                   RECE62-FTNMONEY(KOHFTN-IDX + 1)
                                   RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+            ELSE
+              IF  WRK-KOH-KINGAKU = WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
+                MOVE  WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)  TO
+                                  RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                MOVE  WRK-TAIHI-FTNMONEY-KOJ(KOHFTN-IDX + 1)  TO
+                                  RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+              END-IF
+            END-IF
            END-IF
       *
            .
