@@ -7120,7 +7120,7 @@ grpsys     MOVE    RECE04-HOSPNUM       TO  SANTEI-HOSPNUM
                    MOVE    ZERO   TO    WRK-KETA2
                    PERFORM   VARYING   IDX5    FROM   1   BY   2
                               UNTIL   (IDX5     >    50)
-                      IF   WK-FREE-NAME3(IDX4:IDX5) = SPACE
+                      IF   WK-FREE-NAME3(IDX5:2)    = SPACE
                           MOVE   IDX5   TO   WRK-KETA2
                           MOVE   50     TO   IDX5
                       END-IF
