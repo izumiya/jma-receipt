@@ -615,6 +615,10 @@
       *                                     ÉéÃ´¶âµ­ºÜ½¤Àµ
       *  04.06.20    NACL-ÌçÏÆ    13/12/17  °¦É²¸©ÃÏÊý¸øÈñÂÐ±þ
       *                                     ¡Ê¥Þ¥ëÄ¹Ê»ÍÑ»þµ­ºÜ½¤Àµ¡Ë
+      *  04.06.21    NACL-ÌçÏÆ    13/12/18  ¼çÊÝ¸±¡Ü£°£·£¹Ëô£°£²£´¤Î¿©»öÎÅÍÜ
+      *                                     µ­ºÜ½¤Àµ
+      *  04.06.22    NACL-ÌçÏÆ    13/12/18  Á´¹ñ¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜ½¤Àµ
+      *                                     ¡Ê¾å¸Â³Û¤ËÃ£¤·¤¿¾ì¹ç¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -17204,6 +17208,7 @@
                   OR ( SYU-SKJ-FTNKBN(IDX3)  =  "6"            )
       *           OR ( SYU-SKJ-NISSU(IDX3)   =   ZERO          )
                   OR ( SYU-SKJ-RYOYOHI(IDX3) =   ZERO          )
+                  OR ( SYU-KOH-HKNNUM(IDX3)  =  "079" OR "024" )
       *              IF   RECE62-SHOKUJINISSU(KH-IDX)  =  ZERO
                      IF   RECE62-SHOKUJIRYOYOHI(KH-IDX) =  ZERO
                          MOVE    "1"      TO
@@ -21295,11 +21300,19 @@
                                       / 100
            END-IF
       *
-           IF  (WRK-KOH-KINGAKU   NOT = ZERO                     )
-           AND (WRK-KOH-KINGAKU < RECE62-FTNMONEY(KOHFTN-IDX + 1))
-             MOVE  WRK-KOH-KINGAKU  TO
+           IF   WRK-KOH-KINGAKU   NOT = ZERO
+            IF    WRK-KOH-KINGAKU < RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                MOVE  WRK-KOH-KINGAKU  TO
                                   RECE62-FTNMONEY(KOHFTN-IDX + 1)
                                   RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+            ELSE
+              IF  WRK-KOH-KINGAKU = WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
+                MOVE  WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)  TO
+                                  RECE62-FTNMONEY(KOHFTN-IDX + 1)
+                MOVE  WRK-TAIHI-FTNMONEY-KOJ(KOHFTN-IDX + 1)  TO
+                                  RECE62-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+              END-IF
+            END-IF
            END-IF
       *
            .

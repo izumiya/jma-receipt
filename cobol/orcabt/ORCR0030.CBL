@@ -630,6 +630,8 @@
       *                                     負担金記載修正
       *  04.06.22    NACL-門脇    13/12/17  愛媛県地方公費対応
       *                                     （マル長併用時記載修正）
+      *  04.06.23    NACL-門脇    13/12/18  全国公費一部負担金記載修正
+      *                                     （上限額に達した場合）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -16852,11 +16854,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       / 100
            END-IF
       *
-           IF  (WRK-KOH-KINGAKU   NOT = ZERO                     )
-           AND (WRK-KOH-KINGAKU < RECE02-FTNMONEY(KOHFTN-IDX + 1))
-             MOVE  WRK-KOH-KINGAKU  TO
+           IF   WRK-KOH-KINGAKU   NOT = ZERO
+            IF    WRK-KOH-KINGAKU < RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                MOVE  WRK-KOH-KINGAKU  TO
                                   RECE02-FTNMONEY(KOHFTN-IDX + 1)
                                   RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+            ELSE
+              IF  WRK-KOH-KINGAKU = WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)
+                MOVE  WRK-TAIHI-FTNMONEY(KOHFTN-IDX + 1)  TO
+                                  RECE02-FTNMONEY(KOHFTN-IDX + 1)
+                MOVE  WRK-TAIHI-FTNMONEY-KOJ(KOHFTN-IDX + 1)  TO
+                                  RECE02-FTNMONEY-KOJ(KOHFTN-IDX + 1)
+              END-IF
+            END-IF
            END-IF
       *
            .
