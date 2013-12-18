@@ -3379,9 +3379,12 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                            INTO        SPA-ERRMSG
                    END-STRING
                WHEN    "0011"
-                   MOVE
-                   "医保分（一括全体）しか連携基盤用は選択できません"
-                                                       TO  SPA-ERRMSG
+                   STRING  "連携基盤用は医保分（一括作成・全件）"
+                                           DELIMITED   BY  SIZE  
+                           "のときだけ選択できます"
+                                           DELIMITED   BY  SIZE  
+                                           INTO        SPA-ERRMSG
+                   END-STRING
                WHEN    "0012"
                    MOVE    "レセプト作成区分入力エラー"
                                                        TO  SPA-ERRMSG
