@@ -628,6 +628,8 @@
       *  04.06.20    NACL-門脇    13/11/28  後期高齢の月途中県外転出対応
       *  04.06.21    NACL-門脇    13/11/29  全国公費併用時の地方公費一部
       *                                     負担金記載修正
+      *  04.06.22    NACL-門脇    13/12/17  愛媛県地方公費対応
+      *                                     （マル長併用時記載修正）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -15404,20 +15406,17 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       AND   WRK-CYOKI-KEISAN3  <  FTN-KOH-XX7
       *                   愛媛県
                           IF   SYS-1001-PREFNUM  =  38
-      **>                   COMPUTE WRK-CYOKI-KEISAN4
-      **>                                         = FTN-KOH-XX7
-      **>                                         - WRK-CYOKI-KEISAN3
-                            IF   FTN-KOH-XX7      > WRK-CYOKI-KEISAN6
-                             MOVE WRK-CYOKI-KEISAN6
-                                                TO  WRK-CYOKI-KEISAN7
-                             MOVE WRK-CYOKI-KEISAN6
-                                          TO   RECE02-ZAITAKU-SAIKEI2
-                             IF   WRK-CYOKI-KEISAN6 = ZERO
-                                MOVE   1        TO  RECE02-YOBIETC(7)
-                             END-IF
-                            ELSE
+      ***>                  IF   FTN-KOH-XX7      > WRK-CYOKI-KEISAN6
+      ***>                   MOVE WRK-CYOKI-KEISAN6
+      ***>                                      TO  WRK-CYOKI-KEISAN7
+      ***>                   MOVE WRK-CYOKI-KEISAN6
+      ***>                                TO   RECE02-ZAITAKU-SAIKEI2
+      ***>                   IF   WRK-CYOKI-KEISAN6 = ZERO
+      ***>                      MOVE   1        TO  RECE02-YOBIETC(7)
+      ***>                   END-IF
+      ***>                  ELSE
                              MOVE  FTN-KOH-XX7  TO  WRK-CYOKI-KEISAN7
-                            END-IF
+      ***>                  END-IF
                             IF  WRK-CYOKI-KEISAN7 > WRK-CYOKI-KEISAN3
                              COMPUTE WRK-CYOKI-KEISAN4
                                                   = WRK-CYOKI-KEISAN7
