@@ -502,7 +502,8 @@
                IF      WRK-PARA-NYUGAIKBN  =   "1"
                    INITIALIZE  ORCSDIVCSV-AREA
                    MOVE    RECEDEN-RECEDATA    TO  ORCSDIVCSV-REC
-                   MOVE    36                  TO  ORCSDIVCSV-ELE-C
+      *            21請求情報に退院日がセットされているため
+                   MOVE    21                  TO  ORCSDIVCSV-ELE-C
                    MOVE    ","                 TO  ORCSDIVCSV-DELI
                    MOVE    ZERO                TO  ORCSDIVCSV-DQ
                    CALL    "ORCSDIVCSV"     USING  ORCSDIVCSV-AREA

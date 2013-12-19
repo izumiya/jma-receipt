@@ -29,7 +29,7 @@
       *    要素数
            03  ORCSDIVCSV-ELE-C            PIC 9(03).
       *    デリミタ(1バイト)
-           03  ORCSDIVCSV-DELI             PIC X(03).
+           03  ORCSDIVCSV-DELI             PIC X(01).
       *    ダブルコーテーション有無(0:なし,1:あり)
            03  ORCSDIVCSV-DQ               PIC 9(01).
       *    要素情報
