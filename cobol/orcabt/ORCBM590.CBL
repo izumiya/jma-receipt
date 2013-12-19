@@ -136,6 +136,7 @@
            03  WRK-SEIYM               PIC 9(05).         
       *    診療年月（和暦）
            03  WRK-SRYYM               PIC 9(05). 
+           03  WRK-TAIYMD              PIC 9(07).
       *
            03  WRK-MOJISU              PIC 9(02).        
       *
@@ -423,7 +424,8 @@
       *
            MOVE    LNK-PRTKANRI-SKYYMD TO  WRK-SYMD
            PERFORM 5002-HIZUKE-HEN-SEC
-           MOVE    WRK-HENYMD (1:5)    TO  WRK-SEIYM 
+           MOVE    WRK-HENYMD (1:5)    TO  WRK-SEIYM
+           MOVE    WRK-HENYMD          TO  WRK-TAIYMD
       *
            MOVE    LNK-PRTKANRI-SRYYM  TO  WRK-SYMD(1:6)
            MOVE    "01"                TO  WRK-SYMD(7:2)
@@ -537,10 +539,16 @@
       *                データ提出同意か確認
                        PERFORM 900-PTPUBLIC-READ-SEC
       *                地域連携IDなし又は同意しない場合はスキップする
+      *                入退院データ（処理区分7）の場合、入院中と
+      *                指定日より後の退院日はスキップする
                        IF     (PTPUBLIC-AGREEMENT
                                                NOT =   "1")  OR
                               (PTPUBLIC-PATIENT-ID1
-                                                   =   SPACE)
+                                                   =   SPACE)  OR
+                             ((WRK-PARA-NYUGAIKBN  =   "1")  AND
+                              (WRK-PARA-PRTKBN     =   "7")  AND
+                             ((WRK-TAIINYMD        =   SPACE)  OR
+                              (WRK-TAIINYMD        >   WRK-TAIYMD)))
                            EXIT  PERFORM
                        END-IF
       *                レセプト番号の編集

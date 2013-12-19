@@ -23,7 +23,7 @@ fi
 #        ${20} HOSPNUM
 #        ${21} レセプト作成区分
 #            1:提出用レセ、2:点検用レセ
-#            6:連係基盤用、7:連係基盤用（当日）
+#            6:連携基盤用、7:連携基盤用（当日）
 #        ${22} 症状詳記作成区分
 #            1:作成する
 #        ${23} 光ディスク等送付書作成区分
@@ -84,20 +84,26 @@ fi
 	rm  /tmp/${20}${RECEFILE2}*.txt
 
 
-#   連係基盤ファイル作成
+#   連携基盤ファイル作成
     if  [ ${21} -eq '6' ] || [ ${21} -eq '7' ]; then
         if  [ ${12} -eq '1' ]; then
             if  [ ${19} -eq '1' ]; then
-                RECEFILE1="RECEIPTCS2"
+                RECEFILE1="RECEIPTCS3"
                 RECEFILE2="RECEDENS2"
+                if  [ ${21} -eq '7' ]; then
+                    RECEFILE1="RECEIPTCS2"
+                fi
             else
                 RECEFILE1="RECEIPTCS1"
                 RECEFILE2="RECEDENS1"
             fi
         else
             if  [ ${19} -eq '1' ]; then
-                RECEFILE1="RECEIPTCK2"
+                RECEFILE1="RECEIPTCK3"
                 RECEFILE2="RECEDENK2"
+                if  [ ${21} -eq '7' ]; then
+                    RECEFILE1="RECEIPTCK2"
+                fi
             else 
                 RECEFILE1="RECEIPTCK1"
                 RECEFILE2="RECEDENK1"

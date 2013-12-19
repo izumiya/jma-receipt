@@ -87,16 +87,22 @@ fi
     if  [ ${24} -eq '6' ] || [ ${24} -eq '7' ]; then
         if  [ ${12} -eq '1' ]; then
             if  [ ${29} -eq '1' ]; then
-                RECEFILE1="RECEIPTCS2"
+                RECEFILE1="RECEIPTCS3"
                 RECEFILE2="RECEDENS2"
+                if  [ ${24} -eq '7' ]; then
+                    RECEFILE1="RECEIPTCS2"
+                fi
             else
                 RECEFILE1="RECEIPTCS1"
                 RECEFILE2="RECEDENS1"
             fi
         else
             if  [ ${29} -eq '1' ]; then
-                RECEFILE1="RECEIPTCK2"
+                RECEFILE1="RECEIPTCK3"
                 RECEFILE2="RECEDENK2"
+                if  [ ${24} -eq '7' ]; then
+                    RECEFILE1="RECEIPTCK2"
+                fi
             else 
                 RECEFILE1="RECEIPTCK1"
                 RECEFILE2="RECEDENK1"
