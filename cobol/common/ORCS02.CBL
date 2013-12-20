@@ -842,6 +842,11 @@
                05  WK-RUI-FTN1-M3-JI         PIC  9(07)V9(01).
                05  WK-RUI-FTN1-M3-JI-TOKU75  PIC  9(07)V9(01).
       *
+               05  WK-RUI-FTN1-M4            PIC  9(07).
+               05  WK-RUI-FTN1-M4-TOKU75     PIC  9(07).
+               05  WK-RUI-FTN1-M4-JI         PIC  9(07).
+               05  WK-RUI-FTN1-M4-JI-TOKU75  PIC  9(07).
+      *
                05  WK-RUI-FTN2-M           PIC  9(07).
                05  WK-RUI-FTN2-M2          PIC  9(07).
                05  WK-RUI-FTN2-M3          PIC  9(07).
@@ -853,6 +858,7 @@
                05  WK-RUI-COMPFTN          PIC  9(07).
                05  WK-RUI-HKNFTNMONEY      PIC  9(07).
                05  WK-RUI-COMPFTN-ENTANI   PIC  9(07)V9(01).
+               05  WK-RUI-COMPFTN-ENTANI2  PIC  9(07).
                05  WK-RUI-TAISYO           PIC  9(01).
       *
                05  WK-RUI-MONEY            PIC  9(07).
@@ -13028,11 +13034,15 @@
                                                 TO  WK-RUI-FTN1-M2
                               ADD    SYU-KOH1COMPFTN-ENTANI
                                                 TO  WK-RUI-FTN1-M3
+                              COMPUTE WK-ENTANI =
+                                     SYU-KOH1COMPFTN-ENTANI + 0.9
+                              ADD    WK-ENTANI  TO  WK-RUI-FTN1-M4
                               IF   SYU-KOH1SKJ-FTNKBN =  "2"
                                ADD   SYU-KOH1SKJ-FTN
                                                 TO  WK-RUI-FTN1-M
                                                     WK-RUI-FTN1-M2
                                                     WK-RUI-FTN1-M3
+                                                    WK-RUI-FTN1-M4
                               END-IF
                              END-IF
                              IF ((LNK-SYU-SRYYMD(1:6)  >=  "200604") AND
@@ -13066,6 +13076,9 @@
                                                    TO  WK-RUI-FTN1-M2-JI
                                   ADD   SYU-KOH1COMPFTN-ENTANI
                                                    TO  WK-RUI-FTN1-M3-JI
+                                  COMPUTE WK-ENTANI =
+                                        SYU-KOH1COMPFTN-ENTANI + 0.9
+                                  ADD   WK-ENTANI  TO  WK-RUI-FTN1-M4-JI
                                 END-IF
                                 IF   FLG-RUITAISYO  =  1
                                   ADD   SYU-KOH1HKNFTNMONEY
@@ -13088,6 +13101,10 @@
                                             TO  WK-RUI-FTN1-M2-JI-TOKU75
                                     ADD   SYU-KOH1COMPFTN-ENTANI
                                             TO  WK-RUI-FTN1-M3-JI-TOKU75
+                                    COMPUTE WK-ENTANI =
+                                          SYU-KOH1COMPFTN-ENTANI + 0.9
+                                    ADD   WK-ENTANI
+                                            TO  WK-RUI-FTN1-M4-JI-TOKU75
                                   END-IF
                                 END-IF
                              END-IF
@@ -13141,11 +13158,16 @@
                                         TO  WK-RUI-FTN1-M2-TOKU75
                                  ADD   SYU-KOH1COMPFTN-ENTANI
                                         TO  WK-RUI-FTN1-M3-TOKU75
+                                 COMPUTE WK-ENTANI =
+                                       SYU-KOH1COMPFTN-ENTANI + 0.9
+                                 ADD   WK-ENTANI
+                                        TO  WK-RUI-FTN1-M4-TOKU75
                                  IF    SYU-KOH1SKJ-FTNKBN =  "2"
                                   ADD  SYU-KOH1SKJ-FTN
                                         TO  WK-RUI-FTN1-M-TOKU75
                                             WK-RUI-FTN1-M2-TOKU75
                                             WK-RUI-FTN1-M3-TOKU75
+                                            WK-RUI-FTN1-M4-TOKU75
                                  END-IF
                                END-IF
                              END-IF
@@ -23287,6 +23309,8 @@
               MOVE   LNK-SYU-KOH1COMPFTN-ENTANI
                                            TO   WK-RUI-COMPFTN-ENTANI
            END-IF
+           COMPUTE  WK-RUI-COMPFTN-ENTANI2 =
+                    WK-RUI-COMPFTN-ENTANI  + 0.9
       *
            COMPUTE  WK-RUI-HKNFTNMONEY  =
                     WK-RUI-COMPFTN      +   5
@@ -23296,38 +23320,44 @@
                     WK-RUI-HKNFTNMONEY  *  10
       *
            IF    LNK-SYU-KOH1SKJ-FTNKBN   =  "2"
-                 ADD  LNK-SYU-KOH1SKJ-FTN      TO  WK-RUI-HKNFTNMONEY
-                                                   WK-RUI-COMPFTN
-                                                   WK-RUI-COMPFTN-ENTANI
+                 ADD  LNK-SYU-KOH1SKJ-FTN    TO  WK-RUI-HKNFTNMONEY
+                                                 WK-RUI-COMPFTN
+                                                 WK-RUI-COMPFTN-ENTANI
+                                                 WK-RUI-COMPFTN-ENTANI2
            END-IF
       *
            IF ((LNK-SYU-KOH1HKNNUM  =  "015" OR "016" OR "021") AND
                (WK-JIRITU-CYUKANSOU(1)   =  2                 ))
            OR ( LNK-SYU-KOH1HKNNUM  =  "024" OR "079" OR "038" )
               IF  FLG-TOKU75  = 1 OR 2 OR 3
-                 ADD  WK-RUI-FTN1-M-JI-TOKU75  TO  WK-RUI-HKNFTNMONEY
-                 ADD  WK-RUI-FTN1-M2-JI-TOKU75 TO  WK-RUI-COMPFTN
-                 ADD  WK-RUI-FTN1-M3-JI-TOKU75 TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M-JI-TOKU75  TO  WK-RUI-HKNFTNMONEY
+               ADD  WK-RUI-FTN1-M2-JI-TOKU75 TO  WK-RUI-COMPFTN
+               ADD  WK-RUI-FTN1-M3-JI-TOKU75 TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M4-JI-TOKU75 TO  WK-RUI-COMPFTN-ENTANI2
               ELSE
-                 ADD  WK-RUI-FTN1-M-JI         TO  WK-RUI-HKNFTNMONEY
-                 ADD  WK-RUI-FTN1-M2-JI        TO  WK-RUI-COMPFTN
-                 ADD  WK-RUI-FTN1-M3-JI        TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M-JI         TO  WK-RUI-HKNFTNMONEY
+               ADD  WK-RUI-FTN1-M2-JI        TO  WK-RUI-COMPFTN
+               ADD  WK-RUI-FTN1-M3-JI        TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M4-JI        TO  WK-RUI-COMPFTN-ENTANI2
               END-IF
            ELSE
             IF  (WK-1001-PREFNUM    =  13           )
             AND (LNK-SYU-KOH1HKNNUM = "182" OR "382")
-                 ADD  WK-RUI-FTN1-M            TO  WK-RUI-HKNFTNMONEY
-                 ADD  WK-RUI-FTN1-M2           TO  WK-RUI-COMPFTN
-                 ADD  WK-RUI-FTN1-M3           TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M            TO  WK-RUI-HKNFTNMONEY
+               ADD  WK-RUI-FTN1-M2           TO  WK-RUI-COMPFTN
+               ADD  WK-RUI-FTN1-M3           TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M4           TO  WK-RUI-COMPFTN-ENTANI2
             ELSE
               IF  FLG-TOKU75  = 1 OR 2 OR 3
-                 ADD  WK-RUI-FTN1-M-TOKU75     TO  WK-RUI-HKNFTNMONEY
-                 ADD  WK-RUI-FTN1-M2-TOKU75    TO  WK-RUI-COMPFTN
-                 ADD  WK-RUI-FTN1-M3-TOKU75    TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M-TOKU75     TO  WK-RUI-HKNFTNMONEY
+               ADD  WK-RUI-FTN1-M2-TOKU75    TO  WK-RUI-COMPFTN
+               ADD  WK-RUI-FTN1-M3-TOKU75    TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M4-TOKU75    TO  WK-RUI-COMPFTN-ENTANI2
               ELSE
-                 ADD  WK-RUI-FTN1-M            TO  WK-RUI-HKNFTNMONEY
-                 ADD  WK-RUI-FTN1-M2           TO  WK-RUI-COMPFTN
-                 ADD  WK-RUI-FTN1-M3           TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M            TO  WK-RUI-HKNFTNMONEY
+               ADD  WK-RUI-FTN1-M2           TO  WK-RUI-COMPFTN
+               ADD  WK-RUI-FTN1-M3           TO  WK-RUI-COMPFTN-ENTANI
+               ADD  WK-RUI-FTN1-M4           TO  WK-RUI-COMPFTN-ENTANI2
               END-IF
             END-IF
            END-IF
@@ -23388,11 +23418,11 @@
                MOVE   ZERO      TO  ZAN-KOHI22
            END-IF
       *
-           IF  WK-RUI-COMPFTN-ENTANI   NOT =  ZERO
-               IF   WK-RUI-FTN2-M3        >=  WK-RUI-COMPFTN-ENTANI
+           IF  WK-RUI-COMPFTN-ENTANI2  NOT =  ZERO
+               IF   WK-RUI-FTN2-M3        >=  WK-RUI-COMPFTN-ENTANI2
                     MOVE     ZERO         TO  ZAN-KOHI2-M3
                ELSE
-                    COMPUTE  ZAN-KOHI2-M3 =   WK-RUI-COMPFTN-ENTANI -
+                    COMPUTE  ZAN-KOHI2-M3 =   WK-RUI-COMPFTN-ENTANI2 -
                                               WK-RUI-FTN2-M3
                END-IF
                EVALUATE  FLG-RUIKEIYO2
@@ -24249,11 +24279,12 @@
                 IF  (KOH-IDX         =   2)
                 AND (WK-RUI-TAISYO   =   1)
                 AND (FLG-RUIKEIYO2   =   2)
-                 IF    WK-RUI-FTN2-M3-XXX  >=  WK-RUI-HKNFTNMONEY
+                 IF    WK-RUI-FTN2-M3-XXX  >=  WK-RUI-COMPFTN-ENTANI
                      MOVE     ZERO         TO  WK-ZAN-FTN2-M3-XXX
                  ELSE
-                     COMPUTE  WK-ZAN-FTN2-M3-XXX = WK-RUI-HKNFTNMONEY -
-                                                   WK-RUI-FTN2-M3-XXX
+                     COMPUTE  WK-ZAN-FTN2-M3-XXX
+                                            =  WK-RUI-COMPFTN-ENTANI -
+                                               WK-RUI-FTN2-M3-XXX
                  END-IF
                  IF    LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
                                      >      WK-ZAN-FTN2-M3-XXX
@@ -27780,11 +27811,12 @@
        2308B-RUIKEIYO-HENSYU-SEC           SECTION.
       *
            IF    LNK-SYU-SYUHKNNUM     NOT =   SPACE
-             IF  WK-RUI-FTN2-M3-XXX  >=  WK-RUI-HKNFTNMONEY
+             IF  WK-RUI-FTN2-M3-XXX  >=  WK-RUI-COMPFTN-ENTANI
                MOVE     ZERO         TO  WK-ZAN-FTN2-M3-XXX
              ELSE
-               COMPUTE  WK-ZAN-FTN2-M3-XXX = WK-RUI-HKNFTNMONEY -
-                                             WK-RUI-FTN2-M3-XXX
+               COMPUTE  WK-ZAN-FTN2-M3-XXX
+                                      =  WK-RUI-COMPFTN-ENTANI -
+                                         WK-RUI-FTN2-M3-XXX
              END-IF
              IF  LNK-SYU-KOH-COMPFTN-ENTANI(KOH-IDX)
                                     > WK-ZAN-FTN2-M3-XXX
