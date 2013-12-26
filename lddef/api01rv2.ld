@@ -71,6 +71,7 @@ db "xml2" {
  xml_medicalget01v2res;
  xml_medicalget02v2res;
  xml_medicalget03v2res;
+ xml_medicalget04v2res;
  xml_disease_infov2res;
  xml_disease_infov2req;
  xml_appointlst2v2req;
