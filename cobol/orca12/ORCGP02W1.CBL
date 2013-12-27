@@ -2583,8 +2583,8 @@
       *    ÅÐÏ¿¥Ü¥¿¥ó¤Ø
            MOVE    60                  TO  SPA-GMN-CUR
       *    Ï«ºÒÊÝ¸±¾ðÊó
-           MOVE    SPACE               TO  SPA-P02D-AREA
-           INITIALIZE                      SPA-P02D-AREA
+      *    MOVE    SPACE               TO  SPA-P02D-AREA
+      *    INITIALIZE                      SPA-P02D-AREA
       *
            .
        4910-RSKOH-PARAOUT-EXT.
@@ -7923,16 +7923,16 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        IF      FLG-CHK             =   ZERO
                            MOVE    IDX-R           TO  IDX-R2
                            MOVE    1               TO  FLG-CHK
-      *                ELSE
-      *                    MOVE    ZERO            TO  IDX-R2
+                       ELSE
+                           MOVE    ZERO            TO  IDX-R2
                        END-IF
                    END-IF
                END-IF
            END-PERFORM
       *    Í­¸ú¤ÊÏ«ºÒ¡¦¼«ÇåÀÕ¤¬£±·ï¤Î»þ¡¢ÂÐ¾Ý¤È¤¹¤ë
-      *    IF     (FLG-CHK             =   1  )  AND
-      ***         (IDX-R2              >   ZERO)
-           IF      IDX-R2              >   ZERO
+           IF     (FLG-CHK             =   1  )  AND
+                  (IDX-R2              >   ZERO)
+     ****  IF      IDX-R2              >   ZERO
                MOVE    IDX-R2          TO  SPA-NAI-HKNSTR
                MOVE    IDX-R2          TO  IDX
                PERFORM 3101-HOKEN-HEN-SEC
@@ -7946,15 +7946,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPACE           TO  SPA-GMN-CONTKBN-G
                MOVE    SPACE           TO  SPA-GMN-CONTKBN-LIST
                MOVE    ZERO            TO  SPA-GMN-CONT-MAX
-      *    ELSE
+           ELSE
       *        Í­¸ú¤ÊÏ«ºÒ¡¦¼«ÇåÀÕ¤¬¤Ê¤¤»þ¡¢¿·µ¬ÄÉ²Ã
-      *??      IF      FLG-CHK             =   ZERO
-      *            INITIALIZE                  SPA-GMN-HKN-AREA
-      *            MOVE    ZERO                TO  SPA-NAI-HKNSTR
-      *        ELSE
-      *            MOVE    "0022"        TO  SPA-ERRCD
-      *            MOVE    8             TO  SPA-GMN-CUR
-      *        END-IF
+               IF      FLG-CHK             =   ZERO
+                   INITIALIZE                  SPA-GMN-HKN-AREA
+                   MOVE    ZERO                TO  SPA-NAI-HKNSTR
+               ELSE
+                   MOVE    "0022"        TO  SPA-ERRCD
+                   MOVE    8             TO  SPA-GMN-CUR
+               END-IF
            END-IF
            .
        4811-RSIHKN-SET-EXT.
