@@ -51,6 +51,7 @@
       *
       *  04.07.01    NACL-門脇    11/09/07  労災請求書作成対応
       *  04.07.02    NACL-門脇    13/01/21  労災レセ電対応
+      *  04.07.03    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -363,6 +364,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    WHEN    "2"             ALSO    "2"
                        MOVE    7102            TO  RECE82-RECESYUBETU
                    WHEN    "4"             ALSO    ANY
+                   WHEN    "6"             ALSO    ANY
                        MOVE    7011            TO  RECE82-RECESYUBETU
                    WHEN    "5"          ALSO    ANY
                        MOVE    7061            TO  RECE82-RECESYUBETU
