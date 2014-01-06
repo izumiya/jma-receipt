@@ -127,6 +127,7 @@
       *                                     コメントの対応
       *  04.07.02    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.03    NACL-門脇    13/01/21  労災レセ電対応
+      *  04.07.04    NACL-門脇    13/10/02  自賠責（第三者行為）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1026,7 +1027,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE459PARA-HOSPNUM
                OR     ( RECE41-HKNID     NOT =   RECE44-HKNID        )
                OR     ( RECE41-TEKSTYMD  NOT =   RECE44-TEKSTYMD     )
       *
-               IF   RECE41-HKNKBN    NOT  =  "4"                        
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                   EVALUATE      RECE44-SRYKBN
                       WHEN      "11"
       *               （初診料算定科：のカウント）
@@ -1364,6 +1365,16 @@ grpsys       PERFORM 900-DBSELECT-SEC
              END-EVALUATE
            END-IF
       *
+      *    第三者行為
+           IF   RECE41-HKNKBN     =   "6"
+      *           乳幼児・幼児のコメント
+                  IF    RECE41-NYUYOJIFLG   =  SPACE
+                     CONTINUE
+                  ELSE
+                     PERFORM    2001-NYUYOJI-COMMENT-SEC
+                  END-IF
+           END-IF
+      *
       *    在支援コメント
            IF     TBL-ZAISIEN-COMMENT   NOT =  ZERO
                PERFORM     2001-ZAISIEN-COMMENT-SEC
@@ -1392,7 +1403,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
                INITIALIZE    WRK-JIDO-SETCOM-AREA
       *
-               IF   RECE41-HKNKBN    NOT  =  "4"                        
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                  EVALUATE      RECE44-SRYKBN                   
                    WHEN      "11"
                       IF   RECE41-HKNKBN     =   "5"
@@ -1577,10 +1588,10 @@ grpsys       PERFORM 900-DBSELECT-SEC
                ELSE                                                     
                  EVALUATE      RECE44-SRYKBN                            
                    WHEN      "11"
-                      EVALUATE   RECE41-JIBAIKBN
-                        WHEN       "1"
+                      IF   (RECE41-HKNKBN    =  "4")
+                      AND  (RECE41-JIBAIKBN  =  "1")
                           PERFORM      2099-RECE44-TENSOU-SEC
-                        WHEN       "2"
+                      ELSE
                           MOVE   ZERO   TO  FLG-COMMENT
       *                （初診（同日複数診療科）算定科のセット）
                           IF   FLG-COMMENT  =  ZERO
@@ -1589,12 +1600,12 @@ grpsys       PERFORM 900-DBSELECT-SEC
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2099-RECE44-TENSOU-SEC
                           END-IF
-                      END-EVALUATE
+                      END-IF
                    WHEN      "12"
-                      EVALUATE   RECE41-JIBAIKBN
-                        WHEN       "1"
+                      IF   (RECE41-HKNKBN    =  "4")
+                      AND  (RECE41-JIBAIKBN  =  "1")
                           PERFORM      2099-RECE44-TENSOU-SEC
-                        WHEN       "2"
+                      ELSE
                           MOVE   ZERO   TO  FLG-COMMENT
       *                （再診（同一日２科目）算定科のセット）
                           IF   FLG-COMMENT  =  ZERO
@@ -1603,7 +1614,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2099-RECE44-TENSOU-SEC
                           END-IF
-                      END-EVALUATE
+                      END-IF
                    WHEN      "13"                                       
                       MOVE   ZERO   TO  FLG-COMMENT
       *            （慢性疼痛疾患管理料算定日のセット）
@@ -1807,8 +1818,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    "key24"         TO  MCP-PATHNAME
                PERFORM   900-JYURRK-READ-SEC
                PERFORM   UNTIL   FLG-JYURRK   =    1
-                  IF   RECE41-HKNKBN    NOT  =  "4" 
-                   IF    JYURRK-HKNKBN    =       "1"  OR  "5"
+                  IF  ((RECE41-HKNKBN  =  "1" OR "2" OR "3" OR "5") AND
+                       (JYURRK-HKNKBN  =  "1" OR "5"              ))
+                  OR  ((RECE41-HKNKBN  =  "4"                     ) AND
+                       (JYURRK-HKNKBN  =  "2" OR "4"              ))
+                  OR  ((RECE41-HKNKBN  =  "6"                     ) AND
+                       (JYURRK-HKNKBN  =  "7"                     ))
                       MOVE   JYURRK-HKNCOMBINUM
                                        TO  WRK-HKNCOMBINUMX
                       IF  WRK-HKNCOMBINUM9  =  RECE41-HKNCOMBI
@@ -1836,23 +1851,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             END-IF
                           END-IF
                       END-IF      
-                   END-IF
-                  ELSE
-                   IF    JYURRK-HKNKBN    =       "2"  OR  "4"
-                      MOVE   JYURRK-HKNCOMBINUM
-                                       TO  WRK-HKNCOMBINUMX
-                      IF  WRK-HKNCOMBINUM9  =  RECE41-HKNCOMBI
-                            MOVE   JYURRK-SRYYMD   TO   WRK-SRYYMDX
-                            IF   RECE41-JNISSUTBL(WRK-SRYDD) = SPACE
-                               CONTINUE
-                            ELSE
-                               MOVE   "1"     TO    
-                                        TBL-JUSHIN-ARI (IDX)
-                               MOVE   "1"     TO    
-                                        TBL-JUSHIN-DAY (IDX WRK-SRYDD)
-                            END-IF
-                      END-IF      
-                   END-IF
                   END-IF
       *
                   MOVE    "tbl_jyurrk"    TO  MCP-TABLE
@@ -2811,7 +2809,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                  COMPUTE WRK-ZAINUM    =    99998200
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE41-HKNKBN    NOT  =  "4"
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2856,7 +2854,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                  COMPUTE WRK-ZAINUM    =    99998400
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE41-HKNKBN    NOT  =  "4"
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2900,7 +2898,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                  COMPUTE WRK-ZAINUM    =    99998600
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE41-HKNKBN    NOT  =  "4"
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2925,7 +2923,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                  COMPUTE WRK-ZAINUM    =    99998800
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE41-HKNKBN    NOT  =  "4"
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2950,7 +2948,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                  COMPUTE WRK-ZAINUM    =    99999000
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE41-HKNKBN    NOT  =  "4"
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2994,7 +2992,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                  COMPUTE WRK-ZAINUM    =    99999200
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE41-HKNKBN    NOT  =  "4"
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -3019,7 +3017,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                  COMPUTE WRK-ZAINUM    =    99999400
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE41-HKNKBN    NOT  =  "4"
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN

@@ -185,6 +185,7 @@
       *                                     一画面対応
       *  04.07.07    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *  04.07.08    NACL-藤原    13/02/07  労災レセ電対応
+      *  04.07.09    NACL-門脇    13/09/11  自賠責（第三者行為）対応
       *  04.07.10    NACL-門脇    13/11/11  減額（円）の対応
       *  04.07.11    NACL-藤原    13/12/09  医療情報連係基盤対応
       *****************************************************************
@@ -735,6 +736,9 @@
       *
       ***  03  WRK-FUTAN           PIC ZZZ,ZZZ,ZZ9. 
            03  WRK-FUTAN           PIC ZZZZZZZZ9.
+           03  WRK-FUTAN2          PIC ZZZZZZZ9.
+           03  WRK-FUTAN3          PIC ZZ,ZZZ,ZZ9.
+           03  WRK-FUTAN4          PIC ZZZ,ZZZ,ZZ9.
            03  WRK-TITLE           PIC X(50).
            03  WRK-TEKIYOU         PIC X(50).
            03  WRK-ADRS.
@@ -7587,6 +7591,96 @@
                                            TO  HC063-TEKIYO(WRK-LINETEK)
                            END-EVALUATE
                    END-EVALUATE
+               END-IF
+           END-IF
+      *
+      *    第三者行為対応
+           IF   RECE02-DAISAN-GAITO   =   1  OR  2
+      *        摘要欄に記載されている場合１行あける
+               IF      WRK-LINETEK     >   ZERO
+                   IF      WRK-LINETEK     >=   WRK-TEKIYOU-LINE
+                       PERFORM 34120-PAGE-SEC
+                   ELSE
+                       ADD     1               TO  WRK-LINETEK
+                   END-IF
+               END-IF
+      *
+      *        請求点数
+               MOVE    SPACE                   TO  WRK-TITLE
+               MOVE    RECE02-DAISAN-TOTALTEN  TO  WRK-FUTAN3
+               INITIALIZE              ORCSKANACHKAREA
+               MOVE    "2"             TO  KANACHK-SYORI
+               MOVE    WRK-FUTAN3      TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+               IF    ( KANACHK-RC      =   ZERO )
+               AND   ( KANACHK-MAX     >   ZERO )
+                 STRING  "（第三者行為）請求点　　　"
+                                         DELIMITED  BY  SIZE
+                          KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                         DELIMITED  BY  SIZE
+                          "点"           DELIMITED  BY  SIZE
+                                         INTO    WRK-TITLE
+                 END-STRING
+               END-IF
+               INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "　"
+      *
+               IF      WRK-LINETEK         >=  WRK-TEKIYOU-LINE
+                   PERFORM 34120-PAGE-SEC
+               END-IF
+               ADD     1                   TO  WRK-LINETEK
+      *
+               IF      CNT-PAGE        =   1
+                     MOVE    WRK-TITLE  TO  HC06-TEKIYO (WRK-LINETEK)
+               ELSE
+                   EVALUATE    SYS-2005-NEXTPRTKBN-G
+                     WHEN    "0"
+                       MOVE  WRK-TITLE  TO  HC06-TEKIYO (WRK-LINETEK)
+                     WHEN    "1"
+                       MOVE  WRK-TITLE  TO  HC061-TEKIYO(WRK-LINETEK)
+                     WHEN    "2"
+                       MOVE  WRK-TITLE  TO  HC062-TEKIYO(WRK-LINETEK)
+                     WHEN    "3"
+                       MOVE  WRK-TITLE  TO  HC063-TEKIYO(WRK-LINETEK)
+                    END-EVALUATE
+               END-IF
+      *
+      *        一部負担金
+               MOVE    SPACE                   TO  WRK-TITLE
+               MOVE    RECE02-DAISAN-FTNMONEY  TO  WRK-FUTAN4
+               INITIALIZE              ORCSKANACHKAREA
+               MOVE    "2"             TO  KANACHK-SYORI
+               MOVE    WRK-FUTAN4      TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+               IF    ( KANACHK-RC      =   ZERO )
+               AND   ( KANACHK-MAX     >   ZERO )
+                 STRING  "（第三者行為）一部負担額"
+                                         DELIMITED  BY  SIZE
+                          KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                         DELIMITED  BY  SIZE
+                          "円"           DELIMITED  BY  SIZE
+                                         INTO    WRK-TITLE
+                 END-STRING
+               END-IF
+               INSPECT WRK-TITLE   REPLACING   ALL "  "    BY  "　"
+      *
+               IF      WRK-LINETEK         >=  WRK-TEKIYOU-LINE
+                   PERFORM 34120-PAGE-SEC
+               END-IF
+               ADD     1                   TO  WRK-LINETEK
+      *
+               IF      CNT-PAGE        =   1
+                     MOVE    WRK-TITLE  TO  HC06-TEKIYO (WRK-LINETEK)
+               ELSE
+                   EVALUATE    SYS-2005-NEXTPRTKBN-G
+                     WHEN    "0"
+                       MOVE  WRK-TITLE  TO  HC06-TEKIYO (WRK-LINETEK)
+                     WHEN    "1"
+                       MOVE  WRK-TITLE  TO  HC061-TEKIYO(WRK-LINETEK)
+                     WHEN    "2"
+                       MOVE  WRK-TITLE  TO  HC062-TEKIYO(WRK-LINETEK)
+                     WHEN    "3"
+                       MOVE  WRK-TITLE  TO  HC063-TEKIYO(WRK-LINETEK)
+                    END-EVALUATE
                END-IF
            END-IF
       *

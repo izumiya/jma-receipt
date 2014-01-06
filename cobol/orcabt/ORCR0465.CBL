@@ -53,6 +53,7 @@
       *                                     （電話再診料　等）
       *
       *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
+      *  04.07.02    NACL-門脇    13/10/02  自賠責（第三者行為）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -661,6 +662,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *
            IF     (WRK-PARA-RECEKBN       =  "5")
            OR     (RECE41-HKNKBN          =  "5")
+           OR     (RECE41-HKNKBN          =  "6")
              CONTINUE
            ELSE
              EVALUATE    RECE44-SRYKBN

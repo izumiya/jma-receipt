@@ -38,6 +38,8 @@
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    09/06/18  円摘要欄コメント編集対応
+      *
+      *  04.07.01    NACL-門脇    13/10/02  自賠責（第三者行為）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -139,8 +141,6 @@
            03  WRK-PARA-JIBAIPRTKBN            PIC  X(01).
            03  WRK-PARA-HOSPNUM                PIC  9(02).
       *
-           03  WRK-RECEERR         PIC X(200).
-      *
            03  WRK-LINENUM         PIC 9(05).
       *    剤印字行数
            03  WRK-TBLMAX          PIC 9(03).
@@ -162,6 +162,19 @@
                    07  WRK-ZAIKAISU            PIC X(06).
       *
            03  WRK-ST                          PIC 9(03).
+      *
+       01  WRK-ERR-AREA.
+           03  WRK-RECEERR         PIC X(200).
+           03  WRK-ERRMSG          PIC X(300).
+           03  WRK-MCP-RC          PIC 9(9).
+           03  WRK-ERR-FILE-STS    PIC X(02).
+           03  WRK-ERR-FILE-MSG    PIC X(100).
+           03  WRK-ERR-FILE-MSG1   PIC X(17).
+           03  WRK-ERR-FLG         PIC 9(01).
+      *    エラーファイル名称領域 
+           COPY    "CPRECEDAT1.INC"
+                                   REPLACING  //RECEDAT1PARA//
+                                   BY         //WRK-ERR-FILE-NM//.
       *
       *    剤・診療行為テーブル
        01  TBL-ZAI-AREA.
@@ -288,10 +301,40 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
 grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE47PARA-HOSPNUM
       *
            OPEN    INPUT               RECE41-FILE
+           IF      STS-RECE41          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    1                   TO  WRK-ERR-FLG
+               MOVE    RECE01PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE41          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
       *
            OPEN    INPUT               RECE46-FILE
+           IF      STS-RECE46          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    1                   TO  WRK-ERR-FLG
+               MOVE    RECE46PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE46          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
       *
            OPEN    I-O                 RECE47-FILE
+           IF      STS-RECE47          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERR-AREA
+               INITIALIZE                      WRK-ERR-AREA
+               MOVE    1                   TO  WRK-ERR-FLG
+               MOVE    RECE47PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE47          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
       *
            .
        110-FILE-OPEN-EXT.
@@ -552,11 +595,16 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE47PARA-HOSPNUM
              END-READ
              IF      FLG-RECE47            =   1
                  WRITE   RECE47-REC
-                 IF      STS-RECE47          NOT =   ZERO
-                     DISPLAY "*** ORCR0468 RECE47 WRITE ERR  ***"
-                     MOVE    1                 TO  FLG-END
+                 IF      STS-RECE47          =   "00"
+                     ADD     1             TO  CNT-RECE47
                  ELSE
-                     ADD     1                 TO  CNT-RECE47
+                     MOVE    SPACE               TO  WRK-ERR-AREA
+                     INITIALIZE                      WRK-ERR-AREA
+      *
+                     MOVE    3                   TO  WRK-ERR-FLG
+                     MOVE    RECE47PARA          TO  WRK-ERR-FILE-NM
+                     MOVE    STS-RECE47          TO  WRK-ERR-FILE-STS
+                     PERFORM 500-FILE-ERR-ABORT-SEC
                  END-IF
              ELSE
                  DISPLAY "*** ORCR0468 RECE47 KEY CYOFUKU  ***"
@@ -648,6 +696,66 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
+      *    エラー時終了処理
+      *****************************************************************
+       500-COBABORT-SEC                SECTION.
+      *
+           CALL    "cobabort"          USING   WRK-ERRMSG
+      *
+           .
+       500-COBABORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ファイルエラー処理
+      *****************************************************************
+       500-FILE-ERR-ABORT-SEC           SECTION.
+      *
+           EVALUATE    WRK-ERR-FLG
+               WHEN    1
+                   MOVE    "ファイルＯＰＥＮエラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file open err" TO  WRK-ERR-FILE-MSG1
+               WHEN    2
+                   MOVE    "ファイル読み込みエラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file read err" TO  WRK-ERR-FILE-MSG1
+               WHEN    3
+                   MOVE    "ファイル書き込みエラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file write err"
+                                           TO  WRK-ERR-FILE-MSG1
+               WHEN    4
+                   MOVE    "ファイル更新エラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file rewrite err"
+                                           TO  WRK-ERR-FILE-MSG1
+           END-EVALUATE
+      *
+           STRING  WRK-ERR-FILE-MSG        DELIMITED   BY  SPACE
+                   WRK-ERR-FILE-NM-FILE-ID DELIMITED   BY  SIZE
+                   " STS="                 DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-STS        DELIMITED   BY  SIZE
+                                           INTO    WRK-RECEERR
+           END-STRING
+           PERFORM 500-ERR-HENSYU-SEC
+      *
+           STRING  "ORCR0468 "             DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-MSG1       DELIMITED   BY  SIZE
+                   " FILE="                DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-NM         DELIMITED   BY  SIZE
+                   "  STS="                DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-STS        DELIMITED   BY  SIZE
+                   LOW-VALUE               DELIMITED   BY  SIZE
+                                           INTO    WRK-ERRMSG
+           END-STRING
+           PERFORM 500-COBABORT-SEC
+      *
+           .
+       500-FILE-ERR-ABORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    処理中止処理
       *****************************************************************
        500-CANCEL-HENSYU-SEC                SECTION.
@@ -725,6 +833,17 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                AT  END
                    MOVE    1           TO  FLG-END
                NOT AT  END
+                   IF      STS-RECE41          =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE01PARA      TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE41      TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
                    ADD     1           TO  CNT-RECE41
                                            CNT-IN-CANCEL
       *
@@ -732,6 +851,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
                    IF     (WRK-PARA-RECEKBN       =  "5")
                    OR     (RECE41-HKNKBN          =  "5")
+                   OR     (RECE41-HKNKBN          =  "6")
                        CONTINUE
                    ELSE
                        GO  TO  990-RECE41-READ-SEC
@@ -752,6 +872,17 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                AT  END
                    MOVE    1         TO  FLG-RECE46
                NOT AT  END
+                   IF      STS-RECE46          =   "00"
+                       CONTINUE
+                   ELSE
+                       MOVE    SPACE           TO  WRK-ERR-AREA
+                       INITIALIZE                  WRK-ERR-AREA
+                       MOVE    2               TO  WRK-ERR-FLG
+                       MOVE    RECE46PARA      TO  WRK-ERR-FILE-NM
+                       MOVE    STS-RECE46      TO  WRK-ERR-FILE-STS
+                       PERFORM 500-FILE-ERR-ABORT-SEC
+                   END-IF
+      *
                    MOVE    ZERO      TO  FLG-RECE46
                    ADD     1         TO  CNT-IN-CANCEL
            END-READ

@@ -122,6 +122,7 @@
       *
       *  04.07.01    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    13/01/21  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *  04.07.03    NACL-ÌçÏÆ    13/10/02  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1060,6 +1061,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                        END-EVALUATE
                      WHEN      "5"
                        MOVE      WRK-KENSA-KAISU  TO  RECE82-KAISU  (32)
+                     WHEN      "6"
+                       MOVE      WRK-KENSA-KAISU  TO  RECE82-KAISU  (21)
                    END-EVALUATE
                    REWRITE RECE82-REC
                END-IF
@@ -1160,7 +1163,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                      ELSE
                        EVALUATE    RECE85-SRYCD (IDX) (1:1)
                            WHEN    "0"
-                            IF   RECE82-HKNKBN    NOT  =  "4" 
+                            IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                               IF     RECE85-SRYCD (IDX) (1:3) = "059"
                                  IF    ( RECE84-SRYKBN     =   "70" )
                                  AND   ( RECE85-DATAKBN (IDX)
@@ -1209,7 +1212,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                                    MOVE    2             TO  IDY
                                END-IF    
                            WHEN    "1"
-                               IF   RECE82-HKNKBN    NOT  =  "4" 
+                               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                                    MOVE    3             TO  IDY
                                ELSE
                                    IF  RECE85-SRYCD (IDX)    =
@@ -1225,7 +1228,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                                    ELSE
                                      IF  RECE85-SRYCD (IDX)  =
                                            WRK-CONS-RYOYOTEATE
-                                       IF  RECE82-JIBAIKBN   =  "2"
+                                       IF ((RECE82-HKNKBN   = "4") AND
+                                           (RECE82-JIBAIKBN = "2"))
+                                       OR ( RECE82-HKNKBN   = "6" )
                                          MOVE  4         TO  IDY
                                        ELSE
                                          MOVE  3         TO  IDY
@@ -1238,7 +1243,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                            WHEN    "6"
                                MOVE    5             TO  IDY
                            WHEN    "7"
-                            IF   RECE82-HKNKBN    NOT  =  "4" 
+                            IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                                IF    ( RECE84-SRYKBN     =   "70" )
                                AND   ( RECE85-DATAKBN (IDX)
                                                          =   "3"  )

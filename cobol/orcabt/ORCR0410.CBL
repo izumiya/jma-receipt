@@ -102,6 +102,7 @@
       *                                     テスト患者にする
       *  04.07.04    NACL-門脇    13/04/16  労災レセ電対応
       *                                     労災指定医療機関区分編集
+      *  04.07.05    NACL-門脇    13/10/02  自賠責（第三者行為）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -118,11 +119,6 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE41-KEY
                                    FILE    STATUS  IS  STS-RECE41.
-           SELECT  RECE412-FILE    ASSIGN  RECE41PARA
-                                   ORGANIZATION    IS  INDEXED
-                                   ACCESS  MODE    IS  SEQUENTIAL
-                                   RECORD  KEY     IS  RECE412-KEY
-                                   FILE    STATUS  IS  STS-RECE41.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
                                    FILE    STATUS  IS  STS-RECEERR.
@@ -137,11 +133,6 @@
        FD  RECE41-FILE.
        01  RECE41-REC. 
            COPY    "CPRCF041.INC".
-      *
-       FD  RECE412-FILE.
-       01  RECE412-REC. 
-           COPY    "CPRCF041.INC"  REPLACING  //RECE41//
-                                   BY         //RECE412//.
       *
       *    エラーファイル
        FD  RECEERR-FILE.
@@ -164,7 +155,7 @@
       *
       *    フラグ領域
        01  STS-AREA.
-           03  STS-RECE40                              PIC  X(02).
+           03  STS-RECE40                              PIC X(02).
            03  STS-RECE41                              PIC  X(02).
            03  STS-RECEERR                             PIC  X(02).
       *
@@ -191,6 +182,9 @@
            03  FLG-SET                                 PIC  9(01).
            03  FLG-JYURRKCHECK                         PIC  9(01).
            03  FLG-JYURRK                              PIC  9(01).
+           03  FLG-PTHKNINF                            PIC 9(01).
+           03  FLG-HKNJAINF                            PIC 9(01).
+           03  FLG-HKNNUM                              PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -227,8 +221,6 @@
            03  WRK-PARA-HOSPNUM                        PIC  9(02).
       *
            03  WRK-SYS-SRYYMD                          PIC  X(08).
-      *
-           03  WRK-RECEERR                             PIC  X(200).
       *
            03  WRK-KEISAN                              PIC  9(09).
            03  WRK-KEISAN2                             PIC  9(09).
@@ -324,6 +316,19 @@
            03  TBL-GXXNISSU-DAY                        PIC  X(01)
                                                        OCCURS   31.
       *
+       01  WRK-ERRMSG-AREA.
+           03  WRK-RECEERR         PIC X(200).
+           03  WRK-ERRMSG          PIC X(300).
+           03  WRK-MCP-RC          PIC 9(9).
+           03  WRK-ERR-FILE-STS    PIC X(02).
+           03  WRK-ERR-FILE-MSG    PIC X(100).
+           03  WRK-ERR-FILE-MSG1   PIC X(17).
+           03  WRK-ERR-FLG         PIC 9(01).
+      *    エラーファイル名称領域 
+           COPY    "CPRECEDAT1.INC"
+                                   REPLACING  //RECEDAT1PARA//
+                                   BY         //WRK-ERR-FILE-NM//.
+      *
       *---------------------------------------------------------------
       *
       *    固定値
@@ -385,6 +390,11 @@
       *    療養担当手当て
            03  CONS-RYOYOTEATE PIC X(09)   VALUE   "199000610".
       *
+           03  WRK-CONS-SRYYM-200804
+                               PIC 9(06)   VALUE   200804.
+           03  WRK-CONS-SRYYM-201109
+                               PIC 9(06)   VALUE   201109.
+      *
       *---------------------------------------------------------------
       *
            COPY    "MCPAREA".
@@ -439,6 +449,18 @@
       *    受診履歴
        01  JYURRK-REC.
            COPY    "CPJYURRK.INC".
+      *
+      *    患者保険情報
+       01  PTHKNINF-REC.
+           COPY    "CPPTHKNINF.INC".
+      *
+      *    保険者
+       01  HKNJAINF-REC.
+           COPY    "CPHKNJAINF.INC".
+      *
+      *    保険番号
+       01  HKNNUM-REC.
+           COPY    "CPHKNNUM.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -649,22 +671,28 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-4001-HOSPNUM
                   END-IF
                   MOVE   SYS-4001-TAXKBN   TO    WRK-TAXKBN                
                   MOVE   SYS-4001-KOTEIKBN TO    WRK-KOTEIKBN
-                  IF     SYS-4001-JIBAIKBN  =    SPACE
-                    MOVE "1"               TO    WRK-JIBAIKBN
+                  IF     WRK-PARA-RECEKBN  =   "8"
+                      MOVE    "2"                TO    WRK-JIBAIKBN
+                      MOVE    10                 TO    WRK-SYUTENTANKA
+                      MOVE    10                 TO    WRK-YKZTENTANKA
                   ELSE
-                    MOVE SYS-4001-JIBAIKBN TO    WRK-JIBAIKBN
-                  END-IF
-                  IF     SYS-4001-SYUTENTANKA-X  =  SPACE
-                    MOVE ZERO              TO    WRK-SYUTENTANKA
-                  ELSE
-                    MOVE SYS-4001-SYUTENTANKA
-                                           TO    WRK-SYUTENTANKA
-                  END-IF
-                  IF     SYS-4001-YKZTENTANKA-X  =  SPACE
-                    MOVE ZERO              TO    WRK-YKZTENTANKA
-                  ELSE
-                    MOVE SYS-4001-YKZTENTANKA
-                                           TO    WRK-YKZTENTANKA
+                      IF     SYS-4001-JIBAIKBN  =    SPACE
+                          MOVE "1"               TO    WRK-JIBAIKBN
+                      ELSE
+                          MOVE SYS-4001-JIBAIKBN TO    WRK-JIBAIKBN
+                      END-IF
+                      IF     SYS-4001-SYUTENTANKA-X  =  SPACE
+                          MOVE ZERO              TO    WRK-SYUTENTANKA
+                      ELSE
+                          MOVE SYS-4001-SYUTENTANKA
+                                                 TO    WRK-SYUTENTANKA
+                      END-IF
+                      IF     SYS-4001-YKZTENTANKA-X  =  SPACE
+                          MOVE ZERO              TO    WRK-YKZTENTANKA
+                      ELSE
+                          MOVE SYS-4001-YKZTENTANKA
+                                                 TO    WRK-YKZTENTANKA
+                      END-IF
                   END-IF
                   IF     SYS-4001-KOMUKBN  =    SPACE
                     MOVE "1"               TO    WRK-KOMUKBN
@@ -736,11 +764,21 @@ grpsys        PERFORM 900-DBSELECT-SEC
               PERFORM 900-CLOSE-SEC
            END-IF
       *
-      *
-           OPEN    OUTPUT              RECE412-FILE
-           CLOSE                       RECE412-FILE
-      *
            OPEN    INPUT               RECE40-FILE
+           IF      STS-RECE40          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERRMSG-AREA
+               INITIALIZE                      WRK-ERRMSG-AREA
+      *
+               MOVE    1                   TO  WRK-ERR-FLG
+               MOVE    RECE40PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE40          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
+           OPEN    OUTPUT              RECE41-FILE
+           CLOSE                       RECE41-FILE
       *
            OPEN    I-O                 RECE41-FILE
       *
@@ -858,7 +896,11 @@ grpsys     MOVE    RECE40-HOSPNUM       TO      KYUSEI-HOSPNUM
                INITIALIZE                           PTRSIINF-REC
 grpsys         MOVE    RECE40-HOSPNUM       TO      PTRSI-HOSPNUM
                MOVE    RECE40-PTID          TO      PTRSI-PTID
-               MOVE    RECE40-HKNID         TO      PTRSI-HKNID
+               IF      WRK-PARA-RECEKBN     =   "8"
+                   MOVE    RECE40-HKNID         TO      PTRSI-KOHID
+               ELSE
+                   MOVE    RECE40-HKNID         TO      PTRSI-HKNID
+               END-IF
                MOVE    PTRSIINF-REC         TO      MCPDATA-REC
                MOVE    "tbl_ptrsiinf"       TO      MCP-TABLE
                MOVE    "key"                TO      MCP-PATHNAME
@@ -936,6 +978,51 @@ grpsys         PERFORM 900-DBSELECT-SEC
            IF      RECE41-HKNKBN    =   "4" OR "5"
               PERFORM 2109-JYURRK-CHECK-SEC
            END-IF
+      *
+      *    第三者行為時の医保分主保険情報
+           EVALUATE    WRK-PARA-RECEKBN
+               WHEN    "8"
+                   MOVE    RECE40-HKNNUM-X     TO  RECE41-HKNNUM-X
+                   MOVE    RECE40-HKNID-X      TO  RECE41-HKNID-X
+      * 
+                   INITIALIZE                      PTHKNINF-REC
+                   MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
+                   MOVE    RECE40-PTID         TO  PTHKN-PTID
+                   MOVE    RECE40-HKNID-X      TO  PTHKN-HKNID
+                   MOVE    PTHKNINF-REC        TO  MCPDATA-REC
+                   PERFORM 900-PTHKNINF-READ-SEC
+                   IF      FLG-PTHKNINF        =   ZERO
+                       MOVE    PTHKN-HKNJANUM      TO  RECE41-HKNJANUM
+                       MOVE    PTHKN-KIGO          TO  RECE41-KIGO
+                       MOVE    PTHKN-NUM           TO  RECE41-NUM
+                       IF      RECE41-HKNJANUM NOT =   SPACE
+                           MOVE    SPACE               TO  HKNJAINF-REC
+                           INITIALIZE                      HKNJAINF-REC
+                           MOVE    SPA-HOSPNUM         TO  HKNJA-HOSPNUM
+                           MOVE    RECE41-HKNJANUM     TO
+                                                       HKNJA-HKNJANUM
+                           MOVE    HKNJAINF-REC        TO  MCPDATA-REC
+                           PERFORM 900-HKNJAINF-READ-SEC
+                           MOVE    HKNJA-HKNJANAME TO  RECE41-HKNJANAME
+                       END-IF
+                   END-IF
+      *
+                   INITIALIZE                      HKNNUM-REC
+                   MOVE   RECE41-HOSPNUM       TO  HKN-HOSPNUM
+                   MOVE    RECE41-SRYYM        TO  HKN-TEKSTYMD (1:6)
+                   MOVE    "01"                TO  HKN-TEKSTYMD (7:2)
+                   MOVE    HKN-TEKSTYMD        TO  HKN-TEKEDYMD
+                   IF     RECE41-HKNNUM-X      =   "069"
+                       MOVE    "067"               TO  HKN-HKNNUM
+                   ELSE
+                       MOVE   RECE41-HKNNUM-X      TO  HKN-HKNNUM
+                   END-IF
+                   MOVE    HKNNUM-REC          TO  MCPDATA-REC
+                   PERFORM 900-HKNNUM-READ-SEC
+      *
+      *            負担割合セット処理
+                   PERFORM 2120-FTNRATE-SET-SEC
+           END-EVALUATE
       *
       *    レセプト種別
            PERFORM 2101-RECESYUBETU-SET-SEC
@@ -1036,7 +1123,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
            MOVE    WRK-KYUGYO-PRTKBN     TO   RECE41-KYUGYO-PRTKBN
       *    労災指定医療機関区分
            MOVE    WRK-RSIIRYOKBN        TO   RECE41-RSIIRYOKBN
-           IF      RECE41-HKNKBN     =   "4"
+           IF      RECE41-HKNKBN     =   "4" OR "6"
                MOVE    "0"               TO   RECE41-RSIIRYOKBN
            END-IF
       *
@@ -1133,6 +1220,117 @@ grpsys         PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    負担割合セット処理
+      *****************************************************************
+       2120-FTNRATE-SET-SEC            SECTION.
+      *
+      *    平成２０年４月以降のみ設定
+           IF      RECE41-SRYYM    >=  WRK-CONS-SRYYM-200804
+               EVALUATE    RECE41-HKNNUM-X
+                   WHEN    "060"
+                   WHEN    "068"
+                       IF       AGECHK-SYUGAKUKBN  =   1
+                           EVALUATE   PTHKN-HOJOKBN
+                              WHEN   "0"
+                                  MOVE   ZERO      TO  RECE41-FTNRATE
+                              WHEN   "1"
+                                  MOVE   10        TO  RECE41-FTNRATE
+                              WHEN   "4"
+                                  MOVE   10        TO  RECE41-FTNRATE
+                              WHEN   OTHER
+                                  MOVE   20        TO  RECE41-FTNRATE
+                           END-EVALUATE
+                       ELSE
+                           EVALUATE   PTHKN-HOJOKBN
+                               WHEN   "0"
+                                  MOVE    ZERO     TO  RECE41-FTNRATE
+                               WHEN   "1"
+                                  MOVE    10       TO  RECE41-FTNRATE
+                               WHEN   "2"
+                                  MOVE    20       TO  RECE41-FTNRATE
+                               WHEN   "3"
+                                  MOVE    30       TO  RECE41-FTNRATE
+                               WHEN   "4"
+                                  MOVE    10       TO  RECE41-FTNRATE
+                               WHEN   "5"
+                                  MOVE    20       TO  RECE41-FTNRATE
+                               WHEN   "6"
+                                  MOVE    30       TO  RECE41-FTNRATE
+                               WHEN   "8"
+                                  MOVE    20       TO  RECE41-FTNRATE
+                               WHEN   "9"
+                                  MOVE    10       TO  RECE41-FTNRATE
+                           END-EVALUATE
+                       END-IF
+                   WHEN    "067"
+                   WHEN    "069"
+                       IF      AGECHK-SYUGAKUKBN   =   1
+                           MOVE    20              TO  RECE41-FTNRATE
+                       ELSE
+                           IF      PTHKN-HOJOKBN     NOT =  SPACE
+                               EVALUATE   PTHKN-HOJOKBN
+                                   WHEN   "7"
+                                       MOVE    30  TO  RECE41-FTNRATE
+                                   WHEN   "8"
+                                       MOVE    20  TO  RECE41-FTNRATE
+                                   WHEN   "9"
+                                       MOVE    10  TO  RECE41-FTNRATE
+                               END-EVALUATE
+                           ELSE
+                               IF    ( RECE41-HKNJANUM =   "67330753" )
+                               AND   ( RECE41-SRYYM    <=
+                                               WRK-CONS-SRYYM-201109  )
+                                   MOVE    20      TO  RECE41-FTNRATE
+                               ELSE
+                                   IF      PTHKN-HONKZKKBN =   "1"
+                                       MOVE    HKN-HON-GAIKFTNRATE
+                                                   TO  RECE41-FTNRATE
+                                   ELSE
+                                       MOVE    HKN-KZK-GAIKFTNRATE
+                                                   TO  RECE41-FTNRATE
+                                   END-IF
+                               END-IF
+                           END-IF
+                       END-IF
+                   WHEN    SPACE
+                       MOVE    ZERO            TO  RECE41-FTNRATE
+                   WHEN    "039"
+                   WHEN    "040"
+                       EVALUATE   PTHKN-HOJOKBN
+                           WHEN   "1"
+                               MOVE    10          TO  RECE41-FTNRATE
+                           WHEN   "3"
+                               MOVE    30          TO  RECE41-FTNRATE
+                       END-EVALUATE
+                   WHEN    OTHER
+                       IF       AGECHK-SYUGAKUKBN  =   1
+                           MOVE    20          TO  RECE41-FTNRATE
+                       ELSE
+                           IF      PTHKN-HOJOKBN       =   SPACE
+                               IF      PTHKN-HOJOKBN       =     "1"
+                                   MOVE   HKN-HON-GAIKFTNRATE
+                                                   TO  RECE41-FTNRATE
+                               ELSE
+                                   MOVE   HKN-KZK-GAIKFTNRATE
+                                                   TO  RECE41-FTNRATE
+                               END-IF
+                           ELSE
+                               EVALUATE   PTHKN-HOJOKBN
+                                   WHEN   "7"
+                                       MOVE    30  TO  RECE41-FTNRATE
+                                   WHEN   "9"
+                                       MOVE    10  TO  RECE41-FTNRATE
+                               END-EVALUATE
+                          END-IF
+                      END-IF
+               END-EVALUATE
+           END-IF
+      *
+           .
+       2120-FTNRATE-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    レセプト種別セット処理
       *****************************************************************
        2101-RECESYUBETU-SET-SEC              SECTION.
@@ -1156,6 +1354,7 @@ grpsys         PERFORM 900-DBSELECT-SEC
                WHEN    "3"          ALSO    ANY   
                    MOVE    7021            TO    RECE41-RECESYUBETU
                WHEN    "4"          ALSO    ANY                         
+               WHEN    "6"          ALSO    ANY                         
                    MOVE    7001            TO    RECE41-RECESYUBETU     
                WHEN    "5"          ALSO    ANY                         
                    MOVE    7051            TO    RECE41-RECESYUBETU     
@@ -1273,13 +1472,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                    PERFORM   21034-GAIRAI-HANTEI-SEC
                                END-IF
                                PERFORM   21035-ENDATE-HANTEI-SEC 
-                               IF    RECE41-HKNKBN   =   "4"            
+                               IF    RECE41-HKNKBN   =   "4" OR "6"
                                  IF   ACCT-SRYKBN  =  "80"              
                                    PERFORM   21036-SINDAN-HANTEI-SEC          
                                  END-IF                                 
                                END-IF                                   
       *
-                               IF    RECE41-HKNKBN   =   "4"
+                               IF    RECE41-HKNKBN   =   "4" OR "6"
                                 PERFORM VARYING ID1 FROM 1  BY 1
                                            UNTIL    ID1     >    31
                                  IF  ACCT-DAY(1 ID1)   NOT =    ZERO
@@ -1305,7 +1504,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                           OR  "99" 
                                    PERFORM   21031-SHOSAISIN-HANTEI-SEC
                                END-IF
-                               IF    RECE41-HKNKBN   =   "4"
+                               IF    RECE41-HKNKBN   =   "4" OR "6"
                                  IF   ACCT-SRYKBN  =  "80"
                                    PERFORM   21036-SINDAN-HANTEI-SEC
                                  END-IF
@@ -1976,7 +2175,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             COMPUTE  TBL-SYUTEN-JI(ID1)  =
                                      TBL-SYUTEN-JI(ID1)  -
                                     ( WRK-ZAIKAISU-JI * TNS-TEN )
-                            IF   WRK-JIBAIKBN  =  "2"
+                            IF ((RECE41-HKNKBN  =  "4") AND
+                                (WRK-JIBAIKBN   =  "2"))
+                            OR ( RECE41-HKNKBN  =  "6" )
                               COMPUTE  TBL-YKZTEN-JI(ID1)  =
                                        TBL-YKZTEN-JI(ID1)  +
                                       ( WRK-ZAIKAISU-JI * TNS-TEN )
@@ -2097,7 +2298,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        END-PERFORM
                     END-PERFORM
                END-IF
-               IF    RECE41-HKNKBN   =   "4"
+               IF    RECE41-HKNKBN   =   "4" OR "6"
                    CONTINUE
                ELSE
                  IF        ACCT-SRYKBN        =    "95"   OR  "96"
@@ -2194,6 +2395,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (WRK-JIBAIKBN    =   "2"))
            OR  ((RECE41-HKNKBN   =   "5") AND
                 (WRK-KOMUKBN     =   "2"))
+           OR  ( RECE41-HKNKBN   =   "6" )
              CONTINUE
            ELSE
              IF       RECE41-JNISSU   =    ZERO  
@@ -2264,7 +2466,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2105-HENSYU-SET2-SEC                    SECTION.
       *
-           IF    RECE41-HKNKBN   =   "4"                                
+           IF    RECE41-HKNKBN   =   "4" OR "6"
                CONTINUE                                                 
            ELSE                                                         
              IF    RECE41-HKNKBN   =   "5"
@@ -2613,6 +2815,18 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            WRITE   RECE41-REC
       *
+           IF      STS-RECE41          =   "00"
+               CONTINUE
+           ELSE
+               MOVE    SPACE               TO  WRK-ERRMSG-AREA
+               INITIALIZE                      WRK-ERRMSG-AREA
+      *
+               MOVE    3                   TO  WRK-ERR-FLG
+               MOVE    RECE41PARA          TO  WRK-ERR-FILE-NM
+               MOVE    STS-RECE41          TO  WRK-ERR-FILE-STS
+               PERFORM 500-FILE-ERR-ABORT-SEC
+           END-IF
+      *
            ADD     1                   TO  CNT-OUT
       *
            .
@@ -2677,6 +2891,66 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    1                   TO  FLG-END
            .
        500-ERR-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    エラー時終了処理
+      *****************************************************************
+       500-COBABORT-SEC                SECTION.
+      *
+           CALL    "cobabort"          USING   WRK-ERRMSG
+      *
+           .
+       500-COBABORT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ファイルエラー処理
+      *****************************************************************
+       500-FILE-ERR-ABORT-SEC           SECTION.
+      *
+           EVALUATE    WRK-ERR-FLG
+               WHEN    1
+                   MOVE    "ファイルＯＰＥＮエラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file open err" TO  WRK-ERR-FILE-MSG1
+               WHEN    2
+                   MOVE    "ファイル読み込みエラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file read err" TO  WRK-ERR-FILE-MSG1
+               WHEN    3
+                   MOVE    "ファイル書き込みエラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file write err"
+                                           TO  WRK-ERR-FILE-MSG1
+               WHEN    4
+                   MOVE    "ファイル更新エラー　FILE="
+                                           TO  WRK-ERR-FILE-MSG
+                   MOVE    "file rewrite err"
+                                           TO  WRK-ERR-FILE-MSG1
+           END-EVALUATE
+      *
+           STRING  WRK-ERR-FILE-MSG        DELIMITED   BY  SPACE
+                   WRK-ERR-FILE-NM-FILE-ID DELIMITED   BY  SIZE
+                   " STS="                 DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-STS        DELIMITED   BY  SIZE
+                                           INTO    WRK-RECEERR
+           END-STRING
+           PERFORM 500-ERR-HENSYU-SEC
+      *
+           STRING  "ORCR0410 "             DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-MSG1       DELIMITED   BY  SIZE
+                   " FILE="                DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-NM         DELIMITED   BY  SIZE
+                   "  STS="                DELIMITED   BY  SIZE
+                   WRK-ERR-FILE-STS        DELIMITED   BY  SIZE
+                   LOW-VALUE               DELIMITED   BY  SIZE
+                                           INTO    WRK-ERRMSG
+           END-STRING
+           PERFORM 500-COBABORT-SEC
+      *
+           .
+       500-FILE-ERR-ABORT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3054,22 +3328,28 @@ grpsys     PERFORM 900-DBFETCH-SEC
                    END-IF
                    MOVE   SYS-4001-TAXKBN   TO    WRK-TAXKBN
                    MOVE   SYS-4001-KOTEIKBN TO    WRK-KOTEIKBN
-                   IF     SYS-4001-JIBAIKBN  =    SPACE
-                     MOVE "1"               TO    WRK-JIBAIKBN
+                   IF     WRK-PARA-RECEKBN  =   "8"
+                      MOVE    "2"                TO    WRK-JIBAIKBN
+                      MOVE    10                 TO    WRK-SYUTENTANKA
+                      MOVE    10                 TO    WRK-YKZTENTANKA
                    ELSE
-                     MOVE SYS-4001-JIBAIKBN TO    WRK-JIBAIKBN
-                   END-IF
-                   IF     SYS-4001-SYUTENTANKA-X  =  SPACE
-                     MOVE ZERO              TO    WRK-SYUTENTANKA
-                   ELSE
-                     MOVE SYS-4001-SYUTENTANKA
-                                            TO    WRK-SYUTENTANKA
-                   END-IF
-                   IF     SYS-4001-YKZTENTANKA-X  =  SPACE
-                     MOVE ZERO              TO    WRK-YKZTENTANKA
-                   ELSE
-                     MOVE SYS-4001-YKZTENTANKA
-                                            TO    WRK-YKZTENTANKA
+                      IF     SYS-4001-JIBAIKBN  =    SPACE
+                          MOVE "1"               TO    WRK-JIBAIKBN
+                      ELSE
+                          MOVE SYS-4001-JIBAIKBN TO    WRK-JIBAIKBN
+                      END-IF
+                      IF     SYS-4001-SYUTENTANKA-X  =  SPACE
+                          MOVE ZERO              TO    WRK-SYUTENTANKA
+                      ELSE
+                          MOVE SYS-4001-SYUTENTANKA
+                                                 TO    WRK-SYUTENTANKA
+                      END-IF
+                      IF     SYS-4001-YKZTENTANKA-X  =  SPACE
+                          MOVE ZERO              TO    WRK-YKZTENTANKA
+                      ELSE
+                          MOVE SYS-4001-YKZTENTANKA
+                                                 TO    WRK-YKZTENTANKA
+                      END-IF
                    END-IF
                    IF     SYS-4001-KOMUKBN  =    SPACE
                      MOVE "1"               TO    WRK-KOMUKBN
@@ -3116,6 +3396,102 @@ grpsys     PERFORM 900-DBFETCH-SEC
            EXIT.
       *
       *****************************************************************
+      *    患者保険情報マスタ読込
+      *****************************************************************
+       900-PTHKNINF-READ-SEC         SECTION.
+      *
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-PTHKNINF
+                   MOVE    MCPDATA-REC         TO  PTHKNINF-REC
+                   IF      PTHKN-SAKJOKBN      =   "1"
+                       MOVE    1                   TO  FLG-PTHKNINF
+                   END-IF
+               ELSE
+                   MOVE    1                   TO  FLG-PTHKNINF
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-PTHKNINF
+           END-IF
+      *
+           MOVE    "tbl_pthkninf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-PTHKNINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険者読込
+      *****************************************************************
+       900-HKNJAINF-READ-SEC           SECTION.
+      *
+           MOVE    "tbl_hknjainf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_hknjainf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-HKNJAINF
+                   MOVE    MCPDATA-REC         TO  HKNJAINF-REC
+               ELSE
+                   MOVE    1                   TO  FLG-HKNJAINF
+                   INITIALIZE                      HKNJAINF-REC
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-HKNJAINF
+               INITIALIZE                      HKNJAINF-REC
+           END-IF
+      *
+           MOVE    "tbl_hknjainf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-HKNJAINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険番号読込
+      *****************************************************************
+       900-HKNNUM-READ-SEC           SECTION.
+      *
+           MOVE   "tbl_hknnum"         TO  MCP-TABLE
+           MOVE   "key5"               TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE   "tbl_hknnum"         TO  MCP-TABLE
+               MOVE   "key5"               TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    MCPDATA-REC     TO  HKNNUM-REC
+                   MOVE    ZERO            TO  FLG-HKNNUM
+               ELSE
+                   INITIALIZE                  HKNNUM-REC
+                   MOVE    1               TO  FLG-HKNNUM
+               END-IF
+           ELSE
+               INITIALIZE                  HKNNUM-REC
+               MOVE    1               TO  FLG-HKNNUM
+           END-IF
+      *
+           MOVE   "tbl_hknnum"         TO  MCP-TABLE
+           MOVE   "key5"               TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           .
+       900-HKNNUM-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    ジョブ管理ＤＢ制御処理
       *****************************************************************
        900-CALL-ORCSJOB-SEC            SECTION.
@@ -3138,12 +3514,34 @@ grpsys     MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
        900-DBSELECT-SEC                SECTION.
       *
            MOVE    "DBSELECT"          TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
            IF      MCP-RC              =   ZERO
                CONTINUE
            ELSE
-               DISPLAY "SELECT ERR table=" MCP-TABLE
-                       " pathname="        MCP-PATHNAME
+               MOVE    SPACE               TO  WRK-ERRMSG-AREA
+               INITIALIZE                      WRK-ERRMSG-AREA
+               MOVE    MCP-RC              TO  WRK-MCP-RC
+      *
+               STRING  "ＤＢ読み込みエラー　TABLE="
+                                           DELIMITED   BY  SIZE
+                       MCP-TABLE           DELIMITED   BY  SPACE
+                       " RC="              DELIMITED   BY  SIZE
+                       WRK-MCP-RC          DELIMITED   BY  SIZE
+                                           INTO    WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
+      *
+               STRING  "ORCR0410 select err TABLE="
+                                           DELIMITED   BY  SIZE
+                       MCP-TABLE           DELIMITED   BY  SPACE
+                       " PATHNAME="        DELIMITED   BY  SIZE
+                       MCP-PATHNAME        DELIMITED   BY  SPACE
+                       " RC="              DELIMITED   BY  SIZE
+                       WRK-MCP-RC          DELIMITED   BY  SIZE
+                       LOW-VALUE           DELIMITED   BY  SIZE
+                                           INTO    WRK-ERRMSG
+               END-STRING
+               PERFORM 500-COBABORT-SEC
            END-IF
            .
        900-DBSELECT-EXT.

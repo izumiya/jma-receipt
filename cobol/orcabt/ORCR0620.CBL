@@ -214,6 +214,7 @@
       *
       *  04.07.01    NACL-門脇    12/10/02  高齢者判定フラグ編集
       *  04.07.02    NACL-藤原    12/12/17  複数枚レセプト分割対応
+      *  04.07.03    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1548,6 +1549,8 @@
                                            =   "0" OR  "9" )
                    AND  ( RECE61-KOHNUMHC (IDX IDY2) (1:2)
                                        NOT =   "99"        )
+                   AND  ( RECE61-KOHNUMHC (IDX IDY2)
+                                       NOT =   "970"       )
                        MOVE    1           TO  RECE62-HKNCOMBIFLG(IDX)
                        MOVE    4           TO  IDY2
                    END-IF
@@ -1586,6 +1589,16 @@
                         MOVE      3     TO   RECE62-HKNCOMBIFLG(IDX)
                  END-IF
                END-IF
+      *
+               PERFORM VARYING IDY2    FROM    1   BY  1
+                       UNTIL   IDY2    >       4
+                   IF   RECE61-KOHNUMHC(IDX IDY2) =  "970"
+                       MOVE    1        TO   RECE62-DAISANFLG(IDX)
+                       MOVE    RECE61-KOHIDHC(IDX IDY2)
+                                        TO   RECE62-DAISAN-KOHID(IDX)
+                       MOVE    4        TO   IDY2
+                   END-IF
+               END-PERFORM
       *
       *        組合せ公費保険番号情報のセット
                PERFORM   KOHNUMHC-SET-SEC

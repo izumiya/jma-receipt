@@ -85,6 +85,7 @@
       *
       *  04.07.01    NACL-ÌçÏÆ    11/09/09  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
+      *  04.07.03    NACL-ÌçÏÆ    13/10/02  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1539,7 +1540,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               WRK-KIN
                                               WRK-KIN2
                        PERFORM   2602-ENDATE-HANTEI-SEC
-                       IF    RECE82-HKNKBN   =   "4"
+                       IF    RECE82-HKNKBN   =   "4" OR "6"
                          IF   ACCT-SRYKBN  =  "80"
                              PERFORM   2603-SINDAN-HANTEI-SEC
                          END-IF
@@ -1569,7 +1570,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE    ZERO     TO    WRK-TEN
                                               WRK-KIN
                                               WRK-KIN2
-                       IF    RECE82-HKNKBN   =   "4"
+                       IF    RECE82-HKNKBN   =   "4" OR "6"
                          IF  WRK-TENTEK-FLG2  =   ZERO
                            PERFORM VARYING IDY FROM 1  BY 1
                                        UNTIL    IDY     >    31
@@ -1599,7 +1600,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                         (ACCT-ZAIKAISU  NOT =    ZERO)    AND
                         (ACCT-JIHOKBN       =   SPACE)
                      IF  ACCT-ZAIKBN    NOT = 1 AND 2
-                       IF    RECE82-HKNKBN   =   "4"
+                       IF    RECE82-HKNKBN   =   "4" OR "6"
                          IF   ACCT-SRYKBN  =  "80"
                              PERFORM   2603-SINDAN-HANTEI-SEC
                          END-IF
@@ -1628,16 +1629,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   AND (WRK-DAY7-ZAITEN(IDY)   NOT =  ZERO)
                   AND ((WRK-DAY2(IDY)         =  ZERO   ) OR
                        (WRK-DAY2(IDY)        >=   4     ))
-                     IF    RECE82-HKNKBN   =   "4"
-                      EVALUATE  RECE82-JIBAIKBN
-                       WHEN  "1"
+                     IF    RECE82-HKNKBN   =   "4" OR "6"
+                      IF   (RECE82-HKNKBN    =  "4")
+                      AND  (RECE82-JIBAIKBN  =  "1")
                         COMPUTE  TOTALKIN2-ACCT =  TOTALKIN2-ACCT
                                                 +  120
-                       WHEN  "2"
+                      ELSE
                         COMPUTE  TBL-YKZTEN-JI(IDY)  =
                                  TBL-YKZTEN-JI(IDY)  +
                                  WRK-DAY7-ZAITEN(IDY)
-                      END-EVALUATE
+                      END-IF
                      ELSE
                         COMPUTE  TOTALTEN-ACCT  =  TOTALTEN-ACCT
                                                 +  WRK-DAY7-ZAITEN(IDY)
@@ -1737,7 +1738,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                    IF       FLG-TENSU      =    ZERO
       *
-                     IF    RECE82-HKNKBN   =   "4"
+                     IF    RECE82-HKNKBN   =   "4" OR "6"
                          IF   RECE82-SRYYM    >=   "201307"
                           IF  SRY-SRYCD(SRYACT-IDX) = CONS-ROUSAI1  OR
                                                       CONS-ROUSAI42 OR
@@ -1813,7 +1814,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *                ¡Ê¼«ÇåÀÕ¤Î¾ì¹ç¡¢£±£°ÅÀ¤ò£±£²£°±ß¤ËÆÉ¤ßÂØ¤¨¤ë¡Ë
       *                ¡ÊÎÅÍÜÃ´Åö¼êÅö¡§£±·î£±²ó¤Î»»Äê¡Ë
                          IF   SRY-SRYCD(SRYACT-IDX) =  CONS-RYOYOTEATE
-                          IF   RECE82-JIBAIKBN      =  "1"
+                          IF   (RECE82-HKNKBN    =  "4")
+                          AND  (RECE82-JIBAIKBN  =  "1")
                             ADD    120          TO    WRK-KIN2
                           END-IF
                          END-IF
@@ -2247,7 +2249,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             COMPUTE  TBL-SYUTEN-JI(IDY)  =
                                      TBL-SYUTEN-JI(IDY)  -
                                     ( WRK-ZAIKAISU-JI * TNS-TEN )
-                            IF   RECE82-JIBAIKBN  =  "2"
+                            IF ((RECE82-HKNKBN     =  "4") AND
+                                (RECE82-JIBAIKBN   =  "2"))
+                            OR ( RECE82-HKNKBN     =  "6" )
                               COMPUTE  TBL-YKZTEN-JI(ID1)  =
                                        TBL-YKZTEN-JI(ID1)  +
                                       ( WRK-ZAIKAISU-JI * TNS-TEN )
@@ -2313,7 +2317,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                    (WRK-TEN    *
                                                     ACCT-ZAIKAISU)
       *
-                       IF    RECE82-HKNKBN   =   "4"
+                       IF    RECE82-HKNKBN   =   "4" OR "6"
                          COMPUTE  TOTALKIN-ACCT  =  TOTALKIN-ACCT  +
                                                      (WRK-KIN    *
                                                       ACCT-ZAIKAISU)
@@ -2541,6 +2545,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 (RECE82-JIBAIKBN   =   "2"))
            OR  ((RECE82-HKNKBN     =   "5") AND
                 (RECE82-KOMUKBN    =   "2"))
+           OR  ( RECE82-HKNKBN     =   "6" )
              CONTINUE
            ELSE
              IF  RECE82-JNISSU     =   ZERO
@@ -2585,7 +2590,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 MOVE   WRK-MEISAI-KIN      TO  RECE82-MEISAI-KIN
            END-IF                                                       
       *
-           IF    RECE82-HKNKBN   =   "4"
+           IF    RECE82-HKNKBN   =   "4" OR "6"
       *
               PERFORM    VARYING    IDX    FROM   1   BY   1
                       UNTIL      IDX    >      10

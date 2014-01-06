@@ -54,6 +54,8 @@
       *  04.05.02    NACL-ÌçÏÆ    12/06/28  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅ¦Í×Íóµ­ºÜÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/10/14  ÊÔ½¸¾ò·ïÈ½Äê½¤Àµ
+      *
+      *  04.07.01    NACL-ÌçÏÆ    13/09/04  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -376,6 +378,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                 PERFORM   20013-KOHBUNRI-OKIKAE-SEC
              END-IF
            END-IF
+      *
+           PERFORM        20014-RIHA-KOHBUNRI-HENSYU-SEC
       *
            REWRITE RECE02-REC
       *
@@ -895,6 +899,39 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            .
        2001322-RECE05-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥ê¥Ï¥Ó¥ê³«»ÏÆüÊÔ½¸ÍÑ¸øÈñÊ¬Î¥¶èÊ¬ÊÔ½¸
+      *****************************************************************
+       20014-RIHA-KOHBUNRI-HENSYU-SEC                SECTION.
+      *
+           MOVE    SPACE          TO        RECE04-REC
+           INITIALIZE                       RECE04-REC
+           MOVE    RECE02-KEY     TO        RECE04-KEY1
+           START   RECE04-FILE  KEY IS  >=  RECE04-KEY
+             INVALID
+               MOVE     1         TO        FLG-RECE04
+             NOT  INVALID
+               MOVE     ZERO      TO        FLG-RECE04
+               PERFORM    900-RECE04-NEXT-SEC
+           END-START
+           PERFORM   UNTIL
+               (RECE02-KEY     NOT =   RECE04-KEY1 ) OR
+               (FLG-RECE04         =   1           )
+             PERFORM  VARYING  IDX  FROM   1   BY   1
+                       UNTIL  (IDX                   >   10 )
+                        OR    (RECE02-HKNCOMBI(IDX)  =  ZERO)
+               IF   RECE04-HKNCOMBI  =  RECE02-HKNCOMBI(IDX)
+                  MOVE  RECE04-KOHBUNRI  TO  RECE02-RIHA-KOHBUNRI(IDX)
+                  MOVE    10             TO  IDX
+               END-IF
+             END-PERFORM
+             PERFORM      900-RECE04-NEXT-SEC
+           END-PERFORM
+      *
+           .
+       20014-RIHA-KOHBUNRI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

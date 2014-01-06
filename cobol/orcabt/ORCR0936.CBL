@@ -38,6 +38,8 @@
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    09/06/18  円摘要欄コメント編集対応
       *  04.05.03    NACL-門脇    13/02/07  金額項目７桁対応
+      *
+      *  04.07.01    NACL-門脇    13/10/02  自賠責（第三者行為）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -682,6 +684,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
                    IF     (WRK-PARA-RECEKBN       =  "5")
                    OR     (RECE82-HKNKBN          =  "5")
+                   OR     (RECE82-HKNKBN          =  "6")
                        CONTINUE
                    ELSE
                        GO  TO  990-RECE82-READ-SEC

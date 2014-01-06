@@ -976,7 +976,7 @@
                OR     ( RECE82-HKNID     NOT =   RECE84-HKNID        )
                OR     ( RECE82-TEKSTYMD  NOT =   RECE84-TEKSTYMD     )
       *
-               IF   RECE82-HKNKBN    NOT  =  "4"                        
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                   EVALUATE      RECE84-SRYKBN
                       WHEN      "14"
       *               （在支援に関する診療のカウント）
@@ -1222,7 +1222,7 @@
                 INITIALIZE  WRK-JIDO-SETCOM-AREA
                 PERFORM     20011-HOKATU-COMMENT-SEC
                ELSE
-                IF   RECE82-HKNKBN    NOT  =  "4"                        
+                IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                  EVALUATE      RECE84-SRYKBN                   
                    WHEN      "11"
                       IF   RECE82-HKNKBN     =   "5"
@@ -1420,12 +1420,12 @@
                 ELSE                                                     
                  EVALUATE      RECE84-SRYKBN                            
                    WHEN      "11"
-                      EVALUATE   RECE82-JIBAIKBN
-                        WHEN       "1"
+                      IF   (RECE82-HKNKBN    =  "4")
+                      AND  (RECE82-JIBAIKBN  =  "1")
                           MOVE    2     TO  FLG-HANTEI
-                        WHEN       "2"
+                      ELSE
                           MOVE    1     TO  FLG-HANTEI
-                      END-EVALUATE
+                      END-IF
                       MOVE   ZERO   TO  FLG-COMMENT
       *               （初診（同日複数診療科）算定科のセット）
                       IF   FLG-COMMENT  =  ZERO
@@ -2231,7 +2231,7 @@
                  COMPUTE WRK-ZAINUM    =    99998200
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE82-HKNKBN    NOT  =  "4"
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2276,7 +2276,7 @@
                  COMPUTE WRK-ZAINUM    =    99998400
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE82-HKNKBN    NOT  =  "4"
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2320,7 +2320,7 @@
                  COMPUTE WRK-ZAINUM    =    99998600
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE82-HKNKBN    NOT  =  "4"
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2345,7 +2345,7 @@
                  COMPUTE WRK-ZAINUM    =    99998800
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE82-HKNKBN    NOT  =  "4"
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2370,7 +2370,7 @@
                  COMPUTE WRK-ZAINUM    =    99999000
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE82-HKNKBN    NOT  =  "4"
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2414,7 +2414,7 @@
                  COMPUTE WRK-ZAINUM    =    99999200
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE82-HKNKBN    NOT  =  "4"
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN
@@ -2439,7 +2439,7 @@
                  COMPUTE WRK-ZAINUM    =    99999400
                                        +   (IDX16 + 31)
                END-IF
-               IF   RECE82-HKNKBN    NOT  =  "4"
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                     MOVE    "80" TO  WRK-SRYKBN
                ELSE
                  EVALUATE  WRK-PARA-JIBAIPRTKBN

@@ -236,6 +236,7 @@
       *  04.07.05    NACL-門脇    13/07/01  入院料他保険算定時コメント記載対応
       *  04.07.06    NACL-門脇    13/08/20  ０９５９３で始まるコードの有無区分
       *                                     編集
+      *  04.07.07    NACL-門脇    13/10/02  自賠責（第三者行為）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2013,7 +2014,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            PERFORM    250-RECE84-HENSYU4-SEC
            PERFORM    260-FTN-SET-SEC
       *
-           IF      RECE82-HKNKBN    =   "4"
+           IF      RECE82-HKNKBN    =   "4" OR "6"
              PERFORM  270-KHNTEN-JI-CLEAR-SEC
            END-IF                            
       *
@@ -2318,7 +2319,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    ACCT-SYUTEN2         TO      RECE84-SYUTEN2
            MOVE    ACCT-YKZTEN          TO      RECE84-YKZTEN
            MOVE    ACCT-KIZAITEN        TO      RECE84-KIZAITEN
-           IF   RECE82-HKNKBN     =  "4"
+           IF   RECE82-HKNKBN     =  "4" OR "6"
               IF  ACCT-SRYKBN     =  "70"
                   COMPUTE  RECE84-SYUTEN1   =  RECE84-SYUTEN1
                                             -  RECE84-SYUTEN2
@@ -2819,7 +2820,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    SRY-AUTOKBN(IDX2)  TO    RECE85-AUTOKBN(IDX4)
                MOVE    SRY-INPUTNUM(IDX2) TO    RECE85-INPUTNUM(IDX4)
       *
-               IF   RECE82-HKNKBN    NOT  =  "4"                        
+               IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                   IF ((SRY-SRYCD(IDX2)  =  CONS-ROUSAI3    ) AND
                       (RECE82-SRYYM     <  "200804"        ))
                   OR ((SRY-SRYCD(IDX2)  =
@@ -2895,20 +2896,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *           （自賠責の場合、１０点を１２０円に読み替える）
       *           （療養担当手当：１月１回の算定）
                   IF      SRY-SRYCD(IDX2)    =     CONS-RYOYOTEATE
-                    EVALUATE  RECE82-JIBAIKBN
-                      WHEN      "1"
+                    IF   (RECE82-HKNKBN    =  "4")
+                    AND  (RECE82-JIBAIKBN  =  "1")
                         MOVE     120    TO     WRK-RYOYOTEATE2
                         COMPUTE  WRK-RYOYOTEATE   =
                                  WRK-RYOYOTEATE   +
                                  WRK-RYOYOTEATE2
-                      WHEN      "2"
+                    ELSE
                         COMPUTE  WRK-RYOYOTEATE   =  WRK-RYOYOTEATE
                                                   +  TNS-TEN
                         COMPUTE  RECE84-SYUTEN1   =  RECE84-SYUTEN1
                                                   -  TNS-TEN
                         COMPUTE  RECE84-KIZAITEN  =  RECE84-KIZAITEN
                                                   +  TNS-TEN
-                    END-EVALUATE
+                    END-IF
                   END-IF
       *
                   IF ( ACCT-SRYKBN          =  "80"               ) AND
@@ -2931,7 +2932,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    OR ( SRY-SRYCD(IDX2)(1:5) = "09594"       )
                    OR ((SRY-SRYCD(IDX2)  =  CONS-ROUSAI3    ) AND
                        (RECE82-SRYYM     <  "200804"        ))
-                   OR ((RECE82-JIBAIKBN  =  "1"             ) AND
+                   OR ((RECE82-HKNKBN    =  "4"             ) AND
+                       (RECE82-JIBAIKBN  =  "1"             ) AND
                        (SRY-SRYCD(IDX2)  =  CONS-RYOYOTEATE ))
                    OR ((SRY-SRYCD(IDX2)  =
                         CONS-ROUSAI2  OR
@@ -3076,7 +3078,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   ( SRY-SRYCD(IDX2)(1:5) =  "09591" OR "09592"
                                          OR "09593" OR "09594")         
                     MOVE  1               TO  RECE85-TENSIKIBETU(IDX4)  
-                    IF     (RECE82-HKNKBN        =  "4"               )
+                    IF     (RECE82-HKNKBN        =  "4" OR "6"        )
                     AND    (SRY-SRYCD(IDX2)(1:5) =  "09591" OR "09592"
                                                             OR "09593")
                       IF    SRY-SRYCD(IDX2)(1:5) =  "09593"
@@ -3505,6 +3507,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          (RECE82-JIBAIKBN    =   "2"))
                     OR  ((RECE82-HKNKBN      =   "5") AND
                          (RECE82-KOMUKBN     =   "2"))
+                    OR  ( RECE82-HKNKBN      =   "6" )
                       IF (( ACCT-SRYKBN          =  "80"    ) AND
                           ( WRK-CHECK-SRYCD(1:5) =  "09591"
                                                  OR "09592"
@@ -3832,9 +3835,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
            END-IF
       *
-           IF    ((RECE82-HKNKBN    NOT  =  "4"         ) AND
+           IF    ((RECE82-HKNKBN    NOT  =  "4" AND "6" ) AND
                   (RECE84-SRYKBN         =  "80"        ))
-           OR    ((RECE82-HKNKBN         =  "4"         ) AND
+           OR    ((RECE82-HKNKBN         =  "4"  OR "6" ) AND
                   (RECE84-SRYKBN         =  "40" OR "80"))
       *       リハビリ
               IF   SRY-SRYCD(IDX2)    =     "180706910"   OR
@@ -4125,10 +4128,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
            END-IF
       *
-           IF     (RECE82-HKNKBN    NOT  =  "4"    AND
-                   RECE84-SRYKBN         =  "14"       )
-           OR     (RECE82-HKNKBN         =  "4"    AND
-                   RECE84-SRYKBN         =  "80"       )
+           IF    ((RECE82-HKNKBN    NOT  =  "4" AND "6") AND
+                  (RECE84-SRYKBN         =  "14"       ))
+           OR    ((RECE82-HKNKBN         =  "4"  OR "6") AND
+                  (RECE84-SRYKBN         =  "80"       ))
               IF   SRY-SRYCD(IDX2)    =     CONS-HOUSIJI-COMMENT
               AND  FLG-HOUSIJI-COM    =     ZERO
                    MOVE   "1"   TO    RECE84-FLG-HOUSIJI-COMMENT
@@ -4276,9 +4279,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
            END-IF
       *
-           IF    ((RECE82-HKNKBN    NOT  =  "4"         ) AND
+           IF    ((RECE82-HKNKBN    NOT  =  "4" AND "6" ) AND
                   (RECE84-SRYKBN         =  "80"        ))
-           OR    ((RECE82-HKNKBN         =  "4"         ) AND
+           OR    ((RECE82-HKNKBN         =  "4"  OR "6" ) AND
                   (RECE84-SRYKBN         =  "40" OR "80"))
               IF   SRY-SRYCD(IDX2)    =     CONS-HOUSEI-COMMENT
               AND  FLG-HOUSEI-COM     =     ZERO
@@ -4853,7 +4856,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                        IF      SRY-SRYKBN   =  "31" OR "32" OR "33"
                                 MOVE   ACCT-YKZTEN    TO   WK-YKZTEN2
                        END-IF
-                       IF   RECE82-HKNKBN    NOT  =  "4"
+                       IF   RECE82-HKNKBN    NOT  =  "4" AND "6"
                          IF    SRY-SRYKBN   =  "31" OR "32" OR "33" OR
                                                "40" OR "50" OR "54" OR
                                                "60" OR "70" OR "80" OR
@@ -4903,7 +4906,9 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                                        + WRK-SOGAIKASAN
                                 END-IF
                                 IF  WRK-RYOYOTEATE  NOT =  ZERO
-                                 IF  RECE82-JIBAIKBN    =  "2"
+                                 IF ((RECE82-HKNKBN     =  "4") AND
+                                     (RECE82-JIBAIKBN   =  "2"))
+                                 OR ( RECE82-HKNKBN     =  "6" )
                                    COMPUTE  WK-SYUTEN  = WK-SYUTEN
                                                        - WRK-RYOYOTEATE
                                    COMPUTE  WK-YKZTEN  = WK-YKZTEN
@@ -4916,7 +4921,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                            MOVE    ACCT-SYUTEN1   TO   WK-SYUTEN
                            MOVE    ACCT-KIZAITEN  TO   WK-KIZAITEN
                            MOVE    ACCT-YKZTEN    TO   WK-YKZTEN
-                           IF   RECE82-HKNKBN   =  "4"
+                           IF   RECE82-HKNKBN   =  "4" OR "6"
                              IF  WRK-YOUBUKASAN  NOT =  ZERO
                                 COMPUTE  WK-SYUTEN   =  WK-SYUTEN
                                                      -  WRK-YOUBUKASAN
@@ -4985,6 +4990,8 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                         END-EVALUATE
                     WHEN       "5"
                         PERFORM   220224-RECE-LEFT-SET4-SEC
+                    WHEN       "6"
+                        PERFORM   220223-RECE-LEFT-SET3-SEC
                   END-EVALUATE
                END-IF
                IF  ( SRY-SRYKBN   =   "21"   OR   "22"   OR   "23"   OR
@@ -5909,8 +5916,8 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
            EVALUATE    SRY-SRYKBN
       *    初診のレセ点数欄の編集
                WHEN    "11"
-                 EVALUATE   RECE82-JIBAIKBN
-                  WHEN       "1"
+                 IF   (RECE82-HKNKBN    =  "4")
+                 AND  (RECE82-JIBAIKBN  =  "1")
                    IF   TNS-DATAKBN  =   2
                      EVALUATE    TNS-TIMEKSNKBN
                          WHEN    1
@@ -5958,7 +5965,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                    WRK-KINGAKU-JI   +
                                    (TNS-TEN         *  ACCT-ZAIKAISU)
                    END-IF  
-                  WHEN       "2"
+                 ELSE
                    IF   TNS-DATAKBN  =   2
                      EVALUATE    TNS-TIMEKSNKBN
                          WHEN    1
@@ -5988,11 +5995,11 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                    COMPUTE    TBL-SYUTEN-JI(1)   =
                               TBL-SYUTEN-JI(1)   +
                                (TNS-TEN   *   ACCT-ZAIKAISU)
-                 END-EVALUATE
+                 END-IF
       *    指導のレセ点数欄の編集
                WHEN    "13"
-                 EVALUATE   RECE82-JIBAIKBN
-                  WHEN       "1"
+                 IF   (RECE82-HKNKBN    =  "4")
+                 AND  (RECE82-JIBAIKBN  =  "1")
                    IF ((SRY-SRYCD(IDX3) =
                         CONS-ROUSAI4  OR  CONS-ROUSAI5  OR
                         CONS-ROUSAI6  OR  CONS-ROUSAI7  OR
@@ -6019,7 +6026,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                    (WK-ZAITEN *   WK-ZAIKAISU)
                      END-IF
                    END-IF                   
-                  WHEN       "2"
+                 ELSE
                      IF   ACCT-ZAIKBN     =  2
                          COMPUTE    WRK-RECE82G-TENSU(2)  =
                                     WRK-RECE82G-TENSU(2)  +
@@ -6032,7 +6039,7 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                     TBL-SYUTEN-JI(2) +
                                    (WK-ZAITEN *   WK-ZAIKAISU)
                      END-IF
-                 END-EVALUATE
+                 END-IF
       *    在宅のレセ点数欄の編集
                WHEN    "14"
                  IF  ACCT-ZAIKBN   =    2
@@ -6475,8 +6482,8 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                              "101800560" OR "101800990" )  AND
                         (RECE82-SRYYM   >=  "201307"    ))
                      IF  SRY-SRYCD(IDX3)(1:5) =  "09593"
-                      EVALUATE   RECE82-JIBAIKBN
-                       WHEN       "1"
+                      IF   (RECE82-HKNKBN    =  "4")
+                      AND  (RECE82-JIBAIKBN  =  "1")
                          EVALUATE  WRK-JIBAIKZI-SYUKEIKBN(IDX3)
                            WHEN       0
                            WHEN       5
@@ -6489,11 +6496,11 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                                       WRK-KINGAKU-JI +
                                (WRK-JIBAIKZI-TNS(IDX3) * ACCT-ZAIKAISU)
                          END-EVALUATE
-                       WHEN       "2"
+                      ELSE
                              COMPUTE  RECE82-SONOTAKIN-JYU =
                                       RECE82-SONOTAKIN-JYU +
                                (WRK-JIBAIKZI-TNS(IDX3) * ACCT-ZAIKAISU)
-                      END-EVALUATE
+                      END-IF
                      ELSE
                       IF  SRY-SRYCD(IDX3)  = "101800550" OR
                               "101800560" OR "101800990"
@@ -6511,7 +6518,8 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                       END-IF
                      END-IF
                     ELSE                                                
-                     IF  RECE82-JIBAIKBN      =    "1"
+                     IF  RECE82-HKNKBN        =    "4"
+                     AND RECE82-JIBAIKBN      =    "1"
                      AND SRY-SRYCD(IDX3)      =    CONS-RYOYOTEATE
                        COMPUTE    RECE82-SONOTAKIN-JYU  =               
                                   RECE82-SONOTAKIN-JYU  +               
@@ -7395,6 +7403,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       (RECE82-JIBAIKBN    =   "2"))
                  OR  ((RECE82-HKNKBN      =   "5") AND
                       (RECE82-KOMUKBN     =   "2"))
+                 OR  ( RECE82-HKNKBN      =   "6" )
                     CONTINUE
                  ELSE
                     MOVE  SPACE   TO  WRK-NYULIFE-KBN(SYUKEI-IDX3)
@@ -7965,9 +7974,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    NACCT-SYUTEN2        TO      RECE84-SYUTEN2
            MOVE    NACCT-YKZTEN         TO      RECE84-YKZTEN
            MOVE    NACCT-KIZAITEN       TO      RECE84-KIZAITEN
-           IF    RECE82-HKNKBN    =  "4"
-           AND   RECE82-JIBAIKBN  =  "2"
-           AND   NACCT-ZAISKBKBN  =  "7"
+           IF  ((RECE82-HKNKBN    =  "4") AND
+                (RECE82-JIBAIKBN  =  "2") AND
+                (NACCT-ZAISKBKBN  =  "7"))
+           OR  ((RECE82-HKNKBN    =  "6") AND
+                (NACCT-ZAISKBKBN  =  "7"))
              MOVE  NACCT-SYUTEN1        TO      RECE84-KIZAITEN
              MOVE  ZERO                 TO      RECE84-SYUTEN1
            END-IF
@@ -8238,6 +8249,13 @@ grpsys     PERFORM  900-DBSELECT-SEC
                 COMPUTE    RECE82-TENSU(37)  =
                            RECE82-TENSU(37)  +
                           (NACCT-ZAITEN   *   CNT-DAY21)
+             WHEN      "6"
+                COMPUTE    RECE82-TENSU(28)  =
+                           RECE82-TENSU(28)  +
+                          (NACCT-ZAITEN   *   CNT-DAY21)
+                COMPUTE    TBL-YKZTEN-JI(28)  =
+                           TBL-YKZTEN-JI(28)  +
+                          (NACCT-ZAITEN   *   CNT-DAY21)
            END-EVALUATE
       *
            .
@@ -8373,6 +8391,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                 (RECE82-JIBAIKBN    =   "2"))
            OR  ((RECE82-HKNKBN      =   "5") AND
                 (RECE82-KOMUKBN     =   "2"))
+           OR  ( RECE82-HKNKBN      =   "6" )
              CONTINUE
            ELSE
              IF      RECE82-HKNKBN    =   "4"
@@ -8407,6 +8426,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                   (RECE82-JIBAIKBN    =   "2"))
              OR  ((RECE82-HKNKBN      =   "5") AND
                   (RECE82-KOMUKBN     =   "2"))
+             OR  ( RECE82-HKNKBN      =   "6" )
               CONTINUE
              ELSE
               IF      RECE82-HKNKBN    =   "4"
@@ -8446,6 +8466,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                     (RECE82-JIBAIKBN    =   "2"))
                OR  ((RECE82-HKNKBN      =   "5") AND
                     (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
                 CONTINUE
                ELSE
                 IF    RECE82-HKNKBN    =   "4"
@@ -8486,6 +8507,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                     (RECE82-JIBAIKBN    =   "2"))
                OR  ((RECE82-HKNKBN      =   "5") AND
                     (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
                 CONTINUE
                ELSE
                 IF    RECE82-HKNKBN    =   "4"
@@ -8527,6 +8549,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                   (RECE82-JIBAIKBN    =   "2"))
              OR  ((RECE82-HKNKBN      =   "5") AND
                   (RECE82-KOMUKBN     =   "2"))
+             OR  ( RECE82-HKNKBN      =   "6" )
               CONTINUE
              ELSE
               IF      RECE82-HKNKBN    =   "4"
@@ -8571,6 +8594,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                   (RECE82-JIBAIKBN    =   "2"))
              OR  ((RECE82-HKNKBN      =   "5") AND
                   (RECE82-KOMUKBN     =   "2"))
+             OR  ( RECE82-HKNKBN      =   "6" )
               CONTINUE
              ELSE
               IF      RECE82-HKNKBN    =   "4"
@@ -8610,6 +8634,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                     (RECE82-JIBAIKBN    =   "2"))
                OR  ((RECE82-HKNKBN      =   "5") AND
                     (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
                 CONTINUE
                ELSE
                 IF    RECE82-HKNKBN    =   "4"
@@ -8650,6 +8675,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                     (RECE82-JIBAIKBN    =   "2"))
                OR  ((RECE82-HKNKBN      =   "5") AND
                     (RECE82-KOMUKBN     =   "2"))
+               OR  ( RECE82-HKNKBN      =   "6" )
                 CONTINUE
                ELSE
                 IF    RECE82-HKNKBN    =   "4"
@@ -8691,6 +8717,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                   (RECE82-JIBAIKBN    =   "2"))
              OR  ((RECE82-HKNKBN      =   "5") AND
                   (RECE82-KOMUKBN     =   "2"))
+             OR  ( RECE82-HKNKBN      =   "6" )
               CONTINUE
              ELSE
               IF      RECE82-HKNKBN    =   "4"
@@ -8783,6 +8810,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                 (RECE82-JIBAIKBN    =   "2"))
            OR  ((RECE82-HKNKBN      =   "5") AND
                 (RECE82-KOMUKBN     =   "2"))
+           OR  ( RECE82-HKNKBN      =   "6" )
              CONTINUE
            ELSE
              IF      RECE82-HKNKBN    =   "4"
@@ -8810,6 +8838,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                   (RECE82-JIBAIKBN    =   "2"))
              OR  ((RECE82-HKNKBN      =   "5") AND
                   (RECE82-KOMUKBN     =   "2"))
+             OR  ( RECE82-HKNKBN      =   "6" )
               CONTINUE
              ELSE
               IF      RECE82-HKNKBN    =   "4"
@@ -8849,6 +8878,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
                   (RECE82-JIBAIKBN    =   "2"))
              OR  ((RECE82-HKNKBN      =   "5") AND
                   (RECE82-KOMUKBN     =   "2"))
+             OR  ( RECE82-HKNKBN      =   "6" )
               CONTINUE
              ELSE
               IF      RECE82-HKNKBN    =   "4"
@@ -9183,6 +9213,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE82-JIBAIKBN    =   "2"))
               OR  ((RECE82-HKNKBN      =   "5") AND
                    (RECE82-KOMUKBN     =   "2"))
+              OR  ( RECE82-HKNKBN      =   "6" )
                   COMPUTE RECE84-ZAITEN =
                           RECE84-ZAITEN +
                   (TNS-TEN * WRK-SKJ200604-SURYOU(SYUKEI-IDX3 IDX2))
@@ -9328,6 +9359,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    (RECE82-JIBAIKBN    =   "2"))
               OR  ((RECE82-HKNKBN      =   "5") AND
                    (RECE82-KOMUKBN     =   "2"))
+              OR  ( RECE82-HKNKBN      =   "6" )
                   COMPUTE RECE84-ZAITEN =
                           RECE84-ZAITEN +
                   (TNS-TEN * WRK-SKJ200604-SURYOU-KAN
@@ -10324,6 +10356,30 @@ grpsys     PERFORM 900-DBSELECT-SEC
              COMPUTE   WRK-RECE82C-TENSU(27)  =
                        WRK-RECE82C-TENSU(27)  +
                        (RECE84-YKZTEN  *  RECE84-ZAIKAISU)
+            WHEN       "6"
+             ADD   RECE84-ZAIKAISU    TO   RECE82-KAISU(13)
+      *
+             IF    FLG-SIKIBETU  =  3 OR 4
+                COMPUTE   RECE82-TENSU(13)  =
+                          RECE82-TENSU(13)  +
+                          (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                COMPUTE   TBL-SYUTEN-JI(13)  =
+                          TBL-SYUTEN-JI(13)  +
+                          (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+             ELSE
+                COMPUTE   RECE82-TENSU(13)  =
+                          RECE82-TENSU(13)  +
+                          (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                COMPUTE   TBL-YKZTEN-JI(13) =
+                          TBL-YKZTEN-JI(13) +
+                          (RECE84-ZAITEN  *  RECE84-ZAIKAISU)
+                COMPUTE   WRK-RECE82C-TENSU(13)  =
+                          WRK-RECE82C-TENSU(13)  +
+                          (RECE84-YKZTEN  *  RECE84-ZAIKAISU)
+                COMPUTE   TBL-YKZTEN-JI-C(13)  =
+                          TBL-YKZTEN-JI-C(13)  +
+                          (RECE84-YKZTEN  *  RECE84-ZAIKAISU)
+             END-IF
            END-EVALUATE
            .                                           
       *
@@ -10708,9 +10764,11 @@ grpsys     PERFORM  900-DBSELECT-SEC
                IF  SYU-SHOKUJI(ID1)   =   ZERO
                    CONTINUE
                ELSE
-                 IF   (RECE82-HKNKBN         = "4")
-                 AND  (WRK-PARA-RECEKBN      = "5")
-                 AND  (WRK-PARA-JIBAIPRTKBN  = "1")
+                 IF  ((RECE82-HKNKBN         = "4") AND
+                      (WRK-PARA-RECEKBN      = "5") AND
+                      (WRK-PARA-JIBAIPRTKBN  = "1"))
+                 OR  ((RECE82-HKNKBN         = "6") AND
+                      (WRK-PARA-JIBAIPRTKBN  = "1"))
                    EVALUATE    ID1
                      WHEN       1
                      WHEN       2
@@ -10918,6 +10976,10 @@ grpsys     PERFORM  900-DBSELECT-SEC
                                        RECE82-SHOKUJITOTALDAY
                    ADD   SYU-SYUSKJ-RYOYOHI   TO
                                        RECE82-SHOKUJITOTALKIN
+                   IF    RECE82-HKNKBN  =  "6"
+                     ADD SYU-SYUSKJ-FTN-RECE  TO
+                                       RECE82-SKJFTNMONEY
+                   END-IF
            END-IF
       *
            .
@@ -11286,6 +11348,58 @@ grpsys     PERFORM  900-DBSELECT-SEC
                    END-IF
                  END-IF
                END-IF
+             WHEN       "6"
+               IF   RECE82-TENSU(2)   >=  WRK-RECE82G-TENSU(2)
+                 COMPUTE  RECE82-TENSU(2)   =
+                          RECE82-TENSU(2)   -  WRK-RECE82G-TENSU(2)
+               ELSE
+                 MOVE     ZERO    TO   RECE82-TENSU(2)
+               END-IF
+               IF   RECE82-TENSU(27)  >=  WRK-RECE82G-TENSU(27)
+                 COMPUTE  RECE82-TENSU(27)  =
+                          RECE82-TENSU(27)  -  WRK-RECE82G-TENSU(27)
+               ELSE
+                 MOVE     ZERO    TO   RECE82-TENSU(27)
+               END-IF
+               IF   RECE82-TENSU(28)  >=  WRK-RECE82G-TENSU(28)
+                 COMPUTE  RECE82-TENSU(28)  =
+                          RECE82-TENSU(28)  -  WRK-RECE82G-TENSU(28)
+               ELSE
+                 MOVE     ZERO    TO   RECE82-TENSU(28)
+               END-IF
+               MOVE   WRK-RECE82G-TENSU(13)  TO   WRK-GENTEN-YKZTEN
+               IF   WRK-RECE82C-TENSU(13)  >=  WRK-RECE82G-TENSU(13)
+                 COMPUTE  RECE82-TENSU(13)  =
+                          RECE82-TENSU(13)  -  WRK-RECE82G-TENSU(13)
+               ELSE
+                 COMPUTE  RECE82-TENSU(13)  =
+                          RECE82-TENSU(13)  -  WRK-RECE82C-TENSU(13)
+                 COMPUTE  WRK-RECE82G-TENSU(13) =
+                          WRK-RECE82G-TENSU(13) -
+                          WRK-RECE82C-TENSU(13)
+                 IF  WRK-RECE82C-TENSU(12)  >= WRK-RECE82G-TENSU(13)
+                   COMPUTE  RECE82-TENSU(12)  =
+                            RECE82-TENSU(12)  -
+                            WRK-RECE82G-TENSU(13)
+                 ELSE
+                   COMPUTE  RECE82-TENSU(12)  =
+                            RECE82-TENSU(12)  -
+                            WRK-RECE82C-TENSU(12)
+                   COMPUTE  WRK-RECE82G-TENSU(13) =
+                            WRK-RECE82G-TENSU(13) -
+                            WRK-RECE82C-TENSU(12)
+                   IF  WRK-RECE82C-TENSU(11)  >=
+                                               WRK-RECE82G-TENSU(13)
+                     COMPUTE  RECE82-TENSU(11)  =
+                              RECE82-TENSU(11)  -
+                              WRK-RECE82G-TENSU(13)
+                   ELSE
+                     COMPUTE  RECE82-TENSU(11)  =
+                              RECE82-TENSU(11)  -
+                              WRK-RECE82C-TENSU(11)
+                   END-IF
+                 END-IF
+               END-IF
            END-EVALUATE
       *
            .
@@ -11297,7 +11411,7 @@ grpsys     PERFORM  900-DBSELECT-SEC
       *****************************************************************
        280-RECE82-REWRITE-SEC                SECTION.
       *
-           IF   RECE82-HKNKBN     NOT  =   "4"
+           IF   RECE82-HKNKBN     NOT  =   "4" AND "6"
              COMPUTE  RECE82-KINGAKU2-SYO  =  RECE82-KINGAKU2-SYO
                                            +  WRK-ZAITENNASHI
            END-IF
@@ -11648,6 +11762,220 @@ grpsys     PERFORM  900-DBSELECT-SEC
              END-EVALUATE
       *
            END-IF                                                       
+      *
+           IF   RECE82-HKNKBN     =   "6"
+      *
+               MOVE      ZERO              TO    RECE82-TOTALTEN
+                                                 RECE82-TOTALTEN-YAK
+                                                 RECE82-KINGAKU2-SYO
+                                                 RECE82-KINGAKU3-SYO
+                                                 RECE82-TOTALKIN
+                                                 RECE82-TOTALKIN-YAK
+                                                 RECE82-TOTALKIN2
+                                                 RECE82-TOTALKIN-ETC
+      *
+               COMPUTE   RECE82-TENSU(3)      =  RECE82-TENSU(1)
+                                              +  RECE82-TENSU(2)
+      *
+               COMPUTE   RECE82-TENSU(10)     =  RECE82-TENSU(4)
+                                              +  RECE82-TENSU(5)
+                                              +  RECE82-TENSU(6)
+                                              +  RECE82-TENSU(7)
+                                              +  RECE82-TENSU(8)
+                                              +  RECE82-TENSU(9)
+      *
+               COMPUTE   RECE82-TENSU(14)     =  RECE82-TENSU(11)
+                                              +  RECE82-TENSU(12)
+                                              +  RECE82-TENSU(13)
+      *
+               COMPUTE   RECE82-TENSU(17)     =  RECE82-TENSU(15)
+                                              +  RECE82-TENSU(16)
+      *
+               COMPUTE   RECE82-TENSU(20)     =  RECE82-TENSU(18)
+                                              +  RECE82-TENSU(19)
+      *
+               COMPUTE   RECE82-TENSU(23)     =  RECE82-TENSU(21)
+                                              +  RECE82-TENSU(22)
+      *
+               COMPUTE   RECE82-TENSU(26)     =  RECE82-TENSU(24)
+                                              +  RECE82-TENSU(25)
+      *
+               COMPUTE   RECE82-TENSU(29)     =  RECE82-TENSU(27)
+                                              +  RECE82-TENSU(28)
+      *
+               MOVE     ZERO              TO   WRK-SYUTEN-JI
+               MOVE     ZERO              TO   WRK-YKZTEN-JI
+               PERFORM    VARYING    ID3    FROM    1   BY   1
+                           UNTIL     ID3     >     31
+                  COMPUTE  WRK-SYUTEN-JI  =  WRK-SYUTEN-JI
+                                          +  RECE82-SYUTEN-JI(ID3)
+                  COMPUTE  WRK-YKZTEN-JI  =  WRK-YKZTEN-JI
+                                          +  RECE82-YKZTEN-JI(ID3)
+               END-PERFORM
+               COMPUTE   RECE82-TOTALTEN  =  RECE82-NYUTOTALTEN
+                                          +  WRK-SYUTEN-JI
+                                          +  WRK-YKZTEN-JI
+      *
+               IF   TBL-SYUTEN-JI(2)   >=  WRK-RECE82G-TENSU(2)
+                 COMPUTE  TBL-SYUTEN-JI(2)  =
+                          TBL-SYUTEN-JI(2)  -  WRK-RECE82G-TENSU(2)
+               ELSE
+                 MOVE     ZERO    TO   TBL-SYUTEN-JI(2)
+               END-IF
+               IF   TBL-SYUTEN-JI(27)  >=  WRK-RECE82G-TENSU(27)
+                 COMPUTE  TBL-SYUTEN-JI(27) =
+                          TBL-SYUTEN-JI(27) -  WRK-RECE82G-TENSU(27)
+               ELSE
+                 MOVE     ZERO    TO   TBL-SYUTEN-JI(27)
+               END-IF
+               IF   TBL-SYUTEN-JI(28)  >=  WRK-RECE82G-TENSU(28)
+                 COMPUTE  TBL-SYUTEN-JI(28) =
+                          TBL-SYUTEN-JI(28) -  WRK-RECE82G-TENSU(28)
+               ELSE
+                 MOVE     ZERO    TO   TBL-SYUTEN-JI(28)
+               END-IF
+               IF   TBL-YKZTEN-JI-C(13)  >=  WRK-GENTEN-YKZTEN
+                 COMPUTE  TBL-YKZTEN-JI(13) =
+                          TBL-YKZTEN-JI(13) -  WRK-GENTEN-YKZTEN
+               ELSE
+                 COMPUTE  TBL-YKZTEN-JI(13) =
+                          TBL-YKZTEN-JI(13) -  TBL-YKZTEN-JI-C(13)
+                 COMPUTE  WRK-GENTEN-YKZTEN =
+                          WRK-GENTEN-YKZTEN -  TBL-YKZTEN-JI-C(13)
+                 IF  TBL-YKZTEN-JI-C(12)   >=  WRK-GENTEN-YKZTEN
+                   COMPUTE  TBL-YKZTEN-JI(12) =
+                            TBL-YKZTEN-JI(12) -  WRK-GENTEN-YKZTEN
+                 ELSE
+                   COMPUTE  TBL-YKZTEN-JI(12) =
+                            TBL-YKZTEN-JI(12) -  TBL-YKZTEN-JI-C(12)
+                   COMPUTE  WRK-GENTEN-YKZTEN =
+                            WRK-GENTEN-YKZTEN -  TBL-YKZTEN-JI-C(12)
+                   IF  TBL-YKZTEN-JI-C(11)  >=   WRK-GENTEN-YKZTEN
+                     COMPUTE  TBL-YKZTEN-JI(11) =
+                              TBL-YKZTEN-JI(11) -  WRK-GENTEN-YKZTEN
+                   ELSE
+                     COMPUTE  TBL-YKZTEN-JI(11) =
+                              TBL-YKZTEN-JI(11) -  TBL-YKZTEN-JI-C(11)
+                   END-IF
+                 END-IF
+               END-IF
+      *
+               COMPUTE  RECE82-TOTALKIN-JYU   =
+                        RECE82-TOTALKIN-JYU   +
+                  ((WRK-SYUTEN-JI +  RECE82-NYUTOTALTEN)
+                                  *  RECE82-SYUTENTANKA )
+               COMPUTE  RECE82-TOTALKIN-JYU   =
+                        RECE82-TOTALKIN-JYU   +
+                  ( WRK-YKZTEN-JI *  RECE82-YKZTENTANKA )
+      ***
+               PERFORM    VARYING    ID3    FROM    1   BY   1
+                           UNTIL     ID3     >     29
+                 IF   ID3  =   3  OR  10  OR  14  OR  17  OR
+                              20  OR  23  OR  26  OR  29
+                    CONTINUE
+                 ELSE
+                    COMPUTE  RECE82-KINGAKU-JYU(ID3) =
+                             RECE82-KINGAKU-JYU(ID3) +
+                      (TBL-SYUTEN-JI(ID3) * RECE82-SYUTENTANKA)
+                    COMPUTE  RECE82-KINGAKU-JYU(ID3) =
+                             RECE82-KINGAKU-JYU(ID3) +
+                      (TBL-YKZTEN-JI(ID3) * RECE82-YKZTENTANKA)
+                 END-IF
+               END-PERFORM
+      ***
+               PERFORM    VARYING    ID3    FROM    1   BY   1
+                           UNTIL     ID3     >     10
+      *
+                  COMPUTE  RECE82-NYUKHNKIN-JYU(ID3) =
+                           RECE82-NYUKHNKIN-JYU(ID3) +
+                    (RECE82-NYUKHNKEI(ID3) * RECE82-SYUTENTANKA)
+                  COMPUTE  RECE82-NYUTOTALKIN-JYU    =
+                           RECE82-NYUTOTALKIN-JYU    +
+                    (RECE82-NYUKHNKEI(ID3) * RECE82-SYUTENTANKA)
+      *
+                  COMPUTE  RECE82-NYUTOKKIN-JYU(ID3) =
+                           RECE82-NYUTOKKIN-JYU(ID3) +
+                    (RECE82-NYUTOKKEI(ID3) * RECE82-SYUTENTANKA)
+                  COMPUTE  RECE82-NYUTOTALKIN-JYU    =
+                           RECE82-NYUTOTALKIN-JYU    +
+                    (RECE82-NYUTOKKEI(ID3) * RECE82-SYUTENTANKA)
+      *
+               END-PERFORM
+      *
+               MOVE   RECE82-NYUKHNKEI2  TO  WRK-KEISAN2
+               COMPUTE  RECE82-NYUKHNKIN2-JYU  =
+                        RECE82-NYUKHNKIN2-JYU  +
+                        (WRK-KEISAN2 * RECE82-SYUTENTANKA)
+               MOVE   RECE82-NYUTOKKEI2  TO  WRK-KEISAN2
+               COMPUTE  RECE82-NYUTOKKIN2-JYU  =
+                        RECE82-NYUTOKKIN2-JYU  +
+                        (WRK-KEISAN2 * RECE82-SYUTENTANKA)
+               IF     RECE82-NYUKHNKEI2  <   ZERO
+                   COMPUTE  RECE82-NYUKHNKIN2-JYU   =
+                            RECE82-NYUKHNKIN2-JYU   *  -1
+               END-IF
+               IF     RECE82-NYUTOKKEI2  <   ZERO
+                   COMPUTE  RECE82-NYUTOKKIN2-JYU   =
+                            RECE82-NYUTOKKIN2-JYU   *  -1
+               END-IF
+      *
+               COMPUTE  RECE82-NYUTOTALKIN-JYU    =
+                        RECE82-NYUTOTALKIN-JYU    +
+                        RECE82-NYUKHNKIN2-JYU
+               COMPUTE  RECE82-NYUTOTALKIN-JYU    =
+                        RECE82-NYUTOTALKIN-JYU    +
+                        RECE82-NYUTOKKIN2-JYU
+      *
+               COMPUTE   RECE82-KINGAKU-JYU(3)  =
+                         RECE82-KINGAKU-JYU(1)  +
+                         RECE82-KINGAKU-JYU(2)   
+      *
+               COMPUTE   RECE82-KINGAKU-JYU(10)  =
+                         RECE82-KINGAKU-JYU(4)   +
+                         RECE82-KINGAKU-JYU(5)   +
+                         RECE82-KINGAKU-JYU(6)   +
+                         RECE82-KINGAKU-JYU(7)   +
+                         RECE82-KINGAKU-JYU(8)   +
+                         RECE82-KINGAKU-JYU(9)    
+      *
+               COMPUTE   RECE82-KINGAKU-JYU(14)  =
+                         RECE82-KINGAKU-JYU(11)  +
+                         RECE82-KINGAKU-JYU(12)  +
+                         RECE82-KINGAKU-JYU(13)   
+      *
+               COMPUTE   RECE82-KINGAKU-JYU(17)  =
+                         RECE82-KINGAKU-JYU(15)  +
+                         RECE82-KINGAKU-JYU(16)   
+      *
+               COMPUTE   RECE82-KINGAKU-JYU(20)  =
+                         RECE82-KINGAKU-JYU(18)  +
+                         RECE82-KINGAKU-JYU(19)   
+      *
+               COMPUTE   RECE82-KINGAKU-JYU(23)  =
+                         RECE82-KINGAKU-JYU(21)  +
+                         RECE82-KINGAKU-JYU(22)   
+      *
+               COMPUTE   RECE82-KINGAKU-JYU(26)  =
+                         RECE82-KINGAKU-JYU(24)  +
+                         RECE82-KINGAKU-JYU(25)   
+      *
+               COMPUTE   RECE82-KINGAKU-JYU(29)  =
+                         RECE82-KINGAKU-JYU(27)  +
+                         RECE82-KINGAKU-JYU(28)   
+      *
+               IF   RECE82-TOTALKIN-JYU  NOT =  ZERO
+               AND  RECE82-FTNRATE       NOT =  ZERO
+                 COMPUTE RECE82-FTNMONEY = RECE82-TOTALKIN-JYU
+                                         * RECE82-FTNRATE
+                                         / 100
+               END-IF
+               COMPUTE   RECE82-SKYMONEY = RECE82-TOTALKIN-JYU
+                                         - RECE82-FTNMONEY
+      *
+               COMPUTE   RECE82-SKYMONEY = RECE82-SKYMONEY +
+                 (RECE82-SHOKUJITOTALKIN - RECE82-SKJFTNMONEY)
+      *
+           END-IF
       *
            REWRITE   RECE82-REC
       *

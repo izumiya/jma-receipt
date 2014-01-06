@@ -395,14 +395,15 @@
       *  04.06.10    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
       *  04.06.11    NACL-藤原    13/04/05  コメントの記録方法の変更
-      *  04.06.12    NACL-藤原    13/06/02  氏名の外字チェックに条件追加
+      *  04.06.12    NACL-藤原    13/05/02  氏名の外字チェックに条件追加
       *  04.06.13    NACL-藤原    13/06/28  ００８２で始まるコメントの
       *                                     記録方法の修正
       *
       *  04.07.01    NACL-藤原    11/06/02  入退院履歴記載対応
       *                                     「2自費分は含まない」を追加
       *  04.07.02    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
-      *  04.07.03    NACL-門脇    13/12/09  医療情報連携対応
+      *  04.07.03    NACL-門脇    13/09/11  自賠責（第三者行為）対応
+      *  04.07.04    NACL-門脇    13/12/09  医療情報連携対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -782,6 +783,9 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-DISASTER-COMMENT    PIC X(76).
       ***  03  WRK-FUTAN               PIC ZZZ,ZZZ,ZZ9. 
            03  WRK-FUTAN               PIC ZZZZZZZZ9.
+           03  WRK-FUTAN2              PIC ZZZZZZZ9.
+           03  WRK-FUTAN3              PIC ZZ,ZZZ,ZZ9.
+           03  WRK-FUTAN4              PIC ZZZ,ZZZ,ZZ9.
            03  WRK-ADRS.
                05  WRK-ADRS-R      PIC X(76)  OCCURS  4.
       *
@@ -3409,6 +3413,10 @@ grpsys         OR     ( RECE02-KEY       NOT =   RECE041-KEY1        )
                    ELSE
                        PERFORM 20070-DISASTER-HENSYU-SEC
                    END-IF
+      *
+      *            第三者行為
+                   PERFORM 20073-DAISAN-HENSYU-SEC
+      *
       *            症状詳記（適用欄上段コメント・入退院履歴・手術歴・保険履歴）
                    MOVE    WRK-FTNKBN          TO  WRK-COM-FTNKBN
                    MOVE    ZERO                TO  FLG-TOYAKUFLG
@@ -3980,6 +3988,55 @@ grpsys         MOVE    RECE041-HOSPNUM TO  COMB-HOSPNUM
            MOVE    SPACE                TO  WRK-DISASTER-COMMENT
            .
        200701-DISASTER-COMMENT-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    摘要データ（第三者行為コメント）編集処理
+      *****************************************************************
+       20073-DAISAN-HENSYU-SEC       SECTION.
+      *
+           MOVE    "01"                TO  WRK-SRYKBN
+      *
+           MOVE    SPACE               TO  WRK-DISASTER-COMMENT
+           IF   RECE02-DAISAN-GAITO   =   1  OR  2
+               MOVE    RECE02-DAISAN-TOTALTEN  TO  WRK-FUTAN3
+               INITIALIZE              ORCSKANACHKAREA
+               MOVE    "2"             TO  KANACHK-SYORI 
+               MOVE    WRK-FUTAN3      TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+               IF    ( KANACHK-RC      =   ZERO )
+               AND   ( KANACHK-MAX     >   ZERO )
+                 STRING  "（第三者行為）請求点　　　"
+                                         DELIMITED  BY  SIZE
+                          KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                         DELIMITED  BY  SIZE
+                          "点"           DELIMITED  BY  SIZE
+                                         INTO    WRK-DISASTER-COMMENT
+                 END-STRING
+               END-IF
+               PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+      *
+               MOVE    SPACE           TO  WRK-DISASTER-COMMENT
+               MOVE    RECE02-DAISAN-FTNMONEY  TO  WRK-FUTAN4
+               INITIALIZE              ORCSKANACHKAREA
+               MOVE    "2"             TO  KANACHK-SYORI 
+               MOVE    WRK-FUTAN4      TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+               IF    ( KANACHK-RC      =   ZERO )
+               AND   ( KANACHK-MAX     >   ZERO )
+                 STRING  "（第三者行為）一部負担額"
+                                         DELIMITED  BY  SIZE
+                          KANACHK-OUT-INPUT(1:KANACHK-MAX)
+                                         DELIMITED  BY  SIZE
+                          "円"           DELIMITED  BY  SIZE
+                                         INTO    WRK-DISASTER-COMMENT
+                 END-STRING
+               END-IF
+               PERFORM 200701-DISASTER-COMMENT-HENSYU-SEC
+           END-IF
+      *
+           .
+       20073-DAISAN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

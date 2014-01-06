@@ -249,6 +249,7 @@
       *  04.07.03    NACL-門脇    13/01/21  労災レセ電対応
       *  04.07.04    NACL-門脇    13/08/20  ０９５９３で始まるコードの有無区分
       *                                     編集
+      *  04.07.05    NACL-門脇    13/10/02  自賠責（第三者行為）対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1629,6 +1630,7 @@ grpsys           PERFORM 900-DBSELECT-SEC
                 WHEN       "2"
                   PERFORM     2102-KHNTEN-CLEAR-SEC
                 WHEN       "4"
+                WHEN       "6"
                   PERFORM     2103-KHNTEN-JI-CLEAR-SEC                       
                 WHEN       "5"
                   PERFORM     2106-KHNTEN-KO-CLEAR-SEC
@@ -1866,7 +1868,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    ACCT-SYUTEN2         TO      RECE44-SYUTEN2
            MOVE    ACCT-YKZTEN          TO      RECE44-YKZTEN
            MOVE    ACCT-KIZAITEN        TO      RECE44-KIZAITEN
-           IF   RECE41-HKNKBN     =  "4"
+           IF   RECE41-HKNKBN     =  "4" OR "6"
               IF  ACCT-SRYKBN     =  "70"
                   COMPUTE  RECE44-SYUTEN1   =  RECE44-SYUTEN1
                                             -  RECE44-SYUTEN2
@@ -2011,7 +2013,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
              MOVE    TNS-DATAKBN        TO  WRK-TNS-DATAKBN(IDX2)
              MOVE    TNS-TIMEKSNKBN     TO  WRK-TNS-TIMEKSNKBN(IDX2)
       *
-             IF     (RECE41-HKNKBN        =  "4"               )
+             IF     (RECE41-HKNKBN        =  "4" OR "6"        )
              AND    (ACCT-SRYKBN          =  "80"              )
              AND    (SRY-SRYCD(IDX2)(1:5) =  "09591" OR "09592"
                                                      OR "09593")
@@ -2307,7 +2309,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                MOVE    SRY-AUTOKBN(IDX2)  TO    RECE45-AUTOKBN(IDX4)
                MOVE    SRY-INPUTNUM(IDX2) TO    RECE45-INPUTNUM(IDX4)
       **
-               IF   RECE41-HKNKBN    NOT  =  "4"                        
+               IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                   IF ((SRY-SRYCD(IDX2)  =  CONS-ROUSAI8    ) AND
                       (RECE41-SRYYM     <  "200804"        ))
                   OR ((SRY-SRYCD(IDX2)  =
@@ -2391,20 +2393,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *           （自賠責の場合、７点を８４円に読み替える）
       *           （療養担当手当：１月１回の算定）
                   IF      SRY-SRYCD(IDX2)    =     CONS-RYOYOTEATE
-                    EVALUATE  RECE41-JIBAIKBN
-                      WHEN      "1"
+                    IF   (RECE41-HKNKBN    =  "4")
+                    AND  (RECE41-JIBAIKBN  =  "1")
                         MOVE     84     TO     WRK-RYOYOTEATE2
                         COMPUTE  WRK-RYOYOTEATE   =
                                  WRK-RYOYOTEATE   +
                                  WRK-RYOYOTEATE2
-                      WHEN      "2"
+                    ELSE
                         COMPUTE  WRK-RYOYOTEATE   =  WRK-RYOYOTEATE
                                                   +  TNS-TEN
                         COMPUTE  RECE44-SYUTEN1   =  RECE44-SYUTEN1
                                                   -  TNS-TEN
                         COMPUTE  RECE44-KIZAITEN  =  RECE44-KIZAITEN
                                                   +  TNS-TEN
-                    END-EVALUATE
+                    END-IF
                   END-IF
       *
                   IF ( ACCT-SRYKBN          =  "80"               ) AND
@@ -2426,7 +2428,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    IF ( SRY-SRYCD(IDX2)(1:5) = "09593"       )
                    OR ((SRY-SRYCD(IDX2)  =  CONS-ROUSAI8    ) AND
                        (RECE41-SRYYM     <  "200804"        ))
-                   OR ((RECE41-JIBAIKBN  =  "1"             ) AND
+                   OR ((RECE41-HKNKBN    =  "4"             ) AND
+                       (RECE41-JIBAIKBN  =  "1"             ) AND
                        (SRY-SRYCD(IDX2)  =  CONS-RYOYOTEATE ))
                    OR ((SRY-SRYCD(IDX2)  =
                         CONS-ROUSAI3  OR CONS-ROUSAI4  OR
@@ -3011,6 +3014,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          (RECE41-JIBAIKBN    =   "2"))
                     OR  ((RECE41-HKNKBN      =   "5") AND
                          (RECE41-KOMUKBN     =   "2"))
+                    OR  ( RECE41-HKNKBN      =   "6" )
                       IF (( ACCT-SRYKBN            =  "80"      ) AND
                           ( WRK-CHECK-SRYCD(1:5)   =  "09591"
                                                    OR "09592"
@@ -3469,9 +3473,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
            END-IF
       *
-           IF    ((RECE41-HKNKBN    NOT  =  "4"         ) AND
+           IF    ((RECE41-HKNKBN    NOT  =  "4" AND "6" ) AND
                   (RECE44-SRYKBN         =  "80"        ))
-           OR    ((RECE41-HKNKBN         =  "4"         ) AND
+           OR    ((RECE41-HKNKBN         =  "4"  OR "6" ) AND
                   (RECE44-SRYKBN         =  "40" OR "80"))
       *       リハビリ
               IF   SRY-SRYCD(IDX2)    =     "180706910"   OR
@@ -4539,7 +4543,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                           MOVE  WRK-ZAIKAISU-XXX  TO   WK-ZAIKAISU
                        END-IF 
                        MOVE  ACCT-ZAITEN       TO   WK-ZAITEN
-                       IF   RECE41-HKNKBN    NOT  =  "4"                
+                       IF   RECE41-HKNKBN    NOT  =  "4" AND "6"
                          IF    SRY-SRYKBN  =  "31" OR "32" OR "33" OR
                                               "40" OR "50" OR "54" OR
                                               "60" OR "70" OR "80" OR
@@ -4589,7 +4593,9 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                                        + WRK-SOGAIKASAN
                                   END-IF
                                   IF  WRK-RYOYOTEATE  NOT =  ZERO
-                                   IF  RECE41-JIBAIKBN    =  "2"
+                                   IF ((RECE41-HKNKBN     =  "4") AND
+                                       (RECE41-JIBAIKBN   =  "2"))
+                                   OR ( RECE41-HKNKBN     =  "6" )
                                     COMPUTE WK-SYUTEN  = WK-SYUTEN
                                                        - WRK-RYOYOTEATE
                                     COMPUTE WK-YKZTEN  = WK-YKZTEN
@@ -4602,7 +4608,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                            MOVE    ACCT-SYUTEN1   TO   WK-SYUTEN
                            MOVE    ACCT-KIZAITEN  TO   WK-KIZAITEN
                            MOVE    ACCT-YKZTEN    TO   WK-YKZTEN
-                           IF   RECE41-HKNKBN   =  "4"
+                           IF   RECE41-HKNKBN   =  "4" OR "6"
                              IF  WRK-YOUBUKASAN  NOT =  ZERO
                                 COMPUTE  WK-SYUTEN   =  WK-SYUTEN
                                                      -  WRK-YOUBUKASAN
@@ -4673,6 +4679,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                         END-EVALUATE
                     WHEN       "5"
                         PERFORM   2101225-RECE-LEFT-SET5-SEC
+                    WHEN       "6"
+                        PERFORM   2101224-RECE-LEFT-SET4-SEC
                   END-EVALUATE
                END-IF
                IF  ( SRY-SRYKBN   =  "21"   OR   "22"   OR   "23"   OR
@@ -4882,6 +4890,39 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
       *         麻毒の算定回数から処方料（麻・向・毒・覚）の減算
                 COMPUTE    RECE41-KAISU(23)   =    RECE41-KAISU(23)  -
                                                    WRK-MADOKU-SHOHO  
+      *
+             WHEN       "6"
+      *
+      *         処方の算定回数から特定疾患処方管理加算の減算
+                COMPUTE    RECE41-KAISU(15)  =  RECE41-KAISU(15)  -
+                                                WRK-TOKUTEI-SKAN
+      *         処方の算定回数から処方(乳幼児)加算の減算
+                COMPUTE    RECE41-KAISU(15)  =  RECE41-KAISU(15)  -
+                                                WRK-NYUYOUJI-SKAN
+      *         処方の算定回数から長期投薬加算（処方料)の減算
+                COMPUTE    RECE41-KAISU(15)  =  RECE41-KAISU(15)  -
+                                                WRK-CYOKI-SKAN
+      *         処方の算定回数から抗悪性腫瘍剤処方管理加算（処方料）の減算
+                COMPUTE    RECE41-KAISU(15)  =  RECE41-KAISU(15)  -
+                                                WRK-AKUSEI-SKAN
+      *         処方の算定回数から特定疾患処方管理加算(処方料)の減算
+                COMPUTE    RECE41-KAISU(35)  =  RECE41-KAISU(35)  -
+                                                WRK-TOKUTEI-SKAN2
+      *         処方せんの算定回数から処方せん(乳幼児)加算の減算
+                COMPUTE    RECE41-KAISU(35)  =  RECE41-KAISU(35)  -
+                                                WRK-NYUYOUJI-SHOKAN
+      *         処方せんの算定回数から長期投薬加算(処方せん料)の減算
+                COMPUTE    RECE41-KAISU(35)  =  RECE41-KAISU(35)  -
+                                                WRK-CYOKI-SKAN2
+      *         処方せんの算定回数から抗悪性腫瘍剤処方管理加算(処方せん料)の減算
+                COMPUTE    RECE41-KAISU(35)  =  RECE41-KAISU(35)  -
+                                                WRK-AKUSEI-SKAN2
+      *         処方せんの算定回数から一般名処方加算(処方せん料)の減算
+                COMPUTE    RECE41-KAISU(35)  =  RECE41-KAISU(35)  -
+                                                WRK-IPPAN-SKAN2
+      *         麻毒の算定回数から処方料（麻・向・毒・覚）の減算
+                COMPUTE    RECE41-KAISU(16)  =  RECE41-KAISU(16)  -
+                                                WRK-MADOKU-SHOHO
       *
            END-EVALUATE
       *
@@ -6534,8 +6575,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
            EVALUATE    SRY-SRYKBN
       *    初診のレセ点数欄の編集
                WHEN    "11"
-                 EVALUATE   RECE41-JIBAIKBN
-                  WHEN       "1"
+                 IF   (RECE41-HKNKBN    =  "4")
+                 AND  (RECE41-JIBAIKBN  =  "1")
                    IF   WRK-TNS-DATAKBN(IDX3)  =   2
                      EVALUATE    WRK-TNS-TIMEKSNKBN(IDX3)
                          WHEN    1
@@ -6583,7 +6624,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                    WRK-KINGAKU-JI   +
                                (WRK-TNS-TEN(IDX3)   * ACCT-ZAIKAISU)
                    END-IF
-                  WHEN       "2"
+                 ELSE
                    IF   WRK-TNS-DATAKBN(IDX3)  =   2
                      EVALUATE    WRK-TNS-TIMEKSNKBN(IDX3)
                          WHEN    1
@@ -6613,11 +6654,11 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                    COMPUTE    TBL-SYUTEN-JI(1)   =
                               TBL-SYUTEN-JI(1)   +
                               (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
-                 END-EVALUATE
+                 END-IF
       *    再診のレセ点数欄の編集（集計方法変更後）
                WHEN    "12"
-                 EVALUATE   RECE41-JIBAIKBN
-                  WHEN       "1"
+                 IF   (RECE41-HKNKBN    =  "4")
+                 AND  (RECE41-JIBAIKBN  =  "1")
                    EVALUATE  WRK-TNS-GAITENTTLKBN(IDX3)
       *      （基本手技）
                     WHEN  120
@@ -6778,7 +6819,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                      (WK-ZAITEN   *   WK-ZAIKAISU)
                         END-IF
                    END-EVALUATE
-                  WHEN       "2"
+                 ELSE
                    EVALUATE  WRK-TNS-GAITENTTLKBN(IDX3)
       *      （基本手技）
                     WHEN  120
@@ -6930,11 +6971,11 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                      (WK-ZAITEN   *   WK-ZAIKAISU)
                         END-IF
                    END-EVALUATE
-                 END-EVALUATE
+                 END-IF
       *    指導のレセ点数欄の編集
                WHEN    "13"
-                 EVALUATE   RECE41-JIBAIKBN
-                  WHEN       "1"
+                 IF   (RECE41-HKNKBN    =  "4")
+                 AND  (RECE41-JIBAIKBN  =  "1")
                      IF   (SRY-SRYCD(IDX3) =  CONS-ROUSAI33)
                      AND  (RECE41-SRYYM   >=  "201307"     )
                              COMPUTE    WRK-KINGAKU-JI  =
@@ -6968,7 +7009,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                          END-IF
                        END-IF
                      END-IF
-                  WHEN       "2"
+                 ELSE
                      IF   ACCT-ZAIKBN     =  2
                          COMPUTE    WRK-RECE41G-TENSU(7)  =
                                     WRK-RECE41G-TENSU(7)  +
@@ -6981,7 +7022,7 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                     TBL-SYUTEN-JI(7)  +
                                    (WK-ZAITEN   *   WK-ZAIKAISU)
                      END-IF
-                 END-EVALUATE
+                 END-IF
       *    在宅のレセ点数欄の編集
                WHEN    "14"
                  IF  ACCT-ZAIKBN   =    2
@@ -7406,8 +7447,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                    ELSE
                     IF ( ACCT-SRYKBN          =  "80"    )  AND         
                        ( SRY-SRYCD(IDX3)(1:5) =  "09593" )              
-                     EVALUATE   RECE41-JIBAIKBN
-                       WHEN       "1"
+                     IF   (RECE41-HKNKBN    =  "4")
+                     AND  (RECE41-JIBAIKBN  =  "1")
                          EVALUATE  WRK-TNS-JIBAISYUKEIKBN(IDX3)
                            WHEN       0
                            WHEN       5
@@ -7422,13 +7463,14 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                       WRK-KINGAKU-JI   +
                                      (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
                          END-EVALUATE
-                       WHEN       "2"
+                     ELSE
                              COMPUTE  RECE41-SONOTAKIN-JYU  =
                                       RECE41-SONOTAKIN-JYU  +
                                      (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
-                     END-EVALUATE
+                     END-IF
                     ELSE                                                
-                     IF  RECE41-JIBAIKBN      =    "1"
+                     IF  RECE41-HKNKBN        =    "4"
+                     AND RECE41-JIBAIKBN      =    "1"
                      AND SRY-SRYCD(IDX3)      =    CONS-RYOYOTEATE
                        COMPUTE    RECE41-SONOTAKIN-JYU  =               
                                   RECE41-SONOTAKIN-JYU  +               
@@ -8644,7 +8686,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2103-KHNTEN-JI-CLEAR-SEC               SECTION.
       *
-           EVALUATE  WRK-PARA-RECEKBN
+           IF     RECE41-HKNKBN   =   "4"
+            EVALUATE  WRK-PARA-RECEKBN
               WHEN      "4"
       **********（新様式）
                 IF        FLG-KHNTEN10-JI    =    1
@@ -8691,7 +8734,36 @@ grpsys     PERFORM 900-DBSELECT-SEC
       **>          END-IF
       **>        END-IF
       **>       END-IF
-           END-EVALUATE
+            END-EVALUATE
+           END-IF
+      *
+           IF     RECE41-HKNKBN   =   "6"
+                IF        FLG-KHNTEN2-JI2  =    1
+                  MOVE    ZERO             TO   RECE41-KHNTEN(2)
+                END-IF
+                IF        FLG-KHNTEN3-JI2  =    1
+                  MOVE    ZERO             TO   RECE41-KHNTEN(3)
+                END-IF
+                IF        FLG-KHNTEN4-JI2  =    1
+                  MOVE    ZERO             TO   RECE41-KHNTEN(4)
+                END-IF
+                IF        FLG-KHNTEN5-JI2  =    1
+                  MOVE    ZERO             TO   RECE41-KHNTEN(5)
+                END-IF
+                IF        FLG-KHNTEN6-JI2  =    1
+                  MOVE    ZERO             TO   RECE41-KHNTEN(6)
+                END-IF
+                IF        FLG-KHNTEN11-JI2   =    1
+                  MOVE    ZERO             TO   RECE41-KHNTEN(11)
+                END-IF
+                IF        FLG-KHNTEN14-JI2   =    1
+                  MOVE    ZERO             TO   RECE41-KHNTEN(14)
+                END-IF
+                IF        FLG-KHNTEN15-JI2   =    1
+                  MOVE    ZERO             TO   RECE41-KHNTEN(15)
+                END-IF
+           END-IF
+      *
            .
        2103-KHNTEN-JI-CLEAR-EXT.
            EXIT.
@@ -8951,7 +9023,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            END-IF
       *
       *    合計点数の編集
-           IF   RECE41-HKNKBN     NOT  =   "4"
+           IF   RECE41-HKNKBN     NOT  =   "4" AND "6"
               COMPUTE  RECE41-TOTALTEN  =  RECE41-TOTALTEN
                                         -  WRK-RECE41G-TENSU(2)
                                         -  WRK-RECE41G-TENSU(3)
@@ -8973,7 +9045,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *****************************************************************
        2105-RECE41-REWRITE-SEC                SECTION.
       *
-           IF   RECE41-HKNKBN     NOT  =   "4"
+           IF   RECE41-HKNKBN     NOT  =   "4" AND "6"
              COMPUTE  RECE41-TOTALKIN2  =  RECE41-TOTALKIN2
                                         +  WRK-ZAITENNASHI
              IF    RECE41-HKNKBN   =   "5"
@@ -9272,6 +9344,175 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          RECE41-KINGAKU-JYU(37)   
       *
              END-EVALUATE
+      *
+           END-IF                                                       
+      *
+           IF   RECE41-HKNKBN     =   "6"
+      *
+               COMPUTE   RECE41-TENSU(9)      =  RECE41-TENSU(1)
+                                              +  RECE41-TENSU(2)
+                                              +  RECE41-TENSU(3)
+                                              +  RECE41-TENSU(4)
+                                              +  RECE41-TENSU(5)
+                                              +  RECE41-TENSU(6)
+                                              +  RECE41-TENSU(7)
+                                              +  RECE41-TENSU(8)
+      *
+               COMPUTE   RECE41-TENSU(18)     =  RECE41-TENSU(10)
+                                              +  RECE41-TENSU(11)
+                                              +  RECE41-TENSU(12)
+                                              +  RECE41-TENSU(13)
+                                              +  RECE41-TENSU(14)
+                                              +  RECE41-TENSU(15)
+                                              +  RECE41-TENSU(16)
+                                              +  RECE41-TENSU(17)
+      *
+               COMPUTE   RECE41-TENSU(22)     =  RECE41-TENSU(19)
+                                              +  RECE41-TENSU(20)
+                                              +  RECE41-TENSU(21)
+      *
+               COMPUTE   RECE41-TENSU(25)     =  RECE41-TENSU(23)
+                                              +  RECE41-TENSU(24)
+      *
+               COMPUTE   RECE41-TENSU(28)     =  RECE41-TENSU(26)
+                                              +  RECE41-TENSU(27)
+      *
+               COMPUTE   RECE41-TENSU(31)     =  RECE41-TENSU(29)
+                                              +  RECE41-TENSU(30)
+      *
+               COMPUTE   RECE41-TENSU(34)     =  RECE41-TENSU(32)
+                                              +  RECE41-TENSU(33)
+      *
+               COMPUTE   RECE41-TENSU(38)     =  RECE41-TENSU(35)
+                                              +  RECE41-TENSU(36)
+                                              +  RECE41-TENSU(37)
+      *
+               MOVE       ZERO         TO        WRK-SYUTEN-JI
+                                                 WRK-YKZTEN-JI
+               PERFORM    VARYING    ID1    FROM    1   BY   1
+                           UNTIL     ID1     >     31
+                  ADD   RECE41-SYUTEN-JI(ID1)  TO  RECE41-TOTALTEN
+                                                   WRK-SYUTEN-JI
+                  ADD   RECE41-YKZTEN-JI(ID1)  TO  RECE41-TOTALTEN
+                                                   WRK-YKZTEN-JI
+               END-PERFORM
+      *        減点編集
+               COMPUTE   RECE41-TOTALTEN  =  RECE41-TOTALTEN
+                                          -  WRK-RECE41G-TENSU(2)
+                                          -  WRK-RECE41G-TENSU(3)
+                                          -  WRK-RECE41G-TENSU(5)
+                                          -  WRK-RECE41G-TENSU(6)
+                                          -  WRK-RECE41G-TENSU(7)
+                                          -  WRK-RECE41G-TENSU(8)
+                                          -  WRK-RECE41G-TENSU(9)
+                                          -  WRK-RECE41G-TENSU(12)
+                                          -  WRK-RECE41G-TENSU(14)
+               COMPUTE   WRK-SYUTEN-JI    =  WRK-SYUTEN-JI
+                                          -  WRK-RECE41G-TENSU(2)
+                                          -  WRK-RECE41G-TENSU(3)
+                                          -  WRK-RECE41G-TENSU(5)
+                                          -  WRK-RECE41G-TENSU(6)
+                                          -  WRK-RECE41G-TENSU(7)
+                                          -  WRK-RECE41G-TENSU(8)
+                                          -  WRK-RECE41G-TENSU(9)
+                                          -  WRK-RECE41G-TENSU(12)
+                                          -  WRK-RECE41G-TENSU(14)
+      *
+               IF   TBL-SYUTEN-JI(2)  >=  WRK-RECE41G-TENSU(2)
+                 COMPUTE  TBL-SYUTEN-JI(2) =
+                          TBL-SYUTEN-JI(2) -  WRK-RECE41G-TENSU(2)
+               ELSE
+                 MOVE     ZERO    TO   TBL-SYUTEN-JI(2)
+               END-IF
+               IF   TBL-SYUTEN-JI(7)  >=  WRK-RECE41G-TENSU(7)
+                 COMPUTE  TBL-SYUTEN-JI(7) =
+                          TBL-SYUTEN-JI(7) -  WRK-RECE41G-TENSU(7)
+               ELSE
+                 MOVE     ZERO    TO   TBL-SYUTEN-JI(7)
+               END-IF
+               IF   TBL-SYUTEN-JI(8)  >=  WRK-RECE41G-TENSU(8)
+                 COMPUTE  TBL-SYUTEN-JI(8) =
+                          TBL-SYUTEN-JI(8) -  WRK-RECE41G-TENSU(8)
+               ELSE
+                 MOVE     ZERO    TO   TBL-SYUTEN-JI(8)
+               END-IF
+      *
+               COMPUTE  RECE41-TOTALKIN-JYU   =
+                        RECE41-TOTALKIN-JYU   +
+                       (WRK-SYUTEN-JI  *  RECE41-SYUTENTANKA)
+               COMPUTE  RECE41-TOTALKIN-JYU   =
+                        RECE41-TOTALKIN-JYU   +
+                       (WRK-YKZTEN-JI  *  RECE41-YKZTENTANKA)
+      ***
+               PERFORM    VARYING    ID1    FROM    1   BY   1
+                           UNTIL     ID1     >     38
+                 IF   ID1  =   9  OR  18  OR  22  OR  25  OR
+                              28  OR  31  OR  34  OR  38
+                    CONTINUE
+                 ELSE
+                    COMPUTE  RECE41-KINGAKU-JYU(ID1) =
+                             RECE41-KINGAKU-JYU(ID1) +
+                            (TBL-SYUTEN-JI(ID1) * RECE41-SYUTENTANKA)
+                    COMPUTE  RECE41-KINGAKU-JYU(ID1) =
+                             RECE41-KINGAKU-JYU(ID1) +
+                            (TBL-YKZTEN-JI(ID1) * RECE41-YKZTENTANKA)
+                 END-IF
+               END-PERFORM
+      *
+               COMPUTE   RECE41-KINGAKU-JYU(9)  =
+                         RECE41-KINGAKU-JYU(1)  +
+                         RECE41-KINGAKU-JYU(2)  +
+                         RECE41-KINGAKU-JYU(3)  +
+                         RECE41-KINGAKU-JYU(4)  +
+                         RECE41-KINGAKU-JYU(5)  +
+                         RECE41-KINGAKU-JYU(6)  +
+                         RECE41-KINGAKU-JYU(7)  +
+                         RECE41-KINGAKU-JYU(8)   
+      *
+               COMPUTE   RECE41-KINGAKU-JYU(18)  =
+                         RECE41-KINGAKU-JYU(10)  +
+                         RECE41-KINGAKU-JYU(11)  +
+                         RECE41-KINGAKU-JYU(12)  +
+                         RECE41-KINGAKU-JYU(13)  +
+                         RECE41-KINGAKU-JYU(14)  +
+                         RECE41-KINGAKU-JYU(15)  +
+                         RECE41-KINGAKU-JYU(16)  +
+                         RECE41-KINGAKU-JYU(17)   
+      *
+               COMPUTE   RECE41-KINGAKU-JYU(22)  =
+                         RECE41-KINGAKU-JYU(19)  +
+                         RECE41-KINGAKU-JYU(20)  +
+                         RECE41-KINGAKU-JYU(21)   
+      *
+               COMPUTE   RECE41-KINGAKU-JYU(25)  =
+                         RECE41-KINGAKU-JYU(23)  +
+                         RECE41-KINGAKU-JYU(24)   
+      *
+               COMPUTE   RECE41-KINGAKU-JYU(28)  =
+                         RECE41-KINGAKU-JYU(26)  +
+                         RECE41-KINGAKU-JYU(27)   
+      *
+               COMPUTE   RECE41-KINGAKU-JYU(31)  =
+                         RECE41-KINGAKU-JYU(29)  +
+                         RECE41-KINGAKU-JYU(30)   
+      *
+               COMPUTE   RECE41-KINGAKU-JYU(34)  =
+                         RECE41-KINGAKU-JYU(32)  +
+                         RECE41-KINGAKU-JYU(33)   
+      *
+               COMPUTE   RECE41-KINGAKU-JYU(38)  =
+                         RECE41-KINGAKU-JYU(35)  +
+                         RECE41-KINGAKU-JYU(36)  +
+                         RECE41-KINGAKU-JYU(37)   
+      *
+               IF   RECE41-TOTALKIN-JYU  NOT =  ZERO
+               AND  RECE41-FTNRATE       NOT =  ZERO
+                 COMPUTE RECE41-FTNMONEY = RECE41-TOTALKIN-JYU
+                                         * RECE41-FTNRATE
+                                         / 100
+               END-IF
+               COMPUTE   RECE41-SKYMONEY = RECE41-TOTALKIN-JYU
+                                         - RECE41-FTNMONEY
       *
            END-IF                                                       
       *

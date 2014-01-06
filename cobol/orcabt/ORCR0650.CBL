@@ -48,6 +48,8 @@
       *  04.05.03    NACL-ÌçÏÆ    12/06/28  À¸ÊÝ¤Þ¤È¤áÊ¬ÅÀÍóÅ¦Í×Íóµ­ºÜÂÐ±þ
       *
       *  04.06.01    NACL-ÌçÏÆ    10/10/14  ÊÔ½¸¾ò·ïÈ½Äê½¤Àµ
+      *
+      *  04.07.01    NACL-ÌçÏÆ    13/09/04  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -411,6 +413,8 @@
                 PERFORM   2103-KOHBUNRI-OKIKAE-SEC
              END-IF
            END-IF
+      *
+           PERFORM        20014-RIHA-KOHBUNRI-HENSYU-SEC
       *
            REWRITE RECE62-REC
       *
@@ -936,6 +940,39 @@
       *
            .
        210322-RECE65-HENSYU2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¥ê¥Ï¥Ó¥ê³«»ÏÆüÊÔ½¸ÍÑ¸øÈñÊ¬Î¥¶èÊ¬ÊÔ½¸
+      *****************************************************************
+       20014-RIHA-KOHBUNRI-HENSYU-SEC                SECTION.
+      *
+           MOVE    SPACE          TO        RECE64-REC
+           INITIALIZE                       RECE64-REC
+           MOVE    RECE62-KEY     TO        RECE64-KEY1
+           START   RECE64-FILE  KEY IS  >=  RECE64-KEY
+             INVALID
+               MOVE     1         TO        FLG-RECE64
+             NOT  INVALID
+               MOVE     ZERO      TO        FLG-RECE64
+               PERFORM    900-RECE64-NEXT-SEC
+           END-START
+           PERFORM   UNTIL
+               (RECE62-KEY     NOT =   RECE64-KEY1 ) OR
+               (FLG-RECE64         =   1           )
+             PERFORM  VARYING  IDX  FROM   1   BY   1
+                       UNTIL  (IDX                   >   10 )
+                        OR    (RECE62-HKNCOMBI(IDX)  =  ZERO)
+               IF   RECE64-HKNCOMBI  =  RECE62-HKNCOMBI(IDX)
+                  MOVE  RECE64-KOHBUNRI  TO  RECE62-RIHA-KOHBUNRI(IDX)
+                  MOVE    10             TO  IDX
+               END-IF
+             END-PERFORM
+             PERFORM      900-RECE64-NEXT-SEC
+           END-PERFORM
+      *
+           .
+       20014-RIHA-KOHBUNRI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

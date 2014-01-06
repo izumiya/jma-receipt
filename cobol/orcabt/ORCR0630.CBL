@@ -109,6 +109,8 @@
       *  04.05.12    NACL-門脇    12/10/22  生保まとめ分点欄点数集計修正
       *
       *  04.06.01    NACL-門脇    10/12/13  保険別請求チェック表の本体取込み
+      *
+      *  04.07.01    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *****************************************************************
       *
       *
@@ -1129,7 +1131,11 @@
                                 IF   ACCT-SRYKBN  =  "95"  OR  "96"
                                     CONTINUE
                                 ELSE
-                                    MOVE    1    TO    FLG-SHOSAISIN
+                                 IF   ACCT-SRYKBN  =  "80"
+                                  PERFORM 2001115-SHOSAISIN-HANTEI2-SEC
+                                 ELSE
+                                  MOVE    1    TO    FLG-SHOSAISIN
+                                 END-IF
                                 END-IF
                                 PERFORM   2001114-RECE62-TENSOU12-SEC
                            END-IF
@@ -1357,7 +1363,47 @@
       *
            .
       *
-       SHOSAISHIN-HANTEI-EXT.
+       2001113-SHOSAISIN-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療会計テーブルの内容から診療行為テーブルを読み込み、
+      *    診療実日数のカウントを行える剤であるかの判定
+      *****************************************************************
+       2001115-SHOSAISIN-HANTEI2-SEC                 SECTION.
+      *
+           INITIALIZE                           SRYACT-REC
+           MOVE    ACCT-HOSPNUM         TO      SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN       TO      SRY-NYUGAIKBN
+           MOVE    ACCT-PTID            TO      SRY-PTID
+      ***  MOVE    ACCT-SRYKA           TO      SRY-SRYKA
+           MOVE    ACCT-SRYYM           TO      SRY-SRYYM
+           MOVE    ACCT-ZAINUM          TO      SRY-ZAINUM
+           MOVE    SRYACT-REC           TO      MCPDATA-REC
+           MOVE    "tbl_sryact"         TO      MCP-TABLE
+           MOVE    "key9"               TO      MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC               =       ZERO
+               MOVE    "tbl_sryact"     TO      MCP-TABLE
+               MOVE    "key9"           TO      MCP-PATHNAME
+               PERFORM  900-SRYACT-READ-SEC
+               IF   FLG-SRYACT = ZERO
+                 IF   SRY-SRYCD(1)(1:5) =
+                      "09591" OR "09592" OR "09593" OR "09594"
+                      CONTINUE
+                 ELSE
+                      MOVE    1         TO      FLG-SHOSAISIN
+                 END-IF
+               END-IF
+           END-IF
+      *
+           MOVE    "tbl_sryact"         TO      MCP-TABLE
+           MOVE    "key9"               TO      MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+      *
+       2001115-SHOSAISIN-HANTEI2-EXT.
            EXIT.
       *
       *****************************************************************
