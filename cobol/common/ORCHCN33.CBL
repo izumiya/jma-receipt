@@ -32,6 +32,7 @@
       *  04.01.00    NACL-Â¿¡¹Ç¼  07/10/23  ¸øÌ³ºÒ³²ÂÐ±þ
       *  04.04.00    NACL-Â¿¡¹Ç¼  08/12/24  Æþ±¡ÎÁÊñ³çÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/09/25  ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥óÊÝ¸±ÂÐ±þ
+      *  04.07.01    NACL-ÌçÏÆ    13/09/30  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -83,6 +84,7 @@
            03  FLG-OK              PIC 9(01).
            03  FLG-ARI             PIC 9(01).
            03  FLG-ARI-RSI         PIC 9(01).
+           03  FLG-ARI2            PIC 9(01).
            03  FLG-HKNKBN          PIC 9(01).
       *
            03  FLG-GENTEN          PIC 9(01).
@@ -969,15 +971,19 @@
       *****************************************************************
        200110-SRYACCT-HENSYU-SEC       SECTION.
       *
+           MOVE    ZERO                TO  FLG-ARI2
            MOVE    ZERO                TO  WRK-RSI-MONEY
       *    Ï«ºÒ¡¦¼«ÇåÀÕ¤Î»þ¡¢±ßÊ¬¤ò¸º»»¤¹¤ë
-           IF     (FLG-HKNKBN          =   1  )  AND
-                  (ACCT-SRYKBN         =   "11"
-                                       OR  "12"
-                                       OR  "13"
-                                       OR  "80" ) 
+           IF  ((FLG-HKNKBN      =   1                           ) AND
+                (ACCT-SRYKBN     =  "11" OR "12" OR "13" OR "80" ) AND
+                (ACCT-ZAIREQFLG  =  "1"                          ))
+           OR  ((FLG-HKNKBN      =   2                           ) AND
+                (ACCT-SRYKBN     =  "80"                         ) AND
+                (ACCT-ZAIREQFLG  =  "1"                          ))
                PERFORM 200111-RSI-ZAITEN-SEC
-           ELSE
+           END-IF
+      *
+           IF    FLG-ARI2   =  ZERO
       *        Äþ¸ºÅÀ¿ô¤òÈ½Äê¤¹¤ë
                MOVE    ZERO                TO  FLG-GENTEN
                IF      ACCT-ZAIREQFLG      =   "1"
@@ -1100,6 +1106,7 @@
            END-IF
       *    Ï«ºÒ±ßÊ¬
            IF      WRK-RSI-MONEY       >   ZERO
+               MOVE      1                 TO  FLG-ARI2
                PERFORM 2001111-RSI-TBLHENSYU-SEC
            END-IF
       *
@@ -1326,7 +1333,11 @@
            IF      COMB-HKNNUM         =   "971"  OR  "973"
                MOVE    1               TO  TBL-HKNKBN (IDX)
            ELSE
+             IF    COMB-KOH1HKNNUM     =   "970"
+               MOVE    2               TO  TBL-HKNKBN (IDX)
+             ELSE
                MOVE    ZERO            TO  TBL-HKNKBN (IDX)
+             END-IF
            END-IF
            .
        200131-HKNCOMBI-MEI-EXT.

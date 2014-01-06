@@ -97,6 +97,7 @@
       *  04.07.01    NACL-門脇    11/09/01  システム管理２０１０機能追加対応
       *  04.07.02    NACL-門脇    12/08/27  システム管理２０１０機能追加対応
       *  04.07.03    NACL-門脇    13/07/01  システム管理２０１０機能追加対応
+      *  04.07.04    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *  04.07.05    NACL-門脇    13/11/11  減額（円）の対応
       *****************************************************************
       *
@@ -303,6 +304,12 @@
            PERFORM   100-PRM-CHK-SEC
            IF       (LNK-FTNJGNCHK-RC   NOT =   ZERO)
                GO   TO   000-PROC-EXT
+           END-IF
+      *
+           IF    LNK-FTNJGNCHK-RC      =   ZERO
+             IF  LNK-FTNJGNCHK-KOHNUM  =   "970"
+                MOVE    01    TO   LNK-FTNJGNCHK-RC
+             END-IF
            END-IF
       *
            IF    LNK-FTNJGNCHK-RC      =   ZERO

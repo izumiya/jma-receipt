@@ -147,6 +147,7 @@
       *                                     ¡Ê£°£¹£µ£¹£±¡Á£¹£´¡Ë
       *
       *  04.07.01    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
+      *  04.07.02    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -2256,6 +2257,7 @@
                                  FLG-KOREI-TANYUIN2
            IF  (LNK-SYU-SYUHKNNUM(IDX) =
                 "971" OR "973" OR "975" OR "068" OR "069" OR "040")
+           OR  (LNK-SYU-KOH1HKNNUM(IDX)     = "970"               )
            OR  (LNK-SYU-SYUHKNNUM(IDX)(1:2) = "98" OR "90" OR "91")
              CONTINUE
            ELSE
@@ -5418,6 +5420,9 @@ grpsys                                        SPA-AREA
       *              ¸ø³²ÍÑ¤ÎÊÔ½¸½èÍý
                      PERFORM     KOGAI-HENSYU-SEC
                  WHEN       OTHER
+                     IF   SYU-KOH1HKNNUM   =   "970"
+                        PERFORM  DAISANSYA-HENSYU-SEC
+                     END-IF
       *              ½é¿ÇÎÁ»»Äê¥Õ¥é¥°¡ÊÃÏÊý¸øÈñÍÑ¡Ë¤Î¥»¥Ã¥È
                      IF    WRK-SYOSIN(IDX)   =   SPACE
                         PERFORM  SYOSINFLG-SET-SEC
@@ -6280,6 +6285,106 @@ grpsys                              SPA-AREA
            EXIT.
       *
       **************************************************************
+      *    Âè»°¼Ô¹Ô°Ù¤ÎÊÔ½¸½èÍý
+      **************************************************************
+       DAISANSYA-HENSYU-SEC          SECTION.
+      *
+           IF   (ACCT-SRYKBN  =  "90" OR "92" OR "95" OR "96" OR "97")
+           OR   (ACCT-ZAIKBN  =   2                                  )
+             CONTINUE
+           ELSE
+             IF  ACCT-SRYKBN  =  "80"
+               INITIALIZE                      SRYACT-REC
+               MOVE    ACCT-HOSPNUM       TO   SRY-HOSPNUM
+               MOVE    ACCT-NYUGAIKBN     TO   SRY-NYUGAIKBN
+               MOVE    ACCT-PTID          TO   SRY-PTID
+               MOVE    ACCT-SRYKA         TO   SRY-SRYKA
+               MOVE    ACCT-SRYYM         TO   SRY-SRYYM
+               MOVE    ACCT-ZAINUM        TO   SRY-ZAINUM
+               MOVE    SRYACT-REC         TO   MCPDATA-REC
+               MOVE    "DBSELECT"         TO   MCP-FUNC
+               MOVE    "tbl_sryact"       TO   MCP-TABLE
+               MOVE    "key2"             TO   MCP-PATHNAME
+               CALL    "ORCDBMAIN"        USING   MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+               IF      MCP-RC             =    ZERO
+                 MOVE    "tbl_sryact"    TO   MCP-TABLE
+                 MOVE    "key2"          TO   MCP-PATHNAME
+                 PERFORM  SRYACT-READ-SEC
+                 PERFORM  UNTIL  FLG-SRYACT    =    1
+                   PERFORM   VARYING   IDZ   FROM   1   BY   1
+                              UNTIL   (IDZ            >       5)
+                                OR    (SRY-SRYCD(IDZ) =   SPACE)
+                     IF   SRY-SRYCD(IDZ)(1:5) = "09591" OR "09592" OR
+                                                "09593" OR "09594"
+                       MOVE    SPACE            TO  TNS-TENSU-REC
+                       INITIALIZE                   TNS-TENSU-REC
+                       MOVE    LNK-S02-HOSPNUM  TO  TNS-HOSPNUM
+                       MOVE    SRY-SRYCD(IDZ)   TO  TNS-SRYCD
+                       MOVE    SYU-SRYYMD(1:6)  TO  TNS-YUKOSTYMD
+                                                    TNS-YUKOEDYMD
+                       MOVE    "01"             TO  TNS-YUKOSTYMD(7:2)
+                                                    TNS-YUKOEDYMD(7:2)
+                       PERFORM    TENSU-READ-SEC
+                       IF      FLG-TENSU    =    ZERO
+      *
+                         COMPUTE  WRK-TEN  =    TNS-TEN  /  10
+      *
+                         IF  SRY-SRYSYUKBN = "809"
+                           COMPUTE WRK-TEN     = SRY-JIHIMONEY(IDZ)
+                                               / 10
+                           COMPUTE WRK-RSIETC  = WRK-RSIETC  +
+                                  (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (SRY-JIHIMONEY(IDZ)
+                                            *   SINRYO-COUNT)
+                         ELSE
+                           COMPUTE WRK-RSIETC  = WRK-RSIETC  +
+                                  (WRK-TEN  *   SINRYO-COUNT)
+                           COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
+                                  (TNS-TEN  *   SINRYO-COUNT)
+                         END-IF
+      *
+                         IF  SRY-SRYCD(IDZ)(1:5) =
+                                    "09591" OR "09592" OR "09593"
+                           IF   IDX3  >= 50
+                             DISPLAY "TABLE OVER"
+                           ELSE
+                             ADD    1   TO  IDX3
+                             MOVE   SRY-SRYCD(IDZ)
+                                TO  WRK-JIBAI-SONOTA-SRYCD(IDX IDX3)
+                             MOVE   SINRYO-COUNT
+                                TO  WRK-JIBAI-SONOTA-ZAIKAISU(IDX IDX3)
+                             IF  SRY-SRYSYUKBN = "809"
+                               MOVE SRY-JIHIMONEY(IDZ)
+                                TO  WRK-JIBAI-SONOTA-TANKA(IDX IDX3)
+                             ELSE
+                               MOVE TNS-TEN
+                                TO  WRK-JIBAI-SONOTA-TANKA(IDX IDX3)
+                             END-IF
+                           END-IF
+                         END-IF
+      *
+                       END-IF
+                     END-IF
+                   END-PERFORM
+                   MOVE    "tbl_sryact"    TO   MCP-TABLE
+                   MOVE    "key2"          TO   MCP-PATHNAME
+                   PERFORM  SRYACT-READ-SEC
+                 END-PERFORM
+               END-IF
+               MOVE    "tbl_sryact"    TO   MCP-TABLE
+               MOVE    "key2"          TO   MCP-PATHNAME
+               PERFORM  CSR-CLOSE-SEC
+             END-IF
+           END-IF
+      *
+           .
+       DAISANSYA-HENSYU-EXT.
+           EXIT.
+      *
+      **************************************************************
       *    ¸ø³²ÍÑ¤ÎÊÔ½¸½èÍý
       **************************************************************
        KOGAI-HENSYU-SEC          SECTION.
@@ -6555,6 +6660,14 @@ grpsys                                    SPA-AREA
       *    ¤½¤ÎÂ¾ÊÝ¸±ÍÑ¤ÎÅ¾Á÷½èÍý
       **************************************************************
        ETCHKN-TENSO-SEC          SECTION.
+      *
+           IF   SYU-KOH1HKNNUM   =   "970"
+              IF    WRK-RSIETC   NOT =   ZERO
+                COMPUTE SYU-HKNTEN(11) =  SYU-HKNTEN(11)
+                                       -  WRK-RSIETC
+              END-IF
+              MOVE    WRK-RSIETC2   TO    SYU-RSIETC-MONEY
+           END-IF
       *
            IF   SYU-HKNTEN(2)   >= WRK-SYUG-SDO-HKNTEN(IDX)
               COMPUTE   SYU-HKNTEN(2)  =  SYU-HKNTEN(2)

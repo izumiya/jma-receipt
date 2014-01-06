@@ -30,6 +30,7 @@
       *  04.05.02    NACL-門脇    11/11/09  同日再入院食事対応
       *  04.07.01    NACL-門脇    12/10/12  保険別請求チェック表（標準帳票）
       *                                     の機能追加対応
+      *  04.07.02    NACL-門脇    13/10/15  自賠責（第三者行為）対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -153,6 +154,8 @@
              WHEN      "4"
       *      ＜公害の請求管理データ単位の編集＞
              WHEN      "5"
+      *      ＜第三者行為の請求管理データ単位の編集＞
+             WHEN      "6"
                IF      LNK-SKYGET-SRYYM  <  201004
                       MOVE    1     TO   LNK-SKYGET-RC
                ELSE
@@ -193,6 +196,8 @@
                PERFORM    2001-HENSYU3-SEC
              WHEN      "5"
                PERFORM    2001-HENSYU5-SEC
+             WHEN      "6"
+               PERFORM    2001-HENSYU6-SEC
            END-EVALUATE
       *
            .
@@ -709,6 +714,10 @@
            IF    IDX1   =   ZERO
               MOVE     1             TO    IDX1
            END-IF
+      *    第三者行為
+           IF    SYU-KOH1HKNNUM       =   "970"
+              MOVE    10             TO    IDX1
+           END-IF
       *
            .
        200211-INDEX-HENSYU-EXT.
@@ -801,6 +810,65 @@
       *
            .
        2001-HENSYU5-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    区分”６”の編集　＜第三者行為＞
+      *****************************************************************
+       2001-HENSYU6-SEC            SECTION.
+      *
+           MOVE    ZERO                TO   WRK-PTFTNRATE
+      *
+           INITIALIZE                       ORCSAGECHKAREA
+           MOVE    SPA-HOSPNUM         TO   AGECHK-HOSPNUM
+           MOVE    RECE10-PTID         TO   AGECHK-PTID
+           MOVE    RECE10-SRYYM        TO   AGECHK-SRYYMD(1:6)
+           MOVE    "01"                TO   AGECHK-SRYYMD(7:2)
+           MOVE    RECE10-HKNCOMBI(1)  TO   AGECHK-HKNCOMBINUM
+           MOVE    RECE10-NYUGAIKBN    TO   AGECHK-NYUGAIKBN
+           CALL    "ORCSAGECHK"        USING
+                                       ORCSAGECHKAREA
+                                       SPA-AREA
+           IF    AGECHK-RC       =  ZERO
+             MOVE  AGECHK-FTNRATE      TO   WRK-PTFTNRATE
+           END-IF
+      *
+           MOVE    RECE10-JNISSU(1)         TO LNK-SKYGET-IRYO-NISSU
+           MOVE    RECE10-TOTALTEN(1)       TO LNK-SKYGET-IRYO-TOTALTEN
+           IF    WRK-PTFTNRATE   =  ZERO
+             IF    RECE10-NYUGAIKBN   =  "1"
+               COMPUTE   LNK-SKYGET-IRYO-HOKENJA   =
+                         RECE10-FTNMONEY(1)        -
+                         RECE10-SHOKUJIRYOYOHI(1)
+             ELSE
+               MOVE  RECE10-FTNMONEY(1)     TO LNK-SKYGET-IRYO-HOKENJA
+             END-IF
+             MOVE    ZERO                   TO LNK-SKYGET-IRYO-ICHIBUFTN
+           ELSE
+             IF    RECE10-NYUGAIKBN   =  "1"
+               COMPUTE   LNK-SKYGET-IRYO-ICHIBUFTN =
+                         RECE10-FTNMONEY(1)        -
+                         RECE10-SHOKUJIRYOYOHI(1)
+             ELSE
+               MOVE  RECE10-FTNMONEY(1)     TO LNK-SKYGET-IRYO-ICHIBUFTN
+             END-IF
+             MOVE    ZERO                   TO LNK-SKYGET-IRYO-HOKENJA
+           END-IF
+           MOVE    ZERO                     TO LNK-SKYGET-IRYO-KOHFTN
+      *
+           MOVE    RECE10-SHOKUJINISSU(1)   TO LNK-SKYGET-SKJ-KAISU
+           MOVE    RECE10-SHOKUJIRYOYOHI(1) TO LNK-SKYGET-SKJ-RYOYOHI
+           IF    WRK-PTFTNRATE   =  ZERO
+             MOVE  RECE10-SHOKUJIRYOYOHI(1) TO LNK-SKYGET-SKJ-HOKENJA
+             MOVE  ZERO                     TO LNK-SKYGET-SKJ-ICHIBUFTN
+           ELSE
+             MOVE  RECE10-SHOKUJIRYOYOHI(1) TO LNK-SKYGET-SKJ-ICHIBUFTN
+             MOVE  ZERO                     TO LNK-SKYGET-SKJ-HOKENJA
+           END-IF
+           MOVE    ZERO                     TO LNK-SKYGET-SKJ-KOHFTN
+      *
+           .
+       2001-HENSYU6-EXT.
            EXIT.
       *
       *****************************************************************

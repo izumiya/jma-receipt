@@ -141,6 +141,7 @@
       *  04.07.02    NACL-藤原    12/01/06  予備を２０に変更
       *  04.07.03    NACL-門脇    12/08/27  システム管理２０１０機能追加対応
       *  04.07.04    NACL-門脇    12/10/02  高齢者判定フラグ追加
+      *  04.07.05    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       ************************************************************
       *01  RECE02-REC.
            03  RECE02-KEY.
@@ -741,6 +742,39 @@
       *
       *高齢者判定フラグ
            03  RECE02-KOUREI-HANTEIFLG         PIC X(01).
+      *
+      *第三者行為情報（インデックスの情報は保険組合せ番号情報とリンク）
+           03  RECE02-DAISANINF-AREA.
+             04  RECE02-DAISANINF               OCCURS 10.
+      *第三者行為保険組合せフラグ
+               05  RECE02-DAISANFLG             PIC 9(01).
+      *第三者行為公費ＩＤ
+               05  RECE02-DAISAN-KOHID          PIC 9(10).
+      *第三者行為請求点数あり
+               05  RECE02-DAISAN-SKYFLG         PIC 9(01).
+      *リハビリ開始日編集用公費分離区分
+               05  RECE02-RIHA-KOHBUNRI         PIC 9(01).
+      *リハビリ算定テーブル
+               05  RECE02-RIHA-DAY-AREA.
+                 06  RECE02-RIHA-DAY-OCC        OCCURS 31.
+                   07  RECE02-RIHA-SINDAI       PIC 9(01).
+                   07  RECE02-RIHA-KOKYUKI      PIC 9(01).
+                   07  RECE02-RIHA-NOUKE        PIC 9(01).
+                   07  RECE02-RIHA-UNDOKI       PIC 9(01).
+                   07  RECE02-RIHA-NANBYO       PIC 9(01).
+                   07  RECE02-RIHA-SYOGAI       PIC 9(01).
+                   07  RECE02-RIHA-SESSYOKU     PIC 9(01).
+      *
+      *第三者行為レセプト該当フラグ
+      *（０：第三者行為以外のみ）
+      *（１：第三者行為のみ）
+      *（２：第三者行為と第三者行為外が混在）
+      *（９：患者登録で第三者行為の登録なし）
+           03  RECE02-DAISAN-GAITO              PIC 9(01).
+      *第三者行為請求点数合計
+           03  RECE02-DAISAN-TOTALTEN           PIC 9(08).
+      *第三者行為一部負担金相当額合計（１円単位）
+           03  RECE02-DAISAN-FTNMONEY           PIC 9(09).
       *
       *予備
            03  RECE02-YOBIETC-AREA.

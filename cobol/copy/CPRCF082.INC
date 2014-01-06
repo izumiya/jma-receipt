@@ -58,6 +58,7 @@
       *                                     労災指定医療機関区分追加
       *  04.07.04    NACL-門脇    13/08/20  ０９５９３で始まるコードの
       *                                     有無区分追加
+      *  04.07.05    NACL-藤原    13/09/20  第三者行為対応
       ************************************************************
       *01  RECE82-REC.
            03  RECE82-KEY.
@@ -396,6 +397,30 @@
                05  RECE82-NYUINDAY-TBL.
                    07  RECE82-NYUINDAY-KBN
                                           PIC  X(01)  OCCURS  31.
+      *
+      *第三者行為時の医保分主保険情報
+           03  RECE82-HKN-X.
+      *医保分主保険番号
+               05  RECE82-HKNNUM-X        PIC X(03).
+      *医保分主保険ＩＤ
+               05  RECE82-HKNID-X         PIC 9(10).
+      *医保分保険者番号
+               05  RECE82-HKNJANUM        PIC X(08).
+      *医保分保険者名
+               05  RECE82-HKNJANAME       PIC X(200).
+      *医保分記号
+               05  RECE82-KIGO            PIC X(80).
+      *医保分番号
+               05  RECE82-NUM             PIC X(80).
+      *
+      *第三者行為（社会保険への請求額）
+           03  RECE82-SKYMONEY            PIC  9(09).
+      *第三者行為（患者負担）
+           03  RECE82-FTNMONEY            PIC  9(09).
+      *第三者行為（患者割合）
+           03  RECE82-FTNRATE             PIC  9(03).
+      *第三者行為（食事標準負担）
+           03  RECE82-SKJFTNMONEY         PIC  9(09).
       *
       *予備
            03  RECE82-YOBIETC-AREA.

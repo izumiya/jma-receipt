@@ -60,6 +60,7 @@
       *                                     ¸øÈñ¤ò´Þ¤à¾ì¹ç¤Î¼çÊÝ¸±¤Î°ìÉôÉéÃ´³Û
       *                                     ¤ÎÊÔ½¸½¤Àµ
       *
+      *  04.07.01    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *****************************************************************
       *
@@ -224,14 +225,18 @@ grpsys     MOVE    LNK-KOREIFTNCHK-HOSPNUM TO  COMB-HOSPNUM
                     UNTIL   (IDX1             >=    50 )   OR
                             (FLG-HKNCOMBI  NOT =   ZERO)
       *
+                 IF   COMB-KOH1HKNNUM  =  "970"
+                   CONTINUE
+                 ELSE
                    ADD     1     TO     IDX1
                    MOVE    COMB-HKNCOMBINUM
                                  TO     WRK-HKNCOMBINUM(IDX1)
                    PERFORM   210-KYURATE-HENSYU-SEC
+                 END-IF
       *
-                   MOVE   "tbl_hkncombi"   TO  MCP-TABLE
-                   MOVE   "key5"           TO  MCP-PATHNAME
-                   PERFORM 910-HKNCOMBI-READ-SEC
+                 MOVE   "tbl_hkncombi"   TO  MCP-TABLE
+                 MOVE   "key5"           TO  MCP-PATHNAME
+                 PERFORM 910-HKNCOMBI-READ-SEC
                END-PERFORM
            END-IF
       *

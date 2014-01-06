@@ -90,6 +90,7 @@
       *                                     （新診療行為コード対応）
       *
       *  04.07.01    NACL-門脇    11/11/22  同日再入院対応
+      *  04.07.02    NACL-門脇    13/10/02  自賠責（第三者行為）対応
       *****************************************************************
       *
       *
@@ -657,7 +658,7 @@
       *
       *    健保準拠判定
            MOVE      ZERO       TO    FLG-KENPOJYUNKYO
-           IF      AGECHK-HKNKBN =   4  OR  5
+           IF      AGECHK-HKNKBN =   4  OR  5  OR  7
               MOVE      1       TO    FLG-KENPOJYUNKYO
            END-IF
       *

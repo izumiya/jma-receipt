@@ -64,6 +64,8 @@
       *  04.06.05    NACL-ÌçÏÆ    13/02/27  Ê¿À®£²£µÇ¯£´·î²þÀµÂÐ±þ
       *  04.06.06    NACL-ÌçÏÆ    13/09/25  Ï«ºÒ¥Þ¥¹¥¿ÄÉ²ÃÂÐ±þ
       *                                     ¡ÊÅÅÏÃºÆ¿ÇÎÁ¡¡Åù¡Ë
+      *
+      *  04.07.01    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -1246,11 +1248,12 @@
       *
            MOVE      ZERO    TO     FLG-TAISYO
       *
-           IF    (LNK-SYU-SYUHKNNUM(IDY)  =   "971" OR "973"    )
-           AND   (ACCT-SRYKBN             =   "80"              )
-           AND   (ACCT-ZAITEN             =    ZERO             )
-           AND   (ACCT-DAY(SAI-IDX  WRK-SAIKEISAN-DD) NOT = ZERO)
-           AND   (ACCT-JIHOKBN            =    SPACE            )
+           IF    ((LNK-SYU-SYUHKNNUM(IDY)  =   "971" OR "973"    ) OR
+                  (LNK-SYU-KOH1HKNNUM(IDY) =   "970"             ))
+           AND   ( ACCT-SRYKBN             =   "80"               )
+           AND   ( ACCT-ZAITEN             =    ZERO              )
+           AND   ( ACCT-DAY(SAI-IDX  WRK-SAIKEISAN-DD) NOT = ZERO )
+           AND   ( ACCT-JIHOKBN            =    SPACE             )
       *
               PERFORM  44011-SRYACCTPLUS-KENSAKU-SEC
       *
@@ -1796,10 +1799,13 @@
                    PERFORM   DB-CLOSE-SEC
                END-IF
       *
-               IF  LNK-SYU-SYUHKNNUM(IDY)   =   "971"  OR  "973"
-                                                       OR  "975"
-                 IF  (TBL-SRYKBN(IDX1)  = "95" OR "96")
-                 OR  (TBL-ZAIKBN(IDX1)  =  2          )
+               IF  (LNK-SYU-SYUHKNNUM(IDY)   =   "971"  OR  "973"
+                                                        OR  "975")
+               OR  (LNK-SYU-KOH1HKNNUM(IDY)  =   "970"           )
+                 IF  ( TBL-SRYKBN(IDX1)         =   "95" OR "96")
+                 OR  ( TBL-ZAIKBN(IDX1)         =    2          )
+                 OR  ((LNK-SYU-KOH1HKNNUM(IDY)  =   "970"      ) AND
+                      (TBL-SRYKBN(IDX1)     NOT =   "80"       ))
                    CONTINUE                                            
                  ELSE                                                  
                    INITIALIZE                        SRYACT-REC
@@ -1824,7 +1830,11 @@
                      PERFORM   900-SRYACT-READ-SEC
                      PERFORM  UNTIL  (FLG-SRYACT   =    1)
       *                   ÉéÃ´¶â³Û¤Î¼êµ»ÅÀ»»½ÐÅù
-                          PERFORM    44023-SYUTEN-KEISAN-SEC
+                          IF   LNK-SYU-KOH1HKNNUM(IDY)  =   "970"
+                             PERFORM    44026-SYUTEN-KEISAN2-SEC
+                          ELSE
+                             PERFORM    44023-SYUTEN-KEISAN-SEC
+                          END-IF
       *
                           MOVE     "tbl_sryact" TO   MCP-TABLE
                           MOVE     "key2"       TO   MCP-PATHNAME
@@ -1882,6 +1892,17 @@
                            WK-RSIETC-TENSU
              END-IF
              MOVE     WK-RSIETC2    TO   LNK-SYU-RSIETC-MONEY(IDY)
+           END-IF
+      *
+           IF  LNK-SYU-KOH1HKNNUM(IDY)      =   "970"
+             COMPUTE  LNK-SYU-RSIETC-MONEY(IDY) = WK-RSIETC * 10
+             IF   LNK-SYU-RSIETC-MONEY(IDY) NOT = ZERO
+               MOVE   ZERO        TO  WK-RSIETC-TENSU
+               COMPUTE WK-RSIETC-TENSU = LNK-SYU-RSIETC-MONEY(IDY) / 10
+               COMPUTE LNK-SYU-HKNTEN(IDY 11) = LNK-SYU-HKNTEN(IDY 11)
+                                              - WK-RSIETC-TENSU
+             END-IF
+             MOVE     WK-RSIETC2  TO  LNK-SYU-RSIETC-MONEY(IDY)
            END-IF
       *
            IF   LNK-SYU-HKNTEN(IDY 01) >= WRK-SYUG-HKNTEN(01)
@@ -2806,6 +2827,68 @@
            .
       *
        44023-SYUTEN-KEISAN-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    ÉéÃ´¶â³Û¤Î¼êµ»ÅÀ»»½ÐÅù¡ÊÂè»°¼Ô¹Ô°Ù¡Ë
+      **************************************************************
+       44026-SYUTEN-KEISAN2-SEC          SECTION.
+      *
+           PERFORM   VARYING   IDX3   FROM   1   BY   1
+                      UNTIL   (IDX3            >       5)
+                        OR    (SRY-SRYCD(IDX3) =   SPACE)
+      *
+             IF  SRY-SRYCD(IDX3)(1:5) = "09591" OR "09592" OR "09593"
+      *
+               INITIALIZE    TNS-TENSU-REC
+               MOVE    SRY-SRYCD(IDX3)      TO   TNS-SRYCD
+               MOVE    LNK-SYU-HOSPNUM(IDY) TO   TNS-HOSPNUM
+               MOVE    LNK-SYU-SRYYMD(IDY)  TO   TNS-YUKOSTYMD
+               MOVE    LNK-SYU-SRYYMD(IDY)  TO   TNS-YUKOEDYMD
+               PERFORM    900-TENSU-READ-SEC
+               IF      FLG-TENSU   =    ZERO
+      *
+                 COMPUTE  WRK-TEN  =    TNS-TEN  /  10
+      *
+                 IF  SRY-SRYSYUKBN = "809"
+                   COMPUTE WRK-TEN    = SRY-JIHIMONEY(IDX3) / 10
+                   COMPUTE WK-RSIETC  = WK-RSIETC  +
+                          (WRK-TEN    * TBL-ZAIKAISU(IDX1))
+                   COMPUTE WK-RSIETC2 = WK-RSIETC2 +
+                          (SRY-JIHIMONEY(IDX3)
+                                      * TBL-ZAIKAISU(IDX1))
+                 ELSE
+                   COMPUTE WK-RSIETC  = WK-RSIETC  +
+                          (WRK-TEN    * TBL-ZAIKAISU(IDX1))
+                   COMPUTE WK-RSIETC2 = WK-RSIETC2 +
+                          (TNS-TEN    * TBL-ZAIKAISU(IDX1))
+                 END-IF
+      *
+                 IF   IDX5  >= 20
+                   DISPLAY "TABLE OVER"
+                 ELSE
+                   ADD    1   TO  IDX5
+                   MOVE   SRY-SRYCD(IDX3)
+                              TO  LNK-S01-SONOTA-SRYCD(IDY IDX5)
+                   MOVE   TBL-ZAIKAISU(IDX1)
+                              TO  LNK-S01-SONOTA-ZAIKAISU(IDY IDX5)
+                   IF  SRY-SRYSYUKBN = "809"
+                      MOVE SRY-JIHIMONEY(IDX3)
+                              TO  LNK-S01-SONOTA-TANKA(IDY IDX5)
+                   ELSE
+                      MOVE TNS-TEN
+                              TO  LNK-S01-SONOTA-TANKA(IDY IDX5)
+                   END-IF
+                 END-IF
+      *
+               END-IF
+      *
+             END-IF
+      *
+           END-PERFORM
+           .
+      *
+       44026-SYUTEN-KEISAN2-EXT.
            EXIT.
       *
       **************************************************************

@@ -32,6 +32,8 @@
       *  04.05.01    NACL-藤原    11/09/16  公費単独対応
       *                                     公費を最大５０に変更に併せて
       *                                     保険組合せも変更
+      *
+      *  04.07.01    NACL-門脇    13/09/19  自賠責（第三者行為）対応
       *****************************************************************
       *
       *
@@ -51,14 +53,20 @@
            03  FLG-PTINF                   PIC 9(01).
            03  FLG-SRYACCT                 PIC 9(01).
            03  FLG-JYURRK                  PIC 9(01).
+           03  FLG-SRYACCTPLUS             PIC 9(01).
+           03  FLG-HKNCOMBI                PIC 9(01).
            03  FLG-ARI                     PIC 9(01).
            03  FLG-ARI2                    PIC 9(01).
+           03  FLG-NG                      PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                         PIC 9(03).
            03  IDX2                        PIC 9(03).
       *    一時領域
-      *01  WRK-AREA.
+       01  WRK-AREA.
+           03  WRK-HKNCOMBIINF-TABLE.
+             05  WRK-HKNCOMBIINF-OCC       OCCURS  50.
+               07  WRK-HKNCOMBI-DAISANFLG  PIC 9(01).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -75,6 +83,14 @@
       *    受診履歴
        01  JYURRK-REC.
            COPY    "CPJYURRK.INC".
+      *
+      *    診療会計付加情報マスタ−
+       01  SRYACCTPLUS-REC.
+           COPY    "CPSRYACCTPLUS.INC".
+      *
+      *    保険組み合わせ
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -112,7 +128,7 @@ grpsys     COPY    "COMMON-SPA".
       *
            INITIALIZE                  FLG-AREA
            INITIALIZE                  IDX-AREA
-      *    INITIALIZE                  WRK-AREA
+           INITIALIZE                  WRK-AREA
            INITIALIZE                  LNK-ORCSTOTALACCT-OUT-AREA
            MOVE    ZERO          TO    LNK-ORCSTOTALACCT-RC
       *
@@ -241,6 +257,7 @@ grpsys     CALL    "ORCDBMAIN"                  USING MCPAREA
                      IF  IDX     <=    50
                         MOVE   ACCT-HKNCOMBI TO
                                      LNK-ORCSTOTALACCT-HKNCOMBINUM(IDX)
+                        PERFORM   20012-HKNCOMBI-HENSYU-SEC
                         PERFORM   20011-SRYKA-HENSYU-SEC
                      END-IF
                    END-IF
@@ -265,8 +282,16 @@ grpsys     CALL    "ORCDBMAIN"                  USING MCPAREA
       *****************************************************************
        20011-SRYKA-HENSYU-SEC            SECTION.
       *
-           MOVE     ZERO     TO     FLG-ARI2
-           PERFORM VARYING IDX2   FROM    1   BY  1
+           MOVE    ZERO    TO   FLG-NG
+           IF  (WRK-HKNCOMBI-DAISANFLG(IDX)  =   1  )
+           AND (ACCT-SRYKBN                  =  "80")
+           AND (ACCT-ZAIREQFLG               =  "1" )
+               PERFORM 200112-SRYACCTPLUS-KENSAKU-SEC
+           END-IF
+      *
+           IF   FLG-NG  =  ZERO
+             MOVE     ZERO     TO     FLG-ARI2
+             PERFORM VARYING IDX2   FROM    1   BY  1
                     UNTIL (IDX2       >    50)
                       OR  (LNK-ORCSTOTALACCT-SRYKA(IDX IDX2) =  SPACE)
                       OR  (FLG-ARI2   =     1)
@@ -274,13 +299,14 @@ grpsys     CALL    "ORCDBMAIN"                  USING MCPAREA
                        PERFORM 200111-TENSU-KEISAN-SEC
                        MOVE     1     TO     FLG-ARI2
                 END-IF
-           END-PERFORM
-           IF   FLG-ARI2  =   ZERO
+             END-PERFORM
+             IF   FLG-ARI2  =   ZERO
                IF  IDX2  <=    50
                    MOVE   ACCT-SRYKA  TO
                                     LNK-ORCSTOTALACCT-SRYKA(IDX IDX2)
                    PERFORM 200111-TENSU-KEISAN-SEC
                END-IF
+             END-IF
            END-IF
       *
            .
@@ -312,6 +338,79 @@ grpsys     CALL    "ORCDBMAIN"                  USING MCPAREA
       *
            .
        200111-TENSU-KEISAN-EXT.
+           EXIT.
+      *
+      **************************************************************
+      *    診療会計付加情報検索
+      **************************************************************
+       200112-SRYACCTPLUS-KENSAKU-SEC           SECTION.
+      *
+           INITIALIZE                                SRYACCTPLUS-REC
+           MOVE    LNK-ORCSTOTALACCT-HOSPNUM    TO   ACCTP-HOSPNUM
+           MOVE    LNK-ORCSTOTALACCT-NYUGAIKBN  TO   ACCTP-NYUGAIKBN
+           MOVE    LNK-ORCSTOTALACCT-PTID       TO   ACCTP-PTID
+           MOVE    ACCT-SRYKA                   TO   ACCTP-SRYKA
+           MOVE    LNK-ORCSTOTALACCT-SANTEIYM   TO   ACCTP-SRYYM
+           MOVE    ACCT-ZAINUM                  TO   ACCTP-ZAINUM
+           MOVE    1                            TO   ACCTP-RENNUM
+           MOVE    SRYACCTPLUS-REC              TO   MCPDATA-REC
+           MOVE    "tbl_sryacctplus"            TO   MCP-TABLE
+           MOVE    "key"                        TO   MCP-PATHNAME
+           MOVE    "DBSELECT"                   TO   MCP-FUNC
+           CALL    "ORCDBMAIN"                  USING  MCPAREA
+                                                       MCPDATA-REC
+                                                       SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryacctplus"  TO   MCP-TABLE
+               MOVE    "key"              TO   MCP-PATHNAME
+               PERFORM  900-SRYACCTPLUS-READ-SEC
+               IF    FLG-SRYACCTPLUS   =   ZERO
+                 IF   ACCTP-RSIKINGAKU  NOT = ZERO
+                    MOVE    1    TO    FLG-NG
+                 END-IF
+               END-IF
+           END-IF
+           MOVE    "tbl_sryacctplus"  TO   MCP-TABLE
+           MOVE    "key"              TO   MCP-PATHNAME
+           PERFORM 910-DB-CLOSE-SEC
+      *
+           .
+      *
+       200112-SRYACCTPLUS-KENSAKU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組み合わせ情報編集
+      *****************************************************************
+       20012-HKNCOMBI-HENSYU-SEC            SECTION.
+      *
+           INITIALIZE                                HKNCOMBI-REC
+           MOVE    LNK-ORCSTOTALACCT-HOSPNUM    TO   COMB-HOSPNUM
+           MOVE    LNK-ORCSTOTALACCT-PTID       TO   COMB-PTID
+           MOVE    ACCT-HKNCOMBI                TO   COMB-HKNCOMBINUM
+           MOVE    HKNCOMBI-REC                 TO   MCPDATA-REC
+           MOVE    "tbl_hkncombi"               TO   MCP-TABLE
+           MOVE    "key"                        TO   MCP-PATHNAME
+           MOVE    "DBSELECT"                   TO   MCP-FUNC
+           CALL    "ORCDBMAIN"                  USING  MCPAREA
+                                                       MCPDATA-REC
+                                                       SPA-AREA
+           IF      MCP-RC               =       ZERO
+               MOVE    "tbl_hkncombi"   TO      MCP-TABLE
+               MOVE    "key"            TO      MCP-PATHNAME
+               PERFORM  900-HKNCOMBI-READ-SEC
+               IF    FLG-HKNCOMBI   =   ZERO
+                 IF   COMB-KOH1HKNNUM = "970"
+                    MOVE    1    TO    WRK-HKNCOMBI-DAISANFLG(IDX)
+                 END-IF
+               END-IF
+           END-IF
+           MOVE    "tbl_hkncombi"       TO       MCP-TABLE
+           MOVE    "key"                TO       MCP-PATHNAME
+           PERFORM 910-DB-CLOSE-SEC
+      *
+           .
+       20012-HKNCOMBI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -492,6 +591,48 @@ grpsys     CALL    "ORCDBMAIN"         USING  MCPAREA
       *
            .
        900-JYURRK-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療会計付加情報読込
+      *****************************************************************
+       900-SRYACCTPLUS-READ-SEC           SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING  MCPAREA
+                                              MCPDATA-REC
+                                              SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SRYACCTPLUS-REC
+               MOVE    ZERO            TO  FLG-SRYACCTPLUS
+           ELSE
+               INITIALIZE                  SRYACCTPLUS-REC
+               MOVE    1               TO  FLG-SRYACCTPLUS
+           END-IF
+      *
+           .
+       900-SRYACCTPLUS-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    保険組み合わせ情報読込
+      *****************************************************************
+       900-HKNCOMBI-READ-SEC           SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING  MCPAREA
+                                              MCPDATA-REC
+                                              SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+               MOVE    ZERO            TO  FLG-HKNCOMBI
+           ELSE
+               INITIALIZE                  HKNCOMBI-REC
+               MOVE    1               TO  FLG-HKNCOMBI
+           END-IF
+      *
+           .
+       900-HKNCOMBI-READ-EXT.
            EXIT.
       *
       *****************************************************************
