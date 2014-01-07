@@ -249,6 +249,7 @@
            03  WRK-CNT-HKN2            PIC 9(04).
       *
            03  WRK-HKNCOMBI            PIC X(100).
+           03  WRK-HKNCOMBI-2          PIC X(100).
       *
            03  WRK-RENNUM              PIC 9(02).
       *
@@ -1681,13 +1682,19 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                END-STRING
            END-IF
       *
-           MOVE    SPACE               TO  WRK-HKNKBN-MEI
+           MOVE    WRK-HKNCOMBI        TO  SPA-GMN-THKNCOMBIMEI (IDX)
+      *****
+      *****
+      *労災の部位は編集していなかったので、編集なし。要望があれば行う
+           GO      TO      310131-HKNCOMBIMEI-HEN-EXT
+      *****
+      *
       *    労災の時、コメントの追加
            IF      COMB-HKNNUM         =   "971"  OR  "973"
       *        患者保険情報検索
                INITIALIZE                      PTRSIINF-REC
                MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
-               MOVE    SPA-PTID            TO  PTRSI-PTID
+               MOVE    COMB-PTID           TO  PTRSI-PTID
                MOVE    COMB-HKNID          TO  PTRSI-HKNID
                MOVE    PTRSIINF-REC        TO  MCPDATA-REC
                MOVE    "DBSELECT"          TO  MCP-FUNC
@@ -1732,6 +1739,44 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                            "）"                    DELIMITED  BY  SIZE
                            INTO              WRK-HKNCOMBI
                    END-STRING
+               END-IF
+           END-IF
+      *H25.7
+      *    第三者行為
+           IF      COMB-KOH1HKNNUM     =   "970"
+      *        患者保険情報検索
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
+               MOVE    COMB-PTID           TO  PTRSI-PTID
+               MOVE    ZERO                TO  PTRSI-HKNID
+               MOVE    COMB-KOH1ID         TO  PTRSI-KOHID
+      *
+               MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+               MOVE    "DBSELECT"          TO  MCP-FUNC
+               MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   PERFORM 993-PTRSIINF-NEXT-SEC
+      *
+                DISPLAY "FLG-PTRSIINF:" FLG-PTRSIINF
+      *
+               ELSE
+                   INITIALIZE                      PTRSIINF-REC
+                   MOVE    1                   TO  FLG-PTRSIINF
+               END-IF
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+               IF      PTRSI-COMMENT   NOT =   SPACE
+                   MOVE    SPACE               TO  WRK-HKNCOMBI-2
+                   STRING  WRK-HKNCOMBI            DELIMITED  BY  "  "
+                           "（"                    DELIMITED  BY  SIZE
+                           PTRSI-COMMENT(1:24)     DELIMITED  BY  SPACE
+                           "）"                    DELIMITED  BY  SIZE
+                           INTO              WRK-HKNCOMBI-2
+                   END-STRING
+                   MOVE    WRK-HKNCOMBI-2      TO  WRK-HKNCOMBI
                END-IF
            END-IF
       *
@@ -3163,6 +3208,11 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                    IF      COMB-HKNNUM         =   "971"  OR  "973"
                        PERFORM 4101152-RSI-HENSYU-SEC
                    END-IF
+      *H25.7
+      *            第三者行為の時、部位を公費２の項目へ
+                   IF      COMB-KOH1HKNNUM     =   "970"
+                       PERFORM 4101152-DAI3-HENSYU-SEC
+                   END-IF
       *
                END-IF
       *
@@ -3338,6 +3388,9 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
                       (SPA-SYSYMD      <=  PTKOH-TEKEDYMD )      AND
                       (SPA-SYSYMD(1:6) >   PTKOH-KAKUNINYMD(1:6)) AND 
                       (PTKOH-SAKJOKBN  =   SPACE           )
+      *H25.7
+      *            第三者行為対象外
+                 AND  (PTKOH-KOHNUM    NOT =   "970"       )
                    IF      IDX             <   10
       *                未確認公費
                        PERFORM 4101151-KOHMIKAKU-SEC
@@ -3469,6 +3522,45 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
            END-IF
            .
        4101152-RSI-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    第三者行為の時、部位を追加編集処理
+      *****************************************************************
+       4101152-DAI3-HENSYU-SEC           SECTION.
+      *
+           INITIALIZE                      PTRSIINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTRSI-PTID
+           MOVE    ZERO                TO  PTRSI-HKNID
+           MOVE    COMB-KOH1ID         TO  PTRSI-KOHID
+      *
+           MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 993-PTRSIINF-NEXT-SEC
+           ELSE
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    1                   TO  FLG-PTRSIINF
+           END-IF
+           MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      PTRSI-COMMENT   NOT =   SPACE
+               MOVE    SPACE           TO  SPA-GMN-KOH2-TANSEIDONAME
+                                                                   (IDX)
+               STRING  "（"                    DELIMITED  BY  SIZE
+                       PTRSI-COMMENT           DELIMITED  BY  SPACE
+                       "）"                    DELIMITED  BY  SIZE
+                       INTO              SPA-GMN-KOH2-TANSEIDONAME (IDX)
+               END-STRING
+           END-IF
+           .
+       4101152-DAI3-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

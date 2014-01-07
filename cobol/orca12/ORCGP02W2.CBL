@@ -118,6 +118,7 @@
       *  04.06.05    NACL-ÌçÏÆ    13/09/13  À¸ÊÝ¤Ë´Ø¤ï¤ëÊÝ¸±ÁÈ¹ç¤»ºîÀ®½¤Àµ
       *
       *  04.07.01    NACL-ÌçÏÆ    13/07/08  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
+      *  04.07.02    NACL-Â¿¡¹Ç¼  13/10/29  Âè»°¼Ô¹Ô°ÙÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -198,6 +199,7 @@
            03  FLG-HIYATOI         PIC 9(01).
            03  FLG-NYUSYO          PIC 9(01).
            03  FLG-TUUKA           PIC 9(01).
+           03  FLG-DAIRSIFLG       PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -236,6 +238,7 @@
            03  IDX9                PIC 9(04).
            03  IDY2                PIC 9(04).
            03  IDY3                PIC 9(04).
+           03  IDXR                PIC 9(04).
       *
        01  WRK-KCOMB-AREA.
       *      ÁÈ¹ç¤»ÂàÈòÍÑ
@@ -413,6 +416,8 @@
                    07  WRK-KOH-GENHKNNUM2  PIC X(03).
                    07  WRK-KOH-GENHKNNUM3  PIC X(03).
                    07  WRK-KOH-FTNJANUM    PIC X(08).
+      *            Âè»°¼Ô
+                   07  WRK-KOH-JIBAISEIKBN PIC X(01).
       *
            03  WRK-SYOCYO-TEKSTYMD         PIC 9(08).
            03  WRK-SYOCYO-TEKEDYMD         PIC 9(08).
@@ -463,10 +468,16 @@
            03  PTKOH-GENHKNNUM1   PIC X(03).
            03  PTKOH-GENHKNNUM2   PIC X(03).
            03  PTKOH-GENHKNNUM3   PIC X(03).
+      *    Âè»°¼Ô
+           03  PTKOH-JIBAISEIKBN  PIC X(01).
       *
       *    ¥Ñ¥é¥á¥¿
        01  PARA-REC.
            COPY    "CPPARA.INC".
+      *
+      *    ´µ¼ÔÏ«ºÒÊÝ¸±¾ðÊó
+       01  PTRSIINF-REC.
+           COPY    "CPPTRSIINF.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -593,6 +604,7 @@
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+           MOVE    ZERO                TO  FLG-DAIRSIFLG
       *    ¸øÈñ¾ðÊó
            INITIALIZE                      PARA-REC
            MOVE    "P02"               TO  PARA-GYOUMUID
@@ -646,6 +658,11 @@
            MOVE    "tbl_para"          TO  MCP-TABLE
            MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *
+      *    Âè»°¼Ô¹Ô°Ù¡¡ÉéÃ´¶èÊ¬¤Î¼èÆÀ
+           IF      FLG-DAIRSIFLG       =   1
+               PERFORM 3301-DAI3RSIINF-SEC
+           END-IF
       *
            .
        320-PARAFILE-KENSAKU-EXT.
@@ -771,6 +788,11 @@
                MOVE    HKN-GENHKNNUM2   TO  PTKOH-GENHKNNUM2
                MOVE    HKN-GENHKNNUM3   TO  PTKOH-GENHKNNUM3
                MOVE    HKN-TANSEIDONAME TO  PTKOH-SEIDO
+      *
+      *        Âè»°¼Ô¹Ô°Ù¡¡ÉéÃ´¶èÊ¬¤Î¼èÆÀ
+               IF      PTKOH-KOHNUM     =   "970"
+                   MOVE    1                TO  FLG-DAIRSIFLG
+               END-IF
            END-IF
       *
       ****     MOVE    PTKOHINF-REC        TO  PARA-DATA-REC
@@ -796,6 +818,64 @@
       *
            .
        330-KOHINF-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Âè»°¼Ô¹Ô°Ù¡¡ÉéÃ´¶èÊ¬¤Î¼èÆÀ½èÍý
+      *****************************************************************
+       3301-DAI3RSIINF-SEC         SECTION.
+      *
+           INITIALIZE                      PARA-REC
+           MOVE    "P02"               TO  PARA-GYOUMUID
+           MOVE    SPA-TERMID          TO  PARA-TERMID
+           MOVE    "PTRSIINF"          TO  PARA-FILEMEI
+      *
+           MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
+           MOVE    PARA-REC            TO  MCPDATA-REC
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_para"          TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 990-PARA-READ-SEC
+           ELSE
+               INITIALIZE                  PARA-REC
+               MOVE    1               TO  FLG-PARA
+           END-IF
+      *
+           PERFORM
+               UNTIL  (FLG-PARA    NOT =   ZERO      )
+      *
+               MOVE    PARA-DATA-REC       TO  PTRSIINF-REC
+               IF     (PTRSI-HKNKBN        =   "6"    )
+                AND   (PTRSI-SAKUJOKBN     =   SPACE  )
+      *
+                   PERFORM VARYING     IDXR    FROM    1   BY  1
+                           UNTIL       IDXR    >   CNT-KOH
+                       IF      (WRK-KOH-KOHID (IDXR)   =   PTRSI-KOHID)
+                           MOVE    PTRSI-JIBAISEIKBN
+                                               TO  WRK-KOH-JIBAISEIKBN
+                                                              (IDXR)
+      *TEST
+      ***     DISPLAY "P02W2 IDXR:" IDXR
+      ***             ",KOHID:" WRK-KOH-KOHID (IDXR) 
+      ***             ",HKNNUM:" WRK-KOH-HKNNUM (IDXR) 
+      ***             ",JIBAISEIKBN:" WRK-KOH-JIBAISEIKBN (IDXR)
+      *TEST
+                           MOVE    CNT-KOH     TO  IDXR
+                       END-IF
+                   END-PERFORM
+               END-IF
+               MOVE    "tbl_para"          TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 990-PARA-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       3301-DAI3RSIINF-EXT.
            EXIT.
       *
       *****************************************************************
@@ -945,6 +1025,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                 AND  (WRK-LCOMB-TEKEDYMD(IDZ)   >= "20080401")
                   IF  WRK-LCOMB-TEKSTYMD(IDZ)   <  "20080401"
                     MOVE  "20080401"  TO  WRK-LCOMB-TEKSTYMD(IDZ)
+                  END-IF
+                  IF  WRK-LCOMB-DELKBN(IDZ) = "9"
+                    MOVE   SPACE      TO  WRK-LCOMB-DELKBN(IDZ)
                   END-IF
                   ADD     1    TO  WRK-TCOMB2-MAX
                   MOVE    WRK-LCOMB-REC(IDZ)
@@ -2018,39 +2101,45 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *           == 2·ïÌÜ°Ê¹ß == ÊÝ¸±¥Þ¥¹¥¿¤òÈæ³Ó¤·¡¢ÉéÃ´¶èÊ¬¤òÅ¾Á÷
       *           [ÄÌ¾ï]ËÜ¿Í
                   IF  WRK-LCOMB-GAI-FTNKBN(IDX2)      NOT =   "0"
-                      IF  HKN-HON-GAIFTNKBN         =   "0"  OR  "2"
+                      IF  (HKN-HON-GAIFTNKBN          =   "0"  OR  "2")
+                      AND (WRK-LCOMB-DELKBN(IDX2) NOT =   "9"         )
                           MOVE    HKN-HON-GAIFTNKBN
                                          TO  WRK-LCOMB-GAI-FTNKBN(IDX2)
                       END-IF
                   END-IF
                   IF  WRK-LCOMB-NYU-FTNKBN(IDX2)      NOT =   "0"
-                      IF  HKN-HON-NYUFTNKGN          =   "0"  OR  "2"
+                      IF  (HKN-HON-NYUFTNKGN          =   "0"  OR  "2")
+                      AND (WRK-LCOMB-DELKBN(IDX2) NOT =   "9"         )
                           MOVE    HKN-HON-NYUFTNKGN
                                          TO  WRK-LCOMB-NYU-FTNKBN(IDX2)
                       END-IF
                   END-IF
       *           [Äã½êÆÀ]
                   IF  WRK-LCOMB-TSY-GAIFTNKBN(IDX2)   NOT =   "0"
-                      IF  HKN-TSY-GAIFTNKBN      =   "0"  OR  "2"
+                      IF  (HKN-TSY-GAIFTNKBN          =   "0"  OR  "2")
+                      AND (WRK-LCOMB-DELKBN(IDX2) NOT =   "9"         )
                           MOVE    HKN-TSY-GAIFTNKBN
                                  TO  WRK-LCOMB-TSY-GAIFTNKBN(IDX2)
                       END-IF
                   END-IF
                   IF  WRK-LCOMB-TSY-NYUFTNKBN(IDX2)   NOT =   "0"
-                      IF  HKN-TSY-NYUFTNNBK      =   "0"  OR  "2"
+                      IF  (HKN-TSY-NYUFTNNBK          =   "0"  OR  "2")
+                      AND (WRK-LCOMB-DELKBN(IDX2) NOT =   "9"         )
                           MOVE    HKN-TSY-NYUFTNNBK
                               TO  WRK-LCOMB-TSY-NYUFTNKBN(IDX2)
                       END-IF
                   END-IF
       *           [ÄãÇ¯¶â]
                   IF  WRK-LCOMB-TNK-GAIFTNKBN(IDX2)   NOT =   "0"
-                      IF  HKN-TNK-GAIFTNKBN      =   "0"  OR  "2"
+                      IF  (HKN-TNK-GAIFTNKBN          =   "0"  OR  "2")
+                      AND (WRK-LCOMB-DELKBN(IDX2) NOT =   "9"         )
                           MOVE    HKN-TNK-GAIFTNKBN
                               TO  WRK-LCOMB-TNK-GAIFTNKBN(IDX2)
                       END-IF
                   END-IF
                   IF  WRK-LCOMB-TNK-NYUFTNKBN(IDX2)   NOT =   "0"
-                      IF  HKN-TNK-NYUFTNKBN      =   "0"  OR  "2"
+                      IF  (HKN-TNK-NYUFTNKBN          =   "0"  OR  "2")
+                      AND (WRK-LCOMB-DELKBN(IDX2) NOT =   "9"         )
                           MOVE    HKN-TNK-NYUFTNKBN
                               TO  WRK-LCOMB-TNK-NYUFTNKBN(IDX2)
                       END-IF
@@ -2269,16 +2358,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                  END-IF
              END-IF
       *
-             IF  WRK-LCOMB-GAI-KFTNRATE(IDX2)      =   ZERO
+             IF  WRK-LCOMB-DELKBN(IDX2)  NOT =   "9"
+              IF  WRK-LCOMB-GAI-KFTNRATE(IDX2)      =   ZERO
                 MOVE    HKN-HON-GAIKFTNRATE
                         TO  WRK-LCOMB-GAI-KFTNRATE(IDX2)
-             ELSE
+              ELSE
                 IF  (HKN-HON-GAIKFTNRATE     >   ZERO )    AND
                     (HKN-HON-GAIKFTNRATE
                          <   WRK-LCOMB-GAI-KFTNRATE(IDX2))
                   MOVE  HKN-HON-GAIKFTNRATE
                          TO  WRK-LCOMB-GAI-KFTNRATE(IDX2)
                 END-IF
+              END-IF
              END-IF
       *****  IF  WRK-LCOMB-GAI-KFTNRATE(IDX2)      =   ZERO
       *         MOVE    WRK-GAIKFTNRATE
@@ -2403,15 +2494,17 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                                   (IDX2)
                  END-IF
              END-IF
-             IF  WRK-LCOMB-NYU-KFTNRATE(IDX2)      =   ZERO
+             IF  WRK-LCOMB-DELKBN(IDX2)  NOT =   "9"
+              IF  WRK-LCOMB-NYU-KFTNRATE(IDX2)      =   ZERO
                 MOVE    HKN-HON-NYUKFTNRATE
                      TO  WRK-LCOMB-NYU-KFTNRATE(IDX2)
-             ELSE
+              ELSE
                IF  (HKN-HON-NYUKFTNRATE     >   ZERO )    AND
                   (HKN-HON-NYUKFTNRATE < WRK-LCOMB-NYU-KFTNRATE(IDX2))
                  MOVE  HKN-HON-NYUKFTNRATE
                     TO  WRK-LCOMB-NYU-KFTNRATE(IDX2)
                END-IF
+              END-IF
              END-IF
      ****    IF  WRK-LCOMB-NYU-KFTNRATE(IDX2)      =   ZERO
       *         MOVE    WRK-GAIKFTNRATE
@@ -2495,16 +2588,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                INITIALIZE        WRK-LCOMB-TSY-GAI-NAIYO (IDX2)
            ELSE
       *   <²ó¡ÝÉéÃ´³ä¹ç>
-             IF  WRK-LCOMB-TSY-GAIKFTNRATE(IDX2)  =   ZERO
+             IF  WRK-LCOMB-DELKBN(IDX2)  NOT =   "9"
+              IF  WRK-LCOMB-TSY-GAIKFTNRATE(IDX2)  =   ZERO
                MOVE    HKN-TSY-GAIKFTNRATE
                       TO  WRK-LCOMB-TSY-GAIKFTNRATE(IDX2)
-             ELSE
+              ELSE
                IF  (HKN-TSY-GAIKFTNRATE   >   ZERO )    AND
                    (HKN-TSY-GAIKFTNRATE
                       <   WRK-LCOMB-TSY-GAIKFTNRATE(IDX2))
                  MOVE  HKN-TSY-GAIKFTNRATE
                      TO  WRK-LCOMB-TSY-GAIKFTNRATE(IDX2)
                END-IF
+              END-IF
              END-IF
       *   <²ó¡Ý¸ÇÄê³Û>
              IF  WRK-LCOMB-TSY-GAIKKOTGAK(IDX2) =   ZERO
@@ -2596,16 +2691,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                INITIALIZE        WRK-LCOMB-TSY-NYU-NAIYO (IDX2)
            ELSE
       *   <²ó¡ÝÉéÃ´³ä¹ç>
-             IF  WRK-LCOMB-TSY-NYUKFTNRATE(IDX2)   =   ZERO
+             IF  WRK-LCOMB-DELKBN(IDX2)  NOT =   "9"
+              IF  WRK-LCOMB-TSY-NYUKFTNRATE(IDX2)   =   ZERO
                MOVE    HKN-TSY-NYUKFTNRATE
                    TO  WRK-LCOMB-TSY-NYUKFTNRATE(IDX2)
-             ELSE
+              ELSE
                IF  (HKN-TSY-NYUKFTNRATE  >   ZERO )    AND
                    (HKN-TSY-NYUKFTNRATE
                          <   WRK-LCOMB-TSY-NYUKFTNRATE(IDX2))
                  MOVE  HKN-TSY-NYUKFTNRATE
                          TO  WRK-LCOMB-TSY-NYUKFTNRATE(IDX2)
                END-IF
+              END-IF
              END-IF
       *   <²ó¡Ý¸ÇÄê³Û>
              IF  WRK-LCOMB-TSY-NYUKKOTGAK(IDX2)    =   ZERO
@@ -2684,16 +2781,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                INITIALIZE        WRK-LCOMB-TNK-GAI-NAIYO (IDX2)
            ELSE
       *   <²ó¡ÝÉéÃ´³ä¹ç>
-             IF  WRK-LCOMB-TNK-GAIKFTNRATE(IDX2)  =   ZERO
+             IF  WRK-LCOMB-DELKBN(IDX2)  NOT =   "9"
+              IF  WRK-LCOMB-TNK-GAIKFTNRATE(IDX2)  =   ZERO
                MOVE    HKN-TNK-GAIKFTNRATE
                       TO  WRK-LCOMB-TNK-GAIKFTNRATE(IDX2)
-             ELSE
+              ELSE
                IF  (HKN-TNK-GAIKFTNRATE   >   ZERO )    AND
                    (HKN-TNK-GAIKFTNRATE
                       <   WRK-LCOMB-TNK-GAIKFTNRATE(IDX2))
                  MOVE  HKN-TNK-GAIKFTNRATE
                      TO  WRK-LCOMB-TNK-GAIKFTNRATE(IDX2)
                END-IF
+              END-IF
              END-IF
       *   <²ó¡Ý¸ÇÄê³Û>
              IF  WRK-LCOMB-TNK-GAIKKOTGAK(IDX2) =   ZERO
@@ -2785,16 +2884,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                INITIALIZE        WRK-LCOMB-TNK-NYU-NAIYO (IDX2)
            ELSE
       *   <²ó¡ÝÉéÃ´³ä¹ç>
-             IF  WRK-LCOMB-TNK-NYUKFTNRATE(IDX2)   =   ZERO
+             IF  WRK-LCOMB-DELKBN(IDX2)  NOT =   "9"
+              IF  WRK-LCOMB-TNK-NYUKFTNRATE(IDX2)   =   ZERO
                MOVE    HKN-TNK-NYUKFTNRATE
                    TO  WRK-LCOMB-TNK-NYUKFTNRATE(IDX2)
-             ELSE
+              ELSE
                IF  (HKN-TNK-NYUKFTNRATE  >   ZERO )    AND
                    (HKN-TNK-NYUKFTNRATE
                          <   WRK-LCOMB-TNK-NYUKFTNRATE(IDX2))
                  MOVE  HKN-TNK-NYUKFTNRATE
                          TO  WRK-LCOMB-TNK-NYUKFTNRATE(IDX2)
                END-IF
+              END-IF
              END-IF
       *   <²ó¡Ý¸ÇÄê³Û>
              IF  WRK-LCOMB-TNK-NYUKKOTGAK(IDX2)    =   ZERO
@@ -2926,7 +3027,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                 END-IF
               END-IF
            WHEN    "1"
-              IF  HKN-HON-NYUSKJRYYKBN      =   "3"  OR  "0"  OR  "2"
+              IF  (HKN-HON-NYUSKJRYYKBN       =  "3"  OR  "0"  OR  "2")
+              AND (WRK-LCOMB-DELKBN(IDX2) NOT =  "9"                  )
                 IF  (IDA                    =    1 )
                 AND (HKN-HON-NYUSKJRYYKBN   =   "0")
                   CONTINUE
@@ -2987,7 +3089,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                 END-IF
               END-IF
            WHEN    "1"
-              IF  HKN-TSY-NYUSKJRYYKBN   =   "3"  OR  "0"  OR  "2"
+              IF  (HKN-TSY-NYUSKJRYYKBN       =  "3"  OR  "0"  OR  "2")
+              AND (WRK-LCOMB-DELKBN(IDX2) NOT =  "9"                  )
                 IF  (IDA                    =    1 )
                 AND (HKN-TSY-NYUSKJRYYKBN   =   "0")
                   CONTINUE
@@ -3048,7 +3151,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                 END-IF
               END-IF
            WHEN    "1"
-              IF  HKN-TNK-NYUSKJRYYKBN    =   "3"  OR  "0"  OR  "2"
+              IF  (HKN-TNK-NYUSKJRYYKBN       =  "3"  OR  "0"  OR  "2")
+              AND (WRK-LCOMB-DELKBN(IDX2) NOT =  "9"                  )
                 IF  (IDA                    =    1 )
                 AND (HKN-TNK-NYUSKJRYYKBN   =   "0")
                   CONTINUE
@@ -3553,9 +3657,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                      TO  WRK-KCOMB-KOH1PAYKBN   (IDX2)
            MOVE    WRK-KOH-SEIDO  (IDX)
                                   TO  WRK-KCOMB-KOH1-TANSEIDONAME(IDX2)
-      *    ------------------------------------
            MOVE    WRK-KOH-SBT  (IDX)
                                   TO  WRK-KCOMB-KOH1-HKNKOHSBTKBN(IDX2)
+      *
+           IF  (WRK-KOH-HKNNUM(IDX)       = "970")
+           AND (WRK-KOH-JIBAISEIKBN(IDX)  = "1"  )
+             MOVE  "9"               TO  WRK-KCOMB-DELKBN(IDX2)
+           END-IF
       *
       *    [¼çÊÝ¸± ³«»ÏÆü]¡å[¼ç¸øÈñ ³«»ÏÆü]
            IF  WRK-HKN-TEKSTYMD(WRK-COMB-SYUHOIDX)

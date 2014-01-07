@@ -45,6 +45,7 @@
       *  04.06.00    NACL-多々納  10/09/10  分娩管理テーブル削除対応
       *  04.06.00    NACL-多々納  10/11/05  発行日変更対応
       *  04.07.00    NACL-多々納  11/08/XX  算定履歴付加テーブル削除対応
+      *  04.07.00    NACL-多々納  13/07/XX  第三者行為対応
       *****************************************************************
       *
       *
@@ -649,19 +650,25 @@
                IF      FLG-FUKU-FLG            =   1
                    MOVE    ZERO                TO  WRK-SRYKA
       *            複数科まとめ収納作成
-                   PERFORM 1004-DBKOUSIN-SYUTTL-SEC
+                   IF      SPA-ERRCD           =   SPACE
+                       PERFORM 1004-DBKOUSIN-SYUTTL-SEC
+                   END-IF
                END-IF
            END-PERFORM
       *    内服７種類逓減の診療会計附加情報追加
-           PERFORM 4504-SRYACCTPLUS-GENINS-SEC
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4504-SRYACCTPLUS-GENINS-SEC
+           END-IF
       *!!!!
-           IF      SPA-SYORIFLG        =   1
+           IF     (SPA-SYORIFLG        =   1    )
+              AND (SPA-ERRCD           =   SPACE)
       *        リハビリ開始日の履歴付加削除
                PERFORM 45005-SANTEIPLUS-DEL-SEC
            END-IF
       *!!!!
       *
-           IF      SPA-SYORIFLG        =   1
+           IF     (SPA-SYORIFLG        =   1    )
+              AND (SPA-ERRCD           =   SPACE)
       *        訂正の時、前回の削除分を削除する
                PERFORM 45004-ALL-JYURRK-UPD-SEC
            END-IF
@@ -2064,6 +2071,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        ELSE
                            MOVE    "1"                 TO  JYURRK-HKNKBN
                        END-IF
+      *
+                   WHEN    "6"
+      *                自賠責（第三者行為）
+                       MOVE    "7"             TO  JYURRK-HKNKBN
                END-EVALUATE
            END-IF
       *    公害保険
@@ -2766,6 +2777,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "6"
       *            公害
                    MOVE    "2"             TO  SSANTEI-HKNKBN
+      *
+               WHEN    "7"
+      *            自賠責（第三者行為）
+                   MOVE    "1"             TO  SSANTEI-HKNKBN
+                   MOVE    "6"             TO  SSANTEI-RSI-HKNKBN
+                   MOVE    "1"             TO  SSANTEI-RSI-JUNKYO
            END-EVALUATE
            CALL    "ORCSSANTEI"        USING
                                        ORCSSANTEIAREA
@@ -3132,7 +3149,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-IF
       *
       *    診療行為マスター処理 
-           IF      FLG-SINKI           =   1
+           IF     (FLG-SINKI           =   1     )
+             AND  (SPA-ERRCD           =   SPACE )
                PERFORM 4501-SRYACT-SYORI-SEC
            END-IF
       *
@@ -3140,6 +3158,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    診療会計附加情報処理 
            IF     (FLG-SINKI           =   1 )  AND
                   (LNK-WKSRYP-ADDKBN(01)   =   "1"  )
+             AND  (SPA-ERRCD           =   SPACE )
                PERFORM 4503-SRYACCTPLUS-SYORI-SEC
            END-IF
       *!!
@@ -5329,6 +5348,10 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                        ELSE
                            MOVE    "1"             TO  LNK-UPD-HKNKBN
                        END-IF
+      *
+                   WHEN    "6"
+      *                自賠責（第三者行為）
+                       MOVE    "7"             TO  LNK-UPD-HKNKBN
                END-EVALUATE
            END-IF
       *    公害保険

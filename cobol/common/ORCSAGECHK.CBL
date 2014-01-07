@@ -57,6 +57,7 @@
       *                                     （残留邦人）
       * 04.05.00     NACL-多々納  09/08/11  退職国保の６５歳以上判定追加
       * 04.05.00     NACL-多々納  10/08/24  高齢者非該当追加
+      * 04.08.00     NACL-多々納  13/07/XX  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -498,6 +499,11 @@
       *    公害
            IF      COMB-HKNNUM         =   "975"
                MOVE    6               TO  AGECHK-HKNKBN
+           END-IF
+      *H25.7
+      *    第三者行為
+           IF     (COMB-KOH1HKNNUM     =   "970" )
+               MOVE    7               TO  AGECHK-HKNKBN
            END-IF
       *
            IF      AGECHK-NYUGAIKBN    =   "1"

@@ -35,7 +35,7 @@
       *  04.05.00    NACL-多々納  09/06/XX  数量小数５桁対応
       *  04.05.00    NACL-多々納  09/11/XX  移行履歴、リハビリコメント登録対応、登録変更対応
       *  04.07.00    NACL-多々納  13/02/XX  労災レセ電コード対応(H25.7)
-      *  04.07.00    NACL-多々納  13/XX/XX  第三者行為対応
+      *  04.07.00    NACL-多々納  13/07/XX  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -700,55 +700,63 @@
            END-IF
       *ver.4.7
       *    第三者行為
-      *    IF      COMB-KOH1HKNNUM     =   "970"
+           IF      COMB-KOH1HKNNUM     =   "970"
       *        患者保険情報検索
-      *        INITIALIZE                      PTRSIINF-REC
-      *        MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
-      *        MOVE    SPA-PTID            TO  PTRSI-PTID
-      *        MOVE    ZERO                TO  PTRSI-HKNID
-      *        MOVE    COMB-KOH1ID         TO  PTRSI-KOHID
-      *        MOVE    PTRSIINF-REC        TO  MCPDATA-REC
-      *        MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
-      *        MOVE    "key"               TO  MCP-PATHNAME
-      *        PERFORM 910-DBSELECT-SEC
-      *        IF      MCP-RC              =   ZERO
-      *            MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
-      *            MOVE    "key"               TO  MCP-PATHNAME
-      *            PERFORM 993-PTRSIINF-NEXT-SEC
-      *        ELSE
-      *            INITIALIZE                      PTRSIINF-REC
-      *            MOVE    1                   TO  FLG-PTRSIINF
-      *        END-IF
-      *        MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
-      *        MOVE    "key"               TO  MCP-PATHNAME
-      *        PERFORM 990-DBCLOSE-SEC
+               INITIALIZE                      PTRSIINF-REC
+               MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
+               MOVE    SPA-PTID            TO  PTRSI-PTID
+               MOVE    ZERO                TO  PTRSI-HKNID
+               MOVE    COMB-KOH1ID         TO  PTRSI-KOHID
+               MOVE    PTRSIINF-REC        TO  MCPDATA-REC
+               MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   PERFORM 993-PTRSIINF-NEXT-SEC
+               ELSE
+                   INITIALIZE                      PTRSIINF-REC
+                   MOVE    1                   TO  FLG-PTRSIINF
+               END-IF
+               MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
       *        名称編集
-      *        IF      PTRSI-COMMENT   NOT =   SPACE
+               IF      PTRSI-COMMENT   NOT =   SPACE
       *            保険＋公費１のみとなる
-      *            MOVE    SPACE               TO  WRK-HKNCOMBIMEI
-      *            STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
-      *                    " "                     DELIMITED  BY  SIZE
-      *                    COMB-KOH1-TANSEIDONAME  DELIMITED  BY  SPACE
-      *                    "（"                    DELIMITED  BY  SIZE
-      *                    PTRSI-COMMENT(1:24)     DELIMITED  BY  SPACE
-      *                    "）"                    DELIMITED  BY  SIZE
-      *                    INTO              WRK-HKNCOMBIMEI
-      *            END-STRING
+                   MOVE    SPACE               TO  WRK-HKNCOMBIMEI
+                   STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
+                           " "                     DELIMITED  BY  SIZE
+                           COMB-KOH1-TANSEIDONAME  DELIMITED  BY  SPACE
+                           "（"                    DELIMITED  BY  SIZE
+                           PTRSI-COMMENT(1:24)     DELIMITED  BY  SPACE
+                           "）"                    DELIMITED  BY  SIZE
+                           INTO              WRK-HKNCOMBIMEI
+                   END-STRING
       *            保険組合せ名は２０バイト
-      *            INITIALIZE                  ORCSKANACHKAREA
-      *            MOVE    "1"                 TO  KANACHK-SYORI
-      *            MOVE    WRK-HKNCOMBIMEI     TO  KANACHK-MAE-INPUT
-      *            MOVE    20                  TO  KANACHK-MAX-CNT
-      *            CALL    "ORCSKANACHK"       USING
-      *                                        ORCSKANACHKAREA
-      *            MOVE    KANACHK-MAE-INPUT   TO  WRK-HKNCOMBIMEI
-      *        END-IF
+                   INITIALIZE                  ORCSKANACHKAREA
+                   MOVE    "1"                 TO  KANACHK-SYORI
+                   MOVE    WRK-HKNCOMBIMEI     TO  KANACHK-MAE-INPUT
+                   MOVE    20                  TO  KANACHK-MAX-CNT
+                   CALL    "ORCSKANACHK"       USING
+                                               ORCSKANACHKAREA
+                   MOVE    KANACHK-MAE-INPUT   TO  WRK-HKNCOMBIMEI
+               END-IF
       *        傷病年月日と療養開始日判定
-      *        IF     (PTRSI-SHOBYOYMD     NOT =   SPACE  )  AND
-      *               (PTRSI-SHOBYOYMD         <   COMB-TEKSTYMD)
-      *            MOVE    PTRSI-SHOBYOYMD     TO  WRK-COMB-TEKSTYMD
-      *        END-IF
-      ****END-IF
+               IF     (PTRSI-SHOBYOYMD     NOT =   SPACE  )  AND
+                      (PTRSI-SHOBYOYMD         <   COMB-TEKSTYMD)
+                   MOVE    PTRSI-SHOBYOYMD     TO  WRK-COMB-TEKSTYMD
+               END-IF
+          END-IF
+      *   保険組合せ名は２０バイト
+          INITIALIZE                  ORCSKANACHKAREA
+          MOVE    "1"                 TO  KANACHK-SYORI
+          MOVE    WRK-HKNCOMBIMEI     TO  KANACHK-MAE-INPUT
+          MOVE    20                  TO  KANACHK-MAX-CNT
+          CALL    "ORCSKANACHK"       USING
+                                          ORCSKANACHKAREA
+          MOVE    KANACHK-MAE-INPUT   TO  WRK-HKNCOMBIMEI
            .
        31011-HKNCOMBI-SET-EXT.
            EXIT.
@@ -1182,9 +1190,9 @@
       *
       *    保険組合せの変更はエラー
            IF     (SPA-ERRCD           =   SPACE )
-              AND (SPA-GMN-RENNUM      >   ZERO  )
-               IF      SPA-GMN-HKNCOMBI    NOT =   SPA-NAI-THKNCOMBI
-                                                    (SPA-GMN-RENNUM)
+             AND  (SPA-GMN-RENNUM      >   ZERO  )
+               IF      SPA-GMN-HKNCOMBI NOT =   SPA-NAI-THKNCOMBI
+                                                       (SPA-GMN-RENNUM)
                    MOVE    "0033"              TO  SPA-ERRCD
                    MOVE    5                   TO  SPA-GMN-CUR
                    GO      TO      4109-HKNCOMBI-CHK-EXT

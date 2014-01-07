@@ -43,6 +43,7 @@
       *  04.05.00    NACL-多々納  09/10/XX  換算値・関連コメント対応
       *  04.07.00    NACL-多々納  11/08/XX  算定履歴付加テーブル削除対応
       *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
+      *  04.07.00    NACL-多々納  13/07/XX  第三者行為対応
       *****************************************************************
       *
       *
@@ -2305,6 +2306,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        ELSE
                            MOVE    "1"                 TO  JYURRK-HKNKBN
                        END-IF
+      *
+                   WHEN    "6"
+      *                自賠責（第三者行為）
+                       MOVE    "7"             TO  JYURRK-HKNKBN
                END-EVALUATE
            END-IF
       *    公害保険
@@ -2775,6 +2780,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "6"
       *            公害
                    MOVE    "2"             TO  SSANTEI-HKNKBN
+      *
+               WHEN    "7"
+      *            自賠責（第三者行為）
+                   MOVE    "1"             TO  SSANTEI-HKNKBN
+                   MOVE    "6"             TO  SSANTEI-RSI-HKNKBN
+                   MOVE    "1"             TO  SSANTEI-RSI-JUNKYO
            END-EVALUATE
            CALL    "ORCSSANTEI"        USING
                                        ORCSSANTEIAREA

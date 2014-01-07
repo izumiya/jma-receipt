@@ -63,6 +63,7 @@
       *  04.07.00    NACL-多々納  12/04/09  Ｈ２４年４月改正対応
       *                                     （一般名記載編集）
       *  04.07.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
+      *  04.07.00    NACL-多々納  13/10/XX  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1077,6 +1078,10 @@
                        MOVE    1               TO  FLG-KAKU-FLG
                        PERFORM 4503-HOUKATU-SYORI-SEC
                    END-IF
+      *        第三者行為確認
+               WHEN    "1001"
+      *            プレビュー処理
+                   PERFORM 4130-PREVIEW-SEC
            END-EVALUATE
            MOVE    SPACE               TO  SPA-KIDCD
       *
@@ -1615,6 +1620,9 @@
                MOVE    SRT-WKSRYACT-REC (IDX2) TO  WRK-WKSRYACT-REC
                MOVE    WRK-WKSRYACT-REC    TO  PARA-DATA-REC02
                WRITE   PARA-REC02
+               IF      STS-PARA02      NOT =  ZERO
+                   MOVE    "0051"             TO  SPA-ERRCD
+               END-IF
       *
            END-PERFORM
       *    剤毎に処理を行う
@@ -3875,7 +3883,9 @@
       *    自賠責の時、システム管理検索
            IF      (SPA-HKNKBN         =   1   )  AND
                    (SPA-RSI-HKNKBN     =   "4"
-                                       OR  "5"  )
+                                       OR  "5"
+      *             第三者行為追加
+                                       OR  "6"  ) 
                PERFORM 4500-RSI-SYSKANRI-SEC
            END-IF
       *
@@ -3962,6 +3972,9 @@
                IF      HZN-PARA-DATA-REC (IDY) NOT =   SPACE
                    MOVE    HZN-PARA-REC(IDY)   TO  PARA-REC
                    WRITE                       PARA-REC
+                   IF      STS-PARA        NOT =  ZERO
+                       MOVE    "0051"             TO  SPA-ERRCD
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -3978,6 +3991,9 @@
                MOVE    LNK-SYUNOU2-REC(IDX)
                                            TO  PARA-DATA-REC
                WRITE                       PARA-REC
+               IF      STS-PARA        NOT =  ZERO
+                   MOVE    "0051"             TO  SPA-ERRCD
+               END-IF
            END-PERFORM
       *
            CLOSE                       PARA-FILE
@@ -4065,6 +4081,9 @@
                    MOVE    LNK-WKSRYACT-REC (IDX) TO  WRK-WKSRYACT-REC
                    MOVE    WRK-WKSRYACT-REC    TO  PARA-DATA-REC
                    WRITE                       PARA-REC
+                   IF      STS-PARA        NOT =  ZERO
+                       MOVE    "0051"             TO  SPA-ERRCD
+                   END-IF
                ELSE
                    MOVE    SPACE               TO  LNK-WKSRYACT-REC(IDX)
                    INITIALIZE                      LNK-WKSRYACT-REC(IDX)
@@ -4689,7 +4708,9 @@
       *            自賠責の時、技術点を集計する
                    IF      (SPA-HKNKBN         =   1   )  AND
                            (SPA-RSI-HKNKBN     =   "4"
-                                               OR  "5"  ) 
+                                               OR  "5"
+      *                    第三者行為追加
+                                               OR  "6"  ) 
       ************   AND   (LNK-WKSRY-SYUTEN1 (IDX)    >   ZERO )
                        PERFORM 45052-JIBAI-SYORI-SEC
                    END-IF
@@ -5394,6 +5415,9 @@
                IF      HZN-PARA-DATA-REC (IDY) NOT =   SPACE
                    MOVE    HZN-PARA-REC(IDY)   TO  PARA-REC
                    WRITE                       PARA-REC
+                   IF      STS-PARA        NOT =  ZERO
+                       MOVE    "0051"             TO  SPA-ERRCD
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -5752,6 +5776,9 @@
                IF      HZN-PARA-DATA-REC (IDY) NOT =   SPACE
                    MOVE    HZN-PARA-REC(IDY)   TO  PARA-REC
                    WRITE                       PARA-REC
+                   IF      STS-PARA        NOT =  ZERO
+                       MOVE    "0051"             TO  SPA-ERRCD
+                   END-IF
                END-IF
            END-PERFORM
       *
@@ -6223,6 +6250,15 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                ELSE
                    PERFORM 40102-PREVIEW-GAI-SEC
                END-IF
+      *!!!
+      *        第三者行為の時、保険確認
+               IF      (SPA-HKNKBN         =   1   )  AND
+                       (SPA-RSI-HKNKBN     =  "6"  ) 
+                  AND  (SPA-ERRCD          =   SPACE)
+                   MOVE    "1001"          TO  SPA-KIDCD
+                   GO      TO      4010-PREVIEW-SYORI-EXT
+               END-IF
+      *!!!
                IF      SPA-ERRCD           =   SPACE
       *            プレビュー処理
                    PERFORM 4130-PREVIEW-SEC
@@ -6556,6 +6592,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-HKNKBN          =   "2"
                MOVE    "3"                 TO  WRK-PRV-HKNKBN
            END-IF
+      *H25.10
+      *    第三者行為
+           IF     (SPA-HKNKBN          =   "1"  )  AND
+                  (SPA-RSI-HKNKBN      =   "6"  )
+               IF      (SPA-KID1-FLG        =   "OK" )
+                   MOVE    "4"                 TO  WRK-PRV-HKNKBN
+               ELSE
+      *            健保
+                   MOVE    "0"                 TO  WRK-PRV-HKNKBN
+                   MOVE    "0"                 TO  WRK-PRV-RSI-HKNKBN
+               END-IF
+           END-IF
+      *
       *    レセプトプレビュー区分
            MOVE    SPA-NAI-RESPRVFLG   TO  WRK-PRV-KBN
       *ver.4.7
@@ -6968,7 +7017,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SPA-ERRMSG
                WHEN    "0051"
                    STRING  "中間データに不整合が発生しました。"
-                           "再度、診療行為から入力して下さい。"
+      *H26.1 ***********   "再度、診療行為から入力して下さい。"
+                           "再度、診療行為へ戻って下さい。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
@@ -7078,6 +7128,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  WRK-KIDMSG
                    MOVE    "よろしいですか？"
                                        TO  WRK-KIDMSG(35:)
+               WHEN    "1001"
+                   STRING  "第三者行為の保険組合せです。"
+                           "ＯＫで第三者をＮＯで健保の処理を行います。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  WRK-KIDMSG
+                   END-STRING
                WHEN    OTHER
                    MOVE    SPA-KIDCD
                                        TO  WRK-KIDMSG
@@ -7091,6 +7147,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "ＯＫ"              TO  KID1-B12
            EVALUATE    SPA-KIDCD
                WHEN    "0101"
+               WHEN    "1001"
                    MOVE    "ＮＯ"            TO  KID1-B01
            END-EVALUATE
       *

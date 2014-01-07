@@ -4102,6 +4102,10 @@
            MOVE    SPACE               TO  I4ID1
            MOVE    SPA-IIDCD           TO  I4ID1-ID1CODE
            MOVE    WRK-I4IDMSG         TO  I4ID1-ID1MSG
+      *
+           MOVE    "Ã·§Î"              TO  I4ID1-B01
+           MOVE    "£œ£À"              TO  I4ID1-B12
+      *
            MOVE    "B12"               TO  MCP-WIDGET
       *
            MOVE    "I47"               TO  SPA-MOTOPG

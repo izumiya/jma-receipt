@@ -39,6 +39,7 @@
       * 04.05.00     NACL-多々納  10/01/XX  治験対応
       * 04.06.00     NACL-太田    10/08/30  補助区分、本人家族区分追加
       * 04.06.00     NACL-多々納  10/09/29  入院・外来非該当対応
+      * 04.08.00     NACL-多々納  13/07/XX  第三者行為対応
       *****************************************************************
       *
       *
@@ -295,16 +296,20 @@
                    MOVE    1                   TO  FLG-HKNCOMBIERR
                ELSE
       *            非表示分は処理区分３＝１ のときのみ対象
+      *                      処理区分３＝２　第三者行為のみ対象外追加
                    IF      COMB-HYOJIKBN       =   "1"
                        IF      ORCSHKN-KBN3        =   "1"
+                                                   OR  "2"
                            CONTINUE
                        ELSE
                            MOVE    1               TO  FLG-HKNCOMBIERR
                        END-IF
                    END-IF
       *            入院非表示分は外来・処理区分３＝１ のときのみ対象
+      *                      処理区分３＝２　第三者行為のみ対象外追加
                    IF      COMB-HYOJIKBN       =   "2"
                        IF     (ORCSHKN-KBN3        =   "1" )
+                         OR   (ORCSHKN-KBN3        =   "2" )
                          OR   (SPA-NYUGAIKBN       =   "2" )
                            CONTINUE
                        ELSE
@@ -312,8 +317,10 @@
                        END-IF
                    END-IF
       *            外来非表示分は入院・処理区分３＝１ のときのみ対象
+      *                      処理区分３＝２　第三者行為のみ対象外追加
                    IF      COMB-HYOJIKBN       =   "3"
                        IF     (ORCSHKN-KBN3        =   "1" )
+                         OR   (ORCSHKN-KBN3        =   "2" )
                          OR   (SPA-NYUGAIKBN       =   "1" )
                            CONTINUE
                        ELSE
@@ -343,9 +350,19 @@
                        END-IF
                    END-IF
                END-IF
+      *H25.7
+      *        処理区分３＝２の時、第三者行為は対象外
+               IF     (FLG-HKNCOMBICHK     =    1    )  AND
+                      (ORCSHKN-KBN3        =   "2"   )
+                   IF      COMB-KOH1HKNNUM     =   "970" 
+                       MOVE    ZERO            TO  FLG-HKNCOMBICHK
+                   END-IF
+               END-IF
+      *
       *        労災・自賠責保険検索
                IF     (FLG-HKNCOMBICHK     =    1    )  AND
-                      (COMB-HKNNUM         =   "971"  OR  "973")
+                     ((COMB-HKNNUM         =   "971"  OR  "973")
+                  OR  (COMB-KOH1HKNNUM     =   "970"   ))
                    PERFORM 1100-PTRSIINF-CHK-SEC
                    IF      FLG-PTRSIINF        =   1
                        MOVE    ZERO            TO  FLG-HKNCOMBICHK
@@ -381,6 +398,12 @@
            MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
            MOVE    SPA-PTID            TO  PTRSI-PTID
            MOVE    COMB-HKNID          TO  PTRSI-HKNID
+      *    第三者行為
+           IF      COMB-KOH1HKNNUM     =   "970"
+               MOVE    COMB-KOH1ID         TO  PTRSI-KOHID
+               MOVE    ZERO                TO  PTRSI-HKNID
+           END-IF
+      *
            MOVE    PTRSIINF-REC        TO  MCPDATA-REC
       *
            MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
@@ -644,6 +667,28 @@
                    MOVE    PTRSI-JIBAISEIKBN   TO  WRK-JIBAISEKIKBN
                END-IF
            END-IF
+      *ver.4.7
+      *    第三者行為
+           IF      COMB-KOH1HKNNUM     =   "970"
+      *        保険区分
+               MOVE    1               TO  ORCSHKN-NAI-HKNKBN (IDX)
+      *        労災保険区分
+               MOVE    PTRSI-HKNKBN    TO  ORCSHKN-NAI-RSI-HKNKBN
+                                                               (IDX)
+      *        名称編集
+               IF      PTRSI-COMMENT   NOT =   SPACE
+      *            保険＋公費１のみとなる
+                   MOVE    SPACE               TO  WRK-HKNCOMBI
+                   STRING  COMB-SYU-TANSEIDONAME   DELIMITED  BY  SPACE
+                           " "                     DELIMITED  BY  SIZE
+                           COMB-KOH1-TANSEIDONAME  DELIMITED  BY  SPACE
+                           "（"                    DELIMITED  BY  SIZE
+                           PTRSI-COMMENT(1:24)     DELIMITED  BY  SPACE
+                           "）"                    DELIMITED  BY  SIZE
+                           INTO              WRK-HKNCOMBI
+                   END-STRING
+               END-IF
+          END-IF
       *
            INITIALIZE                  ORCSKANACHKAREA
            MOVE    "1"                 TO  KANACHK-SYORI

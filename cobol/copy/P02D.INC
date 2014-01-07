@@ -41,7 +41,7 @@
                 04  P02D-HKNKBN.
                   05  P02D-VALUE  PIC X(16).
                 04  P02D-HKNKBN-COUNT  PIC S9(9)   BINARY.
-                04  P02D-HKNKBN-ITEM   PIC X(16)   OCCURS  5 TIMES.
+                04  P02D-HKNKBN-ITEM   PIC X(16)   OCCURS  9 TIMES.
               03  P02D-COMMENT.
                 04  P02D-VALUE  PIC X(100).
               03  P02D-SONSHOUKBNCOMBO.
@@ -117,6 +117,20 @@
                 04  P02D-VALUE  PIC X(5).
               03  P02D-SYOCDNAME.
                 04  P02D-VALUE  PIC X(26).
+              03  P02D-SCROLLEDWINDOW1.
+                04  P02D-HPOS   PIC S9(9)   BINARY.
+                04  P02D-VPOS   PIC S9(9)   BINARY.
+                04  P02D-RSILIST.
+                  05  P02D-RSILIST-COUNT  PIC S9(9)   BINARY.
+                  05  P02D-RSILIST-ROW    PIC S9(9)   BINARY.
+                  05  P02D-ITEM       OCCURS  50 TIMES.
+                   06  P02D-RSINUM    PIC X(3).
+                    06  P02D-RSINAME  PIC X(16).
+                    06  P02D-RSIKIKAN PIC X(20).
+                  05  P02D-RSILIST-SELECT
+                          PIC X       OCCURS  50 TIMES.
+              03  P02D-SELNUM.
+                04  P02D-VALUE  PIC S9(3).
 
 
 

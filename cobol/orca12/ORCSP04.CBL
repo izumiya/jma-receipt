@@ -667,6 +667,10 @@
                IF    ( PTKOH-SAKJOKBN      =   SPACE      )  AND
                      ((PTKOH-TEKSTYMD      <=  SPA-SYSYMD ) AND
                       (PTKOH-TEKEDYMD      >=  SPA-SYSYMD ))
+      *H25.11
+      *            第三者行為対象外
+                  AND (PTKOH-KOHNUM    NOT =   "970"      )
+      *
       *            内容の変更
                    MOVE    SPA-HOSPNUM         TO  PTKOH-HOSPNUM
                    MOVE    SPA-GMN-PTID        TO  PTKOH-PTID

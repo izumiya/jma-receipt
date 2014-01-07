@@ -61,6 +61,7 @@
       *  04.07.00    NACL=多々納  11/10/XX  同日再入院対応
       *  04.07.00    NACL=多々納  11/10/30  API検索対応
       *  04.07.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
+      *  04.07.00    NACL-多々納  13/07/XX  第三者行為対応
       *****************************************************************
       *
       *
@@ -2255,6 +2256,11 @@
       *        公務災害の健保準拠判定
                WHEN    5
                    MOVE    "5"             TO  SPA-RSI-HKNKBN
+                   MOVE    "1"             TO  SPA-RSI-JUNKYO
+      *        第三者行為（自賠責の健保準拠）
+               WHEN    7
+                   MOVE    1               TO  SPA-HKNKBN
+                   MOVE    "6"             TO  SPA-RSI-HKNKBN
                    MOVE    "1"             TO  SPA-RSI-JUNKYO
            END-EVALUATE
       *

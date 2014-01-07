@@ -19,4 +19,8 @@
               03  I4ID1-ID1CODE.
                 04  I4ID1-VALUE  PIC X(10).
               03  I4ID1-ID1MSG.
-                04  I4ID1-VALUE  PIC X(70).
+                04  I4ID1-VALUE  PIC X(80).
+              03  I4ID1-B01.
+                04  I4ID1-LABEL  PIC X(4).
+              03  I4ID1-B12.
+                04  I4ID1-LABEL  PIC X(4).

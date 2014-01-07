@@ -31,6 +31,8 @@
                05  PTRSI-PTID              PIC  9(10).
       *瘦副ＩＤ
                05  PTRSI-HKNID             PIC  9(10).
+      *给锐ＩＤ
+               05  PTRSI-KOHID             PIC  9(10).
       *汐阂瘦副惰尸
            03  PTRSI-HKNKBN                PIC  X(01).
       *瘦副戎规

@@ -40,6 +40,8 @@
       *  04.01.00    NACL-Â¿¡¹Ç¼  07/10/19  ¸øÌ³ºÒ³²ÄÉ²Ã
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/06/26  ¼«ÇåÀÕÀÁµá¶èÊ¬½é´üÀßÄêÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/09/06  Ï«Æ¯´ð½à´ÆÆÄ½ð¥³¡¼¥ÉÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  13/07/XX  Ï«ºÒÁªÂòÂÐ±þ
+      *                                     Âè»°¼Ô¹Ô°ÙÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -87,6 +89,10 @@
            03  IDX2                PIC 9(02).
            03  IDX3                PIC 9(02).
       *
+           03  IDR                 PIC 9(04).
+           03  IDR2                PIC 9(04).
+           03  IDX-R               PIC 9(04).
+      *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
       *
@@ -102,15 +108,22 @@
       *
            03  WRK-EDANUM          PIC 9(04).
       *
-           03  WRK-N-IDX          PIC 9(04).
-      *    È¾³ÑÁ´³ÑÊÑ´¹
-       01  WRK-HENKAN-AREA.
-           03  WRK-MAE-INPUT       PIC X(100).
-           03  WRK-ATO-INPUT       PIC X(100).
-           03  WRK-MAX             PIC 9(04).
+           03  WRK-N-IDX           PIC 9(04).
       *    ÆþÎÏ¹àÌÜÌ¾
            03  WRK-MCP-WIDGET          PIC X(64).
+      *H25.7
+           03  WRK-ZZZ                 PIC ZZZ.
+           03  WRK-SELNUM              PIC 9(03).
       *
+      *    ¹ß½çÉ½¼¨
+           03  WRK-KEY-SYMD            PIC X(08).
+           03  WRK-KEY-EYMD            PIC X(08).
+           03  WRK-IN-SYMD             PIC X(08).
+           03  WRK-IN-EYMD             PIC X(08).
+           03  WRK-IDR                 PIC 9(03).
+      *
+      *    ¸øÈñ·ï¿ô
+       01  TBL-MAX-KOH             PIC 9(02)  VALUE    60.
       *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMD.
@@ -176,6 +189,14 @@
        01  LABOR-SIO-REC.
            COPY    "CPLABOR-SIO.INC".
       *
+      *
+      *    ´µ¼ÔÏ«ºÒÊÝ¸±¾ðÊó
+       01  TBL-PTRSIINF-AREA.
+           02  TBL-PTRSIINF-REC        OCCURS   50.
+           COPY    "CPPTRSIINF.INC"    REPLACING
+                                   //PTRSI-// BY //TBL-PTRSI-//.
+           03  TBL-PARA-EDANUM     PIC 9(04).
+      *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
@@ -213,33 +234,6 @@
       *
        01  SCRAREA.
            COPY    "ORCA12SCRAREA.INC".
-      *    COPY    "P02.INC".
-      *    COPY    "P02A.INC".
-      *    COPY    "P02D.INC".
-      *    COPY    "P02E.INC".
-      *    COPY    "P02F.INC".
-      *    COPY    "P014.INC".
-      *    COPY    "P015.INC".
-      *    COPY    "P98.INC".
-      *    COPY    "P981.INC".
-      *    COPY    "P0201.INC".
-      *    COPY    "P982.INC".
-      *    COPY    "P100.INC".
-      *    COPY    "P02X.INC".
-      *    COPY    "P02S.INC".
-      *    COPY    "P02Q.INC".
-      *    COPY    "P02Q1.INC".
-      *    COPY    "P02Y.INC".
-      *    COPY    "P02Y1.INC".
-      *    COPY    "P02G.INC".
-      *    COPY    "P02G2.INC".
-      *    COPY    "P02K.INC".
-      *    COPY    "P02H.INC".
-      *    COPY    "P02T.INC".
-      *    COPY    "PERR.INC".
-      *    COPY    "PID1.INC".
-      *    COPY    "PDMY01.INC".
-      *    COPY    "CPAPIMOD.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -324,32 +318,193 @@
       *****************************************************************
        300-SCREEN-SEC              SECTION.
       *
+      *    Ï«ºÒÊÝ¸±¾ðÊó
+           MOVE    SPACE               TO  SPA-P02D-AREA
+           INITIALIZE                      SPA-P02D-AREA
       *
-           IF      SPA-GMN-HKNNUM      =   SPACE
-      *        [¿·µ¬ÆþÎÏ]
-      *        ÊÝ¸±¾ðÊó
-      *********MOVE    "971"               TO  SPA-GMN-HKNNUM
-      *        Ï«ºÒÊÝ¸±¾ðÊó
-               MOVE    SPACE               TO  SPA-P02D-AREA
-               INITIALIZE                      SPA-P02D-AREA
-      *        ÊÝ¸±ÈÖ¹æ
-      *******  MOVE    "971"               TO  SPA-NAI2D-HKNNUM
-               MOVE    ZERO                TO  SPA-NAI2D-GMNIDX
-               MOVE    SPA-GMN-NAME        TO  SPA-GMN2D-HIHKNJANAME
-           ELSE
-      *
-      *        Ï«ºÒÊÝ¸±¾ðÊó
-               MOVE    SPACE               TO  SPA-P02D-AREA
-               INITIALIZE                      SPA-P02D-AREA
-      *        Ï«ºÒÊ¬
-               PERFORM 3001-RSHKN-SET-SEC
-           END-IF
+           MOVE    SPA-NAI-RSHKN-EDANUM    TO  SPA-NAI2D-RSHKN-EDANUM
       *
       *    ¥³¥ó¥Ü¥Ü¥¯¥¹¤ÎÊÔ½¸
            PERFORM 3002-COMBBOX-HEX-SEC
       *
+      *    ÊÝ¸±°ìÍ÷
+           PERFORM 3001-RSILIST-HEN-SEC
+      *
+           IF      SPA-NAI2D-RSHKN-EDANUM  =   ZERO
+      *        [¿·µ¬ÆþÎÏ]
+               MOVE    SPA-GMN-NAME        TO  SPA-GMN2D-HIHKNJANAME
+           ELSE
+      *        Ï«ºÒÆâÍÆÊÔ½¸
+               PERFORM 3001-RSHKN-SET-SEC
+           END-IF
+      *
+      *    ¶èÊ¬Ëè¥³¥ó¥Ü¥Ü¥¯¥¹ÊÔ½¸
+           PERFORM 41012-SINKEI-SET-SEC
+      *    ¥³¥ó¥Ü¥Ü¥¯¥¹¤ÎÊÔ½¸
+           PERFORM 3003-COMBBOX-SET-SEC
+      *
            .
        300-SCREEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ï«ºÒÊÝ¸±°ìÍ÷ÊÔ½¸½èÍý
+      *****************************************************************
+       3001-RSILIST-HEN-SEC             SECTION.
+      *
+      *
+           INITIALIZE                      PARA-REC
+           MOVE    "P02"               TO  PARA-GYOUMUID
+           MOVE    SPA-TERMID          TO  PARA-TERMID
+           MOVE    "PTRSIINF"          TO  PARA-FILEMEI
+      *
+           MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
+           MOVE    PARA-REC            TO  MCPDATA-REC
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_para"          TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 990-PARA-READ-SEC
+           ELSE
+               INITIALIZE                  PARA-REC
+               MOVE    1               TO  FLG-PARA
+           END-IF
+      *
+           MOVE    ZERO                TO  IDR
+           MOVE    SPACE               TO  TBL-PTRSIINF-AREA
+           PERFORM UNTIL   (FLG-PARA       =   1 )
+                       OR  (IDR            >=  50)
+               MOVE    PARA-DATA-REC       TO  PTRSIINF-REC
+               IF      PTRSI-SAKUJOKBN     =   SPACE
+                   ADD     1                   TO  IDR
+                   MOVE    PARA-DATA-REC       TO  TBL-PTRSIINF-REC(IDR)
+                   MOVE    PARA-EDANUM         TO  TBL-PARA-EDANUM (IDR)
+               END-IF
+               MOVE    "tbl_para"          TO  MCP-TABLE
+               MOVE    "key5"              TO  MCP-PATHNAME
+               PERFORM 990-PARA-READ-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_para"          TO  MCP-TABLE
+           MOVE    "key5"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           PERFORM VARYING    IDR      FROM    1   BY  1
+                   UNTIL      IDR      >   50
+               MOVE    SPACE               TO  WRK-KEY-SYMD
+               MOVE    SPACE               TO  WRK-KEY-EYMD
+               MOVE    ZERO                TO  WRK-IDR
+               PERFORM VARYING    IDR2     FROM    1   BY  1
+                       UNTIL      IDR2     >   50
+               IF      TBL-PTRSIINF-REC (IDR2) NOT =   SPACE
+                   MOVE    TBL-PTRSIINF-REC (IDR2) TO  PTRSIINF-REC
+      *            ÎÅÍÜ³«»ÏÇ¯·îÆü
+                   IF      PTRSI-HKNKBN        =   "3"
+      *                ¥¢¥Õ¥¿¡¼¥±¥¢
+                       MOVE    PTRSI-SINSATUYMD    TO  WRK-IN-SYMD
+                       MOVE    PTRSI-SINSATUEND    TO  WRK-IN-EYMD
+                   ELSE
+                       MOVE    PTRSI-RYOSTYMD      TO  WRK-IN-SYMD
+                       MOVE    PTRSI-RYOEDYMD      TO  WRK-IN-EYMD
+                   END-IF
+                   IF     (WRK-KEY-SYMD        =   SPACE)
+                       MOVE    WRK-IN-SYMD         TO  WRK-KEY-SYMD
+                       MOVE    WRK-IN-EYMD         TO  WRK-KEY-EYMD
+                       MOVE    IDR2                TO  WRK-IDR
+                   ELSE
+      *                ¹ß½ç¤ËÉ½¼¨
+                       IF     (WRK-KEY-SYMD        <   WRK-IN-SYMD )
+                         AND  (WRK-KEY-EYMD        <=  WRK-IN-EYMD )
+                           MOVE    WRK-IN-SYMD         TO  WRK-KEY-SYMD
+                           MOVE    WRK-IN-EYMD         TO  WRK-KEY-EYMD
+                           MOVE    IDR2                TO  WRK-IDR
+                       END-IF
+                   END-IF
+               END-IF
+               END-PERFORM
+               IF      WRK-IDR             >   ZERO
+                   PERFORM 30011-RSIINF-HEN-SEC
+                   MOVE    SPACE           TO  TBL-PTRSIINF-REC(WRK-IDR)
+               ELSE
+                   MOVE    50              TO  IDR
+               END-IF
+           END-PERFORM
+      *    ÁªÂò¤¬¤Ê¤¤»þ¡¢£±·ïÌÜ
+           IF      SPA-NAI2D-RSHKN-EDANUM  =   ZERO
+               IF      SPA-GMN2D-TRYOEDYMD (1) =   "99999999"
+                   MOVE    SPA-GMN2D-TPARANUM (1)
+                                           TO  SPA-NAI2D-RSHKN-EDANUM
+                   MOVE    1                   TO  SPA-GMN2D-SELNUM
+                   MOVE    SPA-GMN2D-SELNUM    TO  SPA-GMN2D-MAE-SELNUM
+               END-IF
+           END-IF
+           .
+       3001-RSILIST-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ï«ºÒÊÝ¸±¼Ô¤ÎÊÔ½¸½èÍý
+      *****************************************************************
+       30011-RSIINF-HEN-SEC             SECTION.
+      *
+           MOVE    TBL-PTRSIINF-REC (WRK-IDR) TO  PTRSIINF-REC
+      *
+           MOVE    IDR                 TO  SPA-GMN2D-TRENNUM (IDR)
+           MOVE    TBL-PARA-EDANUM (WRK-IDR)
+                                       TO  SPA-GMN2D-TPARANUM (IDR)
+           IF      SPA-NAI2D-RSHKN-EDANUM
+                                       =   TBL-PARA-EDANUM (WRK-IDR)
+               MOVE    IDR                 TO  SPA-GMN2D-SELNUM
+               MOVE    SPA-GMN2D-SELNUM    TO  SPA-GMN2D-MAE-SELNUM
+           END-IF
+      *
+           MOVE    PTRSI-HKNKBN        TO  SPA-GMN2D-THKNKBN (IDR)
+           MOVE    PTRSI-HKNID         TO  SPA-GMN2D-THKNID (IDR)
+           MOVE    PTRSI-KOHID         TO  SPA-GMN2D-TKOHID (IDR)
+      *
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-HKNKBN-MAX
+               IF      SPA-GMN2D-HKNKBN-LST(IDX) (1:1)
+                                           =   PTRSI-HKNKBN
+                   MOVE    SPA-GMN2D-HKNKBN-LST (IDX)(3:)
+                                           TO  SPA-GMN2D-THKNKBNMEI(IDR)
+               END-IF
+           END-PERFORM
+      *    ÎÅÍÜ³«»ÏÇ¯·îÆü
+           IF      PTRSI-HKNKBN        =   "3"
+      *        ¥¢¥Õ¥¿¡¼¥±¥¢
+               MOVE    PTRSI-SINSATUYMD    TO  WRK-SYMD
+               PERFORM 410112-SE-WAFORMAT-YMDEDIT-SEC
+               MOVE    WRK-HENYMD          TO  SPA-GMN2D-TRSIKIKAN
+                                                          (IDR) (1:9)
+               MOVE    "-"                 TO  SPA-GMN2D-TRSIKIKAN
+                                                          (IDR) (10:1)
+               MOVE    PTRSI-SINSATUEND    TO  WRK-SYMD
+               PERFORM 410112-SE-WAFORMAT-YMDEDIT-SEC
+               MOVE    WRK-HENYMD          TO  SPA-GMN2D-TRSIKIKAN
+                                                          (IDR) (11:9)
+               MOVE    PTRSI-SINSATUYMD    TO  SPA-GMN2D-TRYOSTYMD(IDR)
+               MOVE    PTRSI-SINSATUEND    TO  SPA-GMN2D-TRYOEDYMD(IDR)
+           ELSE
+               MOVE    PTRSI-RYOSTYMD      TO  WRK-SYMD
+               PERFORM 410112-SE-WAFORMAT-YMDEDIT-SEC
+               MOVE    WRK-HENYMD          TO  SPA-GMN2D-TRSIKIKAN
+                                                          (IDR) (1:9)
+               MOVE    "-"                 TO  SPA-GMN2D-TRSIKIKAN
+                                                          (IDR) (10:1)
+               MOVE    PTRSI-RYOEDYMD      TO  WRK-SYMD
+               PERFORM 410112-SE-WAFORMAT-YMDEDIT-SEC
+               MOVE    WRK-HENYMD          TO  SPA-GMN2D-TRSIKIKAN
+                                                       (IDR) (11:9)
+               MOVE    PTRSI-RYOSTYMD      TO  SPA-GMN2D-TRYOSTYMD(IDR)
+               MOVE    PTRSI-RYOEDYMD      TO  SPA-GMN2D-TRYOEDYMD(IDR)
+           END-IF
+      *
+           MOVE    IDR             TO  SPA-GMN2D-RSIMAX
+           .
+       30011-RSIINF-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -362,7 +517,7 @@
            MOVE    "P02"               TO  PARA-GYOUMUID
            MOVE    SPA-TERMID          TO  PARA-TERMID
            MOVE    "PTRSIINF"          TO  PARA-FILEMEI
-           MOVE    SPA-NAI-RSHKN-EDANUM
+           MOVE    SPA-NAI2D-RSHKN-EDANUM
                                        TO  PARA-EDANUM
       *
            MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
@@ -387,7 +542,9 @@
            ELSE
                MOVE    PARA-DATA-REC       TO  PTRSIINF-REC
            END-IF
-      *
+      *H25.7
+           MOVE    PTRSI-HKNID         TO  SPA-NAI2D-HKNID
+           MOVE    PTRSI-KOHID         TO  SPA-NAI2D-KOHID
       *    Ï«ºÒÊÝ¸±¶èÊ¬
            MOVE    PTRSI-HKNKBN        TO  SPA-GMN2D-HKNKBN
            MOVE    PTRSI-HKNKBN        TO  SPA-NAI2D-HKNKBN-MAE
@@ -635,73 +792,50 @@
                                                  (SPA-GMN2D-HKNKBN-MAX)
            END-IF
       *
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-GMN2D-HKNKBN-MAX
-               IF      SPA-GMN2D-HKNKBN-LST(IDX) (1:1)
-                                           =   SPA-GMN2D-HKNKBN
-                   MOVE    SPA-GMN2D-HKNKBN-LST (IDX)
-                                           TO  SPA-GMN2D-HKNKBN-G
-               END-IF
-           END-PERFORM
+           IF      SPA-DAISAN-FLG      =   1
+               ADD     1                   TO  SPA-GMN2D-HKNKBN-MAX
+               MOVE    "6 Âè»°¼Ô¹Ô°Ù"      TO  SPA-GMN2D-HKNKBN-LST
+                                                 (SPA-GMN2D-HKNKBN-MAX)
+           END-IF
+      *
+      *    ¸«½Ð¤·½¤Àµ
+      *    EVALUATE    SPA-GMN2D-HKNKBN
+      *        WHEN    "5"
+      *            MOVE    "ÀÁµá¶èÊ¬"          TO  SPA-GMN2D-SEIKBNMEI
+      *            MOVE    "Ã´Åö°å"            TO  SPA-GMN2D-TANTOIMEI
+      *        WHEN    OTHER
+      *            MOVE    "¼«ÇåÀÕÀÁµá¶èÊ¬"    TO  SPA-GMN2D-SEIKBNMEI
+      *            MOVE    "¼«ÇåÀÕÃ´Åö°å"      TO  SPA-GMN2D-TANTOIMEI
+      *    END-EVALUATE
+      *    ¼«ÇåÀÕ´µ¼ÔÀÁµá¶èÊ¬
+      *    MOVE    "1 ´µ¼ÔÀÁµá¤¹¤ë(100%)"
+      *                                TO  SPA-GMN2D-JIBAISEIKBN-LST(01)
+      *    MOVE    "2 ´µ¼ÔÀÁµá¤·¤Ê¤¤(0%)"
+      *                                TO  SPA-GMN2D-JIBAISEIKBN-LST(02)
+      *!   Âè»°¼Ô
+      *    IF      SPA-GMN2D-HKNKBN    =   "6"
+      *        MOVE    "1 ´µ¼ÔÀÁµá¤¹¤ë"
+      *                                TO  SPA-GMN2D-JIBAISEIKBN-LST(01)
+      *    END-IF
+      *
+      *    IF      SPA-GMN2D-HKNKBN    =   "4"
+      *                                OR  "5"
+      *                                OR  "6"
+      *        MOVE    2                   TO  SPA-GMN2D-JIBAISEIKBN-MAX
+      *    ELSE
+      *        MOVE    ZERO                TO  SPA-GMN2D-JIBAISEIKBN-MAX
+      **** END-IF
       *
       *    ºÒ³²¶èÊ¬
            MOVE    "1 ¶ÈÌ³Ãæ¤ÎºÒ³²"    TO  SPA-GMN2D-SAIGAI-LST (01)
            MOVE    "2 ÄÌ¶ÐÅÓ¾å¤ÎºÒ³²"  TO  SPA-GMN2D-SAIGAI-LST (02)
            MOVE    2                   TO  SPA-GMN2D-SAIGAI-MAX
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-GMN2D-SAIGAI-MAX
-               IF      SPA-GMN2D-SAIGAI-LST(IDX) (1:1)
-                                           =   SPA-GMN2D-SAIGAI
-                   MOVE    SPA-GMN2D-SAIGAI-LST (IDX)
-                                           TO  SPA-GMN2D-SAIGAI-G
-               END-IF
-           END-PERFORM
       *
       *    ¼«ÇåÀÕ¡¦¸øÌ³ºÒ³²¤Î½é´üÉ½¼¨
            IF     (SPA-JIBAI-FLG       =   1  )  OR
                   (SPA-ROSAI-FLG       =   1  )
                PERFORM 30022-JIBAISEIKBN-SET-SEC
            END-IF
-      *    ¼«ÇåÀÕ´µ¼ÔÀÁµá¶èÊ¬
-           MOVE    "1 ´µ¼ÔÀÁµá¤¹¤ë(100%)"
-                                       TO  SPA-GMN2D-JIBAISEIKBN-LST(01)
-           MOVE    "2 ´µ¼ÔÀÁµá¤·¤Ê¤¤(0%)"
-                                       TO  SPA-GMN2D-JIBAISEIKBN-LST(02)
-           IF      SPA-GMN2D-HKNKBN    =   "4"
-                                       OR  "5"
-               MOVE    2                   TO  SPA-GMN2D-JIBAISEIKBN-MAX
-           ELSE
-               MOVE    ZERO                TO  SPA-GMN2D-JIBAISEIKBN-MAX
-           END-IF
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-GMN2D-JIBAISEIKBN-MAX
-               IF      SPA-GMN2D-JIBAISEIKBN-LST(IDX) (1:1)
-                                           =   SPA-GMN2D-JIBAISEIKBN
-                   MOVE    SPA-GMN2D-JIBAISEIKBN-LST (IDX)
-                                           TO  SPA-GMN2D-JIBAISEIKBN-G
-               END-IF
-           END-PERFORM
-      *
-      *    ¸«½Ð¤·½¤Àµ
-           EVALUATE    SPA-GMN2D-HKNKBN
-               WHEN    "5"
-                   MOVE    "ÀÁµá¶èÊ¬"          TO  SPA-GMN2D-SEIKBNMEI
-                   MOVE    "Ã´Åö°å"            TO  SPA-GMN2D-TANTOIMEI
-               WHEN    OTHER
-                   MOVE    "¼«ÇåÀÕÀÁµá¶èÊ¬"    TO  SPA-GMN2D-SEIKBNMEI
-                   MOVE    "¼«ÇåÀÕÃ´Åö°å"      TO  SPA-GMN2D-TANTOIMEI
-           END-EVALUATE
-      *
-      *    ¿··Ñ¶èÊ¬
-           PERFORM 41012-SINKEI-SET-SEC
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-GMN2D-SINKEI-MAX
-               IF      SPA-GMN2D-SINKEI-LST(IDX) (1:1)
-                                           =   SPA-GMN2D-SINKEI
-                   MOVE    SPA-GMN2D-SINKEI-LST (IDX)
-                                           TO  SPA-GMN2D-SINKEI-G
-               END-IF
-           END-PERFORM
       *
       *    Å¾µ¢¶èÊ¬
            MOVE    "1 ¼£Ìþ"            TO  SPA-GMN2D-TENKI-LST (01)
@@ -710,28 +844,12 @@
            MOVE    "7 Ãæ»ß"            TO  SPA-GMN2D-TENKI-LST (04)
            MOVE    "9 »àË´"            TO  SPA-GMN2D-TENKI-LST (05)
            MOVE    5                   TO  SPA-GMN2D-TENKI-MAX
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-GMN2D-TENKI-MAX
-               IF      SPA-GMN2D-TENKI-LST(IDX) (1:1)
-                                           =   SPA-GMN2D-TENKI
-                   MOVE    SPA-GMN2D-TENKI-LST (IDX)
-                                           TO  SPA-GMN2D-TENKI-G
-               END-IF
-           END-PERFORM
       *
       *    »Í»èÆÃÎã
            MOVE    "0 ¤Ê¤·"            TO  SPA-GMN2D-SISIKBN-LST (01)
            MOVE    "1 »Í»è"            TO  SPA-GMN2D-SISIKBN-LST (02)
            MOVE    "2 ¼ê»Ø"            TO  SPA-GMN2D-SISIKBN-LST (03)
            MOVE    3                   TO  SPA-GMN2D-SISIKBN-MAX
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-GMN2D-SISIKBN-MAX
-               IF      SPA-GMN2D-SISIKBN-LST(IDX) (1:1)
-                                           =   SPA-GMN2D-SISIKBN
-                   MOVE    SPA-GMN2D-SISIKBN-LST (IDX)
-                                           TO  SPA-GMN2D-SISIKBN-G
-               END-IF
-           END-PERFORM
       *
       *    ÅÔÆ»ÉÜ¸©
            MOVE    "ËÌ³¤Æ»"            TO  SPA-GMN2D-PREFNAME-LST(1)
@@ -789,27 +907,11 @@
            MOVE    "3 ÉÜ"              TO  SPA-GMN2D-PREFKBN-LST (03)
            MOVE    "4 ¸©"              TO  SPA-GMN2D-PREFKBN-LST (04)
            MOVE    4                   TO  SPA-GMN2D-PREFKBN-MAX
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-GMN2D-PREFKBN-MAX
-               IF      SPA-GMN2D-PREFKBN-LST(IDX) (1:1)
-                                           =   SPA-GMN2D-PREFKBN
-                   MOVE    SPA-GMN2D-PREFKBN-LST (IDX)
-                                           TO  SPA-GMN2D-PREFKBN-G
-               END-IF
-           END-PERFORM
       *
            MOVE    "1 ·´"              TO  SPA-GMN2D-CITYKBN-LST (01)
            MOVE    "2 »Ô"              TO  SPA-GMN2D-CITYKBN-LST (02)
            MOVE    "3 ¶è"              TO  SPA-GMN2D-CITYKBN-LST (03)
            MOVE    3                   TO  SPA-GMN2D-CITYKBN-MAX
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-GMN2D-CITYKBN-MAX
-               IF      SPA-GMN2D-CITYKBN-LST(IDX) (1:1)
-                                           =   SPA-GMN2D-CITYKBN
-                   MOVE    SPA-GMN2D-CITYKBN-LST (IDX)
-                                           TO  SPA-GMN2D-CITYKBN-G
-               END-IF
-           END-PERFORM
       *
       *    Â»½ý¶èÊ¬
            MOVE    SPACE               TO  SYS-4002-REC
@@ -860,6 +962,94 @@
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+           .
+       3002-COMBBOX-HEX-EXT.
+           EXIT.
+      *
+      *!!!
+      *****************************************************************
+      *    ¥³¥ó¥Ü¥Ü¥¯¥¹¤ÎÀßÄêÊÔ½¸½èÍý
+      *****************************************************************
+       3003-COMBBOX-SET-SEC             SECTION.
+      *
+      *    Ï«ºÒÊÝ¸±¶èÊ¬
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-HKNKBN-MAX
+               IF      SPA-GMN2D-HKNKBN-LST(IDX) (1:1)
+                                           =   SPA-GMN2D-HKNKBN
+                   MOVE    SPA-GMN2D-HKNKBN-LST (IDX)
+                                           TO  SPA-GMN2D-HKNKBN-G
+               END-IF
+           END-PERFORM
+      *
+      *    ¼«ÇåÀÕ´µ¼ÔÀÁµá¶èÊ¬
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-JIBAISEIKBN-MAX
+               IF      SPA-GMN2D-JIBAISEIKBN-LST(IDX) (1:1)
+                                           =   SPA-GMN2D-JIBAISEIKBN
+                   MOVE    SPA-GMN2D-JIBAISEIKBN-LST (IDX)
+                                           TO  SPA-GMN2D-JIBAISEIKBN-G
+               END-IF
+           END-PERFORM
+      *
+      *    ºÒ³²¶èÊ¬
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-SAIGAI-MAX
+               IF      SPA-GMN2D-SAIGAI-LST(IDX) (1:1)
+                                           =   SPA-GMN2D-SAIGAI
+                   MOVE    SPA-GMN2D-SAIGAI-LST (IDX)
+                                           TO  SPA-GMN2D-SAIGAI-G
+               END-IF
+           END-PERFORM
+      *
+      *    ¿··Ñ¶èÊ¬
+      *****PERFORM 41012-SINKEI-SET-SEC
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-SINKEI-MAX
+               IF      SPA-GMN2D-SINKEI-LST(IDX) (1:1)
+                                           =   SPA-GMN2D-SINKEI
+                   MOVE    SPA-GMN2D-SINKEI-LST (IDX)
+                                           TO  SPA-GMN2D-SINKEI-G
+               END-IF
+           END-PERFORM
+      *
+      *    Å¾µ¢¶èÊ¬
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-TENKI-MAX
+               IF      SPA-GMN2D-TENKI-LST(IDX) (1:1)
+                                           =   SPA-GMN2D-TENKI
+                   MOVE    SPA-GMN2D-TENKI-LST (IDX)
+                                           TO  SPA-GMN2D-TENKI-G
+               END-IF
+           END-PERFORM
+      *
+      *    »Í»èÆÃÎã
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-SISIKBN-MAX
+               IF      SPA-GMN2D-SISIKBN-LST(IDX) (1:1)
+                                           =   SPA-GMN2D-SISIKBN
+                   MOVE    SPA-GMN2D-SISIKBN-LST (IDX)
+                                           TO  SPA-GMN2D-SISIKBN-G
+               END-IF
+           END-PERFORM
+      *    ¸©¶èÊ¬
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-PREFKBN-MAX
+               IF      SPA-GMN2D-PREFKBN-LST(IDX) (1:1)
+                                           =   SPA-GMN2D-PREFKBN
+                   MOVE    SPA-GMN2D-PREFKBN-LST (IDX)
+                                           TO  SPA-GMN2D-PREFKBN-G
+               END-IF
+           END-PERFORM
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-CITYKBN-MAX
+               IF      SPA-GMN2D-CITYKBN-LST(IDX) (1:1)
+                                           =   SPA-GMN2D-CITYKBN
+                   MOVE    SPA-GMN2D-CITYKBN-LST (IDX)
+                                           TO  SPA-GMN2D-CITYKBN-G
+               END-IF
+           END-PERFORM
+      *    Â»½ý¶èÊ¬
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-GMN2D-SONSHOUKBN-MAX
                IF     (SPA-GMN2D-SONSHOUKBN-LST(IDX) (1:2)
@@ -876,8 +1066,9 @@
                PERFORM 30021-DRCD-HEN-SEC
            END-IF
            .
-       3002-COMBBOX-HEX-EXT.
+       3003-COMBBOX-SET-EXT.
            EXIT.
+      *
       *
       *****************************************************************
       *    ¼«ÇåÀÕ¡¦¸øÌ³ºÒ³²¤Î½é´üÉ½¼¨ÊÔ½¸½èÍý
@@ -925,6 +1116,7 @@
       *    ¥É¥¯¥¿¡¼Ì¾¾ÎÊÔ½¸½èÍý
       *****************************************************************
        30021-DRCD-HEN-SEC            SECTION.
+      *
       *    ¿¦°÷¾ðÊó¡Ê¥É¥¯¥¿¡¼¡Ë
            MOVE    SPACE               TO  SYS-1010-REC
            INITIALIZE                  SYS-1010-REC
@@ -973,6 +1165,7 @@
        500-GMNHEN-SEC              SECTION.
       *
            MOVE    SPACE               TO  P02D
+           INITIALIZE                      P02D
       *
       *    ÊÝ¸±¶èÊ¬
            MOVE    SPA-GMN2D-HKNKBN-G  TO  P02D-HKNKBN
@@ -1120,6 +1313,28 @@
            MOVE    SPA-GMN2D-SEIKBNMEI    TO  P02D-SEIKBNMEI
            MOVE    SPA-GMN2D-TANTOIMEI    TO  P02D-TANTOIMEI
       *
+      *H25.7
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-RSIMAX
+               MOVE    SPA-GMN2D-TRENNUM (IDX)
+                                       TO  WRK-ZZZ
+               MOVE    WRK-ZZZ         TO  P02D-RSINUM (IDX)
+               MOVE    SPA-GMN2D-THKNKBNMEI (IDX)
+                                       TO  P02D-RSINAME(IDX)
+               MOVE    SPA-GMN2D-TRSIKIKAN (IDX)
+                                       TO  P02D-RSIKIKAN(IDX)
+               IF      IDX             =   SPA-GMN2D-SELNUM
+                   MOVE    "T"         TO  P02D-RSILIST-SELECT
+                                                         (IDX)
+               ELSE
+                   MOVE    "F"         TO  P02D-RSILIST-SELECT
+                                                         (IDX)
+               END-IF
+           END-PERFORM
+           MOVE    SPA-GMN2D-RSIMAX    TO  P02D-RSILIST-COUNT
+           MOVE    SPA-GMN2D-SELNUM    TO  P02D-SELNUM
+      *!!!
+      *
            PERFORM 5001-MAPCUR-SEC
       *
            .
@@ -1194,8 +1409,12 @@
                    MOVE    "JIBAISEIKBN"       TO  MCP-WIDGET
       *********WHEN    19
       **********   MOVE    "KENSAYMD"          TO  MCP-WIDGET
+               WHEN    31
+                   MOVE    "SELNUM"            TO  MCP-WIDGET
                WHEN    90
                    MOVE    "B12"               TO  MCP-WIDGET
+               WHEN    91
+                   MOVE    "B01"               TO  MCP-WIDGET
            END-EVALUATE
       *
            .
@@ -1214,6 +1433,7 @@
                    EVALUATE    SPA-GMN2D-HKNKBN
                        WHEN    "4"
                        WHEN    "5"
+                       WHEN    "6"
                            MOVE    22              TO  SPA-GMN2D-CUR
                    END-EVALUATE
       *        ¼«ÇåÀÕÀÁµá¶èÊ¬
@@ -1231,6 +1451,9 @@
                        WHEN    "4"
                        WHEN    "5"
                            MOVE    6               TO  SPA-GMN2D-CUR
+      *                Âè»°¼Ô¹Ô°Ù
+                       WHEN    "6"
+                           MOVE    6               TO  SPA-GMN2D-CUR
                    END-EVALUATE
                WHEN    "KOHNUM1"
                    MOVE    21              TO  SPA-GMN2D-CUR
@@ -1242,6 +1465,11 @@
                    MOVE    06              TO  SPA-GMN2D-CUR
                WHEN    "TENKI"
                    MOVE    07              TO  SPA-GMN2D-CUR
+                   EVALUATE    SPA-GMN2D-HKNKBN
+      *                Âè»°¼Ô¹Ô°Ù
+                       WHEN    "6"
+                           MOVE    08              TO  SPA-GMN2D-CUR
+                   END-EVALUATE
                WHEN    "SISIKBN"
                    MOVE    08              TO  SPA-GMN2D-CUR
                WHEN    "SHOBYOYMD"
@@ -1260,6 +1488,10 @@
                        WHEN    "2"
       *                    Ï«ºÒ¥ì¥»²ó¿ôµ­ºÜ¤Ø
                            MOVE    28              TO  SPA-GMN2D-CUR
+      *                Âè»°¼Ô¹Ô°Ù
+                       WHEN    "6"
+      *                    ¼«ÇåÀÕÃ´Åö°å¤Ø
+                           MOVE    25              TO  SPA-GMN2D-CUR
                    END-EVALUATE
                WHEN    "JIGYOUNAME"
                    MOVE    12              TO  SPA-GMN2D-CUR
@@ -1306,6 +1538,14 @@
                    MOVE    19              TO  SPA-GMN2D-CUR
                WHEN    "SINSATUEND"
                    MOVE    90              TO  SPA-GMN2D-CUR
+      *        ÁªÂò
+               WHEN    "SELNUM"
+                   MOVE    2               TO  SPA-GMN2D-CUR
+                   EVALUATE    SPA-GMN2D-HKNKBN
+                       WHEN    "4"
+                       WHEN    "5"
+                           MOVE    22              TO  SPA-GMN2D-CUR
+                   END-EVALUATE
            END-EVALUATE
       *
            .
@@ -1328,6 +1568,14 @@
       *    ÅÐÏ¿
                WHEN    "CLICKED"       ALSO    "B12"
                    PERFORM 490-TOROKU-SEC
+      *
+      *H25.7
+      *    ¥¯¥ê¥¢
+               WHEN    "CLICKED"       ALSO    "B02"
+                   PERFORM 420-CLERA-SEC
+      *    ¼¡
+               WHEN    "CLICKED"       ALSO    "B07"
+                   PERFORM 460-NEXT-TBL-SEC
            END-EVALUATE
       *
            .
@@ -1343,8 +1591,17 @@
            MOVE    ZERO                TO  SPA-GMN2D-CUR
       *
            MOVE    ZERO                TO  FLG-TOUROKU
+           EVALUATE    MCP-EVENT       ALSO    MCP-WIDGET
+      *        Ï«ºÒ¥ê¥¹¥ÈÁªÂò
+               WHEN    ANY             ALSO    "RSILIST"
+                   PERFORM 4001-RSILIST-SEL-SEC
+      *        Ï«ºÒÁªÂò
+               WHEN    ANY             ALSO    "SELNUM"
+                   PERFORM 4002-SELNUM-CHK-SEC
+               WHEN    OTHER
       *    ÆþÎÏ¥Á¥§¥Ã¥¯½èÍý
-           PERFORM 410-INPUT-CHK-SEC
+                   PERFORM 410-INPUT-CHK-SEC
+           END-EVALUATE
       *
            .
       *
@@ -1576,7 +1833,7 @@
       *
       *    ¿·µ¬¤Î»þ¡¢½é´üÉ½¼¨
            IF      SPA-ERRCD           =   SPACE
-               IF     (SPA-NAI-RSHKN-EDANUM    =   ZERO )  AND
+               IF     (SPA-NAI2D-RSHKN-EDANUM  =   ZERO )  AND
                       (SPA-GMN2D-HKNKBN    NOT =   SPA-NAI2D-HKNKBN-HZN)
                    PERFORM 41011-SYOKI-SET-SEC
                    MOVE    ZERO            TO  SPA-NAI2D-KEIFLG
@@ -1596,6 +1853,7 @@
       *    ¼«ÇåÀÕ¡¦¸øÌ³ºÒ³²°Ê³°¤ÏÆþÎÏ¤Ê¤·¤È¤¹¤ë
            IF      SPA-GMN2D-HKNKBN    =   "4"
                                        OR  "5"
+                                       OR  "6"
                CONTINUE
            ELSE
                MOVE    SPACE               TO  SPA-GMN2D-JIBAISEIKBN-G
@@ -1627,14 +1885,27 @@
       *****************************************************************
        41011-SYOKI-SET-SEC           SECTION.
       *
+      *    ¶¦ÄÌÊÔ½¸
+           PERFORM 41012-SINKEI-SET-SEC
+      *  ¥¯¥ê¥¢
+      *    ¼«ÇåÀÕ´µ¼ÔÀÁµá¶èÊ¬
+           MOVE    SPACE           TO  SPA-GMN2D-JIBAISEIKBN-G
+      *    ºÒ³²¶èÊ¬
+           MOVE    SPACE           TO  SPA-GMN2D-SAIGAI-G
+      *    ¿··ÑºÆÊÌÊÔ½¸
+           MOVE    SPACE           TO  SPA-GMN2D-SINKEI-G
+           MOVE    ZERO            TO  SPA-GMN2D-KAISU
+      *    Å¾µ¢
+           MOVE    SPACE           TO  SPA-GMN2D-TENKI-G
+           MOVE    SPACE           TO  SPA-GMN2D-SISIKBN-G
+      *    Â»½ý¶èÊ¬
+           MOVE    SPACE           TO  SPA-GMN2D-SONSHOUKBN-G
+      *
            EVALUATE    SPA-GMN2D-HKNKBN
+      *        Ã»´ü¡¦½ýÉÂ
                WHEN    "1"
                WHEN    "2"
-      *            ¼«ÇåÀÕÀÁµá¶èÊ¬
-                   MOVE    SPACE           TO  SPA-GMN2D-JIBAISEIKBN-G
-                   MOVE    ZERO            TO  SPA-GMN2D-JIBAISEIKBN-MAX
       *            ¿··ÑºÆÊÌÊÔ½¸
-                   PERFORM 41012-SINKEI-SET-SEC
                    IF      SPA-GMN2D-SINKEIMEI =   SPACE
                        MOVE    SPA-GMN2D-SINKEI-LST (01)
                                                TO  SPA-GMN2D-SINKEI-G
@@ -1682,33 +1953,24 @@
       *************END-IF
       *            Ï«ºÒ¥ì¥»²ó¿ôµ­ºÜ¡§²ó¿ô
                    MOVE    1               TO  SPA-GMN2D-KAISU
-      *
+      *        ¥¢¥Õ¥¿¡¼¥±¥¢
                WHEN    "3"
-      *            ¼«ÇåÀÕÀÁµá¶èÊ¬
-                   MOVE    SPACE           TO  SPA-GMN2D-JIBAISEIKBN-G
-                   MOVE    ZERO            TO  SPA-GMN2D-JIBAISEIKBN-MAX
       *
                    IF      SPA-GMN2D-SONSHOUKBN   =   SPACE
                        MOVE    SPA-GMN2D-SONSHOUKBN-LST (01)
                                            TO  SPA-GMN2D-SONSHOUKBN-G
                    END-IF
+      *        ¼«ÇåÀÕ
                WHEN    "4"
-      *            ¼«ÇåÀÕ
       *            ¼«ÇåÀÕ´µ¼ÔÀÁµá¶èÊ¬
-                   MOVE    2               TO  SPA-GMN2D-JIBAISEIKBN-MAX
-      ***          IF      SPA-GMN2D-JIBAISEIKBN   =   SPACE
-      *                ¥·¥¹¥Æ¥à´ÉÍýÀßÄê¤Ë¤è¤ê¡¢½é´üÉ½¼¨ÊÑ¹¹
-                       IF      SPA-JIBAI-SEI       =   "2"
-                           MOVE    SPA-GMN2D-JIBAISEIKBN-LST (2)
+      *            ¥·¥¹¥Æ¥à´ÉÍýÀßÄê¤Ë¤è¤ê¡¢½é´üÉ½¼¨ÊÑ¹¹
+                   IF      SPA-JIBAI-SEI       =   "2"
+                       MOVE    SPA-GMN2D-JIBAISEIKBN-LST (2)
                                            TO  SPA-GMN2D-JIBAISEIKBN-G
-                       ELSE
-                           MOVE    SPA-GMN2D-JIBAISEIKBN-LST (1)
+                   ELSE
+                       MOVE    SPA-GMN2D-JIBAISEIKBN-LST (1)
                                            TO  SPA-GMN2D-JIBAISEIKBN-G
-                       END-IF
-      ***          END-IF
-      *
-                   PERFORM 41012-SINKEI-SET-SEC
-                   MOVE    SPACE           TO  SPA-GMN2D-SINKEI-G
+                   END-IF
       *            Å¾µ¢
                    IF      SPA-GMN2D-TENKI     =   SPACE
                        MOVE    SPA-GMN2D-TENKI-LST (02)
@@ -1719,12 +1981,9 @@
                        MOVE    SPA-GMN2D-SISIKBN-LST (01)
                                                TO  SPA-GMN2D-SISIKBN-G
                    END-IF
-      *            ºÒ³²¶èÊ¬
-                   MOVE   SPACE                TO  SPA-GMN2D-SAIGAI-G
+      *        ¸øÌ³ºÒ³²
                WHEN    "5"
-      *            ¸øÌ³ºÒ³²
       *            ¼«ÇåÀÕ´µ¼ÔÀÁµá¶èÊ¬
-                   MOVE    2               TO  SPA-GMN2D-JIBAISEIKBN-MAX
       ***          IF      SPA-GMN2D-JIBAISEIKBN   =   SPACE
       *                ¥·¥¹¥Æ¥à´ÉÍýÀßÄê¤Ë¤è¤ê¡¢½é´üÉ½¼¨ÊÑ¹¹
                        IF      SPA-KOMU-SEI        =   "2"
@@ -1735,9 +1994,6 @@
                                            TO  SPA-GMN2D-JIBAISEIKBN-G
                        END-IF
       **           END-IF
-      *
-                   PERFORM 41012-SINKEI-SET-SEC
-                   MOVE    SPACE           TO  SPA-GMN2D-SINKEI-G
       *            Å¾µ¢
                    IF      SPA-GMN2D-TENKI     =   SPACE
                        MOVE    SPA-GMN2D-TENKI-LST (02)
@@ -1748,27 +2004,28 @@
                        MOVE    SPA-GMN2D-SISIKBN-LST (01)
                                                TO  SPA-GMN2D-SISIKBN-G
                    END-IF
-      *            ºÒ³²¶èÊ¬
-                   MOVE   SPACE                TO  SPA-GMN2D-SAIGAI-G
-           END-EVALUATE
-      *    ¸«½Ð¤·½¤Àµ
-           EVALUATE    SPA-GMN2D-HKNKBN
-               WHEN    "5"
-                   MOVE    "ÀÁµá¶èÊ¬"          TO  SPA-GMN2D-SEIKBNMEI
-                   MOVE    "Ã´Åö°å"            TO  SPA-GMN2D-TANTOIMEI
-               WHEN    OTHER
-                   MOVE    "¼«ÇåÀÕÀÁµá¶èÊ¬"    TO  SPA-GMN2D-SEIKBNMEI
-                   MOVE    "¼«ÇåÀÕÃ´Åö°å"      TO  SPA-GMN2D-TANTOIMEI
+      *!!!!
+      *        Âè»°¼Ô¹Ô°Ù
+               WHEN    "6"
+      *            ¼«ÇåÀÕ´µ¼ÔÀÁµá¶èÊ¬
+                   MOVE    SPA-GMN2D-JIBAISEIKBN-LST (2)
+                                           TO  SPA-GMN2D-JIBAISEIKBN-G
+      *            Å¾µ¢
+                   IF      SPA-GMN2D-TENKI     =   SPACE
+                       MOVE    SPA-GMN2D-TENKI-LST (02)
+                                               TO  SPA-GMN2D-TENKI-G
+                   END-IF
            END-EVALUATE
       *
           .
        41011-SYOKI-SET-EXT.
            EXIT.
       *****************************************************************
-      *    ¿··ÑºÆÊÌÊÔ½¸½èÍý
+      *    ½é´üÊÔ½¸½èÍý
       *****************************************************************
        41012-SINKEI-SET-SEC           SECTION.
       *
+      *    ¿··ÑºÆÊÌÊÔ½¸
            EVALUATE    SPA-GMN2D-HKNKBN
                WHEN    "1"
       *            Ã»´üµëÉÕ
@@ -1788,6 +2045,33 @@
                    MOVE    ZERO            TO  SPA-GMN2D-SINKEI-MAX
            END-EVALUATE
       *
+      *    ¸«½Ð¤·½¤Àµ
+           EVALUATE    SPA-GMN2D-HKNKBN
+               WHEN    "5"
+                   MOVE    "ÀÁµá¶èÊ¬"          TO  SPA-GMN2D-SEIKBNMEI
+                   MOVE    "Ã´Åö°å"            TO  SPA-GMN2D-TANTOIMEI
+               WHEN    OTHER
+                   MOVE    "¼«ÇåÀÕÀÁµá¶èÊ¬"    TO  SPA-GMN2D-SEIKBNMEI
+                   MOVE    "¼«ÇåÀÕÃ´Åö°å"      TO  SPA-GMN2D-TANTOIMEI
+           END-EVALUATE
+      *
+      *    ¼«ÇåÀÕ´µ¼ÔÀÁµá¶èÊ¬
+           MOVE    "1 ´µ¼ÔÀÁµá¤¹¤ë(100%)"
+                                       TO  SPA-GMN2D-JIBAISEIKBN-LST(01)
+           MOVE    "2 ´µ¼ÔÀÁµá¤·¤Ê¤¤(0%)"
+                                       TO  SPA-GMN2D-JIBAISEIKBN-LST(02)
+           IF      SPA-GMN2D-HKNKBN    =   "6"
+               MOVE    "1 ´µ¼ÔÀÁµá¤¹¤ë"
+                                       TO  SPA-GMN2D-JIBAISEIKBN-LST(01)
+           END-IF
+      *    ¼«ÇåÀÕ´µ¼ÔÀÁµá¶èÊ¬
+           IF      SPA-GMN2D-HKNKBN    =   "4"
+                                       OR  "5"
+                                       OR  "6"
+               MOVE    2                   TO  SPA-GMN2D-JIBAISEIKBN-MAX
+           ELSE
+               MOVE    ZERO                TO  SPA-GMN2D-JIBAISEIKBN-MAX
+           END-IF
       *
           .
        41012-SINKEI-SET-EXT.
@@ -2091,6 +2375,18 @@
                END-IF
            END-IF
       *!
+      *
+      *!!
+      *    Âè»°¼Ô¹Ô°Ù¤ÏH25.4.1¤«¤é¤È¤¹¤ë
+      *    IF     (SPA-ERRCD           =   SPACE ) AND
+      *           (SPA-NAI2D-RYOSTYMD  NOT =    SPACE )
+      *        IF     (SPA-GMN2D-HKNKBN    =   "6" ) AND
+      *               (SPA-NAI2D-RYOSTYMD  <   "20130401" )
+      *            MOVE    "0045"              TO  SPA-ERRCD
+      *            MOVE    9                   TO  SPA-GMN2D-CUR
+      *        END-IF
+      *****END-IF
+      *!
            .
        4101-RYOSTYMD-CHK-EXT.
            EXIT.
@@ -2282,6 +2578,7 @@
       *    ¼«ÇåÀÕ¡¦¸øÌ³ºÒ³²°Ê³°¤ÏÆþÎÏ¤Ê¤·¤È¤¹¤ë
            IF      SPA-GMN2D-HKNKBN    =   "4"
                                        OR  "5"
+                                       OR  "6"
                CONTINUE
            ELSE
                MOVE    SPACE               TO  SPA-GMN2D-SRYKA-G
@@ -2356,6 +2653,7 @@
       *    ¼«ÇåÀÕ¡¦¸øÌ³ºÒ³²°Ê³°¤ÏÆþÎÏ¤Ê¤·¤È¤¹¤ë
            IF      SPA-GMN2D-HKNKBN    =   "4"
                                        OR  "5"
+                                       OR  "6"
                CONTINUE
            ELSE
                MOVE    SPACE               TO  SPA-GMN2D-DRCD-G
@@ -2393,6 +2691,7 @@
       *
       *    ¼«ÇåÀÕ°Ê³°¤ÏÆþÎÏ¤Ê¤·¤È¤¹¤ë
            IF      SPA-GMN2D-HKNKBN    =   "4"
+                                       OR  "6"
                CONTINUE
            ELSE
                MOVE    SPACE               TO  SPA-GMN2D-HOKENNAME
@@ -2668,6 +2967,147 @@
        4101-SINSATUEND-CHK-EXT.
            EXIT.
       *
+      *!!!!!!!!!!!!!!!!!!!!!!!!!!
+      *****************************************************************
+      *    ¥¯¥ê¥¢½èÍý
+      *****************************************************************
+       420-CLERA-SEC       SECTION.
+      *
+      *    ¥¯¥ê¥¢
+           PERFORM 4201-CLERA-SYORI-SEC
+      *
+           MOVE    ZERO                TO  SPA-NAI2D-GMNIDX
+           MOVE    SPA-GMN-NAME        TO  SPA-GMN2D-HIHKNJANAME
+      *
+           MOVE    ZERO                TO  SPA-GMN2D-SELNUM
+           MOVE    ZERO                TO  SPA-GMN2D-MAE-SELNUM
+           MOVE    1                   TO  SPA-GMN2D-CUR
+           .
+       420-CLERA-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥¯¥ê¥¢¶¦ÄÌ½èÍý
+      *****************************************************************
+       4201-CLERA-SYORI-SEC       SECTION.
+      *
+           INITIALIZE                  SPA-GMN2D-AREA
+           INITIALIZE                  SPA-NAI2D-AREA
+           MOVE    ZERO                TO  SPA-NAI2D-HKNID
+           MOVE    ZERO                TO  SPA-NAI2D-KOHID
+      *
+           MOVE    ZERO                TO  SPA-NAI2D-RSHKN-EDANUM
+      *
+      *    ¥³¥ó¥Ü¥Ü¥¯¥¹¤ÎÊÔ½¸
+           PERFORM 3002-COMBBOX-HEX-SEC
+      *    ¶èÊ¬Ëè¥³¥ó¥Ü¥Ü¥¯¥¹ÊÔ½¸
+           PERFORM 41012-SINKEI-SET-SEC
+      *
+           .
+       4201-CLERA-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ï«ºÒ°ìÍ÷ÁªÂò½èÍý
+      *****************************************************************
+       4001-RSILIST-SEL-SEC       SECTION.
+      *
+           MOVE    ZERO                TO  WRK-SELNUM
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL       IDX     >   SPA-GMN2D-RSIMAX
+               IF      P02D-RSILIST-SELECT (IDX)   =   "T"
+                   MOVE    IDX                 TO  WRK-SELNUM
+                   MOVE    SPA-GMN2D-RSIMAX    TO  IDX
+               END-IF
+           END-PERFORM
+      *
+           IF      WRK-SELNUM      NOT =   ZERO
+               MOVE    WRK-SELNUM      TO  P02D-SELNUM
+               PERFORM 4002-SELNUM-CHK-SEC
+           END-IF
+      *
+           .
+       4001-RSILIST-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    Ï«ºÒÁªÂò½èÍý
+      *****************************************************************
+       4002-SELNUM-CHK-SEC       SECTION.
+      *
+           MOVE    P02D-SELNUM         TO  SPA-GMN2D-SELNUM
+      *
+           IF      SPA-GMN2D-SELNUM    >   SPA-GMN2D-RSIMAX
+               MOVE    "0051"              TO  SPA-ERRCD
+               MOVE    31                  TO  SPA-GMN2D-CUR
+               GO      TO      4002-SELNUM-CHK-EXT
+           END-IF
+      *
+           IF      SPA-GMN2D-SELNUM    =   ZERO
+      *         ÁªÂò¤Ê¤·
+                IF      SPA-GMN2D-MAE-SELNUM   NOT =   ZERO
+      *             ¥¯¥ê¥¢
+                    PERFORM 420-CLERA-SEC
+               END-IF
+           ELSE
+      *        Ï«ºÒ¥ê¥¹¥ÈÁªÂò
+               PERFORM 40021-RISSEL-HEN-SEC
+           END-IF
+           .
+       4002-SELNUM-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥¯¥ê¥¢½èÍý
+      *****************************************************************
+       40021-RISSEL-HEN-SEC       SECTION.
+      *
+      *    ¥¯¥ê¥¢
+           PERFORM 4201-CLERA-SYORI-SEC
+      *
+      *    ¥Ñ¥é¥á¥¿Ï¢ÈÖ
+           MOVE    SPA-GMN2D-TPARANUM (SPA-GMN2D-SELNUM)
+                                       TO  SPA-NAI2D-RSHKN-EDANUM
+      *    Ï«ºÒ¾ÜºÙÊÔ½¸
+           PERFORM 3001-RSHKN-SET-SEC
+      *    ¶èÊ¬Ëè¥³¥ó¥Ü¥Ü¥¯¥¹ÊÔ½¸
+           PERFORM 41012-SINKEI-SET-SEC
+      *    ¥³¥ó¥Ü¥Ü¥¯¥¹¤ÎÊÔ½¸
+           PERFORM 3003-COMBBOX-SET-SEC
+      *
+           MOVE    SPA-GMN2D-SELNUM    TO  SPA-GMN2D-MAE-SELNUM
+      *
+      *    Éô°Ì¤Î¼¡¤Ø
+           EVALUATE    SPA-GMN2D-HKNKBN
+               WHEN    "1"
+                   MOVE    3               TO  SPA-GMN2D-CUR
+               WHEN    "2"
+                   MOVE    4               TO  SPA-GMN2D-CUR
+               WHEN    "3"
+                   MOVE    16              TO  SPA-GMN2D-CUR
+               WHEN    "4"
+               WHEN    "5"
+               WHEN    "6"
+                   MOVE    6               TO  SPA-GMN2D-CUR
+           END-EVALUATE
+      *
+           .
+       40021-RISSEL-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¥¯¥ê¥¢½èÍý
+      *****************************************************************
+       460-NEXT-TBL-SEC       SECTION.
+      *
+           IF      SPA-GMN2D-RSIMAX    >   ZERO
+               ADD     1               TO  SPA-GMN2D-SELNUM
+               IF      SPA-GMN2D-SELNUM    >   SPA-GMN2D-RSIMAX
+                   MOVE    1               TO  SPA-GMN2D-SELNUM
+               END-IF
+      *        Ï«ºÒ¥ê¥¹¥ÈÁªÂò
+               PERFORM 40021-RISSEL-HEN-SEC
+           END-IF
+           .
+       460-NEXT-TBL-EXT.
+           EXIT.
+      *!!!!!!!!!!!!!!!!!!!!!!!!!!
+      *
       *****************************************************************
       *    ¼è¤ê¾Ã¤·½èÍý
       *****************************************************************
@@ -2697,13 +3137,11 @@
                GO  TO                  430-SAKUJYO-EXT
            END-IF
       *
-           MOVE    "1"                 TO  SPA-NAI-SAKJOKBN
-      *
            INITIALIZE                      PARA-REC
            MOVE    "P02"               TO  PARA-GYOUMUID
            MOVE    SPA-TERMID          TO  PARA-TERMID
            MOVE    "PTRSIINF"          TO  PARA-FILEMEI
-           MOVE    SPA-NAI-RSHKN-EDANUM
+           MOVE    SPA-NAI2D-RSHKN-EDANUM
                                        TO  PARA-EDANUM
       *
            MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
@@ -2726,6 +3164,7 @@
            IF      FLG-PARA           =    ZERO
                MOVE    PARA-DATA-REC       TO  PTRSIINF-REC
                MOVE    "1"                 TO  PTRSI-SAKUJOKBN
+      *
                MOVE    PTRSIINF-REC        TO  PARA-DATA-REC
       *
                MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
@@ -2741,13 +3180,25 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
+      *    ´µ¼ÔÊÝ¸±½èÍý
+           IF      SPA-ERRCD           =   SPACE
+               IF      SPA-GMN2D-HKNKBN    =   "6"
+      *            Âè»°¼Ô¹Ô°Ù
+                   PERFORM 49013-PTKOHINF-HEN-SEC
+               ELSE
+                   PERFORM 49012-PTHKNINF-HEN-SEC
+               END-IF
+           END-IF
       *
-           MOVE    1                   TO  FLG-END
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    "1"                 TO  SPA-NAI-SAKJOKBN
       *
-      *    ½ªÎ»¤Ø
-           PERFORM 210-BACK
+               MOVE    1                   TO  FLG-END
       *
-          .
+      *        ½ªÎ»¤Ø
+               PERFORM 210-BACK
+           END-IF
+           .
        430-SAKUJYO-EXT.
            EXIT.
       *
@@ -2767,7 +3218,13 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    ´µ¼ÔÊÝ¸±½èÍý
            IF      SPA-ERRCD           =   SPACE
-               PERFORM 49012-PTHKNINF-HEN-SEC
+      *!!!!!!!!!!!!!!!!
+               IF      SPA-GMN2D-HKNKBN    =   "6"
+      *            Âè»°¼Ô¹Ô°Ù
+                   PERFORM 49013-PTKOHINF-HEN-SEC
+               ELSE
+                   PERFORM 49012-PTHKNINF-HEN-SEC
+               END-IF
            END-IF
       *
       *    Ï«ºÒÊÝ¸±ÊÔ½¸½èÍý
@@ -2932,6 +3389,24 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    "0012"              TO  SPA-ERRCD
                        MOVE    9                   TO  SPA-GMN2D-CUR
                    END-IF
+      *        Âè»°¼Ô¹Ô°Ù
+               WHEN    "6"
+      *            Å¾µ¢»öÍ³
+                   IF     (SPA-GMN2D-TENKI         =   SPACE )
+                     AND  (SPA-ERRCD               =   SPACE )
+                       MOVE    "0006"              TO  SPA-ERRCD
+                       MOVE    6                   TO  SPA-GMN2D-CUR
+                   END-IF
+                   IF      SPA-GMN2D-SHOBYOYMD     =   SPACE
+                     AND  (SPA-ERRCD               =   SPACE )
+                       MOVE    "0025"              TO  SPA-ERRCD
+                       MOVE    8                   TO  SPA-GMN2D-CUR
+                   END-IF
+                   IF      SPA-GMN2D-RYOSTYMD      =   SPACE
+                     AND  (SPA-ERRCD               =   SPACE )
+                       MOVE    "0012"              TO  SPA-ERRCD
+                       MOVE    9                   TO  SPA-GMN2D-CUR
+                   END-IF
            END-EVALUATE
       *
            .
@@ -2956,10 +3431,29 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        49012-PTHKNINF-HEN-SEC         SECTION.
       *
+           MOVE    ZERO                TO  SPA-NAI2D-KOHID
+      *
+           INITIALIZE                  SPA-GMN-HKN-AREA
       *    ¿·µ¬¤Î»þ¡¢ÊÝ¸±£É£Ä·×»»
-           IF      SPA-NAI-HKNID       =   ZERO
+           IF      SPA-NAI2D-HKNID     =   ZERO
                ADD     1                   TO  SPA-PTNUM-HKNID
                MOVE    SPA-PTNUM-HKNID     TO  SPA-NAI-HKNID
+               MOVE    SPA-PTNUM-HKNID     TO  SPA-NAI2D-HKNID
+               MOVE    ZERO                TO  SPA-NAI-HKNSTR
+           ELSE
+      *        ´ðËÜ²èÌÌÀßÄêÍÑ
+               PERFORM VARYING IDX-R       FROM    1   BY  1
+                       UNTIL   IDX-R       >   SPA-PTHKN-MAX
+                  IF      (SPA-PTHKN-HKNNUM (IDX-R)  =   "971"  OR
+                                                         "973" )  AND
+                          (SPA-PTHKN-SAKJOKBN(IDX-R) =   SPACE )
+                     AND  (SPA-PTHKN-HKNID  (IDX-R)
+                                               =   SPA-NAI2D-HKNID)
+                      MOVE    IDX-R            TO  SPA-NAI-HKNSTR
+                      MOVE    SPA-PTHKN-HKNID  (IDX-R)
+                                               TO  SPA-NAI-HKNID
+                   END-IF
+               END-PERFORM
            END-IF
       *
            EVALUATE    SPA-GMN2D-HKNKBN
@@ -3028,11 +3522,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            INITIALIZE                      PTRSIINF-REC
       *
-           MOVE    SPA-HOSPNUM          TO  PTRSI-HOSPNUM
+           MOVE    SPA-HOSPNUM         TO  PTRSI-HOSPNUM
            MOVE    SPA-GMN-PTID        TO  PTRSI-PTID
            MOVE    SPA-GMN2D-HKNKBN    TO  PTRSI-HKNKBN
            MOVE    SPA-NAI2D-HKNNUM    TO  PTRSI-HKNNUM
-           MOVE    SPA-NAI-HKNID       TO  PTRSI-HKNID
+           MOVE    SPA-NAI2D-HKNID     TO  PTRSI-HKNID
+           MOVE    SPA-NAI2D-KOHID     TO  PTRSI-KOHID
       *
       *    ´µ¼Ô¸òÉÕÈÖ¹æ
            EVALUATE    SPA-GMN2D-HKNKBN
@@ -3069,6 +3564,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    "1"                 TO  PTRSI-DRCD(1:1)
                        MOVE    SPA-GMN2D-DRCD      TO  PTRSI-DRCD(2:4)
                    END-IF
+      *
+               WHEN    "6"
+      *    Âè»°¼Ô¹Ô°Ù
+                   MOVE    SPA-GMN2D-JIBAISEIKBN
+                                               TO  PTRSI-JIBAISEIKBN
+                   IF      SPA-GMN2D-DRCD      =   SPACE
+                       MOVE    SPACE               TO  PTRSI-DRCD
+                   ELSE
+                       MOVE    "1"                 TO  PTRSI-DRCD(1:1)
+                       MOVE    SPA-GMN2D-DRCD      TO  PTRSI-DRCD(2:4)
+                   END-IF
+      *            ¼«ÇåÀÕÊÝ¸±²ñ¼ÒÌ¾
+                   MOVE    SPA-GMN2D-HOKENNAME TO  PTRSI-HOKENNAME
            END-EVALUATE
       *
            MOVE    SPA-GMN2D-HIHKNJANAME
@@ -3105,6 +3613,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    SPA-GMN2D-SISIKBN   TO  PTRSI-SISIKBN
                    MOVE    SPA-NAI2D-RYOSTYMD  TO  PTRSI-RYOSTYMD
                    MOVE    SPA-NAI2D-RYOEDYMD  TO  PTRSI-RYOEDYMD
+               WHEN    "6"
+      *        Âè»°¼Ô¹Ô°Ù
+                   MOVE    SPA-GMN2D-TENKI     TO  PTRSI-TENKI
+                   MOVE    SPA-NAI2D-SHOBYOYMD TO  PTRSI-SHOBYOYMD
+                   MOVE    SPA-NAI2D-RYOSTYMD  TO  PTRSI-RYOSTYMD
+                   MOVE    SPA-NAI2D-RYOEDYMD  TO  PTRSI-RYOEDYMD
            END-EVALUATE
            EVALUATE    SPA-GMN2D-HKNKBN
       *        ¥¢¥Õ¥¿¡¼¥±¥¢
@@ -3134,17 +3648,18 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *****MOVE    PTRSIINF-REC        TO  RSPAR-REC
       *
       *
-           IF      SPA-NAI-RSHKN-EDANUM    =   ZERO
+           IF      SPA-NAI2D-RSHKN-EDANUM  =   ZERO
                ADD     1                   TO  SPA-P02-RSHKNMAX
-               MOVE    SPA-P02-RSHKNMAX    TO  SPA-NAI-RSHKN-EDANUM
+               MOVE    SPA-P02-RSHKNMAX    TO  SPA-NAI2D-RSHKN-EDANUM
            END-IF
       *
+           MOVE    SPA-NAI2D-RSHKN-EDANUM  TO  SPA-NAI-RSHKN-EDANUM
       *
            INITIALIZE                      PARA-REC
            MOVE    "P02"               TO  PARA-GYOUMUID
            MOVE    SPA-TERMID          TO  PARA-TERMID
            MOVE    "PTRSIINF"          TO  PARA-FILEMEI
-           MOVE    SPA-NAI-RSHKN-EDANUM
+           MOVE    SPA-NAI2D-RSHKN-EDANUM
                                        TO  PARA-EDANUM
       *
            MOVE    SPA-HOSPNUM         TO  PARA-HOSPNUM
@@ -3170,7 +3685,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "P02"               TO  PARA-GYOUMUID
                MOVE    SPA-TERMID          TO  PARA-TERMID
                MOVE    "PTRSIINF"          TO  PARA-FILEMEI
-               MOVE    SPA-NAI-RSHKN-EDANUM
+               MOVE    SPA-NAI2D-RSHKN-EDANUM
                                            TO  PARA-EDANUM
                MOVE    PTRSIINF-REC        TO  PARA-DATA-REC
       *
@@ -3204,6 +3719,47 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        4905-PTRSIINF-HEN-EXT.
            EXIT.
+      *
+      *H25.7
+      *****************************************************************
+      *    ´µ¼Ô¸øÈñÊÔ½¸½èÍý
+      *****************************************************************
+       49013-PTKOHINF-HEN-SEC         SECTION.
+      *
+           MOVE    ZERO                TO  SPA-NAI2D-HKNID
+           MOVE    "970"               TO  SPA-NAI2D-HKNNUM
+      *
+           IF      SPA-NAI2D-KOHID     =   ZERO
+      *        ¿·µ¬
+      *        ¸øÈñ¤Î¾å¸Â£¶£°·ï°Ê¾å¤Ë¤Ê¤ë»þ¤Ï¡¢¥¨¥é¡¼
+               IF      SPA-PTKOH-MAX       >=  TBL-MAX-KOH
+                   MOVE    "0106"          TO  SPA-ERRCD
+                   MOVE    91              TO  SPA-GMN2D-CUR
+                   GO      TO   49013-PTKOHINF-HEN-EXT
+               END-IF
+      *
+               ADD     1                   TO  SPA-PTNUM-KOHID
+               MOVE    SPA-PTNUM-KOHID     TO  SPA-NAI2D-KOHID
+               MOVE    ZERO                TO  SPA-NAI2D-KOHIDX
+               MOVE    1                   TO  SPA-NAI2D-KOHIADD
+           ELSE
+               MOVE    ZERO                TO  SPA-NAI2D-KOHIADD
+               MOVE    ZERO                TO  SPA-NAI2D-KOHIDX
+      *        ¸øÈñÉ½¼¨Ãæ
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL      (IDX         >   SPA-KOH-MAX )
+                             OR   (SPA-NAI2D-KOHIDX    NOT =   ZERO)
+                   IF      SPA-NAI-PTKOH-KOHID (IDX)
+                                              =   SPA-NAI2D-KOHID
+                       MOVE    IDX                 TO  SPA-NAI2D-KOHIDX
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       49013-PTKOHINF-HEN-EXT.
+           EXIT.
+      *!!!!!!!!!!!!!!!!
       *
       *****************************************************************
       *    Ìá¤ë¡¡½èÍý
@@ -3413,6 +3969,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING
+               WHEN    "0045"
+                   STRING  "Âè»°¼Ô¹Ô°Ù¤ÏÊ¿À®£²£µÇ¯£´·î¤«¤é¤Î"
+                           "ÂÐ±þ¤Ç¤¹¡£"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "K049"
                    STRING  "·Ù¹ð¡ª¡ª"
                            "Ï«Æ¯´ð½à´ÆÆÄ½ð¥³¡¼¥É¤¬Â¸ºß¤·¤Þ¤»¤ó¡£"
@@ -3429,6 +3991,17 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "K052"
                    STRING  "·Ù¹ð¡ª¡ª"
                            "Ï«Æ¯´ð½à´ÆÆÄ½ð¥³¡¼¥É¤ÇºÆÆþÎÏ¤·¤Æ²¼¤µ¤¤¡£"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0051"
+                   STRING  "ÁªÂòÈÖ¹æ¥¨¥é¡¼¤Ç¤¹¡£"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "0106"
+                   STRING   "¸øÈñ¤ÎÅÐÏ¿¤Ï£¶£°·ï¤Þ¤Ç¤Ç¤¹¡£"
+                            "¤³¤ì°Ê¾åÄÉ²Ã¤Ç¤­¤Þ¤»¤ó¡£"
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING

@@ -2,6 +2,7 @@ tbl_ptrsiinf {
 	HOSPNUM				number(2,0);
 	PTID				number(10);
 	HKNID				number(10);
+	KOHID				number(10);
         HKNKBN  			char(1);
         HKNNUM  			char(3);
         KOFUNUM  			char(14);
@@ -39,7 +40,7 @@ tbl_ptrsiinf {
 };
 
 primary	{
-	HOSPNUM,PTID,HKNID;
+	HOSPNUM,PTID,HKNID,KOHID;
 };
 
 path	key 	{
@@ -50,6 +51,7 @@ path	key 	{
 			WHERE   HOSPNUM    =   :HOSPNUM
 			AND   PTID        =   :PTID
 			AND   HKNID       =   :HKNID
+			AND   KOHID       =   :KOHID
 		;
 	};
 };

@@ -1822,6 +1822,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                        ELSE
                            MOVE    "1"                 TO  JYURRK-HKNKBN
                        END-IF
+      *
+                   WHEN    "6"
+      *                极清勒∈妈话荚乖百∷
+                       MOVE    "7"             TO  JYURRK-HKNKBN
                END-EVALUATE
            END-IF
       *    给巢瘦副
@@ -4873,6 +4877,10 @@ grpsys                 CALL    "ORCDBMAIN"         USING   MCPAREA
                        ELSE
                            MOVE    "1"             TO  LNK-UPD-HKNKBN
                        END-IF
+      *
+                   WHEN    "6"
+      *                极清勒∈妈话荚乖百∷
+                       MOVE    "7"             TO  LNK-UPD-HKNKBN
                END-EVALUATE
            END-IF
       *    给巢瘦副

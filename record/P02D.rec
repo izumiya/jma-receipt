@@ -35,7 +35,7 @@ P02D	{
 				value	varchar(16);
 			};
 			count	int;
-			item	varchar(16)[5];
+			item	varchar(16)[9];
 		};
 		COMMENT	{
 			value	varchar(100);
@@ -140,6 +140,23 @@ P02D	{
 		};
 		SYOCDNAME	{
 			value	varchar(26);
+		};
+		scrolledwindow1	{
+			hpos	int;
+			vpos	int;
+			RSILIST	{
+				count	int;
+				row	int;
+				item	{
+					value0	varchar(3);
+					value1	varchar(16);
+					value2	varchar(20);
+				}	[50];
+				select	bool[50];
+			};
+		};
+		SELNUM	{
+			value	number(3);
 		};
 	};
 };

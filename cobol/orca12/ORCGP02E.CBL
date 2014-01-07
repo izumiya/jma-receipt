@@ -871,6 +871,9 @@
                IF     (PTKOH-SAKJOKBN        =   SPACE    )  AND
                       (PTKOH-TEKSTYMD      <=  SPA-SYSYMD AND
                        PTKOH-TEKEDYMD      >=  SPA-SYSYMD )
+      *            第三者行為対象外
+                  AND (PTKOH-KOHNUM    NOT =   "970"      )
+      *
                    PERFORM 410130-KOHNUM-CHK-SEC
       *            患者紐付けは、期間エラーも複写する
                    IF     (FLG-HKNNUM-OK       =   ZERO )
@@ -1538,6 +1541,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                IF     (PTKOH-SAKJOKBN        =   SPACE    )  AND
                       (PTKOH-TEKSTYMD      <=  SPA-SYSYMD AND
                        PTKOH-TEKEDYMD      >=  SPA-SYSYMD )
+      *H25.11
+      *            第三者行為対象外
+                  AND (PTKOH-KOHNUM    NOT =   "970"      )
       *            保険番号マスタ登録チェック
                    PERFORM 410130-KOHNUM-CHK-SEC
                    IF      FLG-HKNNUM-OK       =   1

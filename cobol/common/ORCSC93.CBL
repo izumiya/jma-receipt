@@ -62,6 +62,7 @@
       * 04.05.00     NACL-Â¿¡¹Ç¼  10/01/XX  ¼£¸³ÂÐ±þ
       * 04.06.00     NACL-Â¿¡¹Ç¼  10/12/01  ¼«ÇåÀÕ¶â³ÛÆþÎÏÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  13/07/XX  Âè»°¼Ô¹Ô°ÙÂÐ±þ
       *****************************************************************
       *
       *
@@ -1783,6 +1784,27 @@
                        MOVE    "1"         TO  SPA-COM-ZAIEND  (IDX)
                        MOVE    2           TO  FLG-ZAI
                    END-IF
+      *H25.7
+      *            Âè»°¼Ô¹Ô°Ù¤Î»þ¡¡£¸£°¤È¤¹¤ë
+                   IF     (SPA-RSI-HKNKBN            =  "6" )
+                    AND  ((SPA-COM-INPUTCD(IDX)(1:5) =  "09591"
+                                                    OR  "09592"
+                                                    OR  "09593")  OR
+                         ((SPA-NYUGAIKBN             =  "1"  ) AND
+                          (SPA-COM-INPUTCD(IDX)(1:5) =  "09594")))
+                       MOVE    "80"        TO  SPA-COM-SRYKBN (IDX)
+                       MOVE    "800"       TO  SPA-COM-SRYSYUKBN
+                                                               (IDX)
+      *                ÅÀ¿ô¥Þ¥¹¥¿¶â³Û¡á£°
+                       IF     (SPA-COM-TEN (IDX)    =   ZERO )
+                       AND    (SPA-SRYYMD           >=  "20100401")
+                           MOVE    "809"       TO  SPA-COM-SRYSYUKBN
+                                                               (IDX)
+                       END-IF
+                       MOVE    "1"         TO  SPA-COM-ZAIEND (IDX)
+                       MOVE    2           TO  FLG-ZAI
+                   END-IF
+      *
       *        ÊÝ¸±³°¡Ê¼«Èñ¡Ë¡Ê1¹Ô£±ºÞ¤È¤¹¤ë¡Ë
                WHEN    "096"
                    MOVE    "96"            TO  SPA-COM-SRYKBN (IDX)

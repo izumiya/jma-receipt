@@ -4,7 +4,13 @@ I4ID1	{
 			value	varchar(10);
 		};
 		ID1MSG	{
-			value	varchar(70);
+			value	varchar(80);
+		};
+		B01	{
+			label	varchar(4);
+		};
+		B12	{
+			label	varchar(4);
 		};
 	};
 };

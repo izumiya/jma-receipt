@@ -183,6 +183,8 @@
                05  SPA-XC01-RSI-HKNKBN     PIC X(01).
                05  SPA-XC01-RESPRVFLG      PIC X(01).
       *
+               05  SPA-XC01-DAISANFLG      PIC X(01).
+      *
       *    プレビュー保険組合せ一覧
            03  SPA-I411-AREA.
                05  SPA-I411-GMN-CUR        PIC 9(02).
