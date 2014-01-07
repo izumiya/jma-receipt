@@ -73,5 +73,9 @@ I03	{
 			item	varchar(10)[02];
 			state	int;
 		};
+		TOKUTAISYONISSU	{
+			value	number(5);
+			state	int;
+		};
 	};
 };

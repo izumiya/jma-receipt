@@ -86,6 +86,8 @@
            03  PTNYUINRRK-TUSANNISSU1             PIC  9(05).
       *通算日数２（１８０日越え算定用）
            03  PTNYUINRRK-TUSANNISSU2             PIC  9(05).
+      *特定入院−通算対象日数
+           03  PTNYUINRRK-TOKU-TAISYONISSU        PIC  9(05).
       *自院歴−入院中区分
       *  自院歴で作成した歴と
       *  入院登録で作成した歴をレセプト上１つの入院期間としたい

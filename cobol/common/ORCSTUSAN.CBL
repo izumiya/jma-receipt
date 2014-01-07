@@ -452,6 +452,9 @@
                    COMPUTE STUSAN-TAINREL-NISSU
                        =   STUSAN-TAINREL-NISSU
                        +   PTNYUINRRK-TAISYONISSU
+                   COMPUTE STUSAN-NISSU08
+                       =   STUSAN-NISSU08
+                       +   PTNYUINRRK-TOKU-TAISYONISSU
                END-IF
            WHEN    "6"
                COMPUTE STUSAN-NISSU02
@@ -463,7 +466,7 @@
                COMPUTE STUSAN-NISSU05
                    =   STUSAN-NISSU05  +   PTNYUINRRK-TAISYONISSU
                COMPUTE STUSAN-NISSU08
-                   =   STUSAN-NISSU08  +   PTNYUINRRK-TAISYONISSU
+                   =   STUSAN-NISSU08  +   PTNYUINRRK-TOKU-TAISYONISSU
                IF    ( PTNYUINRRK-NYUINCHUKBN  =   "1" )
                    MOVE   PTNYUINRRK-TAIINYMD
                                        TO  WRK-YMD

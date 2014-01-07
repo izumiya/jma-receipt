@@ -57,3 +57,5 @@
                                            OCCURS  2.
                 05  I03-NYUINCHUKBN-ITM-STT
                                            PIC S9(9)   BINARY.
+              04  I03-TOKUTAISYONISSU      PIC S9(5).
+              04  I03-TOKUTAISYONISSU-STT  PIC S9(9)   BINARY.

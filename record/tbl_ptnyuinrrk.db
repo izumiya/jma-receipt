@@ -29,6 +29,7 @@ tbl_ptnyuinrrk	{
 	TAISYONISSU		number(5,0);
 	TUSANNISSU1		number(5,0);
 	TUSANNISSU2		number(5,0);
+	TOKU_TAISYONISSU	number(5,0);
 	NYUINCHUKBN		char(1);
 	DOUJITSUKBN		char(1);
 	MAXEDANUM		number(3,0);
