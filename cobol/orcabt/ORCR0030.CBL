@@ -1555,6 +1555,7 @@
       *
            03  WRK-TAIHI-TOTALTEN              PIC 9(08).
            03  WRK-DAISAN-FTNMONEY             PIC 9(08).
+           03  WRK-DAISAN-TOTALTEN-GEN         PIC 9(08).
       *
       *---------------------------------------------------------------
       *  ²ó¿ô¸º»»ÍÑÂàÈòÎÎ°è
@@ -3500,6 +3501,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
        211X-DAISAN-CHECK-SEC      SECTION.
       *
            MOVE      ZERO      TO      FLG-DAISAN-ARI
+           MOVE      ZERO      TO      WRK-DAISAN-TOTALTEN-GEN
       *
            PERFORM  VARYING  IDX16   FROM    1   BY  1
                      UNTIL  (IDX16                   >   10 )
@@ -3507,38 +3509,55 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *
              IF     RECE02-DAISANFLG(IDX16)   =   1
       *
-               INITIALIZE                       SYUNOU-REC
-               MOVE  RECE02-HOSPNUM         TO  SYU-HOSPNUM
-               MOVE  RECE02-NYUGAIKBN       TO  SYU-NYUGAIKBN
-               MOVE  RECE02-PTID            TO  SYU-PTID
-               MOVE  RECE02-SRYYM           TO  SYU-SRYYMD(1:6)
-               MOVE  "__"                   TO  SYU-SRYYMD(7:2)
-               MOVE  RECE02-HKNCOMBI(IDX16) TO  SYU-HKNCOMBINUM
-               MOVE  SYUNOU-REC             TO  MCPDATA-REC
-               MOVE  "tbl_syunou"           TO  MCP-TABLE
-               MOVE  "key41"                TO  MCP-PATHNAME
+               INITIALIZE                        SRYACCT-REC
+               MOVE  RECE02-HOSPNUM         TO   ACCT-HOSPNUM
+               MOVE  RECE02-NYUGAIKBN       TO   ACCT-NYUGAIKBN
+               MOVE  RECE02-PTID            TO   ACCT-PTID
+               MOVE  RECE02-SRYYM           TO   ACCT-SRYYM
+               MOVE  RECE02-HKNCOMBI(IDX16) TO   ACCT-HKNCOMBI
+               MOVE  SRYACCT-REC            TO   MCPDATA-REC
+               MOVE  "tbl_sryacct"          TO   MCP-TABLE
+               MOVE  "key22"                TO   MCP-PATHNAME
                PERFORM 900-DBSELECT-SEC
                IF    MCP-RC   =   ZERO
-                 MOVE    "tbl_syunou"       TO  MCP-TABLE
-                 MOVE    "key41"            TO  MCP-PATHNAME
-                 PERFORM  900-SYUNOU-READ-SEC
-                 PERFORM  UNTIL  (FLG-SYUNOU  =  1)
-                   IF    SYU-DENPJTIKBN    NOT =  "3"
-                     IF  SYU-TOTAL-HKNTEN  NOT = ZERO
+                 MOVE    "tbl_sryacct"      TO   MCP-TABLE
+                 MOVE    "key22"            TO   MCP-PATHNAME
+                 PERFORM  900-SRYACCT-READ-SEC
+                 PERFORM  UNTIL  (FLG-SRYACCT =  1)
+                   IF   (ACCT-ZAITEN    NOT =  ZERO         )
+                   AND  (ACCT-ZAIKAISU  NOT =  ZERO         )
+                   AND  (ACCT-JIHOKBN       =  SPACE        )
+                   AND  (ACCT-SRYKBN    NOT =  "95" AND "96")
                        MOVE   1   TO  RECE02-DAISAN-SKYFLG(IDX16)
-                       ADD  SYU-TOTAL-HKNTEN
-                                  TO  RECE02-DAISAN-TOTALTEN
+                       IF      ACCT-ZAIKBN      =    2
+                           COMPUTE    WRK-DAISAN-TOTALTEN-GEN =
+                                      WRK-DAISAN-TOTALTEN-GEN +
+                                     (ACCT-ZAITEN  *  ACCT-ZAIKAISU)
+                       ELSE
+                         IF    ACCT-SRYCDTOTAL  =  630010002
+                           COMPUTE    RECE02-DAISAN-TOTALTEN  =
+                                      RECE02-DAISAN-TOTALTEN  -
+                                     (ACCT-ZAITEN  *  ACCT-ZAIKAISU)
+                         ELSE
+                           COMPUTE    RECE02-DAISAN-TOTALTEN  =
+                                      RECE02-DAISAN-TOTALTEN  +
+                                     (ACCT-ZAITEN  *  ACCT-ZAIKAISU)
+                         END-IF
+                       END-IF
                        MOVE   1   TO  RECE02-DAISAN-GAITO
-                     END-IF
                    END-IF
-                   MOVE    "tbl_syunou"     TO  MCP-TABLE
-                   MOVE    "key41"          TO  MCP-PATHNAME
-                   PERFORM  900-SYUNOU-READ-SEC
+                   MOVE    "tbl_sryacct"    TO  MCP-TABLE
+                   MOVE    "key22"          TO  MCP-PATHNAME
+                   PERFORM  900-SRYACCT-READ-SEC
                  END-PERFORM
                END-IF
-               MOVE      "tbl_syunou"       TO  MCP-TABLE
-               MOVE      "key41"            TO  MCP-PATHNAME
+               MOVE      "tbl_sryacct"      TO  MCP-TABLE
+               MOVE      "key22"            TO  MCP-PATHNAME
                PERFORM    900-CLOSE-SEC
+      *
+               COMPUTE    RECE02-DAISAN-TOTALTEN    =
+                          RECE02-DAISAN-TOTALTEN    -
+                          WRK-DAISAN-TOTALTEN-GEN
       *
                MOVE       1                 TO  FLG-DAISAN-ARI
       *
@@ -3555,35 +3574,35 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *
                IF     RECE02-DAISANFLG(IDX16)   NOT =   1
       *
-                 INITIALIZE                       SYUNOU-REC
-                 MOVE  RECE02-HOSPNUM         TO  SYU-HOSPNUM
-                 MOVE  RECE02-NYUGAIKBN       TO  SYU-NYUGAIKBN
-                 MOVE  RECE02-PTID            TO  SYU-PTID
-                 MOVE  RECE02-SRYYM           TO  SYU-SRYYMD(1:6)
-                 MOVE  "__"                   TO  SYU-SRYYMD(7:2)
-                 MOVE  RECE02-HKNCOMBI(IDX16) TO  SYU-HKNCOMBINUM
-                 MOVE  SYUNOU-REC             TO  MCPDATA-REC
-                 MOVE  "tbl_syunou"           TO  MCP-TABLE
-                 MOVE  "key41"                TO  MCP-PATHNAME
+                 INITIALIZE                        SRYACCT-REC
+                 MOVE  RECE02-HOSPNUM         TO   ACCT-HOSPNUM
+                 MOVE  RECE02-NYUGAIKBN       TO   ACCT-NYUGAIKBN
+                 MOVE  RECE02-PTID            TO   ACCT-PTID
+                 MOVE  RECE02-SRYYM           TO   ACCT-SRYYM
+                 MOVE  RECE02-HKNCOMBI(IDX16) TO   ACCT-HKNCOMBI
+                 MOVE  SRYACCT-REC            TO   MCPDATA-REC
+                 MOVE  "tbl_sryacct"          TO   MCP-TABLE
+                 MOVE  "key22"                TO   MCP-PATHNAME
                  PERFORM 900-DBSELECT-SEC
                  IF    MCP-RC   =   ZERO
-                   MOVE    "tbl_syunou"       TO  MCP-TABLE
-                   MOVE    "key41"            TO  MCP-PATHNAME
-                   PERFORM  900-SYUNOU-READ-SEC
-                   PERFORM  UNTIL  (FLG-SYUNOU          =  1 )
+                   MOVE    "tbl_sryacct"      TO   MCP-TABLE
+                   MOVE    "key22"            TO   MCP-PATHNAME
+                   PERFORM  900-SRYACCT-READ-SEC
+                   PERFORM  UNTIL  (FLG-SRYACCT         =  1 )
                              OR    (RECE02-DAISAN-GAITO =  2 )
-                     IF    SYU-DENPJTIKBN    NOT =  "3"
-                       IF  SYU-TOTAL-HKNTEN  NOT = ZERO
+                     IF   (ACCT-ZAITEN    NOT =  ZERO         )
+                     AND  (ACCT-ZAIKAISU  NOT =  ZERO         )
+                     AND  (ACCT-JIHOKBN       =  SPACE        )
+                     AND  (ACCT-SRYKBN    NOT =  "95" AND "96")
                          MOVE   2   TO  RECE02-DAISAN-GAITO
-                       END-IF
                      END-IF
-                     MOVE    "tbl_syunou"     TO  MCP-TABLE
-                     MOVE    "key41"          TO  MCP-PATHNAME
-                     PERFORM  900-SYUNOU-READ-SEC
+                     MOVE    "tbl_sryacct"    TO  MCP-TABLE
+                     MOVE    "key22"          TO  MCP-PATHNAME
+                     PERFORM  900-SRYACCT-READ-SEC
                    END-PERFORM
                  END-IF
-                 MOVE      "tbl_syunou"       TO  MCP-TABLE
-                 MOVE      "key41"            TO  MCP-PATHNAME
+                 MOVE      "tbl_sryacct"      TO  MCP-TABLE
+                 MOVE      "key22"            TO  MCP-PATHNAME
                  PERFORM    900-CLOSE-SEC
       *
                END-IF
