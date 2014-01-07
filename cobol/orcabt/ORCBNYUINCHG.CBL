@@ -86,7 +86,6 @@
            03  FLG-NYUKSN                  PIC 9(01).
            03  FLG-SYUNOU                  PIC 9(01).
            03  FLG-DBRC                    PIC 9(01).
-           03  FLG-TAISYO                  PIC 9(01).
            03  FLG-NG                      PIC 9(01).
            03  FLG-WWK-PTNYUINRRK          PIC 9(01).
       *
@@ -197,12 +196,6 @@
            03  WRK-NYUKHNKSN-AREA.
                05  WRK-NYUKHNKSN-SRYCD PIC X(09)  OCCURS 60.
            03  WRK-NYUKSNKBN               PIC X(03).
-           03  WRK-BTU-NYUKSNKBN           PIC X(03).
-           03  WRK-BTU-CDKBN-KBNNUM        PIC 9(03).
-           03  WRK-BTU-CDKBN-KBNNUM-EDA    PIC 9(02).
-           03  WRK-KSN-NYUKSNKBN           PIC X(03).
-           03  WRK-KSN-CDKBN-KBNNUM        PIC 9(03).
-           03  WRK-KSN-CDKBN-KBNNUM-EDA    PIC 9(02).
            03  WRK-SRYCD                   PIC X(09).
            03  WRK-STYUKYMD                PIC X(08).
            03  WRK-NYUINYM                 PIC X(06).
@@ -286,12 +279,6 @@
        01  WWK-PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC"     REPLACING
                                 //PTNYUINRRK-// BY //WWK-PTNYUINRRK-//.
-      *    特定入院期間算定用ワーク
-       01  WRK-SCNYUACCT-AREA.
-           03  WRK-SCNYUACCT-KAGENCD-TBL         OCCURS  7.
-               05  WRK-SCNYUACCT-KAGEN-SRYCD     PIC  X(09).
-               05  WRK-SCNYUACCT-KAGEN-STYUKYMD  PIC  X(08).
-               05  WRK-SCNYUACCT-KAGEN-EDYUKYMD  PIC  X(08).
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -414,6 +401,12 @@
       *
       *    亜急性期入院医療管理料判定パラメタ
            COPY  "CPORCSAKYUSEI.INC".
+      *
+      *    特定入院料算定期間取得パラメタ
+           COPY  "CPORCSTOKNYUIN2.INC".
+      *
+      *    入院料加算取得パラメタ
+           COPY  "CPORCSNYUKSNGET.INC".
       *
       *    ＤＢ検索
            COPY    "MCPAREA".
@@ -541,6 +534,42 @@
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 900-CLOSE-SEC
+      *
+      *    病棟検索
+           IF   WRK-PARA-BTUNUM        NOT =   SPACE
+             INITIALIZE                      SYS-5001-REC
+             MOVE    "5001"              TO  SYS-5001-KANRICD
+             MOVE    WRK-PARA-BTUNUM     TO  SYS-5001-KBNCD
+             MOVE    WRK-PARA-SRYYM      TO  SYS-5001-STYUKYMD (1:6)
+             MOVE    "01"                TO  SYS-5001-STYUKYMD (7:2)
+             MOVE    SYS-5001-STYUKYMD   TO  SYS-5001-EDYUKYMD
+             MOVE    WRK-PARA-HOSPNUM    TO  SYS-5001-HOSPNUM
+             MOVE    SYS-5001-REC        TO  MCPDATA-REC
+             MOVE    "tbl_syskanri"      TO  MCP-TABLE
+             MOVE    "key10"             TO  MCP-PATHNAME
+             PERFORM 910-SYSKANRI-SELECT-SEC
+             IF      FLG-SYSKANRI        =   ZERO
+                 MOVE    "tbl_syskanri"     TO  MCP-TABLE
+                 MOVE    "key10"            TO  MCP-PATHNAME
+                 PERFORM     910-SYSKANRI-READ-SEC
+                 IF    FLG-SYSKANRI  NOT =   ZERO
+                           MOVE  "病棟情報が取得できませんでした。"
+                                             TO  WRK-RECEERR
+                           PERFORM 500-ERR-HENSYU-SEC
+                       GO  TO  100-INIT-EXT
+                 END-IF
+             ELSE
+                 MOVE    "病棟情報が取得できませんでした。"
+                                         TO  WRK-RECEERR
+                 PERFORM 500-ERR-HENSYU-SEC
+                 GO  TO  100-INIT-EXT
+             END-IF
+      *
+             MOVE    "tbl_syskanri"      TO  MCP-TABLE
+             MOVE    "key10"             TO  MCP-PATHNAME
+             PERFORM 900-CLOSE-SEC
+      *
+           END-IF
       *
       *    主科情報取得
            INITIALIZE                      SYS-2009-REC
@@ -755,15 +784,17 @@
       *
            MOVE    SPACE          TO        WRK-ERRCD
       *
-      *    入院当月分でないことのチェック
+      *    入院月が当月でないことのチェック
            IF  (WRK-PARA-SRYYM    =    PTNYUINRRK-NYUINYMD(1:6)) AND
                (WRK-PARA-SRYYM    =    PTNYUINRRK-TENNYUYMD(1:6))
                MOVE   "2007"      TO        WRK-ERRCD
            END-IF
       *
       *    退院済分でないことのチェック
-           IF  (PTNYUINRRK-TAIINYMD    NOT =  "99999999")
-               MOVE   "2008"      TO        WRK-ERRCD
+           IF   WRK-ERRCD         =     SPACE
+               IF  (PTNYUINRRK-TAIINYMD    NOT =  "99999999")
+                   MOVE   "2008"      TO        WRK-ERRCD
+               END-IF
            END-IF
       *
       *    定期請求済分でないことのチェック
@@ -797,24 +828,33 @@
                END-IF
            END-IF
       *
-      *    特定入院料算定患者でないことのチェック
+      *   処理対象月以降に異動がないことのチェック
            IF   WRK-ERRCD           =    SPACE
-              DISPLAY "PTNYUINRRK-TOKUTEI-KBN ="
-                       PTNYUINRRK-TOKUTEI-KBN
-              DISPLAY "PTNYUINRRK-TOKUTEI-NYUIN ="
-                       PTNYUINRRK-TOKUTEI-NYUIN
-              IF        PTNYUINRRK-TOKUTEI-KBN  =  SPACE
-                  CONTINUE
-              ELSE
-                IF  (PTNYUINRRK-TOKUTEI-KBN    =   "3")     AND
-                   ((PTNYUINRRK-TOKUTEI-NYUIN  >=   "25")   AND
-                    (PTNYUINRRK-TOKUTEI-NYUIN  <=   "48"))
-                         CONTINUE
-                ELSE
-                    MOVE   "2011"    TO   WRK-ERRCD
-                END-IF
-              END-IF
+               IF (PTNYUINRRK-TENSTUYMD       NOT = "99999999")  AND
+                  (PTNYUINRRK-TENSTUYMD(1:6)  >   WRK-PARA-SRYYM)
+                   MOVE   "2013"    TO   WRK-ERRCD
+               END-IF
            END-IF
+      *
+      *    特定入院料算定患者でないことのチェック
+      *    (2013.11.15-MEMO)このチェックは外す
+      **     IF   WRK-ERRCD           =    SPACE
+      **        DISPLAY "PTNYUINRRK-TOKUTEI-KBN ="
+      **                 PTNYUINRRK-TOKUTEI-KBN
+      **        DISPLAY "PTNYUINRRK-TOKUTEI-NYUIN ="
+      **                 PTNYUINRRK-TOKUTEI-NYUIN
+      **        IF        PTNYUINRRK-TOKUTEI-KBN  =  SPACE
+      **            CONTINUE
+      **        ELSE
+      **          IF  (PTNYUINRRK-TOKUTEI-KBN    =   "3")     AND
+      **             ((PTNYUINRRK-TOKUTEI-NYUIN  >=   "25")   AND
+      **              (PTNYUINRRK-TOKUTEI-NYUIN  <=   "48"))
+      **                   CONTINUE
+      **          ELSE
+      **              MOVE   "2011"    TO   WRK-ERRCD
+      **          END-IF
+      **        END-IF
+      **     END-IF
       *
            IF        (FLG-NYUINACCTARI   =    1)   AND
                      (WRK-ERRCD          =    SPACE)
@@ -926,25 +966,11 @@
                EVALUATE    WRK-ERRCD
                    WHEN    SPACE
                        MOVE  "入院会計を更新しました" TO  WRK-NAIYO
-      *
-      **                 IF   WRK-PARA-SRYYM = "200804"
-      **                   PERFORM 20021-GAITOU-HENSYU-SEC
-      **
-      **                   EVALUATE   FLG-TAISYO
-      **                    WHEN        1
-      **                  MOVE  "入院会計を更新しました（後期高齢該当）"
-      **                                                TO  WRK-NAIYO
-      **                    WHEN        2
-      **                  MOVE  "入院会計を更新しました（生活療養該当）"
-      **                                                TO  WRK-NAIYO
-      **                   END-EVALUATE
-      **                 END-IF
-      *
                    WHEN    "2003"
                        MOVE  "通算日数の取得に失敗しました"
                                                       TO  WRK-NAIYO
                    WHEN    "2006"
-                       MOVE  "入院料加算の取得に失敗しました"
+                       MOVE  "入院期間加算の取得に失敗しました"
                                                       TO  WRK-NAIYO
                    WHEN    "2007"
                        MOVE  "対象月入院登録分のため処理できません"
@@ -964,6 +990,9 @@
                    WHEN    "2012"
                       MOVE  "入院行為照会用テーブルの更新に失敗"
                                                       TO  WRK-NAIYO
+                   WHEN    "2013"
+                    MOVE  "対象月以降で異動処理があるため処理できません"
+                                                      TO  WRK-NAIYO
                    END-EVALUATE
            END-IF
            MOVE    WRK-NAIYO           TO  LST-NAIYO (CNT-LINE)
@@ -974,130 +1003,6 @@
       *
            .
        2002-HCMSL55-HEN-EXT.
-           EXIT.
-      *****************************************************************
-      *    該当者編集処理
-      *****************************************************************
-       20021-GAITOU-HENSYU-SEC            SECTION.
-      *
-           MOVE     ZERO     TO     FLG-TAISYO
-      *
-      *    保険組合せマスタの検索
-           INITIALIZE                           HKNCOMBI-REC
-           MOVE    WRK-PARA-HOSPNUM     TO      COMB-HOSPNUM
-           MOVE    WRK-PTID             TO      COMB-PTID
-           MOVE    WRK-TAIHI-HKN(1)     TO      COMB-HKNCOMBINUM
-           MOVE    HKNCOMBI-REC         TO      MCPDATA-REC
-           MOVE    "DBSELECT"           TO      MCP-FUNC
-           MOVE    "tbl_hkncombi"       TO      MCP-TABLE
-           MOVE    "key"                TO      MCP-PATHNAME
-           CALL    "ORCDBMAIN"          USING   MCPAREA
-                                                MCPDATA-REC
-                                                SPA-AREA
-           IF      MCP-RC               =       ZERO
-               MOVE    "tbl_hkncombi"   TO      MCP-TABLE
-               MOVE    "key"            TO      MCP-PATHNAME
-               MOVE    "DBFETCH"        TO      MCP-FUNC
-               CALL    "ORCDBMAIN"      USING   MCPAREA
-                                                MCPDATA-REC
-                                                SPA-AREA
-               IF      MCP-RC           =       ZERO
-                  MOVE    MCPDATA-REC   TO  HKNCOMBI-REC
-               ELSE
-                  INITIALIZE                HKNCOMBI-REC
-                  DISPLAY "HKNCOMBI DBFETCH ERR"
-               END-IF
-           ELSE
-                  INITIALIZE                HKNCOMBI-REC
-                  DISPLAY "HKNCOMBI DBSELECT ERR"
-           END-IF
-           MOVE    "tbl_hkncombi"       TO  MCP-TABLE
-           MOVE    "key"                TO  MCP-PATHNAME
-           PERFORM  900-CLOSE-SEC
-      *
-      *    入院患者の年齢計算（３月１日時点）
-           MOVE    ZERO                TO  WRK-NENREIXXX
-           INITIALIZE                      ORCSAGECHKAREA
-           MOVE    WRK-PARA-HOSPNUM    TO  AGECHK-HOSPNUM
-           MOVE    WRK-PTID            TO  AGECHK-PTID
-           MOVE    "200803"            TO  AGECHK-SRYYMD(1:6)
-           MOVE    "01"                TO  AGECHK-SRYYMD(7:2)
-           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
-           CALL    "ORCSAGECHK"        USING
-                                       ORCSAGECHKAREA
-                                       SPA-AREA
-           IF      AGECHK-RC           =   ZERO
-              MOVE   AGECHK-NENREI     TO  WRK-NENREIXXX
-           END-IF
-      *    入院患者の年齢計算（４月１日時点）
-           INITIALIZE                      ORCSAGECHKAREA
-           MOVE    WRK-PARA-HOSPNUM    TO  AGECHK-HOSPNUM
-           MOVE    WRK-PTID            TO  AGECHK-PTID
-           MOVE    "200804"            TO  AGECHK-SRYYMD(1:6)
-           MOVE    "01"                TO  AGECHK-SRYYMD(7:2)
-           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
-           CALL    "ORCSAGECHK"        USING
-                                       ORCSAGECHKAREA
-                                       SPA-AREA
-           IF      AGECHK-RC           =   ZERO
-      *
-             IF     (COMB-HKNNUM  =  "971" OR "973" OR "975")
-             OR     (COMB-HKNNUM(1:2) = "98"                )
-             OR     (COMB-HKNNUM  =  SPACE                  )
-               CONTINUE
-             ELSE
-               IF   (COMB-KOH1HKNNUM  =  "027")
-               OR   (AGECHK-NENREI   >=   75  )
-                   MOVE     1     TO     FLG-TAISYO
-               END-IF
-             END-IF
-      *
-             IF   (FLG-TAISYO             =    1            )
-             OR   (COMB-HKNNUM            =  "971" OR "973" )
-             OR   (AGECHK-NENREI          <   65            )
-             OR   (WRK-NENREIXXX         >=   70            )
-             OR   (SYS-5001-BTU-SBT   NOT =  "04" AND "09"  )
-                 CONTINUE
-             ELSE
-                 MOVE    ZERO                 TO  FLG-NG
-                 INITIALIZE                       PTKOHINF-REC
-                 MOVE    WRK-PARA-HOSPNUM     TO  PTKOH-HOSPNUM
-                 MOVE    WRK-PTID             TO  PTKOH-PTID
-                 MOVE    "027"                TO  PTKOH-KOHNUM
-                 MOVE    "20080331"           TO  PTKOH-TEKSTYMD
-                                                  PTKOH-TEKEDYMD
-                 MOVE    PTKOHINF-REC         TO  MCPDATA-REC
-                 MOVE    "DBSELECT"           TO  MCP-FUNC
-                 MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                 MOVE    "key6"               TO  MCP-PATHNAME
-                 CALL    "ORCDBMAIN"          USING  MCPAREA
-                                                     MCPDATA-REC
-                                                     SPA-AREA
-                 IF      MCP-RC               =      ZERO
-                    MOVE    "tbl_ptkohinf"    TO  MCP-TABLE
-                    MOVE    "key6"            TO  MCP-PATHNAME
-                    MOVE    "DBFETCH"         TO  MCP-FUNC
-                    CALL    "ORCDBMAIN"       USING  MCPAREA
-                                                     MCPDATA-REC
-                                                     SPA-AREA
-                    IF      MCP-RC            =      ZERO
-                      MOVE    MCPDATA-REC     TO  PTKOHINF-REC
-                      MOVE    1               TO  FLG-NG
-                    END-IF
-                 END-IF
-                 MOVE    "tbl_ptkohinf"       TO  MCP-TABLE
-                 MOVE    "key6"               TO  MCP-PATHNAME
-                 PERFORM  900-CLOSE-SEC
-      *
-                 IF    FLG-NG   =   ZERO
-                     MOVE     2     TO     FLG-TAISYO
-                 END-IF
-             END-IF
-      *
-           END-IF
-      *
-           .
-       20021-GAITOU-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1153,7 +1058,7 @@
            MOVE    LNK-PRTKANRI-PRIORITY
                                    TO  SPRT-PRIORITY
            MOVE   "HCMSL55.red"    TO  SPRT-PRTID
-           MOVE    "入院会計一括置換え"
+           MOVE    "入院会計一括置換"
                                     TO  SPRT-TITLE
            MOVE    HCMSL55          TO  SPRT-PRTDATA
            MOVE    LNK-PRTKANRI-TERMID
@@ -1352,7 +1257,7 @@
       *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "13"
-                   IF       STUSAN-NISSU06  >=  60
+                   IF       STUSAN-NISSU08  >=  60
                        MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                    END-IF
                END-IF
@@ -1385,12 +1290,18 @@
            IF PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN   = "18"
                   IF   PTNYUINRRK-NYUINYMD   >=   "20120401"
-                      IF  STUSAN-NISSU06   >=   60
+                      IF  STUSAN-NISSU08   >=   60
                           MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
                       END-IF
                   ELSE
-                      IF  STUSAN-NISSU06   >=   90
-                          MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
+                      IF    LNK-AKYUSEI-RC   =   1
+                         IF   STUSAN-NISSU08   >=   90
+                             MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
+                         END-IF
+                      ELSE
+                         IF   STUSAN-NISSU08   >=   60
+                             MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
+                         END-IF
                       END-IF
                   END-IF
                END-IF
@@ -1403,16 +1314,16 @@
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
              IF   PTNYUINRRK-TOKUTEI-NYUIN   = "54"
                IF  PTNYUINRRK-NYUINYMD   >=   "20120401"
-                   IF   STUSAN-NISSU06   >=   60
+                   IF   STUSAN-NISSU08   >=   60
                        MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
                    END-IF
                ELSE
                    IF    LNK-AKYUSEI-RC   =   1
-                      IF   STUSAN-NISSU06   >=   90
+                      IF   STUSAN-NISSU08   >=   90
                           MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
                       END-IF
                    ELSE
-                      IF   STUSAN-NISSU06   >=   60
+                      IF   STUSAN-NISSU08   >=   60
                           MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
                       END-IF
                    END-IF
@@ -1424,7 +1335,7 @@
       *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "92"
-                   IF       STUSAN-NISSU06  >=  60
+                   IF       STUSAN-NISSU08  >=  60
                        MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                    END-IF
                END-IF
@@ -1434,7 +1345,7 @@
       *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "93"
-                   IF       STUSAN-NISSU06  >=  60
+                   IF       STUSAN-NISSU08  >=  60
                        MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                    END-IF
                END-IF
@@ -1444,7 +1355,7 @@
       *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "95"
-                   IF       STUSAN-NISSU06  >=  60
+                   IF       STUSAN-NISSU08  >=  60
                        MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                    END-IF
                END-IF
@@ -1454,7 +1365,7 @@
       *    最長６０日間の算定の為、次月の会計作成時に６０日経過時は無条件に
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "96"
-                   IF       STUSAN-NISSU06  >=  60
+                   IF       STUSAN-NISSU08  >=  60
                        MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                    END-IF
                END-IF
@@ -1464,7 +1375,7 @@
       *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "56"
-                   IF       STUSAN-NISSU06  >=  60
+                   IF       STUSAN-NISSU08  >=  60
                        MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                    END-IF
                END-IF
@@ -1474,7 +1385,7 @@
       *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "58"
-                   IF       STUSAN-NISSU06  >=  60
+                   IF       STUSAN-NISSU08  >=  60
                        MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                    END-IF
                END-IF
@@ -1484,7 +1395,7 @@
       *    次月の会計作成時に６０日経過時は無条件に一般の入院料算定とする
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "60"
-                   IF       STUSAN-NISSU06  >=  60
+                   IF       STUSAN-NISSU08  >=  60
                        MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                    END-IF
                END-IF
@@ -1586,1818 +1497,42 @@
            MOVE    WRK-TSUSAN          TO  LNK-SCNYUACCT-NYUKHN-NISUU
       *    特定入院で入院料が変更になるコードの対応
       *
-      *    診療所老人医療管理料
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190774110"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-               MOVE   "190774110"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE    13              TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                   (1)
-      *
-               MOVE   "190774210"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE     1              TO  LNK-DAY6-ZOGEN
-               CALL  "ORCSDAY"         USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                  (2)
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                  (2)
-               PERFORM    4801-KIKAN-CHG-SEC
+      *    ===  TEST ===
+           INITIALIZE                       ORCSTOKNYUIN2-AREA
+           MOVE   PTNYUINRRK-HOSPNUM    TO  LNK-TOKNYUIN2-HOSPNUM
+           MOVE   PTNYUINRRK-PTID       TO  LNK-TOKNYUIN2-PTID
+           MOVE   "2"                   TO  LNK-TOKNYUIN2-IDOKBN
+           MOVE   PTNYUINRRK-NYUINYMD   TO  LNK-TOKNYUIN2-NYUINYMD
+           MOVE   SYOKIKSN-IN-SANTEISTYMD  TO  LNK-TOKNYUIN2-SANTEIYMD
+           MOVE   SYOKIKSN-IN-KHNSRYCD  TO  LNK-TOKNYUIN2-SET-SRYCD
+           MOVE   STUSAN-NISSU08        TO  LNK-TOKNYUIN2-NISSU08
+           MOVE   PTNYUINRRK-TOKUTEI-NYUIN
+                             TO  LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN
+           IF    LNK-AKYUSEI-RC          =   1
+              MOVE   "1"      TO   LNK-TOKNYUIN2-TOKUBETSU-SYORI-FLG(1)
+           END-IF
+           CALL  "ORCSTOKNYUIN2"     USING  ORCSTOKNYUIN2-AREA
+                                            SPA-AREA
+           IF     LNK-TOKNYUIN2-RC      =   ZERO
+              MOVE   SPACE           TO  SYOKIKSN-IN-KHNSRYCD
+                                         LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+              PERFORM   VARYING   IDX    FROM    1   BY  1
+                UNTIL   IDX       >    5
+                  IF   LNK-TOKNYUIN2-SRYCD(IDX)  NOT =   SPACE
+                    MOVE  LNK-TOKNYUIN2-SRYCD(IDX)
+                                  TO  LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                    MOVE  LNK-TOKNYUIN2-STYMD(IDX)
+                                  TO  LNK-SCNYUACCT-KAGEN-STYUKYMD(IDX)
+                    MOVE  LNK-TOKNYUIN2-EDYMD(IDX)
+                                  TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD(IDX)
+                  END-IF
+              END-PERFORM
+              MOVE    LNK-TOKNYUIN2-IPN-KAIKEI-FLG
+                                          TO  IPN-NYUKAIKEI-SAKUSEI-FLG
+              MOVE    LNK-TOKNYUIN2-IPN-KAIKEI-YMD
+                                          TO  IPN-SANTEISTYMD
            END-IF
       *
-      *    診療所老人医療管理料（生活療養）
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190125010"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-               MOVE   "190125010"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE    13              TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                   (1)
-      *
-               MOVE   "190125110"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE     1              TO  LNK-DAY6-ZOGEN
-               CALL  "ORCSDAY"         USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                  (2)
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                  (2)
-               PERFORM    4801-KIKAN-CHG-SEC
-           END-IF
-      *
-      *    認知症病棟入院料１（平成２２年３月までの期間対応）
-           IF      PTNYUINRRK-TENNYUYMD   <=   "20100331"
-             IF    SYOKIKSN-IN-KHNSRYCD    =   "190739910"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-               MOVE   "190739910"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-      **         MOVE   PTNYUINRRK-TENNYUYMD
-      **                                 TO  LNK-DAY6-KIJUN
-               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
-                       (PTNYUINRRK-JTIKBN  = "1")
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               ELSE
-                   MOVE   SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-DAY6-KIJUN
-               END-IF
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-      **         IF      PTNYUINRRK-SHOKAIKBN  = "1"
-               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
-                       (PTNYUINRRK-JTIKBN  = "1")
-                   MOVE    89              TO  LNK-DAY6-ZOGEN
-               ELSE
-                   COMPUTE  LNK-DAY6-ZOGEN = 90  -  STUSAN-NISSU03
-               END-IF
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
-      *
-               IF      LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           <   SYOKIKSN-IN-SANTEISTYMD
-                   MOVE    1               TO  TN-IDX
-               ELSE
-                   MOVE    2               TO  TN-IDX
-               END-IF
-               MOVE    "190740010"        TO  LNK-SCNYUACCT-KAGEN-SRYCD
-                                                               (TN-IDX)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               IF      TN-IDX              =   2
-                   MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1                  TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                               (TN-IDX)
-               ELSE
-                   MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                               (TN-IDX)
-               END-IF
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                              (TN-IDX)
-             END-IF
-           END-IF
-      *
-      *    認知症治療病棟入院料１（平成２４年３月までの期間対応）
-           IF     (PTNYUINRRK-TENNYUYMD    >=  "20100401")   AND
-                  (PTNYUINRRK-TENNYUYMD    <=  "20120331")
-             IF    SYOKIKSN-IN-KHNSRYCD    =   "190739910"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-               MOVE   "190739910"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-      **         MOVE   PTNYUINRRK-TENNYUYMD
-      **                                 TO  LNK-DAY6-KIJUN
-               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
-                       (PTNYUINRRK-JTIKBN  = "1")
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               ELSE
-                   MOVE   SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-DAY6-KIJUN
-               END-IF
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-      **         IF      PTNYUINRRK-SHOKAIKBN  = "1"
-               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
-                       (PTNYUINRRK-JTIKBN  = "1")
-                   MOVE    59              TO  LNK-DAY6-ZOGEN
-               ELSE
-                   COMPUTE  LNK-DAY6-ZOGEN = 60  -  STUSAN-NISSU03
-               END-IF
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                  TO LNK-SCNYUACCT-KAGEN-STYUKYMD(1)
-      *
-               IF      LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           <   SYOKIKSN-IN-SANTEISTYMD
-                   MOVE    1               TO  TN-IDX
-               ELSE
-                   MOVE    2               TO  TN-IDX
-               END-IF
-               MOVE    "190740010"        TO  LNK-SCNYUACCT-KAGEN-SRYCD
-                                                               (TN-IDX)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               IF      TN-IDX              =   2
-                   MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1                  TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                               (TN-IDX)
-               ELSE
-                   MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                               (TN-IDX)
-               END-IF
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                              (TN-IDX)
-             END-IF
-           END-IF
-      *
-      *    認知症治療病棟入院料１（平成２４年４月からの期間対応）
-           IF      PTNYUINRRK-TENNYUYMD    >=  "20120401"
-             IF      SYOKIKSN-IN-KHNSRYCD    =   "190151610"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-               MOVE   SPACE            TO  LNK-SCNYUACCT-NYUKHN-SRYCD
-                                                                    (1)
-               MOVE   SPACE            TO  WRK-SCNYUACCT-AREA
-               INITIALIZE                  WRK-SCNYUACCT-AREA
-               MOVE   ZERO             TO  TN-IDX
-               IF     STUSAN-NISSU03      <=  30
-                   ADD    1      TO    TN-IDX
-                   MOVE   "190151610"  TO  WRK-SCNYUACCT-KAGEN-SRYCD
-                                                               (TN-IDX)
-                   MOVE   SYOKIKSN-IN-SANTEISTYMD
-                                       TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                               (TN-IDX)
-                   INITIALIZE              STS-AREA-DAY
-                   INITIALIZE              LNK-DAY6-AREA
-                   MOVE    "61"        TO  LNK-DAY6-IRAI
-                   MOVE    PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-                   MOVE    "1"         TO  LNK-DAY6-ZOGENPTN
-                   MOVE    29          TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"   USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN
-                                       TO  WRK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                               (TN-IDX)
-               END-IF
-      *
-               IF     STUSAN-NISSU03   <=  60
-                   ADD    1            TO  TN-IDX
-                   MOVE   "190739910"  TO  WRK-SCNYUACCT-KAGEN-SRYCD
-                                                               (TN-IDX)
-      *            認知症治療病棟入院料１の６０日以内の開始日セット
-                   IF     TN-IDX        =      1
-                       MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                               (TN-IDX)
-                   END-IF
-                   IF     TN-IDX       =      2
-                       MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                              TO  LNK-DAY6-KIJUN
-                       MOVE    "1"            TO  LNK-DAY6-ZOGENPTN
-                       MOVE     1             TO  LNK-DAY6-ZOGEN
-                       CALL  "ORCSDAY"        USING   STS-AREA-DAY
-                                                      LNK-DAY6-AREA
-                       MOVE    LNK-DAY6-KEISAN
-                                     TO WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                             (TN-IDX)
-                   END-IF
-      *            認知症治療病棟入院料１の６０日以内の終日
-      *            を再計算
-                   MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                   COMPUTE  WK-TOKUTEI-DAY  =  60  - STUSAN-NISSU03
-                   INITIALIZE                STS-AREA-DAY
-                   INITIALIZE                LNK-DAY6-AREA
-                   MOVE    "61"              TO  LNK-DAY6-IRAI
-                   MOVE   SYOKIKSN-IN-SANTEISTYMD
-                                             TO  LNK-DAY6-KIJUN
-                   MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
-                   MOVE    WK-TOKUTEI-DAY    TO  LNK-DAY6-ZOGEN
-                   CALL  "ORCSDAY"           USING   STS-AREA-DAY
-                                                     LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN
-                                      TO WRK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                             (TN-IDX)
-               END-IF
-      *
-               ADD    1   TO    TN-IDX
-      *
-               MOVE   "190740010"  TO  WRK-SCNYUACCT-KAGEN-SRYCD
-                                                           (TN-IDX)
-               INITIALIZE                STS-AREA-DAY
-               INITIALIZE                LNK-DAY6-AREA
-               MOVE    "61"              TO  LNK-DAY6-IRAI
-               IF      TN-IDX      =     2
-                   MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                         TO  LNK-DAY6-KIJUN
-                   MOVE    "1"           TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1            TO  LNK-DAY6-ZOGEN
-                   CALL  "ORCSDAY"       USING   STS-AREA-DAY
-                                                 LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN
-                                     TO WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                             (TN-IDX)
-               ELSE
-                   IF   TN-IDX      =     3
-                       MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(2)
-                                          TO  LNK-DAY6-KIJUN
-                       MOVE    "1"        TO  LNK-DAY6-ZOGENPTN
-                       MOVE     1         TO  LNK-DAY6-ZOGEN
-                       CALL  "ORCSDAY"        USING   STS-AREA-DAY
-                                              LNK-DAY6-AREA
-                       MOVE    LNK-DAY6-KEISAN
-                                 TO WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                         (TN-IDX)
-                   ELSE
-                       MOVE    PTNYUINRRK-TENNYUYMD
-                                     TO WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                             (TN-IDX)
-                   END-IF
-               END-IF
-               MOVE    "99999999"    TO WRK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                             (TN-IDX)
-      *
-               MOVE    ZERO            TO  SC-IDX2
-               PERFORM    VARYING    SC-IDX   FROM  1   BY   1
-                 UNTIL  (WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX) = SPACE) OR
-                        (SC-IDX        >    7)
-                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) <=
-                                          LNK-SCNYUACCT-STSRYYMD)  AND
-                        (WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX) >=
-                                          LNK-SCNYUACCT-STSRYYMD)
-                      ADD     1     TO   SC-IDX2
-                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
-                      MOVE  LNK-SCNYUACCT-STSRYYMD  TO
-                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
-                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
-                 END-IF
-                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) >
-                                          LNK-SCNYUACCT-STSRYYMD)
-                      ADD     1     TO   SC-IDX2
-                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
-                      MOVE  WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
-                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
-                 END-IF
-               END-PERFORM
-             END-IF
-           END-IF
-      *
-      *    認知症病棟入院料２（平成２２年３月までの期間対応）
-           IF      PTNYUINRRK-TENNYUYMD   <=   "20100331"
-             IF    SYOKIKSN-IN-KHNSRYCD    =   "190813410"
-               MOVE    SPACE           TO  SYOKIKSN-IN-KHNSRYCD
-                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-               MOVE   "190813410"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-      **         MOVE   PTNYUINRRK-TENNYUYMD
-      **                                 TO  LNK-DAY6-KIJUN
-               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
-                       (PTNYUINRRK-JTIKBN  = "1")
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               ELSE
-                   MOVE   SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-DAY6-KIJUN
-               END-IF
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-      **         IF      PTNYUINRRK-SHOKAIKBN  = "1"
-               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
-                       (PTNYUINRRK-JTIKBN  = "1")
-                   MOVE    89              TO  LNK-DAY6-ZOGEN
-               ELSE
-                   COMPUTE  LNK-DAY6-ZOGEN = 90  -  STUSAN-NISSU03
-               END-IF
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-      *
-               IF       LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           <   SYOKIKSN-IN-SANTEISTYMD
-                   MOVE    1               TO  TN-IDX
-               ELSE
-                   MOVE    2               TO  TN-IDX
-               END-IF
-               MOVE   "190813510"          TO  
-                                      LNK-SCNYUACCT-KAGEN-SRYCD(TN-IDX)
-               INITIALIZE                      STS-AREA-DAY
-               INITIALIZE                      LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               IF      TN-IDX              =   2
-                   MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1                  TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                              (TN-IDX)
-               ELSE
-                   MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                              (TN-IDX)
-               END-IF
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                              (TN-IDX)
-             END-IF
-           END-IF
-      *
-      *    認知症治療病棟入院料２（平成２４年３月までの期間対応）
-           IF     (PTNYUINRRK-TENNYUYMD    >=  "20100401")   AND
-                  (PTNYUINRRK-TENNYUYMD    <=  "20120331")
-             IF    SYOKIKSN-IN-KHNSRYCD    =   "190813410"
-               MOVE    SPACE           TO  SYOKIKSN-IN-KHNSRYCD
-                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-               MOVE   "190813410"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-      **         MOVE   PTNYUINRRK-TENNYUYMD
-      **                                 TO  LNK-DAY6-KIJUN
-               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
-                       (PTNYUINRRK-JTIKBN  = "1")
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               ELSE
-                   MOVE   SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-DAY6-KIJUN
-               END-IF
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-      **         IF      PTNYUINRRK-SHOKAIKBN  = "1"
-               IF      (PTNYUINRRK-SHOKAIKBN  = "1")  AND
-                       (PTNYUINRRK-JTIKBN  = "1")
-                   MOVE    59              TO  LNK-DAY6-ZOGEN
-               ELSE
-                   COMPUTE  LNK-DAY6-ZOGEN = 60  -  STUSAN-NISSU03
-               END-IF
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-      *
-               IF       LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           <   SYOKIKSN-IN-SANTEISTYMD
-                   MOVE    1               TO  TN-IDX
-               ELSE
-                   MOVE    2               TO  TN-IDX
-               END-IF
-               MOVE   "190813510"          TO  
-                                      LNK-SCNYUACCT-KAGEN-SRYCD(TN-IDX)
-               INITIALIZE                      STS-AREA-DAY
-               INITIALIZE                      LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               IF      TN-IDX              =   2
-                   MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1                  TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                              (TN-IDX)
-               ELSE
-                   MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                              (TN-IDX)
-               END-IF
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                              (TN-IDX)
-             END-IF
-           END-IF
-      *
-      *    認知症治療病棟入院料２（平成２４年４月からの期間対応）
-           IF      PTNYUINRRK-TENNYUYMD    >=  "20120401"
-             IF      SYOKIKSN-IN-KHNSRYCD    =   "190151710"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-               MOVE   SPACE            TO  LNK-SCNYUACCT-NYUKHN-SRYCD
-                                                                    (1)
-               MOVE   SPACE            TO  WRK-SCNYUACCT-AREA
-               INITIALIZE                  WRK-SCNYUACCT-AREA
-               MOVE   ZERO             TO  TN-IDX
-               IF     STUSAN-NISSU03      <=  30
-                   ADD    1      TO    TN-IDX
-                   MOVE   "190151710"  TO  WRK-SCNYUACCT-KAGEN-SRYCD
-                                                               (TN-IDX)
-                   MOVE   SYOKIKSN-IN-SANTEISTYMD
-                                       TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                               (TN-IDX)
-                   INITIALIZE              STS-AREA-DAY
-                   INITIALIZE              LNK-DAY6-AREA
-                   MOVE    "61"        TO  LNK-DAY6-IRAI
-                   MOVE    PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-                   MOVE    "1"         TO  LNK-DAY6-ZOGENPTN
-                   MOVE    29          TO  LNK-DAY6-ZOGEN
-                   CALL    "ORCSDAY"   USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN
-                                       TO  WRK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                               (TN-IDX)
-               END-IF
-      *
-               IF     STUSAN-NISSU03   <=  60
-                   ADD    1            TO  TN-IDX
-                   MOVE   "190813410"  TO  WRK-SCNYUACCT-KAGEN-SRYCD
-                                                               (TN-IDX)
-      *            認知症治療病棟入院料２の６０日以内の開始日セット
-                   IF     TN-IDX        =      1
-                       MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                               (TN-IDX)
-                   END-IF
-                   IF     TN-IDX       =      2
-                       MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                              TO  LNK-DAY6-KIJUN
-                       MOVE    "1"            TO  LNK-DAY6-ZOGENPTN
-                       MOVE     1             TO  LNK-DAY6-ZOGEN
-                       CALL  "ORCSDAY"        USING   STS-AREA-DAY
-                                                      LNK-DAY6-AREA
-                       MOVE    LNK-DAY6-KEISAN
-                                     TO WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                             (TN-IDX)
-                   END-IF
-      *            認知症治療病棟入院料２の６０日以内の終日
-      *            を再計算
-                   MOVE     ZERO      TO   WK-TOKUTEI-DAY
-                   COMPUTE  WK-TOKUTEI-DAY  =  60  - STUSAN-NISSU03
-                   INITIALIZE                STS-AREA-DAY
-                   INITIALIZE                LNK-DAY6-AREA
-                   MOVE    "61"              TO  LNK-DAY6-IRAI
-                   MOVE   SYOKIKSN-IN-SANTEISTYMD
-                                             TO  LNK-DAY6-KIJUN
-                   MOVE    "1"               TO  LNK-DAY6-ZOGENPTN
-                   MOVE    WK-TOKUTEI-DAY    TO  LNK-DAY6-ZOGEN
-                   CALL  "ORCSDAY"           USING   STS-AREA-DAY
-                                                     LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN
-                                      TO WRK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                             (TN-IDX)
-               END-IF
-      *
-               ADD    1   TO    TN-IDX
-      *
-               MOVE   "190813510"  TO  WRK-SCNYUACCT-KAGEN-SRYCD
-                                                           (TN-IDX)
-               INITIALIZE                STS-AREA-DAY
-               INITIALIZE                LNK-DAY6-AREA
-               MOVE    "61"              TO  LNK-DAY6-IRAI
-               IF      TN-IDX      =     2
-                   MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                         TO  LNK-DAY6-KIJUN
-                   MOVE    "1"           TO  LNK-DAY6-ZOGENPTN
-                   MOVE     1            TO  LNK-DAY6-ZOGEN
-                   CALL  "ORCSDAY"       USING   STS-AREA-DAY
-                                                 LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN
-                                     TO WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                             (TN-IDX)
-               ELSE
-                   IF   TN-IDX      =     3
-                       MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(2)
-                                          TO  LNK-DAY6-KIJUN
-                       MOVE    "1"        TO  LNK-DAY6-ZOGENPTN
-                       MOVE     1         TO  LNK-DAY6-ZOGEN
-                       CALL  "ORCSDAY"        USING   STS-AREA-DAY
-                                              LNK-DAY6-AREA
-                       MOVE    LNK-DAY6-KEISAN
-                                 TO WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                         (TN-IDX)
-                   ELSE
-                       MOVE    PTNYUINRRK-TENNYUYMD
-                                     TO WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                             (TN-IDX)
-                   END-IF
-               END-IF
-               MOVE    "99999999"    TO WRK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                             (TN-IDX)
-      *
-               MOVE    ZERO            TO  SC-IDX2
-               PERFORM    VARYING    SC-IDX   FROM  1   BY   1
-                 UNTIL  (WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX) = SPACE) OR
-                        (SC-IDX        >    7)
-                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) <=
-                                          LNK-SCNYUACCT-STSRYYMD)  AND
-                        (WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX) >=
-                                          LNK-SCNYUACCT-STSRYYMD)
-                      ADD     1     TO   SC-IDX2
-                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
-                      MOVE  LNK-SCNYUACCT-STSRYYMD  TO
-                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
-                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
-                 END-IF
-                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) >
-                                          LNK-SCNYUACCT-STSRYYMD)
-                      ADD     1     TO   SC-IDX2
-                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
-                      MOVE  WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
-                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
-                 END-IF
-               END-PERFORM
-             END-IF
-           END-IF
-      *
-      *    緩和ケア病棟入院料（平成２４年４月からの期間対応）
-           IF      PTNYUINRRK-TENNYUYMD    >=  "20120401"
-             IF      SYOKIKSN-IN-KHNSRYCD    =   "190028910"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-               MOVE   SPACE            TO  LNK-SCNYUACCT-NYUKHN-SRYCD
-                                                                    (1)
-               MOVE   SPACE            TO  WRK-SCNYUACCT-AREA
-               INITIALIZE                  WRK-SCNYUACCT-AREA
-      *
-      *        緩和ケアの算定開始日を検索
-               MOVE   SPACE            TO  WRK-TOKUTEI-TENNYUYMD
-               INITIALIZE                  WWK-PTNYUINRRK-REC
-               MOVE   SPA-HOSPNUM      TO  WWK-PTNYUINRRK-HOSPNUM
-               MOVE   PTNYUINRRK-PTID  TO  WWK-PTNYUINRRK-PTID
-               MOVE   PTNYUINRRK-RRKNUM TO WWK-PTNYUINRRK-RRKNUM
-               PERFORM    980-PTNYUINRRK-SELECT-SEC
-               IF     FLG-WWK-PTNYUINRRK   =   ZERO
-                   MOVE  "tbl_ptnyuinrrk"  TO  MCP-TABLE
-                   MOVE  "key4"            TO  MCP-PATHNAME
-                   PERFORM 980-PTNYUINRRK-READ-SEC
-                   IF   ( PTNYUINRRK-TOKUTEI-KBN  =
-                                   WWK-PTNYUINRRK-TOKUTEI-KBN ) AND
-                        ( PTNYUINRRK-TOKUTEI-NYUIN  =
-                                   WWK-PTNYUINRRK-TOKUTEI-NYUIN )
-                       MOVE   WWK-PTNYUINRRK-TENNYUYMD
-                                           TO   WRK-TOKUTEI-TENNYUYMD
-                   END-IF
-                   PERFORM   UNTIL  ( FLG-WWK-PTNYUINRRK   =   1 )  OR
-                                    ( PTNYUINRRK-TOKUTEI-KBN NOT =
-                                       WWK-PTNYUINRRK-TOKUTEI-KBN ) OR
-                                    ( PTNYUINRRK-TOKUTEI-NYUIN NOT =
-                                       WWK-PTNYUINRRK-TOKUTEI-NYUIN )
-                       MOVE  "tbl_ptnyuinrrk"  TO  MCP-TABLE
-                       MOVE  "key4"            TO  MCP-PATHNAME
-                       PERFORM 980-PTNYUINRRK-READ-SEC
-                       IF   ( PTNYUINRRK-TOKUTEI-KBN  =
-                                       WWK-PTNYUINRRK-TOKUTEI-KBN ) AND
-                            ( PTNYUINRRK-TOKUTEI-NYUIN  =
-                                       WWK-PTNYUINRRK-TOKUTEI-NYUIN )
-                           MOVE   WWK-PTNYUINRRK-TENNYUYMD
-                                            TO   WRK-TOKUTEI-TENNYUYMD
-                       END-IF
-                   END-PERFORM
-               END-IF
-               MOVE  "tbl_ptnyuinrrk"  TO  MCP-TABLE
-               MOVE  "key4"            TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
-      *
-               MOVE   "190028910"      TO  WRK-SCNYUACCT-KAGEN-SRYCD(1)
-      **         MOVE   PTNYUINRRK-TENNYUYMD
-               MOVE   WRK-TOKUTEI-TENNYUYMD
-                                       TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-      **         MOVE   PTNYUINRRK-TENNYUYMD
-               MOVE   WRK-TOKUTEI-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE    29              TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  WRK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                   (1)
-      *
-               MOVE   "190150510"      TO  WRK-SCNYUACCT-KAGEN-SRYCD(2)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE     1              TO  LNK-DAY6-ZOGEN
-               CALL  "ORCSDAY"         USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                  (2)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-      **         MOVE   PTNYUINRRK-TENNYUYMD
-               MOVE   WRK-TOKUTEI-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE    59              TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  WRK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                   (2)
-      *
-               MOVE   "190150610"      TO  WRK-SCNYUACCT-KAGEN-SRYCD(3)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    WRK-SCNYUACCT-KAGEN-EDYUKYMD(2)
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE     1              TO  LNK-DAY6-ZOGEN
-               CALL  "ORCSDAY"         USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  WRK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                  (3)
-               MOVE    "99999999"      TO  WRK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                  (3)
-      *
-               MOVE    ZERO            TO  SC-IDX2
-               PERFORM    VARYING    SC-IDX   FROM  1   BY   1
-                 UNTIL  (WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX) = SPACE) OR
-                        (SC-IDX        >    7)
-                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) <=
-                                          LNK-SCNYUACCT-STSRYYMD)  AND
-                        (WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX) >=
-                                          LNK-SCNYUACCT-STSRYYMD)
-                      ADD     1     TO   SC-IDX2
-                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
-                      MOVE  LNK-SCNYUACCT-STSRYYMD  TO
-                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
-                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
-                 END-IF
-                 IF     (WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX) >
-                                          LNK-SCNYUACCT-STSRYYMD)
-                      ADD     1     TO   SC-IDX2
-                      MOVE  WRK-SCNYUACCT-KAGEN-SRYCD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-SRYCD(SC-IDX2)
-                      MOVE  WRK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-STYUKYMD(SC-IDX2)
-                      MOVE  WRK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX)  TO
-                            LNK-SCNYUACCT-KAGEN-EDYUKYMD(SC-IDX2)
-                 END-IF
-               END-PERFORM
-             END-IF
-           END-IF
-      *
-      *    広範囲熱傷特定集中治療室管理料
-           IF      SYOKIKSN-IN-KHNSRYCD   =   "190024810"
-               MOVE   SPACE               TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM      TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE               TO  SYOKIKSN-IN-KHNSRYCD
-                                          LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        広範囲熱傷特定集中治療室管理料の算定可能日数を計算
-               MOVE     ZERO              TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY    =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06    <   60
-                   MOVE   "190024810"         TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"            TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料１（９０日限度）
-           IF   SYOKIKSN-IN-KHNSRYCD    =   "190117410"
-             IF   WRK-PARA-SRYYM       <=   "201203"
-               MOVE    SPACE               TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE    WRK-PARA-SRYYM      TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE    "01"                TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE    SPACE               TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        亜急性期入院医療管理料の算定可能日数を計算
-               MOVE    ZERO                TO  WK-TOKUTEI-DAY
-               COMPUTE WK-TOKUTEI-DAY      =   90  -   STUSAN-NISSU06
-               IF      STUSAN-NISSU06      <   90
-                   MOVE   "190117410"      TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                    STS-AREA-DAY
-                   INITIALIZE                      LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE    PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                       LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                      STS-AREA-DAY
-               INITIALIZE                      LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE    WK-TOKUTEI-DAY      TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD     1               TO  WRK-IPN-HANTEI-Y1
-                   MOVE    1               TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD     1               TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE    WRK-IPN-HANTEI-YM1  TO  LNK-DAY7-YM
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *          一般入院会計作成用のフラグ設定
-               IF     (WRK-IPN-HANTEI-YMD1      >  WRK-IPN-HANTEI-YMD2)
-                 AND  (WRK-IPN-HANTEI-YMD2(1:6) =  WRK-PARA-SRYYM)
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-             END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料１（平成２４年改正から６０日限度）
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190117410"
-            IF    WRK-PARA-SRYYM         >=   "201204"
-             IF    LNK-AKYUSEI-RC          =  1
-      *        経過措置により９０日限度
-               MOVE    SPACE               TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE    WRK-PARA-SRYYM      TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE    "01"                TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE    SPACE               TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        亜急性期入院医療管理料１の算定可能日数を計算
-               MOVE    ZERO                TO  WK-TOKUTEI-DAY
-               COMPUTE WK-TOKUTEI-DAY      =   90  -   STUSAN-NISSU06
-               IF      STUSAN-NISSU06      <   90
-                   MOVE   "190117410"      TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                    STS-AREA-DAY
-                   INITIALIZE                      LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE    PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                       LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                      STS-AREA-DAY
-               INITIALIZE                      LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE    WK-TOKUTEI-DAY      TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（９０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD     1               TO  WRK-IPN-HANTEI-Y1
-                   MOVE    1               TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD     1               TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE    WRK-IPN-HANTEI-YM1  TO  LNK-DAY7-YM
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *          一般入院会計作成用のフラグ設定
-               IF     (WRK-IPN-HANTEI-YMD1      >  WRK-IPN-HANTEI-YMD2)
-                 AND  (WRK-IPN-HANTEI-YMD2(1:6) =  WRK-PARA-SRYYM)
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-             ELSE
-      *        ６０日限度
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        亜急性期入院医療管理料１の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190117410"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-             END-IF
-            END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料２
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190129910"
-             IF    WRK-PARA-SRYYM          <=   "201203"
-      *          ６０日限度
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        亜急性期入院医療管理料２の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190129910"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-             END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料２
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190129910"
-            IF     WRK-PARA-SRYYM         >=   "201204"
-             IF    LNK-AKYUSEI-RC          =  1
-      *        経過措置により９０日限度
-               MOVE    SPACE               TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE    WRK-PARA-SRYYM      TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE    "01"                TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE    SPACE               TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        亜急性期入院医療管理料２の算定可能日数を計算
-               MOVE    ZERO                TO  WK-TOKUTEI-DAY
-               COMPUTE WK-TOKUTEI-DAY      =   90  -   STUSAN-NISSU06
-               IF      STUSAN-NISSU06      <   90
-                   MOVE   "190129910"      TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                    STS-AREA-DAY
-                   INITIALIZE                      LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE    PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                       LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                      STS-AREA-DAY
-               INITIALIZE                      LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE    WK-TOKUTEI-DAY      TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（９０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD     1               TO  WRK-IPN-HANTEI-Y1
-                   MOVE    1               TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD     1               TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE    WRK-IPN-HANTEI-YM1  TO  LNK-DAY7-YM
-               CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *          一般入院会計作成用のフラグ設定
-               IF     (WRK-IPN-HANTEI-YMD1      >  WRK-IPN-HANTEI-YMD2)
-                 AND  (WRK-IPN-HANTEI-YMD2(1:6) =  WRK-PARA-SRYYM)
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-             ELSE
-      *          ６０日限度
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        亜急性期入院医療管理料２の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190129910"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-             END-IF
-            END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料１（指定地域）
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190150310"
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        亜急性期入院医療管理料１（指定地域）の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190150310"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-           END-IF
-      *
-      *    亜急性期入院医療管理料２（指定地域）
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190150410"
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        亜急性期入院医療管理料２（指定地域）の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190150410"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（亜急性期入院医療管理）
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190152610"
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        特定一般病棟入院料（亜急性期入院医療管理）の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190152610"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-           END-IF
-      *
-      *    特定一般病棟入院料（亜急性期入院医療管理・リハビリ算定患者）
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190152710"
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        特定一般病棟入院料（亜急性期入院医療管理・リハビリ算定患者）
-      *        の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190152710"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-           END-IF
-      *
-      *    救命救急入院料３（広範囲熱傷特定集中治療）
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190138410"   OR
-                                               "190138510"   OR
-                                               "190138610"
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        救命救急入院料３（広範囲熱傷特定集中治療）の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190138610"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-           END-IF
-      *
-      *    救命救急入院料４（広範囲熱傷特定集中治療）
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190139010"   OR
-                                               "190139110"   OR
-                                               "190139210"   OR
-                                               "190139310"
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        救命救急入院料４（広範囲熱傷特定集中治療）の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190139310"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-           END-IF
-      *
-      *    特定集中治療室管理料２（広範囲熱傷特定集中治療）
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190140010"   OR
-                                               "190140110"
-               MOVE   SPACE                TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               MOVE   WRK-PARA-SRYYM       TO  PTNYUINRRK-TENNYUYMD(1:6)
-               MOVE   "01"                 TO  PTNYUINRRK-TENNYUYMD(7:2)
-               MOVE   SPACE                TO  SYOKIKSN-IN-KHNSRYCD
-                                           LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-      *        特定集中治療室管理料２（広範囲熱傷特定集中治療）の算定可能日数を計算
-               MOVE     ZERO               TO  WK-TOKUTEI-DAY
-               COMPUTE  WK-TOKUTEI-DAY     =   60  -    STUSAN-NISSU06
-               IF       STUSAN-NISSU06     <   60
-                   MOVE   "190140110"          TO
-                                           LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                   MOVE   PTNYUINRRK-TENNYUYMD TO
-                                           LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                   (1)
-                   INITIALIZE                  STS-AREA-DAY
-                   INITIALIZE                  LNK-DAY6-AREA
-                   MOVE    "61"                TO  LNK-DAY6-IRAI
-                   MOVE   PTNYUINRRK-TENNYUYMD
-                                               TO  LNK-DAY6-KIJUN
-                   MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-                   COMPUTE LNK-DAY6-ZOGEN      =   WK-TOKUTEI-DAY  -  1
-                   CALL    "ORCSDAY"           USING   STS-AREA-DAY
-                                                       LNK-DAY6-AREA
-                   MOVE    LNK-DAY6-KEISAN     TO
-                                           LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                    (1)
-               END-IF
-      *        一般入院料の算定開始日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"                TO  LNK-DAY6-IRAI
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                           TO  LNK-DAY6-KIJUN
-               MOVE    "1"                 TO  LNK-DAY6-ZOGENPTN
-               MOVE   WK-TOKUTEI-DAY       TO  LNK-DAY6-ZOGEN
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN     TO  IPN-SANTEISTYMD
-      *        特定入院期間（６０日経過）した際の一般入院料作成の
-      *        可否を判定
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                           TO  WRK-IPN-HANTEI-YMD1
-               IF      WRK-IPN-HANTEI-M1   =   12
-                   ADD    1                TO  WRK-IPN-HANTEI-Y1
-                   MOVE   1                TO  WRK-IPN-HANTEI-M1
-               ELSE
-                   ADD    1                TO  WRK-IPN-HANTEI-M1
-               END-IF
-      *        月末日を算定
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY7-AREA
-               MOVE    "71"                TO  LNK-DAY7-IRAI
-               MOVE   WRK-IPN-HANTEI-YM1   TO  LNK-DAY7-YM
-               CALL   "ORCSDAY"            USING   STS-AREA-DAY
-                                                   LNK-DAY7-AREA
-               MOVE    LNK-DAY7-KOYOMI     TO  WRK-IPN-HANTEI-YMD1
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                           TO  WRK-IPN-HANTEI-YMD2
-      *        一般入院会計作成用のフラグ設定
-               IF      WRK-IPN-HANTEI-YMD1 >   WRK-IPN-HANTEI-YMD2
-                   MOVE    "1"             TO  IPN-NYUKAIKEI-SAKUSEI-FLG
-               END-IF
-           END-IF
-      *
-      *    精神科救急入院料
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190121010"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-               MOVE   "190111410"      TO  LNK-SCNYUACCT-NYUKHN-SRYCD
-                                                                    (1)
-               MOVE   "190121010"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE    29              TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                   (1)
-      *
-               MOVE   "190111410"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE     1              TO  LNK-DAY6-ZOGEN
-               CALL  "ORCSDAY"         USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                  (2)
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                  (2)
-           END-IF
-      *
-      *    精神科急性期治療病棟入院料１
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190121110"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-               MOVE   "190066910"      TO  LNK-SCNYUACCT-NYUKHN-SRYCD
-                                                                    (1)
-               MOVE   "190121110"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE    29              TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                   (1)
-      *
-               MOVE   "190066910"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE     1              TO  LNK-DAY6-ZOGEN
-               CALL  "ORCSDAY"         USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                  (2)
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                  (2)
-           END-IF
-      *
-      *    精神科急性期治療病棟入院料２
-           IF      SYOKIKSN-IN-KHNSRYCD    =   "190121210"
-               MOVE   SPACE            TO  SYOKIKSN-IN-KHNSRYCD
-               MOVE   "190067010"      TO  LNK-SCNYUACCT-NYUKHN-SRYCD
-                                                                    (1)
-               MOVE   "190121210"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-               MOVE   PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                    (1)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    PTNYUINRRK-TENNYUYMD
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE    29              TO  LNK-DAY6-ZOGEN
-               CALL    "ORCSDAY"       USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                   (1)
-      *
-               MOVE   "190067010"      TO  LNK-SCNYUACCT-KAGEN-SRYCD(2)
-               INITIALIZE                  STS-AREA-DAY
-               INITIALIZE                  LNK-DAY6-AREA
-               MOVE    "61"            TO  LNK-DAY6-IRAI
-               MOVE    LNK-SCNYUACCT-KAGEN-EDYUKYMD(1)
-                                       TO  LNK-DAY6-KIJUN
-               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-               MOVE     1              TO  LNK-DAY6-ZOGEN
-               CALL  "ORCSDAY"         USING   STS-AREA-DAY
-                                               LNK-DAY6-AREA
-               MOVE    LNK-DAY6-KEISAN TO  LNK-SCNYUACCT-KAGEN-STYUKYMD
-                                                                  (2)
-               MOVE    "99999999"      TO  LNK-SCNYUACCT-KAGEN-EDYUKYMD
-                                                                  (2)
-           END-IF
       *
       *    入院料加算診療コード取り込み
            PERFORM    410191-NYUKSN-GET-SEC
@@ -3586,6 +1721,29 @@
                                                ORCSNYUACCT-AREA
            MOVE   WRK-TAIHI-SRYKA      TO  SPA-SRYKA
       *
+      *
+      *    システム管理５０００の外泊区分を取得
+           INITIALIZE                      SYS-5000-REC
+           MOVE    "5000"              TO  SYS-5000-KANRICD
+           MOVE    WRK-PARA-SRYYM      TO  SYS-5000-STYUKYMD (1:6)
+           MOVE    "01"                TO  SYS-5000-STYUKYMD (7:2)
+           MOVE    SYS-5000-STYUKYMD   TO  SYS-5000-EDYUKYMD
+           MOVE    WRK-PARA-HOSPNUM    TO  SYS-5000-HOSPNUM
+           MOVE    SYS-5000-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-SYSKANRI-SELECT-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM     910-SYSKANRI-READ-SEC
+           END-IF
+      *
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+           DISPLAY "===== GAIHAKU-KBN = " SYS-5000-NACCT-GAIHAKUKBN
+      *
       *    入院会計作成後に退避データの食事区分を復元
            IF WRK-PARA-SRYYM        >= "200604"
       *       （更新月分）
@@ -3625,18 +1783,36 @@
                             UNTIL     IDX-SKJ   >   31
                                MOVE   WRK-TAIHI-SKJ18(IDX-SKJ)
                                              TO  NACCT-DAY(IDX-SKJ)
+                               IF  (SYS-5000-NACCT-GAIHAKUKBN = "2") AND
+                                   (WRK-TAIHI-GAIHAKU(IDX-SKJ) =  1 OR
+                                                                  2 OR
+                                                                  3)
+                                    MOVE  ZERO  TO   NACCT-DAY(IDX-SKJ)
+                               END-IF
                           END-PERFORM
                          WHEN  2
                           PERFORM VARYING IDX-SKJ FROM 1 BY 1
                             UNTIL     IDX-SKJ   >   31
                                MOVE   WRK-TAIHI-SKJ19(IDX-SKJ)
                                              TO  NACCT-DAY(IDX-SKJ)
+                               IF  (SYS-5000-NACCT-GAIHAKUKBN = "2") AND
+                                   (WRK-TAIHI-GAIHAKU(IDX-SKJ) =  1 OR
+                                                                  2 OR
+                                                                  3)
+                                    MOVE  ZERO  TO   NACCT-DAY(IDX-SKJ)
+                               END-IF
                           END-PERFORM
                          WHEN  3
                           PERFORM VARYING IDX-SKJ FROM 1 BY 1
                             UNTIL     IDX-SKJ   >   31
                                MOVE   WRK-TAIHI-SKJ20(IDX-SKJ)
                                              TO  NACCT-DAY(IDX-SKJ)
+                               IF  (SYS-5000-NACCT-GAIHAKUKBN = "2") AND
+                                   (WRK-TAIHI-GAIHAKU(IDX-SKJ) =  1 OR
+                                                                  2 OR
+                                                                  3)
+                                    MOVE  ZERO  TO   NACCT-DAY(IDX-SKJ)
+                               END-IF
                           END-PERFORM
                      END-EVALUATE
       *              剤回数再セット
@@ -3664,9 +1840,95 @@
                          MOVE    "key32"     TO  MCP-PATHNAME
                  END-EVALUATE
                  PERFORM 900-CLOSE-SEC
-
               END-PERFORM
            END-IF
+      *
+      *    入院会計作成後に食堂加算に外泊区分を反映
+      *    （更新月分）
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
+           MOVE    WRK-PARA-SRYYM      TO  NACCT-SRYYM
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key43"             TO  MCP-PATHNAME
+           PERFORM  910-NYUINACCT-SELECT-SEC
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key43"             TO  MCP-PATHNAME
+           PERFORM  910-NYUINACCT-READ-SEC
+           IF      FLG-NYUINACCT        =   ZERO
+      *        外泊を反映
+               PERFORM   VARYING   IDX   FROM  1  BY  1
+                         UNTIL     IDX    >   31
+                 IF  (SYS-5000-NACCT-GAIHAKUKBN = "2") AND
+                     (WRK-TAIHI-GAIHAKU(IDX)     =  1 OR
+                                                    2 OR
+                                                    3)
+                     MOVE  ZERO  TO   NACCT-DAY(IDX)
+                 END-IF
+               END-PERFORM
+      *        剤回数再セット
+               MOVE  ZERO              TO  NACCT-ZAIKAISU
+               PERFORM  VARYING   IDX   FROM  1  BY  1
+                        UNTIL     IDX  >   31
+                   IF   NACCT-DAY(IDX)   NOT =  0
+                       ADD   1        TO  NACCT-ZAIKAISU
+                   END-IF
+               END-PERFORM   
+           END-IF
+           MOVE     NYUINACCT-REC      TO  MCPDATA-REC
+           MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+           MOVE     "key"              TO  MCP-PATHNAME
+           PERFORM 910-DBUPDATE-SEC
+      *    入院会計マスタクローズ
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key43"             TO  MCP-PATHNAME
+           PERFORM  900-CLOSE-SEC
+      *
+      *    入院会計作成後に入院料加算に外泊区分を反映
+      *    （更新月分）
+           INITIALIZE                      NYUINACCT-REC
+           MOVE    PTNYUINRRK-HOSPNUM  TO  NACCT-HOSPNUM
+           MOVE    PTNYUINRRK-PTID     TO  NACCT-PTID
+           MOVE    WRK-PARA-SRYYM      TO  NACCT-SRYYM
+           MOVE    "6"                 TO  NACCT-ZAISKBKBN
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM  910-NYUINACCT-SELECT-SEC
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM  910-NYUINACCT-READ-SEC
+           PERFORM  UNTIL   FLG-NYUINACCT     NOT =   ZERO
+      *        外泊を反映
+               PERFORM   VARYING   IDX   FROM  1  BY  1
+                         UNTIL     IDX    >   31
+                 IF  (SYS-5000-NACCT-GAIHAKUKBN = "2") AND
+                     (WRK-TAIHI-GAIHAKU(IDX)     =  1 OR
+                                                    2 OR
+                                                    3)
+                     MOVE  ZERO  TO   NACCT-DAY(IDX)
+                 END-IF
+               END-PERFORM
+      *        剤回数再セット
+               MOVE  ZERO              TO  NACCT-ZAIKAISU
+               PERFORM  VARYING   IDX   FROM  1  BY  1
+                        UNTIL     IDX  >   31
+                   IF   NACCT-DAY(IDX)   NOT =  0
+                       ADD   1        TO  NACCT-ZAIKAISU
+                   END-IF
+               END-PERFORM   
+               MOVE     NYUINACCT-REC      TO  MCPDATA-REC
+               MOVE     "tbl_nyuinacct"    TO  MCP-TABLE
+               MOVE     "key"              TO  MCP-PATHNAME
+               PERFORM 910-DBUPDATE-SEC
+      *
+               MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+               MOVE    "key17"             TO  MCP-PATHNAME
+               PERFORM  910-NYUINACCT-READ-SEC
+           END-PERFORM
+      *    入院会計マスタクローズ
+           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
+           MOVE    "key17"             TO  MCP-PATHNAME
+           PERFORM  900-CLOSE-SEC
       *
       *    入院会計作成後に退避データの外泊区分を復元
       *    （更新月分）
@@ -4089,797 +2351,39 @@
       *****************************************************************
        410191-NYUKSN-GET-SEC         SECTION.
       *
-           INITIALIZE                       WRK-NYUKHNKSN-AREA
-           MOVE    ZERO                TO   IDX8
-      *
-      *医療機関加算（減算）情報
-           INITIALIZE                  SYSKANRI-REC
-           MOVE    "5000"              TO  SYS-KANRICD
-           MOVE    WRK-PARA-SRYYM      TO  SYS-STYUKYMD(1:6)
-           MOVE    "01"                TO  SYS-STYUKYMD(7:2)
-           MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
-           MOVE    WRK-PARA-HOSPNUM    TO  SYS-HOSPNUM
-           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
-      *
-      *    システム管理マスタの医療機関情報より取得
-           MOVE    "tbl_syskanri"      TO  WRK-MCP-TABLE
-           MOVE    "key2"              TO  WRK-MCP-PATHNAME
-           PERFORM 900-TBL-SELECT-SEC
-      *
-           IF      FLG-DBRC            =   ZERO
-               MOVE    MCPDATA-REC         TO   SYS-5000-REC
-      *        入院料加算
-               PERFORM VARYING     IDX7    FROM   1  BY  1
-                   UNTIL          (IDX7           >   20)  OR
-                                  (SYS-5000-KSNCD(IDX7)  =   SPACE)
-                   IF      SYS-5000-KSNKBN(IDX7)   =   "2"
-                       ADD    1                    TO  IDX8
-                       MOVE   SYS-5000-KSNCD(IDX7) TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                   END-IF
-               END-PERFORM
-      *        地域加算
-               IF      SYS-5000-CHIIKIKSN  NOT =   SPACE
-                    ADD    1               TO  IDX8
-                    MOVE   SYS-5000-CHIIKIKSN  TO
-                                           WRK-NYUKHNKSN-SRYCD(IDX8)
-               END-IF
+      *    入院料加算取得サブ
+           INITIALIZE                       ORCSNYUKSNGET-AREA
+           MOVE   WRK-PARA-HOSPNUM      TO  LNK-NYUKSNGET-HOSPNUM
+           MOVE   PTNYUINRRK-PTID       TO  LNK-NYUKSNGET-PTID
+           MOVE   WRK-PARA-SRYYM        TO  LNK-NYUKSNGET-SANTEIYM
+           MOVE   PTNYUINRRK-BTUNUM     TO  LNK-NYUKSNGET-BTUNUM
+           MOVE   PTNYUINRRK-BRMNUM     TO  LNK-NYUKSNGET-BRMNUM
+           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)   NOT = SPACE
+               MOVE   LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                                        TO  LNK-NYUKSNGET-NYUIN-SRYCD
+           ELSE
+               MOVE   LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                                        TO  LNK-NYUKSNGET-NYUIN-SRYCD
            END-IF
-      *
-      *    システム管理マスタクローズ
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
-      *
-      *病棟加算情報
-           PERFORM 4801-BTUSEL-SEC
-      *
-           IF      FLG-SYSKANRI        =   ZERO
-      *
-      *        看護補助加算
-               IF      SYS-5001-BTU-KNGHJOKSN  NOT =   SPACE
-                   ADD     1               TO     IDX8
-                   EVALUATE     SYS-5001-BTU-KNGHJOKSN
-                       WHEN     "01"
-                           MOVE  "190103070"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "02"
-                           MOVE  "190103470"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "03"
-                           MOVE  "190103770"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "04"
-                           MOVE  "190103970"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "05"
-                           MOVE  "190104070"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "06"
-                           MOVE  "190103770"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "07"
-                           MOVE  "190103870"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "08"
-                           MOVE  "190103970"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "09"
-                           MOVE  "190104070"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                   END-EVALUATE
-               END-IF
-      *
-      *        夜間勤務等看護加算
-               IF    SYS-5001-BTU-YAKANKNGKSN   NOT =   SPACE
-                   ADD      1          TO     IDX8
-                   EVALUATE     SYS-5001-BTU-YAKANKNGKSN
-                       WHEN     "01"
-                           MOVE  "190109870"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "02"
-                           MOVE  "190076070"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "03"
-                           MOVE  "190076170"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "04"
-                           MOVE  "190076370"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                       WHEN     "05"
-                           MOVE  "190076470"   TO
-                                              WRK-NYUKHNKSN-SRYCD(IDX8)
-                   END-EVALUATE
-               END-IF
-      *
-      *        小児入院医療管理料加算（保育士１人以上）
-               MOVE  SPACE       TO   WRK-BTU-HIKSISUKBN
-               IF    SYS-5001-BTU-HIKSISUKBN   =   "2"
-                   MOVE   "2"    TO   WRK-BTU-HIKSISUKBN
-               END-IF
-      *
-      *      病棟入院料加算
-      *
-      *      平成２０年３月までの加算セット処理
-             IF     WRK-PARA-SRYYM     <=     "200803"
-               PERFORM   VARYING   IDX7   FROM   1  BY  1
-                 UNTIL  (IDX7                    >   14)
-                   EVALUATE   IDX7
-                       WHEN   3
-                       WHEN   4
-                       WHEN   5
-                           CONTINUE
-      *                児童思春期精神科入院医療管理加算（２０才未満）
-                       WHEN   6
-                           IF      SYS-5001-KSNKBN(IDX7)   =   "2"
-                               PERFORM   4801-PT-AGE-SEC
-                               IF      WRK-NENREI          <      20
-                                   ADD    1                TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                               WRK-NYUKHNKSN-SRYCD(IDX8)
-                               END-IF
-                           END-IF
-      *                看護配置適合加算
-                       WHEN   13
-                           MOVE  SPACE       TO   WRK-BTU-KNGTEK-KBN
-                           IF    SYS-5001-KNGTEK-KBN   =   "2"
-                               MOVE   "2"    TO   WRK-BTU-KNGTEK-KBN
-                           END-IF
-      *                複数医師及び看護配置適合加算
-                       WHEN   14
-                           MOVE  SPACE       TO   WRK-BTU-DRTEK-KBN
-                           IF    SYS-5001-DRTEK-KBN   =   "2"
-                               MOVE   "2"    TO   WRK-BTU-DRTEK-KBN
-                           END-IF
-                       WHEN   OTHER
-                           IF     SYS-5001-KSNKBN(IDX7)    =   "2"
-                               ADD    1                TO  IDX8
-                               MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                           END-IF
-                   END-EVALUATE
-               END-PERFORM
-             END-IF
-      *
-      *      平成２０年４月から平成２２年３月までの加算セット処理
-             IF    (WRK-PARA-SRYYM   >=     "200804")    AND
-                   (WRK-PARA-SRYYM   <=     "201003")
-                 PERFORM   VARYING   IDX7   FROM   1  BY  1
-                   UNTIL  (IDX7      >   14)
-                     IF   SYS-5001-KSNKBN(IDX7)   =   "2"
-                         EVALUATE    SYS-5001-KSNCD(IDX7)
-      *                      児童思春期精神科入院医療管理加算（２０才未満）
-                             WHEN    "190110170"
-                                PERFORM   4801-PT-AGE-SEC
-                                IF      WRK-NENREI   <      20
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      重症患者回復病棟加算（回復期リハビリテーション入院料１）
-                             WHEN    "190129870"
-                                IF  SYOKIKSN-IN-KHNSRYCD = "190129410"
-                                                        OR "190129510"  
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      医師配置適合加算（有床診療所入院基本料１）
-      *                      看護配置加算１（有床診療所入院基本料１）
-      *                      看護配置加算２（有床診療所入院基本料１）
-      *                      夜間看護配置加算１（有床診療所入院基本料１）
-      *                      夜間看護配置加算２（有床診療所入院基本料１）
-                             WHEN    "190117070"
-                             WHEN    "190126570"
-                             WHEN    "190109670"
-                             WHEN    "190126670"
-                             WHEN    "190126770"
-                                IF  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                                                         = "190097010"
-                                                        OR "190097110"
-                                                        OR "190119510"
-                                                        OR "190119610"
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      夜間緊急体制確保加算（有床診療所入院基本料１と２）
-                             WHEN    "190126470"
-                                IF  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                                                         = "190097010"
-                                                        OR "190097110"
-                                                        OR "190119510"
-                                                        OR "190119610"
-                                                        OR "190097210"
-                                                        OR "190097310"
-                                                        OR "190119710"
-                                                        OR "190119810"
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-                             WHEN   OTHER
-                                ADD    1                TO  IDX8
-                                MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                         END-EVALUATE
-                     END-IF
-                 END-PERFORM
-             END-IF
-      *
-      *      平成２２年４月から平成２４年３月までの加算セット処理
-             IF    (WRK-PARA-SRYYM   >=     "201004")    AND
-                   (WRK-PARA-SRYYM   <=     "201203")
-      *         （システム管理の病棟設定見直しによるもの）
-               PERFORM   VARYING   IDX7   FROM   1  BY  1
-                 UNTIL  (IDX7      >   14)
-                     IF   SYS-5001-KSNKBN(IDX7)   =   "2"
-                         EVALUATE    SYS-5001-KSNCD(IDX7)
-      *                      児童思春期精神科入院医療管理加算（２０才未満）
-                             WHEN    "190110170"
-                                PERFORM   4801-PT-AGE-SEC
-                                IF      WRK-NENREI   <      20
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      重症患者回復病棟加算（回復期リハビリテーション入院料１）
-                             WHEN    "190129870"
-                                IF  SYOKIKSN-IN-KHNSRYCD = "190129410"
-                                                        OR "190129510"
-                                                        OR "190141610"
-                                                        OR "190141710"
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-      *                            基準未適合の場合は重症患者回復病棟加算（基準未適合）
-      *                            に置き換える
-                                   IF SYOKIKSN-IN-KHNSRYCD = "190129410"
-                                                          OR "190129510"
-                                     MOVE   "190142370"  TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                   END-IF
-                                END-IF
-      *                      医師配置加算１（有床診療所入院基本料１と２）
-      *                      医師配置加算２（有床診療所入院基本料１と２）
-      *                      看護配置加算１（有床診療所入院基本料１と２）
-      *                      看護配置加算２（有床診療所入院基本料１と２）
-      *                      夜間看護配置加算１（有床診療所入院基本料１と２）
-      *                      夜間看護配置加算２（有床診療所入院基本料１と２）
-                             WHEN    "190135570"
-                             WHEN    "190117070"
-                             WHEN    "190109670"
-                             WHEN    "190126570"
-                             WHEN    "190126770"
-                             WHEN    "190126670"
-                                IF  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                                                         = "190097010"
-                                                        OR "190119510"
-                                                        OR "190119610"
-                                                        OR "190097210"
-                                                        OR "190119710"
-                                                        OR "190119810"
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      夜間緊急体制確保加算（有床診療所入院基本料１と２と３）
-                             WHEN    "190126470"
-                                IF  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                                                         = "190097010"
-                                                        OR "190119510"
-                                                        OR "190119610"
-                                                        OR "190097210"
-                                                        OR "190119710"
-                                                        OR "190119810"
-                                                        OR "190135110"
-                                                        OR "190135210"
-                                                        OR "190135310"
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      一般病棟看護必要度評価加算（１０対１入院基本料）
-                             WHEN    "190131570"
-      *                            一般病棟看護必要度評価加算
-                                   IF SYOKIKSN-IN-KHNSRYCD = "190077410"
-                                     ADD    1            TO  IDX8
-                                     MOVE   "190131570"  TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                   END-IF
-      *                            一般病棟看護必要度評価加算（特定機能病院）
-                                   IF SYOKIKSN-IN-KHNSRYCD = "190085910"
-                                     ADD    1            TO  IDX8
-                                     MOVE   "190134870"  TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                   END-IF
-      *                            一般病棟看護必要度評価加算（専門病院）
-                                   IF SYOKIKSN-IN-KHNSRYCD = "190090210"
-                                     ADD    1            TO  IDX8
-                                     MOVE   "190134970"  TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                   END-IF
-      *                      休日リハビリテーション提供体制加算（回復期リハビリテーション病棟入院料）
-                             WHEN    "190140870"
-                                IF  SYOKIKSN-IN-KHNSRYCD = "190141610"
-                                                        OR "190141710"
-                                                        OR "190141810"
-                                                        OR "190141910"
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-                             WHEN   OTHER
-                                ADD    1                TO  IDX8
-                                MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                         END-EVALUATE
-                     END-IF
-               END-PERFORM
-             END-IF
-      *
-      *      平成２４年４月からの加算セット処理
-             IF     WRK-PARA-SRYYM      >=     "201204"
-      *         （システム管理の病棟設定見直しによるもの）
-               PERFORM   VARYING   IDX7   FROM   1  BY  1
-                 UNTIL  (IDX7      >   14)
-                     IF   SYS-5001-KSNKBN(IDX7)   =   "2"
-                         EVALUATE    SYS-5001-KSNCD(IDX7)
-      *                      医師配置加算１（有床診療所入院基本料１と２）
-      *                      医師配置加算２（有床診療所入院基本料１と２）
-      *                      看護配置加算１（有床診療所入院基本料１と２）
-      *                      看護配置加算２（有床診療所入院基本料１と２）
-      *                      夜間看護配置加算１（有床診療所入院基本料１と２）
-      *                      夜間看護配置加算２（有床診療所入院基本料１と２）
-                             WHEN    "190135570"
-                             WHEN    "190117070"
-                             WHEN    "190109670"
-                             WHEN    "190126570"
-                             WHEN    "190126770"
-                             WHEN    "190126670"
-                                IF  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                                                         = "190097010"
-                                                        OR "190119510"
-                                                        OR "190119610"
-                                                        OR "190097210"
-                                                        OR "190119710"
-                                                        OR "190119810"
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      夜間緊急体制確保加算（有床診療所入院基本料１と２と３）
-                             WHEN    "190126470"
-                                IF  LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                                                         = "190097010"
-                                                        OR "190119510"
-                                                        OR "190119610"
-                                                        OR "190097210"
-                                                        OR "190119710"
-                                                        OR "190119810"
-                                                        OR "190135110"
-                                                        OR "190135210"
-                                                        OR "190135310"
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      一般病棟看護必要度評価加算（１３対１入院基本料）
-                             WHEN    "190131570"
-      *                            一般病棟看護必要度評価加算
-                                   IF SYOKIKSN-IN-KHNSRYCD = "190077510"
-                                     ADD    1            TO  IDX8
-                                     MOVE   "190131570"  TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                   END-IF
-      *                            一般病棟看護必要度評価加算（専門病院）
-                                   IF SYOKIKSN-IN-KHNSRYCD = "190090310"
-                                     ADD    1            TO  IDX8
-                                     MOVE   "190134970"  TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                   END-IF
-      *                            一般病棟看護必要度評価加算（特定一般病棟入院料１）
-                                   IF SYOKIKSN-IN-KHNSRYCD = "190151910"
-                                     ADD    1            TO  IDX8
-                                     MOVE   "190152570"  TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                   END-IF
-      *                      休日リハビリテーション提供体制加算（回復期リハビリテーション病棟入院料）
-                             WHEN    "190140870"
-                                IF  SYOKIKSN-IN-KHNSRYCD = "190141610"
-                                                        OR "190141710"
-                                                        OR "190141810"
-                                                        OR "190141910"
-                                                        OR "190150110"
-                                                        OR "190150210"
-                                   ADD    1            TO  IDX8
-                                   MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      看護必要度加算１（１０対１入院基本料）
-                             WHEN    "190143070"
-      *                         看護必要度加算１（一般病棟入院基本料）
-                                IF SYOKIKSN-IN-KHNSRYCD = "190077410"
-                                   ADD    1            TO  IDX8
-                                   MOVE   "190143070"  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                         看護必要度加算１（特定機能病院）
-                                IF SYOKIKSN-IN-KHNSRYCD = "190085910"
-                                   ADD    1            TO  IDX8
-                                   MOVE   "190143970"  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                         看護必要度加算１（専門病院）
-                                IF SYOKIKSN-IN-KHNSRYCD = "190090210"
-                                   ADD    1            TO  IDX8
-                                   MOVE   "190144570"  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                      看護必要度加算２（１０対１入院基本料）
-                             WHEN    "190143170"
-      *                         看護必要度加算２（一般病棟入院基本料）
-                                IF SYOKIKSN-IN-KHNSRYCD = "190077410"
-                                   ADD    1            TO  IDX8
-                                   MOVE   "190143170"  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                         看護必要度加算２（特定機能病院）
-                                IF SYOKIKSN-IN-KHNSRYCD = "190085910"
-                                   ADD    1            TO  IDX8
-                                   MOVE   "190144070"  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-      *                         看護必要度加算２（専門病院）
-                                IF SYOKIKSN-IN-KHNSRYCD = "190090210"
-                                   ADD    1            TO  IDX8
-                                   MOVE   "190144670"  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                                END-IF
-                             WHEN   OTHER
-                                ADD    1                TO  IDX8
-                                MOVE   SYS-5001-KSNCD(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                         END-EVALUATE
-                     END-IF
-               END-PERFORM
-             END-IF
-      *
-      *      入院料加算（ユーザー設定）
-             PERFORM   VARYING   IDX7   FROM   1  BY  1
-               UNTIL  (IDX7      >   10)
-                   IF   SYS-5001-KSNCD2(IDX7)  NOT =   SPACE
-                       ADD   1     TO    IDX8
-                       MOVE   SYS-5001-KSNCD2(IDX7) TO
-                                            WRK-NYUKHNKSN-SRYCD(IDX8)
-                   END-IF
-             END-PERFORM
-      *
-           END-IF
-      *
-      *    病室入院料加算
-           PERFORM     4801-BRMSEL-SEC
-      *
-           IF   FLG-SYSKANRI       =    ZERO
-      *
-               PERFORM   VARYING   IDX7   FROM   1  BY  1
-                 UNTIL    (IDX7                    >   12)
-                     IF   SYS-5002-KSNKBN(IDX7)   =   "2"
-                          ADD    1                TO  IDX8
-                          MOVE   SYS-5002-KSNCD(IDX7)  TO
-                                             WRK-NYUKHNKSN-SRYCD(IDX8)
-                     END-IF
-               END-PERFORM
-      *
-           END-IF
-      *
-      *    入院料と入院料加算の併算定チェック
-           MOVE    ZERO                TO     IDX9
-           PERFORM VARYING     IDX8    FROM   1   BY   1
-                   UNTIL      (IDX8    >     20)
-                         OR   (WRK-NYUKHNKSN-SRYCD(IDX8)   =  SPACE)
-               PERFORM 4801-NYUKSN-CHK-SEC
-               IF      FLG-NYUKSN          =   ZERO
-                   ADD    1                TO  IDX9
-                   MOVE   WRK-NYUKHNKSN-SRYCD(IDX8)  TO
-                                   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
-      *            褥瘡患者管理加算のフラグセット
-                   IF   WRK-NYUKHNKSN-SRYCD(IDX8)  =   "190116990"
-                        MOVE   "1"    TO
-                                   LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX9)
-                   END-IF
-               END-IF
+           CALL    "ORCSNYUKSNGET"      USING  ORCSNYUKSNGET-AREA
+                                               SPA-AREA
+      *    入院料加算取得サブからの返却値セット
+           PERFORM    VARYING    IDX8   FROM   1   BY   1
+             UNTIL    (LNK-NYUKSNGET-KSNSRYCD(IDX8)  =  SPACE)  OR
+                      (IDX8   >     20)
+                 MOVE   LNK-NYUKSNGET-NYUKSNKBN(IDX8)
+                             TO  LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX8)
+                 MOVE   LNK-NYUKSNGET-KSNSRYCD(IDX8)
+                             TO  LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
            END-PERFORM
-      *
-      *    小児入院医療管理料加算（保育士１人以上）
-           IF    (WRK-BTU-HIKSISUKBN   =   "2")  AND
-                 (IDX9    <   20 )
-               ADD    1            TO  IDX9
-               MOVE  "190111370"   TO
-                                   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
-           END-IF
-      *
-           IF     WRK-PARA-SRYYM     <=     "200803"
-      *      看護配置適合加算
-             IF    (WRK-BTU-KNGTEK-KBN   =   "2")  AND
-                   (IDX9    <   20 )
-                 ADD    1            TO  IDX9
-                 MOVE  "190109670"   TO
-                                   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
-             END-IF
-      *
-      *      複数医師及び看護配置適合加算
-             IF    (WRK-BTU-DRTEK-KBN   =   "2")  AND
-                   (IDX9    <   20 )
-                 ADD    1            TO  IDX9
-                 MOVE  "190117070"   TO
-                                   LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX9)
-             END-IF
-           END-IF
+           MOVE    LNK-NYUKSNGET-TOKUBETSU-NYUIN
+                                        TO  WRK-TOKUBETSU-NYUIN
       *
            .
       *
        410191-NYUKSN-GET-EXT.
            EXIT.
       *
-      *****************************************************************
-      *    入院料加算の算定可・不可チェック
-      *****************************************************************
-       4801-NYUKSN-CHK-SEC         SECTION.
-      *
-           MOVE    ZERO            TO  FLG-NYUKSN
-      *
-      *     EVALUATE   SYS-5000-KSNCD(IDX7)
-      *        診療録管理体制加算
-      *         WHEN   "190100370"
-      *             IF   SPA-GMN-I01-SYORIKBN-CD   =  "08"
-      *                  MOVE   1        TO     FLG-NYUKSN
-      *             END-IF
-      *            自院での継続入院チェック
-      *     END-EVALUATE
-      *
-      *    入院料加算チェックテーブルによる判定
-           INITIALIZE  NYUKSNCHK-REC
-      *
-           PERFORM 48011-TENSU-SEL-SEC
-           MOVE    WRK-BTU-NYUKSNKBN   TO  NYUKSNCHK-NYUINKBN
-           PERFORM 48012-TENSU-SEL-SEC
-           IF      TNS-NYUKHNKSNKBN    NOT =   ZERO
-               MOVE    WRK-KSN-NYUKSNKBN   TO  NYUKSNCHK-KSNKBN
-               MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                           TO  NYUKSNCHK-YUKOSTYMD
-               MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                           TO  NYUKSNCHK-YUKOEDYMD
-      *
-               MOVE    "tbl_nyuksnchk"     TO  WRK-MCP-TABLE
-               MOVE    "key"               TO  WRK-MCP-PATHNAME
-               MOVE    NYUKSNCHK-REC       TO  MCPDATA-REC
-               PERFORM 900-TBL-SELECT-SEC
-               IF    ( FLG-DBRC            =   ZERO )
-                   MOVE    MCPDATA-REC         TO  NYUKSNCHK-REC
-                   IF    ( NYUKSNCHK-CHKKBN    =   "1" OR "2" )
-                       CONTINUE
-                   ELSE
-                       MOVE   1        TO     FLG-NYUKSN
-                   END-IF
-               ELSE
-                   MOVE   1            TO  FLG-NYUKSN
-               END-IF
-      *
-               MOVE    "tbl_nyuksnchk"     TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-               PERFORM 900-CLOSE-SEC
-           END-IF
-      *
-      *    表用番号が同一であることの判定
-           IF   WRK-KSN-CDKBN-KBNNUM    NOT =    ZERO
-              IF  (WRK-BTU-CDKBN-KBNNUM  = WRK-KSN-CDKBN-KBNNUM)  AND
-                  (WRK-BTU-CDKBN-KBNNUM-EDA = WRK-KSN-CDKBN-KBNNUM-EDA)
-                  CONTINUE
-              ELSE
-                  MOVE    1     TO    FLG-NYUKSN
-              END-IF
-           END-IF
-      *
-           .
-      *
-       4801-NYUKSN-CHK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    点数マスタ検索処理（入院料）
-      *****************************************************************
-       48011-TENSU-SEL-SEC              SECTION.
-      *
-           MOVE    SPACE           TO  WRK-NYUKSNKBN
-           MOVE    ZERO            TO  WRK-BTU-CDKBN-KBNNUM
-           MOVE    ZERO            TO  WRK-BTU-CDKBN-KBNNUM-EDA
-           MOVE    SPACE           TO  WRK-TOKUBETSU-NYUIN
-      *
-           MOVE    ZERO            TO  FLG-TENSU
-           INITIALIZE              TNS-TENSU-REC
-      *
-           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1) NOT = SPACE
-               MOVE   LNK-SCNYUACCT-NYUKHN-SRYCD(1)
-                                   TO  TNS-SRYCD
-           ELSE
-               MOVE   LNK-SCNYUACCT-KAGEN-SRYCD(1)
-                                   TO  TNS-SRYCD
-           END-IF
-           MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                   TO  TNS-YUKOSTYMD
-           MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                   TO  TNS-YUKOEDYMD
-           MOVE    WRK-PARA-HOSPNUM TO  TNS-HOSPNUM
-           MOVE    TNS-TENSU-REC   TO  MCPDATA-REC
-      *
-           MOVE    "tbl_tensu"     TO  WRK-MCP-TABLE
-           MOVE    "key"           TO  WRK-MCP-PATHNAME
-           PERFORM 900-TBL-SELECT-SEC
-           IF    ( FLG-DBRC        =   ZERO )
-               MOVE    MCPDATA-REC TO  TNS-TENSU-REC
-           ELSE
-               MOVE    1           TO  FLG-TENSU
-           END-IF
-      *
-      *    点数マスタクローズ
-           MOVE    "tbl_tensu"     TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
-      *
-           IF    ( FLG-TENSU       NOT =   ZERO )
-               GO  TO  48011-TENSU-SEL-EXT
-           END-IF
-      *
-           MOVE    TNS-NYUKHNKSNKBN
-                                    TO  WRK-BTU-NYUKSNKBN
-           MOVE    TNS-CDKBN-KBNNUM TO  WRK-BTU-CDKBN-KBNNUM
-           MOVE    TNS-CDKBN-KBNNUM-EDA TO WRK-BTU-CDKBN-KBNNUM-EDA
-      *    療養病床以外・有床診療所療養病床入院基本料のとき、
-      *    表用番号の置き換え
-           IF     (TNS-CDKBN-KBNNUM  = 108)   AND
-                  (TNS-CDKBN-KOUBAN  =  10)   AND
-                  (TNS-YUKOSTYMD    >=  "20120401")
-               MOVE   109           TO WRK-BTU-CDKBN-KBNNUM
-               MOVE   ZERO          TO WRK-BTU-CDKBN-KBNNUM-EDA
-           END-IF
-      *    特別入院料の判定
-           EVALUATE   TNS-NYUKHNKBN
-               WHEN   73
-               WHEN   74
-               WHEN   75
-               WHEN   76
-               WHEN   77
-               WHEN   78
-               WHEN   79
-               WHEN   83
-               WHEN   84
-                   MOVE    "1"     TO  WRK-TOKUBETSU-NYUIN
-           END-EVALUATE
-           IF  TNS-SRYCD      =    "190121810"
-                   MOVE    "1"     TO  WRK-TOKUBETSU-NYUIN
-           END-IF
-           IF  TNS-SRYCD      =    "190799510"
-                   MOVE    "1"     TO  WRK-TOKUBETSU-NYUIN
-           END-IF
-           .
-      *
-       48011-TENSU-SEL-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    点数マスタ検索処理（入院料加算）
-      *****************************************************************
-       48012-TENSU-SEL-SEC              SECTION.
-      *
-           MOVE    SPACE           TO  WRK-NYUKSNKBN
-           MOVE    ZERO            TO  WRK-KSN-CDKBN-KBNNUM
-           MOVE    ZERO            TO  WRK-KSN-CDKBN-KBNNUM-EDA
-      *
-           MOVE    ZERO            TO  FLG-TENSU
-           INITIALIZE              TNS-TENSU-REC
-      *
-      *    特別入院料算定時に幼児加算と乳幼児加算の加算コード置き換え
-           IF      WRK-TOKUBETSU-NYUIN   =   "1"
-               EVALUATE   WRK-NYUKHNKSN-SRYCD(IDX8)
-                   WHEN   "190100470"
-                       MOVE  "190100570"  TO  WRK-NYUKHNKSN-SRYCD(IDX8)
-                   WHEN   "190100770"
-                       MOVE  "190100870"  TO  WRK-NYUKHNKSN-SRYCD(IDX8)
-               END-EVALUATE
-           END-IF
-      *
-           MOVE    WRK-NYUKHNKSN-SRYCD(IDX8)
-                                   TO  TNS-SRYCD
-           MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                   TO  TNS-YUKOSTYMD
-           MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                   TO  TNS-YUKOEDYMD
-           MOVE    WRK-PARA-HOSPNUM TO  TNS-HOSPNUM
-           MOVE    TNS-TENSU-REC   TO  MCPDATA-REC
-      *
-           MOVE    "tbl_tensu"     TO  WRK-MCP-TABLE
-           MOVE    "key"           TO  WRK-MCP-PATHNAME
-           PERFORM 900-TBL-SELECT-SEC
-           IF    ( FLG-DBRC        =   ZERO )
-               MOVE    MCPDATA-REC TO  TNS-TENSU-REC
-           ELSE
-               MOVE    1           TO  FLG-TENSU
-           END-IF
-      *
-      *    点数マスタクローズ
-           MOVE    "tbl_tensu"     TO  MCP-TABLE
-           MOVE    "key"           TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
-      *
-           IF    ( FLG-TENSU       NOT =   ZERO )
-               GO  TO  48012-TENSU-SEL-EXT
-           END-IF
-      *
-           MOVE    TNS-NYUKHNKSNKBN
-                                   TO  WRK-KSN-NYUKSNKBN
-      *
-      *    入院料（Ａ１００番台）、特定入院料（Ａ３００番台）に含まれる
-      *    注加算のみが判定対象となる
-           IF      (TNS-CDKBN-KBN       =   "A")     AND
-                   (TNS-CDKBN-KBNNUM   >=   100)     AND
-                   (TNS-CDKBN-KBNNUM   <=   199)
-                MOVE  TNS-CDKBN-KBNNUM TO  WRK-KSN-CDKBN-KBNNUM
-                MOVE  TNS-CDKBN-KBNNUM-EDA
-                                       TO  WRK-KSN-CDKBN-KBNNUM-EDA
-           END-IF
-      *
-           IF      (TNS-CDKBN-KBN       =   "A")     AND
-                   (TNS-CDKBN-KBNNUM   >=   300)     AND
-                   (TNS-CDKBN-KBNNUM   <=   399)
-                MOVE  TNS-CDKBN-KBNNUM TO  WRK-KSN-CDKBN-KBNNUM
-                MOVE  TNS-CDKBN-KBNNUM-EDA
-                                       TO  WRK-KSN-CDKBN-KBNNUM-EDA
-           END-IF
-           .
-      *
-       48012-TENSU-SEL-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    入院患者の年齢算出
-      *****************************************************************
-       4801-PT-AGE-SEC         SECTION.
-      *
-      *    入院患者の年齢計算
-           INITIALIZE                      ORCSAGECHKAREA
-           MOVE    WRK-PARA-HOSPNUM    TO  AGECHK-HOSPNUM
-           MOVE    PTNYUINRRK-PTID     TO  AGECHK-PTID
-           MOVE    SYOKIKSN-IN-SANTEISTYMD
-                                       TO  AGECHK-SRYYMD
-           MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
-           MOVE    WRK-PTID            TO  PTINF-PTID
-           MOVE    "tbl_ptinf"         TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-PTINF-SELECT-SEC
-           MOVE    "tbl_ptinf"         TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 910-PTINF-READ-SEC
-           MOVE    PTINF-BIRTHDAY      TO  AGECHK-BIRTHDAY
-                                           SPA-BIRTHDAY
-           CALL    "ORCSAGECHK"        USING
-                                           ORCSAGECHKAREA
-                                           SPA-AREA
-           IF    ( AGECHK-RC           =   ZERO )
-               MOVE     AGECHK-NENREI2-YY  TO  WRK-NENREI
-           ELSE
-               INITIALIZE  ORCSAGECHKAREA
-               MOVE     ZERO               TO  WRK-NENREI
-           END-IF
-      *
-           MOVE    "tbl_ptinf"         TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
-      *
-           .
-      *
-       4801-PT-AGE-EXT.
-           EXIT.
       *****************************************************************
       *    病棟情報検索処理
       *****************************************************************
@@ -4912,39 +2416,6 @@
       *
            .
        4801-BTUSEL-EXT.
-           EXIT.
-      *****************************************************************
-      *    病室情報検索処理
-      *****************************************************************
-       4801-BRMSEL-SEC             SECTION.
-      *
-           INITIALIZE              SYSKANRI-REC
-           MOVE    ZERO            TO  FLG-SYSKANRI
-      *
-           MOVE    "5002"          TO  SYS-KANRICD
-           MOVE    PTNYUINRRK-BRMNUM
-                                   TO  SYS-KBNCD
-           MOVE    WRK-PARA-SRYYM  TO  SYS-STYUKYMD(1:6)
-           MOVE    "01"            TO  SYS-STYUKYMD(7:2)
-           MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
-           MOVE    WRK-PARA-HOSPNUM TO  SYS-HOSPNUM
-           MOVE    SYSKANRI-REC    TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"  TO  WRK-MCP-TABLE
-           MOVE    "key10"         TO  WRK-MCP-PATHNAME
-           PERFORM 900-TBL-SELECT-SEC
-           IF    ( FLG-DBRC    =   ZERO )
-               MOVE    MCPDATA-REC
-                                  TO  SYS-5002-REC
-           ELSE
-               MOVE    1          TO  FLG-SYSKANRI
-           END-IF
-      *
-           MOVE    "tbl_syskanri"  TO  MCP-TABLE
-           MOVE    "key10"         TO  MCP-PATHNAME
-           PERFORM 900-CLOSE-SEC
-      *
-           .
-       4801-BRMSEL-EXT.
            EXIT.
       *
       *****************************************************************
@@ -5039,52 +2510,6 @@
       *
            .
        4801-RJNCD-CHG-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    特定入院料の算定期間置き換え
-      *****************************************************************
-       4801-KIKAN-CHG-SEC   SECTION.
-      *
-           MOVE      ZERO              TO   KIKAN-IDX2
-           PERFORM   VARYING   KIKAN-IDX1   FROM  1  BY  1
-             UNTIL  (KIKAN-IDX1        >    6  )
-              IF    LNK-SCNYUACCT-KAGEN-STYUKYMD(KIKAN-IDX1)
-                                    <  LNK-SCNYUACCT-STSRYYMD
-                IF    LNK-SCNYUACCT-STSRYYMD    <=
-                          LNK-SCNYUACCT-KAGEN-EDYUKYMD(KIKAN-IDX1)
-                    ADD   1       TO   KIKAN-IDX2
-                    MOVE  LNK-SCNYUACCT-KAGEN-SRYCD(KIKAN-IDX1) TO
-                          LNK-SCNYUACCT-KAGEN-SRYCD(KIKAN-IDX2)
-                    MOVE  LNK-SCNYUACCT-STSRYYMD   TO
-                          LNK-SCNYUACCT-KAGEN-STYUKYMD(KIKAN-IDX2)
-                    MOVE  LNK-SCNYUACCT-KAGEN-EDYUKYMD(KIKAN-IDX1) TO
-                          LNK-SCNYUACCT-KAGEN-EDYUKYMD(KIKAN-IDX2)
-                END-IF
-              ELSE
-                    ADD   1       TO   KIKAN-IDX2
-                    MOVE  LNK-SCNYUACCT-KAGEN-SRYCD(KIKAN-IDX1) TO
-                          LNK-SCNYUACCT-KAGEN-SRYCD(KIKAN-IDX2)
-                    MOVE  LNK-SCNYUACCT-KAGEN-STYUKYMD(KIKAN-IDX1) TO
-                          LNK-SCNYUACCT-KAGEN-STYUKYMD(KIKAN-IDX2)
-                    MOVE  LNK-SCNYUACCT-KAGEN-EDYUKYMD(KIKAN-IDX1) TO
-                          LNK-SCNYUACCT-KAGEN-EDYUKYMD(KIKAN-IDX2)
-              END-IF
-           END-PERFORM 
-      *
-           IF    KIKAN-IDX2    NOT =  ZERO
-             ADD       1         TO    KIKAN-IDX2
-             PERFORM   VARYING   KIKAN-IDX1   FROM  KIKAN-IDX2  BY  1
-               UNTIL  (KIKAN-IDX1        >    6  )
-                 MOVE   SPACE   TO  
-                             LNK-SCNYUACCT-KAGEN-SRYCD(KIKAN-IDX1)
-                             LNK-SCNYUACCT-KAGEN-STYUKYMD(KIKAN-IDX1)
-                             LNK-SCNYUACCT-KAGEN-EDYUKYMD(KIKAN-IDX1)
-             END-PERFORM
-           END-IF
-
-           .
-       4801-KIKAN-CHG-EXT.
            EXIT.
       *
       *****************************************************************
