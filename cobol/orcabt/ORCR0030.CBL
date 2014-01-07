@@ -3555,10 +3555,6 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                MOVE      "key22"            TO  MCP-PATHNAME
                PERFORM    900-CLOSE-SEC
       *
-               COMPUTE    RECE02-DAISAN-TOTALTEN    =
-                          RECE02-DAISAN-TOTALTEN    -
-                          WRK-DAISAN-TOTALTEN-GEN
-      *
                MOVE       1                 TO  FLG-DAISAN-ARI
       *
              END-IF
@@ -3566,6 +3562,9 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            END-PERFORM
       *
            IF    RECE02-DAISAN-GAITO  =   1
+      *
+             COMPUTE  RECE02-DAISAN-TOTALTEN = RECE02-DAISAN-TOTALTEN
+                                             - WRK-DAISAN-TOTALTEN-GEN
       *
              PERFORM  VARYING  IDX16   FROM    1   BY  1
                        UNTIL  (IDX16                   >   10 )
