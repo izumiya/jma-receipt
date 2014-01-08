@@ -61,6 +61,7 @@
       *  04.06.00    NACL=多々納  11/02/03  保険適応病名判定対応
       *  04.07.00    NACL=多々納  11/06/XX  病名なし処理区分対応
       *  04.07.00    NACL=多々納  11/08/03  主病区分、全公費編集対応
+      *  04.07.00    NACL-多々納  13/10/07  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -264,12 +265,14 @@
            03  COM-MAX                 PIC 9(03).
       *
            03  WRK-COMB-HKNNUM         PIC X(03).
+           03  WRK-COMB-KOHID          PIC 9(10).
       *
       *    保険組合せテーブル
        01  TBL-HKNCOMBI-AREA.
            03  TBL-HKNCOMBI-OCC        OCCURS   20.
                05  TBL-HKNCOMBINUM     PIC X(04).
                05  TBL-HKNNUM          PIC X(03).
+               05  TBL-KOHID           PIC 9(10).
       *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMDG         PIC X(22).
@@ -306,6 +309,7 @@
            03  PARA-HKNCOMBIKBN        PIC X(01).
            03  PARA-SYUBYOKBN          PIC X(01).
            03  PARA-ALLKOHKBN          PIC X(01).
+           03  PARA-DAISANKBN          PIC X(01).
       *
            03  WRK-PARA-NAME           PIC X(25).
            03  WRK-PARA                PIC X(50).
@@ -555,6 +559,11 @@
            MOVE    "ALLKOHKBN"         TO  WRK-PARA-NAME
            PERFORM 1001-OPTION-CALL-SEC
            MOVE    WRK-PARA(1:1)       TO  PARA-ALLKOHKBN
+      *
+      *    第三者編集区分
+           MOVE    "DAISANKBN"         TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA(1:1)       TO  PARA-DAISANKBN
       *
       *    病名編集オプション設定
            IF      PARA-BYOMEIKBN      =   "0"
@@ -1089,6 +1098,7 @@
        3103-KOHHEN-HC01-SEC         SECTION.
       *
            PERFORM 3102-PTKOHINF-HEN-SEC
+      *
            MOVE    WRK-FTNSNO      TO  HC01-FTNSNO (IDY)
       *****MOVE    WRK-JKYSNO      TO  HC01-JKYSNO (IDY)
            EVALUATE    WRK-JKYSNO-MAX
@@ -1273,6 +1283,9 @@
                           (PTKOH-KOHID         =   COMB-KOHID (2)) OR
                           (PTKOH-KOHID         =   COMB-KOHID (3)) OR
                           (PTKOH-KOHID         =   COMB-KOHID (4)))
+      *ver.4.7
+      *            第三者行為は対象外
+                   OR    ( PTKOH-KOHNUM        =   "970"   )
                        CONTINUE
                    ELSE
                        ADD     1               TO  IDX-KOH
@@ -1303,6 +1316,12 @@
                MOVE    SPACE               TO  WRK-COMB-HKNNUM
            ELSE
                MOVE    COMB-HKNNUM         TO  WRK-COMB-HKNNUM
+      *ver.4.7
+      *        第三者
+               IF      COMB-KOH1HKNNUM     =   "970"
+                   MOVE    COMB-KOH1HKNNUM TO  WRK-COMB-HKNNUM
+                   MOVE    COMB-KOH1ID     TO  WRK-COMB-KOHID
+               END-IF
            END-IF
            IF     (PARA-HKNCOMBIKBN    =   "1"
                                        OR  "2" )
@@ -1420,11 +1439,20 @@
       *        労災・自賠責とその他保険
                IF      WRK-COMB-HKNNUM         =   "971"
                                                OR  "973"
+                                               OR  "970"
       *            保険組合せ一致のみ
                    IF      SPA-HKNCOMBINUM     =   PTBYO-HKNCOMBI
                        CONTINUE
                    ELSE
                        MOVE    1                   TO  FLG-INNO
+                   END-IF
+      *ver.47
+      *            第三者行為は、公費ＩＤ一致
+                   IF      WRK-COMB-HKNNUM     =   "970"
+                       MOVE    1                   TO  FLG-INNO
+                       IF      PTBYO-KOHID         =   WRK-COMB-KOHID
+                           MOVE    ZERO                TO  FLG-INNO
+                       END-IF
                    END-IF
                ELSE
       *            労災・自賠責は対象外
@@ -1435,11 +1463,17 @@
                                                                (IDX-H)
                            IF      TBL-HKNNUM (IDX-H)  =   "971"
                                                        OR  "973"
+                                                       OR  "970"
                                MOVE    1                   TO  FLG-INNO
                            END-IF
                            MOVE    20                  TO  IDX-H
                        END-IF
                    END-PERFORM
+      *ver.47
+      *            第三者行為は対象外
+                   IF      PTBYO-KOHID     NOT =   ZERO
+                       MOVE    1                   TO  FLG-INNO
+                   END-IF
                END-IF
            WHEN    "2"
       *        保険組合せ一致のみ
@@ -1447,6 +1481,14 @@
                    CONTINUE
                ELSE
                    MOVE    1                   TO  FLG-INNO
+               END-IF
+      *ver.47
+      *        第三者行為は、公費ＩＤ一致
+               IF      WRK-COMB-HKNNUM     =   "970"
+                   MOVE    1                   TO  FLG-INNO
+                   IF      PTBYO-KOHID         =   WRK-COMB-KOHID
+                       MOVE    ZERO                TO  FLG-INNO
+                   END-IF
                END-IF
            END-EVALUATE
            .
@@ -1622,7 +1664,6 @@
            MOVE    SPACE               TO  WRK-JKYSNO
            MOVE    ZERO                TO  WRK-JKYSNO-MAX
       *    保険者情報
-      *    全角変換
            MOVE    PTKOH-FTNJANUM      TO  WRK-MAE-INPUT
            MOVE    16                  TO  WRK-MOJISU
            PERFORM 2009-HENKAN-SEC
@@ -1638,6 +1679,42 @@
            MOVE    SPACE               TO  WRK-JKYSNO
            MOVE    WRK-OUT-INPUT       TO  WRK-JKYSNO
            MOVE    WRK-OUT-MAX         TO  WRK-JKYSNO-MAX
+      *
+      *ver.4.7
+           IF      COMB-KOH1HKNNUM     =   "970"
+      *        第三者行為
+               IF      PARA-DAISANKBN      =   "1"
+      *            負担者番号へ
+                   MOVE    COMB-KOH1-TANSEIDONAME
+                                               TO  WRK-FTNSNO
+                   MOVE    SPACE               TO  WRK-JKYSNO
+                   IF      PTKOH-JKYSNUM   NOT =   SPACE
+                       STRING  "（"
+                               PTKOH-JKYSNUM
+                               "）"            DELIMITED  BY  SPACE
+                                           INTO    WRK-JKYSNO
+                       END-STRING
+                       ADD     4                   TO  WRK-JKYSNO-MAX
+                   END-IF
+               ELSE
+      *            備考へ
+                   MOVE    SPACE               TO  WRK-FTNSNO
+                   MOVE    SPACE               TO  WRK-JKYSNO
+                   MOVE    SPACE               TO  WRK-COMMENT-G
+                   IF      PTKOH-JKYSNUM       =   SPACE
+                       MOVE    COMB-KOH1-TANSEIDONAME
+                                               TO  WRK-COMMENT-G
+                   ELSE
+                       STRING  COMB-KOH1-TANSEIDONAME
+                               "（"
+                               PTKOH-JKYSNUM
+                               "）"            DELIMITED  BY  SPACE
+                                               INTO    WRK-COMMENT-G
+                       END-STRING
+                   END-IF
+               END-IF
+               PERFORM 200210-H01-COMMENT-SEC
+           END-IF
       *
       *    適用開始年月日
            MOVE    PTKOH-TEKSTYMD      TO  WRK-SYMD
@@ -1693,6 +1770,12 @@
                                                                (IDX-H)
                    MOVE    COMB-HKNNUM         TO  TBL-HKNNUM
                                                                (IDX-H)
+      *ver.4.7
+      *            第三者
+                   IF      COMB-KOH1HKNNUM     =   "970"
+                       MOVE    COMB-KOH1HKNNUM TO  TBL-HKNNUM (IDX-H)
+                       MOVE    COMB-KOH1ID     TO  TBL-KOHID  (IDX-H)
+                   END-IF
                END-IF
                MOVE    "tbl_hkncombi"      TO  MCP-TABLE
                MOVE    "key6"              TO  MCP-PATHNAME

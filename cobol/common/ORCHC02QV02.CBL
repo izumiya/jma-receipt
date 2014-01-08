@@ -78,6 +78,7 @@
       * 04.06.00     NACL-多々納  12/04/10  一般名１００文字対応
       *                                     含量規格変更不可等の対応
       * 04.06.00     NACL-多々納  12/09/27  医師コード等編集対応
+      * 04.07.00     NACL-多々納  14/01/08  第三者行為対応
       *****************************************************************
       *
       *
@@ -1324,6 +1325,16 @@
                                             TO  WRK-JKYSNO
                MOVE    KANACHK-MAX          TO  WRK-JKYSNO-MAX
            END-IF
+      *ver.4.7
+           IF      COMB-KOH1HKNNUM     =   "970"
+      *        第三者行為は備考へ
+               ADD     1               TO  IDX-K3
+               MOVE    COMB-KOH1-TANSEIDONAME
+                                           TO  WRK-HEN-KOH(IDX-K3)
+               MOVE    SPACE               TO  WRK-FTNSNO
+               MOVE    SPACE               TO  WRK-JKYSNO
+           END-IF
+      *
       *@@@ 埼玉県対応
       *    負担者番号編集なし
            IF     SYS-1001-PREFNUM     =   "11"
@@ -4382,6 +4393,11 @@
                                    AND <=  "899"
                    MOVE    1               TO  FLG-KOHERR
                END-IF
+           END-IF
+      *ver.4.7
+           IF      COMB-KOHHKNNUM (IDX-K)  =   "970"
+      *        第三者行為は対象外
+               MOVE    1               TO  FLG-KOHERR
            END-IF
       *
            IF      FLG-KOHERR          =   ZERO
