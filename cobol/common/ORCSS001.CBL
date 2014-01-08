@@ -91,6 +91,7 @@
            03  CONST-ROUSAI            PIC X(03)   VALUE   "971".
            03  CONST-JIBAI             PIC X(03)   VALUE   "973".
            03  CONST-KOUGAI            PIC X(03)   VALUE   "975".
+           03  CONST-DAI3SHA           PIC X(03)   VALUE   "970".
            03  CONST-HOUKATU           PIC 9(04)   VALUE   9999.
            03  CONST-TCOMBI-MAX        PIC 9(05)   VALUE   31.
            03  CONST-SRYKA-MAX         PIC 9(05)   VALUE   50.
@@ -501,6 +502,10 @@ grpsys     COPY  "COMMON-SPA".
                    MOVE    1               TO  SS001-IHO-FLG(IDX-NYUGAI)
                END-IF
       *
+               IF    ( COMB-KOHHKNNUM (1)  =   "970" )
+                   MOVE    1               TO  SS001-DI3-FLG(IDX-NYUGAI)
+               END-IF
+      *
                EVALUATE    COMB-HKNNUM
                WHEN    SPACE
                    MOVE    1               TO  SS001-SYA-FLG(IDX-NYUGAI)
@@ -578,6 +583,11 @@ grpsys     COPY  "COMMON-SPA".
                                                   (IDX-SRYKA IDX-NYUGAI)
                    END-IF
       *
+                   IF    ( COMB-KOHHKNNUM (1)  =   "970" )
+                       MOVE    1       TO  SS001-SRYKA-DI3-FLG
+                                                  (IDX-SRYKA IDX-NYUGAI)
+                   END-IF
+      *
                    EVALUATE    COMB-HKNNUM
                    WHEN    SPACE
                        MOVE    1       TO  SS001-SRYKA-SYA-FLG
@@ -627,7 +637,7 @@ grpsys     COPY  "COMMON-SPA".
                END-IF
            END-IF
       *
-      *    PERFORM 800-DISPLAY-SEC
+      D    PERFORM 800-DISPLAY-SEC
       *
            .
        300-END-EXT.
@@ -647,6 +657,8 @@ grpsys     COPY  "COMMON-SPA".
            DISPLAY "GSYA-FLG   = " SS001-GSYA-FLG
            DISPLAY "GKOK-FLG   = " SS001-GKOK-FLG
            DISPLAY "GJHI-FLG   = " SS001-GJHI-FLG
+           DISPLAY "GKGI-FLG   = " SS001-GKGI-FLG
+           DISPLAY "GDI3-FLG   = " SS001-GDI3-FLG
            DISPLAY "GHKT-FLG   = " SS001-GHKT-FLG
       *
            DISPLAY "NIHO-FLG   = " SS001-NIHO-FLG
@@ -655,6 +667,8 @@ grpsys     COPY  "COMMON-SPA".
            DISPLAY "NSYA-FLG   = " SS001-NSYA-FLG
            DISPLAY "NKOK-FLG   = " SS001-NKOK-FLG
            DISPLAY "NJHI-FLG   = " SS001-NJHI-FLG
+           DISPLAY "NKGI-FLG   = " SS001-NKGI-FLG
+           DISPLAY "NDI3-FLG   = " SS001-NDI3-FLG
            DISPLAY "NHKT-FLG   = " SS001-NHKT-FLG
       *
            DISPLAY "SRYKA-MAX  = " SS001-SRYKA-MAX
@@ -705,6 +719,11 @@ grpsys     COPY  "COMMON-SPA".
                         SS001-SRYKA-HKT-FLG (IDX0 1)
                DISPLAY       "SRYKA-HKT-FLG ( " IDX0 "2 )="
                         SS001-SRYKA-HKT-FLG (IDX0 2)
+      *
+               DISPLAY       "SRYKA-DI3-FLG ( " IDX0 "1 )="
+                        SS001-SRYKA-DI3-FLG (IDX0 1)
+               DISPLAY       "SRYKA-DI3-FLG ( " IDX0 "2 )="
+                        SS001-SRYKA-DI3-FLG (IDX0 2)
       *
                DISPLAY       "SRYKA-DAY-OCC ( " IDX0 "1 )="
                         SS001-SRYKA-DAY-OCC (IDX0 1)

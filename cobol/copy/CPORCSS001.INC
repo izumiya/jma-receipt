@@ -38,6 +38,7 @@
                05  SS001-NKOUKI-FLG                PIC 9(01).
                05  SS001-NJHI-FLG                  PIC 9(01).
                05  SS001-NHKT-FLG                  PIC 9(01).
+               05  SS001-NDI3-FLG                  PIC 9(01).
       *
                05  SS001-GIHO-FLG                  PIC 9(01).
                05  SS001-GRSI-FLG                  PIC 9(01).
@@ -48,6 +49,7 @@
                05  SS001-GKOUKI-FLG                  PIC 9(01).
                05  SS001-GJHI-FLG                  PIC 9(01).
                05  SS001-GHKT-FLG                  PIC 9(01).
+               05  SS001-GDI3-FLG                  PIC 9(01).
            03  SS001-HKNGRP-R  REDEFINES SS001-HKNGRP-G.
                05  SS001-HKNGRP-OCC                OCCURS 2.
                    07  SS001-IHO-FLG               PIC 9(01).
@@ -59,6 +61,7 @@
                    07  SS001-KOUKI-FLG             PIC 9(01).
                    07  SS001-JHI-FLG               PIC 9(01).
                    07  SS001-HKT-FLG               PIC 9(01).
+                   07  SS001-DI3-FLG               PIC 9(01).
            03  SS001-SRYKA-G.
                05  SS001-SRYKA-MAX                 PIC 9(03).
                05  SS001-SRYKA-OCC                 OCCURS  50.
@@ -73,6 +76,7 @@
                        09  SS001-SRYKA-KOUKI-FLG   PIC 9(01).
                        09  SS001-SRYKA-JHI-FLG     PIC 9(01).
                        09  SS001-SRYKA-HKT-FLG     PIC 9(01).
+                       09  SS001-SRYKA-DI3-FLG     PIC 9(01).
                    07  SS001-SRYKA-DAY-G.
                        09  SS001-SRYKA-NYU-DAY     PIC 9(01)
                                                    OCCURS  31.
