@@ -624,8 +624,11 @@
       *  04.07.09    NACL-ÌçÏÆ    13/07/01  Æþ±¡ÎÁÂ¾ÊÝ¸±»»Äê»þ¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.07.10    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.11    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
-      *  04.07.12    NACL-ÌçÏÆ    13/12/06  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
-      *  04.07.13    NACL-ÌçÏÆ    13/12/09  °åÎÅ¾ðÊóÏ¢·ÈÂÐ±þ
+      *  04.07.12    NACL-ÌçÏÆ    13/12/09  °åÎÅ¾ðÊóÏ¢·ÈÂÐ±þ
+      *  04.07.13    NACL-ÌçÏÆ    14/01/08  ÀÁµáÅÀ¿ô¤¬¤Ê¤¤ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤¬Í­¤ë
+      *                                     ¾ì¹ç¤Î¸øÈñÊ¬Î¥¶èÊ¬ÊÔ½¸ÂÐ±þ
+      *
+      *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -928,6 +931,7 @@
            03  IDX10                                   PIC 9(03).
            03  IDX13                                   PIC 9(03).
            03  IDX16                                   PIC 9(03).
+           03  IDX18                                   PIC 9(03).
            03  IDX-SAI                                 PIC 9(03).
       *
            03  IDA                 PIC 9(04).
@@ -1339,6 +1343,11 @@
        01  TBL-HKNCOMBI.
            03  TBL-HKNCOMBI-OCC                        OCCURS  10.
                05  TBL-HKNCOMBI-TOTALTEN               PIC  9(07).
+      *
+       01  TBL-HKNCOMBI2.
+           03  TBL-HKNCOMBI2-OCC                       OCCURS  10.
+               05  TBL-HKNCOMBI-SKYTENFLG              PIC  9(01).
+               05  TBL-HKNCOMBI-SKYTENFLG2             PIC  9(01).
       *
       *    °åÎÅµ¡´Ø¡ÊÆþ±¡´ðËÜ¡ËÂàÈòÍÑÎÎ°è
        01  TBL-SYS5000-T.
@@ -3013,6 +3022,8 @@
       *
            INITIALIZE          WK-GENGAKU-SKJFLG-T
       *
+           INITIALIZE          TBL-HKNCOMBI2
+      *
            MOVE      ZERO      TO   WK-GENGAKU-KEISAN2
       *
            MOVE      ZERO      TO   WRK-TAIHI-ZAINUM
@@ -3513,6 +3524,15 @@
                END-IF
              END-IF
            END-IF
+      *
+      *    ÀÁµáÅÀ¿ô¤¬¤Ê¤¤ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»Í­¤ê¥Õ¥é¥°ÊÔ½¸
+           PERFORM  VARYING  IDX18  FROM  1  BY  1
+                     UNTIL   IDX18   >   10
+               IF    (TBL-HKNCOMBI-SKYTENFLG (IDX18) = ZERO)
+               AND   (TBL-HKNCOMBI-SKYTENFLG2(IDX18) =  1  )
+                   MOVE    1    TO   RECE62-SKYTENFLG
+               END-IF
+           END-PERFORM
       *
            PERFORM     RECE62-REWRITE-SEC
            .
@@ -6056,6 +6076,12 @@
                                    PERFORM   21012-RECE65-HENSYU-SEC
                                    IF    FLG-WRITE65  =   1
                                      PERFORM RECE64-WRITE-SEC
+                                     IF  (ACCT-JIHOKBN     = SPACE)
+                                     AND (ACCT-SRYKBN  NOT =
+                                                     "95" AND "96")
+                                      MOVE  1  TO
+                                          TBL-HKNCOMBI-SKYTENFLG(IDX1)
+                                     END-IF
                                    END-IF
                                  END-IF
                                ELSE
@@ -6063,6 +6089,12 @@
                                  PERFORM   21012-RECE65-HENSYU-SEC
                                  IF    FLG-WRITE65  =   1
                                    PERFORM RECE64-WRITE-SEC
+                                   IF  (ACCT-JIHOKBN     = SPACE)
+                                   AND (ACCT-SRYKBN  NOT =
+                                                   "95" AND "96")
+                                    MOVE  1  TO
+                                        TBL-HKNCOMBI-SKYTENFLG(IDX1)
+                                   END-IF
                                  END-IF
                                END-IF
                            ELSE
@@ -6121,6 +6153,11 @@
                                       PERFORM   21012-RECE65-HENSYU-SEC
                                       IF    FLG-WRITE65  =   1
                                         PERFORM RECE64-WRITE-SEC
+                                        IF  ACCT-SRYKBN  NOT =
+                                                        "95" AND "96"
+                                         MOVE  1  TO
+                                          TBL-HKNCOMBI-SKYTENFLG2(IDX1)
+                                        END-IF
                                       END-IF
                                  END-IF
                                END-IF
@@ -14616,6 +14653,7 @@
                        PERFORM   21035-RECE65-TENTEKI2-HENSYU-SEC
                        PERFORM   21034-RECE62-HENSYU3-SEC
                        PERFORM   RECE64-WRITE-SEC
+                       MOVE      1   TO   TBL-HKNCOMBI-SKYTENFLG(IDX1)
                     END-IF
                  END-PERFORM
                END-IF
@@ -14632,6 +14670,7 @@
                        PERFORM   21035-RECE65-TENTEKI2-HENSYU-SEC
                        PERFORM   21034-RECE62-HENSYU3-SEC
                        PERFORM   RECE64-WRITE-SEC
+                       MOVE      1   TO   TBL-HKNCOMBI-SKYTENFLG(IDX1)
                     END-IF
                  END-PERFORM
                END-IF

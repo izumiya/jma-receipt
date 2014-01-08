@@ -50,6 +50,8 @@
       *  04.06.01    NACL-門脇    10/10/14  編集条件判定修正
       *
       *  04.07.01    NACL-門脇    13/09/04  自賠責（第三者行為）対応
+      *  04.07.02    NACL-門脇    14/01/08  請求点数がない保険組み合わせが有る
+      *                                     場合の公費分離区分編集対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -349,6 +351,8 @@
                    (RECE62-HENTOTALTEN(2)           =  ZERO   )  AND
                    (RECE62-HENTOTALTEN(1)
                              NOT = RECE62-HENTOTALTEN(2)      ))
+               OR ((RECE62-HENTOTALTEN(2)       NOT =  ZERO   )  AND
+                   (RECE62-SKYTENFLG                =   1     ))
                    MOVE      1          TO     BUN-IDX
                    PERFORM   RECE64-HENSYU-SEC
                END-IF
@@ -365,6 +369,8 @@
                    (RECE62-HENTOTALTEN(3)           =  ZERO   )  AND
                    (RECE62-HENTOTALTEN(1)
                              NOT = RECE62-HENTOTALTEN(3)      ))
+               OR ((RECE62-HENTOTALTEN(3)       NOT =  ZERO   )  AND
+                   (RECE62-SKYTENFLG                =   1     ))
                    MOVE      2          TO     BUN-IDX
                    PERFORM   RECE64-HENSYU-SEC
                END-IF
@@ -381,6 +387,8 @@
                    (RECE62-HENTOTALTEN(4)           =  ZERO   )  AND
                    (RECE62-HENTOTALTEN(1)
                              NOT = RECE62-HENTOTALTEN(4)      ))
+               OR ((RECE62-HENTOTALTEN(4)       NOT =  ZERO   )  AND
+                   (RECE62-SKYTENFLG                =   1     ))
                    MOVE      3          TO     BUN-IDX
                    PERFORM   RECE64-HENSYU-SEC
                END-IF
@@ -397,6 +405,8 @@
                    (RECE62-HENTOTALTEN(5)           =  ZERO   )  AND
                    (RECE62-HENTOTALTEN(1)
                              NOT = RECE62-HENTOTALTEN(5)      ))
+               OR ((RECE62-HENTOTALTEN(5)       NOT =  ZERO   )  AND
+                   (RECE62-SKYTENFLG                =   1     ))
                    MOVE      4          TO     BUN-IDX
                    PERFORM   RECE64-HENSYU-SEC
                END-IF
@@ -541,13 +551,17 @@
       *
            MOVE       ZERO              TO   KH-IDX
            IF ((RECE62-KOHNUMHC(HC-IDX 1) = RECE62-KOHNUM(BUN-IDX)) AND
-               (RECE62-KOHIDHC(HC-IDX 1)  = RECE62-KOHID(BUN-IDX) ))
+               (RECE62-KOHIDHC(HC-IDX 1)  = RECE62-KOHID(BUN-IDX) ) AND
+               (RECE62-KOHNUM(BUN-IDX)    NOT = SPACE             ))
            OR ((RECE62-KOHNUMHC(HC-IDX 2) = RECE62-KOHNUM(BUN-IDX)) AND
-               (RECE62-KOHIDHC(HC-IDX 2)  = RECE62-KOHID(BUN-IDX) ))
+               (RECE62-KOHIDHC(HC-IDX 2)  = RECE62-KOHID(BUN-IDX) ) AND
+               (RECE62-KOHNUM(BUN-IDX)    NOT = SPACE             ))
            OR ((RECE62-KOHNUMHC(HC-IDX 3) = RECE62-KOHNUM(BUN-IDX)) AND
-               (RECE62-KOHIDHC(HC-IDX 3)  = RECE62-KOHID(BUN-IDX) ))
+               (RECE62-KOHIDHC(HC-IDX 3)  = RECE62-KOHID(BUN-IDX) ) AND
+               (RECE62-KOHNUM(BUN-IDX)    NOT = SPACE             ))
            OR ((RECE62-KOHNUMHC(HC-IDX 4) = RECE62-KOHNUM(BUN-IDX)) AND
-               (RECE62-KOHIDHC(HC-IDX 4)  = RECE62-KOHID(BUN-IDX) ))
+               (RECE62-KOHIDHC(HC-IDX 4)  = RECE62-KOHID(BUN-IDX) ) AND
+               (RECE62-KOHNUM(BUN-IDX)    NOT = SPACE             ))
                 MOVE    BUN-IDX     TO        KH-IDX
            END-IF
       *

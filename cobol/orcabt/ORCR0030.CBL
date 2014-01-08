@@ -635,8 +635,11 @@
       *  04.07.07    NACL-門脇    13/01/17  複数枚レセプト分割対応
       *  04.07.08    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *  04.07.09    NACL-門脇    13/11/11  減額（円）の対応
-      *  04.07.10    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
-      *  04.07.11    NACL-門脇    13/12/09  医療情報連携対応
+      *  04.07.10    NACL-門脇    13/12/09  医療情報連携対応
+      *  04.07.11    NACL-門脇    14/01/08  請求点数がない保険組み合わせが有る
+      *                                     場合の公費分離区分編集対応
+      *
+      *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -938,6 +941,7 @@
            03  IDX15                                   PIC 9(03).
            03  IDX16                                   PIC 9(03).
            03  IDX17                                   PIC 9(03).
+           03  IDX18                                   PIC 9(03).
            03  IDX-SAI                                 PIC 9(03).
       *
            03  IDA                 PIC 9(04).
@@ -1239,6 +1243,11 @@
        01  TBL-HKNCOMBI.
            03  TBL-HKNCOMBI-OCC                        OCCURS  10.
                05  TBL-HKNCOMBI-TOTALTEN               PIC  9(07).
+      *
+       01  TBL-HKNCOMBI2.
+           03  TBL-HKNCOMBI2-OCC                       OCCURS  10.
+               05  TBL-HKNCOMBI-SKYTENFLG              PIC  9(01).
+               05  TBL-HKNCOMBI-SKYTENFLG2             PIC  9(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -2747,6 +2756,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *
            INITIALIZE                   WRK-RECE02G-REC
       *
+           INITIALIZE                   TBL-HKNCOMBI2
+      *
            MOVE    ZERO         TO      WRK-SURYOU-COUNT
       *
            MOVE      ZERO       TO      WRK-CHIHOU-KIN
@@ -3489,6 +3500,15 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                END-IF
              END-IF
            END-IF
+      *
+      *    請求点数がない保険組み合わせ有りフラグ編集
+           PERFORM  VARYING  IDX18  FROM  1  BY  1
+                     UNTIL   IDX18   >   10
+               IF    (TBL-HKNCOMBI-SKYTENFLG (IDX18) = ZERO)
+               AND   (TBL-HKNCOMBI-SKYTENFLG2(IDX18) =  1  )
+                   MOVE    1    TO   RECE02-SKYTENFLG
+               END-IF
+           END-PERFORM
       *
            PERFORM     RECE02-REWRITE-SEC
            .
@@ -8248,6 +8268,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                PERFORM 21044-RECE05-HENSYU-SEC
                                IF    FLG-WRITE05  =   1
                                  PERFORM RECE04-WRITE-SEC
+                                 IF  (ACCT-JIHOKBN     = SPACE        )
+                                 AND (ACCT-SRYKBN  NOT = "95" AND "96")
+                                  MOVE  1  TO
+                                          TBL-HKNCOMBI-SKYTENFLG(IDX1)
+                                 END-IF
                                END-IF
                            ELSE
                              IF   ACCT-ZAIKAISU  NOT =    ZERO
@@ -8310,6 +8335,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       PERFORM   21044-RECE05-HENSYU-SEC
                                       IF    FLG-WRITE05  =   1
                                         PERFORM RECE04-WRITE-SEC
+                                        IF  ACCT-SRYKBN  NOT =
+                                                        "95" AND "96"
+                                         MOVE  1  TO
+                                          TBL-HKNCOMBI-SKYTENFLG2(IDX1)
+                                        END-IF
                                       END-IF
                                  END-IF
                                END-IF
