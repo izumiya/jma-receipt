@@ -38,6 +38,7 @@ tbl_ptbyomei {
 	MANSEIKBN  			number(2);
 	NYUGAIKBN			char(1);
 	HKNCOMBI       			number(4);
+	KOHID				number(10);
 	REZEFLG        		char(1);
 	REZEMM         		number(2);
 	TENKIKBN       		char(1);

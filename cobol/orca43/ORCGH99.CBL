@@ -72,6 +72,7 @@
       *                                     ０８（老健）のレセプト対応
       *
       *  04.07.01    NACL-藤原    11/09/02  労災請求書作成対応
+      *  04.07.02    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -644,11 +645,15 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SYS-1005-HOSPNUM
                        MOVE    "公務災害"          TO  WRK-RECESYUBETU
                    WHEN    "7011"
                    WHEN    "7001"
-                       IF      RECE10-RECEKBN      =   "4"
-                           MOVE    "新様式"        TO  WRK-RECESYUBETU
-                       ELSE
-                           MOVE    "従来様式"      TO  WRK-RECESYUBETU
-                       END-IF
+                       EVALUATE    RECE10-RECEKBN
+                           WHEN    "4"
+                              MOVE    "新様式"     TO  WRK-RECESYUBETU
+                           WHEN    "5"
+                               MOVE    "従来様式"  TO  WRK-RECESYUBETU
+                           WHEN    "6"
+                               MOVE    "第三者行為"
+                                                   TO  WRK-RECESYUBETU
+                       END-EVALUATE
                END-EVALUATE
                GO  TO  530-RECESYUBETU-HENSYU-EXT
            END-IF        

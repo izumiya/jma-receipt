@@ -33,6 +33,8 @@
       *                                     の削除処理の有無対応
       *
       *  04.06.01    NACL-藤原    11/12/12  点検レセ０点公費印字対応
+      *
+      *  04.07.01    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
        01  SPA-R01FREE.
@@ -63,6 +65,7 @@
                            11  SPA-GMN-R01-TRSI    PIC X(04).
                            11  SPA-GMN-R01-TJBI    PIC X(04).
                            11  SPA-GMN-R01-TKGI    PIC X(04).
+                           11  SPA-GMN-R01-TDAISAN PIC X(04).
                    07  SPA-GMN-R01-SYORI-G.
                        09  SPA-GMN-R01-SYORI       PIC X(01).
                        09  SPA-GMN-R01-F1          PIC X(01).

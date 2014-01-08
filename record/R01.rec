@@ -75,6 +75,7 @@ R01	{
 					value9	varchar(4);
 					value10	varchar(4);
 					value11	varchar(4);
+					value12	varchar(4);
 				}	[500];
 				select	bool[500];
 			};

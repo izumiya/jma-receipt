@@ -33,7 +33,7 @@ R03	{
 		};
 		PRTKBN_LABEL	{
 			style   varchar(20);
-			value	varchar(20);
+			value	varchar(28);
 		};
 		KOBETU	{
 			value	bool;
@@ -51,6 +51,9 @@ R03	{
 			value	bool;
 		};
 		DATAKBN32	{
+			value	bool;
+		};
+		DATAKBN33	{
 			value	bool;
 		};
 		DATAKBN11	{
@@ -75,6 +78,9 @@ R03	{
 			value	bool;
 		};
 		DATAKBN25	{
+			value	bool;
+		};
+		DATAKBN26	{
 			value	bool;
 		};
 	};

@@ -691,7 +691,7 @@
       <widget>
         <class>GtkNumberEntry</class>
         <name>REZEMM</name>
-        <x>355</x>
+        <x>345</x>
         <y>670</y>
         <width>32</width>
         <height>24</height>
@@ -1244,7 +1244,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>label488</name>
-        <x>235</x>
+        <x>230</x>
         <y>584</y>
         <width>46</width>
         <height>18</height>
@@ -1262,7 +1262,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>label482</name>
-        <x>235</x>
+        <x>230</x>
         <y>614</y>
         <width>46</width>
         <height>16</height>
@@ -1280,7 +1280,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>label489</name>
-        <x>235</x>
+        <x>230</x>
         <y>644</y>
         <width>54</width>
         <height>18</height>
@@ -1298,7 +1298,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>label487</name>
-        <x>235</x>
+        <x>230</x>
         <y>674</y>
         <width>120</width>
         <height>18</height>
@@ -1767,8 +1767,8 @@
           <has_focus>False</has_focus>
           <border_width>0</border_width>
           <show_titles>True</show_titles>
-          <columns>14</columns>
-          <column_widths>40,40,310,70,70,70,68,50,70,51,60,100,150,60</column_widths>
+          <columns>15</columns>
+          <column_widths>40,40,310,70,70,70,68,50,70,51,60,60,100,150,60</column_widths>
           <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
           <signal>
             <name>select_row</name>
@@ -1949,6 +1949,21 @@
           <widget>
             <class>GtkLabel</class>
             <child_name>CList:title</child_name>
+            <name>label596</name>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0.5</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>第三者行為</label>
+            <justify>GTK_JUSTIFY_CENTER</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <child_name>CList:title</child_name>
             <name>label497</name>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
@@ -2033,7 +2048,7 @@
       <widget>
         <class>GtkPandaCombo</class>
         <name>TENKICOMBO</name>
-        <x>280</x>
+        <x>285</x>
         <y>580</y>
         <width>95</width>
         <height>24</height>
@@ -2109,7 +2124,7 @@
       <widget>
         <class>GtkPandaCombo</class>
         <name>SYUBYOFLGCOMBO</name>
-        <x>280</x>
+        <x>285</x>
         <y>610</y>
         <width>130</width>
         <height>24</height>
@@ -2149,7 +2164,7 @@
         <name>MANSEIFLGCOMBO</name>
         <x>480</x>
         <y>608</y>
-        <width>242</width>
+        <width>245</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -2224,7 +2239,7 @@
       <widget>
         <class>GtkPandaCombo</class>
         <name>HKNCOMBICOMBO</name>
-        <x>310</x>
+        <x>285</x>
         <y>640</y>
         <width>260</width>
         <height>24</height>
@@ -2301,7 +2316,7 @@
       <widget>
         <class>GtkPandaCombo</class>
         <name>HKNBYOMEIFLGCOMBO</name>
-        <x>470</x>
+        <x>460</x>
         <y>670</y>
         <width>100</width>
         <height>24</height>
@@ -2324,6 +2339,45 @@
           <has_focus>False</has_focus>
           <editable>True</editable>
           <text>1 保険病名</text>
+          <input_mode>XIM</input_mode>
+          <xim_enabled>False</xim_enabled>
+          <signal>
+            <name>changed</name>
+            <handler>entry_changed</handler>
+            <data>CHANGED</data>
+          </signal>
+          <signal>
+            <name>activate</name>
+            <handler>send_event</handler>
+            <data>ACTIVATE</data>
+          </signal>
+        </widget>
+      </widget>
+      <widget>
+        <class>GtkPandaCombo</class>
+        <name>KOHIDCOMBO</name>
+        <x>545</x>
+        <y>640</y>
+        <width>180</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <border_width>0</border_width>
+        <items>
+
+</items>
+        <case_sensitive>False</case_sensitive>
+        <use_arrows>True</use_arrows>
+        <widget>
+          <class>GtkPandaEntry</class>
+          <child_name>GtkPandaCombo:entry</child_name>
+          <name>KOHID</name>
+          <sensitive>True</sensitive>
+          <can_focus>True</can_focus>
+          <has_focus>False</has_focus>
+          <editable>True</editable>
+          <text></text>
           <input_mode>XIM</input_mode>
           <xim_enabled>False</xim_enabled>
           <signal>

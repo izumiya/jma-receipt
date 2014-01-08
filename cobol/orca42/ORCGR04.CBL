@@ -72,6 +72,7 @@
       *  04.06.01    NACL-藤原    10/08/25  一括入力対応
       *
       *  04.07.01    NACL-藤原    11/09/02  起動方法の変更
+      *  04.07.02    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -166,7 +167,7 @@
            03  WRK-NYUGAIKBN       PIC X(06).
            03  WRK-RECEERR         PIC X(200).
            03  WRK-RECEPRTKBN      PIC X(10).
-           03  WRK-RECEKBN         PIC X(18).
+           03  WRK-RECEKBN         PIC X(20).
            03  WRK-PREFKBN         PIC X(01).
            03  WRK-TEISYUTUSAKI    PIC X(01).
            03  WRK-HENFLG          PIC 9(01).
@@ -479,6 +480,9 @@
                                          TO  WRK-RECEKBN
                WHEN    "6"
                    MOVE    "公害"        TO  WRK-RECEKBN
+               WHEN    "8"
+                   MOVE    "自賠責（第三者行為）"
+                                         TO  WRK-RECEKBN
            END-EVALUATE  
            EVALUATE    SPA-R01-RECE07-NYUGAIKBN
                WHEN    "1"
@@ -514,6 +518,8 @@
                            MOVE    "01"               TO  WRK-SYMD (7:)
                            PERFORM 5002-HIZUKE-HEN-SEC
                            STRING  WRK-RECEPRTKBN DELIMITED  BY SPACE 
+                                   WRK-NYUGAIKBN  DELIMITED  BY  SPACE 
+                                   WRK-RECEKBN    DELIMITED  BY  SPACE 
                                    "訂正日指定　" DELIMITED  BY SIZE
                                    WRK-HENYMDG3 (1:16)
                                                   DELIMITED  BY SIZE
@@ -530,6 +536,8 @@
                            PERFORM 5002-HIZUKE-HEN-SEC
                            MOVE    WRK-HENYMDG3       TO  WRK-EDYMD
                            STRING  WRK-RECEPRTKBN DELIMITED  BY SPACE 
+                                   WRK-NYUGAIKBN  DELIMITED  BY  SPACE 
+                                   WRK-RECEKBN    DELIMITED  BY  SPACE 
                                    "受診日指定　" DELIMITED  BY SIZE
                                    WRK-STYMD      DELIMITED  BY SIZE
                                    "〜"           DELIMITED  BY SIZE
@@ -543,7 +551,8 @@
                            MOVE    "01"               TO  WRK-SYMD (7:)
                            PERFORM 5002-HIZUKE-HEN-SEC
                            STRING  WRK-RECEPRTKBN DELIMITED  BY  SPACE 
-                                   WRK-NYUGAIKBN  DELIMITED  BY SPACE 
+                                   WRK-NYUGAIKBN  DELIMITED  BY  SPACE 
+                                   WRK-RECEKBN    DELIMITED  BY  SPACE 
                                    "　照会連携　" DELIMITED  BY SIZE
                                    WRK-HENYMDG3 (1:16)
                                                   DELIMITED  BY SIZE
@@ -835,6 +844,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        END-IF
                    WHEN    "4"
                    WHEN    "5"
+                   WHEN    "8"
                        IF      SYS-2003-TEISYUTUSAKI =   "4"
                            ADD     1             TO  IDX  
       *************        MOVE    SYS-2003-KBNCD (1:2)    TO 
@@ -881,6 +891,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    MOVE    "3"         TO  SPA-NAI-R04-TEISYUTUSAKI(25)
                WHEN    "4"
                WHEN    "5"
+               WHEN    "8"
                    MOVE    "4"         TO  SPA-NAI-R04-TEISYUTUSAKI(25)
                WHEN    "6"
                    MOVE    "5"         TO  SPA-NAI-R04-TEISYUTUSAKI(25)
@@ -909,6 +920,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE    "3"             TO  RECE07-TEISYUTUSAKI
                    WHEN    "4"
                    WHEN    "5"
+                   WHEN    "8"
                        MOVE    "4"             TO  RECE07-TEISYUTUSAKI
                    WHEN    "6"
                        MOVE    "5"             TO  RECE07-TEISYUTUSAKI
@@ -932,6 +944,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  RECE07-HOSPNUM
                            END-IF    
                        WHEN    "4"
                        WHEN    "5"
+                       WHEN    "8"
                            IF      RECE07-RECESYUBETU (4:1)
                                            NOT =   "2"
                                ADD     RECE07-KENSU
@@ -1611,6 +1624,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                            END-EVALUATE
                        WHEN    "4"
                        WHEN    "5"
+                       WHEN    "8"
                            EVALUATE    IDX
                                WHEN    1
                                WHEN    25
@@ -1713,6 +1727,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    "3"              TO  WRK-TEISYUTUSAKI
                WHEN    "4"
                WHEN    "5"
+               WHEN    "8"
                    MOVE    "4"              TO  WRK-TEISYUTUSAKI
                WHEN    "6"
                    MOVE    "5"              TO  WRK-TEISYUTUSAKI
@@ -1729,6 +1744,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                            MOVE    "3"     TO  WRK-TEISYUTUSAKI
                        WHEN    "4"
                        WHEN    "5"
+                       WHEN    "8"
                            MOVE    "4"     TO  WRK-TEISYUTUSAKI
                        WHEN    "6"
                            MOVE    "5"     TO  WRK-TEISYUTUSAKI
@@ -1789,6 +1805,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                        MOVE    3           TO  LNK-PRTKANRI-PRIORITY
                    WHEN    "4"
                    WHEN    "5"
+                   WHEN    "8"
                        MOVE    5           TO  LNK-PRTKANRI-PRIORITY
                    WHEN    "6"
                        MOVE    7           TO  LNK-PRTKANRI-PRIORITY
@@ -1799,6 +1816,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                        MOVE    4           TO  LNK-PRTKANRI-PRIORITY
                    WHEN    "4"
                    WHEN    "5"
+                   WHEN    "8"
                        MOVE    6           TO  LNK-PRTKANRI-PRIORITY
                    WHEN    "6"
                        MOVE    8           TO  LNK-PRTKANRI-PRIORITY
@@ -1980,6 +1998,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                                                TO  SHELLTBL-ARG24
                    WHEN    "4"
                    WHEN    "5"
+                   WHEN    "8"
                        MOVE    SPA-NAI-R04-2005-JBAIPRTNM-N
                                                TO  SHELLTBL-ARG11
                        MOVE    SPA-NAI-R04-2005-JBAIPRTNM-NEXT-N
@@ -1999,6 +2018,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  RECEERR-HOSPNUM
                                                TO  SHELLTBL-ARG24
                    WHEN    "4"
                    WHEN    "5"
+                   WHEN    "8"
                        MOVE    SPA-NAI-R04-2005-JBAIPRTNM
                                                TO  SHELLTBL-ARG11
                        MOVE    SPA-NAI-R04-2005-JBAIPRTNM-NEXT
@@ -2221,6 +2241,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                                TO  SPA-R01-PRTNM-NMEI
                    WHEN    "4"
                    WHEN    "5"
+                   WHEN    "8"
                        MOVE    SPA-NAI-R04-2005-JBAIPRTNM-N
                                                TO  SPA-R01-PRTNMMEI
                        MOVE    SPA-NAI-R04-2005-JBAIPRTNM-NEXT-N
@@ -2240,6 +2261,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                                TO  SPA-R01-PRTNM-NMEI
                    WHEN    "4"
                    WHEN    "5"
+                   WHEN    "8"
                        MOVE    SPA-NAI-R04-2005-JBAIPRTNM
                                                TO  SPA-R01-PRTNMMEI
                        MOVE    SPA-NAI-R04-2005-JBAIPRTNM-NEXT

@@ -25,6 +25,8 @@
       *
       *  04.07.01    NACL-藤原    11/06/10  未コード化病名となる病名の別
       *                                     組み立てへの移行を可能にする
+      *  04.07.02    NACL-藤原    13/07/30  自院病名のセット登録対応
+      *  04.07.03    NACL-藤原    13/07/12  第三者行為対応
       *****************************************************************
       *
        01  SPA-C01KYOUTU.
@@ -69,7 +71,8 @@
                07  SPA-C01-STNUM-O         PIC 9(05)   OCCURS  5.
                07  SPA-C01-EDNUM-O         PIC 9(05)   OCCURS  5.
            05  SPA-C01-HENSYU-DATA-G.
-               07  SPA-C01-HENSYU-DATA-O   PIC X(10)   OCCURS  9.
+               07  SPA-C01-HENSYU-DATA-O   PIC X(10)   OCCURS  10.
+               07  SPA-C01-HENSYU-DATA-9   PIC 9(10).
       *
       *戻り先
            05  SPA-C01-MOTOPG              PIC  X(08).

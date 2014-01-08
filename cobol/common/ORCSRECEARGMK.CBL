@@ -47,6 +47,7 @@
       *  04.07.01    NACL-藤原    12/11/20  スクリプト起動パスサーチ対応
       *  04.07.02    NACL-藤原    12/11/20  リアルタイムプレビュー時の
       *                                     一画面対応
+      *  04.07.03    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -174,7 +175,7 @@
       *****************************************************************
       *
       *     LINK-HKNKBN
-      *     ０：医保  １：労災  ２：自賠責
+      *     ０：医保  １：労災  ２：自賠責  ３：公害  ４：第三者行為
       *     LINK-PTRSI-HKNKBN
       *     １：労災  ２：自賠責
       *      LINK-GYOUMUKBN
@@ -585,6 +586,8 @@ grpsys     MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
                                            TO  SHELLTBL-ARG3
                WHEN    "3"
                    MOVE    "6"             TO  SHELLTBL-ARG3
+               WHEN    "4"
+                   MOVE    "8"             TO  SHELLTBL-ARG3
            END-EVALUATE 
            MOVE    RECEERR         TO  SHELLTBL-ARG4
            MOVE    WRK-CONS-JOB-JOBID
@@ -626,9 +629,11 @@ grpsys     MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
                WHEN   "2"              ALSO    "1"
                    MOVE    SYS-200501-ROUPRTKBN    TO  SHELLTBL-ARG14
                WHEN   "1"              ALSO    "2"
+               WHEN   "1"              ALSO    "4"
                    MOVE    SYS-200501-JIBAIPRTKBN-N
                                                    TO  SHELLTBL-ARG14
                WHEN   "2"              ALSO    "2"
+               WHEN   "2"              ALSO    "4"
                    MOVE    SYS-200501-JIBAIPRTKBN  TO  SHELLTBL-ARG14
                WHEN   OTHER
                    MOVE    "0"                     TO  SHELLTBL-ARG14

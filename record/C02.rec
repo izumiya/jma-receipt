@@ -173,6 +173,14 @@ C02	{
 			count	int;
 			item	varchar(40)[100];
 		};
+		KOHIDCOMBO	{
+			state	int;
+			KOHID	{
+				value	varchar(22);
+			};
+			count	int;
+			item	varchar(22)[100];
+		};
 		BYOMEIHENFLG	{
 			style	varchar(20);
 			value	varchar(10);
@@ -227,9 +235,10 @@ C02	{
 					value8	varchar(14);
 					value9	varchar(8);
 					value10	varchar(40);
-					value11	varchar(10);
-					value12	varchar(4);
-					value13	varchar(10);
+					value11	varchar(22);
+					value12	varchar(10);
+					value13	varchar(4);
+					value14	varchar(10);
 				}	[200];
 				select	bool[200];
 			};

@@ -78,6 +78,7 @@
       *
       *  04.07.01    NACL-藤原    13/07/01  レセ電請求時の受付エラー分の
       *                                     自費レセプト対象の有無設定
+      *  04.07.02    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -435,6 +436,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    患者病名診療年月日別処理
       *****************************************************************
        2001-PTBYO-HENSYU-SEC                SECTION.
+      *??
+           DISPLAY "RECE02-DAISAN-GAITO=" RECE02-DAISAN-GAITO "#"
+      *??
       *
            MOVE    PTBYO-SRYYMD            TO  KEY-N-SRYYMD
            MOVE    ZERO                    TO  WRK-RENNUM
@@ -512,13 +516,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    保険組合せ
            IF      PTBYO-HKNCOMBI     =   ZERO
                CONTINUE
-           ELSE 
+           ELSE
+      *        第三者行為のみの場合は対象外
+               IF      RECE02-DAISAN-GAITO
+                                           =   1
+                   GO  TO  2001-PTBYO-CHK-EXT
+               END-IF
+      *
                MOVE    ZERO            TO  IDZ  
                PERFORM VARYING IDX     FROM    1   BY  1
                        UNTIL   IDX     >       10
                        OR      RECE02-HKNCOMBI (IDX)   =   ZERO 
-                   IF      PTBYO-HKNCOMBI   =
-                                            RECE02-HKNCOMBI (IDX)
+                   IF      PTBYO-HKNCOMBI  =
+                                           RECE02-HKNCOMBI (IDX)
                        MOVE    IDX             TO  IDZ
                        MOVE    10              TO  IDX
                    END-IF
@@ -527,6 +537,45 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    CONTINUE
                ELSE
                    GO  TO  2001-PTBYO-CHK-EXT
+               END-IF
+           END-IF
+      *
+      *    公費ＩＤ（第三者行為）
+           IF      RECE02-DAISAN-GAITO =   9
+               CONTINUE
+           ELSE
+      *        患者登録で第三者行為の登録なし以外のときにチェック
+               IF      PTBYO-KOHID         =   ZERO
+      *            第三者行為のみの場合は対象外
+                   IF      RECE02-DAISAN-GAITO =   1
+                       GO  TO  2001-PTBYO-CHK-EXT
+                   END-IF
+               ELSE 
+      *            第三者行為以外のみの場合は対象外
+                   IF      RECE02-DAISAN-GAITO =   0
+                       GO  TO  2001-PTBYO-CHK-EXT
+                   END-IF
+      *
+                   MOVE    ZERO            TO  IDZ
+                   PERFORM VARYING IDX     FROM    1   BY  1
+                           UNTIL   IDX     >       10
+                           OR      RECE02-HKNCOMBI (IDX)
+                                           =   ZERO 
+                       IF    ( RECE02-DAISANFLG     (IDX)
+                                               =   1           )
+                       AND   ( RECE02-DAISAN-SKYFLG (IDX)
+                                               =   1           )
+                       AND   ( RECE02-DAISAN-KOHID  (IDX)
+                                               =   PTBYO-KOHID )  
+                           MOVE    IDX             TO  IDZ
+                           MOVE    10              TO  IDX
+                       END-IF
+                   END-PERFORM
+                   IF      IDZ            >   ZERO
+                       CONTINUE
+                   ELSE
+                       GO  TO  2001-PTBYO-CHK-EXT
+                   END-IF
                END-IF
            END-IF
       *

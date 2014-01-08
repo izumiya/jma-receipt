@@ -48,6 +48,7 @@
       *  04.06.02    NACL-藤原    12/07/04  表示期間によるレセプト記載対応
       *
       *  04.07.01    NACL-藤原    13/01/21  労災レセ電対応
+      *  04.07.02    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -440,11 +441,20 @@ grpsys     PERFORM 900-DBSELECT-SEC
                END-IF
            END-IF
       *
-      *    保険組合せ
-           IF      PTBYO-HKNCOMBI       =   RECE41-HKNCOMBI 
-               CONTINUE
+           IF      WRK-PARA-RECEKBN     =   "8"
+      *        公費ＩＤ（第三者行為）
+               IF      PTBYO-KOHID          =   RECE41-HKNID 
+                   CONTINUE
+               ELSE
+                   GO  TO  2001-PTBYO-CHK-EXT
+               END-IF
            ELSE
-               GO  TO  2001-PTBYO-CHK-EXT
+      *        保険組合せ
+               IF      PTBYO-HKNCOMBI       =   RECE41-HKNCOMBI 
+                   CONTINUE
+               ELSE
+                   GO  TO  2001-PTBYO-CHK-EXT
+               END-IF
            END-IF
       *
       *    レセプト表示月

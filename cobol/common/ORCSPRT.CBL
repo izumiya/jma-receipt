@@ -37,7 +37,9 @@
       *  03.05.01    NACL-Æ£¸¶    07/04/19  ¥°¥ë¡¼¥×¿ÇÎÅÂÐ±þ
       *
       *  04.01.01    NACL-Æ£¸¶    07/11/22  ¸ø³²¥ì¥»¥×¥ÈÂÐ±þ
-      *****************************************************************
+      *
+      *  04.07.01    NACL-Æ£¸¶    13/09/20  Âè»°¼Ô¹Ô°ÙÂÐ±þ
+     *****************************************************************
       *
        ENVIRONMENT             DIVISION.
        CONFIGURATION           SECTION.
@@ -88,7 +90,7 @@
            COPY    "MCPDATA.INC".
            COPY    "MCPAREA".
       *     
-      **************************************************************************
+      *****************************************************************
       *
        LINKAGE                 SECTION.
       *   °õºþ£Ä£ÂÀ©¸æ¥µ¥Ö
@@ -96,7 +98,7 @@
 grpsys*
 grpsys     COPY    "COMMON-SPA".
       *
-      **************************************************************************
+      *****************************************************************
        PROCEDURE           DIVISION
                USING
                ORCSPRTAREA
@@ -198,6 +200,8 @@ grpsys         MOVE    SPA-HOSPNUM         TO  PRTKANRI-HOSPNUM
                    WHEN    61
                    WHEN    71
                    WHEN    81
+                   WHEN    91
+                   WHEN    101
                            COMPUTE PRTKANRI-PRIORITY  =   SPRT-PRIORITY 
                                                       /   10
                            MOVE    SPRT-SRYYM         TO  PRTKANRI-SRYYM
@@ -209,6 +213,8 @@ grpsys         MOVE    SPA-HOSPNUM         TO  PRTKANRI-HOSPNUM
                    WHEN    62
                    WHEN    72
                    WHEN    82
+                   WHEN    92
+                   WHEN    102
                            COMPUTE PRTKANRI-PRIORITY  =   SPRT-PRIORITY 
                                                       /   10
                            MOVE    ZERO               TO  PRTKANRI-SRYYM
@@ -293,6 +299,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTDATA-HOSPNUM
                    WHEN    61
                    WHEN    71
                    WHEN    81
+                   WHEN    91
+                   WHEN    101
                            COMPUTE PRTDATA-PRIORITY   =   SPRT-PRIORITY 
                                                       /   10
                            MOVE    SPRT-SRYYM         TO  PRTDATA-SRYYM
@@ -304,6 +312,8 @@ grpsys     MOVE    SPA-HOSPNUM         TO  PRTDATA-HOSPNUM
                    WHEN    62
                    WHEN    72
                    WHEN    82
+                   WHEN    92
+                   WHEN    102
                            COMPUTE PRTDATA-PRIORITY   =   SPRT-PRIORITY 
                                                       /   10
                            MOVE    SPRT-SRYYM         TO  PRTDATA-SRYYM

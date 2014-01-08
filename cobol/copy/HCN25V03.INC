@@ -180,3 +180,5 @@
                         PIC X(14)       OCCURS 9 TIMES.
             02  HCN25V03-LOPTION
                         PIC X(100).
+            02  HCN25V03-HKNJANUM
+                        PIC X(8).

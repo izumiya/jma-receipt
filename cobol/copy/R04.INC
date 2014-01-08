@@ -23,7 +23,7 @@
                 04  R04-TCHK-VALUE   PIC X.
                 04  R04-TCHK-LABEL   PIC X(41).
               03  R04-FILEKBN.
-                04  R04-VALUE     PIC X(48).
+                04  R04-VALUE     PIC X(94).
               03  R04-CREYMD.
                 04  R04-VALUE     PIC X(22).
               03  R04-KENSU.

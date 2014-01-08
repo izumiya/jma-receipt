@@ -123,6 +123,12 @@
                   05  C02-VALUE   PIC X(40).
                 04  C02-HKNCOMBI-COUNT   PIC S9(9)   BINARY.
                 04  C02-HKNCOMBI-ITEM    PIC X(40)   OCCURS  100 TIMES.
+              03  C02-KOHIDCOMBO.
+                04  C02-KOHIDCOMBO-STATE   PIC S9(9)   BINARY.
+                04  C02-KOHID.
+                  05  C02-VALUE   PIC X(22).
+                04  C02-KOHID-COUNT   PIC S9(9)   BINARY.
+                04  C02-KOHID-ITEM    PIC X(22)   OCCURS  100 TIMES.
               03  C02-BYOMEIHENFLG.
                 04  C02-BYOMEIHENFLG-STYLE   PIC X(20).
                 04  C02-BYOMEIHENFLG-VALUE   PIC X(10).
@@ -167,6 +173,7 @@
                     06  C02-TUTAGAIFLG    PIC X(14).
                     06  C02-TNYUGAIKBN    PIC X(8).
                     06  C02-THKNCOMBI     PIC X(40).
+                    06  C02-TKOHID        PIC X(22).
                     06  C02-TREZEFLG      PIC X(10).
                     06  C02-TREZEMM       PIC X(4).
                     06  C02-THKNBYOMEIFLG PIC X(10).

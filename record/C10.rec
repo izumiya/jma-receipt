@@ -34,6 +34,14 @@ C10	{
 			count	int;
 			item	varchar(40)[101];
 		};
+		KOHIDCOMBO	{
+			state	int;
+			KOHID	{
+				value	varchar(22);
+			};
+			count	int;
+			item	varchar(22)[101];
+		};
 		NYUGAIKBNCOMBO	{
 			NYUGAIKBN	{
 				value	varchar(8);

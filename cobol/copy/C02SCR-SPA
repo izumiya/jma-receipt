@@ -110,6 +110,7 @@
       *                                     組み立てへの移行を可能にする
       *  04.07.02    NACL-藤原    13/07/05  病名の複数自院病名登録対応
       *  04.07.03    NACL-藤原    13/07/30  自院病名のセット登録対応
+      *  04.07.04    NACL-藤原    13/07/12  第三者行為対応
       *****************************************************************
       *
        01  SPA-C02FREE.
@@ -214,6 +215,7 @@
                                13  SPA-GMN-F1              PIC X(01).
                                13  SPA-GMN-C02-HKNCOMBIMEI
                                                            PIC X(40).
+                           11  SPA-GMN-C02-KOHID           PIC X(22).
                            11  SPA-GMN-C02-REZEFLG-G.
                                13  SPA-GMN-C02-REZEFLG     PIC X(01).
                                13  SPA-GMN-F1              PIC X(01).
@@ -256,6 +258,7 @@
                                13  SPA-GMN-C02-TMANSEIKBN  PIC X(42).
                                13  SPA-GMN-C02-TNYUGAIKBN  PIC X(06).
                                13  SPA-GMN-C02-THKNCOMBI   PIC X(40).
+                               13  SPA-GMN-C02-TKOHID      PIC X(22).
                                13  SPA-GMN-C02-TREZEFLG    PIC X(10).
                                13  SPA-GMN-C02-TREZEMM     PIC 9(02).
                                13  SPA-GMN-C02-TTENKIKBN   PIC X(08).
@@ -302,6 +305,10 @@
                                13  SPA-GMN-C02-HKNCOMBIMEIL
                                                            PIC X(40).    
                        09  SPA-GMN-C02-HKNCOMBI-MAX        PIC 9(03).
+      *
+                       09  SPA-GMN-C02-KOHIDLST            OCCURS  100.
+                           11  SPA-GMN-C02-KOHIDL          PIC X(22).    
+                       09  SPA-GMN-C02-KOHID-MAX           PIC 9(03).
       *                         
                        09  SPA-GMN-C02-REZEFLGLST          OCCURS  2.
                            11  SPA-GMN-C02-REZEFLGL        PIC X(01).
@@ -333,6 +340,7 @@
                            11  SPA-NAI-C02-HKNCOMBI-ROUSAI PIC 9(01).
                            11  SPA-NAI-C02-HKNCOMBI-JIHI   PIC 9(01).
                            11  SPA-NAI-C02-HKNCOMBI-KOUGAI PIC 9(01).
+                           11  SPA-NAI-C02-KOHID-DAISANSYA PIC 9(01).
                            11  SPA-NAI-C02-LOCK            PIC 9(01). 
                        09  SPA-NAI-C02-KOUMOKU.
                            11  SPA-NAI-C02-SRYYMD          PIC X(08).
@@ -345,6 +353,7 @@
                            11  SPA-NAI-C02-RECEDENFLG      PIC X(01).
                            11  SPA-NAI-C02-MANSEIKBN       PIC 9(02).
                            11  SPA-NAI-C02-NANBYOCD        PIC 9(02).
+                           11  SPA-NAI-C02-KOHID           PIC 9(10).
                            11  SPA-NAI-C02-BYOMEI-TBL.
                                13  SPA-NAI-C02-BYOMEI-OCC  OCCURS  21.
                                    15  SPA-NAI-C02-BYOMEICD
@@ -409,6 +418,7 @@
                                13  SPA-NAI-C02-TNYUGAIKBN  PIC X(01).
                                13  SPA-NAI-C02-TTENKIYMD   PIC X(08).
                                13  SPA-NAI-C02-THKNCOMBI   PIC X(04).
+                               13  SPA-NAI-C02-TKOHID      PIC 9(10).
                                13  SPA-NAI-C02-TBYOMEI     PIC X(80).
                                13  SPA-NAI-C02-THOSOKU-COMMENT
                                                            PIC X(40).
@@ -422,6 +432,11 @@
                                13  SPA-NAI-C02-TEKSTYMD     PIC 9(08).
                                13  SPA-NAI-C02-TEKEDYMD     PIC 9(08).
                            11  SPA-NAI-C02-HKN-MAX          PIC 9(04).
+      *
+                       09  SPA-NAI-C02-KOHIDLST            OCCURS  100.
+                           11  SPA-NAI-C02-KOHIDL          PIC 9(10).    
+                           11  SPA-NAI-C02-RYOSTYMDL       PIC X(08).
+                           11  SPA-NAI-C02-RYOEDYMDL       PIC X(08).
       *                         
                        09  SPA-NAI-C02-SELNO       PIC 9(05).
                        09  SPA-NAI-C02-UPDOWN      PIC 9(01). 
@@ -948,6 +963,7 @@
                                13  SPA-GMN-F1              PIC X(01).
                                13  SPA-GMN-C10-HKNCOMBIMEI
                                                            PIC X(40).
+                           11  SPA-GMN-C10-KOHID           PIC X(22).
                            11  SPA-GMN-C10-TENKIKBN-G.
                                13  SPA-GMN-C10-TENKIKBN    PIC X(01).
                                13  SPA-GMN-F1              PIC X(01).
@@ -990,6 +1006,10 @@
                                13  SPA-GMN-C10-HKNCOMBIMEIL
                                                            PIC X(40).    
                        09  SPA-GMN-C10-HKNCOMBI-MAX        PIC 9(03).
+      *
+                       09  SPA-GMN-C10-KOHIDLST            OCCURS  101.
+                           11  SPA-GMN-C10-KOHIDL          PIC X(22).    
+                       09  SPA-GMN-C10-KOHID-MAX           PIC 9(03).
       *                         
                        09  SPA-GMN-C10-TENKIKBNLST         OCCURS  6.
                            11  SPA-GMN-C10-TENKIKBNL       PIC X(01).
@@ -1007,6 +1027,7 @@
                        09  SPA-NAI-C10-KOUMOKU.
                            11  SPA-NAI-C10-TENKIYMD        PIC X(08).
                            11  SPA-NAI-C10-SRYYMD          PIC X(08).
+                           11  SPA-NAI-C10-KOHID           PIC 9(10).
       *              
       *    手術歴入力画面
            03  SPA-C11-AREA.

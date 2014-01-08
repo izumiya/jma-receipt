@@ -103,6 +103,8 @@
       *  04.07.01    NACL-藤原    11/09/02  労災請求書作成対応
       *  04.07.02    NACL-藤原    12/11/19  主科情報の取得方法変更
       *  04.07.03    NACL-藤原    13/02/07  労災レセ電対応
+      *  04.07.04    NACL-藤原    13/09/20  第三者行為対応
+      *  04.07.02    NACL-藤原    13/10/07  労災レセ電返戻対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2253,33 +2255,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    WIDGET-INSENSITIVE  TO
                                        SPA-H01GMN-HENREI-SIJI-FLG-STATE
            MOVE    ZERO                TO  SPA-H01NAI-HENREI-MSG
-      *
-           IF    ( RECE10-RECESYUBETU  =   "6666"              )
-           OR    ( RECE10-TEISYUTUSAKI =   "5" OR  "3" OR  "4" )
+      *    特別療養費、公害、自賠責はチェックしない
+           IF    ( RECE10-RECESYUBETU  =   "6666"      )
+           OR    ( RECE10-TEISYUTUSAKI =   "5" OR  "4" )
                CONTINUE
            ELSE
-               INITIALIZE                      HENREI-B-REC
-               MOVE    SPA-HOSPNUM         TO  HENREI-B-HOSPNUM
-               MOVE    RECE10-SRYYM        TO  HENREI-B-SRYYM
-               MOVE    RECE10-PTID         TO  HENREI-B-PTID
-               MOVE    RECE10-NYUGAIKBN    TO  HENREI-B-NYUGAIKBN
-               MOVE    HENREI-B-REC        TO  MCPDATA-REC
-               PERFORM 900-HENREI-BODY-INV-SEC
-               IF      FLG-HENREI-B        =   ZERO
-                   MOVE    1               TO  SPA-H01NAI-HENREI-MSG
-      *            返戻データ退避処理
-                   PERFORM 410211-HENREI-B-SPA-HENSYU-SEC
+      *        労災でアフターケア、公務災害はチェックしない
+               IF      RECE10-TEISYUTUSAKI =   "3"
+                   IF    ( RECE10-HKNKBN       =   "3" OR  "4" )
+                   OR    ( RECE10-SRYYM        <   201307      )
+                       CONTINUE
+                   ELSE
+                       PERFORM 410211-HENREI-B-CHECK-SEC
+                   END-IF
                ELSE
-                   MOVE    ZERO            TO  SPA-H01NAI-HENREI-MSG
-               END-IF
-      *
-               IF    ( SPA-H01NAI-HENREIYM >   ZERO )
-               AND   ( SPA-H01NAI-HENREI-MSG
-                                           =   1    )
-                   MOVE    WIDGET-NORMAL       TO
-                                       SPA-H01GMN-HENREI-SIJI-FLG-STATE
+                   PERFORM 410211-HENREI-B-CHECK-SEC
                END-IF
            END-IF
+      *
       *    点検レセ０点公費あり
            MOVE    RECE10-SKYKBN-RECEDEN
                                        TO  SPA-H01NAI-SKYKBN-RECEDEN
@@ -2366,6 +2359,36 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    返戻データ存在チェック処理
+      *****************************************************************
+       410211-HENREI-B-CHECK-SEC   SECTION.
+      *
+           INITIALIZE                      HENREI-B-REC
+           MOVE    SPA-HOSPNUM         TO  HENREI-B-HOSPNUM
+           MOVE    RECE10-SRYYM        TO  HENREI-B-SRYYM
+           MOVE    RECE10-PTID         TO  HENREI-B-PTID
+           MOVE    RECE10-NYUGAIKBN    TO  HENREI-B-NYUGAIKBN
+           MOVE    HENREI-B-REC        TO  MCPDATA-REC
+           PERFORM 900-HENREI-BODY-INV-SEC
+           IF      FLG-HENREI-B        =   ZERO
+               MOVE    1               TO  SPA-H01NAI-HENREI-MSG
+      *        返戻データ退避処理
+               PERFORM 410211-HENREI-B-SPA-HENSYU-SEC
+           ELSE
+               MOVE    ZERO            TO  SPA-H01NAI-HENREI-MSG
+           END-IF
+      *
+           IF    ( SPA-H01NAI-HENREIYM >   ZERO )
+           AND   ( SPA-H01NAI-HENREI-MSG
+                                       =   1    )
+               MOVE    WIDGET-NORMAL       TO
+                                       SPA-H01GMN-HENREI-SIJI-FLG-STATE
+            END-IF
+           .
+       410211-HENREI-B-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    返戻データ退避処理
       *****************************************************************
        410211-HENREI-B-SPA-HENSYU-SEC SECTION.
@@ -2392,6 +2415,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                WHEN    6
                    MOVE   "2"      TO  HENREI-B-TEISYUTUSAKI
                    MOVE   "6"      TO  HENREI-B-XXTEISYUTUSAKI
+               WHEN    3
+                   MOVE    "3"     TO  HENREI-B-TEISYUTUSAKI
+                                       HENREI-B-XXTEISYUTUSAKI
            END-EVALUATE
            MOVE    SPA-RECE10-PTID     TO  HENREI-B-PTID
            MOVE    HENREI-B-REC    TO  MCPDATA-REC
@@ -2855,6 +2881,19 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
                                        MOVE    1   TO  FLG-HENREI-B-CHK
                                    END-IF    
                                END-IF
+                           WHEN    3
+                               IF      TBL-HENREI-B-TEISYUTUSAKI (IDXX)
+                                               =   3
+                                   IF    ( TBL-HENREI-B-RECEIPT-KBN
+                                                                 (IDXX)
+                                           =   SPA-RECE10-RECEIPT-KBN )
+                                   AND   ( TBL-HENREI-B-MAX
+                                           =   1                      )
+                                       MOVE    TBL-HENREI-B-REC (IDXX)
+                                                   TO  WRK-HENREI-B-REC
+                                       MOVE    1   TO  FLG-HENREI-B-CHK
+                                   END-IF
+                               END-IF
                        END-EVALUATE
                    END-IF
                ELSE
@@ -2884,6 +2923,19 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
                            WHEN    6
                                IF      TBL-HENREI-B-TEISYUTUSAKI (IDXX)
                                                =   2
+                                   IF    ( TBL-HENREI-B-RECEIPT-KBN
+                                                                 (IDXX)
+                                           =   SPA-RECE10-RECEIPT-KBN )
+                                   AND   ( TBL-HENREI-B-MAX
+                                           =   1                      )
+                                       MOVE    TBL-HENREI-B-REC (IDXX)
+                                                   TO  WRK-HENREI-B-REC
+                                       MOVE    1   TO  FLG-HENREI-B-CHK
+                                   END-IF
+                               END-IF
+                           WHEN    3
+                               IF      TBL-HENREI-B-TEISYUTUSAKI (IDXX)
+                                               =   3
                                    IF    ( TBL-HENREI-B-RECEIPT-KBN
                                                                  (IDXX)
                                            =   SPA-RECE10-RECEIPT-KBN )
@@ -4808,11 +4860,15 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
                        MOVE    "公務災害"          TO  WRK-RECESYUBETU
                    WHEN    "7011"
                    WHEN    "7001"
-                       IF      RECE10-RECEKBN      =   "4"
-                           MOVE    "新様式"        TO  WRK-RECESYUBETU
-                       ELSE
-                           MOVE    "従来様式"      TO  WRK-RECESYUBETU
-                       END-IF
+                       EVALUATE    RECE10-RECEKBN
+                           WHEN    "4"
+                              MOVE    "新様式"     TO  WRK-RECESYUBETU
+                           WHEN    "5"
+                               MOVE    "従来様式"  TO  WRK-RECESYUBETU
+                           WHEN    "6"
+                               MOVE    "第三者行為"
+                                                   TO  WRK-RECESYUBETU
+                       END-EVALUATE
                END-EVALUATE
                GO  TO  530-RECESYUBETU-HENSYU-EXT
            END-IF        

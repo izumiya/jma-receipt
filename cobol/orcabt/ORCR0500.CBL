@@ -128,6 +128,8 @@
       *                                     金額項目７桁対応
       *
       *  04.06.01    NACL-藤原    13/04/12  帳票タイトル設定の条件追加
+      *
+      *  04.07.01    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1673,12 +1675,23 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCM26.red"     ALSO    "2"
                WHEN    "HCM26V01.red"  ALSO    "2"
                WHEN    "HCM26V02.red"  ALSO    "2"
-                   IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
-                       MOVE    "自賠責（従来様式）レセプト（入院外）"
+                   IF      WRK-PARA-RECEKBN    =   "8"
+                       IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
+                           MOVE
+                           "自賠責（第三者行為）レセプト（入院外）"
                                                        TO  SPRT-TITLE
+                       ELSE
+                           MOVE    "自賠（第三者）レセプト（入院外）"
+                                                       TO  SPRT-TITLE
+                       END-IF
                    ELSE
-                       MOVE    "自賠（従）レセプト（入院外）"
+                       IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
+                           MOVE   "自賠責（従来様式）レセプト（入院外）"
                                                        TO  SPRT-TITLE
+                       ELSE
+                           MOVE    "自賠（従）レセプト（入院外）"
+                                                       TO  SPRT-TITLE
+                       END-IF
                    END-IF
                WHEN    "HCM58.red"     ALSO    "2"
                WHEN    "HCM58V01.red"  ALSO    "2"
@@ -1784,12 +1797,22 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCN25V03.red"  ALSO    "1"
                WHEN    "HCM26.red"     ALSO    "1"
                WHEN    "HCM26V02.red"  ALSO    "1"
-                   IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
-                       MOVE    "自賠責（従来様式）レセプト（入院）"
+                   IF      WRK-PARA-RECEKBN    =   "8"
+                       IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
+                           MOVE   "自賠責（第三者行為）レセプト（入院）"
                                                        TO  SPRT-TITLE
+                       ELSE
+                           MOVE    "自賠（第三者）レセプト（入院）"
+                                                       TO  SPRT-TITLE
+                       END-IF
                    ELSE
-                       MOVE    "自賠（従）レセプト（入院）"
+                       IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
+                           MOVE    "自賠責（従来様式）レセプト（入院）"
                                                        TO  SPRT-TITLE
+                       ELSE
+                           MOVE    "自賠（従）レセプト（入院）"
+                                                       TO  SPRT-TITLE
+                       END-IF
                    END-IF
                WHEN    "HCN58.red"     ALSO    "1"
                WHEN    "HCN58V01.red"  ALSO    "1"

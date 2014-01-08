@@ -46,6 +46,7 @@
       *
       *  04.07.01    NACL-藤原    12/02/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
+      *  04.07.02    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
        01  SPA-R02.
@@ -283,7 +284,7 @@
                05  SPA-GMN-R04-PAGE                PIC 9(02).
                05  SPA-GMN-R04-CUR                 PIC 9(02).
                05  SPA-GMN-R04-AREA.
-                   07  SPA-GMN-R04-FILEKBN         PIC X(50).
+                   07  SPA-GMN-R04-FILEKBN         PIC X(94).
                    07  SPA-GMN-R04-CREYMD          PIC X(22).
                    07  SPA-GMN-R04-PAGEH           PIC 9(04).
                    07  SPA-GMN-R04-KENSUH          PIC 9(04).

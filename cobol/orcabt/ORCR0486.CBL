@@ -72,6 +72,7 @@
       *
       *  04.07.01    NACL-Æ£¸¶    11/09/02  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-Æ£¸¶    12/01/24  monpe-0.6.20ÂÐ±þ
+      *  04.07.03    NACL-Æ£¸¶    13/09/20  Âè»°¼Ô¹Ô°ÙÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1027,8 +1028,29 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                     " "            DELIMITED   BY  SIZE
                     RECE41-RECEKA  DELIMITED   BY  SPACE
                                    INTO    HC23-PTNUM
+      *
+           EVALUATE    WRK-PARA-RECEKBN
+               WHEN    "8"
+      *            ÈïÊÝ¸±¼Ô¾Ú¤Îµ­¹æ¡¦ÈÖ¹æ
+                   STRING   RECE41-KIGO    DELIMITED  BY  SPACE
+                            "¡¡"           DELIMITED  BY  SIZE
+                            RECE41-NUM     DELIMITED  BY  SPACE
+                                           INTO    HC23-KIGONUM
+                   END-STRING
+      *            ÊÝ¸±¼ÔÈÖ¹æ
+                   MOVE    RECE41-HKNJANUM     TO  HC23-HKNJANUM
+      *            ÊÝ¸±¼ÔÌ¾
+                   MOVE    RECE41-HKNJANAME    TO  HC23-HKNJANAME
+           END-EVALUATE
       *    ¿ÇÎÅ¤Î¼ïÎà
-           MOVE    "¡û"                TO  HC23-SINRYOKBN(3)
+           EVALUATE    WRK-PARA-RECEKBN
+               WHEN    "3"
+               WHEN    "4"
+               WHEN    "5"
+                   MOVE    "¡û"                TO  HC23-SINRYOKBN (3)
+               WHEN    "8"
+                   MOVE    "¡û"                TO  HC23-SINRYOKBN (1)
+           END-EVALUATE
       *    ¥«¥Ê»áÌ¾
            MOVE    RECE41-KANANAME     TO  HC23-KANANAME
       *    »áÌ¾
@@ -1203,6 +1225,21 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            MOVE    RECE41-TOTALKIN-JYU  TO  WRK-TOTALTEN
            MOVE    WRK-TOTALTEN         TO  HC23-KINGAKUG
       *
+           EVALUATE    WRK-PARA-RECEKBN
+               WHEN    "8"
+      *          ¼Ò²ñÊÝ¸±¤Ø¤ÎÀÁµá³Û
+                 MOVE    RECE41-SKYMONEY      TO  WRK-KINGAKUZ
+                 MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYU(1)
+      *          ´µ¼ÔÉéÃ´
+                 IF   RECE41-FTNMONEY  NOT =  ZERO
+                   MOVE  RECE41-FTNRATE       TO  WRK-ZZZ
+                   MOVE  WRK-ZZZ              TO  HC23-FTNWARIAI
+                 END-IF
+                 MOVE    RECE41-FTNMONEY      TO  WRK-KINGAKUZ
+                 MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYU(2)
+                                                  HC23-SEIKYU(4)
+           END-EVALUATE
+      *
       *    ¿ÇÃÇ½ñÎÁ
            MOVE    RECE41-SINDAN-TUU    TO  WRK-ZZZ
            MOVE    WRK-ZZZ              TO  HC23-SHINDANSYOSUU
@@ -1226,12 +1263,24 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            MOVE    WRK-GOKEI            TO  WRK-KINGAKUZ
            MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYU(8)
       *    ÁíÀÁµá³Û
-           COMPUTE WRK-GOKEI   =    RECE41-TOTALKIN-JYU
-                               +    RECE41-SONOTAKIN-JYU
-                               +    RECE41-SINDAN-KIN
-                               +    RECE41-MEISAI-KIN
-           MOVE    WRK-GOKEI            TO  WRK-KINGAKUZ
-           MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYUG
+           EVALUATE    WRK-PARA-RECEKBN
+               WHEN    "3"
+               WHEN    "4"
+               WHEN    "5"
+                 COMPUTE WRK-GOKEI   =    RECE41-TOTALKIN-JYU
+                                     +    RECE41-SONOTAKIN-JYU
+                                     +    RECE41-SINDAN-KIN
+                                     +    RECE41-MEISAI-KIN
+                 MOVE    WRK-GOKEI            TO  WRK-KINGAKUZ
+                 MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYUG
+               WHEN    "8"
+                 COMPUTE WRK-GOKEI   =    RECE41-FTNMONEY
+                                     +    RECE41-SONOTAKIN-JYU
+                                     +    RECE41-SINDAN-KIN
+                                     +    RECE41-MEISAI-KIN
+                 MOVE    WRK-GOKEI            TO  WRK-KINGAKUZ
+                 MOVE    WRK-KINGAKUZ         TO  HC23-SEIKYUG
+           END-EVALUATE
       *
       *    ÅÀ¿ôÃ±²Á
            EVALUATE    RECE41-JIBAIKBN
@@ -1281,12 +1330,24 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            MOVE    WRK-Z9               TO  HC23-TSUINSUU(1)
       *
       *    ÀÁµá³Û
-           COMPUTE WRK-GOKEI   =    RECE41-TOTALKIN-JYU
-                               +    RECE41-SONOTAKIN-JYU
-                               +    RECE41-SINDAN-KIN
-                               +    RECE41-MEISAI-KIN
-           MOVE    WRK-GOKEI            TO  WRK-SEIKYUZ
-           MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUGAKUTOTAL
+           EVALUATE    WRK-PARA-RECEKBN
+               WHEN    "3"
+               WHEN    "4"
+               WHEN    "5"
+                 COMPUTE WRK-GOKEI   =    RECE41-TOTALKIN-JYU
+                                     +    RECE41-SONOTAKIN-JYU
+                                     +    RECE41-SINDAN-KIN
+                                     +    RECE41-MEISAI-KIN
+                 MOVE    WRK-GOKEI            TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUGAKUTOTAL
+               WHEN    "8"
+                 COMPUTE WRK-GOKEI   =    RECE41-FTNMONEY
+                                     +    RECE41-SONOTAKIN-JYU
+                                     +    RECE41-SINDAN-KIN
+                                     +    RECE41-MEISAI-KIN
+                 MOVE    WRK-GOKEI            TO  WRK-SEIKYUZ
+                 MOVE    WRK-SEIKYUZ          TO  HC23-SEIKYUGAKUTOTAL
+           END-EVALUATE
       *
       *    ½êºßÃÏ
            IF      FLG-SYS-1902        =   1
@@ -2014,10 +2075,17 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            MOVE    SPACE               TO  WRK-RECECOM-NAME 
                                            WRK-RECECOM-SJKBN
       *     
-      *    Å¬ÍÑÍó¥³¥á¥ó¥È     
-           MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
-           MOVE    "key7"              TO  WRK-MCP-PATHNAME
-           PERFORM 3601-RECECOM-HENSYU-SEC
+           IF      WRK-PARA-RECEKBN    =   "8"
+      *        Âè»°¼Ô¹Ô°Ù¤Î¤ß¤ÎÅ¬ÍÑÍó¥³¥á¥ó¥È
+               MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
+               MOVE    "key16"             TO  WRK-MCP-PATHNAME
+               PERFORM 3601-RECECOM-HENSYU-SEC
+           ELSE
+      *        Å¬ÍÑÍó¥³¥á¥ó¥È     
+               MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
+               MOVE    "key7"              TO  WRK-MCP-PATHNAME
+               PERFORM 3601-RECECOM-HENSYU-SEC
+           END-IF
       *     
       *    ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£°£±¡Á£°£¶¡Ë
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
@@ -2047,6 +2115,9 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
            MOVE    RECE41-SRYYM        TO  RECECOM-SRYYM
            MOVE    RECE41-PTID         TO  RECECOM-PTID
            MOVE    RECE41-NYUGAIKBN    TO  RECECOM-NYUGAIKBN
+           IF      WRK-MCP-PATHNAME    =   "key16"
+               MOVE    "BB"                TO  RECECOM-SJKBN
+           END-IF
       * 
            MOVE    RECECOM-REC         TO  MCPDATA-REC
            MOVE    WRK-MCP-TABLE       TO  MCP-TABLE
@@ -2558,7 +2629,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    RECE41-COMMENT      TO  RECE10-COMMENT
       *
-           MOVE    "5"                 TO  RECE10-RECEKBN
+           IF      WRK-PARA-RECEKBN    =   "8"
+               MOVE    "6"                 TO  RECE10-RECEKBN
+           ELSE
+               MOVE    "5"                 TO  RECE10-RECEKBN
+           END-IF
       * 
            IF      RECE41-JNISSU       =   999
                MOVE    ZERO                TO  RECE10-JNISSU       (1)
@@ -2566,11 +2641,22 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                MOVE    RECE41-JNISSU       TO  RECE10-JNISSU       (1)
            END-IF
            MOVE    RECE41-TOTALTEN     TO  RECE10-TOTALTEN     (1)
-           COMPUTE RECE10-FTNMONEY (1) =   RECE41-TOTALKIN-JYU     +
-                                           RECE41-SONOTAKIN-JYU    +
-                                           RECE41-SINDAN-KIN       +
-                                           RECE41-MEISAI-KIN
-           MOVE    RECE41-TOTALKIN-JYU TO  RECE10-FTNMONEY-FTN (1)
+           EVALUATE    WRK-PARA-RECEKBN
+               WHEN    "3"
+               WHEN    "4"
+               WHEN    "5"
+                 COMPUTE RECE10-FTNMONEY (1) =   RECE41-TOTALKIN-JYU  +
+                                                 RECE41-SONOTAKIN-JYU +
+                                                 RECE41-SINDAN-KIN    +
+                                                 RECE41-MEISAI-KIN
+                 MOVE    RECE41-TOTALKIN-JYU TO  RECE10-FTNMONEY-FTN(1)
+               WHEN    "8"
+                 COMPUTE RECE10-FTNMONEY (1) =   RECE41-FTNMONEY      +
+                                                 RECE41-SONOTAKIN-JYU +
+                                                 RECE41-SINDAN-KIN    +
+                                                 RECE41-MEISAI-KIN
+                 MOVE    RECE41-FTNMONEY     TO  RECE10-FTNMONEY-FTN(1)
+           END-EVALUATE
            COMPUTE RECE10-FTNMONEY-KOJ (1) 
                                        =   RECE41-SONOTAKIN-JYU    +
                                            RECE41-SINDAN-KIN       +
@@ -2820,7 +2906,7 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
-      *    Ãæ»ß½èÍý»þ¥Ç¡¼¥¿ºï½ü½èÍý
+      *    ¥Ç¡¼¥¿ºï½ü½èÍý
       *****************************************************************
        5001-DB-DELETE-SEC               SECTION.
       *
@@ -2831,10 +2917,15 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE10-HOSPNUM
                MOVE    WRK-PARA-SRYYM      TO  RECE10-SRYYM
                MOVE    "2"                 TO  RECE10-NYUGAIKBN
                MOVE    4                   TO  RECE10-TEISYUTUSAKI
+               IF      WRK-PARA-RECEKBN    =   "8"
+                   MOVE    "970"               TO  RECE10-HKNNUM
+               ELSE
+                   MOVE    "973"               TO  RECE10-HKNNUM
+               END-IF
                MOVE    RECE10-REC          TO  MCPDATA-REC
                MOVE    "DBDELETE"          TO  MCP-FUNC
                MOVE    "tbl_seikyu"        TO  MCP-TABLE
-               MOVE    "del6"              TO  MCP-PATHNAME
+               MOVE    "del8"              TO  MCP-PATHNAME
 grpsys         PERFORM 900-ORCDBMAIN-SEC
                IF      MCP-RC           NOT =   ZERO
                    DISPLAY "DBPATH=" MCP-TABLE " " MCP-PATHNAME
@@ -2978,13 +3069,18 @@ grpsys                     MOVE    WRK-PARA-HOSPNUM    TO
                            MOVE    4                   TO
                                                    RECE10-TEISYUTUSAKI
                                                    RECE10-XXTEISYUTUSAKI 
+                           IF      WRK-PARA-RECEKBN    =   "8"
+                               MOVE    "970"           TO  RECE10-HKNNUM
+                           ELSE
+                               MOVE    "973"           TO  RECE10-HKNNUM
+                           END-IF
                            MOVE    RECE10-REC          TO  MCPDATA-REC
                            MOVE    "DBDELETE"          TO  MCP-FUNC
                            MOVE    "tbl_seikyu"        TO  MCP-TABLE
                            IF      WRK-PARA-DLTKBN     =   "0"
-                               MOVE    "del4"          TO  MCP-PATHNAME
+                               MOVE    "del9"          TO  MCP-PATHNAME
                            ELSE
-                               MOVE    "del7"          TO  MCP-PATHNAME
+                               MOVE    "del10"         TO  MCP-PATHNAME
                            END-IF
 grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC           NOT =   ZERO
@@ -3014,8 +3110,13 @@ grpsys                 MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
                        MOVE    BTPARA-INFO-PARA (9:8)
                                                    TO  PTINF-ED-SRYYMD
                        MOVE    "2"                 TO  PTINF-NYUGAIKBN
-                       MOVE    "2"                TO  PTINF-HKNKBN
-                       MOVE    "4"                TO  PTINF-HKNKBN2
+                       EVALUATE    WRK-PARA-RECEKBN
+                           WHEN    "5"
+                               MOVE    "2"             TO  PTINF-HKNKBN
+                               MOVE    "4"             TO  PTINF-HKNKBN2
+                           WHEN    "8"
+                               MOVE    "7"             TO  PTINF-HKNKBN
+                       END-EVALUATE
                        MOVE    BTPARA-INFO-PARA(17:6) 
                                                    TO  PTINF-SRYYM
                        MOVE    BTPARA-INFO-PARA(17:6)
@@ -3023,11 +3124,21 @@ grpsys                 MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
                        MOVE    "__"                TO  PTINF-SRYYMD(7:2)
                        MOVE    PTINF-REC           TO  MCPDATA-REC
                        MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                       MOVE    "key18"             TO  MCP-PATHNAME
+                       EVALUATE    WRK-PARA-RECEKBN
+                           WHEN    "5"
+                               MOVE    "key18"         TO  MCP-PATHNAME
+                           WHEN    "8"
+                               MOVE    "key13"         TO  MCP-PATHNAME
+                       END-EVALUATE
 grpsys                 PERFORM 900-DBSELECT-SEC
                        IF      MCP-RC              =   ZERO
                            MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                           MOVE    "key18"             TO  MCP-PATHNAME
+                           EVALUATE    WRK-PARA-RECEKBN
+                               WHEN    "5"
+                                   MOVE    "key18"     TO  MCP-PATHNAME
+                               WHEN    "8"
+                                   MOVE    "key13"     TO  MCP-PATHNAME
+                           END-EVALUATE
                            PERFORM 900-PTINF-READ-N-SEC
                        ELSE
                            MOVE    1                  TO  FLG-PTINF
@@ -3049,13 +3160,18 @@ grpsys                     MOVE    WRK-PARA-HOSPNUM
                            MOVE    4               TO
                                                    RECE10-TEISYUTUSAKI
                                                    RECE10-XXTEISYUTUSAKI 
+                           IF      WRK-PARA-RECEKBN    =   "8"
+                               MOVE    "970"           TO  RECE10-HKNNUM
+                           ELSE
+                               MOVE    "973"           TO  RECE10-HKNNUM
+                           END-IF
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
                            IF      WRK-PARA-DLTKBN     =   "0"
-                               MOVE    "del4"          TO  MCP-PATHNAME
+                               MOVE    "del9"          TO  MCP-PATHNAME
                            ELSE
-                               MOVE    "del7"          TO  MCP-PATHNAME
+                               MOVE    "del10"         TO  MCP-PATHNAME
                            END-IF
 grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
@@ -3070,12 +3186,22 @@ grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            END-IF
       *
                            MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                           MOVE    "key18"             TO  MCP-PATHNAME
+                           EVALUATE    WRK-PARA-RECEKBN
+                               WHEN    "5"
+                                   MOVE    "key18"     TO  MCP-PATHNAME
+                               WHEN    "8"
+                                   MOVE    "key13"     TO  MCP-PATHNAME
+                           END-EVALUATE
                            PERFORM 900-PTINF-READ-N-SEC
                        END-PERFORM
       *
                        MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                       MOVE    "key18"             TO  MCP-PATHNAME
+                       EVALUATE    WRK-PARA-RECEKBN
+                           WHEN    "5"
+                               MOVE    "key18"         TO  MCP-PATHNAME
+                           WHEN    "8"
+                               MOVE    "key13"         TO  MCP-PATHNAME
+                       END-EVALUATE
                        PERFORM 900-CLOSE-SEC
                    WHEN    "03"
                        INITIALIZE                      PTINF-REC
@@ -3085,15 +3211,30 @@ grpsys                 MOVE    WRK-PARA-HOSPNUM    TO  PTINF-HOSPNUM
                        MOVE    BTPARA-INFO-PARA (9:8)
                                                    TO  PTINF-ED-SRYYMD
                        MOVE    "2"                 TO  PTINF-NYUGAIKBN
-                       MOVE    "2"                TO  PTINF-HKNKBN
-                       MOVE    "4"                TO  PTINF-HKNKBN2
+                       EVALUATE    WRK-PARA-RECEKBN
+                           WHEN    "5"
+                               MOVE    "2"             TO  PTINF-HKNKBN
+                               MOVE    "4"             TO  PTINF-HKNKBN2
+                           WHEN    "8"
+                               MOVE    "7"             TO  PTINF-HKNKBN
+                       END-EVALUATE
                        MOVE    PTINF-REC           TO  MCPDATA-REC
                        MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                       MOVE    "key16"             TO  MCP-PATHNAME
+                       EVALUATE    WRK-PARA-RECEKBN
+                           WHEN    "5"
+                               MOVE    "key16"         TO  MCP-PATHNAME
+                           WHEN    "8"
+                               MOVE    "key11"         TO  MCP-PATHNAME
+                       END-EVALUATE
 grpsys                 PERFORM 900-DBSELECT-SEC
                        IF      MCP-RC              =   ZERO
                            MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                           MOVE    "key16"             TO  MCP-PATHNAME
+                           EVALUATE    WRK-PARA-RECEKBN
+                               WHEN    "5"
+                                   MOVE    "key16"     TO  MCP-PATHNAME
+                               WHEN    "8"
+                                   MOVE    "key11"     TO  MCP-PATHNAME
+                           END-EVALUATE
                            PERFORM 900-PTINF-READ-N-SEC
                        ELSE
                            MOVE    1                  TO  FLG-PTINF
@@ -3115,13 +3256,18 @@ grpsys                     MOVE    WRK-PARA-HOSPNUM
                            MOVE    4               TO
                                                    RECE10-TEISYUTUSAKI
                                                    RECE10-XXTEISYUTUSAKI 
+                           IF      WRK-PARA-RECEKBN    =   "8"
+                               MOVE    "970"           TO  RECE10-HKNNUM
+                           ELSE
+                               MOVE    "973"           TO  RECE10-HKNNUM
+                           END-IF
                            MOVE    RECE10-REC      TO  MCPDATA-REC
                            MOVE    "DBDELETE"      TO  MCP-FUNC
                            MOVE    "tbl_seikyu"    TO  MCP-TABLE
                            IF      WRK-PARA-DLTKBN     =   "0"
-                               MOVE    "del4"          TO  MCP-PATHNAME
+                               MOVE    "del9"          TO  MCP-PATHNAME
                            ELSE
-                               MOVE    "del7"          TO  MCP-PATHNAME
+                               MOVE    "del10"         TO  MCP-PATHNAME
                            END-IF
 grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC      NOT =   ZERO
@@ -3136,12 +3282,22 @@ grpsys                     PERFORM 900-ORCDBMAIN-SEC
                            END-IF
       *
                            MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                           MOVE    "key16"             TO  MCP-PATHNAME
+                           EVALUATE    WRK-PARA-RECEKBN
+                               WHEN    "5"
+                                   MOVE    "key16"     TO  MCP-PATHNAME
+                               WHEN    "8"
+                                   MOVE    "key11"     TO  MCP-PATHNAME
+                           END-EVALUATE
                            PERFORM 900-PTINF-READ-N-SEC
                        END-PERFORM
       *
                        MOVE    "tbl_ptinf"         TO  MCP-TABLE
-                       MOVE    "key16"             TO  MCP-PATHNAME
+                       EVALUATE    WRK-PARA-RECEKBN
+                           WHEN    "5"
+                               MOVE    "key16"     TO  MCP-PATHNAME
+                           WHEN    "8"
+                               MOVE    "key11"     TO  MCP-PATHNAME
+                       END-EVALUATE
                        PERFORM 900-CLOSE-SEC
                END-EVALUATE
            END-IF
@@ -3200,18 +3356,29 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    END-IF
       *
                    MOVE    ZERO                TO  FLG-RECE41
-                   IF    ( RECE41-PTNUM        =   SPACE  )
-                   OR    ( RECE41-HKNKBN       =   "4"    )
-                   OR    ( RECE41-RECESYUBETU  =   "0000" )
+                   IF    ( RECE41-PTNUM        =   SPACE       )
+                   OR    ( RECE41-HKNKBN       =   "4" OR  "6" )
+                   OR    ( RECE41-RECESYUBETU  =   "0000"      )
       *
-                       IF    ( RECE41-TOTALKIN-JYU  =   ZERO )
-                       AND   ( RECE41-SONOTAKIN-JYU =   ZERO )
-                       AND   ( RECE41-SINDAN-KIN    =   ZERO )
-                       AND   ( RECE41-MEISAI-KIN    =   ZERO )
-                               GO  TO  990-RECE41-READ-SEC
-                       END-IF
+                       EVALUATE  RECE41-HKNKBN
+                         WHEN      "4"
+                          IF    ( RECE41-TOTALKIN-JYU  =   ZERO )
+                          AND   ( RECE41-SONOTAKIN-JYU =   ZERO )
+                          AND   ( RECE41-SINDAN-KIN    =   ZERO )
+                          AND   ( RECE41-MEISAI-KIN    =   ZERO )
+                              GO  TO  990-RECE41-READ-SEC
+                          END-IF
+                         WHEN      "6"
+                          IF    ( RECE41-FTNMONEY      =   ZERO )
+                          AND   ( RECE41-SONOTAKIN-JYU =   ZERO )
+                          AND   ( RECE41-SINDAN-KIN    =   ZERO )
+                          AND   ( RECE41-MEISAI-KIN    =   ZERO )
+                              GO  TO  990-RECE41-READ-SEC
+                          END-IF
+                       END-EVALUATE
       *
                        DISPLAY "RECE41  PTNUM=" RECE41-PTNUM
+                                     " HKNKBN=" RECE41-HKNKBN
       *
                        ADD     1                   TO  CNT-RECE41
                        MOVE    RECE41-HOSPNUM      TO  KEY-N-HOSPNUM
