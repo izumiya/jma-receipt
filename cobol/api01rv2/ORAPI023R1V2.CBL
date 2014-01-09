@@ -2078,7 +2078,9 @@
       *            自賠責の時、技術点を集計する
                    IF      (SPA-HKNKBN         =   1   )  AND
                            (SPA-RSI-HKNKBN     =   "4"
-                                               OR  "5"  ) 
+                                               OR  "5"
+      *                    第三者行為追加
+                                               OR  "6"  ) 
                        PERFORM 45052-JIBAI-SYORI-SEC
                    END-IF
       *            公害保険の時、技術点を集計する
