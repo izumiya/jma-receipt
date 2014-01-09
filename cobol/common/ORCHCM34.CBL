@@ -177,6 +177,7 @@
            03  FLG-HIT                             PIC 9(01).
            03  FLG-ORCSHKNSET                      PIC 9(01)
                                                    OCCURS 100.
+           03  FLG-HKNGENTEI                       PIC 9(01).
            03  FLG-PTRSIINF                        PIC 9(01).
            03  FLG-RECECOM                         PIC 9(01).
            03  FLG-TAJYUSHIN                       PIC 9(01).
@@ -383,6 +384,7 @@
            03  WRK-HKNCOMBI-KEY                    PIC X(04).
            03  WRK-HKNCOMBINUM                     PIC 9(04).
            03  WRK-HKNNUM                          PIC X(03).
+           03  WRK-KOHNUM                          PIC X(03).
            03  WRK-SHONUM-G.
                05  WRK-SHONUM-MAX                  PIC 9(03).
                05  WRK-SHONUM                      PIC 9(03)
@@ -1355,9 +1357,12 @@
       *
                IF    ( ORCHCM34-HOKEN  =   SPACE )
                    MOVE    1       TO  FLG-ORCSHKNSET (IDX0)
+                   MOVE    ZERO    TO  FLG-HKNGENTEI
                ELSE
                    MOVE    ORCSHKN-NAI-HKNNUM (IDX0)
                                    TO  WRK-HKNNUM
+                   MOVE    ORCSHKN-NAI-KOHHKNNUM (IDX0 1)
+                                   TO  WRK-KOHNUM
       *
                    PERFORM 800-HOKENBUNRUI-SEC
                    IF    ( ORCHCM34-HOKEN  =   WRK-HOKEN )
@@ -1365,6 +1370,10 @@
                    END-IF
                END-IF
            END-PERFORM
+      *
+           IF    ( ORCHCM34-HOKEN  =   "4" OR "5" OR "6" OR "7" )
+               MOVE    1           TO  FLG-HKNGENTEI
+           END-IF
       *
            .
        1001-KHN-EDIT-EXT.
@@ -2548,46 +2557,55 @@
                INITIALIZE              WRK-BYOMEI-G
       *
                IF    ( ORCHCM34-HOKEN  NOT =   SPACE )
-                   IF   ( PTBYO-HKNCOMBI   NOT =   SPACE )
-                       MOVE    ZERO    TO  FLG-HIT
-                       PERFORM VARYING IDX0    FROM    1   BY  1
-                               UNTIL ( IDX0    >   ORCSHKN-HKN-MAX )
-                                OR   ( FLG-HIT =   1 )
+                   IF   ( PTBYO-HKNCOMBI       =   ZERO )
+                    AND ( PTBYO-KOHID          =   ZERO )
+                       IF    ( FLG-HKNGENTEI   =   1 )
+                           MOVE    ZERO    TO FLG-TARGET
+                       END-IF
+                   ELSE
+                       IF   ( PTBYO-HKNCOMBI   NOT =   ZERO )
+                           MOVE    ZERO    TO  FLG-HIT
+                           PERFORM VARYING IDX0    FROM    1   BY  1
+                                   UNTIL ( IDX0    >   ORCSHKN-HKN-MAX )
+                                    OR   ( FLG-HIT =   1 )
       *
-                           IF    ( PTBYO-HKNCOMBI
+                               IF    ( PTBYO-HKNCOMBI
                                    =   ORCSHKN-GMN-HKNCOMBINUM (IDX0))
       *
-                               MOVE    1       TO  FLG-HIT
+                                   MOVE    1       TO  FLG-HIT
       *
-                               IF    ( FLG-ORCSHKNSET (IDX0)   =   1 )
-                                   CONTINUE
-                               ELSE
-                                   MOVE    ZERO    TO FLG-TARGET
+                                   IF    ( FLG-ORCSHKNSET (IDX0)
+                                                   =   1 )
+                                       CONTINUE
+                                   ELSE
+                                       MOVE    ZERO    TO FLG-TARGET
+                                   END-IF
                                END-IF
+                           END-PERFORM
+                           IF    ( FLG-HIT =    ZERO )
+                               MOVE    ZERO    TO FLG-TARGET
                            END-IF
-                       END-PERFORM
-                   END-IF
+                       END-IF
       *
-                   IF    ( PTBYO-KOHID NOT =   ZERO )
-                       MOVE    ZERO    TO  FLG-HIT
-                       PERFORM VARYING IDX0    FROM    1   BY  1
-                               UNTIL ( IDX0    >   ORCSHKN-HKN-MAX )
+                       IF    ( PTBYO-KOHID     NOT =   ZERO )
+                           MOVE    ZERO    TO  FLG-HIT
+                           PERFORM VARYING IDX0    FROM    1   BY  1
+                                   UNTIL ( IDX0    >   ORCSHKN-HKN-MAX )
       *
-                           IF    ( PTBYO-KOHID
+                               IF    ( PTBYO-KOHID
                                    =   ORCSHKN-NAI-KOHID (IDX0 1))
       *
-                               MOVE    1       TO  FLG-HIT
+                                   MOVE    1       TO  FLG-HIT
       *
-                               IF    ( FLG-ORCSHKNSET (IDX0)   =   1 )
-                                   CONTINUE
-                               ELSE
-                                   MOVE    ZERO    TO FLG-TARGET
+                                   IF    ( FLG-ORCSHKNSET (IDX0)  = 1 )
+                                       CONTINUE
+                                   ELSE
+                                       MOVE    ZERO    TO FLG-TARGET
+                                   END-IF
                                END-IF
-                           END-IF
-                       END-PERFORM
-      *
+                           END-PERFORM
+                       END-IF
                    END-IF
-      *
                END-IF
       *
                IF    ( FLG-TARGET      =   1 )
@@ -5441,6 +5459,8 @@
                ELSE
       *
                    MOVE    COMB-HKNNUM     TO  WRK-HKNNUM
+                   MOVE    COMB-KOHHKNNUM (1)
+                                           TO  WRK-KOHNUM
                    PERFORM 800-HOKENBUNRUI-SEC
                    IF    ( ORCHCM34-HOKEN  =   WRK-HOKEN )
                        CONTINUE
@@ -7019,30 +7039,34 @@
       *
            INITIALIZE              WRK-HOKEN
       *
-           EVALUATE    WRK-HKNNUM
-           WHEN    SPACE
-               MOVE    "1"         TO  WRK-HOKEN
-           WHEN    "971"
-               MOVE    "9"         TO  WRK-HOKEN
-           WHEN    "973"
-               MOVE    "9"         TO  WRK-HOKEN
-           WHEN    "975"
-               MOVE    "9"         TO  WRK-HOKEN
-           WHEN    "060"
-           WHEN    "067"
-           WHEN    "068"
-           WHEN    "069"
-               MOVE    "2"         TO  WRK-HOKEN
-           WHEN    "040"
-           WHEN    "039"
-               MOVE    "3"         TO  WRK-HOKEN
-           WHEN    OTHER
-               IF    ( WRK-HKNNUM (1:2)   =   "98" OR "90" OR "91" )
-                   MOVE    "9"     TO  WRK-HOKEN
-               ELSE
-                   MOVE    "1"     TO  WRK-HOKEN
-               END-IF
-           END-EVALUATE
+           IF    ( WRK-KOHNUM      =   "970" )
+                   MOVE    "6"         TO  WRK-HOKEN
+           ELSE
+               EVALUATE    WRK-HKNNUM
+               WHEN    SPACE
+                   MOVE    "1"         TO  WRK-HOKEN
+               WHEN    "971"
+                   MOVE    "4"         TO  WRK-HOKEN
+               WHEN    "973"
+                   MOVE    "5"         TO  WRK-HOKEN
+               WHEN    "975"
+                   MOVE    "7"         TO  WRK-HOKEN
+               WHEN    "060"
+               WHEN    "067"
+               WHEN    "068"
+               WHEN    "069"
+                   MOVE    "2"         TO  WRK-HOKEN
+               WHEN    "040"
+               WHEN    "039"
+                   MOVE    "3"         TO  WRK-HOKEN
+               WHEN    OTHER
+                   IF    ( WRK-HKNNUM (1:2)   =   "98" OR "90" OR "91" )
+                       MOVE    "8"     TO  WRK-HOKEN
+                   ELSE
+                       MOVE    "1"     TO  WRK-HOKEN
+                   END-IF
+               END-EVALUATE
+           END-IF
       *
            .
        800-HOKENBUNRUI-EXT.
@@ -7434,6 +7458,8 @@
                        MOVE    ACCT-HKNCOMBI   TO  WRK-HKNCOMBINUM
                        PERFORM 900-HKNCOMBI-KEY-SEL-SEC
                        MOVE    COMB-HKNNUM     TO  WRK-HKNNUM
+                       MOVE    COMB-KOHHKNNUM (1)
+                                               TO  WRK-KOHNUM
                        PERFORM 800-HOKENBUNRUI-SEC
                        IF    ( ORCHCM34-HOKEN  =   WRK-HOKEN )
                            CONTINUE
