@@ -831,13 +831,29 @@ grpsys     END-UNSTRING
       *
                IF    ( SS001-SRYKA-RSI-FLG (IDX1 WRK-NYUGAI)
                                        =   1 )
-                OR   ( SS001-SRYKA-JBI-FLG (IDX1 WRK-NYUGAI)
+                   MOVE    "4"     TO  WRK-HOKENBUNRUI
+                   PERFORM 210111-BG00701-WRITE-SEC
+               END-IF
+               IF    ( SS001-SRYKA-JBI-FLG (IDX1 WRK-NYUGAI)
                                        =   1 )
-                OR   ( SS001-SRYKA-JHI-FLG (IDX1 WRK-NYUGAI)
+                   MOVE    "5"     TO  WRK-HOKENBUNRUI
+                   PERFORM 210111-BG00701-WRITE-SEC
+               END-IF
+               IF    ( SS001-SRYKA-DI3-FLG (IDX1 WRK-NYUGAI)
                                        =   1 )
-                OR   ( SS001-SRYKA-KGI-FLG (IDX1 WRK-NYUGAI)
+                   MOVE    "6"     TO  WRK-HOKENBUNRUI
+                   PERFORM 210111-BG00701-WRITE-SEC
+               END-IF
+               IF    ( SS001-SRYKA-KGI-FLG (IDX1 WRK-NYUGAI)
                                        =   1 )
-                OR   ( SS001-SRYKA-HKT-FLG (IDX1 WRK-NYUGAI)
+                   MOVE    "7"     TO  WRK-HOKENBUNRUI
+               END-IF
+               IF    ( SS001-SRYKA-JHI-FLG (IDX1 WRK-NYUGAI)
+                                       =   1 )
+                   MOVE    "8"     TO  WRK-HOKENBUNRUI
+                   PERFORM 210111-BG00701-WRITE-SEC
+               END-IF
+               IF    ( SS001-SRYKA-HKT-FLG (IDX1 WRK-NYUGAI)
                                        =   1 )
                    MOVE    "9"     TO  WRK-HOKENBUNRUI
                    PERFORM 210111-BG00701-WRITE-SEC
@@ -1912,7 +1928,14 @@ grpsys     END-UNSTRING
                 OR   ( WRK-PARA-HOKEN      =   ZERO )
                    CONTINUE
                ELSE
-                   IF    ( WRK-PARA-HOKEN  NOT =   BG00701-HOKENBUNRUI )
+                   IF   (( WRK-PARA-HOKEN  =   "1" OR "2" OR "3")
+                     AND ( WRK-PARA-HOKEN  =   BG00701-HOKENBUNRUI ))
+                    OR  (( WRK-PARA-HOKEN  =   "9" )
+                     AND ( BG00701-HOKENBUNRUI
+                                           =   "4" OR "5" OR "6"
+                                            OR "7" OR "8" OR "9" ))
+                       CONTINUE
+                   ELSE
                        MOVE    ZERO    TO  FLG-LOOPEND
                    END-IF
                END-IF
