@@ -1409,14 +1409,17 @@
                    UNTIL   (IDX        >   SPA-MAX-LINE )  OR
                           ((SPA-GMN-INPUTCD(IDX)   =   SPACE ) AND
                            (SPA-COM-INPUTCD(IDX)   =   SPACE ))
-               IF     (SPA-COM-ZAIEND(IDX)     =   "1" )  OR
-                     ((SPA-COM-SRYKBN(IDX)     =   "95"
+      *H25.12
+               IF     (SPA-COM-SRYKBN(IDX)     =   "95"
                                                OR  "96" ) AND
-                      (SPA-COM-JIHIMONEY(IDX)  >   ZERO ))
+                      (SPA-COM-JIHIMONEY(IDX)  >   ZERO )
+                   ADD     SPA-COM-JIHIMONEY(IDX)
+                                                   TO  WRK-TENSU
+               END-IF
+               IF     (SPA-COM-ZAIEND(IDX)     =   "1" )
                    IF      SPA-COM-SRYKBN(IDX)     =   "95"
                                                    OR  "96"
-                       MOVE    SPA-COM-JIHIMONEY(IDX)
-                                                   TO  WRK-TENSU
+                       CONTINUE
                    ELSE
                        MOVE    SPA-COM-TENSU (IDX)
                                                    TO  WRK-TENSU
@@ -2404,6 +2407,9 @@
                    MOVE    "1"             TO  SPA-RSI-JUNKYO
                WHEN    5
       *            Ï«Ì³ºÒ³²·òÊÝ½àµò
+                   MOVE    "1"             TO  SPA-RSI-JUNKYO
+               WHEN    7
+      *            Âè»°¼Ô¹Ô°Ù¡Ê¼«ÇåÀÕ·òÊÝ½àµò¡Ë
                    MOVE    "1"             TO  SPA-RSI-JUNKYO
            END-EVALUATE
       *    Å¬ÍÑ´ü´ÖÈ½Äê
@@ -5181,6 +5187,7 @@
                GO      TO      4100-TOROKU-EXT
            END-IF
       *
+           MOVE    SPACE               TO  SPA-J99-DATA
       *
            IF      SPA-J04-SYORI       =   ZERO
                MOVE    "0101"              TO  SPA-JIDCD
@@ -6639,6 +6646,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                    Ï«ºÒ½àµò
                            MOVE    "1"             TO  JYURRK-HKNKBN
                        END-IF
+      *H25.7
+                   WHEN    "6"
+      *                Âè»°¼Ô¹Ô°Ù
+                       MOVE    "7"                 TO  JYURRK-HKNKBN
                END-EVALUATE
            END-IF
       *    ¸ø³²
@@ -7078,6 +7089,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *                    Ï«ºÒ½àµò
                            MOVE    "1"             TO  LNK-UPD-HKNKBN
                        END-IF
+      *H25.7
+                   WHEN    "6"
+      *                Âè»°¼Ô¹Ô°Ù
+                       MOVE    "7"                 TO  LNK-UPD-HKNKBN
                END-EVALUATE
            END-IF
            CALL    "ORCSRECEUPD"       USING    ORCSRECEUPDAREA

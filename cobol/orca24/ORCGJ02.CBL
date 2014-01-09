@@ -69,6 +69,7 @@
       *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *  04.07.00    NACL-多々納  13/02/06  レセ電データ移行対応
       *  04.07.00    NACL-多々納  13/04/XX  労災レセ電コード変換対応
+      *  04.07.00    NACL-多々納  14/01/08  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -215,6 +216,8 @@
            03  FLG-RSIHKN-OK       PIC 9(01).
            03  FLG-RSIHKN-OK2      PIC 9(01).
            03  FLG-RRKNUM-ARI      PIC 9(01).
+           03  FLG-DAISAN-OK       PIC 9(01).
+      *!!
       *
            03  FLG-HKN-CHK         PIC 9(01).
            03  FLG-DEKIDAKA        PIC 9(01).
@@ -2185,6 +2188,10 @@
                IF      ORCSHKN-NAI-RSI-HKNKBN (IDX)    =   "4"
                                                        OR  "5"
                    PERFORM 30081-JIBAISEKI-HEN-SEC
+               END-IF
+      *        第三者行為（健保準拠）
+               IF      ORCSHKN-NAI-RSI-HKNKBN (IDX)    =   "6"
+                   MOVE    "1"             TO  SPA-NAI-TRSI-JUNKYO(IDH)
                END-IF
       *
                MOVE    IDH             TO  SPA-HKN-MAX
@@ -8786,7 +8793,6 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        439901-SRYACCT-DEL-EXT.
            EXIT.
       *
-      *
       *****************************************************************
       *    剤変更画面へ
       *****************************************************************
@@ -10534,6 +10540,11 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                MOVE    "5"         TO  WRK-RRK-HKNKBN
                            END-IF
                        END-IF
+      *H25.7
+      *                第三者行為
+                       IF     (SPA-NAI-TRSI-HKNKBN (IDH)   =   "6")
+                           MOVE    "7"             TO  WRK-RRK-HKNKBN
+                       END-IF
                    END-IF
                    MOVE    SPA-HKN-MAX             TO  IDH
                END-IF
@@ -11268,6 +11279,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    会計連番
            MOVE    SPA-RRK-KAIKEI-RENNUM(IDX)
                                        TO  JYURRK-KAIKEI-RENNUM
+           IF      JYURRK-KAIKEI-RENNUM    =   ZERO
+               MOVE    1               TO  JYURRK-KAIKEI-RENNUM
+           END-IF
       *
       *****MOVE    "1"                 TO  JYURRK-LASTKBN
       *
@@ -12797,6 +12811,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        3104-SYUNOU-CHECK-EXT.
            EXIT.
       *
+      *!!!未使用
       *****************************************************************
       *    保険組合せ名称編集処理
       *****************************************************************
@@ -12831,6 +12846,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        510-HKNCOMBI-MEI-EXT.
            EXIT.
+      *!!!未使用
       *
       *****************************************************************
       *    保険組合せ名称編集処理
@@ -12962,6 +12978,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        5101-HKNCOMBI-SET-EXT.
            EXIT.
+      *!!!未使用　まで
+      *
+      *
       *****************************************************************
       *    算定履歴チェック処理
       *****************************************************************
@@ -13627,6 +13646,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  FLG-RSIHKN-OK
            MOVE    ZERO                TO  FLG-KOGHKN-OK
            MOVE    ZERO                TO  FLG-RSIHKN-OK2
+           MOVE    ZERO                TO  FLG-DAISAN-OK
            IF     (SPA-GMN-PTNUM   NOT =   SPACE )  AND
                   (SPA-GMN-PTID    NOT =   ZERO  )  AND
                   (SPA-ERRCD           =   SPACE )  AND
@@ -13692,6 +13712,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPACE               TO  SPA-XC01-RSI-HKNKBN
                IF     (FLG-RSIHKN-OK   NOT =   ZERO ) OR
                       (FLG-KOGHKN-OK   NOT =   ZERO )
+                 OR   (FLG-DAISAN-OK   NOT =   ZERO )
                    MOVE    "1"             TO  SPA-XC01-CHK
                END-IF
            ELSE
@@ -13802,6 +13823,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        MOVE    1               TO  FLG-KOGHKN-OK
                    ELSE
                        MOVE    1               TO  FLG-HKN-OK
+                   END-IF
+      *!!!
+      *            第三者行為
+                   IF     (SPA-NAI-TRSI-HKNKBN (IDH)   =   "6")
+                       MOVE    1               TO  FLG-DAISAN-OK
                    END-IF
                END-IF
            ELSE
@@ -13990,6 +14016,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     SPA-XC01-RSI-HKNKBN  =   "4"
       *D                               OR  "5"
                MOVE    "2"                 TO  SPA-XC01-HKNKBN
+           END-IF
+      *
+      *    第三者行為
+           IF     SPA-XC01-RSI-HKNKBN  =   "6"
+               MOVE    "4"                 TO  SPA-XC01-HKNKBN
            END-IF
       *
            MOVE    SPA-NAI-RESPRVFLG   TO  SPA-XC01-RESPRVFLG

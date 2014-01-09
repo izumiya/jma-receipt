@@ -35,6 +35,7 @@
       * 03.05.00     NACL-多々納  07/05/XX  グループ診療対応
       * 04.02.00     NACL-多々納  08/03/XX  Ｈ２０年４月改正
       * 04.06.00     NACL-多々納  10/09/06  自費保険入院中入力対応
+      * 04.07.00     NACL-多々納  14/01/08  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -505,9 +506,11 @@
                    END-IF
       *******  END-IF
       *        労災・自賠責は対象外
-               IF      COMB-HKNNUM         =   "971"  OR
+               IF     (COMB-HKNNUM         =   "971"  OR
                                                "973"
-                                           OR  "975"
+                                           OR  "975"  )
+      *           第三者行為
+                  OR  (COMB-KOH1HKNNUM     =   "970"  )
                   MOVE    ZERO                 TO  FLG-HKNCOMBICHK
                END-IF
       *
@@ -1177,10 +1180,12 @@
                INITIALIZE                  HKNCOMBI-REC
            END-IF
       *    労災・自賠責は対象外
-           IF      COMB-HKNNUM         =   "971"  OR
+           IF     (COMB-HKNNUM         =   "971"  OR
                                            "973"
       *        公害
-                                       OR  "975"
+                                       OR  "975"  )
+      *           第三者行為
+              OR  (COMB-KOH1HKNNUM     =   "970"  )
                MOVE    "0001"              TO  SPA-ERRCD
                MOVE    1                   TO  SPA-J021-CUR
            END-IF
