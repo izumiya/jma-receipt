@@ -147,6 +147,7 @@
                                                ORCBSD01-KGIPROCKBN
                                                ORCBSD01-KOUKIPROCKBN
                                                ORCBSD01-CHIKENPROCKBN
+                                               ORCBSD01-DAISANPROCKBN
            END-UNSTRING
       *
            DISPLAY "ORCBSD01-IKTKBT = " ORCBSD01-IKTKBT
@@ -165,7 +166,8 @@
            DISPLAY "ORCBSD01-STSRYYMD = " ORCBSD01-STSRYYMD
            DISPLAY "ORCBSD01-EDSRYYMD = " ORCBSD01-EDSRYYMD
            DISPLAY "ORCBSD01-KGIPROCKBN = " ORCBSD01-KGIPROCKBN
-           DISPLAY "ORCBSD01-KOUKIPROCKBN = " ORCBSD01-KOUKIPROCKBN
+           DISPLAY "ORCBSD01-CHIKENPROCKBN = " ORCBSD01-CHIKENPROCKBN
+           DISPLAY "ORCBSD01-DAISANPROCKBN = " ORCBSD01-DAISANPROCKBN
            DISPLAY " " 
            DISPLAY " " 
       *

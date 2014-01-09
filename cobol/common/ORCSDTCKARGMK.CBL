@@ -282,6 +282,7 @@
            MOVE    "1"             TO  ORCBSD01-KGIPROCKBN
            MOVE    "1"             TO  ORCBSD01-KOUKIPROCKBN
            MOVE    "1"             TO  ORCBSD01-CHIKENPROCKBN
+           MOVE    "1"             TO  ORCBSD01-DAISANPROCKBN
       *
            MOVE   SPA-HOSPNUM      TO  SHELLTBL-ARG1
            MOVE    LNK-PRTKANRI-RENNUM
@@ -345,9 +346,11 @@
                                    TO  SHELLTBL-ARG33
            MOVE    ORCBSD01-CHIKENPROCKBN
                                    TO  SHELLTBL-ARG34
-           MOVE    LINK-SHORI-KBN  TO  SHELLTBL-ARG35
-           MOVE    LINK-HKNKBN     TO  SHELLTBL-ARG36
-           MOVE    LINK-PTID       TO  SHELLTBL-ARG37
+           MOVE    ORCBSD01-DAISANPROCKBN
+                                   TO  SHELLTBL-ARG35
+           MOVE    LINK-SHORI-KBN  TO  SHELLTBL-ARG36
+           MOVE    LINK-HKNKBN     TO  SHELLTBL-ARG37
+           MOVE    LINK-PTID       TO  SHELLTBL-ARG38
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE

@@ -969,6 +969,8 @@
       *    労災・自賠の時、点数表示なし
            IF    ( COMB-HKNNUM             =    "971"
                                            OR   "973" )
+            OR   ( COMB-KOHHKNNUM (1)      =    "970"
+              AND  SYU-PTFTNRATE       NOT =     ZERO )
                IF    ( COMB-HKNNUM             =    "971"
                    AND PTRSI-HKNKBN        NOT =    "5"
                    AND SYS-4001-RSIIRYOKBN     =    "1" )
@@ -986,6 +988,7 @@
                                        +    SYU-RSISAISHIN-MONEY
                                        +    SYU-RSISDO-MONEY
                                        +    SYU-RSIETC-MONEY
+                                       +    SYU-KOH-FTN
                    MOVE    WRK-GOKTEN      TO  WRK-KINGAKU-Z
                    MOVE    WRK-KINGAKU-Z   TO  WRK-ZHENSYU12
                    PERFORM 800-HENKAN-SEC
@@ -1001,6 +1004,11 @@
                        MOVE  "（内労災診察等）"  TO HCN03-RSIMIDASI
                    WHEN    "973"
                        MOVE  "（内自賠診察等）"  TO HCN03-RSIMIDASI
+                   WHEN    OTHER
+                       IF    ( COMB-KOHHKNNUM (1)   =   "970" )
+                           MOVE  "（内自賠文書等）"
+                                                 TO HCN03-RSIMIDASI
+                       END-IF
                END-EVALUATE
                MOVE    SYU-RSI-TOTAL          TO  WRK-KINGAKU-Z
                MOVE    WRK-KINGAKU-Z          TO  WRK-ZHENSYU12

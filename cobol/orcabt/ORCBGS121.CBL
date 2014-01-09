@@ -59,8 +59,10 @@
       *
        WORKING-STORAGE             SECTION.
       *
-           COPY  "HCGS121N.INC".
-           COPY  "HCGS121G.INC".
+           COPY  "HCGS121NV02.INC" REPLACING  //HCGS121NV02//
+                                   BY         //HCGS121N//.
+           COPY  "HCGS121GV02.INC" REPLACING  //HCGS121GV02//
+                                   BY         //HCGS121G//.
       *
        01  ASS-AREA.
            03  ASS-BGSMEI          PIC X(255).
@@ -127,7 +129,7 @@
            03  WRK-NYUGAIKBNMEI    PIC X(04).
            03  WRK-PRTKBN.
                05  WRK-PRTKBN9     PIC 9(01).
-           03  WRK-PRTKBNMEI       PIC X(10).
+           03  WRK-PRTKBNMEI       PIC X(40).
            03  WRK-DATAKBN         PIC X(01).
            03  WRK-DATAKBNMEI      PIC X(50).
            03  WRK-HKNKBN-G.
@@ -277,15 +279,16 @@
                05  KEY-HKNKBN2     PIC 9(02).
       *
        01  CONST-AREA.
-           03  CONST-SYAHO         PIC 9(01)   VALUE 1.
-           03  CONST-KOKUHO        PIC 9(01)   VALUE 2.
-           03  CONST-KOUKI         PIC 9(01)   VALUE 3.
-           03  CONST-TOKUYOU       PIC 9(01)   VALUE 4.
-           03  CONST-JIHI          PIC 9(01)   VALUE 5.
-           03  CONST-CHIKEN        PIC 9(01)   VALUE 6.
-           03  CONST-ROUSAI        PIC 9(01)   VALUE 7.
-           03  CONST-JIBAI         PIC 9(01)   VALUE 8.
-           03  CONST-KOUGAI        PIC 9(01)   VALUE 9.
+           03  CONST-SYAHO         PIC 9(02)   VALUE 1.
+           03  CONST-KOKUHO        PIC 9(02)   VALUE 2.
+           03  CONST-KOUKI         PIC 9(02)   VALUE 3.
+           03  CONST-TOKUYOU       PIC 9(02)   VALUE 4.
+           03  CONST-JIHI          PIC 9(02)   VALUE 5.
+           03  CONST-CHIKEN        PIC 9(02)   VALUE 6.
+           03  CONST-ROUSAI        PIC 9(02)   VALUE 7.
+           03  CONST-JIBAI         PIC 9(02)   VALUE 8.
+           03  CONST-DAISAN        PIC 9(02)   VALUE 9.
+           03  CONST-KOUGAI        PIC 9(02)   VALUE 10.
       *
            03  CONST-SYA-KOU9HEI   PIC 9(02)   VALUE 1.
            03  CONST-SYA-KOU9TAN   PIC 9(02)   VALUE 2.
@@ -321,6 +324,8 @@
            03  CONST-JBI-USUAL      PIC 9(02)   VALUE 2.
       *
            03  CONST-KGI-GRP        PIC 9(02)   VALUE 1.
+      *
+           03  CONST-DSN-GRP        PIC 9(02)   VALUE 1.
       *
            03  CONST-HKNKBN2-TTL   PIC 9(02)   VALUE 99.
       *
@@ -630,6 +635,9 @@
                MOVE    "∈极清勒∷"    TO  HCGS121N-HKNNAME
            WHEN    CONST-KOUGAI
                MOVE    "∈给巢∷"      TO  HCGS121N-HKNNAME
+           WHEN    CONST-DAISAN
+               MOVE    "∈极清勒∈妈话荚乖百∷∷"
+                                       TO  HCGS121N-HKNNAME
            END-EVALUATE
       *
            MOVE    WRK-PRT-SRYYM       TO  HCGS121N-SRYYM
@@ -686,7 +694,9 @@
                    AND WRK-HKNKBN1         =   CONST-SYA-KOH )
                  OR (  BGSMEI-HOKEN        =   CONST-ROUSAI
                                             OR CONST-JIBAI
-                                            OR CONST-KOUGAI )
+                                            OR CONST-KOUGAI
+                                            OR CONST-DAISAN
+                                                            )
                    CONTINUE
                ELSE
                    IF    ( BGSMEI-HKNNUM   =   "009" )
@@ -954,6 +964,12 @@
                    MOVE    "给巢"
                                        TO  WRK-HKNKBNNAME
                END-EVALUATE
+           WHEN    CONST-DAISAN
+               EVALUATE    WRK-HKNKBN1
+               WHEN    CONST-DSN-GRP
+                   MOVE    "妈话荚乖百"
+                                       TO  WRK-HKNKBNNAME
+               END-EVALUATE
            END-EVALUATE
       *
            .
@@ -982,7 +998,7 @@
            INITIALIZE                  ORCSPRTAREA
       *
            IF    ( KEY-NYUGAIKBN   =   "1" )
-               MOVE    "HCGS121N.red"  TO  SPRT-PRTID
+               MOVE    "HCGS121NV02.red"  TO  SPRT-PRTID
                MOVE    HCGS121N        TO  SPRT-PRTDATA
            ELSE
                INITIALIZE                      HCGS121G
@@ -1028,7 +1044,7 @@
                                            TO  HCGS121G-TTLMONEY (IDX0)
                END-PERFORM
       *
-               MOVE    "HCGS121G.red"  TO  SPRT-PRTID
+               MOVE    "HCGS121GV02.red"  TO  SPRT-PRTID
                MOVE    HCGS121G        TO  SPRT-PRTDATA
       *
            END-IF
@@ -1103,6 +1119,9 @@
                MOVE    "汐阂"      TO  WRK-PRTKBNMEI
            WHEN    CONST-JIBAI
                MOVE    "极清勒"    TO  WRK-PRTKBNMEI
+           WHEN    CONST-DAISAN
+               MOVE    "极清勒∈妈话荚乖百∷" 
+                                   TO  WRK-PRTKBNMEI
            WHEN    CONST-KOUGAI
                MOVE    "给巢"      TO  WRK-PRTKBNMEI
            END-EVALUATE
@@ -1601,25 +1620,21 @@
       *
                    IF    ( BGS100P-HKNKBN-HKN
                                            NOT =   SPACE )
+      *
                        IF    ( BGS100P-HKNKBN-HKN
-                                               =   "1" OR "2" OR "3"
-                                                OR "7" OR "8" OR "9" )
+                                               =   "1" OR "2" OR "3" )
                            MOVE    BGS100P-HKNKBN-HKN
                                                TO  WRK-HKNKBN-HKN-G
                            IF    ( WRK-HKNKBN-HKN
                                            NOT =   BGSMEI-HOKEN )
                                MOVE    ZERO    TO  FLG-LOOPEND
                            END-IF
-                       ELSE
-                               MOVE    ZERO    TO  FLG-LOOPEND
-                       END-IF
-      *
-                       IF    ( BGS100P-HKNKBN-HKN
-                                               =   "1" OR "2" OR "3" )
                            IF    ( BGS100P-HKNKBN
                                            NOT =   BGSMEI-RECESBT (1:2))
                                MOVE    ZERO    TO  FLG-LOOPEND
                            END-IF
+                       ELSE
+                           MOVE        ZERO    TO  FLG-LOOPEND
                        END-IF
                    END-IF
       *

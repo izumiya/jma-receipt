@@ -138,6 +138,7 @@
            03  CNT-RSIMEI          PIC 9(08).
            03  CNT-JBIMEI          PIC 9(08).
            03  CNT-KGIMEI          PIC 9(08).
+           03  CNT-DSNMEI          PIC 9(08).
            03  CNT-BGSMEI          PIC 9(08).
       *
        01  STS-AREA.
@@ -171,7 +172,7 @@
            03  WRK-TABLE           PIC X(64).
            03  WRK-PATHNAME        PIC X(64).
            03  WRK-ERRMSG          PIC X(200).
-           03  WRK-HOKEN           PIC 9(1).
+           03  WRK-HOKEN           PIC 9(2).
            03  WRK-KOHKBN          PIC X(1).
            03  WRK-KOHNUM          PIC X(3).
            03  WRK-TTLID           PIC 9(5).
@@ -183,15 +184,16 @@
                05  WRK-HKNKBN2     PIC 9(02).
       *
        01  CONST-AREA.
-           03  CONST-SYAHO         PIC 9(01)   VALUE 1.
-           03  CONST-KOKUHO        PIC 9(01)   VALUE 2.
-           03  CONST-KOUKI         PIC 9(01)   VALUE 3.
-           03  CONST-TOKUYOU       PIC 9(01)   VALUE 4.
-           03  CONST-JIHI          PIC 9(01)   VALUE 5.
-           03  CONST-CHIKEN        PIC 9(01)   VALUE 6.
-           03  CONST-ROUSAI        PIC 9(01)   VALUE 7.
-           03  CONST-JIBAI         PIC 9(01)   VALUE 8.
-           03  CONST-KOUGAI        PIC 9(01)   VALUE 9.
+           03  CONST-SYAHO         PIC 9(02)   VALUE 1.
+           03  CONST-KOKUHO        PIC 9(02)   VALUE 2.
+           03  CONST-KOUKI         PIC 9(02)   VALUE 3.
+           03  CONST-TOKUYOU       PIC 9(02)   VALUE 4.
+           03  CONST-JIHI          PIC 9(02)   VALUE 5.
+           03  CONST-CHIKEN        PIC 9(02)   VALUE 6.
+           03  CONST-ROUSAI        PIC 9(02)   VALUE 7.
+           03  CONST-JIBAI         PIC 9(02)   VALUE 8.
+           03  CONST-DAISAN        PIC 9(02)   VALUE 9.
+           03  CONST-KOUGAI        PIC 9(02)   VALUE 10.
            03  CONST-RECEKA-MAX    PIC 9(05)   VALUE 100.
       *
            03  CONST-SYA-KOU9HEI   PIC 9(02)   VALUE 1.
@@ -239,6 +241,7 @@
            03  CONST-JBI-USUAL      PIC 9(02)   VALUE 2.
       *
            03  CONST-KGI-GRP        PIC 9(02)   VALUE 1.
+           03  CONST-DSN-GRP        PIC 9(02)   VALUE 1.
       *
            03  CONST-TOTAL-GROUPID PIC 9(02)   VALUE 99.
       *
@@ -440,11 +443,7 @@
            END-IF
       *
       *    ¤½¤ÎÂ¾ÀÁµá¡ÊÀÁµá´ÉÍý¤è¤ê¡Ë
-           IF    ( BGS100P-MEISAI      =   1 )
-            OR  (( BGS100P-SOUKATU     =   1 )
-            AND  ( BGS100P-ETCGETKBN   =   "0" ))
-               PERFORM 2002-ETC-SEIKYU-EDIT-SEC
-           END-IF
+           PERFORM 2002-ETC-SEIKYU-EDIT-SEC
       *
       *    ¿ÇÎÅ²ÊÊÔ½¸
            IF    ( BGS100P-RC      =   ZERO )
@@ -536,6 +535,8 @@
                MOVE    CONST-JIBAI     TO  WRK-HOKEN
            WHEN    "975"
                MOVE    CONST-KOUGAI    TO  WRK-HOKEN
+           WHEN    "970"
+               MOVE    CONST-DAISAN    TO  WRK-HOKEN
            WHEN    OTHER
                MOVE    CONST-SYAHO     TO  WRK-HOKEN
            END-EVALUATE
@@ -768,6 +769,8 @@
                MOVE    CONST-JIBAI     TO  WRK-HOKEN
            WHEN    "975"
                MOVE    CONST-KOUGAI    TO  WRK-HOKEN
+           WHEN    "970"
+               MOVE    CONST-DAISAN    TO  WRK-HOKEN
            WHEN    OTHER
                MOVE    CONST-SYAHO     TO  WRK-HOKEN
            END-EVALUATE
@@ -830,6 +833,8 @@
                    COMPUTE CNT-JBIMEI  =   CNT-JBIMEI  +   1
                WHEN    CONST-KOUGAI
                    COMPUTE CNT-KGIMEI  =   CNT-KGIMEI  +   1
+               WHEN    CONST-DAISAN
+                   COMPUTE CNT-DSNMEI  =   CNT-DSNMEI  +   1
                END-EVALUATE
            END-IF
       *
@@ -897,6 +902,8 @@
                PERFORM 9001-JIBAI-HKNKBN-EDIT-SEC
            WHEN    CONST-KOUGAI
                PERFORM 9001-KOUGAI-HKNKBN-EDIT-SEC
+           WHEN    CONST-DAISAN
+               PERFORM 9001-DAISAN-HKNKBN-EDIT-SEC
            END-EVALUATE
            MOVE    WRK-HKNKBN-G    TO  BGSMEI-RECESBT
       *
@@ -928,6 +935,8 @@
                PERFORM 9001-JIBAI-GROUPID-EDIT-SEC
            WHEN    CONST-KOUGAI
                PERFORM 9001-KOUGAI-GROUPID-EDIT-SEC
+           WHEN    CONST-DAISAN
+               PERFORM 9001-DAISAN-GROUPID-EDIT-SEC
            END-EVALUATE
            MOVE    WRK-GROUPID     TO  BGSMEI-GROUPID
       *
@@ -998,10 +1007,17 @@
                    UNTIL ( IDX-NG    >   2 )
       *
                PERFORM VARYING IDX-HKN    FROM    1   BY  1
-                       UNTIL ( IDX-HKN >  9 )
+                       UNTIL ( IDX-HKN >  10 )
       *
-                   INITIALIZE              BGSETC-REC
-                   MOVE   IDX-HKN      TO  BGSETC-HOKEN
+                   INITIALIZE          BGSETC-REC
+                   EVALUATE    IDX-HKN
+                   WHEN   9
+                       MOVE   10       TO  BGSETC-HOKEN
+                   WHEN   10
+                       MOVE   9        TO  BGSETC-HOKEN
+                   WHEN   OTHER
+                       MOVE   IDX-HKN  TO  BGSETC-HOKEN
+                   END-EVALUATE
                    IF    ( IDX-NG      =   1 )
                        MOVE    "1"     TO  BGSETC-NYUGAIKBN
                    ELSE
@@ -1112,6 +1128,8 @@
                        MOVE    "4"         TO  LNK-SKYGET-KBN
                    WHEN    "975"
                        MOVE    "5"         TO  LNK-SKYGET-KBN
+                   WHEN    "970"
+                       MOVE    "6"         TO  LNK-SKYGET-KBN
                    END-EVALUATE
                    MOVE    BGS100P-SRYYM   TO  LNK-SKYGET-SRYYM
                    CALL    "ORCSSKYGET"        USING
@@ -1167,6 +1185,8 @@
                MOVE    CONST-JIBAI     TO  WRK-HOKEN
            WHEN    "975"
                MOVE    CONST-KOUGAI    TO  WRK-HOKEN
+           WHEN    "970"
+               MOVE    CONST-DAISAN    TO  WRK-HOKEN
            END-EVALUATE
       *
            MOVE    WRK-HOKEN           TO  BGSETC-HOKEN
@@ -1450,7 +1470,16 @@
                    MOVE    1           TO  FLG-LOOPEND
       *
                    IF    ( RECE10-HKNNUM-S
-                               =   "971" OR "973" OR "975" )
+                               =   "970" OR "971" OR "973" OR "975" )
+                       CONTINUE
+                   ELSE
+                       MOVE    ZERO    TO  FLG-LOOPEND
+                   END-IF
+      *
+                   IF    ( BGS100P-MEISAI      =   1 )
+                    OR  (( BGS100P-SOUKATU     =   1 )
+                    AND  ( BGS100P-ETCGETKBN   =   "0" ))
+                    OR   ( RECE10-HKNNUM-S     =   "970" )
                        CONTINUE
                    ELSE
                        MOVE    ZERO    TO  FLG-LOOPEND
@@ -1812,6 +1841,19 @@
        9001-KOUGAI-HKNKBN-EDIT-EXT.
            EXIT.
       *****************************************************************
+      *    Âè»°¼Ô¹Ô°ÙÊÝ¸±¶èÊ¬ÊÔ½¸½èÍý
+      *****************************************************************
+       9001-DAISAN-HKNKBN-EDIT-SEC     SECTION.
+      *
+           INITIALIZE                  WRK-HKNKBN-G
+      *
+           PERFORM 9001-DAISAN-GROUPID-EDIT-SEC
+           MOVE    WRK-GROUPID     TO  WRK-HKNKBN1
+      *
+           .
+       9001-DAISAN-HKNKBN-EDIT-EXT.
+           EXIT.
+      *****************************************************************
       *    ¼ÒÊÝ¥°¥ë¡¼¥×£É£ÄÊÔ½¸½èÍý
       *****************************************************************
        9001-SYAHO-GROUPID-EDIT-SEC     SECTION.
@@ -2113,6 +2155,25 @@
            .
       *
        9001-KOUGAI-GROUPID-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    Âè»°¼Ô¹Ô°Ù¥°¥ë¡¼¥×£É£ÄÊÔ½¸½èÍý
+      *****************************************************************
+       9001-DAISAN-GROUPID-EDIT-SEC       SECTION.
+      *
+           MOVE   ZERO                    TO  WRK-GROUPID
+      *
+           EVALUATE    RECE10-RECESYUBETU
+           WHEN    "7011"
+           WHEN    "7001"
+                   MOVE    CONST-DSN-GRP  TO  WRK-GROUPID
+           WHEN    OTHER
+               DISPLAY "RECESBT[" RECE10-RECESYUBETU "]" RECE10-REC
+           END-EVALUATE
+      *
+           .
+      *
+       9001-DAISAN-GROUPID-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â¸¡º÷½èÍý¡ÊFHETCH¤â¹Ô¤¦)

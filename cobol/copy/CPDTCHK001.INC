@@ -30,3 +30,5 @@
            03  DTCHK001-PTID               PIC 9(10).
            03  DTCHK001-MULHKNKBN          PIC  X(01).
            03  DTCHK001-HKNKBN             PIC  X(01).
+           03  DTCHK001-DAISAN             PIC  X(01).
+           03  DTCHK001-KOHID              PIC  9(10).

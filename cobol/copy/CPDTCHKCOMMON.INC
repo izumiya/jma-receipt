@@ -55,6 +55,9 @@
            03  THKNCOMBI-MAX                           PIC 9(05).
            03  THKNCOMBI-OCC                           OCCURS 40.
                05  THKNCOMBI-HKNCOMBI                  PIC 9(04).
+               05  THKNCOMBI-HKNNUM                    PIC X(03).
+               05  THKNCOMBI-KOHNUM                    PIC X(03).
+               05  THKNCOMBI-KOHID                     PIC 9(10).
                05  THKNCOMBI-ACCTKBN                   PIC X(01).
                05  THKNCOMBI-STYMD                     PIC X(08).
                05  THKNCOMBI-EDYMD                     PIC X(08).

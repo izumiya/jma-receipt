@@ -717,6 +717,7 @@
            03  PTZAI-ACCTKBN                   PIC X(01).
            03  PTZAI-NYUGAIKBN                 PIC X(01).
            03  PTZAI-HKNNUM                    PIC X(03).
+           03  PTZAI-KOHNUM                    PIC X(03).
            03  PTZAI-DAY                       PIC 9(05)
                                                OCCURS  31.
       *
@@ -813,6 +814,8 @@
                                                    VALUE   "7".
            03  CONST-CHIKEN                        PIC X(01)
                                                    VALUE   "8".
+           03  CONST-DAISAN                        PIC X(01)
+                                                   VALUE   "9".
            03  CONST-HOUKATU                       PIC X(01)
                                                    VALUE   "H".
            03  CONST-MKCD-MAX                      PIC 9(05)
@@ -2551,6 +2554,10 @@
                IF    ( DTCHK003-HKNKBN =   CONST-ROSAI )
                    MOVE    1           TO  FLG-TAISYO-HKN
                END-IF
+           WHEN      ( WRK-ZAIHKNNUM   =   "970" )
+               IF    ( DTCHK003-HKNKBN =   CONST-DAISAN )
+                   MOVE    1           TO  FLG-TAISYO-HKN
+               END-IF
            WHEN      ( WRK-ZAIHKNNUM   =   "973" )
                IF    ( DTCHK003-HKNKBN =   CONST-JIBAI )
                    MOVE    1           TO  FLG-TAISYO-HKN
@@ -2593,6 +2600,10 @@
       *
            MOVE    PTZAI-HKNNUM (IDX-ZAI)
                                    TO   WRK-ZAIHKNNUM
+           IF    ( PTZAI-KOHNUM (IDX-ZAI)  =   "970" )
+               MOVE    PTZAI-KOHNUM (IDX-ZAI)
+                                   TO   WRK-ZAIHKNNUM
+           END-IF
            PERFORM 2001111-TAISYO-HKN-CHK-SEC
            IF    ( FLG-TAISYO-HKN      =   1 )
            AND   ( DCACCT-STS-NYUINDAY =   ZERO )
@@ -2716,6 +2727,7 @@
                                            TO  PTZAI-NYUGAIKBN
                                                             (PTZAI-MAX)
                    MOVE    DCACCT-HKNNUM   TO  PTZAI-HKNNUM (PTZAI-MAX)
+                   MOVE    DCACCT-KOHNUM   TO  PTZAI-KOHNUM (PTZAI-MAX)
                    MOVE    DCACCT-DAYCNT   TO  PTZAI-DAY
                                                  (PTZAI-MAX DCACCT-DAY)
       *
@@ -3003,6 +3015,15 @@
       *
                    MOVE    DCACCT-HKNCOMBI
                                        TO  THKNCOMBI-HKNCOMBI
+                                                       (THKNCOMBI-MAX)
+                   MOVE    DCACCT-HKNNUM
+                                       TO  THKNCOMBI-HKNNUM
+                                                       (THKNCOMBI-MAX)
+                   MOVE    DCACCT-KOHNUM
+                                       TO  THKNCOMBI-KOHNUM
+                                                       (THKNCOMBI-MAX)
+                   MOVE    DCACCT-KOHID
+                                       TO  THKNCOMBI-KOHID
                                                        (THKNCOMBI-MAX)
                    MOVE    DCACCT-ACCTKBN
                                        TO  THKNCOMBI-ACCTKBN
@@ -3544,6 +3565,10 @@
                ELSE
                    MOVE    PTZAI-HKNNUM (IDX-ZAI)
                                            TO   WRK-ZAIHKNNUM
+                   IF    ( PTZAI-KOHNUM (IDX-ZAI)  =   "970" )
+                       MOVE    PTZAI-KOHNUM (IDX-ZAI)
+                                           TO   WRK-ZAIHKNNUM
+                   END-IF
                    PERFORM 2001111-TAISYO-HKN-CHK-SEC
                    IF    ( FLG-TAISYO-HKN      =   1 )
                        MOVE    1           TO  WRK-HKNFLG
@@ -3574,7 +3599,7 @@
       *
       *
                        IF    ( PTZAI-HKNNUM (IDX-ZAI)
-                                               =   "971" OR "973" )
+                                           =   "971" OR "973" )
                            CONTINUE
                        ELSE
                            MOVE    "1"     TO  TSRYCD-DAY-IHOKBN
@@ -4015,6 +4040,10 @@
                 AND (  TNS-TANICD          =   SPACE  OR "000" )
                    MOVE    PTZAI-HKNNUM (IDX-ZAI)
                                            TO   WRK-ZAIHKNNUM
+                   IF    ( PTZAI-KOHNUM (IDX-ZAI)  =   "970" )
+                       MOVE    PTZAI-KOHNUM (IDX-ZAI)
+                                           TO   WRK-ZAIHKNNUM
+                   END-IF
                    PERFORM 2001111-TAISYO-HKN-CHK-SEC
                    IF    ( FLG-TAISYO-HKN      =   1 )
                        IF    ( PTZAI-NYUGAIKBN (IDX-ZAI)
@@ -4267,6 +4296,10 @@
       *
                MOVE    PTZAI-HKNNUM (IDX-ZAI)
                                   TO   WRK-ZAIHKNNUM
+               IF    ( PTZAI-KOHNUM (IDX-ZAI)  =   "970" )
+                   MOVE    PTZAI-KOHNUM (IDX-ZAI)
+                                   TO   WRK-ZAIHKNNUM
+               END-IF
                PERFORM 2001111-TAISYO-HKN-CHK-SEC
                IF    ( FLG-TAISYO-HKN  =   ZERO )
                 OR   ( PTZAI-NYUGAIKBN (IDX-ZAI)
@@ -4510,6 +4543,14 @@
       *    データチェック処理
       *****************************************************************
        20011-DATA-CHK-CHKMST-SEC       SECTION.
+      *
+      *    併用算定のチェック用に
+      *    入力引数とは反対の入外区分および、対象外の保険で診療会計
+      *    テーブルを検索する
+           IF    ( ORCBSD01-CHKKBN (11)    NOT =   ZERO )
+            OR   ( ORCBSD01-CHKKBN (16)    NOT =   ZERO )
+               PERFORM 200112-SRYINF-TAIHI-SEC
+           END-IF
       *
            INITIALIZE                  PTACCT-AREA
                                        PTSRY-AREA
@@ -5165,8 +5206,8 @@
       *        負担者番号・受給者番号抜け
                IF    ( FLG-CHKEND (3)          =   ZERO )
       *
-      *            長期以外を対象とする
-                   IF    ( PTKOH-KOHNUM    NOT =   "972" AND "974" )
+      *            第三者行為、長期以外を対象とする
+                   IF    ( PTKOH-KOHNUM NOT = "970" AND "972" AND "974")
                         PERFORM 200111-FTNJKYNUM-CHK-SEC
                    END-IF
                END-IF
@@ -5532,6 +5573,7 @@
                 OR   ( COMB-HKNNUM         =   "971" )
                 OR   ( COMB-HKNNUM         =   "973" )
                 OR   ( COMB-HKNNUM         =   "975" )
+                OR   ( COMB-KOHHKNNUM (1)  =   "970" )
                 OR   ( COMB-HKNNUM (1:2)   =   "98" OR "90" OR "91" )
                 OR  (( COMB-HKNNUM         =   "002") 
                  AND ( COMB-HOJOKBN        >=  "A" )
@@ -5953,46 +5995,71 @@
            END-IF
       *
            IF    ( PTBYO-HKNCOMBI  NOT =   ZERO )
-               MOVE    PTBYO-HKNCOMBI  TO  WRK-HKNCOMBI
-               PERFORM 220-HKNCOMBI-GET-SEC
-               MOVE    COMB-HKNNUM         TO  WRK-ZAIHKNNUM
-               PERFORM 2001111-TAISYO-HKN-CHK-SEC
-               IF    ( FLG-TAISYO-HKN  =   ZERO )
-                   MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
+            OR   ( PTBYO-KOHID     NOT =   ZERO )
+      *
+               MOVE    "99999999"          TO  WRK-BYOEDYMD
+               IF    ( PTBYO-TENKIYMD  NOT =   SPACE )
+                   MOVE    PTBYO-TENKIYMD  TO  WRK-BYOEDYMD
                END-IF
       *
-               MOVE    ZERO            TO  WRK-HKNCOMBI
-               PERFORM VARYING IDX-COMB    FROM    1   BY  1
-                       UNTIL ( IDX-COMB    >   THKNCOMBI-MAX )
-                        OR   ( WRK-HKNCOMBI    NOT =   ZERO )
-      *
-                   IF    ( COMB-HKNCOMBINUM    =   THKNCOMBI-HKNCOMBI
-                                                        (IDX-COMB))
-                       MOVE    THKNCOMBI-HKNCOMBI (IDX-COMB)
-                                       TO  WRK-HKNCOMBI
-                       MOVE    "99999999"          TO  WRK-BYOEDYMD
-                       IF    ( PTBYO-TENKIYMD  NOT =   SPACE )
-                           MOVE    PTBYO-TENKIYMD  TO  WRK-BYOEDYMD
-                       END-IF
-      *
-                       IF    ( PTBYO-SRYYMD    <=  COMB-TEKEDYMD )
-                        AND  ( WRK-BYOEDYMD    >=  COMB-TEKSTYMD )
-                           CONTINUE
-                       ELSE
-                           MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
-                       END-IF
-      *
+               IF    ( PTBYO-HKNCOMBI  NOT =   ZERO )
+                   MOVE    PTBYO-HKNCOMBI  TO  WRK-HKNCOMBI
+                   PERFORM 220-HKNCOMBI-GET-SEC
+                   MOVE    COMB-HKNNUM     TO  WRK-ZAIHKNNUM
+                   PERFORM 2001111-TAISYO-HKN-CHK-SEC
+                   IF    ( FLG-TAISYO-HKN  =   ZERO )
+                       MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
                    END-IF
       *
-               END-PERFORM
+                   MOVE    ZERO            TO  WRK-HKNCOMBI
+                   PERFORM VARYING IDX-COMB    FROM    1   BY  1
+                           UNTIL ( IDX-COMB    >   THKNCOMBI-MAX )
+                            OR   ( WRK-HKNCOMBI    NOT =   ZERO )
       *
-               IF    ( WRK-HKNCOMBI    =   ZERO )
+                       IF    ( COMB-HKNCOMBINUM
+                                           =   THKNCOMBI-HKNCOMBI
+                                                        (IDX-COMB))
+                           MOVE    THKNCOMBI-HKNCOMBI (IDX-COMB)
+                                           TO  WRK-HKNCOMBI
+      *
+                           IF    ( PTBYO-SRYYMD    <=  COMB-TEKEDYMD )
+                            AND  ( WRK-BYOEDYMD    >=  COMB-TEKSTYMD )
+                               CONTINUE
+                           ELSE
+                               MOVE    ZERO
+                                           TO  FLG-TAISYO-BYOMEI
+                           END-IF
+      *
+                       END-IF
+      *
+                   END-PERFORM
+      *
+                   IF    ( WRK-HKNCOMBI    =   ZERO )
                            MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
+                   END-IF
+               END-IF
+               IF    ( PTBYO-KOHID     NOT =   ZERO )
+                   MOVE    "970"           TO  WRK-ZAIHKNNUM
+                   PERFORM 2001111-TAISYO-HKN-CHK-SEC
+                   IF    ( FLG-TAISYO-HKN  =   ZERO )
+                       MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
+                   ELSE
+                       MOVE    PTBYO-KOHID TO  WRK-KOHID
+                       PERFORM 900-PTKOHINF-KEY-SEL-SEC
+                       IF    ( PTBYO-SRYYMD    <=  PTKOH-TEKEDYMD )
+                        AND  ( WRK-BYOEDYMD    >=  PTKOH-TEKSTYMD )
+                           CONTINUE
+                       ELSE
+                           MOVE    ZERO
+                                           TO  FLG-TAISYO-BYOMEI
+                       END-IF
+                   END-IF
                END-IF
            ELSE
                IF    ( DTCHK003-HKNKBN =   CONST-ROSAI
                                        OR  CONST-JIBAI 
-                                       OR  CONST-KOUGAI )
+                                       OR  CONST-KOUGAI
+                                       OR  CONST-DAISAN     )
                    MOVE    ZERO        TO  FLG-TAISYO-BYOMEI
                END-IF
            END-IF
@@ -11124,6 +11191,10 @@
            END-PERFORM
       *
            MOVE    DCACCT-HKNNUM   TO  WRK-ZAIHKNNUM
+           IF    ( DCACCT-KOHNUM   =   "970" )
+               MOVE    DCACCT-KOHNUM
+                                   TO  WRK-ZAIHKNNUM
+           END-IF
            PERFORM 2001111-TAISYO-HKN-CHK-SEC
            IF    ( FLG-TAISYO-HKN  =   1 )
             AND  ( DTCHK003-HKNKBN NOT =   CONST-HOUKATU )
@@ -11131,6 +11202,9 @@
                MOVE    DCACCT-HKNNUM       TO  WRK-HKNNUM
                IF    ( WRK-HKNNUM      =   SPACE )
                    MOVE    ZERO        TO  WRK-HKNNUM
+               END-IF
+               IF    ( DCACCT-KOHNUM   =   "970" )
+                   MOVE    "970"       TO  WRK-HKNNUM
                END-IF
                PERFORM VARYING IDX0    FROM    1   BY  1
                        UNTIL ( IDX0    >   CONST-TINGAI-MAX )
@@ -11247,6 +11321,7 @@
                MOVE    SYS-1101-RSI-INGAITEN
                                    TO  WRK-INGAITEN
            WHEN    CONST-JIBAI
+           WHEN    CONST-DAISAN
                MOVE    SYS-1101-JBI-INGAITEN
                                    TO  WRK-INGAITEN
            WHEN    CONST-JIHI
@@ -11760,12 +11835,14 @@
                MOVE    "4"             TO  WRK-SRTKBN
            WHEN  CONST-JIBAI
                MOVE    "5"             TO  WRK-SRTKBN
-           WHEN  CONST-KOUGAI
+           WHEN  CONST-DAISAN
                MOVE    "6"             TO  WRK-SRTKBN
-           WHEN  CONST-JIHI
+           WHEN  CONST-KOUGAI
                MOVE    "7"             TO  WRK-SRTKBN
-           WHEN  CONST-CHIKEN
+           WHEN  CONST-JIHI
                MOVE    "8"             TO  WRK-SRTKBN
+           WHEN  CONST-CHIKEN
+               MOVE    "9"             TO  WRK-SRTKBN
            WHEN  CONST-HOUKATU
                MOVE    "H"             TO  WRK-SRTKBN
            END-EVALUATE

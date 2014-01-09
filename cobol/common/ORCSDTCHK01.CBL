@@ -49,6 +49,7 @@
            03  FLG-LOOP-END                PIC 9(01).
            03  FLG-TAISYO-HKN              PIC 9(01).
            03  FLG-CHKSND                  PIC 9(01).
+           03  FLG-PTKOHINF                PIC 9(01).
            03  FLG-GRPCHK                  PIC 9(01).
       *
       *    Åº»úÎÎ°è
@@ -131,6 +132,8 @@
                                        VALUE   "7".
            03  CONST-CHIKEN            PIC X(01)
                                        VALUE   "8".
+           03  CONST-DAISAN            PIC X(01)
+                                       VALUE   "9".
            03  CONST-HOUKATU           PIC X(01)
                                        VALUE   "H".
            03  CONST-GRP-MAX           PIC 9(31)
@@ -151,6 +154,10 @@
       *    ¥Á¥§¥Ã¥¯¥Þ¥¹¥¿£²
        01  CHKSND-REC.
            COPY    "CPCHKSND.INC".
+      *
+      *    ´µ¼Ô¸øÈñ¾ðÊó
+       01  PTKOHINF-REC.
+           COPY    "CPPTKOHINF.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑÎÎ°è
@@ -744,6 +751,10 @@
                IF    ( SDTCHK01-HKNKBN =   CONST-JIBAI )
                    MOVE    1           TO  FLG-TAISYO-HKN
                END-IF
+           WHEN      ( WRK-ZAIHKNNUM   =   "970" )
+               IF    ( SDTCHK01-HKNKBN =   CONST-DAISAN )
+                   MOVE    1           TO  FLG-TAISYO-HKN
+               END-IF
            WHEN      ( WRK-ZAIHKNNUM   =   "975" )
                IF    ( SDTCHK01-HKNKBN =   CONST-KOUGAI )
                    MOVE    1           TO  FLG-TAISYO-HKN
@@ -979,51 +990,75 @@
                    END-IF
       *
                    IF    ( QDTCHK-HKNCOMBI  NOT =   ZERO )
-                       MOVE    QDTCHK-HKNCOMBI     TO  WRK-HKNCOMBI
-                       PERFORM 220-HKNCOMBI-GET-SEC
-                       MOVE    COMB-HKNNUM         TO  WRK-ZAIHKNNUM
-                       PERFORM 220-TAISYO-HKN-CHK-SEC
-                       IF    ( FLG-TAISYO-HKN  =   ZERO )
-                           MOVE    ZERO            TO  FLG-LOOP-END
+                    OR   ( QDTCHK-KOHID     NOT =   ZERO )
+      *
+                       MOVE    "99999999"  TO  WRK-BYOEDYMD
+                       IF    ( QDTCHK-TENKIYMD NOT = SPACE )
+                           MOVE    QDTCHK-TENKIYMD
+                                           TO  WRK-BYOEDYMD
                        END-IF
       *
-                       MOVE    ZERO            TO  WRK-HKNCOMBI
-                       PERFORM VARYING IDX-COMB    FROM    1   BY  1
-                               UNTIL ( IDX-COMB    >   THKNCOMBI-MAX )
-                                OR   ( WRK-HKNCOMBI    NOT =   ZERO )
+                       IF    ( QDTCHK-HKNCOMBI  NOT =   ZERO )
+                           MOVE    QDTCHK-HKNCOMBI     TO  WRK-HKNCOMBI
+                           PERFORM 220-HKNCOMBI-GET-SEC
+                           MOVE    COMB-HKNNUM         TO  WRK-ZAIHKNNUM
+                           PERFORM 220-TAISYO-HKN-CHK-SEC
+                           IF    ( FLG-TAISYO-HKN  =   ZERO )
+                               MOVE    ZERO            TO  FLG-LOOP-END
+                           END-IF
       *
-                           IF    ( COMB-HKNCOMBINUM
+                           MOVE    ZERO            TO  WRK-HKNCOMBI
+                           PERFORM VARYING IDX-COMB FROM    1   BY  1
+                                   UNTIL ( IDX-COMB >   THKNCOMBI-MAX )
+                                    OR   ( WRK-HKNCOMBI NOT =   ZERO )
+      *
+                               IF    ( COMB-HKNCOMBINUM
                                                =   THKNCOMBI-HKNCOMBI
                                                         (IDX-COMB))
-                               MOVE    THKNCOMBI-HKNCOMBI (IDX-COMB)
+                                   MOVE    THKNCOMBI-HKNCOMBI (IDX-COMB)
                                                    TO  WRK-HKNCOMBI
-                               MOVE    "99999999"  TO  WRK-BYOEDYMD
-                               IF    ( QDTCHK-TENKIYMD  NOT =   SPACE )
-                                   MOVE    QDTCHK-TENKIYMD
-                                                   TO  WRK-BYOEDYMD
+      *
+                                   IF    ( QDTCHK-SRYYMD
+                                               <=  COMB-TEKEDYMD )
+                                    AND  ( WRK-BYOEDYMD
+                                               >=  COMB-TEKSTYMD )
+                                       CONTINUE
+                                   ELSE
+                                       MOVE    ZERO    TO  FLG-LOOP-END
+                                   END-IF
+      *
                                END-IF
       *
+                           END-PERFORM
+      *
+                           IF    ( WRK-HKNCOMBI    =   ZERO )
+                                   MOVE    ZERO    TO  FLG-LOOP-END
+                           END-IF
+                       END-IF
+      *
+                       IF    ( QDTCHK-KOHID    NOT =   ZERO )
+                           MOVE    "970"           TO  WRK-ZAIHKNNUM
+                           PERFORM 220-TAISYO-HKN-CHK-SEC
+                           IF    ( FLG-TAISYO-HKN  =   ZERO )
+                               MOVE    ZERO        TO  FLG-LOOP-END
+                           ELSE
+                               PERFORM 900-PTKOHINF-KEY-SEL-SEC
                                IF    ( QDTCHK-SRYYMD
-                                               <=  COMB-TEKEDYMD )
+                                                   <=  PTKOH-TEKEDYMD )
                                 AND  ( WRK-BYOEDYMD
-                                               >=  COMB-TEKSTYMD )
+                                                   >=  PTKOH-TEKSTYMD )
                                    CONTINUE
                                ELSE
                                    MOVE    ZERO    TO  FLG-LOOP-END
                                END-IF
-      *
                            END-IF
-      *
-                       END-PERFORM
-      *
-                       IF    ( WRK-HKNCOMBI    =   ZERO )
-                                   MOVE    ZERO    TO  FLG-LOOP-END
                        END-IF
       *
                    ELSE
                        IF    ( SDTCHK01-HKNKBN      =  CONST-ROSAI
                                                     OR CONST-JIBAI
-                                                    OR CONST-KOUGAI  )
+                                                    OR CONST-KOUGAI 
+                                                    OR CONST-DAISAN )
                            MOVE    ZERO            TO  FLG-LOOP-END
                        END-IF
                    END-IF
@@ -1085,6 +1120,35 @@
       *
            .
        900-CHKSND-KEY25-FET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼Ô¸øÈñ¾ðÊó¸¡º÷½èÍý
+      *****************************************************************
+       900-PTKOHINF-KEY-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-PTKOHINF
+           INITIALIZE                      PTKOHINF-REC
+           MOVE    SDTCHK01-HOSPNUM    TO  PTKOH-HOSPNUM
+           MOVE    SDTCHK01-PTID       TO  PTKOH-PTID
+           MOVE    QDTCHK-KOHID        TO  PTKOH-KOHID
+           MOVE    PTKOHINF-REC        TO  MCPDATA-REC
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  PTKOHINF-REC
+           ELSE
+               MOVE    1               TO  FLG-PTKOHINF
+               INITIALIZE                  PTKOHINF-REC
+           END-IF
+      *
+           MOVE    "tbl_ptkohinf"      TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+      *
+       900-PTKOHINF-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    £Ä£Â¸¡º÷½èÍý¡ÊFHETCH¤â¹Ô¤¦)

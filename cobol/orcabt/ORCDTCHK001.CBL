@@ -108,8 +108,8 @@
                    07  CNT-KOUGAI                      PIC 9(03).
                    07  CNT-KOUKI                       PIC 9(03).
                    07  CNT-CHIKEN                      PIC 9(03).
+                   07  CNT-DAISAN                      PIC 9(03).
                    07  CNT-HOUKATU                     PIC 9(03).
-                   07  CNT-ETC                         PIC 9(03).
                05  CNT-HKNKBN-R    REDEFINES   CNT-HKNKBN-VAL.
                    07  CNT-HKNKBN                      PIC 9(03)
                                                        OCCURS   10.
@@ -135,14 +135,14 @@
                    07  WRK-KGIPROCKBN                  PIC X(01).
                    07  WRK-KOUKIPROCKBN                PIC X(01).
                    07  WRK-CHIKENPROCKBN               PIC X(01).
+                   07  WRK-DAISANPROCKBN               PIC X(01).
                    07  WRK-HOUKATUPROCKBN              PIC X(01).
-                   07  WRK-ETCPROCKBN                  PIC X(01).
                05  WRK-HKNKBN-R    REDEFINES           WRK-HKNKBN-VAL.
                    07  WRK-HKNKBN                      PIC X(01)
                                                        OCCURS  10.
       *
        01  CONST-AREA.
-           03  CONST-HKNKBN-MAX                PIC 9(03)   VALUE    9.
+           03  CONST-HKNKBN-MAX                PIC 9(03)   VALUE    10.
            03  CONST-HKNKBN-G.
                05  CONST-HKNKBN-VAL.
                    07  CONST-SYAHO             PIC X(01)   VALUE   "1".
@@ -153,10 +153,10 @@
                    07  CONST-KOUGAI            PIC X(01)   VALUE   "6".
                    07  CONST-KOUKI             PIC X(01)   VALUE   "7".
                    07  CONST-CHIKEN            PIC X(01)   VALUE   "8".
+                   07  CONST-DAISAN            PIC X(01)   VALUE   "9".
                    07  CONST-HOUKATU           PIC X(01)   VALUE   "H".
-                   07  CONST-ETC               PIC X(01)   VALUE   "E".
                05  CONST-HKNKBN-R      REDEFINES   CONST-HKNKBN-VAL.
-                   07  CONST-HKNKBN            PIC X(01)   OCCURS   9.
+                   07  CONST-HKNKBN            PIC X(01)   OCCURS   10.
       *
            COPY    "COMMON-SPA".
       *
@@ -354,6 +354,11 @@
                     OR   ( DCACCT-STS-NODATA   =   "1" )
                        MOVE    DCACCT-HKNNUM   TO  WRK-ZAIHKNNUM
                        MOVE    DCACCT-HKNCOMBI TO  WRK-ZAIHKNCOMBI
+                       IF    ( DCACCT-KOHNUM   =   "970" )
+                           MOVE    DCACCT-KOHNUM  
+                                               TO  WRK-ZAIHKNNUM
+                           MOVE    ZERO        TO  WRK-ZAIHKNCOMBI
+                       END-IF
                        PERFORM 220-TAISYO-HKN-CHK-SEC
                    END-IF
       *
@@ -454,6 +459,13 @@
       *
                IF    ( ORCBSD01-JBIPROCKBN  =   "1" )
                    MOVE    "1"         TO  WRK-JBIPROCKBN
+               END-IF
+           WHEN      ( WRK-ZAIHKNNUM   =   "970" )
+      *
+               MOVE    1               TO  CNT-DAISAN
+      *
+               IF    ( ORCBSD01-DAISANPROCKBN  =   "1" )
+                   MOVE    "1"         TO  WRK-DAISANPROCKBN
                END-IF
            WHEN      ( WRK-ZAIHKNNUM   =   "975" )
       *

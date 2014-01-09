@@ -409,7 +409,7 @@
            03  KEY-NYUGAIKBN               PIC X(01).
       *
        01  CONST-AREA.
-           03  CONST-KOKUHO        PIC 9(01) VALUE 2.
+           03  CONST-KOKUHO        PIC 9(02) VALUE 2.
            03  CONST-IPNKOU9       PIC 9(03) VALUE 1.
            03  CONST-IPNKOU7       PIC 9(03) VALUE 2.
            03  CONST-IPN           PIC 9(03) VALUE 3.

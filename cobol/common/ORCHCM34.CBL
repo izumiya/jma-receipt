@@ -678,8 +678,10 @@
                "¡Ú¥ì¥»¥×¥ÈÅ¦Í×Íó¥³¥á¥ó¥È¡Û".
                05  FILLER                       PIC X(52)   VALUE
                "¡ÚÏ«ºÒ¥ì¥»¥×¥È¡Ö½ýÉÂ¤Î·Ð²á¡×¡Û".
+               05  FILLER                       PIC X(52)   VALUE
+               "¡Ú¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡Ë¥ì¥»¥×¥ÈÅ¦Í×Íó¥³¥á¥ó¥È¡Û".
            03  CONST-RECECOM-R     REDEFINES   CONST-RECECOM-VAL.
-               05  CONST-RECECOM   PIC X(52)   OCCURS   12.
+               05  CONST-RECECOM   PIC X(52)   OCCURS   13.
       *    ÌôºÞÎÁÄþ¸º
            03  CONST-TEIGEN                PIC X(09)   VALUE
                "630010002".
@@ -2545,28 +2547,46 @@
                MOVE    1           TO  FLG-TARGET
                INITIALIZE              WRK-BYOMEI-G
       *
-               IF    ( ORCHCM34-HOKEN  =   SPACE )
-                OR   ( PTBYO-HKNCOMBI  =   SPACE )
-                   CONTINUE
-               ELSE
-                   MOVE    ZERO    TO  FLG-HIT
-                   PERFORM VARYING IDX0    FROM    1   BY  1
-                           UNTIL ( IDX0    >   ORCSHKN-HKN-MAX )
-                            OR   ( FLG-HIT =   1 )
+               IF    ( ORCHCM34-HOKEN  NOT =   SPACE )
+                   IF   ( PTBYO-HKNCOMBI   NOT =   SPACE )
+                       MOVE    ZERO    TO  FLG-HIT
+                       PERFORM VARYING IDX0    FROM    1   BY  1
+                               UNTIL ( IDX0    >   ORCSHKN-HKN-MAX )
+                                OR   ( FLG-HIT =   1 )
       *
-                       IF    ( PTBYO-HKNCOMBI
+                           IF    ( PTBYO-HKNCOMBI
                                    =   ORCSHKN-GMN-HKNCOMBINUM (IDX0))
       *
-                           MOVE    1       TO  FLG-HIT
+                               MOVE    1       TO  FLG-HIT
       *
-                           IF    ( FLG-ORCSHKNSET (IDX0)   =   1 )
-                               CONTINUE
-                           ELSE
-                               MOVE    ZERO    TO FLG-TARGET
+                               IF    ( FLG-ORCSHKNSET (IDX0)   =   1 )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    ZERO    TO FLG-TARGET
+                               END-IF
                            END-IF
-                       END-IF
+                       END-PERFORM
+                   END-IF
       *
-                   END-PERFORM
+                   IF    ( PTBYO-KOHID NOT =   ZERO )
+                       MOVE    ZERO    TO  FLG-HIT
+                       PERFORM VARYING IDX0    FROM    1   BY  1
+                               UNTIL ( IDX0    >   ORCSHKN-HKN-MAX )
+      *
+                           IF    ( PTBYO-KOHID
+                                   =   ORCSHKN-NAI-KOHID (IDX0 1))
+      *
+                               MOVE    1       TO  FLG-HIT
+      *
+                               IF    ( FLG-ORCSHKNSET (IDX0)   =   1 )
+                                   CONTINUE
+                               ELSE
+                                   MOVE    ZERO    TO FLG-TARGET
+                               END-IF
+                           END-IF
+                       END-PERFORM
+      *
+                   END-IF
       *
                END-IF
       *
@@ -5378,18 +5398,17 @@
       *
            END-PERFORM
       *
-           IF    (     IDX26               >   TCOMBI-MAX )
+           IF    (     IDX26               >   ZERO )
                IF    ( CONST-TCOMBI-MAX    >   TCOMBI-MAX )
-                   COMPUTE TCOMBI-MAX  =   TCOMBI-MAX  +   1
+                   MOVE    IDX26   TO      TCOMBI-MAX
                    MOVE    WRK-HKNCOMBINUM
-                                           TO  TCOMBI-HKNCOMBI
-                                                       (TCOMBI-MAX)
-                   COMPUTE TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
-                       =   TCOMBI-HKNCOMBI-CNT (TCOMBI-MAX)
-                       +   1
-                   MOVE    1       TO  TCOMBI-HKNCOMBI-DAY
-                                               (TCOMBI-MAX IDX25)
+                                   TO  TCOMBI-HKNCOMBI (TCOMBI-MAX)
                ELSE
+                   MOVE    ZERO    TO  IDX26
+               END-IF
+           END-IF
+      *
+           IF    (     IDX26               >   ZERO )
                    IF    ( TCOMBI-HKNCOMBI-DAY (IDX26 IDX25)
                                            =    ZERO )
                        COMPUTE TCOMBI-HKNCOMBI-CNT (IDX26)
@@ -5398,7 +5417,6 @@
                        MOVE    1   TO  TCOMBI-HKNCOMBI-DAY
                                                    (IDX26 IDX25)
                    END-IF
-               END-IF
            END-IF
       *
            .
@@ -5838,6 +5856,9 @@
                        WHEN    "AA"
                            MOVE    1           TO  TRECECOM-AA
                            MOVE    CONST-RECECOM (12)
+                                               TO  WRK-LONGSTR
+                       WHEN    "BB"
+                           MOVE    CONST-RECECOM (13)
                                                TO  WRK-LONGSTR
                        END-EVALUATE
                    END-IF
@@ -7793,6 +7814,15 @@
       *
                    IF    ( RECECOM-SJKBN       =   "AA" )
                        IF    ( WKCOMB-HKNNUM   =   "971" )
+                           CONTINUE
+                       ELSE
+                           MOVE    ZERO    TO  FLG-LOOPEND
+                       END-IF
+                   END-IF
+      *
+                   IF    ( RECECOM-SJKBN       =   "BB" )
+                       IF    ( WKCOMB-KOHHKNNUM (1)
+                                               =   "970" )
                            CONTINUE
                        ELSE
                            MOVE    ZERO    TO  FLG-LOOPEND

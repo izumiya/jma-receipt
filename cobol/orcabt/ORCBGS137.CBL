@@ -383,7 +383,7 @@
                                                VALUE   19.
       *
        01  CONST-AREA.
-           03  CONST-SYAHO         PIC 9(01) VALUE 1.
+           03  CONST-SYAHO         PIC 9(02) VALUE 1.
            03  CONST-KOU9          PIC 9(03) VALUE 1.
            03  CONST-KOU7          PIC 9(03) VALUE 10.
            03  CONST-HON           PIC 9(03) VALUE 19.

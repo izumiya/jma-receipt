@@ -107,6 +107,8 @@
                                                    VALUE   "7".
            03  CONST-CHIKEN                        PIC X(01)
                                                    VALUE   "8".
+           03  CONST-DAISAN                        PIC X(01)
+                                                   VALUE   "9".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -444,6 +446,10 @@
                        IF   ( SDTCHK02-O-CHIKEN  (IDX-HKNNUM)  =   1 )
                            MOVE    1       TO  FLG-TARGET
                        END-IF
+                   WHEN    CONST-DAISAN
+                       IF   ( SDTCHK02-O-DAISAN  (IDX-HKNNUM)  =   1 )
+                           MOVE    1       TO  FLG-TARGET
+                       END-IF
                    END-EVALUATE
                ELSE
                    IF    ( ORCBSD01-SYAHOPROCKBN   =   "1" )
@@ -476,6 +482,10 @@
                    END-IF
                    IF    ( ORCBSD01-CHIKENPROCKBN  =   "1" )
                     AND  ( SDTCHK02-O-CHIKEN   (IDX-HKNNUM)    =   1 )
+                           MOVE    1       TO  FLG-TARGET
+                   END-IF
+                   IF    ( ORCBSD01-DAISANPROCKBN  =   "1" )
+                    AND  ( SDTCHK02-O-DAISAN   (IDX-HKNNUM)    =   1 )
                            MOVE    1       TO  FLG-TARGET
                    END-IF
                END-IF

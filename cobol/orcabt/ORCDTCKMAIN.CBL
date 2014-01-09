@@ -233,6 +233,7 @@
                                        ORCBSD01-KGIPROCKBN
                                        ORCBSD01-KOUKIPROCKBN
                                        ORCBSD01-CHIKENPROCKBN
+                                       ORCBSD01-DAISANPROCKBN
                                        WRK-PARA-SHORI-KBN
                                        WRK-PARA-HKNKBN
                                        WRK-PARA-PTID
@@ -351,6 +352,8 @@
                    ORCBSD01-KOUKIPROCKBN       DELIMITED   BY  SIZE
                    ","                         DELIMITED   BY  SIZE
                    ORCBSD01-CHIKENPROCKBN      DELIMITED   BY  SIZE
+                   ","                         DELIMITED   BY  SIZE
+                   ORCBSD01-DAISANPROCKBN      DELIMITED   BY  SIZE
                    ","                         DELIMITED   BY  SIZE
            INTO    WRK-ARG
            END-STRING

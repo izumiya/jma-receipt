@@ -437,7 +437,7 @@ path	key21		{
 			AND     PTID      =   :PTID
 			AND     SRYYM     =   :SRYYM
 			AND     NYUGAIKBN =   :NYUGAIKBN
-			ORDER BY HKNCOMBI,(SJKBN <> 'AA'),(SJKBN <> '99'),SJKBN,SRYDD,RENNUM
+			ORDER BY HKNCOMBI,(SJKBN <> 'AA'),(SJKBN <> '99'),(SJKBN <> 'BB'),SJKBN,SRYDD,RENNUM
 		;
 	};
 };
@@ -451,7 +451,8 @@ path	key22		{
 			AND     PTID      =   :PTID
 			AND     SRYYM     =   :SRYYM
 			AND     NYUGAIKBN =   :NYUGAIKBN
-			ORDER BY HKNCOMBI,SRYDD,(SJKBN <> 'AA'),(SJKBN <> '99'),SJKBN,RENNUM
+			ORDER BY HKNCOMBI,SRYDD,(SJKBN <> 'AA'),(SJKBN <> '99'),(SJKBN <> 'BB'),SJKBN,RENNUM
 		;
 	};
 };
+

@@ -727,6 +727,14 @@
                    MOVE    "¸ø³²"          TO  SPA-GMN-THKNSBT(IDXL)
                WHEN    "7"
                    MOVE    "¸å´ü¹âÎð¼Ô"    TO  SPA-GMN-THKNSBT(IDXL)
+               WHEN    "8"
+                   MOVE    "¼£¸³"          TO  SPA-GMN-THKNSBT(IDXL)
+               WHEN    "9"
+                   MOVE    "Âè»°¼Ô¹Ô°Ù"    TO  SPA-GMN-THKNSBT(IDXL)
+               WHEN    "H"
+                   MOVE    "Êñ³ç"          TO  SPA-GMN-THKNSBT(IDXL)
+               WHEN    "Z"
+                   MOVE    "¤½¤ÎÂ¾"        TO  SPA-GMN-THKNSBT(IDXL)
                END-EVALUATE
       *
                MOVE    CK4-1200-ERRMSG TO  SPA-GMN-TERRMSG (IDXL)

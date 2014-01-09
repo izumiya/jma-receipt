@@ -139,6 +139,7 @@
            03  WRK-HKNCOMBINUM             PIC 9(04).
            03  WRK-HKNNUM                  PIC X(03).
            03  WRK-KOHNUM                  PIC X(03).
+           03  WRK-KOHID                   PIC 9(10).
            03  WRK-LASTCOMB                PIC X(04).
            03  WRK-NYUINYMD                PIC X(08).
            03  WRK-HBTSRYKA-G.
@@ -428,6 +429,7 @@
                MOVE    COMB-HKNNUM     TO  WRK-HKNNUM
                MOVE    COMB-KOHHKNNUM (1)
                                        TO  WRK-KOHNUM
+               MOVE    COMB-KOHID  (1) TO  WRK-KOHID
                PERFORM 20012-DCACCT-INS-SEC
            END-IF
       *
@@ -704,6 +706,7 @@
            MOVE    ZERO            TO  FLG-NODATA
            MOVE    SPACE           TO  WRK-HKNNUM
                                        WRK-KOHNUM
+           MOVE    ZERO            TO  WRK-KOHID
            PERFORM 20012-DCACCT-INS-SEC
       *
            .
@@ -781,6 +784,7 @@
       *
            MOVE    COMB-HKNNUM         TO  DCACCT-HKNNUM
            MOVE    COMB-KOHHKNNUM (1)  TO  DCACCT-KOHNUM
+           MOVE    COMB-KOHID  (1)     TO  DCACCT-KOHID
            MOVE    NACCT-NYUGAIKBN     TO  DCACCT-NYUGAIKBN
       *
            IF    ( HCM34S01-ZAISKBKBN (IDX4) =   "1" )

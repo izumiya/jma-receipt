@@ -409,7 +409,7 @@
            03  KEY-NYUGAIKBN               PIC X(01).
       *
        01  CONST-AREA.
-           03  CONST-KOUKI         PIC 9(03) VALUE 3.
+           03  CONST-KOUKI         PIC 9(02) VALUE 3.
            03  CONST-KOU9          PIC 9(03) VALUE 1.
            03  CONST-KOU7          PIC 9(03) VALUE 2.
            03  CONST-HKNTTL        PIC 9(03) VALUE 3.

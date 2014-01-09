@@ -265,15 +265,26 @@
        1101-HKNINF-HEN-SEC             SECTION.
       *
            IF    ( CONST-HKNINF-MAX    >   SDTCHK02-O-HKNINF-MAX )
-               MOVE    COMB-HKNNUM     TO  WRK-SYUHKNNUM
+               IF    ( COMB-KOHHKNNUM (1)  =   "970" )
+                   MOVE    "970"       TO  WRK-SYUHKNNUM
+                   MOVE    COMB-HKNNUM TO  WRK-HKNNUM
+                   PERFORM 11011-HKNINF-HEN-SEC
+                   MOVE    COMB-KOHHKNNUM (1)
+                                       TO  WRK-SYUHKNNUM
                                            WRK-HKNNUM
-               PERFORM 11011-HKNINF-HEN-SEC
+                   PERFORM 11011-HKNINF-HEN-SEC
+               ELSE
+                   MOVE    COMB-HKNNUM TO  WRK-SYUHKNNUM
+                                           WRK-HKNNUM
+                   PERFORM 11011-HKNINF-HEN-SEC
+               END-IF
            END-IF
       *
            PERFORM VARYING IDX-KOH     FROM    1   BY  1
                    UNTIL ( IDX-KOH     >   4 )
       *
                IF    ( COMB-KOHHKNNUM (IDX-KOH)    NOT =   SPACE )
+                AND  ( COMB-KOHHKNNUM (IDX-KOH)    NOT =   "970" )
                    IF    ( CONST-HKNINF-MAX
                                        >   SDTCHK02-O-HKNINF-MAX)
                        MOVE    COMB-HKNNUM TO  WRK-SYUHKNNUM
@@ -323,6 +334,8 @@
                    MOVE    1       TO  SDTCHK02-O-ROSAI (IDX-HKNNUM)
                WHEN      "973"
                    MOVE    1       TO  SDTCHK02-O-JIBAI (IDX-HKNNUM)
+               WHEN      "970"
+                   MOVE    1       TO  SDTCHK02-O-DAISAN (IDX-HKNNUM)
                WHEN      "975"
                    MOVE    1       TO  SDTCHK02-O-KOUGAI (IDX-HKNNUM)
                WHEN      "040"
