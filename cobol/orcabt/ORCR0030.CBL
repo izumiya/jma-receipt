@@ -3502,13 +3502,16 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            END-IF
       *
       *    請求点数がない保険組み合わせ有りフラグ編集
-           PERFORM  VARYING  IDX18  FROM  1  BY  1
-                     UNTIL   IDX18   >   10
+           IF   RECE02-HKNCOMBI(2)   NOT =   ZERO
+             PERFORM  VARYING  IDX18  FROM  1  BY  1
+                       UNTIL  (IDX18                   >  10  )
+                         OR   (RECE02-HKNCOMBI(IDX18)  =  ZERO)
                IF    (TBL-HKNCOMBI-SKYTENFLG (IDX18) = ZERO)
                AND   (TBL-HKNCOMBI-SKYTENFLG2(IDX18) =  1  )
                    MOVE    1    TO   RECE02-SKYTENFLG
                END-IF
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *
            PERFORM     RECE02-REWRITE-SEC
            .
@@ -8268,11 +8271,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                PERFORM 21044-RECE05-HENSYU-SEC
                                IF    FLG-WRITE05  =   1
                                  PERFORM RECE04-WRITE-SEC
-                                 IF  (ACCT-JIHOKBN     = SPACE        )
-                                 AND (ACCT-SRYKBN  NOT = "95" AND "96")
-                                  MOVE  1  TO
-                                          TBL-HKNCOMBI-SKYTENFLG(IDX1)
-                                 END-IF
                                END-IF
                            ELSE
                              IF   ACCT-ZAIKAISU  NOT =    ZERO
@@ -8335,11 +8333,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       PERFORM   21044-RECE05-HENSYU-SEC
                                       IF    FLG-WRITE05  =   1
                                         PERFORM RECE04-WRITE-SEC
-                                        IF  ACCT-SRYKBN  NOT =
-                                                        "95" AND "96"
-                                         MOVE  1  TO
-                                          TBL-HKNCOMBI-SKYTENFLG2(IDX1)
-                                        END-IF
                                       END-IF
                                  END-IF
                                END-IF
@@ -22934,6 +22927,23 @@ grpsys         PERFORM 900-DBFETCH-SEC
                MOVE    RECE04-KIZAITEN    TO    RECE04-HOKATU-KIZAITEN
       *
                WRITE   RECE04-REC
+      *
+               IF     (RECE04-ZAIKAISU    NOT =    ZERO         )
+               AND    (RECE04-JIHOKBN         =    SPACE        )
+               AND    (RECE04-SRYKBN      NOT =    "95" AND "96")
+                 PERFORM  VARYING  IDX18  FROM  1  BY  1
+                           UNTIL  (IDX18                   >  10  )
+                             OR   (RECE02-HKNCOMBI(IDX18)  =  ZERO)
+                   IF  RECE04-HKNCOMBI  =  RECE02-HKNCOMBI(IDX18)
+                     IF   RECE04-ZAITEN   NOT =    ZERO
+                       MOVE   1   TO   TBL-HKNCOMBI-SKYTENFLG(IDX18)
+                     ELSE
+                       MOVE   1   TO   TBL-HKNCOMBI-SKYTENFLG2(IDX18)
+                     END-IF
+                     MOVE    10   TO   IDX18
+                   END-IF
+                 END-PERFORM
+               END-IF
       *
                IF      STS-RECE04          =   "00"
                    CONTINUE

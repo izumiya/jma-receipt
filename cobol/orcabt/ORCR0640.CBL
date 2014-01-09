@@ -3526,13 +3526,16 @@
            END-IF
       *
       *    請求点数がない保険組み合わせ有りフラグ編集
-           PERFORM  VARYING  IDX18  FROM  1  BY  1
-                     UNTIL   IDX18   >   10
+           IF   RECE62-HKNCOMBI(2)   NOT =   ZERO
+             PERFORM  VARYING  IDX18  FROM  1  BY  1
+                       UNTIL  (IDX18                   >  10  )
+                         OR   (RECE62-HKNCOMBI(IDX18)  =  ZERO)
                IF    (TBL-HKNCOMBI-SKYTENFLG (IDX18) = ZERO)
                AND   (TBL-HKNCOMBI-SKYTENFLG2(IDX18) =  1  )
                    MOVE    1    TO   RECE62-SKYTENFLG
                END-IF
-           END-PERFORM
+             END-PERFORM
+           END-IF
       *
            PERFORM     RECE62-REWRITE-SEC
            .
@@ -6076,12 +6079,6 @@
                                    PERFORM   21012-RECE65-HENSYU-SEC
                                    IF    FLG-WRITE65  =   1
                                      PERFORM RECE64-WRITE-SEC
-                                     IF  (ACCT-JIHOKBN     = SPACE)
-                                     AND (ACCT-SRYKBN  NOT =
-                                                     "95" AND "96")
-                                      MOVE  1  TO
-                                          TBL-HKNCOMBI-SKYTENFLG(IDX1)
-                                     END-IF
                                    END-IF
                                  END-IF
                                ELSE
@@ -6089,12 +6086,6 @@
                                  PERFORM   21012-RECE65-HENSYU-SEC
                                  IF    FLG-WRITE65  =   1
                                    PERFORM RECE64-WRITE-SEC
-                                   IF  (ACCT-JIHOKBN     = SPACE)
-                                   AND (ACCT-SRYKBN  NOT =
-                                                   "95" AND "96")
-                                    MOVE  1  TO
-                                        TBL-HKNCOMBI-SKYTENFLG(IDX1)
-                                   END-IF
                                  END-IF
                                END-IF
                            ELSE
@@ -6153,11 +6144,6 @@
                                       PERFORM   21012-RECE65-HENSYU-SEC
                                       IF    FLG-WRITE65  =   1
                                         PERFORM RECE64-WRITE-SEC
-                                        IF  ACCT-SRYKBN  NOT =
-                                                        "95" AND "96"
-                                         MOVE  1  TO
-                                          TBL-HKNCOMBI-SKYTENFLG2(IDX1)
-                                        END-IF
                                       END-IF
                                  END-IF
                                END-IF
@@ -14653,7 +14639,6 @@
                        PERFORM   21035-RECE65-TENTEKI2-HENSYU-SEC
                        PERFORM   21034-RECE62-HENSYU3-SEC
                        PERFORM   RECE64-WRITE-SEC
-                       MOVE      1   TO   TBL-HKNCOMBI-SKYTENFLG(IDX1)
                     END-IF
                  END-PERFORM
                END-IF
@@ -14670,7 +14655,6 @@
                        PERFORM   21035-RECE65-TENTEKI2-HENSYU-SEC
                        PERFORM   21034-RECE62-HENSYU3-SEC
                        PERFORM   RECE64-WRITE-SEC
-                       MOVE      1   TO   TBL-HKNCOMBI-SKYTENFLG(IDX1)
                     END-IF
                  END-PERFORM
                END-IF
@@ -28200,6 +28184,23 @@
                MOVE    RECE64-KIZAITEN    TO    RECE64-HOKATU-KIZAITEN
       *
                WRITE   RECE64-REC
+      *
+               IF     (RECE64-ZAIKAISU    NOT =    ZERO         )
+               AND    (RECE64-JIHOKBN         =    SPACE        )
+               AND    (RECE64-SRYKBN      NOT =    "95" AND "96")
+                 PERFORM  VARYING  IDX18  FROM  1  BY  1
+                           UNTIL  (IDX18                   >  10  )
+                             OR   (RECE62-HKNCOMBI(IDX18)  =  ZERO)
+                   IF  RECE64-HKNCOMBI  =  RECE62-HKNCOMBI(IDX18)
+                     IF   RECE64-ZAITEN   NOT =    ZERO
+                       MOVE   1   TO   TBL-HKNCOMBI-SKYTENFLG(IDX18)
+                     ELSE
+                       MOVE   1   TO   TBL-HKNCOMBI-SKYTENFLG2(IDX18)
+                     END-IF
+                     MOVE    10   TO   IDX18
+                   END-IF
+                 END-PERFORM
+               END-IF
       *
                IF      STS-RECE64          =   "00"
                    CONTINUE

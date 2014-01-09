@@ -351,8 +351,11 @@
                    (RECE62-HENTOTALTEN(2)           =  ZERO   )  AND
                    (RECE62-HENTOTALTEN(1)
                              NOT = RECE62-HENTOTALTEN(2)      ))
-               OR ((RECE62-HENTOTALTEN(2)       NOT =  ZERO   )  AND
-                   (RECE62-SKYTENFLG                =   1     ))
+               OR ((RECE62-HENTOTALTEN(1)       NOT =  ZERO   )  AND
+                   (RECE62-HENTOTALTEN(2)       NOT =  ZERO   )  AND
+                   (RECE62-HENTOTALTEN(1) =
+                                         RECE62-HENTOTALTEN(2))  AND
+                   (RECE62-SKYTENFLG      =     1             ))
                    MOVE      1          TO     BUN-IDX
                    PERFORM   RECE64-HENSYU-SEC
                END-IF
@@ -369,8 +372,11 @@
                    (RECE62-HENTOTALTEN(3)           =  ZERO   )  AND
                    (RECE62-HENTOTALTEN(1)
                              NOT = RECE62-HENTOTALTEN(3)      ))
-               OR ((RECE62-HENTOTALTEN(3)       NOT =  ZERO   )  AND
-                   (RECE62-SKYTENFLG                =   1     ))
+               OR ((RECE62-HENTOTALTEN(1)       NOT =  ZERO   )  AND
+                   (RECE62-HENTOTALTEN(3)       NOT =  ZERO   )  AND
+                   (RECE62-HENTOTALTEN(1) =
+                                         RECE62-HENTOTALTEN(3))  AND
+                   (RECE62-SKYTENFLG      =     1             ))
                    MOVE      2          TO     BUN-IDX
                    PERFORM   RECE64-HENSYU-SEC
                END-IF
@@ -387,8 +393,11 @@
                    (RECE62-HENTOTALTEN(4)           =  ZERO   )  AND
                    (RECE62-HENTOTALTEN(1)
                              NOT = RECE62-HENTOTALTEN(4)      ))
-               OR ((RECE62-HENTOTALTEN(4)       NOT =  ZERO   )  AND
-                   (RECE62-SKYTENFLG                =   1     ))
+               OR ((RECE62-HENTOTALTEN(1)       NOT =  ZERO   )  AND
+                   (RECE62-HENTOTALTEN(4)       NOT =  ZERO   )  AND
+                   (RECE62-HENTOTALTEN(1) =
+                                         RECE62-HENTOTALTEN(4))  AND
+                   (RECE62-SKYTENFLG      =     1             ))
                    MOVE      3          TO     BUN-IDX
                    PERFORM   RECE64-HENSYU-SEC
                END-IF
@@ -405,8 +414,11 @@
                    (RECE62-HENTOTALTEN(5)           =  ZERO   )  AND
                    (RECE62-HENTOTALTEN(1)
                              NOT = RECE62-HENTOTALTEN(5)      ))
-               OR ((RECE62-HENTOTALTEN(5)       NOT =  ZERO   )  AND
-                   (RECE62-SKYTENFLG                =   1     ))
+               OR ((RECE62-HENTOTALTEN(1)       NOT =  ZERO   )  AND
+                   (RECE62-HENTOTALTEN(5)       NOT =  ZERO   )  AND
+                   (RECE62-HENTOTALTEN(1) =
+                                         RECE62-HENTOTALTEN(5))  AND
+                   (RECE62-SKYTENFLG      =     1             ))
                    MOVE      4          TO     BUN-IDX
                    PERFORM   RECE64-HENSYU-SEC
                END-IF
