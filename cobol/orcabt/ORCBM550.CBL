@@ -38,6 +38,7 @@
       *  04.06.04    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
       *                                     receipt_kbn 追加 
+      *  04.07.02    NACL-藤原    13/10/07  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -173,6 +174,13 @@
                05  WRK-SIKIBETU        PIC X(03).
                05  WRK-DATA            PIC X(500).
                05  WRK-RIREKIKANRI-FLG PIC 9(01).
+      *
+           03  WRK-SAIGAIKBN           PIC X(01).
+           03  WRK-CHOHYOKBN           PIC X(01).
+      *
+           03  WRK-SEIKYU-DATA.
+               05  WRK-SEIKYU-SKYYM    PIC X(05).
+               05  WRK-SEIKYU-SRYYM    PIC X(05).
       *
        01  CNT-RESEDEN.
            03  PATIENT-CNT             PIC 9(05).
@@ -470,6 +478,11 @@
       *                データ取り込み処理（返戻ファイル）
                        PERFORM 2002-PARA-HENSYU-SEC
                END-EVALUATE
+               EVALUATE    WRK-FILE-TMP(10:6)
+                   WHEN    "RRECEC"
+      *                データ取り込み処理（労災返戻ファイル）
+                       PERFORM 2003-PARA-HENSYU-SEC
+               END-EVALUATE
            END-PERFORM
       *
            MOVE    1               TO  FLG-END
@@ -703,6 +716,100 @@
            EXIT.
       *
       *****************************************************************
+      *    データ取り込み処理（労災・返戻ファイル）
+      *****************************************************************
+       2003-PARA-HENSYU-SEC             SECTION.
+      *??
+           DISPLAY "2003=" WRK-FILE-TMP (10:)
+      *??
+      *
+           EVALUATE    WRK-FILE-TMP (10:)
+               WHEN    "RRECEC.HEN"
+                   MOVE    "0"         TO  WRK-HENREI-K-TEISYUTUSAKI2
+           END-EVALUATE
+           MOVE    ZERO            TO  IDZZ
+      *
+      *    取り込みデータファイル読み込み処理
+           PERFORM 900-PARA-READ-SEC
+      *
+           PERFORM             UNTIL   FLG-PARA    =   1
+                               OR      FLG-END     =   1
+      *
+      *        文字コード変換
+               MOVE  PARA-DATA             TO  SJISTOEUC-INDATA
+               INITIALIZE                      SJISTOEUC-OUTDATA
+               MOVE    10000               TO  SJISTOEUC-INLEN
+               MOVE    10000               TO  SJISTOEUC-OUTLEN
+               CALL    "orcsjistoeuc"      USING
+                                           ORCSJISTOEUC
+               IF      SJISTOEUC-RETURN    =   0
+                   CONTINUE
+               ELSE
+                   DISPLAY "SJISTOEUC-RETURN =" SJISTOEUC-RETURN
+                   DISPLAY "SJISTOEUC-INDATA=" SJISTOEUC-INDATA (1:5)
+               END-IF
+               MOVE    SJISTOEUC-OUTDATA   TO  WRK-PARA-REC
+      *
+               UNSTRING  WRK-PARA-REC      DELIMITED  BY  X"0D"  OR
+                                                          X"0A"
+                                           INTO    WRK-PARA-REC1
+                                                   WRK-PARA-REC2
+               END-UNSTRING
+               MOVE    WRK-PARA-REC1       TO  WRK-PARA-REC
+      *
+               INITIALIZE                      WRK-RIREKIKANRI-CHK
+      * 
+               IF      WRK-PARA-REC (1:1)  =   X"1A"
+                   CONTINUE
+               ELSE
+                   EVALUATE    WRK-PARA-REC (1:2)
+                                           ALSO    WRK-FILE-TMP(10:12) 
+                       WHEN    "RE"            ALSO     ANY
+                           IF      IDZZ            >   ZERO
+      *                        ＤＢ更新処理（労災・返戻ファイル）
+                               PERFORM 20031-DB-UPDATE-SEC
+      *                        MOVE    ZERO        TO  IDZZ
+                               INITIALIZE              TABLE-AREA
+                                                       WRK-HENREI-B-REC
+                           END-IF
+                           MOVE    ZERO            TO  IDZZ
+                           MOVE    1               TO  IDZZ
+                           MOVE    21              TO  SPLIT-CNT
+                           MOVE    22              TO  SPLIT-CNT1
+                           PERFORM 20011-PARA-SPLIT-SEC
+                       WHEN    "RR"            ALSO     ANY
+                           ADD     1               TO  IDZZ
+                           MOVE    6               TO  SPLIT-CNT
+                           MOVE    7               TO  SPLIT-CNT1
+                           PERFORM 20011-PARA-SPLIT-SEC
+                       WHEN    OTHER
+                           ADD     1               TO  IDZZ
+                           MOVE    1               TO  SPLIT-CNT
+                           MOVE    2               TO  SPLIT-CNT1
+                           PERFORM 20011-PARA-SPLIT-SEC
+                   END-EVALUATE
+               END-IF
+      *
+      *        取り込みデータファイル読み込み処理
+               PERFORM 900-PARA-READ-SEC
+           END-PERFORM
+      *
+           CLOSE   PARA-FILE
+      *
+           IF      IDZZ            >   ZERO
+      *        ＤＢ更新処理（労災・返戻ファイル）
+               PERFORM 20031-DB-UPDATE-SEC
+           END-IF
+      *
+           DISPLAY "IN   CNT = " READ-CNT
+           DISPLAY "OUT  CNT = " INS-K-CNT
+           DISPLAY "     CNT = " INS-B-CNT
+      *
+           .
+       2003-PARA-HENSYU-EXT.
+           EXIT.
+      *
+     *****************************************************************
       *    データカンマ分離処理
       *****************************************************************
        20011-PARA-SPLIT-SEC          SECTION.
@@ -853,6 +960,10 @@
            EVALUATE    WRK-FILE-TMP(10:8)
                WHEN    "RECEIPTC"
                    PERFORM 2001133-RECEIPTC-KOUMOKU-BETU-SEC
+           END-EVALUATE
+           EVALUATE    WRK-FILE-TMP(10:6)
+               WHEN    "RRECEC"
+                   PERFORM 2001134-RRECEC-KOUMOKU-BETU-SEC
            END-EVALUATE
       *
            .
@@ -2060,6 +2171,218 @@
        2001133-RECEIPTC-KOUMOKU-BETU-EXT.
            EXIT.
       *
+      *
+      *****************************************************************
+      *    労災・返戻ファイル項目別処理
+      *****************************************************************
+       2001134-RRECEC-KOUMOKU-BETU-SEC     SECTION.
+      *
+      *??
+           DISPLAY "WRK-KOUMOKU-NO=" WRK-KOUMOKU-NO "#"
+                    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+      *??
+           EVALUATE    WRK-PARA-REC(1:2)
+               WHEN    "RE"
+                   EVALUATE    WRK-KOUMOKU-NO
+                       WHEN    1
+                           ADD  1                  TO  PATIENT-CNT
+                           MOVE    SPACE           TO  WRK-SAIGAIKBN
+                                                       WRK-CHOHYOKBN 
+      *
+                           MOVE    "3"             TO
+                                       WRK-HENREI-K-TEISYUTUSAKI
+      *
+                           MOVE    PATIENT-CNT         TO
+                                               WRK-HENREI-B-RECEIPT-NO
+      *
+                           MOVE    0               TO  
+                                       TBL-HENREI-B-SELECT-FLG   (IDZZ)
+                           MOVE    SPACE           TO
+                                       TBL-HENREI-B-HENREI-INFO1 (IDZZ)
+                           MOVE    WRK-PARA-REC    TO
+                                       TBL-HENREI-B-HENREI-INFO2 (IDZZ)
+      *                氏名
+                       WHEN    5
+                           MOVE  WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                               TO  WRK-HENREI-B-NAME
+                       WHEN    6
+                           MOVE  WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                               TO  WRK-HENREI-B-SEX
+                       WHEN    7
+                           INITIALIZE              ORCSGDAYAREA
+                           MOVE    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                               TO  SGDAY-INDAY
+                           CALL    "ORCSGDAY"      USING
+                                                   ORCSGDAYAREA
+                           IF      SGDAY-RC            =   ZERO
+                               MOVE    SGDAY-SDAY
+                                               TO  WRK-HENREI-B-BIRTHDAY
+                           ELSE
+                               MOVE    "W42"   TO  WRK-ERRCD
+                               PERFORM 500-ERRCD-HENSYU-SEC
+                           END-IF
+      *                患者番号
+                       WHEN    14
+                           MOVE    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                               TO  WRK-HENREI-B-PTNUM
+                                                   WRK-PTNUM
+                           PERFORM 500-PTID-HENSYU-SEC
+                           IF      SPTNUM-RC   =   00
+                               MOVE    SPTNUM-PTID TO  WRK-HENREI-B-PTID
+                           ELSE
+                               MOVE    "W43"       TO  WRK-ERRCD
+                               PERFORM 500-ERRCD-HENSYU-SEC
+                           END-IF
+      *                電算処理受付番号
+                       WHEN    19
+                           IF      WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                               NUMERIC
+                               MOVE
+                                   WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                                   TO
+                                               WRK-HENREI-B-SEARCH-NO
+                           ELSE
+                               MOVE    "E01"       TO  WRK-ERRCD
+                               PERFORM 500-ERRCD-HENSYU-SEC
+                           END-IF
+      *                請求情報
+                       WHEN    21
+                           MOVE    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                                   TO  WRK-SEIKYU-DATA
+                           IF      PATIENT-CNT     =   1
+      *                        請求年月
+                               INITIALIZE              ORCSGDAYAREA
+                               MOVE    "1"             TO  SGDAY-INTYPE
+                               MOVE
+                                   WRK-SEIKYU-SKYYM    TO  SGDAY-INDAY
+                               CALL    "ORCSGDAY"      USING
+                                                       ORCSGDAYAREA
+                               IF      SGDAY-RC        =   ZERO
+                                   MOVE    SGDAY-SDAY (1:6)    TO
+                                                   WRK-HENREI-K-SYORIYM
+                               ELSE
+                                   MOVE    SPACE       TO  WRK-CSVERR
+                                   STRING  "請求年月エラー DATA="
+                                                   DELIMITED  BY  SIZE
+                                           WRK-PARA-REC
+                                               (WRK-MO-ST:WRK-MO-CNT)
+                                                   DELIMITED  BY  SIZE
+                                                   INTO    WRK-CSVERR
+                                   END-STRING
+                                   PERFORM 500-ERR-HENSYU-SEC
+                                   PERFORM 500-COBABORT-SEC
+                               END-IF
+                           END-IF
+      *                    診療年月
+                           INITIALIZE              ORCSGDAYAREA
+                           MOVE    WRK-SEIKYU-SRYYM
+                                                   TO  SGDAY-INDAY
+                           MOVE    "1"             TO  SGDAY-INTYPE
+                           CALL    "ORCSGDAY"      USING
+                                                   ORCSGDAYAREA
+                           IF      SGDAY-RC        =   ZERO
+                               MOVE    SGDAY-SDAY (1:6)
+                                               TO  WRK-HENREI-B-SRYYM
+                                                   WRK-PTID-SRYYM
+                           ELSE
+                               MOVE    "W41"   TO  WRK-ERRCD
+                               PERFORM 500-ERRCD-HENSYU-SEC
+                           END-IF
+                   END-EVALUATE
+               WHEN    "RR"
+                   EVALUATE    WRK-KOUMOKU-NO
+                       WHEN    1
+                           MOVE    0               TO  
+                                       TBL-HENREI-B-SELECT-FLG   (IDZZ)
+                           MOVE    SPACE           TO
+                                       TBL-HENREI-B-HENREI-INFO1 (IDZZ)
+                           MOVE    WRK-PARA-REC    TO
+                                       TBL-HENREI-B-HENREI-INFO2 (IDZZ)
+      *                業務災害・通勤災害の区分
+                       WHEN    3
+                           MOVE    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                                   TO  WRK-SAIGAIKBN
+      *                帳票種別
+                       WHEN    4
+                           MOVE    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                                   TO  WRK-CHOHYOKBN
+                           IF      WRK-CHOHYOKBN   =   "2" OR  "4"
+                               MOVE    "1" TO  WRK-HENREI-B-NYUGAIKBN
+                           ELSE
+                               MOVE    "2" TO  WRK-HENREI-B-NYUGAIKBN
+                           END-IF
+                           EVALUATE    WRK-CHOHYOKBN
+                                               ALSO    WRK-SAIGAIKBN
+                               WHEN    "2"     ALSO    "1"   
+                                   MOVE    "7081"  TO
+                                               WRK-HENREI-B-RECESYUBETU
+                               WHEN    "2"     ALSO    "3"
+                                   MOVE    "7082"  TO
+                                               WRK-HENREI-B-RECESYUBETU
+                               WHEN    "3"     ALSO    "1"
+                                   MOVE    "7101"  TO
+                                               WRK-HENREI-B-RECESYUBETU
+                               WHEN    "3"     ALSO    "3"
+                                   MOVE    "7102"  TO
+                                               WRK-HENREI-B-RECESYUBETU
+                               WHEN    "4"     ALSO    "1"   
+                                   MOVE    "7071"  TO
+                                               WRK-HENREI-B-RECESYUBETU
+                               WHEN    "4"     ALSO    "3"
+                                   MOVE    "7072"  TO
+                                               WRK-HENREI-B-RECESYUBETU
+                               WHEN    "5"     ALSO    "1"
+                                   MOVE    "7091"  TO
+                                               WRK-HENREI-B-RECESYUBETU
+                               WHEN    "5"     ALSO    "3"
+                                   MOVE    "7092"  TO
+                                               WRK-HENREI-B-RECESYUBETU
+                           END-EVALUATE
+      *                年金証書番号
+                       WHEN    5
+                           IF       WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                                   NOT =   SPACE
+                               MOVE
+                                   WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                                   TO  WRK-HENREI-B-KIGO
+                           END-IF    
+      *                労働保険番号
+                       WHEN    6
+                           IF       WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                                   NOT =   SPACE
+                               MOVE
+                                   WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                                   TO  WRK-HENREI-B-KIGO
+                           END-IF    
+                   END-EVALUATE
+               WHEN    "SY"
+               WHEN    "RI"
+               WHEN    "IY"
+               WHEN    "TO"
+               WHEN    "CO"
+               WHEN    "SJ"
+                   MOVE    0               TO  TBL-HENREI-B-SELECT-FLG
+                                                            (IDZZ)
+                   MOVE    SPACE           TO  TBL-HENREI-B-HENREI-INFO1
+                                                            (IDZZ)
+                   MOVE    WRK-PARA-REC    TO  TBL-HENREI-B-HENREI-INFO2
+                                                            (IDZZ)
+               WHEN    OTHER
+                   MOVE    0               TO  TBL-HENREI-B-SELECT-FLG
+                                                            (IDZZ)
+                   MOVE    SPACE           TO  TBL-HENREI-B-HENREI-INFO1
+                                                            (IDZZ)
+                   MOVE    WRK-PARA-REC    TO  TBL-HENREI-B-HENREI-INFO2
+                                                            (IDZZ)
+      *
+                   MOVE    "E99"           TO  WRK-ERRCD
+                   PERFORM 500-ERRCD-HENSYU-SEC
+           END-EVALUATE
+      *
+           .
+       2001134-RRECEC-KOUMOKU-BETU-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    ＤＢ更新処理
       *****************************************************************
@@ -2661,6 +2984,96 @@
       *
            .
        20021-DB-UPDATE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢ更新処理（労災・返戻ファイル）
+      *****************************************************************
+       20031-DB-UPDATE-SEC           SECTION.
+      *
+      *    更新日取得
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
+      *    返戻管理ファイル更新
+           IF      FLG-PARA            =   1
+               MOVE    WRK-HENREI-K-REC    TO  HENREI-K-REC
+               MOVE    IDZZ                TO  HENREI-K-RECV-TOTAL-CNT
+               MOVE    PATIENT-CNT         TO  HENREI-K-RECV-PATIENT-CNT
+               MOVE    WRK-PARA-HOSPNUM    TO  HENREI-K-HOSPNUM
+               MOVE    SMCNDATE-YMD        TO  HENREI-K-CREYMD
+               MOVE    HENREI-K-REC        TO  MCPDATA-REC
+      *
+               MOVE   "tbl_henrei_kanri"   TO  MCP-TABLE
+               MOVE   "key"                TO  MCP-PATHNAME
+               MOVE    "DBINSERT"          TO  MCP-FUNC
+               PERFORM 900-ORCDBMAIN-SEC
+               IF      MCP-RC              =   ZERO
+                   ADD     1                   TO  INS-K-CNT
+               ELSE 
+                   CALL "coblog" USING "abort insert tbl_henrei_kanri"
+      *
+                   MOVE    SPACE               TO  WRK-CSVERR
+                   MOVE    MCP-RC              TO  WRK-MCP-RC
+                   STRING  "返戻管理ＤＢ更新エラー MCP-RC="
+                                               DELIMITED  BY  SIZE
+                           WRK-MCP-RC          DELIMITED  BY  SIZE
+                                               INTO    WRK-CSVERR
+                   END-STRING
+                   PERFORM 500-ERR-HENSYU-SEC
+                   PERFORM 500-COBABORT-SEC
+               END-IF
+           END-IF
+      *
+      *    返戻明細ファイル更新
+      *
+           PERFORM VARYING   IDX   FROM    1   BY  1
+                   UNTIL     IDX           >   IDZZ
+               MOVE    WRK-HENREI-B-REC        TO  HENREI-B-REC
+               MOVE    WRK-PARA-HOSPNUM        TO  HENREI-B-HOSPNUM
+               MOVE    WRK-HENREI-K-TEISYUTUSAKI
+                                               TO  HENREI-B-TEISYUTUSAKI
+               MOVE    WRK-HENREI-K-TEISYUTUSAKI2
+                                               TO
+                                               HENREI-B-TEISYUTUSAKI2
+               MOVE    WRK-HENREI-K-SYORIYM    TO  HENREI-B-SYORIYM
+               MOVE    IDX                     TO  HENREI-B-PT-RENNUM
+               MOVE    TBL-HENREI-B-SELECT-FLG   (IDX)
+                                               TO  HENREI-B-SELECT-FLG
+               MOVE    TBL-HENREI-B-HENREI-INFO1 (IDX)
+                                               TO  HENREI-B-HENREI-INFO1  
+               MOVE    TBL-HENREI-B-HENREI-INFO2 (IDX)
+                                               TO  HENREI-B-HENREI-INFO2  
+               MOVE    TBL-HENREI-B-ERRCD        (IDX)
+                                               TO  HENREI-B-ERRCD
+               MOVE    SMCNDATE-YMD            TO  HENREI-B-CREYMD
+      *
+               MOVE    HENREI-B-REC            TO  MCPDATA-REC
+      *
+               MOVE   "tbl_henrei_body"        TO  MCP-TABLE
+               MOVE   "key"                    TO  MCP-PATHNAME
+               MOVE    "DBINSERT"              TO  MCP-FUNC
+               PERFORM 900-ORCDBMAIN-SEC
+               IF      MCP-RC              =   ZERO
+                   ADD     1                   TO  INS-B-CNT
+               ELSE 
+                   INITIALIZE          ONRECE-K-REC
+                   CALL "coblog" USING "abort insert tbl_henrei_body"
+      *
+                   MOVE    SPACE               TO  WRK-CSVERR
+                   MOVE    MCP-RC              TO  WRK-MCP-RC
+                   STRING  "返戻明細ＤＢ更新エラー MCP-RC="
+                                               DELIMITED  BY  SIZE
+                           WRK-MCP-RC          DELIMITED  BY  SIZE
+                                               INTO    WRK-CSVERR
+                   END-STRING
+                   PERFORM 500-ERR-HENSYU-SEC
+                   PERFORM 500-COBABORT-SEC
+               END-IF
+           END-PERFORM
+      *
+           .
+       20031-DB-UPDATE-EXT.
            EXIT.
       *
       *****************************************************************

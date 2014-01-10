@@ -29,6 +29,8 @@ fi
 #            0:作成する
 #        ${24} レセ電データ履歴保存設定区分
 #            1:履歴保存する
+#        ${26} レセ電データチェックの有無
+#            1:チェックする
 #-------------------------------------------#
 
     rennum=0
@@ -55,20 +57,29 @@ fi
     echo "arg22 = [" ${22} "]" >>$LOG_FILE
     echo "arg23 = [" ${23} "]" >>$LOG_FILE
     echo "arg24 = [" ${24} "]" >>$LOG_FILE
+    echo "arg26 = [" ${26} "]" >>$LOG_FILE
     echo "hostname =  [" `hostname`  "]" >>$LOG_FILE
 
+#   一時請求
     RECEFILE1="RREC"
     RECEFILE2="RECEDEN"
+#   再請求
+    RECEFILE3="RREC"
+    RECEFILE4="UKSRECE"
 
     if  [ ${21} -eq '2' ]; then
 	RECEFILE1="TENC"
 	RECEFILE2="TENKENT"
+	RECEFILE3="TENC"
+	RECEFILE4="UKSTENK"
 	echo "file name change!" >>$LOG_FILE
     fi
 
 #   該当ファイル削除
     rm  ${13}${20}${RECEFILE1}*.UKE
     rm  /tmp/${20}${RECEFILE2}*.txt
+    rm  ${13}${20}${RECEFILE3}*.UKS
+    rm  /tmp/${20}${RECEFILE4}*.txt
 
     rm -fr "/tmp/${20}Rousai_"*
     rm -fr "/tmp/${20}TRousai_"*
@@ -81,6 +92,7 @@ fi
         exit 
     fi
 
+#   一時フォルダ作成
     if  [ ${21} -eq '2' ]; then
         ROUSAI_FOLDER="${20}_TRousai_${5}"
     else
@@ -88,8 +100,9 @@ fi
     fi
     OUT_FOLDER="/tmp/$ROUSAI_FOLDER/"
 
+    echo "--- rm out folder [" ${OUT_FOLDER} "]" >>$LOG_FILE
+    rm -fr ${OUT_FOLDER}
 
-#   一時フォルダ作成
     if ( [ ${17} -eq '3' ]|| [ ${17} -eq '4' ] ) && [ ${24} -eq '0' ]; then
         echo "--- not out holder  ---" >>$LOG_FILE
     else
@@ -111,23 +124,43 @@ fi
         fi
     fi
 
+
 #   漢字コード変換
     echo "ファイルの処理(sjis変換)"
 
+#   一次請求
     all=`ls  /tmp/${20}${RECEFILE2}*.txt`
  
     for f in $all ; do
         echo "f= " $f >> $LOG_FILE 2>&1
-        echo "mm = " ${f:14:2} >> $LOG_FILE 2>&1
-        echo "nn = " ${f:16:2} >> $LOG_FILE 2>&1
+##      echo "mm = " ${f:14:2} >> $LOG_FILE 2>&1
+##      echo "nn = " ${f:16:2} >> $LOG_FILE 2>&1
 
-#       システム管理場所出力のとき
+#       システム管理場所出力（履歴保存を行わない）のとき
         if ( [ ${17} -eq '3' ]|| [ ${17} -eq '4' ] ) && [ ${24} -eq '0' ]; then
             echo ${13}${20}${RECEFILE1}${f:14:2}${f:16:2}.UKE >> $LOG_FILE 2>&1
             nkf -s $f > ${13}${20}${RECEFILE1}${f:14:2}${f:16:2}.UKE
         else
             echo ${OUT_FOLDER}${RECEFILE1}${f:14:2}${f:16:2}.UKE >> $LOG_FILE 2>&1
             nkf -s $f > ${OUT_FOLDER}${RECEFILE1}${f:14:2}${f:16:2}.UKE
+        fi
+    done
+
+#   再請求
+    all=`ls  /tmp/${20}${RECEFILE4}*.txt`
+ 
+    for f in $all ; do
+        echo "f= " $f >> $LOG_FILE 2>&1
+##      echo "mm = " ${f:14:2} >> $LOG_FILE 2>&1
+##      echo "nn = " ${f:16:2} >> $LOG_FILE 2>&1
+
+#       システム管理場所出力（履歴保存を行わない）のとき
+        if ( [ ${17} -eq '3' ]|| [ ${17} -eq '4' ] ) && [ ${24} -eq '0' ]; then
+            echo ${13}${20}${RECEFILE3}${f:14:2}${f:16:2}.UKS >> $LOG_FILE 2>&1
+            nkf -s $f > ${13}${20}${RECEFILE3}${f:14:2}${f:16:2}.UKS
+        else
+            echo ${OUT_FOLDER}${RECEFILE3}${f:14:2}${f:16:2}.UKS >> $LOG_FILE 2>&1
+            nkf -s $f > ${OUT_FOLDER}${RECEFILE3}${f:14:2}${f:16:2}.UKS
         fi
     done
 
@@ -153,11 +186,16 @@ fi
                  rm ${RIREKI_FOLDER}*
                  echo "--- rm rireki holder file ---" >>$LOG_FILE
             fi
+#           一時請求
             cp ${OUT_FOLDER}${RECEFILE1}*.UKE ${RIREKI_FOLDER}
             chmod -R g+r ${RIREKI_FOLDER}${RECEFILE1}*.UKE
+#           再請求
+            cp ${OUT_FOLDER}${RECEFILE3}*.UKS ${RIREKI_FOLDER}
+            chmod -R g+r ${RIREKI_FOLDER}${RECEFILE3}*.UKS
         else
 #           履歴保存を行わないとき
             chmod -R g+r ${13}${20}${RECEFILE1}*.UKE
+            chmod -R g+r ${13}${20}${RECEFILE3}*.UKS
         fi
     fi
 
@@ -192,8 +230,6 @@ fi
             exit
 	fi
     fi
-
-
 
     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${14}${15},${20} >> $LOG_FILE
     exit 

@@ -56,6 +56,7 @@
       *
       *  04.07.01    NACL-Æ£¸¶    11/09/02  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-Æ£¸¶    13/02/07  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
+      *  04.07.03    NACL-Æ£¸¶    13/10/07  Ï«ºÒ¥ì¥»ÅÅÊÖÌáÂÐ±þ
       *****************************************************************
        01  SPA-H01FREE.
          02  SPA-H01FREE-AREA.
@@ -230,7 +231,7 @@
                05  SPA-H02GMN-LABEL           PIC X(10).
                05  SPA-H02GMN-SYORIYM         PIC X(06).
                05  SPA-H02GMN-NYUGAIKBN       PIC X(06).
-               05  SPA-H02GMN-RECESYUBETU     PIC X(04).
+               05  SPA-H02GMN-RECESYUBETU     PIC X(10).
                05  SPA-H02GMN-HKNJANUM        PIC X(14).
                05  SPA-H02GMN-KIGO            PIC X(20).
                05  SPA-H02GMN-ERR             PIC X(100).
@@ -242,7 +243,7 @@
                        09  SPA-H02GMN-TNYUGAIKBN   PIC X(2).
                        09  SPA-H02GMN-TTEISYUTUSAKI2
                                                    PIC X(2).
-                       09  SPA-H02GMN-TRECESYUBETU PIC X(4).
+                       09  SPA-H02GMN-TRECESYUBETU PIC X(10).
                        09  SPA-H02GMN-THKNJANUM    PIC X(8).
                        09  SPA-H02GMN-TKIGO        PIC X(20).
                        09  SPA-H02GMN-TRECEIPT-KBN PIC X(4).

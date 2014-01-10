@@ -33,7 +33,9 @@
       *                                     は公費単独のレセプトとする
       *  04.06.04    NACL-藤原    12/10/26  特記事項０７（老併）及び
       *                                     ０８（老健）のレセプト対応
-      *                                     receipt_kbn 追加 
+      *                                     receipt_kbn 追加
+      *
+      *  04.07.01    NACL-藤原    13/10/07  労災レセ電返戻対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -356,8 +358,35 @@
                    WHEN    "2"
                        MOVE    "外"    TO  SPA-H02GMN-TNYUGAIKBN  (IDY)
                END-EVALUATE
-               MOVE    TBL-HENREI-B-RECESYUBETU(IDZZ)
+      *
+               EVALUATE    TBL-HENREI-B-TEISYUTUSAKI (IDZZ)
+                   WHEN    "3"
+                       EVALUATE    TBL-HENREI-B-RECESYUBETU(IDZZ)
+                           WHEN    "7101"
+                           WHEN    "7091"
+                               MOVE    "傷病・業務"
                                    TO  SPA-H02GMN-TRECESYUBETU    (IDY)
+                           WHEN    "7102"
+                           WHEN    "7092"
+                               MOVE    "傷病・通勤"
+                                   TO  SPA-H02GMN-TRECESYUBETU    (IDY)
+                           WHEN    "7071"
+                           WHEN    "7081"
+                               MOVE    "短期・業務"
+                                   TO  SPA-H02GMN-TRECESYUBETU    (IDY)
+                           WHEN    "7072"
+                           WHEN    "7082"
+                               MOVE    "短期・通勤"
+                                   TO  SPA-H02GMN-TRECESYUBETU    (IDY)
+                           WHEN    OTHER
+                               MOVE    TBL-HENREI-B-RECESYUBETU(IDZZ)
+                                   TO  SPA-H02GMN-TRECESYUBETU    (IDY)
+                       END-EVALUATE
+                   WHEN    OTHER
+                       MOVE    TBL-HENREI-B-RECESYUBETU(IDZZ)
+                                   TO  SPA-H02GMN-TRECESYUBETU    (IDY)
+               END-EVALUATE
+      * 
                MOVE    TBL-HENREI-B-HKNJANUM   (IDZZ)
                                    TO  SPA-H02GMN-THKNJANUM       (IDY)
       *

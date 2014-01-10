@@ -39,6 +39,7 @@
       *  04.06.04    NACL-藤原    12/06/19  取り込み時のレコード長変更
       *
       *  04.07.01    NACL-藤原    12/08/01  レセ電データチェック機能対応
+      *  04.07.02    NACL-藤原    13/10/07  労災レセ電対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -138,6 +139,10 @@
                                        PIC X(04).
                05  WRK-ERRMSG-SRYYM    PIC X(06).
                05  WRK-ERRMSG-HKNJA    PIC X(20).
+      *
+           03  WRK-SEIKYU-DATA.
+               05  WRK-SEIKYU-SKYYM    PIC X(05).
+               05  WRK-SEIKYU-SRYYM    PIC X(05).
       *
        01  ASS-AREA.
            03  ASS-PARA                PIC X(256).
@@ -768,8 +773,10 @@
                MOVE    99                  TO  WRK-ERRMSG1
            END-IF
       * 
-           IF      WRK-FILENM(1:6)     =   "RECEIP"    OR  
-                                           "receip"
+           IF      WRK-FILENM(1:6)     =   "RECEIP"    OR
+                                           "receip"    OR
+                                           "RRECEC"    OR
+                                           "rrecec"
                EVALUATE    WRK-FILENM
                    WHEN    "receiptc.hen"
                    WHEN    "RECEIPTC.HEN"
@@ -777,6 +784,9 @@
                    WHEN    "receiptc.sah"
                    WHEN    "RECEIPTC.SAH"
                        MOVE    "RECEIPTC.SAH"      TO  WRK-FILENM
+                   WHEN    "rrecec.hen"
+                   WHEN    "RRECEC.HEN"
+                       MOVE    "RRECEC.HEN"        TO  WRK-FILENM 
                END-EVALUATE
                MOVE    IDY                 TO  WRK-INDEX-9
                STRING  "/tmp/"             DELIMITED   BY  SIZE
@@ -819,6 +829,9 @@
                                                WRK-ERRMSG-TEISYUTUSAKI
                    WHEN    "2"
                        MOVE    "国保"          TO
+                                               WRK-ERRMSG-TEISYUTUSAKI
+                   WHEN    "3"
+                       MOVE    "労災"          TO
                                                WRK-ERRMSG-TEISYUTUSAKI
                END-EVALUATE
                MOVE    SPA-GMN-T05-TSRYYM(IDY) TO  WRK-ERRMSG-SRYYM
@@ -1158,6 +1171,24 @@
                    END-EVALUATE
       *
                    MOVE    8               TO  SPILIT-CNT
+               WHEN    "RRECEC"
+               WHEN    "rrecec"
+      *            返戻データ（労災）
+                   EVALUATE    MOJI-CNT
+                       WHEN    10
+      *                    ファイル名
+                           IF      WRK-FILENM      =   "RRECEC.HEN" 
+                                                   OR  "rrecec.hen"
+                               CONTINUE
+                           ELSE
+                               MOVE    1               TO  WRK-ERRMSG1
+                           END-IF
+                       WHEN    OTHER
+                           MOVE    1                   TO  WRK-ERRMSG1
+                           MOVE    1                   TO  WRK-ERRMSG2
+                   END-EVALUATE
+      *
+                   MOVE    21              TO  SPILIT-CNT
                WHEN    OTHER
                    MOVE    1               TO  WRK-ERRMSG1
            END-EVALUATE
@@ -1253,6 +1284,13 @@
                                END-EVALUATE
                                MOVE    1               TO  WK-HEAD-LINE
                                MOVE    2               TO  WK-BODY-LINE
+                           WHEN    "RRECEC"
+                           WHEN    "rrecec"
+                                       MOVE
+                                       "オンライン返戻ファイル（労災）"
+                                                       TO  WRK-TITLE
+                               MOVE    1               TO  WK-HEAD-LINE
+                               MOVE    2               TO  WK-BODY-LINE
                        END-EVALUATE
                    END-IF
                    IF      CNT-PARA            =   WK-HEAD-LINE
@@ -1333,19 +1371,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    GO  TO  7002-FILE-CHECK-EXT
                END-IF
            ELSE
-               PERFORM VARYING IDX FROM    1   BY  1
-                       UNTIL   IDX >       TBL-SYS1001-MAX
-                   MOVE    TBL-SYS1001-REC (IDX)   TO  SYS-1001-REC
-                   IF    ( WRK-FILENM (8:2)    =   SYS-1001-PREFNUM )
-                   AND   ( WRK-FILENM (11:7)   =   SYS-1001-HOSPCD  )
-                       MOVE    ZERO                    TO  WRK-ERRMSG1
-                       MOVE    TBL-SYS1001-MAX         TO  IDX
-                   ELSE
-                       MOVE    2                   TO  WRK-ERRMSG1
+               IF      WRK-FILENM      =   "RRECEC.HEN"  OR
+                                           "rrecec.hen"
+                   CONTINUE
+               ELSE
+                   PERFORM VARYING IDX FROM    1   BY  1
+                           UNTIL   IDX >       TBL-SYS1001-MAX
+                       MOVE    TBL-SYS1001-REC (IDX)   TO  SYS-1001-REC
+                       IF    ( WRK-FILENM (8:2)    =  SYS-1001-PREFNUM )
+                       AND   ( WRK-FILENM (11:7)   =  SYS-1001-HOSPCD  )
+                           MOVE    ZERO                TO  WRK-ERRMSG1
+                           MOVE    TBL-SYS1001-MAX     TO  IDX
+                       ELSE
+                           MOVE    2                   TO  WRK-ERRMSG1
+                       END-IF
+                   END-PERFORM    
+                   IF      WRK-ERRMSG1         >   ZERO
+                       GO  TO  7002-FILE-CHECK-EXT
                    END-IF
-               END-PERFORM    
-               IF      WRK-ERRMSG1         >   ZERO
-                   GO  TO  7002-FILE-CHECK-EXT
                END-IF
            END-IF
       *
@@ -1355,6 +1398,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EVALUATE    WRK-FILENM
                WHEN    "RECEIPTC.HEN"
                WHEN    "receiptc.hen"
+               WHEN    "RRECEC.HEN"
+               WHEN    "rrecec.hen"
                    MOVE    "0"             TO  SPA-NAI-T05-TFLG2 (IDY)
                WHEN    "RECEIPTC.SAH"
                WHEN    "receiptc.sah" 
@@ -1370,7 +1415,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                        "receiptc.sah" 
                MOVE    WRK-TEISYUTUSAKI    TO  SPA-NAI-T05-TFLG3 (IDY)
            ELSE
-               MOVE    WRK-FILENM (7:1)    TO  SPA-NAI-T05-TFLG3 (IDY)
+               IF      WRK-FILENM      =   "RRECEC.HEN"  OR
+                                           "rrecec.hen"
+                   MOVE    "3"             TO  SPA-NAI-T05-TFLG3 (IDY)
+               ELSE
+                   MOVE    WRK-FILENM (7:1)
+                                           TO  SPA-NAI-T05-TFLG3 (IDY)
+               END-IF
            END-IF
       *
       *    取り込み済のファイルかどうかの確認
@@ -1408,6 +1459,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                OR  "receiptc.sah" )
                        AND   ( WRK-FILENM      =   "RECEIPTC.SAH"
                                                OR  "receiptc.sah" )
+                           MOVE    3               TO  WRK-ERRMSG1
+                           GO  TO  7002-FILE-CHECK-EXT
+                       END-IF
+                       IF    ( SPA-GMN-T05-TFILENM (IDX)
+                                               =   "RRECEC.HEN"
+                                               OR  "rrecec.hen" )
+                       AND   ( WRK-FILENM      =   "RRECEC.HEN"
+                                               OR  "rrecec.hen" )
                            MOVE    3               TO  WRK-ERRMSG1
                            GO  TO  7002-FILE-CHECK-EXT
                        END-IF
@@ -1485,6 +1544,24 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        MOVE    4               TO  WRK-ERRMSG1
                        GO  TO  7002-FILE-CHECK-EXT
                    END-IF
+               WHEN    "RRECEC"
+               WHEN    "rrecec"
+                   INITIALIZE                  HENREI-K-REC
+                   MOVE   SPA-HOSPNUM      TO  HENREI-K-HOSPNUM
+                   MOVE   SPA-NAI-T05-TFLG3 (IDY)
+                                           TO  HENREI-K-TEISYUTUSAKI
+                   MOVE   SPA-NAI-T05-TFLG2 (IDY)
+                                           TO  HENREI-K-TEISYUTUSAKI2
+                   MOVE   SPA-NAI-T05-TSRYYM(IDY)
+                                           TO  HENREI-K-SYORIYM
+                   MOVE    "tbl_henrei_kanri"
+                                           TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   PERFORM 900-HENREI-KANRI-READ-SEC
+                   IF      FLG-HENREI-K    =   ZERO
+                       MOVE    4               TO  WRK-ERRMSG1
+                       GO  TO  7002-FILE-CHECK-EXT
+                   END-IF
            END-EVALUATE
       *
       *    エラー件数のチェック（１０００件超えた場合は取り込み不可）
@@ -1503,6 +1580,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EVALUATE    WRK-FILENM(1:6)
                WHEN    "RECEIP"
                WHEN    "receip"
+                   ADD     1               TO  SPA-GMN-T05-TCNT(IDY)
+               WHEN    "RRECEC"
+               WHEN    "rrecec"
                    ADD     1               TO  SPA-GMN-T05-TCNT(IDY)
            END-EVALUATE
       *
@@ -1692,12 +1772,39 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                MOVE    21              TO  WRK-ERRMSG1
                            END-IF
                    END-EVALUATE
+               WHEN    "RRECEC"
+               WHEN    "rrecec"
+                   EVALUATE    WRK-KOUMOKU-NO
+      *                レコード識別情報
+                       WHEN    1
+                           IF      PARA-DATA (WRK-MO-ST:WRK-MO-CNT)
+                                                   NOT =   "RE"
+                               MOVE    18              TO  WRK-ERRMSG1
+                           END-IF
+      *                請求年月
+                       WHEN    21
+                           MOVE    WRK-PARA-REC (WRK-MO-ST:WRK-MO-CNT)
+                                                   TO  WRK-SEIKYU-DATA
+                           INITIALIZE                  ORCSGDAYAREA
+                           MOVE    "1"             TO  SGDAY-INTYPE
+                           MOVE    WRK-SEIKYU-SKYYM
+                                                   TO  SGDAY-INDAY
+                           CALL    "ORCSGDAY"      USING
+                                                   ORCSGDAYAREA
+                           IF      SGDAY-RC        =   ZERO
+                               MOVE    SGDAY-SDAY (1:6)    TO
+                                               SPA-GMN-T05-TSRYYM (IDY)
+                               MOVE    SGDAY-SDAY (1:6)    TO
+                                               SPA-NAI-T05-TSRYYM (IDY)
+                           ELSE
+                               MOVE    14              TO  WRK-ERRMSG1
+                           END-IF
+                   END-EVALUATE
            END-EVALUATE
       *
            .
        700211-HEAD-HENSYU-EXT.
            EXIT.
-      *
       *
       *****************************************************************
       *    ボディ項目別編集処理
@@ -1866,6 +1973,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    ADD     1               TO  SPA-GMN-T05-TCNT(IDY)
                    IF      PARA-DATA (1:2) =   "HG"
                        MOVE    1               TO  FLG-HG-CHK
+                   END-IF
+               WHEN    "RRECEC"
+               WHEN    "rrecec"
+                   IF       PARA-DATA(1:1) =   X"1A"
+                       CONTINUE
+                   ELSE
+                       ADD     1               TO  SPA-GMN-T05-TCNT(IDY)
                    END-IF
            END-EVALUATE
       *

@@ -10,7 +10,7 @@
               03  H02-NYUGAIKBN-STYLE   PIC X(20).
               03  H02-NYUGAIKBN     PIC X(6).
               03  H02-RECESYUBETU-STYLE   PIC X(20).
-              03  H02-RECESYUBETU   PIC X(4).
+              03  H02-RECESYUBETU   PIC X(10).
               03  H02-HKNJANUM-STYLE   PIC X(20).
               03  H02-HKNJANUM      PIC X(8).
               03  H02-KIGO-STYLE   PIC X(20).
@@ -26,7 +26,7 @@
                     06  H02-TSYORIYM           PIC X(7).
                     06  H02-TTEISYUTUSAKI2     PIC X(2).
                     06  H02-TNYUGAIKBN         PIC X(2).
-                    06  H02-TRECESYUBETU       PIC X(4).
+                    06  H02-TRECESYUBETU       PIC X(10).
                     06  H02-THKNJANUM          PIC X(8).
                     06  H02-TKIGO              PIC X(20).
                     06  H02-TRECEIPT-KBN       PIC X(4).

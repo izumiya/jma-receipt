@@ -23,12 +23,12 @@
     <wmclass_class>jma-receipt.dialog</wmclass_class>
     <wmclass_name></wmclass_name>
     <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
-    <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -159,7 +159,7 @@
         <name>RECESYUBETU</name>
         <x>341</x>
         <y>270</y>
-        <width>40</width>
+        <width>80</width>
         <height>24</height>
         <sensitive>True</sensitive>
         <can_focus>False</can_focus>
@@ -168,7 +168,7 @@
         <yalign>0.5</yalign>
         <xpad>0</xpad>
         <ypad>0</ypad>
-        <label>1124</label>
+        <label>1234567890</label>
         <justify>GTK_JUSTIFY_CENTER</justify>
         <wrap>False</wrap>
       </widget>
@@ -193,7 +193,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>HKNJANUM</name>
-        <x>387</x>
+        <x>427</x>
         <y>270</y>
         <width>71</width>
         <height>24</height>
@@ -229,7 +229,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>KIGO</name>
-        <x>468</x>
+        <x>508</x>
         <y>270</y>
         <width>132</width>
         <height>24</height>
@@ -247,7 +247,7 @@
       <widget>
         <class>GtkLabel</class>
         <name>ERR</name>
-        <x>609</x>
+        <x>649</x>
         <y>270</y>
         <width>221</width>
         <height>24</height>
@@ -284,7 +284,7 @@
           <border_width>0</border_width>
           <show_titles>True</show_titles>
           <columns>18</columns>
-          <column_widths>29,58,16,30,39,84,114,15,140,15,57,30,36,74,111,21,20,15</column_widths>
+          <column_widths>29,58,16,30,80,84,114,15,140,15,57,30,36,74,111,21,20,15</column_widths>
           <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
           <signal>
             <name>select_row</name>

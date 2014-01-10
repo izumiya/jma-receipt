@@ -21,7 +21,7 @@ H02	{
 		};
 		RECESYUBETU	{
 			style   varchar(20);
-			value	varchar(4);
+			value	varchar(10);
 		};
 		HKNJANUM	{
 			style   varchar(20);
@@ -44,7 +44,7 @@ H02	{
 					value1	varchar(7);
 					value2	varchar(2);
 					value3	varchar(2);
-					value4	varchar(4);
+					value4	varchar(10);
 					value5	varchar(8);
 					value6	varchar(20);
 					value7	varchar(4);
