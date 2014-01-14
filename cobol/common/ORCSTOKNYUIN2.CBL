@@ -956,6 +956,9 @@
                      MOVE   LNK-TOKNYUIN2-SANTEIYMD
                                        TO  LNK-TOKNYUIN2-STYMD (TN-IDX)
       *              特定入院終了日（１）
+                   IF    WRK-JGN-NISSU(1) =   999
+                     MOVE  "99999999"   TO  LNK-TOKNYUIN2-EDYMD (TN-IDX)
+                   ELSE
                      MOVE     ZERO     TO  WRK-TOKUTEI-DAY
                      COMPUTE  WRK-TOKUTEI-DAY =  WRK-JGN-NISSU(1)  -
                                                  LNK-TOKNYUIN2-NISSU08
@@ -983,6 +986,7 @@
                                                     LNK-DAY6-AREA
                      MOVE   LNK-DAY6-KEISAN TO
                                           LNK-TOKNYUIN2-IPN-KAIKEI-YMD
+                   END-IF
                  END-IF
       *
            END-IF
