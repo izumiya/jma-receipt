@@ -33,6 +33,7 @@
       *  03.05.00    NACL-多々納  07/06/05  コメント内容の全角変換
       *  04.06.00    NACL-多々納  10/10/01  コメント文字　３０００、
       *                                     連番対応他
+      *  04.07.00    NACL-多々納  13/09/XX  第三者行為対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -959,6 +960,11 @@
                                            TO  SPA-GMN-SJKBNLST (14)
                MOVE    14                  TO  SPA-SJKBN-MAX
            END-IF
+      *!!!
+           ADD     1                   TO  SPA-SJKBN-MAX
+           MOVE    "BB 自賠責（第三者行為）レセプト摘要欄コメント"
+                                       TO  SPA-GMN-SJKBNLST
+                                                (SPA-SJKBN-MAX)
       *
            IF      SPA-GMN-SJKBN   NOT =   SPACE
                MOVE    ZERO                TO  FLG-OK

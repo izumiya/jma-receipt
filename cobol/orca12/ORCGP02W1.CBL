@@ -2535,9 +2535,9 @@
                            "¡Ë"                    DELIMITED  BY  SIZE
                            INTO              WRK-HKNCOMBI
                        END-STRING
-                   END-IF
-                   MOVE    WRK-HKNCOMBI        TO  SPA-GMN-THKNCOMBIMEI
+                       MOVE    WRK-HKNCOMBI    TO  SPA-GMN-THKNCOMBIMEI
                                                                    (IDX)
+                   END-IF
                    MOVE    1               TO  FLG-PARA
                END-IF
       *
