@@ -16,6 +16,7 @@
                           PIC X       OCCURS  100 TIMES.
               03  T08-SCROLLEDWINDOW1.
                 04  T08-RECE-LIST.
+                  05  T08-RECE-LIST-HYODAI1   PIC X(14).
                   05  T08-RECE-LIST-COUNT     PIC S9(9)   BINARY.
                   05  T08-RECE-LIST-ROW       PIC S9(9)   BINARY.
                   05  T08-RECE-LIST-ITEM      OCCURS  1000 TIMES.
@@ -25,7 +26,7 @@
                     06  T08-RECE-TNAME        PIC X(40).
                     06  T08-RECE-TBIRTHDAY    PIC X(9).
                     06  T08-RECE-TSRYYM       PIC X(6).
-                    06  T08-RECE-TRECESYUBETU PIC X(4).
+                    06  T08-RECE-TRECESYUBETU PIC X(10).
                     06  T08-RECE-THKNJANUM    PIC X(8).
                     06  T08-RECE-TKIGO        PIC X(40).
                     06  T08-RECE-THOJOKBN     PIC X(2).

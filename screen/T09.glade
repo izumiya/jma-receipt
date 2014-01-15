@@ -10,7 +10,7 @@
   <widget>
     <class>GtkWindow</class>
     <name>T09</name>
-    <width>835</width>
+    <width>875</width>
     <height>557</height>
     <sensitive>True</sensitive>
     <can_focus>False</can_focus>
@@ -24,12 +24,12 @@
     <wmclass_class>jma-receipt.dialog</wmclass_class>
     <wmclass_name></wmclass_name>
     <signal>
-      <name>set_focus</name>
-      <handler>set_focus</handler>
-    </signal>
-    <signal>
       <name>map_event</name>
       <handler>map_event</handler>
+    </signal>
+    <signal>
+      <name>set_focus</name>
+      <handler>set_focus</handler>
     </signal>
     <signal>
       <name>delete_event</name>
@@ -319,7 +319,7 @@
           <border_width>0</border_width>
           <show_titles>True</show_titles>
           <columns>11</columns>
-          <column_widths>25,81,149,28,54,80,55,168,20,63,17</column_widths>
+          <column_widths>25,81,149,28,94,80,55,168,20,63,17</column_widths>
           <selection_mode>GTK_SELECTION_MULTIPLE</selection_mode>
           <signal>
             <name>select_row</name>
@@ -451,7 +451,7 @@
           <widget>
             <class>GtkLabel</class>
             <child_name>CList:title</child_name>
-            <name>label471</name>
+            <name>HYODAI1</name>
             <sensitive>True</sensitive>
             <can_focus>False</can_focus>
             <has_focus>False</has_focus>

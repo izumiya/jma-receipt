@@ -45,6 +45,7 @@
       *                                     receipt_kbn 追加 
       *
       *  04.07.01    NACL-藤原    12/08/01  レセ電データチェック機能対応
+      *  04.07.02    NACL-藤原    13/10/07  労災レセ電対応
       *****************************************************************
        01  SPA-T06.
       *    個別指示画面
@@ -53,7 +54,7 @@
       *
                05  SPA-GMN-T06-AREA.
                    07  SPA-GMN-T06-KANRI-TBL.
-                       09  SPA-GMN-T06-KANRI-G     OCCURS  500.
+                       09  SPA-GMN-T06-KANRI-G     OCCURS  100.
                            11  SPA-GMN-T06-K-TRENNUM   PIC 9(03).
                            11  SPA-GMN-T06-K-TUKEYMD   PIC X(09).
                            11  SPA-GMN-T06-K-TUCNT     PIC 9(03).
@@ -83,7 +84,7 @@
                        09  SPA-GMN-T06-BODY-MAX        PIC 9(04).
       *
                    07  SPA-GMN-T06-RECE-TBL.
-                       09  SPA-GMN-T06-RECE-G      OCCURS  1000.
+                       09  SPA-GMN-T06-RECE-G      OCCURS  500.
                            11  SPA-GMN-T06-R-TRENNUM   PIC 9(04).
                            11  SPA-GMN-T06-R-TNYUGAIKBN
                                                        PIC X(02).
@@ -108,11 +109,15 @@
                                                    PIC X(01).
                            11  SPA-GMN-T06-TEISYUTUSAKI3
                                                    PIC X(01).
+                           11  SPA-GMN-T06-TEISYUTUSAKI4
+                                                   PIC X(01).
                        09  SPA-GMN-T06-TEISYUTUSAKI1-STATE
                                                    PIC S9(09)  BINARY.
                        09  SPA-GMN-T06-TEISYUTUSAKI2-STATE
                                                    PIC S9(09)  BINARY.
                        09  SPA-GMN-T06-TEISYUTUSAKI3-STATE
+                                                   PIC S9(09)  BINARY.
+                       09  SPA-GMN-T06-TEISYUTUSAKI4-STATE
                                                    PIC S9(09)  BINARY.
       *
                        09  SPA-GMN-T06-RECE-KOUMOKU.
@@ -157,7 +162,7 @@
                                                    PIC X(01).
       * 
                    07  SPA-NAI-T06-KANRI-TBL.
-                       09  SPA-NAI-T06-KANRI-G     OCCURS   500.
+                       09  SPA-NAI-T06-KANRI-G     OCCURS   100.
                            11  SPA-NAI-T06-K-TUKEYMD   PIC 9(08).
       *
                    07  SPA-NAI-T06-BODY-TBL.
@@ -173,10 +178,14 @@
                                                        PIC 9(06).
       *
                    07  SPA-NAI-T06-RECE-TBL.
-                       09  SPA-NAI-T06-RECE-G      OCCURS   1000.
+                       09  SPA-NAI-T06-RECE-G      OCCURS   500.
                            11  SPA-NAI-T06-R-THKNNUM   PIC X(03).
                            11  SPA-NAI-T06-R-THENREI-SIJI-FLG
                                                        PIC 9(01).
+                           11  SPA-NAI-T06-R-THKNJANUM-S
+                                                       PIC X(08).
+                           11  SPA-NAI-T06-R-TSYOKAIFLG
+                                                       PIC X(01).
                            11  SPA-NAI-T06-RECE10-KEY.
                                13  SPA-NAI-T06-RECE10-HOSPNUM
                                                        PIC 9(02).
@@ -234,6 +243,13 @@
                        09  SPA-NAI-T06-DIRECT-HKNJANUM-63L
                                                PIC X(08).
       *
+               05  SPA-NAI-T06-4001-T.
+                   07  SPA-NAI-T06-4001-MAX    PIC 9(02).
+                   07  SPA-NAI-T06-4001-OCC    OCCURS  10.
+                       09  SPA-NAI-T06-4001-STYUKYMD    PIC  X(08).
+                       09  SPA-NAI-T06-4001-EDYUKYMD    PIC  X(08).
+                       09  SPA-NAI-T06-4001-RSIIRYOKBN  PIC  X(01).
+      *
       *    作成履歴画面
            03  SPA-T08-AREA.
                05  SPA-GMN-T08-MAX             PIC 9(03).
@@ -258,7 +274,7 @@
                        09  SPA-GMN-T09-TNAME       PIC X(20).
                        09  SPA-GMN-T09-TNYUGAIKBN  PIC X(2).
                        09  SPA-GMN-T09-TRECESYUBETU
-                                                   PIC X(4).
+                                                   PIC X(10).
                        09  SPA-GMN-T09-THKNJANUM   PIC X(8).
                        09  SPA-GMN-T09-TKIGO       PIC X(40).
                        09  SPA-GMN-T09-THOJOKBN    PIC X(8).
@@ -283,6 +299,10 @@
                        09  SPA-NAI-T09-RECE10-THKNNUM  PIC X(03).
                        09  SPA-NAI-T09-RECE10-THENREI-SIJI-FLG
                                                        PIC 9(01).
+                       09  SPA-NAI-T09-RECE10-THKNJANUM-S
+                                                       PIC X(08).
+                       09  SPA-NAI-T09-RECE10-TSYOKAIFLG
+                                                       PIC X(01).
                        09  SPA-NAI-T09-RECE10-TKIGO    PIC X(40).
                        09  SPA-NAI-T09-RECE10-TNUM     PIC X(40).
       *

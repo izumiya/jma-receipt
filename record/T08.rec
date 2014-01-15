@@ -21,6 +21,9 @@ T08	{
 		};
 		scrolledwindow1	{
 			RECE_LIST	{
+			         HYODAI1 {
+					value   varchar(14);
+				};
 				count	int;
 				row	int;
 				item	{
@@ -30,7 +33,7 @@ T08	{
 					value3	varchar(40);
 					value4	varchar(9);
 					value5	varchar(6);
-					value6	varchar(4);
+					value6	varchar(10);
 					value7	varchar(8);
 					value8	varchar(40);
 					value9	varchar(2);

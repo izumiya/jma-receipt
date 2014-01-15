@@ -57,6 +57,10 @@ T06	{
                         state   int;
 			value	bool;
 		};
+		TEISYUTUSAKI4	{
+                        state   int;
+			value	bool;
+		};
 		scrolledwindow3	{
 			KANRI_LIST	{
 				count	int;
@@ -96,6 +100,9 @@ T06	{
 		};
 		scrolledwindow1	{
 			RECE_LIST	{
+				HYODAI1 {
+					value   varchar(14);
+				};
 				count	int;
 				row	int;
 				item	{
@@ -105,7 +112,7 @@ T06	{
 					value3	varchar(20);
 					value4	varchar(40);
 					value5	varchar(6);
-					value6	varchar(4);
+					value6	varchar(10);
 					value7	varchar(8);
 					value8	varchar(40);
 					value9	varchar(4);

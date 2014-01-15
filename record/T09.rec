@@ -26,6 +26,9 @@ T09	{
 		};
 		scrolledwindow26	{
 			RECELIST	{
+				HYODAI1 {
+					value   varchar(14);
+				};
 				count	int;
 				row	int;
 				item	{
@@ -33,7 +36,7 @@ T09	{
 					value1	varchar(20);
 					value2	varchar(20);
 					value3	varchar(2);
-					value4	varchar(4);
+					value4	varchar(10);
 					value5	varchar(8);
 					value6	varchar(8);
 					value7	varchar(40);

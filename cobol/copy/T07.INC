@@ -9,6 +9,7 @@
                 04  T07-VALUE   PIC X(40).
               03  T07-SCROLLEDWINDOW26.
                 04  T07-LIST.
+                  05  T07-LIST-HYODAI1   PIC X(14).
                   05  T07-LIST-COUNT     PIC S9(9)   BINARY.
                   05  T07-LIST-ROW       PIC S9(9)   BINARY.
                   05  T07-LIST-ITEM      OCCURS  100 TIMES.
@@ -19,7 +20,7 @@
                     06  T07-TSKYYMD      PIC X(9).
                     06  T07-TSCNT        PIC X(2).
                     06  T07-TNYUGAIKBN   PIC X(2).
-                    06  T07-TRECESYUBETU PIC X(4).
+                    06  T07-TRECESYUBETU PIC X(10).
                     06  T07-THKNJANUM    PIC X(8).
                     06  T07-TKIGO        PIC X(40).
                   05  T07-SELECT

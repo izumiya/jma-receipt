@@ -282,5 +282,20 @@ path    upd2    {
                 ;
         };
 };
+path    key7            {
+        DBSELECT        {
+                DECLARE tbl_onrece_body_key7_csr CURSOR FOR
+                SELECT *
+                FROM tbl_onrece_body
+                WHERE	HOSPNUM		= :HOSPNUM
+                    AND	TEISYUTUSAKI	= :TEISYUTUSAKI
+                    AND	SRYYM		= :SRYYM
+                    AND	UCNT		= :UCNT
+                    AND	SCNT		= :SCNT
+                    AND	RENNUM		= :RENNUM
+		ORDER	BY	U_YOBI1 DESC,U_YOBI2,PTNUM
+                ;
+        };
+};
 
 

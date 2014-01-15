@@ -41,6 +41,7 @@ utf8_shell_sources = \
 	monthly/recept4_fd.sh.in \
 	monthly/recept4_kobetu.sh.in \
 	monthly/recept41.sh.in \
+	monthly/recept41_kobetu.sh.in \
 	monthly/recept5.sh.in \
 	monthly/recept50.sh.in \
 	monthly/recept6.sh.in \

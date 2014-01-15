@@ -32,6 +32,9 @@
               03  T06-TEISYUTUSAKI3-STATE   PIC S9(9)   BINARY.
               03  T06-TEISYUTUSAKI3.
                 04  T06-VALUE   PIC X.
+              03  T06-TEISYUTUSAKI4-STATE   PIC S9(9)   BINARY.
+              03  T06-TEISYUTUSAKI4.
+                04  T06-VALUE   PIC X.
               03  T06-SCROLLEDWINDOW3.
                 04  T06-KANRI-LIST.
                   05  T06-KANRI-LIST-COUNT   PIC S9(9)   BINARY.
@@ -67,6 +70,7 @@
                           PIC X       OCCURS  1000 TIMES.
               03  T06-SCROLLEDWINDOW1.
                 04  T06-RECE-LIST.
+                  05  T06-RECE-LIST-HYODAI1   PIC X(14).
                   05  T06-RECE-LIST-COUNT     PIC S9(9)   BINARY.
                   05  T06-RECE-LIST-ROW       PIC S9(9)   BINARY.
                   05  T06-RECE-LIST-ITEM          OCCURS  1000 TIMES.
@@ -76,7 +80,7 @@
                     06  T06-RECE-TPTNUM       PIC X(20).
                     06  T06-RECE-TNAME        PIC X(40).
                     06  T06-RECE-TSRYYM       PIC X(6).
-                    06  T06-RECE-TRECESYUBETU PIC X(4).
+                    06  T06-RECE-TRECESYUBETU PIC X(10).
                     06  T06-RECE-THKNJANUM    PIC X(8).
                     06  T06-RECE-TKIGO        PIC X(40).
                     06  T06-RECE-TRECEIPT-KBN PIC X(4).

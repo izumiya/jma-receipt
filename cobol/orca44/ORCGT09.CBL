@@ -41,6 +41,7 @@
       *  04.07.01    NACL-藤原    12/01/13  健保組合への直接請求と審査
       *                                     支払機関請求対応
       *  04.07.02    NACL-藤原    12/08/01  レセ電データチェック機能対応
+      *  04.07.03    NACL-藤原    13/10/07  労災レセ電対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -90,6 +91,7 @@
            03  WRK-Z9              PIC Z9.
            03  WRK-ZZ9             PIC ZZ9.
       *
+      *    SPA-GMN-T09-SELNUM-OCCにあわせる
            03  WRK-GKN-T09.
                05  WRK-GMN-T09-SELNUM-OCC.
                    07  WRK-GMN-T09-SELNUM
@@ -897,7 +899,12 @@
                                        =   "T"
                MOVE    "社保"              TO  T07-TEISYUTUSAKI
            ELSE
-               MOVE    "国保"              TO  T07-TEISYUTUSAKI
+               IF      SPA-GMN-T06-TEISYUTUSAKI4
+                                           =   "T"
+                   MOVE    "労災"              TO  T07-TEISYUTUSAKI
+               ELSE
+                   MOVE    "国保"              TO  T07-TEISYUTUSAKI
+               END-IF
            END-IF
       *
            MOVE    ZERO            TO  IDX
@@ -910,12 +917,18 @@
            MOVE    SPA-NAI-T09-RECE10-TPTID (SPA-NAI-T09-SELNUM)
                                    TO  ONRECE-B-PTID
            IF      SPA-GMN-T06-TEISYUTUSAKI1
-                                      =   "T"
+                                       =   "T"
                MOVE    "1"                 TO  ONRECE-B-TEISYUTUSAKI
                                                ONRECE-B-XXTEISYUTUSAKI
            ELSE
-               MOVE    "6"                 TO  ONRECE-B-TEISYUTUSAKI
-               MOVE    "2"                 TO  ONRECE-B-XXTEISYUTUSAKI
+               IF      SPA-GMN-T06-TEISYUTUSAKI4
+                                           =   "T"
+                   MOVE    "3"             TO  ONRECE-B-TEISYUTUSAKI
+                                               ONRECE-B-XXTEISYUTUSAKI
+               ELSE
+                   MOVE    "6"             TO  ONRECE-B-TEISYUTUSAKI
+                   MOVE    "2"             TO  ONRECE-B-XXTEISYUTUSAKI
+               END-IF
            END-IF
            MOVE    SPA-NAI-T09-RECE10-TNYUGAIKBN (SPA-NAI-T09-SELNUM)
                                    TO  ONRECE-B-NYUGAIKBN
@@ -1105,6 +1118,13 @@
                                    TO  SPA-NAI-T09-TSELECT (IDX)
            END-PERFORM
            MOVE    IDX             TO  T09-COUNT
+      *
+           IF      SPA-GMN-T06-TEISYUTUSAKI4
+                                       =   "T"
+               MOVE    "年金証書番号等"    TO  T09-HYODAI1
+           ELSE
+               MOVE    "記号・番号"        TO  T09-HYODAI1
+           END-IF
       *
            PERFORM 5001-MAPCUR-SEC
       *

@@ -1,0 +1,240 @@
+#!/bin/bash
+
+if test -z "$JMARECEIPT_ENV" ; then
+    JMARECEIPT_ENV="@jma-receipt-env@"
+fi
+if ! test -f "$JMARECEIPT_ENV"; then
+    exit 0
+fi
+
+. $JMARECEIPT_ENV
+
+#-------------------------------------------#
+#    労災レセ電ファイル個別作成処理
+#        ${1}-${11} 印刷ＤＢ用固定引数
+#        ${13} 連番
+#        ${17} レセ電ファイル出力先
+#        ${18} JOBID 
+#        ${19} SHELLID
+#        ${20} エラーファイル名 
+#        ${21} ファイル出力先区分
+#        ${22} 端末ｉｐアドレス
+#        ${23} HOSPNUM
+#        ${24} レセプト作成区分
+#            1:提出用レセ、2:点検用レセ
+#        ${25} 症状詳記作成区分
+#            1:作成する
+#        ${26} レセ電データ履歴保存設定区分
+#            1:履歴保存する
+#        ${28} レセ電データチェックの有無
+#            1:チェックする
+#-------------------------------------------#
+
+    rennum=0
+##  2HD flesize  
+    fixedsize=1441500
+
+##  エラーファイル削除
+	echo $#
+	echo "echo " ${20}
+    if  [ -e ${20} ]; then
+        rm ${20}
+    fi
+
+    LOG_FILE="/var/log/jma-receipt/${23}recept41_kobetu.log"
+
+    echo "arg5 =  [" ${5} "]"  >$LOG_FILE
+    echo "arg13 = [" ${13} "]" >>$LOG_FILE
+    echo "arg17 = [" ${17} "]" >>$LOG_FILE
+    echo "arg18 = [" ${18} "]" >>$LOG_FILE
+    echo "arg19 = [" ${19} "]" >>$LOG_FILE
+    echo "arg20 = [" ${20} "]" >>$LOG_FILE
+    echo "arg21 = [" ${21} "]" >>$LOG_FILE
+    echo "arg22 = [" ${22} "]" >>$LOG_FILE
+    echo "arg23 = [" ${23} "]" >>$LOG_FILE
+    echo "arg24 = [" ${24} "]" >>$LOG_FILE
+    echo "arg26 = [" ${26} "]" >>$LOG_FILE
+    echo "arg28 = [" ${28} "]" >>$LOG_FILE
+    echo "hostname =  ["`hostname`  "]" >>$LOG_FILE
+
+#   一時請求
+    RECEFILE1="RREC"
+    RECEFILE2="RECEDEN"
+#   再請求
+    RECEFILE3="RREC"
+    RECEFILE4="UKSRECE"
+
+    if  [ ${24} -eq '2' ]; then
+	RECEFILE1="TENC"
+	RECEFILE2="TENKENT"
+	RECEFILE3="TENC"
+	RECEFILE4="UKSTENK"
+	echo "file name change!" >>$LOG_FILE
+    fi
+
+#   該当ファイル削除
+    rm  ${17}${23}${RECEFILE1}*.UKE
+    rm  /tmp/${23}${RECEFILE2}*.txt
+    rm  ${17}${23}${RECEFILE3}*.UKS
+    rm  /tmp/${23}${RECEFILE4}*.txt
+
+    rm -fr "/tmp/${23}Rousai_"*
+    rm -fr "/tmp/${23}TRousai_"*
+
+#   レセ電ファイル作成
+
+    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM710 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${13},${17},${18},${19},${21},$fixedsize,${24},${23},${20} >> $LOG_FILE 2>&1
+    if  [ -e ${20} ]; then
+        echo "--- BM710 err file exist ---" >> $LOG_FILE 2>&1
+        exit 
+    fi
+
+#   一時フォルダ作成
+    if  [ ${24} -eq '2' ]; then
+        ROUSAI_FOLDER1="${23}_TRousai_${5}"
+    else
+        ROUSAI_FOLDER1="${23}_Rousai_${5}"
+    fi
+    if  [ ${21} -eq '5' ]|| [ ${21} -eq '6' ]; then
+        ROUSAI_FOLDER="${ROUSAI_FOLDER1}_Kobetsu"
+    else
+        ROUSAI_FOLDER="${ROUSAI_FOLDER1}/Kobetsu"
+    fi
+    OUT_FOLDER="/tmp/${ROUSAI_FOLDER}/"
+
+    echo "--- rm work folder [" /tmp/${ROUSAI_FOLDER1} "]" >>$LOG_FILE
+    rm -fr /tmp/${ROUSAI_FOLDER1}
+
+    if ( [ ${21} -eq '3' ]|| [ ${21} -eq '4' ] ) && [ ${26} -eq '0' ]; then
+        echo "--- not out holder  ---" >>$LOG_FILE
+    else
+        echo "--- folder name  [" ${OUT_FOLDER} "]" >>$LOG_FILE
+        if ! test -d  "${OUT_FOLDER}"; then
+            mkdir -p ${OUT_FOLDER}
+            RC=$?
+            if  [ $RC -ne '0' ]; then
+                ERRCD='0077'
+                $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19}'  '${ERRCD},${23} >> $LOG_FILE
+                echo "--- mkdir  err   ---" >>$LOG_FILE
+                exit
+            fi
+            chmod -R g+r ${OUT_FOLDER}
+            echo "--- mkdir out holder ---" >>$LOG_FILE
+        else
+            rm ${OUT_FOLDER}*
+            echo "--- rm out holder file ---" >>$LOG_FILE
+        fi
+    fi
+
+
+#   漢字コード変換
+    echo "ファイルの処理(sjis変換)"
+
+#   一次請求
+    all=`ls  /tmp/${23}${RECEFILE2}*.txt`
+ 
+    for f in $all ; do
+        echo "f= " $f >> $LOG_FILE 2>&1
+      echo "mm = " ${f:14:2} >> $LOG_FILE 2>&1
+      echo "nn = " ${f:16:2} >> $LOG_FILE 2>&1
+
+#       システム管理場所出力（履歴保存を行わない）のとき
+        if ( [ ${21} -eq '3' ]|| [ ${21} -eq '4' ] ) && [ ${26} -eq '0' ]; then
+            echo ${17}${23}${RECEFILE1}${f:14:2}${f:16:2}.UKE >> $LOG_FILE 2>&1
+            nkf -s $f > ${17}${23}${RECEFILE1}${f:14:2}${f:16:2}.UKE
+        else
+            echo ${OUT_FOLDER}${RECEFILE1}${f:14:2}${f:16:2}.UKE >> $LOG_FILE 2>&1
+            nkf -s $f > ${OUT_FOLDER}${RECEFILE1}${f:14:2}${f:16:2}.UKE
+        fi
+    done
+
+#   再請求
+    all=`ls  /tmp/${23}${RECEFILE4}*.txt`
+ 
+    for f in $all ; do
+        echo "f= " $f >> $LOG_FILE 2>&1
+      echo "mm = " ${f:14:2} >> $LOG_FILE 2>&1
+      echo "nn = " ${f:16:2} >> $LOG_FILE 2>&1
+
+#       システム管理場所出力（履歴保存を行わない）のとき
+        if ( [ ${21} -eq '3' ]|| [ ${21} -eq '4' ] ) && [ ${26} -eq '0' ]; then
+            echo ${17}${23}${RECEFILE3}${f:14:2}${f:16:2}.UKS >> $LOG_FILE 2>&1
+            nkf -s $f > ${17}${23}${RECEFILE3}${f:14:2}${f:16:2}.UKS
+        else
+            echo ${OUT_FOLDER}${RECEFILE3}${f:14:2}${f:16:2}.UKS >> $LOG_FILE 2>&1
+            nkf -s $f > ${OUT_FOLDER}${RECEFILE3}${f:14:2}${f:16:2}.UKS
+        fi
+    done
+
+
+#   システム管理場所出力のとき
+    if  [ ${21} -eq '3' ]|| [ ${21} -eq '4' ]; then
+        if  [ ${26} -eq '1' ]; then
+#           履歴保存先のフォルダへファイル作成
+            RIREKI_FOLDER1="${17}${ROUSAI_FOLDER1}/"
+            RIREKI_FOLDER="${RIREKI_FOLDER1}Kobetsu/"
+
+            echo "--- rireki folder name  [" ${RIREKI_FOLDER} "]" >>$LOG_FILE
+            if ! test -d  "${RIREKI_FOLDER}"; then
+                 mkdir -p ${RIREKI_FOLDER}
+                 RC=$?
+                 echo "--- mkdir end   ---[" $RC  "]" >>$LOG_FILE
+                 if  [ $RC -ne '0' ]; then
+                     ERRCD='0077'
+                     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19}'  '${ERRCD},${23} >> $LOG_FILE
+                     echo "--- mkdir  err   ---" >>$LOG_FILE
+                     exit
+                 fi
+                 chmod -R g+r ${RIREKI_FOLDER1}
+                 echo "--- mkdir rireki holder ---" >>$LOG_FILE
+            else
+                 rm ${RIREKI_FOLDER}*
+                 echo "--- rm rireki holder file ---" >>$LOG_FILE
+            fi
+#           一時請求
+            cp ${OUT_FOLDER}${RECEFILE1}*.UKE ${RIREKI_FOLDER}
+            chmod -R g+r ${RIREKI_FOLDER}${RECEFILE1}*.UKE
+#           再請求
+            cp ${OUT_FOLDER}${RECEFILE3}*.UKS ${RIREKI_FOLDER}
+            chmod -R g+r ${RIREKI_FOLDER}${RECEFILE3}*.UKS
+        else
+#           履歴保存を行わないとき
+            chmod -R g+r ${17}${23}${RECEFILE1}*.UKE
+            chmod -R g+r ${17}${23}${RECEFILE3}*.UKS
+        fi
+    fi
+
+#   クライアント保存
+    if  [ ${21} -eq '5' ]; then
+        cd  /tmp/
+        echo "--- zip name [" ${ROUSAI_FOLDER}.zip "]" >>$LOG_FILE
+        rm  ${ROUSAI_FOLDER}.zip
+        zip -r ${ROUSAI_FOLDER}.zip ${ROUSAI_FOLDER}/
+	RC=$?
+        echo "--- zip end   ---[" $RC  "]" >>$LOG_FILE
+	if  [ $RC -ne '0' ]; then
+	    ERRCD='0000'$RC
+	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19}'  '${ERRCD:${#ERRCD}-4:4},${23} >> $LOG_FILE
+            echo "--- zip err   ---" >>$LOG_FILE
+            exit
+	fi
+    fi
+
+#   ＣＤ−Ｒ出力のときisoファイル作成
+    if  [ ${21} -eq '6' ]; then
+        echo "--- iso start ---" >>$LOG_FILE
+        cd  /tmp/
+        echo "--- iso name [" ${17}${ROUSAI_FOLDER}.iso "]" >>$LOG_FILE
+        mkisofs --input-charset cp437 -l -o ${17}${ROUSAI_FOLDER}.iso ${ROUSAI_FOLDER}/
+	RC=$?
+        echo "--- iso end   ---[" $RC  "]" >>$LOG_FILE
+	if  [ $RC -ne '0' ]; then
+	    ERRCD='0000'$RC
+	    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19}'  '${ERRCD:${#ERRCD}-4:4},${23} >> $LOG_FILE
+            echo "--- iso err   ---" >>$LOG_FILE
+            exit
+	fi
+    fi
+
+    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19},${23} >> $LOG_FILE
+    exit 
