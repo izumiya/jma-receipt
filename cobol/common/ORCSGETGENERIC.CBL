@@ -88,6 +88,11 @@
                05  FLG-FUKACHK         PIC 9(01).
                05  FLG-FUKACHK2        PIC 9(01).
       *
+           03  WRK-GENERIC-CODE        PIC X(12).
+           03  WRK-GENERIC-STYMD       PIC X(08).
+           03  WRK-GENERIC-EDYMD       PIC X(08).
+           03  WRK-YAKKAKJNCD-OLD      PIC X(12).
+      *
       *
       *    剤内容テーブル
        01  WRK-SRYACT-GRP-AREA.
@@ -110,6 +115,10 @@
                05  WRK-SRY-COM-NAME        PIC X(200).
       *
            03  WRK-SRY-MAX                 PIC 9(03).
+      *
+      *
+      *    一般名例外コードテーブル
+           COPY    "CMGENERICTBL.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -210,7 +219,7 @@
       *         DISPLAY  "GENERICNAME:" ORCSGETGE-GENERICNAME (IDX)
       *                      (1:20)
       *        END-IF
-      *****END-PERFORM
+      **** END-PERFORM
            .
        000-PROC-EXT.
            EXIT    PROGRAM
@@ -522,6 +531,12 @@
                                        OR  "23"
                PERFORM 200122-IPNKSN-HEN-SEC
            END-IF
+      *
+      *    一般名例外コード変換処理
+           IF     (WRK-YAKKAKJNCD  NOT =   SPACE )
+              AND (WRK-GENERIC-KBN NOT =   SPACE )
+               PERFORM 200123-GENERICCD-HEN-SEC
+           END-IF
            .
        200121-GENERIC-CHK-EXT.
            EXIT.
@@ -540,6 +555,52 @@
            .
        200122-IPNKSN-HEN-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    一般名例外コード変換処理
+      *****************************************************************
+       200123-GENERICCD-HEN-SEC         SECTION.
+      *
+           SET     TBL-GEN             TO  1
+           SEARCH      TBL-GENERIC-OCC     VARYING   TBL-GEN
+                   AT  END
+                       MOVE    SPACE           TO  WRK-GENERIC-CODE
+                       MOVE    SPACE           TO  WRK-GENERIC-STYMD
+                       MOVE    SPACE           TO  WRK-GENERIC-EDYMD
+                   WHEN    WRK-YAKKAKJNCD      =   TBL-YAKKAKJNCD
+                                                           (TBL-GEN)
+                       MOVE    TBL-GENERIC-CODE (TBL-GEN)
+                                                TO  WRK-GENERIC-CODE
+                       MOVE    TBL-GENERIC-STYMD (TBL-GEN)
+                                                TO  WRK-GENERIC-STYMD
+                       MOVE    TBL-GENERIC-EDYMD (TBL-GEN)
+                                                TO  WRK-GENERIC-EDYMD
+           END-SEARCH
+      *
+           IF      WRK-GENERIC-CODE    NOT =   SPACE
+      *        有効期間判定
+               IF    (WRK-SRYYMD           >=  WRK-GENERIC-STYMD)
+                 AND (WRK-SRYYMD           <=  WRK-GENERIC-EDYMD)
+                   CONTINUE
+               ELSE
+                   MOVE    SPACE           TO  WRK-GENERIC-CODE
+               END-IF
+           END-IF
+      *
+           IF      WRK-GENERIC-CODE      =   SPACE
+               MOVE    WRK-YAKKAKJNCD        TO  WRK-YAKKAKJNCD-OLD
+               MOVE    SPACE                 TO  WRK-YAKKAKJNCD
+               STRING  WRK-YAKKAKJNCD-OLD(1:9)
+                       "ZZZ"               DELIMITED  BY  SIZE
+                                           INTO    WRK-YAKKAKJNCD
+               END-STRING
+           ELSE
+               MOVE    WRK-GENERIC-CODE    TO  WRK-YAKKAKJNCD
+           END-IF
+           .
+       20039-GENERICCD-HEN-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    点数マスター読込
       *****************************************************************
