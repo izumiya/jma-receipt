@@ -95,7 +95,6 @@
       *    √Êø¥¿≈ÃÆ§¢§Í 
            03  FLG-SYUGI-CHU       PIC 9(01).
       *
-      *
       *    ≈∫ª˙ŒŒ∞Ë
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -2676,7 +2675,8 @@
       *******                              +   1
       **** END-IF
            PERFORM VARYING     IDY     FROM    1   BY  1
-                   UNTIL       IDY     >   31
+                   UNTIL      (IDY     >   31            )
+                           OR (SPA-ERRCD   NOT =   SPACE )
       *        £∂∫–Ã§À˛
                IF      WRK-BYMD(1:6)       >   SPA-SRYYMD(1:6)
                    MOVE    "130003710"     TO  WRK-SRYCD
@@ -2802,7 +2802,8 @@
                    END-IF
                END-IF
       *        ≤Ë¡¸ø«√«§Œ≈¿≈©ºÍµª§¨¬∏∫ﬂ§π§Îª˛
-               IF      TBL-GAZ-DAY (IDY)   >   ZERO
+               IF     (TBL-GAZ-DAY (IDY)   >   ZERO )
+                 AND  (SPA-ERRCD           =   SPACE)
                    IF     (TBL-TEN-SRYCD (IDY) NOT =   SPACE) OR
                           (TBL-TEN-SRYCD2(IDY) NOT =   SPACE)
                        MOVE    "9022"              TO  SPA-ERRCD
@@ -2813,9 +2814,10 @@
                        END-IF
                    END-IF
                    IF      SPA-ERRCD       NOT =   SPACE
+      *
                    IF      TBL-GAZ-IDX (IDY)   >   ZERO
       *                ºÍµªŒ¡•®•È°º
-                       MOVE    "9022"              TO  SPA-ERRCD
+      *?????           MOVE    "9022"              TO  SPA-ERRCD
                        MOVE    TBL-GAZ-IDX (IDY)   TO  IDX-K
                        MOVE    "1"                 TO  WRK-COM-CUR
                                                               (IDX-K)
@@ -2833,6 +2835,7 @@
                            END-IF
                        END-IF
                    END-IF
+      *
                    END-IF
                END-IF
            END-PERFORM
