@@ -259,6 +259,8 @@
                                                    PIC X(2).
                        09  SPA-H02GMN-TS-RECEIPT-KBN
                                                    PIC X(4).
+                       09  SPA-H02GMN-TS-RECESYUBETU
+                                                   PIC X(10).
       *
                05  SPA-H02NAI-AREA.
                    07  SPA-H02NAI-SELNUM           PIC 9(02).

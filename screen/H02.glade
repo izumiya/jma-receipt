@@ -284,7 +284,7 @@
           <border_width>0</border_width>
           <show_titles>True</show_titles>
           <columns>18</columns>
-          <column_widths>29,58,16,30,80,84,114,15,140,15,57,30,36,74,111,21,20,15</column_widths>
+          <column_widths>29,58,16,30,80,84,114,15,140,15,57,30,80,74,111,21,20,15</column_widths>
           <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
           <signal>
             <name>select_row</name>

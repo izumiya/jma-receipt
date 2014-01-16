@@ -52,7 +52,7 @@ H02	{
 					value9	varchar(2);
 					value10	varchar(6);
 					value11	varchar(2);
-					value12	varchar(4);
+					value12	varchar(10);
 					value13	varchar(8);
 					value14	varchar(20);
 					value15	varchar(2);

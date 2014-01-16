@@ -1760,7 +1760,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
        41021-SEIKYU-HENSYU-SEC         SECTION.
       *
            MOVE    RECE10-KEY          TO  SPA-RECE10-KEY
-           MOVE    RECE10-KIGO         TO  SPA-RECE10-KIGO
+           IF      RECE10-TEISYUTUSAKI =   "3"
+               MOVE    RECE10-KOFUNUM      TO  SPA-RECE10-KIGO
+           ELSE
+               MOVE    RECE10-KIGO         TO  SPA-RECE10-KIGO
+           END-IF
            MOVE    RECE10-NUM          TO  SPA-RECE10-NUM
            MOVE    RECE10-SKYYM        TO  SPA-RECE10-SKYYM
            MOVE    RECE10-HKNNUM       TO  SPA-RECE10-HKNNUM
@@ -2897,6 +2901,24 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
                        END-EVALUATE
                    END-IF
                ELSE
+                IF      SPA-RECE10-TEISYUTUSAKI    =   "3"
+                   IF    ( TBL-HENREI-B-RECESYUBETU (IDXX)
+                                           =   SPA-RECE10-RECESYUBETU )
+                   AND   ( TBL-HENREI-B-KIGO        (IDXX)
+                                           =   SPA-RECE10-KIGO        )
+                       IF      TBL-HENREI-B-TEISYUTUSAKI (IDXX)
+                                               =   3
+                           IF    ( TBL-HENREI-B-RECEIPT-KBN      (IDXX)
+                                           =   SPA-RECE10-RECEIPT-KBN )
+                           AND   ( TBL-HENREI-B-MAX
+                                           =   1                      )
+                               MOVE    TBL-HENREI-B-REC (IDXX)
+                                                   TO  WRK-HENREI-B-REC
+                               MOVE    1   TO  FLG-HENREI-B-CHK
+                           END-IF
+                       END-IF
+                   END-IF
+                ELSE
                    IF    ( TBL-HENREI-B-RECESYUBETU (IDXX)
                                            =   SPA-RECE10-RECESYUBETU )
                    AND   ( TBL-HENREI-B-HKNJANUM    (IDXX)
@@ -2933,21 +2955,9 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
                                        MOVE    1   TO  FLG-HENREI-B-CHK
                                    END-IF
                                END-IF
-                           WHEN    3
-                               IF      TBL-HENREI-B-TEISYUTUSAKI (IDXX)
-                                               =   3
-                                   IF    ( TBL-HENREI-B-RECEIPT-KBN
-                                                                 (IDXX)
-                                           =   SPA-RECE10-RECEIPT-KBN )
-                                   AND   ( TBL-HENREI-B-MAX
-                                           =   1                      )
-                                       MOVE    TBL-HENREI-B-REC (IDXX)
-                                                   TO  WRK-HENREI-B-REC
-                                       MOVE    1   TO  FLG-HENREI-B-CHK
-                                   END-IF
-                               END-IF
                        END-EVALUATE
                    END-IF
+                 END-IF
                END-IF
       *
       *        既に返戻設定済か
@@ -3702,12 +3712,16 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
       *****                END-STRING
                        END-IF
                    ELSE
-                       STRING  RECE10-KIGO     DELIMITED   BY  SPACE
-                               "　"            DELIMITED   BY  SIZE
-                               RECE10-NUM      DELIMITED   BY  SPACE
-                                           INTO
+                       IF      RECE10-TEISYUTUSAKI     =   "3"
+                           MOVE    RECE10-KOFUNUM      TO  
                                            WRK-HENREI-B-S-KIGO    (IDZZ)
-                       END-STRING
+                       ELSE
+                           STRING  RECE10-KIGO     DELIMITED   BY  SPACE
+                                   "　"            DELIMITED   BY  SIZE
+                                   RECE10-NUM      DELIMITED   BY  SPACE
+                                   INTO    WRK-HENREI-B-S-KIGO    (IDZZ)
+                           END-STRING
+                       END-IF
                    END-IF
                    MOVE    1                   TO
                                       WRK-HENREI-B-S-HENREI-SIJI-FLG

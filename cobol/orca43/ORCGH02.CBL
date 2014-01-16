@@ -479,6 +479,35 @@
                                    TO  SPA-H02NAI-TS-RECEKA       (IDY)
                    MOVE    TBL-HENREI-B-S-RECESYUBETU      (IDZZ IDX)
                                    TO  SPA-H02NAI-TS-RECESYUBETU  (IDY)
+                   EVALUATE    SPA-H02NAI-TS-TEISYUTUSAKI  (IDY)
+                       WHEN    "3"
+                           EVALUATE    SPA-H02NAI-TS-RECESYUBETU  (IDY)
+                               WHEN    "7101"
+                               WHEN    "7091"
+                                   MOVE    "½ýÉÂ¡¦¶ÈÌ³"    TO
+                                       SPA-H02GMN-TS-RECESYUBETU  (IDY)
+                               WHEN    "7102"
+                               WHEN    "7092"
+                                   MOVE    "½ýÉÂ¡¦ÄÌ¶Ð"    TO
+                                       SPA-H02GMN-TS-RECESYUBETU  (IDY)
+                               WHEN    "7071"
+                               WHEN    "7081"
+                                   MOVE    "Ã»´ü¡¦¶ÈÌ³"    TO
+                                       SPA-H02GMN-TS-RECESYUBETU  (IDY)
+                               WHEN    "7072"
+                               WHEN    "7082"
+                                   MOVE    "Ã»´ü¡¦ÄÌ¶Ð"    TO
+                                       SPA-H02GMN-TS-RECESYUBETU  (IDY)
+                               WHEN    OTHER
+                                   MOVE
+                                       SPA-H02NAI-TS-RECESYUBETU (IDY)
+                                                           TO
+                                       SPA-H02GMN-TS-RECESYUBETU  (IDY)
+                           END-EVALUATE
+                       WHEN    OTHER
+                           MOVE    SPA-H02NAI-TS-RECESYUBETU  (IDY)
+                                   TO  SPA-H02GMN-TS-RECESYUBETU  (IDY)
+                   END-EVALUATE
                    MOVE    TBL-HENREI-B-S-HKNJANUM         (IDZZ IDX)
                                    TO  SPA-H02NAI-TS-HKNJANUM     (IDY)
                    MOVE    TBL-HENREI-B-S-HOJOKBN-KEY      (IDZZ IDX)
@@ -1121,7 +1150,7 @@
                                        TO  H02-TS-SKYYM     (IDX)
                MOVE    SPA-H02GMN-TS-NYUGAIKBN (IDX)
                                        TO  H02-TS-NYUGAIKBN (IDX)
-               MOVE    SPA-H02NAI-TS-RECESYUBETU (IDX)
+               MOVE    SPA-H02GMN-TS-RECESYUBETU (IDX)
                                        TO  H02-TS-RECESYUBETU(IDX)
                IF      SPA-H02NAI-TS-HKNJANUM   (IDX)
                                        NOT =   "00000000"
