@@ -30,6 +30,7 @@
       * 04.05.00     NACL-多々納  10/01/XX  治験対応
       * 04. 05.00    NACL-太田    10/01/29  拡張漢字対応
       * 04.07.00     NACL-多々納  11/10/31  同日再入院対応
+      * 04.07.00     NACL-多々納  14/01/17  数量ゼロエラー対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -192,6 +193,12 @@
            03  WRK-MAX                 PIC  9(04).
       *
            03  LINE-MAX                PIC 9(04).
+      *
+      *
+           03  WRK-ERR-MEI             PIC X(80).
+           03  WRK-ERR-MEI-R           REDEFINES  WRK-ERR-MEI.
+               05  WRK-ERR-MEI1            PIC X(56).
+               05  WRK-ERR-MEI2            PIC X(24).
       *
        01  TBL-KEIMSG-AREA.
            03  TBL-KEIMSG-G            OCCURS   50.
@@ -1409,6 +1416,8 @@
            MOVE    ZERO                TO  SPA-NAI-TIMEFLG
            MOVE    SPACE               TO  WRK-ERRCD
            MOVE    SPACE               TO  SPA-ERRCD
+      *!
+           MOVE    SPACE               TO  WRK-ERR-MEI
       *
       *    再表示編集処理
            PERFORM 3103-SAIHEN-HEN-SEC
@@ -1425,8 +1434,28 @@
       *                入院期間判定
                        PERFORM 3101-NYUKIKANCHK-SEC
                    WHEN    OTHER
+      *H26.1
+      *                器材・薬剤の数量＝ゼロはエラー
+                       IF     (SPA-COM-INPUTCD (IDX)(1:1)
+                                                       =   "7"
+                                                       OR  "6" )
+                       OR     (SPA-COM-INPUTCD (IDX)(1:3)
+                                                       =   "059")
+                       OR    ((SPA-COM-INPUTCD(IDX)(1:1)
+                                                       =   "1") AND
+                              (SPA-COM-KZMCOMPSIKIBETU(IDX)
+                                                   NOT =   0  ))
+                           IF      SPA-COM-SURYO (IDX)     =   ZERO
+      *                        数量＝ゼロはエラー
+                               MOVE    "E001"          TO  SPA-ERRCD
+                               MOVE    SPA-COM-NAME(IDX)
+                                                       TO  WRK-ERR-MEI
+                           END-IF
+                       END-IF
+      *
       *                点数マスタチェック（再表示編集時にエラー）
-                       IF      SPA-COM-CUR (IDX)   NOT =   SPACE
+                       IF     (SPA-COM-CUR (IDX)   NOT =   SPACE )
+                        AND   (SPA-ERRCD               =   SPACE )
                            PERFORM 3100-KIHONCHK-SEC
                        END-IF
                END-EVALUATE
@@ -1992,7 +2021,8 @@
       *        確認メッセージ処理
                PERFORM 30091-KIDCD-SYORI-SEC
            ELSE
-               IF      FLG-ERR             =   2
+               IF     (FLG-ERR             =   2     )
+               OR     (SPA-ERRCD(1:1)      =   "E"   )
                    PERFORM 30092-KOUSIN-ERR-SEC
                ELSE
                    MOVE    "K02"               TO  LNK-SC96-PG
@@ -2024,6 +2054,13 @@
                WHEN    "0006"
                    STRING  "１日の受診履歴が１３５剤以上になります。"
                            "剤を減らして入力して下さい。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *H26.1
+               WHEN    "E001"
+                   STRING  WRK-ERR-MEI1        DELIMITED  BY  SPACE
+                           "　に数量設定がありません"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
