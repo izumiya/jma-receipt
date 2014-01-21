@@ -2,9 +2,9 @@ PATH=@SITESCRIPTSDIR@/tools:@PATCHSCRIPTSDIR@/tools:@SCRIPTSDIR@/tools:@PATCHSCR
 
 10 * * * * orca run.rb
 
-# ���ž���Ϣ�ȴ�����(������)
-#  run_renkei_data_2.sh (���ŵ��ؼ����ֹ�) (Ϣ�ȴ����ѥǡ������ϥǥ��쥯�ȥ�)
-#  �� ���ŵ��ؼ����ֹ桧01
-#     Ϣ�ȴ����ѥǡ������ϥǥ��쥯�ȥꡧ/var/tmp/renkei
-#     ����23��00ʬ�¹�
+# 医療情報連携基盤用(外来一括)
+#  run_renkei_data_2.sh (医療機関識別番号) (連携基盤用データ出力ディレクトリ)
+#  例 医療機関識別番号：01
+#     連携基盤用データ出力ディレクトリ：/var/tmp/renkei
+#     毎日23時00分実行
 #00 23 * * * orca run_renkei_data_2.sh 01 /var/tmp/renkei
