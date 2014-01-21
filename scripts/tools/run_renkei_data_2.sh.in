@@ -1,0 +1,123 @@
+#!/bin/bash
+
+JMARECEIPT_ENV="@jma-receipt-env@"
+if [ ! -f ${JMARECEIPT_ENV} ]; then
+    echo "${JMARECEIPT_ENV} does not found."
+    exit 1
+fi
+. $JMARECEIPT_ENV
+
+export PATH=${SITESCRIPTSDIR}/monthly:${PATCHSCRIPTSDIR}/monthly:${SCRIPTSDIR}/monthly:$PATH
+export COB_LIBRARY_PATH=${PATCHLIBDIR}:${ORCALIBDIR}:/usr/lib/panda
+if [ `whoami` != "${ORCAUSER}" ]; then
+    echo   "${ORCAUSER}ユーザーで実行してください。"
+    exit 1
+fi
+
+#-------------------------------------------#
+# 連携基盤用レセプト一括処理（外来）
+#    $1  SRYYM TERID SYSYMD
+#    $2  SYOKBN
+#        1:一括作成  2:個別作成
+#    $3  RECEKBN
+#        0:全体  1:社保  2:国保
+#    $4  エラーファイル名 
+#    $5  JOBID 
+#    $6  SHELLID
+#    $7  県単用項目編集プログラム名
+#    $8  処理年月
+#    $9  作成年月日
+#    $10 作成時間
+#    $11 県番号（個別作成のときは"00"）
+#    $12 社保レセ電出力区分
+#    $13 国保レセ電出力区分
+#    $14 県区分（個別作成のとき山形、福岡のみ設定
+#    $16 HOSPNUM 
+#    $18 レセプト作成区分
+#        1:提出用レセ、2:点検用レセ、3:点検用レセ（０点公費記載）
+#        9:連係基盤用
+#    $19 請求データ削除区分
+#        0:削除しない、2:削除する
+#    $20 業務区分
+#        0:レセプト 1:会計照会 2:入院会計照会 3:診療行為
+#-------------------------------------------#
+
+ARG08=$(date  '+%Y%m')
+ARG09=$(date  '+%Y%m%d')
+ARG10="$(date  '+%H%M%S')00"
+ARG16=`printf "%02d" $1`
+ARG01="${ARG08}AAAABBBBCCCCDDDD${ARG09}"
+ARG04="/tmp/${ARG16}00OR042ERRAAAABBBBCCCCDDDD.dat"
+
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001RECEPT1,${ARG16}"
+
+recept1.sh "${ARG01}" "1" "0" "${ARG04}" "0000001" "RECEPT1" \
+           "NOPG" "${ARG08}" "${ARG09}" "${ARG10}" "" "3" "3" \
+           "" "" "${ARG16}" "" "9" "0" "0"
+R1RC=$?
+
+if [ ${R1RC} -ne 0 ] ; then
+  exit ${R1RC}
+fi
+
+#-------------------------------------------#
+# 連携基盤用CSVデータ作成処理（外来）
+#   $1-${11} 印刷ＤＢ用固定引数
+#   $12 提出先
+#   $13 レセ電ファイル出力先
+#   $14 JOBID 
+#   $15 SHELLID
+#   $16 エラーファイル名 
+#   $17 ファイル出力先区分
+#   $18 端末ｉｐアドレス
+#   $19 入外区分
+#   ${20} HOSPNUM
+#   ${21} レセプト作成区分
+#       1:提出用レセ、2:点検用レセ
+#       6:連携基盤用、7:連携基盤用（当日）
+#   ${22} 症状詳記作成区分
+#       1:作成する
+#   ${23} 光ディスク等送付書作成区分
+#       0:作成する
+#   ${24} レセ電データ履歴保存設定区分
+#       1:履歴保存する
+#   ${25} 直接請求する保険者番号
+#       99999999:設定なし
+#   ${26} レセ電データチェックの有無
+#       1:チェックする
+#-------------------------------------------#
+
+ARG05=$(date  '+%Y%m')
+ARG06=$(date  '+%Y%m%d')
+ARG13="$2/"
+ARG18="127.0.0.1"
+ARG20=`printf "%02d" $1`
+ARG16="/tmp/${ARG20}00OR044ERRAAAABBBBCCCCDDDD.dat"
+
+# 社保
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
+
+recept4.sh "0001" "SOKATU" "${ARG05}${ARG06}" "0000" "${ARG05}" "${ARG06}" \
+           "recept4.sh" "0000" "AAAABBBBCCCCDDDD" "orcacron" "prt" "1" \
+           "${ARG13}" "0000001" "SOKATU" "${ARG16}" "4" "${ARG18}" \
+           "2" "${ARG20}" "6" "0" "0" "0" "99999999" "0"
+R4RC=$?
+
+if [ ${R4RC} -ne 0 ] ; then
+  exit ${R4RC}
+fi
+
+# 国保
+$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter "JBS0000001SOKATU,${ARG20}"
+
+recept4.sh "0001" "SOKATU" "${ARG05}${ARG06}" "0000" "${ARG05}" "${ARG06}" \
+           "recept4.sh" "0000" "AAAABBBBCCCCDDDD" "orcacron" "prt" "2" \
+           "${ARG13}" "0000001" "SOKATU" "${ARG16}" "4" "${ARG18}" \
+           "2" "${ARG20}" "6" "0" "0" "0" "99999999" "0"
+R4RC=$?
+
+if [ ${R4RC} -ne 0 ] ; then
+  exit ${R4RC}
+fi
+
+exit ${R4RC}
