@@ -9,9 +9,18 @@ fi
 
 export PATH=${SITESCRIPTSDIR}/monthly:${PATCHSCRIPTSDIR}/monthly:${SCRIPTSDIR}/monthly:$PATH
 export COB_LIBRARY_PATH=${PATCHLIBDIR}:${ORCALIBDIR}:/usr/lib/panda
+
 if [ `whoami` != "${ORCAUSER}" ]; then
-    echo   "${ORCAUSER}ユーザーで実行してください。"
-    exit 1
+  echo "${ORCAUSER}ユーザーで実行してください。"
+  exit 1
+fi
+if [ $# -ne 2 ]; then
+  echo "オプション不正"
+  exit 1
+fi
+if ! [ -d $2 ]; then 
+  echo "連携基盤用データ出力ディレクトリが見つかりません"
+  exit 1
 fi
 
 #-------------------------------------------#
