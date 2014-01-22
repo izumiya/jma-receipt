@@ -1339,7 +1339,7 @@ path	key52	{
                     AND     CREYMD       =   :CREYMD
                     AND     CREHMS       =   :CREHMS
                     AND     NYUGAIKBN    =   :NYUGAIKBN 
-                   ORDER BY SORT_2,PTNUM
+                   ORDER BY SORT_2,PTNUM,RECENUM,RENNUM
 		;
 	};
 };
