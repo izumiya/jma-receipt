@@ -2260,6 +2260,15 @@ grpsys*                        CALL    "ORCDBMAIN"     USING   MCPAREA
       *****************************************************************
        41011-PTNUM-HENSYU-SEC            SECTION.
       *
+           MOVE    SPA-HOSPNUM         TO  PTINF-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTINF-PTID
+           PERFORM 900-PTINF-READ-SEC
+           IF      FLG-PTINF           NOT =   ZERO
+               MOVE    "0002"              TO  SPA-ERRCD
+               MOVE    2                   TO  SPA-GMN-CUR
+               GO      TO      41011-PTNUM-HENSYU-EXT
+           END-IF
+      *
            MOVE    PTINF-NAME          TO  SPA-GMN-NAME
       *
            MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
@@ -4954,6 +4963,19 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                GO  TO  4901-UKEADD-EXT
            END-IF
       *
+      *
+      *    受付ＩＤの二重登録チェック
+           INITIALIZE                       UKETUKE-REC
+           MOVE    SPA-HOSPNUM              TO  UKE-HOSPNUM
+           MOVE    SPA-SYSYMD               TO  UKE-UKEYMD
+           MOVE    WRK-UKEID                TO  UKE-UKEID
+           PERFORM 900-UKETUKE-READ-SEC
+           IF      FLG-UKETUKE         =   ZERO
+               MOVE    "1006"              TO  SPA-ERRCD
+               DISPLAY "U02 UKETUKE INS ERR KEY:"  UKE-KEY
+               GO      TO      4901-UKEADD-EXT
+           END-IF
+      *
       *    明細レコード追加
       *
            INITIALIZE                       UKETUKE-REC
@@ -4993,15 +5015,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            MOVE    SPA-OPID            TO  UKE-OPID
       *
-           MOVE    UKETUKE-REC              TO  WRK-UKETUKE-REC
-           PERFORM 900-UKETUKE-READ-SEC
-           IF      FLG-UKETUKE         =   ZERO
-               MOVE    "1006"              TO  SPA-ERRCD
-               DISPLAY "U02 UKETUKE INS ERR KEY:"  UKE-KEY
-               GO      TO      4901-UKEADD-EXT
-           END-IF
-      *
-           MOVE    WRK-UKETUKE-REC     TO  MCPDATA-REC
+           MOVE    UKETUKE-REC         TO  MCPDATA-REC
            MOVE    "DBINSERT"          TO  MCP-FUNC
            MOVE    "tbl_uketuke"       TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
