@@ -2346,7 +2346,7 @@
                    MOVE    SYS-1902-TEL        TO  WRK-SYS-1002-TEL
                END-IF
                IF      SYS-1902-POST   NOT =   SPACE
-                   MOVE    SYS-1902-TEL        TO  WRK-SYS-1002-POST
+                   MOVE    SYS-1902-POST       TO  WRK-SYS-1002-POST
                END-IF
                IF      SYS-1902-ADRS1  NOT =   SPACE
                    MOVE    SYS-1902-ADRS1      TO  WRK-SYS-1002-ADRS
