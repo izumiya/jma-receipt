@@ -843,6 +843,7 @@
            03  FLG-IRYORENKEI                          PIC 9(01).
            03  FLG-NYUSYO                              PIC 9(01).
            03  FLG-DAISAN-ARI                          PIC 9(01).
+           03  FLG-DAISAN-NG                           PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -3551,6 +3552,37 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    AND  (ACCT-ZAIKAISU  NOT =  ZERO         )
                    AND  (ACCT-JIHOKBN       =  SPACE        )
                    AND  (ACCT-SRYKBN    NOT =  "95" AND "96")
+                     MOVE    ZERO    TO   FLG-DAISAN-NG
+                     IF  (ACCT-SRYKBN             =  "80")
+                     AND (ACCT-ZAIREQFLG          =  "1" )
+                       INITIALIZE                  SRYACT-REC
+                       MOVE    ACCT-HOSPNUM    TO  SRY-HOSPNUM
+                       MOVE    ACCT-NYUGAIKBN  TO  SRY-NYUGAIKBN
+                       MOVE    ACCT-PTID       TO  SRY-PTID
+                       MOVE    ACCT-SRYKA      TO  SRY-SRYKA
+                       MOVE    ACCT-SRYYM      TO  SRY-SRYYM
+                       MOVE    ACCT-ZAINUM     TO  SRY-ZAINUM
+                       MOVE    1               TO  SRY-RENNUM
+                       MOVE    SRYACT-REC      TO  MCPDATA-REC
+                       MOVE    "tbl_sryact"    TO  MCP-TABLE
+                       MOVE    "key"           TO  MCP-PATHNAME
+                       PERFORM 900-DBSELECT-SEC
+                       IF      MCP-RC          =   ZERO
+                         MOVE  "tbl_sryact"    TO  MCP-TABLE
+                         MOVE  "key"           TO  MCP-PATHNAME
+                         PERFORM  900-SRYACT-READ-SEC
+                         IF    FLG-SRYACT      =   ZERO
+                           IF  SRY-SRYCD(1)(1:5) =
+                               "09591" OR "09592" OR "09593"
+                             MOVE    1    TO   FLG-DAISAN-NG
+                           END-IF
+                         END-IF
+                       END-IF
+                       MOVE    "tbl_sryact"    TO  MCP-TABLE
+                       MOVE    "key"           TO  MCP-PATHNAME
+                       PERFORM 900-CLOSE-SEC
+                     END-IF
+                     IF   FLG-DAISAN-NG = ZERO
                        MOVE   1   TO  RECE02-DAISAN-SKYFLG(IDX16)
                        IF      ACCT-ZAIKBN      =    2
                            COMPUTE    WRK-DAISAN-TOTALTEN-GEN =
@@ -3568,6 +3600,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                          END-IF
                        END-IF
                        MOVE   1   TO  RECE02-DAISAN-GAITO
+                     END-IF
                    END-IF
                    MOVE    "tbl_sryacct"    TO  MCP-TABLE
                    MOVE    "key22"          TO  MCP-PATHNAME
