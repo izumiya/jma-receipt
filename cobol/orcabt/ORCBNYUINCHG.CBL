@@ -219,6 +219,8 @@
                05  WRK-CHK-SRYMR           PIC 9(02).
            03  WRK-ERRCD                   PIC X(04).
       *
+           03  WRK-CHK-PTID                PIC 9(10).
+      *
            03  WRK-NENREIXXX               PIC 9(03).
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
@@ -641,8 +643,11 @@
                MOVE    "tbl_ptnyuinrrk"     TO      MCP-TABLE
                MOVE    "key50"              TO      MCP-PATHNAME
                PERFORM  910-PTNYUINRRK-READ-SEC
+               MOVE     ZERO            TO  WRK-CHK-PTID
                PERFORM  UNTIL  FLG-PTNYUINRRK    =    1
-                       DISPLAY "WRK-PARA-BTUNUM = " WRK-PARA-BTUNUM
+      *                 DISPLAY "WRK-PARA-BTUNUM = " WRK-PARA-BTUNUM
+                   IF   PTNYUINRRK-PTID     NOT =  WRK-CHK-PTID
+                       MOVE   PTNYUINRRK-PTID  TO  WRK-CHK-PTID
                        IF   WRK-PARA-BTUNUM      =    SPACE
                            MOVE    PTNYUINRRK-PTID   TO  WRK-PTID
       *                    入院会計存在チェック
@@ -658,6 +663,7 @@
                              PERFORM     2001-NYUINACCT-UPD-SEC
                          END-IF
                        END-IF
+                   END-IF
                    MOVE    "tbl_ptnyuinrrk"     TO      MCP-TABLE
                    MOVE    "key50"              TO      MCP-PATHNAME
                    PERFORM  910-PTNYUINRRK-READ-SEC
