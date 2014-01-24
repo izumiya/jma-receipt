@@ -1482,6 +1482,11 @@
                                          LNK-TOKNYUIN2-IPN-KAIKEI-YMD
            END-IF
       *
+           IF        FLG-HIT    =    ZERO
+               MOVE    SPACE      TO     LNK-TOKNYUIN2-IPN-KAIKEI-FLG
+                                         LNK-TOKNYUIN2-IPN-KAIKEI-YMD
+           END-IF
+      *
            DISPLAY  "====  ORCSTOKNYUIN2 HENKYAKU  ===="
            DISPLAY  "LNK-TOKNYUIN2-SRYCD(1) = " LNK-TOKNYUIN2-SRYCD(1)
                  " " LNK-TOKNYUIN2-STYMD(1) " " LNK-TOKNYUIN2-EDYMD(1)
