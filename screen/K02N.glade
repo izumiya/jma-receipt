@@ -1549,6 +1549,7 @@
           <column_types>label,text,text,label</column_types>
           <column_titles>診区,入力コード,名称,数量・点数</column_titles>
           <column_widths>36,140,330,300</column_widths>
+          <im_controls>f,f,t,f</im_controls>
           <signal>
             <name>cell_edited</name>
             <handler>table_send_event</handler>
