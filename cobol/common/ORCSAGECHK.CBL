@@ -144,6 +144,10 @@
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
       *
+      *!!
+      *    保険組み合わせ負担割合取得サブ
+           COPY    "CPORCSFTNRATE.INC".
+      *!!
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -505,6 +509,30 @@
            IF     (COMB-KOH1HKNNUM     =   "970" )
                MOVE    7               TO  AGECHK-HKNKBN
            END-IF
+      *
+      *!!!!
+           IF     (COMB-KOH1HKNNUM     =   "970" )
+               OR (COMB-KOH1HKNNUM     =   SPACE )
+               CONTINUE
+           ELSE
+      *        地方公費対応負担割合設定
+               INITIALIZE                  ORCSFTNRATEAREA
+               MOVE    AGECHK-HOSPNUM      TO  LNK-FTNRATE-HOSPNUM
+               MOVE    AGECHK-PTID         TO  LNK-FTNRATE-PTID
+               MOVE    AGECHK-SRYYMD       TO  LNK-FTNRATE-SRYYMD
+               MOVE    AGECHK-HKNCOMBINUM  TO  LNK-FTNRATE-HKNCOMBINUM
+               MOVE    "1"                 TO  LNK-FTNRATE-KBN
+               CALL    "ORCSFTNRATE"       USING
+                                           ORCSFTNRATEAREA
+                                           SPA-AREA
+                                           HKNCOMBI-REC
+               IF      LNK-FTNRATE-RC      =   ZERO
+                   MOVE    LNK-FTNRATE-NYUIN   TO  COMB-NYU-KFTNRATE
+                   MOVE    LNK-FTNRATE-GAIRAI  TO  COMB-GAI-KFTNRATE
+               END-IF
+           END-IF
+      *
+      *!!!!
       *
            IF      AGECHK-NYUGAIKBN    =   "1"
                MOVE    COMB-NYU-KFTNRATE   TO  AGECHK-FTNRATE

@@ -40,6 +40,7 @@
       * 04.06.00     NACL-太田    10/08/30  補助区分、本人家族区分追加
       * 04.06.00     NACL-多々納  10/09/29  入院・外来非該当対応
       * 04.08.00     NACL-多々納  13/07/XX  第三者行為対応
+      * 04.08.00     NACL-多々納  14/01/XX  負担割合公費対応
       *****************************************************************
       *
       *
@@ -170,6 +171,11 @@
            COPY    "CPORCSKANACHK.INC".
       *    年齢・負担割合サブ
            COPY    "CPORCSAGECHK.INC".
+      *
+      *!!
+      *    保険組み合わせ負担割合取得サブ
+           COPY    "CPORCSFTNRATE.INC".
+      *!!
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -488,6 +494,30 @@
                    MOVE    4               TO  IDK
                END-IF
            END-PERFORM
+      *
+      *!!!!
+           IF     (COMB-KOH1HKNNUM     =   "970" )
+               OR (COMB-KOH1HKNNUM     =   SPACE )
+               CONTINUE
+           ELSE
+      *        地方公費対応負担割合設定
+               INITIALIZE                  ORCSFTNRATEAREA
+               MOVE    COMB-HOSPNUM        TO  LNK-FTNRATE-HOSPNUM
+               MOVE    COMB-PTID           TO  LNK-FTNRATE-PTID
+               MOVE    SPA-SRYYMD          TO  LNK-FTNRATE-SRYYMD
+               MOVE    COMB-HKNCOMBINUM    TO  LNK-FTNRATE-HKNCOMBINUM
+               MOVE    "1"                 TO  LNK-FTNRATE-KBN
+               CALL    "ORCSFTNRATE"       USING
+                                           ORCSFTNRATEAREA
+                                           SPA-AREA
+                                           HKNCOMBI-REC
+               IF      LNK-FTNRATE-RC      =   ZERO
+                   MOVE    LNK-FTNRATE-NYUIN   TO  COMB-NYU-KFTNRATE
+                   MOVE    LNK-FTNRATE-GAIRAI  TO  COMB-GAI-KFTNRATE
+               END-IF
+           END-IF
+      *
+      *!!!!
       *
       *    負担割合
            IF      SPA-NYUGAIKBN       =   "1"

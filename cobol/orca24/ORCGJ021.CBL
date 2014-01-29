@@ -560,7 +560,8 @@
                    CALL    "ORCSAGECHK"        USING
                                                ORCSAGECHKAREA
                                                SPA-AREA
-                   IF      AGECHK-FTNRATE  NOT =   ZERO
+      *!!!!!!!     IF      AGECHK-FTNRATE  NOT =   ZERO
+                   IF      AGECHK-RC           =   ZERO
       *                …È√¥Œ®
                        MOVE    AGECHK-FTNRATE      TO  SPA-NAI-FTNWARI
                                                          (SPA-J021-MAX)
@@ -1781,7 +1782,8 @@
                CALL    "ORCSAGECHK"        USING
                                            ORCSAGECHKAREA
                                            SPA-AREA
-               IF      AGECHK-FTNRATE  NOT =   ZERO
+      *!!!!!   IF      AGECHK-FTNRATE  NOT =   ZERO
+               IF      AGECHK-RC           =   ZERO
                    MOVE    AGECHK-FTNRATE      TO  WRK-PTFTNRATE
                END-IF
       *
