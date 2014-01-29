@@ -638,7 +638,6 @@
       *  04.07.10    NACL-門脇    13/12/09  医療情報連携対応
       *  04.07.11    NACL-門脇    14/01/08  請求点数がない保険組み合わせが有る
       *                                     場合の公費分離区分編集対応
-      *  04.07.12    NACL-門脇    14/01/28  東京都地方公費一部負担金記載対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -845,7 +844,6 @@
            03  FLG-NYUSYO                              PIC 9(01).
            03  FLG-DAISAN-ARI                          PIC 9(01).
            03  FLG-DAISAN-NG                           PIC 9(01).
-           03  FLG-TOKYO                               PIC 9(01).
       *
       *    基本点数の非表示判定用フラグ
        01  FLG-KHNTEN-AREA.
@@ -17998,8 +17996,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *
-           MOVE     ZERO           TO    FLG-TOKYO
-      *
            PERFORM  2109A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC
       *
            MOVE    999999999   TO   WRK-FTNMONEY-MAE
@@ -20292,33 +20288,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
              END-IF
            END-IF
       *
-      *****
-      *
-           IF  (SYS-1001-PREFNUM       =  13               )
-           AND (RECE02-KOHNUM(1)       = "182" OR "382"    )
-           AND (RECE02-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
-           AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
-           AND (RECE02-TOTALTEN(2)     = RECE02-TOTALTEN(3))
-             IF    RECE02-FTNMONEY(2)  <  RECE02-FTNMONEY(3)
-                MOVE  RECE02-FTNMONEY(2)     TO  RECE02-FTNMONEY(3)
-                MOVE  RECE02-FTNMONEY-KOJ(2) TO  RECE02-FTNMONEY-KOJ(3)
-                MOVE  1                      TO  FLG-TOKYO
-             END-IF
-           END-IF
-      *
-           IF  (SYS-1001-PREFNUM       =  13               )
-           AND (RECE02-KOHNUM(1)       = "972" OR "974"    )
-           AND (RECE02-KOHNUM(2)       = "182" OR "382"    )
-           AND (RECE02-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
-           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
-           AND (RECE02-TOTALTEN(3)     = RECE02-TOTALTEN(4))
-             IF    RECE02-FTNMONEY(3)  <  RECE02-FTNMONEY(4)
-                MOVE  RECE02-FTNMONEY(3)     TO  RECE02-FTNMONEY(4)
-                MOVE  RECE02-FTNMONEY-KOJ(3) TO  RECE02-FTNMONEY-KOJ(4)
-                MOVE  1                      TO  FLG-TOKYO
-             END-IF
-           END-IF
-      *
            .
        2109A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-EXT.
            EXIT.
@@ -20473,7 +20442,6 @@ grpsys     PERFORM 900-DBSELECT-SEC
                 END-IF
       *
                 IF   RECE02-ZAITAKU  =  SPACE
-                AND  FLG-TOKYO       =  ZERO
                   PERFORM  VARYING   KOHFTN-IDX   FROM   1   BY   1
                             UNTIL    KOHFTN-IDX     >    4
                     IF  (RECE02-KOHNUM(KOHFTN-IDX) = 
