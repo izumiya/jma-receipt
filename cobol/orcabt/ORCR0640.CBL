@@ -627,6 +627,7 @@
       *  04.07.12    NACL-ÌçÏÆ    13/12/09  °åÎÅ¾ðÊóÏ¢·ÈÂÐ±þ
       *  04.07.13    NACL-ÌçÏÆ    14/01/08  ÀÁµáÅÀ¿ô¤¬¤Ê¤¤ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤¬Í­¤ë
       *                                     ¾ì¹ç¤Î¸øÈñÊ¬Î¥¶èÊ¬ÊÔ½¸ÂÐ±þ
+      *  04.07.14    NACL-ÌçÏÆ    14/01/28  ÅìµþÅÔÃÏÊý¸øÈñ°ìÉôÉéÃ´¶âµ­ºÜÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
@@ -849,6 +850,7 @@
            03  FLG-SYOGAISEIHO2                        PIC 9(01).
            03  FLG-SYOGAISEIHO3                        PIC 9(01).
            03  FLG-DAISAN-ARI                          PIC 9(01).
+           03  FLG-TOKYO                               PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -20636,6 +20638,7 @@
                END-IF
       *
                IF    RECE62-KOUREI   =  SPACE
+               AND   FLG-TOKYO       =  ZERO
                  PERFORM  VARYING   KOHFTN-IDX   FROM   1   BY   1
                            UNTIL    KOHFTN-IDX     >    4
                    IF  (RECE62-KOHNUM(KOHFTN-IDX) = 
@@ -21889,6 +21892,8 @@
                END-IF
              END-IF
            END-IF
+      *
+           MOVE     ZERO           TO    FLG-TOKYO
       *
            PERFORM  21046A-CHIHOKOHI-ICHIBUFUTAN-HENSYU-SEC
       *
@@ -24224,6 +24229,33 @@
              AND  (RECE62-FTNMONEY(3)        NOT = ZERO       )
                 MOVE  RECE62-FTNMONEY(3)     TO  RECE62-FTNMONEY(4)
                 MOVE  RECE62-FTNMONEY-KOJ(3) TO  RECE62-FTNMONEY-KOJ(4)
+             END-IF
+           END-IF
+      *
+      *****
+      *
+           IF  (WRK-PREFNUM            = "13"              )
+           AND (RECE62-KOHNUM(1)       = "182" OR "382"    )
+           AND (RECE62-KOHNUM(2)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(2)    = ZERO              )
+           AND (RECE62-TOTALTEN(2)     = RECE62-TOTALTEN(3))
+             IF    RECE62-FTNMONEY(2)  <  RECE62-FTNMONEY(3)
+                MOVE  RECE62-FTNMONEY(2)     TO  RECE62-FTNMONEY(3)
+                MOVE  RECE62-FTNMONEY-KOJ(2) TO  RECE62-FTNMONEY-KOJ(3)
+                MOVE  1                      TO  FLG-TOKYO
+             END-IF
+           END-IF
+      *
+           IF  (WRK-PREFNUM            = "13"              )
+           AND (RECE62-KOHNUM(1)       = "972" OR "974"    )
+           AND (RECE62-KOHNUM(2)       = "182" OR "382"    )
+           AND (RECE62-KOHNUM(3)(1:1) >= "1" AND <= "8"    )
+           AND (TBL-TOKATUKAIFLG(3)    = ZERO              )
+           AND (RECE62-TOTALTEN(3)     = RECE62-TOTALTEN(4))
+             IF    RECE62-FTNMONEY(3)  <  RECE62-FTNMONEY(4)
+                MOVE  RECE62-FTNMONEY(3)     TO  RECE62-FTNMONEY(4)
+                MOVE  RECE62-FTNMONEY-KOJ(3) TO  RECE62-FTNMONEY-KOJ(4)
+                MOVE  1                      TO  FLG-TOKYO
              END-IF
            END-IF
       *

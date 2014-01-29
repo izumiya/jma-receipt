@@ -375,6 +375,7 @@
       *  04.07.07    NACL-ÌçÏÆ    13/07/01  ¥·¥¹¥Æ¥à´ÉÍý£²£°£±£°µ¡Ç½ÄÉ²ÃÂÐ±þ
       *  04.07.08    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.09    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
+      *  04.07.10    NACL-ÌçÏÆ    14/01/28  ÅìµþÅÔÃÏÊý¸øÈñ¼ýÇ¼¹àÌÜÊÔ½¸½¤Àµ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -862,7 +863,11 @@
                05  WK-RUI-COMPFTN-ENTANI2  PIC  9(07).
                05  WK-RUI-TAISYO           PIC  9(01).
       *
-               05  WK-RUI-MONEY            PIC  9(07).
+               05  WK-RUI-TAIHI-HKNFTNMONEY
+                                           PIC  9(07).
+               05  WK-RUI-TAIHI-COMPFTN    PIC  9(07).
+               05  WK-RUI-TAIHI-COMPFTN-ENTANI
+                                           PIC  9(07)V9(01).
                05  WK-RUI-ZENGAKU          PIC  9(10).
       *
            03  WK-MARUKO-TBL.
@@ -12787,7 +12792,12 @@
                  END-IF
       *
                  IF    LNK-SYU-KOH1HKNNUM  =  SYU-KOH1HKNNUM
-                      MOVE  SYU-KOH1HKNFTNMONEY   TO  WK-RUI-MONEY
+                      MOVE  SYU-KOH1HKNFTNMONEY
+                                      TO  WK-RUI-TAIHI-HKNFTNMONEY
+                      MOVE  SYU-KOH1COMPFTN
+                                      TO  WK-RUI-TAIHI-COMPFTN
+                      MOVE  SYU-KOH1COMPFTN-ENTANI
+                                      TO  WK-RUI-TAIHI-COMPFTN-ENTANI
                  END-IF
       *
                  IF   WK-2010-KINJYOKBN-N(1)  = "1"
@@ -13193,19 +13203,27 @@
                                                =  WK-HKNJANUM-TBL)
                               IF  (WK-1001-PREFNUM    =  13           )
                               AND (LNK-SYU-KOH1HKNNUM = "182" OR "382")
-                               ADD   WK-RUI-MONEY
+                               ADD   WK-RUI-TAIHI-HKNFTNMONEY
                                                 TO  WK-RUI-FTN1-M
+                               ADD   WK-RUI-TAIHI-COMPFTN
+                                                TO  WK-RUI-FTN1-M2
+                               ADD   WK-RUI-TAIHI-COMPFTN-ENTANI
+                                                TO  WK-RUI-FTN1-M3
+                               COMPUTE WK-ENTANI =
+                                       WK-RUI-TAIHI-COMPFTN-ENTANI
+                                                              + 0.9
+                               ADD   WK-ENTANI  TO  WK-RUI-FTN1-M4
                               ELSE
                                ADD   SYU-KOH1HKNFTNMONEY
                                                 TO  WK-RUI-FTN1-M
-                              END-IF
-                              ADD    SYU-KOH1COMPFTN
+                               ADD   SYU-KOH1COMPFTN
                                                 TO  WK-RUI-FTN1-M2
-                              ADD    SYU-KOH1COMPFTN-ENTANI
+                               ADD   SYU-KOH1COMPFTN-ENTANI
                                                 TO  WK-RUI-FTN1-M3
-                              COMPUTE WK-ENTANI =
-                                     SYU-KOH1COMPFTN-ENTANI + 0.9
-                              ADD    WK-ENTANI  TO  WK-RUI-FTN1-M4
+                               COMPUTE WK-ENTANI =
+                                       SYU-KOH1COMPFTN-ENTANI + 0.9
+                               ADD   WK-ENTANI  TO  WK-RUI-FTN1-M4
+                              END-IF
                               IF   SYU-KOH1SKJ-FTNKBN =  "2"
                                ADD   SYU-KOH1SKJ-FTN
                                                 TO  WK-RUI-FTN1-M
