@@ -45,6 +45,7 @@
        01  FLG-AREA.
            03  FLG-SYSKANRI                PIC 9(01).
            03  FLG-HIT                     PIC 9(01).
+           03  FLG-PTCONF                  PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -74,12 +75,18 @@
                05  WRK-IPN-HANTEI-D1       PIC 9(02).
            03  WRK-IPN-HANTEI-YMD2         PIC X(08).
       *
+           03  WRK-WEIGHT                  PIC 9(04).
+      *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
       *
       *    ¥·¥¹¥Æ¥à´ÉÍý
            COPY    "CPSK5001.INC".
+      *
+      *    ´µ¼Ô¸ÄÊÌÀßÄê
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -155,6 +162,21 @@
                 (LNK-TOKNYUIN2-PTNYUINRRK-TOKUTEI-NYUIN   =   "25")
                MOVE    ZERO            TO  LNK-TOKNYUIN2-NISSU08
            END-IF
+      *
+      *    ½ÐÀ¸»ùÂÎ½Å¤Î¼èÆÀ
+           MOVE   SPACE                TO  PTCONF-REC
+           INITIALIZE                      PTCONF-REC
+           MOVE   LNK-TOKNYUIN2-HOSPNUM
+                                       TO  PTCONF-HOSPNUM
+           MOVE   LNK-TOKNYUIN2-PTID   TO  PTCONF-PTID
+           MOVE   "BIRTHWEIGHT"        TO  PTCONF-CKEY
+           PERFORM 900-PTCONF-READ-SEC
+           IF     FLG-PTCONF           =   ZERO
+               MOVE   PTCONF-CDATA(1:4)  TO  WRK-WEIGHT
+           ELSE
+               MOVE   9999               TO  WRK-WEIGHT
+           END-IF
+           DISPLAY  "ORCSTOKNYUIN2  WRK-WEIGHT = " WRK-WEIGHT
       *
       *    ÆÃÄêÆþ±¡ÎÁ¥³¡¼¥É¤È»»Äê¾å¸ÂÆü¿ô¤Î¥»¥Ã¥È¡ÊÊ¿À®£±£¸Ç¯£³·î£³£±Æü°ÊÁ°¡Ë
            IF     LNK-TOKNYUIN2-SANTEIYMD   <=   "20060331"
@@ -631,11 +653,59 @@
                   MOVE  "190120810"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  14             TO  WRK-JGN-NISSU(1)
                   MOVE  1              TO  WRK-SRYCD-COUNT
-      *      (A302)¿·À¸»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ
-      *      (A303)Áí¹ç¼þ»º´üÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ
+      *      (A302)¿·À¸»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£±
+              WHEN      "190024710"
+                  MOVE  "190024710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  60         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+      *      (A302)¿·À¸»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²
+              WHEN      "190140410"
+                  MOVE  "190140410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  60         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+      *      (A303)Áí¹ç¼þ»º´üÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡ÊÊìÂÎ¡¦ÂÛ»ù¡Ë
+              WHEN      "190066710"
+                  MOVE  "190066710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  14             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+      *      (A303)Áí¹ç¼þ»º´üÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ê¿·À¸»ù¡Ë
+              WHEN      "190066810"
+                  MOVE  "190066810"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  60         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
       *      (A303-2)¿·À¸»ù¼£ÎÅ²óÉü¼¼Æþ±¡°åÎÅ´ÉÍýÎÁ
-      *          ¢¨¾åµ­Æþ±¡ÎÁ¤Ï½ÐÀ¸»þÂÎ½Å¤Ë¤è¤ê¾å¸ÂÆü¿ô¤¬ÊÑÆ°¤¹¤ë°Ù¡¢
-      *            ¤³¤Î¥µ¥Ö¥×¥í¥°¥é¥à¤Ç¤ÏÂÐ±þ¤·¤Ê¤¤
+              WHEN      "190140510"
+                  MOVE  "190140510"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  120        TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
       *      (A305)°ìÎà´¶À÷¾É´µ¼ÔÆþ±¡°åÎÅ´ÉÍýÎÁ
               WHEN      "190075510"
                   MOVE  "190075510"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -802,11 +872,59 @@
                   MOVE  "190150010"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  14             TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
-      *      (A302)¿·À¸»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ
-      *      (A303)Áí¹ç¼þ»º´üÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ
+      *      (A302)¿·À¸»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£±
+              WHEN      "190024710"
+                  MOVE  "190024710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  60         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+      *      (A302)¿·À¸»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²
+              WHEN      "190140410"
+                  MOVE  "190140410"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  60         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+      *      (A303)Áí¹ç¼þ»º´üÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡ÊÊìÂÎ¡¦ÂÛ»ù¡Ë
+              WHEN      "190066710"
+                  MOVE  "190066710"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  14             TO  WRK-JGN-NISSU(1)
+                  MOVE  1              TO  WRK-SRYCD-COUNT
+      *      (A303)Áí¹ç¼þ»º´üÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ê¿·À¸»ù¡Ë
+              WHEN      "190066810"
+                  MOVE  "190066810"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  21             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  60         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
       *      (A303-2)¿·À¸»ù¼£ÎÅ²óÉü¼¼Æþ±¡°åÎÅ´ÉÍýÎÁ
-      *          ¢¨¾åµ­Æþ±¡ÎÁ¤Ï½ÐÀ¸»þÂÎ½Å¤Ë¤è¤ê¾å¸ÂÆü¿ô¤¬ÊÑÆ°¤¹¤ë°Ù¡¢
-      *            ¤³¤Î¥µ¥Ö¥×¥í¥°¥é¥à¤Ç¤ÏÂÐ±þ¤·¤Ê¤¤
+              WHEN      "190140510"
+                  MOVE  "190140510"    TO  WRK-TOKNYUIN2-SRYCD(1)
+                  MOVE  30             TO  WRK-JGN-NISSU(1)
+                  IF    WRK-WEIGHT     <   1000
+                      MOVE  120        TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  IF   (WRK-WEIGHT     >=  1000)   AND
+                       (WRK-WEIGHT     <   1500)
+                      MOVE  90         TO  WRK-JGN-NISSU(1)
+                  END-IF
+                  MOVE  1              TO  WRK-SRYCD-COUNT
       *      (A305)°ìÎà´¶À÷¾É´µ¼ÔÆþ±¡°åÎÅ´ÉÍýÎÁ
               WHEN      "190075510"
                   MOVE  "190075510"    TO  WRK-TOKNYUIN2-SRYCD(1)
@@ -1507,8 +1625,39 @@
                MOVE    1                TO     LNK-TOKNYUIN2-RC
            END-IF
       *
+      *
            .
        200-EDIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸ÄÊÌÀßÄê¥Æ¡¼¥Ö¥ëÆÉ¹þ½èÍý
+      *****************************************************************
+       900-PTCONF-READ-SEC         SECTION.
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               PERFORM 920-DBFETCH-SEC
+               IF      MCP-RC          =   ZERO
+                   MOVE    MCPDATA-REC TO  PTCONF-REC
+                   MOVE    ZERO        TO  FLG-PTCONF
+               ELSE
+                   INITIALIZE              PTCONF-REC
+                   MOVE    1           TO  FLG-PTCONF
+               END-IF
+           ELSE
+               INITIALIZE                  PTCONF-REC
+               MOVE    1               TO  FLG-PTCONF
+           END-IF
+      *
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       900-PTCONF-READ-EXT.
            EXIT.
       *
       *****************************************************************
