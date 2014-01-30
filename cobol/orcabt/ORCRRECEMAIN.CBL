@@ -61,7 +61,7 @@
       *
       *  04.07.01    NACL-藤原    12/11/20  リアルタイムプレビュー時の
       *                                     一画面対応
-      *  04.07.02    NACL-藤原    13/12/09  医療情報連係基盤対応
+      *  04.07.02    NACL-藤原    13/12/09  医療情報連携基盤対応
       *  04.07.03    NACL-藤原    13/09/20  第三者行為対応
       *****************************************************************
       *
@@ -509,6 +509,7 @@
            STRING   WRK-PARA2      DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-PRTKBN
+                                   DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
@@ -782,6 +783,7 @@
            STRING   WRK-PARA2      DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-PRTKBN
+                                   DELIMITED   BY  SIZE
                     ","            DELIMITED   BY  SIZE
                     WRK-PARA-HOSPNUM
                                    DELIMITED   BY  SIZE
