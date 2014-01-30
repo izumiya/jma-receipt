@@ -39,7 +39,9 @@
       *
       *  04.07.01    NACL-藤原    12/08/01  レセ電データチェック機能対応
       *  04.07.02    NACL-藤原    13/10/07  労災レセ電対応
-      *  04.07.03    NACL-藤原    13/12/09  医療情報連携基盤対応
+      *  04.07.03    NACL-藤原    13/11/01  労災レセ電データチェック機能
+      *                                     対応
+      *  04.07.04    NACL-藤原    13/12/09  医療情報連携基盤対応
       *****************************************************************
        ENVIRONMENT                 DIVISION.
        CONFIGURATION               SECTION.
@@ -581,24 +583,23 @@
            IF      SPA-GMN-T06-TEISYUTUSAKI4
                                        =   "T"
       *        労災のとき
-      *********IF  ( ( SPA-NAI-T06-200501-RECEDEN-CHK-KBN
-      *********                                =   "1"    )    AND
-      *********      ( SPA-NAI-T06-SRYYM-H     >=  201307 )        )
-      *********    STRING   WRK-TIDMSG         DELIMITED  BY  SPACE
-      *********             "（レセ電チェックリストの印刷を指定）"  
-      *********                                DELIMITED  BY  SIZE
-      *********                                INTO    T98-ID1MSG
-      *********    END-STRING
+               IF  ( ( SPA-NAI-T06-200501-RECEDEN-CHK-KBN
+                                               =   "1"    )    AND
+                     ( SPA-NAI-T06-SRYYM-H     >=  201307 )        )
+                   STRING   WRK-TIDMSG         DELIMITED  BY  SPACE
+                            "（レセ電チェックリストの印刷を指定）"  
+                                               DELIMITED  BY  SIZE
+                                               INTO    T98-ID1MSG
+                   END-STRING
       *
-      *********    MOVE    "T"                 TO  T98-B10-VISIBLE
-      *********    MOVE    "T"                 TO  T98-B11-VISIBLE
-      *********    MOVE    "F12:印刷する"      TO  T98-B12-LABEL
-      *********ELSE
-      *********    MOVE    WRK-TIDMSG          TO  T98-ID1MSG
-      *********END-IF
-               MOVE    WRK-TIDMSG          TO  T98-ID1MSG
+                   MOVE    "T"                 TO  T98-B10-VISIBLE
+                   MOVE    "T"                 TO  T98-B11-VISIBLE
+                   MOVE    "F12:印刷する"      TO  T98-B12-LABEL
+               ELSE
+                   MOVE    WRK-TIDMSG          TO  T98-ID1MSG
+               END-IF
            ELSE
-      *        労災以外のとき
+      *      労災以外のとき
              IF      SPA-T01-PRTKBN    =   "6" OR  "7"
                  MOVE    WRK-TIDMSG          TO  T98-ID1MSG
              ELSE
@@ -632,28 +633,12 @@
                             "の印刷を指定）"   DELIMITED  BY  SIZE
                                                INTO    T98-ID1MSG
                    END-STRING
-               ELSE
-                   MOVE    WRK-TIDMSG          TO  T98-ID1MSG
-               END-IF
-             END-IF
       *
-             IF      SPA-T01-PRTKBN    =   "6" OR  "7"
-               MOVE    "F"                 TO  T98-B10-VISIBLE
-               MOVE    "F"                 TO  T98-B11-VISIBLE
-               MOVE    "F12:作成する"      TO  T98-B12-LABEL
-             ELSE
-               IF  (   SPA-NAI-T06-200501-RECEDEN-LST1KBN
-                                           =   "0"            )
-               AND ( ( SPA-NAI-T06-200501-RECEDEN-CHK-KBN
-                                           =   "0"    )    OR
-                     ( SPA-NAI-T06-SRYYM-H <   201204 )       )
-                   MOVE    "F"                 TO  T98-B10-VISIBLE
-                   MOVE    "F"                 TO  T98-B11-VISIBLE
-                   MOVE    "F12:作成する"      TO  T98-B12-LABEL
-               ELSE
                    MOVE    "T"                 TO  T98-B10-VISIBLE
                    MOVE    "T"                 TO  T98-B11-VISIBLE
                    MOVE    "F12:印刷する"      TO  T98-B12-LABEL
+               ELSE
+                   MOVE    WRK-TIDMSG          TO  T98-ID1MSG
                END-IF
              END-IF
            END-IF

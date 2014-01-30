@@ -166,6 +166,76 @@ fi
         fi
     done
 
+#   レセ電データチェック
+    if  [ ${28} -eq '1' ]; then
+        rennum=1
+
+        cleanup(){
+	    rm -f ${TMPFILEBASE}*
+        }
+
+	SHNAME=$(basename $0)
+	TMPFILEBASE="/tmp/${23}ORCB44RECEDENCHK"
+	ERRFILE="${TMPFILEBASE}${SHNAME%%.sh}.ERR"
+	ERRFILE="${ERRFILE// /X}"
+	ERRLOG="${TMPFILEBASE}${SHNAME%%.sh}.log"
+	EUCFILE="${TMPFILEBASE}$(basename ${INFILE}).euc"
+
+	echo "echo " ${ERRFILE} >> $LOG_FILE
+        if  [ -e ${ERRFILE} ]; then
+            rm ${ERRFILE}
+        fi
+
+        if ( [ ${21} -eq '3' ]|| [ ${21} -eq '4' ] ) && [ ${26} -eq '0' ]; then
+            cd ${17}
+        else 
+            cd ${OUT_FOLDER}
+        fi
+
+        all=`ls  *${RECEFILE1}*.UK*`
+  
+        for f in $all ; do
+            echo "check f= " $f >> $LOG_FILE 2>&1
+
+            if ( [ ${21} -eq '3' ]|| [ ${21} -eq '4' ] ) && [ ${26} -eq '0' ]; then
+	      INFILE=${17}$f
+            else
+	      INFILE=${OUT_FOLDER}$f
+            fi
+            echo "INFILE= " ${INFILE} >> $LOG_FILE 2>&1
+
+            if  [ ${f: -4} = '.UKE' ]; then
+	        SKYKBN="1"
+            else
+#              再請求
+	        SKYKBN="2"
+            fi
+	    PRM="${23},${f: -12},${EUCFILE},${ERRFILE},${ERRLOG},${SKYKBN},${24}}"
+
+	    export  RUBYLIB=$SITESCRIPTSDIR:$PATCHSCRIPTSDIR:$SCRIPTSDIR:$RUBYLIB
+	    export  APS_EXEC_PATH=$(dirname $0)
+
+	    cleanup
+
+	    [ -e ${ERRLOG}  ] && rm -f ${ERRLOG}
+	    [ -e ${INFILE}  ] && nkf -S -e -I ${INFILE} > ${EUCFILE}
+
+
+	    $DBSTUB -dir $LDDIRECTORY -bd orcabt Rosai_receden_check_start -parameter $PRM 2>  ${ERRLOG}
+	    if [ -s ${ERRLOG} ]; then
+	        cat ${ERRLOG} >> $LOG_FILE
+	        ERRCD='0099'
+	        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${18}${19}'  '${ERRCD:${#ERRCD}-4:4},${23} >> $LOG_FILE
+	        exit
+	    fi
+        done
+
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM570 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${24},'0',${18},${19},'99999999',${ERRFILE},${23},${20} >> $LOG_FILE 2>&1
+        if  [ -e ${20} ]; then
+            echo "--- BM570 err file exist ---" >>$LOG_FILE
+            exit 
+        fi
+    fi
 
 #   システム管理場所出力のとき
     if  [ ${21} -eq '3' ]|| [ ${21} -eq '4' ]; then
