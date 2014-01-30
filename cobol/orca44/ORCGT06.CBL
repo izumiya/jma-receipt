@@ -2530,7 +2530,7 @@
                GO  TO  4105-NYUGAIKBN-CHK-EXT
            END-IF
       *
-      *    連係用の時Ｔ０１で設定した入外区分とする
+      *    連携用の時Ｔ０１で設定した入外区分とする
            IF      SPA-T01-PRTKBN  =   "6" OR  "7"
                MOVE    SPA-T01-NYUGAIKBN
                                        TO  SPA-GMN-T06-NYUGAIKBN
@@ -3973,7 +3973,7 @@
                MOVE    "0025"          TO  SPA-ERRCD
                GO  TO  480-ZENKAI-HYOUJI-TID-EXT
            ELSE
-      *        前回が連係用のとき
+      *        前回が連携用のとき
                IF      ONRECE-B-U-HENREI-FLG
                                        =   "9"
                    MOVE    "0029"          TO  SPA-ERRCD
@@ -4586,7 +4586,7 @@
                MOVE    SPA-NAI-T06-R-THKNNUM      (IDX)
                                            TO  ONRECE-B-HKNNUM
                IF      SPA-T01-PRTKBN      =   "6" OR  "7"
-      *            連係用のとき識別のためにセット
+      *            連携用のとき識別のためにセット
                    MOVE    "9"             TO  ONRECE-B-U-HENREI-FLG
                ELSE
                    IF      SPA-NAI-T06-R-THENREI-SIJI-FLG (IDX)
@@ -5886,7 +5886,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                                                    INTO    TERR-ERRMSG
                    END-STRING
                WHEN    "0021"
-                   MOVE    "対象の連係データがありません"
+                   MOVE    "対象の連携データがありません"
                                                        TO  TERR-ERRMSG
                WHEN    "0022"
                    MOVE    "患者情報を入力中です"      TO  TERR-ERRMSG
@@ -5904,10 +5904,10 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG18
                    MOVE    "選択した保険者と違います"  TO  TERR-ERRMSG
                WHEN    "0028"
                    MOVE
-                   "連係用のときは違う診療年月は入力できません"
+                   "連携用のときは違う診療年月は入力できません"
                                                        TO  TERR-ERRMSG
                WHEN    "0029"
-                   MOVE    "前回作成分が連係用ですので表示できません"
+                   MOVE    "前回作成分が連携用ですので表示できません"
                                                        TO  TERR-ERRMSG
                WHEN    "0041"
                    MOVE    "データが入力してあるので遷移できません"
@@ -6496,7 +6496,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
-      *    連係テンポラリ読込
+      *    連携テンポラリ読込
       *****************************************************************
        900-RENKEI-TMP-READ-SEC             SECTION.
       *
