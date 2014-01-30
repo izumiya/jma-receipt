@@ -112,6 +112,7 @@ grpsys     03  EIE01PARA-FILE      PIC X(23).
            03  IDX7                PIC 9(03).
            03  IDX8                PIC 9(03).
            03  IDX9                PIC 9(05).
+           03  IDXP                PIC 9(05).
       *
       *    編集作業
        01  W-AREA.
@@ -140,6 +141,13 @@ grpsys         05  WRK-PARA-HOSPNUM    PIC  9(02).
            03  WK-PTID-SL              PIC  9(06).
            03  WK-PTID-L               PIC  9(06).
            03  WK-PTID-K               PIC  X(01).
+           03  WRK-SNUM-G.
+               05  WRK-SNUM            PIC  S9(18).
+           03  WRK-NUM-G.
+               05  WRK-NUM             PIC  9(18).
+           03  WRK-STR                 PIC  X(20).
+           03  WRK-SIGN                PIC  X(1).
+           03  WRK-SEISU               PIC  9(03).
       *
       *    作業テーブル名称領域
        01  WK-TBL1.
@@ -610,26 +618,44 @@ grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
                COMPUTE       IDX4 = IDX4 + 1
            ELSE
                IF  WK-TBL-RMSG-3 (IDX1)   =   "number "
-                   IF  WK-PTPNT   =   ZERO
-                       MOVE    MCPDATA-REC(WK-STPNT:WK-KTPNT)
-                                     TO  WK-EIECS-REC(IDX4:WK-KTPNT)
-                       COMPUTE       IDX4 = IDX4 + WK-KTPNT
-                       MOVE    ","   TO  WK-EIECS-REC(IDX4:1)
-                       COMPUTE       IDX4 = IDX4 + 1
+                   MOVE    MCPDATA-REC(WK-STPNT:WK-KTPNT)
+                           TO  WRK-SNUM-G (19 - WK-KTPNT : WK-KTPNT )
+                   MOVE    SPACE  TO  WRK-STR
+                   MOVE    SPACE  TO  WRK-SIGN
+                   MOVE    ZERO   TO  WRK-NUM-G
+                   MOVE    1      TO  IDXP
+                   IF    ( WRK-SNUM   >=   ZERO )
+                       COMPUTE WRK-NUM =   WRK-SNUM
                    ELSE
-                       COMPUTE       WK-KTPNT = WK-KTPNT - WK-PTPNT
-                       MOVE    MCPDATA-REC(WK-STPNT:WK-KTPNT)
-                                     TO  WK-EIECS-REC(IDX4:WK-KTPNT)
-                       COMPUTE       IDX4 = IDX4 + WK-KTPNT
-                       MOVE    "."   TO  WK-EIECS-REC(IDX4:1)
-                       COMPUTE       IDX4 = IDX4 + 1
-                       COMPUTE       WK-STPNT = WK-STPNT + WK-KTPNT
-                       MOVE    MCPDATA-REC(WK-STPNT:WK-PTPNT)
-                                     TO  WK-EIECS-REC(IDX4:WK-PTPNT)
-                       COMPUTE       IDX4 = IDX4 + WK-PTPNT
-                       MOVE    ","   TO  WK-EIECS-REC(IDX4:1)
-                       COMPUTE       IDX4 = IDX4 + 1
+                       COMPUTE WRK-NUM =   WRK-SNUM * -1
+                       MOVE    "-"     TO  WRK-SIGN
                    END-IF
+                   IF  WK-PTPNT   =   ZERO
+                       STRING  WRK-SIGN     DELIMITED BY SPACE
+                               WRK-NUM-G (19 - WK-KTPNT : WK-KTPNT)
+                                            DELIMITED BY SIZE
+                       INTO    WRK-STR
+                       WITH    POINTER IDXP
+                       END-STRING
+                   ELSE
+                       COMPUTE WRK-SEISU = WK-KTPNT - WK-PTPNT
+                       STRING  WRK-SIGN     DELIMITED BY SPACE
+                               WRK-NUM-G (19 - WK-KTPNT : WRK-SEISU )
+                                            DELIMITED BY SIZE
+                               "."          DELIMITED BY SIZE
+                               WRK-NUM-G (19 - WK-PTPNT : WK-PTPNT )
+                       INTO    WRK-STR
+                       WITH    POINTER IDXP
+                       END-STRING
+                   END-IF
+      *
+                   COMPUTE IDXP    =   IDXP    -   1
+                   MOVE    WRK-STR (1 : IDXP)
+                                     TO  WK-EIECS-REC(IDX4:IDXP)
+                   COMPUTE       IDX4 = IDX4 + IDXP
+                   MOVE    ","   TO  WK-EIECS-REC(IDX4:1)
+                   COMPUTE       IDX4 = IDX4 + 1
+      *
                ELSE
                    IF  WK-TBL-RMSG-3 (IDX1)   =   "varchar"
                        MOVE    MCPDATA-REC(WK-STPNT:WK-KTPNT)
