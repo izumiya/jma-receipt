@@ -48,36 +48,5 @@ data	{
 	};
 };
 
-db	{
-	tbl_byomei;
-	tbl_byomeiinputset;
-	tbl_example;
-	tbl_hkncombi;
-	tbl_hknnum;
-	tbl_jyurrk;
-	tbl_jobkanri;
-	tbl_ldmap;
-	tbl_lock;
-	tbl_nyuinacct;
-	tbl_opecom;
-	tbl_ptbyomei;
-	tbl_ptinf;
-	tbl_ptnum;
-	tbl_ptnyuinrrk;
-	tbl_ptrsiinf;
-	tbl_pthkninf;
-	tbl_ptkohinf;
-	tbl_rececom;
-	tbl_receupd;
-	tbl_sryact;
-	tbl_srykarrk;
-	tbl_syskanri;
-	tbl_tensu;
-	tbl_userbyomei;
-	tbl_sryacct_main;
-	tbl_sryacct_sub;
-	tbl_synonym;
-};
-
-/* #include "orcadb.inc" */
+#include "orcadb.inc"
 #include "orcadbh.inc"
