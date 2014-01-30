@@ -271,13 +271,6 @@ I41	{
 		DAY31	{
 			value	varchar(3);
 		};
-		NYUINKACOMB	{
-			NYUINKA	{
-				value	varchar(16);
-			};
-			count	int;
-			item	varchar(16)[100];
-		};
 		scrolledwindow1	{
 			DATELIST	{
 				count	int;
@@ -475,6 +468,10 @@ I41	{
 		};
 		AGE	{
 			value	varchar(9);
+		};
+		NYUINKA	{
+			style   varchar(20);
+			value	varchar(40);
 		};
 	};
 };

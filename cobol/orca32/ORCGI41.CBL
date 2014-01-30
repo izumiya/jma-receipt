@@ -182,6 +182,8 @@
       *
            03  FLG-DAISAN          PIC 9(01).
       *
+           03  FLG-NYUINKA-SET     PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -418,6 +420,17 @@
       *
       *    出生児体重
            03  WRK-WEIGHT              PIC 9(04).
+      *
+      *    入院科表示用
+           03  WRK-NYUINKA-AREA.
+               05  WRK-NYUINKA1        PIC X(02).
+               05  WRK-NYUINKAMEI1     PIC X(08).
+               05  WRK-NYUINKA2        PIC X(02).
+               05  WRK-NYUINKAMEI2     PIC X(08).
+               05  WRK-NYUINKA3        PIC X(02).
+               05  WRK-NYUINKAMEI3     PIC X(08).
+               05  WRK-NYUINKA-ETC     PIC X(01).
+               05  WRK-NYUINKAMEI      PIC X(08).
       *
       *    回数一括変更用
        01  WRK-DAY-AREA.
@@ -977,14 +990,8 @@
       *    室料差額テーブルセット
            PERFORM 3113-SAGAKU-HEN-SEC
       *
-      *    入院科テーブルセット
-           PERFORM 3005-NYUINKA-HEN-SEC
       *    入院基本テーブルセット
            PERFORM 3500-KIHON-HEN-SEC
-      *
-      *    全科指定
-           MOVE    SPA-GMN-SRYKA-LIST (1)
-                                       TO  SPA-GMN-SRYKA-IG-41
       *
            .
        3001-INIT-HENSYU-EXT.
@@ -1108,60 +1115,6 @@
            END-IF.
       *
        3101-P97SPASET-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    入院科初期編集
-      *****************************************************************
-       3005-NYUINKA-HEN-SEC                SECTION.
-      *
-           INITIALIZE                  SPA-GMN-SRYKA-AREA
-           MOVE    "00"                TO  SPA-GMN-SRYKA-L-41 (1).
-           MOVE    "全科指定"          TO  SPA-GMN-SRYKAMEI-L-41 (1).
-           MOVE     1                  TO  SPA-GMN-SRYKA-MAX-41.
-      *    入院科
-           MOVE    SPACE               TO  SYS-1005-REC.
-           INITIALIZE                      SYS-1005-REC
-           MOVE    "1005"              TO  SYS-1005-KANRICD.
-           MOVE    SPA-NAI-SRYYM       TO  SYS-1005-STYUKYMD(1:6)
-           MOVE    "01"                TO  SYS-1005-STYUKYMD(7:2)
-           MOVE    SYS-1005-STYUKYMD   TO  SYS-1005-EDYUKYMD
-      *    システム管理検索
-           MOVE    SPA-HOSPNUM         TO  SYS-1005-HOSPNUM
-           MOVE    SYS-1005-REC        TO  MCPDATA-REC
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 900-KANRIMST-READ-SEC
-           ELSE
-               INITIALIZE                  SYS-1005-REC
-               MOVE    1               TO  FLG-SYSKANRI
-           END-IF
-           MOVE    1                   TO  IDX
-           PERFORM
-                   UNTIL       (IDX            >=  100)  OR
-                               (FLG-SYSKANRI   =   1)
-               MOVE    MCPDATA-REC         TO  SYS-1005-REC
-               ADD     1                   TO  IDX
-               MOVE    SYS-1005-KBNCD (1:2)
-                                           TO  SPA-GMN-SRYKA-L-41 (IDX)
-               MOVE    SYS-1005-SRYKANAME1 TO  SPA-GMN-SRYKAMEI-L-41
-                                                                  (IDX)
-               MOVE    IDX                 TO  SPA-GMN-SRYKA-MAX-41
-      *
-               MOVE    "tbl_syskanri"      TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
-               PERFORM 900-KANRIMST-READ-SEC
-           END-PERFORM
-           MOVE    "tbl_syskanri"      TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-           .
-      *
-       3005-NYUINKA-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1420,11 +1373,6 @@
       *****************************************************************
        310-SPA-SET-SEC                  SECTION.
       *
-      *    入院科テーブルセット
-           PERFORM 3005-NYUINKA-HEN-SEC
-      *    全科指定
-           MOVE    SPA-GMN-SRYKA-LIST (1)
-                                       TO  SPA-GMN-SRYKA-IG-41
       *    入院基本テーブルセット
            PERFORM 3500-KIHON-HEN-SEC
       *    室料差額テーブルセット
@@ -1735,6 +1683,152 @@
       *
            .
        3103-180DAYS-EDIT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *   入院科編集処理（表示月の入院科編集）
+      *****************************************************************
+       3103-NYUINKA-EDIT-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  SPA-GMN-NYUINKA
+           MOVE    SPACE               TO  WRK-NYUINKA-AREA
+      *
+      *    表示月の入院科取得
+      *     DISPLAY "ZZZZZZZZZZZZZZZZZZZZZZZZZZZ"
+      *     DISPLAY "SPA-NAI-SRYYM = " SPA-NAI-SRYYM
+           INITIALIZE                       PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM          TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-PTID             TO  PTNYUINRRK-PTID
+           MOVE    SPA-NAI-SRYYM        TO  PTNYUINRRK-TENSTUYMD(1:6)
+           MOVE    "01"                 TO  PTNYUINRRK-TENSTUYMD(7:2)
+      *    月末日を取得
+           INITIALIZE                       STS-AREA-DAY
+           INITIALIZE                       LNK-DAY7-AREA
+           MOVE      "71"               TO  LNK-DAY7-IRAI
+           MOVE    SPA-NAI-SRYYM        TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"     USING      STS-AREA-DAY
+                                            LNK-DAY7-AREA
+           MOVE    LNK-DAY7-KOYOMI      TO  PTNYUINRRK-TENNYUYMD
+           MOVE    PTNYUINRRK-REC       TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
+           MOVE    "key44"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+               MOVE    "tbl_ptnyuinrrk" TO  MCP-TABLE
+               MOVE    "key44"          TO  MCP-PATHNAME
+               PERFORM 970-PTNYUINRRK-READ-SEC
+               PERFORM    UNTIL   FLG-PTNYUINRRK  =   1
+      *            DISPLAY  "NYUINKA = " PTNYUINRRK-NYUINKA
+                  IF   (PTNYUINRRK-NYUINKA  =  WRK-NYUINKA1)  OR
+                       (PTNYUINRRK-NYUINKA  =  WRK-NYUINKA2)  OR
+                       (PTNYUINRRK-NYUINKA  =  WRK-NYUINKA3)
+                      CONTINUE
+                  ELSE
+      *               表示用診療科名をシステム管理から取得
+                      MOVE    SPACE           TO  WRK-NYUINKAMEI
+                      INITIALIZE                  SYSKANRI-REC
+                      MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
+                      MOVE    "1005"          TO  SYS-KANRICD
+                      MOVE    PTNYUINRRK-NYUINKA
+                                              TO  SYS-KBNCD
+                      MOVE    SPA-NAI-SRYYM   TO  SYS-STYUKYMD(1:6)
+                      MOVE    "01"            TO  SYS-STYUKYMD(7:2)
+                      MOVE    SYS-STYUKYMD    TO  SYS-EDYUKYMD
+                      MOVE    SYSKANRI-REC    TO  MCPDATA-REC
+                      MOVE    "tbl_syskanri"  TO  MCP-TABLE
+                      MOVE    "key10"         TO  MCP-PATHNAME
+                      PERFORM 910-DBSELECT-SEC
+                      MOVE    "tbl_syskanri"  TO  MCP-TABLE
+                      MOVE    "key10"         TO  MCP-PATHNAME
+                      PERFORM 900-KANRIMST-READ-SEC
+                      IF      FLG-SYSKANRI    =   ZERO
+                          MOVE    MCPDATA-REC TO  SYS-1005-REC
+                          MOVE    SYS-1005-SRYKANAME2
+                                              TO  WRK-NYUINKAMEI
+                      END-IF
+      *
+      *                DISPLAY "WRK-NYUINKAMEI = " WRK-NYUINKAMEI
+                      MOVE    "tbl_syskanri"  TO  MCP-TABLE
+                      MOVE    "key10"         TO  MCP-PATHNAME
+                      PERFORM 990-DBCLOSE-SEC
+      *
+                      MOVE  ZERO              TO   FLG-NYUINKA-SET
+                      IF    WRK-NYUINKA1      =    SPACE
+                         MOVE   PTNYUINRRK-NYUINKA
+                                              TO   WRK-NYUINKA1
+                         MOVE   WRK-NYUINKAMEI
+                                              TO   WRK-NYUINKAMEI1
+                         MOVE   1             TO   FLG-NYUINKA-SET
+                      END-IF
+                      IF   (WRK-NYUINKA2      =    SPACE)   AND
+                           (FLG-NYUINKA-SET   =    ZERO)
+                         MOVE   PTNYUINRRK-NYUINKA
+                                              TO   WRK-NYUINKA2
+                         MOVE   WRK-NYUINKAMEI
+                                              TO   WRK-NYUINKAMEI2
+                         MOVE   1             TO   FLG-NYUINKA-SET
+                      END-IF
+                      IF   (WRK-NYUINKA3      =    SPACE)   AND
+                           (FLG-NYUINKA-SET   =    ZERO)
+                         MOVE   PTNYUINRRK-NYUINKA
+                                              TO   WRK-NYUINKA3
+                         MOVE   WRK-NYUINKAMEI
+                                              TO   WRK-NYUINKAMEI3
+                         MOVE   1             TO   FLG-NYUINKA-SET
+                      END-IF
+                  END-IF
+      *
+                  IF      FLG-NYUINKA-SET =    ZERO
+                      MOVE   "1"          TO   WRK-NYUINKA-ETC
+                  END-IF
+      *
+                  MOVE    "tbl_ptnyuinrrk" TO  MCP-TABLE
+                  MOVE    "key44"          TO  MCP-PATHNAME
+                  PERFORM 970-PTNYUINRRK-READ-SEC
+               END-PERFORM
+           END-IF
+      *
+           MOVE    "tbl_ptnyuinrrk"       TO   MCP-TABLE
+           MOVE    "key44"                TO   MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *     DISPLAY  "WRK-NYUINKA1 = "  WRK-NYUINKA1
+      *     DISPLAY  "WRK-NYUINKAMEI1 = "  WRK-NYUINKAMEI1
+      *     DISPLAY  "WRK-NYUINKA2 = "  WRK-NYUINKA2
+      *     DISPLAY  "WRK-NYUINKAMEI2 = "  WRK-NYUINKAMEI2
+      *     DISPLAY  "WRK-NYUINKA3 = "  WRK-NYUINKA3
+      *     DISPLAY  "WRK-NYUINKAMEI3 = "  WRK-NYUINKAMEI3
+      *     DISPLAY  "WRK-NYUINKA-ETC = " WRK-NYUINKA-ETC
+      *
+           IF      (WRK-NYUINKAMEI1    NOT =   SPACE)   OR
+                   (WRK-NYUINKAMEI2    NOT =   SPACE)   OR
+                   (WRK-NYUINKAMEI3    NOT =   SPACE)
+              IF       WRK-NYUINKA-ETC    =    SPACE
+                  STRING   "【"
+                           WRK-NYUINKAMEI1  DELIMITED BY SPACE
+                           "　"
+                           WRK-NYUINKAMEI2  DELIMITED BY SPACE
+                           "　"
+                           WRK-NYUINKAMEI3  DELIMITED BY SPACE
+                           "】"
+                  INTO     SPA-GMN-NYUINKA
+              ELSE
+                  STRING   "【"
+                           WRK-NYUINKAMEI1  DELIMITED BY SPACE
+                           "　"
+                           WRK-NYUINKAMEI2  DELIMITED BY SPACE
+                           "　"
+                           WRK-NYUINKAMEI3  DELIMITED BY SPACE
+                           "　"
+                           "等"            DELIMITED BY SIZE
+                           "】"
+                  INTO     SPA-GMN-NYUINKA
+              END-IF
+           END-IF
+      *     DISPLAY  "SPA-GMN-NYUINKA = " SPA-GMN-NYUINKA
+      *
+           .
+       3103-NYUINKA-EDIT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -2299,8 +2393,6 @@
            IF      FLG-PTNYUINRRK      =   1
                IF      SPA-GMN-SRYKA-I-41  =   "00"
                    MOVE    "0020"              TO  SPA-ERRCD
-               ELSE
-                   MOVE    "0031"              TO  SPA-ERRCD
                END-IF
            END-IF
            PERFORM
@@ -3321,7 +3413,6 @@
            MOVE    SPA-GMN-SRYYM       TO  I41-SRYYM.
            MOVE    SPA-GMN-BIRTHDAYW   TO  I41-BIRTHDAY.
            MOVE    SPA-GMN-AGE         TO  I41-AGE.
-           MOVE    SPA-GMN-SRYKA-IG-41 TO  I41-NYUINKA.
            MOVE    SPA-GMN-IJYOU91-STYLE
                                        TO  I41-IJYOU91-STYLE.
            MOVE    SPA-GMN-IJYOU91     TO  I41-IJYOU91.
@@ -3330,6 +3421,10 @@
            MOVE    SPA-GMN-TAINBI      TO  I41-TAINBI.
            MOVE    SPA-GMN-NYUINNISSU  TO  I41-NYUINNISSU.
            MOVE    SPA-GMN-TSUSANNISSU TO  I41-TSUSANNISSU.
+      *    入院科
+           PERFORM      3103-NYUINKA-EDIT-SEC
+           MOVE    "black"             TO  I41-NYUINKA-STYLE.
+           MOVE    SPA-GMN-NYUINKA     TO  I41-NYUINKA.
       *    病棟種別日数
            MOVE    "black"             TO  I41-SYUBETSU1-STYLE.
            MOVE    "black"             TO  I41-SYUBETSU2-STYLE.
@@ -3345,13 +3440,6 @@
            MOVE    SPA-GMN-SYUBETSU5   TO  I41-SYUBETSU5.
            MOVE    SPA-GMN-SYUBETSU6   TO  I41-SYUBETSU6.
            MOVE    SPA-GMN-LASTNYUIN   TO  I41-LASTNYUIN.
-      *    入院科
-           PERFORM   VARYING   IDX     FROM    1   BY  1
-                     UNTIL     IDX         >   SPA-GMN-SRYKA-MAX-41
-               MOVE    SPA-GMN-SRYKA-LIST (IDX)
-                                          TO  I41-NYUINKA-ITEM (IDX)
-           END-PERFORM.
-           MOVE    SPA-GMN-SRYKA-MAX-41   TO  I41-NYUINKA-COUNT.
       *    保険組合せ
            PERFORM   VARYING   IDX     FROM    1   BY  1
                      UNTIL     IDX         >   SPA-HKNCOMBI-MAX

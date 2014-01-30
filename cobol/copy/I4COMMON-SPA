@@ -71,6 +71,7 @@
                    07  SPA-GMN-SYUBETSU5       PIC X(20).
                    07  SPA-GMN-SYUBETSU6       PIC X(20).
                    07  SPA-GMN-LASTNYUIN       PIC X(40).
+                   07  SPA-GMN-NYUINKA         PIC X(40).
       *
       *ø«Œ≈∂Ë ¨
                05  SPA-SRYKBN                  PIC X(02).

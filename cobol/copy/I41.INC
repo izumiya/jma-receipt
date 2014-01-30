@@ -58,11 +58,6 @@
             04  I41-LDAY        PIC X(02).
           03  I41-DAY-OCC       OCCURS 31.
             04  I41-DAY         PIC X(03).
-          03  I41-NYUINKACOMB.
-            04  I41-NYUINKA.
-              05  I41-VALUE            PIC X(16).
-            04  I41-NYUINKA-COUNT      PIC S9(9)   BINARY.
-            04  I41-NYUINKA-ITEM       PIC X(16)   OCCURS  100 TIMES.
           03  I41-SCROLLEDWINDOW1.
             04  I41-DATELIST.
               05  I41-DATELIST-COUNT   PIC S9(9)   BINARY.
@@ -134,3 +129,8 @@
               05  I41-VALUE       PIC X(40).
           03  I41-AGE.
             04  I41-VALUE         PIC X(9).
+          03  I41-NYUINKA-G.
+            04  I41-NYUINKA-STYLE.
+              05  I41-VALUE       PIC X(20).
+            04  I41-NYUINKA.
+              05  I41-VALUE       PIC X(40).
