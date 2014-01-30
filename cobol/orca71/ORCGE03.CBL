@@ -145,6 +145,8 @@ grpsys         05  WRK-PARA-HOSPNUM    PIC  9(02).
                05  WRK-SNUM            PIC  S9(18).
            03  WRK-NUM-G.
                05  WRK-NUM             PIC  9(18).
+           03  WRK-INT-G.
+               05  WRK-INT             PIC  S9(09) BINARY.
            03  WRK-STR                 PIC  X(20).
            03  WRK-SIGN                PIC  X(1).
            03  WRK-SEISU               PIC  9(03).
@@ -617,9 +619,17 @@ grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
                MOVE    ","   TO  WK-EIECS-REC(IDX4:1)
                COMPUTE       IDX4 = IDX4 + 1
            ELSE
-               IF  WK-TBL-RMSG-3 (IDX1)   =   "number "
-                   MOVE    MCPDATA-REC(WK-STPNT:WK-KTPNT)
+               IF  WK-TBL-RMSG-3 (IDX1)   =   "number " OR "integer"
+                   MOVE    ZERO           TO  WRK-SNUM-G
+                   IF    ( WK-TBL-RMSG-3 (IDX1)   =   "number " )
+                       MOVE    MCPDATA-REC(WK-STPNT:WK-KTPNT)
                            TO  WRK-SNUM-G (19 - WK-KTPNT : WK-KTPNT )
+                   ELSE
+                       MOVE    MCPDATA-REC(WK-STPNT:WK-KTPNT)
+                           TO  WRK-INT-G
+                       MOVE    WRK-INT    TO  WRK-SNUM
+                       MOVE    9          TO  WK-KTPNT
+                   END-IF
                    MOVE    SPACE  TO  WRK-STR
                    MOVE    SPACE  TO  WRK-SIGN
                    MOVE    ZERO   TO  WRK-NUM-G
@@ -688,8 +698,6 @@ grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
       *
        T-001-TBLCNVAT-02-EXT.
            EXIT.
-      *
-      **********************
       *
        T-001-WRITWRIT-01-SEC             SECTION.
       *

@@ -1644,7 +1644,8 @@ grpsys     MOVE    SPA-TERMID        TO  EIE01PARA-TERMID.
                COMPUTE  IDY6   =   IDY6   -   1
                IF  ((WK-TBL-MSG-C3 (IDX4)    =   "char   ")   OR
                     (WK-TBL-MSG-C3 (IDX4)    =   "number ")   OR
-                    (WK-TBL-MSG-C3 (IDX4)    =   "varchar"))  AND
+                    (WK-TBL-MSG-C3 (IDX4)    =   "varchar")   OR
+                    (WK-TBL-MSG-C3 (IDX4)    =   "integer"))  AND
                    (WK-TBL-MSG-C1 (IDX4) NOT =   "#")         AND
                    (WK-SEW04 (IDY9:1)        NOT =  X"2C")
       *½¤Àµ/*³«»Ï*03.06.05*********************************************
@@ -1653,21 +1654,27 @@ grpsys     MOVE    SPA-TERMID        TO  EIE01PARA-TERMID.
                    END-IF
       *½¤Àµ/*½ªÎ»*03.06.05*********************************************
                    IF  IDY5   =   ZERO
-                       MOVE    5         TO  IDY7
-                       MOVE    IDY6      TO  IDY8
-                       MOVE    ZERO      TO  WK-SEW05
-                       MOVE    WK-SEW05  TO  WK-TBL-MSG-C7 (IDX4)
-                       PERFORM UNTIL   IDY8  <     1
-                           IF  WK-SEW04 (IDY8:1)  = X"28"
-                               MOVE  ZERO       TO  IDY8
-                           ELSE
-                               MOVE  WK-SEW04 (IDY8:1)
-                                                TO  WK-SEW05 (IDY7:1)
-                               COMPUTE  IDY7   =   IDY7   -   1
-                               COMPUTE  IDY8   =   IDY8   -   1
-                           END-IF
-                       END-PERFORM
-                       MOVE    WK-SEW05   TO  WK-TBL-MSG-C5 (IDX4)
+                       IF    ( WK-TBL-MSG-C3 (IDX4)  =   "integer")
+                           MOVE    4         TO  WK-SEW05
+                           MOVE    WK-SEW05  TO  WK-TBL-MSG-C5 (IDX4)
+                           MOVE    ZERO      TO  WK-TBL-MSG-C7 (IDX4)
+                       ELSE
+                           MOVE    5         TO  IDY7
+                           MOVE    IDY6      TO  IDY8
+                           MOVE    ZERO      TO  WK-SEW05
+                           MOVE    WK-SEW05  TO  WK-TBL-MSG-C7 (IDX4)
+                           PERFORM UNTIL   IDY8  <     1
+                               IF  WK-SEW04 (IDY8:1)  = X"28"
+                                   MOVE  ZERO       TO  IDY8
+                               ELSE
+                                   MOVE  WK-SEW04 (IDY8:1)
+                                                    TO WK-SEW05 (IDY7:1)
+                                   COMPUTE  IDY7   =   IDY7   -   1
+                                   COMPUTE  IDY8   =   IDY8   -   1
+                               END-IF
+                           END-PERFORM
+                           MOVE    WK-SEW05   TO  WK-TBL-MSG-C5 (IDX4)
+                       END-IF
                    ELSE
                        MOVE    5          TO  IDY7
                        MOVE    IDY6       TO  IDY8
