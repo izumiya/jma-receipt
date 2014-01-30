@@ -13,6 +13,7 @@ handler "RubyExec" {
 
 bind	"Sysbase"		    "RubyExec";
 bind	"receden_check_start"	"RubyExec";
+bind	"Rosai_receden_check_start"	"RubyExec";
 
 bind    "ORCVTPTINF"    	"OpenCOBOL";
 bind    "ORCVTPTHKNINF" 	"OpenCOBOL";
