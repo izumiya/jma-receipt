@@ -4027,6 +4027,29 @@
             </widget>
           </widget>
           <widget>
+            <class>GtkNumberEntry</class>
+            <name>P02_BIRTHWEIGHT</name>
+            <x>946</x>
+            <y>452</y>
+            <width>40</width>
+            <height>24</height>
+            <sensitive>True</sensitive>
+            <can_focus>True</can_focus>
+            <has_focus>False</has_focus>
+            <editable>True</editable>
+            <format>ZZZZ</format>
+            <signal>
+              <name>changed</name>
+              <handler>entry_changed</handler>
+              <data>CHANGED</data>
+            </signal>
+            <signal>
+              <name>activate</name>
+              <handler>send_event</handler>
+              <data>ACTIVATE</data>
+            </signal>
+          </widget>
+          <widget>
             <class>GtkLabel</class>
             <name>label2101</name>
             <x>12</x>
@@ -4230,6 +4253,44 @@
             <ypad>0</ypad>
             <label></label>
             <justify>GTK_JUSTIFY_RIGHT</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>label27</name>
+            <x>878</x>
+            <y>452</y>
+            <width>70</width>
+            <height>24</height>
+            <visible>True</visible>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>出生時体重</label>
+            <justify>GTK_JUSTIFY_LEFT</justify>
+            <wrap>False</wrap>
+          </widget>
+          <widget>
+            <class>GtkLabel</class>
+            <name>label28</name>
+            <x>986</x>
+            <y>452</y>
+            <width>16</width>
+            <height>24</height>
+            <visible>True</visible>
+            <sensitive>True</sensitive>
+            <can_focus>False</can_focus>
+            <has_focus>False</has_focus>
+            <xalign>0</xalign>
+            <yalign>0.5</yalign>
+            <xpad>0</xpad>
+            <ypad>0</ypad>
+            <label>ｇ</label>
+            <justify>GTK_JUSTIFY_LEFT</justify>
             <wrap>False</wrap>
           </widget>
         </widget>

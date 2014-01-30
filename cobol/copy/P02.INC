@@ -355,6 +355,8 @@
                     06  P02-P02-SKYPRTFLG-COUNT   PIC S9(9)   BINARY.
                     06  P02-P02-SKYPRTFLG-ITEM
                             PIC X(50)   OCCURS  10 TIMES.
+                  05  P02-P02-BIRTHWEIGHT.
+                    06  P02-VALUE   PIC S9(4).
                   05  P02-TEIMSG.
                     06  P02-TEIMSG-STYLE   PIC X(20).
                     06  P02-TEIMSG-VALUE   PIC X(20).

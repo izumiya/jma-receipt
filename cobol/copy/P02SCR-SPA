@@ -44,6 +44,7 @@
       *  04.07.00    NACL-多々納  12/06/XX  公費種別２００件対応
       *  04.07.00    NACL-多々納  12/12/19  患者レセ分割対応
       *  04.07.00    NACL-多々納  13/07/19  患者個別設定追加対応
+      *  04.07.00    NACL-多々納  14/01/20  出生時体重追加対応
       *****************************************************************
        01  SPA-P02SCRAREA.
       *
@@ -180,6 +181,11 @@
                        09  SPA-GMN-SKYPRTFLG-LST      PIC X(50)
                                                       OCCURS 10.
                    07  SPA-SKYPRTFLG-MAX              PIC 9(02).
+      *            出生時体重
+                   07  SPA-GMN-BIRTHWEIGHT         PIC 9(04).
+                   07  SPA-GMN-BIRTHWEIGHT-X       REDEFINES
+                       SPA-GMN-BIRTHWEIGHT         PIC X(04).
+      *
       *            保険情報
                    07  SPA-GMN-HKN-AREA.
       *                保険情報

@@ -2902,6 +2902,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            日医データフォーマット区分
                        MOVE    PTCONF-CDATA(1:1)
                                            TO  SPA-GMN28-JMAMRVER
+      *H26.1
+                   WHEN    "BIRTHWEIGHT"
+      *            出生時体重
+                       MOVE    PTCONF-CDATA(1:4)
+                                           TO  SPA-GMN-BIRTHWEIGHT-X
                END-EVALUATE
                MOVE    "tbl_ptconf"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -3569,6 +3574,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  P02-P02-SKYPRTFLG-ITEM(IDX)
                MOVE    IDX             TO  P02-P02-SKYPRTFLG-COUNT
            END-PERFORM
+      *
+      *    出生時体重
+           MOVE    SPA-GMN-BIRTHWEIGHT TO  P02-P02-BIRTHWEIGHT
       *
       *    保険情報
       *    保険者番号

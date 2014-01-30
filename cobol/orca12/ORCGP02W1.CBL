@@ -100,6 +100,7 @@
       * 04.07.00     NACL-多々納  13/07/XX  第三者行為対応など
       * 04.07.00     NACL-多々納  13/11/01  API保険・公費追加対応
       * 04.07.00     NACL-多々納  13/11/13  生活保護重複警告対応
+      * 04.07.00     NACL-多々納  14/01/20  出生時体重追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2985,6 +2986,8 @@
            MOVE    P02-P02-ALLERGY2    TO  SPA-GMN-ALLERGY-2
            MOVE    P02-P02-KANSENSYO1  TO  SPA-GMN-KANSENSYO-1
            MOVE    P02-P02-KANSENSYO2  TO  SPA-GMN-KANSENSYO-2
+      *    出生時体重
+           MOVE    P02-P02-BIRTHWEIGHT TO  SPA-GMN-BIRTHWEIGHT
       *
            MOVE    P02-P02-SELNUM      TO  SPA-GMN-SELNUM
            MOVE    P02-P02-SRYKA       TO  SPA-GMN-SRYKA-G
@@ -3408,6 +3411,11 @@
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (SPA-FLG-END         =   ZERO  )
                PERFORM 4101-SKYPRTFLG-CHK-SEC
+           END-IF
+      *    出生時体重
+           IF     (SPA-ERRCD           =   SPACE )  AND
+                  (SPA-FLG-END         =   ZERO  )
+               PERFORM 4101-BIRTHWEIGHT-CHK-SEC
            END-IF
       *    禁忌他
            IF     (SPA-ERRCD           =   SPACE )  AND
@@ -4805,6 +4813,16 @@
       *
            .
        4101-SKYPRTFLG-CHK-EXT.
+           EXIT.
+      *
+      ***************************************************************
+      *    出生時体重チェック処理
+      ***************************************************************
+       4101-BIRTHWEIGHT-CHK-SEC         SECTION.
+      *
+      *
+           .
+       4101-BIRTHWEIGHT-CHK-EXT.
            EXIT.
       *
       ****************************************************************
@@ -8524,6 +8542,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                   MOVE    "P02_NYUKIN"          TO  MCP-WIDGET
               WHEN    67
                   MOVE    "P02_SKYPRTFLG"        TO  MCP-WIDGET
+              WHEN    68
+                  MOVE    "P02_BIRTHWEIGHT"      TO  MCP-WIDGET
               WHEN    47
                   MOVE    "P02_SETAINUSI"        TO  MCP-WIDGET
               WHEN    48
@@ -8746,9 +8766,20 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "P02_CONDITION3"
       *******      MOVE    51                  TO  SPA-GMN-CUR
                    MOVE    66                  TO  SPA-GMN-CUR
+      *H26.1
+      *            １歳未満は出生時体重へ
+                   IF     (SPA-NAI-NENREI-YY   =   ZERO )
+      ****           AND  (SPA-P02-SYORI       =   1    )
+                       MOVE    67                  TO  SPA-GMN-CUR
+                   END-IF
+      *H26.1
+      *    出生時体重
+               WHEN    "P02_BIRTHWEIGHT"
+                   MOVE    66                  TO  SPA-GMN-CUR
       *    請求書発行区分
                WHEN    "P02_SKYPRTFLG"
                    MOVE    51                  TO  SPA-GMN-CUR
+      *
       *    禁忌
                WHEN    "P02_TABOO1"
                    MOVE    52                  TO  SPA-GMN-CUR

@@ -458,6 +458,9 @@ P02	{
 					count	int;
 					item	varchar(50)[10];
 				};
+				P02_BIRTHWEIGHT	{
+					value	number(4);
+				};
 				TEIMSG	{
 					style	varchar(20);
 					value	varchar(20);

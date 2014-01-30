@@ -944,6 +944,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      211-PTCONF-SYORI-EXT
            END-IF
+      *
+      *H26.1
+      *    出生時体重
+           IF      SPA-GMN-BIRTHWEIGHT     =   ZERO
+               MOVE    SPACE                   TO  WRK-CONF-CDATA
+           ELSE
+               MOVE    SPA-GMN-BIRTHWEIGHT-X   TO  WRK-CONF-CDATA
+           END-IF
+           MOVE    "BIRTHWEIGHT"           TO  WRK-CONF-CKEY
+           PERFORM 2111-PTCONF-DBSYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      211-PTCONF-SYORI-EXT
+           END-IF
            .
        211-PTCONF-SYORI-EXT.
            EXIT.
