@@ -210,7 +210,7 @@ fi
 #              ∫∆¿¡µ·
 	        SKYKBN="2"
             fi
-	    PRM="${23},${f: -12},${EUCFILE},${ERRFILE},${ERRLOG},${SKYKBN},${24}}"
+	    PRM="${23},${f: -12},${EUCFILE},${ERRFILE},${ERRLOG},${SKYKBN},${24}"
 
 	    export  RUBYLIB=$SITESCRIPTSDIR:$PATCHSCRIPTSDIR:$SCRIPTSDIR:$RUBYLIB
 	    export  APS_EXEC_PATH=$(dirname $0)
