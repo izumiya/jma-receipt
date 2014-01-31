@@ -177,6 +177,8 @@
       *  04.07.12    NACL-藤原    13/11/01  労災レセ電データチェック機能
       *                                     対応
       *  04.07.13    NACL-藤原    13/12/09  医療情報連携基盤対応
+      *  04.04.04    NACL-藤原    14/01/30  労災の光ディスク等送付書作成
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -7205,17 +7207,42 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "1027"
                WHEN    "1028"
                WHEN    "1029"
-                   IF  ( ( SPA-GMN-RECEDEN-CHK
+                   IF ( ( SPA-NAI-200501-RECEDEN-LST2KBN
+                                           =   "1"    )    AND
+                         ( SPA-GMN-PRTKBN  =   "1"    )        )
+                   OR  ( ( SPA-GMN-RECEDEN-CHK
                                            =   "1"    )    AND
                          ( SPA-NAI-SKYYM   >=  201307 )        )
-                       STRING   WRK-TIDMSG         DELIMITED  BY  SPACE
-                                "（レセ電チェックリストの印刷を指定）" 
+                       MOVE    SPACE           TO  WRK-TIDMSG1
+                                                   WRK-TIDCD-MSG
+      *
+                       IF  ( ( SPA-NAI-200501-RECEDEN-LST2KBN
+                                               =   "1" )   AND
+                             ( SPA-GMN-PRTKBN  =   "1" )       )
+                           MOVE    "、光ディスク等送付書"
+                                                   TO  WRK-TIDMSG1
+                       END-IF
+                       IF  ( ( SPA-GMN-RECEDEN-CHK
+                                               =   "1"    )    AND
+                             ( SPA-NAI-SKYYM   >=  201307 )        )
+                           STRING  WRK-TIDMSG1     DELIMITED  BY  SPACE
+                                  "、レセ電チェックリスト"
                                                    DELIMITED  BY  SIZE
-                                                   INTO  TID2-ID1MSG
+                                                   INTO  WRK-TIDCD-MSG
+                           END-STRING
+                           MOVE    WRK-TIDCD-MSG   TO  WRK-TIDMSG1
+                           MOVE    SPACE           TO  WRK-TIDCD-MSG
+                       END-IF
+      * 
+                       STRING   WRK-TIDMSG         DELIMITED  BY  SPACE
+                                "（"               DELIMITED  BY  SIZE
+                                WRK-TIDMSG1 (3:)   DELIMITED  BY  SPACE
+                                  "の印刷を指定）" DELIMITED  BY  SIZE
+                                                   INTO    TID2-ID1MSG
                        END-STRING
                    ELSE
                        MOVE    WRK-TIDMSG      TO  TID2-ID1MSG
-                   END-IF    
+                   END-IF
                    IF      FLG-RECEDEN-CHK =   1
                        MOVE    "red"           TO  TID2-ID1MSG-STYLE
                    END-IF
@@ -7273,7 +7300,10 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "1027"
                WHEN    "1028"
                WHEN    "1029"
-                   IF  ( ( SPA-GMN-RECEDEN-CHK
+                   IF ( ( SPA-NAI-200501-RECEDEN-LST2KBN
+                                           =   "1"    )    AND
+                         ( SPA-GMN-PRTKBN  =   "1"    )        )
+                   OR  ( ( SPA-GMN-RECEDEN-CHK
                                            =   "1"    )    AND
                          ( SPA-NAI-SKYYM   >=  201307 )        )
                        MOVE    "T"             TO  TID2-B10-VISIBLE

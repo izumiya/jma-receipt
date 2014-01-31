@@ -92,6 +92,18 @@ fi
         exit 
     fi
 
+    rennum=1
+
+#   光ディスク等送付書（提出用レセのときのみ）
+    if  [ ${23} -eq '1' ] && [ ${21} -eq '1' ]; then
+        rennum=$(expr $rennum + 1) 
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBM720 -parameter $1,$2,$3,$rennum,$5,$6,$7,$8,$9,${10},${11},${12},${17},${14},${15},${20},${16} >> $LOG_FILE 2>&1
+        if  [ -e ${16} ]; then
+            echo "--- BM720 err file exist ---" >>$LOG_FILE
+            exit 
+        fi
+    fi
+
 #   一時フォルダ作成
     if  [ ${21} -eq '2' ]; then
         ROUSAI_FOLDER="${20}_TRousai_${5}"
@@ -190,7 +202,7 @@ fi
             cd ${OUT_FOLDER}
         fi
 
-        all=`ls  *RREC*.UK*`
+        all=`ls  *${RECEFILE1}*.UK*`
   
         for f in $all ; do
             echo "check f= " $f >> $LOG_FILE 2>&1
