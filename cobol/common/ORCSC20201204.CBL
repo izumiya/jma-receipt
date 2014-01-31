@@ -2346,7 +2346,7 @@
       *!!
                    IF      WRK-COM-ZAIEND (IDX3) =   "1"
                        MOVE    IDX3           TO  IDX
-                       MOVE    300            TO  IDX3
+                       MOVE    SPA-MAX-LINE   TO  IDX3
                    END-IF
                END-IF
       *@
