@@ -94,6 +94,7 @@ grpsys     03  EIE01PARA-FILE      PIC X(23).
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
+           03  FLG-CHANGE          PIC 9(01).
       *
       *    エンドステータス領域
        01  STS-AREA.
@@ -105,18 +106,21 @@ grpsys     03  EIE01PARA-FILE      PIC X(23).
        01  IDX-AREA.
            03  IDX1                PIC 9(03).
            03  IDX2                PIC 9(03).
-           03  IDX3                PIC 9(03).
+           03  IDX3                PIC 9(05).
            03  IDX4                PIC 9(05).
            03  IDX5                PIC 9(05).
            03  IDX6                PIC 9(03).
            03  IDX7                PIC 9(03).
            03  IDX8                PIC 9(03).
            03  IDX9                PIC 9(05).
+           03  IDXA                PIC 9(05).
+           03  IDXB                PIC 9(05).
            03  IDXP                PIC 9(05).
       *
       *    編集作業
        01  W-AREA.
            03  WK-EIECS-REC            PIC  X(51000).
+           03  WK-HEADER-REC           PIC  X(51000).
            03  WRK-PARA.
                05  WRK-PARA-SRYYM      PIC  X(06).
                05  WRK-PARA-TERMID     PIC  X(64).
@@ -167,8 +171,9 @@ grpsys         05  WRK-PARA-HOSPNUM    PIC  9(02).
        01  WK-TBL2.
            03  WK-TBLRET       OCCURS  900.
                05  WK-TBL-RMSG.
-                   07  WK-TBL-RMSG-1   PIC X(01).
-                   07  WK-TBL-RMSG-2   PIC X(29).
+                   07  WK-TBL-RMSG-ID.
+                       09  WK-TBL-RMSG-1   PIC X(01).
+                       09  WK-TBL-RMSG-2   PIC X(29).
                    07  WK-TBL-RMSG-3   PIC X(07).
                    07  WK-TBL-RMSG-4   PIC X(13).
                    07  WK-TBL-RMSG-5   PIC X(05).
@@ -461,6 +466,57 @@ grpsys*DD                                        TO  WK-HOSPID-L(2:5)
                CLOSE                       EIE01-FILE
                OPEN    OUTPUT              EIECS-FILE
       *
+               MOVE    1             TO  FLG-CHANGE
+               PERFORM VARYING IDXA      FROM  1   BY  1
+                       UNTIL ( IDXA      >     900 )
+                        OR   ( WK-TBL-RMSG (IDXA)   =   SPACE )
+                        OR   ( FLG-CHANGE           =   ZERO )
+      *
+                   IF ( WK-TBL-RMSG-ID (IDXA)       =   "PTNUM" )
+                       MOVE    ZERO  TO  FLG-CHANGE
+                   END-IF
+      *
+               END-PERFORM
+      *
+               MOVE    1               TO  IDXB
+               MOVE    SPACE           TO  WK-HEADER-REC
+               PERFORM VARYING IDXA      FROM  1   BY  1
+                       UNTIL ( IDXA      >     900 )
+                        OR   ( WK-TBL-RMSG (IDXA)   =   SPACE )
+      *
+                   IF    ( IDXA        >   1 )
+                       STRING  ","     DELIMITED BY  SIZE
+                       INTO    WK-HEADER-REC
+                       WITH    POINTER IDXB
+                       END-STRING
+                   END-IF
+      *
+                   IF  (WK-TBL-CHKBTN01            =   "T")   AND
+                       (FLG-CHANGE                 =   1  )  AND
+                       (WK-TBL-RMSG-ID (IDXA)      =   "PTID")
+      *
+                       STRING  "PTNUM"            DELIMITED BY  SPACE
+                       INTO    WK-HEADER-REC
+                       WITH    POINTER IDXB
+                       END-STRING
+                   ELSE
+                       STRING  WK-TBL-RMSG-ID (IDXA) DELIMITED BY SPACE
+                       INTO    WK-HEADER-REC
+                       WITH    POINTER IDXB
+                       END-STRING
+                   END-IF
+      *
+               END-PERFORM
+      *
+               PERFORM VARYING IDX5   FROM   1   BY   1
+                       UNTIL   IDX5   >=  IDXB
+                   MOVE    WK-HEADER-REC(IDX5:1)  TO  EIECS-REC
+                   WRITE   EIECS-REC
+               END-PERFORM
+      *
+               MOVE    X"0A"          TO   EIECS-REC
+               WRITE   EIECS-REC
+      *
       *         MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
                MOVE    SPACE           TO  MCPDATA-REC
                MOVE    SPA-HOSPNUM     TO  MCPDATA-REC(1:2)
@@ -602,10 +658,8 @@ grpsys*             MOVE    SPA-HOSPNUM     TO  WK-HOSPNUM
            MOVE    WK-TBL-RMSG-5 (IDX1)        TO  WK-KTPNT.
            MOVE    WK-TBL-RMSG-7 (IDX1)        TO  WK-PTPNT.
       *修正/*開始*03.06.05*********************************************
-           IF  (WK-TBL-MSG (IDX2)(1:5)    NOT =   "PTNUM")  AND
-               (WK-TBL-MSG (IDX2)(1:5)    NOT =   "BD001")  AND
-               (WK-TBL-MSG (IDX2)(1:4)    NOT =   "I001")   AND
-               (WK-TBL-RMSG (IDX1)(1:4)       =   "PTID")
+           IF  (FLG-CHANGE               =   1      )  AND
+               (WK-TBL-RMSG-ID (IDX1)    =   "PTID")
                MOVE    IDX4                        TO  WK-PTID-C
                MOVE    WK-TBL-RMSG-9 (IDX1)        TO  WK-PTID-S
                MOVE    WK-TBL-RMSG-5 (IDX1)        TO  WK-PTID-L
