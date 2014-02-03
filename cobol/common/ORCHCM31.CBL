@@ -363,6 +363,8 @@
            MOVE    ZERO            TO  CNT-LINE
       *
            MOVE    1               TO  IDX4
+           MOVE    WRK-NYUGAIKBN (IDX4)
+                                   TO  KEY-NYUGAIKBN
            PERFORM 20011-SKIP-SEC
       *
            PERFORM UNTIL ( IDX4    >   WRK-HEN-MAX )
