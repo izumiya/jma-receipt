@@ -117,3 +117,23 @@ path	key2 	{
 		;
 	};
 };
+
+path	key3 	{
+	DBSELECT	{
+		DECLARE tbl_tensuplus_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_tensuplus
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   SRYCD    =   :SRYCD
+ 			AND   YUKOSTYMD  <=  :YUKOSTYMD
+			AND   YUKOEDYMD  >=  :YUKOEDYMD
+            AND   EXISTS (
+		SELECT *
+		FROM tbl_tensu
+		WHERE 	HOSPNUM	= :HOSPNUM
+			AND   SRYCD    =   :SRYCD
+ 			AND   YUKOSTYMD  <=  :YUKOSTYMD
+			AND   YUKOEDYMD  >=  :YUKOEDYMD
+		) ;
+	};
+};

@@ -260,6 +260,8 @@
            END-IF
       *
            IF    ( DTCHK-RC            =   ZERO )
+      *        入院会計は現状入院時算定可能な項目のみ
+      *        登録している為、入院処理時に限り実行する。
                IF    ( ORCBSD01-NYUGAIKBN  =       "1" )
                    PERFORM 800-MCNDATE-SEC
                    DISPLAY SMCNDATE-HMS "ST:ORCDTCHK006"
@@ -283,6 +285,19 @@
                                                ORCBSD01PARA
                    PERFORM 800-MCNDATE-SEC
                    DISPLAY SMCNDATE-HMS "ED:ORCDTCHK001"
+           END-IF
+      *
+           IF    ( DTCHK-RC            =   ZERO )
+            AND  ( ORCBSD01-CHKKBN (20)    =   "2" )
+                   PERFORM 800-MCNDATE-SEC
+                   DISPLAY SMCNDATE-HMS "ST:ORCDTCHK011"
+                   CALL    "ORCDTCHK011"       USING
+                                               DTCHK-RC
+                                               WRK-PARA
+                                               DTCHKERRPARA
+                                               ORCBSD01PARA
+                   PERFORM 800-MCNDATE-SEC
+                   DISPLAY SMCNDATE-HMS "ED:ORCDTCHK011"
            END-IF
       *
            IF    ( DTCHK-RC            =   ZERO )

@@ -113,6 +113,14 @@
                    07  SPA-GMN-SRYHEIWRNKBN    PIC X(01).
                    07  SPA-GMN-SRYHEIWRNKBNFL  PIC X(01).
                    07  SPA-GMN-SRYHEIWRNKBNMEI PIC X(30).
+               05  SPA-GMN-SRYKAISUMSTKBN-G.
+                   07  SPA-GMN-SRYKAISUMSTKBN    PIC X(01).
+                   07  SPA-GMN-SRYKAISUMSTKBNFL  PIC X(01).
+                   07  SPA-GMN-SRYKAISUMSTKBNMEI PIC X(20).
+               05  SPA-GMN-SRYKAISUWRNKBN-G.
+                   07  SPA-GMN-SRYKAISUWRNKBN    PIC X(01).
+                   07  SPA-GMN-SRYKAISUWRNKBNFL  PIC X(01).
+                   07  SPA-GMN-SRYKAISUWRNKBNMEI PIC X(20).
                05  SPA-GMN-REIGAICHKKBN-G.
                    07  SPA-GMN-REIGAICHKKBN    PIC X(01).
                    07  SPA-GMN-REIGAICHKKBNFL  PIC X(01).
@@ -229,6 +237,18 @@
                        09  SPA-GMN-SRYHEIWRNKBNL   PIC X(01).
                        09  SPA-GMN-SRYHEIWRNKBNFLL PIC X(01).
                        09  SPA-GMN-SRYHEIWRNKBNMEIL PIC X(30).
+               05  SPA-GMN-SRYKAISUMSTKBNLST-G.
+                   07  SPA-GMN-SRYKAISUMSTKBN-MAX    PIC 9(03).
+                   07  SPA-GMN-SRYKAISUMSTKBNLST     OCCURS   2.
+                       09  SPA-GMN-SRYKAISUMSTKBNL   PIC X(01).
+                       09  SPA-GMN-SRYKAISUMSTKBNFLL PIC X(01).
+                       09  SPA-GMN-SRYKAISUMSTKBNMEIL PIC X(20).
+               05  SPA-GMN-SRYKAISUWRNKBNLST-G.
+                   07  SPA-GMN-SRYKAISUWRNKBN-MAX    PIC 9(03).
+                   07  SPA-GMN-SRYKAISUWRNKBNLST     OCCURS   2.
+                       09  SPA-GMN-SRYKAISUWRNKBNL   PIC X(01).
+                       09  SPA-GMN-SRYKAISUWRNKBNFLL PIC X(01).
+                       09  SPA-GMN-SRYKAISUWRNKBNMEIL PIC X(20).
                05  SPA-GMN-REIGAICHKKBNLST-G.
                    07  SPA-GMN-REIGAICHKKBN-MAX    PIC 9(03).
                    07  SPA-GMN-REIGAICHKKBNLST     OCCURS   2.
@@ -587,6 +607,24 @@
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-SRYHEIWRNKBN-G
            END-IF
       *
+           MOVE    SPA-GMN-SRYKAISUMSTKBN TO  WRK-CMB-CD
+           PERFORM 4200-SRYKAISUMSTKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-SRYKAISUMSTKBNLST (2)
+                                       TO  SPA-GMN-SRYKAISUMSTKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-SRYKAISUMSTKBN-G
+           END-IF
+      *
+           MOVE    SPA-GMN-SRYKAISUWRNKBN TO  WRK-CMB-CD
+           PERFORM 4200-SRYKAISUWRNKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-SRYKAISUWRNKBNLST (1)
+                                       TO  SPA-GMN-SRYKAISUWRNKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM     TO  SPA-GMN-SRYKAISUWRNKBN-G
+           END-IF
+      *
            MOVE    SPA-GMN-ERR990009KBN TO  WRK-CMB-CD
            PERFORM 4200-ERR990009KBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     =   SPACE )
@@ -716,6 +754,12 @@
       *
                MOVE    SYS-1101-SRYHEIWRNKBN
                                        TO  SPA-GMN-SRYHEIWRNKBN
+      *
+               MOVE    SYS-1101-SRYKAISUMSTKBN
+                                       TO  SPA-GMN-SRYKAISUMSTKBN
+      *
+               MOVE    SYS-1101-SRYKAISUWRNKBN
+                                       TO  SPA-GMN-SRYKAISUWRNKBN
       *
                MOVE    SYS-1101-REIGAICHKKBN
                                        TO  SPA-GMN-REIGAICHKKBN
@@ -853,6 +897,12 @@
       *
       *    併用算定警告エラーコンボ設定処理
            PERFORM 3101-SRYHEIWRNKBNLST-SEC
+      *
+      *    電子点数表回数参照コンボ設定処理
+           PERFORM 3101-SRYKAISUMSTKBNLST-SEC
+      *
+      *    点数マスタ警告エラーコンボ設定処理
+           PERFORM 3101-SRYKAISUWRNKBNLST-SEC
       *
       *    その他のチェックエラーコンボ設定処理
            PERFORM 3101-ERR990009KBNLST-SEC
@@ -1204,6 +1254,48 @@
        3101-SRYHEIWRNKBNLST-EXT.
            EXIT.
       *****************************************************************
+      *    電子点数表回数参照コンボ設定処理
+      *****************************************************************
+       3101-SRYKAISUMSTKBNLST-SEC           SECTION.
+      *
+           INITIALIZE                  SPA-GMN-SRYKAISUMSTKBNLST-G
+      *
+           MOVE    2               TO  SPA-GMN-SRYKAISUMSTKBN-MAX
+      *
+           MOVE    "1"             TO  SPA-GMN-SRYKAISUMSTKBNL    (1)
+           MOVE    "参照する"      TO  SPA-GMN-SRYKAISUMSTKBNMEIL (1)
+      *
+           MOVE    "2"             TO  SPA-GMN-SRYKAISUMSTKBNL    (2)
+           MOVE    "参照しない"    TO  SPA-GMN-SRYKAISUMSTKBNMEIL (2)
+      *
+           MOVE    SPA-GMN-SRYKAISUMSTKBNLST  (2)
+                                   TO  SPA-GMN-SRYKAISUMSTKBN-G
+      *
+           . 
+       3101-SRYKAISUMSTKBNLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ警告エラーコンボ設定処理
+      *****************************************************************
+       3101-SRYKAISUWRNKBNLST-SEC           SECTION.
+      *
+           INITIALIZE                  SPA-GMN-SRYKAISUWRNKBNLST-G
+      *
+           MOVE    2               TO  SPA-GMN-SRYKAISUWRNKBN-MAX
+      *
+           MOVE    "1"             TO  SPA-GMN-SRYKAISUWRNKBNL    (1)
+           MOVE    "チェックする"  TO  SPA-GMN-SRYKAISUWRNKBNMEIL (1)
+      *
+           MOVE    "2"             TO  SPA-GMN-SRYKAISUWRNKBNL    (2)
+           MOVE    "チェックしない" TO SPA-GMN-SRYKAISUWRNKBNMEIL (2)
+      *
+           MOVE    SPA-GMN-SRYKAISUWRNKBNLST  (1)
+                                   TO  SPA-GMN-SRYKAISUWRNKBN-G
+      *
+           . 
+       3101-SRYKAISUWRNKBNLST-EXT.
+           EXIT.
+      *****************************************************************
       *    その他エラーコンボ設定処理
       *****************************************************************
        3101-ERR990009KBNLST-SEC           SECTION.
@@ -1496,6 +1588,8 @@
            MOVE    W60-YBSHOHOYKZKBN   TO  SPA-GMN-YBSHOHOYKZKBN-G
            MOVE    W60-YBUTAGAIKBN     TO  SPA-GMN-YBUTAGAIKBN-G
            MOVE    W60-SRYHEIWRNKBN    TO  SPA-GMN-SRYHEIWRNKBN-G
+           MOVE    W60-SRYKAISUMSTKBN  TO  SPA-GMN-SRYKAISUMSTKBN-G
+           MOVE    W60-SRYKAISUWRNKBN  TO  SPA-GMN-SRYKAISUWRNKBN-G
            MOVE    W60-ERR990009KBN    TO  SPA-GMN-ERR990009KBN-G
            MOVE    W60-ERRA10001KBN    TO  SPA-GMN-ERRA10001KBN-G
            PERFORM VARYING IDX0    FROM    1   BY  1
@@ -1585,6 +1679,14 @@
       *    設定２基本チェック処理
       *****************************************************************
        4102-PAGE01-KIHON-CHK-SEC       SECTION.
+      *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-SRYKAISUMSTKBN-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-SRYKAISUWRNKBN-CHK-SEC
+           END-IF
       *
            IF    ( SPA-ERRCD   =   SPACE )
                PERFORM 4101-ERR990009KBN-CHK-SEC
@@ -1878,6 +1980,42 @@
            .
       *
        4101-SRYHEIWRNKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    電子点数表回数参照チェック処理
+      *****************************************************************
+       4101-SRYKAISUMSTKBN-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-SRYKAISUMSTKBN TO  WRK-CMB-CD
+           PERFORM 4200-SRYKAISUMSTKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-SRYKAISUMSTKBNLST (2)
+                                   TO  SPA-GMN-SRYKAISUMSTKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-SRYKAISUMSTKBN-G
+           END-IF
+      *
+           .
+      *
+       4101-SRYKAISUMSTKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ警告エラーチェック処理
+      *****************************************************************
+       4101-SRYKAISUWRNKBN-CHK-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-SRYKAISUWRNKBN TO  WRK-CMB-CD
+           PERFORM 4200-SRYKAISUWRNKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-SRYKAISUWRNKBNLST (1)
+                                   TO  SPA-GMN-SRYKAISUWRNKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-SRYKAISUWRNKBN-G
+           END-IF
+      *
+           .
+      *
+       4101-SRYKAISUWRNKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    その他エラー区分チェック処理
@@ -2306,6 +2444,54 @@
        4200-SRYHEIWRNKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    電子点数表回数参照コンボチェック処理
+      *****************************************************************
+       4200-SRYKAISUMSTKBNLST-CHK-SEC  SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB     >   SPA-GMN-SRYKAISUMSTKBN-MAX)
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-SRYKAISUMSTKBNL (IDX-CMB)
+                                   =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-SRYKAISUMSTKBNLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-SRYKAISUMSTKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ警告エラーコンボチェック処理
+      *****************************************************************
+       4200-SRYKAISUWRNKBNLST-CHK-SEC  SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB     >   SPA-GMN-SRYKAISUWRNKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-SRYKAISUWRNKBNL (IDX-CMB)
+                                   =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-SRYKAISUWRNKBNLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-SRYKAISUWRNKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    その他エラー区分コンボチェック処理
       *****************************************************************
        4200-ERR990009KBNLST-CHK-SEC     SECTION.
@@ -2592,7 +2778,7 @@
                WHEN    0
                    MOVE    101         TO  SPA-GMN-CUR
                WHEN    1
-                   MOVE    201         TO  SPA-GMN-CUR
+                   MOVE    213         TO  SPA-GMN-CUR
                END-EVALUATE
       *
            END-IF
@@ -2728,6 +2914,10 @@
            MOVE    SPA-GMN-YBUTAGAIKBN TO   SYS-1101-YBUTAGAIKBN
       *
            MOVE    SPA-GMN-SRYHEIWRNKBN TO   SYS-1101-SRYHEIWRNKBN
+      *
+           MOVE    SPA-GMN-SRYKAISUMSTKBN TO SYS-1101-SRYKAISUMSTKBN
+      *
+           MOVE    SPA-GMN-SRYKAISUWRNKBN TO SYS-1101-SRYKAISUWRNKBN
       *
            MOVE    SPA-GMN-SYA-INGAITEN
                                        TO  SYS-1101-SYA-INGAITEN
@@ -3087,6 +3277,30 @@
       *
            END-PERFORM
       *
+           MOVE    SPA-GMN-SRYKAISUMSTKBN-G   TO  W60-SRYKAISUMSTKBN
+      *
+           MOVE    SPA-GMN-SRYKAISUMSTKBN-MAX
+                                   TO  W60-SRYKAISUMSTKBN-COUNT
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   SPA-GMN-SRYKAISUMSTKBN-MAX )
+      *
+               MOVE    SPA-GMN-SRYKAISUMSTKBNLST (IDX0)
+                                   TO  W60-SRYKAISUMSTKBN-ITEM (IDX0)
+      *
+           END-PERFORM
+      *
+           MOVE    SPA-GMN-SRYKAISUWRNKBN-G   TO  W60-SRYKAISUWRNKBN
+      *
+           MOVE    SPA-GMN-SRYKAISUWRNKBN-MAX
+                                   TO  W60-SRYKAISUWRNKBN-COUNT
+           PERFORM VARYING IDX0    FROM    1   BY  1
+                   UNTIL ( IDX0    >   SPA-GMN-SRYKAISUWRNKBN-MAX )
+      *
+               MOVE    SPA-GMN-SRYKAISUWRNKBNLST (IDX0)
+                                   TO  W60-SRYKAISUWRNKBN-ITEM (IDX0)
+      *
+           END-PERFORM
+      *
            MOVE    SPA-GMN-ERR990009KBN-G   TO  W60-ERR990009KBN
       *
            MOVE    SPA-GMN-ERR990009KBN-MAX
@@ -3262,6 +3476,12 @@
                MOVE    "PRTSRTKBN"     TO  MCP-WIDGET
            WHEN    212
                MOVE    "PRTPTLSTKBN"   TO  MCP-WIDGET
+           WHEN    213
+               MOVE    "SRYKAISUMSTKBN"
+                                       TO  MCP-WIDGET
+           WHEN    214
+               MOVE    "SRYKAISUWRNKBN"
+                                       TO  MCP-WIDGET
            WHEN    908
                MOVE    "B08"           TO  MCP-WIDGET
            WHEN    912
@@ -3318,6 +3538,10 @@
                MOVE    120         TO  SPA-GMN-CUR
            WHEN    "SRYHEIWRNKBN"
                MOVE    908         TO  SPA-GMN-CUR
+           WHEN    "SRYKAISUMSTKBN"
+               MOVE    214         TO  SPA-GMN-CUR
+           WHEN    "SRYKAISUWRNKBN"
+               MOVE    201         TO  SPA-GMN-CUR
            WHEN    "ERR990009KBN"
                MOVE    202         TO  SPA-GMN-CUR
            WHEN    "SYA_INGAITEN"

@@ -50,7 +50,14 @@
                05  CK4-1201-TEKCD       PIC  X(09).
                05  CK4-1201-TEKBYOMEI   PIC  X(80).
                05  CK4-1201-TEKCOMPKBN  PIC  X(1).
-               05  CK4-1201-FILLER      PIC  X(278).
+               05  CK4-1201-TANICD      PIC  9(3).
+               05  CK4-1201-TANINAME    PIC  X(12).
+               05  CK4-1201-SHONUM      PIC  9(3).
+               05  CK4-1201-SRYSTYMD    PIC  X(08).
+               05  CK4-1201-SRYEDYMD    PIC  X(08).
+               05  CK4-1201-LIMIT       PIC  9(5).
+               05  CK4-1201-TSUKISU     PIC  9(2).
+               05  CK4-1201-FILLER      PIC  X(237).
       *Ã¼Ëö£É£Ä
            03  CK4-1201-TERMID          PIC  X(16).
       *¥ª¥Ú¡¼¥ì¡¼¥¿£É£Ä

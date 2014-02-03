@@ -74,3 +74,15 @@ path	key2 	{
 	};
 };
 
+path	key3 	{
+	DBSELECT	{
+		DECLARE tbl_nrrksrh_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nrrksrh
+			WHERE HOSPNUM     =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   SRYYMD      LIKE   :SRYYMD
+			AND   ZAINUM      =   :ZAINUM
+		;
+	};
+};

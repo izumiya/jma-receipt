@@ -105,6 +105,27 @@
       *条件区分
            03  DTCHK004-TEKCOMPKBN    PIC X(1).
       *
+      *単位コード
+           03  DTCHK004-TANICD        PIC 9(3).
+      *
+      *単位名称
+           03  DTCHK004-TANINAME      PIC X(12).
+      *
+      *初回番号
+           03  DTCHK004-SHONUM        PIC 9(3).
+      *
+      *診療開始日
+           03  DTCHK004-SRYSTYMD      PIC X(8).
+      *
+      *診療終了日
+           03  DTCHK004-SRYEDYMD      PIC X(8).
+      *
+      *上限回数
+           03  DTCHK004-LIMIT         PIC 9(5).
+      *
+      *月数
+           03  DTCHK004-TSUKISU       PIC 9(2).
+      *
       *日付
            03  DTCHK004-DAY-G.
                05  DTCHK004-DAY       PIC 9(01)

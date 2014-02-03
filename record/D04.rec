@@ -79,7 +79,7 @@ D04	{
 					value1	varchar(20);
 					value2	varchar(100);
 					value3	varchar(20);
-					value4	varchar(200);
+					value4	varchar(220);
 				}	[200];
 				select	bool[200];
 			};
@@ -122,8 +122,8 @@ D04	{
 					value0	varchar(5);
 					value1	varchar(101);
 					value2	varchar(12);
-				}	[200];
-				select	bool[200];
+				}	[500];
+				select	bool[500];
 			};
 		};
 	};

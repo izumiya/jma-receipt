@@ -56,7 +56,7 @@
                     06  D04-TPTNUM         PIC X(20).
                     06  D04-TNAME          PIC X(100).
                     06  D04-THKNSBT        PIC X(20).
-                    06  D04-TERRMSG        PIC X(200).
+                    06  D04-TERRMSG        PIC X(220).
                   05  D04-ERRLST-SELECT    PIC X       OCCURS  200.
               03  D04-SW2.
                 04  D04-BYOLST.
@@ -83,11 +83,11 @@
                   05  D04-CHKLST-COUNT     PIC S9(9)   BINARY.
                   05  D04-CHKLST-ROW       PIC S9(9)   BINARY.
                   05  D04-CHKLST-ROWATTR   PIC S9(9)   BINARY.
-                  05  D04-CHKLST-ITEM      OCCURS  200.
+                  05  D04-CHKLST-ITEM      OCCURS  500.
                     06  D04-TCHKLSTNO-G.
                       07  D04-TCHKLSTNO    PIC X(4).
                       07  D04-TCHKGRPID    PIC X(1).
                     06  D04-TCHKBYOMEI     PIC X(101).
                     06  D04-TCOMPKBN       PIC X(12).
-                  05  D04-CHKLST-SELECT    PIC X       OCCURS  200.
+                  05  D04-CHKLST-SELECT    PIC X       OCCURS  500.
 

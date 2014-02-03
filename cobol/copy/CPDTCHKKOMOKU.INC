@@ -23,7 +23,7 @@
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       ************************************************************
        01  DTCHKKOMOKU-AREA.
-           03  DTCHKKOMOKU-MAX             PIC 9(03)   VALUE   19.
+           03  DTCHKKOMOKU-MAX             PIC 9(03)   VALUE   20.
            03  DTCHKKOMOKU-VAL.
                05                          PIC X(02)   VALUE
                "01".
@@ -101,7 +101,11 @@
                "19".
                05                          PIC X(40)   VALUE
                "ÌôºÞ¤Î·î¾å¸Â²ó¿ô¡¦ÁíÅêÍ¿ÎÌ".
+               05                          PIC X(02)   VALUE
+               "20".
+               05                          PIC X(40)   VALUE
+               "¿ÇÎÅ¹Ô°Ù»»Äê²ó¿ô".
            03  DTCHKKOMOKU-R   REDEFINES   DTCHKKOMOKU-VAL.
-               05  DTCHKKOMOKU-CHKKOMOKU-OCC    OCCURS  19.
+               05  DTCHKKOMOKU-CHKKOMOKU-OCC    OCCURS  20.
                    07  DTCHKKOMOKU-CHKNUM       PIC X(02).
                    07  DTCHKKOMOKU-CHKKOMOKU    PIC X(40).

@@ -72,7 +72,9 @@
                05  SYS-1101-YBSJTYKZKBN     PIC  X(1).
                05  SYS-1101-YBMSIYKZKBN     PIC  X(1).
                05  SYS-1101-YBSHOHOYKZKBN   PIC  X(1).
-               05  SYS-1101-YOBI            PIC  X(441).
+               05  SYS-1101-SRYKAISUMSTKBN  PIC  X(1).
+               05  SYS-1101-SRYKAISUWRNKBN  PIC  X(1).
+               05  SYS-1101-YOBI            PIC  X(439).
       *Ã¼Ëö£É£Ä
            03  SYS-1101-TERMID          PIC  X(16).
       *¥ª¥Ú¡¼¥ì¡¼¥¿£É£Ä

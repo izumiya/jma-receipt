@@ -61,8 +61,8 @@
       *
        WORKING-STORAGE                 SECTION.
       *
-           COPY    "HCM401V04.INC"
-                                   REPLACING  //HCM401V04//
+           COPY    "HCM401V05.INC"
+                                   REPLACING  //HCM401V05//
                                    BY         //HCM401//.
       *
       *    エラーファイルファイル名称領域 
@@ -948,7 +948,7 @@
            MOVE    WRK-SHORI-RENNUM    TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
-           MOVE   "HCM401V04.red"      TO  SPRT-PRTID
+           MOVE   "HCM401V05.red"      TO  SPRT-PRTID
            IF    ( WRK-HKNMES      NOT =   SPACE )
                STRING  WRK-SPRT-TITLE      DELIMITED   BY  SPACE
                        "（"                DELIMITED   BY  SIZE

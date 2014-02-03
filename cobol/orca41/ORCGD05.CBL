@@ -21,7 +21,7 @@
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : データチェック
-      *  コンポーネント名  : 例外登録一覧画面画面
+      *  コンポーネント名  : 例外登録一覧画面
       *  管理者            : 
       *  作成日付    作業者        記述
       *  07.07.20    NACL-太田     新規作成
@@ -65,6 +65,7 @@
       *    添字領域
        01  IDX-AREA.
            03  IDX0                        PIC 9(05).
+           03  IDX1                        PIC 9(05).
            03  IDX-CMB                     PIC 9(05).
            03  IDXE                        PIC 9(05).
            03  IDXL                        PIC 9(05).
@@ -90,6 +91,12 @@
            03  WRK-EDIT-COMPKBN-MEI        PIC X(04).
            03  WRK-CHKNAIYO                PIC X(222).
            03  WRK-ERRMSG                  PIC X(200).
+           03  WRK-LTRIM                   PIC X(500).
+           03  WRK-LTRIM-Z                 REDEFINES WRK-LTRIM.
+               05  WRK-LTRIM-ZX99          PIC Z(9)9.
+               05  WRK-LTRIM-FL            PIC X(490).
+           03  WRK-LTRIM-TMP               PIC X(500).
+           03  WRK-KANACHK-STR             PIC X(500).
       *
        01  KEY-AREA.
            03  KEY-PTID                    PIC 9(10).
@@ -109,7 +116,6 @@
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
-      *
       *
            COPY    "CPCHKREIGAI.INC".
       *
@@ -383,27 +389,43 @@
                MOVE    SPACE           TO  WRK-CHKNAIYO
       *
                IF    ( CHKREIGAI-CHKKBN    =   SPACE )
-                   PERFORM VARYING IDXE    FROM    1   BY  1
-                           UNTIL ( IDXE    >   ERRMES-MAX )
-                            OR   ( SPA-GMN-D05-TCHKNAIYO (IDXL)
-                                       NOT =   SPACE )
+                   EVALUATE    TRUE
+                   WHEN  ( CHKREIGAI-CHKNUM    =   "20" )
+                    AND  ( CHKREIGAI-ERRCD     =   "200001" )
+                       MOVE    CHKREIGAI-SRYCD
+                                           TO  WRK-TNS-SRYCD
+                       PERFORM 900-TENSU-KEY-SEL-SEC
+                       STRING "［"                 DELIMITED BY SIZE
+                            CHKREIGAI-TANINAME     DELIMITED BY SPACE
+                           "］："                  DELIMITED BY SIZE
+                           CHKREIGAI-SRYCD         DELIMITED BY SIZE
+                           " "                     DELIMITED BY SIZE
+                           TNS-NAME                DELIMITED BY SPACE
+                       INTO    WRK-CHKNAIYO
+                       END-STRING
+                   WHEN    OTHER
+                       PERFORM VARYING IDXE    FROM    1   BY  1
+                               UNTIL ( IDXE    >   ERRMES-MAX )
+                                OR   ( SPA-GMN-D05-TCHKNAIYO (IDXL)
+                                           NOT =   SPACE )
       *
-                       IF    ( CHKREIGAI-ERRCD =   ERRMES-CD (IDXE))
-                           MOVE    ERRMES-MESSAGE (IDXE)
+                           IF    ( CHKREIGAI-ERRCD =   ERRMES-CD (IDXE))
+                               MOVE    ERRMES-MESSAGE (IDXE)
+                                       TO  WRK-ERRMSG
+                           END-IF
+      *
+                       END-PERFORM
+                       IF    ( WRK-ERRMSG  =   SPACE )
+                           MOVE    CHKREIGAI-ERRMSG
                                        TO  WRK-ERRMSG
                        END-IF
       *
-                   END-PERFORM
-                   IF    ( WRK-ERRMSG  =   SPACE )
-                       MOVE    CHKREIGAI-ERRMSG
-                                       TO  WRK-ERRMSG
-                   END-IF
-      *
-                   STRING  CHKREIGAI-ERRCD DELIMITED BY SIZE
-                           " "             DELIMITED BY SIZE
-                           WRK-ERRMSG      DELIMITED BY SPACE
-                   INTO    WRK-CHKNAIYO
-                   END-STRING
+                       STRING  CHKREIGAI-ERRCD DELIMITED BY SIZE
+                               " "             DELIMITED BY SIZE
+                               WRK-ERRMSG      DELIMITED BY SPACE
+                       INTO    WRK-CHKNAIYO
+                       END-STRING
+                   END-EVALUATE
       *
                ELSE
                    EVALUATE    CHKREIGAI-CHKKBN
@@ -1155,7 +1177,7 @@
       *
            EVALUATE    SPA-DIDCD
            WHEN    "2001"
-               MOVE    "削除します。よろしいですか"
+               MOVE    "例外設定を解除します。よろしいですか"
                                        TO  WRK-DIDMSG
            END-EVALUATE
       *
@@ -1235,6 +1257,45 @@
            .
        800-EDIT-COMPKBN-MEI-EXT.
             EXIT.
+      *****************************************************************
+      *    文字列左詰処理
+      *****************************************************************
+       800-LTRIM-SEC               SECTION.
+      *
+           MOVE    SPACE           TO  WRK-LTRIM-FL
+      *
+           PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL ( IDX1    >       500 )
+      *
+               IF    ( WRK-LTRIM (IDX1 : 1)
+                                       NOT =   SPACE )
+                   MOVE    WRK-LTRIM (IDX1:)
+                                           TO  WRK-LTRIM-TMP
+                   MOVE    WRK-LTRIM-TMP   TO  WRK-LTRIM
+                   MOVE    500             TO  IDX1
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       800-LTRIM-EXT.
+           EXIT.
+      *****************************************************************
+      *    全角変換処理
+      *****************************************************************
+       800-ZENKAKU-SEC                 SECTION.
+      *
+           INITIALIZE                  ORCSKANACHKAREA
+           MOVE   "2"              TO  KANACHK-SYORI
+           MOVE  500               TO  KANACHK-MAX-CNT
+           MOVE  WRK-KANACHK-STR   TO  KANACHK-MAE-INPUT
+           CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
+           MOVE    KANACHK-OUT-INPUT
+                                   TO  WRK-KANACHK-STR
+      *
+           .
+       800-ZENKAKU-EXT.
+           EXIT.
       *****************************************************************
       *    チェック例外マスタ検索処理
       *****************************************************************

@@ -61,6 +61,8 @@
                 04  X91-VALUE   PIC X.
               03  X91-CHKBYOSRY.
                 04  X91-VALUE   PIC X.
+              03  X91-CHKKAISU.
+                04  X91-VALUE   PIC X.
               03  X91-CMB-MOREKIKAN.
                 04  X91-MOREKIKAN.
                   05  X91-VALUE   PIC X(40).

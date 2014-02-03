@@ -159,6 +159,7 @@
       *
        01  IDX-AREA.
            03  IDX0                                    PIC 9(05).
+           03  IDXA                                    PIC 9(05).
            03  IDX-COMB                                PIC 9(05).
       *
        01  WRK-AREA.
@@ -526,6 +527,12 @@
                        MOVE    IDX0        TO  DTCHK005-DAY
                        MOVE    ACCT-DAY (1 IDX0)
                                            TO  DTCHK005-DAYCNT
+                       PERFORM VARYING IDXA    FROM    2   BY  1
+                               UNTIL ( IDXA    >   10 )
+                           MOVE    ACCT-DAY (IDXA IDX0)
+                                       TO  DTCHK005-DAYCNT2 (IDXA - 1)
+                       END-PERFORM
+      *
                        IF    ( ACCT-NYUGAIKBN  =   "1" )
       *
                            MOVE    DTCHK005-REC    TO  DTCHK005N-REC
@@ -598,44 +605,24 @@
            OPEN    OUTPUT              DCACCT-FILE
       *
            PERFORM 900-DTCHK005N-READ-SEC
-           PERFORM 900-DTCHK005G-READ-SEC
       *
            PERFORM UNTIL ( DTCHK005N-KEY   =   HIGH-VALUE )
-                    AND  ( DTCHK005G-KEY   =   HIGH-VALUE )
       *
-               EVALUATE    TRUE
-               WHEN  ( DTCHK005N-PTID-X    >   DTCHK005G-PTID-X  )
-                   IF    ( ORCBSD01-NYUGAIKBN  =   "1" )
-                       PERFORM 900-DTCHK005G-READ-SEC
-                   ELSE
-                       MOVE    DTCHK005G-REC   TO  DTCHK005-REC
-                       PERFORM 200111-DCACCT-INS-SEC
-                       PERFORM 900-DTCHK005G-READ-SEC
-                   END-IF
-               WHEN  ( DTCHK005N-PTID-X    <   DTCHK005G-PTID-X  )
-                   IF    ( ORCBSD01-NYUGAIKBN  =   "1" )
-                       MOVE    DTCHK005N-REC   TO  DTCHK005-REC
-                       PERFORM 200111-DCACCT-INS-SEC
-                       PERFORM 900-DTCHK005N-READ-SEC
-                   ELSE
-                       PERFORM 900-DTCHK005N-READ-SEC
-                   END-IF
-               WHEN  ( DTCHK005N-PTID-X    =   DTCHK005G-PTID-X  )
-      *
-                   IF    ( ORCBSD01-NYUGAIKBN  =   "1" )
-                       MOVE    DTCHK005G-REC   TO  DTCHK005-REC
-                       PERFORM 200111-DCACCT-INS-SEC
-                       PERFORM 900-DTCHK005G-READ-SEC
-                   ELSE
-                       MOVE    DTCHK005N-REC   TO  DTCHK005-REC
-                       PERFORM 200111-DCACCT-INS-SEC
-                       PERFORM 900-DTCHK005N-READ-SEC
-                   END-IF
-      *
-               END-EVALUATE
+               MOVE    DTCHK005N-REC   TO  DTCHK005-REC
+               PERFORM 200111-DCACCT-INS-SEC
+               PERFORM 900-DTCHK005N-READ-SEC
       *
            END-PERFORM
       *
+           PERFORM 900-DTCHK005G-READ-SEC
+      *
+           PERFORM UNTIL ( DTCHK005G-KEY   =   HIGH-VALUE )
+      *
+               MOVE    DTCHK005G-REC   TO  DTCHK005-REC
+               PERFORM 200111-DCACCT-INS-SEC
+               PERFORM 900-DTCHK005G-READ-SEC
+      *
+           END-PERFORM
       *
            CLOSE   DTCHK005N-FILE
            CLOSE   DTCHK005G-FILE
@@ -685,6 +672,7 @@
            MOVE    DTCHK005-ZAIKBN     TO  DCACCT-ZAIKBN
            MOVE    DTCHK005-DAY        TO  DCACCT-DAY
            MOVE    DTCHK005-DAYCNT     TO  DCACCT-DAYCNT
+           MOVE    DTCHK005-DAYCNT2-G  TO  DCACCT-DAYCNT2-G
            MOVE    DTCHK005-INGAITEN   TO  DCACCT-INGAITEN
       *
            PERFORM 800-MCNDATE-SEC

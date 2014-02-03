@@ -292,6 +292,7 @@ bind    "ORCBMNOTE"      "OpenCOBOL";
 bind    "ORCBDELMNOTE"      "OpenCOBOL";
 bind    "ORCBM580"      "OpenCOBOL";
 bind    "ORCBM590"      "OpenCOBOL";
+bind	"ORCBX03"	"OpenCOBOL";
 bind    "ORCBM710"      "OpenCOBOL";
 bind    "ORCBM570"      "OpenCOBOL";
 bind    "ORCBM720"      "OpenCOBOL";

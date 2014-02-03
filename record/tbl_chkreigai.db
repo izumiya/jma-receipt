@@ -9,8 +9,10 @@ tbl_chkreigai	{
 	BYOMEI   		varchar(160);
 	COMPKBN   		char(1);
 	TEKCD   		char(9);
-	TEKBYOMEI   		varchar(160);
-	TEKCOMPKBN   		char(1);
+	TEKBYOMEI   	varchar(160);
+	TEKCOMPKBN      char(1);
+	TANICD   		number(3,0);
+	TANINAME   		varchar(12);
 	ERRCD   		char(6);
 	ERRMSG   		varchar(200);
 	STYUKYMD	  	char(8);
@@ -128,6 +130,7 @@ path	del2		{
 		AND ( TEKCD      = :TEKCD  OR  :TEKCD  = '')
 		AND ( TEKBYOMEI  = :TEKBYOMEI  OR  :TEKBYOMEI  = '')
 		AND ( TEKCOMPKBN = :TEKCOMPKBN OR  :TEKCOMPKBN = '')
+		AND ( TANICD     = :TANICD  OR  :TANICD = 0 )
 		AND NYUGAIKBN	 =  :NYUGAIKBN
 		AND STYUKYMD	<=  :STYUKYMD
 		AND EDYUKYMD	>=  :EDYUKYMD

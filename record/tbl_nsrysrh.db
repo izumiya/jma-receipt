@@ -16,7 +16,6 @@ tbl_nsrysrh {
 	UPYMD    			char(8);
 	UPHMS				char(6);
 };
-
 primary	{
 	HOSPNUM,PTID,ZAINUM,SRYYM;
 };
@@ -65,3 +64,18 @@ path	del3 	{
 		;
 	};
 };
+
+path	key2 	{
+	DBSELECT	{
+		DECLARE tbl_nsrysrh_key2_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nsrysrh
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   SRYYM      >=   :SRYYM
+			AND   SRYYM      <=   :CREYMD
+			AND   SRYCD       =   :SRYCD
+		;
+	};
+};
+

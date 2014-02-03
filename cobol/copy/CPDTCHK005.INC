@@ -41,6 +41,9 @@
            03  DTCHK005-RECESYUBETU    PIC X(04).
            03  DTCHK005-DAY            PIC 9(02).
            03  DTCHK005-DAYCNT         PIC 9(03).
+           03  DTCHK005-DAYCNT2-G.
+               05  DTCHK005-DAYCNT2    PIC 9(03)
+                                       OCCURS 9.
            03  DTCHK005-STATUS         PIC 9(05).
            03  DTCHK005-NYUGAIKBN      PIC X(01).
            03  DTCHK005-ZAIKBN         PIC 9(03).

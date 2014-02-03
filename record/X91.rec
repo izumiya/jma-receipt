@@ -56,6 +56,9 @@ X91	{
 		CHKBYOSRY	{
 			value	bool;
 		};
+		CHKKAISU	{
+			value	bool;
+		};
 		CMB_MOREKIKAN	{
 			MOREKIKAN	{
 				value	varchar(40);

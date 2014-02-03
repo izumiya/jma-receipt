@@ -73,3 +73,29 @@ path	upd1	{
 		;
 	};
 };
+
+path	key3 	{
+	DBSELECT	{
+		DECLARE tbl_etensu_5_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_etensu_5
+		WHERE   SRYCD    =   :SRYCD
+ 		AND   YUKOSTYMD  <=  :YUKOSTYMD
+		AND   YUKOEDYMD  >=  :YUKOEDYMD
+		ORDER   BY  TANICD
+		;
+	};
+};
+
+path	key4 	{
+	DBSELECT	{
+		DECLARE tbl_etensu_5_key4_csr CURSOR FOR
+		SELECT *
+		FROM tbl_etensu_5
+		WHERE YUKOSTYMD  <=  :YUKOSTYMD
+		AND   YUKOEDYMD  >=  :YUKOEDYMD
+		ORDER BY  TANICD,SRYCD
+		;
+	};
+};
+

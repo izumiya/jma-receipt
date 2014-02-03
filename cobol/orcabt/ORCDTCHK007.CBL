@@ -61,8 +61,8 @@
       *
        WORKING-STORAGE                 SECTION.
       *
-           COPY    "HCM402V02.INC"
-                                   REPLACING  //HCM402V02//
+           COPY    "HCM402V03.INC"
+                                   REPLACING  //HCM402V03//
                                    BY         //HCM402//.
       *
       *    エラーファイルファイル名称領域 
@@ -689,7 +689,12 @@
       *
            IF    ( WRK-MESG        NOT =   WRK-MESG-ORG )
                COMPUTE CNT-LINE    =   CNT-LINE    +   1
-               MOVE    WRK-MESG        TO  HCM402-MESG (CNT-LINE)
+               MOVE    WRK-MESG        TO  HCM402-MESG2 (CNT-LINE)
+               IF    ( HCM402-MESG2 (CNT-LINE)(157:)   =   SPACE )
+                   MOVE    HCM402-MESG2 (CNT-LINE)
+                                       TO  HCM402-MESG (CNT-LINE)
+                   MOVE    SPACE       TO  HCM402-MESG2 (CNT-LINE)
+               END-IF
            END-IF
       *
            .
@@ -815,13 +820,19 @@
                    STRING  WRK-HKNMES      DELIMITED   BY  SPACE
                            "："            DELIMITED   BY  SIZE
                            DTCHK004-ERRMSG DELIMITED   BY  SIZE
-                   INTO    HCM402-MESG  (CNT-LINE)
+                   INTO    HCM402-MESG2 (CNT-LINE)
                    END-STRING
                ELSE
-                   MOVE    DTCHK004-ERRMSG TO  HCM402-MESG  (CNT-LINE)
+                   MOVE    DTCHK004-ERRMSG TO  HCM402-MESG2  (CNT-LINE)
                END-IF
            ELSE
-                   MOVE    DTCHK004-ERRMSG TO  HCM402-MESG  (CNT-LINE)
+                   MOVE    DTCHK004-ERRMSG TO  HCM402-MESG2  (CNT-LINE)
+           END-IF
+      *
+           IF    ( HCM402-MESG2 (CNT-LINE)(157:)   =   SPACE )
+               MOVE    HCM402-MESG2 (CNT-LINE)
+                                   TO  HCM402-MESG  (CNT-LINE)
+               MOVE    SPACE       TO  HCM402-MESG2 (CNT-LINE)
            END-IF
       *
            .
@@ -907,7 +918,7 @@
            MOVE    WRK-SHORI-RENNUM    TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
                                        TO  SPRT-PRIORITY
-           MOVE   "HCM402V02.red"      TO  SPRT-PRTID
+           MOVE   "HCM402V03.red"      TO  SPRT-PRTID
            IF    ( WRK-HKNMES      NOT =   SPACE )
                STRING  WRK-SPRT-TITLE      DELIMITED   BY  SPACE
                        "（"                DELIMITED   BY  SIZE

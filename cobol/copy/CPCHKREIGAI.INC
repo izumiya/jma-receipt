@@ -50,6 +50,7 @@
       *    17:病名と薬剤
       *    18:病名と診療行為
       *    19:薬剤の月上限回数・月投与量
+      *    20:診療行為算定回数
       *    99:その他
       *    A1:未登録薬剤（薬剤と病名）
            03  CHKREIGAI-CHKNUM            PIC X(02).
@@ -69,6 +70,10 @@
            03  CHKREIGAI-TEKBYOMEI         PIC X(160).
       *適応病名条件区分
            03  CHKREIGAI-TEKCOMPKBN        PIC X(1).
+      *単位コード
+           03  CHKREIGAI-TANICD            PIC 9(3).
+      *単位名称
+           03  CHKREIGAI-TANINAME          PIC X(12).
       *エラーコード
            03  CHKREIGAI-ERRCD             PIC X(06).
       *エラーメッセージ

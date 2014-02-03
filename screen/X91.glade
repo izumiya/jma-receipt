@@ -290,7 +290,7 @@
       <class>GtkPandaEntry</class>
       <name>STSRYCD</name>
       <x>128</x>
-      <y>308</y>
+      <y>280</y>
       <width>160</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -318,7 +318,7 @@
       <class>GtkPandaEntry</class>
       <name>STSRYNAME</name>
       <x>128</x>
-      <y>336</y>
+      <y>308</y>
       <width>280</width>
       <height>25</height>
       <editable>False</editable>
@@ -333,7 +333,7 @@
       <class>GtkPandaEntry</class>
       <name>EDSRYCD</name>
       <x>456</x>
-      <y>312</y>
+      <y>280</y>
       <width>160</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -361,7 +361,7 @@
       <class>GtkHSeparator</class>
       <name>hseparator43</name>
       <x>88</x>
-      <y>396</y>
+      <y>376</y>
       <width>832</width>
       <height>16</height>
     </widget>
@@ -370,7 +370,7 @@
       <class>GtkCheckButton</class>
       <name>CHKBYOSRY</name>
       <x>112</x>
-      <y>440</y>
+      <y>420</y>
       <width>192</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -392,25 +392,9 @@
 
     <widget>
       <class>GtkLabel</class>
-      <name>label171</name>
-      <x>112</x>
-      <y>652</y>
-      <width>104</width>
-      <height>24</height>
-      <label>出力順指定</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
       <name>label164</name>
-      <x>416</x>
-      <y>312</y>
+      <x>420</x>
+      <y>280</y>
       <width>36</width>
       <height>24</height>
       <label>〜</label>
@@ -423,35 +407,10 @@
     </widget>
 
     <widget>
-      <class>GtkHSeparator</class>
-      <name>hseparator48</name>
-      <x>88</x>
-      <y>636</y>
-      <width>832</width>
-      <height>16</height>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label168</name>
-      <x>128</x>
-      <y>564</y>
-      <width>120</width>
-      <height>24</height>
-      <label>診療行為と病名</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
       <class>GtkCheckButton</class>
       <name>CHKMOREBUI</name>
       <x>144</x>
-      <y>612</y>
+      <y>616</y>
       <width>192</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -472,66 +431,10 @@
     </widget>
 
     <widget>
-      <class>GtkPandaCombo</class>
-      <name>CMB_MOREKIKAN</name>
-      <x>412</x>
-      <y>496</y>
-      <width>120</width>
-      <height>24</height>
-      <value_in_list>False</value_in_list>
-      <ok_if_empty>True</ok_if_empty>
-      <case_sensitive>False</case_sensitive>
-      <use_arrows>True</use_arrows>
-      <use_arrows_always>False</use_arrows_always>
-      <items></items>
-
-      <widget>
-	<class>GtkPandaEntry</class>
-	<child_name>GtkPandaCombo:entry</child_name>
-	<name>MOREKIKAN</name>
-	<can_focus>True</can_focus>
-	<signal>
-	  <name>activate</name>
-	  <handler>send_event</handler>
-	  <data>ACTIVATE</data>
-	  <last_modification_time>Mon, 01 Mar 2004 09:29:40 GMT</last_modification_time>
-	</signal>
-	<signal>
-	  <name>changed</name>
-	  <handler>entry_changed</handler>
-	  <data>CHANGED</data>
-	  <last_modification_time>Mon, 01 Mar 2004 09:29:49 GMT</last_modification_time>
-	</signal>
-	<editable>True</editable>
-	<text_visible>True</text_visible>
-	<text_max_length>40</text_max_length>
-	<text></text>
-	<input_mode>XIM</input_mode>
-	<xim_enabled>False</xim_enabled>
-      </widget>
-    </widget>
-
-    <widget>
-      <class>GtkLabel</class>
-      <name>label172</name>
-      <x>540</x>
-      <y>496</y>
-      <width>464</width>
-      <height>24</height>
-      <label>＊入力コードがある場合は期間指定に関係なく対象となります。</label>
-      <justify>GTK_JUSTIFY_LEFT</justify>
-      <wrap>False</wrap>
-      <xalign>0</xalign>
-      <yalign>0.5</yalign>
-      <xpad>0</xpad>
-      <ypad>0</ypad>
-    </widget>
-
-    <widget>
       <class>GtkCheckButton</class>
       <name>CHKYKZHEI</name>
       <x>112</x>
-      <y>104</y>
+      <y>96</y>
       <width>300</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -555,7 +458,7 @@
       <class>GtkCheckButton</class>
       <name>CHKYKZKNKBYO</name>
       <x>112</x>
-      <y>160</y>
+      <y>144</y>
       <width>300</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -576,54 +479,12 @@
     </widget>
 
     <widget>
-      <class>GtkCheckButton</class>
-      <name>CHKBYOYKZ</name>
-      <x>112</x>
-      <y>412</y>
-      <width>192</width>
-      <height>24</height>
-      <can_focus>True</can_focus>
-      <signal>
-	<name>toggled</name>
-	<handler>button_toggled</handler>
-	<last_modification_time>Thu, 05 Dec 2002 08:49:02 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>clicked</name>
-	<handler>send_event</handler>
-	<data>CLICKED</data>
-	<last_modification_time>Thu, 05 Dec 2002 08:49:26 GMT</last_modification_time>
-      </signal>
-      <label>病名と薬剤</label>
-      <active>False</active>
-      <draw_indicator>True</draw_indicator>
-    </widget>
-
-    <widget>
       <class>GtkHSeparator</class>
       <name>hseparator31</name>
       <x>88</x>
       <y>32</y>
       <width>832</width>
       <height>16</height>
-    </widget>
-
-    <widget>
-      <class>GtkVSeparator</class>
-      <name>vseparator17</name>
-      <x>80</x>
-      <y>404</y>
-      <width>16</width>
-      <height>68</height>
-    </widget>
-
-    <widget>
-      <class>GtkVSeparator</class>
-      <name>vseparator18</name>
-      <x>912</x>
-      <y>404</y>
-      <width>16</width>
-      <height>68</height>
     </widget>
 
     <widget>
@@ -646,7 +507,7 @@
       <class>GtkHSeparator</class>
       <name>hseparator38</name>
       <x>88</x>
-      <y>264</y>
+      <y>240</y>
       <width>832</width>
       <height>16</height>
     </widget>
@@ -655,34 +516,16 @@
       <class>GtkHSeparator</class>
       <name>hseparator42</name>
       <x>88</x>
-      <y>388</y>
+      <y>364</y>
       <width>832</width>
       <height>16</height>
-    </widget>
-
-    <widget>
-      <class>GtkVSeparator</class>
-      <name>vseparator15</name>
-      <x>80</x>
-      <y>40</y>
-      <width>16</width>
-      <height>356</height>
-    </widget>
-
-    <widget>
-      <class>GtkVSeparator</class>
-      <name>vseparator16</name>
-      <x>912</x>
-      <y>40</y>
-      <width>16</width>
-      <height>356</height>
     </widget>
 
     <widget>
       <class>GtkLabel</class>
       <name>label163</name>
       <x>128</x>
-      <y>364</y>
+      <y>340</y>
       <width>88</width>
       <height>24</height>
       <label>出力順指定</label>
@@ -695,34 +538,10 @@
     </widget>
 
     <widget>
-      <class>GtkCheckButton</class>
-      <name>CHKSRYRANGE</name>
-      <x>112</x>
-      <y>280</y>
-      <width>188</width>
-      <height>24</height>
-      <can_focus>True</can_focus>
-      <signal>
-	<name>toggled</name>
-	<handler>button_toggled</handler>
-	<last_modification_time>Thu, 05 Dec 2002 08:49:02 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>clicked</name>
-	<handler>send_event</handler>
-	<data>CLICKED</data>
-	<last_modification_time>Thu, 05 Dec 2002 08:49:26 GMT</last_modification_time>
-      </signal>
-      <label>診療行為コードで絞込む</label>
-      <active>False</active>
-      <draw_indicator>True</draw_indicator>
-    </widget>
-
-    <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_SORT</name>
       <x>216</x>
-      <y>364</y>
+      <y>340</y>
       <width>192</width>
       <height>24</height>
       <value_in_list>False</value_in_list>
@@ -762,7 +581,7 @@
       <class>GtkCheckButton</class>
       <name>CHKSRYBYO</name>
       <x>112</x>
-      <y>76</y>
+      <y>72</y>
       <width>300</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -784,33 +603,9 @@
 
     <widget>
       <class>GtkCheckButton</class>
-      <name>CHKYKZBYO</name>
-      <x>112</x>
-      <y>48</y>
-      <width>300</width>
-      <height>24</height>
-      <can_focus>True</can_focus>
-      <signal>
-	<name>toggled</name>
-	<handler>button_toggled</handler>
-	<last_modification_time>Fri, 11 Jan 2002 02:34:48 GMT</last_modification_time>
-      </signal>
-      <signal>
-	<name>clicked</name>
-	<handler>send_event</handler>
-	<data>CLICKED</data>
-	<last_modification_time>Fri, 11 Jan 2002 02:35:17 GMT</last_modification_time>
-      </signal>
-      <label>薬剤と病名</label>
-      <active>False</active>
-      <draw_indicator>True</draw_indicator>
-    </widget>
-
-    <widget>
-      <class>GtkCheckButton</class>
       <name>CHKSRYSNT</name>
       <x>112</x>
-      <y>188</y>
+      <y>168</y>
       <width>300</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -834,7 +629,7 @@
       <class>GtkCheckButton</class>
       <name>CHKSRYHEI</name>
       <x>112</x>
-      <y>132</y>
+      <y>120</y>
       <width>300</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -858,7 +653,7 @@
       <class>GtkCheckButton</class>
       <name>CHKSRYHEIA</name>
       <x>112</x>
-      <y>216</y>
+      <y>192</y>
       <width>300</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -882,7 +677,7 @@
       <class>GtkCheckButton</class>
       <name>CHKSRYHEIB</name>
       <x>112</x>
-      <y>244</y>
+      <y>216</y>
       <width>300</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -947,19 +742,193 @@
     </widget>
 
     <widget>
+      <class>GtkCheckButton</class>
+      <name>CHKYKZBYO</name>
+      <x>112</x>
+      <y>48</y>
+      <width>300</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>toggled</name>
+	<handler>button_toggled</handler>
+	<last_modification_time>Fri, 11 Jan 2002 02:34:48 GMT</last_modification_time>
+      </signal>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Fri, 11 Jan 2002 02:35:17 GMT</last_modification_time>
+      </signal>
+      <label>薬剤と病名</label>
+      <active>False</active>
+      <draw_indicator>True</draw_indicator>
+    </widget>
+
+    <widget>
+      <class>GtkCheckButton</class>
+      <name>CHKSRYRANGE</name>
+      <x>112</x>
+      <y>256</y>
+      <width>188</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>toggled</name>
+	<handler>button_toggled</handler>
+	<last_modification_time>Thu, 05 Dec 2002 08:49:02 GMT</last_modification_time>
+      </signal>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Thu, 05 Dec 2002 08:49:26 GMT</last_modification_time>
+      </signal>
+      <label>診療行為コードで絞込む</label>
+      <active>False</active>
+      <draw_indicator>True</draw_indicator>
+    </widget>
+
+    <widget>
+      <class>GtkVSeparator</class>
+      <name>vseparator15</name>
+      <x>80</x>
+      <y>40</y>
+      <width>16</width>
+      <height>332</height>
+    </widget>
+
+    <widget>
+      <class>GtkVSeparator</class>
+      <name>vseparator16</name>
+      <x>912</x>
+      <y>40</y>
+      <width>16</width>
+      <height>332</height>
+    </widget>
+
+    <widget>
+      <class>GtkVSeparator</class>
+      <name>vseparator18</name>
+      <x>912</x>
+      <y>384</y>
+      <width>16</width>
+      <height>68</height>
+    </widget>
+
+    <widget>
+      <class>GtkCheckButton</class>
+      <name>CHKBYOYKZ</name>
+      <x>112</x>
+      <y>396</y>
+      <width>192</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>toggled</name>
+	<handler>button_toggled</handler>
+	<last_modification_time>Thu, 05 Dec 2002 08:49:02 GMT</last_modification_time>
+      </signal>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Thu, 05 Dec 2002 08:49:26 GMT</last_modification_time>
+      </signal>
+      <label>病名と薬剤</label>
+      <active>False</active>
+      <draw_indicator>True</draw_indicator>
+    </widget>
+
+    <widget>
+      <class>GtkHSeparator</class>
+      <name>hseparator45</name>
+      <x>88</x>
+      <y>444</y>
+      <width>832</width>
+      <height>16</height>
+    </widget>
+
+    <widget>
+      <class>GtkVSeparator</class>
+      <name>vseparator17</name>
+      <x>80</x>
+      <y>384</y>
+      <width>16</width>
+      <height>68</height>
+    </widget>
+
+    <widget>
+      <class>GtkHSeparator</class>
+      <name>hseparator49</name>
+      <x>0</x>
+      <y>484</y>
+      <width>1024</width>
+      <height>16</height>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label167</name>
+      <x>316</x>
+      <y>500</y>
+      <width>96</width>
+      <height>24</height>
+      <label>診療年月指定</label>
+      <justify>GTK_JUSTIFY_LEFT</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label172</name>
+      <x>536</x>
+      <y>500</y>
+      <width>464</width>
+      <height>24</height>
+      <label>＊入力コードがある場合は期間指定に関係なく対象となります。</label>
+      <justify>GTK_JUSTIFY_LEFT</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
+    </widget>
+
+    <widget>
       <class>GtkHSeparator</class>
       <name>hseparator47</name>
       <x>88</x>
-      <y>676</y>
+      <y>680</y>
       <width>832</width>
       <height>16</height>
+    </widget>
+
+    <widget>
+      <class>GtkLabel</class>
+      <name>label171</name>
+      <x>112</x>
+      <y>656</y>
+      <width>104</width>
+      <height>24</height>
+      <label>出力順指定</label>
+      <justify>GTK_JUSTIFY_LEFT</justify>
+      <wrap>False</wrap>
+      <xalign>0</xalign>
+      <yalign>0.5</yalign>
+      <xpad>0</xpad>
+      <ypad>0</ypad>
     </widget>
 
     <widget>
       <class>GtkPandaCombo</class>
       <name>CMB_MORESORT</name>
       <x>216</x>
-      <y>652</y>
+      <y>656</y>
       <width>164</width>
       <height>24</height>
       <value_in_list>False</value_in_list>
@@ -996,10 +965,37 @@
     </widget>
 
     <widget>
+      <class>GtkVSeparator</class>
+      <name>vseparator19</name>
+      <x>80</x>
+      <y>532</y>
+      <width>16</width>
+      <height>156</height>
+    </widget>
+
+    <widget>
+      <class>GtkVSeparator</class>
+      <name>vseparator20</name>
+      <x>912</x>
+      <y>532</y>
+      <width>16</width>
+      <height>156</height>
+    </widget>
+
+    <widget>
+      <class>GtkHSeparator</class>
+      <name>hseparator48</name>
+      <x>88</x>
+      <y>640</y>
+      <width>832</width>
+      <height>16</height>
+    </widget>
+
+    <widget>
       <class>GtkCheckButton</class>
       <name>CHKMOREKENSA</name>
       <x>144</x>
-      <y>588</y>
+      <y>592</y>
       <width>192</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -1020,40 +1016,13 @@
     </widget>
 
     <widget>
-      <class>GtkVSeparator</class>
-      <name>vseparator19</name>
-      <x>80</x>
-      <y>524</y>
-      <width>16</width>
-      <height>160</height>
-    </widget>
-
-    <widget>
-      <class>GtkVSeparator</class>
-      <name>vseparator20</name>
-      <x>912</x>
-      <y>524</y>
-      <width>16</width>
-      <height>160</height>
-    </widget>
-
-    <widget>
-      <class>GtkHSeparator</class>
-      <name>hseparator45</name>
-      <x>88</x>
-      <y>464</y>
-      <width>832</width>
-      <height>16</height>
-    </widget>
-
-    <widget>
       <class>GtkLabel</class>
-      <name>label167</name>
-      <x>316</x>
-      <y>496</y>
-      <width>96</width>
+      <name>label168</name>
+      <x>128</x>
+      <y>568</y>
+      <width>120</width>
       <height>24</height>
-      <label>診療年月指定</label>
+      <label>診療行為と病名</label>
       <justify>GTK_JUSTIFY_LEFT</justify>
       <wrap>False</wrap>
       <xalign>0</xalign>
@@ -1065,8 +1034,8 @@
     <widget>
       <class>GtkCheckButton</class>
       <name>CHKMOREYKZBYO</name>
-      <x>112</x>
-      <y>536</y>
+      <x>108</x>
+      <y>544</y>
       <width>192</width>
       <height>24</height>
       <can_focus>True</can_focus>
@@ -1087,10 +1056,59 @@
     </widget>
 
     <widget>
+      <class>GtkHSeparator</class>
+      <name>hseparator46</name>
+      <x>88</x>
+      <y>524</y>
+      <width>832</width>
+      <height>16</height>
+    </widget>
+
+    <widget>
+      <class>GtkPandaCombo</class>
+      <name>CMB_MOREKIKAN</name>
+      <x>412</x>
+      <y>500</y>
+      <width>120</width>
+      <height>24</height>
+      <value_in_list>False</value_in_list>
+      <ok_if_empty>True</ok_if_empty>
+      <case_sensitive>False</case_sensitive>
+      <use_arrows>True</use_arrows>
+      <use_arrows_always>False</use_arrows_always>
+      <items></items>
+
+      <widget>
+	<class>GtkPandaEntry</class>
+	<child_name>GtkPandaCombo:entry</child_name>
+	<name>MOREKIKAN</name>
+	<can_focus>True</can_focus>
+	<signal>
+	  <name>activate</name>
+	  <handler>send_event</handler>
+	  <data>ACTIVATE</data>
+	  <last_modification_time>Mon, 01 Mar 2004 09:29:40 GMT</last_modification_time>
+	</signal>
+	<signal>
+	  <name>changed</name>
+	  <handler>entry_changed</handler>
+	  <data>CHANGED</data>
+	  <last_modification_time>Mon, 01 Mar 2004 09:29:49 GMT</last_modification_time>
+	</signal>
+	<editable>True</editable>
+	<text_visible>True</text_visible>
+	<text_max_length>40</text_max_length>
+	<text></text>
+	<input_mode>XIM</input_mode>
+	<xim_enabled>False</xim_enabled>
+      </widget>
+    </widget>
+
+    <widget>
       <class>GtkLabel</class>
       <name>label166</name>
       <x>88</x>
-      <y>496</y>
+      <y>500</y>
       <width>228</width>
       <height>24</height>
       <label>チェックマスタ登録漏れ確認リスト</label>
@@ -1103,21 +1121,27 @@
     </widget>
 
     <widget>
-      <class>GtkHSeparator</class>
-      <name>hseparator46</name>
+      <class>GtkCheckButton</class>
+      <name>CHKKAISU</name>
       <x>88</x>
-      <y>516</y>
-      <width>832</width>
-      <height>16</height>
-    </widget>
-
-    <widget>
-      <class>GtkHSeparator</class>
-      <name>hseparator49</name>
-      <x>0</x>
-      <y>476</y>
-      <width>1024</width>
-      <height>16</height>
+      <y>460</y>
+      <width>192</width>
+      <height>24</height>
+      <can_focus>True</can_focus>
+      <signal>
+	<name>toggled</name>
+	<handler>button_toggled</handler>
+	<last_modification_time>Fri, 11 Jan 2002 02:34:48 GMT</last_modification_time>
+      </signal>
+      <signal>
+	<name>clicked</name>
+	<handler>send_event</handler>
+	<data>CLICKED</data>
+	<last_modification_time>Fri, 11 Jan 2002 02:35:17 GMT</last_modification_time>
+      </signal>
+      <label>算定回数チェック一覧表</label>
+      <active>False</active>
+      <draw_indicator>True</draw_indicator>
     </widget>
   </widget>
 </widget>

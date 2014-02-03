@@ -151,6 +151,20 @@ W60	{
 				};
 			};
 			fixed3	{
+				CMB_SRYKAISUMSTKBN	{
+					SRYKAISUMSTKBN	{
+						value	varchar(22);
+					};
+					count	int;
+					item	varchar(22)[5];
+				};
+				CMB_SRYKAISUWRNKBN	{
+					SRYKAISUWRNKBN	{
+						value	varchar(22);
+					};
+					count	int;
+					item	varchar(22)[5];
+				};
 				CMB_REIGAICHKKBN	{
 					REIGAICHKKBN	{
 						value	varchar(20);

@@ -589,7 +589,23 @@
       *    ** 19xxxx 薬剤の月上限回数・総投与量
            05 PIC  X(06)   VALUE   "190001".
            05 PIC  X(30)   VALUE   "月の投与回数または投与量が上限".
-           05 PIC  X(30)   VALUE   "をオーバーしています          ".
+           05 PIC  X(30)   VALUE   "を超えています                ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
+      *    ** 20xxxx 診療行為算定回数
+           05 PIC  X(06)   VALUE   "200001".
+           05 PIC  X(30)   VALUE   "上限回数を超えています        ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(06)   VALUE   "200101".
+           05 PIC  X(30)   VALUE   "入院初日に算定されていません  ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(30)   VALUE   "                              ".
+           05 PIC  X(06)   VALUE   "200102".
+           05 PIC  X(30)   VALUE   "退院日に算定されていません    ".
+           05 PIC  X(30)   VALUE   "                              ".
            05 PIC  X(30)   VALUE   "                              ".
            05 PIC  X(30)   VALUE   "                              ".
       *    ** 99xxxx その他必須チェック
@@ -775,7 +791,7 @@
            05 PIC  X(30)   VALUE   "                              ".
       *
          03  ERRMES-RED    REDEFINES   ERRMES-VAL.
-           05 ERRMES-OCC   OCCURS  118.
+           05 ERRMES-OCC   OCCURS  121.
               07  ERRMES-CD            PIC X(06).
               07  ERRMES-MESSAGE       PIC X(120).
-         03  ERRMES-MAX                PIC 9(05)   VALUE   118.
+         03  ERRMES-MAX                PIC 9(05)   VALUE   121.

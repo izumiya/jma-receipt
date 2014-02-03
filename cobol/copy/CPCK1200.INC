@@ -42,8 +42,8 @@
                05  CK4-1200-HKNKBN      PIC  X(01).
                05  CK4-1200-ERRCD       PIC  X(06).
                05  CK4-1200-FIL1        PIC  X(193).
-               05  CK4-1200-ERRMSG      PIC  X(200).
-               05  CK4-1200-FIL2        PIC  X(100).
+               05  CK4-1200-ERRMSG      PIC  X(220).
+               05  CK4-1200-FIL2        PIC  X(80).
       *Ã¼Ëö£É£Ä
            03  CK4-1200-TERMID          PIC  X(16).
       *¥ª¥Ú¡¼¥ì¡¼¥¿£É£Ä

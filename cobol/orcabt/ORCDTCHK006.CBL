@@ -814,6 +814,7 @@
                    MOVE    IDX-DAY     TO  DCACCT-SRYYMD (7:2)
                    MOVE    WRK-DAY (IDX-DAY)
                                        TO  DCACCT-DAYCNT
+                                           DCACCT-DAYCNT2 (1)
                    MOVE    IDX-DAY     TO  DCACCT-DAY
       *
                    WRITE   DCACCT-REC
@@ -907,6 +908,7 @@
                    MOVE    NACCT-SRYYM TO  DCACCT-SRYYMD
                    MOVE    IDX-DAY     TO  DCACCT-SRYYMD (7:2)
                    MOVE    1           TO  DCACCT-DAYCNT
+                   MOVE    1           TO  DCACCT-DAYCNT2 (1)
                    MOVE    IDX-DAY     TO  DCACCT-DAY
                    WRITE   DCACCT-REC
                END-IF

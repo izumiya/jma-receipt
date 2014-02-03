@@ -531,43 +531,24 @@
            OPEN    OUTPUT              DCSRY-FILE
       *
            PERFORM 900-DTCHK006N-READ-SEC
-           PERFORM 900-DTCHK006G-READ-SEC
       *
            PERFORM UNTIL ( DTCHK006N-KEY   =   HIGH-VALUE )
-                    AND  ( DTCHK006G-KEY   =   HIGH-VALUE )
       *
-               EVALUATE    TRUE
-               WHEN  ( DTCHK006N-PTID-X    >   DTCHK006G-PTID-X  )
-                   IF    ( ORCBSD01-NYUGAIKBN  =   "1" )
-                       PERFORM 900-DTCHK006G-READ-SEC
-                   ELSE
-                       MOVE    DTCHK006G-REC   TO  DTCHK006-REC
-                       PERFORM 20011-DCSRY-INS-SEC
-                       PERFORM 900-DTCHK006G-READ-SEC
-                   END-IF
-               WHEN  ( DTCHK006N-PTID-X    <   DTCHK006G-PTID-X  )
-                   IF    ( ORCBSD01-NYUGAIKBN  =   "1" )
-                       MOVE    DTCHK006N-REC   TO  DTCHK006-REC
-                       PERFORM 20011-DCSRY-INS-SEC
-                       PERFORM 900-DTCHK006N-READ-SEC
-                   ELSE
-                       PERFORM 900-DTCHK006N-READ-SEC
-                   END-IF
-               WHEN  ( DTCHK006N-PTID-X    =   DTCHK006G-PTID-X  )
-      *
-                   IF    ( ORCBSD01-NYUGAIKBN  =   "1" )
-                       MOVE    DTCHK006G-REC   TO  DTCHK006-REC
-                       PERFORM 20011-DCSRY-INS-SEC
-                       PERFORM 900-DTCHK006G-READ-SEC
-                   ELSE
-                       MOVE    DTCHK006N-REC   TO  DTCHK006-REC
-                       PERFORM 20011-DCSRY-INS-SEC
-                       PERFORM 900-DTCHK006N-READ-SEC
-                   END-IF
-               END-EVALUATE
+               MOVE    DTCHK006N-REC   TO  DTCHK006-REC
+               PERFORM 20011-DCSRY-INS-SEC
+               PERFORM 900-DTCHK006N-READ-SEC
       *
            END-PERFORM
       *
+           PERFORM 900-DTCHK006G-READ-SEC
+      *
+           PERFORM UNTIL ( DTCHK006G-KEY   =   HIGH-VALUE )
+      *
+               MOVE    DTCHK006G-REC   TO  DTCHK006-REC
+               PERFORM 20011-DCSRY-INS-SEC
+               PERFORM 900-DTCHK006G-READ-SEC
+      *
+           END-PERFORM
       *
            CLOSE   DTCHK006N-FILE
            CLOSE   DTCHK006G-FILE

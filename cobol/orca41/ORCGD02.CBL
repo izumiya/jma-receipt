@@ -161,10 +161,12 @@
       *
        01  CONST-AREA.
            03  CONST-CHKLST-MAX            PIC 9(05)   VALUE   200.
-           03  CONST-CHKKBN-MAX            PIC 9(05)   VALUE   19.
       *
       *    データチェック一括処理パラメータ
            COPY    "CPORCBSD01PARA.INC".
+      *
+      *    データチェック確認項目
+           COPY    "CPDTCHKKOMOKU.INC".
       *
            COPY "COMMON-SPA"       REPLACING //SPA-//
                                    BY        //WKSPA-//.
@@ -379,7 +381,7 @@
            MOVE    SPA-D01-SRYYM           TO  SPA-NAI-SRYYM
            MOVE    SPA-D01-NYUGAIKBN       TO  SPA-NAI-NYUGAIKBN
            PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   CONST-CHKKBN-MAX )
+                   UNTIL ( IDX0    >   DTCHKKOMOKU-MAX )
                MOVE    SPA-D01-CHKKBN  (IDX0)
                                            TO  SPA-NAI-CHKKBN  (IDX0)
            END-PERFORM
@@ -1174,7 +1176,7 @@
                                    TO  SPA-NAI-NYUGAIKBN
       *
            PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   CONST-CHKKBN-MAX )
+                   UNTIL ( IDX0    >   DTCHKKOMOKU-MAX )
                MOVE    ORCBSD01-CHKKBN (IDX0)
                                    TO  SPA-NAI-CHKKBN (IDX0)
            END-PERFORM
@@ -1456,7 +1458,7 @@
                                    TO  SPA-D01-NYUGAIKBN
       *
            PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   CONST-CHKKBN-MAX )
+                   UNTIL ( IDX0    >   DTCHKKOMOKU-MAX )
                MOVE    SPA-NAI-CHKKBN (IDX0)
                                    TO  SPA-D01-CHKKBN (IDX0)
            END-PERFORM

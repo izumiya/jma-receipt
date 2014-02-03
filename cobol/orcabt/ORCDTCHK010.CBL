@@ -476,6 +476,20 @@
                                    TO  CK4-1201-TEKBYOMEI
            MOVE    DTCHK004-TEKCOMPKBN
                                    TO  CK4-1201-TEKCOMPKBN
+           MOVE    DTCHK004-TANICD
+                                   TO  CK4-1201-TANICD
+           MOVE    DTCHK004-TANINAME
+                                   TO  CK4-1201-TANINAME
+           MOVE    DTCHK004-SHONUM
+                                   TO  CK4-1201-SHONUM
+           MOVE    DTCHK004-SRYSTYMD
+                                   TO  CK4-1201-SRYSTYMD
+           MOVE    DTCHK004-SRYEDYMD
+                                   TO  CK4-1201-SRYEDYMD
+           MOVE    DTCHK004-LIMIT
+                                   TO  CK4-1201-LIMIT
+           MOVE    DTCHK004-TSUKISU
+                                   TO  CK4-1201-TSUKISU
       *
            MOVE    SMCNDATE-YMD    TO  CK4-1201-CREYMD
                                        CK4-1201-UPYMD

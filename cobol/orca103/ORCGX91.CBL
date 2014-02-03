@@ -104,6 +104,7 @@
                        09  SPA-GMN-MORESORT        PIC X(01).
                        09  SPA-GMN-MORESORTFL      PIC X(01).
                        09  SPA-GMN-MORESORTMEI     PIC X(28).
+                   07  SPA-GMN-CHKKAISU            PIC X(01).
                05  SPA-GMN-CMB-AREA.
                    07  SPA-GMN-SORTLST-G.
                        09  SPA-GMN-SORT-MAX        PIC 9(05).
@@ -239,6 +240,9 @@
       *    ジョブ管理ＤＢのキー値  
            03  WRK-CONS-JOB-SHELLID    PIC X(08)   VALUE   "CHKMST".
            03  WRK-CONS-JOB-JOBID      PIC 9(07)   VALUE   ZERO.
+      *
+           COPY    "CPSHELLTBL.INC"    REPLACING  //SHELLTBL//
+                                       BY         //PRMTBL//.
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -487,6 +491,7 @@
       *
            MOVE    ALL "F"         TO  SPA-GMN-CHK-VAL
                                        SPA-GMN-CHKMORE-G
+                                       SPA-GMN-CHKKAISU
       *
            MOVE    "F"             TO  SPA-GMN-CHKSRYRANGE
       *
@@ -805,6 +810,12 @@
       *    診療行為範囲指定チェックボタン
            WHEN    "CLICKED"       ALSO    "CHKSRYRANGE"
                PERFORM 4101-CHKSRYRANGE-CHK-SEC
+      *
+      *    算定回数チェック一覧
+           WHEN    "CLICKED"       ALSO    "CHKKAISU"
+               PERFORM 4101-GMN-SPA-SET-SEC
+               MOVE    X91-CHKKAISU    TO  SPA-GMN-CHKKAISU
+               MOVE    ZERO            TO  SPA-GMN-CUR
       *
       *    登録漏れ確認リスト−薬剤と病名
            WHEN    "CLICKED"       ALSO    "CHKMOREYKZBYO"
@@ -1238,6 +1249,7 @@
       *
            IF    ( SPA-GMN-CHK-VAL     = ALL "F" )
             AND  ( SPA-GMN-CHKMORE-G   = ALL "F" )
+            AND  ( SPA-GMN-CHKKAISU    = "F" )
                MOVE    "0100"          TO  SPA-ERRCD
                MOVE    1               TO  SPA-GMN-CUR
                GO  TO  4101-KANREN-CHK-EXT
@@ -1788,6 +1800,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 4902-PRINT-SYORI-SEC
            END-IF
       *
+           IF    ( SPA-GMN-CHKKAISU        =   "T" )
+               PERFORM 4904-PRINT-SYORI-SEC
+           END-IF
+      *
       *    印刷処理
            IF      SPA-XID1-FLG        =   "OK"  OR "PV"
                PERFORM 4903-PRINT-SYORI-SEC
@@ -1888,6 +1904,27 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        4902-PRINT-SYORI-SEC            SECTION.
       *
+           MOVE    SPACE           TO  PRMTBL
+      *
+           MOVE    "ORCBX02"       TO  PRMTBL-ARG1
+      *
+           MOVE    WRK-CHKMORE     TO  PRMTBL-ARG17
+           MOVE    WRK-KIKAN       TO  PRMTBL-ARG18
+           MOVE    WRK-MORERANGE-G TO  PRMTBL-ARG19
+           MOVE    WRK-SRTKBN      TO  PRMTBL-ARG20
+           MOVE    SPA-SYSYMD      TO  PRMTBL-ARG21
+      *
+           PERFORM 49021-PRINT-SYORI-SEC
+      *
+           .
+      *
+       4902-PRINT-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    印刷編集処理
+      *****************************************************************
+       49021-PRINT-SYORI-SEC            SECTION.
+      *
            PERFORM 45011-JOBKANRI-HENSYU-SEC
       *
       *    ファイルデイレクトリ位置指定
@@ -1909,45 +1946,44 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SYS-1031-PRTNM (6)
                                    TO  LNK-PRTKANRI-PRTNM
       *
-           MOVE    SPACE           TO  SHELLTBL 
-           INITIALIZE              ORCSMKPASSAREA
+           MOVE    SPACE           TO  SHELLTBL
            MOVE    "chkmst2.sh"    TO  SHELLTBL-NAME
+           MOVE    PRMTBL-ARG1     TO  SHELLTBL-ARG1
            MOVE    LNK-PRTKANRI-RENNUM
-                                   TO  SHELLTBL-ARG1
-           MOVE    LNK-PRTKANRI-TBL-KEY
                                    TO  SHELLTBL-ARG2
-           MOVE    LNK-PRTKANRI-TBL-GROUP
+           MOVE    LNK-PRTKANRI-TBL-KEY
                                    TO  SHELLTBL-ARG3
-           MOVE    LNK-PRTKANRI-SHORI-RENNUM
+           MOVE    LNK-PRTKANRI-TBL-GROUP
                                    TO  SHELLTBL-ARG4
-           MOVE    LNK-PRTKANRI-SRYYM
+           MOVE    LNK-PRTKANRI-SHORI-RENNUM
                                    TO  SHELLTBL-ARG5
-           MOVE    LNK-PRTKANRI-SKYYMD
+           MOVE    LNK-PRTKANRI-SRYYM
                                    TO  SHELLTBL-ARG6
-           MOVE    LNK-PRTKANRI-SHELLID
+           MOVE    LNK-PRTKANRI-SKYYMD
                                    TO  SHELLTBL-ARG7
-           MOVE    LNK-PRTKANRI-PRIORITY
+           MOVE    LNK-PRTKANRI-SHELLID
                                    TO  SHELLTBL-ARG8
-           MOVE    LNK-PRTKANRI-TERMID
+           MOVE    LNK-PRTKANRI-PRIORITY
                                    TO  SHELLTBL-ARG9
-           MOVE    LNK-PRTKANRI-OPID
+           MOVE    LNK-PRTKANRI-TERMID
                                    TO  SHELLTBL-ARG10
-           MOVE    LNK-PRTKANRI-PRTNM
+           MOVE    LNK-PRTKANRI-OPID
                                    TO  SHELLTBL-ARG11
+           MOVE    LNK-PRTKANRI-PRTNM
+                                   TO  SHELLTBL-ARG12
       *
            MOVE    WRK-CONS-JOB-JOBID
-                                   TO  SHELLTBL-ARG12
-           MOVE    WRK-CONS-JOB-SHELLID
                                    TO  SHELLTBL-ARG13
-           MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG14
-           MOVE    WRK-CHKMORE     TO  SHELLTBL-ARG15
-           MOVE    WRK-KIKAN       TO  SHELLTBL-ARG16
-           MOVE    WRK-MORERANGE-G TO  SHELLTBL-ARG17
-           MOVE    WRK-SRTKBN      TO  SHELLTBL-ARG18
-           MOVE    CHKMERR         TO  SHELLTBL-ARG19
-           MOVE    SPA-SYSYMD      TO  SHELLTBL-ARG20
+           MOVE    WRK-CONS-JOB-SHELLID
+                                   TO  SHELLTBL-ARG14
+           MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG15
+           MOVE    CHKMERR         TO  SHELLTBL-ARG16
+           MOVE    PRMTBL-ARG17    TO  SHELLTBL-ARG17
+           MOVE    PRMTBL-ARG18    TO  SHELLTBL-ARG18
+           MOVE    PRMTBL-ARG19    TO  SHELLTBL-ARG19
+           MOVE    PRMTBL-ARG20    TO  SHELLTBL-ARG20
+           MOVE    PRMTBL-ARG21    TO  SHELLTBL-ARG21
       *
-grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    SHELLTBL        TO  MCPDATA-REC
            MOVE    "SHELL"         TO  MCP-FUNC
            MOVE    "shell"         TO  MCP-TABLE
@@ -1961,7 +1997,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
       *
-       4902-PRINT-SYORI-EXT.
+       49021-PRINT-SYORI-EXT.
            EXIT.
       *****************************************************************
       *    印刷編集処理
@@ -2042,6 +2078,23 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            .
       *
        4903-PRINT-SYORI-EXT.
+           EXIT.
+      *****************************************************************
+      *    印刷編集処理
+      *****************************************************************
+       4904-PRINT-SYORI-SEC            SECTION.
+      *
+           MOVE    SPACE           TO  PRMTBL
+      *
+           MOVE    "ORCBX03"       TO  PRMTBL-ARG1
+      *
+           MOVE    SPA-NAI-KJNYMD  TO  PRMTBL-ARG17
+      *
+           PERFORM 49021-PRINT-SYORI-SEC
+      *
+           .
+      *
+       4904-PRINT-SYORI-EXT.
            EXIT.
       *****************************************************************
       *    ジョブ開始セット処理
@@ -2292,6 +2345,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-STSRYCD     TO  X91-STSRYCD
            MOVE    SPA-GMN-STSRYNAME   TO  X91-STSRYNAME
            MOVE    SPA-GMN-EDSRYCD     TO  X91-EDSRYCD
+           MOVE    SPA-GMN-CHKKAISU    TO  X91-CHKKAISU
            MOVE    SPA-GMN-CHKMOREYKZBYO TO X91-CHKMOREYKZBYO
            MOVE    SPA-GMN-CHKMOREKENSA TO X91-CHKMOREKENSA
            MOVE    SPA-GMN-CHKMOREBUI  TO X91-CHKMOREBUI
@@ -2402,6 +2456,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    "CHKSRYHEIA"    TO  MCP-WIDGET
            WHEN    21
                MOVE    "CHKSRYHEIB"    TO  MCP-WIDGET
+           WHEN    22
+               MOVE    "CHKKAISU"      TO  MCP-WIDGET
            WHEN    101
                MOVE    "KJNYMD"        TO  MCP-WIDGET
            WHEN    212
@@ -2446,6 +2502,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            WHEN    "CHKBYOYKZ"
                MOVE    14              TO  SPA-GMN-CUR
            WHEN    "CHKBYOSRY"
+               MOVE    22              TO  SPA-GMN-CUR
+           WHEN    "CHKKAISU"
                MOVE    15              TO  SPA-GMN-CUR
       *----(03.04.01)--UPD-END-----
            WHEN    "MOREKIKAN"

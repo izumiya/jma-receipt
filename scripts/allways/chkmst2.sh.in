@@ -11,21 +11,23 @@ fi
 
 #-------------------------------------------#
 #    チェックマスタ一覧作成
-#        $1-${11} 印刷ＤＢ用固定引数
-#        ${12} ジョブＩＤ
-#        ${13} シェルＩＤ
-#        ${14} 医療機関番号
-#        ${15} 帳票区分
-#        ${16} 対象期間
-#        ${17} 対象範囲
-#        ${18} 出力順
-#        ${19} エラーファイル名 
-#        ${20} 基準日
+#        $1    プログラムID
+#        $2-${12} 印刷ＤＢ用固定引数
+#        ${13} ジョブＩＤ
+#        ${14} シェルＩＤ
+#        ${15} 医療機関番号
+#        ${16} エラーファイル名 
+#        ${17}以降 プログラム固有パラメタ
 #-------------------------------------------#
 #
-ERR_FILE=${19}
-HOSPNUM=${14}
-LOGFILE=/var/log/jma-receipt/${HOSPNUM}orcb103_2.log
+
+PGID=$1
+JOBID=${13}
+SHELLID=${14}
+HOSPNUM=${15}
+ERR_FILE=${16}
+LOGNUM=$(( $(echo ${PGID} | sed  "s/[^0-9]//g") ))
+LOGFILE=/var/log/jma-receipt/${HOSPNUM}orcb103_${LOGNUM}.log
 echo $LOGFILE
 ##      エラーファイル削除
 	echo $#
@@ -34,9 +36,11 @@ echo $LOGFILE
             rm  $ERR_FILE
         fi
 
-        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBX02 -parameter "$1,$2,$3,$4,$5,$6,$7,$8,$9,${10},${11},${12},${13},${14},${15},${16},${17},${18},${19},${20}" > $LOGFILE 2>&1
+        shift
+
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ${PGID} -parameter "$(printf '%s,' $@)" > $LOGFILE 2>&1
         if  [ -e $ERR_FILE ]; then
             exit
         fi
-        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${12}${13},$HOSPNUM
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCBJOB -parameter JBE${JOBID}${SHELLID},${HOSPNUM}
         exit 

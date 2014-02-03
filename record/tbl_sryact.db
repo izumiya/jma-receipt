@@ -531,3 +531,24 @@ path	key19 	{
 		;
 	};
 };
+
+path	key20 	{
+	DBSELECT	{
+		DECLARE tbl_sryact_key20_csr CURSOR FOR
+		SELECT *
+		FROM tbl_sryact
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND     NYUGAIKBN LIKE  :NYUGAIKBN
+			AND     PTID	  =    :PTID
+			AND     SRYYM     >=   :SRYYM
+			AND     SRYYM     <=   :CREYMD
+			AND     SRYKBN    LIKE :SRYKBN
+		    AND   ( SRYCD1     =     :SRYCD1
+		         OR SRYCD2     =     :SRYCD2
+		         OR SRYCD3     =     :SRYCD3
+		         OR SRYCD4     =     :SRYCD4
+		         OR SRYCD5     =     :SRYCD5 )
+		;
+	};
+};
+
