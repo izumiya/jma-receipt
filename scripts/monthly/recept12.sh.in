@@ -18,7 +18,7 @@ fi
 #        $3 RECEKBN
 #           5:従来様式  8:第三者行為
 #        $4 エラーファイル名 
-#        $5 JOBID 
+#        $5 JOBID RECE40-FILE
 #        $6 SHELLID
 #        $7 県単用項目編集プログラム名（医保用）
 #        $8 処理年月
@@ -58,7 +58,7 @@ fi
             fi
         fi
 
-	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0400 -parameter $1$2$3$5$6,${17},${18},${16},${4}    > $LOG_FILE 2>&1
+	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0400 -parameter $1$2$3$5$6,${17},${16},${4}    > $LOG_FILE 2>&1
 	
         if  [ -e $4 ]; then
             exit  
