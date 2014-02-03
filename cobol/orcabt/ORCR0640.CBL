@@ -627,6 +627,8 @@
       *  04.07.12    NACL-門脇    13/12/09  医療情報連携対応
       *  04.07.13    NACL-門脇    14/01/08  請求点数がない保険組み合わせが有る
       *                                     場合の公費分離区分編集対応
+      *  04.07.14    NACL-門脇    14/02/03  第三者行為対応（院外処方のみの
+      *                                     保険組み合わせの病名記載対応）
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -1293,6 +1295,11 @@
            03  WRK-ORCSTEN-T2                          OCCURS   31.
                05  WRK-ORCSTEN-DAY                     PIC 9(03).
            03  WRK-ORCSTEN-ZAIKAISU                    PIC 9(04).
+      *
+      *    第三者行為用の保険組み合わせ毎の院外処方判定領域
+       01  WRK-DAISAN-INGAI-TABLE.
+           03  WRK-DAISAN-INGAI-OCC                    OCCURS  10.
+               05  WRK-DAISAN-INGAI                    PIC 9(01).
       *
       *    医療機関（基本情報）退避用領域
        01  TBL-SYS1001-T.
@@ -3020,6 +3027,8 @@
       *
            INITIALIZE          WRK-KOHJGNGET-TAISYOKBN-T
       *
+           INITIALIZE          WRK-DAISAN-INGAI-TABLE
+      *
            INITIALIZE          WK-GENGAKU-SKJFLG-T
       *
            INITIALIZE          TBL-HKNCOMBI2
@@ -3537,6 +3546,9 @@
              END-PERFORM
            END-IF
       *
+      *    第三者行為の院外処方の有無チェック
+           PERFORM     211B1-DAISAN-CHECK2-SEC
+      *
            PERFORM     RECE62-REWRITE-SEC
            .
        210-HENSYU-EXT.
@@ -3679,6 +3691,48 @@
       *
            .
        211B-DAISAN-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    第三者行為の院外処方の有無チェック
+      *****************************************************************
+       211B1-DAISAN-CHECK2-SEC      SECTION.
+      *
+      *    病名記載の為、院外処方の有無チェックを行い、フラグの値を置換する
+      *
+      *    ＜第三者行為の請求点なし＞の場合
+           IF    RECE62-DAISAN-GAITO  =  ZERO
+             PERFORM  VARYING  IDX16   FROM    1   BY  1
+                       UNTIL  (IDX16                   >   10 )
+                         OR   (RECE62-HKNCOMBI(IDX16)  =  ZERO)
+               IF   WRK-DAISAN-INGAI(IDX16)  =   1
+                 IF     RECE62-DAISANFLG(IDX16)   =   1
+                     MOVE   1   TO  RECE62-DAISAN-SKYFLG(IDX16)
+                     MOVE   3   TO  RECE62-DAISAN-GAITO
+                 END-IF
+               END-IF
+             END-PERFORM
+           END-IF
+      *
+      *    ＜第三者行為のみ請求点あり＞の場合
+           IF    RECE62-DAISAN-GAITO  =   1
+             PERFORM  VARYING  IDX16   FROM    1   BY  1
+                       UNTIL  (IDX16                   >   10 )
+                         OR   (RECE62-HKNCOMBI(IDX16)  =  ZERO)
+               IF   WRK-DAISAN-INGAI(IDX16)  =   1
+                 IF     RECE62-DAISANFLG(IDX16)   =   1
+                   IF   RECE62-DAISAN-SKYFLG(IDX16) =  ZERO
+                     MOVE   1   TO  RECE62-DAISAN-SKYFLG(IDX16)
+                   END-IF
+                 ELSE
+                     MOVE   4   TO  RECE62-DAISAN-GAITO
+                 END-IF
+               END-IF
+             END-PERFORM
+           END-IF
+      *
+           .
+       211B1-DAISAN-CHECK2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6686,6 +6740,13 @@
                         MOVE    "1"       TO    RECE64-TOYAKUFLG
                     END-IF
                   END-IF
+      *
+                  IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
+                  OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
+                      CONTINUE
+                  ELSE
+                      MOVE      1         TO    WRK-DAISAN-INGAI(IDX1)
+                  END-IF
                END-IF
       *
                IF    ( SRY-SRYKBN        =     "14"  )
@@ -6705,6 +6766,13 @@
                     ELSE
                         MOVE    "1"       TO    RECE64-TOYAKUFLG
                     END-IF
+                  END-IF
+      *
+                  IF  (SRY-SRYCD(IDX2)(1:1)  =  "8"  )
+                  OR  (SRY-SRYCD(IDX2)(1:3)  =  "008")
+                      CONTINUE
+                  ELSE
+                      MOVE      1         TO    WRK-DAISAN-INGAI(IDX1)
                   END-IF
                END-IF
       *

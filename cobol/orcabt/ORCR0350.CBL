@@ -370,6 +370,8 @@
       *  04.07.04    NACL-門脇    13/09/11  自賠責（第三者行為）対応
       *  04.07.05    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
       *  04.07.06    NACL-藤原    13/12/09  医療情報連係基盤対応
+      *  04.07.07    NACL-門脇    14/02/03  第三者行為対応（院外処方のみの
+      *                                     保険組み合わせの病名記載対応）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4379,7 +4381,7 @@
            MOVE    "01"                TO  WRK-SRYKBN
       *
            MOVE    SPACE               TO  WRK-DISASTER-COMMENT
-           IF   RECE62-DAISAN-GAITO   =   1  OR  2
+           IF   RECE62-DAISAN-GAITO   =   1  OR  2  OR  4
                MOVE    RECE62-DAISAN-TOTALTEN  TO  WRK-FUTAN4
                INITIALIZE              ORCSKANACHKAREA
                MOVE    "2"             TO  KANACHK-SYORI 
