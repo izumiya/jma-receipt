@@ -1113,9 +1113,9 @@
                IF     (FLG-TBL             =   ZERO )  AND
                       (WRK-ERRCD           =   SPACE)
       *        初診料が算定済みであること
-                   IF     (LNK-ORCSC-SYOYMD    =   SPACE ) OR
-                         ((LNK-ORCSC-SYORIFLG  =   1  )  AND
-                          (SPA-SYOYMD1         =   SPA-SRYYMD ))
+                   IF     (LNK-ORCSC-SYOYMD    =   SPACE )
+      *!!            OR  ((LNK-ORCSC-SYORIFLG  =   1  )  AND
+      *!!                 (SPA-SYOYMD1         =   SPA-SRYYMD ))
                        MOVE    "1020"          TO  WRK-ERRCD
                        MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
                    END-IF
