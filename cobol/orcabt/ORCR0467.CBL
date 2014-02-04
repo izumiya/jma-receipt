@@ -43,6 +43,9 @@
       *
       *  04.05.01    NACL-門脇    09/06/18  円摘要欄コメント編集対応
       *  04.05.02    NACL-藤原    09/07/14  小数点以下５桁対応
+      *
+      *  04.07.01    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
+      *                                     追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -866,6 +869,11 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                                            CNT-IN-CANCEL
       *
                    DISPLAY "RECE41  PTNUM=" RECE41-PTNUM
+      *
+                   IF    (WRK-PARA-RECEKBN       =  "4")
+                   AND   (WRK-PARA-JIBAIPRTKBN   =  "2")
+                       GO  TO  990-RECE41-READ-SEC
+                   END-IF
       *
            END-READ
       *

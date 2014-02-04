@@ -29,23 +29,27 @@
       *  04.02.01    NACL-門脇    08/04/21  処方せん判別フラグ追加
       *  04.04.01    NACL-門脇    10/03/29  診療日２の追加
       *  04.05.01    NACL-門脇    10/01/19  剤区分追加
+      *
+      *  04.07.01    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
+      *                                     追加対応
       ************************************************************
       *01  RECE47-REC.
            03  RECE47-KEY.
+               05  RECE47-KEY1.
       *医療機関ＩＤ
-               05  RECE47-HOSPNUM         PIC  9(02).
+                   07  RECE47-HOSPNUM     PIC  9(02).
       *診療年月
-               05  RECE47-SRYYM           PIC  9(06).
+                   07  RECE47-SRYYM       PIC  9(06).
       *入外区分
-               05  RECE47-NYUGAIKBN       PIC  X(01).
+                   07  RECE47-NYUGAIKBN   PIC  X(01).
       *患者ＩＤ
-               05  RECE47-PTID            PIC  9(10).
+                   07  RECE47-PTID        PIC  9(10).
       *レセプト科
-               05  RECE47-RECEKA          PIC  X(02).
+                   07  RECE47-RECEKA      PIC  X(02).
       *保険ＩＤ        
-               05  RECE47-HKNID           PIC  9(10).
+                   07  RECE47-HKNID       PIC  9(10).
       *適用開始年月日
-               05  RECE47-TEKSTYMD        PIC  X(08). 
+                   07  RECE47-TEKSTYMD    PIC  X(08). 
       *診療区分
                05  RECE47-SRYKBN          PIC  X(02).
       *剤区分
@@ -92,3 +96,9 @@
                05  RECE47-ASTER           PIC  X(02).
       *摘要
                05  RECE47-TEKIYO          PIC  X(100).
+      *適要欄情報２
+           03  RECE47-TEKIYO2-INF.
+               05  RECE47-TEKIYO2-KISAIFLG  PIC  9(01).
+               05  RECE47-TEKIYO2-YENFLG    PIC  9(01).
+               05  RECE47-TEKIYO2-TEN       PIC S9(07).
+               05  RECE47-TEKIYO2-KAISU     PIC  9(03).

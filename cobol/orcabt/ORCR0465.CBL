@@ -54,6 +54,8 @@
       *
       *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
       *  04.07.02    NACL-門脇    13/10/02  自賠責（第三者行為）対応
+      *  04.07.03    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
+      *                                     追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -679,6 +681,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                        IF  TBL-ZAIW-SRYCD (WRK-WIDX1)
                                          =   CONS-SAISHIN2(IDY)
                            MOVE    1           TO  FLG-NOPRT
+                           IF   (WRK-PARA-RECEKBN      =  "4")
+                           AND  (WRK-PARA-JIBAIPRTKBN  =  "2")
+                              IF  TBL-ZAIW-SRYCD (WRK-WIDX1) =
+                                  "101120050" OR "101120060"
+                                              OR "101120070"
+                                MOVE   ZERO    TO  FLG-NOPRT
+                              END-IF
+                           END-IF
                        END-IF
                      END-PERFORM
                    ELSE

@@ -16,35 +16,18 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION          DIVISION.
-       PROGRAM-ID.             ORCR0935.
+       PROGRAM-ID.             ORCR0937.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : レセプト入院（自賠責）
       *  コンポーネント名  : 月次業務　自賠責明細書ファイル作成
-      *                      金額摘要欄編集（自賠責）
+      *                      金額摘要欄編集（自賠責）（新様式（ＯＣＲ様式））
       *  管理者            : 
       *  作成日付    作業者        記述
-      *  03/06/01    NACL-藤原      新規作成
+      *  05/07/27    NaCl-門脇     新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  01.00.01    NACL-門脇    04.04.26  ユーザーコメント追加対応
-      *  中止処理追加
-      *  01.01.01    NACL-藤原    04/10/13  中止処理の追加
-      *  01.01.02    NACL-門脇    05/07/15  自賠責従来様式対応
-      *
-      *  03.05.01    NACL-門脇    07/06/01  グループ診療対応
-      *  03.05.02    NACL-藤原    07/06/01  realtime preview 処理追加
-      *  03.05.03    NACL-門脇    07/06/26  不要項目削除
-      *  04.01.01    NACL-門脇    07/11/26  特定器材商品名記載対応
-      *  04.03.01    NACL-門脇    09/01/23  円摘要欄編集修正
-      *
-      *  04.05.01    NACL-門脇    09/06/18  円摘要欄コメント編集対応
-      *  04.05.02    NACL-藤原    09/07/14  小数点以下５桁対応
-      *  04.05.03    NACL-門脇    13/02/07  金額項目７桁対応
-      *
-      *  04.07.01    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
-      *                                     追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -57,23 +40,17 @@
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE82-KEY
                                    FILE    STATUS  IS  STS-RECE82.
-      *   
+      *
            SELECT  RECE86-FILE     ASSIGN  RECE86PARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  SEQUENTIAL
                                    RECORD  KEY     IS  RECE86-KEY
                                    FILE    STATUS  IS  STS-RECE86.
-      *   
+      *
            SELECT  RECE87-FILE     ASSIGN  RECE87PARA
                                    ORGANIZATION    IS  INDEXED
                                    ACCESS  MODE    IS  DYNAMIC
                                    RECORD  KEY     IS  RECE87-KEY
-                                   FILE    STATUS  IS  STS-RECE87.
-      *    
-           SELECT  RECE87X-FILE     ASSIGN  RECE87PARA
-                                   ORGANIZATION    IS  INDEXED
-                                   ACCESS  MODE    IS  SEQUENTIAL
-                                   RECORD  KEY     IS  RECE87X-KEY
                                    FILE    STATUS  IS  STS-RECE87.
       *    エラーファイル
            SELECT  RECEERR-FILE    ASSIGN  RECEERR
@@ -91,19 +68,13 @@
            COPY    "CPRCF0861.INC" REPLACING  //RECE861//
                                    BY         //RECE86//.
       *
-      *
        FD  RECE87-FILE.
        01  RECE87-REC. 
-           COPY    "CPRCF0871.INC"  REPLACING //RECE871//
-                                   BY         //RECE87//.
+           COPY    "CPRCF087.INC".
       *
-       FD  RECE87X-FILE.
-       01  RECE87X-REC. 
-           COPY    "CPRCF0871.INC"  REPLACING //RECE871//
-                                   BY         //RECE87X//.
       *    エラーファイル
        FD  RECEERR-FILE.
-       01  RECEERR-REC             PIC X(200). 
+       01  RECEERR-REC             PIC X(200).
       *
        WORKING-STORAGE             SECTION.
       *
@@ -122,7 +93,6 @@
       *
       *    フラグ領域
        01  STS-AREA.
-           03  SPA-STS             PIC 9(04).
            03  STS-RECE82          PIC X(02).
            03  STS-RECE87          PIC X(02).
            03  STS-RECE86          PIC X(02).
@@ -131,11 +101,8 @@
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END             PIC 9(01).
-           03  FLG-RECE82          PIC 9(01).
            03  FLG-RECE86          PIC 9(01).
            03  FLG-RECE87          PIC 9(01).
-           03  FLG-SP              PIC 9(01).
-           03  FLG-NOPRT           PIC 9(01).
            03  FLG-HENSYU          PIC 9(01).
            03  FLG-HENSYU2         PIC 9(01).
       *
@@ -143,20 +110,12 @@
        01  CNT-AREA.
            03  CNT-RECE82          PIC 9(06).
            03  CNT-RECE87          PIC 9(06).
-           03  CNT-RECE86          PIC 9(06).
            03  CNT-IN-CANCEL       PIC 9(06).
       *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
-           03  IDY                 PIC 9(04).
            03  IDZ                 PIC 9(04).
-      *    点数回数編集用     
-           03  IDA                 PIC 9(04).
-           03  IDB                 PIC 9(04).
-      *    剤診療行為コード別編集用     
-           03  IDX1                PIC 9(04).
-           03  IDX2                PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -178,107 +137,27 @@
       *
            03  WRK-ZAINUM          PIC 9(08).
            03  WRK-KINGAKU         PIC 9(09)V9(02).
+           03  WRK-ZAIKAISU        PIC 9(04).
       *
-      *    数字半角全角変換用     
-           03  WRK-NUM                         PIC 9(01).
-           03  WRK-CHAR-IDX                    PIC 9(02).
-           03  WRK-CHAR-HENKAN-AREA.
-               05  WRK-CHAR-X                  PIC X(10).
-               05  WRK-CHAR-N                  PIC X(20).
-               05  WRK-CHAR-CNT                PIC 9(02).
-               05  WRK-CHAR-FLG                PIC 9(01). 
-               05  WRK-CHAR-N-CNT              PIC 9(02).
+           03  WRK-ST              PIC 9(03).
       *
-           03  WRK-EDIT-AREA.
-               05  WRK-CLM                     PIC 9(03).
-               05  WRK-WCLM                    PIC 9(03).
+      *    剤・診療行為テーブル
+       01  TBL-ZAI-AREA.
+           03  TBL-ZAI-OCC                     OCCURS 100.
+               05  TBL-ZAI-NAME                PIC X(32).
+               05  TBL-ZAI-KISAIFLG            PIC 9(01).
+               05  TBL-ZAI-YENFLG              PIC 9(01).
+               05  TBL-ZAI-TEN                 PIC 9(07).
+               05  TBL-ZAI-KAISU               PIC 9(03).
       *
-           03  WRK-KOUI                        PIC X(200).
-      *
-           03  WRK-ZAI.
-               05  WRK-ZAI-NAME                PIC X(52).
-      *
-           03  WRK-ZAI1.
-               05  WRK-ZAI1-NAME               PIC X(28).
-      *
-      *    点数・回数編集用
-           03  WRK-ZAITENX                     PIC ZZZZZZZZ9.99.
-           03  WRK-ZAIKAISUX                   PIC ZZZ9.
-           03  WRK-TNSKAI-AREA.
-               05  WRK-TNSKAI-ST               PIC 9(03).
-               05  WRK-TNSKAI-ST1              PIC 9(03).
-               05  WRK-TNSKAI-KETA             PIC 9(02).
-               05  WRK-TNSKAI-LEN              PIC 9(02).
-      *
-               05  WRK-TNSKAI.
-                   07  WRK-ZAITEN              PIC X(14).
-                   07  WRK-X                   PIC X(02).
-                   07  WRK-ZAIKAISU            PIC X(06).
-      *             
-           03  WRK-ST                          PIC 9(03).
-      *     
-           03  WRK-WLINETEK                    PIC 9(03).
-           03  WRK-SRYSURYOW                   PIC X(20).
-           03  WRK-ZAIIDX                      PIC 9(03).
-           03  WRK-NAMEKETA                    PIC 9(03).
-           03  WRK-YOHAKU                      PIC 9(03).
-           03  WRK-WKETA                       PIC 9(03).
-      *     
-           03  WRK-SRYKBN                      PIC X(02).
-           03  WRK-Z9                          PIC ZZZ9.
-      *
-      *
-       01  WRK-HENSYU-AREA.
-           03  WRK-HENYMDG         PIC X(22).
-           03  WRK-HENYMD.
-               05  WRK-HGO         PIC X(01).
-               05  WRK-HYY         PIC Z9.
-               05  FILLER          PIC X(01)   VALUE  ".".
-               05  WRK-HMM         PIC Z9.
-               05  FILLER          PIC X(01)   VALUE  ".".
-               05  WRK-HDD         PIC Z9.
-      *
-           03  WRK-HENTIME.
-               05  WRK-THH         PIC 99.
-               05  FILLER          PIC X(01)   VALUE  ":".
-               05  WRK-TMM         PIC 99.
-      *          
-      *    診療行為別テーブル
-       01  TBL-ZAIW-AREA.
-           03  TBL-ZAIW-REC.
-               05  TBL-ZAIW-SRYACTINF.
-      *            診療コード/数量/回数
-                   07  TBL-ZAIW-SRYCD           PIC  X(09).
-                   07  TBL-ZAIW-SRYSURYO        PIC  9(05)V9(05).
-                   07  TBL-ZAIW-SRYKAISU        PIC  9(03).
-      *            単位コード/単位名称有効桁数/単位名称
-                   07  TBL-ZAIW-TANICD          PIC  9(03).
-                   07  TBL-ZAIW-TANIMOJISU      PIC  9(01).
-                   07  TBL-ZAIW-TANINAME        PIC  X(24).
-      *            点数識別区分/点数/明細請求フラグ
-                   07  TBL-ZAIW-TENSIKIBETU     PIC  9(01).
-                   07  TBL-ZAIW-TEN             PIC  9(09)V9(02).
-                   07  TBL-ZAIW-MEISKYFLG       PIC  X(01).
-      *            自動算定区分/名称入力番号/点数欄集計先識別
-                   07  TBL-ZAIW-AUTOKBN         PIC  X(01).
-                   07  TBL-ZAIW-INPUTNUM        PIC  9(03).
-                   07  TBL-ZAIW-TENTTLKBN       PIC  9(03).
-               05  TBL-ZAIW-NAMEINF.
-      *            漢字有効桁数/漢字名称
-                   07  TBL-ZAIW-YUKOKETA        PIC  9(03).
-                   07  TBL-ZAIW-NAME            PIC  X(200).
+       01  WRK-RECE86-REC.
+           COPY    "CPRCF0861.INC" REPLACING  //RECE861//
+                                   BY         //WRK-RECE86//.
       *
       *    固定値
        01  CONST-AREA.
-      *         
-      *    適用欄最大文字数（金額欄）
-           03  CONS-TEKIYOU1-LEN           PIC 9(02)   VALUE   24.
-      *     
       *    適用欄最大文字数（点数欄）
-           03  CONS-TEKIYOU2-LEN           PIC 9(02)   VALUE   52.
-      *
-      *    適用欄最大行数（金額欄）
-           03  CONS-TEKIYOU1-LINE-MAX      PIC  9(03)  VALUE   8.
+           03  CONS-TEKIYOU2-LEN           PIC 9(02)   VALUE   32.
       *
       *
            COPY    "MCPAREA".
@@ -298,9 +177,6 @@
       *****************************************************************
       *   ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
-      *     
-      *    数値変換サブ
-           COPY    "CPORCSNUM.INC".
       *
       *    半角チェックサブ
            COPY    "CPORCSKANACHK.INC".
@@ -325,7 +201,7 @@
            PERFORM 100-INIT-SEC
       *
            PERFORM 200-MAIN-SEC
-                   UNTIL       SPA-STS     =   2
+                   UNTIL       FLG-END     =   1
       *
            PERFORM 300-END-SEC
       *
@@ -340,11 +216,11 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
-           INITIALIZE                  SPA-AREA
            INITIALIZE                  FLG-AREA
            INITIALIZE                  STS-AREA
            INITIALIZE                  WRK-AREA
            INITIALIZE                  CNT-AREA
+           INITIALIZE                  SPA-AREA
       *
       *    ファイルＯＰＥＮ処理
       *
@@ -356,18 +232,16 @@
       *        ステップ管理開始処理
                MOVE    "STS"               TO  SJOBKANRI-MODE
                INITIALIZE                      JOBKANRI-REC
-               MOVE    "ORCR0935"          TO  JOB-PGID
-               MOVE    "金額摘要欄編集（自賠責）"
+               MOVE    "ORCR0937"          TO  JOB-PGID
+               MOVE    "金額摘要欄編集（自賠責（ＯＣＲ様式））"
                                            TO  JOB-SHELLMSG
-grpsys         PERFORM 900-CALL-ORCSJOB-SEC
+               PERFORM 900-CALL-ORCSJOB-SEC
       *
       *        処理中止設定処理
                PERFORM 500-CANCEL-HENSYU-SEC
            END-IF 
       *
-           IF      SPA-STS         =   ZERO
-               PERFORM 990-RECE82-READ-SEC
-           END-IF 
+           PERFORM 990-RECE82-READ-SEC
            .
        100-INIT-EXT.
            EXIT.
@@ -387,22 +261,19 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            MOVE    "RECE820"           TO  RECE01PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE01PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *
            MOVE    "RECE861"           TO  RECE86PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE86PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
       *
-           MOVE    "RECE871"           TO  RECE87PARA-FILE-ID
+           MOVE    "RECE870"           TO  RECE87PARA-FILE-ID
            MOVE    WRK-PARA-TERMID     TO  RECE87PARA-TERMID
-grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE87PARA-HOSPNUM
+           MOVE    WRK-PARA-HOSPNUM    TO  RECE87PARA-HOSPNUM
       *
            OPEN    INPUT               RECE82-FILE
       *
            OPEN    INPUT               RECE86-FILE
-      *
-           OPEN    OUTPUT              RECE87X-FILE
-           CLOSE                       RECE87X-FILE
       *
            OPEN    I-O                 RECE87-FILE
       *
@@ -415,15 +286,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE87PARA-HOSPNUM
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-      *    行カウンタ初期化
-           MOVE    ZERO                TO  WRK-LINENUM
-           MOVE    ZERO                TO  WRK-TBLMAX
+           MOVE    ZERO       TO     WRK-LINENUM
       *
-           INITIALIZE                      TBL-ZAIW-AREA
-      *
-           MOVE        ZERO            TO  WRK-ZAINUM
-                                           WRK-KINGAKU
-           MOVE        ZERO            TO  FLG-HENSYU2
+           MOVE    ZERO       TO     WRK-ZAINUM
+           MOVE    ZERO       TO     WRK-TBLMAX
+                                     WRK-KINGAKU
+                                     WRK-ZAIKAISU
+           INITIALIZE                TBL-ZAI-AREA
       *
       *    パラメータ０４ファイルより編集
            INITIALIZE                      RECE86-REC
@@ -443,7 +312,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE87PARA-HOSPNUM
                    PERFORM 990-RECE86-NEXT-SEC
            END-START
            PERFORM
-               UNTIL  ( SPA-STS              =   2                )
+               UNTIL  ( FLG-END              =   1                )
                OR     ( FLG-RECE86           =   1                )
                OR     ( RECE82-HOSPNUM   NOT =   RECE86-HOSPNUM   )
                OR     ( RECE82-SRYYM     NOT =   RECE86-SRYYM     )
@@ -454,253 +323,194 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE87PARA-HOSPNUM
                OR     ( RECE82-TEKSTYMD  NOT =   RECE86-TEKSTYMD  )
       *
                    IF      RECE86-ZAINUM   NOT =   WRK-ZAINUM
+                      IF      WRK-ZAINUM   NOT =   ZERO
+                          PERFORM 2002-RECE87-OUT-SEC
+                      END-IF
+                      MOVE    RECE86-REC     TO    WRK-RECE86-REC
                       MOVE    RECE86-ZAINUM  TO    WRK-ZAINUM
-                      MOVE    ZERO           TO    WRK-KINGAKU
-                      MOVE    ZERO           TO    FLG-HENSYU2
+                      MOVE    ZERO           TO    WRK-TBLMAX
+                                                   WRK-KINGAKU
+                                                   WRK-ZAIKAISU
+                      INITIALIZE                   TBL-ZAI-AREA
                    END-IF
       *
                    ADD     RECE86-TEN        TO    WRK-KINGAKU
-                   MOVE    WRK-KINGAKU       TO    WRK-ZAITENX
-                   MOVE    RECE86-ZAIKAISU   TO    WRK-ZAIKAISUX
+                   MOVE    RECE86-ZAIKAISU   TO    WRK-ZAIKAISU
       *
-                   PERFORM 2001-RECE44-ZAIHEN-MAE-SEC
-      *            
-                   PERFORM 2002-TBLZAIW-TAIHI-SEC
-      *
-                   PERFORM 2003-TEKIYOU-HENSYU-SEC
+      *            明細編集・明細桁数計算
+                   PERFORM 2003-MEISAI-KETA-HEN-SEC
       *
                    PERFORM 990-RECE86-NEXT-SEC
       *
-      *           処理中止設定処理
+      *            処理中止設定処理
                    IF      CNT-IN-CANCEL   =   50
                        MOVE    ZERO            TO  CNT-IN-CANCEL
                        PERFORM 500-CANCEL-HENSYU-SEC
                    END-IF
            END-PERFORM
       *
-           PERFORM 990-RECE82-READ-SEC
+           IF      FLG-END         =   ZERO
+      *
+               IF    WRK-ZAINUM       NOT =   ZERO
+               AND   TBL-ZAI-NAME(1)  NOT =   SPACE
+                     PERFORM   2002-RECE87-OUT-SEC
+               END-IF
+      *
+               PERFORM 990-RECE82-READ-SEC
+      *
+      *        処理中止設定処理
+               IF      CNT-IN-CANCEL   =   50
+                   MOVE    ZERO            TO  CNT-IN-CANCEL
+                   PERFORM 500-CANCEL-HENSYU-SEC
+               END-IF
+           END-IF
       *
            .
        200-MAIN-EXT.
            EXIT.
       *
       *****************************************************************
-      *    剤編集前処理
-      *****************************************************************
-       2001-RECE44-ZAIHEN-MAE-SEC     SECTION.
-      *
-           MOVE    SPACE               TO  WRK-ZAI
-                                           WRK-ZAI1
-           MOVE    ZERO                TO  WRK-CLM
-      *
-           .
-       2001-RECE44-ZAIHEN-MAE-EXT.
-           EXIT.
-      *
-      *
-      *****************************************************************
-      *    明細テーブル退避処理
-      *****************************************************************
-       2002-TBLZAIW-TAIHI-SEC    SECTION.
-      *
-           MOVE    RECE86-SRYACTINF  TO  TBL-ZAIW-SRYACTINF
-           MOVE    RECE86-NAMEINF    TO  TBL-ZAIW-NAMEINF  
-      *
-           .
-       2002-TBLZAIW-TAIHI-EXT.
-           EXIT.
-      *****************************************************************
-      *    編集処理
-      *****************************************************************
-       2003-TEKIYOU-HENSYU-SEC    SECTION.
-      *
-      *    金額・回数編集
-      ***> MOVE    TBL-ZAIW-TEN        TO  WRK-ZAITENX
-      ***> MOVE    RECE86-ZAIKAISU     TO  WRK-ZAIKAISUX
-      *     
-           PERFORM 4304-TENSUKAI-HEN-SEC 
-      *
-      *    明細編集・明細桁数計算
-           PERFORM 4302-MEISAI-KETA-HEN1-SEC
-      *
-      *    剤・診療行為テーブル出力処理
-      **** PERFORM 450-RECE87-OUT-SEC
-      *
-           .
-       2003-TEKIYOU-HENSYU-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    明細・明細桁　編集処理
-      *****************************************************************
-       4302-MEISAI-KETA-HEN1-SEC    SECTION.
-      *
-           MOVE    1                   TO  WRK-ST              
-      *
-           MOVE    ZERO                TO  FLG-HENSYU
-      *     
-           PERFORM UNTIL   FLG-HENSYU  =   1  
-               IF      WRK-TBLMAX         <   CONS-TEKIYOU1-LINE-MAX 
-                   MOVE    SPACE               TO  WRK-ZAI1
-                   IF  FLG-HENSYU2  =  ZERO
-                       MOVE   "＊"  TO   WRK-ZAI1-NAME(1:2)
-                       MOVE    1    TO   FLG-HENSYU2
-                   END-IF
-                   MOVE    TBL-ZAIW-NAME (WRK-ST:)
-                                               TO  WRK-ZAI1-NAME(3:)
-                   IF      WRK-TNSKAI      NOT =   SPACE                            
-                       IF      WRK-ZAI1-NAME (WRK-TNSKAI-ST1:)
-                                               =   SPACE
-                           MOVE    WRK-TNSKAI (WRK-TNSKAI-LEN:)
-                                               TO
-                                        WRK-ZAI1-NAME(WRK-TNSKAI-ST1:)
-                           MOVE    1               TO  FLG-HENSYU
-                       END-IF                 
-                   END-IF                                                  
-      *            剤・診療行為テーブル編集処理
-                   PERFORM 450-RECE87-OUT-SEC
-                   COMPUTE WRK-ST  =
-                           WRK-ST  + CONS-TEKIYOU1-LEN - 2
-               ELSE
-                   MOVE    SPACE               TO  WRK-ZAI
-                   IF  FLG-HENSYU2  =  ZERO
-                       MOVE   "＊"  TO   WRK-ZAI-NAME(1:2)
-                       MOVE    1    TO   FLG-HENSYU2
-                   END-IF
-                   MOVE    TBL-ZAIW-NAME (WRK-ST:)
-                                               TO  WRK-ZAI-NAME(3:)
-                   IF      WRK-TNSKAI      NOT =   SPACE                            
-                       IF      WRK-ZAI-NAME (WRK-TNSKAI-ST:)
-                                               =   SPACE
-                           MOVE    WRK-TNSKAI (WRK-TNSKAI-LEN:)
-                                               TO
-                                        WRK-ZAI-NAME(WRK-TNSKAI-ST:)
-                           MOVE    1               TO  FLG-HENSYU
-                       END-IF                 
-                   END-IF                                                  
-      *            剤・診療行為テーブル編集処理
-                   PERFORM 450-RECE87-OUT-SEC
-                   COMPUTE WRK-ST  =
-                           WRK-ST  + CONS-TEKIYOU2-LEN - 2
-               END-IF
-      *
-      *　　　　金額の編集がないときまだ印刷する文字があるか         
-               IF      WRK-TNSKAI          =   SPACE                            
-                   IF      TBL-ZAIW-NAME (WRK-ST:)
-                                               =   SPACE
-                       MOVE    1               TO  FLG-HENSYU
-                   END-IF                                                  
-               END-IF
-           END-PERFORM        
-           .
-       4302-MEISAI-KETA-HEN1-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    金額・回数編集処理
-      *****************************************************************
-       4304-TENSUKAI-HEN-SEC    SECTION.
-      *
-           INITIALIZE              WRK-TNSKAI-AREA
-      *
-      ***> IF    ( TBL-ZAIW-SRYCD (1:1)  =   "8"   )
-      ***> OR    ( TBL-ZAIW-SRYCD (1:3)  =   "008" )
-           IF    ( RECE86-ZAILAST   =   ZERO )
-           OR    ( WRK-KINGAKU      =   ZERO )
-               GO  TO  4304-TENSUKAI-HEN-EXT
-           END-IF
-      *                                           
-           INITIALIZE              ORCSKANACHKAREA
-           MOVE    "2"             TO  KANACHK-SYORI 
-           MOVE    WRK-ZAITENX(3:7)
-                                   TO  KANACHK-MAE-INPUT (1:7)
-           MOVE    "X"             TO  KANACHK-MAE-INPUT (8:1)
-           MOVE    WRK-ZAIKAISUX (2:3)
-                                   TO  KANACHK-MAE-INPUT (9:3)
-           CALL    "ORCSKANACHK"   USING   ORCSKANACHKAREA
-           IF      KANACHK-RC      =   ZERO
-           AND     KANACHK-MAX     >   ZERO
-               MOVE    KANACHK-OUT-INPUT(1:KANACHK-MAX)
-                                       TO  WRK-TNSKAI
-               MOVE    "×"                TO  WRK-X
-           END-IF
-      *
-      *    必要有効桁数（点数ZZZZZ X 数量ZZZ の全角の桁数）
-           MOVE    ZERO                TO  WRK-TNSKAI-KETA
-           PERFORM VARYING   IDZ     FROM    1   BY  2
-                   UNTIL     IDZ     >       22
-      ***>     IF      WRK-TNSKAI (IDZ:2)      NOT =   SPACE
-               IF      WRK-TNSKAI (IDZ:2)      NOT =   "　"
-                   IF   IDZ = 1
-                      COMPUTE WRK-TNSKAI-KETA = 22 - IDZ + 1
-                      MOVE    IDZ   TO   WRK-TNSKAI-LEN
-                   ELSE
-                      COMPUTE WRK-TNSKAI-KETA = 22 - IDZ + 1 + 2
-                      COMPUTE WRK-TNSKAI-LEN  = IDZ  -  2
-                   END-IF
-                   MOVE    22                  TO  IDZ
-               END-IF 
-           END-PERFORM
-      *     
-      *    印刷開始位置を取得
-           COMPUTE   WRK-TNSKAI-ST     =   ( CONS-TEKIYOU2-LEN  -
-                                             WRK-TNSKAI-KETA      )
-                                       +   1
-           COMPUTE   WRK-TNSKAI-ST1    =   ( CONS-TEKIYOU1-LEN  -
-                                             WRK-TNSKAI-KETA      )
-                                       +   1
-      *
-           .
-       4304-TENSUKAI-HEN-EXT.
-           EXIT.
-      *
-      *****************************************************************
       *    レセプト０６出力処理
       *****************************************************************
-       450-RECE87-OUT-SEC    SECTION.
+       2002-RECE87-OUT-SEC    SECTION.
       *
-           ADD     1                   TO  WRK-LINENUM
-           MOVE    SPACE               TO  RECE87-REC
-           INITIALIZE                      RECE87-REC
-      *     
-           IF      WRK-TBLMAX         <   CONS-TEKIYOU1-LINE-MAX 
-               ADD     1                   TO  WRK-TBLMAX
-               MOVE    WRK-ZAI1            TO  RECE87-TEKIYO-INF
-           ELSE    
-               MOVE    WRK-ZAI             TO  RECE87-TEKIYO-INF
-           END-IF
-      *     
-           PERFORM 4501-RECE87-HENSYU-SEC
+           PERFORM   VARYING   IDX   FROM    1   BY  1
+                      UNTIL    IDX        >   WRK-TBLMAX
+                        OR     IDX        >   100
+                        OR     FLG-END    =     1
       *
-           MOVE    SPACE                TO  WRK-ZAI
-                                            WRK-ZAI1
+             ADD     1                     TO  WRK-LINENUM
+             MOVE    SPACE                 TO  RECE87-REC
+             INITIALIZE                        RECE87-REC
+      *
+             MOVE    WRK-RECE86-HOSPNUM    TO  RECE87-HOSPNUM
+             MOVE    WRK-RECE86-SRYYM      TO  RECE87-SRYYM
+             MOVE    WRK-RECE86-NYUGAIKBN  TO  RECE87-NYUGAIKBN
+             MOVE    WRK-RECE86-PTID       TO  RECE87-PTID
+             MOVE    WRK-RECE86-RECEKA     TO  RECE87-RECEKA
+             MOVE    WRK-RECE86-HKNID      TO  RECE87-HKNID
+             MOVE    WRK-RECE86-TEKSTYMD   TO  RECE87-TEKSTYMD
+             MOVE    WRK-RECE86-SRYKBN     TO  RECE87-SRYKBN
+             MOVE    SPACE                 TO  RECE87-ZAISKBKBN
+             MOVE    ZERO                  TO  RECE87-ZAISKBBAN
+             MOVE    ZERO                  TO  RECE87-TENTEKIKBN
+             MOVE    ZERO                  TO  RECE87-TENTEKIBAN
+             MOVE    ZERO                  TO  RECE87-KNSJISKBN
+             MOVE    SPACE                 TO  RECE87-SRYSYUKBN
+             MOVE    ZERO                  TO  RECE87-DAY
+             IF    WRK-RECE86-SRYKBN  = "11"
+               MOVE  ZERO                  TO  RECE87-CDKBN-SYO
+               MOVE  ZERO                  TO  RECE87-CDKBN-BU
+               MOVE  SPACE                 TO  RECE87-CDKBN-KBN
+               MOVE  ZERO                  TO  RECE87-CDKBN-KBNNUM
+               MOVE  ZERO                  TO  RECE87-CDKBN-KBNNUM-EDA
+               MOVE  ZERO                  TO  RECE87-CDKBN-KOUBAN
+               MOVE  ZERO                  TO  RECE87-KOUHYOJUNNUM
+             ELSE
+               MOVE  9                     TO  RECE87-CDKBN-SYO
+               MOVE  99                    TO  RECE87-CDKBN-BU
+               MOVE  "9"                   TO  RECE87-CDKBN-KBN
+               MOVE  999                   TO  RECE87-CDKBN-KBNNUM
+               MOVE  99                    TO  RECE87-CDKBN-KBNNUM-EDA
+               MOVE  99                    TO  RECE87-CDKBN-KOUBAN
+               MOVE  999999999             TO  RECE87-KOUHYOJUNNUM
+             END-IF
+             MOVE    WRK-RECE86-NYUTENTTLKBN
+                                           TO  RECE87-NYUTENTTLKBN
+             MOVE    WRK-RECE86-SRYCD1     TO  RECE87-SRYCD1
+             MOVE    ZERO                  TO  RECE87-ZAITEN
+             MOVE    WRK-RECE86-ZAINUM     TO  RECE87-ZAINUM
+             MOVE    WRK-LINENUM           TO  RECE87-LINENUM
+      *
+             MOVE    WRK-TBLMAX            TO  RECE87-ZAIMEISAISU
+             MOVE    WRK-RECE86-PTNUM      TO  RECE87-PTNUM
+             MOVE    WRK-RECE86-SRYKA      TO  RECE87-SRYKA
+             MOVE    TBL-ZAI-NAME(IDX)     TO  RECE87-TEKIYO-INF
+      *
+             MOVE    TBL-ZAI-KISAIFLG(IDX) TO  RECE87-TEKIYO2-KISAIFLG
+             MOVE    TBL-ZAI-YENFLG(IDX)   TO  RECE87-TEKIYO2-YENFLG
+             MOVE    TBL-ZAI-TEN(IDX)      TO  RECE87-TEKIYO2-TEN
+             MOVE    TBL-ZAI-KAISU(IDX)    TO  RECE87-TEKIYO2-KAISU
+      *
+             READ    RECE87-FILE
+               INVALID
+                   MOVE    1               TO  FLG-RECE87
+               NOT INVALID
+                   MOVE    ZERO            TO  FLG-RECE87
+             END-READ
+             IF      FLG-RECE87            =   1
+                 WRITE   RECE87-REC
+                 IF      STS-RECE87          NOT =   ZERO
+                     DISPLAY "*** ORCR0937 RECE87 WRITE ERR  ***"
+                     MOVE    1                 TO  FLG-END
+                 ELSE
+                     ADD     1                 TO  CNT-RECE87
+                 END-IF
+             ELSE
+                 DISPLAY "*** ORCR0937 RECE87 KEY CYOFUKU  ***"
+             END-IF
+      *
+           END-PERFORM
+      *
            .
-       450-RECE87-OUT-EXT.
+       2002-RECE87-OUT-EXT.
            EXIT.
       *
       *****************************************************************
-      *    レセプト０６編集処理
+      *    明細編集・明細桁数計算
       *****************************************************************
-       4501-RECE87-HENSYU-SEC    SECTION.
+       2003-MEISAI-KETA-HEN-SEC    SECTION.
       *
-           MOVE    RECE86-KEY        TO  RECE87-KEY
-           MOVE    WRK-LINENUM       TO  RECE87-LINENUM
-           MOVE    RECE86-PTNUM      TO  RECE87-PTNUM
-           MOVE    RECE86-SRYKA      TO  RECE87-SRYKA
-      **** MOVE    RECE86-SRYKBN     TO  RECE87-SRYKBN
+           MOVE    1                   TO  WRK-ST
       *
-           WRITE   RECE87-REC
-           IF      STS-RECE87          NOT =   ZERO
-               DISPLAY "*** ORCR0935 RECE87 WRITE ERR  ***"
-               MOVE    2             TO  SPA-STS                       
-           ELSE
-               ADD     1             TO  CNT-RECE87
-           END-IF    
+           MOVE    ZERO                TO  FLG-HENSYU
+                                           FLG-HENSYU2
+      *
+           PERFORM   UNTIL   FLG-HENSYU  =   1
+      *
+               ADD     1               TO  WRK-TBLMAX
+               IF  WRK-TBLMAX          >   100
+                   DISPLAY "*** ORCR0937 INDEX[100] OVER  ***"
+               END-IF
+      *
+               IF    WRK-TBLMAX    =    1
+               AND   FLG-HENSYU2   =    ZERO
+                   EVALUATE  RECE86-SRYCD1(1:5)
+                     WHEN   "09591"
+                       MOVE  "診"  TO  TBL-ZAI-NAME(WRK-TBLMAX)(1:2)
+                     WHEN   "09592"
+                       MOVE  "明"  TO  TBL-ZAI-NAME(WRK-TBLMAX)(1:2)
+                     WHEN    OTHER
+                       MOVE  "＊"  TO  TBL-ZAI-NAME(WRK-TBLMAX)(1:2)
+                   END-EVALUATE
+                   MOVE      1     TO  FLG-HENSYU2
+               END-IF
+               MOVE  RECE86-NAME(WRK-ST:)  TO
+                                     TBL-ZAI-NAME(WRK-TBLMAX)(3:)
+      *
+               COMPUTE  WRK-ST  =  WRK-ST  +  CONS-TEKIYOU2-LEN  - 2
+      *
+      *        金額の編集がないときまだ印刷する文字があるか
+               IF      RECE86-NAME (WRK-ST:)   =   SPACE
+                  MOVE    1             TO  FLG-HENSYU
+                  IF   (RECE86-ZAILAST     =   1   )
+                  AND  (WRK-KINGAKU    NOT =   ZERO)
+                  AND  (WRK-ZAIKAISU   NOT =   ZERO)
+                    MOVE  1             TO  TBL-ZAI-KISAIFLG(WRK-TBLMAX)
+                    MOVE  1             TO  TBL-ZAI-YENFLG(WRK-TBLMAX)
+                    MOVE  WRK-KINGAKU   TO  TBL-ZAI-TEN(WRK-TBLMAX)
+                    MOVE  WRK-ZAIKAISU  TO  TBL-ZAI-KAISU(WRK-TBLMAX)
+                  END-IF
+               ELSE
+                  MOVE    "＆"    TO    TBL-ZAI-NAME(WRK-TBLMAX)(31:2)
+                  COMPUTE  WRK-ST  =  WRK-ST  -  2
+               END-IF
+           END-PERFORM
       *
            .
-       4501-RECE87-HENSYU-EXT.
+       2003-MEISAI-KETA-HEN-EXT.
            EXIT.
-      *     
+      *
       *****************************************************************
       *    エラー出力処理
       *****************************************************************
@@ -715,19 +525,18 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE87PARA-HOSPNUM
                MOVE    WRK-RECEERR         TO  RECEERR-REC
                WRITE   RECEERR-REC
                CLOSE   RECEERR-FILE
-      *         
+      *
                IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
       *            ジョブ管理終了処理
                    MOVE    "JBE"           TO  SJOBKANRI-MODE
                    INITIALIZE                  JOBKANRI-REC
                    MOVE    WRK-RECEERR     TO  JOB-YOBI
                    MOVE    "9999"          TO  JOB-ERRCD
-grpsys             PERFORM 900-CALL-ORCSJOB-SEC
+                   PERFORM 900-CALL-ORCSJOB-SEC
                END-IF
            END-IF
-      *                             
+      *
            MOVE    1                   TO  FLG-END
-           MOVE    2                   TO  SPA-STS                       
       *
            .
        500-ERR-HENSYU-EXT.
@@ -743,7 +552,7 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
            ELSE
                MOVE    "CHK"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
-grpsys         PERFORM 900-CALL-ORCSJOB-SEC
+               PERFORM 900-CALL-ORCSJOB-SEC
                IF    ( SJOBKANRI-RETURN
                                        =   ZERO )
                AND   ( JOB-STOPFLG     =   1    )
@@ -766,11 +575,10 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                        MOVE    WRK-RECEERR     TO  JOB-YOBI
                        MOVE    "8888"          TO  JOB-ERRCD
                        MOVE    2               TO  JOB-STOPFLG
-grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
+                       PERFORM 900-CALL-ORCSJOB-SEC
                    END-IF
       *                             
                    MOVE    1                   TO  FLG-END
-                   MOVE    2                   TO  SPA-STS                       
                END-IF
            END-IF
            .
@@ -784,20 +592,21 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
       *
            CLOSE                       RECE82-FILE
            CLOSE                       RECE87-FILE
-           CLOSE                       RECE86-FILE     
+           CLOSE                       RECE86-FILE
       *
            IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
       *        ステップ管理終了処理
                MOVE    "STE"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
-grpsys         PERFORM 900-CALL-ORCSJOB-SEC
+               PERFORM 900-CALL-ORCSJOB-SEC
       *
                PERFORM 900-DBDISCONNECT-SEC
            END-IF
       *
-           DISPLAY "RECE82  IN  " CNT-RECE82   
-           DISPLAY "RECE87  CNT " CNT-RECE87 
-           DISPLAY "*** ORCR0935 END ***"
+           DISPLAY "RECE82  IN      " CNT-RECE82
+           DISPLAY "RECE87  ADDCNT  " CNT-RECE87
+           DISPLAY "*** ORCR0937 END ***"
+      *
            .
        300-END-EXT.
            EXIT.
@@ -810,15 +619,16 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            READ    RECE82-FILE         NEXT
                AT  END
                    MOVE    1           TO  FLG-END
-                   MOVE    2           TO  SPA-STS
                NOT AT  END
                    ADD     1           TO  CNT-RECE82
-                   MOVE    ZERO        TO  FLG-END
+                                           CNT-IN-CANCEL
       *
                    DISPLAY "RECE82  PTNUM=" RECE82-PTNUM
       *
                    IF    (WRK-PARA-RECEKBN       =  "4")
                    AND   (WRK-PARA-JIBAIPRTKBN   =  "2")
+                       CONTINUE
+                   ELSE
                        GO  TO  990-RECE82-READ-SEC
                    END-IF
       *
@@ -838,7 +648,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    1         TO  FLG-RECE86
                NOT AT  END
                    MOVE    ZERO      TO  FLG-RECE86
-                   ADD     1         TO  CNT-IN-CANCEL 
+                   ADD     1         TO  CNT-IN-CANCEL
            END-READ
       *
            .
@@ -853,7 +663,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
            MOVE    WRK-PARA-SHELLID
                                    TO  JOB-SHELLID
-grpsys     MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA 
                                    JOBKANRI-REC
@@ -867,7 +677,7 @@ grpsys     MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
       *****************************************************************
        900-ORCDBMAIN-SEC               SECTION.
       *
-grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+           CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
            .
@@ -883,12 +693,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBOPEN"            TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBSTART"           TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
            .
        120-DBOPEN-EXT.
            EXIT.
@@ -901,12 +711,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBCOMMIT"          TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
       *
            MOVE    LOW-VALUE           TO  MCP-TABLE
                                            MCP-PATHNAME
            MOVE    "DBDISCONNECT"      TO  MCP-FUNC
-grpsys     PERFORM 900-ORCDBMAIN-SEC
+           PERFORM 900-ORCDBMAIN-SEC
            .
        900-DBDISCONNECT-EXT.
            EXIT.

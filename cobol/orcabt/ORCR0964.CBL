@@ -1926,8 +1926,9 @@
                                                  TO  SUM-NYUKHNKEI (1)
                END-PERFORM    
       *        <基本料>
-               MOVE    SPACE                 TO  HCN67-NYUKHNTEN (8)
-                                                 HCN67-NYUKHNTENN(8)
+               MOVE    SPACE                 TO  HCN67-NYUKHNTEN  (8)
+                                                 HCN67-NYUKHNTENN (8)
+                                                 HCN67-NYUKHNTENN2(8)
       *        <日数>
                MOVE    SUM-NYUKHNNISSU       TO  WRK-KAISUZ
                MOVE    WRK-KAISUZ            TO  HCN67-NYUKAISU  (8)
@@ -1974,7 +1975,7 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       11
                    OR      RECE82-NYUSYUBETU (IDX) =   SPACE
-               IF      RECE82-NYUSYUBETU (IDX) (13:)
+               IF      RECE82-NYUSYUBETU (IDX) (11:)
                                        =   SPACE
                    MOVE    RECE82-NYUSYUBETU (IDX)
                                          TO  HCN67-NYUSYUBETSU (IDX)

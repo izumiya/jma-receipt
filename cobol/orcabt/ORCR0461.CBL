@@ -16,144 +16,18 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION          DIVISION.
-       PROGRAM-ID.             ORCR0460.
+       PROGRAM-ID.             ORCR0461.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : レセプト（労災・自賠責）
       *  コンポーネント名  : 月次業務　労災自賠責明細書ファイル作成
-      *                      点数摘要欄編集（労災・自賠責）
+      *                      点数摘要欄編集（自賠責）（新様式（ＯＣＲ様式））
       *  管理者            : 
       *  作成日付    作業者        記述
       *  00/12/01    MCC-藤原      新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *  01.00.01    NACL-藤原    02.08.23  検査にコメントがあるとき検査数
-      *                                     にカウントしないようにする
-      *  01.00.02    NACL-藤原    02.08.26  皮下筋肉注射以外は手技名を印刷
-      *                                     するようにする
-      *  01.00.03    NACL-門脇    02.09.19  自賠責対応
-      *  01.00.04    NACL-藤原    02.09.20  検査のときの表示方法を変更
-      *  01.00.05    NACL-門脇    02.10.02  摘要出力項目変更
-      *  01.00.06    NACL-門脇    02.11.26  診療実日数算定用の
-      *                                     コードを印刷しないよう追加 
-      *                                     検診コードを印刷するよう追加
-      *  01.00.07    NACL-藤原    02.12.02  酸素の時単価を表示するように追加
-      *  01.00.08    NACL-藤原    03.01.10  検査の回数の編集
-      *                                     画像診断のフィルムを手技に表示
-      *  01.00.09    NACL-門脇    03.02.13  乳幼児加算の時手技に表示
-      *  01.00.10    NACL-門脇    03.03.06  初再診のコメント編集対応
-      *  01.00.11    NACL-門脇    03.03.12  先頭の診療行為コードの判定修正
-      *  01.00.12    NACL-門脇    03.05.08  先頭の診療行為コードの判定修正
-      *  01.00.13    NACL-門脇    03.05.13  腰部固定帯加算を器材点へ
-      *  01.00.14    NACL-藤原    03.05.27  検査のまとめの修正
-      *  01.00.15    NACL-門脇    03.06.05  摘要欄出力条件修正
-      *  01.00.16    NACL-藤原    03.06.30  薬剤・器材の剤点数が０のとき
-      *                                     摘要欄に印刷しないように修正
-      *  01.00.17    NACL-門脇    03.09.29  点数マスタを読み込まないよう
-      *                                     修正
-      *  01.00.18    NACL-藤原    04.02.05  薬剤・器材の編集順を逆にする
-      *  ２００４年４月改正対応
-      *  01.01.01    NACL-門脇    04.04.01  初診（乳幼児）（夜間・休日・
-      *                                     深夜）加算の摘要欄記載
-      *  01.01.02    NACL-門脇    04.04.10  在宅患者訪問点滴注射管理指導料
-      *                                     算定時の点滴注射のコメント対応
-      *  01.01.03    NACL-門脇    04.04.26  ユーザーコメント追加対応
-      *  01.01.04    NACL-門脇    04.06.11  皮下筋肉注射で、薬剤点・器材点
-      *                                     が無いの場合の摘要欄記載対応
-      *  01.01.05    NACL-藤原    04.07.16  検査のまとめを回数テーブルの
-      *                                     合計で行うようにする 
-      *  01.01.06    NACL-門脇    04.09.22  薬剤・器材の記載順修正
-      *  中止処理追加
-      *  01.02.01    NACL-藤原    04/10/13  中止処理の追加
-      *  01.02.02    NACL-門脇    04/12/17  胸部固定帯加算、創外固定器
-      *                                     使用加算を薬剤等へ
-      *  01.02.03    NACL-門脇    05/01/27  腰・胸部固定帯加算、創外固定器
-      *                                     使用加算の技術・薬剤等の選択対応
-      *  01.02.04    NACL-門脇    05/02/28  （サ）記載対応
-      *  01.02.05    NACL-門脇    05/03/02  薬剤で単位のないデータの数量編集
-      *                                     修正
-      *  01.02.06    NACL-藤原    05/03/07  包括対象検査のまとめの修正
-      *  01.02.07    NACL-藤原    05/04/18  包括対象検査がまとまらない
-      *                                     場合の編集の修正
-      *  01.02.08    NACL-門脇    05/05/26  手術・麻酔の記載順変更対応
-      *  01.02.09    NACL-門脇    05/06/06  ワーク項目桁数修正
-      *  01.02.10    NACL-藤原    05/08/17  包括対象検査フラグの新設に対応
-      *  01.02.11    NACL-門脇    05/08/18  自賠責従来様式対応
-      *  01.02.12    NACL-伊藤    05/09/01  検体検査コメントのついた包括
-      *                                     対象検査の剤まとめに対応
-      *  01.02.13    NACL-門脇    05/11/01  （検選）等コメント対応
-      *
-      *  ２００６年４月改正対応
-      *  02.09.01    NACL-門脇    06/04/13  ２００６年４月改正対応
-      *  02.09.02    NACL-藤原    06/04/14  包括対象検査「１１」の追加
-      *  02.09.03    NACL-門脇    06/05/22  電子化加算編集修正
-      *  03.01.01    NACL-門脇    06/06/28  実日数減算コード対応
-      *  03.01.02    NACL-門脇    06/07/10  在支援コメント自動記載対応
-      *  03.01.03    NACL-門脇    06/07/14  診療区分置き換えフラグの編集
-      *  03.04.01    NACL-門脇    06/12/01  自賠責健保準拠対応
-      *  03.04.02    NACL-門脇    07/03/23  月途中医療機関コード変更時対応
-      *
-      *  03.05.01    NACL-門脇    07/05/25  グループ診療対応
-      *  03.05.02    NACL-藤原    07/06/01  realtime preview 処理追加
-      *  03.05.03    NACL-門脇    07/09/13  点滴の記載順変更（日付順）
-      *  03.05.04    NACL-門脇    07/09/13  皮下筋肉、静脈注射の記載変更対応
-      *
-      *  04.01.01    NACL-門脇    07/10/31  公務災害対応
-      *  04.01.02    NACL-門脇    07/11/26  特定器材商品名記載対応
-      *  04.02.01    NACL-門脇    08/03/24  平成２０年４月改正対応
-      *                                     （初診（夜間・早朝等）加算追加）
-      *                                     （診療区分６４：病理診断対応）
-      *                                     （再就労、職業復帰：記載順対応）
-      *  04.02.02    NACL-門脇    08/04/21  ８０その他記載順対応
-      *  04.02.03    NACL-門脇    08/06/25  ８０その他記載順対応
-      *  04.02.04    NACL-門脇    08/11/06  皮下筋肉、静脈注射の記載変更対応
-      *
-      *  04.03.01    NACL-門脇    08/07/09  投薬の記載順変更（日付順）
-      *  04.03.02    NACL-門脇    08/07/14  投薬剤点０（院外等）記載対応
-      *  04.03.03    NACL-門脇    08/12/01  在宅（院外分）編集修正
-      *  04.03.04    NACL-門脇    09/01/15  処方（乳幼児）加算編集対応
-      *                                     処方せん（乳幼児）加算編集対応
-      *
-      *  04.04.01    NACL-門脇    09/02/04  検査のコメント自動記載対応
-      *  04.04.02    NACL-門脇    09/09/30  検査の数量編集修正
-      *  04.04.03    NACL-門脇    09/11/19  自賠責健保準拠療養担当手当対応
-      *  04.04.04    NACL-門脇    10/03/25  改正対応
-      *                                     （地域医療貢献加算記載編集）
-      *                                     （明細書発行体制等加算記載編集）
-      *  04.04.05    NACL-門脇    10/03/29  改正対応
-      *                                     （画像診断２回目以降減算編集）
-      *                                     （コード追加）
-      *  04.04.06    NACL-門脇    10/03/31  改正対応
-      *                                     （頸部固定帯加算の対応）
-      *                                     （８０その他の記載順）
-      *  04.04.07    NACL-門脇    10/09/03  在宅薬剤院外処方点検用レセ
-      *                                     記載修正
-      *
-      *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
-      *  04.05.02    NACL-門脇    09/06/17  処置の記載順変更（日付順）
-      *  04.05.03    NACL-藤原    09/07/14  小数点以下５桁対応
-      *  04.05.04    NACL-門脇    10/01/21  治験対応
-      *  04.05.05    NACL-門脇    10/01/26  東京都マル子追加対応
-      *  04.05.06    NACL-門脇    11/02/28  長崎県地方公費対応
-      *  04.05.07    NACL-門脇    11/11/30  画像診断フイルム分画数対応
-      *  04.05.08    NACL-門脇    12/04/02  平成２４年４月改正
-      *                                     「再診」の対応
-      *                                     「その他」の対応
-      *  04.05.09    NACL-門脇    13/01/22  ワーク領域拡張
-      *
-      *  04.06.01    NACL-門脇    12/10/15  診療行為入力したコメントのみの剤の
-      *                                     レセプト記載対応
-      *  04.06.02    NACL-門脇    13/02/18  労災レセ電対応
-      *                                     （新診療行為コード対応）
-      *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
-      *  04.06.04    NACL-門脇    13/11/07  公務災害（労災準拠）の地公災特別
-      *                                     加算対応（京都府）
-      *
-      *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
-      *  04.07.02    NACL-門脇    13/10/02  自賠責（第三者行為）対応
-      *  04.07.03    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
-      *                                     追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -294,10 +168,7 @@
            03  IDX4                PIC 9(04).
       *
            03  IDX6                PIC 9(04).
-      *
-           03  WRK-SYU-INDEX       PIC 9(04).
-           03  WRK-YKZ-INDEX       PIC 9(04).
-           03  WRK-KIZ-INDEX       PIC 9(04).
+           03  IDX8                PIC 9(04).
       *
            03  IDW3                PIC 9(04).
       *
@@ -346,23 +217,16 @@
                05  WRK-CLM                     PIC 9(03).
                05  WRK-WCLM                    PIC 9(03).
       *
-           03  WRK-KOUI                        PIC X(210).
+           03  WRK-KOUI                        PIC X(250).
       *
            03  WRK-ZAI.
                05  WRK-ZAI-MK                  PIC X(02).
-               05  WRK-ZAI-NAME.
-                   07  FILLER                  PIC X(28).
-                   07  WRK-ZAI-TNSKAI          PIC X(22).
-      *
-           03  WRK-TNSKAI.
-               05  WRK-ZAITEN                  PIC X(14).
-               05  WRK-X                       PIC X(02).
-               05  WRK-ZAIKAISU                PIC X(06).
-      *
-           03  WRK-ZAITENX                     PIC ZZZZZZ9.
-           03  WRK-ZAIKAISUX                   PIC ZZ9.
-           03  WRK-TNSKAI-ST                   PIC 9(02).
-           03  WRK-TNSKAI-KETA                 PIC 9(02).
+               05  WRK-ZAI-NAME                PIC X(30).
+           03  WRK-ZAI2.
+               05  WRK-ZAI2-KISAIFLG           PIC 9(01).
+               05  WRK-ZAI2-YENFLG             PIC 9(01).
+               05  WRK-ZAI2-TEN                PIC S9(07).
+               05  WRK-ZAI2-KAISU              PIC 9(03).
       *
            03  WRK-SRYCD                       PIC X(01).
       *     
@@ -436,7 +300,13 @@
       *
       *    剤・診療行為テーブル
        01  TBL-ZAI-AREA.
-           03  TBL-ZAI      OCCURS 100  PIC X(52).
+           03  TBL-ZAI-OCC                  OCCURS   100.
+               05  TBL-ZAI                  PIC X(32).
+               05  TBL-ZAI2.
+                   07  TBL-ZAI2-KISAIFLG    PIC 9(01).
+                   07  TBL-ZAI2-YENFLG      PIC 9(01).
+                   07  TBL-ZAI2-TEN         PIC S9(07).
+                   07  TBL-ZAI2-KAISU       PIC 9(03).
       *
       *    検査をまとめるテーブル
        01  WRK-KENSA-MATOME-MAX            PIC 9(03).
@@ -995,8 +865,8 @@
       *        ステップ管理開始処理
                MOVE    "STS"           TO  SJOBKANRI-MODE
                INITIALIZE                  JOBKANRI-REC
-               MOVE    "ORCR0460"      TO  JOB-PGID
-               MOVE    "点数摘要欄編集（労災・自賠責）"                      
+               MOVE    "ORCR0461"      TO  JOB-PGID
+               MOVE    "点数摘要欄編集（自賠責（ＯＣＲ様式））"
                                        TO  JOB-SHELLMSG
 grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *        処理中止設定処理
@@ -1168,17 +1038,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *
       *        検査のとき回数を編集する
                IF      WRK-KENSA-KAISU        >   ZERO
-                   EVALUATE  RECE41-HKNKBN
-                     WHEN      "1"
-                     WHEN      "2"
-                     WHEN      "4"
-                     WHEN      "6"
-                       MOVE    WRK-KENSA-KAISU    TO  RECE41-KAISU  (29)
-                     WHEN      "3"
-                       MOVE    WRK-KENSA-KAISU    TO  RECE41-KAISU  (24)
-                     WHEN      "5"
-                       MOVE    WRK-KENSA-KAISU    TO  RECE41-KAISU  (32)
-                   END-EVALUATE
+                   MOVE  WRK-KENSA-KAISU  TO  RECE41-KAISU(27)
                    REWRITE RECE41-REC
                END-IF
       *
@@ -1213,10 +1073,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
            MOVE    "＊"                TO  WRK-ZAI-MK
            MOVE    ZERO                TO  WRK-CLM
       *    点数・回数セット
-           MOVE    RECE44-ZAITEN       TO  WRK-ZAITENX
-           MOVE    RECE44-ZAIKAISU     TO  WRK-ZAIKAISUX
-      *    必要有効桁数・開始位置・回数編集
-           PERFORM 810-TENSUKAI-HEN-SEC
+           INITIALIZE                      WRK-ZAI2
+           MOVE    1                   TO  WRK-ZAI2-KISAIFLG
+           IF      FLG-TEIGEN          =   1
+             COMPUTE  WRK-ZAI2-TEN = RECE44-ZAITEN * -1
+           ELSE
+             MOVE  RECE44-ZAITEN       TO  WRK-ZAI2-TEN
+           END-IF
+           MOVE    RECE44-ZAIKAISU     TO  WRK-ZAI2-KAISU
       *
            .
        2001-RECE44-ZAIHEN-MAE-EXT.
@@ -1388,7 +1252,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                        MOVE    4             TO  IDY
                              END-IF
                            WHEN    OTHER
-                               DISPLAY "ORCR0460 SRYCD="
+                               DISPLAY "ORCR0461 SRYCD="
                                                  RECE45-SRYCD (IDX) 
                                MOVE    "診療行為コードが範囲外です"
                                                  TO  WRK-RECEERR
@@ -1958,17 +1822,17 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
            MOVE    1                 TO  IDX
                
            PERFORM UNTIL   IDX     >       WRK-KENSA-MAX
-               IF      TBL-HOUKNSKBN(IDX)   =   ZERO
-               OR      FLG-SRYCD1           =    1
-                   IF     (TBL-HOUKNSKBN(IDX)  NOT =  ZERO)
-                   AND    (FLG-SRYCD1              =   1  )
+      **>      IF      TBL-HOUKNSKBN(IDX)   =   ZERO
+      **>      OR      FLG-SRYCD1           =    1
+      **>          IF     (TBL-HOUKNSKBN(IDX)  NOT =  ZERO)
+      **>          AND    (FLG-SRYCD1              =   1  )
                      IF    IDX  =   1
                        MOVE  TBL-HOUKNSKBN(IDX)  TO  WRK-TNS-HOUKNSKBN
                      END-IF
                      IF  TBL-DATAKBN (IDX)   NOT =   "2"
                        ADD     1                 TO  WRK-KOUMOKUSU
                      END-IF
-                   END-IF
+      **>          END-IF
                    ADD     1                        TO  WRK-ZAIWMAX (3)
                    MOVE    WRK-ZAIWMAX (3)          TO  IDZ
                    MOVE    TBL-NAMEINF (IDX)   TO
@@ -1996,74 +1860,74 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                            PERFORM 200511-GJK-DAY-ADD-SEC
                    END-IF
                    ADD     1                   TO  IDX                     
-               ELSE
-                   IF      IDX             =   1
-                       MOVE    TBL-HOUKNSKBN(IDX)
-                                           TO  WRK-TNS-HOUKNSKBN         
-                   END-IF                                
-                   MOVE    ZERO            TO  WRK-YUKOKETA
-                   MOVE    SPACE           TO  WRK-NAME
-                   MOVE    TBL-SRYCD (IDX) TO  WRK-SRYCD
-                   PERFORM     UNTIL   IDX >       WRK-KENSA-MAX
-                               OR      TBL-SRYCD (IDX) (1:1)
-                                           NOT =   WRK-SRYCD
-      *                次の名称があるとき”、”＋名称をつける
-                       IF      WRK-YUKOKETA    >   ZERO
-                           STRING  WRK-NAME    DELIMITED  BY  SPACE
-                                   "，"        DELIMITED  BY  SIZE
-                                   INTO        WRK-NAME
-                           END-STRING        
-                           ADD     2           TO  WRK-YUKOKETA
-      *              
-                           COMPUTE IDZ     =   WRK-YUKOKETA        +
-                                               TBL-YUKOKETA (IDX)  *  2
-                           IF      IDZ             >   38
-                               ADD     1               TO
-                                                   WRK-ZAIWMAX (3)
-                               MOVE    WRK-ZAIWMAX (3) TO  IDZ
-                               MOVE    WRK-NAME        TO
-                                           TBL-ZAIW-NAME(3 IDZ)
-                               COMPUTE TBL-ZAIW-YUKOKETA (3 IDZ) 
-                                           =   WRK-YUKOKETA   /   2  
-                               MOVE    SPACE           TO  WRK-NAME
-                               MOVE    ZERO            TO  WRK-YUKOKETA
-                           END-IF
-                       END-IF
-      *
-                       IF      TBL-YUKOKETA (IDX)  >   19
-                           ADD     1               TO  WRK-ZAIWMAX (3)
-                           MOVE    WRK-ZAIWMAX (3) TO  IDZ
-                           MOVE    TBL-NAME (IDX) (1:38)   TO
-                                       TBL-ZAIW-NAME    (3 IDZ)
-                           MOVE    19                      TO  
-                                       TBL-ZAIW-YUKOKETA(3 IDZ)
-                           MOVE    TBL-NAME (IDX) (39:)    TO  WRK-NAME
-                           COMPUTE WRK-YUKOKETA    =  
-                                   ( TBL-YUKOKETA (IDX) -   19 )  *   2                                           
-                       ELSE
-                           STRING  WRK-NAME        DELIMITED  BY  SPACE
-                                   TBL-NAME    (IDX)
-                                                   DELIMITED  BY  SPACE
-                                   INTO            WRK-NAME
-                           END-STRING
-                           COMPUTE WRK-YUKOKETA =  WRK-YUKOKETA   +
-                                       TBL-YUKOKETA (IDX)  *   2
-                       END-IF
-      *                 
-                       IF  TBL-DATAKBN (IDX)   NOT =   "2"
-                          ADD  1           TO  WRK-KOUMOKUSU
-                       END-IF
-                       ADD     1           TO  IDX
-                   END-PERFORM                            
-                   ADD     1               TO  WRK-ZAIWMAX (3)
-                   MOVE    WRK-ZAIWMAX (3) TO  IDZ
-                   MOVE    WRK-NAME    TO  TBL-ZAIW-NAME (3 IDZ)
-                   COMPUTE TBL-ZAIW-YUKOKETA (3 IDZ) 
-                                       =   WRK-YUKOKETA   /   2
-                   IF      (FLG-GAIJINKEN  =   1) 
-                           PERFORM 200512-GJK-DAY-ADD-SEC
-                   END-IF
-               END-IF                                        
+      **>      ELSE
+      **>          IF      IDX             =   1
+      **>              MOVE    TBL-HOUKNSKBN(IDX)
+      **>                                  TO  WRK-TNS-HOUKNSKBN
+      **>          END-IF
+      **>          MOVE    ZERO            TO  WRK-YUKOKETA
+      **>          MOVE    SPACE           TO  WRK-NAME
+      **>          MOVE    TBL-SRYCD (IDX) TO  WRK-SRYCD
+      **>          PERFORM     UNTIL   IDX >       WRK-KENSA-MAX
+      **>                      OR      TBL-SRYCD (IDX) (1:1)
+      **>                                  NOT =   WRK-SRYCD
+      **>              次の名称があるとき”、”＋名称をつける
+      **>              IF      WRK-YUKOKETA    >   ZERO
+      **>                  STRING  WRK-NAME    DELIMITED  BY  SPACE
+      **>                          "，"        DELIMITED  BY  SIZE
+      **>                          INTO        WRK-NAME
+      **>                  END-STRING
+      **>                  ADD     2           TO  WRK-YUKOKETA
+      **>
+      **>                  COMPUTE IDZ     =   WRK-YUKOKETA        +
+      **>                                      TBL-YUKOKETA (IDX)  *  2
+      **>                  IF      IDZ             >   38
+      **>                      ADD     1               TO
+      **>                                          WRK-ZAIWMAX (3)
+      **>                      MOVE    WRK-ZAIWMAX (3) TO  IDZ
+      **>                      MOVE    WRK-NAME        TO
+      **>                                  TBL-ZAIW-NAME(3 IDZ)
+      **>                      COMPUTE TBL-ZAIW-YUKOKETA (3 IDZ)
+      **>                                  =   WRK-YUKOKETA   /   2
+      **>                      MOVE    SPACE           TO  WRK-NAME
+      **>                      MOVE    ZERO            TO  WRK-YUKOKETA
+      **>                  END-IF
+      **>              END-IF
+      **>
+      **>              IF      TBL-YUKOKETA (IDX)  >   19
+      **>                  ADD     1               TO  WRK-ZAIWMAX (3)
+      **>                  MOVE    WRK-ZAIWMAX (3) TO  IDZ
+      **>                  MOVE    TBL-NAME (IDX) (1:38)   TO
+      **>                              TBL-ZAIW-NAME    (3 IDZ)
+      **>                  MOVE    19                      TO
+      **>                              TBL-ZAIW-YUKOKETA(3 IDZ)
+      **>                  MOVE    TBL-NAME (IDX) (39:)    TO  WRK-NAME
+      **>                  COMPUTE WRK-YUKOKETA    =
+      **>                          ( TBL-YUKOKETA (IDX) -   19 )  *   2
+      **>              ELSE
+      **>                  STRING  WRK-NAME        DELIMITED  BY  SPACE
+      **>                          TBL-NAME    (IDX)
+      **>                                          DELIMITED  BY  SPACE
+      **>                          INTO            WRK-NAME
+      **>                  END-STRING
+      **>                  COMPUTE WRK-YUKOKETA =  WRK-YUKOKETA   +
+      **>                              TBL-YUKOKETA (IDX)  *   2
+      **>              END-IF
+      **>
+      **>              IF  TBL-DATAKBN (IDX)   NOT =   "2"
+      **>                 ADD  1           TO  WRK-KOUMOKUSU
+      **>              END-IF
+      **>              ADD     1           TO  IDX
+      **>          END-PERFORM
+      **>          ADD     1               TO  WRK-ZAIWMAX (3)
+      **>          MOVE    WRK-ZAIWMAX (3) TO  IDZ
+      **>          MOVE    WRK-NAME    TO  TBL-ZAIW-NAME (3 IDZ)
+      **>          COMPUTE TBL-ZAIW-YUKOKETA (3 IDZ)
+      **>                              =   WRK-YUKOKETA   /   2
+      **>          IF      (FLG-GAIJINKEN  =   1)
+      **>                  PERFORM 200512-GJK-DAY-ADD-SEC
+      **>          END-IF
+      **>      END-IF
            END-PERFORM
       *
       *    検査の項目数をコメントにセット
@@ -2271,9 +2135,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                IF      IDX1              =   3
                AND     WRK-ZAIWMAX(IDX1) >   ZERO
                    IF      RECE44-SRYKBN     >=  "33"       
-                       MOVE    RECE44-SYUTEN1    TO  WRK-ZAITENX
-                       MOVE    RECE44-ZAIKAISU   TO  WRK-ZAIKAISUX
-                       PERFORM 810-TENSUKAI-HEN-SEC
+                       INITIALIZE                    WRK-ZAI2
+                       MOVE    1                 TO  WRK-ZAI2-KISAIFLG
+                       IF      FLG-TEIGEN          =   1
+                         COMPUTE  WRK-ZAI2-TEN = RECE44-SYUTEN1 * -1
+                       ELSE
+                         MOVE  RECE44-SYUTEN1    TO  WRK-ZAI2-TEN
+                       END-IF
+                       MOVE    RECE44-ZAIKAISU   TO  WRK-ZAI2-KAISU
                        MOVE    WRK-TBLMAX        TO  IDY
                        PERFORM 440-TNSKAI-SET-SEC
                        MOVE    IDY               TO  WRK-TBLMAX 
@@ -2284,9 +2153,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                AND     WRK-ZAIWMAX(IDX1) >   ZERO
                AND     RECE44-KIZAITEN   >   ZERO
                    IF      RECE44-SRYKBN     >=  "33"   
-                       MOVE    RECE44-KIZAITEN   TO  WRK-ZAITENX
-                       MOVE    RECE44-ZAIKAISU   TO  WRK-ZAIKAISUX
-                       PERFORM 810-TENSUKAI-HEN-SEC
+                       INITIALIZE                    WRK-ZAI2
+                       MOVE    1                 TO  WRK-ZAI2-KISAIFLG
+                       IF      FLG-TEIGEN          =   1
+                         COMPUTE  WRK-ZAI2-TEN = RECE44-KIZAITEN * -1
+                       ELSE
+                         MOVE  RECE44-KIZAITEN   TO  WRK-ZAI2-TEN
+                       END-IF
+                       MOVE    RECE44-ZAIKAISU   TO  WRK-ZAI2-KAISU
                        MOVE    WRK-TBLMAX        TO  IDY
                        PERFORM 440-TNSKAI-SET-SEC
                        MOVE    IDY               TO  WRK-TBLMAX 
@@ -2299,9 +2173,14 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       ***          IF      RECE44-SRYKBN     >=  "31"   
       *                点数・回数セット
                        IF      RECE44-SRYKBN     >=   "33"
-                           MOVE    RECE44-YKZTEN     TO  WRK-ZAITENX
-                           MOVE    RECE44-ZAIKAISU   TO  WRK-ZAIKAISUX
-                           PERFORM 810-TENSUKAI-HEN-SEC
+                           INITIALIZE                    WRK-ZAI2
+                           MOVE    1        TO  WRK-ZAI2-KISAIFLG
+                           IF      FLG-TEIGEN          =   1
+                             COMPUTE  WRK-ZAI2-TEN = RECE44-YKZTEN * -1
+                           ELSE
+                             MOVE  RECE44-YKZTEN     TO  WRK-ZAI2-TEN
+                           END-IF
+                           MOVE    RECE44-ZAIKAISU   TO  WRK-ZAI2-KAISU
                            MOVE    WRK-TBLMAX        TO  IDY
                            PERFORM 440-TNSKAI-SET-SEC
                            MOVE    IDY               TO  WRK-TBLMAX 
@@ -2869,13 +2748,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                  WHEN     11
                  WHEN     12
       *
+                   INITIALIZE                    WRK-ZAI2
                    MOVE    SPACE             TO  WRK-ZAI
-                   MOVE    TBL-DENSHI-TEN(IDX6)  TO  WRK-ZAITENX
-                   MOVE    TBL-DENSHI-ZAIKAISU(IDX6)
-                                                 TO  WRK-ZAIKAISUX
-                   PERFORM 810-TENSUKAI-HEN-SEC
-                   MOVE    WRK-TNSKAI        TO  WRK-ZAI-TNSKAI
-      *
                    MOVE    "＊"              TO  WRK-ZAI-MK
                    EVALUATE  IDX6
                      WHEN      1
@@ -2913,40 +2787,98 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                                              TO  WRK-ZAI-NAME(1:20)
                    END-EVALUATE
       *
+                   INITIALIZE                          WRK-ZAI2
+                   MOVE  1                         TO  WRK-ZAI2-KISAIFLG
+                   MOVE  TBL-DENSHI-TEN(IDX6)      TO  WRK-ZAI2-TEN
+                   MOVE  TBL-DENSHI-ZAIKAISU(IDX6) TO  WRK-ZAI2-KAISU
+      *
                    MOVE    1                 TO  WRK-SET-LINENUM
                    PERFORM 20101-DENSHI-WRITE-SEC
       *
                  WHEN      4
-                 WHEN      5
-                 WHEN      6
-                 WHEN      7
       *
+                   INITIALIZE                    WRK-ZAI2
                    MOVE    SPACE             TO  WRK-ZAI
                    MOVE    "＊"              TO  WRK-ZAI-MK
-                   EVALUATE  IDX6
-                     WHEN      4
-                       MOVE  "再診（乳幼児時間外特例医療機関）加算"
-                                             TO  WRK-ZAI-NAME(1:36)
-                     WHEN      5
-                       MOVE  "小児科再診（乳幼児夜間）加算（６歳未満）"
-                                             TO  WRK-ZAI-NAME(1:40)
-                     WHEN      6
-                       MOVE  "小児科再診（乳幼児休日）加算（６歳未満）"
-                                             TO  WRK-ZAI-NAME(1:40)
-                     WHEN      7
-                       MOVE  "小児科再診（乳幼児深夜）加算（６歳未満）"
-                                             TO  WRK-ZAI-NAME(1:40)
-                   END-EVALUATE
+                   MOVE    "再診（乳幼児時間外特例医療機＆"
+                                             TO  WRK-ZAI-NAME(1:30)
       *
                    MOVE    1                 TO  WRK-SET-LINENUM
                    PERFORM 20101-DENSHI-WRITE-SEC
       *@
                    MOVE    SPACE             TO  WRK-ZAI
-                   MOVE    TBL-DENSHI-TEN(IDX6)  TO  WRK-ZAITENX
-                   MOVE    TBL-DENSHI-ZAIKAISU(IDX6)
-                                                 TO  WRK-ZAIKAISUX
-                   PERFORM 810-TENSUKAI-HEN-SEC
-                   MOVE    WRK-TNSKAI        TO  WRK-ZAI-TNSKAI
+                   MOVE    "関）加算"        TO  WRK-ZAI-NAME(1:8)
+      *
+                   INITIALIZE                          WRK-ZAI2
+                   MOVE  1                         TO  WRK-ZAI2-KISAIFLG
+                   MOVE  TBL-DENSHI-TEN(IDX6)      TO  WRK-ZAI2-TEN
+                   MOVE  TBL-DENSHI-ZAIKAISU(IDX6) TO  WRK-ZAI2-KAISU
+      *
+                   MOVE    2                 TO  WRK-SET-LINENUM
+                   PERFORM 20101-DENSHI-WRITE-SEC
+      *
+                 WHEN      5
+      *
+                   INITIALIZE                    WRK-ZAI2
+                   MOVE    SPACE             TO  WRK-ZAI
+                   MOVE    "＊"              TO  WRK-ZAI-MK
+                   MOVE    "小児科再診（乳幼児夜間）加算＆"
+                                             TO  WRK-ZAI-NAME(1:30)
+      *
+                   MOVE    1                 TO  WRK-SET-LINENUM
+                   PERFORM 20101-DENSHI-WRITE-SEC
+      *@
+                   MOVE    SPACE             TO  WRK-ZAI
+                   MOVE    "（６歳未満）"    TO  WRK-ZAI-NAME(1:12)
+      *
+                   INITIALIZE                          WRK-ZAI2
+                   MOVE  1                         TO  WRK-ZAI2-KISAIFLG
+                   MOVE  TBL-DENSHI-TEN(IDX6)      TO  WRK-ZAI2-TEN
+                   MOVE  TBL-DENSHI-ZAIKAISU(IDX6) TO  WRK-ZAI2-KAISU
+      *
+                   MOVE    2                 TO  WRK-SET-LINENUM
+                   PERFORM 20101-DENSHI-WRITE-SEC
+      *
+                 WHEN      6
+      *
+                   INITIALIZE                    WRK-ZAI2
+                   MOVE    SPACE             TO  WRK-ZAI
+                   MOVE    "＊"              TO  WRK-ZAI-MK
+                   MOVE    "小児科再診（乳幼児休日）加算＆"
+                                             TO  WRK-ZAI-NAME(1:30)
+      *
+                   MOVE    1                 TO  WRK-SET-LINENUM
+                   PERFORM 20101-DENSHI-WRITE-SEC
+      *@
+                   MOVE    SPACE             TO  WRK-ZAI
+                   MOVE    "（６歳未満）"    TO  WRK-ZAI-NAME(1:12)
+      *
+                   INITIALIZE                          WRK-ZAI2
+                   MOVE  1                         TO  WRK-ZAI2-KISAIFLG
+                   MOVE  TBL-DENSHI-TEN(IDX6)      TO  WRK-ZAI2-TEN
+                   MOVE  TBL-DENSHI-ZAIKAISU(IDX6) TO  WRK-ZAI2-KAISU
+      *
+                   MOVE    2                 TO  WRK-SET-LINENUM
+                   PERFORM 20101-DENSHI-WRITE-SEC
+      *
+                 WHEN      7
+      *
+                   INITIALIZE                    WRK-ZAI2
+                   MOVE    SPACE             TO  WRK-ZAI
+                   MOVE    "＊"              TO  WRK-ZAI-MK
+                   MOVE    "小児科再診（乳幼児深夜）加算＆"
+                                             TO  WRK-ZAI-NAME(1:30)
+      *
+                   MOVE    1                 TO  WRK-SET-LINENUM
+                   PERFORM 20101-DENSHI-WRITE-SEC
+      *@
+                   MOVE    SPACE             TO  WRK-ZAI
+                   MOVE    "（６歳未満）"    TO  WRK-ZAI-NAME(1:12)
+      *
+                   INITIALIZE                          WRK-ZAI2
+                   MOVE  1                         TO  WRK-ZAI2-KISAIFLG
+                   MOVE  TBL-DENSHI-TEN(IDX6)      TO  WRK-ZAI2-TEN
+                   MOVE  TBL-DENSHI-ZAIKAISU(IDX6) TO  WRK-ZAI2-KAISU
       *
                    MOVE    2                 TO  WRK-SET-LINENUM
                    PERFORM 20101-DENSHI-WRITE-SEC
@@ -3036,6 +2968,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
            MOVE    SPACE             TO  RECE46-SRYSYUKBN
            MOVE    ZERO              TO  RECE46-DAY
       *
+           MOVE    WRK-ZAI2          TO  RECE46-TEKIYO2-INF
+      *
            WRITE   RECE46-REC
            ADD     1                 TO  CNT-RECE46
       *
@@ -3052,33 +2986,19 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
            MOVE    SPACE               TO  WRK-ZAI
            MOVE    "＊"                TO  WRK-ZAI-MK
       *    点数・回数セット
-           MOVE    WRK-TENSUGOKEI      TO  WRK-ZAITENX
-           MOVE    RECE44-ZAIKAISU     TO  WRK-ZAIKAISUX
-      *    必要有効桁数・開始位置・回数編集
-           PERFORM 810-TENSUKAI-HEN-SEC
+           INITIALIZE                      WRK-ZAI2
+           MOVE    1                   TO  WRK-ZAI2-KISAIFLG
+           IF      FLG-TEIGEN          =   1
+             COMPUTE  WRK-ZAI2-TEN = WRK-TENSUGOKEI * -1
+           ELSE
+             MOVE  WRK-TENSUGOKEI      TO  WRK-ZAI2-TEN
+           END-IF
+           MOVE    RECE44-ZAIKAISU     TO  WRK-ZAI2-KAISU
       *
            .
        400-TENSU-SAIKEISAN-EXT.
            EXIT.
       *
-      *****************************************************************
-      *    明細空白処理
-      *****************************************************************
-       410-MEISAI-SPACE-SEC   SECTION.
-      *
-           PERFORM   VARYING   IDY   FROM    1   BY  1
-                     UNTIL     IDY   >       WRK-TBLMAX
-               IF  IDY                   =   1
-                   MOVE    SPACE         TO  TBL-ZAI (IDY)(3:)
-               ELSE
-                   INITIALIZE                TBL-ZAI (IDY)
-               END-IF
-           END-PERFORM
-           MOVE    1                 TO  WRK-TBLMAX
-      *
-           .
-       410-MEISAI-SPACE-EXT.
-           EXIT.
       *****************************************************************
       *    剤テーブル編集処理
       *****************************************************************
@@ -3092,26 +3012,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *
       *    明細編集・明細桁数計算
            PERFORM 4302-MEISAI-KETA-HEN1-SEC
-      *
-      *    剤・診療行為テーブル編集処理
-           PERFORM 4303-ZAITBL-TENSO-SEC
-      *    
-      *    明細が１行に収まりきらない場合
-           IF  WRK-WCLM            >   50
-               MOVE    SPACE             TO  WRK-ZAI-NAME
-               MOVE    WRK-KOUI (51:)    TO  WRK-ZAI-NAME
-               PERFORM 4303-ZAITBL-TENSO-SEC
-           END-IF
-           IF  WRK-WCLM            >   100
-               MOVE    SPACE             TO  WRK-ZAI-NAME
-               MOVE    WRK-KOUI (101:)   TO  WRK-ZAI-NAME
-               PERFORM 4303-ZAITBL-TENSO-SEC
-           END-IF
-           IF  WRK-WCLM            >   150
-               MOVE    SPACE             TO  WRK-ZAI-NAME
-               MOVE    WRK-KOUI (151:)   TO  WRK-ZAI-NAME
-               PERFORM 4303-ZAITBL-TENSO-SEC
-           END-IF
       *
            .
        430-TBLZAI-HEN-EXT.
@@ -3330,145 +3230,140 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                COMPUTE   WRK-NAMEKETA  =
                          TBL-ZAIW-YUKOKETA (WRK-WIDX1 WRK-WIDX2)
                          *   2
-      *        -----------------------------------
-      *        １明細に数量単位まで収まるかどうか
-      *        -----------------------------------
-               EVALUATE    TRUE
-               WHEN    WRK-NAMEKETA    >   50
-      *            明細行
-                   MOVE    TBL-ZAIW-NAME (WRK-WIDX1 WRK-WIDX2)
-                                       TO  WRK-KOUI
-                   MOVE    WRK-KOUI    TO  WRK-ZAI-NAME
-                   PERFORM 4303-ZAITBL-TENSO-SEC
       *
-                   MOVE    SPACE       TO  WRK-KOUI
-                   MOVE    SPACE       TO  WRK-ZAI-NAME
-                   COMPUTE WRK-NAMEKETA    =   WRK-NAMEKETA  -  50
-      *   　       < 名称後半 + 空白 + 数量 + 単位 + 分画数>
-                   STRING  TBL-ZAIW-NAME     (WRK-WIDX1 WRK-WIDX2)
-                                             (51:WRK-NAMEKETA)
-                                              DELIMITED  BY  SIZE
-                           "  "               DELIMITED  BY  SIZE
-                           WRK-SRYSURYOW      DELIMITED  BY  " "
-                           TBL-ZAIW-TANINAME (WRK-WIDX1 WRK-WIDX2)
-                                              DELIMITED  BY  " "
-                           "  "               DELIMITED  BY  SIZE
-                           WRK-BUNKAKU-N      DELIMITED  BY  " "
-                           INTO               WRK-KOUI
-                   END-STRING
-                   COMPUTE   WRK-WCLM
-                         =   ( WRK-SURYOKETA                  *   2 )
-                         +   ( TBL-ZAIW-TANIMOJISU (WRK-WIDX1 WRK-WIDX2)
-                                                              *   2 )
-                         +   WRK-NAMEKETA  +  2
-                   IF      WRK-BUNKAKUKETA        >   ZERO
-                       COMPUTE   WRK-WCLM    =   WRK-WCLM         +
-                                                 WRK-BUNKAKUKETA  +
-                                                 2
-                   END-IF                                             
-      *
-               WHEN    WRK-NAMEKETA    =   50
-      *            数量・単位　次行印字処理
-                   PERFORM 43021-SURYO-NEXTPRT-SEC
-      *
-               WHEN    WRK-NAMEKETA    <   50
-      *            間の空白分を足し込む
-                   COMPUTE   WRK-NAMEKETA  =   WRK-NAMEKETA   +   2
-                   IF  WRK-NAMEKETA    <   50
-      *                余白
-                       COMPUTE   WRK-YOHAKU  =   50  -   WRK-NAMEKETA
-      *                数量・分画数桁数
-                       COMPUTE   WRK-WKETA   =
-                         ( WRK-SURYOKETA                  * 2 )
-                             +
-                         ( TBL-ZAIW-TANIMOJISU (WRK-WIDX1 WRK-WIDX2)
-                                                          * 2 )
-                       IF      WRK-BUNKAKUKETA   >   ZERO
-                           COMPUTE   WRK-WKETA   =   WRK-WKETA        +
-                                                     WRK-BUNKAKUKETA  +
-                                                     2
-                       END-IF                                             
-      *
-                       IF  WRK-YOHAKU        >=  WRK-WKETA
-      *                    < 名称 + 空白 + 数量 + 単位 + 空白 + 分画数>
-      ********************STRING  TBL-ZAIW-NAME (WRK-WIDX1 WRK-WIDX2)
-      ********************                        DELIMITED  BY  " "
-      ********************         "  "           DELIMITED  BY  SIZE
-                          STRING  TBL-ZAIW-NAME (WRK-WIDX1 WRK-WIDX2)
-                                                (1:WRK-NAMEKETA)
-                                                  DELIMITED  BY  SIZE
-                                   WRK-SRYSURYOW  DELIMITED  BY  " "
-                                   TBL-ZAIW-TANINAME
-                                                 (WRK-WIDX1 WRK-WIDX2)
-                                                  DELIMITED  BY  " "
-                                   "  "           DELIMITED  BY  SIZE
-                                   WRK-BUNKAKU-N  DELIMITED  BY  " "
-                                   INTO           WRK-KOUI
-                           END-STRING
-      *                    < 名称*2 + 空白*2 + 数量 + 単位*2 + 空白 + 分画数>
-                           COMPUTE   WRK-WCLM     =
-                               ( TBL-ZAIW-YUKOKETA 
-                                         (WRK-WIDX1 WRK-WIDX2)  * 2 )
-                             + ( WRK-SURYOKETA                  * 2 )
-                             + ( TBL-ZAIW-TANIMOJISU 
-                                         (WRK-WIDX1 WRK-WIDX2)  * 2 )
-                             +  2
-                           IF      WRK-BUNKAKUKETA   >   ZERO
-                               COMPUTE   WRK-WCLM   =   WRK-WCLM      +
-                                                     WRK-BUNKAKUKETA  +
-                                                     2
-                           END-IF                                             
-                       ELSE
-      *                    数量・単位　次行印字処理
-                           PERFORM 43021-SURYO-NEXTPRT-SEC
-                       END-IF
-                   ELSE
-      *                数量・単位　次行印字処理
-                       PERFORM 43021-SURYO-NEXTPRT-SEC
-                   END-IF
-               END-EVALUATE
+      *        ＜名称 + 空白 + 数量 + 単位 + 分画数＞
+               IF      WRK-BUNKAKUKETA        >   ZERO
+                 STRING  TBL-ZAIW-NAME(WRK-WIDX1 WRK-WIDX2)
+                                           (1:WRK-NAMEKETA)
+                                            DELIMITED  BY  SIZE
+                         "　　"             DELIMITED  BY  SIZE
+                         WRK-SRYSURYOW      DELIMITED  BY  " "
+                         TBL-ZAIW-TANINAME (WRK-WIDX1 WRK-WIDX2)
+                                            DELIMITED  BY  " "
+                         "　　"             DELIMITED  BY  SIZE
+                         WRK-BUNKAKU-N      DELIMITED  BY  " "
+                         INTO               WRK-KOUI
+                 END-STRING
+               ELSE
+                 STRING  TBL-ZAIW-NAME(WRK-WIDX1 WRK-WIDX2)
+                                           (1:WRK-NAMEKETA)
+                                            DELIMITED  BY  SIZE
+                         "　　"             DELIMITED  BY  SIZE
+                         WRK-SRYSURYOW      DELIMITED  BY  " "
+                         TBL-ZAIW-TANINAME (WRK-WIDX1 WRK-WIDX2)
+                                            DELIMITED  BY  " "
+                         INTO               WRK-KOUI
+                 END-STRING
+               END-IF
+               COMPUTE   WRK-WCLM
+                     =   ( WRK-SURYOKETA                  *   2 )
+                     +   ( TBL-ZAIW-TANIMOJISU (WRK-WIDX1 WRK-WIDX2)
+                                                          *   2 )
+                     +   WRK-NAMEKETA  +  4
+               IF      WRK-BUNKAKUKETA        >   ZERO
+                   COMPUTE   WRK-WCLM    =   WRK-WCLM         +
+                                             WRK-BUNKAKUKETA  +
+                                             4
+               END-IF
            END-IF
-           MOVE    WRK-KOUI        TO  WRK-ZAI-NAME
+      *
+           EVALUATE    TRUE
+             WHEN    WRK-WCLM    <=  30
+                   MOVE    SPACE             TO  WRK-ZAI-NAME
+                   MOVE    WRK-KOUI          TO  WRK-ZAI-NAME
+                   PERFORM 4303-ZAITBL-TENSO-SEC
+             WHEN    WRK-WCLM    <=  58
+                   PERFORM  VARYING  IDX8   FROM   1   BY  28
+                             UNTIL   IDX8    >    28
+                     MOVE  SPACE             TO  WRK-ZAI-NAME
+                     MOVE  WRK-KOUI(IDX8:28) TO  WRK-ZAI-NAME(1:28)
+                     MOVE  "＆"              TO  WRK-ZAI-NAME(29:2)
+                     PERFORM 4303-ZAITBL-TENSO-SEC
+                   END-PERFORM
+                   MOVE    SPACE             TO  WRK-ZAI-NAME
+                   MOVE    WRK-KOUI(29:30)   TO  WRK-ZAI-NAME
+                   PERFORM 4303-ZAITBL-TENSO-SEC
+             WHEN    WRK-WCLM    <=  86
+                   PERFORM  VARYING  IDX8   FROM   1   BY  28
+                             UNTIL   IDX8    >    56
+                     MOVE  SPACE             TO  WRK-ZAI-NAME
+                     MOVE  WRK-KOUI(IDX8:28) TO  WRK-ZAI-NAME(1:28)
+                     MOVE  "＆"              TO  WRK-ZAI-NAME(29:2)
+                     PERFORM 4303-ZAITBL-TENSO-SEC
+                   END-PERFORM
+                   MOVE    SPACE             TO  WRK-ZAI-NAME
+                   MOVE    WRK-KOUI(57:30)   TO  WRK-ZAI-NAME
+                   PERFORM 4303-ZAITBL-TENSO-SEC
+             WHEN    WRK-WCLM    <=  114
+                   PERFORM  VARYING  IDX8   FROM   1   BY  28
+                             UNTIL   IDX8    >    84
+                     MOVE  SPACE             TO  WRK-ZAI-NAME
+                     MOVE  WRK-KOUI(IDX8:28) TO  WRK-ZAI-NAME(1:28)
+                     MOVE  "＆"              TO  WRK-ZAI-NAME(29:2)
+                     PERFORM 4303-ZAITBL-TENSO-SEC
+                   END-PERFORM
+                   MOVE    SPACE             TO  WRK-ZAI-NAME
+                   MOVE    WRK-KOUI(85:30)   TO  WRK-ZAI-NAME
+                   PERFORM 4303-ZAITBL-TENSO-SEC
+             WHEN    WRK-WCLM    <=  142
+                   PERFORM  VARYING  IDX8   FROM   1   BY  28
+                             UNTIL   IDX8    >   112
+                     MOVE  SPACE             TO  WRK-ZAI-NAME
+                     MOVE  WRK-KOUI(IDX8:28) TO  WRK-ZAI-NAME(1:28)
+                     MOVE  "＆"              TO  WRK-ZAI-NAME(29:2)
+                     PERFORM 4303-ZAITBL-TENSO-SEC
+                   END-PERFORM
+                   MOVE    SPACE             TO  WRK-ZAI-NAME
+                   MOVE    WRK-KOUI(113:30)  TO  WRK-ZAI-NAME
+                   PERFORM 4303-ZAITBL-TENSO-SEC
+             WHEN    WRK-WCLM    <=  170
+                   PERFORM  VARYING  IDX8   FROM   1   BY  28
+                             UNTIL   IDX8    >   140
+                     MOVE  SPACE             TO  WRK-ZAI-NAME
+                     MOVE  WRK-KOUI(IDX8:28) TO  WRK-ZAI-NAME(1:28)
+                     MOVE  "＆"              TO  WRK-ZAI-NAME(29:2)
+                     PERFORM 4303-ZAITBL-TENSO-SEC
+                   END-PERFORM
+                   MOVE    SPACE             TO  WRK-ZAI-NAME
+                   MOVE    WRK-KOUI(141:30)  TO  WRK-ZAI-NAME
+                   PERFORM 4303-ZAITBL-TENSO-SEC
+             WHEN    WRK-WCLM    <=  198
+                   PERFORM  VARYING  IDX8   FROM   1   BY  28
+                             UNTIL   IDX8    >   168
+                     MOVE  SPACE             TO  WRK-ZAI-NAME
+                     MOVE  WRK-KOUI(IDX8:28) TO  WRK-ZAI-NAME(1:28)
+                     MOVE  "＆"              TO  WRK-ZAI-NAME(29:2)
+                     PERFORM 4303-ZAITBL-TENSO-SEC
+                   END-PERFORM
+                   MOVE    SPACE             TO  WRK-ZAI-NAME
+                   MOVE    WRK-KOUI(169:30)  TO  WRK-ZAI-NAME
+                   PERFORM 4303-ZAITBL-TENSO-SEC
+             WHEN    WRK-WCLM    <=  226
+                   PERFORM  VARYING  IDX8   FROM   1   BY  28
+                             UNTIL   IDX8    >   196
+                     MOVE  SPACE             TO  WRK-ZAI-NAME
+                     MOVE  WRK-KOUI(IDX8:28) TO  WRK-ZAI-NAME(1:28)
+                     MOVE  "＆"              TO  WRK-ZAI-NAME(29:2)
+                     PERFORM 4303-ZAITBL-TENSO-SEC
+                   END-PERFORM
+                   MOVE    SPACE             TO  WRK-ZAI-NAME
+                   MOVE    WRK-KOUI(197:30)  TO  WRK-ZAI-NAME
+                   PERFORM 4303-ZAITBL-TENSO-SEC
+             WHEN    WRK-WCLM    >   226
+                   PERFORM  VARYING  IDX8   FROM   1   BY  28
+                             UNTIL   IDX8    >   224
+                     MOVE  SPACE             TO  WRK-ZAI-NAME
+                     MOVE  WRK-KOUI(IDX8:28) TO  WRK-ZAI-NAME(1:28)
+                     MOVE  "＆"              TO  WRK-ZAI-NAME(29:2)
+                     PERFORM 4303-ZAITBL-TENSO-SEC
+                   END-PERFORM
+                   MOVE    SPACE             TO  WRK-ZAI-NAME
+                   MOVE    WRK-KOUI(225:26)  TO  WRK-ZAI-NAME
+                   PERFORM 4303-ZAITBL-TENSO-SEC
+           END-EVALUATE
       *
            .
        4302-MEISAI-KETA-HEN1-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    数量・単位　次行編集処理
-      *****************************************************************
-       43021-SURYO-NEXTPRT-SEC    SECTION.
-      *
-      *    < 名称 >
-           MOVE    TBL-ZAIW-NAME (WRK-WIDX1 WRK-WIDX2)
-                                      TO  WRK-KOUI
-           MOVE    WRK-KOUI           TO  WRK-ZAI-NAME
-           PERFORM 4303-ZAITBL-TENSO-SEC
-      *
-           MOVE    SPACE              TO  WRK-KOUI
-           MOVE    SPACE              TO  WRK-ZAI-NAME
-      *    < 空白 + 数量 + 単位 + 空白 + 分画数>
-           STRING  "    "             DELIMITED  BY  SIZE
-                   WRK-SRYSURYOW      DELIMITED  BY  " "
-                   TBL-ZAIW-TANINAME (WRK-WIDX1 WRK-WIDX2)
-                                      DELIMITED  BY  " "
-                   "  "               DELIMITED  BY  SIZE
-                   WRK-BUNKAKU-N      DELIMITED  BY  " "
-                   INTO               WRK-KOUI
-           END-STRING
-           COMPUTE   WRK-WCLM
-                 =   ( WRK-SURYOKETA                  *   2 )
-                 +   ( TBL-ZAIW-TANIMOJISU (WRK-WIDX1 WRK-WIDX2)
-                                                      *   2 )
-                 +   4
-           IF      WRK-BUNKAKUKETA   >   ZERO
-               COMPUTE   WRK-WCLM   =   WRK-WCLM         +
-                                        WRK-BUNKAKUKETA  +
-                                        2
-           END-IF                                             
-      *
-           .
-       43021-SURYO-NEXTPRT-EXT.
            EXIT.
       *
       *****************************************************************
@@ -3478,7 +3373,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *
            ADD     1                 TO  WRK-TBLMAX
            IF  WRK-TBLMAX           >   100
-               DISPLAY "*** ORCR0460 TBL-ZAI INDEX[100] OVER  ***"
+               DISPLAY "*** ORCR0461 TBL-ZAI INDEX[100] OVER  ***"
            ELSE
                MOVE    WRK-ZAI       TO  TBL-ZAI (WRK-TBLMAX)
                MOVE    SPACE         TO  WRK-ZAI
@@ -3493,8 +3388,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *****************************************************************
        440-TNSKAI-SET-SEC          SECTION.
       *
-      *---- (01.00.05) LINE ADD START --------------------------------
-      ***  IF   RECE44-ZAIKBN      =    1 OR 2
            IF   RECE44-ZAIKBN      =    2
              CONTINUE
            ELSE
@@ -3515,35 +3408,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                   GO  TO  440-TNSKAI-SET-EXT
              END-IF
            END-IF
-      *---- (01.00.05) LINE ADD END   --------------------------------
-      *         
-           MOVE    WRK-TNSKAI-ST     TO  IDA
-           COMPUTE   IDA             =   IDA     -   2
-           MOVE    WRK-TNSKAI-KETA   TO  IDB
-      *****MOVE    WRK-TBLMAX       TO  IDY
       *
-      *    最終明細に点数・回数を印字するスペース有り
-           MOVE    TBL-ZAI (IDY)(3:)     TO  WRK-ZAI-NAME
-           IF  WRK-ZAI-NAME (IDA:)       =   SPACE
-               COMPUTE   WRK-TNSKAI-ST   =   22
-                                         -   WRK-TNSKAI-KETA
-               ADD     1                 TO  WRK-TNSKAI-ST
-               MOVE    WRK-TNSKAI (WRK-TNSKAI-ST:IDB)
-                                         TO  WRK-ZAI-TNSKAI
-                                                    (WRK-TNSKAI-ST:)
-               MOVE    WRK-ZAI-NAME      TO  TBL-ZAI (IDY)(3:)
-           ELSE
-      *    最終明細に点数・回数を印字するスペース無し
-               ADD     1                 TO  IDY
-               IF  IDY                   >   100
-                   DISPLAY "*#* ORCR0460 TBL-ZAI INDEX[100] OVER  ***"
-               ELSE
-                   MOVE    SPACE         TO  WRK-ZAI
-                   MOVE    WRK-TNSKAI    TO  WRK-ZAI-TNSKAI
-                   MOVE    WRK-ZAI       TO  TBL-ZAI (IDY)
-                   MOVE    SPACE         TO  WRK-ZAI
-               END-IF
-           END-IF
+           MOVE    WRK-ZAI2    TO   TBL-ZAI2(IDY)
       *
            .
        440-TNSKAI-SET-EXT.
@@ -3698,9 +3564,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                  END-IF
                END-IF
       *
+               MOVE    TBL-ZAI2(IDY)     TO  RECE46-TEKIYO2-INF
+      *
                WRITE   RECE46-REC
                IF  STS-RECE46          NOT =   ZERO
-                   DISPLAY "*** ORCR0460 RECE46 WRITE ERR  ***"
+                   DISPLAY "*** ORCR0461 RECE46 WRITE ERR  ***"
                    MOVE   WRK-TBLMAX     TO  IDY
                    MOVE    2             TO  SPA-STS                       
                ELSE
@@ -3810,7 +3678,7 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
            DISPLAY "RECE41  IN  " CNT-RECE41   
            DISPLAY "RECE46  CNT " CNT-RECE46 
-           DISPLAY "*** ORCR0460 END ***"
+           DISPLAY "*** ORCR0461 END ***"
       *
            .
        300-END-EXT.
@@ -3854,53 +3722,6 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            EXIT.
       *
       *****************************************************************
-      *    点数・回数編集処理
-      *****************************************************************
-       810-TENSUKAI-HEN-SEC    SECTION.
-      *    点数編集
-           INITIALIZE                      WRK-CHAR-HENKAN-AREA
-           MOVE    WRK-ZAITENX         TO  WRK-CHAR-X
-           MOVE    7                   TO  WRK-CHAR-CNT
-           PERFORM 800-NUM-ZENKAKU-HENKAN-SEC
-           MOVE    WRK-CHAR-N          TO  WRK-ZAITEN
-      *    回数編集
-           INITIALIZE                      WRK-CHAR-HENKAN-AREA
-           MOVE    WRK-ZAIKAISUX       TO  WRK-CHAR-X
-           MOVE    3                   TO  WRK-CHAR-CNT
-           PERFORM 800-NUM-ZENKAKU-HENKAN-SEC
-           MOVE    WRK-CHAR-N          TO  WRK-ZAIKAISU
-           MOVE    "×"                TO  WRK-X
-      *
-      *    薬剤料逓減のとき点数のまえに▲を表示
-           IF      FLG-TEIGEN          =   1
-               PERFORM VARYING IDZ FROM    13  BY  -2
-                       UNTIL   IDZ <       3
-                   IF      WRK-ZAITEN (IDZ:2)  =   SPACE
-                       MOVE    "▲"        TO  WRK-ZAITEN (IDZ:2)
-                       MOVE    1           TO  IDZ
-                   END-IF
-               END-PERFORM
-           END-IF
-      *
-      *
-      *    必要有効桁数（点数ZZZZZZZ X 数量ZZZ の全角の桁数）
-           MOVE    ZERO                TO  WRK-TNSKAI-KETA
-           PERFORM VARYING   IDZ     FROM    1   BY  1
-                   UNTIL     IDZ     >       22
-               IF      WRK-TNSKAI (IDZ:1)      NOT =   SPACE
-                   COMPUTE WRK-TNSKAI-KETA   =   22  -  IDZ     +   1
-                   MOVE    22                  TO  IDZ
-               END-IF 
-           END-PERFORM
-      *    開始位置を取得
-           COMPUTE   WRK-TNSKAI-ST     =   ( 50  -  WRK-TNSKAI-KETA )
-                                       +   1
-      *
-           .
-       810-TENSUKAI-HEN-EXT.
-           EXIT.
-      *
-      *****************************************************************
       *    レセプト０２データ順検索処理
       *****************************************************************
        990-RECE41-READ-SEC           SECTION.
@@ -3917,6 +3738,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
       *
                    IF    (WRK-PARA-RECEKBN       =  "4")
                    AND   (WRK-PARA-JIBAIPRTKBN   =  "2")
+                       CONTINUE
+                   ELSE
                        GO  TO  990-RECE41-READ-SEC
                    END-IF
       *

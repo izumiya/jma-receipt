@@ -27,6 +27,9 @@
       *  03.05.01    NACL-門脇    07.06.01  グループ診療対応
       *  04.04.01    NACL-門脇    10/03/29  診療日２の追加
       *  04.05.01    NACL-門脇    10/01/19  剤区分追加
+      *
+      *  04.07.01    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
+      *                                     追加対応
       ************************************************************
       *01  RECE86-REC.
            03  RECE86-KEY.
@@ -94,3 +97,9 @@
            03  RECE86-ZAIKBN              PIC  9(03).
       *診療日２
            03  RECE86-DAY2                PIC  9(02).
+      *適要欄情報２
+           03  RECE86-TEKIYO2-INF.
+               05  RECE86-TEKIYO2-KISAIFLG  PIC  9(01).
+               05  RECE86-TEKIYO2-YENFLG    PIC  9(01).
+               05  RECE86-TEKIYO2-TEN       PIC S9(07).
+               05  RECE86-TEKIYO2-KAISU     PIC  9(03).

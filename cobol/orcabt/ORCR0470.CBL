@@ -53,6 +53,9 @@
       *
       *  04.05.01    NACL-門脇    09/06/10  摘要欄下部へのコメント記載対応
       *  04.05.02    NACL-門脇    10/01/21  治験対応
+      *
+      *  04.07.01    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
+      *                                     追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -310,7 +313,12 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    RECE46-SRYKA         TO      RECE47-SRYKA
            IF     (RECE46-SRYKBN          =  "99" )
            AND    (RECE46-SRYSYUKBN   NOT =  "991")
+             IF     (WRK-PARA-RECEKBN       =  "4")
+             AND    (WRK-PARA-JIBAIPRTKBN   =  "2")
+               MOVE  "01"               TO      RECE47-SRYKBN
+             ELSE
                MOVE  SPACE              TO      RECE47-SRYKBN
+             END-IF
            ELSE
                MOVE  RECE46-SRYKBN      TO      RECE47-SRYKBN
            END-IF
@@ -356,6 +364,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
            MOVE   RECE46-ZAIKBN      TO   RECE47-ZAIKBN
       *
            MOVE   RECE46-DAY2        TO   RECE47-DAY2
+      *
+           MOVE   RECE46-TEKIYO2-INF TO   RECE47-TEKIYO2-INF
       *
            IF     RECE46-SRYKBN  NOT =  "95" AND "96"
                PERFORM     2101-RECE47-WRITE-SEC

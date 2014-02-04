@@ -1592,8 +1592,9 @@ grpsys        PERFORM 900-DBSELECT-SEC
                                                  TO  SUM-NYUKHNKIN-JYU
                END-PERFORM
       *        <基本料>
-               MOVE    SPACE                 TO  HC23-NYUKHNTEN(8)
-                                                 HC23-NYUKHNTENN(8)
+               MOVE    SPACE                 TO  HC23-NYUKHNTEN  (8)
+                                                 HC23-NYUKHNTENN (8)
+                                                 HC23-NYUKHNTENN2(8)
       *        <日数>
                MOVE    SUM-NYUKHNNISSU       TO  WRK-KAISUZ
                MOVE    WRK-KAISUZ            TO  HC23-NYUKAISU(8)
@@ -1649,7 +1650,7 @@ grpsys        PERFORM 900-DBSELECT-SEC
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       9
                    OR      RECE82-NYUSYUBETU (IDX) =   SPACE
-               IF      RECE82-NYUSYUBETU (IDX) (13:)
+               IF      RECE82-NYUSYUBETU (IDX) (11:)
                                        =   SPACE
                    MOVE    RECE82-NYUSYUBETU (IDX)
                                          TO  HC23-NYUINSYUBETU (IDX)

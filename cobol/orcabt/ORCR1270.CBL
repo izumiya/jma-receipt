@@ -1859,7 +1859,7 @@
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       5
                    OR      RECE200-NYUSYUBETU (IDX) =   SPACE
-               IF      RECE200-NYUSYUBETU (IDX) (13:)
+               IF      RECE200-NYUSYUBETU (IDX) (11:)
                                        =   SPACE
                    MOVE    RECE200-NYUSYUBETU (IDX)
                                          TO  HCN58-NYUSYUBETU (IDX)

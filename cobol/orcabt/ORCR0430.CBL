@@ -128,6 +128,8 @@
       *  04.07.02    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.03    NACL-門脇    13/01/21  労災レセ電対応
       *  04.07.04    NACL-門脇    13/10/02  自賠責（第三者行為）対応
+      *  04.07.05    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
+      *                                     追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -303,6 +305,7 @@
            03  FLG-TAKYO-HENSYU    PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-GAIKAN          PIC 9(01).
+           03  FLG-JIBAI-OCR       PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -1004,6 +1007,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE459PARA-HOSPNUM
            MOVE       ZERO             TO  FLG-TAKYO-HENSYU
       *
            MOVE       ZERO             TO  IDX6
+      *
+           MOVE       ZERO             TO  FLG-JIBAI-OCR
+           IF    (WRK-PARA-RECEKBN       =  "4")
+           AND   (WRK-PARA-JIBAIPRTKBN   =  "2")
+             MOVE     1                TO  FLG-JIBAI-OCR
+           END-IF
       *
            IF   RECE41-COMCNTFLG   =   "1"
       *
@@ -1933,7 +1942,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                     MOVE      1              TO  FLG-FIRST
                  ELSE
                     IF  IDY     <  10 
-                       IF    WK-FREE-YUKOKETA(IDZ)  =  25
+                       IF   (WK-FREE-YUKOKETA(IDZ)  =  25  )
+                       AND  (FLG-JIBAI-OCR          =  ZERO)
                           PERFORM  20011-FREE-COMMENT-KAIGYO-SEC
                           ADD   1  TO  WK-FREE-YUKOKETA(IDZ)
                           COMPUTE  WRK-KETA   =  WRK-KETA   +  1
@@ -1947,7 +1957,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                        END-IF
       *
-                       IF    WK-FREE-YUKOKETA(IDZ)  =  24 OR 25
+                       IF   (WK-FREE-YUKOKETA(IDZ)  =  24 OR 25)
+                       AND  (FLG-JIBAI-OCR          =  ZERO    )
                           PERFORM  20011-FREE-COMMENT-KAIGYO-SEC
                           ADD   1  TO  WK-FREE-YUKOKETA(IDZ)
                           COMPUTE  WRK-KETA   =  WRK-KETA   +  1
@@ -1970,7 +1981,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                    TO  WK-FREE-NAME(IDZ)(WRK-KETA:2) 
                        END-IF
                     ELSE
-                       IF    WK-FREE-YUKOKETA(IDZ)  =  25
+                       IF   (WK-FREE-YUKOKETA(IDZ)  =  25  )
+                       AND  (FLG-JIBAI-OCR          =  ZERO)
                           PERFORM  20011-FREE-COMMENT-KAIGYO-SEC
                           ADD   1  TO  WK-FREE-YUKOKETA(IDZ)
                           COMPUTE  WRK-KETA   =  WRK-KETA   +  1
@@ -1983,7 +1995,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                    TO  WK-FREE-NAME(IDZ)(WRK-KETA:2)
                        END-IF
       *
-                       IF    WK-FREE-YUKOKETA(IDZ)  =  23 OR 24 OR 25
+                       IF   (WK-FREE-YUKOKETA(IDZ)  =  23 OR 24 OR 25)
+                       AND  (FLG-JIBAI-OCR          =  ZERO          )
                           PERFORM  20011-FREE-COMMENT-KAIGYO-SEC
                           ADD   2  TO  WK-FREE-YUKOKETA(IDZ)
                           COMPUTE  WRK-KETA   =  WRK-KETA   +  1
@@ -2817,6 +2830,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                     MOVE    "40" TO  WRK-SRYKBN
                     MOVE    "1"  TO  WRK-OKIKAEFLG
                   WHEN     "1"
+                  WHEN     "2"
                     MOVE    "80" TO  WRK-SRYKBN
                  END-EVALUATE
                END-IF
@@ -2862,6 +2876,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                     MOVE    "40" TO  WRK-SRYKBN
                     MOVE    "1"  TO  WRK-OKIKAEFLG
                   WHEN     "1"
+                  WHEN     "2"
                     MOVE    "80" TO  WRK-SRYKBN
                  END-EVALUATE
                END-IF
@@ -2906,6 +2921,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                     MOVE    "40" TO  WRK-SRYKBN
                     MOVE    "1"  TO  WRK-OKIKAEFLG
                   WHEN     "1"
+                  WHEN     "2"
                     MOVE    "80" TO  WRK-SRYKBN
                  END-EVALUATE
                END-IF
@@ -2931,6 +2947,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                     MOVE    "40" TO  WRK-SRYKBN
                     MOVE    "1"  TO  WRK-OKIKAEFLG
                   WHEN     "1"
+                  WHEN     "2"
                     MOVE    "80" TO  WRK-SRYKBN
                  END-EVALUATE
                END-IF
@@ -2956,6 +2973,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                     MOVE    "40" TO  WRK-SRYKBN
                     MOVE    "1"  TO  WRK-OKIKAEFLG
                   WHEN     "1"
+                  WHEN     "2"
                     MOVE    "80" TO  WRK-SRYKBN
                  END-EVALUATE
                END-IF
@@ -3000,6 +3018,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                     MOVE    "40" TO  WRK-SRYKBN
                     MOVE    "1"  TO  WRK-OKIKAEFLG
                   WHEN     "1"
+                  WHEN     "2"
                     MOVE    "80" TO  WRK-SRYKBN
                  END-EVALUATE
                END-IF
@@ -3025,6 +3044,7 @@ grpsys        PERFORM  900-DBSELECT-SEC
                     MOVE    "40" TO  WRK-SRYKBN
                     MOVE    "1"  TO  WRK-OKIKAEFLG
                   WHEN     "1"
+                  WHEN     "2"
                     MOVE    "80" TO  WRK-SRYKBN
                  END-EVALUATE
                END-IF
@@ -5586,7 +5606,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
                        MOVE   TB-SANTEI-DAY(IDX)  TO  IDY
       *
-                       IF    WK-FREE-YUKOKETA2(IDZ)  =  25
+                       IF   (WK-FREE-YUKOKETA2(IDZ)  =  25  )
+                       AND  (FLG-JIBAI-OCR           =  ZERO)
                           PERFORM  2001111-FREE-COMMENT2-KAIGYO-SEC
                           ADD   1  TO  WK-FREE-YUKOKETA2(IDZ)
                           COMPUTE  WRK-KETA   =  WRK-KETA   +  1
@@ -5600,7 +5621,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
                        END-IF
       *
-                       IF    WK-FREE-YUKOKETA2(IDZ)  =  24 OR 25
+                       IF   (WK-FREE-YUKOKETA2(IDZ)  =  24 OR 25)
+                       AND  (FLG-JIBAI-OCR           =  ZERO    )
                           PERFORM  2001111-FREE-COMMENT2-KAIGYO-SEC
                           ADD   1  TO  WK-FREE-YUKOKETA2(IDZ)
                           COMPUTE  WRK-KETA   =  WRK-KETA   +  1
@@ -5626,7 +5648,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
                        MOVE   TB-SANTEI-DAY(IDX)  TO  IDY
       *
-                       IF    WK-FREE-YUKOKETA2(IDZ)  =  25
+                       IF   (WK-FREE-YUKOKETA2(IDZ)  =  25  )
+                       AND  (FLG-JIBAI-OCR           =  ZERO)
                           PERFORM  2001111-FREE-COMMENT2-KAIGYO-SEC
                           ADD   1  TO  WK-FREE-YUKOKETA2(IDZ)
                           COMPUTE  WRK-KETA   =  WRK-KETA   +  1
@@ -5639,7 +5662,8 @@ grpsys       PERFORM 900-DBSELECT-SEC
                                    TO  WK-FREE-NAME2(IDZ)(WRK-KETA:2)
                        END-IF
       *
-                       IF    WK-FREE-YUKOKETA2(IDZ)  =  23 OR 24 OR 25
+                       IF   (WK-FREE-YUKOKETA2(IDZ)  =  23 OR 24 OR 25)
+                       AND  (FLG-JIBAI-OCR           =  ZERO          )
                           PERFORM  2001111-FREE-COMMENT2-KAIGYO-SEC
                           ADD   2  TO  WK-FREE-YUKOKETA2(IDZ)
                           COMPUTE  WRK-KETA   =  WRK-KETA   +  1
@@ -6864,6 +6888,13 @@ grpsys       PERFORM 900-DBSELECT-SEC
            END-IF
       *
            IF     WRK-KETA    >   1
+             IF     FLG-JIBAI-OCR          =   1
+               ADD     1      TO    IDZ
+               COMPUTE   WRK-KETA2 = WRK-KETA - 1
+               COMPUTE   WK-FREE-YUKOKETA2(IDZ)  =  WRK-KETA2  /  2
+               MOVE   WK-FREE-NAME3(1:WRK-KETA2)
+                              TO    WK-FREE-NAME2(IDZ)
+             ELSE
                PERFORM   VARYING   IDX4    FROM   1   BY   50
                           UNTIL   (IDX4     >    1000)
                             OR    (WK-FREE-NAME3(IDX4:1) = SPACE)
@@ -6885,6 +6916,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
                    MOVE   WK-FREE-NAME3(IDX4:50)
                                    TO    WK-FREE-NAME2(IDZ)
                END-PERFORM
+             END-IF
            END-IF
       *
            .
