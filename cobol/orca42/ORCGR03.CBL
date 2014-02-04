@@ -125,6 +125,8 @@
       *  04.07.04    NACL-藤原    12/11/21  労災レセ電作成対応
       *  04.07.05    NACL-藤原    13/12/09  医療情報連携基盤対応
       *  04.07.06    NACL-藤原    13/09/20  第三者行為対応
+      *  04.07.07    NACL-藤原    13/12/04  自賠責（労災準拠）のレセプト
+      *                                     様式追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2600,6 +2602,18 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
                        MOVE    ZERO            TO
                                                SYS-200501-JIBAIPRTKBN-N
                    END-IF
+                   IF      SYS-200501-JIBAIPRTKBN1
+                                               =   SPACE
+                       MOVE    SYS-200501-JIBAIPRTKBN
+                                               TO
+                                               SYS-200501-JIBAIPRTKBN1
+                   END-IF
+                   IF      SYS-200501-JIBAIPRTKBN1-N
+                                               =   SPACE
+                       MOVE    SYS-200501-JIBAIPRTKBN-N
+                                               TO
+                                               SYS-200501-JIBAIPRTKBN1-N
+                   END-IF
                    IF      SYS-200501-KOUIKIRECEKBN
                                                =   SPACE
                        MOVE    ZERO        TO  SYS-200501-KOUIKIRECEKBN
@@ -2794,6 +2808,13 @@ grpsys             MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
 grpsys             MOVE    SPA-HOSPNUM     TO  SHELLTBL-ARG16
                    EVALUATE    SPA-R01-RECEKBN
                        WHEN    "4"
+                           IF      SPA-GMN-NYUGAIKBN   =   "1"
+                               MOVE    SYS-200501-JIBAIPRTKBN1-N
+                                                   TO  SHELLTBL-ARG17
+                           ELSE
+                               MOVE    SYS-200501-JIBAIPRTKBN1
+                                                   TO  SHELLTBL-ARG17
+                           END-IF
                        WHEN    "5"
                        WHEN    "8"
                            IF      SPA-GMN-NYUGAIKBN   =   "1"

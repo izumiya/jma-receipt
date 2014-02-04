@@ -130,6 +130,8 @@
       *  04.06.01    NACL-藤原    13/04/12  帳票タイトル設定の条件追加
       *
       *  04.07.01    NACL-藤原    13/09/20  第三者行為対応
+      *  04.07.02    NACL-藤原    13/12/04  自賠責（労災準拠）のレセプト
+      *                                     様式追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -364,6 +366,8 @@ grpsys     COPY    "COMMON-SPA".
            COPY    "HCM55V01.INC".
            COPY    "HCM55V02.INC".
            COPY    "HCM55V03.INC".
+           COPY    "HCM76.INC".
+           COPY    "HCM77.INC".
       *
            COPY    "HCN23.INC".
            COPY    "HCN23V01.INC".
@@ -393,6 +397,7 @@ grpsys     COPY    "COMMON-SPA".
            COPY    "HCN55V01.INC".
            COPY    "HCN55V02.INC".
            COPY    "HCN55V03.INC".
+           COPY    "HCN70.INC".
       *
       *    公害レセプト
            COPY    "HCM58.INC".
@@ -1279,6 +1284,14 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                        MOVE    RECE08-PRTDATA      TO  HCM55V03
                        MOVE    WRK-HEN-RENNUM-AREA TO  HCM55V03-RENNUM
                        MOVE    HCM55V03            TO  RECE08-PRTDATA
+                   WHEN    "HCM76.red"
+                       MOVE    RECE08-PRTDATA      TO  HCM76
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCM76-RENNUM
+                       MOVE    HCM76               TO  RECE08-PRTDATA
+                   WHEN    "HCM77.red"
+                       MOVE    RECE08-PRTDATA      TO  HCM77
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCM77-RENNUM
+                       MOVE    HCM77               TO  RECE08-PRTDATA
                    WHEN    "HCN53.red"
                    WHEN    "HCN54.red"
                        MOVE    RECE08-PRTDATA      TO  HCN53
@@ -1324,6 +1337,10 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                        MOVE    RECE08-PRTDATA      TO  HCN55V03
                        MOVE    WRK-HEN-RENNUM-AREA TO  HCN55V03-RENNUM
                        MOVE    HCN55V03            TO  RECE08-PRTDATA
+                   WHEN    "HCN70.red"
+                       MOVE    RECE08-PRTDATA      TO  HCN70
+                       MOVE    WRK-HEN-RENNUM-AREA TO  HCN70-RENNUM
+                       MOVE    HCN70               TO  RECE08-PRTDATA
                    WHEN    "HCM56.red"
                        MOVE    RECE08-PRTDATA      TO  HCM56
                        MOVE    WRK-HEN-RENNUM-AREA TO  HCM56-RENNUM
@@ -1650,6 +1667,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCM54.red"     ALSO    ANY
                WHEN    "HCM54V01.red"  ALSO    ANY
                WHEN    "HCM54V02.red"  ALSO    ANY
+               WHEN    "HCM76.red"     ALSO    ANY
                WHEN    "HCM29.red"     ALSO    "2"
                WHEN    "HCM29V01.red"  ALSO    "2"
                WHEN    "HCM29V02.red"  ALSO    "2"
@@ -1658,6 +1676,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCM49.red"     ALSO    "2"
                WHEN    "HCM49V01.red"  ALSO    "2"
                WHEN    "HCM49V02.red"  ALSO    "2"
+               WHEN    "HCM77.red"     ALSO    "2"
                    IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
                        MOVE    "自賠責（新様式）レセプト（入院外）"
                                                        TO  SPRT-TITLE
@@ -1772,6 +1791,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCN54V02.red"  ALSO    ANY
                WHEN    "HCN54V03.red"  ALSO    ANY
                WHEN    "HCN54V04.red"  ALSO    ANY
+               WHEN    "HCN70.red"     ALSO    ANY
                WHEN    "HCM29.red"     ALSO    "1"
                WHEN    "HCM29V01.red"  ALSO    "1"
                WHEN    "HCM29V02.red"  ALSO    "1"
@@ -1780,6 +1800,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
                WHEN    "HCM49.red"     ALSO    "1"
                WHEN    "HCM49V01.red"  ALSO    "1"
                WHEN    "HCM49V02.red"  ALSO    "1"
+               WHEN    "HCM77.red"     ALSO    "1"
                    IF      WRK-PARA-SHELLID    NOT =   "RECEPTX"
                        MOVE    "自賠責（新様式）レセプト（入院）"
                                                        TO  SPRT-TITLE

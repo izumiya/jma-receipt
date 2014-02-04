@@ -26,6 +26,7 @@ fi
 #        $15 枠記載区分
 #        $16 HOSPNUM 
 #        $17 様式区分
+#            0:旧様式、1:平成１９年４月改正様式、2:ＯＣＲ様式
 #        $18 レセプト作成区分
 #            1:提出用レセ、2:点検用レセ
 #        $19 請求データ削除区分
@@ -51,8 +52,20 @@ fi
            LOG_FILE="/var/log/jma-receipt/${16}recept8b.log"
         fi
 
-	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0400 -parameter $1$2$3$5$6,${17},${16},${4}    > $LOG_FILE 2>&1
-	
+    echo "arg1 =  [" ${1} "]" >$LOG_FILE
+    echo "arg2 =  [" ${2} "]" >>$LOG_FILE
+    echo "arg5 =  [" ${5} "]" >>$LOG_FILE
+    echo "arg6 =  [" ${6} "]" >>$LOG_FILE
+    echo "arg8 =  [" ${8} "]" >>$LOG_FILE
+    echo "arg9 =  [" ${9} "]" >>$LOG_FILE
+    echo "arg10 = [" ${10} "]" >>$LOG_FILE
+    echo "arg15 = [" ${15} "]" >>$LOG_FILE
+    echo "arg16 = [" ${16} "]" >>$LOG_FILE
+    echo "arg17 = [" ${17} "]" >>$LOG_FILE
+    echo "arg18 = [" ${18} "]" >>$LOG_FILE
+    echo "arg19 = [" ${19} "]" >>$LOG_FILE
+
+	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0400 -parameter $1$2$3$5$6,${17},${18},${16},${4}    >> $LOG_FILE 2>&1
 	   
         if  [ -e $4 ]; then
             exit  
@@ -117,18 +130,25 @@ fi
 	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0460 -parameter $1$3$5$6,${17},${18},${16},${4}      >> $LOG_FILE 2>&1
         fi
 
+        if  [ ${17} -eq '2' ]; then
+            if  [ -e $4 ]; then
+                exit 
+            else 
+                $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0461 -parameter $1$3$5$6,${17},${18},${16},${4}      >> $LOG_FILE 2>&1
+            fi
+        fi
+
+
         if  [ -e $4 ]; then
             exit 
         else 
 	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0465 -parameter $1$3$5$6,${17},${16},${4}      >> $LOG_FILE 2>&1
-
         fi
 
         if  [ -e $4 ]; then
             exit 
         else 
 	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0467 -parameter $1$3$5$6,${17},${16},${4}      >> $LOG_FILE 2>&1
-
         fi
 
  
@@ -136,7 +156,14 @@ fi
             exit 
         else 
 	$DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0470 -parameter $1$3$5$6,${17},${16},${4}      >> $LOG_FILE 2>&1
+        fi
 
+        if  [ ${17} -eq '2' ]; then
+            if  [ -e $4 ]; then
+                exit 
+            else 
+                $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0469 -parameter $1$3$5$6,${17},${16},${4}      >> $LOG_FILE 2>&1
+            fi
         fi
 
         if  [ -e $4 ]; then
@@ -149,7 +176,11 @@ fi
                    $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0487 -parameter $9${10}$1$2$3$8$5$6,${18},${19},${16},${4}    >> $LOG_FILE 2>&1
                fi
            else
-               $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0488 -parameter $9${10}$1$2$3$8$5$6,${15},${18},${19},${16},${4}  >> $LOG_FILE 2>&1
+               if  [ ${17} -eq '1' ]; then
+                   $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0488 -parameter $9${10}$1$2$3$8$5$6,${15},${18},${19},${16},${4}  >> $LOG_FILE 2>&1
+               else
+                   $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0510 -parameter $9${10}$1$2$3$8$5$6,${15},${18},${19},${16},${4}  >> $LOG_FILE 2>&1
+               fi
            fi
         fi
         

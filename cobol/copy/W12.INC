@@ -293,13 +293,25 @@
                       07  W12-VALUE   PIC X(24).
                     06  W12-JIBAIPRTKBN-COUNT   PIC S9(9)   BINARY.
                     06  W12-JIBAIPRTKBNLST
-                            PIC X(24)   OCCURS  2 TIMES.
+                            PIC X(24)   OCCURS  5 TIMES.
                   05  W12-JIBAIPRTKBN-N-COMBO.
                     06  W12-JIBAIPRTKBN-N.
                       07  W12-VALUE   PIC X(24).
                     06  W12-JIBAIPRTKBN-N-COUNT   PIC S9(9)   BINARY.
                     06  W12-JIBAIPRTKBN-NLST
-                            PIC X(24)   OCCURS  2 TIMES.
+                            PIC X(24)   OCCURS  5 TIMES.
+                  05  W12-JIBAIPRTKBN1-COMBO.
+                    06  W12-JIBAIPRTKBN1.
+                      07  W12-VALUE   PIC X(24).
+                    06  W12-JIBAIPRTKBN1-COUNT  PIC S9(9)   BINARY.
+                    06  W12-JIBAIPRTKBN1LST
+                            PIC X(24)   OCCURS  5 TIMES.
+                  05  W12-JIBAIPRTKBN1-N-COMBO.
+                    06  W12-JIBAIPRTKBN1-N.
+                      07  W12-VALUE   PIC X(24).
+                    06  W12-JIBAIPRTKBN1-N-COUNT  PIC S9(9)   BINARY.
+                    06  W12-JIBAIPRTKBN1-NLST
+                            PIC X(24)   OCCURS  5 TIMES.
                   05  W12-ROUPRTNM.
                     06  W12-VALUE   PIC X(16).
                   05  W12-ROUPRTNM-NEXT.

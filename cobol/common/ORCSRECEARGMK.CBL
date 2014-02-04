@@ -48,6 +48,8 @@
       *  04.07.02    NACL-藤原    12/11/20  リアルタイムプレビュー時の
       *                                     一画面対応
       *  04.07.03    NACL-藤原    13/09/20  第三者行為対応
+      *  04.07.04    NACL-藤原    13/12/04  自賠責（労災準拠）のレセプト
+      *                                     様式追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -314,6 +316,16 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-200501-HOSPNUM
            END-IF
            IF      SYS-200501-JIBAIPRTKBN-N  =   SPACE
                MOVE    ZERO                TO  SYS-200501-JIBAIPRTKBN-N
+           END-IF
+           IF      SYS-200501-JIBAIPRTKBN1
+                                       =   SPACE
+               MOVE    SYS-200501-JIBAIPRTKBN
+                                       TO  SYS-200501-JIBAIPRTKBN1
+           END-IF
+           IF      SYS-200501-JIBAIPRTKBN1-N
+                                       =   SPACE
+               MOVE    SYS-200501-JIBAIPRTKBN-N
+                                       TO  SYS-200501-JIBAIPRTKBN1-N
            END-IF
            IF      SYS-200501-FRAME-ROUPRTKBN
                                            =   SPACE
@@ -637,6 +649,15 @@ grpsys     MOVE    SPA-HOSPNUM     TO  RECEERR-HOSPNUM
                    MOVE    SYS-200501-JIBAIPRTKBN  TO  SHELLTBL-ARG14
                WHEN   OTHER
                    MOVE    "0"                     TO  SHELLTBL-ARG14
+           END-EVALUATE
+           EVALUATE   LINK-NYUGAIKBN   ALSO    LINK-HKNKBN
+               WHEN   "1"              ALSO    "2"
+                   MOVE    SYS-200501-JIBAIPRTKBN1-N
+                                                   TO  SHELLTBL-ARG38
+               WHEN   "2"              ALSO    "2"
+                   MOVE    SYS-200501-JIBAIPRTKBN1 TO  SHELLTBL-ARG38
+               WHEN   OTHER
+                   MOVE    "0"                     TO  SHELLTBL-ARG38
            END-EVALUATE
       *
       *------------------> recept2.sh $11 - $26 (#24 は除く)
