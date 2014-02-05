@@ -272,6 +272,8 @@
       *
            03  WRK-SRYKBN          PIC X(02).
       *
+           03  WRK-TEL             PIC X(15).
+      *
            03  WRK-EDIT-AREA.
       *        編集傷病名文字数 
                05  WRK-CLM                     PIC 9(04).
@@ -1280,10 +1282,29 @@
            INSPECT HCN70-HOSPNAME      REPLACING   ALL "  "    BY  "　"
       *    電話番号
            IF      FLG-SYS-1902        =   1
-               MOVE    SYS-1902-TEL        TO  HCN70-TEL
+               MOVE    SYS-1902-TEL        TO  WRK-TEL
            ELSE
-               MOVE    SYS-1002-TEL        TO  HCN70-TEL
+               MOVE    SYS-1002-TEL        TO  WRK-TEL
            END-IF
+           MOVE    ZERO                TO  IDZ
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       15
+                   OR      WRK-TEL (IDX:1) =   SPACE
+               EVALUATE    WRK-TEL (IDX:1)
+                   WHEN    "0"
+                   WHEN    "1"
+                   WHEN    "2"
+                   WHEN    "3"
+                   WHEN    "4"
+                   WHEN    "5"
+                   WHEN    "6"
+                   WHEN    "7"
+                   WHEN    "8"
+                   WHEN    "9"
+                       ADD     1                   TO  IDZ
+                       MOVE    WRK-TEL (IDX:1)     TO  HCN70-TEL (IDZ:1)
+               END-EVALUATE
+           END-PERFORM
       *    医師名
            IF      RECE82-DRCD         =   SPACE
                MOVE    SYS-1001-KANRINAME  TO  HCN70-ISYA
@@ -1335,7 +1356,7 @@
                                        TO  WRK-MOJISU-MAX
       *
            INITIALIZE                  HCM77
-           MOVE    "JK21"              TO  HCM77-CYOHYONAME
+           MOVE    "JK12"              TO  HCM77-CYOHYONAME
            MOVE    "入院"              TO  HCM77-NYUGAINAME
       *    診療年月
            MOVE     WRK-STYMDW(1:1)    TO  HCM77-HAKKOUG
