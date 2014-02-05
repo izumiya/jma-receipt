@@ -13019,7 +13019,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            MOVE    "INPUTCD"       TO  MCP-WIDGET
       *            MOVE    WRK-IDX2        TO  MCP-WIDGET(8:2)
                    MOVE    "PANDATABLE1"   TO  MCP-WIDGET
-                   MOVE    4               TO  K02-PANDATABLE1-TROWATTR
+      *最後へ      MOVE    4               TO  K02-PANDATABLE1-TROWATTR
+                   MOVE    1               TO  K02-PANDATABLE1-TROWATTR
                    MOVE    2               TO  K02-PANDATABLE1-TCOLUMN
                    MOVE    WRK-IDX2        TO  K02-PANDATABLE1-TROW
       *
@@ -13055,7 +13056,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            MOVE    "MEISYO"        TO  MCP-WIDGET
       *            MOVE    WRK-IDX2        TO  MCP-WIDGET(7:2)
                    MOVE    "PANDATABLE1"   TO  MCP-WIDGET
-                   MOVE    4               TO  K02-PANDATABLE1-TROWATTR
+      *!最後へ     MOVE    4               TO  K02-PANDATABLE1-TROWATTR
+                   MOVE    1               TO  K02-PANDATABLE1-TROWATTR
                    MOVE    3               TO  K02-PANDATABLE1-TCOLUMN
                    MOVE    WRK-IDX2        TO  K02-PANDATABLE1-TROW
                WHEN    04
