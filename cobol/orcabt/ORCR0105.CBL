@@ -190,6 +190,7 @@
       *  04.07.11    NACL-藤原    13/12/09  医療情報連係基盤対応
       *  04.07.12    NACL-門脇    14/02/03  第三者行為対応（院外処方のみの
       *                                     保険組み合わせの病名記載対応）
+      *  04.07.13    NACL-藤原    13/12/09  点検用レセプトの医師名記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -537,6 +538,8 @@
            03  WRK-SUM-TENSU       PIC 9(08).
       *
            03  WRK-TAIHI-FTNMONEY  PIC 9(09).
+      *
+           03  WRK-DRNAME          PIC X(20).
       *
            03  WRK-TOKKI           PIC X(02).
            03  WRK-TOKKI-X         PIC X(12).
@@ -2511,6 +2514,7 @@
            MOVE    1                  TO  CNT-PAGE
            MOVE    WRK-TEKIYOU1-LINE  TO  WRK-TEKIYOU-LINE
            INITIALIZE                     TABLE-AREA
+           MOVE    SPACE              TO  WRK-DRNAME
       *
       *    医療保険・公費のフラグ
            MOVE    SPACE              TO  WRK-3SYU-KBN
@@ -3174,20 +3178,24 @@
                                        NOT =   "RECEPTX" ) AND
                      ( WRK-PARA-SYOKBN     =   "1"       )     )
                OR  (   WRK-PARA-SHELLID    =   "RECEPTX"       )
-                   MOVE    SPACE               TO  SYSKANRI-REC
-                   INITIALIZE                      SYSKANRI-REC
-                   MOVE    "1010"              TO  SYS-KANRICD
-                   MOVE    RECE02-DRCD         TO  SYS-KBNCD
-                   MOVE    RECE02-SRYYM        TO  SYS-STYUKYMD(1:6)
-                   MOVE    "01"                TO  SYS-STYUKYMD(7:2)
-                   MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
-                   MOVE    "tbl_syskanri"      TO  WRK-MCP-TABLE
-                   MOVE    "key10"             TO  WRK-MCP-PATHNAME
-                   PERFORM 900-SYSKANRI-READ-SEC
-                   IF      FLG-SYSKANRI    =   ZERO
-                       MOVE    MCPDATA-REC         TO  SYS-1010-REC
-                       MOVE  SYS-1010-NAME (1:20)  TO  HC06-DRNAME
-                   END-IF
+                   IF      CNT-PAGE                =   1
+                       MOVE    SPACE               TO  WRK-DRNAME
+                       MOVE    SPACE               TO  SYSKANRI-REC
+                       INITIALIZE                      SYSKANRI-REC
+                       MOVE    "1010"              TO  SYS-KANRICD
+                       MOVE    RECE02-DRCD         TO  SYS-KBNCD
+                       MOVE    RECE02-SRYYM        TO  SYS-STYUKYMD(1:6)
+                       MOVE    "01"                TO  SYS-STYUKYMD(7:2)
+                       MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
+                       MOVE    "tbl_syskanri"      TO  WRK-MCP-TABLE
+                       MOVE    "key10"             TO  WRK-MCP-PATHNAME
+                       PERFORM 900-SYSKANRI-READ-SEC
+                       IF      FLG-SYSKANRI    =   ZERO
+                           MOVE    MCPDATA-REC         TO  SYS-1010-REC
+                           MOVE  SYS-1010-NAME (1:20)  TO  WRK-DRNAME
+                       END-IF
+                   END-IF  
+                   MOVE    WRK-DRNAME          TO  HC06-DRNAME
                END-IF
            END-IF
       *
