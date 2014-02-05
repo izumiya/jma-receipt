@@ -306,6 +306,9 @@
       *                                     の表示
       *  04.07.12    NACL-藤原    13/12/26  病名入力時のコード置換え画面
       *                                     の表示時の移行先のチェック
+      *  04.07.13    NACL-藤原    14/01/29  病名入力時のコード置換え画面
+      *                                     の表示時のチェック追加
+      *                                     病名コード削除時の修正 
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5540,6 +5543,17 @@ grpsys         MOVE    SPA-HOSPNUM     TO  USBYO-HOSPNUM
       *
            IF    ( C02-BYOMEICD  (IDZ)
                                    =   SPACE )
+           AND   ( SPA-GMN-C02-BYOMEICD (IDZ)
+                               NOT =   SPACE )
+               STRING   SPA-GMN-C02-BYOMEICD (IDZ)
+                                       DELIMITED  BY  SPACE
+                        "-"            DELIMITED  BY  SIZE
+                                       INTO    C02-BYOMEICD  (IDZ)
+               END-STRING
+           END-IF
+      *
+           IF    ( C02-BYOMEICD  (IDZ)
+                                   =   SPACE )
            AND   ( SPA-GMN-C02-BYOMEICD-G  
                                NOT =   SPACE )
       *      病名コード未入力時他の病名コードに入力があるときの処理
@@ -7692,6 +7706,7 @@ grpsys                                       SPA-AREA
                      AND   ( LNK-BYO-O-IKOSAKICD   (IDXX)
                                                  =
                                                  LNK-BYO-KHNBYOMEICD )
+                     AND   ( LNK-BYO-BYOMEICDSU  =  1                )
       *                移行先病名が元の病名と同じ時は対象としない
                        CONTINUE
                      ELSE  
