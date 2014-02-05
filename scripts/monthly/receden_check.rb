@@ -1329,7 +1329,7 @@ class Receden_check < Receden_common
             end
 
             if flg_tensu_required == true
-              if ( @check_level == "1" ) || ( @check_level == "2" && zai["RECID"].value != "IY" )
+              if ( @check_level == "1" )
                 if zai["TEN"].value.to_i == 0
                   @errors.push("33070",rece,zai,"TEN",nil,tbl_tensu["NAME"])
                 end

@@ -1153,19 +1153,12 @@ class Receden_check < Receden_common
                 if flg_kingaku_santei == true && zai["KINGAKU"].value.to_i == 0
                   @errors.push("38380",rece,zai,"KINGAKU",nil,tbl_tensu["NAME"])
                 end
-              else
-                if zai["TEN"].value == "" && zai["KINGAKU"].value == ""
-                  @errors.push("38351",rece,zai,nil,nil,tbl_tensu["NAME"])
-                end
-                if flg_kingaku_santei == true && zai["KINGAKU"].value == ""
-                  @errors.push("38381",rece,zai,"KINGAKU",nil,tbl_tensu["NAME"])
-                end
               end
               if flg_kingaku_santei == false && zai["KINGAKU"].value.to_i != 0
                 @errors.push("38390",rece,zai,"KINGAKU",nil,tbl_tensu["NAME"])
               end
             else
-              if ( @check_level == "1" ) || ( @check_level == "2" && zai["RECID"].value != "IY" )
+              if ( @check_level == "1" )
                 if zai["TEN"].value.to_i == 0
                   @errors.push("33070",rece,zai,"TEN",nil,tbl_tensu["NAME"])
                 end
