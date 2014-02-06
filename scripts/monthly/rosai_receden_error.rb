@@ -436,6 +436,8 @@ class Receden_error < Receden_common
       err.msg="初診料の算定回数が算定可能回数を超えています。"
     when "46410"
       err.msg="注加算の記録順序が誤っています。"
+    when "46411"
+      err.msg="基本項目に対して、算定できない注加算です。"
     when "48410"
       err.msg="小計点数が摘要データの点数の合計と一致していません。"
     when "48420"

@@ -1030,7 +1030,7 @@ class Receden_check < Receden_common
                         when ksnsort.khn_exists == false
                           @errors.push("46410",rece,zai,"CHUKSNCD",nil,tbl_tensu["NAME"])
                         when tbl_tensu["CHUKSNCD"].to_i != ksnsort.chuksncd
-                          @errors.push("46410",rece,zai,"CHUKSNCD",nil,tbl_tensu["NAME"])
+                          @errors.push("46411",rece,zai,"CHUKSNCD",nil,tbl_tensu["NAME"])
                         when tbl_tensu["CHUKSNTSUBAN"].to_i == ksnsort.chuksntsuban
                           @errors.push("46120",rece,zai,"CHUKSNTSUBAN",nil,tbl_tensu["NAME"])
                         when tbl_tensu["CHUKSNTSUBAN"].to_i < ksnsort.chuksntsuban
