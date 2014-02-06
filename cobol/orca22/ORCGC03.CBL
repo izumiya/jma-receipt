@@ -127,6 +127,8 @@
       *  04.07.06    NACL-藤原    13/11/15  更新時のopid 設定
       *  04.07.07    NACL-藤原    13/12/26  病名入力時のコード置換え画面
       *                                     の表示時の移行先のチェック
+      *  04.07.08    NACL-藤原    14/01/29  病名入力時のコード置換え画面
+      *                                     の表示時のチェック追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3751,6 +3753,7 @@ grpsys                                         SPA-AREA
                      AND   ( LNK-BYO-O-IKOSAKICD   (IDXX)
                                                  =
                                                  LNK-BYO-KHNBYOMEICD )
+                     AND   ( LNK-BYO-BYOMEICDSU  =  1                )
       *                移行先病名が元の病名と同じ時は対象としない
                        CONTINUE
                      ELSE  
