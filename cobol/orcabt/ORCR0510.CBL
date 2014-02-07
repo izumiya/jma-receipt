@@ -2067,7 +2067,11 @@
                        MOVE    9               TO  FLG-RECECOM-SJKBN
                END-EVALUATE
            ELSE
-               MOVE    ZERO           TO  FLG-MARK
+               IF      RECECOM-SJKBN       =   "99"
+                   MOVE    1                   TO  FLG-MARK
+               ELSE
+                   MOVE    ZERO                TO  FLG-MARK
+               END-IF
            END-IF
       *
            PERFORM     UNTIL       WRK-RECEHEN  =   1      
