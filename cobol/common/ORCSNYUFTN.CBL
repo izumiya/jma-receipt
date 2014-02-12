@@ -148,6 +148,7 @@
       *
       *  04.07.01    NACL-門脇    12/08/28  薬剤料減点対応
       *  04.07.02    NACL-門脇    13/07/10  自賠責（第三者行為）対応
+      *  04.07.03    NACL-門脇    14/02/12  重症皮膚潰瘍管理加算対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -541,11 +542,12 @@
       *    入院料加算判定用テーブル
        01  TBL-NYUINRYO-KASAN-AREA.
            03  FILLER          PIC X(09)   VALUE    "190101770".
+           03  FILLER          PIC X(09)   VALUE    "190106770".
       *
        01  TBL-NYUINRYO-KASAN-R   REDEFINES   TBL-NYUINRYO-KASAN-AREA.
-           03  TBL-NYUINRYO-KASAN   PIC X(09)   OCCURS    1.
+           03  TBL-NYUINRYO-KASAN   PIC X(09)   OCCURS    2.
       *
-       01  TBL-NYUINRYO-KASAN-MAX   PIC 9(02)   VALUE     1.
+       01  TBL-NYUINRYO-KASAN-MAX   PIC 9(02)   VALUE     2.
       *
       *    入院料加算判定用テーブル２
        01  TBL-NYUINRYO-KASAN2-AREA.
