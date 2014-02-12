@@ -39,6 +39,8 @@
       *                                     ０８（老健）のレセプト対応
       *                                     receipt_kbn 追加 
       *  04.07.02    NACL-藤原    13/10/07  労災レセ電対応
+      *  04.07.03    NACL-藤原    14/02/12  データ識別が数字であれば全て
+      *                                     取り込むようにする
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -642,13 +644,6 @@
                        MOVE    4               TO  SPLIT-CNT
                        MOVE    5               TO  SPLIT-CNT1
                        PERFORM 20011-PARA-SPLIT-SEC
-                   WHEN    "8,"            ALSO     "RECEIPTC.HEN"
-                       MOVE    1               TO  WRK-RIREKIKANRI-FLG
-      *
-                       ADD     1               TO  IDZZ
-                       MOVE    5               TO  SPLIT-CNT
-                       MOVE    6               TO  SPLIT-CNT1
-                       PERFORM 20011-PARA-SPLIT-SEC
                    WHEN    "HR"            ALSO     ANY
                        ADD     1               TO  IDZZ
                        MOVE    14              TO  SPLIT-CNT
@@ -660,7 +655,7 @@
                        MOVE    5               TO  SPLIT-CNT1
                        PERFORM 20011-PARA-SPLIT-SEC
                    WHEN    OTHER
-                       IF      WRK-FILE-TMP(10:12)  =   "RECEIPTC.SAH"
+      *??              IF      WRK-FILE-TMP(10:12)  =   "RECEIPTC.SAH"
       *                    データ識別が数字のとき履歴管理ブロックとして取り込み
                            UNSTRING    WRK-PARA-REC (1:10)
                                                    DELIMITED  BY  ","
@@ -688,12 +683,12 @@
                                MOVE    2               TO  SPLIT-CNT1
                                PERFORM 20011-PARA-SPLIT-SEC
                            END-IF
-                       ELSE
-                           ADD     1               TO  IDZZ
-                           MOVE    1               TO  SPLIT-CNT
-                           MOVE    2               TO  SPLIT-CNT1
-                           PERFORM 20011-PARA-SPLIT-SEC
-                       END-IF
+      *??              ELSE
+      *??                  ADD     1               TO  IDZZ
+      *??                  MOVE    1               TO  SPLIT-CNT
+      *??                  MOVE    2               TO  SPLIT-CNT1
+      *??                  PERFORM 20011-PARA-SPLIT-SEC
+      *??              END-IF
                END-EVALUATE
       *
       *        取り込みデータファイル読み込み処理
