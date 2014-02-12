@@ -56,7 +56,7 @@
        01  WRK-AREA.
       *
            03  WRK-TOKNYUIN2-SRYCD         PIC X(09)  OCCURS 5.
-           03  WRK-JGN-NISSU               PIC 9(03)  OCCURS 5.
+           03  WRK-JGN-NISSU               PIC 9(05)  OCCURS 5.
            03  WRK-SRYCD-COUNT             PIC 9(02).
            03  WRK-TOKUTEI-DAY             PIC 9(03).
            03  WRK-TOKUTEI-DAY1            PIC 9(03).
@@ -273,7 +273,7 @@
                   MOVE  "190774110"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  14             TO  WRK-JGN-NISSU(1)
                   MOVE  "190774210"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
              END-EVALUATE
            END-IF
@@ -375,49 +375,49 @@
                   MOVE  "190121010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190111410"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
               WHEN      "190121110"
                   MOVE  "190121110"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190066910"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
               WHEN      "190121210"
                   MOVE  "190121210"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190067010"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A314)Ï·¿ÍÀ­Ç§ÃÎ¾É¼À´µ¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
               WHEN      "190739910"
                   MOVE  "190739910"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  90             TO  WRK-JGN-NISSU(1)
                   MOVE  "190740010"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A314)Ï·¿ÍÀ­Ç§ÃÎ¾É¼À´µ¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
               WHEN      "190813410"
                   MOVE  "190813410"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  90             TO  WRK-JGN-NISSU(1)
                   MOVE  "190813510"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A316)¿ÇÎÅ½êÏ·¿Í°åÎÅ´ÉÍýÎÁ
               WHEN      "190774110"
                   MOVE  "190774110"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  14             TO  WRK-JGN-NISSU(1)
                   MOVE  "190774210"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A316)¿ÇÎÅ½êÏ·¿Í°åÎÅ´ÉÍýÎÁ¡ÊÀ¸³èÎÅÍÜ¡Ë
               WHEN      "190125010"
                   MOVE  "190125010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  14             TO  WRK-JGN-NISSU(1)
                   MOVE  "190125110"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
              END-EVALUATE
            END-IF
@@ -500,63 +500,63 @@
                   MOVE  "190121010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190111410"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311)Àº¿À²ÊµßµÞÆþ±¡ÎÁ£²
               WHEN      "190130010"
                   MOVE  "190130010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190130110"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
               WHEN      "190121110"
                   MOVE  "190121110"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190066910"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
               WHEN      "190121210"
                   MOVE  "190121210"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190067010"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-3)Àº¿À²ÊµßµÞ¡¦¹çÊ»¾ÉÆþ±¡ÎÁ
               WHEN      "190130210"
                   MOVE  "190130210"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190130310"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A314)Ç§ÃÎ¾ÉÉÂÅïÆþ±¡ÎÁ£±
               WHEN      "190739910"
                   MOVE  "190739910"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  90             TO  WRK-JGN-NISSU(1)
                   MOVE  "190740010"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A314)Ç§ÃÎ¾ÉÉÂÅïÆþ±¡ÎÁ£²
               WHEN      "190813410"
                   MOVE  "190813410"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  90             TO  WRK-JGN-NISSU(1)
                   MOVE  "190813510"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A316)¿ÇÎÅ½ê¸å´ü¹âÎð¼Ô°åÎÅ´ÉÍýÎÁ
               WHEN      "190774110"
                   MOVE  "190774110"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  14             TO  WRK-JGN-NISSU(1)
                   MOVE  "190774210"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A316)¿ÇÎÅ½ê¸å´ü¹âÎð¼Ô°åÎÅ´ÉÍýÎÁ¡ÊÀ¸³èÎÅÍÜ¡Ë
               WHEN      "190125010"
                   MOVE  "190125010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  14             TO  WRK-JGN-NISSU(1)
                   MOVE  "190125110"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
              END-EVALUATE
            END-IF
@@ -728,49 +728,49 @@
                   MOVE  "190121010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190111410"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311)Àº¿À²ÊµßµÞÆþ±¡ÎÁ£²
               WHEN      "190130010"
                   MOVE  "190130010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190130110"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
               WHEN      "190121110"
                   MOVE  "190121110"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190066910"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
               WHEN      "190121210"
                   MOVE  "190121210"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190067010"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-3)Àº¿À²ÊµßµÞ¡¦¹çÊ»¾ÉÆþ±¡ÎÁ
               WHEN      "190130210"
                   MOVE  "190130210"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190130310"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A314)Ç§ÃÎ¾É¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
               WHEN      "190739910"
                   MOVE  "190739910"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  "190740010"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A314)Ç§ÃÎ¾É¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
               WHEN      "190813410"
                   MOVE  "190813410"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  60             TO  WRK-JGN-NISSU(1)
                   MOVE  "190813510"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
              END-EVALUATE
            END-IF
@@ -967,42 +967,42 @@
                   MOVE  "190150510"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  60             TO  WRK-JGN-NISSU(2)
                   MOVE  "190150610"    TO  WRK-TOKNYUIN2-SRYCD(3)
-                  MOVE  999            TO  WRK-JGN-NISSU(3)
+                  MOVE  99999          TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
       *      (A311)Àº¿À²ÊµßµÞÆþ±¡ÎÁ£±
               WHEN      "190121010"
                   MOVE  "190121010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190111410"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311)Àº¿À²ÊµßµÞÆþ±¡ÎÁ£²
               WHEN      "190130010"
                   MOVE  "190130010"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190130110"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
               WHEN      "190121110"
                   MOVE  "190121110"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190066910"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-2)Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
               WHEN      "190121210"
                   MOVE  "190121210"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190067010"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A311-3)Àº¿À²ÊµßµÞ¡¦¹çÊ»¾ÉÆþ±¡ÎÁ
               WHEN      "190130210"
                   MOVE  "190130210"    TO  WRK-TOKNYUIN2-SRYCD(1)
                   MOVE  30             TO  WRK-JGN-NISSU(1)
                   MOVE  "190130310"    TO  WRK-TOKNYUIN2-SRYCD(2)
-                  MOVE  999            TO  WRK-JGN-NISSU(2)
+                  MOVE  99999          TO  WRK-JGN-NISSU(2)
                   MOVE  2              TO  WRK-SRYCD-COUNT
       *      (A314)Ç§ÃÎ¾É¼£ÎÅÉÂÅïÆþ±¡ÎÁ£±
               WHEN      "190151610"
@@ -1011,7 +1011,7 @@
                   MOVE  "190739910"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  60             TO  WRK-JGN-NISSU(2)
                   MOVE  "190740010"    TO  WRK-TOKNYUIN2-SRYCD(3)
-                  MOVE  999            TO  WRK-JGN-NISSU(3)
+                  MOVE  99999          TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
       *      (A314)Ç§ÃÎ¾É¼£ÎÅÉÂÅïÆþ±¡ÎÁ£²
               WHEN      "190151710"
@@ -1020,7 +1020,7 @@
                   MOVE  "190813410"    TO  WRK-TOKNYUIN2-SRYCD(2)
                   MOVE  60             TO  WRK-JGN-NISSU(2)
                   MOVE  "190813510"    TO  WRK-TOKNYUIN2-SRYCD(3)
-                  MOVE  999            TO  WRK-JGN-NISSU(3)
+                  MOVE  99999          TO  WRK-JGN-NISSU(3)
                   MOVE  3              TO  WRK-SRYCD-COUNT
       *      (A317)ÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡Ê°¡µÞÀ­´üÆþ±¡°åÎÅ´ÉÍý¡Ë
               WHEN      "190152610"
@@ -1042,23 +1042,23 @@
       *
       *    »»Äê¾å¸ÂÆü¿ô¤ò¥×¥é¥¹·×»»¤Ç»ÈÍÑ¤¹¤ë°Ù¤Ë¥Þ¥¤¥Ê¥¹£±¤·¤Æ¤ª¤¯
            IF    (WRK-JGN-NISSU(1)     >=     1)   AND
-                 (WRK-JGN-NISSU(1)     <=   998)
+                 (WRK-JGN-NISSU(1)     <=   99998)
                COMPUTE  WRK-JGN-NISSU(1)  =   WRK-JGN-NISSU(1)   -  1
            END-IF
            IF    (WRK-JGN-NISSU(2)     >=     1)   AND
-                 (WRK-JGN-NISSU(2)     <=   998)
+                 (WRK-JGN-NISSU(2)     <=   99998)
                COMPUTE  WRK-JGN-NISSU(2)  =   WRK-JGN-NISSU(2)   -  1
            END-IF
            IF    (WRK-JGN-NISSU(3)     >=     1)   AND
-                 (WRK-JGN-NISSU(3)     <=   998)
+                 (WRK-JGN-NISSU(3)     <=   99998)
                COMPUTE  WRK-JGN-NISSU(3)  =   WRK-JGN-NISSU(3)   -  1
            END-IF
            IF    (WRK-JGN-NISSU(4)     >=     1)   AND
-                 (WRK-JGN-NISSU(4)     <=   998)
+                 (WRK-JGN-NISSU(4)     <=   99998)
                COMPUTE  WRK-JGN-NISSU(4)  =   WRK-JGN-NISSU(4)   -  1
            END-IF
            IF    (WRK-JGN-NISSU(5)     >=     1)   AND
-                 (WRK-JGN-NISSU(5)     <=   998)
+                 (WRK-JGN-NISSU(5)     <=   99998)
                COMPUTE  WRK-JGN-NISSU(5)  =   WRK-JGN-NISSU(5)   -  1
            END-IF
       *
@@ -1074,7 +1074,7 @@
                      MOVE   LNK-TOKNYUIN2-SANTEIYMD
                                        TO  LNK-TOKNYUIN2-STYMD (TN-IDX)
       *              ÆÃÄêÆþ±¡½ªÎ»Æü¡Ê£±¡Ë
-                   IF    WRK-JGN-NISSU(1) =   999
+                   IF    WRK-JGN-NISSU(1) =   99999
                      MOVE  "99999999"   TO  LNK-TOKNYUIN2-EDYMD (TN-IDX)
                    ELSE
                      MOVE     ZERO     TO  WRK-TOKUTEI-DAY
@@ -1163,7 +1163,7 @@
                                         TO  LNK-TOKNYUIN2-STYMD (TN-IDX)
                    END-IF
       *            ÆÃÄêÆþ±¡½ªÎ»Æü¡Ê£²¡Ë
-                   IF    WRK-JGN-NISSU(2) =   999
+                   IF    WRK-JGN-NISSU(2) =   99999
                      MOVE  "99999999"   TO  LNK-TOKNYUIN2-EDYMD (TN-IDX)
                    ELSE
                      MOVE     ZERO      TO  WRK-TOKUTEI-DAY
@@ -1312,7 +1312,7 @@
                                         TO  LNK-TOKNYUIN2-STYMD (TN-IDX)
                    END-EVALUATE
       *            ÆÃÄêÆþ±¡½ªÎ»Æü¡Ê£³¡Ë
-                   IF    WRK-JGN-NISSU(3) =   999
+                   IF    WRK-JGN-NISSU(3) =   99999
                      MOVE  "99999999"   TO  LNK-TOKNYUIN2-EDYMD (TN-IDX)
                    ELSE
                      MOVE     ZERO      TO  WRK-TOKUTEI-DAY
@@ -1518,7 +1518,7 @@
                                         TO  LNK-TOKNYUIN2-STYMD (TN-IDX)
                    END-EVALUATE
       *            ÆÃÄêÆþ±¡½ªÎ»Æü¡Ê£´¡Ë
-                   IF    WRK-JGN-NISSU(4) =   999
+                   IF    WRK-JGN-NISSU(4) =   99999
                      MOVE  "99999999"   TO  LNK-TOKNYUIN2-EDYMD (TN-IDX)
                    ELSE
                      MOVE     ZERO      TO  WRK-TOKUTEI-DAY
