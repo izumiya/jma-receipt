@@ -319,7 +319,7 @@ class Receden_check < Receden_common
     if rs["HOSPCD"].value.strip == ""
       @errors.push("10200",nil,rs,"HOSPCD")
     else
-        if rs["HOSPCD"].value =~ /^[0-9]{7}$/
+        if rs["HOSPCD"].value =~ /^[0-9]*$/
         else
           @errors.push("10210",nil,rs,"HOSPCD")
         end
