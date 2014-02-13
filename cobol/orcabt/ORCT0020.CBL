@@ -79,6 +79,7 @@
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
            03  CNT-OUT1                    PIC 9(06).
+           03  CNT-OUT2                    PIC 9(06).
            03  CNT-SELKBT                  PIC 9(06).
       *
        01  IDX-AREA.
@@ -581,6 +582,7 @@
            END-PERFORM
       *
            IF     ( TEIKI2P-OID1-FLG   =   "OK"  OR "PV")
+            AND   ( CNT-OUT2           >   ZERO )
                PERFORM 2001-PRINT-SEC
            END-IF
       *
@@ -620,7 +622,8 @@
            IF    ( ORCHCN03-CNT    >    ZERO )
       *
                CALL    WRK-SEIKYU-PG    USING   ORCHCN03AREA
-                                               SPA-AREA
+                                                SPA-AREA
+               COMPUTE CNT-OUT2 = CNT-OUT2 + ORCHCN03-OUTCNT
            END-IF
       *
            .
@@ -659,6 +662,7 @@
            CALL    WRK-MEISAI-PG    USING
                                     SPA-AREA
                                     ORCHCN04AREA
+           COMPUTE CNT-OUT2 = CNT-OUT2 + ORCHCN04-PAGE
       *
            .
        2001-MEISAI-PRT-EXT.
@@ -1154,7 +1158,7 @@
       *****************************************************************
        300-TERM-SEC                SECTION.
       *
-           IF    ( CNT-OUT1            =   ZERO  )
+           IF    ( CNT-OUT2            =   ZERO  )
                 MOVE  "0004"           TO  ERR-ERRCD
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
@@ -1165,7 +1169,7 @@
            MOVE    TEIKI2P-HOSPNUM         TO  JOB-HOSPNUM
            MOVE    TEIKI2P-JOBID   TO  JOB-JOBID
            MOVE    TEIKI2P-SHELLID TO  JOB-SHELLID
-           MOVE    ORCHCN03-OUTCNT TO  JOB-UPDCNT
+           MOVE    CNT-OUT2        TO  JOB-UPDCNT
            CALL    "ORCSJOB"       USING
                                    ORCSJOBKANRIAREA
                                    JOBKANRI-REC

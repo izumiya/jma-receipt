@@ -1595,6 +1595,12 @@
                GO  TO  450-PRINT-GIDMSG-EXT
            END-IF
       *
+           IF  (   SPA-GMN-O03-SKYPRTKBN   =   "0" )
+            AND(   SPA-GMN-O03-SRYPRTKBN   =   "0" )
+               MOVE    "0011"      TO  SPA-ERRCD
+               GO  TO  450-PRINT-GIDMSG-EXT
+           END-IF
+      *
       *    ガイドメッセージセット
            EVALUATE    SPA-GMN-O03-SYOKBN
            WHEN    "T"
@@ -2309,6 +2315,9 @@
                MOVE    "前頁はありません"  TO  SPA-ERRMSG
            WHEN    "0010"
                MOVE    "次頁はありません"  TO  SPA-ERRMSG
+           WHEN    "0011"
+               MOVE    "処理対象の帳票が選択してありません"
+                                           TO  SPA-ERRMSG
            WHEN    "4001"
                MOVE    "バッチパラメタの更新に失敗しました"
                                            TO  SPA-ERRMSG
