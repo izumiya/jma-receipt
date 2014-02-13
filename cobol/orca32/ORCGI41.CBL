@@ -2363,9 +2363,10 @@
       *
       *    ´µ¼ÔÆþ±¡ÍúÎò¤ò¸¡º÷¤¹¤ë
       *    °åÎÅµ¡´Ø¡¢´µ¼Ô£É£Ä¡¢Å¾ÆþÆü¡¢Å¾½ÐÆü¤ò»²¾È
-           INITIALIZE                  PTNYUINRRK-REC.
-           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM.
-           MOVE    SPA-GMN-PTID        TO  PTNYUINRRK-PTID.
+           INITIALIZE                  PTNYUINRRK-REC
+           MOVE    SPA-HOSPNUM         TO  PTNYUINRRK-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTNYUINRRK-PTID
+           MOVE    "00"                TO  SPA-GMN-SRYKA-I-41
            IF      SPA-GMN-SRYKA-I-41  =   "00"
                MOVE    "key19"             TO  WRK-DBPATH
            ELSE
@@ -2377,7 +2378,7 @@
            MOVE    SPA-NAI-SRYYM       TO  PTNYUINRRK-TENSTUYMD(1:6)
            MOVE    "01"                TO  PTNYUINRRK-TENSTUYMD(7:2)
       *
-           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC.
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
            MOVE    WRK-DBPATH          TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
