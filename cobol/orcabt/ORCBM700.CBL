@@ -31,6 +31,8 @@
       *                                     るレセプトは対象外とする
       *  04.07.02    NACL-藤原    13/08/30  改行コードの編集追加
       *  04.07.03    NACL-藤原    13/10/07  返戻対応
+      *  04.07.04    NACL-藤原    14/02/13  労災指定医療機関番号の記録
+      *                                     方法の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1232,9 +1234,9 @@
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC
       *    指定病院等の番号
-           MOVE    WRK-RSIIRYOCD       TO  WRK-NUM
+           MOVE    WRK-RSIIRYOCD       TO  WRK-DATA
            MOVE    7                   TO  WRK-NAGASA
-           PERFORM 5005-NUM-HENSYU-SEC
+           PERFORM 5004-MOJI-HENSYU-SEC
       *    郵便番号
            MOVE    WRK-SYS-1002-POST   TO  WRK-DATA
            MOVE    7                   TO  WRK-NAGASA

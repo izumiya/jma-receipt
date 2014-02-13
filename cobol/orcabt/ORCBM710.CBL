@@ -27,6 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.01    NACL-藤原    14/02/13  労災指定医療機関番号の記録
+      *                                     方法の修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1208,9 +1210,9 @@
            END-IF
            PERFORM 5004-MOJI-HENSYU-SEC
       *    指定病院等の番号
-           MOVE    WRK-RSIIRYOCD       TO  WRK-NUM
+           MOVE    WRK-RSIIRYOCD       TO  WRK-DATA
            MOVE    7                   TO  WRK-NAGASA
-           PERFORM 5005-NUM-HENSYU-SEC
+           PERFORM 5004-MOJI-HENSYU-SEC
       *    郵便番号
            MOVE    WRK-SYS-1002-POST   TO  WRK-DATA
            MOVE    7                   TO  WRK-NAGASA
