@@ -203,6 +203,8 @@ fi
         fi
 
         all=`ls  *${RECEFILE1}*.UK*`
+
+    	cleanup
   
         for f in $all ; do
             echo "check f= " $f >> $LOG_FILE 2>&1
@@ -224,8 +226,6 @@ fi
 
 	    export  RUBYLIB=$SITESCRIPTSDIR:$PATCHSCRIPTSDIR:$SCRIPTSDIR:$RUBYLIB
 	    export  APS_EXEC_PATH=$(dirname $0)
-
-	    cleanup
 
 	    [ -e ${ERRLOG}  ] && rm -f ${ERRLOG}
 	    [ -e ${INFILE}  ] && nkf -S -e -I ${INFILE} > ${EUCFILE}
