@@ -460,7 +460,7 @@ class Receden_error < Receden_common
   end
 
   def write(outfile)
-    open(outfile,"w"){|f|
+    open(outfile,"a"){|f|
       @errors.each_with_index{|err,i|
         errdata =  sprintf("<ERR_FILENAME>%s</ERR_FILENAME>",err.filename)
         errdata << sprintf("<ERR_RECENUM>%s</ERR_RECENUM>",err.recenum)
