@@ -29,6 +29,8 @@
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.06.00    NACL-Â¿¡¹Ç¼  10/11/29  ¼«ÇåÀÕ¶â³ÛÆþÎÏÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/12/19  ¾¦ÉÊÌ¾¥³¡¼¥ÉÃ±²ÁÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  13/01/11  ¿ÇÎÅ²ó¿ô¥Æ¡¼¥Ö¥ë£±£°ÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/02/13  Ï«ºÒ¶â³Û¡ó²Ã»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -163,6 +165,8 @@
                05  TBL-SRYKBN          PIC X(02).
                05  TBL-SRYSYUKBN       PIC X(03).
                05  TBL-ZAITENSU        PIC S9(07).
+               05  TBL-RSIKINGAKU      PIC S9(07).
+               05  TBL-RSIKIN          PIC X(01).
                05  TBL-KAISU           PIC 9(03).
                05  TBL-ZAI-TBL         OCCURS   50.
                    07  TBL-SRYCD           PIC X(09).
@@ -179,6 +183,8 @@
                05  TBL-SORT-SRYKBN          PIC X(02).
                05  TBL-SORT-SRYSYUKBN       PIC X(03).
                05  TBL-SORT-ZAITENSU        PIC S9(07).
+               05  TBL-SORT-RSIKINGAKU      PIC S9(07).
+               05  TBL-SORT-RSIKIN          PIC X(01).
                05  TBL-SORT-KAISU           PIC 9(03).
                05  TBL-SORT-ZAI-TBL         OCCURS   50.
                    07  TBL-SORT-SRYCD           PIC X(09).
@@ -673,11 +679,27 @@
                    MOVE    ZERO            TO  TBL-ZAITENSU (IDX-TBL)
                END-IF
            END-IF
+      *
            IF     (WRK-SUM-KINGAKU NOT =   ZERO )  AND
                   (WRK-SUM-TENSU       =   ZERO )
       *        ¼«ÇåÀÕ¤Î¶â³ÛÊ¬
                MOVE    1               TO  FLG-MEISAI
                MOVE    ZERO            TO  TBL-ZAITENSU (IDX-TBL)
+           END-IF
+      *!!!
+      *    Ï«ºÒ¶â³Û
+           IF     (WRK-SUM-KINGAKU NOT =   ZERO )  AND
+                  (WRK-SUM-TENSU       =   ZERO )  AND
+                  (TBL-RSIKINGAKU (IDX-TBL)    NOT =   ZERO )
+               IF      ACCT-SRYKBN         =   "11"
+                                           OR  "12"
+                   CONTINUE
+               ELSE
+      *            ½é¿Ç¡¦ºÆ¿Ç°Ê³°¤Ï£±ºÞËè¤Î¶â³Û¤È¤¹¤ë 
+                   MOVE    "1"             TO  TBL-RSIKIN   (IDX-TBL)
+                   MOVE    ZERO            TO  TBL-ZAITENSU (IDX-TBL)
+                   MOVE    ZERO            TO  FLG-MEISAI
+               END-IF
            END-IF
       *
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -749,6 +771,9 @@
                ELSE
                    MOVE    ACCT-ZAITEN     TO  TBL-ZAITENSU(IDX-TBL)
                END-IF
+      *!
+      *        Ï«ºÒ¶â³Û
+               MOVE    ACCTP-RSIKINGAKU    TO  TBL-RSIKINGAKU (IDX-TBL)
            ELSE
                MOVE    ACCT-ZAITEN     TO  TBL-ZAITENSU(IDX-TBL)
            END-IF
@@ -1000,6 +1025,41 @@
                    COMPUTE WRK-TENSU-KEI       =   WRK-TENSU-KEI
                                                +   WRK-KINGAKU
                END-IF
+      *!!!
+               IF     (TBL-RSIKIN (IDX)    =   "1"  )
+      *            Ï«ºÒ±ß
+                   MOVE    TBL-RSIKINGAKU (IDX)  TO  WRK-ZAITENSU
+                   IF      WRK-ZAITENSU        >   ZERO
+                       MOVE    WRK-ZAITENSU    TO  WRK-Z1192
+                       MOVE    WRK-Z1192       TO  ORCHC04SUB-H-TENSU
+                                                              (IDX-H)
+                   ELSE
+                       MOVE    WRK-ZAITENSU    TO  WRK-Z1192-2
+                       MOVE    WRK-Z1192-2     TO  ORCHC04SUB-H-TENSU
+                                                              (IDX-H)
+                   END-IF
+      *            ¹ç·×
+                   COMPUTE WRK-KINGAKU         =  (WRK-ZAITENSU
+                                               *   TBL-KAISU    (IDX) )
+                   IF      WRK-KINGAKU         >   ZERO
+                       MOVE    WRK-KINGAKU     TO  WRK-Z119
+                       MOVE    WRK-Z119        TO  ORCHC04SUB-H-KINGAKU
+                                                              (IDX-H)
+                   ELSE
+                       MOVE    WRK-KINGAKU     TO  WRK-Z119-2
+                       MOVE    WRK-Z119-2      TO  ORCHC04SUB-H-KINGAKU
+                                                              (IDX-H)
+                   END-IF
+      *            ºÞÅÀ¿ô
+                   MOVE    TBL-RSIKINGAKU (IDX)
+                                           TO  ORCHC04SUB-ZAITENSU
+                                                              (IDX-H)
+      *            ±ß
+                   MOVE    "1"                 TO  ORCHC04SUB-H-ENKBN
+                                                              (IDX-H)
+               END-IF
+      *!!!
+      *
       *        ²ó¿ô
                MOVE    TBL-KAISU (IDX)     TO  WRK-ZZ9
                MOVE    WRK-ZZ9             TO  ORCHC04SUB-H-KAISU

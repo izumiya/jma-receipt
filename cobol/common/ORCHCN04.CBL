@@ -43,6 +43,7 @@
       *  04.06.00    NACL-Â¿¡¹Ç¼  10/12/01  ¼«ÇåÀÕ¶â³ÛÆþÎÏÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/10/XX  Æ±ÆüºÆÆþ±¡ÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/12/22  ¾¦ÉÊÌ¾¥³¡¼¥ÉÃ±²ÁÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/02/13  Ï«ºÒ¶â³Û¡ó²Ã»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -96,6 +97,8 @@
            03  FLG-RSIKSN          PIC 9(01).
            03  FLG-MEISAI          PIC 9(01).
            03  FLG-LINE            PIC 9(01).
+      *
+           03  FLG-RSIKIN          PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -246,6 +249,7 @@
            03  TBL-SRYKBN              PIC X(02).
            03  TBL-SRYSYUKBN           PIC X(03).
            03  TBL-ZAITENSU            PIC S9(07).
+           03  TBL-RSIKINGAKU          PIC S9(07).
            03  TBL-KINGAKU             PIC S9(08).
            03  TBL-ENKBN               PIC X(01).
            03  TBL-KAISU               PIC 9(03).
@@ -1413,10 +1417,28 @@
                MOVE    1               TO  FLG-MEISAI
                MOVE    ZERO            TO  TBL-ZAITENSU 
            END-IF
+      *!!!
+           MOVE    ZERO                TO  FLG-RSIKIN
+      *    Ï«ºÒ¶â³Û
+           IF     (WRK-SUM-KINGAKU NOT =   ZERO )  AND
+                  (WRK-SUM-TENSU       =   ZERO )  AND
+                  (TBL-RSIKINGAKU  NOT =   ZERO )
+               IF      ACCT-SRYKBN         =   "11"
+                                           OR  "12"
+                   CONTINUE
+               ELSE
+      *            ½é¿Ç¡¦ºÆ¿Ç°Ê³°¤Ï£±ºÞËè¤Î¶â³Û¤È¤¹¤ë 
+                   MOVE    TBL-RSIKINGAKU  TO  TBL-ZAITENSU
+                   MOVE    1               TO  FLG-RSIKIN
+                   MOVE    ZERO            TO  FLG-MEISAI
+               END-IF
+           END-IF
       *
       *    ¶â³Û
-           IF      TBL-SRYKBN          =   "97"
+           IF     (TBL-SRYKBN          =   "97" )
       *        ¿©»ö¤Ï¶â³Û
+              OR  (FLG-RSIKIN          =   1    )
+      *        Ï«ºÒ¶â³Û
                COMPUTE TBL-KINGAKU         =  (TBL-ZAITENSU
                                            *   TBL-KAISU )
                MOVE    "1"                 TO  TBL-ENKBN
@@ -1479,6 +1501,9 @@
                ELSE
                    MOVE    ACCT-ZAITEN     TO  TBL-ZAITENSU
                END-IF
+      *!
+      *        Ï«ºÒ¶â³Û
+               MOVE    ACCTP-RSIKINGAKU    TO  TBL-RSIKINGAKU
            ELSE
                MOVE    ACCT-ZAITEN     TO  TBL-ZAITENSU
            END-IF

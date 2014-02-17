@@ -35,6 +35,7 @@
       * 04.01.00     NACL-Â¿¡¹Ç¼  07/10/23  ¸øÌ³ºÒ³²ÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/09/25  ¥×¥í¥°¥é¥à¥ª¥×¥·¥ç¥óÊÝ¸±ÂÐ±þ
       * 04.07.01     NACL-ÌçÏÆ    13/09/30  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  14/02/13  Ï«ºÒ¶â³Û¡ó²Ã»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -95,6 +96,8 @@
       *
            03  FLG-NEXT-YY             PIC 9(01).
            03  FLG-HKNCOMBICHK     PIC 9(01).
+      *
+           03  FLG-KAGEN           PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -1021,6 +1024,8 @@
       *
            MOVE    ZERO                TO  WRK-SUM-TEN
            MOVE    ZERO                TO  WRK-RSI-MONEY
+      *    Ï«ºÒ¶â³Û¡ó²Ã»» 
+           MOVE    ZERO                TO  FLG-KAGEN
       *    ¿ÇÎÅ¹Ô°Ù¥Þ¥¹¥¿¡¼ÆÉ¤ß¹þ¤ß
            INITIALIZE                      SRYACT-REC
            MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
@@ -1079,6 +1084,11 @@
                            COMPUTE WRK-RSI-MONEY   =   WRK-RSI-MONEY
                                                    +   TNS-TEN
                        END-IF
+      *                ¡ó²Ã»»¡¦¸º»»¤¢¤ê
+                       IF     (TNS-TENSIKIBETU     =   5
+                                                   OR  6  )
+                           MOVE    1               TO  FLG-KAGEN
+                       END-IF
                    END-IF
                END-PERFORM
       *
@@ -1096,6 +1106,23 @@
            ELSE
                MOVE    ZERO                TO  WRK-ZAITEN
            END-IF
+      *
+      *    Ï«ºÒ¶â³Û¡ó²Ã»»ÂÐ±þ
+           IF     (ACCT-ZAIREQFLG      =   "1" )
+             AND  (FLG-KAGEN           =   1   )
+             AND  (WRK-RSI-MONEY       >   ZERO)
+               PERFORM 950-SRYACCTPLUS-READ-SEC
+               IF     (ACCTP-RSIKINGAKU    =   ZERO )
+                  OR  (ACCT-SRYKBN         =   "11"
+                                           OR  "12" )
+                   CONTINUE
+               ELSE
+      *            ¶â³Û¤Î¤ß¤ÎºÞ¤Ç¤¢¤ë
+                   MOVE    ACCTP-RSIKINGAKU    TO  WRK-RSI-MONEY
+                   MOVE    ZERO                TO  WRK-ZAITEN
+               END-IF
+           END-IF
+      *
       *    Ï«ºÒ±ßÊ¬
            IF      WRK-RSI-MONEY       >   ZERO
                MOVE      1                 TO  FLG-ARI2

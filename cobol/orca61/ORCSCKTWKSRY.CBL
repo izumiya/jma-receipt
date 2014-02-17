@@ -184,6 +184,8 @@
       *
            03  FLG-DAY             PIC 9(01).
       *
+           03  FLG-RSITEN          PIC 9(01).
+      *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
            03  IDX                     PIC 9(04).
@@ -291,6 +293,15 @@
            03  IDX-N2                  PIC 9(02).
       *
            03  WRK-KANSURYO            PIC 9(05)V9(5).
+      *
+      *    Ï«ºÒ»Ü½Ñ²Ã»»ÅùÍÑ
+           03  WRK-ENTANKA             PIC S9(08).
+           03  IDR-1                   PIC 9(04).
+           03  IDR-2                   PIC 9(04).
+           03  WRK-TENKEISAN           PIC 9(08)V99.
+           03  WRK-TENSUKEI-9          PIC S9(08).
+           03  WRK-TENSUKEI-G          PIC S9(08).
+           03  WRK-TENSUKEI-K          PIC S9(08).
       *
       *    ½¸·×¼ýÇ¼ÀÁµáÆâÍÆ
        01  WRK-SUM-AREA.
@@ -3504,24 +3515,49 @@
                   (SPA-COM-RSIKBN      (IDX)   =   1  )  AND
                   (SPA-COM-INPUTCD (IDX)(1:1)  =   "1")
       *        ±ß
-               COMPUTE WRK-EN          =   SPA-COM-TEN (IDX)
+      *H26.2
+      *        Ï«ºÒ¶â³Û¡ó²Ã»»ºÆ·×»»ÂÐ±þ
+               PERFORM 450112-RSI-SKASAN-SEC
+      *******  COMPUTE WRK-EN          =   SPA-COM-TEN (IDX)
+               COMPUTE WRK-EN          =   WRK-ENTANKA
                                        *   SPA-COM-KAISU (IDX)
                MOVE    ZERO            TO  WRK-TENSU
       *        Ï«ºÒ¤Î±ß
-               MOVE    WRK-EN          TO  SPA-COM-RSIKIN(IDX)
+      ******   MOVE    WRK-EN          TO  SPA-COM-RSIKIN(IDX)
+               MOVE    WRK-ENTANKA     TO  SPA-COM-RSIKIN(IDX)
+               MOVE    1               TO  FLG-RSITEN
            ELSE
-               IF      SPA-COM-PLUSKBN (IDX)   =   1
-                   COMPUTE WRK-TENSU       =  (SPA-COM-KISOTEN (IDX)
-                                           *   SPA-COM-KAISU (IDX) )
-                                           *   -1
-               ELSE
+               IF     (SPA-COM-TENSIKIBETU (IDX)   =   3  )
+      *            ÅÀ¿ô
                    COMPUTE WRK-TENSU       =   SPA-COM-KISOTEN (IDX)
                                            *   SPA-COM-KAISU (IDX)
+                   IF      SPA-COM-PLUSKBN(IDX)    =   1
+                       COMPUTE WRK-TENSU       =  (SPA-COM-KISOTEN (IDX)
+                                               *   SPA-COM-KAISU (IDX) )
+                                               *   -1
+                   END-IF
+                   MOVE    ZERO            TO  WRK-EN
+      *            Ï«ºÒ¤Î±ß
+                   MOVE    ZERO            TO  SPA-COM-RSIKIN(IDX)
+      *
+               ELSE
+                   MOVE    ZERO            TO  WRK-EN
+                   MOVE    ZERO            TO  WRK-TENSU
                END-IF
-               MOVE    ZERO            TO  WRK-EN
-      *        Ï«ºÒ¤Î±ß
-               MOVE    ZERO            TO  SPA-COM-RSIKIN(IDX)
            END-IF
+      *
+           IF     (SPA-COM-SRYKBN  (IDX)   =   "11"
+                                           OR  "12"
+                                           OR  "13" ) OR
+                 ((SPA-COM-SRYKBN (IDX)    =   "80" ) AND
+                  (FLG-RSITEN              =   1    ))
+               CONTINUE
+           ELSE
+               IF      SPA-COM-ZAIEND (IDX)    NOT =   "1"
+                   GO      TO      45011-RSI-SYUNOU-EXT
+               END-IF
+           END-IF
+      *
       *
            EVALUATE    SPA-COM-SRYKBN  (IDX)
       *        ½é¿Ç
@@ -3580,6 +3616,54 @@
            END-EVALUATE
            .
        45011-RSI-SYUNOU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ï«ºÒ¶â³Û¡ó²Ã»»ºÆ·×»»ÂÐ±þ½èÍý
+      *****************************************************************
+       450112-RSI-SKASAN-SEC               SECTION.
+      *
+           MOVE    ZERO                TO  WRK-ENTANKA
+           MOVE    ZERO                TO  WRK-TENSUKEI-G
+           MOVE    ZERO                TO  WRK-TENSUKEI-K
+           IF      SPA-COM-ZAIEND (IDX)    =   "1"
+               COMPUTE IDR-1           =   SPA-GMN-MAX +   1
+           ELSE
+               COMPUTE IDR-1           =   IDX     +   1
+           END-IF
+           PERFORM VARYING     IDR-2   FROM    IDR-1   BY  1
+                   UNTIL      (IDR-2   >   SPA-GMN-MAX  )
+      *
+               IF     (SPA-COM-TENSIKIBETU (IDR-2) =   "5"  )  AND
+                      (SPA-COM-INPUTCD(IDR-2)(1:3) =   "101")
+      *            ¡ó²Ã»»¡¡±ßÌ¤ËþÀÚ¤ê¼Î¤Æ
+                   MOVE    ZERO                TO  WRK-TENKEISAN
+                   COMPUTE WRK-TENKEISAN   =   SPA-COM-TEN (IDX)
+                                           *   SPA-COM-KISOTEN (IDR-2)
+                                           /   100
+                   MOVE    WRK-TENKEISAN       TO  WRK-TENSUKEI-9
+                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-K
+               END-IF
+      *
+               IF     (SPA-COM-TENSIKIBETU (IDR-2) =   "6"  )  AND
+                      (SPA-COM-INPUTCD(IDR-2)(1:3) =   "101")
+      *            ¡ó¸º»»¡¡±ßÌ¤ËþÀÚ¤ê¼Î¤Æ
+                   MOVE    ZERO                TO  WRK-TENKEISAN
+                   COMPUTE WRK-TENKEISAN   =   SPA-COM-TEN (IDX)
+                                           *   SPA-COM-KISOTEN (IDR-2)
+                                           /   100
+                   MOVE    WRK-TENKEISAN       TO  WRK-TENSUKEI-9
+                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-G
+               END-IF
+               IF      (SPA-COM-ZAIEND (IDR-2)  =   "1" )
+                   MOVE    SPA-GMN-MAX     TO  IDR-2
+               END-IF
+           END-PERFORM
+           COMPUTE WRK-ENTANKA         =   SPA-COM-TEN (IDX)
+                                       +   WRK-TENSUKEI-K
+                                       -   WRK-TENSUKEI-G
+           .
+       450112-RSI-SKASAN-EXT.
            EXIT.
       *
       *****************************************************************
