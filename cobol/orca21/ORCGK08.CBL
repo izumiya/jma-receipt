@@ -64,6 +64,7 @@
       *                                     （一般名記載編集）
       *  04.07.00    NACL-多々納  13/03/XX  Ｈ２５年４月改正対応
       *  04.07.00    NACL-多々納  13/10/XX  第三者行為対応
+      *  04.07.00    NACL-多々納  14/02/13  労災金額％加算対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -326,6 +327,8 @@
            03  FLG-GENERICNAME         PIC 9(01).
            03  FLG-TENSUPLUS           PIC 9(01).
       *
+           03  FLG-RSIKSN              PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -372,6 +375,9 @@
            03  IDX-TS              PIC 9(04).
       *
            03  IDM2                PIC 9(04).
+      *
+           03  IDR-2                PIC 9(04).
+      *
       *    一時領域
        01  WRK-AREA.
            03  WRK-SYSYMD.
@@ -637,6 +643,10 @@
       *    点数マスタ−
       *01  TENSU-REC.
            COPY    "CPTENSU.INC".
+      *
+      *    点数マスタ−（ワーク）
+      *01  TNSWK-TENSU-REC.
+           COPY    "CPTENSUWK.INC".
       *
       *    入力コードマスタ−
        01  INPUTCD-REC.
@@ -4835,6 +4845,9 @@
                                                =   "101" ) AND
                           (TNS-TENSIKIBETU     =   1    )
                        MOVE    1                   TO  FLG-RSIFLG
+      *H26.2
+      *                労災金額％加算対応
+                       PERFORM 450521-RSI-SKASAN-SEC
                    END-IF
       *            自賠責で証明料等の時、点数をゼロとする
                    IF     (LNK-WKSRY-SRYKBN(IDX)       =   "80")  AND
@@ -4971,6 +4984,39 @@
            .
        45052-JIBAI-SYORI-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    労災金額％加算再計算対応処理
+      *****************************************************************
+       450521-RSI-SKASAN-SEC               SECTION.
+      *
+           MOVE    TNS-TENSU-REC       TO  TNSWK-TENSU-REC
+           MOVE    ZERO                TO  FLG-RSIKSN
+           PERFORM VARYING     IDR-2   FROM    IDS   BY  1
+                   UNTIL      (IDR-2         >   5   )  OR
+                              (LNK-WKSRY-SRYCD(IDX IDR-2)
+                                              =   SPACE )
+               IF     (LNK-WKSRY-SRYCD (IDX IDR-2)(1:3)
+                                               =   "101" )
+                   MOVE    LNK-WKSRY-SRYCD (IDX IDR-2)   TO  TNS-SRYCD
+                   PERFORM 910-TENSU-READ-SEC
+                   IF      TNS-TENSIKIBETU     =   5
+                                               OR  6
+                       MOVE    1               TO  FLG-RSIKSN
+                   END-IF
+               END-IF
+           END-PERFORM
+      *
+           IF      FLG-RSIKSN          =   1
+      *        ％加算ありは、剤点数を対象とする
+               ADD     LNK-WKSRY-SYUTEN1 (IDX) TO  WRK-SYUTEN1
+               MOVE    ZERO                TO  FLG-RSIFLG
+           END-IF
+           MOVE    TNSWK-TENSU-REC     TO  TNS-TENSU-REC
+           .
+       450521-RSI-SKASAN-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    公害保険の時、技術点を集計処理
