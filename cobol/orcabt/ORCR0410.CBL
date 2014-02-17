@@ -103,6 +103,7 @@
       *  04.07.04    NACL-ÌçÏÆ    13/04/16  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *                                     Ï«ºÒ»ØÄê°åÎÅµ¡´Ø¶èÊ¬ÊÔ½¸
       *  04.07.05    NACL-ÌçÏÆ    13/10/02  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
+      *  04.07.06    NACL-ÌçÏÆ    14/02/13  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î»Ü½Ñ²Ã»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -224,7 +225,11 @@
       *
            03  WRK-KEISAN                              PIC  9(09).
            03  WRK-KEISAN2                             PIC  9(09).
+           03  WRK-KEISAN-KG                           PIC  9(09).
+           03  WRK-KEISAN-KG2                          PIC  9(09).
            03  WRK-TEN                                 PIC  9(09).
+           03  WRK-TEN-KG                              PIC  9(09).
+           03  WRK-TEN-KG2                             PIC  9(09).
            03  WRK-KIN                                 PIC  9(09).
            03  WRK-TANKA                               PIC  9(02)V99.
            03  WRK-KSNRATE                             PIC  9(03).      
@@ -273,6 +278,8 @@
            03  WRK-HKNKBN                              PIC  X(01).
       *
            03  WRK-TAIHI-DAY                           PIC  9(02).
+      *
+           03  WRK-FUTANWARI                           PIC  9V99.
       *
       *    ¼êµ»ÅÀ¡¦ÌôºÞÅùÅÀ¿ôÍÑÎÎ°è
        01  TBL-TENSUG-JI.
@@ -1890,6 +1897,30 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                        END-IF
       *
+                       IF   RECE41-SRYYM   >=  "201307"
+                          EVALUATE  SRY-SRYCD(IDY)
+                           WHEN    "101801010"  THRU  "101801020"
+                            ADD  TNS-TEN             TO  WRK-KIN
+                            COMPUTE  WRK-TEN  =  WRK-TEN   +
+                                    (TNS-TEN / 10)
+      *
+                            COMPUTE WRK-TEN-KG  = TNS-TEN / 10
+                            COMPUTE WRK-TEN-KG2 = TNS-TEN
+                          END-EVALUATE
+                          IF   SRY-SRYCD(IDY) = "101801030"
+                            COMPUTE WRK-FUTANWARI = TNS-TEN / 100
+      *
+                            COMPUTE WRK-KEISAN-KG2 =
+                                   (WRK-TEN-KG2 * WRK-FUTANWARI)
+                            ADD  WRK-KEISAN-KG2 TO    WRK-KIN
+      *
+                            COMPUTE WRK-KEISAN-KG  =
+                                   (WRK-TEN-KG  * WRK-FUTANWARI)
+                                                + 0.5
+                            ADD  WRK-KEISAN-KG  TO    WRK-TEN
+                          END-IF
+                       END-IF
+      *
                    END-PERFORM
       *
                    MOVE    "tbl_sryact"     TO      MCP-TABLE
@@ -2141,6 +2172,28 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                         TBL-SYUTEN-JI(ID1)  -
                                  ( WRK-ZAIKAISU-JI * WRK-TEN-JI )
       *
+                       END-IF
+      *
+                       IF   RECE41-SRYYM  >=  "201307"
+                         EVALUATE  SRY-SRYCD(IDY)
+                           WHEN    "101801010"  THRU  "101801020"
+                               COMPUTE  WRK-TEN-JI   =  TNS-TEN / 10
+                               COMPUTE  TBL-SYUTEN-JI(ID1)  =
+                                        TBL-SYUTEN-JI(ID1)  -
+                                 ( WRK-ZAIKAISU-JI * WRK-TEN-JI )
+      *
+                               COMPUTE  WRK-TEN-KG   =  TNS-TEN / 10
+                         END-EVALUATE
+                         IF   SRY-SRYCD(IDY) = "101801030"
+                               COMPUTE  WRK-FUTANWARI = TNS-TEN / 100
+      *
+                               COMPUTE  WRK-KEISAN-KG =
+                                       (WRK-TEN-KG * WRK-FUTANWARI)
+                                                   + 0.5
+                               COMPUTE  TBL-SYUTEN-JI(ID1)  =
+                                        TBL-SYUTEN-JI(ID1)  -
+                                 ( WRK-ZAIKAISU-JI * WRK-KEISAN-KG )
+                         END-IF
                        END-IF
       *
                        IF  ( ACCT-SRYKBN         =  "80"    ) AND

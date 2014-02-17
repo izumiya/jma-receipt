@@ -86,6 +86,7 @@
       *  04.07.01    NACL-ÌçÏÆ    11/09/09  Ï«ºÒÀÁµá½ñºîÀ®ÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
       *  04.07.03    NACL-ÌçÏÆ    13/10/02  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
+      *  04.07.04    NACL-ÌçÏÆ    14/02/13  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î»Ü½Ñ²Ã»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1782,12 +1783,14 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          IF   RECE82-SRYYM         >= "201307"
                            EVALUATE  SRY-SRYCD(SRYACT-IDX)
                              WHEN    "101800570"  THRU  "101800860"
+                             WHEN    "101801010"  THRU  "101801020"
                               ADD    TNS-TEN      TO    WRK-KIN2
       *
                               COMPUTE WRK-TEN-KG2 = TNS-TEN
                            END-EVALUATE
                            IF   SRY-SRYCD(SRYACT-IDX) = "101800550" OR
-                                         "101800560" OR "101800990"
+                                         "101800560" OR "101800990" OR
+                                         "101801030"
                               COMPUTE WRK-FUTANWARI = TNS-TEN / 100
       *
                               COMPUTE WRK-KEISAN-KG2 =
@@ -1856,6 +1859,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                          IF   RECE82-SRYYM         >= "201307"
                            EVALUATE  SRY-SRYCD(SRYACT-IDX)
                              WHEN    "101800570"  THRU  "101800860"
+                             WHEN    "101801010"  THRU  "101801020"
                               ADD    TNS-TEN      TO    WRK-KIN
                               COMPUTE  WRK-TEN  =   WRK-TEN   +
                                        ( TNS-TEN / 10)
@@ -1864,7 +1868,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               COMPUTE WRK-TEN-KG2 = TNS-TEN
                            END-EVALUATE
                            IF   SRY-SRYCD(SRYACT-IDX) = "101800550" OR
-                                         "101800560" OR "101800990"
+                                         "101800560" OR "101800990" OR
+                                         "101801030"
                               COMPUTE WRK-FUTANWARI = TNS-TEN / 100
       *
                               COMPUTE WRK-KEISAN-KG2 =
@@ -2187,6 +2192,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                        IF   RECE82-SRYYM         >= "201307"
                          EVALUATE  SRY-SRYCD(SRYACT-IDX)
                            WHEN    "101800570"  THRU  "101800860"
+                           WHEN    "101801010"  THRU  "101801020"
                               COMPUTE  WRK-TEN-JI   =  TNS-TEN / 10
                               COMPUTE  TBL-SYUTEN-JI(IDY)  =
                                        TBL-SYUTEN-JI(IDY)  -
@@ -2195,7 +2201,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               COMPUTE  WRK-TEN-KG = TNS-TEN / 10
                          END-EVALUATE
                          IF   SRY-SRYCD(SRYACT-IDX) = "101800550" OR
-                                       "101800560" OR "101800990"
+                                       "101800560" OR "101800990" OR
+                                       "101801030"
                               COMPUTE  WRK-FUTANWARI = TNS-TEN / 100
       *
                               COMPUTE  WRK-KEISAN-KG =

@@ -56,6 +56,7 @@
       *  04.07.02    NACL-ÌçÏÆ    13/10/02  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.03    NACL-ÌçÏÆ    13/12/03  ¼«ÇåÀÕ¡ÊÏ«ºÒ½àµò¡Ë¤Î¥ì¥»¥×¥ÈÍÍ¼°
       *                                     ÄÉ²ÃÂÐ±þ
+      *  04.07.04    NACL-ÌçÏÆ    14/02/13  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î»Ü½Ñ²Ã»»ÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -820,8 +821,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                        MOVE   778       TO  RECE46-GAITENTTLKBN
                    END-EVALUATE
                END-EVALUATE
-             ELSE                                                         
-               MOVE   WRK-GAITENTTLKBN  TO  RECE46-GAITENTTLKBN
+             ELSE
+               IF   (RECE46-SRYCD1 >= "101801010" AND <= "101801020")
+               AND  (RECE41-SRYYM  >= "201307"                      )
+                    MOVE   997               TO  RECE46-GAITENTTLKBN
+               ELSE
+                    MOVE   WRK-GAITENTTLKBN  TO  RECE46-GAITENTTLKBN
+               END-IF
              END-IF
            END-IF
       *

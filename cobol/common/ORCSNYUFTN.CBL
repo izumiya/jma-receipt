@@ -149,6 +149,7 @@
       *  04.07.01    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
       *  04.07.02    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.03    NACL-ÌçÏÆ    14/02/12  ½Å¾ÉÈéÉæÄÙáç´ÉÍý²Ã»»ÂÐ±þ
+      *  04.07.04    NACL-ÌçÏÆ    14/02/13  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î»Ü½Ñ²Ã»»ÂÐ±þ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -6079,6 +6080,7 @@ grpsys                              SPA-AREA
                         END-IF
                         EVALUATE  SRY-SRYCD(IDZ)
                           WHEN    "101800570"  THRU  "101800860"
+                          WHEN    "101801010"  THRU  "101801020"
                            COMPUTE WRK-RSIETC = WRK-RSIETC +
                                   (WRK-TEN  *   SINRYO-COUNT)
                            COMPUTE WRK-RSIETC2 = WRK-RSIETC2 +
@@ -6088,7 +6090,8 @@ grpsys                              SPA-AREA
                            COMPUTE WRK-TEN-KG2    = TNS-TEN
                         END-EVALUATE
                         IF   SRY-SRYCD(IDZ)   = "101800550" OR
-                                 "101800560" OR "101800990"
+                                 "101800560" OR "101800990" OR
+                                 "101801030"
                            COMPUTE WRK-FUTANWARI  = TNS-TEN / 100
       *
                            COMPUTE WRK-KEISAN     =

@@ -66,6 +66,7 @@
       *                                     （電話再診料　等）
       *
       *  04.07.01    NACL-門脇    13/07/10  自賠責（第三者行為）対応
+      *  04.07.02    NACL-門脇    14/02/13  労災・自賠責の施術加算対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -146,6 +147,8 @@
            03  WRK-SYURRKNUM               PIC S9(09)  BINARY.
            03  WRK-SYUEDANUM               PIC S9(09)  BINARY.
            03  WRK-SYURRKUPDKBN            PIC X(01).
+           03  WRK-FUTANWARI               PIC 9V99.
+           03  WRK-KEISAN2                 PIC 9(09).
       *
       *    剤番号等退避用テーブル
        01  ZAIBAN-TABLE.
@@ -195,6 +198,9 @@
            03  WRK-TEN                     PIC  9(08).
       *
            03  WK-KOGAI-TEN                PIC  9(08).
+      *
+           03  WRK-TEN-KG                  PIC  9(09).
+           03  WRK-TEN-KG2                 PIC  9(09).
       *
       *    システム領域
        01  SYS-AREA.
@@ -2688,6 +2694,36 @@
                                     (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
                              COMPUTE WK-RSIETC2 = WK-RSIETC2 +
                                     (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
+                           END-IF
+                           EVALUATE  SRY-SRYCD(IDX3)
+                            WHEN    "101801010"  THRU  "101801020"
+                             COMPUTE WK-RSIETC  = WK-RSIETC +
+                                    (WRK-TEN  *   TBL-ZAIKAISU (IDX1))
+                             COMPUTE WK-RSIETC2 = WK-RSIETC2 +
+                                    (TNS-TEN  *   TBL-ZAIKAISU (IDX1))
+      *
+                             COMPUTE WRK-TEN-KG     = WRK-TEN
+                             COMPUTE WRK-TEN-KG2    = TNS-TEN
+                           END-EVALUATE
+                           IF  SRY-SRYCD(IDX3) = "101801030"
+                             COMPUTE WRK-FUTANWARI  = TNS-TEN / 100
+      *
+                             COMPUTE WRK-KEISAN2    =
+                                    (WRK-TEN-KG     * WRK-FUTANWARI)
+                                                    + 0.5
+                             COMPUTE WRK-KEISAN2    =
+                                    (WRK-KEISAN2    *
+                                                TBL-ZAIKAISU (IDX1))
+                             COMPUTE WK-RSIETC      =
+                                     WK-RSIETC      + WRK-KEISAN2
+      *
+                             COMPUTE WRK-KEISAN2    =
+                                    (WRK-TEN-KG2    * WRK-FUTANWARI)
+                             COMPUTE WRK-KEISAN2    =
+                                    (WRK-KEISAN2    *
+                                                TBL-ZAIKAISU (IDX1))
+                             COMPUTE WK-RSIETC2     =
+                                     WK-RSIETC2     + WRK-KEISAN2
                            END-IF
                          ELSE
                            IF  SRY-SRYCD(IDX3) =
