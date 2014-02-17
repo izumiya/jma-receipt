@@ -335,6 +335,7 @@
            03  WRK-DRCD                PIC X(05).
            03  WRK-SRYKA               PIC X(02).
            03  WRK-HKNCOMBINUM         PIC X(04).
+           03  WRK-MAE-HKNCOMBINUM     PIC X(04).
       *
            03  WRK-MOTOPG              PIC X(08).
       *
@@ -1464,8 +1465,12 @@
            MOVE    SPA-HKNCOMBINUM     TO  SPA-NAI-HKNCOMBIOK
       *
            MOVE    SPA-HKNCOMBINUM     TO  SPA-GMN-HKNCOMBINUM
+      *    Á°²ó´µ¼ÔÊÝÂ¸
+           MOVE    SPA-PTID            TO  SPA-LAST-PTID
+           MOVE    SPA-GMN-PTNUM       TO  SPA-LAST-PTNUM
       *
            MOVE    2                   TO  SPA-GMN-CUR
+      *
            .
        4101-PTNUM-CHK-EXT.
            EXIT.
@@ -2030,6 +2035,9 @@
            END-IF
       *
       *    ¿ÇÎÅ²Ê
+           IF      SPA-GMN-SRYKA       =   SPACE
+               MOVE    SPA-GMN-SRYKAL(01)  TO  SPA-GMN-SRYKA
+           END-IF
            PERFORM VARYING     IDX     FROM    1  BY  1
                    UNTIL       IDX     >   SPA-SRYKA-MAX
                IF      SPA-GMN-SRYKA       =   SPA-GMN-SRYKAL(IDX)
@@ -2073,7 +2081,12 @@
       *
                MOVE    WRK-HENYMDG         TO  K01-SRYYMD
                MOVE    WRK-HENYMDG         TO  SPA-GMN-SRYYMD
+               MOVE    SPA-GMN-HKNCOMBINUM TO  WRK-MAE-HKNCOMBINUM
                PERFORM 4103-SRYYMD-CHK-SEC
+      *
+               IF      SPA-GMN-HKNCOMBINUM =   SPACE
+                   MOVE    WRK-MAE-HKNCOMBINUM TO  SPA-GMN-HKNCOMBINUM
+               END-IF
            ELSE
                MOVE    "0013"              TO  SPA-ERRCD
            END-IF
