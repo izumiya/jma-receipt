@@ -179,7 +179,6 @@ fi
 	ERRFILE="${TMPFILEBASE}${SHNAME%%.sh}.ERR"
 	ERRFILE="${ERRFILE// /X}"
 	ERRLOG="${TMPFILEBASE}${SHNAME%%.sh}.log"
-	EUCFILE="${TMPFILEBASE}$(basename ${INFILE}).euc"
 
 	echo "echo " ${ERRFILE} >> $LOG_FILE
         if  [ -e ${ERRFILE} ]; then
@@ -205,6 +204,7 @@ fi
 	      INFILE=${OUT_FOLDER}$f
             fi
             echo "INFILE= " ${INFILE} >> $LOG_FILE 2>&1
+			EUCFILE="${TMPFILEBASE}$(basename ${INFILE}).euc"
 
             if  [ ${f: -4} = '.UKE' ]; then
 	        SKYKBN="1"
