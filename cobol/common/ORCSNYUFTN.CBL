@@ -150,6 +150,9 @@
       *  04.07.02    NACL-ÃÁœ∆    13/07/10  º´«Â¿’° ¬Ëª∞º‘π‘∞Ÿ°À¬–±˛
       *  04.07.03    NACL-ÃÁœ∆    14/02/12  Ω≈æ…»È…ÊƒŸ·Á¥…Õ˝≤√ªª¬–±˛
       *  04.07.04    NACL-ÃÁœ∆    14/02/13  œ´∫“°¶º´«Â¿’§Œª‹Ω—≤√ªª¬–±˛
+      *  04.07.05    NACL-ÃÁœ∆    14/02/18  œ´∫“°¶º´«Â¿’°¶∏¯≥≤§«∆˛±°Œ¡§ÚªªƒÍ
+      *                                     §∑°¢∞Â ›§«∆˛±°Œ¡≤√ªª§Œø«Œ≈π‘∞Ÿ∆˛
+      *                                     Œœ§Úπ‘§√§øæÏπÁ§Œ•¡•ß•√•ØΩ§¿µ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -544,11 +547,12 @@
        01  TBL-NYUINRYO-KASAN-AREA.
            03  FILLER          PIC X(09)   VALUE    "190101770".
            03  FILLER          PIC X(09)   VALUE    "190106770".
+           03  FILLER          PIC X(09)   VALUE    "190814010".
       *
        01  TBL-NYUINRYO-KASAN-R   REDEFINES   TBL-NYUINRYO-KASAN-AREA.
-           03  TBL-NYUINRYO-KASAN   PIC X(09)   OCCURS    2.
+           03  TBL-NYUINRYO-KASAN   PIC X(09)   OCCURS    3.
       *
-       01  TBL-NYUINRYO-KASAN-MAX   PIC 9(02)   VALUE     2.
+       01  TBL-NYUINRYO-KASAN-MAX   PIC 9(02)   VALUE     3.
       *
       *    ∆˛±°Œ¡≤√ªª»ΩƒÍÕ—•∆°º•÷•Î£≤
        01  TBL-NYUINRYO-KASAN2-AREA.
@@ -5835,41 +5839,84 @@ grpsys                                        SPA-AREA
       **************************************************************
        NYUINRYO-KASAN-CHECK-SEC          SECTION.
       *
-           PERFORM   VARYING   IDX6   FROM    1   BY  1
-                      UNTIL   (IDX6    >   TBL-NYUINRYO-KASAN-MAX)
-                       OR     (FLG-NYUINRYO-KASAN-OK =  1        )
+      ***  PERFORM   VARYING   IDX6   FROM    1   BY  1
+      ***             UNTIL   (IDX6    >   TBL-NYUINRYO-KASAN-MAX)
+      ***              OR     (FLG-NYUINRYO-KASAN-OK =  1        )
       *
-             INITIALIZE                      SRYACT-REC
-             MOVE    ACCT-HOSPNUM     TO     SRY-HOSPNUM
-             MOVE    ACCT-NYUGAIKBN   TO     SRY-NYUGAIKBN
-             MOVE    ACCT-PTID        TO     SRY-PTID
-             MOVE    ACCT-SRYYM       TO     SRY-SRYYM
-             MOVE    ACCT-ZAINUM      TO     SRY-ZAINUM
-             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(1)
-             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(2)
-             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(3)
-             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(4)
-             MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(5)
-             MOVE    SRYACT-REC       TO     MCPDATA-REC
-             MOVE    "DBSELECT"       TO     MCP-FUNC
-             MOVE    "tbl_sryact"     TO     MCP-TABLE
-             MOVE    "key8"           TO     MCP-PATHNAME
-             CALL    "ORCDBMAIN"      USING  MCPAREA
-                                             MCPDATA-REC
-                                             SPA-AREA
-             IF      MCP-RC           =      ZERO
-               MOVE  "tbl_sryact"     TO     MCP-TABLE
-               MOVE  "key8"           TO     MCP-PATHNAME
-               PERFORM   SRYACT-READ-SEC
-               IF    FLG-SRYACT       =      ZERO
-                   MOVE       1       TO     FLG-NYUINRYO-KASAN-OK
-               END-IF
-             END-IF
-             MOVE    "tbl_sryact"     TO     MCP-TABLE
-             MOVE    "key8"           TO     MCP-PATHNAME
-             PERFORM     CSR-CLOSE-SEC
+      ***    INITIALIZE                      SRYACT-REC
+      ***    MOVE    ACCT-HOSPNUM     TO     SRY-HOSPNUM
+      ***    MOVE    ACCT-NYUGAIKBN   TO     SRY-NYUGAIKBN
+      ***    MOVE    ACCT-PTID        TO     SRY-PTID
+      ***    MOVE    ACCT-SRYYM       TO     SRY-SRYYM
+      ***    MOVE    ACCT-ZAINUM      TO     SRY-ZAINUM
+      ***    MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(1)
+      ***    MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(2)
+      ***    MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(3)
+      ***    MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(4)
+      ***    MOVE    TBL-NYUINRYO-KASAN(IDX6)   TO   SRY-SRYCD(5)
+      ***    MOVE    SRYACT-REC       TO     MCPDATA-REC
+      ***    MOVE    "DBSELECT"       TO     MCP-FUNC
+      ***    MOVE    "tbl_sryact"     TO     MCP-TABLE
+      ***    MOVE    "key8"           TO     MCP-PATHNAME
+      ***    CALL    "ORCDBMAIN"      USING  MCPAREA
+      ***                                    MCPDATA-REC
+      ***                                    SPA-AREA
+      ***    IF      MCP-RC           =      ZERO
+      ***      MOVE  "tbl_sryact"     TO     MCP-TABLE
+      ***      MOVE  "key8"           TO     MCP-PATHNAME
+      ***      PERFORM   SRYACT-READ-SEC
+      ***      IF    FLG-SRYACT       =      ZERO
+      ***          MOVE       1       TO     FLG-NYUINRYO-KASAN-OK
+      ***      END-IF
+      ***    END-IF
+      ***    MOVE    "tbl_sryact"     TO     MCP-TABLE
+      ***    MOVE    "key8"           TO     MCP-PATHNAME
+      ***    PERFORM     CSR-CLOSE-SEC
       *
-           END-PERFORM
+      ***  END-PERFORM
+      *
+      *    °„≈¿øÙ•ﬁ•π•ø§Œ•≥°º•……ΩÕ—»÷πÊ°‰
+      *    ∂Ë ¨§¨°÷£¡°◊§«°¢»÷πÊ§¨£≤£∞£∞»÷¬Ê§´•¡•ß•√•Ø§π§Î
+           INITIALIZE                       SRYACT-REC
+           MOVE    ACCT-HOSPNUM     TO      SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN   TO      SRY-NYUGAIKBN
+           MOVE    ACCT-PTID        TO      SRY-PTID
+           MOVE    ACCT-SRYYM       TO      SRY-SRYYM
+           MOVE    ACCT-ZAINUM      TO      SRY-ZAINUM
+           MOVE    SRYACT-REC       TO      MCPDATA-REC
+           MOVE    "DBSELECT"       TO      MCP-FUNC
+           MOVE    "tbl_sryact"     TO      MCP-TABLE
+           MOVE    "key9"           TO      MCP-PATHNAME
+           CALL    "ORCDBMAIN"      USING   MCPAREA
+                                            MCPDATA-REC
+                                            SPA-AREA
+           IF      MCP-RC = ZERO
+              MOVE  "tbl_sryact"    TO      MCP-TABLE
+              MOVE  "key9"          TO      MCP-PATHNAME
+              PERFORM   SRYACT-READ-SEC
+              IF   FLG-SRYACT = ZERO
+                 IF   SRY-SRYCD(1) NOT = SPACE
+                   MOVE     SPACE         TO  TNS-TENSU-REC
+                   INITIALIZE                 TNS-TENSU-REC
+                   MOVE     SRY-HOSPNUM   TO  TNS-HOSPNUM
+                   MOVE     SRY-SRYCD(1)  TO  TNS-SRYCD
+                   MOVE     SRY-SRYYM     TO  TNS-YUKOSTYMD(1:6)
+                                              TNS-YUKOEDYMD(1:6)
+                   MOVE     "01"          TO  TNS-YUKOSTYMD(7:2)
+                                              TNS-YUKOEDYMD(7:2)
+                   PERFORM  TENSU-READ-SEC
+                   IF  FLG-TENSU = ZERO
+                     IF  (TNS-CDKBN-KBN         = "A")
+                     AND (TNS-CDKBN-KBNNUM(1:1) = "2")
+                       MOVE       1       TO  FLG-NYUINRYO-KASAN-OK
+                     END-IF
+                   END-IF
+                 END-IF
+              END-IF
+           END-IF
+           MOVE    "tbl_sryact"     TO      MCP-TABLE
+           MOVE    "key9"           TO      MCP-PATHNAME
+           PERFORM     CSR-CLOSE-SEC
       *
            .
        NYUINRYO-KASAN-CHECK-EXT.
