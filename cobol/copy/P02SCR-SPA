@@ -1189,6 +1189,78 @@
                                                    OCCURS 20.
                05  SPA-GMN28-JMAMRVER-MAX         PIC 9(02).
       *
+      *        ²ð¸îÊÝ¸±¾ðÊó
+               05  SPA-GMN28-CAREHKN-AREA.
+                   07  SPA-GMN28-CR-HKNLST-G.
+                       09  SPA-GMN28-CR-HKNLST-OCC OCCURS   10.
+                           11  SPA-GMN28-TCHNUM        PIC 9(02).
+                           11  SPA-GMN28-TCRHKNJANUM   PIC X(06).
+                           11  SPA-GMN28-TCRHIHKNJANUM PIC X(10).
+                           11  SPA-GMN28-TCRHSTRYMD    PIC X(09).
+                           11  SPA-GMN28-TCRHENDYMD    PIC X(09).
+      *
+                           11  SPA-NAI28-TCRHSTRYMD    PIC X(08).
+                           11  SPA-NAI28-TCRHENDYMD    PIC X(08).
+                           11  SPA-NAI28-TCHKNSKBN     PIC X(01).
+                       09  SPA-GMN28-CRHKN-MAX      PIC 9(02).
+      *
+                   07  SPA-GMN28-CRHSELNUM          PIC 9(02).
+                   07  SPA-MAE28-CRHSELNUM          PIC 9(02).
+      *
+                   07  SPA-GMN28-CRHKN-ING.
+                       09  SPA-GMN28-CR-HKNJANUM       PIC X(06).
+                       09  SPA-GMN28-CR-HIHKNJANUM     PIC X(10).
+                       09  SPA-GMN28-CHTEKSTYMD        PIC X(10).
+                       09  SPA-GMN28-CHTEKEDYMD        PIC X(10).
+      *
+                       09  SPA-NAI28-CHTEKSTYMD        PIC X(08).
+                       09  SPA-NAI28-CHTEKEDYMD        PIC X(08).
+                       09  SPA-NAI28-CHKNSKBN          PIC X(01).
+      *
+      *                ²ð¸îÊÝ¸±¼Ô¾ðÊó
+                       09  SPA-P028-CAREHKNMEI         PIC X(50).
+                       09  SPA-P028-CRHKNJANAME        PIC X(50).
+                       09  SPA-P028-CRHKNJAADRS        PIC X(80).
+                       09  SPA-P028-CRHKNJAADRS2       PIC X(80).
+                       09  SPA-P028-CRHKNJATEL         PIC X(15).
+      *
+      *        ²ð¸îÇ§Äê¼Ô¾ðÊó
+               05  SPA-GMN28-CARENIN-AREA.
+                   07  SPA-GMN28-CR-NINLST-G.
+                       09  SPA-GMN28-CR-NINLST-OCC OCCURS   50.
+                           11  SPA-GMN28-TCRNUM        PIC 9(03).
+                           11  SPA-GMN28-TCAREJOTAI    PIC X(30).
+                           11  SPA-GMN28-TCRNINYMD     PIC X(09).
+                           11  SPA-GMN28-TCRSTRYMD     PIC X(09).
+                           11  SPA-GMN28-TCRENDYMD     PIC X(09).
+      *
+                           11  SPA-NAI28-TCAREJOTAI    PIC X(02).
+                           11  SPA-NAI28-TCRNINYMD     PIC X(08).
+                           11  SPA-NAI28-TCRSTRYMD     PIC X(08).
+                           11  SPA-NAI28-TCRENDYMD     PIC X(08).
+                           11  SPA-NAI28-TINSKBN       PIC X(01).
+                   07  SPA-GMN28-CRNIN-MAX         PIC 9(03).
+      *
+                   07  SPA-GMN28-CRSELNUM          PIC 9(03).
+                   07  SPA-MAE28-CRSELNUM          PIC 9(03).
+      *
+                   07  SPA-GMN28-CRNIN-ING.
+                       09  SPA-GMN28-CAREJOTAICD-G.
+                           11  SPA-GMN28-CAREJOTAI     PIC X(02).
+                           11  SPA-GMN28-CAREF1        PIC X(01).
+                           11  SPA-GMN28-CAREJOTAIMEI  PIC X(26).
+                       09  SPA-GMN28-CRNINYMD      PIC X(10).
+                       09  SPA-GMN28-CRTEKSTYMD    PIC X(10).
+                       09  SPA-GMN28-CRTEKEDYMD    PIC X(10).
+      *
+                       09  SPA-NAI28-CRNINYMD      PIC X(08).
+                       09  SPA-NAI28-CRTEKSTYMD    PIC X(08).
+                       09  SPA-NAI28-CRTEKEDYMD    PIC X(08).
+                       09  SPA-NAI28-INSKBN        PIC X(01).
+               05  SPA-GMN28-CAREJOTAI-LST-G.
+                   07  SPA-GMN28-CAREJOTAI-LST     PIC X(30)
+                                                       OCCURS   50.
+                   07  SPA-GMN28-CAREJOTAI-MAX     PIC 9(03).
       *
       *    P0201¡ÊÌ¤ÅÐÏ¿¼õÉÕ¼Ô°ìÍ÷¡Ë
            03  SPA-P0201-AREA.

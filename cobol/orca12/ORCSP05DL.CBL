@@ -30,6 +30,7 @@
       * 04.07.00     NACL-多々納  12/11/22  患者地域連携対応
       * 04.07.00     NACL-多々納  12/12/19  患者レセプト分割対応
       * 04.07.00     NACL-多々納  13/07/XX  患者個別設定対応
+      * 04.07.00     NACL-多々納  14/02/XX  患者介護情報追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -292,6 +293,14 @@
       *    患者個別設定テーブル
        01  PTCONF-REC.
            COPY    "CPPTCONF.INC".
+      *
+      *    患者介護保険情報テーブル
+       01  PTCARE-HKNINF-REC.
+           COPY    "CPPTCARE-HKNINF.INC".
+      *
+      *    患者介護認定者情報テーブル
+       01  PTCARE-NINTEI-REC.
+           COPY    "CPPTCARE-NINTEI.INC".
       *
       *
       *****************************************************************
@@ -1049,6 +1058,30 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    PTCONF-REC          TO  MCPDATA-REC
            MOVE    "DBDELETE"          TO  MCP-FUNC
            MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "del1"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+      *    患者介護保険情報
+           INITIALIZE                      PTCARE-HKNINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCRHKN-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCRHKN-PTID
+           MOVE    PTCARE-HKNINF-REC   TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_ptcare_hkninf" TO  MCP-TABLE
+           MOVE    "del1"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *
+      *    患者介護認定者情報
+           INITIALIZE                      PTCARE-NINTEI-REC
+           MOVE    SPA-HOSPNUM         TO  PTCRNIN-HOSPNUM
+           MOVE    SPA-PTID            TO  PTCRNIN-PTID
+           MOVE    PTCARE-NINTEI-REC   TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
            MOVE    "del1"              TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC

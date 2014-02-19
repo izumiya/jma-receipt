@@ -766,6 +766,9 @@ DB_files = \
 	xml_incomeinfv2res.db \
 	tbl_renkei_tmp \
 	xml_medicalget04v2res.db \
+	tbl_ptcare_hkninf.db \
+	tbl_ptcare_nintei.db \
+	tbl_hknjainf_care.db \
 
 shell.db: shell.db.in
 	sed -e 's,\@scriptsdir\@,$(scriptsdir),g' $< >$@

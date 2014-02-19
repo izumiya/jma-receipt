@@ -181,4 +181,7 @@ db	{
         tbl_ptconf;
         tbl_byomeiinputset;
         tbl_renkei_tmp;
+	tbl_ptcare_hkninf;
+	tbl_ptcare_nintei;
+	tbl_hknjainf_care;
 };

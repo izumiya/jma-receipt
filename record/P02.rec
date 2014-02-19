@@ -1182,6 +1182,91 @@ P02	{
 					count	int;
 					item	varchar(50)[20];
 				};
+				P028_CRHKNJANUM	{
+					value	varchar(6);
+				};
+				P028_CRHIHKNJANUM	{
+					value	varchar(10);
+				};
+				scrolledwindow4	{
+					hpos	int;
+					vpos	int;
+					P028_CARENINLST	{
+						count	int;
+						row	int;
+						item	{
+							value0	varchar(3);
+							value1	varchar(30);
+							value2	varchar(9);
+							value3	varchar(9);
+							value4	varchar(9);
+						}	[50];
+						select	bool[50];
+						fgcolor	varchar(16)[50];
+						bgcolor	varchar(16)[50];
+					};
+				};
+				P028_CRNINYMD	{
+					value	varchar(10);
+				};
+				P028_CRTEKSTYMD	{
+					value	varchar(10);
+				};
+				P028_CRTEKEDYMD	{
+					value	varchar(10);
+				};
+				P028_CAREJOTAI_COMB	{
+					P028_CAREJOTAI	{
+						value	varchar(50);
+					};
+					count	int;
+					item	varchar(50)[99];
+				};
+				P028_CRSELNUM	{
+					value	number(3);
+				};
+				P028_CAREHKNMEI	{
+					value	varchar(50);
+				};
+				P028_CAREHKNJAMEI	{
+					value	varchar(50);
+				};
+				P028_CAREHKNJAADRS	{
+					value	varchar(80);
+				};
+				P028_CAREHKNJAADRS2	{
+					value	varchar(80);
+				};
+				P028_CAREHKNJATEL	{
+					value	varchar(16);
+				};
+				P028_CRHSELNUM	{
+					value	number(2);
+				};
+				P028_CHTEKSTYMD	{
+					value	varchar(10);
+				};
+				P028_CHTEKEDYMD	{
+					value	varchar(10);
+				};
+				scrolledwindow5	{
+					hpos	int;
+					vpos	int;
+					P028_CAREHKNLST	{
+						count	int;
+						row	int;
+						item	{
+							value0	varchar(2);
+							value1	varchar(6);
+							value2	varchar(10);
+							value3	varchar(9);
+							value4	varchar(9);
+						}	[10];
+						select	bool[10];
+						fgcolor	varchar(16)[10];
+						bgcolor	varchar(16)[10];
+					};
+				};
 			};
 		};
 	};

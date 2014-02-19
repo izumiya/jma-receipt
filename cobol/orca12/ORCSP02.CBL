@@ -53,6 +53,7 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  11/08/XX  ÊÝ¸±³ÎÇ§Ç¯·îÆüÍúÎòÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/11/22  ÃÏ°èÏ¢·È£É£ÄÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/12/25  ´µ¼Ô¥ì¥»¥×¥ÈÊ¬³äÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  14/02/XX  ´µ¼Ô²ð¸î¾ðÊóÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -126,6 +127,8 @@
            03  FLG-PTSAME          PIC 9(01).
            03  FLG-PTPUBLIC        PIC 9(01).
            03  FLG-PTCONF          PIC 9(01).
+           03  FLG-PTCARE-HKNINF   PIC 9(01).
+           03  FLG-PTCARE-NINTEI   PIC 9(01).
       *
            03  FLG-PTRSIINF        PIC 9(01).
            03  FLG-HKNNUM          PIC 9(01).
@@ -154,6 +157,7 @@
            03  WRK-YMD                 PIC X(08).
            03  WRK-RENNUMZ             PIC ZZZZ.
            03  WRK-RENNUMZ3            PIC ZZZ.
+           03  WRK-RENNUMZ2            PIC ZZ.
            03  WRK-HST                 PIC 9(04).
            03  WRK-HED                 PIC 9(04).
            03  WRK-KST                 PIC 9(04).
@@ -237,6 +241,15 @@
       *    Á´³Ñ¶õÇò
        01  WRK-SPACE           PIC X(02)   VALUE  "¡¡".
       *
+      *PandaTable¿§
+      *¥¯¥í
+       01  CL-BLACK                PIC X(07)   VALUE   "#000000".
+      *Çò
+       01  CL-WHITE                PIC X(07)   VALUE   "#FFFFFF".
+      *ÇöÎÐ
+       01  CL-GREEN                PIC X(07)   VALUE   "#E5FFD1".
+      *¥Ô¥ó¥¯
+       01  CL-PINK                 PIC X(07)   VALUE   "#FCEEEE".
       *   
            COPY    "ENUM-VALUE".
       *
@@ -395,6 +408,14 @@
       *    ´µ¼Ô¸ÄÊÌÀßÄê¥Æ¡¼¥Ö¥ë
        01  PTCONF-REC.
            COPY    "CPPTCONF.INC".
+      *
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó¥Æ¡¼¥Ö¥ë
+       01  PTCARE-HKNINF-REC.
+           COPY    "CPPTCARE-HKNINF.INC".
+      *
+      *    ´µ¼Ô²ð¸îÇ§Äê¼Ô¾ðÊó¥Æ¡¼¥Ö¥ë
+       01  PTCARE-NINTEI-REC.
+           COPY    "CPPTCARE-NINTEI.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -1466,6 +1487,28 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "1 Ver.?.?"
                                        TO  SPA-GMN28-JMAMRVER-LST(1)
            MOVE    1                   TO  SPA-GMN28-JMAMRVER-MAX
+      *ver.4.7
+      *    ´µ¼Ô²ð¸îÀßÄê
+      *    Í×²ð¸î¾õÂÖ¶èÊ¬
+           MOVE    "01 ¼«Î©"
+                                       TO  SPA-GMN28-CAREJOTAI-LST (1)
+           MOVE    "11 Í×»Ù±ç"
+                                       TO  SPA-GMN28-CAREJOTAI-LST (2)
+           MOVE    "12 Í×»Ù±ç£±"
+                                       TO  SPA-GMN28-CAREJOTAI-LST (3)
+           MOVE    "13 Í×»Ù±ç£²"
+                                       TO  SPA-GMN28-CAREJOTAI-LST (4)
+           MOVE    "21 Í×²ð¸î£±"
+                                       TO  SPA-GMN28-CAREJOTAI-LST (5)
+           MOVE    "22 Í×²ð¸î£²"
+                                       TO  SPA-GMN28-CAREJOTAI-LST (6)
+           MOVE    "23 Í×²ð¸î£³"
+                                       TO  SPA-GMN28-CAREJOTAI-LST (7)
+           MOVE    "24 Í×²ð¸î£´"
+                                       TO  SPA-GMN28-CAREJOTAI-LST (8)
+           MOVE    "25 Í×²ð¸î£µ"
+                                       TO  SPA-GMN28-CAREJOTAI-LST (9)
+           MOVE    9                   TO  SPA-GMN28-CAREJOTAI-MAX
            .
        1005-COMB-SET-EXT.
            EXIT.
@@ -1676,6 +1719,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7
       *    ´µ¼Ô¸ÄÊÌ¾ðÊóÊÔ½¸
            PERFORM 10028-PTCONF-SET-SEC
+      *ver.4.7
+      *    ´µ¼Ô²ð¸î¾ðÊóÊÔ½¸
+           PERFORM 10028-PTCARE-SET-SEC
       *
       *    ´µ¼ÔÏ«ºÒ¾ðÊóÊÔ½¸
            PERFORM 10023-RSIPARA-SET-SEC
@@ -2950,6 +2996,163 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            .
        10028-PTCONF-SET-EXT.
+           EXIT.
+      *ver.4.7
+      *
+      *****************************************************************
+      *    ´µ¼Ô²ð¸î¾ðÊóÊÔ½¸½èÍý
+      *****************************************************************
+       10028-PTCARE-SET-SEC           SECTION.
+      *
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó
+           MOVE    SPACE               TO  PTCARE-HKNINF-REC
+           INITIALIZE                  PTCARE-HKNINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCRHKN-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTCRHKN-PTID
+      *
+           MOVE    PTCARE-HKNINF-REC   TO  MCPDATA-REC
+           MOVE    "tbl_ptcare_hkninf" TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptcare_hkninf" TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCAREHKNINF-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTCARE-HKNINF
+               INITIALIZE                  PTCARE-HKNINF-REC
+           END-IF
+      *
+           MOVE    ZERO                TO  IDX
+           PERFORM UNTIL      (FLG-PTCARE-HKNINF   =   1  )
+                          OR  (IDX                 >=  10 )
+               ADD     1                       TO  IDX
+               PERFORM 100281-PTCAREHKNINF-HEN-SEC
+      *
+               MOVE    "tbl_ptcare_hkninf" TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCAREHKNINF-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptcare_hkninf" TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó
+           INITIALIZE                  PTCARE-NINTEI-REC
+           MOVE    SPA-HOSPNUM         TO  PTCRNIN-HOSPNUM
+           MOVE    SPA-GMN-PTID        TO  PTCRNIN-PTID
+      *
+           MOVE    PTCARE-NINTEI-REC   TO  MCPDATA-REC
+           MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCARENINTEI-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCARE-NINTEI
+               INITIALIZE                  PTCARE-NINTEI-REC
+           END-IF
+           MOVE    ZERO                TO  IDX
+           PERFORM UNTIL      (FLG-PTCARE-NINTEI   =   1  )
+                          OR  (IDX                 >=  50 )
+               ADD     1                       TO  IDX
+               PERFORM 100281-PTCARENINTEI-HEN-SEC
+      *
+               MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCARENINTEI-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       10028-PTCARE-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó¥Æ¡¼¥Ö¥ëÊÔ½¸½èÍý
+      *****************************************************************
+       100281-PTCAREHKNINF-HEN-SEC           SECTION.
+      *
+           MOVE    IDX                 TO  SPA-GMN28-TCHNUM (IDX)
+      *
+           MOVE    PTCRHKN-HKNJANUM    TO  SPA-GMN28-TCRHKNJANUM
+                                                             (IDX)
+           MOVE    PTCRHKN-HIHKNJANUM  TO  SPA-GMN28-TCRHIHKNJANUM
+                                                             (IDX)
+           MOVE    PTCRHKN-TEKSTYMD    TO  SPA-NAI28-TCRHSTRYMD
+                                                             (IDX)
+           MOVE    PTCRHKN-TEKEDYMD    TO  SPA-NAI28-TCRHENDYMD
+                                                             (IDX)
+      *
+           MOVE    PTCRHKN-TEKSTYMD   TO  WRK-SYMD
+           PERFORM 4001-SEIWA-YMDEDIT-SEC
+           MOVE    WRK-HENYMD          TO  SPA-GMN28-TCRHSTRYMD (IDX)
+      *
+           MOVE    PTCRHKN-TEKEDYMD   TO  WRK-SYMD
+           PERFORM 4001-SEIWA-YMDEDIT-SEC
+           MOVE    WRK-HENYMD          TO  SPA-GMN28-TCRHENDYMD (IDX)
+      *
+           MOVE    "1"                 TO  SPA-NAI28-TCHKNSKBN (IDX)
+           MOVE    IDX                 TO  SPA-GMN28-CRHKN-MAX
+           .
+       100281-PTCAREHKNINF-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó¥Æ¡¼¥Ö¥ëÊÔ½¸½èÍý
+      *****************************************************************
+       100281-PTCARENINTEI-HEN-SEC           SECTION.
+      *
+           MOVE    IDX                 TO  SPA-GMN28-TCRNUM (IDX)
+      *
+           MOVE    PTCRNIN-CAREJOTAICD TO  SPA-NAI28-TCAREJOTAI
+                                                             (IDX)
+           MOVE    PTCRNIN-NINTEIYMD   TO  SPA-NAI28-TCRNINYMD
+                                                             (IDX)
+           MOVE    PTCRNIN-TEKSTYMD    TO  SPA-NAI28-TCRSTRYMD
+                                                             (IDX)
+           MOVE    PTCRNIN-TEKEDYMD    TO  SPA-NAI28-TCRENDYMD
+                                                             (IDX)
+      *
+           MOVE    PTCRNIN-NINTEIYMD   TO  WRK-SYMD
+           PERFORM 4001-SEIWA-YMDEDIT-SEC
+           MOVE    WRK-HENYMD          TO  SPA-GMN28-TCRNINYMD (IDX)
+      *
+           MOVE    PTCRNIN-TEKSTYMD   TO  WRK-SYMD
+           PERFORM 4001-SEIWA-YMDEDIT-SEC
+           MOVE    WRK-HENYMD          TO  SPA-GMN28-TCRSTRYMD (IDX)
+      *
+           MOVE    PTCRNIN-TEKEDYMD   TO  WRK-SYMD
+           PERFORM 4001-SEIWA-YMDEDIT-SEC
+           MOVE    WRK-HENYMD          TO  SPA-GMN28-TCRENDYMD (IDX)
+      *
+      *    Í×²ð¸î¾õÂÖ
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDY     FROM    1   BY  1
+                    UNTIL    ( IDY     >   SPA-GMN28-CAREJOTAI-MAX )
+                         OR  ( FLG-OK  =   1      )
+               IF      PTCRNIN-CAREJOTAICD
+                                       =  SPA-GMN28-CAREJOTAI-LST 
+                                                      (IDY)(1:2)
+                   MOVE    SPA-GMN28-CAREJOTAI-LST (IDY)
+                                       TO  SPA-GMN28-TCAREJOTAI (IDX)
+                   MOVE    1           TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF     (FLG-OK              =   ZERO     )
+               MOVE    PTCRNIN-CAREJOTAICD     TO  SPA-GMN28-TCAREJOTAI
+                                                                   (IDX)
+           END-IF
+      *
+           MOVE    "1"                 TO  SPA-NAI28-TINSKBN (IDX)
+           MOVE    IDX                 TO  SPA-GMN28-CRNIN-MAX
+           .
+       100281-PTCARENINTEI-HEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -4708,6 +4911,108 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN28-JMAMRVER-G
                                        TO  P02-P028-JMAMRVER
       *
+      *    ²ð¸îÊÝ¸±¾ðÊó
+           PERFORM   VARYING     IDX     FROM   1   BY  1
+                     UNTIL     ( IDX     >   50 )
+                     OR        ( IDX     >   SPA-GMN28-CRHKN-MAX )
+               MOVE    SPA-GMN28-TCHNUM (IDX)   TO WRK-RENNUMZ2
+               MOVE    WRK-RENNUMZ2        TO  P02-P028-TCHNUM (IDX)
+               MOVE    SPA-GMN28-TCRHKNJANUM (IDX)
+                                           TO  P02-P028-TCRHKNJANUM
+                                                               (IDX)
+               MOVE    SPA-GMN28-TCRHIHKNJANUM (IDX)
+                                           TO  P02-P028-TCRHIHKNJANUM
+                                                               (IDX)
+               MOVE    SPA-GMN28-TCRHSTRYMD (IDX)
+                                           TO  P02-P028-TCRHSTRYMD
+                                                               (IDX)
+               MOVE    SPA-GMN28-TCRHENDYMD (IDX)
+                                           TO  P02-P028-TCRHENDYMD
+                                                               (IDX)
+      *
+               IF      IDX             =   SPA-GMN28-CRHSELNUM
+                   MOVE    "T"         TO  P02-P028-CRHKNLST-SELECT
+                                                              (IDX)
+               ELSE
+                   MOVE    "F"         TO  P02-P028-CRHKNLST-SELECT
+                                                              (IDX)
+               END-IF
+      *ver.4.8 ¤Î¤ß
+      **       º£²ó¿·µ¬
+      *        IF      SPA-NAI28-TCHKNSKBN (IDX) =   SPACE
+      *            MOVE    CL-GREEN    TO  P02-P028-CRHKNLST-BGCOLOR
+      *                                                       (IDX)
+      *****    END-IF
+           END-PERFORM
+           MOVE    SPA-GMN28-CRHKN-MAX     TO  P02-P028-CRHKNLST-COUNT
+      *
+           MOVE    SPA-GMN28-CRHSELNUM     TO  P02-P028-CRHSELNUM
+      *
+           MOVE    SPA-GMN28-CR-HKNJANUM   TO  P02-P028-CRHKNJANUM
+           MOVE    SPA-GMN28-CR-HIHKNJANUM TO  P02-P028-CRHIHKNJANUM
+           MOVE    SPA-GMN28-CHTEKSTYMD    TO  P02-P028-CHTEKSTYMD
+           MOVE    SPA-GMN28-CHTEKEDYMD    TO  P02-P028-CHTEKEDYMD
+      *    ²ð¸îÊÝ¸±¼Ô¾ðÊó
+      *!!! MOVE    SPA-P028-CAREHKNMEI     TO  P02-P028-CAREHKNMEI
+           MOVE    SPA-P028-CRHKNJANAME    TO  P02-P028-CAREHKNJAMEI
+           MOVE    SPA-P028-CRHKNJAADRS    TO  P02-P028-CAREHKNJAADRS
+           MOVE    SPA-P028-CRHKNJAADRS2   TO  P02-P028-CAREHKNJAADRS2
+           MOVE    SPA-P028-CRHKNJATEL     TO  P02-P028-CAREHKNJATEL
+      *    ²ð¸îÇ§Äê¼Ô¾ðÊó
+           PERFORM   VARYING     IDX     FROM   1   BY  1
+                     UNTIL     ( IDX     >   50 )
+                     OR        ( IDX     >   SPA-GMN28-CRNIN-MAX )
+               MOVE    SPA-GMN28-TCRNUM (IDX)   TO WRK-RENNUMZ3
+               MOVE    WRK-RENNUMZ3        TO  P02-P028-TCRNUM (IDX)
+               MOVE    SPA-GMN28-TCAREJOTAI (IDX)
+                                           TO  P02-P028-TCAREJOTAI
+                                                               (IDX)
+               MOVE    SPA-GMN28-TCRNINYMD (IDX)
+                                           TO  P02-P028-TCRNINYMD
+                                                               (IDX)
+               MOVE    SPA-GMN28-TCRSTRYMD (IDX)
+                                           TO  P02-P028-TCRTEKSTYMD
+                                                               (IDX)
+               MOVE    SPA-GMN28-TCRENDYMD (IDX)
+                                           TO  P02-P028-TCRTEKEDYMD
+                                                               (IDX)
+      *
+               IF      IDX             =   SPA-GMN28-CRSELNUM
+                   MOVE    "T"         TO  P02-P028-CARELST-SELECT
+                                                              (IDX)
+               ELSE
+                   MOVE    "F"         TO  P02-P028-CARELST-SELECT
+                                                              (IDX)
+               END-IF
+      *ver.4.8 ¤Î¤ß
+      *        º£²ó¿·µ¬
+      *        IF      SPA-NAI28-TINSKBN (IDX) =   SPACE
+      *            MOVE    CL-GREEN    TO  P02-P028-CARELST-BGCOLOR
+      *                                                       (IDX)
+      *        END-IF
+      *        º£²ó½¤Àµ
+      *        IF      SPA-NAI28-TINSKBN (IDX) =   "2"
+      *            MOVE    CL-PINK     TO  P02-P028-CARELST-BGCOLOR
+      *                                                       (IDX)
+      ****     END-IF
+           END-PERFORM
+           MOVE    SPA-GMN28-CRNIN-MAX     TO  P02-P028-CARELST-COUNT
+      *
+           MOVE    SPA-GMN28-CRSELNUM      TO  P02-P028-CRSELNUM
+      *
+           MOVE    SPA-GMN28-CRNINYMD      TO  P02-P028-CRNINYMD
+           MOVE    SPA-GMN28-CRTEKSTYMD    TO  P02-P028-CRTEKSTYMD
+           MOVE    SPA-GMN28-CRTEKEDYMD    TO  P02-P028-CRTEKEDYMD
+      *
+           MOVE    SPA-GMN28-CAREJOTAICD-G TO  P02-P028-CAREJOTAI
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                    UNTIL    ( IDX     >   SPA-GMN28-CAREJOTAI-MAX )
+               MOVE    SPA-GMN28-CAREJOTAI-LST (IDX)
+                                       TO  P02-P028-CAREJOTAI-ITEM
+                                                          (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN28-CAREJOTAI-MAX  TO  P02-P028-CAREJOTAI-COUNT
+      *
            .
        2001-P028-SET-EXT.
            EXIT.
@@ -5139,6 +5444,42 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        930-PTCONF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó¥Ç¡¼¥¿¥Ç¡¼¥¿ÆÉ¹þ½èÍý
+      *****************************************************************
+       930-PTCAREHKNINF-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTCARE-HKNINF
+               MOVE    MCPDATA-REC         TO  PTCARE-HKNINF-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTCARE-HKNINF
+               INITIALIZE                  PTCARE-HKNINF-REC
+           END-IF
+      *
+           .
+       930-PTCAREHKNINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô²ð¸î¼ÔÇ§Äê¾ðÊó¥Ç¡¼¥¿ÆÉ¹þ½èÍý
+      *****************************************************************
+       930-PTCARENINTEI-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTCARE-NINTEI
+               MOVE    MCPDATA-REC         TO  PTCARE-NINTEI-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTCARE-NINTEI
+               INITIALIZE                 PTCARE-NINTEI-REC
+           END-IF
+      *
+           .
+       930-PTCARENINTEI-READ-EXT.
            EXIT.
       *
       *****************************************************************
