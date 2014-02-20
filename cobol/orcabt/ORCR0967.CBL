@@ -1357,7 +1357,7 @@
       *
            INITIALIZE                  HCM77
            MOVE    "JK12"              TO  HCM77-CYOHYONAME
-           MOVE    "Æþ±¡"              TO  HCM77-NYUGAINAME
+           MOVE    "¡ÊÆþ±¡¡Ë"          TO  HCM77-NYUGAINAME
       *    ¿ÇÎÅÇ¯·î
            MOVE     WRK-STYMDW(1:1)    TO  HCM77-HAKKOUG
            MOVE     WRK-STYMDW(2:2)    TO  HCM77-HAKKOUYY

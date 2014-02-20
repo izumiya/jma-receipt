@@ -1350,7 +1350,7 @@
       *
            INITIALIZE                  HCM77
            MOVE    "JK22"              TO  HCM77-CYOHYONAME
-           MOVE    "ェ情陸"            TO  HCM77-NYUGAINAME
+           MOVE    "﹋ェ情陸﹌"        TO  HCM77-NYUGAINAME
       *    褲恓ヵ畸
            MOVE     WRK-STYMDW(1:1)    TO  HCM77-HAKKOUG
            MOVE     WRK-STYMDW(2:2)    TO  HCM77-HAKKOUYY
