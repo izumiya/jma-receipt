@@ -722,6 +722,9 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                WHEN    "ORCADB24"
                    MOVE    "ºÇÄãÌô²Á¥Þ¥¹¥¿"
                                           TO  SPA-GMN-MASTNAME(IDX2)
+               WHEN    "ORCADB25"
+                   MOVE    "²ð¸îÊÝ¸±¼Ô¥Þ¥¹¥¿"
+                                          TO  SPA-GMN-MASTNAME(IDX2)
                WHEN    OTHER
                    MOVE    MSTKANRI-KANRICD
                                           TO  SPA-GMN-MASTNAME(IDX2)
