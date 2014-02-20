@@ -133,6 +133,7 @@
            03  FLG-SRYCD1          PIC 9(01).
            03  FLG-OK              PIC 9(01).
            03  FLG-GAIJINKEN       PIC 9(01).
+           03  FLG-ARI             PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -1823,6 +1824,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
            MOVE    ZERO              TO  WRK-TBLMAX
            MOVE    SPACE             TO  WRK-ZAI
            MOVE    "＊"              TO  WRK-ZAI-MK
+           MOVE    ZERO              TO  FLG-ARI
       *     
            PERFORM VARYING IDX3    FROM    1   BY  1
                    UNTIL   IDX3    >       5
@@ -1837,8 +1839,11 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                        MOVE    IDX3            TO  IDX1
                END-EVALUATE
       *  
-               IF      RECE84-SRYKBN   <=   "33"
+               IF    ( RECE84-SRYKBN   <=   "33" )
+               OR    ((RECE84-SRYKBN    >   "33") AND
+                      (FLG-ARI          =    1  ))
                    MOVE    "＊"            TO  WRK-ZAI-MK
+                   MOVE    ZERO            TO  FLG-ARI
                END-IF    
                IF    ((RECE84-YKZTEN        =   ZERO ) AND
                       (IDX1                 =   5    ) AND
@@ -1885,6 +1890,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                        MOVE    WRK-TBLMAX        TO  IDY
                        PERFORM 440-TNSKAI-SET-SEC
                        MOVE    IDY               TO  WRK-TBLMAX 
+                       IF   RECE84-SRYKBN    >   "33"
+                         MOVE    1               TO  FLG-ARI
+                       END-IF
                    END-IF
                END-IF    
       *        点数・回数セット処理（特定器材）
@@ -1904,6 +1912,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                        MOVE    WRK-TBLMAX        TO  IDY
                        PERFORM 440-TNSKAI-SET-SEC
                        MOVE    IDY               TO  WRK-TBLMAX 
+                       IF   RECE84-SRYKBN    >   "33"
+                         MOVE    1               TO  FLG-ARI
+                       END-IF
                    END-IF
                END-IF     
       *        点数・回数セット処理（薬剤）
@@ -1932,6 +1943,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE86PARA-HOSPNUM
                            MOVE    WRK-TBLMAX        TO  IDY
                            PERFORM 440-TNSKAI-SET-SEC
                            MOVE    IDY               TO  WRK-TBLMAX 
+                           IF   RECE84-SRYKBN    >   "33"
+                             MOVE    1               TO  FLG-ARI
+                           END-IF
                        END-IF          
       ***          END-IF
                END-IF        
