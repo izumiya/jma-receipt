@@ -778,6 +778,8 @@ grpsys                                 SPA-AREA
                MOVE    "Ï«Æ¯´ð½à´ÆÆÄ½ð¥Þ¥¹¥¿"  TO  WRK-MSTNAME
            WHEN    "24"
                MOVE    "ºÇÄãÌô²Á¥Þ¥¹¥¿"        TO  WRK-MSTNAME
+           WHEN    "25"
+               MOVE    "²ð¸îÊÝ¸±¼Ô¥Þ¥¹¥¿"      TO  WRK-MSTNAME
            WHEN    OTHER
                MOVE    PARA-MASTER-KBN         TO  WRK-MSTNAME
            END-EVALUATE
