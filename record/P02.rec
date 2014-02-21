@@ -1202,8 +1202,6 @@ P02	{
 							value4	varchar(9);
 						}	[50];
 						select	bool[50];
-						fgcolor	varchar(16)[50];
-						bgcolor	varchar(16)[50];
 					};
 				};
 				P028_CRNINYMD	{
@@ -1263,8 +1261,6 @@ P02	{
 							value4	varchar(9);
 						}	[10];
 						select	bool[10];
-						fgcolor	varchar(16)[10];
-						bgcolor	varchar(16)[10];
 					};
 				};
 			};

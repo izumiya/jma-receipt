@@ -874,10 +874,6 @@
                         08  P02-P028-TCRTEKEDYMD  PIC X(9).
                       07  P02-P028-CARELST-SELECT
                               PIC X       OCCURS  50 TIMES.
-                      07  P02-P028-CARELST-FGCOLOR
-                              PIC X(16)   OCCURS  50 TIMES.
-                      07  P02-P028-CARELST-BGCOLOR
-                              PIC X(16)   OCCURS  50 TIMES.
                   05  P02-P028-CRNINYMD.
                     06  P02-VALUE   PIC X(10).
                   05  P02-P028-CRTEKSTYMD.
@@ -922,10 +918,6 @@
                         08  P02-P028-TCRHENDYMD     PIC X(9).
                       07  P02-P028-CRHKNLST-SELECT
                               PIC X       OCCURS  10 TIMES.
-                      07  P02-P028-CRHKNLST-FGCOLOR
-                              PIC X(16)   OCCURS  10 TIMES.
-                      07  P02-P028-CRHKNLST-BGCOLOR
-                              PIC X(16)   OCCURS  10 TIMES.
 
 
 

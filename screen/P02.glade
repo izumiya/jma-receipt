@@ -11430,7 +11430,7 @@
             <name>scrolledwindow4</name>
             <x>28</x>
             <y>418</y>
-            <width>450</width>
+            <width>444</width>
             <height>120</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
@@ -11451,7 +11451,7 @@
               <border_width>0</border_width>
               <show_titles>True</show_titles>
               <columns>5</columns>
-              <column_widths>40,180,74,74,74</column_widths>
+              <column_widths>30,150,74,74,74</column_widths>
               <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
               <signal>
                 <name>select_row</name>
@@ -12109,7 +12109,7 @@
             <name>scrolledwindow5</name>
             <x>24</x>
             <y>210</y>
-            <width>360</width>
+            <width>363</width>
             <height>90</height>
             <visible>True</visible>
             <sensitive>True</sensitive>
@@ -12121,7 +12121,7 @@
             <widget>
               <class>GtkPandaCList</class>
               <name>P028_CAREHKNLST</name>
-              <width>50</width>
+              <width>360</width>
               <height>80</height>
               <visible>True</visible>
               <sensitive>True</sensitive>
@@ -12130,7 +12130,7 @@
               <border_width>0</border_width>
               <show_titles>True</show_titles>
               <columns>5</columns>
-              <column_widths>40,74,80,74,74</column_widths>
+              <column_widths>30,70,74,74,74</column_widths>
               <selection_mode>GTK_SELECTION_SINGLE</selection_mode>
               <signal>
                 <name>select_row</name>
