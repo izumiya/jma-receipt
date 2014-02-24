@@ -10661,6 +10661,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       ****         MOVE    WRK-IDX2        TO  MCP-WIDGET(8:2)
                    MOVE    "PANDATABLE1"   TO  MCP-WIDGET
                    MOVE    4               TO  K02N-PANDATABLE1-TROWATTR
+      *TEST
+                   IF     (WRK-IDX2        >=  WRK-MAP-MAX  )
+                       MOVE    1           TO  K02N-PANDATABLE1-TROWATTR
+                   END-IF
+      *TEST
                    MOVE    2               TO  K02N-PANDATABLE1-TCOLUMN
                    MOVE    WRK-IDX2        TO  K02N-PANDATABLE1-TROW
       *
@@ -10697,6 +10702,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       ****         MOVE    WRK-IDX2        TO  MCP-WIDGET(7:2)
                    MOVE    "PANDATABLE1"   TO  MCP-WIDGET
                    MOVE    4               TO  K02N-PANDATABLE1-TROWATTR
+      *TEST
+                   IF     (WRK-IDX2        >=  WRK-MAP-MAX  )
+                       MOVE    1           TO  K02N-PANDATABLE1-TROWATTR
+                   END-IF
+      *TEST
                    MOVE    3               TO  K02N-PANDATABLE1-TCOLUMN
                    MOVE    WRK-IDX2        TO  K02N-PANDATABLE1-TROW
                WHEN    03
