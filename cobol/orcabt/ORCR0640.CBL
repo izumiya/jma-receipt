@@ -629,6 +629,8 @@
       *                                     場合の公費分離区分編集対応
       *  04.07.14    NACL-門脇    14/02/03  第三者行為対応（院外処方のみの
       *                                     保険組み合わせの病名記載対応）
+      *  04.07.15    NACL-門脇    14/02/19  自賠責（第三者行為）対応
+      *                                     （負担金額１０円未満四捨五入）
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -1112,6 +1114,7 @@
            03  WRK-SKY-KEISAN3                         PIC 9(09).
            03  WRK-SKY-KEISAN4                         PIC S9(09).
            03  WRK-SKY-KEISAN5                         PIC 9(09).
+           03  WRK-SKY-KEISAN6                         PIC 9(09).
            03  WRK-SKY-HOKENJA                         PIC 9(09).
            03  WRK-SKY-HOKENJA-KOH                     PIC 9(09).
            03  WRK-SKY-ICHIBUFTN                       PIC 9(09).
@@ -1741,6 +1744,7 @@
       *
            03  WRK-TAIHI-TOTALTEN              PIC 9(08).
            03  WRK-DAISAN-FTNMONEY             PIC 9(08).
+           03  WRK-DAISAN-DAISANKBN            PIC X(01).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).
@@ -2391,6 +2395,11 @@
                   IF      FLG-SYSKANRI     =   ZERO
                      MOVE   MCPDATA-REC   TO  SYS-1001-REC
                      MOVE   SYS-1001-PREFNUM  TO  WRK-PREFNUM
+                     MOVE   SYS-1001-DAISANKBN
+                                          TO  WRK-DAISAN-DAISANKBN
+                     IF  WRK-DAISAN-DAISANKBN = SPACE
+                       MOVE "2"           TO  WRK-DAISAN-DAISANKBN
+                     END-IF
                   ELSE
                      MOVE  "医療機関情報が取得できませんでした。"
                                           TO  WRK-RECEERR
@@ -3504,6 +3513,14 @@
                                             *  10
                                             *  RECE62-KYURATE
                                             /  100
+              IF   WRK-DAISAN-DAISANKBN  =  "1"
+                COMPUTE  WRK-DAISAN-FTNMONEY  =
+                         WRK-DAISAN-FTNMONEY  +  5
+                COMPUTE  WRK-DAISAN-FTNMONEY  =
+                         WRK-DAISAN-FTNMONEY  /  10
+                COMPUTE  WRK-DAISAN-FTNMONEY  =
+                         WRK-DAISAN-FTNMONEY  *  10
+              END-IF
               MOVE   WRK-DAISAN-FTNMONEY  TO  RECE62-DAISAN-FTNMONEY
               IF  (RECE62-KOUREI         =  "1" OR "2")
               OR  (RECE62-DAISAN-KOUREI  =   1        )
@@ -16869,10 +16886,25 @@
       *
            ADD   SYU-TOTAL-HKNTEN   TO   RECE62-SKYIRYO-TOTALTEN
       *
-           COMPUTE  WRK-SKY-KEISAN  =  SYU-TOTAL-HKNTEN
-                                    *  10
-                                    * (100 - RECE62-KYURATE)
-                                    /  100
+           IF   WRK-DAISAN-DAISANKBN  =  "1"
+             COMPUTE  WRK-SKY-KEISAN6 =  SYU-TOTAL-HKNTEN
+                                      *  10
+                                      *  RECE62-KYURATE
+                                      /  100
+             COMPUTE  WRK-SKY-KEISAN6 =
+                      WRK-SKY-KEISAN6 +  5
+             COMPUTE  WRK-SKY-KEISAN6 =
+                      WRK-SKY-KEISAN6 /  10
+             COMPUTE  WRK-SKY-KEISAN6 =
+                      WRK-SKY-KEISAN6 *  10
+             COMPUTE  WRK-SKY-KEISAN  = (SYU-TOTAL-HKNTEN * 10)
+                                      -  WRK-SKY-KEISAN6
+           ELSE
+             COMPUTE  WRK-SKY-KEISAN  =  SYU-TOTAL-HKNTEN
+                                      *  10
+                                      * (100 - RECE62-KYURATE)
+                                      /  100
+           END-IF
            ADD   WRK-SKY-KEISAN     TO   RECE62-SKYIRYO-HOKENJA
       *
       *  （１）（請求円−標準負担金額）計算分は、医保分の保険者負担に集計
@@ -28099,6 +28131,11 @@
                  AND  ( WRK-SYS-SRYYMD     <=  SYS-1001-EDYUKYMD )
                     MOVE     1               TO    FLG-SET
                     MOVE   SYS-1001-PREFNUM  TO    WRK-PREFNUM
+                    MOVE   SYS-1001-DAISANKBN
+                                             TO    WRK-DAISAN-DAISANKBN
+                    IF  WRK-DAISAN-DAISANKBN = SPACE
+                      MOVE "2"               TO    WRK-DAISAN-DAISANKBN
+                    END-IF
                  END-IF
       *
                END-PERFORM

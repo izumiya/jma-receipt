@@ -240,6 +240,8 @@
       *  04.07.08    NACL-門脇    13/12/03  自賠責（労災準拠）のレセプト様式
       *                                     追加対応
       *  04.07.09    NACL-門脇    14/02/13  労災・自賠責の施術加算対応
+      *  04.07.10    NACL-門脇    14/02/19  自賠責（第三者行為）対応
+      *                                     （負担金額１０円未満四捨五入）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -811,6 +813,8 @@
            03  WRK-FUTANWARI                   PIC 9V99.
       *
            03  WRK-CHECK-SRYCD                 PIC X(09).
+      *
+           03  WRK-DAISAN-DAISANKBN            PIC X(01).
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).
@@ -1481,6 +1485,10 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                 MOVE  MCPDATA-REC         TO  SYS-1001-REC
                 MOVE  SYS-1001-TAX-HASU-KBN
                                           TO  WRK-TAX1001-KBN
+                MOVE  SYS-1001-DAISANKBN  TO  WRK-DAISAN-DAISANKBN
+                IF  WRK-DAISAN-DAISANKBN = SPACE
+                  MOVE  "2"               TO  WRK-DAISAN-DAISANKBN
+                END-IF
               ELSE
                 MOVE  "医療機関情報が取得できませんでした。"
                                           TO  WRK-RECEERR
@@ -12397,6 +12405,14 @@ grpsys     PERFORM  900-DBSELECT-SEC
                                          * RECE82-FTNRATE
                                          / 100
                END-IF
+               IF   WRK-DAISAN-DAISANKBN  =  "1"
+                 COMPUTE  RECE82-FTNMONEY  =
+                          RECE82-FTNMONEY  +  5
+                 COMPUTE  RECE82-FTNMONEY  =
+                          RECE82-FTNMONEY  /  10
+                 COMPUTE  RECE82-FTNMONEY  =
+                          RECE82-FTNMONEY  *  10
+               END-IF
                COMPUTE   RECE82-SKYMONEY = RECE82-TOTALKIN-JYU
                                          - RECE82-FTNMONEY
       *
@@ -13164,6 +13180,11 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
                      MOVE     1       TO    FLG-SET
                      MOVE    SYS-1001-TAX-HASU-KBN
                                       TO    WRK-TAX1001-KBN
+                     MOVE    SYS-1001-DAISANKBN
+                                      TO    WRK-DAISAN-DAISANKBN
+                     IF  WRK-DAISAN-DAISANKBN = SPACE
+                       MOVE  "2"      TO    WRK-DAISAN-DAISANKBN
+                     END-IF
                   END-IF
       *
                END-PERFORM

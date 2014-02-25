@@ -414,6 +414,8 @@
       *  04.07.07    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.08    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *  04.07.09    NACL-ÌçÏÆ    14/01/28  ÅìµþÅÔÃÏÊý¸øÈñ¼ýÇ¼¹àÌÜÊÔ½¸½¤Àµ
+      *  04.07.10    NACL-ÌçÏÆ    14/02/19  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
+      *                                     ¡ÊÉéÃ´¶â³Û£±£°±ßÌ¤Ëþ»Í¼Î¸ÞÆþ¡Ë
       *  04.07.11    NACL-ÌçÏÆ    14/02/21  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÅÀ¿ôÃ±²ÁÀßÄê
       *                                     ÂÐ±þ
       *****************************************************************
@@ -629,6 +631,7 @@
            03  WK-1001-JIHIPOSITION    PIC X(01).
            03  WK-1001-CHIHOUNUMKBN    PIC X(01).
            03  WK-1001-GENTAIKBN       PIC X(01).
+           03  WK-1001-DAISANKBN       PIC X(01).
       *
            03  WK-GAIJGNKBN            PIC X(01).
            03  WK-GAIJGNGAK            PIC 9(07).
@@ -685,6 +688,10 @@
            03  WK-HASU1001-KBN4J       PIC X(1).
       *    ÀÁµá³Û¶â³ÛÃ¼¿ô¶èÊ¬¡§¸ø³²¡¡¡Ê¸ºÌÈÌµ¤·¡¦¼«ÈñÊ¬¡Ë
            03  WK-HASU1001-KBN5J       PIC X(1).
+      *    ÀÁµá³Û¶â³ÛÃ¼¿ô¶èÊ¬¡§Âè»°¼Ô¹Ô°Ù¡Ê¸ºÌÈÌµ¤·¡¦ÊÝ¸±Ê¬¡Ë
+           03  WK-HASU1001-KBN6        PIC X(1).
+      *    ÀÁµá³Û¶â³ÛÃ¼¿ô¶èÊ¬¡¡¡¡¡¡¡¡¡¡¡¡¡Ê¸ºÌÈÌµ¤·¡¦¼«ÈñÊ¬¡Ë
+           03  WK-HASU1001-KBN6J       PIC X(1).
       *
            03  WK-HASU-KBN             PIC X(1).
       *
@@ -1700,6 +1707,15 @@
               MOVE   "4"                       TO  WK-HASU1001-KBN5J
            END-IF.
       *
+           MOVE   SYS-1001-DISCOUNT-HASU-KBN6 TO   WK-HASU1001-KBN6.
+           IF   WK-HASU1001-KBN6 =  SPACE
+              MOVE   WK-HASU1001-KBN4         TO   WK-HASU1001-KBN6
+           END-IF.
+           MOVE   SYS-1001-DISCOUNT-HASU-KBN6J TO  WK-HASU1001-KBN6J.
+           IF   WK-HASU1001-KBN6J = SPACE
+              MOVE   WK-HASU1001-KBN4J         TO  WK-HASU1001-KBN6J
+           END-IF.
+      *
            MOVE   SYS-1001-TAX-HASU-KBN       TO   WK-TAX1001-KBN.
            MOVE   SYS-1001-PREFNUM            TO   WK-1001-PREFNUM.
            MOVE   SYS-1001-HOSPSBT            TO   WK-1001-HOSPSBT.
@@ -1707,6 +1723,10 @@
            MOVE   SYS-1001-JIHIPOSITION       TO   WK-1001-JIHIPOSITION.
            MOVE   SYS-1001-CHIHOUNUMKBN       TO   WK-1001-CHIHOUNUMKBN.
            MOVE   SYS-1001-GENTAIKBN          TO   WK-1001-GENTAIKBN.
+           MOVE   SYS-1001-DAISANKBN          TO   WK-1001-DAISANKBN.
+           IF   WK-1001-DAISANKBN = SPACE
+              MOVE   "2"                      TO   WK-1001-DAISANKBN
+           END-IF.
       *
       *    ÊÝ¸±ÁÈ¹ç¤»¥Þ¥¹¥¿¤Î¸¡º÷
            INITIALIZE                           HKNCOMBI-REC.
@@ -2945,8 +2965,8 @@
       ******************************************************************
        400-SEIKYU-HASUU-KEISAN-DAISAN-SEC          SECTION.
       *
-           IF  WK-HASU1001-KBN4J  =  "0"
-             EVALUATE   WK-HASU1001-KBN4
+           IF  WK-HASU1001-KBN6J  =  "0"
+             EVALUATE   WK-HASU1001-KBN6
               WHEN  "1"
                   COMPUTE  LNK-SYU-SKYMONEY = LNK-SYU-SKYMONEY  +   5
                   COMPUTE  WK-SEIKYUGK      = LNK-SYU-SKYMONEY  /  10
@@ -2965,7 +2985,7 @@
              MOVE    WK-GENTAI-SKYMONEY      TO   LNK-SYU-SKYMONEY
              COMPUTE WK-GENTAI-SKYMONEY3     =    WK-GENTAI-SKYMONEY2
                                              -    WK-GENTAI-SKYMONEY
-             EVALUATE   WK-HASU1001-KBN4
+             EVALUATE   WK-HASU1001-KBN6
               WHEN  "1"
                   COMPUTE  LNK-SYU-SKYMONEY = LNK-SYU-SKYMONEY  +   5
                   COMPUTE  WK-SEIKYUGK      = LNK-SYU-SKYMONEY  /  10
@@ -2980,7 +3000,7 @@
               WHEN  "4"
                   CONTINUE
              END-EVALUATE
-             EVALUATE   WK-HASU1001-KBN4J
+             EVALUATE   WK-HASU1001-KBN6J
               WHEN  "1"
                   COMPUTE WK-GENTAI-SKYMONEY3 = WK-GENTAI-SKYMONEY3 +  5
                   COMPUTE WK-GENTAI-SKYMONEY3 = WK-GENTAI-SKYMONEY3 / 10
@@ -21506,6 +21526,14 @@
                         IF   COMB-KOH1HKNNUM  =  "970"
                           MOVE    WK-TOKUTEI-COMPFTN
                                         TO  LNK-SYU-RSIJIBAI-SKYMONEY
+                          IF   WK-1001-DAISANKBN  = "1"
+                            COMPUTE LNK-SYU-RSIJIBAI-SKYMONEY =
+                                    LNK-SYU-RSIJIBAI-SKYMONEY +  5
+                            COMPUTE WK-FTN      =
+                                    LNK-SYU-RSIJIBAI-SKYMONEY /  10
+                            COMPUTE LNK-SYU-RSIJIBAI-SKYMONEY =
+                                    WK-FTN   *  10
+                          END-IF
                         END-IF
                ELSE
                         MOVE  HKN-KZK-GAIKFTNRATE
@@ -21784,6 +21812,14 @@
                         IF   COMB-KOH1HKNNUM  =  "970"
                           MOVE    WK-TOKUTEI-COMPFTN
                                         TO  LNK-SYU-RSIJIBAI-SKYMONEY
+                          IF   WK-1001-DAISANKBN  = "1"
+                            COMPUTE LNK-SYU-RSIJIBAI-SKYMONEY =
+                                    LNK-SYU-RSIJIBAI-SKYMONEY +  5
+                            COMPUTE WK-FTN      =
+                                    LNK-SYU-RSIJIBAI-SKYMONEY /  10
+                            COMPUTE LNK-SYU-RSIJIBAI-SKYMONEY =
+                                    WK-FTN   *  10
+                          END-IF
                         END-IF
                END-IF
              WHEN   "1"
@@ -22218,7 +22254,9 @@
            IF  (COMB-KOHHKNNUM(KOH-IDX)  =  "970")
            AND (LNK-SYU-PTFTNRATE    NOT =  ZERO )
              MOVE    LNK-SYU-PTFTNRATE    TO   WK-GAIKFTNRATE
-             MOVE    "2"                  TO   HKN-RECEFTNDSPKBN
+             IF   WK-1001-DAISANKBN  = "2"
+               MOVE  "2"                  TO   HKN-RECEFTNDSPKBN
+             END-IF
            END-IF.
       *
            IF  (KOH-IDX                  =    1           )
@@ -26191,7 +26229,8 @@
              IF ((WK-1001-PREFNUM       =  43           ) AND
                  (COMB-KOH1HKNNUM       = "143" OR "342") AND
                  (LNK-SYU-SRYYMD(1:6)  <= "200911"      ))
-             OR ( COMB-KOH1HKNNUM       = "970"          )
+             OR ((COMB-KOH1HKNNUM       = "970"         ) AND
+                 (WK-1001-DAISANKBN     = "2"           ))
                MOVE     LNK-SYU-KOH1COMPFTN  TO
                                LNK-SYU-KOH1HKNFTNMONEY
              ELSE
@@ -26575,7 +26614,9 @@
            END-IF.
       *
            IF   LNK-SYU-KOH1HKNNUM      =   "970"
+             IF   WK-1001-DAISANKBN  = "2"
                     MOVE    1      TO    FLG-FTNGAKEN
+             END-IF
            END-IF.
       *
       *    ¸½ÊªµëÉÕ¤Ë´Ø¤¹¤ëÂÐ¾Ý¥Ç¡¼¥¿¥Õ¥é¥°ÊÔ½¸

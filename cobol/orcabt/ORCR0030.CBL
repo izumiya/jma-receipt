@@ -640,6 +640,8 @@
       *                                     場合の公費分離区分編集対応
       *  04.07.12    NACL-門脇    14/02/03  第三者行為対応（院外処方のみの
       *                                     保険組み合わせの病名記載対応）
+      *  04.07.13    NACL-門脇    14/02/19  自賠責（第三者行為）対応
+      *                                     （負担金額１０円未満四捨五入）
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -1133,6 +1135,7 @@
            03  WRK-SKY-KEISAN3                         PIC 9(09).
            03  WRK-SKY-KEISAN4                         PIC S9(09).
            03  WRK-SKY-KEISAN5                         PIC 9(09).
+           03  WRK-SKY-KEISAN6                         PIC 9(09).
            03  WRK-SKY-HOKENJA                         PIC 9(09).
            03  WRK-SKY-HOKENJA-KOH                     PIC 9(09).
            03  WRK-SKY-ICHIBUFTN                       PIC 9(09).
@@ -1572,7 +1575,12 @@
       *
            03  WRK-TAIHI-TOTALTEN              PIC 9(08).
            03  WRK-DAISAN-FTNMONEY             PIC 9(08).
+           03  WRK-DAISAN-FTNMONEY2            PIC 9(08).
+           03  WRK-DAISAN-FTNMONEY3            PIC 9(08).
            03  WRK-DAISAN-TOTALTEN-GEN         PIC 9(08).
+           03  WRK-DAISAN-DAISANKBN            PIC X(01).
+           03  WRK-DAISAN-TOTALTEN-SYUNOU      PIC 9(08).
+           03  WRK-DAISAN-ACCT-UPDKBN          PIC X(01).
       *
       *---------------------------------------------------------------
       *  回数減算用退避領域
@@ -2378,6 +2386,11 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                   MOVE    WRK-PARA-SRYYM
                                        TO  WRK-SYSCHK-SRYYM
                   PERFORM 901-SYSKANRI-CHECK-SEC
+                  MOVE    SYS-1001-DAISANKBN
+                                       TO  WRK-DAISAN-DAISANKBN
+                  IF  WRK-DAISAN-DAISANKBN = SPACE
+                    MOVE  "2"          TO  WRK-DAISAN-DAISANKBN
+                  END-IF
               ELSE    
                   MOVE    "医療機関情報が取得できませんでした。"
                                        TO  WRK-RECEERR
@@ -3478,10 +3491,15 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
               MOVE     13     TO     FLG-TOKKI
               PERFORM  21045-TOKKI-HENSYU-SEC
       *
-              COMPUTE  WRK-DAISAN-FTNMONEY  =  RECE02-DAISAN-TOTALTEN
-                                            *  10
-                                            *  RECE02-KYURATE
-                                            /  100
+              IF   WRK-DAISAN-DAISANKBN  =  "1"
+                PERFORM  211X2-DAISAN-CHECK3-SEC
+                MOVE     WRK-DAISAN-FTNMONEY2 TO WRK-DAISAN-FTNMONEY
+              ELSE
+                COMPUTE  WRK-DAISAN-FTNMONEY  =  RECE02-DAISAN-TOTALTEN
+                                              *  10
+                                              *  RECE02-KYURATE
+                                              /  100
+              END-IF
               MOVE   WRK-DAISAN-FTNMONEY  TO  RECE02-DAISAN-FTNMONEY
               IF  RECE02-ZAITAKU      =  "1" OR "2"
                 ADD  WRK-DAISAN-FTNMONEY  TO  RECE02-FTNMONEY(1)
@@ -3750,6 +3768,101 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
       *
            .
        211X1-DAISAN-CHECK2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    第三者行為の一部負担金計算（１０円未満四捨五入の場合）
+      *****************************************************************
+       211X2-DAISAN-CHECK3-SEC      SECTION.
+      *
+           MOVE     ZERO     TO    WRK-DAISAN-TOTALTEN-SYUNOU
+           MOVE     ZERO     TO    WRK-DAISAN-FTNMONEY2
+           MOVE     SPACE    TO    WRK-DAISAN-ACCT-UPDKBN
+      *
+           PERFORM  VARYING  IDX16   FROM    1   BY  1
+                     UNTIL  (IDX16                   >   10 )
+                       OR   (RECE02-HKNCOMBI(IDX16)  =  ZERO)
+      *
+             IF     RECE02-DAISANFLG(IDX16)   =   1
+      *
+               INITIALIZE                       SYUNOU-REC
+               MOVE  RECE02-HOSPNUM         TO  SYU-HOSPNUM
+               MOVE  RECE02-NYUGAIKBN       TO  SYU-NYUGAIKBN
+               MOVE  RECE02-PTID            TO  SYU-PTID
+               MOVE  RECE02-SRYYM           TO  SYU-SRYYMD(1:6)
+               MOVE  "__"                   TO  SYU-SRYYMD(7:2)
+               MOVE  RECE02-HKNCOMBI(IDX16) TO  SYU-HKNCOMBINUM
+               MOVE  SYUNOU-REC             TO  MCPDATA-REC
+               MOVE  "tbl_syunou"           TO  MCP-TABLE
+               MOVE  "key41"                TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF    MCP-RC   =   ZERO
+                 MOVE    "tbl_syunou"       TO  MCP-TABLE
+                 MOVE    "key41"            TO  MCP-PATHNAME
+                 PERFORM  900-SYUNOU-READ-SEC
+                 PERFORM  UNTIL  (FLG-SYUNOU  =  1)
+                   IF    SYU-DENPJTIKBN    NOT =  "3"
+                     IF  SYU-TOTAL-HKNTEN  NOT = ZERO
+                       ADD  SYU-TOTAL-HKNTEN
+                                  TO  WRK-DAISAN-TOTALTEN-SYUNOU
+                       COMPUTE  WRK-DAISAN-FTNMONEY3 = SYU-TOTAL-HKNTEN
+                                                     * 10
+                                                     * RECE02-KYURATE
+                                                     / 100
+                       COMPUTE  WRK-DAISAN-FTNMONEY3 =
+                                WRK-DAISAN-FTNMONEY3 +  5
+                       COMPUTE  WRK-DAISAN-FTNMONEY3 =
+                                WRK-DAISAN-FTNMONEY3 /  10
+                       COMPUTE  WRK-DAISAN-FTNMONEY3 =
+                                WRK-DAISAN-FTNMONEY3 *  10
+      *
+                       COMPUTE  WRK-DAISAN-FTNMONEY2 =
+                                WRK-DAISAN-FTNMONEY2 +
+                                WRK-DAISAN-FTNMONEY3
+                     END-IF
+                     IF  SYU-ACCT-UPDKBN   =   "1"
+                       MOVE  "1"  TO  WRK-DAISAN-ACCT-UPDKBN
+                     END-IF
+                   END-IF
+                   MOVE    "tbl_syunou"     TO  MCP-TABLE
+                   MOVE    "key41"          TO  MCP-PATHNAME
+                   PERFORM  900-SYUNOU-READ-SEC
+                 END-PERFORM
+               END-IF
+               MOVE      "tbl_syunou"       TO  MCP-TABLE
+               MOVE      "key41"            TO  MCP-PATHNAME
+               PERFORM    900-CLOSE-SEC
+      *
+             END-IF
+      *
+           END-PERFORM
+      *
+      *    リアルタイムプレビュー時
+           IF   (WRK-PARA-SHELLID        =   "RECEPTX")
+           AND  (WRK-DAISAN-ACCT-UPDKBN  =    SPACE   )
+      *
+             IF   RECE02-DAISAN-TOTALTEN  >  WRK-DAISAN-TOTALTEN-SYUNOU
+               COMPUTE  WRK-DAISAN-FTNMONEY3 =
+                  (RECE02-DAISAN-TOTALTEN - WRK-DAISAN-TOTALTEN-SYUNOU)
+                                             * 10
+                                             * RECE02-KYURATE
+                                             / 100
+               COMPUTE  WRK-DAISAN-FTNMONEY3 =
+                        WRK-DAISAN-FTNMONEY3 +  5
+               COMPUTE  WRK-DAISAN-FTNMONEY3 =
+                        WRK-DAISAN-FTNMONEY3 /  10
+               COMPUTE  WRK-DAISAN-FTNMONEY3 =
+                        WRK-DAISAN-FTNMONEY3 *  10
+      *
+               COMPUTE  WRK-DAISAN-FTNMONEY2 =
+                        WRK-DAISAN-FTNMONEY2 +
+                        WRK-DAISAN-FTNMONEY3
+             END-IF
+      *
+           END-IF
+      *
+           .
+       211X2-DAISAN-CHECK3-EXT.
            EXIT.
       *
       *****************************************************************
@@ -14074,10 +14187,25 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
            ADD   SYU-TOTAL-HKNTEN   TO   RECE02-SKYIRYO-TOTALTEN
       *
-           COMPUTE  WRK-SKY-KEISAN  =  SYU-TOTAL-HKNTEN
-                                    *  10
-                                    * (100 - RECE02-KYURATE)
-                                    /  100
+           IF   WRK-DAISAN-DAISANKBN  =  "1"
+             COMPUTE  WRK-SKY-KEISAN6 =  SYU-TOTAL-HKNTEN
+                                      *  10
+                                      *  RECE02-KYURATE
+                                      /  100
+             COMPUTE  WRK-SKY-KEISAN6 =
+                      WRK-SKY-KEISAN6 +  5
+             COMPUTE  WRK-SKY-KEISAN6 =
+                      WRK-SKY-KEISAN6 /  10
+             COMPUTE  WRK-SKY-KEISAN6 =
+                      WRK-SKY-KEISAN6 *  10
+             COMPUTE  WRK-SKY-KEISAN  = (SYU-TOTAL-HKNTEN * 10)
+                                      -  WRK-SKY-KEISAN6
+           ELSE
+             COMPUTE  WRK-SKY-KEISAN  =  SYU-TOTAL-HKNTEN
+                                      *  10
+                                      * (100 - RECE02-KYURATE)
+                                      /  100
+           END-IF
            ADD   WRK-SKY-KEISAN     TO   RECE02-SKYIRYO-HOKENJA
       *
            .
@@ -22852,6 +22980,10 @@ grpsys         PERFORM 900-DBFETCH-SEC
                    MOVE    SYS-1001-HOSPCD     TO  WRK-SYSCHK-HOSPCD
                    MOVE    RECE02-SRYYM        TO  WRK-SYSCHK-SRYYM
                    PERFORM 901-SYSKANRI-CHECK-SEC
+                   MOVE    SYS-1001-DAISANKBN  TO  WRK-DAISAN-DAISANKBN
+                   IF  WRK-DAISAN-DAISANKBN = SPACE
+                     MOVE  "2"                 TO  WRK-DAISAN-DAISANKBN
+                   END-IF
                END-IF
            END-PERFORM
            IF      FLG-SET             =   ZERO
