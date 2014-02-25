@@ -376,6 +376,8 @@
       *  04.07.08    NACL-ÌçÏÆ    13/07/10  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.09    NACL-ÌçÏÆ    13/11/11  ¸º³Û¡Ê±ß¡Ë¤ÎÂÐ±þ
       *  04.07.10    NACL-ÌçÏÆ    14/01/28  ÅìµþÅÔÃÏÊý¸øÈñ¼ýÇ¼¹àÌÜÊÔ½¸½¤Àµ
+      *  04.07.12    NACL-ÌçÏÆ    14/02/21  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÅÀ¿ôÃ±²ÁÀßÄê
+      *                                     ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -535,6 +537,8 @@
            03  FLG-OK                  PIC 9(01).
            03  FLG-ICHIBU-JYOSEI       PIC 9(01).
            03  FLG-ZEROKOGAITO         PIC 9(01).
+           03  FLG-PTRSIINF            PIC 9(01).
+           03  FLG-KOMURSI             PIC 9(01).
       *
        01  WRK-AREA.
            03  WK-PAYKBN               PIC X(02).
@@ -656,6 +660,11 @@
            03  WK-4001-YKZTENTANKA     PIC 9(2).
       *    ¸øÌ³ºÒ³²ÅÀÃ±²Á
            03  WK-4001-KOMUTENTANKA    PIC 9(2).
+      *    ¸øÌ³ºÒ³²Ï«ºÒ½àµòÅÀ¿ôÃ±²Á¶èÊ¬
+           03  WK-4001-KOMURSITANKAKBN PIC X(01).
+      *    ¸øÌ³ºÒ³²Ï«ºÒ½àµòÅÀ¿ôÃ±²Á
+           03  WK-4001-KOMURSITANKA-G.
+               05  WK-4001-KOMURSITANKA    PIC  99V99.
       *
       *    ¼«ÇåÀÕÆÃÄê´ïºàÅù¾ÃÈñÀÇÂÐ¾Ý³°¥³¡¼¥É
            03  WK-4003-TAIGAI.
@@ -1459,6 +1468,10 @@
        01  PTNYUINRRK-REC.
            COPY    "CPPTNYUINRRK.INC".
       *
+      *    Ï«ºÒ´µ¼ÔÊÝ¸±¾ðÊó
+       01  PTRSIINF-REC.
+           COPY    "CPPTRSIINF.INC".
+      *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
       *****************************************************************
@@ -1701,6 +1714,8 @@
            MOVE     ZERO      TO    WK-4001-SYUTENTANKA.
            MOVE     ZERO      TO    WK-4001-YKZTENTANKA.
            MOVE     ZERO      TO    WK-4001-KOMUTENTANKA.
+           MOVE     SPACE     TO    WK-4001-KOMURSITANKAKBN.
+           MOVE     SPACE     TO    WK-4001-KOMURSITANKA-G.
            IF   LNK-SYU-SYUHKNNUM         =    "971" OR "973"
                INITIALIZE                         SYS-4001-REC
                MOVE    "4001"               TO    SYS-4001-KANRICD
@@ -1744,6 +1759,10 @@
                         MOVE  SYS-4001-KOMUTENTANKA
                                             TO    WK-4001-KOMUTENTANKA
                    END-IF
+                   MOVE   SYS-4001-KOMURSITANKAKBN
+                                         TO    WK-4001-KOMURSITANKAKBN
+                   MOVE   SYS-4001-KOMURSITANKA-G
+                                         TO    WK-4001-KOMURSITANKA-G
                END-IF
                MOVE     "tbl_syskanri"      TO    MCP-TABLE
                MOVE     "key10"             TO    MCP-PATHNAME
@@ -22615,14 +22634,25 @@
                END-IF
                IF     LNK-SYU-SYUHKNNUM       =  "971"
                  IF   FLG-KENPOJYUNKYO  =  ZERO
-                   EVALUATE  WK-4001-TENKBN
-                     WHEN  "1"
-                         COMPUTE  WK-ZENGAKU  =  
-                                 (WK-ZENGAKU  / 10 * 11.5)
-                     WHEN  "2"
-                         COMPUTE  WK-ZENGAKU  =  
-                                 (WK-ZENGAKU  / 10 * 12.0)
-                   END-EVALUATE
+                   MOVE   ZERO   TO   FLG-KOMURSI
+                   IF  (WK-4001-KOMURSITANKAKBN     =  "2"  )
+                   AND (WK-4001-KOMURSITANKA-G  NOT =  SPACE)
+                     PERFORM   23051-PTRSIINF-KENSAKU-SEC
+                   END-IF
+                   IF   FLG-KOMURSI  =   1
+                       COMPUTE      WK-ZENGAKU  =
+                                   (WK-ZENGAKU  / 10
+                                     *  WK-4001-KOMURSITANKA)
+                   ELSE
+                       EVALUATE  WK-4001-TENKBN
+                         WHEN  "1"
+                           COMPUTE  WK-ZENGAKU  =  
+                                   (WK-ZENGAKU  / 10 * 11.5)
+                         WHEN  "2"
+                           COMPUTE  WK-ZENGAKU  =  
+                                   (WK-ZENGAKU  / 10 * 12.0)
+                       END-EVALUATE
+                   END-IF
                  ELSE
                    COMPUTE WK-ZENGAKU =
                           (WK-ZENGAKU / 10 * WK-4001-KOMUTENTANKA)
@@ -22751,6 +22781,41 @@
            END-EVALUATE.
       *
        2305-SYUHOKEN-KEISAN-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *        Ï«ºÒ¤ÎÊÝ¸±¶èÊ¬¼èÆÀ                                      *
+      ******************************************************************
+       23051-PTRSIINF-KENSAKU-SEC           SECTION.
+      *
+           INITIALIZE                     PTRSIINF-REC
+           MOVE    COMB-HOSPNUM      TO   PTRSI-HOSPNUM
+           MOVE    COMB-PTID         TO   PTRSI-PTID
+           MOVE    COMB-HKNID        TO   PTRSI-HKNID
+           MOVE    PTRSIINF-REC      TO   MCPDATA-REC
+           MOVE    "DBSELECT"        TO   MCP-FUNC
+           MOVE    "tbl_ptrsiinf"    TO   MCP-TABLE
+           MOVE    "key"             TO   MCP-PATHNAME
+           CALL    "ORCDBMAIN"       USING   MCPAREA
+                                             MCPDATA-REC
+                                             SPA-AREA
+           IF      MCP-RC  =  ZERO
+             MOVE    "tbl_ptrsiinf"  TO   MCP-TABLE
+             MOVE    "key"           TO   MCP-PATHNAME
+             PERFORM  PTRSIINF-READ-SEC
+             IF    FLG-PTRSIINF     =  ZERO
+               IF     PTRSI-HKNKBN  =  "5"
+                  MOVE     1         TO   FLG-KOMURSI
+               END-IF
+             END-IF
+           END-IF
+           MOVE    "tbl_ptrsiinf"    TO   MCP-TABLE
+           MOVE    "key"             TO   MCP-PATHNAME
+           PERFORM  DB-CLOSE-SEC
+      *
+           .
+      *
+       23051-PTRSIINF-KENSAKU-EXT.
            EXIT.
       *
       ******************************************************************
@@ -31403,6 +31468,27 @@
       *
            .
        PTNYUINRRK-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼ÔÏ«ºÒÊÝ¸±¾ðÊóÆÉ¹þ
+      *****************************************************************
+       PTRSIINF-READ-SEC           SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTRSIINF-REC
+               MOVE    ZERO            TO  FLG-PTRSIINF
+           ELSE
+               INITIALIZE                  PTRSIINF-REC
+               MOVE    1               TO  FLG-PTRSIINF
+           END-IF
+      *
+           .
+       PTRSIINF-READ-EXT.
            EXIT.
       *
       *****************************************************************

@@ -104,6 +104,8 @@
       *                                     Ï«ºÒ»ØÄê°åÎÅµ¡´Ø¶èÊ¬ÊÔ½¸
       *  04.07.05    NACL-ÌçÏÆ    13/10/02  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.06    NACL-ÌçÏÆ    14/02/13  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î»Ü½Ñ²Ã»»ÂÐ±þ
+      *  04.07.07    NACL-ÌçÏÆ    14/02/21  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÅÀ¿ôÃ±²Á
+      *                                     ÀßÄêÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -242,6 +244,9 @@
            03  WRK-KOMUTENTANKA                        PIC  9(02).
            03  WRK-KYUGYO-PRTKBN                       PIC  X(01).
            03  WRK-RSIIRYOKBN                          PIC  X(01).
+           03  WRK-KOMURSITANKAKBN                     PIC  X(01).
+           03  WRK-KOMURSITANKA-G.
+               05  WRK-KOMURSITANKA                    PIC  99V99.
       *
            03  WRK-TAIHI-FLG                           PIC  9(01).
            03  WRK-TAIHI-SRYYMD.
@@ -724,6 +729,10 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-4001-HOSPNUM
                     MOVE SYS-4001-RSIIRYOKBN
                                            TO    WRK-RSIIRYOKBN
                   END-IF
+                  MOVE   SYS-4001-KOMURSITANKAKBN
+                                           TO    WRK-KOMURSITANKAKBN
+                  MOVE   SYS-4001-KOMURSITANKA-G
+                                           TO    WRK-KOMURSITANKA-G
               ELSE
                   MOVE    "Ï«ºÒ¼«Çå°åÎÅµ¡´Ø¾ðÊó¤¬¼èÆÀ¤Ç¤­¤Þ¤»¤ó¤Ç¤·¤¿"     
                                               TO  WRK-RECEERR
@@ -1106,6 +1115,13 @@ grpsys         PERFORM 900-DBSELECT-SEC
       *
       *    ÅÀ¿ôÃ±²Á
            MOVE    WRK-TANKA             TO   RECE41-TANKA
+      *    ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÅÀ¿ôÃ±²Á
+           IF   (RECE41-HKNKBN           =   "5" )
+           AND  (WRK-KOMUKBN             =   "1" )
+           AND  (WRK-KOMURSITANKAKBN     =   "2" )
+           AND  (WRK-KOMURSITANKA-G  NOT =  SPACE)
+               MOVE   WRK-KOMURSITANKA   TO   RECE41-TANKA
+           END-IF
       *    ¼«ÇåÀÕ²Ã»»Î¨
            MOVE    WRK-KSNRATE           TO   RECE41-KSNRATE
       *    ¼«ÇåÀÕÊ¸½ñÎÁ¾ÃÈñÀÇ
@@ -2527,8 +2543,16 @@ grpsys     PERFORM 900-DBSELECT-SEC
                COMPUTE  RECE41-TOTALKIN   =   RECE41-TOTALTEN   *
                                               WRK-KOMUTENTANKA
              ELSE
-               COMPUTE  RECE41-TOTALKIN   =   RECE41-TOTALTEN   *
-                                              WRK-TANKA    
+               IF   (RECE41-HKNKBN           =   "5" )
+               AND  (WRK-KOMUKBN             =   "1" )
+               AND  (WRK-KOMURSITANKAKBN     =   "2" )
+               AND  (WRK-KOMURSITANKA-G  NOT =  SPACE)
+                 COMPUTE  RECE41-TOTALKIN   =   RECE41-TOTALTEN   *
+                                                WRK-KOMURSITANKA
+               ELSE
+                 COMPUTE  RECE41-TOTALKIN   =   RECE41-TOTALTEN   *
+                                                WRK-TANKA
+               END-IF
              END-IF
            END-IF                                                       
       *
@@ -3427,6 +3451,10 @@ grpsys     PERFORM 900-DBFETCH-SEC
                      MOVE SYS-4001-RSIIRYOKBN
                                             TO    WRK-RSIIRYOKBN
                    END-IF
+                   MOVE   SYS-4001-KOMURSITANKAKBN
+                                            TO    WRK-KOMURSITANKAKBN
+                   MOVE   SYS-4001-KOMURSITANKA-G
+                                            TO    WRK-KOMURSITANKA-G
                 END-IF
       *
               END-PERFORM

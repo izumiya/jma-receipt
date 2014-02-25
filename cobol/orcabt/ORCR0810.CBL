@@ -62,6 +62,8 @@
       *  04.07.02    NACL-ÌçÏÆ    13/04/16  Ï«ºÒ¥ì¥»ÅÅÂÐ±þ
       *                                     Ï«ºÒ»ØÄê°åÎÅµ¡´Ø¶èÊ¬ÊÔ½¸
       *  04.07.03    NACL-Æ£¸¶    13/09/20  Âè»°¼Ô¹Ô°ÙÂÐ±þ
+      *  04.07.04    NACL-ÌçÏÆ    14/02/21  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÅÀ¿ôÃ±²Á
+      *                                     ÀßÄêÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -194,6 +196,10 @@
            03  WRK-KOMUTENTANKA        PIC 9(02).
       *
            03  WRK-RSIIRYOKBN          PIC X(01).
+      *
+           03  WRK-KOMURSITANKAKBN     PIC X(01).
+           03  WRK-KOMURSITANKA-G.
+               05  WRK-KOMURSITANKA    PIC 99V99.
       *
            03  WRK-STYMD               PIC X(08).
            03  WRK-EDYMD               PIC X(08).
@@ -571,6 +577,10 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-4001-HOSPNUM
                     MOVE SYS-4001-RSIIRYOKBN
                                            TO    WRK-RSIIRYOKBN
                   END-IF
+                  MOVE   SYS-4001-KOMURSITANKAKBN
+                                           TO    WRK-KOMURSITANKAKBN
+                  MOVE   SYS-4001-KOMURSITANKA-G
+                                           TO    WRK-KOMURSITANKA-G
               ELSE
                   MOVE    "Ï«ºÒ¼«Çå°åÎÅµ¡´Ø¾ðÊó¤¬¼èÆÀ¤Ç¤­¤Þ¤»¤ó¤Ç¤·¤¿"     
                                               TO  WRK-RECEERR
@@ -1338,6 +1348,13 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
                WHEN  "2"
                     MOVE     12.0        TO   WRK-RECE82-TANKA
            END-EVALUATE
+      *    ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÅÀ¿ôÃ±²Á
+           IF   (WRK-RECE82-HKNKBN       =   "5" )
+           AND  (WRK-KOMUKBN             =   "1" )
+           AND  (WRK-KOMURSITANKAKBN     =   "2" )
+           AND  (WRK-KOMURSITANKA-G  NOT =  SPACE)
+               MOVE   WRK-KOMURSITANKA   TO   WRK-RECE82-TANKA
+           END-IF
       *    ¼«ÇåÀÕ²Ã»»Î¨
            MOVE    WRK-KSNRATE           TO   WRK-RECE82-KSNRATE
       *    ¼«ÇåÀÕÊ¸½ñÎÁ¾ÃÈñÀÇ
@@ -1823,6 +1840,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       MOVE SYS-4001-RSIIRYOKBN
                                              TO    WRK-RSIIRYOKBN
                     END-IF
+                    MOVE   SYS-4001-KOMURSITANKAKBN
+                                             TO    WRK-KOMURSITANKAKBN
+                    MOVE   SYS-4001-KOMURSITANKA-G
+                                             TO    WRK-KOMURSITANKA-G
                 END-IF
       *
            END-PERFORM
@@ -2024,6 +2045,10 @@ grpsys         MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
                       MOVE SYS-4001-RSIIRYOKBN
                                              TO    WRK-RSIIRYOKBN
                     END-IF
+                    MOVE   SYS-4001-KOMURSITANKAKBN
+                                             TO    WRK-KOMURSITANKAKBN
+                    MOVE   SYS-4001-KOMURSITANKA-G
+                                             TO    WRK-KOMURSITANKA-G
                 END-IF
       *
            END-PERFORM
