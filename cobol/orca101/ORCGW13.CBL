@@ -143,6 +143,13 @@
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-KOMUKBNMEI
                                               PIC X(08).
+                       09  SPA-GMN-KOMURSITANKAKBN-G.
+                           11  SPA-GMN-KOMURSITANKAKBN
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-KOMURSITANKAKBNMEI
+                                              PIC X(08).
+                       09  SPA-GMN-KOMURSITANKA PIC 9(02)V9.
                        09  SPA-GMN-KOMUTENTANKA PIC 9(02).
                        09  SPA-GMN-JBISKYKBN-G.
                            11  SPA-GMN-JBISKYKBN
@@ -187,6 +194,8 @@
                        09  SPA-GMN-TENKBNMEIL
                                               PIC X(18).
                    07  SPA-GMN-TENKBN-MAX     PIC 9(02).    
+                   07  SPA-GMN-RSITENLST      PIC 99V9
+                                                    OCCURS  2.
                    07  SPA-GMN-ROUKAISULST          OCCURS  2.
                        09  SPA-GMN-ROUKAISUL
                                               PIC X(01).
@@ -237,6 +246,13 @@
                        09  SPA-GMN-F1L             PIC X(01).
                        09  SPA-GMN-KOMUKBNMEIL     PIC X(08).
                    07  SPA-GMN-KOMUKBN-MAX         PIC 9(02).
+                   07  SPA-GMN-KOMURSITANKAKBNLST OCCURS  2.
+                       09  SPA-GMN-KOMURSITANKAKBNL
+                                                   PIC X(01).
+                       09  SPA-GMN-F1L             PIC X(01).
+                       09  SPA-GMN-KOMURSITANKAKBNMEIL
+                                                   PIC X(28).
+                   07  SPA-GMN-KOMURSITANKAKBN-MAX PIC 9(02).
                    07  SPA-GMN-JBISKYKBNLST OCCURS  2.
                        09  SPA-GMN-JBISKYKBNL        PIC X(01).
                        09  SPA-GMN-F1L             PIC X(01).
@@ -278,6 +294,7 @@
                05  SPA-NAIB-AREA.
                    07  SPA-NAI-STYUKYMD       PIC 9(08).
                    07  SPA-NAI-EDYUKYMD       PIC 9(08).
+                   07  SPA-NAI-RSITEN         PIC 99V9.
       *
                    07  SPA-NAI-KIZAITBL-FLG   PIC 9(01).
                    07  SPA-NAI-KIZAITBL-PAGE  PIC 9(05).
@@ -364,6 +381,7 @@
            03  WRK-SKIPKNS         PIC 9(05).
            03  WRK-CHK-SRYCD       PIC X(09).
            03  WRK-W01-YMD         PIC X(08).
+           03  WRK-RSITEN          PIC 99V9.
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -758,6 +776,7 @@
       *
            IF    ( SPA-GMN-TENKBN-G        =   SPACE )
                MOVE    SPA-GMN-TENKBNLST(1)    TO  SPA-GMN-TENKBN-G
+               MOVE    SPA-GMN-RSITENLST(1)    TO  SPA-NAI-RSITEN
            END-IF
       *
            IF    ( SPA-GMN-ROUKAISU-G        =   SPACE )
@@ -819,6 +838,7 @@
            MOVE    SYS-4001-TENKBN     TO  WRK-CMB-CD
            PERFORM 4200-TENKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-TENKBN-G
+           MOVE    WRK-RSITEN          TO  SPA-NAI-RSITEN
       *
       *
            MOVE    SYS-4001-ROUKAISU   TO  WRK-CMB-CD
@@ -884,6 +904,25 @@
                                        TO  SPA-GMN-KOMUKBN-G
            ELSE
                MOVE    WRK-CMB-ITM TO  SPA-GMN-KOMUKBN-G
+           END-IF
+      *
+           MOVE    SYS-4001-KOMURSITANKAKBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-KOMURSITANKAKBNLST-CHK-SEC
+           IF    ( WRK-CMB-ITM         =   SPACE )
+               MOVE    SPA-GMN-KOMURSITANKAKBNLST (1)
+                                   TO  SPA-GMN-KOMURSITANKAKBN-G
+           ELSE
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-KOMURSITANKAKBN-G
+           END-IF
+      *
+           MOVE    ZERO            TO  SPA-GMN-KOMURSITANKA
+           IF    ( SPA-GMN-KOMURSITANKAKBN  =   "2" )
+               MOVE    SYS-4001-KOMURSITANKA
+                                   TO  SPA-GMN-KOMURSITANKA
+           ELSE
+               MOVE    SPA-NAI-RSITEN
+                                   TO  SPA-GMN-KOMURSITANKA
            END-IF
       *
            IF      SYS-4001-KOMUTENTANKA-X  IS  NUMERIC
@@ -1224,6 +1263,9 @@
            MOVE    "£±£²±ß"            TO  SPA-GMN-TENKBNMEIL   (2)
            MOVE    2                   TO  SPA-GMN-TENKBN-MAX 
       *     
+           MOVE    11.5                TO  SPA-GMN-RSITENLST (1)
+           MOVE    12.0                TO  SPA-GMN-RSITENLST (2)
+      *     
            MOVE    "1"                 TO  SPA-GMN-ROUKAISUL      (1)
            MOVE    "µ­ºÜ¤Ê¤·"          TO  SPA-GMN-ROUKAISUMEIL   (1)
            MOVE    "2"                 TO  SPA-GMN-ROUKAISUL      (2)
@@ -1277,6 +1319,12 @@
            MOVE    "2"                 TO  SPA-GMN-KOMUKBNL      (2)
            MOVE    "·òÊÝ½àµò"          TO  SPA-GMN-KOMUKBNMEIL   (2)
            MOVE    2                   TO  SPA-GMN-KOMUKBN-MAX 
+      *     
+           MOVE    "1"                 TO SPA-GMN-KOMURSITANKAKBNL   (1)
+           MOVE   "Ï«ºÒÅÀ¿ôÃ±²Á¤Ë½àµò" TO SPA-GMN-KOMURSITANKAKBNMEIL(1)
+           MOVE    "2"                 TO SPA-GMN-KOMURSITANKAKBNL   (2)
+           MOVE    "Ç¤°Õ¤ÎÅÀ¿ô¤òÀßÄê"  TO SPA-GMN-KOMURSITANKAKBNMEIL(2)
+           MOVE    2                   TO SPA-GMN-KOMURSITANKAKBN-MAX 
       *     
            MOVE    "1"                 TO  SPA-GMN-JBISKYKBNL      (1)
            MOVE    "£±£°£°¡ó"          TO  SPA-GMN-JBISKYKBNMEIL   (1)
@@ -1393,6 +1441,8 @@
            MOVE    W13-YKZTENTANKA     TO  SPA-GMN-YKZTENTANKA
            MOVE    W13-RSIPRT          TO  SPA-GMN-RSIPRT-G
            MOVE    W13-KOMUKBN         TO  SPA-GMN-KOMUKBN-G
+           MOVE    W13-KOMURSITANKAKBN TO  SPA-GMN-KOMURSITANKAKBN-G
+           MOVE    W13-KOMURSITANKA    TO  SPA-GMN-KOMURSITANKA
            MOVE    W13-KOMUTENTANKA    TO  SPA-GMN-KOMUTENTANKA
            MOVE    W13-JBISKYKBN       TO  SPA-GMN-JBISKYKBN-G
            MOVE    W13-KOMUSKYKBN      TO  SPA-GMN-KOMUSKYKBN-G
@@ -1481,6 +1531,16 @@
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
       *
+           PERFORM 4101-KOMURSITANKAKBN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4101-KOMURSITANKA-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
            PERFORM 4101-KOMUSKYKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
@@ -1515,7 +1575,6 @@
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
-      *
       *
            .
        4102-KIHON-CHK-EXT.
@@ -1594,6 +1653,8 @@
       *****************************************************************
        4101-TENKBN-CHK-SEC             SECTION.
       *
+           MOVE    ZERO                    TO  SPA-NAI-RSITEN
+      *
            IF    ( SPA-GMN-TENKBN      =   SPACE )
                MOVE    "0002"              TO  SPA-ERRCD
                MOVE    3                   TO  SPA-GMN-CUR
@@ -1605,6 +1666,7 @@
                    MOVE    3               TO  SPA-GMN-CUR
                ELSE
                    MOVE    WRK-CMB-ITM     TO  SPA-GMN-TENKBN-G
+                   MOVE    WRK-RSITEN      TO  SPA-NAI-RSITEN
                END-IF
            END-IF
       *
@@ -1813,7 +1875,54 @@
            EXIT.
       *     
       *****************************************************************
-      *    ¸øÌ³ºÒ³²ÅÀÃ±²Á
+      *    ¸øÌ³ºÒ³²Ï«ºÒ½àµòÅÀ¿ôÃ±²Á¥Á¥§¥Ã¥¯
+      *****************************************************************
+       4101-KOMURSITANKAKBN-CHK-SEC        SECTION.
+      *
+           IF    ( SPA-GMN-KOMURSITANKAKBN      =   SPACE )
+               MOVE    SPA-GMN-KOMURSITANKAKBNLST (1)
+                                       TO  SPA-GMN-KOMURSITANKAKBN-G
+               MOVE    SPA-NAI-RSITEN  TO  SPA-GMN-KOMURSITANKA
+           ELSE
+               MOVE    SPA-GMN-KOMURSITANKAKBN  TO  WRK-CMB-CD
+               PERFORM 4200-KOMURSITANKAKBNLST-CHK-SEC
+               IF    ( WRK-CMB-ITM         =   SPACE )
+                   MOVE    SPA-GMN-KOMURSITANKAKBNLST (1)
+                                       TO  SPA-GMN-KOMURSITANKAKBN-G
+               ELSE
+                   MOVE    WRK-CMB-ITM TO  SPA-GMN-KOMURSITANKAKBN-G
+               END-IF
+           END-IF
+      *
+           .
+       4101-KOMURSITANKAKBN-CHK-EXT.
+           EXIT.
+      *     
+      *****************************************************************
+      *    ¸øÌ³ºÒ³²ÅÀÃ±²Á¡ÊÏ«ºÒ½àµò¡Ë
+      *****************************************************************
+       4101-KOMURSITANKA-CHK-SEC       SECTION.
+      *
+           IF    ( SPA-GMN-KOMURSITANKAKBN  =   "2" )
+               IF    ( SPA-GMN-KOMURSITANKA =   ZERO )
+                   MOVE    "0017"      TO  SPA-ERRCD
+                   MOVE    25          TO  SPA-GMN-CUR
+               END-IF
+               IF    ( SPA-ERRCD       =    SPACE )
+                   IF    ( SPA-GMN-KOMURSITANKA >   15 )
+                       MOVE    "0018"  TO  SPA-ERRCD
+                       MOVE    25      TO  SPA-GMN-CUR
+                   END-IF
+               END-IF
+           ELSE
+               MOVE    SPA-NAI-RSITEN  TO  SPA-GMN-KOMURSITANKA
+           END-IF
+      *
+           .
+       4101-KOMURSITANKA-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¸øÌ³ºÒ³²ÅÀÃ±²Á¡Ê·òÊÝ½àµò¡Ë
       *****************************************************************
        4101-KOMUTENTANKA-CHK-SEC       SECTION.
       *
@@ -2000,6 +2109,12 @@
                GO  TO  4105-SONSHOUNAME-CHK-EXT
            END-IF
       *
+           IF    ( SPA-GMN-SONSHOUKBN  =   SPACE )
+               INITIALIZE                  SPA-GMN-KOUMOKU1
+               MOVE    ZERO            TO  SPA-NAI-SELNO
+               GO  TO  4105-SONSHOUNAME-CHK-EXT
+           END-IF
+      *
            MOVE    ZERO                TO  IDX
            PERFORM VARYING IDY FROM    1   BY  1
                    UNTIL   IDY >       SPA-GMN-MAX
@@ -2128,6 +2243,7 @@
        4200-TENKBNLST-CHK-SEC          SECTION.
       *
            INITIALIZE                      WRK-CMB-ITM-G
+                                           WRK-RSITEN
       *
            PERFORM VARYING IDY FROM    1   BY  1
                    UNTIL ( IDY >       SPA-GMN-TENKBN-MAX )
@@ -2136,6 +2252,8 @@
                IF    ( WRK-CMB-CD      =   SPA-GMN-TENKBNL (IDY) )
                    MOVE    SPA-GMN-TENKBNLST (IDY)
                                        TO  WRK-CMB-ITM
+                   MOVE    SPA-GMN-RSITENLST (IDY)
+                                       TO  WRK-RSITEN
                END-IF
       *
            END-PERFORM
@@ -2310,6 +2428,27 @@
       *
            .
        4200-KOMUKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ¸øÌ³ºÒ³²Ï«ºÒ½àµòÅÀ¿ôÃ±²Á¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       4200-KOMURSITANKAKBNLST-CHK-SEC         SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL ( IDY >       SPA-GMN-KOMURSITANKAKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( WRK-CMB-CD  =   SPA-GMN-KOMURSITANKAKBNL (IDY) )
+                   MOVE    SPA-GMN-KOMURSITANKAKBNLST (IDY)
+                                       TO  WRK-CMB-ITM
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       4200-KOMURSITANKAKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    ¼«ÇåÀÕÀÁµá¶èÊ¬¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
@@ -2680,6 +2819,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SYUTENTANKA     TO  SYS-4001-SYUTENTANKA
            MOVE    SPA-GMN-YKZTENTANKA     TO  SYS-4001-YKZTENTANKA
            MOVE    SPA-GMN-KOMUKBN         TO  SYS-4001-KOMUKBN
+           MOVE    SPA-GMN-KOMURSITANKAKBN TO  SYS-4001-KOMURSITANKAKBN
+           MOVE    SPA-GMN-KOMURSITANKA    TO  SYS-4001-KOMURSITANKA
            MOVE    SPA-GMN-KOMUTENTANKA    TO  SYS-4001-KOMUTENTANKA
            MOVE    SPA-GMN-RSIPRT          TO  SYS-4001-RSIPRTKBN
            MOVE    SPA-GMN-JBISKYKBN       TO  SYS-4001-JIBAI-SEIKYUKBN
@@ -3037,6 +3178,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SYUTENTANKA      TO  W13-SYUTENTANKA
            MOVE    SPA-GMN-YKZTENTANKA      TO  W13-YKZTENTANKA
            MOVE    SPA-GMN-KOMUKBN-G        TO  W13-KOMUKBN
+           MOVE    SPA-GMN-KOMURSITANKAKBN-G TO W13-KOMURSITANKAKBN
+           MOVE    SPA-GMN-KOMURSITANKA     TO  W13-KOMURSITANKA
            MOVE    SPA-GMN-KOMUTENTANKA     TO  W13-KOMUTENTANKA
            MOVE    SPA-GMN-RSIPRT-G         TO  W13-RSIPRT
            MOVE    SPA-GMN-JBISKYKBN-G      TO  W13-JBISKYKBN
@@ -3111,6 +3254,14 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-KOMUKBN-MAX
                                        TO  W13-KOMUKBN-COUNT
+      *
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-GMN-KOMURSITANKAKBN-MAX
+               MOVE    SPA-GMN-KOMURSITANKAKBNLST (IDY)
+                                       TO  W13-KOMURSITANKAKBNLST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-KOMURSITANKAKBN-MAX
+                                       TO  W13-KOMURSITANKAKBN-COUNT
       *
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >       SPA-GMN-JBISKYKBN-MAX
@@ -3193,6 +3344,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
       *
            MOVE    SPA-GMN-KIZAITBL-MAX    TO  W13-KIZAILST-COUNT
+      *
+           IF    ( SPA-GMN-KOMURSITANKAKBN =   "1" )
+               MOVE    WIDGET-INSENSITIVE
+                                       TO  W13-KOMURSITANKA-STATE
+           ELSE
+               MOVE    WIDGET-NORMAL   TO  W13-KOMURSITANKA-STATE
+           END-IF
       *
            IF    ( SPA-NAI-KIZAITBL-FLG    =   ZERO )
                IF    ( SPA-GMN-KIZAITBL-SEL    =   ZERO )
@@ -3283,8 +3441,19 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    INTO    SPA-ERRMSG
                    END-STRING
                WHEN    "0016"
-                   MOVE    "¸øÌ³ºÒ³²¤ÎÃ±²Á¤òÆþÎÏ¤·¤Æ¤¯¤À¤µ¤¤"
+                   MOVE    "¸øÌ³ºÒ³²¡¦·òÊÝ½àµò¤ÎÃ±²Á¤òÆþÎÏ¤·¤Æ¤¯¤À¤µ¤¤"
                                                TO  SPA-ERRMSG
+               WHEN    "0017"
+                   MOVE    "¸øÌ³ºÒ³²¡¦Ï«ºÒ½àµò¤ÎÃ±²Á¤òÆþÎÏ¤·¤Æ¤¯¤À¤µ¤¤"
+                                               TO  SPA-ERRMSG
+               WHEN    "0018"
+                   MOVE    SPACE               TO  SPA-ERRMSG
+                   STRING  "¸øÌ³ºÒ³²¡¦Ï«ºÒ½àµò¤ÎÃ±²Á¤Ï"
+                                                   DELIMITED BY SIZE
+                           "£±£µ±ß°Ê²¼¤ÇÀßÄê¤·¤Æ¤¯¤À¤µ¤¤"
+                                                   DELIMITED BY SIZE
+                   INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "0099"
                    MOVE    "Ì¤ÆþÎÏ¤Î¹àÌÜ¤¬¤¢¤ê¤Þ¤¹"
                                                TO  SPA-ERRMSG
@@ -3419,6 +3588,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "KOMUSKYKBN"     TO   MCP-WIDGET
                 WHEN    23
                     MOVE  "KYUGYOPRTKBN"   TO   MCP-WIDGET
+                WHEN    24
+                    MOVE  "KOMURSITANKAKBN" TO  MCP-WIDGET
+                WHEN    25
+                    MOVE  "KOMURSITANKA"    TO  MCP-WIDGET
                 WHEN    99
                     MOVE  "B12"            TO   MCP-WIDGET
             END-EVALUATE
@@ -3461,6 +3634,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "KOMUKBN"
                    MOVE    22              TO  SPA-GMN-CUR
                WHEN    "KOMUSKYKBN"
+                   MOVE    24              TO  SPA-GMN-CUR
+               WHEN    "KOMURSITANKAKBN"
+                   MOVE    25              TO  SPA-GMN-CUR
+               WHEN    "KOMURSITANKA"
                    MOVE    20              TO  SPA-GMN-CUR
                WHEN    "KOMUTENTANKA"
                    MOVE    14              TO  SPA-GMN-CUR
@@ -3479,6 +3656,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "SONSHOUNAME"
                    MOVE    99              TO  SPA-GMN-CUR
             END-EVALUATE
+      *
+            IF    ( SPA-GMN-CUR            =   25 )
+                IF    ( W13-KOMURSITANKA-STATE =   WIDGET-INSENSITIVE )
+                    MOVE    20             TO  SPA-GMN-CUR
+                END-IF
+            END-IF
       *
            .
        50011-CUR-SET-EXT.

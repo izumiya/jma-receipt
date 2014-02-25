@@ -138,6 +138,17 @@ W13	{
 			count	int;
 			item	varchar(10)[02];
 		};
+		KOMURSITANKAKBN_COMBO	{
+			KOMURSITANKAKBN	{
+				value	varchar(30);
+			};
+			count	int;
+			item	varchar(30)[05];
+		};
+		KOMURSITANKA	{
+			value	number(3,1);
+	        state	int;
+		};
 		KOMUTENTANKA	{
 			value	number(2);
 		};
