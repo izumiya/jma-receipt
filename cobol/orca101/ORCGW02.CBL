@@ -194,6 +194,13 @@
                            11  SPA-GMN-F11L           PIC X(01).
                            11  SPA-GMN-DISCOUNT-HASU-KBNJMEIL
                                                       PIC X(30).
+                       09  SPA-GMN-DAISANKBNLST
+                                                      OCCURS  2.
+                           11  SPA-GMN-DAISANKBNL
+                                                      PIC X(01).
+                           11  SPA-GMN-DAISANKBNL-FL  PIC X(01).
+                           11  SPA-GMN-DAISANKBNMEIL
+                                                      PIC X(30).
                        09  SPA-GMN-GENTAIKBNLST
                                                       OCCURS  3.
                            11  SPA-GMN-GENTAIKBNL
@@ -318,11 +325,18 @@
                                13  SPA-GMN-CHIHOUNUMKBNMEI
                                                       PIC X(08).
                            11  SPA-GMN-DISCOUNT-HASU-KBN-G
-                                                      OCCURS 8.
+                                                      OCCURS 10.
                                13  SPA-GMN-DISCOUNT-HASU-KBN
                                                       PIC X(01).
                                13  SPA-GMN-F11        PIC X(01).
                                13  SPA-GMN-DISCOUNT-HASU-KBNMEI
+                                                      PIC X(30).
+                           11  SPA-GMN-DAISANKBN-G.
+                               13  SPA-GMN-DAISANKBN
+                                                      PIC X(01).
+                               13  SPA-GMN-DAISANKBN-FL
+                                                      PIC X(01).
+                               13  SPA-GMN-DAISANKBNMEI
                                                       PIC X(30).
                            11  SPA-GMN-GENTAIKBN-G.
                                13  SPA-GMN-GENTAIKBN
@@ -608,7 +622,9 @@
            03  CONST-DHASU4        PIC 9(05) VALUE 6.
            03  CONST-DHASU4J       PIC 9(05) VALUE 7.
            03  CONST-DHASU5J       PIC 9(05) VALUE 8.
-           03  CONST-DHASU-MAX     PIC 9(05) VALUE 8.
+           03  CONST-DHASU6        PIC 9(05) VALUE 9.
+           03  CONST-DHASU6J       PIC 9(05) VALUE 10.
+           03  CONST-DHASU-MAX     PIC 9(05) VALUE 10.
       *    感染症参加送信  
            03  CONST-INFAJOBID     PIC 9(07)  VALUE    1.
            03  CONST-INFASHELLID   PIC X(08)  VALUE    "INFAGREE".
@@ -1060,6 +1076,10 @@
                                                (CONST-DHASU4)
                                    SPA-GMN-DISCOUNT-HASU-KBN-G
                                                (CONST-DHASU5J)
+                                   SPA-GMN-DISCOUNT-HASU-KBN-G
+                                               (CONST-DHASU6)
+                                   SPA-GMN-DISCOUNT-HASU-KBN-G
+                                               (CONST-DHASU6J)
       *
            MOVE    "0"         TO  SPA-GMN-DISCOUNT-HASU-KBNJL    (1)
            MOVE    "保険分に準ずる"
@@ -1083,6 +1103,15 @@
                                                (CONST-DHASU3J)
                                    SPA-GMN-DISCOUNT-HASU-KBN-G
                                                (CONST-DHASU4J)
+      *
+           MOVE    "1"         TO  SPA-GMN-DAISANKBNL    (1)
+           MOVE    "負担金額１０円未満四捨五入"
+                               TO  SPA-GMN-DAISANKBNMEIL (1)
+           MOVE    "2"         TO  SPA-GMN-DAISANKBNL    (2)
+           MOVE    "負担金額１０円未満端数処理なし"
+                               TO  SPA-GMN-DAISANKBNMEIL (2)
+           MOVE    SPA-GMN-DAISANKBNLST (2)
+                                       TO  SPA-GMN-DAISANKBN-G
       *
            MOVE    "1"         TO  SPA-GMN-GENTAIKBNL    (1)
            MOVE    "自費分を含む"  
@@ -1837,6 +1866,54 @@
                 END-IF
            END-PERFORM
       *
+      *    請求額端数区分第三者行為（減免無保険分） 空白の時、自賠責の設定とする
+           IF      SYS-1001-DISCOUNT-HASU-KBN6   =   SPACE
+                MOVE    SPA-GMN-DISCOUNT-HASU-KBN-G (CONST-DHASU4)
+                                   TO  SPA-GMN-DISCOUNT-HASU-KBN-G
+                                                  (CONST-DHASU6)
+           END-IF
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       4
+               IF      SYS-1001-DISCOUNT-HASU-KBN6
+                                   =   SPA-GMN-DISCOUNT-HASU-KBNL (IDY)
+                   MOVE    SPA-GMN-DISCOUNT-HASU-KBNLST (IDY)
+                                       TO  SPA-GMN-DISCOUNT-HASU-KBN-G
+                                                  (CONST-DHASU6)
+                   MOVE    4               TO  IDY
+                END-IF
+           END-PERFORM
+      *
+      *    請求額端数区分自賠責（減免無自費分） 空白の時、自賠責の設定とする
+           IF      SYS-1001-DISCOUNT-HASU-KBN6J   =   SPACE
+                MOVE    SPA-GMN-DISCOUNT-HASU-KBN-G (CONST-DHASU4J)
+                                   TO  SPA-GMN-DISCOUNT-HASU-KBN-G
+                                                    (CONST-DHASU6J)
+           END-IF
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       5
+               IF      SYS-1001-DISCOUNT-HASU-KBN6J
+                                   =   SPA-GMN-DISCOUNT-HASU-KBNJL (IDY)
+                   MOVE    SPA-GMN-DISCOUNT-HASU-KBNJLST (IDY)
+                                       TO  SPA-GMN-DISCOUNT-HASU-KBN-G
+                                                  (CONST-DHASU6J)
+                   MOVE    5               TO  IDY
+                END-IF
+           END-PERFORM
+      *
+      *    第三者行為（医療費）負担金額計算区分、空白の時"2"とする
+           IF      SYS-1001-DAISANKBN    =   SPACE
+               MOVE    "2"             TO  SYS-1001-DAISANKBN
+           END-IF
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       2
+               IF      SYS-1001-DAISANKBN
+                                   =   SPA-GMN-DAISANKBNL (IDY)
+                   MOVE    SPA-GMN-DAISANKBNLST (IDY)
+                                       TO  SPA-GMN-DAISANKBN-G
+                   MOVE    2               TO  IDY
+                END-IF
+           END-PERFORM
+      *
       *    減免計算対象区分、空白の時"1"とする
            IF      SYS-1001-GENTAIKBN    =   SPACE
                MOVE    "1"             TO  SYS-1001-GENTAIKBN
@@ -2227,6 +2304,7 @@
                                    TO  SPA-GMN-DISCOUNT-HASU-KBN-G
                                                         (IDX-DHASU)
            END-PERFORM
+           MOVE    W02-DAISANKBN       TO  SPA-GMN-DAISANKBN-G
            MOVE    W02-GENTAIKBN       TO  SPA-GMN-GENTAIKBN-G
            MOVE    W02-TAXHASU         TO  SPA-GMN-TAX-HASU-KBN-G
            MOVE    W02-HIWARIKBN       TO  SPA-GMN-HIWARIKBN-G
@@ -2430,6 +2508,10 @@
                    PERFORM 4130-DISCOUNT-HASU-KBN-CHK-SEC
                END-IF
            END-PERFORM
+      *
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4132-DAISANKBN-CHK-SEC
+           END-IF
       *
            IF      SPA-ERRCD           =   SPACE
                PERFORM 4132-GENTAIKBN-CHK-SEC
@@ -3328,7 +3410,8 @@
            MOVE    ZERO                TO  FLG-OK
            IF    ( IDX-DHASU       =   CONST-DHASU2J
                                     OR CONST-DHASU3J
-                                    OR CONST-DHASU4J )
+                                    OR CONST-DHASU4J
+                                    OR CONST-DHASU6J )
              PERFORM VARYING IDY     FROM    1   BY  1
                     UNTIL   IDY     >       5
                IF      SPA-GMN-DISCOUNT-HASU-KBN (IDX-DHASU)
@@ -3379,11 +3462,41 @@
                WHEN    CONST-DHASU5J
                    MOVE    "0212"      TO  SPA-ERRCD
                    MOVE    216         TO  SPA-GMN-CUR
+               WHEN    CONST-DHASU6
+                   MOVE    "0218"      TO  SPA-ERRCD
+                   MOVE    219         TO  SPA-GMN-CUR
+               WHEN    CONST-DHASU6J
+                   MOVE    "0219"      TO  SPA-ERRCD
+                   MOVE    220         TO  SPA-GMN-CUR
                END-EVALUATE
            END-IF
       *
            .
        4130-DISCOUNT-HASU-KBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    第三者行為（医療費）負担金額計算区分
+      *****************************************************************
+       4132-DAISANKBN-CHK-SEC     SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       2
+               IF      SPA-GMN-DAISANKBN
+                                   =   SPA-GMN-DAISANKBNL
+                                                              (IDY)
+                   MOVE    SPA-GMN-DAISANKBNLST (IDY)
+                                   TO  SPA-GMN-DAISANKBN-G
+                   MOVE    1           TO  FLG-OK
+               END-IF
+           END-PERFORM
+           IF      FLG-OK              =   ZERO
+               MOVE    "0220"          TO  SPA-ERRCD
+               MOVE    221             TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       4132-DAISANKBN-CHK-EXT.
            EXIT.
       *****************************************************************
       *    減免計算対象区分
@@ -4176,6 +4289,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  SYS-1001-DISCOUNT-HASU-KBN4J
                    MOVE    SPA-GMN-DISCOUNT-HASU-KBN(CONST-DHASU5J)
                                        TO  SYS-1001-DISCOUNT-HASU-KBN5J
+                   MOVE    SPA-GMN-DISCOUNT-HASU-KBN(CONST-DHASU6)
+                                       TO  SYS-1001-DISCOUNT-HASU-KBN6
+                   MOVE    SPA-GMN-DISCOUNT-HASU-KBN(CONST-DHASU6J)
+                                       TO  SYS-1001-DISCOUNT-HASU-KBN6J
+                   MOVE    SPA-GMN-DAISANKBN
+                                       TO  SYS-1001-DAISANKBN
                    MOVE    SPA-GMN-GENTAIKBN
                                        TO  SYS-1001-GENTAIKBN
                    MOVE    SPA-GMN-TAX-HASU-KBN
@@ -4722,6 +4841,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                        TO  W02-DISCOUNTHASU
                                              (IDX-DHASU)
            END-PERFORM
+           MOVE    SPA-GMN-DAISANKBN-G
+                                       TO  W02-DAISANKBN
            MOVE    SPA-GMN-GENTAIKBN-G
                                        TO  W02-GENTAIKBN
            MOVE    SPA-GMN-TAX-HASU-KBN-G
@@ -4828,7 +4949,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    UNTIL ( IDX-DHASU   >   CONST-DHASU-MAX )
              IF    ( IDX-DHASU         =   CONST-DHASU2J
                                         OR CONST-DHASU3J
-                                        OR CONST-DHASU4J )
+                                        OR CONST-DHASU4J
+                                        OR CONST-DHASU6J )
                  PERFORM VARYING IDX FROM    1   BY  1
                           UNTIL   IDX >       5
                    MOVE    SPA-GMN-DISCOUNT-HASU-KBNJLST(IDX)
@@ -4848,6 +4970,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                (IDX-DHASU)
              END-IF
            END-PERFORM
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL   IDX >       2
+               MOVE    SPA-GMN-DAISANKBNLST(IDX)
+                                       TO  W02-DAISANKBNLST (IDX)
+           END-PERFORM    
+           MOVE    2                   TO  W02-DAISANKBN-COUNT     
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       3
                MOVE    SPA-GMN-GENTAIKBNLST(IDX)
@@ -5242,6 +5370,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0217"
                    MOVE    "ＯＲＣＡサーベイランス区分入力エラー"
                                                TO  SPA-ERRMSG
+               WHEN    "0218"
+             MOVE "請求金端数設定第三者行為（減免無・自費分）入力エラー"
+                                               TO  SPA-ERRMSG
+               WHEN    "0219"
+             MOVE "請求金端数設定第三者行為（減免無・自費分）入力エラー"
+                                               TO  SPA-ERRMSG
+               WHEN    "0220"
+                   MOVE "第三者行為（医療費）負担金額計算区分入力エラー"
+                                               TO  SPA-ERRMSG
                WHEN    "0030"
                    MOVE    "自費名称は全角で入力して下さい。"
                                                TO  SPA-ERRMSG
@@ -5436,6 +5573,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    216
                     MOVE  "DISCOUNTHASU5_J"
                                            TO   MCP-WIDGET
+                WHEN    219
+                    MOVE  "DISCOUNTHASU6"
+                                           TO   MCP-WIDGET
+                WHEN    220
+                    MOVE  "DISCOUNTHASU6_J"
+                                           TO   MCP-WIDGET
+                WHEN    221
+                    MOVE  "DAISANKBN"
+                                           TO   MCP-WIDGET
                 WHEN    217
                     MOVE  "SANKANUM"
                                            TO   MCP-WIDGET
@@ -5534,7 +5680,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *----(01.00.09) LINE ADD START ----------------------------------
                 WHEN    32  THRU    39
       *          WHEN    32  THRU    33
-                WHEN    201 THRU    216
+                WHEN    201 THRU    221
                     MOVE    0                TO  W02-PAGENO
       *----(01.00.09) LINE ADD END   ----------------------------------
                 WHEN    20  THRU    29
@@ -5633,6 +5779,12 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
               WHEN    "DISCOUNTHASU4_J"
                   MOVE    216               TO  SPA-GMN-CUR
               WHEN    "DISCOUNTHASU5_J"
+                  MOVE    219                TO  SPA-GMN-CUR
+              WHEN    "DISCOUNTHASU6"
+                  MOVE    220               TO  SPA-GMN-CUR
+              WHEN    "DISCOUNTHASU6_J"
+                  MOVE    221               TO  SPA-GMN-CUR
+              WHEN    "DAISANKBN"
                   MOVE    39                TO  SPA-GMN-CUR
               WHEN    "GENTAIKBN"
                   MOVE    38               TO  SPA-GMN-CUR

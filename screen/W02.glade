@@ -1080,7 +1080,7 @@
 	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>GENTAIKBN_CMB</name>
-	  <x>736</x>
+	  <x>740</x>
 	  <y>228</y>
 	  <width>232</width>
 	  <height>24</height>
@@ -1120,8 +1120,8 @@
 	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>CHIHOUNUMKBN_COMB</name>
-	  <x>736</x>
-	  <y>492</y>
+	  <x>740</x>
+	  <y>564</y>
 	  <width>100</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -1175,25 +1175,9 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label606</name>
-	  <x>484</x>
-	  <y>444</y>
-	  <width>252</width>
-	  <height>24</height>
-	  <label>消費税端数区分</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>7.45058e-09</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label1622</name>
 	  <x>484</x>
-	  <y>468</y>
+	  <y>540</y>
 	  <width>252</width>
 	  <height>24</height>
 	  <label>自費保険集計先区分</label>
@@ -1203,46 +1187,6 @@
 	  <yalign>0.5</yalign>
 	  <xpad>0</xpad>
 	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkPandaCombo</class>
-	  <name>JIHIPOSITION_COMB</name>
-	  <x>736</x>
-	  <y>468</y>
-	  <width>260</width>
-	  <height>24</height>
-	  <value_in_list>False</value_in_list>
-	  <ok_if_empty>True</ok_if_empty>
-	  <case_sensitive>False</case_sensitive>
-	  <use_arrows>True</use_arrows>
-	  <use_arrows_always>False</use_arrows_always>
-	  <items></items>
-
-	  <widget>
-	    <class>GtkPandaEntry</class>
-	    <child_name>GtkPandaCombo:entry</child_name>
-	    <name>JIHIPOSITION</name>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>activate</name>
-	      <handler>send_event</handler>
-	      <data>ACTIVATE</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>changed</name>
-	      <handler>entry_changed</handler>
-	      <data>CHANGED</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
-	    </signal>
-	    <editable>True</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>40</text_max_length>
-	    <text>1 保険分（負担金額端数処理なし）</text>
-	    <input_mode>XIM</input_mode>
-	    <xim_enabled>False</xim_enabled>
-	  </widget>
 	</widget>
 
 	<widget>
@@ -1799,25 +1743,9 @@
 
 	<widget>
 	  <class>GtkLabel</class>
-	  <name>label1671</name>
-	  <x>484</x>
-	  <y>420</y>
-	  <width>252</width>
-	  <height>24</height>
-	  <label>　　　　　　　公害（減免無・自費分）</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>7.45058e-09</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
-	  <class>GtkLabel</class>
 	  <name>label1624</name>
 	  <x>484</x>
-	  <y>492</y>
+	  <y>564</y>
 	  <width>252</width>
 	  <height>24</height>
 	  <label>地方公費保険番号タブ区分</label>
@@ -1880,7 +1808,7 @@
 	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>DISCOUNTHASU2_J_CMB</name>
-	  <x>736</x>
+	  <x>740</x>
 	  <y>300</y>
 	  <width>232</width>
 	  <height>24</height>
@@ -1920,7 +1848,7 @@
 	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>DISCOUNTHASU3_CMB</name>
-	  <x>736</x>
+	  <x>740</x>
 	  <y>324</y>
 	  <width>232</width>
 	  <height>24</height>
@@ -1960,7 +1888,7 @@
 	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>DISCOUNTHASU3_J_CMB</name>
-	  <x>736</x>
+	  <x>740</x>
 	  <y>348</y>
 	  <width>232</width>
 	  <height>24</height>
@@ -1999,48 +1927,8 @@
 
 	<widget>
 	  <class>GtkPandaCombo</class>
-	  <name>DISCOUNTHASU4_CMB</name>
-	  <x>736</x>
-	  <y>372</y>
-	  <width>232</width>
-	  <height>24</height>
-	  <value_in_list>False</value_in_list>
-	  <ok_if_empty>True</ok_if_empty>
-	  <case_sensitive>False</case_sensitive>
-	  <use_arrows>True</use_arrows>
-	  <use_arrows_always>False</use_arrows_always>
-	  <items></items>
-
-	  <widget>
-	    <class>GtkPandaEntry</class>
-	    <child_name>GtkPandaCombo:entry</child_name>
-	    <name>DISCOUNTHASU4</name>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>activate</name>
-	      <handler>send_event</handler>
-	      <data>ACTIVATE</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>changed</name>
-	      <handler>entry_changed</handler>
-	      <data>CHANGED</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
-	    </signal>
-	    <editable>True</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>32</text_max_length>
-	    <text></text>
-	    <input_mode>XIM</input_mode>
-	    <xim_enabled>False</xim_enabled>
-	  </widget>
-	</widget>
-
-	<widget>
-	  <class>GtkPandaCombo</class>
 	  <name>DISCOUNTHASU4_J_CMB</name>
-	  <x>736</x>
+	  <x>740</x>
 	  <y>396</y>
 	  <width>232</width>
 	  <height>24</height>
@@ -2079,48 +1967,8 @@
 
 	<widget>
 	  <class>GtkPandaCombo</class>
-	  <name>DISCOUNTHASU5_J_CMB</name>
-	  <x>736</x>
-	  <y>420</y>
-	  <width>232</width>
-	  <height>24</height>
-	  <value_in_list>False</value_in_list>
-	  <ok_if_empty>True</ok_if_empty>
-	  <case_sensitive>False</case_sensitive>
-	  <use_arrows>True</use_arrows>
-	  <use_arrows_always>False</use_arrows_always>
-	  <items></items>
-
-	  <widget>
-	    <class>GtkPandaEntry</class>
-	    <child_name>GtkPandaCombo:entry</child_name>
-	    <name>DISCOUNTHASU5_J</name>
-	    <can_focus>True</can_focus>
-	    <signal>
-	      <name>activate</name>
-	      <handler>send_event</handler>
-	      <data>ACTIVATE</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
-	    </signal>
-	    <signal>
-	      <name>changed</name>
-	      <handler>entry_changed</handler>
-	      <data>CHANGED</data>
-	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
-	    </signal>
-	    <editable>True</editable>
-	    <text_visible>True</text_visible>
-	    <text_max_length>32</text_max_length>
-	    <text></text>
-	    <input_mode>XIM</input_mode>
-	    <xim_enabled>False</xim_enabled>
-	  </widget>
-	</widget>
-
-	<widget>
-	  <class>GtkPandaCombo</class>
 	  <name>DISCOUNTHASU2_CMB</name>
-	  <x>736</x>
+	  <x>740</x>
 	  <y>276</y>
 	  <width>232</width>
 	  <height>24</height>
@@ -2160,7 +2008,7 @@
 	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>DISCOUNTHASU_CMB</name>
-	  <x>736</x>
+	  <x>740</x>
 	  <y>252</y>
 	  <width>232</width>
 	  <height>24</height>
@@ -2198,26 +2046,10 @@
 	</widget>
 
 	<widget>
-	  <class>GtkLabel</class>
-	  <name>label1614</name>
-	  <x>484</x>
-	  <y>516</y>
-	  <width>252</width>
-	  <height>24</height>
-	  <label>更正・育成限度額日割計算</label>
-	  <justify>GTK_JUSTIFY_LEFT</justify>
-	  <wrap>False</wrap>
-	  <xalign>7.45058e-09</xalign>
-	  <yalign>0.5</yalign>
-	  <xpad>0</xpad>
-	  <ypad>0</ypad>
-	</widget>
-
-	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>HIWARIKBN_COMBO</name>
-	  <x>736</x>
-	  <y>516</y>
+	  <x>740</x>
+	  <y>588</y>
 	  <width>232</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -2256,8 +2088,8 @@
 	<widget>
 	  <class>GtkPandaCombo</class>
 	  <name>TAXHASU_COMBO</name>
-	  <x>736</x>
-	  <y>444</y>
+	  <x>740</x>
+	  <y>516</y>
 	  <width>232</width>
 	  <height>24</height>
 	  <value_in_list>False</value_in_list>
@@ -2371,6 +2203,342 @@
 	    <class>GtkPandaEntry</class>
 	    <child_name>GtkPandaCombo:entry</child_name>
 	    <name>MEIPRTFLG</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>32</text_max_length>
+	    <text></text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label1614</name>
+	  <x>484</x>
+	  <y>588</y>
+	  <width>252</width>
+	  <height>24</height>
+	  <label>更正・育成限度額日割計算</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>7.45058e-09</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label1671</name>
+	  <x>484</x>
+	  <y>420</y>
+	  <width>252</width>
+	  <height>24</height>
+	  <label>　　　　　　　公害（減免無・自費分）</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>7.45058e-09</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label1696</name>
+	  <x>484</x>
+	  <y>444</y>
+	  <width>252</width>
+	  <height>24</height>
+	  <label>　　　　第三者行為（減免無・保険分）</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>7.45058e-09</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label606</name>
+	  <x>484</x>
+	  <y>516</y>
+	  <width>252</width>
+	  <height>24</height>
+	  <label>消費税端数区分</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>7.45058e-09</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label1697</name>
+	  <x>484</x>
+	  <y>468</y>
+	  <width>252</width>
+	  <height>24</height>
+	  <label>　　　　　　　　　（減免無・自費分）</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>7.45058e-09</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkLabel</class>
+	  <name>label1698</name>
+	  <x>484</x>
+	  <y>492</y>
+	  <width>256</width>
+	  <height>24</height>
+	  <label>第三者行為（医療費）負担金額計算区分</label>
+	  <justify>GTK_JUSTIFY_LEFT</justify>
+	  <wrap>False</wrap>
+	  <xalign>7.45058e-09</xalign>
+	  <yalign>0.5</yalign>
+	  <xpad>0</xpad>
+	  <ypad>0</ypad>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>DISCOUNTHASU4_CMB</name>
+	  <x>740</x>
+	  <y>372</y>
+	  <width>232</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>DISCOUNTHASU4</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>32</text_max_length>
+	    <text></text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>DISCOUNTHASU5_J_CMB</name>
+	  <x>740</x>
+	  <y>420</y>
+	  <width>232</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>DISCOUNTHASU5_J</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>32</text_max_length>
+	    <text></text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>DISCOUNTHASU6_CMB</name>
+	  <x>740</x>
+	  <y>444</y>
+	  <width>232</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>DISCOUNTHASU6</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>32</text_max_length>
+	    <text></text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>DISCOUNTHASU6_J_CMB</name>
+	  <x>740</x>
+	  <y>468</y>
+	  <width>232</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>DISCOUNTHASU6_J</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>32</text_max_length>
+	    <text></text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>JIHIPOSITION_COMB</name>
+	  <x>740</x>
+	  <y>540</y>
+	  <width>260</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>JIHIPOSITION</name>
+	    <can_focus>True</can_focus>
+	    <signal>
+	      <name>activate</name>
+	      <handler>send_event</handler>
+	      <data>ACTIVATE</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:23:41 GMT</last_modification_time>
+	    </signal>
+	    <signal>
+	      <name>changed</name>
+	      <handler>entry_changed</handler>
+	      <data>CHANGED</data>
+	      <last_modification_time>Mon, 25 Dec 2000 08:24:01 GMT</last_modification_time>
+	    </signal>
+	    <editable>True</editable>
+	    <text_visible>True</text_visible>
+	    <text_max_length>40</text_max_length>
+	    <text>1 保険分（負担金額端数処理なし）</text>
+	    <input_mode>XIM</input_mode>
+	    <xim_enabled>False</xim_enabled>
+	  </widget>
+	</widget>
+
+	<widget>
+	  <class>GtkPandaCombo</class>
+	  <name>DAISANKBN_CMB</name>
+	  <x>740</x>
+	  <y>492</y>
+	  <width>260</width>
+	  <height>24</height>
+	  <value_in_list>False</value_in_list>
+	  <ok_if_empty>True</ok_if_empty>
+	  <case_sensitive>False</case_sensitive>
+	  <use_arrows>True</use_arrows>
+	  <use_arrows_always>False</use_arrows_always>
+	  <items></items>
+
+	  <widget>
+	    <class>GtkPandaEntry</class>
+	    <child_name>GtkPandaCombo:entry</child_name>
+	    <name>DAISANKBN</name>
 	    <can_focus>True</can_focus>
 	    <signal>
 	      <name>activate</name>

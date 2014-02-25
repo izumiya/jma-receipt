@@ -168,6 +168,27 @@ W02	{
 					count	int;
 					item	varchar(32)[5];
 				};
+				DISCOUNTHASU6_CMB	{
+					DISCOUNTHASU6	{
+						value	varchar(32);
+					};
+					count	int;
+					item	varchar(32)[5];
+				};
+				DISCOUNTHASU6_J_CMB	{
+					DISCOUNTHASU6_J	{
+						value	varchar(32);
+					};
+					count	int;
+					item	varchar(32)[5];
+				};
+				DAISANKBN_CMB	{
+					DAISANKBN	{
+						value	varchar(32);
+					};
+					count	int;
+					item	varchar(32)[5];
+				};
 				GENTAIKBN_CMB	{
 					GENTAIKBN	{
 						value	varchar(22);

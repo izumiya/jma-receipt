@@ -140,12 +140,21 @@
       *データ感染症区分
                05  SYS-1001-DATAINFECTIONKBN
                                         PIC  X(01).
+      *請求額端数設定第三者行為（減免無・保険分）
+               05  SYS-1001-DISCOUNT-HASU-KBN6
+                                        PIC  X(01).
+      *請求額端数設定第三者行為（減免無・自費分）
+               05  SYS-1001-DISCOUNT-HASU-KBN6J
+                                        PIC  X(01).
+      *第三者行為（医療費）負担金額計算区分
+               05  SYS-1001-DAISANKBN   PIC  X(01).
       *予備
       ***  03                           PIC  X(94).
       ***  03                           PIC  X(86).
       **** 03                           PIC  X(83).
       ***  03  SYS-1001-YOBI            PIC  X(42).
-           03  SYS-1001-YOBI            PIC  X(41).
+      ***  03  SYS-1001-YOBI            PIC  X(41).
+           03  SYS-1001-YOBI            PIC  X(38).
       *----(01.00.02) LINE ADD END   ----------------------------------
       *端末ＩＤ
            03  SYS-1001-TERMID          PIC  X(16).
