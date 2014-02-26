@@ -38,7 +38,7 @@ echo $LOGFILE
 
         shift
 
-        $DBSTUB -dir $LDDIRECTORY -bd orcabt ${PGID} -parameter "$(printf '%s,' $@)" > $LOGFILE 2>&1
+        $DBSTUB -dir $LDDIRECTORY -bd orcabt ${PGID} -parameter \"$(printf "%s," "$@")\" > $LOGFILE 2>&1
         if  [ -e $ERR_FILE ]; then
             exit
         fi
