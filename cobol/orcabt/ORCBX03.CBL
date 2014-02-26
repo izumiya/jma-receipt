@@ -328,7 +328,7 @@
                MOVE    "2"         TO  SYS-1101-SRYKAISUMSTKBN
            END-IF
            IF    ( SYS-1101-SRYKAISUWRNKBN =   SPACE )
-               MOVE    "1"         TO  SYS-1101-SRYKAISUWRNKBN
+               MOVE    "2"         TO  SYS-1101-SRYKAISUWRNKBN
            END-IF
       *
            OPEN    OUTPUT  IN01-FILE

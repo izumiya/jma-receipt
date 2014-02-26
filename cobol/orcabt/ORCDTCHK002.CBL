@@ -400,6 +400,7 @@
            03  FLG-NORMAL                              PIC 9(01).
            03  FLG-TANKI-SHOBYO                        PIC 9(01).
            03  FLG-KAISU-CHK                           PIC 9(01).
+           03  FLG-HKNKBN                              PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -473,6 +474,7 @@
            03  IDX39                                   PIC 9(05).
            03  IDX40                                   PIC 9(05).
            03  IDX41                                   PIC 9(05).
+           03  IDX42                                   PIC 9(05).
            03  IDXA                                    PIC 9(05).
            03  IDXD                                    PIC 9(05).
            03  IDXE                                    PIC 9(05).
@@ -2075,7 +2077,7 @@
                MOVE    "2"             TO  SYS-1101-SRYKAISUMSTKBN
            END-IF
            IF    ( SYS-1101-SRYKAISUWRNKBN =   SPACE )
-               MOVE    "1"             TO  SYS-1101-SRYKAISUWRNKBN
+               MOVE    "2"             TO  SYS-1101-SRYKAISUWRNKBN
            END-IF
       *
            .
@@ -11143,6 +11145,31 @@
            PERFORM UNTIL ( FLG-DTCHK013    NOT =   ZERO )
       *
                MOVE    1               TO  FLG-KAISU-CHK
+      *
+               MOVE    ZERO            TO  FLG-HKNKBN
+               PERFORM VARYING IDX42   FROM    1   BY  1
+                       UNTIL ( IDX42   >   DTCHK013-HKNCOMBI-MAX )
+                        OR   ( FLG-HKNKBN  =   1 )
+      *
+                   MOVE    DTCHK013-HKNCOMBI (IDX42)
+                                       TO  WRK-HKNCOMBI
+                   PERFORM 220-HKNCOMBI-GET-SEC
+                   MOVE    COMB-HKNNUM
+                                  TO   WRK-ZAIHKNNUM
+                   IF    ( COMB-KOHHKNNUM (1)  =   "970" )
+                       MOVE    COMB-KOHHKNNUM (1)
+                                  TO   WRK-ZAIHKNNUM
+                   END-IF
+                   PERFORM 2001111-TAISYO-HKN-CHK-SEC
+                   IF    ( FLG-TAISYO-HKN  =   1 )
+                       MOVE    1  TO   FLG-HKNKBN
+                   END-IF
+      *
+               END-PERFORM
+      *
+               IF    ( FLG-HKNKBN              =   ZERO )
+                   MOVE    ZERO        TO  FLG-KAISU-CHK
+               END-IF
       *
                IF    ( DTCHK013-JGNCNTERR      =   9 )
                 AND  ( SYS-1101-SRYKAISUWRNKBN =   "2" )

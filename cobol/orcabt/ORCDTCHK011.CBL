@@ -85,6 +85,13 @@
                                    RECORD  KEY     IS  DTCHK016-KEY
                                    FILE    STATUS  IS  STS-DTCHK016.
       *
+      *    保険組合せ
+           SELECT  DTCHK017-FILE   ASSIGN  DTCHK017PARA
+                                   ORGANIZATION    IS  INDEXED
+                                   ACCESS  MODE    IS  DYNAMIC
+                                   RECORD  KEY     IS  DTCHK017-KEY
+                                   FILE    STATUS  IS  STS-DTCHK017.
+      *
       *    エラーファイル
            SELECT  DTCHKERR-FILE   ASSIGN  DTCHKERRPARA
                                    FILE    STATUS  IS  STS-DTCHKERR.
@@ -130,6 +137,12 @@
            COPY    "CPTENSU.INC"   REPLACING  //TNS//
                                    BY         //DTCHK016//.
       *
+      *    データチェック中間ファイル（保険組合せ）
+       FD  DTCHK017-FILE.
+       01  DTCHK017-REC.
+           COPY    "CPHKNCOMBI.INC" REPLACING  //COMB-//
+                                    BY         //DTCHK017-//.
+      *
       *    エラーファイル
        FD  DTCHKERR-FILE.
        01  DTCHKERR-REC                PIC X(200). 
@@ -168,6 +181,10 @@
                                    REPLACING  //TMPFLPARA//
                                    BY         //DTCHK016PARA//.
       *
+           COPY    "CPCOMMONDAT3.INC"
+                                   REPLACING  //TMPFLPARA//
+                                   BY         //DTCHK017PARA//.
+      *
       *    エラーファイルファイル名称領域 
            COPY    "CPERRFL.INC"   REPLACING  //ERRFLPARA//
                                    BY         //DTCHKERRPARA//.
@@ -181,6 +198,7 @@
            03  STS-DTCHK014                            PIC X(02).
            03  STS-DTCHK015                            PIC X(02).
            03  STS-DTCHK016                            PIC X(02).
+           03  STS-DTCHK017                            PIC X(02).
            03  STS-DTCHKERR                            PIC X(02).
       *
        01  FLG-AREA.
@@ -193,6 +211,7 @@
            03  FLG-DTCHK014                            PIC 9(01).
            03  FLG-DTCHK015                            PIC 9(01).
            03  FLG-DTCHK016                            PIC 9(01).
+           03  FLG-DTCHK017                            PIC 9(01).
            03  FLG-LOOP-END                            PIC 9(01).
            03  FLG-PTNYUINRRK                          PIC 9(01).
            03  FLG-ETENSU5                             PIC 9(01).
@@ -204,6 +223,7 @@
            03  FLG-TENSU                               PIC 9(01).
            03  FLG-TENSUPLUS                           PIC 9(01).
            03  FLG-SYSKANRI                            PIC 9(01).
+           03  FLG-HKNCOMBI                            PIC 9(01).
       *
        01  CNT-AREA.
            03  CNT-ETENSU5                             PIC 9(05).
@@ -215,6 +235,7 @@
            03  IDX3                                    PIC 9(05).
            03  IDX4                                    PIC 9(05).
            03  IDX5                                    PIC 9(05).
+           03  IDX6                                    PIC 9(05).
            03  IDXA                                    PIC 9(05).
            03  IDXD                                    PIC 9(05).
            03  IDXK                                    PIC 9(05).
@@ -256,6 +277,9 @@
            03  WRK-TSUKISUZ1                           PIC Z.
            03  WRK-TSUKISUZ2                           PIC ZZ.
            03  WRK-KANACHK-STR                         PIC X(500).
+           03  WRK-PTID                                PIC 9(10).
+           03  WRK-HKNCOMBINUMX.
+               05  WRK-HKNCOMBINUM                     PIC 9(04).
       *
        01  KEY-AREA.
            03  KEY-PTID                                PIC 9(10).
@@ -294,6 +318,7 @@
            03  CONST-TDOJITSU-MAX              PIC 9(03) VALUE 50.
            03  CONST-SHONUM-MAX                PIC 9(03) VALUE 10.
            03  CONST-RRK-MAX                   PIC 9(03) VALUE 50.
+           03  CONST-HKNCOMBI-MAX              PIC 9(03) VALUE 40.
       *
        01  TNRRK-REC.
            COPY    "CPPTNYUINRRK.INC"
@@ -356,6 +381,10 @@
       *    点数マスタ付加情報
        01  TENSUPLUS-REC.
            COPY    "CPTENSUPLUS.INC".
+      *
+      *    保険組合せ
+       01  HKNCOMBI-REC.
+           COPY    "CPHKNCOMBI.INC".
       *
       *****************************************************************
       *    サブプロ用領域
@@ -484,6 +513,10 @@
            MOVE    "DTCHK016"          TO  DTCHK016PARA-FILE-ID
            MOVE    LNK-PRTKANRI-TERMID TO  DTCHK016PARA-TERMID
       *
+           MOVE    WRK-PARA-HOSPNUM    TO  DTCHK017PARA-HOSPNUM
+           MOVE    "DTCHK017"          TO  DTCHK017PARA-FILE-ID
+           MOVE    LNK-PRTKANRI-TERMID TO  DTCHK017PARA-TERMID
+      *
            OPEN    INPUT               DCACCT-FILE
                                        DCSRY-FILE
                                        DTCHK003-FILE
@@ -500,6 +533,10 @@
            CLOSE   DTCHK016-FILE
            OPEN    I-O                 DTCHK016-FILE
       *
+           OPEN    OUTPUT              DTCHK017-FILE
+           CLOSE   DTCHK017-FILE
+           OPEN    I-O                 DTCHK017-FILE
+      *
       *    初期値設定処理
            PERFORM 1001-INIT-VAL-SET-SEC
       *
@@ -515,7 +552,7 @@
                MOVE    "2"         TO  SYS-1101-SRYKAISUMSTKBN
            END-IF
            IF    ( SYS-1101-SRYKAISUWRNKBN =   SPACE )
-               MOVE    "1"         TO  SYS-1101-SRYKAISUWRNKBN
+               MOVE    "2"         TO  SYS-1101-SRYKAISUWRNKBN
            END-IF
       *
            .
@@ -920,6 +957,7 @@
            END-IF
       *
            IF    ( FLG-DTCHK013    =   ZERO )
+               PERFORM 20011111-HKNCOMBI-EDIT-SEC
                REWRITE                     DTCHK013-REC
            ELSE
                MOVE    MASTER-TANINAME TO  DTCHK013-TANINAME
@@ -927,6 +965,7 @@
                MOVE    MASTER-TOKUREI  TO  DTCHK013-TOKUREI
                MOVE    WRK-TSUKISU     TO  DTCHK013-TSUKISU
                MOVE    WRK-JGNCNTERR   TO  DTCHK013-JGNCNTERR
+               PERFORM 20011111-HKNCOMBI-EDIT-SEC
                WRITE                       DTCHK013-REC
            END-IF
       *
@@ -951,17 +990,46 @@
                +   DCACCT-DAYCNT
       *
            IF    ( FLG-DTCHK013    =   ZERO )
+               PERFORM 20011111-HKNCOMBI-EDIT-SEC
                REWRITE                     DTCHK013-REC
            ELSE
                MOVE    MASTER-TANINAME TO  DTCHK013-TANINAME
                MOVE    MASTER-KAISU    TO  DTCHK013-LIMIT
                MOVE    MASTER-TOKUREI  TO  DTCHK013-TOKUREI
                MOVE    WRK-JGNCNTERR   TO  DTCHK013-JGNCNTERR
+               PERFORM 20011111-HKNCOMBI-EDIT-SEC
                WRITE                       DTCHK013-REC
            END-IF
       *
            .
        2001112-DTCHK013-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険組合せ編集処理
+      *****************************************************************
+       20011111-HKNCOMBI-EDIT-SEC        SECTION.
+      *
+           PERFORM VARYING IDX6    FROM    1   BY  1
+                   UNTIL ( IDX6    >   CONST-HKNCOMBI-MAX )
+      *
+               IF    ( DTCHK013-HKNCOMBI (IDX6)
+                                   =   ZERO
+                                OR     DCACCT-HKNCOMBI )
+                   IF    ( DTCHK013-HKNCOMBI (IDX6)  =   ZERO )
+                       MOVE    DCACCT-HKNCOMBI
+                                           TO  DTCHK013-HKNCOMBI (IDX6)
+                       MOVE    IDX6        TO  DTCHK013-HKNCOMBI-MAX
+                   END-IF
+      *
+                   MOVE    CONST-HKNCOMBI-MAX
+                                           TO   IDX6
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           .
+       20011111-HKNCOMBI-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    同日再入院情報退避領域初期処理
@@ -1407,12 +1475,18 @@
       *
                PERFORM 900-SRYACCT-KEY57-SEL-SEC
       *
+               MOVE    ACCT-PTID       TO  WRK-PTID
+               MOVE    ACCT-HKNCOMBI   TO  WRK-HKNCOMBINUM
+               PERFORM 900-HKNCOMBI-KEY-SEL-SEC
+      *
                PERFORM UNTIL ( FLG-SRYACT  NOT =   ZERO )
                         OR   ( SRY-ZAINUM  NOT =   ACCT-ZAINUM )
       *
                    IF  ( ACCT-SRYKBN   =   "95" OR "96"
                                                 OR "98" )
                     OR ( ACCT-HKNCOMBI =   9999 )
+                    OR ( COMB-HKNNUM   =   "971" OR "972" OR "973" )
+                    OR ( COMB-KOHHKNNUM (1)  =   "970" )
                     OR ( ACCT-JIHOKBN  =   "1" )
       *
                        CONTINUE
@@ -1571,23 +1645,34 @@
       *
            PERFORM UNTIL ( FLG-NSRYSRH NOT =   ZERO )
       *
-               PERFORM 900-NRRKSRH-KEY3-SEL-SEC
+               MOVE    NSRYSRH-PTID       TO  WRK-PTID
+               MOVE    NSRYSRH-HKNCOMBINUM TO WRK-HKNCOMBINUMX
+               PERFORM 900-HKNCOMBI-KEY-SEL-SEC
       *
-               PERFORM UNTIL ( FLG-NRRKSRH NOT =   ZERO )
+               IF  ( COMB-HKNNUM         =   "971" OR "972" OR "973" )
+                OR ( COMB-KOHHKNNUM (1)  =   "970" )
+                   CONTINUE
+               ELSE
       *
-                   IF    ( DTCHK013-TANICD =   132 OR 133 OR 134 )
-                       PERFORM 200122-KAKO-KAISU-EDIT-SEC
-                   ELSE
-                       PERFORM 200121-KAKO-KAISU-EDIT-SEC
-                   END-IF
+                   PERFORM 900-NRRKSRH-KEY3-SEL-SEC
       *
-                   PERFORM 900-NRRKSRH-KEY3-FET-SEC
+                   PERFORM UNTIL ( FLG-NRRKSRH NOT =   ZERO )
       *
-               END-PERFORM
+                       IF    ( DTCHK013-TANICD =   132 OR 133 OR 134 )
+                           PERFORM 200122-KAKO-KAISU-EDIT-SEC
+                       ELSE
+                           PERFORM 200121-KAKO-KAISU-EDIT-SEC
+                       END-IF
       *
-               MOVE    "tbl_nrrksrh"   TO  MCP-TABLE
-               MOVE    "key3"          TO  MCP-PATHNAME
-               PERFORM 910-DBCLOSECURSOR-SEC
+                       PERFORM 900-NRRKSRH-KEY3-FET-SEC
+      *
+                   END-PERFORM
+      *
+                   MOVE    "tbl_nrrksrh"   TO  MCP-TABLE
+                   MOVE    "key3"          TO  MCP-PATHNAME
+                   PERFORM 910-DBCLOSECURSOR-SEC
+      *
+               END-IF
       *
                PERFORM 900-NSRYSRH-KEY2-FET-SEC
       *
@@ -1711,6 +1796,7 @@
                                        DTCHK014-FILE
                                        DTCHK015-FILE
                                        DTCHK016-FILE
+                                       DTCHK017-FILE
       *
            IF      LNK-PRTKANRI-TBL-KEY  NOT =  "RECEPTX"
       *    ステップ管理終了処理
@@ -1929,6 +2015,10 @@
                            END-IF
       *
                            IF    ( DCACCT-HKNCOMBI =   9999 )
+                            OR   ( DCACCT-HKNNUM   =   "971" )
+                            OR   ( DCACCT-HKNNUM   =   "973" )
+                            OR   ( DCACCT-HKNNUM   =   "975" )
+                            OR   ( DCACCT-KOHNUM   =   "970" )
                             OR   ( DCACCT-JIHOKBN  =   "1" )
                                MOVE   ZERO    TO   FLG-LOOP-END
                            END-IF
@@ -2685,6 +2775,8 @@
                    MOVE    "99999999"  TO  DTCHK016-YUKOEDYMD
                    MOVE    "NONE"      TO  DTCHK016-OPID
                    WRITE   DTCHK016-TENSU-REC
+                   INITIALIZE              TNS-TENSU-REC
+                   MOVE    1           TO  FLG-TENSU
                END-IF
       *
                MOVE    "tbl_tensu"     TO  MCP-TABLE
@@ -2715,6 +2807,73 @@
       *
            .
        900-DTCHK016-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険組合せ検索処理
+      *****************************************************************
+       900-HKNCOMBI-KEY-SEL-SEC        SECTION.
+      *
+           MOVE    ZERO                TO  FLG-HKNCOMBI
+      *
+           PERFORM 900-DTCHK017-READ-SEC
+           IF    ( FLG-DTCHK017        =   ZERO )
+               IF    ( DTCHK016-OPID
+                                   =   SPACE )
+                   MOVE    DTCHK017-REC    TO  HKNCOMBI-REC
+               ELSE
+                   INITIALIZE                  HKNCOMBI-REC
+                   MOVE    1               TO  FLG-HKNCOMBI
+               END-IF
+           ELSE
+      *
+               INITIALIZE                  HKNCOMBI-REC
+               MOVE    SPA-HOSPNUM     TO  COMB-HOSPNUM
+               MOVE    WRK-PTID        TO  COMB-PTID
+               MOVE    WRK-HKNCOMBINUM TO  COMB-HKNCOMBINUM
+               MOVE    HKNCOMBI-REC    TO  MCPDATA-REC
+               MOVE    "tbl_hkncombi"  TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF    ( MCP-RC              =   ZERO )
+                   MOVE    MCPDATA-REC     TO  HKNCOMBI-REC
+                   MOVE    HKNCOMBI-REC    TO  DTCHK017-REC
+                   MOVE    SPACE           TO  DTCHK017-OPID
+                   WRITE   DTCHK017-REC
+               ELSE
+                   MOVE    HKNCOMBI-REC    TO  DTCHK017-REC
+                   MOVE    "NONE"          TO  DTCHK017-OPID
+                   WRITE   DTCHK017-REC
+                   MOVE    1               TO  FLG-HKNCOMBI
+                   INITIALIZE                  HKNCOMBI-REC
+               END-IF
+      *
+               MOVE    "tbl_hkncombi"      TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           END-IF
+      *
+           .
+       900-HKNCOMBI-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    保険組合せ読込処理
+      *****************************************************************
+       900-DTCHK017-READ-SEC           SECTION.
+      *
+           MOVE    ZERO            TO  FLG-DTCHK017
+      *
+           INITIALIZE                  DTCHK017-REC
+           MOVE    SPA-HOSPNUM     TO  DTCHK017-HOSPNUM
+           MOVE    WRK-PTID        TO  DTCHK017-PTID
+           MOVE    WRK-HKNCOMBINUM TO  DTCHK017-HKNCOMBINUM
+           READ    DTCHK017-FILE
+           INVALID
+               MOVE    1           TO  FLG-DTCHK017
+           END-READ
+      *
+           .
+       900-DTCHK017-READ-EXT.
            EXIT.
       *****************************************************************
       *    ＤＢ検索処理（FHETCHも行う)

@@ -57,3 +57,7 @@
            03  DTCHK013-WEEK                   PIC 9(01).
            03  DTCHK013-JGNCNTERR              PIC 9(01).
            03  DTCHK013-NYUGAIKBN              PIC X(01).
+      *    診療年月の保険情報
+           03  DTCHK013-HKNCOMBI-MAX           PIC 9(03).
+           03  DTCHK013-HKNCOMBI               PIC 9(04)
+                                               OCCURS 40.

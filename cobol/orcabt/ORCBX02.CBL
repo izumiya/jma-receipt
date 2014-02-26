@@ -290,6 +290,12 @@
                                        WRK-PARA-SRTKBN
                                        WRK-PARA-KJNYMD
       *
+           DISPLAY "WRK-PARA-CHKMORE[" WRK-PARA-CHKMORE "]"
+                   "MOREKIKAN[" WRK-PARA-MOREKIKAN "]"
+                   "MORERANGE-G[" WRK-PARA-MORERANGE-G "]"
+                   "SRTKBN[" WRK-PARA-SRTKBN "]"
+                   "KJNYMD[" WRK-PARA-KJNYMD "]"
+      *
            MOVE    WRK-PARA-HOSPNUM    TO  SPA-HOSPNUM
            MOVE    LNK-PRTKANRI-SKYYMD TO  SPA-SYSYMD
       *

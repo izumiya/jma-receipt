@@ -619,7 +619,7 @@
            MOVE    SPA-GMN-SRYKAISUWRNKBN TO  WRK-CMB-CD
            PERFORM 4200-SRYKAISUWRNKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     =   SPACE )
-               MOVE    SPA-GMN-SRYKAISUWRNKBNLST (1)
+               MOVE    SPA-GMN-SRYKAISUWRNKBNLST (2)
                                        TO  SPA-GMN-SRYKAISUWRNKBN-G
            ELSE
                MOVE    WRK-CMB-ITM     TO  SPA-GMN-SRYKAISUWRNKBN-G
@@ -1289,7 +1289,7 @@
            MOVE    "2"             TO  SPA-GMN-SRYKAISUWRNKBNL    (2)
            MOVE    "チェックしない" TO SPA-GMN-SRYKAISUWRNKBNMEIL (2)
       *
-           MOVE    SPA-GMN-SRYKAISUWRNKBNLST  (1)
+           MOVE    SPA-GMN-SRYKAISUWRNKBNLST  (2)
                                    TO  SPA-GMN-SRYKAISUWRNKBN-G
       *
            . 
@@ -2007,7 +2007,7 @@
            MOVE    SPA-GMN-SRYKAISUWRNKBN TO  WRK-CMB-CD
            PERFORM 4200-SRYKAISUWRNKBNLST-CHK-SEC
            IF    ( WRK-CMB-ITM     =   SPACE )
-               MOVE    SPA-GMN-SRYKAISUWRNKBNLST (1)
+               MOVE    SPA-GMN-SRYKAISUWRNKBNLST (2)
                                    TO  SPA-GMN-SRYKAISUWRNKBN-G
            ELSE
                MOVE    WRK-CMB-ITM TO  SPA-GMN-SRYKAISUWRNKBN-G
