@@ -179,6 +179,8 @@
       *  04.07.02    NACL-藤原    13/07/01  レセ電請求時の受付エラー分の
       *                                     自費レセプト対象の有無設定
       *  04.07.03    NACL-門脇    13/12/06  包括診療分の点検用レセプト記載対応
+      *  04.07.04    NACL-藤原    14/02/10  レセプト特記事項編集情報の
+      *                                     条件に入外区分、所得区分の追加
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -368,6 +370,8 @@
                                        PIC  X(01).
                    07  TBL-SYS2006-FTNJANUM
                                        PIC  X(01).
+                   07  TBL-SYS2006-SYOTOKUKBN
+                                       PIC  X(01).
       *
       *    一時領域
        01  WRK-AREA.
@@ -499,9 +503,12 @@
                                        PIC  X(01).
                    07  WRK-SYS2006-FTNJANUM
                                        PIC  X(01).
+                   07  WRK-SYS2006-SYOTOKUKBN
+                                       PIC  X(01).
       *
            03  WRK-HKNNUM              PIC X(03).
            03  WRK-FTNJANUM            PIC X(08).
+           03  WRK-TEISYOTOKU2         PIC X(01).
       *
       *    剤・診療行為テーブル
        01  TBL-ZAI-AREA.
@@ -1143,28 +1150,35 @@
                             OR      SYSKAN-IDY      >=  200
       *
                        MOVE    MCPDATA-REC   TO  SYS-2006-REC
-                       ADD     1             TO  SYSKAN-IDY
-                       MOVE    SYS-2006-REC  TO  TBL-SYS2006
+                       IF      SYS-2006-NYUGAIKBN   =   "2"
+                           CONTINUE
+                       ELSE
+                           ADD     1             TO  SYSKAN-IDY
+                           MOVE    SYS-2006-REC  TO  TBL-SYS2006
                                                           (SYSKAN-IDY)
-                       MOVE    SYS-2006-HKNNUM
+                           MOVE    SYS-2006-HKNNUM
                                           TO  TBL-SYS2006-HKNNUM
                                                           (SYSKAN-IDY)
-                       MOVE    SYS-2006-TEISYUTUSAKI
+                           MOVE    SYS-2006-TEISYUTUSAKI
                                           TO  TBL-SYS2006-TEISYUTUSAKI
                                                           (SYSKAN-IDY)
-                       MOVE    SYS-2006-HKNJANUM
+                           MOVE    SYS-2006-HKNJANUM
                                           TO  TBL-SYS2006-HKNJANUM
                                                           (SYSKAN-IDY)
-                       MOVE    SYS-2006-RJNKBN
+                           MOVE    SYS-2006-RJNKBN
                                           TO  TBL-SYS2006-RJNKBN
                                                           (SYSKAN-IDY)
-                       MOVE    SYS-2006-ZAITAKU
+                           MOVE    SYS-2006-ZAITAKU
                                           TO  TBL-SYS2006-ZAITAKU
                                                           (SYSKAN-IDY)
-                       MOVE    SYS-2006-FTNJANUMKBN-JYOKEN
+                           MOVE    SYS-2006-FTNJANUMKBN-JYOKEN
                                           TO  TBL-SYS2006-FTNJANUM
                                                           (SYSKAN-IDY)
-                       MOVE    1             TO  FLG-SYS-2006
+                           MOVE    SYS-2006-SYOTOKUKBN
+                                          TO  TBL-SYS2006-SYOTOKUKBN
+                                                          (SYSKAN-IDY)
+                           MOVE    1             TO  FLG-SYS-2006
+                       END-IF
       *
                        MOVE    "tbl_syskanri"       TO  MCP-TABLE
                        MOVE    "key7"               TO  MCP-PATHNAME
@@ -1216,9 +1230,13 @@
                             OR      SYSKAN-IDX     >=  200
       *
                        MOVE    MCPDATA-REC     TO  SYS-2006-REC
-                       ADD     1               TO  SYSKAN-IDX
-                       MOVE    SYS-2006-REC    TO  TBL-SYS2006-ALL
-                                                      (SYSKAN-IDX)
+                       IF      SYS-2006-NYUGAIKBN  =   "2"
+                           CONTINUE
+                       ELSE
+                           ADD     1               TO  SYSKAN-IDX
+                           MOVE    SYS-2006-REC    TO  TBL-SYS2006-ALL
+                                                          (SYSKAN-IDX)
+                       END-IF
       *
                        MOVE    "tbl_syskanri"  TO  MCP-TABLE
                        MOVE    "key5"          TO  MCP-PATHNAME
@@ -3005,6 +3023,7 @@
        2008-SYS2006-HENSYU-SEC          SECTION.
       *
            INITIALIZE                   WRK-FTNJANUM
+                                        WRK-TEISYOTOKU2
                                         FLG-CHK-SYOKBN 
       *
       *    給付割合
@@ -3113,6 +3132,8 @@
                                            =   WRK-2006-HKNNUM
                        MOVE    RECE62-KOHFTNJANUM (IDY)
                                                    TO  WRK-FTNJANUM
+                       MOVE    RECE62-TEISYOTOKU2 (IDY)
+                                                   TO  WRK-TEISYOTOKU2
                        PERFORM 200811-SYS2006-CHECK-SEC
                    END-IF    
                END-PERFORM
@@ -3156,6 +3177,7 @@
            MOVE    ZERO                TO  FLG-2006-CHK
            INITIALIZE                      SYS-2006-REC
                                            WRK-FTNJANUM
+                                           WRK-TEISYOTOKU2
       *
            PERFORM VARYING IDW1    FROM    1   BY  1
                    UNTIL ( IDW1    >       4             )
@@ -3169,6 +3191,8 @@
                                            =   WRK-2006-HKNNUM
                        MOVE    RECE62-KOHFTNJANUM (IDW1)
                                                TO  WRK-FTNJANUM
+                       MOVE    RECE62-TEISYOTOKU2 (IDW1)
+                                               TO  WRK-TEISYOTOKU2
                        EVALUATE    FLG-CHK-SYOKBN
                            WHEN    1
                                IF      WRK-2006-KYURATE
@@ -3188,6 +3212,9 @@
                    MOVE    4               TO  IDW1
                END-IF
            END-PERFORM
+      *
+           INITIALIZE                      WRK-FTNJANUM
+                                           WRK-TEISYOTOKU2
       *
            IF      RECE62-ETC-KOHNUM (1)
                                        =   SPACE
@@ -3352,6 +3379,15 @@
                    END-IF
            END-EVALUATE
       *
+           IF      WRK-2006-SYOTOKUKBN
+                                       NOT =   SPACE
+               IF      WRK-TEISYOTOKU2     =   WRK-2006-SYOTOKUKBN
+                   CONTINUE
+               ELSE
+                   GO  TO  200811-SYS2006-CHECK-EXT
+               END-IF
+           END-IF
+      *
            MOVE    1                  TO  FLG-2006-CHK
            MOVE    WRK-2006-REC       TO  SYS-2006-REC
            .
@@ -3366,6 +3402,7 @@
            MOVE    ZERO                TO  FLG-2006-CHK
            INITIALIZE                      SYS-2006-REC
                                            WRK-FTNJANUM
+                                           WRK-TEISYOTOKU2
       *
       *    保険番号設定時の対象の保険チェック
            MOVE    ZERO                TO  FLG-HKNNUM-OK
@@ -3379,6 +3416,8 @@
                        MOVE    1                   TO  FLG-HKNNUM-OK
                        MOVE    RECE62-KOHFTNJANUM (IDW2)
                                                    TO  WRK-FTNJANUM
+                       MOVE    RECE62-TEISYOTOKU2 (IDW2)
+                                                   TO  WRK-TEISYOTOKU2
                    END-IF
                END-PERFORM
       ******** 原爆のときはレセプト記載外公費情報も検索
@@ -3465,6 +3504,7 @@
            MOVE    ZERO                TO  FLG-2006-CHK
            INITIALIZE                      SYS-2006-REC
                                            WRK-FTNJANUM
+                                           WRK-TEISYOTOKU2
       *
       *    対象の保険チェック
            MOVE    ZERO                TO  FLG-HKNNUM-OK
@@ -3477,6 +3517,8 @@
                    MOVE    1                   TO  FLG-HKNNUM-OK
                    MOVE    RECE62-KOHFTNJANUM (IDW2)
                                                TO  WRK-FTNJANUM
+                   MOVE    RECE62-TEISYOTOKU2 (IDW2)
+                                               TO  WRK-TEISYOTOKU2
                END-IF
            END-PERFORM
       *    レセプト記載外公費情報も検索
@@ -4698,6 +4740,12 @@
                                                           (SYSKAN-IDY)
                     MOVE    SYS-2006-ZAITAKU
                                           TO  TBL-SYS2006-ZAITAKU
+                                                          (SYSKAN-IDY)
+                    MOVE    SYS-2006-FTNJANUMKBN-JYOKEN
+                                          TO  TBL-SYS2006-FTNJANUM
+                                                          (SYSKAN-IDY)
+                    MOVE    SYS-2006-SYOTOKUKBN
+                                          TO  TBL-SYS2006-SYOTOKUKBN
                                                           (SYSKAN-IDY)
                     MOVE    1             TO  FLG-SYS-2006
                END-IF

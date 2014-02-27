@@ -51,6 +51,7 @@
       *                                     変更
       *  04.04.03    NACL-藤原    09/08/28  期間重複チェックに負担者番号
       *                                     を追加
+      *  04.07.01    NACL-藤原    14/02/10  条件に入外区分、所得区分の追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -94,6 +95,18 @@
                                                    PIC X(30).
                    07  SPA-GMN-FTNJANUMKBN-JYOKEN-MAX
                                                    PIC 9(01).
+      *
+                   07  SPA-GMN-NYUGAIKBNLST        OCCURS  5.
+                       09  SPA-GMN-NYUGAIKBNL      PIC X(01).
+                       09  SPA-GMN-F1L             PIC X(01).
+                       09  SPA-GMN-NYUGAIKBNMEIL   PIC X(10).
+                   07  SPA-GMN-NYUGAIKBN-MAX       PIC 9(01).
+      *
+                   07  SPA-GMN-SYOTOKUKBNLST       OCCURS  5.
+                       09  SPA-GMN-SYOTOKUKBNL     PIC X(01).
+                       09  SPA-GMN-F1L             PIC X(01).
+                       09  SPA-GMN-SYOTOKUKBNMEIL  PIC X(20).
+                   07  SPA-GMN-SYOTOKUKBN-MAX      PIC 9(01).
       *
                    07  SPA-GMN-ZAITAKULST          OCCURS  5.
                        09  SPA-GMN-ZAITAKUL        PIC X(01).
@@ -148,6 +161,8 @@
                            11  SPA-GMN-THKNJANUM   PIC X(08).
                            11  SPA-GMN-TFTNJANUMKBN-JYOKEN
                                                    PIC X(10).
+                           11  SPA-GMN-TNYUGAIKBN  PIC X(06).
+                           11  SPA-GMN-TSYOTOKUKBN PIC X(10).
                            11  SPA-GMN-TRJNKBN     PIC X(10).
                            11  SPA-GMN-TZAITAKU    PIC X(10).
                            11  SPA-GMN-TSTYUKYMD   PIC X(09).
@@ -172,6 +187,18 @@
                                13  SPA-GMN-F1      PIC X(01).
                                13  SPA-GMN-FTNJANUMKBN-JYOKENMEI
                                                    PIC X(30).
+                           11  SPA-GMN-NYUGAIKBN-G.
+                               13  SPA-GMN-NYUGAIKBN
+                                                   PIC X(01).
+                               13  SPA-GMN-F1      PIC X(01).
+                               13  SPA-GMN-NYUGAIKBNMEI
+                                                   PIC X(10).
+                           11  SPA-GMN-SYOTOKUKBN-G.
+                               13  SPA-GMN-SYOTOKUKBN
+                                                   PIC X(01).
+                               13  SPA-GMN-F1      PIC X(01).
+                               13  SPA-GMN-SYOTOKUKBNMEI
+                                                   PIC X(20).
                            11  SPA-GMN-ZAITAKU-G.
                                13  SPA-GMN-ZAITAKU
                                                    PIC X(01).
@@ -251,6 +278,7 @@
                        09  SPA-NAI-KBNCD           PIC X(03).
                        09  SPA-NAI-STYUKYMD        PIC 9(08).
                        09  SPA-NAI-EDYUKYMD        PIC 9(08).
+                       09  SPA-NAI-RECESKYKBN      PIC X(01).
                    07  SPA-NAI-TBL.
                        09  SPA-NAI-TBL-OCC         OCCURS  200.
                            11  SPA-NAI-TSTYUKYMD   PIC 9(08).
@@ -265,6 +293,8 @@
                            11  SPA-NAI-TRJNKBN-FLG PIC X(01).
                            11  SPA-NAI-TTEISYUTUSAKI
                                                    PIC X(01).
+                           11  SPA-NAI-TNYUGAIKBN  PIC X(01).
+                           11  SPA-NAI-TSYOTOKUKBN PIC X(01).
       *
               05  SPA-NAI-SELNUM                   PIC 9(03).
       *
@@ -511,6 +541,20 @@
                                    TO  SPA-GMN-FTNJANUMKBN-JYOKENMEIL(3)
            MOVE    3               TO  SPA-GMN-FTNJANUMKBN-JYOKEN-MAX
       *
+           MOVE    "1"             TO  SPA-GMN-NYUGAIKBNL      (1)
+           MOVE    "入院"          TO  SPA-GMN-NYUGAIKBNMEIL   (1)
+           MOVE    "2"             TO  SPA-GMN-NYUGAIKBNL      (2)
+           MOVE    "入院外"        TO  SPA-GMN-NYUGAIKBNMEIL   (2)
+           MOVE    2               TO  SPA-GMN-NYUGAIKBN-MAX
+      *
+           MOVE    "1"             TO  SPA-GMN-SYOTOKUKBNL     (1)
+           MOVE    "低所得１のみ対象"
+                                   TO  SPA-GMN-SYOTOKUKBNMEIL  (1)
+           MOVE    "2"             TO  SPA-GMN-SYOTOKUKBNL     (2)
+           MOVE    "低所得２のみ対象"
+                                   TO  SPA-GMN-SYOTOKUKBNMEIL  (2)
+           MOVE    2               TO  SPA-GMN-SYOTOKUKBN-MAX
+      *
            MOVE    "01"            TO  SPA-GMN-FTNJANUMKBNL      (1)
            MOVE    "記録しない"    TO  SPA-GMN-FTNJANUMKBNMEIL   (1)
            MOVE    "02"            TO  SPA-GMN-FTNJANUMKBNL      (2)
@@ -649,6 +693,24 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                MOVE    SYS-2006-FTNJANUM-JYOKEN
                                            TO
                                        SPA-NAI-TFTNJANUM-JYOKEN (IDX)
+      *
+               MOVE    SYS-2006-NYUGAIKBN  TO  WRK-KBN
+                                               SPA-NAI-TNYUGAIKBN  (IDX)
+               PERFORM 5001-NYUGAIKBN-HENSYU-SEC
+               MOVE    WRK-KBNMEI          TO  SPA-GMN-TNYUGAIKBN  (IDX)
+      *
+               MOVE    SYS-2006-SYOTOKUKBN TO  SPA-NAI-TSYOTOKUKBN (IDX)
+               EVALUATE    SYS-2006-SYOTOKUKBN
+                   WHEN    "1"
+                       MOVE    "低所得１"      TO
+                                               SPA-GMN-TSYOTOKUKBN (IDX)
+                   WHEN    "2"
+                       MOVE    "低所得２"      TO
+                                               SPA-GMN-TSYOTOKUKBN (IDX)
+                   WHEN    OTHER
+                       MOVE    SPACE           TO
+                                               SPA-GMN-TSYOTOKUKBN (IDX)
+               END-EVALUATE
       *
                MOVE    SYS-2006-RJNKBN     TO  SPA-NAI-TRJNKBN   (IDX)
                EVALUATE    SYS-2006-RJNKBN
@@ -852,6 +914,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    W61-FTNJANUMKBN-JYOKEN
                                        TO  SPA-GMN-FTNJANUMKBN-JYOKEN-G
            MOVE    W61-FTNJANUM-JYOKEN TO  SPA-GMN-FTNJANUM-JYOKEN
+           MOVE    W61-NYUGAIKBN       TO  SPA-GMN-NYUGAIKBN-G
+           MOVE    W61-SYOTOKUKBN      TO  SPA-GMN-SYOTOKUKBN-G
            MOVE    W61-ZAITAKU         TO  SPA-GMN-ZAITAKU-G
            MOVE    W61-RJNKBN          TO  SPA-GMN-RJNKBN-G
            MOVE    W61-KYURATE         TO  SPA-GMN-KYURATE 
@@ -924,6 +988,18 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            END-IF
       *    負担者番号内容
            PERFORM 41021-FTNJANUM-JYOKEN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+      *    入外区分
+           PERFORM 41021-NYUGAIKBN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+      *    所得区分
+           PERFORM 41021-SYOTOKUKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -1098,17 +1174,18 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                MOVE    SYS-2006-HKNNUM     TO  SPA-GMN-HKNNUM
                MOVE    SPACE               TO  HKNNUM-REC
                INITIALIZE                      HKNNUM-REC
-               MOVE    SPA-HOSPNUM          TO  HKN-HOSPNUM
+               MOVE    SPA-HOSPNUM         TO  HKN-HOSPNUM
                MOVE    SPA-GMN-HKNNUM      TO  HKN-HKNNUM
                MOVE    "00"                TO  HKN-PAYKBN
                MOVE    HKNNUM-REC          TO  MCPDATA-REC
                PERFORM 900-HKNNUM-READ-SEC
                MOVE    HKN-SEIDONAME       TO SPA-GMN-SEIDONAME
+               MOVE    HKN-RECESKYKBN      TO  SPA-NAI-RECESKYKBN
       *
                MOVE    SYS-2006-HKNJANUM   TO SPA-GMN-HKNJANUM
                MOVE    SPACE               TO  HKNJAINF-REC
                INITIALIZE                      HKNJAINF-REC
-               MOVE    SPA-HOSPNUM          TO  HKNJA-HOSPNUM
+               MOVE    SPA-HOSPNUM         TO  HKNJA-HOSPNUM
                MOVE    SPA-GMN-HKNJANUM    TO  HKNJA-HKNJANUM
                MOVE    HKNJAINF-REC        TO  MCPDATA-REC
                PERFORM 900-HKNJAINF-READ-SEC
@@ -1127,9 +1204,20 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                PERFORM 5001-FTNJANUMKBN-JYOKEN-HENSYU-SEC
                MOVE    WRK-KBNMEI          TO
                                            SPA-GMN-FTNJANUMKBN-JYOKENMEI
-      *
+      *           MOVE    SPA-NAI-C02-SELNO   TO  C02-BYO-ROW
+
                MOVE    SYS-2006-FTNJANUM-JYOKEN
                                            TO  SPA-GMN-FTNJANUM-JYOKEN
+      *
+               MOVE    SYS-2006-NYUGAIKBN  TO  SPA-GMN-NYUGAIKBN
+                                               WRK-KBN
+               PERFORM 5001-NYUGAIKBN-HENSYU-SEC
+               MOVE    WRK-KBNMEI          TO  SPA-GMN-NYUGAIKBNMEI
+      *
+               MOVE    SYS-2006-SYOTOKUKBN TO  SPA-GMN-SYOTOKUKBN
+                                               WRK-KBN
+               PERFORM 5001-SYOTOKUKBN-HENSYU-SEC
+               MOVE    WRK-KBNMEI          TO  SPA-GMN-SYOTOKUKBNMEI
       *
                MOVE    SYS-2006-RJNKBN     TO  SPA-GMN-RJNKBN
                                                WRK-KBN
@@ -1214,6 +1302,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
                MOVE    SYS-2006-TEKIYOU-COMMENT2
                                            TO  SPA-GMN-TEKIYOU-COMMENT2
+      *
+               MOVE    SPA-NAI-SELNUM      TO  W61-ROW
       *
                MOVE    2                   TO  SPA-GMN-CUR
            ELSE
@@ -1367,6 +1457,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
        41021-HKNNUM-CHK-SEC           SECTION.
       *
            MOVE    SPACE           TO  SPA-GMN-SEIDONAME
+                                       SPA-NAI-RECESKYKBN
       *
            IF      SPA-GMN-HKNNUM  =   SPACE
                CONTINUE 
@@ -1380,7 +1471,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                PERFORM 900-HKNNUM-READ-SEC
       *
                IF      FLG-HKNNUM      =   ZERO
-                   MOVE    HKN-SEIDONAME           TO  SPA-GMN-SEIDONAME
+                   MOVE    HKN-SEIDONAME   TO  SPA-GMN-SEIDONAME
+                   MOVE    HKN-RECESKYKBN  TO  SPA-NAI-RECESKYKBN
                    IF      HKN-HKNNUM(1:1) =   "9"
                        MOVE    "0015"                  TO  SPA-ERRCD
                    ELSE
@@ -1503,7 +1595,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                IF    ( WRK-MCP-WIDGET      =   "FTNJANUMKBN_JYOKEN"    )
                AND   ( SPA-GMN-FTNJANUMKBN-JYOKEN
                                            =   SPACE   OR  "1" OR  "2" )
-                   MOVE    7                   TO  SPA-GMN-CUR
+                   MOVE    21                  TO  SPA-GMN-CUR
                END-IF
            ELSE
                MOVE    15                  TO  SPA-GMN-CUR
@@ -1525,6 +1617,107 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            .
        41021-FTNJANUM-JYOKEN-CHK-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    入外区分入力処理
+      *****************************************************************
+       41021-NYUGAIKBN-CHK-SEC      SECTION.
+      *
+           IF      SPA-GMN-NYUGAIKBN
+                                       =   SPACE
+               MOVE    SPACE               TO  SPA-GMN-NYUGAIKBN-G
+           ELSE
+               MOVE    SPA-GMN-NYUGAIKBN
+                                           TO  WRK-KBN
+               PERFORM 5001-NYUGAIKBN-HENSYU-SEC
+               IF      WRK-KBNMEI          =   SPACE
+                   MOVE    "0033"              TO  SPA-ERRCD
+               ELSE
+                   MOVE    WRK-KBNMEI          TO  SPA-GMN-NYUGAIKBNMEI
+               END-IF
+           END-IF
+      *
+           IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    21                  TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       41021-NYUGAIKBN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    所得区分入力処理
+      *****************************************************************
+       41021-SYOTOKUKBN-CHK-SEC      SECTION.
+      *
+           IF      SPA-GMN-SYOTOKUKBN
+                                       =   SPACE
+               MOVE    SPACE           TO  SPA-GMN-SYOTOKUKBN-G
+           ELSE
+               MOVE    SPA-GMN-SYOTOKUKBN
+                                           TO  WRK-KBN
+               PERFORM 5001-SYOTOKUKBN-HENSYU-SEC
+               IF      WRK-KBNMEI          =   SPACE
+                   MOVE    "0034"              TO  SPA-ERRCD
+               ELSE
+                   MOVE    WRK-KBNMEI          TO  SPA-GMN-SYOTOKUKBNMEI
+                   IF      SPA-GMN-HKNNUM      =   SPACE
+                       MOVE    "0014"              TO  SPA-ERRCD
+                   ELSE
+                       IF      SPA-GMN-HKNNUM(1:1) =   "0"
+                           MOVE    "0035"              TO  SPA-ERRCD
+                       ELSE
+                           IF      SPA-NAI-RECESKYKBN  =   "3"
+                               MOVE    "0036"              TO  SPA-ERRCD
+                           END-IF
+      *********************IF      SPA-GMN-TEISYUTUSAKI    =   SPACE
+      *                        MOVE    "0037"              TO  SPA-ERRCD
+      *                    ELSE
+      *                        EVALUATE    SPA-NAI-RECESKYKBN
+      *                          WHEN    "0"
+      *                            CONTINUE
+      *                          WHEN    "1"
+      *                            IF      SPA-GMN-TEISYUTUSAKI =   "1"
+      *                                CONTINUE
+      *                            ELSE 
+      *                                MOVE    "0036"      TO  SPA-ERRCD
+      *                            END-IF
+      *                          WHEN    "2"
+      *                            IF      SPA-GMN-TEISYUTUSAKI =   "2"
+      *                                                        OR  "6"
+      *                                CONTINUE
+      *                            ELSE 
+      *                                MOVE    "0036"      TO  SPA-ERRCD
+      *                            END-IF
+      *                          WHEN    "3"
+      *                            MOVE    "0036"      TO  SPA-ERRCD
+      *                          WHEN    "4"
+      *                            IF      SPA-GMN-TEISYUTUSAKI =   "2"
+      *                                CONTINUE
+      *                             ELSE 
+      *                                MOVE    "0036"      TO  SPA-ERRCD
+      *                            END-IF
+      *                          WHEN    "5"
+      *                            IF      SPA-GMN-TEISYUTUSAKI =   "6"
+      *                                CONTINUE
+      *                            ELSE 
+      *                                MOVE    "0036"      TO  SPA-ERRCD
+      *                            END-IF
+      *                        END-EVALUATE
+      *********************END-IF
+                       END-IF 
+                   END-IF
+               END-IF
+           END-IF 
+      *
+           IF      SPA-ERRCD       NOT =   SPACE
+               MOVE    22                  TO  SPA-GMN-CUR
+           END-IF
+      *
+           .
+       41021-SYOTOKUKBN-CHK-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    老人保険入力処理
@@ -2276,28 +2469,38 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                        UNTIL   IDX >       SPA-GMN-MAX
                        OR      SPA-ERRCD   NOT =   SPACE
                    IF    ( SPA-GMN-THKNNUM       (IDX)
-                                           =   SPA-GMN-HKNNUM       )
+                                           =   SPA-GMN-HKNNUM         )
                    AND   ( SPA-NAI-TTEISYUTUSAKI (IDX)
-                                           =   SPA-GMN-TEISYUTUSAKI )
+                                           =   SPA-GMN-TEISYUTUSAKI   )
                    AND   ( SPA-GMN-THKNJANUM     (IDX)
-                                           =   SPA-GMN-HKNJANUM     )
+                                           =   SPA-GMN-HKNJANUM       )
                    AND   ( SPA-NAI-TRJNKBN       (IDX)
-                                           =   SPA-GMN-RJNKBN       )
+                                           =   SPA-GMN-RJNKBN         )
                    AND   ( SPA-NAI-TZAITAKU      (IDX)
-                                           =   SPA-GMN-ZAITAKU      )
+                                           =   SPA-GMN-ZAITAKU        )
                    AND   ( SPA-NAI-TFTNJANUMKBN-JYOKEN (IDX)
                                            =
                                            SPA-GMN-FTNJANUMKBN-JYOKEN )
-                   AND   ( SPA-NAI-TFTNJANUM-JYOKEN (IDX)
-                                           =   SPA-GMN-FTNJANUM-JYOKEN )
-                       IF      SPA-NAI-SELNUM  NOT =   IDX 
-                           IF    ( SPA-NAI-EDYUKYMD
+                   AND   ( SPA-NAI-TSYOTOKUKBN   (IDX)
+                                           =   SPA-GMN-SYOTOKUKBN     )
+      *                入外区分は空白とのチェックも行う
+                       IF    ( SPA-NAI-TNYUGAIKBN    (IDX)
+                                           NOT =   SPACE             )
+                       AND   ( SPA-GMN-NYUGAIKBN
+                                           NOT =   SPACE             )
+                       AND   ( SPA-NAI-TNYUGAIKBN    (IDX)
+                                           NOT =   SPA-GMN-NYUGAIKBN )
+                           CONTINUE
+                       ELSE
+                           IF      SPA-NAI-SELNUM  NOT =   IDX 
+                               IF    ( SPA-NAI-EDYUKYMD
                                            <   SPA-NAI-TSTYUKYMD (IDX) )
-                           OR    ( SPA-NAI-STYUKYMD
+                               OR    ( SPA-NAI-STYUKYMD
                                            >   SPA-NAI-TEDYUKYMD (IDX) )
-                               CONTINUE
-                           ELSE
-                               MOVE    "0105"          TO  SPA-ERRCD
+                                   CONTINUE
+                               ELSE
+                                   MOVE    "0105"          TO  SPA-ERRCD
+                               END-IF
                            END-IF
                        END-IF
                    END-IF 
@@ -2337,6 +2540,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            INITIALIZE                  SPA-GMN-KOUMOKU
                                        SPA-NAI-KOUMOKU
                                        SPA-NAI-SELNUM
+      *
+           MOVE    ZERO                TO  FLG-ROW
       *
            MOVE    1                   TO  SPA-GMN-CUR
            .
@@ -2511,6 +2716,8 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                                            SYS-2006-FTNJANUMKBN-JYOKEN
                MOVE    SPA-GMN-FTNJANUM-JYOKEN
                                            TO  SYS-2006-FTNJANUM-JYOKEN
+               MOVE    SPA-GMN-NYUGAIKBN   TO  SYS-2006-NYUGAIKBN
+               MOVE    SPA-GMN-SYOTOKUKBN  TO  SYS-2006-SYOTOKUKBN
                MOVE    SPA-GMN-RJNKBN      TO  SYS-2006-RJNKBN 
                MOVE    SPA-GMN-ZAITAKU     TO  SYS-2006-ZAITAKU
                MOVE    SPA-GMN-TOKKI       TO  SYS-2006-TOKKI
@@ -2650,6 +2857,10 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                MOVE    SPA-GMN-TFTNJANUMKBN-JYOKEN (IDX)
                                                TO
                                            W61-TFTNJANUMKBN-JYOKEN(IDX)
+               MOVE    SPA-GMN-TNYUGAIKBN (IDX)
+                                               TO W61-TNYUGAIKBN  (IDX)
+               MOVE    SPA-GMN-TSYOTOKUKBN (IDX)
+                                               TO  W61-TSYOTOKUKBN(IDX)
                MOVE    SPA-GMN-TRJNKBN   (IDX) TO  W61-TRJNKBN    (IDX)
                MOVE    SPA-GMN-TZAITAKU  (IDX) TO  W61-TZAITAKU   (IDX)
                MOVE    SPA-GMN-TSTYUKYMD (IDX) TO  W61-TSTYUKYMD  (IDX)
@@ -2666,6 +2877,9 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            IF      WRK-W61-ROW         >   ZERO
                MOVE    WRK-W61-ROW         TO  W61-ROW
            END-IF
+           IF      SPA-NAI-SELNUM      >   ZERO
+               MOVE    2                   TO  W61-ROWATTR
+           END-IF
       *
            MOVE    SPA-GMN-SELNUM      TO  W61-SELNUM
            MOVE    SPA-GMN-STYUKYMD    TO  W61-STYUKYMD
@@ -2680,6 +2894,9 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            MOVE    SPA-GMN-FTNJANUM-JYOKEN
                                        TO  W61-FTNJANUM-JYOKEN
            MOVE    SPA-GMN-HKNJANAME   TO  W61-HKNJANAME
+           MOVE    SPA-GMN-NYUGAIKBN-G TO  W61-NYUGAIKBN
+           MOVE    SPA-GMN-SYOTOKUKBN-G
+                                       TO  W61-SYOTOKUKBN
            MOVE    SPA-GMN-RJNKBN-G    TO  W61-RJNKBN 
            MOVE    SPA-GMN-ZAITAKU-G   TO  W61-ZAITAKU
            MOVE    SPA-GMN-TOKKI       TO  W61-TOKKI
@@ -2729,6 +2946,22 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
            END-PERFORM
            MOVE    SPA-GMN-FTNJANUMKBN-JYOKEN-MAX
                                    TO  W61-FTNJANUMKBN-JYOKEN-COUNT
+      *
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >       SPA-GMN-NYUGAIKBN-MAX
+                MOVE   SPA-GMN-NYUGAIKBNLST (IDX)
+                                       TO  W61-NYUGAIKBN-ITEM (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-NYUGAIKBN-MAX
+                                   TO  W61-NYUGAIKBN-COUNT
+      *
+           PERFORM VARYING IDX     FROM    1   BY  1
+                   UNTIL   IDX     >   SPA-GMN-SYOTOKUKBN-MAX
+                MOVE   SPA-GMN-SYOTOKUKBNLST (IDX)
+                                       TO  W61-SYOTOKUKBN-ITEM (IDX)
+           END-PERFORM
+           MOVE    SPA-GMN-SYOTOKUKBN-MAX
+                                   TO  W61-SYOTOKUKBN-COUNT
       *
            PERFORM VARYING IDX     FROM    1   BY  1
                    UNTIL   IDX     >       SPA-GMN-RJNKBN-MAX
@@ -2822,6 +3055,10 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
              WHEN    16
                     MOVE  "FTNJANUM_JYOKEN"
                                            TO  MCP-WIDGET   
+             WHEN    21
+                    MOVE  "NYUGAIKBN"      TO  MCP-WIDGET   
+             WHEN    22
+                    MOVE  "SYOTOKUKBN"     TO  MCP-WIDGET   
              WHEN    7
                     MOVE  "RJNKBN"         TO  MCP-WIDGET   
              WHEN    8
@@ -2901,6 +3138,10 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                WHEN    "FTNJANUMKBN_JYOKEN"
                    MOVE    16          TO  SPA-GMN-CUR
                WHEN    "FTNJANUM_JYOKEN"
+                   MOVE    21           TO  SPA-GMN-CUR
+               WHEN    "NYUGAIKBN"
+                   MOVE    22          TO  SPA-GMN-CUR
+               WHEN    "SYOTOKUKBN"
                    MOVE    7           TO  SPA-GMN-CUR
                WHEN    "RJNKBN"
                    MOVE    8           TO  SPA-GMN-CUR
@@ -3051,6 +3292,21 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
                                            TO  SPA-ERRMSG
                WHEN    "0032"
                    MOVE    "全角空白のみ入力されています"
+                                           TO  SPA-ERRMSG
+               WHEN    "0033"
+                   MOVE    "入外区分入力エラー"
+                                           TO  SPA-ERRMSG
+               WHEN    "0034"
+                   MOVE    "所得区分入力エラー"
+                                           TO  SPA-ERRMSG
+               WHEN    "0035"
+                   MOVE    "入力した保険番号には設定できません"
+                                           TO  SPA-ERRMSG
+               WHEN    "0036"
+                   MOVE   "レセプト請求しない保険番号には設定できません"
+                                           TO  SPA-ERRMSG
+               WHEN    "0037"
+                   MOVE   "所得区分の設定には提出先の設定が必要です"
                                            TO  SPA-ERRMSG
       *
                WHEN    "0101"
@@ -3214,6 +3470,56 @@ grpsys         PERFORM 900-ORCDBMAIN-SEC
       *
            .
        5001-FTNJANUMKBN-JYOKEN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入外区分編集処理
+      *****************************************************************
+       5001-NYUGAIKBN-HENSYU-SEC   SECTION.
+      * 
+           MOVE    SPACE               TO  WRK-KBNMEI
+      *     
+           IF      WRK-KBN             =   SPACE   
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM   1   BY  1
+                       UNTIL   IDY >      SPA-GMN-NYUGAIKBN-MAX
+                   IF      WRK-KBN =   SPA-GMN-NYUGAIKBNL (IDY)
+                       MOVE    SPA-GMN-NYUGAIKBNMEIL (IDY)
+                                              TO  WRK-KBNMEI
+                       MOVE    SPA-GMN-NYUGAIKBN-MAX
+                                              TO  IDY
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       5001-NYUGAIKBN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    所得区分編集処理
+      *****************************************************************
+       5001-SYOTOKUKBN-HENSYU-SEC  SECTION.
+      * 
+           MOVE    SPACE               TO  WRK-KBNMEI
+      *     
+           IF      WRK-KBN             =   SPACE   
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM   1   BY  1
+                       UNTIL   IDY >      SPA-GMN-SYOTOKUKBN-MAX
+                   IF      WRK-KBN =   SPA-GMN-SYOTOKUKBNL (IDY)
+                       MOVE    SPA-GMN-SYOTOKUKBNMEIL (IDY)
+                                              TO  WRK-KBNMEI
+                       MOVE    SPA-GMN-SYOTOKUKBN-MAX
+                                              TO  IDY
+                   END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+       5001-SYOTOKUKBN-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************

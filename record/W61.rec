@@ -4,6 +4,7 @@ W61	{
 			TOKKILST	{
 				count	int;
 				row	int;
+				rowattr	int;
 				item	{
 					value0	varchar(3);
 					value1	varchar(3);
@@ -11,10 +12,12 @@ W61	{
 					value3	varchar(10);
 					value4	varchar(8);
 					value5	varchar(10);
-					value6	varchar(10);
+					value6	varchar(6);
 					value7	varchar(10);
-					value8	varchar(9);
-					value9	varchar(9);
+					value8	varchar(10);
+					value9	varchar(10);
+					value10	varchar(9);
+					value11	varchar(9);
 				}	[200];
 				select	bool[200];
 			};
@@ -56,6 +59,20 @@ W61	{
 		};
 		FTNJANUM_JYOKEN	{
 			value	varchar(8);
+		};
+		NYUGAIKBN_COMBO	{
+			NYUGAIKBN	{
+				value	varchar(10);
+			};
+			count	int;
+			item	varchar(10)[5];
+		};
+		SYOTOKUKBN_COMBO	{
+			SYOTOKUKBN	{
+				value	varchar(20);
+			};
+			count	int;
+			item	varchar(20)[5];
 		};
 		ZAITAKU_COMBO	{
 			ZAITAKU	{

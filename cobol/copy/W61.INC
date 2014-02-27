@@ -3,6 +3,7 @@
                 04  W61-TOKKILST.
                   05  W61-COUNT   PIC S9(9)   BINARY.
                   05  W61-ROW PIC S9(9)   BINARY.
+                  05  W61-ROWATTR     PIC S9(9)   BINARY.
                   05  W61-ITEM            OCCURS  200 TIMES.
                     06  W61-TRENNUM       PIC X(3).
                     06  W61-THKNNUM       PIC X(3).
@@ -11,6 +12,8 @@
                     06  W61-THKNJANUM     PIC X(8).
                     06  W61-TFTNJANUMKBN-JYOKEN
                                           PIC X(10).
+                    06  W61-TNYUGAIKBN    PIC X(06).
+                    06  W61-TSYOTOKUKBN   PIC X(10).
                     06  W61-TRJNKBN       PIC X(10).
                     06  W61-TZAITAKU      PIC X(10).
                     06  W61-TSTYUKYMD     PIC X(9).
@@ -44,6 +47,16 @@
                         PIC X(32)   OCCURS  5 TIMES.
               03  W61-FTNJANUM-JYOKEN.
                 04  W61-VALUE   PIC X(8).
+              03  W61-NYUGAIKBN-COMBO.
+                04  W61-NYUGAIKBN      PIC X(10).
+                04  W61-NYUGAIKBN-COUNT   PIC S9(9)   BINARY.
+                04  W61-NYUGAIKBN-ITEM
+                        PIC X(10)   OCCURS  5 TIMES.
+              03  W61-SYOTOKUKBN-COMBO.
+                04  W61-SYOTOKUKBN      PIC X(20).
+                04  W61-SYOTOKUKBN-COUNT   PIC S9(9)   BINARY.
+                04  W61-SYOTOKUKBN-ITEM
+                        PIC X(20)   OCCURS  5 TIMES.
               03  W61-ZAITAKU-COMBO.
                 04  W61-ZAITAKU         PIC X(44).
                 04  W61-ZAITAKU-COUNT   PIC S9(9)   BINARY.
