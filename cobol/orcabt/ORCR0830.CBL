@@ -87,6 +87,7 @@
       *  04.07.02    NACL-ÌçÏÆ    12/08/28  ÌôºÞÎÁ¸ºÅÀÂÐ±þ
       *  04.07.03    NACL-ÌçÏÆ    13/10/02  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *  04.07.04    NACL-ÌçÏÆ    14/02/13  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î»Ü½Ñ²Ã»»ÂÐ±þ
+      *  04.07.05    NACL-ÌçÏÆ    14/03/01  Ï«ºÒ¥Þ¥¹¥¿ÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -339,6 +340,8 @@
            03  CONS-ROUSAI41   PIC X(09)   VALUE   "101800980".
       *
            03  CONS-ROUSAI42   PIC X(09)   VALUE   "101800880".
+      *
+           03  CONS-ROUSAI43   PIC X(09)   VALUE   "101801040".
       *
       *    ¹øÉô¸ÇÄêÂÓ²Ã»»
            03  CONS-YOUBUKASAN PIC X(09)   VALUE   "140037490".
@@ -1089,7 +1092,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                       CONS-ROUSAI34 OR CONS-ROUSAI35 OR
                       CONS-ROUSAI36 OR CONS-ROUSAI37 OR
                       CONS-ROUSAI38 OR CONS-ROUSAI39 OR
-                      CONS-ROUSAI40 OR CONS-ROUSAI41      ) AND
+                      CONS-ROUSAI40 OR CONS-ROUSAI41 OR
+                      CONS-ROUSAI43                       ) AND
                      (RECE82-SRYYM  >= "201307"           ))
                  OR ( SRY-SRYCD(1)(1:5) =
                       "09591" OR "09592" OR "09593"        )
@@ -1776,7 +1780,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               CONS-ROUSAI34 OR  CONS-ROUSAI35 OR
                               CONS-ROUSAI36 OR  CONS-ROUSAI37 OR
                               CONS-ROUSAI38 OR  CONS-ROUSAI39 OR
-                              CONS-ROUSAI40 OR  CONS-ROUSAI41      ) AND
+                              CONS-ROUSAI40 OR  CONS-ROUSAI41 OR
+                              CONS-ROUSAI43                        ) AND
                              (RECE82-SRYYM         >= "201307"     ))
                             ADD    TNS-TEN      TO    WRK-KIN2
                          END-IF
@@ -1850,7 +1855,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                               CONS-ROUSAI34 OR  CONS-ROUSAI35 OR
                               CONS-ROUSAI36 OR  CONS-ROUSAI37 OR
                               CONS-ROUSAI38 OR  CONS-ROUSAI39 OR
-                              CONS-ROUSAI40 OR  CONS-ROUSAI41      ) AND
+                              CONS-ROUSAI40 OR  CONS-ROUSAI41 OR
+                              CONS-ROUSAI43                        ) AND
                              (RECE82-SRYYM         >= "201307"     ))
                             ADD    TNS-TEN      TO    WRK-KIN
                             COMPUTE  WRK-TEN  =   WRK-TEN   +
@@ -2180,7 +2186,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                             CONS-ROUSAI34 OR  CONS-ROUSAI35 OR
                             CONS-ROUSAI36 OR  CONS-ROUSAI37 OR
                             CONS-ROUSAI38 OR  CONS-ROUSAI39 OR
-                            CONS-ROUSAI40 OR  CONS-ROUSAI41       ) AND
+                            CONS-ROUSAI40 OR  CONS-ROUSAI41 OR
+                            CONS-ROUSAI43                         ) AND
                            (RECE82-SRYYM         >=  "201307"     ))
       *
                             COMPUTE  WRK-TEN-JI   =  TNS-TEN / 10

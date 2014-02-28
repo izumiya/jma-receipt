@@ -2253,27 +2253,23 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       ***  AND  ( WRK-WIDX2               NOT = 1     )
       ***          MOVE    1                 TO  FLG-NOPRT
       ***  END-IF
-           IF     RECE44-SRYKBN   = "31" OR "32"
-            IF  (WRK-PARA-RECEKBN      =  "4")
-            AND (WRK-PARA-JIBAIPRTKBN  =  "2")
-              CONTINUE
-            ELSE
-              IF  FLG-HIKAKIN     =  ZERO
-                IF   ( TBL-ZAIW-NAME (3 1)         = SPACE )
-                AND  ( TBL-ZAIW-NAME (3 2)     NOT = SPACE )
-                AND  ( WRK-WIDX1                   = 3     )
-                AND  ( WRK-WIDX2                   = 1     )
-                   MOVE    1                 TO  FLG-NOPRT
-                END-IF
-              ELSE
-                IF   ( TBL-ZAIW-NAME (3 1)         = SPACE )
-                AND  ( WRK-WIDX1                   = 3     )
-                AND  ( WRK-WIDX2                   = 1     )
-                   MOVE    1                 TO  FLG-NOPRT
-                END-IF
-              END-IF
-            END-IF
-           END-IF
+      *
+      **>  IF     RECE44-SRYKBN   = "31" OR "32"
+      **>     IF  FLG-HIKAKIN     =  ZERO
+      **>       IF   ( TBL-ZAIW-NAME (3 1)         = SPACE )
+      **>       AND  ( TBL-ZAIW-NAME (3 2)     NOT = SPACE )
+      **>       AND  ( WRK-WIDX1                   = 3     )
+      **>       AND  ( WRK-WIDX2                   = 1     )
+      **>          MOVE    1                 TO  FLG-NOPRT
+      **>       END-IF
+      **>     ELSE
+      **>       IF   ( TBL-ZAIW-NAME (3 1)         = SPACE )
+      **>       AND  ( WRK-WIDX1                   = 3     )
+      **>       AND  ( WRK-WIDX2                   = 1     )
+      **>          MOVE    1                 TO  FLG-NOPRT
+      **>       END-IF
+      **>     END-IF
+      **>  END-IF
       *
            .
        200521-SEYKBNELSE-MEISAI-EXT.
