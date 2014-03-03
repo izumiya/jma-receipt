@@ -203,6 +203,11 @@
                05  WRK-DOJITU-OCC              OCCURS  31.
                    07  WRK-DOJITUST            PIC  X(01).
                    07  WRK-DOJITUED            PIC  X(01).
+           03  WRK-RATE1                       PIC 999V99.
+           03  WRK-RATE2                       PIC 999V99.
+           03  WRK-RATE3                       PIC 999V99.
+           03  WRK-RATE4                       PIC 999V99.
+           03  WRK-HASU                        PIC 9V99999.
       *
       *    入院料
        01  WNYUINRYO-AREA.
@@ -399,6 +404,8 @@
       *
       *    コンスタント値
        01  CONST-AREA.
+           03  CONST-H2710                 PIC X(08)   VALUE "999999".
+           03  CONST-H2604                 PIC X(08)   VALUE "201404".
            03  CONST-H1904                 PIC X(06)   VALUE "200704".
            03  CONST-H1804                 PIC X(06)   VALUE "200604".
            03  CONST-H1810                 PIC X(06)   VALUE "200610".
@@ -739,6 +746,21 @@
                MOVE       "1"              TO  HCM34S01-EXGAIHAKU
            END-IF
       *
+           EVALUATE    TRUE
+           WHEN  ( HCM34S01-SANTEIYM   >=  CONST-H2710 )
+               MOVE    0.10            TO  WRK-RATE1
+           WHEN  ( HCM34S01-SANTEIYM   >=  CONST-H2604 )
+               MOVE    0.08            TO  WRK-RATE1
+           WHEN  OTHER
+               MOVE    0.05            TO  WRK-RATE1
+           END-EVALUATE
+      *
+           COMPUTE WRK-RATE2 = WRK-RATE1   +   1
+      *
+           COMPUTE WRK-RATE3 = WRK-RATE1   *   100
+      *
+           COMPUTE WRK-RATE4 = WRK-RATE2   *   100
+      *
            .
        100-PRM-CHK-EXT.
            EXIT.
@@ -893,6 +915,14 @@
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key10"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           MOVE    0                   TO  WRK-HASU
+           EVALUATE  SYS-1001-TAX-HASU-KBN
+           WHEN    "1"
+               MOVE    0.5             TO  WRK-HASU
+           WHEN    "3"
+               MOVE    0.99999         TO  WRK-HASU
+           END-EVALUATE
       *
            .
        1501-SYS1001-GET-EXT.
@@ -1497,7 +1527,8 @@
                    IF    ( HCM34S01-SANTEIYM   >=  CONST-H1904 )
                        IF    ( SYS-5000-BRMSGK-TAXKBN  =   "1" )
                            COMPUTE WRK-BRMSAGAKU
-                               =   WRK-BRMSAGAKU   *   1.05
+                               =   WRK-BRMSAGAKU   *   WRK-RATE2
+                               +   WRK-HASU
                        END-IF
                    END-IF
                END-IF
