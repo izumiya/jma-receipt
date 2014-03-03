@@ -112,7 +112,7 @@
                     06  W02-TAXHASU-COUNT
                                              PIC S9(9)   BINARY.
                     06  W02-TAXHASULST       PIC X(32)
-                                                      OCCURS  2.
+                                                      OCCURS  3.
                   05  W02-HIWARIKBN-COMBO.
                     06  W02-HIWARIKBN        PIC X(20).
                     06  W02-HIWARIKBN-COUNT

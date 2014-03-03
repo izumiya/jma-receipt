@@ -201,7 +201,7 @@ W02	{
 						value	varchar(32);
 					};
 					count	int;
-					item	varchar(32)[2];
+					item	varchar(32)[3];
 				};
 				HIWARIKBN_COMBO	{
 					HIWARIKBN	{

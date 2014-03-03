@@ -614,6 +614,7 @@
                05  WRK-HDD         PIC 9(02).
       *
        01  CONST-AREA.
+           03  CONST-H260401       PIC X(08) VALUE "20140401".
            03  CONST-DHASU         PIC 9(05) VALUE 1.
            03  CONST-DHASU2        PIC 9(05) VALUE 2.
            03  CONST-DHASU2J       PIC 9(05) VALUE 3.
@@ -1129,6 +1130,9 @@
            MOVE    "2"         TO  SPA-GMN-TAX-HASU-KBNL    (2)
            MOVE    "£±±ßÌ¤ËþÀÚ¤ê¼Î¤Æ" 
                                TO  SPA-GMN-TAX-HASU-KBNMEIL (2)
+           MOVE    "3"         TO  SPA-GMN-TAX-HASU-KBNL    (3)
+           MOVE    "£±±ßÌ¤ËþÀÚ¤ê¾å¤²" 
+                               TO  SPA-GMN-TAX-HASU-KBNMEIL (3)
            MOVE    SPA-GMN-TAX-HASU-KBNLST (2)
                                TO  SPA-GMN-TAX-HASU-KBN-G
       *
@@ -1933,12 +1937,12 @@
                MOVE    "2"             TO  SYS-1001-TAX-HASU-KBN
            END-IF
            PERFORM VARYING IDY FROM    1   BY  1
-                   UNTIL   IDY >       2
+                   UNTIL   IDY >       3
                IF      SYS-1001-TAX-HASU-KBN
                                        =   SPA-GMN-TAX-HASU-KBNL (IDY)
                    MOVE    SPA-GMN-TAX-HASU-KBNLST (IDY)
                                            TO  SPA-GMN-TAX-HASU-KBN-G
-                   MOVE    2               TO  IDY
+                   MOVE    3               TO  IDY
                 END-IF
            END-PERFORM
       *
@@ -3529,7 +3533,7 @@
       *
            MOVE    ZERO                TO  FLG-OK
            PERFORM VARYING IDY     FROM    1   BY  1
-                   UNTIL   IDY     >       2
+                   UNTIL   IDY     >       3
                IF      SPA-GMN-TAX-HASU-KBN
                                        =   SPA-GMN-TAX-HASU-KBNL
                                                               (IDY)
@@ -4983,11 +4987,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM    
            MOVE    3                   TO  W02-GENTAIKBN-COUNT     
            PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       2
+                   UNTIL   IDX >       3
                MOVE    SPA-GMN-TAX-HASU-KBNLST(IDX)
                                        TO  W02-TAXHASULST (IDX)
            END-PERFORM    
-           MOVE    2                   TO  W02-TAXHASU-COUNT     
+           MOVE    3                   TO  W02-TAXHASU-COUNT     
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       2
                MOVE    SPA-GMN-HIWARIKBNLST(IDX)
