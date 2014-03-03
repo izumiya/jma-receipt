@@ -348,6 +348,21 @@
                05  TINGAI-NYUGAIKBN                PIC X(01).
                05  TINGAI-TEN                      PIC 9(07).
       *
+      *  ²ð¸îÆÍ¹ç¥Á¥§¥Ã¥¯ÂàÈòÎÎ°è
+         02  TKAIGO-AREA.
+           03  TKAIGO-NINTEI-DAY-G.
+               05  TKAIGO-NINTEI-DAY               PIC 9(01)
+                                                   OCCURS  31.
+           03  TKAIGO-ERR-DAY-G.
+               05  TKAIGO-ERR-DAY                  PIC 9(01)
+                                                   OCCURS  31.
+           03  TKAIGO-IDX                          PIC 9(05).
+           03  TKAIGO-MAX                          PIC 9(05).
+           03  TKAIGO-OCC                          OCCURS  50.
+               05  TKAIGO-SRYCD                    PIC X(09).
+               05  TKAIGO-SRYCD-DAY                PIC 9(01)
+                                                   OCCURS  31.
+      *
          02  SRH-AREA.
            03  SRH-IDX                             PIC 9(05).
            03  SRH-HKNNUM-DAT.
