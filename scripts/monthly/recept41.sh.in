@@ -201,7 +201,7 @@ fi
             cd ${OUT_FOLDER}
         fi
 
-        all=`ls  *${RECEFILE1}*.UK*`
+        all=`ls  *${RECEFILE1}*.UK?`
 
     	cleanup
   
