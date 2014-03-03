@@ -74,6 +74,12 @@
            03  WRK-TANKA           PIC 9(08)V99.
            03  WRK-KISOTEN         PIC 9(08)V99.
       *
+           03  WRK-ZEIRITU         PIC 9(01)V99.
+      *
+      *消費税率
+       01  CONS-ZEI1               PIC 9(01)V99   VALUE   0.05.
+       01  CONS-ZEI2               PIC 9(01)V99   VALUE   0.08.
+      *
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -270,6 +276,12 @@
            INITIALIZE                  WRK-AREA
            INITIALIZE                  ORCSC90AREA
       *
+      *    消費税率編集
+           MOVE    CONS-ZEI1           TO  WRK-ZEIRITU
+           IF      SPA-SRYYMD          >=  "20140401"
+               MOVE    CONS-ZEI2           TO  WRK-ZEIRITU
+           END-IF
+      *
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-MAX-LINE  )   OR
                               (SPA-ERRCD       NOT =   SPACE )  OR
@@ -374,15 +386,30 @@
        10021-ZEIKEISEN-SEC                  SECTION.
       *
            COMPUTE WRK-ZEIKIN-9        =   WRK-KISOTEN
-                                       *   0.05
-           IF      SPA-TAX-HASU-KBN    =   "1"
+                                       *   WRK-ZEIRITU
+      *
+      *****IF      SPA-TAX-HASU-KBN    =   "1"
       *        小数点以下四捨五入
-               COMPUTE WRK-ZEIKIN      =   WRK-ZEIKIN-9
-                                       +   0.5
-           ELSE
+      *        COMPUTE WRK-ZEIKIN      =   WRK-ZEIKIN-9
+      *                                +   0.5
+      *    ELSE
       *        小数点以下切り捨て
-               MOVE    WRK-ZEIKIN-9        TO  WRK-ZEIKIN
-           END-IF
+      *        MOVE    WRK-ZEIKIN-9        TO  WRK-ZEIKIN
+      *****END-IF
+           EVALUATE    SPA-TAX-HASU-KBN
+               WHEN    "1"
+      *        小数点以下四捨五入
+                   COMPUTE WRK-ZEIKIN      =   WRK-ZEIKIN-9
+                                           +   0.5
+               WHEN    "3"
+      *        小数点以下切り上げ
+                   COMPUTE WRK-ZEIKIN      =   WRK-ZEIKIN-9
+                                           +   0.99999
+               WHEN    OTHER
+      *            小数点以下切り捨て
+                   MOVE    WRK-ZEIKIN-9        TO  WRK-ZEIKIN
+           END-EVALUATE
+      *
            COMPUTE WRK-TANKA           =   WRK-KISOTEN
                                        +   WRK-ZEIKIN
            .
