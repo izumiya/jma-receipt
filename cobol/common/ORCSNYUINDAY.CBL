@@ -273,7 +273,7 @@
                           (PTNYUINRRK-TENSTUYMD(1:6)
                                           >  LNK-NYUINDAY-SANTEIYM)
                           MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ST
-                          MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ED
+                          MOVE  99                         TO  IDX-ED
                       END-IF
                       IF      PTNYUINRRK-TENSTUYMD(1:6) = "999999"
                            MOVE   99     TO    IDX-ED
@@ -337,7 +337,7 @@
                           (PTNYUINRRK-TENSTUYMD(1:6)
                                           >  LNK-NYUINDAY-SANTEIYM)
                           MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ST
-                          MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ED
+                          MOVE  99                         TO  IDX-ED
                       END-IF
                       IF      PTNYUINRRK-TENSTUYMD(1:6) = "999999"
                            MOVE   99     TO    IDX-ED
@@ -401,7 +401,7 @@
                           (PTNYUINRRK-TENSTUYMD(1:6)
                                           >  LNK-NYUINDAY-SANTEIYM)
                           MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ST
-                          MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ED
+                          MOVE  99                         TO  IDX-ED
                       END-IF
                       IF      PTNYUINRRK-TENSTUYMD(1:6) = "999999"
                            MOVE   99     TO    IDX-ED
@@ -465,7 +465,7 @@
                           (PTNYUINRRK-TENSTUYMD(1:6)
                                           >  LNK-NYUINDAY-SANTEIYM)
                           MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ST
-                          MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ED
+                          MOVE  99                         TO  IDX-ED
                       END-IF
                       IF      PTNYUINRRK-TENSTUYMD(1:6) = "999999"
                            MOVE   99     TO    IDX-ED
@@ -877,7 +877,10 @@
       *
       **     PERFORM   VARYING  IDX    FROM  1  BY  1 
       **       UNTIL   IDX   >   31
-      **       DISPLAY "IDX = " IDX
+      **         DISPLAY "IDX = " IDX
+      **         DISPLAY "LNK-NYUINDAY-KBN = " LNK-NYUINDAY-KBN(IDX)
+      **         DISPLAY "LNK-NYUINDAY-TANKI2-KBN = "
+      **                  LNK-NYUINDAY-TANKI2-KBN(IDX)
       **       DISPLAY "DOUJITSU = " LNK-NYUINDAY-DOUJITSU-KBN(IDX)
       **       DISPLAY "HKNHEN   = " LNK-NYUINDAY-DOUJITSU-HKNHENKBN(IDX)
       **       DISPLAY "TAI-SKJ  = " LNK-NYUINDAY-DOUJITSU-T-SKJKBN(IDX)
