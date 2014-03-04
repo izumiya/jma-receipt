@@ -107,6 +107,7 @@
       *  04.07.07    NACL-ÌçÏÆ    14/02/21  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÅÀ¿ôÃ±²Á
       *                                     ÀßÄêÂÐ±þ
       *  04.07.08    NACL-ÌçÏÆ    14/03/01  Ï«ºÒ¥Þ¥¹¥¿ÄÉ²ÃÂÐ±þ
+      *  04.07.09    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -286,6 +287,12 @@
            03  WRK-TAIHI-DAY                           PIC  9(02).
       *
            03  WRK-FUTANWARI                           PIC  9V99.
+      *
+           03  WRK-S1                                  PIC  9(03).
+           03  WRK-S2                                  PIC  9(03).
+           03  WRK-S3                                  PIC  9V99999.
+           03  WRK-S4                                  PIC  9V99.
+           03  WRK-S5                                  PIC  9V99.
       *
       *    ¼êµ»ÅÀ¡¦ÌôºÞÅùÅÀ¿ôÍÑÎÎ°è
        01  TBL-TENSUG-JI.
@@ -579,6 +586,9 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
                   MOVE    MCPDATA-REC     TO  SYS-1001-REC
                   MOVE    SYS-1001-TAX-HASU-KBN
                                           TO  WRK-TAX1001-KBN
+                  IF   WRK-TAX1001-KBN = SPACE
+                     MOVE   "2"           TO  WRK-TAX1001-KBN
+                  END-IF
               ELSE
                   MOVE    "°åÎÅµ¡´Ø¾ðÊó¤¬¼èÆÀ¤Ç¤­¤Þ¤»¤ó¤Ç¤·¤¿¡£"
                                               TO  WRK-RECEERR
@@ -831,6 +841,27 @@ grpsys        PERFORM 900-DBSELECT-SEC
       *    ÊÔ½¸½èÍý
       *****************************************************************
        210-HENSYU-SEC                   SECTION.
+      *
+      *    ¾ÃÈñÀÇ·×»»¤Î·¸¿ôÀßÄê
+           IF  RECE40-SRYYM >= "201404"
+               MOVE       8      TO  WRK-S1
+               MOVE     108      TO  WRK-S2
+               MOVE     0.08     TO  WRK-S4
+               MOVE     1.08     TO  WRK-S5
+           ELSE
+               MOVE       5      TO  WRK-S1
+               MOVE     105      TO  WRK-S2
+               MOVE     0.05     TO  WRK-S4
+               MOVE     1.05     TO  WRK-S5
+           END-IF
+           EVALUATE  WRK-TAX1001-KBN
+               WHEN      "1"
+                 MOVE   0.50000  TO  WRK-S3
+               WHEN      "2"
+                 MOVE   0.00000  TO  WRK-S3
+               WHEN      "3"
+                 MOVE   0.99999  TO  WRK-S3
+           END-EVALUATE
       *
            MOVE    SPACE                TO  RECE41-REC
            INITIALIZE                       RECE41-REC
@@ -1994,22 +2025,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                     ACCT-ZAIKAISU
       ****
                           IF    WRK-TAXKBN      =   "2"
-                            IF  WRK-TAX1001-KBN =   "1"
-                              IF  SRY-SRYSYUKBN = "809"
-                                COMPUTE  WRK-KEISAN  =
-                                 (SRY-JIHIMONEY(IDY) *  1.05) + 0.5
-                              ELSE
-                                COMPUTE  WRK-KEISAN  =
-                                 (TNS-TEN            *  1.05) + 0.5
-                              END-IF
+                            IF  SRY-SRYSYUKBN = "809"
+                              COMPUTE  WRK-KEISAN  =
+                               (SRY-JIHIMONEY(IDY) * WRK-S5) + WRK-S3
                             ELSE
-                              IF  SRY-SRYSYUKBN = "809"
-                                COMPUTE  WRK-KEISAN  =
-                                  SRY-JIHIMONEY(IDY) *  1.05
-                              ELSE
-                                COMPUTE  WRK-KEISAN  =
-                                  TNS-TEN            *  1.05
-                              END-IF
+                              COMPUTE  WRK-KEISAN  =
+                               (TNS-TEN            * WRK-S5) + WRK-S3
                             END-IF
                             COMPUTE  WRK-KEISAN2     =  WRK-KEISAN
                                                      *  ACCT-ZAIKAISU
@@ -2036,22 +2057,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                     ACCT-ZAIKAISU
       ****
                           IF    WRK-TAXKBN      =   "2"
-                            IF  WRK-TAX1001-KBN =   "1"
-                              IF  SRY-SRYSYUKBN = "809"
-                                COMPUTE  WRK-KEISAN  =
-                                 (SRY-JIHIMONEY(IDY) *  1.05) + 0.5
-                              ELSE
-                                COMPUTE  WRK-KEISAN  =
-                                 (TNS-TEN            *  1.05) + 0.5
-                              END-IF
+                            IF  SRY-SRYSYUKBN = "809"
+                              COMPUTE  WRK-KEISAN  =
+                               (SRY-JIHIMONEY(IDY) * WRK-S5) + WRK-S3
                             ELSE
-                              IF  SRY-SRYSYUKBN = "809"
-                                COMPUTE  WRK-KEISAN  =
-                                  SRY-JIHIMONEY(IDY) *  1.05
-                              ELSE
-                                COMPUTE  WRK-KEISAN  =
-                                  TNS-TEN            *  1.05
-                              END-IF
+                              COMPUTE  WRK-KEISAN  =
+                               (TNS-TEN            * WRK-S5) + WRK-S3
                             END-IF
                             COMPUTE  WRK-KEISAN2     =  WRK-KEISAN
                                                      *  ACCT-ZAIKAISU
@@ -2496,13 +2507,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            ELSE                                                         
                 MOVE   WRK-SINDAN-TUU      TO  RECE41-SINDAN-TUU        
       ***>      IF    WRK-TAXKBN      =   "2"                           
-      ***>        IF  WRK-TAX1001-KBN =   "1"
-      ***>           COMPUTE  WRK-SINDAN-KIN  =  
-      ***>                   (WRK-SINDAN-KIN  *  1.05)  +  0.5          
-      ***>        ELSE
-      ***>           COMPUTE  WRK-SINDAN-KIN  =  
-      ***>                    WRK-SINDAN-KIN  *  1.05                   
-      ***>        END-IF
+      ***>        COMPUTE  WRK-SINDAN-KIN  =
+      ***>                (WRK-SINDAN-KIN  * WRK-S5) + WRK-S3
       ***>      END-IF                                                  
                 MOVE   WRK-SINDAN-KIN      TO  RECE41-SINDAN-KIN        
            END-IF
@@ -2512,13 +2518,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            ELSE                                                         
                 MOVE   WRK-MEISAI-TUU      TO  RECE41-MEISAI-TUU        
       ***>      IF    WRK-TAXKBN      =   "2"                           
-      ***>        IF  WRK-TAX1001-KBN =   "1"
-      ***>           COMPUTE  WRK-MEISAI-KIN  =  
-      ***>                   (WRK-MEISAI-KIN  *  1.05)  +  0.5          
-      ***>        ELSE
-      ***>           COMPUTE  WRK-MEISAI-KIN  =  
-      ***>                    WRK-MEISAI-KIN  *  1.05                   
-      ***>        END-IF
+      ***>        COMPUTE  WRK-MEISAI-KIN  =
+      ***>                (WRK-MEISAI-KIN  * WRK-S5) + WRK-S3
       ***>      END-IF                                                  
                 MOVE   WRK-MEISAI-KIN      TO  RECE41-MEISAI-KIN
            END-IF                                                       
@@ -3363,6 +3364,9 @@ grpsys     PERFORM 900-DBFETCH-SEC
                     MOVE     1       TO    FLG-SET
                     MOVE    SYS-1001-TAX-HASU-KBN
                                      TO    WRK-TAX1001-KBN
+                    IF   WRK-TAX1001-KBN = SPACE
+                       MOVE   "2"    TO    WRK-TAX1001-KBN
+                    END-IF
                  END-IF
       *
               END-PERFORM

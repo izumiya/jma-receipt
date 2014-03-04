@@ -243,6 +243,7 @@
       *  04.07.10    NACL-ÌçÏÆ    14/02/19  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *                                     ¡ÊÉéÃ´¶â³Û£±£°±ßÌ¤Ëþ»Í¼Î¸ÞÆþ¡Ë
       *  04.07.11    NACL-ÌçÏÆ    14/03/01  Ï«ºÒ¥Þ¥¹¥¿ÄÉ²ÃÂÐ±þ
+      *  04.07.12    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -816,6 +817,12 @@
            03  WRK-CHECK-SRYCD                 PIC X(09).
       *
            03  WRK-DAISAN-DAISANKBN            PIC X(01).
+      *
+           03  WRK-S1                          PIC 9(03).
+           03  WRK-S2                          PIC 9(03).
+           03  WRK-S3                          PIC 9V99999.
+           03  WRK-S4                          PIC 9V99.
+           03  WRK-S5                          PIC 9V99.
       *
        01  WRK-ERR-AREA.
            03  WRK-RECEERR                         PIC X(200).
@@ -1488,6 +1495,9 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
                 MOVE  MCPDATA-REC         TO  SYS-1001-REC
                 MOVE  SYS-1001-TAX-HASU-KBN
                                           TO  WRK-TAX1001-KBN
+                IF   WRK-TAX1001-KBN = SPACE
+                   MOVE   "2"             TO  WRK-TAX1001-KBN
+                END-IF
                 MOVE  SYS-1001-DAISANKBN  TO  WRK-DAISAN-DAISANKBN
                 IF  WRK-DAISAN-DAISANKBN = SPACE
                   MOVE  "2"               TO  WRK-DAISAN-DAISANKBN
@@ -1998,6 +2008,27 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *    ÊÔ½¸½èÍý
       *****************************************************************
        210-HENSYU-SEC                   SECTION.
+      *
+      *    ¾ÃÈñÀÇ·×»»¤Î·¸¿ôÀßÄê
+           IF  RECE82-SRYYM >= "201404"
+               MOVE       8      TO  WRK-S1
+               MOVE     108      TO  WRK-S2
+               MOVE     0.08     TO  WRK-S4
+               MOVE     1.08     TO  WRK-S5
+           ELSE
+               MOVE       5      TO  WRK-S1
+               MOVE     105      TO  WRK-S2
+               MOVE     0.05     TO  WRK-S4
+               MOVE     1.05     TO  WRK-S5
+           END-IF
+           EVALUATE  WRK-TAX1001-KBN
+               WHEN      "1"
+                 MOVE   0.50000  TO  WRK-S3
+               WHEN      "2"
+                 MOVE   0.00000  TO  WRK-S3
+               WHEN      "3"
+                 MOVE   0.99999  TO  WRK-S3
+           END-EVALUATE
       *
            INITIALIZE          WRK-DAY-TABLE
       *
@@ -4448,24 +4479,13 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
       *
       *       ÆÃÄê´ïºàÅù¾ÃÈñÀÇ·×»»
               IF   FLG-TAIGAI  =  ZERO
-                   IF    WRK-TAX1001-KBN  =  "1"
-                    IF  SRY-SRYSYUKBN = "809"
-                      COMPUTE  WRK-TEN-KZI  =
-                              (SRY-JIHIMONEY(IDX2)
-                                        *  1.05)  +  0.5
-                    ELSE
-                      COMPUTE  WRK-TEN-KZI  =
-                              (TNS-TEN  *  1.05)  +  0.5
-                    END-IF
+                   IF  SRY-SRYSYUKBN = "809"
+                     COMPUTE  WRK-TEN-KZI  =
+                             (SRY-JIHIMONEY(IDX2)
+                                       * WRK-S5) + WRK-S3
                    ELSE
-                    IF  SRY-SRYSYUKBN = "809"
-                      COMPUTE  WRK-TEN-KZI  =
-                              (SRY-JIHIMONEY(IDX2)
-                                        *  1.05)
-                    ELSE
-                      COMPUTE  WRK-TEN-KZI  =
-                              (TNS-TEN  *  1.05)
-                    END-IF
+                     COMPUTE  WRK-TEN-KZI  =
+                             (TNS-TEN  * WRK-S5) + WRK-S3
                    END-IF
               ELSE
                    IF  SRY-SRYSYUKBN = "809"
@@ -4560,24 +4580,13 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
            MOVE        ZERO          TO    WRK-TEN-BUN
       *
            IF   RECE82-TAXKBN   =   "2"
-              IF    WRK-TAX1001-KBN  =  "1"
-               IF  SRY-SRYSYUKBN = "809"
-                  COMPUTE  WRK-TEN-BUN  =
-                          (SRY-JIHIMONEY(IDX2)
-                                    *  1.05)  +  0.5
-               ELSE
-                  COMPUTE  WRK-TEN-BUN  =
-                          (TNS-TEN  *  1.05)  +  0.5
-               END-IF
+              IF  SRY-SRYSYUKBN = "809"
+                 COMPUTE  WRK-TEN-BUN  =
+                         (SRY-JIHIMONEY(IDX2)
+                                   * WRK-S5) + WRK-S3
               ELSE
-               IF  SRY-SRYSYUKBN = "809"
-                  COMPUTE  WRK-TEN-BUN  =
-                          (SRY-JIHIMONEY(IDX2)
-                                    *  1.05)
-               ELSE
-                  COMPUTE  WRK-TEN-BUN  =
-                          (TNS-TEN  *  1.05)
-               END-IF
+                 COMPUTE  WRK-TEN-BUN  =
+                         (TNS-TEN  * WRK-S5) + WRK-S3
               END-IF
            ELSE
                IF  SRY-SRYSYUKBN = "809"
@@ -13192,6 +13201,9 @@ grpsys                 PERFORM 900-CALL-ORCSJOB-SEC
                      MOVE     1       TO    FLG-SET
                      MOVE    SYS-1001-TAX-HASU-KBN
                                       TO    WRK-TAX1001-KBN
+                     IF   WRK-TAX1001-KBN = SPACE
+                        MOVE   "2"    TO    WRK-TAX1001-KBN
+                     END-IF
                      MOVE    SYS-1001-DAISANKBN
                                       TO    WRK-DAISAN-DAISANKBN
                      IF  WRK-DAISAN-DAISANKBN = SPACE

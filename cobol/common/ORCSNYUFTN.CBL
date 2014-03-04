@@ -154,6 +154,7 @@
       *                                     し、医保で入院料加算の診療行為入
       *                                     力を行った場合のチェック修正
       *  04.07.06    NACL-門脇    14/03/01  労災マスタ追加対応
+      *  04.07.07    NACL-門脇    14/03/04  平成２６年４月改正対応
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -198,6 +199,11 @@
            03  WRK-YUSENYMD                PIC X(08).
            03  WRK-FUTANWARI               PIC 9V99.
            03  WRK-TAIHI-DAY               PIC 9(02).
+           03  WRK-S1                      PIC 9(03).
+           03  WRK-S2                      PIC 9(03).
+           03  WRK-S3                      PIC 9V99999.
+           03  WRK-S4                      PIC 9V99.
+           03  WRK-S5                      PIC 9V99.
       *
        01  WRK-ROSAI-AREA.
            03  WRK-SYUTEN                  PIC 9(09).
@@ -2728,11 +2734,35 @@ grpsys                            SPA-AREA
                PERFORM   SYSKANRI-READ-SEC
                MOVE      SYS-1001-TAX-HASU-KBN
                                         TO    WRK-TAX1001-KBN
+               IF   WRK-TAX1001-KBN = SPACE
+                  MOVE   "2"            TO    WRK-TAX1001-KBN
+               END-IF
            END-IF
       *
            MOVE      "tbl_syskanri"     TO    MCP-TABLE
            MOVE      "key10"            TO    MCP-PATHNAME
            PERFORM   CSR-CLOSE-SEC
+      *
+      *    消費税計算の係数設定
+           IF  SYU-SRYYMD(1:6) >= "201404"
+               MOVE       8      TO  WRK-S1
+               MOVE     108      TO  WRK-S2
+               MOVE     0.08     TO  WRK-S4
+               MOVE     1.08     TO  WRK-S5
+           ELSE
+               MOVE       5      TO  WRK-S1
+               MOVE     105      TO  WRK-S2
+               MOVE     0.05     TO  WRK-S4
+               MOVE     1.05     TO  WRK-S5
+           END-IF
+           EVALUATE  WRK-TAX1001-KBN
+               WHEN      "1"
+                 MOVE   0.50000  TO  WRK-S3
+               WHEN      "2"
+                 MOVE   0.00000  TO  WRK-S3
+               WHEN      "3"
+                 MOVE   0.99999  TO  WRK-S3
+           END-EVALUATE
       *
            .
        SYSKANRI-TAXKBN-GET-EXT.
@@ -3328,15 +3358,9 @@ grpsys                                    SPA-AREA
                              MOVE  NACCT-DAY(SYU-IDX)  TO  RMSAGAKU-IDX
                              IF  (WRK-BRMSGK-TAXKBN    =  "1"    )
                              AND (SYU-SRYYMD(1:6)     >= "200704")
-                               IF    WRK-TAX1001-KBN  =  "1"
-                                 COMPUTE WRK-KEISAN  =
-                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
-                                                         * 0.05) + 0.5
-                               ELSE
-                                 COMPUTE WRK-KEISAN  =
-                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
-                                                         * 0.05)
-                               END-IF
+                               COMPUTE WRK-KEISAN  =
+                                      (TBL-RMSAGAKU(RMSAGAKU-IDX)
+                                                   * WRK-S4) + WRK-S3
                                ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
                                                    TO   SYU-RMSAGAKU
                                ADD   WRK-KEISAN    TO   SYU-RMSAGAKU
@@ -3355,15 +3379,9 @@ grpsys                                    SPA-AREA
                                MOVE  NACCT-DAY(SYU-IDX) TO RMSAGAKU-IDX
                                IF  (WRK-BRMSGK-TAXKBN    =  "1"    )
                                AND (SYU-SRYYMD(1:6)     >= "200704")
-                                 IF    WRK-TAX1001-KBN  =  "1"
-                                   COMPUTE WRK-KEISAN  =
-                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
-                                                         * 0.05) + 0.5
-                                 ELSE
-                                   COMPUTE WRK-KEISAN  =
-                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
-                                                         * 0.05)
-                                 END-IF
+                                 COMPUTE WRK-KEISAN  =
+                                        (TBL-RMSAGAKU(RMSAGAKU-IDX)
+                                                     * WRK-S4) + WRK-S3
                                  ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
                                                      TO   SYU-RMSAGAKU
                                  ADD   WRK-KEISAN    TO   SYU-RMSAGAKU
@@ -3382,15 +3400,9 @@ grpsys                                    SPA-AREA
                                MOVE  NACCT-DAY(SYU-IDX) TO RMSAGAKU-IDX
                                IF  (WRK-BRMSGK-TAXKBN    =  "1"    )
                                AND (SYU-SRYYMD(1:6)     >= "200704")
-                                 IF    WRK-TAX1001-KBN  =  "1"
-                                   COMPUTE WRK-KEISAN  =
-                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
-                                                         * 0.05) + 0.5
-                                 ELSE
-                                   COMPUTE WRK-KEISAN  =
-                                     (TBL-RMSAGAKU(RMSAGAKU-IDX)
-                                                         * 0.05)
-                                 END-IF
+                                 COMPUTE WRK-KEISAN  =
+                                        (TBL-RMSAGAKU(RMSAGAKU-IDX)
+                                                     * WRK-S4) + WRK-S3
                                  ADD   TBL-RMSAGAKU (RMSAGAKU-IDX)
                                                      TO   SYU-RMSAGAKU
                                  ADD   WRK-KEISAN    TO   SYU-RMSAGAKU
@@ -4358,19 +4370,11 @@ grpsys                            SPA-AREA
                                               WRK-SENTEI-KHNTEN) * 
                                               SYS-5000-SENTEI-TANKA)
                                      IF  SYU-SRYYMD(1:6) >= "200704"
-                                      IF    WRK-TAX1001-KBN  =  "1"
-                                       COMPUTE WRK-KEISAN =
+                                      COMPUTE  WRK-KEISAN =
                                              ((WRK-KHNTEN -
                                                WRK-SENTEI-KHNTEN)    *
                                                SYS-5000-SENTEI-TANKA *
-                                               0.05) + 0.5
-                                      ELSE
-                                       COMPUTE WRK-KEISAN =
-                                             ((WRK-KHNTEN -
-                                               WRK-SENTEI-KHNTEN)    *
-                                               SYS-5000-SENTEI-TANKA *
-                                               0.05)
-                                      END-IF
+                                               WRK-S4) + WRK-S3
                                       COMPUTE  NYUIN-TGMONEY-TAX =
                                                NYUIN-TGMONEY-TAX +
                                                WRK-KEISAN
@@ -4391,19 +4395,11 @@ grpsys                            SPA-AREA
                                               WRK-SENTEI-GAIHAKU2)
                                               *  SYS-5000-SENTEI-TANKA)
                                      IF  SYU-SRYYMD(1:6) >= "200704"
-                                      IF    WRK-TAX1001-KBN  =  "1"
-                                       COMPUTE WRK-KEISAN =
+                                      COMPUTE  WRK-KEISAN =
                                              ((WRK-SENTEI-GAIHAKU1 -
                                                WRK-SENTEI-GAIHAKU2)  *
                                                SYS-5000-SENTEI-TANKA *
-                                               0.05) + 0.5
-                                      ELSE
-                                       COMPUTE WRK-KEISAN =
-                                             ((WRK-SENTEI-GAIHAKU1 -
-                                               WRK-SENTEI-GAIHAKU2)  *
-                                               SYS-5000-SENTEI-TANKA *
-                                               0.05)
-                                      END-IF
+                                               WRK-S4) + WRK-S3
                                       COMPUTE  NYUIN-TGMONEY-TAX =
                                                NYUIN-TGMONEY-TAX +
                                                WRK-KEISAN
@@ -4419,19 +4415,11 @@ grpsys                            SPA-AREA
                                             ((WRK-SENTEI-GAIHAKU1 -
                                               WRK-SENTEI-GAIHAKU2)
                                               *  SYS-5000-SENTEI-TANKA)
-                                     IF    WRK-TAX1001-KBN  =  "1"
-                                       COMPUTE WRK-KEISAN =
-                                             ((WRK-SENTEI-GAIHAKU1 -
-                                               WRK-SENTEI-GAIHAKU2)  *
-                                               SYS-5000-SENTEI-TANKA *
-                                               0.05) + 0.5
-                                     ELSE
-                                       COMPUTE WRK-KEISAN =
-                                             ((WRK-SENTEI-GAIHAKU1 -
-                                               WRK-SENTEI-GAIHAKU2)  *
-                                               SYS-5000-SENTEI-TANKA *
-                                               0.05)
-                                     END-IF
+                                     COMPUTE  WRK-KEISAN =
+                                            ((WRK-SENTEI-GAIHAKU1 -
+                                              WRK-SENTEI-GAIHAKU2)  *
+                                              SYS-5000-SENTEI-TANKA *
+                                              WRK-S4) + WRK-S3
                                      COMPUTE  NYUIN-TGMONEY-TAX =
                                               NYUIN-TGMONEY-TAX +
                                               WRK-KEISAN
@@ -4452,19 +4440,11 @@ grpsys                            SPA-AREA
                                                WRK-SENTEI-GAIHAKU2)
                                                *  SYS-5000-SENTEI-TANKA)
                                       IF  SYU-SRYYMD(1:6) >= "200704"
-                                       IF    WRK-TAX1001-KBN  =  "1"
-                                        COMPUTE WRK-KEISAN =
+                                       COMPUTE  WRK-KEISAN =
                                               ((WRK-SENTEI-GAIHAKU1 -
                                                 WRK-SENTEI-GAIHAKU2)  *
                                                 SYS-5000-SENTEI-TANKA *
-                                                0.05) + 0.5
-                                       ELSE
-                                        COMPUTE WRK-KEISAN =
-                                              ((WRK-SENTEI-GAIHAKU1 -
-                                                WRK-SENTEI-GAIHAKU2)  *
-                                                SYS-5000-SENTEI-TANKA *
-                                                0.05)
-                                       END-IF
+                                                WRK-S4) + WRK-S3
                                        COMPUTE  NYUIN-TGMONEY-TAX =
                                                 NYUIN-TGMONEY-TAX +
                                                 WRK-KEISAN
@@ -4503,19 +4483,11 @@ grpsys                            SPA-AREA
                                             ((WRK-SENTEI-GAIHAKU1 -
                                               WRK-SENTEI-GAIHAKU2)
                                               *  SYS-5000-SENTEI-TANKA)
-                                     IF    WRK-TAX1001-KBN  =  "1"
-                                       COMPUTE WRK-KEISAN =
-                                             ((WRK-SENTEI-GAIHAKU1 -
-                                               WRK-SENTEI-GAIHAKU2)  *
-                                               SYS-5000-SENTEI-TANKA *
-                                               0.05) + 0.5
-                                     ELSE
-                                       COMPUTE WRK-KEISAN =
-                                             ((WRK-SENTEI-GAIHAKU1 -
-                                               WRK-SENTEI-GAIHAKU2)  *
-                                               SYS-5000-SENTEI-TANKA *
-                                               0.05)
-                                     END-IF
+                                     COMPUTE  WRK-KEISAN =
+                                            ((WRK-SENTEI-GAIHAKU1 -
+                                              WRK-SENTEI-GAIHAKU2)  *
+                                              SYS-5000-SENTEI-TANKA *
+                                              WRK-S4) + WRK-S3
                                      COMPUTE  NYUIN-TGMONEY-TAX =
                                               NYUIN-TGMONEY-TAX +
                                               WRK-KEISAN
@@ -4588,15 +4560,9 @@ grpsys                            SPA-AREA
                                               NYUIN-TGMONEY-TAX +
                                               SYS-5000-SENTEI-KINGAKU
                                      IF  SYU-SRYYMD(1:6) >= "200704"
-                                      IF    WRK-TAX1001-KBN  =  "1"
-                                       COMPUTE WRK-KEISAN =
-                                              (SYS-5000-SENTEI-KINGAKU *
-                                               0.05) + 0.5
-                                      ELSE
-                                       COMPUTE WRK-KEISAN =
-                                              (SYS-5000-SENTEI-KINGAKU *
-                                               0.05)
-                                      END-IF
+                                      COMPUTE WRK-KEISAN =
+                                             (SYS-5000-SENTEI-KINGAKU *
+                                              WRK-S4) + WRK-S3
                                       COMPUTE  NYUIN-TGMONEY-TAX =
                                                NYUIN-TGMONEY-TAX +
                                                WRK-KEISAN
@@ -4718,19 +4684,11 @@ grpsys                            SPA-AREA
                                           WRK-SENTEI-KHNTEN) * 
                                        SBTUSENTEI-DAY-TANKA(SYU-IDX))
                                  IF  SYU-SRYYMD(1:6) >= "200704"
-                                  IF    WRK-TAX1001-KBN  =  "1"
-                                   COMPUTE   WRK-KEISAN =
-                                           ((WRK-KHNTEN -
-                                             WRK-SENTEI-KHNTEN)    *
-                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                             0.05) + 0.5
-                                  ELSE
-                                   COMPUTE   WRK-KEISAN =
-                                           ((WRK-KHNTEN -
-                                             WRK-SENTEI-KHNTEN)    *
-                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                             0.05)
-                                  END-IF
+                                  COMPUTE  WRK-KEISAN =
+                                         ((WRK-KHNTEN -
+                                           WRK-SENTEI-KHNTEN)        *
+                                       SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                           WRK-S4) + WRK-S3
                                   COMPUTE  NYUIN-TGMONEY-TAX =
                                            NYUIN-TGMONEY-TAX +
                                            WRK-KEISAN
@@ -4751,19 +4709,11 @@ grpsys                            SPA-AREA
                                           WRK-SENTEI-GAIHAKU2)
                                       *  SBTUSENTEI-DAY-TANKA(SYU-IDX))
                                  IF  SYU-SRYYMD(1:6) >= "200704"
-                                  IF    WRK-TAX1001-KBN  =  "1"
-                                   COMPUTE   WRK-KEISAN =
-                                           ((WRK-SENTEI-GAIHAKU1 -
-                                             WRK-SENTEI-GAIHAKU2)  *
-                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                             0.05) + 0.5
-                                  ELSE
-                                   COMPUTE   WRK-KEISAN =
-                                           ((WRK-SENTEI-GAIHAKU1 -
-                                             WRK-SENTEI-GAIHAKU2)  *
-                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                             0.05)
-                                  END-IF
+                                  COMPUTE  WRK-KEISAN =
+                                         ((WRK-SENTEI-GAIHAKU1 -
+                                           WRK-SENTEI-GAIHAKU2)      *
+                                       SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                           WRK-S4) + WRK-S3
                                   COMPUTE  NYUIN-TGMONEY-TAX =
                                            NYUIN-TGMONEY-TAX +
                                            WRK-KEISAN
@@ -4779,19 +4729,11 @@ grpsys                            SPA-AREA
                                         ((WRK-SENTEI-GAIHAKU1 -
                                           WRK-SENTEI-GAIHAKU2)
                                       *  SBTUSENTEI-DAY-TANKA(SYU-IDX))
-                                 IF    WRK-TAX1001-KBN  =  "1"
-                                   COMPUTE   WRK-KEISAN =
-                                           ((WRK-SENTEI-GAIHAKU1 -
-                                             WRK-SENTEI-GAIHAKU2)  *
-                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                             0.05) + 0.5
-                                 ELSE
-                                   COMPUTE   WRK-KEISAN =
-                                           ((WRK-SENTEI-GAIHAKU1 -
-                                             WRK-SENTEI-GAIHAKU2)  *
-                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                             0.05)
-                                 END-IF
+                                 COMPUTE  WRK-KEISAN =
+                                        ((WRK-SENTEI-GAIHAKU1 -
+                                          WRK-SENTEI-GAIHAKU2)      *
+                                      SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                          WRK-S4) + WRK-S3
                                  COMPUTE  NYUIN-TGMONEY-TAX =
                                           NYUIN-TGMONEY-TAX +
                                           WRK-KEISAN
@@ -4812,19 +4754,11 @@ grpsys                            SPA-AREA
                                            WRK-SENTEI-GAIHAKU2)
                                        *  SBTUSENTEI-DAY-TANKA(SYU-IDX))
                                   IF  SYU-SRYYMD(1:6) >= "200704"
-                                   IF    WRK-TAX1001-KBN  =  "1"
-                                    COMPUTE   WRK-KEISAN =
-                                            ((WRK-SENTEI-GAIHAKU1 -
-                                              WRK-SENTEI-GAIHAKU2)  *
-                                      SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                              0.05) + 0.5
-                                   ELSE
-                                    COMPUTE   WRK-KEISAN =
-                                            ((WRK-SENTEI-GAIHAKU1 -
-                                              WRK-SENTEI-GAIHAKU2)  *
-                                      SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                              0.05)
-                                   END-IF
+                                   COMPUTE  WRK-KEISAN =
+                                          ((WRK-SENTEI-GAIHAKU1 -
+                                            WRK-SENTEI-GAIHAKU2)      *
+                                        SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                            WRK-S4) + WRK-S3
                                    COMPUTE  NYUIN-TGMONEY-TAX =
                                             NYUIN-TGMONEY-TAX +
                                             WRK-KEISAN
@@ -4863,19 +4797,11 @@ grpsys                            SPA-AREA
                                         ((WRK-SENTEI-GAIHAKU1 -
                                           WRK-SENTEI-GAIHAKU2)
                                       *  SBTUSENTEI-DAY-TANKA(SYU-IDX))
-                                 IF    WRK-TAX1001-KBN  =  "1"
-                                   COMPUTE   WRK-KEISAN =
-                                           ((WRK-SENTEI-GAIHAKU1 -
-                                             WRK-SENTEI-GAIHAKU2)  *
-                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                             0.05) + 0.5
-                                 ELSE
-                                   COMPUTE   WRK-KEISAN =
-                                           ((WRK-SENTEI-GAIHAKU1 -
-                                             WRK-SENTEI-GAIHAKU2)  *
-                                     SBTUSENTEI-DAY-TANKA(SYU-IDX) *
-                                             0.05)
-                                 END-IF
+                                 COMPUTE  WRK-KEISAN =
+                                        ((WRK-SENTEI-GAIHAKU1 -
+                                          WRK-SENTEI-GAIHAKU2)      *
+                                      SBTUSENTEI-DAY-TANKA(SYU-IDX) *
+                                          WRK-S4) + WRK-S3
                                  COMPUTE  NYUIN-TGMONEY-TAX =
                                           NYUIN-TGMONEY-TAX +
                                           WRK-KEISAN
@@ -4923,15 +4849,9 @@ grpsys                            SPA-AREA
                                           NYUIN-TGMONEY-TAX +
                                        SBTUSENTEI-DAY-KINGAKU(SYU-IDX)
                                  IF  SYU-SRYYMD(1:6) >= "200704"
-                                  IF    WRK-TAX1001-KBN  =  "1"
-                                   COMPUTE WRK-KEISAN =
+                                  COMPUTE  WRK-KEISAN =
                                      (SBTUSENTEI-DAY-KINGAKU(SYU-IDX) *
-                                           0.05) + 0.5
-                                  ELSE
-                                   COMPUTE WRK-KEISAN =
-                                     (SBTUSENTEI-DAY-KINGAKU(SYU-IDX) *
-                                           0.05)
-                                  END-IF
+                                           WRK-S4) + WRK-S3
                                   COMPUTE  NYUIN-TGMONEY-TAX =
                                            NYUIN-TGMONEY-TAX +
                                            WRK-KEISAN

@@ -380,6 +380,7 @@
       *                                     ¡ÊÉéÃ´¶â³Û£±£°±ßÌ¤Ëþ»Í¼Î¸ÞÆþ¡Ë
       *  04.07.12    NACL-ÌçÏÆ    14/02/21  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÅÀ¿ôÃ±²ÁÀßÄê
       *                                     ÂÐ±þ
+      *  04.07.13    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -457,6 +458,11 @@
            03  WK-CYOKI-ENTANI-TOKU75  PIC 9(08).
            03  WK-CYOKI-ZAN-XXX        PIC 9(08).
            03  WK-DAY-KEISAN           PIC 9(08).
+           03  WK-S1                   PIC 9(03).
+           03  WK-S2                   PIC 9(03).
+           03  WK-S3                   PIC 9V99999.
+           03  WK-S4                   PIC 9V99.
+           03  WK-S5                   PIC 9V99.
        01  FLG-AREA.
            03  FLG-SYUNOU              PIC 9(01).
            03  FLG-HKNNUM              PIC 9(01).
@@ -1710,6 +1716,9 @@
       *
                MOVE      SYS-1001-TAX-HASU-KBN       
                                         TO    WK-TAX1001-KBN
+               IF   WK-TAX1001-KBN = SPACE
+                  MOVE   "2"            TO    WK-TAX1001-KBN
+               END-IF
                MOVE      SYS-1001-PREFNUM
                                         TO    WK-1001-PREFNUM
                MOVE      SYS-1001-JIHIPOSITION
@@ -1793,6 +1802,27 @@
                MOVE     "key10"             TO    MCP-PATHNAME
                PERFORM   DB-CLOSE-SEC
            END-IF.
+      *
+      *    ¾ÃÈñÀÇ·×»»¤Î·¸¿ôÀßÄê
+           IF  LNK-SYU-SRYYMD(1:6) >= "201404"
+               MOVE       8      TO  WK-S1
+               MOVE     108      TO  WK-S2
+               MOVE     0.08     TO  WK-S4
+               MOVE     1.08     TO  WK-S5
+           ELSE
+               MOVE       5      TO  WK-S1
+               MOVE     105      TO  WK-S2
+               MOVE     0.05     TO  WK-S4
+               MOVE     1.05     TO  WK-S5
+           END-IF.
+           EVALUATE  WK-TAX1001-KBN
+               WHEN      "1"
+                 MOVE   0.50000  TO  WK-S3
+               WHEN      "2"
+                 MOVE   0.00000  TO  WK-S3
+               WHEN      "3"
+                 MOVE   0.99999  TO  WK-S3
+           END-EVALUATE.
       *
       *    ÊÝ¸±ÁÈ¹ç¤»¥Þ¥¹¥¿¤Î¸¡º÷
            INITIALIZE                           HKNCOMBI-REC.
@@ -1961,24 +1991,16 @@
                                             LNK-SYU-SKYMONEY-LIFE-KEI.
       *
            IF    LNK-SYU-SRYYMD(1:6)       >=   "200704"
-             IF    WK-TAX1001-KBN  =  "1"
-                COMPUTE LNK-SYU-JIHI-TAX =
-                       (LNK-SYU-JIHI-TOTAL-TAX  * 5 / 105) + 0.5
-                COMPUTE LNK-SYU-TGMONEY-TAX-SAI   =
-                       (LNK-SYU-TGMONEY-TAX(17) * 5 / 105) + 0.5
-                IF   WK-BRMSGK-TAXKBN    =  "1"
-                  COMPUTE LNK-SYU-RMSAGAKU-TAX-SAI    =
-                         (LNK-SYU-RMSAGAKU      * 5 / 105) + 0.5
-                END-IF
-             ELSE
-                COMPUTE LNK-SYU-JIHI-TAX =
-                       (LNK-SYU-JIHI-TOTAL-TAX  * 5 / 105)
-                COMPUTE LNK-SYU-TGMONEY-TAX-SAI   =
-                       (LNK-SYU-TGMONEY-TAX(17) * 5 / 105)
-                IF   WK-BRMSGK-TAXKBN    =  "1"
-                  COMPUTE LNK-SYU-RMSAGAKU-TAX-SAI    =
-                         (LNK-SYU-RMSAGAKU      * 5 / 105)
-                END-IF
+             COMPUTE    LNK-SYU-JIHI-TAX =
+                       (LNK-SYU-JIHI-TOTAL-TAX  * WK-S1 / WK-S2)
+                                                        + WK-S3
+             COMPUTE    LNK-SYU-TGMONEY-TAX-SAI   =
+                       (LNK-SYU-TGMONEY-TAX(17) * WK-S1 / WK-S2)
+                                                        + WK-S3
+             IF   WK-BRMSGK-TAXKBN    =  "1"
+               COMPUTE  LNK-SYU-RMSAGAKU-TAX-SAI    =
+                       (LNK-SYU-RMSAGAKU        * WK-S1 / WK-S2)
+                                                        + WK-S3
              END-IF
       *      ÀÁµá¶â³Û¤Î·×»»¡ÊÄ´À°¶â´Þ¤Þ¤º¡Ë
              COMPUTE    LNK-SYU-SKYMONEY  =
@@ -2023,13 +2045,9 @@
                           LNK-SYU-TAX-TAISHOU     +
                           LNK-SYU-RMSAGAKU
              END-IF
-             IF    WK-TAX1001-KBN  =  "1"
-                 COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
-                         (LNK-SYU-TAX-TAISHOU  * 5 / 105) + 0.5
-             ELSE
-                 COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
-                         (LNK-SYU-TAX-TAISHOU  * 5 / 105)
-             END-IF
+             COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
+                     (LNK-SYU-TAX-TAISHOU * WK-S1 / WK-S2)
+                                                  + WK-S3
       *
       ***    COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI       =
       ***             LNK-SYU-JIHI-TAX               +
@@ -2045,32 +2063,17 @@
                  ( COMB-HOJOKBN           =  "1"        )
               CONTINUE
              ELSE
-              IF    WK-TAX1001-KBN  =  "1"
-                COMPUTE LNK-SYU-JIHI-TAX =
-                       (LNK-SYU-JIHI-TOTAL-TAX  * 0.05)  +  0.5
-                COMPUTE LNK-SYU-TGMONEY-TAX-SAI   =
-                       (LNK-SYU-TGMONEY-TAX(17) * 0.05)  +  0.5
-                COMPUTE LNK-SYU-TGMONEY-TAX(17)   = 
-                       (LNK-SYU-TGMONEY-TAX(17) * 1.05)  +  0.5
-                IF   WK-BRMSGK-TAXKBN    =  "1"
-                  COMPUTE  LNK-SYU-RMSAGAKU-TAX-SAI  =
-                          (LNK-SYU-RMSAGAKU     * 0.05)  +  0.5
-                  COMPUTE  LNK-SYU-RMSAGAKU  =
-                          (LNK-SYU-RMSAGAKU     * 1.05)  +  0.5
-                END-IF
-              ELSE
-                COMPUTE LNK-SYU-JIHI-TAX =
-                        LNK-SYU-JIHI-TOTAL-TAX  * 0.05
-                COMPUTE LNK-SYU-TGMONEY-TAX-SAI   = 
-                        LNK-SYU-TGMONEY-TAX(17) * 0.05
-                COMPUTE LNK-SYU-TGMONEY-TAX(17)   = 
-                        LNK-SYU-TGMONEY-TAX(17) * 1.05
-                IF   WK-BRMSGK-TAXKBN    =  "1"
-                  COMPUTE  LNK-SYU-RMSAGAKU-TAX-SAI  =
-                           LNK-SYU-RMSAGAKU     * 0.05
-                  COMPUTE  LNK-SYU-RMSAGAKU  =
-                           LNK-SYU-RMSAGAKU     * 1.05
-                END-IF
+              COMPUTE   LNK-SYU-JIHI-TAX =
+                       (LNK-SYU-JIHI-TOTAL-TAX  * WK-S4) + WK-S3
+              COMPUTE   LNK-SYU-TGMONEY-TAX-SAI   =
+                       (LNK-SYU-TGMONEY-TAX(17) * WK-S4) + WK-S3
+              COMPUTE   LNK-SYU-TGMONEY-TAX(17)   = 
+                       (LNK-SYU-TGMONEY-TAX(17) * WK-S5) + WK-S3
+              IF   WK-BRMSGK-TAXKBN    =  "1"
+                COMPUTE LNK-SYU-RMSAGAKU-TAX-SAI  =
+                       (LNK-SYU-RMSAGAKU        * WK-S4) + WK-S3
+                COMPUTE LNK-SYU-RMSAGAKU  =
+                       (LNK-SYU-RMSAGAKU        * WK-S5) + WK-S3
               END-IF
              END-IF
       *      ÀÁµá¶â³Û¤Î·×»»¡ÊÄ´À°¶â´Þ¤Þ¤º¡Ë
@@ -2103,17 +2106,10 @@
       *      ¼«ÈñÊÝ¸±¤ÎÊä½õ¶èÊ¬¤¬²ÝÀÇ¤Î¾ì¹ç¡¢¾ÃÈñÀÇ·×»»¤ò¹Ô¤¦
              IF  ( COMB-SYU-HKNKOHSBTKBN  =  "8" OR "9" ) AND
                  ( COMB-HOJOKBN           =  "1"        )
-               IF    WK-TAX1001-KBN  =  "1"
-                 COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
-                        ( LNK-SYU-SKYMONEY  *  0.05 ) + 0.5
-                 COMPUTE  LNK-SYU-SKYMONEY          =
-                        ( LNK-SYU-SKYMONEY  *  1.05 ) + 0.5
-               ELSE
-                 COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
-                          LNK-SYU-SKYMONEY  *  0.05
-                 COMPUTE  LNK-SYU-SKYMONEY          =
-                          LNK-SYU-SKYMONEY  *  1.05
-               END-IF
+               COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
+                      ( LNK-SYU-SKYMONEY  *  WK-S4 ) + WK-S3
+               COMPUTE  LNK-SYU-SKYMONEY          =
+                      ( LNK-SYU-SKYMONEY  *  WK-S5 ) + WK-S3
              ELSE
                COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI       =
                         LNK-SYU-JIHI-TAX               +
@@ -2297,13 +2293,9 @@
                                  LNK-SYU-TAX-TAISHOU     +
                                  LNK-SYU-RMSAGAKU
                      END-IF
-                     IF    WK-TAX1001-KBN  =  "1"
-                        COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
-                                (LNK-SYU-TAX-TAISHOU  * 5 / 105) + 0.5
-                     ELSE
-                        COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
-                                (LNK-SYU-TAX-TAISHOU  * 5 / 105)
-                     END-IF
+                     COMPUTE    LNK-SYU-SKYMONEY-TAX-SAI  =
+                               (LNK-SYU-TAX-TAISHOU * WK-S1 / WK-S2)
+                                                            + WK-S3
       ***            COMPUTE    LNK-SYU-SKYMONEY-TAX-SAI  =
       ***                       LNK-SYU-SKYMONEY-TAX-SAI  +
       ***                       LNK-SYU-RSI-TAX-SAI    
@@ -2452,13 +2444,9 @@
                             LNK-SYU-TAX-TAISHOU   +
                             LNK-SYU-RMSAGAKU
                 END-IF
-                IF    WK-TAX1001-KBN  =  "1"
-                   COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
-                           (LNK-SYU-TAX-TAISHOU  * 5 / 105) + 0.5
-                ELSE
-                   COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
-                           (LNK-SYU-TAX-TAISHOU  * 5 / 105)
-                END-IF
+                COMPUTE  LNK-SYU-SKYMONEY-TAX-SAI  =
+                        (LNK-SYU-TAX-TAISHOU * WK-S1 / WK-S2)
+                                                     + WK-S3
                 COMPUTE  WK-GENTAI-SKYMONEY       =
                          WK-GENTAI-SKYMONEY       +
                          LNK-SYU-RSISHOSHIN-MONEY +
@@ -3171,14 +3159,12 @@
       *
            IF   WK-4001-TAXKBN   =   "2"
       *
-              IF    WK-TAX1001-KBN  =  "1"
-      *
                  PERFORM   VARYING   IDX4    FROM   1   BY   1
                             UNTIL   (IDX4                    >    50 )
                               OR    (WK-SONOTA91-SRYCD(IDX4) =  SPACE)
       *
                    COMPUTE  WK-KEISAN  =
-                           (WK-SONOTA91-TANKA(IDX4)  *  0.05)  +  0.5
+                           (WK-SONOTA91-TANKA(IDX4) * WK-S4) + WK-S3
                    COMPUTE  WK-KEISAN  =  WK-KEISAN
                                        *  WK-SONOTA91-ZAIKAISU(IDX4)
                    COMPUTE  LNK-SYU-RSI-TAX-SAI  = LNK-SYU-RSI-TAX-SAI
@@ -3201,7 +3187,7 @@
                               OR    (WK-SONOTA92-SRYCD(IDX4) =  SPACE)
       *
                    COMPUTE  WK-KEISAN  =
-                           (WK-SONOTA92-TANKA(IDX4)  *  0.05)  +  0.5
+                           (WK-SONOTA92-TANKA(IDX4) * WK-S4) + WK-S3
                    COMPUTE  WK-KEISAN  =  WK-KEISAN
                                        *  WK-SONOTA92-ZAIKAISU(IDX4)
                    COMPUTE  LNK-SYU-RSI-TAX-SAI  = LNK-SYU-RSI-TAX-SAI
@@ -3218,56 +3204,6 @@
                    END-IF
       *
                  END-PERFORM
-      *
-              ELSE
-      *
-                 PERFORM   VARYING   IDX4    FROM   1   BY   1
-                            UNTIL   (IDX4                    >    50 )
-                              OR    (WK-SONOTA91-SRYCD(IDX4) =  SPACE)
-      *
-                   COMPUTE  WK-KEISAN  =
-                           (WK-SONOTA91-TANKA(IDX4)  *  0.05)
-                   COMPUTE  WK-KEISAN  =  WK-KEISAN
-                                       *  WK-SONOTA91-ZAIKAISU(IDX4)
-                   COMPUTE  LNK-SYU-RSI-TAX-SAI  = LNK-SYU-RSI-TAX-SAI
-                                                 + WK-KEISAN
-                   COMPUTE  LNK-SYU-RSIETC-MONEY = LNK-SYU-RSIETC-MONEY
-                                                 + WK-KEISAN
-                   IF    LNK-SYU-SRYYMD(1:6)       >=   "200704"
-                     COMPUTE  WK-KEISAN-JIBAI =
-                              WK-SONOTA91-TANKA(IDX4)    *
-                              WK-SONOTA91-ZAIKAISU(IDX4)
-                     COMPUTE  WK-RSIETC-ZEITAISYO = WK-RSIETC-ZEITAISYO
-                                                  + WK-KEISAN-JIBAI
-                                                  + WK-KEISAN
-                   END-IF
-      *
-                 END-PERFORM
-      *
-                 PERFORM   VARYING   IDX4    FROM   1   BY   1
-                            UNTIL   (IDX4                    >    50 )
-                              OR    (WK-SONOTA92-SRYCD(IDX4) =  SPACE)
-      *
-                   COMPUTE  WK-KEISAN  =
-                           (WK-SONOTA92-TANKA(IDX4)  *  0.05)
-                   COMPUTE  WK-KEISAN  =  WK-KEISAN
-                                       *  WK-SONOTA92-ZAIKAISU(IDX4)
-                   COMPUTE  LNK-SYU-RSI-TAX-SAI  = LNK-SYU-RSI-TAX-SAI
-                                                 + WK-KEISAN
-                   COMPUTE  LNK-SYU-RSIETC-MONEY = LNK-SYU-RSIETC-MONEY
-                                                 + WK-KEISAN
-                   IF    LNK-SYU-SRYYMD(1:6)       >=   "200704"
-                     COMPUTE  WK-KEISAN-JIBAI =
-                              WK-SONOTA92-TANKA(IDX4)    *
-                              WK-SONOTA92-ZAIKAISU(IDX4)
-                     COMPUTE  WK-RSIETC-ZEITAISYO = WK-RSIETC-ZEITAISYO
-                                                  + WK-KEISAN-JIBAI
-                                                  + WK-KEISAN
-                   END-IF
-      *
-                 END-PERFORM
-      *
-              END-IF
       *
            END-IF.
       *
@@ -3275,14 +3211,12 @@
       *
            IF   WK-4001-TAXKBN-KZI   =   "2"
       *
-              IF    WK-TAX1001-KBN  =  "1"
-      *
                  PERFORM   VARYING   IDX4    FROM   1   BY   1
                             UNTIL   (IDX4                    >    50 )
                               OR    (WK-SONOTA93-SRYCD(IDX4) =  SPACE)
       *
                    COMPUTE  WK-KEISAN  =
-                           (WK-SONOTA93-TANKA(IDX4)  *  0.05)  +  0.5
+                           (WK-SONOTA93-TANKA(IDX4) * WK-S4) + WK-S3
                    COMPUTE  WK-KEISAN  =  WK-KEISAN
                                        *  WK-SONOTA93-ZAIKAISU(IDX4)
                    COMPUTE  LNK-SYU-RSI-TAX-SAI  = LNK-SYU-RSI-TAX-SAI
@@ -3299,33 +3233,6 @@
                    END-IF
       *
                  END-PERFORM
-      *
-              ELSE
-      *
-                 PERFORM   VARYING   IDX4    FROM   1   BY   1
-                            UNTIL   (IDX4                    >    50 )
-                              OR    (WK-SONOTA93-SRYCD(IDX4) =  SPACE)
-      *
-                   COMPUTE  WK-KEISAN  =
-                           (WK-SONOTA93-TANKA(IDX4)  *  0.05)
-                   COMPUTE  WK-KEISAN  =  WK-KEISAN
-                                       *  WK-SONOTA93-ZAIKAISU(IDX4)
-                   COMPUTE  LNK-SYU-RSI-TAX-SAI  = LNK-SYU-RSI-TAX-SAI
-                                                 + WK-KEISAN
-                   COMPUTE  LNK-SYU-RSIETC-MONEY = LNK-SYU-RSIETC-MONEY
-                                                 + WK-KEISAN
-                   IF    LNK-SYU-SRYYMD(1:6)       >=   "200704"
-                     COMPUTE  WK-KEISAN-JIBAI =
-                              WK-SONOTA93-TANKA(IDX4)    *
-                              WK-SONOTA93-ZAIKAISU(IDX4)
-                     COMPUTE  WK-RSIETC-ZEITAISYO = WK-RSIETC-ZEITAISYO
-                                                  + WK-KEISAN-JIBAI
-                                                  + WK-KEISAN
-                   END-IF
-      *
-                 END-PERFORM
-      *
-              END-IF
       *
            END-IF.
       *
@@ -3540,13 +3447,8 @@
                             LNK-SYU-HKNTEN (IDX9) *  HKN-TENTNK
                     COMPUTE WK-JIHIGAKU2  =
                             WK-JIHIGAKU           *  WK-JIHIFTN
-                    IF    WK-TAX1001-KBN  =  "1"
-                       COMPUTE WK-JIHIGAKU3  =
-                              (WK-JIHIGAKU2  * 0.05) + 0.5
-                    ELSE
-                       COMPUTE WK-JIHIGAKU3  =
-                              (WK-JIHIGAKU2  * 0.05)
-                    END-IF
+                    COMPUTE WK-JIHIGAKU3  =
+                           (WK-JIHIGAKU2  *  WK-S4) + WK-S3
                     IF    IDX9  =  17
                        MOVE   ZERO  TO  WK-JIHIGAKU2
                        MOVE   ZERO  TO  WK-JIHIGAKU3
@@ -21170,13 +21072,9 @@
                   MOVE    WK-NYULIFE-SKJ-MONEY(IDY)
                                            TO LNK-SYU-SHOKUJI5
                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    IF    WK-TAX1001-KBN  =  "1"
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-NYULIFE-SKJ-MONEY(IDY) * 0.05) + 0.5
-                    ELSE
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-NYULIFE-SKJ-MONEY(IDY) * 0.05)
-                    END-IF
+                    COMPUTE   WK-SKJ-ZEI   =
+                             (WK-NYULIFE-SKJ-MONEY(IDY) * WK-S4)
+                                                        + WK-S3
                     COMPUTE   WK-SKJ-ZEIKEI2L  =
                               WK-SKJ-ZEIKEI2L  +
                              (WK-SKJ-ZEI   *  WK-SHOKUJI-NYUINJI(IDY))
@@ -21193,13 +21091,9 @@
                       MOVE    WK-SHOKUJI-KINGAKU(6)
                                            TO LNK-SYU-SHOKUJI7
                       IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                        IF    WK-TAX1001-KBN  =  "1"
-                          COMPUTE WK-SKJ-ZEI   =
-                                 (WK-SHOKUJI-KINGAKU(6) * 0.05) + 0.5
-                        ELSE
-                          COMPUTE WK-SKJ-ZEI   =
-                                 (WK-SHOKUJI-KINGAKU(6) * 0.05)
-                        END-IF
+                        COMPUTE   WK-SKJ-ZEI   =
+                                 (WK-SHOKUJI-KINGAKU(6) * WK-S4)
+                                                        + WK-S3
                         COMPUTE   WK-SKJ-ZEIKEI2L  =
                                   WK-SKJ-ZEIKEI2L  +
                                  (WK-SKJ-ZEI * WK-SHOKUJI-TOKUSYO(IDY))
@@ -21215,13 +21109,9 @@
                       MOVE    WK-SHOKUJI-KINGAKU(7)
                                            TO LNK-SYU-SHOKUJI8
                       IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                        IF    WK-TAX1001-KBN  =  "1"
-                          COMPUTE WK-SKJ-ZEI   =
-                                 (WK-SHOKUJI-KINGAKU(7) * 0.05) + 0.5
-                        ELSE
-                          COMPUTE WK-SKJ-ZEI   =
-                                 (WK-SHOKUJI-KINGAKU(7) * 0.05)
-                        END-IF
+                        COMPUTE   WK-SKJ-ZEI   =
+                                 (WK-SHOKUJI-KINGAKU(7) * WK-S4)
+                                                        + WK-S3
                         COMPUTE   WK-SKJ-ZEIKEI2L  =
                                   WK-SKJ-ZEIKEI2L  +
                                   WK-SKJ-ZEI
@@ -21243,13 +21133,9 @@
                   MOVE    WK-NYULIFE-SKJ-MONEY(IDY)
                                            TO LNK-SYU-SHOKUJI6
                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    IF    WK-TAX1001-KBN  =  "1"
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-NYULIFE-SKJ-MONEY(IDY) * 0.05) + 0.5
-                    ELSE
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-NYULIFE-SKJ-MONEY(IDY) * 0.05)
-                    END-IF
+                    COMPUTE   WK-SKJ-ZEI   =
+                             (WK-NYULIFE-SKJ-MONEY(IDY) * WK-S4)
+                                                        + WK-S3
                     COMPUTE   WK-SKJ-ZEIKEI2L  =
                               WK-SKJ-ZEIKEI2L  +
                              (WK-SKJ-ZEI   *  WK-SHOKUJI-NYUINJI(IDY))
@@ -21327,13 +21213,9 @@
                   MOVE    WK-NYULIFE-KAN-MONEY(IDY)
                                         TO  LNK-SYU-SHOKUJI9
                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    IF    WK-TAX1001-KBN  =  "1"
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-NYULIFE-KAN-MONEY(IDY) * 0.05) + 0.5
-                    ELSE
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-NYULIFE-KAN-MONEY(IDY) * 0.05)
-                    END-IF
+                    COMPUTE   WK-SKJ-ZEI   =
+                             (WK-NYULIFE-KAN-MONEY(IDY) * WK-S4)
+                                                        + WK-S3
                     COMPUTE   WK-SKJ-ZEIKEI2L  =
                               WK-SKJ-ZEIKEI2L  +
                               WK-SKJ-ZEI
@@ -21350,13 +21232,9 @@
                   MOVE    WK-NYULIFE-KAN-MONEY(IDY)
                                         TO  LNK-SYU-SHOKUJI10
                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    IF    WK-TAX1001-KBN  =  "1"
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-NYULIFE-KAN-MONEY(IDY) * 0.05) + 0.5
-                    ELSE
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-NYULIFE-KAN-MONEY(IDY) * 0.05)
-                    END-IF
+                    COMPUTE   WK-SKJ-ZEI   =
+                             (WK-NYULIFE-KAN-MONEY(IDY) * WK-S4)
+                                                        + WK-S3
                     COMPUTE   WK-SKJ-ZEIKEI2L  =
                               WK-SKJ-ZEIKEI2L  +
                               WK-SKJ-ZEI
@@ -21411,13 +21289,9 @@
                   MOVE    WK-SHOKUJI-KINGAKU(1)
                                            TO LNK-SYU-SHOKUJI1
                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    IF    WK-TAX1001-KBN  =  "1"
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(1) * 0.05) + 0.5
-                    ELSE
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(1) * 0.05)
-                    END-IF
+                    COMPUTE   WK-SKJ-ZEI   =
+                             (WK-SHOKUJI-KINGAKU(1) * WK-S4)
+                                                    + WK-S3
                     COMPUTE   WK-SKJ-ZEIKEI2  =
                               WK-SKJ-ZEIKEI2  +
                              (WK-SKJ-ZEI   *  WK-SHOKUJI-NYUINJI(IDY))
@@ -21434,13 +21308,9 @@
                       MOVE    WK-SHOKUJI-KINGAKU(3)
                                            TO LNK-SYU-SHOKUJI3
                       IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                        IF    WK-TAX1001-KBN  =  "1"
-                          COMPUTE WK-SKJ-ZEI   =
-                                 (WK-SHOKUJI-KINGAKU(3) * 0.05) + 0.5
-                        ELSE
-                          COMPUTE WK-SKJ-ZEI   =
-                                 (WK-SHOKUJI-KINGAKU(3) * 0.05)
-                        END-IF
+                        COMPUTE   WK-SKJ-ZEI   =
+                                 (WK-SHOKUJI-KINGAKU(3) * WK-S4)
+                                                        + WK-S3
                         COMPUTE   WK-SKJ-ZEIKEI2  =
                                   WK-SKJ-ZEIKEI2  +
                                  (WK-SKJ-ZEI * WK-SHOKUJI-TOKUSYO(IDY))
@@ -21456,13 +21326,9 @@
                       MOVE    WK-SHOKUJI-KINGAKU(4)
                                            TO LNK-SYU-SHOKUJI4
                       IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                        IF    WK-TAX1001-KBN  =  "1"
-                          COMPUTE WK-SKJ-ZEI   =
-                                 (WK-SHOKUJI-KINGAKU(4) * 0.05) + 0.5
-                        ELSE
-                          COMPUTE WK-SKJ-ZEI   =
-                                 (WK-SHOKUJI-KINGAKU(4) * 0.05)
-                        END-IF
+                        COMPUTE   WK-SKJ-ZEI   =
+                                 (WK-SHOKUJI-KINGAKU(4) * WK-S4)
+                                                        + WK-S3
                         COMPUTE   WK-SKJ-ZEIKEI2  =
                                   WK-SKJ-ZEIKEI2  +
                                   WK-SKJ-ZEI
@@ -21484,13 +21350,9 @@
                   MOVE    WK-SHOKUJI-KINGAKU(2)
                                            TO LNK-SYU-SHOKUJI2
                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    IF    WK-TAX1001-KBN  =  "1"
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(2) * 0.05) + 0.5
-                    ELSE
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(2) * 0.05)
-                    END-IF
+                    COMPUTE   WK-SKJ-ZEI   =
+                             (WK-SHOKUJI-KINGAKU(2) * WK-S4)
+                                                    + WK-S3
                     COMPUTE   WK-SKJ-ZEIKEI2  =
                               WK-SKJ-ZEIKEI2  +
                              (WK-SKJ-ZEI   *  WK-SHOKUJI-NYUINJI(IDY))
@@ -21574,13 +21436,9 @@
                AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
       *          É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
                  IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                   IF    WK-TAX1001-KBN  =  "1"
-                     COMPUTE WK-SKJ-ZEI   =
-                            (WK-SHOKUJI-KINGAKU(5) * 0.05) + 0.5
-                   ELSE
-                     COMPUTE WK-SKJ-ZEI   =
-                            (WK-SHOKUJI-KINGAKU(5) * 0.05)
-                   END-IF
+                   COMPUTE   WK-SKJ-ZEI   =
+                            (WK-SHOKUJI-KINGAKU(5) * WK-S4)
+                                                   + WK-S3
                    COMPUTE   WK-SKJ-ZEIKEIL  =
                              WK-SKJ-ZEIKEIL  +
                             (WK-SKJ-ZEI   *  WK-ROSAITOKU96(IDY))
@@ -21629,13 +21487,9 @@
                   MOVE    WK-SHOKUJI-KINGAKU(5)
                                             TO  LNK-SYU-SHOKUJI7
                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    IF    WK-TAX1001-KBN  =  "1"
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(5) * 0.05) + 0.5
-                    ELSE
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(5) * 0.05)
-                    END-IF
+                    COMPUTE   WK-SKJ-ZEI   =
+                             (WK-SHOKUJI-KINGAKU(5) * WK-S4)
+                                                    + WK-S3
                     COMPUTE   WK-SKJ-ZEIKEI2L =
                               WK-SKJ-ZEIKEI2L +
                              (WK-SKJ-ZEI   *  WK-ROSAITOKU97(IDY))
@@ -21664,13 +21518,9 @@
                AND      ( LNK-SYU-DAY(IDY)         =  "2"        )
       *          É¸½àÉéÃ´³Û¡ÊÏ«ºÒÆþ±¡Ãæ¡Ë
                  IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                   IF    WK-TAX1001-KBN  =  "1"
-                     COMPUTE WK-SKJ-ZEI   =
-                            (WK-SHOKUJI-KINGAKU(5) * 0.05) + 0.5
-                   ELSE
-                     COMPUTE WK-SKJ-ZEI   =
-                            (WK-SHOKUJI-KINGAKU(5) * 0.05)
-                   END-IF
+                   COMPUTE   WK-SKJ-ZEI   =
+                            (WK-SHOKUJI-KINGAKU(5) * WK-S4)
+                                                   + WK-S3
                    COMPUTE   WK-SKJ-ZEIKEI   =
                              WK-SKJ-ZEIKEI   +
                             (WK-SKJ-ZEI   *  WK-ROSAITOKU96(IDY))
@@ -21719,13 +21569,9 @@
                   MOVE    WK-SHOKUJI-KINGAKU(5)
                                             TO  LNK-SYU-SHOKUJI3
                   IF    LNK-SYU-SRYYMD(1:6)   >=   "200704"
-                    IF    WK-TAX1001-KBN  =  "1"
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(5) * 0.05) + 0.5
-                    ELSE
-                      COMPUTE WK-SKJ-ZEI   =
-                             (WK-SHOKUJI-KINGAKU(5) * 0.05)
-                    END-IF
+                    COMPUTE   WK-SKJ-ZEI   =
+                             (WK-SHOKUJI-KINGAKU(5) * WK-S4)
+                                                    + WK-S3
                     COMPUTE   WK-SKJ-ZEIKEI2  =
                               WK-SKJ-ZEIKEI2  +
                              (WK-SKJ-ZEI   *  WK-ROSAITOKU97(IDY))
@@ -28439,13 +28285,8 @@
                  IF    COMB-HOJOKBN       =  "1"
                    CONTINUE
                  ELSE
-                   IF    WK-TAX1001-KBN  =  "1"
-                     COMPUTE LNK-SYU-SKYMONEY-SKJ-TAX   =
-                           ( LNK-SYU-SKYMONEY-SKJ  *   0.05 )  +  0.5
-                   ELSE
-                     COMPUTE LNK-SYU-SKYMONEY-SKJ-TAX   =
-                           ( LNK-SYU-SKYMONEY-SKJ  *   0.05 )
-                   END-IF
+                   COMPUTE  LNK-SYU-SKYMONEY-SKJ-TAX   =
+                          ( LNK-SYU-SKYMONEY-SKJ  *  WK-S4 ) + WK-S3
                  END-IF
                END-IF
              ELSE
@@ -28478,13 +28319,8 @@
                  IF    COMB-HOJOKBN       =  "1"
                    CONTINUE
                  ELSE
-                   IF    WK-TAX1001-KBN  =  "1"
-                     COMPUTE LNK-SYU-SKYMONEY-LIFE-TAX   =
-                           ( LNK-SYU-SKYMONEY-LIFE  *   0.05 )  +  0.5
-                   ELSE
-                     COMPUTE LNK-SYU-SKYMONEY-LIFE-TAX   =
-                           ( LNK-SYU-SKYMONEY-LIFE  *   0.05 )
-                   END-IF
+                   COMPUTE  LNK-SYU-SKYMONEY-LIFE-TAX   =
+                          ( LNK-SYU-SKYMONEY-LIFE  *  WK-S4 ) + WK-S3
                  END-IF
                END-IF
              ELSE
@@ -28598,13 +28434,8 @@
                  ( COMB-HOJOKBN           =  "1"        )
                CONTINUE
              ELSE
-               IF    WK-TAX1001-KBN  =  "1"
-                   COMPUTE  LNK-SYU-SKYMONEY-SKJ-JIHI-TAX  =
-                          ( WK-SHOKUJI-FTN96  *  0.05 )  +  0.5
-               ELSE
-                   COMPUTE  LNK-SYU-SKYMONEY-SKJ-JIHI-TAX  =
-                          ( WK-SHOKUJI-FTN96  *  0.05 )
-               END-IF
+               COMPUTE  LNK-SYU-SKYMONEY-SKJ-JIHI-TAX  =
+                      ( WK-SHOKUJI-FTN96  *  WK-S4 ) + WK-S3
              END-IF
            END-IF.
            COMPUTE  LNK-SYU-SKYMONEY-SKJ-JIHI-KEI
@@ -28627,13 +28458,8 @@
                  ( COMB-HOJOKBN           =  "1"        )
                CONTINUE
              ELSE
-               IF    WK-TAX1001-KBN  =  "1"
-                   COMPUTE  LNK-SYU-SKYMONEY-LIFE-JIHI-TAX  =
-                          ( WK-SHOKUJI-FTN96L  *  0.05 )  +  0.5
-               ELSE
-                   COMPUTE  LNK-SYU-SKYMONEY-LIFE-JIHI-TAX  =
-                          ( WK-SHOKUJI-FTN96L  *  0.05 )
-               END-IF
+               COMPUTE  LNK-SYU-SKYMONEY-LIFE-JIHI-TAX  =
+                      ( WK-SHOKUJI-FTN96L  *  WK-S4 ) + WK-S3
              END-IF
            END-IF.
            COMPUTE  LNK-SYU-SKYMONEY-LIFE-JIHI-KEI

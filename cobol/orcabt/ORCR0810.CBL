@@ -2532,24 +2532,46 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                        IF      FLG-HKNCOMBI    =   ZERO
                            MOVE    HKNCOMBI-REC    TO
                                            WRK-HKNCOMBI-REC  (IDX1)
-      *                    医保以外読み飛ばし
-                           IF      COMB-HKNNUM NOT =   WRK-CONS-HKNNUM
+                           EVALUATE  WRK-PARA-RECEKBN
+                            WHEN     "3"
+                            WHEN     "4"
+                            WHEN     "5"
+                             IF    COMB-HKNNUM NOT =   WRK-CONS-HKNNUM
                                MOVE    "1"         TO
                                            WRK-HKNCOMBI-SYOKBN (IDX1)
-                           END-IF
+                             END-IF
+                            WHEN     "8"
+                             IF    COMB-KOHHKNNUM (1)
+                                               NOT =   WRK-CONS-HKNNUM
+                               MOVE    "1"         TO
+                                           WRK-HKNCOMBI-SYOKBN (IDX1)
+                             END-IF
+                           END-EVALUATE
                        ELSE
                            IF      COMB-DELKBN         =   "1"
                                MOVE    HKNCOMBI-REC    TO
                                                WRK-HKNCOMBI-REC  (IDX1)
-      *                        医保以外読み飛ばし
-                               IF      COMB-HKNNUM NOT =
-                                                       WRK-CONS-HKNNUM
-                                   MOVE    "1"         TO
-                                           WRK-HKNCOMBI-SYOKBN (IDX1)
-                               ELSE
-                                   MOVE    "2"             TO
-                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
-                               END-IF
+                               EVALUATE  WRK-PARA-RECEKBN
+                                WHEN     "3"
+                                WHEN     "4"
+                                WHEN     "5"
+                                 IF  COMB-HKNNUM NOT = WRK-CONS-HKNNUM
+                                     MOVE    "1"         TO
+                                             WRK-HKNCOMBI-SYOKBN (IDX1)
+                                 ELSE
+                                    MOVE     "2"         TO
+                                             WRK-HKNCOMBI-SYOKBN (IDX1)
+                                 END-IF
+                                WHEN     "8"
+                                 IF  COMB-KOHHKNNUM (1)
+                                                 NOT = WRK-CONS-HKNNUM
+                                     MOVE    "1"         TO
+                                             WRK-HKNCOMBI-SYOKBN (IDX1)
+                                 ELSE
+                                    MOVE     "2"         TO
+                                             WRK-HKNCOMBI-SYOKBN (IDX1)
+                                 END-IF
+                               END-EVALUATE
                            ELSE
                                MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI
                                                                 (IDXX)
