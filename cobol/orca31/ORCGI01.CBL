@@ -17188,7 +17188,7 @@
            END-IF
       *
            IF    ( SPA-NAI-I01-RSI-HKNKBN  =   SPACE )
-            OR   ( AGECHK-HKNKBN           =   4 OR 5 )
+            OR   ( AGECHK-HKNKBN           =   4 OR 5 OR 7 )
                EVALUATE    TRUE
                WHEN  ( WRK-AGECHK-SRYYMD   >=  CONST-H200401 )
       *

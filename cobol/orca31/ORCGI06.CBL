@@ -6164,7 +6164,7 @@
            END-IF
       *
            IF    ( SPA-NAI-HKNNUM  NOT =  "971" AND "973" )
-             OR  ( AGECHK-HKNKBN       =  4 OR 5)
+             OR  ( AGECHK-HKNKBN       =  4 OR 5 OR 7 )
                EVALUATE    TRUE
                WHEN  ( SPA-NAI-KJNYMD         >=  CONST-H200401 )
                    IF    ( AGECHK-NENREI2-YY  >=  65 )
