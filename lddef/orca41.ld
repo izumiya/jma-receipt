@@ -75,6 +75,8 @@ db	{
 	tbl_etensu_5 ;
 	tbl_nsrysrh ;
 	tbl_nrrksrh ;
+	tbl_tnkrrk;
+	tbl_tsyrrk;
 };
 
 /* #include "orcadb.inc" */

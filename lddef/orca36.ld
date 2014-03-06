@@ -41,6 +41,8 @@ db	{
 	tbl_jyurrk;
 	tbl_ptnyuinrrk;
 	tbl_ptsrh;
+	tbl_tnkrrk;
+	tbl_tsyrrk;
 };
 
 /* #include "orcadb.inc" */

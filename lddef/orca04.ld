@@ -29,6 +29,8 @@ db	{
 	tbl_ptkohinf;
 	tbl_ptrsiinf;
 	tbl_ptinf;
+	tbl_tnkrrk;
+	tbl_tsyrrk;
 };
 
 /* #include "orcadb.inc" */
