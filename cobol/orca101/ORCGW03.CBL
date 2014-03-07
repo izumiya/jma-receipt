@@ -397,7 +397,6 @@
       *
            MOVE    ZERO                TO  IDX
            PERFORM             UNTIL   FLG-SYSKANRI   =   1
-                               OR      IDX            >=  8500
                MOVE    ZERO                TO  SPA-SYORIFLG
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
       *H2.4
