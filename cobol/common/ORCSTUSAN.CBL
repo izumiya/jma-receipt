@@ -552,7 +552,7 @@
            MOVE    "tbl_nyuinacct"     TO MCP-TABLE
            MOVE    "key7"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC              =   1 )
+           IF    ( MCP-RC          NOT =   ZERO )
                MOVE    1               TO  FLG-NYUINACCT
            END-IF
       *
@@ -574,7 +574,7 @@
                MOVE    "tbl_nyuinacct"     TO MCP-TABLE
                MOVE    "key7"              TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
-               IF    ( MCP-RC              =   1 )
+               IF    ( MCP-RC         NOT  =   ZERO )
                    MOVE    1           TO  FLG-NYUINACCT
                END-IF
       *
@@ -819,7 +819,7 @@
            MOVE    "key38"             TO  MCP-PATHNAME
            MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
            PERFORM 910-DBSELECT-SEC
-           IF    ( MCP-RC              =   1 )
+           IF    ( MCP-RC          NOT =   ZERO )
                MOVE    1               TO  FLG-PTNYUINRRK
            END-IF
       *
@@ -844,7 +844,7 @@
                MOVE    "tbl_ptnyuinrrk"    TO MCP-TABLE
                MOVE    "key38"             TO  MCP-PATHNAME
                PERFORM 910-DBFETCH-SEC
-               IF    ( MCP-RC              =   1 )
+               IF    ( MCP-RC          NOT =   ZERO )
                    MOVE    1           TO  FLG-PTNYUINRRK
                END-IF
            END-PERFORM
