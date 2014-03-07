@@ -875,9 +875,6 @@ class Receden_check < Receden_common
                 if tbl_tensu["NYUTENTTLKBN"].to_i == 240  && tbl_tensu["KOKUJISKBKBN2"] == "1"
                   chozai_kaisu += zai["KAISU"].value.to_i
                 end
-                if tbl_tensu["NYUTENTTLKBN"].to_i == 240  && tbl_tensu["KOKUJISKBKBN2"] == "1"
-                  chozai_kaisu += zai["KAISU"].value.to_i
-                end
                 case rs["HOSPKBN"].value
                 when "1","2"
                   if tbl_tensu["HOSPSRYKBN"] == "2"
