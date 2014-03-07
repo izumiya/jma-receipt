@@ -34,6 +34,7 @@
       *  03.04.00    NACL-多々納  06/10/26  診療コード対応
       *  03.05.00    NACL-多々納  07/05/02  グループ診療対応
       *  04.07.00    NACL-多々納  12/03/06  平成２４年４月改正対応
+      *  04.07.00    NACL-多々納  14/03/06  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -78,7 +79,7 @@
       *
                    07  SPA-NAI-AREA.
                        09  SPA-NAI-TBL.
-                           11  SPA-NAI-TBLO            OCCURS  3500.
+                           11  SPA-NAI-TBLO            OCCURS  8500.
                                13  SPA-NAI-TSSTKIJUN   PIC 9(01).
                                13  SPA-NAI-TKEIFLG     PIC 9(01).
       *
@@ -128,7 +129,10 @@
       *    一時領域
        01  WRK-AREA.
            03  WRK-WIDMSG          PIC X(70).
-           03  WRK-KBNCD           PIC 9(01).
+           03  WRK-KBNCD           PIC 9(02).
+           03  WRK-KBNCD-R         REDEFINES   WRK-KBNCD.
+               05  WRK-KBNCD-RR    PIC 9(01).
+               05  WRK-KBNCD-1     PIC 9(01).
            03  WRK-MAX-X.
                05  WRK-MAX         PIC 9(04). 
            03  WRK-MCP-WIDGET      PIC X(64).
@@ -393,7 +397,7 @@
       *
            MOVE    ZERO                TO  IDX
            PERFORM             UNTIL   FLG-SYSKANRI   =   1
-                               OR      IDX            >=  3500
+                               OR      IDX            >=  8500
                MOVE    ZERO                TO  SPA-SYORIFLG
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
       *H2.4
@@ -404,6 +408,8 @@
                        MOVE    500             TO  IDX
                    WHEN    "7"
                        MOVE    3000            TO  IDX
+                   WHEN    "17"
+                       MOVE    8000            TO  IDX
                END-EVALUATE
                PERFORM VARYING IDY FROM    1   BY  1
                        UNTIL   IDY >       500
@@ -431,6 +437,12 @@
            IF      SPA-W01-EDYUKYMD    >=  "20120401"
                IF      IDX                 <   3500
                    MOVE    3500            TO  IDX
+               END-IF
+           END-IF
+      *H26.4  8500 とする
+           IF      SPA-W01-EDYUKYMD    >=  "20140401"
+               IF      IDX                 <   8500
+                   MOVE    8500            TO  IDX
                END-IF
            END-IF
       *
@@ -494,6 +506,8 @@
                        MOVE    500             TO  IDX
                    WHEN    "7"
                        MOVE    3000            TO  IDX
+                   WHEN    "17"
+                       MOVE    8000            TO  IDX
                    END-EVALUATE
                    PERFORM VARYING IDY     FROM    1   BY  1
                            UNTIL   IDY     >   500
@@ -514,11 +528,17 @@
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key17"             TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
-
       *H24.4
            IF      SPA-W01-EDYUKYMD    >=  "20120401"
                IF      IDX                 <   3500
                    MOVE    3500            TO  IDX
+               END-IF
+           END-IF
+      *
+      *H26.4
+           IF      SPA-W01-EDYUKYMD    >=  "20140401"
+               IF      IDX                 <   8500
+                   MOVE    8500            TO  IDX
                END-IF
            END-IF
       *
@@ -540,11 +560,21 @@
                    MOVE    ZERO                TO  SPA-NAI-TSSTKIJUN
                                                                 (IDY)
                END-IF
+      *H26.4
+      *        1000 の次は、3000
+               IF      IDY                 =   1000
+                   MOVE    3000            TO  IDY
+               END-IF
+      *        3500 の次は、8001
+               IF      IDY                 =   3500
+                   MOVE    8000            TO  IDY
+               END-IF
            END-PERFORM
       *    対象がない時、１レコード分とする
            IF      IDX                 =   ZERO
                MOVE    1               TO  SPA-SYORIFLG
-               MOVE    3500            TO  IDX
+      **       MOVE    3500            TO  IDX
+               MOVE    8500            TO  IDX
            END-IF
       *
            .
@@ -944,8 +974,11 @@
                END-IF
       *H24.4
       *        1001から3000 はエラーとする
-               IF      SPA-NAI-SELCD       >=  1001  AND
-                                           <=  3000
+               IF     (SPA-NAI-SELCD       >=  1001  AND
+                                           <=  3000   )
+      *        3501から8000 はエラーとする
+                 OR   (SPA-NAI-SELCD       >=  3501  AND
+                                           <=  8000   )
                    MOVE    "0001"              TO  SPA-ERRCD
                    MOVE    90                  TO  SPA-GMN-CUR
                END-IF
@@ -1056,6 +1089,11 @@
            IF      SPA-GMN-PAGE   =   120
                MOVE    40         TO  SPA-GMN-PAGE
            END-IF
+      *H26.4
+      *    3501から8000 までは画面表示なしとする
+           IF      SPA-GMN-PAGE   =   320
+               MOVE    140        TO  SPA-GMN-PAGE
+           END-IF
       *
            PERFORM 3101-SSTKIJUN-HENSYU-SEC  
            .
@@ -1081,6 +1119,11 @@
       *    1001から3000 までは画面表示なしとする
            IF      SPA-GMN-PAGE   =   41
                MOVE    121        TO  SPA-GMN-PAGE
+           END-IF
+      *H26.4
+      *    3501から8000 までは画面表示なしとする
+           IF      SPA-GMN-PAGE   =   141
+               MOVE    321        TO  SPA-GMN-PAGE
            END-IF
       *
            PERFORM 3101-SSTKIJUN-HENSYU-SEC  
@@ -1336,7 +1379,18 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    7                   TO  WRK-KBNCD
                    MOVE    3000                TO  IDX
                END-IF
-               MOVE    WRK-KBNCD               TO  SYS-1006-KBNCD
+      *H26.4
+      *        3501 →　8001　とする
+               IF     (WRK-KBNCD               =   8  )
+                   MOVE    17                  TO  WRK-KBNCD
+                   MOVE    8000                TO  IDX
+               END-IF
+               IF      WRK-KBNCD               <   10
+      *            １桁をキーとする
+                   MOVE    WRK-KBNCD-1             TO  SYS-1006-KBNCD
+               ELSE
+                   MOVE    WRK-KBNCD               TO  SYS-1006-KBNCD
+               END-IF
       *
                PERFORM VARYING IDY FROM    1   BY  1
                        UNTIL   IDY >       500

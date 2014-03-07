@@ -1246,10 +1246,14 @@
                                OR      IDX            >=  100
                MOVE    MCPDATA-REC        TO  SYSKANRI-REC
                IF (   (SYS-KBNCD (1:1)        =   "*" OR  "1" )
-                  AND (SYS-KANRICD        NOT =   "3004"      ))      
+                  AND (SYS-KANRICD        NOT =   "3004"
+                                              AND "1006"      ))      
                OR (   (SYS-KBNCD (1:4)        =   "0001"  )
                   AND (SYS-KANRICD            =   "3004"      ))      
                OR (   (SYS-KANRICD            =   "1901"  )    )      
+      *        施設基準は、１　を対象
+               OR (   (SYS-KANRICD            =   "1006"      )       
+                  AND (SYS-KBNCD (1:2)        =   "1 "        ))
                    ADD     1              TO  IDX
                    MOVE    IDX            TO  SPA-GMN-TBANGO    (IDX)
                    MOVE    SYS-STYUKYMD   TO  SPA-NAI-TSTYUKYMD (IDX)
