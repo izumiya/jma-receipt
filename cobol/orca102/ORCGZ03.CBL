@@ -53,6 +53,8 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/03/XX  Ê¿À®£²£²Ç¯£´·î²þÀµÂÐ±þ
       *  04.05.00    NACL-Â¿¡¹Ç¼  10/04/XX  Ä¢É¼Ì¾¾ÎÄÉ²ÃÂÐ±þ
       *  04.06.00    NACL-Â¿¡¹Ç¼  10/10/19  ½ýÉÂ´ØÏ¢¶èÊ¬ÄÉ²ÃÂÐ±þ¡¢»ÜÀß´ð½à£´·åÂÐ±þÂ¾
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/03/XX  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *                                    ¡ÊDPC¶èÊ¬¡¢ÉûÉ¡¹ÐÅù²Ã»»Åù¡Ë
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -200,6 +202,8 @@
            03  FILLER          PIC X(32)  VALUE   "0 HOSPSRYKBN".
       *    °åÎÅ´Ñ»¡Ë¡
            03  FILLER          PIC X(32)  VALUE   "0 IRYOKAN".
+      *    DPC¶èÊ¬
+           03  FILLER          PIC X(32)  VALUE   "0 DPCKBN".
            03  FILLER          PIC X(32)  VALUE   "0 OSINKBN".
            03  FILLER          PIC X(32)  VALUE   "0 BYOSYOKBN".
            03  FILLER          PIC X(32)  VALUE   "0 SANTEIRRKKBN".
@@ -269,8 +273,15 @@
            03  FILLER          PIC X(32)  VALUE   "2 MASUISKBKBN".
       *    »ÜÀß´ð½àÉÔÅ¬¹ç¶èÊ¬
            03  FILLER          PIC X(32)  VALUE   "2 KIJUNTEIGENKBN".
-      *     ´ð½àÉÔÅ¬¹çÄþ¸ºÂÐ¾Ý»ÜÀß´ð½à¥³¡¼¥É
+      *    ´ð½àÉÔÅ¬¹çÄþ¸ºÂÐ¾Ý»ÜÀß´ð½à¥³¡¼¥É
            03  FILLER          PIC X(32)  VALUE   "2 KIJUNTEIGENCD".
+      *    ÉûÉ¡¹ÐÆâ»ë¶À²Ã»»
+           03  FILLER          PIC X(32)  VALUE   "2 FUKUBIKUNAIKBN".
+      *    ÉûÉ¡¹ÐÀÚ½üµ¡´ï²Ã»»
+           03  FILLER          PIC X(32)  VALUE   "2 FUKUBIKUKOTUKBN".
+      *    Ä¹»þ´ÖËã¿ì´ÉÍý²Ã»»
+           03  FILLER          PIC X(32)  VALUE   "2 TIMEMASUIKBN".
+      *
            03  FILLER          PIC X(32)  VALUE   "2 KNSJISKBN".
            03  FILLER          PIC X(32)  VALUE   "2 KNSJISGRPKBN".
            03  FILLER          PIC X(32)  VALUE   "2 KENTAICOMMENT".
@@ -319,7 +330,8 @@
       **** 03  TBL-GMN-OCC                 OCCURS  115
       **** 03  TBL-GMN-OCC                 OCCURS  118
       **** 03  TBL-GMN-OCC                 OCCURS  119
-           03  TBL-GMN-OCC                 OCCURS  121
+      ***  03  TBL-GMN-OCC                 OCCURS  121
+           03  TBL-GMN-OCC                 OCCURS  125
                                            INDEXED  IDX-GMN.
                05  TBL-PAGE                PIC 9(01).
                05  TBL-YOBI1               PIC X(01).
@@ -933,6 +945,12 @@
            MOVE  TNS-KIJUNTEIGENKBN        TO  SPA-GMN-KIJUNTEIGENKBN
       *    ´ð½àÉÔÅ¬¹çÄþ¸ºÂÐ¾Ý»ÜÀß´ð½à¥³¡¼¥É
            MOVE  TNS-KIJUNTEIGENCD         TO  SPA-GMN-KIJUNTEIGENCD
+      *    ÉûÉ¡¹ÐÆâ»ë¶À²Ã»»
+           MOVE  TNS-FUKUBIKUNAIKBN        TO  SPA-GMN-FUKUBIKUNAIKBN
+           MOVE  TNS-FUKUBIKUKOTUKBN       TO  SPA-GMN-FUKUBIKUKOTUKBN
+      *    Ä¹»þ´ÖËã¿ì´ÉÍý²Ã»»
+           MOVE  TNS-TIMEMASUIKBN          TO  SPA-GMN-TIMEMASUIKBN
+      *
            MOVE  TNS-KNSJISKBN             TO  SPA-GMN-KNSJISKBN       
            MOVE  TNS-KNSJISGRPKBN          TO  SPA-GMN-KNSJISGRPKBN    
            MOVE  TNS-KENTAICOMMENT         TO  SPA-GMN-KENTAICOMMENT   
@@ -971,6 +989,8 @@
            MOVE  TNS-FORMALNAME            TO  SPA-GMN-FORMALNAME
       *    °åÎÅ´Ñ»¡Ë¡
            MOVE  TNS-IRYOKANSATUKBN        TO  SPA-GMN-IRYOKAN
+      *    £Ä£Ð£Ã¶èÊ¬
+           MOVE  TNS-DPCKBN                TO  SPA-GMN-DPCKBN
            MOVE  TNS-GAZOOPESUP            TO  SPA-GMN-GAZOOPESUP
            MOVE  TNS-MASUISKBKBN           TO  SPA-GMN-MASUISKBKBN
       *    ³Æ¥ê¥¹¥È¥Ü¥Ã¥¯¥¹ÊÔ½¸
@@ -1438,7 +1458,11 @@
                                          TO  SPA-GMN-TIMEKSNKBNCOB (7)
                MOVE    "7 Ìë´Ö²Ã»»"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (8)
-               MOVE    8                 TO  SPA-TIMEKSNKBN-MAX
+               MOVE    "8 »þ´Ö³°Åù²Ã»»¡Ê100ÅÀ°Ê¾å¡Ë"
+                                         TO  SPA-GMN-TIMEKSNKBNCOB (9)
+               MOVE    "9 µÙÆü²Ã»»¡Ê100ÅÀ°Ê¾å¡Ë"
+                                         TO  SPA-GMN-TIMEKSNKBNCOB (10)
+               MOVE    10                 TO  SPA-TIMEKSNKBN-MAX
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-TIMEKSNKBN-MAX
@@ -1793,6 +1817,16 @@
            MOVE    Z03-KIJUNTEIGENKBN  TO  SPA-GMN-KIJUNTEIGENKBN
       *        ´ð½àÉÔÅ¬¹çÄþ¸ºÂÐ¾Ý»ÜÀß´ð½à¥³¡¼¥É
            MOVE    Z03-KIJUNTEIGENCD   TO  SPA-GMN-KIJUNTEIGENCD
+      *H26.4
+      *    £Ä£Ð£Ã¶èÊ¬
+           MOVE    Z03-DPCKBN          TO  SPA-GMN-DPCKBN
+      *    ÉûÉ¡¹Ð¼ê½ÑÍÑÆâ»ë¶À²Ã»»
+           MOVE    Z03-FUKUBIKUNAIKBN  TO  SPA-GMN-FUKUBIKUNAIKBN
+      *    ÉûÉ¡¹Ð¼ê½ÑÍÑÆð¹üÉôÁÈ¿¥ÀÚ½üµ¡´ï²Ã»»
+           MOVE    Z03-FUKUBIKUKOTUKBN TO  SPA-GMN-FUKUBIKUKOTUKBN
+      *    Ä¹»þ´ÖËã¿ì´ÉÍý²Ã»»
+           MOVE    Z03-TIMEMASUIKBN    TO  SPA-GMN-TIMEMASUIKBN
+      *
       *        ¸¡ººÅù¼Â»ÜÈ½ÃÇ
            MOVE    Z03-KNSJISKBN       TO  SPA-GMN-KNSJISKBN
       *        ¸¡ººÅù¼Â»ÜÈ½ÃÇ¥°¥ë¡¼¥×
@@ -1956,6 +1990,9 @@
       *        °åÎÅ´Ñ»¡Ë¡ÂÐ¾Ý
                WHEN    "IRYOKAN"
                    PERFORM 505-IRYOKAN-CHK-SEC
+      *        £Ä£Ð£Ã¶èÊ¬
+               WHEN    "DPCKBN"
+                   CONTINUE
       *        ±ý¿Ç
                WHEN    "OSINKBN"
                    PERFORM 505-OSINKBN-CHK-SEC
@@ -2115,6 +2152,12 @@
                WHEN    "KIJUNTEIGENKBN"
       *        ´ð½àÉÔÅ¬¹çÄþ¸ºÂÐ¾Ý»ÜÀß´ð½à¥³¡¼¥É
                WHEN    "KIJUNTEIGENCD"
+      *        ÉûÉ¡¹Ð¼ê½ÑÍÑÆâ»ë¶À²Ã»»
+               WHEN    "FUKUBIKUNAIKBN"
+      *        ÉûÉ¡¹Ð¼ê½ÑÍÑÀÚ½üµ¡´ï²Ã»»
+               WHEN    "FUKUBIKUKOTUKBN"
+      *        Ä¹»þ´ÖËã¿ì´ÉÍý²Ã»»
+               WHEN    "TIMEMASUIKBN"
       *        ¸¡ººÅù¼Â»ÜÈ½ÃÇ
                WHEN    "KNSJISKBN"
       *        ¸¡ººÅù¼Â»ÜÈ½ÃÇ¥°¥ë¡¼¥×
@@ -3026,6 +3069,7 @@
            IF      SPA-GMN-KGNAGE      =   "AA"
                                        OR  "B3"
                                        OR  "BF"
+                                       OR  "BK"
                CONTINUE
            ELSE
       *
@@ -3059,6 +3103,7 @@
            IF      SPA-GMN-JGNAGE      =   "AA"
                                        OR  "B3"
                                        OR  "BF"
+                                       OR  "BK"
                CONTINUE
            ELSE
                MOVE    SPA-GMN-JGNAGE      TO  WRK-SNUM-INX
@@ -3089,17 +3134,18 @@
                MOVE    ZERO                TO  SPA-GMN-CHUKSNCD
             END-IF
       *
-           INITIALIZE                      ORCSNUMAREA
-           MOVE    SPA-GMN-CHUKSNCD    TO  SNUM-INX
-           CALL    "ORCSNUM"           USING
-                                       ORCSNUMAREA
-           IF     (SNUM-RC         NOT =   ZERO  )   OR
-                  (SNUM-MINKBN     NOT =   SPACE )   OR
-                  (SNUM-SYOKBN     NOT =   SPACE )
-               MOVE    "0007"              TO  SPA-ERRCD
-           ELSE
-               MOVE    SNUM-OUTEDT(12:4)       TO  SPA-GMN-CHUKSNCD
-           END-IF
+      *H26.2 Ï«ºÒÂÐ±þ¤Ç¥Á¥§¥Ã¥¯ºï½ü
+      *    INITIALIZE                      ORCSNUMAREA
+      *    MOVE    SPA-GMN-CHUKSNCD    TO  SNUM-INX
+      *    CALL    "ORCSNUM"           USING
+      *                                ORCSNUMAREA
+      *    IF     (SNUM-RC         NOT =   ZERO  )   OR
+      *           (SNUM-MINKBN     NOT =   SPACE )   OR
+      *           (SNUM-SYOKBN     NOT =   SPACE )
+      *        MOVE    "0007"              TO  SPA-ERRCD
+      *    ELSE
+      *        MOVE    SNUM-OUTEDT(12:4)       TO  SPA-GMN-CHUKSNCD
+      *****END-IF
            .    
       *
        5042-CHUKSNCD-CHK-EXT.
@@ -3116,6 +3162,7 @@
            IF      WRK-AGEKSNKGN       =   "AA"
                                        OR  "B3"
                                        OR  "BF"
+                                       OR  "BK"
                CONTINUE
            ELSE
                INITIALIZE                      ORCSNUMAREA
@@ -3146,6 +3193,7 @@
            IF      WRK-AGEKSNJGN       =   "AA"
                                        OR  "B3"
                                        OR  "BF"
+                                       OR  "BK"
                CONTINUE
            ELSE
                INITIALIZE                      ORCSNUMAREA
@@ -4204,7 +4252,17 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE  SPA-GMN-IRYOKAN           TO  TNS-IRYOKANSATUKBN 
            MOVE  SPA-GMN-GAZOOPESUP        TO  TNS-GAZOOPESUP 
            MOVE  SPA-GMN-MASUISKBKBN       TO  TNS-MASUISKBKBN 
-           .    
+      *H26.4¡¡¤«¤é
+      *    £Ä£Ð£Ã¶èÊ¬
+           MOVE  SPA-GMN-DPCKBN            TO  TNS-DPCKBN
+      *    ÉûÉ¡¹ÐÆâ»ë¶À²Ã»»
+           MOVE  SPA-GMN-FUKUBIKUNAIKBN    TO  TNS-FUKUBIKUNAIKBN
+      *    ÉûÉ¡¹Ð¼ê½ÑÍÑÀÚ½üµ¡´ï²Ã»»
+           MOVE  SPA-GMN-FUKUBIKUKOTUKBN   TO  TNS-FUKUBIKUKOTUKBN
+      *    Ä¹»þ´ÖËã¿ì´ÉÍý²Ã»»
+           MOVE  SPA-GMN-TIMEMASUIKBN      TO  TNS-TIMEMASUIKBN
+      *
+           .
       *
        4121-KOUMOKUISO-EXT.
            EXIT.
@@ -4661,6 +4719,15 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE  SPA-GMN-KOKUCHI-KOUBAN        TO  Z03-KOKUCHI-KOUBAN  
            MOVE  SPA-GMN-KOKUJISKBKBN1         TO  Z03-KOKUJISKBKBN1   
            MOVE  SPA-GMN-KOKUJISKBKBN2         TO  Z03-KOKUJISKBKBN2   
+      *H26.4
+      *    £Ä£Ð£Ã¶èÊ¬
+           MOVE    SPA-GMN-DPCKBN          TO  Z03-DPCKBN
+      *    ÉûÉ¡¹Ð¼ê½ÑÍÑÆâ»ë¶À²Ã»»
+           MOVE    SPA-GMN-FUKUBIKUNAIKBN  TO  Z03-FUKUBIKUNAIKBN
+      *    ÉûÉ¡¹Ð¼ê½ÑÍÑÆð¹üÉôÁÈ¿¥ÀÚ½üµ¡´ï²Ã»»
+           MOVE    SPA-GMN-FUKUBIKUKOTUKBN TO  Z03-FUKUBIKUKOTUKBN
+      *    Ä¹»þ´ÖËã¿ì´ÉÍý²Ã»»
+           MOVE    SPA-GMN-TIMEMASUIKBN    TO  Z03-TIMEMASUIKBN
       *
            PERFORM 5001-MAPCUR-SEC
       *

@@ -148,6 +148,8 @@
                     06  Z03-ZENKNSKBN-COUNT   PIC S9(9)   BINARY.
                     06  Z03-ZENKNSKBN-ITEM
                             PIC X(30)   OCCURS  5 TIMES.
+                  05  Z03-DPCKBN.
+                    06  Z03-VALUE   PIC S9(1).
                 04  Z03-FIXED10.
                   05  Z03-JITUDAY.
                     06  Z03-VALUE   PIC S9(1).
@@ -275,6 +277,12 @@
                   05  Z03-GAZOOPESUP.
                     06  Z03-VALUE   PIC S9(1).
                   05  Z03-MASUISKBKBN.
+                    06  Z03-VALUE   PIC S9(1).
+                  05  Z03-FUKUBIKUNAIKBN.
+                    06  Z03-VALUE   PIC S9(1).
+                  05  Z03-FUKUBIKUKOTUKBN.
+                    06  Z03-VALUE   PIC S9(1).
+                  05  Z03-TIMEMASUIKBN.
                     06  Z03-VALUE   PIC S9(1).
                 04  Z03-FIXED12.
                   05  Z03-SSTKIJUNCD1.

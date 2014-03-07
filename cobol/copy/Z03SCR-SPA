@@ -183,6 +183,8 @@
                        09  SPA-GMN-IRYOKANCOB      PIC X(20)
                                                    OCCURS  9.
                    07  SPA-IRYOKAN-MAX             PIC 9(04).
+      *            £Ä£Ð£Ã¶èÊ¬
+                   07  SPA-GMN-DPCKBN              PIC 9(01).
       *
                    07  SPA-GMN-OSINKBN-G.
                        09  SPA-GMN-OSINKBN         PIC 9(1).
@@ -304,6 +306,13 @@
                    07  SPA-GMN-KIJUNTEIGENKBN  PIC  9(01).
       *            ´ð½àÉÔÅ¬¹çÄþ¸ºÂÐ¾Ý»ÜÀß´ð½à¥³¡¼¥É
                    07  SPA-GMN-KIJUNTEIGENCD   PIC  9(04).
+      *            ÉûÉ¡¹Ð¼ê½ÑÍÑÆâ»ë¶À²Ã»»
+                   07  SPA-GMN-FUKUBIKUNAIKBN  PIC  9(01).
+      *            ÉûÉ¡¹Ð¼ê½ÑÍÑÆð¹üÉôÁÈ¿¥ÀÚ½üµ¡´ï²Ã»»
+                   07  SPA-GMN-FUKUBIKUKOTUKBN PIC  9(01).
+      *            Ä¹»þ´ÖËã¿ì´ÉÍý²Ã»»
+                   07  SPA-GMN-TIMEMASUIKBN    PIC  9(01).
+      *
                    07  SPA-GMN-KNSJISKBN       PIC 9(1).
                    07  SPA-GMN-KNSJISGRPKBN    PIC 9(2).
                    07  SPA-GMN-KENTAICOMMENT   PIC 9(1).

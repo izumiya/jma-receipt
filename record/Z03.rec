@@ -182,6 +182,9 @@ Z03	{
 					count	int;
 					item	varchar(30)[5];
 				};
+				DPCKBN	{
+					value	number(1);
+				};
 			};
 			fixed10	{
 				JITUDAY	{
@@ -371,6 +374,15 @@ Z03	{
 					value	number(1);
 				};
 				MASUISKBKBN	{
+					value	number(1);
+				};
+				FUKUBIKUNAIKBN	{
+					value	number(1);
+				};
+				FUKUBIKUKOTUKBN	{
+					value	number(1);
+				};
+				TIMEMASUIKBN	{
 					value	number(1);
 				};
 			};
