@@ -31,6 +31,10 @@
       *                                     °åÎÅ´Ñ»¡Ë¡ÂÐ¾Ý¶èÊ¬
       *                                     Ëã¿ì¼±ÊÌ¶èÊ¬ ÄÉ²Ã
       * 04.06.00     NACL-Â¿¡¹Ç¼  10/10/29  »ÜÀß´ð½à¡¡£´·åÂÐ±þ
+      * 04.07.00     NACL-°ËÆ£    14/03/06  ÉûÉ¡¹Ð¼ê½ÑÍÑÆâ»ë¶À²Ã»»
+      *                                     ÉûÉ¡¹Ð¼ê½ÑÍÑ¹üÆðÉôÁÈ¿¥ÀÚ½üµ¡´ï²Ã»»
+      *                                     Ä¹»þ´ÖËã¿ì´ÉÍý²Ã»»
+      *                                     DPCÅ¬±þ¶èÊ¬
       ************************************************************
        01  TNS-TENSU-REC.
       *(1)
@@ -124,6 +128,12 @@
            03  TNS-GAZOOPESUP          PIC  9(01).
            03  TNS-IRYOKANSATUKBN      PIC  9(01).
            03  TNS-MASUISKBKBN         PIC  9(01).
+      *H24.4 ADD START
+           03  TNS-FUKUBIKUNAIKBN      PIC  9(01).
+           03  TNS-FUKUBIKUKOTUKBN     PIC  9(01).
+           03  TNS-TIMEMASUIKBN        PIC  9(01).
+           03  TNS-DPCKBN              PIC  9(01).
+      *H24.4 ADD END
            03  TNS-OLDTENSKB           PIC  9(01).
            03  TNS-OLDTEN              PIC  9(09)V99.
            03  TNS-MADOKUKBN           PIC  9(01).

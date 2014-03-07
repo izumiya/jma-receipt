@@ -31,6 +31,10 @@
       *                                     °åÎÅ´Ñ»¡Ë¡ÂÐ¾Ý¶èÊ¬
       *                                     Ëã¿ì¼±ÊÌ¶èÊ¬ ÄÉ²Ã
       * 04.06.00     NACL-Â¿¡¹Ç¼  10/10/29  »ÜÀß´ð½à¡¡£´·åÂÐ±þ
+      * 04.07.00     NACL-°ËÆ£    14/03/06  ÉûÉ¡¹Ð¼ê½ÑÍÑÆâ»ë¶À²Ã»»
+      *                                     ÉûÉ¡¹Ð¼ê½ÑÍÑ¹üÆðÉôÁÈ¿¥ÀÚ½üµ¡´ï²Ã»»
+      *                                     Ä¹»þ´ÖËã¿ì´ÉÍý²Ã»»
+      *                                     DPCÅ¬±þ¶èÊ¬
       ************************************************************
        01  TNSWK-TENSU-REC.
       *(1)
@@ -125,6 +129,12 @@
            03  TNSWK-GAZOOPESUP          PIC  9(01).
            03  TNSWK-IRYOKANSATUKBN      PIC  9(01).
            03  TNSWK-MASUISKBKBN         PIC  9(01).
+      *H24.4 ADD START
+           03  TNSWK-FUKUBIKUNAIKBN      PIC  9(01).
+           03  TNSWK-FUKUBIKUKOTUKBN     PIC  9(01).
+           03  TNSWK-TIMEMASUIKBN        PIC  9(01).
+           03  TNSWK-DPCKBN              PIC  9(01).
+      *H24.4 ADD END
            03  TNSWK-OLDTENSKB           PIC  9(01).
            03  TNSWK-OLDTEN              PIC  9(09)V99.
            03  TNSWK-MADOKUKBN           PIC  9(01).

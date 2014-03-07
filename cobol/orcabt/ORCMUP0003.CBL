@@ -31,6 +31,8 @@
       * 04.03.00     NACL-太田    08/05/28  エラー処理強化対応
       * 04.06.00     NACL-伊藤    10/12/02  点数マスタレイアウト変更
       *                                     対応
+      * 04.07.00     NACL-伊藤    14/03/06  点数マスタレイアウト変更
+      *                                     対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -202,6 +204,12 @@ grpsys     COPY    "COMMON-SPA".
            03  TNSWK-V04-AREA-04-TBL   OCCURS 10.
                05  TNSWK-V04-AREA-04       PIC X(03).
            03  TNSWK-V04-AREA-05       PIC X(304).
+      *---(04.06.00) LINE ADD START -------------------------------------
+      *---(04.06.00) LINE ADD START -------------------------------------
+      *    旧マスタデータ退避領域
+       01  TNSWK-TENSU-REC-V05.
+           03  TNSWK-V05-AREA-01       PIC X(1094).
+           03  TNSWK-V05-AREA-02       PIC X(206).
       *---(04.06.00) LINE ADD START -------------------------------------
       *
        01  WRK-HOMEDIR.
@@ -1016,6 +1024,9 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            WHEN    LNK-DBRVERSION (3:6)    <   "040500"
                PERFORM 900-TNSWK-V04-SET
       *
+           WHEN    LNK-DBRVERSION (3:6)    <   "040700"
+               PERFORM 900-TNSWK-V05-SET
+      *
            WHEN    OTHER
                MOVE    IN-REC      TO  TNSWK-TENSU-REC
            END-EVALUATE
@@ -1107,6 +1118,27 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            EXIT.
       *
       *---(04.06.00) LINE ADD END   -------------------------------------
+      *---(04.07.00) LINE ADD START -------------------------------------
+      *****************************************************************
+      *    変更後レイアウト移送処理
+      *****************************************************************
+       900-TNSWK-V05-SET          SECTION.
+      *
+           MOVE    IN-REC              TO  TNSWK-TENSU-REC-V05
+      *
+           MOVE    TNSWK-V05-AREA-01   TO  TNSWK-TENSU-REC (1    : 1094)
+      *****MOVE    ZERO                TO  TNSWK-FUKUBIKUNAIKBN
+      *****MOVE    ZERO                TO  TNSWK-FUKUBIKUKOTUKBN
+      *****MOVE    ZERO                TO  TNSWK-TIMEMASUIKBN
+      *****MOVE    ZERO                TO  TNSWK-DPCKBN
+           MOVE    ZERO                TO  TNSWK-TENSU-REC (1095 : 4)
+           MOVE    TNSWK-V05-AREA-02   TO  TNSWK-TENSU-REC (1099 :)
+      *
+          .
+       900-TNSWK-V05-EXT.
+           EXIT.
+      *
+      *---(04.07.00) LINE ADD END   -------------------------------------
       *****************************************************************
       *    点数マスター読込
       *****************************************************************
