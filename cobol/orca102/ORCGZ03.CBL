@@ -1442,7 +1442,7 @@
                MOVE    3                 TO  SPA-TIMEKSNKBN-MAX
            END-IF
            IF      SPA-GMN-DATAKBN        =   2
-               MOVE    "0 時間外算定不可"
+               MOVE    "0 下記以外の診療行為"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (1)
                MOVE    "1 時間外加算"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (2)
@@ -1462,7 +1462,7 @@
                                          TO  SPA-GMN-TIMEKSNKBNCOB (9)
                MOVE    "9 休日加算（100点以上）"
                                          TO  SPA-GMN-TIMEKSNKBNCOB (10)
-               MOVE    10                 TO  SPA-TIMEKSNKBN-MAX
+               MOVE    10                TO  SPA-TIMEKSNKBN-MAX
            END-IF
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-TIMEKSNKBN-MAX
