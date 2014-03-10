@@ -103,6 +103,7 @@
       *  04.07.03    NACL-門脇    13/01/21  労災レセ電対応
       *  04.07.04    NACL-藤原    13/08/20  ０９５９３で始まるコードの有
       *                                     無区分を追加
+      *  04.07.05    NACL-藤原    14/03/10  誕生日に平成の元号を追加
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1337,6 +1338,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  BTPARA-HOSPNUM
                    MOVE    "○"            TO  HC21-TANJYOG (2)    
                WHEN    "S"
                    MOVE    "○"            TO  HC21-TANJYOG (3)   
+               WHEN    "H"
+                   MOVE    "○"            TO  HC21-TANJYOG2
            END-EVALUATE     
            MOVE    WRK-HENYY           TO  HC21-TANJYOY
            MOVE    WRK-HENMM           TO  HC21-TANJYOM

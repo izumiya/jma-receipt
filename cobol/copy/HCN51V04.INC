@@ -132,3 +132,5 @@
                         PIC X(14)       OCCURS 9 TIMES.
             02  HCN51V04-LOPTION
                         PIC X(100).
+            02  HCN51V04-TANJYOG2
+                        PIC X(2).
