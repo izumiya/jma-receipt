@@ -152,6 +152,7 @@ C02.glade	orca22	(C02)病名登録−登録
 C03.glade	orca22	(C03)自院病名登録
 C04.glade	orca22	(C04)自院病名検索
 C05.glade	orca22	(C05)病名登録−病名検索
+C06.glade	orca22	(C06)自院病名セット入力
 C09.glade	orca22	(C09)病名コード一覧
 C10.glade	orca22	(C10)病名登録−簡単修正・病名複写・病名削除
 C11.glade	orca22	(C11)手術歴レセプト記載登録
@@ -230,6 +231,7 @@ I48.glade	orca32	(I48)診療行為一覧選択サブ
 I49.glade	orca32	(I49)ｐカ入力
 I4ERR.glade	orca32	(I4ERR)エラー情報
 I4ID1.glade	orca32	(I4ID1)確認画面
+I411.glade	orca32	(I411)入院会計照会−保険組合せ選択
 
 O01.glade	orca33	(O01)患者請求 - 定期請求
 O02.glade	orca33	(O02)患者請求−個別指示
@@ -394,6 +396,7 @@ W65.glade	orca101	(W65)システム管理情報−公費付加情報設定
 W66.glade	orca101	(W66)システム管理情報−公害医療機関情報設定
 W67.glade	orca101	(W67)システム管理情報−出産費用内訳明細情報
 W68.glade	orca101	(W68)システム管理情報−保険者付加情報
+W91.glade	orca101	(W91)システム管理情報−医療情報連携基盤情報
 W96.glade	orca101	(W96)システム管理情報−CRON設定情報
 W98.glade	orca101	(W98)システム管理情報−排他情報設定
 W981.glade	orca101	(W981)システム管理情報−排他制御状態
