@@ -240,6 +240,9 @@
            03  TPARA-YUKOSTYMD          PIC X(08).
            03  TPARA-YUKOEDYMD          PIC X(08).
            03  TPARA-MEMO               PIC X(80) OCCURS 10.
+           03  TPARA-CHUI-YUKOSTYMD     PIC X(08).
+           03  TPARA-CHUI-YUKOEDYMD     PIC X(08).
+           03  TPARA-CHUI               PIC X(100).
       *
        01  CONST-AREA.
            03  CONST-H200401           PIC X(08)   VALUE "20080401".
@@ -927,6 +930,8 @@
            MOVE    "1"             TO  TPARA-MISYUKBN2
            MOVE    "00000000"      TO  TPARA-YUKOSTYMD
            MOVE    "99999999"      TO  TPARA-YUKOEDYMD
+           MOVE    "00000000"      TO  TPARA-CHUI-YUKOSTYMD
+           MOVE    "99999999"      TO  TPARA-CHUI-YUKOEDYMD
       *
       *    診療科名
            MOVE    "SRYKA"         TO  WRK-PARA-NAME
@@ -1014,6 +1019,28 @@
       *
            END-PERFORM
       *
+      *    注意書き有効開始日
+           MOVE    "CHUI_YUKOSTYMD" TO WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA        TO  WRK-YMD
+           PERFORM 800-HIZUKE-CHK-SEC
+           IF    ( FLG-HIZUKECHK   =   ZERO )
+               MOVE    WRK-SYMD    TO  TPARA-CHUI-YUKOSTYMD
+           END-IF
+      *
+      *    注意書き有効終了日
+           MOVE    "CHUI_YUKOEDYMD" TO WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA        TO  WRK-YMD
+           PERFORM 800-HIZUKE-CHK-SEC
+           IF    ( FLG-HIZUKECHK   =   ZERO )
+               MOVE    WRK-SYMD    TO  TPARA-CHUI-YUKOEDYMD
+           END-IF
+      *
+      *    注意書き
+           MOVE    "CHUI"          TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA        TO  TPARA-CHUI
       *
            .
        100-OPTION-SELECT-EXT.
@@ -1057,8 +1084,13 @@
            WHEN    "MEMO10"
                MOVE    ORCSPRGOPTION-OT-PARA (1:80)
                                        TO  KANACHK-MAE-INPUT
+           WHEN    "CHUI"
+               MOVE    ORCSPRGOPTION-OT-PARA (1:100)
+                                       TO  KANACHK-MAE-INPUT
            WHEN    "YUKOSTYMD"
            WHEN    "YUKOEDYMD"
+           WHEN    "CHUI_YUKOSTYMD"
+           WHEN    "CHUI_YUKOEDYMD"
                MOVE    ORCSPRGOPTION-OT-PARA(1:10)
                                        TO  KANACHK-MAE-INPUT
            WHEN    OTHER
@@ -1448,6 +1480,11 @@
                END-PERFORM
            END-IF
       *
+           IF    ( SMCNDATE-YMD        >=  TPARA-CHUI-YUKOSTYMD )
+            AND  ( SMCNDATE-YMD        <=  TPARA-CHUI-YUKOEDYMD )
+               MOVE    TPARA-CHUI      TO  HC03-CHUI
+           END-IF
+      *
            IF    ( ORCHC03-HAKKOFLG        =   4 )
                PERFORM 3001-TUKIBETU-HEN-SEC
            END-IF
@@ -1620,6 +1657,7 @@
                                    TO  HC03V01-MEMO (IDX)
            END-PERFORM
            MOVE  HC03-LBLFTNRATE   TO  HC03V01-LBLFTNRATE
+           MOVE  HC03-CHUI         TO  HC03V01-CHUI
       *
            .
        2002-HC03V01-HEN-EXT.
@@ -1707,6 +1745,7 @@
                                    TO  HC03V02-MEMO (IDX)
            END-PERFORM
            MOVE  HC03-LBLFTNRATE   TO  HC03V02-LBLFTNRATE
+           MOVE  HC03-CHUI         TO  HC03V02-CHUI
       *
            .
        2002-HC03V02-HEN-EXT.
