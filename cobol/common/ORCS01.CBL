@@ -4097,7 +4097,7 @@
       *    Á°´ü¹âÎð¼Ô¡Ê£·£°ºÐ¡Á£·£´ºÐ¡Ë
            MOVE      ZERO       TO    FLG-ZENKI-TOKUREI
            IF    LNK-SYU-SRYYMD(1:6)    >=   "200804"
-           AND   LNK-SYU-SRYYMD(1:6)    <=   "201403"
+           AND   LNK-SYU-SRYYMD(1:6)    <=   "201903"
              IF  (COMB-HKNNUM                =   SPACE   )
              OR  (COMB-SYU-HKNKOHSBTKBN  = "8" OR "9"    )
              OR  (COMB-HKNNUM  =  "971" OR "973" OR "975"
@@ -6661,7 +6661,8 @@
                        WHEN   "5"
                        WHEN   "8"
                          IF    LNK-SYU-SRYYMD(1:6)   >=  "200610"
-                           IF   FLG-KEIKASOCHI-IPAN  =  1
+                           IF  (FLG-KEIKASOCHI-IPAN  =  1       )
+                           OR  (LNK-SYU-SRYYMD(1:6) >=  "201405")
                                MOVE   12000   TO   MAX-KIN-SYU-M
                            ELSE
                                MOVE   44400   TO   MAX-KIN-SYU-M
@@ -13000,7 +13001,8 @@
                            WHEN   "5"
                            WHEN   "8"
                              MOVE     20     TO    WK-KEISAN-FTNRATE
-                             IF   FLG-KEIKASOCHI-IPAN  =  1
+                             IF  (FLG-KEIKASOCHI-IPAN  =  1       )
+                             OR  (LNK-SYU-SRYYMD(1:6) >=  "201405")
                                 MOVE   2     TO    FLG-KEISAN-TAI
                              ELSE
                                 MOVE   1     TO    FLG-KEISAN-TAI

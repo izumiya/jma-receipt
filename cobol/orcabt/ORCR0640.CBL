@@ -631,6 +631,7 @@
       *                                     保険組み合わせの病名記載対応）
       *  04.07.15    NACL-門脇    14/02/19  自賠責（第三者行為）対応
       *                                     （負担金額１０円未満四捨五入）
+      *  04.07.16    NACL-門脇    14/03/04  平成２６年４月改正対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -4127,7 +4128,7 @@
                    ( RECE62-SRYYM   <  "200704"              ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE62-SRYYM   <  "200804") OR
-                    (RECE62-SRYYM   >  "201403")             ))
+                    (RECE62-SRYYM   >  "201903")             ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE62-SRYYM   <  "200901"              ))
                OR (( RECE62-PTTOKKI-CD(TOKKI-IDX) =
@@ -9523,7 +9524,7 @@
                END-IF
              WHEN      "20"
                IF  (RECE62-SRYYM   >=  "200804")
-               AND (RECE62-SRYYM   <=  "201403")
+               AND (RECE62-SRYYM   <=  "201903")
                    CONTINUE
                ELSE
                    GO  TO  21013-TOKKI-HENSYU-EXT
@@ -15777,7 +15778,7 @@
            END-IF
       *
            IF    (RECE62-SRYYM   >=  "200804")
-           AND   (RECE62-SRYYM   <=  "201403")
+           AND   (RECE62-SRYYM   <=  "201903")
              IF  (RECE62-HKNNUM       =   SPACE                      )
              OR  (RECE62-HKNNUM(1:2)  =   "98"  OR "90"  OR "91"     )
              OR  (RECE62-HKNNUM  =   "068" OR "069" OR "040" OR "039")
@@ -17851,9 +17852,11 @@
                    PERFORM   2104421-ICHIBUFTN-KOH-SET-SEC
               END-EVALUATE
             ELSE
-              IF   (  RECE62-KYURATE         =  20 OR 30 )
-              AND  (  RECE62-RJNGENMENKBN    =  SPACE    )
-              AND  (  FLG-KOHYONKAIME        =  ZERO     )
+              IF   (( RECE62-KYURATE  =  30       ) OR
+                    ((RECE62-SRYYM    <  "201405") AND
+                     (RECE62-KYURATE  =  20      ))    )
+              AND  (  RECE62-RJNGENMENKBN  =  SPACE    )
+              AND  (  FLG-KOHYONKAIME      =  ZERO     )
                 IF    RECE62-SRYYM   >=  "200610"
                   COMPUTE   WRK-CHIHOU-KIN  =  WRK-CHIHOU-KIN
                                             + (SYU-TOTAL-HKNTEN * 10)
@@ -23576,9 +23579,11 @@
                       END-IF
                 END-EVALUATE
              ELSE
-                IF  (RECE62-KYURATE        =    20 OR 30)
-                AND (RECE62-RJNGENMENKBN   =    SPACE   )
-                AND (FLG-KOHYONKAIME       =    ZERO    )
+                IF  (( RECE62-KYURATE  =  30       ) OR
+                     ((RECE62-SRYYM    <  "201405") AND
+                      (RECE62-KYURATE  =  20      ))    )
+                AND (  RECE62-RJNGENMENKBN  =  SPACE    )
+                AND (  FLG-KOHYONKAIME      =  ZERO     )
                  IF    RECE62-SRYYM  >=  "200610"
                   COMPUTE WRK-CHIHOU-KIN6 = WRK-HANTEI-TOTALTEN * 10
                   IF  FLG-TOKU75 = 1 OR 2
@@ -24412,8 +24417,10 @@
            END-IF
       *
       *    高額４回目以降対象者
-           IF   (RECE62-KYURATE       =  20 OR 30)
-           AND  (RECE62-RJNGENMENKBN  =  SPACE   )
+           IF   (( RECE62-KYURATE  =  30       ) OR
+                 ((RECE62-SRYYM    <  "201405") AND
+                  (RECE62-KYURATE  =  20      ))    )
+           AND  (  RECE62-RJNGENMENKBN  =  SPACE    )
       *
                 PERFORM   2104A-KOHYONKAIME-HANTEI-SEC
       *

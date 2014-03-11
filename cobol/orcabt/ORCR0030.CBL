@@ -642,6 +642,7 @@
       *                                     ÊÝ¸±ÁÈ¤ß¹ç¤ï¤»¤ÎÉÂÌ¾µ­ºÜÂÐ±þ¡Ë
       *  04.07.13    NACL-ÌçÏÆ    14/02/19  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *                                     ¡ÊÉéÃ´¶â³Û£±£°±ßÌ¤Ëþ»Í¼Î¸ÞÆþ¡Ë
+      *  04.07.14    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
@@ -2870,7 +2871,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
            END-IF
       *
            IF    (RECE02-SRYYM   >=  "200804")
-           AND   (RECE02-SRYYM   <=  "201403")
+           AND   (RECE02-SRYYM   <=  "201903")
              IF  (RECE02-HKNNUM       =   SPACE                      )
              OR  (RECE02-HKNNUM(1:2)  =   "98" OR "90" OR "91"       )
              OR  (RECE02-HKNNUM  =   "068" OR "069" OR "040" OR "039")
@@ -4420,7 +4421,7 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
                    ( RECE02-SRYYM   <  "200704"              ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "20"     ) AND
                    ((RECE02-SRYYM   <  "200804") OR
-                    (RECE02-SRYYM   >  "201403")             ))
+                    (RECE02-SRYYM   >  "201903")             ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "21"     ) AND
                    ( RECE02-SRYYM   <  "200901"              ))
                OR (( RECE02-PTTOKKI-CD(TOKKI-IDX) = "25"     ) AND
@@ -13523,7 +13524,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                END-IF
              WHEN      "20"
                IF  (RECE02-SRYYM   >=  "200804")
-               AND (RECE02-SRYYM   <=  "201403")
+               AND (RECE02-SRYYM   <=  "201903")
                    CONTINUE
                ELSE
                    GO  TO  21045-TOKKI-HENSYU-EXT
@@ -14519,11 +14520,13 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      ADD  SYU-TOTAL-HKNTEN
                                        TO   WRK-JYOGENKBN-TEN2
                    ELSE
-                     IF   ( RECE02-KYURATE    =  20 OR 30 )
-                     AND  ((SYU-KOH-HKNNUM(1) = "974"    ) OR
-                           (SYU-KOH-HKNNUM(2) = "974"    ) OR
-                           (SYU-KOH-HKNNUM(3) = "974"    ) OR
-                           (SYU-KOH-HKNNUM(4) = "974"    ))
+                     IF   (( RECE02-KYURATE  =  30       ) OR
+                           ((RECE02-SRYYM    <  "201405") AND
+                            (RECE02-KYURATE  =  20      )))
+                     AND  (( SYU-KOH-HKNNUM(1) = "974"   ) OR
+                           ( SYU-KOH-HKNNUM(2) = "974"   ) OR
+                           ( SYU-KOH-HKNNUM(3) = "974"   ) OR
+                           ( SYU-KOH-HKNNUM(4) = "974"   ))
                        IF   RECE02-RJNGENMENKBN  =  SPACE
                          IF  FLG-TOKU75 = 1 OR 2
                            MOVE    10000  TO   WRK-KINGAKU
@@ -15129,8 +15132,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  PERFORM     2105215-ICHIBUFTN-GEN-SEC
                  PERFORM     2105211-ICHIBUFTN-KOH-SET-SEC
             ELSE
-             IF   ( RECE02-KYURATE         =  20 OR 30 )
-             AND  ( RECE02-RJNGENMENKBN    =  SPACE    )
+             IF   (( RECE02-KYURATE  =  30       ) OR
+                   ((RECE02-SRYYM    <  "201405") AND
+                    (RECE02-KYURATE  =  20      ))    )
+             AND  (  RECE02-RJNGENMENKBN  =  SPACE    )
                  IF    RECE02-SRYYM   >=  "200610"
                    IF  FLG-TOKU75 = 1 OR 2
                      MOVE    22200     TO   WRK-KINGAKU
@@ -19714,8 +19719,10 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE  8000    TO   WRK-KINGAKU3
                 END-IF
               ELSE
-                IF  (RECE02-KYURATE       =  20 OR 30)
-                AND (RECE02-RJNGENMENKBN  =  SPACE   )
+                IF   (( RECE02-KYURATE  =  30       ) OR
+                      ((RECE02-SRYYM    <  "201405") AND
+                       (RECE02-KYURATE  =  20      ))    )
+                AND  (  RECE02-RJNGENMENKBN  =  SPACE    )
                   IF    RECE02-SRYYM   >=  "200610"
                     IF  FLG-TOKU75 = 1 OR 2
                      MOVE  22200   TO   WRK-KINGAKU3
@@ -20190,7 +20197,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                      MOVE  8000    TO   WRK-KINGAKU-GENBUTU3
                 END-IF
               ELSE
-                IF   RECE02-KYURATE      =  20 OR 30
+                IF  ( RECE02-KYURATE  =  30       )
+                OR  ((RECE02-SRYYM    <  "201405") AND
+                     (RECE02-KYURATE  =  20      ))
                   IF  FLG-TOKU75 = 1 OR 2
                      MOVE  22200   TO   WRK-KINGAKU-GENBUTU3
                   ELSE
