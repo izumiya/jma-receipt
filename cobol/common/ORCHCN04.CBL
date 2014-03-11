@@ -44,6 +44,7 @@
       *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *  04.07.00    NACL-多々納  11/12/22  商品名コード単価対応
       *  04.07.00    NACL-多々納  14/02/13  労災金額％加算対応
+      *  04.07.00    NACL-多々納  14/03/XX  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -100,6 +101,8 @@
       *
            03  FLG-RSIKIN          PIC 9(01).
       *
+           03  FLG-HIZUKECHK       PIC 9(01).
+      *
       *    添字領域
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
@@ -139,6 +142,7 @@
                05  WRK-WMM             PIC 9(02).
                05  WRK-WDD             PIC 9(02).
            03  WRK-HENYMDG             PIC X(22).
+           03  WRK-YMD                 PIC X(10).
       *
            03  WRK-SRYYMD              PIC X(08).
       *
@@ -321,9 +325,14 @@
            03  PARA-HAKKOUBIKBN        PIC X(01).
            03  PARA-ROOMKBN            PIC X(01).
            03  PARA-KANANAME           PIC X(01).
+      *H26.4
+      *    注意書き
+           03  PARA-CHUI-YUKOSTYMD     PIC X(08).
+           03  PARA-CHUI-YUKOEDYMD     PIC X(08).
+           03  PARA-CHUI               PIC X(100).
       *
            03  WRK-PARA-NAME           PIC X(25).
-           03  WRK-PARA                PIC X(50).
+           03  WRK-PARA                PIC X(100).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -402,6 +411,10 @@
       *   日付変換サブ
            COPY    "CPORCSDAY.INC".
            COPY    "CPORCSLNK.INC".
+           COPY    "CPORCSGDAY.INC".
+      *
+      *    マシン日付取得サブ
+           COPY    "CPORCSMCNDATE.INC".
       *
       *    全角チェックパラメタ
            COPY    "CPORCSKANACHK.INC".
@@ -548,6 +561,34 @@
                MOVE    "0"                 TO  PARA-KANANAME
            END-IF
       *
+      *    注意書き有効開始日
+           MOVE    "CHUI_YUKOSTYMD"    TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  WRK-YMD
+           PERFORM 800-HIZUKE-CHK-SEC
+           IF      FLG-HIZUKECHK       =   ZERO
+               MOVE    WRK-SYMD            TO  PARA-CHUI-YUKOSTYMD
+           ELSE
+               MOVE    "00000000"          TO  PARA-CHUI-YUKOSTYMD
+           END-IF
+      *
+      *    注意書き有効終了日
+           MOVE    "CHUI_YUKOEDYMD"    TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  WRK-YMD
+           PERFORM 800-HIZUKE-CHK-SEC
+           IF      FLG-HIZUKECHK       =   ZERO
+               MOVE    WRK-SYMD            TO  PARA-CHUI-YUKOEDYMD
+           ELSE
+               MOVE    "99999999"          TO  PARA-CHUI-YUKOEDYMD
+           END-IF
+      *
+      *    注意書き
+           MOVE    "CHUI"              TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-CHUI
+      *
+      *
            .
        100-OPTION-SELECT-EXT.
            EXIT.
@@ -565,6 +606,19 @@
            IF      ORCSPRGOPTION-OT-TYPE   =   1
       *        半角で１文字目を値とする
                MOVE    ORCSPRGOPTION-OT-PARA(1:1)  TO  WRK-PARA(1:1)
+      *
+               IF      WRK-PARA-NAME       =   "CHUI_YUKOSTYMD"
+                                           OR  "CHUI_YUKOEDYMD"
+                   MOVE    ORCSPRGOPTION-OT-PARA   TO  WRK-PARA
+               END-IF
+           ELSE
+      *
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI
+               MOVE    ORCSPRGOPTION-OT-PARA (1:100)
+                                           TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+               MOVE    KANACHK-MAE-INPUT   TO  WRK-PARA
            END-IF
            .
        1001-OPTION-CALL-EXT.
@@ -624,6 +678,10 @@
       *    医療機関編集情報
            PERFORM 900-1900-READ-SEC
       *----(03.04.01)--ADD-END-----
+      *
+      *    マシン日付取得サブ
+           CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
+      *
       *
            .
        100-SYORI-EXT.
@@ -2080,6 +2138,13 @@
            ELSE
                MOVE    CONS-LABEL1         TO  HCN04-LABEL2
            END-IF
+      *H26.4
+      *    注意
+           IF      (SMCNDATE-YMD       >=  PARA-CHUI-YUKOSTYMD )
+              AND  (SMCNDATE-YMD       <=  PARA-CHUI-YUKOEDYMD )
+               MOVE    PARA-CHUI           TO  HCN04-CHUI
+           END-IF
+      *
       *
            EVALUATE   PARA-SHADE
                WHEN    "0"
@@ -2410,6 +2475,30 @@
            MOVE    LNK-DAY2-EDTYMD3    TO  WRK-HENYMDG
            .
        800-SEIWA-HEN-EXT.
+           EXIT.
+      *****************************************************************
+      *    日付チェック・編集処理
+      *****************************************************************
+       800-HIZUKE-CHK-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  FLG-HIZUKECHK
+      *
+           IF    ( WRK-YMD             =   "00000000" 
+                                       OR  "99999999" )
+               MOVE    WRK-YMD         TO  WRK-SYMD
+           ELSE
+               INITIALIZE                  ORCSGDAYAREA
+               MOVE    WRK-YMD         TO  SGDAY-INDAY
+               CALL    "ORCSGDAY"          USING
+                                           ORCSGDAYAREA
+               IF      SGDAY-RC            =   ZERO
+                   MOVE    SGDAY-SDAY      TO  WRK-SYMD
+               ELSE
+                   MOVE    1               TO  FLG-HIZUKECHK
+               END-IF
+           END-IF
+           .
+       800-HIZUKE-CHK-EXT.
            EXIT.
       *
       *----(03.04.01)--ADD-START---

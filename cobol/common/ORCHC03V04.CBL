@@ -27,6 +27,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.00    NACL-多々納  14/03/XX  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -286,6 +287,12 @@
            03  PARA-SYOKEI             PIC X(01).
            03  PARA-MISYUKBN1          PIC X(01).
            03  PARA-MISYUKBN2          PIC X(01).
+      *H26.4
+      *    注意書き
+           03  PARA-CHUI-YUKOSTYMD     PIC X(08).
+           03  PARA-CHUI-YUKOEDYMD     PIC X(08).
+           03  PARA-RCHUI              PIC X(100).
+           03  PARA-MCHUI              PIC X(100).
       *
            03  WRK-PARA-NAME               PIC X(25).
            03  WRK-PARA                    PIC X(50).
@@ -582,6 +589,10 @@
       *    プログラムオプション
            PERFORM 100-OPTION-SELECT-SEC
       *
+      *    マシン日付取得サブ
+           CALL    "ORCSMCNDATE"   USING   ORCSMCNDATEAREA
+      *
+      *
            .
        100-SYORI-EXT.
            EXIT.
@@ -674,6 +685,38 @@
                MOVE    "1"                 TO  PARA-MISYUKBN2
            END-IF
       *
+      *    注意書き有効開始日
+           MOVE    "CHUI_YUKOSTYMD"    TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  WRK-YMD
+           PERFORM 800-HIZUKE-CHK-SEC
+           IF      FLG-HIZUKECHK       =   ZERO
+               MOVE    WRK-SYMD            TO  PARA-CHUI-YUKOSTYMD
+           ELSE
+               MOVE    "00000000"          TO  PARA-CHUI-YUKOSTYMD
+           END-IF
+      *
+      *    注意書き有効終了日
+           MOVE    "CHUI_YUKOEDYMD"    TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  WRK-YMD
+           PERFORM 800-HIZUKE-CHK-SEC
+           IF      FLG-HIZUKECHK       =   ZERO
+               MOVE    WRK-SYMD            TO  PARA-CHUI-YUKOEDYMD
+           ELSE
+               MOVE    "99999999"          TO  PARA-CHUI-YUKOEDYMD
+           END-IF
+      *
+      *    注意書き
+           MOVE    "RCHUI"             TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-RCHUI
+      *    注意書き
+           MOVE    "MCHUI"             TO  WRK-PARA-NAME
+           PERFORM 1001-OPTION-CALL-SEC
+           MOVE    WRK-PARA            TO  PARA-MCHUI
+      *
+      *
            .
        100-OPTION-SELECT-EXT.
            EXIT.
@@ -691,15 +734,25 @@
            MOVE    WRK-PARA-NAME       TO  ORCSPRGOPTION-IN-DATA
            CALL    "ORCSPRGOPTION"     USING   SPA-AREA
                                                ORCSPRGOPTIONAREA
-           IF      ORCSPRGOPTION-OT-TYPE   =   1
-      *        半角
-               MOVE    ORCSPRGOPTION-OT-PARA   TO  WRK-PARA
-           END-IF
-           IF      ORCSPRGOPTION-OT-TYPE   =   2
-      *        全角
-               MOVE    ORCSPRGOPTION-OT-PARA(1:80)
-                                           TO  WRK-PARA-N
-           END-IF
+      *
+           EVALUATE    WRK-PARA-NAME
+           WHEN    "RCHUI" 
+           WHEN    "MCHUI" 
+      *        注意
+               INITIALIZE                  ORCSKANACHKAREA
+               MOVE    "1"                 TO  KANACHK-SYORI
+               MOVE    ORCSPRGOPTION-OT-PARA(1:100)
+                                           TO  KANACHK-MAE-INPUT
+               CALL    "ORCSKANACHK"       USING   ORCSKANACHKAREA
+               MOVE    KANACHK-MAE-INPUT   TO  WRK-PARA
+           WHEN    OTHER
+               IF      ORCSPRGOPTION-OT-TYPE   =   1
+      *            半角
+                   MOVE    ORCSPRGOPTION-OT-PARA   TO  WRK-PARA
+               ELSE
+                   MOVE    ORCSPRGOPTION-OT-PARA   TO  WRK-PARA-N
+               END-IF
+           END-EVALUATE
       *
            .
        1001-OPTION-CALL-EXT.
@@ -965,6 +1018,13 @@
                MOVE    CONS-LABEL2         TO  HCM03V04-LABEL3
            ELSE
                MOVE    CONS-LABEL1         TO  HCM03V04-LABEL3
+           END-IF
+      *H26.4
+      *    注意
+           IF      (SMCNDATE-YMD       >=  PARA-CHUI-YUKOSTYMD )
+              AND  (SMCNDATE-YMD       <=  PARA-CHUI-YUKOEDYMD )
+               MOVE    PARA-RCHUI          TO  HCM03V04-RCHUI
+               MOVE    PARA-MCHUI          TO  HCM03V04-MCHUI
            END-IF
       *
            EVALUATE   PARA-SHADE
