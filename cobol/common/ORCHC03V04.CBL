@@ -294,9 +294,9 @@
            03  PARA-RCHUI              PIC X(100).
            03  PARA-MCHUI              PIC X(100).
       *
-           03  WRK-PARA-NAME               PIC X(25).
-           03  WRK-PARA                    PIC X(50).
-           03  WRK-PARA-N                  PIC X(100).
+           03  WRK-PARA-NAME           PIC X(25).
+           03  WRK-PARA                PIC X(100).
+           03  WRK-PARA-N              PIC X(100).
       *
       *
       *****************************************************************
