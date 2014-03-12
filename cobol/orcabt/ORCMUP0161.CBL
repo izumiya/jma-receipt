@@ -140,12 +140,12 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-OPID                PIC X(16).
       *----(04.07.01)--ADD-END-----
       *
-           03  WRK-MAE-NAIYO           PIC X(100).
-           03  WRK-ATO-NAIYO           PIC X(100).
+           03  WRK-MAE-NAIYO           PIC X(200).
+           03  WRK-ATO-NAIYO           PIC X(200).
            03  WRK-MAE-AREA.
-               05  WRK-MAE-OPTION      PIC X(100) OCCURS 100.
+               05  WRK-MAE-OPTION      PIC X(200) OCCURS 100.
            03  WRK-ATO-AREA.
-               05  WRK-ATO-OPTION      PIC X(100) OCCURS 100.
+               05  WRK-ATO-OPTION      PIC X(200) OCCURS 100.
       *
       *    旧マスタデータ退避領域
        01  PRGWK-REC.
@@ -623,12 +623,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *            コメントチェック
                    IF      WRK-MAE-NAIYO(1:1)  NOT =   "#"
                        PERFORM VARYING IDX-PNT2 FROM 1 BY 1
-                               UNTIL ( IDX-PNT2 >   100 )
+                               UNTIL ( IDX-PNT2 >   200 )
                                OR    ( WRK-MAE-NAIYO(IDX-PNT2:)
                                                            =   SPACE )
                            IF      WRK-MAE-NAIYO(IDX-PNT2:1)   =   "="
                                MOVE    1               TO  FLG-LF
-                               MOVE    100             TO  IDX-PNT2
+                               MOVE    200             TO  IDX-PNT2
                            END-IF
                        END-PERFORM
                    END-IF
@@ -652,11 +652,11 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *    コメントチェック
            IF      WRK-MAE-NAIYO(1:1)  NOT =   "#"
                PERFORM VARYING IDX-PNT2 FROM 1 BY 1
-                       UNTIL ( IDX-PNT2 >   100 )
+                       UNTIL ( IDX-PNT2 >   200 )
                        OR    ( WRK-MAE-NAIYO(IDX-PNT2:)    =   SPACE )
                    IF      WRK-MAE-NAIYO(IDX-PNT2:1)   =   "="
                        MOVE    1               TO  FLG-LF
-                       MOVE    100             TO  IDX-PNT2
+                       MOVE    200             TO  IDX-PNT2
                    END-IF
                END-PERFORM
            END-IF
@@ -725,7 +725,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                MOVE    WRK-ATO-OPTION(IDX) TO  WRK-ATO-NAIYO
                MOVE    ZERO            TO  FLG-LF
                PERFORM VARYING IDX-PNT1 FROM 1 BY 1
-                       UNTIL ( IDX-PNT1 >   100 )
+                       UNTIL ( IDX-PNT1 >   200 )
                        OR    ( WRK-ATO-NAIYO(IDX-PNT1:)    =  SPACE )
                        OR    ( FLG-LF  =   1 )
       *            コメントチェック
@@ -753,7 +753,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *
                IF  ( FLG-LF  =  ZERO )
                    PERFORM VARYING IDX-PNT1 FROM 1 BY 1
-                           UNTIL ( IDX-PNT1 >   100 )
+                           UNTIL ( IDX-PNT1 >   200 )
                            OR    ( WRK-ATO-NAIYO(IDX-PNT1:)  =   SPACE )
                        MOVE    WRK-ATO-NAIYO(IDX-PNT1:1)
                                        TO  WRK-OPTION(IDX-PNT3:1)
@@ -761,7 +761,7 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                    END-PERFORM
                ELSE
                    PERFORM VARYING IDX-PNT1 FROM 1 BY 1
-                           UNTIL ( IDX-PNT1 >   100 )
+                           UNTIL ( IDX-PNT1 >   200 )
                            OR    ( WRK-MAE-NAIYO(IDX-PNT1:)  =   SPACE )
                        MOVE    WRK-MAE-NAIYO(IDX-PNT1:1)
                                        TO  WRK-OPTION(IDX-PNT3:1)
