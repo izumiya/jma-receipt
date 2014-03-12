@@ -32,6 +32,8 @@
       *                　７：退院取消　８：異動　９：次月作成
       *                　Ａ：退院登録（診療保存））
            03  LNK-SCNYUACCT-SYORI-KBN               PIC  X(01).
+      *病棟番号
+           03  LNK-SCNYUACCT-BTU-NUM                 PIC  X(02).
       *特定入院料区分（０：一般入院料　１：特定入院料）
            03  LNK-SCNYUACCT-TOKUTEINYUIN-KBN        PIC  X(01).
       *入院会計作成期間（開始）

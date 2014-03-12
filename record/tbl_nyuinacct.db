@@ -995,3 +995,18 @@ path	key51	{
 	};
 };
 
+path	key52	{
+	DBSELECT	{
+		DECLARE tbl_nyuinacct_key52_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nyuinacct
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND   NYUGAIKBN   =   '1'
+			AND   PTID        =   :PTID
+			AND   SRYYM       >=  :SRYYM
+                        AND   ZAISKBKBN   =   '6'
+                        AND   SRYCDTOTAL  =   190177170
+			ORDER  BY  SRYYM
+		;
+	};
+};

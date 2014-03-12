@@ -342,8 +342,40 @@
                    WHEN   "333333999"
                MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥° ±…¥…∑–≤·¡º√÷°À"
                                                        TO   TNS-NAME
+                   WHEN   "444444444"
+                      MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£¥"  TO   TNS-NAME
+                   WHEN   "555555555"
+                      MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£µ"  TO   TNS-NAME
+                   WHEN   "666666666"
+                      MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£∂"  TO   TNS-NAME
+                   WHEN   "444444499"
+                      MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£¥"
+                                                       TO   TNS-NAME
+                   WHEN   "555555599"
+                      MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£µ"
+                                                       TO   TNS-NAME
+                   WHEN   "666666699"
+                      MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£∂"
+                                                       TO   TNS-NAME
+                   WHEN   "111119999"
+                      MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"  TO   TNS-NAME
+                   WHEN   "222229999"
+                      MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"  TO   TNS-NAME
+                   WHEN   "333339999"
+                      MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"  TO   TNS-NAME
+                   WHEN   "111199999"
+                      MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"
+                                                       TO   TNS-NAME
+                   WHEN   "222299999"
+                      MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"
+                                                       TO   TNS-NAME
+                   WHEN   "333399999"
+                      MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"
+                                                       TO   TNS-NAME
                END-EVALUATE
-               IF    (NACCT-SRYYM      >=   "200604")    AND
+      *
+               IF   ((NACCT-SRYYM      >=   "200604")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190097010"  OR
                                             "190097110"  OR
                                             "190119510"  OR
@@ -351,7 +383,8 @@
                    MOVE   "111111111"     TO    NSRY-SRYCD(1)
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"  TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "200604")    AND
+               IF   ((NACCT-SRYYM      >=   "200604")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190097210"  OR
                                             "190097310"  OR
                                             "190119710"  OR
@@ -359,14 +392,16 @@
                    MOVE   "222222222"     TO    NSRY-SRYCD(1)
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"  TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201004")    AND
+               IF   ((NACCT-SRYYM      >=   "201004")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190135110"  OR
                                             "190135210"  OR
                                             "190135310")
                    MOVE   "333333333"     TO    NSRY-SRYCD(1)
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"  TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190708610"  OR
                                             "190708710"  OR
                                             "190708810")
@@ -374,7 +409,8 @@
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±° ±…¥…∑–≤·¡º√÷°À"
                                           TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190708910"  OR
                                             "190709010"  OR
                                             "190709110")
@@ -382,7 +418,8 @@
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤° ±…¥…∑–≤·¡º√÷°À"
                                           TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190709210"  OR
                                             "190709310"  OR
                                             "190709410")
@@ -390,7 +427,8 @@
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥° ±…¥…∑–≤·¡º√÷°À"
                                           TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190153410"  OR
                                             "190153610"  OR
                                             "190153810")
@@ -398,7 +436,8 @@
                    MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"
                                           TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190154010"  OR
                                             "190154210"  OR
                                             "190154410")
@@ -406,7 +445,8 @@
                    MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"
                                           TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190154610"  OR
                                             "190154810"  OR
                                             "190155010")
@@ -414,7 +454,8 @@
                    MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"
                                           TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190153510"  OR
                                             "190153710"  OR
                                             "190153910")
@@ -422,7 +463,8 @@
                MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±° ±…¥…∑–≤·¡º√÷°À"
                                           TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190154110"  OR
                                             "190154310"  OR
                                             "190154510")
@@ -430,12 +472,109 @@
                MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤° ±…¥…∑–≤·¡º√÷°À"
                                           TO   TNS-NAME
                END-IF
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (NSRY-SRYCD(1)    =    "190154710"  OR
                                             "190154910"  OR
                                             "190155110")
                    MOVE   "333333999"     TO    NSRY-SRYCD(1)
                MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥° ±…¥…∑–≤·¡º√÷°À"
+                                          TO   TNS-NAME
+               END-IF
+      *
+      *         ø¿Æ£≤£∂«Ø£¥∑Ó§´§È§Œø∑¿ﬂ ¨° £±§´§È£≥°À
+      *        §À≥∫≈ˆ
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190169610"  OR
+                                            "190169710"  OR
+                                            "190169810")
+                   MOVE   "111119999"     TO    NSRY-SRYCD(1)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"  TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190169910"  OR
+                                            "190170010"  OR
+                                            "190170110")
+                   MOVE   "222229999"     TO    NSRY-SRYCD(1)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"  TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190170210"  OR
+                                            "190170310"  OR
+                                            "190170410")
+                   MOVE   "333339999"     TO    NSRY-SRYCD(1)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"  TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190170810"  OR
+                                            "190170910"  OR
+                                            "190171010")
+                   MOVE   "111199999"     TO    NSRY-SRYCD(1)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"
+                                          TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190171110"  OR
+                                            "190171210"  OR
+                                            "190171310")
+                   MOVE   "222299999"     TO    NSRY-SRYCD(1)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"
+                                          TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190171410"  OR
+                                            "190171510"  OR
+                                            "190171610")
+                   MOVE   "333399999"     TO    NSRY-SRYCD(1)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"
+                                          TO   TNS-NAME
+               END-IF
+      *
+      *        Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£¥§´§È£∂§œ ø¿Æ£≤£∂«Ø£≥∑Ó§ﬁ§«§Œ£±§´§È£≥
+      *        §À≥∫≈ˆ
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190097010"  OR
+                                            "190119510"  OR
+                                            "190119610")
+                   MOVE   "444444444"     TO    NSRY-SRYCD(1)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£¥"  TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190097210"  OR
+                                            "190119710"  OR
+                                            "190119810")
+                   MOVE   "555555555"     TO    NSRY-SRYCD(1)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£µ"  TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190135110"  OR
+                                            "190135210"  OR
+                                            "190135310")
+                   MOVE   "666666666"     TO    NSRY-SRYCD(1)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£∂"  TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190153410"  OR
+                                            "190153610"  OR
+                                            "190153810")
+                   MOVE   "444444499"     TO    NSRY-SRYCD(1)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£¥"
+                                          TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (NSRY-SRYCD(1)    =    "190154010"  OR
+                                            "190154210"  OR
+                                            "190154410")
+                   MOVE   "555555599"     TO    NSRY-SRYCD(1)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£µ"
+                                          TO   TNS-NAME
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201204")    AND
+                     (NSRY-SRYCD(1)    =    "190154610"  OR
+                                            "190154810"  OR
+                                            "190155010")
+                   MOVE   "666666699"     TO    NSRY-SRYCD(1)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£∂"
                                           TO   TNS-NAME
                END-IF
       *
@@ -484,7 +623,8 @@
                PERFORM    910-TENSU-READ-SEC
                MOVE     TNS-NAME      TO
                              LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
-               IF    (NACCT-SRYYM      >=   "200604")    AND
+               IF   ((NACCT-SRYYM      >=   "200604")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190097010"  OR
                                             "190097110"  OR
@@ -496,7 +636,8 @@
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"  TO
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
-               IF    (NACCT-SRYYM      >=   "200604")    AND
+               IF   ((NACCT-SRYYM      >=   "200604")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190097210"  OR
                                             "190097310"  OR
@@ -508,7 +649,8 @@
                    MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"  TO
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
-               IF    (NACCT-SRYYM      >=   "201004")    AND
+               IF   ((NACCT-SRYYM      >=   "201004")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190135110"  OR
                                             "190135210"  OR
@@ -520,7 +662,8 @@
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190708610"  OR
                                             "190708710"  OR
@@ -532,7 +675,8 @@
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190708910"  OR
                                             "190709010"  OR
@@ -544,7 +688,8 @@
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190709210"  OR
                                             "190709310"  OR
@@ -556,7 +701,8 @@
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190153410"  OR
                                             "190153610"  OR
@@ -568,7 +714,8 @@
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190154010"  OR
                                             "190154210"  OR
@@ -580,7 +727,8 @@
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190154610"  OR
                                             "190154810"  OR
@@ -592,7 +740,8 @@
                                LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190153510"  OR
                                             "190153710"  OR
@@ -604,7 +753,8 @@
                        TO      LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190154110"  OR
                                             "190154310"  OR
@@ -616,7 +766,8 @@
                        TO      LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
-               IF    (NACCT-SRYYM      >=   "201204")    AND
+               IF   ((NACCT-SRYYM      >=   "201204")    AND
+                     (NACCT-SRYYM      <=   "201403"))   AND
                      (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
                                             "190154710"  OR
                                             "190154910"  OR
@@ -626,6 +777,144 @@
                                LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
                MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥° ±…¥…∑–≤·¡º√÷°À"
                        TO      LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+      *
+      *        Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£¥§´§È£∂§œ ø¿Æ£≤£∂«Ø£≥∑Ó§ﬁ§«§Œ£±§´§È£≥
+      *        §À≥∫≈ˆ
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190097010"  OR
+                                            "190119510"  OR
+                                            "190119610"  OR
+                                            "444444444")
+                   MOVE   "444444444"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£¥"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190097210"  OR
+                                            "190119710"  OR
+                                            "190119810"  OR
+                                            "555555555")
+                   MOVE   "555555555"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£µ"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190135110"  OR
+                                            "190135210"  OR
+                                            "190135310"  OR
+                                            "666666666")
+                   MOVE   "666666666"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£∂"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190153410"  OR
+                                            "190153610"  OR
+                                            "190153810"  OR
+                                            "444444499")
+                   MOVE   "444444499"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£¥"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190154010"  OR
+                                            "190154210"  OR
+                                            "190154410"  OR
+                                            "555555599")
+                   MOVE   "555555599"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£µ"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190154610"  OR
+                                            "190154810"  OR
+                                            "190155010"  OR
+                                            "666666699")
+                   MOVE   "666666699"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£∂"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+      *
+      *         ø¿Æ£≤£∂«Ø£¥∑Ó§´§È§Œø∑¿ﬂ ¨° £±§´§È£≥°À
+      *        §À≥∫≈ˆ
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190169610"  OR
+                                            "190169710"  OR
+                                            "190169810"  OR
+                                            "111119999")
+                   MOVE   "111119999"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190169910"  OR
+                                            "190170010"  OR
+                                            "190170110"  OR
+                                            "222229999")
+                   MOVE   "222229999"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190170210"  OR
+                                            "190170310"  OR
+                                            "190170410"  OR
+                                            "333339999")
+                   MOVE   "333339999"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190170810"  OR
+                                            "190170910"  OR
+                                            "190171010"  OR
+                                            "111199999")
+                   MOVE   "111199999"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£±"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190171110"  OR
+                                            "190171210"  OR
+                                            "190171310"  OR
+                                            "222299999")
+                   MOVE   "222299999"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≤"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
+               END-IF
+               IF    (NACCT-SRYYM      >=   "201404")    AND
+                     (LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)  =
+                                            "190171410"  OR
+                                            "190171510"  OR
+                                            "190171610"  OR
+                                            "333399999")
+                   MOVE   "333399999"     TO
+                               LNK-ORCHCN02SUB-SYUBETUCD(NYUIN-IDX)
+                   MOVE   "Œ≈Õ‹…¬æ≤°¶Õ≠æ≤ø«Œ≈ΩÍ∆˛±°¥À‹Œ¡£≥"  TO
+                               LNK-ORCHCN02SUB-SYUBETUMEI(NYUIN-IDX)
                END-IF
       *
                IF   NACCT-SRYYM  =  LNK-ORCHCN02SUB-NYUINYMD(1:6)

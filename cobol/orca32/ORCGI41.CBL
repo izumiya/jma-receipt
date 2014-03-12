@@ -100,6 +100,10 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/07/21  Æþ±¡ÎÁºï½ü¤ÎÆþ±¡²Ã»»ÂÐ±þ
       *  04.06.00    NACL-Â¿¡¹Ç¼  10/09/17  °ì³ç½¤ÀµÆþÎÏÊÑ¹¹ÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/11/09  ¥×¥ì¥Ó¥å¡¼ÄÉ²ÃÂÐ±þ
+      *Ê¿À®£²£¶Ç¯£´·î²þÄêÂÐ±þ
+      *  00.00.00    NACL-¾®Æ¦Âô  14/02/27  Í­¾²¿ÇÎÅ½êÆþ±¡´ðËÜÎÁ£±
+      *                                     Í­¾²¿ÇÎÅ½êÆþ±¡´ðËÜÎÁ£²
+      *                                     Í­¾²¿ÇÎÅ½êÆþ±¡´ðËÜÎÁ£³ÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -705,6 +709,9 @@
       *
       *    Æþ±¡ÎÁ²Ã»»¼èÆÀ¥Ñ¥é¥á¥¿
            COPY  "CPORCSNYUKSNGET.INC".
+      *
+      *    Ìë¶Ð»þ´ÖÄ¶²á¸º»»Æþ±¡ÎÁ¥³¡¼¥É¼èÆÀ¥µ¥Ö
+           COPY "CPORCSYAKINGEN.INC".
       *
       *    £Ä£Â¸¡º÷
            COPY    "MCPDATA.INC".
@@ -3204,6 +3211,21 @@
                                                     "190135210"   OR
                                                     "190135310")  AND
                            (SYS-5001-BTU-KHNSRYCD = "099999952"))
+                                               OR
+                          ((SPA-GMN-TSRYCD (IDU)  = "190169610"   OR
+                                                    "190169710"   OR
+                                                    "190169810")  AND
+                           (SYS-5001-BTU-KHNSRYCD = "099999955"))
+                                               OR
+                          ((SPA-GMN-TSRYCD (IDU)  = "190169910"   OR
+                                                    "190170010"   OR
+                                                    "190170110")  AND
+                           (SYS-5001-BTU-KHNSRYCD = "099999956"))
+                                               OR
+                          ((SPA-GMN-TSRYCD (IDU)  = "190170210"   OR
+                                                    "190170310"   OR
+                                                    "190170410")  AND
+                           (SYS-5001-BTU-KHNSRYCD = "099999957"))
                                CONTINUE
                         ELSE
                            MOVE   SPACE  TO  SPA-GMN-KEIKOKU
@@ -5096,7 +5118,7 @@
       *    Æþ±¡ÎÁ¤Î»þ¡¢²Ã»»Â¾¤Îºï½ü¡ÊÃ»´üÂÚºß¡¢ÁªÄêÆþ±¡¡¢ÎÅÍÜÉÂ¾²¤Ïºï½ü¤·¤Ê¤¤¡Ë
            MOVE    SPA-NAI-TBANGO (SPA-NAI-BANGO)  TO  IDG
       *
-      *    ÎÅÍÜÉÂ¾²¤ÎÈ½ÄêÍÑ¤ËÅÀ¿ô¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
+      *    Ã»´üÂÚºß¡¢ÎÅÍÜÉÂ¾²¤ÎÈ½ÄêÍÑ¤ËÅÀ¿ô¥Þ¥¹¥¿ÆÉ¤ß¹þ¤ß
            INITIALIZE                           TNS-TENSU-REC
            MOVE    SPA-HOSPNUM             TO   TNS-HOSPNUM
            MOVE    SPA-GMN-TSRYCD (IDG)    TO   TNS-SRYCD
@@ -5120,11 +5142,12 @@
            MOVE    "key"                   TO   MCP-PATHNAME
            PERFORM    990-DBCLOSE-SEC
       *
-           IF     (SPA-GMN-TSRYCD (IDG)    =   "190076810"
-                                           OR  "190125310"
-                                           OR  "190130410"
-                                           OR  "190130510"
-                                           OR  "099999916")
+           IF     (SPA-GMN-TSRYCD (IDG)    =  "099999916")
+           OR     (TNS-NYUKHNKSNKBN        =
+      *                                        Ã»´üÂÚºß£²¡ÊÀ¸³èÎÅÍÜ´Þ¤à¡Ë
+                                                  226   OR
+      *                                        Ã»´üÂÚºß£³¡ÊÀ¸³èÎÅÍÜ´Þ¤à¡Ë
+                                                  240 )
       *    ÎÅÍÜÉÂ¾²¤ÎÈ½Äê
            OR     ((SPA-5000-RYOYODSPKBN    =    "1")
                                            AND
@@ -5152,52 +5175,6 @@
                                                   156   OR
                                                   157   OR
                                                   196))
-      *             (SPA-GMN-TSRYCD (IDG)    =  "190122010"
-      *                                     OR  "190122110"
-      *                                     OR  "190122210"
-      *                                     OR  "190122310"
-      *                                     OR  "190122410"
-      *                                     OR  "190124310"
-      *                                     OR  "190124410"
-      *                                     OR  "190124510"
-      *                                     OR  "190124610"
-      *                                     OR  "190124710"
-      *                                     OR  "190121310"
-      *                                     OR  "190121410"
-      *                                     OR  "190121510"
-      *                                     OR  "190121610"
-      *                                     OR  "190121710"
-      *                                     OR  "190131610"
-      *                                     OR  "190131810"
-      *                                     OR  "190132010"
-      *                                     OR  "190132210"
-      *                                     OR  "190123710"
-      *                                     OR  "190123810"
-      *                                     OR  "190123910"
-      *                                     OR  "190124010"
-      *                                     OR  "190124110"
-      *                                     OR  "190131710"
-      *                                     OR  "190131910"
-      *                                     OR  "190132110"
-      *                                     OR  "190132310"
-      *                                     OR  "190132410"
-      *                                     OR  "190132610"
-      *                                     OR  "190132810"
-      *                                     OR  "190133010"
-      *                                     OR  "190133210"
-      *                                     OR  "190133410"
-      *                                     OR  "190133610"
-      *                                     OR  "190133810"
-      *                                     OR  "190134010"
-      *                                     OR  "190132510"
-      *                                     OR  "190132710"
-      *                                     OR  "190132910"
-      *                                     OR  "190133110"
-      *                                     OR  "190133310"
-      *                                     OR  "190133510"
-      *                                     OR  "190133710"
-      *                                     OR  "190133910"
-      *                                     OR  "190134110"))
                CONTINUE
            ELSE
       *        Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ°Ê³°¤È¤¹¤ë
@@ -6408,22 +6385,59 @@
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£±
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£²
       *    °ìÎà´¶À÷¾É´µ¼ÔÆþ±¡°åÎÅ´ÉÍýÎÁ
-      *    ¥Ï¥¤¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ
       *    Ç¾Â´Ãæ¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£³¡ÊµßÌ¿µßµÞÆþ±¡ÎÁ¡Ë
       *    µßÌ¿µßµÞÆþ±¡ÎÁ£´¡ÊµßÌ¿µßµÞÆþ±¡ÎÁ¡Ë
       *    ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²¡ÊÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ë
       *    ¾®»ùÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ
+      *    ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£±¡ÊÊ¿À®£²£¶Ç¯²þÀµ¡Ë
+      *    ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²¡ÊÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¡Ë¡ÊÊ¿À®£²£¶Ç¯²þÀµ¡Ë
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN = "03" OR "04" OR "05" OR
                                                "06" OR "07" OR "08" OR
                                                "09" OR "14" OR "16" OR
-                                               "17" OR "19" OR "55" OR
-                                               "57" OR "59" OR "91"
+                                               "19" OR "55" OR
+                                               "57" OR "59" OR "91" OR
+                                               "AH" OR "AI"
                    MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                END-IF
            END-IF
       *
+      *    ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡ÊÊ¿À®£²£¶Ç¯²þÀµ¡Ë¤Î»»ÄêÆü¤¬£¶£°Æü¤ò
+      *    ·Ð²á¤·¤Æ¤¤¤¿¾ì¹ç¤Ï°ìÈÌ¤ÎÆþ±¡ÎÁ»»Äê¤È¤¹¤ë
+           IF   PTNYUINRRK-TOKUTEI-KBN   =   "2"
+               IF   PTNYUINRRK-TOKUTEI-NYUIN  =  "41" OR "42" OR "43"
+                                              OR "44" OR "45" OR "46"
+                                              OR "47" OR "48"
+                   IF   STUSAN-NISSU08   >=   60
+                       MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *    ÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍýÎÁ¡ÊÊ¿À®£²£¶Ç¯²þÀµ¡Ë¤Î»»ÄêÆü¤¬£¶£°Æü¤ò
+      *    ·Ð²á¤·¤Æ¤¤¤¿¾ì¹ç¤Ï°ìÈÌ¤ÎÆþ±¡ÎÁ»»Äê¤È¤¹¤ë
+           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
+               IF   PTNYUINRRK-TOKUTEI-NYUIN  = "AL" OR "AM" OR "AN" OR
+                                                "AO" OR "AP" OR "AQ" OR
+                                                "AR" OR "AS"
+                   IF   STUSAN-NISSU08   >=   60
+                       MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *    ÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡ÊÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍý£±¡Ë¡ÊÊ¿À®£²£¶Ç¯²þÀµ¡Ë
+      *    ÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡ÊÃÏ°èÊñ³ç¥±¥¢Æþ±¡°åÎÅ´ÉÍý£²¡Ë¡ÊÊ¿À®£²£¶Ç¯²þÀµ¡Ë
+      *    ¤Î»»ÄêÆü¤¬£¶£°Æü¤ò
+      *    ·Ð²á¤·¤Æ¤¤¤¿¾ì¹ç¤Ï°ìÈÌ¤ÎÆþ±¡ÎÁ»»Äê¤È¤¹¤ë
+           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
+               IF   PTNYUINRRK-TOKUTEI-NYUIN  = "AU" OR "AV"
+                   IF   STUSAN-NISSU08   >=   60
+                       MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
+                   END-IF
+               END-IF
+           END-IF
       *
       *    ¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ¤Î¾ì¹ç¤ÏºÇÄ¹£¶£°Æü´Ö¤Î»»Äê¤Î°Ù¡¢
       *    ¼¡·î¤Î²ñ·×ºîÀ®»þ¤Ë£¶£°Æü·Ð²á»þ¤ÏÌµ¾ò·ï¤Ë°ìÈÌ¤ÎÆþ±¡ÎÁ»»Äê¤È¤¹¤ë
@@ -6570,8 +6584,10 @@
       *
       *    ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë¤Î¾ì¹ç¤ÏºÇÄ¹£¶£°Æü´Ö¤Î»»Äê¤Î°Ù¡¢
       *    ¼¡·î¤Î²ñ·×ºîÀ®»þ¤Ë£¶£°Æü·Ð²á»þ¤ÏÌµ¾ò·ï¤Ë°ìÈÌ¤ÎÆþ±¡ÎÁ»»Äê¤È¤¹¤ë
+      *    °Ê²¼¤ÎÆÃÄêÆþ±¡ÎÁ¤âÆ±ÍÍ
+      *    ÆÃÄê½¸Ãæ¼£ÎÅ¼¼´ÉÍýÎÁ£²¡Ê¹­ÈÏ°ÏÇ®½ýÆÃÄê½¸Ãæ¼£ÎÅ¡Ë¡ÊÊ¿À®£²£¶Ç¯²þÀµ¡Ë
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
-               IF   PTNYUINRRK-TOKUTEI-NYUIN = "60"
+               IF   PTNYUINRRK-TOKUTEI-NYUIN = "60" OR "AT"
                    IF       STUSAN-NISSU08  >=  60
                        MOVE    SPACE   TO    WRK-TOKUTEI-NYUIN
                    END-IF
@@ -6583,6 +6599,19 @@
            IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
                IF   PTNYUINRRK-TOKUTEI-NYUIN   = "11"
                    IF   STUSAN-NISSU08   >=   14
+                       MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
+                   END-IF
+               END-IF
+           END-IF
+      *
+      *    ¥Ï¥¤¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ»»Äê»þ¤ËÆÃÄêÆþ±¡¤Ç¤Î»»ÄêÆü¤¬£²£±Æü¤ò
+      *    ·Ð²á¤·¤Æ¤¤¤¿¾ì¹ç¤Ï°ìÈÌ¤ÎÆþ±¡ÎÁ»»Äê¤È¤¹¤ë
+      *    °Ê²¼¤ÎÆÃÄêÆþ±¡ÎÁ¤âÆ±ÍÍ
+      *    ¥Ï¥¤¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ£±¡ÊÊ¿À®£²£¶Ç¯²þÀµ¡Ë
+      *    ¥Ï¥¤¥±¥¢¥æ¥Ë¥Ã¥ÈÆþ±¡°åÎÅ´ÉÍýÎÁ£²¡ÊÊ¿À®£²£¶Ç¯²þÀµ¡Ë
+           IF   PTNYUINRRK-TOKUTEI-KBN   =   "3"
+               IF   PTNYUINRRK-TOKUTEI-NYUIN   = "17" OR "AJ" OR "AK"
+                   IF   STUSAN-NISSU08   >=   21
                        MOVE    SPACE   TO   WRK-TOKUTEI-NYUIN
                    END-IF
                END-IF
@@ -6686,7 +6715,10 @@
                                                 "190152010"   OR
                                                 "099999950"   OR
                                                 "099999951"   OR
-                                                "099999952"
+                                                "099999952"   OR
+                                                "099999955"   OR
+                                                "099999956"   OR
+                                                "099999957"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -6700,6 +6732,7 @@
                    MOVE    SYS-5001-BTU-KHNSRYCD
                                                TO  SYOKIKSN-IN-KHNSRYCD
                    PERFORM 4801-RJNCD-CHG-SEC
+                   PERFORM 4801-YAKINGEN-CHG-SEC
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -6964,13 +6997,82 @@
            END-IF
       *
       *    Í­¾²¿ÇÎÅ½êÆþ±¡´ðËÜÎÁ¤ÎÁê¸ß»»Äê¥³¡¼¥ÉÃÖ¤­´¹¤¨
-           IF     LNK-SCNYUACCT-STSRYYMD   >=   "20120401"
+           IF    (LNK-SCNYUACCT-STSRYYMD   >=   "20120401")  AND
+                 (LNK-SCNYUACCT-STSRYYMD   <=   "20140331")
                IF  (SYS-5001-BTU-SBT       =    "09")  AND
                    (SYS-5001-CRYOYOKBN     =    "1" OR "2" OR "3")
                   PERFORM    VARYING   IDX  FROM   1  BY  1
                     UNTIL (LNK-SCNYUACCT-KAGEN-SRYCD(IDX)  =  SPACE) OR
                           (IDX           >   10)
                       EVALUATE   LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190097010"
+                             MOVE "190153410" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190119510"
+                             MOVE "190153610" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190119610"
+                             MOVE "190153810" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190097210"
+                             MOVE "190154010" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190119710"
+                             MOVE "190154210" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190119810"
+                             MOVE "190154410" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190135110"
+                             MOVE "190154610" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190135210"
+                             MOVE "190154810" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190135310"
+                             MOVE "190155010" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                      END-EVALUATE
+                  END-PERFORM
+               END-IF
+           END-IF
+      *
+      *    Í­¾²¿ÇÎÅ½êÆþ±¡´ðËÜÎÁ¤ÎÁê¸ß»»Äê¥³¡¼¥ÉÃÖ¤­´¹¤¨¡ÊÊ¿À®£²£¶Ç¯²þÄê¡Ë
+           IF     LNK-SCNYUACCT-STSRYYMD   >=   "20140401"
+               IF  (SYS-5001-BTU-SBT       =    "09")  AND
+                   (SYS-5001-CRYOYOKBN     =    "1" OR "2" OR "3" OR
+                                                "4" OR "5" OR "6")
+                  PERFORM    VARYING   IDX  FROM   1  BY  1
+                    UNTIL (LNK-SCNYUACCT-KAGEN-SRYCD(IDX)  =  SPACE) OR
+                          (IDX           >   10)
+                      EVALUATE   LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190169610"
+                             MOVE "190170810" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190169710"
+                             MOVE "190170910" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190169810"
+                             MOVE "190171010" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190169910"
+                             MOVE "190171110" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190170010"
+                             MOVE "190171210" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190170110"
+                             MOVE "190171310" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190170210"
+                             MOVE "190171410" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190170310"
+                             MOVE "190171510" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
+                          WHEN    "190170410"
+                             MOVE "190171610" TO
+                                        LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
                           WHEN    "190097010"
                              MOVE "190153410" TO
                                         LNK-SCNYUACCT-KAGEN-SRYCD(IDX)
@@ -7041,6 +7143,7 @@
       *
            DISPLAY "LNK-SCNYUACCT-STSRYYMD = "
                     LNK-SCNYUACCT-STSRYYMD
+           MOVE     PTNYUINRRK-BTUNUM  TO  LNK-SCNYUACCT-BTU-NUM
            CALL    "ORCSNYUACCT"       USING   SPA-AREA
                                                ORCSNYUACCT-AREA
            MOVE   WRK-TAIHI-SRYKA      TO  SPA-SRYKA
@@ -7123,6 +7226,7 @@
                    MOVE    SYS-5001-BTU-KHNSRYCD
                                            TO  SYOKIKSN-IN-KHNSRYCD
                    PERFORM 4801-RJNCD-CHG-SEC
+                   PERFORM 4801-YAKINGEN-CHG-SEC
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -7212,6 +7316,7 @@
                   MOVE   ZERO   TO  LNK-SCNYUACCT-NYUCAL-KBN
            END-IF
       *
+           MOVE    PTNYUINRRK-BTUNUM  TO  LNK-SCNYUACCT-BTU-NUM
            CALL   "ORCSNYUACCT"    USING   SPA-AREA
                                            ORCSNYUACCT-AREA
            MOVE   WRK-TAIHI-SRYKA  TO  SPA-SRYKA
@@ -7463,6 +7568,31 @@
       *
            .
        4801-BTUSEL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ìë¶Ð»þ´ÖÄ¶²á¸º»»¥³¡¼¥É¤Ø¤ÎÃÖ¤­´¹¤¨½èÍý
+      *****************************************************************
+       4801-YAKINGEN-CHG-SEC   SECTION.
+      *
+           IF    SYOKIKSN-IN-SANTEISTYMD   >=   "20140401"
+               INITIALIZE    ORCSYAKINGEN-AREA
+               MOVE   SYOKIKSN-IN-SANTEISTYMD(1:6)
+                                   TO    LNK-YAKINGEN-SANTEIYM
+               MOVE   SYS-5001-BTU-NUM
+                                   TO    LNK-YAKINGEN-BTU-NUM
+               MOVE   SYOKIKSN-IN-KHNSRYCD
+                                   TO    LNK-YAKINGEN-SRYCD
+               CALL   "ORCSYAKINGEN"    USING   ORCSYAKINGEN-AREA
+                                                SPA-AREA
+               IF   LNK-YAKINGEN-RC     =       ZERO
+                    MOVE LNK-YAKINGEN-CHGSRYCD
+                                   TO    SYOKIKSN-IN-KHNSRYCD
+               END-IF
+           END-IF
+      *
+           .
+       4801-YAKINGEN-CHG-EXT.
            EXIT.
       *
       *****************************************************************

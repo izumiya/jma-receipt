@@ -60,6 +60,7 @@
            03  IDX1                        PIC 9(04).
            03  IDX-ST                      PIC 9(02).
            03  IDX-ED                      PIC 9(02).
+           03  IDX-TK3                     PIC 9(02).
       *
       *    ¥³¥ó¥¹¥¿¥ó¥ÈÃÍ
        01  CONSTANT-AREA.
@@ -71,6 +72,151 @@
            03   CONS-TANKI3                PIC X(09) VALUE "190130410".
       *    Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£³¡ÊÀ¸³èÎÅÍÜ¡Ë
            03   CONS-TANKI3-SEIKATSU       PIC X(09) VALUE "190130510".
+      *
+           03   CONS-TANKI3-H26-AREA.
+      *      Ã»¼ê£³¡Ê½ªÌë¿çÌ²¥Ý¥ê¥°¥é¥Õ¥£¡¼£±¡Ê·ÈÂÓÍÑÁõÃÖ»ÈÍÑ¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "97".
+             05   FILLER                   PIC X(09) VALUE "190177610".
+      *      Ã»¼ê£³¡Ê½ªÌë¿çÌ²¥Ý¥ê¥°¥é¥Õ¥£¡¼£±¡Ê·ÈÂÓÍÑÁõÃÖ»ÈÍÑ¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "98".
+             05   FILLER                   PIC X(09) VALUE "190177710".
+      *      Ã»¼ê£³¡Ê½ªÌë¿çÌ²¥Ý¥ê¥°¥é¥Õ¥£¡¼£²¡ÊÂ¿ÅÀ´¶°µ¥»¥ó¥µ¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "99".
+             05   FILLER                   PIC X(09) VALUE "190177810".
+      *      Ã»¼ê£³¡Ê½ªÌë¿çÌ²¥Ý¥ê¥°¥é¥Õ¥£¡¼£²¡ÊÂ¿ÅÀ´¶°µ¥»¥ó¥µ¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9A".
+             05   FILLER                   PIC X(09) VALUE "190177910".
+      *      Ã»¼ê£³¡Ê½ªÌë¿çÌ²¥Ý¥ê¥°¥é¥Õ¥£¡¼£³¡Ê£±µÚ¤Ó£²°Ê³°¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "9B".
+             05   FILLER                   PIC X(09) VALUE "190178010".
+      *      Ã»¼ê£³¡Ê½ªÌë¿çÌ²¥Ý¥ê¥°¥é¥Õ¥£¡¼£³¡Ê£±µÚ¤Ó£²°Ê³°¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9C".
+             05   FILLER                   PIC X(09) VALUE "190178110".
+      *      Ã»¼ê£³¡Ê¾®»ù¿©Êª¥¢¥ì¥ë¥®¡¼Éé²Ù¸¡ºº¡Ë
+             05   FILLER                   PIC X(02) VALUE "9D".
+             05   FILLER                   PIC X(09) VALUE "190178210".
+      *      Ã»¼ê£³¡Ê¾®»ù¿©Êª¥¢¥ì¥ë¥®¡¼Éé²Ù¸¡ºº¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9E".
+             05   FILLER                   PIC X(09) VALUE "190178310".
+      *      Ã»¼ê£³¡ÊÁ°Î©Á£¿ËÀ¸¸¡Ë¡¡Ë
+             05   FILLER                   PIC X(02) VALUE "9F".
+             05   FILLER                   PIC X(09) VALUE "190178410".
+      *      Ã»¼ê£³¡ÊÁ°Î©Á£¿ËÀ¸¸¡Ë¡¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9G".
+             05   FILLER                   PIC X(09) VALUE "190178510".
+      *      Ã»¼ê£³¡Êæþ½­¾É¼ê½Ñ¡ÊÈéÉæÍ­ÌÓÉôÀÚ½ü½Ñ¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "9H".
+             05   FILLER                   PIC X(09) VALUE "190178610".
+      *      Ã»¼ê£³¡Êæþ½­¾É¼ê½Ñ¡ÊÈéÉæÍ­ÌÓÉôÀÚ½ü½Ñ¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9I".
+             05   FILLER                   PIC X(09) VALUE "190178710".
+      *      Ã»¼ê£³¡Ê´ØÀá¶À²¼¼êº¬´É³«Êü¼ê½Ñ¡Ë
+             05   FILLER                   PIC X(02) VALUE "9J".
+             05   FILLER                   PIC X(09) VALUE "190178810".
+      *      Ã»¼ê£³¡Ê´ØÀá¶À²¼¼êº¬´É³«Êü¼ê½Ñ¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9K".
+             05   FILLER                   PIC X(09) VALUE "190178910".
+      *      Ã»¼ê£³¡Ê¶»¹Ð¶À²¼¸ò´¶¿À·ÐÀáÀÚ½ü½Ñ¡ÊÎ¾Â¦¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "9L".
+             05   FILLER                   PIC X(09) VALUE "190179010".
+      *      Ã»¼ê£³¡Ê¶»¹Ð¶À²¼¸ò´¶¿À·ÐÀáÀÚ½ü½Ñ¡ÊÎ¾Â¦¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9M".
+             05   FILLER                   PIC X(09) VALUE "190179110".
+      *      Ã»¼ê£³¡Ê¿å¾½ÂÎºÆ·ú½Ñ¡¦´ãÆâ¥ì¥ó¥ºÁÞÆþ¡¦¤½¤ÎÂ¾¤Î¤â¤Î¡Ë
+             05   FILLER                   PIC X(02) VALUE "9N".
+             05   FILLER                   PIC X(09) VALUE "190179210".
+      *      Ã»¼ê£³¡Ê¿å¾½ÂÎºÆ·ú½Ñ¡¦´ãÆâ¥ì¥ó¥ºÁÞÆþ¡¦¤½¤ÎÂ¾¤Î¤â¤Î¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9O".
+             05   FILLER                   PIC X(09) VALUE "190179310".
+      *      Ã»¼ê£³¡Ê¿å¾½ÂÎºÆ·ú½Ñ¡Ê´ãÆâ¥ì¥ó¥ºÁÞÆþ¤·¤Ê¤¤¾ì¹ç¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "9P".
+             05   FILLER                   PIC X(09) VALUE "190179410".
+      *      Ã»¼ê£³¡Ê¿å¾½ÂÎºÆ·ú½Ñ¡Ê´ãÆâ¥ì¥ó¥ºÁÞÆþ¤·¤Ê¤¤¾ì¹ç¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9Q".
+             05   FILLER                   PIC X(09) VALUE "190179510".
+      *      Ã»¼ê£³¡ÊÆýÁ£¼ðáçÅ¦½Ð½Ñ¡ÊÄ¹·Â£µ£ã£íÌ¤Ëþ¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "9R".
+             05   FILLER                   PIC X(09) VALUE "190179610".
+      *      Ã»¼ê£³¡ÊÆýÁ£¼ðáçÅ¦½Ð½Ñ¡ÊÄ¹·Â£µ£ã£íÌ¤Ëþ¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9S".
+             05   FILLER                   PIC X(09) VALUE "190179710".
+      *      Ã»¼ê£³¡Ê²¼»èÀÅÌ®áî¼ê½Ñ¡ÊÈ´µîÀÚ½ü½Ñ¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "9T".
+             05   FILLER                   PIC X(09) VALUE "190179810".
+      *      Ã»¼ê£³¡Ê²¼»èÀÅÌ®áî¼ê½Ñ¡ÊÈ´µîÀÚ½ü½Ñ¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9U".
+             05   FILLER                   PIC X(09) VALUE "190179910".
+      *      Ã»¼ê£³¡Ê²¼»èÀÅÌ®áî¼ê½Ñ¡Ê¹Å²½ÎÅË¡¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "9V".
+             05   FILLER                   PIC X(09) VALUE "190180010".
+      *      Ã»¼ê£³¡Ê²¼»èÀÅÌ®áî¼ê½Ñ¡Ê¹Å²½ÎÅË¡¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9W".
+             05   FILLER                   PIC X(09) VALUE "190180110".
+      *      Ã»¼ê£³¡Ê²¼»èÀÅÌ®áî¼ê½Ñ¡Ê¹â°Ì·ëå§½Ñ¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "9X".
+             05   FILLER                   PIC X(09) VALUE "190180210".
+      *      Ã»¼ê£³¡Ê²¼»èÀÅÌ®áî¼ê½Ñ¡Ê¹â°Ì·ëå§½Ñ¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "9Y".
+             05   FILLER                   PIC X(09) VALUE "190180310".
+      *      Ã»¼ê£³¡ÊÁÍ·Â¥Ø¥ë¥Ë¥¢¼ê½Ñ¡Ê£±£µºÐÌ¤Ëþ¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "9Z".
+             05   FILLER                   PIC X(09) VALUE "190180410".
+      *      Ã»¼ê£³¡ÊÁÍ·Â¥Ø¥ë¥Ë¥¢¼ê½Ñ¡Ê£±£µºÐÌ¤Ëþ¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "A0".
+             05   FILLER                   PIC X(09) VALUE "190180510".
+      *      Ã»¼ê£³¡ÊÁÍ·Â¥Ø¥ë¥Ë¥¢¼ê½Ñ¡Ê£±£µºÐ°Ê¾å¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "A1".
+             05   FILLER                   PIC X(09) VALUE "190180610".
+      *      Ã»¼ê£³¡ÊÁÍ·Â¥Ø¥ë¥Ë¥¢¼ê½Ñ¡Ê£±£µºÐ°Ê¾å¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "A2".
+             05   FILLER                   PIC X(09) VALUE "190180710".
+      *      Ã»¼ê£³¡ÊÊ¢¹Ð¶À²¼ÁÍ·Â¥Ø¥ë¥Ë¥¢¼ê½Ñ¡Ë¡Ê£±£µºÐÌ¤Ëþ¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "A3".
+             05   FILLER                   PIC X(09) VALUE "190180810".
+      *      Ã»¼ê£³¡ÊÊ¢¹Ð¶À²¼ÁÍ·Â¥Ø¥ë¥Ë¥¢¼ê½Ñ¡Ë¡Ê£±£µºÐÌ¤Ëþ¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "A4".
+             05   FILLER                   PIC X(09) VALUE "190180910".
+      *      Ã»¼ê£³¡ÊÊ¢¹Ð¶À²¼ÁÍ·Â¥Ø¥ë¥Ë¥¢¼ê½Ñ¡Ë¡Ê£±£µºÐ°Ê¾å¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "A5".
+             05   FILLER                   PIC X(09) VALUE "190181010".
+      *      Ã»¼ê£³¡ÊÊ¢¹Ð¶À²¼ÁÍ·Â¥Ø¥ë¥Ë¥¢¼ê½Ñ¡Ë¡Ê£±£µºÐ°Ê¾å¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "A6".
+             05   FILLER                   PIC X(09) VALUE "190181110".
+      *      Ã»¼ê£³¡ÊÆâ»ë¶ÀÅª·ëÄ²¥Ý¥ê¡¼¥×¡¦Ç´ËìÀÚ½ü½Ñ£²£ã£íÌ¤Ëþ¡Ë
+             05   FILLER                   PIC X(02) VALUE "A7".
+             05   FILLER                   PIC X(09) VALUE "190181210".
+      *      Ã»¼ê£³¡ÊÆâ»ë¶ÀÅª·ëÄ²¥Ý¥ê¡¼¥×¡¦Ç´ËìÀÚ½ü½Ñ£²£ã£íÌ¤Ëþ¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "A8".
+             05   FILLER                   PIC X(09) VALUE "190181310".
+      *      Ã»¼ê£³¡ÊÆâ»ë¶ÀÅª·ëÄ²¥Ý¥ê¡¼¥×¡¦Ç´ËìÀÚ½ü½Ñ£²£ã£í°Ê¾å¡Ë
+             05   FILLER                   PIC X(02) VALUE "A9".
+             05   FILLER                   PIC X(09) VALUE "190181410".
+      *      Ã»¼ê£³¡ÊÆâ»ë¶ÀÅª·ëÄ²¥Ý¥ê¡¼¥×¡¦Ç´ËìÀÚ½ü½Ñ£²£ã£í°Ê¾å¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "AA".
+             05   FILLER                   PIC X(09) VALUE "190181510".
+      *      Ã»¼ê£³¡Ê¼¦³Ë¼ê½Ñ¡Ê¹Å²½ÎÅË¡¡Ê»ÍÃÊ³¬Ãí¼ÍË¡¡Ë¡Ë
+             05   FILLER                   PIC X(02) VALUE "AB".
+             05   FILLER                   PIC X(09) VALUE "190181610".
+      *      Ã»¼ê£³¡Ê¼¦³Ë¼ê½Ñ¡Ê¹Å²½ÎÅË¡¡Ê»ÍÃÊ³¬Ãí¼ÍË¡¡Ë¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "AC".
+             05   FILLER                   PIC X(09) VALUE "190181710".
+      *      Ã»¼ê£³¡Ê»ÒµÜ·ÛÉô¡ÊçµÉô¡ËÀÚ½ü½Ñ¡Ë
+             05   FILLER                   PIC X(02) VALUE "AD".
+             05   FILLER                   PIC X(09) VALUE "190181810".
+      *      Ã»¼ê£³¡Ê»ÒµÜ·ÛÉô¡ÊçµÉô¡ËÀÚ½ü½Ñ¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "AE".
+             05   FILLER                   PIC X(09) VALUE "190181910".
+      *      Ã»¼ê£³¡Ê»ÒµÜ¶À²¼»ÒµÜ¶Ú¼ðÅ¦½Ð½Ñ¡Ë
+             05   FILLER                   PIC X(02) VALUE "AF".
+             05   FILLER                   PIC X(09) VALUE "190182010".
+      *      Ã»¼ê£³¡Ê»ÒµÜ¶À²¼»ÒµÜ¶Ú¼ðÅ¦½Ð½Ñ¡Ë¡ÊÀ¸³è¡Ë
+             05   FILLER                   PIC X(02) VALUE "AG".
+             05   FILLER                   PIC X(09) VALUE "190182110".
+      *
+           03  CONS-TANKI3-H26-AREA-R  REDEFINES  CONS-TANKI3-H26-AREA.
+             05   CONS-TANKI3-H26-TBL      OCCURS  46.
+                07   CONS-TANKI3-H26-KBNCD PIC X(02).
+                07   CONS-TANKI3-H26-SRYCD PIC X(09).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -489,6 +635,78 @@
            MOVE    "key49"                 TO  MCP-PATHNAME
            PERFORM   900-CLOSE-SEC
       *
+      *    Ê¿À®£²£¶Ç¯²þÄê¤ÎÄÉ²ÃÊ¬
+      *    Æþ±¡ÍúÎò¤è¤êÃ»´üÂÚºß¼ê½ÑÅù´ðËÜÎÁ£³¡ÊÀ¸³èÎÅÍÜ¡Ë¤Î»»ÄêÍ­Ìµ¤òÆÃÄê
+           IF       LNK-NYUINDAY-SANTEIYM   >=   "201404"
+            PERFORM     VARYING   IDX-TK3  FROM   1  BY  1
+             UNTIL     IDX-TK3   >   46
+             INITIALIZE                     PTNYUINRRK-REC
+             MOVE    LNK-NYUINDAY-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
+             MOVE    LNK-NYUINDAY-PTID      TO  PTNYUINRRK-PTID
+             MOVE    "3"                    TO  PTNYUINRRK-TOKUTEI-KBN
+             MOVE    CONS-TANKI3-H26-KBNCD(IDX-TK3)
+                                            TO  PTNYUINRRK-TOKUTEI-NYUIN
+             MOVE    "tbl_ptnyuinrrk"       TO  MCP-TABLE
+             MOVE    "key49"                TO  MCP-PATHNAME
+             PERFORM 910-PTNYUINRRK-SELECT-SEC
+             IF      FLG-PTNYUINRRK         =   ZERO
+               MOVE    "tbl_ptnyuinrrk"   TO  MCP-TABLE
+               MOVE    "key49"            TO  MCP-PATHNAME
+               PERFORM   910-PTNYUINRRK-READ-SEC
+               PERFORM   UNTIL   (FLG-PTNYUINRRK   =   1)
+                 IF (PTNYUINRRK-TENNYUYMD(1:6) = LNK-NYUINDAY-SANTEIYM)
+                                   OR
+                   ((PTNYUINRRK-TENSTUYMD(1:6) = LNK-NYUINDAY-SANTEIYM)
+                                   OR
+                    (PTNYUINRRK-TENSTUYMD(1:6) = "999999"))
+                      MOVE     ZERO       TO     IDX-ST
+                                                 IDX-ED
+                      IF  (PTNYUINRRK-TENNYUYMD(1:6)
+                                          =  LNK-NYUINDAY-SANTEIYM) AND
+                          (PTNYUINRRK-TENSTUYMD(1:6)
+                                          =  LNK-NYUINDAY-SANTEIYM)
+                          MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ST
+                          MOVE  PTNYUINRRK-TENSTUYMD(7:2)  TO  IDX-ED
+                      END-IF
+                      IF  (PTNYUINRRK-TENNYUYMD(1:6)
+                                          <  LNK-NYUINDAY-SANTEIYM) AND
+                          (PTNYUINRRK-TENSTUYMD(1:6)
+                                            =  LNK-NYUINDAY-SANTEIYM)
+                          MOVE  1                          TO  IDX-ST
+                          MOVE  PTNYUINRRK-TENSTUYMD(7:2)  TO  IDX-ED
+                      END-IF
+                      IF  (PTNYUINRRK-TENNYUYMD(1:6)
+                                          =  LNK-NYUINDAY-SANTEIYM) AND
+                          (PTNYUINRRK-TENSTUYMD(1:6)
+                                          >  LNK-NYUINDAY-SANTEIYM)
+                          MOVE  PTNYUINRRK-TENNYUYMD(7:2)  TO  IDX-ST
+                          MOVE  99                         TO  IDX-ED
+                      END-IF
+                      IF      PTNYUINRRK-TENSTUYMD(1:6) = "999999"
+                           MOVE   99     TO    IDX-ED
+                      END-IF
+                      PERFORM    VARYING   IDX   FROM   1   BY   1
+                               UNTIL     IDX   >   31
+                         IF    (IDX-ST    <=    IDX)   AND
+                               (IDX-ED    >=    IDX)
+                            MOVE  "2"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
+                         END-IF
+                      END-PERFORM
+                 END-IF
+                 MOVE    "tbl_ptnyuinrrk"     TO  MCP-TABLE
+                 MOVE    "key49"              TO  MCP-PATHNAME
+                 PERFORM 910-PTNYUINRRK-READ-SEC
+               END-PERFORM
+             END-IF
+      *
+      *      ´µ¼ÔÆþ±¡ÍúÎò¥¯¥í¡¼¥º
+             MOVE    "tbl_ptnyuinrrk"        TO  MCP-TABLE
+             MOVE    "key49"                 TO  MCP-PATHNAME
+             PERFORM   900-CLOSE-SEC
+      *
+            END-PERFORM
+           END-IF
+      *
       *    Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£²¡ÊÀ¸³èÎÅÍÜ´Þ¤à¡ËËô¤ÏÃ»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£³¡ÊÀ¸³èÎÅÍÜ´Þ¤à¡Ë
       *    ¤Ë³ºÅö¤¹¤ëÆþ±¡ÎÁ¤òÈ½Äê¤·¡¢Æþ±¡²ñ·×¤Ç»»ÄêºÑ¤ß¤Î¾ì¹ç¤ÏÊÖµÑÃÍ¤ò¥¯¥ê¥¢¤¹¤ë
            INITIALIZE                          NYUINACCT-REC
@@ -508,10 +726,56 @@
                        CONTINUE
                    ELSE
                        PERFORM    210-NYUINACT-GET-SEC
-                       IF   NSRY-SRYCD(1)   =  CONS-TANKI2     OR
-                                               CONS-TANKI2-SEIKATSU OR
-                                               CONS-TANKI3     OR
-                                               CONS-TANKI3-SEIKATSU
+                       IF  NSRY-SRYCD(1)  = CONS-TANKI2     OR
+                                            CONS-TANKI2-SEIKATSU OR
+                                            CONS-TANKI3     OR
+                                            CONS-TANKI3-SEIKATSU OR
+                                            CONS-TANKI3-H26-SRYCD(1) OR
+                                            CONS-TANKI3-H26-SRYCD(2) OR
+                                            CONS-TANKI3-H26-SRYCD(3) OR
+                                            CONS-TANKI3-H26-SRYCD(4) OR
+                                            CONS-TANKI3-H26-SRYCD(5) OR
+                                            CONS-TANKI3-H26-SRYCD(6) OR
+                                            CONS-TANKI3-H26-SRYCD(7) OR
+                                            CONS-TANKI3-H26-SRYCD(8) OR
+                                            CONS-TANKI3-H26-SRYCD(9) OR
+                                            CONS-TANKI3-H26-SRYCD(10) OR
+                                            CONS-TANKI3-H26-SRYCD(11) OR
+                                            CONS-TANKI3-H26-SRYCD(12) OR
+                                            CONS-TANKI3-H26-SRYCD(13) OR
+                                            CONS-TANKI3-H26-SRYCD(14) OR
+                                            CONS-TANKI3-H26-SRYCD(15) OR
+                                            CONS-TANKI3-H26-SRYCD(16) OR
+                                            CONS-TANKI3-H26-SRYCD(17) OR
+                                            CONS-TANKI3-H26-SRYCD(18) OR
+                                            CONS-TANKI3-H26-SRYCD(19) OR
+                                            CONS-TANKI3-H26-SRYCD(20) OR
+                                            CONS-TANKI3-H26-SRYCD(21) OR
+                                            CONS-TANKI3-H26-SRYCD(22) OR
+                                            CONS-TANKI3-H26-SRYCD(23) OR
+                                            CONS-TANKI3-H26-SRYCD(24) OR
+                                            CONS-TANKI3-H26-SRYCD(25) OR
+                                            CONS-TANKI3-H26-SRYCD(26) OR
+                                            CONS-TANKI3-H26-SRYCD(27) OR
+                                            CONS-TANKI3-H26-SRYCD(28) OR
+                                            CONS-TANKI3-H26-SRYCD(29) OR
+                                            CONS-TANKI3-H26-SRYCD(30) OR
+                                            CONS-TANKI3-H26-SRYCD(31) OR
+                                            CONS-TANKI3-H26-SRYCD(32) OR
+                                            CONS-TANKI3-H26-SRYCD(33) OR
+                                            CONS-TANKI3-H26-SRYCD(34) OR
+                                            CONS-TANKI3-H26-SRYCD(35) OR
+                                            CONS-TANKI3-H26-SRYCD(36) OR
+                                            CONS-TANKI3-H26-SRYCD(37) OR
+                                            CONS-TANKI3-H26-SRYCD(38) OR
+                                            CONS-TANKI3-H26-SRYCD(39) OR
+                                            CONS-TANKI3-H26-SRYCD(40) OR
+                                            CONS-TANKI3-H26-SRYCD(41) OR
+                                            CONS-TANKI3-H26-SRYCD(42) OR
+                                            CONS-TANKI3-H26-SRYCD(43) OR
+                                            CONS-TANKI3-H26-SRYCD(44) OR
+                                            CONS-TANKI3-H26-SRYCD(45) OR
+                                            CONS-TANKI3-H26-SRYCD(46)
                           PERFORM    VARYING   IDX   FROM   1   BY   1
                                   UNTIL     IDX   >   31
                             IF     NACCT-DAY(IDX)  NOT =  ZERO

@@ -36,6 +36,10 @@
       *  03.05.00    NACL-太田    07/05/10  グループ診療対応
       *平成２２年４月改定対応
       *  00.00.00    NACL-小豆沢  10/03/02  有床診療所入院基本料３対応
+      *平成２６年４月改定対応
+      *  00.00.00    NACL-小豆沢  14/02/27  有床診療所入院基本料１
+      *                                     有床診療所入院基本料２
+      *                                     有床診療所入院基本料３追加対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -54,6 +58,7 @@
            03  FLG-ERR                     PIC 9(01).
            03  FLG-SINRYOJO-VAL-1804       PIC 9(01).
            03  FLG-SINRYOJO-VAL-2204       PIC 9(01).
+           03  FLG-SINRYOJO-VAL-2604       PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -158,6 +163,22 @@
                05  CONST-SINRYOJO-06-ED    PIC X(4)    VALUE   "1035".
                05  CONST-SINRYOJO-07-ST    PIC X(4)    VALUE   "1036".
                05  CONST-SINRYOJO-07-ED    PIC X(4)    VALUE   "9999".
+      *    有床診療所入院基本料１、２、３、４、５、６（平成２６年度改定）
+           03  CONST-SINRYOJO-VAL-2604.
+               05  CONST-SINRYOJO-01-ST    PIC X(4)    VALUE   "1001".
+               05  CONST-SINRYOJO-01-ED    PIC X(4)    VALUE   "1014".
+               05  CONST-SINRYOJO-02-ST    PIC X(4)    VALUE   "1015".
+               05  CONST-SINRYOJO-02-ED    PIC X(4)    VALUE   "1030".
+               05  CONST-SINRYOJO-03-ST    PIC X(4)    VALUE   "1031".
+               05  CONST-SINRYOJO-03-ED    PIC X(4)    VALUE   "1999".
+               05  CONST-SINRYOJO-04-ST    PIC X(4)    VALUE   "1031".
+               05  CONST-SINRYOJO-04-ED    PIC X(4)    VALUE   "1999".
+               05  CONST-SINRYOJO-05-ST    PIC X(4)    VALUE   "1032".
+               05  CONST-SINRYOJO-05-ED    PIC X(4)    VALUE   "1033".
+               05  CONST-SINRYOJO-06-ST    PIC X(4)    VALUE   "1034".
+               05  CONST-SINRYOJO-06-ED    PIC X(4)    VALUE   "1035".
+               05  CONST-SINRYOJO-07-ST    PIC X(4)    VALUE   "1036".
+               05  CONST-SINRYOJO-07-ED    PIC X(4)    VALUE   "9999".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -211,11 +232,16 @@
            END-IF
       *
       *    編集処理
-           IF     SYOKIKSN-IN-SANTEISTYMD   >=  "20100401"
-               PERFORM 201-EDIT-SEC
+           IF     SYOKIKSN-IN-SANTEISTYMD   >=  "20140401"
+               PERFORM 202-EDIT-SEC
            ELSE
-               PERFORM 200-EDIT-SEC
+               IF     SYOKIKSN-IN-SANTEISTYMD   >=  "20100401"
+                   PERFORM 201-EDIT-SEC
+               ELSE
+                   PERFORM 200-EDIT-SEC
+               END-IF
            END-IF
+      *
            IF    ( FLG-ERR NOT =   ZERO )
                MOVE    FLG-ERR TO  SYOKIKSN-OT-RC
                GO  TO  000-PROC-EXT
@@ -442,7 +468,7 @@
       *    入院料算定マスタ検索処理
            PERFORM 210-NYUINKHN-SEL-SEC
            IF    ( FLG-ERR NOT =   ZERO )
-               GO  TO  200-EDIT-EXT
+               GO  TO  201-EDIT-EXT
            END-IF
       *
       *    平成２２年４月改定対応（有床診療所入院基本料）
@@ -546,6 +572,138 @@
       *
            .
        201-EDIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    編集処理（平成２６年４月改定以降）
+      *****************************************************************
+       202-EDIT-SEC                SECTION.
+      *
+           IF    ( SYOKIKSN-IN-KHNSRYCD    =   "099999950"
+            OR                                 "099999951"
+            OR                                 "099999952"
+            OR                                 "099999955"
+            OR                                 "099999956"
+            OR                                 "099999957"   )
+      *        平成２６年４月改定対応（有床診療所入院基本料）
+               MOVE    1       TO    FLG-SINRYOJO-VAL-2604
+               MOVE    CONST-SINRYOJO-VAL-2604  TO  WRK-KIKAN-TBL
+           ELSE
+               MOVE    CONST-KGNTEN-VAL    TO  WRK-KIKAN-TBL
+           END-IF
+      *
+      *    基準日取得処理
+           PERFORM 210-KJNYMD-GET-SEC
+      *
+      *    入院料算定マスタ検索処理
+           PERFORM 210-NYUINKHN-SEL-SEC
+           IF    ( FLG-ERR NOT =   ZERO )
+               GO  TO  202-EDIT-EXT
+           END-IF
+      *
+      *    平成２６年４月改定対応（有床診療所入院基本料）
+           IF   FLG-SINRYOJO-VAL-2604     =    1
+               IF   SYOKIKSN-IN-KHNSRYCD  = "099999950"  OR
+                                            "099999951"  OR
+                                            "099999952"  OR
+                                            "099999955"  OR
+                                            "099999956"  OR
+                                            "099999957"
+                   MOVE    SPACE        TO  SYOKIKSN-IN-KHNSRYCD
+               END-IF
+           END-IF
+      *    ワーク加減算テーブルに診療行為コードと有効期間を設定
+           INITIALIZE              WRK-KGNTEN-TBL
+           PERFORM VARYING IDX1    FROM    1   BY  1
+               UNTIL     ( IDX1    >   7 )
+      *
+               MOVE    NYUKHN-KAGENCD (IDX1)
+                                   TO  WRK-KGNTEN-SRYCD (IDX1)
+      *        基準日
+               MOVE    WRK-KJNYMD
+                                   TO WRK-YMD
+               MOVE    WRK-KIKAN-STZOGENPTN (IDX1)
+                                   TO WRK-ZOGENPTN
+               MOVE    WRK-KIKAN-STZOGEN (IDX1)
+                                   TO WRK-ZOGEN
+               PERFORM 220-HIZUKE-GET-SEC
+               MOVE    WRK-KEISANYMD
+                                   TO  WRK-KGNTEN-YUKOSTYMD (IDX1)
+      *
+      *        有効期間終了日
+               MOVE    WRK-KJNYMD
+                                   TO WRK-YMD
+               MOVE    WRK-KIKAN-EDZOGENPTN (IDX1)
+                                   TO WRK-ZOGENPTN
+               MOVE    WRK-KIKAN-EDZOGEN (IDX1)
+                                   TO WRK-ZOGEN
+               PERFORM 220-HIZUKE-GET-SEC
+               MOVE    WRK-KEISANYMD
+                                   TO  WRK-KGNTEN-YUKOEDYMD (IDX1)
+      *
+           END-PERFORM
+      *
+      *    ワーク加減算テーブルの該当の有効期間開始日に算定開始日を
+      *    設定する
+           PERFORM VARYING IDX1    FROM    1   BY  1
+               UNTIL     ( IDX1    >   7 )
+      *
+               IF    ( SYOKIKSN-IN-SANTEISTYMD
+                                   >=  WRK-KGNTEN-YUKOSTYMD (IDX1) )
+                AND  ( SYOKIKSN-IN-SANTEISTYMD
+                                   <=  WRK-KGNTEN-YUKOEDYMD (IDX1) )
+                       MOVE    SYOKIKSN-IN-SANTEISTYMD
+                                       TO  WRK-KGNTEN-YUKOSTYMD (IDX1)
+               ELSE
+                   IF    ( SYOKIKSN-IN-SANTEISTYMD
+                                   >   WRK-KGNTEN-YUKOEDYMD (IDX1))
+                       MOVE    SPACE   TO  WRK-KGNTEN-SRYCD  (IDX1)
+                   END-IF
+               END-IF
+      *
+           END-PERFORM
+      *
+      *    同一点数のデータが存在する場合はまとめる
+           PERFORM VARYING IDX1    FROM    1   BY  1
+               UNTIL     ( IDX1    >   6 )
+               COMPUTE IDX2    =   IDX1    +   1
+               IF    ( WRK-KGNTEN-SRYCD (IDX1) NOT =   SPACE )
+                   IF    ( WRK-KGNTEN-SRYCD (IDX1)
+                                   =   WRK-KGNTEN-SRYCD (IDX2))
+                       PERFORM VARYING IDX3    FROM    IDX2    BY  1
+                           UNTIL     ( IDX3    >   7 )
+                               OR    ( WRK-KGNTEN-SRYCD (IDX1)
+                                       NOT =   WRK-KGNTEN-SRYCD (IDX3))
+                           MOVE    WRK-KGNTEN-YUKOEDYMD (IDX3)
+                               TO  WRK-KGNTEN-YUKOEDYMD (IDX1)
+                           MOVE    SPACE   TO  WRK-KGNTEN-SRYCD (IDX3)
+                       END-PERFORM
+                   END-IF
+               END-IF
+      *
+           END-PERFORM
+      *
+      *    ワーク加減算テーブルの内容を返却値に設定
+           MOVE    ZERO            TO  IDX2
+           PERFORM VARYING IDX1    FROM    1   BY  1
+               UNTIL     ( IDX1    >   7)
+      *
+               IF    ( WRK-KGNTEN-SRYCD  (IDX1)
+                                   NOT =   SPACE )
+                   COMPUTE IDX2    =   IDX2    +   1
+                   MOVE    WRK-KGNTEN-SRYCD (IDX1)
+                                   TO  SYOKIKSN-OT-KGNSRYCD  (IDX2)
+                   MOVE    WRK-KGNTEN-YUKOSTYMD (IDX1)
+                                   TO  SYOKIKSN-OT-YUKOSTYMD (IDX2)
+                   MOVE    WRK-KGNTEN-YUKOEDYMD (IDX1)
+                                   TO  SYOKIKSN-OT-YUKOEDYMD (IDX2)
+               END-IF
+      *
+           END-PERFORM
+      *
+           MOVE    ZERO            TO  SYOKIKSN-OT-RC
+      *
+           .
+       202-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    基準日取得処理
