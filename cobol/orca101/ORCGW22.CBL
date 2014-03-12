@@ -466,12 +466,6 @@
       *
            PERFORM 4900-KANRENCHK-SEC
            IF  SPA-W22-ERRMSG   =   SPACE
-               IF  FLG-ARI   =   ZERO
-                   MOVE    T-MESSAGE-003   TO  SPA-W22-ERRMSG
-                   MOVE    2               TO  SPA-W22-CUR
-               END-IF
-           END-IF
-           IF  SPA-W22-ERRMSG   =   SPACE
       *    有効期間の開始日と終了日が同時に変更されていないこと
                    IF  (SPA-W22-STYUKYMD-S  NOT =
                                                SPA-W22-STYUKYMD-OLD) AND
@@ -698,10 +692,8 @@
                        (SPA-W22-EDYUKYMD-OLD   =   SYS-EDYUKYMD)
                        CONTINUE
                    ELSE
-                       IF  (SPA-W22-STYUKYMD-OLD   <   SYS-STYUKYMD)  OR
-                           (SPA-W22-EDYUKYMD-OLD   >   SYS-EDYUKYMD)
-                           CONTINUE
-                       ELSE
+                       IF  (SPA-W22-STYUKYMD-S <=  SYS-EDYUKYMD)  AND
+                           (SPA-W22-EDYUKYMD-S >=  SYS-STYUKYMD)
                            MOVE    1               TO  FLG-KIKAN-DABURI
                        END-IF
                    END-IF
@@ -1176,12 +1168,6 @@
                GO  TO  4900-KANRENCHK-EXT
            END-IF.
       *
-           IF  SPA-W22-EDYUKYMD-S   <   SPA-SYSYMD
-               MOVE    T-MESSAGE-006   TO  SPA-W22-ERRMSG
-               MOVE    4               TO  SPA-W22-CUR
-               GO  TO  4900-KANRENCHK-EXT
-           END-IF.
-      *
        4900-KANRENCHK-EXT.
            EXIT.
       *
@@ -1495,31 +1481,6 @@
                            MOVE    2               TO  SPA-W22-CUR
                    END-IF
                END-IF
-      *
-           END-IF.
-           IF  SPA-W22-ERRMSG   =   SPACE
-               MOVE    ZERO                  TO  IDX
-               MOVE    ZERO                  TO  FLG-ARI
-               INITIALIZE                        SYSKANRI-REC
-               MOVE    SPA-HOSPNUM           TO  SYS-HOSPNUM
-               MOVE    SPA-W22-KANRICD-C     TO  SYS-KANRICD
-               MOVE    SPA-W22-KBNCD         TO  SYS-KBNCD
-               MOVE    "tbl_syskanri"        TO  MCP-TABLE
-               MOVE    "key8"                TO  MCP-PATHNAME
-               MOVE    "tbl_syskanri"        TO  WRK-TABLE
-               MOVE    "key8"                TO  WRK-PATHNAME
-               MOVE    SYSKANRI-REC          TO  MCPDATA-REC
-      *
-               PERFORM 910-DB-SELECT-SEC
-               IF  MCP-RC   =   ZERO
-                   PERFORM SYS-KANRI-READ-SEC
-                   IF  IDX   =   ZERO
-                       MOVE    1            TO  FLG-ARI
-                       MOVE    SYS-STYUKYMD TO  SPA-W22-STYUKYMD-OLD
-                       MOVE    SYS-EDYUKYMD TO  SPA-W22-EDYUKYMD-OLD
-                   END-IF
-               END-IF
-               PERFORM SYS-KANRI-CLOSE-SEC
       *
            END-IF.
       *
