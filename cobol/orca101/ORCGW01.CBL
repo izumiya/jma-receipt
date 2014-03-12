@@ -381,6 +381,8 @@
            03  FILLER              PIC X(35)   VALUE
                "5002 病室管理情報".
            03  FILLER              PIC X(35)   VALUE
+               "5003 短期滞在手術等基本料３情報".
+           03  FILLER              PIC X(35)   VALUE
                "5005 室料差額設定".
            03  FILLER              PIC X(35)   VALUE
                "5006 病棟選定入院料情報".
@@ -408,11 +410,11 @@
                "9800 排他制御情報".
       *
        01  TBL-KANRICD-N-AREAR         REDEFINES   TBL-KANRICD-N-AREA.
-           03  TBL-KANRICD-N-TBL           OCCURS   16.
+           03  TBL-KANRICD-N-TBL           OCCURS   17.
                05  TBL-KANRICD-N           PIC X(04).
                05  TBL-FILLER              PIC X(01).
                05  TBL-KANRICDMEI-N        PIC X(30).
-       01  TBL-KANRICDN-MAX                PIC 9(04)   VALUE   16.
+       01  TBL-KANRICDN-MAX                PIC 9(04)   VALUE   17.
       *
       *    他業務からシステム管理に遷移する場合の引継ぎパラメタ
            COPY    "CPLNKSYS.INC".
@@ -2089,6 +2091,8 @@
                    MOVE    "W20"               TO  SPA-SAKIPG
                WHEN    "5002"
                    MOVE    "W21"               TO  SPA-SAKIPG
+               WHEN    "5003"
+                   MOVE    "W37"               TO  SPA-SAKIPG
                WHEN    "5005"
                    MOVE    "W22"               TO  SPA-SAKIPG
                WHEN    "5006"

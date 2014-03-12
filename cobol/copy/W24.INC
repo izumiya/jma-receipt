@@ -201,6 +201,17 @@
                                                OCCURS  2.
                 05  W24-TEISU-ITM-STATE        PIC S9(9)
                                                BINARY.
+              04  W24-CMB-YKNCHOKA.
+                05  W24-YKNCHOKA-VISIBLE       PIC X(1).
+                05  W24-YKNCHOKA               PIC X(32).
+                05  W24-YKNCHOKA-STATE         PIC S9(9)
+                                               BINARY.
+                05  W24-YKNCHOKA-CNT           PIC S9(9)
+                                               BINARY.
+                05  W24-YKNCHOKA-ITM           PIC X(32)
+                                               OCCURS  2.
+                05  W24-YKNCHOKA-ITM-STATE     PIC S9(9)
+                                               BINARY.
               04  W24-CMB-ADLINPUT.
                 05  W24-ADLINPUT               PIC X(10).
                 05  W24-ADLINPUT-STATE         PIC S9(9)

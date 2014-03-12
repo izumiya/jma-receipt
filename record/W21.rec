@@ -57,7 +57,7 @@ W21	{
 				state	int;
 			};
 			count	int;
-			item	varchar(53)[30];
+			item	varchar(53)[50];
 			state	int;
 		};
 		BRM_NINZU	{

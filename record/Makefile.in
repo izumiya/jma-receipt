@@ -486,6 +486,7 @@ RECORD_files = \
 	hsacsimulatev2.rec \
 	W91.rec \
 	incomeinfv2.rec \
+	W37.rec \
 
 DEF_files = \
 

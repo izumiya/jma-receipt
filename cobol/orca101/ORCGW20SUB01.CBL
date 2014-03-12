@@ -59,7 +59,9 @@
            03  WRK-TNS-TEN                         PIC 9(05).
            03  WRK-PATHNAME                        PIC X(64).
            03  WRK-CHG-SRYCD                       PIC X(09).
-           03  WRK-SRYCD                           PIC X(09).
+      *
+       01  CONST-AREA.
+           03  CONST-H260401           PIC X(08)   VALUE "20140401".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -134,8 +136,13 @@
       *
            MOVE    ZERO        TO  W20SUB01-O-RC
            MOVE    TNS-NAME    TO  W20SUB01-O-NAME
-           MOVE    W20SUB01-I-KHNSRYCD
+           IF    ( W20SUB01-I-KHNSRYCD (1:1)   =   "0" )
+               MOVE    W20SUB01-I-KHNSRYCD
                                TO  W20SUB01-O-KHNSRYCD
+           ELSE
+               MOVE    TNS-SRYCD
+                               TO  W20SUB01-O-KHNSRYCD
+           END-IF
            MOVE    TNS-TEN     TO  W20SUB01-O-KHNTEN
       *
            .
@@ -152,6 +159,9 @@
       *
            MOVE    SPA-HOSPNUM     TO  TNS-HOSPNUM
       *
+           MOVE    W20SUB01-I-KHNSRYCD
+                                   TO  TNS-SRYCD
+      *
            EVALUATE    W20SUB01-I-KHNSRYCD
            WHEN    "099999950"
                MOVE    "190097010" TO  TNS-SRYCD
@@ -159,11 +169,23 @@
                MOVE    "190097210" TO  TNS-SRYCD
            WHEN    "099999952"
                MOVE    "190135110" TO  TNS-SRYCD
-           WHEN    OTHER
-               MOVE    W20SUB01-I-KHNSRYCD
-                                   TO  TNS-SRYCD
+           WHEN    "099999955"
+               MOVE    "190169610" TO  TNS-SRYCD
+           WHEN    "099999956"
+               MOVE    "190169910" TO  TNS-SRYCD
+           WHEN    "099999957"
+               MOVE    "190170210" TO  TNS-SRYCD
            END-EVALUATE
-           
+      *
+           EVALUATE    TRUE
+           WHEN  ( W20SUB01-I-KJNYMD   >=  CONST-H260401 )
+             AND ( W20SUB01-I-KHNSRYCD  =  "190131310" )
+               MOVE    "190117710" TO  TNS-SRYCD
+           WHEN  ( W20SUB01-I-KJNYMD   >=  CONST-H260401 )
+             AND ( W20SUB01-I-KHNSRYCD  =  "190131410" )
+               MOVE    "190077410" TO  TNS-SRYCD
+           END-EVALUATE
+      *
            MOVE    W20SUB01-I-KJNYMD   TO  TNS-YUKOSTYMD
                                            TNS-YUKOEDYMD
            MOVE    TNS-TENSU-REC       TO  MCPDATA-REC

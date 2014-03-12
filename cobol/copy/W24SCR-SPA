@@ -94,6 +94,11 @@
                    13  SPA-GMN-W24-TEISU               PIC X(01).
                    13  SPA-GMN-W24-TEISUFL             PIC X(01).
                    13  SPA-GMN-W24-TEISUMEI            PIC X(32).
+      *          Ìë¶Ð»þ´ÖÄ¶²á¶èÊ¬
+                 11  SPA-GMN-W24-YKNCHOKA-G.
+                   13  SPA-GMN-W24-YKNCHOKA            PIC X(01).
+                   13  SPA-GMN-W24-YKNCHOKAFL          PIC X(01).
+                   13  SPA-GMN-W24-YKNCHOKAMEI         PIC X(32).
       *          £Á£Ä£ÌÆþÎÏ¶èÊ¬
                  11  SPA-GMN-W24-ADLINPUT-G.
                    13  SPA-GMN-W24-ADLINPUT            PIC X(01).
@@ -401,6 +406,14 @@
                        15  SPA-GMN-W24-TEISUL          PIC X(01).
                        15  SPA-GMN-W24-TEISULFL        PIC X(01).
                        15  SPA-GMN-W24-TEISUMEIL       PIC X(32).
+      *
+      *          Ìë¶Ð»þ´ÖÄ¶²á¶èÊ¬
+                 11  SPA-GMN-W24-YKNCHOKALST-G.
+                   13  SPA-GMN-W24-YKNCHOKA-MAX           PIC 9(03).
+                   13  SPA-GMN-W24-YKNCHOKALST            OCCURS  2.
+                       15  SPA-GMN-W24-YKNCHOKAL          PIC X(01).
+                       15  SPA-GMN-W24-YKNCHOKALFL        PIC X(01).
+                       15  SPA-GMN-W24-YKNCHOKAMEIL       PIC X(32).
       *
       *          £Á£Ä£ÌÆþÎÏ¶èÊ¬
                  11  SPA-GMN-W24-ADLINPUTLST-G.

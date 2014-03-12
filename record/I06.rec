@@ -163,7 +163,7 @@ I06	{
 				state	int;
 			};
 			count	int;
-			item	varchar(63)[30];
+			item	varchar(63)[100];
 			state	int;
 		};
 		SNTNYUIN	{

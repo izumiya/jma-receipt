@@ -198,6 +198,8 @@
            03  WRK-FROM                            PIC 9(05).
            03  WRK-KBN1-G.
                05  WRK-KBN1                        PIC 9(01).
+           03  WRK-KBN2-G.
+               05  WRK-KBN2                        PIC 9(02).
       *
        01  TKSN-AREA.
            03  TKSN-MAX                            PIC 9(03).
@@ -206,14 +208,13 @@
                05  TKSN-IDX                        PIC 9(03).
                05  TKSN-SRYCD                      PIC X(09).
       *
-      *
        01  SSTKJN-AREA.
            03  SSTKJN-VAL.
                05  SSTKJN-VAL-OCC                  PIC X(500)
-                                                   OCCURS  7.
+                                                   OCCURS  20.
            03  SSTKJN-R    REDEFINES       SSTKJN-VAL.
                05  SSTKJN-CD                       PIC X(01)
-                                                   OCCURS  3500.
+                                                   OCCURS  10000.
       *
       *    ¸ÇÄêÃÍÎÎ°è
        01  CONST-AREA.
@@ -227,7 +228,7 @@
            03  CONST-KSN-MAX           PIC 9(03) VALUE 10.
            03  CONST-GKSN-MAX          PIC 9(03) VALUE 14.
            03  CONST-5002-KSN-MAX      PIC 9(03) VALUE 12.
-           03  CONST-TOKNYUIN-MAX      PIC 9(03) VALUE 30.
+           03  CONST-TOKNYUIN-MAX      PIC 9(03) VALUE 50.
            03  CONST-H24-AREA.
                05   CONST-H2404-BTURYO1     PIC X(09) VALUE "190120210".
                05   CONST-H2404-BTURYO2     PIC X(09) VALUE "190106070".
@@ -4795,12 +4796,20 @@
       *
                MOVE    SYSKANRI-REC    TO  SYS-1006-REC
       *
-               IF    ( SYS-1006-KBNCD  >=  "1" )
-                AND  ( SYS-1006-KBNCD  <=  "7" )
+               EVALUATE    TRUE
+               WHEN  ( SYS-1006-KBNCD (2:)         =   SPACE )
+                AND  ( SYS-1006-KBNCD  >=  "1" )
+                AND  ( SYS-1006-KBNCD  <=  "9" )
                    MOVE    SYS-1006-KBNCD  TO  WRK-KBN1-G
                    MOVE    SYS-1006-TBL    TO  SSTKJN-VAL-OCC
                                                      (WRK-KBN1)
-               END-IF
+               WHEN  ( SYS-1006-KBNCD (2:1)    NOT =   SPACE )
+                AND  ( SYS-1006-KBNCD  >=  "10" )
+                AND  ( SYS-1006-KBNCD  <=  "19" )
+                   MOVE    SYS-1006-KBNCD  TO  WRK-KBN2-G
+                   MOVE    SYS-1006-TBL    TO  SSTKJN-VAL-OCC
+                                                     (WRK-KBN2)
+               END-EVALUATE
       *
                PERFORM 900-SYSKANRI-KEY2-FET-SEC
       *

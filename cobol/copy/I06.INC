@@ -100,7 +100,7 @@
                 04  I06-TOKNYUIN               PIC X(63).
                 04  I06-TOKNYUIN-STATE         PIC S9(9)   BINARY.
                 04  I06-TOKNYUIN-COUNT         PIC S9(9)   BINARY.
-                04  I06-TOKNYUIN-ITEM          PIC X(63)   OCCURS  30.
+                04  I06-TOKNYUIN-ITEM          PIC X(63)   OCCURS  100.
                 04  I06-TOKNYUIN-ITEM-STATE    PIC S9(9)   BINARY.
               03  I06-SNTNYUIN-G.
                 04  I06-SNTNYUIN               PIC X(60).

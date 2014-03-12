@@ -135,7 +135,7 @@
                 05  I01-TOKNYUIN-STT               PIC S9(9)   BINARY.
                 05  I01-TOKNYUIN-CNT               PIC S9(9)   BINARY.
                 05  I01-TOKNYUIN-ITM               PIC X(63)
-                                                   OCCURS  30.
+                                                   OCCURS  100.
                 05  I01-TOKNYUIN-ITM-STT           PIC S9(9)   BINARY.
               04  I01-SNTNYUIN                     PIC X(60).
               04  I01-SNTNYUIN-STT                 PIC S9(9)   BINARY.

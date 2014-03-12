@@ -1,0 +1,142 @@
+W37	{
+	fixed6	{
+		B02	{
+			label	varchar(10);
+		};
+		B03	{
+			label	varchar(10);
+			state	int;
+		};
+		STYUKYMD	{
+			value	varchar(10);
+		};
+		EDYUKYMD	{
+			value	varchar(10);
+		};
+		CHK_TANKI3_01	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_02	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_03	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_04	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_05	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_06	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_07	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_08	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_09	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_10	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_11	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_12	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_13	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_14	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_15	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_16	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_17	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_18	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_19	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_20	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_21	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_22	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_23	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_24	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+		CHK_TANKI3_25	{
+			value	bool;
+			label	varchar(100);
+           	state	int;
+		};
+	};
+};

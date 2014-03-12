@@ -431,6 +431,16 @@ W24	{
 			item	varchar(32)[02];
 			state	int;
 		};
+		CMB_YKNCHOKA	{
+			visible		bool;
+			YKNCHOKA	{
+				value	varchar(32);
+				state	int;
+			};
+			count	int;
+			item	varchar(32)[02];
+			state	int;
+		};
 		CMB_ADLINPUT	{
 			ADLINPUT	{
 				value	varchar(10);
