@@ -29,6 +29,7 @@
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.07.00    NACL-Â¿¡¹Ç¼  13/11/26  ´µ¼Ô¸ÄÊÌÀßÄêÄÉ²ÃÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/02/XX  ´µ¼Ô²ð¸î¾ðÊóÄÉ²ÃÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/03/XX  ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -66,6 +67,7 @@
        01  IDX-AREA.
            03  IDX                 PIC 9(04).
            03  IDY                 PIC 9(04).
+           03  IDH1                PIC 9(01).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -296,6 +298,14 @@
                    MOVE    "P028_CRTEKEDYMD"    TO  MCP-WIDGET
                WHEN    25
                    MOVE    "BCRN2"              TO  MCP-WIDGET
+               WHEN    30
+                   MOVE    "P028_CHKHKTBYO1"    TO  MCP-WIDGET
+               WHEN    31
+                   MOVE    "P028_CHKHKTBYO2"    TO  MCP-WIDGET
+               WHEN    32
+                   MOVE    "P028_CHKHKTBYO3"    TO  MCP-WIDGET
+               WHEN    33
+                   MOVE    "P028_CHKHKTBYO4"    TO  MCP-WIDGET
       *
                WHEN    90
                    MOVE    "B08"                TO  MCP-WIDGET
@@ -353,10 +363,20 @@
                      AND  (SPA-GMN28-CRNINYMD      =   SPACE )
                      AND  (SPA-GMN28-CRTEKSTYMD    =   SPACE )
                      AND  (SPA-GMN28-CRTEKEDYMD    =   SPACE )
-                       MOVE    90          TO  SPA-GMN28-CUR
+      *********        MOVE    90          TO  SPA-GMN28-CUR
+                       MOVE    30          TO  SPA-GMN28-CUR
                    ELSE
                        MOVE    25          TO  SPA-GMN28-CUR
                    END-IF
+      *ÃÏ°èÊñ³çÂÐ¾Ý¼ÀÉÂ
+               WHEN    "P028_CHKHKTBYO1"
+                   MOVE    31              TO  SPA-GMN28-CUR
+               WHEN    "P028_CHKHKTBYO2"
+                   MOVE    32              TO  SPA-GMN28-CUR
+               WHEN    "P028_CHKHKTBYO3"
+                   MOVE    33              TO  SPA-GMN28-CUR
+               WHEN    "P028_CHKHKTBYO4"
+                   MOVE    90              TO  SPA-GMN28-CUR
            END-EVALUATE
       *
            .
@@ -387,6 +407,12 @@
                WHEN    "CLICKED"       ALSO    "BCRN1"
                    PERFORM 4802-CRNIN-DELETE-SEC
       *
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ
+               WHEN    "CLICKED"       ALSO    "P028_CHKHKTBYO1"
+               WHEN    "CLICKED"       ALSO    "P028_CHKHKTBYO2"
+               WHEN    "CLICKED"       ALSO    "P028_CHKHKTBYO3"
+               WHEN    "CLICKED"       ALSO    "P028_CHKHKTBYO4"
+                   PERFORM 4802-CHKHTKBYO-SEC
       *     °Ê³°¤Ï¥¨¥é¡¼
                WHEN    "CLICKED"       ALSO     ANY
                    MOVE    "0110"          TO  SPA-ERRCD
@@ -493,6 +519,40 @@
            END-IF
            .
        4101-CARELST-SYORI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ½èÍý
+      *****************************************************************
+       4802-CHKHTKBYO-SEC          SECTION.
+      *
+           MOVE    MCP-WIDGET(15:1)    TO  IDH1
+           EVALUATE    SPA-GMN28-CHKHKTBYO (IDH1)
+               WHEN    "1"
+                   MOVE    "0"         TO  SPA-GMN28-CHKHKTBYO (IDH1)
+               WHEN    "0"
+               WHEN    SPACE
+                   MOVE    "1"         TO  SPA-GMN28-CHKHKTBYO (IDH1)
+           END-EVALUATE
+      *
+           MOVE    ZERO                TO  FLG-TOUROKU
+      *    ÆþÎÏ¥Á¥§¥Ã¥¯½èÍý
+           PERFORM 410-INPUT-CHK-SEC
+      *
+           IF      SPA-ERRCD           =   SPACE
+               EVALUATE     IDH1
+                   WHEN     1
+                       MOVE    31              TO  SPA-GMN28-CUR
+                   WHEN     2
+                       MOVE    32              TO  SPA-GMN28-CUR
+                   WHEN     3
+                       MOVE    33              TO  SPA-GMN28-CUR
+                   WHEN     4
+                       MOVE    90              TO  SPA-GMN28-CUR
+               END-EVALUATE
+           END-IF
+          .
+       4802-CHKHTKBYO-EXT.
            EXIT.
       *
       *****************************************************************

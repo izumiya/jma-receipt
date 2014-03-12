@@ -34,6 +34,7 @@
       *  04.03.00    NACL-多々納  08/07/XX  最大RL=19280 へ変更
       *  04.04.00    NACL-多々納  08/12/XX  入院料包括対応
       *  04.07.00    NACL-多々納  12/01/25  入力スクロール背景色
+      *  04.07.00    NACL-多々納  14/03/XX  Ｈ２６年４月改正対応
       ************************************************************
       *
        01  SPA-K01KYOUTU.
@@ -77,6 +78,9 @@
                05  SPA-CHIIKKBN            PIC  9(01).
       *明細書発行体制等加算
                05  SPA-MEISAKBN            PIC  9(01).
+      *H26.4
+      *地域包括診療加算
+               05  SPA-CHKHTKKSN           PIC  9(01).
       *
       *病院種別
                05  SPA-NAI-HOSPSBT         PIC 9(01).
@@ -171,6 +175,10 @@
                05  SPA-HKTSANTEI-205       PIC 9(01).
       *包括診療行為チェック（特定施設入居時等医学管理料）
                05  SPA-HKTSANTEI-206       PIC 9(01).
+      *
+      *H26.4
+      *        妥結率５割以下区分  (H27.4から使用）
+               05  SPA-DAKT50-KBN          PIC 9(01).
       *@
       *腫瘍マーカー一覧展開選択
                05  SPA-AKUSEIHYOFLG        PIC  X(01).
@@ -365,6 +373,9 @@
       *施設入居(H20.9)
                05  SPA-PTTOKK-KBN              PIC X(02).
                05  SPA-PTTOKK-NAIYO            PIC X(12).
+      *H26.4
+      *        地域包括診療対象疾病あり
+               05  SPA-CHKHKTBYO-ARI       PIC 9(01).
       *
       *入院用（Ｋ０２Ｎ）
                05  SPA-K02N-DATA-REC.
@@ -555,6 +566,12 @@
       *        包括診療チェックあり
                05  SPA-HKTSANTEI-CHK           PIC 9(01).
                05  SPA-HKTKEI-FLG              PIC 9(01).
+      *H26.4
+      *        地域包括診療料算定
+               05  SPA-CHKHKT-ARI          PIC 9(01).
+               05  SPA-CHKHKT-ARI2         PIC 9(01).
+      *        包括診療行為チェック（地域包括診療料）
+               05  SPA-HKTSANTEI-207       PIC 9(01).
       *@
            03  SPA-SONOTA-AREA.
       *確認メッセージ
@@ -621,6 +638,12 @@
            03  SPA-HZN-MOTOPG          PIC X(08).
       *戻り先（KHELP,K081)
            03  SPA-ETC-MOTOPG          PIC X(08).
+      *
+      *H26.4
+      *    画面最大行数
+           03  SPA-GMLINCNT            PIC 9(02).
+      *    予備
+           03  SPA-K01-YOBI            PIC X(10).
       *
       *ヘルプ・発行指示共通
            03  SPA-ETCKYOUTU-AREA           PIC X(7500).

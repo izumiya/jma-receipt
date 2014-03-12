@@ -1262,6 +1262,12 @@
                                                        OCCURS   50.
                    07  SPA-GMN28-CAREJOTAI-MAX     PIC 9(03).
       *
+      *    √œ∞Ë Ò≥Áø«Œ≈¬–æ›º¿…¬
+               05  SPA-GMN28-CHKHKTBYO-AREA.
+                   07  SPA-GMN28-CHKHKTBYO         PIC X(01)
+                                                   OCCURS   4.
+      *
+      *
       *    P0201° Ã§≈–œøºı…’º‘∞ÏÕ˜°À
            03  SPA-P0201-AREA.
                05  SPA-GMN201-MAX                   PIC 9(04).

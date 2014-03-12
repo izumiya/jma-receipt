@@ -35,6 +35,7 @@
       *                                     ºßÂðËö´üÁí¹ç¿Ç»¡ÎÁÄÉ²Ã
       *  04.06.00    NACL-Â¿¡¹Ç¼  11/01/XX  ÅÅ»ÒÅÀ¿ôÉ½ÂÐ±þ
       *                                     ³ÆÆþ±¡ÎÁÅùÄÉ²Ã
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/03/XX  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -305,18 +306,19 @@
            INITIALIZE   SPA-W32
       *
       *    Êñ³ç¿ÇÎÅ¥³¡¼¥É¤è¤ê´ÉÍýÈÖ¹æ·èÄê
+      *    RENNUM=1 ¤ò¸¡º÷
            MOVE    SPACE               TO  HKTSRYCD-REC
            INITIALIZE                      HKTSRYCD-REC
-           MOVE    SPA-SYSYMD          TO  HKTSRYCD-YUKOSTYMD
-           MOVE    SPA-SYSYMD          TO  HKTSRYCD-YUKOEDYMD
+      *    MOVE    SPA-SYSYMD          TO  HKTSRYCD-YUKOSTYMD
+      *    MOVE    SPA-SYSYMD          TO  HKTSRYCD-YUKOEDYMD
 grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    HKTSRYCD-REC        TO  MCPDATA-REC
            MOVE    "tbl_hktsrycd"      TO  MCP-TABLE
-           MOVE    "key4"              TO  MCP-PATHNAME
+           MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_hktsrycd"      TO  MCP-TABLE
-               MOVE    "key4"              TO  MCP-PATHNAME
+               MOVE    "key5"              TO  MCP-PATHNAME
                PERFORM 900-HKTSRYCD-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-HKTSRYCD
@@ -324,8 +326,13 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            MOVE    ZERO                TO  IDX
            PERFORM UNTIL   (FLG-HKTSRYCD   =   1  )
                        OR  (IDX            >=  200)
-               IF      HKTSRYCD-RENNUM     =   1
-                   ADD     1                   TO  IDX
+               IF     (IDX             >   ZERO )
+                 AND  (HKTSRYCD-KANRICD
+                                           =   SPA-GMN-TKBNCD (IDX))
+                   MOVE    HKTSRYCD-YUKOEDYMD  TO  SPA-NAIB-YUKOEDYMD
+                                                             (IDX)
+               ELSE
+                   ADD    1                TO  IDX
                    MOVE    HKTSRYCD-KANRICD    TO  SPA-GMN-TKBNCD
                                                              (IDX)
                    MOVE    HKTSRYCD-YUKOSTYMD  TO  SPA-NAIB-YUKOSTYMD
@@ -336,11 +343,11 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    MOVE    IDX                 TO  SPA-KBNCD-MAX
                END-IF
                MOVE    "tbl_hktsrycd"      TO  MCP-TABLE
-               MOVE    "key4"              TO  MCP-PATHNAME
+               MOVE    "key5"              TO  MCP-PATHNAME
                PERFORM 900-HKTSRYCD-READ-SEC
            END-PERFORM
            MOVE    "tbl_hktsrycd"      TO  MCP-TABLE
-           MOVE    "key4"              TO  MCP-PATHNAME
+           MOVE    "key5"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
       *    Êñ³ç»»ÄêÊýË¡
@@ -434,6 +441,10 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *H24.4       MOVE    "ºßÂðËö´ü°åÎÅÁí¹ç¿ÇÎÅÎÁ" 
                    MOVE    "ºßÂð¤¬¤ó°åÎÅÁí¹ç¿ÇÎÅÎÁ" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
+      *H26.4
+               WHEN    "207"
+                   MOVE    "ÃÏ°èÊñ³ç¿ÇÎÅÎÁ" 
+                                            TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "504"
                    MOVE    "²óÉü´ü¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥óÉÂÅïÆþ±¡ÎÁ" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
@@ -493,6 +504,10 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
                WHEN    "523"
                    MOVE    "Ç§ÃÎ¾É¼£ÎÅÉÂÅïÆþ±¡ÎÁ" 
+                                            TO  SPA-GMN-TKBNCD-MEI(IDX)
+      *H26.4
+               WHEN    "524"
+                   MOVE    "ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ" 
                                             TO  SPA-GMN-TKBNCD-MEI(IDX)
            END-EVALUATE
            . 
@@ -742,6 +757,9 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                WHEN    "206"
       *            ºßÂðËö´ü°åÎÅÁí¹ç¿ÇÎÅÎÁ
                    PERFORM 200211-KBNCD-206-SEC
+               WHEN    "207"
+      *            ÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+                   PERFORM 200211-KBNCD-207-SEC
                WHEN    "504"
       *            ²óÉü´ü¥ê¥ÏÆþ±¡ÎÁ
                    PERFORM 200211-KBNCD-504-SEC
@@ -767,6 +785,9 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                WHEN    "523"
       *            Àº¿ÀÎÅÍÜÉÂÅïÆþ±¡ÎÁ
                    PERFORM 200211-KBNCD-522-SEC
+               WHEN    "524"
+      *            ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ
+                   PERFORM 200211-KBNCD-524-SEC
                WHEN    OTHER
       *            Êñ³ç¤Ê¤·
                    PERFORM 200211-KBNCD-999-SEC
@@ -1008,6 +1029,24 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
        200211-KBNCD-522-EXT.
            EXIT.
       *****************************************************************
+      *    ÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ½èÍý
+      *****************************************************************
+       200211-KBNCD-524-SEC       SECTION.
+      *
+      *    Êñ³ç»»Äê¶èÊ¬
+           MOVE    SPA-GMN-SANTEIKBN-LST (2)   TO  SPA-GMN-SANTEIKBN-G
+           MOVE    SPA-GMN-NYUGAIKBN-LST (1)   TO  SPA-GMN-NYUGAIKBN-G
+           MOVE    SPA-GMN-HKNCOMBIKBN-LST(1)  TO  SPA-GMN-HKNCOMBIKBN-G
+      *
+           PERFORM VARYING    IDX      FROM    1   BY  1
+                   UNTIL      IDX      >   SPA-GMN-SRYKBN-MAX
+               MOVE    SPA-GMN-SRYKBN-LST (2)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+           END-PERFORM
+           .
+       200211-KBNCD-524-EXT.
+           EXIT.
+      *****************************************************************
       *    ËýÀ­°Ý»ýÆ©ÀÏ´µ¼Ô³°Íè°å³Ø´ÉÍý½èÍý
       *****************************************************************
        200211-KBNCD-201-SEC       SECTION.
@@ -1021,12 +1060,12 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    UNTIL      IDX      >   SPA-GMN-SRYKBN-MAX
                MOVE    SPA-GMN-SRYKBN-LST (1)
                                            TO  SPA-GMN-SRYKBN-G (IDX)
-      ****     IF      IDX             =    5
+      ***      IF      IDX             =    5
       *                                OR   6
       *            ¸¡ºº¡¦²èÁü¿ÇÃÇ¤¬Êñ³ç
       *            MOVE    SPA-GMN-SRYKBN-LST (2)
       *                                    TO  SPA-GMN-SRYKBN-G (IDX)
-      ****     END-IF
+      ***      END-IF
            END-PERFORM
       *
            .
@@ -1155,6 +1194,35 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            .
        200211-KBNCD-206-EXT.
+           EXIT.
+      *****************************************************************
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÎÁ½èÍý
+      *****************************************************************
+       200211-KBNCD-207-SEC       SECTION.
+      *
+      *    Êñ³ç»»ÄêÊýË¡¤Ï»»Äê¤¹¤ë¤ò½é´ü
+           MOVE    SPA-GMN-SANTEIHOU-LST (2)   TO  SPA-GMN-SANTEIHOU-G
+      *
+      *    Êñ³ç»»Äê¶èÊ¬
+           MOVE    SPA-GMN-SANTEIKBN-LST (3)   TO  SPA-GMN-SANTEIKBN-G
+           MOVE    SPA-GMN-NYUGAIKBN-LST (1)   TO  SPA-GMN-NYUGAIKBN-G
+           MOVE    SPA-GMN-HKNCOMBIKBN-LST(1)  TO  SPA-GMN-HKNCOMBIKBN-G
+      *
+           PERFORM VARYING    IDX      FROM    1   BY  1
+                   UNTIL      IDX      >   SPA-GMN-SRYKBN-MAX
+               IF      IDX             =    01
+                                       OR   12
+      *            ÅêÌô¡¦ºßÂð¡¡Êñ³ç³°
+                   MOVE    SPA-GMN-SRYKBN-LST (1)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+               ELSE
+                   MOVE    SPA-GMN-SRYKBN-LST (2)
+                                           TO  SPA-GMN-SRYKBN-G (IDX)
+               END-IF
+           END-PERFORM
+      *
+           .
+       200211-KBNCD-207-EXT.
            EXIT.
       *****************************************************************
       *    ÈÖ¹æÁªÂò¥Á¥§¥Ã¥¯½èÍý

@@ -31,6 +31,8 @@
       *  04.06.00    NACL=Â¿¡¹Ç¼  10/07/01  »ÄÎÌÇÑ´þ¶èÊ¬ÂÐ±þ
       *  04.06.00    NACL=Â¿¡¹Ç¼  10/11/02  ÆñÉÂ³°Íè»ØÆ³´ÉÍýÎÁÂÐ±þ
       *  04.06.00    NACL=Â¿¡¹Ç¼  10/11/25  ÉÂÌ¾ÊäÂ­¥³¥á¥ó¥ÈÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  13/01/15  ¿ÇÎÅ²ó¿ô¥Æ¡¼¥Ö¥ë£±£°ÂÐ±þ
+      *  04.08.00    NACL-Â¿¡¹Ç¼  13/03/XX  £È£²£µÇ¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -93,6 +95,7 @@
            03  FLG-PTKOHINF        PIC 9(01).
            03  FLG-PTTOKKI         PIC 9(01).
            03  FLG-PTSAME          PIC 9(01).
+           03  FLG-PTCONF          PIC 9(01).
       *
            03  FLG-SYSKANRIOK      PIC 9(01).
            03  FLG-HKNCOMBICHK     PIC 9(01).
@@ -147,6 +150,8 @@
            03  WRK-IDY             PIC 9(04).
       *
            03  IDX-R2              PIC 9(04).
+      *
+           03  IDX-AC              PIC 9(04).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -292,6 +297,10 @@
            03  WRK-CHK-SRYYMD.
                05  WRK-CHK-SRYYM           PIC X(06).
                05  WRK-CHK-SRYDD           PIC X(02).
+      *
+           03  WRK-CHKHKTBYO-G.
+               05  WRK-CHKHKTBYO       PIC X(01)   OCCURS   4.
+           03  WRK-CNT                 PIC 9(02).
       *
       *    ¶Ø´÷£±
        01  WRK-TABOO-G.
@@ -457,6 +466,10 @@
       *    Æ±°ì´µ¼Ô¼±ÊÌ¥Æ¡¼¥Ö¥ë
        01  PTSAME-REC.
            COPY    "CPPTSAME.INC".
+      *
+      *    ´µ¼Ô¸ÄÊÌÀßÄê¥Æ¡¼¥Ö¥ë
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
       *
       *****************************************************************
       *    ¥µ¥Ö¥×¥íÍÑ¡¡ÎÎ°è
@@ -1860,6 +1873,11 @@
                WHEN    5
                    MOVE    "5"             TO  SPA-RSI-HKNKBN
                    MOVE    "1"             TO  SPA-RSI-JUNKYO
+      *        Âè»°¼Ô¹Ô°Ù¡Ê¼«ÇåÀÕ¤Î·òÊÝ½àµò¡Ë
+               WHEN    7
+                   MOVE    1               TO  SPA-HKNKBN
+                   MOVE    "6"             TO  SPA-RSI-HKNKBN
+                   MOVE    "1"             TO  SPA-RSI-JUNKYO
            END-EVALUATE
       *
            MOVE    ZERO                TO  SPA-RJN-ERR
@@ -2057,6 +2075,14 @@
                PERFORM 10015-PTSAME-SET-SEC
            END-IF
       *
+      *H26.4
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ
+           IF     (SPA-SRYYMD          >=  "20140401" )
+            AND   (SPA-CHKHTKKSN       =   1          )
+               PERFORM 11019-CHKHTKBYO-SET-SEC
+           END-IF
+      *
+      *
            .
        1101-PTINF-HENSYU-EXT.
            EXIT.
@@ -2126,6 +2152,54 @@
            .
        10015-PTSAME-SET-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂÊÔ½¸½èÍý
+      *****************************************************************
+       11019-CHKHTKBYO-SET-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  SPA-CHKHKTBYO-ARI
+      *
+           INITIALIZE                  PTCONF-REC
+           MOVE    PTINF-HOSPNUM       TO  PTCONF-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCONF-PTID
+           MOVE    "TIIKIHOKATU"       TO  PTCONF-CKEY
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           IF      FLG-PTCONF          =   ZERO
+      *        ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ¥Á¥§¥Ã¥¯
+               MOVE    PTCONF-CDATA(1:4)   TO  WRK-CHKHKTBYO-G
+               MOVE    ZERO                TO  WRK-CNT
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL       IDX     >   4
+                   IF      WRK-CHKHKTBYO (IDX) =   "1"
+                       ADD     1               TO  WRK-CNT
+                   END-IF
+               END-PERFORM
+               IF      WRK-CNT             >=  2
+      *            ÃÏ°èÊñ³ç¿ÇÎÅ²Ã»»¡¡»»Äê¤¢¤ê
+                   MOVE    1               TO  SPA-CHKHKTBYO-ARI
+               END-IF
+           END-IF
+           .
+       11019-CHKHTKBYO-SET-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    ¶Ø´÷¾ðÊóÀßÄê½èÍý
@@ -3705,7 +3779,6 @@
            IF      WRK-SRYYYMM         >=  "201304"
                PERFORM 3009111-DOU-SANTEI-SEC
            END-IF
-      *
       *
       *    Æ±Æü½é¿Ç¡ÊÏ«ºÒ¡Ë¡ÊÁ°·î¡Ë
            MOVE    "101110040"         TO  WRK-SRYCD
@@ -5416,6 +5489,23 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        900-PTTOKKI-READ-EXT.
+           EXIT.
+      *****************************************************************
+      *    ´µ¼ÔÆÃµ­»ö¹àÆÉ¤ß¹þ¤ß
+      *****************************************************************
+       930-PTCONF-READ-SEC         SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  PTCONF-REC
+               MOVE    ZERO            TO  FLG-PTCONF
+           ELSE
+               INITIALIZE                  PTCONF-REC
+               MOVE    1               TO  FLG-PTCONF
+           END-IF
+      *
+           .
+       930-PTCONF-READ-EXT.
            EXIT.
       *****************************************************************
       *    Æ±°ì´µ¼Ô¼±ÊÌ¥Þ¥¹¥¿¡¼ÆÉ¹þ½èÍý

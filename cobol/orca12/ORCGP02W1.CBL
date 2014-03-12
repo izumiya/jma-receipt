@@ -101,6 +101,7 @@
       * 04.07.00     NACL-¬ø°π«º  13/11/01  API ›∏±°¶∏¯»Òƒ…≤√¬–±˛
       * 04.07.00     NACL-¬ø°π«º  13/11/13  ¿∏≥Ë ›∏ÓΩ≈ £∑Ÿπ¬–±˛
       * 04.07.00     NACL-¬ø°π«º  14/01/20  Ω–¿∏ª˛¬ŒΩ≈ƒ…≤√¬–±˛
+      * 04.07.00     NACL-¬ø°π«º  14/03/XX  ¡∞¥¸¥¸π‚Œº‘£≤≥‰¬–±˛
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -232,6 +233,8 @@
            03  FLG-KOH-01              PIC 9(01).
            03  FLG-KOH-02              PIC 9(01).
            03  FLG-KOH-03              PIC 9(01).
+      *H26.5
+           03  FLG-RJN-02              PIC 9(01).
       *
       *    •´•¶•Û•»ŒŒ∞Ë
        01  CNT-AREA.
@@ -415,6 +418,8 @@
                05  WRK-P02-KOHNUM      PIC X(03).
                05  WRK-P02-KOHNUM2     PIC X(01).
                05  WRK-P02-KOHNUMMEI   PIC X(16).
+      *H26.5
+           03  WRK-HOJO-ERR            PIC X(01).
       *
       *    ∏¯»Ò£”£œ£“£‘Õ—° £”£–£¡§»∆±§∏ŒŒ∞Ë°À
        01  WRK-KOUHI-AREA.
@@ -611,6 +616,38 @@
                05  WRK-HJO-REC-R6        REDEFINES   WRK-HJO-REC-G6.
                    07  WRK-HJO-REC6      PIC X(10) OCCURS  2.
       *
+      *H25.5 ≥´ªœ∆¸° S19.4.2¿∏°°∞ πﬂ°À
+      *        œ∑øÕ§Œ ‰Ωı∂Ë ¨ƒ…≤√° ¡∞¥¸π‚Œº‘°À
+               05  WRK-HJO-REC-G4-3.
+                   07  FILLER          PIC X(06) VALUE "7 £≥≥‰".
+                   07  FILLER          PIC X(06) VALUE "8 £≤≥‰".
+               05  WRK-HJO-REC-R4-3    REDEFINES   WRK-HJO-REC-G4-3.
+                   07  WRK-HJO-REC4-3      PIC X(06) OCCURS  2.
+      *        ∂¶∫—§Œ≤º¡•∏Â ‰Ωı∂Ë ¨ƒ…≤√° ¡∞¥¸π‚Œº‘°À
+               05  WRK-HJO-REC-G5-3.
+                   07  FILLER          PIC X(10) VALUE "2 ≤º¡•£≥∑Ó".
+                   07  FILLER          PIC X(10) VALUE "7 £≥≥‰".
+                   07  FILLER          PIC X(10) VALUE "8 £≤≥‰".
+                   07  FILLER          PIC X(10) VALUE "E £≤≥‰≤º¡•".
+                   07  FILLER          PIC X(10) VALUE "H £≥≥‰≤º¡•".
+               05  WRK-HJO-REC-R5-3    REDEFINES   WRK-HJO-REC-G5-3.
+                   07  WRK-HJO-REC5-3      PIC X(10) OCCURS  5.
+      *        ¡•∞˜° ¡∞¥¸π‚Œº‘°À
+               05  WRK-HJO-REC-G1-3.
+                   07  FILLER          PIC X(10) VALUE "1 ø¶Ã≥".
+                   07  FILLER          PIC X(10) VALUE "2 ≤º¡•".
+                   07  FILLER          PIC X(10) VALUE "3 ƒÃ∂–".
+                   07  FILLER          PIC X(10) VALUE "7 £≥≥‰".
+                   07  FILLER          PIC X(10) VALUE "8 £≤≥‰".
+                   07  FILLER          PIC X(10) VALUE "D £≤≥‰ø¶Ã≥".
+                   07  FILLER          PIC X(10) VALUE "E £≤≥‰≤º¡•".
+                   07  FILLER          PIC X(10) VALUE "F £≤≥‰ƒÃ∂–".
+                   07  FILLER          PIC X(10) VALUE "G £≥≥‰ø¶Ã≥".
+                   07  FILLER          PIC X(10) VALUE "H £≥≥‰≤º¡•".
+                   07  FILLER          PIC X(10) VALUE "I £≥≥‰ƒÃ∂–".
+               05  WRK-HJO-REC-R1-3    REDEFINES   WRK-HJO-REC-G1-3.
+                   07  WRK-HJO-REC1-3  PIC X(10) OCCURS  11.
+      *
            03  WRK-KEI-TBL.
                05  WRK-KEI-REC-G.
                    07  FILLER          PIC X(06) VALUE "1 ∑—¬≥".
@@ -799,33 +836,6 @@
       *
        01  SCRAREA.
            COPY    "ORCA12SCRAREA.INC".
-      *    COPY    "P02.INC".
-      *    COPY    "P02A.INC".
-      *    COPY    "P02D.INC".
-      *    COPY    "P02E.INC".
-      *    COPY    "P02F.INC".
-      *    COPY    "P014.INC".
-      *    COPY    "P015.INC".
-      *    COPY    "P98.INC".
-      *    COPY    "P981.INC".
-      *    COPY    "P0201.INC".
-      *    COPY    "P982.INC".
-      *    COPY    "P100.INC".
-      *    COPY    "P02X.INC".
-      *    COPY    "P02S.INC".
-      *    COPY    "P02Q.INC".
-      *    COPY    "P02Q1.INC".
-      *    COPY    "P02Y.INC".
-      *    COPY    "P02Y1.INC".
-      *    COPY    "P02G.INC".
-      *    COPY    "P02G2.INC".
-      *    COPY    "P02K.INC".
-      *    COPY    "P02H.INC".
-      *    COPY    "P02T.INC".
-      *    COPY    "PERR.INC".
-      *    COPY    "PID1.INC".
-      *    COPY    "PDMY01.INC".
-      *    COPY    "CPAPIMOD.INC".
       *
        PROCEDURE                   DIVISION    USING
            MCPAREA
@@ -1226,6 +1236,15 @@
                    END-IF
                END-PERFORM
       *
+      *H26.4
+      *        H26.5.1∞ πﬂ§ŒS19.4.2¿∏§Œπ‚Œº‘…È√¥≥‰πÁ
+               IF      (SPA-NAI-BIRTHDAY        >=  "19440402")
+                   AND (SPA-PTHKN-TEKSTYMD(IDX) >=  "20140501")
+                   AND (SPA-PTHKN-HKNNUM(IDX)(1:1)
+                                             NOT =  "9"       )
+                   PERFORM 31002-HKNTBL-HOJKBNHEN-SEC
+               ELSE
+      *
       *        …È√¥≥‰πÁ
                EVALUATE    SPA-PTHKN-HKNNUM (IDX)
       *        ¡•∞˜
@@ -1362,6 +1381,9 @@
                        END-IF
                    END-EVALUATE
                END-EVALUATE
+      *
+      *
+               END-IF
            END-PERFORM
       *
            .
@@ -1403,6 +1425,88 @@
            END-IF
            .
        31001-HKNTBL-RJNHEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    π‚Œº‘…È√¥≥‰πÁ°  ‰Ωı∂Ë ¨°À¿ﬂƒÍΩËÕ˝(H26.5§´§È°À
+      *****************************************************************
+       31002-HKNTBL-HOJKBNHEN-SEC            SECTION.
+      *
+      *    …È√¥≥‰πÁ
+           EVALUATE    SPA-PTHKN-HKNNUM (IDX)
+      *        ¡•∞˜
+               WHEN    "002"
+                   MOVE    4               TO  IDY
+                   MOVE    11              TO  WRK-HJO-MAX
+                   PERFORM VARYING     IDT     FROM    IDY BY  1
+                           UNTIL       IDT     >   WRK-HJO-MAX
+                       IF      WRK-HJO-REC1-3 (IDT)(1:1)
+                                           =   SPA-PTHKN-HOJOKBN(IDX)
+                           MOVE    WRK-HJO-REC1-3 (IDT)(3:)
+                                               TO  SPA-PTHKN-HOJOKBN-MEI
+                                                                 (IDX)
+                           MOVE    WRK-HJO-MAX     TO  IDT
+                       END-IF
+                   END-PERFORM
+      *        πÒ ›
+               WHEN    "060"
+               WHEN    "068"
+                   PERFORM VARYING     IDT     FROM    1  BY  1
+                           UNTIL       IDT     >   7
+                       IF      WRK-HJO-REC2 (IDT)(1:1)
+                                           =   SPA-PTHKN-HOJOKBN(IDX)
+                           MOVE    WRK-HJO-REC2 (IDT)(3:)
+                                               TO  SPA-PTHKN-HOJOKBN-MEI
+                                                                 (IDX)
+                           MOVE    7           TO  IDT
+                       END-IF
+                   END-PERFORM
+      *        ∂¶∫—
+               WHEN    "031"
+               WHEN    "032"
+               WHEN    "033"
+               WHEN    "034"
+                   MOVE    2                   TO  IDY
+                   MOVE    5                   TO  WRK-HJO-MAX
+                   PERFORM VARYING     IDT     FROM    IDY BY  1
+                           UNTIL       IDT     >   WRK-HJO-MAX
+                       IF      WRK-HJO-REC5-3 (IDT)(1:1)
+                                           =   SPA-PTHKN-HOJOKBN(IDX)
+                           MOVE    WRK-HJO-REC5-3 (IDT)(3:)
+                                               TO  SPA-PTHKN-HOJOKBN-MEI
+                                                                 (IDX)
+                           MOVE    WRK-HJO-MAX     TO  IDT
+                       END-IF
+                   END-PERFORM
+      *        ∏Â¥¸π‚Œº‘
+               WHEN    "039"
+               WHEN    "040"
+                   PERFORM VARYING     IDT     FROM    1  BY  1
+                           UNTIL       IDT     >   2
+                       IF      WRK-HJO-REC6 (IDT)(1:1)
+                                           =   SPA-PTHKN-HOJOKBN(IDX)
+                           MOVE    WRK-HJO-REC6 (IDT)(3:)
+                                               TO  SPA-PTHKN-HOJOKBN-MEI
+                                                                 (IDX)
+                           MOVE    2           TO  IDT
+                       END-IF
+                   END-PERFORM
+      *        §Ω§Œ¬æ
+               WHEN    OTHER
+                   PERFORM VARYING     IDT     FROM    1  BY  1
+                           UNTIL       IDT     >   2
+                       IF      WRK-HJO-REC4-3 (IDT)(1:1)
+                                           =   SPA-PTHKN-HOJOKBN(IDX)
+                           MOVE    WRK-HJO-REC4-3 (IDT)(3:)
+                                               TO  SPA-PTHKN-HOJOKBN-MEI
+                                                                 (IDX)
+                           MOVE    2           TO  IDT
+                       END-IF
+                   END-PERFORM
+           END-EVALUATE
+      *
+           .
+       31002-HKNTBL-HOJKBNHEN-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1773,6 +1877,14 @@
                END-PERFORM
            END-IF
       *
+      *H26.4
+      *    H26.5.1∞ πﬂ§ŒS19.4.2¿∏§Œπ‚Œº‘…È√¥≥‰πÁ
+           IF      (SPA-NAI-BIRTHDAY       >=  "19440402")
+               AND (SPA-NAI-HTEKSTYMD      >=  "20140501")
+               AND (SPA-GMN-HKNNUM(1:1) NOT =  "9"       )
+               PERFORM 310112-HKN-HOJOHEN2-SEC
+           ELSE
+      *
       *    …È√¥≥‰πÁ
            EVALUATE    SPA-GMN-HKNNUM
       *        ¡•∞˜
@@ -1874,6 +1986,8 @@
                    END-IF
            END-EVALUATE
       *
+           END-IF
+      *
            IF      SPA-GMN-HOJO-MAX    =   ZERO
                MOVE    SPACE           TO  SPA-GMN-HOJOKBN-G
            END-IF
@@ -1917,6 +2031,73 @@
            .
        310111-HKN-RJNHEN-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    π‚Œº‘…È√¥≥‰πÁ°  ‰Ωı∂Ë ¨°À¿ﬂƒÍΩËÕ˝(≥´ªœ∆¸H26.5§´§È°À
+      *****************************************************************
+       310112-HKN-HOJOHEN2-SEC            SECTION.
+      *
+      *    …È√¥≥‰πÁ
+           EVALUATE    SPA-GMN-HKNNUM
+      *        ¡•∞˜
+               WHEN    "002"
+                   MOVE    4                   TO  IDY
+                   MOVE    11                  TO  WRK-HJO-MAX
+                   MOVE    ZERO                TO  SPA-GMN-HOJO-MAX
+                   PERFORM VARYING     IDT     FROM    IDY BY  1
+                           UNTIL       IDT     >   WRK-HJO-MAX
+                       ADD     1               TO  SPA-GMN-HOJO-MAX
+                       MOVE    WRK-HJO-REC1-3 (IDT)
+                                               TO  SPA-GMN-HOJOKBNL
+                                                    (SPA-GMN-HOJO-MAX)
+                   END-PERFORM
+      *        πÒ ›
+               WHEN    "060"
+               WHEN    "068"
+                   PERFORM VARYING   IDT     FROM    1  BY  1
+                         UNTIL       IDT     >   7
+                       MOVE    WRK-HJO-REC2 (IDT)
+                                           TO  SPA-GMN-HOJOKBNL (IDT)
+                       MOVE    IDT         TO  SPA-GMN-HOJO-MAX
+                   END-PERFORM
+      *        ∂¶∫—
+               WHEN    "031"
+               WHEN    "032"
+               WHEN    "033"
+               WHEN    "034"
+                   MOVE    2                   TO  IDY
+                   MOVE    5                   TO  WRK-HJO-MAX
+                   MOVE    ZERO                TO  SPA-GMN-HOJO-MAX
+                   PERFORM VARYING     IDT     FROM    IDY BY  1
+                           UNTIL       IDT     >   WRK-HJO-MAX
+                       ADD     1               TO  SPA-GMN-HOJO-MAX
+                       MOVE    WRK-HJO-REC5-3 (IDT)
+                                               TO  SPA-GMN-HOJOKBNL
+                                                    (SPA-GMN-HOJO-MAX)
+                   END-PERFORM
+      *        ∏Â¥¸π‚Œº‘
+               WHEN    "039"
+               WHEN    "040"
+                   PERFORM VARYING   IDT     FROM    1  BY  1
+                         UNTIL       IDT     >   2
+                       MOVE    WRK-HJO-REC6 (IDT)
+                                           TO  SPA-GMN-HOJOKBNL (IDT)
+                       MOVE    IDT         TO  SPA-GMN-HOJO-MAX
+                   END-PERFORM
+      *        §Ω§Œ¬æ
+               WHEN    OTHER
+                   PERFORM VARYING     IDT     FROM    1  BY  1
+                           UNTIL       IDT     >   2
+                       MOVE    WRK-HJO-REC4-3 (IDT)
+                                           TO  SPA-GMN-HOJOKBNL (IDT)
+                       MOVE    IDT         TO  SPA-GMN-HOJO-MAX
+                   END-PERFORM
+           END-EVALUATE
+      *
+           .
+       310112-HKN-HOJOHEN2-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    œ´∫“ ›∏± ‘Ω∏ΩËÕ˝
@@ -5769,6 +5950,10 @@
                    MOVE    "1067"              TO  SPA-ERRCD
                    MOVE    11                  TO  SPA-GMN-CUR
                END-IF
+               IF      FLG-RJNERR          =   3
+                   MOVE    "1068"              TO  SPA-ERRCD
+                   MOVE    11                  TO  SPA-GMN-CUR
+               END-IF
            END-IF
       *
       *    œ∑øÕ∏¯»Ò£≤≥‰§Œ ›∏±§¨¬∏∫ﬂ§π§Îª˛° VER.3.2.0§´§È°À
@@ -5814,6 +5999,14 @@
       ****************************************************************
        4103311-HKNKBN-CHK-SEC     SECTION.
       *
+      *H26.4
+      *    H26.5.1∞ πﬂ§ŒS19.4.2¿∏∞ πﬂ§Œπ‚Œº‘…È√¥≥‰πÁ
+           MOVE    ZERO                TO  FLG-RJN-02
+           IF      (SPA-NAI-BIRTHDAY       >=  "19440402")
+             AND   (SPA-PTHKN-TEKSTYMD (IDX)   >=  "20140501")
+               MOVE    1               TO  FLG-RJN-02
+           END-IF
+      *
            EVALUATE    SPA-PTHKN-HKNNUM  (IDX)
       *        πÒ ›
                WHEN    "060"
@@ -5844,16 +6037,27 @@
                                MOVE    1               TO  FLG-RJNCHK
                            END-IF
                        END-IF
+      *H26.4
+                       IF     FLG-RJN-02           =   1
+      *                    £±≥‰•®•È°º
+                           MOVE    "1"             TO  WRK-HOJO-ERR
+                       ELSE
+      *                    £≤≥‰•®•È°º
+                           MOVE    "2"             TO  WRK-HOJO-ERR
+                       END-IF
       *                ¡»πÁπÒ ›∞ ≥∞§œ£≤≥‰•®•È°º
                        IF    (SPA-PTHKN-HKNJANUM(IDX)(3:1)
                                                    NOT =  "3" ) AND
-                             (SPA-PTHKN-HOJOKBN (IDX)  =   "2")
+                             (SPA-PTHKN-HOJOKBN (IDX)  =   WRK-HOJO-ERR)
                            IF      SPA-PTHKN-TEKSTYMD (IDX)
                                                        <  "20061001"
                                MOVE    1           TO  FLG-RJNERR
                                MOVE    IDX         TO  SPA-HKN-IDX1
                            ELSE
                                MOVE    2           TO  FLG-RJNERR
+                               IF      WRK-HOJO-ERR    =   "1"
+                                   MOVE   3            TO  FLG-RJNERR
+                               END-IF
                                MOVE    IDX         TO  SPA-HKN-IDX1
                            END-IF
                        END-IF

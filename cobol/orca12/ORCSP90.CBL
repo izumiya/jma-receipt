@@ -382,6 +382,13 @@
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
                    END-STRING
+      *H26.4
+               WHEN    "1068"
+                   STRING  "補助区分１割は前期高齢者の補助区分では"
+                           "ありません。変更して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "0067"
                    MOVE    "保険者番号と法別番号が違います。"
                                                TO  SPA-ERRMSG

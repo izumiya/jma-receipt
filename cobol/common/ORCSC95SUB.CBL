@@ -28,6 +28,7 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       * 04.07.00     NACL=多々納  12/03/XX  平成２４年４月改正対応
+      * 04.08.00     NACL-多々納  14/03/XX  平成２６年４月改正対応
       *****************************************************************
       *
       *
@@ -63,6 +64,10 @@
                05  WRK-WYY         PIC 9(02).
                05  WRK-WMM         PIC 9(02).
                05  WRK-WDD         PIC 9(02).
+      *
+           03  WRK-LINECNT-G.
+               05  WRK-GLINECNT        PIC 9(02).
+               05  WRK-NLINECNT        PIC 9(02).
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -863,6 +868,15 @@
                                    MOVE    3           TO  SPA-CHIIKKBN
                                END-IF
                        END-EVALUATE
+                   END-IF
+      *H26.4
+                   IF      SPA-SRYYMD      >=  "20140401"
+      *                地域包括診療加算（3195)
+                       IF      SYS-1006-SSTKIJUN (195) =   1
+                           MOVE    1               TO  SPA-CHKHTKKSN
+                       ELSE
+                           MOVE    ZERO            TO  SPA-CHKHTKKSN
+                       END-IF
                    END-IF
                END-IF
                MOVE    "key2"              TO  MCP-PATHNAME

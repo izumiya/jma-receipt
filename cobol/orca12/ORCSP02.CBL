@@ -54,6 +54,7 @@
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/11/22  ÃÏ°èÏ¢·È£É£ÄÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/12/25  ´µ¼Ô¥ì¥»¥×¥ÈÊ¬³äÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  14/02/XX  ´µ¼Ô²ð¸î¾ðÊóÄÉ²ÃÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  14/03/XX  ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2953,6 +2954,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *            ½ÐÀ¸»þÂÎ½Å
                        MOVE    PTCONF-CDATA(1:4)
                                            TO  SPA-GMN-BIRTHWEIGHT-X
+      *H26.4
+                   WHEN    "TIIKIHOKATU"
+      *            ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ
+                       MOVE    PTCONF-CDATA(1:4)
+                                           TO  SPA-GMN28-CHKHKTBYO-AREA
                END-EVALUATE
                MOVE    "tbl_ptconf"        TO  MCP-TABLE
                MOVE    "key2"              TO  MCP-PATHNAME
@@ -4937,12 +4943,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "F"         TO  P02-P028-CRHKNLST-SELECT
                                                               (IDX)
                END-IF
-      *ver.4.8 ¤Î¤ß
-      **       º£²ó¿·µ¬
-      *        IF      SPA-NAI28-TCHKNSKBN (IDX) =   SPACE
-      *            MOVE    CL-GREEN    TO  P02-P028-CRHKNLST-BGCOLOR
-      *                                                       (IDX)
-      *****    END-IF
            END-PERFORM
            MOVE    SPA-GMN28-CRHKN-MAX     TO  P02-P028-CRHKNLST-COUNT
       *
@@ -4984,17 +4984,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE    "F"         TO  P02-P028-CARELST-SELECT
                                                               (IDX)
                END-IF
-      *ver.4.8 ¤Î¤ß
-      *        º£²ó¿·µ¬
-      *        IF      SPA-NAI28-TINSKBN (IDX) =   SPACE
-      *            MOVE    CL-GREEN    TO  P02-P028-CARELST-BGCOLOR
-      *                                                       (IDX)
-      *        END-IF
-      *        º£²ó½¤Àµ
-      *        IF      SPA-NAI28-TINSKBN (IDX) =   "2"
-      *            MOVE    CL-PINK     TO  P02-P028-CARELST-BGCOLOR
-      *                                                       (IDX)
-      ****     END-IF
            END-PERFORM
            MOVE    SPA-GMN28-CRNIN-MAX     TO  P02-P028-CARELST-COUNT
       *
@@ -5013,6 +5002,28 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN28-CAREJOTAI-MAX  TO  P02-P028-CAREJOTAI-COUNT
       *
+      *H26.4
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ
+           IF      SPA-GMN28-CHKHKTBYO(1)  =   "1"
+               MOVE    "T"                 TO  P02-P028-CHKHKTBYO1
+           ELSE
+               MOVE    "F"                 TO  P02-P028-CHKHKTBYO1
+           END-IF
+           IF      SPA-GMN28-CHKHKTBYO(2)  =   "1"
+               MOVE    "T"                 TO  P02-P028-CHKHKTBYO2
+           ELSE
+               MOVE    "F"                 TO  P02-P028-CHKHKTBYO2
+           END-IF
+           IF      SPA-GMN28-CHKHKTBYO(3)  =   "1"
+               MOVE    "T"                 TO  P02-P028-CHKHKTBYO3
+           ELSE
+               MOVE    "F"                 TO  P02-P028-CHKHKTBYO3
+           END-IF
+           IF      SPA-GMN28-CHKHKTBYO(4)  =   "1"
+               MOVE    "T"                 TO  P02-P028-CHKHKTBYO4
+           ELSE
+               MOVE    "F"                 TO  P02-P028-CHKHKTBYO4
+           END-IF
            .
        2001-P028-SET-EXT.
            EXIT.

@@ -51,6 +51,7 @@
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/11/22  ´µ¼ÔÃÏ°èÏ¢·ÈÄÉ²Ã
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/12/21  ¥ì¥»¥×¥ÈÊ¬³äÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/02/XX  ´µ¼Ô²ð¸î¾ðÊóÄÉ²ÃÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/03/XX  ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -160,6 +161,7 @@
            03  IDX                 PIC 9(04).
            03  IDX2                PIC 9(04).
            03  IDX5                PIC 9(04).
+           03  IDH1                PIC 9(02).
       *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
@@ -974,6 +976,25 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    SPA-GMN-BIRTHWEIGHT-X   TO  WRK-CONF-CDATA
            END-IF
            MOVE    "BIRTHWEIGHT"           TO  WRK-CONF-CKEY
+           PERFORM 2111-PTCONF-DBSYORI-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      211-PTCONF-SYORI-EXT
+           END-IF
+      *
+      *H26.4
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ
+           PERFORM VARYING     IDH1    FROM    1   BY  1
+                   UNTIL       IDH1    >   4
+               IF      SPA-GMN28-CHKHKTBYO(1)  =   SPACE
+                   MOVE    "0"             TO  SPA-GMN28-CHKHKTBYO(1)
+               END-IF
+           END-PERFORM
+           IF      SPA-GMN28-CHKHKTBYO-AREA    =   ZERO
+               MOVE    SPACE                   TO  WRK-CONF-CDATA
+           ELSE
+               MOVE    SPA-GMN28-CHKHKTBYO-AREA    TO  WRK-CONF-CDATA
+           END-IF
+           MOVE    "TIIKIHOKATU"           TO  WRK-CONF-CKEY
            PERFORM 2111-PTCONF-DBSYORI-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      211-PTCONF-SYORI-EXT

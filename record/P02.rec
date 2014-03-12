@@ -1263,6 +1263,18 @@ P02	{
 						select	bool[10];
 					};
 				};
+				P028_CHKHKTBYO1	{
+					value	bool;
+				};
+				P028_CHKHKTBYO2	{
+					value	bool;
+				};
+				P028_CHKHKTBYO3	{
+					value	bool;
+				};
+				P028_CHKHKTBYO4	{
+					value	bool;
+				};
 			};
 		};
 	};
