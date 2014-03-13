@@ -326,20 +326,16 @@
            MOVE    SPACE               TO  HKTSRYCD-REC
            INITIALIZE                      HKTSRYCD-REC
            MOVE    SPA-NAI-STYUKYMD    TO  HKTSRYCD-YUKOSTYMD
-      *?   MOVE    SPA-NAI-EDYUKYMD    TO  HKTSRYCD-YUKOEDYMD
-           MOVE    SPA-NAI-STYUKYMD    TO  HKTSRYCD-YUKOEDYMD
+           MOVE    SPA-NAI-EDYUKYMD    TO  HKTSRYCD-YUKOEDYMD
            MOVE    SPA-GMN-KBNCD       TO  HKTSRYCD-KANRICD
-      *TEST
-      *     DISPLAY "W31 SPA-GMN-KBNCD:" SPA-GMN-KBNCD
-      *           ",SPA-NAI-STYUKYMD:" SPA-NAI-STYUKYMD
       *
            MOVE    HKTSRYCD-REC        TO  MCPDATA-REC
            MOVE    "tbl_hktsrycd"      TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "key6"              TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
                MOVE    "tbl_hktsrycd"      TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
+               MOVE    "key6"              TO  MCP-PATHNAME
                PERFORM 900-HKTSRYCD-READ-SEC
            ELSE
                MOVE    1                   TO  FLG-HKTSRYCD
@@ -350,11 +346,11 @@
                PERFORM 3101-ETENSU1-CHEK-SEC
       *
                MOVE    "tbl_hktsrycd"      TO  MCP-TABLE
-               MOVE    "key2"              TO  MCP-PATHNAME
+               MOVE    "key6"              TO  MCP-PATHNAME
                PERFORM 900-HKTSRYCD-READ-SEC
            END-PERFORM
            MOVE    "tbl_hktsrycd"      TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "key6"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            IF      SPA-W321-H-GROUP    NOT =   SPACE
@@ -363,9 +359,6 @@
       *        包括コードリスト
                PERFORM 320-HKTLIST-SYORI-SEC
            END-IF
-      *TEST
-      *     DISPLAY "SPA-W321-MAX:" SPA-W321-MAX
-      *         ",SPA-W321-H-GROUP:" SPA-W321-H-GROUP
       *
            .
        310-SPASET-EXT.
@@ -379,10 +372,8 @@
            MOVE    SPACE               TO  ETENSU1-REC
            INITIALIZE                      ETENSU1-REC
            MOVE    HKTSRYCD-SRYCD      TO  ETENSU1-SRYCD
-      *?   MOVE    SPA-NAI-EDYUKYMD    TO  ETENSU1-YUKOSTYMD
-      *?   MOVE    SPA-NAI-EDYUKYMD    TO  ETENSU1-YUKOEDYMD
-           MOVE    HKTSRYCD-YUKOSTYMD    TO  ETENSU1-YUKOSTYMD
-           MOVE    HKTSRYCD-YUKOSTYMD    TO  ETENSU1-YUKOEDYMD
+           MOVE    SPA-NAI-EDYUKYMD    TO  ETENSU1-YUKOSTYMD
+           MOVE    SPA-NAI-EDYUKYMD    TO  ETENSU1-YUKOEDYMD
            MOVE    ETENSU1-REC         TO  MCPDATA-REC
       *
            MOVE    "tbl_etensu_1"      TO  MCP-TABLE
