@@ -1200,9 +1200,6 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *****************************************************************
        200211-KBNCD-207-SEC       SECTION.
       *
-      *    Êñ³ç»»ÄêÊýË¡¤Ï»»Äê¤¹¤ë¤ò½é´ü
-           MOVE    SPA-GMN-SANTEIHOU-LST (2)   TO  SPA-GMN-SANTEIHOU-G
-      *
       *    Êñ³ç»»Äê¶èÊ¬
            MOVE    SPA-GMN-SANTEIKBN-LST (3)   TO  SPA-GMN-SANTEIKBN-G
            MOVE    SPA-GMN-NYUGAIKBN-LST (1)   TO  SPA-GMN-NYUGAIKBN-G
