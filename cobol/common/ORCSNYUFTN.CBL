@@ -3441,6 +3441,13 @@ grpsys                                    SPA-AREA
                WHEN   230  THRU  239
                WHEN   241  THRU  249
                WHEN   250  THRU  255
+      *        (H26-ADD-ST)
+               WHEN   256
+               WHEN   257  THRU  259
+               WHEN   260  THRU  261
+               WHEN   262  THRU  265
+               WHEN   266  THRU  267
+      *        (H26-ADD-ED)
                  IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
                  END-IF
@@ -3482,6 +3489,11 @@ grpsys                                    SPA-AREA
                WHEN   147  THRU  152
                WHEN   173  THRU  190
                WHEN   196
+      *        (H26-ADD-ST)
+               WHEN   199
+               WHEN   004  THRU  008
+               WHEN   010  THRU  012
+      *        (H26-ADD-ED)
                  IF    TBL-SENTEI(SYU-IDX)  NOT  =   ZERO
                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
                  END-IF
@@ -3520,6 +3532,9 @@ grpsys                                    SPA-AREA
                WHEN   038
                WHEN   170
                WHEN   191
+      *        (H26-ADD-ST)
+               WHEN   017  THRU  020
+      *        (H26-ADD-ED)
                  IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6
                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
                  END-IF
@@ -3533,6 +3548,9 @@ grpsys                                    SPA-AREA
                WHEN   136
                WHEN   168
                WHEN   169
+      *        (H26-ADD-ST)
+               WHEN   013  THRU  016
+      *        (H26-ADD-ED)
                  IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6
                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
                  END-IF
@@ -3540,6 +3558,9 @@ grpsys                                    SPA-AREA
                WHEN   081
                WHEN   083
                WHEN   172
+      *        (H26-ADD-ST)
+               WHEN   032  THRU  037
+      *        (H26-ADD-ED)
                  IF    TBL-GAIHAKU(SYU-IDX)  =    4 OR 6
                     MOVE    1    TO    WRK-TAIJYUSIN-ERR
                  END-IF
