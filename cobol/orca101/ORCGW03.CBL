@@ -152,6 +152,7 @@
                05  WRK-WDD         PIC 9(02).
       *
            03  WRK-EDYUKYMD        PIC X(08).
+           03  WRK-YUKOSTYMD       PIC X(08).
       *
            03  WRK-TCD             PIC 9(04).
            03  WRK-PAGE            PIC 9(04).
@@ -795,8 +796,15 @@
        4203-SYRCD-SYORI-SEC       SECTION.
       *
       *    点数マスタ読込み
+           MOVE    SPA-W01-EDYUKYMD    TO  WRK-YUKOSTYMD
            MOVE    SPA-GMN-SRYCD       TO  TNS-SRYCD
            PERFORM 910-TENSU-READ-SEC
+           IF      FLG-TENSU           =   1
+      *        開始日での検索
+               MOVE    SPA-W01-STYUKYMD    TO  WRK-YUKOSTYMD
+               MOVE    SPA-GMN-SRYCD       TO  TNS-SRYCD
+               PERFORM 910-TENSU-READ-SEC
+           END-IF
            IF      FLG-TENSU           =   1
                MOVE    "0102"              TO  SPA-ERRCD
                MOVE    50                  TO  SPA-GMN-CUR
@@ -1919,8 +1927,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        910-TENSU-READ-SEC         SECTION.
       *
-           MOVE    SPA-W01-EDYUKYMD    TO  TNS-YUKOSTYMD
-           MOVE    SPA-W01-EDYUKYMD    TO  TNS-YUKOEDYMD
+           MOVE    WRK-YUKOSTYMD       TO  TNS-YUKOSTYMD
+           MOVE    WRK-YUKOSTYMD       TO  TNS-YUKOEDYMD
       *
            MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
            MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
