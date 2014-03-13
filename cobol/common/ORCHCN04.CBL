@@ -1489,6 +1489,11 @@
                    MOVE    TBL-RSIKINGAKU  TO  TBL-ZAITENSU
                    MOVE    1               TO  FLG-RSIKIN
                    MOVE    ZERO            TO  FLG-MEISAI
+      *            その他とする
+                   IF     (TBL-SRYKBN          =   "80" )
+                     AND  (TBL-SRYSYUKBN       =   "800")
+                       MOVE    "86"            TO  TBL-SRYKBN
+                   END-IF
                END-IF
            END-IF
       *

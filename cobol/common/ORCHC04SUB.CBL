@@ -699,6 +699,11 @@
                    MOVE    "1"             TO  TBL-RSIKIN   (IDX-TBL)
                    MOVE    ZERO            TO  TBL-ZAITENSU (IDX-TBL)
                    MOVE    ZERO            TO  FLG-MEISAI
+      *            その他とする
+                   IF     (WRK-SRYSYUKBN       =   "800"  )  AND
+                          (ACCT-SRYKBN         =   "80"   )
+                       MOVE    "86"            TO  TBL-SRYKBN (IDX-TBL)
+                   END-IF
                END-IF
            END-IF
       *
