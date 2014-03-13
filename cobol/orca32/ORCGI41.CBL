@@ -5174,7 +5174,16 @@
                                                   155   OR
                                                   156   OR
                                                   157   OR
-                                                  196))
+                                                  196   OR
+                                                  199   OR
+                                                    4   OR
+                                                    5   OR
+                                                    6   OR
+                                                    7   OR
+                                                    8   OR
+                                                   10   OR
+                                                   11   OR
+                                                   12 ))
                CONTINUE
            ELSE
       *        短期滞在手術基本料以外とする
