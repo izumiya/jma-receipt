@@ -129,6 +129,8 @@
       *                                     の表示時の移行先のチェック
       *  04.07.08    NACL-藤原    14/01/29  病名入力時のコード置換え画面
       *                                     の表示時のチェック追加
+      *  04.07.09    NACL-藤原    14/03/14  複数自院病名登録時のコード
+      *                                     存在チェックの修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2161,9 +2163,27 @@
                    END-IF
                END-IF
            ELSE
-               IF    ( SPA-GMN-C03-BYOMEICD-G  NOT =   SPACE )
-               OR    ( SPA-GMN-C03-BYOMEI      NOT =   SPACE )
-      *            コード変更時のチェック
+               IF      IDYY                    =   1
+                   IF    ( SPA-GMN-C03-BYOMEICD-G  NOT =   SPACE )
+                   OR    ( SPA-GMN-C03-BYOMEI      NOT =   SPACE )
+      *                コード変更時のチェック
+                       INITIALIZE              USERBYOMEI-REC
+                       IF      KANACHK-SYUBETU =   "2"    
+                           MOVE    "J"             TO  USBYO-CDSYU
+                       ELSE
+                           MOVE    "A"             TO  USBYO-CDSYU
+                       END-IF           
+                       MOVE    C03-BYOMEIINPUTCD (IDYY)
+                                               TO  USBYO-BYOMEIINPUTCD
+                       PERFORM 900-USBYO-INV-SEC
+                       IF      FLG-USERBYOMEI  =   ZERO    
+                           MOVE    "0002"          TO
+                                   SPA-NAI-C03-BYOMEIINPUTCD-ERRCD(IDYY)
+                           GO  TO  410021-BYOMEIINPUT-CHECK-EXT
+                       END-IF
+                   END-IF
+               ELSE    
+      *            複数コード設定時のチェック
                    INITIALIZE              USERBYOMEI-REC
                    IF      KANACHK-SYUBETU =   "2"    
                        MOVE    "J"             TO  USBYO-CDSYU
@@ -2171,7 +2191,7 @@
                        MOVE    "A"             TO  USBYO-CDSYU
                    END-IF           
                    MOVE    C03-BYOMEIINPUTCD (IDYY)
-                                           TO  USBYO-BYOMEIINPUTCD
+                                               TO  USBYO-BYOMEIINPUTCD
                    PERFORM 900-USBYO-INV-SEC
                    IF      FLG-USERBYOMEI  =   ZERO    
                        MOVE    "0002"          TO
