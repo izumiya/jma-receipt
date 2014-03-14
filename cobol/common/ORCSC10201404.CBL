@@ -3977,7 +3977,7 @@
                   END-IF
               WHEN    "21"
       *           ºßÂð¤¬¤ó°åÁí¹ç(ºß»Ù¿ÇÅù)
-                  MOVE    "114026670"         TO  WRK-SRYCD
+                  MOVE    "114026770"         TO  WRK-SRYCD
            END-EVALUATE
       *
            EVALUATE    WRK-COM-INPUTCD (IDX-Z)
