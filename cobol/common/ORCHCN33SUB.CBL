@@ -50,6 +50,7 @@
       *  04.05.02    NACL-小豆沢  10/01/19  診療入力された特別食加算の対応
       *  04.05.03    NACL-門脇    12/03/13  改正対応（外泊区分６，７の対応）
       *  04.05.04    NACL-門脇    12/09/18  改正対応（外泊区分８，９の対応）
+      *  04.07.01    NACL-門脇    14/03/14  平成２６年４月改正対応
       *****************************************************************
       *
       *
@@ -1521,6 +1522,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN   230  THRU  239
                WHEN   241  THRU  249
                WHEN   250  THRU  255
+      *        (H26-ADD-ST)
+               WHEN   256
+               WHEN   257  THRU  259
+               WHEN   260  THRU  261
+               WHEN   262  THRU  265
+               WHEN   266  THRU  267
+      *        (H26-ADD-ED)
                  IF    WRK-NYUKHNKSNKBN(IDX1) = 221 OR 232
                    EVALUATE   NACCT-DAY(IDX1)
                     WHEN     4
@@ -1535,6 +1543,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                  ELSE
                    IF  WRK-NYUKHNKSNKBN(IDX1) =
                            229 OR 238 OR 215 OR 216 OR 217 OR 239
+                                                           OR 252
                      EVALUATE   NACCT-DAY(IDX1)
                        WHEN     4
                          MOVE   "190108790" TO   WRK-GAIHAKU(IDX1)
@@ -1557,6 +1566,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN   147  THRU  152
                WHEN   173  THRU  190
                WHEN   196
+      *        (H26-ADD-ST)
+               WHEN   199
+               WHEN   004  THRU  008
+               WHEN   010  THRU  012
+      *        (H26-ADD-ED)
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     4
                       MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
@@ -1599,6 +1613,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN   038
                WHEN   170
                WHEN   191
+      *        (H26-ADD-ST)
+               WHEN   017  THRU  020
+      *        (H26-ADD-ED)
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     5
                       MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
@@ -1614,6 +1631,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN   136
                WHEN   168
                WHEN   169
+      *        (H26-ADD-ST)
+               WHEN   013  THRU  016
+      *        (H26-ADD-ED)
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     5
                       MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
@@ -1623,6 +1643,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN   081
                WHEN   083
                WHEN   172
+      *        (H26-ADD-ST)
+               WHEN   032  THRU  037
+      *        (H26-ADD-ED)
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     5
                       MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)

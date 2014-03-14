@@ -3473,7 +3473,7 @@ grpsys                                    SPA-AREA
       *            ¿∫ø¿≤ µﬂµﬁ∆˛±°Œ¡°¢¿∫ø¿≤ µﬁ¿≠¥¸º£Œ≈…¬≈Ô∆˛±°Œ¡
       *            ¿∫ø¿≤ µﬂµﬁ°¶πÁ ªæ…∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
                    IF  WRK-NYUKHNKSNKBN = 229 OR 238 OR 215 OR 216 OR
-                                          217 OR 239
+                                          217 OR 239 OR 252
                      IF    TBL-GAIHAKU(SYU-IDX)  =    7
                         MOVE    1    TO    WRK-TAIJYUSIN-ERR
                      END-IF
