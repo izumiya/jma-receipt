@@ -58,6 +58,7 @@
       * 04.05.00     NACL-多々納  09/08/11  退職国保の６５歳以上判定追加
       * 04.05.00     NACL-多々納  10/08/24  高齢者非該当追加
       * 04.08.00     NACL-多々納  13/07/XX  第三者行為対応
+      * 04.08.00     NACL-多々納  14/03/XX  前期高齢者２割対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -97,6 +98,8 @@
            03  FLG-TAHKN           PIC 9(01).
            03  FLG-HI-ROUJIN       PIC 9(01).
            03  FLG-HI-ROUJIN2      PIC 9(01).
+      *
+           03  FLG-ROU-02          PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -576,6 +579,15 @@
                END-IF
            END-IF
       *
+      *H26.4
+      *    前期高齢者２割負担対応
+      *         （S19.4.2生まれ以降）
+           IF     (AGECHK-SRYYMD       >=  "20140501" )
+              AND (WRK-BIRTHDAY        >=  "19440402" )
+               MOVE    1                   TO  FLG-ROU-02
+           ELSE
+               MOVE    ZERO                TO  FLG-ROU-02
+           END-IF
       *    老人判定
            IF      AGECHK-SRYYMD       <   "20080401"
                PERFORM 2009-ROUJIN-HANTEI-SEC
@@ -1022,6 +1034,14 @@
                        IF      PTHKN-HOJOKBN       =   "2"
                            MOVE    1               TO  FLG-ERR
                        END-IF
+      *                H26.5から２割対応
+                       IF      FLG-ROU-02      =   1
+                           MOVE    ZERO            TO  FLG-ERR
+                           IF      PTHKN-HOJOKBN       =   "1"
+                               MOVE    1               TO  FLG-ERR
+                           END-IF
+                       END-IF
+      *
                    END-IF
       *            前期高齢者開始日以降に確定がない時、警告
                    IF     (PTHKN-TEKSTYMD      <   WRK-BYMD-70 )
@@ -1042,6 +1062,18 @@
                                                    OR  "E"
                                                    OR  "F"
                            IF      PTHKN-CONTKBN   =   SPACE
+                               MOVE    1               TO  FLG-ERR
+                           END-IF
+                       END-IF
+      *                H26.5から２割対応
+                       IF      FLG-ROU-02      =   1
+                           MOVE    ZERO            TO  FLG-ERR
+      *                    １割で継続以外はエラー
+                           IF     (PTHKN-HOJOKBN   =   "9"
+                                                   OR  "A"
+                                                   OR  "B"
+                                                   OR  "C" )
+                           AND    (PTHKN-CONTKBN   =   SPACE)
                                MOVE    1               TO  FLG-ERR
                            END-IF
                        END-IF
@@ -1073,6 +1105,20 @@
                        ELSE
                            MOVE    2               TO  FLG-OK
                        END-IF
+      *                H26.5から２割対応
+                       IF      FLG-ROU-02      =   1
+                           MOVE    ZERO            TO  FLG-ERR
+                           MOVE    1               TO  FLG-OK
+      *                    １割で継続以外はエラー
+                           IF      PTHKN-HOJOKBN       =   "9"
+                                                       OR  "B"
+                               IF      PTHKN-CONTKBN   =   SPACE
+                                   MOVE    1               TO  FLG-ERR
+                               END-IF
+                           ELSE
+                               MOVE    2               TO  FLG-OK
+                           END-IF
+                       END-IF
                    END-IF
       *        Ｈ２０．４から（後期高齢者）
                WHEN    "039"
@@ -1088,6 +1134,16 @@
                        IF      PTHKN-HOJOKBN       =   "8"
                            IF      PTHKN-CONTKBN   =   SPACE
                                MOVE    1               TO  FLG-ERR
+                           END-IF
+                       END-IF
+      *                H26.5から２割対応
+                       IF      FLG-ROU-02      =   1
+                           MOVE    ZERO            TO  FLG-ERR
+      *                    １割で継続以外はエラー
+                           IF      PTHKN-HOJOKBN       =   "9"
+                               IF      PTHKN-CONTKBN   =   SPACE
+                                   MOVE    1               TO  FLG-ERR
+                               END-IF
                            END-IF
                        END-IF
                    END-IF

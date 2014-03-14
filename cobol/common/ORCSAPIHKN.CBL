@@ -29,6 +29,7 @@
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       * 04.07.00     NACL-Â¿¡¹Ç¼  12/07/24  Ï«ºÒ¶èÊ¬ÄÉ²ÃÂÐ±þ
       * 04.07.00     NACL-Â¿¡¹Ç¼  13/11/01  ÊÝ¸±ÁÈ¹ç¤»£²£°·ï°Ê¾åÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  14/03/XX  Á°´ü¹âÎð¼Ô£²³äÂÐ±þ
       *****************************************************************
       *
       *
@@ -1091,6 +1092,9 @@
                    WHEN    "7"
                        MOVE    "£³³ä" 
                                        TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
+                   WHEN    "8"
+                       MOVE    "£²³ä" 
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "9"
                        MOVE    "£±³ä" 
                                        TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
@@ -1102,6 +1106,15 @@
                                        TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "C"
                        MOVE    "£±³äÄÌ¶Ð" 
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
+                   WHEN    "D"
+                       MOVE    "£²³ä¿¦Ì³" 
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
+                   WHEN    "E"
+                       MOVE    "£²³ä²¼Á¥" 
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
+                   WHEN    "F"
+                       MOVE    "£²³äÄÌ¶Ð" 
                                        TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "G"
                        MOVE    "£³³ä¿¦Ì³" 
@@ -1136,11 +1149,17 @@
                    WHEN    "7"
                        MOVE    "£³³ä" 
                                        TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
+                   WHEN    "8"
+                       MOVE    "£²³ä" 
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "9"
                        MOVE    "£±³ä" 
                                        TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "B"
                        MOVE    "£±³ä²¼Á¥" 
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
+                   WHEN    "E"
+                       MOVE    "£²³ä²¼Á¥" 
                                        TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                    WHEN    "H"
                        MOVE    "£³³ä²¼Á¥" 
@@ -1202,6 +1221,9 @@
                    EVALUATE    TBL-COMB-HOJOKBN (IDX)
                        WHEN    "9"
                            MOVE    "£±³ä" 
+                                       TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
+                       WHEN    "8"
+                           MOVE    "£²³ä" 
                                        TO  ORCSAPIHKN-HOJOKBN-NAME(IDXH)
                        WHEN    "7"
                            MOVE    "£³³ä" 
