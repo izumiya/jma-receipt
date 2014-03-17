@@ -87,3 +87,16 @@ path	key4 	{
 		;
 	};
 };
+
+path	key5 	{
+	DBSELECT	{
+		DECLARE tbl_srykarrk_key5_csr CURSOR FOR
+		SELECT *
+		FROM tbl_srykarrk
+			WHERE   HOSPNUM   =   :HOSPNUM
+			AND   PTID        =   :PTID
+			ORDER   BY        SYOSINYMD1
+		;
+	};
+};
+
