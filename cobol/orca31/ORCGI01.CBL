@@ -5517,10 +5517,15 @@
                MOVE    "3"         TO  WRK-TOKNYUIN-KBN
                PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
       *
-               MOVE    "5111"      TO  WRK-KANRICD
-               MOVE    "24"        TO  WRK-KBNCD
-               MOVE    "3"         TO  WRK-TOKNYUIN-KBN
-               PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+               IF    ( WRK-KJNYMD   >=  CONST-H260401 )
+                AND  ( SPA-NAI-I01-BTUSBT  =   "05" OR "06")
+                   CONTINUE
+               ELSE
+                   MOVE    "5111"      TO  WRK-KANRICD
+                   MOVE    "24"        TO  WRK-KBNCD
+                   MOVE    "3"         TO  WRK-TOKNYUIN-KBN
+                   PERFORM 4100-CMB-TOKNYUIN-DAT-SET-SEC
+               END-IF
            END-IF
       *
       *    短期滞在手術基本料をコンボに設定
