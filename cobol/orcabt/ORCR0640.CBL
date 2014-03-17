@@ -12871,6 +12871,13 @@
                WHEN   230  THRU  239
                WHEN   241  THRU  249
                WHEN   250  THRU  255
+      *        (H26-ADD-ST)
+               WHEN   256
+               WHEN   257  THRU  259
+               WHEN   260  THRU  261
+               WHEN   262  THRU  265
+               WHEN   266  THRU  267
+      *        (H26-ADD-ED)
       *          «ß√Œæ…º£Œ≈…¬≈Ô∆˛±°Œ¡
                  IF    WRK-DAY22-NYUKHNKSNKBN(SYUKEI-IDX4) = 221 OR 232
                    EVALUATE   SYUKEI-IDX
@@ -12891,7 +12898,7 @@
       *            ¿∫ø¿≤ µﬂµﬁ∆˛±°Œ¡°¢¿∫ø¿≤ µﬁ¿≠¥¸º£Œ≈…¬≈Ô∆˛±°Œ¡
       *            ¿∫ø¿≤ µﬂµﬁ°¶πÁ ªæ…∆˛±°Œ¡°¢¿∫ø¿Œ≈Õ‹…¬≈Ô∆˛±°Œ¡
                    IF  WRK-DAY22-NYUKHNKSNKBN(SYUKEI-IDX4) =
-                          229 OR 238 OR 215 OR 216 OR 217 OR 239
+                          229 OR 238 OR 215 OR 216 OR 217 OR 239 OR 252
                      EVALUATE   SYUKEI-IDX
                       WHEN     4
                       WHEN     9
@@ -12920,6 +12927,11 @@
                WHEN   147  THRU  152
                WHEN   173  THRU  190
                WHEN   196
+      *        (H26-ADD-ST)
+               WHEN   199
+               WHEN   004  THRU  008
+               WHEN   010  THRU  012
+      *        (H26-ADD-ED)
                  EVALUATE   SYUKEI-IDX
                    WHEN     4
                    WHEN     9
@@ -12974,6 +12986,9 @@
                WHEN   038
                WHEN   170
                WHEN   191
+      *        (H26-ADD-ST)
+               WHEN   017  THRU  020
+      *        (H26-ADD-ED)
                  EVALUATE   SYUKEI-IDX
                    WHEN    11
                    WHEN    13
@@ -12992,6 +13007,9 @@
                WHEN   136
                WHEN   168
                WHEN   169
+      *        (H26-ADD-ST)
+               WHEN   013  THRU  016
+      *        (H26-ADD-ED)
                  EVALUATE   SYUKEI-IDX
                    WHEN    11
                    WHEN    13
@@ -13004,6 +13022,9 @@
                WHEN   081
                WHEN   083
                WHEN   172
+      *        (H26-ADD-ST)
+               WHEN   032  THRU  037
+      *        (H26-ADD-ED)
                  EVALUATE   SYUKEI-IDX
                    WHEN    11
                    WHEN    13
@@ -13051,6 +13072,13 @@
                WHEN   230  THRU  239
                WHEN   241  THRU  249
                WHEN   250  THRU  255
+      *        (H26-ADD-ST)
+               WHEN   256
+               WHEN   257  THRU  259
+               WHEN   260  THRU  261
+               WHEN   262  THRU  265
+               WHEN   266  THRU  267
+      *        (H26-ADD-ED)
                  EVALUATE   SYUKEI-IDX
                    WHEN     5
                    WHEN    10
@@ -13064,6 +13092,11 @@
                WHEN   147  THRU  152
                WHEN   173  THRU  190
                WHEN   196
+      *        (H26-ADD-ST)
+               WHEN   199
+               WHEN   004  THRU  008
+               WHEN   010  THRU  012
+      *        (H26-ADD-ED)
                  EVALUATE   SYUKEI-IDX
                    WHEN     5
                    WHEN    10
