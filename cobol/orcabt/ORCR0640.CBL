@@ -1150,6 +1150,8 @@
                05  WRK-DAY1-KSNTEN                     PIC S9(08).
                05  WRK-DAY1-NYUKHNKSNKBN               PIC 9(03).
                05  WRK-DAY1-CHUKSNCD                   PIC X(04).
+               05  WRK-DAY1-NYUKHNKBN                  PIC 9(03).
+               05  WRK-DAY1-NYUINKHN                   PIC X(09).
                05  WRK-DAY2                            PIC 9(04).
                05  WRK-DAY4                            PIC 9(04).
                05  WRK-DAY4X                           PIC 9(04).
@@ -1164,6 +1166,8 @@
                05  WRK-DAY22-NYUKHNRYO                 PIC 9(08).
                05  WRK-DAY22-NYUKHNKSNKBN              PIC 9(03).
                05  WRK-DAY22-CHUKSNCD                  PIC X(04).
+               05  WRK-DAY22-NYUKHNKBN                 PIC 9(03).
+               05  WRK-DAY22-NYUINKHN                  PIC X(09).
                05  WRK-DAY24                           PIC 9(04).
       *
        01  WRK-GAI-TABLE.
@@ -1495,6 +1499,8 @@
            03  WRK-GAIHAKU-KHNTEN                      PIC 9(08).
            03  WRK-NYUKHNKSNKBN                        PIC 9(03).
            03  WRK-CHUKSNCD                            PIC X(04).
+           03  WRK-NYUKHNKBN                           PIC 9(03).
+           03  WRK-NYUINKHN                            PIC X(09).
            03  WRK-SHOKUJIRYOYO-OCC.
                05  WRK-SHOKUJIRYOYO                    PIC 9(01)
                                                        OCCURS 31.
@@ -9697,6 +9703,10 @@
                                       TO  WRK-DAY1-NYUKHNKSNKBN(IDY)    
                            MOVE   WRK-CHUKSNCD
                                       TO  WRK-DAY1-CHUKSNCD(IDY)
+                           MOVE   WRK-NYUKHNKBN
+                                      TO  WRK-DAY1-NYUKHNKBN(IDY)
+                           MOVE   WRK-NYUINKHN
+                                      TO  WRK-DAY1-NYUINKHN(IDY)
                            MOVE   WRK-HYOKETU-SRYCD
                                          TO   WRK-DAY1-HYOKETU-SRYCD
                                                                (IDY)
@@ -9875,6 +9885,10 @@
                                         TO  WRK-DAY22-NYUKHNKSNKBN(IDY) 
                                MOVE   WRK-DAY1-CHUKSNCD(IDY)
                                         TO  WRK-DAY22-CHUKSNCD(IDY)
+                               MOVE   WRK-DAY1-NYUKHNKBN(IDY)
+                                        TO  WRK-DAY22-NYUKHNKBN(IDY)
+                               MOVE   WRK-DAY1-NYUINKHN(IDY)
+                                        TO  WRK-DAY22-NYUINKHN(IDY)
                                PERFORM      210203-NYUINACCT-GET-SEC
       *************************ADD    1     TO   CNT-DAY22
       *************************MOVE   1     TO   FLG-DAY22
@@ -10350,6 +10364,8 @@
                                            WRK-KSN-SRYCD
       *
            MOVE    SPACE              TO   WRK-CHUKSNCD
+           MOVE    ZERO               TO   WRK-NYUKHNKBN
+           MOVE    SPACE              TO   WRK-NYUINKHN
       *
            MOVE    ZERO               TO   WRK-SENTEI-KHNTEN
                                            WRK-SENTEI-ZAITEN
@@ -10401,6 +10417,10 @@
                                            TO   WRK-NYUKHNKSNKBN   
                           MOVE   TNS-CHUKSNCD
                                            TO   WRK-CHUKSNCD
+                          MOVE   TNS-NYUKHNKBN
+                                           TO   WRK-NYUKHNKBN
+                          MOVE   NSRY-SRYCD(IDX2)
+                                           TO   WRK-NYUINKHN
                           MOVE   NSRY-SRYCD(IDX2)
                                            TO   WRK-SENTEI-SRYCD
       *                   ´Ç¸îÈæÎ¨´ð½àÌ¤Ã£»þ¤ÎÆþ±¡´ðËÜÅÀ¿ô¤Î¼èÆÀ
@@ -13159,7 +13179,18 @@
              WHEN     38
                EVALUATE   WRK-DAY22-CHUKSNCD(SYUKEI-IDX4)
                  WHEN   "9017"
-                   MOVE   "190161470"  TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                   IF   RECE62-SRYYM   >=  "201404"
+                    IF  (WRK-DAY22-NYUKHNKBN(SYUKEI-IDX4)
+                                             =   79 OR 88  )
+                    OR  (WRK-DAY22-NYUINKHN(SYUKEI-IDX4)
+                                             =  "190799510")
+                      MOVE "190161570" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                    ELSE
+                      MOVE "190161470" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                    END-IF
+                   ELSE
+                      MOVE "190161470" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                   END-IF
                  WHEN   "9018"
                    MOVE   "190161570"  TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
                  WHEN   "9026"
@@ -13185,7 +13216,18 @@
              WHEN     46
                EVALUATE   WRK-DAY22-CHUKSNCD(SYUKEI-IDX4)
                  WHEN   "9017"
-                   MOVE   "190161670"  TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                   IF   RECE62-SRYYM   >=  "201404"
+                    IF  (WRK-DAY22-NYUKHNKBN(SYUKEI-IDX4)
+                                             =   79 OR 88  )
+                    OR  (WRK-DAY22-NYUINKHN(SYUKEI-IDX4)
+                                             =  "190799510")
+                      MOVE "190161770" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                    ELSE
+                      MOVE "190161670" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                    END-IF
+                   ELSE
+                      MOVE "190161670" TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
+                   END-IF
                  WHEN   "9018"
                    MOVE   "190161770"  TO  WRK-GAI2-SRYCD(SYUKEI-IDX3)
                  WHEN   "9026"

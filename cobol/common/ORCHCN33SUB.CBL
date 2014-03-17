@@ -155,6 +155,7 @@
            03  WRK-MEISAISU                PIC 9(03).
            03  WRK-KSNKBN                  PIC 9(03).
            03  WRK-CHUKSNCD-XXX            PIC X(04).
+           03  WRK-NYUKHNKBN-XXX           PIC 9(03).
       *
            03  WRK-SYS5000-COUNT           PIC 9(02).
       *
@@ -180,6 +181,7 @@
                    07  WRK-NYUKHNKSNKBN    PIC 9(03).
                    07  WRK-GAIHAKU-KBN     PIC 9(03).
                    07  WRK-CHUKSNCD        PIC X(04).
+                   07  WRK-NYUKHNKBN       PIC 9(03).
       *
       *    入院会計並び替えワーク
            03  WRK-NYUIN-SORT-TABLE.
@@ -674,6 +676,7 @@
                    MOVE      ZERO     TO      FLG-RYAKU
                                               WRK-KSNKBN
                    MOVE      SPACE    TO      WRK-CHUKSNCD-XXX
+                   MOVE      ZERO     TO      WRK-NYUKHNKBN-XXX
                    IF    NACCT-SRYCDTOTAL     =    99999916
                        CONTINUE
                    ELSE
@@ -779,6 +782,8 @@
                                          TO  WRK-NYUKHNKSNKBN(IDX1)
                                MOVE  WRK-CHUKSNCD-XXX
                                          TO  WRK-CHUKSNCD(IDX1)
+                               MOVE  WRK-NYUKHNKBN-XXX
+                                         TO  WRK-NYUKHNKBN(IDX1)
       *
                                MOVE    1    TO   FLG-OK
                            END-IF
@@ -1438,6 +1443,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM 910-TENSU-READ-SEC
            MOVE    TNS-NYUKHNKSNKBN    TO  WRK-KSNKBN
            MOVE    TNS-CHUKSNCD        TO  WRK-CHUKSNCD-XXX
+           MOVE    TNS-NYUKHNKBN       TO  WRK-NYUKHNKBN-XXX
       *
            .
        210-GAIHAKU-MAE-EXT.
@@ -1675,7 +1681,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              WHEN    11
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
-                      MOVE   "190161470"    TO   WRK-GAIHAKU(IDX1)
+                      IF   LNK-ORCHCN33SUB-SANTEIYM  >=  "201404"
+                        IF  (WRK-NYUKHNKBN(IDX1) =   79 OR 88  )
+                        OR  (WRK-NYUINKHN(IDX1)  =  "190799510")
+                          MOVE  "190161570" TO   WRK-GAIHAKU(IDX1)
+                        ELSE
+                          MOVE  "190161470" TO   WRK-GAIHAKU(IDX1)
+                        END-IF
+                      ELSE
+                          MOVE  "190161470" TO   WRK-GAIHAKU(IDX1)
+                      END-IF
                    WHEN   "9018"
                       MOVE   "190161570"    TO   WRK-GAIHAKU(IDX1)
                    WHEN   "9026"
@@ -1691,7 +1706,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              WHEN    13
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
-                      MOVE   "190161670"    TO   WRK-GAIHAKU(IDX1)
+                      IF   LNK-ORCHCN33SUB-SANTEIYM  >=  "201404"
+                        IF  (WRK-NYUKHNKBN(IDX1) =   79 OR 88  )
+                        OR  (WRK-NYUINKHN(IDX1)  =  "190799510")
+                          MOVE  "190161770" TO   WRK-GAIHAKU(IDX1)
+                        ELSE
+                          MOVE  "190161670" TO   WRK-GAIHAKU(IDX1)
+                        END-IF
+                      ELSE
+                          MOVE  "190161670" TO   WRK-GAIHAKU(IDX1)
+                      END-IF
                    WHEN   "9018"
                       MOVE   "190161770"    TO   WRK-GAIHAKU(IDX1)
                    WHEN   "9026"

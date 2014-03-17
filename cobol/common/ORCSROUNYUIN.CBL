@@ -258,6 +258,7 @@
            03  WRK-SRYKBN                  PIC X(02).
            03  WRK-KSNKBN                  PIC 9(03).
            03  WRK-CHUKSNCD-XXX            PIC X(04).
+           03  WRK-NYUKHNKBN-XXX           PIC 9(03).
            03  WRK-ZAISKBKBN               PIC X(01).
            03  WRK-SANTEIED-DDX            PIC X(02).
            03  WRK-SANTEIED-DD9            REDEFINES  WRK-SANTEIED-DDX
@@ -295,6 +296,7 @@
                    07  WRK-GAIHAKU2        PIC X(09).
                    07  WRK-NYUKHNKSNKBN    PIC 9(03).
                    07  WRK-CHUKSNCD        PIC X(04).
+                   07  WRK-NYUKHNKBN       PIC 9(03).
       *
       *    Æþ±¡ÎÁ²Ã»»ÂàÈòÎÎ°è
            03  WRK-NYUKSN-TABLE.
@@ -758,6 +760,7 @@
                    MOVE      ZERO     TO      FLG-RYAKU
                                               WRK-KSNKBN
                    MOVE      SPACE    TO      WRK-CHUKSNCD-XXX
+                   MOVE      ZERO     TO      WRK-NYUKHNKBN-XXX
                    MOVE      SPACE    TO      WRK-RYAKUSHO
                                               WRK-SRYKBN
                                               WRK-SHOKIKSN-TAIHI
@@ -852,6 +855,8 @@
                                          TO  WRK-NYUKHNKSNKBN(IDX1)
                                MOVE  WRK-CHUKSNCD-XXX
                                          TO  WRK-CHUKSNCD(IDX1)
+                               MOVE  WRK-NYUKHNKBN-XXX
+                                         TO  WRK-NYUKHNKBN(IDX1)
       *
                                IF    WRK-RYAKUSHO   NOT =  SPACE
                                   MOVE  WRK-RYAKUSHO
@@ -1726,6 +1731,7 @@
                    MOVE      ZERO     TO      FLG-RYAKU
                                               WRK-KSNKBN
                    MOVE      SPACE    TO      WRK-CHUKSNCD-XXX
+                   MOVE      ZERO     TO      WRK-NYUKHNKBN-XXX
                    MOVE      SPACE    TO      WRK-RYAKUSHO
                                               WRK-SRYKBN
                                               WRK-SHOKIKSN-TAIHI
@@ -1820,6 +1826,8 @@
                                          TO  WRK-NYUKHNKSNKBN(IDX1)
                                MOVE  WRK-CHUKSNCD-XXX
                                          TO  WRK-CHUKSNCD(IDX1)
+                               MOVE  WRK-NYUKHNKBN-XXX
+                                         TO  WRK-NYUKHNKBN(IDX1)
       *
                                IF    WRK-RYAKUSHO   NOT =  SPACE
                                   MOVE  WRK-RYAKUSHO
@@ -2467,6 +2475,7 @@
                    MOVE      ZERO     TO      FLG-RYAKU
                                               WRK-KSNKBN
                    MOVE      SPACE    TO      WRK-CHUKSNCD-XXX
+                   MOVE      ZERO     TO      WRK-NYUKHNKBN-XXX
                    MOVE      SPACE    TO      WRK-RYAKUSHO
                                               WRK-SRYKBN
                                               WRK-SHOKIKSN-TAIHI
@@ -2595,6 +2604,8 @@
                                          TO  WRK-NYUKHNKSNKBN(IDX1)
                                MOVE  WRK-CHUKSNCD-XXX
                                          TO  WRK-CHUKSNCD(IDX1)
+                               MOVE  WRK-NYUKHNKBN-XXX
+                                         TO  WRK-NYUKHNKBN(IDX1)
       *
                                IF    WRK-RYAKUSHO   NOT =  SPACE
                                   MOVE  WRK-RYAKUSHO
@@ -3412,6 +3423,7 @@
                    MOVE      ZERO     TO      FLG-RYAKU
                                               WRK-KSNKBN
                    MOVE      SPACE    TO      WRK-CHUKSNCD-XXX
+                   MOVE      ZERO     TO      WRK-NYUKHNKBN-XXX
                    MOVE      SPACE    TO      WRK-RYAKUSHO
                                               WRK-SRYKBN
                                               WRK-SHOKIKSN-TAIHI
@@ -3540,6 +3552,8 @@
                                          TO  WRK-NYUKHNKSNKBN(IDX1)
                                MOVE  WRK-CHUKSNCD-XXX
                                          TO  WRK-CHUKSNCD(IDX1)
+                               MOVE  WRK-NYUKHNKBN-XXX
+                                         TO  WRK-NYUKHNKBN(IDX1)
       *
                                IF    WRK-RYAKUSHO   NOT =  SPACE
                                   MOVE  WRK-RYAKUSHO
@@ -4628,6 +4642,7 @@
            PERFORM 910-TENSU-READ-SEC
            MOVE    TNS-NYUKHNKSNKBN        TO  WRK-KSNKBN
            MOVE    TNS-CHUKSNCD            TO  WRK-CHUKSNCD-XXX
+           MOVE    TNS-NYUKHNKBN           TO  WRK-NYUKHNKBN-XXX
       *
            .
        210-GAIHAKU-MAE-EXT.
@@ -4904,7 +4919,16 @@
              WHEN    11
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
-                      MOVE   "190161470"    TO   WRK-GAIHAKU(IDX1)
+                      IF   LNK-SROUNYUIN-SANTEIYM   >=  "201404"
+                        IF  (WRK-NYUKHNKBN(IDX1) =   79 OR 88  )
+                        OR  (WRK-NYUINKHN(IDX1)  =  "190799510")
+                          MOVE  "190161570" TO   WRK-GAIHAKU(IDX1)
+                        ELSE
+                          MOVE  "190161470" TO   WRK-GAIHAKU(IDX1)
+                        END-IF
+                      ELSE
+                          MOVE  "190161470" TO   WRK-GAIHAKU(IDX1)
+                      END-IF
                    WHEN   "9018"
                       MOVE   "190161570"    TO   WRK-GAIHAKU(IDX1)
                    WHEN   "9026"
@@ -4944,7 +4968,16 @@
              WHEN    13
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
-                      MOVE   "190161670"    TO   WRK-GAIHAKU(IDX1)
+                      IF   LNK-SROUNYUIN-SANTEIYM   >=  "201404"
+                        IF  (WRK-NYUKHNKBN(IDX1) =   79 OR 88  )
+                        OR  (WRK-NYUINKHN(IDX1)  =  "190799510")
+                          MOVE  "190161770" TO   WRK-GAIHAKU(IDX1)
+                        ELSE
+                          MOVE  "190161670" TO   WRK-GAIHAKU(IDX1)
+                        END-IF
+                      ELSE
+                          MOVE  "190161670" TO   WRK-GAIHAKU(IDX1)
+                      END-IF
                    WHEN   "9018"
                       MOVE   "190161770"    TO   WRK-GAIHAKU(IDX1)
                    WHEN   "9026"
