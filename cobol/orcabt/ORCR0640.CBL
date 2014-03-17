@@ -632,6 +632,8 @@
       *  04.07.15    NACL-ÌçÏÆ    14/02/19  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *                                     ¡ÊÉéÃ´¶â³Û£±£°±ßÌ¤Ëþ»Í¼Î¸ÞÆþ¡Ë
       *  04.07.16    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.17    NACL-ÌçÏÆ    14/03/17  Äã½êÆÀ¥Õ¥é¥°£²¾ðÊó¤ÎÆþ¤ìÂØ¤¨
+      *                                     ¡Ê¥Þ¥ëÄ¹Ê»ÍÑ»þ¡Ë
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
@@ -26871,6 +26873,7 @@
                                       RECE62-ZEROKISAIFLGINF-AREA
                                       RECE62-ETCKISAIFLGINF-AREA
                                       RECE62-FUKUSHIFLGINF-AREA
+                                      RECE62-TEISYOTOKU2-INF
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       30
                INITIALIZE              RECE62-TENSUINF-AREA (IDX)
@@ -26949,6 +26952,8 @@
                            MOVE    WRK-RECE62-FUKUSHIFLG-SKJSEI (IDX)
                                         TO  RECE62-FUKUSHIFLG-SKJSEI
                                                              (IDY)
+                           MOVE    WRK-RECE62-TEISYOTOKU2(IDX)
+                                        TO  RECE62-TEISYOTOKU2(IDY)
                            COMPUTE IDYX    =   IDY +   1
                            MOVE    WRK-RECE62-JNISSU      (IDXX)
                                            TO  RECE62-JNISSU      (IDYX)

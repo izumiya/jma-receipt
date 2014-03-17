@@ -643,6 +643,8 @@
       *  04.07.13    NACL-ÌçÏÆ    14/02/19  ¼«ÇåÀÕ¡ÊÂè»°¼Ô¹Ô°Ù¡ËÂÐ±þ
       *                                     ¡ÊÉéÃ´¶â³Û£±£°±ßÌ¤Ëþ»Í¼Î¸ÞÆþ¡Ë
       *  04.07.14    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.15    NACL-ÌçÏÆ    14/03/17  Äã½êÆÀ¥Õ¥é¥°£²¾ðÊó¤ÎÆþ¤ìÂØ¤¨
+      *                                     ¡Ê¥Þ¥ëÄ¹Ê»ÍÑ»þ¡Ë
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
@@ -21797,6 +21799,7 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                                             RECE02-ZEROKISAIFLGINF-AREA
                                             RECE02-ETCKISAIFLGINF-AREA
                                             RECE02-FUKUSHIFLGINF-AREA
+                                            RECE02-TEISYOTOKU2-INF
            PERFORM VARYING IDX FROM    1   BY  1
                    UNTIL   IDX >       50
                INITIALIZE              RECE02-TENSUINF-AREA (IDX)
@@ -21848,6 +21851,8 @@ grpsys     MOVE   RECE02-HOSPNUM      TO  LNK-ORCSJGNGET-HOSPNUM
                                                IDX2
                            MOVE    WRK-RECE02-KOHINF (IDX)
                                            TO  RECE02-KOHINF (IDY)
+                           MOVE    WRK-RECE02-TEISYOTOKU2(IDX)
+                                           TO  RECE02-TEISYOTOKU2(IDY)
                            COMPUTE IDYX    =   IDY +   1
                            MOVE    WRK-RECE02-JNISSU   (IDXX)
                                            TO  RECE02-JNISSU  (IDYX)
