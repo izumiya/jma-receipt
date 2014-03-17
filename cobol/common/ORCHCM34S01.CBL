@@ -155,6 +155,7 @@
            03  WRK-GAIHAKU-KSNTEN              PIC 9(08).
            03  WRK-NYUKHNKSNKBN                PIC 9(03).
            03  WRK-CHUKSNCD                    PIC X(04).
+           03  WRK-NYUKHNKBN                   PIC 9(03).
            03  WRK-NACCT-ZAISKBKBN             PIC X(01).
            03  WRK-KHNTEN                      PIC S9(08).
            03  WRK-KSNTEN                      PIC S9(08).
@@ -1419,6 +1420,7 @@
       *    入院基本料のコードを探す
            MOVE    ZERO                TO  WRK-KHNTEN
            MOVE    ZERO                TO  WRK-NYUKHNKSNKBN
+           MOVE    ZERO                TO  WRK-NYUKHNKBN
            MOVE    SPACE               TO  WRK-CHUKSNCD
            MOVE    SPACE               TO  WRK-KHNSRYCD
            MOVE    ZERO                TO  WRK-HYOKETU-TEN
@@ -1444,6 +1446,7 @@
                    WHEN    1
                        MOVE    TNS-TEN             TO  WRK-KHNTEN
                        MOVE    TNS-NYUKHNKSNKBN    TO  WRK-NYUKHNKSNKBN
+                       MOVE    TNS-NYUKHNKBN       TO  WRK-NYUKHNKBN
                        MOVE    TNS-CHUKSNCD        TO  WRK-CHUKSNCD
                        MOVE    IDX2                TO  IDX-KHN
                    WHEN    2
@@ -1858,6 +1861,11 @@
            WHEN    230 THRU    239
            WHEN    241 THRU    249
            WHEN    250 THRU    255
+           WHEN    256
+           WHEN    257 THRU  259
+           WHEN    260 THRU  261
+           WHEN    262 THRU  265
+           WHEN    266 THRU  267
                EVALUATE   FLG-GAIHAKUDAY (IDXD)
                WHEN   4
                    MOVE   "190108790" TO  WRK-GAIHAKU-SRYCD
@@ -1866,7 +1874,8 @@
                WHEN   6
                    IF    ( WRK-NYUKHNKSNKBN
                        =   221 OR 232
-                        OR 229 OR 238 OR 215 OR 216 OR 217 OR 239 )
+                        OR 229 OR 238 OR 215 OR 216 OR 217 OR 239
+                        OR 252 )
                        MOVE   "190153190" TO   WRK-GAIHAKU-SRYCD
                    END-IF
                WHEN   7
@@ -1880,6 +1889,9 @@
            WHEN    147 THRU    152
            WHEN    173 THRU    190
            WHEN    196
+           WHEN    199
+           WHEN    004  THRU  008
+           WHEN    010  THRU  012
                EVALUATE   FLG-GAIHAKUDAY (IDXD)
                WHEN   4
                    MOVE   "190108890"  TO  WRK-GAIHAKU-SRYCD
@@ -1915,6 +1927,7 @@
            WHEN   038
            WHEN   170
            WHEN   191
+           WHEN   017 THRU 020
       *
            WHEN   022
            WHEN   023
@@ -1925,10 +1938,12 @@
            WHEN   136
            WHEN   168
            WHEN   169
+           WHEN   013 THRU 016
       *
            WHEN   081
            WHEN   083
            WHEN   172
+           WHEN   032 THRU 037
                EVALUATE   FLG-GAIHAKUDAY (IDXD)
                WHEN     5
                    MOVE   "190141590"      TO  WRK-GAIHAKU-SRYCD
@@ -2041,7 +2056,16 @@
            WHEN     11
                EVALUATE   WRK-CHUKSNCD
                WHEN   "9017"
-                   MOVE   "190161470"  TO  WRK-GAIHAKU-SRYCD
+                   IF   ( HCM34S01-SANTEIYM   >=  CONST-H2604 )
+                       IF  (  WRK-NYUKHNKBN    =  79 OR 88 )
+                        OR (  WRK-KHNSRYCD     =  "190799510" )
+                           MOVE   "190161570"  TO  WRK-GAIHAKU-SRYCD
+                       ELSE
+                           MOVE   "190161470"  TO  WRK-GAIHAKU-SRYCD
+                       END-IF
+                   ELSE
+                       MOVE   "190161470"  TO  WRK-GAIHAKU-SRYCD
+                   END-IF
                WHEN   "9018"
                    MOVE   "190161570"  TO  WRK-GAIHAKU-SRYCD
                WHEN   "9026"
@@ -2057,7 +2081,16 @@
            WHEN     13
                EVALUATE   WRK-CHUKSNCD
                WHEN   "9017"
-                   MOVE   "190161670"  TO  WRK-GAIHAKU-SRYCD
+                   IF   ( HCM34S01-SANTEIYM   >=  CONST-H2604 )
+                       IF  (  WRK-NYUKHNKBN    =  79 OR 88 )
+                        OR (  WRK-KHNSRYCD     =  "190799510" )
+                           MOVE   "190161770"  TO  WRK-GAIHAKU-SRYCD
+                       ELSE
+                           MOVE   "190161670"  TO  WRK-GAIHAKU-SRYCD
+                       END-IF
+                   ELSE
+                       MOVE   "190161670"  TO  WRK-GAIHAKU-SRYCD
+                   END-IF
                WHEN   "9018"
                    MOVE   "190161770"  TO  WRK-GAIHAKU-SRYCD
                WHEN   "9026"
