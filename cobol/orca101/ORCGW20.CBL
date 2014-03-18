@@ -216,6 +216,7 @@
       *    ¸ÇÄêÃÍÎÎ°è
        01  CONST-AREA.
            03  CONST-H26-AREA.
+               05  CONST-H26-ZTKFUKKI      PIC X(09) VALUE "190168070".
                05  CONST-H26-DRHJO1-VAL.
                    07                      PIC X(09) VALUE "190172210".
                    07                      PIC X(09) VALUE "190172310".
@@ -1060,6 +1061,9 @@
       *    Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£²
            PERFORM 3101-CMB-YKNHICH2-SET-SEC
       *
+      *    ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»
+           PERFORM 3101-CMB-ZTKFUKKI-SET-SEC
+      *
       *    µÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»
            PERFORM 3101-CMB-KYUKNGHJ-SET-SEC
       *
@@ -1626,6 +1630,17 @@
       *
            .
        3101-CMB-YKNHICH2-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»
+      *****************************************************************
+       3101-CMB-ZTKFUKKI-SET-SEC        SECTION.
+      *
+           MOVE    SPA-GMN-W20-KSNCOMMONLST-G
+                                       TO  SPA-GMN-W20-ZTKFUKKILST-G
+      *
+           .
+       3101-CMB-ZTKFUKKI-SET-EXT.
            EXIT.
       *****************************************************************
       *    µÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»
@@ -4260,6 +4275,22 @@
                PERFORM 420121-BTU-KSN-EDIT-SEC
            END-IF
       *
+      *    ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»
+           IF    ( SPA-GMN-W20-ZTKFUKKI     =  "2" )
+               MOVE    CONST-H26-ZTKFUKKI   TO  WRK-KSNCD
+               MOVE    SPA-NAI-W20-ZTKFUKKI-IDX
+                                            TO  WRK-KSNIDX
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
+      *    ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»
+           IF    ( SPA-GMN-W20-ZTKFUKKI     =  "2" )
+               MOVE    CONST-H26-ZTKFUKKI   TO  WRK-KSNCD
+               MOVE    SPA-NAI-W20-ZTKFUKKI-IDX
+                                            TO  WRK-KSNIDX
+               PERFORM 420121-BTU-KSN-EDIT-SEC
+           END-IF
+      *
       *    ±ÉÍÜ´ÉÍý¼Â»Ü²Ã»»
            IF    ( SPA-GMN-W20-EIYO  =   "2" )
                MOVE    CONST-H26-EIYO-A108 TO  WRK-KSNCD
@@ -6093,6 +6124,8 @@
                        MOVE    "2"         TO  SPA-GMN-W20-YKNHICH1
                    WHEN    CONST-H2204-YKNHICH2
                        MOVE    "2"         TO  SPA-GMN-W20-YKNHICH2
+                   WHEN    CONST-H26-ZTKFUKKI
+                       MOVE    "2"         TO  SPA-GMN-W20-ZTKFUKKI
                    WHEN    CONST-H26-ADLIJI-A100
                        MOVE    "2"         TO  SPA-GMN-W20-ADLIJI
                    WHEN    CONST-H26-SSNKYUDR
@@ -6127,7 +6160,7 @@
        41007-KSN-EDIT-EXT.
            EXIT.
       *****************************************************************
-      *    ÉÂÅïÊÌÀßÄê²Ã»»ÀßÄê½èÍý(H24.4¡Á)
+      *    ÉÂÅïÊÌÀßÄê²Ã»»ÀßÄê½èÍý(H24.4¡ÁH26.3)
       *****************************************************************
        41006-KSN-EDIT-SEC               SECTION.
       *
@@ -6756,6 +6789,10 @@
                MOVE    "Ìë´Ö´Ç¸îÇÛÃÖ²Ã»»£²" TO SPA-GMN-W20-YKNHICH2-LBL
                MOVE    CONST-H2204-YKNHICH2
                                         TO  SPA-NAI-W20-YKNHICH2-CD
+               MOVE    "ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»"
+                                           TO SPA-GMN-W20-ZTKFUKKI-LBL
+               MOVE    CONST-H26-ZTKFUKKI
+                                        TO  SPA-NAI-W20-ZTKFUKKI-CD
                MOVE    "£Á£Ä£Ì°Ý»ý¸þ¾åÅùÂÎÀ©²Ã»»"
                                         TO SPA-GMN-W20-ADLIJI-LBL
                MOVE    CONST-H26-ADLIJI-A100
@@ -8374,6 +8411,33 @@
       *
            .
        4200-YKNHICH2LST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    ºßÂðÉüµ¢µ¡Ç½¶¯²½²Ã»»¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
+      *****************************************************************
+       4200-ZTKFUKKILST-CHK-SEC         SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-W20-ZTKFUKKI-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-W20-ZTKFUKKIL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+                   MOVE    SPA-GMN-W20-ZTKFUKKILST (IDX-CMB)
+                                       TO  WRK-CMB-ITM
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM         =   SPACE )
+                   MOVE    SPA-GMN-W20-ZTKFUKKILST (1)
+                                       TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-ZTKFUKKILST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    µÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»¥³¥ó¥Ü¥Á¥§¥Ã¥¯½èÍý
