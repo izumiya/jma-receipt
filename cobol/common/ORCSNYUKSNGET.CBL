@@ -67,6 +67,7 @@
            03  WRK-BTU-NYUKSNKBN           PIC X(03).
            03  WRK-BTU-CDKBN-KBNNUM        PIC 9(03).
            03  WRK-BTU-CDKBN-KBNNUM-EDA    PIC 9(02).
+           03  WRK-BTU-CDKBN-KOUBAN        PIC 9(02).
            03  WRK-KSN-NYUKSNKBN           PIC X(03).
            03  WRK-KSN-CDKBN-KBNNUM        PIC 9(03).
            03  WRK-KSN-CDKBN-KBNNUM-EDA    PIC 9(02).
@@ -1292,6 +1293,26 @@
                END-IF
            END-IF
       *
+      *    平成２４年改正で新設された入院料加算のチェック追加
+      *    以下の入院料加算については点数マスタに入院基本料加算区分がセット
+      *    されていない為、入院料加算チェックテーブルによる判定ができない
+      *    ことから、療養病棟入院基本料１の場合のみ算定可とする暫定対処を
+      *    追加する
+      *    こととする。
+      *    ・在宅復帰機能強化加算（療養病棟入院基本料）（平成２６年改正で追加）
+           IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =    "190168070"
+               IF   ((WRK-BTU-CDKBN-KBNNUM   =    101)     AND
+                     (WRK-BTU-CDKBN-KOUBAN   =    1))      OR
+                    ((WRK-BTU-CDKBN-KBNNUM   =    100)     AND
+                     (WRK-BTU-CDKBN-KOUBAN   =    17))     OR
+                    ((WRK-BTU-CDKBN-KBNNUM   =    317)     AND
+                     (WRK-BTU-CDKBN-KOUBAN   =    11))
+                  CONTINUE
+               ELSE
+                  MOVE    1     TO    FLG-NYUKSN
+               END-IF
+           END-IF
+      *
            .
       *
        4801-NYUKSN-CHK-EXT.
@@ -1305,6 +1326,7 @@
            MOVE    SPACE           TO  WRK-NYUKSNKBN
            MOVE    ZERO            TO  WRK-BTU-CDKBN-KBNNUM
            MOVE    ZERO            TO  WRK-BTU-CDKBN-KBNNUM-EDA
+           MOVE    ZERO            TO  WRK-BTU-CDKBN-KOUBAN
            MOVE    SPACE           TO  WRK-TOKUBETSU-NYUIN
       *
       *    平成２６年改正　夜勤時間超過減算の特別入院基本料判定用に
@@ -1360,8 +1382,12 @@
       *
            MOVE    TNS-NYUKHNKSNKBN
                                    TO  WRK-BTU-NYUKSNKBN
-           MOVE    TNS-CDKBN-KBNNUM TO WRK-BTU-CDKBN-KBNNUM
-           MOVE    TNS-CDKBN-KBNNUM-EDA TO WRK-BTU-CDKBN-KBNNUM-EDA
+           MOVE    TNS-CDKBN-KBNNUM
+                                   TO WRK-BTU-CDKBN-KBNNUM
+           MOVE    TNS-CDKBN-KBNNUM-EDA
+                                   TO WRK-BTU-CDKBN-KBNNUM-EDA
+           MOVE    TNS-CDKBN-KOUBAN
+                                   TO WRK-BTU-CDKBN-KOUBAN
       *    療養病床以外・有床診療所療養病床入院基本料のとき、
       *    表用番号の置き換え（平成２４年改正）
            IF     (TNS-CDKBN-KBNNUM  = 108)   AND
