@@ -124,6 +124,7 @@
            03  WRK-MEISAISU                PIC 9(03).
            03  WRK-KSNKBN                  PIC 9(03).
            03  WRK-CHUKSNCD-XXX            PIC X(04).
+           03  WRK-NYUKHNKBN-XXX           PIC 9(03).
       *
       *    同日再入院処理用
            03  WRK-GETSUMATSU-YMD.
@@ -146,6 +147,7 @@
                    07  WRK-NYUKHNKSNKBN    PIC 9(03).
                    07  WRK-GAIHAKU-KBN     PIC 9(02).
                    07  WRK-CHUKSNCD        PIC X(04).
+                   07  WRK-NYUKHNKBN       PIC 9(03).
       *
       *    入院会計並び替えワーク
            03  WRK-NYUIN-SORT-TABLE.
@@ -691,6 +693,7 @@
                    MOVE      ZERO     TO      FLG-RYAKU
                                               WRK-KSNKBN
                    MOVE      SPACE    TO      WRK-CHUKSNCD-XXX
+                   MOVE      ZERO     TO      WRK-NYUKHNKBN-XXX
                    IF    NACCT-SRYCDTOTAL     =    99999916
                        CONTINUE
                    ELSE
@@ -771,6 +774,8 @@
                                          TO  WRK-NYUKHNKSNKBN(IDX1)
                              MOVE  WRK-CHUKSNCD-XXX
                                          TO  WRK-CHUKSNCD(IDX1)
+                             MOVE  WRK-NYUKHNKBN-XXX
+                                         TO  WRK-NYUKHNKBN(IDX1)
       *
                              MOVE    1    TO   FLG-OK
                          END-IF
@@ -2393,6 +2398,7 @@
            PERFORM 910-TENSU-READ-SEC
            MOVE    TNS-NYUKHNKSNKBN    TO  WRK-KSNKBN
            MOVE    TNS-CHUKSNCD        TO  WRK-CHUKSNCD-XXX
+           MOVE    TNS-NYUKHNKBN       TO  WRK-NYUKHNKBN-XXX
       *
            .
        210-GAIHAKU-MAE-EXT.
@@ -2473,6 +2479,13 @@
                WHEN   230  THRU  239
                WHEN   241  THRU  249
                WHEN   250  THRU  255
+      *        (H26-ADD-ST)
+               WHEN   256
+               WHEN   257  THRU  259
+               WHEN   260  THRU  261
+               WHEN   262  THRU  265
+               WHEN   266  THRU  267
+      *        (H26-ADD-ED)
                  IF    WRK-NYUKHNKSNKBN(IDX1) = 221 OR 232
                    EVALUATE   NACCT-DAY(IDX1)
                       WHEN     4
@@ -2487,6 +2500,7 @@
                  ELSE
                    IF  WRK-NYUKHNKSNKBN(IDX1) =
                            229 OR 238 OR 215 OR 216 OR 217 OR 239
+                                                           OR 252
                      EVALUATE   NACCT-DAY(IDX1)
                        WHEN     4
                          MOVE   "190108790" TO   WRK-GAIHAKU(IDX1)
@@ -2509,6 +2523,11 @@
                WHEN   147  THRU  152
                WHEN   173  THRU  190
                WHEN   196
+      *        (H26-ADD-ST)
+               WHEN   199
+               WHEN   004  THRU  008
+               WHEN   010  THRU  012
+      *        (H26-ADD-ED)
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     4
                       MOVE   "190108890"    TO   WRK-GAIHAKU(IDX1)
@@ -2551,6 +2570,9 @@
                WHEN   038
                WHEN   170
                WHEN   191
+      *        (H26-ADD-ST)
+               WHEN   017  THRU  020
+      *        (H26-ADD-ED)
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     5
                       MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
@@ -2566,6 +2588,9 @@
                WHEN   136
                WHEN   168
                WHEN   169
+      *        (H26-ADD-ST)
+               WHEN   013  THRU  016
+      *        (H26-ADD-ED)
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     5
                       MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
@@ -2575,6 +2600,9 @@
                WHEN   081
                WHEN   083
                WHEN   172
+      *        (H26-ADD-ST)
+               WHEN   032  THRU  037
+      *        (H26-ADD-ED)
                  EVALUATE   NACCT-DAY(IDX1)
                     WHEN     5
                       MOVE   "190141590"    TO   WRK-GAIHAKU(IDX1)
@@ -2604,7 +2632,16 @@
              WHEN    11
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
-                      MOVE   "190161470"    TO   WRK-GAIHAKU(IDX1)
+                      IF   LNK-RNYURECEDEN-SANTEIYM   >=  "201404"
+                        IF  (WRK-NYUKHNKBN(IDX1) =   79 OR 88  )
+                        OR  (WRK-NYUINKHN(IDX1)  =  "190799510")
+                          MOVE  "190161570" TO   WRK-GAIHAKU(IDX1)
+                        ELSE
+                          MOVE  "190161470" TO   WRK-GAIHAKU(IDX1)
+                        END-IF
+                      ELSE
+                          MOVE  "190161470" TO   WRK-GAIHAKU(IDX1)
+                      END-IF
                    WHEN   "9018"
                       MOVE   "190161570"    TO   WRK-GAIHAKU(IDX1)
                    WHEN   "9026"
@@ -2621,7 +2658,16 @@
              WHEN    13
                 EVALUATE   WRK-CHUKSNCD(IDX1)
                    WHEN   "9017"
-                      MOVE   "190161670"    TO   WRK-GAIHAKU(IDX1)
+                      IF   LNK-RNYURECEDEN-SANTEIYM   >=  "201404"
+                        IF  (WRK-NYUKHNKBN(IDX1) =   79 OR 88  )
+                        OR  (WRK-NYUINKHN(IDX1)  =  "190799510")
+                          MOVE  "190161770" TO   WRK-GAIHAKU(IDX1)
+                        ELSE
+                          MOVE  "190161670" TO   WRK-GAIHAKU(IDX1)
+                        END-IF
+                      ELSE
+                          MOVE  "190161670" TO   WRK-GAIHAKU(IDX1)
+                      END-IF
                    WHEN   "9018"
                       MOVE   "190161770"    TO   WRK-GAIHAKU(IDX1)
                    WHEN   "9026"
