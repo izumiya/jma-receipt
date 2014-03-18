@@ -30,5 +30,11 @@ W05	{
 		RECESRYKANAME	{
 			value	varchar(40);
 		};
+		JIKANKSN1_40	{
+			value	bool;
+		};
+		JIKANKSN1_50	{
+			value	bool;
+		};
 	};
 };

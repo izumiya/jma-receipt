@@ -565,6 +565,13 @@
                WHEN    "0094"
                    MOVE    "既にこの労災では算定済です。算定できません"
                                        TO  SPA-ERRMSG
+      *H25.10
+               WHEN    "K094"
+                   STRING  "警告！"
+                           "既にこの労災では算定済です。算定できません"
+                                       DELIMITED   BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
                WHEN    "0095"
                    MOVE    "個別療法と集団療法の混在している日が"
                                        TO  SPA-ERRMSG
@@ -2066,6 +2073,37 @@
                                            DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H26.4 から
+               WHEN    "0511"
+                   STRING  "副鼻腔手術用内視鏡加算の算定できない"
+                           "手術です。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0512"
+                   STRING  "副鼻腔手術軟骨部組織切除器加算の"
+                           "算定できない手術です。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0513"
+                   STRING  "この脊髄誘発電位測定等加算の算定できない"
+                           "手術です。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0514"
+                   STRING  "脊髄誘発電位測定等加算は算定できない"
+                           "手術です。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "0541"
+                   STRING  "長時間麻酔管理加算の算定できない"
+                           "麻酔です。"
+                                           DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
@@ -2176,6 +2214,7 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+      *
                WHEN    "1101"
                    MOVE    "初診算定日＜診療日で入力して下さい。"
                                        TO  SPA-ERRMSG
@@ -2937,6 +2976,7 @@
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
                    END-STRING
+      *
       *H26.4　改正から
                WHEN    "K106"
                    STRING  "警告！"
@@ -2950,6 +2990,12 @@
                            "うがい薬のみの投薬となります。"
                                        DELIMITED  BY  SIZE
                                        INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K541"
+                   STRING  "警告！長時間麻酔管理加算の算定できる"
+                           "手術の算定がありません。"
+                                       DELIMITED   BY  SIZE
+                                       INTO    SPA-ERRMSG
                    END-STRING
       *
                WHEN    "K910"

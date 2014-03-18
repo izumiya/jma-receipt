@@ -34,7 +34,9 @@
       * 01.01.04     NACL-藤原    06/07/03  レセ電診療科コードのチェック
       *                                     追加
       * 01.01.05     NACL-多々納  06/07/13  MONFUNC 対応
-      *  03.05.00    NACL-多々納  07/05/02  グループ診療対応
+      * 03.05.00     NACL-多々納  07/05/02  グループ診療対応
+      * 04.07.00     NACL-多々納  13/03/XX  Ｈ２６年４月改正対応
+      *                                    （時間外加算等１設定追加）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -72,6 +74,12 @@
                        09  SPA-GMN-RECESRYKA  PIC X(02). 
                        09  SPA-GMN-RECESRYKANAME
                                               PIC X(40).
+      *                処置時間外加算等１
+                       09  SPA-GMN-JIKANKSN1-40
+                                              PIC X(01).
+      *                手術時間外加算等１
+                       09  SPA-GMN-JIKANKSN1-50
+                                              PIC X(01).
       *
                05  SPA-NAIB-AREA.
                    07  SPA-NAI-STYUKYMD           PIC 9(08).
@@ -321,7 +329,22 @@
                MOVE    SYS-1005-RECESRYKA      TO  SPA-GMN-RECESRYKA
                PERFORM 5003-RECESRYKA-HENSYU-SEC
                MOVE    WRK-RECESRYKANAME       TO  SPA-GMN-RECESRYKANAME
+      *
+      *        処置時間外加算等１設定
+      *v4.8 から項目名追加
+      *v4.8    MOVE    SYS-1005-JIKANKSN1-40   TO  SPA-GMN-JIKANKSN1-40
+      *        MOVE    SYS-1005-JIKANKSN1-50   TO  SPA-GMN-JIKANKSN1-50
+               MOVE    SYS-1005-YOBI (1:1)     TO  SPA-GMN-JIKANKSN1-40
+               MOVE    SYS-1005-YOBI (2:1)     TO  SPA-GMN-JIKANKSN1-50
            END-IF     
+      *
+      *    処置時間外加算等１初期
+           IF      SPA-GMN-JIKANKSN1-40    =   SPACE
+               MOVE    "0"             TO  SPA-GMN-JIKANKSN1-40
+           END-IF
+           IF      SPA-GMN-JIKANKSN1-50    =   SPACE
+               MOVE    "0"             TO  SPA-GMN-JIKANKSN1-50
+           END-IF
       *
            MOVE    2                   TO  SPA-GMN-CUR
            . 
@@ -344,10 +367,64 @@
       *    登録
                WHEN    "CLICKED"       ALSO    "B12"
                    PERFORM 490-TOUROKU-SEC
+      *
+      *H26.4
+      *    処置時間外加算等１
+               WHEN    "CLICKED"       ALSO    "JIKANKSN1_40"
+                   PERFORM 4801-JIKANKSN140-SET-SEC
+      *    手術時間外加算等１
+               WHEN    "CLICKED"       ALSO    "JIKANKSN1_50"
+                   PERFORM 4801-JIKANKSN150-SET-SEC
            END-EVALUATE
       *
            .
        200-GMNSENI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    処置時間外加算等１処理
+      *****************************************************************
+       4801-JIKANKSN140-SET-SEC          SECTION.
+      *
+           EVALUATE    SPA-GMN-JIKANKSN1-40
+               WHEN    "1"
+                   MOVE    "0"         TO  SPA-GMN-JIKANKSN1-40
+               WHEN    "0"
+               WHEN    SPACE
+                   MOVE    "1"         TO  SPA-GMN-JIKANKSN1-40
+           END-EVALUATE
+      *
+      *    入力チェック処理
+           PERFORM 410-INPUT-CHK-SEC
+      *
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    11              TO  SPA-GMN-CUR
+           END-IF
+          .
+       4801-JIKANKSN140-SET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    手術時間外加算等１処理
+      *****************************************************************
+       4801-JIKANKSN150-SET-SEC          SECTION.
+      *
+           EVALUATE    SPA-GMN-JIKANKSN1-50
+               WHEN    "1"
+                   MOVE    "0"         TO  SPA-GMN-JIKANKSN1-50
+               WHEN    "0"
+               WHEN    SPACE
+                   MOVE    "1"         TO  SPA-GMN-JIKANKSN1-50
+           END-EVALUATE
+      *
+      *    入力チェック処理
+           PERFORM 410-INPUT-CHK-SEC
+      *
+           IF      SPA-ERRCD           =   SPACE
+               MOVE    99              TO  SPA-GMN-CUR
+           END-IF
+          .
+       4801-JIKANKSN150-SET-EXT.
            EXIT.
       *****************************************************************
       *    会話　処理
@@ -646,6 +723,15 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SRYKANAME2      TO  SYS-1005-SRYKANAME2 
            MOVE    SPA-GMN-SRYKANAME3      TO  SYS-1005-SRYKANAME3 
            MOVE    SPA-GMN-RECESRYKA       TO  SYS-1005-RECESRYKA
+      *
+      *v4.8 から項目名追加
+      *    MOVE    SPA-GMN-JIKANKSN1-40    TO  SYS-1005-JIKANKSN1-40
+      **   MOVE    SPA-GMN-JIKANKSN1-50    TO  SYS-1005-JIKANKSN1-50
+      *    処置
+           MOVE    SPA-GMN-JIKANKSN1-40    TO  SYS-1005-YOBI (1:1)
+      *    手術
+           MOVE    SPA-GMN-JIKANKSN1-50    TO  SYS-1005-YOBI (2:1)
+      *
            MOVE    SYS-1005-REC            TO  SYSKANRI-REC
       *     
            IF      FLG-SYSKANRI            =   ZERO
@@ -743,6 +829,18 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-GMN-SRYKANAME3       TO  W05-SRYKANAME3
            MOVE    SPA-GMN-RECESRYKA        TO  W05-RECESRYKA
            MOVE    SPA-GMN-RECESRYKANAME    TO  W05-RECESRYKANAME
+      *H26.4
+      *    時間外加算等１設定
+           IF      SPA-GMN-JIKANKSN1-40    =   "1"
+               MOVE    "T"                 TO  W05-JIKANKSN1-40
+           ELSE
+               MOVE    "F"                 TO  W05-JIKANKSN1-40
+           END-IF
+           IF      SPA-GMN-JIKANKSN1-50    =   "1"
+               MOVE    "T"                 TO  W05-JIKANKSN1-50
+           ELSE
+               MOVE    "F"                 TO  W05-JIKANKSN1-50
+           END-IF
       *
            PERFORM 5001-MAPCUR-SEC
       *
@@ -866,6 +964,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "SRYKANAME3"       TO   MCP-WIDGET
                 WHEN    6
                     MOVE  "RECESRYKA"        TO   MCP-WIDGET
+                WHEN    10
+                    MOVE  "JIKANKSN1_40"     TO   MCP-WIDGET
+                WHEN    11
+                    MOVE  "JIKANKSN1_50"     TO   MCP-WIDGET
                 WHEN    99
                     MOVE  "B12"              TO   MCP-WIDGET
            END-EVALUATE
@@ -889,6 +991,11 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "SRYKANAME3"
                    MOVE    6               TO  SPA-GMN-CUR
                WHEN    "RECESRYKA"
+      ****         MOVE    99              TO  SPA-GMN-CUR
+                   MOVE    10              TO  SPA-GMN-CUR
+               WHEN    "JIKANKSN1_40"
+                   MOVE    11              TO  SPA-GMN-CUR
+               WHEN    "JIKANKSN1_50"
                    MOVE    99              TO  SPA-GMN-CUR
            END-EVALUATE
       *

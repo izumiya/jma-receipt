@@ -37,3 +37,7 @@
                 05  W05-VALUE   PIC X(2).
               04  W05-RECESRYKANAME.
                 05  W05-VALUE   PIC X(40).
+              04  W05-JIKANKSN1-40.
+                05  W05-VALUE   PIC X.
+              04  W05-JIKANKSN1-50.
+                05  W05-VALUE   PIC X.

@@ -335,7 +335,7 @@
       *
       *    施設規準テーブル
        01  WRK-TBL-SSTKIJUN-AREA.
-           03  WRK-TBL-SSTKIJUN-OCC       OCCURS  3500.
+           03  WRK-TBL-SSTKIJUN-OCC       OCCURS  8500.
                05  WRK-TBL-SSTKIJUN       PIC 9(01).
       *
       *   日本語数字
@@ -1662,7 +1662,6 @@
            END-IF
            MOVE    ZERO                TO  IDX
            PERFORM UNTIL   (FLG-SYSKANRI   =   1    )
-                   OR      (IDX            >=  3500 )
                MOVE    MCPDATA-REC         TO  SYS-1006-REC
       *H24.4
                EVALUATE    SYS-1006-KBNCD
@@ -1672,6 +1671,9 @@
                        MOVE    500             TO  IDX
                    WHEN    "7"
                        MOVE    3000            TO  IDX
+      *H26.4
+                   WHEN    "17"
+                       MOVE    8000            TO  IDX
                    END-EVALUATE
       *H24.4
                PERFORM VARYING IDY         FROM    1   BY  1
@@ -1826,6 +1828,14 @@
       *                    同じコードの算定チェック
                            PERFORM 20032-NENREI-RRKCHK-SEC
                        END-IF
+                   END-IF
+      *H26.4
+               WHEN    "BK"
+      *           ２０歳誕生月まで（H26.4改正）
+                   IF     (LNK-SC92-NENREI-YY   >    20    )
+                      OR ((LNK-SC92-NENREI-YY   =    20    )
+                      AND (LNK-SC92-NENREI-MM   >    ZERO  ))
+                       MOVE    "0032"             TO  LNK-SC92-ERRCD5
                    END-IF
                WHEN    OTHER
       *            年齢判定
@@ -3586,6 +3596,7 @@
            IF     (LNK-SC92-SRYCD (1:6)    =   "101989") 
                IF     (SPA-HKNKBN          =   1 )
                   AND (SPA-RSI-HKNKBN      =   5 )
+                  AND (SPA-RSI-JUNKYO  NOT =   "1")
       *            京都以外は警告
                    IF     (SPA-PREFNUM         NOT =   26    )
                        MOVE    "K811"          TO  LNK-SC92-ERRCD8
@@ -3986,6 +3997,16 @@
            ELSE
                MOVE    ZERO            TO  SPA-COM-YCOMKBN (IDX-T)
            END-IF
+      *Ｈ２６年４月から
+      *    v4.7 はYOBI1 V4.8は追加
+      *    副鼻腔手術用内視鏡加算
+           MOVE    TNS-FUKUBIKUNAIKBN  TO  SPA-COM-YOBI1 (IDX-T)(2:1)
+      *    副鼻腔切除機器加算
+           MOVE    TNS-FUKUBIKUKOTUKBN TO  SPA-COM-YOBI1 (IDX-T)(3:1)
+      *    長時間麻酔管理加算
+           MOVE    TNS-TIMEMASUIKBN    TO  SPA-COM-YOBI1 (IDX-T)(4:1)
+      *    脊髄誘発電位測定
+           MOVE    TNS-SEKIZUISOKUTEI  TO  SPA-COM-YOBI1 (IDX-T)(5:1)
       *
       *    点数マスタ付加情報より編集
            PERFORM 3006-TENSUPLUS-HEN-SEC
