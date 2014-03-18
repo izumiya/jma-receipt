@@ -5837,6 +5837,14 @@
            MOVE     "key30"           TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
       *
+      *    œ´∫“Õ—•≥°º•… ‘Ω∏
+           ADD     1          TO  IDX1
+           MOVE  "101900100"  TO  LNK-SROUNYUIN-CHUKSNSRYCD(IDX1)
+           ADD     1          TO  IDX1
+           MOVE  "101900110"  TO  LNK-SROUNYUIN-CHUKSNSRYCD(IDX1)
+           ADD     1          TO  IDX1
+           MOVE  "101900120"  TO  LNK-SROUNYUIN-CHUKSNSRYCD(IDX1)
+      *
            .
       *
        210-CHUKSN-GET-EXT.
