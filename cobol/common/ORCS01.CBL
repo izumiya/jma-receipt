@@ -848,6 +848,8 @@
       *
            03  WK-KOH-FTNJANUM             PIC  X(08).
       *
+           03  WK-BIRTHDAY                 PIC  X(08).
+      *
            03  WK-TOKU75-BIRTHDAY          PIC  X(08).
            03  WK-TOKU75-TEKSTYMD          PIC  X(08).
            03  WK-TOKU75-TEKEDYMD          PIC  X(08).
@@ -3964,6 +3966,7 @@
       *
            MOVE      ZERO       TO    FLG-KENPOJYUNKYO
                                       FLG-SYUGAKUMAE
+           MOVE      SPACE      TO    WK-BIRTHDAY
            IF    LNK-SYU-SRYYMD(1:6)    >=   "200210"
       *        ´µ¼ÔÇ¯Îð·×»»
                INITIALIZE                           PTINF-REC
@@ -3987,6 +3990,8 @@
                MOVE    "tbl_ptinf"          TO      MCP-TABLE
                MOVE    "key"                TO      MCP-PATHNAME
                PERFORM  DB-CLOSE-SEC
+      *
+               MOVE    PTINF-BIRTHDAY  TO  WK-BIRTHDAY
       *
                INITIALIZE                  ORCSAGECHKAREA
                MOVE    LNK-SYU-HOSPNUM TO  AGECHK-HOSPNUM
@@ -6661,8 +6666,9 @@
                        WHEN   "5"
                        WHEN   "8"
                          IF    LNK-SYU-SRYYMD(1:6)   >=  "200610"
-                           IF  (FLG-KEIKASOCHI-IPAN  =  1       )
-                           OR  (LNK-SYU-SRYYMD(1:6) >=  "201405")
+                           IF  ( FLG-KEIKASOCHI-IPAN  =  1        )
+                           OR  ((LNK-SYU-SRYYMD(1:6) >=  "201405") AND
+                                (WK-BIRTHDAY  >=  "19440402"     ))
                                MOVE   12000   TO   MAX-KIN-SYU-M
                            ELSE
                                MOVE   44400   TO   MAX-KIN-SYU-M
@@ -13001,8 +13007,9 @@
                            WHEN   "5"
                            WHEN   "8"
                              MOVE     20     TO    WK-KEISAN-FTNRATE
-                             IF  (FLG-KEIKASOCHI-IPAN  =  1       )
-                             OR  (LNK-SYU-SRYYMD(1:6) >=  "201405")
+                             IF  ( FLG-KEIKASOCHI-IPAN  =  1        )
+                             OR  ((LNK-SYU-SRYYMD(1:6) >=  "201405") AND
+                                  (WK-BIRTHDAY  >=  "19440402"     ))
                                 MOVE   2     TO    FLG-KEISAN-TAI
                              ELSE
                                 MOVE   1     TO    FLG-KEISAN-TAI

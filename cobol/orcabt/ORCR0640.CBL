@@ -4532,7 +4532,7 @@
                       (RECE62-SRYYM         >=  "201107"   ))
                   OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
                       (RECE62-KOHNUM(KOHFTN-IDX) =
-                                           "625" OR "627"  ) AND
+                         "625" OR "627" OR "628" OR "629"  ) AND
                       (RECE62-SRYYM         >=  "201302"   ))
                     MOVE "1" TO
                           RECE62-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
@@ -5811,7 +5811,7 @@
                   (RECE62-SRYYM          <  "201107"   ))
               OR ((RECE62-TEISYUTUSAKI   =   2 OR 6    ) AND
                   (RECE62-KOHNUM(KOHFTN-IDX) =
-                                       "625" OR "627"  ) AND
+                     "625" OR "627" OR "628" OR "629"  ) AND
                   (RECE62-SRYYM          <  "201302"   ))
                 MOVE  SPACE TO RECE62-EKF-FTNKEIFLG(KOHFTN-IDX + 1)
               END-IF
@@ -17931,7 +17931,10 @@
             ELSE
               IF   (( RECE62-KYURATE  =  30       ) OR
                     ((RECE62-SRYYM    <  "201405") AND
-                     (RECE62-KYURATE  =  20      ))    )
+                     (RECE62-KYURATE  =  20      )) OR
+                    ((RECE62-SRYYM   >=  "201405") AND
+                     (RECE62-KYURATE  =  20      ) AND
+                     (RECE62-BIRTHDAY <  19440402))    )
               AND  (  RECE62-RJNGENMENKBN  =  SPACE    )
               AND  (  FLG-KOHYONKAIME      =  ZERO     )
                 IF    RECE62-SRYYM   >=  "200610"
@@ -23658,7 +23661,10 @@
              ELSE
                 IF  (( RECE62-KYURATE  =  30       ) OR
                      ((RECE62-SRYYM    <  "201405") AND
-                      (RECE62-KYURATE  =  20      ))    )
+                      (RECE62-KYURATE  =  20      )) OR
+                     ((RECE62-SRYYM   >=  "201405") AND
+                      (RECE62-KYURATE  =  20      ) AND
+                      (RECE62-BIRTHDAY <  19440402))    )
                 AND (  RECE62-RJNGENMENKBN  =  SPACE    )
                 AND (  FLG-KOHYONKAIME      =  ZERO     )
                  IF    RECE62-SRYYM  >=  "200610"
@@ -24496,7 +24502,10 @@
       *    ¹â³Û£´²óÌÜ°Ê¹ßÂÐ¾Ý¼Ô
            IF   (( RECE62-KYURATE  =  30       ) OR
                  ((RECE62-SRYYM    <  "201405") AND
-                  (RECE62-KYURATE  =  20      ))    )
+                  (RECE62-KYURATE  =  20      )) OR
+                 ((RECE62-SRYYM   >=  "201405") AND
+                  (RECE62-KYURATE  =  20      ) AND
+                  (RECE62-BIRTHDAY <  19440402))    )
            AND  (  RECE62-RJNGENMENKBN  =  SPACE    )
       *
                 PERFORM   2104A-KOHYONKAIME-HANTEI-SEC

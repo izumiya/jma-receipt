@@ -842,6 +842,8 @@
       *
            03  WK-KOH-FTNJANUM             PIC  X(08).
       *
+           03  WK-BIRTHDAY                 PIC  X(08).
+      *
            03  WK-TOKU75-BIRTHDAY          PIC  X(08).
            03  WK-TOKU75-TEKSTYMD          PIC  X(08).
            03  WK-TOKU75-TEKEDYMD          PIC  X(08).
@@ -3931,6 +3933,7 @@
       *
            MOVE      ZERO       TO    FLG-KENPOJYUNKYO
                                       FLG-SYUGAKUMAE
+           MOVE      SPACE      TO    WK-BIRTHDAY
            IF    LNK-SYU-SRYYMD(1:6)    >=   "200210"
       *        ´µ¼ÔÇ¯Îð·×»»
                INITIALIZE                           PTINF-REC
@@ -3955,6 +3958,8 @@
                MOVE    "tbl_ptinf"          TO      MCP-TABLE
                MOVE    "key"                TO      MCP-PATHNAME
                PERFORM  DB-CLOSE-SEC
+      *
+               MOVE    PTINF-BIRTHDAY    TO  WK-BIRTHDAY
       *
                INITIALIZE                    ORCSAGECHKAREA
                MOVE    LNK-SYU-HOSPNUM   TO  AGECHK-HOSPNUM
@@ -6507,8 +6512,9 @@
                        WHEN   "6"
                        WHEN   "8"
                          IF    LNK-SYU-SRYYMD(1:6)   >=  "200610"
-                           IF  (FLG-KEIKASOCHI-IPAN  =  1       )
-                           OR  (LNK-SYU-SRYYMD(1:6) >=  "201405")
+                           IF  ( FLG-KEIKASOCHI-IPAN  =  1        )
+                           OR  ((LNK-SYU-SRYYMD(1:6) >=  "201405") AND
+                                (WK-BIRTHDAY  >=  "19440402"     ))
                              MOVE   44400       TO   MAX-KIN-SYU-M
                            ELSE
                             IF  FLG-KOHYONKAIME      =  1
