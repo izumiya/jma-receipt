@@ -2998,6 +2998,21 @@
                                        INTO    SPA-ERRMSG
                    END-STRING
       *
+               WHEN    "1316"
+                   MOVE    "初診料への自動変更はできません。"
+                                       TO  SPA-ERRMSG
+               WHEN    "1317"
+                   STRING  "再診料への自動変更はできません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "1318"
+                   STRING  "小児科外来診療料の入力がありません。"
+                           "自動変更はできません。"
+                                       DELIMITED  BY  SIZE
+                                       INTO  SPA-ERRMSG
+                   END-STRING
+      *
                WHEN    "K910"
                    STRING  "警告！"
                            "入院会計照会を確認して下さい。"
