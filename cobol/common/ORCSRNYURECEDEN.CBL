@@ -1186,6 +1186,27 @@
                               MOVE   7            TO   TNS-KOKUJISKBKBN1
                           END-IF
       *
+      *                   一般病棟看護必要度評価加算（一般病棟）（労災用）
+      *                   を直接入力された場合にコード表用番号の番号が
+      *                   提供マスタに未設定の為、セットを行う
+                          IF     SRY-SRYCD(1)     =    "101900100"
+                              MOVE   100          TO   TNS-CDKBN-KBNNUM
+                          END-IF
+      *
+      *                   一般病棟看護必要度評価加算（専門病院）（労災用）
+      *                   を直接入力された場合にコード表用番号の番号が
+      *                   提供マスタに未設定の為、セットを行う
+                          IF     SRY-SRYCD(1)     =    "101900120"
+                              MOVE   105          TO   TNS-CDKBN-KBNNUM
+                          END-IF
+      *
+      *                   重度認知症加算（精神病棟）（労災用）
+      *                   を直接入力された場合にコード表用番号の番号が
+      *                   提供マスタに未設定の為、セットを行う
+                          IF     SRY-SRYCD(1)     =    "101900110"
+                              MOVE   103          TO   TNS-CDKBN-KBNNUM
+                          END-IF
+      *
                         END-IF
                      END-IF
       *              診療行為クローズ
