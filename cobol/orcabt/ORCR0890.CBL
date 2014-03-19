@@ -47,6 +47,7 @@
       *
       *  04.07.01    NACL-藤原    13/01/21  労災レセ電対応
       *  04.07.02    NACL-藤原    13/09/20  第三者行為対応
+      *  04.07.03    NACL-藤原    14/03/18  連番号を３桁に変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -134,7 +135,7 @@
            03  WRK-PARA-HOSPNUM      PIC 9(02).
       *
            03  WRK-YM              PIC 9(06).
-           03  WRK-RENNUM          PIC 9(02).
+           03  WRK-RENNUM          PIC 9(03).
       *
        01  KEY-AREA                            VALUE   LOW-VALUE.
            03  KEY-NEW.
