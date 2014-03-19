@@ -4373,7 +4373,7 @@
       *    Ìë´ÖµÞÀ­´ü´Ç¸îÊä½õÂÎÀ©²Ã»»
            IF    ( SPA-GMN-W20-YKNKYUKNGHJ    >=   "2" )
             AND  ( SPA-GMN-W20-YKNKYUKNGHJ    <=   "4" )
-               MOVE    SPA-GMN-W20-KYUKNGHJ
+               MOVE    SPA-GMN-W20-YKNKYUKNGHJ
                                    TO  WRK-KBN1-G
                COMPUTE WRK-KBN1    =   WRK-KBN1    -   1
                MOVE    CONST-H26-YKNKYUKNGHJ (WRK-KBN1)
