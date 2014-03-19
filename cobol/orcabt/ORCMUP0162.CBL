@@ -103,6 +103,9 @@ grpsys     COPY    "COMMON-SPA".
            03  IDX-PNT3                PIC 9(05).
            03  IDX                     PIC 9(03).
            03  IDY                     PIC 9(03).
+           03  IDXL                    PIC 9(05).
+           03  IDXP                    PIC 9(05).
+           03  IDXS                    PIC 9(05).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -143,7 +146,7 @@ grpsys     COPY    "COMMON-SPA".
            03  WRK-MAE-NAIYO           PIC X(200).
            03  WRK-ATO-NAIYO           PIC X(200).
            03  WRK-MAE-AREA.
-               05  WRK-MAE-OPTION      PIC X(200) OCCURS 100.
+               05  WRK-MAE-OPTION      PIC X(200) OCCURS 200.
            03  WRK-ATO-AREA.
                05  WRK-ATO-OPTION      PIC X(200) OCCURS 100.
       *
@@ -612,65 +615,33 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
            MOVE    0                   TO  CNT-MAE
            MOVE    1                   TO  IDX-PNT1
            MOVE    1                   TO  IDX-PNT2
-           MOVE    SPACE               TO  WRK-MAE-NAIYO
            MOVE    SPACE               TO  WRK-MAE-AREA
+      *
       *
            PERFORM UNTIL ( IDX-PNT1    >   WRK-OPTION-LEN )
                    OR    ( PRGOPTION-OPTION(IDX-PNT1:) =   SPACE )
-      *        行が終わったとき
-               IF    ( PRGOPTION-OPTION(IDX-PNT1:1)    =   X"0A" )
-                   MOVE    ZERO       TO  FLG-LF
-      *            コメントチェック
-                   IF      WRK-MAE-NAIYO(1:1)  NOT =   "#"
-                       PERFORM VARYING IDX-PNT2 FROM 1 BY 1
-                               UNTIL ( IDX-PNT2 >   200 )
-                               OR    ( WRK-MAE-NAIYO(IDX-PNT2:)
-                                                           =   SPACE )
-                           IF      WRK-MAE-NAIYO(IDX-PNT2:1)   =   "="
-                               MOVE    1               TO  FLG-LF
-                               MOVE    200             TO  IDX-PNT2
-                           END-IF
-                       END-PERFORM
-                   END-IF
-      *            コメントでない場合セット
-                   IF      FLG-LF      =   1
-                       COMPUTE CNT-MAE     =   CNT-MAE     +   1
-                       MOVE    WRK-MAE-NAIYO
-                                           TO  WRK-MAE-OPTION(CNT-MAE)
-                   END-IF
-                   MOVE    1               TO  IDX-PNT2
-                   MOVE    SPACE           TO  WRK-MAE-NAIYO
-               ELSE
-                   MOVE    PRGOPTION-OPTION(IDX-PNT1:1)
-                                           TO  WRK-MAE-NAIYO(IDX-PNT2:1)
-                   COMPUTE IDX-PNT2    =   IDX-PNT2    +   1
-               END-IF
-               COMPUTE IDX-PNT1    =   IDX-PNT1   +   1
-           END-PERFORM
-      *    最終行
-           MOVE    ZERO       TO  FLG-LF
-      *    コメントチェック
-           IF      WRK-MAE-NAIYO(1:1)  NOT =   "#"
+      *
+               MOVE    SPACE               TO  WRK-MAE-NAIYO
+               UNSTRING    PRGOPTION-OPTION    DELIMITED   BY  X"0A"
+               INTO    WRK-MAE-NAIYO
+               WITH    POINTER IDX-PNT1
+               END-UNSTRING
+
                PERFORM VARYING IDX-PNT2 FROM 1 BY 1
                        UNTIL ( IDX-PNT2 >   200 )
-                       OR    ( WRK-MAE-NAIYO(IDX-PNT2:)    =   SPACE )
+                       OR    ( WRK-MAE-NAIYO(IDX-PNT2:)
+                                                   =   SPACE )
                    IF      WRK-MAE-NAIYO(IDX-PNT2:1)   =   "="
-                       MOVE    1               TO  FLG-LF
-                       MOVE    200             TO  IDX-PNT2
+                       COMPUTE CNT-MAE     =   CNT-MAE     +   1
+                       MOVE    WRK-MAE-NAIYO
+                                   TO  WRK-MAE-OPTION(CNT-MAE)
+                       MOVE    200 TO  IDX-PNT2
                    END-IF
                END-PERFORM
-           END-IF
-      *    コメントでない場合セット
-           IF      FLG-LF      =   1
-               COMPUTE CNT-MAE     =   CNT-MAE     +   1
-               MOVE    WRK-MAE-NAIYO   TO  WRK-MAE-OPTION(CNT-MAE)
-           END-IF
-      *----(04.07.01)--ADD-START---
-           IF      CNT-MAE     =   ZERO
-               MOVE    SPACE           TO  WRK-OPID
-           ELSE
-               MOVE    PRGOPTION-OPID  TO  WRK-OPID
-           END-IF
+           END-PERFORM
+      *
+           MOVE    PRGOPTION-OPID  TO  WRK-OPID
+      *
       *----(04.07.01)--ADD-END-----
       *
       *    更新データ
@@ -742,9 +713,30 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
                                    MOVE    1       TO  FLG-LF
                                END-IF
                            ELSE
-                               IF      WRK-ATO-NAIYO(1:IDX-PNT1)
-                                   =   WRK-MAE-NAIYO(1:IDX-PNT1)
-                                   MOVE    1       TO  FLG-LF
+                               MOVE    ZERO        TO  IDXS
+                                                       IDXL
+                               PERFORM VARYING IDXP    FROM    1   BY  1
+                                       UNTIL ( IDXP    >   200 )
+                                        OR   ( WRK-ATO-NAIYO(IDXP:)
+                                                   =   SPACE )
+                                        OR   ( IDXL    >   ZERO )
+                                   IF    ( IDXS    =   ZERO )
+                                       IF    ( WRK-MAE-NAIYO(IDXP:1)
+                                               NOT =   "#" )
+                                           MOVE    IDXP    TO  IDXS
+                                       END-IF
+                                   ELSE
+                                       IF    ( WRK-MAE-NAIYO(IDXP:1)
+                                                   =   "=" )
+                                         COMPUTE IDXL = IDXP - IDXS + 1
+                                       END-IF
+                                   END-IF
+                               END-PERFORM
+                               IF    ( IDXL    >   ZERO )
+                                   IF      WRK-ATO-NAIYO(1:IDX-PNT1)
+                                       =   WRK-MAE-NAIYO(IDXS:IDXL)
+                                       MOVE    1       TO  FLG-LF
+                                   END-IF
                                END-IF
                            END-IF
                        END-PERFORM
