@@ -1416,9 +1416,9 @@
       *        算定歴チェック
                MOVE    WRK-COM-INPUTCD (IDX-TEIGEN) TO  WRK-SRYCD
                PERFORM 108121-SANTEI-CHK-SEC
-               IF      SPA-ERRCD       NOT =   SPACE
-                   GO      TO      100812-TEIGEN-CHK-EXT
-               END-IF
+      ****     IF      SPA-ERRCD       NOT =   SPACE
+      *            GO      TO      100812-TEIGEN-CHK-EXT
+      ****     END-IF
       *        逓減加算自動追加あり
                MOVE    1                   TO  WRK-COM-TEIGEN-CHK
                                                        (IDX-TEIGEN)
@@ -1606,9 +1606,9 @@
       *
       *    算定歴の回数をチェックする
            MOVE    SANTEI-MSANTEICNT   TO  WRK-SANTEI-CNT
-           IF      SANTEI-FSANTEIYMD   >   SPA-SRYYMD
-               MOVE    "0056"          TO  SPA-ERRCD
-           END-IF
+      **** IF      SANTEI-FSANTEIYMD   >   SPA-SRYYMD
+      *        MOVE    "0056"          TO  SPA-ERRCD
+      **** END-IF
       *
       *    訂正の時、訂正前までカウントする
            IF      LNK-ORCSC-SYORIFLG  =   1
