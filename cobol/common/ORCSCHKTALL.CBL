@@ -154,6 +154,9 @@
       *    電子点数表マスタチェックパラメタ
            COPY    "CPORCSCETNSCHK.INC".
       *
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
+      *
       *    診療行為用共通パラメタ
            COPY    "K01COMMON-SPA".
       *
@@ -324,6 +327,15 @@
       *****************************************************************
        200-NYUIN-CHKSYORI-SEC         SECTION.
       *
+      *    入院料未算定日取得
+           INITIALIZE                      ORCSNYUINDAY-AREA
+           MOVE    SPA-HOSPNUM         TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    ORCSCHKTALL-PTID    TO  LNK-NYUINDAY-PTID
+           MOVE    ORCSCHKTALL-SRYYM   TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"      USING
+                                           ORCSNYUINDAY-AREA
+                                           SPA-AREA
+      *
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
@@ -363,7 +375,7 @@
            PERFORM 990-DBCLOSE-SEC
       *
            .
-       500-NYUIN-CHKSYORI-EXT.
+       200-NYUIN-CHKSYORI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -410,7 +422,16 @@
       *
            PERFORM VARYING     IDX-D   FROM    1   BY  1
                    UNTIL       IDX-D   >   31
-               IF      NACCT-DAY (IDX-D)   NOT =   ZERO
+      *        短期滞在手術基本料２・３判定
+               IF    ((WRK-IDX-N               >   ZERO  ) AND
+                      (TBL-N-KANRICD (WRK-IDX-N)   =   "526"
+                                                   OR  "525"))
+                 AND ( LNK-NYUINDAY-TANKI2-KBN (IDX-D)
+                                           NOT =   SPACE     )
+                   MOVE    1               TO  NACCT-DAY (IDX-D)
+               END-IF
+      *
+               IF    ( NACCT-DAY (IDX-D)   NOT =   ZERO  )
                    IF      WRK-IDX-N       >   ZERO
                        MOVE    TBL-N-KANRICD (WRK-IDX-N)
                                            TO  WRK-NYUHKTCD (IDX-D)
@@ -432,6 +453,7 @@
       *****************************************************************
        5001-SRYCD-CHK-SEC         SECTION.
       *
+           MOVE    SPACE               TO  WRK-K-SRYCD
            PERFORM VARYING     IDX-N   FROM    1  BY  1
                    UNTIL      (IDX-N       >   TBL-N-MAX )
                            OR (FLG-CHK     =   1         )

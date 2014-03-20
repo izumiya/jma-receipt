@@ -2239,6 +2239,7 @@
       *****************************************************************
        30091-HKTCD-CHK-SEC          SECTION.
       *
+      *
            MOVE    ZERO                TO  SPA-NAI-HKTERR
            MOVE    ZERO                TO  SPA-NAI-HKTKEI
            IF      SPA-GMN-NYUGAIKBN   =   "1"
@@ -7909,6 +7910,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      FLG-NYUGAICHG       =   1
                PERFORM 3008-HKNCOMBI-HEN-SEC
            END-IF
+      *
+      *    Æþ±¡ÎÁÊñ³ç¿ÇÎÅ¥Á¥§¥Ã¥¯½èÍý
+           PERFORM 30091-HKTCD-CHK-SEC
       *
            MOVE    ZERO                TO  SPA-GMN-MAX
       *

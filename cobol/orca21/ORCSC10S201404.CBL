@@ -1824,9 +1824,6 @@
                MOVE    WRK-KIKAN           TO  LNK-DAY6-ZOGEN
                CALL    "ORCSDAY"           USING   STS-AREA-DAY
                                                    LNK-DAY6-AREA
-      *TEST
-                 DISPLAY "SC10 LNK-DAY6-KEISAN:"  LNK-DAY6-KEISAN
-      *TEST
                IF      LNK-DAY6-KEISAN     >   SPA-SRYYMD
       *            外来リハ診察料等算定中（後期高齢者診療料の区分に）
                    MOVE    2                   TO  SPA-KOURESRY-ARI2

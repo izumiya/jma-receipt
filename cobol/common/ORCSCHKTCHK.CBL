@@ -36,6 +36,8 @@
       *  04.06.00    NACL-Â¿¡¹Ç¼  11/01/XX  ÅÅ»ÒÅÀ¿ôÉ½¥Þ¥¹¥¿ÂÐ±þ
       *  04.06.00    NACL-Â¿¡¹Ç¼  12/03/28  £È£²£´Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  12/08/XX  ¥µ¥ó¥×¥ëÌô¡Ê¥µ¡ËÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/03/XX  £È£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *                                     Ã»´üÂÚºß¼ê½ÑÂÐ±þ
       *****************************************************************
       *
       *
@@ -228,6 +230,9 @@
       *
       *    ÅÅ»ÒÅÀ¿ôÉ½¥Þ¥¹¥¿¥Á¥§¥Ã¥¯¥Ñ¥é¥á¥¿
            COPY    "CPORCSCETNSCHK.INC".
+      *
+      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *    ¿ÇÎÅ¹Ô°ÙÍÑ¶¦ÄÌ¥Ñ¥é¥á¥¿
            COPY    "K01COMMON-SPA".
@@ -603,6 +608,14 @@
       *        ËýÀ­°Ý»ýÆ©ÀÏ´µ¼ÔÎÁ¤ÏÌôºÞ¡¦´ïºà¤Ï»»Äê²Ä
                IF    (SPA-COM-INPUTCD (IDX)(1:1)   =   "6"
                                                    OR  "7" )
+                   MOVE    1           TO  SPA-COM-HOUKATU-FLG2 (IDX)
+               END-IF
+           WHEN    "208"
+           WHEN    "525"
+      *        Ã»´üÂÚºß¼ê½Ñ£±¡¢£²¤Î¥Õ¥£¥ë¥à¤Ï»»Äê²Ä
+               IF    (SPA-COM-SRYKBN  (IDX)        =   "70")  AND
+                     (SPA-COM-INPUTCD (IDX)(1:1)   =   "7" )  AND
+                     (SPA-COM-DATAKBN (IDX)        =   "3" )
                    MOVE    1           TO  SPA-COM-HOUKATU-FLG2 (IDX)
                END-IF
            END-EVALUATE
@@ -1803,6 +1816,15 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *****************************************************************
        500-NYUIN-CHKSYORI-SEC         SECTION.
       *
+      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ
+           INITIALIZE                      ORCSNYUINDAY-AREA
+           MOVE    SPA-HOSPNUM         TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    SPA-PTID            TO  LNK-NYUINDAY-PTID
+           MOVE    WRK-SRYYM           TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"      USING
+                                           ORCSNYUINDAY-AREA
+                                           SPA-AREA
+      *
            INITIALIZE                      NYUINACCT-REC
            MOVE    SPA-HOSPNUM         TO  NACCT-HOSPNUM
            MOVE    SPA-NYUGAIKBN       TO  NACCT-NYUGAIKBN
@@ -1926,7 +1948,16 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            PERFORM VARYING     IDX-D   FROM    1   BY  1
                    UNTIL       IDX-D   >   31
-               IF      NACCT-DAY (IDX-D)   NOT =   ZERO
+      *        Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁÈ½Äê
+               IF    ((WRK-IDX-N               >   ZERO  ) AND
+                      (TBL-N-KANRICD (WRK-IDX-N)   =   "526"
+                                                   OR  "525"))
+                 AND ( LNK-NYUINDAY-TANKI2-KBN (IDX-D)
+                                           NOT =   SPACE     )
+                   MOVE    1               TO  NACCT-DAY (IDX-D)
+               END-IF
+      *
+               IF    ( NACCT-DAY (IDX-D)   NOT =   ZERO )
                    IF      WRK-IDX-N       >   ZERO
                        MOVE    TBL-N-KANRICD (WRK-IDX-N)
                                            TO  WRK-NYUHKTCD (IDX-D)
@@ -1946,6 +1977,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *****************************************************************
        5001-SRYCD-CHK-SEC         SECTION.
       *
+           MOVE    SPACE               TO  WRK-NT-SRYCD
            PERFORM VARYING     IDX-N   FROM    1  BY  1
                    UNTIL      (IDX-N       >   TBL-N-MAX )
                            OR (FLG-CHK     =   1         )
