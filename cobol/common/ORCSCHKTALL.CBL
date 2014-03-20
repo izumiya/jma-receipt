@@ -420,6 +420,7 @@
            MOVE    "key2"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
+      *
            PERFORM VARYING     IDX-D   FROM    1   BY  1
                    UNTIL       IDX-D   >   31
       *        Ã»´üÂÚºß¼ê½Ñ´ðËÜÎÁ£²¡¦£³È½Äê
@@ -501,6 +502,8 @@
                                                TO  ORCSCHKTALL-NYUHKTCD
                                                                   (IDX)
                    ELSE
+                       MOVE    WRK-NYUSRYCD (IDX)
+                                           TO  WRK-K-SRYCD
                        PERFORM 3002-NYUHKTCD-CHK-SEC
                    END-IF
                END-IF
