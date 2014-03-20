@@ -9518,8 +9518,6 @@
       *      £´£±Ï·¿Í
              IF ((WK-1001-PREFNUM  =  26 OR 27 OR 34 OR 12       ) AND
                  (COMB-KOH1HKNNUM  =  "241"                      ))
-             OR ((WK-1001-PREFNUM  =  10                         ) AND
-                 (COMB-KOH1HKNNUM  =  "255"                      ))
              OR ((WK-1001-PREFNUM  =  33                         ) AND
                  (COMB-KOH1HKNNUM  =  "241"                      ))
              OR ((WK-1001-PREFNUM  =  23                         ) AND
@@ -9529,6 +9527,9 @@
              OR ((WK-1001-PREFNUM  =  01                         ) AND
                  (COMB-KOH1HKNNUM  =  "241"                      ) AND
                  (LNK-SYU-SRYYMD(1:6)   <=   "200803"            ))
+             OR ((WK-1001-PREFNUM  =  10                         ) AND
+                 (COMB-KOH1HKNNUM  =  "255"                      ) AND
+                 (LNK-SYU-SRYYMD(1:6)   <=   "201403"            ))
                 MOVE   WK-ZENGAKU  TO   WK-KOUREI-IRYOHI70K
                 IF   MAX-KIN-KOHI1-M    =    72300
                    MOVE   11       TO   FLG-IRYOHI70K
@@ -9560,8 +9561,6 @@
              MOVE       ZERO        TO      FLG-ROJIN41
              IF ((WK-1001-PREFNUM  =  26 OR 27 OR 34 OR 12       ) AND
                  (COMB-KOH1HKNNUM  =  "241"                      ))
-             OR ((WK-1001-PREFNUM  =  10                         ) AND
-                 (COMB-KOH1HKNNUM  =  "255"                      ))
              OR ((WK-1001-PREFNUM  =  33                         ) AND
                  (COMB-KOH1HKNNUM  =  "241"                      ) AND
                  (LNK-SYU-SRYYMD(1:6)   >=   "200610"            ))
@@ -9574,6 +9573,9 @@
              OR ((WK-1001-PREFNUM  =  01                         ) AND
                  (COMB-KOH1HKNNUM  =  "241"                      ) AND
                  (LNK-SYU-SRYYMD(1:6)   <=   "200803"            ))
+             OR ((WK-1001-PREFNUM  =  10                         ) AND
+                 (COMB-KOH1HKNNUM  =  "255"                      ) AND
+                 (LNK-SYU-SRYYMD(1:6)   <=   "201403"            ))
                 IF  LNK-SYU-SRYYMD(1:6)   >=   "200610"
                     CONTINUE
                 ELSE
