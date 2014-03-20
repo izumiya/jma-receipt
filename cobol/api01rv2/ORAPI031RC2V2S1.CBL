@@ -411,6 +411,12 @@
                    MOVE    "190097210" TO  SYS-5001-BTU-KHNSRYCD
                WHEN    "099999952"
                    MOVE    "190135110" TO  SYS-5001-BTU-KHNSRYCD
+               WHEN    "099999955"
+                   MOVE    "190169610" TO  SYS-5001-BTU-KHNSRYCD
+               WHEN    "099999956"
+                   MOVE    "190169910" TO  SYS-5001-BTU-KHNSRYCD
+               WHEN    "099999957"
+                   MOVE    "190170210" TO  SYS-5001-BTU-KHNSRYCD
                END-EVALUATE
            END-IF
       *

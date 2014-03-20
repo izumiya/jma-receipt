@@ -84,6 +84,7 @@
       *
        01  CONST-AREA.
            03  CONST-NYUINKSN-MAX      PIC 9(03)   VALUE 21.
+           03  CONST-H260401           PIC X(08)   VALUE "20140401".
            03  CONST-H240401           PIC X(08)   VALUE "20120401".
            03  CONST-H200401           PIC X(08)   VALUE "20080401".
       *
@@ -316,17 +317,23 @@
            MOVE    TNS-NAME            TO  HSCBRES-SKJRYOYO-NAME
       *
            IF    ( SYS-5000-STYUKYMD   >=  CONST-H240401 )
-               MOVE    "栄養管理経過措置"  TO  HSCBRES-EIYOKANRI-LBL
-               MOVE    SYS-5000-EIYOUKSNKBN
+               IF    ( SYS-5000-STYUKYMD   >=  CONST-H260401 )
+                AND  ( SPA-HOSPSBT     =   2 )
+                   CONTINUE
+               ELSE
+                   MOVE    "栄養管理経過措置"
+                                       TO  HSCBRES-EIYOKANRI-LBL
+                   MOVE    SYS-5000-EIYOUKSNKBN
                                        TO  HSCBRES-EIYOKANRI-DATA
-               EVALUATE    SYS-5000-EIYOUKSNKBN
-               WHEN    "0"
-                   MOVE    "栄養管理体制基準適合"
+                   EVALUATE    SYS-5000-EIYOUKSNKBN
+                   WHEN    "0"
+                       MOVE    "栄養管理体制基準適合"
                                        TO  HSCBRES-EIYOKANRI-NAME
-               WHEN    "1"
-                   MOVE    "栄養管理体制基準未適合"
+                   WHEN    "1"
+                       MOVE    "栄養管理体制基準未適合"
                                        TO  HSCBRES-EIYOKANRI-NAME
-               END-EVALUATE
+                   END-EVALUATE
+               END-IF
            END-IF
       *
            MOVE    "室料差額消費税"    TO  HSCBRES-SAGAKUTAX-LBL
