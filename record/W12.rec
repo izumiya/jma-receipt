@@ -135,6 +135,13 @@ W12	{
 					count	int;
 					item	varchar(36)[5];
 				};
+				SHOKUJI_PRTKBN_COMBO	{
+					SHOKUJI_PRTKBN	{
+						value	varchar(36);
+					};
+					count	int;
+					item	varchar(36)[5];
+				};
 				BYOMEI_PRTJYUN_COMBO	{
 					BYOMEI_PRTJYUN	{
 						value	varchar(36);

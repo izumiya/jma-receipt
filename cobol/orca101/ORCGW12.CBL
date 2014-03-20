@@ -165,6 +165,8 @@
       *                                     対応
       *  04.07.13    NACL-藤原    13/12/04  自賠責（労災準拠）のレセプト
       *                                     様式追加対応
+      *  04.07.14    NACL-藤原    14/03/20  上限０円時の食事欄記載対応
+      *                                    （法別２４・７９）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -370,6 +372,12 @@
                                               PIC X(01).
                            11  SPA-GMN-F1     PIC X(01).
                            11  SPA-GMN-BYOMEI-PRTJYUNMEI
+                                              PIC X(34).
+                       09  SPA-GMN-SHOKUJI-PRTKBN-G.
+                           11  SPA-GMN-SHOKUJI-PRTKBN
+                                              PIC X(01).
+                           11  SPA-GMN-F1     PIC X(01).
+                           11  SPA-GMN-SHOKUJI-PRTKBNMEI
                                               PIC X(34).
                        09  SPA-GMN-INSPECT-CHARACTER-KBN-G.
                            11  SPA-GMN-INSPECT-CHARACTER-KBN
@@ -1030,6 +1038,15 @@
                        09  SPA-GMN-BYOMEI-PRTJYUNMEIL
                                               PIC X(34).
                    07  SPA-GMN-BYOMEI-PRTJYUN-MAX
+                                              PIC 9(02).    
+      *
+                   07  SPA-GMN-SHOKUJI-PRTKBNLST       OCCURS  5.
+                       09  SPA-GMN-SHOKUJI-PRTKBNL
+                                              PIC X(01).
+                       09  SPA-GMN-F1L        PIC X(01).
+                       09  SPA-GMN-SHOKUJI-PRTKBNMEIL
+                                              PIC X(34).
+                   07  SPA-GMN-SHOKUJI-PRTKBN-MAX
                                               PIC 9(02).    
       *                                        
                    07  SPA-GMN-INSPECT-CHARACTER-KBNLST    OCCURS  5.
@@ -2391,6 +2408,14 @@
            MOVE    "入力順に記載する"
                                        TO  SPA-GMN-BYOMEI-PRTJYUNMEIL(3)
            MOVE    3                   TO  SPA-GMN-BYOMEI-PRTJYUN-MAX 
+      *
+           MOVE    "0"                 TO  SPA-GMN-SHOKUJI-PRTKBNL   (1)
+           MOVE    "食事上限０円時は「０」を記載する"
+                                       TO  SPA-GMN-SHOKUJI-PRTKBNMEIL(1)
+           MOVE    "1"                 TO  SPA-GMN-SHOKUJI-PRTKBNL   (2)
+           MOVE    "食事上限０円時は「０」を記載しない"
+                                       TO  SPA-GMN-SHOKUJI-PRTKBNMEIL(2)
+           MOVE    2                   TO  SPA-GMN-SHOKUJI-PRTKBN-MAX 
       *     
            MOVE    "0"                 TO
                                    SPA-GMN-INSPECT-CHARACTER-KBNL   (1)
@@ -3780,6 +3805,19 @@
                END-IF
            END-PERFORM
       *
+           MOVE    SYS-200501-SHOKUJI-PRTKBN
+                                       TO  SPA-GMN-SHOKUJI-PRTKBN
+           PERFORM VARYING IDY FROM    1   BY  1
+                   UNTIL   IDY >       SPA-GMN-SHOKUJI-PRTKBN-MAX
+               IF      SPA-GMN-SHOKUJI-PRTKBN 
+                               =   SPA-GMN-SHOKUJI-PRTKBNL (IDY)
+                   MOVE    SPA-GMN-SHOKUJI-PRTKBNLST (IDY)
+                                       TO  SPA-GMN-SHOKUJI-PRTKBN-G
+                   MOVE    SPA-GMN-SHOKUJI-PRTKBN-MAX
+                                       TO  IDY
+               END-IF
+           END-PERFORM
+      *
            MOVE    SYS-200501-INSPECT-CHARACTER-KBN
                                        TO  SPA-GMN-INSPECT-CHARACTER-KBN
            PERFORM VARYING IDY FROM    1   BY  1
@@ -4602,6 +4640,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                MOVE    SPA-GMN-BYOMEI-PRTJYUNLST (1)
                                            TO  SPA-GMN-BYOMEI-PRTJYUN-G
            END-IF                                              
+           IF     SPA-GMN-SHOKUJI-PRTKBN-G
+                                       =   SPACE
+               MOVE    SPA-GMN-SHOKUJI-PRTKBNLST (1)
+                                           TO  SPA-GMN-SHOKUJI-PRTKBN-G
+           END-IF                                              
            IF     SPA-GMN-INSPECT-CHARACTER-KBN-G
                                        =   SPACE
                MOVE    SPA-GMN-INSPECT-CHARACTER-KBNLST (1)
@@ -4795,6 +4838,7 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                                        TO  SPA-GMN-COMMENT-NYUINRYO1-G 
            MOVE    W12-CHKKBN          TO  SPA-GMN-CHKKBN-G 
            MOVE    W12-BYOMEI-PRTJYUN  TO  SPA-GMN-BYOMEI-PRTJYUN-G 
+           MOVE    W12-SHOKUJI-PRTKBN  TO  SPA-GMN-SHOKUJI-PRTKBN-G 
            MOVE    W12-INSPECT-CHARACTER-KBN  TO
                                        SPA-GMN-INSPECT-CHARACTER-KBN-G 
            MOVE    W12-INSPECT-ZERO-KBN       TO
@@ -5017,6 +5061,11 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
       *
            PERFORM 4175-BYOMEI-PRTJYUN-CHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      4102-KIHON-CHK-EXT
+           END-IF
+      *
+           PERFORM 4197-SHOKUJI-PRTKBN-CHK-SEC
            IF      SPA-ERRCD       NOT =   SPACE
                GO      TO      4102-KIHON-CHK-EXT
            END-IF
@@ -6171,6 +6220,33 @@ grpsys*        MOVE    SPA-HOSPNUM         TO  -HOSPNUM
            END-IF
            .
        4175-BYOMEI-PRTJYUN-CHK-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    食事欄記載区分チェック
+      *****************************************************************
+       4197-SHOKUJI-PRTKBN-CHK-SEC      SECTION.
+      *
+           IF      SPA-GMN-SHOKUJI-PRTKBN    =   SPACE
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL   IDY >       SPA-GMN-SHOKUJI-PRTKBN-MAX
+                        OR     SPA-GMN-SHOKUJI-PRTKBN
+                                   =   SPA-GMN-SHOKUJI-PRTKBNL (IDY)
+                   CONTINUE
+               END-PERFORM
+      * 
+               IF      IDY <=      SPA-GMN-SHOKUJI-PRTKBN-MAX
+                   MOVE    SPA-GMN-SHOKUJI-PRTKBNLST (IDY)
+                                          TO  SPA-GMN-SHOKUJI-PRTKBN-G
+               ELSE
+                   MOVE    308            TO  SPA-GMN-CUR
+                   MOVE    "0080"         TO  SPA-ERRCD
+               END-IF
+           END-IF    
+           .
+       4197-SHOKUJI-PRTKBN-CHK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -8958,6 +9034,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                    SYS-200501-COMMENT-NYUINRYO1-KSIKBN
            MOVE    SPA-GMN-CHKKBN          TO  SYS-200501-CHKKBN
            MOVE    SPA-GMN-BYOMEI-PRTJYUN  TO  SYS-200501-BYOMEI-PRTJYUN
+           MOVE    SPA-GMN-SHOKUJI-PRTKBN  TO  SYS-200501-SHOKUJI-PRTKBN
            MOVE    SPA-GMN-SEIHO-DSPKBN    TO  SYS-200501-SEIHO-DSPKBN
            MOVE    SPA-GMN-RECEIPT-MAKEKBN TO
                                            SYS-200501-RECEIPT-MAKE-KBN
@@ -9566,6 +9643,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                                             TO  W12-COMMENT-NYUINRYO1
            MOVE    SPA-GMN-CHKKBN-G         TO  W12-CHKKBN
            MOVE    SPA-GMN-BYOMEI-PRTJYUN-G TO  W12-BYOMEI-PRTJYUN
+           MOVE    SPA-GMN-SHOKUJI-PRTKBN-G TO  W12-SHOKUJI-PRTKBN
            MOVE    SPA-GMN-INSPECT-CHARACTER-KBN-G
                                             TO
                                             W12-INSPECT-CHARACTER-KBN
@@ -9874,6 +9952,14 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE    SPA-GMN-BYOMEI-PRTJYUN-MAX
                                        TO  W12-BYOMEI-PRTJYUN-COUNT 
+      *
+           PERFORM VARYING IDY     FROM    1   BY  1
+                   UNTIL   IDY     >       SPA-GMN-SHOKUJI-PRTKBN-MAX
+               MOVE    SPA-GMN-SHOKUJI-PRTKBNLST (IDY)
+                                       TO  W12-SHOKUJI-PRTKBNLST (IDY)
+           END-PERFORM
+           MOVE    SPA-GMN-SHOKUJI-PRTKBN-MAX
+                                       TO  W12-SHOKUJI-PRTKBN-COUNT 
       *     
            PERFORM VARYING IDY     FROM    1   BY  1
                    UNTIL   IDY     >   SPA-GMN-INSPECT-CHARACTER-KBN-MAX
@@ -10746,6 +10832,9 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                    MOVE
                        "自倍責様式選択（新様式・入院）入力エラー"
                                                          TO  SPA-ERRMSG
+               WHEN    "0080"
+                   MOVE
+                       "食事欄記載入力エラー"  TO  SPA-ERRMSG
       *
                WHEN    "0096"
                    STRING  "一括作成出力順（国保）の指定が編綴順です。"
@@ -11020,6 +11109,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "CHKKBN"           TO   MCP-WIDGET
                 WHEN    65
                     MOVE  "BYOMEI_PRTJYUN"   TO   MCP-WIDGET
+                WHEN    308
+                    MOVE  "SHOKUJI_PRTKBN"   TO   MCP-WIDGET
                 WHEN    62
                     MOVE  "SEIHO_DSPKBN"     TO   MCP-WIDGET
                 WHEN    302
@@ -11252,7 +11343,7 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                 WHEN    68  THRU    69
                 WHEN    300 THRU    302
                 WHEN    304
-                WHEN    307
+                WHEN    307 THRU    308
                     MOVE    0                TO  W12-PAGENO
                 WHEN    9
                 WHEN    10
@@ -11348,6 +11439,8 @@ grpsys             CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "CHKKBN"
                    MOVE    65          TO  SPA-GMN-CUR
                WHEN    "BYOMEI_PRTJYUN"
+                   MOVE    308         TO  SPA-GMN-CUR
+               WHEN    "SHOKUJI_PRTKBN"
                    MOVE    8          TO  SPA-GMN-CUR
                WHEN    "PREFPRGID"
                    IF      SPA-BEDSU       >   ZERO
