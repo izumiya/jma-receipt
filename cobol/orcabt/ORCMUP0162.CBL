@@ -490,13 +490,12 @@ grpsys     PERFORM 900-ORCDBMAIN-SEC
       *****************************************************************
        20101-PRGOPTION-UPD-SEC  SECTION.
       *
-      *    ユーザがオプションを編集していた場合は更新しない
-           IF     (PRGOPTIONWK-KBNCD   =   "*")
-             AND  (PRGOPTION-OPID     NOT = SPACE)
-             AND  (PRGOPTION-UPYMD    NOT = SPACE)
-               PERFORM 220-PRGOPTION-HENSYU-SEC
-           ELSE
+      *    説明文は更新データに置き換え
+      *    オプションデータは既存データと比較して置き換え
+           IF     (PRGOPTIONWK-KBNCD   =   "EXPLANATION")
                PERFORM 220-PRGOPTION-EDIT-SEC
+           ELSE
+               PERFORM 220-PRGOPTION-HENSYU-SEC
            END-IF
       *
                MOVE    PRGOPTION-REC       TO  MCPDATA-REC
