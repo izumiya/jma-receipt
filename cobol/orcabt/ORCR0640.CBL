@@ -634,6 +634,8 @@
       *  04.07.16    NACL-門脇    14/03/04  平成２６年４月改正対応
       *  04.07.17    NACL-門脇    14/03/17  低所得フラグ２情報の入れ替え
       *                                     （マル長併用時）
+      *  04.07.18    NACL-門脇    14/01/20  主保険＋０７９又０２４の食事療養
+      *                                     記載修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -2734,6 +2736,10 @@
            IF      SYS-200501-COMMENT-NYUINRYO1-KSIKBN
                                     =   SPACE
                MOVE    "2"   TO  SYS-200501-COMMENT-NYUINRYO1-KSIKBN
+           END-IF
+           IF      SYS-200501-SHOKUJI-PRTKBN
+                                    =   SPACE
+               MOVE    "0"   TO  SYS-200501-SHOKUJI-PRTKBN
            END-IF
       *
            MOVE    "tbl_syskanri"       TO  MCP-TABLE
@@ -19885,7 +19891,8 @@
                   OR ( SYU-SKJ-FTNKBN(IDX3)  =  "6"            )
       *           OR ( SYU-SKJ-NISSU(IDX3)   =   ZERO          )
                   OR ( SYU-SKJ-RYOYOHI(IDX3) =   ZERO          )
-                  OR ( SYU-KOH-HKNNUM(IDX3)  =  "079" OR "024" )
+                  OR ((SYU-KOH-HKNNUM(IDX3)  =  "079" OR "024") AND
+                      (SYS-200501-SHOKUJI-PRTKBN  =  "0"      ))
       *              IF   RECE62-SHOKUJINISSU(KH-IDX)  =  ZERO
                      IF   RECE62-SHOKUJIRYOYOHI(KH-IDX) =  ZERO
                          MOVE    "1"      TO
