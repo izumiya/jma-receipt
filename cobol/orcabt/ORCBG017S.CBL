@@ -1361,6 +1361,8 @@
                END-IF
                PERFORM 400-ZHEN-SURYO-SET-SEC
                MOVE    WRK-HENSURYO    TO  CSV-SURYO
+           ELSE
+               MOVE    SPACE           TO  CSV-SURYO
            END-IF
       *
            MOVE    IN01-KAISU          TO  WRK-ZZZZZ9
