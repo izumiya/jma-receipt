@@ -28,6 +28,8 @@
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
       *  04.05.01    NACL-藤原    10/03/23  ＨＯＳＴ名取得方法の変更
+      *
+      *  04.07.01    NACL-藤原    14/03/24  スクリプト起動パスサーチ対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -109,11 +111,6 @@
                05  FILLER          PIC X(01)   VALUE   ".".
                05  WRK-SS          PIC X(02).
       *
-       01  WRK-SHELL-NAME.
-           05  FILLER             PIC X(16) VALUE
-                                             "scripts/allways/".
-           05  WRK-SHELL-SHELL    PIC X(20).
-      *
        01  WRK-ROW.
            05  WRK-LIST-ROW        PIC S9(9)   BINARY.
       *
@@ -160,9 +157,6 @@
       *
       *    ファイル削除パラメタ
            COPY    "CPORCSFDEL.INC".
-      *
-      *    ファイルデイレクトリ位置指定サブ
-           COPY    "CPMKPASS.INC".
       *
            COPY    "ORCA-SYSTEM".
       *
@@ -524,15 +518,9 @@
            MOVE    "OR007ERR"          TO  TOUKEICSVERR-FILE-ID
            MOVE    SPA-TERMID          TO  TOUKEICSVERR-TERMID
            MOVE    1                   TO  TOUKEICSVERR-SYOKBN1
-      *             
-      *    ファイルデイレクトリ位置指定
-           INITIALIZE                      ORCSMKPASSAREA
-           MOVE    "orc_putcsv.sh"     TO  WRK-SHELL-SHELL
-           MOVE    WRK-SHELL-NAME      TO  MKPASS-IN-01
-           CALL    "ORCSMKPASS"        USING   ORCSMKPASSAREA
       *
            MOVE    SPACE               TO  SHELLTBL
-           MOVE    MKPASS-OT-01        TO  SHELLTBL-NAME
+           MOVE    "orc_putcsv.sh"     TO  SHELLTBL-NAME
            MOVE    SPA-HOSPNUM         TO  SHELLTBL-ARG1
            EVALUATE    SPA-XG01-MOTOPG
                WHEN    "L01"
@@ -588,7 +576,7 @@
            MOVE    SHELLTBL            TO  MCPDATA-REC
            MOVE    "SHELL"             TO  MCP-FUNC
            MOVE    "shell"             TO  MCP-TABLE
-           MOVE    "shell"             TO  MCP-PATHNAME
+           MOVE    "allways"           TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING
                                            MCPAREA
                                            MCPDATA-REC
