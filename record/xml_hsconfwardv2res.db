@@ -43,7 +43,7 @@ xml_hsconfwardv2res {
 				Data	varchar(09);
 				Name	varchar(100);
 			};
-			Nigit_Shift_Overtime{
+			Night_Shift_Overtime{
 				Label	varchar(20);
 				Data	varchar(1);
 				Name	varchar(20);
