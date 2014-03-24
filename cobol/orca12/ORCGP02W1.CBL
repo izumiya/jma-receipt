@@ -1242,6 +1242,7 @@
                    AND (SPA-PTHKN-TEKSTYMD(IDX) >=  "20140501")
                    AND (SPA-PTHKN-HKNNUM(IDX)(1:1)
                                              NOT =  "9"       )
+                   AND (SPA-PTHKN-TEKSTYMD(IDX) >=  SPA-BYMD-70)
                    PERFORM 31002-HKNTBL-HOJKBNHEN-SEC
                ELSE
       *
@@ -1882,6 +1883,7 @@
            IF      (SPA-NAI-BIRTHDAY       >=  "19440402")
                AND (SPA-NAI-HTEKSTYMD      >=  "20140501")
                AND (SPA-GMN-HKNNUM(1:1) NOT =  "9"       )
+               AND (SPA-NAI-HTEKSTYMD      >=  SPA-BYMD-70)
                PERFORM 310112-HKN-HOJOHEN2-SEC
            ELSE
       *
@@ -6004,6 +6006,7 @@
            MOVE    ZERO                TO  FLG-RJN-02
            IF      (SPA-NAI-BIRTHDAY       >=  "19440402")
              AND   (SPA-PTHKN-TEKSTYMD (IDX)   >=  "20140501")
+             AND   (SPA-PTHKN-TEKSTYMD (IDX)   >=  SPA-BYMD-70)
                MOVE    1               TO  FLG-RJN-02
            END-IF
       *

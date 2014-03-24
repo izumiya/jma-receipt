@@ -943,6 +943,8 @@
            MOVE    ZERO                TO  FLG-RJN-02
            IF      (SPA-NAI-BIRTHDAY       >=  "19440402")
              AND   (SPA-GMN-HKNNUM(1:1) NOT =  "9"       )
+             AND  ((SPA-NAI-HTEKSTYMD      >=  SPA-BYMD-70)
+               OR  (SPA-SYSYMD             >=  SPA-BYMD-70 ))
                IF      (SPA-NAI-HTEKSTYMD      >=  "20140501")
                    OR ((SPA-NAI-HTEKSTYMD      =   SPACE     ) AND
                        (SPA-SYSYMD             >=  "20140501"))
