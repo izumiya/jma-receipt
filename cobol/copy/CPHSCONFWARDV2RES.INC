@@ -56,6 +56,10 @@
                        09  HSCWRES-NYUINKHN-LBL        PIC X(20).
                        09  HSCWRES-NYUINKHN-DATA       PIC X(9).
                        09  HSCWRES-NYUINKHN-NAME       PIC X(100).
+                   07  HSCWRES-YKNCHOKA-G.
+                       09  HSCWRES-YKNCHOKA-LBL        PIC X(20).
+                       09  HSCWRES-YKNCHOKA-DATA       PIC X(1).
+                       09  HSCWRES-YKNCHOKA-NAME       PIC X(20).
                    07  HSCWRES-NYUINKSN-G.
                        09 HSCWRES-NYUINKSN-OCC         OCCURS  20.
                           11 HSCWRES-NYUINKSN-LBL      PIC X(20).

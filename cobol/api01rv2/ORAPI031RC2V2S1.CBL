@@ -97,6 +97,7 @@
            03  KEY-BRMNUM              PIC X(06).
       *
        01  CONST-AREA.
+           03  CONST-H260401           PIC X(08)   VALUE "20140401".
            03  CONST-H240401           PIC X(08)   VALUE "20120401".
            03  CONST-H200401           PIC X(08)   VALUE "20080401".
            03  CONST-BYOTO-MAX         PIC 9(03)   VALUE 50.
@@ -420,6 +421,10 @@
                END-EVALUATE
            END-IF
       *
+           IF    ( SYS-5001-YKNCHOKAKBN    =   SPACE )
+               MOVE    "0"             TO  SYS-5001-YKNCHOKAKBN
+           END-IF
+      *
            IF    ( SYS-5000-SENTEI-FTNKBN  =   "1" OR "2" )
                MOVE    SYS-5000-SENTEI-FTNKBN
                                        TO  SYS-5001-SENTEI-FTNKBN
@@ -522,18 +527,50 @@
                MOVE    TNS-NAME        TO  HSCWRES-TOKNYUIN-NAME (IDXW)
            END-IF
       *
-           IF    ( SYS-5001-BTU-KHNSRYCD
+           MOVE    SPACE               TO  WRK-SRYCD
+           EVALUATE    TRUE
+           WHEN    ( SYS-5001-BTU-KHNSRYCD
                                        NOT =   SPACE )
-               MOVE    "Æþ±¡´ðËÜÎÁ"    TO  HSCWRES-NYUINKHN-LBL (IDXW)
                MOVE    SYS-5001-BTU-KHNSRYCD
-                                       TO  HSCWRES-NYUINKHN-DATA(IDXW)
+                                       TO  WRK-SRYCD
+           WHEN    ( SYS-5001-KHNSRYCD NOT =   SPACE )
+               MOVE    SYS-5001-KHNSRYCD
+                                       TO  WRK-SRYCD
+           END-EVALUATE
       *
-               MOVE    SYS-5001-BTU-KHNSRYCD
-                                       TO  WRK-TNS-SRYCD
+           IF    ( WRK-SRYCD       NOT =   SPACE )
+               MOVE    "Æþ±¡´ðËÜÎÁ"    TO  HSCWRES-NYUINKHN-LBL (IDXW)
+               MOVE    WRK-SRYCD       TO  HSCWRES-NYUINKHN-DATA(IDXW)
+      *
+               MOVE    WRK-SRYCD       TO  WRK-TNS-SRYCD
                MOVE    SYS-5001-STYUKYMD
                                        TO  WRK-TNS-SRYYMD
                PERFORM 901-TENSU-KEY-SEL-SEC
                MOVE    TNS-NAME        TO  HSCWRES-NYUINKHN-NAME (IDXW)
+      *
+               IF    ( WRK-KJNYMD      >=  CONST-H260401 )
+                   IF    ( TNS-CDKBN-KBNNUM   =   100 )
+                    OR   ( TNS-CDKBN-KBNNUM   =   101
+                       AND TNS-CDKBN-KOUBAN   =   2 )
+                    OR   ( TNS-CDKBN-KBNNUM   =   102 )
+                    OR   ( TNS-CDKBN-KBNNUM   =   103 )
+                    OR   ( TNS-CDKBN-KBNNUM   =   106 )
+                    OR   ( TNS-SRYCD          =   "099999954" )
+                       MOVE    "·îÊ¿¶ÑÌë¶Ð»þ´ÖÄ¶²á"
+                                       TO  HSCWRES-YKNCHOKA-LBL (IDXW)
+                       MOVE    SYS-5001-YKNCHOKAKBN
+                                       TO  HSCWRES-YKNCHOKA-DATA(IDXW)
+                       EVALUATE    SYS-5001-YKNCHOKAKBN
+                       WHEN    "0"
+                           MOVE    "Ä¶²á¤Ê¤·"
+                                       TO  HSCWRES-YKNCHOKA-NAME(IDXW)
+                       WHEN    "1"
+                           MOVE    "Ä¶²á¤¢¤ê"
+                                       TO  HSCWRES-YKNCHOKA-NAME(IDXW)
+                       END-EVALUATE
+                   END-IF
+               END-IF
+      *
            END-IF
       *
            PERFORM 20011-NYUIN-KSN-EDIT-SEC
