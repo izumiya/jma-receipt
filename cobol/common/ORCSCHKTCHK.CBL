@@ -1019,6 +1019,9 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    OR  (SPA-COM-GENTEN  (IDX-Z)    =   "1"   )
       *            アフターケア
                    OR  (SPA-RSI-HKNKBN             =   "3" )
+      *            入院算定日指定
+                   OR (SPA-GMN-INPUTCD (IDX-Z)(1:1)
+                                                   =   "*"  )
                    CONTINUE
                ELSE
                    IF     (SPA-COM-INPUTCD (IDX-Z)(1:1) =   "1"
@@ -2170,6 +2173,7 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
       *
            PERFORM VARYING     IDX-Z   FROM    1   BY  1
                    UNTIL      (IDX-Z       >   SPA-GMN-MAX  ) 
+               MOVE    ZERO            TO  SPA-COM-HOUKATU-KFLG(IDX-Z)
                MOVE    ZERO            TO  SPA-COM-HOUKATU-FLG (IDX-Z)
                MOVE    ZERO            TO  SPA-COM-HOUKATU-FLG2(IDX-Z)
                MOVE    ZERO            TO  SPA-COM-HOUKATU-ZAI (IDX-Z)
