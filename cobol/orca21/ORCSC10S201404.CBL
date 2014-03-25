@@ -4298,6 +4298,9 @@
            MOVE    ZERO                TO  SPA-SYONIKA-ARI2
            MOVE    ZERO                TO  SPA-SYONIKA-ARI3
       *
+           MOVE    ZERO                TO  WRK-KAISU
+           MOVE    SPACE               TO  WRK-SRYCD
+      *
       *    初診料算定
            IF      SPA-SYOSIN          =   1
                MOVE    ZERO                TO  WRK-KAISU
@@ -6229,6 +6232,7 @@
       *        画面テーブル内容チェック
                PERFORM 1001-TBLCHEK-SEC
            END-IF
+      *
       *!!!!!!!!!!!!!!!!!
       *    小児科外来診察料以外の入力は、そのまま
            MOVE    ZERO                TO  FLG-SYONIKA-NAI
