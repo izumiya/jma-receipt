@@ -161,7 +161,7 @@
                05  SPA-GMN-BYOLST-AREA.
                    07  SPA-GMN-BYOLST-MAX          PIC 9(05).
                    07  SPA-GMN-BYOLST-SEL          PIC 9(05).
-                   07  SPA-GMN-BYOLST-OCC          OCCURS  201.
+                   07  SPA-GMN-BYOLST-OCC          OCCURS  401.
                        09  SPA-GMN-TBYOMEI         PIC X(100).
                        09  SPA-GMN-TJYKN           PIC X(01).
                        09  SPA-GMN-TUTAGAI         PIC X(01).
@@ -192,7 +192,7 @@
                05  SPA-NAI-HEAD-AREA.
                    07  SPA-NAI-SYS-UTAGAIKBN   PIC X(01).
                05  SPA-NAI-BYOLST-AREA.
-                   07  SPA-NAI-BYOLST-OCC      OCCURS  201.
+                   07  SPA-NAI-BYOLST-OCC      OCCURS  401.
                        09  SPA-NAI-TBYOSTATUS  PIC X(01).
                        09  SPA-NAI-TBYOCD-G.
                            11  SPA-NAI-TBYOCD  PIC X(07)
@@ -209,7 +209,7 @@
                    07  SPA-NAI-INPUT-MODE      PIC 9(1).
                    07  SPA-NAI-SELNUM          PIC 9(3).
                    07  SPA-NAI-SELNUM-FLG      PIC 9(1)
-                                               OCCURS  200.
+                                               OCCURS  400.
                    07  SPA-NAI-BYOINF-G.
                        09  SPA-NAI-BYOINF-OVER     PIC 9(01).
                        09  SPA-NAI-BYOINF-CNT      PIC 9(03).
@@ -313,7 +313,7 @@
                05  WRK-SELNUM-X            PIC X(50).
                05  WRK-SELNUM              PIC 9(03).
                05  WRK-SELNUM-FLG          PIC 9(01)
-                                           OCCURS  200.
+                                           OCCURS  400.
            03  WRK-NO                      PIC 9(05).
            03  WRK-PRT-NO-G.
                05  WRK-PRT-NO              PIC ZZ9.
@@ -329,7 +329,7 @@
            03  WRK-SAVE-G.
                05  WRK-SAVE-MAX            PIC 9(05).
                05  WRK-SAVE-IDX-G.
-                   07  WRK-SAVE-OCC        OCCURS  200.
+                   07  WRK-SAVE-OCC        OCCURS  400.
                        09  WRK-SAVE-IDX    PIC 9(05).
                        09  WRK-SAVE-CTRL   PIC X(01).
            03  WRK-BYOCD-CUR-G.
@@ -368,7 +368,7 @@
        01  CONST-AREA.
            03  CONST-BYOCD-MAX             PIC 9(05)   VALUE   6.
            03  CONST-MKCD-MAX              PIC 9(05)   VALUE   21.
-           03  CONST-BYOLST-MAX            PIC 9(05)   VALUE   200.
+           03  CONST-BYOLST-MAX            PIC 9(05)   VALUE   400.
            03  CONST-SRCBYOLST-MAX         PIC 9(05)   VALUE   50.
            03  CONST-CDLST-MAX             PIC 9(05)   VALUE   150.
            03  CONST-SRTKBN-MAX            PIC 9(05)   VALUE   50.

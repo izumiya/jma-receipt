@@ -816,7 +816,7 @@
            03  CONST-TCHK-MAX                      PIC 9(05)
                                                    VALUE   2000.
            03  CONST-TCHK-STK-CD-MAX               PIC 9(05)
-                                                   VALUE   200.
+                                                   VALUE   400.
            03  CONST-THKN-MAX                      PIC 9(05)
                                                    VALUE   100.
            03  CONST-PTACCT-MAX                    PIC 9(05)

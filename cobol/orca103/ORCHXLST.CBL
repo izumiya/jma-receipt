@@ -219,7 +219,7 @@
                05  WRK-CMB-ITM         PIC X(200).
            03  WRK-TEKCD-G.
                05  WRK-TEKCD-MAX       PIC 9(05).
-               05  WRK-TEKCD-OCC       OCCURS  200.
+               05  WRK-TEKCD-OCC       OCCURS  400.
                    07  WRK-DMKBN       PIC X(01).
                    07  WRK-TEKCD       PIC X(170).
            03  WRK-MIDASI1             PIC X(68).
@@ -325,7 +325,7 @@
                                            VALUE "無：チェックしない".
            03  CONST-CHKERR-MES-R      REDEFINES   CONST-CHKERR-MES-VAL.
                05  CONST-CHKERR-MES    PIC X(20)   OCCURS  2.
-           03  CONST-TEKCD-MAX         PIC 9(05)   VALUE   200.
+           03  CONST-TEKCD-MAX         PIC 9(05)   VALUE   400.
       *
       *    病名システム予約コードテーブル
            COPY    "CMBYOMEICD.INC".

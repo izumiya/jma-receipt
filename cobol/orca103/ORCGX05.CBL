@@ -83,7 +83,7 @@
                        09  SPA-GMN-JYKNKBNMEI  PIC X(10).
                    07  SPA-GMN-TBL.
                        09  SPA-GMN-TBL-MAX     PIC 9(05).
-                       09  SPA-GMN-TBL-OCC     OCCURS  200.
+                       09  SPA-GMN-TBL-OCC     OCCURS  400.
                            11  SPA-GMN-TTEKCD     PIC X(20).
                            11  SPA-GMN-TNAME      PIC X(100).
                            11  SPA-GMN-TDMKBN-G.
@@ -209,7 +209,7 @@
        01  TBL-AREA.
            03  TBL-GMN-AREA.
                05  TBL-GMN-MAX         PIC 9(05).
-               05  TBL-GMN-OCC         OCCURS  200.
+               05  TBL-GMN-OCC         OCCURS  400.
                    07  TBL-GMN-TTEKCD     PIC X(20).
                    07  TBL-GMN-TNAME      PIC X(100).
                    07  TBL-GMN-TDMKBN     PIC 9(01).
@@ -226,9 +226,9 @@
                05  WRK-HDD         PIC 9(02).
       *
        01  CONST-AREA.
-           03  CONST-TEKCD-MAX     PIC 9(05)   VALUE   200.
+           03  CONST-TEKCD-MAX     PIC 9(05)   VALUE   400.
            03  CONST-LINE-MAX      PIC 9(03)   VALUE   20. 
-           03  CONST-PAGE-MAX      PIC 9(02)   VALUE   10.
+           03  CONST-PAGE-MAX      PIC 9(02)   VALUE   20.
            03  CONST-MKCD-MAX      PIC 9(03)   VALUE   21. 
            03  CONST-SRY           PIC 9(01)   VALUE   0.
            03  CONST-BYO           PIC 9(01)   VALUE   1.

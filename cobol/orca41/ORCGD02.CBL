@@ -69,7 +69,7 @@
                05  SPA-GMN-CHKLST-MAX  PIC 9(5).
                05  SPA-GMN-CHKLST-SEL  PIC 9(5).
                05  SPA-GMN-CHKLST-NEXT PIC 9(01).
-               05  SPA-GMN-CHKLST-OCC  OCCURS  200.
+               05  SPA-GMN-CHKLST-OCC  OCCURS  400.
                    07  SPA-GMN-TNUM    PIC 9(5).
                    07  SPA-GMN-TTESTPT PIC X(1).
                    07  SPA-GMN-TPTNUM  PIC X(20).
@@ -105,7 +105,7 @@
                05  SPA-NAI-INPUT-AREA.
                    07  SPA-NAI-PTID        PIC  9(10).
            03  SPA-NAI-CHKLST-AREA.
-               05  SPA-NAI-CHKLST-OCC      OCCURS  200.
+               05  SPA-NAI-CHKLST-OCC      OCCURS  400.
                    07  SPA-NAI-TPTID       PIC 9(10).
                    07  SPA-NAI-TKBNCD      PIC X(08).
                    07  SPA-NAI-TSTYUKYMD   PIC X(08).
@@ -160,7 +160,7 @@
            03  WRK-CHKLST-ROW              PIC S9(9).
       *
        01  CONST-AREA.
-           03  CONST-CHKLST-MAX            PIC 9(05)   VALUE   200.
+           03  CONST-CHKLST-MAX            PIC 9(05)   VALUE   400.
       *
       *    データチェック一括処理パラメータ
            COPY    "CPORCBSD01PARA.INC".

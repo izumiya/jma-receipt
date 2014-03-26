@@ -125,7 +125,7 @@
       *
        01  WRK-LCHKLST-AREA.
            03  WRK-LCHKLST-MAX             PIC 9(05).
-           03  WRK-LCHKLST-OCC             OCCURS   200.
+           03  WRK-LCHKLST-OCC             OCCURS   400.
                05  WRK-LCHKLST-NAME        PIC X(100).
                05  WRK-LCHKLST-SRYCD       PIC X(09).
                05  WRK-LCHKLST-JYKN        PIC X(01).
@@ -149,7 +149,7 @@
        01  CONST-AREA.
            03  CONST-MKCD-MAX              PIC 9(05)   VALUE   21.
            03  CONST-SELCHKLST-MAX         PIC 9(05)   VALUE   50.
-           03  CONST-CHKLST-MAX            PIC 9(05)   VALUE   200.
+           03  CONST-CHKLST-MAX            PIC 9(05)   VALUE   400.
            03  CONST-JYKN-MAX              PIC 9(05)   VALUE   4.
            03  CONST-JYKN-VAL.
                05                          PIC X(01)   VALUE   "1".

@@ -233,7 +233,7 @@
                05  TCHK-ACT-BYOMEI                     PIC X(160).
                05  TCHK-ACT-CD-G.
                    07  TCHK-ACT-CD-MAX                 PIC 9(05).
-                   07  TCHK-ACT-CD-OCC                 OCCURS  200.
+                   07  TCHK-ACT-CD-OCC                 OCCURS  400.
                        09  TCHK-ACT-CD                 PIC X(09).
                        09  TCHK-ACT-DAYMONTHKBN        PIC X(01).
                        09  TCHK-ACT-NYUGAIKBN          PIC X(01).
@@ -258,7 +258,7 @@
                    07  TCHK-STK-BYOMEI                 PIC X(160).
                    07  TCHK-STK-CD-G.
                        09  TCHK-STK-CD-MAX             PIC 9(05).
-                       09  TCHK-STK-CD-OCC             OCCURS  200.
+                       09  TCHK-STK-CD-OCC             OCCURS  400.
                            11  TCHK-STK-CD             PIC X(09).
                            11  TCHK-STK-DAYMONTHKBN    PIC X(01).
                            11  TCHK-STK-NYUGAIKBN      PIC X(01).

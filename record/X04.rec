@@ -184,8 +184,8 @@ X04	{
 					value2	varchar(150);
 					value3	varchar(12);
 					value4	varchar(4);
-				}	[200];
-				select	bool[200];
+				}	[400];
+				select	bool[400];
 			};
 		};
 		scrolledwindow3	{
