@@ -495,6 +495,11 @@
                    IF     (IDX             >   1   )  AND
                           (WRK-NYUHKTCD (IDX)
                                            =   WRK-NYUHKTCD (IDX - 1))
+      *!!!
+      *            入院料コード毎にチェックする
+                   AND    (WRK-NYUSRYCD (IDX)
+                                           =   WRK-NYUSRYCD (IDX - 1))
+      *!!!
                        MOVE    ORCSCHKTALL-HKTCHKFLG (IDX - 1)
                                                TO  ORCSCHKTALL-HKTCHKFLG
                                                                   (IDX)

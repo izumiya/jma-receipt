@@ -1327,6 +1327,9 @@
                WHEN    IDY             <=  3500
                    MOVE    "7"                 TO  SYS-1006-KBNCD
                    MOVE    3000                TO  IDS
+               WHEN    IDY             <=  8500
+                   MOVE    "17"                TO  SYS-1006-KBNCD
+                   MOVE    8000                TO  IDS
            END-EVALUATE
            MOVE    SPA-SRYYMD          TO  SYS-1006-STYUKYMD
            MOVE    SPA-SRYYMD          TO  SYS-1006-EDYUKYMD
