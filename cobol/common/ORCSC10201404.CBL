@@ -3980,11 +3980,11 @@
                   MOVE    "114026770"         TO  WRK-SRYCD
            END-EVALUATE
       *
-           EVALUATE    WRK-COM-INPUTCD (IDX-Z)
+      **** EVALUATE    WRK-COM-INPUTCD (IDX-Z)
       *        ºßÂð´µ¼ÔË¬Ìä¿Ç»¡ÎÁ
-               WHEN    "114012910"
-                  MOVE    "114023070"         TO  WRK-SRYCD
-           END-EVALUATE
+      *        WHEN    "114012910"
+      *           MOVE    "114023070"         TO  WRK-SRYCD
+      **** END-EVALUATE
       *
            IF      WRK-SRYCD       NOT =   SPACE
                PERFORM 1110-KASAN-CHK-SEC
