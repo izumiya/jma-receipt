@@ -6069,6 +6069,9 @@
                                ELSE
                                    MOVE    ZERO            TO  FLG-HIT
                                END-IF
+                           WHEN    032
+                           WHEN    036
+                           WHEN    037
                            WHEN    081
                            WHEN    083
                            WHEN    172
