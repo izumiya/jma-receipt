@@ -124,6 +124,7 @@
            03  IDX-SKJ                     PIC 9(02).
            03  IDX-GAIHAKU                 PIC 9(02).
            03  IDX-HKN                     PIC 9(02).
+           03  IDX-KSN                     PIC 9(02).
            03  KIKAN-IDX1                  PIC 9(04).
            03  KIKAN-IDX2                  PIC 9(04).
            03  IDX-SKJ-TAIHI               PIC 9(02).
@@ -188,6 +189,8 @@
            03  WRK-TAIHI-SKJ20             PIC 9(02)   OCCURS  31.
            03  WRK-TAIHI-GAIHAKU           PIC 9(01)   OCCURS  31.
            03  WRK-TAIHI-HKN               PIC 9(04)   OCCURS  31.
+           03  WRK-TAIHI-KSN-SRYCD         PIC X(09).
+           03  WRK-TAIHI-KSN-DAY           PIC 9(01)   OCCURS  31.
            03  WRK-ZOGENPTN                PIC X(01).
            03  WRK-ZOGEN                   PIC S9(05).
            03  WRK-KEISANYMD               PIC X(08).
@@ -777,6 +780,38 @@
                           UNTIL (IDX-HKN       >    31)
                            MOVE    NACCT-DAY(IDX-HKN)
                                            TO  WRK-TAIHI-HKN(IDX-HKN)
+                       END-PERFORM
+                   END-IF
+      *
+      *            ÆþÂà±¡ÅÐÏ¿²èÌÌ¤ÇÀßÄê¤¹¤ë²Ã»»¤ÎÂàÈò
+      *              Í­¾²¿ÇÎÅ½ê°ìÈÌÉÂ¾²½é´ü²Ã»»¡ÊÍ­¾²¿ÇÎÅ½êÆþ±¡´ðËÜÎÁ¡Ë
+      *              190135470
+      *              µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÍ­¾²¿ÇÎÅ½êÎÅÍÜÉÂ¾²Æþ±¡´ðËÜÎÁ¡Ë
+      *              190135670
+      *              µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»
+      *              190134270
+      *              µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¡ÊÎÅÍÜÉÂÅïÆþ±¡´ðËÜÎÁ£±¡Ë
+      *              190143370
+      *              µßµÞ¡¦ºßÂðÅù»Ù±çÉÂ¾²½é´ü²Ã»»¡Ê°ìÈÌÉÂÅïÆþ±¡´ðËÜÎÁ¡Ë
+      *              190142970
+      *              µßµÞ¡¦ºßÂðÅù»Ù±çÉÂ¾²½é´ü²Ã»»¡ÊÆÃÄê°ìÈÌÉÂÅïÆþ±¡ÎÁ¡Ë
+      *              190152470
+      *              µßµÞ¡¦ºßÂðÅù»Ù±çÉÂ¾²½é´ü²Ã»»¡ÊÃÏ°èÊñ³ç¥±¥¢ÉÂÅïÆþ±¡ÎÁ¡Ë
+      *              190177170
+                   IF    ( NACCT-ZAISKBKBN     =    "6"    )  AND
+                         ( NACCT-SRYCDTOTAL    =    190135470 OR
+                                                    190135670 OR
+                                                    190134270 OR
+                                                    190143370 OR
+                                                    190142970 OR
+                                                    190152470 OR
+                                                    190177170 )
+                       MOVE    NACCT-SRYCDTOTAL(6:9)
+                                               TO   WRK-TAIHI-KSN-SRYCD
+                       PERFORM VARYING IDX-KSN  FROM 1 BY 1
+                          UNTIL (IDX-KSN       >    31)
+                           MOVE    NACCT-DAY(IDX-KSN)
+                                         TO  WRK-TAIHI-KSN-DAY(IDX-KSN)
                        END-PERFORM
                    END-IF
       *
@@ -2626,6 +2661,10 @@
            MOVE    LNK-NYUKSNGET-TOKUBETSU-NYUIN
                                         TO  WRK-TOKUBETSU-NYUIN
       *
+      *    »öÁ°¤ËÂàÈò¤·¤Æ¤¤¤¿Æþ±¡ÎÁ²Ã»»¤Î¥»¥Ã¥È
+           MOVE    SPACE     TO  LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX8)
+           MOVE    WRK-TAIHI-KSN-SRYCD
+                             TO  LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
            .
       *
        410191-NYUKSN-GET-EXT.
