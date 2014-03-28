@@ -399,16 +399,62 @@
            03   FILLER                     PIC X(09) VALUE "190167410".
       *40  療養病棟入院基本料２（入院基本料Ｈ）（生活療養）（夜勤時間超過減算）
            03   FILLER                     PIC X(09) VALUE "190167610".
-      *41  療養病棟入院基本料２（入院基本料Ｉ）（生活療養）（夜勤時間超過減算）
+      *    療養病棟入院基本料２（入院基本料Ｉ）（生活療養）（夜勤時間超過減算）
            03   FILLER                     PIC X(09) VALUE "190167810".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190177710".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190177910".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190178110".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190178310".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190178510".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190178710".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190178910".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190179110".
+      *50  短手３
+           03   FILLER                     PIC X(09) VALUE "190179310".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190179510".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190179710".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190179910".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190180110".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190180310".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190180510".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190180710".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190180910".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190181110".
+      *60  短手３
+           03   FILLER                     PIC X(09) VALUE "190181310".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190181510".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190181710".
+      *    短手３
+           03   FILLER                     PIC X(09) VALUE "190181910".
+      *64  短手３
+           03   FILLER                     PIC X(09) VALUE "190182110".
       *
-      *42  有床診療所療養病床入院基本料（特別入院基本料）（生活療養）
+      *65  有床診療所療養病床入院基本料（特別入院基本料）（生活療養）
            03   FILLER                     PIC X(09) VALUE "190124810".
-      *43  療養病棟入院基本料（特別入院基本料）（生活療養）
+      *66  療養病棟入院基本料（特別入院基本料）（生活療養）
            03   FILLER                     PIC X(09) VALUE "190124210".
       *
        01  TBL-H26-SEIKATSU-R     REDEFINES  TBL-H26-SEIKATSU-AREA.
-           03   TBL-H26-SEISRYCD           PIC X(09)  OCCURS  43.
+           03   TBL-H26-SEISRYCD           PIC X(09)  OCCURS  66.
       *
       *    一時領域
        01  WRK-AREA.
@@ -477,7 +523,7 @@
            COPY    "CPORCSSYOTOKU.INC".
       *
       *    入院料未算定日取得サブ
-           COPY    "CPORCSNYUINDAY.INC".
+           COPY    "CPORCSNYUINDAY2.INC".
       *
       *    医療区分取得サブ
            COPY    "CPORCSS008.INC".
@@ -520,6 +566,12 @@
                PERFORM 200-MAIN-SEC
            END-IF
       *
+      *     PERFORM    VARYING IDX   FROM   1   BY  1
+      *                UNTIL IDX   >   31
+      *       DISPLAY "IDX = " IDX
+      *       DISPLAY "LNK-NYULIFE-KBN = " LNK-NYULIFE-KBN(IDX)
+      *       DISPLAY "LNK-NYULIFE-FTNKBN2 = " LNK-NYULIFE-FTNKBN2(IDX)
+      *     END-PERFORM
            .
        000-PROC-EXT.
       *
@@ -806,7 +858,7 @@
                        MOVE       ZERO        TO   FLG-SEI
                                                    IDX-SEI2
                        PERFORM    VARYING   IDX-SEI  FROM 1  BY  1
-                         UNTIL   (IDX-SEI   >   43)    OR
+                         UNTIL   (IDX-SEI   >   66)    OR
                                  (FLG-SEI   =    1)
                              IF  NSRY-SRYCD(1) = TBL-H26-SEISRYCD
                                                         (IDX-SEI)
@@ -830,7 +882,7 @@
       *                        病状の程度、治療の内容をしん酌して標準
       *                        負担額を軽減する患者の判定（特別入院基本料算定時の
       *                                                    ＡＤＬ入力判断）
-                               IF (IDX-SEI2   =   42  OR  43)    AND
+                               IF (IDX-SEI2   =   65  OR  66)    AND
                                   (SS008-MEDKBNDAY(IDX1)  =  "2" OR
                                                              "3" )
                                    MOVE   "1"   TO   
@@ -856,11 +908,11 @@
       *
       *    短期滞在手術基本料２（短期滞在手術基本料３）の入院料未算定日
       *    について生活療養の該当日と軽減区分２の情報を取得（サブプロより取得）
-           INITIALIZE                          ORCSNYUINDAY-AREA
+           INITIALIZE                          ORCSNYUINDAY2-AREA
            MOVE    LNK-NYULIFE-HOSPNUM     TO  LNK-NYUINDAY-HOSPNUM
            MOVE    LNK-NYULIFE-PTID        TO  LNK-NYUINDAY-PTID
            MOVE    LNK-NYULIFE-SANTEIYM    TO  LNK-NYUINDAY-SANTEIYM
-           CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
+           CALL    "ORCSNYUINDAY2"     USING   ORCSNYUINDAY2-AREA
                                                SPA-AREA
            IF      LNK-NYUINDAY-RC         =   ZERO
                IF    LNK-NYUINDAY-TANKI2-TBL   NOT =    SPACE
@@ -870,6 +922,10 @@
                                MOVE   "1"   TO   LNK-NYULIFE-KBN(IDX1)
                                MOVE   "1"   TO
                                              LNK-NYULIFE-FTNKBN2(IDX1)
+                               IF   LNK-NYUINDAY-TANKI3-KBN(IDX1) = "2"
+                                    MOVE   SPACE  TO
+                                              LNK-NYULIFE-FTNKBN2(IDX1)
+                               END-IF
                                MOVE    1    TO   FLG-OK
                          END-IF
                    END-PERFORM

@@ -16,11 +16,11 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION              DIVISION.
-       PROGRAM-ID.                 ORCSNYUINDAY.
+       PROGRAM-ID.                 ORCSNYUINDAY2.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : 入院
-      *  コンポーネント名  : 入院料未算定日取得
+      *  コンポーネント名  : 入院料未算定日取得２
       *  管理者            : 
       *  作成日付    作業者        記述
       *  07/12/13    NACL−小豆沢  新規作成
@@ -286,13 +286,13 @@
       *****************************************************************
         LINKAGE                     SECTION.
       *
-           COPY    "CPORCSNYUINDAY.INC".
+           COPY    "CPORCSNYUINDAY2.INC".
       *
       *    スパ領域
            COPY    "COMMON-SPA".
       *
        PROCEDURE                   DIVISION    USING
-           ORCSNYUINDAY-AREA
+           ORCSNYUINDAY2-AREA
            SPA-AREA
            .
       *
@@ -698,6 +698,7 @@
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
                             MOVE  "1"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
+                            MOVE  "1"  TO  LNK-NYUINDAY-TANKI3-KBN(IDX)
                          END-IF
                       END-PERFORM
                  END-IF
@@ -766,6 +767,7 @@
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
                             MOVE  "2"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
+                            MOVE  "2"  TO  LNK-NYUINDAY-TANKI3-KBN(IDX)
                          END-IF
                       END-PERFORM
                  END-IF
