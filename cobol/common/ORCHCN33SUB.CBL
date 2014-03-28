@@ -51,6 +51,8 @@
       *  04.05.03    NACL-門脇    12/03/13  改正対応（外泊区分６，７の対応）
       *  04.05.04    NACL-門脇    12/09/18  改正対応（外泊区分８，９の対応）
       *  04.07.01    NACL-門脇    14/03/14  平成２６年４月改正対応
+      *  04.07.02    NACL-門脇    14/03/26  平成２６年４月改正対応
+      *                                     （夜勤時間経過減算の選定対応）
       *****************************************************************
       *
       *
@@ -1124,9 +1126,23 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                MOVE    "key2"   TO  MCP-PATHNAME
                                PERFORM  910-SENTEICDCHG-READ-SEC
                                IF    FLG-SENTEICDCHG  =   ZERO
+                                 IF  SENCHG-IPNSRYCD  =
+                                                  SENCHG-SENTEISRYCD
+      *                            夜勤時間経過減算の選定対応
+      *                            "190131410","190165810","190165910",
+      *                            "190131310"
+                                   IF  LNK-ORCHCN33SUB-SANTEIYM
+                                                  >= "201404"
+                                    ADD    1    TO  WRK-MEISAISU
+                                    MOVE  "190122890"
+                                                TO  WRK-SO-SRYCD
+                                                   (IDX1 WRK-MEISAISU)
+                                   END-IF
+                                 ELSE
                                    MOVE  SENCHG-SENTEISRYCD
                                                 TO  WRK-SO-SRYCD
                                                    (IDX1 WRK-MEISAISU)
+                                 END-IF
                                END-IF
                           END-IF
                           MOVE    "tbl_senteicdchg"    TO  MCP-TABLE
@@ -1463,6 +1479,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                       MOVE   "190107290"   TO  WRK-GAIHAKU(IDX1)
                     WHEN     2
                       MOVE   "190107390"   TO  WRK-GAIHAKU(IDX1)
+                    WHEN     3
+                      MOVE   "999999999"   TO  WRK-GAIHAKU(IDX1)
                     WHEN     4
                     WHEN     5
                     WHEN     6
@@ -1482,6 +1500,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                       MOVE   "190107490"   TO  WRK-GAIHAKU(IDX1)
                     WHEN     2
                       MOVE   "190107590"   TO  WRK-GAIHAKU(IDX1)
+                    WHEN     3
+                      MOVE   "999999999"   TO  WRK-GAIHAKU(IDX1)
                     WHEN     4
                     WHEN     5
                     WHEN     6

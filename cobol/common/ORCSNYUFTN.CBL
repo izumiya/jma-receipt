@@ -155,6 +155,8 @@
       *                                     力を行った場合のチェック修正
       *  04.07.06    NACL-門脇    14/03/01  労災マスタ追加対応
       *  04.07.07    NACL-門脇    14/03/04  平成２６年４月改正対応
+      *  04.07.08    NACL-門脇    14/03/26  平成２６年４月改正対応
+      *                                     （夜勤時間経過減算の選定対応）
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4034,6 +4036,23 @@ grpsys                                SPA-AREA
                PERFORM  CSR-CLOSE-SEC
       *
                IF   FLG-SENTEICDCHG = ZERO
+                IF    SENCHG-IPNSRYCD  =  SENCHG-SENTEISRYCD
+      *           夜勤時間経過減算の選定対応
+      *           "190131410","190165810","190165910","190131310"
+                  IF   SYU-SRYYMD(1:6) >= "201404"
+                    COMPUTE    WRK-SENTEI-KHNTEN  =
+                              (WRK-KHNTEN * 0.85) +  0.5
+                    COMPUTE    WRK-SENTEI-ZAITEN  =  WRK-SENTEI-KHNTEN
+                                                  +  WRK-KSNTEN
+                    IF     WRK-HYOKETU-TEN    NOT =   ZERO
+      *               標欠：％減算
+                      COMPUTE    WRK-SENTEI-ZAITEN  =
+                               ( WRK-SENTEI-ZAITEN  -
+                                (WRK-SENTEI-ZAITEN  *
+                                 (WRK-HYOKETU-TEN   /  100)))  +  0.5
+                    END-IF
+                  END-IF
+                ELSE
                  MOVE    SPACE         TO   TNS-TENSU-REC
                  INITIALIZE                 TNS-TENSU-REC
                  MOVE     LNK-S02-HOSPNUM   TO  TNS-HOSPNUM
@@ -4059,6 +4078,7 @@ grpsys                                SPA-AREA
                                 (WRK-HYOKETU-TEN   /  100)))  +  0.5
                    END-IF
                  END-IF
+                END-IF
                END-IF
       *
            END-IF
