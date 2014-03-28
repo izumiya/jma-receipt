@@ -205,9 +205,10 @@
                        MOVE    ZERO           TO  FLG-CHK2
       *                前が空白か改行であること
                        COMPUTE IDX4        =   (IDX   -  1 )
-                       IF     (IDX4        >   ZERO )
+                       IF     (IDX4        =   ZERO )
+                         OR  ((IDX4        >   ZERO )
                          AND  (WRK-OPTION(IDX4:1)   =   SPACE
-                                                OR  X"0A" )
+                                                OR  X"0A" ))
                            CONTINUE
                        ELSE
                            MOVE    1              TO  FLG-CHK2
