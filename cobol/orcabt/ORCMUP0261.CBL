@@ -20,7 +20,7 @@
       *****************************************************************
       *  システム名        : ＯＲＣＡ
       *  サブシステム名    : ＤＢ作成処理
-      *  コンポーネント名  : 一般選定置換
+      *  コンポーネント名  : 選定療養費一般コード振替
       *                    : 
       *  管理者            : 
       *  作成日付    作業者        記述
@@ -35,7 +35,7 @@
        INPUT-OUTPUT                SECTION.
        FILE-CONTROL.
       *
-      *    入力：一般選定置換更新データ
+      *    入力：選定療養費一般コード振替更新データ
            SELECT  IN-FILE         ASSIGN
                                    ASS-IN
                                    ORGANIZATION    IS  LINE SEQUENTIAL
@@ -54,7 +54,7 @@
        DATA                        DIVISION.
        FILE                        SECTION.
       *
-      *    入力：一般選定置換更新データ
+      *    入力：選定療養費一般コード振替更新データ
        FD  IN-FILE.
        01  SENTEICDCHGWK-REC.
            03  SENTEICDCHGWK-SYORIKBN     PIC  X(01).
@@ -144,7 +144,7 @@ grpsys     COPY    "COMMON-SPA".
                05  MES-TITLE1-HOSPNUM  PIC 9(02).
       *
        01  WRK-MSG-AREA.
-           03  WRK-MSG-01              PIC X(30).
+           03  WRK-MSG-01              PIC X(32).
            03  FILLER                  PIC X(01)   VALUE   SPACE.
            03  WRK-SYORIKBN            PIC X(01).
            03  FILLER                  PIC X(01)   VALUE   ",".
@@ -161,7 +161,7 @@ grpsys     COPY    "COMMON-SPA".
       *    ファイル定義
       *****************************************************************
       *
-      *    一般選定置換
+      *    選定療養費一般コード振替
        01  SENTEICDCHG-REC.
            COPY    "CPSENTEICDCHG.INC".
       *
@@ -238,7 +238,7 @@ grpsys     COPY    "COMMON-SPA".
       *    出力ファイル　初期処理
            PERFORM 2700-OUTLST-INIT-SEC
       *
-      *    一般選定置換更新データ読込み処理
+      *    選定療養費一般コード振替更新データ読込み処理
            IF      FLG-IN              =   ZERO
                PERFORM 900-IN-KENSAKU-SEC
            END-IF
@@ -300,7 +300,7 @@ grpsys     COPY    "COMMON-SPA".
                PERFORM 2030-DELETE-SYORI-SEC
            END-EVALUATE
       *
-      *    一般選定置換更新データ読込み処理
+      *    選定療養費一般コード振替更新データ読込み処理
            PERFORM 900-IN-KENSAKU-SEC
            .
        200-MAIN-EXT.
@@ -408,7 +408,7 @@ grpsys     COPY    "COMMON-SPA".
                                       TO  WRK-SENTEISRYCD
            EVALUATE    WRK-ERRCD
                WHEN    1
-                   MOVE  "一般選定置換登録済み"
+                   MOVE  "選定療養費一般コード振替登録済み"
                                        TO  WRK-MSG-01
                WHEN    2
                    MOVE  "追加エラー"  TO  WRK-MSG-01
@@ -498,7 +498,7 @@ grpsys     COPY    "COMMON-SPA".
            EXIT.
       *
       *****************************************************************
-      *     一般選定置換変更データ読込み処理
+      *     選定療養費一般コード振替変更データ読込み処理
       *****************************************************************
        900-IN-KENSAKU-SEC          SECTION.
       *
@@ -514,7 +514,7 @@ grpsys     COPY    "COMMON-SPA".
           EXIT.
       *
       *****************************************************************
-      *    一般選定置換読込
+      *    選定療養費一般コード振替読込
       *****************************************************************
        910-SENTEICDCHG-READ-SEC   SECTION.
       *

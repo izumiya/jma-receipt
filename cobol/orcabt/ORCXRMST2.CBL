@@ -842,7 +842,8 @@ grpsys                                 SPA-AREA
            WHEN    "25"
                MOVE    "拆割瘦副荚マスタ"      TO  WRK-MSTNAME
            WHEN    "26"
-               MOVE    "办忍联年弥垂マスタ"    TO  WRK-MSTNAME
+               MOVE    "联年闻蛙锐办忍コ〖ド慷仑マスタ"
+                                               TO  WRK-MSTNAME
            WHEN    OTHER
                MOVE    PARA-MASTER-KBN         TO  WRK-MSTNAME
            END-EVALUATE

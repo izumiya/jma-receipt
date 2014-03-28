@@ -726,7 +726,7 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                    MOVE    "拆割瘦副荚マスタ"
                                           TO  SPA-GMN-MASTNAME(IDX2)
                WHEN    "ORCADB26"
-                   MOVE    "办忍联年弥垂マスタ"
+                   MOVE    "联年闻蛙锐办忍コ〖ド慷仑マスタ"
                                           TO  SPA-GMN-MASTNAME(IDX2)
                WHEN    OTHER
                    MOVE    MSTKANRI-KANRICD
