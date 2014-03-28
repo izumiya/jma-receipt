@@ -75,6 +75,8 @@
            03  FLG-ARI             PIC 9(01).
            03  FLG-SYORI-END       PIC 9(01).
            03  FLG-CHK             PIC 9(01).
+           03  FLG-TANKI           PIC 9(01).
+           03  FLG-TANKI-NASI      PIC 9(01).
       *    選定療養費
            03  FLG-SENTEI              PIC 9(01).
       *    食事
@@ -1142,6 +1144,46 @@
                  END-IF
              END-IF
            END-IF
+      *
+      *    短期滞在手術等入院基本料の判定
+           MOVE    ZERO                    TO  FLG-TANKI
+           IF      LNK-SCNYUACCT-STSRYYMD  >=  "20140401"
+      *
+             MOVE  LNK-SCNYUACCT-STSRYYMD  TO  TNS-YUKOSTYMD
+             MOVE  LNK-SCNYUACCT-STSRYYMD  TO  TNS-YUKOEDYMD
+             MOVE  SPA-HOSPNUM             TO  TNS-HOSPNUM
+             MOVE  LNK-SCNYUACCT-NYUKHN-SRYCD (1)
+                                           TO  TNS-SRYCD
+             MOVE    TNS-TENSU-REC         TO  MCPDATA-REC
+             MOVE    "tbl_tensu"           TO  MCP-TABLE
+             MOVE    "key"                 TO  MCP-PATHNAME
+             PERFORM 910-DBSELECT-SEC
+             IF      MCP-RC                =   ZERO
+                 MOVE    "tbl_tensu"       TO  MCP-TABLE
+                 MOVE    "key"             TO  MCP-PATHNAME
+                 PERFORM 920-DBFETCH-SEC
+                 IF      MCP-RC            =   ZERO
+                     MOVE    MCPDATA-REC   TO  TNS-TENSU-REC
+                     IF   TNS-NYUKHNKSNKBN  =  226  OR
+                                               240
+                         MOVE    1         TO  FLG-TANKI
+                     END-IF
+                     MOVE    ZERO          TO  FLG-TENSU
+                 ELSE
+                     INITIALIZE                  TNS-TENSU-REC
+                     MOVE    1                   TO  FLG-TENSU
+                 END-IF
+             ELSE
+                 INITIALIZE                  TNS-TENSU-REC
+                 MOVE    1                   TO  FLG-TENSU
+             END-IF
+      *
+             MOVE    "tbl_tensu"         TO  MCP-TABLE
+             MOVE    "key"               TO  MCP-PATHNAME
+             PERFORM 990-DBCLOSE-SEC
+      *
+           END-IF
+      *
       *    加算により剤を決定する
            PERFORM VARYING     IDX-K   FROM    1   BY  1
                    UNTIL       IDX-K   >   10
@@ -2514,6 +2556,7 @@
       *****************************************************************
        400-NYUACT-SYORI-SEC            SECTION.
       *
+      *
       *    点数算定
       *    PERFORM VARYING     IDX     FROM    1   BY  1
       *            UNTIL      (IDX     >   10  )  OR
@@ -2522,13 +2565,36 @@
       *        PERFORM 4001-TENSU-KEI-SEC
       *    END-PERFORM
       *
+           MOVE   ZERO                     TO  FLG-TANKI-NASI
+      *
            IF      WRK-KHN-STYMD(1:6)  =   WRK-KHN-EDYMD(1:6)
-      *        開始と終了が同じ月の時
+      *      開始と終了が同じ月の時
+             IF   (FLG-TANKI                =   1)   AND
+                  (WRK-ACT-ZAISKBKBN        =   "1")
+               MOVE    1                   TO  FLG-TANKI-NASI
                MOVE    WRK-KHN-STYMD       TO  WRK-ACT-STYMD
                MOVE    WRK-KHN-EDYMD       TO  WRK-ACT-EDYMD
                PERFORM 4001-NYUACT-TBL-SEC
+             ELSE
+               MOVE    WRK-KHN-STYMD       TO  WRK-ACT-STYMD
+               MOVE    WRK-KHN-EDYMD       TO  WRK-ACT-EDYMD
+               PERFORM 4001-NYUACT-TBL-SEC
+             END-IF
            ELSE
-      *        開始と終了が違う月の時
+      *      開始と終了が違う月の時
+             IF   (FLG-TANKI                =   1)   AND
+                  (WRK-ACT-ZAISKBKBN        =   "1")
+      *        短期滞在手術等基本料の場合
+               MOVE    WRK-KHN-STYMD       TO  WRK-ACT-STYMD
+               MOVE    WRK-KHN-STYMD       TO  WRK-ACT-EDYMD
+               PERFORM 4001-NYUACT-TBL-SEC
+      *        終了日まで
+               MOVE    WRK-KHN-EDYMD       TO  WRK-ACT-STYMD
+               MOVE    "01"                TO  WRK-ACT-STYMD(7:2)
+               MOVE    WRK-KHN-EDYMD       TO  WRK-ACT-EDYMD
+               MOVE    1                   TO  FLG-TANKI-NASI
+               PERFORM 4001-NYUACT-TBL-SEC
+             ELSE
                MOVE    WRK-KHN-STYMD       TO  WRK-ACT-STYMD
       *        月末算定
                INITIALIZE                      STS-AREA-DAY
@@ -2546,6 +2612,7 @@
                MOVE    "01"                TO  WRK-ACT-STYMD(7:2)
                MOVE    WRK-KHN-EDYMD       TO  WRK-ACT-EDYMD
                PERFORM 4001-NYUACT-TBL-SEC
+             END-IF
            END-IF
       *
       *
@@ -3203,13 +3270,16 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        40024-NYUINACCT-HEN-SEC          SECTION.
       *
       *    回数セット
+           DISPLAY "FLG-TANKI-NASI ========== " FLG-TANKI-NASI
            MOVE    WRK-ACT-STYMD(7:2)  TO  IDX1
            MOVE    WRK-ACT-EDYMD(7:2)  TO  IDX2
            PERFORM VARYING     IDX-D   FROM    IDX1   BY  1
                    UNTIL       IDX-D   >   IDX2
       *         MOVE    WRK-ACT-DAY         TO  NACCT-DAY (IDX-D)
-               IF  (LNK-SCNYUACCT-NYUCAL-KBN  =  1)    AND
-                   (NACCT-ZAISKBKBN     =     "1"  OR  "6"  OR  "7")
+               IF ((LNK-SCNYUACCT-NYUCAL-KBN  =  1)    AND
+                   (NACCT-ZAISKBKBN     =     "1"  OR  "6"  OR  "7")) OR
+                  ((FLG-TANKI-NASI      =      1 )   AND 
+                   (NACCT-ZAISKBKBN     =     "1"))
                    MOVE     ZERO        TO  NACCT-DAY (IDX-D)
                ELSE
                    MOVE    WRK-ACT-DAY  TO  NACCT-DAY (IDX-D)
