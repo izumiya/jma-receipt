@@ -725,6 +725,9 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                WHEN    "ORCADB25"
                    MOVE    "介護保険者マスタ"
                                           TO  SPA-GMN-MASTNAME(IDX2)
+               WHEN    "ORCADB26"
+                   MOVE    "一般選定置換マスタ"
+                                          TO  SPA-GMN-MASTNAME(IDX2)
                WHEN    OTHER
                    MOVE    MSTKANRI-KANRICD
                                           TO  SPA-GMN-MASTNAME(IDX2)

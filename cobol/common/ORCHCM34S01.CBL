@@ -132,6 +132,7 @@
            03  IDXG                            PIC 9(05).
            03  IDXH                            PIC 9(05).
            03  IDXI                            PIC 9(05).
+           03  IDXJ                            PIC 9(05).
            03  IDX-KHN                         PIC 9(05).
            03  IDX-TAX                         PIC 9(05).
            03  IDX-SKJ                         PIC 9(05).
@@ -168,9 +169,11 @@
            03  WRK-HYOKETU-SRYCD               PIC X(09).
            03  WRK-SENTEI-TEN                  PIC S9(08).
            03  WRK-SENTEI-SRYCD                PIC X(09).
+           03  WRK-SENTEI-IPNCD                PIC X(09).
            03  WRK-SENTEI-ZAITEN               PIC  9(08).
            03  WRK-SENTEI-KHNTEN               PIC 9(08).
            03  WRK-SENTEISRYCD                 PIC X(09).
+           03  WRK-SENTEIIPNCD                  PIC X(09).
            03  WRK-SRYCDTOTAL                  PIC 9(09).
            03  WRK-SENTEI-KEISU                PIC 9V99.
            03  WRK-BRMSAGAKU                   PIC 9(07).
@@ -515,6 +518,9 @@
       *    ¿©»öÎÅÍÜÉ¸½àÉéÃ´³Û¡ÊÄã£±¡Ë
            03  CONST-SKJFTN-TEI1               PIC X(09)
                                                    VALUE "197001110".
+      *    ÁªÄêÎÅÍÜ¡ÊÆþ±¡£±£¸£°ÆüÄ¶¡Ë¸º»»¡ÊÆþ±¡´ðËÜÎÁ¡Ë
+           03  CONST-SENTEI                    PIC X(09)
+                                                   VALUE "190122890".
       *
            03  CONST-SKJ-COMMENT-G.
                05  CONST-SKJ-COMMENT-VAL.
@@ -1428,6 +1434,7 @@
            MOVE    ZERO                TO  IDX-KHN
            MOVE    ZERO                TO  WRK-GAIHAKU-KSNTEN
            MOVE    SPACE               TO  WRK-SENTEI-SRYCD
+           MOVE    SPACE               TO  WRK-SENTEI-IPNCD
            MOVE    ZERO                TO  WRK-SENTEI-TEN
            INITIALIZE                      WRK-KSNSRYCD-G
       *
@@ -1510,6 +1517,7 @@
       *    ÁªÄêÆþ±¡»þ¤Î¥³¡¼¥É¼èÆÀ
            PERFORM 900-SENTEICDCHG-KEY2-SEL-SEC
            IF    ( FLG-SENTEICDCHG     =   ZERO )
+               MOVE    SENCHG-IPNSRYCD     TO  WRK-SENTEI-IPNCD
                MOVE    SENCHG-SENTEISRYCD
                                            TO  WRK-SENTEI-SRYCD
                MOVE    SENCHG-SENTEISRYCD  TO  WRK-TNS-SRYCD
@@ -1518,7 +1526,12 @@
                    MOVE    14              TO  HCM34S01-RC
                    PERFORM 990-EXIT-PROGRAM-SEC
                END-IF
-               MOVE    TNS-TEN             TO  WRK-SENTEI-TEN
+               IF    ( SENCHG-IPNSRYCD     =   SENCHG-SENTEISRYCD )
+                   COMPUTE WRK-SENTEI-TEN
+                       = ( WRK-KHNTEN * 0.85 ) +  0.5
+               ELSE
+                   MOVE    TNS-TEN         TO  WRK-SENTEI-TEN
+               END-IF
            END-IF
       *
            .
@@ -1780,8 +1793,22 @@
                IF    ( HCM34S01-EXGAIHAKU =    "1" )
                    COMPUTE WRK-ZAI-CNT    =    WRK-ZAI-CNT +   1
                    MOVE    WRK-ZAI-KHNSRYCD
-                                           TO  WRK-ZAI-SRYCD
+                                          TO   WRK-ZAI-SRYCD
                                                 (WRK-ZAI-CNT)
+               END-IF
+      *
+               IF    ( FLG-SENTEIDAY(IDXD) NOT =   ZERO )
+                AND  ( WRK-SENTEI-IPNCD        =   WRK-SENTEI-SRYCD )
+                   MOVE    CONST-SENTEI   TO  WRK-SRYCD
+                   COMPUTE WRK-ZAI-SRYCDTOTAL
+                       =   WRK-ZAI-SRYCDTOTAL
+                       +   WRK-SRYCD-9
+      *
+                   IF    ( HCM34S01-EXGAIHAKU  =   "1" )
+                       COMPUTE WRK-ZAI-CNT     =   WRK-ZAI-CNT +   1
+                       MOVE    CONST-SENTEI    TO  WRK-ZAI-SRYCD
+                                                    (WRK-ZAI-CNT)
+                   END-IF
                END-IF
       *
            END-IF
@@ -2394,6 +2421,24 @@
            MOVE    WRK-SENTEISRYCD     TO  WNYUINRYO-SRYCD
                                                    (IDXA IDXB IDX-KHN)
       *
+           IF    ( WRK-SENTEISRYCD     =   WRK-SENTEIIPNCD )
+               COMPUTE WRK-STIDX   =   5   -   1
+               PERFORM VARYING IDXJ    FROM    WRK-STIDX   BY  -1
+                       UNTIL ( IDXJ    <=  IDX-KHN )
+                        OR   ( WNYUINRYO-SRYCD (IDXA IDXB IDXJ)
+                                       =   SPACE )
+      *
+                   MOVE    WNYUINRYO-SRYCD (IDXA IDXB IDXJ)
+                               TO  WNYUINRYO-SRYCD (IDXA IDXB IDXJ + 1)
+      *
+                   IF    ( IDXJ        =  IDX-KHN + 1 )
+                       MOVE    CONST-SENTEI
+                               TO  WNYUINRYO-SRYCD (IDXA IDXB IDXJ)
+                   END-IF
+      *
+               END-PERFORM
+           END-IF
+      *
            MOVE    WRK-SENTEI-ZAITEN   TO  WNYUINRYO-ZAITEN (IDXA IDXB)
       *
            .
@@ -2405,6 +2450,7 @@
        20011111-SENTEI-CHG-SEC         SECTION.
       *
            MOVE    SPACE               TO  WRK-SENTEISRYCD
+                                           WRK-SENTEIIPNCD
       *
            MOVE    ZERO                TO  WRK-KHNTEN
                                            WRK-KSNTEN
@@ -2451,6 +2497,7 @@
                PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
+           MOVE    SENCHG-IPNSRYCD     TO  WRK-SENTEIIPNCD
            MOVE    SENCHG-SENTEISRYCD  TO  WRK-SENTEISRYCD
       *
       *    ÅÀ¿ô¤â²þ¤á¤Æµá¤á¤Ê¤ª¤¹
@@ -2461,7 +2508,13 @@
                PERFORM 990-EXIT-PROGRAM-SEC
            END-IF
       *
-           MOVE    TNS-TEN             TO  WRK-SENTEI-KHNTEN
+           IF    ( SENCHG-IPNSRYCD     =   SENCHG-SENTEISRYCD )
+               COMPUTE WRK-SENTEI-KHNTEN
+                   = ( WRK-KHNTEN * 0.85 ) +  0.5
+           ELSE
+                MOVE    TNS-TEN         TO  WRK-SENTEI-KHNTEN
+           END-IF
+      *
            COMPUTE WRK-SENTEI-ZAITEN
                =   WRK-SENTEI-KHNTEN   +   WRK-KSNTEN
       *
