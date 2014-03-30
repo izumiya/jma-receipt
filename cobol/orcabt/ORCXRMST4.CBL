@@ -780,6 +780,9 @@ grpsys                                 SPA-AREA
                MOVE    "最低薬価マスタ"        TO  WRK-MSTNAME
            WHEN    "25"
                MOVE    "介護保険者マスタ"      TO  WRK-MSTNAME
+           WHEN    "26"
+               MOVE    "選定療養費一般コード振替マスタ"
+                                               TO  WRK-MSTNAME
            WHEN    OTHER
                MOVE    PARA-MASTER-KBN         TO  WRK-MSTNAME
            END-EVALUATE
