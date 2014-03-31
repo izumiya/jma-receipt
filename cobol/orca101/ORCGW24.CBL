@@ -2953,6 +2953,8 @@
                                    TO  SYS-5000-KYUKYUKSNKBN
       *
       *    ±ÉÍÜ´ÉÍý·Ð²áÁ¼ÃÖ¶èÊ¬
+           MOVE    SPA-GMN-W24-EIYOUKSN
+                                   TO  SYS-5000-EIYOUKSNKBN
            IF    ( SPA-HOSPSBT         =   2 )
             AND  ( SPA-W01-STYUKYMD   >=   CONST-H260401 )
                MOVE    SPACE           TO  SYS-5000-EIYOUKSNKBN
