@@ -543,7 +543,14 @@
       *????
                        CONTINUE
                    ELSE
-                       MOVE    1                   TO  FLG-HOUKATU
+      *H26.3
+      *            入院算定日指定
+                       IF     (SPA-GMN-INPUTCD (IDX-Z)(1:1)
+                                                   =   "*"  )
+                           CONTINUE
+                       ELSE
+                           MOVE    1                   TO  FLG-HOUKATU
+                       END-IF
                    END-IF
                END-IF
                IF     (SPA-COM-HOUKATU-FLG (IDX-Z) =   ZERO  )
@@ -1019,9 +1026,6 @@ grpsys*    MOVE    SPA-HOSPNUM         TO  -HOSPNUM
                    OR  (SPA-COM-GENTEN  (IDX-Z)    =   "1"   )
       *            アフターケア
                    OR  (SPA-RSI-HKNKBN             =   "3" )
-      *            入院算定日指定
-                   OR (SPA-GMN-INPUTCD (IDX-Z)(1:1)
-                                                   =   "*"  )
                    CONTINUE
                ELSE
                    IF     (SPA-COM-INPUTCD (IDX-Z)(1:1) =   "1"
