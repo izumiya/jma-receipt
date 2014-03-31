@@ -2346,8 +2346,8 @@
                    (LNK-ORCSC-TIMEFLG  NOT =   ZERO ))
              OR   ( WRK-COM-TIMEFLG(IDX-SYU)
                                        NOT =   ZERO  )
-               IF     (WRK-COM-TIMEKSNKBN(IDX-SYU) NOT =   ZERO )
-                   OR (WRK-SUM-TENSUKEI            >=   150    )
+      ******   IF     (WRK-COM-TIMEKSNKBN(IDX-SYU) NOT =   ZERO )
+               IF     (WRK-SUM-TENSUKEI            >=   150    )
                    MOVE    WRK-SUM-TENSUKEI    TO  WRK-SYOTEITEN
                    PERFORM 10063-JIKANGAI-AUTO-SEC
                END-IF
