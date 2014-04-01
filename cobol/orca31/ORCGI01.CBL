@@ -363,6 +363,7 @@
            03  WRK-RRKNUM                  PIC 9(03).
            03  WRK-RRKEDANUM               PIC 9(03).
            03  WRK-KJNYMD                  PIC X(08).
+           03  WRK-SRYYMD                  PIC X(08).
            03  WRK-KIHON-KJNYMD            PIC X(08).
            03  WRK-UPDKBN                  PIC X(3).
            03  WRK-BRMNUM                  PIC X(06).
@@ -6279,7 +6280,8 @@
                PERFORM 900-NSRYSRH-KEY-SEL-SEC
       *
                MOVE    NSRYSRH-SRYCD   TO  WRK-SRYCD
-               PERFORM 900-TENSU-KEY-SEL-SEC
+               MOVE    NRRKSRH-SRYYMD  TO  WRK-SRYYMD
+               PERFORM 901-TENSU-KEY-SEL-SEC
                IF    ( TNS-DATAKBN         =   1 )
                 AND  ( TNS-CDKBN-KBN       = "A" )
                 AND (( TNS-CDKBN-KBNNUM    = 100 OR 101 OR 109)
@@ -20650,6 +20652,36 @@
       *
            .
        900-TENSU-KEY-SEL-EXT.
+           EXIT.
+      *****************************************************************
+      *    点数マスタ検索処理
+      *****************************************************************
+       901-TENSU-KEY-SEL-SEC           SECTION.
+      *
+           MOVE    ZERO                TO  FLG-TENSU
+           INITIALIZE                      TNS-TENSU-REC
+      *
+           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
+           MOVE    WRK-SRYCD           TO  TNS-SRYCD
+           MOVE    WRK-SRYYMD          TO  TNS-YUKOSTYMD
+                                           TNS-YUKOEDYMD
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+      *
+           MOVE    "tbl_tensu"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC     TO  TNS-TENSU-REC
+           ELSE
+               MOVE    1               TO  FLG-TENSU
+           END-IF
+      *
+           MOVE    "tbl_tensu"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *
+           .
+       901-TENSU-KEY-SEL-EXT.
            EXIT.
       *****************************************************************
       *    システム管理マスタ検索処理
