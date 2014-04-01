@@ -4947,9 +4947,21 @@
                                MOVE     "key2"        TO  MCP-PATHNAME
                                PERFORM  910-SENTEICDCHG-READ-SEC
                                IF    FLG-SENTEICDCHG  =   ZERO
-                                   MOVE  SENCHG-SENTEISRYCD
+                                  IF    WRK-NYUINKHN(IDX1)  NOT =
+                                                   SENCHG-SENTEISRYCD
+                                       MOVE  SENCHG-SENTEISRYCD
                                                 TO  WRK-SO-SRYCD
                                                    (IDX1 WRK-MEISAISU)
+                                  ELSE
+      *                               夜勤時間超過減算の選定処理
+                                      IF  LNK-NYURECEDEN-SANTEIYM
+                                                      >=    "201404"
+                                        ADD    1      TO  WRK-MEISAISU
+                                        MOVE  "190122890"
+                                                TO  WRK-SO-SRYCD
+                                                   (IDX1 WRK-MEISAISU)
+                                      END-IF
+                                  END-IF
                                END-IF
                           END-IF
                           MOVE     "tbl_senteicdchg"   TO  MCP-TABLE
