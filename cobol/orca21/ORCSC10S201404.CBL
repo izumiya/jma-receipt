@@ -6032,6 +6032,10 @@
                        IF      (SPA-SINSATU-FLG    =   "0" )
       *                    初診料は自動発生しない
                            MOVE    ZERO                TO  FLG-HENKAN
+      *                    小児科外来診察料が算定可能な時は、再度
+                           IF      FLG-SYONIKA-ARI     =   1
+                               MOVE    1               TO  FLG-HENKAN
+                           END-IF
                        END-IF
                    END-IF
                ELSE
