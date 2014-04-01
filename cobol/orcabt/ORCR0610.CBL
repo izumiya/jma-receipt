@@ -184,6 +184,7 @@
       *  04.07.03    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.04    NACL-藤原    13/08/01  公費記載順設定時の条件の修正
       *  04.07.05    NACL-藤原    13/12/09  医療情報連携基盤対応
+      *  04.07.06    NACL-門脇    14/03/28  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1678,8 +1679,9 @@
       *            入院会計より保険組合せ読込     
                    PERFORM VARYING IDX FROM    1   BY  1
                            UNTIL   IDX >       31
-                       IF      WRK-DAY (1 IDX)     >   ZERO    AND
-                               WRK-DAY (2 IDX)     >   ZERO
+                       IF    ((WRK-DAY (1 IDX)        >   ZERO) OR
+                              (LNK-NYUINDAY-KBN(IDX)  =   "1" ))  AND
+                             ( WRK-DAY (2 IDX)        >   ZERO )
                            PERFORM 200121-NYUINACCT-CHK-SEC
                        END-IF
                    END-PERFORM        
@@ -2527,12 +2529,15 @@
       ***      MOVE    WRK-DAY-TBL (2)    TO  WRK-RECE61-DAY-AREA
                PERFORM   VARYING   IDX3    FROM    1   BY  1
                            UNTIL   IDX3    >      31
-                 IF      WRK-DAY (1 IDX3)     >   ZERO    AND
-                         WRK-DAY (2 IDX3)     >   ZERO
+                 IF    ((WRK-DAY (1 IDX3)        >   ZERO) OR
+                        (LNK-NYUINDAY-KBN(IDX3)  =   "1" ))  AND
+                       ( WRK-DAY (2 IDX3)        >   ZERO )
                     MOVE   WRK-DAY(2 IDX3)  TO  WRK-RECE61-DAY(IDX3)
                  END-IF
-                 IF      WRK-DAY (1 IDX3)     =   ZERO    AND
-                         WRK-DAY (2 IDX3)     >   ZERO
+                 IF    ( WRK-DAY (1 IDX3)        =   ZERO )
+                 AND   ( LNK-NYUINDAY-KBN(IDX3)
+                                             NOT =   "1"  )
+                 AND   ( WRK-DAY (2 IDX3)        >   ZERO )
                     MOVE   WRK-DAY (2 IDX3)   TO  WRK-RECE61-DAY-1
                                                               (IDX3)
                  END-IF
@@ -2834,12 +2839,15 @@
       ***      MOVE    WRK-DAY-TBL (2)    TO  WRK-RECE61-DAY-AREA
                PERFORM   VARYING   IDX3    FROM    1   BY  1
                            UNTIL   IDX3    >      31
-                 IF      WRK-DAY (1 IDX3)     >   ZERO    AND
-                         WRK-DAY (2 IDX3)     >   ZERO
+                 IF    ((WRK-DAY (1 IDX3)        >   ZERO) OR
+                        (LNK-NYUINDAY-KBN(IDX3)  =   "1" ))  AND
+                       ( WRK-DAY (2 IDX3)        >   ZERO )
                     MOVE   WRK-DAY(2 IDX3)  TO  WRK-RECE61-DAY(IDX3)
                  END-IF
-                 IF      WRK-DAY (1 IDX3)     =   ZERO    AND
-                         WRK-DAY (2 IDX3)     >   ZERO
+                 IF    ( WRK-DAY (1 IDX3)        =   ZERO )
+                 AND   ( LNK-NYUINDAY-KBN(IDX3)
+                                             NOT =   "1"  )
+                 AND   ( WRK-DAY (2 IDX3)        >   ZERO )
                      MOVE   WRK-DAY (2 IDX3)   TO  WRK-RECE61-DAY-1
                                                               (IDX3)
                  END-IF
@@ -4011,8 +4019,9 @@ grpsys             END-IF
       *        入院会計より保険組合せ読込     
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       31
-                   IF      WRK-DAY (1 IDX)     >   ZERO    AND
-                           WRK-DAY (2 IDX)     >   ZERO
+                   IF    ((WRK-DAY (1 IDX)        >   ZERO) OR
+                          (LNK-NYUINDAY-KBN(IDX)  =   "1" ))  AND
+                         ( WRK-DAY (2 IDX)        >   ZERO )
                        PERFORM 200121-NYUINACCT-CHK-SEC
                    END-IF
                END-PERFORM        

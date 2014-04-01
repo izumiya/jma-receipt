@@ -42,6 +42,8 @@
       *                                     ³°Çñ¶èÊ¬£¶¡¥£·¤ÎÂÐ±þ
       *                                     Æþ±¡Î¬¾Î¤ÎÊ¸»ú¿ô³ÈÄ¥ÂÐ±þ
       *  04.05.05    NACL-ÌçÏÆ    12/09/18  ²þÀµÂÐ±þ¡Ê³°Çñ¶èÊ¬£¸¡¤£¹¤ÎÂÐ±þ¡Ë
+      *
+      *  04.07.01    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -412,7 +414,8 @@
                      UNTIL   IDY     >     31
       *
                  IF        WRK-DAY5(IDY)   =   RECE200-HKNCOMBI
-                      IF   WRK-DAY1(IDY)   NOT =    ZERO
+                      IF  (WRK-DAY1(IDY)    NOT =    ZERO )
+                      OR  (RECE200-NYUINDAY-KBN(IDY) = "1")
                           MOVE   "1"    TO   TBL-JNISSU-DAY(IDY)
                       END-IF
                  END-IF

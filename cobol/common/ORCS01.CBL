@@ -4113,7 +4113,8 @@
              OR  (FLG-KOREI-HIGAITO     =      1         )
                CONTINUE
              ELSE
-               IF  COMB-HOJOKBN  =  "1"  OR  "9"
+               IF  (COMB-HOJOKBN  =  "1"  OR  "9")
+               AND (WK-BIRTHDAY   <  "19440402"  )
                   MOVE    1     TO    FLG-ZENKI-TOKUREI
                END-IF
              END-IF

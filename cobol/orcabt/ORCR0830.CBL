@@ -89,6 +89,7 @@
       *  04.07.04    NACL-ÌçÏÆ    14/02/13  Ï«ºÒ¡¦¼«ÇåÀÕ¤Î»Ü½Ñ²Ã»»ÂÐ±þ
       *  04.07.05    NACL-ÌçÏÆ    14/03/01  Ï«ºÒ¥Þ¥¹¥¿ÄÉ²ÃÂÐ±þ
       *  04.07.06    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.07    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -878,7 +879,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
       *
                  IF        WRK-DAY5(IDY)   =   RECE82-HKNCOMBI
                       MOVE    ZERO            TO    FLG-SHOSAISIN
-                      IF   WRK-DAY1(IDY)   NOT =    ZERO    
+                      IF  (WRK-DAY1(IDY)   NOT =    ZERO )
+                      OR  (RECE82-NYUINDAY-KBN(IDY) = "1")
                                MOVE    1      TO    FLG-SHOSAISIN
                       END-IF
                       PERFORM   2202-RECE82-TENSOU11-SEC

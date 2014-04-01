@@ -224,6 +224,8 @@
       *
            03  WRK-KYURATE                  PIC 9(03).
       *
+           03  WRK-BIRTHDAY                 PIC X(08).
+      *
       *    ¶¦ÄÌÎÎ°è
            COPY    "MCPAREA".
       *
@@ -341,6 +343,9 @@
            MOVE    LNK-FTNJGNCHK-HOSPNUM   TO  PTINF-HOSPNUM
            MOVE    LNK-FTNJGNCHK-PTID      TO  PTINF-PTID
            PERFORM 900-PTINF-READ-SEC
+      *
+           MOVE    PTINF-BIRTHDAY          TO  WRK-BIRTHDAY
+      *
            IF      FLG-PTINF           NOT =   ZERO
                MOVE    10              TO  LNK-FTNJGNCHK-RC
            END-IF
@@ -2716,7 +2721,8 @@
              OR  (FLG-KOREI-HIGAITO     =      1         )
                CONTINUE
              ELSE
-               IF  COMB-HOJOKBN  =  "1"  OR  "9"
+               IF  (COMB-HOJOKBN  =  "1"  OR  "9")
+               AND (WRK-BIRTHDAY  <  "19440402"  )
                   MOVE    1     TO    FLG-ZENKI-TOKUREI
                END-IF
              END-IF

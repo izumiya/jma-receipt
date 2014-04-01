@@ -2882,7 +2882,8 @@ grpsys         MOVE    WRK-PARA-HOSPNUM    TO  RECE01PARA-HOSPNUM
              OR  (RECE02-YOBIETC(8)   =     1                        )
                CONTINUE
              ELSE
-               IF  RECE02-HOJOKBN     =   "1"  OR  "9"
+               IF  (RECE02-HOJOKBN     =   "1"  OR  "9")
+               AND (RECE02-BIRTHDAY    <    19440402   )
                   MOVE      1     TO    FLG-ZENKI-TOKUREI
                END-IF
              END-IF

@@ -38,6 +38,7 @@
       *
       *  04.07.01    NACL-藤原    14/02/07  入院会計の保険組合せが全て
       *                                     公害以外のときの一括処理の修正
+      *  04.07.02    NACL-門脇    14/03/28  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -733,8 +734,9 @@
       *
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       31
-                   IF      WRK-DAY (1 IDX)     >   ZERO    AND
-                           WRK-DAY (2 IDX)     >   ZERO
+                   IF    ((WRK-DAY (1 IDX)        >   ZERO) OR
+                          (LNK-NYUINDAY-KBN(IDX)  =   "1" ))  AND
+                         ( WRK-DAY (2 IDX)        >   ZERO )
       *                入院会計チェック処理
                        PERFORM 2001211-NYUINACCT-CHK-SEC
                    END-IF
@@ -898,8 +900,9 @@
            ELSE
                PERFORM   VARYING   IDX3    FROM    1   BY  1
                          UNTIL     IDX3    >       31
-                   IF      WRK-DAY (1 IDX3)    >   ZERO    AND
-                           WRK-DAY (2 IDX3)    >   ZERO
+                   IF    ((WRK-DAY (1 IDX3)        >   ZERO) OR
+                          (LNK-NYUINDAY-KBN(IDX3)  =   "1" ))  AND
+                         ( WRK-DAY (2 IDX3)        >   ZERO )
                        MOVE   WRK-DAY(2 IDX3)  TO  WRK-RECE200-DAY(IDX3)
                    END-IF
                END-PERFORM
@@ -1028,8 +1031,9 @@
            ELSE
                PERFORM   VARYING   IDX3    FROM    1   BY  1
                          UNTIL     IDX3    >       31
-                   IF      WRK-DAY (1 IDX3)    >   ZERO    AND
-                           WRK-DAY (2 IDX3)    >   ZERO
+                   IF    ((WRK-DAY (1 IDX3)        >   ZERO) OR
+                          (LNK-NYUINDAY-KBN(IDX3)  =   "1" ))  AND
+                         ( WRK-DAY (2 IDX3)        >   ZERO )
                        MOVE   WRK-DAY(2 IDX3)  TO  WRK-RECE200-DAY(IDX3)
                    END-IF
                END-PERFORM

@@ -64,6 +64,7 @@
       *  04.07.03    NACL-藤原    13/09/20  第三者行為対応
       *  04.07.04    NACL-門脇    14/02/21  公務災害（労災準拠）の点数単価
       *                                     設定対応
+      *  04.07.05    NACL-門脇    14/03/28  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -996,8 +997,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
       *            入院会計より保険組合せ読込     
                    PERFORM VARYING IDX FROM    1   BY  1
                            UNTIL   IDX >       31
-                       IF      WRK-DAY (1 IDX)     >   ZERO    AND
-                               WRK-DAY (2 IDX)     >   ZERO
+                       IF    ((WRK-DAY (1 IDX)        >   ZERO) OR
+                              (LNK-NYUINDAY-KBN(IDX)  =   "1" ))  AND
+                             ( WRK-DAY (2 IDX)        >   ZERO )
                            PERFORM 200121-NYUINACCT-CHK-SEC
                        END-IF
                    END-PERFORM        
@@ -1218,8 +1220,9 @@ grpsys     MOVE    SPA-HOSPNUM     TO  PTRSI-HOSPNUM
       ***      MOVE    WRK-DAY-TBL (2)    TO  WRK-RECE82-DAY-AREA
                PERFORM   VARYING   IDX3    FROM    1   BY  1
                            UNTIL   IDX3    >      31
-                 IF      WRK-DAY (1 IDX3)     >   ZERO    AND
-                         WRK-DAY (2 IDX3)     >   ZERO
+                 IF    ((WRK-DAY (1 IDX3)        >   ZERO) OR
+                        (LNK-NYUINDAY-KBN(IDX3)  =   "1" ))  AND
+                       ( WRK-DAY (2 IDX3)        >   ZERO )
                     MOVE   WRK-DAY(2 IDX3)  TO  WRK-RECE82-DAY(IDX3)
                  END-IF
                END-PERFORM
@@ -1646,8 +1649,9 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SPTID-HOSPNUM
       ***      MOVE    WRK-DAY-TBL (2)    TO  WRK-RECE82-DAY-AREA
                PERFORM   VARYING   IDX3    FROM    1   BY  1
                            UNTIL   IDX3    >      31
-                 IF      WRK-DAY (1 IDX3)     >   ZERO    AND
-                         WRK-DAY (2 IDX3)     >   ZERO
+                 IF    ((WRK-DAY (1 IDX3)        >   ZERO) OR
+                        (LNK-NYUINDAY-KBN(IDX3)  =   "1" ))  AND
+                       ( WRK-DAY (2 IDX3)        >   ZERO )
                     MOVE   WRK-DAY(2 IDX3)  TO  WRK-RECE82-DAY(IDX3)
                  END-IF
                END-PERFORM
@@ -2283,8 +2287,9 @@ grpsys         MOVE    SPA-HOSPNUM         TO  COMB-HOSPNUM
       *        入院会計より保険組合せ読込     
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       31
-                   IF      WRK-DAY (1 IDX)     >   ZERO    AND
-                           WRK-DAY (2 IDX)     >   ZERO
+                   IF    ((WRK-DAY (1 IDX)        >   ZERO) OR
+                          (LNK-NYUINDAY-KBN(IDX)  =   "1" ))  AND
+                         ( WRK-DAY (2 IDX)        >   ZERO )
                        PERFORM 200121-NYUINACCT-CHK-SEC
                    END-IF
                END-PERFORM        
