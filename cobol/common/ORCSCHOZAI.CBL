@@ -36,6 +36,7 @@
       *  04.05.00    NACL-多々納  09/12/03  前月保険組合せ終了対応
       *  04.07.00    NACL-多々納  11/10/XX  同日再入院対応
       *  04.07.00    NACL-多々納  12/08/XX  サンプル薬（サ）対応
+      *  04.07.00    NACL-多々納  14/04/01  出来高算定（剤）等対応
       *****************************************************************
       *
       *
@@ -62,7 +63,7 @@
            03  FLG-PTNYUINRRK      PIC 9(01).
            03  FLG-HKNCOMBI        PIC 9(01).
            03  FLG-JYURRK          PIC 9(01).
-           03  FLG-SYSKANRI            PIC 9(01).
+           03  FLG-SYSKANRI        PIC 9(01).
       *
            03  FLG-ARI             PIC 9(01).
            03  FLG-MADOKU          PIC 9(01).
@@ -80,6 +81,9 @@
            03  FLG-HEN             PIC 9(01).
       *
            03  FLG-NYUIN01         PIC 9(01).
+      *ver.4.7
+           03  FLG-DEKIDA          PIC 9(01).
+           03  FLG-HOKATU          PIC 9(01).
       *ver.4.7
            03  FLG-ARI2            PIC 9(01).
       *
@@ -183,6 +187,7 @@
                05  TBL-CHO-HKNCOMBI        PIC X(04).
                05  TBL-CHO-JIHOKBN         PIC X(01).
                05  TBL-CHO-ADD             PIC X(01).
+               05  TBL-CHO-SYORI           PIC X(01).
       *        作成
                05  TBL-CHO-DAY-AREA.
                    07  TBL-CHO-DAY-TBL     OCCURS   4.
@@ -196,6 +201,7 @@
                05  TBL-MAD-HKNCOMBI        PIC X(04).
                05  TBL-MAD-JIHOKBN         PIC X(01).
                05  TBL-MAD-ADD             PIC X(01).
+               05  TBL-MAD-SYORI           PIC X(01).
       *        作成
                05  TBL-MAD-DAY-AREA.
                    07  TBL-MAD-DAY-TBL     OCCURS   4.
@@ -1137,6 +1143,14 @@
                                                                  (IDX1)
                    MOVE    ACCT-DAY-AREA       TO  TBL-CHO-DAY-AREA
                                                                  (IDX1)
+      *            手入力は内容をチェック
+                   IF      ACCT-SRYCDTOTAL     >   1
+                       PERFORM 3001-CHOZAI-CHEK-SEC
+                       IF     (FLG-DEKIDA      =   1  )
+                          OR  (FLG-HOKATU      =   1  )
+                           MOVE    "1"         TO  TBL-CHO-SYORI (IDX1)
+                       END-IF
+                   END-IF
                END-IF
       *
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
@@ -1187,6 +1201,14 @@
                MOVE    ACCT-JIHOKBN        TO  TBL-MAD-JIHOKBN (IDX1)
                MOVE    ACCT-DAY-AREA       TO  TBL-MAD-DAY-AREA(IDX1)
       *
+      *            手入力は内容をチェック
+                   IF      ACCT-SRYCDTOTAL     >   1
+                       PERFORM 3001-CHOZAI-CHEK-SEC
+                       IF     (FLG-DEKIDA      =   1  )
+                          OR  (FLG-HOKATU      =   1  )
+                           MOVE    "1"         TO  TBL-MAD-SYORI (IDX1)
+                       END-IF
+                   END-IF
                END-IF
       *
                MOVE    "tbl_sryacct"       TO  MCP-TABLE
@@ -1200,6 +1222,59 @@
       *
            .
        300-CHOZAI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    診療行為内容チェック処理
+      *****************************************************************
+       3001-CHOZAI-CHEK-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  SRYACT-REC
+           INITIALIZE                      SRYACT-REC
+           MOVE    ACCT-HOSPNUM        TO  SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN      TO  SRY-NYUGAIKBN
+           MOVE    ACCT-PTID           TO  SRY-PTID
+           MOVE    ACCT-SRYKA          TO  SRY-SRYKA
+           MOVE    ACCT-SRYYM          TO  SRY-SRYYM
+           MOVE    ACCT-ZAINUM         TO  SRY-ZAINUM
+      *
+           MOVE    SRYACT-REC          TO  MCPDATA-REC
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 920-SRYACT-NEXT-SEC
+           ELSE
+               MOVE    1                   TO  FLG-SRYACT
+           END-IF
+      *
+           MOVE    ZERO                TO  FLG-DEKIDA
+           MOVE    ZERO                TO  FLG-HOKATU
+           PERFORM UNTIL      FLG-SRYACT   =   1
+               PERFORM VARYING     IDX2    FROM    1   BY  1
+                       UNTIL      (IDX2            >   5   )  OR
+                                  (SRY-SRYCD(IDX2) =   SPACE )
+      *            出来高剤
+                   IF      SRY-SRYCD (IDX2)        =   "099999903"
+                       MOVE    1                   TO  FLG-DEKIDA
+                   END-IF
+      *            包括剤
+                   IF      SRY-SRYCD (IDX2)        =   "099999908"
+                       MOVE    1                   TO  FLG-HOKATU
+                   END-IF
+               END-PERFORM
+               MOVE    "tbl_sryact"        TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 920-SRYACT-NEXT-SEC
+           END-PERFORM
+      *
+           MOVE    "tbl_sryact"        TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       3001-CHOZAI-CHEK-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1299,8 +1374,35 @@
                                                      (2 IDX IDX-T))
                      AND  (TBL-CHO-JIHOKBN (IDX2)  =   WRK-JIHOKBN )
                        MOVE    1               TO  FLG-CHK
+      *H26.4
+      *                当日出来高剤・包括算定の手入力がない時
+                       IF     (TBL-CHO-SYORI  (IDX2)   =   "1"   )
+                         AND  (TBL-CHO-DAY(IDX2 1 IDX) =   ZERO  )
+                           MOVE    ZERO            TO  FLG-CHK
+                       END-IF
                    END-IF
                END-PERFORM
+      *H26.4
+               IF      FLG-CHK         =   ZERO
+                   PERFORM VARYING     IDX-T   FROM    1   BY  1
+                           UNTIL      (IDX-T   >   10  )  OR
+                                 (TBL-TOU-SRYKA(2 IDX IDX-T)  =  SPACE)
+                             OR  (FLG-CHK      =   1   )
+      *            当日出来高剤・包括算定の手入力剤有
+                   IF     (TBL-CHO-SRYKA(IDX2)     =   TBL-TOU-SRYKA
+                                                     (2 IDX IDX-T)) AND
+                          (TBL-CHO-HKNCOMBI(IDX2)  =   TBL-TOU-HKNCOMBI
+                                                     (2 IDX IDX-T))
+                     AND  (TBL-CHO-JIHOKBN (IDX2)  NOT =   WRK-JIHOKBN )
+                     AND  (TBL-CHO-SYORI   (IDX2)  =   "1"       )
+                     AND  (TBL-CHO-DAY (IDX2 1 IDX)   >   ZERO  )
+                       MOVE    1               TO  FLG-CHK
+                   END-IF
+      *
+                   END-PERFORM
+               END-IF
+      *
+      *
                IF      FLG-CHK         =   1
                    MOVE    IDX2            TO  WRK-IDX2
                    IF      TBL-CHO-DAY (IDX2 1 IDX)   >   ZERO
@@ -1453,8 +1555,34 @@
                                                      (2 IDX IDX-T))
                      AND  (TBL-MAD-JIHOKBN (IDX2)  =   WRK-JIHOKBN )
                        MOVE    1               TO  FLG-CHK
+      *H26.4
+      *                当日出来高剤・包括算定の手入力がない時
+                       IF     (TBL-MAD-SYORI  (IDX2)   =   "1"   )
+                         AND  (TBL-MAD-DAY(IDX2 1 IDX) =   ZERO  )
+                           MOVE    ZERO            TO  FLG-CHK
+                       END-IF
                    END-IF
                END-PERFORM
+      *H26.4
+               IF      FLG-CHK         =   ZERO
+                   PERFORM VARYING     IDX-T   FROM    1   BY  1
+                           UNTIL      (IDX-T   >   10  )  OR
+                                 (TBL-TOU-SRYKA(2 IDX IDX-T)  =  SPACE)
+                             OR  (FLG-CHK      =   1   )
+      *            当日出来高剤・包括算定の手入力剤有
+                   IF     (TBL-MAD-SRYKA(IDX2)     =   TBL-DOK-SRYKA
+                                                     (2 IDX IDX-T)) AND
+                          (TBL-MAD-HKNCOMBI(IDX2)  =   TBL-DOK-HKNCOMBI
+                                                     (2 IDX IDX-T))
+                     AND  (TBL-MAD-JIHOKBN (IDX2)  NOT =   WRK-JIHOKBN )
+                     AND  (TBL-MAD-SYORI   (IDX2)  =   "1"       )
+                     AND  (TBL-MAD-DAY (IDX2 1 IDX)   >   ZERO  )
+                       MOVE    1               TO  FLG-CHK
+                   END-IF
+      *
+                   END-PERFORM
+               END-IF
+      *
                IF      FLG-CHK         =   1
                    MOVE    IDX2            TO  WRK-IDX2
                    IF      TBL-MAD-DAY (IDX2 1 IDX)   >   ZERO
@@ -2225,6 +2353,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    入院調剤料（診療区分のみ判定）
            MOVE    "24"                TO  ORCSCHKTALL-HKTSRYKBN
            MOVE    "240"               TO  ORCSCHKTALL-HKTSRYSYUKBN
+      *H26.4   入院調剤料のみ包括の場合の対応
+           MOVE    "120001110"         TO  ORCSCHKTALL-HKTSRYCD (1)
            CALL    "ORCSCHKTALL"       USING
                                        ORCSCHKTALLAREA
                                        SPA-AREA
