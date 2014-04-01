@@ -5944,30 +5944,6 @@
                END-IF
       *
                IF    ( FLG-HIT         =   1 )
-                   MOVE    ZERO        TO  FLG-SST
-                   MOVE    ZERO        TO  CNT-SST
-                   PERFORM VARYING IDX5    FROM    1   BY  1
-                       UNTIL ( IDX5    >   10 )
-                        OR   ( FLG-SST =   1 )
-      *
-                       IF    ( TNS-SSTKIJUNCD (IDX5)
-                                           >   ZERO )
-                           COMPUTE CNT-SST =   CNT-SST +   1
-                           MOVE    TNS-SSTKIJUNCD (IDX5)
-                                   TO  IDX-SST
-                           IF    ( SSTKJN-CD (IDX-SST) =   1 )
-                               MOVE    1   TO  FLG-SST
-                           END-IF
-                      END-IF
-                   END-PERFORM
-                   IF    ( CNT-SST     >   ZERO )
-                       IF    ( FLG-SST =   ZERO )
-                           MOVE    ZERO    TO  FLG-HIT
-                       END-IF
-                   END-IF
-               END-IF
-      *
-               IF    ( FLG-HIT         =   1 )
       *
                    EVALUATE    SPA-NAI-I01-SNTNYUINCD
                    WHEN    "099999950"
