@@ -1006,8 +1006,28 @@
       *
            MOVE    ZERO                TO  FLG-OK
            MOVE    ZERO                TO  FLG-OK-KEIKA
-           PERFORM UNTIL    (FLG-TENSU     =   1  )  OR
-                            (FLG-OK        =   1  )
+           PERFORM UNTIL    (FLG-TENSU     =   1  )
+      ****              OR  (FLG-OK        =   1  )
+      *H26.4
+            IF     FLG-OK          =   1
+      *        経過措置日は最後の履歴内容
+               MOVE    TNS-KEIKASOCHIYMD   TO  WRK-TNS-KEIKASOCHIYMD
+               IF     (HCSET-KEIKAYMD      NOT =   SPACE )   AND
+                      (TNS-SRYCD (1:1)         =   "6"   )   AND
+                      (TNS-KEIKASOCHIYMD   NOT =   SPACE
+                                               AND ZERO  )
+                   IF     (HCSET-KEIKAYMD      <   TNS-KEIKASOCHIYMD)
+                       MOVE    ZERO                TO  FLG-OK-KEIKA
+                   END-IF
+      *            経過措置日に有効
+                   IF    ((TNS-YUKOSTYMD       <=  HCSET-KEIKAYMD )
+                     AND  (TNS-YUKOEDYMD       >=  HCSET-KEIKAYMD ))
+                     AND  (HCSET-KEIKAYMD      =   TNS-KEIKASOCHIYMD)
+                       MOVE    1               TO  FLG-OK-KEIKA
+                   END-IF
+               END-IF
+            ELSE
+      *
                MOVE    TNS-NAME            TO  WRK-NAME
       *!
       *        検査正式名称
@@ -1058,7 +1078,7 @@
                    END-IF
       *            経過措置日判定
                    IF      HCSET-KEIKAYMD      =   TNS-KEIKASOCHIYMD
-                       MOVE    1               TO  FLG-KEIKA
+      *************    MOVE    1               TO  FLG-KEIKA
                        MOVE    1               TO  FLG-OK-KEIKA
                    END-IF
                END-IF
@@ -1074,12 +1094,20 @@
                MOVE    TNS-TANINAME        TO  WRK-TNS-TANINAME
                MOVE    TNS-DATAKBN         TO  WRK-TNS-DATAKBN
       *
+            END-IF
+      *
+      *
                MOVE    "key4"              TO  MCP-PATHNAME
                PERFORM 910-TENSU-READ-SEC
            END-PERFORM
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key4"              TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
+      *H26.4
+      *    経過措置日が設定日と一致
+           IF      FLG-OK-KEIKA        =   1
+               MOVE    1               TO  FLG-KEIKA
+           END-IF
       *
            IF      FLG-OK              =   ZERO
                MOVE    "削"            TO  B01N-ZUMIFLG
