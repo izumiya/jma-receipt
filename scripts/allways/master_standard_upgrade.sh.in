@@ -282,9 +282,15 @@ do
     echo ${UPD1} "DB更新"
 #ダウンロードファイル生成
     ${DBSTUB}  -dir ${LDDIRECTORY} -bd orcabt ORCXRMST2 -parameter "${HOSPNUM}${MSTDIR}${UPD1}*****************************************************,$(printf "%06d" ${MSTCOUNT}),$(printf "%06d" ${MSTSEQ}),${MSTCNTMSG},${COUNT},${ERRFILE},${JOBID},${SHELLID},${PRFFILE}"
+	if [ $? -ne 0 ]	; then
+    	echo "処理が中止されました"
+    	${DBSTUB} -dir ${LDDIRECTORY} -bd orcabt ORCBJOB2 -parameter "JBE${JOBID}${SHELLID}0004,${HOSPNUM},${ERRFILE},,処理が中止されました"
+    	cleanup
+    	exit 99
+	fi
     if [  -e ${ERRFILE} ] ; then
-	cleanup
-	exit 99
+		cleanup
+		exit 99
     fi
 done
 
