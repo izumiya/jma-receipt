@@ -305,6 +305,7 @@
                        IF    ( FLG-SJOBKANRI         =   ZERO )
                            IF        ( JOB-ENDTIME   NOT =   SPACE )
                                AND   ( JOB-ENDYMD    NOT =   SPACE )
+                               AND   ( JOB-ERRCD         =   "0000")
                                CONTINUE
                            ELSE
                                MOVE    1             TO  FLG-ERR
@@ -993,6 +994,7 @@ grpsys       MOVE    SPA-HOSPNUM         TO  MSTKANRI-HOSPNUM
                IF    ( FLG-SJOBKANRI         =   ZERO )
                    IF        ( JOB-ENDTIME   NOT =   SPACE )
                        AND   ( JOB-ENDYMD    NOT =   SPACE )
+                       AND   ( JOB-ERRCD         =   "0000")
                        CONTINUE
                    ELSE
                        MOVE    1             TO  FLG-ERR

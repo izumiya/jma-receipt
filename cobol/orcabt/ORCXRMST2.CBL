@@ -236,8 +236,9 @@ grpsys     COPY    "COMMON-SPA".
       *
            PERFORM 300-END-SEC
       *
-           STOP    RUN
+           MOVE    ZERO                TO  RETURN-CODE
       *
+           EXIT    PROGRAM
            .
       *
       *****************************************************************
