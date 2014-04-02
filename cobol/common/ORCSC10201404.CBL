@@ -864,6 +864,13 @@
       *****************************************************************
        1001-NAI-CHK-SEC                  SECTION.
       *
+      *!!! マスタ更新チェック
+      *    PERFORM 100119-KOUSINCHK-SEC
+      *    IF      WRK-ERRCD       NOT =   SPACE
+      *        GO      TO      1001-NAI-CHK-EXT
+      *    END-IF
+      *
+      *
            MOVE    ZERO                TO  IDX-MAX
            MOVE    ZERO                TO  IDX-SYU
            INITIALIZE                  WRK-AREA
@@ -1070,6 +1077,101 @@
       *
            .
        10011-SANSO-ADD-EXT.
+           EXIT.
+      *!
+      *!!! マスタ更新チェック
+      *****************************************************************
+      *    マスタ更新チェック処理
+      *****************************************************************
+       100119-KOUSINCHK-SEC            SECTION.
+      *
+           MOVE    SPACE               TO  WRK-ERRCD
+           PERFORM VARYING     IDX-Z   FROM    1   BY  1
+                   UNTIL      (IDX-Z       >   SPA-MAX-LINE      ) OR
+                             ((WRK-GMN-INPUTCD (IDX-Z) =   SPACE ) AND
+                              (WRK-COM-INPUTCD (IDX-Z) =   SPACE ))
+                         OR  ( WRK-ERRCD  NOT =   SPACE  )
+      *
+               EVALUATE    WRK-COM-INPUTCD(IDX-Z)
+               WHEN    "111000110"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  282
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "111012510"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  209
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "111011810"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  141
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "111012610"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  104
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "112007410"
+               WHEN    "112007950"
+               WHEN    "112008350"
+               WHEN    "112008850"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  72
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "112011310"
+               WHEN    "112011710"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  73
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "112016310"
+               WHEN    "112016550"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  54
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "113003510"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  572
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "113003610"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  383
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "113003710"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  682
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "113003810"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  493
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "114001110"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  833
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "114012910"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  103
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               WHEN    "114018010"
+                   IF      WRK-COM-TEN (IDX-Z)   NOT =  203
+                       MOVE    "K990"            TO  WRK-ERRCD
+                   END-IF
+               END-EVALUATE
+      *        警告へ
+           IF      WRK-ERRCD       NOT =   SPACE
+               IF     (WRK-COM-KZMFLG (IDX-Z)  =   SPACE )
+                  AND (LNK-ORCSC-KEI-IDX       =   ZERO  )
+                   MOVE    IDX-Z               TO  LNK-ORCSC-KEI-IDX
+                   MOVE    "1"                 TO  WRK-COM-CUR (IDX-Z)
+                   MOVE    "1"                 TO  WRK-COM-KZMFLG
+                                                          (IDX-Z)
+               ELSE
+                   MOVE    SPACE               TO  WRK-ERRCD
+               END-IF
+           END-IF
+      * 
+           END-PERFORM
+           MOVE    WRK-ERRCD           TO  SPA-ERRCD
+           .
+       100119-KOUSINCHK-EXT.
            EXIT.
       *!
       *****************************************************************
@@ -4808,6 +4910,12 @@
       *    全診療行為チェック処理
       *****************************************************************
        200-ALL-SYORI-SEC               SECTION.
+      *
+      *!!! マスタ更新チェック
+           PERFORM 100119-KOUSINCHK-SEC
+           IF      SPA-ERRCD       NOT =   SPACE
+               GO      TO      200-ALL-SYORI-EXT
+           END-IF
       *
       *    重複チェック
            IF     (LNK-ORCSC-PG        =   "K02" )

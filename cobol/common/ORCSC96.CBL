@@ -2104,6 +2104,13 @@
                                            DELIMITED  BY  SIZE
                                        INTO    SPA-ERRMSG
                    END-STRING
+               WHEN    "K990"
+                   STRING  "警告！！"
+                           "４月改定の点数ではありません。"
+                           "至急、点数マスタをチェックしてください。"
+                                       DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
            END-EVALUATE
            .
        100-KYOUTU-ERRMSG-EXT.
