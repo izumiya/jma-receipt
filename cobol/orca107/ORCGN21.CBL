@@ -54,6 +54,7 @@
       *                                      形状８行以上の時確認表示
       * 04.03.01     NACL-森脇     08/06/25  画像選択機能追加
       * 04.03.02     NACL-森脇     08/12/04  薬剤情報複写機能追加
+      * 04.07.01     NACL-森脇     14/04/02  画像表示方法変更
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -172,6 +173,9 @@
              05  FILLER            PIC X(30)   VALUE
                            "中止し、医師に相談して下さい。".
       *       05  FILLER            PIC X(01)   VALUE   X"0A".
+      *----(04.07.01)--ADD-START---------------------------------------
+           03  WRK-CONS-KARI        PIC X(05)   VALUE  "/tmp/".
+      *----(04.07.01)--ADD-END-----------------------------------------
       *
       *    文字数多い場合の変換領域
        01  WRK-KANACONV-AREA.
@@ -212,6 +216,9 @@
       *
       *    ファイル存在チェック
            COPY    "CPORCSFILECHK.INC".
+      *
+      *    ファイル削除パラメタ
+           COPY    "CPORCSFDEL.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -406,6 +413,10 @@
       *    他のＬＤより
            IF      LINKAREA        NOT =   SPACE
                MOVE    LNK-KYOUTU  TO  SPA-KYOUTU
+      *----(04.07.01)--ADD-START---------------------------------------
+               MOVE    SPACE           TO  SPA-N21FIL-PHOTO
+               MOVE    LOW-VALUE       TO  SPA-N21FIL-OBJECT
+      *----(04.07.01)--ADD-END-----------------------------------------
            END-IF
       *
            EVALUATE    SPA-MOTOPG
@@ -1193,7 +1204,44 @@
       *
            IF    ( SPA-N21FIL-PHOTO    NOT =   SPACE ) AND
                  ( SPA-N21FIL-PHOTO    =   SPA-GMN-PHOTO )
-               MOVE    SPA-N21FIL-OBJECT   TO  SPA-GMN-OBJECT
+      *----(04.07.01)--UPD-START---------------------------------------
+      *        パス名をフォルダ名とファイル名に分ける
+               PERFORM 431-GAZO-PATH-CHK-SEC
+               IF      FLG-OK          =   ZERO
+                   MOVE    SPACE           TO  ORCA-BLOB-FILE
+                   STRING  WRK-CONS-PASS       DELIMITED  BY  SPACE
+                           WRK-FILEMEI         DELIMITED  BY  SPACE
+                                       INTO    ORCA-BLOB-FILE
+                   END-STRING
+               END-IF
+      *        画像ファイルがない場合はファイル作成する
+               INITIALIZE                  ORCSFILECHKAREA
+               MOVE     ORCA-BLOB-FILE TO  FILECHK-NAME
+               CALL    "ORCSFILECHK"       USING
+                                           ORCSFILECHKAREA
+               IF      FILECHK-RC      NOT =   0
+                   MOVE    SPA-N21FIL-OBJECT
+                                       TO  ORCA-BLOB-OBJECT
+      *            画像イメージを表示
+                   MOVE    "BLOBEXPORT"    TO  MCP-FUNC
+                   MOVE    "blob"          TO  MCP-TABLE
+                   MOVE    "key"           TO  MCP-PATHNAME
+                   CALL    "ORCDBMAIN"         USING
+                                               MCPAREA
+                                               ORCA-BLOB
+                                               SPA-AREA
+               END-IF
+      *        画像イメージを表示
+               MOVE    ORCA-BLOB-FILE  TO  ORCA-BLOB-FILE
+               MOVE    "BLOBIMPORT"    TO  MCP-FUNC
+               MOVE    "blob"          TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               CALL    "ORCDBMAIN"         USING
+                                           MCPAREA
+                                           ORCA-BLOB
+                                           SPA-AREA
+               MOVE    ORCA-BLOB-OBJECT    TO  SPA-GMN-OBJECT
+      *----(04.07.01)--UPD-END-----------------------------------------
                GO  TO  430-GAZOCHK-HENSYU-EXT
            ELSE
                MOVE    SPACE           TO  SPA-N21FIL-PHOTO
@@ -1882,15 +1930,45 @@ grpsys     CALL    "ORCDBMAIN"         USING
        481-KOUSHIN-SEC             SECTION.
       *
            IF      SPA-N21FIL-OBJECT   NOT =   LOW-VALUE
-               MOVE    SPA-N21FIL-OBJECT   TO  ORCA-BLOB-OBJECT
-               MOVE    "BLOBEXPORT"        TO  MCP-FUNC
+      *----(04.07.01)--UPD-START---------------------------------------
+      *        パス名をフォルダ名とファイル名に分ける
+               PERFORM 431-GAZO-PATH-CHK-SEC
+               IF      FLG-OK          =   ZERO
+                   MOVE    SPACE           TO  ORCA-BLOB-FILE
+                   STRING  WRK-CONS-PASS       DELIMITED  BY  SPACE
+                           WRK-FILEMEI         DELIMITED  BY  SPACE
+                                       INTO    ORCA-BLOB-FILE
+                   END-STRING
+               END-IF
+      *
+               MOVE    "BLOBINPORT"        TO  MCP-FUNC
                MOVE    "blob"              TO  MCP-TABLE
                MOVE    "key"               TO  MCP-PATHNAME
-               MOVE    SPA-GMN-PHOTO       TO  ORCA-BLOB-FILE
                CALL    "ORCDBMAIN"             USING
                                                MCPAREA
                                                ORCA-BLOB
                                                SPA-AREA
+      *
+      *        画像ファイルがない場合はファイル作成する
+               MOVE    SPA-GMN-PHOTO       TO  ORCA-BLOB-FILE
+      *
+               INITIALIZE                  ORCSFILECHKAREA
+               MOVE     ORCA-BLOB-FILE TO  FILECHK-NAME
+               CALL    "ORCSFILECHK"       USING
+                                           ORCSFILECHKAREA
+               IF      FILECHK-RC      NOT =   0
+                   MOVE    "BLOBEXPORT"        TO  MCP-FUNC
+                   MOVE    "blob"              TO  MCP-TABLE
+                   MOVE    "key"               TO  MCP-PATHNAME
+                   CALL    "ORCDBMAIN"             USING
+                                                   MCPAREA
+                                                   ORCA-BLOB
+                                                   SPA-AREA
+               END-IF
+      *        作業領域クリア
+               MOVE    SPACE           TO  SPA-N21FIL-PHOTO
+               MOVE    LOW-VALUE       TO  SPA-N21FIL-OBJECT
+      *----(04.07.01)--UPD-END-----------------------------------------
            END-IF
       *
            MOVE    SPA-NAI-SRYCD       TO  WRK-SRYCD
