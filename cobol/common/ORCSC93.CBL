@@ -2524,6 +2524,15 @@
                        END-IF
                    END-IF
                END-IF
+      *H26.4
+      *        ÃÏ°èÊñ³ç¿ÇÎÅÎÁ»þ´Ö³°
+               IF     (IDX                 >   1 )  AND
+                      (SPA-GMN-INPUTCD(IDX - 1)(1:4)
+                                           =   ".130")
+                    IF      SPA-COM-TIMEKSNKBN (IDX)   NOT =   ZERO
+                        MOVE    1           TO  FLG-ARI
+                    END-IF
+               END-IF
       *        ºßÂð»ØÆ³ÎÁ¤Î»þ¡¢ÅÀ¿ô²Ã»»¤Ï£Ï£Ë
       ******** IF      LNK-SC93-NETAKIRI-ARI   =   1
                    IF     (WRK-SRYSYUKBN           =   "143" )  AND
