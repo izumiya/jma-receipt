@@ -798,6 +798,7 @@
       *              190152470
       *              救急・在宅等支援病床初期加算（地域包括ケア病棟入院料）
       *              190177170
+                   MOVE    SPACE               TO   WRK-TAIHI-KSN-SRYCD
                    IF    ( NACCT-ZAISKBKBN     =    "6"    )  AND
                          ( NACCT-SRYCDTOTAL    =    190135470 OR
                                                     190135670 OR
