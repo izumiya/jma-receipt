@@ -1606,10 +1606,13 @@
                                                              (IDX) ))
                      OR   ((SPA-NAI-RRK-HKNKBN (IDX-J2)
                                                =   ZERO
-                                               OR  "6"  ) AND
+                                               OR  "6"
+      *H26.4  第三者行為追加
+                                               OR  "7"  ) AND
                            (SPA-NAI-RRK-HKNKBN (IDX)
                                                =   ZERO
-                                               OR  "6" ))
+                                               OR  "6"
+                                               OR  "7" ))
                        ADD     1               TO  IDX-SRY
                        IF      IDX-SRY         <=  10
                            MOVE    SPA-NAI-RRK-SRYKA(IDX)
