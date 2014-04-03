@@ -1409,6 +1409,8 @@
                             MOVE   1       TO  FLG-SANTEI
                     ELSE
                         IF   ( FLG-NYUINRYODAY (IDXD)  =   1 )
+                         OR (( LNK-NYUINDAY-KBN(IDXD)  =   "1" )
+                          AND( HCM34S01-SANTEIYM   >=  CONST-H2604 ))
                             MOVE   1       TO  FLG-SANTEI
                         END-IF
                     END-IF
@@ -3255,10 +3257,10 @@
                    IF    ( NACCT-DAY (IDXD)            >   ZERO )
                     AND  ( FLG-NYUINDAY  (IDXD)        =   1  )
                     AND  ((FLG-NYUINRYODAY (IDXD)      =   1 )
-                      OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)     =   "1" ))
+                      OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
                     AND  ( FLG-GAIHAKUDAY(IDXD)    =   ZERO OR >= 4 )
                     AND  ((FLG-TOKTEIDAY (IDXD)    NOT =   ZERO )
-                      OR  ( LNK-NYUINDAY-TANKI2-KBN(IDXD)     =   "1" ))
+                      OR  ( LNK-NYUINDAY-KBN(IDXD)     =   "1" ))
                        IF    ( FLG-TAISYO              =   ZERO )
                            MOVE    1       TO  FLG-TAISYO
                            PERFORM 2001111-KSN-KHNINF-SET-SEC
