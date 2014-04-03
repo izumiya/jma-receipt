@@ -77,6 +77,7 @@
            03  FLG-PTNUM                   PIC 9(01).
            03  FLG-PTNYUINRRK              PIC 9(01).
            03  FLG-NYUINACCT               PIC 9(01).
+           03  FLG-NYUINACT                PIC 9(01).
            03  FLG-NYUINACCTARI            PIC 9(01).
            03  FLG-NYUINACCT-MAE-CHK       PIC 9(01).
            03  FLG-ENTRYCHK                PIC 9(01).
@@ -816,13 +817,49 @@
                                                     190177170 )
       **                 DISPLAY "NACCT-SRYCDTOTAL(6:9) = " 
       **                          NACCT-SRYCDTOTAL(6:9)
-                       MOVE    NACCT-SRYCDTOTAL(6:9)
+      *                該当入院加算が前月以前に存在するかチェックし、
+      *                存在した場合のみ加算セットを行うようにする
+                       MOVE    ZERO    TO  FLG-NYUINACT
+                       INITIALIZE                        NYUINACT-REC
+                       MOVE    PTNYUINRRK-HOSPNUM    TO  NSRY-HOSPNUM
+                       MOVE    "1"                   TO  NSRY-NYUGAIKBN
+                       MOVE    PTNYUINRRK-PTID       TO  NSRY-PTID
+                       MOVE    NACCT-SRYCDTOTAL(6:9) TO  NSRY-SRYCD(1)
+                                                         NSRY-SRYCD(2)
+                                                         NSRY-SRYCD(3)
+                                                         NSRY-SRYCD(4)
+                                                         NSRY-SRYCD(5)
+                       MOVE    "tbl_nyuinact"        TO  MCP-TABLE
+                       MOVE    "key6"                TO  MCP-PATHNAME
+                       PERFORM 910-NYUINACT-SELECT-SEC
+                       IF      FLG-NYUINACT          =   ZERO
+      *
+                          MOVE    "tbl_nyuinact"     TO  MCP-TABLE
+                          MOVE    "key6"             TO  MCP-PATHNAME
+                          PERFORM 910-NYUINACT-READ-SEC
+                          PERFORM UNTIL  FLG-NYUINACT  NOT =   ZERO
+                             DISPLAY  "NACCT-SRYCDTOTAL(6:9) = "
+                                       NACCT-SRYCDTOTAL(6:9)
+                             DISPLAY  "NSRY-SRYYM = " NSRY-SRYYM
+                             IF    NSRY-SRYYM      <  WRK-PARA-SRYYM
+                                MOVE    NACCT-SRYCDTOTAL(6:9)
                                                TO   WRK-TAIHI-KSN-SRYCD
-                       PERFORM VARYING IDX-KSN  FROM 1 BY 1
-                          UNTIL (IDX-KSN       >    31)
-                           MOVE    NACCT-DAY(IDX-KSN)
+                                PERFORM VARYING IDX-KSN  FROM 1 BY 1
+                                  UNTIL (IDX-KSN       >    31)
+                                   MOVE    NACCT-DAY(IDX-KSN)
                                          TO  WRK-TAIHI-KSN-DAY(IDX-KSN)
-                       END-PERFORM
+                                END-PERFORM
+                             END-IF
+                             MOVE    "tbl_nyuinact"   TO  MCP-TABLE
+                             MOVE    "key6"           TO  MCP-PATHNAME
+                             PERFORM 910-NYUINACT-READ-SEC
+                          END-PERFORM
+                       END-IF
+      *
+                       MOVE    "tbl_nyuinact"      TO  MCP-TABLE
+                       MOVE    "key6"              TO  MCP-PATHNAME
+                       PERFORM 900-CLOSE-SEC
+      *
                    END-IF
       *
                    MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
@@ -2673,20 +2710,20 @@
       *
       *    事前に退避していた入院料加算のセット
            MOVE    SPACE     TO  LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX8)
-      **     DISPLAY  "!!!!! WRK-TAIHI-KSN-SRYCD SET = "
+           DISPLAY  "!!!!! WRK-TAIHI-KSN-SRYCD SET = "
                       WRK-TAIHI-KSN-SRYCD
            IF      WRK-TAIHI-KSN-SRYCD    NOT =   SPACE
       *         加算と入院料の表用番号が一致するかチェック
                 PERFORM   48011-TENSU-SEL-SEC
                 PERFORM   48012-TENSU-SEL-SEC
-      **          DISPLAY "WRK-BTU-CDKBN-KBNNUM = "
-      **                   WRK-BTU-CDKBN-KBNNUM
-      **          DISPLAY "WRK-BTU-CDKBN-KBNNUM-EDA = "
-      **                   WRK-BTU-CDKBN-KBNNUM-EDA
-      **          DISPLAY "WRK-KSN-CDKBN-KBNNUM = "
-      **                   WRK-KSN-CDKBN-KBNNUM
-      **          DISPLAY "WRK-KSN-CDKBN-KBNNUM-EDA = "
-      **                   WRK-KSN-CDKBN-KBNNUM-EDA
+                DISPLAY "WRK-BTU-CDKBN-KBNNUM = "
+                         WRK-BTU-CDKBN-KBNNUM
+                DISPLAY "WRK-BTU-CDKBN-KBNNUM-EDA = "
+                         WRK-BTU-CDKBN-KBNNUM-EDA
+                DISPLAY "WRK-KSN-CDKBN-KBNNUM = "
+                         WRK-KSN-CDKBN-KBNNUM
+                DISPLAY "WRK-KSN-CDKBN-KBNNUM-EDA = "
+                         WRK-KSN-CDKBN-KBNNUM-EDA
       *        表用番号が同一であることの判定
                IF   WRK-KSN-CDKBN-KBNNUM    NOT =    ZERO
                  IF  (WRK-BTU-CDKBN-KBNNUM  = WRK-KSN-CDKBN-KBNNUM)  AND
@@ -3172,6 +3209,41 @@
       *
            .
        910-NYUINACCT-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院行為マスター検索
+      *****************************************************************
+       910-NYUINACT-SELECT-SEC        SECTION.
+      *
+           MOVE    NYUINACT-REC        TO  MCPDATA-REC
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO            TO  FLG-NYUINACT
+           ELSE
+               MOVE    1               TO  FLG-NYUINACT
+           END-IF
+      *
+           .
+       910-NYUINACT-SELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    入院行為マスター読込
+      *****************************************************************
+       910-NYUINACT-READ-SEC        SECTION.
+      *
+           PERFORM 900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  NYUINACT-REC
+               MOVE    ZERO            TO  FLG-NYUINACT
+           ELSE
+               INITIALIZE                  NYUINACT-REC
+               MOVE    1               TO  FLG-NYUINACT
+           END-IF
+      *
+           .
+       910-NYUINACT-READ-EXT.
            EXIT.
       *
       *****************************************************************
