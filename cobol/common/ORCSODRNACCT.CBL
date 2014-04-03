@@ -1141,10 +1141,10 @@
            MOVE    LNK-PTNYUINRRK-HOSPNUM   TO  STUSAN-HOSPNUM
            MOVE    LNK-PTNYUINRRK-PTID TO  STUSAN-PTID
            IF   IPN-NYUKAIKEI-SAKUSEI-FLG  =   "1"
-               MOVE    LNK-PTNYUINRRK-TENNYUYMD
-                                       TO  STUSAN-KJNYMD
-           ELSE
                MOVE   IPN-SANTEISTYMD  TO  STUSAN-KJNYMD
+           ELSE
+               MOVE   LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  STUSAN-KJNYMD
            END-IF
            CALL    "ORCSTUSAN"     USING   ORCSTUSANAREA
                                            SPA-AREA
