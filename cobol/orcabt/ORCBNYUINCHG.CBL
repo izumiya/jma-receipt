@@ -230,6 +230,12 @@
       *    出生児体重
            03  WRK-WEIGHT              PIC 9(04).
       *
+      *    医療機関設定の入院料加算チェック用
+           03  WRK-BTU-CDKBN-KBNNUM        PIC 9(03).
+           03  WRK-BTU-CDKBN-KBNNUM-EDA    PIC 9(02).
+           03  WRK-KSN-CDKBN-KBNNUM        PIC 9(03).
+           03  WRK-KSN-CDKBN-KBNNUM-EDA    PIC 9(02).
+      *
       *    患者年齢算出用エリア
        01  WRK-NENREI-AREA.
            03  WRK-NENREI                  PIC 9(03).
@@ -717,6 +723,7 @@
        2001-NYUINACCT-CHK-SEC          SECTION.
       *
            MOVE    ZERO                TO  FLG-NYUINACCTARI
+           MOVE    SPACE               TO  WRK-TAIHI-KSN-SRYCD
       *
            MOVE    ZERO                TO  FLG-NYUINACCT
            INITIALIZE                      NYUINACCT-REC
@@ -798,7 +805,7 @@
       *              190152470
       *              救急・在宅等支援病床初期加算（地域包括ケア病棟入院料）
       *              190177170
-                   MOVE    SPACE               TO   WRK-TAIHI-KSN-SRYCD
+      **             DISPLAY   "PTNYUINRRK-PTID = " PTNYUINRRK-PTID
                    IF    ( NACCT-ZAISKBKBN     =    "6"    )  AND
                          ( NACCT-SRYCDTOTAL    =    190135470 OR
                                                     190135670 OR
@@ -807,6 +814,8 @@
                                                     190142970 OR
                                                     190152470 OR
                                                     190177170 )
+      **                 DISPLAY "NACCT-SRYCDTOTAL(6:9) = " 
+      **                          NACCT-SRYCDTOTAL(6:9)
                        MOVE    NACCT-SRYCDTOTAL(6:9)
                                                TO   WRK-TAIHI-KSN-SRYCD
                        PERFORM VARYING IDX-KSN  FROM 1 BY 1
@@ -2664,11 +2673,169 @@
       *
       *    事前に退避していた入院料加算のセット
            MOVE    SPACE     TO  LNK-SCNYUACCT-NYUKHNKSN-KBN(IDX8)
-           MOVE    WRK-TAIHI-KSN-SRYCD
+      **     DISPLAY  "!!!!! WRK-TAIHI-KSN-SRYCD SET = "
+                      WRK-TAIHI-KSN-SRYCD
+           IF      WRK-TAIHI-KSN-SRYCD    NOT =   SPACE
+      *         加算と入院料の表用番号が一致するかチェック
+                PERFORM   48011-TENSU-SEL-SEC
+                PERFORM   48012-TENSU-SEL-SEC
+      **          DISPLAY "WRK-BTU-CDKBN-KBNNUM = "
+      **                   WRK-BTU-CDKBN-KBNNUM
+      **          DISPLAY "WRK-BTU-CDKBN-KBNNUM-EDA = "
+      **                   WRK-BTU-CDKBN-KBNNUM-EDA
+      **          DISPLAY "WRK-KSN-CDKBN-KBNNUM = "
+      **                   WRK-KSN-CDKBN-KBNNUM
+      **          DISPLAY "WRK-KSN-CDKBN-KBNNUM-EDA = "
+      **                   WRK-KSN-CDKBN-KBNNUM-EDA
+      *        表用番号が同一であることの判定
+               IF   WRK-KSN-CDKBN-KBNNUM    NOT =    ZERO
+                 IF  (WRK-BTU-CDKBN-KBNNUM  = WRK-KSN-CDKBN-KBNNUM)  AND
+                     (WRK-BTU-CDKBN-KBNNUM-EDA
+                                            = WRK-KSN-CDKBN-KBNNUM-EDA)
+                    MOVE    WRK-TAIHI-KSN-SRYCD
                              TO  LNK-SCNYUACCT-NYUKHNKSN-SRYCD(IDX8)
+                 END-IF
+              END-IF
+           END-IF
            .
       *
        410191-NYUKSN-GET-EXT.
+           EXIT.
+      *
+      *
+      *****************************************************************
+      *    点数マスタ検索処理（入院料）
+      *****************************************************************
+       48011-TENSU-SEL-SEC              SECTION.
+      *
+           MOVE    ZERO            TO  WRK-BTU-CDKBN-KBNNUM
+           MOVE    ZERO            TO  WRK-BTU-CDKBN-KBNNUM-EDA
+      *
+           MOVE    ZERO            TO  FLG-TENSU
+           INITIALIZE                  TNS-TENSU-REC
+           MOVE    WRK-PARA-HOSPNUM
+                                   TO  TNS-HOSPNUM
+           IF      LNK-SCNYUACCT-NYUKHN-SRYCD(1)   NOT = SPACE
+               MOVE   LNK-SCNYUACCT-NYUKHN-SRYCD(1)
+                                        TO  TNS-SRYCD
+           ELSE
+               MOVE   LNK-SCNYUACCT-KAGEN-SRYCD(1)
+                                        TO  TNS-SRYCD
+           END-IF
+           MOVE    WRK-PARA-SRYYM  TO  TNS-YUKOSTYMD(1:6)
+           MOVE    "01"            TO  TNS-YUKOSTYMD(7:2)
+           MOVE    TNS-YUKOSTYMD   TO  TNS-YUKOEDYMD
+           MOVE    TNS-TENSU-REC   TO  MCPDATA-REC
+           MOVE    "tbl_tensu"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           MOVE    "tbl_tensu"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBFETCH-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  TNS-TENSU-REC
+               MOVE    ZERO        TO  FLG-TENSU
+           ELSE
+               MOVE    1           TO  FLG-TENSU
+           END-IF
+      *
+           MOVE    "tbl_tensu"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           IF    ( FLG-TENSU       NOT =   ZERO )
+               GO  TO  48011-TENSU-SEL-EXT
+           END-IF
+      *
+           MOVE    TNS-CDKBN-KBNNUM
+                                   TO WRK-BTU-CDKBN-KBNNUM
+           MOVE    TNS-CDKBN-KBNNUM-EDA
+                                   TO WRK-BTU-CDKBN-KBNNUM-EDA
+      *    療養病床以外・有床診療所療養病床入院基本料のとき、
+      *    表用番号の置き換え（平成２４年改正）
+           IF     (TNS-CDKBN-KBNNUM  = 108)   AND
+                  (TNS-CDKBN-KOUBAN  =  10)   AND
+                 ((TNS-YUKOSTYMD    >=  "20120401")   AND
+                  (TNS-YUKOSTYMD    <=  "20140331"))
+               MOVE   109           TO WRK-BTU-CDKBN-KBNNUM
+               MOVE   ZERO          TO WRK-BTU-CDKBN-KBNNUM-EDA
+           END-IF
+      *    療養病床以外・有床診療所療養病床入院基本料のとき、
+      *    表用番号の置き換え（平成２６年改正）
+           IF     (TNS-CDKBN-KBNNUM  = 108)   AND
+                  (TNS-CDKBN-KOUBAN  =  13)   AND
+                  (TNS-YUKOSTYMD    >=  "20040401")
+               MOVE   109           TO WRK-BTU-CDKBN-KBNNUM
+               MOVE   ZERO          TO WRK-BTU-CDKBN-KBNNUM-EDA
+           END-IF
+      *
+           .
+      *
+       48011-TENSU-SEL-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数マスタ検索処理（入院料加算）
+      *****************************************************************
+       48012-TENSU-SEL-SEC              SECTION.
+      *
+           MOVE    ZERO            TO  WRK-KSN-CDKBN-KBNNUM
+           MOVE    ZERO            TO  WRK-KSN-CDKBN-KBNNUM-EDA
+      *
+           MOVE    ZERO            TO  FLG-TENSU
+           INITIALIZE                  TNS-TENSU-REC
+      *
+           MOVE    WRK-PARA-HOSPNUM
+                                   TO  TNS-HOSPNUM
+      *
+           MOVE    WRK-TAIHI-KSN-SRYCD
+                                   TO  TNS-SRYCD
+           MOVE    WRK-PARA-SRYYM  TO  TNS-YUKOSTYMD(1:6)
+           MOVE    "01"            TO  TNS-YUKOSTYMD(7:2)
+           MOVE    TNS-YUKOSTYMD   TO  TNS-YUKOEDYMD
+           MOVE    TNS-TENSU-REC   TO  MCPDATA-REC
+      *
+           MOVE    "tbl_tensu"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           MOVE    "tbl_tensu"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-DBFETCH-SEC
+           IF    ( MCP-RC          =   ZERO )
+               MOVE    MCPDATA-REC TO  TNS-TENSU-REC
+               MOVE    ZERO        TO  FLG-TENSU
+           ELSE
+               MOVE    1           TO  FLG-TENSU
+           END-IF
+      *
+           MOVE    "tbl_tensu"     TO  MCP-TABLE
+           MOVE    "key"           TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           IF    ( FLG-TENSU       NOT =   ZERO )
+               GO  TO  48012-TENSU-SEL-EXT
+           END-IF
+      *
+      *    入院料（Ａ１００番台）、特定入院料（Ａ３００番台）に含まれる
+      *    注加算のみが判定対象となる
+           IF      (TNS-CDKBN-KBN       =   "A")     AND
+                   (TNS-CDKBN-KBNNUM   >=   100)     AND
+                   (TNS-CDKBN-KBNNUM   <=   199)
+               MOVE    TNS-CDKBN-KBNNUM TO  WRK-KSN-CDKBN-KBNNUM
+               MOVE    TNS-CDKBN-KBNNUM-EDA
+                                        TO  WRK-KSN-CDKBN-KBNNUM-EDA
+           END-IF
+      *
+           IF      (TNS-CDKBN-KBN       =   "A")     AND
+                   (TNS-CDKBN-KBNNUM   >=   300)     AND
+                   (TNS-CDKBN-KBNNUM   <=   399)
+               MOVE    TNS-CDKBN-KBNNUM TO  WRK-KSN-CDKBN-KBNNUM
+               MOVE    TNS-CDKBN-KBNNUM-EDA
+                                        TO  WRK-KSN-CDKBN-KBNNUM-EDA
+           END-IF
+           .
+      *
+       48012-TENSU-SEL-EXT.
            EXIT.
       *
       *****************************************************************
