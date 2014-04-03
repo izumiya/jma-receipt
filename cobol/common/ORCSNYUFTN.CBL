@@ -3355,8 +3355,14 @@ grpsys                                    SPA-AREA
                        EVALUATE  TBL-5000-NACCT-BRMSGKKBN(SYU-IDX)
                          WHEN  SPACE
                          WHEN  "1"
-                           IF  (SYU-DAY(SYU-IDX)            =  "1" )
-                           AND (NACCT-DAY(SYU-IDX)      NOT =  ZERO)
+                           IF (( SYU-DAY(SYU-IDX)         = "1"   ) AND
+                               ( NACCT-DAY(SYU-IDX)   NOT =  ZERO ) AND
+                               ( SYU-SRYYMD(1:6)      <= "201403" ))
+                           OR (((SYU-DAY(SYU-IDX)         = "1"  ) OR
+                                (WRK-NYUINDAY-KBN(IDX SYU-IDX)
+                                                          = "1"  )) AND
+                               ( NACCT-DAY(SYU-IDX)   NOT =  ZERO ) AND
+                               ( SYU-SRYYMD(1:6)      >= "201404" ))
                              MOVE  NACCT-DAY(SYU-IDX)  TO  RMSAGAKU-IDX
                              IF  (WRK-BRMSGK-TAXKBN    =  "1"    )
                              AND (SYU-SRYYMD(1:6)     >= "200704")
