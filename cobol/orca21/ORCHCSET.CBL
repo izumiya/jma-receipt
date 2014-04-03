@@ -1013,10 +1013,10 @@
       *        経過措置日は最後の履歴内容
                MOVE    TNS-KEIKASOCHIYMD   TO  WRK-TNS-KEIKASOCHIYMD
                IF     (HCSET-KEIKAYMD      NOT =   SPACE )   AND
-                      (TNS-SRYCD (1:1)         =   "6"   )   AND
-                      (TNS-KEIKASOCHIYMD   NOT =   SPACE
-                                               AND ZERO  )
+                      (TNS-SRYCD (1:1)         =   "6"   )
                    IF     (HCSET-KEIKAYMD      <   TNS-KEIKASOCHIYMD)
+                      OR  (TNS-KEIKASOCHIYMD   =   ZERO
+                                               OR  SPACE    )
                        MOVE    ZERO                TO  FLG-OK-KEIKA
                    END-IF
       *            経過措置日に有効
