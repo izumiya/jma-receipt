@@ -41,6 +41,7 @@
       *  04.06.00    NACL-Â¿¡¹Ç¼  10/11/29  ¼«ÇåÀÕ¶â³ÛÆþÎÏÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/10/XX  Æ±ÆüºÆÆþ±¡ÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  14/02/13  Ï«ºÒ¶â³Û¡ó²Ã»»ÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/04/03  £È£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -230,6 +231,8 @@
            03  WRK-TENSUKEI-G          PIC S9(08).
            03  WRK-TENSUKEI-K          PIC S9(08).
       *
+           03  WRK-TIME-KBN2           PIC X(01).
+      *
       *    ½¸·×¼ýÇ¼ÀÁµáÆâÍÆ
        01  WRK-SUM-AREA.
            03  SUM-SYU-SKY-NAIYOU.
@@ -251,6 +254,80 @@
            03  TBL-CHISRYCD2       PIC X(09)   VALUE   "112015670".
       *    »þ´Ö³°ÂÐ±þ²Ã»»£³
            03  TBL-CHISRYCD3       PIC X(09)   VALUE   "112016170".
+      *
+      *
+      *    »þ´Ö³°²Ã»»¥Æ¡¼¥Ö¥ë
+       01  TBL-TIMEKSN-AREA.
+      *¾®»ù²Ê³°Íè¿ÇÎÅ²Ê¡Ê½é¿Ç¡Ë
+      *    »þ´Ö³°
+           03  FILLER              PIC X(12)   VALUE   "11 113009670".
+      *    µÙÆü
+           03  FILLER              PIC X(12)   VALUE   "12 113007170".
+      *    ¿¼Ìë
+           03  FILLER              PIC X(12)   VALUE   "13 113007270".
+      *    »þ´Ö³°ÆÃÎã
+           03  FILLER              PIC X(12)   VALUE   "14 111010770".
+      *    Ìë´Ö¡Ê»þ´Ö³°¡Ë²Ã»»
+           03  FILLER              PIC X(12)   VALUE   "15 113007070".
+      *¾®»ù²Ê³°Íè¿ÇÎÅ²Ê¡ÊºÆ¿Ç¡Ë
+      *    »þ´Ö³°
+           03  FILLER              PIC X(12)   VALUE   "21 113009770".
+      *    µÙÆü
+           03  FILLER              PIC X(12)   VALUE   "22 113007470".
+      *    ¿¼Ìë
+           03  FILLER              PIC X(12)   VALUE   "23 113007570".
+      *    »þ´Ö³°ÆÃÎã
+           03  FILLER              PIC X(12)   VALUE   "24 112006070".
+      *    Ìë´Ö¡Ê»þ´Ö³°¡Ë²Ã»»
+           03  FILLER              PIC X(12)   VALUE   "25 113007370".
+      *³°Íè¿Ç»¡ÎÁ³°Íè¿ÇÎÅ²Ê¡ÊºÆ¿Ç¡Ë
+      *    »þ´Ö³°
+           03  FILLER              PIC X(12)   VALUE   "21 113009870".
+      *    µÙÆü
+           03  FILLER              PIC X(12)   VALUE   "22 113007770".
+      *    ¿¼Ìë
+           03  FILLER              PIC X(12)   VALUE   "23 113007870".
+      *    »þ´Ö³°ÆÃÎã
+           03  FILLER              PIC X(12)   VALUE   "24 113005570".
+      *    Ìë´Ö¡Ê»þ´Ö³°¡Ë²Ã»»
+           03  FILLER              PIC X(12)   VALUE   "25 113007670".
+      *
+      *ÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+      *    »þ´Ö³°
+           03  FILLER              PIC X(12)   VALUE   "31 113016270".
+      *    µÙÆü
+           03  FILLER              PIC X(12)   VALUE   "32 113016370".
+      *    ¿¼Ìë
+           03  FILLER              PIC X(12)   VALUE   "33 113016470".
+      *    »þ´Ö³°ÆÃÎã
+           03  FILLER              PIC X(12)   VALUE   "34 113016870".
+      *    ÆýÍÄ»ù»þ´Ö³°²Ã»»
+           03  FILLER              PIC X(12)   VALUE   "31 113016570".
+      *    ÆýÍÄ»ùµÙÆü²Ã»»
+           03  FILLER              PIC X(12)   VALUE   "32 113016670".
+      *    ÆýÍÄ»ù¿¼Ìë²Ã»»
+           03  FILLER              PIC X(12)   VALUE   "33 113016770".
+      *    ÆýÍÄ»ù»þ´Ö³°ÆÃÎã²Ã»»
+           03  FILLER              PIC X(12)   VALUE   "34 113016970".
+      *    ¾®»ù²Ê ÆýÍÄ»ùÌë´Ö
+           03  FILLER              PIC X(12)   VALUE   "35 113017070".
+      *    ¾®»ù²Ê ÆýÍÄ»ùµÙÆü
+           03  FILLER              PIC X(12)   VALUE   "32 113017170".
+      *    ¾®»ù²Ê ÆýÍÄ»ù¿¼Ìë
+           03  FILLER              PIC X(12)   VALUE   "33 113017270".
+      *    ÁáÄ«²Ã»»
+           03  FILLER              PIC X(12)   VALUE   "38 113017370".
+      *
+       01  TBL-TIMEKSN-AREA-R      REDEFINES   TBL-TIMEKSN-AREA.
+           03  TBL-TIMEKSN-OCC     OCCURS   27
+                                   INDEXED  TBL-TIDX.
+      *        1:½é¿Ç¡¢2¡§ºÆ¿Ç¡¢3:ÃÏ°èÊñ³ç¿ÇÎÅÎÁ
+               05  TBL-TM-KBN1         PIC X(01).
+      *        1:»þ´Ö³°¡¢2¡§µÙÆü¡¢3:¿¼Ìë¡¢4:ÆÃÄê»þ´Ö³°¡¢5:Ìë´Ö¡¢8:Ìë´Ö¡¦ÁáÄ«
+               05  TBL-TM-KBN2         PIC X(01).
+               05  TBL-TM-YOBI         PIC X(01).
+      *
+               05  TBL-TM-SRYCD        PIC X(09).
       *
       *
       *****************************************************************
@@ -833,6 +910,24 @@
                                                         OR  "7"
                                                         OR  "8" )
                        PERFORM 10025-HAIKI-CHKI-SEC
+                   END-IF
+      *!!!!
+      *H26.4
+      *            Àº¿ÀÄÌ±¡¤Î£²£°ºÐ²Ã»»¤Î¼«Æ°È¯À¸¤Ê¤·
+                   IF     (SPA-SRYYMD              >=  "20140401")
+                      AND (ORCSCWKSRY-SYORIFLG     =   ZERO      )
+                      AND (SPA-COM-CDKBN-KBN (IDX-1)   =   "I"  )
+                      AND (SPA-COM-CDKBN-KBNNUM(IDX-1) =   "002")
+                       IF      (SPA-COM-AUTOKBN(IDX-1) =  "2"   )
+                           MOVE    SPACE          TO  SPA-COM-AUTOKBN
+                                                             (IDX-1)
+                       END-IF
+                       IF      (SPA-COM-DATAKBN(IDX-1) =  "1"   )
+      *v4.8                MOVE    "1"            TO  SPA-COM-KSNAUTO
+                           MOVE    "1"            TO  SPA-COM-YOBI1
+                                                             (IDX-1)
+                                                             (1:1)
+                       END-IF
                    END-IF
       *
       *            ²ó¿ô¤ÎÆþÎÏ¡Ê³°Íè¤Î¤ß¡Ë
@@ -1557,7 +1652,8 @@
            IF      LNK-WKSRY-SRYKBN    (IDX)       =   "13"
       *        ¾®»ù²Ê³°Íè¿Ç»¡ÎÁ¤Î²Ã»»¤Î¤ß
                PERFORM 310119-SYONIKA-CHK-SEC
-               IF      WRK-SYONIKA-KBN     =   "4"
+               IF     (WRK-SYONIKA-KBN     =   "4"   )
+                  OR  (WRK-TIME-KBN2   NOT =   SPACE )
                    MOVE    1                   TO  FLG-SYUBETU
                END-IF
            END-IF
@@ -1741,6 +1837,23 @@
                                                       (TBL-SYO)
                    MOVE    TBL-SYONIKA-KBN (TBL-SYO)
                                            TO  WRK-SYONIKA-KBN
+           END-SEARCH
+      *
+      *H26.4 ¤«¤é¡¡ÃÏ°èÊñ³ç¿ÇÎÅÎÁ¤Î»þ´Ö³°ÄÉ²Ã
+           IF      SPA-SRYYMD          <   "20140401"
+               MOVE    SPACE           TO  WRK-TIME-KBN2
+               GO      TO      310119-SYONIKA-CHK-EXT
+           END-IF
+      *    ¿Ç»¡ÎÁ¸¡º÷
+           SET     TBL-TIDX            TO  1
+           SEARCH  TBL-TIMEKSN-OCC     VARYING   TBL-TIDX
+               AT  END
+                   MOVE    SPACE           TO  WRK-TIME-KBN2
+                WHEN   LNK-WKSRY-SRYCD (IDX IDY)
+                                           =   TBL-TM-SRYCD
+                                                      (TBL-TIDX)
+                   MOVE    TBL-TM-KBN2 (TBL-TIDX)
+                                           TO  WRK-TIME-KBN2
            END-SEARCH
            .
        310119-SYONIKA-CHK-EXT.
