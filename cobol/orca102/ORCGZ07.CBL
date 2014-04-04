@@ -166,6 +166,7 @@
            03  FLG-TYAKUJYO                    PIC 9(01).
            03  FLG-TPTKINKI                    PIC 9(01).
            03  FLG-LOOPEND                     PIC 9(01).
+           03  FLG-ROW                         PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -208,6 +209,7 @@
            03  WRK-JOBID               PIC 9(07).
            03  WRK-PAGE                PIC ZZZZZZZZZ9.
            03  WRK-PRT-PAGE            PIC 9(10).
+           03  WRK-ROW                 PIC S9(09).
       *
        01  WRK-HEN-AREA.
            03  WRK-HENYMDG         PIC X(09).
@@ -711,6 +713,8 @@
            ELSE
                MOVE    ZERO            TO  SPA-GMN-NEXT
            END-IF
+      *
+           MOVE    1                   TO  FLG-ROW
       *
            PERFORM 3101-CMBSET-SEC
       *
@@ -2840,8 +2844,16 @@
       *****************************************************************
        500-GMNHEN-SEC                  SECTION.
       *
+           MOVE    Z07-TENSU-ROW       TO  WRK-ROW
+      *
            MOVE    SPACE               TO  Z07
            INITIALIZE                      Z07
+      *
+           IF    ( FLG-ROW             =   1 )
+              MOVE    ZERO             TO  Z07-TENSU-ROW
+           ELSE
+              MOVE    WRK-ROW          TO  Z07-TENSU-ROW
+           END-IF
       *
            MOVE    SPA-GMN-YUKOYMD     TO  Z07-YUKOYMD
            MOVE    SPA-GMN-SELNUM      TO  Z07-SELNUM

@@ -1518,19 +1518,22 @@ path	key95	{
 path	key28   	{
 	DBSELECT	{
 		DECLARE tbl_tensu_key28_csr CURSOR FOR
-		SELECT distinct a.*
-		FROM tbl_tensu a,tbl_inputcd b
-			WHERE a.HOSPNUM  =   :HOSPNUM
-			AND   a.HOSPNUM  =   b.HOSPNUM
-			AND   a.SRYCD    =   b.SRYCD
-			AND   a.YUKOEDYMD  =
-                           (SELECT MAX(YUKOEDYMD)
-                                   FROM tbl_tensu
-				WHERE	a.HOSPNUM =  HOSPNUM
-				AND	a.SRYCD   =  SRYCD)
-			AND   a.YUKOEDYMD  =  :YUKOEDYMD
-			ORDER  BY  a.YKZKBN,
-			           a.KANANAME
+		SELECT *
+		FROM tbl_tensu a
+			WHERE HOSPNUM  =   :HOSPNUM
+			AND  (HOSPNUM,SRYCD) in
+              (
+               SELECT HOSPNUM,SRYCD FROM tbl_inputcd
+              )
+			AND   NOT EXISTS 
+              (SELECT * FROM tbl_tensu
+				WHERE	HOSPNUM =  a.HOSPNUM
+				AND	    SRYCD   =  a.SRYCD
+			    AND     YUKOEDYMD  >  :YUKOEDYMD
+            )
+			AND    YUKOEDYMD  =  :YUKOEDYMD
+			ORDER  BY  YKZKBN,
+			           KANANAME
 		;
 	};
 };
