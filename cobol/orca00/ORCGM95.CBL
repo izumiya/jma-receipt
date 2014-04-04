@@ -208,6 +208,10 @@
            03  WRK-M95-SYSLIST-ROW     PIC S9(09).
            03  FLG-GMN-INIT            PIC 9(01).
       *
+      *    Ã´Åö°å°ìÍ÷£Í£Á£Ø
+       01  COM-TANMAX              PIC 9(03)  VALUE   100.
+      *
+      *
        01  WRK-HENSYU-AREA.
            03  WRK-HENYMDG         PIC X(09).
            03  WRK-HENYMD.
@@ -1465,6 +1469,7 @@
       *
            PERFORM VARYING     IDX     FROM    IDX-S   BY  1
                    UNTIL       IDX     >   SPA-SRYKA-MAX
+                          OR  (IDX-H   >=  COM-TANMAX    )
                PERFORM 4200211-SRYKA-HEN-SEC
            END-PERFORM
            .
@@ -1477,7 +1482,8 @@
       *
            MOVE    ZERO                TO  FLG-HEN
            PERFORM VARYING     IDX     FROM    IDX-S   BY  1
-                   UNTIL       IDX     >   SPA-SRYKA-MAX
+                   UNTIL      (IDX     >   SPA-SRYKA-MAX )
+                          OR  (IDX-H   >=  COM-TANMAX    )
                IF      SPA-NAI-SRYKA (IDX) =   WRK-SRYKA
                    PERFORM 4200211-SRYKA-HEN-SEC
                    PERFORM 420021-DRDELIST-HEN-SEC
@@ -1495,6 +1501,7 @@
            END-PERFORM
            IF     (FLG-HEN             =   ZERO  )
               AND (WRK-SRYKA       NOT =   SPACE )
+              AND (IDX-H               >=  COM-TANMAX )
       *        ¿ÇÎÅ²Ê¤Ê¤·
                ADD     1               TO  IDX-H
                MOVE    WRK-SRYKA       TO  SPA-M95GMN-TSRYKA  (IDX-H)
@@ -1513,7 +1520,8 @@
       *
            MOVE    ZERO                TO  FLG-HEN
            PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL       IDX     >   SPA-SRYKA-MAX
+                   UNTIL      (IDX     >   SPA-SRYKA-MAX )
+                         OR   (IDX-H   >=  COM-TANMAX    )
                IF      SPA-NAI-SRYKA (IDX) =   WRK-SRYKA
                    PERFORM 4200211-SRYKA-HEN-SEC
                    PERFORM 420021-DRDELIST-HEN-SEC
@@ -1522,7 +1530,8 @@
                END-IF
            END-PERFORM
       *
-           IF      FLG-HEN             =   ZERO
+           IF     (FLG-HEN             =   ZERO )
+             AND  (IDX-H               >=  COM-TANMAX )
       *        ¿ÇÎÅ²Ê¤Ê¤·
                ADD     1               TO  IDX-H
                MOVE    WRK-SRYKA       TO  SPA-M95GMN-TSRYKA  (IDX-H)
@@ -1555,6 +1564,7 @@
            PERFORM VARYING     IDX-D   FROM    1   BY  1
                    UNTIL      (IDX-D   >   20  )  OR
                               (SYS-1011-DRCD (IDX-D)   =   SPACE)
+                          OR  (IDX-H   >=  COM-TANMAX  )
                IF      IDX-D           >   1
                    ADD     1                   TO  IDX-H
                END-IF
@@ -2225,7 +2235,7 @@ grpsys*        MOVE SPA-HOSPNUM TO -HOSPNUM
                    MOVE    "¿ÇÎÅ²Ê¤ÏÊÑ¹¹¤Ç¤­¤Þ¤»¤ó¡£"
                                                TO  SPA-ERRMSG
                WHEN    "0109"
-                   STRING  "£±£°·ï°Ê¾å¤Ë¤Ê¤ê¤Þ¤¹¡£"
+                   STRING  "£²£°·ï°Ê¾å¤Ë¤Ê¤ê¤Þ¤¹¡£"
                            "¤³¤ì°Ê¾åÅÐÏ¿¤Ç¤­¤Þ¤»¤ó¡£"
                                                DELIMITED  BY  SIZE
                                                INTO  SPA-ERRMSG
