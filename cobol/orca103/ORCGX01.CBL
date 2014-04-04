@@ -111,6 +111,7 @@
                            11  SPA-NAI-TEDYUKYMD  PIC 9(08). 
                            11  SPA-NAI-NAME       PIC X(100).
                            11  SPA-NAI-TID        PIC 9(09).
+                           11  SPA-NAI-TCHOFUKU PIC 9(01).
                    07  SPA-MAE-SRYCD              PIC X(09). 
                    07  SPA-NAI-BYOMEI             PIC X(100).
                    07  SPA-NAI-HOSOKU             PIC X(40).
@@ -1228,7 +1229,7 @@
                PERFORM 41041-SRYCD-CHKTRD-SEC
            END-EVALUATE
       *
-           PERFORM 41041-CHKKBNLIST-SEL-SEC
+           PERFORM 41041-CHKKBNLIST-INIT-SEC
       *
            .
        4104-SRYCD-CHK-EXT.
@@ -1272,8 +1273,8 @@
            END-PERFORM
       *
       *    カーソルクロース
-           MOVE    "tbl_chk"            TO  MCP-TABLE
-           MOVE    "key12"              TO  MCP-PATHNAME
+           MOVE    "tbl_chk"           TO  MCP-TABLE
+           MOVE    "key12"             TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
@@ -1374,9 +1375,11 @@
        41041-SRYCD-CHKTRD-EXT.
            EXIT.
       *****************************************************************
-      *    チェック区分リスト選択処理
+      *    チェック区分リスト初期処理
       *****************************************************************
-       41041-CHKKBNLIST-SEL-SEC             SECTION.
+       41041-CHKKBNLIST-INIT-SEC             SECTION.
+      *
+           PERFORM 410411-CHOFUKU-CHK-SEC
       *
            MOVE    SPACE                       TO  SPA-GMN-SELNUM
            MOVE    ZERO                        TO  SPA-NAI-SELNUM
@@ -1436,7 +1439,40 @@
       *
       *
            .
-       41041-CHKKBNLIST-SEL-EXT.
+       41041-CHKKBNLIST-INIT-EXT.
+           EXIT.
+      *****************************************************************
+      *    期間重複チェック処理
+      *****************************************************************
+       410411-CHOFUKU-CHK-SEC              SECTION.
+      *
+           PERFORM VARYING IDX FROM    1   BY  1
+                   UNTIL ( IDX >   SPA-GMN-MAX  )
+      *
+               MOVE    0   TO  SPA-NAI-TCHOFUKU (IDX)
+      *
+               PERFORM VARYING IDY FROM    1   BY  1
+                       UNTIL ( IDY >   SPA-GMN-MAX )
+      *
+                   IF    ( IDX     =   IDY )
+                       CONTINUE
+                   ELSE
+                       IF    ( SPA-NAI-TEDYUKYMD (IDY)
+                                   <  SPA-NAI-TSTYUKYMD (IDX))
+                       OR    ( SPA-NAI-TSTYUKYMD (IDY)
+                                   >  SPA-NAI-TEDYUKYMD (IDX))
+                           CONTINUE
+                       ELSE
+                           MOVE    1   TO  SPA-NAI-TCHOFUKU (IDX)
+                       END-IF
+                   END-IF
+      *
+               END-PERFORM
+      *
+           END-PERFORM
+      *
+           .
+       410411-CHOFUKU-CHK-EXT.
            EXIT.
       *****************************************************************
       *    診療行為名称編集処理
@@ -1769,7 +1805,7 @@
            MOVE    "key2"               TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
-           PERFORM 41041-CHKKBNLIST-SEL-SEC
+           PERFORM 41041-CHKKBNLIST-INIT-SEC
       *
            .
        41011-BYOMEI-CHK005-EXT.
@@ -2329,27 +2365,33 @@
              END-IF
            END-IF
       *
-           PERFORM VARYING IDX FROM    1   BY  1
-                   UNTIL   IDX >       SPA-GMN-MAX
-                    OR   ( SPA-ERRCD   NOT =   SPACE )
+           IF    ( SPA-NAI-SELNUM      >   ZERO )
+            AND  ( SPA-NAI-TCHOFUKU (SPA-NAI-SELNUM)
+                                       =   1 )
+               CONTINUE
+           ELSE
+               PERFORM VARYING IDX FROM    1   BY  1
+                       UNTIL   IDX >       SPA-GMN-MAX
+                        OR   ( SPA-ERRCD   NOT =   SPACE )
       *
-               IF    ( SPA-NAI-SELNUM      =   IDX )
-                   CONTINUE
-               ELSE
-      *
-                   IF    ( SPA-NAI-EDYUKYMD    <  SPA-NAI-TSTYUKYMD
-                                                              (IDX))
-                   OR    ( SPA-NAI-STYUKYMD    >  SPA-NAI-TEDYUKYMD
-                                                              (IDX))
+                   IF    ( SPA-NAI-SELNUM      =   IDX )
                        CONTINUE
                    ELSE
-                       MOVE    "0004"  TO  SPA-ERRCD
-                       MOVE    4       TO  SPA-GMN-CUR
+      *
+                       IF    ( SPA-NAI-EDYUKYMD    <  SPA-NAI-TSTYUKYMD
+                                                              (IDX))
+                       OR    ( SPA-NAI-STYUKYMD    >  SPA-NAI-TEDYUKYMD
+                                                              (IDX))
+                           CONTINUE
+                       ELSE
+                           MOVE    "0004"  TO  SPA-ERRCD
+                           MOVE    4       TO  SPA-GMN-CUR
+                       END-IF
+      *
                    END-IF
       *
-               END-IF
-      *
-           END-PERFORM 
+               END-PERFORM
+           END-IF
       *
            IF    ( SPA-ERRCD           =   SPACE )
                PERFORM 4101-CHKMST-SENI-SEC
@@ -2376,7 +2418,13 @@
                                        TO  SPA-X01-SEL-STYUKYMD
                MOVE    SPA-NAI-TEDYUKYMD (SPA-NAI-SELNUM)
                                        TO  SPA-X01-SEL-EDYUKYMD
-               MOVE    SPA-NAI-ID      TO  SPA-X01-ID
+               IF    ( SPA-X01-CHKKBN  =   "8" OR "9" )
+                   MOVE    SPA-NAI-ID  TO  SPA-X01-ID
+               ELSE
+                   MOVE    SPA-NAI-TCHOFUKU (SPA-NAI-SELNUM)
+                                       TO  SPA-X01-ID
+
+               END-IF
            END-IF
       *
            EVALUATE    TRUE

@@ -101,6 +101,7 @@
                            11  SPA-Z01NAI-TYUKOSTYMD  PIC X(8).
                            11  SPA-Z01NAI-TYUKOEDYMD  PIC X(8).
                            11  SPA-Z01NAI-NAME        PIC X(100).
+                           11  SPA-Z01NAI-TCHOFUKU    PIC 9(01).
                        09  SPA-Z01NAI-COUNT           PIC 9(04).
       *
                    07  SPA-Z01NAI-KEIFLG          PIC 9(01).
@@ -568,6 +569,19 @@
                PERFORM  832-YMDCONV21-SEC
                MOVE    WRK-HENYMDG         TO  SPA-Z01GMN-TYUKOEDYMD
                                                                 (IDXX)
+      *
+               PERFORM VARYING IDXY    FROM    1   BY  1
+                       UNTIL ( IDXY    >=  IDXX )
+                   IF    ( SPA-Z01NAI-TYUKOEDYMD (IDXY)
+                               <  SPA-Z01NAI-TYUKOSTYMD (IDXX))
+                   OR    ( SPA-Z01NAI-TYUKOSTYMD (IDXY)
+                               >  SPA-Z01NAI-TYUKOEDYMD (IDXX))
+                       CONTINUE
+                   ELSE
+                       MOVE    1   TO  SPA-Z01NAI-TCHOFUKU (IDXX)
+                       MOVE    1   TO  SPA-Z01NAI-TCHOFUKU (IDXY)
+                   END-IF
+               END-PERFORM
       *
                MOVE    "tbl_tensu"         TO  MCP-TABLE
                MOVE    "key4"              TO  MCP-PATHNAME
@@ -1208,34 +1222,42 @@
       *****************************************************************
        41031-YUKOHANI-CHK-SEC                           SECTION.
       *
-      *    前チェック
-           IF      SPA-Z01NAI-SELNUM   >   1
-               MOVE    SPA-Z01NAI-TYUKOEDYMD(SPA-Z01NAI-SELNUM - 1)
+           IF    ( SPA-Z01NAI-SELNUM  >=  1 )
+            AND  ( SPA-Z01NAI-SELNUM  <=  SPA-Z01NAI-COUNT )
+            AND  ( SPA-Z01NAI-TCHOFUKU (SPA-Z01NAI-SELNUM)
+                                       =  1 )
+                   CONTINUE
+           ELSE
+      *
+      *        前チェック
+               IF      SPA-Z01NAI-SELNUM   >   1
+                   MOVE    SPA-Z01NAI-TYUKOEDYMD(SPA-Z01NAI-SELNUM - 1)
                                            TO  WRK-YMD
-      *        対象日＋１日
-               PERFORM 800-DAYSET-SEC
+      *            対象日＋１日
+                   PERFORM 800-DAYSET-SEC
       *********IF      SPA-Z01NAI-YUKOSTYMD  NOT =   WRK-OTYMD
-      *        重複しないこと
-               IF      SPA-Z01NAI-YUKOSTYMD    <     WRK-OTYMD
-                   MOVE    3                   TO  SPA-GMN-CUR
-                   MOVE    "0010"              TO  SPA-ERRCD
-                   GO      TO      41031-YUKOHANI-CHK-EXT
+      *            重複しないこと
+                   IF      SPA-Z01NAI-YUKOSTYMD    <     WRK-OTYMD
+                       MOVE    3                   TO  SPA-GMN-CUR
+                       MOVE    "0010"              TO  SPA-ERRCD
+                       GO      TO      41031-YUKOHANI-CHK-EXT
+                   END-IF
                END-IF
-           END-IF
-      *    後チェック
-           IF      SPA-Z01NAI-SELNUM   <   SPA-Z01NAI-COUNT
-               MOVE    SPA-Z01NAI-YUKOEDYMD
+      *        後チェック
+               IF      SPA-Z01NAI-SELNUM   <   SPA-Z01NAI-COUNT
+                   MOVE    SPA-Z01NAI-YUKOEDYMD
                                            TO  WRK-YMD
-      *        対象日＋１日
-               PERFORM 800-DAYSET-SEC
+      *            対象日＋１日
+                   PERFORM 800-DAYSET-SEC
       *******  IF      SPA-Z01NAI-TYUKOSTYMD(SPA-Z01NAI-SELNUM + 1)
       *****                                NOT =   WRK-OTYMD
-      *        重複しないこと
-               IF      SPA-Z01NAI-TYUKOSTYMD(SPA-Z01NAI-SELNUM + 1)
+      *            重複しないこと
+                   IF      SPA-Z01NAI-TYUKOSTYMD(SPA-Z01NAI-SELNUM + 1)
                                                <   WRK-OTYMD
-                   MOVE    4                   TO  SPA-GMN-CUR
-                   MOVE    "0010"              TO  SPA-ERRCD
-                   GO      TO      41031-YUKOHANI-CHK-EXT
+                       MOVE    4                   TO  SPA-GMN-CUR
+                       MOVE    "0010"              TO  SPA-ERRCD
+                       GO      TO      41031-YUKOHANI-CHK-EXT
+                   END-IF
                END-IF
            END-IF
       *H24.8

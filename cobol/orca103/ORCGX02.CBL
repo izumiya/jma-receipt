@@ -1885,6 +1885,7 @@
                     OR   ( X02-B03-STATE   =   WIDGET-INSENSITIVE )
       *
                IF    ( SPA-GMN-TDATAKBN  (IDX1)    =   "1" )
+                AND  ( SPA-X01-ID                  =   ZERO )
                    MOVE    WIDGET-INSENSITIVE
                                            TO  X02-B03-STATE
                END-IF
