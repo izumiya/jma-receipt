@@ -111,7 +111,7 @@
       *
            IF  LNK-IRYOKNS-KBN      =      "4"
       *
-      *      入院医学管理料のセット
+      *(8801-0)入院医学管理料のセット
              EVALUATE    LNK-IRYOKNS-NYUIN
       *        急性期入院対象者入院医学管理料
                WHEN    "01"
@@ -132,12 +132,17 @@
                WHEN    "09"
                WHEN    "10"
                WHEN    "12"
+               WHEN    "13"
+               WHEN    "14"
+               WHEN    "15"
+               WHEN    "16"
+               WHEN    "17"
                        ADD     1            TO  IDX
                        MOVE   "188000610"   TO  LNK-IRYOKNS-SRYCD(IDX)
              END-EVALUATE
       *
       *
-      *      未基準（病棟に係る基準を満たさない場合）のセット
+      *(8801-1)未基準減算（病棟に係る基準を満たさない場合）のセット
              INITIALIZE                   SYSKANRI-REC
              MOVE    LNK-IRYOKNS-HOSPNUM
                                       TO  SYS-HOSPNUM
@@ -174,20 +179,20 @@
              PERFORM   900-CLOSE-SEC
       *
       *
-      *      急性期入院対象者入院医学管理料の未適合のセット
+      *(8801-2)急性期入院対象者入院医学管理料の未適合減算のセット
              EVALUATE    LNK-IRYOKNS-NYUIN
                WHEN    "02"
-      *                未適合（入院決定日から９１日以上１年以内）
+      *                未適合減算（入院決定日から９１日以上１年以内）
                        ADD     1            TO  IDX
                        MOVE   "188000370"   TO  LNK-IRYOKNS-SRYCD(IDX)
                WHEN    "03"
-      *                未適合（入院決定日から１年超）
+      *                未適合減算（入院決定日から１年超）
                        ADD     1            TO  IDX
                        MOVE   "188000470"   TO  LNK-IRYOKNS-SRYCD(IDX)
              END-EVALUATE
       *
       *
-      *      観察回復期減算のセット（算定開始日から２７１日以上）
+      *(8801-2)観察回復期減算のセット（算定開始日から２７１日以上）
              EVALUATE    LNK-IRYOKNS-NYUIN
                WHEN    "11"
                        ADD     1            TO  IDX
@@ -195,17 +200,10 @@
              END-EVALUATE
       *
       *
-      *      社会復帰期移行加算のセット
-             EVALUATE    LNK-IRYOKNS-NYUIN
-               WHEN    "12"
-                       ADD     1            TO  IDX
-                       MOVE   "188006670"   TO  LNK-IRYOKNS-SRYCD(IDX)
-             END-EVALUATE
-      *
-      *
-      *      観察社会復帰期減算のセット
+      *(8801-2)観察社会復帰期減算のセット
              EVALUATE    LNK-IRYOKNS-NYUIN
                WHEN    "06"
+               WHEN    "15"
       *                観察社会復帰期減算（算定開始日から１８１日以上
       *                                    １年以内）
                        ADD     1            TO  IDX
@@ -219,25 +217,54 @@
       *                観察社会復帰期減算（算定開始日から１年１８０日超）
                        ADD     1            TO  IDX
                        MOVE   "188005870"   TO  LNK-IRYOKNS-SRYCD(IDX)
+               WHEN    "16"
+      *                観察社会復帰期減算（算定開始日から１年超
+      *                                    １年１８０日以内・遠隔地加算）
+                       ADD     1            TO  IDX
+                       MOVE   "188009170"   TO  LNK-IRYOKNS-SRYCD(IDX)
+               WHEN    "17"
+      *                観察社会復帰期減算（算定開始日から１年１８０日超
+      *                                    ・遠隔地加算）
+                       ADD     1            TO  IDX
+                       MOVE   "188009270"   TO  LNK-IRYOKNS-SRYCD(IDX)
              END-EVALUATE
       *
       *
-      *      未経過のセット
+      *(8801-2)未経過減算のセット
              EVALUATE    LNK-IRYOKNS-NYUIN
                WHEN    "09"
-      *                未経過（算定開始日から１年超、退院許可の申立て
-      *                        から１８０日以内）
+      *                未経過減算（算定開始日１年超、退院許可の申立て
+      *                            １８０日以内）
                        ADD     1            TO  IDX
                        MOVE   "188000970"   TO  LNK-IRYOKNS-SRYCD(IDX)
                WHEN    "10"
-      *                未経過（算定開始日１年１８０日超、退院許可の申立て
+      *                未経過減算（算定開始日１年１８０日超、退院許可の申立て
       *                        １８０日以内）
                        ADD     1            TO  IDX
                        MOVE   "188005970"   TO  LNK-IRYOKNS-SRYCD(IDX)
              END-EVALUATE
       *
       *
-      *      小規格病棟病床数加算のセット
+      *(8801-3)社会復帰期移行加算のセット
+             EVALUATE    LNK-IRYOKNS-NYUIN
+               WHEN    "12"
+               WHEN    "14"
+                       ADD     1            TO  IDX
+                       MOVE   "188006670"   TO  LNK-IRYOKNS-SRYCD(IDX)
+             END-EVALUATE
+      *
+      *
+      *(8801-4)遠隔地加算のセット
+             EVALUATE    LNK-IRYOKNS-NYUIN
+               WHEN    "13"
+               WHEN    "14"
+               WHEN    "15"
+                       ADD     1            TO  IDX
+                       MOVE   "188009070"   TO  LNK-IRYOKNS-SRYCD(IDX)
+             END-EVALUATE
+      *
+      *
+      *(8801-5)小規格病棟病床数加算のセット
              INITIALIZE                   SYSKANRI-REC
              MOVE    LNK-IRYOKNS-HOSPNUM
                                       TO  SYS-HOSPNUM
