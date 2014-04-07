@@ -444,6 +444,7 @@
                    PERFORM 2001-TENSUPLUS-CHECK-SEC
                END-IF
                MOVE    ZERO                TO  FLG-TENSUPLUS
+               MOVE    "tbl_tensuplus"     TO  MCP-TABLE
                MOVE    "all"               TO  MCP-PATHNAME
                PERFORM 910-TENSUPLUS-READ-SEC
            END-PERFORM
