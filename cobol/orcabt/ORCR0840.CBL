@@ -244,6 +244,9 @@
       *                                     ¡ÊÉéÃ´¶â³Û£±£°±ßÌ¤Ëþ»Í¼Î¸ÞÆþ¡Ë
       *  04.07.11    NACL-ÌçÏÆ    14/03/01  Ï«ºÒ¥Þ¥¹¥¿ÄÉ²ÃÂÐ±þ
       *  04.07.12    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.13    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.14    NACL-ÌçÏÆ    14/04/07  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *                                     ¡ÊÏ«ºÒ¥Þ¥¹¥¿¤ËÃÖ¤­´¹¤¨¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -946,6 +949,10 @@
            03  CONS-YAKUKAN-COMMENT3 PIC X(09)  VALUE  "120001610".
       *    Æþ±¡±ÉÍÜ¿©»ö»ØÆ³ÎÁ
            03  CONS-NYUEIYO-COMMENT  PIC X(09)  VALUE  "113003310".
+      *    Æþ±¡±ÉÍÜ¿©»ö»ØÆ³ÎÁ£±
+           03  CONS-NYUEIYO1-COMMENT PIC X(09)  VALUE  "113014810".
+      *    Æþ±¡±ÉÍÜ¿©»ö»ØÆ³ÎÁ£²
+           03  CONS-NYUEIYO2-COMMENT PIC X(09)  VALUE  "113014910".
       *    Âà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
            03  CONS-HOUMON-COMMENT1  PIC X(09)  VALUE  "190030310".
       *    ¡ÊÏ·¡ËÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
@@ -1994,6 +2001,11 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE  "101900110"  TO  WRK-CHUKSNSRYCD(IDX14)
            ADD     1          TO  IDX14
            MOVE  "101900120"  TO  WRK-CHUKSNSRYCD(IDX14)
+      *
+           ADD     1          TO  IDX14
+           MOVE  "101900130"  TO  WRK-CHUKSNSRYCD(IDX14)
+           ADD     1          TO  IDX14
+           MOVE  "101900140"  TO  WRK-CHUKSNSRYCD(IDX14)
       *
            .
        140-NYUINKASAN-JYOGAI-CYUSYUTU-EXT.
@@ -4165,7 +4177,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-YAKUKAN-COMMENT3
                    MOVE   "1"   TO    RECE84-FLG-YAKUKAN-COMMENT
               END-IF
-              IF   SRY-SRYCD(IDX2)    =     CONS-NYUEIYO-COMMENT
+              IF   SRY-SRYCD(IDX2)    =     CONS-NYUEIYO-COMMENT  OR
+                                            CONS-NYUEIYO1-COMMENT OR
+                                            CONS-NYUEIYO2-COMMENT
                    MOVE   "1"   TO    RECE84-FLG-NYUEIYO-COMMENT
               END-IF
       *

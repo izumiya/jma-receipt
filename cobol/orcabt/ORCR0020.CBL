@@ -256,6 +256,7 @@
       *  04.07.02    NACL-門脇    12/10/02  高齢者判定フラグ編集
       *  04.07.03    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.04    NACL-門脇    13/07/10  自賠責（第三者行為）対応
+      *  04.07.05    NACL-門脇    14/04/04  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -772,6 +773,95 @@
             03  TBL-ZAITAKU4   PIC X(09)   OCCURS  23.
       *
        01  TBL-ZAITAKU4-MAX    PIC 9(02)   VALUE   23.
+      *
+      *    在総診テーブル（２０１４年４月診療分〜）
+       01  TBL-ZAITAKU5-AREA.
+      *    在がん医総（在支診等）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114007610".
+      *    在がん医総（在支診等）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114007710".
+      *    在医総・在医総管（ＤＵＭＭＹ）
+           03  FILLER          PIC X(09)   VALUE   "099140003".
+      *
+      *    在がん医総（機能強化した在支診等）（病床あり）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114019510".
+      *    在がん医総（機能強化した在支診等）（病床あり）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114019610".
+      *    在がん医総（機能強化した在支診等）（病床なし）（処方せんあり）
+           03  FILLER          PIC X(09)   VALUE   "114019710".
+      *    在がん医総（機能強化した在支診等）（病床なし）（処方せんなし）
+           03  FILLER          PIC X(09)   VALUE   "114019810".
+      *
+      *    在医総管（機能強化在支診等）（病床有・処方せん有・同一建物以外）
+           03  FILLER          PIC X(09)   VALUE   "114023110".
+      *    在医総管（機能強化在支診等）（病床有・処方せん有・同一建物居住）
+           03  FILLER          PIC X(09)   VALUE   "114023210".
+      *    在医総管（機能強化在支診等）（病床有・処方せん無・同一建物以外）
+           03  FILLER          PIC X(09)   VALUE   "114023310".
+      *    在医総管（機能強化在支診等）（病床有・処方せん無・同一建物居住）
+           03  FILLER          PIC X(09)   VALUE   "114023410".
+      *    在医総管（機能強化在支診等）（病床無・処方せん有・同一建物以外）
+           03  FILLER          PIC X(09)   VALUE   "114023510".
+      *    在医総管（機能強化在支診等）（病床無・処方せん有・同一建物居住）
+           03  FILLER          PIC X(09)   VALUE   "114023610".
+      *    在医総管（機能強化在支診等）（病床無・処方せん無・同一建物以外）
+           03  FILLER          PIC X(09)   VALUE   "114023710".
+      *    在医総管（機能強化在支診等）（病床無・処方せん無・同一建物居住）
+           03  FILLER          PIC X(09)   VALUE   "114023810".
+      *    在医総管（在支診等）（処方せんあり・同一建物居住者以外）
+           03  FILLER          PIC X(09)   VALUE   "114023910".
+      *    在医総管（在支診等）（処方せんあり・同一建物居住者）
+           03  FILLER          PIC X(09)   VALUE   "114024010".
+      *    在医総管（在支診等）（処方せんなし・同一建物居住者以外）
+           03  FILLER          PIC X(09)   VALUE   "114024110".
+      *    在医総管（在支診等）（処方せんなし・同一建物居住者）
+           03  FILLER          PIC X(09)   VALUE   "114024210".
+      *    在医総管（在支診等以外）（処方せんあり・同一建物居住者以外）
+           03  FILLER          PIC X(09)   VALUE   "114024310".
+      *    在医総管（在支診等以外）（処方せんあり・同一建物居住者）
+           03  FILLER          PIC X(09)   VALUE   "114024410".
+      *    在医総管（在支診等以外）（処方せんなし・同一建物居住者以外）
+           03  FILLER          PIC X(09)   VALUE   "114024510".
+      *    在医総管（在支診等以外）（処方せんなし・同一建物居住者）
+           03  FILLER          PIC X(09)   VALUE   "114024610".
+      *
+      *    特医総管（機能強化在支診等）（病床有・処方せん有・同一建物以外）
+           03  FILLER          PIC X(09)   VALUE   "114024910".
+      *    特医総管（機能強化在支診等）（病床有・処方せん有・同一建物居住）
+           03  FILLER          PIC X(09)   VALUE   "114025010".
+      *    特医総管（機能強化在支診等）（病床有・処方せん無・同一建物以外）
+           03  FILLER          PIC X(09)   VALUE   "114025110".
+      *    特医総管（機能強化在支診等）（病床有・処方せん無・同一建物居住）
+           03  FILLER          PIC X(09)   VALUE   "114025210".
+      *    特医総管（機能強化在支診等）（病床無・処方せん有・同一建物以外）
+           03  FILLER          PIC X(09)   VALUE   "114025310".
+      *    特医総管（機能強化在支診等）（病床無・処方せん有・同一建物居住）
+           03  FILLER          PIC X(09)   VALUE   "114025410".
+      *    特医総管（機能強化在支診等）（病床無・処方せん無・同一建物以外）
+           03  FILLER          PIC X(09)   VALUE   "114025510".
+      *    特医総管（機能強化在支診等）（病床無・処方せん無・同一建物居住）
+           03  FILLER          PIC X(09)   VALUE   "114025610".
+      *    特医総管（在支診等）（処方せんあり・同一建物居住者以外）
+           03  FILLER          PIC X(09)   VALUE   "114025710".
+      *    特医総管（在支診等）（処方せんあり・同一建物居住者）
+           03  FILLER          PIC X(09)   VALUE   "114025810".
+      *    特医総管（在支診等）（処方せんなし・同一建物居住者以外）
+           03  FILLER          PIC X(09)   VALUE   "114025910".
+      *    特医総管（在支診等）（処方せんなし・同一建物居住者）
+           03  FILLER          PIC X(09)   VALUE   "114026010".
+      *    特医総管（在支診等以外）（処方せんあり・同一建物居住者以外）
+           03  FILLER          PIC X(09)   VALUE   "114026110".
+      *    特医総管（在支診等以外）（処方せんあり・同一建物居住者）
+           03  FILLER          PIC X(09)   VALUE   "114026210".
+      *    特医総管（在支診等以外）（処方せんなし・同一建物居住者以外）
+           03  FILLER          PIC X(09)   VALUE   "114026310".
+      *    特医総管（在支診等以外）（処方せんなし・同一建物居住者）
+           03  FILLER          PIC X(09)   VALUE   "114026410".
+      *
+       01  TBL-ZAITAKU5-R      REDEFINES   TBL-ZAITAKU5-AREA.
+            03  TBL-ZAITAKU5   PIC X(09)   OCCURS  39.
+      *
+       01  TBL-ZAITAKU5-MAX    PIC 9(02)   VALUE   39.
       *
       *
            COPY    "MCPAREA".
@@ -3584,39 +3674,47 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
            END-IF
       *
            IF   RECE01-SRYYM    >=  "200210"
-      *
-            IF     RECE01-SRYYM    >=  "201204"
-                 PERFORM   VARYING   IDX3   FROM    1   BY   1
-                            UNTIL  ( IDX3   >   TBL-ZAITAKU4-MAX )
-                              OR   ( WRK-ZAITAKU    =    "1"     )
-                    MOVE     TBL-ZAITAKU4(IDX3)  TO  WRK-ZAITAKU-SRYCD
-                    PERFORM  ZAITAKU-HENSYU-SEC
-                 END-PERFORM
+            IF        RECE01-SRYYM    >=  "201404"
+                    PERFORM   VARYING   IDX3   FROM    1   BY   1
+                               UNTIL  ( IDX3   >   TBL-ZAITAKU5-MAX )
+                                 OR   ( WRK-ZAITAKU    =    "1"     )
+                       MOVE  TBL-ZAITAKU5(IDX3)  TO  WRK-ZAITAKU-SRYCD
+                       PERFORM  ZAITAKU-HENSYU-SEC
+                    END-PERFORM
             ELSE
-             IF    RECE01-SRYYM    >=  "200804"
-                 PERFORM   VARYING   IDX3   FROM    1   BY   1
-                            UNTIL  ( IDX3   >   TBL-ZAITAKU3-MAX )
-                              OR   ( WRK-ZAITAKU    =    "1"     )
-                    MOVE     TBL-ZAITAKU3(IDX3)  TO  WRK-ZAITAKU-SRYCD
-                    PERFORM  ZAITAKU-HENSYU-SEC
-                 END-PERFORM
-             ELSE
-               IF  RECE01-SRYYM    >=  "200604"
-                 PERFORM   VARYING   IDX3   FROM    1   BY   1
-                            UNTIL  ( IDX3   >   TBL-ZAITAKU2-MAX )
-                              OR   ( WRK-ZAITAKU    =    "1"     )
-                    MOVE     TBL-ZAITAKU2(IDX3)  TO  WRK-ZAITAKU-SRYCD
-                    PERFORM  ZAITAKU-HENSYU-SEC
-                 END-PERFORM
-               ELSE
-                 PERFORM   VARYING   IDX3   FROM    1   BY   1
-                            UNTIL  ( IDX3   >   TBL-ZAITAKU-MAX  )
-                              OR   ( WRK-ZAITAKU    =    "1"     )
-                    MOVE     TBL-ZAITAKU(IDX3)   TO  WRK-ZAITAKU-SRYCD
-                    PERFORM  ZAITAKU-HENSYU-SEC
-                 END-PERFORM
-               END-IF
-             END-IF
+              IF      RECE01-SRYYM    >=  "201204"
+                    PERFORM   VARYING   IDX3   FROM    1   BY   1
+                               UNTIL  ( IDX3   >   TBL-ZAITAKU4-MAX )
+                                 OR   ( WRK-ZAITAKU    =    "1"     )
+                       MOVE  TBL-ZAITAKU4(IDX3)  TO  WRK-ZAITAKU-SRYCD
+                       PERFORM  ZAITAKU-HENSYU-SEC
+                    END-PERFORM
+              ELSE
+                IF    RECE01-SRYYM    >=  "200804"
+                    PERFORM   VARYING   IDX3   FROM    1   BY   1
+                               UNTIL  ( IDX3   >   TBL-ZAITAKU3-MAX )
+                                 OR   ( WRK-ZAITAKU    =    "1"     )
+                       MOVE  TBL-ZAITAKU3(IDX3)  TO  WRK-ZAITAKU-SRYCD
+                       PERFORM  ZAITAKU-HENSYU-SEC
+                    END-PERFORM
+                ELSE
+                  IF  RECE01-SRYYM    >=  "200604"
+                    PERFORM   VARYING   IDX3   FROM    1   BY   1
+                               UNTIL  ( IDX3   >   TBL-ZAITAKU2-MAX )
+                                 OR   ( WRK-ZAITAKU    =    "1"     )
+                       MOVE  TBL-ZAITAKU2(IDX3)  TO  WRK-ZAITAKU-SRYCD
+                       PERFORM  ZAITAKU-HENSYU-SEC
+                    END-PERFORM
+                  ELSE
+                    PERFORM   VARYING   IDX3   FROM    1   BY   1
+                               UNTIL  ( IDX3   >   TBL-ZAITAKU-MAX  )
+                                 OR   ( WRK-ZAITAKU    =    "1"     )
+                       MOVE  TBL-ZAITAKU(IDX3)   TO  WRK-ZAITAKU-SRYCD
+                       PERFORM  ZAITAKU-HENSYU-SEC
+                    END-PERFORM
+                  END-IF
+                END-IF
+              END-IF
             END-IF
       *
             IF   ((WRK-ZAITAKU     =   "1"     ) AND

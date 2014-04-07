@@ -638,6 +638,7 @@
       *                                     記載修正
       *  04.07.19    NACL-門脇    14/03/26  平成２６年４月改正対応
       *                                     （夜勤時間経過減算の選定対応）
+      *  04.07.20    NACL-門脇    14/03/28  平成２６年４月改正対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -1844,6 +1845,10 @@
            03  CONS-YAKUKAN-COMMENT3 PIC X(09)  VALUE  "120001610".
       *    入院栄養食事指導料
            03  CONS-NYUEIYO-COMMENT  PIC X(09)  VALUE  "113003310".
+      *    入院栄養食事指導料１
+           03  CONS-NYUEIYO1-COMMENT PIC X(09)  VALUE  "113014810".
+      *    入院栄養食事指導料２
+           03  CONS-NYUEIYO2-COMMENT PIC X(09)  VALUE  "113014910".
       *    退院前訪問指導料
            03  CONS-HOUMON-COMMENT1  PIC X(09)  VALUE  "190030310".
       *    （老）退院前訪問指導料
@@ -7600,7 +7605,9 @@
                                             CONS-YAKUKAN-COMMENT3
                    MOVE   "1"   TO    RECE64-FLG-YAKUKAN-COMMENT
               END-IF
-              IF   SRY-SRYCD(IDX2)    =     CONS-NYUEIYO-COMMENT
+              IF   SRY-SRYCD(IDX2)    =     CONS-NYUEIYO-COMMENT  OR
+                                            CONS-NYUEIYO1-COMMENT OR
+                                            CONS-NYUEIYO2-COMMENT
                    MOVE   "1"   TO    RECE64-FLG-NYUEIYO-COMMENT
               END-IF
       *

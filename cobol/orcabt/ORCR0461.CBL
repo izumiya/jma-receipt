@@ -28,6 +28,7 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
+      *  04.07.01    NACL-門脇    14/03/28  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -506,7 +507,7 @@
       *
       *    電子化加算等情報
        01  TBL-DENSHI-INF.
-         02    TBL-DENSHI-OCC              OCCURS  12.
+         02    TBL-DENSHI-OCC              OCCURS  13.
            03  TBL-DENSHI-FLG              PIC  9(01).
            03  TBL-DENSHI-TEN              PIC  9(07).
            03  TBL-DENSHI-ZAIKAISU         PIC  9(04).
@@ -632,6 +633,8 @@
            03  FILLER          PIC X(09)   VALUE   "112015670".
       *    明細書発行体制等加算
            03  FILLER          PIC X(09)   VALUE   "112015770".
+      *    地域包括診療加算
+           03  FILLER          PIC X(09)   VALUE   "112017270".
       *    時間外対応加算１
            03  FILLER          PIC X(09)   VALUE   "112016070".
       *    時間外対応加算３
@@ -645,9 +648,9 @@
            03  FILLER          PIC X(09)   VALUE   "099140001".
       *
        01  TBL-NOSRYCD-R       REDEFINES   TBL-NOSRYCD-AREA.
-            03  TBL-NOSRYCD     PIC X(09)   OCCURS   58.
+            03  TBL-NOSRYCD     PIC X(09)   OCCURS   59.
       *
-       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   58.
+       01  TBL-NOSRYCD-MAX     PIC 9(02)   VALUE   59.
       *
       *    固定値
        01  CONST-AREA.
@@ -1046,7 +1049,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
       *        電子化加算編集
                MOVE    ZERO      TO    FLG-TEIGEN
                PERFORM  VARYING  IDX6   FROM   1   BY  1
-                         UNTIL   IDX6    >    12
+                         UNTIL   IDX6    >    13
                  IF      TBL-DENSHI-FLG(IDX6)  =   1
                    PERFORM 2010-DENSHI-HENSYU-SEC
                  END-IF
@@ -1685,6 +1688,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
            OR (( RECE41-SRYYM   >=  "201004"             ) AND
                ( TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
                       =   "112015670"  OR  "112015770"  OR
+                          "112017270"  OR
                           "112016070"  OR  "112016170"   ))
       *
              EVALUATE   TBL-ZAIW-SRYCD (WRK-WIDX1 WRK-WIDX2)
@@ -1710,6 +1714,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                   MOVE    11     TO     IDX6
                WHEN       "112015770"
                   MOVE    12     TO     IDX6
+               WHEN       "112017270"
+                  MOVE    13     TO     IDX6
              END-EVALUATE
       *
              IF   IDX6   NOT = ZERO
@@ -2762,6 +2768,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                  WHEN     10
                  WHEN     11
                  WHEN     12
+                 WHEN     13
       *
                    INITIALIZE                    WRK-ZAI2
                    MOVE    SPACE             TO  WRK-ZAI
@@ -2800,6 +2807,9 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                      WHEN     12
                        MOVE  "明細書発行体制等加算"
                                              TO  WRK-ZAI-NAME(1:20)
+                     WHEN     13
+                       MOVE  "地域包括診療加算"
+                                             TO  WRK-ZAI-NAME(1:16)
                    END-EVALUATE
       *
                    INITIALIZE                          WRK-ZAI2
@@ -2943,6 +2953,8 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
                COMPUTE RECE46-ZAINUM   = 99994101
              WHEN    12
                COMPUTE RECE46-ZAINUM   = 99994111
+             WHEN    13
+               COMPUTE RECE46-ZAINUM   = 99994121
            END-EVALUATE
       *
            MOVE    1                 TO  RECE46-ZAIMEISAISU
@@ -2964,6 +2976,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE46PARA-HOSPNUM
              WHEN    10
              WHEN    11
              WHEN    12
+             WHEN    13
                 MOVE    "12"         TO  RECE46-SRYKBN
            END-EVALUATE
       *

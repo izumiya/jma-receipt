@@ -104,6 +104,7 @@
       *  04.06.03    NACL-門脇    13/02/27  平成２５年４月改正対応
       *  04.07.01    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.02    NACL-門脇    12/09/25  コメント差込取り止め（在宅持続陽圧）
+      *  04.07.03    NACL-門脇    14/03/28  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -231,6 +232,7 @@
            03  FLG-SAISIN-ARI                          PIC 9(01).
            03  FLG-KOKENKSN-ARI                        PIC 9(01).
            03  FLG-MESAIKSN-ARI                        PIC 9(01).
+           03  FLG-CHIHOKATU-ARI                       PIC 9(01).
            03  FLG-JIKANTAI1-ARI                       PIC 9(01).
            03  FLG-JIKANTAI3-ARI                       PIC 9(01).
       *    乳幼児加算カウント
@@ -239,6 +241,7 @@
            03  CNT-NYUYOJI2                            PIC 9(02).
            03  CNT-KOKENKSN                            PIC 9(02).
            03  CNT-MESAIKSN                            PIC 9(02).
+           03  CNT-CHIHOKATU                           PIC 9(02).
            03  CNT-JIKANTAI1                           PIC 9(02).
            03  CNT-JIKANTAI3                           PIC 9(02).
            03  CNT-SAISIN-DOUJITU                      PIC 9(02).
@@ -501,6 +504,8 @@
            03  CONS-JIKANTAI3      PIC X(09) VALUE "112016170".
       *    明細書発行体制等加算
            03  CONS-MESAIKSN       PIC X(09) VALUE "112015770".
+      *    地域包括診療加算
+           03  CONS-CHIHOKATU      PIC X(09) VALUE "112017270".
       *
       *    フィルム料（乳幼児）加算
            03  CONS-FILM-YOUJI-KASAN  
@@ -731,6 +736,72 @@
       *    特医総管（機能強化した在支診等）（病床なし）（処方せんなし）
            03  CONS-ZAIIKAN16-COMMENT PIC X(09) VALUE  "114019410".
       *
+      *    在医総管（機能強化在支診等）（病床有・処方せん有・同一建物以外）
+           03  CONS-ZAIIKAN17-COMMENT PIC X(09) VALUE  "114023110".
+      *    在医総管（機能強化在支診等）（病床有・処方せん有・同一建物居住）
+           03  CONS-ZAIIKAN18-COMMENT PIC X(09) VALUE  "114023210".
+      *    在医総管（機能強化在支診等）（病床有・処方せん無・同一建物以外）
+           03  CONS-ZAIIKAN19-COMMENT PIC X(09) VALUE  "114023310".
+      *    在医総管（機能強化在支診等）（病床有・処方せん無・同一建物居住）
+           03  CONS-ZAIIKAN20-COMMENT PIC X(09) VALUE  "114023410".
+      *    在医総管（機能強化在支診等）（病床無・処方せん有・同一建物以外）
+           03  CONS-ZAIIKAN21-COMMENT PIC X(09) VALUE  "114023510".
+      *    在医総管（機能強化在支診等）（病床無・処方せん有・同一建物居住）
+           03  CONS-ZAIIKAN22-COMMENT PIC X(09) VALUE  "114023610".
+      *    在医総管（機能強化在支診等）（病床無・処方せん無・同一建物以外）
+           03  CONS-ZAIIKAN23-COMMENT PIC X(09) VALUE  "114023710".
+      *    在医総管（機能強化在支診等）（病床無・処方せん無・同一建物居住）
+           03  CONS-ZAIIKAN24-COMMENT PIC X(09) VALUE  "114023810".
+      *    在医総管（在支診等）（処方せんあり・同一建物居住者以外）
+           03  CONS-ZAIIKAN25-COMMENT PIC X(09) VALUE  "114023910".
+      *    在医総管（在支診等）（処方せんあり・同一建物居住者）
+           03  CONS-ZAIIKAN26-COMMENT PIC X(09) VALUE  "114024010".
+      *    在医総管（在支診等）（処方せんなし・同一建物居住者以外）
+           03  CONS-ZAIIKAN27-COMMENT PIC X(09) VALUE  "114024110".
+      *    在医総管（在支診等）（処方せんなし・同一建物居住者）
+           03  CONS-ZAIIKAN28-COMMENT PIC X(09) VALUE  "114024210".
+      *    在医総管（在支診等以外）（処方せんあり・同一建物居住者以外）
+           03  CONS-ZAIIKAN29-COMMENT PIC X(09) VALUE  "114024310".
+      *    在医総管（在支診等以外）（処方せんあり・同一建物居住者）
+           03  CONS-ZAIIKAN30-COMMENT PIC X(09) VALUE  "114024410".
+      *    在医総管（在支診等以外）（処方せんなし・同一建物居住者以外）
+           03  CONS-ZAIIKAN31-COMMENT PIC X(09) VALUE  "114024510".
+      *    在医総管（在支診等以外）（処方せんなし・同一建物居住者）
+           03  CONS-ZAIIKAN32-COMMENT PIC X(09) VALUE  "114024610".
+      *
+      *    特医総管（機能強化在支診等）（病床有・処方せん有・同一建物以外）
+           03  CONS-ZAIIKAN33-COMMENT PIC X(09) VALUE  "114024910".
+      *    特医総管（機能強化在支診等）（病床有・処方せん有・同一建物居住）
+           03  CONS-ZAIIKAN34-COMMENT PIC X(09) VALUE  "114025010".
+      *    特医総管（機能強化在支診等）（病床有・処方せん無・同一建物以外）
+           03  CONS-ZAIIKAN35-COMMENT PIC X(09) VALUE  "114025110".
+      *    特医総管（機能強化在支診等）（病床有・処方せん無・同一建物居住）
+           03  CONS-ZAIIKAN36-COMMENT PIC X(09) VALUE  "114025210".
+      *    特医総管（機能強化在支診等）（病床無・処方せん有・同一建物以外）
+           03  CONS-ZAIIKAN37-COMMENT PIC X(09) VALUE  "114025310".
+      *    特医総管（機能強化在支診等）（病床無・処方せん有・同一建物居住）
+           03  CONS-ZAIIKAN38-COMMENT PIC X(09) VALUE  "114025410".
+      *    特医総管（機能強化在支診等）（病床無・処方せん無・同一建物以外）
+           03  CONS-ZAIIKAN39-COMMENT PIC X(09) VALUE  "114025510".
+      *    特医総管（機能強化在支診等）（病床無・処方せん無・同一建物居住）
+           03  CONS-ZAIIKAN40-COMMENT PIC X(09) VALUE  "114025610".
+      *    特医総管（在支診等）（処方せんあり・同一建物居住者以外）
+           03  CONS-ZAIIKAN41-COMMENT PIC X(09) VALUE  "114025710".
+      *    特医総管（在支診等）（処方せんあり・同一建物居住者）
+           03  CONS-ZAIIKAN42-COMMENT PIC X(09) VALUE  "114025810".
+      *    特医総管（在支診等）（処方せんなし・同一建物居住者以外）
+           03  CONS-ZAIIKAN43-COMMENT PIC X(09) VALUE  "114025910".
+      *    特医総管（在支診等）（処方せんなし・同一建物居住者）
+           03  CONS-ZAIIKAN44-COMMENT PIC X(09) VALUE  "114026010".
+      *    特医総管（在支診等以外）（処方せんあり・同一建物居住者以外）
+           03  CONS-ZAIIKAN45-COMMENT PIC X(09) VALUE  "114026110".
+      *    特医総管（在支診等以外）（処方せんあり・同一建物居住者）
+           03  CONS-ZAIIKAN46-COMMENT PIC X(09) VALUE  "114026210".
+      *    特医総管（在支診等以外）（処方せんなし・同一建物居住者以外）
+           03  CONS-ZAIIKAN47-COMMENT PIC X(09) VALUE  "114026310".
+      *    特医総管（在支診等以外）（処方せんなし・同一建物居住者）
+           03  CONS-ZAIIKAN48-COMMENT PIC X(09) VALUE  "114026410".
+      *
       *    小児特定疾患カウンセリング料（１回目）
            03  CONS-SYOUNI1-COMMENT  PIC X(09)  VALUE  "113000810".
       *    小児特定疾患カウンセリング料（２回目）
@@ -781,6 +852,12 @@
            03  CONS-KYOKUIN6-COMMENT PIC X(09)  VALUE  "140052270".
       *    局所陰圧閉鎖処置初回加算（２００ｃｍ２以上）
            03  CONS-KYOKUIN7-COMMENT PIC X(09)  VALUE  "140052370".
+      *    局所陰圧閉鎖処置初回加算（入院外）（１００ｃｍ２未満）
+           03  CONS-KYOKUIN8-COMMENT  PIC X(09) VALUE  "140054270".
+      *    局所陰圧閉鎖処置初回加算（入院外）（１００ｃｍ２以上）
+           03  CONS-KYOKUIN9-COMMENT  PIC X(09) VALUE  "140054370".
+      *    局所陰圧閉鎖処置初回加算（入院外）（２００ｃｍ２以上）
+           03  CONS-KYOKUIN10-COMMENT PIC X(09) VALUE  "140054470".
       *    認知療法・認知行動療法
            03  CONS-NINRYO-COMMENT   PIC X(09)  VALUE  "180033210".
       *    認知療法・認知行動療法（精神科救急体制の精神保健指定医）
@@ -1775,7 +1852,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                               OR "112015810"
                                               OR "112015950"
                                               OR "112016210"
-                                              OR "112016410"      )
+                                              OR "112016410"
+                                              OR "113015810"      )
       *
                              MOVE    1      TO    FLG-SHOSAISIN         
       *
@@ -2421,19 +2499,27 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE   "1"    TO    RECE120-FLG-JINZOU-COMMENT
                 END-IF
       *         局所陰圧閉鎖処置
-                IF   RECE100-SRYYM     >=    "201204"
+                IF    RECE100-SRYYM     >=    "201404"
+                  IF   SRY-SRYCD(IDX2)  =     CONS-KYOKUIN8-COMMENT
+                                          OR  CONS-KYOKUIN9-COMMENT
+                                          OR  CONS-KYOKUIN10-COMMENT
+                        MOVE   "1"    TO    RECE120-FLG-KYOKUIN-COMMENT
+                  END-IF
+                ELSE
+                 IF   RECE100-SRYYM     >=    "201204"
                   IF   SRY-SRYCD(IDX2)  =     CONS-KYOKUIN5-COMMENT
                                           OR  CONS-KYOKUIN6-COMMENT
                                           OR  CONS-KYOKUIN7-COMMENT
                         MOVE   "1"    TO    RECE120-FLG-KYOKUIN-COMMENT
                   END-IF
-                ELSE
+                 ELSE
                   IF   SRY-SRYCD(IDX2)  =     CONS-KYOKUIN1-COMMENT
                                           OR  CONS-KYOKUIN2-COMMENT
                                           OR  CONS-KYOKUIN3-COMMENT
                                           OR  CONS-KYOKUIN4-COMMENT
                         MOVE   "1"    TO    RECE120-FLG-KYOKUIN-COMMENT
                   END-IF
+                 END-IF
                 END-IF
               END-IF
            END-IF
@@ -2738,6 +2824,38 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-ZAIIKAN14-COMMENT
                                       OR    CONS-ZAIIKAN15-COMMENT
                                       OR    CONS-ZAIIKAN16-COMMENT
+                                      OR    CONS-ZAIIKAN17-COMMENT
+                                      OR    CONS-ZAIIKAN18-COMMENT
+                                      OR    CONS-ZAIIKAN19-COMMENT
+                                      OR    CONS-ZAIIKAN20-COMMENT
+                                      OR    CONS-ZAIIKAN21-COMMENT
+                                      OR    CONS-ZAIIKAN22-COMMENT
+                                      OR    CONS-ZAIIKAN23-COMMENT
+                                      OR    CONS-ZAIIKAN24-COMMENT
+                                      OR    CONS-ZAIIKAN25-COMMENT
+                                      OR    CONS-ZAIIKAN26-COMMENT
+                                      OR    CONS-ZAIIKAN27-COMMENT
+                                      OR    CONS-ZAIIKAN28-COMMENT
+                                      OR    CONS-ZAIIKAN29-COMMENT
+                                      OR    CONS-ZAIIKAN30-COMMENT
+                                      OR    CONS-ZAIIKAN31-COMMENT
+                                      OR    CONS-ZAIIKAN32-COMMENT
+                                      OR    CONS-ZAIIKAN33-COMMENT
+                                      OR    CONS-ZAIIKAN34-COMMENT
+                                      OR    CONS-ZAIIKAN35-COMMENT
+                                      OR    CONS-ZAIIKAN36-COMMENT
+                                      OR    CONS-ZAIIKAN37-COMMENT
+                                      OR    CONS-ZAIIKAN38-COMMENT
+                                      OR    CONS-ZAIIKAN39-COMMENT
+                                      OR    CONS-ZAIIKAN40-COMMENT
+                                      OR    CONS-ZAIIKAN41-COMMENT
+                                      OR    CONS-ZAIIKAN42-COMMENT
+                                      OR    CONS-ZAIIKAN43-COMMENT
+                                      OR    CONS-ZAIIKAN44-COMMENT
+                                      OR    CONS-ZAIIKAN45-COMMENT
+                                      OR    CONS-ZAIIKAN46-COMMENT
+                                      OR    CONS-ZAIIKAN47-COMMENT
+                                      OR    CONS-ZAIIKAN48-COMMENT
                                       OR    CONS-ZAIHOU-COMMENT
                                       OR    CONS-ZAIHOU3-COMMENT
                                       OR    CONS-ZAIHOU4-COMMENT
@@ -3331,6 +3449,10 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                             COMPUTE  CNT-MESAIKSN =  CNT-MESAIKSN
                                                   +  WK-ZAIKAISU
                          END-IF
+                         IF  SRY-SRYCD(IDX3)  =  CONS-CHIHOKATU
+                            COMPUTE  CNT-CHIHOKATU = CNT-CHIHOKATU
+                                                   + WK-ZAIKAISU
+                         END-IF
                        END-IF
       **
                        IF ( SRY-SRYCD(IDX3)      =   CONS-KEIZOKU1  OR
@@ -3357,6 +3479,7 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                           IF  (RECE100-SRYYM   >=  "201004"       )
                           AND (SRY-SRYCD(IDX3)  =  CONS-KOKENKSN  OR
                                                    CONS-MESAIKSN  OR
+                                                   CONS-CHIHOKATU OR
                                                    CONS-JIKANTAI1 OR
                                                    CONS-JIKANTAI3 )
                             EVALUATE  SRY-SRYCD(IDX3)
@@ -3383,6 +3506,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                   ADD  WRK-TNS-TEN(IDX3)
                                                    TO  RECE100-KHNTEN(2)
                                   MOVE     1       TO  FLG-MESAIKSN-ARI
+                                END-IF
+                              WHEN     CONS-CHIHOKATU
+                                IF   FLG-CHIHOKATU-ARI  =  ZERO
+                                  ADD  WRK-TNS-TEN(IDX3)
+                                                   TO  RECE100-KHNTEN(2)
+                                  MOVE     1       TO  FLG-CHIHOKATU-ARI
                                 END-IF
                             END-EVALUATE
                           ELSE
@@ -4203,36 +4332,34 @@ grpsys           PERFORM 900-DBSELECT-SEC
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
              END-IF
              IF    (CNT-NYUYOJI      NOT =  ZERO       )
-      ***    AND   (RECE100-KAISU(2) NOT =  CNT-NYUYOJI)
              AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI)
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
              END-IF
              IF     RECE100-NYUYOJIFLG      =  SPACE
                IF    (CNT-NYUYOJI2     NOT =  ZERO        )
-      ***      AND   (RECE100-KAISU(2) NOT =  CNT-NYUYOJI2)
                AND   (CNT-SAISIN-ETC   NOT =  CNT-NYUYOJI2)
                      MOVE     "1"        TO   RECE100-NYUYOJIFLG
                END-IF
              END-IF
              IF   RECE100-SRYYM  >= "201004"
-               IF    (CNT-JIKANTAI1    NOT =  ZERO          )
-      ***      AND   (RECE100-KAISU(2) NOT =  CNT-JIKANTAI1)
+               IF    (CNT-JIKANTAI1    NOT =  ZERO         )
                AND   (CNT-SAISIN-ETC   NOT =  CNT-JIKANTAI1)
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
                END-IF
                IF    (CNT-KOKENKSN     NOT =  ZERO        )
-      ***      AND   (RECE100-KAISU(2) NOT =  CNT-KOKENKSN)
                AND   (CNT-SAISIN-ETC   NOT =  CNT-KOKENKSN)
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
                END-IF
-               IF    (CNT-JIKANTAI3    NOT =  ZERO          )
-      ***      AND   (RECE100-KAISU(2) NOT =  CNT-JIKANTAI3)
+               IF    (CNT-JIKANTAI3    NOT =  ZERO         )
                AND   (CNT-SAISIN-ETC   NOT =  CNT-JIKANTAI3)
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
                END-IF
                IF    (CNT-MESAIKSN     NOT =  ZERO        )
-      ***      AND   (RECE100-KAISU(2) NOT =  CNT-MESAIKSN)
                AND   (CNT-SAISIN-ETC   NOT =  CNT-MESAIKSN)
+                     MOVE   ZERO         TO   RECE100-KHNTEN(2)
+               END-IF
+               IF    (CNT-CHIHOKATU    NOT =  ZERO         )
+               AND   (CNT-SAISIN-ETC   NOT =  CNT-CHIHOKATU)
                      MOVE   ZERO         TO   RECE100-KHNTEN(2)
                END-IF
              END-IF

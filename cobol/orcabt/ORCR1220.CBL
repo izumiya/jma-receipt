@@ -113,6 +113,7 @@
       *  04.07.04    NACL-ÌçÏÆ    12/09/25  ¥³¥á¥ó¥Èº¹¹þ¼è¤ê»ß¤á¡ÊºßÂð»ýÂ³ÍÛ°µ¡Ë
       *  04.07.05    NACL-ÌçÏÆ    13/07/01  Æþ±¡ÎÁÂ¾ÊÝ¸±»»Äê»þ¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.07.06    NACL-ÌçÏÆ    14/03/14  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.07    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -604,6 +605,10 @@
            03  CONS-YAKUKAN-COMMENT3 PIC X(09)  VALUE  "120001610".
       *    Æþ±¡±ÉÍÜ¿©»ö»ØÆ³ÎÁ
            03  CONS-NYUEIYO-COMMENT  PIC X(09)  VALUE  "113003310".
+      *    Æþ±¡±ÉÍÜ¿©»ö»ØÆ³ÎÁ£±
+           03  CONS-NYUEIYO1-COMMENT PIC X(09)  VALUE  "113014810".
+      *    Æþ±¡±ÉÍÜ¿©»ö»ØÆ³ÎÁ£²
+           03  CONS-NYUEIYO2-COMMENT PIC X(09)  VALUE  "113014910".
       *    Âà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
            03  CONS-HOUMON-COMMENT1  PIC X(09)  VALUE  "190030310".
       *    ¡ÊÏ·¡ËÂà±¡Á°Ë¬Ìä»ØÆ³ÎÁ
@@ -2643,7 +2648,9 @@
                                             CONS-YAKUKAN-COMMENT3
                    MOVE   "1"   TO    RECE220-FLG-YAKUKAN-COMMENT
               END-IF
-              IF   SRY-SRYCD(IDX2)    =     CONS-NYUEIYO-COMMENT
+              IF   SRY-SRYCD(IDX2)    =     CONS-NYUEIYO-COMMENT  OR
+                                            CONS-NYUEIYO1-COMMENT OR
+                                            CONS-NYUEIYO2-COMMENT
                    MOVE   "1"   TO    RECE220-FLG-NYUEIYO-COMMENT
               END-IF
       *
