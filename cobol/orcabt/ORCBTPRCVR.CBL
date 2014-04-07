@@ -16,14 +16,14 @@
       * 113-8621, Japan.
       ********************************************************************
        IDENTIFICATION          DIVISION.
-       PROGRAM-ID.             ORCBSETTANI.
+       PROGRAM-ID.             ORCBTPRCVR.
       *****************************************************************
       *  システム名        : ＯＲＣＡ
-      *  サブシステム名    : 日次処理
-      *  コンポーネント名  : 特定器材改正単位一括置換え
+      *  サブシステム名    : 改定処理
+      *  コンポーネント名  : 点数付加情報引き継ぎ漏れ一括作成
       *  管理者            : 
       *  作成日付    作業者        記述
-      *  10/03/XX    NACL−多々納  新規作成
+      *  14/04/05    NACL−伊藤  新規作成
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
@@ -48,62 +48,30 @@
        WORKING-STORAGE             SECTION.
       *
       *    確認一覧（縦）
-           COPY    "HCMSL80.INC".
+      **** COPY    "HCMSL80.INC".
       *    エラー一覧（横）
-           COPY    "HCMSL55.INC".
+      **** COPY    "HCMSL55.INC".
       *    帳票
            COPY    "HCPOM2.INC".
       *
       *    スパ領域
        01  STS-AREA.
            03  STS-RECEERR             PIC X(02).
-           03  STS-PARA                PIC X(02).
-           03  STS-DATA                PIC X(02).
       *
       *    フラグ領域
        01  FLG-AREA.
            03  FLG-END                 PIC 9(01).
-           03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-TENSU               PIC 9(01).
-      *
-           03  FLG-OK                  PIC 9(01).
-           03  FLG-OK-END              PIC 9(01).
-           03  FLG-ERR                 PIC 9(01).
-           03  FLG-END-SYORI           PIC 9(01).
-           03  FLG-END-SYORI2          PIC 9(01).
-           03  FLG-SYORI-SET           PIC 9(01).
-           03  FLG-CHK                 PIC 9(01).
-      *
-           03  FLG-KEIKA-GAI        PIC 9(01).
-           03  FLG-KEIKA            PIC 9(01).
-           03  FLG-OK-KEIKA         PIC 9(01).
-           03  FLG-SP              PIC 9(01).
-      *
-           03  FLG-KIZAI            PIC 9(01).
+           03  FLG-TENSUPLUS           PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
-           03  CNT-LINE1               PIC 9(03).
            03  CNT-PAGE1               PIC 9(05).
-           03  CNT-LINE2               PIC 9(03).
-           03  CNT-PAGE2               PIC 9(05).
-      *
-           03  CNT-IN                  PIC 9(05).
            03  CNT-OK                  PIC 9(05).
-           03  CNT-ERR                 PIC 9(05).
-           03  CNT-KEI                 PIC 9(05).
-           03  CNT-OUT                 PIC 9(05).
       *
       *    添字領域
        01  IDX-AREA.
            03  IDX                     PIC 9(04).
-           03  IDX-S                   PIC 9(04).
-           03  IDY                     PIC 9(04).
-           03  IDX2                    PIC 9(04).
-           03  IDX-ERR                 PIC 9(04).
-           03  IDXN                    PIC 9(04).
-           03  IDX1                    PIC 9(04).
-           03  IDX4                    PIC 9(04).
            03  IDX-P                   PIC 9(04).
       *
       *    システム領域
@@ -124,7 +92,6 @@
            03  WRK-PARA-SHELLID        PIC X(08).
            03  WRK-PARA-HOSPNUM        PIC X(02).
            03  RECEERR                 PIC X(100).
-           03  WRK-PARA-SYORIKBN       PIC X(01).
            03  WRK-PARA-SRYYMD         PIC X(08).
       *
       *    一時領域
@@ -140,34 +107,16 @@
                05  WRK-SYSMM           PIC 9(02).
                05  WRK-SYSDD           PIC 9(02).
            03  WRK-SYSYMDG             PIC X(22).
-      *
-           03  WRK-SKBN                PIC X(02).
-           03  WRK-SRYCD-D             PIC X(09).
-           03  WRK-SRYCD-A             PIC X(09).
-      *
            03  WRK-MAE-SRYYMD          PIC X(08).
            03  WRK-STR-SRYYMD          PIC X(08).
-      *
-      *    改正前単位
-           03  WRK-TNS-TANICD              PIC  X(03).
-           03  WRK-TNS-TANIMOJISU          PIC  9(01).
-           03  WRK-TNS-TANINAME            PIC  X(24).
-           03  WRK-TNS-NAME                PIC  X(200).
-           03  WRK-TNS-YUKOSTYMD           PIC  X(08).
-           03  WRK-TNS-YUKOEDYMD           PIC  X(08).
-      *
-           03  WRK-HEN-MAX                 PIC 9(04).
-      *
-           03  WRK-ERRCD               PIC X(04).
-           03  WRK-ERRMSG              PIC X(80).
-           03  WRK-ERRMSG2             PIC X(80).
+           03  WRK-HEN-MAX             PIC 9(04).
       *
       *    リスト領域
        01  LST-PRT-AREA.
            03  LST-PRT-HEAD1N.
                05  FILLER              PIC X(05)   VALUE   SPACE.
-               05  FILLER              PIC X(22)   VALUE   
-                   "＃　特定器材単位設定　".
+               05  FILLER              PIC X(24)   VALUE   
+                   "＃　点数付加引継ぎ作成　".
                05  PRT-TAITOL          PIC X(20).
                05  FILLER              PIC X(02)   VALUE   SPACE.
                05  FILLER              PIC X(08)   VALUE
@@ -178,27 +127,14 @@
                05  PRT-SYSYMD          PIC X(10)   VALUE   SPACE.
                05  FILLER              PIC X(02)   VALUE   "P.".
                05  PRT-PAGE            PIC ZZ9.
-           03  LST-PRT-HEAD2.
-               05  FILLER              PIC X(12)   VALUE
-                   "器材コード".
-               05  FILLER              PIC X(12)   VALUE
-                   "有効終了日".
-               05  FILLER              PIC X(10)   VALUE
-                   "単位名称".
-               05  FILLER              PIC X(06)   VALUE   SPACE.
-               05  FILLER              PIC X(46)   VALUE
-                   "器材名称".
-      *
            03  LST-PRT-HEAD3.
                05  FILLER              PIC X(12)   VALUE
-                   "器材コード".
+                   "コード".
                05  FILLER              PIC X(12)   VALUE
                    "有効開始日".
-               05  FILLER              PIC X(10)   VALUE
-                   "単位名称".
                05  FILLER              PIC X(06)   VALUE   SPACE.
                05  FILLER              PIC X(46)   VALUE
-                   "器材名称".
+                   "名称".
       *
            03  LST-PRT-TAIL1.
                05  FILLER              PIC X(20)   VALUE   SPACE.
@@ -208,38 +144,14 @@
                05  FILLER              PIC X(04)   VALUE
                    "　件".
       *
-           03  LST-PRT-TAIL2.
-               05  FILLER              PIC X(20)   VALUE   SPACE.
-               05  FILLER              PIC X(12)   VALUE
-                   "対象件数：".
-               05  PRT-CNT             PIC ZZ,ZZ9.
-               05  FILLER              PIC X(04)   VALUE
-                   "　件".
-      *
        01  LST-PRT-BODY.
            03  PRT-SRYCD               PIC X(09).
            03  FILLER                  PIC X(02).
            03  PRT-EDYMD               PIC X(09).
-           03  FILLER                  PIC X(02).
-           03  PRT-TANICD              PIC X(03).
-      *    03  PRT-TANINAME            PIC X(10).
-      *    03  FILLER                  PIC X(01).
-      *    03  PRT-NAME                PIC X(70).
-      *
       *
        01  LST-PRT-BODYN.
-           03  PRT-F1                  PIC X(25).
-           03  PRT-TANINAME            PIC X(10).
-           03  FILLER                  PIC X(01).
+           03  PRT-F1                  PIC X(26).
            03  PRT-NAME                PIC X(70).
-      *
-      *
-       01  COMT-TAITOL1.
-           03  FILLER              PIC X(20)   VALUE   
-               "確認リスト＃".
-       01  COMT-TAITOL2.
-           03  FILLER              PIC X(20)   VALUE   
-               "更新リスト＃".
       *
        01  LINE-MAX                    PIC 9(03)   VALUE   69.
       *
@@ -266,39 +178,18 @@
                05  WRK-TMM         PIC 9(02).
                05  FILLER          PIC X(01)   VALUE   ")".
       *
-      *    診療種別名テーブル
-      *    COPY    "CPORCSSRYSYU.INC".
-      *
-      *点数マスタワーク
-       01  HZN-TNS-TENSU-REC.
-           03  HZN-TNS-KEY.
-               05  HZN-TNS-HOSPNUM         PIC 9(2).
-               05  HZN-TNS-SRYCD           PIC  X(09).
-               05  HZN-TNS-YUKOSTYMD       PIC  X(08).
-               05  HZN-TNS-YUKOEDYMD       PIC  X(08).
-           03  HZN-TNS-SRYKBN              PIC  X(02).
-           03  HZN-TNS-SRYSYUKBN           PIC  X(03).
-           03  HZN-TNS-YUKOKETA            PIC  9(02).
-           03  HZN-TNS-NAME                PIC  X(200).
-           03  HZN-TNS-KANAYUKOKETA        PIC  9(02).
-           03  HZN-TNS-KANANAME            PIC  X(200).
-           03  HZN-TNS-FORMALYUKOKETA      PIC  9(03).
-           03  HZN-TNS-FORMALNAME          PIC  X(400).
-           03  HZN-TNS-TENSIKIBETU         PIC  9(01).
-           03  HZN-TNS-TEN                 PIC  9(09)V99.
-           03  HZN-TNS-TANICD              PIC  X(03).
-           03  HZN-TNS-TANIMOJISU          PIC  9(01).
-           03  HZN-TNS-TANINAME            PIC  X(24).
-           03  HZN-TNS-DATAKBN             PIC  9(01).
-           03  HZN-TNS-HKNTEKKBN           PIC  9(01).
-           03  HZN-TNS-NYUGAITEKKBN        PIC  9(01).
-      *(20)
-           03  HZN-TNS-FILLER              PIC  X(1000).
-      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
       *
+      *    点数マスタ付加コード
+       01  TENSUPLUS-REC.
+           COPY    "CPTENSUPLUS.INC".
+      *
+      *    点数マスタ付加コードワーク
+       01  HZN-TENSUPLUS-REC.
+           COPY    "CPTENSUPLUS.INC"    REPLACING
+                                       //TNSP-// BY //HZN-TNSP-//.
       *    点数マスタ
            COPY    "CPTENSU.INC".
       *
@@ -373,7 +264,7 @@
       *
            PERFORM 300-END-SEC
       *
-           STOP    RUN
+           EXIT    PROGRAM
            .
       *****************************************************************
       *    初期　処理
@@ -408,7 +299,6 @@
                                        WRK-PARA-SHELLID
                                        WRK-PARA-HOSPNUM
                                        RECEERR
-                                       WRK-PARA-SYORIKBN
                                        WRK-PARA-SRYYMD
       *
       *    ＳＰＡ設定
@@ -416,18 +306,13 @@
       *
            PERFORM 100-DBOPEN-SEC
       *
-      *    CALL    "ORCSENCODING"      USING
-      *                                MCPAREA
-      *                                SPA-AREA
-      *
       *    ステップ管理開始処理
            MOVE    "STS"               TO  SJOBKANRI-MODE
            INITIALIZE                      JOBKANRI-REC
            MOVE    WRK-PARA-JOBID      TO  JOB-JOBID
            MOVE    WRK-PARA-SHELLID    TO  JOB-SHELLID
-           MOVE    "ORCBSETTANI"        TO  JOB-PGID
-           MOVE    "特定器材単位変更"
-                                       TO  JOB-SHELLMSG
+           MOVE    "ORCBTPRCVR"        TO  JOB-PGID
+           MOVE    "点数付加引き継ぎ"  TO  JOB-SHELLMSG
            MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
            CALL    "ORCSJOB"               USING
                                            ORCSJOBKANRIAREA
@@ -436,7 +321,6 @@
       *
       *    初期値セット
            PERFORM 110-SYOKI-SET-SEC
-      *
            .
        100-INIT-EXT.
            EXIT.
@@ -517,23 +401,10 @@
            MOVE    LNK-PRTKANRI-OPID   TO  SPA-OPID
            INSPECT SPA-OPID            REPLACING  ALL " "  BY  "*"
       *
-      *    区分判定
-           EVALUATE    WRK-PARA-SYORIKBN
-               WHEN    "1"
-                   MOVE    COMT-TAITOL1        TO  PRT-TAITOL
-               WHEN    "2"
-                   MOVE    COMT-TAITOL2        TO  PRT-TAITOL
-               WHEN    OTHER
-                   MOVE    "処理区分が設定されていません。"
-                                           TO  WRK-RECEERR
-                   PERFORM 500-ERR-HENSYU-SEC
-           END-EVALUATE
-      *
       *    更新日取得
            INITIALIZE                  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"       USING
                                        ORCSMCNDATEAREA
-      *
            .
        110-SYOKI-SET-EXT.
            EXIT.
@@ -543,137 +414,96 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
+      *    処理概要
+      *    改正日の前日が期限の点数付加を取得（終了日が前日）
+      *    その診療コードから改正日に有効な点数付加の有無を確認
+      *    無い場合
+      *    その診療コードから改正日に有効な点数の有無を確認
+      *    （開始日が改正日であること）
+      *    点数マスタの有効期間で点数付加を作成
       *
-           INITIALIZE                  TNS-TENSU-REC
-           MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
-           MOVE    WRK-STR-SRYYMD      TO  TNS-YUKOSTYMD
-           MOVE    WRK-STR-SRYYMD      TO  TNS-YUKOEDYMD
-           MOVE    "700000000"         TO  TNS-SRYCD
-           MOVE    "799999999"         TO  TNSUP-SRYCD
-      *
-           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
-           MOVE    "tbl_tensu"         TO  MCP-TABLE
-           MOVE    "key12s"            TO  MCP-PATHNAME
+           INITIALIZE  TENSUPLUS-REC
+           MOVE    SPA-HOSPNUM         TO  TNSP-HOSPNUM
+           MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF      MCP-RC              =   ZERO
-               MOVE    "tbl_tensu"         TO  MCP-TABLE
-               MOVE    "key12s"            TO  MCP-PATHNAME
-               PERFORM 910-TENSU-READ-SEC
+               MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+               MOVE    "all"               TO  MCP-PATHNAME
+               PERFORM 910-TENSUPLUS-READ-SEC
            ELSE
-               INITIALIZE                  TNS-TENSU-REC
-               MOVE    1                   TO  FLG-TENSU
+               INITIALIZE  TENSUPLUS-REC
+               MOVE    1                   TO  FLG-TENSUPLUS
            END-IF
       *
-           PERFORM UNTIL    (FLG-TENSU     =   1  )
-      *        改正日に有効で単位コードのない器材
-               IF     (TNS-YUKOSTYMD       >=  WRK-STR-SRYYMD) AND
-                      (TNS-TANICD          =   SPACE
-                                           OR  ZERO  ) AND
-                      (TNS-TANINAME        =   SPACE )
-                   MOVE    TNS-TENSU-REC       TO  HZN-TNS-TENSU-REC
-                   PERFORM 2001-TENSU-CHEK-SEC
+           PERFORM UNTIL    (FLG-TENSUPLUS =   1)
+      *        改正日の前日が終了日のレコード
+               IF      TNSP-YUKOEDYMD      =   WRK-MAE-SRYYMD
+                   MOVE    TENSUPLUS-REC       TO  HZN-TENSUPLUS-REC
+                   PERFORM 2001-TENSUPLUS-CHECK-SEC
                END-IF
-               MOVE    ZERO                TO  FLG-TENSU
-      *
-               MOVE    "key12s"            TO  MCP-PATHNAME
-               PERFORM 910-TENSU-READ-SEC
+               MOVE    ZERO                TO  FLG-TENSUPLUS
+               MOVE    "all"               TO  MCP-PATHNAME
+               PERFORM 910-TENSUPLUS-READ-SEC
            END-PERFORM
-           MOVE    "tbl_tensu"         TO  MCP-TABLE
-           MOVE    "key12s"            TO  MCP-PATHNAME
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "all"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
            PERFORM 2903-END-HENSYU-SEC
       *
            MOVE    1                   TO  FLG-END
-      *
            .
        200-MAIN-EXT.
            EXIT.
       *
       *****************************************************************
+      *    点数付加マスタ検索処理
+      *****************************************************************
+       2001-TENSUPLUS-CHECK-SEC    SECTION.
+      *
+      *    改正日に有効なレコードの存在を確認
+           MOVE    WRK-STR-SRYYMD      TO  TNSP-YUKOSTYMD
+           MOVE    WRK-STR-SRYYMD      TO  TNSP-YUKOEDYMD
+      *
+           MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 910-TENSUPLUS-READ-SEC
+           ELSE
+               INITIALIZE  TENSUPLUS-REC
+               MOVE    1                   TO  FLG-TENSUPLUS
+           END-IF
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           IF      FLG-TENSUPLUS       =   1
+               PERFORM 20011-TENSU-CHECK-SEC
+               IF      FLG-TENSU           =   ZERO
+                   PERFORM 20012-TENSUPLUS-COPY-SEC
+               END-IF
+           END-IF
+           .
+       2001-TENSUPLUS-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    点数マスタ検索処理
       *****************************************************************
-       2001-TENSU-CHEK-SEC             SECTION.
+       20011-TENSU-CHECK-SEC       SECTION.
       *
-           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
-           MOVE    "tbl_tensu"         TO  MCP-TABLE
-           MOVE    "key4"              TO  MCP-PATHNAME
-           PERFORM 910-DBSELECT-SEC
-           IF      MCP-RC              =   ZERO
-               MOVE    "tbl_tensu"         TO  MCP-TABLE
-               MOVE    "key4"              TO  MCP-PATHNAME
-               PERFORM 910-TENSU-READ-SEC
-           ELSE
-               INITIALIZE                  TNS-TENSU-REC
-               MOVE    1                   TO  FLG-TENSU
-           END-IF
-      *
-           MOVE    ZERO                TO  FLG-OK
-           MOVE    ZERO                TO  FLG-OK-END
-           MOVE    SPACE               TO  WRK-TNS-TANICD
-           MOVE    ZERO                TO  WRK-TNS-TANIMOJISU
-           MOVE    SPACE               TO  WRK-TNS-TANINAME
-           MOVE    SPACE               TO  WRK-TNS-NAME
-           PERFORM UNTIL    (FLG-TENSU     =   1  )
-                        OR  (FLG-OK-END    =   1  )
-               IF     (TNS-YUKOSTYMD       <=  WRK-MAE-SRYYMD)  AND
-                      (TNS-YUKOEDYMD       >=  WRK-MAE-SRYYMD)
-                   MOVE    1               TO  FLG-OK-END
-      *            改正前日の有効日の単位コード
-                   IF     (TNS-TANICD          =   SPACE
-                                               OR  ZERO   ) AND
-                          (TNS-TANINAME        =   SPACE  )
-                       CONTINUE
-                   ELSE
-                       MOVE    1               TO  FLG-OK
-                       MOVE    TNS-NAME        TO  WRK-TNS-NAME
-                       MOVE    TNS-TANICD      TO  WRK-TNS-TANICD
-                       MOVE    TNS-TANIMOJISU  TO  WRK-TNS-TANIMOJISU
-                       MOVE    TNS-TANINAME    TO  WRK-TNS-TANINAME
-                       MOVE    TNS-YUKOSTYMD   TO  WRK-TNS-YUKOSTYMD
-                       MOVE    TNS-YUKOEDYMD   TO  WRK-TNS-YUKOEDYMD
-                   END-IF
-               END-IF
-      *
-               MOVE    "key4"              TO  MCP-PATHNAME
-               PERFORM 910-TENSU-READ-SEC
-           END-PERFORM
-           MOVE    "tbl_tensu"         TO  MCP-TABLE
-           MOVE    "key4"              TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
-      *
-           IF     WRK-PARA-SYORIKBN    =   "1"
-      *        一覧表示
-               IF      FLG-OK              =   1
-                   PERFORM 20011-TANI-LIST-SEC
-               END-IF
-           ELSE
-      *        一括変更
-               IF      FLG-OK              =   1
-                   PERFORM 20012-TANI-CHNG-SEC
-               END-IF
-           END-IF
-           .
-       2001-TENSU-CHEK-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    対象セット一覧処理
-      *****************************************************************
-       20011-TANI-LIST-SEC             SECTION.
-      *
-           ADD     1               TO  CNT-OK
-           PERFORM 700-PTNUM-PRINT-SEC
-           .
-       20011-TANI-LIST-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    単位変更更新処理
-      *****************************************************************
-       20012-TANI-CHNG-SEC             SECTION.
-      *
-           MOVE    HZN-TNS-TENSU-REC   TO  TNS-TENSU-REC
+      *    改正日に有効なレコードの存在を確認
+           INITIALIZE  TNS-TENSU-REC
+           MOVE    HZN-TNSP-HOSPNUM    TO  TNS-HOSPNUM
+           MOVE    HZN-TNSP-SRYCD      TO  TNS-SRYCD
+           MOVE    WRK-STR-SRYYMD      TO  TNS-YUKOSTYMD
+           MOVE    WRK-STR-SRYYMD      TO  TNS-YUKOEDYMD
       *
            MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
            MOVE    "tbl_tensu"         TO  MCP-TABLE
@@ -684,117 +514,108 @@
                MOVE    "key"               TO  MCP-PATHNAME
                PERFORM 910-TENSU-READ-SEC
            ELSE
-               INITIALIZE                  TNS-TENSU-REC
+               INITIALIZE  TNS-TENSU-REC
                MOVE    1                   TO  FLG-TENSU
            END-IF
            MOVE    "tbl_tensu"         TO  MCP-TABLE
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 990-DBCLOSE-SEC
       *
-           IF     (FLG-TENSU           =   ZERO ) AND
-                  (TNS-TANICD          =   SPACE
-                                       OR  ZERO ) AND
-                  (TNS-TANINAME        =   SPACE)
-               MOVE    WRK-TNS-TANICD      TO  TNS-TANICD
-               MOVE    WRK-TNS-TANIMOJISU  TO  TNS-TANIMOJISU
-               MOVE    WRK-TNS-TANINAME    TO  TNS-TANINAME
-               MOVE    TNS-YUKOSTYMD       TO  WRK-TNS-YUKOSTYMD
-               MOVE    TNS-YUKOEDYMD       TO  WRK-TNS-YUKOEDYMD
+           IF      FLG-TENSU           =   ZERO
+               IF      TNS-YUKOSTYMD   NOT =   WRK-STR-SRYYMD
+                   INITIALIZE  TNS-TENSU-REC
+                   MOVE    1                   TO  FLG-TENSU
+               END-IF
+           END-IF
+           .
+       20011-TENSU-CHECK-EXT.
+           EXIT.
       *
-      *        MOVE    TNS-HOSPNUM         TO  TNSUP-HOSPNUM
-      *        MOVE    TNS-SRYCD           TO  TNSUP-SRYCD
-      *        MOVE    TNS-YUKOSTYMD       TO  TNSUP-YUKOSTYMD
-      *        MOVE    TNS-YUKOEDYMD       TO  TNSUP-YUKOEDYMD
+      *****************************************************************
+      *    点数付加引き継ぎ作成処理
+      *****************************************************************
+       20012-TENSUPLUS-COPY-SEC    SECTION.
       *
-               MOVE    SMCNDATE-YMD        TO  TNS-UPYMD
-               MOVE    SMCNDATE-HMS        TO  TNS-UPHMS
+           MOVE    HZN-TENSUPLUS-REC   TO  TENSUPLUS-REC
+           MOVE    TNS-YUKOSTYMD       TO  TNSP-YUKOSTYMD
+           MOVE    TNS-YUKOEDYMD       TO  TNSP-YUKOEDYMD
       *
-               MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
-               MOVE    "DBUPDATE"          TO  MCP-FUNC
-               MOVE    "tbl_tensu"         TO  MCP-TABLE
-      *        MOVE    "upd1"              TO  MCP-PATHNAME
-               MOVE    "key"               TO  MCP-PATHNAME
-grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
-                                                   MCPDATA-REC
-                                                   SPA-AREA
+           MOVE    SMCNDATE-YMD        TO  TNSP-CREYMD
+                                           TNSP-UPYMD
+           MOVE    SMCNDATE-HMS        TO  TNSP-UPHMS
+           MOVE    TENSUPLUS-REC       TO  MCPDATA-REC
+           MOVE    "DBINSERT"          TO  MCP-FUNC
+           MOVE    "tbl_tensuplus"     TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           MOVE    SPACE               TO  WRK-RECEERR
+           IF      MCP-RC              NOT =   ZERO
+               DISPLAY "ORCBTPRCVR TENSUPLUS INS ERR:" MCP-RC
+                           ",KEY:" TNSP-KEY
                MOVE    SPACE               TO  WRK-RECEERR
-               IF      MCP-RC              NOT =   ZERO
-                   DISPLAY "ORCBSETTANI TENSU UPD ERR:" MCP-RC
-                           ",KEY:" TNS-KEY
-                   MOVE    SPACE               TO  WRK-RECEERR
-                   STRING  "単位更新でエラーとなりました。"
-                           "処理を終了します。"
-                                       DELIMITED  BY  SIZE
-                                       INTO  WRK-RECEERR
-                   END-STRING
-                   PERFORM 500-ERR-HENSYU-SEC
-               END-IF
-      *
-               IF      WRK-RECEERR         =   SPACE
-                   ADD     1               TO  CNT-OK
-                   PERFORM 700-PTNUM-PRINT-SEC
-               END-IF
+               STRING  "点数付加追加でエラーとなりました。"
+                       "処理を終了します。"
+                                   DELIMITED  BY  SIZE
+                                   INTO  WRK-RECEERR
+               END-STRING
+               PERFORM 500-ERR-HENSYU-SEC
            END-IF
       *
+           IF      WRK-RECEERR         =   SPACE
+               ADD     1               TO  CNT-OK
+               PERFORM 700-PTNUM-PRINT-SEC
+           END-IF
            .
-       20012-SET-CHNG-EXT.
+       20012-TENSUPLUS-COPY-EXT.
            EXIT.
       *
       *****************************************************************
-      *    印刷初期処理
+      *    処理件数編集印刷処理
       *****************************************************************
-       7001-PRT-INIT-SEC          SECTION.
+       2903-END-HENSYU-SEC         SECTION.
       *
-           MOVE    ZERO                TO  IDX-P
-           MOVE    ZERO                TO  CNT-LINE2
-           MOVE    SPACE               TO  HCPOM2
-      *    見出し編集
-           ADD     1                   TO  CNT-PAGE1
-           MOVE    CNT-PAGE1           TO  PRT-PAGE
-           MOVE    LST-PRT-HEAD1N      TO  HCPOM2-MOJI (1)
-           MOVE    LST-PRT-HEAD1       TO  HCPOM2-MOJI2 (1)
-           IF     WRK-PARA-SYORIKBN    =   "1"
-      *        一覧表示
-               MOVE    LST-PRT-HEAD2       TO  HCPOM2-MOJI (3)
-           ELSE
-               MOVE    LST-PRT-HEAD3       TO  HCPOM2-MOJI (3)
+           IF      IDX-P               =   ZERO
+               PERFORM 7001-PRT-INIT-SEC
            END-IF
-           MOVE    4                   TO  IDX-P
+      *    確認件数
+           ADD     3                   TO  IDX-P
+           IF      IDX-P               >   LINE-MAX
+      *        印刷処理
+               PERFORM 400-HCPOM2-PRINT-SEC
+               MOVE    1               TO  IDX-P
+           END-IF
+      *
+           MOVE    CNT-OK              TO  PRT-UPDCNT
+           MOVE    LST-PRT-TAIL1       TO   HCPOM2-MOJI (IDX-P)
+      *    印刷処理
+           PERFORM 400-HCPOM2-PRINT-SEC
            .
-       7001-PRT-INIT-EXT.
+       2903-END-HENSYU-EXIT.
            EXIT.
       *
       *****************************************************************
       *    登録確認メッセージ処理
       *****************************************************************
-       700-PTNUM-PRINT-SEC          SECTION.
+       700-PTNUM-PRINT-SEC         SECTION.
       *
            IF      CNT-OK              =   1
                PERFORM 7001-PRT-INIT-SEC
            END-IF
       *
-           INITIALIZE                  WRK-PRTHEN-AREA
+           INITIALIZE  WRK-PRTHEN-AREA
            MOVE    ZERO                TO  WRK-HEN-MAX
-           INITIALIZE                  LST-PRT-BODY
-           INITIALIZE                  LST-PRT-BODYN
+           INITIALIZE  LST-PRT-BODY
+           INITIALIZE  LST-PRT-BODYN
       *
-           MOVE    HZN-TNS-SRYCD       TO  PRT-SRYCD
-           IF     WRK-PARA-SYORIKBN    =   "1"
-      *        終了日
-               MOVE    WRK-TNS-YUKOEDYMD   TO  WRK-SYMD
-               PERFORM 800-SEIWA-HEN-SEC
-               MOVE    WRK-HENYMDG         TO  PRT-EDYMD
-           ELSE
-      *        開始日
-               MOVE    WRK-TNS-YUKOSTYMD   TO  WRK-SYMD
-               PERFORM 800-SEIWA-HEN-SEC
-               MOVE    WRK-HENYMDG         TO  PRT-EDYMD
-           END-IF
+           MOVE    HZN-TNSP-SRYCD      TO  PRT-SRYCD
+      *    開始日
+           MOVE    HZN-TNSP-YUKOSTYMD  TO  WRK-SYMD
+           PERFORM 800-SEIWA-HEN-SEC
+           MOVE    WRK-HENYMDG         TO  PRT-EDYMD
       *
-           MOVE    WRK-TNS-NAME        TO  PRT-NAME
-           MOVE    WRK-TNS-TANICD      TO  PRT-TANICD
-           MOVE    WRK-TNS-TANINAME    TO  PRT-TANINAME
-           INSPECT PRT-TANINAME        REPLACING  ALL "  "  BY  "　"
+           MOVE    TNS-NAME            TO  PRT-NAME
            ADD     1                   TO  WRK-HEN-MAX
            MOVE    LST-PRT-BODY        TO  WRK-TBL-REC  (WRK-HEN-MAX)
            MOVE    LST-PRT-BODYN       TO  WRK-TBL-REC2 (WRK-HEN-MAX)
@@ -812,89 +633,72 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    WRK-TBL-REC2(IDX)   TO  HCPOM2-MOJI2 (IDX-P)
            END-PERFORM
       *
-           INITIALIZE                  WRK-PRTHEN-AREA
+           INITIALIZE  WRK-PRTHEN-AREA
            MOVE    ZERO                TO  WRK-HEN-MAX
            .
        700-PTNUM-PRINT-EXIT.
            EXIT.
       *
       *****************************************************************
-      *    処理件数編集印刷処理
+      *    印刷初期処理
       *****************************************************************
-       2903-END-HENSYU-SEC          SECTION.
+       7001-PRT-INIT-SEC           SECTION.
       *
-           IF      IDX-P               =   ZERO
-               PERFORM 7001-PRT-INIT-SEC
-           END-IF
-      *    確認件数
-           ADD     3                   TO  IDX-P
-           IF      IDX-P               >   LINE-MAX
-      *        印刷処理
-               PERFORM 400-HCPOM2-PRINT-SEC
-               MOVE    1               TO  IDX-P
-           END-IF
-      *
-           IF      WRK-PARA-SYORIKBN   =   "1"
-               MOVE    CNT-OK              TO  PRT-CNT
-               MOVE    LST-PRT-TAIL2       TO  HCPOM2-MOJI (IDX-P)
-           ELSE
-               MOVE    CNT-OK              TO  PRT-UPDCNT
-               MOVE    LST-PRT-TAIL1       TO   HCPOM2-MOJI (IDX-P)
-           END-IF
-      *    印刷処理
-           PERFORM 400-HCPOM2-PRINT-SEC
-      *
+           MOVE    ZERO                TO  IDX-P
+           MOVE    SPACE               TO  HCPOM2
+      *    見出し編集
+           ADD     1                   TO  CNT-PAGE1
+           MOVE    CNT-PAGE1           TO  PRT-PAGE
+           MOVE    LST-PRT-HEAD1N      TO  HCPOM2-MOJI (1)
+           MOVE    LST-PRT-HEAD1       TO  HCPOM2-MOJI2 (1)
+           MOVE    LST-PRT-HEAD3       TO  HCPOM2-MOJI (3)
+           MOVE    4                   TO  IDX-P
            .
-       2903-END-HENSYU-EXIT.
+       7001-PRT-INIT-EXT.
            EXIT.
+      *
       *****************************************************************
       *    印刷処理
       *****************************************************************
-       400-HCPOM2-PRINT-SEC          SECTION.
+       400-HCPOM2-PRINT-SEC        SECTION.
       *
-           INITIALIZE                  ORCSPRTAREA
-           MOVE    "INS"            TO  SPRT-MODE
-           MOVE    LNK-PRTKANRI-RENNUM
-                                    TO  SPRT-RENNUM
+           INITIALIZE  ORCSPRTAREA
+           MOVE    "INS"               TO  SPRT-MODE
+           MOVE    LNK-PRTKANRI-RENNUM TO  SPRT-RENNUM
            MOVE    LNK-PRTKANRI-TBL-KEY
-                                    TO  SPRT-TBL-KEY
+                                       TO  SPRT-TBL-KEY
            MOVE    LNK-PRTKANRI-TBL-GROUP
-                                    TO  SPRT-TBL-GROUP
-           MOVE    LNK-PRTKANRI-SRYYM
-                                    TO  SPRT-SRYYM
-           MOVE    LNK-PRTKANRI-SKYYMD
-                                    TO  SPRT-SKYYMD
-           MOVE    LNK-PRTKANRI-SHELLID 
-                                    TO  SPRT-SHELLID
+                                       TO  SPRT-TBL-GROUP
+           MOVE    LNK-PRTKANRI-SRYYM  TO  SPRT-SRYYM
+           MOVE    LNK-PRTKANRI-SKYYMD TO  SPRT-SKYYMD
+           MOVE    LNK-PRTKANRI-SHELLID
+                                       TO  SPRT-SHELLID
            MOVE    LNK-PRTKANRI-SHORI-RENNUM
-                                    TO  SPRT-SHORI-RENNUM
+                                       TO  SPRT-SHORI-RENNUM
            MOVE    LNK-PRTKANRI-PRIORITY
-                                    TO  SPRT-PRIORITY
-           MOVE    "HCPOM2.red"     TO  SPRT-PRTID
-           MOVE    "改正単位コード変換確認リスト"
-                                    TO  SPRT-TITLE
-           MOVE    HCPOM2           TO  SPRT-PRTDATA
-           MOVE    LNK-PRTKANRI-TERMID
-                                    TO  SPRT-TERMID
-           MOVE    LNK-PRTKANRI-OPID
-                                    TO  SPRT-OPID
-           MOVE    LNK-PRTKANRI-PRTNM
-                                    TO  SPRT-PRTNM
-           MOVE    "1"              TO  SPRT-SITEKBN
-           CALL    "ORCSPRT"            USING
-                                        ORCSPRTAREA
-                                        SPA-AREA
-           IF      SPRT-RETURN          =   ZERO
+                                       TO  SPRT-PRIORITY
+           MOVE    "HCPOM2.red"        TO  SPRT-PRTID
+           MOVE    "改正点数付加引き継ぎ作成確認リスト"
+                                       TO  SPRT-TITLE
+           MOVE    HCPOM2              TO  SPRT-PRTDATA
+           MOVE    LNK-PRTKANRI-TERMID TO  SPRT-TERMID
+           MOVE    LNK-PRTKANRI-OPID   TO  SPRT-OPID
+           MOVE    LNK-PRTKANRI-PRTNM  TO  SPRT-PRTNM
+           MOVE    "1"                 TO  SPRT-SITEKBN
+           CALL    "ORCSPRT"           USING
+                                           ORCSPRTAREA
+                                           SPA-AREA
+           IF      SPRT-RETURN         =   ZERO
                CONTINUE
            ELSE
                MOVE    "印刷ＤＢに更新できませんでした"
-                                        TO  WRK-RECEERR
+                                       TO  WRK-RECEERR
                PERFORM 500-ERR-HENSYU-SEC
            END-IF
-      *
            .
        400-HCPOM2-PRINT-EXIT.
            EXIT.
+      *
       *****************************************************************
       *    終了　　処理
       *****************************************************************
@@ -902,24 +706,22 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       ***  PERFORM 3001-PARA-DEL-SEC
       *
-           DISPLAY "*** ORCBSETTANI OK :"  CNT-OK   " ***"
-           DISPLAY "*** ORCBSETTANI END ***"
-      *     
+           DISPLAY "*** ORCBTPRCVR OK :"  CNT-OK   " ***"
+           DISPLAY "*** ORCBTPRCVR END ***"
+      *
       *    ステップ管理終了処理
-           MOVE    "STE"           TO  SJOBKANRI-MODE
-           INITIALIZE                  JOBKANRI-REC
-           MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
-           MOVE    WRK-PARA-SHELLID
-                                   TO  JOB-SHELLID
-           MOVE    CNT-OK          TO  JOB-UPDCNT
-           MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
+           MOVE    "STE"               TO  SJOBKANRI-MODE
+           INITIALIZE  JOBKANRI-REC
+           MOVE    WRK-PARA-JOBID      TO  JOB-JOBID
+           MOVE    WRK-PARA-SHELLID    TO  JOB-SHELLID
+           MOVE    CNT-OK              TO  JOB-UPDCNT
+           MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
            CALL    "ORCSJOB"           USING
-                                       ORCSJOBKANRIAREA
-                                       JOBKANRI-REC
-                                       SPA-AREA
+                                           ORCSJOBKANRIAREA
+                                           JOBKANRI-REC
+                                           SPA-AREA
       *
            PERFORM 900-DBDISCONNECT-SEC
-      *
            .
        300-END-EXT.
            EXIT.
@@ -933,36 +735,35 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      STS-RECEERR         =   ZERO
                CLOSE   RECEERR-FILE
            ELSE
-               OPEN    OUTPUT              RECEERR-FILE
+               OPEN    OUTPUT  RECEERR-FILE
       *
                MOVE    WRK-RECEERR         TO  RECEERR-REC
                WRITE   RECEERR-REC
                CLOSE   RECEERR-FILE
-      *         
+      *
       *        ジョブ管理開始処理
-               MOVE    "JBE"           TO  SJOBKANRI-MODE
-               INITIALIZE                  JOBKANRI-REC
-               MOVE    WRK-PARA-JOBID  TO  JOB-JOBID
-               MOVE    WRK-PARA-SHELLID
-                                       TO  JOB-SHELLID
-               MOVE    WRK-RECEERR     TO  JOB-YOBI
-               MOVE    "9999"          TO  JOB-ERRCD
-               MOVE    SPA-HOSPNUM     TO  JOB-HOSPNUM
-               CALL    "ORCSJOB"       USING
-                                       ORCSJOBKANRIAREA  
-                                       JOBKANRI-REC
-                                       SPA-AREA
+               MOVE    "JBE"               TO  SJOBKANRI-MODE
+               INITIALIZE  JOBKANRI-REC
+               MOVE    WRK-PARA-JOBID      TO  JOB-JOBID
+               MOVE    WRK-PARA-SHELLID    TO  JOB-SHELLID
+               MOVE    WRK-RECEERR         TO  JOB-YOBI
+               MOVE    "9999"              TO  JOB-ERRCD
+               MOVE    SPA-HOSPNUM         TO  JOB-HOSPNUM
+               CALL    "ORCSJOB"           USING
+                                               ORCSJOBKANRIAREA
+                                               JOBKANRI-REC
+                                               SPA-AREA
            END-IF
       *
            MOVE    1                   TO  FLG-END
-      *
            .
        500-ERR-HENSYU-EXT.
            EXIT.
+      *
       *****************************************************************
       *    西暦和暦編集処理
       *****************************************************************
-       800-SEIWA-HEN-SEC             SECTION.
+       800-SEIWA-HEN-SEC           SECTION.
       *
            IF      WRK-SYMD            =   ALL "9"  OR   SPACE
                                        OR  ZERO
@@ -983,6 +784,24 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            .
        800-SEIWA-HEN-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    点数マスタ付加情報読込
+      *****************************************************************
+       910-TENSUPLUS-READ-SEC      SECTION.
+      *
+           PERFORM 920-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC         TO  TENSUPLUS-REC
+               MOVE    ZERO                TO  FLG-TENSUPLUS
+           ELSE
+               INITIALIZE  TENSUPLUS-REC
+               MOVE    1                   TO  FLG-TENSUPLUS
+           END-IF
+           .
+       910-TENSUPLUS-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    点数マスター読込
       *****************************************************************
@@ -1010,10 +829,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        MCPAREA
                                        MCPDATA-REC
                                        SPA-AREA
-      *
            .
        910-DBSELECT-EXT.
            EXIT.
+      *
       *****************************************************************
       *    ＤＢ読み込み処理
       *****************************************************************
@@ -1024,9 +843,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        MCPAREA
                                        MCPDATA-REC
                                        SPA-AREA
-      *
            .
-      *
        920-DBFETCH-EXT.
            EXIT.
       *
@@ -1040,7 +857,6 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                                        MCPAREA
                                        MCPDATA-REC
                                        SPA-AREA
-      *
            .
        990-DBCLOSE-EXT.
            EXIT.
