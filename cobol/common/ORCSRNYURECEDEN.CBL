@@ -981,18 +981,38 @@
       *        入院料加算の内容を労災マスタの内容に置き換える
       *        一般病棟看護必要度評価加算（一般病棟）（労災用）
                IF    NSRY-SRYCD(1)  =  "190131570"
+                 IF  LNK-RNYURECEDEN-SANTEIYM  >=  "201404"
+                   MOVE   "9017"       TO   TNS-CHUKSNCD
+                   MOVE   "6"          TO   TNS-CHUKSNTUBAN
+                   MOVE   7            TO   TNS-KOKUJISKBKBN1
+                 ELSE
                    MOVE   "9017"       TO   TNS-CHUKSNCD
                    MOVE   "5"          TO   TNS-CHUKSNTUBAN
                    MOVE   7            TO   TNS-KOKUJISKBKBN1
+                 END-IF
                END-IF
       *        一般病棟看護必要度評価加算（専門病院）（労災用）
                IF    NSRY-SRYCD(1)  =  "190134970"
+                 IF  LNK-RNYURECEDEN-SANTEIYM  >=  "201404"
+                   MOVE   "9030"       TO   TNS-CHUKSNCD
+                   MOVE   "5"          TO   TNS-CHUKSNTUBAN
+                   MOVE   7            TO   TNS-KOKUJISKBKBN1
+                 ELSE
                    MOVE   "9030"       TO   TNS-CHUKSNCD
                    MOVE   "4"          TO   TNS-CHUKSNTUBAN
                    MOVE   7            TO   TNS-KOKUJISKBKBN1
+                 END-IF
                END-IF
       *        重度認知症加算（精神病棟）（労災用）
                IF    NSRY-SRYCD(1)  =  "190118570"
+                   MOVE   7            TO   TNS-KOKUJISKBKBN1
+               END-IF
+      *        慢性維持透析管理加算（療養病棟入院基本料）（労災用）
+               IF    NSRY-SRYCD(1)  =  "190167970"
+                   MOVE   7            TO   TNS-KOKUJISKBKBN1
+               END-IF
+      *        在宅復帰機能強化加算（療養病棟入院基本料）（労災用）
+               IF    NSRY-SRYCD(1)  =  "190168070"
                    MOVE   7            TO   TNS-KOKUJISKBKBN1
                END-IF
       *
@@ -1171,18 +1191,38 @@
       *                   入院料加算の内容を労災マスタの内容に置き換える
       *                   一般病棟看護必要度評価加算（一般病棟）（労災用）
                           IF     SRY-SRYCD(1)     =    "190131570"
+                            IF  LNK-RNYURECEDEN-SANTEIYM  >=  "201404"
+                              MOVE   "9017"       TO   TNS-CHUKSNCD
+                              MOVE   "6"          TO   TNS-CHUKSNTUBAN
+                              MOVE   7            TO   TNS-KOKUJISKBKBN1
+                            ELSE
                               MOVE   "9017"       TO   TNS-CHUKSNCD
                               MOVE   "5"          TO   TNS-CHUKSNTUBAN
                               MOVE   7            TO   TNS-KOKUJISKBKBN1
+                            END-IF
                           END-IF
       *                   一般病棟看護必要度評価加算（専門病院）（労災用）
                           IF     SRY-SRYCD(1)     =    "190134970"
+                            IF  LNK-RNYURECEDEN-SANTEIYM  >=  "201404"
+                              MOVE   "9030"       TO   TNS-CHUKSNCD
+                              MOVE   "5"          TO   TNS-CHUKSNTUBAN
+                              MOVE   7            TO   TNS-KOKUJISKBKBN1
+                            ELSE
                               MOVE   "9030"       TO   TNS-CHUKSNCD
                               MOVE   "4"          TO   TNS-CHUKSNTUBAN
                               MOVE   7            TO   TNS-KOKUJISKBKBN1
+                            END-IF
                           END-IF
       *                   重度認知症加算（精神病棟）（労災用）
                           IF     SRY-SRYCD(1)     =    "190118570"
+                              MOVE   7            TO   TNS-KOKUJISKBKBN1
+                          END-IF
+      *                   慢性維持透析管理加算（療養病棟入院基本料）（労災用）
+                          IF     SRY-SRYCD(1)     =    "190167970"
+                              MOVE   7            TO   TNS-KOKUJISKBKBN1
+                          END-IF
+      *                   在宅復帰機能強化加算（療養病棟入院基本料）（労災用）
+                          IF     SRY-SRYCD(1)     =    "190168070"
                               MOVE   7            TO   TNS-KOKUJISKBKBN1
                           END-IF
       *
@@ -1205,6 +1245,20 @@
       *                   提供マスタに未設定の為、セットを行う
                           IF     SRY-SRYCD(1)     =    "101900110"
                               MOVE   103          TO   TNS-CDKBN-KBNNUM
+                          END-IF
+      *
+      *                   慢性維持透析管理加算（療養病棟入院基本料）（労災用）
+      *                   を直接入力された場合にコード表用番号の番号が
+      *                   提供マスタに未設定の為、セットを行う
+                          IF     SRY-SRYCD(1)     =    "101900130"
+                              MOVE   101          TO   TNS-CDKBN-KBNNUM
+                          END-IF
+      *
+      *                   在宅復帰機能強化加算（療養病棟入院基本料）（労災用）
+      *                   を直接入力された場合にコード表用番号の番号が
+      *                   提供マスタに未設定の為、セットを行う
+                          IF     SRY-SRYCD(1)     =    "101900140"
+                              MOVE   101          TO   TNS-CDKBN-KBNNUM
                           END-IF
       *
                         END-IF
@@ -1918,7 +1972,7 @@
                                MOVE   WRK-SO-SRYKBN(IDX1)  TO   
                                     LNK-RNYURECEDEN-SRYSKB(1 IDX2 IDX3)
                          END-IF
-      *                  入院料加算の労災用置き換え
+      *                入院料加算の労災用置き換え
       *                  一般病棟看護必要度評価加算（一般病棟）（労災用）
                          IF    WRK-SO-SRYCD(IDX1 IDX3)  =  "190131570"
                             MOVE "101900100" TO WRK-SO-SRYCD(IDX1 IDX3)
@@ -1930,6 +1984,15 @@
       *                  重度認知症加算（精神病棟）（労災用）
                          IF    WRK-SO-SRYCD(IDX1 IDX3)  =  "190118570"
                             MOVE "101900110" TO WRK-SO-SRYCD(IDX1 IDX3)
+                         END-IF
+      *                入院料加算の労災用置き換え（平成２６年追加）
+      *                  慢性維持透析管理加算（療養病棟入院基本料）（労災用）
+                         IF    WRK-SO-SRYCD(IDX1 IDX3)  =  "190167970"
+                            MOVE "101900130" TO WRK-SO-SRYCD(IDX1 IDX3)
+                         END-IF
+      *                  在宅復帰機能強化加算（療養病棟入院基本料）（労災用）
+                         IF    WRK-SO-SRYCD(IDX1 IDX3)  =  "190168070"
+                            MOVE "101900140" TO WRK-SO-SRYCD(IDX1 IDX3)
                          END-IF
       *
                          MOVE  WRK-SO-SRYCD(IDX1 IDX3) TO
