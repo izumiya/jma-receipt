@@ -257,6 +257,7 @@
       *  04.07.03    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.04    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *  04.07.05    NACL-門脇    14/04/04  平成２６年４月改正対応
+      *  04.07.06    NACL-門脇    14/04/08  長期の特記事項重複修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -433,6 +434,7 @@
            03  IDYY                                    PIC 9(03).
            03  IDZZ                                    PIC 9(03).
            03  TOKKI-IDX                               PIC 9(02).
+           03  TOKKI-IDX2                              PIC 9(02).
            03  SYSKAN-IDX                              PIC 9(03).
            03  SYOTOKU-IDX                             PIC 9(02).
            03  SYOTOKU-IDX2                            PIC 9(02)
@@ -1743,15 +1745,31 @@ grpsys           PERFORM 900-DBSELECT-SEC
                        IF   HKN-HKNKOHSBTKBN   =   "2"
                            EVALUATE  HKN-HKNNUM
                             WHEN     "972"
-                              ADD      1           TO  TOKKI-IDX
-                              MOVE    "02"         TO  RECE02-TOKKI
-                                                       (TOKKI-IDX)
+                              PERFORM VARYING TOKKI-IDX2 FROM 1 BY 1
+                                       UNTIL  TOKKI-IDX2   >  5
+                                IF  RECE02-TOKKI(TOKKI-IDX2) = SPACE
+                                  MOVE "02" TO RECE02-TOKKI(TOKKI-IDX2)
+                                  MOVE   5  TO TOKKI-IDX2
+                                ELSE
+                                  IF  RECE02-TOKKI(TOKKI-IDX2) = "02"
+                                    MOVE 5  TO TOKKI-IDX2
+                                  END-IF
+                                END-IF
+                              END-PERFORM
                               MOVE    RECE01-KOHHKNNUM-O(IDX)
                                                    TO  WRK-CHOKI
                             WHEN     "974"
-                              ADD      1           TO  TOKKI-IDX
-                              MOVE    "16"         TO  RECE02-TOKKI
-                                                       (TOKKI-IDX)
+                              PERFORM VARYING TOKKI-IDX2 FROM 1 BY 1
+                                       UNTIL  TOKKI-IDX2   >  5
+                                IF  RECE02-TOKKI(TOKKI-IDX2) = SPACE
+                                  MOVE "16" TO RECE02-TOKKI(TOKKI-IDX2)
+                                  MOVE   5  TO TOKKI-IDX2
+                                ELSE
+                                  IF  RECE02-TOKKI(TOKKI-IDX2) = "16"
+                                    MOVE 5  TO TOKKI-IDX2
+                                  END-IF
+                                END-IF
+                              END-PERFORM
                               MOVE    RECE01-KOHHKNNUM-O(IDX)
                                                    TO  WRK-CHOKI2
                            END-EVALUATE
@@ -1762,6 +1780,12 @@ grpsys           PERFORM 900-DBSELECT-SEC
                  MOVE    "key"                 TO  MCP-PATHNAME
                  PERFORM 900-CLOSE-SEC
                END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING TOKKI-IDX2 FROM 1 BY 1
+                    UNTIL (TOKKI-IDX2               >  5   )
+                     OR   (RECE02-TOKKI(TOKKI-IDX2) = SPACE)
+               MOVE   TOKKI-IDX2  TO  TOKKI-IDX
            END-PERFORM
       *
       *    公費情報のセット

@@ -646,6 +646,7 @@
       *  04.07.15    NACL-門脇    14/03/17  低所得フラグ２情報の入れ替え
       *                                     （マル長併用時）
       *  04.07.16    NACL-門脇    14/03/28  平成２６年４月改正対応
+      *  04.07.17    NACL-門脇    14/04/08  長期の特記事項重複修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -18474,8 +18475,19 @@ grpsys     PERFORM 900-DBSELECT-SEC
                            MOVE  ZERO    TO  RECE02-ZAITAKU-SAIKEI
                       END-IF
       *
-                      IF  (RECE02-KOHNUM(1)  = "972" OR "974")
-                      AND (RECE02-KOHNUM(2)  = SPACE         )
+                      IF ((RECE02-KOHNUM(1)  = "972" OR "974") AND
+                          (RECE02-KOHNUM(2)  = SPACE         ))
+                      OR ((RECE02-KOHNUM(1)  = "972" OR "974") AND
+                          (RECE02-KOHNUM(2)  = "972" OR "974") AND
+                          (RECE02-KOHNUM(3)  = SPACE         ))
+                      OR ((RECE02-KOHNUM(1)  = "972" OR "974") AND
+                          (RECE02-KOHNUM(2)  = "972" OR "974") AND
+                          (RECE02-KOHNUM(3)  = "972" OR "974") AND
+                          (RECE02-KOHNUM(4)  = SPACE         ))
+                      OR ((RECE02-KOHNUM(1)  = "972" OR "974") AND
+                          (RECE02-KOHNUM(2)  = "972" OR "974") AND
+                          (RECE02-KOHNUM(3)  = "972" OR "974") AND
+                          (RECE02-KOHNUM(4)  = "972" OR "974"))
                            MOVE  ZERO    TO  RECE02-ZAITAKU-SAIKEI
                       END-IF
                     END-IF

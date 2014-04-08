@@ -215,6 +215,8 @@
       *  04.07.01    NACL-門脇    12/10/02  高齢者判定フラグ編集
       *  04.07.02    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.03    NACL-門脇    13/07/10  自賠責（第三者行為）対応
+      *  04.07.04    NACL-藤原    13/12/09  医療情報連携基盤対応
+      *  04.07.05    NACL-門脇    14/04/08  長期の特記事項重複修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -389,6 +391,7 @@
            03  IDY2                                    PIC 9(03).
            03  IDZ                                     PIC 9(02).
            03  TOKKI-IDX                               PIC 9(02).
+           03  TOKKI-IDX2                              PIC 9(02).
            03  SYSKAN-IDX                              PIC 9(03).
            03  SYSKAN-1017-IDX                         PIC 9(03).
            03  SYOTOKU-IDX                             PIC 9(02).
@@ -1479,15 +1482,31 @@
                        IF   HKN-HKNKOHSBTKBN   =   "2"
                            EVALUATE  HKN-HKNNUM
                             WHEN     "972"
-                              ADD      1           TO  TOKKI-IDX
-                              MOVE    "02"         TO  RECE62-TOKKI
-                                                       (TOKKI-IDX)
+                              PERFORM VARYING TOKKI-IDX2 FROM 1 BY 1
+                                       UNTIL  TOKKI-IDX2   >  5
+                                IF  RECE62-TOKKI(TOKKI-IDX2) = SPACE
+                                  MOVE "02" TO RECE62-TOKKI(TOKKI-IDX2)
+                                  MOVE   5  TO TOKKI-IDX2
+                                ELSE
+                                  IF  RECE62-TOKKI(TOKKI-IDX2) = "02"
+                                    MOVE 5  TO TOKKI-IDX2
+                                  END-IF
+                                END-IF
+                              END-PERFORM
                               MOVE    RECE61-KOHHKNNUM-O(IDX)
                                                    TO  WRK-CHOKI
                             WHEN     "974"
-                              ADD      1           TO  TOKKI-IDX
-                              MOVE    "16"         TO  RECE62-TOKKI
-                                                       (TOKKI-IDX)
+                              PERFORM VARYING TOKKI-IDX2 FROM 1 BY 1
+                                       UNTIL  TOKKI-IDX2   >  5
+                                IF  RECE62-TOKKI(TOKKI-IDX2) = SPACE
+                                  MOVE "16" TO RECE62-TOKKI(TOKKI-IDX2)
+                                  MOVE   5  TO TOKKI-IDX2
+                                ELSE
+                                  IF  RECE62-TOKKI(TOKKI-IDX2) = "16"
+                                    MOVE 5  TO TOKKI-IDX2
+                                  END-IF
+                                END-IF
+                              END-PERFORM
                               MOVE    RECE61-KOHHKNNUM-O(IDX)
                                                    TO  WRK-CHOKI2
                            END-EVALUATE
@@ -1498,6 +1517,12 @@
                  MOVE    "key"              TO  MCP-PATHNAME
                  PERFORM 900-CLOSE-SEC
                END-IF
+           END-PERFORM
+      *
+           PERFORM VARYING TOKKI-IDX2 FROM 1 BY 1
+                    UNTIL (TOKKI-IDX2               >  5   )
+                     OR   (RECE62-TOKKI(TOKKI-IDX2) = SPACE)
+               MOVE   TOKKI-IDX2  TO  TOKKI-IDX
            END-PERFORM
       *
       *    公費情報のセット

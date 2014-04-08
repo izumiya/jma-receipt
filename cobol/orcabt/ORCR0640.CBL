@@ -639,6 +639,7 @@
       *  04.07.19    NACL-門脇    14/03/26  平成２６年４月改正対応
       *                                     （夜勤時間経過減算の選定対応）
       *  04.07.20    NACL-門脇    14/03/28  平成２６年４月改正対応
+      *  04.07.21    NACL-門脇    14/04/08  長期の特記事項重複修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -22316,8 +22317,19 @@
                            MOVE  ZERO     TO  RECE62-KOUREI-SAIKEI
                       END-IF
       *
-                      IF  (RECE62-KOHNUM(1)  = "972" OR "974")
-                      AND (RECE62-KOHNUM(2)  = SPACE         )
+                      IF ((RECE62-KOHNUM(1)  = "972" OR "974") AND
+                          (RECE62-KOHNUM(2)  = SPACE         ))
+                      OR ((RECE62-KOHNUM(1)  = "972" OR "974") AND
+                          (RECE62-KOHNUM(2)  = "972" OR "974") AND
+                          (RECE62-KOHNUM(3)  = SPACE         ))
+                      OR ((RECE62-KOHNUM(1)  = "972" OR "974") AND
+                          (RECE62-KOHNUM(2)  = "972" OR "974") AND
+                          (RECE62-KOHNUM(3)  = "972" OR "974") AND
+                          (RECE62-KOHNUM(4)  = SPACE         ))
+                      OR ((RECE62-KOHNUM(1)  = "972" OR "974") AND
+                          (RECE62-KOHNUM(2)  = "972" OR "974") AND
+                          (RECE62-KOHNUM(3)  = "972" OR "974") AND
+                          (RECE62-KOHNUM(4)  = "972" OR "974"))
                            MOVE  ZERO     TO  RECE62-KOUREI-SAIKEI
                       END-IF
                     END-IF
