@@ -158,6 +158,7 @@
       *
       *    √œ∞Ë Ò≥Áø«Œ≈≤√ªªÕ≠Ãµ
            03  FLG-CHKCARKSN           PIC 9(01).
+           03  FLG-DEKIDAKA            PIC 9(01).
       *
       *    ≈∫ª˙ŒŒ∞Ë
        01  IDX-AREA.
@@ -1317,10 +1318,11 @@
       *H26.4
       *    √œ∞Ë Ò≥Áø«Œ≈≤√ªªÕ≠Ãµ
            MOVE    ZERO                TO  FLG-CHKCARKSN
+           MOVE    ZERO                TO  FLG-DEKIDAKA
            IF     (SPA-CHKHKT-ARI      =   1   )
               OR  (SPA-CHKHKT-ARI2     =   1   )
       *        √œ∞Ë Ò≥Áø«Œ≈Œ¡ªªƒÍ°°Õ≠
-               MOVE    1                   TO  FLG-CHKCARKSN
+               MOVE    2                   TO  FLG-CHKCARKSN
            END-IF
       *
       *    ∑—¬≥§Œª˛°¢ªªƒÍ ¨§Œ ‘Ω∏
@@ -1348,6 +1350,10 @@
       *        √œ∞Ë Ò≥Áø«Œ≈≤√ªª
                IF      WRK-COM-INPUTCD(IDX)    =   "112017270"
                    MOVE    1                   TO  FLG-CHKCARKSN
+               END-IF
+      *        Ω–ÕËπ‚° ≤Ò∑◊°À
+               IF      WRK-COM-INPUTCD (IDX)   =   "099999905"
+                   MOVE    1                   TO  FLG-DEKIDAKA
                END-IF
       *
                IF     (WRK-COM-SRYKBN(IDX)(1:1)    =   "2" )  OR
@@ -1381,6 +1387,15 @@
                END-IF
              END-IF
            END-PERFORM
+      *H26.4
+      *    √œ∞Ë Ò≥Áø«Œ≈Œ¡ªªƒÍÕ≠§«°¢Ω–ÕËπ‚° ≤Ò∑◊°À§Œª˛°¢ Ò≥Á≥∞§»§π§Î
+           IF      FLG-CHKCARKSN       =   2
+               IF      FLG-DEKIDAKA        =   1
+                   MOVE    ZERO            TO  FLG-CHKCARKSN
+               ELSE
+                   MOVE    1               TO  FLG-CHKCARKSN
+               END-IF
+           END-IF
       *
            MOVE    ZERO                TO  IDXS
            MOVE    SPACE               TO  LNK-ORCSC-KIDCD
