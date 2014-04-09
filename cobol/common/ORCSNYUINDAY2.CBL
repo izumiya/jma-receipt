@@ -54,6 +54,7 @@
            03  FLG-PTNYUINRRK              PIC 9(01).
            03  FLG-TANKI2                  PIC 9(01).
            03  FLG-HKNCOMBI                PIC 9(01).
+           03  FLG-TENSU                   PIC 9(01).
       *    添字領域
        01  IDX-AREA.
            03  IDX                         PIC 9(04).
@@ -241,6 +242,9 @@
                05  WRK-GETSUMATSU-MM       PIC 9(02).
                05  WRK-GETSUMATSU-DD       PIC 9(02).
       *
+      *    短期滞在以外で入院料を算定している日
+           03  WRK-TANKI-IGAI              PIC X(01)  OCCURS 31.
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -272,6 +276,9 @@
       *    保険組み合わせ
        01  HKNCOMBI-REC.
            COPY    "CPHKNCOMBI.INC".
+      *
+      *    点数マスタ−
+           COPY    "CPTENSU.INC".
       *
       *
       *    ＤＢ検索
@@ -404,6 +411,51 @@
            IF      STS-DAY-RC1            =   ZERO
                MOVE    LNK-DAY7-KOYOMI    TO  WRK-GETSUMATSU-YMD
            END-IF
+      *
+      *    短期滞在手術基本料以外で入院料のカレンダーが立っている日を
+      *    特定する
+           INITIALIZE                       NYUINACCT-REC
+           MOVE    LNK-NYUINDAY-HOSPNUM   TO  NACCT-HOSPNUM
+           MOVE    LNK-NYUINDAY-PTID      TO  NACCT-PTID
+           MOVE    LNK-NYUINDAY-SANTEIYM  TO  NACCT-SRYYM
+           MOVE    "tbl_nyuinacct"        TO  MCP-TABLE
+           MOVE    "key36"                TO  MCP-PATHNAME
+           PERFORM 910-NYUINACCT-SELECT-SEC
+           IF      FLG-NYUINACCT          =   ZERO
+               MOVE    "tbl_nyuinacct"    TO  MCP-TABLE
+               MOVE    "key36"            TO  MCP-PATHNAME
+               PERFORM 910-NYUINACCT-READ-SEC
+               PERFORM  UNTIL  ( FLG-NYUINACCT    =   1 )
+                  PERFORM    210-NYUINACT-GET-SEC
+      *           点数マスタより短期滞在以外であることの判定
+                  INITIALIZE                  TNS-TENSU-REC
+                  MOVE    LNK-NYUINDAY-HOSPNUM
+                                          TO  TNS-HOSPNUM
+                  MOVE    NSRY-SRYCD(1)   TO  TNS-SRYCD
+                  MOVE    LNK-NYUINDAY-SANTEIYM
+                                          TO  TNS-YUKOSTYMD(1:6)
+                  MOVE    "01"            TO  TNS-YUKOSTYMD(7:2)
+                  MOVE    TNS-YUKOSTYMD   TO  TNS-YUKOEDYMD
+                  PERFORM   910-TENSU-READ-SEC
+                  IF     TNS-NYUKHNKSNKBN  =  226  OR  240
+                      CONTINUE
+                  ELSE
+                      PERFORM    VARYING IDX   FROM   1   BY  1
+                        UNTIL IDX   >   31
+                            IF  NACCT-DAY(IDX)  NOT =   ZERO
+                                MOVE   "1"      TO   WRK-TANKI-IGAI(IDX)
+                            END-IF
+                      END-PERFORM
+                  END-IF
+                  MOVE    "tbl_nyuinacct"    TO  MCP-TABLE
+                  MOVE    "key36"            TO  MCP-PATHNAME
+                  PERFORM 910-NYUINACCT-READ-SEC
+               END-PERFORM
+           END-IF
+      *    入院会計クローズ
+           MOVE    "tbl_nyuinacct"        TO  MCP-TABLE
+           MOVE    "key36"                TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
       *
       *    入院履歴より短期滞在手術基本料２の算定有無を特定
            INITIALIZE                     PTNYUINRRK-REC
@@ -896,6 +948,16 @@
                  UNTIL     IDX   >   31
                IF   LNK-NYUINDAY-TANKI2-KBN(IDX)  NOT =   SPACE
                    MOVE   "1"     TO   LNK-NYUINDAY-KBN(IDX)
+               END-IF
+           END-PERFORM
+      *
+      *    入院区分のクリア
+           PERFORM    VARYING   IDX   FROM   1   BY   1
+                 UNTIL     IDX   >   31
+               IF   WRK-TANKI-IGAI(IDX)  NOT =   SPACE
+                   MOVE   SPACE     TO   LNK-NYUINDAY-KBN(IDX)
+                   MOVE   SPACE     TO   LNK-NYUINDAY-TANKI2-KBN(IDX)
+                   MOVE   SPACE     TO   LNK-NYUINDAY-TANKI3-KBN(IDX)
                END-IF
            END-PERFORM
       *
@@ -1679,6 +1741,39 @@
       *
            .
        910-HKNCOMBI-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    点数マスター読込（主キー）
+      *****************************************************************
+       910-TENSU-READ-SEC         SECTION.
+      *
+           MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM   900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_tensu"     TO  MCP-TABLE
+               MOVE    "key"           TO  MCP-PATHNAME
+               PERFORM   900-DBFETCH-SEC
+               IF      MCP-RC          =   ZERO
+                   MOVE    MCPDATA-REC TO  TNS-TENSU-REC
+                   MOVE    ZERO        TO  FLG-TENSU
+               ELSE
+                   MOVE    1           TO  FLG-TENSU
+                   INITIALIZE              TNS-TENSU-REC
+               END-IF
+           ELSE
+               MOVE    1               TO  FLG-TENSU
+               INITIALIZE                  TNS-TENSU-REC
+           END-IF
+      *
+           MOVE    "tbl_tensu"         TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+           .
+       910-TENSU-READ-EXT.
            EXIT.
       *
       *****************************************************************
