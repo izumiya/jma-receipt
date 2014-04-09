@@ -34,8 +34,10 @@
            03  LNK-EIYOUKKS-SRYCD                  PIC  X(09).
       *返却項目
            03  LNK-EIYOUKKS-HENKYAKU-AREA.
-      *経過措置入院料コード
+      *経過措置入院料コード（平成２６年３月まで返却）
               05  LNK-EIYOUKKS-CHGSRYCD            PIC  X(09).
+      *経過措置入院料コード（平成２６年４月以降のレセプト略称記載用に返却）
+              05  LNK-EIYOUKKS-RECE-CHGSRYCD       PIC  X(09).
       *復帰コード（０：経過措置入院料返却あり　１：経過措置入院料返却なし）
            03  LNK-EIYOUKKS-RC                     PIC S9(9) BINARY.
       *

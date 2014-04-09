@@ -127,6 +127,56 @@
                END-IF
            END-IF
       *
+      *    平成２６年４月から６月分のレセプト略称記載用に返却
+           IF  (LNK-EIYOUKKS-SANTEIYM    >=   "201404")   AND
+               (LNK-EIYOUKKS-SANTEIYM    <=   "201406")
+      *        システム管理検索（栄養管理経過措置の区分取得）
+               MOVE    SPACE               TO  SYS-5000-REC
+               INITIALIZE                      SYS-5000-REC
+               MOVE    "5000"              TO  SYS-5000-KANRICD
+               MOVE    "*"                 TO  SYS-5000-KBNCD
+               MOVE    LNK-EIYOUKKS-SANTEIYM
+                                           TO  SYS-5000-STYUKYMD(1:6)
+               MOVE    "01"                TO  SYS-5000-STYUKYMD(7:2)
+               MOVE    SYS-5000-STYUKYMD   TO  SYS-5000-EDYUKYMD
+               MOVE    SPA-HOSPNUM         TO  SYS-5000-HOSPNUM
+               MOVE    SYS-5000-REC        TO  MCPDATA-REC
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    "tbl_syskanri"      TO  MCP-TABLE
+                   MOVE    "key10"             TO  MCP-PATHNAME
+                   PERFORM 920-DBFETCH-SEC
+                   IF      MCP-RC              =   ZERO
+                       MOVE    ZERO                TO  FLG-SYSKANRI
+                       MOVE    MCPDATA-REC         TO  SYS-5000-REC
+                   ELSE
+                       MOVE    1                   TO  FLG-SYSKANRI
+                   END-IF
+               ELSE
+                   MOVE    SPACE               TO  SYS-5000-REC
+                   INITIALIZE                  SYS-5000-REC
+                   MOVE    1               TO  FLG-SYSKANRI
+               END-IF
+      *
+               MOVE    "tbl_syskanri"      TO  MCP-TABLE
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 990-DBCLOSE-SEC
+      *
+               IF    SYS-5000-EIYOUKSNKBN  =   "1"
+                   IF    LNK-EIYOUKKS-SRYCD    NOT  =  SPACE
+                       PERFORM    200-CDCHG1-SEC
+                       IF   LNK-EIYOUKKS-CHGSRYCD  NOT =   SPACE
+                         MOVE    LNK-EIYOUKKS-CHGSRYCD
+                                        TO  LNK-EIYOUKKS-RECE-CHGSRYCD
+                         MOVE    SPACE  TO  LNK-EIYOUKKS-CHGSRYCD
+                       END-IF
+                   END-IF
+      *
+               END-IF
+           END-IF
+      *
            IF    LNK-EIYOUKKS-CHGSRYCD   =     SPACE
                MOVE    1                 TO     LNK-EIYOUKKS-RC
            END-IF
