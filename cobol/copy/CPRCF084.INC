@@ -50,6 +50,7 @@
       *  04.07.03    NACL-門脇    13/02/12  労災レセ電対応
       *                                     剤（点数）・剤（金額）
       *                                     コード表用番号−区分番号追加
+      *  04.07.04    NACL-門脇    14/04/07  改正対応項目追加
       ************************************************************
       *01  RECE84-REC.
            03  RECE84-KEY.
@@ -227,6 +228,17 @@
       *
       *在宅持続陽圧呼吸療法指導管理料
                05  RECE84-FLG-YOUATU-COMMENT  PIC  X(01).
+      *
+      *心臓ペースメーカー指導管理料（ロ・植込型除細動器移行期加算含む）
+               05  RECE84-FLG-SINPESUR-COMMENT  PIC  X(01).
+      *がん患者指導管理料２・３
+               05  RECE84-FLG-GANSIDO-COMMENT   PIC  X(01).
+      *在宅患者共同診療料
+               05  RECE84-FLG-ZAIKYO-COMMENT    PIC  X(01).
+      *磁気による膀胱等刺激法
+               05  RECE84-FLG-BOKOHO-COMMENT    PIC  X(01).
+      *超重症児（者）入院診療加算・準超重症児（者）入院診療加算
+               05  RECE84-FLG-CYOJKSN-COMMENT   PIC  X(01).
       *
       *手技毎の内容（手術・画像診断・処置）
                05  RECE84-ACCTP-SYUGI-TBL-G.

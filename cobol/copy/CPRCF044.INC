@@ -58,6 +58,7 @@
       *  04.07.02    NACL-門脇    13/01/21  労災レセ電対応
       *  04.07.03    NACL-門脇    13/02/12  労災レセ電対応
       *                                     剤（点数）・剤（金額）追加
+      *  04.07.04    NACL-門脇    14/04/07  改正対応項目追加
       ************************************************************
       *01  RECE44-REC.
            03  RECE44-KEY.
@@ -244,6 +245,19 @@
       *外来管理加算（読み替え）
                05  RECE44-FLG-GAIKAN-COMMENT
                                            PIC X(01).
+      *
+      *心臓ペースメーカー指導管理料（ロ・植込型除細動器移行期加算含む）
+               05  RECE44-FLG-SINPESUR-COMMENT PIC  X(01).
+      *がん患者指導管理料２・３
+               05  RECE44-FLG-GANSIDO-COMMENT  PIC  X(01).
+      *在宅患者共同診療料
+               05  RECE44-FLG-ZAIKYO-COMMENT   PIC  X(01).
+      *在宅患者訪問リハビリテーション指導管理料
+               05  RECE44-FLG-ZAIRIHA-COMMENT  PIC  X(01).
+      *磁気による膀胱等刺激法
+               05  RECE44-FLG-BOKOHO-COMMENT   PIC  X(01).
+      *通院・在宅精神療法（２０歳未満）加算
+               05  RECE44-FLG-TUINZAI-COMMENT  PIC  X(01).
       *
       *手技毎の内容（手術・画像診断・処置）
                05  RECE44-ACCTP-SYUGI-TBL-G.

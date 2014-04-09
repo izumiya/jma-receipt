@@ -33,6 +33,7 @@
       *  04.05.03    NACL-門脇    12/04/10  改正対応項目追加
       *
       *  04.07.01    NACL-門脇    12/09/25  コメント差込項目追加
+      *  04.07.02    NACL-門脇    14/04/07  改正対応項目追加
       ************************************************************
       *01  RECE220-REC.
            03  RECE220-KEY.
@@ -193,6 +194,17 @@
       *
       *在宅持続陽圧呼吸療法指導管理料
            03  RECE220-FLG-YOUATU-COMMENT  PIC  X(01).
+      *
+      *心臓ペースメーカー指導管理料（ロ・植込型除細動器移行期加算含む）
+           03  RECE220-FLG-SINPESUR-COMMENT  PIC  X(01).
+      *がん患者指導管理料２・３
+           03  RECE220-FLG-GANSIDO-COMMENT   PIC  X(01).
+      *在宅患者共同診療料
+           03  RECE220-FLG-ZAIKYO-COMMENT    PIC  X(01).
+      *磁気による膀胱等刺激法
+           03  RECE220-FLG-BOKOHO-COMMENT    PIC  X(01).
+      *超重症児（者）入院診療加算・準超重症児（者）入院診療加算
+           03  RECE220-FLG-CYOJKSN-COMMENT   PIC  X(01).
       *
       *日数回数テーブル
            03  RECE220-DAY-AREA.
