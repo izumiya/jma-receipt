@@ -235,6 +235,12 @@
                05  WRK-YOKUJITSU-YYMM      PIC 9(06).
                05  WRK-YOKUJITSU-DD        PIC 9(02).
       *
+      *    月末日取得用
+           03  WRK-GETSUMATSU-YMD.
+               05  WRK-GETSUMATSU-YY       PIC 9(04).
+               05  WRK-GETSUMATSU-MM       PIC 9(02).
+               05  WRK-GETSUMATSU-DD       PIC 9(02).
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -387,6 +393,18 @@
       *****************************************************************
        200-MAIN-SEC            SECTION.
       *
+      *    月末日を取得
+           INITIALIZE                         STS-AREA-DAY
+           INITIALIZE                         LNK-DAY7-AREA
+           MOVE    "71"                   TO  LNK-DAY7-IRAI
+           MOVE    LNK-NYUINDAY-SANTEIYM
+                                          TO  LNK-DAY7-YM
+           CALL    "ORCSDAY"          USING   STS-AREA-DAY
+                                              LNK-DAY7-AREA
+           IF      STS-DAY-RC1            =   ZERO
+               MOVE    LNK-DAY7-KOYOMI    TO  WRK-GETSUMATSU-YMD
+           END-IF
+      *
       *    入院履歴より短期滞在手術基本料２の算定有無を特定
            INITIALIZE                     PTNYUINRRK-REC
            MOVE    LNK-NYUINDAY-HOSPNUM   TO  PTNYUINRRK-HOSPNUM
@@ -433,7 +451,7 @@
                            MOVE   99     TO    IDX-ED
                       END-IF
                       PERFORM    VARYING   IDX   FROM   1   BY   1
-                               UNTIL     IDX   >   31
+                               UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
                             MOVE  "1"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
@@ -497,7 +515,7 @@
                            MOVE   99     TO    IDX-ED
                       END-IF
                       PERFORM    VARYING   IDX   FROM   1   BY   1
-                               UNTIL     IDX   >   31
+                               UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
                             MOVE  "2"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
@@ -561,7 +579,7 @@
                            MOVE   99     TO    IDX-ED
                       END-IF
                       PERFORM    VARYING   IDX   FROM   1   BY   1
-                               UNTIL     IDX   >   31
+                               UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
                             MOVE  "1"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
@@ -625,7 +643,7 @@
                            MOVE   99     TO    IDX-ED
                       END-IF
                       PERFORM    VARYING   IDX   FROM   1   BY   1
-                               UNTIL     IDX   >   31
+                               UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
                             MOVE  "2"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
@@ -694,7 +712,7 @@
                            MOVE   99     TO    IDX-ED
                       END-IF
                       PERFORM    VARYING   IDX   FROM   1   BY   1
-                               UNTIL     IDX   >   31
+                               UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
                             MOVE  "1"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
@@ -763,7 +781,7 @@
                            MOVE   99     TO    IDX-ED
                       END-IF
                       PERFORM    VARYING   IDX   FROM   1   BY   1
-                               UNTIL     IDX   >   31
+                               UNTIL     IDX   >   WRK-GETSUMATSU-DD
                          IF    (IDX-ST    <=    IDX)   AND
                                (IDX-ED    >=    IDX)
                             MOVE  "2"  TO  LNK-NYUINDAY-TANKI2-KBN(IDX)
@@ -854,7 +872,7 @@
                                             CONS-TANKI3-H26-SRYCD(45) OR
                                             CONS-TANKI3-H26-SRYCD(46)
                           PERFORM    VARYING   IDX   FROM   1   BY   1
-                                  UNTIL     IDX   >   31
+                                  UNTIL     IDX   >   WRK-GETSUMATSU-DD
                             IF     NACCT-DAY(IDX)  NOT =  ZERO
                                MOVE  SPACE TO LNK-NYUINDAY-TANKI2-KBN
                                                                  (IDX)
