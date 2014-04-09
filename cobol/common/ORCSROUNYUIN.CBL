@@ -94,6 +94,7 @@
       *  04.07.03    NACL-門脇    14/03/14  平成２６年４月改正対応
       *  04.07.04    NACL-門脇    14/04/07  平成２６年４月改正対応
       *                                     （労災マスタに置き換え）
+      *  04.07.05    NACL-門脇    14/04/08  平成２６年４月改正対応
       *****************************************************************
       *
       *
@@ -293,6 +294,11 @@
            03  WRK-HYOTEN                  PIC 9(09)V99.
            03  WRK-HIKAKU-ZAITEN           PIC 9(08).
       *
+           03  WRK-HOSPSBT                 PIC 9(01).
+      *
+           03  WRK-TOKUREI-SRYCD           PIC X(09).
+           03  WRK-TOKUREI-SRYCD2          PIC X(09).
+      *
       *    労災入院会計ワーク
            03  WRK-ROUSAI-TABLE.
                05  WRK-ROUSAI-TBL          OCCURS  31.
@@ -414,6 +420,8 @@
       *    システム管理マスタ
            COPY    "CPSYSKANRI.INC".
       *
+           COPY    "CPSK1001.INC".
+      *
            COPY    "CPSK5000.INC".
       *
       *    入院診療会計マスタ−
@@ -467,6 +475,9 @@
       *
       *    入院料未算定日取得サブ
            COPY    "CPORCSNYUINDAY.INC".
+      *
+      *    栄養管理経過措置入院料コード取得サブ
+           COPY    "CPORCSEIYOUKKS.INC".
       *
       *****************************************************************
       *    連絡　領域
@@ -3389,6 +3400,11 @@
       *****************************************************************
        210-ROUNYUIN-SET4-SEC            SECTION.
       *
+           IF      LNK-SROUNYUIN-SANTEIYM   >=   "201404"
+           AND     LNK-SROUNYUIN-SANTEIYM   <=   "201406"
+              PERFORM  210-SYSKAN-HENSYU-SEC
+           END-IF
+      *
       *労災乗数の２週間以内の最終日を取得
            INITIALIZE                      ORCSRSITUSANAREA
            MOVE    LNK-SROUNYUIN-HOSPNUM
@@ -3517,6 +3533,14 @@
       *
                                   MOVE   NSRY-SRYCD(1)
                                                 TO  WRK-RYAKU-SRYCD
+                                                    WRK-TOKUREI-SRYCD2
+                                  MOVE   SPACE  TO  WRK-TOKUREI-SRYCD
+                                  PERFORM  500-RYAKUSYO-KEISO-CHECK-SEC
+                                  IF   WRK-TOKUREI-SRYCD  NOT = SPACE
+                                    MOVE  WRK-TOKUREI-SRYCD
+                                                TO  WRK-RYAKU-SRYCD
+                                  END-IF
+      *
                                   MOVE   NACCT-ZAISKBKBN
                                                 TO  WRK-ZAISKBKBN
                                   PERFORM   210-RYAKUSYO-HENSYU-SEC
@@ -5789,6 +5813,43 @@
            EXIT.
       *
       ******************************************************************
+      *    システム管理編集
+      ******************************************************************
+       210-SYSKAN-HENSYU-SEC                 SECTION.
+      *
+           INITIALIZE                         SYSKANRI-REC
+           MOVE    "1001"                 TO  SYS-KANRICD
+           MOVE    "*"                    TO  SYS-KBNCD
+           MOVE    LNK-SROUNYUIN-HOSPNUM  TO  SYS-HOSPNUM
+           MOVE    LNK-SROUNYUIN-SANTEIYM TO  SYS-STYUKYMD(1:6)
+           MOVE    "01"                   TO  SYS-STYUKYMD(7:2)
+           MOVE    LNK-SROUNYUIN-SANTEIYM TO  SYS-EDYUKYMD(1:6)
+           MOVE    "01"                   TO  SYS-EDYUKYMD(7:2)
+           MOVE    SYSKANRI-REC           TO  MCPDATA-REC
+           MOVE    "DBSELECT"             TO  MCP-FUNC
+           MOVE    "tbl_syskanri"         TO  MCP-TABLE
+           MOVE    "key10"                TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"            USING   MCPAREA
+                                                  MCPDATA-REC
+                                                  SPA-AREA
+           IF      MCP-RC              =  ZERO
+               MOVE    "tbl_syskanri"     TO  MCP-TABLE
+               MOVE    "key10"            TO  MCP-PATHNAME
+               PERFORM  910-SYSKANRI-READ-SEC
+               IF       FLG-SYSKANRI   =  ZERO
+                 MOVE   SYS-1001-HOSPSBT  TO  WRK-HOSPSBT
+               END-IF
+           END-IF
+           MOVE     "tbl_syskanri"        TO  MCP-TABLE
+           MOVE     "key10"               TO  MCP-PATHNAME
+           PERFORM   910-DB-CLOSE-SEC
+      *
+           .
+      *
+       210-SYSKAN-HENSYU-EXT.
+           EXIT.
+      *
+      ******************************************************************
       *    労災入院の労災乗数（期間加算）に含める注加算の取得          *
       ******************************************************************
        210-CHUKSN-GET-SEC                 SECTION.
@@ -5873,6 +5934,32 @@
            EXIT.
       *
       *****************************************************************
+      *    入院略称（経措）チェック
+      *****************************************************************
+       500-RYAKUSYO-KEISO-CHECK-SEC                SECTION.
+      *
+           IF   (LNK-SROUNYUIN-SANTEIYM   >=   "201404")
+           AND  (LNK-SROUNYUIN-SANTEIYM   <=   "201406")
+           AND  (WRK-HOSPSBT               =    1      )
+      *
+             INITIALIZE    ORCSEIYOUKKS-AREA
+             MOVE   LNK-SROUNYUIN-SANTEIYM
+                                          TO  LNK-EIYOUKKS-SANTEIYM
+             MOVE   WRK-TOKUREI-SRYCD2    TO  LNK-EIYOUKKS-SRYCD
+             CALL   "ORCSEIYOUKKS" USING  ORCSEIYOUKKS-AREA
+                                          SPA-AREA
+             IF     LNK-EIYOUKKS-RECE-CHGSRYCD  NOT = SPACE
+               MOVE LNK-EIYOUKKS-RECE-CHGSRYCD
+                                          TO  WRK-TOKUREI-SRYCD
+             END-IF
+      *
+           END-IF
+      *
+           .
+       500-RYAKUSYO-KEISO-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    システム管理マスター読込
       *****************************************************************
        910-SYSKANRI-READ-SEC         SECTION.
@@ -5883,9 +5970,13 @@
                                                SPA-AREA
            IF      MCP-RC              =   ZERO
                MOVE    MCPDATA-REC         TO  SYS-5000-REC
+                                               SYS-1001-REC
+                                               SYSKANRI-REC
                MOVE    ZERO                TO  FLG-SYSKANRI
            ELSE
                INITIALIZE                      SYS-5000-REC
+                                               SYS-1001-REC
+                                               SYSKANRI-REC
                MOVE    1                   TO  FLG-SYSKANRI
            END-IF
       *

@@ -114,6 +114,7 @@
       *  04.07.02    NACL-門脇    14/03/26  平成２６年４月改正対応
       *                                     （夜勤時間経過減算の選定対応）
       *  04.07.03    NACL-門脇    14/03/28  平成２６年４月改正対応
+      *  04.07.04    NACL-門脇    14/04/08  平成２６年４月改正対応
       *****************************************************************
       *
       *
@@ -295,6 +296,8 @@
            03  WRK-SRYYM-5000                          PIC X(06).
       *
            03  WRK-PREFNUM                             PIC X(02).
+           03  WRK-HOSPSBT                             PIC 9(01).
+           03  WRK-EIYOUKSNKBN                         PIC X(01).
       *
            03  WRK-HYOKETU-TEN                         PIC 9(09)V99.
       *
@@ -323,6 +326,9 @@
            03  WRK-NYUYAKU-CD                         PIC X(09).
            03  WRK-NYURYAKU-IDX                       PIC 9(03).
            03  WRK-NYURYAKU-MAX                       PIC 9(03).
+      *
+           03  WRK-TOKUREI-SRYCD                      PIC X(09).
+           03  WRK-TOKUREI-SRYCD2                     PIC X(09).
       *
        01  WRK-TENTEK.
            03  WRK-TENTEK-SYUTEN                       PIC 9(07).
@@ -443,6 +449,8 @@
            COPY    "CPORCSJOBKANRI.INC".
       *    入院点滴一括更新サブ
            COPY    "CPORCSTENTEK.INC".
+      *    栄養管理経過措置入院料コード取得サブ
+           COPY    "CPORCSEIYOUKKS.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -541,6 +549,7 @@
       *
                   IF      FLG-SYSKANRI     =   ZERO
                      MOVE   SYS-1001-PREFNUM  TO  WRK-PREFNUM
+                     MOVE   SYS-1001-HOSPSBT  TO  WRK-HOSPSBT
                   ELSE
                      MOVE  "医療機関情報が取得できませんでした。"
                                           TO  WRK-RECEERR
@@ -631,6 +640,8 @@
                    IF        WRK-SYS5000-COUNT    =     ZERO
                       CONTINUE
                    ELSE
+                      MOVE  WRK-PARA-SRYYM TO  WRK-SYS-SRYYMD(1:6)
+                      MOVE  "01"           TO  WRK-SYS-SRYYMD(7:2)
                       PERFORM  10013-SYS-5000-GET-SEC
                    END-IF
                  ELSE
@@ -813,6 +824,11 @@
                       END-EVALUATE
                  END-PERFORM
       *
+                 IF   ( SYS-5000-STYUKYMD  <=  WRK-SYS-SRYYMD    )
+                 AND  ( WRK-SYS-SRYYMD     <=  SYS-5000-EDYUKYMD )
+                   MOVE   SYS-5000-EIYOUKSNKBN   TO  WRK-EIYOUKSNKBN
+                 END-IF
+      *
                  MOVE    "tbl_syskanri"      TO  MCP-TABLE
                  MOVE    "key11"             TO  MCP-PATHNAME
                  PERFORM  900-SYSKANRI-READ-SEC
@@ -876,6 +892,8 @@
                     MOVE     2      TO   WRK-SHOKUJIRYOYO(IDX3)
               END-EVALUATE
            END-PERFORM
+      *
+           MOVE   SYS-5000-EIYOUKSNKBN   TO  WRK-EIYOUKSNKBN
       *
            .
        10011-SYSKAN-HENSYU-EXT.
@@ -2802,6 +2820,14 @@
                  INITIALIZE                 NYURYAKUSHO-REC
                  MOVE    NSRY-SRYCD(NYUINACT-IDX2) 
                                        TO   NYURYAKUSHO-SRYCD
+                                            WRK-TOKUREI-SRYCD2
+                 MOVE    SPACE         TO   WRK-TOKUREI-SRYCD
+                 PERFORM  500-RYAKUSYO-KEISO-CHECK-SEC
+                 IF   WRK-TOKUREI-SRYCD  NOT = SPACE
+                   MOVE  WRK-TOKUREI-SRYCD
+                                       TO   NYURYAKUSHO-SRYCD
+                 END-IF
+      *
                  MOVE    NACCT-SRYYM   TO   NYURYAKUSHO-YUKOSTYMD(1:6)
                  MOVE    "01"          TO   NYURYAKUSHO-YUKOSTYMD(7:2)
                  MOVE    NYURYAKUSHO-YUKOSTYMD
@@ -3608,6 +3634,17 @@
       *
                        MOVE    NSRY-SRYCD(NYUINACT-IDX) 
                                               TO  WRK-SRYCD
+                                                  WRK-TOKUREI-SRYCD2
+                       MOVE    SPACE          TO  WRK-TOKUREI-SRYCD
+                       IF   NACCT-ZAISKBKBN    =  "1"
+                       AND  NYUINACT-IDX       =   1
+                         PERFORM  500-RYAKUSYO-KEISO-CHECK-SEC
+                       END-IF
+                       IF   WRK-TOKUREI-SRYCD  NOT = SPACE
+                         MOVE     WRK-TOKUREI-SRYCD
+                                              TO  WRK-SRYCD
+                       END-IF
+      *
                        MOVE    NACCT-SRYYM    TO  WRK-SRYYMD-TAIHI(1:6)
                        MOVE    "01"           TO  WRK-SRYYMD-TAIHI(7:2)
                        MOVE    NACCT-SRYYM    TO  WRK-SRYYMD(1:6)
@@ -4912,6 +4949,32 @@
            EXIT.
       *
       *****************************************************************
+      *    入院略称（経措）チェック
+      *****************************************************************
+       500-RYAKUSYO-KEISO-CHECK-SEC                SECTION.
+      *
+           IF   (RECE62-SRYYM    >=  "201404")
+           AND  (RECE62-SRYYM    <=  "201406")
+           AND  (WRK-HOSPSBT      =   1      )
+           AND  (WRK-EIYOUKSNKBN  =  "1"     )
+      *
+             INITIALIZE    ORCSEIYOUKKS-AREA
+             MOVE   RECE62-SRYYM          TO  LNK-EIYOUKKS-SANTEIYM
+             MOVE   WRK-TOKUREI-SRYCD2    TO  LNK-EIYOUKKS-SRYCD
+             CALL   "ORCSEIYOUKKS" USING  ORCSEIYOUKKS-AREA
+                                          SPA-AREA
+             IF     LNK-EIYOUKKS-RECE-CHGSRYCD  NOT = SPACE
+               MOVE LNK-EIYOUKKS-RECE-CHGSRYCD
+                                          TO  WRK-TOKUREI-SRYCD
+             END-IF
+      *
+           END-IF
+      *
+           .
+       500-RYAKUSYO-KEISO-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    組み合わせ判別（福祉用）主保険＋全国公費＋地方公費
       *****************************************************************
        500-KUMIAWASE-HANBETU-SEC               SECTION.
@@ -5362,6 +5425,7 @@
                  AND  ( WRK-SYS-SRYYMD     <=  SYS-1001-EDYUKYMD )
                     MOVE     1               TO    FLG-SET
                     MOVE   SYS-1001-PREFNUM  TO    WRK-PREFNUM
+                    MOVE   SYS-1001-HOSPSBT  TO    WRK-HOSPSBT
                  END-IF
       *
                END-PERFORM

@@ -44,6 +44,7 @@
       *  04.05.05    NACL-門脇    12/09/18  改正対応（外泊区分８，９の対応）
       *
       *  04.07.01    NACL-門脇    14/03/28  平成２６年４月改正対応
+      *  04.07.02    NACL-門脇    14/04/08  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -103,6 +104,8 @@
            03  FLG-GAIHAKU                             PIC 9(01).
            03  FLG-NYURYAKUWRK                         PIC 9(01).
            03  FLG-NISSUSET                            PIC 9(01).
+           03  FLG-SYSKANRI                            PIC 9(01).
+           03  FLG-SET                                 PIC 9(01).
       *
       *    カウント領域
        01  CNT-AREA.
@@ -118,6 +121,7 @@
            03  ACCT-IDX                                PIC 9(03).
            03  SRYACT-IDX                              PIC 9(03).
            03  ID1                                     PIC 9(03).
+           03  SYSKAN-IDX                              PIC 9(03).
       *
       *    実日数カウント用領域
        01  TBL-JNISSU.
@@ -163,6 +167,12 @@
       *
            03  WRK-HYOKETU-TEN                         PIC 9(09)V99.
       *
+           03  WRK-HOSPSBT                             PIC 9(01).
+           03  WRK-SYS-SRYYMD                          PIC X(08).
+      *
+           03  WRK-TOKUREI-SRYCD                       PIC X(09).
+           03  WRK-TOKUREI-SRYCD2                      PIC X(09).
+      *
       *    入院略称退避ワーク
            03  WRK-NYURYAKU-OCC                       OCCURS  200.
                05  WRK-NYURYAKU-SRYCD                 PIC X(09).
@@ -172,6 +182,11 @@
            03  WRK-NYUYAKU-CD                         PIC X(09).
            03  WRK-NYURYAKU-IDX                       PIC 9(03).
            03  WRK-NYURYAKU-MAX                       PIC 9(03).
+      *
+      *    医療機関（基本情報）退避用領域
+       01  TBL-SYS1001-T.
+           03  TBL-SYS1001-OCC     OCCURS  100.
+               05  TBL-SYS1001                        PIC X(610).
       *
        01  WRK-CONS-AREA.
       *    固定端末ＩＤ
@@ -232,6 +247,11 @@
        01  NYURYAKUSHO-REC.
            COPY    "CPNYUINRYAKUSHO.INC".
       *
+      *    システム管理マスタ
+           COPY    "CPSYSKANRI.INC".
+      *
+           COPY    "CPSK1001.INC".
+      *
       *****************************************************************
       *    サブプロ用領域
       *****************************************************************
@@ -245,6 +265,8 @@
            COPY    "CPORCSPTID.INC".
       *    ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
+      *    栄養管理経過措置入院料コード取得サブ
+           COPY    "CPORCSEIYOUKKS.INC".
       *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
@@ -309,8 +331,77 @@
                PERFORM 500-CANCEL-HENSYU-SEC
            END-IF
       *
+      *    システム管理情報編集処理
+           IF      FLG-END             =   ZERO
+               PERFORM 1001-SYSKANRI-HENSYU-SEC
+           END-IF
+      *
            .
        100-INIT-EXT.
+           EXIT.
+      *
+      ******************************************************************
+      *    システム管理情報編集処理
+      ******************************************************************
+       1001-SYSKANRI-HENSYU-SEC          SECTION.
+      *
+           IF   WRK-PARA-SRYYM    NOT =  ZERO
+              INITIALIZE                      SYSKANRI-REC
+              MOVE    "1001"              TO  SYS-KANRICD
+              MOVE    "*"                 TO  SYS-KBNCD
+              MOVE    WRK-PARA-SRYYM      TO  SYS-STYUKYMD (1:6)
+              MOVE    "01"                TO  SYS-STYUKYMD (7:2)
+              MOVE    SYS-STYUKYMD        TO  SYS-EDYUKYMD
+              MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+              MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+              MOVE    "tbl_syskanri"      TO  MCP-TABLE
+              MOVE    "key10"             TO  MCP-PATHNAME
+              PERFORM   900-DBSELECT-SEC
+              IF      MCP-RC              =   ZERO
+                 MOVE    "tbl_syskanri"   TO  MCP-TABLE
+                 MOVE    "key10"          TO  MCP-PATHNAME
+                 PERFORM  900-SYSKANRI-READ-SEC
+                 IF      FLG-SYSKANRI     =   ZERO
+                    MOVE   SYS-1001-HOSPSBT  TO  WRK-HOSPSBT
+                 END-IF
+              END-IF
+              MOVE    "tbl_syskanri"      TO  MCP-TABLE
+              MOVE    "key10"             TO  MCP-PATHNAME
+              PERFORM  900-CLOSE-SEC
+           ELSE
+              MOVE     ZERO               TO  SYSKAN-IDX
+              MOVE     SPACE              TO  TBL-SYS1001-T
+              INITIALIZE                      TBL-SYS1001-T
+      *
+              INITIALIZE                      SYSKANRI-REC
+              MOVE    "1001"              TO  SYS-KANRICD
+              MOVE    "*"                 TO  SYS-KBNCD
+              MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
+              MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+              MOVE    "tbl_syskanri"      TO  MCP-TABLE
+              MOVE    "key8"              TO  MCP-PATHNAME
+              PERFORM   900-DBSELECT-SEC
+              IF      MCP-RC              =   ZERO
+                 MOVE    "tbl_syskanri"   TO  MCP-TABLE
+                 MOVE    "key8"           TO  MCP-PATHNAME
+                 PERFORM  900-SYSKANRI-READ-SEC
+                 PERFORM  UNTIL  (FLG-SYSKANRI  =    1)
+                           OR    (SYSKAN-IDX   >=  100)
+                   ADD     1              TO  SYSKAN-IDX
+                   MOVE    SYS-1001-REC   TO  TBL-SYS1001(SYSKAN-IDX)
+      *
+                   MOVE    "tbl_syskanri" TO  MCP-TABLE
+                   MOVE    "key8"         TO  MCP-PATHNAME
+                   PERFORM  900-SYSKANRI-READ-SEC
+                 END-PERFORM
+              END-IF
+              MOVE    "tbl_syskanri"      TO  MCP-TABLE
+              MOVE    "key8"              TO  MCP-PATHNAME
+              PERFORM  900-CLOSE-SEC
+           END-IF
+      *
+           .
+       1001-SYSKANRI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1294,6 +1385,14 @@
                  INITIALIZE                 NYURYAKUSHO-REC
                  MOVE    NSRY-SRYCD(NYUINACT-IDX2) 
                                        TO   NYURYAKUSHO-SRYCD
+                                            WRK-TOKUREI-SRYCD2
+                 MOVE    SPACE         TO   WRK-TOKUREI-SRYCD
+                 PERFORM  500-RYAKUSYO-KEISO-CHECK-SEC
+                 IF   WRK-TOKUREI-SRYCD  NOT = SPACE
+                   MOVE  WRK-TOKUREI-SRYCD
+                                       TO   NYURYAKUSHO-SRYCD
+                 END-IF
+      *
                  MOVE    NACCT-SRYYM   TO   NYURYAKUSHO-YUKOSTYMD(1:6)
                  MOVE    "01"          TO   NYURYAKUSHO-YUKOSTYMD(7:2)
                  MOVE    NYURYAKUSHO-YUKOSTYMD
@@ -1742,6 +1841,17 @@
       *
                        MOVE    NSRY-SRYCD(NYUINACT-IDX) 
                                               TO  WRK-SRYCD
+                                                  WRK-TOKUREI-SRYCD2
+                       MOVE    SPACE          TO  WRK-TOKUREI-SRYCD
+                       IF   NACCT-ZAISKBKBN    =  "1"
+                       AND  NYUINACT-IDX       =   1
+                         PERFORM  500-RYAKUSYO-KEISO-CHECK-SEC
+                       END-IF
+                       IF   WRK-TOKUREI-SRYCD  NOT = SPACE
+                         MOVE     WRK-TOKUREI-SRYCD
+                                              TO  WRK-SRYCD
+                       END-IF
+      *
                        MOVE    NACCT-SRYYM    TO  WRK-SRYYMD-TAIHI(1:6)
                        MOVE    "01"           TO  WRK-SRYYMD-TAIHI(7:2)
                        MOVE    NACCT-SRYYM    TO  WRK-SRYYMD(1:6)
@@ -2208,6 +2318,31 @@
            EXIT.
       *
       *****************************************************************
+      *    入院略称（経措）チェック
+      *****************************************************************
+       500-RYAKUSYO-KEISO-CHECK-SEC                SECTION.
+      *
+           IF   (RECE200-SRYYM    >=  "201404")
+           AND  (RECE200-SRYYM    <=  "201406")
+           AND  (WRK-HOSPSBT       =   1      )
+      *
+             INITIALIZE    ORCSEIYOUKKS-AREA
+             MOVE   RECE200-SRYYM         TO  LNK-EIYOUKKS-SANTEIYM
+             MOVE   WRK-TOKUREI-SRYCD2    TO  LNK-EIYOUKKS-SRYCD
+             CALL   "ORCSEIYOUKKS" USING  ORCSEIYOUKKS-AREA
+                                          SPA-AREA
+             IF     LNK-EIYOUKKS-RECE-CHGSRYCD  NOT = SPACE
+               MOVE LNK-EIYOUKKS-RECE-CHGSRYCD
+                                          TO  WRK-TOKUREI-SRYCD
+             END-IF
+      *
+           END-IF
+      *
+           .
+       500-RYAKUSYO-KEISO-CHECK-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    入院会計マスター読込
       *****************************************************************
        900-NYUINACCT-READ-SEC         SECTION.
@@ -2401,6 +2536,26 @@
        910-NYURYAKUWRK-HEN-EXT.
            EXIT.
       *
+      **************************************************************
+      *    システム管理マスタ読み込み処理
+      **************************************************************
+       900-SYSKANRI-READ-SEC         SECTION.
+      *
+           PERFORM   900-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    MCPDATA-REC     TO  SYSKANRI-REC
+                                           SYS-1001-REC
+               MOVE    ZERO            TO  FLG-SYSKANRI
+           ELSE
+               INITIALIZE                  SYSKANRI-REC
+                                           SYS-1001-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+      *
+           .
+       900-SYSKANRI-READ-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    中間ファイルＲＥＡＤ処理
       *****************************************************************
@@ -2414,9 +2569,43 @@
                                        CNT-IN-CANCEL
       *
                    DISPLAY "RECE200 "  " PTNUM=" RECE200-PTNUM
+      *
+                   PERFORM 910-SYSKANRI-HENSYU-SEC
+      *
            END-READ
            .
        900-RECE200-READ-EXT.
+           EXIT.
+      *
+      ****************************************************************
+      *    診療年月の対象となるシス管理を取得（個別処理のみ）
+      ****************************************************************
+       910-SYSKANRI-HENSYU-SEC         SECTION.
+      *
+           IF   WRK-PARA-SRYYM    NOT =  ZERO
+               CONTINUE
+           ELSE
+      *        医療機関ＩＤ編集
+               MOVE  ZERO           TO  WRK-HOSPSBT
+               MOVE  ZERO           TO  FLG-SET
+               MOVE  RECE200-SRYYM  TO  WRK-SYS-SRYYMD(1:6)
+               MOVE  "01"           TO  WRK-SYS-SRYYMD(7:2)
+               PERFORM  VARYING  SYSKAN-IDX  FROM  1  BY  1
+                     UNTIL  ( SYSKAN-IDX              >  100  )
+                      OR    ( TBL-SYS1001(SYSKAN-IDX) = SPACE )
+                      OR    ( FLG-SET                 =   1   )
+                 MOVE  TBL-SYS1001(SYSKAN-IDX)  TO  SYS-1001-REC
+                 IF   ( SYS-1001-STYUKYMD  <=  WRK-SYS-SRYYMD    )
+                 AND  ( WRK-SYS-SRYYMD     <=  SYS-1001-EDYUKYMD )
+                    MOVE     1               TO    FLG-SET
+                    MOVE   SYS-1001-HOSPSBT  TO    WRK-HOSPSBT
+                 END-IF
+               END-PERFORM
+           END-IF
+      *
+           .
+      *
+       910-SYSKANRI-HENSYU-EXT.
            EXIT.
       *
       *****************************************************************
