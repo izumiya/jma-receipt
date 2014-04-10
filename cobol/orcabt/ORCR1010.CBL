@@ -895,8 +895,10 @@
       *    在宅患者訪問リハビリテーション指導管理料（同一建物住居者）
            03  CONS-ZAIRIHA2-COMMENT PIC X(09)  VALUE  "114015010".
       *
+      *    心臓ペースメーカー指導管理料（着用型自動除細動器）
+           03  CONS-SINPESUR1-COMMENT PIC X(09) VALUE  "113015010".
       *    心臓ペースメーカー指導管理料（ロ・植込型除細動器移行期加算含む）
-           03  CONS-SINPESUR-COMMENT PIC X(09)  VALUE  "113015130".
+           03  CONS-SINPESUR2-COMMENT PIC X(09) VALUE  "113015130".
       *
       *    がん患者指導管理料（医師・看護師が心理的不安軽減のため面接）
            03  CONS-GANSIDO1-COMMENT PIC X(09)  VALUE  "113015310".
@@ -2825,11 +2827,15 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                         MOVE   "1"    TO    RECE120-FLG-GAIRIHA-COMMENT
                 END-IF
               END-IF
+      *       心臓ペースメーカー指導管理料（着用型自動除細動器）
       *       心臓ペースメーカー指導管理料（ロ・植込型除細動器移行期加算含む）
-      *       がん患者指導管理料
+      *       がん患者指導管理料２・３
               IF   RECE100-SRYYM    >=     "201404"
-                IF   SRY-SRYCD(IDX2) =  CONS-SINPESUR-COMMENT
+                IF   SRY-SRYCD(IDX2) =  CONS-SINPESUR1-COMMENT
                    MOVE   "1"   TO    RECE120-FLG-SINPESUR-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2) =  CONS-SINPESUR2-COMMENT
+                   MOVE   "2"   TO    RECE120-FLG-SINPESUR-COMMENT
                 END-IF
                 IF   SRY-SRYCD(IDX2) =  CONS-GANSIDO1-COMMENT
                    MOVE   "1"   TO    RECE120-FLG-GANSIDO-COMMENT
