@@ -314,12 +314,27 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        1001-NUMBCONT-SEC                     SECTION.
       *
+      *H26.4
+      *    労災・自賠責の本人家族区分は空白とする
+           IF    (DBCOMB-HKNNUM            =   "971"
+                                           OR  "973")
+             AND (DBCOMB-HONKZKKBN     NOT =   SPACE)
+                 MOVE    SPACE             TO  DBCOMB-HONKZKKBN
+           END-IF
+      *
            INITIALIZE                  WRK-RECEDATBL
       *
            PERFORM     VARYING     IDX2    FROM    1   BY  1
                UNTIL  (IDX2                >   999 )  OR
                       (PARA-NC01-REC(IDX2) =   SPACE )
              MOVE  PARA-NC01-REC (IDX2)      TO HKNCOMBI-REC
+      *!!
+      *      労災・自賠責の本人家族区分は空白とする
+             IF    (COMB-HKNNUM            =   "971"
+                                           OR  "973")
+               AND (COMB-HONKZKKBN     NOT =   SPACE)
+                 MOVE    SPACE             TO  COMB-HONKZKKBN
+             END-IF
       *
              IF  COMB-HOSPNUM                =  DBCOMB-HOSPNUM     AND
                  COMB-PTID                   =  DBCOMB-PTID        AND
