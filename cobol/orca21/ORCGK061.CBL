@@ -246,12 +246,18 @@
       *    精神科ケア開始日
            03  FILLER          PIC X(09)   VALUE  "099830101".
            03  FILLER          PIC X(09)   VALUE  SPACE.
+      *    在宅患者共同診療料開始日
+           03  FILLER          PIC X(09)   VALUE  "099140004".
+           03  FILLER          PIC X(09)   VALUE  SPACE.
+      *    通院・在宅精神療法開始日
+           03  FILLER          PIC X(09)   VALUE  "099830102".
+           03  FILLER          PIC X(09)   VALUE  SPACE.
       *
        01  TBL-RRK-SRYCD-GR    REDEFINES   TBL-RRK-SRYCD-G.
-           03  TBL-RRK-SRYCD-GT        OCCURS    10.
+           03  TBL-RRK-SRYCD-GT        OCCURS    12.
                05  TBL-RRK-SRYCD           PIC X(09).
                05  TBL-END-SRYCD           PIC X(09).
-       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   10.
+       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   12.
       *
       *
        01  WRK-MIDAIS-HEN.
@@ -1872,6 +1878,8 @@
                                        OR  "111003610"
       *                紹介状なし追加
                                        OR  "111012510"
+      *                妥結率５割以下
+                                       OR  "111012710"
                                                        )
                MOVE    "2"                 TO  SPA-K061-KBN2
            END-IF

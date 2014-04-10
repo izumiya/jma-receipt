@@ -1999,6 +1999,16 @@
                                        DELIMITED  BY  SPACE
                                        INTO    SPA-ERRMSG
                    END-STRING
+      *H26.4
+               WHEN    "K874"
+                   STRING  "警告！"
+                           "通院・在宅精神療法開始日からの"
+                           "算定期間を経過しています。"
+                           "算定できません。"
+                                               DELIMITED  BY  SIZE
+                                       INTO    SPA-ERRMSG
+                   END-STRING
+      *
                WHEN    "K870"
                    STRING  "警告！"
                            "初期加算（リハビリテーション料）を"

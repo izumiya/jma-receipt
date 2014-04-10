@@ -1357,7 +1357,8 @@
            IF     (SPA-COM-INPUTCD(IDX)    =   "099800101"
                                            OR  "099800102"
       *        ºßÁí¿Ç»»Äê½ªÎ»
-                                           OR  "099140001" )
+                                           OR  "099140001"
+                                           OR  "099140004" )
                MOVE    1               TO  FLG-HASSYO
            ELSE
                IF      FLG-HASSYO          =   1
@@ -1939,6 +1940,8 @@
                            MOVE    1               TO  FLG-ZAI
       *                ºßÁí¿Ç½ªÎ»
                        WHEN    "099140001"
+      *                ºßÂð´µ¼Ô¶¦Æ±³«»ÏÆü
+                       WHEN    "099140004"
                            MOVE    "14"            TO  SPA-COM-SRYKBN
                                                                   (IDX)
                            MOVE    "140"           TO  SPA-COM-SRYSYUKBN
@@ -2064,6 +2067,8 @@
                            MOVE    1               TO  FLG-ZAI
       *ver.4.7         Àº¿À²Ê¥±¥¢³«»Ï
                        WHEN    "099830101"
+      *H26.4           ÄÌ±¡¡¦ºßÂðÀº¿ÀÎÅË¡³«»Ï
+                       WHEN    "099830102"
                            MOVE    "80"            TO  SPA-COM-SRYKBN
                                                                   (IDX)
                            MOVE    "830"           TO  SPA-COM-SRYSYUKBN
@@ -2084,6 +2089,7 @@
                                                                   (IDX)
                            MOVE    1               TO  FLG-ZAI
                        ELSE
+      *                    ¥³¥á¥ó¥È¤È¤¹¤ë
                            MOVE    "99"            TO  SPA-COM-SRYKBN
                                                                   (IDX)
       *!                   MOVE    "990"           TO  SPA-COM-SRYSYUKBN
@@ -2533,6 +2539,7 @@
                         MOVE    1           TO  FLG-ARI
                     END-IF
                END-IF
+      *
       *        ºßÂð»ØÆ³ÎÁ¤Î»þ¡¢ÅÀ¿ô²Ã»»¤Ï£Ï£Ë
       ******** IF      LNK-SC93-NETAKIRI-ARI   =   1
                    IF     (WRK-SRYSYUKBN           =   "143" )  AND

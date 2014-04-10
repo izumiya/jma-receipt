@@ -52,7 +52,7 @@
       * 04.07.00     NACL-多々納  12/03/XX  Ｈ２４．４改正対応
       * 04.07.00     NACL-多々納  13/05/15  疾患別リハビリ月上限対応
       * 04.07.00     NACL-多々納  14/03/XX  Ｈ２６年４月改正対応
-      * 04.07.00     NACL-多々納  14/04/XX  精２０歳未満加算削除対応
+      * 04.07.00     NACL-多々納  14/04/XX  精２０歳未満加算削除対応等
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -352,10 +352,7 @@
            03  WRK-TUKI-CNT            PIC 9(03).
       *    訂正
            03  WRK-TEI-CNT             PIC 9(04).
-      *    今回算定回数
-      *    03  WRK-RIHA-CNT-G.
-      *        05  WRK-RIHA-CNT            PIC 9(03)
-      *                                    OCCURS   31.
+      *
       *
        01  TBL-RIHA-ZAINUM-G.
            03  TBL-RIHA-ZAINUM-OCC     OCCURS  50.
@@ -408,6 +405,10 @@
                05  WRK-DOUSYOSIN-OCC       OCCURS   10.
                    07  WRK-DOU-SRYKA       PIC X(02).
                    07  WRK-DOU-SRYYMD      PIC X(08).
+      *H26.4
+      *    通院・在宅精神開始日
+           03  WRK-TUINSTR-INT             PIC X(01).
+           03  WRK-TUINSTR-YMD             PIC X(08).
       *    精神科ケア早期加算開始日
            03  WRK-KEASOKI-INT             PIC X(01).
            03  WRK-KEASOKI-YMD             PIC X(08).
@@ -762,10 +763,13 @@
       *    労災毎とする
            IF     (SPA-HKNKBN          =   1
                                        OR  2   )
-      *        逓減対象外は１件
-              AND (WRK-SRYCD       NOT =   "099800401" )
                MOVE    SPA-HKNCOMBINUM     TO  SANTEI-HKNCOMBINUM
            ELSE
+               MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
+           END-IF
+      *    逓減対象外、通院精神療法開始日は１件
+           IF     (WRK-SRYCD           =   "099800401" )
+               OR (WRK-SRYCD           =   "099830102" )
                MOVE    ZERO                TO  SANTEI-HKNCOMBINUM
            END-IF
       *
@@ -971,15 +975,17 @@
       *****************************************************************
        10002-DOUJIT-YMD-SEC                SECTION.
       *
+      *    開始日検索
+           MOVE    "099830102"         TO  WRK-SRYCD
+           PERFORM 10001-KYUSEI-YMD-SEC
+           IF      WRK-YMD         NOT =   SPACE
+               MOVE    WRK-YMD             TO  WRK-TUINSTR-YMD
+               MOVE    "1"                 TO  WRK-TUINSTR-INT
+               GO      TO      10002-DOUJIT-YMD-EXT
+           END-IF
+      *
       *    同日初診の診療科設定
            MOVE    SPA-SRYYMD          TO  WRK-SRYYMD-1
-      **   IF      WRK-SRYMM           <=  6
-      **       COMPUTE WRK-SRYMM       =  (WRK-SRYMM   +   12 )
-      *                                                -   6
-      *        COMPUTE WRK-SRYYY       =   WRK-SRYYY   -   1
-      *    ELSE
-      *        COMPUTE WRK-SRYMM       =   WRK-SRYMM   -   6
-      ***  END-IF
       *H25.3
       *    診療日付から前２年間で判定する
            MOVE    SPA-SRYYMD          TO  WRK-SRYYMD-1
@@ -1293,9 +1299,6 @@
                        PERFORM 100111-KIJUNN-CHK-SEC
                    END-IF
       *
-      *            精神通院の乳幼児の自動加算を追加する
-      *****        PERFORM 10011-NENREI-SET-SEC
-      *
       *            労災の時、労災加算の算定
                    IF      SPA-HKNKBN          =   1
                      AND  (SPA-RSI-JUNKYO  NOT =   "1" )
@@ -1468,6 +1471,12 @@
            IF     (LNK-ORCSC-PG        =   "K02"  )  AND
                   (WRK-COM-INPUTCD (IDX-Z) =   "099830101" )
                MOVE    "2"                 TO  WRK-KEASOKI-INT
+           END-IF
+      *
+      *    通院・在宅精神開始日
+           IF     (LNK-ORCSC-PG        =   "K02"  )  AND
+                  (WRK-COM-INPUTCD (IDX-Z) =   "099830102" )
+               MOVE    "2"                 TO  WRK-TUINSTR-INT
            END-IF
       *
            .
@@ -2278,50 +2287,51 @@
                GO      TO      1001132-GAIRI-SEISIN-EXT
            END-IF
       *
-           IF      LNK-ORCSC-SYORIFLG      =   1
+           EVALUATE    WRK-TUINSTR-INT
+               WHEN    "1"
+      *            通院・在宅精神開始日あり
+                   MOVE    WRK-TUINSTR-YMD     TO  WRK-SYOYMD
+               WHEN    "2"
+      *            今回入力
+                   MOVE    SPA-SRYYMD          TO  WRK-SYOYMD
+               WHEN    OTHER
+      *            初診算定日から設定
+                   PERFORM 10011321-SYOSIN-SET-SEC
+           END-EVALUATE
+      *
+      *以下 10011321-SYOSIN-SET-SEC
+      *
+      ***  IF      LNK-ORCSC-SYORIFLG      =   1
       *        訂正時点の初診算定日
-               MOVE    LNK-ORCSC-SYOYMD-OLD    TO  WRK-SYOYMD
-           ELSE
-               MOVE    LNK-ORCSC-SYOYMD        TO  WRK-SYOYMD
-           END-IF
+      *        MOVE    LNK-ORCSC-SYOYMD-OLD    TO  WRK-SYOYMD
+      *    ELSE
+      *        MOVE    LNK-ORCSC-SYOYMD        TO  WRK-SYOYMD
+      *    END-IF
       *    同じ科で同日初診がある時、同日初診
-           IF      WRK-COM-SRYKA (IDX-Z)   =   SPACE
-               MOVE    SPA-SRYKA           TO  WRK-SRYKA
-           ELSE
-               MOVE    WRK-COM-SRYKA (IDX-Z)   TO  WRK-SRYKA
-           END-IF
-           PERFORM VARYING     IDX     FROM    1   BY  1
-                   UNTIL      (IDX     >   10  )   OR
-                              (WRK-DOU-SRYKA (IDX) =   SPACE)
-               IF      WRK-DOU-SRYKA (IDX) =   WRK-SRYKA
-                   IF      WRK-DOU-SRYYMD(IDX) >   WRK-SYOYMD
-                       MOVE    WRK-DOU-SRYYMD(IDX)
-                                               TO  WRK-SYOYMD
-                   END-IF
-                   MOVE    10          TO  IDX
-               END-IF
-           END-PERFORM
+      *    IF      WRK-COM-SRYKA (IDX-Z)   =   SPACE
+      *        MOVE    SPA-SRYKA           TO  WRK-SRYKA
+      *    ELSE
+      *        MOVE    WRK-COM-SRYKA (IDX-Z)   TO  WRK-SRYKA
+      *    END-IF
+      *    PERFORM VARYING     IDX     FROM    1   BY  1
+      *            UNTIL      (IDX     >   10  )   OR
+      *                       (WRK-DOU-SRYKA (IDX) =   SPACE)
+      *        IF      WRK-DOU-SRYKA (IDX) =   WRK-SRYKA
+      *            IF      WRK-DOU-SRYYMD(IDX) >   WRK-SYOYMD
+      *                MOVE    WRK-DOU-SRYYMD(IDX)
+      *                                        TO  WRK-SYOYMD
+      *            END-IF
+      *            MOVE    10          TO  IDX
+      *        END-IF
+      *    END-PERFORM
       *    初診算定日から６月以内
-           IF     (WRK-SYOYMD          =   SPACE  )  OR
-                  (LNK-ORCSC-SYOSIN2   =   1      )
-               MOVE    SPA-SRYYMD          TO  WRK-SYOYMD
-           END-IF
+      *    IF     (WRK-SYOYMD          =   SPACE  )  OR
+      *           (LNK-ORCSC-SYOSIN2   =   1      )
+      *        MOVE    SPA-SRYYMD          TO  WRK-SYOYMD
+      *****END-IF
            MOVE    WRK-SYOYMD          TO  WRK-SYOYMD2
            MOVE    WRK-SYOYMD          TO  WRK-SYOYMD3
-      *    初診料算定日＋６月後
-      *    INITIALIZE                      STS-AREA-DAY
-      *    INITIALIZE                      LNK-DAY6-AREA
-      *    MOVE    "61"                TO  LNK-DAY6-IRAI
-      *    MOVE    WRK-SYOYMD          TO  LNK-DAY6-KIJUN
-      *    MOVE    "2"                 TO  LNK-DAY6-ZOGENPTN
-      *    MOVE    6                   TO  LNK-DAY6-ZOGEN
-      *    CALL    "ORCSDAY"           USING   STS-AREA-DAY
-      *                                        LNK-DAY6-AREA
-      *    MOVE    LNK-DAY6-KOYOMI     TO  WRK-SYOYMD
-      *    ６ヶ月以上
-      *    IF      SPA-SRYYMD          >   WRK-SYOYMD
-      *        MOVE    1               TO  FLG-NENREI
-      **** END-IF
+      *
       *    Ｈ２０．４から１年未満とする
            COMPUTE WRK-SYO2-YY         =   WRK-SYO2-YY   +   1
            COMPUTE WRK-SYO3-YY         =   WRK-SYO3-YY   +   2
@@ -2377,6 +2387,10 @@
                                MOVE    "0215"      TO  WRK-ERRCD
       *H24.4
                                MOVE    "K873"      TO  WRK-ERRCD
+      *H26.4
+                               IF      WRK-TUINSTR-INT NOT =   SPACE
+                                   MOVE    "K874"      TO  WRK-ERRCD
+                               END-IF
                                MOVE    "1"         TO  WRK-COM-CUR
                                                            (IDX-Z)
                            END-IF
@@ -2390,6 +2404,44 @@
       *
            .
        1001132-GAIRI-SEISIN-EXT.
+           EXIT.
+      *H26.4
+      *****************************************************************
+      *     初診算定日・同日初診算定日設定処理
+      *****************************************************************
+       10011321-SYOSIN-SET-SEC            SECTION.
+      *
+           IF      LNK-ORCSC-SYORIFLG      =   1
+      *        訂正時点の初診算定日
+               MOVE    LNK-ORCSC-SYOYMD-OLD    TO  WRK-SYOYMD
+           ELSE
+               MOVE    LNK-ORCSC-SYOYMD        TO  WRK-SYOYMD
+           END-IF
+      *    同じ科で同日初診がある時、同日初診
+           IF      WRK-COM-SRYKA (IDX-Z)   =   SPACE
+               MOVE    SPA-SRYKA           TO  WRK-SRYKA
+           ELSE
+               MOVE    WRK-COM-SRYKA (IDX-Z)   TO  WRK-SRYKA
+           END-IF
+           PERFORM VARYING     IDX     FROM    1   BY  1
+                   UNTIL      (IDX     >   10  )   OR
+                              (WRK-DOU-SRYKA (IDX) =   SPACE)
+               IF      WRK-DOU-SRYKA (IDX) =   WRK-SRYKA
+                   IF      WRK-DOU-SRYYMD(IDX) >   WRK-SYOYMD
+                       MOVE    WRK-DOU-SRYYMD(IDX)
+                                               TO  WRK-SYOYMD
+                   END-IF
+                   MOVE    10          TO  IDX
+               END-IF
+           END-PERFORM
+      *    初診算定日から６月以内
+           IF     (WRK-SYOYMD          =   SPACE  )  OR
+                  (LNK-ORCSC-SYOSIN2   =   1      )
+               MOVE    SPA-SRYYMD          TO  WRK-SYOYMD
+           END-IF
+      *
+           .
+       10011321-SYOSIN-SET-EXT.
            EXIT.
       *H24.4
       *****************************************************************
@@ -2426,9 +2478,10 @@
            END-IF
       *
       *    対象施設基準(3039)（児童・思春期精神科入院管理料）
-      *                (3146)（〃（栄養管理経過措置））追加
-           IF    ((SYS-1006-SSTKIJUN (039)  =   1  )  OR 
-                  (SYS-1006-SSTKIJUN (146)  =   1  )) AND
+      *H25.3　まで     (3146)（〃（栄養管理経過措置））追加
+      *****IF    ((SYS-1006-SSTKIJUN (039)  =   1  )  OR 
+      *********   (SYS-1006-SSTKIJUN (146)  =   1  )) AND
+           IF     (SYS-1006-SSTKIJUN (039)  =   1  )  AND
       *           １６歳未満
                   (LNK-ORCSC-NENREI-YY      <   16 )
                CONTINUE
@@ -2762,34 +2815,6 @@
       *
            .
        10011312-RIGAKU-SERCH-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    年齢加算追加処理（共通）
-      *****************************************************************
-       10011-NENREI-SET-SEC            SECTION.
-      *
-      *    通院精神の時、初診日から１年以内チェック
-           IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "I" )  AND
-                  (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "002")
-               IF      (LNK-ORCSC-PG        =   "K02"
-                                            OR  "KT01"  )
-                   PERFORM 100113-SEISIN-CHK-SEC
-               ELSE
-                   MOVE    1               TO  FLG-NENREI
-               END-IF
-               IF      FLG-NENREI          =   ZERO
-                   PERFORM 10021-JIDO-AGEKASAN-SEC
-               END-IF
-           ELSE
-               PERFORM 10021-JIDO-AGEKASAN-SEC
-               IF      FLG-ADD             =   1
-                   MOVE    1               TO  WRK-COM-SANFLG (IDX-S)
-               END-IF
-           END-IF
-      *
-           .
-       10011-NENREI-SET-EXT.
            EXIT.
       *
       *H24.4

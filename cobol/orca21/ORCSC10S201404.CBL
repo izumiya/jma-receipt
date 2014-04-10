@@ -2854,6 +2854,10 @@
                           (SPA-SYONIKA-ARI3    =   1   ))
       *            ª‹¿ﬂ∆˛µÔº‘∞ ≥∞
                      AND  (SPA-PTTOKK-KBN      =   SPACE )
+      *H26.4
+      *             √œ∞Ë Ò≥Áø«Œ≈Œ¡ªªƒÍ∞ ≥∞
+                     AND  (SPA-CHKHKT-ARI2     =   ZERO  )
+      *
                        PERFORM 3303-SYONIKA-SET-SEC
                    END-IF
                    IF      FLG-SYONIKA       =   1
