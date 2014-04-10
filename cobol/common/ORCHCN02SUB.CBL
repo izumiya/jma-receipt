@@ -75,6 +75,7 @@
            03  WRK-GAIHAKU-SRYCD           PIC X(09).
            03  WRK-MEISAISU                PIC 9(03).
            03  WRK-KSNKBN                  PIC 9(03).
+           03  WRK-TANKI-KBN               PIC X(01).
       *
       *
       *****************************************************************
@@ -116,6 +117,9 @@
       *
       *    ÄÌ»»Æü¿ô¼èÆÀ¥µ¥Ö
            COPY "CPORCSTUSAN.INC".
+      *
+      *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
+           COPY    "CPORCSNYUINDAY.INC".
       *
       *****************************************************************
       *    Ï¢Íí¡¡ÎÎ°è
@@ -232,11 +236,11 @@
            MOVE    LNK-ORCHCN02SUB-NYUINYMD(1:6)
                                             TO  NACCT-SRYYM
            MOVE    "tbl_nyuinacct"          TO  MCP-TABLE
-           MOVE    "key34"                  TO  MCP-PATHNAME
+           MOVE    "key53"                  TO  MCP-PATHNAME
            PERFORM 910-NYUINACCT-SELECT-SEC
            IF      FLG-NYUINACCT           =   ZERO
                MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-               MOVE    "key34"             TO  MCP-PATHNAME
+               MOVE    "key53"             TO  MCP-PATHNAME
                PERFORM   910-NYUINACCT-READ-SEC
                PERFORM   UNTIL   (FLG-NYUINACCT    =   1)
       *
@@ -250,13 +254,13 @@
                    END-IF
       *
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
-                   MOVE    "key34"                 TO  MCP-PATHNAME
+                   MOVE    "key53"                 TO  MCP-PATHNAME
                    PERFORM 910-NYUINACCT-READ-SEC
                END-PERFORM
            END-IF
       *    Æþ±¡²ñ·×¥¯¥í¡¼¥º
            MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
-           MOVE    "key34"                 TO  MCP-PATHNAME
+           MOVE    "key53"                 TO  MCP-PATHNAME
            PERFORM   910-DB-CLOSE-SEC
       *
       *
@@ -597,12 +601,24 @@
                     ELSE
                          MOVE   31       TO   ED-IDX
                     END-IF
+      *             Ã»´üÂÚºß¤ÎÆþ±¡ÎÁÌ¤»»ÄêÆü¤ò¼èÆÀ
+                    IF    WRK-TANKI-KBN   =   "1"
+                        PERFORM   220-TANKI-SEC
+                    ELSE
+                        INITIALIZE  ORCSNYUINDAY-AREA
+                    END-IF
+      *
                     PERFORM   VARYING   IDX1   FROM  ST-IDX  BY  1
                       UNTIL   IDX1      >   ED-IDX
-                          IF   NACCT-DAY(IDX1)    NOT =  ZERO
+                         IF   NACCT-DAY(IDX1)    NOT =  ZERO
                                ADD   1     TO
                                        LNK-ORCHCN02SUB-NISSU(NYUIN-IDX)
-                          END-IF
+                         ELSE
+                           IF  LNK-NYUINDAY-TANKI2-KBN(IDX1) NOT = SPACE
+                               ADD   1     TO
+                                  LNK-ORCHCN02SUB-NISSU(NYUIN-IDX)
+                           END-IF
+                         END-IF
                     END-PERFORM
                END-IF
            END-PERFORM
@@ -931,11 +947,23 @@
                ELSE
                     MOVE   31       TO   ED-IDX
                END-IF
+      *        Ã»´üÂÚºß¤ÎÆþ±¡ÎÁÌ¤»»ÄêÆü¤ò¼èÆÀ
+               IF    WRK-TANKI-KBN   =   "1"
+                   PERFORM   220-TANKI-SEC
+               ELSE
+                   INITIALIZE  ORCSNYUINDAY-AREA
+               END-IF
+      *
                PERFORM   VARYING   IDX1   FROM  ST-IDX  BY  1
                  UNTIL   IDX1      >   ED-IDX
                      IF   NACCT-DAY(IDX1)    NOT =  ZERO
                           ADD   1     TO
                                   LNK-ORCHCN02SUB-NISSU(NYUIN-IDX)
+                     ELSE
+                          IF  LNK-NYUINDAY-TANKI2-KBN(IDX1) NOT = SPACE
+                            ADD   1     TO
+                                  LNK-ORCHCN02SUB-NISSU(NYUIN-IDX)
+                          END-IF
                      END-IF
                END-PERFORM
            END-IF
@@ -971,6 +999,27 @@
       *
            .
        210-NYUINACT-GET-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ã»´üÂÚºß¤ÎÆþ±¡ÎÁÌ¤»»ÄêÆü¤ò¼èÆÀ
+      *****************************************************************
+       220-TANKI-SEC            SECTION.
+      *
+           INITIALIZE                            ORCSNYUINDAY-AREA
+           MOVE    LNK-ORCHCN02SUB-HOSPNUM   TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    LNK-ORCHCN02SUB-PTID      TO  LNK-NYUINDAY-PTID
+           MOVE    NACCT-SRYYM               TO  LNK-NYUINDAY-SANTEIYM
+           CALL    "ORCSNYUINDAY"        USING   ORCSNYUINDAY-AREA
+                                                 SPA-AREA
+      **     DISPLAY   "==== ORCSNYUINDAY ===="
+      **     DISPLAY   "LNK-NYUINDAY-RC = " LNK-NYUINDAY-RC
+      **     DISPLAY   "NACCT-SRYYM = " NACCT-SRYYM
+      **     DISPLAY   "----5----0----5----0----5----0-"
+      **     DISPLAY   LNK-NYUINDAY-TANKI2-TBL
+      *
+           .
+       220-TANKI-EXT.
            EXIT.
       *
       *****************************************************************
@@ -1140,6 +1189,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        910-TENSU-READ-SEC         SECTION.
       *
+           MOVE    SPACE               TO  WRK-TANKI-KBN
+      *
            MOVE    SPA-HOSPNUM         TO  TNS-HOSPNUM
            MOVE    TNS-TENSU-REC       TO  MCPDATA-REC
            MOVE    "DBSELECT"          TO  MCP-FUNC
@@ -1158,6 +1209,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  TNS-TENSU-REC
                    MOVE    ZERO                TO  FLG-TENSU
+      *            Ã»´üÂÚºß¤ÎÈ½ÄêÍÑ
+                   IF     TNS-NYUKHNKSNKBN =  226  OR  240
+                       MOVE   "1"       TO  WRK-TANKI-KBN
+                   END-IF
                ELSE
                    MOVE    1                   TO  FLG-TENSU
                    INITIALIZE                  TNS-TENSU-REC
