@@ -13953,7 +13953,7 @@
                    MOVE    SPACE           TO  TMPSND-HOSOKU
                    MOVE    "1"             TO  TMPSND-HOSOKU-COMPKBN
       *
-                   IF    ( CHK-CHKKBN      =   "1" )
+                   IF    ( WRK-CHK-CHKKBN  =   "1" )
                        MOVE    "0"         TO  TMPSND-UTAGAIKBN
                    ELSE
                        MOVE    "1"         TO  TMPSND-UTAGAIKBN
