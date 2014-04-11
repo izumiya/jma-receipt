@@ -187,6 +187,7 @@
            03  IDT3                PIC 9(04).
       *
            03  IDX-ZS3                PIC 9(04).
+           03  IDX-Z3                 PIC 9(04).
       *
       *    一時領域
        01  WRK-AREA.
@@ -2356,7 +2357,8 @@
            EVALUATE    WRK-COM-INPUTCD(IDX-Z)
                WHEN    "180020570"
       *            逓減チェック
-                   IF      WRK-COM-INPUTCD (IDX-Z - 1)
+                   COMPUTE IDX-Z3      =   IDX-Z   -  1
+                   IF      WRK-COM-INPUTCD (IDX-Z3)
                                                =   "180012210"  OR
                                                    "180012310"
                                                OR  "180020410"
@@ -2370,6 +2372,10 @@
                                                OR  "180031310"
       *H26.4       在宅精神療法
                                                OR  "180040210"
+      *        注加算診療コードが存在する
+                     OR   (WRK-COM-AGEKSNSRYCD (IDX-Z3  1)
+                                           =   WRK-COM-INPUTCD(IDX-Z))
+      *
                        IF     (SPA-SRYYMD      >=  WRK-SYOYMD2 )
       *H24.4
       *                 １年以上で２年未満で算定不可
