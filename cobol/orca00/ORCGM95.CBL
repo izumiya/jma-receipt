@@ -1501,7 +1501,7 @@
            END-PERFORM
            IF     (FLG-HEN             =   ZERO  )
               AND (WRK-SRYKA       NOT =   SPACE )
-              AND (IDX-H               >=  COM-TANMAX )
+              AND (IDX-H               <   COM-TANMAX )
       *        ¿ÇÎÅ²Ê¤Ê¤·
                ADD     1               TO  IDX-H
                MOVE    WRK-SRYKA       TO  SPA-M95GMN-TSRYKA  (IDX-H)
@@ -1531,7 +1531,7 @@
            END-PERFORM
       *
            IF     (FLG-HEN             =   ZERO )
-             AND  (IDX-H               >=  COM-TANMAX )
+             AND  (IDX-H               <   COM-TANMAX )
       *        ¿ÇÎÅ²Ê¤Ê¤·
                ADD     1               TO  IDX-H
                MOVE    WRK-SRYKA       TO  SPA-M95GMN-TSRYKA  (IDX-H)
