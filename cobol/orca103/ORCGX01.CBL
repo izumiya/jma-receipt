@@ -368,13 +368,11 @@
            ELSE
       *        初期画面セット
                PERFORM 300-SCREEN-SEC
-               DISPLAY "X01 FLG-END =" FLG-END
                IF    ( FLG-END         =   1 )
                    GO  TO  100-INIT-EXT
                END-IF
       *        画面編集
                PERFORM 500-GMNHEN-SEC
-               DISPLAY "SPA-ERRCD =" SPA-ERRCD
                IF    ( SPA-ERRCD   NOT =   SPACE )
                    PERFORM 510-ERRSET-SEC
                    GO  TO  100-INIT-EXT
@@ -507,7 +505,6 @@
            WHEN    "9"
                MOVE    SENDX01-BYOMEI  TO  X01-NAME
                PERFORM 4100-BYOMEI-CHK-SEC
-               DISPLAY "SPA-GMN-NAME=" SPA-GMN-NAME
             WHEN   OTHER
                MOVE    SENDX01-SRYCD   TO  SPA-GMN-SRYCD
                PERFORM 4103-SRYCD-CHK-SEC
@@ -2408,6 +2405,9 @@
       *
       *     画面移行用のパラメタ
            INITIALIZE                  SPA-X01KYOUTU
+      *
+           MOVE    SPA-GMN-CHKKBN-G    TO  SPA-X01-CHKKBN-G
+      *
            MOVE    SPA-GMN-SELNUM      TO  SPA-X01-SELNUM
            MOVE    SPA-NAI-STYUKYMD    TO  SPA-X01-STYUKYMD
            MOVE    SPA-NAI-EDYUKYMD    TO  SPA-X01-EDYUKYMD 
@@ -2423,7 +2423,6 @@
                ELSE
                    MOVE    SPA-NAI-TCHOFUKU (SPA-NAI-SELNUM)
                                        TO  SPA-X01-ID
-
                END-IF
            END-IF
       *
@@ -2437,8 +2436,6 @@
            WHEN    OTHER
                MOVE    SPA-SYSYMD      TO  SPA-X01-KJNYMD
            END-EVALUATE
-      *
-           MOVE    SPA-GMN-CHKKBN-G    TO  SPA-X01-CHKKBN-G
       *
            IF    ( SPA-X01-CHKKBN      =   "8" OR  "9" )
                MOVE    CONST-BYO       TO  SPA-X01-SRYBYO
