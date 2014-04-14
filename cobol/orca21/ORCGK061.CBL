@@ -252,12 +252,15 @@
       *    通院・在宅精神療法開始日
            03  FILLER          PIC X(09)   VALUE  "099830102".
            03  FILLER          PIC X(09)   VALUE  SPACE.
+      *    磁気による刺激法開始日
+           03  FILLER          PIC X(09)   VALUE  "099400001".
+           03  FILLER          PIC X(09)   VALUE  SPACE.
       *
        01  TBL-RRK-SRYCD-GR    REDEFINES   TBL-RRK-SRYCD-G.
-           03  TBL-RRK-SRYCD-GT        OCCURS    12.
+           03  TBL-RRK-SRYCD-GT        OCCURS    13.
                05  TBL-RRK-SRYCD           PIC X(09).
                05  TBL-END-SRYCD           PIC X(09).
-       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   12.
+       01  TBL-RRK-MAX                 PIC 9(02)   VALUE   13.
       *
       *
        01  WRK-MIDAIS-HEN.

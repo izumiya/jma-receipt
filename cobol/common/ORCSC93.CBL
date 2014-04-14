@@ -2065,6 +2065,17 @@
                            MOVE    "1"             TO  SPA-COM-ZAIEND
                                                                   (IDX)
                            MOVE    1               TO  FLG-ZAI
+      *H26.4
+      *                磁気による刺激法開始日
+                       WHEN    "099400001"
+                           MOVE    "40"            TO  SPA-COM-SRYKBN
+                                                                  (IDX)
+                           MOVE    "400"           TO  SPA-COM-SRYSYUKBN
+                                                                  (IDX)
+      *                    １剤１明細とする
+                           MOVE    "1"             TO  SPA-COM-ZAIEND
+                                                                  (IDX)
+                           MOVE    1               TO  FLG-ZAI
       *ver.4.7         精神科ケア開始
                        WHEN    "099830101"
       *H26.4           通院・在宅精神療法開始
