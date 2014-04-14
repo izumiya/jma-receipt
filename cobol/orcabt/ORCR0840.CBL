@@ -2664,6 +2664,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
                   MOVE    1     TO    FLG-HENSYU-NG
             END-IF
             IF       SRY-SRYCD(IDX2)   =  "099140004" OR "099830102"
+                                                      OR "099400001"
                   MOVE    1     TO    FLG-HENSYU-NG
             END-IF
       *
