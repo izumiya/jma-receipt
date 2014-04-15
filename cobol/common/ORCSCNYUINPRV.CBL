@@ -346,7 +346,7 @@
            COPY    "CPORCSLNK.INC".
       *
       *    診療行為入力項目変換パラメタ
-           COPY    "CPORCSC97.INC".
+      *    COPY    "CPORCSC97.INC".
       *
       *   算定履歴更新サブ
            COPY    "CPORCSSANTEI.INC".

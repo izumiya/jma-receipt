@@ -1557,6 +1557,34 @@
           </signal>
         </widget>
       </widget>
+      <widget>
+        <class>GtkButton</class>
+        <name>CTRLHOME</name>
+        <x>8</x>
+        <y>744</y>
+        <width>80</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>False</can_focus>
+        <has_focus>False</has_focus>
+        <receives_default>True</receives_default>
+        <border_width>0</border_width>
+        <label>CTRL+Home</label>
+        <relief>GTK_RELIEF_NORMAL</relief>
+        <xalign>0.5</xalign>
+        <yalign>0.5</yalign>
+        <response_id>0</response_id>
+        <accelerator>
+          <modifiers>GDK_CONTROL_MASK</modifiers>
+          <key>GDK_Home</key>
+          <signal>clicked</signal>
+        </accelerator>
+        <signal>
+          <name>clicked</name>
+          <handler>send_event</handler>
+          <data>CLICKED</data>
+        </signal>
+      </widget>
     </widget>
   </widget>
 </GTK-Interface>

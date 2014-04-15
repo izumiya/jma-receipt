@@ -217,6 +217,10 @@
                     06  W06-ICCARDRW-COUNT    PIC S9(9)   BINARY.
                     06  W06-ICCARDRW-ITEM
                             PIC X(40)   OCCURS  2 TIMES.
+                  05  W06-GLINECNT.
+                    06  W06-VALUE   PIC S9(2).
+                  05  W06-NLINECNT.
+                    06  W06-VALUE   PIC S9(2).
                 04  W06-TGN3-STATE       PIC S9(9)   BINARY.
                 04  W06-TG3.
                   05   W06-GRPHOSPNUM  PIC X(02)   OCCURS  9 TIMES.

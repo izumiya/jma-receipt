@@ -57,6 +57,7 @@
       * 04.07.01     NACL-森脇    13/07/05  業務処理権限変更不可
       *                           13/07/17  スーパーバイザー処理変更
       * 04.07.01     NACL-太田    13/07/22  ＩＣカードリーダ／ライタ設定追加
+      * 04.07.00     NACL-多々納  14/02/10  入力スクロール行数対応他
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -198,6 +199,11 @@
                        09  SPA-GMN-FORMALFLG-LST   PIC X(40)
                                                    OCCURS  5. 
                    07  SPA-FORMALFLG-MAX      PIC 9(04).  
+      *
+      *            入力スクロール行数
+                   07  SPA-GMN-GLINECNT       PIC 9(02).
+                   07  SPA-GMN-NLINECNT       PIC 9(02).
+      *
       *            クライアント保存可否
                    07  SPA-GMN-CLIENT-SAVE-LSTG.
                        09  SPA-GMN-CLIENT-SAVE-LST PIC X(40)
@@ -363,6 +369,10 @@
                        09  SPA-MAE-ICCARDRW        PIC X(01).
                        09  SPA-MAE-ICCARDRW-F1     PIC X(01).
                        09  SPA-MAE-ICCARDRW-MEI    PIC X(24).
+      *
+      *            入力スクロール行数
+                   07  SPA-MAE-GLINECNT       PIC 9(02).
+                   07  SPA-MAE-NLINECNT       PIC 9(02).
       *
                    07  SPA-MAE-GRPHOSP-G.
                        09  SPA-MAE-GRPHOSP-MAX     PIC 9(02).
@@ -657,6 +667,7 @@
        310-SPASET-SEC              SECTION.
       *
            INITIALIZE   SPA-W06
+      *
       *    職員区分
            MOVE    "1 医師"            TO  SPA-GMN-SYOKUKBN-LIST (1)
            MOVE    "2 看護師（婦）"    TO  SPA-GMN-SYOKUKBN-LIST (2)
@@ -1012,7 +1023,7 @@
            MOVE    SYS-1001-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC         TO  SYS-1001-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1001-REC
            ELSE
                INITIALIZE                      SYS-1001-REC
            END-IF
@@ -1032,7 +1043,7 @@
            MOVE    SYS-1038-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY-SEC
            IF      FLG-SYSKANRI        =   ZERO
-               MOVE    MCPDATA-REC         TO  SYS-1038-REC
+               MOVE    SYSKANRI-REC        TO  SYS-1038-REC
            ELSE
                INITIALIZE                      SYS-1038-REC
            END-IF
@@ -1379,6 +1390,16 @@
       *
            MOVE    W06-SELNUM          TO  SPA-GMN-SELNUM
       *
+      *H26.5
+           IF      SPA-GMN-SELNUM      =   ZERO
+      *        最終履歴が999999であれば、選択する
+               IF     (SPA-GMN-TBL-MAX     >   ZERO    )
+                 AND  (SPA-NAI-TEDYUKYMD (SPA-GMN-TBL-MAX)
+                                           =   "99999999" )
+                   MOVE    SPA-GMN-TBL-MAX     TO  SPA-GMN-SELNUM
+               END-IF
+           END-IF
+      *
            IF     (SPA-GMN-SELNUM      >=  1   )  AND
                   (SPA-GMN-SELNUM      <=  SPA-GMN-TBL-MAX)
                MOVE    SPA-GMN-SELNUM      TO  IDX
@@ -1454,7 +1475,7 @@
            MOVE    SYS-1010-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY-SEC
            IF      FLG-SYSKANRI            =   ZERO
-               MOVE    MCPDATA-REC             TO  SYS-1010-REC
+               MOVE    SYSKANRI-REC            TO  SYS-1010-REC
       *
                MOVE    SPACE               TO  SYS-1050-REC
                INITIALIZE                      SYS-1050-REC
@@ -1467,7 +1488,7 @@
                MOVE    SYS-1050-REC        TO  MCPDATA-REC
                PERFORM 900-SYSKANRI-KEY-SEC
                IF      FLG-SYSKANRI            =   ZERO
-                   MOVE    MCPDATA-REC     TO  SYS-1050-REC
+                   MOVE    SYSKANRI-REC        TO  SYS-1050-REC
                ELSE
                    MOVE    SPACE           TO  SYS-1050-REC
                    INITIALIZE                  SYS-1050-REC
@@ -1551,6 +1572,21 @@
                MOVE    SYS-1010-CLIENT-PRT     TO  SPA-GMN-CLIENT-PRT
                MOVE    SYS-1010-DIALOGFLG      TO  SPA-GMN-DIALOGFLG
                MOVE    SYS-1050-ICCARDRW       TO  SPA-GMN-ICCARDRW
+      *H26.5
+      *        入力スクロール行数
+               IF      SYS-1050-GLINECNT   NOT NUMERIC
+      *            外来の初期行数　２４行
+                   MOVE    24                  TO  SPA-GMN-GLINECNT
+               ELSE
+                   MOVE    SYS-1050-GLINECNT   TO  SPA-GMN-GLINECNT
+               END-IF
+               IF      SYS-1050-NLINECNT   NOT NUMERIC
+      *            入院の初期行数　２８行
+                   MOVE    28                  TO  SPA-GMN-NLINECNT
+               ELSE
+                   MOVE    SYS-1050-NLINECNT   TO  SPA-GMN-NLINECNT
+               END-IF
+      *
       *
                INITIALIZE                     SPA-PAGE3-G
                PERFORM VARYING IDX FROM    1   BY  1
@@ -1938,7 +1974,7 @@
            . 
        320-SPASET-GSRAUTH-EXT.
            EXIT.
-           .
+      *
       *****************************************************************
       *    入力チェック処理
       *****************************************************************
@@ -2034,6 +2070,9 @@
            MOVE    W06-DIALOGFLG       TO  SPA-GMN-DIALOGFLG-G
            MOVE    W06-ICCARDRW        TO  SPA-GMN-ICCARDRW-G
       *
+           MOVE    W06-GLINECNT        TO  SPA-GMN-GLINECNT
+           MOVE    W06-NLINECNT        TO  SPA-GMN-NLINECNT
+      *
       *    他院情報設定画面
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   CONST-GRPHOSP-MAX
@@ -2087,6 +2126,9 @@
            MOVE    SPA-GMN-CLIENT-PRT-G    TO  SPA-MAE-CLIENT-PRT-G
            MOVE    SPA-GMN-DIALOGFLG-G     TO  SPA-MAE-DIALOGFLG-G
            MOVE    SPA-GMN-ICCARDRW-G      TO  SPA-MAE-ICCARDRW-G
+      *
+           MOVE    SPA-GMN-GLINECNT        TO  SPA-MAE-GLINECNT
+           MOVE    SPA-GMN-NLINECNT        TO  SPA-MAE-NLINECNT
       *
       *    他院情報設定画面
            PERFORM VARYING     IDX     FROM    1   BY  1
@@ -2174,6 +2216,14 @@
            IF      SPA-GMN-FORMALFLG-G NOT =   SPA-MAE-FORMALFLG-G
                MOVE    1               TO  FLG-OK
            END-IF
+      *
+           IF      SPA-GMN-GLINECNT    NOT =   SPA-MAE-GLINECNT
+               MOVE    1               TO  FLG-OK
+           END-IF
+           IF      SPA-GMN-NLINECNT    NOT =   SPA-MAE-NLINECNT
+               MOVE    1               TO  FLG-OK
+           END-IF
+      *
            IF      SPA-GMN-CLIENT-SAVE-G
                                        NOT =   SPA-MAE-CLIENT-SAVE-G
                MOVE    1               TO  FLG-OK
@@ -2285,6 +2335,10 @@
            END-IF
            IF      SPA-ERRCD           =   SPACE
                PERFORM 4121-FORMALFLG-CHK-SEC
+           END-IF
+      *    入力スクロール行数
+           IF      SPA-ERRCD           =   SPACE
+               PERFORM 4121-GLINECNT-CHK-SEC
            END-IF
       *
            IF      SPA-ERRCD           =   SPACE
@@ -2933,6 +2987,23 @@
       *
            .
        4121-FORMALFLG-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    入力スクロール行数チェック処理
+      *****************************************************************
+       4121-GLINECNT-CHK-SEC        SECTION.
+      *
+      *    ゼロは初期値とする
+           IF      SPA-GMN-GLINECNT    =   ZERO
+               MOVE    24              TO  SPA-GMN-GLINECNT
+           END-IF
+      *
+           IF      SPA-GMN-NLINECNT    =   ZERO
+               MOVE    28              TO  SPA-GMN-NLINECNT
+           END-IF
+      *
+           .
+       4121-GLINECNT-CHK-EXT.
            EXIT.
       *****************************************************************
       *    クライアント保存可否チェック処理
@@ -3671,7 +3742,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SYS-1010-REC        TO  MCPDATA-REC
            PERFORM 900-SYSKANRI-KEY-SEC
            IF      FLG-SYSKANRI            =   ZERO
-               MOVE    MCPDATA-REC             TO  SYS-1010-REC
+               MOVE    SYSKANRI-REC            TO  SYS-1010-REC
            ELSE
                MOVE    SPACE                   TO  SYS-1010-REC
                INITIALIZE                      SYS-1010-REC
@@ -4107,6 +4178,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    SPA-NAI-EDYUKYMD    TO  SYS-1050-EDYUKYMD
            MOVE    SPA-GMN-ICCARDRW    TO  SYS-1050-ICCARDRW
       *
+      *    入力スクロール行数
+           MOVE    SPA-GMN-GLINECNT    TO  SYS-1050-GLINECNT
+           MOVE    SPA-GMN-NLINECNT    TO  SYS-1050-NLINECNT
+      *
           .
        49051-SYS1050-UPD-EXT.
            EXIT.
@@ -4370,6 +4445,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            END-PERFORM
            MOVE  SPA-FORMALFLG-MAX     TO  W06-FORMALFLG-COUNT
            MOVE  SPA-GMN-FORMALFLG-G   TO  W06-FORMALFLG
+      *
+      *    入力スクロール行数
+           MOVE    SPA-GMN-GLINECNT    TO  W06-GLINECNT
+           MOVE    SPA-GMN-NLINECNT    TO  W06-NLINECNT
+      *
       *    クライアント保存可否表示
            PERFORM VARYING     IDX     FROM    1   BY  1
                    UNTIL       IDX     >   SPA-CLIENT-SAVE-MAX
@@ -4859,6 +4939,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                     MOVE  "MEIPRTFLG"      TO   MCP-WIDGET
                 WHEN    25
                     MOVE  "FORMALFLG"      TO   MCP-WIDGET
+                WHEN    101
+                    MOVE  "GLINECNT"       TO   MCP-WIDGET
+                WHEN    102
+                    MOVE  "NLINECNT"       TO   MCP-WIDGET
                 WHEN    26
                     MOVE  "CLIENT_SAVE"    TO   MCP-WIDGET
                 WHEN    27
@@ -4969,7 +5053,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN     "MEIPRTFLG"
                    MOVE    25              TO  SPA-GMN-CUR
                WHEN     "FORMALFLG"
+      *!!!!        MOVE    26              TO  SPA-GMN-CUR
+                   MOVE    101             TO  SPA-GMN-CUR
+      *
+               WHEN     "GLINECNT" 
+                   MOVE    102             TO  SPA-GMN-CUR
+               WHEN     "NLINECNT" 
                    MOVE    26              TO  SPA-GMN-CUR
+      *
                WHEN     "CLIENT_SAVE"
                    MOVE    27              TO  SPA-GMN-CUR
                WHEN     "USER_KANRI"
@@ -5122,11 +5213,14 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                PERFORM 920-DBFETCH-SEC
                IF      MCP-RC              =   ZERO
                    MOVE    ZERO                TO  FLG-SYSKANRI
+                   MOVE    MCPDATA-REC         TO  SYSKANRI-REC
                ELSE
                    MOVE    1                   TO  FLG-SYSKANRI
+                   MOVE    SPACE               TO  SYSKANRI-REC
                END-IF
            ELSE
                MOVE    1                   TO  FLG-SYSKANRI
+               MOVE    SPACE               TO  SYSKANRI-REC
            END-IF
            MOVE    "tbl_syskanri"      TO  MCP-TABLE
            MOVE    "key10"             TO  MCP-PATHNAME
