@@ -8618,6 +8618,9 @@
                                    TO  PTNYUINRRK-TAIINYMD
            END-IF
       *
+           MOVE    PTNYUINRRK-TAIINYMD
+                                   TO  WRK-SPA-SRYYMD
+      *
            MOVE    PTNYUINRRK-TAIINYMD (1 : 6)
                                        TO  WRK-NACCT-SRYYM
            PERFORM 4801-NYUINACCT-SEL-SEC
@@ -8691,6 +8694,9 @@
            MOVE    SPA-GMN-I01-PTNUM   TO  WRK-SPA-PTNUM
            MOVE    SPA-GMN-I01-NYUINKA-CD
                                        TO  WRK-SPA-SRYKA
+      *
+           MOVE    SPA-SYSYMD          TO  WRK-SPA-SRYYMD
+      *
       *    カルテ編集用保険組合せ決定処理
            PERFORM 4801-HKNCOMBI-KETTEI-SEC
       *    MOVE    SPA-GMN-I01-HKNCOMBI-CD

@@ -241,7 +241,7 @@
       *
                MOVE    SPA-AREA            TO  WRK-SPA-AREA
       *
-               MOVE    IN01-SRYYMD         TO  WRK-SPA-SRYYMD
+               MOVE    SPA-SRYYMD          TO  WRK-SPA-SRYYMD
                MOVE    IN01-PTID           TO  WRK-SPA-PTID
       *
                INITIALIZE                  ORCSMKPRTAREA

@@ -6133,6 +6133,9 @@
            MOVE    WRK-HENYMDG     TO  WRK-SPA-BIRTHDAYW
            MOVE    WRK-SYMD        TO  WRK-SPA-BIRTHDAY
       *
+           MOVE    SPA-NAI-I04-TAIINYMD
+                                   TO  WRK-SPA-SRYYMD
+      *
            PERFORM 4511-SKYSRYPRT-SEC
       *
       *    Âà±¡¾ÚÌÀ½ñ
