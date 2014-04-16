@@ -204,6 +204,8 @@
            03  FLG-SYODOU-COM                          PIC 9(01).
            03  FLG-SAIDOU-COM                          PIC 9(01).
            03  FLG-NIKOCHIN-COM                        PIC 9(01).
+           03  FLG-ZAIKYO-COM                          PIC 9(01).
+           03  FLG-BOKOHO-COM                          PIC 9(01).
            03  FLG-ZENSOKU-COM                         PIC 9(01).
            03  FLG-KENSA-COM                           PIC 9(01).
            03  FLG-RINYAK                              PIC 9(01).
@@ -889,6 +891,8 @@
            03  CONS-ZAIKYO3-COMMENT  PIC X(09)  VALUE  "114027810".
       *    ºßÂð´µ¼Ô¶¦Æ±¿ÇÎÅÎÁ¡ÊË¬Ìä¿ÇÎÅ¡Ë¡ÊÆ±°ì·úÊªµï½»¼Ô¡¦ÆÃÄê»ÜÀßÅù°Ê³°¡Ë
            03  CONS-ZAIKYO4-COMMENT  PIC X(09)  VALUE  "114027910".
+      *    ½é²ó»»Äê¡¡¡¡¡¡·î¡¡¡¡Æü
+           03  CONS-ZAIKYO5-COMMENT  PIC X(09)  VALUE  "840000097".
       *
       *    ºßÂð´µ¼ÔË¬Ìä¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó»ØÆ³´ÉÍýÎÁ¡ÊÆ±°ì·úÊª½»µï¼Ô°Ê³°¡Ë
            03  CONS-ZAIRIHA1-COMMENT PIC X(09)  VALUE  "114006410".
@@ -906,7 +910,9 @@
            03  CONS-GANSIDO2-COMMENT PIC X(09)  VALUE  "113015410".
       *
       *    ¼§µ¤¤Ë¤è¤ëç¯æùÅù»É·ãË¡
-           03  CONS-BOKOHO-COMMENT   PIC X(09)  VALUE  "140055110".
+           03  CONS-BOKOHO1-COMMENT  PIC X(09)  VALUE  "140055110".
+      *    ½é²ó¼Â»Ü¡¡¡¡¡¡·î¡¡¡¡Æü
+           03  CONS-BOKOHO2-COMMENT  PIC X(09)  VALUE  "840000085".
       *
       *    ÄÌ±¡¡¦ºßÂðÀº¿ÀÎÅË¡¡Ê£²£°ºÐÌ¤Ëþ¡Ë²Ã»»
            03  CONS-TUINZAI-COMMENT  PIC X(09)  VALUE  "180020570".
@@ -1327,6 +1333,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 FLG-TAHOKEN
                                                 FLG-SYOUNI-COM
                                                 FLG-KENSA-COM
+                                                FLG-ZAIKYO-COM
+                                                FLG-BOKOHO-COM
       *
                                MOVE  ZERO  TO   WRK-FILMTEN
                                MOVE  ZERO  TO   FLG-NEBU
@@ -1378,6 +1386,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                        FLG-TAHOKEN
                                                        FLG-SYOUNI-COM
                                                        FLG-KENSA-COM
+                                                       FLG-ZAIKYO-COM
+                                                       FLG-BOKOHO-COM
       *
                                       MOVE  ZERO  TO   WRK-FILMTEN
                                       MOVE  ZERO  TO   FLG-NEBU
@@ -2558,8 +2568,13 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
               END-IF
       *       ¼§µ¤¤Ë¤è¤ëç¯æùÅù»É·ãË¡
               IF   RECE100-SRYYM    >=     "201404"
-                IF   SRY-SRYCD(IDX2) =  CONS-BOKOHO-COMMENT
+                IF  (SRY-SRYCD(IDX2)    =     CONS-BOKOHO1-COMMENT)
+                AND (FLG-BOKOHO-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE120-FLG-BOKOHO-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2)    =     CONS-BOKOHO2-COMMENT
+                   MOVE  SPACE  TO    RECE120-FLG-BOKOHO-COMMENT
+                   MOVE    1    TO    FLG-BOKOHO-COM
                 END-IF
               END-IF
            END-IF
@@ -2999,18 +3014,18 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
               END-IF
       *       ºßÂð´µ¼Ô¶¦Æ±¿ÇÎÅÎÁ
               IF   RECE100-SRYYM    >=     "201404"
-                IF   SRY-SRYCD(IDX2) =  CONS-ZAIKYO1-COMMENT
+                IF  (SRY-SRYCD(IDX2)    =     CONS-ZAIKYO1-COMMENT
+                                        OR    CONS-ZAIKYO2-COMMENT
+                                        OR    CONS-ZAIKYO3-COMMENT
+                                        OR    CONS-ZAIKYO4-COMMENT)
+                AND (FLG-ZAIKYO-COM     =     ZERO                )
                    MOVE   "1"   TO    RECE120-FLG-ZAIKYO-COMMENT
                 END-IF
-                IF   SRY-SRYCD(IDX2) =  CONS-ZAIKYO2-COMMENT
-                   MOVE   "2"   TO    RECE120-FLG-ZAIKYO-COMMENT
+                IF   SRY-SRYCD(IDX2)    =     CONS-ZAIKYO5-COMMENT
+                   MOVE  SPACE  TO    RECE120-FLG-ZAIKYO-COMMENT
+                   MOVE    1    TO    FLG-ZAIKYO-COM
                 END-IF
-                IF   SRY-SRYCD(IDX2) =  CONS-ZAIKYO3-COMMENT
-                   MOVE   "3"   TO    RECE120-FLG-ZAIKYO-COMMENT
-                END-IF
-                IF   SRY-SRYCD(IDX2) =  CONS-ZAIKYO4-COMMENT
-                   MOVE   "4"   TO    RECE120-FLG-ZAIKYO-COMMENT
-                END-IF
+      *
                 IF   SRY-SRYCD(IDX2) =  CONS-ZAIRIHA1-COMMENT
                                     OR  CONS-ZAIRIHA2-COMMENT
                    MOVE   "1"   TO    RECE120-FLG-ZAIRIHA-COMMENT
