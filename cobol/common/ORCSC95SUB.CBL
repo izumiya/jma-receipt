@@ -555,10 +555,12 @@
                PERFORM 10011-CLAIM-HEN-SEC
            END-IF
       *
-      *
       *    職員情報より入力スクロール設定
-           IF     (LNK-SC95-PG         =   "K02"
-                                       OR  "KT01" )
+           IF     (SPA-TERMID          =   ALL "*")
+             OR   (SPA-TERMID (1:4)    =   "API+" )
+      *        API、入院一括登録は対象外
+               CONTINUE
+           ELSE
                PERFORM 10050-LINECNT-HEN-SEC
            END-IF
       *

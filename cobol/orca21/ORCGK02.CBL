@@ -693,7 +693,7 @@
            03  WRK-INSCNT              PIC 9(02).
            03  WRK-GYO                 PIC 9(04).
       *改頁行数
-           03  WRK-PAGE-LINE           PIC 9(02).
+      **** 03  WRK-PAGE-LINE           PIC 9(02).
       *
       *    訂正時の内容保存
        01  WRK-ORCSC95AREA             PIC X(150).
@@ -1148,10 +1148,10 @@
       *    テーブル最大行
            MOVE    MAX-LINE-VALUE      TO  SPA-MAX-LINE
       *v4.7
-           IF      SPA-GMLINCNT(1:2)   NUMERIC
-               MOVE    SPA-GMLINCNT        TO  WRK-PAGE-LINE
-           ELSE
-               MOVE    PAGE-LINE           TO  WRK-PAGE-LINE
+      *    頁行数
+           IF     (SPA-GMLINCNT(1:2)   NOT NUMERIC )
+             OR   (SPA-GMLINCNT        =    ZERO)
+               MOVE    PAGE-LINE            TO  SPA-GMLINCNT
            END-IF
       *
       *    診療種別テーブルセット
@@ -1857,8 +1857,6 @@
            MOVE    1               TO  SPA-GMN-PAGE
            MOVE    0               TO  SPA-GMN-CUR
            MOVE    1               TO  SPA-MAP-IDX
-      *
-           MOVE    SPA-GMLINCNT    TO  WRK-PAGE-LINE
       *
            .
        30010-INIT-GMNN-EXT.
@@ -10624,8 +10622,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF     (WRK-IDX2            >   WRK-MAP-MAX )
                MOVE    WRK-MAP-MAX         TO  WRK-IDX2
            END-IF
-           IF      WRK-IDX2            >   WRK-PAGE-LINE
-               COMPUTE WRK-GYO         =   WRK-IDX2    -   WRK-PAGE-LINE
+           IF      WRK-IDX2            >   SPA-GMLINCNT
+               COMPUTE WRK-GYO         =   WRK-IDX2    -   SPA-GMLINCNT
            ELSE
                MOVE    1               TO  WRK-GYO
            END-IF
@@ -10700,7 +10698,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      WRK-IDX2            =   ZERO
                MOVE    SPA-MAP-IDX     TO  WRK-IDX2
            END-IF
-           COMPUTE WRK-GYO             =   WRK-IDX2 +   WRK-PAGE-LINE
+           COMPUTE WRK-GYO             =   WRK-IDX2 +   SPA-GMLINCNT
       *
            MOVE    ZERO                TO  FLG-F7
            PERFORM VARYING     IDX     FROM    WRK-IDX2  BY  1
@@ -12435,7 +12433,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *ver.4.7
       *訂正展開時、１行目にカーソル移動
            IF      SPA-GMN-CUR         =   98
-               IF      SPA-GMN-MAX     >=  WRK-PAGE-LINE
+               IF      SPA-GMN-MAX     >=  SPA-GMLINCNT
       *            頁行以上であれば１行目へ
                    MOVE    "1"             TO  SPA-COM-CUR (1)
                END-IF
