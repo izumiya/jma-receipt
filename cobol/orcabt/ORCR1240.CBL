@@ -441,7 +441,7 @@
            03  WRK-BOKOHO-YMD9               PIC X(08).
            03  WRK-BOKOHO-YMD2-AREA.
                05  WRK-BOKOHO-YMD2           PIC X(08)
-                                             OCCURS 50.
+                                             OCCURS 30.
       *
            03  WRK-ZAIKYO-YMD9               PIC X(08).
            03  WRK-ZAIKYO-KAISU              PIC 9(02).
@@ -3897,6 +3897,7 @@
                                    TO  WK-FREE-NAME2(IDZ)(17:4)
       *
                 IF   WRK-ZAIKYO-KAISU  NOT =  ZERO
+                AND  WRK-ZAIKYO-KAISU     <=   31
                   ADD        1       TO     IDZ
       *
                   MOVE       11      TO     WK-FREE-YUKOKETA2(IDZ)
@@ -4194,7 +4195,7 @@
                      PERFORM  VARYING  IDX26  FROM  31  BY  -1
                                UNTIL   IDX26   <     1
                        IF  (SANTEI-DAY(IDX26)  NOT =  ZERO)
-                       AND (IDX27              <    50    )
+                       AND (IDX27              <    30    )
                          IF ((SANTEI-SRYYM = WRK-BOKOHO-YMD(1:6) ) AND
                              (IDX26        < IDX28               ))
                          OR ((SANTEI-SRYYM = WRK-BOKOHO-YMD9(1:6)) AND
@@ -4241,20 +4242,40 @@
                                   TO     WK-FREE-NAME2(IDZ)(17:4)
       *
                IF   WRK-BOKOHO-YMD2(1) NOT =  SPACE
-                 PERFORM  VARYING  IDX26  FROM  50  BY  -1
+                 MOVE         1       TO     IDX27
+                 PERFORM  VARYING  IDX26  FROM  30  BY  -1
                            UNTIL   IDX26   <     1
                   IF  WRK-BOKOHO-YMD2(IDX26)  NOT =  SPACE
                    ADD        1       TO     IDZ
       *
-                   MOVE       16      TO     WK-FREE-YUKOKETA2(IDZ)
-                   MOVE     "初回以降の通算実施　　　月　　日"
-                                      TO     WK-FREE-NAME2(IDZ)
-                   MOVE      WRK-BOKOHO-YMD2(IDX26)(5:2) TO  DAY-IDX2
-                   MOVE      TBL-DAY(DAY-IDX2)
-                                      TO     WK-FREE-NAME2(IDZ)(21:4)
-                   MOVE      WRK-BOKOHO-YMD2(IDX26)(7:2) TO  DAY-IDX2
-                   MOVE      TBL-DAY(DAY-IDX2)
-                                      TO     WK-FREE-NAME2(IDZ)(27:4)
+                   ADD        1       TO     IDX27
+                   IF    IDX27   <    10
+                     MOVE       12      TO     WK-FREE-YUKOKETA2(IDZ)
+                     MOVE     "　回目実施　　月　　日"
+                                        TO     WK-FREE-NAME2(IDZ)
+                     MOVE      IDX27    TO     DAY-IDX2
+                     MOVE      TBL-DAY(DAY-IDX2)(3:2)
+                                        TO     WK-FREE-NAME2(IDZ)(1:2)
+                     MOVE      WRK-BOKOHO-YMD2(IDX26)(5:2) TO  DAY-IDX2
+                     MOVE      TBL-DAY(DAY-IDX2)
+                                        TO     WK-FREE-NAME2(IDZ)(11:4)
+                     MOVE      WRK-BOKOHO-YMD2(IDX26)(7:2) TO  DAY-IDX2
+                     MOVE      TBL-DAY(DAY-IDX2)
+                                        TO     WK-FREE-NAME2(IDZ)(17:4)
+                   ELSE
+                     MOVE       13      TO     WK-FREE-YUKOKETA2(IDZ)
+                     MOVE     "　　回目実施　　月　　日"
+                                        TO     WK-FREE-NAME2(IDZ)
+                     MOVE      IDX27    TO     DAY-IDX2
+                     MOVE      TBL-DAY(DAY-IDX2)
+                                        TO     WK-FREE-NAME2(IDZ)(1:4)
+                     MOVE      WRK-BOKOHO-YMD2(IDX26)(5:2) TO  DAY-IDX2
+                     MOVE      TBL-DAY(DAY-IDX2)
+                                        TO     WK-FREE-NAME2(IDZ)(13:4)
+                     MOVE      WRK-BOKOHO-YMD2(IDX26)(7:2) TO  DAY-IDX2
+                     MOVE      TBL-DAY(DAY-IDX2)
+                                        TO     WK-FREE-NAME2(IDZ)(19:4)
+                   END-IF
                   END-IF
                  END-PERFORM
                END-IF
