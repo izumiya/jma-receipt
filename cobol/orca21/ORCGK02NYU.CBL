@@ -4911,6 +4911,13 @@
                                        TO  SPA-GMN-INPUTCD(SPA-GMN-IDX)
       *        挿入行数
                MOVE    LNK-SC97-INSCNT TO  WRK-INSCNT
+      *        約束セット前は１行
+               IF     (SPA-GMN-INPUTCD(SPA-GMN-IDX)(1:1)
+                                           =   "S"  )  AND
+                      (LNK-SC97-INSCNT     >   1    )
+                   MOVE    1               TO  WRK-INSCNT
+               END-IF
+      *
                PERFORM 41014-GYOINSN-SEC
                IF      SPA-ERRCD       =   SPACE
                    MOVE    "3"             TO  SPA-COM-CUR (SPA-GMN-IDX)
