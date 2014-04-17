@@ -858,9 +858,21 @@
                    UNTIL       IDX     >   SPA-M95GMN-MAX
                IF      SPA-M95GMN-SRYKA    =   SPA-M95GMN-TSRYKA
                                                           (IDX)
+                   MOVE    SPA-M95GMN-TSRYKAMEI (IDX)
+                                           TO  WRK-SRYKAMEI
                    MOVE    IDX             TO  IDX-S
                    MOVE    1               TO  FLG-CHK
                    MOVE    SPA-M95GMN-MAX  TO  IDX
+               END-IF
+           END-PERFORM
+           PERFORM VARYING     IDX     FROM    1       BY  1
+                   UNTIL      (IDX     >   SPA-SRYKA-MAX )
+                          OR  (FLG-CHK =   1    )
+               IF      SPA-NAI-SRYKA (IDX) =   SPA-M95GMN-SRYKA
+                   MOVE    SPA-NAI-SRYKAMEI (IDX)
+                                           TO  WRK-SRYKAMEI
+                   MOVE    1               TO  FLG-CHK
+                   MOVE    IDX             TO  IDX-S
                END-IF
            END-PERFORM
       *
@@ -872,7 +884,7 @@
                END-IF
            ELSE
       *
-           IF      FLG-CHK             =   ZERO
+           IF      FLG-CHK         =   ZERO
                MOVE    "0101"          TO  SPA-ERRCD
                MOVE    10              TO  SPA-M95-CUR
                MOVE    SPACE           TO  SPA-MAE-SRYKA
@@ -885,8 +897,8 @@
                    CONTINUE
                ELSE
                    MOVE    SPA-M95GMN-SRYKA    TO  SPA-MAE-SRYKA
-                   MOVE    SPA-M95GMN-TSRYKAMEI (IDX-S)
-                                               TO  SPA-M95GMN-SRYKAMEI
+      ************ MOVE    SPA-M95GMN-TSRYKAMEI (IDX-S)
+                   MOVE    WRK-SRYKAMEI        TO  SPA-M95GMN-SRYKAMEI
       *            担当医一覧表示
                    MOVE    2                   TO  SPA-M95-SYORI
                    PERFORM 42001-SYSLIST-INIT-SEC
