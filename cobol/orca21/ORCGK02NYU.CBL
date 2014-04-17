@@ -10134,7 +10134,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                        (SPA-GMN-INPUTCD(WRK-IDX)   =   SPACE )
                    CONTINUE
                ELSE
-                   ADD     1               TO  SPA-GMN-MAX
+      ***********  ADD     1               TO  SPA-GMN-MAX
+                   MOVE    WRK-IDX         TO  SPA-GMN-MAX
                END-IF
            END-PERFORM
       *
