@@ -10376,11 +10376,11 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *    END-IF
       *
       *    明細入力の時、コードが入力されていること
-           IF      SPA-GMN-CUR         =   2
-               IF      K02N-INPUTCD(SPA-MAP-IDX)    =   SPACE
-                   MOVE    1               TO  SPA-GMN-CUR
-               END-IF
-           END-IF
+      *    IF      SPA-GMN-CUR         =   2
+      *        IF      K02N-INPUTCD(SPA-MAP-IDX)    =   SPACE
+      *            MOVE    1               TO  SPA-GMN-CUR
+      *        END-IF
+      *    END-IF
       *
            MOVE    SPA-GMN-PTNUM       TO  K02N-PTNUM
            MOVE    SPA-GMN-KANANAME    TO  K02N-KANANAME
