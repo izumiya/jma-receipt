@@ -413,6 +413,7 @@
            03  FLG-RETRY           PIC 9(01).
            03  FLG-ZAIKYO-OK       PIC 9(01).
            03  FLG-ZAIKYOCOMARI    PIC 9(01).
+           03  FLG-CYOJKSN-OK      PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -622,6 +623,7 @@
            03  WRK-SINPESUR-YMD              PIC X(08).
            03  WRK-ZAIKYO-YMD                PIC X(08).
            03  WRK-BOKOHO-YMD                PIC X(08).
+           03  WRK-CYOJKSN-YMD               PIC X(08).
       *
            03  WRK-GANSIDO-YMD-AREA.
                05  WRK-GANSIDO-YMD           PIC X(08)
@@ -634,6 +636,11 @@
       *
            03  WRK-ZAIKYO-YMD9               PIC X(08).
            03  WRK-ZAIKYO-KAISU              PIC 9(02).
+      *
+           03  WRK-CYOJKSN-TAIHIYM           PIC X(06).
+           03  WRK-CYOJKSN-DAY-TBL.
+               05  WRK-CYOJKSN-DAY           PIC 9(01)
+                                             OCCURS 31.
       *
        01  WRK-RECE64-REC. 
            COPY    "CPRCF064.INC"  REPLACING   //RECE64//
@@ -804,6 +811,15 @@
            03  CONS-BOKOHO1         PIC X(09) VALUE "099400001".
       *    ¼§µ¤¤Ë¤è¤ëç¯æùÅù»É·ãË¡
            03  CONS-BOKOHO2         PIC X(09) VALUE "140055110".
+      *
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
+           03  CONS-CYOJKSN1        PIC X(09) VALUE "190076570".
+      *    ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
+           03  CONS-CYOJKSN2        PIC X(09) VALUE "190076670".
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
+           03  CONS-CYOJKSN3        PIC X(09) VALUE "190127510".
+      *    ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
+           03  CONS-CYOJKSN4        PIC X(09) VALUE "190127610".
       *
       *    ºßÂð´µ¼Ô¶¦Æ±¿ÇÎÅÎÁ¥Æ¡¼¥Ö¥ë
        01  TBL-ZAIKYO-CHECK-AREA.
@@ -1529,6 +1545,11 @@
       *                  ¡ÊÉÂÅïÌôºÞ¶ÈÌ³¼Â»Ü²Ã»»¤Î»»ÄêÆü¤Î¥»¥Ã¥È¡Ë
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2001-BYOYAK-HANTEI-SEC
+                          END-IF
+      *                  ¡ÊÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡Ë
+      *                    Æþ±¡¿ÇÎÅ²Ã»»¤Î»»Äê³«»ÏÆü¤Î¥»¥Ã¥È¡Ë
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-CYOJKSN-HANTEI-SEC
                           END-IF
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2099-RECE64-TENSOU-SEC
@@ -7577,28 +7598,28 @@
                    MOVE    "900"            TO   RECE659-SRYSYUKBN
                  WHEN      "92"
                    IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
-                     COMPUTE RECE659-ZAINUM =  99994050  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994500  +  IDX19
                    END-IF
                    IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
-                     COMPUTE RECE659-ZAINUM =  99994055  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994505  +  IDX19
                    END-IF
                    IF  (RECE64-FLG-EISAPO-COMMENT    =    "2")
-                     COMPUTE RECE659-ZAINUM =  99994060  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994510  +  IDX19
                    END-IF
                    IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
-                     COMPUTE RECE659-ZAINUM =  99994065  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994515  +  IDX19
                    END-IF
                    IF  (RECE64-FLG-JYUSYO-COMMENT    =    "2")
-                     COMPUTE RECE659-ZAINUM =  99994070  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994520  +  IDX19
                    END-IF
                    IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
-                     COMPUTE RECE659-ZAINUM =  99994075  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994525  +  IDX19
                    END-IF
                    IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
-                     COMPUTE RECE659-ZAINUM =  99994080  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994530  +  IDX19
                    END-IF
                    IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
-                     COMPUTE RECE659-ZAINUM =  99994085  +  IDX19
+                     COMPUTE RECE659-ZAINUM =  99994535  +  IDX19
                    END-IF
                    MOVE    "920"            TO   RECE659-SRYSYUKBN
                END-EVALUATE
@@ -7658,28 +7679,28 @@
                END-IF
              WHEN      "92"
                IF  (RECE64-FLG-KAKURI-COMMENT    =    "1")
-                 COMPUTE RECE649-ZAINUM =  99994050  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994500  +  IDX19
                END-IF
                IF  (RECE64-FLG-EISAPO-COMMENT    =    "1")
-                 COMPUTE RECE649-ZAINUM =  99994055  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994505  +  IDX19
                END-IF
                IF  (RECE64-FLG-EISAPO-COMMENT    =    "2")
-                 COMPUTE RECE649-ZAINUM =  99994060  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994510  +  IDX19
                END-IF
                IF  (RECE64-FLG-KOKKEA-COMMENT    =    "1")
-                 COMPUTE RECE649-ZAINUM =  99994065  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994515  +  IDX19
                END-IF
                IF  (RECE64-FLG-JYUSYO-COMMENT    =    "2")
-                 COMPUTE RECE649-ZAINUM =  99994070  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994520  +  IDX19
                END-IF
                IF  (RECE64-FLG-JYUSYO-COMMENT    =    "1")
-                 COMPUTE RECE649-ZAINUM =  99994075  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994525  +  IDX19
                END-IF
                IF  (RECE64-FLG-SEIRIE-COMMENT    =    "1")
-                 COMPUTE RECE649-ZAINUM =  99994080  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994530  +  IDX19
                END-IF
                IF  (RECE64-FLG-BYOYAK-COMMENT    =    "1")
-                 COMPUTE RECE649-ZAINUM =  99994085  +  IDX19
+                 COMPUTE RECE649-ZAINUM =  99994535  +  IDX19
                END-IF
            END-EVALUATE
            MOVE    ZERO                TO  RECE649-ZAIREN
@@ -7697,6 +7718,416 @@
       *
            .
        20012-NYUKASAN-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤Î»»Äê³«»ÏÆü¥³¥á¥ó¥ÈÊÔ½¸
+      *****************************************************************
+       2001-NYU-COMMENT2-SEC          SECTION.
+      *
+           INITIALIZE  WRK-JIDO-SETCOM-AREA
+      *
+           PERFORM     20011-NYU-DAY2-SEC
+      *
+           PERFORM     200111-RECE65-TAIHI-SEC
+      *
+      *    £Ò£Å£Ã£Å£°£µ¥Õ¥¡¥¤¥ë¤ÎÆâÍÆ¤ò¥Æ¡¼¥Ö¥ë¤ËÂàÈò
+           MOVE    ZERO                 TO  IDX-RECE65
+           MOVE    SPACE                TO  WRK-RECE65XX-REC
+           INITIALIZE                       WRK-RECE65XX-REC
+      *
+           MOVE    RECE64-MEISAISU      TO  MAX-MEISAISU
+      *
+           IF    WRK-CYOJKSN-YMD  NOT =  SPACE
+      *
+      *      »»ÄêÆü¥³¥á¥ó¥È¤ÎÁÞÆþ
+             COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
+             MOVE   "810000001"
+                           TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+             MOVE    ZERO  TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+             MOVE    15    TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE   "»»Äê³«»ÏÆü¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                           TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+      *
+             INITIALIZE                         STS-AREA-DAY
+             INITIALIZE                         LNK-DAY2-AREA
+             MOVE    "21"                   TO  LNK-DAY2-IRAI
+             MOVE    WRK-CYOJKSN-YMD        TO  LNK-DAY2-YMD
+             CALL    "ORCSDAY"    USING     STS-AREA-DAY
+                                            LNK-DAY2-AREA
+             IF      STS-DAY-RC1            =   ZERO
+                MOVE    LNK-DAY2-EDTYMD1-Y   TO  WRK-TAIHI-XX
+                INITIALIZE                       ORCSKANACHKAREA
+                MOVE    "2"                  TO  KANACHK-SYORI
+                MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                IF      KANACHK-RC      =   ZERO
+                   MOVE    KANACHK-OUT-INPUT(1:4)
+                           TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(13:4)
+                END-IF
+      *
+                MOVE    LNK-DAY2-EDTYMD1-M   TO  WRK-TAIHI-XX
+                INITIALIZE                       ORCSKANACHKAREA
+                MOVE    "2"                  TO  KANACHK-SYORI
+                MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                IF      KANACHK-RC      =   ZERO
+                   MOVE    KANACHK-OUT-INPUT(1:4)
+                           TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(19:4)
+                END-IF
+      *
+                MOVE    LNK-DAY2-EDTYMD1-D   TO  WRK-TAIHI-XX
+                INITIALIZE                       ORCSKANACHKAREA
+                MOVE    "2"                  TO  KANACHK-SYORI
+                MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                IF      KANACHK-RC      =   ZERO
+                   MOVE    KANACHK-OUT-INPUT(1:4)
+                           TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(25:4)
+                END-IF
+             END-IF
+      *
+             MOVE    "1"   TO  WRK-RECE65XX-RECEDENFLG(MAX-MEISAISU 1)
+      *
+           END-IF
+      *
+           PERFORM    200111-SRYACTINF-HENSYU-SEC
+      *
+           IF    WRK-CYOJKSN-YMD  NOT =  SPACE
+      *
+             IF     RECE64-ZAISKBKBN             =    "6"
+             AND    RECE64-MEISAISU              =     1
+               IF   RECE64-FLG-CYOJKSN-COMMENT   =
+                                 "1" OR "2" OR "3" OR "4"
+                 PERFORM    20012-NYUKASAN-HENSYU2-SEC
+               END-IF
+             END-IF
+      *
+           END-IF
+      *
+           .
+       2001-NYU-COMMENT2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤Î»»Äê³«»ÏÆü¸¡º÷
+      *****************************************************************
+       20011-NYU-DAY2-SEC          SECTION.
+      *
+           MOVE    ZERO                 TO  FLG-CYOJKSN-OK
+           MOVE    SPACE                TO  WRK-CYOJKSN-YMD
+           MOVE    SPACE                TO  WRK-CYOJKSN-TAIHIYM
+           INITIALIZE                       WRK-CYOJKSN-DAY-TBL
+      *
+           MOVE    ZERO                 TO  FLG-CHECK-MAE
+      *
+           INITIALIZE                       SRYACT-REC
+           MOVE    RECE62-HOSPNUM       TO  SRY-HOSPNUM
+           MOVE    RECE62-NYUGAIKBN     TO  SRY-NYUGAIKBN
+           MOVE    RECE62-PTID          TO  SRY-PTID
+           MOVE    RECE62-NYUINYMD(1:6) TO  SRY-SRYYM
+           EVALUATE  RECE64-FLG-CYOJKSN-COMMENT
+             WHEN     "1"
+               MOVE    CONS-CYOJKSN1    TO  SRY-SRYCD (1)
+                                            SRY-SRYCD (2)
+                                            SRY-SRYCD (3)
+                                            SRY-SRYCD (4)
+                                            SRY-SRYCD (5)
+             WHEN     "2"
+               MOVE    CONS-CYOJKSN2    TO  SRY-SRYCD (1)
+                                            SRY-SRYCD (2)
+                                            SRY-SRYCD (3)
+                                            SRY-SRYCD (4)
+                                            SRY-SRYCD (5)
+             WHEN     "3"
+               MOVE    CONS-CYOJKSN3    TO  SRY-SRYCD (1)
+                                            SRY-SRYCD (2)
+                                            SRY-SRYCD (3)
+                                            SRY-SRYCD (4)
+                                            SRY-SRYCD (5)
+             WHEN     "4"
+               MOVE    CONS-CYOJKSN4    TO  SRY-SRYCD (1)
+                                            SRY-SRYCD (2)
+                                            SRY-SRYCD (3)
+                                            SRY-SRYCD (4)
+                                            SRY-SRYCD (5)
+           END-EVALUATE
+           MOVE    SRYACT-REC           TO  MCPDATA-REC
+           MOVE    "tbl_sryact"         TO  MCP-TABLE
+           MOVE    "key21"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+             MOVE    "tbl_sryact"       TO  MCP-TABLE
+             MOVE    "key21"            TO  MCP-PATHNAME
+             PERFORM  900-SRYACT-READ-SEC
+             PERFORM  UNTIL   FLG-SRYACT      =   1
+                       OR     FLG-CYOJKSN-OK  =   1
+               INITIALIZE                   SRYACCT-REC
+               MOVE    SRY-HOSPNUM      TO  ACCT-HOSPNUM
+               MOVE    SRY-NYUGAIKBN    TO  ACCT-NYUGAIKBN
+               MOVE    SRY-PTID         TO  ACCT-PTID
+               MOVE    SRY-SRYKA        TO  ACCT-SRYKA
+               MOVE    SRY-SRYYM        TO  ACCT-SRYYM
+               MOVE    SRY-ZAINUM       TO  ACCT-ZAINUM
+               MOVE    SRYACCT-REC      TO  MCPDATA-REC
+               MOVE    "tbl_sryacct"    TO  MCP-TABLE
+               MOVE    "key31"          TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC           =   ZERO
+                  MOVE "tbl_sryacct"    TO  MCP-TABLE
+                  MOVE "key31"          TO  MCP-PATHNAME
+                  PERFORM 900-DBFETCH-SEC
+                  IF      MCP-RC        =   ZERO
+                    MOVE  MCPDATA-REC   TO  SRYACCT-REC
+                    IF (WRK-CYOJKSN-TAIHIYM = SPACE     )
+                    OR (WRK-CYOJKSN-TAIHIYM = ACCT-SRYYM)
+                      MOVE    RECE62-NYUINYMD(7:2) TO  IDX28
+                      PERFORM  VARYING  IDX26  FROM  1  BY  1
+                                UNTIL   IDX26   >   31
+                        IF   ACCT-DAY(1 IDX26)  NOT =  ZERO
+                          IF  (ACCT-SRYYM = RECE62-NYUINYMD(1:6))
+                          AND (IDX26      <  IDX28              )
+                            MOVE   1    TO  FLG-CHECK-MAE
+                          ELSE
+                            MOVE   1    TO  WRK-CYOJKSN-DAY(IDX26)
+                            MOVE   ACCT-SRYYM
+                                        TO  WRK-CYOJKSN-TAIHIYM
+                          END-IF
+                        END-IF
+                      END-PERFORM
+                    ELSE
+                      MOVE    1         TO  FLG-CYOJKSN-OK
+                    END-IF
+                  END-IF
+               END-IF
+               MOVE    "tbl_sryacct"    TO  MCP-TABLE
+               MOVE    "key31"          TO  MCP-PATHNAME
+               PERFORM   900-CLOSE-SEC
+      *
+               MOVE    "tbl_sryact"     TO  MCP-TABLE
+               MOVE    "key21"          TO  MCP-PATHNAME
+               PERFORM   900-SRYACT-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE    "tbl_sryact"         TO  MCP-TABLE
+           MOVE    "key21"              TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+           PERFORM  VARYING  IDX26  FROM  1  BY  1
+                     UNTIL   IDX26   >   31
+             IF   WRK-CYOJKSN-DAY(IDX26)  NOT =  ZERO
+               MOVE   WRK-CYOJKSN-TAIHIYM  TO  WRK-CYOJKSN-YMD(1:6)
+               MOVE   IDX26                TO  WRK-CYOJKSN-YMD(7:2)
+               MOVE   31                   TO  IDX26
+             END-IF
+           END-PERFORM
+      *
+           IF     FLG-CHECK-MAE  =  1
+               MOVE   SPACE                TO  WRK-CYOJKSN-YMD
+           END-IF
+      *
+           .
+       20011-NYU-DAY2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ¡Ê¥ì¥»ÅÅÍÑ¡Ë
+      *****************************************************************
+       20012-NYUKASAN-HENSYU2-SEC          SECTION.
+      *
+      *    £Ò£Å£Ã£Å£°£µ¥Õ¥¡¥¤¥ë¤ÎÆâÍÆ¤ò¥Æ¡¼¥Ö¥ë¤ËÂàÈò
+           MOVE    ZERO                 TO  IDX-RECE65
+           MOVE    SPACE                TO  WRK-RECE65XX-REC
+           INITIALIZE                       WRK-RECE65XX-REC
+      *
+           MOVE    1                    TO  MAX-MEISAISU
+      *
+           MOVE  "810000001"  TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+           MOVE   ZERO        TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+           IF  (RECE64-FLG-CYOJKSN-COMMENT    =    "1")
+             MOVE   24        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë»»Äê³«»ÏÆü"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           IF  (RECE64-FLG-CYOJKSN-COMMENT    =    "2")
+             MOVE   25        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë»»Äê³«»ÏÆü"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           IF  (RECE64-FLG-CYOJKSN-COMMENT    =    "3")
+             MOVE   24        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë»»Äê³«»ÏÆü"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           IF  (RECE64-FLG-CYOJKSN-COMMENT    =    "4")
+             MOVE   25        TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë»»Äê³«»ÏÆü"
+                              TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+           END-IF
+           MOVE  "1"          TO  WRK-RECE65XX-RECEPTFLG(MAX-MEISAISU 1)
+      *
+      *    »»ÄêÆü¥³¥á¥ó¥È¤ÎÁÞÆþ
+           COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
+           MOVE   "810000001"
+                         TO  WRK-RECE65XX-SRYCD(MAX-MEISAISU 1)
+           MOVE    ZERO  TO  WRK-RECE65XX-SRYSURYO(MAX-MEISAISU 1)
+           MOVE    9     TO  WRK-RECE65XX-YUKOKETA(MAX-MEISAISU 1)
+           MOVE   "¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)
+      *
+           INITIALIZE                         STS-AREA-DAY
+           INITIALIZE                         LNK-DAY2-AREA
+           MOVE    "21"                   TO  LNK-DAY2-IRAI
+           MOVE    WRK-CYOJKSN-YMD        TO  LNK-DAY2-YMD
+           CALL    "ORCSDAY"    USING     STS-AREA-DAY
+                                          LNK-DAY2-AREA
+           IF      STS-DAY-RC1            =   ZERO
+              MOVE    LNK-DAY2-EDTYMD1-Y   TO  WRK-TAIHI-XX
+              INITIALIZE                       ORCSKANACHKAREA
+              MOVE    "2"                  TO  KANACHK-SYORI
+              MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+              CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+              IF      KANACHK-RC      =   ZERO
+                 MOVE    KANACHK-OUT-INPUT(1:4)
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(1:4)
+              END-IF
+      *
+              MOVE    LNK-DAY2-EDTYMD1-M   TO  WRK-TAIHI-XX
+              INITIALIZE                       ORCSKANACHKAREA
+              MOVE    "2"                  TO  KANACHK-SYORI
+              MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+              CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+              IF      KANACHK-RC      =   ZERO
+                 MOVE    KANACHK-OUT-INPUT(1:4)
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(7:4)
+              END-IF
+      *
+              MOVE    LNK-DAY2-EDTYMD1-D   TO  WRK-TAIHI-XX
+              INITIALIZE                       ORCSKANACHKAREA
+              MOVE    "2"                  TO  KANACHK-SYORI
+              MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+              CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+              IF      KANACHK-RC      =   ZERO
+                 MOVE    KANACHK-OUT-INPUT(1:4)
+                         TO  WRK-RECE65XX-NAME(MAX-MEISAISU 1)(13:4)
+              END-IF
+           END-IF
+      *
+           MOVE   "1"    TO  WRK-RECE65XX-RECEPTFLG(MAX-MEISAISU 1)
+      *
+      *    ¥³¥á¥ó¥È¤ò´Þ¤ó¤ÀÆâÍÆ¤ÇÃæ´Ö¥Õ¥¡¥¤¥ë¤ÎºÆºîÀ®
+           MOVE       ZERO             TO      FLG-WRKRECE65
+           MOVE       ZERO             TO      IDX
+           MOVE       ZERO             TO      IDX-RECE65
+           MOVE       ZERO             TO      WRK-RENNUM
+           MOVE       ZERO             TO      WRK-CNT-MEISAI
+           PERFORM    UNTIL     FLG-WRKRECE65  =    1
+               INITIALIZE                        RECE659-REC
+               MOVE    RECE64-KEY           TO   RECE659-KEY
+               COMPUTE IDX19              =  RECE64-KOHBUNRI + 1
+               EVALUATE  RECE64-SRYKBN
+                 WHEN      "90"
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994100  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "2")
+                     COMPUTE RECE659-ZAINUM =  99994105  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "3")
+                     COMPUTE RECE659-ZAINUM =  99994110  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "4")
+                     COMPUTE RECE659-ZAINUM =  99994115  +  IDX19
+                   END-IF
+                   MOVE    "900"            TO   RECE659-SRYSYUKBN
+                 WHEN      "92"
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "1")
+                     COMPUTE RECE659-ZAINUM =  99994600  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "2")
+                     COMPUTE RECE659-ZAINUM =  99994605  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "3")
+                     COMPUTE RECE659-ZAINUM =  99994610  +  IDX19
+                   END-IF
+                   IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "4")
+                     COMPUTE RECE659-ZAINUM =  99994615  +  IDX19
+                   END-IF
+                   MOVE    "920"            TO   RECE659-SRYSYUKBN
+               END-EVALUATE
+               MOVE    ZERO                 TO   RECE659-ZAIREN
+               ADD     1                    TO   WRK-RENNUM
+               MOVE    WRK-RENNUM           TO   RECE659-RENNUM
+               MOVE    RECE64-KOHBUNRI      TO   RECE659-KOHBUNRI
+               MOVE    RECE64-PTNUM         TO   RECE659-PTNUM
+               MOVE    RECE64-SRYKA         TO   RECE659-SRYKA
+               MOVE    RECE64-SRYKBN        TO   RECE659-SRYKBN
+               MOVE    ZERO                 TO   RECE659-JIHIMONEY
+               PERFORM  VARYING   IDX   FROM   1   BY   1
+                         UNTIL   (IDX       >    5)   OR
+                                 (FLG-WRKRECE65   =   1)
+                   ADD        1             TO    IDX-RECE65
+                   IF  WRK-RECE65XX-SRYCD(IDX-RECE65 1) = SPACE
+                       MOVE   1             TO    FLG-WRKRECE65
+                   ELSE
+                       MOVE  WRK-RECE65XX-SRYACT-TBL(IDX-RECE65 1)
+                                        TO   RECE659-SRYACT-TBL(IDX)
+                       ADD   1          TO   WRK-CNT-MEISAI
+                   END-IF
+               END-PERFORM
+               IF   RECE659-SRYCD(1)  NOT =  SPACE
+                   WRITE   RECE659-REC
+                   ADD     1            TO   CNT-RECE659
+               END-IF
+           END-PERFORM
+      *
+           PERFORM 500-RECE64-KEY-HENSYU-SEC
+           COMPUTE IDX19                =  RECE64-KOHBUNRI + 1
+           EVALUATE  RECE64-SRYKBN
+             WHEN      "90"
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994100  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "2")
+                 COMPUTE RECE649-ZAINUM =  99994105  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "3")
+                 COMPUTE RECE649-ZAINUM =  99994110  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "4")
+                 COMPUTE RECE649-ZAINUM =  99994115  +  IDX19
+               END-IF
+             WHEN      "92"
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "1")
+                 COMPUTE RECE649-ZAINUM =  99994600  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "2")
+                 COMPUTE RECE649-ZAINUM =  99994605  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "3")
+                 COMPUTE RECE649-ZAINUM =  99994610  +  IDX19
+               END-IF
+               IF  (RECE64-FLG-CYOJKSN-COMMENT   =    "4")
+                 COMPUTE RECE649-ZAINUM =  99994615  +  IDX19
+               END-IF
+           END-EVALUATE
+           MOVE    ZERO                TO  RECE649-ZAIREN
+           MOVE    RECE64-KOHBUNRI     TO  RECE649-KOHBUNRI
+           MOVE    RECE64-SRYKBN       TO  RECE649-SRYKBN
+           MOVE    "6"                 TO  RECE649-ZAISKBKBN
+           MOVE    RECE64-PTNUM        TO  RECE649-PTNUM
+           MOVE    RECE64-SRYKA        TO  RECE649-SRYKA
+           MOVE    RECE64-HKNCOMBI     TO  RECE649-HKNCOMBI
+      *
+           MOVE    WRK-CNT-MEISAI      TO  RECE649-MEISAISU
+      *
+           WRITE   RECE649-REC
+           ADD     1                   TO  CNT-RECE649
+      *
+           .
+       20012-NYUKASAN-HENSYU2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -7787,6 +8218,22 @@
       *
            .
        2001-BYOYAK-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤¬¤¢¤ë¤«È½Äê¡Ê¿ÇÎÅ¹Ô°ÙÆþÎÏ¡Ë
+      *****************************************************************
+       2001-CYOJKSN-HANTEI-SEC          SECTION.
+      *
+           IF      RECE64-FLG-CYOJKSN-COMMENT
+                                      =    "1" OR "2" OR "3" OR "4"
+               MOVE       99      TO     FLG-COMMENT
+               PERFORM   2001-NYU-COMMENT2-SEC
+           END-IF
+      *
+           .
+       2001-CYOJKSN-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************

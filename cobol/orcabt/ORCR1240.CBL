@@ -261,6 +261,7 @@
            03  FLG-RETRY           PIC 9(01).
            03  FLG-ZAIKYO-OK       PIC 9(01).
            03  FLG-ZAIKYOCOMARI    PIC 9(01).
+           03  FLG-CYOJKSN-OK      PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -431,6 +432,7 @@
            03  WRK-SINPESUR-YMD              PIC X(08).
            03  WRK-ZAIKYO-YMD                PIC X(08).
            03  WRK-BOKOHO-YMD                PIC X(08).
+           03  WRK-CYOJKSN-YMD               PIC X(08).
       *
            03  WRK-GANSIDO-YMD-AREA.
                05  WRK-GANSIDO-YMD           PIC X(08)
@@ -443,6 +445,11 @@
       *
            03  WRK-ZAIKYO-YMD9               PIC X(08).
            03  WRK-ZAIKYO-KAISU              PIC 9(02).
+      *
+           03  WRK-CYOJKSN-TAIHIYM           PIC X(06).
+           03  WRK-CYOJKSN-DAY-TBL.
+               05  WRK-CYOJKSN-DAY           PIC 9(01)
+                                             OCCURS 31.
       *
        01  WRK-RECE220-REC. 
            COPY    "CPRCF220.INC"  REPLACING   //RECE220//
@@ -607,6 +614,15 @@
            03  CONS-BOKOHO1         PIC X(09) VALUE "099400001".
       *    ¼§µ¤¤Ë¤è¤ëç¯æùÅù»É·ãË¡
            03  CONS-BOKOHO2         PIC X(09) VALUE "140055110".
+      *
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
+           03  CONS-CYOJKSN1        PIC X(09) VALUE "190076570".
+      *    ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
+           03  CONS-CYOJKSN2        PIC X(09) VALUE "190076670".
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
+           03  CONS-CYOJKSN3        PIC X(09) VALUE "190127510".
+      *    ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
+           03  CONS-CYOJKSN4        PIC X(09) VALUE "190127610".
       *
       *    ºßÂð´µ¼Ô¶¦Æ±¿ÇÎÅÎÁ¥Æ¡¼¥Ö¥ë
        01  TBL-ZAIKYO-CHECK-AREA.
@@ -1266,6 +1282,11 @@
       *                  ¡ÊÉÂÅïÌôºÞ¶ÈÌ³¼Â»Ü²Ã»»¤Î»»ÄêÆü¤Î¥»¥Ã¥È¡Ë
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2001-BYOYAK-HANTEI-SEC
+                          END-IF
+      *                  ¡ÊÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡Ë
+      *                    Æþ±¡¿ÇÎÅ²Ã»»¤Î»»Äê³«»ÏÆü¤Î¥»¥Ã¥È¡Ë
+                          IF   FLG-COMMENT  =  ZERO
+                            PERFORM    2001-CYOJKSN-HANTEI-SEC
                           END-IF
                           IF   FLG-COMMENT  =  ZERO
                             PERFORM    2099-RECE220-TENSOU-SEC
@@ -5406,6 +5427,202 @@
            EXIT.
       *
       *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤Î»»Äê³«»ÏÆü¥³¥á¥ó¥ÈÊÔ½¸
+      *****************************************************************
+       2001-NYU-COMMENT2-SEC          SECTION.
+      *
+           PERFORM     20011-NYU-DAY2-SEC
+      *
+           PERFORM     200111-RECE230-TAIHI-SEC
+      *
+      *    £Ò£Å£Ã£Å£°£µ¥Õ¥¡¥¤¥ë¤ÎÆâÍÆ¤ò¥Æ¡¼¥Ö¥ë¤ËÂàÈò
+           MOVE    ZERO                 TO  IDX-RECE230
+           MOVE    SPACE                TO  WRK-RECE230XX-REC
+           INITIALIZE                       WRK-RECE230XX-REC
+      *
+           MOVE    RECE220-MEISAISU     TO  MAX-MEISAISU
+      *
+           IF    WRK-CYOJKSN-YMD  NOT =  SPACE
+      *
+      *      »»ÄêÆü¥³¥á¥ó¥È¤ÎÁÞÆþ
+             COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
+             MOVE   "810000001"
+                           TO  WRK-RECE230XX-SRYCD(MAX-MEISAISU 1)
+             MOVE    ZERO  TO  WRK-RECE230XX-SRYSURYO(MAX-MEISAISU 1)
+             MOVE    15    TO  WRK-RECE230XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE   "»»Äê³«»ÏÆü¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)
+      *
+             INITIALIZE                         STS-AREA-DAY
+             INITIALIZE                         LNK-DAY2-AREA
+             MOVE    "21"                   TO  LNK-DAY2-IRAI
+             MOVE    WRK-CYOJKSN-YMD        TO  LNK-DAY2-YMD
+             CALL    "ORCSDAY"    USING     STS-AREA-DAY
+                                            LNK-DAY2-AREA
+             IF      STS-DAY-RC1            =   ZERO
+                MOVE    LNK-DAY2-EDTYMD1-Y   TO  WRK-TAIHI-XX
+                INITIALIZE                       ORCSKANACHKAREA
+                MOVE    "2"                  TO  KANACHK-SYORI
+                MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                IF      KANACHK-RC      =   ZERO
+                   MOVE    KANACHK-OUT-INPUT(1:4)
+                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)(13:4)
+                END-IF
+      *
+                MOVE    LNK-DAY2-EDTYMD1-M   TO  WRK-TAIHI-XX
+                INITIALIZE                       ORCSKANACHKAREA
+                MOVE    "2"                  TO  KANACHK-SYORI
+                MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                IF      KANACHK-RC      =   ZERO
+                   MOVE    KANACHK-OUT-INPUT(1:4)
+                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)(19:4)
+                END-IF
+      *
+                MOVE    LNK-DAY2-EDTYMD1-D   TO  WRK-TAIHI-XX
+                INITIALIZE                       ORCSKANACHKAREA
+                MOVE    "2"                  TO  KANACHK-SYORI
+                MOVE    WRK-TAIHI-XX         TO  KANACHK-MAE-INPUT
+                CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
+                IF      KANACHK-RC      =   ZERO
+                   MOVE    KANACHK-OUT-INPUT(1:4)
+                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)(25:4)
+                END-IF
+             END-IF
+      *
+           END-IF
+      *
+           PERFORM    200111-SRYACTINF-HENSYU-SEC
+      *
+           .
+       2001-NYU-COMMENT2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤Î»»Äê³«»ÏÆü¸¡º÷
+      *****************************************************************
+       20011-NYU-DAY2-SEC          SECTION.
+      *
+           MOVE    ZERO                 TO  FLG-CYOJKSN-OK
+           MOVE    SPACE                TO  WRK-CYOJKSN-YMD
+           MOVE    SPACE                TO  WRK-CYOJKSN-TAIHIYM
+           INITIALIZE                       WRK-CYOJKSN-DAY-TBL
+      *
+           MOVE    ZERO                 TO  FLG-CHECK-MAE
+      *
+           INITIALIZE                        SRYACT-REC
+           MOVE    RECE200-HOSPNUM       TO  SRY-HOSPNUM
+           MOVE    RECE200-NYUGAIKBN     TO  SRY-NYUGAIKBN
+           MOVE    RECE200-PTID          TO  SRY-PTID
+           MOVE    RECE200-NYUINYMD(1:6) TO  SRY-SRYYM
+           EVALUATE  RECE220-FLG-CYOJKSN-COMMENT
+             WHEN     "1"
+               MOVE    CONS-CYOJKSN1    TO  SRY-SRYCD (1)
+                                            SRY-SRYCD (2)
+                                            SRY-SRYCD (3)
+                                            SRY-SRYCD (4)
+                                            SRY-SRYCD (5)
+             WHEN     "2"
+               MOVE    CONS-CYOJKSN2    TO  SRY-SRYCD (1)
+                                            SRY-SRYCD (2)
+                                            SRY-SRYCD (3)
+                                            SRY-SRYCD (4)
+                                            SRY-SRYCD (5)
+             WHEN     "3"
+               MOVE    CONS-CYOJKSN3    TO  SRY-SRYCD (1)
+                                            SRY-SRYCD (2)
+                                            SRY-SRYCD (3)
+                                            SRY-SRYCD (4)
+                                            SRY-SRYCD (5)
+             WHEN     "4"
+               MOVE    CONS-CYOJKSN4    TO  SRY-SRYCD (1)
+                                            SRY-SRYCD (2)
+                                            SRY-SRYCD (3)
+                                            SRY-SRYCD (4)
+                                            SRY-SRYCD (5)
+           END-EVALUATE
+           MOVE    SRYACT-REC           TO  MCPDATA-REC
+           MOVE    "tbl_sryact"         TO  MCP-TABLE
+           MOVE    "key21"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC               =   ZERO
+             MOVE    "tbl_sryact"       TO  MCP-TABLE
+             MOVE    "key21"            TO  MCP-PATHNAME
+             PERFORM  900-SRYACT-READ-SEC
+             PERFORM  UNTIL   FLG-SRYACT      =   1
+                       OR     FLG-CYOJKSN-OK  =   1
+               INITIALIZE                   SRYACCT-REC
+               MOVE    SRY-HOSPNUM      TO  ACCT-HOSPNUM
+               MOVE    SRY-NYUGAIKBN    TO  ACCT-NYUGAIKBN
+               MOVE    SRY-PTID         TO  ACCT-PTID
+               MOVE    SRY-SRYKA        TO  ACCT-SRYKA
+               MOVE    SRY-SRYYM        TO  ACCT-SRYYM
+               MOVE    SRY-ZAINUM       TO  ACCT-ZAINUM
+               MOVE    SRYACCT-REC      TO  MCPDATA-REC
+               MOVE    "tbl_sryacct"    TO  MCP-TABLE
+               MOVE    "key31"          TO  MCP-PATHNAME
+               PERFORM 900-DBSELECT-SEC
+               IF      MCP-RC           =   ZERO
+                  MOVE "tbl_sryacct"    TO  MCP-TABLE
+                  MOVE "key31"          TO  MCP-PATHNAME
+                  PERFORM 900-DBFETCH-SEC
+                  IF      MCP-RC        =   ZERO
+                    MOVE  MCPDATA-REC   TO  SRYACCT-REC
+                    IF (WRK-CYOJKSN-TAIHIYM = SPACE     )
+                    OR (WRK-CYOJKSN-TAIHIYM = ACCT-SRYYM)
+                      MOVE    RECE200-NYUINYMD(7:2) TO  IDX28
+                      PERFORM  VARYING  IDX26  FROM  1  BY  1
+                                UNTIL   IDX26   >   31
+                        IF   ACCT-DAY(1 IDX26)  NOT =  ZERO
+                          IF  (ACCT-SRYYM = RECE200-NYUINYMD(1:6))
+                          AND (IDX26      <  IDX28               )
+                            MOVE   1    TO  FLG-CHECK-MAE
+                          ELSE
+                            MOVE   1    TO  WRK-CYOJKSN-DAY(IDX26)
+                            MOVE   ACCT-SRYYM
+                                        TO  WRK-CYOJKSN-TAIHIYM
+                          END-IF
+                        END-IF
+                      END-PERFORM
+                    ELSE
+                      MOVE    1         TO  FLG-CYOJKSN-OK
+                    END-IF
+                  END-IF
+               END-IF
+               MOVE    "tbl_sryacct"    TO  MCP-TABLE
+               MOVE    "key31"          TO  MCP-PATHNAME
+               PERFORM   900-CLOSE-SEC
+      *
+               MOVE    "tbl_sryact"     TO  MCP-TABLE
+               MOVE    "key21"          TO  MCP-PATHNAME
+               PERFORM   900-SRYACT-READ-SEC
+             END-PERFORM
+           END-IF
+           MOVE    "tbl_sryact"         TO  MCP-TABLE
+           MOVE    "key21"              TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+           PERFORM  VARYING  IDX26  FROM  1  BY  1
+                     UNTIL   IDX26   >   31
+             IF   WRK-CYOJKSN-DAY(IDX26)  NOT =  ZERO
+               MOVE   WRK-CYOJKSN-TAIHIYM  TO  WRK-CYOJKSN-YMD(1:6)
+               MOVE   IDX26                TO  WRK-CYOJKSN-YMD(7:2)
+               MOVE   31                   TO  IDX26
+             END-IF
+           END-PERFORM
+      *
+           IF     FLG-CHECK-MAE  =  1
+               MOVE   SPACE                TO  WRK-CYOJKSN-YMD
+           END-IF
+      *
+           .
+       20011-NYU-DAY2-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    Àº¿À²Ê³ÖÎ¥ÉÂ¼¼´ÉÍý²Ã»»¡ÊÆþ±¡ÎÁ²Ã»»¡Ë¤Î¥³¥á¥ó¥È¤¬¤¢¤ë¤«È½Äê
       *    ¡Ê¿ÇÎÅ¹Ô°ÙÆþÎÏ¡Ë
       *****************************************************************
@@ -5493,6 +5710,22 @@
       *
            .
        2001-BYOYAK-HANTEI-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤¬¤¢¤ë¤«È½Äê¡Ê¿ÇÎÅ¹Ô°ÙÆþÎÏ¡Ë
+      *****************************************************************
+       2001-CYOJKSN-HANTEI-SEC          SECTION.
+      *
+           IF      RECE220-FLG-CYOJKSN-COMMENT
+                                      =    "1" OR "2" OR "3" OR "4"
+               MOVE       99      TO     FLG-COMMENT
+               PERFORM   2001-NYU-COMMENT2-SEC
+           END-IF
+      *
+           .
+       2001-CYOJKSN-HANTEI-EXT.
            EXIT.
       *
       *****************************************************************
