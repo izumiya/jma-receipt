@@ -439,6 +439,8 @@
                            11  SPA-GMN-1026-F4    PIC X(01).
                            11  SPA-GMN-DISCOUNT-OBJMEI
                                                   PIC X(18).
+      *H26.4
+                       09  SPA-GMN-1026-KFLG      PIC 9(01).
                    07  SPA-GMN-1027-AREA.
                        09  SPA-GMN-TEIRITULST         OCCURS  2.
                            11  SPA-GMN-TEIRITUL       PIC X(01).
@@ -450,6 +452,9 @@
                            11  SPA-GMN-TEIRITUMEI     PIC X(08).
                        09  SPA-GMN-DISCOUNT-RATE  PIC 9(07).
                        09  SPA-GMN-LBL-RATE       PIC X(02).
+      *H26.4
+                       09  SPA-GMN-1027-KFLG      PIC 9(01).
+      *
                    07  SPA-GMN-1018-AREA.
                        09  SPA-GMN-CONDITION-BODY PIC X(20).
                        09  SPA-GMN-CONDITION-WORD PIC X(02).
@@ -2797,7 +2802,6 @@
       *
       *    定額定率区分チェック処理
            PERFORM 4122-TEIRITU-CHK-SEC
-      *
            .
        41021-KIHON-1027-EXT.
            EXIT.
@@ -4705,20 +4709,43 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            EXIT.
       *
       *****************************************************************
-      *       連絡先情報タグの関連チェック処理
+      *       割引率情報タグの関連チェック処理
       *****************************************************************
        4901-TAG4-CHK-SEC           SECTION.
+      *
+      *    区分＝００
+           IF      SPA-W01-KBNCD       =   "00"
+               IF     (SPA-GMN-DISCOUNT-RATE   =   ZERO  )
+                  AND (SPA-GMN-TEIRITU         =   SPACE )
+                   CONTINUE
+               ELSE
+                   IF      SPA-GMN-1027-KFLG   =   ZERO
+                       MOVE    "K015"          TO  SPA-ERRCD
+                       MOVE    40              TO  SPA-GMN-CUR
+                       MOVE    1               TO  SPA-GMN-1027-KFLG
+                   END-IF
+               END-IF
+           END-IF
       *
            .
        4901-TAG4-CHK-EXT.
            EXIT.
-
       *
       *****************************************************************
-      *       広告情報タグの関連チェック処理
+      *       減免事由タグの関連チェック処理
       *****************************************************************
        4901-TAG5-CHK-SEC           SECTION.
       *
+      *    区分＝００
+           IF      SPA-W01-KBNCD       =   "00"
+               IF     (SPA-GMN-DISCOUNT-KBN    NOT =   ZERO  )
+                   IF      SPA-GMN-1026-KFLG   =   ZERO
+                       MOVE    "K010"          TO  SPA-ERRCD
+                       MOVE    51              TO  SPA-GMN-CUR
+                       MOVE    1               TO  SPA-GMN-1026-KFLG
+                   END-IF
+               END-IF
+           END-IF
            .
        4901-TAG5-CHK-EXT.
            EXIT.
@@ -5288,6 +5315,22 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                WHEN    "0015"
                    MOVE    "定率定額区分入力エラー"
                                                TO  SPA-ERRMSG
+      *H26.4
+               WHEN    "K015"
+                   STRING  "警告！"
+                           "「00　該当なし」のコードです。"
+                           "定率定額区分の設定はしないで下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
+               WHEN    "K010"
+                   STRING  "警告！"
+                           "「00　該当なし」のコードです。"
+                           "割引率区分も「00　該当なし」を"
+                           "設定して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "0016"
                    MOVE    "割引対象入力エラー"
                                                TO  SPA-ERRMSG
