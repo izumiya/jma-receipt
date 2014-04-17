@@ -249,8 +249,19 @@
                         (LNK-ORCHCN02SUB-TAIINYMD(1:6)  >= NACCT-SRYYM)
       *                該当入院行為テーブルの読み込み
                        PERFORM    210-NYUINACT-GET-SEC
-      *                入院基本料単位の入院日数カウント
-                       PERFORM    210-NYUIN-COUNT-SEC
+      *
+                       INITIALIZE    TNS-TENSU-REC
+                       MOVE   NSRY-SRYCD(1)   TO    TNS-SRYCD
+                       MOVE   NACCT-SRYYM     TO    TNS-YUKOSTYMD(1:6)
+                                                    TNS-YUKOEDYMD(1:6)
+                       MOVE   "01"            TO    TNS-YUKOSTYMD(7:2)
+                                                    TNS-YUKOEDYMD(7:2)
+                       PERFORM    910-TENSU-READ-SEC
+                       IF     (NACCT-ZAIKAISU    NOT =  ZERO)  OR
+                              (WRK-TANKI-KBN     =      "1")
+      *                  入院基本料単位の入院日数カウント
+                         PERFORM    210-NYUIN-COUNT-SEC
+                       END-IF
                    END-IF
       *
                    MOVE    "tbl_nyuinacct"         TO  MCP-TABLE
