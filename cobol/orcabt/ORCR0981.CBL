@@ -4996,32 +4996,26 @@
       *
                    ADD        1       TO     IDX27
                    IF    IDX27   <    10
-                     MOVE       12      TO     WK-FREE-YUKOKETA2(IDZ)
-                     MOVE     "　回目実施　　月　　日"
+                     MOVE       11      TO     WK-FREE-YUKOKETA2(IDZ)
+                     MOVE     "　回目　　　　月　　日"
                                         TO     WK-FREE-NAME2(IDZ)
                      MOVE      IDX27    TO     DAY-IDX2
                      MOVE      TBL-DAY(DAY-IDX2)(3:2)
                                         TO     WK-FREE-NAME2(IDZ)(1:2)
-                     MOVE      WRK-BOKOHO-YMD2(IDX26)(5:2) TO  DAY-IDX2
-                     MOVE      TBL-DAY(DAY-IDX2)
-                                        TO     WK-FREE-NAME2(IDZ)(11:4)
-                     MOVE      WRK-BOKOHO-YMD2(IDX26)(7:2) TO  DAY-IDX2
-                     MOVE      TBL-DAY(DAY-IDX2)
-                                        TO     WK-FREE-NAME2(IDZ)(17:4)
                    ELSE
-                     MOVE       13      TO     WK-FREE-YUKOKETA2(IDZ)
-                     MOVE     "　　回目実施　　月　　日"
+                     MOVE       11      TO     WK-FREE-YUKOKETA2(IDZ)
+                     MOVE     "　　回目　　　月　　日"
                                         TO     WK-FREE-NAME2(IDZ)
                      MOVE      IDX27    TO     DAY-IDX2
                      MOVE      TBL-DAY(DAY-IDX2)
                                         TO     WK-FREE-NAME2(IDZ)(1:4)
-                     MOVE      WRK-BOKOHO-YMD2(IDX26)(5:2) TO  DAY-IDX2
-                     MOVE      TBL-DAY(DAY-IDX2)
-                                        TO     WK-FREE-NAME2(IDZ)(13:4)
-                     MOVE      WRK-BOKOHO-YMD2(IDX26)(7:2) TO  DAY-IDX2
-                     MOVE      TBL-DAY(DAY-IDX2)
-                                        TO     WK-FREE-NAME2(IDZ)(19:4)
                    END-IF
+                   MOVE      WRK-BOKOHO-YMD2(IDX26)(5:2) TO  DAY-IDX2
+                   MOVE      TBL-DAY(DAY-IDX2)
+                                        TO     WK-FREE-NAME2(IDZ)(11:4)
+                   MOVE      WRK-BOKOHO-YMD2(IDX26)(7:2) TO  DAY-IDX2
+                   MOVE      TBL-DAY(DAY-IDX2)
+                                        TO     WK-FREE-NAME2(IDZ)(17:4)
       *
                    IF    WRK-JIDO-SETCOMATFLG  NOT = ZERO
                      MOVE  "2"        TO     WK-FREE-MEISKYFLG2(IDZ)
