@@ -2140,6 +2140,8 @@
            03  CONS-ZAIKYO4-COMMENT  PIC X(09)  VALUE  "114027910".
       *    初回算定　　　月　　日
            03  CONS-ZAIKYO5-COMMENT  PIC X(09)  VALUE  "840000097".
+      *    通算実施回数（　　回）
+           03  CONS-ZAIKYO6-COMMENT  PIC X(09)  VALUE  "840000086".
       *
       *    在宅患者訪問リハビリテーション指導管理料（同一建物住居者以外）
            03  CONS-ZAIRIHA1-COMMENT PIC X(09)  VALUE  "114006410".
@@ -11373,6 +11375,8 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                 (RECE05-SRYCD(IDX4) = CONS-DOUJITU-COMMENT      ))
            OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
                 (RECE05-SRYCD(IDX4) = CONS-ZAIKYO5-COMMENT      ))
+           OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
+                (RECE05-SRYCD(IDX4) = CONS-ZAIKYO6-COMMENT      ))
       *
                  MOVE  "1"              TO  RECE04-SETCOMFLG
                  MOVE  "2"              TO  RECE05-MEISKYFLG(IDX4)

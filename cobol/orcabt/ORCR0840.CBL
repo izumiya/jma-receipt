@@ -1267,6 +1267,8 @@
            03  CONS-ZAIKYO4-COMMENT  PIC X(09)  VALUE  "114027910".
       *    初回算定　　　月　　日
            03  CONS-ZAIKYO5-COMMENT  PIC X(09)  VALUE  "840000097".
+      *    通算実施回数（　　回）
+           03  CONS-ZAIKYO6-COMMENT  PIC X(09)  VALUE  "840000086".
       *
       *    心臓ペースメーカー指導管理料（着用型自動除細動器）
            03  CONS-SINPESUR1-COMMENT PIC X(09) VALUE  "113015010".
@@ -4950,6 +4952,8 @@ grpsys        MOVE    SPA-HOSPNUM          TO    SYS-HOSPNUM
                 (RECE85-SRYCD(IDX4) = CONS-HOUSIJI2-COMMENT     ))
            OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
                 (RECE85-SRYCD(IDX4) = CONS-ZAIKYO5-COMMENT      ))
+           OR  ((WRK-SETCOM-JIDO    =  29                       ) AND
+                (RECE85-SRYCD(IDX4) = CONS-ZAIKYO6-COMMENT      ))
            OR  ((WRK-SETCOM-JIDO    =  103                      ) AND
                 (RECE85-SRYCD(IDX4) = CONS-HOUMON-COMMENT3      ))
            OR  ((WRK-SETCOM-JIDO    =  105                      ) AND
