@@ -313,6 +313,7 @@
            03  WRK-HKNSTR              PIC 9(04).
       *    ¸øÈñ³«»Ï°ÌÃÖ
            03  WRK-KOHSTR              PIC 9(04).
+           03  WRK-KOHEND              PIC 9(04).
       *
            03  WRK-SELNUM              PIC X(04).
            03  WRK-GMN-SELNUM          PIC 9(04).
@@ -2785,42 +2786,42 @@
                PERFORM 4104-KOH-ADD-SEC
                MOVE    1               TO  SPA-NAI2D-KOHIDX
                MOVE    1               TO  SPA-KOH-GMN2
+               MOVE    1               TO  SPA-NAI-KOHSTR
            ELSE
                MOVE    ZERO                TO  FLG-KOHCHK-END
+               MOVE    SPA-NAI-KOHSTR      TO  WRK-KOHSTR
+               MOVE    SPA-NAI-KOHEND      TO  WRK-KOHEND
+               MOVE    ZERO                TO  SPA-NAI-KOHSTR
                PERFORM 
                        UNTIL   (SPA-NAI2D-KOHIDX   >   ZERO )
                           OR   (SPA-ERRCD      NOT =   SPACE )
                           OR   (FLG-KOHCHK-END NOT =   ZERO  )
-      *           ¼¡¤Î¸øÈñ¾ðÊó
-                   IF     (SPA-NAI-KOHEND      <   SPA-PTKOH-MAX )  AND
-                          (SPA-GMN-KOHNUM(3)   NOT =   SPACE )
-                       MOVE    SPA-NAI-KOHSTR      TO  WRK-KOHSTR
-                       MOVE    SPA-NAI-KOHEND      TO  SPA-NAI-KOHSTR
-      *                ÊÝ¸±¾ðÊó£Ô£Â£Ì¤«¤éÊÔ½¸
-                       ADD     1                   TO  SPA-NAI-KOHSTR
-                       PERFORM 3101-KOH-TBL-SPA-SEC
-                       PERFORM VARYING     IDX     FROM    1   BY  1
-                               UNTIL      (IDX         >   SPA-KOH-MAX )
-                                     OR   (SPA-NAI2D-KOHIDX
+      *            £±·ïÌÜ¤Î¸øÈñ¾ðÊó£Ô£Â£Ì¤«¤éÊÔ½¸
+                   ADD     1                   TO  SPA-NAI-KOHSTR
+                   PERFORM 3101-KOH-TBL-SPA-SEC
+                   PERFORM VARYING     IDX     FROM    1   BY  1
+                           UNTIL      (IDX         >   SPA-KOH-MAX )
+                                 OR   (SPA-NAI2D-KOHIDX
                                                    NOT =   ZERO)
-                           IF      SPA-NAI-PTKOH-KOHID (IDX)
+                       IF      SPA-NAI-PTKOH-KOHID (IDX)
                                               =   SPA-NAI2D-KOHID
-                               MOVE    IDX         TO  SPA-NAI2D-KOHIDX
-                           END-IF
-                       END-PERFORM
-      *                ÂÐ¾Ý¤¬¤Ê¤¤»þ¸µ¤Ø
-                       IF      SPA-NAI-KOHSTR      =   ZERO
-                           MOVE    WRK-KOHSTR      TO  SPA-NAI-KOHSTR
-                           PERFORM 3101-KOH-TBL-SPA-SEC
-                           MOVE    "0144"          TO  SPA-ERRCD
-                           MOVE    1               TO  FLG-KOHCHK-END
+                           MOVE    IDX         TO  SPA-NAI2D-KOHIDX
                        END-IF
+                   END-PERFORM
+                   IF     (SPA-NAI-KOHEND      <   SPA-PTKOH-MAX )
+                     AND  (SPA-GMN-KOHNUM(3)   NOT =   SPACE )
+                       CONTINUE
                    ELSE
-                       MOVE    1                   TO  FLG-KOHCHK-END
+                       MOVE    1               TO  FLG-KOHCHK-END
                    END-IF
                END-PERFORM
+      *
+      *        ÂÐ¾Ý¤¬¤Ê¤¤»þ¸µ¤Ø
                IF      SPA-NAI2D-KOHIDX    =   ZERO
-                   COMPUTE SPA-NAI2D-KOHIDX    =   SPA-KOH-MAX   +   1
+                   MOVE    WRK-KOHSTR      TO  SPA-NAI-KOHSTR
+                   PERFORM 3101-KOH-TBL-SPA-SEC
+                   MOVE    "0144"          TO  SPA-ERRCD
+                   GO      TO      49101-RSIKOH-SYORI-EXT
                END-IF
            END-IF
            IF      SPA-NAI2D-KOHIDX    >   ZERO

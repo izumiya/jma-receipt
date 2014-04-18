@@ -1383,6 +1383,20 @@
                                                DELIMITED  BY  SIZE
                                                INTO    SPA-ERRMSG
                    END-STRING
+      *H26.4
+               WHEN    "9108"
+                   STRING  "労災保険情報に不整合なデータが存在します。"
+                           "登録で削除します。"
+                           "登録押下して下さい。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+               WHEN    "9109"
+                   STRING  "第三者行為の公費更新対象がありません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO    SPA-ERRMSG
+                   END-STRING
+      * 
                WHEN    "9100"
                    STRING  "保険組合の変更で保険期間外の診療が"
                            "存在します。診療を保険変更して下さい。"

@@ -484,7 +484,7 @@
       *            初期パラメタ、ＳＰＡ初期編集
                    PERFORM 100-P01PARA-OUT-SEC
                WHEN    "GMN"
-      *            初期パラメタ、ＳＰＡ初期編集
+      *            画面編集
                    PERFORM 200-P02-SET-SEC
                WHEN    "API"
       *            ＡＰＩ初期パラメタ、ＳＰＡ初期編集
@@ -3184,13 +3184,26 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    ZERO                TO  IDX
            PERFORM   UNTIL    FLG-PTRSIINF   =   1
                IF      PTRSI-SAKUJOKBN       =   SPACE
+      *H26.4
+      *            保険区分設定なしは、削除とする （空白で登録できた為）
+                   IF      PTRSI-HKNNUM        =   SPACE
+                       MOVE    "1"             TO  PTRSI-SAKUJOKBN
+                       MOVE    "9108"          TO  SPA-ERRCD
+                   END-IF
+      *
                    ADD     1                   TO  IDX
                    MOVE    SPACE               TO  PARA-REC
                    MOVE    "PTRSIINF"          TO  PARA-FILEMEI
                    MOVE    IDX                 TO  PARA-EDANUM
                    MOVE    PTRSIINF-REC        TO  PARA-DATA-REC
                    PERFORM 400-PARA-INSERT-SEC
-      *************WRITE   PARA-REC
+               END-IF
+      *H26.4
+      *        保険・公費情報とのチェック（保険・公費が削除されない？）
+               IF      PTRSI-HKNNUM        =   "970"
+                   PERFORM 100231-RSI-PTKOHCHEK-SEC
+               ELSE
+                   PERFORM 100231-RSI-PTHKNCHEK-SEC
                END-IF
       *
                MOVE    "tbl_ptrsiinf"      TO  MCP-TABLE
@@ -3206,6 +3219,55 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            .
        10023-RSIPARA-SET-EXT.
+           EXIT.
+      *****************************************************************
+      *    労災保険と患者保険情報チェック処理
+      *****************************************************************
+       100231-RSI-PTHKNCHEK-SEC            SECTION.
+      *
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX2    FROM    1   BY  1
+                   UNTIL      (IDX2    >   SPA-PTHKN-MAX )
+                          OR  (FLG-OK  =   1             )
+               IF     (PTRSI-HKNID     =   SPA-PTHKN-HKNID (IDX2))
+                  AND (PTRSI-HKNNUM    =   SPA-PTHKN-HKNNUM(IDX2))
+      *            労災保険が削除であれば削除とする
+                   IF      PTRSI-SAKUJOKBN      =   "1"
+                       MOVE    "1"              TO  SPA-PTHKN-SAKJOKBN
+                                                                (IDX2)
+                       MOVE    "9108"           TO  SPA-ERRCD
+                   END-IF
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+      *
+           .
+       100231-RSI-PTHKNCHEK-EXT.
+           EXIT.
+      *****************************************************************
+      *    労災保険と患者公費情報チェック処理
+      *****************************************************************
+       100231-RSI-PTKOHCHEK-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-OK
+           PERFORM VARYING     IDX2    FROM    1   BY  1
+                   UNTIL      (IDX2    >   SPA-PTKOH-MAX )
+                          OR  (FLG-OK  =   1             )
+               IF     (PTRSI-KOHID     =   SPA-PTKOH-KOHID (IDX2) )
+                  AND (PTRSI-HKNNUM    =   SPA-PTKOH-KOHNUM (IDX2))
+      *            労災保険が削除であれば削除とする
+                   IF      PTRSI-SAKUJOKBN      =   "1"
+                       MOVE    "1"              TO  SPA-PTKOH-SAKJOKBN
+                                                                (IDX2)
+                       MOVE    "9108"           TO  SPA-ERRCD
+                   END-IF
+                   MOVE    1               TO  FLG-OK
+               END-IF
+           END-PERFORM
+      *
+           .
+       100231-RSI-PTKOHCHEK-EXT.
            EXIT.
       *****************************************************************
       *    同一患者識別編集処理
