@@ -181,6 +181,13 @@
                MOVE    1                 TO     LNK-EIYOUKKS-RC
            END-IF
       *
+           IF  (LNK-EIYOUKKS-SANTEIYM    >=   "201404")   AND
+               (LNK-EIYOUKKS-SANTEIYM    <=   "201406")
+               IF   (SYS-5000-EIYOUKSNKBN  =   "1")    AND
+                    (LNK-EIYOUKKS-RECE-CHGSRYCD  = SPACE)
+                  MOVE    9              TO     LNK-EIYOUKKS-RC
+               END-IF
+           END-IF
            .
       *
        000-PROC-EXT.
