@@ -298,6 +298,9 @@
       *
            03  WRK-TOKUREI-SRYCD           PIC X(09).
            03  WRK-TOKUREI-SRYCD2          PIC X(09).
+           03  WRK-TOKUREI-FLG             PIC 9(01).
+      *
+           03  WRK-TOKUREI-RYAKUSHO        PIC X(20).
       *
       *    Ï«ºÒÆþ±¡²ñ·×¥ï¡¼¥¯
            03  WRK-ROUSAI-TABLE.
@@ -3531,6 +3534,7 @@
       *                           ¤ÎÂàÈò
                                   PERFORM   210-GAIHAKU-MAE-SEC
       *
+                                  MOVE   ZERO   TO  WRK-TOKUREI-FLG
                                   MOVE   NSRY-SRYCD(1)
                                                 TO  WRK-RYAKU-SRYCD
                                                     WRK-TOKUREI-SRYCD2
@@ -3815,6 +3819,7 @@
                            END-EVALUATE
       *
                            IF   FLG-RYAKU   =   ZERO
+                              MOVE   ZERO   TO  WRK-TOKUREI-FLG
                               MOVE   NACCT-SRYCDTOTAL(6:9)
                                             TO  WRK-RYAKU-SRYCD
                               MOVE   NACCT-ZAISKBKBN
@@ -3837,6 +3842,7 @@
                                         TO  WRK-NYUKSN-DAY(KSN-IDX IDX1)
       *
                            IF   FLG-RYAKU   =   ZERO
+                              MOVE   ZERO   TO  WRK-TOKUREI-FLG
                               MOVE   NACCT-SRYCDTOTAL(6:9)
                                             TO  WRK-RYAKU-SRYCD
                               MOVE   NACCT-ZAISKBKBN
@@ -4139,6 +4145,7 @@
                               END-EVALUATE
       *
                               IF   FLG-RYAKU   =   ZERO
+                                 MOVE   ZERO   TO  WRK-TOKUREI-FLG
                                  MOVE   ACCT-SRYCDTOTAL(6:9)
                                                TO  WRK-RYAKU-SRYCD
                                  MOVE   "6"    TO  WRK-ZAISKBKBN
@@ -4190,6 +4197,7 @@
                                     + (ACCT-ZAITEN * ACCT-DAY(3 IDX1))
       *
                                IF   FLG-RYAKU   =   ZERO
+                                  MOVE   ZERO   TO  WRK-TOKUREI-FLG
                                   MOVE   ACCT-SRYCDTOTAL(6:9)
                                                 TO  WRK-RYAKU-SRYCD
                                   MOVE   "6"    TO  WRK-ZAISKBKBN
@@ -4219,6 +4227,7 @@
                                     + (ACCT-ZAITEN * ACCT-DAY(3 IDX1))
       *
                                IF   FLG-RYAKU   =   ZERO
+                                  MOVE    ZERO  TO    WRK-TOKUREI-FLG
                                   PERFORM   210-SRYACT-HENSYU-SEC
       *
                                   MOVE    1     TO    FLG-RYAKU
@@ -5383,6 +5392,13 @@
       **************************************************************
        210-RYAKUSYO-HENSYU-SEC           SECTION.
       *
+           IF   (LNK-SROUNYUIN-SANTEIYM   >=   "201404")
+           AND  (LNK-SROUNYUIN-SANTEIYM   <=   "201406")
+              CONTINUE
+           ELSE
+              MOVE   ZERO   TO  WRK-TOKUREI-FLG
+           END-IF
+      *
            IF   LNK-SROUNYUIN-RYAKUKBN   =   "1"
       *
               MOVE    SPACE         TO   NYURYAKUSHO-REC
@@ -5952,6 +5968,13 @@
                MOVE LNK-EIYOUKKS-RECE-CHGSRYCD
                                           TO  WRK-TOKUREI-SRYCD
              END-IF
+             IF     LNK-EIYOUKKS-RC  =  9
+               IF   WRK-TOKUREI-SRYCD2(1:3)  =  "188"
+                  CONTINUE
+               ELSE
+                  MOVE    1               TO  WRK-TOKUREI-FLG
+               END-IF
+             END-IF
       *
            END-IF
       *
@@ -6308,6 +6331,18 @@
                                                    SPA-AREA
                IF      MCP-RC              =   ZERO
                    MOVE    MCPDATA-REC         TO  NYURYAKUSHO-REC
+                   IF  WRK-TOKUREI-FLG  =  1
+                      MOVE    SPACE   TO   WRK-TOKUREI-RYAKUSHO
+                      STRING  NYURYAKUSHO-RYAKUSHO
+                                DELIMITED   BY  SPACE
+                              "·ÐÁ¼"
+                                DELIMITED   BY  SIZE
+                              INTO  WRK-TOKUREI-RYAKUSHO
+                      END-STRING
+                      MOVE    SPACE   TO   NYURYAKUSHO-RYAKUSHO
+                      MOVE    WRK-TOKUREI-RYAKUSHO
+                                      TO   NYURYAKUSHO-RYAKUSHO
+                   END-IF
                    MOVE    ZERO                TO  FLG-NYURYAKUSHO
                ELSE
       *            µßÌ¿µßµÞÆþ±¡ÎÁ£±¡Ê£´Æü°Ê¾å£·Æü°ÊÆâ¡Ë

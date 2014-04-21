@@ -329,6 +329,9 @@
       *
            03  WRK-TOKUREI-SRYCD                      PIC X(09).
            03  WRK-TOKUREI-SRYCD2                     PIC X(09).
+           03  WRK-TOKUREI-FLG                        PIC 9(01).
+      *
+           03  WRK-TOKUREI-RYAKUSHO                   PIC X(20).
       *
        01  WRK-TENTEK.
            03  WRK-TENTEK-SYUTEN                       PIC 9(07).
@@ -2816,6 +2819,7 @@
                IF    WRK-NYUTENTTLKBN     =   920  
                AND   NYUINACT-IDX2    NOT =   ZERO
       *
+                 MOVE    ZERO          TO   WRK-TOKUREI-FLG
                  MOVE    SPACE         TO   NYURYAKUSHO-REC
                  INITIALIZE                 NYURYAKUSHO-REC
                  MOVE    NSRY-SRYCD(NYUINACT-IDX2) 
@@ -3574,6 +3578,7 @@
       ***        END-IF
                  MOVE    WRK-SRYYMD-TAIHI  TO   WRK-SRYYMD
       *
+                 MOVE    ZERO              TO   WRK-TOKUREI-FLG
                  PERFORM   500-RYAKUSYO-HENSYU-SEC
                END-IF
       *
@@ -3585,6 +3590,7 @@
       ***        END-IF
                  MOVE    WRK-SRYYMD-TAIHI  TO   WRK-SRYYMD
       *
+                 MOVE    ZERO              TO   WRK-TOKUREI-FLG
                  PERFORM   500-RYAKUSYO-HENSYU-SEC
                END-IF
       *
@@ -3596,6 +3602,7 @@
       ***        END-IF
                  MOVE    WRK-SRYYMD-TAIHI  TO   WRK-SRYYMD
       *
+                 MOVE    ZERO              TO   WRK-TOKUREI-FLG
                  PERFORM   500-RYAKUSYO-HENSYU-SEC
                END-IF
       *
@@ -3632,6 +3639,7 @@
                       UNTIL  (NYUINACT-IDX       >   5)    OR
                              (NSRY-SRYCD(NYUINACT-IDX)  =  SPACE)
       *
+                       MOVE    ZERO           TO  WRK-TOKUREI-FLG
                        MOVE    NSRY-SRYCD(NYUINACT-IDX) 
                                               TO  WRK-SRYCD
                                                   WRK-TOKUREI-SRYCD2
@@ -3700,6 +3708,7 @@
                        MOVE    ACCT-SRYYM         TO  WRK-SRYYMD(1:6)
                        MOVE    "01"               TO  WRK-SRYYMD(7:2)
       *
+                       MOVE    ZERO               TO  WRK-TOKUREI-FLG
                        PERFORM   500-RYAKUSYO-HENSYU-SEC
       *
                    END-PERFORM
@@ -3843,6 +3852,7 @@
       **************************************************************
        2011411-NYUINKHN-SET4-SEC           SECTION.
       *
+           MOVE    ZERO           TO   WRK-TOKUREI-FLG
            MOVE    SPACE          TO   NYURYAKUSHO-REC
            INITIALIZE                  NYURYAKUSHO-REC
            MOVE    WRK-SRYCD      TO   NYURYAKUSHO-SRYCD
@@ -4967,6 +4977,13 @@
                MOVE LNK-EIYOUKKS-RECE-CHGSRYCD
                                           TO  WRK-TOKUREI-SRYCD
              END-IF
+             IF     LNK-EIYOUKKS-RC  =  9
+               IF   WRK-TOKUREI-SRYCD2(1:3)  =  "188"
+                  CONTINUE
+               ELSE
+                  MOVE    1               TO  WRK-TOKUREI-FLG
+               END-IF
+             END-IF
       *
            END-IF
       *
@@ -5253,6 +5270,18 @@
                    PERFORM   900-DBFETCH-SEC
                    IF      MCP-RC               =   ZERO
                        MOVE    MCPDATA-REC      TO  NYURYAKUSHO-REC
+                       IF  WRK-TOKUREI-FLG  =  1
+                          MOVE    SPACE   TO   WRK-TOKUREI-RYAKUSHO
+                          STRING  NYURYAKUSHO-RYAKUSHO
+                                    DELIMITED   BY  SPACE
+                                  "·ÐÁ¼"
+                                    DELIMITED   BY  SIZE
+                                  INTO  WRK-TOKUREI-RYAKUSHO
+                          END-STRING
+                          MOVE    SPACE   TO   NYURYAKUSHO-RYAKUSHO
+                          MOVE    WRK-TOKUREI-RYAKUSHO
+                                          TO   NYURYAKUSHO-RYAKUSHO
+                       END-IF
                        MOVE    ZERO             TO  FLG-NYURYAKUSHO
                        PERFORM  910-NYURYAKUWRK-HEN-SEC
                    ELSE
