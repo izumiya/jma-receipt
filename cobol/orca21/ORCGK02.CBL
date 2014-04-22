@@ -3736,7 +3736,7 @@
                       (SPA-GMN-INPUTCD(SPA-GMN-IDX)(1:1)
                                         NOT =   "$"  AND
                                                 "#" )
-                   IF      SPA-GMN-MAX         <   199
+                   IF      SPA-GMN-MAX         <   398
                        MOVE    SPA-GMN-MAX         TO  SPA-GMN-IDX
                        ADD     1                   TO  SPA-GMN-IDX
                    ELSE
@@ -10862,8 +10862,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF     (SPA-ERRCD           =   SPACE )  AND
                   (SPA-KIDCD           =   SPACE )
-               IF      SPA-GMN-MAX     >   199
-                   CONTINUE
+               IF      SPA-GMN-MAX     >   398
+                   MOVE    "7001"              TO  SPA-ERRCD
                ELSE
                    PERFORM 4101131-K97-SYORI-SEC
                END-IF
@@ -13334,7 +13334,9 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      SPA-GMN-CUR         =   1
                IF      WRK-IDX2            >   MAX-GMN
-                   MOVE    08              TO  SPA-GMN-CUR
+      *            MOVE    08              TO  SPA-GMN-CUR
+      *            最終行へ
+                   MOVE    MAX-GMN         TO  WRK-IDX2
                END-IF
            END-IF
       *

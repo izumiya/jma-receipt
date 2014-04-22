@@ -10801,7 +10801,8 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
            IF      SPA-GMN-CUR         =   1
                IF      WRK-IDX2            >   MAX-GMN
-                   MOVE    09              TO  SPA-GMN-CUR
+      ******       MOVE    09              TO  SPA-GMN-CUR
+                   MOVE    MAX-GMN         TO  WRK-IDX2
                END-IF
            END-IF
       *
