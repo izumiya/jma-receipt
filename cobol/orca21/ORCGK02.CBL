@@ -8817,6 +8817,15 @@
                GO      TO      41014-GYOINSN-EXT
            END-IF
       *
+      *    挿入行のチェック
+           IF     WRK-INSCNT           >   1
+               IF      (SPA-GMN-MAX + (WRK-INSCNT - 1))  >= SPA-MAX-LINE
+                   MOVE    "0007"              TO  SPA-ERRCD
+                   GO      TO      41014-GYOINSN-EXT
+               END-IF
+           END-IF
+      *
+      *
       *    IF      SPA-GMN-IDX         >=  SPA-MAX-LINE
            IF      SPA-GMN-IDX         =   SPA-MAX-LINE
                MOVE    "0007"              TO  SPA-ERRCD
