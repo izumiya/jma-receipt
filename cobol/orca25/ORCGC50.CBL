@@ -941,24 +941,28 @@
                                            TO  SPA-GMN-SJKBNLST (10)
                MOVE    "51 疾患別リハビリテーションに係る治療継続理由"
                                            TO  SPA-GMN-SJKBNLST (11)
-               MOVE    "99 レセプト摘要欄コメント"
-                                           TO  SPA-GMN-SJKBNLST (12)
-               MOVE    12                  TO  SPA-SJKBN-MAX
-           END-IF
-      *
-      *
-           IF      SPA-NAI-SRYYM       >=  "200804"
-               MOVE    "52 廃用症候群に係る評価表"
+               MOVE    "90 上記以外の診療報酬明細書"
                                            TO  SPA-GMN-SJKBNLST (12)
                MOVE    "99 レセプト摘要欄コメント"
                                            TO  SPA-GMN-SJKBNLST (13)
                MOVE    13                  TO  SPA-SJKBN-MAX
            END-IF
       *
-           IF      SPA-NAI-SRYYM       >=  "201307"
-               MOVE    "AA 労災レセプト「傷病の経過」"
+      *
+           IF      SPA-NAI-SRYYM       >=  "200804"
+               MOVE    "52 廃用症候群に係る評価表"
+                                           TO  SPA-GMN-SJKBNLST (12)
+               MOVE    "90 上記以外の診療報酬明細書"
+                                           TO  SPA-GMN-SJKBNLST (13)
+               MOVE    "99 レセプト摘要欄コメント"
                                            TO  SPA-GMN-SJKBNLST (14)
                MOVE    14                  TO  SPA-SJKBN-MAX
+           END-IF
+      *
+           IF      SPA-NAI-SRYYM       >=  "201307"
+               MOVE    "AA 労災レセプト「傷病の経過」"
+                                           TO  SPA-GMN-SJKBNLST (15)
+               MOVE    15                  TO  SPA-SJKBN-MAX
            END-IF
       *!!!
            ADD     1                   TO  SPA-SJKBN-MAX
