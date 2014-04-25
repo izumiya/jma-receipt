@@ -7299,9 +7299,9 @@ grpsys             OR    ( RECE02-KEY       NOT =  RECE12-KEY1         )
            MOVE    "key9"              TO  WRK-MCP-PATHNAME
            PERFORM 2009-RECECOM-HENSYU-SEC
       *     
-      *    ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£µ£°¡¢£µ£±¡Ë       
+      *    ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£µ£°¡¢£µ£±¡¢£µ£²¡¢£¹£°¡Ë       
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
-           MOVE    "key12"             TO  WRK-MCP-PATHNAME
+           MOVE    "key23"             TO  WRK-MCP-PATHNAME
            PERFORM 2009-RECECOM-HENSYU-SEC
            .
        2009-COMMENT-HEN-99-EXT.

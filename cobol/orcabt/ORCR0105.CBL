@@ -903,8 +903,10 @@
                "¡Ú¼À´µÊÌ¥ê¥Ï¥Ó¥ê¥Æ¡¼¥·¥ç¥ó¤Ë·¸¤ë¼£ÎÅ·ÑÂ³¤ÎÍýÍ³Åù¡Û".
            03  FILLER              PIC X(52)   VALUE
                "¡ÚÇÑÍÑ¾É¸õ·²¤Ë·¸¤ëÉ¾²ÁÉ½¡Û".
+           03  FILLER              PIC X(52)   VALUE
+               "¡Ú¾åµ­°Ê³°¤Î¿ÇÎÅÊó½·ÌÀºÙ½ñ¡Û".
        01  TBL-RECECOM-AREA-R      REDEFINES   TBL-RECECOM-AREA.
-           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   10.
+           03  TBL-RECECOM-NAME    PIC X(52)   OCCURS   11.
       *
       *   Âà¿¦¼ÔÊÝ¸±ÈÖ¹æ
        01  WRK-RETIRE-AREA.
@@ -6718,9 +6720,9 @@
            MOVE    "key9"              TO  WRK-MCP-PATHNAME
            PERFORM 3601-RECECOM-HENSYU-SEC
       *     
-      *    ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£µ£°¡¢£µ£±¡¢£µ£²¡Ë     
+      *    ¾É¾õ¾Üµ­¥³¥á¥ó¥È¡Ê£µ£°¡¢£µ£±¡¢£µ£²¡¢£¹£°¡Ë     
            MOVE    "tbl_rececom"       TO  WRK-MCP-TABLE
-           MOVE    "key12"             TO  WRK-MCP-PATHNAME
+           MOVE    "key23"             TO  WRK-MCP-PATHNAME
            PERFORM 3601-RECECOM-HENSYU-SEC
            .
        360-HC101-COMMENT-HEN-EXT.
@@ -6806,6 +6808,10 @@
                    WHEN    "52"
                        MOVE    1               TO  FLG-RECECOM-SJKBN
                        MOVE    TBL-RECECOM-NAME (10)
+                                               TO  WRK-RECECOM-NAME
+                   WHEN    "90"
+                       MOVE    1               TO  FLG-RECECOM-SJKBN
+                       MOVE    TBL-RECECOM-NAME (11)
                                                TO  WRK-RECECOM-NAME
                END-EVALUATE
            END-IF
