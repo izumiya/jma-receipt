@@ -72,6 +72,8 @@
       *                                     コメントの対応
       *  04.07.02    NACL-門脇    12/09/25  コメント差込対応（在宅持続陽圧）
       *  04.07.03    NACL-門脇    14/04/07  平成２６年４月改正対応
+      *  04.07.04    NACL-門脇    14/04/24  超重症児（者）入院診療加算等の
+      *                                     コメント自動記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -5447,6 +5449,7 @@
       *****************************************************************
        2001-NYU-COMMENT2-SEC          SECTION.
       *
+           MOVE    SPACE                TO  WRK-CYOJKSN-YMD
            PERFORM     20011-NYU-DAY2-SEC
       *
            PERFORM     200111-RECE230-TAIHI-SEC
@@ -5465,8 +5468,8 @@
              MOVE   "810000001"
                            TO  WRK-RECE230XX-SRYCD(MAX-MEISAISU 1)
              MOVE    ZERO  TO  WRK-RECE230XX-SRYSURYO(MAX-MEISAISU 1)
-             MOVE    15    TO  WRK-RECE230XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE   "算定開始日　　　年　　月　　日"
+             MOVE    14    TO  WRK-RECE230XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE   "算定開始　　　年　　月　　日"
                            TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)
       *
              INITIALIZE                         STS-AREA-DAY
@@ -5483,7 +5486,7 @@
                 CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
                 IF      KANACHK-RC      =   ZERO
                    MOVE    KANACHK-OUT-INPUT(1:4)
-                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)(13:4)
+                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)(11:4)
                 END-IF
       *
                 MOVE    LNK-DAY2-EDTYMD1-M   TO  WRK-TAIHI-XX
@@ -5493,7 +5496,7 @@
                 CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
                 IF      KANACHK-RC      =   ZERO
                    MOVE    KANACHK-OUT-INPUT(1:4)
-                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)(19:4)
+                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)(17:4)
                 END-IF
       *
                 MOVE    LNK-DAY2-EDTYMD1-D   TO  WRK-TAIHI-XX
@@ -5503,7 +5506,7 @@
                 CALL    "ORCSKANACHK"    USING   ORCSKANACHKAREA
                 IF      KANACHK-RC      =   ZERO
                    MOVE    KANACHK-OUT-INPUT(1:4)
-                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)(25:4)
+                           TO  WRK-RECE230XX-NAME(MAX-MEISAISU 1)(23:4)
                 END-IF
              END-IF
       *
@@ -5522,7 +5525,6 @@
        20011-NYU-DAY2-SEC          SECTION.
       *
            MOVE    ZERO                 TO  FLG-CYOJKSN-OK
-           MOVE    SPACE                TO  WRK-CYOJKSN-YMD
            MOVE    SPACE                TO  WRK-CYOJKSN-TAIHIYM
            INITIALIZE                       WRK-CYOJKSN-DAY-TBL
       *

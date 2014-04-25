@@ -640,6 +640,8 @@
       *                                     ¡ÊÌë¶Ð»þ´Ö·Ð²á¸º»»¤ÎÁªÄêÂÐ±þ¡Ë
       *  04.07.20    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.21    NACL-ÌçÏÆ    14/04/08  Ä¹´ü¤ÎÆÃµ­»ö¹à½ÅÊ£½¤Àµ
+      *  04.07.22    NACL-ÌçÏÆ    14/04/24  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
+      *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
@@ -772,6 +774,7 @@
            03  FLG-KENSA-COM                           PIC 9(01).
            03  FLG-ZAIKYO-COM                          PIC 9(01).
            03  FLG-BOKOHO-COM                          PIC 9(01).
+           03  FLG-CYOJKSN-COM                         PIC 9(01).
            03  FLG-RECESKYKBN                          PIC 9(01).
       *****03  FLG-HKNNUM                              PIC 9(01).
            03  FLG-RECE69                              PIC 9(01).
@@ -2145,6 +2148,8 @@
            03  CONS-CYOJKSN3-COMMENT PIC X(09)  VALUE  "190127510".
       *    ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
            03  CONS-CYOJKSN4-COMMENT PIC X(09)  VALUE  "190127610".
+      *    »»Äê³«»Ï¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü
+           03  CONS-CYOJKSN5-COMMENT PIC X(09)  VALUE  "840000056".
       *
       *    ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -6188,6 +6193,7 @@
                                                   FLG-KENSA-COM
                                                   FLG-ZAIKYO-COM
                                                   FLG-BOKOHO-COM
+                                                  FLG-CYOJKSN-COM
       *
                                MOVE   ZERO   TO   WRK-FILMTEN
       *
@@ -6256,6 +6262,7 @@
                                                          FLG-KENSA-COM
                                                          FLG-ZAIKYO-COM
                                                          FLG-BOKOHO-COM
+                                                         FLG-CYOJKSN-COM
       *
                                       MOVE   ZERO   TO   WRK-FILMTEN
       *
@@ -7957,17 +7964,38 @@
               END-IF
       *       Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
               IF   RECE62-SRYYM    >=     "201404"
-                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "1"   TO    RECE64-FLG-CYOJKSN-COMMENT
                 END-IF
-                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "2"   TO    RECE64-FLG-CYOJKSN-COMMENT
                 END-IF
-                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "3"   TO    RECE64-FLG-CYOJKSN-COMMENT
                 END-IF
-                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "4"   TO    RECE64-FLG-CYOJKSN-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN5-COMMENT
+                   EVALUATE  RECE64-FLG-CYOJKSN-COMMENT
+                     WHEN     "1"
+                       MOVE  "A"  TO  RECE64-FLG-CYOJKSN-COMMENT
+                       MOVE  "1"  TO  RECE65-RECEDENFLG(IDX4)
+                     WHEN     "2"
+                       MOVE  "B"  TO  RECE64-FLG-CYOJKSN-COMMENT
+                       MOVE  "1"  TO  RECE65-RECEDENFLG(IDX4)
+                     WHEN     "3"
+                       MOVE  "C"  TO  RECE64-FLG-CYOJKSN-COMMENT
+                       MOVE  "1"  TO  RECE65-RECEDENFLG(IDX4)
+                     WHEN     "4"
+                       MOVE  "D"  TO  RECE64-FLG-CYOJKSN-COMMENT
+                       MOVE  "1"  TO  RECE65-RECEDENFLG(IDX4)
+                   END-EVALUATE
+                   MOVE    1    TO    FLG-CYOJKSN-COM
                 END-IF
               END-IF
            END-IF

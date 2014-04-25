@@ -114,6 +114,8 @@
       *  04.07.05    NACL-ÌçÏÆ    13/07/01  Æþ±¡ÎÁÂ¾ÊÝ¸±»»Äê»þ¥³¥á¥ó¥Èµ­ºÜÂÐ±þ
       *  04.07.06    NACL-ÌçÏÆ    14/03/14  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.07    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.08    NACL-ÌçÏÆ    14/04/24  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
+      *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -220,6 +222,7 @@
            03  FLG-KENSA-COM       PIC 9(01).
            03  FLG-ZAIKYO-COM      PIC 9(01).
            03  FLG-BOKOHO-COM      PIC 9(01).
+           03  FLG-CYOJKSN-COM     PIC 9(01).
            03  FLG-RINYAK          PIC 9(01).
            03  FLG-TENTEKIMATOME   PIC 9(01).
            03  FLG-TAHOKEN         PIC 9(01).
@@ -900,6 +903,8 @@
            03  CONS-CYOJKSN3-COMMENT PIC X(09)  VALUE  "190127510".
       *    ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
            03  CONS-CYOJKSN4-COMMENT PIC X(09)  VALUE  "190127610".
+      *    »»Äê³«»Ï¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü
+           03  CONS-CYOJKSN5-COMMENT PIC X(09)  VALUE  "840000056".
       *
       *    ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -1585,6 +1590,7 @@
                                          FLG-KENSA-COM
                                          FLG-ZAIKYO-COM
                                          FLG-BOKOHO-COM
+                                         FLG-CYOJKSN-COM
       *
                       MOVE   ZERO   TO   WRK-FILMTEN
       *
@@ -1647,6 +1653,7 @@
                                                     FLG-KENSA-COM
                                                     FLG-ZAIKYO-COM
                                                     FLG-BOKOHO-COM
+                                                    FLG-CYOJKSN-COM
       *
                                  MOVE   ZERO   TO   WRK-FILMTEN
       *
@@ -2978,17 +2985,25 @@
               END-IF
       *       Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
               IF   RECE200-SRYYM    >=     "201404"
-                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "1"   TO    RECE220-FLG-CYOJKSN-COMMENT
                 END-IF
-                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "2"   TO    RECE220-FLG-CYOJKSN-COMMENT
                 END-IF
-                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "3"   TO    RECE220-FLG-CYOJKSN-COMMENT
                 END-IF
-                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT
+                IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT)
+                AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "4"   TO    RECE220-FLG-CYOJKSN-COMMENT
+                END-IF
+                IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN5-COMMENT
+                   MOVE  SPACE  TO    RECE220-FLG-CYOJKSN-COMMENT
+                   MOVE    1    TO    FLG-CYOJKSN-COM
                 END-IF
               END-IF
            END-IF
