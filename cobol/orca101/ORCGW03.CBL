@@ -126,6 +126,8 @@
            03  IDZ1                              PIC 9(04).
            03  IDZ2                              PIC 9(04).
       *
+           03  IDX-STR                           PIC 9(04).
+      *
       *    °ì»þÎÎ°è
        01  WRK-AREA.
            03  WRK-WIDMSG          PIC X(70).
@@ -844,10 +846,10 @@
                    UNTIL      (IDX         >   10  )
                IF      TNS-SSTKIJUNCD (IDX)    NOT =   ZERO
                    ADD    1                    TO  SPA-KIJUN-MAX
-                   MOVE    TNS-SSTKIJUNCD (IDX) 
-                                               TO  SPA-GMN-SSTKIJUNCD
-                                                      (SPA-KIJUN-MAX)
                END-IF
+               MOVE    TNS-SSTKIJUNCD (IDX) 
+                                               TO  SPA-GMN-SSTKIJUNCD
+                                                      (IDX)
            END-PERFORM
       *    ´ð½àÉÔÅ¬¹çÄþ¸ºÂÐ¾Ý»ÜÀß´ð½à
            MOVE    TNS-KIJUNTEIGENCD    TO  SPA-GMN-KIJUNTEIGENCD
@@ -857,6 +859,7 @@
                MOVE    "0103"              TO  SPA-ERRCD
                MOVE    50                  TO  SPA-GMN-CUR
            ELSE
+               MOVE    10                  TO  SPA-KIJUN-MAX
                MOVE    SPACE               TO  SPA-GMN-SELCD
                IF      SPA-GMN-SSTKIJUNCD(1)   NOT =   ZERO
                    MOVE    SPA-GMN-SSTKIJUNCD(1)   TO  SPA-GMN-SELCD
@@ -1153,38 +1156,67 @@
       *****************************************************************
        405-IDOU-01-SEC             SECTION.
       *
-           IF      SPA-NAI-KIJUNFLG    =   11
-               MOVE    SPA-KIJUN-MAX       TO  SPA-NAI-KIJUNFLG
+           IF      SPA-NAI-KIJUNFLG    =   1
+               MOVE    11                  TO  IDX-STR
            ELSE
-               IF      SPA-NAI-KIJUNFLG    =   1
-                   MOVE    11                   TO  SPA-NAI-KIJUNFLG
-               ELSE
-                   COMPUTE SPA-NAI-KIJUNFLG     =   SPA-NAI-KIJUNFLG
-                                                -   1
-                   IF      SPA-NAI-KIJUNFLG     =   ZERO
-                       MOVE    11                   TO  SPA-NAI-KIJUNFLG
-                   END-IF
-               END-IF
-           END-IF
-      *
-           IF      SPA-NAI-KIJUNFLG    =   11
-               IF      SPA-GMN-KIJUNTEIGENCD   =   ZERO
-                   MOVE    SPA-KIJUN-MAX       TO  SPA-NAI-KIJUNFLG
-               END-IF
+               COMPUTE IDX-STR             =   SPA-NAI-KIJUNFLG
+                                           -   1
            END-IF
            MOVE    SPACE               TO  SPA-GMN-SELCD
-           IF      SPA-NAI-KIJUNFLG    =   11
-               MOVE    SPA-GMN-KIJUNTEIGENCD   TO  SPA-GMN-SELCD
-           ELSE
-               MOVE    SPA-NAI-KIJUNFLG        TO  IDX
-               IF      IDX                     =   ZERO
-                   CONTINUE
+           PERFORM VARYING     IDX     FROM    IDX-STR BY  -1
+                   UNTIL       SPA-GMN-SELCD   NOT =   SPACE
+      *
+               IF      IDX             =   11
+                   IF      SPA-GMN-KIJUNTEIGENCD   NOT =   ZERO
+                       MOVE    IDX             TO  SPA-NAI-KIJUNFLG
+                       MOVE    SPA-GMN-KIJUNTEIGENCD
+                                               TO  SPA-GMN-SELCD
+                   END-IF
                ELSE
                    IF      SPA-GMN-SSTKIJUNCD(IDX) NOT =   ZERO
-                       MOVE    SPA-GMN-SSTKIJUNCD(IDX) TO  SPA-GMN-SELCD
+                       MOVE    SPA-GMN-SSTKIJUNCD(IDX)
+                                               TO  SPA-GMN-SELCD
+                       MOVE    IDX             TO  SPA-NAI-KIJUNFLG
+                   ELSE
+                       IF      IDX             =   1
+                           MOVE    12          TO  IDX
+                       END-IF
                    END-IF
                END-IF
-           END-IF
+           END-PERFORM
+      *
+      *    IF      SPA-NAI-KIJUNFLG    =   11
+      *        MOVE    SPA-KIJUN-MAX       TO  SPA-NAI-KIJUNFLG
+      *    ELSE
+      *        IF      SPA-NAI-KIJUNFLG    =   1
+      *            MOVE    11                   TO  SPA-NAI-KIJUNFLG
+      *        ELSE
+      *            COMPUTE SPA-NAI-KIJUNFLG     =   SPA-NAI-KIJUNFLG
+      *                                         -   1
+      *            IF      SPA-NAI-KIJUNFLG     =   ZERO
+      *                MOVE    11                   TO  SPA-NAI-KIJUNFLG
+      *            END-IF
+      *        END-IF
+      *    END-IF
+      *
+      *    IF      SPA-NAI-KIJUNFLG    =   11
+      *        IF      SPA-GMN-KIJUNTEIGENCD   =   ZERO
+      *            MOVE    SPA-KIJUN-MAX       TO  SPA-NAI-KIJUNFLG
+      *        END-IF
+      *    END-IF
+      *    MOVE    SPACE               TO  SPA-GMN-SELCD
+      *    IF      SPA-NAI-KIJUNFLG    =   11
+      *        MOVE    SPA-GMN-KIJUNTEIGENCD   TO  SPA-GMN-SELCD
+      *    ELSE
+      *        MOVE    SPA-NAI-KIJUNFLG        TO  IDX
+      *        IF      IDX                     =   ZERO
+      *            CONTINUE
+      *        ELSE
+      *            IF      SPA-GMN-SSTKIJUNCD(IDX) NOT =   ZERO
+      *                MOVE    SPA-GMN-SSTKIJUNCD(IDX) TO  SPA-GMN-SELCD
+      *            END-IF
+      *        END-IF
+      ***  END-IF
       *
            IF      SPA-GMN-SELCD   NOT =   SPACE
                MOVE    SPA-GMN-SELCD       TO  W03-SELCD
@@ -1200,28 +1232,56 @@
       *****************************************************************
        408-IDOU-02-SEC             SECTION.
       *
-           ADD     1                   TO  SPA-NAI-KIJUNFLG
-           IF      SPA-NAI-KIJUNFLG    >   SPA-KIJUN-MAX
-               IF      SPA-NAI-KIJUNFLG    <=  10
-                   MOVE    11                  TO  SPA-NAI-KIJUNFLG
-                   IF      SPA-GMN-KIJUNTEIGENCD   =   ZERO
-                       MOVE    1                   TO  SPA-NAI-KIJUNFLG
-                   END-IF
-               ELSE
-                   MOVE    1                   TO  SPA-NAI-KIJUNFLG
-               END-IF
+           IF      SPA-NAI-KIJUNFLG    =   11
+               MOVE    1                   TO  IDX-STR
+           ELSE
+               COMPUTE IDX-STR             =   SPA-NAI-KIJUNFLG
+                                           +   1
            END-IF
            MOVE    SPACE               TO  SPA-GMN-SELCD
-           IF      SPA-NAI-KIJUNFLG    =   11
-               MOVE    SPA-GMN-KIJUNTEIGENCD   TO  SPA-GMN-SELCD
-           ELSE
-               MOVE    SPA-NAI-KIJUNFLG        TO  IDX
-               IF      IDX                     >   ZERO
+           PERFORM VARYING     IDX     FROM    IDX-STR BY  1
+                   UNTIL       SPA-GMN-SELCD   NOT =   SPACE
+      *
+               IF      IDX             =   11
+                   IF      SPA-GMN-KIJUNTEIGENCD   NOT =   ZERO
+                       MOVE    IDX             TO  SPA-NAI-KIJUNFLG
+                       MOVE    SPA-GMN-KIJUNTEIGENCD
+                                               TO  SPA-GMN-SELCD
+                   ELSE
+                       MOVE    0               TO  IDX
+                   END-IF
+               ELSE
                    IF      SPA-GMN-SSTKIJUNCD(IDX) NOT =   ZERO
-                       MOVE    SPA-GMN-SSTKIJUNCD(IDX) TO  SPA-GMN-SELCD
+                       MOVE    SPA-GMN-SSTKIJUNCD(IDX)
+                                               TO  SPA-GMN-SELCD
+                       MOVE    IDX             TO  SPA-NAI-KIJUNFLG
                    END-IF
                END-IF
-           END-IF
+           END-PERFORM
+      *
+      *
+      *****ADD     1                   TO  SPA-NAI-KIJUNFLG
+      *    IF      SPA-NAI-KIJUNFLG    >   SPA-KIJUN-MAX
+      *        IF      SPA-NAI-KIJUNFLG    <=  10
+      *            MOVE    11                  TO  SPA-NAI-KIJUNFLG
+      *            IF      SPA-GMN-KIJUNTEIGENCD   =   ZERO
+      *                MOVE    1                   TO  SPA-NAI-KIJUNFLG
+      *            END-IF
+      *        ELSE
+      *            MOVE    1                   TO  SPA-NAI-KIJUNFLG
+      *        END-IF
+      *    END-IF
+      *    MOVE    SPACE               TO  SPA-GMN-SELCD
+      *    IF      SPA-NAI-KIJUNFLG    =   11
+      *        MOVE    SPA-GMN-KIJUNTEIGENCD   TO  SPA-GMN-SELCD
+      *    ELSE
+      *        MOVE    SPA-NAI-KIJUNFLG        TO  IDX
+      *        IF      IDX                     >   ZERO
+      *            IF      SPA-GMN-SSTKIJUNCD(IDX) NOT =   ZERO
+      *                MOVE    SPA-GMN-SSTKIJUNCD(IDX) TO  SPA-GMN-SELCD
+      *            END-IF
+      *        END-IF
+      *****END-IF
       *
            IF      SPA-GMN-SELCD   NOT =   SPACE
                MOVE    SPA-GMN-SELCD       TO  W03-SELCD

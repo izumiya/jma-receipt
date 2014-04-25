@@ -1950,16 +1950,16 @@
                    IF      WRK-COM-CDKBN-KBN (IDX-Z)   =   "M"
                        MOVE    "180025270"         TO  WRK-SRYCD
                    END-IF
-      *            施設基準不適合（脳血管疾患リハビリ）
-                   IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
-                      AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "001")
-                       MOVE    "180042770"         TO  WRK-SRYCD
-                   END-IF
+      **廃止*      施設基準不適合（脳血管疾患リハビリ）
+      *            IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
+      *               AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "001")
+      *                MOVE    "180042770"         TO  WRK-SRYCD
+      *            END-IF
       *            施設基準不適合（運動器リハビリ）
-                   IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
-                      AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "002")
-                       MOVE    "180043370"         TO  WRK-SRYCD
-                   END-IF
+      *            IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
+      *               AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "002")
+      *                MOVE    "180043370"         TO  WRK-SRYCD
+      *******      END-IF
       *            不適合あり
                    IF      WRK-SRYCD       NOT =   SPACE
                        MOVE    2                   TO  FLG-KIJUNN
