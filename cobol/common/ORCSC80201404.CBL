@@ -346,7 +346,7 @@
       *H25.7
       *    疾患別リハビリ月回数
            03  WRK-TUKI-SRYCD.
-               05  WRK-SRYCDT          PIC X(09)   OCCURS   12.
+               05  WRK-SRYCDT          PIC X(09)   OCCURS   18.
            03  WRK-ACCT-CNT            PIC 9(03).
            03  WRK-TUKI-CNT2           PIC 9(03).
       *    月回数
@@ -3539,7 +3539,14 @@
                                                    OR  "180034210"
                                                    OR  "180034310"
                                                    OR  "180034410"
-                               MOVE    "K871"          TO  SPA-ERRCD
+      *        基準不適合
+                                                   OR  "180043430"
+                                                   OR  "180043530"
+                                                   OR  "180043630"
+                                                   OR  "180043730"
+                                                   OR  "180043830"
+                                                   OR  "180043930"
+                              MOVE    "K871"          TO  SPA-ERRCD
                            END-IF
                        WHEN    "3"
       *                    運動器
@@ -3547,6 +3554,10 @@
                                                    =   "180034510"
                                                    OR  "180034610"
                                                    OR  "180034710"
+      *                            不適合
+                                                   OR  "180044030"
+                                                   OR  "180044130"
+                                                   OR  "180044230"
                                MOVE    "K872"          TO  SPA-ERRCD
                            END-IF
                    END-EVALUATE
@@ -3669,6 +3680,13 @@
                    MOVE    "180034210"         TO  WRK-SRYCDT (10)
                    MOVE    "180034310"         TO  WRK-SRYCDT (11)
                    MOVE    "180034410"         TO  WRK-SRYCDT (12)
+      *            不適合
+                   MOVE    "180043430"         TO  WRK-SRYCDT (13)
+                   MOVE    "180043530"         TO  WRK-SRYCDT (14)
+                   MOVE    "180043630"         TO  WRK-SRYCDT (15)
+                   MOVE    "180043730"         TO  WRK-SRYCDT (16)
+                   MOVE    "180043830"         TO  WRK-SRYCDT (17)
+                   MOVE    "180043930"         TO  WRK-SRYCDT (18)
                WHEN    "3"
       *            運動器
                    MOVE    "180027810"         TO  WRK-SRYCDT (1)
@@ -3677,6 +3695,10 @@
                    MOVE    "180034510"         TO  WRK-SRYCDT (4)
                    MOVE    "180034610"         TO  WRK-SRYCDT (5)
                    MOVE    "180034710"         TO  WRK-SRYCDT (6)
+      *            不適合
+                   MOVE    "180044030"         TO  WRK-SRYCDT (7)
+                   MOVE    "180044130"         TO  WRK-SRYCDT (8)
+                   MOVE    "180044230"         TO  WRK-SRYCDT (9)
                WHEN    "4"
       *            呼吸
                    MOVE    "180028010"         TO  WRK-SRYCDT (1)
@@ -3684,7 +3706,7 @@
            END-EVALUATE
       *
            PERFORM VARYING     IDXT    FROM    1   BY  1
-                   UNTIL      (IDXT        >   12  )
+                   UNTIL      (IDXT        >   18  )
                          OR   (WRK-SRYCDT (IDXT)   =   SPACE )
       *
                IF      LNK-ORCSC-SYORIFLG      =   1
