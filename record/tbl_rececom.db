@@ -456,3 +456,18 @@ path	key22		{
 	};
 };
 
+path	key23		{ 	
+	DBSELECT	{
+		DECLARE tbl_rececom_key23_csr CURSOR FOR
+		SELECT *
+		FROM tbl_rececom
+			WHERE   HOSPNUM    =   :HOSPNUM
+			AND     PTID      =   :PTID
+			AND     SRYYM     =   :SRYYM
+			AND     NYUGAIKBN =   :NYUGAIKBN
+			AND     SJKBN     in ( '50','51','52','90')
+			ORDER BY HKNCOMBI,SJKBN,SRYDD,RENNUM
+		;
+	};
+};
+
