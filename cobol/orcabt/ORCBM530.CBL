@@ -156,6 +156,9 @@
            03  WRK-MOJI11.
                05  FILLER111           PIC X(50)   VALUE
                    "¡ÚÇÑÍÑ¾É¸õ·²¤Ë·¸¤ëÉ¾²ÁÉ½¡Û".
+           03  WRK-MOJI12.
+               05  FILLER121           PIC X(50)   VALUE
+                   "¡Ú¾åµ­°Ê³°¤Î¿ÇÎÅÊó½·ÌÀºÙ½ñ¡Û".
       *
        01  CONST-AREA.
            03  CONST-H2004             PIC X(06)   VALUE    "200804".
@@ -422,6 +425,9 @@
                                        TO  HCM37-NAIYO(CNT-LINE)
                            WHEN    "52"
                                MOVE    WRK-MOJI11
+                                       TO  HCM37-NAIYO(CNT-LINE)
+                           WHEN    "90"
+                               MOVE    WRK-MOJI12
                                        TO  HCM37-NAIYO(CNT-LINE)
                            WHEN    "99"
                                MOVE    WRK-MOJI8
@@ -1070,6 +1076,7 @@
                                            OR  "50"
                                            OR  "51"
                                            OR  "52"
+                                           OR  "90"
                                            OR  "99"
                        ADD     1               TO  CNT-RECEDEN
                        MOVE    1               TO  FLG-RECEDENOK

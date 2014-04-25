@@ -193,6 +193,9 @@
            03  WRK-MOJI11.
                05  FILLER111           PIC X(50)   VALUE
                    "¡ÚÇÑÍÑ¾É¸õ·²¤Ë·¸¤ëÉ¾²ÁÉ½¡Û".
+           03  WRK-MOJI12.
+               05  FILLER121           PIC X(50)   VALUE
+                   "¡Ú¾åµ­°Ê³°¤Î¿ÇÎÅÊó½·ÌÀºÙ½ñ¡Û".
       *
        01  CONST-AREA.
            03  CONST-H2004             PIC X(06)   VALUE    "200804".
@@ -538,6 +541,9 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                MOVE    WRK-MOJI11
                                        TO  HCM37-NAIYO(CNT-LINE)
       *----(04.02.01)--ADD-END-----
+                           WHEN    "90"
+                               MOVE    WRK-MOJI12
+                                       TO  HCM37-NAIYO(CNT-LINE)
                            WHEN    "99"
                                MOVE    WRK-MOJI8
                                        TO  HCM37-NAIYO(CNT-LINE)
@@ -1307,6 +1313,7 @@ grpsys         PERFORM 900-DBFETCH-SEC
       *----(04.02.01)--ADD-START---
                                            OR  "52"
       *----(04.02.01)--ADD-END-----
+                                           OR  "90"
                                            OR  "99"
                        ADD     1               TO  CNT-RECEDEN
                        MOVE    1               TO  FLG-RECEDENOK
