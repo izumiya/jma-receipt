@@ -1157,7 +1157,8 @@
        405-IDOU-01-SEC             SECTION.
       *
       *    施設基準なし
-           IF      SPA-GMN-SSTKIJUNCD-G    =   ZERO
+           IF     (SPA-GMN-SSTKIJUNCD-G    =   ZERO )
+             AND  (SPA-GMN-KIJUNTEIGENCD   =   ZERO )
                GO      TO      405-IDOU-01-EXT
            END-IF
       *
@@ -1238,7 +1239,8 @@
        408-IDOU-02-SEC             SECTION.
       *
       *    施設基準なし
-           IF      SPA-GMN-SSTKIJUNCD-G    =   ZERO
+           IF     (SPA-GMN-SSTKIJUNCD-G    =   ZERO )
+             AND  (SPA-GMN-KIJUNTEIGENCD   =   ZERO )
                GO      TO      408-IDOU-02-EXT
            END-IF
       *
