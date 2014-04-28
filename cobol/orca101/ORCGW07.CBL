@@ -2173,15 +2173,18 @@
       *    Ｈ２０．４ から追加
            MOVE    "52 廃用症候群に係る評価表"
                                        TO  SPA-GMN-SJKBNLST (12)
-           MOVE    "99 レセプト摘要欄コメント"
+      *H26.4　追加
+           MOVE    "90 上記以外の診療報酬明細書"
                                        TO  SPA-GMN-SJKBNLST (13)
+           MOVE    "99 レセプト摘要欄コメント"
+                                       TO  SPA-GMN-SJKBNLST (14)
       *H25.7 から追加
            MOVE    "AA 労災レセプト「傷病の経過」"
-                                       TO  SPA-GMN-SJKBNLST (14)
+                                       TO  SPA-GMN-SJKBNLST (15)
       *H25.10
            MOVE    "BB 自賠責（第三者行為）レセプト摘要欄コメント"
-                                       TO  SPA-GMN-SJKBNLST (15)
-           MOVE    15                  TO  SPA-GMN-SJKBN-MAX
+                                       TO  SPA-GMN-SJKBNLST (16)
+           MOVE    16                  TO  SPA-GMN-SJKBN-MAX
       *
       *    会計照会情報
            MOVE    "0 診療科順"        TO  SPA-GMN-SRYKBN-LIST(1)
