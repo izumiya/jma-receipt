@@ -2558,6 +2558,8 @@
                GO  TO  4101-GRPINPUT-CHK-EXT
            END-UNSTRING
       *
+           INITIALIZE  WRK-MUL-TENSU-X
+      *
            PERFORM VARYING IDX-MUL     FROM    1   BY  1
                    UNTIL ( IDX-MUL     >       20 )
       *
@@ -2565,23 +2567,30 @@
                    CONTINUE
                ELSE
       *
-                   INITIALIZE  WRK-MUL-TENSU-X
-                               WRK-MUL-STNUM-X
+                   INITIALIZE  WRK-MUL-STNUM-X
                                WRK-MUL-EDNUM-X
                                WRK-MUL-TENSU
                                WRK-MUL-STNUM
                                WRK-MUL-EDNUM
       *
                    MOVE        1       TO  IDX-PNT
-                   UNSTRING    WRK-MUL-NUM (IDX-MUL) DELIMITED   BY  "/"
-                   INTO        WRK-MUL-TENSU-X
-                   WITH    POINTER IDX-PNT
-                   END-UNSTRING
       *
-                   IF    ( IDX-PNT     =   1 )
-                       MOVE    2               TO  SPA-GMN-CUR
-                       MOVE    "0005"          TO  SPA-ERRCD
-                       GO  TO  4101-GRPINPUT-CHK-EXT
+                   IF    ( IDX-MUL     =   1 )
+                       UNSTRING    WRK-MUL-NUM (IDX-MUL)
+                                                   DELIMITED   BY  "/"
+                       INTO        WRK-MUL-TENSU-X
+                       WITH    POINTER IDX-PNT
+                       END-UNSTRING
+      *
+                       IF    ( IDX-PNT     =   1 )
+                           MOVE    2               TO  SPA-GMN-CUR
+                           MOVE    "0005"          TO  SPA-ERRCD
+                           GO  TO  4101-GRPINPUT-CHK-EXT
+                       END-IF
+      *
+                       IF    ( WRK-MUL-TENSU-X     =   SPACE )
+                           MOVE    "1"             TO  WRK-MUL-TENSU-X
+                       END-IF
                    END-IF
       *
                    UNSTRING    WRK-MUL-NUM (IDX-MUL) DELIMITED   BY  "-"
@@ -2612,17 +2621,14 @@
                        END-EVALUATE
                    END-IF
       *
-                   IF    ( WRK-MUL-TENSU-X     =   SPACE )
-                       MOVE    1               TO  WRK-MUL-TENSU
-                   ELSE
-                       MOVE    WRK-MUL-TENSU-X TO  WRK-TENSU-X
-                       PERFORM 4101-TENSU-LIMIT-CHK-SEC
-                       IF    ( FLG-LIMIT-ERR    NOT =   ZERO )
-                           MOVE    2           TO  SPA-GMN-CUR
-                           MOVE    "0005"  TO  SPA-ERRCD
-                       END-IF
-                       MOVE    WRK-TENSU   TO  WRK-MUL-TENSU
+                   MOVE    WRK-MUL-TENSU-X TO  WRK-TENSU-X
+                   PERFORM 4101-TENSU-LIMIT-CHK-SEC
+                   IF    ( FLG-LIMIT-ERR    NOT =   ZERO )
+                       MOVE    2           TO  SPA-GMN-CUR
+                       MOVE    "0005"  TO  SPA-ERRCD
+                       GO  TO  4101-GRPINPUT-CHK-EXT
                    END-IF
+                   MOVE    WRK-TENSU   TO  WRK-MUL-TENSU
       *
                    MOVE    WRK-MUL-STNUM-X TO  WRK-GRPINPUT-X
                    PERFORM 4101-DAY-LIMIT-CHK-SEC
