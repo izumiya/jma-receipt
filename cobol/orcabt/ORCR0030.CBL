@@ -647,6 +647,10 @@
       *                                     （マル長併用時）
       *  04.07.16    NACL-門脇    14/03/28  平成２６年４月改正対応
       *  04.07.17    NACL-門脇    14/04/08  長期の特記事項重複修正
+      *  04.07.18    NACL-門脇    14/04/28  運動器・脳血管リハの診療コード
+      *                                     追加対応
+      *  04.07.19    NACL-門脇    14/04/28  愛媛県地方公費の受診日コメント
+      *                                     に関する修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -1897,6 +1901,20 @@
            03  CONS-NOUKE15-COMMENT  PIC X(09)  VALUE  "180034310".
       *    脳血管疾患等リハビリテーション料（３）（要介護・廃用症候群）
            03  CONS-NOUKE16-COMMENT  PIC X(09)  VALUE  "180034410".
+      *
+      *    脳血管疾患等リハビリテーション料１（要介・廃用症以外）基準不適合
+           03  CONS-NOUKE23-COMMENT  PIC X(09)  VALUE  "180043430".
+      *    脳血管疾患等リハビリテーション料１（要介・廃用症）基準不適合
+           03  CONS-NOUKE24-COMMENT  PIC X(09)  VALUE  "180043530".
+      *    脳血管疾患等リハビリテーション料２（要介・廃用症以外）基準不適合
+           03  CONS-NOUKE25-COMMENT  PIC X(09)  VALUE  "180043630".
+      *    脳血管疾患等リハビリテーション料２（要介・廃用症）基準不適合
+           03  CONS-NOUKE26-COMMENT  PIC X(09)  VALUE  "180043730".
+      *    脳血管疾患等リハビリテーション料３（要介・廃用症以外）基準不適合
+           03  CONS-NOUKE27-COMMENT  PIC X(09)  VALUE  "180043830".
+      *    脳血管疾患等リハビリテーション料３（要介・廃用症）基準不適合
+           03  CONS-NOUKE28-COMMENT  PIC X(09)  VALUE  "180043930".
+      *
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -1917,6 +1935,14 @@
            03  CONS-UNDOKI9-COMMENT  PIC X(09)  VALUE  "180034610".
       *    運動器リハビリテーション料（３）（要介護）
            03  CONS-UNDOKI10-COMMENT PIC X(09)  VALUE  "180034710".
+      *
+      *    運動器リハビリテーション料（１）（要介護）（施設基準不適合）
+           03  CONS-UNDOKI17-COMMENT PIC X(09)  VALUE  "180044030".
+      *    運動器リハビリテーション料（２）（要介護）（施設基準不適合）
+           03  CONS-UNDOKI18-COMMENT PIC X(09)  VALUE  "180044130".
+      *    運動器リハビリテーション料（３）（要介護）（施設基準不適合）
+           03  CONS-UNDOKI19-COMMENT PIC X(09)  VALUE  "180044230".
+      *
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -10497,6 +10523,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             CONS-NOUKE14-COMMENT  OR
                                             CONS-NOUKE15-COMMENT  OR
                                             CONS-NOUKE16-COMMENT  OR
+                                            CONS-NOUKE23-COMMENT  OR
+                                            CONS-NOUKE24-COMMENT  OR
+                                            CONS-NOUKE25-COMMENT  OR
+                                            CONS-NOUKE26-COMMENT  OR
+                                            CONS-NOUKE27-COMMENT  OR
+                                            CONS-NOUKE28-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
@@ -10505,6 +10537,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                             CONS-UNDOKI8-COMMENT  OR
                                             CONS-UNDOKI9-COMMENT  OR
                                             CONS-UNDOKI10-COMMENT OR
+                                            CONS-UNDOKI17-COMMENT OR
+                                            CONS-UNDOKI18-COMMENT OR
+                                            CONS-UNDOKI19-COMMENT OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT  OR
@@ -10578,6 +10613,12 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-NOUKE14-COMMENT
                                       OR    CONS-NOUKE15-COMMENT
                                       OR    CONS-NOUKE16-COMMENT
+                                      OR    CONS-NOUKE23-COMMENT
+                                      OR    CONS-NOUKE24-COMMENT
+                                      OR    CONS-NOUKE25-COMMENT
+                                      OR    CONS-NOUKE26-COMMENT
+                                      OR    CONS-NOUKE27-COMMENT
+                                      OR    CONS-NOUKE28-COMMENT
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-NOUKE-COMMENT
                         PERFORM  VARYING  IDX16  FROM  1  BY  1
@@ -10597,6 +10638,9 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
                                       OR    CONS-UNDOKI8-COMMENT
                                       OR    CONS-UNDOKI9-COMMENT
                                       OR    CONS-UNDOKI10-COMMENT
+                                      OR    CONS-UNDOKI17-COMMENT
+                                      OR    CONS-UNDOKI18-COMMENT
+                                      OR    CONS-UNDOKI19-COMMENT
                         MOVE   "1"    TO    RECE02-COMCNTFLG
                         MOVE   "1"    TO    RECE04-UNDOKI-COMMENT
                         PERFORM  VARYING  IDX16  FROM  1  BY  1
@@ -16475,6 +16519,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                                 "7" OR "8"
                     MOVE   SYU-SRYYMD(7:2)  TO   IDX8
                     MOVE     "1"     TO   RECE02-KOHJNISSUTBL(IDX8)
+                    IF  SYU-TOTAL-HKNTEN  NOT = ZERO
+                      MOVE   "2"     TO   RECE02-KOHJNISSUTBL(IDX8)
+                    END-IF
                END-IF
       *
            END-EVALUATE
@@ -17321,7 +17368,8 @@ grpsys     PERFORM 900-DBSELECT-SEC
            PERFORM    VARYING    ACCT-IDX    FROM    1   BY   1
                       UNTIL      ACCT-IDX    >     31
               IF    RECE02-KOHJNISSUTBL(ACCT-IDX)  NOT =  SPACE
-                 IF  RECE02-JNISSUTBL(ACCT-IDX)  = SPACE
+                 IF  (RECE02-JNISSUTBL(ACCT-IDX)     = SPACE)
+                 AND (RECE02-KOHJNISSUTBL(ACCT-IDX)  =  "1" )
                      MOVE   SPACE   TO   RECE02-KOHJNISSUTBL(ACCT-IDX)
                  END-IF
               END-IF

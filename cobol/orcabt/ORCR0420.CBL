@@ -258,6 +258,8 @@
       *  04.07.09    NACL-門脇    14/03/01  労災マスタ追加対応
       *  04.07.10    NACL-門脇    14/03/04  平成２６年４月改正対応
       *  04.07.11    NACL-門脇    14/03/28  平成２６年４月改正対応
+      *  04.07.12    NACL-門脇    14/04/28  運動器・脳血管リハの診療コード
+      *                                     追加対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1023,6 +1025,20 @@
            03  CONS-NOUKE21-COMMENT  PIC X(09)  VALUE  "101800260".
       *#   脳血管疾患等リハビリテーション料（３）
            03  CONS-NOUKE22-COMMENT  PIC X(09)  VALUE  "101800270".
+      *
+      *    脳血管疾患等リハビリテーション料１（要介・廃用症以外）基準不適合
+           03  CONS-NOUKE23-COMMENT  PIC X(09)  VALUE  "180043430".
+      *    脳血管疾患等リハビリテーション料１（要介・廃用症）基準不適合
+           03  CONS-NOUKE24-COMMENT  PIC X(09)  VALUE  "180043530".
+      *    脳血管疾患等リハビリテーション料２（要介・廃用症以外）基準不適合
+           03  CONS-NOUKE25-COMMENT  PIC X(09)  VALUE  "180043630".
+      *    脳血管疾患等リハビリテーション料２（要介・廃用症）基準不適合
+           03  CONS-NOUKE26-COMMENT  PIC X(09)  VALUE  "180043730".
+      *    脳血管疾患等リハビリテーション料３（要介・廃用症以外）基準不適合
+           03  CONS-NOUKE27-COMMENT  PIC X(09)  VALUE  "180043830".
+      *    脳血管疾患等リハビリテーション料３（要介・廃用症）基準不適合
+           03  CONS-NOUKE28-COMMENT  PIC X(09)  VALUE  "180043930".
+      *
       *    運動器リハビリテーション料（１）
            03  CONS-UNDOKI1-COMMENT  PIC X(09)  VALUE  "180027810".
       *    運動器リハビリテーション料（２）
@@ -1055,6 +1071,14 @@
            03  CONS-UNDOKI15-COMMENT PIC X(09)  VALUE  "101800290".
       *#   運動器リハビリテーション料（３）
            03  CONS-UNDOKI16-COMMENT PIC X(09)  VALUE  "101800330".
+      *
+      *    運動器リハビリテーション料（１）（要介護）（施設基準不適合）
+           03  CONS-UNDOKI17-COMMENT PIC X(09)  VALUE  "180044030".
+      *    運動器リハビリテーション料（２）（要介護）（施設基準不適合）
+           03  CONS-UNDOKI18-COMMENT PIC X(09)  VALUE  "180044130".
+      *    運動器リハビリテーション料（３）（要介護）（施設基準不適合）
+           03  CONS-UNDOKI19-COMMENT PIC X(09)  VALUE  "180044230".
+      *
       *    難病患者リハビリテーション料
            03  CONS-NANBYO-COMMENT   PIC X(09)  VALUE  "180017910".
       *    障害児（者）リハビリテーション料（６歳未満）
@@ -3797,6 +3821,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-NOUKE17-COMMENT  OR
                                             CONS-NOUKE18-COMMENT  OR
                                             CONS-NOUKE19-COMMENT  OR
+                                            CONS-NOUKE23-COMMENT  OR
+                                            CONS-NOUKE24-COMMENT  OR
+                                            CONS-NOUKE25-COMMENT  OR
+                                            CONS-NOUKE26-COMMENT  OR
+                                            CONS-NOUKE27-COMMENT  OR
+                                            CONS-NOUKE28-COMMENT  OR
                                             CONS-UNDOKI1-COMMENT  OR
                                             CONS-UNDOKI2-COMMENT  OR
                                             CONS-UNDOKI3-COMMENT  OR
@@ -3805,6 +3835,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                             CONS-UNDOKI11-COMMENT OR
                                             CONS-UNDOKI12-COMMENT OR
                                             CONS-UNDOKI13-COMMENT OR
+                                            CONS-UNDOKI17-COMMENT OR
+                                            CONS-UNDOKI18-COMMENT OR
+                                            CONS-UNDOKI19-COMMENT OR
                                             CONS-SYOGAI1-COMMENT  OR
                                             CONS-SYOGAI2-COMMENT  OR
                                             CONS-SYOGAI3-COMMENT  OR
@@ -3895,6 +3928,12 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-NOUKE17-COMMENT
                                       OR    CONS-NOUKE18-COMMENT
                                       OR    CONS-NOUKE19-COMMENT
+                                      OR    CONS-NOUKE23-COMMENT
+                                      OR    CONS-NOUKE24-COMMENT
+                                      OR    CONS-NOUKE25-COMMENT
+                                      OR    CONS-NOUKE26-COMMENT
+                                      OR    CONS-NOUKE27-COMMENT
+                                      OR    CONS-NOUKE28-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-NOUKE-COMMENT
                 END-IF
@@ -3908,6 +3947,9 @@ grpsys     PERFORM 900-DBSELECT-SEC
                                       OR    CONS-UNDOKI11-COMMENT
                                       OR    CONS-UNDOKI12-COMMENT
                                       OR    CONS-UNDOKI13-COMMENT
+                                      OR    CONS-UNDOKI17-COMMENT
+                                      OR    CONS-UNDOKI18-COMMENT
+                                      OR    CONS-UNDOKI19-COMMENT
                         MOVE   "1"    TO    RECE41-COMCNTFLG
                         MOVE   "1"    TO    RECE44-UNDOKI-COMMENT
                 END-IF
