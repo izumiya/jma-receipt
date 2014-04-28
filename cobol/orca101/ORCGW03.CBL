@@ -1156,6 +1156,11 @@
       *****************************************************************
        405-IDOU-01-SEC             SECTION.
       *
+      *    施設基準なし
+           IF      SPA-GMN-SSTKIJUNCD-G    =   ZERO
+               GO      TO      405-IDOU-01-EXT
+           END-IF
+      *
            IF      SPA-NAI-KIJUNFLG    =   1
                MOVE    11                  TO  IDX-STR
            ELSE
@@ -1231,6 +1236,12 @@
       *    →処理
       *****************************************************************
        408-IDOU-02-SEC             SECTION.
+      *
+      *    施設基準なし
+           IF      SPA-GMN-SSTKIJUNCD-G    =   ZERO
+               GO      TO      408-IDOU-02-EXT
+           END-IF
+      *
       *
            IF      SPA-NAI-KIJUNFLG    =   11
                MOVE    1                   TO  IDX-STR
