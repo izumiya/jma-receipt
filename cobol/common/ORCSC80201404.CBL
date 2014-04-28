@@ -354,6 +354,9 @@
       *    訂正
            03  WRK-TEI-CNT             PIC 9(04).
       *
+      *    外来リハビリ（要介護）施設基準不適合
+           03  WRK-ERRCHK              PIC 9(01).
+      *
       *
        01  TBL-RIHA-ZAINUM-G.
            03  TBL-RIHA-ZAINUM-OCC     OCCURS  50.
@@ -1933,6 +1936,7 @@
       *****************************************************************
        100111-KIJUNN-CHK-SEC           SECTION.
       *
+           MOVE    ZERO                TO  WRK-ERRCHK
       *    手技の時、適合チェック
            IF      WRK-COM-KIJUNTEIGENKBN (IDX-Z)  =   2  OR  3
                PERFORM 1001111-SSTKIJUN-CHK-SEC
@@ -1950,16 +1954,18 @@
                    IF      WRK-COM-CDKBN-KBN (IDX-Z)   =   "M"
                        MOVE    "180025270"         TO  WRK-SRYCD
                    END-IF
-      **廃止*      施設基準不適合（脳血管疾患リハビリ）
-      *            IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
-      *               AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "001")
-      *                MOVE    "180042770"         TO  WRK-SRYCD
-      *            END-IF
+      *            施設基準不適合（脳血管疾患リハビリ）
+                   IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
+                      AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "001")
+      **廃止*****      MOVE    "180042770"         TO  WRK-SRYCD
+                       MOVE    1                   TO  WRK-ERRCHK
+                   END-IF
       *            施設基準不適合（運動器リハビリ）
-      *            IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
-      *               AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "002")
-      *                MOVE    "180043370"         TO  WRK-SRYCD
-      *******      END-IF
+                   IF     (WRK-COM-CDKBN-KBN (IDX-Z)   =   "H" )
+                      AND (WRK-COM-CDKBN-KBNNUM(IDX-Z) =   "002")
+      **廃止*****      MOVE    "180043370"         TO  WRK-SRYCD
+                       MOVE    1                   TO  WRK-ERRCHK
+                   END-IF
       *            不適合あり
                    IF      WRK-SRYCD       NOT =   SPACE
                        MOVE    2                   TO  FLG-KIJUNN
@@ -1972,6 +1978,13 @@
                       END-IF
                   END-IF
               END-IF
+           END-IF
+      *
+      *    外来リハビリ（要介護）施設基準不適合判定
+           IF     (WRK-ERRCHK          =   1  )
+            AND   (SPA-NYUGAIKBN       =   "2")
+               MOVE    "0024"          TO  WRK-ERRCD
+               MOVE    "1"             TO  WRK-COM-CUR (IDX-Z)
            END-IF
       *
       *    加算の時、対象の手技が有ること
