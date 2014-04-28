@@ -1312,6 +1312,18 @@
                END-IF
            END-IF
       *
+      *    特定入院基本料（障害者施設等入院基本料）は入院料加算チェックで
+      *    以下の加算がチェックできない為、強制的に算定ＯＫとする
+      *    ・特殊疾患入院施設管理加算
+      *    ・看護配置加算
+           IF      LNK-NYUKSNGET-NYUIN-SRYCD   = "190161210"  OR
+                                                 "190161310"
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =  "190101970"  OR
+                                                    "190102070"
+                  MOVE    ZERO  TO    FLG-NYUKSN
+               END-IF
+           END-IF
+      *
            .
       *
        4801-NYUKSN-CHK-EXT.
@@ -1334,9 +1346,34 @@
            IF      LNK-NYUKSNGET-NYUIN-SRYCD(1:3) = "188"
                CONTINUE
            ELSE
+      *        特定入院基本料のコード細分化置き換え
+               IF     LNK-NYUKSNGET-SANTEIYM   >=   "20120401"
+                   IF  LNK-NYUKSNGET-NYUIN-SRYCD  =  "190799410"
+                       EVALUATE   SYS-5001-BTU-SBT
+      *                    専門病院
+                           WHEN    "06"
+                                 MOVE "190161010" TO
+                                        LNK-NYUKSNGET-NYUIN-SRYCD
+      *                    障害者施設等
+                           WHEN    "05"
+                                 MOVE "190161210" TO
+                                        LNK-NYUKSNGET-NYUIN-SRYCD
+                       END-EVALUATE
+      *
+      *                特定機能病院は病棟設定された入院コードから判定
+                       IF   SYS-5001-BTU-KHNSRYCD =  "190118610" OR
+                                                     "190705610" OR
+                                                     "190085910"
+                         MOVE "190160810" TO  LNK-NYUKSNGET-NYUIN-SRYCD
+                       END-IF
+                   END-IF
+               END-IF
+      *
                INITIALIZE    ORCSYAKINGEN-AREA
                MOVE   LNK-NYUKSNGET-SANTEIYM
                                    TO    LNK-YAKINGEN-SANTEIYM
+               MOVE   SYS-5001-BTU-NUM
+                                   TO    LNK-YAKINGEN-BTU-NUM
                MOVE   LNK-NYUKSNGET-NYUIN-SRYCD
                                    TO    LNK-YAKINGEN-SRYCD
                CALL   "ORCSYAKINGEN"    USING   ORCSYAKINGEN-AREA
