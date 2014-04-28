@@ -690,8 +690,10 @@
                "【労災レセプト「傷病の経過」】".
                05  FILLER                       PIC X(52)   VALUE
                "【自賠責（第三者行為）レセプト摘要欄コメント】".
+               05  FILLER                       PIC X(52)   VALUE
+               "【上記以外の診療報酬明細書】".
            03  CONST-RECECOM-R     REDEFINES   CONST-RECECOM-VAL.
-               05  CONST-RECECOM   PIC X(52)   OCCURS   13.
+               05  CONST-RECECOM   PIC X(52)   OCCURS   14.
       *    薬剤料逓減
            03  CONST-TEIGEN                PIC X(09)   VALUE
                "630010002".
@@ -5880,6 +5882,9 @@
                                                TO  WRK-LONGSTR
                        WHEN    "52"
                            MOVE    CONST-RECECOM (10)
+                                               TO  WRK-LONGSTR
+                       WHEN    "90"
+                           MOVE    CONST-RECECOM (14)
                                                TO  WRK-LONGSTR
                        WHEN    "99"
                            IF    ( TRECECOM-AA =   1 )
