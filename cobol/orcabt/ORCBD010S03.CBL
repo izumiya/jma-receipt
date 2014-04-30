@@ -70,6 +70,9 @@
            03  WRK-SAGAKU                  PIC S9(10).
            03  WRK-HOHO                    PIC  X(02).
            03  WRK-CHOSEI                  PIC S9(10).
+           03  WRK-SHO                     PIC S9(10).
+           03  WRK-JIHHASU                 PIC S9(10).
+           03  WRK-HKNHASU                 PIC S9(10).
       *
        01  TSKY-AREA.
            03  TSKY-OCC                    OCCURS   2.
@@ -401,6 +404,7 @@
                                        TSKY-JIHCHOSEI1(1)
                                        TSKY-JIHCHOSEI2(1)
       *
+      *
            MOVE    SYURRK-SRYKA    TO  WRK-SRYKA
            MOVE    SYURRK-HKNCOMBINUM
                                    TO  WRK-HKNCOMBI
@@ -490,6 +494,31 @@
                +   TSRRK-JIHSEIKYU
                +   TSRRK-CHOSEI
                +   TSRRK-GENMEN )
+      *
+           DIVIDE  TSRRK-HKNSEIKYU    BY    10
+                   GIVING  WRK-SHO    REMAINDER    WRK-HKNHASU
+           DIVIDE  TSRRK-JIHSEIKYU    BY    10
+                   GIVING  WRK-SHO    REMAINDER    WRK-JIHHASU
+      *
+           IF    ( WRK-SAGAKU              NOT =   ZERO )
+      *
+               IF    ( WRK-HKNHASU             =   ZERO )
+                AND  ( WRK-JIHHASU         NOT =   ZERO )
+                   COMPUTE TSRRK-JIHSEIKYU
+                       =   TSRRK-JIHSEIKYU
+                       +   WRK-SAGAKU
+                   MOVE    ZERO            TO  WRK-SAGAKU
+               END-IF
+      *
+               IF    ( WRK-HKNHASU         NOT =   ZERO )
+                AND  ( WRK-JIHHASU             =   ZERO )
+                   COMPUTE TSRRK-HKNSEIKYU
+                       =   TSRRK-HKNSEIKYU
+                       +   WRK-SAGAKU
+                   MOVE    ZERO            TO  WRK-SAGAKU
+               END-IF
+      *
+           END-IF
       *
            IF    ( WRK-SAGAKU              NOT =   ZERO )
                EVALUATE    TRUE
