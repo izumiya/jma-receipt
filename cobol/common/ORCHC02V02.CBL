@@ -1239,8 +1239,14 @@
                    END-IF
                    MOVE    "1"                 TO  WRK-BIKOU-FTN
                WHEN    2
-                   MOVE    "（高８）"          TO  WRK-BIKOU
-                   MOVE    "2"                 TO  WRK-BIKOU-FTN
+                   IF     (SPA-SRYYMD          >=  "20140501" )
+                     AND  (PTINF-BIRTHDAY      >=  "19440402" )
+                       MOVE    "（高一）"          TO  WRK-BIKOU
+                       MOVE    "1"                 TO  WRK-BIKOU-FTN
+                   ELSE
+                       MOVE    "（高８）"          TO  WRK-BIKOU
+                       MOVE    "2"                 TO  WRK-BIKOU-FTN
+                   END-IF
                WHEN    3
                    MOVE    "（高７）"          TO  WRK-BIKOU
                    MOVE    "2"                 TO  WRK-BIKOU-FTN
