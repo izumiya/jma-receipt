@@ -1807,8 +1807,7 @@
       <case_sensitive>False</case_sensitive>
       <use_arrows>True</use_arrows>
       <use_arrows_always>False</use_arrows_always>
-      <items>2 入院外
-</items>
+      <items></items>
 
       <widget>
 	<class>GtkPandaEntry</class>
