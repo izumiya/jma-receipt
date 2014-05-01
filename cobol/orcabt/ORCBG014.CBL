@@ -47,6 +47,7 @@
       *  04.07.01    NACL-øπœ∆     12/03/30  ∑Ú ›¡»πÁ§ÿ§Œƒæ¿‹¿¡µ·§»ø≥∫∫
       *                                      ªŸ ßµ°¥ÿ¿¡µ·¬–±˛
       *  04.07.02    NACL-øπœ∆     13/06/14  ∫ﬂ¡Ìø«∂Ë ¨ ¨Œ‡§ §∑ƒ…≤√   
+      *  04.08.00    NACL-øπœ∆     14/05/01   ø¿Æ£≤£∂«Ø£¥∑Ó≤˛¿µ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -522,6 +523,9 @@
        01  CONST-AREA.
          03  CONST-H2004           PIC X(06)   VALUE   "200804".
          03  CONST-H2010           PIC X(06)   VALUE   "200810".
+      *----(04.08.00)ADD-START---
+         03  CONST-H2604           PIC X(06)   VALUE   "201404".
+      *----(04.08.00)ADD-END-----
       *
       *****************************************************************
       *    •’•°•§•Î•Ï•§•¢•¶•»
@@ -1366,6 +1370,14 @@
                                WHEN    "D"
                                WHEN    "E"
                                WHEN    "F"
+      *----(04.08.00)--ADD-START---
+                                   IF    ( RECE10-SRYYM
+                                               <  CONST-H2604 )
+                                       MOVE    "2" TO  WRK-SYUBETUKBN
+                                   ELSE
+                                       MOVE    "1" TO  WRK-SYUBETUKBN
+                                   END-IF
+      *----(04.08.00)--ADD-END-----
                                WHEN    "7"
                                WHEN    "G"
                                WHEN    "H"
@@ -1382,6 +1394,14 @@
                                        MOVE    "1" TO  WRK-SYUBETUKBN
                                    WHEN    "8"
                                    WHEN    "E"
+      *----(04.08.00)--ADD-START---
+                                   IF    ( RECE10-SRYYM
+                                               <  CONST-H2604 )
+                                       MOVE    "2" TO  WRK-SYUBETUKBN
+                                   ELSE
+                                       MOVE    "1" TO  WRK-SYUBETUKBN
+                                   END-IF
+      *----(04.08.00)--ADD-END-----
                                    WHEN    "7"
                                    WHEN    "H"
                                        MOVE    "2" TO  WRK-SYUBETUKBN
@@ -1391,6 +1411,14 @@
                                    WHEN    9
                                        MOVE    "1" TO  WRK-SYUBETUKBN
                                    WHEN    8
+      *----(04.08.00)--ADD-START---
+                                   IF    ( RECE10-SRYYM
+                                               <  CONST-H2604 )
+                                       MOVE    "2" TO  WRK-SYUBETUKBN
+                                   ELSE
+                                       MOVE    "1" TO  WRK-SYUBETUKBN
+                                   END-IF
+      *----(04.08.00)--ADD-END-----
                                    WHEN    7
                                        MOVE    "2" TO  WRK-SYUBETUKBN
                                END-EVALUATE
@@ -1694,6 +1722,14 @@
                            WHEN    9
                                MOVE    "1"         TO  WRK-SYUBETUKBN
                            WHEN    8
+      *----(04.08.00)--ADD-START---
+                               IF    ( RECE10-SRYYM
+                                               <  CONST-H2604 )
+                                   MOVE    "2" TO  WRK-SYUBETUKBN
+                               ELSE
+                                   MOVE    "1" TO  WRK-SYUBETUKBN
+                               END-IF
+      *----(04.08.00)--ADD-END-----
                            WHEN    7
                                MOVE    "2"         TO  WRK-SYUBETUKBN
                        END-EVALUATE
