@@ -419,6 +419,8 @@
       *  04.07.11    NACL-ÌçÏÆ    14/02/21  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÅÀ¿ôÃ±²ÁÀßÄê
       *                                     ÂÐ±þ
       *  04.07.12    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.13    NACL-ÌçÏÆ    14/05/02  Á°´ü¹âÎð¼Ô£²³ä¡ÊÄã½êÆÀ¡¦ÄãÇ¯¶â¡Ë¤Î
+      *                                     ¾å¸Â³Û½¤Àµ
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -6670,7 +6672,15 @@
                            IF  ( FLG-KEIKASOCHI-IPAN  =  1        )
                            OR  ((LNK-SYU-SRYYMD(1:6) >=  "201405") AND
                                 (WK-BIRTHDAY  >=  "19440402"     ))
+                             IF    FLG-KEIKASOCHI-IPAN  =  1
                                MOVE   12000   TO   MAX-KIN-SYU-M
+                             ELSE
+                               IF  FLG-SANSHOU3   =   SPACE
+                                 MOVE 12000   TO   MAX-KIN-SYU-M
+                               ELSE
+                                 MOVE  8000   TO   MAX-KIN-SYU-M
+                               END-IF
+                             END-IF
                            ELSE
                                MOVE   44400   TO   MAX-KIN-SYU-M
                            END-IF
@@ -13011,7 +13021,15 @@
                              IF  ( FLG-KEIKASOCHI-IPAN  =  1        )
                              OR  ((LNK-SYU-SRYYMD(1:6) >=  "201405") AND
                                   (WK-BIRTHDAY  >=  "19440402"     ))
+                              IF    FLG-KEIKASOCHI-IPAN  =  1
                                 MOVE   2     TO    FLG-KEISAN-TAI
+                              ELSE
+                               IF  FLG-SANSHOU3   =   SPACE
+                                 MOVE  2     TO    FLG-KEISAN-TAI
+                               ELSE
+                                 MOVE  3     TO    FLG-KEISAN-TAI
+                               END-IF
+                              END-IF
                              ELSE
                                 MOVE   1     TO    FLG-KEISAN-TAI
                              END-IF
