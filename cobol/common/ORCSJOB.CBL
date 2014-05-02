@@ -68,6 +68,7 @@
            03  WRK-SYSYMD-8.
                05  WRK-SYSYY           PIC 9(02).
                05  WRK-SYSYMD          PIC 9(06).  
+           03  WRK-SYSTIME             PIC X(08).
       *¥·¥§¥ë£É£Ä
            03  WRK-SHELLID             PIC X(08).
       *
@@ -124,8 +125,22 @@ grpsys         SPA-AREA
       *****************************************************************
        000-PROC-SEC                SECTION.
       *
+           INITIALIZE                  ORCSMCNDATEAREA
+           CALL    "ORCSMCNDATE"       USING
+                                       ORCSMCNDATEAREA
+      *
+           MOVE     SPACE              TO  WRK-SYSTIME
+           ACCEPT   WRK-SYSTIME        FROM      TIME
+      *
       *???
-           DISPLAY "ORCSJOB ST =" SJOBKANRI-MODE "##"
+           DISPLAY "ORCSJOB ST =" SJOBKANRI-MODE "## "
+                   SMCNDATE-YMD (1:4) "/"
+                   SMCNDATE-YMD (5:2) "/"
+                   SMCNDATE-YMD (7:2) " "
+                   WRK-SYSTIME  (1:2) ":"
+                   WRK-SYSTIME  (3:2) ":"
+                   WRK-SYSTIME  (5:2) "."
+                   WRK-SYSTIME  (7:2) " "
       *???     
            INITIALIZE                  CNT-AREA
                                        WRK-AREA
