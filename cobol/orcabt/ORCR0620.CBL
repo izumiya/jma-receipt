@@ -217,6 +217,7 @@
       *  04.07.03    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *  04.07.04    NACL-藤原    13/12/09  医療情報連携基盤対応
       *  04.07.05    NACL-門脇    14/04/08  長期の特記事項重複修正
+      *  04.07.07    NACL-藤原    14/04/30  治験が複数あるときの対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1254,7 +1255,8 @@
            MOVE    RECE61-NYUGAIKBN     TO  RECE62-NYUGAIKBN
            MOVE    RECE61-PTID          TO  RECE62-PTID
            MOVE    RECE61-RECEKA        TO  RECE62-RECEKA
-           IF      RECE61-HKNNUM (1:2)  =   "98"
+           IF      RECE61-HKNNUM (1:2)  =   "98"    OR  "90"    OR
+                                            "91"
                MOVE    RECE61-HKNNUM        TO  RECE62-HKNJANUM-KEY
            ELSE  
                MOVE    RECE61-HKNJANUM      TO  RECE62-HKNJANUM-KEY
