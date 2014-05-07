@@ -2638,6 +2638,18 @@
                            MOVE    "1066"          TO  SPA-ERRCD
                            MOVE    11              TO  SPA-GMN-CUR
                        END-IF
+      *H26.5
+      *                H26.5.1∞ πﬂ§ŒS19.4.2¿∏∞ πﬂ§Œπ‚Œº‘…È√¥≥‰πÁ
+                       IF      FLG-RJN-02          =   1
+                           IF     (SPA-GMN-HOJOKBN     =   "7"
+                                                       OR  "8")
+                               MOVE    SPACE           TO  SPA-ERRCD
+                               MOVE    ZERO            TO  SPA-GMN-CUR
+                           ELSE
+                               MOVE    "1066"          TO  SPA-ERRCD
+                               MOVE    11              TO  SPA-GMN-CUR
+                           END-IF
+                       END-IF
                    END-IF
                ELSE
                    IF      (SPA-NAI-HTEKSTYMD  NOT =   SPACE )
@@ -2667,6 +2679,19 @@
                        MOVE    "1066"          TO  SPA-ERRCD
                        MOVE    11              TO  SPA-GMN-CUR
                    END-IF
+      *H26.5
+      *            H26.5.1∞ πﬂ§ŒS19.4.2¿∏∞ πﬂ§Œπ‚Œº‘…È√¥≥‰πÁ
+                   IF      FLG-RJN-02          =   1
+                       IF      (SPA-GMN-HOJO-MAX    =   4      )  AND
+                               (SPA-GMN-HOJOKBN     =   "E"   OR
+                                                        "H"   )
+                           MOVE    "1066"          TO  SPA-ERRCD
+                           MOVE    11              TO  SPA-GMN-CUR
+                       ELSE
+                           MOVE    SPACE           TO  SPA-ERRCD
+                           MOVE    ZERO            TO  SPA-GMN-CUR
+                       END-IF
+                   END-IF
                ELSE
                    IF      (SPA-GMN-HOJO-MAX    =   4      )  AND
                            (SPA-GMN-HOJOKBN     =   "B"   OR
@@ -2685,6 +2710,7 @@
            .
        20031-HOJOKBN-YMD-EXT.
            EXIT.
+      *
       *
       *****************************************************************
       *     ‰Ωı∂Ë ¨§Œ —ππΩËÕ˝
