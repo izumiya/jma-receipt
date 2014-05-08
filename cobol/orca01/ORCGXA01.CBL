@@ -1764,6 +1764,8 @@
            MOVE    "XA99"                TO  SPA-SAKIPG
       *
            MOVE    "NEW"                TO  MCP-PUTTYPE
+           MOVE    "NEW"                 TO  SPA-PUTTYPE
+      *
            MOVE    "XA99"                TO  MCP-WINDOW
       *
            PERFORM 900-PUT-WINDOW
