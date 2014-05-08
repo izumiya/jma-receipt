@@ -64,9 +64,9 @@ fi
 
         if   [ ${14} = '2' ]; then
             if   [ ${6} != '1' ]; then
-                 nkf -sx -Lw  $FILE_1 > ${13}
+                 nkf -Esx -Lw $FILE_1 > ${13}
             else
-                 nkf -sx -Lw  $FILE_1 > $FILE_3
+                 nkf -Esx -Lw $FILE_1 > $FILE_3
             fi
             RC=$?
             echo "--- nkf end   ---[" $RC  "]" >>$LOG_FILE
