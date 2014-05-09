@@ -105,6 +105,7 @@
            03  IDX-SYU             PIC 9(04).
            03  IDX-EIYOU           PIC 9(04).
            03  IDX-YAKIN           PIC 9(04).
+           03  IDX-KSN             PIC 9(04).
       *
            03  IDX1                PIC 9(02).
            03  IDX2                PIC 9(02).
@@ -217,6 +218,13 @@
            03  WRK-RYOYO-SRYCD                  PIC X(09).
       *    µßµÞ¡¦ºßÂðÅù»Ù±çÎÅÍÜÉÂ¾²½é´ü²Ã»»¤Î»»ÄêºÑÆü¿ô
            03  WRK-KYUKYU-NISSU                 PIC 9(05).
+      *
+      *    ²Ã»»»»ÄêºÑ²ó¿ô¥«¥¦¥ó¥ÈÍÑ
+           03  WRK-KSN-YMD.
+               05  WRK-KSN-YY          PIC 9(04).
+               05  WRK-KSN-MM          PIC 9(02).
+               05  WRK-KSN-DD          PIC 9(02).
+      *
       *    É¸·ç¡¦Ä¶²á¥Æ¡¼¥Ö¥ë
        01  WRK-HYOU-TEISU-TBL.
            03  WRK-HYOU-TEISU-OCC      OCCURS  2.
@@ -1784,8 +1792,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key44"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
@@ -1844,8 +1865,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key45"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
@@ -1905,8 +1939,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key48"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
@@ -1955,8 +2002,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key44"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
@@ -2014,8 +2074,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key49"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
@@ -2064,8 +2137,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key44"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
@@ -2123,8 +2209,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key50"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
@@ -2173,8 +2272,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key44"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
@@ -2232,8 +2344,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key52"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
@@ -2282,8 +2407,21 @@
                        PERFORM 910-NYUINACCT-FETCH-SEC
                        PERFORM    UNTIL
                                   FLG-NYUINACCT    =    1
-                           ADD   KSN-NACCT-ZAIKAISU
+                           IF     PTNYUINRRK-NYUINYMD(1:6)  =
+                                                   KSN-NACCT-SRYYM
+                               MOVE   PTNYUINRRK-NYUINYMD
+                                               TO  WRK-KSN-YMD
+                               PERFORM   VARYING IDX-KSN  FROM
+                                                 WRK-KSN-DD   BY   1
+                                 UNTIL   IDX-KSN  >   31
+                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                         ADD  1  TO  WRK-KYUKYU-NISSU
+                                     END-IF
+                               END-PERFORM
+                           ELSE
+                               ADD   KSN-NACCT-ZAIKAISU
                                                TO  WRK-KYUKYU-NISSU
+                           END-IF
                            MOVE    "tbl_nyuinacct" TO  MCP-TABLE
                            MOVE    "key44"         TO  MCP-PATHNAME
                            PERFORM 910-NYUINACCT-FETCH-SEC
