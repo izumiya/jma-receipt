@@ -545,6 +545,7 @@
            END-PERFORM
       *
            COMPUTE WRK-KENSU   =   SUM-KENSU   (1) +   SUM-KENSU   (2)
+      *    TAX
            IF      LNK-PRTKANRI-SRYYM  <   "201404"
       *        ¼ê¿ôÎÁ¡Ê·ï¿ô¹ç·×¡ß£³£±£µ±ß¡Ë
                COMPUTE WRK-KINGAK  =   WRK-KENSU       *   315
