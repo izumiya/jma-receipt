@@ -28,6 +28,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       *  04.07.01    NACL-Æ£¸¶    12/01/24  monpe-0.6.20ÂÐ±þ
+      *  04.07.02    NACL-Æ£¸¶    14/05/09  ¾ÃÈñÀÇ£¸¡óÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -543,9 +544,14 @@
                MOVE    WRK-KINGAKZ     TO  HCM65-KINGAK(IDX)
            END-PERFORM
       *
-      *    ¼ê¿ôÎÁ¡Ê·ï¿ô¹ç·×¡ß£³£±£µ±ß¡Ë
            COMPUTE WRK-KENSU   =   SUM-KENSU   (1) +   SUM-KENSU   (2)
-           COMPUTE WRK-KINGAK  =   WRK-KENSU       *   315
+           IF      LNK-PRTKANRI-SRYYM  <   "201404"
+      *        ¼ê¿ôÎÁ¡Ê·ï¿ô¹ç·×¡ß£³£±£µ±ß¡Ë
+               COMPUTE WRK-KINGAK  =   WRK-KENSU       *   315
+           ELSE
+      *        ¼ê¿ôÎÁ¡Ê·ï¿ô¹ç·×¡ß£³£²£´±ß¡Ë
+               COMPUTE WRK-KINGAK  =   WRK-KENSU       *   324
+           END-IF
            MOVE    WRK-KENSU       TO  WRK-KENSUZ
            MOVE    WRK-KENSUZ      TO  HCM65-KENSU (3)
            MOVE    WRK-KINGAK      TO  WRK-KINGAKZ
