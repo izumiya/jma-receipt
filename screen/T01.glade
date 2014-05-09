@@ -1932,6 +1932,33 @@
         <justify>GTK_JUSTIFY_CENTER</justify>
         <wrap>False</wrap>
       </widget>
+      <widget>
+        <class>GtkButton</class>
+        <name>B18</name>
+        <x>432</x>
+        <y>694</y>
+        <width>80</width>
+        <height>24</height>
+        <sensitive>True</sensitive>
+        <can_focus>True</can_focus>
+        <has_focus>False</has_focus>
+        <border_width>0</border_width>
+        <label>Ｅ・Ｆ</label>
+        <relief>GTK_RELIEF_NORMAL</relief>
+        <xalign>0.5</xalign>
+        <yalign>0.5</yalign>
+        <response_id>0</response_id>
+        <accelerator>
+          <modifiers>0</modifiers>
+          <key>GDK_F6</key>
+          <signal>clicked</signal>
+        </accelerator>
+        <signal>
+          <name>clicked</name>
+          <handler>send_event</handler>
+          <data>CLICKED</data>
+        </signal>
+      </widget>
     </widget>
   </widget>
 </GTK-Interface>

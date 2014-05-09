@@ -97,6 +97,7 @@
       *  04.07.00    NACL-小豆沢  11/08/09  保険者マスタ業務からの遷移処理
       *                                     追加
       *  04.07.00    NACL-多々納  13/12/09  9101 医療情報連携基盤情報
+      *  04.07.00    NACL-藤原    14/04/22  9102 ＥＦファイル作成
       *****************************************************************
       *
        ENVIRONMENT                               DIVISION.
@@ -360,17 +361,19 @@
            03  FILLER              PIC X(35)   VALUE
                "9101 医療情報連携基盤情報".
            03  FILLER              PIC X(35)   VALUE
+               "9102 ＥＦファイル作成".
+           03  FILLER              PIC X(35)   VALUE
                "9600 ＣＲＯＮ設定情報".
            03  FILLER              PIC X(35)   VALUE
                "9700 ユーザプログラム起動情報".
            03  FILLER              PIC X(35)   VALUE
                "9800 排他制御情報".
        01  TBL-KANRICD-G-AREAR         REDEFINES   TBL-KANRICD-G-AREA.
-           03  TBL-KANRICD-G-TBL           OCCURS   6.
+           03  TBL-KANRICD-G-TBL           OCCURS   7.
                05  TBL-KANRICD-G           PIC X(04).
                05  TBL-FILLER              PIC X(01).
                05  TBL-KANRICDMEI-G        PIC X(30).
-       01  TBL-KANRICDG-MAX                 PIC 9(04)   VALUE   6.
+       01  TBL-KANRICDG-MAX                 PIC 9(04)   VALUE   7.
       *
       *入院のみ
        01  TBL-KANRICD-N-AREA.
@@ -403,6 +406,8 @@
            03  FILLER              PIC X(35)   VALUE
                "9101 医療情報連携基盤情報".
            03  FILLER              PIC X(35)   VALUE
+               "9102 ＥＦファイル作成".
+           03  FILLER              PIC X(35)   VALUE
                "9600 ＣＲＯＮ設定情報".
            03  FILLER              PIC X(35)   VALUE
                "9700 ユーザプログラム起動情報".
@@ -410,11 +415,11 @@
                "9800 排他制御情報".
       *
        01  TBL-KANRICD-N-AREAR         REDEFINES   TBL-KANRICD-N-AREA.
-           03  TBL-KANRICD-N-TBL           OCCURS   17.
+           03  TBL-KANRICD-N-TBL           OCCURS   18.
                05  TBL-KANRICD-N           PIC X(04).
                05  TBL-FILLER              PIC X(01).
                05  TBL-KANRICDMEI-N        PIC X(30).
-       01  TBL-KANRICDN-MAX                PIC 9(04)   VALUE   17.
+       01  TBL-KANRICDN-MAX                PIC 9(04)   VALUE   18.
       *
       *    他業務からシステム管理に遷移する場合の引継ぎパラメタ
            COPY    "CPLNKSYS.INC".
@@ -2116,6 +2121,9 @@
       *        医療情報連携
                WHEN    "9101"
                    MOVE    "W91"               TO  SPA-SAKIPG
+      *        ＥＦファイル作成
+               WHEN    "9102"
+                   MOVE    "W92"               TO  SPA-SAKIPG
                WHEN    "9600"
                    MOVE    "W96"               TO  SPA-SAKIPG
                WHEN    "9700"
@@ -2213,6 +2221,8 @@
                WHEN    "9000"
       *        医療情報連携
                WHEN    "9101"
+      *        ＥＦファイル作成
+               WHEN    "9102"
                   IF      (SPA-NAI-STYUKYMD    =   ZERO )  AND
                           (SPA-NAI-EDYUKYMD    =   99999999)
                        CONTINUE

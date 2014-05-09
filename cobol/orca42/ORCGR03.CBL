@@ -127,6 +127,7 @@
       *  04.07.06    NACL-藤原    13/09/20  第三者行為対応
       *  04.07.07    NACL-藤原    13/12/04  自賠責（労災準拠）のレセプト
       *                                     様式追加対応
+      *  04.07.08    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -186,7 +187,7 @@
                        09  SPA-GMN-F1              PIC X(01).
                        09  SPA-GMN-NYUGAIKBNMEI    PIC X(06).
       *                         
-                   07  SPA-GMN-PRTKBNLST           OCCURS  3.
+                   07  SPA-GMN-PRTKBNLST           OCCURS  10.
                        09  SPA-GMN-PRTKBNL         PIC X(01).
                        09  SPA-GMN-F1L             PIC X(01).
                        09  SPA-GMN-PRTKBNMEIL      PIC X(30).    
@@ -228,6 +229,7 @@
                                                    PIC X(01).
                    07  SPA-NAI-200505-HKNJANUM     PIC X(08).
                    07  SPA-NAI-9101-COOPBASE       PIC X(01).
+                   07  SPA-NAI-9102-EFOUT          PIC X(01).
       *
        01  SPA-RECE07-REC. 
            COPY    "CPRCF007.INC"  REPLACING  //RECE07//
@@ -386,6 +388,8 @@
            COPY    "CPSK4001.INC".
       *
            COPY    "CPSK9101.INC".
+      *
+           COPY    "CPSK9102.INC".
       *
       *    ジョブ管理マスタ
        01  JOBKANRI-REC.
@@ -613,6 +617,25 @@
            MOVE    SYS-9101-COOPBASE
                                    TO  SPA-NAI-9101-COOPBASE
       *
+      *    ＥＦファイルデータ情報
+           INITIALIZE                  SYS-9102-REC
+           MOVE    "9102"          TO  SYS-9102-KANRICD
+           MOVE    "*"             TO  SYS-9102-KBNCD
+           MOVE    SPA-SYSYMD      TO  SYS-9102-STYUKYMD
+                                       SYS-9102-EDYUKYMD
+           MOVE    SPA-HOSPNUM     TO  SYS-9102-HOSPNUM
+           MOVE    SYS-9102-REC    TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE   MCPDATA-REC  TO  SYS-9102-REC
+           ELSE
+               MOVE   SPACE        TO  SYS-9102-REC
+           END-IF
+           IF      SYS-9102-EFOUT   =   SPACE
+               MOVE    "0"             TO  SYS-9102-EFOUT
+           END-IF
+           MOVE    SYS-9102-EFOUT  TO  SPA-NAI-9102-EFOUT
+      *
            IF      SPA-BEDSU       >   ZERO
                MOVE    "1"             TO  SPA-GMN-NYUGAIKBNL       (1)
                MOVE    "入院"          TO  SPA-GMN-NYUGAIKBNMEIL    (1)
@@ -638,6 +661,13 @@
                MOVE    "6"                 TO  SPA-GMN-PRTKBNL   (3)
                MOVE    "連携基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
                MOVE    3                   TO  SPA-GMN-PRTKBN-MAX
+           END-IF
+           IF      SPA-NAI-9102-EFOUT  =   "1"
+               ADD     1                   TO  SPA-GMN-PRTKBN-MAX
+               MOVE    "7"                 TO  SPA-GMN-PRTKBNL
+                                                   (SPA-GMN-PRTKBN-MAX)
+               MOVE    "ＥＦファイル用"    TO  SPA-GMN-PRTKBNMEIL
+                                                   (SPA-GMN-PRTKBN-MAX)
            END-IF
            MOVE    SPA-GMN-PRTKBNLST (1)
                                        TO  SPA-GMN-PRTKBN-G
@@ -909,6 +939,25 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
            MOVE    SYS-9101-COOPBASE
                                    TO  SPA-NAI-9101-COOPBASE
       *
+      *    ＥＦファイルデータ情報
+           INITIALIZE                  SYS-9102-REC
+           MOVE    "9102"          TO  SYS-9102-KANRICD
+           MOVE    "*"             TO  SYS-9102-KBNCD
+           MOVE    SPA-SYSYMD      TO  SYS-9102-STYUKYMD
+                                       SYS-9102-EDYUKYMD
+           MOVE    SPA-HOSPNUM     TO  SYS-9102-HOSPNUM
+           MOVE    SYS-9102-REC    TO  MCPDATA-REC
+           PERFORM 900-SYSKANRI-INV-SEC
+           IF      FLG-SYSKANRI    =   ZERO
+               MOVE   MCPDATA-REC  TO  SYS-9102-REC
+           ELSE
+               MOVE   SPACE        TO  SYS-9102-REC
+           END-IF
+           IF      SYS-9102-EFOUT   =   SPACE
+               MOVE    "0"             TO  SYS-9102-EFOUT
+           END-IF
+           MOVE    SYS-9102-EFOUT  TO  SPA-NAI-9102-EFOUT
+      *
            IF      SPA-BEDSU       >   ZERO
                MOVE    "1"             TO  SPA-GMN-NYUGAIKBNL       (1)
                MOVE    "入院"          TO  SPA-GMN-NYUGAIKBNMEIL    (1)
@@ -941,6 +990,13 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
                MOVE    "連携基盤用"        TO  SPA-GMN-PRTKBNMEIL(3)
                MOVE    3                   TO  SPA-GMN-PRTKBN-MAX
            END-IF
+           IF      SPA-NAI-9102-EFOUT  =   "1"
+               ADD     1                   TO  SPA-GMN-PRTKBN-MAX
+               MOVE    "7"                 TO  SPA-GMN-PRTKBNL
+                                                   (SPA-GMN-PRTKBN-MAX)
+               MOVE    "ＥＦファイル用"    TO  SPA-GMN-PRTKBNMEIL
+                                                   (SPA-GMN-PRTKBN-MAX)
+           END-IF
            EVALUATE    SPA-R01-PRTKBN
                WHEN    "1"
                    MOVE    SPA-GMN-PRTKBNLST (1)
@@ -952,6 +1008,15 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
                WHEN    "9"
                    MOVE    SPA-GMN-PRTKBNLST (3)
                                                TO  SPA-GMN-PRTKBN-G
+               WHEN    "8"
+                   IF      SPA-NAI-9101-COOPBASE
+                                           =   "1"
+                       MOVE    SPA-GMN-PRTKBNLST (4)
+                                               TO  SPA-GMN-PRTKBN-G
+                   ELSE
+                       MOVE    SPA-GMN-PRTKBNLST (3)
+                                               TO  SPA-GMN-PRTKBN-G
+                   END-IF
            END-EVALUATE        
       *   
            EVALUATE    SPA-R01-FILEKBN
@@ -1408,17 +1473,17 @@ grpsys     MOVE    SPA-HOSPNUM     TO  SYS-2005-HOSPNUM
       *****************************************************************
        4103-KAKUTEI-CHK-SEC        SECTION.
       *
-      *    医保分のみ連携基盤を選択可能
-           IF      SPA-GMN-PRTKBN   =   "6"
+      *    医保分のみ連携基盤・ＥＦファイルを選択可能
+           IF      SPA-GMN-PRTKBN   =   "6" OR  "7"
                EVALUATE    TRUE
                    WHEN    SPA-DATAKBN1-VALUE  =   "T"
                        CONTINUE
                    WHEN    SPA-DATAKBN2-VALUE  =   "T"
                    WHEN    SPA-DATAKBN3-VALUE  =   "T"
                    WHEN    SPA-DATAKBN5-VALUE  =   "T"
-                   WHEN    SPA-DATAKBN21-VALUE =   "T"
-      *??              CONTINUE
                        MOVE    "0011"          TO  SPA-ERRCD
+                   WHEN    SPA-DATAKBN21-VALUE =   "T"
+                           CONTINUE
                    WHEN    SPA-DATAKBN11-VALUE =   "T"
                    WHEN    SPA-DATAKBN31-VALUE =   "T"
                    WHEN    SPA-DATAKBN32-VALUE =   "T"
@@ -2433,7 +2498,8 @@ grpsys                 MOVE    SPA-HOSPNUM     TO  SYS-2001-HOSPNUM
                        MOVE    "*"             TO  SYS-2001-KBNCD
                        MOVE    ZERO            TO  SYS-2001-STYUKYMD
                        MOVE    ALL "9"         TO  SYS-2001-EDYUKYMD
-                   END-IF 
+                   END-IF
+                   INITIALIZE                      SYS-2001-TBL 
                    MOVE    "1"                 TO  SYS-2001-SYOKBN
                    MOVE    SPA-R01-RECEKBN     TO  SYS-2001-RECEKBN
                    MOVE    SPA-GMN-NYUGAIKBN   TO  SYS-2001-NYUGAIKBN
@@ -2441,7 +2507,11 @@ grpsys                 MOVE    SPA-HOSPNUM     TO  SYS-2001-HOSPNUM
                    IF      SPA-R01-PRTKBN      =   "1"
                        MOVE    SPACE               TO  SYS-2001-PRTKBN
                    ELSE
-                       MOVE    "1"                 TO  SYS-2001-PRTKBN
+                       IF      SPA-R01-PRTKBN      =   "8" OR  "9"
+                           MOVE    SPA-R01-PRTKBN  TO  SYS-2001-PRTKBN
+                       ELSE
+                           MOVE    "1"             TO  SYS-2001-PRTKBN
+                       END-IF
                    END-IF
                    MOVE    SYS-2001-REC        TO  MCPDATA-REC
                    IF      FLG-SYSKANRI        =   1
@@ -2956,6 +3026,12 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            AND   ( SPA-R01-PRTKBN      =   "6"            )
                MOVE    "9"                 TO  SPA-R01-PRTKBN
            END-IF
+      *    医保分でＥＦファイル作成のとき
+           IF    ( SPA-R01-RECEKBN     =   "0" OR  "1" OR
+                                           "2" OR  "7"    )
+           AND   ( SPA-R01-PRTKBN      =   "7"            )
+               MOVE    "8"                 TO  SPA-R01-PRTKBN
+           END-IF
       *
            MOVE    SPACE               TO  SPA-R01-GMNKBN
       *
@@ -3015,7 +3091,11 @@ grpsys             PERFORM 900-ORCDBMAIN-SEC
            INITIALIZE                      R99
            MOVE    ZERO                TO  R99-COUNT
                                            R99-PROGRESSBAR-VALUE
-           MOVE    "F12:印    刷"      TO  R99-B12-LABEL
+           IF      SPA-R01-PRTKBN  =   "9" OR  "8"
+               CONTINUE
+           ELSE
+               MOVE    "F12:印    刷"      TO  R99-B12-LABEL
+           END-IF
            MOVE    "black"             TO  R99-MSG-STYLE
       *
       *    ジョブ管理チェック処理
@@ -3056,11 +3136,14 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                          MOVE    "対象データがありませんでした"
                                                        TO  R99-MSG
                      ELSE
-                       PERFORM 4501-REPRINT-CHK-SEC
-                       IF      SPA-RECE07-PRTID    =   SPACE
+                       IF      SPA-R01-PRTKBN  =   "9" OR  "8"
+                         CONTINUE
+                       ELSE
+                         PERFORM 4501-REPRINT-CHK-SEC
+                         IF      SPA-RECE07-PRTID    =   SPACE
                            MOVE    "対象のレセプトが作成されていません"
                                                TO  R99-MSG
-                       ELSE                    
+                         ELSE                    
                            MOVE    SPA-RECE07-KEY
                                           TO  SPA-R01-RECE07-KEY
                            MOVE    SPA-RECE07-RECEKBN
@@ -3098,8 +3181,9 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                            MOVE    SPA-RECE07-HKNJANUM-SYAHO-T
                                           TO
                                        SPA-R01-RECE07-HKNJANUM-SYAHO-T
+                         END-IF
                        END-IF
-                     END-IF 
+                     END-IF
                    ELSE
                        STRING  JOB-YOBI    DELIMITED  BY  SPACE
                                "【"        DELIMITED  BY  SIZE
@@ -3116,6 +3200,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            MOVE    WIDGET-INSENSITIVE   TO  R99-B12-STATE
            IF      R99-MSG              =   SPACE
                IF      R99-COUNT            >   ZERO    
+                 IF      SPA-R01-PRTKBN  =   "9" OR  "8"
+                    MOVE    "処理は正常に終了しました"
+                                                TO  R99-MSG
+                 ELSE
                    MOVE    WIDGET-NORMAL        TO  R99-B12-STATE
                    MOVE    "B12"                TO  MCP-WIDGET
                    IF    ( SPA-R01-RECE07-SRYKA =   "XX" )
@@ -3136,8 +3224,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                        MOVE    "処理は正常に終了しました"
                                                 TO  R99-MSG
                    END-IF
-                   MOVE   100                   TO
-                                                R99-PROGRESSBAR-VALUE
+                 END-IF
+                 MOVE   100                 TO  R99-PROGRESSBAR-VALUE
                ELSE
                    MOVE    "B01"                TO  MCP-WIDGET
                    MOVE    "該当する処理はありません"
@@ -3436,9 +3524,9 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                            INTO        SPA-ERRMSG
                    END-STRING
                WHEN    "0011"
-                   STRING  "連携基盤用は医保分（一括作成・全件）"
+                   STRING  "ＥＦファイル作成、連携基盤用は医保分"
                                            DELIMITED   BY  SIZE  
-                           "のときだけ選択できます"
+                           "のときに選択できます"
                                            DELIMITED   BY  SIZE  
                                            INTO        SPA-ERRMSG
                    END-STRING
@@ -3556,6 +3644,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                WHEN    "1016"
                    MOVE    "個別作成分の再印刷処理（公害）を行います"
                                             TO  WRK-RIDMSG
+               WHEN    "1017"
+                   MOVE
+                   "個別作成分の新規作成処理（ＥＦファイル）を行います"
+                                            TO  WRK-RIDMSG
                WHEN    "6666"
                    MOVE    "レセプト作成処理中です"
                                             TO  WRK-RIDMSG
@@ -3576,6 +3668,10 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            IF    ( SPA-GMN-PRTKBN       =   "6" )
            AND   ( SPA-RIDCD (1:1)      =   "1" )
                MOVE    "【連携基盤用レセプト】" TO  RID1-LABEL
+           END-IF
+           IF    ( SPA-GMN-PRTKBN       =   "7" )
+           AND   ( SPA-RIDCD (1:1)      =   "1" )
+               MOVE    "【ＥＦファイル用データ】" TO  RID1-LABEL
            END-IF
       *
            MOVE    "戻る"               TO  RID1-B01-LABEL

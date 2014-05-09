@@ -76,6 +76,7 @@
       *  04.07.02    NACL-藤原    12/12/03  ターミナルデジットによる出力対応
       *  04.07.03    NACL-藤原    13/12/09  医療情報連携基盤対応
       *  04.07.04    NACL-藤原    13/09/20  第三者行為対応
+      *  04.07.05    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -415,8 +416,8 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
                    MOVE    "F12:プレビュー"    TO  R99-B12-LABEL
                END-IF
            ELSE
-               IF    ( SPA-R01-GMNKBN  =   "R97" )
-               OR    ( SPA-R01-PRTKBN  =   "9"   )
+               IF    ( SPA-R01-GMNKBN  =   "R97"       )
+               OR    ( SPA-R01-PRTKBN  =   "9" OR  "8" )
                    CONTINUE
                ELSE
                    MOVE    "F12:印    刷"      TO  R99-B12-LABEL
@@ -519,7 +520,7 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                                MOVE    "対象データがありませんでした"
                                                        TO  R99-MSG
                            ELSE
-                             IF      SPA-R01-PRTKBN  =   "9"
+                             IF      SPA-R01-PRTKBN  =   "9" OR  "8"
                                CONTINUE
                              ELSE
                                PERFORM 4501-REPRINT-CHK-SEC
@@ -614,8 +615,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                            END-IF
                        END-IF
                    ELSE
-                       IF    ( SPA-R01-GMNKBN  =   "R97" )
-                       OR    ( SPA-R01-PRTKBN  =   "9"   )
+                       IF    ( SPA-R01-GMNKBN  =   "R97"       )
+                       OR    ( SPA-R01-PRTKBN  =   "9" OR  "8" )
                            MOVE    "処理は正常に終了しました"
                                                 TO  R99-MSG
                        ELSE
@@ -657,8 +658,8 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                            MOVE    "B01"            TO  MCP-WIDGET
                        END-IF
                    ELSE
-                     IF    ( SPA-R01-GMNKBN  =   "R97" )
-                     OR    ( SPA-R01-PRTKBN  =   "9"   )
+                     IF    ( SPA-R01-GMNKBN  =   "R97"       )
+                     OR    ( SPA-R01-PRTKBN  =   "9" OR  "8" )
                          MOVE    "B01"                TO  MCP-WIDGET
                      ELSE
                        MOVE    WIDGET-NORMAL        TO  R99-B12-STATE

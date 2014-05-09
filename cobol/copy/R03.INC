@@ -18,7 +18,7 @@
                 04  R03-PRTKBN.
                   05  R03-VALUE   PIC X(32).
                 04  R03-PRTKBN-COUNT   PIC S9(9)   BINARY.
-                04  R03-PRTKBN-ITEM    PIC X(32)    OCCURS  3 TIMES.
+                04  R03-PRTKBN-ITEM    PIC X(32)    OCCURS  10 TIMES.
               03  R03-PRTKBN-LABEL-STYLE   PIC X(20).
               03  R03-PRTKBN-LABEL.
                 04  R03-VALUE   PIC X(28).

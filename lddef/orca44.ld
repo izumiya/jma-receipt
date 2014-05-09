@@ -71,6 +71,7 @@ db	{
 	tbl_syskanri;
 	tbl_syuka;
 	tbl_renkei_tmp;
+	tbl_efout;
 };
 
 /* #include "orcadb.inc" */

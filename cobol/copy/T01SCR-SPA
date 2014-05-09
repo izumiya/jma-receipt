@@ -76,6 +76,7 @@
       *  04.07.03    NACL-藤原    12/08/01  レセ電データチェック機能対応
       *  04.07.04    NACL-藤原    13/02/07  労災レセ電対応
       *  04.07.05    NACL-藤原    13/12/09  医療情報連携基盤対応
+      *  04.07.06    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *****************************************************************
       *
        01  SPA-T01FREE.
@@ -167,6 +168,7 @@
                05  SPA-NAIB-T01-AREA.
                    07  SPA-NAI-WIDGET              PIC X(08). 
                    07  SPA-NAI-SKYYM               PIC 9(06).
+                   07  SPA-NAI-SKYYM-W             PIC 9(04).
                    07  SPA-NAI-SKYYMD              PIC 9(08).
                    07  SPA-NAI-PRTKBN1             PIC X(01).
                    07  SPA-NAI-PRTKBN2             PIC X(01).
@@ -279,6 +281,12 @@
       *
                05  SPA-NAI-9101-COOPBASE           PIC X(01).
                05  SPA-NAI-9101-FILE-DIR           PIC X(200).
+      *
+               05  SPA-NAI-9102-EFOUT              PIC X(01).
+               05  SPA-NAI-9102-FILE-DIR           PIC X(200).
+      *
+               05  SPA-NAI-1001-PREFNUM            PIC 9(02).
+               05  SPA-NAI-1001-HOSPCD             PIC 9(07).
       *
       *    公費個別指定
            03  SPA-T02-AREA.

@@ -36,7 +36,7 @@ fi
 #        $16 HOSPNUM 
 #        $18 レセプト作成区分
 #            1:提出用レセ、2:点検用レセ、3:点検用レセ（０点公費記載）
-#            9:連携基盤用
+#            8:ＥＦファイル作成、9:連携基盤用
 #        $19 請求データ削除区分
 #            0:削除しない、2:削除する
 #        $20 業務区分
@@ -64,13 +64,21 @@ fi
             if [ ${18} -eq  '9' ]; then
                 LOG_FILE="/var/log/jma-receipt/${16}recept1a_renkei.log"
             else
-                LOG_FILE="/var/log/jma-receipt/${16}recept1a.log"
+                if [ ${18} -eq  '8' ]; then
+                    LOG_FILE="/var/log/jma-receipt/${16}recept1a_efout.log"
+                else
+                    LOG_FILE="/var/log/jma-receipt/${16}recept1a.log"
+                fi
             fi
         else
             if [ ${18} -eq  '9' ]; then
                 LOG_FILE="/var/log/jma-receipt/${16}recept1b_renkei.log"
             else
-                LOG_FILE="/var/log/jma-receipt/${16}recept1b.log"
+                if [ ${18} -eq  '8' ]; then
+                    LOG_FILE="/var/log/jma-receipt/${16}recept1b_efout.log"
+                else
+                    LOG_FILE="/var/log/jma-receipt/${16}recept1b.log"
+                fi
             fi
         fi
 
@@ -204,12 +212,16 @@ fi
                 fi
             fi  
         fi
-##
-##レセ電作成        
+
         if  [ -e $4 ]; then
             exit 
-        else
-            if  [ ${12} -eq '1' ] || [ ${12} -eq '3' ] || [ ${13} -eq '1' ] || [ ${13} -eq '3' ]; then
+        else 
+            if  [ ${18} -eq '8' ];then
+##            ＥＦファイル作成
+              $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCRDPC20 -parameter $1,$3,${12},${13},$5,$6,${16},${9},${10},${4} >> $LOG_FILE 2>&1
+            else
+##            レセ電作成        
+              if  [ ${12} -eq '1' ] || [ ${12} -eq '3' ] || [ ${13} -eq '1' ] || [ ${13} -eq '3' ]; then
                 if ( ( [ ${12} != '1' ] && [ ${12} != '3' ] ) && [ ${3} -eq '1' ] ) || \
                    ( ( [ ${13} != '1' ] && [ ${13} != '3' ] ) && [ ${3} -eq '2' ] ); then
                     echo "no1"
@@ -224,9 +236,10 @@ fi
                     fi
                     $DBSTUB -dir $LDDIRECTORY -bd orcabt ORCR0300 -parameter $1,$3,${12},${13},$5,$6,${16},${9},${10},${18},${4} >> $LOG_FILE 2>&1
                 fi 
+              fi
             fi
         fi
-        
+
         if  [ -e $4 ]; then
             exit 
         else

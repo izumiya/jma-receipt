@@ -95,6 +95,7 @@ utf8_shell_sources = \
 	allways/orc_print_dmy.sh.in \
 	allways/orcbi202.sh.in \
 	allways/store_mnote.sh.in \
+	monthly/recept42.sh.in \
 
 shell_sources = \
 	allways/master_standard_upgrade.sh.in \

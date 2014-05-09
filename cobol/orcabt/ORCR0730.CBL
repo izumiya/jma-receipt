@@ -193,9 +193,10 @@
       *  04.07.09    NACL-藤原    13/02/07  労災レセ電対応
       *  04.07.10    NACL-門脇    13/09/11  自賠責（第三者行為）対応
       *  04.07.11    NACL-門脇    13/11/11  減額（円）の対応
-      *  04.07.12    NACL-藤原    13/12/09  医療情報連係基盤対応
+      *  04.07.12    NACL-藤原    13/12/09  医療情報連携基盤対応
       *  04.07.13    NACL-門脇    14/02/03  第三者行為対応（院外処方のみの
       *                                     保険組み合わせの病名記載対応）
+      *  04.07.14    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -1450,9 +1451,8 @@
                PERFORM 5001-DB-DELETE-SEC
            END-IF
       *
-      *
-      *    連係基盤用のとき処理終了
-           IF      WRK-PARA-PRTKBN      =   "9"
+      *    ＥＦファイル作成・連携基盤用のとき処理終了
+           IF      WRK-PARA-PRTKBN      =   "9" OR  "8"
                MOVE    2                    TO  FLG-STS
            ELSE
                IF      FLG-STS             =   ZERO
@@ -11156,8 +11156,8 @@
       *****************************************************************
        5001-DB-DELETE-SEC               SECTION.
       *
-      *    連係基盤用のとき
-           IF      WRK-PARA-PRTKBN =   "9"
+      *    ＥＦファイル作成、連携基盤用のとき
+           IF      WRK-PARA-PRTKBN =   "9" OR  "8"
                IF      WRK-PARA-SYOKBN     =   "1"
                    INITIALIZE                      RECEDEN-REC
                    MOVE    WRK-PARA-HOSPNUM    TO  RECEDEN-HOSPNUM
@@ -11165,15 +11165,25 @@
                    MOVE    "1"                 TO  RECEDEN-NYUGAIKBN
                    MOVE    RECEDEN-REC         TO  MCPDATA-REC
                    MOVE    "DBDELETE"          TO  MCP-FUNC
-                   MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
+                   IF      WRK-PARA-PRTKBN =   "9"
+                       MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
+                   ELSE
+                       MOVE    "tbl_efout"         TO  MCP-TABLE
+                   END-IF
                    MOVE    "del1"              TO  MCP-PATHNAME
                    PERFORM 900-ORCDBMAIN-SEC
                    IF      MCP-RC           NOT =   ZERO
                        DISPLAY "DBPATH=" MCP-TABLE " " MCP-PATHNAME
                                " MCP-RC=" MCP-RC
-                       MOVE
-                       "連係基盤削除処理でエラーとなりました"
-                                               TO    WRK-RECEERR
+                       IF      WRK-PARA-PRTKBN =   "8"
+                           MOVE
+                          "ＥＦファイル作成削除処理でエラーとなりました"
+                                                       TO  WRK-RECEERR
+                       ELSE
+                           MOVE
+                               "連係基盤削除処理でエラーとなりました"
+                                                       TO  WRK-RECEERR
+                       END-IF
                        PERFORM 500-ERR-HENSYU-SEC
                        GO  TO  5001-DB-DELETE-EXT
                    END-IF
@@ -11213,16 +11223,26 @@
                                                        RECEDEN-NYUGAIKBN
                            MOVE    RECEDEN-REC         TO  MCPDATA-REC
                            MOVE    "DBDELETE"          TO  MCP-FUNC
-                           MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
+                           IF      WRK-PARA-PRTKBN =   "9"
+                               MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
+                           ELSE
+                               MOVE    "tbl_efout"         TO  MCP-TABLE
+                           END-IF
                            MOVE    "del2"              TO  MCP-PATHNAME
                            PERFORM 900-ORCDBMAIN-SEC
                            IF      MCP-RC           NOT =   ZERO
                                DISPLAY "DBPATH=" MCP-TABLE
                                        " " MCP-PATHNAME
                                        " MCP-RC=" MCP-RC
-                               MOVE
-                        "連係基盤削除処理（個別分）でエラーとなりました"
-                                                   TO    WRK-RECEERR
+                               IF      WRK-PARA-PRTKBN =   "8"
+                                   MOVE
+                          "ＥＦファイル作成削除処理でエラーとなりました"
+                                                       TO  WRK-RECEERR
+                               ELSE
+                                   MOVE
+                               "連係基盤削除処理でエラーとなりました"
+                                                       TO  WRK-RECEERR
+                               END-IF
                                PERFORM 500-ERR-HENSYU-SEC
                                GO  TO  5001-DB-DELETE-EXT
                            END-IF

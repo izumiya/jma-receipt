@@ -52,6 +52,7 @@ bind	"W66"		"OpenCOBOL"	"ORCGW66";
 bind	"W67"		"OpenCOBOL"	"ORCGW67";
 bind	"W68"		"OpenCOBOL"	"ORCGW68";
 bind	"W91"		"OpenCOBOL"	"ORCGW91";
+bind	"W92"		"OpenCOBOL"	"ORCGW92";
 bind	"W96"		"OpenCOBOL"	"ORCGW96";
 bind	"W98"		"OpenCOBOL"	"ORCGW98";
 bind	"W981"		"OpenCOBOL"	"ORCGW981";
@@ -116,6 +117,7 @@ data	{
 		W67;
 		W68;
 		W91;
+		W92;
 		W96;
 		W98;
 		W981;

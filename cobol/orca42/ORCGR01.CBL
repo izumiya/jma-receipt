@@ -162,6 +162,8 @@
       *  04.07.07    NACL-藤原    13/09/20  第三者行為対応
       *  04.07.08    NACL-藤原    13/12/04  自賠責（労災準拠）のレセプト
       *                                     様式追加対応
+      *  04.07.09    NACL-藤原    14/04/22  ＥＦファイル作成対応
+      *                                     医療情報連携基盤対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -709,6 +711,10 @@
                WHEN    "3"
                    MOVE    "【点検用（０点公費記載設定）】"
                                            TO  WRK-PRTKBN
+               WHEN    "8"
+                   MOVE    "【ＥＦファイル】"  TO  WRK-PRTKBN
+               WHEN    "9"
+                   MOVE    "【連係基盤用】"    TO  WRK-PRTKBN
                WHEN    OTHER
                    MOVE    SPACE           TO  WRK-PRTKBN
            END-EVALUATE
@@ -760,7 +766,12 @@
                MOVE    WRK-HENYMDG(1:6)       TO  SPA-NAI-R01-HYO-SRYYMH
            END-IF
       *
-           EVALUATE    SPA-R01-NYUGAIKBN
+           IF      SPA-R01-PRTKBN  =   "8" OR  "9"
+               MOVE    "1"             TO  SPA-GMN-R01-SYORIL    (1)
+               MOVE    "個　別"        TO  SPA-GMN-R01-SYORIMEIL (1)
+               MOVE    1               TO  SPA-GMN-R01-SYORILST-MAX
+           ELSE
+             EVALUATE    SPA-R01-NYUGAIKBN
                WHEN    "1"
                    MOVE    "1"             TO  SPA-GMN-R01-SYORIL    (1)
                    MOVE    "個　別"        TO  SPA-GMN-R01-SYORIMEIL (1)
@@ -777,15 +788,16 @@
                    MOVE    "4"             TO  SPA-GMN-R01-SYORIL    (4)
                    MOVE    "照会連携"      TO  SPA-GMN-R01-SYORIMEIL (4)
                    MOVE    4               TO  SPA-GMN-R01-SYORILST-MAX
-           END-EVALUATE
-           EVALUATE    SPA-R01-RECEKBN
+             END-EVALUATE
+             EVALUATE    SPA-R01-RECEKBN
                WHEN    "0"
                    ADD     1               TO  SPA-GMN-R01-SYORILST-MAX
                    MOVE    "5"             TO  SPA-GMN-R01-SYORIL
                                               (SPA-GMN-R01-SYORILST-MAX)
                    MOVE    "未請求解除"    TO  SPA-GMN-R01-SYORIMEIL
                                               (SPA-GMN-R01-SYORILST-MAX)
-           END-EVALUATE
+             END-EVALUATE
+           END-IF
       *
       *    パラメタＤＢ読み込み
            INITIALIZE                      BTPARA-REC
@@ -2170,7 +2182,7 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-4001-HOSPNUM
                END-IF
            END-IF
       *
-           IF      SPA-R01-PRTKBN       =   "9"
+           IF      SPA-R01-PRTKBN       =   "9" OR  "8"
              CONTINUE
            ELSE
              IF      SPA-ERRCD            =   SPACE
@@ -3167,6 +3179,19 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-2001-HOSPNUM
                            GO  TO  480-ZENKAI-HYOUJI-RID-EXT
                        END-IF
                    END-IF 
+                   IF      SYS-2001-PRTKBN     =   "8" OR  "9"
+                       IF      SPA-R01-PRTKBN      =   SYS-2001-PRTKBN
+                           CONTINUE
+                       ELSE     
+                           MOVE    "0042"              TO  SPA-ERRCD
+                           GO  TO  480-ZENKAI-HYOUJI-RID-EXT
+                       END-IF
+                   ELSE
+                       IF      SPA-R01-PRTKBN      =   "8" OR  "9"
+                           MOVE    "0042"              TO  SPA-ERRCD
+                           GO  TO  480-ZENKAI-HYOUJI-RID-EXT
+                       END-IF
+                   END-IF
                    IF      SYS-2001-NYUGAIKBN  =
                                            SPA-R01-NYUGAIKBN
                        CONTINUE
@@ -4100,6 +4125,7 @@ grpsys     MOVE    SPA-HOSPNUM         TO  SYS-2001-HOSPNUM
                MOVE    ALL "9"             TO  SYS-2001-EDYUKYMD
 grpsys         MOVE    SPA-HOSPNUM         TO  SYS-2001-HOSPNUM
            END-IF 
+           INITIALIZE                      SYS-2001-TBL 
            MOVE    "2"                 TO  SYS-2001-SYOKBN
            MOVE    "000000"            TO  SYS-2001-SRYYM
            MOVE    SPA-R01-RECEKBN     TO  SYS-2001-RECEKBN
@@ -4108,7 +4134,11 @@ grpsys         MOVE    SPA-HOSPNUM         TO  SYS-2001-HOSPNUM
            IF      SPA-R01-PRTKBN      =   "1"
                MOVE    SPACE               TO  SYS-2001-PRTKBN
            ELSE
-               MOVE    "1"                 TO  SYS-2001-PRTKBN
+               IF      SPA-R01-PRTKBN      =   "8" OR  "9"
+                   MOVE    SPA-R01-PRTKBN      TO  SYS-2001-PRTKBN
+               ELSE
+                   MOVE    "1"                 TO  SYS-2001-PRTKBN
+               END-IF
            END-IF
            MOVE    SPA-TERMID          TO  SYS-2001-TERMID
            MOVE    SPA-OPID            TO  SYS-2001-OPID
@@ -5414,6 +5444,9 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
                    END-STRING
                WHEN    "0041"
                    MOVE    "データが入力してあるので遷移できません"
+                                                       TO  SPA-ERRMSG
+               WHEN    "0042"
+                   MOVE    "前回とはレセプトの種類が違います"
                                                        TO  SPA-ERRMSG
                WHEN    "1001"
                    MOVE    "レセプト指示コード（個別）が削除できません"

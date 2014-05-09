@@ -27,6 +27,10 @@ T01	{
 		B17	{
 			state	int;
 		};
+		B18	{
+			state	int;
+			value	varchar(12);
+		};
 		B19	{
 			state	int;
 		};

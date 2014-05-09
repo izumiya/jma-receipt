@@ -1,0 +1,38 @@
+W92	{
+	title	varchar(256);
+	popup_summary	varchar(256);
+	popup_body	varchar(1024);
+	popup_icon	varchar(256);
+	popup_timeout	int;
+	fixed1	{
+		FILEDIR	{
+			value	varchar(200);
+		};
+		EFOUT_COMB	{
+			EFOUT	{
+				value	varchar(20);
+			};
+			count	int;
+			item	varchar(20)[10];
+		};
+		SRYCD1	{
+			value	varchar(9);
+		};
+		NAME1	{
+			value	varchar(100);
+		};
+		SRYCD2	{
+			value	varchar(9);
+		};
+		NAME2	{
+			value	varchar(100);
+		};
+		NUMBER_COMB	{
+			NUMBER	{
+				value	varchar(20);
+			};
+			count	int;
+			item	varchar(20)[5];
+		};
+	};
+};
