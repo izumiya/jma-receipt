@@ -905,7 +905,9 @@
                                            LNK-WKSRY-ZAINUM (IDX-KOUI))
       *                剤毎に処理を行う
                        PERFORM 4501-SRYACT-KOU-SEC
-                       PERFORM 45001-JYURRK-SYORI2-SEC
+                       IF      SPA-ERRCD       =   SPACE
+                           PERFORM 45001-JYURRK-SYORI2-SEC
+                       END-IF
                        MOVE    SPACE           TO  LNK-WKSRYACT-AREA
                        MOVE    ZERO            TO  IDX-KOUI
                    END-IF
@@ -916,7 +918,9 @@
                ELSE
                    IF      IDX-KOUI        >   ZERO
                        PERFORM 4501-SRYACT-KOU-SEC
-                       PERFORM 45001-JYURRK-SYORI2-SEC
+                       IF      SPA-ERRCD       =   SPACE
+                           PERFORM 45001-JYURRK-SYORI2-SEC
+                       END-IF
                        MOVE    SPACE           TO  LNK-WKSRYACT-AREA
                        MOVE    ZERO            TO  IDX-KOUI
                    END-IF
@@ -930,7 +934,9 @@
            IF     (SPA-ERRCD       =   SPACE ) AND
                   (IDX-KOUI        >   ZERO  )
                PERFORM 4501-SRYACT-KOU-SEC
-               PERFORM 45001-JYURRK-SYORI2-SEC
+               IF      SPA-ERRCD       =   SPACE
+                   PERFORM 45001-JYURRK-SYORI2-SEC
+               END-IF
                MOVE    SPACE           TO  LNK-WKSRYACT-AREA
                MOVE    ZERO            TO  IDX-KOUI
                MOVE    ZERO            TO  WRK-ZAINUM
@@ -2162,6 +2168,13 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    END-IF
                END-IF
            END-PERFORM
+      *
+      *H25.5
+      *    レセプト作成管理マスタ更新処理
+           IF     (SPA-HKNCOMBINUM NOT =   "9999")
+             AND  (SPA-ERRCD           =   SPACE )
+               PERFORM 3009-RECEUPD-UPDATE-SEC
+           END-IF
       *
            .
        1001-TEISEI-SYORI-EXT.
