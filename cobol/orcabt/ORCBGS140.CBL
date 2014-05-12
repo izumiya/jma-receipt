@@ -181,6 +181,10 @@
            03  WRK-HKNJANUM        PIC X(08).
            03  WRK-HKNJANAME       PIC X(50).
       *
+       01  LBL-AREA.
+           03  LBL-GRP-KOU9        PIC X(20).
+           03  LBL-GRP-KOU7        PIC X(20).
+      *
        01  CSV-HEAD-AREA.
            03  CSV-H01-G.
                05  CSV-H01-VAL.
@@ -409,6 +413,8 @@
            03  KEY-NYUGAIKBN               PIC X(01).
       *
        01  CONST-AREA.
+           03  CONST-H2605         PIC X(06)   VALUE "201405".
+      *
            03  CONST-KOUKI         PIC 9(02) VALUE 3.
            03  CONST-KOU9          PIC 9(03) VALUE 1.
            03  CONST-KOU7          PIC 9(03) VALUE 2.
@@ -463,6 +469,9 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    文字列操作サブ
+           COPY    "CPORCSSTRING.INC".
       *
       *    ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
@@ -522,6 +531,7 @@
                                            FLG-AREA
                                            IDX-AREA
                                            WRK-AREA
+                                           LBL-AREA
       *
            MOVE    BGS100P-SKYFNAME    TO  ASS-BGSSKY
            MOVE    BGS100P-KOHFNAME    TO  ASS-BGSKOH
@@ -997,6 +1007,20 @@
                END-STRING
            END-IF
       *
+      *    IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+      *        STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+      *                " -L LBL0101 "      DELIMITED  BY  SIZE
+      *                "MonpeLayerOut"     DELIMITED  BY  SIZE
+      *        INTO    HCGS140N1-LOPTION
+      *        END-STRING
+      *    ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0102 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS140N1-LOPTION
+               END-STRING
+      *    END-IF
+      *
            PERFORM 230-HCGS140N1-PRINT-SEC
       *
            .
@@ -1199,6 +1223,18 @@
                                TO  WRK-HKNKBNNAME
            END-EVALUATE
       *
+      *    IF    ( BGS100P-SRYYM  >=  CONST-H2605 )
+      *        INITIALIZE          ORCSSTRINGAREA
+      *        MOVE    "sub"   TO  ORCSSTR-COMMAND
+      *        MOVE    WRK-HKNKBNNAME
+      *                        TO ORCSSTR-STRING1
+      *        MOVE    "高９"  TO  ORCSSTR-STRING2
+      *        MOVE    "高一"  TO  ORCSSTR-STRING3
+      *        CALL    "orcsstring" USING  ORCSSTRINGAREA
+      *        MOVE    ORCSSTR-STRING1
+      *                        TO  WRK-HKNKBNNAME
+      *    END-IF
+      *
            .
        2201-HKNKBNNAME-EDIT-EXT.
            EXIT.
@@ -1307,8 +1343,18 @@
       *
                    MOVE  CONST-HKNMEI (IDX2)
                                        TO  WRK-ITEM
-                   PERFORM 801-CSVDATA-EDIT-SEC
+      *            IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+      *                EVALUATE    WRK-ITEM
+      *                WHEN    "後期高齢者９割"
+      *                    MOVE    "後期一般・低所得"
+      *                                TO  WRK-ITEM
+      *                WHEN    "後期高齢者７割"
+      *                    MOVE    "後期７割"
+      *                                TO  WRK-ITEM
+      *                END-EVALUATE
+      *            END-IF
       *
+                   PERFORM 801-CSVDATA-EDIT-SEC
       *
                    MOVE    HCGS140N1-KENSU (IDX2)
                                        TO  WRK-ITEM
@@ -1818,6 +1864,20 @@
                END-STRING
            END-IF
       *
+      *    IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+      *        STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+      *                " -L LBL0101 "      DELIMITED  BY  SIZE
+      *                "MonpeLayerOut"     DELIMITED  BY  SIZE
+      *        INTO    HCGS140G1-LOPTION
+      *        END-STRING
+      *    ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0102 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS140G1-LOPTION
+               END-STRING
+      *    END-IF
+      *
            PERFORM 230-HCGS140G1-PRINT-SEC
       *
            .
@@ -2064,6 +2124,16 @@
       *
                    MOVE  CONST-HKNMEI (IDX2)
                                        TO  WRK-ITEM
+      *            IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+      *                EVALUATE    WRK-ITEM
+      *                WHEN    "後期高齢者９割"
+      *                    MOVE    "後期一般・低所得"
+      *                                TO  WRK-ITEM
+      *                WHEN    "後期高齢者７割"
+      *                    MOVE    "後期７割"
+      *                                TO  WRK-ITEM
+      *                END-EVALUATE
+      *            END-IF
                    PERFORM 801-CSVDATA-EDIT-SEC
       *
       *

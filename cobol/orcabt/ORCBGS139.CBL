@@ -373,6 +373,8 @@
            03  KEY-NYUGAIKBN               PIC X(01).
       *
        01  CONST-AREA.
+           03  CONST-H2605         PIC X(06)   VALUE "201405".
+      *
            03  CONST-SYAHO         PIC 9(02) VALUE 1.
            03  CONST-KOKUHO        PIC 9(02) VALUE 2.
            03  CONST-KOUKI         PIC 9(02) VALUE 3.
@@ -537,6 +539,9 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+      *    文字列操作サブ
+           COPY    "CPORCSSTRING.INC".
       *
       *    ジョブ管理ＤＢ制御サブ
            COPY    "CPORCSJOBKANRI.INC".
@@ -1388,6 +1393,20 @@
            MOVE    TKOH-KENSU (IDX1)   TO  WRK-Z4
            MOVE    WRK-Z4              TO  HCGS139N-KOHKENSU
       *
+           IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0101 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS139N-LOPTION
+               END-STRING
+           ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0102 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS139N-LOPTION
+               END-STRING
+           END-IF
+      *
            PERFORM 230-HCGS139N-PRINT-SEC
       *
            .
@@ -1592,6 +1611,16 @@
       *
            MOVE    CONST-HKNMEI (IDX2)
                                    TO  WRK-ITEM
+           IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+               INITIALIZE          ORCSSTRINGAREA
+               MOVE    "sub"   TO  ORCSSTR-COMMAND
+               MOVE    WRK-ITEM TO ORCSSTR-STRING1
+               MOVE    "高９"  TO  ORCSSTR-STRING2
+               MOVE    "高一"  TO  ORCSSTR-STRING3
+               CALL    "orcsstring" USING  ORCSSTRINGAREA
+               MOVE    ORCSSTR-STRING1
+                               TO  WRK-ITEM
+           END-IF
            PERFORM 801-CSVDATA-EDIT-SEC
       *
            MOVE    HCGS139N-KENSU (IDX2)
@@ -1878,6 +1907,20 @@
            MOVE    TKOH-KENSU (IDX1)   TO  WRK-Z4
            MOVE    WRK-Z4              TO  HCGS139G-KOHKENSU
       *
+           IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0101 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS139G-LOPTION
+               END-STRING
+           ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0102 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS139G-LOPTION
+               END-STRING
+           END-IF
+      *
            PERFORM 230-HCGS139G-PRINT-SEC
       *
            .
@@ -2091,6 +2134,16 @@
       *
            MOVE    CONST-HKNMEI (IDX2)
                                    TO  WRK-ITEM
+           IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+               INITIALIZE          ORCSSTRINGAREA
+               MOVE    "sub"   TO  ORCSSTR-COMMAND
+               MOVE    WRK-ITEM TO ORCSSTR-STRING1
+               MOVE    "高９"  TO  ORCSSTR-STRING2
+               MOVE    "高一"  TO  ORCSSTR-STRING3
+               CALL    "orcsstring" USING  ORCSSTRINGAREA
+               MOVE    ORCSSTR-STRING1
+                               TO  WRK-ITEM
+           END-IF
            PERFORM 801-CSVDATA-EDIT-SEC
       *
            MOVE    HCGS139G-KENSU (IDX2)

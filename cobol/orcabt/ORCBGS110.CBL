@@ -179,11 +179,13 @@
            03  WRK-RECEKA          PIC X(2).
            03  WRK-ST              PIC 9(5).
            03  WRK-GROUPID         PIC 9(5).
-           03  WRK-HKNKBN-G.
-               05  WRK-HKNKBN1     PIC 9(02).
-               05  WRK-HKNKBN2     PIC 9(02).
+           03  WRK-SBTKBN-G.
+               05  WRK-SBTGRPID    PIC 9(02).
+               05  WRK-SBTRATE     PIC 9(02).
+               05  WRK-SBTHKN      PIC 9(02).
       *
        01  CONST-AREA.
+           03  CONST-H2605         PIC X(06)   VALUE "201405".
            03  CONST-SYAHO         PIC 9(02)   VALUE 1.
            03  CONST-KOKUHO        PIC 9(02)   VALUE 2.
            03  CONST-KOUKI         PIC 9(02)   VALUE 3.
@@ -889,6 +891,8 @@
                    MOVE    "00"    TO  BGSMEI-RECEKA
            END-IF
       *
+           INITIALIZE                  WRK-SBTKBN-G
+      *
            EVALUATE    WRK-HOKEN
            WHEN    CONST-SYAHO
                PERFORM 9001-SYHAO-HKNKBN-EDIT-SEC
@@ -905,7 +909,21 @@
            WHEN    CONST-DAISAN
                PERFORM 9001-DAISAN-HKNKBN-EDIT-SEC
            END-EVALUATE
-           MOVE    WRK-HKNKBN-G    TO  BGSMEI-RECESBT
+           MOVE    WRK-SBTGRPID     TO  BGSMEI-SBTGRPID
+           MOVE    WRK-SBTHKN       TO  BGSMEI-SBTHKN
+      *
+           IF    ( WRK-SBTGRPID     =      CONST-SYA-KOU9TAN
+                                        OR CONST-SYA-KOU9HEI
+                                        OR CONST-KOK-IPNKOU9 )
+      *
+               IF    ( RECE10-SRYYM    >=  CONST-H2605 )
+                   COMPUTE WRK-SBTRATE  =  10 - RECE10-KYURATE
+               ELSE
+                   COMPUTE WRK-SBTRATE  =  1
+               END-IF
+           END-IF
+      *
+           MOVE    WRK-SBTKBN-G    TO  BGSMEI-SBTKBN-G
       *
            MOVE    RECE10-HKNNUM   TO  BGSMEI-HKNNUM
       *
@@ -944,8 +962,6 @@
            MOVE    PTINF-KANANAME  TO  BGSMEI-KANANAME
            MOVE    PTINF-NAME      TO  BGSMEI-NAME
            MOVE    RECE10-PTID     TO  BGSMEI-PTID
-      *
-           
       *
            .
        2001211-BGSMEI-KEY-EDIT-EXT.
@@ -1707,9 +1723,8 @@
            MOVE    TBGSMEI-NYUGAIKBN    TO  BGSMEI-NYUGAIKBN
            MOVE    TBGSMEI-RECEKA       TO  BGSMEI-RECEKA
       *
-           MOVE    TBGSMEI-RECESBT      TO  WRK-HKNKBN-G
-           MOVE    CONST-HKNKBN2-TTL    TO  WRK-HKNKBN2
-           MOVE    WRK-HKNKBN-G         TO  BGSMEI-RECESBT
+           MOVE    TBGSMEI-RECESBT-G    TO  BGSMEI-RECESBT-G
+           MOVE    CONST-HKNKBN2-TTL    TO  BGSMEI-SBTHKN
       *
            IF    ( BGS100P-HKNJANUM
                                     NOT =   SPACE )
@@ -1730,15 +1745,15 @@
       *****************************************************************
        9001-SYHAO-HKNKBN-EDIT-SEC      SECTION.
       *
-           INITIALIZE                  WRK-HKNKBN-G
+           INITIALIZE                  WRK-SBTKBN-G
       *
            PERFORM 9001-SYAHO-GROUPID-EDIT-SEC
            IF    ( WRK-GROUPID     NOT =   ZERO )
-               MOVE    WRK-GROUPID     TO  WRK-HKNKBN1
+               MOVE    WRK-GROUPID     TO  WRK-SBTGRPID
                IF    ( WRK-GROUPID     =   CONST-SYA-KOH2HEI
                                         OR CONST-SYA-KOH3HEI )
                    MOVE    CONST-SYA-KOHTAN
-                                       TO  WRK-HKNKBN1
+                                       TO  WRK-SBTGRPID
                END-IF
                PERFORM 90011-SYHAO-HKNKBN-EDIT-SEC
            END-IF
@@ -1754,22 +1769,22 @@
            EVALUATE    RECE10-HKNNUM
            WHEN    "001"
            WHEN    "009"
-               MOVE    CONST-SYA-H01    TO  WRK-HKNKBN2
+               MOVE    CONST-SYA-H01    TO  WRK-SBTHKN
            WHEN    "002"
-               MOVE    CONST-SYA-H02    TO  WRK-HKNKBN2
+               MOVE    CONST-SYA-H02    TO  WRK-SBTHKN
            WHEN    "003"
-               MOVE    CONST-SYA-H03    TO  WRK-HKNKBN2
+               MOVE    CONST-SYA-H03    TO  WRK-SBTHKN
            WHEN    "004"
-               MOVE    CONST-SYA-H04    TO  WRK-HKNKBN2
+               MOVE    CONST-SYA-H04    TO  WRK-SBTHKN
            WHEN    "031"   THRU    "034"
-               MOVE    CONST-SYA-H31    TO  WRK-HKNKBN2
+               MOVE    CONST-SYA-H31    TO  WRK-SBTHKN
            WHEN    "006"
-               MOVE    CONST-SYA-H06    TO  WRK-HKNKBN2
+               MOVE    CONST-SYA-H06    TO  WRK-SBTHKN
            WHEN    "007"
-               MOVE    CONST-SYA-H07    TO  WRK-HKNKBN2
+               MOVE    CONST-SYA-H07    TO  WRK-SBTHKN
            WHEN    "063"
            WHEN    "072"   THRU    "075"
-               MOVE    CONST-SYA-H63    TO  WRK-HKNKBN2
+               MOVE    CONST-SYA-H63    TO  WRK-SBTHKN
            END-EVALUATE
       *
            .
@@ -1780,10 +1795,10 @@
       *****************************************************************
        9001-KOKUKO-HKNKBN-EDIT-SEC     SECTION.
       *
-           INITIALIZE                  WRK-HKNKBN-G
+           INITIALIZE                  WRK-SBTKBN-G
       *
            PERFORM 9001-KOKUKO-GROUPID-EDIT-SEC
-           MOVE    WRK-GROUPID     TO  WRK-HKNKBN1
+           MOVE    WRK-GROUPID     TO  WRK-SBTGRPID
       *
            .
        9001-KOKUKO-HKNKBN-EDIT-EXT.
@@ -1793,10 +1808,10 @@
       *****************************************************************
        9001-KOUKI-HKNKBN-EDIT-SEC      SECTION.
       *
-           INITIALIZE                  WRK-HKNKBN-G
+           INITIALIZE                  WRK-SBTKBN-G
       *
            PERFORM 9001-KOUKI-GROUPID-EDIT-SEC
-           MOVE    WRK-GROUPID     TO  WRK-HKNKBN1
+           MOVE    WRK-GROUPID     TO  WRK-SBTGRPID
       *
            .
        9001-KOUKI-HKNKBN-EDIT-EXT.
@@ -1806,10 +1821,10 @@
       *****************************************************************
        9001-ROUSAI-HKNKBN-EDIT-SEC     SECTION.
       *
-           INITIALIZE                  WRK-HKNKBN-G
+           INITIALIZE                  WRK-SBTKBN-G
       *
            PERFORM 9001-ROUSAI-GROUPID-EDIT-SEC
-           MOVE    WRK-GROUPID     TO  WRK-HKNKBN1
+           MOVE    WRK-GROUPID     TO  WRK-SBTGRPID
       *
            .
        9001-ROUSAI-HKNKBN-EDIT-EXT.
@@ -1819,10 +1834,10 @@
       *****************************************************************
        9001-JIBAI-HKNKBN-EDIT-SEC      SECTION.
       *
-           INITIALIZE                  WRK-HKNKBN-G
+           INITIALIZE                  WRK-SBTKBN-G
       *
            PERFORM 9001-JIBAI-GROUPID-EDIT-SEC
-           MOVE    WRK-GROUPID     TO  WRK-HKNKBN1
+           MOVE    WRK-GROUPID     TO  WRK-SBTGRPID
       *
            .
        9001-JIBAI-HKNKBN-EDIT-EXT.
@@ -1832,10 +1847,10 @@
       *****************************************************************
        9001-KOUGAI-HKNKBN-EDIT-SEC     SECTION.
       *
-           INITIALIZE                  WRK-HKNKBN-G
+           INITIALIZE                  WRK-SBTKBN-G
       *
            PERFORM 9001-KOUGAI-GROUPID-EDIT-SEC
-           MOVE    WRK-GROUPID     TO  WRK-HKNKBN1
+           MOVE    WRK-GROUPID     TO  WRK-SBTGRPID
       *
            .
        9001-KOUGAI-HKNKBN-EDIT-EXT.
@@ -1845,10 +1860,10 @@
       *****************************************************************
        9001-DAISAN-HKNKBN-EDIT-SEC     SECTION.
       *
-           INITIALIZE                  WRK-HKNKBN-G
+           INITIALIZE                  WRK-SBTKBN-G
       *
            PERFORM 9001-DAISAN-GROUPID-EDIT-SEC
-           MOVE    WRK-GROUPID     TO  WRK-HKNKBN1
+           MOVE    WRK-GROUPID     TO  WRK-SBTGRPID
       *
            .
        9001-DAISAN-HKNKBN-EDIT-EXT.

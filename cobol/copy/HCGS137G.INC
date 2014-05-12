@@ -74,3 +74,5 @@
                         PIC X(9).
             02  HCGS137G-SKYSBT
                         PIC X(50).
+            02  HCGS137G-LOPTION
+                        PIC X(500).

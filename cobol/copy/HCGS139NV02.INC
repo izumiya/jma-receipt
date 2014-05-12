@@ -62,3 +62,5 @@
                         PIC X(20).
             02  HCGS139NV02-SKYSBT
                         PIC X(50).
+            02  HCGS139NV02-LOPTION
+                        PIC X(500).

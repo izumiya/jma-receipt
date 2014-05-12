@@ -181,6 +181,9 @@
            03  WRK-HKNJANUM        PIC X(08).
            03  WRK-HKNJANAME       PIC X(24).
       *
+       01  LBL-AREA.
+           03  LBL-GRP-IPNKOU9     PIC X(20).
+      *
        01  CSV-HEAD-AREA.
            03  CSV-H01-G.
                05  CSV-H01-VAL.
@@ -409,6 +412,7 @@
            03  KEY-NYUGAIKBN               PIC X(01).
       *
        01  CONST-AREA.
+           03  CONST-H2605         PIC X(06) VALUE "201405".
            03  CONST-KOKUHO        PIC 9(02) VALUE 2.
            03  CONST-IPNKOU9       PIC 9(03) VALUE 1.
            03  CONST-IPNKOU7       PIC 9(03) VALUE 2.
@@ -491,6 +495,9 @@
       *    サブプロ脱　挝拌
       *****************************************************************
       *
+      *    矢机误拎侯サブ
+           COPY    "CPORCSSTRING.INC".
+      *
       *    ジョブ瓷妄ＤＢ扩告サブ
            COPY    "CPORCSJOBKANRI.INC".
       *
@@ -549,6 +556,7 @@
                                            FLG-AREA
                                            IDX-AREA
                                            WRK-AREA
+                                           LBL-AREA
       *
            MOVE    BGS100P-SKYFNAME    TO  ASS-BGSSKY
            MOVE    BGS100P-KOHFNAME    TO  ASS-BGSKOH
@@ -577,6 +585,11 @@
            MOVE    SPACE               TO  WRK-ITEM
            INSPECT WRK-ITEM  TALLYING  WRK-ITEM-SIZE   FOR ALL " "
       *
+           IF    ( BGS100P-SRYYM       >=  CONST-H2605 )
+               MOVE    "办忍∈光办∷"  TO  LBL-GRP-IPNKOU9
+           ELSE
+               MOVE    "办忍∈光９∷"  TO  LBL-GRP-IPNKOU9
+           END-IF
       *
            .
        100-INIT-EXT.
@@ -1054,6 +1067,20 @@
                END-STRING
            END-IF
       *
+           IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0101 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS138N1-LOPTION
+               END-STRING
+           ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0102 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS138N1-LOPTION
+               END-STRING
+           END-IF
+      *
            PERFORM 230-HCGS138N1-PRINT-SEC
       *
            .
@@ -1247,7 +1274,7 @@
            MOVE    SPACE       TO  WRK-HKNKBNNAME
            EVALUATE    BGSHKNJA-GROUPID
            WHEN    CONST-GRP-IPNKOU9
-               MOVE    "办忍∈光９∷"
+               MOVE    LBL-GRP-IPNKOU9
                                TO  WRK-HKNKBNNAME
            WHEN    CONST-GRP-IPNKOU7
                MOVE    "办忍∈光７∷"
@@ -1380,6 +1407,16 @@
       *
                    MOVE  CONST-HKNMEI (IDX2)
                                        TO  WRK-ITEM
+                   IF    ( BGS100P-SRYYM  >=  CONST-H2605 )
+                       INITIALIZE          ORCSSTRINGAREA
+                       MOVE    "sub"   TO  ORCSSTR-COMMAND
+                       MOVE    WRK-ITEM TO ORCSSTR-STRING1
+                       MOVE    "光９"  TO  ORCSSTR-STRING2
+                       MOVE    "光办"  TO  ORCSSTR-STRING3
+                       CALL    "orcsstring" USING  ORCSSTRINGAREA
+                       MOVE    ORCSSTR-STRING1
+                                       TO  WRK-ITEM
+                   END-IF
                    PERFORM 801-CSVDATA-EDIT-SEC
       *
       *
@@ -1891,6 +1928,20 @@
                END-STRING
            END-IF
       *
+           IF    ( BGS100P-SRYYM   >=  CONST-H2605 )
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0101 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS138G1-LOPTION
+               END-STRING
+           ELSE
+               STRING  "MonpeLayerIn"      DELIMITED  BY  SIZE
+                       " -L LBL0102 "      DELIMITED  BY  SIZE
+                       "MonpeLayerOut"     DELIMITED  BY  SIZE
+               INTO    HCGS138G1-LOPTION
+               END-STRING
+           END-IF
+      *
            PERFORM 230-HCGS138G1-PRINT-SEC
       *
            .
@@ -2137,6 +2188,16 @@
       *
                    MOVE  CONST-HKNMEI (IDX2)
                                        TO  WRK-ITEM
+                   IF    ( BGS100P-SRYYM  >=  CONST-H2605 )
+                       INITIALIZE          ORCSSTRINGAREA
+                       MOVE    "sub"   TO  ORCSSTR-COMMAND
+                       MOVE    WRK-ITEM TO ORCSSTR-STRING1
+                       MOVE    "光９"  TO  ORCSSTR-STRING2
+                       MOVE    "光办"  TO  ORCSSTR-STRING3
+                       CALL    "orcsstring" USING  ORCSSTRINGAREA
+                       MOVE    ORCSSTR-STRING1
+                                       TO  WRK-ITEM
+                   END-IF
                    PERFORM 801-CSVDATA-EDIT-SEC
       *
       *
