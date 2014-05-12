@@ -1283,7 +1283,7 @@
            COPY    "CPDPCCONST.INC".
       *
       *    退院時投薬コメント
-           COPY    "CPDPCTTOYAKU.INC".
+      **     COPY    "CPDPCTTOYAKU.INC".
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -2344,11 +2344,11 @@
                        WHEN    "8"
                            IF   (RECE65-SRYKBN = "21" OR "22" OR "23")
                            AND ((RECE65-SRYCD(IDX)
-                                               = TBL-TAITOYAKU(1))
+                                               = "840000006")
                            OR   (RECE65-SRYCD(IDX)
-                                               = TBL-TAITOYAKU(2))
+                                               = SYS-9102-SRYCD(1))
                            OR   (RECE65-SRYCD(IDX)
-                                               = TBL-TAITOYAKU(3)))
+                                               = SYS-9102-SRYCD(2)))
                                MOVE  "1"      TO WRK-FEDT-HOUKATU-FLG
       *            テーブルが３件なので繰り返しは保留にしIF文のみとした 
       *                        PERFORM VARYING TBL-TAITOYAKU-IDX
@@ -2949,11 +2949,11 @@
       *ito.TAITOYAKU   IF    IDX               =  1
                        IF   (WRK-FEDT-1ST-FLG  =  ZERO)
                        AND  (TBL-ZAIW-SRYCD (1 IDX)
-                                           NOT =  TBL-TAITOYAKU(1))
+                                           NOT =  "840000006")
                        AND  (TBL-ZAIW-SRYCD (1 IDX)
-                                           NOT =  TBL-TAITOYAKU(2))
+                                           NOT =  SYS-9102-SRYCD(1))
                        AND  (TBL-ZAIW-SRYCD (1 IDX)
-                                           NOT =  TBL-TAITOYAKU(3))
+                                           NOT =  SYS-9102-SRYCD(2))
                              MOVE    1    TO    WRK-FEDT-1ST-FLG
                              PERFORM 200722-YKZ-E-HENSYU-SEC
                              PERFORM 5001-FILE-WRITE-SEC
