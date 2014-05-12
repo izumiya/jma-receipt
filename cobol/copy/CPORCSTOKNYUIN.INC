@@ -38,10 +38,18 @@
            03  LNK-TOKNYUIN-SANTEIYM                  PIC  X(06).
       *病棟番号
            03  LNK-TOKNYUIN-BTUNUM                    PIC  X(02).
+      *特定入院料算定要件区分（空白：該当する／１：該当しない）
+           03  LNK-TOKNYUIN-SANTEIYOUKENKBN           PIC  X(01).
       *返却項目
            03  LNK-TOKNYUIN-HENKYAKU-AREA.
       *特定入院料コード
                05  LNK-TOKNYUIN-SRYCD                 PIC  X(09).
+      *特定入院料算定要件外コード
+               05  LNK-TOKNYUIN-GAI-SRYCD             PIC  X(09).
+      *特定入院料算定要件外で療養病棟入院基本料Ｉを算定時に入院料加算
+      *を一般病棟特別入院基本料の例により算定する場合の判定区分
+      *（空白：通常の加算算定／１：一般病棟特別入院基本料の例で加算算定）
+               05  LNK-TOKNYUIN-GAI-NYUKSNKBN         PIC  X(01).
       *復帰コード（０：特定入院料返却あり　１：特定入院料返却なし）
            03  LNK-TOKNYUIN-RC                     PIC S9(9) BINARY.
       *
