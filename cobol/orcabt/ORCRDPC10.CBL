@@ -67,6 +67,9 @@
       *              NACL-伊藤    14/04/21  出来高点数
       *                                       検査で包括区分が０でない
       *                                       場合薬剤器材の点数を引く
+      *              NACL-伊藤    14/05/12  出来高・包括フラグ
+      *                                       平成26年 4月診療分からは
+      *                                       点数マスタのDPCKBNを設定
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -3279,8 +3282,9 @@
              END-IF
            END-IF
       *出来高・包括フラグ
-           IF      WRK-FEDT-HOUKATU-FLG    NOT =  "6"
-               MOVE    "0"                 TO  WRK-FEDT-HOUKATU-FLG
+           IF      WRK-FEDT-HOUKATU-FLG    NOT =   "6"
+      * 2014.5 MOVE    "0"                 TO  WRK-FEDT-HOUKATU-FLG
+               MOVE    TNS-DPCKBN          TO  WRK-FEDT-HOUKATU-FLG
            END-IF
       *使用量から出来高・包括フラグまで
            PERFORM 200799-ZAI-HENSYU-F-SEC
@@ -4388,7 +4392,8 @@
                END-IF
            END-IF
       *出来高・包括フラグ
-           MOVE    "0"                 TO  WRK-FEDT-HOUKATU-FLG
+      * 2014.5 MOVE    "0"                 TO  WRK-FEDT-HOUKATU-FLG
+           MOVE    TNS-DPCKBN          TO  WRK-FEDT-HOUKATU-FLG
       **   SET     TBL-DPCDEKIDAKA-IDX TO  1
       **   SEARCH  TBL-DPCDEKIDAKA-OCC
       **                       VARYING TBL-DPCDEKIDAKA-IDX
