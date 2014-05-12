@@ -19,6 +19,11 @@
       *    ＡＰＩレスポンス患者情報取得 (xml2)
       *                                    COPY (CPPATIENTXMLV2RES.INC)
       ******************************************************************
+      ************************************************************
+      *  コピー句修正履歴
+      * Maj/Min/Rev  修正者       日付      内容
+      * 04.07.00     NACL-多々納  14/05/12  介護保険情報等追加
+      ************************************************************
         01  XML-PATIENTINFORES.
             02  PTRES-CONTEXT          PIC S9(9)   BINARY.
             02  PTRES-OBJECT           PIC X(8).
@@ -135,4 +140,35 @@
                         07  PTRES-INSURANCE-START-DATE    PIC X(10).
       *                 有効終了日
                         07  PTRES-INSURANCE-END-DATE      PIC X(10).
+      *
+      *H26.5
+      *           介護情報
+                  04  PTRES-CARE-INF-G.
+      *               介護保険情報
+                      05  PTRES-CARE-INSURANCE-G    OCCURS   10.
+      *                   保険者番号
+                          07  PTRES-CARE-INSURANCE-NUMBER  PIC X(08).
+      *                   被保険者番号
+                          07  PTRES-CARE-POLICYHOLDER      PIC X(06).
+      *                   有効開始日
+                          07  PTRES-CARE-START-DATE        PIC X(10).
+      *                   有効終了日
+                          07  PTRES-CARE-END-DATE          PIC X(10).
+      *               要介護認定情報
+                      05  PTRES-CERTIFICATION-G    OCCURS   10.
+      *                   要介護状態区分
+                          07  PTRES-NEED-CARE-STATE-CODE   PIC X(02).
+      *                   要介護状態名称
+                          07  PTRES-NEED-CARE-STATE        PIC X(20).
+      *                   認定日付
+                          07  PTRES-NEED-DATE              PIC X(10).
+      *                   有効開始日
+                          07  PTRES-NEED-START-DATE        PIC X(10).
+      *                   有効終了日
+                          07  PTRES-NEED-END-DATE          PIC X(10).
+      *           地域包括診療対象疾病
+                  04  PTRES-COMMUNITY-DISEASE.
+                      05  PTRES-TARGET-DISEASE     PIC X(05)
+                                                   OCCURS   4.
+      *
       *

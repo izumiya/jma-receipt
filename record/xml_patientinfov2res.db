@@ -61,6 +61,24 @@ xml_patientinfov2res {
                 	Certificate_ExpiredDate		varchar(10);
             	} [4];
         	} [20];
+		Care_Information   {
+		Insurance     {
+                	InsuranceProvider_Number	varchar(08);
+                	HealthInsuredPerson_Number	varchar(06);
+                	Certificate_StartDate		varchar(10);
+                	Certificate_ExpiredDate		varchar(10);
+	        	} [10];
+		Certification  {
+                	Need_Care_State_Code		varchar(02);
+                	Need_Care_State			varchar(20);
+                	Certification_Date		varchar(10);
+                	Certificate_StartDate		varchar(10);
+                	Certificate_ExpiredDate		varchar(10);
+	            	} [10];
+		Community_Disease  {
+			Target_Disease			varchar(05);
+	            	} [4];
+    		};
     	};
    	};
 };

@@ -29,6 +29,7 @@
       *  ¥×¥í¥°¥é¥à½¤ÀµÍúÎò
       * Maj/Min/Rev  ½¤Àµ¼Ô       ÆüÉÕ      ÆâÍÆ
       * 04.07.00     NACL-Â¿¡¹Ç¼  13/12/11  ÃÏ°èÏ¢·È£É£ÄÅùÂÐ±þ
+      * 04.07.00     NACL-Â¿¡¹Ç¼  14/05/13  ²ð¸î¾ðÊóÂ¾ÄÉ²ÃÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -48,6 +49,9 @@
            03  FLG-SYSKANRI            PIC 9(01).
            03  FLG-PTINF               PIC 9(01).
            03  FLG-PTPUBLIC            PIC 9(01).
+           03  FLG-PTCARE-HKNINF       PIC 9(01).
+           03  FLG-PTCARE-NINTEI       PIC 9(01).
+           03  FLG-PTCONF              PIC 9(01).
       *
            03  FLG-ERR                 PIC 9(01).
            03  FLG-SYORI               PIC 9(01).
@@ -134,6 +138,17 @@
       *    ´µ¼ÔÃÏ°èÏ¢·È¥Æ¡¼¥Ö¥ë
        01  PTPUBLIC-REC.
            COPY    "CPPTNUM-PUBLIC.INC".
+      *
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó¥Æ¡¼¥Ö¥ë
+       01  PTCARE-HKNINF-REC.
+           COPY    "CPPTCARE-HKNINF.INC".
+      *    ´µ¼Ô²ð¸îÇ§Äê¼Ô¾ðÊó¥Æ¡¼¥Ö¥ë
+       01  PTCARE-NINTEI-REC.
+           COPY    "CPPTCARE-NINTEI.INC".
+      *    ´µ¼Ô¸ÄÊÌÀßÄê¥Æ¡¼¥Ö¥ë
+       01  PTCONF-REC.
+           COPY    "CPPTCONF.INC".
+      *
       *
            COPY    "MCPDATA.INC".
       *
@@ -354,6 +369,16 @@
       *    ÃÏ°èÏ¢·ÈÊÔ½¸½èÍý
            PERFORM 20022-PTNUMPUBLIC-HEN-SEC
       *
+      *H26.5
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊóÊÔ½¸½èÍý
+           PERFORM 20022-PTCAREHKNINF-HEN-SEC
+      *H26.5
+      *    ´µ¼ÔÍ×²ð¸î¾ðÊóÊÔ½¸½èÍý
+           PERFORM 20022-PTCARENINTEI-HEN-SEC
+      *H26.5
+      *    ´µ¼Ô¸ÄÊÌ¾ðÊóÊÔ½¸
+           PERFORM 20022-PTCONF-HEN-SEC
+      *
            .
        2002-PTINF-HENSYU-EXT.
            EXIT.
@@ -382,6 +407,202 @@
        20022-PTNUMPUBLIC-HEN-EXT.
            EXIT.
       *ver.4.7
+      *H26.5
+      *****************************************************************
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊóÊÔ½¸½èÍý
+      *****************************************************************
+       20022-PTCAREHKNINF-HEN-SEC       SECTION.
+      *
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó
+           MOVE    SPACE               TO  PTCARE-HKNINF-REC
+           INITIALIZE                  PTCARE-HKNINF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCRHKN-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCRHKN-PTID
+      *
+           MOVE    PTCARE-HKNINF-REC   TO  MCPDATA-REC
+           MOVE    "tbl_ptcare_hkninf" TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptcare_hkninf" TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCAREHKNINF-READ-SEC
+           ELSE
+               MOVE    1                   TO  FLG-PTCARE-HKNINF
+               INITIALIZE                  PTCARE-HKNINF-REC
+           END-IF
+      *
+           MOVE    ZERO                TO  IDX
+           PERFORM UNTIL      (FLG-PTCARE-HKNINF   =   1  )
+                          OR  (IDX                 >=  10 )
+               ADD     1                       TO  IDX
+      *        ÊÝ¸±¼ÔÈÖ¹æ
+               MOVE    PTCRHKN-HKNJANUM    TO
+                                           PTRES-CARE-INSURANCE-NUMBER
+                                                             (IDX)
+      *        ÈïÊÝ¸±¼ÔÈÖ¹æ
+               MOVE    PTCRHKN-HIHKNJANUM  TO  PTRES-CARE-POLICYHOLDER
+                                                             (IDX)
+      *        ³«»ÏÆü
+               MOVE    PTCRHKN-TEKSTYMD    TO  WRK-SYMD
+               MOVE    ZERO                TO  WRK-THMS
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  PTRES-CARE-START-DATE
+                                                             (IDX)
+      *        ½ªÎ»Æü
+               MOVE    PTCRHKN-TEKEDYMD    TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  PTRES-CARE-END-DATE
+                                                             (IDX)
+      *
+               MOVE    "tbl_ptcare_hkninf" TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCAREHKNINF-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptcare_hkninf" TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       20022-PTCAREHKNINF-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼ÔÍ×²ð¸î¾ðÊóÊÔ½¸½èÍý
+      *****************************************************************
+       20022-PTCARENINTEI-HEN-SEC       SECTION.
+      *
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó
+           INITIALIZE                  PTCARE-NINTEI-REC
+           MOVE    SPA-HOSPNUM         TO  PTCRNIN-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCRNIN-PTID
+      *
+           MOVE    PTCARE-NINTEI-REC   TO  MCPDATA-REC
+           MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCARENINTEI-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCARE-NINTEI
+               INITIALIZE                  PTCARE-NINTEI-REC
+           END-IF
+           MOVE    ZERO                TO  IDX
+           PERFORM UNTIL      (FLG-PTCARE-NINTEI   =   1  )
+                          OR  (IDX                 >=  10 )
+               ADD     1                   TO  IDX
+      *        Í×²ð¸î¾õÂÖ
+               MOVE    PTCRNIN-CAREJOTAICD TO
+                                           PTRES-NEED-CARE-STATE-CODE
+                                                             (IDX)
+      *        Í×²ð¸î¾õÂÖÌ¾¾ÎÊÔ½¸
+               PERFORM 200221-PTCARE-CARESTATE-SEC
+      *        Ç§ÄêÇ¯·îÆü
+               MOVE    PTCRNIN-NINTEIYMD   TO  WRK-SYMD
+               MOVE    ZERO                TO  WRK-THMS
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  PTRES-NEED-DATE
+                                                             (IDX)
+      *        ³«»ÏÆü
+               MOVE    PTCRNIN-TEKSTYMD    TO  WRK-SYMD
+               MOVE    ZERO                TO  WRK-THMS
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  PTRES-NEED-START-DATE
+                                                             (IDX)
+      *        ½ªÎ»Æü
+               MOVE    PTCRNIN-TEKEDYMD    TO  WRK-SYMD
+               PERFORM 801-DAYHEN01-SEC
+               MOVE    WRK-HEN-DATE        TO  PTRES-NEED-END-DATE
+                                                             (IDX)
+      *
+               MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+               MOVE    "key2"              TO  MCP-PATHNAME
+               PERFORM 930-PTCARENINTEI-READ-SEC
+           END-PERFORM
+           MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
+           MOVE    "key2"              TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       20022-PTCARENINTEI-HEN-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Í×²ð¸î¾õÂÖÌ¾¾ÎÊÔ½¸½èÍý
+      *****************************************************************
+       200221-PTCARE-CARESTATE-SEC       SECTION.
+      *
+      *    Í×²ð¸î¾õÂÖ¶èÊ¬
+           EVALUATE    PTCRNIN-CAREJOTAICD
+               WHEN    "01"
+                   MOVE    "¼«Î©"      TO  PTRES-NEED-CARE-STATE (IDX)
+               WHEN    "11"
+                   MOVE    "Í×»Ù±ç"    TO  PTRES-NEED-CARE-STATE (IDX)
+               WHEN    "12"
+                   MOVE    "Í×»Ù±ç£±"  TO  PTRES-NEED-CARE-STATE (IDX)
+               WHEN    "13"
+                   MOVE    "Í×»Ù±ç£²"  TO  PTRES-NEED-CARE-STATE (IDX)
+               WHEN    "21"
+                   MOVE    "Í×²ð¸î£±"  TO  PTRES-NEED-CARE-STATE (IDX)
+               WHEN    "22"
+                   MOVE    "Í×²ð¸î£²"  TO  PTRES-NEED-CARE-STATE (IDX)
+               WHEN    "23"
+                   MOVE    "Í×²ð¸î£³"  TO  PTRES-NEED-CARE-STATE (IDX)
+               WHEN    "24"
+                   MOVE    "Í×²ð¸î£´"  TO  PTRES-NEED-CARE-STATE (IDX)
+               WHEN    "25"
+                   MOVE    "Í×²ð¸î£µ"  TO  PTRES-NEED-CARE-STATE (IDX)
+           END-EVALUATE
+           .
+       200221-PTCARE-CARESTATE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸ÄÊÌ¾ðÊóÊÔ½¸½èÍý
+      *****************************************************************
+       20022-PTCONF-HEN-SEC       SECTION.
+      *
+      *    ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ¸¡º÷
+           INITIALIZE                  PTCONF-REC
+           MOVE    SPA-HOSPNUM         TO  PTCONF-HOSPNUM
+           MOVE    PTINF-PTID          TO  PTCONF-PTID
+           MOVE    "TIIKIHOKATU"       TO  PTCONF-CKEY
+      *
+           MOVE    PTCONF-REC          TO  MCPDATA-REC
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_ptconf"        TO  MCP-TABLE
+               MOVE    "key"               TO  MCP-PATHNAME
+               PERFORM 930-PTCONF-READ-SEC
+           ELSE
+               MOVE    1               TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+           IF      FLG-PTCONF          =   ZERO
+      *        ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ
+               PERFORM VARYING     IDX     FROM    1   BY  1
+                       UNTIL       IDX     >   4
+                   IF      PTCONF-CDATA(IDX:1) =   "1"
+                       MOVE    "True"      TO  PTRES-TARGET-DISEASE
+                                                              (IDX)
+                   ELSE
+                       MOVE    "False"     TO  PTRES-TARGET-DISEASE
+                                                              (IDX)
+                   END-IF
+               END-PERFORM
+           END-IF
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+           .
+       20022-PTCONF-HEN-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    XML¾ðÊó½ñ¤­¹þ¤ß½èÍý
@@ -740,6 +961,60 @@
       *
            .
        920-PTPUBLIC-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô¸ÄÊÌ¾ðÊó¥Ç¡¼¥¿ÆÉ¹þ½èÍý
+      *****************************************************************
+       930-PTCONF-READ-SEC         SECTION.
+      *
+           PERFORM 910-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTCONF
+               MOVE    MCPDATA-REC         TO  PTCONF-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTCONF
+               INITIALIZE                  PTCONF-REC
+           END-IF
+      *
+           .
+       930-PTCONF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô²ð¸îÊÝ¸±¾ðÊó¥Ç¡¼¥¿¥Ç¡¼¥¿ÆÉ¹þ½èÍý
+      *****************************************************************
+       930-PTCAREHKNINF-READ-SEC         SECTION.
+      *
+           PERFORM 910-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTCARE-HKNINF
+               MOVE    MCPDATA-REC         TO  PTCARE-HKNINF-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTCARE-HKNINF
+               INITIALIZE                  PTCARE-HKNINF-REC
+           END-IF
+      *
+           .
+       930-PTCAREHKNINF-READ-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ´µ¼Ô²ð¸î¼ÔÇ§Äê¾ðÊó¥Ç¡¼¥¿ÆÉ¹þ½èÍý
+      *****************************************************************
+       930-PTCARENINTEI-READ-SEC         SECTION.
+      *
+           PERFORM 910-DBFETCH-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    ZERO                TO  FLG-PTCARE-NINTEI
+               MOVE    MCPDATA-REC         TO  PTCARE-NINTEI-REC
+           ELSE
+               MOVE    1                   TO  FLG-PTCARE-NINTEI
+               INITIALIZE                 PTCARE-NINTEI-REC
+           END-IF
+      *
+           .
+       930-PTCARENINTEI-READ-EXT.
            EXIT.
       *****************************************************************
       *    ¥Æ¡¼¥Ö¥ë¸¡º÷½èÍý
