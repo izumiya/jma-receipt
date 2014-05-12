@@ -145,6 +145,11 @@
                    13  SPA-GMN-I01-TOKNYUIN-CD     PIC X(02).
                    13  SPA-GMN-I01-TOKNYUINFL      PIC X(01).
                    13  SPA-GMN-I01-TOKNYUIN-NM     PIC X(60).
+      *          ÆÃÄêÆþ±¡Èó³ºÅö
+                 11  SPA-GMN-I01-TOKHIGAITO.
+                   13  SPA-GMN-I01-TOKHIGAITO-CD   PIC X(01).
+                   13  SPA-GMN-I01-TOKHIGAITOFL    PIC X(01).
+                   13  SPA-GMN-I01-TOKHIGAITO-NM   PIC X(28).
       *          »»ÄêÆþ±¡ÎÁ
                  11  SPA-GMN-I01-SNTNYUIN          PIC X(60).
       *          Æþ±¡ÎÁ²Ã»»
@@ -265,6 +270,7 @@
                                                    PIC X(02).
                  11  SPA-NAI-I01-TOKNYUINMOT       PIC X(3).
                  11  SPA-NAI-I01-TOKNYUINCD        PIC X(09).
+                 11  SPA-NAI-I01-TOKHIGAITOCD      PIC X(09).
                  11  SPA-NAI-I01-TOKUTEI-KBN       PIC X(01).
                  11  SPA-NAI-I01-TOKUTEI-NYUIN     PIC X(02).
       *          ÉÂÅïÆþ±¡´ðËÜÎÁ
@@ -451,6 +457,16 @@
                                                    PIC X(2).
                      15    SPA-GMN-I01-TOKNYUIN-ITM4
                                                    PIC X(9).
+                     15    SPA-GMN-I01-TOKNYUIN-ITM5
+                                                   PIC X(9).
+      *          ÆÃÄêÆþ±¡Èó³ºÅö¥³¥ó¥Ü
+                 11  SPA-GMN-I01-CMB-TOKHIGAITO.
+                   13  SPA-GMN-I01-TOKHIGAITO-CNT        PIC 9(5).
+                   13  SPA-GMN-I01-TOKHIGAITO-ITM-OCC    OCCURS  2.
+                     15    SPA-GMN-I01-TOKHIGAITO-ITM.
+                       17  SPA-GMN-I01-TOKHIGAITOL   PIC X(01).
+                       17  SPA-GMN-I01-TOKHIGAITOFLL PIC X(01).
+                       17  SPA-GMN-I01-TOKHIGAITOMEIL PIC X(28).
       *          Æþ±¡ÎÁ²Ã»»¥³¥ó¥Ü
                  11  SPA-GMN-I01-CMB-KSN.
                    13  SPA-GMN-I01-CMB-KSN-EDITABLE PIC 9(1).

@@ -328,6 +328,7 @@
                05  WRK-CMB-ITM2            PIC X(100).
                05  WRK-CMB-ITM3            PIC X(100).
                05  WRK-CMB-ITM4            PIC X(100).
+               05  WRK-CMB-ITM5            PIC X(100).
            03  WRK-NUM-EDIT.
                05  WRK-99                  PIC 9(02).
                05  WRK-99999               PIC 9(05).
@@ -543,6 +544,7 @@
                    07  WRK-KSN-CD          PIC X(01).
            03  WRK-CNT                     PIC 9(05).
            03  WRK-TOKNYUINCD              PIC X(03).
+           03  WRK-TOKHIGAITO              PIC X(01).
            03  WRK-BUNBENRRKNUM            PIC 9(03).
       *
       *    食堂加算判定領域
@@ -581,6 +583,9 @@
            03  WRK-DOUJITUFLG-ST           PIC X(01).
            03  WRK-DOUJITUFLG-ED           PIC X(01).
            03  WRK-ORG-PRINT-PG            PIC X(20).
+           03  WRK-TOKHIGAITO-G.
+               05  WRK-TOKHIGAITO-CD       PIC X(09).
+               05  WRK-TOKHIGAITO-NAME     PIC X(60).
       *
       *    診療所老人医療管理料（転科、転棟）計算エリア
        01  TN-IDX                          PIC 9(02).
@@ -2292,6 +2297,26 @@
        310-CMB-RIYOU-SET-EXT.
            EXIT.
       *****************************************************************
+      *    特定入院料非該当コンボボックス初期処理
+      *****************************************************************
+       310-CMB-TOKHIGAITO-SET-SEC          SECTION.
+      *
+           INITIALIZE                  SPA-GMN-I01-CMB-TOKHIGAITO
+      *
+           MOVE    2               TO  SPA-GMN-I01-TOKHIGAITO-CNT
+      *
+           MOVE    "0"             TO  SPA-GMN-I01-TOKHIGAITOL (01)
+           MOVE    "算定要件に該当する患者" 
+                                   TO  SPA-GMN-I01-TOKHIGAITOMEIL (01)
+      *
+           MOVE    "1"             TO  SPA-GMN-I01-TOKHIGAITOL (02)
+           MOVE    "算定要件に該当しない患者"
+                                   TO  SPA-GMN-I01-TOKHIGAITOMEIL (02)
+      *
+           .
+       310-CMB-TOKHIGAITO-SET-EXT.
+           EXIT.
+      *****************************************************************
       *    氏名検索画面（Ｐ９７）からの戻り値設定処理
       *****************************************************************
        330-P97-SET-SEC                 SECTION.
@@ -2775,6 +2800,8 @@
            MOVE    I01-HKNCOMBI        TO  SPA-GMN-I01-HKNCOMBI
       *    特定入院
            MOVE    I01-TOKNYUIN        TO  SPA-GMN-I01-TOKNYUIN
+      *    特定入院料非該当
+           MOVE    I01-TOKHIGAITO      TO  SPA-GMN-I01-TOKHIGAITO
       *    入院料加算
            MOVE    I01-KSN (1)         TO  SPA-GMN-I01-KSN (1)
            MOVE    I01-KSN (2)         TO  SPA-GMN-I01-KSN (2)
@@ -2954,6 +2981,12 @@
       *
       *    特定入院チェック処理
            PERFORM 4101-TOKNYUIN-CHK-SEC
+           IF    ( SPA-ERRCD   NOT =   SPACE )
+               GO  TO  4102-KIHON-CHK-EXT
+           END-IF
+      *
+      *    特定入院料非該当チェック処理
+           PERFORM 4101-TOKHIGAITO-CHK-SEC
            IF    ( SPA-ERRCD   NOT =   SPACE )
                GO  TO  4102-KIHON-CHK-EXT
            END-IF
@@ -3280,6 +3313,20 @@
            MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-TOKNYUIN-ORG
                                        SPA-NAI-I01-TOKNYUINMOT
            MOVE    WRK-CMB-ITM4    TO  SPA-NAI-I01-TOKNYUINCD
+           MOVE    WRK-CMB-ITM5    TO  SPA-NAI-I01-TOKHIGAITOCD
+      *
+      *    特定入院料非該当
+           MOVE    PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+                                   TO  WRK-CMB-CD
+           PERFORM 4103-CMB-TOKHIGAITO-CHK-SEC
+           IF    ( WRK-CMB-ITM     NOT =   SPACE )
+               PERFORM 4103-CMB-TOKHIGAITO-CHK-SEC
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-TOKHIGAITO
+           ELSE
+               MOVE    "0"         TO  WRK-CMB-CD
+               PERFORM 4103-CMB-TOKHIGAITO-CHK-SEC
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-TOKHIGAITO
+           END-IF
       *
       *    算定入院料
            IF    ( SPA-GMN-I01-TOKNYUIN    =   SPACE )
@@ -3288,10 +3335,21 @@
                MOVE    SPA-NAI-I01-KHNRYO-CD
                                        TO  SPA-NAI-I01-SNTNYUINCD
            ELSE
-               MOVE    SPA-GMN-I01-TOKNYUIN-NM
+               IF    ( SPA-NAI-I01-TOKHIGAITOCD    NOT =   SPACE )
+                AND  ( SPA-GMN-I01-TOKHIGAITO-CD       =   "1" )
+                   MOVE    PTNYUINRRK-TENNYUYMD
+                                       TO  WRK-KJNYMD
+                   MOVE    SPA-NAI-I01-TOKHIGAITOCD
+                                       TO  WRK-SRYCD
+                   PERFORM 900-TENSU-KEY-SEL-SEC
+                   MOVE    TNS-NAME    TO  SPA-GMN-I01-SNTNYUIN
+                   MOVE    TNS-SRYCD   TO  SPA-NAI-I01-SNTNYUINCD
+               ELSE
+                   MOVE    SPA-GMN-I01-TOKNYUIN-NM
                                        TO  SPA-GMN-I01-SNTNYUIN
-               MOVE    SPA-NAI-I01-TOKNYUINCD
+                   MOVE    SPA-NAI-I01-TOKNYUINCD
                                        TO  SPA-NAI-I01-SNTNYUINCD
+               END-IF
            END-IF
       *
       *    室料差額
@@ -4821,6 +4879,8 @@
       *
                MOVE    SPA-NAI-I01-TOKNYUIN-ORG
                                    TO  WRK-TOKNYUINCD
+               MOVE    SPA-GMN-I01-TOKHIGAITO-CD
+                                   TO  WRK-TOKHIGAITO
                PERFORM 4101-BRMNUM-CHK-SEC
                MOVE    SPA-GMN-I01-BRMNUM
                                        TO  SPA-NAI-I01-BRMNUM-MAE
@@ -4832,7 +4892,12 @@
                    MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-TOKNYUIN
                    MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-TOKNYUIN-ORG
                    MOVE    WRK-CMB-ITM4    TO  SPA-NAI-I01-TOKNYUINCD
+                   MOVE    WRK-CMB-ITM5    TO  SPA-NAI-I01-TOKHIGAITOCD
                END-IF
+      *
+               MOVE    WRK-TOKHIGAITO      TO  SPA-GMN-I01-TOKHIGAITO-CD
+               PERFORM 4101-TOKHIGAITO-CHK-SEC
+      *
                IF    ( SPA-ERRCD   NOT =   SPACE )
                    GO  TO  4101-IDOYMD-CHK-EXT
                END-IF
@@ -5254,6 +5319,7 @@
                        SPA-NAI-I01-BTUTOKCD
                        SPA-NAI-I01-BRMTOKCD
                        SPA-NAI-I01-SELNYUKHN
+                       SPA-GMN-I01-CMB-TOKHIGAITO
       *
            MOVE    WRK-KJNYMD  TO  WRK-AGECHK-SRYYMD
            PERFORM 4801-RJN-TAISYO-CHK-SEC
@@ -5294,6 +5360,8 @@
            ELSE
                PERFORM 41011-CMB-TOKNYUIN-SET-SEC
            END-IF
+      *
+           PERFORM 310-CMB-TOKHIGAITO-SET-SEC
       *
            .
        4101-CMB-TOKNYUIN-SET-EXT.
@@ -6760,6 +6828,13 @@
                                        TO  SPA-GMN-I01-TOKNYUIN-ITM4
                                                        (IDX10)
       *
+               IF    ( WRK-TOKNYUIN-KBN    =    "2" OR "3" )
+                   PERFORM 800-TOKHIGAITO-CHK-SEC
+                   MOVE    WRK-TOKHIGAITO-CD
+                                       TO  SPA-GMN-I01-TOKNYUIN-ITM5
+                                                       (IDX10)
+               END-IF
+      *
                IF    ( WRK-TOKNYUIN-SRYCD-X    IS  NUMERIC )
                    COMPUTE SPA-GMN-I01-TOKNYUIN-SRYCDTTL
                        =   SPA-GMN-I01-TOKNYUIN-SRYCDTTL
@@ -6781,6 +6856,9 @@
                        SPA-NAI-I01-SNTNYUINCD
                        SPA-NAI-I01-TOKNYUIN-ORG
                        SPA-NAI-I01-TOKNYUINCD
+                       SPA-NAI-I01-TOKHIGAITOCD
+      *
+           INITIALIZE  SPA-GMN-I01-TOKHIGAITO
       *
            PERFORM VARYING IDX10
                    FROM    SPA-GMN-I01-TOKNYUIN-CNT    BY  -1
@@ -6797,6 +6875,8 @@
                                        TO  SPA-NAI-I01-TOKNYUIN-ORG
                    MOVE    SPA-GMN-I01-TOKNYUIN-ITM4 (IDX10)
                                        TO  SPA-NAI-I01-TOKNYUINCD
+                   MOVE    SPA-GMN-I01-TOKNYUIN-ITM5 (IDX10)
+                                       TO  SPA-NAI-I01-TOKHIGAITOCD
       *
                END-IF
            END-PERFORM
@@ -6812,6 +6892,7 @@
                    MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-TOKNYUIN
                    MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-TOKNYUIN-ORG
                    MOVE    WRK-CMB-ITM4    TO  SPA-NAI-I01-TOKNYUINCD
+                   MOVE    WRK-CMB-ITM5    TO  SPA-NAI-I01-TOKHIGAITOCD
                END-IF
            END-IF
       *
@@ -6827,6 +6908,7 @@
                    MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-TOKNYUIN
                    MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-TOKNYUIN-ORG
                    MOVE    WRK-CMB-ITM4    TO  SPA-NAI-I01-TOKNYUINCD
+                   MOVE    WRK-CMB-ITM5    TO  SPA-NAI-I01-TOKHIGAITOCD
                END-IF
            END-IF
       *
@@ -6837,11 +6919,15 @@
                MOVE    SPA-NAI-I01-KHNRYO-CD
                                        TO  SPA-NAI-I01-SNTNYUINCD
            ELSE
+      *
                MOVE    SPA-GMN-I01-TOKNYUIN-NM
                                        TO  SPA-GMN-I01-SNTNYUIN
                MOVE    SPA-NAI-I01-TOKNYUINCD
                                        TO  SPA-NAI-I01-SNTNYUINCD
            END-IF
+      *
+           MOVE    "0"                 TO  SPA-GMN-I01-TOKHIGAITO-CD
+           PERFORM 4101-TOKHIGAITO-CHK-SEC
       *
            .
        4101-TOKNYUIN-SYOKI-EXT.
@@ -7137,6 +7223,26 @@
        4101-SHONUM-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    特定入院料非該当チェック処理
+      *****************************************************************
+       4101-TOKHIGAITO-CHK-SEC             SECTION.
+      *
+           MOVE    SPA-GMN-I01-TOKHIGAITO-CD
+                                       TO  WRK-CMB-CD
+           PERFORM 4103-CMB-TOKHIGAITO-CHK-SEC
+           IF    ( WRK-CMB-ITM     NOT =   SPACE )
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-TOKHIGAITO
+           ELSE
+               MOVE    "0"         TO  WRK-CMB-CD
+               PERFORM 4103-CMB-TOKHIGAITO-CHK-SEC
+               MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-TOKHIGAITO
+           END-IF
+      *
+           .
+      *
+       4101-TOKHIGAITO-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    入院料算定区分チェック処理
       *****************************************************************
        4101-NYUCALKBNCHK-SEC             SECTION.
@@ -7321,6 +7427,7 @@
                                        SPA-GMN-I01-SNTNYUIN
                                        SPA-NAI-I01-SNTNYUINCD
                                        SPA-NAI-I01-TOKNYUINCD
+                                       SPA-NAI-I01-TOKHIGAITOCD
       *
            IF    ( SPA-GMN-I01-TOKNYUIN
                                        =   SPACE )
@@ -7331,6 +7438,9 @@
       *
                MOVE    WRK-KIHON-KJNYMD    TO  WRK-KJNYMD
                PERFORM 4101-CMB-KSN-SET-SEC
+      *
+               MOVE    "0"         TO  SPA-GMN-I01-TOKHIGAITO-CD
+               PERFORM 4101-TOKHIGAITO-CHK-SEC
            ELSE
       *
                MOVE    SPA-GMN-I01-TOKNYUIN-CD
@@ -7342,9 +7452,25 @@
                                        TO  SPA-NAI-I01-TOKNYUIN-ORG
                    MOVE    WRK-CMB-ITM4
                                        TO  SPA-NAI-I01-TOKNYUINCD
-                                           SPA-NAI-I01-SNTNYUINCD
-                   MOVE    SPA-GMN-I01-TOKNYUIN-NM
+                   MOVE    WRK-CMB-ITM5
+                                       TO  SPA-NAI-I01-TOKHIGAITOCD
+      *
+                   PERFORM 4101-TOKHIGAITO-CHK-SEC
+                   IF    ( SPA-NAI-I01-TOKHIGAITOCD    NOT =   SPACE )
+                    AND  ( SPA-GMN-I01-TOKHIGAITO-CD       =   "1" )
+                       MOVE    WRK-KIHON-KJNYMD
+                                       TO  WRK-KJNYMD
+                       MOVE    SPA-NAI-I01-TOKHIGAITOCD
+                                       TO  WRK-SRYCD
+                       PERFORM 900-TENSU-KEY-SEL-SEC
+                       MOVE    TNS-NAME    TO  SPA-GMN-I01-SNTNYUIN
+                       MOVE    TNS-SRYCD   TO  SPA-NAI-I01-SNTNYUINCD
+                   ELSE
+                       MOVE    SPA-NAI-I01-TOKNYUINCD
+                                       TO  SPA-NAI-I01-SNTNYUINCD
+                       MOVE    SPA-GMN-I01-TOKNYUIN-NM
                                        TO  SPA-GMN-I01-SNTNYUIN
+                   END-IF
                ELSE
                    MOVE    "0024"      TO  SPA-ERRCD
                    MOVE    16          TO  SPA-GMN-I01-CUR
@@ -7922,6 +8048,8 @@
                                    TO  WRK-CMB-ITM3
                    MOVE    SPA-GMN-I01-TOKNYUIN-ITM4 (IDX-CMB)
                                    TO  WRK-CMB-ITM4
+                   MOVE    SPA-GMN-I01-TOKNYUIN-ITM5 (IDX-CMB)
+                                   TO  WRK-CMB-ITM5
                END-IF
            END-PERFORM
       *
@@ -7952,12 +8080,37 @@
                                    TO  WRK-CMB-ITM3
                    MOVE    SPA-GMN-I01-TOKNYUIN-ITM4 (IDX-CMB)
                                    TO  WRK-CMB-ITM4
+                   MOVE    SPA-GMN-I01-TOKNYUIN-ITM5 (IDX-CMB)
+                                   TO  WRK-CMB-ITM5
                END-IF
            END-PERFORM
       *
            .
       *
        4103-CMB-TOKNYUIN-SRH2-EXT.
+           EXIT.
+      *****************************************************************
+      *    特定入院料非該当コンボチェック処理
+      *****************************************************************
+       4103-CMB-TOKHIGAITO-CHK-SEC         SECTION.
+      *
+           INITIALIZE              WRK-CMB-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-I01-TOKHIGAITO-CNT )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-I01-TOKHIGAITOL (IDX-CMB)
+                                   =   WRK-CMB-CD )
+                   MOVE    IDX-CMB TO  WRK-CMB-IDX
+                   MOVE    SPA-GMN-I01-TOKHIGAITO-ITM (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+               END-IF
+           END-PERFORM
+      *
+           .
+      *
+       4103-CMB-TOKHIGAITO-CHK-EXT.
            EXIT.
       *****************************************************************
       *    加算コンボチェック処理
@@ -8161,6 +8314,7 @@
                                    SPA-GMN-I01-CMB-HKNCOMBI
                                    SPA-GMN-I01-CMB-TOKNYUIN
                                    SPA-GMN-I01-CMB-KSN
+                                   SPA-GMN-I01-CMB-TOKHIGAITO
       *
            MOVE    "5000"          TO  WRK-KANRICD
            MOVE    "*"             TO  WRK-KBNCD
@@ -8198,7 +8352,6 @@
            END-IF
       *
            PERFORM 310-CMB-USERPG-SET-SEC
-           
       *
       *    入院日にシステム日付を表示
            MOVE    SPA-SYSYMD      TO  WRK-YMD
@@ -10435,6 +10588,15 @@
       *    特定入院料
            MOVE    SPA-NAI-I01-TOKNYUIN-ORG-CD
                                    TO  PTNYUINRRK-TOKUTEI-NYUIN
+      *    特定入院料非該当
+           IF    ( SPA-NAI-I01-TOKHIGAITOCD    NOT =   SPACE )
+            AND  ( SPA-GMN-I01-TOKHIGAITO-CD   NOT =   "0"  )
+               MOVE    SPA-GMN-I01-TOKHIGAITO-CD
+                                   TO  PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+           ELSE
+               MOVE    SPACE       TO  PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+           END-IF
+      *
       *    室料差額
            MOVE    SPA-GMN-I01-SAGAKU-CD
                                    TO  PTNYUINRRK-RM-SAGAKU
@@ -11480,6 +11642,10 @@
       *        初期加算サブを呼び出す（平成２４年改正で追加）
       *        療養病床で有床診療所入院基本料を相互算定する場合も
       *        初期加算サブを呼び出す（平成２４年改正で追加）
+      *        特定入院料の算定要件外に算定にする以下入院料を追加（平成２６年改正で対応）
+      *        ・一般病棟特別入院基本料
+      *        ・精神病棟１５対１入院基本料
+      *        ・精神病棟特別入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -11487,7 +11653,11 @@
                                                 "099999952"   OR
                                                 "099999955"   OR
                                                 "099999956"   OR
-                                                "099999957"
+                                                "099999957"   OR
+      *                                         特定入院料の算定要件外の算定
+                                                "190079010"   OR
+                                                "190083810"   OR
+                                                "190085010"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -12506,6 +12676,13 @@
                MOVE   LNK-SCNYUACCT-KAGEN-SRYCD(1)
                                         TO  LNK-NYUKSNGET-NYUIN-SRYCD
            END-IF
+      *
+      *    特定入院料算定要件外で療養病棟入院基本料Ｉを算定時に、入院料
+      *    加算を一般病棟特別入院基本料の例で算定する為、コードの置き換え
+           IF      LNK-TOKNYUIN-GAI-NYUKSNKBN   =    "1"
+               MOVE   "190079010"       TO  LNK-NYUKSNGET-NYUIN-SRYCD
+           END-IF
+      *
            MOVE    ZERO                 TO  IDX
            PERFORM VARYING IDX-KSN FROM    1   BY  1
                    UNTIL ( IDX-KSN      >   CONST-GMN-KSN-MAX )
@@ -13490,6 +13667,10 @@
       *        初期加算サブを呼び出す（平成２４年改正で追加）
       *        療養病床で有床診療所入院基本料を相互算定する場合も
       *        初期加算サブを呼び出す（平成２４年改正で追加）
+      *        特定入院料の算定要件外に算定にする以下入院料を追加（平成２６年改正で対応）
+      *        ・一般病棟特別入院基本料
+      *        ・精神病棟１５対１入院基本料
+      *        ・精神病棟特別入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -13497,7 +13678,11 @@
                                                 "099999952"   OR
                                                 "099999955"   OR
                                                 "099999956"   OR
-                                                "099999957"
+                                                "099999957"   OR
+      *                                         特定入院料の算定要件外の算定
+                                                "190079010"   OR
+                                                "190083810"   OR
+                                                "190085010"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -14559,6 +14744,10 @@
       *        初期加算サブを呼び出す（平成２４年改正で追加）
       *        療養病床で有床診療所入院基本料を相互算定する場合も
       *        初期加算サブを呼び出す（平成２４年改正で追加）
+      *        特定入院料の算定要件外に算定にする以下入院料を追加（平成２６年改正で対応）
+      *        ・一般病棟特別入院基本料
+      *        ・精神病棟１５対１入院基本料
+      *        ・精神病棟特別入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -14566,7 +14755,11 @@
                                                 "099999952"   OR
                                                 "099999955"   OR
                                                 "099999956"   OR
-                                                "099999957"
+                                                "099999957"   OR
+      *                                         特定入院料の算定要件外の算定
+                                                "190079010"   OR
+                                                "190083810"   OR
+                                                "190085010"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -16567,6 +16760,10 @@
       *        初期加算サブを呼び出す（平成２４年改正で追加）
       *        療養病床で有床診療所入院基本料を相互算定する場合も
       *        初期加算サブを呼び出す（平成２４年改正で追加）
+      *        特定入院料の算定要件外に算定にする以下入院料を追加（平成２６年改正で対応）
+      *        ・一般病棟特別入院基本料
+      *        ・精神病棟１５対１入院基本料
+      *        ・精神病棟特別入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -16574,7 +16771,11 @@
                                                 "099999952"   OR
                                                 "099999955"   OR
                                                 "099999956"   OR
-                                                "099999957"
+                                                "099999957"   OR
+      *                                         特定入院料の算定要件外の算定
+                                                "190079010"   OR
+                                                "190083810"   OR
+                                                "190085010"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -17885,12 +18086,19 @@
            MOVE    PTNYUINRRK-TOKUTEI-KBN   TO  LNK-TOKNYUIN-KBN
            MOVE    PTNYUINRRK-TOKUTEI-NYUIN TO  LNK-TOKNYUIN-NYUIN
            MOVE    PTNYUINRRK-BTUNUM        TO  LNK-TOKNYUIN-BTUNUM
+           MOVE    PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+                                        TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
            MOVE    SYOKIKSN-IN-SANTEISTYMD(1:6)
                                             TO  LNK-TOKNYUIN-SANTEIYM
            CALL    "ORCSTOKNYUIN"      USING    ORCSTOKNYUIN-AREA
                                                 SPA-AREA
            IF      LNK-TOKNYUIN-RC          =   ZERO
-               MOVE   LNK-TOKNYUIN-SRYCD    TO  SYOKIKSN-IN-KHNSRYCD
+               IF    LNK-TOKNYUIN-GAI-SRYCD =  SPACE
+                   MOVE   LNK-TOKNYUIN-SRYCD   TO  SYOKIKSN-IN-KHNSRYCD
+               ELSE
+                   MOVE   LNK-TOKNYUIN-GAI-SRYCD
+                                               TO  SYOKIKSN-IN-KHNSRYCD
+               END-IF
            END-IF
       *
            .
@@ -18983,6 +19191,18 @@
                                            TO  I01-TOKNYUIN-ITM (IDX1)
            END-PERFORM
       *
+      *    特定入院料非該当
+           IF    ( SPA-NAI-I01-TOKHIGAITOCD    NOT =   SPACE )
+               MOVE    SPA-GMN-I01-TOKHIGAITO    TO  I01-TOKHIGAITO
+               MOVE    SPA-GMN-I01-TOKHIGAITO-CNT
+                                           TO  I01-TOKHIGAITO-CNT
+               PERFORM VARYING IDX1    FROM    1   BY  1
+                   UNTIL     ( IDX1    >   SPA-GMN-I01-TOKHIGAITO-CNT )
+                   MOVE    SPA-GMN-I01-TOKHIGAITO-ITM (IDX1)
+                                           TO  I01-TOKHIGAITO-ITM (IDX1)
+               END-PERFORM
+           END-IF
+      *
       *    算定入院料
            MOVE    SPA-GMN-I01-SNTNYUIN    TO  I01-SNTNYUIN
       *
@@ -19208,6 +19428,8 @@
                                        I01-HKNCOMBI-ITM-STT
                                        I01-TOKNYUIN-STT
                                        I01-TOKNYUIN-ITM-STT
+                                       I01-TOKHIGAITO-STT
+                                       I01-TOKHIGAITO-ITM-STT
                                        I01-SNTNYUIN-STT
                                        I01-NYUCALKBN-STT
                                        I01-NYUCALKBN-ITM-STT
@@ -19260,6 +19482,8 @@
                                        I01-HKNCOMBI-ITM-STT
                                        I01-TOKNYUIN-STT
                                        I01-TOKNYUIN-ITM-STT
+                                       I01-TOKHIGAITO-STT
+                                       I01-TOKHIGAITO-ITM-STT
                                        I01-SNTNYUIN-STT
                                        I01-NYUCALKBN-STT
                                        I01-NYUCALKBN-ITM-STT
@@ -19372,6 +19596,15 @@
                                             I01-RIYOUKBN-ITM-STT
            END-IF
       *
+           IF    ( SPA-GMN-I01-SYORIKBN-CD     =   "01" OR "08" )
+            AND  ( SPA-NAI-I01-TOKHIGAITOCD    NOT =    SPACE )
+               CONTINUE
+           ELSE
+               MOVE    WIDGET-INSENSITIVE
+                                       TO  I01-TOKHIGAITO-STT
+                                           I01-TOKHIGAITO-ITM-STT
+           END-IF
+      *
       *    退院証明書再発行
            IF    ( SPA-GMN-I01-NYUREKILST-SEL >   ZERO )
             AND  ( SPA-GMN-I01-NYUREKILST-SEL
@@ -19473,6 +19706,8 @@
                                            I01-HKNCOMBI-ITM-STT
                                            I01-TOKNYUIN-STT
                                            I01-TOKNYUIN-ITM-STT
+                                           I01-TOKHIGAITO-STT
+                                           I01-TOKHIGAITO-ITM-STT
                                            I01-SNTNYUIN-STT
                                            I01-NYUCALKBN-STT
                                            I01-NYUCALKBN-ITM-STT
@@ -19521,12 +19756,6 @@
                MOVE    "BTUNAME"       TO  MCP-WIDGET
            WHEN    6
                MOVE    "SAGAKU"        TO  MCP-WIDGET
-           WHEN    21
-               MOVE    "SKJKBN"        TO  MCP-WIDGET
-           WHEN    22
-               MOVE    "SENTEIKBN"     TO  MCP-WIDGET
-           WHEN    25
-               MOVE    "TIMEKBN"       TO  MCP-WIDGET
            WHEN    7
                MOVE    "NYUINYMD"      TO  MCP-WIDGET
            WHEN    8
@@ -19535,12 +19764,8 @@
                MOVE    "SHOKAI"        TO  MCP-WIDGET
            WHEN    10
                MOVE    "SHONUM"        TO  MCP-WIDGET
-           WHEN    26
-               MOVE    "KAIGO"         TO  MCP-WIDGET
            WHEN    11
                MOVE    "TAIINYMD"      TO  MCP-WIDGET
-           WHEN    20
-               MOVE    "TAIINCD"       TO  MCP-WIDGET
            WHEN    12
                MOVE    "DR1"           TO  MCP-WIDGET
            WHEN    13
@@ -19551,24 +19776,36 @@
                MOVE    "HKNCOMBI"      TO  MCP-WIDGET
            WHEN    16
                MOVE    "TOKNYUIN"      TO  MCP-WIDGET
+           WHEN    18
+               MOVE    "SEIKYU"        TO  MCP-WIDGET
+           WHEN    19
+               MOVE    "DISPKBN"       TO  MCP-WIDGET
+           WHEN    20
+               MOVE    "TAIINCD"       TO  MCP-WIDGET
+           WHEN    21
+               MOVE    "SKJKBN"        TO  MCP-WIDGET
+           WHEN    22
+               MOVE    "SENTEIKBN"     TO  MCP-WIDGET
+           WHEN    24
+               MOVE    "USERPG"        TO  MCP-WIDGET
+           WHEN    25
+               MOVE    "TIMEKBN"       TO  MCP-WIDGET
+           WHEN    26
+               MOVE    "KAIGO"         TO  MCP-WIDGET
            WHEN    27
                MOVE    "KSN01"         TO  MCP-WIDGET
            WHEN    28
                MOVE    "KSN02"         TO  MCP-WIDGET
            WHEN    29
                MOVE    "KSN03"         TO  MCP-WIDGET
-           WHEN    18
-               MOVE    "SEIKYU"        TO  MCP-WIDGET
-           WHEN    19
-               MOVE    "DISPKBN"       TO  MCP-WIDGET
-           WHEN    24
-               MOVE    "USERPG"        TO  MCP-WIDGET
            WHEN    30
                MOVE    "BUNBENKBN"     TO  MCP-WIDGET
            WHEN    31
                MOVE    "RIYOUKBN"      TO  MCP-WIDGET
            WHEN    32
                MOVE    "NYUCALKBN"     TO  MCP-WIDGET
+           WHEN    33
+               MOVE    "TOKHIGAITO"    TO  MCP-WIDGET
            WHEN    100
                MOVE    "SELNUM"        TO  MCP-WIDGET
            WHEN    206
@@ -19616,6 +19853,8 @@
            WHEN    "HKNCOMBI"
                MOVE    016             TO  SPA-GMN-I01-CUR
            WHEN    "TOKNYUIN"
+               MOVE    033             TO  SPA-GMN-I01-CUR
+           WHEN    "TOKHIGAITO"
                MOVE    032             TO  SPA-GMN-I01-CUR
            WHEN    "NYUCALKBN"
                MOVE    030             TO  SPA-GMN-I01-CUR
@@ -19772,6 +20011,12 @@
       *
            IF    ( SPA-GMN-I01-CUR =   16  )
                IF  ( I01-TOKNYUIN-STT  =   WIDGET-INSENSITIVE )
+                   COMPUTE SPA-GMN-I01-CUR =   33
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-I01-CUR =   33  )
+               IF  ( I01-TOKHIGAITO-STT  =   WIDGET-INSENSITIVE )
                    COMPUTE SPA-GMN-I01-CUR =   32
                END-IF
            END-IF
@@ -20580,6 +20825,31 @@
       *
            .
        800-ORCSBRMNUM-EXT.
+           EXIT.
+      *****************************************************************
+      *    特定入院料非該当チェック処理
+      *****************************************************************
+       800-TOKHIGAITO-CHK-SEC      SECTION.
+      *
+           MOVE    SPACE               TO  WRK-TOKHIGAITO-G
+      *
+           INITIALIZE                      ORCSTOKNYUIN-AREA
+           MOVE    WRK-TOKNYUIN-KBN    TO  LNK-TOKNYUIN-KBN
+           MOVE    WRK-TOKNYUIN-CD     TO  LNK-TOKNYUIN-NYUIN
+           MOVE    SPA-GMN-I01-BTUNAME-CD
+                                       TO  LNK-TOKNYUIN-BTUNUM
+           MOVE    "1"                 TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
+           MOVE    WRK-KJNYMD          TO  LNK-TOKNYUIN-SANTEIYM
+           CALL    "ORCSTOKNYUIN"      USING    ORCSTOKNYUIN-AREA
+                                                SPA-AREA
+           IF    ( LNK-TOKNYUIN-RC          =   ZERO )
+            AND  ( LNK-TOKNYUIN-GAI-SRYCD   NOT =  SPACE )
+               MOVE    LNK-TOKNYUIN-GAI-SRYCD
+                                       TO  WRK-TOKHIGAITO-CD
+           END-IF
+      *
+           .
+       800-TOKHIGAITO-CHK-EXT.
            EXIT.
       *****************************************************************
       *    日付チェック・編集処理

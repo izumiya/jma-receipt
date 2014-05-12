@@ -245,12 +245,16 @@
                05  WRK-MMS2                PIC 9(02).
                05  WRK-DDS2                PIC 9(02).
       *
+      *
       *    退院日の同日再入院用ワーク領域
        01  WRK-DOU-AREA.
            03  WRK-DOU-NAI-I01-NYUINYMD      PIC X(08).
            03  WRK-DOU-PTNYUINRRK-TENNYUYMD  PIC X(08).
            03  WRK-DOU-TENNYUYMD             PIC X(08).
            03  FLG-JIINRRK                   PIC 9(01).
+       01  WRK-PTNYUINRRK-REC.
+           COPY  "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
+                                            BY  //WRK-PTNYUINRRK-//.
       *
       *    食堂加算設定用の退避領域
        01   WRK-SHOKUDOU                   PIC 9(02).
@@ -565,6 +569,71 @@
            MOVE    "key"               TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
+      *---------------退院日の同日入院処理ここから----------------------
+           MOVE   SPACE                TO  WRK-DOU-TENNYUYMD
+      *    同日再入院用に入院日（転入日）を退避
+           MOVE   LNK-PTNYUINRRK-NYUINYMD
+                                       TO  WRK-DOU-NAI-I01-NYUINYMD
+           MOVE   LNK-PTNYUINRRK-TENNYUYMD
+                                       TO  WRK-DOU-PTNYUINRRK-TENNYUYMD
+      *    入院履歴の退避
+           MOVE   LNK-PTNYUINRRK-REC   TO  WRK-PTNYUINRRK-REC
+      *    最終入院履歴が自院歴かを判定する
+           MOVE    ZERO                TO  FLG-JIINRRK
+           INITIALIZE  PTNYUINRRK-REC
+           MOVE    LNK-PTNYUINRRK-HOSPNUM
+                                       TO  PTNYUINRRK-HOSPNUM
+           MOVE    LNK-PTNYUINRRK-PTID TO  PTNYUINRRK-PTID
+           MOVE    PTNYUINRRK-REC      TO  MCPDATA-REC
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key9"              TO  MCP-PATHNAME
+           PERFORM 910-DB-SELECT-SEC
+           IF    ( MCP-RC      =   ZERO  )
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key9"              TO  MCP-PATHNAME
+               PERFORM  910-DB-READ-SEC
+           END-IF
+           IF    ( MCP-RC      =   ZERO  )
+               MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+               MOVE    "key9"              TO  MCP-PATHNAME
+               PERFORM  910-DB-READ-SEC
+               MOVE    MCPDATA-REC     TO  PTNYUINRRK-REC
+               IF      PTNYUINRRK-JTIKBN   NOT =   "5"  AND "6"
+                   IF  PTNYUINRRK-TAIINYMD  = WRK-DOU-NAI-I01-NYUINYMD                   
+                       MOVE   1        TO  FLG-JIINRRK
+                   END-IF
+               END-IF
+           END-IF
+           MOVE    "tbl_ptnyuinrrk"    TO  MCP-TABLE
+           MOVE    "key9"              TO  MCP-PATHNAME
+           PERFORM 910-DBCLOSECURSOR-SEC
+      *    入院履歴の復元
+           MOVE    WRK-PTNYUINRRK-REC  TO  LNK-PTNYUINRRK-REC
+      *    前歴が自院歴（同日退院分）の場合、入院会計作成日を１日ずらす
+           IF     FLG-JIINRRK    =     1
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY6-AREA
+               MOVE    "61"            TO  LNK-DAY6-IRAI
+               MOVE    LNK-PTNYUINRRK-NYUINYMD
+                                       TO  LNK-DAY6-KIJUN
+               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+               MOVE    1               TO  LNK-DAY6-ZOGEN
+               CALL    "ORCSDAY"       USING     STS-AREA-DAY
+                                                 LNK-DAY6-AREA
+               MOVE    LNK-DAY6-KEISAN TO  LNK-PTNYUINRRK-NYUINYMD
+               INITIALIZE                  STS-AREA-DAY
+               INITIALIZE                  LNK-DAY6-AREA
+               MOVE    "61"            TO  LNK-DAY6-IRAI
+               MOVE    WRK-DOU-PTNYUINRRK-TENNYUYMD
+                                       TO  LNK-DAY6-KIJUN
+               MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
+               MOVE    1               TO  LNK-DAY6-ZOGEN
+               CALL    "ORCSDAY"       USING     STS-AREA-DAY
+                                                 LNK-DAY6-AREA
+               MOVE    LNK-DAY6-KEISAN TO  WRK-DOU-TENNYUYMD
+           END-IF
+      *---------------退院日の同日入院処理ここまで----------------------
+      *
            INITIALIZE      ORCSSYOKIKSNAREA
       *
       *    通算日数、算定開始日を求める
@@ -585,6 +654,10 @@
       *        初期加算サブを呼び出す（平成２４年改正で追加）
       *        療養病床で有床診療所入院基本料を相互算定する場合も
       *        初期加算サブを呼び出す（平成２４年改正で追加）
+      *        特定入院料の算定要件外に算定にする以下入院料を追加（平成２６年改正で対応）
+      *        ・一般病棟特別入院基本料
+      *        ・精神病棟１５対１入院基本料
+      *        ・精神病棟特別入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -592,7 +665,11 @@
                                                 "099999952"   OR
                                                 "099999955"   OR
                                                 "099999956"   OR
-                                                "099999957"
+                                                "099999957"   OR
+      *                                         特定入院料の算定要件外の算定
+                                                "190079010"   OR
+                                                "190083810"   OR
+                                                "190085010"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )
@@ -1008,6 +1085,13 @@
                MOVE   LNK-SCNYUACCT-KAGEN-SRYCD(1)
                                         TO  LNK-NYUKSNGET-NYUIN-SRYCD
            END-IF
+      *
+      *    特定入院料算定要件外で療養病棟入院基本料Ｉを算定時に、入院料
+      *    加算を一般病棟特別入院基本料の例で算定する為、コードの置き換え
+           IF      LNK-TOKNYUIN-GAI-NYUKSNKBN   =    "1"
+               MOVE   "190079010"       TO  LNK-NYUKSNGET-NYUIN-SRYCD
+           END-IF
+      *
            CALL    "ORCSNYUKSNGET"      USING  ORCSNYUKSNGET-AREA
                                                SPA-AREA
       *    入院料加算取得サブからの返却値セット
@@ -1143,6 +1227,12 @@
            IF   IPN-NYUKAIKEI-SAKUSEI-FLG  =   "1"
                MOVE   IPN-SANTEISTYMD  TO  STUSAN-KJNYMD
            ELSE
+      *---------------退院日の同日入院処理ここから----------------------
+               IF   WRK-DOU-TENNYUYMD    NOT =   SPACE
+                   MOVE    WRK-DOU-TENNYUYMD
+                                       TO  LNK-PTNYUINRRK-TENNYUYMD
+               END-IF
+      *---------------退院日の同日入院処理ここまで----------------------
                MOVE   LNK-PTNYUINRRK-TENNYUYMD
                                        TO  STUSAN-KJNYMD
            END-IF
@@ -1287,12 +1377,19 @@
            MOVE    LNK-PTNYUINRRK-TOKUTEI-KBN   TO  LNK-TOKNYUIN-KBN
            MOVE    LNK-PTNYUINRRK-TOKUTEI-NYUIN TO  LNK-TOKNYUIN-NYUIN
            MOVE    LNK-PTNYUINRRK-BTUNUM        TO  LNK-TOKNYUIN-BTUNUM
+           MOVE    LNK-PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+                                        TO  LNK-TOKNYUIN-SANTEIYOUKENKBN
            MOVE    SYOKIKSN-IN-SANTEISTYMD(1:6)
                                             TO  LNK-TOKNYUIN-SANTEIYM
            CALL    "ORCSTOKNYUIN"      USING    ORCSTOKNYUIN-AREA
                                                 SPA-AREA
            IF      LNK-TOKNYUIN-RC          =   ZERO
-               MOVE   LNK-TOKNYUIN-SRYCD    TO  SYOKIKSN-IN-KHNSRYCD
+               IF    LNK-TOKNYUIN-GAI-SRYCD =  SPACE
+                   MOVE   LNK-TOKNYUIN-SRYCD   TO  SYOKIKSN-IN-KHNSRYCD
+               ELSE
+                   MOVE   LNK-TOKNYUIN-GAI-SRYCD
+                                               TO  SYOKIKSN-IN-KHNSRYCD
+               END-IF
            END-IF
       *
            .
@@ -1854,6 +1951,10 @@
       *        初期加算サブを呼び出す（平成２４年改正で追加）
       *        療養病床で有床診療所入院基本料を相互算定する場合も
       *        初期加算サブを呼び出す（平成２４年改正で追加）
+      *        特定入院料の算定要件外に算定にする以下入院料を追加（平成２６年改正で対応）
+      *        ・一般病棟特別入院基本料
+      *        ・精神病棟１５対１入院基本料
+      *        ・精神病棟特別入院基本料
                IF    SYOKIKSN-IN-KHNSRYCD   =   "190151910"   OR
                                                 "190152010"   OR
                                                 "099999950"   OR
@@ -1861,7 +1962,11 @@
                                                 "099999952"   OR
                                                 "099999955"   OR
                                                 "099999956"   OR
-                                                "099999957"
+                                                "099999957"   OR
+      *                                         特定入院料の算定要件外の算定
+                                                "190079010"   OR
+                                                "190083810"   OR
+                                                "190085010"
                    CALL    "ORCSSYOKIKSN"  USING   ORCSSYOKIKSNAREA
                                                    SPA-AREA
                    IF    ( SYOKIKSN-OT-RC  NOT =   ZERO )

@@ -13,6 +13,7 @@ tbl_ptnyuinrrk	{
 	TAIINCD			char(2);
 	TOKUTEI_KBN		char(1);
 	TOKUTEI_NYUIN		char(2);
+	TOKU_SANTEIYOUKENKBN		char(1);
 	RM_SAGAKU		char(2);
 	TEIKI_SEIKYUKBN		char(1);
 	KENSAKU_DISPKBN		char(1);

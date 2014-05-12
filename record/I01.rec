@@ -207,6 +207,15 @@ I01	{
 			item	varchar(63)[100];
 			state	int;
 		};
+		CMB_TOKHIGAITO	{
+			TOKHIGAITO	{
+				value	varchar(30);
+				state	int;
+			};
+			count	int;
+			item	varchar(30)[05];
+			state	int;
+		};
 		SNTNYUIN{
 			value	varchar(60);
 			state	int;

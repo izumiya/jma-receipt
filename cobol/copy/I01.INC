@@ -137,6 +137,13 @@
                 05  I01-TOKNYUIN-ITM               PIC X(63)
                                                    OCCURS  100.
                 05  I01-TOKNYUIN-ITM-STT           PIC S9(9)   BINARY.
+              04  I01-CMB-TOKHIGAITO.
+                05  I01-TOKHIGAITO                   PIC X(30).
+                05  I01-TOKHIGAITO-STT               PIC S9(9)   BINARY.
+                05  I01-TOKHIGAITO-CNT               PIC S9(9)   BINARY.
+                05  I01-TOKHIGAITO-ITM               PIC X(30)
+                                                     OCCURS  5.
+                05  I01-TOKHIGAITO-ITM-STT           PIC S9(9)   BINARY.
               04  I01-SNTNYUIN                     PIC X(60).
               04  I01-SNTNYUIN-STT                 PIC S9(9)   BINARY.
               04  I01-SCRW2.

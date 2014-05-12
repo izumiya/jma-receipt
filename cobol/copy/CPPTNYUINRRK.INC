@@ -53,6 +53,8 @@
            03  PTNYUINRRK-TOKUTEI-KBN             PIC  X(01).
       *特定入院料
            03  PTNYUINRRK-TOKUTEI-NYUIN           PIC  X(02).
+      *特定入院料算定要件区分（空白：該当する／１：該当しない）
+           03  PTNYUINRRK-TOKU-SANTEIYOUKENKBN    PIC  X(01).
       *室料差額
            03  PTNYUINRRK-RM-SAGAKU               PIC  X(02).
       *定期請求区分
