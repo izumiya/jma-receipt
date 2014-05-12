@@ -109,6 +109,7 @@
       *                                     ０８（老健）のレセプト対応
       *
       *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
+      *  04.07.02    NACL-藤原    14/03/30  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -2538,6 +2539,8 @@ grpsys                 MOVE    LNK-SYUBETU-HOSPNUM TO  PTKOH-HOSPNUM
            IF      WRK-KOUKI-FLG   =   1
                MOVE    SPACE           TO  LNK-SYUBETUGET-HKN-HOJOKBN
            END-IF
+           MOVE    LNK-SYUBETU-BIRTHDAY
+                                   TO  LNK-SYUBETUGET-BIRTHDAY
       *
            CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *

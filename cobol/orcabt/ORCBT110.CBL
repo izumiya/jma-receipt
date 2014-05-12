@@ -47,6 +47,8 @@
       *  04.06.02    NACL-門脇    13/02/27  平成２５年４月改正対応
       *  04.06.03    NACL-門脇    13/09/25  労災マスタ追加対応
       *                                     （電話再診料　等）
+      *
+      *  04.07.01    NACL-藤原    14/03/30  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -243,6 +245,7 @@
            03  WRK-CONS-KOUGAI-HKNNUM PIC X(03)    VALUE   "975".       
       *
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
+           03  WRK-CONS-SRYYM-201404   PIC 9(06)   VALUE   201404.      
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1492,7 +1495,115 @@ grpsys     PERFORM 900-DBSELECT-SEC
                    END-IF
                END-IF
       * 
-               IF      WRK-PARA-SRYYMD(1:6)    >=  WRK-CONS-SRYYM-200804
+               IF      WRK-PARA-SRYYMD(1:6)    >=  WRK-CONS-SRYYM-201404
+                   IF    ( COMB-HKNNUM     =   "002" )
+                   AND  ( WRK-AGE          >=  75    )
+                       EVALUATE    COMB-HOJOKBN
+                           WHEN    "A"
+                           WHEN    "G"
+                           WHEN    "D"
+                               MOVE    "1"     TO  COMB-HOJOKBN
+                           WHEN    "B"
+                           WHEN    "H"
+                           WHEN    "E"
+                               MOVE    "2"     TO  COMB-HOJOKBN
+                           WHEN    "C"
+                           WHEN    "I"
+                           WHEN    "F"
+                               MOVE    "3"     TO  COMB-HOJOKBN
+                       END-EVALUATE
+                   END-IF
+      *
+                   EVALUATE    COMB-HKNNUM
+                       WHEN    "002" 
+                           EVALUATE   COMB-HOJOKBN
+                               WHEN   "A"
+                               WHEN   "B"
+                               WHEN   "C"
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "D"
+                               WHEN   "E"
+                               WHEN   "F"
+                               WHEN   "8"
+                                   MOVE   "8"   TO   WK-HONKZKKBN
+                               WHEN   "G"
+                               WHEN   "H"
+                               WHEN   "I"
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "031"  THRU    "034"  
+                           EVALUATE   COMB-HOJOKBN
+                               WHEN   "B"
+                               WHEN   "9"   
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "E"
+                               WHEN   "8"
+                                   MOVE   "8"   TO   WK-HONKZKKBN
+                               WHEN   "H"
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "060" 
+                       WHEN    "068" 
+      *********************IF  (WRK-AGE  >=   70)  AND
+      *********************    (WRK-AGE  <=   74)
+                           IF  (WRK-AGE  >=   70)
+                           AND (WRK-KOUKI-FLG
+                                         =    0 )
+                               EVALUATE   COMB-HOJOKBN
+                                   WHEN   "1"
+                                   WHEN   "4"
+                                       MOVE   "9"   TO   WK-HONKZKKBN
+                                   WHEN   "2"
+                                   WHEN   "5"
+                                       MOVE   "8"   TO   WK-HONKZKKBN
+                                   WHEN   "3"
+                                   WHEN   "6"
+                                       MOVE   "7"   TO   WK-HONKZKKBN
+                               END-EVALUATE
+                           END-IF     
+                       WHEN    "039" 
+                       WHEN    "040" 
+                           EVALUATE   COMB-HOJOKBN
+                               WHEN   "1"
+                                   MOVE   "9"   TO   WK-RJN
+                               WHEN   "3"
+                                   MOVE   "7"   TO   WK-RJN
+                           END-EVALUATE
+                       WHEN    "067" 
+                       WHEN    "069" 
+                           IF      WRK-AGE       >=   65
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                           ELSE
+                               EVALUATE   COMB-HOJOKBN
+                                   WHEN   "9"
+                                       MOVE   "9"   TO   WK-HONKZKKBN
+                                   WHEN   "8"
+                                       MOVE   "?"   TO   WK-HONKZKKBN
+                                   WHEN   "7"
+                                       MOVE   "7"   TO   WK-HONKZKKBN
+                               END-EVALUATE
+                           END-IF
+                       WHEN    OTHER 
+                           EVALUATE   COMB-HOJOKBN
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "8"
+                                   MOVE   "8"   TO   WK-HONKZKKBN
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                     END-EVALUATE
+      *
+                   IF      COMB-KOH1HKNNUM      =    "027"
+                       MOVE   "?"               TO   WK-RJN
+                   END-IF
+               END-IF
+      * 
+               IF    ( WRK-PARA-SRYYMD(1:6)  >= WRK-CONS-SRYYM-200804 )
+               AND   ( WRK-PARA-SRYYMD(1:6)  <= WRK-CONS-SRYYM-201404 )
                    IF    ( COMB-HKNNUM     =   "002" )
                    AND  ( WRK-AGE          >=  75    )
                        EVALUATE    COMB-HOJOKBN
@@ -1763,6 +1874,7 @@ grpsys     PERFORM 900-DBSELECT-SEC
            MOVE    WRK-PARA-SRYYMD(1:6)
                                        TO  LNK-SYUBETUGET-SRYYM
            MOVE    TOUKEI04-HKNNUM     TO  LNK-SYUBETUGET-HKNNUM
+           MOVE    TOUKEI04-BIRTHDAY   TO  LNK-SYUBETUGET-BIRTHDAY
            CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *
            MOVE    LNK-SYUBETUGET-RECESYUBETU

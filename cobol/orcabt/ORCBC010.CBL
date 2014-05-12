@@ -73,6 +73,7 @@
       *                                     ¡ÊÅÅÏÃºÆ¿ÇÎÁ¡¡Åù¡Ë
       *
       *  04.07.01    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.02    NACL-Æ£¸¶    14/03/30  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -2290,12 +2291,15 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
                            EVALUATE    PTHKN-HOJOKBN
                                WHEN    "A"
                                WHEN    "G"
+                               WHEN    "D"
                                    MOVE    "1" TO  COLDAT01-HOJOKBN
                                WHEN    "B"
                                WHEN    "H"
+                               WHEN    "E"
                                    MOVE    "2" TO  COLDAT01-HOJOKBN
                                WHEN    "C"
                                WHEN    "I"
+                               WHEN    "F"
                                    MOVE    "3" TO  COLDAT01-HOJOKBN
                                WHEN    OTHER
                                    MOVE    PTHKN-HOJOKBN
@@ -2412,12 +2416,15 @@ grpsys                 MOVE    SPA-HOSPNUM         TO  PTHKN-HOSPNUM
                            EVALUATE    PTHKN-HOJOKBN
                                WHEN    "A"
                                WHEN    "G"
+                               WHEN    "D"
                                    MOVE    "1" TO  COLDAT01-THOJOKBN (1)
                                WHEN    "B"
                                WHEN    "H"
+                               WHEN    "E"
                                    MOVE    "2" TO  COLDAT01-THOJOKBN (1)
                                WHEN    "C"
                                WHEN    "I"
+                               WHEN    "F"
                                    MOVE    "3" TO  COLDAT01-THOJOKBN (1)
                            END-EVALUATE
                        END-IF
@@ -2556,14 +2563,17 @@ grpsys             MOVE    SPA-HOSPNUM     TO  HKN-HOSPNUM
                                      EVALUATE    PTHKN-HOJOKBN
                                        WHEN    "A"
                                        WHEN    "G"
+                                       WHEN    "D"
                                          MOVE    "1"
                                            TO  COLDAT01-THOJOKBN (IDX)
                                        WHEN    "B"
                                        WHEN    "H"
+                                       WHEN    "E"
                                          MOVE    "2"
                                            TO  COLDAT01-THOJOKBN (IDX)
                                        WHEN    "C"
                                        WHEN    "I"
+                                       WHEN    "F"
                                          MOVE    "3"
                                            TO  COLDAT01-THOJOKBN (IDX)
                                      END-EVALUATE
@@ -3509,6 +3519,7 @@ grpsys         MOVE    SPA-HOSPNUM     TO HKN-HOSPNUM
            MOVE    COLDAT01-NYUGAIKBN  TO  LNK-SYUBETUGET-NYUGAIKBN
            MOVE    WRK-PARA-SRYYM      TO  LNK-SYUBETUGET-SRYYM
            MOVE    COLDAT01-HKNNUM     TO  LNK-SYUBETUGET-HKNNUM
+           MOVE    COLDAT01-BIRTHDAY   TO  LNK-SYUBETUGET-BIRTHDAY 
            CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *
            MOVE    LNK-SYUBETUGET-RECESYUBETU

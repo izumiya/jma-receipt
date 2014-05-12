@@ -35,6 +35,8 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  04.03.01    NACL-藤原    08/05/07  公費４種までの併用の記録対応
       *                                     レセプト種別（紙レセプト）の追加
+      *
+      *  04.07.01    NACL-藤原    14/03/30  平成２６年４月改正対応
       ************************************************************
       *
        01  ORCSSYUBETUGETAREA.
@@ -71,6 +73,7 @@
       *
                05  LNK-SYUBETUGET-AGE          PIC 9(03).
                05  LNK-SYUBETUGET-SYUGAKUKBN   PIC 9(01).
+               05  LNK-SYUBETUGET-BIRTHDAY     PIC 9(08).
       *
                05  LNK-SYUBETUGET-RJNHKNNUM    PIC X(03).
                05  LNK-SYUBETUGET-RJNPAYKBN    PIC X(02).

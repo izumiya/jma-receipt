@@ -37,7 +37,9 @@
       *
       *  04.05.01    NACL-Æ£¸¶    10/01/05  ¼£¸³ÂÐ±þ
       *                                     Ê¿À®£²£°Ç¯£´·îÊ¬¤è¤ê¼«Èñ¥ì¥»
-      *                                     ¤È¤¹¤ë 
+      *                                     ¤È¤¹¤ë
+      *
+      *  04.07.01    NACL-Æ£¸¶    14/03/30  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -70,6 +72,7 @@
            03  WRK-CONS-SRYYM-200609   PIC 9(06)   VALUE   200609.      
            03  WRK-CONS-SRYYM-200803   PIC 9(06)   VALUE   200803.      
            03  WRK-CONS-SRYYM-200804   PIC 9(06)   VALUE   200804.      
+           03  WRK-CONS-SRYYM-201404   PIC 9(06)   VALUE   201404.      
       *
       *****************************************************************
       *    Ï¢ÍíÎÎ°è
@@ -134,6 +137,7 @@
       **   DISPLAY "KOKUHO    : " LNK-SYUBETUGET-KOKUHO 
       **   DISPLAY "RJN       : " LNK-SYUBETUGET-RJN 
       **   DISPLAY "KOHI-CNT  : " LNK-SYUBETUGET-KOHI-CNT
+      **   DISPLAY "BIRTHDAY  : " LNK-SYUBETUGET-BIRTHDAY
       *
       *    Ê¿À®£±£´Ç¯£¹·î¤Þ¤Ç
            IF      LNK-SYUBETUGET-SRYYM    <=  WRK-CONS-SRYYM-200209
@@ -1071,6 +1075,7 @@
       *
       *    Ê¿À®£²£°Ç¯£´·î²þÀµÂÐ±þ
            IF    ( LNK-SYUBETUGET-SRYYM    >   WRK-CONS-SRYYM-200803 )
+           AND   ( LNK-SYUBETUGET-SRYYM    <=  WRK-CONS-SRYYM-201404 )
              EVALUATE  LNK-SYUBETUGET-HONKZKKBN ALSO
                                     LNK-SYUBETUGET-NYUGAIKBN  ALSO
                        LNK-SYUBETUGET-IHO  ALSO
@@ -1321,16 +1326,20 @@
                WHEN    "9"   ALSO   "2"    ALSO
                        SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
                    MOVE    1148     TO  LNK-SYUBETUGET-RECESYUBETU
-               WHEN    "8"   ALSO   "1"    ALSO
+               WHEN    "7"   ALSO   "1"    ALSO
                        "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
                    MOVE    1149     TO  LNK-SYUBETUGET-RECESYUBETU
                WHEN    "8"   ALSO   "1"    ALSO
                        SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+               WHEN    "7"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
                    MOVE    1149     TO  LNK-SYUBETUGET-RECESYUBETU
-               WHEN    "8"   ALSO   "2"    ALSO
+               WHEN    "7"   ALSO   "2"    ALSO
                        "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
                    MOVE    1140     TO  LNK-SYUBETUGET-RECESYUBETU
                WHEN    "8"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+               WHEN    "7"   ALSO   "2"    ALSO
                        SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
                    MOVE    1140     TO  LNK-SYUBETUGET-RECESYUBETU
       *        ÊÝ¸±¤È¸øÈñ£´¼ï¤ÎÊ»ÍÑ
@@ -1382,16 +1391,614 @@
                WHEN    "9"   ALSO   "2"    ALSO
                        SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
                    MOVE    1158     TO  LNK-SYUBETUGET-RECESYUBETU
-               WHEN    "8"   ALSO   "1"    ALSO
+               WHEN    "7"   ALSO   "1"    ALSO
                        "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
                    MOVE    1159     TO  LNK-SYUBETUGET-RECESYUBETU
                WHEN    "8"   ALSO   "1"    ALSO
                        SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+               WHEN    "7"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
                    MOVE    1159     TO  LNK-SYUBETUGET-RECESYUBETU
-               WHEN    "8"   ALSO   "2"    ALSO
+               WHEN    "7"   ALSO   "2"    ALSO
                        "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
                    MOVE    1150     TO  LNK-SYUBETUGET-RECESYUBETU
                WHEN    "8"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+               WHEN    "7"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1150     TO  LNK-SYUBETUGET-RECESYUBETU
+      *¸øÈñÃ±ÆÈ
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   SPACE  ALSO  SPACE  ALSO   1
+                   MOVE    1211     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   SPACE  ALSO  SPACE  ALSO   1
+                   MOVE    1212     TO  LNK-SYUBETUGET-RECESYUBETU
+      *£²¼ï¤Î¸øÈñÊ»ÍÑ
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   SPACE  ALSO  SPACE  ALSO   2
+                   MOVE    1221     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   SPACE  ALSO  SPACE  ALSO   2
+                   MOVE    1222     TO  LNK-SYUBETUGET-RECESYUBETU
+      *£³¼ï¤Î¸øÈñÊ»ÍÑ
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   SPACE  ALSO  SPACE  ALSO   3
+                   MOVE    1231     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   SPACE  ALSO  SPACE  ALSO   3
+                   MOVE    1232     TO  LNK-SYUBETUGET-RECESYUBETU
+      *£´¼ï¤Î¸øÈñÊ»ÍÑ
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   SPACE  ALSO  SPACE  ALSO   4
+                   MOVE    1241     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   SPACE  ALSO  SPACE  ALSO   4
+                   MOVE    1242     TO  LNK-SYUBETUGET-RECESYUBETU
+      *¸å´ü¹âÎð¼ÔÃ±ÆÈ
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   ZERO
+                   MOVE    1317     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   ZERO
+                   MOVE    1318     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   ZERO
+                   MOVE    1319     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   ZERO
+                   MOVE    1310     TO  LNK-SYUBETUGET-RECESYUBETU
+      *¸å´ü¹âÎð¼Ô¤È¸øÈñ£±¼ï¤ÎÊ»ÍÑ
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   1
+                   MOVE    1327     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   1
+                   MOVE    1328     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   1
+                   MOVE    1329     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   1
+                   MOVE    1320     TO  LNK-SYUBETUGET-RECESYUBETU
+      *¸å´ü¹âÎð¼Ô¤È¸øÈñ£²¼ï¤ÎÊ»ÍÑ
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   2
+                   MOVE    1337     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   2
+                   MOVE    1338     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   2
+                   MOVE    1339     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   2
+                   MOVE    1330     TO  LNK-SYUBETUGET-RECESYUBETU
+      *¸å´ü¹âÎð¼Ô¤È¸øÈñ£³¼ï¤ÎÊ»ÍÑ
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   3
+                   MOVE    1347     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   3
+                   MOVE    1348     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   3
+                   MOVE    1349     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   3
+                   MOVE    1340     TO  LNK-SYUBETUGET-RECESYUBETU
+      *¸å´ü¹âÎð¼Ô¤È¸øÈñ£´¼ï¤ÎÊ»ÍÑ
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   4
+                   MOVE    1357     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "9"    ALSO   4
+                   MOVE    1358     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "1"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   4
+                   MOVE    1359     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    ANY   ALSO   "2"    ALSO
+                       SPACE ALSO   "3"    ALSO  "7"    ALSO   4
+                   MOVE    1350     TO  LNK-SYUBETUGET-RECESYUBETU
+      *Âà¿¦¼ÔÃ±ÆÈ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1411     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1412     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1413     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1414     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1415     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1416     TO  LNK-SYUBETUGET-RECESYUBETU
+      *Âà¿¦¼Ô¤È¸øÈñ£±¼ï¤ÎÊ»ÍÑ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  1
+                   MOVE    1421     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  1
+                   MOVE    1422     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  1
+                   MOVE    1423     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  1
+                   MOVE    1424     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  1
+                   MOVE    1425     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  1
+                   MOVE    1426     TO  LNK-SYUBETUGET-RECESYUBETU
+      *Âà¿¦¼Ô¤È¸øÈñ£²¼ï¤ÎÊ»ÍÑ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  2
+                   MOVE    1431     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  2
+                   MOVE    1432     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  2
+                   MOVE    1433     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  2
+                   MOVE    1434     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  2
+                   MOVE    1435     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO  2
+                   MOVE    1436     TO  LNK-SYUBETUGET-RECESYUBETU
+      *Âà¿¦¼Ô¤È¸øÈñ£³¼ï¤ÎÊ»ÍÑ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    3
+                   MOVE    1441     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    3
+                   MOVE    1442     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    3
+                   MOVE    1443     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    3
+                   MOVE    1444     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    3
+                   MOVE    1445     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    3
+                   MOVE    1446     TO  LNK-SYUBETUGET-RECESYUBETU
+      *Âà¿¦¼Ô¤È¸øÈñ£´¼ï¤ÎÊ»ÍÑ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    4
+                   MOVE    1451     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    4
+                   MOVE    1452     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    4
+                   MOVE    1453     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    4
+                   MOVE    1454     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    4
+                   MOVE    1455     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "2"    ALSO  SPACE  ALSO    4
+                   MOVE    1456     TO  LNK-SYUBETUGET-RECESYUBETU
+             END-EVALUATE
+           END-IF
+      *
+      *    Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+           IF    ( LNK-SYUBETUGET-SRYYM    >   WRK-CONS-SRYYM-201404 )
+             EVALUATE  LNK-SYUBETUGET-HONKZKKBN ALSO
+                                    LNK-SYUBETUGET-NYUGAIKBN  ALSO
+                       LNK-SYUBETUGET-IHO  ALSO
+                                    LNK-SYUBETUGET-KOKUHO     ALSO
+                       LNK-SYUBETUGET-RJN  ALSO
+                                    LNK-SYUBETUGET-KOHI-CNT
+      *        ÊÝ¸±Ã±ÆÈ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1111     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1111     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1112     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1112     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1113     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1113     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1114     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1114     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1115     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1115     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1116     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1116     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+               WHEN    "8"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1117     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1117     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1119     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1117     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "9"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+               WHEN    "8"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1118     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1118     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1110     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1118     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "7"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1119     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1119     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  ZERO
+                   MOVE    1110     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  ZERO
+                   MOVE    1110     TO  LNK-SYUBETUGET-RECESYUBETU
+      *        ÊÝ¸±¤È¸øÈñ£±¼ï¤ÎÊ»ÍÑ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1121     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1121     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1122     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1122     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1123     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1123     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1124     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1124     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1125     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1125     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1126     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1126     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+               WHEN    "8"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1127     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1127     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1129     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1127     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "9"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+               WHEN    "8"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1128     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1128     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1120     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1128     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "7"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1129     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1129     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  1
+                   MOVE    1120     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  1
+                   MOVE    1120     TO  LNK-SYUBETUGET-RECESYUBETU
+      *ÊÝ¸±¤È¸øÈñ£²¼ï¤ÎÊ»ÍÑ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1131     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1131     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1132     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1132     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1133     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1133     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1134     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1134     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1135     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1135     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1136     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1136     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+               WHEN    "8"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1137     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1137     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1139     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1137     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "9"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+               WHEN    "8"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1138     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1138     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1130     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1138     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "7"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1139     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1139     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  2
+                   MOVE    1130     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  2
+                   MOVE    1130     TO  LNK-SYUBETUGET-RECESYUBETU
+      *        ÊÝ¸±¤È¸øÈñ£³¼ï¤ÎÊ»ÍÑ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1141     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1141     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1142     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1142     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1143     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1143     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1144     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1144     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1145     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1145     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1146     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1146     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+               WHEN    "8"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1147     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1147     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1149     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1147     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "9"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+               WHEN    "8"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1148     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1148     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1140     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1148     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "7"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1149     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1149     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  3
+                   MOVE    1140     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  3
+                   MOVE    1140     TO  LNK-SYUBETUGET-RECESYUBETU
+      *        ÊÝ¸±¤È¸øÈñ£´¼ï¤ÎÊ»ÍÑ
+               WHEN    "1"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1151     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1151     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1152     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "1"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1152     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1153     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1153     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1154     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "3"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1154     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1155     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1155     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1156     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "2"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1156     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+               WHEN    "8"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1157     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1157     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1159     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1157     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "9"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+               WHEN    "8"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1158     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "9"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1158     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "8"   ALSO   "2"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   IF      LNK-SYUBETUGET-BIRTHDAY <   19440402
+                       MOVE    1150     TO  LNK-SYUBETUGET-RECESYUBETU
+                   ELSE
+                       MOVE    1158     TO  LNK-SYUBETUGET-RECESYUBETU
+                   END-IF
+               WHEN    "7"   ALSO   "1"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1159     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "1"    ALSO
+                       SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
+                   MOVE    1159     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
+                       "1"   ALSO   SPACE  ALSO  SPACE  ALSO  4
+                   MOVE    1150     TO  LNK-SYUBETUGET-RECESYUBETU
+               WHEN    "7"   ALSO   "2"    ALSO
                        SPACE ALSO   "1"    ALSO  SPACE  ALSO  4
                    MOVE    1150     TO  LNK-SYUBETUGET-RECESYUBETU
       *¸øÈñÃ±ÆÈ
@@ -1810,8 +2417,108 @@
                    END-IF
                END-IF
       *
-      *        Ê¿À®£²£°Ç¯£´·î°Ê¹ß 
-               IF      LNK-SYUBETUGET-SRYYM    >=  WRK-CONS-SRYYM-200804
+      *        Ê¿À®£²£°Ç¯£µ·î°Ê¹ß 
+               IF      LNK-SYUBETUGET-SRYYM    >   WRK-CONS-SRYYM-201404
+                   EVALUATE    LNK-SYUBETUGET-HKNNUM
+                       WHEN    "002" 
+                           EVALUATE   LNK-SYUBETUGET-HKN-HOJOKBN
+                               WHEN   "A"
+                               WHEN   "B"
+                               WHEN   "C"
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "D"
+                               WHEN   "E"
+                               WHEN   "F"
+                               WHEN   "8"
+                                   MOVE   "8"   TO   WK-HONKZKKBN
+                               WHEN   "G"
+                               WHEN   "H"
+                               WHEN   "I"
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "031"  THRU    "034"  
+                           EVALUATE   LNK-SYUBETUGET-HKN-HOJOKBN
+                               WHEN   "B"
+                               WHEN   "9"   
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "E"
+                               WHEN   "8"
+                                   MOVE   "8"   TO   WK-HONKZKKBN
+                               WHEN   "H"
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "060" 
+                       WHEN    "068" 
+                           IF    ( LNK-SYUBETUGET-AGE  >=  70 )
+      *********************AND   ( LNK-SYUBETUGET-AGE  <=  74 )
+                             EVALUATE    LNK-SYUBETUGET-NYUGAIKBN
+                               WHEN    "1"
+                                   EVALUATE   LNK-SYUBETUGET-HKN-HOJOKBN
+                                       WHEN   "1"
+                                       WHEN   "5"
+                                           MOVE   "9"  TO  WK-HONKZKKBN
+                                       WHEN   "2"
+                                       WHEN   "6"
+                                           MOVE   "8"  TO  WK-HONKZKKBN
+                                       WHEN   "3"
+                                           MOVE   "7"  TO  WK-HONKZKKBN
+                                   END-EVALUATE
+                               WHEN    "2"
+                                   EVALUATE   LNK-SYUBETUGET-HKN-HOJOKBN
+                                       WHEN   "1"
+                                       WHEN   "4"
+                                           MOVE   "9"  TO  WK-HONKZKKBN
+                                       WHEN   "2"
+                                       WHEN   "5"
+                                           MOVE   "8"  TO  WK-HONKZKKBN
+                                       WHEN   "3"
+                                       WHEN   "6"
+                                           MOVE   "7"  TO  WK-HONKZKKBN
+                                   END-EVALUATE
+                             END-EVALUATE
+                           END-IF     
+                       WHEN    "039" 
+                       WHEN    "040" 
+                           EVALUATE   LNK-SYUBETUGET-HKN-HOJOKBN
+                               WHEN   "1"
+                                   MOVE   "9"   TO   WK-RJN
+                               WHEN   "3"
+                                   MOVE   "7"   TO   WK-RJN
+                           END-EVALUATE
+                       WHEN    "067" 
+                       WHEN    "069" 
+                           IF      LNK-SYUBETUGET-AGE  >=   65
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                           ELSE
+                               EVALUATE   LNK-SYUBETUGET-HKN-HOJOKBN
+                                   WHEN   "9"
+                                       MOVE   "9"   TO   WK-HONKZKKBN
+                                   WHEN   "8"
+                                       MOVE   "?"   TO   WK-HONKZKKBN
+                                   WHEN   "7"
+                                       MOVE   "7"   TO   WK-HONKZKKBN
+                               END-EVALUATE
+                           END-IF
+                       WHEN    OTHER 
+                           EVALUATE   LNK-SYUBETUGET-HKN-HOJOKBN
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "8"
+                                   MOVE   "8"   TO   WK-HONKZKKBN
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                   END-EVALUATE
+               END-IF
+      *
+      *        Ê¿À®£²£°Ç¯£´·î¡ÁÊ¿À®£²£¶Ç¯£´·î
+               IF    ( LNK-SYUBETUGET-SRYYM    >=
+                                               WRK-CONS-SRYYM-200804 )
+               AND   ( LNK-SYUBETUGET-SRYYM    <=
+                                               WRK-CONS-SRYYM-201404 )
                    EVALUATE    LNK-SYUBETUGET-HKNNUM
                        WHEN    "002" 
                            EVALUATE   LNK-SYUBETUGET-HKN-HOJOKBN

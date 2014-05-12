@@ -94,6 +94,7 @@
       *
       *  04.07.01    NACL-Æ£¸¶    12/02/13  ·òÊÝÁÈ¹ç¤Ø¤ÎÄ¾ÀÜÀÁµá¤È¿³ºº
       *                                     »ÙÊ§µ¡´ØÀÁµáÂÐ±þ
+      *  04.07.02    NACL-Æ£¸¶    14/03/30  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -979,7 +980,6 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                    END-IF
                  END-IF
                ELSE    
-      *      
       *            ¶¦ºÑÁÈ¹ç¤ÎÊä½õ¶èÊ¬¤¬Á°´ü¹âÎð¼Ô°Ê³°¤Î»þ     
                    IF    (  RECE10-HKNNUM          >=  "031"   AND
                                                    <=  "034"         )
@@ -1015,6 +1015,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                    WHEN    "D"
                                    WHEN    "E"
                                    WHEN    "F"
+                                       IF      RECE10-RECESYUBETU (4:1)
+                                                       =   "7" OR  "8"
+                                           MOVE    1           TO  IDY1
+                                       ELSE
+                                           MOVE    2           TO  IDY1
+                                       END-IF
                                    WHEN    "7"    
                                    WHEN    "G"
                                    WHEN    "H"
@@ -1031,6 +1037,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                            MOVE    1           TO  IDY1
                                        WHEN    "8"
                                        WHEN    "E"
+                                       IF      RECE10-RECESYUBETU (4:1)
+                                                       =   "7" OR  "8"
+                                           MOVE    1           TO  IDY1
+                                       ELSE
+                                           MOVE    2           TO  IDY1
+                                       END-IF
                                        WHEN    "7"
                                        WHEN    "H"
                                            MOVE    2           TO  IDY1
@@ -1040,6 +1052,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                        WHEN    9
                                            MOVE    1           TO  IDY1
                                        WHEN    8
+                                           IF      RECE10-RECESYUBETU
+                                                                   (4:1)
+                                                       =   "7" OR  "8"
+                                               MOVE    1       TO  IDY1
+                                           ELSE
+                                               MOVE    2       TO  IDY1
+                                           END-IF
                                        WHEN    7
                                            MOVE    2           TO  IDY1
                                    END-EVALUATE
@@ -1082,6 +1101,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                            MOVE    3       TO  IDY2
                                        WHEN    "9"
                                            MOVE    4       TO  IDY2
+                                       WHEN    "D"
+                                       WHEN    "E"
+                                       WHEN    "F"
+                                           MOVE    3       TO  IDY2
+                                       WHEN    "8"
+                                           MOVE    4       TO  IDY2
                                    END-EVALUATE        
                                WHEN    "003"
                                    MOVE    5               TO  IDY2
@@ -1090,6 +1115,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2007-HOSPNUM
                                WHEN    "031"  THRU  "034"
                                    EVALUATE    RECE10-HOJOKBN
                                        WHEN    "B"
+                                       WHEN    "E"
                                            MOVE    7       TO  IDY2
                                        WHEN    OTHER
                                            MOVE    8       TO  IDY2
@@ -1963,6 +1989,11 @@ grpsys         MOVE    RECE10-HOSPNUM      TO  PTINF-HOSPNUM
                        " SKYYM="     RECE10-SKYYM
                        " HENREIYM="  RECE10-HENREIYM
                        " HENREI-SIJI-FLG=" RECE10-HENREI-SIJI-FLG
+                       " AGE="       RECE10-AGE
+                       " HIGAITOU="  RECE10-ETC-YKZFTN (2) 
+                       " HKNNUM="    RECE10-HKNNUM
+                       " HOJOKBN="   RECE10-HOJOKBN
+      *??
       *         
            ELSE
                MOVE    1                   TO  FLG-RECE10

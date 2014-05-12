@@ -258,6 +258,7 @@
       *  04.07.04    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *  04.07.05    NACL-門脇    14/04/04  平成２６年４月改正対応
       *  04.07.06    NACL-門脇    14/04/08  長期の特記事項重複修正
+      *  04.07.07    NACL-藤原    14/03/30  平成２６年４月改正対応
       *  04.07.08    NACL-藤原    14/04/30  治験が複数あるときの対応
       *****************************************************************
       *
@@ -2861,6 +2862,7 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
                IF      RECE02-YOBIETC (8)  =   1
                    MOVE    SPACE       TO  LNK-SYUBETUGET-HKN-HOJOKBN
                END-IF
+               MOVE    RECE02-BIRTHDAY TO  LNK-SYUBETUGET-BIRTHDAY
                CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *
                MOVE    LNK-SYUBETUGET-RECESYUBETU
@@ -3579,6 +3581,8 @@ grpsys                     MOVE    RECE02-HOSPNUM  TO
                                        MOVE    30  TO  RECE02-KYURATE
                                    WHEN   "9"
                                        MOVE    10  TO  RECE02-KYURATE
+                                   WHEN   "8"
+                                       MOVE    20  TO  RECE02-KYURATE
                               END-EVALUATE
                           END-IF
                       END-IF
@@ -4001,7 +4005,9 @@ grpsys                   PERFORM 900-DBSELECT-SEC
                              IF  (   PTHKN-HKNNUM     =   "002"        )
                              AND (   PTHKN-HOJOKBN    =   "A" OR "B" OR
                                                           "C" OR "G" OR 
-                                                          "H" OR "I"   )
+                                                          "H" OR "I" OR
+                                                          "D" OR "E" OR
+                                                          "F"          )
                                  IF    ( RECE01-AGE  >=  75    )
                                  OR    ( RECE01-AGE  =   74          AND
                                          RECE01-BIRTHDAY (5:2)

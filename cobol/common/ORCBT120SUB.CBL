@@ -40,6 +40,8 @@
       *                                     ¡Ê¹âÎð¼õµë¼ÔÉ¼¤¬¤Ê¤¤¾ì¹ç¡Ë
       * 
       *  04.05.00    NACL-¾®Æ¦Âô  10/01/07  ¼£¸³¤Î¥ì¥»¥×¥È¼ïÊÌÂÐ±þ
+      *
+      *  04.07.01    NACL-Æ£¸¶    14/03/30  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *****************************************************************
       *
       *
@@ -1100,8 +1102,115 @@
       *            "£¹"¤Þ¤¿¤Ï"£¸"¤ò¥»¥Ã¥È
       *            Ï·¿ÍÊÝ¸±¤Î¾ì¹ç¤Ï£×£Ë¡Ý£Ò£Ê£Î¤Ë¥»¥Ã¥È¤¹¤ë
       *
-      *        Ê¿À®£²£°Ç¯£´·î°Ê¹ß
-               IF     LNK-ORCBT120SUB-SANTEIYMD(1:6)  >=  "200804"
+      *        Ê¿À®£²£µÇ¯£µ·î°Ê¹ß
+               IF     LNK-ORCBT120SUB-SANTEIYMD(1:6)  >=  "201405"
+                   IF    ( LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
+                                           =   "002" )
+                   AND  ( WRK-AGE          >=  75    )
+                       EVALUATE    LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                           WHEN    "A"
+                           WHEN    "G"
+                           WHEN    "D"
+                               MOVE    "1"
+                                   TO  LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                           WHEN    "B"
+                           WHEN    "H"
+                           WHEN    "E"
+                               MOVE    "2"
+                                   TO  LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                           WHEN    "C"
+                           WHEN    "I"
+                           WHEN    "F"
+                               MOVE    "3"
+                                   TO  LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                       END-EVALUATE
+                   END-IF
+      *
+                   EVALUATE    LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
+                       WHEN    "002" 
+                           EVALUATE   LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                               WHEN   "A"
+                               WHEN   "B"
+                               WHEN   "C"
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "D"
+                               WHEN   "E"
+                               WHEN   "F"
+                               WHEN   "8"
+                                   MOVE   "8"   TO   WK-HONKZKKBN
+                               WHEN   "G"
+                               WHEN   "H"
+                               WHEN   "I"
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "031"  THRU    "034"  
+                           EVALUATE   LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                               WHEN   "B"
+                               WHEN   "9"   
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "E"
+                               WHEN   "8"
+                                   MOVE   "8"   TO   WK-HONKZKKBN
+                               WHEN   "H"
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                       WHEN    "060" 
+                       WHEN    "068" 
+      *********************IF  (WRK-AGE        >=   70)  AND
+      *********************    (WRK-AGE        <=   74)
+                           IF  (WRK-AGE        >=   70)
+                           AND (WRK-KOUKI-FLG  =    0 )
+                              EVALUATE LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                                   WHEN   "1"
+                                   WHEN   "5"
+                                       MOVE   "9"   TO   WK-HONKZKKBN
+                                   WHEN   "2"
+                                   WHEN   "6"
+                                       MOVE   "8"   TO   WK-HONKZKKBN
+                                   WHEN   "3"
+                                       MOVE   "7"   TO   WK-HONKZKKBN
+                              END-EVALUATE
+                           END-IF     
+                       WHEN    "039" 
+                       WHEN    "040" 
+                           EVALUATE  LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                               WHEN   "1"
+                                   MOVE   "9"   TO   WK-RJN
+                               WHEN   "3"
+                                   MOVE   "7"   TO   WK-RJN
+                           END-EVALUATE
+                       WHEN    "067" 
+                       WHEN    "069" 
+                           IF      WRK-AGE  >=   65
+                               MOVE   "?"   TO   WK-HONKZKKBN
+                           ELSE
+                              EVALUATE LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                                  WHEN   "9"
+                                      MOVE   "9"   TO   WK-HONKZKKBN
+                                  WHEN   "8"
+                                      MOVE   "?"   TO   WK-HONKZKKBN
+                                  WHEN   "7"
+                                      MOVE   "7"   TO   WK-HONKZKKBN
+                              END-EVALUATE
+                           END-IF
+                       WHEN    OTHER 
+                           EVALUATE   LNK-ORCBT120SUB-HOJOKBN(SYU-IDX)
+                               WHEN   "9"
+                                   MOVE   "9"   TO   WK-HONKZKKBN
+                               WHEN   "8"
+                                   MOVE   "8"   TO   WK-HONKZKKBN
+                               WHEN   "7"
+                                   MOVE   "7"   TO   WK-HONKZKKBN
+                           END-EVALUATE
+                   END-EVALUATE
+               END-IF
+      *
+      *        Ê¿À®£²£°Ç¯£´·î¡ÁÊ¿À®£²£µÇ¯£´·î
+               IF    ( LNK-ORCBT120SUB-SANTEIYMD(1:6)  >=  "200804" )
+               AND   ( LNK-ORCBT120SUB-SANTEIYMD(1:6)  <=  "201404" )
                    IF    ( LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
                                            =   "002" )
                    AND  ( WRK-AGE          >=  75    )
@@ -1361,6 +1470,7 @@
                                        TO  LNK-SYUBETUGET-SRYYM
            MOVE    LNK-ORCBT120SUB-HKNNUM(SYU-IDX)
                                        TO  LNK-SYUBETUGET-HKNNUM
+           MOVE    PTINF-BIRTHDAY      TO  LNK-SYUBETUGET-BIRTHDAY 
            CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *
            MOVE    LNK-SYUBETUGET-RECESYUBETU  TO    WRK-RECESYUBETU

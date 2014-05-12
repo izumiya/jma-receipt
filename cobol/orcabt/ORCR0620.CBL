@@ -217,6 +217,7 @@
       *  04.07.03    NACL-門脇    13/07/10  自賠責（第三者行為）対応
       *  04.07.04    NACL-藤原    13/12/09  医療情報連携基盤対応
       *  04.07.05    NACL-門脇    14/04/08  長期の特記事項重複修正
+      *  04.07.06    NACL-藤原    14/03/30  平成２６年４月改正対応
       *  04.07.07    NACL-藤原    14/04/30  治験が複数あるときの対応
       *****************************************************************
       *
@@ -2400,6 +2401,7 @@
                IF      RECE62-YOBIETC (8)  =   1
                    MOVE    SPACE       TO  LNK-SYUBETUGET-HKN-HOJOKBN
                END-IF
+               MOVE    RECE62-BIRTHDAY TO  LNK-SYUBETUGET-BIRTHDAY
                CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *
                MOVE    LNK-SYUBETUGET-RECESYUBETU
@@ -3060,6 +3062,8 @@
                                    MOVE   30   TO  RECE62-KYURATE
                                WHEN   "9"
                                    MOVE   10   TO  RECE62-KYURATE
+                               WHEN   "8"
+                                   MOVE   20   TO  RECE62-KYURATE
                            END-EVALUATE
                        END-IF
                    END-IF
@@ -3258,7 +3262,9 @@ grpsys             IF      TBL-RECE69-HOSPNUM (IDYY)  =   ZERO
                              IF  (   PTHKN-HKNNUM     =   "002"        )
                              AND (   PTHKN-HOJOKBN    =   "A" OR "B" OR
                                                           "C" OR "G" OR 
-                                                          "H" OR "I"   )
+                                                          "H" OR "I" OR
+                                                          "D" OR "E" OR
+                                                          "F"          )
                                  IF    ( RECE61-AGE  >=  75    )
                                  OR    ( RECE61-AGE  =   74          AND
                                          RECE61-BIRTHDAY (5:2)

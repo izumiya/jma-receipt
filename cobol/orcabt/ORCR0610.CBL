@@ -185,6 +185,7 @@
       *  04.07.04    NACL-Æ£¸¶    13/08/01  ¸øÈñµ­ºÜ½çÀßÄê»þ¤Î¾ò·ï¤Î½¤Àµ
       *  04.07.05    NACL-Æ£¸¶    13/12/09  °åÎÅ¾ðÊóÏ¢·È´ðÈ×ÂÐ±þ
       *  04.07.06    NACL-ÌçÏÆ    14/03/28  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
+      *  04.07.07    NACL-Æ£¸¶    14/03/30  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.08    NACL-Æ£¸¶    14/04/22  £Å£Æ¥Õ¥¡¥¤¥ëºîÀ®ÂÐ±þ
       *****************************************************************
       *
@@ -2355,12 +2356,15 @@
                            EVALUATE    PTHKN-HOJOKBN
                                WHEN    "A"
                                WHEN    "G"
+                               WHEN    "D"
                                    MOVE    "1" TO  WRK-RECE61-HOJOKBN
                                WHEN    "B"
                                WHEN    "H"
+                               WHEN    "E"
                                    MOVE    "2" TO  WRK-RECE61-HOJOKBN
                                WHEN    "C"
                                WHEN    "I"
+                               WHEN    "F"
                                    MOVE    "3" TO  WRK-RECE61-HOJOKBN
                                WHEN    OTHER
                                    MOVE    PTHKN-HOJOKBN
@@ -2580,12 +2584,15 @@
                    EVALUATE    PTHKN-HOJOKBN
                        WHEN    "A"
                        WHEN    "G"
+                       WHEN    "D"
                            MOVE    "1" TO  WRK-RECE61-HKN-HOJOKBN
                        WHEN    "B"
                        WHEN    "H"
+                       WHEN    "E"
                            MOVE    "2" TO  WRK-RECE61-HKN-HOJOKBN
                        WHEN    "C"
                        WHEN    "I"
+                       WHEN    "F"
                            MOVE    "3" TO  WRK-RECE61-HKN-HOJOKBN
                    END-EVALUATE
                END-IF
@@ -2824,12 +2831,15 @@
                        EVALUATE    PTHKN-HOJOKBN
                            WHEN    "A"
                            WHEN    "G"
+                           WHEN    "D"
                                MOVE    "1" TO  WRK-RECE61-HKN-HOJOKBN
                            WHEN    "B"
                            WHEN    "H"
+                           WHEN    "E"
                                MOVE    "2" TO  WRK-RECE61-HKN-HOJOKBN
                            WHEN    "C"
                            WHEN    "I"
+                           WHEN    "F"
                                MOVE    "3" TO  WRK-RECE61-HKN-HOJOKBN
                        END-EVALUATE
                    END-IF

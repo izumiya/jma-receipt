@@ -71,6 +71,7 @@
       *                                     平成２４年４月分以降はまとめる
       *
       *  04.07.01    NACL-藤原    12/01/24  monpe-0.6.20対応
+      *  04.07.02    NACL-藤原    14/03/30  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -835,6 +836,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  SYS-2010-HOSPNUM
                                    WHEN    9
                                        MOVE    1           TO  IDX
                                    WHEN    8
+                                       IF      RECE10-RECESYUBETU (4:1)
+                                                       =   "7" OR  "8"
+                                           MOVE    1           TO  IDX
+                                       ELSE
+                                           MOVE    2           TO  IDX
+                                       END-IF
                                    WHEN    7
                                        MOVE    2           TO  IDX
                                END-EVALUATE        

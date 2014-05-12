@@ -120,6 +120,7 @@
       *                                     ０８（老健）のレセプト対応
       *
       *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
+      *  04.07.02    NACL-藤原    14/03/30  平成２６年４月改正対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1587,12 +1588,15 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
                            EVALUATE    PTHKN-HOJOKBN
                                WHEN    "A"
                                WHEN    "G"
+                               WHEN    "D"
                                    MOVE    "1" TO  TOUKEI01-HOJOKBN
                                WHEN    "B"
                                WHEN    "H"
+                               WHEN    "E"
                                    MOVE    "2" TO  TOUKEI01-HOJOKBN
                                WHEN    "C"
                                WHEN    "I"
+                               WHEN    "F"
                                    MOVE    "3" TO  TOUKEI01-HOJOKBN
                                WHEN    OTHER
                                    MOVE    PTHKN-HOJOKBN
@@ -1841,12 +1845,15 @@ grpsys         MOVE    SPA-HOSPNUM             TO  TNS-HOSPNUM
                            EVALUATE    PTHKN-HOJOKBN
                                WHEN    "A"
                                WHEN    "G"
+                               WHEN    "D"
                                    MOVE    "1" TO  TOUKEI01-THOJOKBN (1)
                                WHEN    "B"
                                WHEN    "H"
+                               WHEN    "E"
                                    MOVE    "2" TO  TOUKEI01-THOJOKBN (1)
                                WHEN    "C"
                                WHEN    "I"
+                               WHEN    "F"
                                    MOVE    "3" TO  TOUKEI01-THOJOKBN (1)
                            END-EVALUATE
                        END-IF
@@ -2032,14 +2039,17 @@ grpsys                                 SPA-AREA
                                      EVALUATE    PTHKN-HOJOKBN
                                        WHEN    "A"
                                        WHEN    "G"
+                                       WHEN    "D"
                                          MOVE    "1" 
                                            TO  TOUKEI01-THOJOKBN (IDX)
                                        WHEN    "B"
                                        WHEN    "H"
+                                       WHEN    "E"
                                          MOVE    "2"
                                            TO  TOUKEI01-THOJOKBN (IDX)
                                        WHEN    "C"
                                        WHEN    "I"
+                                       WHEN    "F"
                                          MOVE    "3"
                                            TO  TOUKEI01-THOJOKBN (IDX)
                                      END-EVALUATE
@@ -2927,6 +2937,7 @@ grpsys                                         SPA-AREA
                    MOVE    SPACE       TO  LNK-SYUBETUGET-HKN-HOJOKBN
                END-IF
            END-IF
+           MOVE    TOUKEI01-BIRTHDAY   TO  LNK-SYUBETUGET-BIRTHDAY
       *
            CALL    "ORCSSYUBETUGET"    USING   ORCSSYUBETUGETAREA
       *

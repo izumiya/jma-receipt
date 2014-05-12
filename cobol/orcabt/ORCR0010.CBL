@@ -231,6 +231,7 @@
       *  04.07.03    NACL-Æ£¸¶    12/12/17  Ê£¿ôËç¥ì¥»¥×¥ÈÊ¬³äÂÐ±þ
       *  04.07.04    NACL-Æ£¸¶    13/08/01  ¸øÈñµ­ºÜ½çÀßÄê»þ¤Î¾ò·ï¤Î½¤Àµ
       *  04.07.05    NACL-Æ£¸¶    13/12/09  °åÎÅ¾ðÊóÏ¢·¸´ðÈ×ÂÐ±þ
+      *  04.07.06    NACL-Æ£¸¶    14/03/30  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.07    NACL-Æ£¸¶    14/04/22  £Å£Æ¥Õ¥¡¥¤¥ëºîÀ®ÂÐ±þ
       *****************************************************************
       *
@@ -1851,12 +1852,15 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
                            EVALUATE    PTHKN-HOJOKBN
                                WHEN    "A"
                                WHEN    "G"
+                               WHEN    "D"
                                    MOVE    "1" TO  WRK-RECE01-HOJOKBN
                                WHEN    "B"
                                WHEN    "H"
+                               WHEN    "E"
                                    MOVE    "2" TO  WRK-RECE01-HOJOKBN
                                WHEN    "C"
                                WHEN    "I"
+                               WHEN    "F"
                                    MOVE    "3" TO  WRK-RECE01-HOJOKBN
                                WHEN    OTHER
                                    MOVE    PTHKN-HOJOKBN
@@ -2093,12 +2097,15 @@ grpsys     MOVE    SPA-HOSPNUM         TO  WRK-RECE01-HOSPNUM
                    EVALUATE    PTHKN-HOJOKBN
                        WHEN    "A"
                        WHEN    "G"
+                       WHEN    "D"
                            MOVE    "1" TO  WRK-RECE01-HKN-HOJOKBN
                        WHEN    "B"
                        WHEN    "H"
+                       WHEN    "E"
                            MOVE    "2" TO  WRK-RECE01-HKN-HOJOKBN
                        WHEN    "C"
                        WHEN    "I"
+                       WHEN    "F"
                            MOVE    "3" TO  WRK-RECE01-HKN-HOJOKBN
                    END-EVALUATE
                END-IF
@@ -2319,12 +2326,15 @@ grpsys     MOVE    SPA-HOSPNUM         TO  KYUSEI-HOSPNUM
                        EVALUATE    PTHKN-HOJOKBN
                            WHEN    "A"
                            WHEN    "G"
+                           WHEN    "D"
                                MOVE    "1" TO  WRK-RECE01-HKN-HOJOKBN
                            WHEN    "B"
                            WHEN    "H"
+                           WHEN    "E"
                                MOVE    "2" TO  WRK-RECE01-HKN-HOJOKBN
                            WHEN    "C"
                            WHEN    "I"
+                           WHEN    "F"
                                MOVE    "3" TO  WRK-RECE01-HKN-HOJOKBN
                        END-EVALUATE
                    END-IF
