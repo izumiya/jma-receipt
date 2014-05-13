@@ -1018,6 +1018,11 @@
       *
       *        告示等識別区分（１）が７（加算項目）以外の入院料加算の退避
                IF   TNS-KOKUJISKBKBN1   NOT =   7
+      *          病衣貸与料と労災治療計画加算は処理対象外
+                 IF    NSRY-SRYCD(1)    =    "101910050"  OR
+                                             "101910060"
+                     CONTINUE
+                 ELSE
                    ADD    1         TO  IDX-CHUKSN0
                    MOVE   NSRY-SRYCD(1) TO  WRK-CHUKSN-SRYCD-0
                                                       (IDX-CHUKSN0)
@@ -1042,6 +1047,7 @@
                    END-PERFORM
                    MOVE   "9999"       TO   TNS-CHUKSNCD
                    MOVE   999          TO   TNS-CDKBN-KBNNUM
+                 END-IF
                END-IF
       *
       *
@@ -1270,6 +1276,11 @@
       *
       *              告示等識別区分（１）が７（加算項目）以外の入院料加算の退避
                      IF   TNS-KOKUJISKBKBN1   NOT =   7
+      *                病衣貸与料と労災治療計画加算は処理対象外
+                       IF    SRY-SRYCD(1)     =    "101910050"  OR
+                                                   "101910060"
+                           CONTINUE
+                       ELSE
                          ADD    1         TO  IDX-CHUKSN0
                          MOVE   SRY-SRYCD(1) TO  WRK-CHUKSN-SRYCD-0
                                                        (IDX-CHUKSN0)
@@ -1294,6 +1305,7 @@
                          END-PERFORM
                          MOVE   "9999"       TO   TNS-CHUKSNCD
                          MOVE   999          TO   TNS-CDKBN-KBNNUM
+                      END-IF
                      END-IF
       *
       *             告示等識別区分（１）が７（加算項目）の入院料加算の退避
