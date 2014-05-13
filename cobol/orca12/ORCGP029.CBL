@@ -985,8 +985,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *    ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ
            PERFORM VARYING     IDH1    FROM    1   BY  1
                    UNTIL       IDH1    >   4
-               IF      SPA-GMN28-CHKHKTBYO(1)  =   SPACE
-                   MOVE    "0"             TO  SPA-GMN28-CHKHKTBYO(1)
+               IF      SPA-GMN28-CHKHKTBYO(IDH1)  =   SPACE
+                   MOVE    "0"             TO  SPA-GMN28-CHKHKTBYO(IDH1)
                END-IF
            END-PERFORM
            IF      SPA-GMN28-CHKHKTBYO-AREA    =   ZERO

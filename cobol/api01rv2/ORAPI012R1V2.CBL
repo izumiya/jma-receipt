@@ -55,6 +55,7 @@
       *
            03  FLG-ERR                 PIC 9(01).
            03  FLG-SYORI               PIC 9(01).
+           03  FLG-CONFCHK             PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -583,6 +584,11 @@
                MOVE    1               TO  FLG-PTCONF
                INITIALIZE                  PTCONF-REC
            END-IF
+           MOVE    "tbl_ptconf"        TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           MOVE    ZERO                TO  FLG-CONFCHK
            IF      FLG-PTCONF          =   ZERO
       *        ÃÏ°èÊñ³ç¿ÇÎÅÂÐ¾Ý¼ÀÉÂ
                PERFORM VARYING     IDX     FROM    1   BY  1
@@ -590,15 +596,17 @@
                    IF      PTCONF-CDATA(IDX:1) =   "1"
                        MOVE    "True"      TO  PTRES-TARGET-DISEASE
                                                               (IDX)
+                       MOVE    1           TO  FLG-CONFCHK
                    ELSE
                        MOVE    "False"     TO  PTRES-TARGET-DISEASE
                                                               (IDX)
                    END-IF
                END-PERFORM
+               IF      FLG-CONFCHK         =   ZERO
+                   MOVE    SPACE           TO  PTRES-COMMUNITY-DISEASE
+               END-IF
            END-IF
-           MOVE    "tbl_ptconf"        TO  MCP-TABLE
-           MOVE    "key"               TO  MCP-PATHNAME
-           PERFORM 990-DBCLOSE-SEC
+      *
            .
        20022-PTCONF-HEN-EXT.
            EXIT.
