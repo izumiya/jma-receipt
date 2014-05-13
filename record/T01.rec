@@ -29,7 +29,7 @@ T01	{
 		};
 		B18	{
 			state	int;
-			value	varchar(12);
+			label	varchar(6);
 		};
 		B19	{
 			state	int;

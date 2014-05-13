@@ -6860,7 +6860,7 @@ grpsys             PERFORM 900-CALL-ORCSJOB-SEC
                                    TO  T01-DIRECT-HKNJANUM-COUNT
       *
            IF      SPA-NAI-9102-EFOUT  =   "1"
-               MOVE    "£Å£Æ¥Õ¥¡¥¤¥ë"      TO  T01-B18-VALUE
+               MOVE    "£Å¡¦£Æ"            TO  T01-B18-LABEL
            END-IF
       *
            PERFORM 5001-MAPCUR-SEC
