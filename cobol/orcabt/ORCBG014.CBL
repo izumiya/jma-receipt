@@ -523,9 +523,6 @@
        01  CONST-AREA.
          03  CONST-H2004           PIC X(06)   VALUE   "200804".
          03  CONST-H2010           PIC X(06)   VALUE   "200810".
-      *----(04.08.00)ADD-START---
-         03  CONST-H2604           PIC X(06)   VALUE   "201404".
-      *----(04.08.00)ADD-END-----
       *
       *****************************************************************
       *    ファイルレイアウト
@@ -1371,11 +1368,11 @@
                                WHEN    "E"
                                WHEN    "F"
       *----(04.08.00)--ADD-START---
-                                   IF    ( RECE10-SRYYM
-                                               <  CONST-H2604 )
-                                       MOVE    "2" TO  WRK-SYUBETUKBN
-                                   ELSE
+                                   IF      RECE10-RECESYUBETU (4:1)
+                                                   =   "7" OR  "8"
                                        MOVE    "1" TO  WRK-SYUBETUKBN
+                                   ELSE
+                                       MOVE    "2" TO  WRK-SYUBETUKBN
                                    END-IF
       *----(04.08.00)--ADD-END-----
                                WHEN    "7"
@@ -1395,11 +1392,11 @@
                                    WHEN    "8"
                                    WHEN    "E"
       *----(04.08.00)--ADD-START---
-                                   IF    ( RECE10-SRYYM
-                                               <  CONST-H2604 )
-                                       MOVE    "2" TO  WRK-SYUBETUKBN
-                                   ELSE
+                                   IF      RECE10-RECESYUBETU (4:1)
+                                                   =   "7" OR  "8"
                                        MOVE    "1" TO  WRK-SYUBETUKBN
+                                   ELSE
+                                       MOVE    "2" TO  WRK-SYUBETUKBN
                                    END-IF
       *----(04.08.00)--ADD-END-----
                                    WHEN    "7"
@@ -1412,11 +1409,11 @@
                                        MOVE    "1" TO  WRK-SYUBETUKBN
                                    WHEN    8
       *----(04.08.00)--ADD-START---
-                                   IF    ( RECE10-SRYYM
-                                               <  CONST-H2604 )
-                                       MOVE    "2" TO  WRK-SYUBETUKBN
-                                   ELSE
+                                   IF      RECE10-RECESYUBETU (4:1)
+                                                   =   "7" OR  "8"
                                        MOVE    "1" TO  WRK-SYUBETUKBN
+                                   ELSE
+                                       MOVE    "2" TO  WRK-SYUBETUKBN
                                    END-IF
       *----(04.08.00)--ADD-END-----
                                    WHEN    7
@@ -1723,11 +1720,11 @@
                                MOVE    "1"         TO  WRK-SYUBETUKBN
                            WHEN    8
       *----(04.08.00)--ADD-START---
-                               IF    ( RECE10-SRYYM
-                                               <  CONST-H2604 )
-                                   MOVE    "2" TO  WRK-SYUBETUKBN
-                               ELSE
+                               IF      RECE10-RECESYUBETU (4:1)
+                                               =   "7" OR  "8"
                                    MOVE    "1" TO  WRK-SYUBETUKBN
+                               ELSE
+                                   MOVE    "2" TO  WRK-SYUBETUKBN
                                END-IF
       *----(04.08.00)--ADD-END-----
                            WHEN    7
