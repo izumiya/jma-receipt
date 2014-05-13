@@ -109,11 +109,11 @@ fi
 #       システム管理場所出力のとき
         if  [ ${17} -eq '4' ]; then
             echo "nkf " ${13}${20}${f:11:21} >> $LOG_FILE 2>&1
-            nkf -s $f > ${13}${20}${f:11:21}
+            nkf -s -Lw $f > ${13}${20}${f:11:21}
 #           chmod -R g+r ${13}${20}${f:11:21}
         else
             echo "nkf " ${OUT_FOLDER}${f:11:21} >> $LOG_FILE 2>&1
-            nkf -s $f > ${OUT_FOLDER}${f:11:21}
+            nkf -s -Lw $f > ${OUT_FOLDER}${f:11:21}
         fi
     done
 
