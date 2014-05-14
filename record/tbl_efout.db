@@ -105,3 +105,13 @@ path	del2 	{
 		;
 	};
 };
+
+path	del3 	{
+	DBDELETE	{
+		DELETE
+		FROM tbl_efout
+                WHERE   HOSPNUM     =   :HOSPNUM
+                  AND   PTID        =   :PTID
+		;
+	};
+};

@@ -302,7 +302,6 @@
        01  PTCARE-NINTEI-REC.
            COPY    "CPPTCARE-NINTEI.INC".
       *
-      *
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
@@ -1083,6 +1082,29 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            MOVE    "DBDELETE"          TO  MCP-FUNC
            MOVE    "tbl_ptcare_nintei" TO  MCP-TABLE
            MOVE    "del1"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *H26.5
+      *    医療情報連携基盤データ(レセプト電算)
+           INITIALIZE                      RECEDEN-REC
+           MOVE    SPA-HOSPNUM         TO  RECEDEN-HOSPNUM
+           MOVE    SPA-PTID            TO  RECEDEN-PTID
+           MOVE    RECEDEN-REC         TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_renkei_tmp"    TO  MCP-TABLE
+           MOVE    "del3"              TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+      *    ＥＦ出力データ(レセプト電算)
+           INITIALIZE                      RECEDEN-REC
+           MOVE    SPA-HOSPNUM         TO  RECEDEN-HOSPNUM
+           MOVE    SPA-PTID            TO  RECEDEN-PTID
+           MOVE    RECEDEN-REC         TO  MCPDATA-REC
+           MOVE    "DBDELETE"          TO  MCP-FUNC
+           MOVE    "tbl_efout"         TO  MCP-TABLE
+           MOVE    "del3"              TO  MCP-PATHNAME
            CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
                                                SPA-AREA
