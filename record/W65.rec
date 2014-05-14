@@ -1282,6 +1282,22 @@ W65	{
 					item	varchar(40)[10];
 					state	int;
 				};
+				CMB_TANKIKBN	{
+					TANKIKBN	{
+						value	varchar(80);
+					};
+					count	int;
+					item	varchar(80)[10];
+				};
+				CMB_TANKITAIKBN	{
+					TANKITAIKBN	{
+						value	varchar(40);
+						state	int;
+					};
+					count	int;
+					item	varchar(40)[10];
+					state	int;
+				};
 			};
 		};
 		YUKOSTYMD	{

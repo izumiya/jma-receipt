@@ -709,6 +709,14 @@
                        09  SPA-GMN-KOGAKKEITAIKBN            PIC X(01).
                        09  SPA-GMN-KOGAKKEITAIKBNF           PIC X(01).
                        09  SPA-GMN-KOGAKKEITAIKBNMEI         PIC X(38).
+                   07  SPA-GMN-TANKIKBN-G.
+                       09  SPA-GMN-TANKIKBN               PIC X(01).
+                       09  SPA-GMN-TANKIKBNF              PIC X(01).
+                       09  SPA-GMN-TANKIKBNMEI            PIC X(78).
+                   07  SPA-GMN-TANKITAIKBN-G.
+                       09  SPA-GMN-TANKITAIKBN            PIC X(01).
+                       09  SPA-GMN-TANKITAIKBNF           PIC X(01).
+                       09  SPA-GMN-TANKITAIKBNMEI         PIC X(38).
                05  SPA-GMN-CMB-AREA.
                    07  SPA-GMN-KOHNUMLST-G.
                        09  SPA-GMN-KOHNUM-MAX              PIC 9(03).
@@ -1129,6 +1137,19 @@
                            11  SPA-GMN-KOGAKKEITAIKBNL       PIC X(01).
                            11  SPA-GMN-KOGAKKEITAIKBNFL      PIC X(01).
                            11  SPA-GMN-KOGAKKEITAIKBNMEIL    PIC X(38).
+                   07  SPA-GMN-TANKIKBNLST-G.
+                       09  SPA-GMN-TANKIKBN-MAX              PIC 9(03).
+                       09  SPA-GMN-TANKIKBNLST               OCCURS 10.
+                           11  SPA-GMN-TANKIKBNL             PIC X(01).
+                           11  SPA-GMN-TANKIKBNFL            PIC X(01).
+                           11  SPA-GMN-TANKIKBNMEIL          PIC X(78).
+      *
+                   07  SPA-GMN-TANKITAIKBNLST-G.
+                       09  SPA-GMN-TANKITAIKBN-MAX        PIC 9(03).
+                       09  SPA-GMN-TANKITAIKBNLST         OCCURS 10.
+                           11  SPA-GMN-TANKITAIKBNL       PIC X(01).
+                           11  SPA-GMN-TANKITAIKBNFL      PIC X(01).
+                           11  SPA-GMN-TANKITAIKBNMEIL    PIC X(38).
                    07  SPA-GMN-COMMONTAIKBNLST-G.
                        09  SPA-GMN-COMMONTAIKBN-MAX        PIC 9(03).
                        09  SPA-GMN-COMMONTAIKBNLST         OCCURS 10.
@@ -1703,6 +1724,12 @@
       *
       *    ７０歳未満現物給付高額療養費合算計算対象区分コンボ編集処理
            PERFORM 3110-KOGAKKEITAIKBNLST-SEC
+      *
+      *    短期滞在手術等基本料２、３の特別計算コンボ編集処理
+           PERFORM 3110-TANKIKBNLST-SEC
+      *
+      *    短期滞在手術等基本料２、３の特別計算対象区分コンボ編集処理
+           PERFORM 3110-TANKITAIKBNLST-SEC
       *
            .
        311-COMBO-EDIT-EXT.
@@ -2750,6 +2777,45 @@
        3110-KOGAKKEITAIKBNLST-EXT.
            EXIT.
       *****************************************************************
+      *    短期滞在手術等基本料２、３の特別計算コンボ編集処理
+      *****************************************************************
+       3110-TANKIKBNLST-SEC        SECTION.
+      *
+           INITIALIZE                  SPA-GMN-TANKIKBNLST-G
+      *
+           MOVE    "0"             TO  SPA-GMN-TANKIKBNL    (1)
+           MOVE    "設定なし"      TO  SPA-GMN-TANKIKBNMEIL (1)
+      *
+           MOVE    "1"             TO  SPA-GMN-TANKIKBNL    (2)
+           STRING  "入院料のカレンダーに「１」が立っていない日は"
+                                       DELIMITED BY SIZE
+                   "日上限額を固定額とする"
+                                       DELIMITED BY SIZE
+           INTO    SPA-GMN-TANKIKBNMEIL (2)
+           END-STRING
+      *
+           MOVE    2               TO  SPA-GMN-TANKIKBN-MAX
+      *
+           .
+       3110-TANKIKBNLST-EXT.
+           EXIT.
+      *****************************************************************
+      *    短期滞在手術等基本料２、３の特別計算対象区分コンボ編集処理
+      *****************************************************************
+       3110-TANKITAIKBNLST-SEC        SECTION.
+      *
+           INITIALIZE                  SPA-GMN-TANKITAIKBNLST-G
+      *
+           MOVE  "0"               TO  SPA-GMN-TANKITAIKBNL    (1)
+           MOVE  "日上限額設定のある公費"
+                                   TO  SPA-GMN-TANKITAIKBNMEIL (1)
+      *
+           MOVE    1               TO  SPA-GMN-TANKITAIKBN-MAX
+      *
+           .
+       3110-TANKITAIKBNLST-EXT.
+           EXIT.
+      *****************************************************************
       *    日・月上限負担金計算コンボ編集処理
       *****************************************************************
        3110-JGNFTNKBNLST-SEC           SECTION.
@@ -3613,6 +3679,8 @@
            MOVE    W65-NINJYOTAIKBN    TO  SPA-GMN-NINJYOTAIKBN-G
            MOVE    W65-KOGAKKEIKBN     TO  SPA-GMN-KOGAKKEIKBN-G
            MOVE    W65-KOGAKKEITAIKBN  TO  SPA-GMN-KOGAKKEITAIKBN-G
+           MOVE    W65-TANKIKBN        TO  SPA-GMN-TANKIKBN-G
+           MOVE    W65-TANKITAIKBN     TO  SPA-GMN-TANKITAIKBN-G
       *
            MOVE    W65-YUKOSTYMD       TO  SPA-GMN-YUKOSTYMD
            MOVE    W65-YUKOEDYMD       TO  SPA-GMN-YUKOEDYMD
@@ -4459,6 +4527,14 @@
                PERFORM 4101-KOGAKKEITAIKBN-CHK-SEC
            END-IF
       *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-TANKIKBN-CHK-SEC
+           END-IF
+      *
+           IF    ( SPA-ERRCD   =   SPACE )
+               PERFORM 4101-TANKITAIKBN-CHK-SEC
+           END-IF
+      *
            IF    ( SPA-ERRCD   NOT =   SPACE )
                MOVE    7           TO  SPA-GMN-PAGENO
            END-IF
@@ -5070,6 +5146,8 @@
            MOVE    SPA-GMN-NINJYOTAIKBN    TO SYS-2010-NINJYO-TAIKBN
            MOVE    SPA-GMN-KOGAKKEIKBN     TO SYS-2010-KOGAKKEIKBN
            MOVE    SPA-GMN-KOGAKKEITAIKBN  TO SYS-2010-KOGAKKEI-TAIKBN
+           MOVE    SPA-GMN-TANKIKBN        TO SYS-2010-TANKIKBN
+           MOVE    SPA-GMN-TANKITAIKBN     TO SYS-2010-TANKI-TAIKBN
       ***
            .
        4201-KOHINF-EDIT-EXT.
@@ -6393,6 +6471,15 @@
                                        TO  WRK-CMB-CD
            PERFORM 4200-KOGAKKEITAIKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-KOGAKKEITAIKBN-G
+      *
+           MOVE    SYS-2010-TANKIKBN  TO  WRK-CMB-CD
+           PERFORM 4200-TANKIKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-TANKIKBN-G
+      *
+           MOVE    SYS-2010-TANKI-TAIKBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-TANKITAIKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-TANKITAIKBN-G
       *
       **
       *
@@ -8896,6 +8983,35 @@
        4101-KOGAKKEITAIKBN-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    短期滞在手術等基本料２、３の特別計算チェック処理
+      *****************************************************************
+       4101-TANKIKBN-CHK-SEC      SECTION.
+      *
+           MOVE    SPA-GMN-TANKIKBN  TO  WRK-CMB-CD
+           PERFORM 4200-TANKIKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-TANKIKBN-G
+      *
+           IF    ( SPA-GMN-TANKIKBN   =   "0" )
+               MOVE    "0"             TO  SPA-GMN-TANKITAIKBN
+           END-IF
+      *
+           .
+       4101-TANKIKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    短期滞在手術等基本料２、３の特別計算対象区分チェック処理
+      *****************************************************************
+       4101-TANKITAIKBN-CHK-SEC      SECTION.
+      *
+           MOVE    SPA-GMN-TANKITAIKBN
+                                       TO  WRK-CMB-CD
+           PERFORM 4200-TANKITAIKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-TANKITAIKBN-G
+      *
+           .
+       4101-TANKITAIKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    有効期間開始日
       *****************************************************************
        4101-YUKOSTYMD-CHK-SEC          SECTION.
@@ -9562,6 +9678,16 @@
            MOVE    "0"             TO  WRK-CMB-CD
            PERFORM 4200-KOGAKKEITAIKBNLST-CHK-SEC
            MOVE    WRK-CMB-ITM         TO  SPA-GMN-KOGAKKEITAIKBN-G
+      *
+      *    短期滞在手術等基本料２、３の特別計算
+           MOVE    "0"             TO  WRK-CMB-CD
+           PERFORM 4200-TANKIKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-TANKIKBN-G
+      *
+      *    短期滞在手術等基本料２、３の特別計算対象区分
+           MOVE    "0"             TO  WRK-CMB-CD
+           PERFORM 4200-TANKITAIKBNLST-CHK-SEC
+           MOVE    WRK-CMB-ITM         TO  SPA-GMN-TANKITAIKBN-G
       *
            .
        42011-COMBO-SET-DEFAULT-ETXT.
@@ -10423,6 +10549,8 @@
            MOVE    SPA-GMN-NINJYOTAIKBN-G      TO  W65-NINJYOTAIKBN
            MOVE    SPA-GMN-KOGAKKEIKBN-G       TO  W65-KOGAKKEIKBN
            MOVE    SPA-GMN-KOGAKKEITAIKBN-G    TO  W65-KOGAKKEITAIKBN
+           MOVE    SPA-GMN-TANKIKBN-G          TO  W65-TANKIKBN
+           MOVE    SPA-GMN-TANKITAIKBN-G       TO  W65-TANKITAIKBN
       *
            MOVE    SPA-GMN-JNISSUKBN-MAX       TO  W65-JNISSUKBN-COUNT
            PERFORM VARYING IDX-CMB FROM    1   BY  1
@@ -11146,6 +11274,24 @@
                                    TO  W65-KOGAKKEITAIKBN-ITEM (IDX-CMB)
            END-PERFORM
       *
+      *    短期滞在手術等基本料２、３の特別計算
+           MOVE    SPA-GMN-TANKIKBN-MAX
+                                   TO  W65-TANKIKBN-COUNT
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-TANKIKBN-MAX )
+               MOVE    SPA-GMN-TANKIKBNLST (IDX-CMB)
+                                   TO  W65-TANKIKBN-ITEM (IDX-CMB)
+           END-PERFORM
+      *
+      *    短期滞在手術等基本料２、３の特別計算対象区分
+           MOVE    SPA-GMN-TANKITAIKBN-MAX
+                                   TO  W65-TANKITAIKBN-COUNT
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-TANKITAIKBN-MAX )
+               MOVE    SPA-GMN-TANKITAIKBNLST (IDX-CMB)
+                                   TO  W65-TANKITAIKBN-ITEM (IDX-CMB)
+           END-PERFORM
+      *
       *    公費リスト
            MOVE    SPA-GMN-KOHLST-MAX  TO  W65-KOHLST-COUNT
            PERFORM VARYING IDX-LST    FROM    1   BY  1
@@ -11437,6 +11583,8 @@
                                        W65-NINJYOTAIKBN-ITEM-STATE
                                        W65-KOGAKKEITAIKBN-STATE
                                        W65-KOGAKKEITAIKBN-ITEM-STATE
+                                       W65-TANKITAIKBN-STATE
+                                       W65-TANKITAIKBN-ITEM-STATE
                                        W65-YUKOSTYMD-STATE
                                        W65-YUKOEDYMD-STATE
                                        W65-SELNUM2-STATE
@@ -11830,6 +11978,11 @@
                                    TO  W65-KOGAKKEITAIKBN-STATE
                                        W65-KOGAKKEITAIKBN-ITEM-STATE
            END-IF
+           IF    ( SPA-GMN-TANKIKBN   =  "0" )
+               MOVE    WIDGET-INSENSITIVE
+                                   TO  W65-TANKITAIKBN-STATE
+                                       W65-TANKITAIKBN-ITEM-STATE
+           END-IF
       *
       *
            IF    ( SPA-GMN-KOHLST-MAX  >=  CONST-KOHLST-MAX )
@@ -12185,6 +12338,10 @@
               MOVE    "KOGAKKEIKBN"          TO  MCP-WIDGET
            WHEN    824
               MOVE    "KOGAKKEITAIKBN"       TO  MCP-WIDGET
+           WHEN    825
+              MOVE    "TANKIKBN"           TO  MCP-WIDGET
+           WHEN    826
+              MOVE    "TANKITAIKBN"        TO  MCP-WIDGET
            WHEN    003
                MOVE    "SELNUM2"           TO  MCP-WIDGET
            WHEN    004
@@ -12538,6 +12695,10 @@
            WHEN    "KOGAKKEIKBN"
                MOVE    824                 TO  SPA-GMN-CUR
            WHEN    "KOGAKKEITAIKBN"
+               MOVE    825                 TO  SPA-GMN-CUR
+           WHEN    "TANKIKBN"
+               MOVE    826                 TO  SPA-GMN-CUR
+           WHEN    "TANKITAIKBN"
                MOVE    004                 TO  SPA-GMN-CUR
            WHEN    "SELNUM2"
                MOVE    002                 TO  SPA-GMN-CUR
@@ -13091,6 +13252,13 @@
       *
            IF    ( SPA-GMN-CUR     =   824 )
                IF    ( W65-KOGAKKEITAIKBN-STATE
+                                       =   WIDGET-INSENSITIVE )
+                   MOVE    825                 TO  SPA-GMN-CUR
+               END-IF
+           END-IF
+      *
+           IF    ( SPA-GMN-CUR     =   826 )
+               IF    ( W65-TANKITAIKBN-STATE
                                        =   WIDGET-INSENSITIVE )
                    MOVE    004                 TO  SPA-GMN-CUR
                END-IF
@@ -15185,6 +15353,64 @@
       *
            .
        4200-KOGAKKEITAIKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    短期滞在手術等基本料２、３の特別計算コンボチェック処理
+      *****************************************************************
+       4200-TANKIKBNLST-CHK-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-TANKIKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-TANKIKBNL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-TANKIKBNLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-TANKIKBNLST (1)
+                                   TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-TANKIKBNLST-CHK-EXT.
+           EXIT.
+      *****************************************************************
+      *    短期滞在手術等基本料２、３の特別計算対象区分コンボチェック処理
+      *****************************************************************
+       4200-TANKITAIKBNLST-CHK-SEC          SECTION.
+      *
+           INITIALIZE                  WRK-CMB-ITM-G
+      *
+           PERFORM VARYING IDX-CMB FROM    1   BY  1
+                   UNTIL ( IDX-CMB >   SPA-GMN-TANKITAIKBN-MAX )
+                    OR   ( WRK-CMB-ITM NOT =   SPACE )
+      *
+               IF    ( SPA-GMN-TANKITAIKBNL (IDX-CMB)
+                                       =   WRK-CMB-CD )
+      *
+                   MOVE    SPA-GMN-TANKITAIKBNLST (IDX-CMB)
+                                   TO  WRK-CMB-ITM
+      *
+               END-IF
+      *
+           END-PERFORM
+      *
+           IF    ( WRK-CMB-ITM     =   SPACE )
+               MOVE    SPA-GMN-TANKITAIKBNLST (1)
+                                   TO  WRK-CMB-ITM
+           END-IF
+      *
+           .
+       4200-TANKITAIKBNLST-CHK-EXT.
            EXIT.
       *****************************************************************
       *    公費の種類コンボボックスチェック処理

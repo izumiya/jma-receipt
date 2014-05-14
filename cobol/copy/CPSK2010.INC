@@ -268,8 +268,12 @@
            03  SYS-2010-INNAIKBN            PIC  X(01).
            03  SYS-2010-INNAI-TAIKBN        PIC  X(01).
       *
+      *短期滞在手術等基本料入院時の日別の負担金計算
+           03  SYS-2010-TANKIKBN            PIC  X(01).
+           03  SYS-2010-TANKI-TAIKBN        PIC  X(01).
+      *
       *予備
-           03  SYS-2010-YOBI                PIC  X(346).
+           03  SYS-2010-YOBI                PIC  X(344).
       *端末ＩＤ
            03  SYS-2010-TERMID              PIC  X(16).
       *オペレータＩＤ
