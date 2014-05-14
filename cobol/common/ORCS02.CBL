@@ -383,6 +383,8 @@
       *  04.07.13    NACL-ÌçÏÆ    14/03/04  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.14    NACL-ÌçÏÆ    14/05/02  Á°´ü¹âÎð¼Ô£²³ä¡ÊÄã½êÆÀ¡¦ÄãÇ¯¶â¡Ë¤Î
       *                                     ¾å¸Â³Û½¤Àµ
+      *  04.07.15    NACL-ÌçÏÆ    14/05/14  Ã»´üÂÚºß¼ê½ÑÅù´ðËÜÎÁÆþ±¡»þ¤ÎÆüÊÌ¤Î
+      *                                     ÉéÃ´¶â·×»»ÂÐ±þ
       ****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -593,6 +595,8 @@
                  06  WK-2010-NYUKEI-KJNYMD       PIC X(08).
       *
                  06  WK-2010-KOGAKKEIKBN         PIC X(01).
+      *
+                 06  WK-2010-TANKIKBN            PIC X(01).
       *
            03  WK-DAYTAIHI-FTNMONEY    PIC 9(07).
            03  WK-DAYTAIHI-COMPFTN     PIC 9(07).
@@ -1212,6 +1216,7 @@
            03  IDX10R                  REDEFINES    IDX10X.
                05  IDX10               PIC  9(02).
            03  IDX14                   PIC  9(03).
+           03  IDX15                   PIC  9(03).
            03  IDX-ST                  PIC  9(02)  VALUE  ZERO.
            03  IDX-ED                  PIC  9(02)  VALUE  ZERO.
            03  IDY                     PIC  9(02)  VALUE  ZERO.
@@ -10823,6 +10828,13 @@
              END-EVALUATE
            END-IF
       *
+           IF   LNK-SYU-SRYYMD(1:6)  >= "201404"
+             EVALUATE  SYS-2010-TANKIKBN
+               WHEN       "1"
+                       MOVE    "1"    TO  WK-2010-TANKIKBN(IDX-CYO)
+             END-EVALUATE
+           END-IF
+      *
            .
       *
        21131-SYSKAN2010-SET-EXT.
@@ -12990,7 +13002,9 @@
                           (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
-                     IF   SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9"
+                     IF ( SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9" )
+                     OR ((LNK-S02-NYUINDAY-KBN(IDX2)   =  "1") AND
+                         (WK-2010-TANKIKBN(1)          =  "1")       )
                         EVALUATE  TRUE
                            WHEN  (LNK-SYU-KOH1HKNNUM = SYU-KOH1HKNNUM)
                              IF  KOHI1-TBL(IDX2)            =  ZERO
@@ -13826,7 +13840,9 @@
                           (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
-                     IF   SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9"
+                     IF ( SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9" )
+                     OR ((LNK-S02-NYUINDAY-KBN(IDX2)   =  "1") AND
+                         (WK-2010-TANKIKBN(2)          =  "1")       )
                         EVALUATE  TRUE
                            WHEN  (LNK-SYU-KOH2HKNNUM = SYU-KOH1HKNNUM)
                              IF  KOHI2-TBL(IDX2)            =  ZERO
@@ -14498,7 +14514,9 @@
                           (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
-                     IF   SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9"
+                     IF ( SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9" )
+                     OR ((LNK-S02-NYUINDAY-KBN(IDX2)   =  "1") AND
+                         (WK-2010-TANKIKBN(3)          =  "1")       )
                         EVALUATE  TRUE
                            WHEN  (LNK-SYU-KOH3HKNNUM = SYU-KOH1HKNNUM)
                              IF  KOHI3-TBL(IDX2)            =  ZERO
@@ -15085,7 +15103,9 @@
                           (LNK-SYU-SRYYMD(1:6) >= "200508" ))
                    PERFORM   VARYING  IDX2  FROM  1  BY  1
                               UNTIL   IDX2   >   31
-                     IF   SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9"
+                     IF ( SYU-DAY(IDX2)  =  "1" OR "2" OR "8" OR "9" )
+                     OR ((LNK-S02-NYUINDAY-KBN(IDX2)   =  "1") AND
+                         (WK-2010-TANKIKBN(4)          =  "1")       )
                         EVALUATE  TRUE
                            WHEN  (LNK-SYU-KOH4HKNNUM = SYU-KOH1HKNNUM)
                              IF  KOHI4-TBL(IDX2)            =  ZERO
@@ -17412,6 +17432,7 @@
            INITIALIZE                WK-RRK-TBL
            INITIALIZE                WK-RRK2-TBL
            MOVE       ZERO     TO    RRK-IDX5
+           MOVE       ZERO     TO    IDX15
       *
            IF  ((WK-2010-NYUKEIKBN-N(1)  =  "1" ) AND
                 (MAX-KAI-KOHI1-M     NOT =  ZERO))
@@ -17424,22 +17445,28 @@
       *
              IF   WK-2010-NYUKEIKBN-N(1)  =  "1"
                MOVE      1     TO    WK-RRK2-FLG(1)
+               MOVE      1     TO    IDX15
              END-IF
              IF   WK-2010-NYUKEIKBN-N(2)  =  "1"
                MOVE      1     TO    WK-RRK2-FLG(2)
+               MOVE      2     TO    IDX15
              END-IF
              IF   WK-2010-NYUKEIKBN-N(3)  =  "1"
                MOVE      1     TO    WK-RRK2-FLG(3)
+               MOVE      3     TO    IDX15
              END-IF
              IF   WK-2010-NYUKEIKBN-N(4)  =  "1"
                MOVE      1     TO    WK-RRK2-FLG(4)
+               MOVE      4     TO    IDX15
              END-IF
       *
              PERFORM  VARYING  RRK-IDX  FROM  1  BY  1
                        UNTIL   RRK-IDX   >   31
       *
-               IF  (LNK-SYU-DAY(RRK-IDX) = "1" OR "2" OR "8" OR "9")
-               AND (LNK-SDAY-HKNTEN(RRK-IDX)  NOT =  ZERO          )
+               IF ((LNK-SYU-DAY(RRK-IDX) = "1" OR "2" OR "8" OR "9") AND
+                   (LNK-SDAY-HKNTEN(RRK-IDX)  NOT =  ZERO          ))
+               OR ((LNK-S02-NYUINDAY-KBN(RRK-IDX) =  "1"           ) AND
+                   (WK-2010-TANKIKBN(IDX15)       =  "1"           ))
       *
                  INITIALIZE                  PTNYUINRRK-REC
                  MOVE LNK-SYU-HOSPNUM     TO PTNYUINRRK-HOSPNUM
@@ -19215,9 +19242,11 @@
                   MOVE        1         TO    WK-DAYINFFLG(1)
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
-                     IF   ( LNK-SYU-DAY(IDX2)  =
-                                             "1" OR "2" OR "8" OR "9")
-                     AND  ( LNK-SDAY-HKNTEN(IDX2)      NOT =  ZERO   )
+                     IF  ((LNK-SYU-DAY(IDX2) =
+                                       "1" OR "2" OR "8" OR "9") AND
+                          (LNK-SDAY-HKNTEN(IDX2)  NOT =  ZERO  ))
+                     OR  ((LNK-S02-NYUINDAY-KBN(IDX2) =  "1"   ) AND
+                          (WK-2010-TANKIKBN(1)        =  "1"   ))
                        IF   WK-RRK2-FLG(1)  =   1
                         IF   WK-RRK-KAISU-ZAN(IDX2)  NOT = ZERO
                           MOVE        SPACE    TO    FLG-NG
@@ -19281,9 +19310,11 @@
                   MOVE        1         TO    WK-DAYINFFLG(2)
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
-                     IF   ( LNK-SYU-DAY(IDX2)  =
-                                             "1" OR "2" OR "8" OR "9")
-                     AND  ( LNK-SDAY-HKNTEN(IDX2)      NOT =  ZERO   )
+                     IF  ((LNK-SYU-DAY(IDX2) =
+                                       "1" OR "2" OR "8" OR "9") AND
+                          (LNK-SDAY-HKNTEN(IDX2)  NOT =  ZERO  ))
+                     OR  ((LNK-S02-NYUINDAY-KBN(IDX2) =  "1"   ) AND
+                          (WK-2010-TANKIKBN(2)        =  "1"   ))
                        IF   WK-RRK2-FLG(2)  =   1
                         IF   WK-RRK-KAISU-ZAN(IDX2)  NOT = ZERO
                           MOVE        SPACE    TO    FLG-NG
@@ -19347,9 +19378,11 @@
                   MOVE        1         TO    WK-DAYINFFLG(3)
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
-                     IF   ( LNK-SYU-DAY(IDX2)  =
-                                             "1" OR "2" OR "8" OR "9")
-                     AND  ( LNK-SDAY-HKNTEN(IDX2)      NOT =  ZERO   )
+                     IF  ((LNK-SYU-DAY(IDX2) =
+                                       "1" OR "2" OR "8" OR "9") AND
+                          (LNK-SDAY-HKNTEN(IDX2)  NOT =  ZERO  ))
+                     OR  ((LNK-S02-NYUINDAY-KBN(IDX2) =  "1"   ) AND
+                          (WK-2010-TANKIKBN(3)        =  "1"   ))
                        IF   WK-RRK2-FLG(3)  =   1
                         IF   WK-RRK-KAISU-ZAN(IDX2)  NOT = ZERO
                           MOVE        SPACE    TO    FLG-NG
@@ -19413,9 +19446,11 @@
                   MOVE        1         TO    WK-DAYINFFLG(4)
                   PERFORM    VARYING   IDX2   FROM   1   BY   1
                               UNTIL    IDX2     >    31
-                     IF   ( LNK-SYU-DAY(IDX2)  =
-                                             "1" OR "2" OR "8" OR "9")
-                     AND  ( LNK-SDAY-HKNTEN(IDX2)      NOT =  ZERO   )
+                     IF  ((LNK-SYU-DAY(IDX2) =
+                                       "1" OR "2" OR "8" OR "9") AND
+                          (LNK-SDAY-HKNTEN(IDX2)  NOT =  ZERO  ))
+                     OR  ((LNK-S02-NYUINDAY-KBN(IDX2) =  "1"   ) AND
+                          (WK-2010-TANKIKBN(4)        =  "1"   ))
                        IF   WK-RRK2-FLG(4)  =   1
                         IF   WK-RRK-KAISU-ZAN(IDX2)  NOT = ZERO
                           MOVE        SPACE    TO    FLG-NG
@@ -25627,6 +25662,15 @@
                               LNK-SDAY-HKNTEN(IDX2)    *
                               HKN-TENTNK
                  END-IF
+      *
+                 IF   (LNK-S02-NYUINDAY-KBN(IDX2)   =  "1")
+                 AND  (WK-2010-TANKIKBN(KOH-IDX)    =  "1")
+                    MOVE   ZAN-KOHI-D(IDX2 KOH-IDX)   TO
+                                    WK-TAIHI-SDAY-COMPFTN
+                    MOVE   ZAN-KOHI-D3(IDX2 KOH-IDX)  TO
+                                    WK-TAIHI-SDAY-COMPFTNWK
+                 END-IF
+      *
                  IF ((KOH-IDX                   =    1   ) AND
                      (LNK-SYU-SYUHKNNUM     NOT =   SPACE) AND
                      (LNK-SYU-SYUCOMPFTN        =   ZERO ))

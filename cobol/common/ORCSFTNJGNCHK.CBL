@@ -140,6 +140,7 @@
            03  FLG-INGAI           PIC 9(01).
            03  FLG-INNAI           PIC 9(01).
            03  FLG-HKNCOMBI-CHECK  PIC 9(01).
+           03  FLG-SKJ-CHECK       PIC 9(01).
       *
       *    Åº»úÎÎ°è
        01  IDX-AREA.
@@ -1728,6 +1729,7 @@
            MOVE      ZERO          TO      FLG-INGAI
            MOVE      ZERO          TO      FLG-INNAI
            MOVE      ZERO          TO      FLG-HKNCOMBI-CHECK
+           MOVE      ZERO          TO      FLG-SKJ-CHECK
            PERFORM   UNTIL    FLG-SYUNOU  =   1
              MOVE    ZERO          TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
@@ -1763,6 +1765,11 @@
                          ADD SYU-KOH-HKNFTNMONEY(1)    TO WRK-KOHFTN-X
                          ADD SYU-SYUCOMPFTN-ENTANI     TO WRK-KOHFTN9-H
                          ADD SYU-SYUCOMPFTN            TO WRK-KOHFTN9-X
+                         IF  (LNK-FTNJGNCHK-NYUGAIKBN  =  "1"      )
+                         AND (SYU-SYUSKJ-RYOYOHI   NOT = ZERO      )
+                         AND (SYU-SYUSKJ-FTN  NOT = SYU-KOH1SKJ-FTN)
+                             MOVE    1    TO   FLG-SKJ-CHECK
+                         END-IF
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(1)        =  "2"
@@ -1799,6 +1806,11 @@
                          ADD SYU-KOH-HKNFTNMONEY(2)    TO WRK-KOHFTN-X
                          ADD SYU-KOH-COMPFTN-ENTANI(1) TO WRK-KOHFTN9-H
                          ADD SYU-KOH-HKNFTNMONEY(1)    TO WRK-KOHFTN9-X
+                         IF  (LNK-FTNJGNCHK-NYUGAIKBN  =  "1"      )
+                         AND (SYU-SYUSKJ-RYOYOHI   NOT = ZERO      )
+                         AND (SYU-SYUSKJ-FTN  NOT = SYU-KOH2SKJ-FTN)
+                             MOVE    1    TO   FLG-SKJ-CHECK
+                         END-IF
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(2)        =  "2"
@@ -1835,6 +1847,11 @@
                          ADD SYU-KOH-HKNFTNMONEY(3)    TO WRK-KOHFTN-X
                          ADD SYU-KOH-COMPFTN-ENTANI(2) TO WRK-KOHFTN9-H
                          ADD SYU-KOH-HKNFTNMONEY(2)    TO WRK-KOHFTN9-X
+                         IF  (LNK-FTNJGNCHK-NYUGAIKBN  =  "1"      )
+                         AND (SYU-SYUSKJ-RYOYOHI   NOT = ZERO      )
+                         AND (SYU-SYUSKJ-FTN  NOT = SYU-KOH3SKJ-FTN)
+                             MOVE    1    TO   FLG-SKJ-CHECK
+                         END-IF
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(3)        =  "2"
@@ -1871,6 +1888,11 @@
                          ADD SYU-KOH-HKNFTNMONEY(4)    TO WRK-KOHFTN-X
                          ADD SYU-KOH-COMPFTN-ENTANI(3) TO WRK-KOHFTN9-H
                          ADD SYU-KOH-HKNFTNMONEY(3)    TO WRK-KOHFTN9-X
+                         IF  (LNK-FTNJGNCHK-NYUGAIKBN  =  "1"      )
+                         AND (SYU-SYUSKJ-RYOYOHI   NOT = ZERO      )
+                         AND (SYU-SYUSKJ-FTN  NOT = SYU-KOH4SKJ-FTN)
+                             MOVE    1    TO   FLG-SKJ-CHECK
+                         END-IF
                        END-IF
                        IF   LNK-FTNJGNCHK-NYUGAIKBN  =  "1"
                        AND  SYU-SKJ-FTNKBN(4)        =  "2"
@@ -2353,6 +2375,12 @@
                          END-IF
                        END-IF
                      END-IF
+      *
+                     IF    LNK-FTNJGNCHK-RC   NOT =   ZERO
+                     AND   FLG-SKJ-CHECK          =    1
+                             MOVE   ZERO       TO  LNK-FTNJGNCHK-RC
+                     END-IF
+      *
                    END-IF
                END-EVALUATE
            END-IF
@@ -2382,6 +2410,7 @@
            MOVE      ZERO       TO      FLG-SAIGAI-ARI2
            MOVE      ZERO       TO      WRK-SYUSKJ-FTN
            MOVE      ZERO       TO      WRK-SKYMONEY-SKJ
+           MOVE      ZERO       TO      FLG-SKJ-CHECK
            PERFORM   UNTIL    FLG-SYUNOU     =  1
              MOVE    ZERO       TO      FLG-ARI
              PERFORM   VARYING   IDX1   FROM  1  BY  1
