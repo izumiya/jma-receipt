@@ -52,6 +52,7 @@
       *  04.07.01    NACL-門脇    11/09/07  労災請求書作成対応
       *  04.07.02    NACL-門脇    13/01/21  労災レセ電対応
       *  04.07.03    NACL-藤原    13/09/20  第三者行為対応
+      *  04.07.04    NACL-門脇    14/05/08  労災レセ「新継再別」記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -418,6 +419,12 @@ grpsys         PERFORM 900-CALL-ORCSJOB-SEC
               END-IF
               MOVE     LNK-ORCSROUKAISU-RECEKAISU
                                          TO  RECE82-RECEKAISU
+      *
+              IF   LNK-ORCSROUKAISU-RECEKAISU  =  1
+                CONTINUE
+              ELSE
+                MOVE   "5"               TO  RECE82-SINKEI
+              END-IF
              END-IF
            END-IF
       *

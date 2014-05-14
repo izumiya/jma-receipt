@@ -110,6 +110,7 @@
       *  04.07.09    NACL-門脇    14/03/04  平成２６年４月改正対応
       *  04.07.10    NACL-門脇    14/03/28  平成２６年４月改正対応
       *  04.07.11    NACL-藤原    14/05/07  第三者行為の給付割合の設定
+      *  04.07.12    NACL-門脇    14/05/08  労災レセ「新継再別」記載修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1238,6 +1239,12 @@ grpsys         PERFORM 900-DBSELECT-SEC
               END-IF
               MOVE     LNK-ORCSROUKAISU-RECEKAISU
                                          TO  RECE41-RECEKAISU
+      *
+              IF   LNK-ORCSROUKAISU-RECEKAISU  =  1
+                CONTINUE
+              ELSE
+                MOVE   "5"               TO  RECE41-SINKEI
+              END-IF
              END-IF
            END-IF
       *

@@ -34,6 +34,8 @@
       *  04.07.04    NACL-ÌçÏÆ    14/04/07  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.05    NACL-ÌçÏÆ    14/04/24  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
       *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
+      *  04.07.06    NACL-ÌçÏÆ    14/05/08  µßµÞ°åÎÅ´ÉÍý²Ã»»¤Î»»ÄêÆüµ­ºÜ
+      *                                     ¤ä¤á¤ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -6117,11 +6119,12 @@
            IF (( RECE82-KYUKYU-PRTKBN    =      1         ) AND
                ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU  ) AND
                ( RECE82-SRYYM           <=   "201306"     ))
-           OR (( RECE82-KYUKYU-PRTKBN    =      1         ) AND
-               ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU2 ) AND
-               ( RECE82-SRYYM           >=   "201307"     ))
+      ***  OR (( RECE82-KYUKYU-PRTKBN    =      1         ) AND
+      ***      ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU2 ) AND
+      ***      ( RECE82-SRYYM           >=   "201307"     ))
            OR (( RECE84-JIBAISYUKEIKBN   =      4         ) AND
-               ( RECE84-SRYCDTOTAL(6:5)  =   "09593"      ))
+               ( RECE84-SRYCDTOTAL(6:5)  =   "09593"      ) AND
+               ( RECE82-SRYYM           <=   "201306"     ))
                IF   RECE82-SRYYM   >=  "200604"
                  MOVE      99            TO  FLG-COMMENT
                  PERFORM   2001-KYUKYU-COMMENT200604-SEC

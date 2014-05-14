@@ -48,6 +48,8 @@
       *
       *  04.07.01    NACL-門脇    13/01/21  労災レセ電対応
       *  04.07.02    NACL-門脇    13/10/02  自賠責（第三者行為）対応
+      *  04.07.03    NACL-門脇    14/05/08  救急医療管理加算の算定日記載
+      *                                     やめる
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -494,11 +496,12 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE851PARA-HOSPNUM
                    IF (( RECE82-KYUKYU-PRTKBN    =      1         ) AND
                        ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU  ) AND
                        ( RECE82-SRYYM           <=   "201306"     ))
-                   OR (( RECE82-KYUKYU-PRTKBN    =      1         ) AND
-                       ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU2 ) AND
-                       ( RECE82-SRYYM           >=   "201307"     ))
+      ***          OR (( RECE82-KYUKYU-PRTKBN    =      1         ) AND
+      ***              ( RECE84-SRYCDTOTAL(6:9)  =   CONS-KYUKYU2 ) AND
+      ***              ( RECE82-SRYYM           >=   "201307"     ))
                    OR (( RECE84-JIBAISYUKEIKBN   =      4         ) AND
-                       ( RECE84-SRYCDTOTAL(6:5)  =   "09593"      ))
+                       ( RECE84-SRYCDTOTAL(6:5)  =   "09593"      ) AND
+                       ( RECE82-SRYYM           <=   "201306"     ))
                        MOVE    SPACE   TO   WRK-TAIHI-SRYYMD
                        IF  (RECE84-JIBAISYUKEIKBN   =    4   )
                        AND (RECE84-SRYCDTOTAL(6:5)  = "09593")

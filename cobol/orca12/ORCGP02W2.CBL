@@ -119,6 +119,8 @@
       *
       *  04.07.01    NACL-門脇    13/07/08  自賠責（第三者行為）対応
       *  04.07.02    NACL-多々納  13/10/29  第三者行為対応
+      *  04.07.03    NACL-門脇    14/05/08  053児童保護と地方公費の
+      *                                     保険組合せ作成
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -4716,6 +4718,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
              OR    ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
                     (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "019"))
              OR    ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "019" )
+             OR    ((WRK-KCOMB-KOH1-HKNKOHSBTKBN (IDX2)  =  "3" ) AND
+                    (WRK-KCOMB-KOH2HKNNUM (IDX2)         = "053"))
+             OR    ( WRK-KCOMB-KOH1HKNNUM (IDX2)         = "053" )
                    MOVE    "3"            TO  WRK-FTN-FLG
              END-IF
            END-IF
