@@ -121,6 +121,8 @@
       *  04.07.06    NACL-ÌçÏÆ    14/04/07  Ê¿À®£²£¶Ç¯£´·î²þÀµÂÐ±þ
       *  04.07.07    NACL-ÌçÏÆ    14/04/24  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
       *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
+      *  04.07.08    NACL-ÌçÏÆ    14/05/13  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
+      *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -308,6 +310,8 @@
            03  FLG-ZAIKYO-OK       PIC 9(01).
            03  FLG-ZAIKYOCOMARI    PIC 9(01).
            03  FLG-CYOJKSN-OK      PIC 9(01).
+           03  FLG-CYOJKSNCOMARI   PIC 9(01).
+           03  FLG-CYOJKSN         PIC 9(01).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -452,6 +456,11 @@
            03  WRK-ZAIKYO-SRYKA      PIC X(02).
            03  WRK-ZAIKYO-ZAINUM     PIC 9(08).
       *
+           03  WRK-CYOJKSN-INPUTCOMENT
+                                     PIC X(80).
+           03  WRK-CYOJKSN-INPUTCOMENT2
+                                     PIC X(80).
+      *
            03  WRK-HENYMD            PIC X(08).
            03  WRK-TAIHI-XX          PIC X(02).
       *
@@ -506,9 +515,22 @@
            03  WRK-ZAIKYO-KAISU              PIC 9(02).
       *
            03  WRK-CYOJKSN-TAIHIYM           PIC X(06).
-           03  WRK-CYOJKSN-DAY-TBL.
-               05  WRK-CYOJKSN-DAY           PIC 9(01)
-                                             OCCURS 31.
+           03  WRK-CYOJKSN-TAIHIDD           PIC X(02).
+      *
+           03  WRK-CYOJKSN-YMD-XXX              PIC X(08).
+           03  WRK-CYOJKSN-COM-XXX              PIC X(80).
+           03  WRK-CYOJKSN-YMD-YYY              PIC X(08).
+           03  WRK-CYOJKSN-COM-YYY              PIC X(80).
+           03  WRK-CYOJKSN-KAISHIDAY-XXX-AREA.
+             04  WRK-CYOJKSN-KAISHIDAY-XXX-OCC  OCCURS  2.
+               05  WRK-CYOJKSN-KAISHIDAY-XXX    PIC X(08).
+               05  WRK-CYOJKSN-INPUTCOMENT-XXX  PIC X(80).
+           03  WRK-CYOJKSN-KAISHIDAY-YYY-AREA.
+             04  WRK-CYOJKSN-KAISHIDAY-YYY-OCC  OCCURS  2.
+               05  WRK-CYOJKSN-KAISHIDAY-YYY    PIC X(08).
+               05  WRK-CYOJKSN-INPUTCOMENT-YYY  PIC X(80).
+      *
+           03  WRK-SRYACCT-PATHNAME             PIC X(64).
       *
        01  WRK-RECE84-REC. 
            COPY    "CPRCF084.INC"  REPLACING   //RECE84//
@@ -678,15 +700,6 @@
       *    ¼§µ¤¤Ë¤è¤ëç¯æùÅù»É·ãË¡
            03  CONS-BOKOHO2         PIC X(09) VALUE "140055110".
       *
-      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
-           03  CONS-CYOJKSN1        PIC X(09) VALUE "190076570".
-      *    ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë
-           03  CONS-CYOJKSN2        PIC X(09) VALUE "190076670".
-      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
-           03  CONS-CYOJKSN3        PIC X(09) VALUE "190127510".
-      *    ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë
-           03  CONS-CYOJKSN4        PIC X(09) VALUE "190127610".
-      *
       *    ºßÂð´µ¼Ô¶¦Æ±¿ÇÎÅÎÁ¥Æ¡¼¥Ö¥ë
        01  TBL-ZAIKYO-CHECK-AREA.
            03  FILLER          PIC X(09)   VALUE    "114027610".
@@ -698,6 +711,28 @@
            03  TBL-ZAIKYO-CHECK     PIC X(09)   OCCURS    4.
       *
        01  TBL-ZAIKYO-CHECK-MAX     PIC 9(02)   VALUE     4.
+      *
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¥Æ¡¼¥Ö¥ë
+       01  TBL-CYOJKSN-CHECK-XXX-AREA.
+           03  FILLER          PIC X(09)   VALUE    "190127510".
+           03  FILLER          PIC X(09)   VALUE    "190076570".
+      *
+       01  TBL-CYOJKSN-CHECK-XXX-R
+                               REDEFINES  TBL-CYOJKSN-CHECK-XXX-AREA.
+           03  TBL-CYOJKSN-CHECK-XXX  PIC X(09)   OCCURS    2.
+      *
+       01  TBL-CYOJKSN-CHECK-XXX-MAX  PIC 9(02)   VALUE     2.
+      *
+      *    ½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¥Æ¡¼¥Ö¥ë
+       01  TBL-CYOJKSN-CHECK-YYY-AREA.
+           03  FILLER          PIC X(09)   VALUE    "190127610".
+           03  FILLER          PIC X(09)   VALUE    "190076670".
+      *
+       01  TBL-CYOJKSN-CHECK-YYY-R
+                               REDEFINES  TBL-CYOJKSN-CHECK-YYY-AREA.
+           03  TBL-CYOJKSN-CHECK-YYY  PIC X(09)   OCCURS    2.
+      *
+       01  TBL-CYOJKSN-CHECK-YYY-MAX  PIC 9(02)   VALUE     2.
       *
       *    ÌôºÞ´ÉÍý»ØÆ³ÎÁ¥Æ¡¼¥Ö¥ë¡Ê£²£°£°£¸Ç¯£´·î¿ÇÎÅÊ¬¡Á¡Ë
        01  TBL-YAKUKAN-AREA.
@@ -791,6 +826,11 @@
                    07  TBL-RYOCOM2-ADL-TEN-MOJI-H22  PIC  X(04).
                05  TBL-RYOCOM2-INF4            OCCURS  31.
                  06  TBL-RYOCOM2-DAY           PIC  9(01).
+      *
+       01  TBL-CYOJKSN-INF.
+           03  TBL-CYOJKSN-INF2.
+               05  TBL-CYOJKSN-X               PIC  9(01).
+               05  TBL-CYOJKSN-Y               PIC  9(01).
       *
       *    »ÀÁÇ
            COPY    "CMSANSOTBL.INC".
@@ -998,6 +1038,7 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
            INITIALIZE                        TBL-HASSYO-INF
            INITIALIZE                        TBL-ZAISIEN-INF
            INITIALIZE                        TBL-RYOCOM-INF
+           INITIALIZE                        TBL-CYOJKSN-INF
            INITIALIZE                        WRK-JIDO-SETCOM-AREA
       *
            MOVE      ZERO     TO      FLG-JIBAI-OCR
@@ -1156,6 +1197,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                              END-IF
                             END-PERFORM
                          END-IF
+                   WHEN      "90"
+                   WHEN      "92"
+                         IF  (RECE82-CYOJKSNFLG  NOT = SPACE     )
+                         AND (RECE84-FLG-CYOJKSN-COMMENT =
+                                         "1" OR "2" OR "3" OR "4")
+                            PERFORM   20011-CYOJKSN-KAISHIDAY-SEC
+                         END-IF
                   END-EVALUATE
                ELSE                                                     
                   EVALUATE      RECE84-SRYKBN
@@ -1238,6 +1286,13 @@ grpsys     MOVE    WRK-PARA-HOSPNUM    TO  RECE859PARA-HOSPNUM
                               WHEN      "2"
                                 MOVE  2  TO  TBL-ZAISIEN-COMMENT
                             END-EVALUATE
+                         END-IF
+                   WHEN      "90"
+                   WHEN      "92"
+                         IF  (RECE82-CYOJKSNFLG  NOT = SPACE     )
+                         AND (RECE84-FLG-CYOJKSN-COMMENT =
+                                         "1" OR "2" OR "3" OR "4")
+                            PERFORM   20011-CYOJKSN-KAISHIDAY-SEC
                          END-IF
                   END-EVALUATE                                          
                END-IF                                                   
@@ -5636,6 +5691,409 @@ grpsys       PERFORM 900-DBSELECT-SEC
            EXIT.
       *
       *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤Î»»Äê³«»ÏÆü¸¡º÷
+      *****************************************************************
+       20011-CYOJKSN-KAISHIDAY-SEC          SECTION.
+      *
+           MOVE   SPACE   TO  WRK-CYOJKSN-YMD-XXX
+                              WRK-CYOJKSN-COM-XXX
+           MOVE   SPACE   TO  WRK-CYOJKSN-YMD-YYY
+                              WRK-CYOJKSN-COM-YYY
+      *
+           IF     RECE82-CYOJKSNFLG   =   "X" OR "Z"
+      *
+             MOVE     "key21"     TO   WRK-SRYACCT-PATHNAME
+             MOVE      1          TO   FLG-CYOJKSN
+             PERFORM  200111-CYOJKSN-KAISHIDAY4-SEC
+      *
+             IF    WRK-CYOJKSN-KAISHIDAY-XXX(1)  NOT = SPACE
+                 MOVE  WRK-CYOJKSN-KAISHIDAY-XXX(1)
+                                  TO   WRK-CYOJKSN-YMD-XXX
+             ELSE
+               IF  WRK-CYOJKSN-KAISHIDAY-XXX(2)  NOT = SPACE
+                 MOVE  WRK-CYOJKSN-KAISHIDAY-XXX(2)
+                                  TO   WRK-CYOJKSN-YMD-XXX
+               END-IF
+             END-IF
+      *
+      ****   IF     FLG-CHECK-MAE  =  1
+      ****       MOVE   SPACE   TO  WRK-CYOJKSN-YMD-XXX
+      ****   END-IF
+      *
+      *      »»Äê³«»ÏÆü¥³¥á¥ó¥È¤¬¤¢¤ë¤«¸¡º÷
+      *
+             MOVE     "key22"     TO   WRK-SRYACCT-PATHNAME
+             MOVE      2          TO   FLG-CYOJKSN
+             PERFORM  200111-CYOJKSN-KAISHIDAY4-SEC
+      *
+             IF    WRK-CYOJKSN-KAISHIDAY-XXX(1)  NOT = SPACE
+             AND   WRK-CYOJKSN-KAISHIDAY-XXX(2)  NOT = SPACE
+               IF    WRK-CYOJKSN-KAISHIDAY-XXX(1)(1:6) =
+                           WRK-CYOJKSN-KAISHIDAY-XXX(2)(1:6)
+                   MOVE  WRK-CYOJKSN-INPUTCOMENT-XXX(1)
+                                  TO   WRK-CYOJKSN-COM-XXX
+               ELSE
+                   MOVE  WRK-CYOJKSN-INPUTCOMENT-XXX(2)
+                                  TO   WRK-CYOJKSN-COM-XXX
+               END-IF
+             ELSE
+               IF    WRK-CYOJKSN-KAISHIDAY-XXX(1)  NOT = SPACE
+                   MOVE  WRK-CYOJKSN-INPUTCOMENT-XXX(1)
+                                  TO   WRK-CYOJKSN-COM-XXX
+               ELSE
+                 IF  WRK-CYOJKSN-KAISHIDAY-XXX(2)  NOT = SPACE
+                   MOVE  WRK-CYOJKSN-INPUTCOMENT-XXX(2)
+                                  TO   WRK-CYOJKSN-COM-XXX
+                 END-IF
+               END-IF
+             END-IF
+      *
+           END-IF
+      *
+           IF     RECE82-CYOJKSNFLG   =   "Y" OR "Z"
+      *
+             MOVE     "key21"     TO   WRK-SRYACCT-PATHNAME
+             MOVE      1          TO   FLG-CYOJKSN
+             PERFORM  200111-CYOJKSN-KAISHIDAY5-SEC
+      *
+             IF    WRK-CYOJKSN-KAISHIDAY-YYY(1)  NOT = SPACE
+                 MOVE  WRK-CYOJKSN-KAISHIDAY-YYY(1)
+                                  TO   WRK-CYOJKSN-YMD-YYY
+             ELSE
+               IF  WRK-CYOJKSN-KAISHIDAY-YYY(2)  NOT = SPACE
+                 MOVE  WRK-CYOJKSN-KAISHIDAY-YYY(2)
+                                  TO   WRK-CYOJKSN-YMD-YYY
+               END-IF
+             END-IF
+      *
+      ****   IF     FLG-CHECK-MAE  =  1
+      ****       MOVE   SPACE   TO  WRK-CYOJKSN-YMD-YYY
+      ****   END-IF
+      *
+      *      »»Äê³«»ÏÆü¥³¥á¥ó¥È¤¬¤¢¤ë¤«¸¡º÷
+      *
+             MOVE     "key22"     TO   WRK-SRYACCT-PATHNAME
+             MOVE      2          TO   FLG-CYOJKSN
+             PERFORM  200111-CYOJKSN-KAISHIDAY5-SEC
+      *
+             IF    WRK-CYOJKSN-KAISHIDAY-YYY(1)  NOT = SPACE
+             AND   WRK-CYOJKSN-KAISHIDAY-YYY(2)  NOT = SPACE
+               IF    WRK-CYOJKSN-KAISHIDAY-YYY(1)(1:6) =
+                           WRK-CYOJKSN-KAISHIDAY-YYY(2)(1:6)
+                   MOVE  WRK-CYOJKSN-INPUTCOMENT-YYY(1)
+                                  TO   WRK-CYOJKSN-COM-YYY
+               ELSE
+                   MOVE  WRK-CYOJKSN-INPUTCOMENT-YYY(2)
+                                  TO   WRK-CYOJKSN-COM-YYY
+               END-IF
+             ELSE
+               IF    WRK-CYOJKSN-KAISHIDAY-YYY(1)  NOT = SPACE
+                   MOVE  WRK-CYOJKSN-INPUTCOMENT-YYY(1)
+                                  TO   WRK-CYOJKSN-COM-YYY
+               ELSE
+                 IF  WRK-CYOJKSN-KAISHIDAY-YYY(2)  NOT = SPACE
+                   MOVE  WRK-CYOJKSN-INPUTCOMENT-YYY(2)
+                                  TO   WRK-CYOJKSN-COM-YYY
+                 END-IF
+               END-IF
+             END-IF
+      *
+           END-IF
+      *
+           .
+       20011-CYOJKSN-KAISHIDAY-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤Î»»Äê³«»ÏÆü¸¡º÷£²
+      *****************************************************************
+       200111-CYOJKSN-KAISHIDAY2-SEC          SECTION.
+      *
+           INITIALIZE                   SRYACCT-REC
+           MOVE    SRY-HOSPNUM      TO  ACCT-HOSPNUM
+           MOVE    SRY-NYUGAIKBN    TO  ACCT-NYUGAIKBN
+           MOVE    SRY-PTID         TO  ACCT-PTID
+           MOVE    SRY-SRYKA        TO  ACCT-SRYKA
+           MOVE    SRY-SRYYM        TO  ACCT-SRYYM
+           MOVE    SRY-ZAINUM       TO  ACCT-ZAINUM
+           MOVE    SRYACCT-REC      TO  MCPDATA-REC
+           MOVE    "tbl_sryacct"    TO  MCP-TABLE
+           MOVE    "key31"          TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC           =   ZERO
+              MOVE "tbl_sryacct"    TO  MCP-TABLE
+              MOVE "key31"          TO  MCP-PATHNAME
+              PERFORM 900-DBFETCH-SEC
+              IF      MCP-RC        =   ZERO
+                MOVE  MCPDATA-REC   TO  SRYACCT-REC
+                IF (WRK-CYOJKSN-TAIHIYM = SPACE     )
+                OR (WRK-CYOJKSN-TAIHIYM = ACCT-SRYYM)
+                 IF  ( ACCT-SRYYM   >  RECE82-SRYYM )
+                 OR  ((FLG-CYOJKSN  =   2      ) AND
+                      (ACCT-SRYYM   <  "201404")    )
+                  CONTINUE
+                 ELSE
+                  MOVE    RECE82-NYUINYMD(7:2) TO  IDX28
+                  PERFORM  VARYING  IDX26  FROM  1  BY  1
+                            UNTIL   IDX26   >   31
+                    IF   ACCT-DAY(1 IDX26)  NOT =  ZERO
+                      IF  (ACCT-SRYYM = RECE82-NYUINYMD(1:6))
+                      AND (IDX26      <  IDX28              )
+                          MOVE   1           TO  FLG-CHECK-MAE
+                      ELSE
+                        EVALUATE  FLG-CYOJKSN
+                          WHEN       1
+                            IF   WRK-CYOJKSN-TAIHIYM = SPACE
+                              MOVE  ACCT-SRYYM  TO  WRK-CYOJKSN-TAIHIYM
+                              MOVE  IDX26       TO  WRK-CYOJKSN-TAIHIDD
+                              MOVE  31          TO  IDX26
+                            ELSE
+                              IF   IDX26  <  WRK-CYOJKSN-TAIHIDD
+                                MOVE   IDX26    TO  WRK-CYOJKSN-TAIHIDD
+                                MOVE   31       TO  IDX26
+                              END-IF
+                            END-IF
+                          WHEN       2
+                            IF   WRK-CYOJKSN-TAIHIYM = SPACE
+                               MOVE ZERO   TO FLG-CYOJKSNCOMARI
+                               MOVE SPACE  TO WRK-CYOJKSN-INPUTCOMENT
+                               PERFORM 200111-CYOJKSN-KAISHIDAY3-SEC
+                               IF   FLG-CYOJKSNCOMARI  =  1
+                                 MOVE  WRK-CYOJKSN-INPUTCOMENT
+                                           TO WRK-CYOJKSN-INPUTCOMENT2
+      *
+                                 MOVE ACCT-SRYYM TO WRK-CYOJKSN-TAIHIYM
+                                 MOVE IDX26      TO WRK-CYOJKSN-TAIHIDD
+                               END-IF
+                               MOVE   31         TO IDX26
+                            ELSE
+                             IF   IDX26  <  WRK-CYOJKSN-TAIHIDD
+                               MOVE ZERO   TO FLG-CYOJKSNCOMARI
+                               MOVE SPACE  TO WRK-CYOJKSN-INPUTCOMENT
+                               PERFORM 200111-CYOJKSN-KAISHIDAY3-SEC
+                               IF   FLG-CYOJKSNCOMARI  =  1
+                                 MOVE  WRK-CYOJKSN-INPUTCOMENT
+                                           TO WRK-CYOJKSN-INPUTCOMENT2
+      *
+                                 MOVE IDX26      TO WRK-CYOJKSN-TAIHIDD
+                               END-IF
+                               MOVE   31         TO IDX26
+                             END-IF
+                            END-IF
+                        END-EVALUATE
+                      END-IF
+                    END-IF
+                  END-PERFORM
+                 END-IF
+                ELSE
+                  MOVE    1         TO  FLG-CYOJKSN-OK
+                END-IF
+              END-IF
+           END-IF
+           MOVE    "tbl_sryacct"    TO  MCP-TABLE
+           MOVE    "key31"          TO  MCP-PATHNAME
+           PERFORM   900-CLOSE-SEC
+      *
+           .
+       200111-CYOJKSN-KAISHIDAY2-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤Î»»Äê³«»ÏÆü¸¡º÷£³
+      *****************************************************************
+       200111-CYOJKSN-KAISHIDAY3-SEC          SECTION.
+      *
+           INITIALIZE                         SRYACT-REC
+           MOVE    ACCT-HOSPNUM           TO  SRY-HOSPNUM
+           MOVE    ACCT-NYUGAIKBN         TO  SRY-NYUGAIKBN
+           MOVE    ACCT-PTID              TO  SRY-PTID
+           MOVE    ACCT-SRYKA             TO  SRY-SRYKA
+           MOVE    ACCT-SRYYM             TO  SRY-SRYYM
+           MOVE    ACCT-ZAINUM            TO  SRY-ZAINUM
+           MOVE    SRYACT-REC             TO  MCPDATA-REC
+           MOVE    "tbl_sryact"           TO  MCP-TABLE
+           MOVE    "key2"                 TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC                 =   ZERO
+              MOVE    "tbl_sryact"        TO  MCP-TABLE
+              MOVE    "key2"              TO  MCP-PATHNAME
+              PERFORM  900-SRYACT-READ-SEC
+              PERFORM  UNTIL  (FLG-SRYACT        =  1)
+                        OR    (FLG-CYOJKSNCOMARI =  1)
+                PERFORM  VARYING  IDX12  FROM  1  BY  1
+                          UNTIL  (IDX12             >    5   )
+                           OR    (SRY-SRYCD(IDX12)  =   SPACE)
+                           OR    (FLG-CYOJKSNCOMARI =    1   )
+                   IF  SRY-SRYCD(IDX12)  =   "840000056"
+                      MOVE    1    TO   FLG-CYOJKSNCOMARI
+                      IF   SRY-INPUTNUM(IDX12)  NOT =  ZERO
+                        INITIALIZE                    PTCOM-REC
+                        MOVE  SRY-HOSPNUM         TO  PTCOM-HOSPNUM
+                        MOVE  SRY-PTID            TO  PTCOM-PTID
+                        MOVE  SRY-ZAINUM          TO  PTCOM-ZAINUM
+                        MOVE  SRY-SRYCD(IDX12)    TO  PTCOM-SRYCD
+                        MOVE  SRY-INPUTNUM(IDX12) TO  PTCOM-RENNUM
+                        PERFORM 900-PTCOM-READ-SEC
+                        MOVE  PTCOM-INPUTCOMENT
+                                       TO  WRK-CYOJKSN-INPUTCOMENT
+                      END-IF
+                   END-IF
+                END-PERFORM
+                MOVE    "tbl_sryact"      TO  MCP-TABLE
+                MOVE    "key2"            TO  MCP-PATHNAME
+                PERFORM   900-SRYACT-READ-SEC
+              END-PERFORM
+           END-IF
+           MOVE    "tbl_sryact"           TO  MCP-TABLE
+           MOVE    "key2"                 TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       200111-CYOJKSN-KAISHIDAY3-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤Î»»Äê³«»ÏÆü¸¡º÷£´
+      *****************************************************************
+       200111-CYOJKSN-KAISHIDAY4-SEC          SECTION.
+      *
+           INITIALIZE         WRK-CYOJKSN-KAISHIDAY-XXX-AREA
+      *
+           MOVE      ZERO                 TO  FLG-CHECK-MAE
+      *
+           PERFORM  VARYING  IDX30  FROM  1  BY  1
+                     UNTIL   IDX30   >   TBL-CYOJKSN-CHECK-XXX-MAX
+      *
+             MOVE    ZERO                 TO  FLG-CYOJKSN-OK
+             MOVE    SPACE                TO  WRK-CYOJKSN-TAIHIYM
+             MOVE    SPACE                TO  WRK-CYOJKSN-TAIHIDD
+             MOVE    SPACE                TO  WRK-CYOJKSN-INPUTCOMENT2
+      *
+             INITIALIZE                       SRYACT-REC
+             MOVE    RECE82-HOSPNUM       TO  SRY-HOSPNUM
+             MOVE    RECE82-NYUGAIKBN     TO  SRY-NYUGAIKBN
+             MOVE    RECE82-PTID          TO  SRY-PTID
+             MOVE    RECE82-NYUINYMD(1:6) TO  SRY-SRYYM
+             MOVE    TBL-CYOJKSN-CHECK-XXX(IDX30)
+                                          TO  SRY-SRYCD (1)
+                                              SRY-SRYCD (2)
+                                              SRY-SRYCD (3)
+                                              SRY-SRYCD (4)
+                                              SRY-SRYCD (5)
+             MOVE    SRYACT-REC           TO  MCPDATA-REC
+             MOVE    "tbl_sryact"         TO  MCP-TABLE
+             MOVE    WRK-SRYACCT-PATHNAME TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC               =   ZERO
+               MOVE    "tbl_sryact"       TO  MCP-TABLE
+               MOVE    WRK-SRYACCT-PATHNAME
+                                          TO  MCP-PATHNAME
+               PERFORM  900-SRYACT-READ-SEC
+               PERFORM  UNTIL   FLG-SRYACT      =   1
+                         OR     FLG-CYOJKSN-OK  =   1
+      *
+                 PERFORM  200111-CYOJKSN-KAISHIDAY2-SEC
+      *
+                 MOVE    "tbl_sryact"     TO  MCP-TABLE
+                 MOVE    WRK-SRYACCT-PATHNAME
+                                          TO  MCP-PATHNAME
+                 PERFORM   900-SRYACT-READ-SEC
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_sryact"         TO  MCP-TABLE
+             MOVE    WRK-SRYACCT-PATHNAME TO  MCP-PATHNAME
+             PERFORM   900-CLOSE-SEC
+      *
+             IF   WRK-CYOJKSN-TAIHIYM  NOT = SPACE
+             AND  WRK-CYOJKSN-TAIHIDD  NOT = SPACE
+               MOVE  WRK-CYOJKSN-TAIHIYM
+                           TO WRK-CYOJKSN-KAISHIDAY-XXX(IDX30)(1:6)
+               MOVE  WRK-CYOJKSN-TAIHIDD
+                           TO WRK-CYOJKSN-KAISHIDAY-XXX(IDX30)(7:2)
+               MOVE  WRK-CYOJKSN-INPUTCOMENT2
+                           TO WRK-CYOJKSN-INPUTCOMENT-XXX(IDX30)
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+       200111-CYOJKSN-KAISHIDAY4-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
+      *    ¤Î»»Äê³«»ÏÆü¸¡º÷£µ
+      *****************************************************************
+       200111-CYOJKSN-KAISHIDAY5-SEC          SECTION.
+      *
+           INITIALIZE         WRK-CYOJKSN-KAISHIDAY-YYY-AREA
+      *
+           MOVE      ZERO                 TO  FLG-CHECK-MAE
+      *
+           PERFORM  VARYING  IDX30  FROM  1  BY  1
+                     UNTIL   IDX30   >   TBL-CYOJKSN-CHECK-YYY-MAX
+      *
+             MOVE    ZERO                 TO  FLG-CYOJKSN-OK
+             MOVE    SPACE                TO  WRK-CYOJKSN-TAIHIYM
+             MOVE    SPACE                TO  WRK-CYOJKSN-TAIHIDD
+             MOVE    SPACE                TO  WRK-CYOJKSN-INPUTCOMENT2
+      *
+             INITIALIZE                       SRYACT-REC
+             MOVE    RECE82-HOSPNUM       TO  SRY-HOSPNUM
+             MOVE    RECE82-NYUGAIKBN     TO  SRY-NYUGAIKBN
+             MOVE    RECE82-PTID          TO  SRY-PTID
+             MOVE    RECE82-NYUINYMD(1:6) TO  SRY-SRYYM
+             MOVE    TBL-CYOJKSN-CHECK-YYY(IDX30)
+                                          TO  SRY-SRYCD (1)
+                                              SRY-SRYCD (2)
+                                              SRY-SRYCD (3)
+                                              SRY-SRYCD (4)
+                                              SRY-SRYCD (5)
+             MOVE    SRYACT-REC           TO  MCPDATA-REC
+             MOVE    "tbl_sryact"         TO  MCP-TABLE
+             MOVE    WRK-SRYACCT-PATHNAME TO  MCP-PATHNAME
+             PERFORM 900-DBSELECT-SEC
+             IF      MCP-RC               =   ZERO
+               MOVE    "tbl_sryact"       TO  MCP-TABLE
+               MOVE    WRK-SRYACCT-PATHNAME
+                                          TO  MCP-PATHNAME
+               PERFORM  900-SRYACT-READ-SEC
+               PERFORM  UNTIL   FLG-SRYACT      =   1
+                         OR     FLG-CYOJKSN-OK  =   1
+      *
+                 PERFORM  200111-CYOJKSN-KAISHIDAY2-SEC
+      *
+                 MOVE    "tbl_sryact"     TO  MCP-TABLE
+                 MOVE    WRK-SRYACCT-PATHNAME
+                                          TO  MCP-PATHNAME
+                 PERFORM   900-SRYACT-READ-SEC
+               END-PERFORM
+             END-IF
+             MOVE    "tbl_sryact"         TO  MCP-TABLE
+             MOVE    WRK-SRYACCT-PATHNAME TO  MCP-PATHNAME
+             PERFORM   900-CLOSE-SEC
+      *
+             IF   WRK-CYOJKSN-TAIHIYM  NOT = SPACE
+             AND  WRK-CYOJKSN-TAIHIDD  NOT = SPACE
+               MOVE  WRK-CYOJKSN-TAIHIYM
+                           TO WRK-CYOJKSN-KAISHIDAY-YYY(IDX30)(1:6)
+               MOVE  WRK-CYOJKSN-TAIHIDD
+                           TO WRK-CYOJKSN-KAISHIDAY-YYY(IDX30)(7:2)
+               MOVE  WRK-CYOJKSN-INPUTCOMENT2
+                           TO WRK-CYOJKSN-INPUTCOMENT-YYY(IDX30)
+             END-IF
+      *
+           END-PERFORM
+      *
+           .
+       200111-CYOJKSN-KAISHIDAY5-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    »»ÄêÆü¤Î³ÎÄê
       *****************************************************************
        200111-SANTEI-DAY-SEC          SECTION.
@@ -6553,11 +7011,18 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            INITIALIZE  WRK-JIDO-SETCOM-AREA
       *
-           MOVE    SPACE                TO  WRK-CYOJKSN-YMD
-           IF      RECE84-FLG-CYOJKSN-COMMENT
-                                      =    "1" OR "2" OR "3" OR "4"
-             PERFORM   20011-NYU-DAY2-SEC
-           END-IF
+           MOVE    SPACE                  TO  WRK-CYOJKSN-YMD
+                                              WRK-CYOJKSN-INPUTCOMENT
+           EVALUATE  RECE84-FLG-CYOJKSN-COMMENT
+             WHEN      "1"
+             WHEN      "3"
+               MOVE  WRK-CYOJKSN-YMD-XXX  TO  WRK-CYOJKSN-YMD
+               MOVE  WRK-CYOJKSN-COM-XXX  TO  WRK-CYOJKSN-INPUTCOMENT
+             WHEN      "2"
+             WHEN      "4"
+               MOVE  WRK-CYOJKSN-YMD-YYY  TO  WRK-CYOJKSN-YMD
+               MOVE  WRK-CYOJKSN-COM-YYY  TO  WRK-CYOJKSN-INPUTCOMENT
+           END-EVALUATE
       *
            PERFORM     200111-RECE85-TAIHI-SEC
       *
@@ -6617,6 +7082,17 @@ grpsys       PERFORM 900-DBSELECT-SEC
                 END-IF
              END-IF
       *
+             IF    WRK-CYOJKSN-INPUTCOMENT  NOT =  SPACE
+               MOVE  "»»Äê³«»Ï¡¡¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+               MOVE  WRK-CYOJKSN-INPUTCOMENT(11:4)
+                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(11:4)
+               MOVE  WRK-CYOJKSN-INPUTCOMENT(17:4)
+                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(17:4)
+               MOVE  WRK-CYOJKSN-INPUTCOMENT(23:4)
+                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(23:4)
+             END-IF
+      *
              MOVE    "1"   TO  WRK-RECE85XX-RECEDENFLG(MAX-MEISAISU 1)
              MOVE    "1"   TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
       *
@@ -6625,147 +7101,24 @@ grpsys       PERFORM 900-DBSELECT-SEC
            PERFORM    200111-SRYACTINF-HENSYU-SEC
       *
            IF    WRK-CYOJKSN-YMD  NOT =  SPACE
-      *
-             IF     RECE84-ZAISKBKBN             =    "6"
-             AND    RECE84-MEISAISU              =     1
-                 PERFORM    20012-NYUKASAN-HENSYU2-SEC
-             END-IF
-      *
-           END-IF
-      *
-           IF    RECE84-FLG-CYOJKSN-COMMENT   =
-                                 "A" OR "B" OR "C" OR "D"
-      *
-             IF     RECE84-ZAISKBKBN             =    "6"
-             AND    RECE84-MEISAISU              =     2
-                 PERFORM    20012-NYUKASAN-HENSYU3-SEC
-             END-IF
-      *
+             EVALUATE  RECE84-FLG-CYOJKSN-COMMENT
+               WHEN      "1"
+               WHEN      "3"
+                 IF    TBL-CYOJKSN-X =  ZERO
+                   PERFORM    20012-NYUKASAN-HENSYU2-SEC
+                   MOVE   1   TO   TBL-CYOJKSN-X
+                 END-IF
+               WHEN      "2"
+               WHEN      "4"
+                 IF    TBL-CYOJKSN-Y =  ZERO
+                   PERFORM    20012-NYUKASAN-HENSYU2-SEC
+                   MOVE   1   TO   TBL-CYOJKSN-Y
+                 END-IF
+             END-EVALUATE
            END-IF
       *
            .
        2001-NYU-COMMENT2-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡¦½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»
-      *    ¤Î»»Äê³«»ÏÆü¸¡º÷
-      *****************************************************************
-       20011-NYU-DAY2-SEC          SECTION.
-      *
-           MOVE    ZERO                 TO  FLG-CYOJKSN-OK
-           MOVE    SPACE                TO  WRK-CYOJKSN-TAIHIYM
-           INITIALIZE                       WRK-CYOJKSN-DAY-TBL
-      *
-           MOVE    ZERO                 TO  FLG-CHECK-MAE
-      *
-           INITIALIZE                       SRYACT-REC
-           MOVE    RECE82-HOSPNUM       TO  SRY-HOSPNUM
-           MOVE    RECE82-NYUGAIKBN     TO  SRY-NYUGAIKBN
-           MOVE    RECE82-PTID          TO  SRY-PTID
-           MOVE    RECE82-NYUINYMD(1:6) TO  SRY-SRYYM
-           EVALUATE  RECE84-FLG-CYOJKSN-COMMENT
-             WHEN     "1"
-               MOVE    CONS-CYOJKSN1    TO  SRY-SRYCD (1)
-                                            SRY-SRYCD (2)
-                                            SRY-SRYCD (3)
-                                            SRY-SRYCD (4)
-                                            SRY-SRYCD (5)
-             WHEN     "2"
-               MOVE    CONS-CYOJKSN2    TO  SRY-SRYCD (1)
-                                            SRY-SRYCD (2)
-                                            SRY-SRYCD (3)
-                                            SRY-SRYCD (4)
-                                            SRY-SRYCD (5)
-             WHEN     "3"
-               MOVE    CONS-CYOJKSN3    TO  SRY-SRYCD (1)
-                                            SRY-SRYCD (2)
-                                            SRY-SRYCD (3)
-                                            SRY-SRYCD (4)
-                                            SRY-SRYCD (5)
-             WHEN     "4"
-               MOVE    CONS-CYOJKSN4    TO  SRY-SRYCD (1)
-                                            SRY-SRYCD (2)
-                                            SRY-SRYCD (3)
-                                            SRY-SRYCD (4)
-                                            SRY-SRYCD (5)
-           END-EVALUATE
-           MOVE    SRYACT-REC           TO  MCPDATA-REC
-           MOVE    "tbl_sryact"         TO  MCP-TABLE
-           MOVE    "key21"              TO  MCP-PATHNAME
-           PERFORM 900-DBSELECT-SEC
-           IF      MCP-RC               =   ZERO
-             MOVE    "tbl_sryact"       TO  MCP-TABLE
-             MOVE    "key21"            TO  MCP-PATHNAME
-             PERFORM  900-SRYACT-READ-SEC
-             PERFORM  UNTIL   FLG-SRYACT      =   1
-                       OR     FLG-CYOJKSN-OK  =   1
-               INITIALIZE                   SRYACCT-REC
-               MOVE    SRY-HOSPNUM      TO  ACCT-HOSPNUM
-               MOVE    SRY-NYUGAIKBN    TO  ACCT-NYUGAIKBN
-               MOVE    SRY-PTID         TO  ACCT-PTID
-               MOVE    SRY-SRYKA        TO  ACCT-SRYKA
-               MOVE    SRY-SRYYM        TO  ACCT-SRYYM
-               MOVE    SRY-ZAINUM       TO  ACCT-ZAINUM
-               MOVE    SRYACCT-REC      TO  MCPDATA-REC
-               MOVE    "tbl_sryacct"    TO  MCP-TABLE
-               MOVE    "key31"          TO  MCP-PATHNAME
-               PERFORM 900-DBSELECT-SEC
-               IF      MCP-RC           =   ZERO
-                  MOVE "tbl_sryacct"    TO  MCP-TABLE
-                  MOVE "key31"          TO  MCP-PATHNAME
-                  PERFORM 900-DBFETCH-SEC
-                  IF      MCP-RC        =   ZERO
-                    MOVE  MCPDATA-REC   TO  SRYACCT-REC
-                    IF (WRK-CYOJKSN-TAIHIYM = SPACE     )
-                    OR (WRK-CYOJKSN-TAIHIYM = ACCT-SRYYM)
-                      MOVE    RECE82-NYUINYMD(7:2) TO  IDX28
-                      PERFORM  VARYING  IDX26  FROM  1  BY  1
-                                UNTIL   IDX26   >   31
-                        IF   ACCT-DAY(1 IDX26)  NOT =  ZERO
-                          IF  (ACCT-SRYYM = RECE82-NYUINYMD(1:6))
-                          AND (IDX26      <  IDX28              )
-                            MOVE   1    TO  FLG-CHECK-MAE
-                          ELSE
-                            MOVE   1    TO  WRK-CYOJKSN-DAY(IDX26)
-                            MOVE   ACCT-SRYYM
-                                        TO  WRK-CYOJKSN-TAIHIYM
-                          END-IF
-                        END-IF
-                      END-PERFORM
-                    ELSE
-                      MOVE    1         TO  FLG-CYOJKSN-OK
-                    END-IF
-                  END-IF
-               END-IF
-               MOVE    "tbl_sryacct"    TO  MCP-TABLE
-               MOVE    "key31"          TO  MCP-PATHNAME
-               PERFORM   900-CLOSE-SEC
-      *
-               MOVE    "tbl_sryact"     TO  MCP-TABLE
-               MOVE    "key21"          TO  MCP-PATHNAME
-               PERFORM   900-SRYACT-READ-SEC
-             END-PERFORM
-           END-IF
-           MOVE    "tbl_sryact"         TO  MCP-TABLE
-           MOVE    "key21"              TO  MCP-PATHNAME
-           PERFORM   900-CLOSE-SEC
-      *
-           PERFORM  VARYING  IDX26  FROM  1  BY  1
-                     UNTIL   IDX26   >   31
-             IF   WRK-CYOJKSN-DAY(IDX26)  NOT =  ZERO
-               MOVE   WRK-CYOJKSN-TAIHIYM  TO  WRK-CYOJKSN-YMD(1:6)
-               MOVE   IDX26                TO  WRK-CYOJKSN-YMD(7:2)
-               MOVE   31                   TO  IDX26
-             END-IF
-           END-PERFORM
-      *
-           IF     FLG-CHECK-MAE  =  1
-               MOVE   SPACE                TO  WRK-CYOJKSN-YMD
-           END-IF
-      *
-           .
-       20011-NYU-DAY2-EXT.
            EXIT.
       *
       *****************************************************************
@@ -6782,24 +7135,14 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            MOVE  "810000001"  TO  WRK-RECE85XX-SRYCD(MAX-MEISAISU 1)
            MOVE   ZERO        TO  WRK-RECE85XX-SRYSURYO(MAX-MEISAISU 1)
-           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "1")
-             MOVE   23        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë»»Äê³«»Ï"
+           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "1" OR "3")
+             MOVE   17        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»»»Äê³«»Ï"
                               TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
            END-IF
-           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "2")
-             MOVE   24        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë»»Äê³«»Ï"
-                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
-           END-IF
-           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "3")
-             MOVE   23        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë»»Äê³«»Ï"
-                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
-           END-IF
-           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "4")
-             MOVE   24        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë»»Äê³«»Ï"
+           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "2" OR "4")
+             MOVE   18        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
+             MOVE  "½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»»»Äê³«»Ï"
                               TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
            END-IF
            MOVE  "1"          TO  WRK-RECE85XX-RECEPTFLG(MAX-MEISAISU 1)
@@ -6852,6 +7195,17 @@ grpsys       PERFORM 900-DBSELECT-SEC
               END-IF
            END-IF
       *
+           IF    WRK-CYOJKSN-INPUTCOMENT  NOT =  SPACE
+             MOVE  "¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
+                         TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
+             MOVE  WRK-CYOJKSN-INPUTCOMENT(11:4)
+                         TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(1:4)
+             MOVE  WRK-CYOJKSN-INPUTCOMENT(17:4)
+                         TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(7:4)
+             MOVE  WRK-CYOJKSN-INPUTCOMENT(23:4)
+                         TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(13:4)
+           END-IF
+      *
            MOVE   "1"    TO  WRK-RECE85XX-RECEPTFLG(MAX-MEISAISU 1)
            MOVE   "1"    TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
       *
@@ -6865,31 +7219,19 @@ grpsys       PERFORM 900-DBSELECT-SEC
                PERFORM 800-RECE82-SET859-SEC
                EVALUATE  RECE84-SRYKBN
                  WHEN      "90"
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "1")
+                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "1" OR "3")
                      COMPUTE RECE859-ZAINUM =  99994101
                    END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "2")
+                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "2" OR "4")
                      COMPUTE RECE859-ZAINUM =  99994106
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "3")
-                     COMPUTE RECE859-ZAINUM =  99994111
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "4")
-                     COMPUTE RECE859-ZAINUM =  99994116
                    END-IF
                    MOVE    "900"            TO   RECE859-SRYSYUKBN
                  WHEN      "92"
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "1")
+                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "1" OR "3")
                      COMPUTE RECE859-ZAINUM =  99994601
                    END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "2")
+                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "2" OR "4")
                      COMPUTE RECE859-ZAINUM =  99994606
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "3")
-                     COMPUTE RECE859-ZAINUM =  99994611
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "4")
-                     COMPUTE RECE859-ZAINUM =  99994616
                    END-IF
                    MOVE    "920"            TO   RECE859-SRYSYUKBN
                END-EVALUATE
@@ -6920,30 +7262,18 @@ grpsys       PERFORM 900-DBSELECT-SEC
            PERFORM 800-RECE82-SET849-SEC
            EVALUATE  RECE84-SRYKBN
              WHEN      "90"
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "1")
+               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "1" OR "3")
                  COMPUTE RECE849-ZAINUM =  99994101
                END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "2")
+               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "2" OR "4")
                  COMPUTE RECE849-ZAINUM =  99994106
                END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "3")
-                 COMPUTE RECE849-ZAINUM =  99994111
-               END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "4")
-                 COMPUTE RECE849-ZAINUM =  99994116
-               END-IF
              WHEN      "92"
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "1")
+               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "1" OR "3")
                  COMPUTE RECE849-ZAINUM =  99994601
                END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "2")
+               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "2" OR "4")
                  COMPUTE RECE849-ZAINUM =  99994606
-               END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "3")
-                 COMPUTE RECE849-ZAINUM =  99994611
-               END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "4")
-                 COMPUTE RECE849-ZAINUM =  99994616
                END-IF
            END-EVALUATE
            MOVE    RECE84-SRYKBN       TO  RECE849-SRYKBN
@@ -6959,193 +7289,6 @@ grpsys       PERFORM 900-DBSELECT-SEC
       *
            .
        20012-NYUKASAN-HENSYU2-EXT.
-           EXIT.
-      *
-      *****************************************************************
-      *    ¡Ê¥ì¥»ÅÅÍÑ¡Ë
-      *****************************************************************
-       20012-NYUKASAN-HENSYU3-SEC          SECTION.
-      *
-      *    £Ò£Å£Ã£Å£°£µ¥Õ¥¡¥¤¥ë¤ÎÆâÍÆ¤ò¥Æ¡¼¥Ö¥ë¤ËÂàÈò
-           MOVE    ZERO                 TO  IDX-RECE85
-           MOVE    SPACE                TO  WRK-RECE85XX-REC
-           INITIALIZE                       WRK-RECE85XX-REC
-      *
-           MOVE    1                    TO  MAX-MEISAISU
-      *
-           MOVE  "810000001"  TO  WRK-RECE85XX-SRYCD(MAX-MEISAISU 1)
-           MOVE   ZERO        TO  WRK-RECE85XX-SRYSURYO(MAX-MEISAISU 1)
-           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "A")
-             MOVE   23        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë»»Äê³«»Ï"
-                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
-           END-IF
-           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "B")
-             MOVE   24        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐ°Ê¾å¡Ë»»Äê³«»Ï"
-                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
-           END-IF
-           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "C")
-             MOVE   23        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë»»Äê³«»Ï"
-                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
-           END-IF
-           IF  (RECE84-FLG-CYOJKSN-COMMENT    =    "D")
-             MOVE   24        TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-             MOVE  "½àÄ¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»¡Ê£¶ºÐÌ¤Ëþ¡Ë»»Äê³«»Ï"
-                              TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
-           END-IF
-           MOVE  "1"          TO  WRK-RECE85XX-RECEPTFLG(MAX-MEISAISU 1)
-           MOVE  "1"          TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
-      *
-      *    »»ÄêÆü¥³¥á¥ó¥È¤ÎÁÞÆþ
-           COMPUTE  MAX-MEISAISU        =   MAX-MEISAISU  +  1
-           MOVE   "810000001"
-                         TO  WRK-RECE85XX-SRYCD(MAX-MEISAISU 1)
-           MOVE    ZERO  TO  WRK-RECE85XX-SRYSURYO(MAX-MEISAISU 1)
-           MOVE    9     TO  WRK-RECE85XX-YUKOKETA(MAX-MEISAISU 1)
-           MOVE   "¡¡¡¡Ç¯¡¡¡¡·î¡¡¡¡Æü"
-                         TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)
-      *
-           IF   WRK-RECE85-INPUTCOMENT(2)  NOT = SPACE
-             IF   WRK-RECE85-INPUTCOMENT(2)(1:2) = "£°"
-               MOVE  "¡¡"  TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(1:2)
-               MOVE  WRK-RECE85-INPUTCOMENT(2)(3:2)
-                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(3:2)
-             ELSE
-               MOVE  WRK-RECE85-INPUTCOMENT(2)(1:4)
-                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(1:4)
-             END-IF
-             IF   WRK-RECE85-INPUTCOMENT(2)(5:2) = "£°"
-               MOVE  "¡¡"  TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(7:2)
-               MOVE  WRK-RECE85-INPUTCOMENT(2)(7:2)
-                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(9:2)
-             ELSE
-               MOVE  WRK-RECE85-INPUTCOMENT(2)(5:4)
-                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(7:4)
-             END-IF
-             IF   WRK-RECE85-INPUTCOMENT(2)(9:2) = "£°"
-               MOVE  "¡¡"  TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(13:2)
-               MOVE  WRK-RECE85-INPUTCOMENT(2)(11:2)
-                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(15:2)
-             ELSE
-               MOVE  WRK-RECE85-INPUTCOMENT(2)(9:4)
-                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(13:4)
-             END-IF
-           ELSE
-               MOVE  "¡¡¡¡"
-                           TO  WRK-RECE85XX-NAME(MAX-MEISAISU 1)(1:4)
-                               WRK-RECE85XX-NAME(MAX-MEISAISU 1)(7:4)
-                               WRK-RECE85XX-NAME(MAX-MEISAISU 1)(13:4)
-           END-IF
-      *
-           MOVE   "1"    TO  WRK-RECE85XX-RECEPTFLG(MAX-MEISAISU 1)
-           MOVE   "1"    TO  WRK-RECE85XX-SIKFLG(MAX-MEISAISU 1)
-      *
-      *    ¥³¥á¥ó¥È¤ò´Þ¤ó¤ÀÆâÍÆ¤ÇÃæ´Ö¥Õ¥¡¥¤¥ë¤ÎºÆºîÀ®
-           MOVE       ZERO             TO      FLG-WRKRECE85
-           MOVE       ZERO             TO      IDX
-           MOVE       ZERO             TO      IDX-RECE85
-           MOVE       ZERO             TO      WRK-RENNUM
-           MOVE       ZERO             TO      WRK-CNT-MEISAI
-           PERFORM    UNTIL     FLG-WRKRECE85  =    1
-               PERFORM 800-RECE82-SET859-SEC
-               EVALUATE  RECE84-SRYKBN
-                 WHEN      "90"
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "A")
-                     COMPUTE RECE859-ZAINUM =  99994101
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "B")
-                     COMPUTE RECE859-ZAINUM =  99994106
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "C")
-                     COMPUTE RECE859-ZAINUM =  99994111
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "D")
-                     COMPUTE RECE859-ZAINUM =  99994116
-                   END-IF
-                   MOVE    "900"            TO   RECE859-SRYSYUKBN
-                 WHEN      "92"
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "A")
-                     COMPUTE RECE859-ZAINUM =  99994601
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "B")
-                     COMPUTE RECE859-ZAINUM =  99994606
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "C")
-                     COMPUTE RECE859-ZAINUM =  99994611
-                   END-IF
-                   IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "D")
-                     COMPUTE RECE859-ZAINUM =  99994616
-                   END-IF
-                   MOVE    "920"            TO   RECE859-SRYSYUKBN
-               END-EVALUATE
-               ADD     1                    TO   WRK-RENNUM
-               MOVE    WRK-RENNUM           TO   RECE859-RENNUM
-               MOVE    RECE84-PTNUM         TO   RECE859-PTNUM
-               MOVE    RECE84-SRYKA         TO   RECE859-SRYKA
-               MOVE    RECE84-SRYKBN        TO   RECE859-SRYKBN
-               MOVE    ZERO                 TO   RECE859-JIHIMONEY
-               PERFORM  VARYING   IDX   FROM   1   BY   1
-                         UNTIL   (IDX       >    5)   OR
-                                 (FLG-WRKRECE85   =   1)
-                   ADD        1             TO    IDX-RECE85
-                   IF  WRK-RECE85XX-SRYCD(IDX-RECE85 1) = SPACE
-                       MOVE   1             TO    FLG-WRKRECE85
-                   ELSE
-                       MOVE  WRK-RECE85XX-SRYACT-TBL(IDX-RECE85 1)
-                                        TO   RECE859-SRYACT-TBL(IDX)
-                       ADD   1          TO   WRK-CNT-MEISAI
-                   END-IF
-               END-PERFORM
-               IF   RECE859-SRYCD(1)  NOT =  SPACE
-                   WRITE   RECE859-REC
-                   ADD     1            TO   CNT-RECE859
-               END-IF
-           END-PERFORM
-      *
-           PERFORM 800-RECE82-SET849-SEC
-           EVALUATE  RECE84-SRYKBN
-             WHEN      "90"
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "A")
-                 COMPUTE RECE849-ZAINUM =  99994101
-               END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "B")
-                 COMPUTE RECE849-ZAINUM =  99994106
-               END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "C")
-                 COMPUTE RECE849-ZAINUM =  99994111
-               END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "D")
-                 COMPUTE RECE849-ZAINUM =  99994116
-               END-IF
-             WHEN      "92"
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "A")
-                 COMPUTE RECE849-ZAINUM =  99994601
-               END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "B")
-                 COMPUTE RECE849-ZAINUM =  99994606
-               END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "C")
-                 COMPUTE RECE849-ZAINUM =  99994611
-               END-IF
-               IF  (RECE84-FLG-CYOJKSN-COMMENT   =    "D")
-                 COMPUTE RECE849-ZAINUM =  99994616
-               END-IF
-           END-EVALUATE
-           MOVE    RECE84-SRYKBN       TO  RECE849-SRYKBN
-           MOVE    "6"                 TO  RECE849-ZAISKBKBN
-           MOVE    RECE84-PTNUM        TO  RECE849-PTNUM
-           MOVE    RECE84-SRYKA        TO  RECE849-SRYKA
-           MOVE    RECE84-HKNCOMBI     TO  RECE849-HKNCOMBI
-      *
-           MOVE    WRK-CNT-MEISAI      TO  RECE849-MEISAISU
-      *
-           WRITE   RECE849-REC
-           ADD     1                   TO  CNT-RECE849
-      *
-           .
-       20012-NYUKASAN-HENSYU3-EXT.
            EXIT.
       *
       *****************************************************************
@@ -7260,8 +7403,7 @@ grpsys       PERFORM 900-DBSELECT-SEC
        2001-CYOJKSN-HANTEI-SEC          SECTION.
       *
            IF      RECE84-FLG-CYOJKSN-COMMENT
-                                      =    "1" OR "2" OR "3" OR "4" OR
-                                           "A" OR "B" OR "C" OR "D"
+                                      =    "1" OR "2" OR "3" OR "4"
                MOVE       99      TO     FLG-COMMENT
                PERFORM   2001-NYU-COMMENT2-SEC
            END-IF

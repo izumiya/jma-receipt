@@ -642,6 +642,8 @@
       *  04.07.21    NACL-ÌçÏÆ    14/04/08  Ä¹´ü¤ÎÆÃµ­»ö¹à½ÅÊ£½¤Àµ
       *  04.07.22    NACL-ÌçÏÆ    14/04/24  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
       *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
+      *  04.07.23    NACL-ÌçÏÆ    14/05/13  Ä¶½Å¾É»ù¡Ê¼Ô¡ËÆþ±¡¿ÇÎÅ²Ã»»Åù¤Î
+      *                                     ¥³¥á¥ó¥È¼«Æ°µ­ºÜ½¤Àµ
       *
       *  04.08.01    NACL-ÌçÏÆ    13/01/25  Êñ³ç¿ÇÎÅÊ¬¤ÎÅÀ¸¡ÍÑ¥ì¥»¥×¥Èµ­ºÜÂÐ±þ
       *****************************************************************
@@ -7967,35 +7969,53 @@
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN1-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "1"   TO    RECE64-FLG-CYOJKSN-COMMENT
+                   MOVE   "1"   TO    RECE62-COMCNTFLG
+                   EVALUATE  RECE62-CYOJKSNFLG
+                     WHEN     SPACE
+                        MOVE   "X"    TO   RECE62-CYOJKSNFLG
+                     WHEN     "Y"
+                        MOVE   "Z"    TO   RECE62-CYOJKSNFLG
+                   END-EVALUATE
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN2-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "2"   TO    RECE64-FLG-CYOJKSN-COMMENT
+                   MOVE   "1"   TO    RECE62-COMCNTFLG
+                   EVALUATE  RECE62-CYOJKSNFLG
+                     WHEN     SPACE
+                        MOVE   "Y"    TO   RECE62-CYOJKSNFLG
+                     WHEN     "X"
+                        MOVE   "Z"    TO   RECE62-CYOJKSNFLG
+                   END-EVALUATE
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN3-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "3"   TO    RECE64-FLG-CYOJKSN-COMMENT
+                   MOVE   "1"   TO    RECE62-COMCNTFLG
+                   EVALUATE  RECE62-CYOJKSNFLG
+                     WHEN     SPACE
+                        MOVE   "X"    TO   RECE62-CYOJKSNFLG
+                     WHEN     "Y"
+                        MOVE   "Z"    TO   RECE62-CYOJKSNFLG
+                   END-EVALUATE
                 END-IF
                 IF  (SRY-SRYCD(IDX2) =  CONS-CYOJKSN4-COMMENT)
                 AND (FLG-CYOJKSN-COM =  ZERO                 )
                    MOVE   "4"   TO    RECE64-FLG-CYOJKSN-COMMENT
+                   MOVE   "1"   TO    RECE62-COMCNTFLG
+                   EVALUATE  RECE62-CYOJKSNFLG
+                     WHEN     SPACE
+                        MOVE   "Y"    TO   RECE62-CYOJKSNFLG
+                     WHEN     "X"
+                        MOVE   "Z"    TO   RECE62-CYOJKSNFLG
+                   END-EVALUATE
                 END-IF
                 IF   SRY-SRYCD(IDX2) =  CONS-CYOJKSN5-COMMENT
-                   EVALUATE  RECE64-FLG-CYOJKSN-COMMENT
-                     WHEN     "1"
-                       MOVE  "A"  TO  RECE64-FLG-CYOJKSN-COMMENT
-                       MOVE  "1"  TO  RECE65-RECEDENFLG(IDX4)
-                     WHEN     "2"
-                       MOVE  "B"  TO  RECE64-FLG-CYOJKSN-COMMENT
-                       MOVE  "1"  TO  RECE65-RECEDENFLG(IDX4)
-                     WHEN     "3"
-                       MOVE  "C"  TO  RECE64-FLG-CYOJKSN-COMMENT
-                       MOVE  "1"  TO  RECE65-RECEDENFLG(IDX4)
-                     WHEN     "4"
-                       MOVE  "D"  TO  RECE64-FLG-CYOJKSN-COMMENT
-                       MOVE  "1"  TO  RECE65-RECEDENFLG(IDX4)
-                   END-EVALUATE
                    MOVE    1    TO    FLG-CYOJKSN-COM
+                   IF  RECE64-FLG-CYOJKSN-COMMENT  NOT = SPACE
+                        MOVE   "1"    TO   RECE65-RECEPTFLG(IDX4)
+                                           RECE65-RECEDENFLG(IDX4)
+                   END-IF
                 END-IF
               END-IF
            END-IF
