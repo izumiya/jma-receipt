@@ -53,6 +53,7 @@
       * 04.07.00     NACL-多々納  13/05/15  疾患別リハビリ月上限対応
       * 04.07.00     NACL-多々納  14/03/XX  Ｈ２６年４月改正対応
       * 04.07.00     NACL-多々納  14/04/XX  精２０歳未満加算削除対応等
+      * 04.07.00     NACL-多々納  14/05/XX  労災リハビリ％加算対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -356,6 +357,19 @@
       *
       *    外来リハビリ（要介護）施設基準不適合
            03  WRK-ERRCHK              PIC 9(01).
+      *
+      *H26.5
+      *   きざみ値行為再計算用
+           03  WRK-RIHA-KIZAMI-G.
+               05  WRK-KEI-TEN         PIC 9(08)V9(03).
+               05  WRK-KEI-TEN1        PIC 9(08)V9(03).
+               05  WRK-KEI-TEN2        PIC 9(08).
+               05  WRK-KSNTEN          PIC 9(08)V9(05).
+               05  WRK-KZMTEN          PIC 9(08)V9(05).
+               05  WRK-SYU-TEN         PIC 9(08).
+               05  WRK-SYU-KZMTEN      PIC 9(08).
+               05  FLG-RIHAEND         PIC 9(01).
+      *
       *
       *
        01  TBL-RIHA-ZAINUM-G.
@@ -2636,7 +2650,6 @@
                MOVE    SPA-STR-NYUINYMD    TO  WRK-NYUINYMD
            END-IF
       *
-      *
            .
        10011310-NYUINYMD-HEN-EXT.
            EXIT.
@@ -2657,8 +2670,10 @@
                GO      TO      100113-RSIHKN-SYORI-EXT
            END-IF
       *
-      *    リハビリテーション総合計画評価料は対象外
+      *    リハビリテーション総合計画評価料・
+      *    リハビリテーション総合計画提供料　対象外
            IF      WRK-COM-INPUTCD (IDX-Z) =   "180024710"
+                                           OR  "180042910"
                GO      TO      100113-RSIHKN-SYORI-EXT
            END-IF
       *
@@ -2730,6 +2745,9 @@
                        MOVE    "101800010"      TO  WRK-SRYCD
                END-EVALUATE
                MOVE    1                    TO  FLG-ROUSAI
+      *!!!
+               MOVE    8               TO  WRK-COM-SANFLG (IDX-Z)
+      *!!!
            END-IF
       *
       *    既に他の労災加算が入力されている時は自動算定しない
@@ -2842,6 +2860,7 @@
       *****************************************************************
        10021-JIDO-AGEKASAN-SEC        SECTION.
       *
+           MOVE    ZERO                TO  FLG-ADD
            PERFORM VARYING     IDX2    FROM    1   BY  1
                    UNTIL      (IDX2        >   4       )   OR
                               (WRK-COM-AGEKSNSRYCD(IDX-S IDX2)
@@ -3168,6 +3187,14 @@
                END-IF
                MOVE    IDX-Z               TO  IDX-SYU
            END-IF
+      *!!!!
+      *H26.5
+      *    労災リハビリ四肢加算再計算
+           IF      (WRK-COM-INPUTCD (IDX-Z)(1:3)   =   "101" )
+               AND (WRK-COM-SANFLG (IDX-Z)     =   8   )
+               PERFORM 10061-RIHA-KASANKEI-SEC
+           END-IF
+      *!!!!
       *
       *    手技点数計算
            EVALUATE    WRK-MOJI
@@ -3324,20 +3351,20 @@
       *
       *        手技料の点数を所定点数とする
       *        労災１．５ ％加算
-               IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
-                      (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
-                      (WRK-COM-SANFLG     (IDX)    =   2   )
-                   MOVE    ZERO                TO  WRK-TENSUKEI
+      *        IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
+      *               (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
+      *               (WRK-COM-SANFLG     (IDX)    =   2   )
+      *            MOVE    ZERO                TO  WRK-TENSUKEI
       *****        COMPUTE WRK-TENSUKEI        =   LNK-SC90-TENSU
-                   COMPUTE WRK-TENSUKEI        =  (WRK-COM-KISOTEN
-                                                             (IDX-SYU)
-                                               -   WRK-TENSUKEI-G )
-                                               *   WRK-COM-KISOTEN(IDX)
-                                               /   100
-                                               +   0.5
-                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
-                   ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-RSI
-               END-IF
+      *            COMPUTE WRK-TENSUKEI        =  (WRK-COM-KISOTEN
+      *                                                      (IDX-SYU)
+      *                                        -   WRK-TENSUKEI-G )
+      *                                        *   WRK-COM-KISOTEN(IDX)
+      *                                        /   100
+      *                                        +   0.5
+      *            MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+      *            ADD     WRK-TENSUKEI-9      TO  WRK-TENSUKEI-RSI
+      ****     END-IF
       *        労災リハ（１．２）加算
                IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
                       (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
@@ -3360,6 +3387,132 @@
            .
        10061-RSIKASAN-SET-EXT.
            EXIT.
+      *
+      *H26.5
+      *****************************************************************
+      *    労災１．５ ％加算計算処理
+      *****************************************************************
+       10061-RIHA-KASANKEI-SEC            SECTION.
+      *
+           MOVE    ZERO                TO  FLG-RIHAEND
+           INITIALIZE                  WRK-RIHA-KIZAMI-G
+      *
+      *    労災加算対象点数集計
+           PERFORM VARYING     IDX     FROM    IDX-SYU  BY  1
+                   UNTIL      (IDX         >   SPA-MAX-LINE )
+                         OR   (WRK-GMN-INPUTCD (IDX)
+                                           =   SPACE         )
+                         OR   (FLG-RIHAEND =   1        )
+      *
+      *        労災１．５ ％加算
+               IF     (WRK-COM-INPUTCD(IDX)(1:3)   =   "101")  AND
+                      (WRK-COM-TENSIKIBETU(IDX)    =   5   )  AND
+                      (WRK-COM-SANFLG     (IDX)    =   2   )
+      *        リハビリの労災加算は単位点数毎とする（他の加算なし）
+      *            点数の％加算
+                   COMPUTE WRK-TENSUKEI        =   WRK-COM-TEN
+                                                             (IDX-SYU)
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                                               +   0.5
+                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                   MOVE    WRK-TENSUKEI-9      TO  WRK-KSNTEN
+      *
+      *            きざみ点数の％加算
+                   COMPUTE WRK-TENSUKEI        =   WRK-COM-TEN
+                                                             (IDX-SYU)
+                                               *   WRK-COM-KISOTEN(IDX)
+                                               /   100
+                                               +   0.5
+                   MOVE    WRK-TENSUKEI        TO  WRK-TENSUKEI-9
+                   MOVE    WRK-TENSUKEI-9      TO  WRK-KZMTEN
+      *
+                   MOVE    1               TO  FLG-RIHAEND
+               END-IF
+      *
+               IF      (WRK-COM-INPUTCD(IDX)     =   "1"  )  AND
+                       (WRK-COM-DATAKBN (IDX)    =   "1"  )
+                   MOVE    1           TO  FLG-RIHAEND
+               END-IF
+           END-PERFORM
+      *
+      *    きざみ値再計算
+           MOVE    WRK-COM-SURYO (IDX-SYU) TO  WRK-SURYO
+      *    点数の％加算
+           COMPUTE WRK-SYU-TEN         =   WRK-COM-TEN (IDX-SYU)
+                                       +   WRK-KSNTEN
+      *    点数編集
+           MOVE    WRK-SYU-TEN         TO  WRK-COM-KISOTEN  (IDX-SYU)
+      *
+      *    きざみ値の％加算
+           COMPUTE WRK-SYU-KZMTEN      =   WRK-COM-KZMTEN (IDX-SYU)
+                                       +   WRK-KZMTEN
+      *
+           MOVE    ZERO                    TO  WRK-KEI-TEN2
+      *    きざみ値判定
+           EVALUATE    TRUE
+      *            データ≦（下限値−きざみ値）
+               WHEN    WRK-SURYO       <=  (WRK-COM-KZMKGN(IDX-SYU)
+                                        -   WRK-COM-KZM   (IDX-SYU) )
+                   IF      WRK-COM-KZMERR (IDX-SYU)  =   2  OR  3
+                       MOVE    "0021"          TO  SPA-ERRCD
+                   END-IF
+      *
+      *            下限値＜データ≦上限値
+               WHEN     (WRK-COM-KZMKGN (IDX-SYU)  <   WRK-SURYO )   AND
+                        (WRK-COM-KZMJGN (IDX-SYU)  >=  WRK-SURYO )
+      *            点数計算式１
+                   COMPUTE WRK-KEI-TEN1    =  (WRK-SURYO
+                                           -   WRK-COM-KZMKGN(IDX-SYU))
+                                           /   WRK-COM-KZM  (IDX-SYU)
+                                           +   0.999
+                   MOVE    WRK-KEI-TEN1    TO  WRK-KEI-TEN2
+                   COMPUTE WRK-KEI-TEN     =   WRK-SYU-TEN
+                                           + ( WRK-KEI-TEN2
+                                           *   WRK-SYU-KZMTEN  )
+                   COMPUTE WRK-KEI-TEN2    =   WRK-KEI-TEN    +  0.5
+      *
+      *            上限値＜データ
+               WHEN    WRK-COM-KZMJGN (IDX-SYU)  <   WRK-SURYO
+                   IF      WRK-COM-KZMERR (IDX-SYU)  =   0  OR  2
+      *            警告エラーとする
+      *???             MOVE    "K030"          TO  SPA-ERRCD
+      *            点数計算式１
+                       COMPUTE WRK-KEI-TEN1    =  (WRK-SURYO
+                                               -   WRK-COM-KZMKGN
+                                                             (IDX-SYU))
+                                               /   WRK-COM-KZM(IDX-SYU)
+                                               +   0.999
+                       MOVE    WRK-KEI-TEN1    TO  WRK-KEI-TEN2
+                       COMPUTE WRK-KEI-TEN     =   WRK-SYU-TEN
+                                               + ( WRK-KEI-TEN2
+                                               *   WRK-SYU-KZMTEN)
+                       COMPUTE WRK-KEI-TEN2    =   WRK-KEI-TEN    +  0.5
+                   ELSE
+      *            点数計算式２
+                       COMPUTE WRK-KEI-TEN1    =  (WRK-COM-KZMJGN
+                                                             (IDX-SYU)
+                                               -   WRK-COM-KZMKGN
+                                                              (IDX-SYU))
+                                               /   WRK-COM-KZM(IDX-SYU)
+                                               +   0.999
+                       MOVE    WRK-KEI-TEN1    TO  WRK-KEI-TEN2
+                       COMPUTE WRK-KEI-TEN     =   WRK-SYU-TEN
+                                               + ( WRK-KEI-TEN2
+                                               *   WRK-SYU-KZMTEN)
+                       COMPUTE WRK-KEI-TEN2    =   WRK-KEI-TEN  +  0.5
+                   END-IF
+           END-EVALUATE
+      *
+           IF     (SPA-ERRCD           =   SPACE ) AND
+                  (WRK-KEI-TEN2        >   ZERO  )
+               MOVE    WRK-KEI-TEN2    TO  WRK-COM-KISOTEN  (IDX-SYU)
+           END-IF
+      *
+           .
+       10061-RIHA-KASANKEI-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    手技毎の計算処理
