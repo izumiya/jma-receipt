@@ -28,6 +28,11 @@
       * Maj/Min/Rev  修正者       日付      内容
       *  01.00.01    NACL-多々納  05/11/11  MONFUNC 対応 他
       *  03.05.00    NACL-多々納  07/04/XX  グループ診療対応
+      *
+      *  04.07.01    NACL-多々納  14/05/15  レセプト一括作成がまだのときは
+      *                                     更新しない
+      *                                     入院は対象外とする
+      *                                     第三者行為のときは医保分も更新 
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -44,6 +49,10 @@
        01  FLG-AREA.
            03  FLG-JYURRK          PIC 9(01).
            03  FLG-RECEUPD         PIC 9(01).
+           03  FLG-RECE07          PIC 9(01).
+      *
+      *    1:医保のみ 2:第三者行為のみ 9:両方あり
+           03  FLG-DAISANSYA       PIC 9(01).
       *
       *    添字領域
        01  IDX-AREA.
@@ -58,10 +67,12 @@
       *
            03  WRK-MCP-TABLE       PIC X(64).
            03  WRK-MCP-PATHNAME    PIC X(64).
-      *     
-      **** COPY    "ORCA-DBPATH".
-           COPY    "ORCA-DBMETA".
       *
+      *    レセプト作成管理退避
+       01  WRK-RECEUPD-REC.
+           COPY    "CPRECEUPD.INC" REPLACING  //RECEUPD-//
+                                   BY         //WRK-RECEUPD-//.
+      *     
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -74,9 +85,12 @@
        01  RECEUPD-REC.
            COPY    "CPRECEUPD.INC".
       *
+      *    レセプト管理     
+       01  RECE07-REC. 
+           COPY    "CPRCF007.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
-      **** COPY    "CPORCMCP.INC".
       *
            COPY    "MCPAREA".
       *
@@ -133,6 +147,115 @@ grpsys      COPY    "COMMON-SPA".
            END-IF
       *
            MOVE    ZERO                TO  LNK-UPD-RC
+                                           FLG-DAISANSYA
+      *
+           IF      LNK-UPD-SYORI       =   "2"
+      *        入院は対象外
+               IF      LNK-UPD-NYUGAIKBN   =   "1"
+                               DISPLAY "NYUIN "
+                   GO  TO  000-PROC-EXT
+               END-IF
+      *
+      *        該当月のレセプト一括作成の有無
+               INITIALIZE                  RECE07-REC
+      *        0:医保
+      *        1:労災、公務災害（労災準拠）
+      *        2:自賠責（労災準拠）
+      *        4:自賠責（健保準拠）
+      *        5:公務災害（健保準拠）
+      *        6:公害
+      *        7:自賠責（第三者行為）
+               EVALUATE    LNK-UPD-HKNKBN
+                   WHEN    "0"
+      *                医保
+                       MOVE    "HC06"              TO  RECE07-PRTID
+                       MOVE    "0"                 TO  RECE07-RECEKBN
+                   WHEN    "1"
+                   WHEN    "5"
+      *                労災
+                       MOVE    "HC21"              TO  RECE07-PRTID
+                       MOVE    "3"                 TO  RECE07-RECEKBN
+                   WHEN    "2"
+                   WHEN    "4"
+      *                自賠責（新様式）
+                       MOVE    "HC23"              TO  RECE07-PRTID
+                       MOVE    "4"                 TO  RECE07-RECEKBN
+                   WHEN    "7"
+      *                自賠責（第三者行為）
+                       MOVE    "HC23"              TO  RECE07-PRTID
+                       MOVE    "8"                 TO  RECE07-RECEKBN
+                   WHEN    "6"
+      *                公害
+                       MOVE    "HC25"              TO  RECE07-PRTID
+                       MOVE    "6"                 TO  RECE07-RECEKBN
+               END-EVALUATE
+               MOVE    LNK-UPD-SRYYM       TO  RECE07-SRYYM
+               MOVE    "1"                 TO  RECE07-SYOKBN
+               MOVE    LNK-UPD-NYUGAIKBN   TO  RECE07-NYUGAIKBN
+grpsys         MOVE    LNK-UPD-HOSPNUM     TO  RECE07-HOSPNUM
+               MOVE    "tbl_recekanri"     TO  WRK-MCP-TABLE
+               MOVE    "key7"              TO  WRK-MCP-PATHNAME
+               MOVE    RECE07-REC          TO  MCPDATA-REC
+               PERFORM 900-RECE07-INV-SEC
+               IF      FLG-RECE07          =   1
+                   EVALUATE    LNK-UPD-HKNKBN
+                       WHEN    "2"
+                       WHEN    "4"
+      *                    自賠責（従来様式）
+                           INITIALIZE                  RECE07-REC
+                           MOVE    "HC23"          TO  RECE07-PRTID
+                           MOVE    "5"             TO  RECE07-RECEKBN
+                           MOVE    LNK-UPD-SRYYM   TO  RECE07-SRYYM
+                           MOVE    "1"             TO  RECE07-SYOKBN
+                           MOVE    LNK-UPD-NYUGAIKBN
+                                                   TO  RECE07-NYUGAIKBN
+grpsys                     MOVE    LNK-UPD-HOSPNUM TO  RECE07-HOSPNUM
+                           MOVE    RECE07-REC      TO  MCPDATA-REC
+                           PERFORM 900-RECE07-INV-SEC
+                           IF      FLG-RECE07      =   1
+                               DISPLAY "RECEPRT NOT FOUND"
+                               GO  TO  000-PROC-EXT
+                           END-IF
+                       WHEN    "7"
+                           MOVE    1           TO  FLG-DAISANSYA
+                       WHEN    OTHER
+                               DISPLAY "RECEPRT NOT FOUND"
+                           GO  TO  000-PROC-EXT
+                   END-EVALUATE
+               END-IF
+      *
+      *        第三者行為のときは医保分もチェック
+               EVALUATE    LNK-UPD-HKNKBN
+                   WHEN    "7"
+                       INITIALIZE                  RECE07-REC
+                       MOVE    "HC06"          TO  RECE07-PRTID
+                       MOVE    "0"             TO  RECE07-RECEKBN
+                       MOVE    LNK-UPD-SRYYM   TO  RECE07-SRYYM
+                       MOVE    "1"             TO  RECE07-SYOKBN
+                       MOVE    LNK-UPD-NYUGAIKBN
+                                               TO  RECE07-NYUGAIKBN
+grpsys                 MOVE    LNK-UPD-HOSPNUM TO  RECE07-HOSPNUM
+                       MOVE    RECE07-REC      TO  MCPDATA-REC
+                       PERFORM 900-RECE07-INV-SEC
+                       IF      FLG-RECE07      =   1
+                           IF      FLG-DAISANSYA   =   1
+                               DISPLAY "RECEPRT NOT FOUND"
+                               GO  TO  000-PROC-EXT
+                           ELSE                          
+                               MOVE    2           TO  FLG-DAISANSYA
+                           END-IF
+                       ELSE
+                           IF      FLG-DAISANSYA   =   1
+                               CONTINUE
+                           ELSE                          
+                               MOVE    9           TO  FLG-DAISANSYA
+                           END-IF
+                       END-IF
+               END-EVALUATE 
+      *??
+           DISPLAY "FLG-DAISANSYA=" FLG-DAISANSYA
+      *??
+           END-IF
       *
            EVALUATE    LNK-UPD-SYORI
                WHEN    "1"
@@ -188,56 +311,22 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM     UNTIL       FLG-JYURRK     =   1
                        OR          LNK-UPD-RC NOT =   ZERO
                INITIALIZE                  RECEUPD-REC
-               MOVE    JYURRK-HOSPNUM  TO  RECEUPD-HOSPNUM
-               MOVE    JYURRK-NYUGAIKBN
-                                       TO  RECEUPD-NYUGAIKBN
-               MOVE    JYURRK-PTID     TO  RECEUPD-PTID
-               MOVE    JYURRK-SRYKA    TO  RECEUPD-SRYKA
-               MOVE    JYURRK-SRYYMD (1:6)
-                                       TO  RECEUPD-SRYYM
                MOVE    JYURRK-HKNKBN   TO  RECEUPD-HKNKBN
-               MOVE    SPACE           TO  RECEUPD-HKNKBN2
-               PERFORM 900-RECEUPD-READ-SEC
-               IF      FLG-RECEUPD     =   1
-                   INITIALIZE                  RECEUPD-REC
-                   MOVE    JYURRK-HOSPNUM  TO  RECEUPD-HOSPNUM
-                   MOVE    JYURRK-NYUGAIKBN
-                                           TO  RECEUPD-NYUGAIKBN
-                   MOVE    JYURRK-PTID     TO  RECEUPD-PTID
-                   MOVE    JYURRK-SRYKA    TO  RECEUPD-SRYKA
-                   MOVE    JYURRK-SRYYMD (1:6)
-                                           TO  RECEUPD-SRYYM
-                   MOVE    JYURRK-HKNKBN   TO  RECEUPD-HKNKBN
-                   MOVE    SPACE           TO  RECEUPD-HKNKBN2
+      *        第三者行為で医保のみ存在するとき
+               IF      FLG-DAISANSYA   =   1
+                   MOVE    "0"             TO  RECEUPD-HKNKBN
                END-IF
-      *
-               MOVE    "1"             TO  RECEUPD-ONLUPD
-      *
-               EVALUATE    FLG-RECEUPD
-                   WHEN    1
-                       MOVE    LNK-UPD-TERMID      TO  RECEUPD-TERMID
-                       MOVE    LNK-UPD-OPID        TO  RECEUPD-OPID
-                       MOVE    SMCNDATE-YMD        TO  RECEUPD-CREYMD
-                       MOVE    SMCNDATE-YMD        TO  RECEUPD-UPYMD
-                       MOVE    SMCNDATE-HMS        TO  RECEUPD-UPHMS
-                       MOVE    "DBINSERT"          TO  MCP-FUNC
-                   WHEN    ZERO
-                       MOVE    SMCNDATE-YMD        TO  RECEUPD-UPYMD
-                       MOVE    SMCNDATE-HMS        TO  RECEUPD-UPHMS
-                       MOVE    "DBUPDATE"          TO  MCP-FUNC
-               END-EVALUATE    
-      *
-               MOVE    RECEUPD-REC         TO  MCPDATA-REC
-               MOVE    "tbl_receupd"       TO  MCP-TABLE
-               MOVE    "key"               TO  MCP-PATHNAME
-grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
-                                                   MCPDATA-REC
-                                                   SPA-AREA
-               IF      MCP-RC          NOT =   ZERO
-                   MOVE    "2"                 TO  LNK-UPD-RC
+               PERFORM 2001-RECEUPD-SEC
+               IF      LNK-UPD-RC      =   "2"
+                   CONTINUE
                ELSE
-                   MOVE    "tbl_jyurrk"        TO  MCP-TABLE
-                   MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
+      *            第三者行為で医保、第三者行為が両方存在するとき
+                   IF      FLG-DAISANSYA   =   9
+                       INITIALIZE                  RECEUPD-REC
+                       MOVE    "0"             TO  RECEUPD-HKNKBN
+                       PERFORM 2001-RECEUPD-SEC
+                   END-IF
+      *
                    PERFORM 900-JYURRK-READ-N-SEC
                END-IF
            END-PERFORM      
@@ -250,6 +339,57 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                SPA-AREA
            .
        200-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    レセプト作成管理更新処理
+      *****************************************************************
+       2001-RECEUPD-SEC         SECTION.
+      *
+           MOVE    JYURRK-HOSPNUM  TO  RECEUPD-HOSPNUM
+           MOVE    JYURRK-NYUGAIKBN
+                                       TO  RECEUPD-NYUGAIKBN
+           MOVE    JYURRK-PTID     TO  RECEUPD-PTID
+           MOVE    JYURRK-SRYKA    TO  RECEUPD-SRYKA
+           MOVE    JYURRK-SRYYMD (1:6)
+                                   TO  RECEUPD-SRYYM
+           MOVE    SPACE           TO  RECEUPD-HKNKBN2
+           MOVE    RECEUPD-REC     TO  WRK-RECEUPD-REC
+      *??
+           DISPLAY "RECEUPD-HKNKBN=" RECEUPD-HKNKBN " " RECEUPD-SRYYM
+      *??
+           PERFORM 900-RECEUPD-READ-SEC
+           IF      FLG-RECEUPD     =   1
+               MOVE    WRK-RECEUPD-REC     TO  RECEUPD-REC
+           END-IF
+      *
+           MOVE    "1"             TO  RECEUPD-ONLUPD
+      *
+           EVALUATE    FLG-RECEUPD
+               WHEN    1
+                   MOVE    LNK-UPD-TERMID      TO  RECEUPD-TERMID
+                   MOVE    LNK-UPD-OPID        TO  RECEUPD-OPID
+                   MOVE    SMCNDATE-YMD        TO  RECEUPD-CREYMD
+                   MOVE    SMCNDATE-YMD        TO  RECEUPD-UPYMD
+                   MOVE    SMCNDATE-HMS        TO  RECEUPD-UPHMS
+                   MOVE    "DBINSERT"          TO  MCP-FUNC
+               WHEN    ZERO
+                   MOVE    SMCNDATE-YMD        TO  RECEUPD-UPYMD
+                   MOVE    SMCNDATE-HMS        TO  RECEUPD-UPHMS
+                   MOVE    "DBUPDATE"          TO  MCP-FUNC
+           END-EVALUATE    
+      *
+           MOVE    RECEUPD-REC         TO  MCPDATA-REC
+           MOVE    "tbl_receupd"       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           IF      MCP-RC          NOT =   ZERO
+               MOVE    "2"                 TO  LNK-UPD-RC
+           END-IF
+           .
+       2001-RECEUPD-EXT.
            EXIT.
       *
       *****************************************************************
@@ -297,6 +437,8 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *****************************************************************
        900-JYURRK-READ-N-SEC         SECTION.
       *
+           MOVE    "tbl_jyurrk"        TO  MCP-TABLE
+           MOVE    WRK-MCP-PATHNAME    TO  MCP-PATHNAME
            MOVE    "DBFETCH"           TO  MCP-FUNC
 grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                MCPDATA-REC
@@ -304,6 +446,9 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            IF      MCP-RC              =   ZERO
                MOVE    ZERO            TO  FLG-JYURRK
                MOVE    MCPDATA-REC     TO  JYURRK-REC
+               IF      JYURRK-NYUGAIKBN    =   "1"
+                   GO  TO  900-JYURRK-READ-N-SEC
+               END-IF
            ELSE
               MOVE    1               TO  FLG-JYURRK
               INITIALIZE                  JYURRK-REC
@@ -312,3 +457,81 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
        900-JYURRK-READ-N-EXT.
            EXIT.
       *
+      *
+      *****************************************************************
+      *    レセプト管理読込
+      *****************************************************************
+       900-RECE07-INV-SEC         SECTION.
+      *
+           MOVE    "tbl_recekanri"     TO  MCP-TABLE
+           MOVE    "key7"              TO  MCP-PATHNAME
+           PERFORM 900-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "tbl_recekanri"     TO  MCP-TABLE
+               MOVE    "key7"              TO  MCP-PATHNAME
+               PERFORM 900-DBFETCH-SEC
+               IF      MCP-RC              =   ZERO
+                   MOVE    ZERO                TO  FLG-RECE07
+                   MOVE    MCPDATA-REC         TO  RECE07-REC
+               ELSE
+                   MOVE    1                   TO  FLG-RECE07
+               END-IF
+           ELSE
+               MOVE    1                   TO  FLG-RECE07
+           END-IF
+      *
+           MOVE    "tbl_recekanri"     TO  MCP-TABLE
+           MOVE    "key7"              TO  MCP-PATHNAME
+           PERFORM 900-CLOSE-SEC
+      *
+           .
+       900-RECE07-INV-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢＳＥＬＥＣＴ処理
+      *****************************************************************
+       900-DBSELECT-SEC                SECTION.
+      *
+           MOVE    "DBSELECT"          TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+           .
+       900-DBSELECT-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    ＤＢＦＥＴＣＨ処理
+      *****************************************************************
+       900-DBFETCH-SEC                SECTION.
+      *
+           MOVE    "DBFETCH"           TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+      *
+           .
+       900-DBFETCH-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブルクローズ処理
+      *****************************************************************
+       900-CLOSE-SEC               SECTION.
+      *
+           MOVE    "DBCLOSECURSOR"     TO  MCP-FUNC
+           PERFORM 900-ORCDBMAIN-SEC
+      *
+           .
+       900-CLOSE-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    テーブルアクセス処理
+      *****************************************************************
+       900-ORCDBMAIN-SEC               SECTION.
+      *
+           CALL    "ORCDBMAIN"         USING   MCPAREA
+                                               MCPDATA-REC
+                                               SPA-AREA
+           .
+      *
+       900-ORCDBMAIN-EXT.
+           EXIT.
