@@ -700,6 +700,15 @@
                END-IF
            END-IF
       *
+      *H25.5
+      * 訂正時のみ
+      *    レセプト作成管理マスタ更新処理
+           IF     (SPA-SYORIFLG        =   1    )
+             AND  (SPA-HKNCOMBINUM NOT =   "9999")
+             AND  (SPA-ERRCD           =   SPACE )
+               PERFORM 3009-RECEUPD-UPDATE-SEC
+           END-IF
+      *
            IF      SPA-ERRCD           =   SPACE
       *        主科設定
                PERFORM 1009-ORCSSYUKAMAIN-SEC
@@ -2171,10 +2180,10 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *H25.5
       *    レセプト作成管理マスタ更新処理
-           IF     (SPA-HKNCOMBINUM NOT =   "9999")
-             AND  (SPA-ERRCD           =   SPACE )
-               PERFORM 3009-RECEUPD-UPDATE-SEC
-           END-IF
+      *    IF     (SPA-HKNCOMBINUM NOT =   "9999")
+      *      AND  (SPA-ERRCD           =   SPACE )
+      *        PERFORM 3009-RECEUPD-UPDATE-SEC
+      *    END-IF
       *
            .
        1001-TEISEI-SYORI-EXT.
@@ -4703,6 +4712,12 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
        300-DELETE-SYORI-SEC             SECTION.
       *
            MOVE    ZERO                TO  FLG-NAIBUN
+      *
+      *    レセプト作成管理マスタ更新処理
+           IF      SPA-HKNCOMBINUM NOT =   "9999"
+               PERFORM 3009-RECEUPD-UPDATE-SEC
+           END-IF
+      *
       *    削除処理
       *    複数科・保険入力があった場合、すべて削除する
            IF      SPA-TEI-DENPNUM (1) NOT =   ZERO
@@ -4749,10 +4764,10 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                END-IF
            END-IF
       *
-      *    レセプト作成管理マスタ更新処理
-           IF      SPA-HKNCOMBINUM NOT =   "9999"
-               PERFORM 3009-RECEUPD-UPDATE-SEC
-           END-IF
+      **** レセプト作成管理マスタ更新処理
+      *    IF      SPA-HKNCOMBINUM NOT =   "9999"
+      *        PERFORM 3009-RECEUPD-UPDATE-SEC
+      **** END-IF
            IF      SPA-ERRCD           =   SPACE
       *        ワーク診療行為マスタ−が存在した時、削除する
                PERFORM 45002-WKSRYACT-DEL-SEC
