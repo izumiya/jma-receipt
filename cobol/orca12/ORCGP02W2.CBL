@@ -121,6 +121,7 @@
       *  04.07.02    NACL-多々納  13/10/29  第三者行為対応
       *  04.07.03    NACL-門脇    14/05/08  053児童保護と地方公費の
       *                                     保険組合せ作成
+      *  04.07.04    NACL-門脇    14/05/16  地公等の下船後の短縮制度名修正
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -923,6 +924,56 @@
                WHEN    OTHER
                    MOVE    HKN-TANSEIDONAME    TO  WRK-KEN-SEIDO
                END-EVALUATE
+      *
+               IF  WRK-KEN-HKNNUM = "031" OR "032" OR "033" OR "034"
+                   MOVE    SPACE               TO  WRK-KEN-SEIDO
+                   EVALUATE    WRK-KEN-HKNNUM
+                     WHEN    "031"
+                       EVALUATE    WRK-KEN-HOJOKBN
+                         WHEN    "2"
+                           MOVE  "国公下船後"  TO  WRK-KEN-SEIDO
+                         WHEN    "B"
+                           MOVE  "国下船高１"  TO  WRK-KEN-SEIDO
+                         WHEN    "E"
+                           MOVE  "国下船高２"  TO  WRK-KEN-SEIDO
+                         WHEN    "H"
+                           MOVE  "国下船高３"  TO  WRK-KEN-SEIDO
+                       END-EVALUATE
+                     WHEN    "032"
+                       EVALUATE    WRK-KEN-HOJOKBN
+                         WHEN    "2"
+                           MOVE  "地公下船後"  TO  WRK-KEN-SEIDO
+                         WHEN    "B"
+                           MOVE  "地下船高１"  TO  WRK-KEN-SEIDO
+                         WHEN    "E"
+                           MOVE  "地下船高２"  TO  WRK-KEN-SEIDO
+                         WHEN    "H"
+                           MOVE  "地下船高３"  TO  WRK-KEN-SEIDO
+                       END-EVALUATE
+                     WHEN    "033"
+                       EVALUATE    WRK-KEN-HOJOKBN
+                         WHEN    "2"
+                           MOVE  "警察下船後"  TO  WRK-KEN-SEIDO
+                         WHEN    "B"
+                           MOVE  "警下船高１"  TO  WRK-KEN-SEIDO
+                         WHEN    "E"
+                           MOVE  "警下船高２"  TO  WRK-KEN-SEIDO
+                         WHEN    "H"
+                           MOVE  "警下船高３"  TO  WRK-KEN-SEIDO
+                       END-EVALUATE
+                     WHEN    "034"
+                       EVALUATE    WRK-KEN-HOJOKBN
+                         WHEN    "2"
+                           MOVE  "学校下船後"  TO  WRK-KEN-SEIDO
+                         WHEN    "B"
+                           MOVE  "学下船高１"  TO  WRK-KEN-SEIDO
+                         WHEN    "E"
+                           MOVE  "学下船高２"  TO  WRK-KEN-SEIDO
+                         WHEN    "H"
+                           MOVE  "学下船高３"  TO  WRK-KEN-SEIDO
+                       END-EVALUATE
+                   END-EVALUATE
+               END-IF
            ELSE
                MOVE    HKN-TANSEIDONAME    TO  WRK-KEN-SEIDO
                EVALUATE    WRK-KEN-CONTKBN
