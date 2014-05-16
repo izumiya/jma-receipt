@@ -654,6 +654,7 @@
       *  04.07.20    NACL-門脇    14/05/07  在宅の回数記載対応
       *  04.07.21    NACL-門脇    14/05/15  船員等の下船後は、限度額認定証が
       *                                     ないものとみなす
+      *  04.07.22    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -8626,7 +8627,7 @@ grpsys     MOVE    RECE02-HOSPNUM       TO      ACCT-HOSPNUM
            MOVE    RECE02-SRYYM         TO      ACCT-SRYYM
            MOVE    SRYACCT-REC          TO      MCPDATA-REC
            MOVE    "tbl_sryacct"       TO  MCP-TABLE
-           IF      WRK-PARA-PRTKBN     =   "9"
+           IF      WRK-PARA-PRTKBN     =   "9" OR  "8"
                MOVE    "key62"             TO  WRK-SRYACCT-PATHNAME
            ELSE
                MOVE    "key32"             TO  WRK-SRYACCT-PATHNAME

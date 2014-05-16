@@ -646,6 +646,7 @@
       *                                     コメント自動記載修正
       *  04.07.24    NACL-門脇    14/05/15  船員等の下船後は、限度額認定証が
       *                                     ないものとみなす
+      *  04.07.25    NACL-藤原    14/04/22  ＥＦファイル作成対応
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -6149,7 +6150,7 @@
            MOVE    RECE62-SRYYM         TO      ACCT-SRYYM
            MOVE    SRYACCT-REC          TO      MCPDATA-REC
            MOVE    "tbl_sryacct"        TO      MCP-TABLE
-           IF      WRK-PARA-PRTKBN     =   "9"
+           IF      WRK-PARA-PRTKBN     =   "9" OR  "8"
                MOVE    "key63"             TO  WRK-SRYACCT-PATHNAME
            ELSE
                MOVE    "key33"             TO  WRK-SRYACCT-PATHNAME
