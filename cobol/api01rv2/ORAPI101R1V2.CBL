@@ -27,7 +27,8 @@
       *****************************************************************
       *  プログラム修正履歴
       * Maj/Min/Rev  修正者       日付      内容
-      *
+      * 04.07.00     NACL-多々納  14/05/16  リクエスト番号対応
+      *                                     医療機関情報取得追加
       *****************************************************************
       *
        ENVIRONMENT           DIVISION.
@@ -85,6 +86,8 @@
            03  WRK-ZZ9                 PIC ZZZ9.
       *
            03  WRK-CNT                 PIC 9(04).
+      *    リクエスト番号
+           03  WRK-REQUEST-NUMBER      PIC X(02).
       *
        01  WRK-XML-AREA.
            03  WRK-IN-DATE                PIC X(10).
@@ -108,6 +111,9 @@
       *    API XML書き込み用定義体（ドクター）
            COPY    "CPPHYSICIANV2RES.INC".
       *
+      *    API XML書き込み用定義体（医療機関情報）
+            COPY    "CPAPISYS1001V2RES.INC".
+      *
       *ver.4.7
       *    API XML読み込み共通定義
            COPY    "CPAPIV2REQ.INC".
@@ -124,6 +130,13 @@
       *
       *    診療内容情報
            COPY  "CPSK1005.INC".
+      *
+      *    医療機関情報
+           COPY  "CPSK1001.INC".
+      *
+           COPY  "CPSK1002.INC".
+      *
+           COPY  "CPSK1003.INC".
       *
            COPY    "MCPDATA.INC".
       *
@@ -205,6 +218,7 @@
            INITIALIZE                      WRK-XML-AREA
            INITIALIZE                      XML-DEPARTMENTRES
            INITIALIZE                      XML-PHYSICIANRES
+           INITIALIZE                      XML-SYSTEM1001RES
       *    更新日取得
            INITIALIZE                  ORCSMCNDATEAREA
            CALL    "ORCSMCNDATE"       USING
@@ -262,7 +276,18 @@
            MOVE    SPACE               TO  WRK-KEICD
       *
            MOVE    ZERO                TO  FLG-SYORI
-           EVALUATE    APILST5-CLASS
+      *
+      *    リクエスト番号があれば優先
+           IF      SYS01REQ-REQUEST-NUMBER >=  "01"   AND
+                                           <=  "99"
+               MOVE    SYS01REQ-REQUEST-NUMBER
+                                           TO  WRK-REQUEST-NUMBER
+           ELSE
+               MOVE    APILST5-CLASS       TO  WRK-REQUEST-NUMBER
+           END-IF
+      *
+      **** EVALUATE    APILST5-CLASS
+           EVALUATE    WRK-REQUEST-NUMBER
            WHEN    "01"
       *        診療科一覧
                MOVE    1                   TO  FLG-SYORI
@@ -272,6 +297,9 @@
            WHEN    "03"
       *        職員一覧
                MOVE    3                   TO  FLG-SYORI
+           WHEN    "04"
+      *        医療機関情報
+               MOVE    4                   TO  FLG-SYORI
            WHEN    OTHER
                MOVE    "91"                TO  WRK-ERRCD
            END-EVALUATE
@@ -282,7 +310,8 @@
       *
       *    一覧処理
            IF      WRK-ERRCD           =   SPACE
-               EVALUATE    APILST5-CLASS
+      *******  EVALUATE    APILST5-CLASS
+               EVALUATE    WRK-REQUEST-NUMBER
                WHEN    "01"
       *            診療科一覧
                    PERFORM 2002-SRYKA-LIST-SEC
@@ -292,6 +321,9 @@
                WHEN    "03"
       *            職員一覧
                    PERFORM 2004-SYOCD-LIST-SEC
+               WHEN    "04"
+      *            医療機関情報
+                   PERFORM 2005-SYS1001-LIST-SEC
                END-EVALUATE
            END-IF
       *
@@ -604,18 +636,117 @@
            EXIT.
       *
       *****************************************************************
+      *    医療機関情報編集処理
+      *****************************************************************
+       2005-SYS1001-LIST-SEC             SECTION.
+      *
+           MOVE    ZERO                TO  IDX
+      *
+           MOVE    SPACE               TO  SYS-1001-REC
+           INITIALIZE                      SYS-1001-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-1001-HOSPNUM
+           MOVE    "1001"              TO  SYS-1001-KANRICD
+           MOVE    "*"                 TO  SYS-1001-KBNCD
+           MOVE    WRK-IN-YMD          TO  SYS-1001-STYUKYMD
+           MOVE    WRK-IN-YMD          TO  SYS-1001-EDYUKYMD
+      *    システム管理検索
+           MOVE    SYS-1001-REC        TO  SYSKANRI-REC
+           PERFORM 9001-SYSKANRI-KEYREAD-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC    TO  SYS-1001-REC
+      *        県番号
+               MOVE    SYS-1001-PREFNUM
+                                       TO  SYS101RES-PREFECTURES-NUMBER
+      *        点数表区分
+               MOVE    SYS-1001-TENHYOKBN
+                                       TO  SYS101RES-POINT-LIST
+      *        医療機関コード
+               MOVE    SYS-1001-HOSPCD
+                                       TO  SYS101RES-INSTITUTION-CODE
+      *        医療機関種別
+               MOVE    SYS-1001-HOSPSBT
+                                   TO  SYS101RES-INSTITUTION-SPECIATION
+      *        医療機関ＩＤ
+               MOVE    SYS-1001-HOSPID
+                                       TO  SYS101RES-INSTITUTION-ID
+      *        医療機関名称
+               MOVE    SYS-1001-HOSPNAME
+                                   TO  SYS101RES-INSTITUTION-WHOLENAME
+      *        開設者名
+               MOVE    SYS-1001-KAISETUNAME
+                                   TO  SYS101RES-ESTABLISHER-WHOLENAME
+      *        管理者名
+               MOVE    SYS-1001-KANRINAME
+                                   TO  SYS101RES-ADMINISTRATOR-WHOLENAME
+      *
+           ELSE
+      *        対象なし
+               MOVE    "11"            TO  WRK-ERRCD
+           END-IF
+      *
+      *    連絡先情報
+           MOVE    SPACE               TO  SYS-1002-REC
+           INITIALIZE                      SYS-1002-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-1002-HOSPNUM
+           MOVE    "1002"              TO  SYS-1002-KANRICD
+           MOVE    "*"                 TO  SYS-1002-KBNCD
+           MOVE    WRK-IN-YMD          TO  SYS-1002-STYUKYMD
+           MOVE    WRK-IN-YMD          TO  SYS-1002-EDYUKYMD
+      *
+           MOVE    SYS-1002-REC        TO  SYSKANRI-REC
+           PERFORM 9001-SYSKANRI-KEYREAD-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC    TO  SYS-1002-REC
+      *        郵便番号
+               MOVE    SYS-1002-POST   TO  SYS101RES-ADDRESS-ZIPCODE
+      *        所在地
+               MOVE    SYS-1002-ADRS   TO  SYS101RES-WHOLEADDRESS
+      *        電話番号
+               MOVE    SYS-1002-TEL    TO  SYS101RES-PHONENUMBER
+      *        ＦＡＸ番号
+               MOVE    SYS-1002-FAX    TO  SYS101RES-FAXNUMBER
+           END-IF
+      *
+      *    広告
+           MOVE    SPACE               TO  SYS-1003-REC
+           INITIALIZE                      SYS-1003-REC
+           MOVE    SPA-HOSPNUM         TO  SYS-1003-HOSPNUM
+           MOVE    "1003"              TO  SYS-1003-KANRICD
+           MOVE    "*"                 TO  SYS-1003-KBNCD
+           MOVE    WRK-IN-YMD          TO  SYS-1003-STYUKYMD
+           MOVE    WRK-IN-YMD          TO  SYS-1003-EDYUKYMD
+      *
+           MOVE    SYS-1003-REC        TO  SYSKANRI-REC
+           PERFORM 9001-SYSKANRI-KEYREAD-SEC
+           IF      FLG-SYSKANRI        =   ZERO
+               MOVE    SYSKANRI-REC    TO  SYS-1003-REC
+      *        ｅメールアドレス
+               MOVE    SYS-1003-EMAIL  TO  SYS101RES-EMAIL-ADDRESS
+      *        ホームページアドレス
+               MOVE    SYS-1003-HPURL  TO  SYS101RES-HOMEPAGE-ADDRESS
+           END-IF
+           .
+       2005-SYS1001-LIST-EXT.
+           EXIT.
+      *
+      *****************************************************************
       *    XML情報書き込み処理
       *****************************************************************
        300-PTXMLMAKE-SEC               SECTION.
       *
-           IF      FLG-SYORI           =   2
-                                       OR  3
-      *        ドクター・職員一覧
-               PERFORM 3002-PHYSICIAN-MAKE-SEC
-           ELSE
-      *        診療科一覧
-               PERFORM 3001-DEPARTMENT-MAKE-SEC
-           END-IF
+           EVALUATE    FLG-SYORI
+               WHEN    1
+               WHEN    0
+      *            診療科一覧
+                   PERFORM 3001-DEPARTMENT-MAKE-SEC
+               WHEN    2
+               WHEN    3
+      *            ドクター・職員一覧
+                   PERFORM 3002-PHYSICIAN-MAKE-SEC
+               WHEN    4
+      *            医療機関情報
+                   PERFORM 3003-MEDICALINF-MAKE-SEC
+           END-EVALUATE
       *
            .
        300-PTXMLMAKE-EXT.
@@ -782,6 +913,92 @@
        3002-PHYSICIAN-MAKE-EXT.
            EXIT.
       *
+      *
+      *****************************************************************
+      *    XML情報書き込み処理（医療機関情報）
+      *****************************************************************
+       3003-MEDICALINF-MAKE-SEC               SECTION.
+      *
+           MOVE   "Patient Info"       TO  SYS101RES-RESKEY
+      *    日付・時間出力編集
+           MOVE    DEPTRES-INFORMATION-DATE
+                                       TO  SYS101RES-INFORMATION-DATE
+           MOVE    DEPTRES-INFORMATION-TIME
+                                       TO  SYS101RES-INFORMATION-TIME
+           MOVE    ZERO                TO  SYS101RES-API-RESULT
+      *    基準日 
+           MOVE    WRK-HEN-DATE        TO  SYS101RES-BASE-DATE
+      *    エラーメッセージ編集
+           IF      WRK-ERRCD           =   SPACE
+               MOVE    WRK-KEICD           TO  WRK-ERRCD
+           END-IF
+           IF      WRK-ERRCD           =   SPACE
+      *        正常終了
+               MOVE    "処理終了"          TO  SYS101RES-API-RESULT-MSG
+           ELSE
+      *        エラー・警告メッセージ
+               PERFORM 890-ERRCD-MSG-SEC
+               MOVE    WRK-ERRCD           TO  SYS101RES-API-RESULT
+               MOVE    WRK-ERRMSG          TO  SYS101RES-API-RESULT-MSG
+           END-IF
+      *
+           IF      APILST5-BODY     NOT =   LOW-VALUE
+               DISPLAY "SYS101RES-OBJECT not low_value"
+           END-IF
+      *
+           MOVE    "XMLOPEN"           TO  MCP-FUNC
+           MOVE    "xml_system1001v2res"
+                                       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    1                   TO  SYS101RES-MODE
+           MOVE    "system1001res"     TO  SYS101RES-RECORDNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       XML-SYSTEM1001RES
+                                       SPA-AREA
+           IF     (MCP-RC              =   ZERO    OR  1  )
+               CONTINUE
+           ELSE
+               DISPLAY "XMLOPEN failure = " MCP-RC
+           END-IF
+      *
+           MOVE    "XMLWRITE"          TO  MCP-FUNC
+           MOVE    "xml_system1001v2res"
+                                       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           MOVE    "system1001res"     TO  SYS101RES-RECORDNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       XML-SYSTEM1001RES
+                                       SPA-AREA
+           IF     (MCP-RC              =   ZERO    OR  1  )
+               DISPLAY "XMLWRITE OK      = " MCP-RC
+               CONTINUE
+           ELSE
+               DISPLAY "XMLWRITE failure = " MCP-RC
+           END-IF
+      *
+           MOVE    "XMLCLOSE"          TO  MCP-FUNC
+           MOVE    "xml_system1001v2res"
+                                       TO  MCP-TABLE
+           MOVE    "key"               TO  MCP-PATHNAME
+           CALL    "ORCDBMAIN"         USING
+                                       MCPAREA
+                                       XML-SYSTEM1001RES
+                                       SPA-AREA
+           IF     (MCP-RC              =   ZERO    OR  1  )
+               DISPLAY "XMLCLOSE OK   = " MCP-RC
+               MOVE    SYS101RES-OBJECT    TO  APILST5-BODY 
+               MOVE    "application/xml"   TO  APILST5-CONTENT-TYPE
+           ELSE
+               DISPLAY "XMLCLOSE failure = " MCP-RC
+               DISPLAY "patient res xml write failure "
+           END-IF
+      *
+           .
+       3003-MEDICALINF-MAKE-EXT.
+           EXIT.
+      *
       *****************************************************************
       *    日付編集処理
       *****************************************************************
@@ -875,7 +1092,9 @@
            WHEN    "90"
                MOVE    "他端末使用中"          TO  WRK-ERRMSG
            WHEN    "91"
-               MOVE    "処理区分未設定"        TO  WRK-ERRMSG
+      ****     MOVE    "処理区分未設定"        TO  WRK-ERRMSG
+               MOVE    "リクエスト番号がありません"
+                                               TO  WRK-ERRMSG
            WHEN    "97"
                MOVE    "送信内容に誤りがあります。"
                                                TO  WRK-ERRMSG
@@ -889,6 +1108,31 @@
            .
        890-ERRCD-MSG-EXT.
            EXIT.
+      *
+      *****************************************************************
+      *    システム管理読込処理
+      *****************************************************************
+       9001-SYSKANRI-KEYREAD-SEC            SECTION.
+      *
+           MOVE    SYSKANRI-REC        TO  MCPDATA-REC
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 910-DBSELECT-SEC
+           IF      MCP-RC              =   ZERO
+               MOVE    "key10"             TO  MCP-PATHNAME
+               PERFORM 900-SYSKANRI-READ-SEC
+           ELSE
+               INITIALIZE                      SYSKANRI-REC
+               MOVE    1               TO  FLG-SYSKANRI
+           END-IF
+           MOVE    "tbl_syskanri"      TO  MCP-TABLE
+           MOVE    "key10"             TO  MCP-PATHNAME
+           PERFORM 990-DBCLOSE-SEC
+      *
+           .
+       9001-SYSKANRI-KEYREAD-EXT.
+           EXIT.
+      *
       *
       *****************************************************************
       *    システム管理読込処理

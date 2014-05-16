@@ -1,0 +1,48 @@
+xml_system1001v2res {
+	context	        int;
+	object		object;
+	mode		int;
+	recordname	varchar(128);
+        system1001res {
+	Information_Date	varchar(10);
+       	Information_Time	varchar(8);
+	Api_Result		varchar(2);
+	Api_Result_Message	varchar(100);
+       	Reskey			varchar(100);
+#  指定された基準日
+	Base_Date		varchar(10);
+#  医療機関情報
+	Medical_Information	{
+#  都道府県番号
+		Prefectures_Number	varchar(2);
+#  点数表
+		Point_list		varchar(1);
+#  医療機関コード
+		Institution_Code	varchar(7);
+#  医療機関種別
+		Institution_Speciation	varchar(1);
+#  医療機関ID
+		Institution_Id		varchar(24);
+#  医療機関名称
+		Institution_WholeName	varchar(120);
+#  開設者名称
+		Establisher_WholeName	varchar(120);
+#  管理者名称
+		Administrator_WholeName	varchar(80);
+		Address_Information	{
+#  所在地
+			WholeAddress	varchar(200);
+#  郵便番号
+			Address_ZipCode	varchar(7);
+#  電話番号
+			PhoneNumber	varchar(15);
+#  FAX番号
+			FaxNumber	varchar(15);
+#  eメールアドレス
+			E_mail_Address	varchar(100);
+#  ホームページアドレス
+			Homepage_Address	varchar(100);
+    			} ;
+		};
+	};
+};

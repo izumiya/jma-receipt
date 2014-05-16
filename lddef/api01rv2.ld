@@ -100,6 +100,7 @@ db "xml2" {
  xml_hsacsimulatev2res;
  xml_incomeinfv2res;
  xml_incomeinfv2req;
+ xml_system1001v2res;
 };
 
 #include "orcadb.inc"

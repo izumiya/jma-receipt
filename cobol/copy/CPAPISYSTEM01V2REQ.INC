@@ -25,6 +25,8 @@
             02  SYS01REQ-MODE              PIC S9(9)   BINARY.
             02  SYS01REQ-RECORDNAME        PIC X(128).
             02  SYS01REQ-REGIST.
+      *       リクエスト番号
+              03  SYS01REQ-REQUEST-NUMBER  PIC X(02).
       *       基準日
               03  SYS01REQ-BASE-DATE    PIC X(10).
       *
