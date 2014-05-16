@@ -3285,7 +3285,8 @@
                    PERFORM 970-PTNYUINRRK-READ-SEC
                    IF  (FLG-PTNYUINRRK     =   ZERO)   AND
                        (PTNYUINRRK-TOKUTEI-KBN  =      "2")  AND
-                       (PTNYUINRRK-TOKUTEI-NYUIN   =   "11"  OR  "12")
+                       (PTNYUINRRK-TOKUTEI-NYUIN = "11" OR "12") AND
+                       (PTNYUINRRK-TOKU-SANTEIYOUKENKBN  =  SPACE)
       *               Àº¿À²ÊµÞÀ­´ü¼£ÎÅÉÂÅïÆþ±¡ÎÁ¤ÎÄÌ»»Æü¿ô¼èÆÀ
                       INITIALIZE               ORCSTUSANAREA
                       MOVE    SPA-HOSPNUM  TO  STUSAN-HOSPNUM
@@ -3329,7 +3330,9 @@
                                   (LNK-DAY6-KIJUN NOT =  ZERO)
                               IF  (PTNYUINRRK-TOKUTEI-KBN = "2") AND
                                   (PTNYUINRRK-TOKUTEI-NYUIN
-                                                  =   "11"  OR  "12")
+                                                =   "11"  OR  "12") AND
+                                  (PTNYUINRRK-TOKU-SANTEIYOUKENKBN
+                                                     = SPACE)
                                   MOVE   PTNYUINRRK-TENNYUYMD
                                                   TO  LNK-DAY6-KIJUN
                                   DISPLAY "LNK-DAY6-KIJUN(SEI) = "
@@ -3377,6 +3380,8 @@
                       ADD       1     TO     STUSAN-NISSU07
                       DISPLAY   "SEISHINNKA STUSAN-NISSU07 = "
                                  STUSAN-NISSU07
+                      DISPLAY   "LNK-DAY5-NISSU2 = "
+                                 LNK-DAY5-NISSU2
       *               ÄÌ»»Æü¿ô¼èÆÀ¤ÎÈæ³Ó
                       IF   STUSAN-NISSU07        <=  LNK-DAY5-NISSU2
                           MOVE    SPACE          TO  SPA-GMN-KEIKOKU
