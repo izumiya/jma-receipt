@@ -421,6 +421,8 @@
       *  04.07.12    NACL-門脇    14/03/04  平成２６年４月改正対応
       *  04.07.13    NACL-門脇    14/05/02  前期高齢者２割（低所得・低年金）の
       *                                     上限額修正
+      *  04.07.14    NACL-門脇    14/05/15  船員等の下船後は、限度額認定証が
+      *                                     ないものとみなす
       *****************************************************************
        ENVIRONMENT         DIVISION.
        CONFIGURATION       SECTION.
@@ -4194,6 +4196,18 @@
                  MOVE    "key4"             TO  MCP-PATHNAME
                  PERFORM  DB-CLOSE-SEC
                END-PERFORM
+      *
+               IF   (COMB-HKNNUM   =  "002"                )
+               AND  (COMB-HOJOKBN  =  "1" OR "2" OR "3" OR
+                                      "A" OR "B" OR "C" OR
+                                      "D" OR "E" OR "F" OR
+                                      "G" OR "H" OR "I"    )
+                    MOVE    ZERO            TO  FLG-GENBUTU70
+               END-IF
+               IF   (COMB-HKNNUM   =  "031" OR "032" OR "033" OR "034")
+               AND  (COMB-HOJOKBN  =  "2" OR "B" OR "E" OR "H"        )
+                    MOVE    ZERO            TO  FLG-GENBUTU70
+               END-IF
       *
                IF    FLG-GENBUTU70      =  ZERO
                  IF  FLG-TOKUSITU   NOT =  ZERO

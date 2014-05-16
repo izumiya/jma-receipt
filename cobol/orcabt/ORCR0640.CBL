@@ -644,6 +644,8 @@
       *                                     コメント自動記載修正
       *  04.07.23    NACL-門脇    14/05/13  超重症児（者）入院診療加算等の
       *                                     コメント自動記載修正
+      *  04.07.24    NACL-門脇    14/05/15  船員等の下船後は、限度額認定証が
+      *                                     ないものとみなす
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -24860,6 +24862,18 @@
                 MOVE    "key4"              TO  MCP-PATHNAME
                 PERFORM   900-CLOSE-SEC
            END-PERFORM
+      *
+           IF   (RECE62-HKNNUM   =  "002"                )
+           AND  (RECE62-HOJOKBN  =  "1" OR "2" OR "3" OR
+                                    "A" OR "B" OR "C" OR
+                                    "D" OR "E" OR "F" OR
+                                    "G" OR "H" OR "I"    )
+                MOVE    ZERO           TO   FLG-GENBUTU70
+           END-IF
+           IF   (RECE62-HKNNUM   =  "031" OR "032" OR "033" OR "034")
+           AND  (RECE62-HOJOKBN  =  "2" OR "B" OR "E" OR "H"        )
+                MOVE    ZERO           TO   FLG-GENBUTU70
+           END-IF
       *
            IF    FLG-GENBUTU70      =  ZERO
              IF  FLG-TOKUSITU   NOT =  ZERO
