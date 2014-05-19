@@ -32,6 +32,7 @@
                05  BD01004-SYUEDANUM       PIC 9(02).
                05  BD01004-RENNUM          PIC 9(09).
                05  BD01004-RENNUM2         PIC 9(03).
+               05  BD01004-PTID            PIC 9(10).
            03  BD01004-SKYNYUKBN           PIC X(01).
            03  BD01004-HOKENTEN            PIC S9(10).
            03  BD01004-SKYMONEY            PIC S9(10).

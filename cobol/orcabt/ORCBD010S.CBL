@@ -1004,7 +1004,7 @@
       *
            OPEN    OUTPUT          BD01004-FILE
       *
-           PERFORM 900-SYUMEI-KEY8-SEL-SEC
+           PERFORM 900-SYUMEI-KEY17-SEL-SEC
       *
            PERFORM UNTIL ( FLG-SYUMEI  NOT =   ZERO )
       *
@@ -1032,14 +1032,14 @@
                        PERFORM 20011-EDIT-SYUNOU-SEC
                    END-IF
       *
-                   PERFORM 900-SYUMEI-KEY8-FET-SEC
+                   PERFORM 900-SYUMEI-KEY17-FET-SEC
       *
                END-PERFORM
       *
            END-PERFORM
       *
            MOVE    "tbl_syumei"    TO  MCP-TABLE
-           MOVE    "key8"          TO  MCP-PATHNAME
+           MOVE    "key17"          TO  MCP-PATHNAME
            PERFORM 910-DBCLOSECURSOR-SEC
       *
       *
@@ -1409,6 +1409,7 @@
                                        TO  BD01004-SYUEDANUM
            MOVE    SBD010S02-RENNUM     (IDX-S02)
                                        TO  BD01004-RENNUM
+           MOVE    SYU-PTID            TO  BD01004-PTID
            MOVE    PTNUM-PTNUM         TO  BD01004-PTNUM
            MOVE    PTINF-NAME          TO  BD01004-NAME
            MOVE    PTINF-KANANAME      TO  BD01004-KANANAME
@@ -3060,7 +3061,7 @@
       *****************************************************************
       *    収納明細検索処理
       *****************************************************************
-       900-SYUMEI-KEY8-SEL-SEC     SECTION.
+       900-SYUMEI-KEY17-SEL-SEC     SECTION.
       *
            MOVE    ZERO            TO  FLG-SYUMEI
       *
@@ -3076,7 +3077,7 @@
            MOVE    WRK-EDDAILYKEY  TO  SMEI-EDDAILYKEY
            MOVE    SMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_syumei"    TO  MCP-TABLE
-           MOVE    "key8"          TO  MCP-PATHNAME
+           MOVE    "key17"          TO  MCP-PATHNAME
            PERFORM 910-DBSELECT-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC TO  SMEI-REC
@@ -3086,18 +3087,18 @@
            END-IF
       *
            .
-       900-SYUMEI-KEY8-SEL-EXT.
+       900-SYUMEI-KEY17-SEL-EXT.
            EXIT.
       *****************************************************************
       *    収納明細FETCH処理
       *****************************************************************
-       900-SYUMEI-KEY8-FET-SEC     SECTION.
+       900-SYUMEI-KEY17-FET-SEC     SECTION.
       *
            MOVE    ZERO            TO  FLG-SYUMEI
       *
            MOVE    SMEI-REC        TO  MCPDATA-REC
            MOVE    "tbl_syumei"    TO  MCP-TABLE
-           MOVE    "key8"          TO  MCP-PATHNAME
+           MOVE    "key17"          TO  MCP-PATHNAME
            PERFORM 910-DBFETCH-SEC
            IF    ( MCP-RC              =   ZERO )
                MOVE    MCPDATA-REC     TO  SMEI-REC
@@ -3107,7 +3108,7 @@
            END-IF
       *
            .
-       900-SYUMEI-KEY8-FET-EXT.
+       900-SYUMEI-KEY17-FET-EXT.
            EXIT.
       *****************************************************************
       *    システム管理検索処理
