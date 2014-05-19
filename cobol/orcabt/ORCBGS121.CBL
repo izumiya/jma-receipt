@@ -692,8 +692,19 @@
                                    TO  KEY-SBTRATE
       *
                    PERFORM 2201-HKNKBNNAME-EDIT-SEC
-                   MOVE    WRK-HKNKBNNAME
-                                   TO  HCGS121N-HKNKBNNAME (CNT-LINE)
+      *
+                   EVALUATE    WRK-HKNKBNNAME
+                   WHEN "光办给锐驶脱∈９∷"
+                       MOVE    "光办给锐驶脱(9)"
+                                   TO  HCGS121N-HKNKBNNAME(CNT-LINE)
+                   WHEN "光办给锐驶脱∈８∷"
+                       MOVE    "光办给锐驶脱(8)"
+                                   TO  HCGS121N-HKNKBNNAME(CNT-LINE)
+                   WHEN OTHER
+                       MOVE    WRK-HKNKBNNAME
+                                   TO  HCGS121N-HKNKBNNAME(CNT-LINE)
+                   END-EVALUATE
+      *
                END-IF
       *
                IF   (  BGSMEI-HOKEN        =   CONST-SYAHO
