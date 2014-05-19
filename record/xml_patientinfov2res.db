@@ -63,8 +63,8 @@ xml_patientinfov2res {
         	} [20];
 		Care_Information   {
 		Insurance     {
-                	InsuranceProvider_Number	varchar(08);
-                	HealthInsuredPerson_Number	varchar(06);
+                	InsuranceProvider_Number	varchar(06);
+                	HealthInsuredPerson_Number	varchar(10);
                 	Certificate_StartDate		varchar(10);
                 	Certificate_ExpiredDate		varchar(10);
 	        	} [10];

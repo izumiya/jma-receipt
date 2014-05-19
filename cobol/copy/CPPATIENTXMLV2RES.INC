@@ -147,9 +147,9 @@
       *               介護保険情報
                       05  PTRES-CARE-INSURANCE-G    OCCURS   10.
       *                   保険者番号
-                          07  PTRES-CARE-INSURANCE-NUMBER  PIC X(08).
+                          07  PTRES-CARE-INSURANCE-NUMBER  PIC X(06).
       *                   被保険者番号
-                          07  PTRES-CARE-POLICYHOLDER      PIC X(06).
+                          07  PTRES-CARE-POLICYHOLDER      PIC X(10).
       *                   有効開始日
                           07  PTRES-CARE-START-DATE        PIC X(10).
       *                   有効終了日
