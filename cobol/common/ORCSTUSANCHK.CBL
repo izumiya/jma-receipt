@@ -63,6 +63,7 @@
            03  WRK-EDYMD                   PIC X(08).
            03  WRK-NISSU1                  PIC 9(05).
            03  WRK-NISSU2                  PIC 9(05).
+           03  WRK-NISSU3                  PIC 9(05).
            03  WRK-TUSAN                   PIC 9(08).
       *
       *
@@ -213,6 +214,13 @@ grpsys*
                GO  TO  2100-ORCSTUSANCHK-CALL-EXT
            END-IF
       *
+           COMPUTE WRK-NISSU3
+               =   STUSAN-NISSU03
+      *
+           COMPUTE STUSAN-NISSU03
+               =   STUSAN-NISSU03
+               +   STUSAN-TAINREL-NISSU
+      *
            .
        2100-ORCSTUSANCHK-CALL-EXT.
            EXIT.
@@ -230,7 +238,7 @@ grpsys*
                GO  TO  2100-NYUINNISSU-EDIT-EXT
            END-IF
       *
-           COMPUTE STUSANCHK-TSUSAN    = ( STUSAN-NISSU03  -   1 )
+           COMPUTE STUSANCHK-TSUSAN    = ( WRK-NISSU3  -   1 )
                                        + WRK-NISSU2
       *
            .
@@ -258,6 +266,24 @@ grpsys*
                        COMPUTE STUSAN-RRK-NISSU (IDX1)
                            =   STUSAN-RRK-NISSU (IDX1)    +    1
                    END-IF
+      *
+                   IF   (STUSAN-RRK-TAIINYMD(IDX1)  NOT = "99999999")
+                    IF (STUSAN-RRK-NISSU (IDX1)    =   ZERO  OR  1)
+                      CONTINUE
+                    ELSE
+                     INITIALIZE                  STS-AREA-DAY
+                     INITIALIZE                  LNK-DAY5-AREA
+                     MOVE    "51"            TO  LNK-DAY5-IRAI
+                     MOVE    STUSAN-RRK-NYUINYMD (IDX1)
+                                             TO  LNK-DAY5-START
+                     MOVE    STUSAN-RRK-TAIINYMD (IDX1)
+                                             TO  LNK-DAY5-END
+                     CALL    "ORCSDAY"   USING   STS-AREA-DAY
+                                                 LNK-DAY5-AREA
+                     MOVE    LNK-DAY5-NISSU2 TO  STUSAN-RRK-NISSU(IDX1)
+                    END-IF
+                   END-IF
+      *
                    COMPUTE WRK-TUSAN
                        =   WRK-TUSAN   -   STUSAN-RRK-NISSU (IDX1)
                    IF    ( WRK-TUSAN   <   91 )
@@ -268,7 +294,8 @@ grpsys*
                        MOVE    STUSAN-RRK-NYUINYMD (IDX1)
                                                TO  LNK-DAY6-KIJUN
                        MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-                       IF    ( STUSAN-RRK-DJKBN    (IDX1)  =   SPACE )
+                       IF    ( STUSAN-RRK-DJKBN    (IDX1)
+                                               =   SPACE OR "2" )
                            COMPUTE LNK-DAY6-ZOGEN
                                =   91   -          WRK-TUSAN
                        ELSE
@@ -317,7 +344,8 @@ grpsys*
                    MOVE    STUSAN-RRK-NYUINYMD (IDX1)
                                            TO  LNK-DAY6-KIJUN
                    MOVE    "1"             TO  LNK-DAY6-ZOGENPTN
-                   IF    ( STUSAN-RRK-DJKBN    (IDX1)  =   SPACE )
+                   IF    ( STUSAN-RRK-DJKBN    (IDX1)
+                                           =   SPACE OR "2" )
                        COMPUTE LNK-DAY6-ZOGEN
                            =   180   -         WRK-TUSAN
                    ELSE
