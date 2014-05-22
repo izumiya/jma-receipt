@@ -261,6 +261,8 @@
       *  04.07.12    NACL-ÌçÏÆ    14/04/28  ±¿Æ°´ï¡¦Ç¾·ì´É¥ê¥Ï¤Î¿ÇÎÅ¥³¡¼¥É
       *                                     ÄÉ²ÃÂÐ±þ
       *  04.07.13    NACL-ÌçÏÆ    14/05/07  ºßÂð¤Î²ó¿ôµ­ºÜÂÐ±þ
+      *  04.07.14    NACL-ÌçÏÆ    14/05/22  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÃÏ¸øºÒÆÃÊÌ
+      *                                     ²Ã»»ÂÐ±þ¡ÊµþÅÔÉÜ¡Ë¡Ê¥³¡¼¥ÉÄÉ²ÃÊ¬¡Ë
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -481,6 +483,7 @@
            03  FLG-MESAIKSN-ARI                        PIC 9(01).
            03  FLG-CHIHOKATU-ARI                       PIC 9(01).
            03  FLG-SAITOKKSN-ARI                       PIC 9(01).
+           03  FLG-SAITOKKSN-ARI2                      PIC 9(01).
       *
       *    ºÆ¿ÇÎÁ´ðËÜÅÀ¤Ë´Ø¤¹¤ë¥«¥¦¥ó¥È
        01  CNT-SAISIN-AREA.
@@ -490,10 +493,10 @@
            03  CNT-MESAIKSN                            PIC 9(02).
            03  CNT-CHIHOKATU                           PIC 9(02).
            03  CNT-SAITOKKSN                           PIC 9(02).
+           03  CNT-SAITOKKSN2                          PIC 9(02).
            03  CNT-NYUYOJI                             PIC 9(02).
            03  CNT-SAISIN-DOUJITU                      PIC 9(02).
            03  CNT-SAISIN-ETC                          PIC 9(02).
-           03  CNT-KOMU-TOK                            PIC 9(02).
       *
       *    ¥«¥¦¥ó¥ÈÎÎ°è
        01  CNT-AREA.
@@ -7775,7 +7778,21 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                                CONS-DOUJITU-DEN OR
                                                CONS-DOUJITU-GAI OR
                                                CONS-DOUJITU2-GAI
-                        ADD   WK-ZAIKAISU  TO  CNT-SAISIN-DOUJITU
+                        IF   WRK-TNS-CHUKSNTUBAN(IDX3)  NOT = "0"
+                            CONTINUE
+                        ELSE
+                            ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
+                        END-IF
+                        IF  WRK-PARA-JIBAIPRTKBN = "1"
+                          IF    RECE41-KHNTEN(2)   =   ZERO
+                            MOVE WRK-TNS-TEN(IDX3) TO RECE41-KHNTEN(2)
+                          ELSE
+                            IF RECE41-KHNTEN(2) NOT = WRK-TNS-TEN(IDX3)
+                              MOVE   ZERO    TO    RECE41-KHNTEN(2)
+                              MOVE   1       TO    FLG-KHNTEN2-JI2
+                            END-IF
+                          END-IF
+                        END-IF
                         COMPUTE    RECE41-TENSU(2)   =
                                    RECE41-TENSU(2)   +
                                   (WRK-TNS-TEN(IDX3) * ACCT-ZAIKAISU)
@@ -8688,7 +8705,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                          ELSE
                            IF   FLG-COUNT-ARI  =  ZERO
                              IF   SRY-SRYCD(IDX3) = "101989030"
-                               ADD   WK-ZAIKAISU  TO   CNT-KOMU-TOK
+      *********                                  OR "101989070"
+                               CONTINUE
                              ELSE
                                ADD   WK-ZAIKAISU  TO   RECE41-KAISU(2)
                              END-IF
@@ -8705,7 +8723,8 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                                    CONS-JIKANTAI3  OR
                                                    CONS-MESAIKSN   OR
                                                    CONS-CHIHOKATU  OR
-                                                   "101989030"       )
+                                                   "101989030"     OR
+                                                   "101989070"       )
                            AND (RECE41-SRYYM   >=  "201004"          )
                              IF  SRY-SRYCD(IDX3)  =  CONS-JIKANTAI1
                                COMPUTE  CNT-JIKANTAI1 = CNT-JIKANTAI1
@@ -8759,6 +8778,16 @@ grpsys        MOVE    SPA-HOSPNUM         TO  SYS-4003-HOSPNUM
                                   ADD  WRK-TNS-TEN(IDX3)
                                                  TO  RECE41-KHNTEN(2)
                                   MOVE     1     TO  FLG-SAITOKKSN-ARI
+                               END-IF
+                             END-IF
+                             IF  SRY-SRYCD(IDX3)  =  "101989070"
+                               COMPUTE  CNT-SAITOKKSN2
+                                                      = CNT-SAITOKKSN2
+                                                      + WK-ZAIKAISU
+                               IF   FLG-SAITOKKSN-ARI2 =  ZERO
+                                  ADD  WRK-TNS-TEN(IDX3)
+                                                 TO  RECE41-KHNTEN(2)
+                                  MOVE     1     TO  FLG-SAITOKKSN-ARI2
                                END-IF
                              END-IF
                            ELSE
@@ -11092,9 +11121,23 @@ grpsys     PERFORM 900-DBSELECT-SEC
                  END-IF
                END-IF
       *
-               IF    (CNT-KOMU-TOK   NOT = ZERO)
-               AND   (RECE41-KAISU(2)    = ZERO)
-                 MOVE   CNT-KOMU-TOK     TO   RECE41-KAISU(2)
+               IF  CNT-SAITOKKSN2    NOT = ZERO
+                 IF   ((RECE41-KAISU(2)  NOT =  ZERO          ) AND
+                       (RECE41-KAISU(2)      =  CNT-SAITOKKSN2))
+                   IF   CNT-SAITOKKSN    NOT = ZERO
+                     MOVE   ZERO         TO   RECE41-KHNTEN(2)
+                   END-IF
+                 ELSE
+                     MOVE   ZERO         TO   RECE41-KHNTEN(2)
+                 END-IF
+               END-IF
+      *
+               IF  CNT-SAITOKKSN     NOT = ZERO
+                 IF   ( RECE41-KAISU(2)      =  ZERO           )
+                 OR   ((RECE41-KAISU(2)  NOT =  ZERO          ) AND
+                       (RECE41-KAISU(2)      =  CNT-SAITOKKSN2))
+                     ADD    CNT-SAITOKKSN    TO   RECE41-KAISU(2)
+                 END-IF
                END-IF
              END-IF
            END-IF
