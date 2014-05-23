@@ -655,6 +655,8 @@
       *  04.07.21    NACL-門脇    14/05/15  船員等の下船後は、限度額認定証が
       *                                     ないものとみなす
       *  04.07.22    NACL-藤原    14/04/22  ＥＦファイル作成対応
+      *  04.07.23    NACL-門脇    14/05/23  「精神科を初めて受診した日」コメント
+      *                                     の自動記載に関する修正
       *
       *  04.08.01    NACL-門脇    13/01/25  包括診療分の点検用レセプト記載対応
       *****************************************************************
@@ -968,6 +970,7 @@
            03  IDX19                                   PIC 9(03).
            03  IDX20                                   PIC 9(03).
            03  IDX21                                   PIC 9(03).
+           03  IDX22                                   PIC 9(02).
            03  IDX-SAI                                 PIC 9(03).
       *
            03  IDA                 PIC 9(04).
@@ -2204,7 +2207,7 @@
            03  CONS-BOKOHO2-COMMENT  PIC X(09)  VALUE  "840000085".
       *
       *    通院・在宅精神療法（２０歳未満）加算
-           03  CONS-TUINZAI-COMMENT  PIC X(09)  VALUE  "180020570".
+      ***  03  CONS-TUINZAI-COMMENT  PIC X(09)  VALUE  "180020570".
       *
       *    外来迅速検体検査加算
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -10886,8 +10889,26 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
               END-IF
       *       通院・在宅精神療法（２０歳未満）加算
               IF   RECE02-SRYYM      >=    "201404"
-                IF   SRY-SRYCD(IDX2)  =     CONS-TUINZAI-COMMENT
+      ***       IF   SRY-SRYCD(IDX2)  =     CONS-TUINZAI-COMMENT
+                IF    (TNS-DATAKBN       =    1 )
+                AND   (TNS-CDKBN-KBN     =   "I")
+                AND   (TNS-CDKBN-KBNNUM  =    2 )
+                AND   (RECE02-AGE        <    20)
+                  IF    (RECE02-AGE           =      19           )
+                  AND   (RECE02-BIRTHDAY(5:2) =  RECE02-SRYYM(5:2))
+                  AND   (RECE02-BIRTHDAY(7:2) NOT = "01"          )
+                    PERFORM VARYING IDX22 FROM 1 BY 1
+                             UNTIL (IDX22                      >  31)
+                              OR   (RECE04-FLG-TUINZAI-COMMENT = "1")
+                      IF   ACCT-DAY(1 IDX22)  NOT = ZERO
+                        IF   IDX22 < RECE02-BIRTHDAY(7:2)
+                          MOVE "1"    TO    RECE04-FLG-TUINZAI-COMMENT
+                        END-IF
+                      END-IF
+                    END-PERFORM
+                  ELSE
                         MOVE   "1"    TO    RECE04-FLG-TUINZAI-COMMENT
+                  END-IF
                 END-IF
               END-IF
            END-IF

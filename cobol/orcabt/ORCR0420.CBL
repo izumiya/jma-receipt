@@ -263,6 +263,8 @@
       *  04.07.13    NACL-ÌçÏÆ    14/05/07  ºßÂð¤Î²ó¿ôµ­ºÜÂÐ±þ
       *  04.07.14    NACL-ÌçÏÆ    14/05/22  ¸øÌ³ºÒ³²¡ÊÏ«ºÒ½àµò¡Ë¤ÎÃÏ¸øºÒÆÃÊÌ
       *                                     ²Ã»»ÂÐ±þ¡ÊµþÅÔÉÜ¡Ë¡Ê¥³¡¼¥ÉÄÉ²ÃÊ¬¡Ë
+      *  04.07.15    NACL-ÌçÏÆ    14/05/23  ¡ÖÀº¿À²Ê¤ò½é¤á¤Æ¼õ¿Ç¤·¤¿Æü¡×¥³¥á¥ó¥È
+      *                                     ¤Î¼«Æ°µ­ºÜ¤Ë´Ø¤¹¤ë½¤Àµ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -538,6 +540,7 @@
            03  IDX19                                   PIC 9(03).
            03  IDX20                                   PIC 9(03).
            03  IDX21                                   PIC 9(03).
+           03  IDX22                                   PIC 9(02).
       *
       *    ºÞ¾ðÊóÂàÈòÎÎ°è
        01  WK-ZAIKAISU                                 PIC S9(07).
@@ -1334,7 +1337,7 @@
            03  CONS-BOKOHO2-COMMENT  PIC X(09)  VALUE  "840000085".
       *
       *    ÄÌ±¡¡¦ºßÂðÀº¿ÀÎÅË¡¡Ê£²£°ºÐÌ¤Ëþ¡Ë²Ã»»
-           03  CONS-TUINZAI-COMMENT  PIC X(09)  VALUE  "180020570".
+      ***  03  CONS-TUINZAI-COMMENT  PIC X(09)  VALUE  "180020570".
       *
       *    ³°Íè¿×Â®¸¡ÂÎ¸¡ºº²Ã»»
            03  CONS-GAIJINKEN        PIC X(09)  VALUE  "160177770".
@@ -4242,8 +4245,26 @@ grpsys     PERFORM 900-DBSELECT-SEC
               END-IF
       *       ÄÌ±¡¡¦ºßÂðÀº¿ÀÎÅË¡¡Ê£²£°ºÐÌ¤Ëþ¡Ë²Ã»»
               IF   RECE41-SRYYM      >=    "201404"
-                IF   SRY-SRYCD(IDX2)  =     CONS-TUINZAI-COMMENT
+      ***       IF   SRY-SRYCD(IDX2)  =     CONS-TUINZAI-COMMENT
+                IF    (TNS-DATAKBN       =    1 )
+                AND   (TNS-CDKBN-KBN     =   "I")
+                AND   (TNS-CDKBN-KBNNUM  =    2 )
+                AND   (RECE41-AGE        <    20)
+                  IF    (RECE41-AGE           =      19           )
+                  AND   (RECE41-BIRTHDAY(5:2) =  RECE41-SRYYM(5:2))
+                  AND   (RECE41-BIRTHDAY(7:2) NOT = "01"          )
+                    PERFORM VARYING IDX22 FROM 1 BY 1
+                             UNTIL (IDX22                      >  31)
+                              OR   (RECE44-FLG-TUINZAI-COMMENT = "1")
+                      IF   ACCT-DAY(1 IDX22)  NOT = ZERO
+                        IF   IDX22 < RECE41-BIRTHDAY(7:2)
+                          MOVE "1"    TO    RECE44-FLG-TUINZAI-COMMENT
+                        END-IF
+                      END-IF
+                    END-PERFORM
+                  ELSE
                         MOVE   "1"    TO    RECE44-FLG-TUINZAI-COMMENT
+                  END-IF
                 END-IF
               END-IF
            END-IF
