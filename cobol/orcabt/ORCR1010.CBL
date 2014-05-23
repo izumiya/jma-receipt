@@ -2964,10 +2964,11 @@ grpsys             MOVE    SRY-HOSPNUM          TO  PTCOM-HOSPNUM
       *       ÄÌ±¡¡¦ºßÂðÀº¿ÀÎÅË¡¡Ê£²£°ºÐÌ¤Ëþ¡Ë²Ã»»
               IF   RECE100-SRYYM     >=    "201404"
       ***       IF   SRY-SRYCD(IDX2)  =     CONS-TUINZAI-COMMENT
-                IF    (TNS-DATAKBN       =    1 )
-                AND   (TNS-CDKBN-KBN     =   "I")
-                AND   (TNS-CDKBN-KBNNUM  =    2 )
-                AND   (RECE100-AGE       <    20)
+                IF    (TNS-DATAKBN             =    1 )
+                AND   (TNS-CDKBN-KBN           =   "I")
+                AND   (TNS-CDKBN-KBNNUM        =    2 )
+                AND   (TNS-CDKBN-KBNNUM-EDA    =    0 )
+                AND   (RECE100-AGE             <    20)
                   IF    (RECE100-AGE           =      19            )
                   AND   (RECE100-BIRTHDAY(5:2) =  RECE100-SRYYM(5:2))
                   AND   (RECE100-BIRTHDAY(7:2) NOT = "01"           )
