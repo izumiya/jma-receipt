@@ -16,14 +16,23 @@
       * 113-8621, Japan.
       ********************************************************************
       ******************************************************************
-      *    Ç`ÇoÇhÉäÉNÉGÉXÉgì¸â@ïaìèèÓïÒ    COPY (CPHSCONFWARDV2REQ.INC)
+      *    Ç`ÇoÇhÉäÉNÉGÉXÉgêHéñèÓïÒ 
+      *    COPY (CPHSACCTMV2REQ.INC)
       ******************************************************************
-        01  XML-HSFOODV2REQ.
-            03  HSFDREQ-CONTEXT          PIC S9(9)   BINARY.
-            03  HSFDREQ-OBJECT           PIC X(8).
-            03  HSFDREQ-MODE             PIC S9(9)   BINARY.
-            03  HSFDREQ-RECORDNAME       PIC X(128).
-      *
-            03  HSFDREQ-PRIVATE-OBJECTS.
-                05  HSFDREQ-PTNUM        PIC X(20).
-                05  HSFDREQ-SRYYM        PIC X(07).
+       01  XML-HSACCTMREQ.
+           03  HSACCTMREQ-CONTEXT            PIC S9(9)   BINARY.
+           03  HSACCTMREQ-OBJECT             PIC X(8).
+           03  HSACCTMREQ-MODE               PIC S9(9)   BINARY.
+           03  HSACCTMREQ-RECORDNAME         PIC X(128).
+           03  HSACCTMREQ-PRIVATE-OBJECTS.
+               05  HSACCTMREQ-SAVEREQ        PIC X(1).
+               05  HSACCTMREQ-REQNUM         PIC X(1).
+               05  HSACCTMREQ-PTNUM          PIC X(20).
+               05  HSACCTMREQ-NYUINYMD       PIC X(10).
+               05  HSACCTMREQ-SRYYMD         PIC X(10).
+               05  HSACCTMREQ-SKJ-AREA.
+                   07  HSACCTMREQ-SKJ-OCC    OCCURS  3.
+                       09  HSACCTMREQ-SKJTIME    PIC X(2).
+                       09  HSACCTMREQ-SKJTYPE    PIC X(1).
+                       09  HSACCTMREQ-NISSU      PIC X(50).
+               05  HSACCTMREQ-GAIHAKUKBN        PIC X(1).

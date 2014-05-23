@@ -153,14 +153,17 @@
       *    Æþ±¡ÎÁÌ¤»»ÄêÆü¼èÆÀ¥µ¥Ö
            COPY    "CPORCSNYUINDAY.INC".
       *
+      *    Æþ±¡´ðËÜ¾ðÊó¼èÆÀ¥µ¥Ö¡Ê³°ÇñÅù¡Ë
+           COPY    "CPORCSNINF03.INC".
+      *
       *    ÊÝ¸±ÁÈ¹ç¤»¥»¥Ã¥ÈÎÎ°è
            COPY    "CPORCSAPIHKN.INC".
       *
       *    API XMLÆÉ¤ß¹þ¤ßÍÑÄêµÁÂÎ
-           COPY    "CPHSFOODV2REQ.INC".
+           COPY    "CPHSMEALV2REQ.INC".
       *
       *    API XML½ñ¤­¹þ¤ßÍÑÄêµÁÂÎ
-           COPY    "CPHSFOODV2RES.INC".
+           COPY    "CPHSMEALV2RES.INC".
       *
       *ver.4.7
       *    API XMLÆÉ¤ß¹þ¤ß¶¦ÄÌÄêµÁ
@@ -257,7 +260,7 @@
       *****************************************************************
        100-INIT-SEC                SECTION.
       *
-           INITIALIZE                  XML-HSFOODRES
+           INITIALIZE                  XML-HSMEALRES
       *
       *    ¹¹¿·Æü¼èÆÀ
            INITIALIZE                  ORCSMCNDATEAREA
@@ -391,11 +394,11 @@
       *****************************************************************
        10011-SRYYM-CHECK-SEC       SECTION.
       *
-           IF    ( HSFDREQ-SRYYM   =   SPACE )
+           IF    ( HSMEALREQ-SRYYM   =   SPACE )
                MOVE    SPA-SYSYMD (1:6)
                                    TO  KEY-SRYYM
            ELSE
-               MOVE    HSFDREQ-SRYYM
+               MOVE    HSMEALREQ-SRYYM
                                    TO  WRK-DATE
                MOVE    "-01"       TO  WRK-DATE (8:3)
                PERFORM 800-SYMD-SEC
@@ -422,13 +425,13 @@
       *****************************************************************
        10011-PTNUM-CHECK-SEC       SECTION.
       *
-           IF    ( HSFDREQ-PTNUM   =   SPACE )
+           IF    ( HSMEALREQ-PTNUM   =   SPACE )
                MOVE    "02"            TO  WRK-ERRCD
                PERFORM 990-EXIT-PROGRAM-SEC
            ELSE
                INITIALIZE                  ORCSPTIDAREA
                MOVE    SPA-HOSPNUM     TO  SPTID-HOSPNUM
-               MOVE    HSFDREQ-PTNUM   TO  SPTID-PTNUM
+               MOVE    HSMEALREQ-PTNUM   TO  SPTID-PTNUM
                CALL    "ORCSPTID"      USING
                                        ORCSPTIDAREA
                                        SPA-AREA
@@ -455,445 +458,141 @@
       *****************************************************************
        200-MAIN-SEC                SECTION.
       *
-           PERFORM 2001-PTINF-EDIT-SEC
-      *
-           PERFORM 2001-NACCT-EDIT-SEC
-      *
-           PERFORM 2001-HKN-EDIT-SEC
+           PERFORM 2001-RESPONSE-EDIT-SEC
       *
            .
        200-MAIN-EXT.
            EXIT.
       *
       *****************************************************************
-      *    ´µ¼ÔÊóÊÔ½¸½èÍý
+      *    ÊÖµÑ¾ðÊóÊÔ½¸½èÍý
       *****************************************************************
-       2001-PTINF-EDIT-SEC                 SECTION.
+       2001-RESPONSE-EDIT-SEC              SECTION.
       *
-           MOVE    SPA-PTNUM           TO  HSFDRES-PTNUM
-           MOVE    PTINF-NAME          TO  HSFDRES-NAME
-           MOVE    PTINF-KANANAME      TO  HSFDRES-KANANAME
-           MOVE    PTINF-BIRTHDAY      TO  WRK-SYMD
-           PERFORM 800-DATE-SEC
-           MOVE    WRK-DATE            TO  HSFDRES-BIRTHDAY
-           MOVE    PTINF-SEX           TO  HSFDRES-SEX
+           INITIALIZE                  SNINF03-AREA
+           MOVE    KEY-SRYYM       TO  SNINF03-IN-SRYYM
+           CALL    "ORCSNINF03"    USING
+                                   SNINF03-AREA
+                                   SPA-AREA
       *
-          .
-       2001-PTINF-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    Æþ±¡²ñ·×¾ðÊóÊÔ½¸½èÍý
-      *****************************************************************
-       2001-NACCT-EDIT-SEC                 SECTION.
+           MOVE    SNINF03-PTNUM       TO  HSMEALRES-PTNUM
+           MOVE    SNINF03-NAME        TO  HSMEALRES-NAME
+           MOVE    SNINF03-KANANAME    TO  HSMEALRES-KANANAME
+           MOVE    SNINF03-BIRTHDAY    TO  HSMEALRES-BIRTHDAY
+           MOVE    SNINF03-SEX         TO  HSMEALRES-SEX
       *
-           MOVE    ZERO            TO      IDXA
-           PERFORM VARYING IDX0    FROM    SNTYMD-MAX   BY  -1
+           PERFORM VARYING IDXA    FROM    1   BY  1
                    UNTIL ( IDXA    >   5 )
-                    OR   ( IDX0    <   1)
-      *
-               IF    ( KEY-SRYYM   >=  SNTYMD-NYUINYMD (IDX0)(1:6))
-                AND  ( KEY-SRYYM   <=  SNTYMD-TAIINYMD (IDX0)(1:6))
-                   COMPUTE IDXA    =   IDXA    +   1
-                   MOVE    SNTYMD-NYUINYMD (IDX0)
-                                   TO  WRK-SYMD
-                   PERFORM 800-DATE-SEC
-                   MOVE    WRK-DATE    TO  HSFDRES-NYUINYMD (IDXA)
-      *
-                   MOVE    SNTYMD-TAIINYMD (IDX0)
-                                       TO  WRK-SYMD
-                   PERFORM 800-DATE-SEC
-                   MOVE    WRK-DATE    TO  HSFDRES-TAIINYMD (IDXA)
-               END-IF
-      *
+               MOVE    SNINF03-NYUINYMD (IDXA)
+                                       TO  HSMEALRES-NYUINYMD (IDXA)
+               MOVE    SNINF03-TAIINYMD (IDXA)
+                                       TO  HSMEALRES-TAIINYMD (IDXA)
            END-PERFORM
       *
-           MOVE    KEY-SRYYM           TO  WRK-SYMD
-           MOVE    "01"                TO  WRK-SYMD(7:2)
-           PERFORM 800-DATE-SEC
-           MOVE    WRK-DATE (1:7)      TO  HSFDRES-SRYYM
-      *
-           PERFORM 2001-SKJ-GAIHAKU-EDIT-SEC
-      *
-           MOVE    ZERO            TO  IDXA
-      *
-           INITIALIZE                  SS009-AREA
-           MOVE    "1"             TO  SS009-EXGAIHAKU
-           CALL    "ORCSS009"  USING   SS009-AREA
-                                       TCOMB-AREA
-                                       SPA-AREA
-           IF    ( SS009-RC        =   ZERO )
-               PERFORM VARYING IDXD    FROM    1   BY  1
-                       UNTIL ( IDXD    >   31 )
-                   IF    ( WRK-NYUIN-DAY (IDXD)    >   ZERO )
-                    AND  ( TCOMB-DAY     (IDXD)    >   ZERO )
-                       PERFORM 20011-NACCT-EDIT-SEC
-                   END-IF
-               END-PERFORM
-           ELSE
-               MOVE    "05"       TO  WRK-ERRCD
-               PERFORM 990-EXIT-PROGRAM-SEC
-           END-IF
-      *
-          .
-       2001-NACCT-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    Æþ±¡²ñ·×¾ðÊóÊÔ½¸½èÍý
-      *****************************************************************
-       20011-NACCT-EDIT-SEC                SECTION.
-      *
-           COMPUTE IDXA    =   IDXA    +   1
-      *
-           MOVE    IDXA            TO  WRK-CALENDAR-MAX
-      *
-           MOVE    KEY-SRYYM       TO  WRK-SRYYMD-YM
-           MOVE    IDXD            TO  WRK-SRYYMD-DD
-      *
-           MOVE    WRK-SRYYMD      TO  WRK-SYMD
-           PERFORM 800-DATE-SEC
-           MOVE    WRK-DATE        TO  HSFDRES-SRYYMD (IDXA)
-      *
-           MOVE    "¿ÇÎÅ²Ê"        TO  HSFDRES-SRYKA-LBL  (IDXA)
-           MOVE    SS009-SRYKA-DAY (IDXD)
-                                   TO  HSFDRES-SRYKA-DATA (IDXA)
-           INITIALIZE                  SYSKANRI-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
-           MOVE    "1005"          TO  SYS-KANRICD
-           MOVE    SS009-SRYKA-DAY (IDXD)
-                                   TO  SYS-KBNCD
-           MOVE    WRK-SRYYMD      TO  SYS-STYUKYMD
-                                       SYS-EDYUKYMD
-           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-           MOVE    SYSKANRI-REC    TO  SYS-1005-REC
-           MOVE    SYS-1005-SRYKANAME
-                                   TO  HSFDRES-SRYKA-NAME (IDXA)
-      *
-           MOVE    "ÉÂÅïÈÖ¹æ"      TO  HSFDRES-BTUNUM-LBL (IDXA)
-           MOVE    SS009-BRMNUM-DAY(IDXD)(1:2)
-                                   TO  HSFDRES-BTUNUM-DATA(IDXA)
-      *
-           MOVE    "ÉÂÅïÌ¾"        TO  HSFDRES-BTUNAME-LBL(IDXA)
-           INITIALIZE                  SYSKANRI-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
-           MOVE    "5001"          TO  SYS-KANRICD
-           MOVE    SS009-BRMNUM-DAY(IDXD)(1:2)
-                                   TO  SYS-KBNCD
-           MOVE    WRK-SRYYMD      TO  SYS-STYUKYMD
-                                       SYS-EDYUKYMD
-           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-           MOVE    SYSKANRI-REC    TO  SYS-5001-REC
-           MOVE    SYS-5001-BTU-NAME
-                                   TO  HSFDRES-BTUNAME-DATA (IDXA)
-      *
-           MOVE    "ÉÂ¼¼ÈÖ¹æ"      TO  HSFDRES-BRMNUM-LBL   (IDXA)
-           INITIALIZE                  SYSKANRI-REC
-           MOVE    SPA-HOSPNUM     TO  SYS-HOSPNUM
-           MOVE    "5002"          TO  SYS-KANRICD
-           MOVE    SS009-BRMNUM-DAY(IDXD)
-                                   TO  SYS-KBNCD
-           MOVE    WRK-SRYYMD      TO  SYS-STYUKYMD
-                                       SYS-EDYUKYMD
-           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-           MOVE    SYSKANRI-REC    TO  SYS-5002-REC
-           MOVE    SYS-5002-BRM-NUM
-                                   TO  HSFDRES-BRMNUM-DATA  (IDXA)
-      *
-           MOVE    SS009-HKNCOMBI-DAY (IDXD)
-                                   TO  HSFDRES-HKNCOMBI (IDXA)
-      *
-           MOVE    "³°Çñ¡¦Â¾°åÎÅµ¡´Ø¼õ¿Ç¾ðÊóÅù"
-                                   TO  HSFDRES-PTSTATUS-LBL (IDXA)
-           MOVE    TNACCT-DAY (CONST-GAIHAKU IDXD)
-                                   TO  WRK-PTSTATUS-N
-           MOVE    WRK-PTSTATUS-N  TO  HSFDRES-PTSTATUS-DATA (IDXA)
-           EVALUATE    TNACCT-DAY (CONST-GAIHAKU IDXD)
-           WHEN    ZERO
-               MOVE    "Æþ±¡Ãæ"        TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    1
-               MOVE    "³°Çñ"          TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    2
-               MOVE    "¼£ÎÅ¤Î°Ù¤Î³°Çñ"
-                                       TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    3
-               MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£·£°¡ó¸º"
-                                       TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    4
-               MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£·£°¡ó¸º"
-                                       TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    5
-               MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£³£°¡ó¸º"
-                                       TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    6
-               MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£µ£µ¡ó¸º"
-                                       TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    7
-               MOVE    "Â¾°åÎÅµ¡´Ø¼õ¿Ç£±£µ¡ó¸º"
-                                       TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    8
-               MOVE    "ÆÃÄê»þ´ÖÂà±¡¸º»»"
-                                       TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    9
-               MOVE    "ÆÃÄêÍËÆüÆþÂà±¡¸º»»"
-                                       TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           WHEN    13
-               MOVE    "ÆÃÄêÍËÆüÆþÂà±¡¸º»»¡ÜÂ¾°åÎÅµ¡´Ø¼õ¿Ç£³£°¡ó¸º"
-                                       TO  HSFDRES-PTSTATUS-NAME (IDXA)
-           END-EVALUATE
-      *
-           MOVE    "Ä«¿©"              TO  HSFDRES-SKJ-ASA-LBL   (IDXA)
-           MOVE    TNACCT-DAY (CONST-ASA IDXD)
-                                       TO  WRK-SKJ-N
-           MOVE    WRK-SKJ-N           TO  HSFDRES-SKJ-ASA-DATA  (IDXA)
-           MOVE    TNACCT-DAY (CONST-ASA IDXD)
-                                       TO  WRK-DAY
-           PERFORM 200111-SKJ-EDIT-SEC
-           MOVE    WRK-SKJ-NAME        TO  HSFDRES-SKJ-ASA-NAME  (IDXA)
-      *
-           MOVE    "Ãë¿©"              TO  HSFDRES-SKJ-HIRU-LBL  (IDXA)
-           MOVE    TNACCT-DAY (CONST-HIRU IDXD)
-                                       TO  WRK-SKJ-N
-           MOVE    WRK-SKJ-N           TO  HSFDRES-SKJ-HIRU-DATA (IDXA)
-           MOVE    TNACCT-DAY (CONST-HIRU IDXD)
-                                       TO  WRK-DAY
-           PERFORM 200111-SKJ-EDIT-SEC
-           MOVE    WRK-SKJ-NAME        TO  HSFDRES-SKJ-HIRU-NAME (IDXA)
-      *
-           MOVE    "Í¼¿©"              TO  HSFDRES-SKJ-YU-LBL   (IDXA)
-           MOVE    TNACCT-DAY (CONST-YU IDXD)
-                                       TO  WRK-SKJ-N
-           MOVE    WRK-SKJ-N           TO  HSFDRES-SKJ-YU-DATA  (IDXA)
-           MOVE    TNACCT-DAY (CONST-YU IDXD)
-                                       TO  WRK-DAY
-           PERFORM 200111-SKJ-EDIT-SEC
-           MOVE    WRK-SKJ-NAME        TO  HSFDRES-SKJ-YU-NAME  (IDXA)
-      *
-           MOVE    "¼¼ÎÁº¹³Û"          TO  HSFDRES-SAGAKU-LBL   (IDXA)
-           MOVE    "±ß"                TO  HSFDRES-SAGAKU-NAME  (IDXA)
-           INITIALIZE                      SYSKANRI-REC
-           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
-           MOVE    "5113"              TO  SYS-KANRICD
-           MOVE    SS009-SAGAKUCD-DAY (IDXD)
-                                       TO  SYS-KBNCD
-           MOVE    WRK-SRYYMD          TO  SYS-STYUKYMD
-                                           SYS-EDYUKYMD
-           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-           MOVE    SYSKANRI-REC        TO  SYS-5113-REC
-           IF    ( FLG-SYSKANRI    =   ZERO )
-               MOVE    SYS-5113-BRM-SAGAKU-NM
-                                       TO  WRK-NUM7Z
-               MOVE    WRK-NUM7Z       TO  HSFDRES-SAGAKU-DATA (IDXA)
-           ELSE
-               MOVE    ZERO            TO  WRK-NUM7Z
-               MOVE    WRK-NUM7Z       TO  HSFDRES-SAGAKU-DATA (IDXA)
-           END-IF
-      *
-          .
-       20011-NACCT-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ¿©»ö³°Çñ¾ðÊóÊÔ½¸½èÍý
-      *****************************************************************
-       2001-SKJ-GAIHAKU-EDIT-SEC       SECTION.
-      *
-           PERFORM 900-NYUINACCT-KEY51-SEL-SEC
-      *
-           PERFORM UNTIL ( FLG-NYUINACCT   NOT =   ZERO )
-      *
-               MOVE    ZERO                TO  IDXN
-      *
-               EVALUATE    NACCT-ZAISKBKBN
-               WHEN    "2"
-                   MOVE    CONST-GAIHAKU   TO  IDXN
-               WHEN    "4"
-                   EVALUATE    NACCT-SRYCDTOTAL
-                   WHEN    099999918
-                       MOVE    CONST-ASA   TO  IDXN
-                   WHEN    099999919
-                       MOVE    CONST-HIRU  TO  IDXN
-                   WHEN    099999920
-                       MOVE    CONST-YU    TO  IDXN
-                   END-EVALUATE
-               END-EVALUATE
-      *
-               IF    ( IDXN            >   ZERO )
-                   MOVE    NYUINACCT-REC   TO  TNACCT-OCC (IDXN)
-               END-IF
-      *
-               PERFORM 900-NYUINACCT-KEY51-FET-SEC
-      *
-           END-PERFORM
-      *
-           MOVE    "tbl_nyuinacct"     TO  MCP-TABLE
-           MOVE    "key51"             TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
-      *
-           MOVE    TNACCT-OCC (CONST-GAIHAKU)
-                                   TO  TGAIHAKU-AREA
-           MOVE    ZERO            TO  TNACCT-ZAIKAISU (CONST-ASA)
-                                       TNACCT-ZAIKAISU (CONST-HIRU)
-                                       TNACCT-ZAIKAISU (CONST-YU)
+           MOVE    SNINF03-SRYYM       TO  HSMEALRES-SRYYM
       *
            PERFORM VARYING IDXD    FROM    1   BY  1
                    UNTIL ( IDXD    >   31 )
       *
-               MOVE    CONST-ASA   TO  IDXN
-               PERFORM 20011-SKJ-GAIHAKU-EDIT-SEC
+               MOVE    SNINF03-SRYYMD (IDXD)
+                                   TO  HSMEALRES-SRYYMD (IDXD)
       *
-               MOVE    CONST-HIRU  TO  IDXN
-               PERFORM 20011-SKJ-GAIHAKU-EDIT-SEC
+               MOVE    SNINF03-SRYKA-LBL (IDXD)
+                                   TO  HSMEALRES-SRYKA-LBL (IDXD)
+               MOVE    SNINF03-SRYKA-DATA(IDXD)
+                                   TO  HSMEALRES-SRYKA-DATA(IDXD)
+               MOVE    SNINF03-SRYKA-NAME (IDXD)
+                                   TO  HSMEALRES-SRYKA-NAME (IDXD)
       *
-               MOVE    CONST-YU    TO  IDXN
-               PERFORM 20011-SKJ-GAIHAKU-EDIT-SEC
+               MOVE    SNINF03-BTUNUM-LBL (IDXD)
+                                   TO  HSMEALRES-BTUNUM-LBL (IDXD)
+               MOVE    SNINF03-BTUNUM-DATA (IDXD)
+                                   TO  HSMEALRES-BTUNUM-DATA (IDXD)
       *
-           END-PERFORM
+               MOVE    SNINF03-BTUNAME-LBL (IDXD)
+                                   TO  HSMEALRES-BTUNAME-LBL (IDXD)
+               MOVE    SNINF03-BTUNAME-DATA (IDXD)
+                                   TO  HSMEALRES-BTUNAME-DATA (IDXD)
       *
-          .
-       2001-SKJ-GAIHAKU-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ¿©»ö³°Çñ¾ðÊóÊÔ½¸½èÍý
-      *****************************************************************
-       20011-SKJ-GAIHAKU-EDIT-SEC          SECTION.
+               MOVE    SNINF03-BRMNUM-LBL (IDXD)
+                                   TO  HSMEALRES-BRMNUM-LBL (IDXD)
+               MOVE    SNINF03-BRMNUM-DATA (IDXD)
+                                   TO  HSMEALRES-BRMNUM-DATA (IDXD)
       *
-           IF    ( TGAIHAKU-DAY (IDXD)     =   ZERO )
-             OR  ( TGAIHAKU-DAY (IDXD)    >=   4 )
-               IF    ( TNACCT-DAY (IDXN IDXD)      >   ZERO )
-                   COMPUTE TNACCT-ZAIKAISU (IDXN)
-                       =   TNACCT-ZAIKAISU (IDXN)  +   1
-               END-IF
-           ELSE
-               MOVE    ZERO    TO  TNACCT-DAY (IDXN IDXD)
-           END-IF
+               MOVE    SNINF03-HKNCOMBI (IDXD)
+                                   TO  HSMEALRES-HKNCOMBI (IDXD)
       *
-          .
-       20011-SKJ-GAIHAKU-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ¿©»ö¾ðÊóÊÔ½¸½èÍý
-      *****************************************************************
-       200111-SKJ-EDIT-SEC                 SECTION.
+               MOVE    SNINF03-PTSTATUS-LBL (IDXD)
+                                   TO  HSMEALRES-PTSTATUS-LBL (IDXD)
+               MOVE    SNINF03-PTSTATUS-DATA (IDXD)
+                                   TO  HSMEALRES-PTSTATUS-DATA (IDXD)
+               MOVE    SNINF03-PTSTATUS-NAME (IDXD)
+                                   TO  HSMEALRES-PTSTATUS-NAME (IDXD)
       *
-           MOVE    SPACE               TO  WRK-SKJ-NAME
+               MOVE    SNINF03-SKJ-ASA-LBL (IDXD)
+                                   TO  HSMEALRES-SKJ-ASA-LBL (IDXD)
+               MOVE    SNINF03-SKJ-ASA-DATA (IDXD)
+                                   TO  HSMEALRES-SKJ-ASA-DATA (IDXD)
+               MOVE    SNINF03-SKJ-ASA-NAME (IDXD)
+                                   TO  HSMEALRES-SKJ-ASA-NAME (IDXD)
       *
-           EVALUATE    WRK-DAY
-           WHEN    ZERO
-               MOVE    "¿©»ö¤Ê¤·"      TO  WRK-SKJ-NAME
-           WHEN    1
-               MOVE    "¿©»ö¤¢¤ê"      TO  WRK-SKJ-NAME
-           WHEN    2
-               MOVE    "¿©»ö¤¢¤ê¡ÊÆÃÊÌ¿©¡Ë"
-                                       TO  WRK-SKJ-NAME
-           END-EVALUATE
+               MOVE    SNINF03-SKJ-HIRU-LBL (IDXD)
+                                   TO  HSMEALRES-SKJ-HIRU-LBL (IDXD)
+               MOVE    SNINF03-SKJ-HIRU-DATA (IDXD)
+                                   TO  HSMEALRES-SKJ-HIRU-DATA (IDXD)
+               MOVE    SNINF03-SKJ-HIRU-NAME (IDXD)
+                                   TO  HSMEALRES-SKJ-HIRU-NAME (IDXD)
       *
-          .
-       200111-SKJ-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ÊÝ¸±¾ðÊóÊÔ½¸½èÍý
-      *****************************************************************
-       2001-HKN-EDIT-SEC               SECTION.
+               MOVE    SNINF03-SKJ-YU-LBL (IDXD)
+                                   TO  HSMEALRES-SKJ-YU-LBL (IDXD)
+               MOVE    SNINF03-SKJ-YU-DATA (IDXD)
+                                   TO  HSMEALRES-SKJ-YU-DATA (IDXD)
+               MOVE    SNINF03-SKJ-YU-NAME (IDXD)
+                                   TO  HSMEALRES-SKJ-YU-NAME (IDXD)
       *
-           MOVE    ZERO                TO  IDXH
-      *
-           PERFORM VARYING IDXA    FROM    1   BY  1
-                   UNTIL ( IDXA    >   WRK-CALENDAR-MAX )
-      *
-               PERFORM VARYING IDX0    FROM    1   BY  1
-                       UNTIL ( IDX0    >   CONST-HKN-MAX )
-                        OR   ( IDXH    >=  CONST-HKN-MAX )
-      *
-                   IF    ( IDX0        >   IDXH )
-                       COMPUTE IDXH    =   IDXH    +   1
-                       MOVE    HSFDRES-HKNCOMBI (IDXA)
-                                       TO  HSFDRES-HKNCOMBI-KEY (IDXH)
-                       MOVE    CONST-HKN-MAX
-                                       TO  IDX0
-                   ELSE
-                       IF   (  HSFDRES-HKNCOMBI (IDXA)
-                                        =  HSFDRES-HKNCOMBI-KEY (IDX0))
-                           MOVE    CONST-HKN-MAX
-                                       TO  IDX0
-                       END-IF
-                   END-IF
-      *
-               END-PERFORM
+               MOVE    SNINF03-SAGAKU-LBL (IDXD)
+                                   TO  HSMEALRES-SAGAKU-LBL (IDXD)
+               MOVE    SNINF03-SAGAKU-DATA (IDXD)
+                                   TO  HSMEALRES-SAGAKU-DATA (IDXD)
+               MOVE    SNINF03-SAGAKU-NAME (IDXD)
+                                   TO  HSMEALRES-SAGAKU-NAME (IDXD)
       *
            END-PERFORM
-      *
-           MOVE    SPA-AREA    TO  TSPA-AREA
-           MOVE    SPA-SRYYMD  TO  SPA-SYSYMD
-           INITIALIZE              ORCSAPIHKNAREA
-           MOVE    "2"         TO  ORCSAPIHKN-KBN2
-           CALL    "ORCSAPIHKN"    USING
-                                   SPA-AREA
-                                   ORCSAPIHKNAREA
-           MOVE    TSPA-AREA   TO  SPA-AREA
       *
            PERFORM VARYING IDXH    FROM    1   BY  1
-                   UNTIL ( IDXH    >   CONST-HKN-MAX )
-                    OR   ( HSFDRES-HKNCOMBI-KEY (IDXH)
-                                   =   SPACE )
-               PERFORM VARYING IDXA    FROM    1   BY  1
-                       UNTIL ( IDXA    >   20 )
-                         OR  ( ORCSAPIHKN-THKNCOMBI (IDXA)
-                                       =   SPACE  )
-                   IF    ( HSFDRES-HKNCOMBI-KEY (IDXH)
-                                       =   ORCSAPIHKN-THKNCOMBI (IDXA))
-                       PERFORM 20011-HKN-EDIT-SEC
-                       MOVE    20      TO  IDXA
-                   END-IF
+                   UNTIL ( IDXH    >   10 )
+      *
+               MOVE    SNINF03-HKNCOMBI-KEY (IDXH)
+                                   TO  HSMEALRES-HKNCOMBI-KEY (IDXH)
+               MOVE    SNINF03-HKNNUM (IDXH)
+                                   TO  HSMEALRES-HKNNUM (IDXH)
+               MOVE    SNINF03-HKNJANUM (IDXH)
+                                   TO  HSMEALRES-HKNJANUM (IDXH)
+               MOVE    SNINF03-HKNJANAME (IDXH)
+                                   TO  HSMEALRES-HKNJANAME (IDXH)
+               MOVE    SNINF03-HKIGO (IDXH)
+                                   TO  HSMEALRES-HKIGO (IDXH)
+               MOVE    SNINF03-HNUM (IDXH)
+                                   TO  HSMEALRES-HNUM (IDXH)
+      *
+               PERFORM VARYING IDXK    FROM    1   BY  1
+                       UNTIL ( IDXK    >   4 )
+      *
+                   MOVE    SNINF03-KOHNUM (IDXH IDXK)
+                                   TO  HSMEALRES-KOHNUM (IDXH IDXK)
+                   MOVE    SNINF03-KOHNAME (IDXH IDXK)
+                                   TO  HSMEALRES-KOHNAME (IDXH IDXK)
+                   MOVE    SNINF03-FTNJANUM (IDXH IDXK)
+                                   TO  HSMEALRES-FTNJANUM (IDXH IDXK)
+                   MOVE    SNINF03-JKYSNUM (IDXH IDXK)
+                                   TO  HSMEALRES-JKYSNUM (IDXH IDXK)
       *
                END-PERFORM
+      *
            END-PERFORM
       *
           .
-       2001-HKN-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ÊÝ¸±¾ðÊóÊÔ½¸½èÍý
-      *****************************************************************
-       20011-HKN-EDIT-SEC              SECTION.
-      *
-      *    ÊÝ¸±¤Î¼ïÎà
-           MOVE    ORCSAPIHKN-HKNNUM (IDXA)
-                                   TO  HSFDRES-HKNNUM   (IDXH)
-      *
-      *    ÊÝ¸±¼ÔÈÖ¹æ
-           MOVE    ORCSAPIHKN-HKNJANUM (IDXA)
-                                   TO  HSFDRES-HKNJANUM (IDXH)
-      *
-      *    ÊÝ¸±¤ÎÌ¾¾Î
-           MOVE    ORCSAPIHKN-HKNNUM-NAME (IDXA)
-                                   TO  HSFDRES-HKNJANAME(IDXH)
-      *
-      *    µ­¹æ
-           MOVE    ORCSAPIHKN-KIGO  (IDXA)
-                                   TO  HSFDRES-HKIGO (IDXH)
-      *
-      *    ÈÖ¹æ
-           MOVE    ORCSAPIHKN-NUM  (IDXA)
-                                   TO  HSFDRES-HNUM  (IDXH)
-      *
-      *    ¸øÈñ¾ðÊó
-           PERFORM VARYING IDXK    FROM    1   BY  1
-                   UNTIL ( IDXK    >   4 )
-      *
-      *        ¸øÈñ¤Î¼ïÎà
-               MOVE    ORCSAPIHKN-KOHNUM (IDXA IDXK)
-                                   TO  HSFDRES-KOHNUM  (IDXH IDXK)
-      *        ¸øÈñ¤Î¼ïÎàÌ¾¾Î
-               MOVE    ORCSAPIHKN-KOHNUM-NAME (IDXA IDXK)
-                                   TO  HSFDRES-KOHNAME (IDXH IDXK)
-      *        ÉéÃ´¼ÔÈÖ¹æ
-               MOVE    ORCSAPIHKN-FTNJANUM (IDXA IDXK)
-                                   TO  HSFDRES-FTNJANUM(IDXH IDXK)
-      *        ¼õµë¼ÔÈÖ¹æ
-               MOVE    ORCSAPIHKN-JKYSNUM (IDXA IDXK)
-                                   TO  HSFDRES-JKYSNUM (IDXH IDXK)
-           END-PERFORM
-      *
-          .
-       20011-HKN-EDIT-EXT.
+       2001-RESPONSE-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    ½ªÎ»½èÍý
@@ -902,18 +601,18 @@
       *
            MOVE    SMCNDATE-YMD        TO  WRK-SYMD
            PERFORM 800-DATE-SEC
-           MOVE    WRK-DATE            TO  HSFDRES-INFORMATION-DATE
+           MOVE    WRK-DATE            TO  HSMEALRES-INFORMATION-DATE
       *
            MOVE    SMCNDATE-HMS        TO  WRK-HMS
            PERFORM 800-TIME-SEC
-           MOVE    WRK-TIME            TO  HSFDRES-INFORMATION-TIME
+           MOVE    WRK-TIME            TO  HSMEALRES-INFORMATION-TIME
       *
            IF    ( WRK-ERRCD           =   SPACE )
                MOVE    "00"            TO  WRK-ERRCD
            END-IF
            PERFORM 890-ERRCD-MSG-SEC
-           MOVE    WRK-ERRCD           TO  HSFDRES-API-RESULT
-           MOVE    WRK-ERRMSG          TO  HSFDRES-API-RESULT-MSG
+           MOVE    WRK-ERRCD           TO  HSMEALRES-API-RESULT
+           MOVE    WRK-ERRMSG          TO  HSMEALRES-API-RESULT-MSG
       *
            PERFORM 900-XML-WRITE-SEC
       *
@@ -1124,14 +823,14 @@
        9001-XML-FILTER-SEC             SECTION.
       *
            MOVE    APIREQ-PATIENTINFOREQ
-                                       TO  HSFDREQ-PRIVATE-OBJECTS
+                                       TO  HSMEALREQ-PRIVATE-OBJECTS
       *
-           IF    ( HSFDREQ-PTNUM   =   LOW-VALUE )
-               MOVE    SPACE           TO  HSFDREQ-PTNUM
+           IF    ( HSMEALREQ-PTNUM   =   LOW-VALUE )
+               MOVE    SPACE           TO  HSMEALREQ-PTNUM
            END-IF
       *
-           IF    ( HSFDREQ-SRYYM   =   LOW-VALUE )
-               MOVE    SPACE           TO  HSFDREQ-SRYYM
+           IF    ( HSMEALREQ-SRYYM   =   LOW-VALUE )
+               MOVE    SPACE           TO  HSMEALREQ-SRYYM
            END-IF
       *
            .
@@ -1157,7 +856,7 @@
                DISPLAY "XMLOPEN failure = " MCP-RC
            END-IF
       *
-           MOVE    HSFDRES-PRIVATE-OBJECTS TO  APIREQ-PATIENTINFOREQ
+           MOVE    HSMEALRES-PRIVATE-OBJECTS TO  APIREQ-PATIENTINFOREQ
            MOVE    "xml_hsmealv2res"   TO  MCP-TABLE
            MOVE    "key"                   TO  MCP-PATHNAME
            MOVE    "private_objects"       TO  APIREQ-RECORDNAME
@@ -1473,15 +1172,15 @@
       *
            MOVE    SMCNDATE-YMD        TO  WRK-SYMD
            PERFORM 800-DATE-SEC
-           MOVE    WRK-DATE            TO  HSFDRES-INFORMATION-DATE
+           MOVE    WRK-DATE            TO  HSMEALRES-INFORMATION-DATE
       *
            MOVE    SMCNDATE-HMS        TO  WRK-HMS
            PERFORM 800-TIME-SEC
-           MOVE    WRK-TIME            TO  HSFDRES-INFORMATION-TIME
+           MOVE    WRK-TIME            TO  HSMEALRES-INFORMATION-TIME
       *
            PERFORM 890-ERRCD-MSG-SEC
-           MOVE    WRK-ERRCD           TO  HSFDRES-API-RESULT
-           MOVE    WRK-ERRMSG          TO  HSFDRES-API-RESULT-MSG
+           MOVE    WRK-ERRCD           TO  HSMEALRES-API-RESULT
+           MOVE    WRK-ERRMSG          TO  HSMEALRES-API-RESULT-MSG
       *
            PERFORM 900-XML-WRITE-SEC
       *

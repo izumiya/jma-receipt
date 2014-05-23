@@ -39,3 +39,6 @@
            03  NSRYSRH-CREYMD          PIC X(08).
            03  NSRYSRH-UPYMD           PIC X(08).
            03  NSRYSRH-UPHMS           PIC X(06).
+      *    °Ê²¼ virtual
+           03  NSRYSRH-SELRRKNUM       PIC 9(03).
+           03  NSRYSRH-SELSRYYMD       PIC X(08).

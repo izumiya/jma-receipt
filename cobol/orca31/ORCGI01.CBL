@@ -1260,17 +1260,7 @@
            COPY    "LINKAREA".
       *
        01  SCRAREA.
-           COPY    "I01.INC".
-           COPY    "I02.INC".
-           COPY    "I03.INC".
-           COPY    "I04.INC".
-           COPY    "I05.INC".
-           COPY    "I06.INC".
-           COPY    "I0ERR.INC".
-           COPY    "I0ID1.INC".
-           COPY    "I0ID2.INC".
-           COPY    "I041.INC".
-      *
+           COPY    "ORCA31SCRAREA.INC".
       *
        PROCEDURE                   DIVISION    USING
                                                MCPAREA
@@ -9501,13 +9491,9 @@
                GO  TO  4801-PTNYUINRRK-UPD-EXT
            END-IF
       *
-           IF    ( SPA-GMN-I01-SYORIKBN-CD =   "03" )
-               CONTINUE
-           ELSE
-               PERFORM 4801-ORCSS010-SEC
-               IF    ( SPA-ERRCD       NOT =   SPACE )
-                   GO  TO  4801-PTNYUINRRK-UPD-EXT
-               END-IF
+           PERFORM 4801-ORCSS010-SEC
+           IF    ( SPA-ERRCD       NOT =   SPACE )
+               GO  TO  4801-PTNYUINRRK-UPD-EXT
            END-IF
       *
       *    前回患者情報を設定

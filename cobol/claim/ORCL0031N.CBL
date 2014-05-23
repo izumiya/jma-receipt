@@ -125,6 +125,7 @@
       *****************************************************************
       *
            COPY    "CPSYSKANRI.INC".
+           COPY    "CPSK1010.INC".
            COPY    "CPSK5013.INC".
            COPY    "CPSK5113.INC".
       *
@@ -143,6 +144,8 @@
       *****************************************************************
       *    サブプロ用　領域
       *****************************************************************
+      *
+           COPY    "CPORCSCOMMON.INC".
       *
       *    数字変換領域
            COPY    "CPORCSNUM.INC".
@@ -221,6 +224,15 @@
            INITIALIZE                  SPA-AREA
       *
            MOVE    SCL31N-HOSPNUM  TO  SPA-HOSPNUM
+      *
+           INITIALIZE                  SYS-1010-REC
+           INITIALIZE                  ORCSCOMMONAREA
+           MOVE    "M00"               TO  ORCSCOMMON-PG
+           CALL    "ORCSCOMMON"        USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSCOMMONAREA
+                                       SYS-1010-REC
       *
            MOVE    ZERO            TO  FLG-END
            MOVE    ZERO            TO  WRK-ORDERNUM

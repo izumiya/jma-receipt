@@ -185,4 +185,5 @@ db	{
 	tbl_ptcare_nintei;
 	tbl_hknjainf_care;
 	tbl_efout;
+	tbl_nyuincdchg;
 };

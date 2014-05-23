@@ -43,7 +43,18 @@
                05  SODR-OPID               PIC X(16).
                05  SODR-UPYMD              PIC X(08).
                05  SODR-UPHMS              PIC X(06).
+               05  SODR-KHNSRYCD           PIC X(09).
+      *        呼び出し元 0:CLAIM/1:API:/2:画面
+               05  SODR-SRCKBN             PIC X(01).
            03  SODR-OT.
+               05  SODR-RRKNUM             PIC 9(03).
+               05  SODR-RRKEDANUM          PIC 9(03).
+               05  SODR-SHONUM             PIC 9(03).
+               05  SODR-SKYSTYMD           PIC X(08).
+               05  SODR-DENPNUM-MAX        PIC 9(03).
+               05  SODR-DENPNUM-G.
+                   07  SODR-DENPNUM-OCC    OCCURS  10.
+                       09  SODR-DENPNUM    PIC 9(07).
                05  SODR-ERRFLG             PIC 9(01).
                05  SODR-ERRCD              PIC X(04).
                05  SODR-DIALOG             PIC 9(02).

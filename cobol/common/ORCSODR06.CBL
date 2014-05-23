@@ -104,6 +104,7 @@
            03  WRK-DIALOG              PIC 9(02).
            03  WRK-NACCT-SRYYM         PIC X(06).
            03  WRK-NYUKBN              PIC X(02).
+           03  WRK-MCP-WINDOW          PIC X(64).
       *
        01  ITEM-AREA.
            03  ITEM-NYUKBN             PIC X(02).
@@ -120,16 +121,21 @@
            03  ITEM-NYUINKA            PIC X(02).
            03  ITEM-HKNCOMBI           PIC 9(04).
       *
+      *
        01  ERRCD-AREA.
-           03  ERRCD-ITEM              PIC X(04).
+           03  ERRCD-ITEM-G.
+               05  ERRCD-ITEM          PIC X(04).
+               05  ERRCD-ORDER         PIC X(04).
            03  ERRCD-ERRCD             PIC X(04).
-           03  ERRCD-ORDER             PIC X(04).
       *
        01  CONST-AREA.
            03  CONST-ITEMNUM-MAX               PIC 9(05)   VALUE 30.
       *
       *    入院CLAIM項目IDコピー句
            COPY    "CPNCLAIMID.INC".
+      *
+      *    ORDERIDコピー句
+           COPY    "CPNORDERID.INC".
       *
       *    患者入院履歴退避
        01  TRRK-REC.
@@ -209,6 +215,9 @@
            COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                        BY         //LNK-PTNYUINRRK-//.
       *
+      *    排他制御
+           COPY    "CPORCSLOCK.INC".
+      *
            COPY    "MCPDATA.INC".
            COPY    "MCPAREA".
       *
@@ -263,6 +272,10 @@
            INITIALIZE                  TRRK-REC
            INITIALIZE                  SODR-OT
       *
+           IF    ( SODR-SRCKBN     =   "1" OR "2" )
+               PERFORM 990-LOCK-CHK-SEC
+           END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -272,9 +285,13 @@
       *****************************************************************
        200-MAIN-SEC                    SECTION.
       *
-           PERFORM 2001-INPUT-CHK-SEC
+           IF    ( ERRCD-ORDER  =   SPACE )
+            AND  ( ERRCD-ITEM   =   SPACE )
+               PERFORM 2001-INPUT-CHK-SEC
+           END-IF
       *
-           IF    ( ERRCD-ITEM   =   SPACE )
+           IF    ( ERRCD-ORDER  =   SPACE )
+            AND  ( ERRCD-ITEM   =   SPACE )
                PERFORM 2002-KANREN-CHK-SEC
            END-IF
       *
@@ -726,39 +743,44 @@
       *****************************************************************
        20021-NYUKBN-CHK-SEC            SECTION.
       *
-           IF    ( ITEM-NYUKBN     =   SPACE )
-               MOVE    "0102"          TO  ERRCD-ORDER
-           ELSE
-               MOVE    SPACE           TO  WRK-NYUKBN
-               EVALUATE    ITEM-TOKNYUIN-KBN
-               WHEN    SPACE
-                   MOVE    "01"        TO  WRK-NYUKBN
-               WHEN    "1"
-                   MOVE    "02"        TO  WRK-NYUKBN
-               WHEN    "2"
-                   MOVE    "02"        TO  WRK-NYUKBN
-               WHEN    "3"
-                   MOVE    "5111"      TO  WRK-SYS-KANRICD
-                   MOVE    ITEM-TOKNYUIN-NYUIN
-                                       TO  WRK-SYS-KBNCD
-                   PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-                   MOVE    MCPDATA-REC TO  SYS-5111-REC
-                   IF    ( SYS-5111-BRM-NYUINRYOKBN
-                                           =   "03" OR "05" OR "06" )
-                       MOVE    "01"    TO  WRK-NYUKBN
-                   ELSE
-                       MOVE    "02"    TO  WRK-NYUKBN
-                   END-IF
-               END-EVALUATE
+           MOVE    SPACE           TO  WRK-NYUKBN
+           EVALUATE    ITEM-TOKNYUIN-KBN
+           WHEN    SPACE
+               MOVE    "01"        TO  WRK-NYUKBN
+           WHEN    "1"
+               MOVE    "02"        TO  WRK-NYUKBN
+           WHEN    "2"
+               IF    ( ITEM-TOKNYUIN-NYUIN
+                       =   "35" OR "36" OR "37"
+                        OR "38" OR "39"OR "40" )
+                   MOVE    "01"    TO  WRK-NYUKBN
+               ELSE
+                   MOVE    "02"    TO  WRK-NYUKBN
+               END-IF
+           WHEN    "3"
+               MOVE    "5111"      TO  WRK-SYS-KANRICD
+               MOVE    ITEM-TOKNYUIN-NYUIN
+                                   TO  WRK-SYS-KBNCD
+               PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+               MOVE    MCPDATA-REC TO  SYS-5111-REC
+               IF    ( SYS-5111-BRM-NYUINRYOKBN
+                                       =   "03" OR "05" OR "06" )
+                   MOVE    "01"    TO  WRK-NYUKBN
+               ELSE
+                   MOVE    "02"    TO  WRK-NYUKBN
+               END-IF
+           END-EVALUATE
       *
+           IF    ( ITEM-NYUKBN     =   SPACE )
+               MOVE    WRK-NYUKBN  TO  ITEM-NYUKBN
+           ELSE
                IF    ( ITEM-NYUKBN     NOT =   WRK-NYUKBN )
                    IF    ( ITEM-NYUKBN     =   "01" )
-                       MOVE    "0113"      TO  ERRCD-ORDER
+                       MOVE    "0113"  TO  ERRCD-ORDER
                    ELSE
-                       MOVE    "0120"      TO  ERRCD-ORDER
+                       MOVE    "0120"  TO  ERRCD-ORDER
                    END-IF
                END-IF
-      *
            END-IF
       *
            .
@@ -1217,7 +1239,8 @@
        2101-ORCSODRNACCT-CALL-SEC      SECTION.
       *
            INITIALIZE                  SODRNACCT-AREA
-           MOVE    SODR-ORDERID    TO  SODRNACCT-ORDERID
+           MOVE    NORDERID-IDOBTUID
+                                   TO  SODRNACCT-ORDERID
            MOVE    SODR-OPID       TO  SODRNACCT-OPID
            MOVE    SODR-UPYMD      TO  SODRNACCT-UPYMD
            MOVE    SODR-UPHMS      TO  SODRNACCT-UPHMS
@@ -1316,6 +1339,21 @@
            MOVE    ERRCD-ORDER     TO  SODR-ERRCD
       *
            MOVE    FLG-END         TO  SODR-RC
+      *
+           IF    ( SODR-RC         =   ZERO )
+            AND  ( SODR-ERRFLG     =   ZERO )
+               MOVE    TRRK-RRKNUM TO  SODR-RRKNUM
+               MOVE    TRRK-RRKEDANUM
+                                   TO  SODR-RRKEDANUM
+               MOVE    TRRK-SHONUM TO  SODR-SHONUM
+           END-IF
+      *
+           IF    ( FLG-END         NOT =   ZERO )
+               MOVE    "tbl_ptnyuinrrk"
+                                   TO  MCP-TABLE
+               MOVE    "abort"     TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+           END-IF
       *
            .
        300-END-EXT.
@@ -1769,3 +1807,37 @@
       *
        910-DBDELETE-EXT.
            EXIT.
+      *****************************************************************
+      *    排他制御処理（チェックのみ）
+      *****************************************************************
+       990-LOCK-CHK-SEC                SECTION.
+      *
+           MOVE    MCP-WINDOW          TO  WRK-MCP-WINDOW
+      *
+      *    排他制御処理
+           MOVE    "I01"               TO  SPA-MOTOPG
+                                           MCP-WINDOW
+           MOVE    1                   TO  SLOCK-MODE
+           MOVE    SODR-PTID           TO  SLOCK-PTID
+           CALL    "ORCSLOCK"          USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+           IF    ( SLOCK-RETURN    NOT =   ZERO )
+               MOVE    "9999"          TO  ERRCD-ORDER
+           END-IF
+      *
+      *    排他制御解除処理
+           MOVE    ZERO                TO  SLOCK-PTID
+           MOVE    3                   TO  SLOCK-MODE
+           CALL    "ORCSLOCK"          USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+      *
+           MOVE    WRK-MCP-WINDOW      TO  MCP-WINDOW
+      *
+           .
+       990-LOCK-CHK-EXT.
+           EXIT.
+      *

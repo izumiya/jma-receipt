@@ -90,49 +90,10 @@
            03  WRK-SRYYMD.
                05  WRK-SRYYMD-YM       PIC X(06).
                05  WRK-SRYYMD-DD       PIC 9(02).
-           03  WRK-SKYINF-KBN          PIC X(01).
-           03  WRK-KINGAKU             PIC S9(10).
-           03  WRK-KINGAKUM9           PIC ---------9.
-           03  WRK-KINGAKUMM           PIC ----------.
       *
        01  KEY-AREA.
            03  KEY-TAIINYMD            PIC X(08).
            03  KEY-SKYSTYMD            PIC X(08).
-      *
-       01  TSYU-AREA.
-         02  TSYU-OCC                  OCCURS  10.
-           COPY  "CPSYUNOU.INC"        REPLACING   //SYU-//
-                                       BY          //TSYU-//.
-      *
-       01  TTLSYU-AREA.
-         02  TTLSYU-OCC                OCCURS  3.
-           COPY  "CPSYUNOU.INC"        REPLACING   //SYU-//
-                                       BY          //TTLSYU-//.
-      *
-      *    ÀÁµáÅÀ¿ôÌ¾¾Î
-       01  TBL-HKNTEN-MEI-AREA.
-           03  FILLER              PIC X(30)   VALUE   "½é¡¦ºÆ¿ÇÎÁ".
-           03  FILLER              PIC X(30)   VALUE   "°å³Ø´ÉÍýÅù".
-           03  FILLER              PIC X(30)   VALUE   "ºßÂðÎÅÍÜ".
-           03  FILLER              PIC X(30)   VALUE   "ÅêÌô".
-           03  FILLER              PIC X(30)   VALUE   "Ãí¼Í".
-           03  FILLER              PIC X(30)   VALUE   "½èÃÖ".
-           03  FILLER              PIC X(30)   VALUE   "¼ê½Ñ".
-           03  FILLER              PIC X(30)   VALUE   "Ëã¿ì".
-           03  FILLER              PIC X(30)   VALUE   "¸¡ºº".
-           03  FILLER              PIC X(30)   VALUE   "²èÁü¿ÇÃÇ".
-           03  FILLER              PIC X(30)   VALUE   "¥ê¥Ï¥Ó¥ê".
-           03  FILLER              PIC X(30)   VALUE   "Àº¿À²ÊÀìÌç".
-           03  FILLER              PIC X(30)   VALUE   "Êü¼ÍÀþ¼£ÎÅ".
-           03  FILLER              PIC X(30)   VALUE   "ÉÂÍý¿ÇÃÇ".
-           03  FILLER              PIC X(30)   VALUE   "Æþ±¡ÎÁ".
-           03  FILLER              PIC X(30)   VALUE   "ÎÅÍÜÃ´Åö¼êÅö".
-       01  TBL-HKNTEN-MEI-RES      REDEFINES   TBL-HKNTEN-MEI-AREA.
-           03  TBL-HKNTEN-MEI      PIC X(30)   OCCURS   16.
-      *
-       01  CONST-AREA.
-           03  CONST-H190401           PIC X(08)   VALUE   "20070401".
-           03  CONST-JIHI-MAX          PIC 9(03)   VALUE   10.
       *
            COPY    "COMMON-SPA"        REPLACING   //SPA-//
                                        BY          //TSPA-//.
@@ -159,6 +120,9 @@
       *
       *    ÊÝ¸±ÁÈ¹ç¤»¥»¥Ã¥ÈÎÎ°è
            COPY    "CPORCSAPIHKN.INC".
+      *
+      *    ÀÁµá¾ðÊóÊÔ½¸¥µ¥Ö
+           COPY    "CPORCSNINF02.INC".
       *
       *    ÉéÃ´¶â·×»»¥µ¥Ö
        01  LNK-ORCS02-REC.
@@ -466,8 +430,6 @@
       *
            PERFORM 2001-ORCSNYUFTN-SEC
       *
-           PERFORM 2001-TSYU-EDIT-SEC
-      *
            PERFORM 2001-SYUNOU-EDIT-SEC
       *
            .
@@ -525,11 +487,6 @@
            ELSE
                MOVE    "8"         TO  LNK-S02-SYORI-KBN
            END-IF
-           DISPLAY "LNK-S02-HOSPNUM   [" LNK-S02-HOSPNUM   "]"
-           DISPLAY "LNK-S02-NYUGAIKBN [" LNK-S02-NYUGAIKBN "]"
-           DISPLAY "LNK-S02-PTID      [" LNK-S02-PTID      "]"
-           DISPLAY "LNK-S02-SKYSTYMD  [" LNK-S02-SKYSTYMD  "]"
-           DISPLAY "LNK-S02-SKYEDYMD  [" LNK-S02-SKYEDYMD  "]"
            CALL    "ORCSNYUFTN"    USING
                                    SPA-AREA
                                    LNK-ORCS02-REC
@@ -560,503 +517,95 @@
        2001-ORCSNYUFTN-EXT.
            EXIT.
       *****************************************************************
-      *    ¼ýÇ¼ÂàÈòÎÎ°èÊÔ½¸½èÍý
-      *****************************************************************
-       2001-TSYU-EDIT-SEC              SECTION.
-      *
-           INITIALIZE                  TSYU-AREA
-                                       TTLSYU-AREA
-      *
-           PERFORM VARYING IDXS    FROM    1   BY  1
-                   UNTIL ( IDXS    >   10 )
-                    OR   ( LNK-SYU-SKYSTYMD (IDXS) =   SPACE )
-      *
-               MOVE    LNK-SYUNOU-REC (IDXS)
-                                   TO  TSYU-OCC (IDXS)
-      *
-               MOVE    ZERO        TO  TSYU-DENPNUM     (IDXS)
-                                       TSYU-GRP-DENPNUM (IDXS)
-      *
-               IF    ( IDXS        >=  10 )
-                OR   ( LNK-SYU-SKYSTYMD (IDXS + 1) =   SPACE )
-                OR   ( LNK-SYU-SKYSTYMD (IDXS + 1)
-                               NOT =   TSYU-SKYSTYMD (IDXS))
-                   IF    ( TSYU-SKYSTYMD (IDXS)    =   KEY-SKYSTYMD )
-                       MOVE    1   TO  TSYU-DENPNUM (IDXS)
-                   ELSE
-                       MOVE    2   TO  TSYU-DENPNUM (IDXS)
-                   END-IF
-                   IF    ( IDXS        >=  10 )
-                    OR   ( LNK-SYU-SKYSTYMD (IDXS + 1) =   SPACE )
-                       MOVE    3   TO  TSYU-GRP-DENPNUM (IDXS)
-                   END-IF
-               END-IF
-      *
-               IF    ( TSYU-HKNTEKKBN (IDXS)   =   "1" )
-                   MOVE    TSYU-KOH-FTN (IDXS)
-                                   TO  TSYU-HKNTEKMONEY (IDXS)
-                   MOVE    ZERO    TO  TSYU-KOH-FTN     (IDXS)
-               END-IF
-      *
-      *
-               IF    ( TSYU-SKYSTYMD (IDXS)       =   KEY-SKYSTYMD )
-                   MOVE    1      TO   IDXT
-                   PERFORM 20011-TTLSYU-EDIT-SEC
-                   MOVE    3      TO   IDXT
-                   PERFORM 20011-TTLSYU-EDIT-SEC
-               ELSE
-                   MOVE    2      TO   IDXT
-                   PERFORM 20011-TTLSYU-EDIT-SEC
-                   MOVE    3      TO   IDXT
-                   PERFORM 20011-TTLSYU-EDIT-SEC
-               END-IF
-      *
-           END-PERFORM
-      *
-           .
-       2001-TSYU-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ¼ýÇ¼¹ç·×ÎÎ°èÊÔ½¸½èÍý
-      *****************************************************************
-       20011-TTLSYU-EDIT-SEC           SECTION.
-      *
-           MOVE    TSYU-OCC (IDXS)     TO  SYUNOU-REC
-      *
-           IF    ( TTLSYU-SKYSTYMD (IDXT)
-                                       =   SPACE )
-            OR   ( TTLSYU-SKYSTYMD (IDXT)
-                                   >   SYU-SKYSTYMD )
-               MOVE    SYU-SKYSTYMD    TO  TTLSYU-SKYSTYMD (IDXT)
-           END-IF
-      *
-           IF    ( TTLSYU-SKYEDYMD (IDXT)
-                                       =   SPACE )
-            OR   ( TTLSYU-SKYEDYMD (IDXT)
-                                   <   SYU-SKYEDYMD )
-               MOVE    SYU-SKYEDYMD    TO  TTLSYU-SKYEDYMD (IDXT)
-           END-IF
-      *
-           COMPUTE TSYU-DENPLASTNUM (IDXT)
-               =   TSYU-DENPLASTNUM (IDXT)
-               +   1
-      *
-      *    ÊÝ¸±ÎÁ
-           PERFORM VARYING     IDX1   FROM    1   BY  1
-                   UNTIL       IDX1   >   17
-      *
-               COMPUTE TTLSYU-HKNTEN (IDXT IDX1)
-                   =   TTLSYU-HKNTEN (IDXT IDX1)
-                   +   SYU-HKNTEN (IDX1)
-      *
-               COMPUTE TTLSYU-TGMONEY   (IDXT IDX1)
-                   =   TTLSYU-TGMONEY   (IDXT IDX1)
-                   +   SYU-TGMONEY (IDX1)
-      *
-               COMPUTE TTLSYU-TGMONEY-TAX (IDXT IDX1)
-                   =   TTLSYU-TGMONEY-TAX (IDXT IDX1)
-                   +   SYU-TGMONEY-TAX (IDX1)
-           END-PERFORM
-      *
-      *    ÊÝ¸±Å¬ÍÑ¶â³Û
-           COMPUTE TTLSYU-HKNTEKMONEY   (IDXT)
-               =   TTLSYU-HKNTEKMONEY   (IDXT)
-               +   SYU-HKNTEKMONEY
-      *
-      *    Ï·¿Í°ìÉôÉéÃ´¶â
-           COMPUTE TTLSYU-RJN-FTN    (IDXT)
-               =   TTLSYU-RJN-FTN    (IDXT)
-               +   SYU-RJN-FTN
-      *
-      *    ¸øÈñ°ìÉôÉéÃ´¶â
-           COMPUTE TTLSYU-KOH-FTN    (IDXT)
-               =   TTLSYU-KOH-FTN    (IDXT)
-               +   SYU-KOH-FTN
-      *
-      *    ¼«Èñ
-           PERFORM VARYING IDXJ    FROM    1   BY  1
-                   UNTIL ( IDXJ    >   CONST-JIHI-MAX )
-      *
-               COMPUTE TTLSYU-JIHI-TAXNASI (IDXT IDXJ)
-                   =   TTLSYU-JIHI-TAXNASI (IDXT IDXJ)
-                   +   SYU-JIHI-TAXNASI(IDXJ)
-      *
-               COMPUTE TTLSYU-JIHI-TAXARI  (IDXT IDXJ)
-                   =   TTLSYU-JIHI-TAXARI  (IDXT IDXJ)
-                   +   SYU-JIHI-TAXARI (IDXJ)
-      *
-           END-PERFORM
-      *
-      *    ¼«Èñ·×
-           COMPUTE TTLSYU-JIHI-TOTAL   (IDXT)
-               =   TTLSYU-JIHI-TOTAL   (IDXT)
-               +   SYU-JIHI-TOTAL
-      *
-      *    ¼«Èñ·×¡Ê¾ÃÈñÀÇ¤¢¤ê¡Ë
-           COMPUTE TTLSYU-JIHI-TOTAL-TAX (IDXT)
-               =   TTLSYU-JIHI-TOTAL-TAX (IDXT)
-               +   SYU-JIHI-TOTAL-TAX
-      *
-      *    ¼«Èñ¾ÃÈñÀÇ
-           COMPUTE TTLSYU-JIHI-TAX  (IDXT)
-               =   TTLSYU-JIHI-TAX  (IDXT)
-               +   SYU-JIHI-TAX
-      *
-      *    Ï«ºÒ½é¿Ç
-           COMPUTE TTLSYU-RSISHOSHIN-MONEY (IDXT)
-               =   TTLSYU-RSISHOSHIN-MONEY (IDXT)
-               +   SYU-RSISHOSHIN-MONEY
-      *
-      *    Ï«ºÒºÆ¿Ç
-           COMPUTE TTLSYU-RSISAISHIN-MONEY (IDXT)
-               =   TTLSYU-RSISAISHIN-MONEY (IDXT)
-               +   SYU-RSISAISHIN-MONEY
-      *
-      *    Ï«ºÒ»ØÆ³
-           COMPUTE TTLSYU-RSISDO-MONEY  (IDXT)
-               =   TTLSYU-RSISDO-MONEY  (IDXT)
-               +   SYU-RSISDO-MONEY
-      *
-      *    Ï«ºÒ¤½¤ÎÂ¾
-           COMPUTE TTLSYU-RSIETC-MONEY (IDXT)
-               =   TTLSYU-RSIETC-MONEY (IDXT)
-               +   SYU-RSIETC-MONEY
-      *
-      *    ¿©»öÎÅÍÜÈñ¡ÊÊÝ¸±¡Ë
-           COMPUTE TTLSYU-RYOYOHI-SKJ (IDXT)
-               =   TTLSYU-RYOYOHI-SKJ (IDXT)
-               +   SYU-RYOYOHI-SKJ
-      *
-      *    ¿©»öÉéÃ´³Û¡ÊÊÝ¸±¡§¼«¸ÊÉéÃ´¡Ë
-           COMPUTE TTLSYU-SKYMONEY-SKJ (IDXT)
-               =   TTLSYU-SKYMONEY-SKJ (IDXT)
-               +   SYU-SKYMONEY-SKJ
-      *
-      *    ¿©»öÉéÃ´³Û¡ÊÊÝ¸±¡§¼«¸ÊÉéÃ´¾ÃÈñÀÇ¡Ë
-           COMPUTE TTLSYU-SKYMONEY-SKJ-TAX (IDXT)
-               =   TTLSYU-SKYMONEY-SKJ-TAX (IDXT)
-               +   SYU-SKYMONEY-SKJ-TAX
-      *
-      *    ¿©»öÉéÃ´³Û¡ÊÊÝ¸±¡§¼«¸ÊÉéÃ´¹ç·×¡Ë
-           COMPUTE TTLSYU-SKYMONEY-SKJ-KEI (IDXT)
-               =   TTLSYU-SKYMONEY-SKJ-KEI (IDXT)
-               +   SYU-SKYMONEY-SKJ-KEI
-      *
-      *    ¿©»öÎÅÍÜÈñ¡Ê¼«Èñ¡Ë
-           COMPUTE TTLSYU-RYOYOHI-SKJ-JIHI (IDXT)
-               =   TTLSYU-RYOYOHI-SKJ-JIHI (IDXT)
-               +   SYU-RYOYOHI-SKJ-JIHI
-      *
-      *    ¿©»öÉéÃ´³Û¡Ê¼«Èñ¡§¼«¸ÊÉéÃ´¡Ë
-           COMPUTE TTLSYU-SKYMONEY-SKJ-JIHI (IDXT)
-               =   TTLSYU-SKYMONEY-SKJ-JIHI (IDXT)
-               +   SYU-SKYMONEY-SKJ-JIHI
-      *
-      *    ¿©»öÉéÃ´³Û¡Ê¼«Èñ¡§¼«¸ÊÉéÃ´¾ÃÈñÀÇ¡Ë
-           COMPUTE TTLSYU-SKYMONEY-SKJ-JIHI-TAX  (IDXT)
-               =   TTLSYU-SKYMONEY-SKJ-JIHI-TAX  (IDXT)
-               +   SYU-SKYMONEY-SKJ-JIHI-TAX
-      *
-      *    ¿©»öÉéÃ´³Û¡Ê¼«Èñ¡§¼«¸ÊÉéÃ´¹ç·×¡Ë
-           COMPUTE TTLSYU-SKYMONEY-SKJ-JIHI-KEI (IDXT)
-               =   TTLSYU-SKYMONEY-SKJ-JIHI-KEI (IDXT)
-               +   SYU-SKYMONEY-SKJ-JIHI-KEI
-      *
-      *    À¸³èÎÅÍÜÈñ¡ÊÊÝ¸±¡Ë
-           COMPUTE TTLSYU-RYOYOHI-LIFE (IDXT)
-               =   TTLSYU-RYOYOHI-LIFE (IDXT)
-               +   SYU-RYOYOHI-LIFE
-      *
-      *    À¸³èÉéÃ´³Û¡ÊÊÝ¸±¡§¼«¸ÊÉéÃ´¡Ë
-           COMPUTE TTLSYU-SKYMONEY-LIFE (IDXT)
-               =   TTLSYU-SKYMONEY-LIFE (IDXT)
-               +   SYU-SKYMONEY-LIFE
-      *
-      *    À¸³èÉéÃ´³Û¡ÊÊÝ¸±¡§¼«¸ÊÉéÃ´¾ÃÈñÀÇ¡Ë
-           COMPUTE TTLSYU-SKYMONEY-LIFE-TAX (IDXT)
-               =   TTLSYU-SKYMONEY-LIFE-TAX (IDXT)
-               +   SYU-SKYMONEY-LIFE-TAX
-      *
-      *    À¸³èÉéÃ´³Û¡ÊÊÝ¸±¡§¼«¸ÊÉéÃ´¹ç·×¡Ë
-           COMPUTE TTLSYU-SKYMONEY-LIFE-KEI (IDXT)
-               =   TTLSYU-SKYMONEY-LIFE-KEI (IDXT)
-               +   SYU-SKYMONEY-LIFE-KEI
-      *
-      *    À¸³èÎÅÍÜÈñ¡Ê¼«Èñ¡Ë
-           COMPUTE TTLSYU-RYOYOHI-LIFE-JIHI (IDXT)
-               =   TTLSYU-RYOYOHI-LIFE-JIHI (IDXT)
-               +   SYU-RYOYOHI-LIFE-JIHI
-      *
-      *    À¸³èÉéÃ´³Û¡Ê¼«Èñ¡§¼«¸ÊÉéÃ´¡Ë
-           COMPUTE TTLSYU-SKYMONEY-LIFE-JIHI (IDXT)
-               =   TTLSYU-SKYMONEY-LIFE-JIHI (IDXT)
-               +   SYU-SKYMONEY-LIFE-JIHI
-      *
-      *    À¸³èÉéÃ´³Û¡Ê¼«Èñ¡§¼«¸ÊÉéÃ´¾ÃÈñÀÇ¡Ë
-           COMPUTE TTLSYU-SKYMONEY-LIFE-JIHI-TAX (IDXT)
-               =   TTLSYU-SKYMONEY-LIFE-JIHI-TAX (IDXT)
-               +   SYU-SKYMONEY-LIFE-JIHI-TAX
-      *
-      *    À¸³èÉéÃ´³Û¡Ê¼«Èñ¡§¼«¸ÊÉéÃ´¹ç·×¡Ë
-           COMPUTE TTLSYU-SKYMONEY-LIFE-JIHI-KEI (IDXT)
-               =   TTLSYU-SKYMONEY-LIFE-JIHI-KEI (IDXT)
-               +   SYU-SKYMONEY-LIFE-JIHI-KEI
-      *
-      *    ¼¼ÎÁº¹³Û
-           COMPUTE TTLSYU-RMSAGAKU (IDXT)
-               =   TTLSYU-RMSAGAKU (IDXT)
-               +   SYU-RMSAGAKU
-      *
-      *    ÀÁµá¶â³Û
-           COMPUTE TTLSYU-SKYMONEY (IDXT)
-               =   TTLSYU-SKYMONEY (IDXT)
-               +   SYU-SKYMONEY
-      *
-      *    ¸ºÌÈ¶â³Û
-           COMPUTE TTLSYU-DISCOUNT-MONEY   (IDXT)
-               =   TTLSYU-DISCOUNT-MONEY   (IDXT)
-               +   SYU-DISCOUNT-MONEY
-      *
-           .
-       20011-TTLSYU-EDIT-EXT.
-           EXIT.
-      *****************************************************************
       *    ¼ýÇ¼ÊÔ½¸½èÍý
       *****************************************************************
        2001-SYUNOU-EDIT-SEC            SECTION.
       *
-           PERFORM VARYING IDXS    FROM    1   BY  1
-                   UNTIL ( IDXS    >   10 )
-                    OR   ( TSYU-SKYSTYMD (IDXS)    =   SPACE )
+           INITIALIZE                  SNINF02-AREA
       *
-               MOVE    TSYU-OCC (IDXS) TO  SYUNOU-REC
-               MOVE    "0"             TO  WRK-SKYINF-KBN
-               PERFORM 20011-SYUNOU-EDIT-SEC
+           MOVE    KEY-SKYSTYMD   TO  SNINF02-IN-SKYSTYMD
+           MOVE    KEY-TAIINYMD   TO  SNINF02-IN-SKYEDYMD
       *
-               IF    ( TSYU-DENPNUM (IDXS) =   1 OR 2 )
-                   MOVE    TSYU-DENPNUM (IDXS)
-                                       TO  IDXT
-                   MOVE    TTLSYU-OCC (IDXT)
-                                       TO  SYUNOU-REC
-                   MOVE    "1"         TO  WRK-SKYINF-KBN
-                   PERFORM 20011-SYUNOU-EDIT-SEC
-               END-IF
+           CALL    "ORCSNINF02"    USING
+                                   SNINF02-AREA
+                                   LNK-SYUNOU-REC-T
+                                   SPA-AREA
       *
-               IF    ( TSYU-GRP-DENPNUM (IDXS) =   3 )
-                   MOVE    TSYU-GRP-DENPNUM (IDXS)
-                                       TO  IDXT
-                   MOVE    TTLSYU-OCC (IDXT)
-                                       TO  SYUNOU-REC
-                   MOVE    "2"         TO  WRK-SKYINF-KBN
-                   PERFORM 20011-SYUNOU-EDIT-SEC
-               END-IF
+           PERFORM VARYING IDXA    FROM    1   BY  1
+                   UNTIL ( IDXA    >   SNINF02-SKYINF-MAX )
+      *
+               MOVE    SNINF02-SKYINF-KBN-LBL (IDXA)
+                               TO  HSACSRES-SKYINF-KBN-LBL (IDXA)
+               MOVE    SNINF02-SKYINF-KBN-DATA (IDXA)
+                               TO  HSACSRES-SKYINF-KBN-DATA (IDXA)
+               MOVE    SNINF02-SKYINF-KBN-NAME (IDXA)
+                               TO  HSACSRES-SKYINF-KBN-NAME (IDXA)
+               MOVE    SNINF02-SRYYM (IDXA)
+                               TO  HSACSRES-SRYYM (IDXA)
+               MOVE    SNINF02-SRYKA (IDXA)
+                               TO  HSACSRES-SRYKA (IDXA)
+               MOVE    SNINF02-SRYKANAME (IDXA)
+                               TO  HSACSRES-SRYKANAME (IDXA)
+      *
+               MOVE    SNINF02-HKNCOMBI (IDXA)
+                               TO  HSACSRES-HKNCOMBI (IDXA)
+               MOVE    SNINF02-HKNNUM (IDXA)
+                               TO  HSACSRES-HKNNUM (IDXA)
+               MOVE    SNINF02-HKNJANUM (IDXA)
+                               TO  HSACSRES-HKNJANUM (IDXA)
+               MOVE    SNINF02-HKNJANAME (IDXA)
+                               TO  HSACSRES-HKNJANAME (IDXA)
+               MOVE    SNINF02-HKIGO (IDXA)
+                               TO  HSACSRES-HKIGO (IDXA)
+               MOVE    SNINF02-HNUM (IDXA)
+                               TO  HSACSRES-HNUM (IDXA)
+      *
+               PERFORM VARYING IDXK    FROM    1   BY  1
+                   UNTIL ( IDXK    >   4 )
+                   MOVE    SNINF02-KOHNUM (IDXA IDXK)
+                               TO  HSACSRES-KOHNUM (IDXA IDXK)
+                   MOVE    SNINF02-KOHNAME (IDXA IDXK)
+                               TO  HSACSRES-KOHNAME (IDXA IDXK)
+                   MOVE    SNINF02-FTNJANUM (IDXA IDXK)
+                               TO  HSACSRES-FTNJANUM (IDXA IDXK)
+                   MOVE    SNINF02-JKYSNUM (IDXA IDXK)
+                               TO  HSACSRES-JKYSNUM (IDXA IDXK)
+               END-PERFORM
+      *
+               MOVE    SNINF02-SKYMONEY (IDXA)
+                               TO  HSACSRES-SKYMONEY (IDXA)
+               MOVE    SNINF02-HKNMONEY (IDXA)
+                               TO  HSACSRES-HKNMONEY (IDXA)
+               MOVE    SNINF02-JIHIMONEY (IDXA)
+                               TO  HSACSRES-JIHIMONEY (IDXA)
+               MOVE    SNINF02-RJNMONEY (IDXA)
+                               TO  HSACSRES-RJNMONEY (IDXA)
+               MOVE    SNINF02-KOHMONEY (IDXA)
+                               TO  HSACSRES-KOHMONEY (IDXA)
+               MOVE    SNINF02-SKJMONEY (IDXA)
+                               TO  HSACSRES-SKJMONEY (IDXA)
+               MOVE    SNINF02-RSIMONEY (IDXA)
+                               TO  HSACSRES-RSIMONEY (IDXA)
+               MOVE    SNINF02-GENMEN (IDXA)
+                               TO  HSACSRES-GENMEN (IDXA)
+               MOVE    SNINF02-TOTAL-TEN (IDXA)
+                               TO  HSACSRES-TOTAL-TEN (IDXA)
+      *
+               PERFORM VARYING IDX0    FROM    1   BY  1
+                       UNTIL ( IDX0    >   16 )
+                   MOVE    SNINF02-SRYKBN-NAME (IDXA IDX0)
+                               TO  HSACSRES-SRYKBN-NAME  (IDXA IDX0)
+                   MOVE    SNINF02-SRYKBN-TENSU (IDXA IDX0)
+                               TO  HSACSRES-SRYKBN-TENSU (IDXA IDX0)
+               END-PERFORM
+      *
+               MOVE    SNINF02-SKJRYOYO (IDXA)
+                                   TO  HSACSRES-SKJRYOYO (IDXA)
       *
            END-PERFORM
       *
            .
        2001-SYUNOU-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ¼ýÇ¼ÊÔ½¸½èÍý
-      *****************************************************************
-       20011-SYUNOU-EDIT-SEC           SECTION.
-      *
-           COMPUTE IDXA    =   IDXA    +   1
-      *
-           MOVE    "ÀÁµá¾ðÊó¼ïÊÌ"  TO  HSACSRES-SKYINF-KBN-LBL  (IDXA)
-           MOVE    WRK-SKYINF-KBN  TO  HSACSRES-SKYINF-KBN-DATA (IDXA)
-           EVALUATE    WRK-SKYINF-KBN
-           WHEN    "0"
-               MOVE    "ÌÀºÙ"      TO  HSACSRES-SKYINF-KBN-NAME (IDXA)
-           WHEN    "1"
-               MOVE    "·î¹ç·×"    TO  HSACSRES-SKYINF-KBN-NAME (IDXA)
-           WHEN    "2"
-               MOVE    "Áí¹ç·×"    TO  HSACSRES-SKYINF-KBN-NAME (IDXA)
-           END-EVALUATE
-      *
-           IF    ( WRK-SKYINF-KBN      =   "0" OR "1" )
-               MOVE    SYU-SKYSTYMD    TO  WRK-SYMD
-               PERFORM 800-DATE-SEC
-               MOVE    WRK-DATE (1:7)  TO  HSACSRES-SRYYM (IDXA)
-           END-IF
-      *
-           IF    ( WRK-SKYINF-KBN      =   "0" )
-      *
-               PERFORM 900-PTNYUINRRK-KEY42-SEL-SEC
-      *
-               PERFORM 200111-SRYKA-EDIT-SEC
-      *
-               PERFORM 200111-HKN-EDIT-SEC
-      *
-           END-IF
-      *
-           MOVE    SYU-SKYMONEY        TO  WRK-KINGAKUM9
-           MOVE    WRK-KINGAKUM9       TO  HSACSRES-SKYMONEY (IDXA)
-           MOVE    SYU-HKNTEKMONEY     TO  WRK-KINGAKUM9
-           MOVE    WRK-KINGAKUM9       TO  HSACSRES-HKNMONEY (IDXA)
-      *
-           COMPUTE WRK-KINGAKU         =   SYU-RMSAGAKU
-                                       +   SYU-SKYMONEY-SKJ-JIHI-KEI
-                                       +   SYU-SKYMONEY-LIFE-JIHI-KEI
-                                       +   SYU-TOTAL-TGMONEY
-                                       +   SYU-TOTAL-TGMONEY-TAX
-                                       +   SYU-JIHI-TOTAL
-                                       +   SYU-JIHI-TOTAL-TAX
-           IF    ( SYU-SRYYMD  <   CONST-H190401 )
-               COMPUTE WRK-KINGAKU
-                   =   WRK-KINGAKU +   SYU-JIHI-TAX
-           END-IF
-           MOVE    WRK-KINGAKU         TO  WRK-KINGAKUM9
-           MOVE    WRK-KINGAKUM9       TO  HSACSRES-JIHIMONEY (IDXA)
-      *
-           MOVE    SYU-RJN-FTN         TO  WRK-KINGAKUMM
-           MOVE    WRK-KINGAKUMM       TO  HSACSRES-RJNMONEY  (IDXA)
-      *
-           MOVE    SYU-KOH-FTN         TO  WRK-KINGAKUMM
-           MOVE    WRK-KINGAKUMM       TO  HSACSRES-KOHMONEY  (IDXA)
-      *
-           COMPUTE WRK-KINGAKU         =   SYU-SKYMONEY-SKJ-KEI
-                                       +   SYU-SKYMONEY-LIFE-KEI
-           MOVE    WRK-KINGAKU         TO  WRK-KINGAKUM9
-           MOVE    WRK-KINGAKUM9       TO  HSACSRES-SKJMONEY (IDXA)
-      *
-           COMPUTE WRK-KINGAKU         =   SYU-RSISHOSHIN-MONEY
-                                       +   SYU-RSISAISHIN-MONEY
-                                       +   SYU-RSISDO-MONEY
-                                       +   SYU-RSIETC-MONEY
-           MOVE    WRK-KINGAKU         TO  WRK-KINGAKUMM
-           MOVE    WRK-KINGAKUMM       TO  HSACSRES-RSIMONEY (IDXA)
-      *
-           MOVE    SYU-DISCOUNT-MONEY  TO  WRK-KINGAKUMM
-           MOVE    WRK-KINGAKUMM       TO  HSACSRES-GENMEN (IDXA)
-      *
-           MOVE    SYU-TOTAL-HKNTEN    TO  WRK-KINGAKUM9
-           MOVE    WRK-KINGAKUM9       TO  HSACSRES-TOTAL-TEN (IDXA)
-      *
-           PERFORM VARYING IDX0    FROM    1   BY  1
-                   UNTIL ( IDX0    >   16 )
-               IF    ( IDX0    =   16 )
-                   IF    ( SYU-HKNTEN (IDX0)   NOT =   ZERO )
-                       MOVE    TBL-HKNTEN-MEI (IDX0)
-                               TO  HSACSRES-SRYKBN-NAME  (IDXA IDX0)
-                       MOVE    SYU-HKNTEN (IDX0)
-                               TO  WRK-KINGAKUMM
-                       MOVE    WRK-KINGAKUMM
-                               TO  HSACSRES-SRYKBN-TENSU (IDXA IDX0)
-                   END-IF
-               ELSE
-                   MOVE    TBL-HKNTEN-MEI (IDX0)
-                               TO  HSACSRES-SRYKBN-NAME  (IDXA IDX0)
-                   MOVE    SYU-HKNTEN (IDX0)
-                               TO  WRK-KINGAKUM9
-                   MOVE    WRK-KINGAKUM9
-                               TO  HSACSRES-SRYKBN-TENSU (IDXA IDX0)
-               END-IF
-           END-PERFORM
-      *
-           COMPUTE WRK-KINGAKU         =   SYU-RYOYOHI-SKJ
-                                       +   SYU-RYOYOHI-LIFE
-           MOVE    WRK-KINGAKU         TO  WRK-KINGAKUM9
-           MOVE    WRK-KINGAKUM9       TO  HSACSRES-SKJRYOYO (IDXA)
-      *
-           .
-       20011-SYUNOU-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ¿ÇÎÅ²ÊÊÔ½¸½èÍý
-      *****************************************************************
-       200111-SRYKA-EDIT-SEC          SECTION.
-      *
-           MOVE    PTNYUINRRK-NYUINKA  TO  HSACSRES-SRYKA (IDXA)
-           INITIALIZE                      SYSKANRI-REC
-           MOVE    SPA-HOSPNUM         TO  SYS-HOSPNUM
-           MOVE    "1005"              TO  SYS-KANRICD
-           MOVE    PTNYUINRRK-NYUINKA  TO  SYS-KBNCD
-           MOVE    PTNYUINRRK-TENNYUYMD
-                                       TO  SYS-STYUKYMD
-                                           SYS-EDYUKYMD
-           PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-           MOVE    SYSKANRI-REC        TO  SYS-1005-REC
-           MOVE    SYS-1005-SRYKANAME  TO  HSACSRES-SRYKANAME (IDXA)
-      *
-           .
-       200111-SRYKA-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ÊÝ¸±¾ðÊóÊÔ½¸½èÍý
-      *****************************************************************
-       200111-HKN-EDIT-SEC             SECTION.
-      *
-           MOVE    SYU-HKNCOMBINUM TO  HSACSRES-HKNCOMBI (IDXA)
-      *
-           MOVE    SPA-AREA        TO  TSPA-AREA
-           MOVE    SYU-SKYSTYMD    TO  SPA-SYSYMD
-           INITIALIZE                  ORCSAPIHKNAREA
-           MOVE    "2"             TO  ORCSAPIHKN-KBN2
-           CALL    "ORCSAPIHKN"    USING
-                                   SPA-AREA
-                                   ORCSAPIHKNAREA
-           MOVE    TSPA-AREA       TO  SPA-AREA
-      *
-           PERFORM VARYING IDXC    FROM    1   BY  1
-                   UNTIL ( IDXC    >   20 )
-                     OR  ( ORCSAPIHKN-THKNCOMBI (IDXC)
-                                       =   SPACE  )
-               IF    ( SYU-HKNCOMBINUM =   ORCSAPIHKN-THKNCOMBI (IDXC))
-                   PERFORM 2001111-HKN-EDIT-SEC
-                   MOVE    20      TO  IDXC
-               END-IF
-      *
-           END-PERFORM
-      *
-          .
-       200111-HKN-EDIT-EXT.
-           EXIT.
-      *****************************************************************
-      *    ÊÝ¸±¾ðÊóÊÔ½¸½èÍý
-      *****************************************************************
-       2001111-HKN-EDIT-SEC           SECTION.
-      *
-      *    ÊÝ¸±¤Î¼ïÎà
-           MOVE    ORCSAPIHKN-HKNNUM (IDXC)
-                                   TO  HSACSRES-HKNNUM   (IDXA)
-      *
-      *    ÊÝ¸±¼ÔÈÖ¹æ
-           MOVE    ORCSAPIHKN-HKNJANUM (IDXC)
-                                   TO  HSACSRES-HKNJANUM (IDXA)
-      *
-      *    ÊÝ¸±¤ÎÌ¾¾Î
-           MOVE    ORCSAPIHKN-HKNNUM-NAME (IDXC)
-                                   TO  HSACSRES-HKNJANAME(IDXA)
-      *
-      *    µ­¹æ
-           MOVE    ORCSAPIHKN-KIGO  (IDXC)
-                                   TO  HSACSRES-HKIGO (IDXA)
-      *
-      *    ÈÖ¹æ
-           MOVE    ORCSAPIHKN-NUM  (IDXC)
-                                   TO  HSACSRES-HNUM  (IDXA)
-      *
-      *    ¸øÈñ¾ðÊó
-           PERFORM VARYING IDXK    FROM    1   BY  1
-                   UNTIL ( IDXK    >   4 )
-      *
-      *        ¸øÈñ¤Î¼ïÎà
-               MOVE    ORCSAPIHKN-KOHNUM (IDXC IDXK)
-                                   TO  HSACSRES-KOHNUM  (IDXA IDXK)
-      *        ¸øÈñ¤Î¼ïÎàÌ¾¾Î
-               MOVE    ORCSAPIHKN-KOHNUM-NAME (IDXC IDXK)
-                                   TO  HSACSRES-KOHNAME (IDXA IDXK)
-      *        ÉéÃ´¼ÔÈÖ¹æ
-               MOVE    ORCSAPIHKN-FTNJANUM (IDXC IDXK)
-                                   TO  HSACSRES-FTNJANUM(IDXA IDXK)
-      *        ¼õµë¼ÔÈÖ¹æ
-               MOVE    ORCSAPIHKN-JKYSNUM (IDXC IDXK)
-                                   TO  HSACSRES-JKYSNUM (IDXA IDXK)
-           END-PERFORM
-      *
-          .
-       2001111-HKN-EDIT-EXT.
            EXIT.
       *****************************************************************
       *    ½ªÎ»½èÍý

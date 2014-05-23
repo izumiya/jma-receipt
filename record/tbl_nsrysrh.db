@@ -15,6 +15,9 @@ tbl_nsrysrh {
 	CREYMD   			char(8);
 	UPYMD    			char(8);
 	UPHMS				char(6);
+#--
+	SELRRKNUM		    number(3,0),virtual;
+	SELSRYYMD    	    char(8),virtual;
 };
 primary	{
 	HOSPNUM,PTID,ZAINUM,SRYYM;
@@ -75,6 +78,27 @@ path	key2 	{
 			AND   SRYYM      >=   :SRYYM
 			AND   SRYYM      <=   :CREYMD
 			AND   SRYCD       =   :SRYCD
+		;
+	};
+};
+
+path	key3 	{
+	DBSELECT	{
+		DECLARE tbl_nsrysrh_key3_csr CURSOR FOR
+		SELECT *
+		FROM tbl_nsrysrh
+			WHERE HOSPNUM     =   :HOSPNUM
+			AND   PTID        =   :PTID
+			AND   SRYYM       =   :SRYYM
+			AND   SRYCD       =   :SRYCD
+            AND   ZAINUM IN
+        ( SELECT  ZAINUM
+		  FROM tbl_nrrksrh
+			WHERE   HOSPNUM   =   :HOSPNUM
+		 	  AND   PTID      =   :PTID
+              AND   RRKNUM    =   :SELRRKNUM
+			  AND   SRYYMD    =   :SELSRYYMD
+        )
 		;
 	};
 };

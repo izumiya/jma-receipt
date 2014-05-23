@@ -70,14 +70,17 @@
            03  WRK-SYS-KANRICD         PIC X(04).
            03  WRK-SYS-KBNCD           PIC X(08).
            03  WRK-DIALOG              PIC 9(02).
+           03  WRK-MCP-WINDOW          PIC X(64).
       *
        01  ITEM-AREA.
            03  ITEM-NYUINKA            PIC X(02).
            03  ITEM-HKNCOMBI           PIC 9(04).
+           03  ITEM-GAIHAKUKBN         PIC X(01).
       *
        01  ERRCD-AREA.
-           03  ERRCD-ITEM              PIC X(04).
-           03  ERRCD-ERRCD             PIC X(04).
+           03  ERRCD-ITEM-G.
+               05  ERRCD-ITEM          PIC X(04).
+               05  ERRCD-ERRCD         PIC X(04).
            03  ERRCD-ORDER             PIC X(04).
       *
        01  CONST-AREA.
@@ -139,6 +142,9 @@
            COPY    "CPPTNYUINRRK.INC"  REPLACING  //PTNYUINRRK-//
                                        BY         //LNK-PTNYUINRRK-//.
       *
+      *    排他制御
+           COPY    "CPORCSLOCK.INC".
+      *
            COPY    "MCPDATA.INC".
            COPY    "MCPAREA".
       *
@@ -193,6 +199,30 @@
            INITIALIZE                  SODR-OT
            INITIALIZE                  TRRK-REC
       *
+           IF    ( SODR-SRCKBN     =    "1" OR "2" )
+               PERFORM 990-LOCK-CHK-SEC
+           END-IF
+      *
+           IF    ( ERRCD-ITEM-G  =   SPACE )
+               INITIALIZE                  PTNYUINRRK-REC
+               MOVE    SODR-HOSPNUM    TO  PTNYUINRRK-HOSPNUM
+               MOVE    SODR-PTID       TO  PTNYUINRRK-PTID
+               MOVE    SODR-SRYYMD     TO  PTNYUINRRK-TENNYUYMD
+                                           PTNYUINRRK-TENSTUYMD
+               PERFORM 900-PTNYUINRRK-KEY42-SEL-SEC
+               IF    ( FLG-PTNYUINRRK  =   ZERO )
+                   MOVE    PTNYUINRRK-REC  TO  TRRK-REC
+               ELSE
+                   MOVE    "0075"          TO  ERRCD-ORDER
+               END-IF
+           END-IF
+      *
+           IF    ( SODR-ORDERID        =   NORDERID-GPTSTID )
+               MOVE    PTNYUINRRK-NYUINKA  TO  SODR-SRYKA
+               MOVE    PTNYUINRRK-HKNCOMBINUM
+                                           TO  SODR-HKNCOMBI
+           END-IF
+      *
            .
        100-INIT-EXT.
            EXIT.
@@ -202,9 +232,13 @@
       *****************************************************************
        200-MAIN-SEC                    SECTION.
       *
-           PERFORM 2001-INPUT-CHK-SEC
+           IF    ( ERRCD-ORDER  =   SPACE )
+            AND  ( ERRCD-ITEM   =   SPACE )
+               PERFORM 2001-INPUT-CHK-SEC
+           END-IF
       *
-           IF    ( ERRCD-ITEM   =   SPACE )
+           IF    ( ERRCD-ORDER  =   SPACE )
+            AND  ( ERRCD-ITEM   =   SPACE )
                PERFORM 2002-KANREN-CHK-SEC
            END-IF
       *
@@ -222,10 +256,14 @@
                END-IF
       *
                IF    ( FLG-END  =   ZERO )
-                  PERFORM 2101-ORDER-INSERT-SEC
+                   IF    ( SODR-PROCKBN    =   "2" )
+                       CONTINUE
+                   ELSE
+                       PERFORM 2101-ORDER-INSERT-SEC
+                   END-IF
                END-IF
            ELSE
-               IF    ( SODR-PROCKBN    =   "1" )
+               IF    ( SODR-PROCKBN    =   "1" OR "2" )
                        CONTINUE
                ELSE
                    IF    ( FLG-END  =   ZERO )
@@ -251,6 +289,8 @@
                    PERFORM 20011-NYUINKA-CHK-SEC
                WHEN    NCLAIMID-HKNCOMBIJMA
                    PERFORM 20011-HKNCOMBI-CHK-SEC
+               WHEN    NCLAIMID-GAIHAKUKBNJMA
+                   PERFORM 20011-GAIHAKUKBN-CHK-SEC
                END-EVALUATE
       *
            END-PERFORM
@@ -329,6 +369,17 @@
        20011-HKNCOMBI-CHK-EXT.
            EXIT.
       *****************************************************************
+      *    外泊区分チェック処理
+      *****************************************************************
+       20011-GAIHAKUKBN-CHK-SEC        SECTION.
+      *
+           MOVE    LNK-ODRITEM-ITEM (IDX-ODR)
+                                   TO  ITEM-GAIHAKUKBN
+      *
+           .
+       20011-GAIHAKUKBN-CHK-EXT.
+           EXIT.
+      *****************************************************************
       *    項目未処理状態設定処理
       *****************************************************************
        2100-ITEM-UNPROCSTS-SET-SEC        SECTION.
@@ -389,8 +440,12 @@
       *****************************************************************
        20021-NYUINKA-CHK-SEC           SECTION.
       *
-           IF    ( ITEM-NYUINKA    =   SPACE )
-               MOVE    "0071"          TO  ERRCD-ORDER
+           IF    ( SODR-ORDERID        =   NORDERID-GAIHKID
+                                        OR NORDERID-GBACKID
+                                                             )
+               IF    ( ITEM-NYUINKA    =   SPACE )
+                   MOVE    "0071"      TO  ERRCD-ORDER
+               END-IF
            END-IF
       *
            .
@@ -401,8 +456,12 @@
       *****************************************************************
        20021-HKNCOMBI-CHK-SEC          SECTION.
       *
-           IF    ( ITEM-HKNCOMBI   =   ZERO )
-               MOVE    "0073"          TO  ERRCD-ORDER
+           IF    ( SODR-ORDERID        =   NORDERID-GAIHKID
+                                        OR NORDERID-GBACKID
+                                                             )
+               IF    ( ITEM-HKNCOMBI   =   ZERO )
+                   MOVE    "0073"      TO  ERRCD-ORDER
+               END-IF
            END-IF
       *
            .
@@ -413,28 +472,22 @@
       *****************************************************************
        20021-NYUINRRK-CHK-SEC          SECTION.
       *
-           INITIALIZE                  PTNYUINRRK-REC
-           MOVE    SODR-HOSPNUM     TO  PTNYUINRRK-HOSPNUM
-           MOVE    SODR-PTID       TO  PTNYUINRRK-PTID
-           MOVE    SODR-SRYYMD     TO  PTNYUINRRK-TENNYUYMD
-                                       PTNYUINRRK-TENSTUYMD
-           PERFORM 900-PTNYUINRRK-KEY42-SEL-SEC
-           IF    ( FLG-PTNYUINRRK  =   ZERO )
-               MOVE    PTNYUINRRK-REC  TO  TRRK-REC
-           ELSE
-               MOVE    "0075"          TO  ERRCD-ORDER
-               GO  TO  20021-NYUINRRK-CHK-EXT
-           END-IF
+           MOVE    TRRK-REC        TO  PTNYUINRRK-REC
       *
-      *    診療科と保険組合せの変更は不可
-           IF    ( PTNYUINRRK-NYUINKA  NOT =   ITEM-NYUINKA )
-               MOVE    "0077"      TO  ERRCD-ORDER
-               GO  TO  20021-NYUINRRK-CHK-EXT
-           END-IF
+           IF    ( SODR-ORDERID        =   NORDERID-GAIHKID
+                                        OR NORDERID-GBACKID
+                                                             )
       *
-           IF    ( PTNYUINRRK-HKNCOMBINUM  NOT =   ITEM-HKNCOMBI )
-               MOVE    "0078"      TO  ERRCD-ORDER
-               GO  TO  20021-NYUINRRK-CHK-EXT
+      *        診療科と保険組合せの変更は不可
+               IF    ( PTNYUINRRK-NYUINKA  NOT =   ITEM-NYUINKA )
+                   MOVE    "0077"      TO  ERRCD-ORDER
+                   GO  TO  20021-NYUINRRK-CHK-EXT
+               END-IF
+      *
+               IF    ( PTNYUINRRK-HKNCOMBINUM  NOT =   ITEM-HKNCOMBI )
+                   MOVE    "0078"      TO  ERRCD-ORDER
+                   GO  TO  20021-NYUINRRK-CHK-EXT
+               END-IF
            END-IF
       *
            .
@@ -492,7 +545,7 @@
       *
            INITIALIZE                      ORDER-REC
       *
-           MOVE   SODR-HOSPNUM          TO  ORDER-HOSPNUM
+           MOVE   SODR-HOSPNUM         TO  ORDER-HOSPNUM
            MOVE   SODR-KARTE-KEY       TO  ORDER-KARTE-KEY
            MOVE   SODR-ORDERNUM        TO  ORDER-ORDERNUM
            MOVE   SODR-NYUGAIKBN       TO  ORDER-NYUGAIKBN
@@ -564,6 +617,7 @@
            IF    ( LNK-ODRITEM-ITEMID (IDX-ODR)
                                        =   NCLAIMID-NYUINKAJMA
                                        OR  NCLAIMID-HKNCOMBIJMA
+                                       OR  NCLAIMID-GAIHAKUKBNJMA
                                            )
                CONTINUE
            ELSE
@@ -578,7 +632,7 @@
       *
       *
            PERFORM 900-ODRITEM-KEY-SEL-SEC
-           IF    ( FLG-ODRITEM           =   ZERO )
+           IF    ( FLG-ODRITEM         =   ZERO )
                DISPLAY "ORCSDR03 ERROR 003:ODRITEM INSERT CHK ERR"
                        " PTID="        SODR-PTID
                        " KARTE-KEY="   SODR-KARTE-KEY
@@ -606,7 +660,19 @@
        2101-ORCSODRNACCT-CALL-SEC      SECTION.
       *
            INITIALIZE                  SODRNACCT-AREA
-           MOVE    SODR-ORDERID    TO  SODRNACCT-ORDERID
+           EVALUATE    SODR-ORDERID
+           WHEN    NORDERID-GPTSTID
+               IF    ( ITEM-GAIHAKUKBN    =   "0" )
+                   MOVE    NORDERID-GBACKID
+                                   TO  SODRNACCT-ORDERID
+               ELSE
+                   MOVE    NORDERID-GAIHKID
+                                   TO  SODRNACCT-ORDERID
+               END-IF
+           WHEN    OTHER
+               MOVE    SODR-ORDERID
+                                   TO  SODRNACCT-ORDERID
+           END-EVALUATE
            MOVE    ZERO            TO  SODRNACCT-NYUKBN
            MOVE    SODR-SRYYMD     TO  SODRNACCT-STARTYMD
            MOVE    SODR-OPID       TO  SODRNACCT-OPID
@@ -640,6 +706,22 @@
            MOVE    ERRCD-ORDER     TO  SODR-ERRCD
       *
            MOVE    FLG-END         TO  SODR-RC
+      *
+           IF    ( SODR-RC         =   ZERO )
+            AND  ( SODR-ERRFLG     =   ZERO )
+               MOVE    TRRK-RRKNUM TO  SODR-RRKNUM
+               MOVE    TRRK-RRKEDANUM
+                                   TO  SODR-RRKEDANUM
+               MOVE    TRRK-SHONUM TO  SODR-SHONUM
+           END-IF
+      *
+           IF    ( FLG-END         NOT =   ZERO )
+               MOVE    "tbl_ptnyuinrrk"
+                                   TO  MCP-TABLE
+               MOVE    "abort"     TO  MCP-PATHNAME
+               PERFORM 910-DBSELECT-SEC
+           END-IF
+      *
       *
            .
        300-END-EXT.
@@ -908,3 +990,37 @@
       *
        910-DBDELETE-EXT.
            EXIT.
+      *****************************************************************
+      *    排他制御処理（チェックのみ）
+      *****************************************************************
+       990-LOCK-CHK-SEC                SECTION.
+      *
+           MOVE    MCP-WINDOW          TO  WRK-MCP-WINDOW
+      *
+      *    排他制御処理
+           MOVE    "I01"               TO  SPA-MOTOPG
+                                           MCP-WINDOW
+           MOVE    1                   TO  SLOCK-MODE
+           MOVE    SODR-PTID           TO  SLOCK-PTID
+           CALL    "ORCSLOCK"          USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+           IF    ( SLOCK-RETURN    NOT =   ZERO )
+               MOVE    "9999"          TO  ERRCD-ORDER
+           END-IF
+      *
+      *    排他制御解除処理
+           MOVE    ZERO                TO  SLOCK-PTID
+           MOVE    3                   TO  SLOCK-MODE
+           CALL    "ORCSLOCK"          USING
+                                       MCPAREA
+                                       SPA-AREA
+                                       ORCSLOCKAREA
+      *
+           MOVE    WRK-MCP-WINDOW      TO  MCP-WINDOW
+      *
+           .
+       990-LOCK-CHK-EXT.
+           EXIT.
+      *

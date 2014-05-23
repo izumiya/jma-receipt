@@ -16,6 +16,7 @@ xml_hsfoodv2res {
 			Sex					varchar(01);
 		};
 		Hospital_Stay_Infomation{
+			History_Number		varchar(3);
 			Creation_Type{
 				Label			varchar(30);
 				Data			varchar(1);

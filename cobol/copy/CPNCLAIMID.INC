@@ -25,7 +25,6 @@
        01  NCLAIMID-AREA.
            03  NCLAIMID-CLASS          PIC X(20)   VALUE   "Claim010".
            03  NCLAIMID-ORDER          PIC X(20)   VALUE   "Claim011".
-           03  NCLAIMID-ITEM-MAX       PIC 9(03)   VALUE   13.
            03  NCLAIMID-ITEM-VAL.
              05  NCLAIMID-NYUKBN-G.
                07  NCLAIMID-NYUKBN
@@ -111,6 +110,41 @@
                                 PIC X(05)   VALUE  "00012".
                07  NCLAIMID-NISSUMES
                                 PIC X(100)  VALUE  "一括入力".
+             05  NCLAIMID-TEIKIKBN-G.
+               07  NCLAIMID-TEIKIKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-TEIKIKBNJMA
+                                PIC X(05)   VALUE  "00013".
+               07  NCLAIMID-TEIKIKBNMES
+                                PIC X(100)  VALUE  "定期請求の指定".
+             05  NCLAIMID-KAIGOKBN-G.
+               07  NCLAIMID-KAIGOKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-KAIGOKBNJMA
+                                PIC X(05)   VALUE  "00014".
+               07  NCLAIMID-KAIGOKBNMES
+                                PIC X(100)  VALUE  "介護からの異動".
+             05  NCLAIMID-NYUINYMD-G.
+               07  NCLAIMID-NYUINYMD
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-NYUINYMDJMA
+                                PIC X(05)   VALUE  "00015".
+               07  NCLAIMID-NYUINYMDMES
+                                PIC X(100)  VALUE  "入院日".
+             05  NCLAIMID-GAIHAKUKBN-G.
+               07  NCLAIMID-GAIHAKUKBN
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-GAIHAKUKBNJMA
+                                PIC X(05)   VALUE  "00016".
+               07  NCLAIMID-GAIHAKUKBNMES
+                                PIC X(100)  VALUE  "外泊区分".
+             05  NCLAIMID-SKJTYPE-G.
+               07  NCLAIMID-SKJTYPE
+                                PIC X(20)   VALUE  "XXXXXXX".
+               07  NCLAIMID-SKJTYPEJMA
+                                PIC X(05)   VALUE  "00017".
+               07  NCLAIMID-SKJTYPEMES
+                                PIC X(100)  VALUE  "食事の種類".
              05  NCLAIMID-UNCHKECK-G.
                07  NCLAIMID-UNCHKECK
                                 PIC X(20)   VALUE  "XXXXXXX".
@@ -119,7 +153,8 @@
                07  NCLAIMID-UNCHKECKMES
                                 PIC X(100)  VALUE  "不明".
            03  NCLAIMID-ITEM-R          REDEFINES   NCLAIMID-ITEM-VAL.
-             05  NCLAIMID-ITEM-OCC      OCCURS  13.
+             05  NCLAIMID-ITEM-OCC      OCCURS  18.
                07  NCLAIMID-ITEM        PIC X(20).
                07  NCLAIMID-ITEMJMA     PIC X(05).
                07  NCLAIMID-ITEMMES     PIC X(100).
+           03  NCLAIMID-ITEM-MAX        PIC 9(03)   VALUE   18.

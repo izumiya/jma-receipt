@@ -845,6 +845,9 @@ grpsys                                 SPA-AREA
            WHEN    "26"
                MOVE    "選定療養費一般コード振替マスタ"
                                                TO  WRK-MSTNAME
+           WHEN    "27"
+               MOVE    "入院料置換マスタ"
+                                               TO  WRK-MSTNAME
            WHEN    OTHER
                MOVE    PARA-MASTER-KBN         TO  WRK-MSTNAME
            END-EVALUATE

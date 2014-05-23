@@ -38,6 +38,7 @@
                    07  HSPTINFRES-SEX                  PIC X(01).
                05  HSPTINFRES-NYUINRRK-INF-AREA.
                    07 HSPTINFRES-NYUINRRK-INF-OCC      OCCURS  100.
+                       09 HSPTINFRES-RRKNUM            PIC X(03).
                        09  HSPTINFRES-CREATEKBN-G.
                            11  HSPTINFRES-CREATEKBN-LBL
                                                        PIC X(30).
