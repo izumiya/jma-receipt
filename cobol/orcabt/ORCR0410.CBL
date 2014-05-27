@@ -111,6 +111,8 @@
       *  04.07.10    NACL-門脇    14/03/28  平成２６年４月改正対応
       *  04.07.11    NACL-藤原    14/05/07  第三者行為の給付割合の設定
       *  04.07.12    NACL-門脇    14/05/08  労災レセ「新継再別」記載修正
+      *  04.07.13    NACL-門脇    14/05/27  第三者行為の給付割合の設定
+      *                                     （社保前期高齢２割）
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -1384,6 +1386,8 @@ grpsys         PERFORM 900-DBSELECT-SEC
                                EVALUATE   PTHKN-HOJOKBN
                                    WHEN   "7"
                                        MOVE    30  TO  RECE41-FTNRATE
+                                   WHEN   "8"
+                                       MOVE    20  TO  RECE41-FTNRATE
                                    WHEN   "9"
                                        MOVE    10  TO  RECE41-FTNRATE
                                END-EVALUATE
