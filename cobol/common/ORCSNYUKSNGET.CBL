@@ -1312,15 +1312,13 @@
                END-IF
            END-IF
       *
-      *    特定入院基本料（障害者施設等入院基本料）は入院料加算チェックで
-      *    以下の加算がチェックできない為、強制的に算定ＯＫとする
-      *    ・特殊疾患入院施設管理加算
-      *    ・看護配置加算
+      *    特定入院基本料（障害者施設等入院基本料）の、看護配置加算について
+      *    強制的に算定不可とする
+      *    （入院料加算チェックマスタでも対応するが、マスタ更新未実施時を考慮）
            IF      LNK-NYUKSNGET-NYUIN-SRYCD   = "190161210"  OR
                                                  "190161310"
-               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =  "190101970"  OR
-                                                    "190102070"
-                  MOVE    ZERO  TO    FLG-NYUKSN
+               IF    WRK-NYUKHNKSN-SRYCD(IDX8)   =   "190102070"
+                  MOVE    1     TO    FLG-NYUKSN
                END-IF
            END-IF
       *
