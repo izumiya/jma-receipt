@@ -842,7 +842,10 @@
              AND  (SPA-SYONIKA-ARI NOT =   9   )
                PERFORM 1001-SYONIKA-CHK-SEC
            ELSE
-               MOVE    ZERO                TO  SPA-SYONIKA-ARI3
+      *        初診・再診料への変換
+               IF      SPA-SYONIKA-ARI     =   9
+                   MOVE    ZERO                TO  SPA-SYONIKA-ARI3
+               END-IF
                MOVE    ZERO                TO  SPA-SYONIKA-ARI2
                MOVE    ZERO                TO  SPA-SYONIKA-ARI
            END-IF
@@ -2525,6 +2528,7 @@
       *H26.4
            IF     (SPA-DOUJITU         >   ZERO)
              AND  (WRK-DAYCNT-SUM      =   ZERO)
+             AND  (SPA-SYORIFLG        =   ZERO)
       *        同日に受診があり、小児科外来以外の算定は再診料とする
                MOVE    ZERO            TO  FLG-SYONIKA-ARI
                MOVE    ZERO            TO  SPA-SYONIKA-ARI3
@@ -6210,7 +6214,7 @@
                      AND  (SPA-HKNKBN          =   ZERO )
                        PERFORM 1001-SYONIKA-CHK-SEC
                    ELSE
-                       MOVE    ZERO            TO  SPA-SYONIKA-ARI3
+      **H26.5**        MOVE    ZERO            TO  SPA-SYONIKA-ARI3
                        MOVE    ZERO            TO  SPA-SYONIKA-ARI2
                        MOVE    ZERO            TO  SPA-SYONIKA-ARI
                    END-IF
