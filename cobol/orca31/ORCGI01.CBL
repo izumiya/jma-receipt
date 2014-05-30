@@ -6293,45 +6293,45 @@
       *****************************************************************
        410111-IPPAN-NYUIN-CHK-SEC      SECTION.
       *
-           MOVE    ZERO            TO  FLG-IPPAN
+           MOVE    1               TO  FLG-IPPAN
            MOVE    ZERO            TO  FLG-IPPAN2
       *
-           MOVE    SPA-NAI-I01-IDOYMD
-                                   TO  WRK-YMD
-           MOVE    "1"         TO  WRK-ZOGENPTN
-           MOVE    -1          TO  WRK-ZOGEN
-           PERFORM 5002-CALENDAR-SEC
+      *    MOVE    SPA-NAI-I01-IDOYMD
+      *                            TO  WRK-YMD
+      *    MOVE    "1"         TO  WRK-ZOGENPTN
+      *    MOVE    -1          TO  WRK-ZOGEN
+      *    PERFORM 5002-CALENDAR-SEC
       *
-           PERFORM 900-NRRKSRH-KEY2-SEL-SEC
+      *    PERFORM 900-NRRKSRH-KEY2-SEL-SEC
       *
-           DISPLAY "NRRKSRH-SRYYMD="  NRRKSRH-SRYYMD
+      *    DISPLAY "NRRKSRH-SRYYMD="  NRRKSRH-SRYYMD
       *
-           PERFORM UNTIL ( FLG-NRRKSRH NOT =   ZERO )
-                    OR   ( FLG-IPPAN       =   1    )
+      *    PERFORM UNTIL ( FLG-NRRKSRH NOT =   ZERO )
+      *             OR   ( FLG-IPPAN       =   1    )
       *
-               PERFORM 900-NSRYSRH-KEY-SEL-SEC
+      *        PERFORM 900-NSRYSRH-KEY-SEL-SEC
       *
-               IF    ( NSRYSRH-SRYCD   =   "099999914" )
+      *        IF    ( NSRYSRH-SRYCD   =   "099999914" )
       *
-                   MOVE    "5001"          TO  WRK-KANRICD
-                   MOVE    NSRYSRH-BRMNUM (1:2)
-                                           TO  WRK-KBNCD
-                   MOVE    NRRKSRH-SRYYMD  TO  WRK-YUKYMD
-                   PERFORM 900-SYSKANRI-KEY10-SEL-SEC
-                   MOVE    SYSKANRI-REC    TO  SYS-5001-REC
-                   DISPLAY "SYS-5001-BTU-SBT=" SYS-5001-BTU-SBT
-                   IF    ( SYS-5001-BTU-SBT =  "01" )
-                       MOVE    1           TO  FLG-IPPAN
-                   END-IF
-               END-IF
+      *            MOVE    "5001"          TO  WRK-KANRICD
+      *            MOVE    NSRYSRH-BRMNUM (1:2)
+      *                                    TO  WRK-KBNCD
+      *            MOVE    NRRKSRH-SRYYMD  TO  WRK-YUKYMD
+      *            PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+      *            MOVE    SYSKANRI-REC    TO  SYS-5001-REC
+      *            DISPLAY "SYS-5001-BTU-SBT=" SYS-5001-BTU-SBT
+      *            IF    ( SYS-5001-BTU-SBT =  "01" )
+      *                MOVE    1           TO  FLG-IPPAN
+      *            END-IF
+      *        END-IF
       *
-               PERFORM 900-NRRKSRH-KEY2-FET-SEC
+      *        PERFORM 900-NRRKSRH-KEY2-FET-SEC
       *
-           END-PERFORM
+      *    END-PERFORM
       *
-           MOVE    "tbl_nrrksrh"       TO  MCP-TABLE
-           MOVE    "key2"              TO  MCP-PATHNAME
-           PERFORM 910-DBCLOSECURSOR-SEC
+      *    MOVE    "tbl_nrrksrh"       TO  MCP-TABLE
+      *    MOVE    "key2"              TO  MCP-PATHNAME
+      *    PERFORM 910-DBCLOSECURSOR-SEC
       *
            .
        410111-IPPAN-NYUIN-CHK-EXT.
