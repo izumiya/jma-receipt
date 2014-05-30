@@ -5157,12 +5157,10 @@
                    MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-NYUINKA
                    MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-RECEKA
                ELSE
-                   IF    ( WRK-BTU-KA-CD   NOT =   SPACE )
                        MOVE    WRK-BTU-KA-CD   TO  WRK-CMB-CD
                        PERFORM 4103-CMB-NYUINKA-CHK-SEC
                        MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-NYUINKA
                        MOVE    WRK-CMB-ITM2 TO SPA-NAI-I01-RECEKA
-                   END-IF
                END-IF
            END-IF
       *
@@ -6313,27 +6311,18 @@
       *
                PERFORM 900-NSRYSRH-KEY-SEL-SEC
       *
-               MOVE    NSRYSRH-SRYCD   TO  WRK-SRYCD
-               MOVE    NRRKSRH-SRYYMD  TO  WRK-SRYYMD
-               PERFORM 901-TENSU-KEY-SEL-SEC
-               IF    ( TNS-DATAKBN         =   1 )
-                AND  ( TNS-CDKBN-KBN       = "A" )
-                AND (( TNS-CDKBN-KBNNUM    = 100 OR 101 OR 109)
-                  OR(( TNS-CDKBN-KBNNUM    = 308 )
-                   AND(TNS-CDKBN-KBNNUM-EDA =  3 )))
+               IF    ( NSRYSRH-SRYCD   =   "099999914" )
       *
-                   MOVE    1           TO  FLG-IPPAN
-      *
-                   IF    TNS-CDKBN-KBNNUM   =   100
-                       MOVE    1       TO  FLG-IPPAN2
+                   MOVE    "5001"          TO  WRK-KANRICD
+                   MOVE    NSRYSRH-BRMNUM (1:2)
+                                           TO  WRK-KBNCD
+                   MOVE    NRRKSRH-SRYYMD  TO  WRK-YUKYMD
+                   PERFORM 900-SYSKANRI-KEY10-SEL-SEC
+                   MOVE    SYSKANRI-REC    TO  SYS-5001-REC
+                   DISPLAY "SYS-5001-BTU-SBT=" SYS-5001-BTU-SBT
+                   IF    ( SYS-5001-BTU-SBT =  "01" )
+                       MOVE    1           TO  FLG-IPPAN
                    END-IF
-                   IF    TNS-CDKBN-KBNNUM   =   101
-                       MOVE    2       TO  FLG-IPPAN2
-                   END-IF
-                   IF    TNS-CDKBN-KBNNUM   =   109
-                       MOVE    3       TO  FLG-IPPAN2
-                   END-IF
-      *
                END-IF
       *
                PERFORM 900-NRRKSRH-KEY2-FET-SEC
