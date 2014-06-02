@@ -2966,7 +2966,11 @@
            END-IF
       *!!!
       *    カルテ／処方箋発行処理（クライアント印刷の為、移動）
-           IF     (SPA-ERRCD           =   SPACE )
+      **** IF     (SPA-ERRCD           =   SPACE )
+           IF     (SPA-ERRCD      NOT  =   SPACE )
+             AND  (SPA-KEI-FLG         =   ZERO  )
+               CONTINUE
+           ELSE
                PERFORM 49023-HC01-SYORI-SEC
            END-IF
       *!!!
