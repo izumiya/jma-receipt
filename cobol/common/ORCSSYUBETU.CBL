@@ -110,6 +110,8 @@
       *
       *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.02    NACL-藤原    14/03/30  平成２６年４月改正対応
+      *  04.07.03    NACL-藤原    14/06/03  短期滞在手術基本料２（又は３）
+      *                                     で入院料未算定日の対応
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -846,8 +848,9 @@ grpsys         MOVE    LNK-SYUBETU-HOSPNUM TO  COMB-HOSPNUM
       *        入院会計より保険組合せ読込     
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       31
-                   IF      WRK-DAY (1 IDX)     >   ZERO    AND
-                           WRK-DAY (2 IDX)     >   ZERO
+                   IF  ( ( WRK-DAY (1 IDX)        >   ZERO ) OR
+                         ( LNK-NYUINDAY-KBN(IDX)  =   "1"  )    )  AND
+                         ( WRK-DAY (2 IDX)        >   ZERO  )
                        PERFORM 20021-NYUINACCT-CHK-SEC
                    END-IF
                END-PERFORM        
