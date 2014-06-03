@@ -1799,7 +1799,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
@@ -1872,7 +1872,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
@@ -1946,7 +1946,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
@@ -2009,7 +2009,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
@@ -2081,7 +2081,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
@@ -2144,7 +2144,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
@@ -2216,7 +2216,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
@@ -2279,7 +2279,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
@@ -2351,7 +2351,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
@@ -2414,7 +2414,7 @@
                                PERFORM   VARYING IDX-KSN  FROM
                                                  WRK-KSN-DD   BY   1
                                  UNTIL   IDX-KSN  >   31
-                                     IF  NACCT-DAY(IDX-KSN)  =   1
+                                     IF  KSN-NACCT-DAY(IDX-KSN)  =   1
                                          ADD  1  TO  WRK-KYUKYU-NISSU
                                      END-IF
                                END-PERFORM
