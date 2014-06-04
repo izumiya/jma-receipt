@@ -908,7 +908,7 @@
                    07  SPA-GMN24-FTNMSG2             PIC X(16).
       *
                    07  SPA-GMN24-KOHFTNTBL2.
-                       09  SPA-GMN24-FTNTBL2-OCC         OCCURS  100.
+                       09  SPA-GMN24-FTNTBL2-OCC         OCCURS  300.
                            11  SPA-GMN24-TGMNNUM2        PIC 9(03).
                            11  SPA-GMN24-TFTNSTYMD       PIC X(10).
                            11  SPA-GMN24-TFTNEDYMD       PIC X(10).
@@ -961,7 +961,7 @@
                            11  SPA-GMN24-TNKTEKKBN-MAX   PIC 9(04).
       *            ∏¯»Ò…È√¥≥€ΩËÕ˝»œ∞œ
                    07  SPA-NAI24-KOHFTNETC.
-                       09  SPA-NAI24-KOHFTNETC-OCC       OCCURS   100.
+                       09  SPA-NAI24-KOHFTNETC-OCC       OCCURS   300.
                            11  SPA-NAI24-KOHFTN-ID       PIC 9(10).
                            11  SPA-NAI24-KOHFTN-YM       PIC X(06).
       *

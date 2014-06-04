@@ -44,6 +44,7 @@
       *  04.05.00    NACL-Â¿¡¹Ç¼  09/07/XX  ´µ¼Ô¸øÈñÉéÃ´³Ûµ¡Ç½ÄÉ²Ã
       *                                     ¸øÈñÉéÃ´³ÛÌ¤ÆþÎÏ·Ù¹ðÂÐ±þ
       *  04.07.00    NACL-Â¿¡¹Ç¼  11/11/07  ÃÏÊý¸øÈñÉéÃ´³ÛÊÑ¹¹ÂÐ±þ
+      *  04.07.00    NACL-Â¿¡¹Ç¼  14/06/04  ¸øÈñÉéÃ´³Û¾å¸Â·ï¿ôÂÐ±þ
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -185,6 +186,9 @@
       *¸øÈñ·ï¿ô
        01  TBL-MAX-KOH             PIC 9(03)   VALUE   60.
       *
+      *¸øÈñ°ìÉôÉéÃ´·ï¿ô
+       01  MAX-KOHFTN              PIC 9(03)   VALUE   300.
+      *
       *****************************************************************
       *    ¥Õ¥¡¥¤¥ë¥ì¥¤¥¢¥¦¥È
       *****************************************************************
@@ -212,7 +216,7 @@
       *
       *    ¸øÈñÉéÃ´ÊÝÂ¸
        01  LNK-PTKOHFTN-AREA.
-           02  LNK-PTKOHFTN-REC           OCCURS  100.
+           02  LNK-PTKOHFTN-REC           OCCURS  200.
            COPY    "CPPTKOHFTN.INC"
                        REPLACING  //PTKOHFTN-// BY //LNK-PTKOHFTN-//.
       *    ¸øÈñÉéÃ´
@@ -222,7 +226,7 @@
       *    ¸øÈñÉéÃ´¹¹¿·ÊÝÂ¸
        01  HZN-PTKOHFTN-AREA.
            03  HZN-PTKOHFTN-OCC           OCCURS  60.
-               05  HZN-PTKOHFTN-OCC2          OCCURS  100.
+               05  HZN-PTKOHFTN-OCC2          OCCURS  200.
                    07  HZN-PTKOHFTN-REC       PIC X(200).
       *    ´µ¼Ô¸øÈñÉéÃ´
        01  PTKOHFTNETC-REC.
@@ -757,7 +761,7 @@
                IF      PTKOHFTN-KOHID      =   SPA-NAI24-KOHID
                                                         (WRK-FTN1-IDX)
                    ADD     1                   TO  IDX
-                   IF      IDX                 <=  100
+                   IF      IDX                 <=  MAX-KOHFTN
                        MOVE    PARA-DATA-REC   TO  LNK-PTKOHFTN-REC
                                                              (IDX)
                        MOVE    IDX             TO  SPA-FTN2-MAX
@@ -1225,8 +1229,9 @@
       *
            IF      SPA-NAI24-FTNSELNUM2    =   ZERO
       *        ÄÉ²Ã
-               IF      SPA-FTN2-MAX            >=  100
-                   MOVE    "2443"              TO  SPA-ERRCD
+               IF      SPA-FTN2-MAX            >=  MAX-KOHFTN
+      **********   MOVE    "2443"              TO  SPA-ERRCD
+                   MOVE    "2444"              TO  SPA-ERRCD
                    GO      TO              415-KOHFTN-KOUSIN-EXT
                END-IF
                ADD     1                       TO  SPA-FTN2-MAX
@@ -1368,7 +1373,7 @@
            PERFORM 990-DBCLOSE-SEC
       *    ¹¹¿·ÂÐ¾ÝÊÔ½¸
            PERFORM VARYING     IDX3    FROM    1   BY   1
-                   UNTIL      (IDX3    >   100  )
+                   UNTIL      (IDX3    >   MAX-KOHFTN  )
                IF      SPA-NAI24-KOHFTN-ID (IDX3)   =   ZERO
                     MOVE    SPA-NAI24-KOHID(SPA-NAI24-FTNSELNUM)
                                            TO  SPA-NAI24-KOHFTN-ID
@@ -1384,7 +1389,7 @@
                AND    (SPA-NAI24-TFTNSTYMD (SPA-NAI24-FTNSELNUM2)(1:6)
                                            =   SPA-NAI24-KOHFTN-YM
                                                                  (IDX3))
-                   MOVE    100             TO  IDX3
+                   MOVE    MAX-KOHFTN      TO  IDX3
                END-IF
            END-PERFORM
            .
@@ -1447,8 +1452,9 @@
                MOVE    "2443"              TO  SPA-ERRCD
            END-IF
       *
-           IF      SPA-FTN2-MAX        >=  100
-               MOVE    "2443"              TO  SPA-ERRCD
+           IF      SPA-FTN2-MAX        >=  MAX-KOHFTN
+      ****     MOVE    "2443"              TO  SPA-ERRCD
+               MOVE    "2444"              TO  SPA-ERRCD
            END-IF
       *    ¸øÈñÉéÃ´³ÛÊ£¼Ì
            IF      (SPA-ERRCD          =   SPACE  ) 
@@ -2528,7 +2534,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                IF      PTKOHFTN-KOHID      =   SPA-NAI24-KOHID
                                                         (WRK-FTN1-IDX)
                    ADD     1                   TO  IDX
-                   IF      IDX                 <=  100
+                   IF      IDX                 <=  MAX-KOHFTN
                        MOVE    PARA-DATA-REC   TO  LNK-PTKOHFTN-REC
                                                              (IDX)
                        MOVE    IDX             TO  SPA-FTN2-MAX
@@ -2720,7 +2726,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
                MOVE    ZERO                TO  IDP-2
            END-IF
            ADD     1                   TO  IDP-2
-           IF      IDP-2               <=  100
+           IF      IDP-2               <=  MAX-KOHFTN
                MOVE    PARA-DATA-REC   TO  HZN-PTKOHFTN-REC
                                                         (IDP-1 IDP-2)
            END-IF
@@ -2788,7 +2794,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
            PERFORM VARYING IDX         FROM    1   BY  1
                    UNTIL   IDX         >   IDP-1
                PERFORM VARYING IDY         FROM    1   BY  1
-                       UNTIL  (IDY         >   100 )  OR
+                       UNTIL  (IDY         >   MAX-KOHFTN )  OR
                               (HZN-PTKOHFTN-REC(IDX IDY) =   SPACE)
                    ADD     1                   TO  WRK-PARA-EDANUM
                    MOVE    SPACE               TO  PARA-REC
@@ -2884,7 +2890,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                    IF      SPA-NAI24-FTNDELKBN (IDX2)  =   "1" 
       *                ¹¹¿·ÂÐ¾ÝÊÔ½¸
                        PERFORM VARYING     IDX3    FROM    1   BY   1
-                               UNTIL      (IDX3    >   100  )
+                               UNTIL      (IDX3    >   MAX-KOHFTN  )
                            IF      SPA-NAI24-KOHFTN-ID (IDX3)  =   ZERO
                                MOVE    SPA-NAI24-KOHID(IDX2)
                                                TO  SPA-NAI24-KOHFTN-ID
@@ -2895,7 +2901,7 @@ grpsys     CALL    "ORCDBMAIN"         USING   MCPAREA
                                                                 (IDX3))
                                MOVE    SPACE    TO  SPA-NAI24-KOHFTN-YM
                                                                 (IDX3)
-                               MOVE    100      TO  IDX3
+                               MOVE    MAX-KOHFTN      TO  IDX3
                            END-IF
                        END-PERFORM
                    END-IF

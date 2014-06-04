@@ -941,8 +941,8 @@ P02	{
 							value3	varchar(9);
 							value4	varchar(9);
 							value5	varchar(4);
-						}	[100];
-						select	bool[100];
+						}	[300];
+						select	bool[300];
 					};
 				};
 				P024_FTNSELNUM	{

@@ -1063,6 +1063,12 @@
                WHEN    "2443"
                    MOVE    "公費適用終了日以降分は複写できません。"
                                                TO  SPA-ERRMSG
+               WHEN    "2444"
+                   STRING  "上限額履歴が３００件以上となります。"
+                           "登録できません。"
+                                               DELIMITED  BY  SIZE
+                                               INTO  SPA-ERRMSG
+                   END-STRING
                WHEN    "2445"
                    MOVE    "他一部負担入力対象外公費です。"
                                                TO  SPA-ERRMSG

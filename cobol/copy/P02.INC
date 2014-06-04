@@ -660,14 +660,14 @@
                       07  P02-P024-HFTNLST2-COUNT   PIC S9(9)   BINARY.
                       07  P02-P024-HFTNLST2-ROW      PIC S9(9)   BINARY.
                       07  P02-P024-HFTNLST2-ROWATTR  PIC S9(9)   BINARY.
-                      07  P02-ITEM        OCCURS 100 TIMES.
+                      07  P02-ITEM        OCCURS 300 TIMES.
                         08  P02-P024-TFTNNUM2  PIC X(3).
                         08  P02-P024-TFTNSTYMD  PIC X(9).
                         08  P02-P024-TFTNEDYMD  PIC X(9).
                         08  P02-P024-TGAIJGNGAK PIC X(9).
                         08  P02-P024-TNYUJGNGAK PIC X(9).
                         08  P02-P024-TFTNETC    PIC X(4).
-                      07  P02-P024-HFTNLST2-SELECT  PIC X   OCCURS 100.
+                      07  P02-P024-HFTNLST2-SELECT  PIC X   OCCURS 300.
                   05  P02-P024-FTNSELNUM.
                     06  P02-VALUE   PIC S9(3).
                   05  P02-P024-FTNSELNUM2.

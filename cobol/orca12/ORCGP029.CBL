@@ -218,6 +218,10 @@
                05  FILLER          PIC X(01)   VALUE  ":".
                05  WRK-TMM         PIC 99.
       *
+      *公費一部負担件数
+       01  MAX-KOHFTN              PIC 9(03)   VALUE   300.
+      *
+      *
       *****************************************************************
       *    ファイルレイアウト
       *****************************************************************
@@ -2494,7 +2498,7 @@ grpsys         CALL    "ORCDBMAIN"         USING   MCPAREA
       *
       *    今回更新対象月分はすべて削除
            PERFORM VARYING     IDX     FROM    1  BY  1
-                   UNTIL      (IDX     >   100 )  OR
+                   UNTIL      (IDX     >   MAX-KOHFTN )  OR
                               (SPA-NAI24-KOHFTN-ID (IDX)   =   ZERO)
                INITIALIZE                      PTKOHFTNETC-REC
                MOVE    SPA-HOSPNUM         TO  PTKOHFTNETC-HOSPNUM
