@@ -6945,11 +6945,16 @@
                GO  TO  4101-BTUNAME-CHK-EXT
            END-IF
       *
+           MOVE    SPACE               TO  WRK-BTU-KA-CD
+                                           WRK-BRM-KA-CD
+      *
            MOVE    SPA-GMN-I01-BTUNAME-CD
                                        TO  WRK-CMB-CD
            PERFORM 4103-CMB-BTUNAME-CHK-SEC
            IF    ( WRK-CMB-ITM     NOT =   SPACE )
                MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-BTUNAME
+               MOVE    WRK-CMB-ITM3 TO WRK-BTU-KA-CD
+               MOVE    WRK-CMB-ITM4 TO WRK-BRM-KA-CD
       *        室料差額のデフォルト値を設定
                MOVE    WRK-CMB-ITM2
                                    TO  WRK-CMB-CD
@@ -6957,18 +6962,16 @@
                MOVE    WRK-CMB-ITM TO  SPA-GMN-I01-SAGAKU
       *
       *        診療科の初期値を設定
-               IF    ( WRK-CMB-ITM4    NOT =   SPACE )
-                   MOVE    WRK-CMB-ITM4        TO  WRK-CMB-CD
+               IF    ( WRK-BRM-KA-CD   NOT =   SPACE )
+                   MOVE    WRK-BRM-KA-CD       TO  WRK-CMB-CD
                    PERFORM 4103-CMB-NYUINKA-CHK-SEC
                    MOVE    WRK-CMB-ITM         TO  SPA-GMN-I01-NYUINKA
                    MOVE    WRK-CMB-ITM2        TO  SPA-NAI-I01-RECEKA
                ELSE
-                   IF    ( WRK-CMB-ITM3    NOT =   SPACE )
-                       MOVE    WRK-CMB-ITM3    TO  WRK-CMB-CD
+                       MOVE    WRK-BTU-KA-CD   TO  WRK-CMB-CD
                        PERFORM 4103-CMB-NYUINKA-CHK-SEC
                        MOVE    WRK-CMB-ITM     TO  SPA-GMN-I01-NYUINKA
                        MOVE    WRK-CMB-ITM2    TO  SPA-NAI-I01-RECEKA
-                   END-IF
                END-IF
            ELSE
                MOVE    "0015"      TO  SPA-ERRCD
