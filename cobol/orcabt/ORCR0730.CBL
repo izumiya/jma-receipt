@@ -197,6 +197,7 @@
       *  04.07.13    NACL-門脇    14/02/03  第三者行為対応（院外処方のみの
       *                                     保険組み合わせの病名記載対応）
       *  04.07.14    NACL-藤原    14/04/22  ＥＦファイル作成対応
+      *  04.07.15    NACL-門脇    14/06/05  第三者行為のコメント記載修正
       *****************************************************************
       *
        ENVIRONMENT                 DIVISION.
@@ -8627,14 +8628,12 @@
                ELSE
                    EVALUATE    SYS-2005-NEXTPRTKBN
                      WHEN    "0"
-                       MOVE  WRK-TITLE  TO  HC06-TEKIYO (WRK-LINETEK)
-                     WHEN    "1"
                        MOVE  WRK-TITLE  TO  HC061-TEKIYO(WRK-LINETEK)
-                     WHEN    "2"
+                     WHEN    "1"
                        MOVE  WRK-TITLE  TO  HC062-TEKIYO(WRK-LINETEK)
-                     WHEN    "3"
+                     WHEN    "2"
                        MOVE  WRK-TITLE  TO  HC063-TEKIYO(WRK-LINETEK)
-                    END-EVALUATE
+                   END-EVALUATE
                END-IF
       *
                IF   RECE62-DAISAN-TOTALTEN  NOT = ZERO
@@ -8667,14 +8666,12 @@
                  ELSE
                      EVALUATE    SYS-2005-NEXTPRTKBN
                        WHEN    "0"
-                         MOVE  WRK-TITLE  TO  HC06-TEKIYO (WRK-LINETEK)
-                       WHEN    "1"
                          MOVE  WRK-TITLE  TO  HC061-TEKIYO(WRK-LINETEK)
-                       WHEN    "2"
+                       WHEN    "1"
                          MOVE  WRK-TITLE  TO  HC062-TEKIYO(WRK-LINETEK)
-                       WHEN    "3"
+                       WHEN    "2"
                          MOVE  WRK-TITLE  TO  HC063-TEKIYO(WRK-LINETEK)
-                      END-EVALUATE
+                     END-EVALUATE
                  END-IF
                END-IF
       *
@@ -8709,14 +8706,12 @@
                  ELSE
                      EVALUATE    SYS-2005-NEXTPRTKBN
                        WHEN    "0"
-                         MOVE  WRK-TITLE  TO  HC06-TEKIYO (WRK-LINETEK)
-                       WHEN    "1"
                          MOVE  WRK-TITLE  TO  HC061-TEKIYO(WRK-LINETEK)
-                       WHEN    "2"
+                       WHEN    "1"
                          MOVE  WRK-TITLE  TO  HC062-TEKIYO(WRK-LINETEK)
-                       WHEN    "3"
+                       WHEN    "2"
                          MOVE  WRK-TITLE  TO  HC063-TEKIYO(WRK-LINETEK)
-                      END-EVALUATE
+                     END-EVALUATE
                  END-IF
                END-IF
       *
@@ -8750,14 +8745,12 @@
                ELSE
                    EVALUATE    SYS-2005-NEXTPRTKBN
                      WHEN    "0"
-                       MOVE  WRK-TITLE  TO  HC06-TEKIYO (WRK-LINETEK)
-                     WHEN    "1"
                        MOVE  WRK-TITLE  TO  HC061-TEKIYO(WRK-LINETEK)
-                     WHEN    "2"
+                     WHEN    "1"
                        MOVE  WRK-TITLE  TO  HC062-TEKIYO(WRK-LINETEK)
-                     WHEN    "3"
+                     WHEN    "2"
                        MOVE  WRK-TITLE  TO  HC063-TEKIYO(WRK-LINETEK)
-                    END-EVALUATE
+                   END-EVALUATE
                END-IF
       *
                IF   RECE62-DAISAN-SKJ-RYOYOHI-KEI  NOT = ZERO
@@ -8791,14 +8784,12 @@
                  ELSE
                      EVALUATE    SYS-2005-NEXTPRTKBN
                        WHEN    "0"
-                         MOVE  WRK-TITLE  TO  HC06-TEKIYO (WRK-LINETEK)
-                       WHEN    "1"
                          MOVE  WRK-TITLE  TO  HC061-TEKIYO(WRK-LINETEK)
-                       WHEN    "2"
+                       WHEN    "1"
                          MOVE  WRK-TITLE  TO  HC062-TEKIYO(WRK-LINETEK)
-                       WHEN    "3"
+                       WHEN    "2"
                          MOVE  WRK-TITLE  TO  HC063-TEKIYO(WRK-LINETEK)
-                      END-EVALUATE
+                     END-EVALUATE
                  END-IF
                END-IF
            END-IF
