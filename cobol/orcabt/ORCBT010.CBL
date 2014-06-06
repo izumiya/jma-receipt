@@ -121,6 +121,7 @@
       *
       *  04.07.01    NACL-藤原    12/12/17  複数枚レセプト分割対応
       *  04.07.02    NACL-藤原    14/03/30  平成２６年４月改正対応
+      *  04.07.03    NACL-藤原    14/06/03  同日再入院対応
       *****************************************************************
       *
        ENVIRONMENT             DIVISION.
@@ -593,6 +594,9 @@
       *    レセプト種別返却サブ
            COPY    "CPORCSSYUBETUGET.INC".
       *
+      *    入院料未算定日取得サブ
+           COPY    "CPORCSNYUINDAY.INC".
+      *
       *    ＤＢ検索
            COPY    "MCPDATA.INC".
       *
@@ -916,11 +920,16 @@ grpsys             PERFORM 900-DBSELECT-SEC
                    PERFORM 900-NYUINACCT-READ-SEC
                END-PERFORM
       *
+      *        同日再入院のチェック
+               PERFORM 500-ORCSNYUINDAY-CHECK-SEC
+      *
       *        入院会計の保険組合せをまとめる
                PERFORM VARYING IDX FROM    1   BY  1
                        UNTIL   IDX >       31
-                   IF      WRK-DAY (1 IDX)     >   ZERO    AND
-                           WRK-DAY (2 IDX)     >   ZERO
+                   IF  ( ( WRK-DAY (1 IDX)     >   ZERO )  OR
+                         ( LNK-NYUINDAY-KBN (IDX)
+                                               =   "1"  )    )  AND
+                       (   WRK-DAY (2 IDX)     >   ZERO      )
                        PERFORM 20011-NYUINACCT-HENSYU-SEC
                    END-IF
                END-PERFORM        
@@ -2871,6 +2880,13 @@ grpsys                                         SPA-AREA
                END-IF 
            END-PERFORM
       *
+           IF      LNK-SYUBETUGET-HKNNUM
+                                       =   WRK-CONS-ROUSAI-HKNNUM  OR
+                                           WRK-CONS-JIBAI-HKNNUM 
+               MOVE    TOUKEI01-HKNKBN     TO  LNK-SYUBETUGET-HKNKBN
+               MOVE    TOUKEI01-SAIGAIKBN  TO  LNK-SYUBETUGET-SAIGAIKBN
+           END-IF
+      *
       *    後期高齢非該当の有無設定
            MOVE    ZERO            TO  WRK-KOUKI-FLG
       *
@@ -3560,6 +3576,84 @@ grpsys     PERFORM 900-CALL-ORCSJOB-SEC
            .
       *
        500-PT-HDIST-DAY-HENSYU-EXT.
+           EXIT.
+      *
+      *****************************************************************
+      *    同日再入院チェック処理
+      *****************************************************************
+       500-ORCSNYUINDAY-CHECK-SEC          SECTION.
+      *
+           INITIALIZE                      ORCSNYUINDAY-AREA
+           MOVE    SPA-HOSPNUM         TO  LNK-NYUINDAY-HOSPNUM
+           MOVE    WRK-PARA-SRYYM      TO  LNK-NYUINDAY-SANTEIYM
+           MOVE    PTINF-PTID          TO  LNK-NYUINDAY-PTID
+           CALL    "ORCSNYUINDAY"      USING   ORCSNYUINDAY-AREA
+                                               SPA-AREA
+      *
+           IF      LNK-NYUINDAY-RC     >   0
+               DISPLAY "LNK-NYUINDAY-RC=" LNK-NYUINDAY-RC
+               GO  TO  500-ORCSNYUINDAY-CHECK-EXT
+           END-IF
+      *
+           PERFORM VARYING IDXX    FROM    1   BY  1
+                   UNTIL   IDXX    >       31
+               IF      LNK-NYUINDAY-DOUJITSU-KBN (IDXX)
+                                               =   "1"
+                   PERFORM VARYING IDX1    FROM    1   BY  1
+                           UNTIL   IDX1    >   10
+      *                保険組合せ追加
+                       IF      WRK-COMB-HKNCOMBINUM (IDX1)
+                                                   =   ZERO
+                           INITIALIZE                      HKNCOMBI-REC
+                           MOVE    WRK-PARA-HOSPNUM    TO  COMB-HOSPNUM
+                           MOVE    PTINF-PTID          TO  COMB-PTID
+                           MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
+                                                       TO
+                                                       COMB-HKNCOMBINUM 
+                           MOVE    HKNCOMBI-REC        TO  MCPDATA-REC
+                           PERFORM 910-HKNCOMBI-INV-SEC
+      *                    （対象外の組合せは１をセット）
+                           IF      FLG-HKNCOMBI    =   ZERO
+                               MOVE    HKNCOMBI-REC    TO
+                                               WRK-HKNCOMBI-REC(IDX1)
+                           ELSE
+                               MOVE    LNK-NYUINDAY-DOUJITSU-HKNCOMBI
+                                                               (IDXX)
+                                                       TO
+                                           WRK-COMB-HKNCOMBINUM (IDX1)
+                               MOVE    "1"             TO
+                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
+                           END-IF
+                       END-IF
+      *
+      *                適用範囲かチェック（範囲外のとき２をセット）
+                       IF      LNK-NYUINDAY-DOUJITSU-HKNCOMBI (IDXX)
+                                               =
+                                           WRK-COMB-HKNCOMBINUM (IDX1)
+                           IF      WRK-HKNCOMBI-SYOKBN (IDX1)
+                                               NOT =   SPACE
+                               CONTINUE                    
+                           ELSE     
+                               MOVE    WRK-STYMD       TO  WRK-YMD
+                               MOVE    IDXX            TO  WRK-DD
+                               IF      WRK-COMB-TEKSTYMD (IDX1)
+                                                       <=  WRK-YMD
+                               AND     WRK-COMB-TEKEDYMD (IDX1)
+                                                       >=  WRK-YMD
+                                   CONTINUE
+                               ELSE   
+                                   MOVE    "2"         TO
+                                           WRK-HKNCOMBI-SYOKBN  (IDX1)
+                               END-IF
+                           END-IF
+                           MOVE    10              TO  IDX1
+                       END-IF            
+                   END-PERFORM
+               END-IF
+           END-PERFORM
+      *
+           .
+       500-ORCSNYUINDAY-CHECK-EXT.
            EXIT.
       *
       *****************************************************************
