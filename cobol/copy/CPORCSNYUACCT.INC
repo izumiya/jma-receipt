@@ -88,6 +88,8 @@
            03  LNK-SCNYUACCT-DOUJITSUKBN             PIC  X(01).
       *診療会計削除開始日
            03  LNK-SCNYUACCT-SRYDELYMD               PIC  X(08).
+      *異動取消時の入院会計作成区分
+           03  LNK-SCNYUACCT-IDOSAKUSEI-KBN          PIC  X(01).
       *復帰コード
            03  LNK-SCNYUACCT-RC                      PIC S9(9) BINARY.
       *
